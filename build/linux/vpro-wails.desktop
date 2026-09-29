@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=vpro-wails
+Exec=vpro-wails
+Icon=vpro-wails
+Categories=Development;
+Terminal=false
+Keywords=wails
+Version=1.0
+StartupNotify=false
