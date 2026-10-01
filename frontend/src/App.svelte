@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import { Events } from '@wailsio/runtime';
   import { ChevronLeft, ChevronRight, Database, FolderOpen, RefreshCw } from '@lucide/svelte';
   import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary } from '../bindings/github.com/boostao/vpro-wails';
@@ -8,6 +8,7 @@
   import Navigation from './Navigation.svelte';
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
+  import { ReadRequests } from './readRequests';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -18,6 +19,10 @@
   let busy = $state(false);
   let error = $state('');
   let request = 0;
+  const plotReads = new ReadRequests();
+  const hierarchyReads = new ReadRequests();
+  let hierarchyRequest = 0;
+  onDestroy(() => { request++; hierarchyRequest++; plotReads.cancelAll(); hierarchyReads.cancelAll(); });
   let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882'>('home');
   let contextExpanded = $state(false);
   let editorBusy = $state(false);
@@ -147,10 +152,11 @@
 
   async function loadPlots(nextOffset: number) {
     const current = ++request;
+    plotReads.cancelAll();
     busy = true;
     error = '';
     try {
-      const result = await ProjectService.ListPlots(nextOffset, pageSize);
+      const result = await plotReads.track(ProjectService.ListPlots(nextOffset, pageSize));
       if (current !== request) return;
       page = result;
       offset = nextOffset;
@@ -174,10 +180,21 @@
       }
       projectState.set(await ProjectService.GetState());
       await loadPlots(0);
-      hierarchyNodes = await ProjectService.GetHierarchyNodes() ?? [];
+      await loadHierarchy();
     } catch (cause) {
       error = String(cause);
       busy = false;
+    }
+  }
+
+  async function loadHierarchy() {
+    const current = ++hierarchyRequest;
+    hierarchyReads.cancelAll();
+    try {
+      const nodes = await hierarchyReads.track(ProjectService.GetHierarchyNodes());
+      if (current === hierarchyRequest) hierarchyNodes = nodes ?? [];
+    } catch (cause) {
+      if (current === hierarchyRequest) throw cause;
     }
   }
 
@@ -190,6 +207,10 @@
   }
 
   async function switchContext(contextId: string, selection: ContextSelection, next: 'plots' | 'hierarchy') {
+    request++;
+    hierarchyRequest++;
+    plotReads.cancelAll();
+    hierarchyReads.cancelAll();
     busy = true;
     error = '';
     try {
@@ -203,7 +224,7 @@
       view = next;
       await loadPlots(0);
       if (next === 'hierarchy') {
-        try { hierarchyNodes = await ProjectService.GetHierarchyNodes() ?? []; }
+        try { await loadHierarchy(); }
         catch (cause) { error = `Context changed, but hierarchy refresh failed: ${String(cause)}`; }
       }
     } finally {

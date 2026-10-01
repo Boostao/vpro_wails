@@ -270,8 +270,18 @@ project bytes restored after owned close; audits/config/catalogues/supports matc
 beta.26's delayed acknowledgement is handled only for an owned explicitly
 cancelled promise with a RuntimeError whose message is exactly `context canceled`;
 other rejected reads remain errors, including unrelated cancelled promises.
-C3 remains open for browse/project/hierarchy/reference/catalogue reads and their
-frontend ownership, plus any remaining coordinator/metadata lock waits.
+C3b browse/hierarchy/reference is implemented and promoted: injected contexts
+reach the pinned coordinator and all four reference SQL readers; context-aware
+lock acquisition also covers coordinator/pool and scoped snapshot waits. App
+browse/hierarchy and FS882 reference/species ownership cancels supersession/unmount
+without stale results or mutation cancellation. Focused race3.235s, full
+race339.024s,143 frontend tests/check0/0/build; actual bindings remain15/104/33.
+Native generated browse and species promises interrupt expensive SQLite queries;
+switch release0.375s, subsequent header/browse/species/list metadata identical,
+no unhandled errors. Synthetic project/reference schemas are removed and exact
+original file bytes restored after owned close; all fixture files match.
+C3 remains open for catalogue and state/discovery reads and their frontend
+ownership; do not claim the full cleanup or migration gate complete.
 wire C3 along affected retrieval paths without coupling it to an all-service rewrite.
 C4/C5 fit between subsequent validated workflows and do not block parent migration
 merely to reduce file/service counts. Run focused Go tests/benchmarks first, full
@@ -349,7 +359,7 @@ No pending writes or owned native process need continuation.
 C1 pooling and C2 verification caching are complete and promoted. C2 native proof
 preserves all fixture bytes through warm reads, corruption, remount, failed Retry,
 atomic restoration and successful Retry without resetting invalid drafts.
-Next complete the remaining C3 browse/reference/catalogue cancellation on the
+Next complete the remaining C3 catalogue/state/discovery cancellation on the
 affected retrieval paths, then classify and implement the remaining ordinary surveyor/text/
 depth/cover/note fields from the already sealed source checklist. Do not repeat
 reference capture or field-by-field audit matrices. Remaining21: AirPhotoNum, BECSiteUnit, EnteredBy,

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -25,7 +26,7 @@ type HierarchyNode struct {
 	Level  *int64  `json:"level"`
 }
 
-func hierarchyCompatible(database *sql.DB, table string) (bool, error) {
+func hierarchyCompatible(database headerDB, table string) (bool, error) {
 	rows, err := database.Query(`PRAGMA table_info("` + table + `")`)
 	if err != nil {
 		return false, err
@@ -141,6 +142,10 @@ func inspectHierarchies(database *sql.DB, file string) ([]HierarchyInfo, error) 
 }
 
 func listHierarchyNodes(path, name string) ([]HierarchyNode, error) {
+	return listHierarchyNodesContext(context.Background(), path, name)
+}
+
+func listHierarchyNodesContext(ctx context.Context, path, name string) ([]HierarchyNode, error) {
 	if !projectNamePattern.MatchString(name) {
 		return nil, fmt.Errorf("invalid hierarchy name %q", name)
 	}
@@ -151,20 +156,20 @@ func listHierarchyNodes(path, name string) ([]HierarchyNode, error) {
 	defer database.Close()
 	table := name + "_Hierarchy"
 	var exists bool
-	if err := database.QueryRow("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?)", table).Scan(&exists); err != nil {
+	if err := database.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?)", table).Scan(&exists); err != nil {
 		return nil, err
 	}
 	if !exists {
 		return nil, fmt.Errorf("hierarchy table %q does not exist", table)
 	}
-	compatible, err := hierarchyCompatible(database, table)
+	compatible, err := hierarchyCompatible(contextPlotDB{db: database, ctx: ctx}, table)
 	if err != nil {
 		return nil, err
 	}
 	if !compatible {
 		return nil, fmt.Errorf("hierarchy table %q has incompatible fields", table)
 	}
-	rows, err := database.Query(`SELECT ID, Name, Parent, Level FROM "` + table + `" ORDER BY ID`)
+	rows, err := database.QueryContext(ctx, `SELECT ID, Name, Parent, Level FROM "`+table+`" ORDER BY ID`)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"io"
 	"os"
@@ -21,7 +22,7 @@ func TestSampleProjectStartupAndPlots(t *testing.T) {
 	if state.ActiveProject != "Sample" || len(state.Projects) != 1 || !state.Projects[0].Compatible || state.Projects[0].Version != "VP08" {
 		t.Fatalf("unexpected startup state: %+v", state)
 	}
-	page, err := service.ListPlots(0, 10)
+	page, err := service.ListPlots(context.Background(), 0, 10)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +52,7 @@ func TestPlotPageBounds(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, bounds := range [][2]int{{-1, 10}, {0, 0}, {0, 201}} {
-		if _, err := service.ListPlots(bounds[0], bounds[1]); err == nil {
+		if _, err := service.ListPlots(context.Background(), bounds[0], bounds[1]); err == nil {
 			t.Fatalf("accepted invalid page: %v", bounds)
 		}
 	}
@@ -93,7 +94,7 @@ func TestSampleSUSelectionAndRecovery(t *testing.T) {
 	if err != nil || state.ActiveSU != "Sample" {
 		t.Fatalf("could not select Sample SU: %+v: %v", state, err)
 	}
-	page, err := service.ListPlots(0, 100)
+	page, err := service.ListPlots(context.Background(), 0, 100)
 	if err != nil || page.Total != 51 || len(page.Plots) != 51 {
 		t.Fatalf("SU did not filter the Env-SU-Admin intersection: %+v: %v", page, err)
 	}
@@ -109,7 +110,7 @@ func TestSampleSUSelectionAndRecovery(t *testing.T) {
 	if err != nil || state.ActiveSU != "None" {
 		t.Fatalf("could not clear SU: %+v: %v", state, err)
 	}
-	page, err = reopened.ListPlots(0, 100)
+	page, err = reopened.ListPlots(context.Background(), 0, 100)
 	if err != nil || page.Total != 52 {
 		t.Fatalf("clearing SU did not restore project plots: %+v: %v", page, err)
 	}
@@ -134,7 +135,7 @@ func TestProjectPlotsExcludeEnvRowsWithoutAdmin(t *testing.T) {
 	if err := database.Close(); err != nil {
 		t.Fatal(err)
 	}
-	page, err := service.ListPlots(0, 100)
+	page, err := service.ListPlots(context.Background(), 0, 100)
 	if err != nil || page.Total != 52 || len(page.Plots) != 52 {
 		t.Fatalf("unmatched Env row appeared in project-wide USysEnv: %+v: %v", page, err)
 	}
@@ -176,7 +177,7 @@ func TestHierarchySelectionSurvivesRestartAndProjectSwitch(t *testing.T) {
 	if err != nil || state.ActiveHierarchy != "Sample" || state.HierarchyFile != "Sample.db" {
 		t.Fatalf("could not select bundled hierarchy: %+v: %v", state, err)
 	}
-	nodes, err := service.GetHierarchyNodes()
+	nodes, err := service.GetHierarchyNodes(context.Background())
 	if err != nil || len(nodes) != 43 {
 		t.Fatalf("bundled hierarchy nodes unavailable: %d: %v", len(nodes), err)
 	}
@@ -222,7 +223,7 @@ func TestHierarchyFileIdentityAndMissingRecovery(t *testing.T) {
 	if err != nil || state.HierarchyFile != "Trees.db" || len(state.Hierarchies) != 2 {
 		t.Fatalf("hierarchy identity lost: %+v: %v", state, err)
 	}
-	nodes, err := service.GetHierarchyNodes()
+	nodes, err := service.GetHierarchyNodes(context.Background())
 	if err != nil || len(nodes) != 1 || nodes[0].ID != 91 {
 		t.Fatalf("wrong hierarchy source selected: %+v: %v", nodes, err)
 	}
@@ -364,7 +365,7 @@ func TestProjectSwitchSurvivesRestart(t *testing.T) {
 	if err != nil || state.ActiveProject != "Other" || state.ActiveSU != "None" {
 		t.Fatalf("selection was not restored: %+v: %v", state, err)
 	}
-	page, err := reopened.ListPlots(50, 25)
+	page, err := reopened.ListPlots(context.Background(), 50, 25)
 	if err != nil || page.Total != 52 || len(page.Plots) != 2 {
 		t.Fatalf("second project pagination failed: %+v: %v", page, err)
 	}

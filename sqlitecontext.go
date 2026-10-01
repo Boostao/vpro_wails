@@ -35,7 +35,9 @@ func sqliteFileURI(path, mode string) string {
 }
 
 func (c *sqliteContext) projectDatabase(ctx context.Context) (*sql.DB, error) {
-	c.mu.Lock()
+	if err := acquireMutexLease(ctx, &c.mu); err != nil {
+		return nil, err
+	}
 	defer c.mu.Unlock()
 	if c.conn == nil {
 		return nil, errors.New("project context is closed")

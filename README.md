@@ -168,7 +168,12 @@ Native generated-promise cancellation interrupts SQLite, releases the switch lea
 and permits an identical subsequent read. beta.26 reports a delayed backend
 acknowledgement: only `context canceled` RuntimeErrors belonging to explicitly
 cancelled owned read promises are handled; unrelated failures remain visible.
-Browse/reference/catalogue cancellation is still pending, so C3 is not complete.
+Project browse/hierarchy and all four reference read methods now also receive
+injected contexts; coordinator and snapshot lock waits observe cancellation.
+Browse/hierarchy generations and species searches cancel superseded requests and
+reject stale results. Native generated browse/species promises interrupt SQLite
+and recover unchanged. Catalogue and state/discovery cancellation is still pending,
+so C3 is not complete.
 See C1-C5 in
 [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for bounded performance/cleanup gates,
 including incremental packages and optional typed catalogue transport consolidation.

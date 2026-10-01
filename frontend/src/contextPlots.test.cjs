@@ -44,7 +44,7 @@ test('context transitions reuse native close validation and preserve drafts unti
   assert.match(root, /const state = await ContextService\.SwitchContext[\s\S]*?projectState\.set\(state\)/);
   assert.match(root, /\{#key \$projectState\?\.contextId\}/);
   assert.match(form, /bindContextPlots\(untrack\(\(\) => contextId\)\)/);
-  assert.match(form, /onDestroy\(\(\) => \{ loadRequest\+\+; reads\.cancelAll\(\); \}\)/);
+  assert.match(form, /onDestroy\(\(\) => \{[\s\S]*?loadRequest\+\+;[\s\S]*?reads\.cancelAll\(\)/);
 });
 
 test('verified external attachment defaults on and project choices visibly identify their files', () => {

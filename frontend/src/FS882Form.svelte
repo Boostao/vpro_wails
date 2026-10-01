@@ -34,6 +34,10 @@
   let { plotNumber, contextId, onSaved, onClosed, onBusyChange }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void } = $props();
   const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
   const reads = new ReadRequests();
+  const referenceReads = new ReadRequests();
+  const speciesReads = new ReadRequests();
+  let referenceRequest = 0;
+  let speciesRequest = 0;
 
   let activeTab = $state<'site' | 'veg' | 'vegOther' | 'soils' | 'other' | 'audit'>('site');
   let vegetationMode = $state<VegetationMode>('initial');
@@ -62,7 +66,10 @@
   type ChildKind = 'Veg' | 'Humus' | 'Mineral' | 'Other';
   let childCapabilities = $state<Record<ChildKind, Record<string, boolean | undefined>>>({ Veg: {}, Humus: {}, Mineral: {}, Other: {} });
   let loadRequest = 0;
-  onDestroy(() => { loadRequest++; reads.cancelAll(); });
+  onDestroy(() => {
+    loadRequest++; referenceRequest++; speciesRequest++;
+    reads.cancelAll(); referenceReads.cancelAll(); speciesReads.cancelAll();
+  });
   let container: HTMLDivElement;
 
   $effect(() => { onBusyChange?.(busy || headerWorkflowBusy); });
@@ -428,19 +435,22 @@
   });
 
   async function loadReferenceLists() {
+    const request = ++referenceRequest;
+    referenceReads.cancelAll();
     try {
       const [m, n, ms, ss] = await Promise.all([
-        ReferenceService.GetListItems('MoistureRegime'),
-        ReferenceService.GetListItems('NutrientRegime'),
-        ReferenceService.GetListItems('MesoSlopePosition'),
-        ReferenceService.GetListItems('SurfaceShape'),
+        referenceReads.track(ReferenceService.GetListItems('MoistureRegime')),
+        referenceReads.track(ReferenceService.GetListItems('NutrientRegime')),
+        referenceReads.track(ReferenceService.GetListItems('MesoSlopePosition')),
+        referenceReads.track(ReferenceService.GetListItems('SurfaceShape')),
       ]);
+      if (request !== referenceRequest) return;
       moistureList = m ?? [];
       nutrientList = n ?? [];
       mesoSlopeList = ms ?? [];
       surfaceShapeList = ss ?? [];
     } catch (e) {
-      error = `Reference lists could not be loaded: ${String(e)}`;
+      if (request === referenceRequest) error = `Reference lists could not be loaded: ${String(e)}`;
     }
   }
 
@@ -462,18 +472,22 @@
   );
 
   async function searchSpecies() {
+    const request = ++speciesRequest;
+    speciesReads.cancelAll();
     if (!speciesSearchQuery.trim()) {
       speciesSearchResults = [];
+      searchingSpecies = false;
       return;
     }
     searchingSpecies = true;
     try {
-      const res = await ReferenceService.SearchSpecies(speciesSearchQuery, 15);
+      const res = await speciesReads.track(ReferenceService.SearchSpecies(speciesSearchQuery, 15));
+      if (request !== speciesRequest) return;
       speciesSearchResults = res ?? [];
     } catch (e) {
-      error = `Species search failed: ${String(e)}`;
+      if (request === speciesRequest) error = `Species search failed: ${String(e)}`;
     } finally {
-      searchingSpecies = false;
+      if (request === speciesRequest) searchingSpecies = false;
     }
   }
 

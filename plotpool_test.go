@@ -17,7 +17,7 @@ import (
 func poolFixture(t *testing.T) (*ContextService, ProjectState, *FS882Header) {
 	t.Helper()
 	service, state := contextServiceFixture(t)
-	page, err := service.projects.ListPlots(0, 1)
+	page, err := service.projects.ListPlots(context.Background(), 0, 1)
 	if err != nil || len(page.Plots) != 1 {
 		t.Fatalf("plot fixture: %+v %v", page, err)
 	}
@@ -274,7 +274,7 @@ func BenchmarkPlotPoolReads(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	page, err := projects.ListPlots(0, 1)
+	page, err := projects.ListPlots(context.Background(), 0, 1)
 	if err != nil || len(page.Plots) != 1 {
 		b.Fatal("benchmark plot is unavailable", err)
 	}

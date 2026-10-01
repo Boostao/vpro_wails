@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"embed"
 	"fmt"
@@ -93,9 +94,14 @@ func (s *ReferenceService) Close() error {
 }
 
 // SearchSpecies searches the BC master species list by code prefix or name fragment.
-func (s *ReferenceService) SearchSpecies(query string, limit int) ([]SpeciesItem, error) {
-	s.mu.RLock()
+func (s *ReferenceService) SearchSpecies(ctx context.Context, query string, limit int) ([]SpeciesItem, error) {
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
+	if s.db == nil {
+		return nil, fmt.Errorf("reference catalogue is closed")
+	}
 
 	if limit <= 0 || limit > 100 {
 		limit = 30
@@ -117,7 +123,7 @@ func (s *ReferenceService) SearchSpecies(query string, limit int) ([]SpeciesItem
 			ScientificName
 		LIMIT ?`
 
-	rows, err := s.db.Query(sqlQuery, prefix, pattern, pattern, prefix, limit)
+	rows, err := s.db.QueryContext(ctx, sqlQuery, prefix, pattern, pattern, prefix, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -136,13 +142,18 @@ func (s *ReferenceService) SearchSpecies(query string, limit int) ([]SpeciesItem
 		}
 		list = append(list, sp)
 	}
-	return list, nil
+	return list, rows.Err()
 }
 
 // GetSpecies returns full details for a single species by code.
-func (s *ReferenceService) GetSpecies(code string) (*SpeciesItem, error) {
-	s.mu.RLock()
+func (s *ReferenceService) GetSpecies(ctx context.Context, code string) (*SpeciesItem, error) {
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
+	if s.db == nil {
+		return nil, fmt.Errorf("reference catalogue is closed")
+	}
 
 	c := strings.ToUpper(strings.TrimSpace(code))
 	if c == "" {
@@ -151,7 +162,7 @@ func (s *ReferenceService) GetSpecies(code string) (*SpeciesItem, error) {
 
 	var sp SpeciesItem
 	var lf sql.NullInt64
-	err := s.db.QueryRow(`
+	err := s.db.QueryRowContext(ctx, `
 		SELECT Code, ScientificName, EnglishName, Lifeform, FamilyCode, Authority
 		FROM Species
 		WHERE Code = ?`, c).Scan(&sp.Code, &sp.ScientificName, &sp.EnglishName, &lf, &sp.FamilyCode, &sp.Authority)
@@ -169,16 +180,21 @@ func (s *ReferenceService) GetSpecies(code string) (*SpeciesItem, error) {
 }
 
 // GetListItems returns sorted options for a specific VPRO dropdown list.
-func (s *ReferenceService) GetListItems(listName string) ([]ListItem, error) {
-	s.mu.RLock()
+func (s *ReferenceService) GetListItems(ctx context.Context, listName string) ([]ListItem, error) {
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
+	if s.db == nil {
+		return nil, fmt.Errorf("reference catalogue is closed")
+	}
 
 	lname := strings.TrimSpace(listName)
 	if lname == "" {
 		return nil, nil
 	}
 
-	rows, err := s.db.Query(`
+	rows, err := s.db.QueryContext(ctx, `
 		SELECT ListName, Item, ItemDescription, ItemOrder, FieldUsedIn
 		FROM Lists
 		WHERE ListName = ?
@@ -200,15 +216,20 @@ func (s *ReferenceService) GetListItems(listName string) ([]ListItem, error) {
 		}
 		list = append(list, it)
 	}
-	return list, nil
+	return list, rows.Err()
 }
 
 // GetAllLists returns all dropdown items grouped by list name.
-func (s *ReferenceService) GetAllLists() (map[string][]ListItem, error) {
-	s.mu.RLock()
+func (s *ReferenceService) GetAllLists(ctx context.Context) (map[string][]ListItem, error) {
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
+	if s.db == nil {
+		return nil, fmt.Errorf("reference catalogue is closed")
+	}
 
-	rows, err := s.db.Query(`
+	rows, err := s.db.QueryContext(ctx, `
 		SELECT ListName, Item, ItemDescription, ItemOrder, FieldUsedIn
 		FROM Lists
 		ORDER BY ListName, ItemOrder, Item`)
@@ -229,5 +250,5 @@ func (s *ReferenceService) GetAllLists() (map[string][]ListItem, error) {
 		}
 		result[it.ListName] = append(result[it.ListName], it)
 	}
-	return result, nil
+	return result, rows.Err()
 }

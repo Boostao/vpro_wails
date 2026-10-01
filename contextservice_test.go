@@ -103,7 +103,7 @@ func TestContextServiceOperationLeaseBlocksSwitchUntilOriginalContextCompletes(t
 		_, err := withContextPlot(service, before.ContextID, func(scoped *PlotService) (struct{}, error) {
 			close(entered)
 			<-release
-			page, err := scoped.projects.ListPlots(0, 1)
+			page, err := scoped.projects.ListPlots(context.Background(), 0, 1)
 			if err != nil {
 				return struct{}{}, err
 			}

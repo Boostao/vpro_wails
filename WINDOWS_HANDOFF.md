@@ -38,7 +38,7 @@ between shells.
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current and candidate executables contain the same verified default-on payload:
   `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`, SHA256
-  `e3bfec439d1e85f51078a47f4e164580463d0c023eff4ef3a05b8fb3cc2556e9`.
+  `1c6487a7ee168b4ddac3d38930e840961d21065ff8fedf3c13382c3f5ce8e856`.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -118,8 +118,24 @@ between shells.
   acknowledgement candidate/receipt are retained separately.
   beta.26's delayed backend `context canceled` acknowledgement is handled only for
   an owned explicitly cancelled read promise/RuntimeError; all unrelated errors
-  remain visible. C3 remains open for browse/hierarchy/reference/catalogue reads,
-  their frontend cancellation and remaining coordinator/metadata lock waits.
+  remain visible.
+- C3b browse/hierarchy/reference is implemented, tested and promoted. Injected
+  project/hierarchy contexts reach the pinned coordinator; all four reference
+  methods use context-aware SQL and return row iteration errors. Closed reference
+  services reject reads explicitly. Coordinator/pool and scoped snapshot lock waits
+  now observe cancellation. App browse/hierarchy and FS882 reference/species
+  requests own their generations, cancel supersession/unmount and reject stale
+  results. No mutation/switch cancellation or implicit retry.
+  Focused race3.235s/full race339.024s;143 frontend tests/check0/0/build; real
+  binding shapes15/104/33. Native generated browse/species cancellation interrupts
+  SQLite; switch release0.375s; subsequent header/browse/species/list metadata
+  identical, no unhandled errors. Exact project/reference bytes restored after
+  synthetic schema removal/owned close; audits/config/catalogues/supports match.
+  browse-native/browse-promotion receipts are in native-read-cancel; owned PID13204
+  exited and inspector9392 closed. Scoped fallback e3bfec43... sealed there as
+  vpro-scoped-read-verified.exe. Failed probe3076 was explicitly cancelled/closed,
+  both project/reference bytes restored; its receipt is retained.
+  C3 remains open for catalogue and state/discovery reads and frontend ownership.
 - Verified writable parent coverage: **77/98**. Full storage mapping and source
   layout are not full FS882 or application parity.
 - Responsive FS882 presentation is complete across all five source pages,
@@ -261,9 +277,9 @@ Peer-review follow-up is tracked in MIGRATION_PLAN.md C1-C5: C1 session-owned pl
 pool and coordinated ownership and C2 shared catalogue verification cache are delivered;
 cancellation through active bindings/SQL/frontend read promises alongside affected
 paths. Package extraction and optional typed catalogue transport follow incrementally
-between milestones, not as a broad rewrite. C3a scoped reads are delivered;
+between milestones, not as a broad rewrite. C3a scoped and C3b browse/reference reads are delivered;
 the rest of C3 and C4-C5 are pending. The promoted executable contains verified
-F1-F3 plus C1 pooling/C2 caching/C3a scoped-read cancellation.
+F1-F3 plus C1 pooling/C2 caching/C3a-C3b retrieval cancellation.
 Then resume ordinary surveyor/depth/cover/note fields. The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage has explicit LimitToList=NotDefault and needs a distinct membership

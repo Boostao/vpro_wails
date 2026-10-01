@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"testing"
 )
@@ -19,7 +20,7 @@ func TestReferenceService_SpeciesAndLists(t *testing.T) {
 	defer svc.Close()
 
 	// Test 1: Species search
-	matches, err := svc.SearchSpecies("ABIELAS", 10)
+	matches, err := svc.SearchSpecies(context.Background(), "ABIELAS", 10)
 	if err != nil {
 		t.Fatalf("SearchSpecies failed: %v", err)
 	}
@@ -41,7 +42,7 @@ func TestReferenceService_SpeciesAndLists(t *testing.T) {
 	}
 
 	// Test 2: Get single species
-	sp, err := svc.GetSpecies("ABIELAS")
+	sp, err := svc.GetSpecies(context.Background(), "ABIELAS")
 	if err != nil {
 		t.Fatalf("GetSpecies failed: %v", err)
 	}
@@ -50,7 +51,7 @@ func TestReferenceService_SpeciesAndLists(t *testing.T) {
 	}
 
 	// Test 3: List items (MoistureRegime)
-	items, err := svc.GetListItems("MoistureRegime")
+	items, err := svc.GetListItems(context.Background(), "MoistureRegime")
 	if err != nil {
 		t.Fatalf("GetListItems failed: %v", err)
 	}
@@ -59,7 +60,7 @@ func TestReferenceService_SpeciesAndLists(t *testing.T) {
 	}
 
 	// Test 4: GetAllLists
-	all, err := svc.GetAllLists()
+	all, err := svc.GetAllLists(context.Background())
 	if err != nil {
 		t.Fatalf("GetAllLists failed: %v", err)
 	}

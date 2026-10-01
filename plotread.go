@@ -8,16 +8,24 @@ import (
 )
 
 func acquireReadLease(ctx context.Context, mutex *sync.RWMutex) error {
+	return acquireContextLock(ctx, mutex.TryRLock, mutex.RLock, mutex.RUnlock)
+}
+
+func acquireMutexLease(ctx context.Context, mutex *sync.Mutex) error {
+	return acquireContextLock(ctx, mutex.TryLock, mutex.Lock, mutex.Unlock)
+}
+
+func acquireContextLock(ctx context.Context, tryLock func() bool, lock, unlock func()) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
 	if ctx.Done() == nil {
-		mutex.RLock()
+		lock()
 		return nil
 	}
-	if mutex.TryRLock() {
+	if tryLock() {
 		if err := ctx.Err(); err != nil {
-			mutex.RUnlock()
+			unlock()
 			return err
 		}
 		return nil
@@ -30,9 +38,9 @@ func acquireReadLease(ctx context.Context, mutex *sync.RWMutex) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-			if mutex.TryRLock() {
+			if tryLock() {
 				if err := ctx.Err(); err != nil {
-					mutex.RUnlock()
+					unlock()
 					return err
 				}
 				return nil

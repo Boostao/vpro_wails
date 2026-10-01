@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"errors"
 	"os"
@@ -54,11 +55,11 @@ func TestSQLiteProjectServiceStartupRestoresOwnedContextAndPreservesYAML(t *test
 		state.ActiveProject != "Sample" || state.ActiveHierarchy != "Sample" {
 		t.Fatalf("incomplete restored context: %+v %v", state, err)
 	}
-	page, err := service.ListPlots(0, 25)
+	page, err := service.ListPlots(context.Background(), 0, 25)
 	if err != nil || page.Total == 0 || len(page.Plots) == 0 {
 		t.Fatalf("pinned project views did not load plots: %+v %v", page, err)
 	}
-	nodes, err := service.GetHierarchyNodes()
+	nodes, err := service.GetHierarchyNodes(context.Background())
 	if err != nil || len(nodes) == 0 {
 		t.Fatalf("pinned hierarchy did not load: %v %v", nodes, err)
 	}
@@ -110,7 +111,7 @@ func TestSQLiteProjectServiceFailedPublishKeepsHandlesSelectionAndPreferences(t 
 	if err != nil || !bytes.Equal(content, actual) {
 		t.Fatal("failed publication changed previous YAML bytes")
 	}
-	if _, err := service.ListPlots(0, 25); err != nil {
+	if _, err := service.ListPlots(context.Background(), 0, 25); err != nil {
 		t.Fatalf("failed publication closed the previous context: %v", err)
 	}
 	preferences.replace = os.Rename
@@ -163,7 +164,7 @@ func TestSQLiteProjectServiceExternalPathsDriveExistingReadsAndWrites(t *testing
 	if err != nil {
 		t.Fatal(err)
 	}
-	page, err := service.ListPlots(0, 1)
+	page, err := service.ListPlots(context.Background(), 0, 1)
 	if err != nil || len(page.Plots) != 1 {
 		t.Fatal("external coordinator did not supply plot rows")
 	}
@@ -251,7 +252,7 @@ func TestSQLiteProjectServiceClosedContextRejectsReads(t *testing.T) {
 	if _, err := service.GetState(); err == nil {
 		t.Fatal("closed context returned success-shaped state")
 	}
-	if _, err := service.ListPlots(0, 25); err == nil {
+	if _, err := service.ListPlots(context.Background(), 0, 25); err == nil {
 		t.Fatal("closed context returned successful plot data")
 	}
 	if _, err := conn.ExecContext(t.Context(), "SELECT 1"); !errors.Is(err, sql.ErrConnDone) {

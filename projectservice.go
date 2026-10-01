@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"embed"
 	"encoding/json"
@@ -692,11 +693,13 @@ func (service *ProjectService) SelectHierarchy(name, file string) (ProjectState,
 	return ProjectState{ActiveProject: service.active, ActiveSU: service.activeSU, ActiveHierarchy: name, HierarchyFile: file, Projects: projects, SUs: sus, Hierarchies: hierarchies, Diagnostics: diagnostics}, nil
 }
 
-func (service *ProjectService) GetHierarchyNodes() ([]HierarchyNode, error) {
-	service.mu.RLock()
+func (service *ProjectService) GetHierarchyNodes(ctx context.Context) ([]HierarchyNode, error) {
+	if err := acquireReadLease(ctx, &service.mu); err != nil {
+		return nil, err
+	}
 	if service.sqlite != nil {
 		defer service.mu.RUnlock()
-		return service.sqliteHierarchyLocked()
+		return service.sqliteHierarchyLocked(ctx)
 	}
 	service.mu.RUnlock()
 	service.mu.RLock()
@@ -712,7 +715,7 @@ func (service *ProjectService) GetHierarchyNodes() ([]HierarchyNode, error) {
 	if !hasCompatibleHierarchy(hierarchies, name, file) {
 		return nil, errors.New("active hierarchy is no longer available")
 	}
-	return listHierarchyNodes(filepath.Join(service.root, "projects", file), name)
+	return listHierarchyNodesContext(ctx, filepath.Join(service.root, "projects", file), name)
 }
 
 func (service *ProjectService) saveSelection(name, su string) error {
@@ -789,14 +792,19 @@ func (service *ProjectService) saveSelectionWithHierarchy(name, su, hierarchy, f
 	return nil
 }
 
-func (service *ProjectService) ListPlots(offset, limit int) (PlotPage, error) {
+func (service *ProjectService) ListPlots(ctx context.Context, offset, limit int) (PlotPage, error) {
+	if err := ctx.Err(); err != nil {
+		return PlotPage{}, err
+	}
 	if offset < 0 || limit < 1 || limit > 200 {
 		return PlotPage{}, errors.New("plot page requires a nonnegative offset and a limit from 1 to 200")
 	}
-	service.mu.RLock()
+	if err := acquireReadLease(ctx, &service.mu); err != nil {
+		return PlotPage{}, err
+	}
 	if service.sqlite != nil {
 		defer service.mu.RUnlock()
-		return service.sqlitePlotsLocked(offset, limit)
+		return service.sqlitePlotsLocked(ctx, offset, limit)
 	}
 	service.mu.RUnlock()
 	service.mu.RLock()
@@ -829,10 +837,10 @@ func (service *ProjectService) ListPlots(offset, limit int) (PlotPage, error) {
 		from += ` AND EXISTS (SELECT 1 FROM "` + activeSU + `_SU" AS su WHERE su.PlotNumber = env.PlotNumber)`
 	}
 	page := PlotPage{Plots: []PlotSummary{}}
-	if err := database.QueryRow("SELECT COUNT(*)" + from).Scan(&page.Total); err != nil {
+	if err := database.QueryRowContext(ctx, "SELECT COUNT(*)"+from).Scan(&page.Total); err != nil {
 		return PlotPage{}, err
 	}
-	rows, err := database.Query("SELECT env.PlotNumber, env.FieldNumber, env.PlotRepresenting, env.Zone, env.SubZone, env.SiteSeries"+from+" ORDER BY env.PlotNumber LIMIT ? OFFSET ?", limit, offset)
+	rows, err := database.QueryContext(ctx, "SELECT env.PlotNumber, env.FieldNumber, env.PlotRepresenting, env.Zone, env.SubZone, env.SiteSeries"+from+" ORDER BY env.PlotNumber LIMIT ? OFFSET ?", limit, offset)
 	if err != nil {
 		return PlotPage{}, err
 	}

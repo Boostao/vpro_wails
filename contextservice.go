@@ -50,7 +50,10 @@ func withContextPlotRequest[T any](ctx context.Context, s *ContextService, expec
 		return result, err
 	}
 	defer s.projects.operationMu.RUnlock()
-	s.projects.mu.RLock()
+	if err := acquireReadLease(ctx, &s.projects.mu); err != nil {
+		var result T
+		return result, err
+	}
 	if expectedID == "" || expectedID != s.projects.contextID || s.projects.sqlite.conn == nil {
 		s.projects.mu.RUnlock()
 		var result T
@@ -62,7 +65,10 @@ func withContextPlotRequest[T any](ctx context.Context, s *ContextService, expec
 		hierarchyFile: s.projects.hierarchyFile, sqlite: s.projects.sqlite, contextID: s.projects.contextID,
 		preferences: s.projects.preferences, supportPaths: s.projects.supportPaths}
 	s.projects.mu.RUnlock()
-	s.plots.mu.RLock()
+	if err := acquireReadLease(ctx, &s.plots.mu); err != nil {
+		var result T
+		return result, err
+	}
 	plots := &PlotService{projects: projects, auditStrength: s.plots.auditStrength, currentUser: s.plots.currentUser,
 		siteCodes: s.plots.siteCodes, siteCodesError: s.plots.siteCodesError, contextScoped: true, requestContext: ctx}
 	s.plots.mu.RUnlock()

@@ -49,7 +49,7 @@ test('settled reads leave the ownership set and operational failures are not swa
   requests.cancelAll();
   assert.equal(cancelled, 0);
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(form, /loadRequest\+\+; reads\.cancelAll\(\)/);
+  assert.match(form, /loadRequest\+\+;[\s\S]*?reads\.cancelAll\(\)/);
   assert.match(form, /const request = \+\+loadRequest;\s+reads\.cancelAll\(\)/);
   for (const name of ['GetPlot', 'GetHeaderCapabilities', 'GetChildCapabilities', 'ListVegRecords',
     'ListHumusRecords', 'ListMineralRecords', 'ListOtherRecords', 'ListAuditEntries']) {
@@ -76,4 +76,18 @@ test('only owned cancelled read acknowledgements are handled, including after ed
   const unowned = new sdk.CancellablePromise(() => {});
   assert.equal(output.expectedReadCancellation(new sdk.CancelledRejectionError(unowned,
     new RuntimeError('context canceled'))), false);
+});
+
+test('browse, hierarchy, reference and species consumers own only their read generations', () => {
+  const root = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
+  const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  assert.match(root, /plotReads\.track\(ProjectService\.ListPlots/);
+  assert.match(root, /hierarchyReads\.track\(ProjectService\.GetHierarchyNodes/);
+  assert.match(root, /if \(current === hierarchyRequest\) hierarchyNodes/);
+  assert.match(root, /request\+\+;\s+hierarchyRequest\+\+;\s+plotReads\.cancelAll\(\);\s+hierarchyReads\.cancelAll\(\)/);
+  assert.match(form, /referenceReads\.track\(ReferenceService\.GetListItems/);
+  assert.match(form, /speciesReads\.track\(ReferenceService\.SearchSpecies/);
+  assert.match(form, /if \(request !== speciesRequest\) return/);
+  assert.match(form, /if \(request === speciesRequest\) searchingSpecies = false/);
+  assert.doesNotMatch(root, /Reads\.track\(ContextService\.SwitchContext/);
 });

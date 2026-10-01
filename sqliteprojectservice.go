@@ -266,14 +266,15 @@ func (service *ProjectService) sqliteStateLocked() (ProjectState, error) {
 		SUPath: selection.SUPath, HierarchyPath: selection.HierarchyPath}, nil
 }
 
-func (service *ProjectService) sqlitePlotsLocked(offset, limit int) (PlotPage, error) {
+func (service *ProjectService) sqlitePlotsLocked(ctx context.Context, offset, limit int) (PlotPage, error) {
 	coordinator := service.sqlite
-	coordinator.mu.Lock()
+	if err := acquireMutexLease(ctx, &coordinator.mu); err != nil {
+		return PlotPage{}, err
+	}
 	defer coordinator.mu.Unlock()
 	if coordinator.conn == nil {
 		return PlotPage{}, errors.New("project context is closed")
 	}
-	ctx := context.Background()
 	page := PlotPage{Plots: []PlotSummary{}}
 	if err := coordinator.conn.QueryRowContext(ctx, "SELECT COUNT(*) FROM USysEnv").Scan(&page.Total); err != nil {
 		return PlotPage{}, err
@@ -293,9 +294,11 @@ func (service *ProjectService) sqlitePlotsLocked(offset, limit int) (PlotPage, e
 	return page, rows.Err()
 }
 
-func (service *ProjectService) sqliteHierarchyLocked() ([]HierarchyNode, error) {
+func (service *ProjectService) sqliteHierarchyLocked(ctx context.Context) ([]HierarchyNode, error) {
 	coordinator := service.sqlite
-	coordinator.mu.Lock()
+	if err := acquireMutexLease(ctx, &coordinator.mu); err != nil {
+		return nil, err
+	}
 	defer coordinator.mu.Unlock()
 	if coordinator.conn == nil {
 		return nil, errors.New("project context is closed")
@@ -304,7 +307,7 @@ func (service *ProjectService) sqliteHierarchyLocked() ([]HierarchyNode, error) 
 	if coordinator.selection.Hierarchy == "None" {
 		return nodes, nil
 	}
-	rows, err := coordinator.conn.QueryContext(context.Background(), "SELECT ID,Name,Parent,Level FROM USysHierarchy ORDER BY Level,ID")
+	rows, err := coordinator.conn.QueryContext(ctx, "SELECT ID,Name,Parent,Level FROM USysHierarchy ORDER BY Level,ID")
 	if err != nil {
 		return nil, err
 	}
