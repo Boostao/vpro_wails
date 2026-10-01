@@ -15,6 +15,7 @@ type HierarchyInfo struct {
 	File       string `json:"file"`
 	Version    string `json:"version"`
 	Compatible bool   `json:"compatible"`
+	Path       string `json:"path,omitempty"`
 }
 
 type HierarchyNode struct {

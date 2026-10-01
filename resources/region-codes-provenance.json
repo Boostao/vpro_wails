@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "exporter": "native-access-dao-region-codes-v1",
+  "sourceSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "snapshotSha256": "73661609828f78625b083327a750e10819dc05a1a20e78e8c9c91b177ae739ee",
+  "databaseSha256": "5558aea1f888feec234a125050466405621fd6d71ccfbad9c498b2499f7a3ef6",
+  "typedCellsSha256": "16f7cf7b90a1bfc819288088216acad6f54a8a5e6691b51345245a247eadbc54",
+  "rows": 164,
+  "cells": 1640,
+  "sourceTable": "USysTableOfLists",
+  "sql": "Region: SELECT * FROM USysTableOfLists WHERE ListName=\"Region\" ORDER BY ItemOrder; Ecosection: SELECT * FROM USysTableOfLists WHERE ListName=\"ecosection\"",
+  "sourceSchema": [
+    {
+      "name": "ListName",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ListFilter",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemOrder",
+      "daoType": 7,
+      "size": 8
+    },
+    {
+      "name": "Item",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemDescription",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "FieldUsedIn",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ValidateLoops",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Validate",
+      "daoType": 1,
+      "size": 1
+    },
+    {
+      "name": "Note",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Flag",
+      "daoType": 1,
+      "size": 1
+    }
+  ],
+  "itemOrderEncoding": "nullable IEEE754 binary64 big-endian 8-byte BLOB; native source ordinal order"
+}

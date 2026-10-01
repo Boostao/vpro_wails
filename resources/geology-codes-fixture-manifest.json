@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "profile": "current-readonly-dao-bedrock-codes-v1",
+  "fixture": "geology-codes-fixture.json.gz",
+  "fixtureSha256": "2e8585380babdb7110615a43321900edeac882d573f25c99ed1780f93e0956f6",
+  "sourceByteSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "nativeDAOCellsSha256": "926d81a2100d88ac6ba6b9f548ae9ac7d3b48b75a41016a9eba1836d4a9241d0",
+  "rows": 87,
+  "cells": 870,
+  "sourceEvidence": "Current readonly DAO.DBEngine.120 BedrockType capture; not effective form, native UI or write-policy evidence",
+  "sourceFixture": "../evidence/private/bedrock-codes-dao/bedrock-codes.reference.json.gz",
+  "sourceProvenance": "../evidence/private/bedrock-codes-dao/provenance.json",
+  "sourceSchema": "../evidence/private/bedrock-codes-dao/schema.json"
+}

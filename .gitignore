@@ -14,6 +14,28 @@ build/android/gen/
 /data/
 /config/
 /evidence/private/
+# Local tooling, scratch work, validation output and compiled deliverables.
+/tools/
+/tmp/
+/temp/
+/.cache/
+/coverage/
+*.log
+*.tmp
+*.temp
+*.prof
+*.test
+*.exe
+coverage.out
+__pycache__/
+*.py[cod]
+# Native Access copies are private oracle data, not application resources.
+*.accdb
+*.mdb
+*.laccdb
+*.ldb
+# Keep resources/*.db, sealed fixture inputs and generated Wails bindings tracked:
+# they are needed for application builds and reproducible tests.
 .env
 .env.*
 !.env.example

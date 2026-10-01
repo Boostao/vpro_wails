@@ -1,0 +1,122 @@
+Audit:
+  AuditStrength: 1
+CHARS:
+  ShowCHARStreeVersion: 0
+Current:
+  AssignedSuSource: 1
+  CoordMethod: 1
+  CurrPlotlist: "None"
+  CurrProject: "Sample"
+  CurrHierarchy: "Sample"
+  HierarchyPath: ""
+  CurrVegProfile: "Sample"
+  DataFormName: "FS882-6x4"
+  DataFormNumber: "1"
+  ProjectIdSource: 2
+  ProjectPath: ""
+  SUPath: ""
+  User: "Admin"
+Diagnostic:
+  Name: "Diagnostic10"
+Export:
+  rExportUnits: 1
+  rVegBy: 1
+Hierarchy:
+  HierarchyBreaksOnRoots: 0
+Message:
+  DontShowDataQualityMessage: false
+  ShowWhatsNew: true
+PictureOptions:
+  PictureLibrary: 0
+Program:
+  Name: "VPro64"
+ReportOptions:
+  DataQualityFilterBECUse: 1
+  DataQualityFilterBECUseLV: "True"
+  DataQualityFilterEnforce: false
+  DataQualityFilterEnforceLV: false
+  DataQualityFilterSite: "Poor"
+  DataQualityFilterSiteLV: "Poor"
+  DataQualityFilterSiteNull: true
+  DataQualityFilterSiteNullLV: true
+  DataQualityFilterSoil: "Poor"
+  DataQualityFilterSoilLV: "Poor"
+  DataQualityFilterSoilNull: "True"
+  DataQualityFilterSoilNullLV: "True"
+  DataQualityFilterVeg: "Poor"
+  DataQualityFilterVegLV: "Poor"
+  DataQualityFilterVegNull: "True"
+  DataQualityFilterVegNullLV: "True"
+  GoogleEarthDescField: "PlotRepresenting"
+  GoogleEarthPlaceName: "VPro Plot Locations"
+  HDReportTitle: "Report Title"
+  HDShowQuestionableUnits: 0
+  HDShowTentativeUnits: 0
+  LEReportTitle: "Long Evironment Report"
+  LVAvgType: 10
+  LVConstantSppList: -1
+  LVCoverGreaterThan: 0
+  LVGroupBy: 1
+  LVOrderBy: 20
+  LVPresenceGreaterThan: 0
+  LVQuickReport: -1
+  LVReportSummary: -1
+  LVReportTitle: "Long Vegetation Report"
+  LVShowEnglishName: 1
+  LVSpaceBetweenGroups: 0
+  LVUnitGroups: 1
+  LVUseSppCodesOnly: 0
+  PcOrdGroup: 1
+  PcOrdLayerAsSpp: 0
+  PcOrdSppCodesOnly: 0
+  PcOrdSppGreater: 0
+  PcOrdStrataAsSpp: 0
+  SECoverCalc: 1
+  SEIncludeSppSummary: 0
+  SEOptAndOr: 1
+  SEOptValueMethod: 1
+  SEOrderBy: 1
+  SESelectSppCover: 0
+  SESelectSppPresent: 0
+  SESuType: 1
+  SVAvgType: 1
+  SVConstancyFormat: 0
+  SVGroupBy: 1
+  SVIncludeEnvFields: 0
+  SVReportSummary: -1
+  SVReportTitle: "Short veg report title"
+  SVReportUnits: 1
+  SVShowClass: 1
+  SVShowEnglishName: 0
+  SVShowGuideName: 0
+  SVShowHierarchyHeader: 0
+  SVShowValOpt: 0
+  SVSubSppAsSpp: 0
+  SVValue: 1
+  SppAttributeASMR: 0
+  SppAttributeClimate: 0
+  SppAttributeRedBlue: 0
+  SppAttributeReport: 1
+  SppAttributeSRank: 0
+  SppAttributeWeedStatus: 0
+  SppAttributeWetland: 0
+  cmbApplyTheme: 1
+  cmbColourGreater: 5
+  cmbGrayGreater: 65
+  cmbThemeTable: "Sample"
+SumVeg:
+  optLifeformSummary: 0
+  optSiteUnitType: 1
+System:
+  Build: "Thursday, February 23, 2023"
+  GEProgram: "C:/Program Files/Google/Google Earth/client/googleearth.exe"
+  RDataIn: "Three column"
+  RExeLocation: "C:/Program Files/R/R-*/bin/R.exe"
+  RunOnce: true
+  Version: 3
+  Website: "http://www.vuser.ca/VPro19/"
+UpdateOptions:
+  DoUpdateCheck: 0
+  DoUpdateCheckInterval: 15
+User:
+  ShowReadOnce: 0

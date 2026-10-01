@@ -1,34 +1,149 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { ChevronDown, ChevronLeft, ChevronRight, Database, FolderOpen, RefreshCw } from '@lucide/svelte';
-  import { ProjectService, type HierarchyNode, type PlotPage, type PlotSummary } from '../bindings/github.com/boostao/vpro-wails';
+  import { onMount, tick } from 'svelte';
+  import { Events } from '@wailsio/runtime';
+  import { ChevronLeft, ChevronRight, Database, FolderOpen, RefreshCw } from '@lucide/svelte';
+  import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary } from '../bindings/github.com/boostao/vpro-wails';
   import { projectState } from './state';
+  import FS882Form from './FS882Form.svelte';
+  import Navigation from './Navigation.svelte';
+  import CloseConfirm from './CloseConfirm.svelte';
+  import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
   let hierarchyNodes = $state<HierarchyNode[]>([]);
   let selected = $state<PlotSummary | null>(null);
+  let editorPlotNumber = $state<string | undefined>(undefined);
   let offset = $state(0);
   let busy = $state(false);
   let error = $state('');
   let request = 0;
-  let view = $state<'home' | 'plots' | 'hierarchy'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882'>('home');
+  let contextExpanded = $state(false);
+  let editorBusy = $state(false);
+  let editor: { getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean> } | undefined = $state();
+  let closeRequest = $state('');
+  let closeWorking = $state(false);
+  let closeError = $state('');
+  let pendingTransition = $state<{ contextId: string; run: (contextId: string) => Promise<void> } | null>(null);
+  let transitionWorking = $state(false);
+  let transitionError = $state('');
+  let externalProject = $state('');
+  let externalPath = $state('');
+  const externalProjectsEnabled = import.meta.env.VITE_EXTERNAL_PROJECTS !== 'false';
+  let startupFailure = $state<StartupState | null>(null);
+  const closeState = $derived(view === 'fs882' ? editor?.getCloseState() : undefined);
+
+  async function handleCloseRequest(requestId: string) {
+    if (closeWorking || closeRequest === requestId) return;
+    try {
+      if (await CloseService.GetPendingCloseRequest() !== requestId) return;
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      await tick();
+      const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
+      const disposition = closeDisposition(state, busy || transitionWorking || pendingTransition !== null || (view === 'fs882' && !editor));
+      if (disposition === 'busy') {
+        await CloseService.CancelClose(requestId);
+        error = 'Wait for the current operation to finish before closing VPRO.';
+      } else if (disposition === 'clean') {
+        await CloseService.ConfirmClose(requestId);
+      } else {
+        closeError = '';
+        closeRequest = requestId;
+      }
+    } catch (cause) {
+      error = `Window close request failed: ${String(cause)}`;
+    }
+  }
+
+  async function respondToClose(decision: CloseDecision) {
+    if (!closeRequest || closeWorking) return;
+    const requestId = closeRequest;
+    closeWorking = true;
+    closeError = '';
+    try {
+      if (decision === 'cancel') {
+        await CloseService.CancelClose(requestId);
+        closeRequest = '';
+        return;
+      }
+      const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
+      if (closeDisposition(state, busy || (view === 'fs882' && !editor)) === 'busy') {
+        closeError = 'Wait for the current operation to finish before closing VPRO.';
+        return;
+      }
+      if (decision === 'save') {
+        if (!editor || !await editor.saveForClose()) {
+          closeError = editor?.getCloseState().error ?? 'The draft could not be saved. VPRO remains open.';
+          return;
+        }
+      }
+      await CloseService.ConfirmClose(requestId);
+    } catch (cause) {
+      closeError = `VPRO remains open: ${String(cause)}`;
+    } finally {
+      closeWorking = false;
+    }
+  }
   let activeHierarchyIndex = $derived($projectState?.hierarchies?.findIndex(
-    (hierarchy) => hierarchy.name === $projectState?.activeHierarchy && hierarchy.file === $projectState?.hierarchyFile
+    (hierarchy) => hierarchy.name === $projectState?.activeHierarchy && hierarchy.path === $projectState?.hierarchyPath
+  ) ?? -1);
+  let activeSUIndex = $derived($projectState?.sus?.findIndex(
+    (su) => su.name === $projectState?.activeSU && su.path === $projectState?.suPath
   ) ?? -1);
 
-  const menus = [
-    { label: 'Forms', groups: [
-      { label: 'Data Entry', items: ['FS882 Data Forms (6x4)', 'Enter/Edit SIVI Data'] },
-      { label: 'Others', items: ['Metadata', 'Combine Species', 'Herbarium', 'Colour-theme', 'User setup', 'User log'] }
-    ] },
-    { label: 'Reports', groups: [
-      { label: 'Vegetation', items: ['Long Vegetation', 'Summary Vegetation'] },
-      { label: 'Environment', items: ['Long Environment', 'Summary Environment'] },
-      { label: 'Others', items: ['Subzone Matrix of Units', 'Hierarchy Diagram', 'Print a Plot Label', 'Create Plot Locations File', 'Show Plot Locations in Google Earth'] }
-    ] },
-    { label: 'Help', groups: [{ label: 'Help', items: ["What's New"] }] }
-  ];
+  async function requestTransition(run: (contextId: string) => Promise<void>) {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    await tick();
+    const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
+    if (closeDisposition(state, busy || editorBusy || transitionWorking || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
+      error = 'Wait for the current operation or decision before changing context.';
+      return;
+    }
+    const contextId = $projectState?.contextId;
+    if (!contextId) { error = 'A project context must finish loading before navigation.'; return; }
+    transitionError = '';
+    if (state?.unsaved) {
+      pendingTransition = { contextId, run };
+      return;
+    }
+    try { await run(contextId); }
+    catch (cause) { error = String(cause); }
+  }
+
+  async function respondToTransition(decision: CloseDecision) {
+    if (!pendingTransition || transitionWorking) return;
+    if (decision === 'cancel') { pendingTransition = null; transitionError = ''; return; }
+    const pending = pendingTransition;
+    transitionWorking = true;
+    transitionError = '';
+    try {
+      const state = editor?.getCloseState();
+      if (!state || closeDisposition(state, busy) === 'busy') {
+        transitionError = 'Wait for the current editor operation to finish.';
+        return;
+      }
+      if (decision === 'save' && state.unsaved && !await editor?.saveForClose()) {
+        transitionError = editor?.getCloseState().error ?? 'The draft could not be saved; context and draft remain open.';
+        return;
+      }
+      await pending.run(pending.contextId);
+      pendingTransition = null;
+    } catch (cause) {
+      transitionError = `Context remains unchanged: ${String(cause)}`;
+    } finally {
+      transitionWorking = false;
+    }
+  }
+
+  function navigate(next: typeof view) {
+    if (next === view) return;
+    void requestTransition(async () => {
+      error = '';
+      if (next === 'fs882') editorPlotNumber = selected?.plotNumber;
+      view = next;
+    });
+  }
 
   async function loadPlots(nextOffset: number) {
     const current = ++request;
@@ -51,6 +166,12 @@
     busy = true;
     error = '';
     try {
+      const startup = await StartupService.GetState();
+      if (!startup.ready) {
+        startupFailure = startup;
+        busy = false;
+        return;
+      }
       projectState.set(await ProjectService.GetState());
       await loadPlots(0);
       hierarchyNodes = await ProjectService.GetHierarchyNodes() ?? [];
@@ -60,110 +181,154 @@
     }
   }
 
-  async function chooseProject(name: string) {
-    busy = true;
-    error = '';
-    try {
-      projectState.set(await ProjectService.SelectProject(name));
-      await loadPlots(0);
-      view = 'plots';
-    } catch (cause) {
-      error = String(cause);
-      busy = false;
-    }
+  function selectedContext(): ContextSelection {
+    const state = $projectState;
+    if (!state?.projectPath) throw new Error('The active project file identity is unavailable.');
+    return { project: state.activeProject, projectPath: state.projectPath,
+      su: state.activeSU, suPath: state.suPath ?? '',
+      hierarchy: state.activeHierarchy, hierarchyPath: state.hierarchyPath ?? '' };
   }
 
-  async function chooseSU(event: Event) {
-    const select = event.currentTarget as HTMLSelectElement;
+  async function switchContext(contextId: string, selection: ContextSelection, next: 'plots' | 'hierarchy') {
     busy = true;
     error = '';
     try {
-      projectState.set(await ProjectService.SelectSU(select.value));
+      const state = await ContextService.SwitchContext(contextId, selection);
+      request++;
+      projectState.set(state);
+      page = null;
+      selected = null;
+      hierarchyNodes = [];
+      editorPlotNumber = undefined;
+      view = next;
       await loadPlots(0);
-    } catch (cause) {
-      error = String(cause);
-      select.value = $projectState?.activeSU ?? 'None';
-      busy = false;
-    }
-  }
-
-  async function chooseHierarchy(event: Event) {
-    const select = event.currentTarget as HTMLSelectElement;
-    const chosen = $projectState?.hierarchies?.[Number(select.value)];
-    busy = true;
-    error = '';
-    try {
-      projectState.set(await ProjectService.SelectHierarchy(chosen?.name ?? 'None', chosen?.file ?? ''));
-      hierarchyNodes = await ProjectService.GetHierarchyNodes() ?? [];
-      view = 'hierarchy';
-    } catch (cause) {
-      error = String(cause);
-      select.value = String(activeHierarchyIndex);
+      if (next === 'hierarchy') {
+        try { hierarchyNodes = await ProjectService.GetHierarchyNodes() ?? []; }
+        catch (cause) { error = `Context changed, but hierarchy refresh failed: ${String(cause)}`; }
+      }
     } finally {
       busy = false;
     }
   }
 
+  async function chooseProject(project: ProjectInfo) {
+    await requestTransition(async (contextId) => {
+      if (!project.path) throw new Error('Choose a project with an explicit file identity.');
+      const selection = selectedContext();
+      selection.project = project.name;
+      selection.projectPath = project.path;
+      selection.su = 'None';
+      selection.suPath = '';
+      await switchContext(contextId, selection, 'plots');
+    });
+  }
+
+  async function chooseSU(event: Event) {
+    const select = event.currentTarget as HTMLSelectElement;
+    const chosen = $projectState?.sus?.[Number(select.value)];
+    select.value = String(activeSUIndex);
+    await requestTransition(async (contextId) => {
+      const selection = selectedContext();
+      selection.su = chosen?.name ?? 'None';
+      selection.suPath = chosen?.path ?? '';
+      await switchContext(contextId, selection, 'plots');
+    });
+  }
+
+  async function chooseHierarchy(event: Event) {
+    const select = event.currentTarget as HTMLSelectElement;
+    const chosen = $projectState?.hierarchies?.[Number(select.value)];
+    select.value = String(activeHierarchyIndex);
+    await requestTransition(async (contextId) => {
+      const selection = selectedContext();
+      selection.hierarchy = chosen?.name ?? 'None';
+      selection.hierarchyPath = chosen?.path ?? '';
+      await switchContext(contextId, selection, 'hierarchy');
+    });
+  }
+
+  async function attachExternalProject(event: SubmitEvent) {
+    event.preventDefault();
+    const name = externalProject, path = externalPath;
+    await requestTransition(async (contextId) => {
+      const selection = selectedContext();
+      selection.project = name;
+      selection.projectPath = path;
+      selection.su = 'None';
+      selection.suPath = '';
+      await switchContext(contextId, selection, 'plots');
+    });
+  }
+
   onMount(() => {
+    const stopCloseEvents = Events.On('vpro:close-request', (event) => {
+      const requestId: unknown = event.data;
+      if (typeof requestId !== 'string' || !requestId) {
+        error = 'Invalid native window close request; VPRO remains open.';
+        return;
+      }
+      void handleCloseRequest(requestId);
+    });
+    void CloseService.GetPendingCloseRequest().then((requestId) => {
+      if (requestId) void handleCloseRequest(requestId);
+    }).catch((cause) => { error = `Window close handler could not initialise: ${String(cause)}`; });
     void refresh();
-    return () => { request++; };
+    return () => { request++; stopCloseEvents(); };
   });
 </script>
 
 <div class="app-shell">
   <header class="topbar">
     <div class="brand"><span class="brand-symbol" aria-hidden="true">V</span><span>VPRO</span></div>
-    <nav class="main-nav" aria-label="Main navigation">
-      <button class:current={view === 'home'} onclick={() => view = 'home'}>Home</button>
-      <button class:current={view === 'plots'} onclick={() => view = 'plots'}>Plots</button>
-      <button class:current={view === 'hierarchy'} onclick={() => view = 'hierarchy'}>Hierarchy</button>
-      {#each menus as menu (menu.label)}
-        <details class="nav-menu">
-          <summary>{menu.label}<ChevronDown size={14} aria-hidden="true" /></summary>
-          <div class="nav-menu-content">
-            <div class="nav-unavailable">Not yet available in the desktop app</div>
-            {#each menu.groups as group (group.label)}
-              <div class="nav-group-label">{group.label}</div>
-              {#each group.items as item (item)}
-                <button disabled title="Not yet available in the desktop app">{item}</button>
-              {/each}
-            {/each}
-          </div>
-        </details>
-      {/each}
-    </nav>
+    <button class="context-toggle" type="button" disabled={startupFailure !== null} aria-expanded={contextExpanded} aria-controls="project-context" onclick={() => contextExpanded = !contextExpanded}>Projects &amp; context</button>
+    {#if !startupFailure}<Navigation {view} onnavigate={navigate} />{/if}
     <div class="topbar-context"><Database size={16} strokeWidth={1.8} /><span>{$projectState?.activeProject ?? 'No project'}</span></div>
   </header>
 
-  <div class="workspace">
-    <aside class="sidebar" aria-label="Projects">
+  <div class="workspace" class:context-collapsed={!contextExpanded || startupFailure !== null}>
+    <aside id="project-context" class="sidebar" aria-label="Projects">
       <div class="sidebar-heading"><span>PROJECTS</span><FolderOpen size={17} strokeWidth={1.8} /></div>
       <nav aria-label="Project list">
-        {#each $projectState?.projects ?? [] as project (project.name)}
-          <button class:active={project.name === $projectState?.activeProject} disabled={!project.compatible || busy} title={project.compatible ? project.file : `${project.version} is not a complete VP08 project`} onclick={() => chooseProject(project.name)}>
-            <span class="project-name">{project.name}</span>
+        {#each $projectState?.projects ?? [] as project ((project.path ?? project.file) + project.name)}
+          <button class:active={project.name === $projectState?.activeProject && project.path === $projectState?.projectPath} disabled={!project.compatible || busy || transitionWorking} title={project.compatible ? project.path : `${project.version} is not a complete VP08 project`} onclick={() => chooseProject(project)}>
+            <span class="project-name">{project.name}
+              <span class="project-location">{$projectState?.projects?.filter(item => item.name === project.name).length === 1 ? project.file : project.path}</span>
+            </span>
             <span class="project-version">{project.version}</span>
           </button>
         {/each}
       </nav>
       <div class="su-picker">
         <label for="active-su">SITE UNIT</label>
-        <select id="active-su" value={$projectState?.activeSU ?? 'None'} onchange={chooseSU} disabled={busy || !$projectState}>
-          <option value="None">None</option>
-          {#each $projectState?.sus ?? [] as su (su.name)}
-            <option value={su.name} disabled={!su.compatible}>{su.name}{su.kind === 'master' ? ' (master)' : ''}</option>
+        <select id="active-su" value={String(activeSUIndex)} onchange={chooseSU} disabled={busy || transitionWorking || !$projectState}>
+          <option value="-1">None</option>
+          {#each $projectState?.sus ?? [] as su, index ((su.path ?? '') + su.name)}
+            <option value={String(index)} disabled={!su.compatible} title={su.path}>{su.name}{su.kind === 'master' ? ' (master)' : ''}</option>
           {/each}
         </select>
       </div>
       <div class="su-picker">
         <label for="active-hierarchy">HIERARCHY</label>
-        <select id="active-hierarchy" value={String(activeHierarchyIndex)} onchange={chooseHierarchy} disabled={busy || !$projectState}>
+        <select id="active-hierarchy" value={String(activeHierarchyIndex)} onchange={chooseHierarchy} disabled={busy || transitionWorking || !$projectState}>
           <option value="-1">None</option>
-          {#each $projectState?.hierarchies ?? [] as hierarchy, index (hierarchy.file + hierarchy.name)}
-            <option value={String(index)} disabled={!hierarchy.compatible}>{hierarchy.name} ({hierarchy.file})</option>
+          {#each $projectState?.hierarchies ?? [] as hierarchy, index ((hierarchy.path ?? hierarchy.file) + hierarchy.name)}
+            <option value={String(index)} disabled={!hierarchy.compatible} title={hierarchy.path}>{hierarchy.name} ({hierarchy.file})</option>
           {/each}
         </select>
       </div>
+      {#if externalProjectsEnabled}
+        <details class="su-picker">
+          <summary>Attach external SQLite project</summary>
+          <form onsubmit={attachExternalProject}>
+            <label for="external-project">PROJECT PREFIX</label>
+            <input id="external-project" bind:value={externalProject} required disabled={busy || transitionWorking} />
+            <label for="external-path">FULL SQLITE FILE PATH</label>
+            <input id="external-path" bind:value={externalPath} required disabled={busy || transitionWorking} />
+            <p>Attach does not copy or alter the file. Verified editors write to the attached file. Use disposable copies only.</p>
+            <button type="submit" disabled={busy || transitionWorking}>Attach project</button>
+          </form>
+        </details>
+      {/if}
       <div class="sidebar-footer">{$projectState?.projects?.length ?? 0} project{($projectState?.projects?.length ?? 0) === 1 ? '' : 's'}</div>
     </aside>
 
@@ -176,7 +341,14 @@
           {/each}
         </div>
       {/if}
-      {#if view === 'home'}
+      {#if startupFailure}
+        <section class="startup-recovery" role="alert">
+          <h1>Saved context could not be opened</h1>
+          <p>{startupFailure.message}</p>
+          <p>Saved preferences and existing databases have not been reset or replaced. No editor is enabled.</p>
+          <p>Correct the unavailable paths or malformed preferences in <code>{startupFailure.configPath}</code>, then restart VPRO.</p>
+        </section>
+      {:else if view === 'home'}
         <div class="content-heading"><div><div class="eyebrow">VPRO</div><h1>Home</h1></div></div>
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         <div class="home-summary">
@@ -184,6 +356,28 @@
           <button class="open-plots" onclick={() => view = 'plots'}>View plots <ChevronRight size={16} /></button>
         </div>
         <p class="home-count">{page?.total ?? 0} plots in the current project. Select a project on the left to browse its plots.</p>
+      {:else if view === 'fs882'}
+        <div class="h-full flex flex-col p-2">
+          <p class="project-warning"><strong>Experimental FS882 editor</strong> Only verified workflows are writable. Use disposable projects only.</p>
+          {#if error}<p class="error" role="alert">{error}</p>{/if}
+          {#key $projectState?.contextId}
+          <FS882Form
+            bind:this={editor}
+            plotNumber={editorPlotNumber}
+            contextId={$projectState?.contextId ?? ''}
+            onSaved={async (p) => { editorPlotNumber = p; await loadPlots(offset); }}
+            onClosed={() => navigate('plots')}
+            onBusyChange={(busy) => { editorBusy = busy; }}
+          />
+          {/key}
+        </div>
+
+        <CloseConfirm requestId={closeRequest || (pendingTransition ? 'context' : '')}
+          purpose={closeRequest ? 'close' : 'context'}
+          working={closeWorking || transitionWorking} canSave={closeState?.canSave ?? false}
+          saveReason={closeState?.saveReason ?? 'Return to the FS882 editor before saving.'}
+          error={closeRequest ? closeError : transitionError}
+          onrespond={closeRequest ? respondToClose : respondToTransition} />
       {:else if view === 'hierarchy'}
       <div class="content-heading">
         <div><div class="eyebrow">{$projectState?.hierarchyFile ?? 'HIERARCHY'}</div><h1>Hierarchy</h1></div>
@@ -240,6 +434,15 @@
       <aside class="detail" aria-label="Selected plot">
         <div class="eyebrow">SELECTED PLOT</div><h2>{selected.plotNumber}</h2>
         <dl><dt>Field number</dt><dd>{selected.fieldNumber ?? '—'}</dd><dt>Representing</dt><dd>{selected.plotRepresenting ?? '—'}</dd><dt>Zone</dt><dd>{selected.zone ?? '—'}</dd><dt>Subzone</dt><dd>{selected.subZone ?? '—'}</dd><dt>Site series</dt><dd>{selected.siteSeries ?? '—'}</dd></dl>
+        <div class="mt-4 pt-3 border-t border-stone-200">
+          <button
+            type="button"
+            class="w-full py-1.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-semibold"
+            onclick={() => navigate('fs882')}
+          >
+            Open in FS882 Editor (Experimental)
+          </button>
+        </div>
       </aside>
     {/if}
   </div>

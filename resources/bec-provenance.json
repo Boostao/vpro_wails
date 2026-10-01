@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "exporter": "native-access-dao-bec-v1",
+  "sourceSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "snapshotSha256": "0b4d7c15a02b7e7b7b82417622604b27dde4d20b95aa21cffdeba9e0448ef315",
+  "databaseSha256": "9e087c097d472e88e64caf6ef8dddfe50959fd5b7557e45e676befedfe4cfe58",
+  "zoneRows": 281,
+  "siteSeriesRows": 3532,
+  "duplicateKeys": 983
+}

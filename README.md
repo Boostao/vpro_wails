@@ -1,60 +1,156 @@
-# VPRO Desktop Migration
+# VPRO Desktop
 
-This is an **early, read-only migration slice**, not a replacement for the R/Shiny application. It uses Wails v3 beta.26, Go, Svelte 5, Tailwind CSS 4, and SQLite. Do not use it to edit production project data.
+VPRO is being migrated from Access to Go, Wails v3 beta.26, Svelte 5 and SQLite.
+This is an **incomplete, experimental application**, not a production replacement.
+Do not use its write workflows on production projects.
 
-For the Windows Access-oracle continuation, start with [WINDOWS_HANDOFF.md](WINDOWS_HANDOFF.md). It records the current contracts, isolated native checks, pending probes, and separate MDBTools ownership.
+## Current capabilities
 
-## Run
+| Workflow | Status |
+| --- | --- |
+| Database/context/configuration foundation | **F1-F3 implemented and native-verified.** Shared default-init/runtime YAML, retained legacy JSON migration, preserved support family, SQLite-owned external contexts and draft-safe switching are active. Administrative writes and multiwindow coordination remain unavailable. |
+| Project installation, discovery and saved selection | Bundled Sample remains byte-identical to R's SQLite Sample, including tables/indexes/views/`_table_metadata`. Non-overwrite family installation, VP08 compatibility, managed discovery, explicit external attachment and YAML path restoration work. Attachment does not copy or convert files. |
+| Working units and hierarchies | Read-only selection/filtering and hierarchy browsing support separate external files. Verified Working Unit editing includes per-user mode preferences; Master authorization editing and bulk actions remain incomplete. |
+| FS882 storage and source relationships | All 98 parent columns and 69 nonidentity XL child bindings plus five legacy extras are mapped. Extracted geometry is retained as evidence; presentation preserves source containment, labels, bindings and embedded-form links. |
+| FS882 responsive presentation | Site, Soil/Terrain, Vegetation, Veg Other and Other use labelled semantic groups and readable 40px controls. Groups reflow with the available width, child tables scroll locally, and project context can collapse. Actual native sizing, resizing, drafts, validation and close recovery are verified. |
+| FS882 ordinary parent editing | **77/98 parent fields are verified writable**, including coordinates, BEC, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock and 21 additional terrain/classification codes. Remaining controls stay unavailable until their workflows are verified. |
+| FS882 children and height | Transactional child CRUD/storage and bounded existing-row height drafts work. Species selection, height insertion/deletion, broader child editing, pictures and calculations remain incomplete. |
+| Audit and lifecycle | Data/audit transactions, bounded selective restoration, Undo, and native window/context Save/Discard/Cancel are verified, including hidden-invalid and height drafts, failed save/config publication and stale-context rejection. Cover restoration, broader child dirty-state propagation and multiwindow coordination remain incomplete. |
+| Soil classification | Two independent nullable four-UTF-16-unit editors default on. Native selection/manual entry, NULL, Undo, Lock, hidden validation, atomic rollback/retry and actual window-close recovery are verified, alongside frozen catalogue browsing. |
+| Bedrock classification | Three independent nullable four-UTF-16-unit editors default on, using the frozen87-row catalogue. Native full-item/raw entry, NULL, hidden validation, rollback/retry, Lock and clean close pass. Source effective properties remain unmeasured; this is an explicit safer adaptation, not exact Access input-mechanism parity. |
+| Ordinary terrain/classification codes | 21 independent nullable editors default on: Realm, coarse-fragment lithology, surface/subsurface terrain, flooding, humus, hydrogeology, rooting type/particle size and water source. Field-specific UTF-16 bounds, per-list failures/Retry, draft-bound review, hidden validation, rollback and native close recovery are verified. SoilDrainage remains unavailable pending its distinct strict membership policy. |
+| Import/export, reporting, maps and administration | Not complete. Unimplemented navigation remains disabled. |
 
-Install Go, Node.js, npm, the Linux GTK4/WebKitGTK development dependencies (or the equivalent for your platform), and the Wails v3 CLI:
+The field count is a secondary coverage measure, not proof of complete form or
+application parity. SQLite is canonical; the DuckDB coordinator remains an optional
+experiment, with offline extension packaging unresolved.
+The active Go application does not use DuckDB as its data layer. The foundation
+uses connection-owned SQLite attachments/TEMP views, without an offline
+extension dependency. See the compact F1-F3 gates in [MIGRATION_PLAN.md](MIGRATION_PLAN.md).
+
+The active bootstrap owns a pinned readonly SQLite coordinator; verified writers
+use separate transactions against the selected project file. ContextService binds
+editor reads/writes to an immutable context identity and blocks switching while an
+operation is running. Candidate validation and YAML persistence precede publication;
+failure retains the previous context. Legacy unscoped mutation/switch APIs cannot
+bypass this protection in the active application.
+Bundled originals live separately under `resources/database-family`, preserving
+the derived editor read models. Support files remain readonly in this foundation.
+
+Per-project files, original table names and `_table_metadata` descriptions are
+architectural invariants. Descriptions preserve native Access table-object metadata,
+not just compatibility versions. Editor-specific frozen catalogues and the current
+derived `Species`/`Lists` database are read models, not replacements for `VPro64`,
+`VLists`, `VUser`, `VMetaData`, `VMessageBoard` or project storage.
+
+Region/Site/Soil/Bedrock/ordinary parent codes reuse shared Unicode, reference grouping
+and draft-review helpers; physical write/restore guards are shared where policies match. Field-specific limits,
+Exposure membership, source geometry and failure behavior remain explicit.
+
+FS882 keeps the app's green/gold and IBM Plex styling rather than reproducing
+Access's cramped pixel sizes. Routine guidance and reference definitions start
+collapsed below the fields; warnings, loading, errors and required review remain
+visible above them. The native window prefers 1400 x 900 within the available
+work area, with a 560 x 520 minimum capped for smaller screens.
+
+## Run and validate
+
+Install Go, Node/npm, the platform Wails prerequisites and the pinned Wails CLI:
 
 ```sh
 go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.26
-export PATH="$(go env GOPATH)/bin:$PATH"
 wails3 dev
 ```
 
-The native window connects to Vite at `http://127.0.0.1:9245/`. That URL in a regular browser is **UI preview only**; Go bindings work in the desktop window. For a release binary, use `wails3 build` and run `bin/vpro-wails`. Verification: `go test -race ./...` and `cd frontend && npm run check && npm run build`.
+The native development window uses Vite at `http://127.0.0.1:9245/`. A regular
+browser is **preview only** and cannot establish Go-binding behavior.
+Build a release with `wails3 build`; the Windows executable is under `bin`.
 
-On first launch the packaged `Sample.db` is copied without replacing existing data to the VPRO user data `projects` directory. On Linux this defaults to `$HOME/.local/share/vpro/projects` unless `XDG_DATA_HOME` is set; set `VPRO_DATA_DIR` to use an isolated location. The desktop app stores its current project in `desktop-selection.json` under the platform user config directory (`$XDG_CONFIG_HOME/vpro` or `$HOME/.config/vpro` on Linux, `%APPDATA%/vpro` on Windows, and `~/Library/Application Support/vpro` on macOS). Set `VPRO_CONFIG_DIR` to override it. If no config selection exists, startup reads the former data-directory selection without deleting it; the next selection saves to the config directory. It does not yet synchronize that selection to the R application's `config.yml` or attach reference databases. Only complete VP08 SQLite project families in the data directory are selectable. The backend opens their data read-only.
+```sh
+go test -race ./...
+cd frontend
+npm test
+npm run check
+npm run build
+```
 
-## Migration Ledger
+On Windows use `npm.cmd` and the local tool paths in
+[WINDOWS_HANDOFF.md](WINDOWS_HANDOFF.md). Use focused tests while implementing;
+run the complete race suite and frontend validation at integration boundaries.
 
-| Source behavior | Desktop status | Evidence / next boundary |
-| --- | --- | --- |
-| `inst/app/ui.R` navbar and sidebar | Partial | Home, project navigation, plot browser, and a read-only hierarchy browser work in `frontend/src/App.svelte`. Active Forms, Reports and Help destinations are listed but disabled until implemented. |
-| `R/install.R`, `R/project-open.R`, `R/project.R` | Partial | Bundled Sample install, eight-table VP08 check, saved selection, paged Env/Admin plot read in `projectservice.go`. A missing saved project now falls back to Sample and persists the recovery; unreadable unrelated `.db` files are reported in the app without blocking startup. A corrupt Sample still blocks startup. Opening arbitrary files and historical Access projects are absent. |
-| `R/db-connection.R`, `R/project-context.R`, `R/su-context.R`, `R/hierarchy-context.R` | Partial | Same-file read-only SU selection persists and filters the plot browser to Env-SU-Admin plot membership (Sample: 51 plots); None restores the full view, and a project switch clears SU. Master tables are disabled without authorization. Hierarchies in the projects directory can be selected independently by name and file, browsed read-only, and recovered or deactivated on startup; project switches retain them. External SU/hierarchy paths, full diagnostics, and write paths are missing. `coordinator.go` remains an optional in-memory DuckDB experiment; extension packaging is unverified. Keep SQLite as canonical storage. |
-| `inst/app/modules/mod_fs882_6x4.R`, `R/plot-*.R` | Missing | No draft/save/discard, child CRUD, audit restoration, or write transaction; browser is read-only. The active R module targets Access `FS882-6x4XL`, not the non-XL variant. A parity checklist is retained under `/tmp/vpro_parity/wails-fs882/`; the Win11 VM probe was unavailable (SSH port 2222 refused), so write behavior remains unverified and disabled. |
-| `inst/app/modules/mod_import.R`, `R/access-archive.R` | Missing | Access `.mdb/.accdb` conversion and CSV/ZIP/Excel import require separately validated native implementations. |
-| `inst/app/modules/mod_reporting.R`, `inst/app/reports/` | Missing | Quarto rendering, Excel export, report preview and template parity. |
-| `inst/app/modules/mod_becweb_map.R` | Missing | Leaflet map, filtering, map resources and offline tile policy. |
-| Other active modules and shell workflows | Missing | Inventory every active event/dependency before porting; do not treat commented-out server code as active. |
+## Data and safety
 
-Current tests cover the sample's VP08 metadata, project/SU/hierarchy selection and restart, an orphan Env row, master-SU denial, 52 project plots, 51 SU-filtered plots, 43 hierarchy nodes, paging bounds, name validation, non-overwrite behavior, and all 11 DuckDB view row counts against R activation. The DuckDB test skips on a machine without a cached extension; no extension is downloaded during startup or tests. Before allowing writes, port the R package's transaction and authorization rules and validate against the Access oracle and package tests. A green Wails build does not establish feature parity.
+- Set `VPRO_DATA_DIR` and `VPRO_CONFIG_DIR` to isolated disposable directories for
+  testing. Sample is copied without replacing existing files.
+- The active application installs bundled `config.init.yml` defaults into runtime
+  `config.yml` in the platform user config directory. A shared owner serializes
+  selection, coordinate, Working Unit, audit strength and user updates; unknown
+  and inactive R settings retain their values/types.
+- Existing `desktop-selection.json`, `coordinate-settings.json` and
+  `working-unit-settings.json` are validated and imported together, retaining the
+  files and recording source hashes. Explicit YAML conflicts, changed legacy
+  files and malformed input fail diagnostically; completed imports are not
+  replayed. Selection keeps config-directory-first/data-root fallback.
+- Failed YAML replacement preserves prior bytes and effective settings; strength
+  is restricted to0-3. Fresh installs use R's `Admin`; existing Go installations
+  retain `User` unless explicitly configured. The measured no-SU initialization
+  to Master remains unchanged. Machine-specific Access paths are not imported.
+- Discovery/browsing use read-only connections; experimental writes use separate
+  transactional connections.
+- Missing family files install under `<dataDir>/database-family` without replacing
+  existing files. `Desktop.DatabasePaths` can override `VPro64`, `VLists`, `VUser`,
+  `VMetaData` and `VMessageBoard` with explicit absolute paths. Seed hashes establish
+  provenance, not validity of existing user data.
+- Project, SU and hierarchy paths are independently retained in YAML. Same-name
+  projects show full paths; attachment enables the existing verified writers against
+  the selected file, not a copy. Use disposable files only.
+- Invalid configuration or unavailable selected paths open a visible recovery window
+  with editors disabled and configuration retained. Correct the reported YAML/path
+  and restart; automatic repair, conversion and production write approval are absent.
+- Unchanged historical invalid values must survive unrelated saves. New values
+  and restoration targets are validated without silent repair or truncation.
+- Deliberate departures from Access defects include atomic data/history, explicit
+  completion instead of silent code rewriting, and no phantom option audits or
+  automatic deletion of height-only vegetation during restoration.
 
-### Activation parity checklist
+## Experimental switches
 
-| Control or event | Desktop status | Next check |
-| --- | --- | --- |
-| Select a complete VP08 project and reopen it on startup | Implemented for projects discovered in the user data directory | Confirm selection and failure recovery in the native window. |
-| Saved project missing or unreadable | Implemented: recover Sample and persist its selection | Check external project paths when file-open support is added. |
-| Unrelated project file unreadable | Implemented: retain usable projects and expose a diagnostic | Add file-management UX before import is enabled. |
-| Project activation clears the active SU | Implemented for the same-file read-only selector | Verify Access focus/change timing on a disposable VM copy. |
-| Project activation retains the active hierarchy | Implemented for discovered local SQLite hierarchy tables | Confirm selection side effects in the Access VM. |
-| Restore an SU's Env-SU-Admin plot filter | Implemented for SUs in the selected project file | Add external SU paths, full diagnostics, and source parity for orphan Env/Admin rows. |
-| Directly activate a master SU | Missing: disabled, with no authorization UI | Design an explicit authorization contract before enabling it. |
-| Restore an independent hierarchy selection | Implemented for local files with source identity and missing-source deactivation | Add external file attachment, tree diagnostics, and Access VM checks. |
+`VITE_SOIL_CODES_REFERENCE=true` enables the read-only Soil catalogue viewer.
+`VITE_SOIL_CODES_EDITING=false` disables the verified Soil editors; editing defaults
+on. The separate reference viewer defaults off and is suppressed while editing.
+`VITE_GEOLOGY_CODES_EDITING=false` disables the verified Bedrock editors; they
+default on. `VITE_PARENT_CODES_EDITING=false` disables the 21 additional ordinary
+parent-code editors; they default on. Coarse-fragment lithology uses TEXT12,
+not Bedrock's TEXT4; humus phase uses TEXT50 and flooding frequency TEXT7.
+SoilDrainage's explicit source LimitToList is not part of this permissive batch.
+`VITE_EXTERNAL_PROJECTS=false` hides the verified external attachment entry point;
+it defaults on. It does not disable restoration of valid saved external contexts.
 
-### Navigation inventory
+Soil deliberately preserves raw casing and uses explicit full-item selection,
+not Access's implicit completion. It rejects overlength input without truncation,
+keeps data/history atomic and omits phantom checkbox audits. Source case-only
+`ca` against stored `CA` remained `CA`; its exact cause and physical astral,
+overlength, Lock-child and failed-save behavior remain unmeasured. Native desktop
+proof is not a claim that the full installed Access baseline passes.
 
-The active Shiny navigation in `inst/app/ui.R` defines Home, Forms (FS882, SIVI, Metadata, Combine Species, Herbarium, Colour-theme, User setup, User log), Reports (long/summary vegetation and environment, subzone matrix, hierarchy diagram, plot label, plot locations file, Google Earth), and Help (What's New). The desktop menu exposes these destinations for orientation; Home and the separately exposed read-only Plots and Hierarchy browsers work. Disabled entries do not open placeholder workflows or modify data.
+Native inspection is off by default. For disposable debugging only,
+`VPRO_WEBVIEW_DEBUG_PORT` accepts a loopback port from 1024 to 65535. Use one isolated
+config/WebView profile per simultaneous instance; never expose the inspector.
 
-The Shiny Data and References menus, most Help entries, and the later Modules/Sync/Administration block are commented out in that UI definition. They remain migration candidates, not active Shiny navigation or implemented desktop functionality. Their underlying Access behavior still needs assessment before deciding what belongs in the desktop app. The active What's New action reads and updates `tblWhatsNew` in a separate VPro64 SQLite database; it cannot be replaced by static release notes without changing its behavior.
+Backend pooling, shared catalogue verification caching and end-to-end read
+cancellation are planned follow-ups, not delivered optimizations. The current
+context coordinator is long-lived, but plot operations still open direct project
+pools per call; catalogue lookups still rehash/revalidate. See C1-C5 in
+[MIGRATION_PLAN.md](MIGRATION_PLAN.md) for bounded performance/cleanup gates,
+including incremental packages and optional typed catalogue transport consolidation.
 
-## Next Milestones
+## Migration references
 
-1. Extend project/SU/hierarchy activation to external SQLite paths and full diagnostic/authorization parity, keeping canonical data in SQLite. Local read-only selection and startup recovery are available. Identify workflows that genuinely need cross-database joins before making the in-memory DuckDB coordinator mandatory; if needed, provision `sqlite_scanner` offline on each target platform. Only the locally cached Linux 1.5.5 extension has been verified so far.
-2. Port remaining R configuration and reference-database attachment, including the VPro64 What's New store. Project selection now uses a platform config directory with legacy-file fallback, but is not synchronized with R `config.yml`. Make selection broadcasts and unsaved-draft handling explicit before opening multiple Wails windows.
-3. Port the FS882 plot editor and the transactional `R/plot-*.R` operations, including audit and child records; compare fixtures and failure cases with the Access and R oracles before enabling writes.
-4. Validate a native `.mdb`/`.accdb` conversion path against `mdbr` output, then port CSV/ZIP/Excel IO, Quarto/report templates, maps, and remaining active modules. No verified Go Access parser is selected yet.
+- [MIGRATION_PLAN.md](MIGRATION_PLAN.md): one ordered, workflow-based backlog.
+- [WINDOWS_HANDOFF.md](WINDOWS_HANDOFF.md): current local state, paths and next gate.
+- [Access contract](docs/FS882-6x4XL-access-contract.md): detailed source and measured
+  behavior, including limitations and intentional adaptations.
+- [AGENTS.md](AGENTS.md): source-first development and bounded verification rules.
+
+Historical continuation logs and build receipts remain in ignored
+`evidence/private`; they are evidence, not the current work plan.

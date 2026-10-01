@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "exporter": "native-access-dao-plot-quality-site-v1",
+  "sourceSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "snapshotSha256": "fad1c35c8600f1f7224f5d46341f190cb8a443d1e7284ce85beadc17dfe33d5c",
+  "databaseSha256": "e27b9e4cf088b1ccf1951d0eb59af471be40dabcb2673e7aeb6c9ed59c22cc02",
+  "typedCellsSha256": "647d10b705782911a7f01ac012b12bae93460404a2e255a30b8205b7ce40ecdf",
+  "rows": 5,
+  "cells": 50,
+  "sourceTable": "USysTableOfLists",
+  "filter": "ListName=\"PlotQualitySite\"",
+  "sql": "SELECT * FROM USysTableOfLists WHERE ListName=\"PlotQualitySite\" ORDER BY ItemOrder",
+  "sourceSchema": [
+    {
+      "name": "ListName",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ListFilter",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemOrder",
+      "daoType": 7,
+      "size": 8
+    },
+    {
+      "name": "Item",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemDescription",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "FieldUsedIn",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ValidateLoops",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Validate",
+      "daoType": 1,
+      "size": 1
+    },
+    {
+      "name": "Note",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Flag",
+      "daoType": 1,
+      "size": 1
+    }
+  ],
+  "itemOrderEncoding": "nullable IEEE754 binary64 big-endian 8-byte BLOB; native source ordinal order"
+}

@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "exporter": "current-readonly-dao-parent-codes-v1",
+  "sourceSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "snapshotSha256": "e1a6420ddb006fac5a91fcf88ab2703693aea4dee01b6e926558ec7c87427ec2",
+  "databaseSha256": "6e155d54cefb8540feecf28e5c7abb5938bac7394fe26c5a4a32a4950c5c6d69",
+  "typedCellsSha256": "9d54169928d6f1b3202cfd5579bb7a41dad5411c8dc708acb37e3b80cd7efe50",
+  "rows": 347,
+  "cells": 3470,
+  "sourceTable": "USysTableOfLists",
+  "sql": "SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='BedrockType' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='FloodingRegimeDur' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='FloodingRegimeFreq' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='GeoMorPro' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='HumusForm' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='HumusFormPhase' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='HydrogeoSubsystem' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='HydrogeoSystem' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='RealmClass' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='RootRestrictingType' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='RootZoneParticleSize' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='SoilDrainage' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='SurfaceExp' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='SurficialMaterial' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='TerrainTexture' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='WaterSource' ORDER BY [ItemOrder];",
+  "sourceSchema": [
+    {
+      "name": "ListName",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ListFilter",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemOrder",
+      "daoType": 7,
+      "size": 8
+    },
+    {
+      "name": "Item",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemDescription",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "FieldUsedIn",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ValidateLoops",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Validate",
+      "daoType": 1,
+      "size": 1
+    },
+    {
+      "name": "Note",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Flag",
+      "daoType": 1,
+      "size": 1
+    }
+  ],
+  "itemOrderEncoding": "nullable IEEE754 binary64 big-endian 8-byte BLOB; native source ordinal order"
+}

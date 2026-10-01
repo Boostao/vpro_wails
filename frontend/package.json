@@ -8,7 +8,10 @@
     "build:dev": "vite build --minify false --mode development",
     "build": "vite build --mode production",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test": "node --test src/paperLayout.test.cjs src/formPresentation.test.cjs src/sourcePageEditor.test.cjs src/soilCodeReference.test.cjs src/soilCodeEditor.test.cjs src/geologyCodeEditor.test.cjs src/parentCodeEditor.test.cjs src/AuditRestore.test.cjs src/closeLifecycle.test.cjs src/coordinateEditor.test.cjs src/becEditor.test.cjs src/heightEditor.test.cjs src/workingUnitEditor.test.cjs src/qualityEditor.test.cjs src/substrateEditor.test.cjs src/siteCodeEditor.test.cjs src/regionCodeEditor.test.cjs src/contextPlots.test.cjs",
+    "test:context": "node --test src/contextPlots.test.cjs",
+    "test:paper-layout": "node --test src/paperLayout.test.cjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -30,6 +29,7 @@ type ProjectInfo struct {
 	File       string `json:"file"`
 	Version    string `json:"version"`
 	Compatible bool   `json:"compatible"`
+	Path       string `json:"path,omitempty"`
 }
 
 type ProjectState struct {
@@ -41,12 +41,17 @@ type ProjectState struct {
 	SUs             []SUInfo            `json:"sus"`
 	Hierarchies     []HierarchyInfo     `json:"hierarchies"`
 	Diagnostics     []ProjectDiagnostic `json:"diagnostics"`
+	ContextID       string              `json:"contextId,omitempty"`
+	ProjectPath     string              `json:"projectPath,omitempty"`
+	SUPath          string              `json:"suPath,omitempty"`
+	HierarchyPath   string              `json:"hierarchyPath,omitempty"`
 }
 
 type SUInfo struct {
 	Name       string `json:"name"`
 	Kind       string `json:"kind"`
 	Compatible bool   `json:"compatible"`
+	Path       string `json:"path,omitempty"`
 }
 
 type ProjectDiagnostic struct {
@@ -69,6 +74,7 @@ type PlotPage struct {
 }
 
 type ProjectService struct {
+	operationMu     sync.RWMutex
 	mu              sync.RWMutex
 	root            string
 	config          string
@@ -76,6 +82,10 @@ type ProjectService struct {
 	activeSU        string
 	activeHierarchy string
 	hierarchyFile   string
+	preferences     *desktopConfig
+	sqlite          *sqliteContext
+	supportPaths    map[string]string
+	contextID       string
 }
 
 func userDataDir() (string, error) {
@@ -125,6 +135,10 @@ func NewProjectService(root string) (*ProjectService, error) {
 }
 
 func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
+	return newProjectServiceWithPreferences(root, config, nil)
+}
+
+func newProjectServiceWithPreferences(root, config string, preferences *desktopConfig) (*ProjectService, error) {
 	if err := os.MkdirAll(filepath.Join(root, "projects"), 0700); err != nil {
 		return nil, err
 	}
@@ -132,7 +146,33 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 		return nil, err
 	}
 	service := &ProjectService{root: root, config: config, active: "Sample", activeSU: "None", activeHierarchy: "None"}
-	settings, err := os.ReadFile(filepath.Join(config, "desktop-selection.json"))
+	service.preferences = preferences
+	var configured desktopSelection
+	var settings []byte
+	var err error
+	if preferences != nil {
+		configured, err = preferences.selection()
+		if err != nil {
+			return nil, err
+		}
+		service.active, service.activeSU, service.activeHierarchy = configured.Project, configured.SU, configured.Hierarchy
+		if configured.HierarchyPath != "" {
+			path, err := filepath.Abs(configured.HierarchyPath)
+			if err != nil {
+				return nil, err
+			}
+			directory, err := filepath.Abs(filepath.Join(root, "projects"))
+			if err != nil {
+				return nil, err
+			}
+			if !sameDesktopPath(filepath.Dir(path), directory) {
+				return nil, errors.New("configured external hierarchy path requires foundation F2; YAML was retained")
+			}
+			service.hierarchyFile = filepath.Base(path)
+		}
+	} else {
+		settings, err = os.ReadFile(filepath.Join(config, "desktop-selection.json"))
+	}
 	if errors.Is(err, os.ErrNotExist) && config != root {
 		settings, err = os.ReadFile(filepath.Join(root, "desktop-selection.json"))
 	}
@@ -165,6 +205,9 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 		return nil, err
 	}
 	if !hasCompatible(projects, service.active) {
+		if preferences != nil {
+			return nil, fmt.Errorf("configured project %q is unavailable; YAML selection was retained", service.active)
+		}
 		service.active = "Sample"
 		service.activeSU = "None"
 		if len(settings) > 0 {
@@ -179,9 +222,31 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 			return nil, err
 		}
 		if !hasCompatibleSU(sus, service.activeSU) {
+			if preferences != nil {
+				return nil, fmt.Errorf("configured SU %q is unavailable; YAML selection was retained", service.activeSU)
+			}
 			service.activeSU = "None"
 			if err := service.saveSelection(service.active, "None"); err != nil {
 				return nil, err
+			}
+		}
+	}
+	if preferences != nil {
+		selected := compatibleProject(projects, service.active)
+		expected, err := filepath.Abs(filepath.Join(root, "projects", selected.File))
+		if err != nil {
+			return nil, err
+		}
+		for _, path := range []string{configured.ProjectPath, configured.SUPath} {
+			if path == "" {
+				continue
+			}
+			actual, err := filepath.Abs(path)
+			if err != nil {
+				return nil, err
+			}
+			if !sameDesktopPath(actual, expected) {
+				return nil, errors.New("configured external project/SU path requires foundation F2; YAML was retained")
 			}
 		}
 	}
@@ -190,7 +255,20 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 		if err != nil {
 			return nil, err
 		}
+		if preferences != nil && service.hierarchyFile == "" {
+			for _, candidate := range hierarchies {
+				if candidate.Name == service.activeHierarchy && candidate.Compatible {
+					if service.hierarchyFile != "" {
+						return nil, errors.New("configured hierarchy name is ambiguous; YAML was retained")
+					}
+					service.hierarchyFile = candidate.File
+				}
+			}
+		}
 		if !hasCompatibleHierarchy(hierarchies, service.activeHierarchy, service.hierarchyFile) {
+			if preferences != nil {
+				return nil, fmt.Errorf("configured hierarchy %q is unavailable; YAML selection was retained", service.activeHierarchy)
+			}
 			service.activeHierarchy = "None"
 			service.hierarchyFile = ""
 			if err := service.saveSelection(service.active, service.activeSU); err != nil {
@@ -198,7 +276,32 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 			}
 		}
 	}
+	if preferences != nil && (configured.ProjectPath == "" ||
+		(service.activeHierarchy != "None" && configured.HierarchyPath == "")) {
+		path, err := filepath.Abs(filepath.Join(root, "projects", compatibleProject(projects, service.active).File))
+		if err != nil {
+			return nil, err
+		}
+		paths := map[string]any{"ProjectPath": path}
+		if service.activeHierarchy != "None" && configured.HierarchyPath == "" {
+			hierarchyPath, err := filepath.Abs(filepath.Join(root, "projects", service.hierarchyFile))
+			if err != nil {
+				return nil, err
+			}
+			paths["HierarchyPath"] = hierarchyPath
+		}
+		if err := preferences.update("Current", paths); err != nil {
+			return nil, err
+		}
+	}
 	return service, nil
+}
+
+func sameDesktopPath(left, right string) bool {
+	if runtime.GOOS == "windows" {
+		return strings.EqualFold(left, right)
+	}
+	return left == right
 }
 
 func installSample(destination string) error {
@@ -271,7 +374,7 @@ func hasCompatibleHierarchy(hierarchies []HierarchyInfo, name, file string) bool
 }
 
 func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error) {
-	database, err := openReadOnly(filepath.Join(service.root, "projects", project.File))
+	database, err := openReadOnly(service.projectFile(project))
 	if err != nil {
 		return nil, err
 	}
@@ -341,8 +444,11 @@ func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error
 }
 
 func openReadOnly(path string) (*sql.DB, error) {
-	address := (&url.URL{Scheme: "file", Path: path, RawQuery: "mode=ro"}).String()
-	database, err := sql.Open("sqlite3", address)
+	absolute, err := filepath.Abs(path)
+	if err != nil {
+		return nil, err
+	}
+	database, err := sql.Open("sqlite3", sqliteFileURI(absolute, "ro"))
 	if err == nil {
 		database.SetMaxOpenConns(1)
 		err = database.Ping()
@@ -439,6 +545,12 @@ func (service *ProjectService) discover() ([]ProjectInfo, []ProjectDiagnostic, e
 }
 
 func (service *ProjectService) GetState() (ProjectState, error) {
+	service.mu.RLock()
+	if service.sqlite != nil {
+		defer service.mu.RUnlock()
+		return service.sqliteStateLocked()
+	}
+	service.mu.RUnlock()
 	projects, diagnostics, err := service.discover()
 	if err != nil {
 		return ProjectState{}, err
@@ -465,6 +577,12 @@ func (service *ProjectService) GetState() (ProjectState, error) {
 }
 
 func (service *ProjectService) SelectProject(name string) (ProjectState, error) {
+	service.mu.Lock()
+	if service.sqlite != nil {
+		defer service.mu.Unlock()
+		return ProjectState{}, errors.New("use an identity-bound context switch for the active SQLite application")
+	}
+	service.mu.Unlock()
 	if !projectNamePattern.MatchString(name) {
 		return ProjectState{}, errors.New("invalid VPRO project name")
 	}
@@ -494,6 +612,12 @@ func (service *ProjectService) SelectProject(name string) (ProjectState, error) 
 }
 
 func (service *ProjectService) SelectSU(name string) (ProjectState, error) {
+	service.mu.Lock()
+	if service.sqlite != nil {
+		defer service.mu.Unlock()
+		return ProjectState{}, errors.New("use an identity-bound context switch for the active SQLite application")
+	}
+	service.mu.Unlock()
 	if name != "None" && !projectNamePattern.MatchString(name) {
 		return ProjectState{}, errors.New("invalid VPRO SU name")
 	}
@@ -526,6 +650,12 @@ func (service *ProjectService) SelectSU(name string) (ProjectState, error) {
 }
 
 func (service *ProjectService) SelectHierarchy(name, file string) (ProjectState, error) {
+	service.mu.Lock()
+	if service.sqlite != nil {
+		defer service.mu.Unlock()
+		return ProjectState{}, errors.New("use an identity-bound context switch for the active SQLite application")
+	}
+	service.mu.Unlock()
 	if name != "None" && !projectNamePattern.MatchString(name) {
 		return ProjectState{}, errors.New("invalid VPRO hierarchy name")
 	}
@@ -564,6 +694,12 @@ func (service *ProjectService) SelectHierarchy(name, file string) (ProjectState,
 
 func (service *ProjectService) GetHierarchyNodes() ([]HierarchyNode, error) {
 	service.mu.RLock()
+	if service.sqlite != nil {
+		defer service.mu.RUnlock()
+		return service.sqliteHierarchyLocked()
+	}
+	service.mu.RUnlock()
+	service.mu.RLock()
 	name, file := service.activeHierarchy, service.hierarchyFile
 	service.mu.RUnlock()
 	if name == "None" {
@@ -584,6 +720,34 @@ func (service *ProjectService) saveSelection(name, su string) error {
 }
 
 func (service *ProjectService) saveSelectionWithHierarchy(name, su, hierarchy, file string) error {
+	if service.preferences != nil {
+		projects, _, err := service.discover()
+		if err != nil {
+			return err
+		}
+		selected := compatibleProject(projects, name)
+		if selected.Name == "" {
+			return errors.New("cannot persist an unavailable project")
+		}
+		path, err := filepath.Abs(filepath.Join(service.root, "projects", selected.File))
+		if err != nil {
+			return err
+		}
+		suPath, hierarchyPath := "", ""
+		if su != "None" {
+			suPath = path
+		}
+		if hierarchy != "None" {
+			hierarchyPath, err = filepath.Abs(filepath.Join(service.root, "projects", file))
+			if err != nil {
+				return err
+			}
+		}
+		return service.preferences.update("Current", map[string]any{
+			"CurrProject": name, "ProjectPath": path, "CurrPlotlist": su, "SUPath": suPath,
+			"CurrHierarchy": hierarchy, "HierarchyPath": hierarchyPath,
+		})
+	}
 	if su == "None" {
 		su = ""
 	}
@@ -629,6 +793,12 @@ func (service *ProjectService) ListPlots(offset, limit int) (PlotPage, error) {
 	if offset < 0 || limit < 1 || limit > 200 {
 		return PlotPage{}, errors.New("plot page requires a nonnegative offset and a limit from 1 to 200")
 	}
+	service.mu.RLock()
+	if service.sqlite != nil {
+		defer service.mu.RUnlock()
+		return service.sqlitePlotsLocked(offset, limit)
+	}
+	service.mu.RUnlock()
 	service.mu.RLock()
 	active := service.active
 	activeSU := service.activeSU

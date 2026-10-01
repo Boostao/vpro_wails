@@ -6,6 +6,7 @@ require (
 	github.com/duckdb/duckdb-go/v2 v2.10505.0
 	github.com/mattn/go-sqlite3 v1.14.52
 	github.com/wailsapp/wails/v3 v3.0.0-beta.26
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

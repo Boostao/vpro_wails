@@ -1,0 +1,89 @@
+<script lang="ts">
+  import { paperChild } from './paperLayout';
+  import { controlLabel } from './formPresentation';
+  import { heightField, type HeightDrafts } from './heightEditor';
+  type Row = { id: number; values: Record<string, string | number | boolean | null | undefined> };
+  let { name, rows, disabled = true, revision = 0, onedit, ondelete, onstage, drafts = {} }: {
+    name: string; rows: Row[]; disabled?: boolean; revision?: number;
+    onedit?: (name: string, id: number, column: string, value: string) => Promise<void>;
+    ondelete?: (name: string, id: number) => Promise<void>;
+    onstage?: (id: number, column: string, value: string) => void;
+    drafts?: HeightDrafts;
+  } = $props();
+  const source = $derived(paperChild(name));
+  const columns = $derived(source.controls.filter(control => !['Label', 'Rectangle', 'OptionGroup'].includes(control.type))
+    .sort((a, b) => a.tabOrder - b.tabOrder));
+  const numeric = new Set(['cover1', 'cover2', 'cover3', 'totala', 'cover4', 'cover5', 'totalb', 'cover6', 'cover7', 'cover8', 'cover9', 'upperdepth', 'lowerdepth', 'humusformph']);
+  const editable = new Set([...numeric, 'species', 'collected', 'horizon', 'comment', 'comments', 'texture', 'colour', 'dataname', 'dataitem']);
+</script>
+
+<div class="source-child" data-source-form={name} aria-label={`${name} records`}>
+  <table>
+    <caption class="sr-only">{name} records; unavailable columns remain read-only</caption>
+    <thead>
+      <tr>
+        {#each columns as control (control.controlId)}
+          <th scope="col">{controlLabel(control)}</th>
+        {/each}
+        {#if ondelete}<th scope="col">Actions</th>{/if}
+      </tr>
+    </thead>
+    <tbody>
+    {#each rows as row, index (`${row.id}/${index}/${revision}`)}
+      <tr data-record-id={row.id}>
+        {#each columns as control (control.controlId)}
+          {@const value = control.column ? row.values[control.column.toLowerCase()] : undefined}
+          {@const mapped = control.column !== undefined && Object.hasOwn(row.values, control.column.toLowerCase())}
+          {@const stagedField = control.column ? heightField(control.column) : undefined}
+          {@const staged = stagedField ? drafts[String(row.id)]?.[stagedField] : undefined}
+          <td>
+          {#if mapped && onstage && stagedField && control.column}
+            <input class="source-cell" type="text" inputmode="decimal"
+              value={staged?.raw ?? value ?? ''} disabled={disabled || control.locked || !control.enabled}
+              aria-label={`${controlLabel(control)}, row ${row.id}`} aria-invalid={staged?.error != null} data-column={control.column}
+              title={staged?.error ?? 'Unsubmitted draft: use Save height drafts or Cancel height drafts'}
+              oninput={event => onstage?.(row.id, control.column ?? '', event.currentTarget.value)} />
+          {:else if mapped && onedit && control.column && editable.has(control.column.toLowerCase())}
+            <input class="source-cell" type={numeric.has(control.column.toLowerCase()) ? 'number' : 'text'} step="any"
+              value={value ?? ''} disabled={disabled || control.locked || !control.enabled}
+              aria-label={`${controlLabel(control)}, row ${row.id}`} data-column={control.column} title={control.caption || control.column}
+              onchange={(event) => {
+                if (!event.currentTarget.validity.valid) { event.currentTarget.reportValidity(); return; }
+                void onedit?.(name, row.id, control.column ?? '', event.currentTarget.value);
+              }} />
+          {:else if mapped && control.type === 'CheckBox'}
+            <input class="source-cell" type="checkbox" data-column={control.column} disabled checked={value === true} indeterminate={value == null}
+              aria-label={control.column || control.caption} />
+          {:else}
+          <span class:pending={!mapped} class="source-cell" data-column={control.column}
+            title={control.caption || control.column || control.controlName}
+            aria-label={control.caption || control.column || control.controlName}>
+            {mapped ? value ?? '' : 'Pending'}
+          </span>
+          {/if}
+          </td>
+        {/each}
+        {#if ondelete}
+          <td><button class="delete" type="button" disabled={disabled}
+            aria-label={`Delete ${name} row ${row.id}`} onclick={() => void ondelete?.(name, row.id)}>Delete</button></td>
+        {/if}
+      </tr>
+    {:else}
+      <tr><td class="empty" colspan={columns.length + (ondelete ? 1 : 0)}>No records in this source grid.</td></tr>
+    {/each}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .source-child { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; background: white; border: 1px solid #d1dcd4; border-radius: 4px; }
+  table { width: max-content; min-width: 100%; border-collapse: collapse; font-size: .875rem; }
+  th { background: #e9efeb; color: #365c48; text-align: left; font-size: .875rem; font-weight: 600; white-space: normal; }
+  th, td { padding: .5rem; min-width: 7rem; max-width: 18rem; border-bottom: 1px solid #d1dcd4; }
+  td { overflow: visible; white-space: normal; }
+  .source-cell { display: block; box-sizing: border-box; width: 100%; min-height: 40px; border: 1px solid #b7cfc0; border-radius: 4px; padding: .5rem; font: inherit; line-height: 1.4; overflow-wrap: anywhere; }
+  input[type="checkbox"] { width: 1.2rem; min-height: 1.2rem; }
+  .pending { color: #78716c; background: #f5f5f4; }
+  .delete { min-height: 40px; color: #b91c1c; padding: .5rem .75rem; border: 1px solid #d6d3d1; border-radius: 4px; }
+  .empty { padding: 1rem; color: #78716c; }
+</style>
