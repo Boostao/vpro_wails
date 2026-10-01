@@ -106,7 +106,7 @@ func TestSoilCatalogueReadonlyNonoverwriteCorruptionWarmRetryRestart(t *testing.
 		t.Fatal(err)
 	}
 	defer service.Close()
-	if _, err := service.db.Exec(`UPDATE SiteCodeChoices SET Item='changed'`); err == nil {
+	if _, err := readonlyCatalogueFixture(t, service.path).Exec(`UPDATE SiteCodeChoices SET Item='changed'`); err == nil {
 		t.Fatal("reference writable")
 	}
 	file, err := os.OpenFile(service.path, os.O_WRONLY, 0)

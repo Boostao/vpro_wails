@@ -128,7 +128,7 @@ func TestSiteCodeCatalogueFailClosedNonoverwritingAndReadonly(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer service.Close()
-	if _, err := service.db.Exec(`UPDATE SiteCodeChoices SET Item='zz' WHERE ListName='Exposure'`); err == nil {
+	if _, err := readonlyCatalogueFixture(t, service.path).Exec(`UPDATE SiteCodeChoices SET Item='zz' WHERE ListName='Exposure'`); err == nil {
 		t.Fatal("catalogue connection writable")
 	}
 	// Even an already-open catalogue cannot hide file corruption behind cached choices.

@@ -133,3 +133,43 @@ test('Lookup publishes real failure/retry, ignores late stale success and releas
   await malformed.refresh();
   assert.match(malformed.snapshot().error, /did not return/);
 });
+
+test('explicit catalogue Retry forces verification while normal refresh remains warm', async () => {
+  const calls = [];
+  const lookup = new QualityLookup(async force => { calls.push(force); return [row('1')]; }, () => {});
+  await lookup.refresh();
+  await lookup.refresh(true);
+  assert.deepEqual(calls, [false, true]);
+  assert.equal(lookup.snapshot().ready, true);
+  for (const [file, service] of [
+    ['ParentCodeFields.svelte', 'ParentCodeService'],
+    ['GeologyCodeFields.svelte', 'GeologyCodeService'],
+    ['SoilCodeFields.svelte', 'SoilCodeService'],
+    ['SiteCodeFields.svelte', 'SiteCodeService'],
+    ['RegionCodeFields.svelte', 'RegionCodeService'],
+    ['SoilCodeReference.svelte', 'SoilCodeService']
+  ]) {
+    const source = readFileSync(path.join(__dirname, file), 'utf8');
+    assert.match(source, new RegExp(`if \\(force\\) await ${service}\\.ReloadCatalogue\\(\\)`));
+    assert.match(source, /refresh\(true\)/);
+    assert.equal(compile(source, { filename: file, generate: 'client' }).warnings.length, 0);
+  }
+});
+
+test('failed forced revalidation clears choices and stays unavailable until valid retry', async () => {
+  let broken = false;
+  const lookup = new QualityLookup(async force => {
+    if (force && broken) throw new Error('checksum failure');
+    return [row('1')];
+  }, () => {});
+  await lookup.refresh();
+  broken = true;
+  await lookup.refresh(true);
+  assert.equal(lookup.snapshot().ready, false);
+  assert.equal(lookup.snapshot().choices.length, 0);
+  assert.match(lookup.snapshot().error, /checksum failure/);
+  broken = false;
+  await lookup.refresh(true);
+  assert.equal(lookup.snapshot().ready, true);
+  assert.equal(lookup.snapshot().choices.length, 1);
+});

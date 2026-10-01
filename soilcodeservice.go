@@ -1,10 +1,8 @@
 package main
 
 import (
-	"database/sql"
 	_ "embed"
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/boostao/vpro-wails/internal/listcatalog"
@@ -20,46 +18,41 @@ type SoilCodeChoice listcatalog.Choice
 
 type SoilCodeService struct {
 	mu         sync.RWMutex
-	db         *sql.DB
+	closed     bool
 	path       string
 	provenance listcatalog.Provenance
+	cache      *listCatalogueCache
 }
 
 func NewSoilCodeService(dataDir string) (*SoilCodeService, error) {
-	db, path, provenance, err := openListCatalogue(dataDir, "soil-codes.db", "soil code",
+	path, provenance, cache, err := openListCatalogue(dataDir, "soil-codes.db", "soil code",
 		soilCodeDatabase, soilCodeProvenanceJSON, listcatalog.SoilProfile())
 	if err != nil {
 		return nil, err
 	}
-	return &SoilCodeService{db: db, path: path, provenance: provenance}, nil
+	return &SoilCodeService{path: path, provenance: provenance, cache: cache}, nil
 }
 
 func (s *SoilCodeService) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.db == nil {
+	if s.closed {
 		return nil
 	}
-	err := s.db.Close()
-	s.db = nil
-	return err
+	s.closed = true
+	s.cache.rows = nil
+	return nil
 }
 
 func (s *SoilCodeService) listChoices(list string) ([]SoilCodeChoice, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if s.db == nil {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
 		return nil, errors.New("soil code catalogue is closed")
 	}
-	if err := checkListCatalogueChecksum(s.path, s.provenance, "soil code"); err != nil {
-		return nil, err
-	}
-	if err := listcatalog.ValidateDatabaseFor(s.db, s.provenance, listcatalog.SoilProfile()); err != nil {
-		return nil, fmt.Errorf("soil code catalogue: %w", err)
-	}
-	rows, err := listcatalog.ReadChoicesFor(s.db, list, listcatalog.SoilProfile())
+	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.SoilProfile(), "soil code", list, false)
 	if err != nil {
-		return nil, fmt.Errorf("soil code catalogue: %w", err)
+		return nil, err
 	}
 	result := make([]SoilCodeChoice, 0, len(rows))
 	for _, source := range rows {
@@ -78,6 +71,16 @@ func (s *SoilCodeService) listChoices(list string) ([]SoilCodeChoice, error) {
 
 func (s *SoilCodeService) ListGreatGroupChoices() ([]SoilCodeChoice, error) {
 	return s.listChoices("SoilClassGroup")
+}
+
+func (s *SoilCodeService) ReloadCatalogue() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
+		return errors.New("soil code catalogue is closed")
+	}
+	_, err := s.cache.choices(s.path, s.provenance, listcatalog.SoilProfile(), "soil code", "", true)
+	return err
 }
 
 func (s *SoilCodeService) ListSubgroupChoices() ([]SoilCodeChoice, error) {

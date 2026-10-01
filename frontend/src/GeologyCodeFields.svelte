@@ -15,7 +15,8 @@
     children: Snippet<[{ columns: readonly string[]; input: Snippet<[PaperControl, string]> } | undefined]>;
   } = $props();
   const editingEnabled = import.meta.env.VITE_GEOLOGY_CODES_EDITING !== 'false';
-  const lookup = new QualityLookup(async () => {
+  const lookup = new QualityLookup(async (force) => {
+    if (force) await GeologyCodeService.ReloadCatalogue();
     const rows = await GeologyCodeService.ListBedrockChoices();
     if (rows === null) throw new Error('Bedrock service did not return reference rows.');
     return rows;
@@ -60,7 +61,7 @@
     {#if view.busy}<p role="status">Refreshing bedrock choices...</p>{/if}
     {#if view.error}
       <p role="alert">{view.error}</p>
-      <button type="button" disabled={disabled || view.busy} onclick={() => void lookup.refresh()}>Retry bedrock choices</button>
+      <button type="button" disabled={disabled || view.busy} onclick={() => void lookup.refresh(true)}>Retry bedrock choices</button>
     {/if}
     {#if validation}<p role="alert">{validation}</p>{/if}
     {#if warnings.length}

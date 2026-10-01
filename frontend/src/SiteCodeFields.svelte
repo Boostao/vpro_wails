@@ -17,12 +17,14 @@
   } = $props();
   const editingEnabled = import.meta.env.VITE_SITE_CODES_EDITING !== 'false';
   const listId = $props.id();
-  const disturbanceLookup = new QualityLookup(async () => {
+  const disturbanceLookup = new QualityLookup(async (force) => {
+    if (force) await SiteCodeService.ReloadCatalogue();
     const rows = await SiteCodeService.ListSiteDisturbanceChoices();
     if (rows === null) throw new Error('Disturbance service did not return choice rows.');
     return rows;
   }, next => { disturbance = next; }, 'Disturbance');
-  const exposureLookup = new QualityLookup(async () => {
+  const exposureLookup = new QualityLookup(async (force) => {
+    if (force) await SiteCodeService.ReloadCatalogue();
     const rows = await SiteCodeService.ListExposureChoices();
     if (rows === null) throw new Error('Exposure service did not return choice rows.');
     return rows;
@@ -76,7 +78,7 @@
       {#if view.error}
         <span role="alert">{view.error}</span>
         <button type="button" disabled={disabled || lookupBusy}
-          onclick={() => void (index === 0 ? disturbanceLookup : exposureLookup).refresh()}>
+          onclick={() => void (index === 0 ? disturbanceLookup : exposureLookup).refresh(true)}>
           Retry {index === 0 ? 'disturbance' : 'exposure'} choices
         </button>
       {/if}

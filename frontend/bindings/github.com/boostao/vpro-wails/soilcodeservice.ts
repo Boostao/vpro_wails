@@ -20,3 +20,7 @@ export function ListGreatGroupChoices(): $CancellablePromise<$models.SoilCodeCho
 export function ListSubgroupChoices(): $CancellablePromise<$models.SoilCodeChoice[] | null> {
     return $Call.ByID(982071910);
 }
+
+export function ReloadCatalogue(): $CancellablePromise<void> {
+    return $Call.ByID(3560504295);
+}

@@ -93,7 +93,7 @@ func TestGeologyCatalogueNonoverwriteReadonlyWarmRetryAndClose(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer s.Close()
-	if _, err := s.db.Exec(`UPDATE SiteCodeChoices SET Item='changed'`); err == nil {
+	if _, err := readonlyCatalogueFixture(t, s.path).Exec(`UPDATE SiteCodeChoices SET Item='changed'`); err == nil {
 		t.Fatal("reference writable")
 	}
 	if _, err := s.ListBedrockChoices(); err != nil {

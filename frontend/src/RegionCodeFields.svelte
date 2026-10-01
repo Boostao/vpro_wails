@@ -18,12 +18,14 @@
   } = $props();
   const editingEnabled = import.meta.env.VITE_REGION_CODES_EDITING !== 'false';
   const listId = $props.id();
-  const regionLookup = new QualityLookup(async () => {
+  const regionLookup = new QualityLookup(async (force) => {
+    if (force) await RegionCodeService.ReloadCatalogue();
     const rows = await RegionCodeService.ListRegionChoices();
     if (rows === null) throw new Error('Region service did not return choice rows.');
     return rows;
   }, next => { region = next; }, 'Region');
-  const ecosectionLookup = new QualityLookup(async () => {
+  const ecosectionLookup = new QualityLookup(async (force) => {
+    if (force) await RegionCodeService.ReloadCatalogue();
     const rows = await RegionCodeService.ListEcosectionChoices();
     if (rows === null) throw new Error('Ecosection service did not return choice rows.');
     return rows;
@@ -77,7 +79,7 @@
       {#if view.error}
         <span role="alert">{view.error}</span>
         <button type="button" disabled={disabled || lookupBusy}
-          onclick={() => void (index === 0 ? regionLookup : ecosectionLookup).refresh()}>
+          onclick={() => void (index === 0 ? regionLookup : ecosectionLookup).refresh(true)}>
           Retry {index === 0 ? 'region' : 'ecosection'} choices
         </button>
       {/if}

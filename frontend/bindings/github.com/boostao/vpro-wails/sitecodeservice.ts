@@ -20,3 +20,7 @@ export function ListExposureChoices(): $CancellablePromise<$models.SiteCodeChoic
 export function ListSiteDisturbanceChoices(): $CancellablePromise<$models.SiteCodeChoice[] | null> {
     return $Call.ByID(2718777524);
 }
+
+export function ReloadCatalogue(): $CancellablePromise<void> {
+    return $Call.ByID(4045756807);
+}

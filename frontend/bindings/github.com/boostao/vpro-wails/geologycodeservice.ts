@@ -16,3 +16,7 @@ export function Close(): $CancellablePromise<void> {
 export function ListBedrockChoices(): $CancellablePromise<$models.GeologyCodeChoice[] | null> {
     return $Call.ByID(3629466706);
 }
+
+export function ReloadCatalogue(): $CancellablePromise<void> {
+    return $Call.ByID(1831459118);
+}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	_ "embed"
 	"errors"
 	"sync"
@@ -19,18 +18,19 @@ type SiteCodeChoice listcatalog.Choice
 
 type SiteCodeService struct {
 	mu         sync.RWMutex
-	db         *sql.DB
+	closed     bool
 	path       string
 	provenance listcatalog.Provenance
+	cache      *listCatalogueCache
 }
 
 func NewSiteCodeService(dataDir string) (*SiteCodeService, error) {
-	db, target, provenance, err := openListCatalogue(dataDir, "site-codes.db", "site code",
+	target, provenance, cache, err := openListCatalogue(dataDir, "site-codes.db", "site code",
 		siteCodeDatabase, siteCodeProvenanceJSON, listcatalog.SiteProfile())
 	if err != nil {
 		return nil, err
 	}
-	return &SiteCodeService{db: db, path: target, provenance: provenance}, nil
+	return &SiteCodeService{path: target, provenance: provenance, cache: cache}, nil
 }
 
 func checkSiteCodeChecksum(path string, provenance listcatalog.Provenance) error {
@@ -40,27 +40,21 @@ func checkSiteCodeChecksum(path string, provenance listcatalog.Provenance) error
 func (s *SiteCodeService) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.db == nil {
+	if s.closed {
 		return nil
 	}
-	err := s.db.Close()
-	s.db = nil
-	return err
+	s.closed = true
+	s.cache.rows = nil
+	return nil
 }
 
 func (s *SiteCodeService) listChoices(list string) ([]SiteCodeChoice, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if s.db == nil {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
 		return nil, errors.New("site code catalogue is closed")
 	}
-	if err := checkSiteCodeChecksum(s.path, s.provenance); err != nil {
-		return nil, err
-	}
-	if err := listcatalog.ValidateDatabase(s.db, s.provenance); err != nil {
-		return nil, err
-	}
-	rows, err := listcatalog.ReadChoices(s.db, list)
+	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.SiteProfile(), "site code", list, false)
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +86,16 @@ func (s *SiteCodeService) listChoices(list string) ([]SiteCodeChoice, error) {
 
 func (s *SiteCodeService) ListSiteDisturbanceChoices() ([]SiteCodeChoice, error) {
 	return s.listChoices("SiteDisturbance")
+}
+
+func (s *SiteCodeService) ReloadCatalogue() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
+		return errors.New("site code catalogue is closed")
+	}
+	_, err := s.cache.choices(s.path, s.provenance, listcatalog.SiteProfile(), "site code", "", true)
+	return err
 }
 
 func (s *SiteCodeService) ListExposureChoices() ([]SiteCodeChoice, error) {

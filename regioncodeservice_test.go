@@ -111,7 +111,7 @@ func TestRegionCatalogueReadonlyNonoverwritingCorruptionAndRetry(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer s.Close()
-	if _, err := s.db.Exec(`UPDATE SiteCodeChoices SET Item='zz'`); err == nil {
+	if _, err := readonlyCatalogueFixture(t, s.path).Exec(`UPDATE SiteCodeChoices SET Item='zz'`); err == nil {
 		t.Fatal("read-only catalogue writable")
 	}
 	file, err := os.OpenFile(s.path, os.O_WRONLY, 0)
@@ -160,12 +160,12 @@ func TestRegionCatalogueConcurrentReadCloseAndProvenance(t *testing.T) {
 	}
 	p := s.provenance
 	p.Rows--
-	if err := listcatalog.ValidateDatabaseFor(s.db, p, listcatalog.RegionProfile()); err == nil {
+	if err := listcatalog.ValidateDatabaseFor(readonlyCatalogueFixture(t, s.path), p, listcatalog.RegionProfile()); err == nil {
 		t.Fatal("invalid row provenance accepted")
 	}
 	p = s.provenance
 	p.TypedCellsSHA256 = strings.Repeat("0", 64)
-	if err := listcatalog.ValidateDatabaseFor(s.db, p, listcatalog.RegionProfile()); err == nil {
+	if err := listcatalog.ValidateDatabaseFor(readonlyCatalogueFixture(t, s.path), p, listcatalog.RegionProfile()); err == nil {
 		t.Fatal("invalid stored provenance accepted")
 	}
 	var group sync.WaitGroup

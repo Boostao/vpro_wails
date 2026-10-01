@@ -147,8 +147,20 @@ header reads reuse one idle connection; a bounded backend benchmark measured
 machine. This is not a frontend latency or contention guarantee. Native warm
 reads, same-name project switching, stale rejection and close preserve fixture
 data/config/supports; process handles plateau after warmup.
-Shared catalogue verification caching and end-to-end read cancellation remain
-planned; catalogue lookups still rehash/revalidate. See C1-C5 in
+Shared verification caching is implemented for Parent, Geology, Soil, Region and
+Site catalogues. Mount verifies the full file/profile and publishes an immutable
+metadata snapshot; warm lookups clone that snapshot without additional hashes,
+SQL queries or profile scans. Temporary readonly SQL handles close before
+publication, allowing replacement/removal. File identity/size/modtime changes
+invalidate the cache; Windows also checks ChangeTime. Explicit Retry forces
+verification, and failures return no choices until successful revalidation.
+Metadata is not a cryptographic guarantee: a host preserving every observed
+attribute can retain the old verified snapshot until forced Retry, never read
+unchecked new rows. Non-Windows invalidation uses identity/size/modtime only.
+Three100-call backend runs measured warm54-63us versus forced full verification
+3.09-3.15ms, not UI latency. Native corruption/remount/Retry/restoration preserves
+invalid drafts and all project/audit/config/support bytes.
+End-to-end read cancellation remains planned. See C1-C5 in
 [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for bounded performance/cleanup gates,
 including incremental packages and optional typed catalogue transport consolidation.
 

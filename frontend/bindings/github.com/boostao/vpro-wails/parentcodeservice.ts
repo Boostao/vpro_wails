@@ -16,3 +16,7 @@ export function Close(): $CancellablePromise<void> {
 export function ListChoices(listName: string): $CancellablePromise<$models.ParentCodeChoice[] | null> {
     return $Call.ByID(1950183236, listName);
 }
+
+export function ReloadCatalogue(): $CancellablePromise<void> {
+    return $Call.ByID(334352106);
+}

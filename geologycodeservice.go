@@ -1,10 +1,8 @@
 package main
 
 import (
-	"database/sql"
 	_ "embed"
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/boostao/vpro-wails/internal/listcatalog"
@@ -20,47 +18,43 @@ type GeologyCodeChoice listcatalog.Choice
 
 type GeologyCodeService struct {
 	mu         sync.RWMutex
-	db         *sql.DB
+	closed     bool
 	path       string
 	provenance listcatalog.Provenance
+	cache      *listCatalogueCache
 }
 
 func NewGeologyCodeService(dataDir string) (*GeologyCodeService, error) {
-	db, path, provenance, err := openListCatalogue(dataDir, "geology-codes.db", "geology code",
+	path, provenance, cache, err := openListCatalogue(dataDir, "geology-codes.db", "geology code",
 		geologyCodeDatabase, geologyCodeProvenanceJSON, listcatalog.GeologyProfile())
 	if err != nil {
 		return nil, err
 	}
-	return &GeologyCodeService{db: db, path: path, provenance: provenance}, nil
+	return &GeologyCodeService{path: path, provenance: provenance, cache: cache}, nil
 }
 
 func (s *GeologyCodeService) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.db == nil {
+	if s.closed {
 		return nil
 	}
-	err := s.db.Close()
-	s.db = nil
-	return err
+	s.closed = true
+	s.cache.rows = nil
+	return nil
 }
 
 func (s *GeologyCodeService) ListBedrockChoices() ([]GeologyCodeChoice, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if s.db == nil {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
 		return nil, errors.New("geology code catalogue is closed")
 	}
-	if err := checkListCatalogueChecksum(s.path, s.provenance, "geology code"); err != nil {
+	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.GeologyProfile(), "geology code", "BedrockType", false)
+	if err != nil {
 		return nil, err
 	}
-	if err := listcatalog.ValidateDatabaseFor(s.db, s.provenance, listcatalog.GeologyProfile()); err != nil {
-		return nil, fmt.Errorf("geology code catalogue: %w", err)
-	}
-	rows, err := listcatalog.ReadChoicesFor(s.db, "BedrockType", listcatalog.GeologyProfile())
-	if err != nil {
-		return nil, fmt.Errorf("geology code catalogue: %w", err)
-	}
+
 	result := make([]GeologyCodeChoice, 0, len(rows))
 	for _, source := range rows {
 		row := GeologyCodeChoice(source)
@@ -74,4 +68,14 @@ func (s *GeologyCodeService) ListBedrockChoices() ([]GeologyCodeChoice, error) {
 		result = append(result, row)
 	}
 	return result, nil
+}
+
+func (s *GeologyCodeService) ReloadCatalogue() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
+		return errors.New("geology code catalogue is closed")
+	}
+	_, err := s.cache.choices(s.path, s.provenance, listcatalog.GeologyProfile(), "geology code", "", true)
+	return err
 }

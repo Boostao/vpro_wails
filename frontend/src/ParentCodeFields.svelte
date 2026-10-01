@@ -18,7 +18,8 @@
   const editor = createParentCodeEditor(untrack(() => scope));
   const validationKey = `parentCodes-${untrack(() => scope)}`;
   let views = $state<ParentCodeViews>({});
-  const lookups = editor.lists.map(list => new QualityLookup(async () => {
+  const lookups = editor.lists.map(list => new QualityLookup(async (force) => {
+    if (force) await ParentCodeService.ReloadCatalogue();
     const rows = await ParentCodeService.ListChoices(list);
     if (rows === null) throw new Error(`${list} service did not return reference rows.`);
     return rows;
@@ -64,7 +65,7 @@
       {#if views[list]?.busy}<p role="status">Refreshing {list} choices...</p>{/if}
       {#if views[list]?.error}
         <p role="alert">{views[list]?.error}</p>
-        <button type="button" disabled={disabled || views[list]?.busy} onclick={() => void lookups[index].refresh()}>Retry {list} choices</button>
+        <button type="button" disabled={disabled || views[list]?.busy} onclick={() => void lookups[index].refresh(true)}>Retry {list} choices</button>
       {/if}
     {/each}
     {#if validation}<p role="alert">{validation}</p>{/if}

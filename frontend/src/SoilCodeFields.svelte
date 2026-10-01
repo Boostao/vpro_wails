@@ -16,12 +16,14 @@
     children: Snippet<[{ columns: readonly string[]; input: Snippet<[PaperControl, string]> } | undefined]>;
   } = $props();
   const editingEnabled = import.meta.env.VITE_SOIL_CODES_EDITING !== 'false';
-  const groupLookup = new QualityLookup(async () => {
+  const groupLookup = new QualityLookup(async (force) => {
+    if (force) await SoilCodeService.ReloadCatalogue();
     const rows = await SoilCodeService.ListGreatGroupChoices();
     if (rows === null) throw new Error('Soil great-group service did not return reference rows.');
     return rows;
   }, next => { group = next; }, 'Soil great group');
-  const subgroupLookup = new QualityLookup(async () => {
+  const subgroupLookup = new QualityLookup(async (force) => {
+    if (force) await SoilCodeService.ReloadCatalogue();
     const rows = await SoilCodeService.ListSubgroupChoices();
     if (rows === null) throw new Error('Soil subgroup service did not return reference rows.');
     return rows;
@@ -88,7 +90,7 @@
       {#if view.error}
         <p role="alert">{view.error}</p>
         <button type="button" disabled={disabled || view.busy}
-          onclick={() => void (index === 0 ? groupLookup : subgroupLookup).refresh()}>
+          onclick={() => void (index === 0 ? groupLookup : subgroupLookup).refresh(true)}>
           Retry {index === 0 ? 'great group' : 'subgroup'} choices
         </button>
       {/if}

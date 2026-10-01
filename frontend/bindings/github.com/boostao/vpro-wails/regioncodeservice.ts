@@ -20,3 +20,7 @@ export function ListEcosectionChoices(): $CancellablePromise<$models.RegionCodeC
 export function ListRegionChoices(): $CancellablePromise<$models.RegionCodeChoice[] | null> {
     return $Call.ByID(4202444580);
 }
+
+export function ReloadCatalogue(): $CancellablePromise<void> {
+    return $Call.ByID(1882880046);
+}

@@ -38,7 +38,7 @@ between shells.
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current and candidate executables contain the same verified default-on payload:
   `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`, SHA256
-  `9e293175be924e03bb16cea7b62f292d5e5bb0eece2c003558eeed500f4f8872`.
+  `e486a63d42b55bbb2133cf9156525370b1fbf6a9c31c8a308a8c4c177ea11a0c`.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -84,6 +84,25 @@ between shells.
   inspector9392 closed. Receipts pool-readonly/pool-plateau/pool-promotion.json in
   native-context. Foundation fallback f1c9ddd... is sealed there as
   vpro-foundation-verified.exe. Frontend/bindings remain unchanged.
+- C2 shared catalogue caching is implemented, tested and promoted. The five
+  Parent/Geology/Soil/Region/Site services publish verified immutable metadata
+  snapshots and close temporary SQL handles. Warm calls clone snapshot rows;
+  identity/size/modtime changes and Windows ChangeTime invalidate verification.
+  Explicit UI Retry calls ReloadCatalogue; failures return no stale success.
+  Tests prove one mount hash/profile scan, zero additional warm hashes/scans/bytes,
+  pointer isolation, replacement/removal/restoration, successful concurrent reads/
+  reloads before close and same-size/restored-modtime Windows corruption.
+  Full race root338.652s,139 frontend tests/check0/0/build; actual bindings
+ 15 services/104 methods/33 models. Three100-call backend runs: warm54-63us versus
+  forced full verification3.09-3.15ms, not UI latency. Native160 warm reads/eight
+  forced reloads, corruption/remount/failed Retry/atomic restoration/recovery retain
+  invalid drafts and reject Save; all project/audit/config/support/catalogue bytes
+  unchanged. Owned PID4528 exited; inspector9392 closed. cache-native/cache-promotion
+  receipts and representative failure/restored visuals are in native-context.
+  Pool fallback9e293175... is sealed as vpro-pool-verified.exe.
+  Metadata cannot guarantee freshness if every observed attribute is preserved:
+  warm retains only the old verified snapshot; forced Retry detects corruption.
+  Non-Windows uses identity/size/modtime only. C3 cancellation remains unimplemented.
 - Verified writable parent coverage: **77/98**. Full storage mapping and source
   layout are not full FS882 or application parity.
 - Responsive FS882 presentation is complete across all five source pages,
@@ -209,7 +228,7 @@ and labels, using the Shiny module as a presentation precedent; no second UI
 framework was installed.
 ParentCodeService's21 physical save/raw-JSON/restore guards and frontend workflow
 are native-verified and default-on (adapted desktop behavior, not unmeasured Access
-input parity). Bindings are15 services/99 methods/33 models.
+input parity). Current bindings are15 services/104 methods/33 models.
 Architecture clarification is delivered: F1 YAML/legacy migration and F2-F3
 SQLite database-family/external-path context/native safe switching pass.
 Readonly inspection of R's family/config/startup/context and matching Access
@@ -222,11 +241,11 @@ must not be an offline dependency. Verification used disposable data/config only
 no R/Access/production data writes or new Access instance. Foundation promotion
 receipt and sealed fallback are under `evidence/private/native-context`.
 Peer-review follow-up is tracked in MIGRATION_PLAN.md C1-C5: C1 session-owned plot
-pool and coordinated ownership is delivered; shared catalogue verification cache next;
+pool and coordinated ownership and C2 shared catalogue verification cache are delivered;
 cancellation through active bindings/SQL/frontend read promises alongside affected
 paths. Package extraction and optional typed catalogue transport follow incrementally
-between milestones, not as a broad rewrite. C2-C5 are not implemented;
-the promoted executable contains verified F1-F3 plus C1 pooling.
+between milestones, not as a broad rewrite. C3-C5 are not implemented;
+the promoted executable contains verified F1-F3 plus C1 pooling/C2 caching.
 Then resume ordinary surveyor/depth/cover/note fields. The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage has explicit LimitToList=NotDefault and needs a distinct membership

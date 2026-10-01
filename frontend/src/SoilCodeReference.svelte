@@ -5,12 +5,14 @@
 
   let { disabled = false }: { disabled?: boolean } = $props();
   const enabled = import.meta.env.VITE_SOIL_CODES_REFERENCE === 'true';
-  const groupLookup = new QualityLookup(async () => {
+  const groupLookup = new QualityLookup(async (force) => {
+    if (force) await SoilCodeService.ReloadCatalogue();
     const rows = await SoilCodeService.ListGreatGroupChoices();
     if (rows === null) throw new Error('Soil great-group service did not return reference rows.');
     return rows;
   }, next => { group = next; }, 'Soil great group');
-  const subgroupLookup = new QualityLookup(async () => {
+  const subgroupLookup = new QualityLookup(async (force) => {
+    if (force) await SoilCodeService.ReloadCatalogue();
     const rows = await SoilCodeService.ListSubgroupChoices();
     if (rows === null) throw new Error('Soil subgroup service did not return reference rows.');
     return rows;
@@ -35,7 +37,7 @@
       {#if view.error}
         <p role="alert">{view.error}</p>
         <button type="button" disabled={disabled || busy}
-          onclick={() => void (index === 0 ? groupLookup : subgroupLookup).refresh()}>Retry {label} reference</button>
+          onclick={() => void (index === 0 ? groupLookup : subgroupLookup).refresh(true)}>Retry {label} reference</button>
       {/if}
       <details>
         <summary>{label}: {view.ready ? view.choices.length : 'Pending'} reference rows</summary>

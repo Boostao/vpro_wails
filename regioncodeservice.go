@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	_ "embed"
 	"errors"
 	"sync"
@@ -19,44 +18,39 @@ type RegionCodeChoice listcatalog.Choice
 
 type RegionCodeService struct {
 	mu         sync.RWMutex
-	db         *sql.DB
+	closed     bool
 	path       string
 	provenance listcatalog.Provenance
+	cache      *listCatalogueCache
 }
 
 func NewRegionCodeService(dataDir string) (*RegionCodeService, error) {
-	db, path, p, err := openListCatalogue(dataDir, "region-codes.db", "region code",
+	path, p, cache, err := openListCatalogue(dataDir, "region-codes.db", "region code",
 		regionCodeDatabase, regionCodeProvenanceJSON, listcatalog.RegionProfile())
 	if err != nil {
 		return nil, err
 	}
-	return &RegionCodeService{db: db, path: path, provenance: p}, nil
+	return &RegionCodeService{path: path, provenance: p, cache: cache}, nil
 }
 
 func (s *RegionCodeService) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.db == nil {
+	if s.closed {
 		return nil
 	}
-	err := s.db.Close()
-	s.db = nil
-	return err
+	s.closed = true
+	s.cache.rows = nil
+	return nil
 }
 
 func (s *RegionCodeService) listChoices(list string, limit int) ([]RegionCodeChoice, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if s.db == nil {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
 		return nil, errors.New("region code catalogue is closed")
 	}
-	if err := checkListCatalogueChecksum(s.path, s.provenance, "region code"); err != nil {
-		return nil, err
-	}
-	if err := listcatalog.ValidateDatabaseFor(s.db, s.provenance, listcatalog.RegionProfile()); err != nil {
-		return nil, err
-	}
-	rows, err := listcatalog.ReadChoicesFor(s.db, list, listcatalog.RegionProfile())
+	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.RegionProfile(), "region code", list, false)
 	if err != nil {
 		return nil, err
 	}
@@ -77,6 +71,16 @@ func (s *RegionCodeService) listChoices(list string, limit int) ([]RegionCodeCho
 
 func (s *RegionCodeService) ListRegionChoices() ([]RegionCodeChoice, error) {
 	return s.listChoices("Region", 7)
+}
+
+func (s *RegionCodeService) ReloadCatalogue() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
+		return errors.New("region code catalogue is closed")
+	}
+	_, err := s.cache.choices(s.path, s.provenance, listcatalog.RegionProfile(), "region code", "", true)
+	return err
 }
 
 func (s *RegionCodeService) ListEcosectionChoices() ([]RegionCodeChoice, error) {

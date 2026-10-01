@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	_ "embed"
 	"errors"
 	"fmt"
@@ -20,29 +19,30 @@ type ParentCodeChoice listcatalog.Choice
 
 type ParentCodeService struct {
 	mu         sync.RWMutex
-	db         *sql.DB
+	closed     bool
 	path       string
 	provenance listcatalog.Provenance
+	cache      *listCatalogueCache
 }
 
 func NewParentCodeService(dataDir string) (*ParentCodeService, error) {
-	db, path, provenance, err := openListCatalogue(dataDir, "parent-codes.db", "parent code",
+	path, provenance, cache, err := openListCatalogue(dataDir, "parent-codes.db", "parent code",
 		parentCodeDatabase, parentCodeProvenanceJSON, listcatalog.ParentProfile())
 	if err != nil {
 		return nil, err
 	}
-	return &ParentCodeService{db: db, path: path, provenance: provenance}, nil
+	return &ParentCodeService{path: path, provenance: provenance, cache: cache}, nil
 }
 
 func (s *ParentCodeService) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.db == nil {
+	if s.closed {
 		return nil
 	}
-	err := s.db.Close()
-	s.db = nil
-	return err
+	s.closed = true
+	s.cache.rows = nil
+	return nil
 }
 
 func (s *ParentCodeService) ListChoices(listName string) ([]ParentCodeChoice, error) {
@@ -50,18 +50,12 @@ func (s *ParentCodeService) ListChoices(listName string) ([]ParentCodeChoice, er
 	if !supported {
 		return nil, fmt.Errorf("unsupported parent code list %q", listName)
 	}
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if s.db == nil {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
 		return nil, errors.New("parent code catalogue is closed")
 	}
-	if err := checkListCatalogueChecksum(s.path, s.provenance, "parent code"); err != nil {
-		return nil, err
-	}
-	if err := listcatalog.ValidateDatabaseFor(s.db, s.provenance, listcatalog.ParentProfile()); err != nil {
-		return nil, fmt.Errorf("parent code catalogue: %w", err)
-	}
-	rows, err := listcatalog.ReadChoicesFor(s.db, listName, listcatalog.ParentProfile())
+	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.ParentProfile(), "parent code", listName, false)
 	if err != nil {
 		return nil, fmt.Errorf("parent code catalogue: %w", err)
 	}
@@ -70,6 +64,16 @@ func (s *ParentCodeService) ListChoices(listName string) ([]ParentCodeChoice, er
 		result = append(result, parentCodeChoice(source, maximum))
 	}
 	return result, nil
+}
+
+func (s *ParentCodeService) ReloadCatalogue() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
+		return errors.New("parent code catalogue is closed")
+	}
+	_, err := s.cache.choices(s.path, s.provenance, listcatalog.ParentProfile(), "parent code", "", true)
+	return err
 }
 
 func parentCodeChoice(source listcatalog.Choice, maximum int) ParentCodeChoice {

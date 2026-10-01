@@ -93,19 +93,19 @@ export class QualityLookup {
   private revision = 0;
   private disposed = false;
   private view: QualityView = { choices: [], busy: false, ready: false, error: null };
-  constructor(private fetch: () => Promise<PlotQualityChoice[]>, private state: (view: QualityView) => void,
+  constructor(private fetch: (force: boolean) => Promise<PlotQualityChoice[]>, private state: (view: QualityView) => void,
     private label = 'Quality') {}
   snapshot(): QualityView { return { ...this.view }; }
   private publish(update: Partial<QualityView>): void {
     this.view = { ...this.view, ...update };
     this.state(this.snapshot());
   }
-  async refresh(): Promise<void> {
+  async refresh(force = false): Promise<void> {
     if (this.disposed) return;
     const revision = ++this.revision;
     this.publish({ choices: [], busy: true, ready: false, error: null });
     try {
-      const choices = await this.fetch();
+      const choices = await this.fetch(force);
       if (!Array.isArray(choices)) throw new Error(`${this.label} service did not return choice rows.`);
       if (this.disposed || revision !== this.revision) return;
       this.publish({ choices, ready: true, busy: false });
