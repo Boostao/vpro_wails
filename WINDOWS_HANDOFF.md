@@ -38,7 +38,7 @@ between shells.
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current and candidate executables contain the same verified default-on payload:
   `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`, SHA256
-  `e486a63d42b55bbb2133cf9156525370b1fbf6a9c31c8a308a8c4c177ea11a0c`.
+  `e3bfec439d1e85f51078a47f4e164580463d0c023eff4ef3a05b8fb3cc2556e9`.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -102,7 +102,24 @@ between shells.
   Pool fallback9e293175... is sealed as vpro-pool-verified.exe.
   Metadata cannot guarantee freshness if every observed attribute is preserved:
   warm retains only the old verified snapshot; forced Retry detects corruption.
-  Non-Windows uses identity/size/modtime only. C3 cancellation remains unimplemented.
+  Non-Windows uses identity/size/modtime only.
+- C3a scoped FS882 retrieval is implemented, tested and promoted. Eight injected
+  ContextService read contexts flow through capability/header/child/audit SQL and
+  the owned pool. Queued operation leases and pool waits observe cancellation.
+  FS882 tracks generated read promises, cancelling supersession/unmount only;
+  mutation/Save/Lock/restoration commits are unchanged. Full race root348.272s,
+ 142 frontend tests/check0/0/build; real binding shapes remain15/104/33.
+  Actual generated SDK cancellation interrupts an expensive query on an isolated
+  project copy; switch lease release0.328s, subsequent header identical. The
+  synthetic schema was removed and exact original bytes restored after close;
+  project/audits/config/catalogues/family all match. Evidence/promotion:
+  evidence/private/native-read-cancel. Owned PID15024 exited; inspector9392 closed.
+  Cache fallback e486a63d... is sealed there as vpro-cache-verified.exe; failed
+  acknowledgement candidate/receipt are retained separately.
+  beta.26's delayed backend `context canceled` acknowledgement is handled only for
+  an owned explicitly cancelled read promise/RuntimeError; all unrelated errors
+  remain visible. C3 remains open for browse/hierarchy/reference/catalogue reads,
+  their frontend cancellation and remaining coordinator/metadata lock waits.
 - Verified writable parent coverage: **77/98**. Full storage mapping and source
   layout are not full FS882 or application parity.
 - Responsive FS882 presentation is complete across all five source pages,
@@ -244,8 +261,9 @@ Peer-review follow-up is tracked in MIGRATION_PLAN.md C1-C5: C1 session-owned pl
 pool and coordinated ownership and C2 shared catalogue verification cache are delivered;
 cancellation through active bindings/SQL/frontend read promises alongside affected
 paths. Package extraction and optional typed catalogue transport follow incrementally
-between milestones, not as a broad rewrite. C3-C5 are not implemented;
-the promoted executable contains verified F1-F3 plus C1 pooling/C2 caching.
+between milestones, not as a broad rewrite. C3a scoped reads are delivered;
+the rest of C3 and C4-C5 are pending. The promoted executable contains verified
+F1-F3 plus C1 pooling/C2 caching/C3a scoped-read cancellation.
 Then resume ordinary surveyor/depth/cover/note fields. The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage has explicit LimitToList=NotDefault and needs a distinct membership

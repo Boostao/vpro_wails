@@ -242,6 +242,7 @@ type PlotService struct {
 	siteCodes      *SiteCodeService
 	siteCodesError error
 	contextScoped  bool
+	requestContext context.Context
 }
 
 func (s *PlotService) requireContextEdit() error {
@@ -326,7 +327,7 @@ func (s *PlotService) getActiveDB() (*sql.DB, string, func(), error) {
 	coordinator := s.projects.sqlite
 	s.projects.mu.RUnlock()
 	if coordinator != nil {
-		db, err := coordinator.projectDatabase(context.Background())
+		db, err := coordinator.projectDatabase(s.operationContext())
 		if err != nil {
 			release()
 			return nil, "", nil, err
@@ -387,7 +388,7 @@ func (s *PlotService) ListAuditEntries(plotNumber string) ([]AuditEntry, error) 
 	}
 	defer release()
 
-	entries, err := readAuditEntries(db, project, `"PlotNumber" = ?`, plotNumber)
+	entries, err := readAuditEntries(s.readDB(db), project, `"PlotNumber" = ?`, plotNumber)
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"testing"
 	"time"
@@ -62,14 +63,14 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 			_, err := service.RestoreSelectedAuditRecords(stale, "stale", nil, AuditRestoreRetain)
 			return err
 		},
-		"header read":        func() error { _, err := service.GetPlot(stale, "stale"); return err },
-		"capabilities":       func() error { _, err := service.GetHeaderCapabilities(stale); return err },
-		"child capabilities": func() error { _, err := service.GetChildCapabilities(stale, "Veg"); return err },
-		"veg read":           func() error { _, err := service.ListVegRecords(stale, "stale"); return err },
-		"humus read":         func() error { _, err := service.ListHumusRecords(stale, "stale"); return err },
-		"mineral read":       func() error { _, err := service.ListMineralRecords(stale, "stale"); return err },
-		"other read":         func() error { _, err := service.ListOtherRecords(stale, "stale"); return err },
-		"audit read":         func() error { _, err := service.ListAuditEntries(stale, "stale"); return err },
+		"header read":        func() error { _, err := service.GetPlot(context.Background(), stale, "stale"); return err },
+		"capabilities":       func() error { _, err := service.GetHeaderCapabilities(context.Background(), stale); return err },
+		"child capabilities": func() error { _, err := service.GetChildCapabilities(context.Background(), stale, "Veg"); return err },
+		"veg read":           func() error { _, err := service.ListVegRecords(context.Background(), stale, "stale"); return err },
+		"humus read":         func() error { _, err := service.ListHumusRecords(context.Background(), stale, "stale"); return err },
+		"mineral read":       func() error { _, err := service.ListMineralRecords(context.Background(), stale, "stale"); return err },
+		"other read":         func() error { _, err := service.ListOtherRecords(context.Background(), stale, "stale"); return err },
+		"audit read":         func() error { _, err := service.ListAuditEntries(context.Background(), stale, "stale"); return err },
 		"switch":             func() error { _, err := service.SwitchContext(stale, contextSelection(current)); return err },
 		"legacy header":      func() error { return service.plots.UpdatePlot(FS882Header{PlotNumber: "stale"}) },
 		"legacy child":       func() error { return service.plots.DeleteVegRecord("stale", 1) },
@@ -144,7 +145,7 @@ func TestContextServiceClosedOwnerRejectsCurrentToken(t *testing.T) {
 	if err := service.projects.closeSQLiteContext(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.GetPlot(state.ContextID, "stale"); err == nil {
+	if _, err := service.GetPlot(context.Background(), state.ContextID, "stale"); err == nil {
 		t.Fatal("closed context accepted a formerly current token")
 	}
 	if _, err := service.SwitchContext(state.ContextID, contextSelection(state)); err == nil {

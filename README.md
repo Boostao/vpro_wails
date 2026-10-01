@@ -160,7 +160,16 @@ unchecked new rows. Non-Windows invalidation uses identity/size/modtime only.
 Three100-call backend runs measured warm54-63us versus forced full verification
 3.09-3.15ms, not UI latency. Native corruption/remount/Retry/restoration preserves
 invalid drafts and all project/audit/config/support bytes.
-End-to-end read cancellation remains planned. See C1-C5 in
+Scoped FS882 header/capability/child/audit reads now accept the injected Wails
+context and use QueryContext/QueryRowContext. Supersession/unmount explicitly
+cancels retained generated read promises; Save/Lock/restoration commits are not
+cancelled or retried. Queued operation leases and SQL pool waits observe cancellation.
+Native generated-promise cancellation interrupts SQLite, releases the switch lease
+and permits an identical subsequent read. beta.26 reports a delayed backend
+acknowledgement: only `context canceled` RuntimeErrors belonging to explicitly
+cancelled owned read promises are handled; unrelated failures remain visible.
+Browse/reference/catalogue cancellation is still pending, so C3 is not complete.
+See C1-C5 in
 [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for bounded performance/cleanup gates,
 including incremental packages and optional typed catalogue transport consolidation.
 

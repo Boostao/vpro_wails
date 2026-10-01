@@ -179,7 +179,7 @@ func (s *PlotService) GetHeaderCapabilities() (map[string]bool, error) {
 		return nil, err
 	}
 	defer release()
-	return headerCapabilities(db, project)
+	return headerCapabilities(s.readDB(db), project)
 }
 
 func readHeader(db headerDB, project, plot string, caps map[string]bool) (*FS882Header, error) {
@@ -214,11 +214,11 @@ func (s *PlotService) GetPlot(plotNumber string) (*FS882Header, error) {
 		return nil, err
 	}
 	defer release()
-	caps, err := headerCapabilities(db, project)
+	caps, err := headerCapabilities(s.readDB(db), project)
 	if err != nil {
 		return nil, err
 	}
-	h, err := readHeader(db, project, plotNumber, caps)
+	h, err := readHeader(s.readDB(db), project, plotNumber, caps)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, fmt.Errorf("plot %q not found", plotNumber)
 	}

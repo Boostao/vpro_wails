@@ -210,7 +210,7 @@ func (s *PlotService) GetChildCapabilities(kind string) (map[string]bool, error)
 		return nil, err
 	}
 	defer release()
-	caps, err := childCapabilities(db, project, kind)
+	caps, err := childCapabilities(s.readDB(db), project, kind)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func listChildRecords[T any](s *PlotService, kind, plot string) ([]T, error) {
 		return nil, err
 	}
 	defer release()
-	caps, err := childCapabilities(db, project, kind)
+	caps, err := childCapabilities(s.readDB(db), project, kind)
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +245,7 @@ func listChildRecords[T any](s *PlotService, kind, plot string) ([]T, error) {
 	if kind == "Veg" && caps["species"] {
 		order = `"Species"`
 	}
-	rows, err := db.Query(`SELECT `+strings.Join(columns, ",")+` FROM `+
+	rows, err := s.readDB(db).Query(`SELECT `+strings.Join(columns, ",")+` FROM `+
 		quoteHeaderIdentifier(project+"_"+kind)+` WHERE "PlotNumber" = ? ORDER BY `+order, plot)
 	if err != nil {
 		return nil, err

@@ -21,7 +21,7 @@ func poolFixture(t *testing.T) (*ContextService, ProjectState, *FS882Header) {
 	if err != nil || len(page.Plots) != 1 {
 		t.Fatalf("plot fixture: %+v %v", page, err)
 	}
-	header, err := service.GetPlot(state.ContextID, page.Plots[0].PlotNumber)
+	header, err := service.GetPlot(context.Background(), state.ContextID, page.Plots[0].PlotNumber)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,11 +40,11 @@ func TestPlotPoolWarmReadsReuseOwnedHandleAndPreserveFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 	for i := 0; i < 100; i++ {
-		header, err := service.GetPlot(state.ContextID, original.PlotNumber)
+		header, err := service.GetPlot(context.Background(), state.ContextID, original.PlotNumber)
 		if err != nil || !reflect.DeepEqual(header, original) {
 			t.Fatalf("warm header changed: %v", err)
 		}
-		if _, err := service.GetHeaderCapabilities(state.ContextID); err != nil {
+		if _, err := service.GetHeaderCapabilities(context.Background(), state.ContextID); err != nil {
 			t.Fatal(err)
 		}
 		if owner.projectDB != pool {
@@ -107,7 +107,7 @@ func TestPlotPoolConcurrentReadsKeepOneOwnerAndBoundedConnections(t *testing.T) 
 		go func() {
 			defer wait.Done()
 			for i := 0; i < 10; i++ {
-				if _, err := service.GetPlot(state.ContextID, header.PlotNumber); err != nil {
+				if _, err := service.GetPlot(context.Background(), state.ContextID, header.PlotNumber); err != nil {
 					results <- err
 					return
 				}
@@ -140,7 +140,7 @@ func TestPlotPoolFailedPublicationRetainsPoolAndSwitchClosesIt(t *testing.T) {
 	if service.projects.sqlite != owner || owner.projectDB != pool {
 		t.Fatal("failed publication retired the original pool")
 	}
-	if _, err := service.GetPlot(state.ContextID, header.PlotNumber); err != nil {
+	if _, err := service.GetPlot(context.Background(), state.ContextID, header.PlotNumber); err != nil {
 		t.Fatal(err)
 	}
 	next, err := service.SwitchContext(state.ContextID, contextSelection(state))
@@ -150,7 +150,7 @@ func TestPlotPoolFailedPublicationRetainsPoolAndSwitchClosesIt(t *testing.T) {
 	if err := pool.Ping(); err == nil || owner.projectDB != nil {
 		t.Fatal("successful switch left old project pool open")
 	}
-	if _, err := service.GetPlot(next.ContextID, header.PlotNumber); err != nil {
+	if _, err := service.GetPlot(context.Background(), next.ContextID, header.PlotNumber); err != nil {
 		t.Fatal(err)
 	}
 	newPool := service.projects.sqlite.projectDB
@@ -214,7 +214,7 @@ func TestPlotPoolAuditFailureRollsBackAndRetryKeepsTheSamePool(t *testing.T) {
 	if err := service.UpdatePlot(state.ContextID, changed); err == nil || !strings.Contains(err.Error(), "pool audit failure") {
 		t.Fatalf("injected failure did not reject save: %v", err)
 	}
-	actual, err := service.GetPlot(state.ContextID, original.PlotNumber)
+	actual, err := service.GetPlot(context.Background(), state.ContextID, original.PlotNumber)
 	if err != nil || !reflect.DeepEqual(actual, original) {
 		t.Fatalf("failed pooled save changed parent data: %v", err)
 	}
@@ -228,7 +228,7 @@ func TestPlotPoolAuditFailureRollsBackAndRetryKeepsTheSamePool(t *testing.T) {
 	if err := service.UpdatePlot(state.ContextID, changed); err != nil {
 		t.Fatal(err)
 	}
-	actual, err = service.GetPlot(state.ContextID, original.PlotNumber)
+	actual, err = service.GetPlot(context.Background(), state.ContextID, original.PlotNumber)
 	if err != nil || actual.PlotRepresenting == nil || *actual.PlotRepresenting != value {
 		t.Fatal("pooled retry did not save the intended value", err)
 	}
@@ -281,7 +281,7 @@ func BenchmarkPlotPoolReads(b *testing.B) {
 	plot := page.Plots[0].PlotNumber
 	for name, read := range map[string]func() (*FS882Header, error){
 		"legacy-per-operation": func() (*FS882Header, error) { return legacy.GetPlot(plot) },
-		"context-owned-pool":   func() (*FS882Header, error) { return scoped.GetPlot(projects.contextID, plot) },
+		"context-owned-pool":   func() (*FS882Header, error) { return scoped.GetPlot(context.Background(), projects.contextID, plot) },
 	} {
 		b.Run(name, func(b *testing.B) {
 			if _, err := read(); err != nil {

@@ -29,9 +29,11 @@
   import type { WorkingUnitSession } from './workingUnitEditor';
   import { onDestroy, untrack } from 'svelte';
   import { bindContextPlots } from './contextPlots';
+  import { ReadRequests } from './readRequests';
 
   let { plotNumber, contextId, onSaved, onClosed, onBusyChange }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void } = $props();
   const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
+  const reads = new ReadRequests();
 
   let activeTab = $state<'site' | 'veg' | 'vegOther' | 'soils' | 'other' | 'audit'>('site');
   let vegetationMode = $state<VegetationMode>('initial');
@@ -60,7 +62,7 @@
   type ChildKind = 'Veg' | 'Humus' | 'Mineral' | 'Other';
   let childCapabilities = $state<Record<ChildKind, Record<string, boolean | undefined>>>({ Veg: {}, Humus: {}, Mineral: {}, Other: {} });
   let loadRequest = 0;
-  onDestroy(() => { loadRequest++; });
+  onDestroy(() => { loadRequest++; reads.cancelAll(); });
   let container: HTMLDivElement;
 
   $effect(() => { onBusyChange?.(busy || headerWorkflowBusy); });
@@ -286,7 +288,7 @@
     : 'Save the plot before restoring fields.');
 
   async function refreshAfterRestore(plot: string, request: number) {
-    const header = await PlotService.GetPlot(plot);
+    const header = await reads.track(PlotService.GetPlot(plot));
     if (!header) throw new Error('Restored plot could not be reloaded.');
     await loadChildData(plot);
     if (request !== loadRequest) return;
@@ -350,6 +352,7 @@
 
   async function load(p?: string) {
     const request = ++loadRequest;
+    reads.cancelAll();
     if (workingUnitSession.plot !== (p ?? '')) workingUnitSession.mode = null;
     workingUnitSession.plot = p ?? '';
     busy = true;
@@ -364,8 +367,8 @@
     childCapabilities = { Veg: {}, Humus: {}, Mineral: {}, Other: {} };
     try {
       const [fields, res] = await Promise.all([
-        PlotService.GetHeaderCapabilities(),
-        p ? PlotService.GetPlot(p) : Promise.resolve(null)
+        reads.track(PlotService.GetHeaderCapabilities()),
+        p ? reads.track(PlotService.GetPlot(p)) : Promise.resolve(null)
       ]);
       if (request !== loadRequest) return;
       if (fields === null) throw new Error('Header capabilities were not returned.');
@@ -396,15 +399,15 @@
     const request = loadRequest;
     try {
       const [v, h, m, o, a, vc, hc, mc, oc] = await Promise.all([
-        PlotService.ListVegRecords(p),
-        PlotService.ListHumusRecords(p),
-        PlotService.ListMineralRecords(p),
-        PlotService.ListOtherRecords(p),
-        PlotService.ListAuditEntries(p),
-        PlotService.GetChildCapabilities('Veg'),
-        PlotService.GetChildCapabilities('Humus'),
-        PlotService.GetChildCapabilities('Mineral'),
-        PlotService.GetChildCapabilities('Other')
+        reads.track(PlotService.ListVegRecords(p)),
+        reads.track(PlotService.ListHumusRecords(p)),
+        reads.track(PlotService.ListMineralRecords(p)),
+        reads.track(PlotService.ListOtherRecords(p)),
+        reads.track(PlotService.ListAuditEntries(p)),
+        reads.track(PlotService.GetChildCapabilities('Veg')),
+        reads.track(PlotService.GetChildCapabilities('Humus')),
+        reads.track(PlotService.GetChildCapabilities('Mineral')),
+        reads.track(PlotService.GetChildCapabilities('Other'))
       ]);
       if (request !== loadRequest) return;
       if (vc === null || hc === null || mc === null || oc === null) throw new Error('Child capabilities were not returned.');

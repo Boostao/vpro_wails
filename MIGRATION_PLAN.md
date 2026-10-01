@@ -257,7 +257,21 @@ bounded; do not reopen the foundation as a general framework rewrite.
 | C4: Incremental package seams | Between validated milestones, extract shared catalogue storage first, then self-contained config/coordinator/domain logic into internal packages as useful. Keep main for composition/service registration and thin Wails adapters; preserve exported DTOs and existing helpers during migration. | One cohesive extraction per checkpoint, no dependency cycles or global singleton state. Preserve public bindings, localization/errors, embedded asset ownership and legacy adapters; focused tests then full race at integration. No simultaneous package move, API replacement and behavior change. Existing internal/listcatalog is prior art, not something to recreate. |
 | C5: Optional catalogue transport consolidation | After shared internals/policies are stable, evaluate a typed CatalogService with allowlisted domain/list identifiers; retain existing services as compatibility adapters until callers migrate. Implement only if it measurably reduces transport/maintenance duplication. | Unsupported domains/lists fail explicitly; no arbitrary SQL/file selection. Preserve provenance, nullable/duplicate metadata, per-field UTF-16 bounds, strict versus permissive membership, independent failures/Retry and typed return shapes. Real bindings/frontend/native lookup regressions pass; frozen catalogues remain read models, never replacements for the canonical database family. |
 
-C1-C2 are complete; implement C3 as the next small retrieval checkpoint;
+C1-C2 are complete. C3a scoped editor retrieval is implemented and promoted:
+eight ContextService read methods receive injected context without changing JS
+arguments; header/schema/child/audit queries use context-aware SQL. FS882 retains
+read promises and explicitly cancels on supersession/unmount; writes are unchanged.
+Tests cover pre-cancelled calls, queued operation leases, SQL pool waits, SQLite
+interruption/release/recovery and actual SDK promises. Full race root348.272s,
+142 frontend tests/check0/0/build; real bindings remain15/104/33. Native cancellation
+of an intentionally expensive query on an isolated copy releases the switch lease
+in0.328s and the next read is identical. The synthetic schema is removed and exact
+project bytes restored after owned close; audits/config/catalogues/supports match.
+beta.26's delayed acknowledgement is handled only for an owned explicitly
+cancelled promise with a RuntimeError whose message is exactly `context canceled`;
+other rejected reads remain errors, including unrelated cancelled promises.
+C3 remains open for browse/project/hierarchy/reference/catalogue reads and their
+frontend ownership, plus any remaining coordinator/metadata lock waits.
 wire C3 along affected retrieval paths without coupling it to an all-service rewrite.
 C4/C5 fit between subsequent validated workflows and do not block parent migration
 merely to reduce file/service counts. Run focused Go tests/benchmarks first, full
@@ -335,7 +349,7 @@ No pending writes or owned native process need continuation.
 C1 pooling and C2 verification caching are complete and promoted. C2 native proof
 preserves all fixture bytes through warm reads, corruption, remount, failed Retry,
 atomic restoration and successful Retry without resetting invalid drafts.
-Next complete bounded C3 cancellation on the
+Next complete the remaining C3 browse/reference/catalogue cancellation on the
 affected retrieval paths, then classify and implement the remaining ordinary surveyor/text/
 depth/cover/note fields from the already sealed source checklist. Do not repeat
 reference capture or field-by-field audit matrices. Remaining21: AirPhotoNum, BECSiteUnit, EnteredBy,

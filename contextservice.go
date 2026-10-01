@@ -1,6 +1,9 @@
 package main
 
-import "errors"
+import (
+	"context"
+	"errors"
+)
 
 type ContextSelection struct {
 	Project       string `json:"project"`
@@ -38,7 +41,14 @@ func (s *ContextService) SwitchContext(expectedID string, requested ContextSelec
 }
 
 func withContextPlot[T any](s *ContextService, expectedID string, operation func(*PlotService) (T, error)) (T, error) {
-	s.projects.operationMu.RLock()
+	return withContextPlotRequest(context.Background(), s, expectedID, operation)
+}
+
+func withContextPlotRequest[T any](ctx context.Context, s *ContextService, expectedID string, operation func(*PlotService) (T, error)) (T, error) {
+	if err := acquireReadLease(ctx, &s.projects.operationMu); err != nil {
+		var result T
+		return result, err
+	}
 	defer s.projects.operationMu.RUnlock()
 	s.projects.mu.RLock()
 	if expectedID == "" || expectedID != s.projects.contextID || s.projects.sqlite.conn == nil {
@@ -54,7 +64,7 @@ func withContextPlot[T any](s *ContextService, expectedID string, operation func
 	s.projects.mu.RUnlock()
 	s.plots.mu.RLock()
 	plots := &PlotService{projects: projects, auditStrength: s.plots.auditStrength, currentUser: s.plots.currentUser,
-		siteCodes: s.plots.siteCodes, siteCodesError: s.plots.siteCodesError, contextScoped: true}
+		siteCodes: s.plots.siteCodes, siteCodesError: s.plots.siteCodesError, contextScoped: true, requestContext: ctx}
 	s.plots.mu.RUnlock()
 	return operation(plots)
 }
@@ -66,36 +76,36 @@ func (s *ContextService) edit(expectedID string, operation func(*PlotService) er
 	return err
 }
 
-func (s *ContextService) GetPlot(contextID, plot string) (*FS882Header, error) {
-	return withContextPlot(s, contextID, func(plots *PlotService) (*FS882Header, error) { return plots.GetPlot(plot) })
+func (s *ContextService) GetPlot(ctx context.Context, contextID, plot string) (*FS882Header, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*FS882Header, error) { return plots.GetPlot(plot) })
 }
 
-func (s *ContextService) GetHeaderCapabilities(contextID string) (map[string]bool, error) {
-	return withContextPlot(s, contextID, func(plots *PlotService) (map[string]bool, error) { return plots.GetHeaderCapabilities() })
+func (s *ContextService) GetHeaderCapabilities(ctx context.Context, contextID string) (map[string]bool, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (map[string]bool, error) { return plots.GetHeaderCapabilities() })
 }
 
-func (s *ContextService) GetChildCapabilities(contextID, kind string) (map[string]bool, error) {
-	return withContextPlot(s, contextID, func(plots *PlotService) (map[string]bool, error) { return plots.GetChildCapabilities(kind) })
+func (s *ContextService) GetChildCapabilities(ctx context.Context, contextID, kind string) (map[string]bool, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (map[string]bool, error) { return plots.GetChildCapabilities(kind) })
 }
 
-func (s *ContextService) ListVegRecords(contextID, plot string) ([]VegRecord, error) {
-	return withContextPlot(s, contextID, func(plots *PlotService) ([]VegRecord, error) { return plots.ListVegRecords(plot) })
+func (s *ContextService) ListVegRecords(ctx context.Context, contextID, plot string) ([]VegRecord, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) ([]VegRecord, error) { return plots.ListVegRecords(plot) })
 }
 
-func (s *ContextService) ListHumusRecords(contextID, plot string) ([]HumusRecord, error) {
-	return withContextPlot(s, contextID, func(plots *PlotService) ([]HumusRecord, error) { return plots.ListHumusRecords(plot) })
+func (s *ContextService) ListHumusRecords(ctx context.Context, contextID, plot string) ([]HumusRecord, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) ([]HumusRecord, error) { return plots.ListHumusRecords(plot) })
 }
 
-func (s *ContextService) ListMineralRecords(contextID, plot string) ([]MineralRecord, error) {
-	return withContextPlot(s, contextID, func(plots *PlotService) ([]MineralRecord, error) { return plots.ListMineralRecords(plot) })
+func (s *ContextService) ListMineralRecords(ctx context.Context, contextID, plot string) ([]MineralRecord, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) ([]MineralRecord, error) { return plots.ListMineralRecords(plot) })
 }
 
-func (s *ContextService) ListOtherRecords(contextID, plot string) ([]OtherRecord, error) {
-	return withContextPlot(s, contextID, func(plots *PlotService) ([]OtherRecord, error) { return plots.ListOtherRecords(plot) })
+func (s *ContextService) ListOtherRecords(ctx context.Context, contextID, plot string) ([]OtherRecord, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) ([]OtherRecord, error) { return plots.ListOtherRecords(plot) })
 }
 
-func (s *ContextService) ListAuditEntries(contextID, plot string) ([]AuditEntry, error) {
-	return withContextPlot(s, contextID, func(plots *PlotService) ([]AuditEntry, error) { return plots.ListAuditEntries(plot) })
+func (s *ContextService) ListAuditEntries(ctx context.Context, contextID, plot string) ([]AuditEntry, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) ([]AuditEntry, error) { return plots.ListAuditEntries(plot) })
 }
 
 func (s *ContextService) CreatePlot(contextID string, header FS882Header) error {
