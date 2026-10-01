@@ -186,7 +186,7 @@ func TestOrdinaryAtomicAuditRollbackRetryAndRestoreGuards(t *testing.T) {
 			t.Fatal("overflow restore accepted", field.name)
 		}
 	}
-	for _, held := range []string{"becSiteUnit", "soilDrainage", "photo", "xCoord", "yCoord", "speciesListComplete", "updatedFromCards"} {
+	for _, held := range []string{"becSiteUnit", "soilDrainage", "speciesListComplete", "updatedFromCards"} {
 		if isOrdinaryProperty(held) {
 			t.Fatal(fmt.Sprintf("unavailable distinct workflow enabled: %s", held))
 		}

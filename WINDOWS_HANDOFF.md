@@ -38,7 +38,7 @@ between shells.
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current and candidate executables contain the same verified default-on payload:
   `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`, SHA256
-  `3568c87513da9767fdc9ea6aed2ce7e6433159bc2b8c560b73840c42136f4ff1`.
+  `72f2407a7ade54adb067cfe0043f5f8481b361e10bf762ac8a563d5736c9e255`.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -177,7 +177,7 @@ between shells.
   exited, inspector9392 closed. Catalogue fallback80a008... is sealed there as
   vpro-all-catalogue-read-verified.exe. Parent migration resumes next; optional
   C4/C5 cleanup is nonblocking.
-- Verified writable parent coverage: **95/98**, including conditionally authorized
+- Verified writable parent coverage: **98/98**, including conditionally authorized
   BEC Master. Full storage mapping and source
   layout are not full FS882 or application parity.
 - Fourteen ordinary surveyor/text/depth/cover/note fields are default-on, with
@@ -225,6 +225,19 @@ between shells.
   Owned PID2336 exited; inspector9392 closed. Proof/visuals/failed-loading cleanup/
   promotion and sealed drainage fallback6a6085...:
   evidence/private/native-master-bec/vpro-drainage-verified.exe.
+- Final XCoord/YCoord/Photo scalar editing is verified/default-on;
+  `VITE_ADDITIONAL_PARENT_EDITING=false` opts out. Static exports show unlocked,
+  bound textboxes without individual events: nullable Single X/Y and TEXT50 Photo.
+  No projection/geographic range/rounding/path handling or picture-manager activation.
+  Shared validation, numeric sessions, historical omission and restoration guards
+  are reused. Native two-error hidden remount/one-correction/Save-Lock-close refusal,
+  raw50/full-precision values, atomic rollback/retry, NULL/Undo and Lock pass.
+  All15 tables/32 old audits/support/config preserved; exactly six scalar audits.
+  Canonical scientific audit verification continued without replaying the Save.
+  Full race473.062s,161 frontend tests/check0/0/default+optout; bindings15/106/33.
+  Default assets exactly match accepted native payload. Owned PID17832 exited;
+  inspector9392 closed. Proof/visual/promotion and sealed Master fallback3568c8...:
+  evidence/private/native-final-scalars/vpro-master-verified.exe.
 - Responsive FS882 presentation is complete across all five source pages,
   child tables, toolbar/tabs and collapsible project context. Semantic field
   groups reflow4/3/2/1 columns with40px controls; raw source geometry remains
@@ -369,15 +382,17 @@ C3c shared-catalogue, C3d BEC/Quality/Working Unit and C3e state/discovery reads
 delivered. C1-C3 are complete; C4-C5 are optional/nonblocking. The promoted executable
 contains verified F1-F3 plus C1 pooling/C2 caching/C3a-C3e retrieval cancellation.
 The fourteen ordinary surveyor/depth/cover/note fields are now native-verified.
-The two nullable flags, strict SoilDrainage and source-authorized BEC Master are also
-complete. Continue the remaining three distinct
-workflows. The original42-field checklist and readonly
+The two nullable flags, strict SoilDrainage, source-authorized BEC Master and
+final X/Y/Photo scalar batch complete the98-field writable parent baseline.
+Continue actual FS882 child workflows, not another parent-field inventory.
+The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage's explicit LimitToList=NotDefault now has a separately verified
 exact-canonical membership policy, not unrestricted raw-code writes.
 Omitted ordinary-combo effective properties are unknown:
 raw-case/full-item/nullable/no-truncation behavior is a deliberate desktop policy,
-not inferred Access parity. X/Y and pictures remain separate;
-do not enable them as incidental text fields. See the current remaining3 list in
-MIGRATION_PLAN.md. No native Access instance was launched for this batch.
+not inferred Access parity. X/Y textboxes have no individual conversion events;
+Photo text is not picture management. Projection, picture-manager/display,
+bulk/reverse copy and remaining child/calculation events are still separate gaps.
+See MIGRATION_PLAN.md. No native Access instance was launched for this batch.
 No old grant, archived process identity or historical hash authorizes a new run.

@@ -11,14 +11,14 @@ const numeric = loadTypeScript('numericEditor.ts');
 const editor = loadTypeScript('ordinaryEditor.ts', { './qualityEditor': quality, './numericEditor': numeric });
 const { ordinaryFields, ordinaryField, ordinaryTextError, ordinaryNumberValue,
   ordinaryValidation, ordinarySession, rememberOrdinarySession } = editor;
-const values = () => Object.fromEntries(ordinaryFields.map(field => [field.key, null]));
+const values = () => Object.fromEntries([...ordinaryFields, ...editor.additionalParentFields].map(field => [field.key, null]));
 
-test('Fourteen fields retain source scopes and keep seven distinct workflows unavailable', () => {
+test('Fourteen original fields retain scopes independently from later scalar and constrained workflows', () => {
   assert.equal(ordinaryFields.length, 14);
   assert.equal(ordinaryFields.filter(field => field.scope === 'site').length, 2);
   assert.equal(ordinaryFields.filter(field => field.scope === 'veg').length, 6);
   assert.equal(ordinaryFields.filter(field => field.scope === 'soils').length, 6);
-  for (const column of ['BECSiteUnit', 'Photo', 'XCoord', 'YCoord', 'SpeciesListComplete', 'UpdatedFromCards', 'SoilDrainage']) {
+  for (const column of ['BECSiteUnit', 'SpeciesListComplete', 'UpdatedFromCards', 'SoilDrainage']) {
     assert.equal(ordinaryField(column), undefined);
   }
 });
@@ -81,7 +81,8 @@ test('Actual scoped source controls render once with labels and explicit opt-out
   assert.equal(compile(source, { filename: 'OrdinaryFields.svelte', generate: 'client' }).warnings.length, 0);
   for (const enabled of [true, false]) {
     const Ordinary = serverComponent(source.replace('import.meta.env.VITE_ORDINARY_PARENT_EDITING',
-      enabled ? 'undefined' : "'false'").replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'false'"),
+      enabled ? 'undefined' : "'false'").replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'false'")
+      .replace('import.meta.env.VITE_ADDITIONAL_PARENT_EDITING', "'false'"),
       'OrdinaryFields.svelte', { './ordinaryEditor': editor });
     for (const scope of ['site', 'veg', 'soils']) {
       const fields = ordinaryFields.filter(field => field.scope === scope);
@@ -118,6 +119,63 @@ test('Shared lifecycle owns validation and VegNotes Tab targets source Terrain w
   assert.doesNotMatch(source, /PlotService|UpdatePlot|CreatePlot|Math\.fround|max="100"|min="0"|maxlength/);
 });
 
+test('Source X/Y Singles and Photo TEXT50 reuse raw-domain validation without geographic/path transformations', () => {
+  const { presentationHelpers } = require('./svelteTestHelpers.cjs');
+  const source = presentationHelpers().paper.paperPage('Site').controls;
+  assert.equal(editor.additionalParentFields.length, 3);
+  for (const field of editor.additionalParentFields) {
+    const control = source.find(control => control.column === field.column);
+    assert.equal(control.type, 'TextBox');
+    assert.equal(control.locked, false);
+    assert.equal(control.enabled, true);
+    for (const event of ['BeforeUpdate', 'AfterUpdate', 'OnChange', 'OnKeyDown']) {
+      assert.equal(control.properties[event], undefined);
+    }
+    assert.equal(ordinaryField(field.column).key, field.key);
+    if (field.kind === 'single') {
+      assert.equal(ordinaryNumberValue(field, '-123456.123456789', null).value, -123456.123456789);
+      assert.ok(ordinaryNumberValue(field, '3.5e38', null).error);
+      assert.equal(ordinaryNumberValue(field, '3.5e38', 3.5e38).error, null);
+    } else {
+      assert.equal(ordinaryTextError(field, "  Raw'O " + 'x'.repeat(42), null), null);
+      assert.ok(ordinaryTextError(field, 'x'.repeat(51), null));
+      assert.ok(ordinaryTextError(field, 'x'.repeat(49) + '😀', null));
+      assert.ok(ordinaryTextError(field, '\ud800', null));
+    }
+  }
+  const draft = { ...values(), xCoord: 3.5e38 };
+  assert.ok(ordinaryValidation('site', draft, null, {}));
+  assert.equal(ordinaryValidation('site', draft, null, {}, ordinaryFields), null);
+});
+
+test('Actual final scalar slot is independently gated and never enables the picture manager', () => {
+  const source = readFileSync(path.join(__dirname, 'OrdinaryFields.svelte'), 'utf8');
+  for (const enabled of [true, false]) {
+    const Scalar = serverComponent(source
+      .replace('import.meta.env.VITE_ORDINARY_PARENT_EDITING', "'false'")
+      .replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'false'")
+      .replace('import.meta.env.VITE_ADDITIONAL_PARENT_EDITING', enabled ? "'true'" : "'false'"),
+      'OrdinaryFields.svelte', { './ordinaryEditor': editor });
+    const fixture = `<script>import Scalar from './Scalar.svelte';let {draft, controls, capabilities}=$props();</script>
+      <Scalar bind:draft original={null} scope="site" {capabilities} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
+        {#snippet children(slot)}
+          {#each controls as control}
+            {#if slot && slot.columns.includes(control.column)}{@render slot.input(control,'width:100%')}
+            {:else}<input disabled data-column={control.column}/>{/if}
+          {/each}
+        {/snippet}
+      </Scalar>`;
+    const Wrapper = serverComponent(fixture, 'ScalarFixture.svelte', { './Scalar.svelte': { default: Scalar } });
+    const fields = editor.additionalParentFields;
+    const html = render(Wrapper, { props: { draft: values(),
+      controls: fields.map(field => ({ column: field.column, type: 'TextBox', enabled: true, locked: false, controlName: field.column })),
+      capabilities: Object.fromEntries(fields.map(field => [field.key, true])) } }).body;
+    assert.equal((html.match(/data-column=/g) || []).length, 3);
+    assert.equal((html.match(/ disabled/g) || []).length, enabled ? 0 : 3);
+    assert.doesNotMatch(html, /btnManagePictures|btnPlotPicture/);
+  }
+});
+
 test('Two separately gated source flags retain nullable identity and labelled CheckBox ownership', () => {
   assert.equal(editor.nullableParentFlags.length, 2);
   for (const field of editor.nullableParentFlags) {
@@ -130,7 +188,8 @@ test('Two separately gated source flags retain nullable identity and labelled Ch
   assert.match(source, /draft\[field.key\] = event\.currentTarget\.checked/);
   assert.match(source, /draft\[field.key\] = null; onchange\(\)/);
   const Flags = serverComponent(source.replace('import.meta.env.VITE_ORDINARY_PARENT_EDITING', "'false'")
-    .replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'true'"), 'OrdinaryFields.svelte', { './ordinaryEditor': editor });
+    .replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'true'")
+    .replace('import.meta.env.VITE_ADDITIONAL_PARENT_EDITING', "'false'"), 'OrdinaryFields.svelte', { './ordinaryEditor': editor });
   const fixture = `<script>import Flags from './OrdinaryFields.svelte';let {draft, field}=$props();</script>
     <Flags bind:draft original={null} scope={field.scope} capabilities={{[field.key]:true}} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
       {#snippet children(slot)}

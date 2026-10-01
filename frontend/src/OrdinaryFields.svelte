@@ -2,7 +2,7 @@
   import { untrack, type Snippet } from 'svelte';
   import type { FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
-  import { ordinaryFields, nullableParentFlags, nullableParentField, ordinaryTextError, ordinaryNumberValue, ordinaryValidation,
+  import { ordinaryFields, additionalParentFields, nullableParentFlags, nullableParentField, ordinaryTextError, ordinaryNumberValue, ordinaryValidation,
     ordinarySession, rememberOrdinarySession, type OrdinaryScope, type OrdinaryNumberField,
     type OrdinaryTextField, type OrdinaryDrafts } from './ordinaryEditor';
   let { draft = $bindable(), original, scope, capabilities, disabled, onchange, onvalidation, onVegNotesTab, children }: {
@@ -13,18 +13,20 @@
   } = $props();
   const editingEnabled = import.meta.env.VITE_ORDINARY_PARENT_EDITING !== 'false';
   const flagsEnabled = import.meta.env.VITE_PARENT_FLAGS_EDITING !== 'false';
+  const additionalEnabled = import.meta.env.VITE_ADDITIONAL_PARENT_EDITING !== 'false';
   let staged = $state<OrdinaryDrafts>({});
   const fields = $derived([
     ...(editingEnabled ? ordinaryFields : []),
+    ...(additionalEnabled ? additionalParentFields : []),
     ...(flagsEnabled ? nullableParentFlags : [])
   ].filter(field => field.scope === scope));
-  const validation = $derived(ordinaryValidation(scope, draft, original, staged));
+  const validation = $derived(ordinaryValidation(scope, draft, original, staged, fields.filter(field => field.kind !== 'flag')));
   $effect(() => {
     const identity = draft, baseline = original;
     untrack(() => { staged = ordinarySession(identity, baseline); });
   });
   $effect(() => {
-    const message = editingEnabled ? validation : null;
+    const message = validation;
     untrack(() => onvalidation(`ordinary-${scope}`, message));
   });
   function setText(field: OrdinaryTextField, raw: string): void {
@@ -44,7 +46,7 @@
   }
 </script>
 
-{#if editingEnabled && validation}<p role="alert">{validation}</p>{/if}
+{#if validation}<p role="alert">{validation}</p>{/if}
 {@render children(fields.length ? { columns: fields.map(field => field.column), input } : undefined)}
 {#snippet input(control: PaperControl, position: string)}
   {@const field = nullableParentField(control.column)}

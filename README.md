@@ -13,7 +13,7 @@ Do not use its write workflows on production projects.
 | Working units and hierarchies | Read-only selection/filtering and hierarchy browsing support separate external files. Verified Working Unit editing includes per-user mode preferences; Master authorization editing and bulk actions remain incomplete. |
 | FS882 storage and source relationships | All 98 parent columns and 69 nonidentity XL child bindings plus five legacy extras are mapped. Extracted geometry is retained as evidence; presentation preserves source containment, labels, bindings and embedded-form links. |
 | FS882 responsive presentation | Site, Soil/Terrain, Vegetation, Veg Other and Other use labelled semantic groups and readable 40px controls. Groups reflow with the available width, child tables scroll locally, and project context can collapse. Actual native sizing, resizing, drafts, validation and close recovery are verified. |
-| FS882 ordinary parent editing | **95/98 parent fields are verified writable**, including coordinates, BEC, source-authorized BEC Master, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock, 21 terrain/classification codes, fourteen surveyor/text/depth/cover/note fields, two nullable source flags and strict SoilDrainage. Three distinct workflows remain unavailable. |
+| FS882 parent field editing | **98/98 mapped parent fields are verified writable**, including conditionally source-authorized BEC Master, strict SoilDrainage, X/Y scalar coordinates and Photo text. This completes the bounded parent-field baseline, not all form events, children, projections, picture management or application migration. |
 | FS882 children and height | Transactional child CRUD/storage and bounded existing-row height drafts work. Species selection, height insertion/deletion, broader child editing, pictures and calculations remain incomplete. |
 | Audit and lifecycle | Data/audit transactions, bounded selective restoration, Undo, and native window/context Save/Discard/Cancel are verified, including hidden-invalid and height drafts, failed save/config publication and stale-context rejection. Cover restoration, broader child dirty-state propagation and multiwindow coordination remain incomplete. |
 | Soil classification | Two independent nullable four-UTF-16-unit editors default on. Native selection/manual entry, NULL, Undo, Lock, hidden validation, atomic rollback/retry and actual window-close recovery are verified, alongside frozen catalogue browsing. |
@@ -173,7 +173,19 @@ unprivileged saves; restoration targets are validated afresh. Reference-loading
 inputs are disabled. Native raw100/NULL, hidden validation/Lock/close refusal,
 rollback/retry, unprivileged readonly and direct backend refusal preserve all15 tables,
 32 historical audits and restored support/config bytes, adding exactly two Master audits.
-Photo, XCoord and YCoord remain disabled.
+`VITE_ADDITIONAL_PARENT_EDITING=false` separately disables XCoord, YCoord and Photo;
+they default on and reuse the ordinary scalar editor. Static exports show three
+bound, unlocked textboxes with no individual events: nullable Env.XCoord/YCoord
+Single values and Env.Photo TEXT50. X/Y are not latitude/longitude or a declared
+projection; no geographic limits, automatic conversion or partner updates are
+invented. Photo is raw text metadata, not file attachment or picture management.
+Physical bounds, UTF-16/Unicode validation, unchanged historical omission,
+fresh restoration guards and draft/original-bound numeric errors are shared.
+Native two-error remount/Save/Lock/close refusal, raw50/non-rounded Single values,
+rollback/retry, NULL, Undo and Lock preserve all15 tables,32 historical audits
+and support/config bytes, adding exactly six intended scalar audits.
+The picture manager, picture display, projection and bulk/reverse-copy actions
+remain unavailable. Parent-field coverage does not enable those workflows.
 `VITE_EXTERNAL_PROJECTS=false` hides the verified external attachment entry point;
 it defaults on. It does not disable restoration of valid saved external contexts.
 

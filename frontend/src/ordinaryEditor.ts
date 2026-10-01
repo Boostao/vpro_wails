@@ -18,6 +18,12 @@ export const ordinaryFields = [
   { key: 'seepageDepth', column: 'SeepageDepth', label: 'Seepage depth', scope: 'soils', kind: 'integer' },
   { key: 'soilNotes', column: 'SoilNotes', label: 'Soil notes', scope: 'soils', kind: 'memo' }
 ] as const;
+export const additionalParentFields = [
+  { key: 'xCoord', column: 'XCoord', label: 'X Co-ord.', scope: 'site', kind: 'single' },
+  { key: 'yCoord', column: 'YCoord', label: 'Y Co-ord', scope: 'site', kind: 'single' },
+  { key: 'photo', column: 'Photo', label: 'Photo', scope: 'site', kind: 'text', maximum: 50 }
+] as const;
+const allOrdinaryFields = [...ordinaryFields, ...additionalParentFields];
 export const nullableParentFlags = [
   { key: 'speciesListComplete', column: 'SpeciesListComplete', label: 'Species list complete', scope: 'veg', kind: 'flag' },
   { key: 'updatedFromCards', column: 'UpdatedFromCards', label: 'Updated from cards', scope: 'site', kind: 'flag' }
@@ -25,7 +31,7 @@ export const nullableParentFlags = [
 export function nullableParentField(column: string | undefined) {
   return ordinaryField(column) ?? nullableParentFlags.find(field => field.column === column);
 }
-export type OrdinaryField = typeof ordinaryFields[number];
+export type OrdinaryField = typeof allOrdinaryFields[number];
 export type OrdinaryScope = OrdinaryField['scope'];
 export type OrdinaryKey = OrdinaryField['key'];
 export type OrdinaryTextField = Extract<OrdinaryField, { kind: 'text' | 'memo' }>;
@@ -35,7 +41,7 @@ export interface OrdinaryCell { raw: string; value: number | null; error: string
 export type OrdinaryDrafts = Partial<Record<OrdinaryNumberField['key'], OrdinaryCell>>;
 
 export function ordinaryField(column: string | undefined): OrdinaryField | undefined {
-  return ordinaryFields.find(field => field.column === column);
+  return allOrdinaryFields.find(field => field.column === column);
 }
 export function ordinaryTextError(field: OrdinaryTextField, value: string | null, original: string | null): string | null {
   if (value === null || value === original) return null;
@@ -55,8 +61,8 @@ export function ordinaryNumberValue(field: OrdinaryNumberField, raw: string, ori
   return { raw, ...parsed };
 }
 export function ordinaryValidation(scope: OrdinaryScope, values: OrdinaryValues,
-  original: OrdinaryValues | null, drafts: OrdinaryDrafts): string | null {
-  for (const field of ordinaryFields.filter(field => field.scope === scope)) {
+  original: OrdinaryValues | null, drafts: OrdinaryDrafts, fields: readonly OrdinaryField[] = allOrdinaryFields): string | null {
+  for (const field of fields.filter(field => field.scope === scope)) {
     if (field.kind === 'text' || field.kind === 'memo') {
       const error = ordinaryTextError(field, values[field.key], original?.[field.key] ?? null);
       if (error) return error;

@@ -15,6 +15,7 @@ func ordinaryTextFields(h FS882Header) []becHeaderField {
 		{"VegSurveyor", "vegSurveyor", "Env", 30, h.VegSurveyor},
 		{"SoilNotes", "soilNotes", "Env", 0, h.SoilNotes},
 		{"VegNotes", "vegNotes", "Env", 0, h.VegNotes},
+		{"Photo", "photo", "Env", 50, h.Photo},
 	}
 }
 
@@ -35,6 +36,8 @@ func ordinaryNumberFields(h FS882Header) []ordinaryNumberField {
 		{"StrataCoverMoss", "strataCoverMoss", "Env", nil, h.StrataCoverMoss, false},
 		{"StrataCoverShrub", "strataCoverShrub", "Env", nil, h.StrataCoverShrub, false},
 		{"StrataCoverTree", "strataCoverTree", "Env", nil, h.StrataCoverTree, false},
+		{"XCoord", "xCoord", "Env", nil, h.XCoord, false},
+		{"YCoord", "yCoord", "Env", nil, h.YCoord, false},
 	}
 }
 

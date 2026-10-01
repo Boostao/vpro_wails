@@ -31,7 +31,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 3 | Consolidate ordinary code editing (complete) | Shared nullable Unicode/reference grouping/suggestions/draft acknowledgement and Region/Soil write/restore guards preserve public APIs, source positions and field-specific policies. All117 frontend tests/check/build, focused Go/full race and actual Wails rollback/close regression pass. New groups reuse definitions/fixtures, not copied validators. |
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
-| 5 | Complete remaining FS882 parent workflows (checkpointed at95/98) | Responsive presentation,21 ordinary-code editors, fourteen surveyor/text/depth/cover/note editors, two nullable source flags, strict SoilDrainage and source-authorized BEC Master are native-verified and default-on. Continue the three distinct remaining workflows by source/event semantics; keep unavailable controls disabled. |
+| 5 | Complete bounded FS882 parent field editing (complete98/98) | All98 mapped parent fields have a native-verified writable baseline, including source-authorized BEC Master, strict SoilDrainage and final X/Y/Photo scalars. This is not full form/application parity; picture management, projection, bulk/reverse copying and remaining child/calculation events stay separately scoped and unavailable until verified. |
 | 6 | Complete FS882 child workflows | Vegetation/species/cover/height, Humus, Mineral and Other support their actual add/edit/delete/validation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
@@ -460,7 +460,25 @@ Default assets match accepted native payload. Evidence/private/native-master-bec
 retains proof, two representative visuals, cleanup and sealed drainage fallback.
 No Access instance or production/source writes.
 
-Next: Photo, XCoord and YCoord. Keep X/Y and pictures
-as distinct workflows. Reuse sealed
+The final XCoord/YCoord/Photo scalar batch is native-verified/default-on:
+bounded parent-field coverage is98/98. Static source corrects the earlier assumption
+that these three textboxes necessarily require projection or picture-manager events.
+They are bound/unlocked with no individual events; Env.XCoord/YCoord are nullable
+Single, Env.Photo is TEXT50. Shared ordinary validation/session/restoration and
+historical-omission behavior is reused, with a separate opt-out. No invented
+geographic range, rounding, coordinate conversion, path completion or picture
+attachment occurs. The source picture-manager button remains disabled.
+Focused regression13.180s/full race473.062s;161 frontend tests/check0/0/default+
+optout builds; bindings15/106/33 unchanged. Native two-error hidden remount,
+one-error correction, Save/Lock/close refusal, raw50/full-precision Singles,
+atomic audit rollback/retry, NULL/Undo and Lock preserve all15 tables/32 old audits
+and support/config bytes, with exactly six scalar audits. Canonical scientific
+audit text was verified without replaying a completed Save. Default assets match
+the accepted native payload; evidence/private/native-final-scalars retains proof/
+visual/promotion and the sealed Master fallback. No Access or production/source writes.
+
+Next: complete the actual FS882 child add/edit/delete/filter/calculation workflows.
+Picture management, projections and reverse/bulk actions remain independent gaps;
+98 writable mapped fields are not complete form/application parity. Reuse sealed
 source evidence and shared lifecycle tests, not field-by-field audit matrices.
 The original42-field checklist is frozen evidence, not current coverage.
