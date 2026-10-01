@@ -13,7 +13,7 @@ Do not use its write workflows on production projects.
 | Working units and hierarchies | Read-only selection/filtering and hierarchy browsing support separate external files. Verified Working Unit editing includes per-user mode preferences; Master authorization editing and bulk actions remain incomplete. |
 | FS882 storage and source relationships | All 98 parent columns and 69 nonidentity XL child bindings plus five legacy extras are mapped. Extracted geometry is retained as evidence; presentation preserves source containment, labels, bindings and embedded-form links. |
 | FS882 responsive presentation | Site, Soil/Terrain, Vegetation, Veg Other and Other use labelled semantic groups and readable 40px controls. Groups reflow with the available width, child tables scroll locally, and project context can collapse. Actual native sizing, resizing, drafts, validation and close recovery are verified. |
-| FS882 ordinary parent editing | **77/98 parent fields are verified writable**, including coordinates, BEC, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock and 21 additional terrain/classification codes. Remaining controls stay unavailable until their workflows are verified. |
+| FS882 ordinary parent editing | **91/98 parent fields are verified writable**, including coordinates, BEC, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock, 21 terrain/classification codes and fourteen surveyor/text/depth/cover/note fields. Seven distinct workflows remain unavailable. |
 | FS882 children and height | Transactional child CRUD/storage and bounded existing-row height drafts work. Species selection, height insertion/deletion, broader child editing, pictures and calculations remain incomplete. |
 | Audit and lifecycle | Data/audit transactions, bounded selective restoration, Undo, and native window/context Save/Discard/Cancel are verified, including hidden-invalid and height drafts, failed save/config publication and stale-context rejection. Cover restoration, broader child dirty-state propagation and multiwindow coordination remain incomplete. |
 | Soil classification | Two independent nullable four-UTF-16-unit editors default on. Native selection/manual entry, NULL, Undo, Lock, hidden validation, atomic rollback/retry and actual window-close recovery are verified, alongside frozen catalogue browsing. |
@@ -127,6 +127,22 @@ default on. `VITE_PARENT_CODES_EDITING=false` disables the 21 additional ordinar
 parent-code editors; they default on. Coarse-fragment lithology uses TEXT12,
 not Bedrock's TEXT4; humus phase uses TEXT50 and flooding frequency TEXT7.
 SoilDrainage's explicit source LimitToList is not part of this permissive batch.
+`VITE_ORDINARY_PARENT_EDITING=false` disables the fourteen surveyor/text/depth/cover/
+note editors; they default on. Short text preserves source UTF-16 bounds (20/50/30),
+depths use signed 16-bit Access Integer bounds and five summaries use finite Single
+physical bounds without rounding, balancing or an invented 0-100 restriction.
+Memos preserve multiline raw text without an invented short-text limit.
+Unchanged historical invalid values are omitted from UPDATE assignments. New
+values and restoration targets are validated; malformed raw JSON Unicode is rejected
+before decoder repair. Invalid numeric drafts survive page remounts and block
+Save/Lock/close; valid correction, Save and Undo use the existing identity lifecycle.
+Vegetation notes Tab (including Shift-Tab) activates Soils, preserving the source
+event's ignored Shift modifier. These are source-bound/adapted desktop policies,
+not claims of unmeasured effective Access input parity. Native verification on one
+disposable fixture compared all 15 tables and preserved historical audits, adding
+exactly fourteen field audits plus one explicit memo-to-NULL audit. BECSiteUnit,
+SoilDrainage, Photo, SpeciesListComplete, UpdatedFromCards, XCoord and YCoord remain
+disabled.
 `VITE_EXTERNAL_PROJECTS=false` hides the verified external attachment entry point;
 it defaults on. It does not disable restoration of valid saved external contexts.
 
@@ -190,7 +206,7 @@ cancelled inspection is an error, never a partial successful state or diagnostic
 App refresh generations cancel discovery and reject late publication; context
 switch commits remain untracked. Native metadata SQL cancels/recoveries preserve
 identical state and fixture bytes. C3's planned active retrieval scope is delivered;
-this does not enable the remaining parent fields or unavailable workflows.
+Cancellation itself does not enable unavailable workflows.
 See C1-C5 in
 [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for bounded performance/cleanup gates,
 including incremental packages and optional typed catalogue transport consolidation.

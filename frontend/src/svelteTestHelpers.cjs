@@ -21,6 +21,12 @@ function serverComponent(source, filename, dependencies) {
     require(name) {
       if (name in dependencies) return dependencies[name];
       if (name === './readRequests') return serverReads;
+      if (name === './ordinaryEditor') return loadTypeScript('ordinaryEditor.ts', {
+        './qualityEditor': dependencies['./qualityEditor'] || loadTypeScript('qualityEditor.ts', {
+          './becEditor': loadTypeScript('becEditor.ts')
+        }),
+        './numericEditor': loadTypeScript('numericEditor.ts')
+      });
       if (name === './catalogueLookup' && './qualityEditor' in dependencies) {
         return loadTypeScript('catalogueLookup.ts', {
           './qualityEditor': dependencies['./qualityEditor'],

@@ -38,7 +38,7 @@ between shells.
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current and candidate executables contain the same verified default-on payload:
   `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`, SHA256
-  `8a083359e649efb7d27399f1cb6343c9523d7c94409fcdada47504c7454f9ce8`.
+  `4d0a86e95fe5a1d5391868bc459a082ce04ed4a59acaaec2c64c92445cf7b8c1`.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -177,8 +177,18 @@ between shells.
   exited, inspector9392 closed. Catalogue fallback80a008... is sealed there as
   vpro-all-catalogue-read-verified.exe. Parent migration resumes next; optional
   C4/C5 cleanup is nonblocking.
-- Verified writable parent coverage: **77/98**. Full storage mapping and source
+- Verified writable parent coverage: **91/98**. Full storage mapping and source
   layout are not full FS882 or application parity.
+- Fourteen ordinary surveyor/text/depth/cover/note fields are default-on, with
+  `VITE_ORDINARY_PARENT_EDITING=false` opt-out. Source UTF-16 bounds, Integer/Single
+  physical domains, raw multiline memos and VegNotes Tab reuse shared lifecycle;
+  omitted effective input constraints remain unknown. One native fixture checked
+  all15 tables, fourteen edits plus one memo NULL audit, historical preservation,
+  two-scope invalid remount/Save/Lock/close refusal, Undo, audit rollback/retry and
+  Lock/Unlock. Proof/visuals/receipt: evidence/private/native-ordinary-parent.
+  Owned PID12120 exited; inspector9392 closed. Discovery fallback8a0833... is archived
+  as evidence/private/native-read-cancel/vpro-state-read-verified.exe.
+  Full race371.176s,153 frontend tests/check0/0/build; bindings15/104/33.
 - Responsive FS882 presentation is complete across all five source pages,
   child tables, toolbar/tabs and collapsible project context. Semantic field
   groups reflow4/3/2/1 columns with40px controls; raw source geometry remains
@@ -322,13 +332,14 @@ between milestones, not as a broad rewrite. C3a scoped, C3b browse/reference and
 C3c shared-catalogue, C3d BEC/Quality/Working Unit and C3e state/discovery reads are
 delivered. C1-C3 are complete; C4-C5 are optional/nonblocking. The promoted executable
 contains verified F1-F3 plus C1 pooling/C2 caching/C3a-C3e retrieval cancellation.
-Then resume ordinary surveyor/depth/cover/note fields. The original42-field checklist and readonly
+The fourteen ordinary surveyor/depth/cover/note fields are now native-verified.
+Continue the remaining seven distinct workflows. The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage has explicit LimitToList=NotDefault and needs a distinct membership
 policy; it must not silently inherit unrestricted raw-code writes.
 Omitted ordinary-combo effective properties are unknown:
 raw-case/full-item/nullable/no-truncation behavior is a deliberate desktop policy,
 not inferred Access parity. Master BEC, BIT/NULL, X/Y and pictures remain separate;
-do not enable them as incidental text fields. See the current remaining21 list in
+do not enable them as incidental text fields. See the current remaining7 list in
 MIGRATION_PLAN.md. No native Access instance was launched for this batch.
 No old grant, archived process identity or historical hash authorizes a new run.

@@ -82,6 +82,9 @@ func fullHeader(plot string) FS882Header {
 			if isParentCodeProperty(v.Type().Field(i).Tag.Get("json")) {
 				text = "X"
 			}
+			if isOrdinaryProperty(v.Type().Field(i).Tag.Get("json")) {
+				text = "raw q'X4"
+			}
 			value.Elem().SetString(text)
 		}
 		field.Set(value)

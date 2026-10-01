@@ -17,6 +17,7 @@
   import { becKey, type BECCodes } from './becEditor';
   import { isWorkingUnitControl, type WorkingUnitCodes, type WorkingUnitSession } from './workingUnitEditor';
   import { isCoordinateControl, type CoordinateDisplayMode } from './coordinateEditor';
+  import { ordinaryField } from './ordinaryEditor';
 
   type TextKey = { [K in keyof FS882Header]: FS882Header[K] extends string | null ? K : never }[keyof FS882Header];
   type NullableTextKey = Exclude<TextKey, 'plotNumber'>;
@@ -24,7 +25,7 @@
   type Field = { key: NullableTextKey; label: string; kind: 'text' | 'notes'; list?: boolean } |
     { key: NumberKey; label: string; kind: 'number'; step?: string };
 
-  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, editor }: {
+  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, editor, additionalEditor }: {
     draft: FS882Header;
     original: (BECCodes & WorkingUnitCodes & QualityCodes & SubstrateValues & SiteCodes & RegionCodes) | null;
     capabilities: Record<string, boolean | undefined>;
@@ -41,6 +42,7 @@
     onRegionCodeBusyChange?: (busy: boolean) => void;
     workingUnitSession: WorkingUnitSession;
     editor?: { columns: readonly string[]; input: Snippet<[PaperControl, string]> };
+    additionalEditor?: { columns: readonly string[]; input: Snippet<[PaperControl, string]> };
   } = $props();
 
   let coordinateMode = $state<CoordinateDisplayMode>('dd');
@@ -117,7 +119,9 @@
       return `header-working-unit-${control.controlName}`;
     }
     const key = becKey(control.column) ?? qualityKey(control.column) ?? substrateKey(control.column) ??
-      siteCodeKey(control.column) ?? regionCodeKey(control.column) ?? byColumn.get(control.column ?? '')?.key;
+      siteCodeKey(control.column) ?? regionCodeKey(control.column) ??
+      (additionalEditor?.columns.includes(control.column ?? '') ? ordinaryField(control.column)?.key : undefined) ??
+      byColumn.get(control.column ?? '')?.key;
     return key ? `header-${key}` : control.column === 'RealmClass' && editor?.columns.includes('RealmClass')
       ? 'header-realmClass' : control.column === 'PlotNumber' ? 'header-plotNumber' : `header-source-${control.controlId}`;
   }
@@ -198,6 +202,8 @@
           {@render siteCodeInputs(control)}
         {:else if regionCodeKey(control.column)}
           {@render regionCodeInputs(control)}
+        {:else if additionalEditor && control.column && additionalEditor.columns.includes(control.column)}
+          {@render additionalEditor.input(control, position(control))}
         {:else if editor && control.column && editor.columns.includes(control.column)}
           {@render editor.input(control, position(control))}
         {:else if control.column === 'PlotNumber'}

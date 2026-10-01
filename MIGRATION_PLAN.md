@@ -31,7 +31,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 3 | Consolidate ordinary code editing (complete) | Shared nullable Unicode/reference grouping/suggestions/draft acknowledgement and Region/Soil write/restore guards preserve public APIs, source positions and field-specific policies. All117 frontend tests/check/build, focused Go/full race and actual Wails rollback/close regression pass. New groups reuse definitions/fixtures, not copied validators. |
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
-| 5 | Complete remaining FS882 parent workflows (checkpointed at77/98) | Responsive presentation and21 ordinary-code editors are native-verified and default-on. After the foundation gate, continue remaining21 columns by source/event semantics. Classify controls as verified, intentionally adapted, read-only or blocked; cover calculations, coordinates, notes and pictures explicitly. |
+| 5 | Complete remaining FS882 parent workflows (checkpointed at91/98) | Responsive presentation,21 ordinary-code editors and fourteen surveyor/text/depth/cover/note editors are native-verified and default-on. Continue the seven distinct remaining workflows by source/event semantics; keep unavailable controls disabled. |
 | 6 | Complete FS882 child workflows | Vegetation/species/cover/height, Humus, Mineral and Other support their actual add/edit/delete/validation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
@@ -376,8 +376,7 @@ and pool/hash counts; do not invent latency targets without a measured baseline.
 ## Immediate next session
 
 Deliverables1-3, Bedrock, responsive FS882 presentation and the 21-field ordinary
-parent-code batch are complete. The exact native-tested default-on payload is
-promoted; coverage77/98. Its ten native cases compared all15 tables, preserved31
+parent-code batch are complete. Its ten native cases compared all15 tables, preserved31
 old audits and added exactly24 intended audits, including real rollback/close
 retry and per-list checksum failure/Retry. All134 frontend tests/check/build,
 default/opt-out builds and full Go race pass.
@@ -395,13 +394,25 @@ No pending writes or owned native process need continuation.
 C1 pooling and C2 verification caching are complete and promoted. C2 native proof
 preserves all fixture bytes through warm reads, corruption, remount, failed Retry,
 atomic restoration and successful Retry without resetting invalid drafts.
-C3 active retrieval cancellation is complete and promoted. Next classify and
-implement the remaining ordinary surveyor/text/
-depth/cover/note fields from the already sealed source checklist. Do not repeat
-reference capture or field-by-field audit matrices. Remaining21: AirPhotoNum, BECSiteUnit, EnteredBy,
-HumusThickness, Photo, RootRestrictingDepth, RootingDepth, SeepageDepth,
-SoilDrainage, SoilNotes, SoilSurveyor, SpeciesListComplete, StrataCoverHerb,
-StrataCoverMoss, StrataCoverShrub, StrataCoverTree, UpdatedFromCards, VegNotes,
-VegSurveyor, XCoord and YCoord. Keep Master BEC authorization, BIT/NULL, X/Y,
-pictures and SoilDrainage strict membership/reference availability as distinct
-workflows. The original42-field checklist is frozen evidence, not current coverage.
+C3 active retrieval cancellation is complete and promoted. The fourteen-field
+ordinary surveyor/text/depth/cover/note batch is also complete and promoted;
+coverage is91/98. Source text bounds, signed16-bit Integer and finite Single
+physical domains reuse existing transaction/audit/Lock and historical-omission
+mechanics. Memo/raw text is preserved; no guessed positivity, percent balancing,
+Single rounding or memo short limit was added. VegNotes Tab goes to Terrain/Soils.
+Effective omitted input constraints remain unknown: these are source-bound/adapted
+policies, not measured exact Access input parity.
+Focused race7.861s/full race371.176s;153 frontend tests/check0/0/build;
+real bindings15/104/33. One disposable native fixture verified all fourteen visible
+labelled controls, two invalid numeric scopes surviving remount and refusing
+Save/Lock/close, Undo, atomic cross-Env/Admin audit failure/retry, precise raw values,
+Lock/Unlock, memo NULL/Undo and the Tab event. All15 tables were compared;
+historical audits and support/config bytes were preserved. Exactly fourteen parent
+fields changed and fifteen intended audit rows were added.
+Current proof/visuals/promotion: evidence/private/native-ordinary-parent.
+
+Next: BECSiteUnit, SoilDrainage, Photo, SpeciesListComplete, UpdatedFromCards, XCoord
+and YCoord. Keep Master BEC authorization, BIT/NULL, X/Y, pictures and SoilDrainage
+strict membership/reference availability as distinct workflows. Reuse sealed
+source evidence and shared lifecycle tests, not field-by-field audit matrices.
+The original42-field checklist is frozen evidence, not current coverage.

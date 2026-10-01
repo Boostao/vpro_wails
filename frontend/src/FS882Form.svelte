@@ -19,6 +19,7 @@
   import SoilCodeFields from './SoilCodeFields.svelte';
   import GeologyCodeFields from './GeologyCodeFields.svelte';
   import ParentCodeFields from './ParentCodeFields.svelte';
+  import OrdinaryFields from './OrdinaryFields.svelte';
   import SourceChild from './SourceChild.svelte';
   import NewChild from './NewChild.svelte';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
@@ -27,7 +28,7 @@
   import type { EditorCloseState } from './closeLifecycle';
   import { heightField, stageHeight, heightDirty, heightErrors, heightUpdates, type HeightDrafts } from './heightEditor';
   import type { WorkingUnitSession } from './workingUnitEditor';
-  import { onDestroy, untrack } from 'svelte';
+  import { onDestroy, untrack, tick } from 'svelte';
   import { bindContextPlots } from './contextPlots';
   import { ReadRequests } from './readRequests';
 
@@ -40,6 +41,11 @@
   let speciesRequest = 0;
 
   let activeTab = $state<'site' | 'veg' | 'vegOther' | 'soils' | 'other' | 'audit'>('site');
+  async function vegetationNotesTab() {
+    activeTab = 'soils';
+    await tick();
+    document.querySelector<HTMLInputElement>('#header-soilSurveyor')?.focus();
+  }
   let vegetationMode = $state<VegetationMode>('initial');
   let busy = $state(false);
   let coordinateBusy = $state(false);
@@ -623,6 +629,8 @@
 
   const invalidHeaderMessage = 'Correct the invalid header input before saving.';
   function headerValidationError(message: string) {
+    if (message === headerValidation['ordinary-veg']) return `Correct the invalid header input on Vegetation or Undo changes before saving. ${message}`;
+    if (message === headerValidation['ordinary-soils']) return `Correct the invalid header input on Soils or Undo changes before saving. ${message}`;
     if (message === headerValidation['parentCodes-soils']) return `Correct the invalid header input on Soils or Undo changes before saving. ${message}`;
     if (message === headerValidation.soilCodes || message === headerValidation.geologyCodes) return `Correct the invalid header input on Soils or Undo changes before saving. ${message}`;
     return `Correct the invalid header input on Site or Undo changes before saving. ${message}`;
@@ -932,8 +940,12 @@
           disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
           onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => parentCodeBusy = pending}>
         {#snippet children(editor)}
+        <OrdinaryFields bind:draft {original} {capabilities} scope="site"
+          disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+          onchange={markDirty} onvalidation={validateHeader}>
+        {#snippet children(ordinaryEditor)}
         <HeaderEditor bind:draft {original} {capabilities} disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
-          {editor}
+          {editor} additionalEditor={ordinaryEditor}
           existing={original !== null}
           lists={{ moistureRegime: moistureList, nutrientRegime: nutrientList, mesoSlopePos: mesoSlopeList, surfaceShape: surfaceShapeList }}
           onchange={markDirty} onerror={(message) => error = message} onvalidation={validateHeader}
@@ -943,10 +955,16 @@
           onSiteCodeBusyChange={(pending) => siteCodeBusy = pending}
           onRegionCodeBusyChange={(pending) => regionCodeBusy = pending} {workingUnitSession} />
         {/snippet}
+        </OrdinaryFields>
+        {/snippet}
         </ParentCodeFields>
       {/key}
     {:else if activeTab === 'veg'}
-      <SourcePage name="Vegetation" values={sourceHeaderValues} {vegetationMode} onHeightToggle={() => vegetationMode = vegetationMode === 'height' ? 'cover' : 'height'}>
+      <OrdinaryFields bind:draft {original} {capabilities} scope="veg"
+        disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+        onchange={markDirty} onvalidation={validateHeader} onVegNotesTab={vegetationNotesTab}>
+      {#snippet children(ordinaryEditor)}
+      <SourcePage name="Vegetation" values={sourceHeaderValues} {vegetationMode} editor={ordinaryEditor} onHeightToggle={() => vegetationMode = vegetationMode === 'height' ? 'cover' : 'height'}>
         {#snippet embedded(control)}
           {@const child = embeddedForm(control.controlId)}
           {@const heightGrid = child.form === 'SubVegAhtXL' || child.form === 'SubVegChtXL'}
@@ -955,6 +973,8 @@
             onedit={heightGrid ? undefined : editSourceChild} ondelete={heightGrid ? undefined : deleteSourceChild} />
         {/snippet}
       </SourcePage>
+      {/snippet}
+      </OrdinaryFields>
       {#if vegetationMode === 'height'}
         <p class="mt-2 text-xs text-stone-500">{heightEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain. Species and collected workflows remain read-only here.' : 'Cover/height editing is gated until native Wails verification.'} Switching view does not save or change data.</p>
       {/if}
@@ -1177,6 +1197,10 @@
         <button disabled={childEditingDisabled} onclick={() => openNewChild('humus')}>Add Humus Layer</button>
         <button disabled={childEditingDisabled} onclick={() => openNewChild('mineral')}>Add Mineral Layer</button>
       </div>
+      <OrdinaryFields bind:draft {original} {capabilities} scope="soils"
+        disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+        onchange={markDirty} onvalidation={validateHeader}>
+      {#snippet children(ordinaryEditor)}
       <SoilCodeFields bind:draft {original} {capabilities}
         disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || geologyCodeBusy}
         onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => soilCodeBusy = pending}>
@@ -1189,7 +1213,7 @@
                 disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
                 onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => parentCodeBusy = pending}>
               {#snippet children(parentEditor)}
-              <SourcePage name="Soil/Terrain" values={sourceHeaderValues} {editor} editors={[...(geologyEditor ? [geologyEditor] : []), ...(parentEditor ? [parentEditor] : [])]}>
+              <SourcePage name="Soil/Terrain" values={sourceHeaderValues} {editor} editors={[...(geologyEditor ? [geologyEditor] : []), ...(parentEditor ? [parentEditor] : []), ...(ordinaryEditor ? [ordinaryEditor] : [])]}>
                 {#snippet embedded(control)}
                   {@const child = embeddedForm(control.controlId)}
                   <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={childEditingDisabled} onedit={editSourceChild} ondelete={deleteSourceChild} />
@@ -1201,6 +1225,8 @@
           </GeologyCodeFields>
         {/snippet}
       </SoilCodeFields>
+      {/snippet}
+      </OrdinaryFields>
       <details class="mt-4 border border-stone-200 rounded p-3">
         <summary class="text-xs font-semibold cursor-pointer">Experimental soil record actions</summary>
       <div class="space-y-6">
