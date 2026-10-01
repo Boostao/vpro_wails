@@ -56,8 +56,13 @@ func (s *PlotService) operationContext() context.Context {
 	return context.Background()
 }
 
+type contextSQLReader interface {
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
+	QueryRowContext(context.Context, string, ...any) *sql.Row
+}
+
 type contextPlotDB struct {
-	db  *sql.DB
+	db  contextSQLReader
 	ctx context.Context
 }
 

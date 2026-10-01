@@ -4,6 +4,10 @@ const { readFileSync } = require('node:fs');
 const path = require('node:path');
 const ts = require('typescript');
 const { compile } = require('svelte/compiler');
+const serverReads = { ReadRequests: class {
+  track(request) { return request; }
+  cancelAll() {}
+} };
 
 function serverComponent(source, filename, dependencies) {
   const compiled = compile(source, { filename: path.resolve(__dirname, filename), generate: 'server' });
@@ -16,13 +20,11 @@ function serverComponent(source, filename, dependencies) {
     module, exports: module.exports,
     require(name) {
       if (name in dependencies) return dependencies[name];
+      if (name === './readRequests') return serverReads;
       if (name === './catalogueLookup' && './qualityEditor' in dependencies) {
         return loadTypeScript('catalogueLookup.ts', {
           './qualityEditor': dependencies['./qualityEditor'],
-          './readRequests': { ReadRequests: class {
-            track(request) { return request; }
-            cancelAll() {}
-          } }
+          './readRequests': serverReads
         });
       }
       if (name === 'svelte' || name.startsWith('svelte/')) return require(name);

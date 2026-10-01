@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"database/sql"
 	_ "embed"
@@ -145,8 +146,10 @@ func (s *BECService) Close() error {
 	return err
 }
 
-func (s *BECService) GetBECCatalogueStatus() (BECCatalogueStatus, error) {
-	s.mu.RLock()
+func (s *BECService) GetBECCatalogueStatus(ctx context.Context) (BECCatalogueStatus, error) {
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return BECCatalogueStatus{}, err
+	}
 	defer s.mu.RUnlock()
 	if s.db == nil {
 		return BECCatalogueStatus{}, errors.New("BEC catalogue is closed")
@@ -154,14 +157,16 @@ func (s *BECService) GetBECCatalogueStatus() (BECCatalogueStatus, error) {
 	return s.status, nil
 }
 
-func (s *BECService) ListBECZones() ([]BECZone, error) {
-	s.mu.RLock()
+func (s *BECService) ListBECZones(ctx context.Context) ([]BECZone, error) {
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
 	result := []BECZone{}
 	if s.db == nil {
 		return nil, errors.New("BEC catalogue is closed")
 	}
-	rows, err := s.db.Query(`SELECT DISTINCT Zone, ZoneDescription FROM BECZoneList ORDER BY Zone COLLATE NOCASE, Zone, ZoneDescription`)
+	rows, err := s.db.QueryContext(ctx, `SELECT DISTINCT Zone, ZoneDescription FROM BECZoneList ORDER BY Zone COLLATE NOCASE, Zone, ZoneDescription`)
 	if err != nil {
 		return nil, err
 	}
@@ -173,14 +178,19 @@ func (s *BECService) ListBECZones() ([]BECZone, error) {
 		}
 		result = append(result, row)
 	}
-	return result, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
-func (s *BECService) ListBECSubZones(zone *string) ([]BECSubZone, error) {
+func (s *BECService) ListBECSubZones(ctx context.Context, zone *string) ([]BECSubZone, error) {
 	if err := validateBECCode("Zone", zone, 4); err != nil {
 		return nil, err
 	}
-	s.mu.RLock()
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
 	if s.db == nil {
 		return nil, errors.New("BEC catalogue is closed")
@@ -192,7 +202,7 @@ func (s *BECService) ListBECSubZones(zone *string) ([]BECSubZone, error) {
 		args = append(args, *zone)
 	}
 	query += ` ORDER BY Zone COLLATE NOCASE, Zone, SubZone COLLATE NOCASE, SubZone, CAST(RowID AS INTEGER)`
-	rows, err := s.db.Query(query, args...)
+	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +215,10 @@ func (s *BECService) ListBECSubZones(zone *string) ([]BECSubZone, error) {
 		}
 		result = append(result, row)
 	}
-	return result, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 const becSeriesColumns = `RowID, SourceID, SSCode, Name, Region, Zone, SubZone, BaseSubZone, Variant, Phase, SiteSeries,
@@ -220,14 +233,16 @@ func becSeriesScan(row *BECSiteSeries) []any {
 		&row.MissingNpeNa, &row.TransferID, &row.Flag}
 }
 
-func (s *BECService) ListBECSiteSeries(zone, subZone *string) ([]BECSiteSeries, error) {
+func (s *BECService) ListBECSiteSeries(ctx context.Context, zone, subZone *string) ([]BECSiteSeries, error) {
 	if err := validateBECCode("Zone", zone, 4); err != nil {
 		return nil, err
 	}
 	if err := validateBECCode("SubZone", subZone, 8); err != nil {
 		return nil, err
 	}
-	s.mu.RLock()
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
 	if s.db == nil {
 		return nil, errors.New("BEC catalogue is closed")
@@ -236,7 +251,7 @@ func (s *BECService) ListBECSiteSeries(zone, subZone *string) ([]BECSiteSeries, 
 	if zone == nil || subZone == nil {
 		return result, nil
 	}
-	rows, err := s.db.Query(`SELECT `+becSeriesColumns+` FROM BECSiteSeries
+	rows, err := s.db.QueryContext(ctx, `SELECT `+becSeriesColumns+` FROM BECSiteSeries
  WHERE Zone = ? COLLATE NOCASE AND SubZone = ? COLLATE NOCASE
  ORDER BY SiteSeries COLLATE NOCASE, SiteSeries, CAST(RowID AS INTEGER)`, *zone, *subZone)
 	if err != nil {
@@ -254,5 +269,8 @@ func (s *BECService) ListBECSiteSeries(zone, subZone *string) ([]BECSiteSeries, 
 		}
 		result = append(result, row)
 	}
-	return result, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	_ "embed"
 	"errors"
@@ -127,8 +128,8 @@ func workingUnitChoiceStatus(row *WorkingUnitChoice) {
 	}
 }
 
-func (s *WorkingUnitService) masterChoices() ([]WorkingUnitChoice, error) {
-	rows, err := s.db.Query(`SELECT RowID,Origin,SourceID,Code,Description,ScientificName,Level
+func (s *WorkingUnitService) masterChoices(ctx context.Context) ([]WorkingUnitChoice, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT RowID,Origin,SourceID,Code,Description,ScientificName,Level
  FROM WorkingUnits WHERE Origin='master' AND Level=11
  ORDER BY Code COLLATE NOCASE,Code,CAST(RowID AS INTEGER)`)
 	if err != nil {
@@ -144,16 +145,21 @@ func (s *WorkingUnitService) masterChoices() ([]WorkingUnitChoice, error) {
 		workingUnitChoiceStatus(&row)
 		result = append(result, row)
 	}
-	return result, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
-func (s *WorkingUnitService) GetMasterWorkingUnitChoices() ([]WorkingUnitChoice, error) {
-	s.mu.RLock()
+func (s *WorkingUnitService) GetMasterWorkingUnitChoices(ctx context.Context) ([]WorkingUnitChoice, error) {
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
 	if s.db == nil {
 		return nil, errors.New("Working Unit catalogue is closed")
 	}
-	return s.masterChoices()
+	return s.masterChoices(ctx)
 }
 
 // Caller holds the project selection read lock through the complete operation.
@@ -243,22 +249,29 @@ func workingUnitSUAuthorized(db workingUnitDB, name string) error {
 	return nil
 }
 
-func (s *WorkingUnitService) GetWorkingUnitChoices(mode string) ([]WorkingUnitChoice, error) {
+func (s *WorkingUnitService) GetWorkingUnitChoices(ctx context.Context, mode string) ([]WorkingUnitChoice, error) {
 	if err := validateWorkingUnitMode(mode); err != nil {
 		return nil, err
 	}
-	s.mu.RLock()
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
 	if s.db == nil {
 		return nil, errors.New("Working Unit catalogue is closed")
 	}
 	if mode == "master" {
-		return s.masterChoices()
+		return s.masterChoices(ctx)
 	}
-	s.projects.mu.RLock()
+	if err := acquireReadLease(ctx, &s.projects.mu); err != nil {
+		return nil, err
+	}
 	defer s.projects.mu.RUnlock()
 	project, su, err := s.context()
 	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	if mode == "su" && su == "None" {
@@ -273,30 +286,31 @@ func (s *WorkingUnitService) GetWorkingUnitChoices(mode string) ([]WorkingUnitCh
 		return nil, err
 	}
 	defer db.Close()
-	tx, err := db.Begin()
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback()
+	reader := contextPlotDB{db: tx, ctx: ctx}
 	query := ""
 	if mode == "env" {
-		if err := workingUnitTextColumns(tx, project.Name+"_Env", "PlotNumber"); err != nil {
+		if err := workingUnitTextColumns(reader, project.Name+"_Env", "PlotNumber"); err != nil {
 			return nil, err
 		}
-		if err := workingUnitTextColumns(tx, project.Name+"_Admin", "Plot", "UserSiteUnit"); err != nil {
+		if err := workingUnitTextColumns(reader, project.Name+"_Admin", "Plot", "UserSiteUnit"); err != nil {
 			return nil, err
 		}
 		query = `SELECT DISTINCT a.UserSiteUnit FROM ` + quoteHeaderIdentifier(project.Name+"_Admin") +
 			` AS a INNER JOIN ` + quoteHeaderIdentifier(project.Name+"_Env") +
 			` AS e ON e.PlotNumber=a.Plot WHERE a.UserSiteUnit IS NOT NULL ORDER BY a.UserSiteUnit COLLATE NOCASE,a.UserSiteUnit`
 	} else {
-		if err := workingUnitSUAuthorized(tx, su); err != nil {
+		if err := workingUnitSUAuthorized(reader, su); err != nil {
 			return nil, err
 		}
 		query = `SELECT DISTINCT SiteUnit FROM ` + quoteHeaderIdentifier(su+"_SU") +
 			` WHERE SiteUnit IS NOT NULL ORDER BY SiteUnit COLLATE NOCASE,SiteUnit`
 	}
-	rows, err := tx.Query(query)
+	rows, err := tx.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -311,5 +325,8 @@ func (s *WorkingUnitService) GetWorkingUnitChoices(mode string) ([]WorkingUnitCh
 		workingUnitChoiceStatus(&row)
 		result = append(result, row)
 	}
-	return result, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
 }

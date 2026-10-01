@@ -124,3 +124,78 @@ test('catalogue lookup cancels superseded reloads and disposal without publishin
   assert.equal(cancelled, 2);
   assert.equal(states.length, count);
 });
+
+test('BEC cancellation replaces pending zones but retains successfully cached zones', async () => {
+  const sdk = await runtime();
+  const { loadTypeScript } = require('./svelteTestHelpers.cjs');
+  const { ReadRequests } = load(sdk);
+  const { BECLookup } = loadTypeScript('becEditor.ts');
+  const reads = new ReadRequests();
+  const pending = [];
+  let cancellations = 0;
+  const fetch = () => {
+    const request = sdk.CancellablePromise.withResolvers();
+    request.oncancelled = () => cancellations++;
+    pending.push(request);
+    return reads.track(request.promise);
+  };
+  const states = [];
+  const lookup = new BECLookup({ zones: fetch, subZones: fetch, siteSeries: fetch },
+    state => states.push(state), () => reads.cancelAll());
+  const first = lookup.refresh('BG', 'xh1');
+  const second = lookup.refresh('CMA', 'wh');
+  assert.equal(pending.length, 6);
+  for (const request of pending.slice(3)) request.resolve([]);
+  await Promise.all([first, second]);
+  assert.equal(cancellations, 3);
+  assert.equal(lookup.snapshot().ready, true);
+  const third = lookup.refresh('BG', 'xh1');
+  assert.equal(pending.length, 8, 'successful zones remain cached after late cancelled rejection');
+  const count = states.length;
+  lookup.dispose();
+  await third;
+  assert.equal(cancellations, 5);
+  assert.equal(states.length, count);
+});
+
+test('Working Unit disposal cancels choice reads, never preference initialization or commits', async () => {
+  const sdk = await runtime();
+  const { loadTypeScript } = require('./svelteTestHelpers.cjs');
+  const { ReadRequests } = load(sdk);
+  const bec = loadTypeScript('becEditor.ts');
+  const { WorkingUnitLookup } = loadTypeScript('workingUnitEditor.ts', { './becEditor': bec });
+  const reads = new ReadRequests();
+  let preferenceCancellations = 0;
+  let readCancellations = 0;
+  const preference = () => {
+    const request = sdk.CancellablePromise.withResolvers();
+    request.oncancelled = () => preferenceCancellations++;
+    return request;
+  };
+  const initial = preference(), commit = preference();
+  let readCount = 0, markStarted;
+  const started = new Promise(resolve => { markStarted = resolve; });
+  const choices = () => {
+    const request = sdk.CancellablePromise.withResolvers();
+    request.oncancelled = () => readCancellations++;
+    if (++readCount === 2) markStarted();
+    return reads.track(request.promise);
+  };
+  const states = [];
+  const api = { getMode: () => initial.promise, setMode: () => commit.promise, choices, master: choices };
+  const lookup = new WorkingUnitLookup(api, state => states.push(state), { mode: null }, () => reads.cancelAll());
+  const loading = lookup.refresh();
+  initial.resolve({ mode: 'master', warning: null });
+  await started;
+  lookup.dispose();
+  await loading;
+  assert.equal(readCancellations, 2);
+  const writing = new WorkingUnitLookup(api, state => states.push(state), { mode: null }, () => reads.cancelAll());
+  const save = writing.refresh('env');
+  const count = states.length;
+  writing.dispose();
+  commit.resolve({ mode: 'env', warning: null });
+  await save;
+  assert.equal(preferenceCancellations, 0);
+  assert.equal(states.length, count);
+});

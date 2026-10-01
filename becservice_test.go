@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"os"
@@ -38,7 +39,7 @@ func becString(value string) *string { return &value }
 
 func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 	s := becFixture(t)
-	status, err := s.GetBECCatalogueStatus()
+	status, err := s.GetBECCatalogueStatus(context.Background())
 	if err != nil || status.ZoneRows != 281 || status.SiteSeriesRows != 3532 || status.DuplicateKeys != 983 ||
 		status.UnselectableRows != 73 ||
 		status.SourceSHA256 != "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d" ||
@@ -46,27 +47,27 @@ func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 		becHash(becDatabase) != "9e087c097d472e88e64caf6ef8dddfe50959fd5b7557e45e676befedfe4cfe58" {
 		t.Fatalf("catalogue status %#v: %v", status, err)
 	}
-	zones, err := s.ListBECZones()
+	zones, err := s.ListBECZones(context.Background())
 	if err != nil || len(zones) != 17 {
 		t.Fatalf("zones %d: %v", len(zones), err)
 	}
-	all, err := s.ListBECSubZones(nil)
+	all, err := s.ListBECSubZones(context.Background(), nil)
 	if err != nil || len(all) != 281 {
 		t.Fatalf("all subzones %d: %v", len(all), err)
 	}
-	upper, err := s.ListBECSubZones(becString("BG"))
+	upper, err := s.ListBECSubZones(context.Background(), becString("BG"))
 	if err != nil || len(upper) == 0 {
 		t.Fatalf("BG subzones: %v", err)
 	}
-	lower, err := s.ListBECSubZones(becString("bg"))
+	lower, err := s.ListBECSubZones(context.Background(), becString("bg"))
 	if err != nil || !reflect.DeepEqual(upper, lower) {
 		t.Fatalf("ASCII lookup changed raw subzones: %v", err)
 	}
-	series, err := s.ListBECSiteSeries(becString("BG"), becString("xh1"))
+	series, err := s.ListBECSiteSeries(context.Background(), becString("BG"), becString("xh1"))
 	if err != nil || len(series) != 10 {
 		t.Fatalf("BG xh1 rows %d: %v", len(series), err)
 	}
-	mixed, err := s.ListBECSiteSeries(becString("bg"), becString("XH1"))
+	mixed, err := s.ListBECSiteSeries(context.Background(), becString("bg"), becString("XH1"))
 	if err != nil || !reflect.DeepEqual(series, mixed) {
 		t.Fatalf("ASCII lookup changed raw definitions: %v", err)
 	}
@@ -83,7 +84,7 @@ func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 	if !leadingZero || !duplicate {
 		t.Fatalf("lost leading zeros/duplicates: %#v", codes)
 	}
-	emptyCodes, err := s.ListBECSiteSeries(becString("CMA"), becString("wh"))
+	emptyCodes, err := s.ListBECSiteSeries(context.Background(), becString("CMA"), becString("wh"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +106,7 @@ func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 		{"1", "64", "ESSF", "xv1", "07", "Bl - Valerian - Arnica"},
 		{"3532", "3756", "CWH", "vh2", "19", "Ss - Pacific crab apple"},
 	} {
-		rows, err := s.ListBECSiteSeries(&identity.zone, &identity.subZone)
+		rows, err := s.ListBECSiteSeries(context.Background(), &identity.zone, &identity.subZone)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -124,7 +125,7 @@ func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 		}
 	}
 	for _, code := range []string{"All", "ZZ", "O'Q"} {
-		rows, err := s.ListBECSubZones(&code)
+		rows, err := s.ListBECSubZones(context.Background(), &code)
 		if err != nil || len(rows) != 0 || rows == nil {
 			t.Fatalf("literal/no-match subzones %q: %#v %v", code, rows, err)
 		}
@@ -133,18 +134,18 @@ func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 		{nil, nil}, {nil, becString("xh1")}, {becString("BG"), nil},
 		{becString("ZZ"), becString("xh1")}, {becString("BG"), becString("O'Q")}, {becString("All"), becString("xh1")},
 	} {
-		rows, err := s.ListBECSiteSeries(pair[0], pair[1])
+		rows, err := s.ListBECSiteSeries(context.Background(), pair[0], pair[1])
 		if err != nil || len(rows) != 0 || rows == nil {
 			t.Fatalf("NULL/no-match series: %#v %v", rows, err)
 		}
 	}
 	for _, code := range []string{"", "ABCDE"} {
-		if _, err := s.ListBECSubZones(&code); err == nil {
+		if _, err := s.ListBECSubZones(context.Background(), &code); err == nil {
 			t.Fatalf("invalid Zone %q accepted", code)
 		}
 	}
 	for _, code := range []string{"", "123456789"} {
-		if _, err := s.ListBECSiteSeries(becString("BG"), &code); err == nil {
+		if _, err := s.ListBECSiteSeries(context.Background(), becString("BG"), &code); err == nil {
 			t.Fatalf("invalid SubZone %q accepted", code)
 		}
 	}
@@ -166,16 +167,16 @@ func TestBECExistingFileAndCloseGuards(t *testing.T) {
 	if err := s.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.ListBECZones(); err == nil {
+	if _, err := s.ListBECZones(context.Background()); err == nil {
 		t.Fatal("closed lookup succeeded")
 	}
-	if _, err := s.ListBECSubZones(nil); err == nil {
+	if _, err := s.ListBECSubZones(context.Background(), nil); err == nil {
 		t.Fatal("closed subzone lookup succeeded")
 	}
-	if _, err := s.ListBECSiteSeries(nil, nil); err == nil {
+	if _, err := s.ListBECSiteSeries(context.Background(), nil, nil); err == nil {
 		t.Fatal("closed NULL lookup succeeded")
 	}
-	if _, err := s.GetBECCatalogueStatus(); err == nil {
+	if _, err := s.GetBECCatalogueStatus(context.Background()); err == nil {
 		t.Fatal("closed status succeeded")
 	}
 	data, _ := os.ReadFile(filepath.Join(root, "vlists.db"))
@@ -296,7 +297,7 @@ func TestBECImportAllMetadataAndNullableSignedIdentities(t *testing.T) {
 	}
 	service := &BECService{db: db}
 	for _, pair := range [][2]string{{"ESSF", "xv1"}, {"CWH", "vh2"}} {
-		rows, err := service.ListBECSiteSeries(&pair[0], &pair[1])
+		rows, err := service.ListBECSiteSeries(context.Background(), &pair[0], &pair[1])
 		if err != nil {
 			t.Fatal(err)
 		}

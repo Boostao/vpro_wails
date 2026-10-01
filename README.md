@@ -178,8 +178,14 @@ their field/reference consumers cancel supersession/unmount and forced Retry rea
 Native checks preserve metadata, invalid drafts and every fixture database/config
 byte. Synchronous file reads are checked before/after, not promised interruptible.
 Cancellation acknowledgements alone are handled; corruption errors from cancelled
-reads remain visible. BEC/Quality/Working Unit and state/discovery cancellation
-remain pending, so C3 is not complete.
+reads remain visible. BEC/Quality/Working Unit catalogue queries also use injected
+contexts, including dynamic project/SU schema and choice queries. BEC retains
+successfully cached zones while replacing cancelled pending generations. Working
+Unit cancels choices only: its getter initializes a persistent preference fallback,
+so initialization and setters are deliberately not auto-cancelled or retried.
+Native expensive queries interrupt and recover with identical metadata; invalid
+Quality drafts survive remount. State/discovery cancellation remains pending,
+so C3 is not complete.
 See C1-C5 in
 [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for bounded performance/cleanup gates,
 including incremental packages and optional typed catalogue transport consolidation.

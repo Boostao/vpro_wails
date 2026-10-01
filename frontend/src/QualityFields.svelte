@@ -3,7 +3,8 @@
   import { QualityService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
   import FieldGuidance from './FieldGuidance.svelte';
-  import { QualityLookup, qualityKey, qualityKeys, qualityLabels, qualityGroups, qualityDefinitions,
+  import { CatalogueLookup } from './catalogueLookup';
+  import { qualityKey, qualityKeys, qualityLabels, qualityGroups, qualityDefinitions,
     qualityChanged, qualityLengthError, qualityValueError, qualityWarnings, qualityValidation, qualityAcknowledged,
     rememberQualityAcknowledgement, type QualityCodes } from './qualityEditor';
 
@@ -16,11 +17,11 @@
   } = $props();
   const editingEnabled = import.meta.env.VITE_QUALITY_EDITING !== 'false';
   const listId = $props.id();
-  const lookup = new QualityLookup(async () => {
-    const rows = await QualityService.ListPlotQualityChoices();
+  const lookup = new CatalogueLookup(async (_force, requests) => {
+    const rows = await requests.track(QualityService.ListPlotQualityChoices());
     if (rows === null) throw new Error('Quality service did not return choice rows.');
     return rows;
-  }, next => { view = next; onbusy?.(next.busy); });
+  }, next => { view = next; onbusy?.(next.busy); }, 'Quality');
   let view = $state(lookup.snapshot());
   let acknowledged = $state(false);
   const changed = $derived(qualityChanged(draft, original));

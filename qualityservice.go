@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	_ "embed"
 	"encoding/binary"
@@ -164,14 +165,19 @@ func qualityChoices(db headerDB) ([]PlotQualityChoice, error) {
 		qualityChoiceStatus(&row)
 		result = append(result, row)
 	}
-	return result, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
-func (s *QualityService) ListPlotQualityChoices() ([]PlotQualityChoice, error) {
-	s.mu.RLock()
+func (s *QualityService) ListPlotQualityChoices(ctx context.Context) ([]PlotQualityChoice, error) {
+	if err := acquireReadLease(ctx, &s.mu); err != nil {
+		return nil, err
+	}
 	defer s.mu.RUnlock()
 	if s.db == nil {
 		return nil, errors.New("quality catalogue is closed")
 	}
-	return qualityChoices(s.db)
+	return qualityChoices(contextPlotDB{db: s.db, ctx: ctx})
 }

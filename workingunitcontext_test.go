@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -20,7 +21,7 @@ func TestWorkingUnitEmptyChoicesAndServerResolvedFamilyFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, mode := range []string{"env", "su"} {
-		rows, err := service.GetWorkingUnitChoices(mode)
+		rows, err := service.GetWorkingUnitChoices(context.Background(), mode)
 		if err != nil || rows == nil || len(rows) != 0 {
 			t.Fatalf("empty %s choices silently fallback: %#v %v", mode, rows, err)
 		}
@@ -28,7 +29,7 @@ func TestWorkingUnitEmptyChoicesAndServerResolvedFamilyFile(t *testing.T) {
 	projects.mu.Lock()
 	projects.activeSU = "BadSchema"
 	projects.mu.Unlock()
-	if _, err := service.GetWorkingUnitChoices("su"); err == nil {
+	if _, err := service.GetWorkingUnitChoices(context.Background(), "su"); err == nil {
 		t.Fatal("nontext SU schema accepted")
 	}
 	projects.mu.Lock()
@@ -44,7 +45,7 @@ func TestWorkingUnitEmptyChoicesAndServerResolvedFamilyFile(t *testing.T) {
 	if err := os.Rename(filepath.Join(projects.root, "projects", "Sample.db"), filepath.Join(projects.root, "projects", "Families.db")); err != nil {
 		t.Fatal(err)
 	}
-	rows, err := service.GetWorkingUnitChoices("env")
+	rows, err := service.GetWorkingUnitChoices(context.Background(), "env")
 	if err != nil || !reflect.DeepEqual(workingUnitCodes(rows), []string{"server-resolved"}) {
 		t.Fatalf("lookup guessed project filename rather than resolving it: %#v %v", rows, err)
 	}
@@ -69,7 +70,7 @@ func TestWorkingUnitConcurrentChoicesPreferencesAndContext(t *testing.T) {
 				var err error
 				switch worker {
 				case 0:
-					_, err = service.GetWorkingUnitChoices("env")
+					_, err = service.GetWorkingUnitChoices(context.Background(), "env")
 				case 1:
 					_, err = service.SetWorkingUnitMode([]string{"env", "master", "su"}[i%3])
 				case 2:

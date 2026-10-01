@@ -2,6 +2,7 @@
   import { onDestroy, untrack, type Snippet } from 'svelte';
   import { WorkingUnitService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
+  import { ReadRequests } from './readRequests';
   import FieldGuidance from './FieldGuidance.svelte';
   import { WorkingUnitLookup, isWorkingUnitControl, workingUnitAcknowledged, rememberWorkingUnitAcknowledgement,
     workingUnitChanged, workingUnitCopy, workingUnitDefinitions, workingUnitGroups, workingUnitValidation,
@@ -22,12 +23,13 @@
     if (value === null) throw new Error('The Working Unit service did not return choice rows.');
     return value;
   }
+  const reads = new ReadRequests();
   const lookup = new WorkingUnitLookup({
     getMode: () => WorkingUnitService.GetWorkingUnitMode(),
     setMode: mode => WorkingUnitService.SetWorkingUnitMode(mode),
-    choices: async mode => rows(await WorkingUnitService.GetWorkingUnitChoices(mode)),
-    master: async () => rows(await WorkingUnitService.GetMasterWorkingUnitChoices())
-  }, next => { view = next; onbusy?.(next.busy); }, untrack(() => session));
+    choices: async mode => rows(await reads.track(WorkingUnitService.GetWorkingUnitChoices(mode))),
+    master: async () => rows(await reads.track(WorkingUnitService.GetMasterWorkingUnitChoices()))
+  }, next => { view = next; onbusy?.(next.busy); }, untrack(() => session), () => reads.cancelAll());
   let view = $state(lookup.snapshot());
   let acknowledged = $state(false);
   let notice = $state<string | null>(null);

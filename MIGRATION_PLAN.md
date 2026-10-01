@@ -293,8 +293,21 @@ queued-lock deadlines are proven by tests. Synchronous file reads are checked
 before/after, not promised interruptible. Non-cancellation corruption rejections
 remain visible even when their promise was cancelled; the failed overly strict
 native assertion and exact-byte cleanup are retained.
-C3 remains open for BEC/Quality/Working Unit and state/discovery reads and their
-frontend ownership; do not claim the full cleanup or migration gate complete.
+C3d BEC/Quality/Working Unit catalogue retrieval is implemented and promoted.
+Injected contexts cover catalogue locks/pool waits and dynamic Working Unit
+project/SU transactions/schema/choices. Cancelled iteration returns no partial rows.
+BEC preserves fulfilled zone caching and replaces pending generations without a
+late cancelled rejection clearing the new cache. Quality and Working Unit choices
+own supersession/disposal. Working Unit preference initialization and setters are
+not pure reads and remain uncancelled; no implicit preference retries.
+Focused race19.966s/full race335.572s;146 frontend tests/check0/0/build; bindings15/104/33.
+Native expensive BEC/Quality/Master/environment queries all interrupt and recover
+identical metadata within3s. Sixteen-unit Quality input (source bound15+1) survives
+remount/rejected Save; all fixture bytes restored after owned close. The primary
+probe incorrectly used7 characters as invalid; corrected UI phase only, without
+repeating completed SQL phases. Evidence/cleanup receipts remain in native-read-cancel.
+C3 remains open for state/discovery reads and their frontend ownership; do not
+claim the full cleanup or migration gate complete.
 Wire C3 along affected retrieval paths without coupling it to an all-service rewrite.
 C4/C5 fit between subsequent validated workflows and do not block parent migration
 merely to reduce file/service counts. Run focused Go tests/benchmarks first, full

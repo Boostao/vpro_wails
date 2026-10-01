@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,7 +24,7 @@ func TestWorkingUnitExplicitEnvWithoutSUAndInitializationLifecycle(t *testing.T)
 		if saved, err := readWorkingUnitPreference(service.settingsPath); err != nil || saved != mode {
 			t.Fatalf("explicit %s not persisted: %s %v", mode, saved, err)
 		}
-		if _, err := service.GetWorkingUnitChoices(mode); err != nil {
+		if _, err := service.GetWorkingUnitChoices(context.Background(), mode); err != nil {
 			t.Fatalf("refresh explicit %s without SU: %v", mode, err)
 		}
 		if saved, err := readWorkingUnitPreference(service.settingsPath); err != nil || saved != mode {

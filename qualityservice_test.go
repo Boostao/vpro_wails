@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"math"
@@ -48,7 +49,7 @@ func TestQualityCatalogueAll50CellsAndProvenance(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { service.Close() })
-	got, err := service.ListPlotQualityChoices()
+	got, err := service.ListPlotQualityChoices(context.Background())
 	if err != nil || !reflect.DeepEqual(got, qualitySourceChoices()) {
 		t.Fatalf("native ten-column/five-row catalogue mismatch: %#v %v", got, err)
 	}
@@ -69,7 +70,7 @@ func TestQualityCatalogueAll50CellsAndProvenance(t *testing.T) {
 	if err := service.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.ListPlotQualityChoices(); err == nil {
+	if _, err := service.ListPlotQualityChoices(context.Background()); err == nil {
 		t.Fatal("closed service silently succeeded")
 	}
 	reopened, err := NewQualityService(dir)
@@ -77,7 +78,7 @@ func TestQualityCatalogueAll50CellsAndProvenance(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer reopened.Close()
-	again, err := reopened.ListPlotQualityChoices()
+	again, err := reopened.ListPlotQualityChoices(context.Background())
 	if err != nil || !reflect.DeepEqual(again, got) {
 		t.Fatalf("reopen changed catalogue: %v", err)
 	}
@@ -114,7 +115,7 @@ func TestQualityCatalogueNonoverwritingCollisionAndConcurrency(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for j := 0; j < 10; j++ {
-				_, _ = service.ListPlotQualityChoices() // Close races deliberately; either rows or explicit closed error.
+				_, _ = service.ListPlotQualityChoices(context.Background()) // Close races deliberately; either rows or explicit closed error.
 			}
 		}()
 	}

@@ -109,7 +109,7 @@ export class WorkingUnitLookup {
   private view: WorkingUnitView = { mode: null, warning: null, choices: [], master: [],
     ready: false, masterReady: false, busy: false, error: null, masterError: null };
   constructor(private api: WorkingUnitAPI, private state: (view: WorkingUnitView) => void,
-    private session: WorkingUnitSession = { mode: null }) {}
+    private session: WorkingUnitSession = { mode: null }, private cancel?: () => void) {}
   snapshot(): WorkingUnitView { return { ...this.view }; }
   private publish(update: Partial<WorkingUnitView>): void {
     this.view = { ...this.view, ...update };
@@ -119,6 +119,7 @@ export class WorkingUnitLookup {
     if (this.disposed) return;
     if (mode !== undefined && this.view.busy) throw new Error('Wait for the current Working Unit preference operation.');
     const revision = ++this.revision;
+    this.cancel?.();
     this.publish({ busy: true, ready: false, masterReady: false, choices: [], master: [], error: null, masterError: null });
     try {
       const preference = mode === undefined ? this.session.mode ?? await this.api.getMode() : await this.api.setMode(mode);
@@ -142,5 +143,5 @@ export class WorkingUnitLookup {
         error: `Working Unit preference could not be loaded or saved: ${String(cause)}` });
     }
   }
-  dispose(): void { this.disposed = true; this.revision++; }
+  dispose(): void { this.disposed = true; this.revision++; this.cancel?.(); }
 }

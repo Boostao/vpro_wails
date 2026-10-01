@@ -118,8 +118,9 @@ export class BECLookup {
   private revision = 0;
   private disposed = false;
   private zones: Promise<BECZone[]> | null = null;
+  private zonesReady = false;
   private view: BECView = { zones: [], subZones: [], siteSeries: [], busy: false, ready: false, error: null };
-  constructor(private api: BECAPI, private state: (view: BECView) => void) {}
+  constructor(private api: BECAPI, private state: (view: BECView) => void, private cancel?: () => void) {}
   snapshot(): BECView { return { ...this.view }; }
   private publish(update: Partial<BECView>): void {
     this.view = { ...this.view, ...update };
@@ -128,12 +129,23 @@ export class BECLookup {
   async refresh(zone: string | null, subZone: string | null): Promise<void> {
     if (this.disposed) return;
     const revision = ++this.revision;
+    if (this.cancel) {
+      if (!this.zonesReady) this.zones = null;
+      this.cancel();
+    }
     this.publish({ busy: true, ready: false, error: null, subZones: [], siteSeries: [] });
     try {
       const invalid = becLengthError({ zone, subZone, siteSeries: null });
       if (invalid) throw new Error(invalid);
       if (!this.zones) {
-        this.zones = this.api.zones().catch(cause => { this.zones = null; throw cause; });
+        const pending = this.api.zones().then(rows => {
+          if (this.zones === pending) this.zonesReady = true;
+          return rows;
+        }, cause => {
+          if (this.zones === pending) { this.zones = null; this.zonesReady = false; }
+          throw cause;
+        });
+        this.zones = pending;
       }
       const [zones, subZones, siteSeries] = await Promise.all([
         this.zones, this.api.subZones(zone), this.api.siteSeries(zone, subZone)
@@ -149,5 +161,6 @@ export class BECLookup {
   dispose(): void {
     this.disposed = true;
     this.revision++;
+    this.cancel?.();
   }
 }

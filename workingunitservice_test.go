@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"os"
@@ -59,11 +60,11 @@ func TestWorkingUnitFrozenMasterChoicesAndReadOnly(t *testing.T) {
 		p.MasterRows+p.UserRows != 3508 || len(p.SourceCopies) != 5 {
 		t.Fatal("native reference integrity boundary changed")
 	}
-	rows, err := service.GetMasterWorkingUnitChoices()
+	rows, err := service.GetMasterWorkingUnitChoices(context.Background())
 	if err != nil || len(rows) != 3504 {
 		t.Fatalf("master catalogue %d: %v", len(rows), err)
 	}
-	same, err := service.GetWorkingUnitChoices("master")
+	same, err := service.GetWorkingUnitChoices(context.Background(), "master")
 	if err != nil || !reflect.DeepEqual(rows, same) {
 		t.Fatalf("master APIs disagree: %v", err)
 	}
@@ -142,7 +143,7 @@ func TestWorkingUnitMasterNullableDuplicateAndLevelShape(t *testing.T) {
 		t.Fatal(err)
 	}
 	service := &WorkingUnitService{db: db}
-	rows, err := service.GetMasterWorkingUnitChoices()
+	rows, err := service.GetMasterWorkingUnitChoices(context.Background())
 	if err != nil || len(rows) != 4 {
 		t.Fatalf("raw Level11 shape: %#v %v", rows, err)
 	}
@@ -163,7 +164,7 @@ func TestWorkingUnitMasterNullableDuplicateAndLevelShape(t *testing.T) {
 	if _, err := db.Exec(`ALTER TABLE WorkingUnits DROP COLUMN ScientificName`); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.GetMasterWorkingUnitChoices(); err == nil {
+	if _, err := service.GetMasterWorkingUnitChoices(context.Background()); err == nil {
 		t.Fatal("missing catalogue schema silently accepted")
 	}
 }
@@ -189,14 +190,14 @@ func TestWorkingUnitProjectAndWholeSUChoicesNoWrites(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	env, err := service.GetWorkingUnitChoices("env")
+	env, err := service.GetWorkingUnitChoices(context.Background(), "env")
 	if err != nil || !reflect.DeepEqual(workingUnitCodes(env), []string{"", "001", "Case", "case", "O'Brien"}) {
 		t.Fatalf("joined raw env values: %#v %v", env, err)
 	}
 	if env[0].Selectable || env[0].Diagnostic == "" {
 		t.Fatal("historical empty value was silently selectable")
 	}
-	su, err := service.GetWorkingUnitChoices("su")
+	su, err := service.GetWorkingUnitChoices(context.Background(), "su")
 	if err != nil || !reflect.DeepEqual(workingUnitCodes(su), []string{"001", "NULL partner", "O'Brien", "off-project"}) {
 		t.Fatalf("SU must include entire authorized table: %#v %v", su, err)
 	}
@@ -218,11 +219,11 @@ func TestWorkingUnitProjectAndWholeSUChoicesNoWrites(t *testing.T) {
 
 func TestWorkingUnitContextSchemaAndClosedGuards(t *testing.T) {
 	service, projects, db := workingUnitServiceFixture(t)
-	if _, err := service.GetWorkingUnitChoices("su"); err == nil {
+	if _, err := service.GetWorkingUnitChoices(context.Background(), "su"); err == nil {
 		t.Fatal("SU mode without active table silently returned master/empty")
 	}
 	for _, invalid := range []string{"", "Env", "unknown", `master'; DELETE FROM Sample_Admin;--`} {
-		if _, err := service.GetWorkingUnitChoices(invalid); err == nil {
+		if _, err := service.GetWorkingUnitChoices(context.Background(), invalid); err == nil {
 			t.Fatal("invalid source mode accepted")
 		}
 		if _, err := service.SetWorkingUnitMode(invalid); err == nil {
@@ -239,7 +240,7 @@ func TestWorkingUnitContextSchemaAndClosedGuards(t *testing.T) {
 		projects.mu.Lock()
 		projects.activeSU = name
 		projects.mu.Unlock()
-		if _, err := service.GetWorkingUnitChoices("su"); err == nil {
+		if _, err := service.GetWorkingUnitChoices(context.Background(), "su"); err == nil {
 			t.Fatalf("unauthorized/stale context %q accepted", name)
 		}
 		if _, err := service.GetWorkingUnitMode(); err == nil {
@@ -249,7 +250,7 @@ func TestWorkingUnitContextSchemaAndClosedGuards(t *testing.T) {
 	projects.mu.Lock()
 	projects.activeSU, projects.active = "None", "Missing"
 	projects.mu.Unlock()
-	if _, err := service.GetWorkingUnitChoices("env"); err == nil {
+	if _, err := service.GetWorkingUnitChoices(context.Background(), "env"); err == nil {
 		t.Fatal("stale project context accepted")
 	}
 	projects.mu.Lock()
@@ -258,13 +259,13 @@ func TestWorkingUnitContextSchemaAndClosedGuards(t *testing.T) {
 	if _, err := db.Exec(`ALTER TABLE Sample_Admin DROP COLUMN UserSiteUnit`); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.GetWorkingUnitChoices("env"); err == nil {
+	if _, err := service.GetWorkingUnitChoices(context.Background(), "env"); err == nil {
 		t.Fatal("unsupported Admin schema silently accepted")
 	}
 	if err := service.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.GetMasterWorkingUnitChoices(); err == nil {
+	if _, err := service.GetMasterWorkingUnitChoices(context.Background()); err == nil {
 		t.Fatal("closed master lookup succeeded")
 	}
 	if _, err := service.GetWorkingUnitMode(); err == nil {
