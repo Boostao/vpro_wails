@@ -70,7 +70,9 @@ func withContextPlotRequest[T any](ctx context.Context, s *ContextService, expec
 		return result, err
 	}
 	plots := &PlotService{projects: projects, auditStrength: s.plots.auditStrength, currentUser: s.plots.currentUser,
-		siteCodes: s.plots.siteCodes, siteCodesError: s.plots.siteCodesError, contextScoped: true, requestContext: ctx}
+		siteCodes: s.plots.siteCodes, siteCodesError: s.plots.siteCodesError,
+		parentCodes: s.plots.parentCodes, parentCodesError: s.plots.parentCodesError,
+		contextScoped: true, requestContext: ctx}
 	s.plots.mu.RUnlock()
 	return operation(plots)
 }

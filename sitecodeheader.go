@@ -75,9 +75,17 @@ func (s *PlotService) validateSiteCodeHeaderValues(h FS882Header, old *FS882Head
 				}
 			}
 		}
-		if !membership[*field.value] {
-			return fmt.Errorf("%s must be NULL or an exact canonical Exposure Item; %q is not listed", field.name, *field.value)
+		if err := canonicalItemError(field.name, "Exposure", *field.value, membership); err != nil {
+			return err
 		}
+	}
+
+	return nil
+}
+
+func canonicalItemError(name, list, value string, membership map[string]bool) error {
+	if !membership[value] {
+		return fmt.Errorf("%s must be NULL or an exact canonical %s Item; %q is not listed", name, list, value)
 	}
 	return nil
 }

@@ -174,7 +174,7 @@ test('Concurrent preference writes refused explicitly and disposal never publish
 });
 test('Header lifecycle and all mutation gates include Working Unit preference/lookup ownership', () => {
   const source = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(source, /headerWorkflowBusy = \$derived\(coordinateBusy \|\| workingUnitBusy \|\| qualityBusy \|\| siteCodeBusy \|\| regionCodeBusy \|\| soilCodeBusy \|\| geologyCodeBusy \|\| parentCodeBusy\)/);
+  assert.match(source, /headerWorkflowBusy = \$derived\(coordinateBusy \|\| workingUnitBusy \|\| qualityBusy \|\| siteCodeBusy \|\| regionCodeBusy \|\| soilCodeBusy \|\| geologyCodeBusy \|\| parentCodeBusy \|\| drainageBusy\)/);
   assert.match(source, /onWorkingUnitBusyChange=\{\(pending\) => workingUnitBusy = pending\}/);
   assert.match(source, /busy: busy \|\| headerWorkflowBusy/);
   assert.doesNotMatch(source, /busy \|\| coordinateBusy/);

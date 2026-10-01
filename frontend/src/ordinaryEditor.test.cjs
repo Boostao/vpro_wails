@@ -149,3 +149,63 @@ test('Two separately gated source flags retain nullable identity and labelled Ch
     }
   }
 });
+
+const drainage = loadTypeScript('drainageEditor.ts', {
+  './referenceCodeEditor': loadTypeScript('referenceCodeEditor.ts', { './becEditor': bec, './qualityEditor': quality })
+});
+test('Soil drainage requires exact membership and availability, never acknowledgement or case rewriting', () => {
+  const rows = [
+    { rowId: '1', listName: 'SoilDrainage', code: 'w', selectable: true },
+    { rowId: '2', listName: 'SoilDrainage', code: 'w', selectable: true },
+    { rowId: '3', listName: 'SoilDrainage', code: '', selectable: false },
+    { rowId: '4', listName: 'SoilDrainage', code: 'p', selectable: false },
+    { rowId: '5', listName: 'Other', code: 'r', selectable: true }
+  ];
+  const view = { choices: rows, ready: true, busy: false, error: null };
+  assert.equal(drainage.drainageError('w', null, view), null);
+  for (const raw of ['W', ' w', 'w ', 'p', 'r', '?????', 'abcdef', '', '\ud800']) {
+    assert.ok(drainage.drainageError(raw, null, view));
+  }
+  assert.equal(drainage.drainageGroups(rows, 'SoilDrainage').length, 1);
+  assert.equal(drainage.drainageGroups(rows, 'SoilDrainage')[0].records.length, 2);
+  const unavailable = { ...view, ready: false, error: 'reference failure' };
+  assert.equal(drainage.drainageError(null, 'legacy-long', unavailable), null);
+  assert.equal(drainage.drainageError('legacy-long', 'legacy-long', unavailable), null);
+  assert.equal(drainage.drainageError('w', null, unavailable), 'reference failure');
+  assert.match(drainage.drainageError('w', null, { ...view, busy: true }), /Wait/);
+});
+
+test('Actual drainage component owns only its strict source slot and retains explicit opt-out', () => {
+  const source = readFileSync(path.join(__dirname, 'DrainageFields.svelte'), 'utf8');
+  const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  assert.equal(compile(source, { filename: 'DrainageFields.svelte', generate: 'client' }).warnings.length, 0);
+  assert.match(source, /requests\.track\(ParentCodeService\.ListChoices\('SoilDrainage'\)\)/);
+  assert.match(source, /onDestroy[\s\S]*lookup\.dispose\(\)[\s\S]*onvalidation\('soilDrainage'/);
+  assert.match(form, /parentCodeBusy \|\| drainageBusy/);
+  assert.doesNotMatch(source, /type="checkbox"|rememberAcknowledgement|maxlength=/);
+  for (const enabled of [true, false]) {
+    const Component = serverComponent(source.replace('import.meta.env.VITE_SOIL_DRAINAGE_EDITING',
+      enabled ? "'true'" : "'false'"), 'DrainageFields.svelte', {
+      './drainageEditor': drainage, './qualityEditor': quality,
+      '../bindings/github.com/boostao/vpro-wails': { ParentCodeService: {} }
+    });
+    const fixture = `<script>import Drainage from './Drainage.svelte';let draft={soilDrainage:'legacy-long'};</script>
+      <label>Drainage class
+        <Drainage bind:draft original={{soilDrainage:'legacy-long'}} capabilities={{soilDrainage:true}} disabled={false}
+          onchange={()=>{}} onvalidation={()=>{}} onbusy={()=>{}}>
+          {#snippet children(slot)}
+            {#if slot}{@render slot.input({column:'SoilDrainage',type:'ComboBox',enabled:true,locked:false,controlName:'SoilDrainage'},'width:100%')}
+            {:else}<input disabled data-column="SoilDrainage"/>{/if}
+          {/snippet}
+        </Drainage>
+      </label>`;
+    const Wrapper = serverComponent(fixture, 'DrainageFixture.svelte', { './Drainage.svelte': { default: Component } });
+    const html = render(Wrapper).body;
+    assert.equal((html.match(/data-column="SoilDrainage"/g) || []).length, 1);
+    if (enabled) {
+      assert.match(html, /id="header-soilDrainage"/);
+      assert.match(html, /value="legacy-long"/);
+      assert.doesNotMatch(html, /aria-invalid="true"/);
+    } else assert.match(html, /disabled(?:="")? data-column="SoilDrainage"/);
+  }
+});

@@ -78,6 +78,7 @@ func main() {
 		log.Printf("Warning: failed to initialize GeologyCodeService: %v", err)
 	}
 	parentCodes, err := NewParentCodeService(dataDir)
+	plots.parentCodes, plots.parentCodesError = parentCodes, err
 	if err != nil {
 		log.Printf("Warning: failed to initialize ParentCodeService: %v", err)
 	}

@@ -55,7 +55,7 @@ func isParentCodeProperty(property string) bool {
 
 func parentCodeListMaximum(list string) (int, bool) {
 	if list == "SoilDrainage" {
-		return 5, true // Reference-only while the distinct LimitToList constraint is held.
+		return 5, true
 	}
 	for _, field := range parentCodeDescriptors {
 		if list == field.list {

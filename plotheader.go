@@ -346,6 +346,9 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 	if err := validateOrdinaryHeaderBeforeTransaction(db, project, h, mode); err != nil {
 		return err
 	}
+	if err := s.validateSoilDrainageBeforeTransaction(db, project, h, mode); err != nil {
+		return err
+	}
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -425,6 +428,9 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 	if err := validateOrdinaryHeaderValues(h, qualityOld); err != nil {
 		return err
 	}
+	if err := s.validateSoilDrainageHeaderValues(h, qualityOld); err != nil {
+		return err
+	}
 	for _, table := range []string{"Env", "Admin"} {
 		key := "PlotNumber"
 		if table == "Admin" {
@@ -438,7 +444,7 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 			if field.table != table || field.property == "plotNumber" || !caps[field.property] {
 				continue
 			}
-			if !creating && (field.property == "zone" || field.property == "subZone" || field.property == "siteSeries" || field.property == "userSiteUnit" || field.property == "speciesListComplete" || field.property == "updatedFromCards" || isQualityProperty(field.property) || isSubstrateProperty(field.property) || isSiteCodeProperty(field.property) || isRegionProperty(field.property) || isSoilProperty(field.property) || isGeologyProperty(field.property) || isParentCodeProperty(field.property) || isOrdinaryProperty(field.property)) &&
+			if !creating && (field.property == "zone" || field.property == "subZone" || field.property == "siteSeries" || field.property == "userSiteUnit" || field.property == "speciesListComplete" || field.property == "updatedFromCards" || field.property == "soilDrainage" || isQualityProperty(field.property) || isSubstrateProperty(field.property) || isSiteCodeProperty(field.property) || isRegionProperty(field.property) || isSoilProperty(field.property) || isGeologyProperty(field.property) || isParentCodeProperty(field.property) || isOrdinaryProperty(field.property)) &&
 				reflect.DeepEqual(headerValue(h, field), headerValue(*old, field)) {
 				continue
 			}

@@ -38,7 +38,7 @@ between shells.
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current and candidate executables contain the same verified default-on payload:
   `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`, SHA256
-  `f4f0d712aa4c74e59488dca211786c677eb487596e1b47e0341f45bbc4792ba3`.
+  `6a6085ad87196c601f6f8ae8babc31f385664295a472ed221a2835d7b936f564`.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -177,7 +177,7 @@ between shells.
   exited, inspector9392 closed. Catalogue fallback80a008... is sealed there as
   vpro-all-catalogue-read-verified.exe. Parent migration resumes next; optional
   C4/C5 cleanup is nonblocking.
-- Verified writable parent coverage: **93/98**. Full storage mapping and source
+- Verified writable parent coverage: **94/98**. Full storage mapping and source
   layout are not full FS882 or application parity.
 - Fourteen ordinary surveyor/text/depth/cover/note fields are default-on, with
   `VITE_ORDINARY_PARENT_EDITING=false` opt-out. Source UTF-16 bounds, Integer/Single
@@ -199,6 +199,17 @@ between shells.
   optout builds; bindings15/104/33. Proof/visual/failed-dispatch cleanup:
   evidence/private/native-parent-flags. Closed ordinary fallback4d0a86... is sealed
   as evidence/private/native-ordinary-parent/vpro-ordinary-parent-verified.exe.
+- SoilDrainage is separately verified/default-on; `VITE_SOIL_DRAINAGE_EDITING=false`
+  opts out. Source LimitToList/TEXT5 uses exact canonical membership, not silent
+  recasing/completion/trimming. Fourteen metadata rows retain one empty Item;
+  thirteen nonempty Items are selectable. Native strict invalid/remount/
+  Save-Lock-close refusal, Undo, rollback/retry, corruption/Retry and NULL pass.
+  All15 tables/32 old audits/support/config bytes preserved; exactly two new audits.
+  Full race373.627s,157 frontend tests/check0/0/default+optout builds;
+  bindings15/104/33. Default assets exactly match accepted native assets.
+  Owned PID1288 exited; inspector9392 closed. Proof/visual/promotion:
+  evidence/private/native-drainage. Closed flag fallbackf4f0d7... is sealed as
+  evidence/private/native-parent-flags/vpro-nullable-flags-verified.exe.
 - Responsive FS882 presentation is complete across all five source pages,
   child tables, toolbar/tabs and collapsible project context. Semantic field
   groups reflow4/3/2/1 columns with40px controls; raw source geometry remains
@@ -225,8 +236,8 @@ between shells.
   `VITE_PARENT_CODES_EDITING=false` opt-out. Realm is on Site; 20 fields are on
   Soil/Terrain. Per-list loading/failure/Retry, field-specific lengths, explicit
   full Items, raw casing, NULL and scope/draft-bound review reuse shared helpers.
-  SoilDrainage remains disabled. Frozen catalogue:16 lists/347 rows/3,470 cells;
-  the UI owns15 lists, excluding the distinct SoilDrainage workflow.
+  SoilDrainage is independently verified under its strict membership workflow.
+  Frozen catalogue:16 lists/347 rows/3,470 cells; the UI now owns all16 lists.
 - BedrockGeology1/2/3 default on with `VITE_GEOLOGY_CODES_EDITING=false` opt-out.
   Its87-row/870-cell frozen DAO catalogue and generic guards are integrated.
   Nine actual native cases checked15 tables, preserved31 old audits and added
@@ -343,14 +354,14 @@ C3c shared-catalogue, C3d BEC/Quality/Working Unit and C3e state/discovery reads
 delivered. C1-C3 are complete; C4-C5 are optional/nonblocking. The promoted executable
 contains verified F1-F3 plus C1 pooling/C2 caching/C3a-C3e retrieval cancellation.
 The fourteen ordinary surveyor/depth/cover/note fields are now native-verified.
-The two nullable flags are also complete. Continue the remaining five distinct
+The two nullable flags and strict SoilDrainage are also complete. Continue the remaining four distinct
 workflows. The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
-SoilDrainage has explicit LimitToList=NotDefault and needs a distinct membership
-policy; it must not silently inherit unrestricted raw-code writes.
+SoilDrainage's explicit LimitToList=NotDefault now has a separately verified
+exact-canonical membership policy, not unrestricted raw-code writes.
 Omitted ordinary-combo effective properties are unknown:
 raw-case/full-item/nullable/no-truncation behavior is a deliberate desktop policy,
 not inferred Access parity. Master BEC, X/Y and pictures remain separate;
-do not enable them as incidental text fields. See the current remaining5 list in
+do not enable them as incidental text fields. See the current remaining4 list in
 MIGRATION_PLAN.md. No native Access instance was launched for this batch.
 No old grant, archived process identity or historical hash authorizes a new run.

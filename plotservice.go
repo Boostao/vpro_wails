@@ -235,14 +235,16 @@ type AuditEntry struct {
 }
 
 type PlotService struct {
-	mu             sync.RWMutex
-	projects       *ProjectService
-	auditStrength  int
-	currentUser    string
-	siteCodes      *SiteCodeService
-	siteCodesError error
-	contextScoped  bool
-	requestContext context.Context
+	mu               sync.RWMutex
+	projects         *ProjectService
+	auditStrength    int
+	currentUser      string
+	siteCodes        *SiteCodeService
+	siteCodesError   error
+	parentCodes      *ParentCodeService
+	parentCodesError error
+	contextScoped    bool
+	requestContext   context.Context
 }
 
 func (s *PlotService) requireContextEdit() error {

@@ -78,7 +78,7 @@ test('Bedrock defaults on with opt-out and wires source slots, hidden validation
   assert.match(source, /Retry bedrock choices/);
   assert.match(form, /soilCodeBusy \|\| geologyCodeBusy/);
   assert.match(form, /headerValidation\.soilCodes \|\| message === headerValidation\.geologyCodes/);
-  assert.match(form, /editors=\{\[\.\.\.\(geologyEditor \? \[geologyEditor\] : \[\]\), \.\.\.\(parentEditor \? \[parentEditor\] : \[\]\), \.\.\.\(ordinaryEditor \? \[ordinaryEditor\] : \[\]\)\]\}/);
+  assert.match(form, /editors=\{\[\.\.\.\(geologyEditor \? \[geologyEditor\] : \[\]\), \.\.\.\(parentEditor \? \[parentEditor\] : \[\]\), \.\.\.\(ordinaryEditor \? \[ordinaryEditor\] : \[\]\), \.\.\.\(drainageEditor \? \[drainageEditor\] : \[\]\)\]\}/);
 });
 
 test('Actual Bedrock component renders only its three source slots with default enablement and opt-out', () => {

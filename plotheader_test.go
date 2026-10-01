@@ -76,6 +76,8 @@ func fullHeader(plot string) FS882Header {
 				text = "1234"
 			case "SoilClassSubGroup":
 				text = "Z9"
+			case "SoilDrainage":
+				text = "w"
 			case "BedrockGeology1", "BedrockGeology2", "BedrockGeology3":
 				text = "AB"
 			}
@@ -295,6 +297,8 @@ func TestPlotHeader_AllFieldsRoundTripAndAudit(t *testing.T) {
 				f.Elem().SetString("5678")
 			case "SoilClassSubGroup":
 				f.Elem().SetString("Q2")
+			case "SoilDrainage":
+				f.Elem().SetString("p")
 			case "BedrockGeology1", "BedrockGeology2", "BedrockGeology3":
 				f.Elem().SetString("aB")
 			}

@@ -295,6 +295,9 @@ func (s *PlotService) restorePlans(tx *sql.Tx, project, plot string, entries []A
 		if err := validateOrdinaryRestoreValue(plan.table, plan.column, plan.before); err != nil {
 			return nil, fmt.Errorf("audit rowId %s: %w", entry.RowID, err)
 		}
+		if err := s.validateSoilDrainageRestoreValue(plan.table, plan.column, plan.before); err != nil {
+			return nil, fmt.Errorf("audit rowId %s: %w", entry.RowID, err)
+		}
 		if _, err := restoreCurrentValue(tx, project, plot, plan); err != nil {
 			return nil, err
 		}

@@ -13,12 +13,12 @@ Do not use its write workflows on production projects.
 | Working units and hierarchies | Read-only selection/filtering and hierarchy browsing support separate external files. Verified Working Unit editing includes per-user mode preferences; Master authorization editing and bulk actions remain incomplete. |
 | FS882 storage and source relationships | All 98 parent columns and 69 nonidentity XL child bindings plus five legacy extras are mapped. Extracted geometry is retained as evidence; presentation preserves source containment, labels, bindings and embedded-form links. |
 | FS882 responsive presentation | Site, Soil/Terrain, Vegetation, Veg Other and Other use labelled semantic groups and readable 40px controls. Groups reflow with the available width, child tables scroll locally, and project context can collapse. Actual native sizing, resizing, drafts, validation and close recovery are verified. |
-| FS882 ordinary parent editing | **93/98 parent fields are verified writable**, including coordinates, BEC, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock, 21 terrain/classification codes, fourteen surveyor/text/depth/cover/note fields and two nullable source flags. Five distinct workflows remain unavailable. |
+| FS882 ordinary parent editing | **94/98 parent fields are verified writable**, including coordinates, BEC, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock, 21 terrain/classification codes, fourteen surveyor/text/depth/cover/note fields, two nullable source flags and strict SoilDrainage. Four distinct workflows remain unavailable. |
 | FS882 children and height | Transactional child CRUD/storage and bounded existing-row height drafts work. Species selection, height insertion/deletion, broader child editing, pictures and calculations remain incomplete. |
 | Audit and lifecycle | Data/audit transactions, bounded selective restoration, Undo, and native window/context Save/Discard/Cancel are verified, including hidden-invalid and height drafts, failed save/config publication and stale-context rejection. Cover restoration, broader child dirty-state propagation and multiwindow coordination remain incomplete. |
 | Soil classification | Two independent nullable four-UTF-16-unit editors default on. Native selection/manual entry, NULL, Undo, Lock, hidden validation, atomic rollback/retry and actual window-close recovery are verified, alongside frozen catalogue browsing. |
 | Bedrock classification | Three independent nullable four-UTF-16-unit editors default on, using the frozen87-row catalogue. Native full-item/raw entry, NULL, hidden validation, rollback/retry, Lock and clean close pass. Source effective properties remain unmeasured; this is an explicit safer adaptation, not exact Access input-mechanism parity. |
-| Ordinary terrain/classification codes | 21 independent nullable editors default on: Realm, coarse-fragment lithology, surface/subsurface terrain, flooding, humus, hydrogeology, rooting type/particle size and water source. Field-specific UTF-16 bounds, per-list failures/Retry, draft-bound review, hidden validation, rollback and native close recovery are verified. SoilDrainage remains unavailable pending its distinct strict membership policy. |
+| Ordinary terrain/classification codes | 21 independent nullable editors default on: Realm, coarse-fragment lithology, surface/subsurface terrain, flooding, humus, hydrogeology, rooting type/particle size and water source. Field-specific UTF-16 bounds, per-list failures/Retry, draft-bound review, hidden validation, rollback and native close recovery are verified. SoilDrainage uses its separately verified strict membership policy. |
 | Import/export, reporting, maps and administration | Not complete. Unimplemented navigation remains disabled. |
 
 The field count is a secondary coverage measure, not proof of complete form or
@@ -149,7 +149,17 @@ property. Storage and audits retain NULL/0/-1; unchanged historical true represe
 are omitted from unrelated UPDATE assignments. Native remount, cross-Env/Admin audit
 rollback/retry, NULL/false/true, Undo and Lock preserve all15 tables and32 old audits,
 adding exactly six intended flag audits and no phantom option history.
-BECSiteUnit, SoilDrainage, Photo, XCoord and YCoord remain disabled.
+`VITE_SOIL_DRAINAGE_EDITING=false` separately disables SoilDrainage; it defaults on.
+Source LimitToList and TEXT5 are preserved through exact full-item membership and
+five-UTF-16-unit validation. The 14 reference rows retain the empty Item metadata
+distinct from NULL; only 13 nonempty canonical Items are selectable. No silent
+recasing, completion or trimming occurs. This input mechanism is a deliberate
+desktop adaptation, not measured Access auto-expansion parity. New/changed codes
+and restoration targets require a verified reference; NULL and unchanged historical
+values remain available without it. Invalid drafts survive remount and block
+Save/Lock/close. Native corruption/Retry, rollback/retry and NULL verification
+preserved all15 tables and32 historical audits, adding exactly two drainage audits.
+BECSiteUnit, Photo, XCoord and YCoord remain disabled.
 `VITE_EXTERNAL_PROJECTS=false` hides the verified external attachment entry point;
 it defaults on. It does not disable restoration of valid saved external contexts.
 

@@ -20,6 +20,7 @@
   import GeologyCodeFields from './GeologyCodeFields.svelte';
   import ParentCodeFields from './ParentCodeFields.svelte';
   import OrdinaryFields from './OrdinaryFields.svelte';
+  import DrainageFields from './DrainageFields.svelte';
   import SourceChild from './SourceChild.svelte';
   import NewChild from './NewChild.svelte';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
@@ -56,8 +57,9 @@
   let soilCodeBusy = $state(false);
   let geologyCodeBusy = $state(false);
   let parentCodeBusy = $state(false);
+  let drainageBusy = $state(false);
   const soilCodeEditingEnabled = import.meta.env.VITE_SOIL_CODES_EDITING !== 'false';
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy);
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   let heightDrafts = $state<HeightDrafts>({});
@@ -632,6 +634,7 @@
     if (message === headerValidation['ordinary-veg']) return `Correct the invalid header input on Vegetation or Undo changes before saving. ${message}`;
     if (message === headerValidation['ordinary-soils']) return `Correct the invalid header input on Soils or Undo changes before saving. ${message}`;
     if (message === headerValidation['parentCodes-soils']) return `Correct the invalid header input on Soils or Undo changes before saving. ${message}`;
+    if (message === headerValidation.soilDrainage) return `Correct the invalid header input on Soils or Undo changes before saving. ${message}`;
     if (message === headerValidation.soilCodes || message === headerValidation.geologyCodes) return `Correct the invalid header input on Soils or Undo changes before saving. ${message}`;
     return `Correct the invalid header input on Site or Undo changes before saving. ${message}`;
   }
@@ -1201,6 +1204,10 @@
         disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
         onchange={markDirty} onvalidation={validateHeader}>
       {#snippet children(ordinaryEditor)}
+      <DrainageFields bind:draft {original} {capabilities}
+        disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+        onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => drainageBusy = pending}>
+      {#snippet children(drainageEditor)}
       <SoilCodeFields bind:draft {original} {capabilities}
         disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || geologyCodeBusy}
         onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => soilCodeBusy = pending}>
@@ -1213,7 +1220,7 @@
                 disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
                 onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => parentCodeBusy = pending}>
               {#snippet children(parentEditor)}
-              <SourcePage name="Soil/Terrain" values={sourceHeaderValues} {editor} editors={[...(geologyEditor ? [geologyEditor] : []), ...(parentEditor ? [parentEditor] : []), ...(ordinaryEditor ? [ordinaryEditor] : [])]}>
+              <SourcePage name="Soil/Terrain" values={sourceHeaderValues} {editor} editors={[...(geologyEditor ? [geologyEditor] : []), ...(parentEditor ? [parentEditor] : []), ...(ordinaryEditor ? [ordinaryEditor] : []), ...(drainageEditor ? [drainageEditor] : [])]}>
                 {#snippet embedded(control)}
                   {@const child = embeddedForm(control.controlId)}
                   <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={childEditingDisabled} onedit={editSourceChild} ondelete={deleteSourceChild} />
@@ -1225,6 +1232,8 @@
           </GeologyCodeFields>
         {/snippet}
       </SoilCodeFields>
+      {/snippet}
+      </DrainageFields>
       {/snippet}
       </OrdinaryFields>
       <details class="mt-4 border border-stone-200 rounded p-3">
