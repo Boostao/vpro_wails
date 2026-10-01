@@ -13,7 +13,7 @@ Do not use its write workflows on production projects.
 | Working units and hierarchies | Read-only selection/filtering and hierarchy browsing support separate external files. Verified Working Unit editing includes per-user mode preferences; Master authorization editing and bulk actions remain incomplete. |
 | FS882 storage and source relationships | All 98 parent columns and 69 nonidentity XL child bindings plus five legacy extras are mapped. Extracted geometry is retained as evidence; presentation preserves source containment, labels, bindings and embedded-form links. |
 | FS882 responsive presentation | Site, Soil/Terrain, Vegetation, Veg Other and Other use labelled semantic groups and readable 40px controls. Groups reflow with the available width, child tables scroll locally, and project context can collapse. Actual native sizing, resizing, drafts, validation and close recovery are verified. |
-| FS882 ordinary parent editing | **91/98 parent fields are verified writable**, including coordinates, BEC, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock, 21 terrain/classification codes and fourteen surveyor/text/depth/cover/note fields. Seven distinct workflows remain unavailable. |
+| FS882 ordinary parent editing | **93/98 parent fields are verified writable**, including coordinates, BEC, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock, 21 terrain/classification codes, fourteen surveyor/text/depth/cover/note fields and two nullable source flags. Five distinct workflows remain unavailable. |
 | FS882 children and height | Transactional child CRUD/storage and bounded existing-row height drafts work. Species selection, height insertion/deletion, broader child editing, pictures and calculations remain incomplete. |
 | Audit and lifecycle | Data/audit transactions, bounded selective restoration, Undo, and native window/context Save/Discard/Cancel are verified, including hidden-invalid and height drafts, failed save/config publication and stale-context rejection. Cover restoration, broader child dirty-state propagation and multiwindow coordination remain incomplete. |
 | Soil classification | Two independent nullable four-UTF-16-unit editors default on. Native selection/manual entry, NULL, Undo, Lock, hidden validation, atomic rollback/retry and actual window-close recovery are verified, alongside frozen catalogue browsing. |
@@ -140,9 +140,16 @@ Vegetation notes Tab (including Shift-Tab) activates Soils, preserving the sourc
 event's ignored Shift modifier. These are source-bound/adapted desktop policies,
 not claims of unmeasured effective Access input parity. Native verification on one
 disposable fixture compared all 15 tables and preserved historical audits, adding
-exactly fourteen field audits plus one explicit memo-to-NULL audit. BECSiteUnit,
-SoilDrainage, Photo, SpeciesListComplete, UpdatedFromCards, XCoord and YCoord remain
-disabled.
+exactly fourteen field audits plus one explicit memo-to-NULL audit.
+`VITE_PARENT_FLAGS_EDITING=false` separately disables SpeciesListComplete and
+UpdatedFromCards; they default on. NULL is visibly indeterminate with an explicit
+Clear action, rather than silently displayed or persisted as false. This nullable
+presentation adapts the source checkboxes without assuming their omitted TripleState
+property. Storage and audits retain NULL/0/-1; unchanged historical true representations
+are omitted from unrelated UPDATE assignments. Native remount, cross-Env/Admin audit
+rollback/retry, NULL/false/true, Undo and Lock preserve all15 tables and32 old audits,
+adding exactly six intended flag audits and no phantom option history.
+BECSiteUnit, SoilDrainage, Photo, XCoord and YCoord remain disabled.
 `VITE_EXTERNAL_PROJECTS=false` hides the verified external attachment entry point;
 it defaults on. It does not disable restoration of valid saved external contexts.
 

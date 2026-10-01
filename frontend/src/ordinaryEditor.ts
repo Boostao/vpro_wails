@@ -18,6 +18,13 @@ export const ordinaryFields = [
   { key: 'seepageDepth', column: 'SeepageDepth', label: 'Seepage depth', scope: 'soils', kind: 'integer' },
   { key: 'soilNotes', column: 'SoilNotes', label: 'Soil notes', scope: 'soils', kind: 'memo' }
 ] as const;
+export const nullableParentFlags = [
+  { key: 'speciesListComplete', column: 'SpeciesListComplete', label: 'Species list complete', scope: 'veg', kind: 'flag' },
+  { key: 'updatedFromCards', column: 'UpdatedFromCards', label: 'Updated from cards', scope: 'site', kind: 'flag' }
+] as const;
+export function nullableParentField(column: string | undefined) {
+  return ordinaryField(column) ?? nullableParentFlags.find(field => field.column === column);
+}
 export type OrdinaryField = typeof ordinaryFields[number];
 export type OrdinaryScope = OrdinaryField['scope'];
 export type OrdinaryKey = OrdinaryField['key'];

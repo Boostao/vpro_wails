@@ -81,7 +81,8 @@ test('Actual scoped source controls render once with labels and explicit opt-out
   assert.equal(compile(source, { filename: 'OrdinaryFields.svelte', generate: 'client' }).warnings.length, 0);
   for (const enabled of [true, false]) {
     const Ordinary = serverComponent(source.replace('import.meta.env.VITE_ORDINARY_PARENT_EDITING',
-      enabled ? 'undefined' : "'false'"), 'OrdinaryFields.svelte', { './ordinaryEditor': editor });
+      enabled ? 'undefined' : "'false'").replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'false'"),
+      'OrdinaryFields.svelte', { './ordinaryEditor': editor });
     for (const scope of ['site', 'veg', 'soils']) {
       const fields = ordinaryFields.filter(field => field.scope === scope);
       const controls = fields.map(field => ({ column: field.column, type: 'TextBox', enabled: true,
@@ -90,7 +91,7 @@ test('Actual scoped source controls render once with labels and explicit opt-out
         <Ordinary bind:draft original={null} {scope} {capabilities} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
           {#snippet children(slot)}
             {#each controls as control}
-              {#if slot}{@render slot.input(control,'width:100%')}
+              {#if slot && slot.columns.includes(control.column)}{@render slot.input(control,'width:100%')}
               {:else}<input disabled data-column={control.column}/>{/if}
             {/each}
           {/snippet}
@@ -115,4 +116,36 @@ test('Shared lifecycle owns validation and VegNotes Tab targets source Terrain w
   assert.match(source, /field\.key === 'vegNotes' && event\.key === 'Tab'/);
   assert.match(form, /activeTab = 'soils';\s*await tick\(\)/);
   assert.doesNotMatch(source, /PlotService|UpdatePlot|CreatePlot|Math\.fround|max="100"|min="0"|maxlength/);
+});
+
+test('Two separately gated source flags retain nullable identity and labelled CheckBox ownership', () => {
+  assert.equal(editor.nullableParentFlags.length, 2);
+  for (const field of editor.nullableParentFlags) {
+    assert.equal(editor.ordinaryField(field.column), undefined);
+    assert.equal(editor.nullableParentField(field.column).key, field.key);
+  }
+  const source = readFileSync(path.join(__dirname, 'OrdinaryFields.svelte'), 'utf8');
+  assert.match(source, /VITE_PARENT_FLAGS_EDITING !== 'false'/);
+  assert.match(source, /indeterminate=\{draft\[field.key\] === null\}/);
+  assert.match(source, /draft\[field.key\] = event\.currentTarget\.checked/);
+  assert.match(source, /draft\[field.key\] = null; onchange\(\)/);
+  const Flags = serverComponent(source.replace('import.meta.env.VITE_ORDINARY_PARENT_EDITING', "'false'")
+    .replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'true'"), 'OrdinaryFields.svelte', { './ordinaryEditor': editor });
+  const fixture = `<script>import Flags from './OrdinaryFields.svelte';let {draft, field}=$props();</script>
+    <Flags bind:draft original={null} scope={field.scope} capabilities={{[field.key]:true}} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
+      {#snippet children(slot)}
+        {#if slot}{@render slot.input({column:field.column,type:'CheckBox',enabled:true,locked:false,controlName:field.column},'width:100%')}{/if}
+      {/snippet}
+    </Flags>`;
+  const Component = serverComponent(fixture, 'FlagFixture.svelte', { './OrdinaryFields.svelte': { default: Flags } });
+  for (const field of editor.nullableParentFlags) {
+    for (const value of [null, false, true]) {
+      const html = render(Component, { props: { draft: { ...values(), [field.key]: value }, field } }).body;
+      assert.equal((html.match(/type="checkbox"/g) || []).length, 1);
+      assert.match(html, new RegExp(`id="header-${field.key}"`));
+      assert.match(html, new RegExp(`aria-label="${field.label}"`));
+      assert.match(html, new RegExp(value === null ? 'Not recorded \\(NULL\\)' : value ? 'Yes' : 'No'));
+      assert.match(html, new RegExp(`aria-label="Clear ${field.label} to NULL"`));
+    }
+  }
 });

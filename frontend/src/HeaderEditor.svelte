@@ -17,7 +17,7 @@
   import { becKey, type BECCodes } from './becEditor';
   import { isWorkingUnitControl, type WorkingUnitCodes, type WorkingUnitSession } from './workingUnitEditor';
   import { isCoordinateControl, type CoordinateDisplayMode } from './coordinateEditor';
-  import { ordinaryField } from './ordinaryEditor';
+  import { nullableParentField } from './ordinaryEditor';
 
   type TextKey = { [K in keyof FS882Header]: FS882Header[K] extends string | null ? K : never }[keyof FS882Header];
   type NullableTextKey = Exclude<TextKey, 'plotNumber'>;
@@ -120,7 +120,7 @@
     }
     const key = becKey(control.column) ?? qualityKey(control.column) ?? substrateKey(control.column) ??
       siteCodeKey(control.column) ?? regionCodeKey(control.column) ??
-      (additionalEditor?.columns.includes(control.column ?? '') ? ordinaryField(control.column)?.key : undefined) ??
+      (additionalEditor?.columns.includes(control.column ?? '') ? nullableParentField(control.column)?.key : undefined) ??
       byColumn.get(control.column ?? '')?.key;
     return key ? `header-${key}` : control.column === 'RealmClass' && editor?.columns.includes('RealmClass')
       ? 'header-realmClass' : control.column === 'PlotNumber' ? 'header-plotNumber' : `header-source-${control.controlId}`;

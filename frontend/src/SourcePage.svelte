@@ -46,12 +46,12 @@
           {:else}
             <label class="form-field" class:full-width={wideControl(control)}>
               <span class="field-label">{controlLabel(control)}</span>
-              {#if control.type === 'CheckBox' || control.type === 'OptionButton'}
+              {#if fieldEditor}
+                {@render fieldEditor.input(control, 'box-sizing:border-box;width:100%;min-width:0;min-height:40px;font:inherit;')}
+              {:else if control.type === 'CheckBox' || control.type === 'OptionButton'}
                 <input data-column={column} data-source-control={control.controlName} type={control.type === 'OptionButton' ? 'radio' : 'checkbox'} checked={stored === true} disabled aria-label={controlLabel(control)} />
               {:else if control.type === 'TextBox' || control.type === 'ComboBox'}
-                {#if fieldEditor}
-                  {@render fieldEditor.input(control, 'box-sizing:border-box;width:100%;min-width:0;min-height:40px;font:inherit;')}
-                {:else if wideControl(control)}
+                {#if wideControl(control)}
                   <textarea data-column={column} data-source-control={control.controlName} disabled value={typeof stored === 'string' ? stored : ''} placeholder={stored !== undefined ? '' : 'Pending'} aria-label={controlLabel(control)} rows="3"></textarea>
                 {:else}
                   <input data-column={column} data-source-control={control.controlName} disabled value={typeof stored === 'string' || typeof stored === 'number' ? stored : ''} placeholder={stored !==undefined ? '' : 'Pending'} aria-label={controlLabel(control)} />

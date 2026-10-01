@@ -2,7 +2,7 @@
   import { untrack, type Snippet } from 'svelte';
   import type { FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
-  import { ordinaryFields, ordinaryField, ordinaryTextError, ordinaryNumberValue, ordinaryValidation,
+  import { ordinaryFields, nullableParentFlags, nullableParentField, ordinaryTextError, ordinaryNumberValue, ordinaryValidation,
     ordinarySession, rememberOrdinarySession, type OrdinaryScope, type OrdinaryNumberField,
     type OrdinaryTextField, type OrdinaryDrafts } from './ordinaryEditor';
   let { draft = $bindable(), original, scope, capabilities, disabled, onchange, onvalidation, onVegNotesTab, children }: {
@@ -12,8 +12,12 @@
     children: Snippet<[{ columns: readonly string[]; input: Snippet<[PaperControl, string]> } | undefined]>;
   } = $props();
   const editingEnabled = import.meta.env.VITE_ORDINARY_PARENT_EDITING !== 'false';
+  const flagsEnabled = import.meta.env.VITE_PARENT_FLAGS_EDITING !== 'false';
   let staged = $state<OrdinaryDrafts>({});
-  const fields = $derived(ordinaryFields.filter(field => field.scope === scope));
+  const fields = $derived([
+    ...(editingEnabled ? ordinaryFields : []),
+    ...(flagsEnabled ? nullableParentFlags : [])
+  ].filter(field => field.scope === scope));
   const validation = $derived(ordinaryValidation(scope, draft, original, staged));
   $effect(() => {
     const identity = draft, baseline = original;
@@ -41,10 +45,22 @@
 </script>
 
 {#if editingEnabled && validation}<p role="alert">{validation}</p>{/if}
-{@render children(editingEnabled ? { columns: fields.map(field => field.column), input } : undefined)}
+{@render children(fields.length ? { columns: fields.map(field => field.column), input } : undefined)}
 {#snippet input(control: PaperControl, position: string)}
-  {@const field = ordinaryField(control.column)}
-  {#if field && control.type === 'TextBox'}
+  {@const field = nullableParentField(control.column)}
+  {#if field?.kind === 'flag' && control.type === 'CheckBox'}
+    <div class="nullable-flag" style={position}>
+      <input id={`header-${field.key}`} data-column={field.column} data-source-control={control.controlName}
+        type="checkbox" aria-label={field.label} checked={draft[field.key] === true}
+        indeterminate={draft[field.key] === null}
+        disabled={disabled || capabilities[field.key] !== true || !control.enabled || control.locked}
+        onchange={event => { draft[field.key] = event.currentTarget.checked; onchange(); }} />
+      <span>{draft[field.key] === null ? 'Not recorded (NULL)' : draft[field.key] ? 'Yes' : 'No'}</span>
+      <button type="button" aria-label={`Clear ${field.label} to NULL`}
+        disabled={disabled || capabilities[field.key] !== true || !control.enabled || control.locked || draft[field.key] === null}
+        onclick={() => { draft[field.key] = null; onchange(); }}>Clear</button>
+    </div>
+  {:else if field && field.kind !== 'flag' && control.type === 'TextBox'}
     {#if field.kind === 'memo'}
       <textarea class="ordinary-control" id={`header-${field.key}`} data-column={field.column}
         data-source-control={control.controlName} style={position} aria-label={field.label} rows="4"
@@ -77,5 +93,9 @@
   .ordinary-control:disabled { color: #78716c; background: #f5f5f4; }
   .ordinary-control:focus { outline: 2px solid #047857; outline-offset: 1px; }
   .ordinary-control[aria-invalid="true"] { border-color: #b91c1c; }
+  .nullable-flag { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; min-height: 40px; }
+  .nullable-flag input { width: 1.25rem; height: 1.25rem; accent-color: #047857; }
+  .nullable-flag button { padding: .25rem .5rem; border: 1px solid #b7cfc0; border-radius: 4px; background: white; }
+  .nullable-flag button:disabled { color: #78716c; background: #f5f5f4; }
   p { color: #b91c1c; font-size: .75rem; }
 </style>

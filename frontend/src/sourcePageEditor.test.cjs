@@ -23,6 +23,25 @@ const page = {
   ]
 };
 
+test('Source checkbox editors take ownership while unavailable checkbox partners stay disabled', () => {
+  const checkboxPage = { ...page, controls: [control('SpeciesListComplete', 'CheckBox', 105),
+    control('UnmigratedFlag', 'CheckBox', 231)] };
+  const FlagsPage = serverComponent(source, 'SourcePage.svelte', {
+    './paperLayout': { paperPage: () => checkboxPage, accessCaption: value => value },
+    './formPresentation': presentation
+  });
+  const fixture = `<script>import FlagsPage from './FlagsPage.svelte';</script>
+    {#snippet flag(control, position)}<input type="checkbox" data-live-flag={control.column} style={position}/>{/snippet}
+    <FlagsPage name="Vegetation" editor={{columns:['SpeciesListComplete'],input:flag}}>
+      {#snippet embedded(control)}{/snippet}
+    </FlagsPage>`;
+  const Component = serverComponent(fixture, 'FlagSourceFixture.svelte', { './FlagsPage.svelte': { default: FlagsPage } });
+  const html = render(Component).body;
+  assert.equal((html.match(/data-live-flag="SpeciesListComplete"/g) || []).length, 1);
+  assert.match(html, /data-column="UnmigratedFlag"[^>]*disabled/);
+  assert.doesNotMatch(html, /data-column="SpeciesListComplete"/);
+});
+
 const SourcePage = serverComponent(source, 'SourcePage.svelte', {
   './paperLayout': { paperPage: () => page, accessCaption: value => value },
   './formPresentation': presentation

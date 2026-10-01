@@ -31,7 +31,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 3 | Consolidate ordinary code editing (complete) | Shared nullable Unicode/reference grouping/suggestions/draft acknowledgement and Region/Soil write/restore guards preserve public APIs, source positions and field-specific policies. All117 frontend tests/check/build, focused Go/full race and actual Wails rollback/close regression pass. New groups reuse definitions/fixtures, not copied validators. |
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
-| 5 | Complete remaining FS882 parent workflows (checkpointed at91/98) | Responsive presentation,21 ordinary-code editors and fourteen surveyor/text/depth/cover/note editors are native-verified and default-on. Continue the seven distinct remaining workflows by source/event semantics; keep unavailable controls disabled. |
+| 5 | Complete remaining FS882 parent workflows (checkpointed at93/98) | Responsive presentation,21 ordinary-code editors, fourteen surveyor/text/depth/cover/note editors and two nullable source flags are native-verified and default-on. Continue the five distinct remaining workflows by source/event semantics; keep unavailable controls disabled. |
 | 6 | Complete FS882 child workflows | Vegetation/species/cover/height, Humus, Mineral and Other support their actual add/edit/delete/validation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
@@ -411,8 +411,21 @@ historical audits and support/config bytes were preserved. Exactly fourteen pare
 fields changed and fifteen intended audit rows were added.
 Current proof/visuals/promotion: evidence/private/native-ordinary-parent.
 
-Next: BECSiteUnit, SoilDrainage, Photo, SpeciesListComplete, UpdatedFromCards, XCoord
-and YCoord. Keep Master BEC authorization, BIT/NULL, X/Y, pictures and SoilDrainage
+SpeciesListComplete and UpdatedFromCards are now separately native-verified and
+default-on; coverage is93/98. Source CheckBox bindings have no individual events.
+Shared controls explicitly display NULL and offer Clear; omitted TripleState is not
+inferred. Existing storage/audit normalization preserves true=-1, false=0 and NULL,
+without phantom option history. Unchanged historical true representations are omitted
+from unrelated assignments. SourcePage now dispatches owned checkbox editors before
+readonly fallbacks; unavailable partners remain disabled.
+Focused race18.920s/full race370.621s;155 frontend tests/check0/0/default+optout builds;
+bindings15/104/33. One native fixture checked all15 tables,32 historical audits,
+exactly six intended flag audits, cross-Env/Admin rollback/retry, remount, Undo and Lock.
+Default assets are byte-identical to the native accepted opt-in payload.
+Evidence/private/native-parent-flags retains proof, visual, closed failed dispatcher
+probe and sealed fallback. No production/source data changes or Access instance.
+
+Next: BECSiteUnit, SoilDrainage, Photo, XCoord and YCoord. Keep Master BEC authorization, X/Y, pictures and SoilDrainage
 strict membership/reference availability as distinct workflows. Reuse sealed
 source evidence and shared lifecycle tests, not field-by-field audit matrices.
 The original42-field checklist is frozen evidence, not current coverage.
