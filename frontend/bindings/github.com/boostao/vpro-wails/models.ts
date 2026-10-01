@@ -323,6 +323,11 @@ export interface MineralRecord {
     "mineralFormpH": number | null;
 }
 
+export interface OtherFlagUpdate {
+    "value": boolean | null;
+    "expected": boolean | null;
+}
+
 /**
  * OtherRecord represents an auxiliary data item.
  */
@@ -337,6 +342,17 @@ export interface OtherRecord {
     "userFlag1": boolean | null;
     "userFlag2": boolean | null;
     "userFlag3": boolean | null;
+}
+
+export interface OtherRecordUpdate {
+    "id": number;
+    "text": { [_ in string]?: OtherTextUpdate } | null;
+    "flags": { [_ in string]?: OtherFlagUpdate } | null;
+}
+
+export interface OtherTextUpdate {
+    "value": string | null;
+    "expected": string | null;
 }
 
 export interface ParentCodeChoice {

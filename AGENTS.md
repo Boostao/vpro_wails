@@ -96,3 +96,9 @@ archive; consult them for a specific issue, not as a growing default prompt.
   fields need visible associated labels. After a tab remount, wait for reference
   loading and Save readiness before clicking, without resetting drafts or replaying
   completed writes. Keep routine guidance below the fields, never safety feedback.
+- WebView2-hosted JavaScript confirmations can block CDP, including the mouse
+  response that opened them. For example, observe the exact `Delete this
+  SubOtherXL record?` message and OK/Cancel controls through the current owned
+  window's UI Automation descendants, then invoke only that planned decision;
+  unknown dialogs stop. Continue from the last sealed mutation checkpoint,
+  never replay a successful create/save to recover a blocked harness.

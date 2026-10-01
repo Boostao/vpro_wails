@@ -151,6 +151,9 @@ func (r *MineralRecord) UnmarshalJSON(data []byte) error {
 
 func (r *OtherRecord) UnmarshalJSON(data []byte) error {
 	type plain OtherRecord
+	if err := validateJSONTextProperties(data, otherTextJSONNames); err != nil {
+		return err
+	}
 	var decoded plain
 	present, err := decodeChildJSON(data, &decoded)
 	if err != nil {
@@ -504,6 +507,24 @@ func (s *PlotService) saveChild(kind string, record any, mode childSaveMode) err
 				}
 			}
 		}
+	}
+	if kind == "Other" && !deleting {
+		var changedFields []childField
+		var changedColumns []string
+		var changedBefore, changedAfter []any
+		for i, field := range fields {
+			if !creating && reflect.DeepEqual(before[i], after[i]) {
+				continue
+			}
+			if err := validateOtherField(field.column, after[i]); err != nil {
+				return err
+			}
+			changedFields = append(changedFields, field)
+			changedColumns = append(changedColumns, columns[i])
+			changedBefore = append(changedBefore, before[i])
+			changedAfter = append(changedAfter, after[i])
+		}
+		fields, columns, before, after = changedFields, changedColumns, changedBefore, changedAfter
 	}
 	if kind == "Veg" && !deleting {
 		for i, field := range fields {

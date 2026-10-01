@@ -2,13 +2,17 @@
   import { paperChild } from './paperLayout';
   import { controlLabel } from './formPresentation';
   import { heightField, type HeightDrafts } from './heightEditor';
+  import { otherField, type OtherDrafts, type OtherValue } from './otherEditor';
   type Row = { id: number; values: Record<string, string | number | boolean | null | undefined> };
-  let { name, rows, disabled = true, revision = 0, onedit, ondelete, onstage, drafts = {} }: {
+  let { name, rows, disabled = true, deleteDisabled = false, revision = 0, onedit, ondelete, onstage, drafts = {}, onotherstage, otherDrafts = {} }: {
     name: string; rows: Row[]; disabled?: boolean; revision?: number;
     onedit?: (name: string, id: number, column: string, value: string) => Promise<void>;
     ondelete?: (name: string, id: number) => Promise<void>;
     onstage?: (id: number, column: string, value: string) => void;
     drafts?: HeightDrafts;
+    onotherstage?: (id: number, column: string, value: OtherValue) => void;
+    otherDrafts?: OtherDrafts;
+    deleteDisabled?: boolean;
   } = $props();
   const source = $derived(paperChild(name));
   const columns = $derived(source.controls.filter(control => !['Label', 'Rectangle', 'OptionGroup'].includes(control.type))
@@ -36,8 +40,27 @@
           {@const mapped = control.column !== undefined && Object.hasOwn(row.values, control.column.toLowerCase())}
           {@const stagedField = control.column ? heightField(control.column) : undefined}
           {@const staged = stagedField ? drafts[String(row.id)]?.[stagedField] : undefined}
+          {@const other = name === 'SubOtherXL' && control.column ? otherField(control.column) : undefined}
+          {@const otherStaged = other ? otherDrafts[String(row.id)]?.[other.key] : undefined}
           <td>
-          {#if mapped && onstage && stagedField && control.column}
+          {#if mapped && onotherstage && other && control.column}
+            {#if other.kind === 'flag'}
+              {@const flagValue = otherStaged ? otherStaged.value : value}
+              <input class="source-cell" type="checkbox" checked={flagValue === true} indeterminate={flagValue == null}
+                disabled={disabled || control.locked || !control.enabled}
+                aria-label={`${controlLabel(control)}, row ${row.id}`} data-column={control.column}
+                onchange={event => onotherstage?.(row.id, control.column ?? '', event.currentTarget.checked)} />
+              <button type="button" disabled={disabled || control.locked || !control.enabled || flagValue == null}
+                aria-label={`Clear ${controlLabel(control)} to NULL, row ${row.id}`}
+                onclick={() => onotherstage?.(row.id, control.column ?? '', null)}>Clear to NULL</button>
+            {:else}
+              <input class="source-cell" type="text" value={otherStaged ? otherStaged.raw ?? '' : value ?? ''}
+                disabled={disabled || control.locked || !control.enabled} aria-invalid={otherStaged?.error != null}
+                aria-label={`${controlLabel(control)}, row ${row.id}`} data-column={control.column}
+                title={otherStaged?.error ?? 'Unsubmitted draft: use Save Other drafts or Cancel Other drafts'}
+                oninput={event => onotherstage?.(row.id, control.column ?? '', event.currentTarget.value)} />
+            {/if}
+          {:else if mapped && onstage && stagedField && control.column}
             <input class="source-cell" type="text" inputmode="decimal"
               value={staged?.raw ?? value ?? ''} disabled={disabled || control.locked || !control.enabled}
               aria-label={`${controlLabel(control)}, row ${row.id}`} aria-invalid={staged?.error != null} data-column={control.column}
@@ -64,7 +87,7 @@
           </td>
         {/each}
         {#if ondelete}
-          <td><button class="delete" type="button" disabled={disabled}
+          <td><button class="delete" type="button" disabled={disabled || deleteDisabled}
             aria-label={`Delete ${name} row ${row.id}`} onclick={() => void ondelete?.(name, row.id)}>Delete</button></td>
         {/if}
       </tr>

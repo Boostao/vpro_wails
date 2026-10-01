@@ -112,12 +112,31 @@ func validateQualityHeaderBeforeTransaction(db *sql.DB, project string, h FS882H
 // before encoding/json replaces malformed Unicode in string values.
 func (h *FS882Header) UnmarshalJSON(data []byte) error {
 	type headerAlias FS882Header
+	fields := append(qualityHeaderFields(FS882Header{}), siteCodeHeaderFields(FS882Header{})...)
+	fields = append(fields, regionHeaderFields(FS882Header{})...)
+	fields = append(fields, soilHeaderFields(FS882Header{})...)
+	fields = append(fields, geologyHeaderFields(FS882Header{})...)
+	fields = append(fields, parentCodeHeaderFields(FS882Header{})...)
+	fields = append(fields, ordinaryTextFields(FS882Header{})...)
+	fields = append(fields, soilDrainageHeaderField(FS882Header{}))
+	fields = append(fields, masterBECHeaderField(FS882Header{}))
+	names := make(map[string]string, len(fields))
+	for _, field := range fields {
+		names[strings.ToLower(field.property)] = field.name
+	}
+	if err := validateJSONTextProperties(data, names); err != nil {
+		return err
+	}
+	return json.Unmarshal(data, (*headerAlias)(h))
+}
+
+func validateJSONTextProperties(data []byte, names map[string]string) error {
 	var syntax json.RawMessage
 	if err := json.Unmarshal(data, &syntax); err != nil {
 		return err
 	}
 	if len(syntax) == 0 || syntax[0] != '{' {
-		return json.Unmarshal(data, (*headerAlias)(h))
+		return nil
 	}
 	decoder := json.NewDecoder(strings.NewReader(string(data)))
 	token, err := decoder.Token()
@@ -140,23 +159,16 @@ func (h *FS882Header) UnmarshalJSON(data []byte) error {
 		if !ok {
 			continue
 		}
-		fields := append(qualityHeaderFields(FS882Header{}), siteCodeHeaderFields(FS882Header{})...)
-		fields = append(fields, regionHeaderFields(FS882Header{})...)
-		fields = append(fields, soilHeaderFields(FS882Header{})...)
-		fields = append(fields, geologyHeaderFields(FS882Header{})...)
-		fields = append(fields, parentCodeHeaderFields(FS882Header{})...)
-		fields = append(fields, ordinaryTextFields(FS882Header{})...)
-		fields = append(fields, soilDrainageHeaderField(FS882Header{}))
-		fields = append(fields, masterBECHeaderField(FS882Header{}))
-		for _, field := range fields {
-			if strings.EqualFold(name, field.property) {
+		for property, label := range names {
+			if strings.EqualFold(name, property) {
 				if err := validateQualityJSONToken(raw); err != nil {
-					return fmt.Errorf("%s: %w", field.name, err)
+					return fmt.Errorf("%s: %w", label, err)
 				}
+				break
 			}
 		}
 	}
-	return json.Unmarshal(data, (*headerAlias)(h))
+	return nil
 }
 
 func validateQualityJSONToken(raw []byte) error {

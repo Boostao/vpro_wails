@@ -14,8 +14,8 @@ Do not use its write workflows on production projects.
 | FS882 storage and source relationships | All 98 parent columns and 69 nonidentity XL child bindings plus five legacy extras are mapped. Extracted geometry is retained as evidence; presentation preserves source containment, labels, bindings and embedded-form links. |
 | FS882 responsive presentation | Site, Soil/Terrain, Vegetation, Veg Other and Other use labelled semantic groups and readable 40px controls. Groups reflow with the available width, child tables scroll locally, and project context can collapse. Actual native sizing, resizing, drafts, validation and close recovery are verified. |
 | FS882 parent field editing | **98/98 mapped parent fields are verified writable**, including conditionally source-authorized BEC Master, strict SoilDrainage, X/Y scalar coordinates and Photo text. This completes the bounded parent-field baseline, not all form events, children, projections, picture management or application migration. |
-| FS882 children and height | Transactional child CRUD/storage and bounded existing-row height drafts work. Species selection, height insertion/deletion, broader child editing, pictures and calculations remain incomplete. |
-| Audit and lifecycle | Data/audit transactions, bounded selective restoration, Undo, and native window/context Save/Discard/Cancel are verified, including hidden-invalid and height drafts, failed save/config publication and stale-context rejection. Cover restoration, broader child dirty-state propagation and multiwindow coordination remain incomplete. |
+| FS882 children and height | Other's eight source-bound fields, create/delete and persistent conflict-checked drafts are native-verified. Transactional child storage and bounded existing-row height drafts work. Species selection, height insertion/deletion, full Humus/Mineral/vegetation editing, pictures and calculations remain incomplete. |
+| Audit and lifecycle | Data/audit transactions, bounded selective restoration, Undo, and native window/context Save/Discard/Cancel are verified, including hidden-invalid parent/height/Other drafts, failed save/config publication and stale-context rejection. Cover restoration, remaining child dirty-state propagation and multiwindow coordination remain incomplete. |
 | Soil classification | Two independent nullable four-UTF-16-unit editors default on. Native selection/manual entry, NULL, Undo, Lock, hidden validation, atomic rollback/retry and actual window-close recovery are verified, alongside frozen catalogue browsing. |
 | Bedrock classification | Three independent nullable four-UTF-16-unit editors default on, using the frozen87-row catalogue. Native full-item/raw entry, NULL, hidden validation, rollback/retry, Lock and clean close pass. Source effective properties remain unmeasured; this is an explicit safer adaptation, not exact Access input-mechanism parity. |
 | Ordinary terrain/classification codes | 21 independent nullable editors default on: Realm, coarse-fragment lithology, surface/subsurface terrain, flooding, humus, hydrogeology, rooting type/particle size and water source. Field-specific UTF-16 bounds, per-list failures/Retry, draft-bound review, hidden validation, rollback and native close recovery are verified. SoilDrainage uses its separately verified strict membership policy. |
@@ -186,6 +186,36 @@ rollback/retry, NULL, Undo and Lock preserve all15 tables,32 historical audits
 and support/config bytes, adding exactly six intended scalar audits.
 The picture manager, picture display, projection and bulk/reverse-copy actions
 remain unavailable. Parent-field coverage does not enable those workflows.
+
+Other editing defaults on; `VITE_OTHER_EDITING=false` makes its source grid and
+create/delete actions read-only. The eight exported SubOtherXL bindings are
+DataName TEXT50, DataItem/UserItem1-3 TEXT255 and three nullable BOOLEAN flags.
+UsysOther routes the selected project's original table, linked by PlotNumber;
+the source form's only active update event audits its ID. The desktop preserves
+raw text, UTF-16 bounds, malformed-JSON rejection before repair and true=-1 storage/
+audit. Backend physical guards do not invent a zero-length prohibition; clearing
+an editor text control explicitly submits NULL. Unbound Other.Flag is untouched.
+Unchanged historical invalid text is omitted from assignments; fresh restoration
+targets must be physically valid, including accepted table/field recasing aliases.
+
+All eight table cells now stage explicit Save/Cancel drafts instead of immediate
+blur saves. This is a documented lifecycle adaptation: errors/raw text survive
+tab remounts and block Save/Lock/close and unrelated mutations. Only changed cells
+are patched, with exact original NULL/value expectations and plot/ID ownership.
+Multirow writes/history share one transaction; stale/duplicate/deleted identities
+are refused. Create retains the existing two-field dialog; optional items/flags
+can then be entered in the source table. Delete has a native confirmation and
+retains identity reservations, so later creates cannot reuse deleted IDs.
+Deletion history and reservation safety are desktop adaptations, not new runtime
+proof of Access delete auditing or its random identity generator.
+Committed writes followed by refresh failure are reported as committed and disable
+editing rather than inviting duplicate creation or retry.
+
+The native Other proof checks12 scenarios, all15 original project tables and32
+historical audits, exactly16 intended audits and the existing reservation-ledger
+contract. Support/config bytes and canonical R/Access/SQLite sources are unchanged.
+Default assets exactly match the tested opt-in assets; final delivery also proves
+Unicode-folded malformed header keys cannot bypass the reused raw-token guard.
 `VITE_EXTERNAL_PROJECTS=false` hides the verified external attachment entry point;
 it defaults on. It does not disable restoration of valid saved external contexts.
 

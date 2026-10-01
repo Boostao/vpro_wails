@@ -32,7 +32,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
 | 5 | Complete bounded FS882 parent field editing (complete98/98) | All98 mapped parent fields have a native-verified writable baseline, including source-authorized BEC Master, strict SoilDrainage and final X/Y/Photo scalars. This is not full form/application parity; picture management, projection, bulk/reverse copying and remaining child/calculation events stay separately scoped and unavailable until verified. |
-| 6 | Complete FS882 child workflows | Vegetation/species/cover/height, Humus, Mineral and Other support their actual add/edit/delete/validation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
+| 6 | Complete FS882 child workflows (in progress; Other complete) | Other's eight source-bound cells and create/delete/draft lifecycle are native-verified. Finish vegetation/species/cover/height, Humus and Mineral actual add/edit/delete/validation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
 | 9 | Implement reports, maps and remaining active modules | Source-driven templates, preview/export, filters, offline assets and administration. Inventory all active entry points; keep placeholders disabled. |
@@ -481,4 +481,45 @@ Next: complete the actual FS882 child add/edit/delete/filter/calculation workflo
 Picture management, projections and reverse/bulk actions remain independent gaps;
 98 writable mapped fields are not complete form/application parity. Reuse sealed
 source evidence and shared lifecycle tests, not field-by-field audit matrices.
+
+### Child checkpoint: Other
+
+Static source read first: SubOtherXL/UsysOther/Sample_Other definitions, parent
+PlotNumber links and Form_BeforeUpdate's ID-bound AuditTrail call. Five textboxes
+and three checkboxes have no individual update/calculation events. Reuse original
+DTO/storage mapping, boolean normalization, identity allocation/reservation,
+transactional audits and source renderer; do not add editor catalogue databases.
+
+All eight fields are native-verified/default-on with a separate read-only opt-out.
+TEXT50/TEXT255 and raw JSON Unicode bounds, NULL/empty physical distinction,
+unchanged historical assignment omission and fresh restoration-alias guards
+protect Save/Update and selective restoration. Explicit persistent drafts replace
+blur saves; exact expected cell values prevent stale full-row replacement.
+Hidden-invalid Save/Lock/close refusal, one-error correction, Undo/Cancel,
+atomic multirow audit rollback/retry, raw UTF-16 limits, true=-1/false=0/NULL,
+create, cancelled/accepted delete and nonreused deleted identities pass.
+The existing create dialog initializes two fields; optional cells remain editable
+after creation. Report committed/failed-refresh state and disable editing so
+neither patches nor creates are replayed. Height and Other drafts mutually gate
+unrelated child/header/audit mutations; context transitions reuse native close.
+
+Native evidence/private/native-other seals12 scenarios, all15 original tables/
+32 historical audits,16 new audits and the expected identity ledger; support/
+config bytes and canonical sources remain unchanged. Remount/Undo readiness and
+hosted native confirmations required bounded harness continuations, not repeated
+writes or app behavior changes. Final production delivery independently rejects
+Unicode-folded malformed header JSON and preserves all fixture bytes. Default
+assets match native opt-in assets exactly;168 frontend tests/check0/0/default+
+optout builds; bindings15/108/36. Focused integration15.970s, initial full race
+495.442s and final-source full race418.460s pass. Final native-verified production
+payload5975b991... is promoted; sealed parent fallback retained.
+
+Next bounded groups: Humus12 and Mineral18 actual source-bound fields, including
+physical numeric/text domains, depth row order, nullable codes/suggestions and
+shared persistent drafts. Vegetation species/membership/cover/calculation events
+remain a distinct workflow, not incidental text editing. Storage-bound coverage
+alone never enables unmigrated columns, pictures or bulk operations.
+Preserve the exported ordering difference: Humus UpperDepth DESC, Mineral
+UpperDepth ASC. FecalAbundance intentionally uses MycelAbundance suggestions;
+RootsAbundance/RootsSize are textboxes, not invented restricted combos.
 The original42-field checklist is frozen evidence, not current coverage.

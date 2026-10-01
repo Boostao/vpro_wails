@@ -36,9 +36,10 @@ between shells.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
   all25 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
-- Current and candidate executables contain the same verified default-on payload:
-  `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`, SHA256
-  `72f2407a7ade54adb067cfe0043f5f8481b361e10bf762ac8a563d5736c9e255`.
+- Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
+  contain the same native-verified default-on Other payload:
+  `5975b99173ab5614c4881d20e6f1d5ec02c369f6815dad473d61735197c70c6c`.
+  Native Other/delivery and final-source full race pass; exact payload promoted.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -243,6 +244,23 @@ between shells.
   groups reflow4/3/2/1 columns with40px controls; raw source geometry remains
   evidence, not the rendering contract. Routine guidance/reference definitions
   are collapsed below the fields; safety feedback and required review stay visible.
+- Other's8 source-bound fields/create/delete/drafts are native-verified/default-on;
+  `VITE_OTHER_EDITING=false` disables its grid/actions. Reused source renderer,
+  physical/raw JSON Unicode/historical omission/restoration guards, nullable
+  BOOLEAN true=-1, expected-value patches and shared identity/audit transactions.
+  Hidden two-error remount/one-correction Save-Lock-close refusal, Undo/NULL,
+  multirow rollback/retry, exact UTF-16 values, native delete confirmation and
+  reserved deleted IDs pass. All15 original tables/32 old audits preserved,
+  exactly16 intended audits; identity ledger is the only expected new table.
+  Support/config/canonical sources unchanged. Parent+height+Other lifecycle gates
+  are coordinated; committed writes with failed refresh explicitly disable editing.
+  Native core PID17384 and final-delivery PID15852 exited; inspector9392 closed.
+  Default assets match native opt-in exactly;168 frontend tests/check0/0/default+
+  optout; bindings15/108/36. Focused15.970s/initial full race495.442s;
+  final-source full race418.460s passes.
+  Proof/delivery/visual/default-assets and sealed parent72f240... fallback:
+  evidence/private/native-other/vpro-parent-verified.exe. Core baa73e... archive
+  retains native-tested payload before the preserved Unicode-fold token guard.
 - Soil read-only catalogue: 39 great-group rows plus 62 subgroup rows; 1,010 typed
   metadata cells, including NULL/empty distinctions and duplicate definitions.
   Native browsing, checksum failure and warm Retry are verified.
@@ -385,6 +403,8 @@ The fourteen ordinary surveyor/depth/cover/note fields are now native-verified.
 The two nullable flags, strict SoilDrainage, source-authorized BEC Master and
 final X/Y/Photo scalar batch complete the98-field writable parent baseline.
 Continue actual FS882 child workflows, not another parent-field inventory.
+Other's eight-field workflow is verified/promoted; continue Humus/Mineral and
+distinct vegetation/species/cover events.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage's explicit LimitToList=NotDefault now has a separately verified

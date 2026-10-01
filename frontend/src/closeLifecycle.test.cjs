@@ -39,10 +39,11 @@ test('native close dialog compiles and exposes explicit accessible decisions', (
 test('form refuses save-and-close on invalid, locked, loading or incomplete child entry', () => {
   const source = read('FS882Form.svelte');
   assert.match(source, /export function getCloseState\(\): EditorCloseState/);
-  assert.match(source, /unsaved: dirty \|\| heightUnsaved \|\| invalid \|\| newChild !== null \|\| invalidChild/);
-  assert.match(source, /const invalid = Object\.keys\(headerValidation\)\.length > 0 \|\| heightInvalid\.length > 0/);
+  assert.match(source, /childUnsaved = \$derived\(heightUnsaved \|\| otherUnsaved\)/);
+  assert.match(source, /unsaved: dirty \|\| childUnsaved \|\| invalid \|\| newChild !== null \|\| invalidChild/);
+  assert.match(source, /const invalid = Object\.keys\(headerValidation\)\.length > 0 \|\| heightInvalid\.length > 0 \|\| otherInvalid\.length > 0/);
   assert.match(source, /if \(!state\.canSave\)/);
-  assert.match(source, /return !dirty && !heightUnsaved && Object\.keys\(headerValidation\)\.length === 0 && error === null/);
+  assert.match(source, /return !dirty && !childUnsaved && Object\.keys\(headerValidation\)\.length === 0 && error === null/);
   assert.match(source, /headerRevision\+\+;[\s\S]*?successMsg = 'Changes undone.'/);
   assert.match(source, /\{#key headerRevision\}/);
 });

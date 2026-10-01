@@ -23,7 +23,7 @@ test('Source grids stage lexical input while close, view and cancellation guards
   assert.match(child,/oninput=\{event => onstage/);
   assert.match(child,/staged\?\.raw \?\? value/);
   const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
-  assert.match(form,/heightUnsaved \?[\s\S]*?Save height drafts/);
+  assert.match(form,/\{#if heightUnsaved\}[\s\S]*?Save height drafts/);
   assert.match(form,/await PlotService\.UpdateHeightRecords\(draft\.plotNumber, updates\)/);
   assert.match(form,/VITE_HEIGHT_EDITING !== 'false'/);
   assert.match(form,/async function cancelHeightDrafts\(\)[\s\S]*?await loadChildData\(draft\.plotNumber\)/);

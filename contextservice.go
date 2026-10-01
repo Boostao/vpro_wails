@@ -174,6 +174,10 @@ func (s *ContextService) UpdateOtherRecord(contextID string, record OtherRecord)
 	return s.edit(contextID, func(plots *PlotService) error { return plots.UpdateOtherRecord(record) })
 }
 
+func (s *ContextService) UpdateOtherRecords(contextID, plot string, updates []OtherRecordUpdate) error {
+	return s.edit(contextID, func(plots *PlotService) error { return plots.UpdateOtherRecords(plot, updates) })
+}
+
 func (s *ContextService) DeleteOtherRecord(contextID, plot string, id int64) error {
 	return s.edit(contextID, func(plots *PlotService) error { return plots.DeleteOtherRecord(plot, id) })
 }

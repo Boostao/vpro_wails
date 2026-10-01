@@ -203,6 +203,13 @@ export function UpdateOtherRecord(r: $models.OtherRecord): $CancellablePromise<v
     return $Call.ByID(2136503922, r);
 }
 
+/**
+ * Patch only explicit cells; expected values prevent stale full-row replacement.
+ */
+export function UpdateOtherRecords(plot: string, updates: $models.OtherRecordUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(2034353043, plot, updates);
+}
+
 export function UpdatePlot(h: $models.FS882Header): $CancellablePromise<void> {
     return $Call.ByID(2912839176, h);
 }

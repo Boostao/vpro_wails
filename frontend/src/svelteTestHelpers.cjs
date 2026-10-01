@@ -27,6 +27,11 @@ function serverComponent(source, filename, dependencies) {
         }),
         './numericEditor': loadTypeScript('numericEditor.ts')
       });
+      if (name === './otherEditor') return loadTypeScript('otherEditor.ts', {
+        './qualityEditor': dependencies['./qualityEditor'] || loadTypeScript('qualityEditor.ts', {
+          './becEditor': loadTypeScript('becEditor.ts')
+        })
+      });
       if (name === './catalogueLookup' && './qualityEditor' in dependencies) {
         return loadTypeScript('catalogueLookup.ts', {
           './qualityEditor': dependencies['./qualityEditor'],

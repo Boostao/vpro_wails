@@ -109,6 +109,10 @@ export function UpdateOtherRecord(contextID: string, record: $models.OtherRecord
     return $Call.ByID(3386625786, contextID, record);
 }
 
+export function UpdateOtherRecords(contextID: string, plot: string, updates: $models.OtherRecordUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(1309024683, contextID, plot, updates);
+}
+
 export function UpdatePlot(contextID: string, header: $models.FS882Header): $CancellablePromise<void> {
     return $Call.ByID(3840380656, contextID, header);
 }

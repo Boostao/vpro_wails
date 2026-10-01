@@ -28,6 +28,7 @@
   import { embeddedForm, type VegetationMode } from './paperLayout';
   import type { EditorCloseState } from './closeLifecycle';
   import { heightField, stageHeight, heightDirty, heightErrors, heightUpdates, type HeightDrafts } from './heightEditor';
+  import { otherField, stageOther, otherDirty, otherErrors, otherUpdates, type OtherDrafts, type OtherValue } from './otherEditor';
   import type { WorkingUnitSession } from './workingUnitEditor';
   import { onDestroy, untrack, tick } from 'svelte';
   import { bindContextPlots } from './contextPlots';
@@ -65,6 +66,11 @@
   let heightDrafts = $state<HeightDrafts>({});
   const heightUnsaved = $derived(heightDirty(heightDrafts));
   const heightInvalid = $derived(heightErrors(heightDrafts));
+  const otherEditingEnabled = import.meta.env.VITE_OTHER_EDITING !== 'false';
+  let otherDrafts = $state<OtherDrafts>({});
+  const otherUnsaved = $derived(otherDirty(otherDrafts));
+  const otherInvalid = $derived(otherErrors(otherDrafts));
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -293,8 +299,10 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
-  const heightEditingDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null);
-  const childEditingDisabled = $derived(heightEditingDisabled || heightUnsaved);
+  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null);
+  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved);
+  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved);
+  const childEditingDisabled = $derived(childParentDisabled || childUnsaved);
   const auditRestoreEnabled = import.meta.env.VITE_AUDIT_RESTORE !== 'false';
   const auditProject = $derived($projectState?.activeProject ?? '');
   const auditBlocked = $derived(childEditingDisabled || Object.keys(headerValidation).length > 0);
@@ -580,6 +588,63 @@
     }
   }
 
+  function stageOtherCell(id: number, column: string, raw: OtherValue) {
+    try {
+      if (otherEditingDisabled) throw new Error('Other editing is unavailable while loading, locked, busy or another draft is unsaved.');
+      const field = otherField(column);
+      if (!field || childCapabilities.Other[field.key] !== true) throw new Error(`Other column ${column} is unavailable in the active schema.`);
+      const rows = otherList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
+      if (rows.length !== 1) throw new Error('Other row identity is missing or ambiguous; reload before editing.');
+      otherDrafts = stageOther(otherDrafts, id, field, raw, rows[0][field.key] ?? null);
+      successMsg = null;
+      if (error?.startsWith('Other ')) error = null;
+    } catch (cause) {
+      error = `Other draft failed: ${String(cause)}`;
+      childRevision++;
+    }
+  }
+
+  async function cancelOtherDrafts() {
+    if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling Other drafts.'; return; }
+    otherDrafts = {};
+    childRevision++;
+    error = null;
+    successMsg = null;
+    busy = true;
+    try {
+      await loadChildData(draft.plotNumber);
+      successMsg = 'Other drafts cancelled. Stored data and history were unchanged; current rows reloaded.';
+    } catch (cause) {
+      capabilitiesReady = false;
+      error = `Other drafts cancelled, but current rows could not be reloaded. Reopen the plot: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function saveOtherDrafts() {
+    if (otherEditingDisabled) { error = 'Save a clean, unlocked header before saving Other drafts.'; return; }
+    let committed = false;
+    busy = true;
+    error = null;
+    successMsg = null;
+    try {
+      const updates = otherUpdates(otherDrafts);
+      if (updates.length === 0) { otherDrafts = {}; successMsg = 'No Other values changed.'; return; }
+      await PlotService.UpdateOtherRecords(draft.plotNumber, updates);
+      committed = true;
+      otherDrafts = {};
+      await loadChildData(draft.plotNumber);
+      successMsg = `Saved ${updates.length} Other row drafts atomically.`;
+    } catch (cause) {
+      if (committed) capabilitiesReady = false;
+      error = committed ? `Other changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
+        : `Other save failed; drafts retained: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
   async function editSourceChild(name: string, id: number, column: string, raw: string) {
     const key = column.toLowerCase();
     function numeric() {
@@ -660,6 +725,7 @@
       return;
     }
     if (heightUnsaved) { await saveHeightDrafts(); return; }
+    if (otherUnsaved) { await saveOtherDrafts(); return; }
     const invalid = container.querySelector<HTMLInputElement>('.header-editor input:invalid');
     if (invalid) {
       invalid.reportValidity();
@@ -701,14 +767,15 @@
   }
 
   export function getCloseState(): EditorCloseState {
-    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0;
+    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0;
     const invalidChild = Boolean(container?.querySelector('.source-child input:invalid'));
     const saveReason = busy || headerWorkflowBusy || !capabilitiesReady ? 'Wait for the plot to finish loading or header workflow.'
       : draft.locked ? 'Unlock the plot before saving.'
       : newChild !== null || invalidChild ? 'Finish or cancel child entry before saving and closing.'
+      : otherInvalid.length > 0 ? 'Correct invalid Other drafts or Cancel Other drafts before saving.'
       : invalid ? 'Correct invalid header inputs or Undo before saving.'
       : !draft.plotNumber.trim() ? 'Plot Number is required before saving.' : '';
-    return { unsaved: dirty || heightUnsaved || invalid || newChild !== null || invalidChild, busy: busy || headerWorkflowBusy, canSave: saveReason === '', saveReason, error };
+    return { unsaved: dirty || childUnsaved || invalid || newChild !== null || invalidChild, busy: busy || headerWorkflowBusy, canSave: saveReason === '', saveReason, error };
   }
 
   export async function saveForClose(): Promise<boolean> {
@@ -718,7 +785,7 @@
       return false;
     }
     await save();
-    return !dirty && !heightUnsaved && Object.keys(headerValidation).length === 0 && error === null;
+    return !dirty && !childUnsaved && Object.keys(headerValidation).length === 0 && error === null;
   }
 
   function undo() {
@@ -727,6 +794,7 @@
       return;
     }
     if (heightUnsaved) { void cancelHeightDrafts(); return; }
+    if (otherUnsaved) { void cancelOtherDrafts(); return; }
     if (original) {
       draft = JSON.parse(JSON.stringify(original));
     } else {
@@ -748,6 +816,10 @@
       error = 'Save or Cancel height drafts before changing the plot lock.';
       return;
     }
+    if (otherUnsaved) {
+      error = 'Save or Cancel Other drafts before changing the plot lock.';
+      return;
+    }
     if (!draft.locked && dirty) {
       await save();
       if (dirty) return;
@@ -760,7 +832,7 @@
       error = 'Child editing is unavailable while the plot is loading, busy or locked.';
       return false;
     }
-    if (!original || !draft.plotNumber || dirty || heightUnsaved) {
+    if (!original || !draft.plotNumber || dirty || childUnsaved) {
       error = 'Save the plot header before editing child records.';
       return false;
     }
@@ -771,11 +843,18 @@
     busy = true;
     error = null;
     successMsg = null;
+    let committed = false;
     try {
       await operation();
+      committed = true;
       await loadChildData(draft.plotNumber);
       return true;
     } catch (cause) {
+      if (committed) {
+        capabilitiesReady = false;
+        error = `Child changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`;
+        return true;
+      }
       error = `Child operation failed: ${String(cause)}`;
       try {
         await loadChildData(draft.plotNumber);
@@ -803,8 +882,8 @@
   <header class="fs882-toolbar p-3 bg-stone-100 border-b border-stone-200 flex justify-between items-center">
     <div class="flex items-center gap-3">
       <h2 class="font-bold text-stone-900 text-base">FS882-6x4XL: Ecosystem Field Form</h2>
-      <span class="px-2 py-0.5 rounded text-xs font-semibold {dirty || heightUnsaved ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-600'}">
-        {dirty || heightUnsaved ? 'Draft Unsaved' : 'Clean'}
+      <span class="px-2 py-0.5 rounded text-xs font-semibold {dirty || childUnsaved ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-600'}">
+        {dirty || childUnsaved ? 'Draft Unsaved' : 'Clean'}
       </span>
       {#if draft.locked}
         <span class="px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700 flex items-center gap-1">
@@ -831,7 +910,7 @@
       <button
         type="button"
         onclick={undo}
-        disabled={(!dirty && !heightUnsaved) || draft.locked || busy || headerWorkflowBusy || !capabilitiesReady}
+        disabled={(!dirty && !childUnsaved) || draft.locked || busy || headerWorkflowBusy || !capabilitiesReady}
         class="px-3 py-1 rounded text-xs font-medium border border-stone-300 bg-white hover:bg-stone-50 disabled:opacity-50 flex items-center gap-1"
       >
         <RotateCcw size={14} /> Undo
@@ -840,7 +919,7 @@
       <button
         type="button"
         onclick={save}
-        disabled={(!dirty && !heightUnsaved) || draft.locked || busy || headerWorkflowBusy || !capabilitiesReady}
+        disabled={(!dirty && !childUnsaved) || draft.locked || busy || headerWorkflowBusy || !capabilitiesReady}
         class="px-3 py-1 rounded text-xs font-medium bg-emerald-700 hover:bg-emerald-800 text-white disabled:opacity-50 flex items-center gap-1"
       >
         <Save size={14} /> Save
@@ -928,6 +1007,16 @@
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if otherUnsaved}
+      <div class="other-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Other draft controls">
+        <span>Other drafts are unsubmitted. Switching tabs never saves them; header and other child editing wait.</span>
+        <div class="flex gap-2 mt-2">
+          <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={otherEditingDisabled || otherInvalid.length > 0} onclick={() => void saveOtherDrafts()}>Save Other drafts</button>
+          <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelOtherDrafts}>Cancel Other drafts</button>
+        </div>
+        {#each otherInvalid as message}<p role="alert">{message}</p>{/each}
+      </div>
+    {/if}
     {#if heightUnsaved}
       <div class="height-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Height draft controls">
         <span>Height/cover drafts are unsubmitted. Switching views never saves them; header and other child editing wait.</span>
@@ -944,14 +1033,14 @@
     {#if activeTab === 'site'}
       {#key headerRevision}
         <ParentCodeFields bind:draft {original} {capabilities} scope="site"
-          disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+          disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
           onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => parentCodeBusy = pending}>
         {#snippet children(editor)}
         <OrdinaryFields bind:draft {original} {capabilities} scope="site"
-          disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+          disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
           onchange={markDirty} onvalidation={validateHeader}>
         {#snippet children(ordinaryEditor)}
-        <HeaderEditor bind:draft {original} {capabilities} disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+        <HeaderEditor bind:draft {original} {capabilities} disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
           {editor} additionalEditor={ordinaryEditor} {masterAllowed}
           existing={original !== null}
           lists={{ moistureRegime: moistureList, nutrientRegime: nutrientList, mesoSlopePos: mesoSlopeList, surfaceShape: surfaceShapeList }}
@@ -968,7 +1057,7 @@
       {/key}
     {:else if activeTab === 'veg'}
       <OrdinaryFields bind:draft {original} {capabilities} scope="veg"
-        disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+        disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
         onchange={markDirty} onvalidation={validateHeader} onVegNotesTab={vegetationNotesTab}>
       {#snippet children(ordinaryEditor)}
       <SourcePage name="Vegetation" values={sourceHeaderValues} {vegetationMode} editor={ordinaryEditor} onHeightToggle={() => vegetationMode = vegetationMode === 'height' ? 'cover' : 'height'}>
@@ -1205,23 +1294,23 @@
         <button disabled={childEditingDisabled} onclick={() => openNewChild('mineral')}>Add Mineral Layer</button>
       </div>
       <OrdinaryFields bind:draft {original} {capabilities} scope="soils"
-        disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+        disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
         onchange={markDirty} onvalidation={validateHeader}>
       {#snippet children(ordinaryEditor)}
       <DrainageFields bind:draft {original} {capabilities}
-        disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+        disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
         onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => drainageBusy = pending}>
       {#snippet children(drainageEditor)}
       <SoilCodeFields bind:draft {original} {capabilities}
-        disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || geologyCodeBusy}
+        disabled={draft.locked || busy || !capabilitiesReady || childUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || geologyCodeBusy}
         onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => soilCodeBusy = pending}>
         {#snippet children(editor)}
           <GeologyCodeFields bind:draft {original} {capabilities}
-            disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy}
+            disabled={draft.locked || busy || !capabilitiesReady || childUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy}
             onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => geologyCodeBusy = pending}>
             {#snippet children(geologyEditor)}
               <ParentCodeFields bind:draft {original} {capabilities} scope="soils"
-                disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
+                disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
                 onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => parentCodeBusy = pending}>
               {#snippet children(parentEditor)}
               <SourcePage name="Soil/Terrain" values={sourceHeaderValues} {editor} editors={[...(geologyEditor ? [geologyEditor] : []), ...(parentEditor ? [parentEditor] : []), ...(ordinaryEditor ? [ordinaryEditor] : []), ...(drainageEditor ? [drainageEditor] : [])]}>
@@ -1343,11 +1432,13 @@
         {/snippet}
       </SourcePage>
     {:else if activeTab === 'other'}
-      <button class="mb-3 text-xs" disabled={childEditingDisabled} onclick={() => openNewChild('other')}>Add Other Data</button>
+      <button class="mb-3 text-xs" disabled={otherEditingDisabled || otherUnsaved} onclick={() => openNewChild('other')}>Add Other Data</button>
       <SourcePage name="Other" values={sourceHeaderValues}>
         {#snippet embedded(control)}
           {@const child = embeddedForm(control.controlId)}
-          <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={childEditingDisabled} onedit={editSourceChild} ondelete={deleteSourceChild} />
+          <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={otherEditingDisabled}
+            deleteDisabled={otherUnsaved} onotherstage={otherEditingEnabled ? stageOtherCell : undefined}
+            {otherDrafts} ondelete={deleteSourceChild} />
         {/snippet}
       </SourcePage>
       <div class="space-y-3">
