@@ -211,8 +211,8 @@ Installing a family does not enable its unavailable domain workflows.
 ## Backend peer-review follow-up
 
 Reviewed against the integrated F1-F3 implementation,2026-10-01. These are
-bounded improvements. C1 pooling is implemented/verified; checksum caching and
-end-to-end cancellation remain planned. Preserve sealed baselines and keep this work
+bounded improvements. C1 pooling and C2 checksum caching are implemented/verified;
+C3 cancellation is partially delivered. Preserve sealed baselines and keep this work
 bounded; do not reopen the foundation as a general framework rewrite.
 
 ### Confirmed findings and design decisions
@@ -280,9 +280,22 @@ Native generated browse and species promises interrupt expensive SQLite queries;
 switch release0.375s, subsequent header/browse/species/list metadata identical,
 no unhandled errors. Synthetic project/reference schemas are removed and exact
 original file bytes restored after owned close; all fixture files match.
-C3 remains open for catalogue and state/discovery reads and their frontend
-ownership; do not claim the full cleanup or migration gate complete.
-wire C3 along affected retrieval paths without coupling it to an all-service rewrite.
+C3c shared Parent/Geology/Soil/Region/Site retrieval is implemented and promoted:
+injected contexts reach queued exclusive locks, profile/row SQL and snapshot cloning.
+Six field/reference consumers share catalogue promise ownership; refresh/dispose
+cancel reads without late state publication or mutation cancellation. Focused race
+4.518s/full race346.630s;144 frontend tests/check0/0/build; bindings remain15/104/33.
+Actual Wails proves five generated reload cancellations, unchanged recovery,
+supersession/disposal and remount/failed Retry/restored Retry retaining invalid
+drafts. All database/audit/config/support bytes match after owned close.
+Immediate short-scan native cancellation does not prove mid-SQL interruption;
+queued-lock deadlines are proven by tests. Synchronous file reads are checked
+before/after, not promised interruptible. Non-cancellation corruption rejections
+remain visible even when their promise was cancelled; the failed overly strict
+native assertion and exact-byte cleanup are retained.
+C3 remains open for BEC/Quality/Working Unit and state/discovery reads and their
+frontend ownership; do not claim the full cleanup or migration gate complete.
+Wire C3 along affected retrieval paths without coupling it to an all-service rewrite.
 C4/C5 fit between subsequent validated workflows and do not block parent migration
 merely to reduce file/service counts. Run focused Go tests/benchmarks first, full
 race at integration, frontend tests/check/build for binding/lifecycle changes and

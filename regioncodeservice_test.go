@@ -10,6 +10,7 @@ import (
 	"sync"
 	"testing"
 
+	"context"
 	"github.com/boostao/vpro-wails/internal/listcatalog"
 )
 
@@ -39,7 +40,7 @@ func TestRegionCatalogueAll1640CellsShapeAndNativeOrder(t *testing.T) {
 			read = s.ListRegionChoices
 			count = 27
 		}
-		rows, err := read()
+		rows, err := read(context.Background())
 		if err != nil || len(rows) != count {
 			t.Fatalf("%s: %d rows %v", list, len(rows), err)
 		}
@@ -124,8 +125,8 @@ func TestRegionCatalogueReadonlyNonoverwritingCorruptionAndRetry(t *testing.T) {
 	if err := file.Close(); err != nil {
 		t.Fatal(err)
 	}
-	for _, read := range []func() ([]RegionCodeChoice, error){s.ListRegionChoices, s.ListEcosectionChoices} {
-		if _, err := read(); err == nil || !strings.Contains(err.Error(), "checksum") {
+	for _, read := range []func(context.Context) ([]RegionCodeChoice, error){s.ListRegionChoices, s.ListEcosectionChoices} {
+		if _, err := read(context.Background()); err == nil || !strings.Contains(err.Error(), "checksum") {
 			t.Fatalf("corruption hidden: %v", err)
 		}
 	}
@@ -139,13 +140,13 @@ func TestRegionCatalogueReadonlyNonoverwritingCorruptionAndRetry(t *testing.T) {
 	if err := file.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if rows, err := s.ListEcosectionChoices(); err != nil || len(rows) != 137 {
+	if rows, err := s.ListEcosectionChoices(context.Background()); err != nil || len(rows) != 137 {
 		t.Fatalf("restored bytes retry failed %v", err)
 	}
 	if err := s.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.ListRegionChoices(); err == nil || !strings.Contains(err.Error(), "closed") {
+	if _, err := s.ListRegionChoices(context.Background()); err == nil || !strings.Contains(err.Error(), "closed") {
 		t.Fatal("closed catalogue succeeded")
 	}
 	if err := s.Close(); err != nil {
@@ -174,7 +175,7 @@ func TestRegionCatalogueConcurrentReadCloseAndProvenance(t *testing.T) {
 		go func() {
 			defer group.Done()
 			for j := 0; j < 3; j++ {
-				if _, err := s.ListRegionChoices(); err != nil && !strings.Contains(err.Error(), "closed") {
+				if _, err := s.ListRegionChoices(context.Background()); err != nil && !strings.Contains(err.Error(), "closed") {
 					t.Error(err)
 				}
 			}

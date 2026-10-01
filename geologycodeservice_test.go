@@ -11,6 +11,7 @@ import (
 	"sync"
 	"testing"
 
+	"context"
 	"github.com/boostao/vpro-wails/internal/listcatalog"
 )
 
@@ -28,7 +29,7 @@ func TestGeologyCatalogue870CellsAnd13FieldShape(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows, err := service.ListBedrockChoices()
+	rows, err := service.ListBedrockChoices(context.Background())
 	if err != nil || len(rows) != 87 {
 		t.Fatal("catalogue count", err)
 	}
@@ -96,7 +97,7 @@ func TestGeologyCatalogueNonoverwriteReadonlyWarmRetryAndClose(t *testing.T) {
 	if _, err := readonlyCatalogueFixture(t, s.path).Exec(`UPDATE SiteCodeChoices SET Item='changed'`); err == nil {
 		t.Fatal("reference writable")
 	}
-	if _, err := s.ListBedrockChoices(); err != nil {
+	if _, err := s.ListBedrockChoices(context.Background()); err != nil {
 		t.Fatal(err)
 	}
 	file, err := os.OpenFile(s.path, os.O_WRONLY, 0)
@@ -109,7 +110,7 @@ func TestGeologyCatalogueNonoverwriteReadonlyWarmRetryAndClose(t *testing.T) {
 	if err := file.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if rows, err := s.ListBedrockChoices(); err == nil || !strings.Contains(err.Error(), "checksum") || rows != nil {
+	if rows, err := s.ListBedrockChoices(context.Background()); err == nil || !strings.Contains(err.Error(), "checksum") || rows != nil {
 		t.Fatal("checksum failure hidden", err)
 	}
 	file, err = os.OpenFile(s.path, os.O_WRONLY, 0)
@@ -122,17 +123,17 @@ func TestGeologyCatalogueNonoverwriteReadonlyWarmRetryAndClose(t *testing.T) {
 	if err := file.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if rows, err := s.ListBedrockChoices(); err != nil || len(rows) != 87 {
+	if rows, err := s.ListBedrockChoices(context.Background()); err != nil || len(rows) != 87 {
 		t.Fatal("exact restoration warm retry failed", err)
 	}
 	old := s.provenance
 	s.provenance.TypedCellsSHA256 = strings.Repeat("0", 64)
-	if _, err := s.ListBedrockChoices(); err == nil {
+	if _, err := s.ListBedrockChoices(context.Background()); err == nil {
 		t.Fatal("stored fidelity failure hidden")
 	}
 	s.provenance = old
 	s.provenance.Rows--
-	if _, err := s.ListBedrockChoices(); err == nil {
+	if _, err := s.ListBedrockChoices(context.Background()); err == nil {
 		t.Fatal("invalid provenance hidden")
 	}
 	s.provenance = old
@@ -141,7 +142,7 @@ func TestGeologyCatalogueNonoverwriteReadonlyWarmRetryAndClose(t *testing.T) {
 		group.Add(1)
 		go func() {
 			defer group.Done()
-			if _, err := s.ListBedrockChoices(); err != nil && !strings.Contains(err.Error(), "closed") {
+			if _, err := s.ListBedrockChoices(context.Background()); err != nil && !strings.Contains(err.Error(), "closed") {
 				t.Error(err)
 			}
 		}()
@@ -150,7 +151,7 @@ func TestGeologyCatalogueNonoverwriteReadonlyWarmRetryAndClose(t *testing.T) {
 		t.Fatal(err)
 	}
 	group.Wait()
-	if _, err := s.ListBedrockChoices(); err == nil || !strings.Contains(err.Error(), "closed") {
+	if _, err := s.ListBedrockChoices(context.Background()); err == nil || !strings.Contains(err.Error(), "closed") {
 		t.Fatal("closed catalogue succeeded")
 	}
 	if err := s.Close(); err != nil {

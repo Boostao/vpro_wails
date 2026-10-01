@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
   import { ParentCodeService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
-  import { QualityLookup } from './qualityEditor';
+  import { CatalogueLookup } from './catalogueLookup';
   import type { PaperControl } from './paperLayout';
   import FieldGuidance from './FieldGuidance.svelte';
   import { createParentCodeEditor, parentCodeField, type ParentCodes, type ParentCodeKey,
@@ -18,9 +18,9 @@
   const editor = createParentCodeEditor(untrack(() => scope));
   const validationKey = `parentCodes-${untrack(() => scope)}`;
   let views = $state<ParentCodeViews>({});
-  const lookups = editor.lists.map(list => new QualityLookup(async (force) => {
-    if (force) await ParentCodeService.ReloadCatalogue();
-    const rows = await ParentCodeService.ListChoices(list);
+  const lookups = editor.lists.map(list => new CatalogueLookup(async (force, requests) => {
+    if (force) await requests.track(ParentCodeService.ReloadCatalogue());
+    const rows = await requests.track(ParentCodeService.ListChoices(list));
     if (rows === null) throw new Error(`${list} service did not return reference rows.`);
     return rows;
   }, next => { views = { ...views, [list]: next }; }, list));

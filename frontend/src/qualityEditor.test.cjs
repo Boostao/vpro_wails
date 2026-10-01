@@ -150,7 +150,7 @@ test('explicit catalogue Retry forces verification while normal refresh remains 
     ['SoilCodeReference.svelte', 'SoilCodeService']
   ]) {
     const source = readFileSync(path.join(__dirname, file), 'utf8');
-    assert.match(source, new RegExp(`if \\(force\\) await ${service}\\.ReloadCatalogue\\(\\)`));
+    assert.match(source, new RegExp(`if \\(force\\) await requests\\.track\\(${service}\\.ReloadCatalogue\\(\\)\\)`));
     assert.match(source, /refresh\(true\)/);
     assert.equal(compile(source, { filename: file, generate: 'client' }).warnings.length, 0);
   }

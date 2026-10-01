@@ -10,6 +10,7 @@ import (
 	"sync"
 	"testing"
 
+	"context"
 	"github.com/boostao/vpro-wails/internal/listcatalog"
 )
 
@@ -36,9 +37,9 @@ func TestSiteCodeCatalogueFrozenCellsDTOOrderAndDuplicates(t *testing.T) {
 	for _, list := range []string{"Exposure", "SiteDisturbance"} {
 		var rows []SiteCodeChoice
 		if list == "Exposure" {
-			rows, err = service.ListExposureChoices()
+			rows, err = service.ListExposureChoices(context.Background())
 		} else {
-			rows, err = service.ListSiteDisturbanceChoices()
+			rows, err = service.ListSiteDisturbanceChoices(context.Background())
 		}
 		if err != nil {
 			t.Fatal(err)
@@ -141,15 +142,15 @@ func TestSiteCodeCatalogueFailClosedNonoverwritingAndReadonly(t *testing.T) {
 	if writeErr != nil || closeErr != nil {
 		t.Fatalf("corruption probe: %v %v", writeErr, closeErr)
 	}
-	for _, list := range []func() ([]SiteCodeChoice, error){service.ListExposureChoices, service.ListSiteDisturbanceChoices} {
-		if _, err := list(); err == nil || !strings.Contains(err.Error(), "checksum") {
+	for _, list := range []func(context.Context) ([]SiteCodeChoice, error){service.ListExposureChoices, service.ListSiteDisturbanceChoices} {
+		if _, err := list(context.Background()); err == nil || !strings.Contains(err.Error(), "checksum") {
 			t.Fatalf("open catalogue silently trusted corrupt file: %v", err)
 		}
 	}
 	if err := service.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.ListExposureChoices(); err == nil || !strings.Contains(err.Error(), "closed") {
+	if _, err := service.ListExposureChoices(context.Background()); err == nil || !strings.Contains(err.Error(), "closed") {
 		t.Fatal("closed catalogue silently succeeded")
 	}
 	if err := service.Close(); err != nil {
@@ -168,7 +169,7 @@ func TestSiteCodeCatalogueConcurrentReadsAndClose(t *testing.T) {
 		go func() {
 			defer group.Done()
 			for j := 0; j < 4; j++ {
-				if _, err := service.ListExposureChoices(); err != nil && !strings.Contains(err.Error(), "closed") {
+				if _, err := service.ListExposureChoices(context.Background()); err != nil && !strings.Contains(err.Error(), "closed") {
 					t.Error(err)
 				}
 			}

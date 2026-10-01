@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	_ "embed"
 	"errors"
 	"sync"
@@ -44,13 +45,15 @@ func (s *SoilCodeService) Close() error {
 	return nil
 }
 
-func (s *SoilCodeService) listChoices(list string) ([]SoilCodeChoice, error) {
-	s.mu.Lock()
+func (s *SoilCodeService) listChoices(ctx context.Context, list string) ([]SoilCodeChoice, error) {
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return nil, err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return nil, errors.New("soil code catalogue is closed")
 	}
-	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.SoilProfile(), "soil code", list, false)
+	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SoilProfile(), "soil code", list, false)
 	if err != nil {
 		return nil, err
 	}
@@ -69,20 +72,22 @@ func (s *SoilCodeService) listChoices(list string) ([]SoilCodeChoice, error) {
 	return result, nil
 }
 
-func (s *SoilCodeService) ListGreatGroupChoices() ([]SoilCodeChoice, error) {
-	return s.listChoices("SoilClassGroup")
+func (s *SoilCodeService) ListGreatGroupChoices(ctx context.Context) ([]SoilCodeChoice, error) {
+	return s.listChoices(ctx, "SoilClassGroup")
 }
 
-func (s *SoilCodeService) ReloadCatalogue() error {
-	s.mu.Lock()
+func (s *SoilCodeService) ReloadCatalogue(ctx context.Context) error {
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return errors.New("soil code catalogue is closed")
 	}
-	_, err := s.cache.choices(s.path, s.provenance, listcatalog.SoilProfile(), "soil code", "", true)
+	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SoilProfile(), "soil code", "", true)
 	return err
 }
 
-func (s *SoilCodeService) ListSubgroupChoices() ([]SoilCodeChoice, error) {
-	return s.listChoices("SoilClassSubgroup")
+func (s *SoilCodeService) ListSubgroupChoices(ctx context.Context) ([]SoilCodeChoice, error) {
+	return s.listChoices(ctx, "SoilClassSubgroup")
 }

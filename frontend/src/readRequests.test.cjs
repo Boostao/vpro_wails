@@ -91,3 +91,36 @@ test('browse, hierarchy, reference and species consumers own only their read gen
   assert.match(form, /if \(request === speciesRequest\) searchingSpecies = false/);
   assert.doesNotMatch(root, /Reads\.track\(ContextService\.SwitchContext/);
 });
+
+test('catalogue lookup cancels superseded reloads and disposal without publishing stale errors', async () => {
+  const sdk = await runtime();
+  const { loadTypeScript } = require('./svelteTestHelpers.cjs');
+  const reads = load(sdk);
+  const bec = loadTypeScript('becEditor.ts');
+  const quality = loadTypeScript('qualityEditor.ts', { './becEditor': bec });
+  const { CatalogueLookup } = loadTypeScript('catalogueLookup.ts',
+    { './qualityEditor': quality, './readRequests': reads });
+  const pending = [];
+  let cancelled = 0;
+  const states = [];
+  const lookup = new CatalogueLookup(async (force, requests) => {
+    const read = sdk.CancellablePromise.withResolvers();
+    read.oncancelled = () => { cancelled++; };
+    pending.push({ ...read, force });
+    return requests.track(read.promise);
+  }, view => states.push(view), 'Catalogue');
+  const old = lookup.refresh(true);
+  const current = lookup.refresh();
+  pending[1].resolve([]);
+  await current; await old;
+  assert.equal(cancelled, 1);
+  assert.equal(pending[0].force, true);
+  assert.equal(lookup.snapshot().ready, true);
+  assert.equal(lookup.snapshot().error, null);
+  const disposed = lookup.refresh(true);
+  const count = states.length;
+  lookup.dispose();
+  await disposed;
+  assert.equal(cancelled, 2);
+  assert.equal(states.length, count);
+});

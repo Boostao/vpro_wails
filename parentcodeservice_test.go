@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"context"
 	"github.com/boostao/vpro-wails/internal/listcatalog"
 )
 
@@ -43,7 +44,7 @@ func TestParentCatalogueAll16Lists3470CellsAnd13Properties(t *testing.T) {
 		if !exists || maximum <= 0 {
 			t.Fatal("registry missing bound", list.Name)
 		}
-		rows, err := s.ListChoices(list.Name)
+		rows, err := s.ListChoices(context.Background(), list.Name)
 		if err != nil || len(rows) != list.Rows {
 			t.Fatal(list.Name, err)
 		}
@@ -80,7 +81,7 @@ func TestParentCatalogueAll16Lists3470CellsAnd13Properties(t *testing.T) {
 		}
 	}
 	for _, unsupported := range []string{"", "bedrocktype", "HydroGeoSystem", "SoilClassGroup", "BECSiteUnit", "WaterSource' OR 1=1"} {
-		if rows, err := s.ListChoices(unsupported); err == nil || rows != nil || !strings.Contains(err.Error(), "unsupported") {
+		if rows, err := s.ListChoices(context.Background(), unsupported); err == nil || rows != nil || !strings.Contains(err.Error(), "unsupported") {
 			t.Fatal("unsupported list hidden", unsupported, err)
 		}
 	}
@@ -128,7 +129,7 @@ func TestParentCatalogueNonoverwriteChecksumWarmRetryAndClose(t *testing.T) {
 	if _, err := readonlyCatalogueFixture(t, s.path).Exec(`UPDATE SiteCodeChoices SET Item='changed'`); err == nil {
 		t.Fatal("reference writable")
 	}
-	if _, err := s.ListChoices("HumusForm"); err != nil {
+	if _, err := s.ListChoices(context.Background(), "HumusForm"); err != nil {
 		t.Fatal(err)
 	}
 	file, err := os.OpenFile(s.path, os.O_WRONLY, 0)
@@ -142,7 +143,7 @@ func TestParentCatalogueNonoverwriteChecksumWarmRetryAndClose(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, list := range listcatalog.ParentProfile().Lists {
-		if rows, err := s.ListChoices(list.Name); err == nil || rows != nil || !strings.Contains(err.Error(), "checksum") {
+		if rows, err := s.ListChoices(context.Background(), list.Name); err == nil || rows != nil || !strings.Contains(err.Error(), "checksum") {
 			t.Fatal("cached catalogue hid corruption", err)
 		}
 	}
@@ -157,25 +158,25 @@ func TestParentCatalogueNonoverwriteChecksumWarmRetryAndClose(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, list := range listcatalog.ParentProfile().Lists {
-		if rows, err := s.ListChoices(list.Name); err != nil || len(rows) != list.Rows {
+		if rows, err := s.ListChoices(context.Background(), list.Name); err != nil || len(rows) != list.Rows {
 			t.Fatal("exact byte restoration retry failed", err)
 		}
 	}
 	old := s.provenance
 	s.provenance.TypedCellsSHA256 = strings.Repeat("0", 64)
-	if _, err := s.ListChoices("WaterSource"); err == nil {
+	if _, err := s.ListChoices(context.Background(), "WaterSource"); err == nil {
 		t.Fatal("bad stored fidelity hidden")
 	}
 	s.provenance = old
 	s.provenance.Rows--
-	if _, err := s.ListChoices("WaterSource"); err == nil {
+	if _, err := s.ListChoices(context.Background(), "WaterSource"); err == nil {
 		t.Fatal("bad provenance count hidden")
 	}
 	s.provenance = old
 	if err := s.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.ListChoices("WaterSource"); err == nil || !strings.Contains(err.Error(), "closed") {
+	if _, err := s.ListChoices(context.Background(), "WaterSource"); err == nil || !strings.Contains(err.Error(), "closed") {
 		t.Fatal("closed catalogue succeeded")
 	}
 	if err := s.Close(); err != nil {

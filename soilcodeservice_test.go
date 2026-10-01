@@ -11,6 +11,7 @@ import (
 	"sync"
 	"testing"
 
+	"context"
 	"github.com/boostao/vpro-wails/internal/listcatalog"
 )
 
@@ -36,11 +37,11 @@ func TestSoilCatalogueAll1010CellsAndExact13FieldShape(t *testing.T) {
 	for _, test := range []struct {
 		list  string
 		count int
-		read  func() ([]SoilCodeChoice, error)
+		read  func(context.Context) ([]SoilCodeChoice, error)
 	}{
 		{"SoilClassGroup", 39, service.ListGreatGroupChoices}, {"SoilClassSubgroup", 62, service.ListSubgroupChoices},
 	} {
-		rows, err := test.read()
+		rows, err := test.read(context.Background())
 		if err != nil || len(rows) != test.count {
 			t.Fatalf("%s: %d %v", test.list, len(rows), err)
 		}
@@ -119,8 +120,8 @@ func TestSoilCatalogueReadonlyNonoverwriteCorruptionWarmRetryRestart(t *testing.
 	if err := file.Close(); err != nil {
 		t.Fatal(err)
 	}
-	for _, read := range []func() ([]SoilCodeChoice, error){service.ListGreatGroupChoices, service.ListSubgroupChoices} {
-		if _, err := read(); err == nil || !strings.Contains(err.Error(), "checksum") {
+	for _, read := range []func(context.Context) ([]SoilCodeChoice, error){service.ListGreatGroupChoices, service.ListSubgroupChoices} {
+		if _, err := read(context.Background()); err == nil || !strings.Contains(err.Error(), "checksum") {
 			t.Fatal("corruption hidden", err)
 		}
 	}
@@ -134,15 +135,15 @@ func TestSoilCatalogueReadonlyNonoverwriteCorruptionWarmRetryRestart(t *testing.
 	if err := file.Close(); err != nil {
 		t.Fatal(err)
 	}
-	for _, read := range []func() ([]SoilCodeChoice, error){service.ListGreatGroupChoices, service.ListSubgroupChoices} {
-		if rows, err := read(); err != nil || len(rows) == 0 {
+	for _, read := range []func(context.Context) ([]SoilCodeChoice, error){service.ListGreatGroupChoices, service.ListSubgroupChoices} {
+		if rows, err := read(context.Background()); err != nil || len(rows) == 0 {
 			t.Fatal("exact byte restoration warm retry failed", err)
 		}
 	}
 	if err := service.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.ListGreatGroupChoices(); err == nil || !strings.Contains(err.Error(), "closed") {
+	if _, err := service.ListGreatGroupChoices(context.Background()); err == nil || !strings.Contains(err.Error(), "closed") {
 		t.Fatal("closed list success")
 	}
 	if err := service.Close(); err != nil {
@@ -169,12 +170,12 @@ func TestSoilCataloguePerCallProvenanceFailureAndConcurrentClose(t *testing.T) {
 	defer service.Close()
 	old := service.provenance
 	service.provenance.TypedCellsSHA256 = strings.Repeat("0", 64)
-	if _, err := service.ListSubgroupChoices(); err == nil {
+	if _, err := service.ListSubgroupChoices(context.Background()); err == nil {
 		t.Fatal("bad stored fidelity hidden")
 	}
 	service.provenance = old
 	service.provenance.Rows--
-	if _, err := service.ListGreatGroupChoices(); err == nil {
+	if _, err := service.ListGreatGroupChoices(context.Background()); err == nil {
 		t.Fatal("bad count hidden")
 	}
 	service.provenance = old
@@ -184,7 +185,7 @@ func TestSoilCataloguePerCallProvenanceFailureAndConcurrentClose(t *testing.T) {
 		go func() {
 			defer group.Done()
 			for j := 0; j < 3; j++ {
-				if _, err := service.ListSubgroupChoices(); err != nil && !strings.Contains(err.Error(), "closed") {
+				if _, err := service.ListSubgroupChoices(context.Background()); err != nil && !strings.Contains(err.Error(), "closed") {
 					t.Error(err)
 				}
 			}

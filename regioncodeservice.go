@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	_ "embed"
 	"errors"
 	"sync"
@@ -44,13 +45,15 @@ func (s *RegionCodeService) Close() error {
 	return nil
 }
 
-func (s *RegionCodeService) listChoices(list string, limit int) ([]RegionCodeChoice, error) {
-	s.mu.Lock()
+func (s *RegionCodeService) listChoices(ctx context.Context, list string, limit int) ([]RegionCodeChoice, error) {
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return nil, err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return nil, errors.New("region code catalogue is closed")
 	}
-	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.RegionProfile(), "region code", list, false)
+	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.RegionProfile(), "region code", list, false)
 	if err != nil {
 		return nil, err
 	}
@@ -69,20 +72,22 @@ func (s *RegionCodeService) listChoices(list string, limit int) ([]RegionCodeCho
 	return result, nil
 }
 
-func (s *RegionCodeService) ListRegionChoices() ([]RegionCodeChoice, error) {
-	return s.listChoices("Region", 7)
+func (s *RegionCodeService) ListRegionChoices(ctx context.Context) ([]RegionCodeChoice, error) {
+	return s.listChoices(ctx, "Region", 7)
 }
 
-func (s *RegionCodeService) ReloadCatalogue() error {
-	s.mu.Lock()
+func (s *RegionCodeService) ReloadCatalogue(ctx context.Context) error {
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return errors.New("region code catalogue is closed")
 	}
-	_, err := s.cache.choices(s.path, s.provenance, listcatalog.RegionProfile(), "region code", "", true)
+	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.RegionProfile(), "region code", "", true)
 	return err
 }
 
-func (s *RegionCodeService) ListEcosectionChoices() ([]RegionCodeChoice, error) {
-	return s.listChoices("Ecosection", 3)
+func (s *RegionCodeService) ListEcosectionChoices(ctx context.Context) ([]RegionCodeChoice, error) {
+	return s.listChoices(ctx, "Ecosection", 3)
 }

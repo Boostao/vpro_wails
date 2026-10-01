@@ -172,8 +172,14 @@ Project browse/hierarchy and all four reference read methods now also receive
 injected contexts; coordinator and snapshot lock waits observe cancellation.
 Browse/hierarchy generations and species searches cancel superseded requests and
 reject stale results. Native generated browse/species promises interrupt SQLite
-and recover unchanged. Catalogue and state/discovery cancellation is still pending,
-so C3 is not complete.
+and recover unchanged. The five shared Parent/Geology/Soil/Region/Site catalogue
+services now use injected contexts for queued locks, verification SQL and cloning;
+their field/reference consumers cancel supersession/unmount and forced Retry reads.
+Native checks preserve metadata, invalid drafts and every fixture database/config
+byte. Synchronous file reads are checked before/after, not promised interruptible.
+Cancellation acknowledgements alone are handled; corruption errors from cancelled
+reads remain visible. BEC/Quality/Working Unit and state/discovery cancellation
+remain pending, so C3 is not complete.
 See C1-C5 in
 [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for bounded performance/cleanup gates,
 including incremental packages and optional typed catalogue transport consolidation.

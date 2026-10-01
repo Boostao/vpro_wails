@@ -38,7 +38,7 @@ between shells.
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current and candidate executables contain the same verified default-on payload:
   `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`, SHA256
-  `1c6487a7ee168b4ddac3d38930e840961d21065ff8fedf3c13382c3f5ce8e856`.
+  `a2285ce37861acd7691be24351bdced9ca7eecef001eb3b5611dd97ca39564ef`.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -135,7 +135,21 @@ between shells.
   exited and inspector9392 closed. Scoped fallback e3bfec43... sealed there as
   vpro-scoped-read-verified.exe. Failed probe3076 was explicitly cancelled/closed,
   both project/reference bytes restored; its receipt is retained.
-  C3 remains open for catalogue and state/discovery reads and frontend ownership.
+- C3c shared Parent/Geology/Soil/Region/Site reads are implemented, tested and
+  promoted. Injected contexts cover queued exclusive locks, verification SQL
+  and snapshot cloning. Six field/reference consumers cancel owned lookup and
+  Retry promises on refresh/dispose; stale state and mutation behavior stay intact.
+  Focused race4.518s/full race346.630s;144 frontend tests/check0/0/build; bindings
+  remain15/104/33. Native five generated reload cancellations/recovery,
+  supersession/disposal and corrupt/restored Retry retain invalid drafts and all
+  database/audit/config/support bytes. Short native scans prove transport ownership,
+  not mid-SQL interruption; synchronous file reads only check context before/after.
+  Non-cancellation corruption errors remain visible, including cancelled reads.
+  Failed overly strict probe assertion/cleanup receipt is retained.
+  Catalogue-native/catalogue-promotion receipts are in native-read-cancel;
+  owned PID3036 exited and inspector9392 closed. Browse fallback1c6487... is sealed
+  there as vpro-browse-read-verified.exe. C3 remains open for BEC/Quality/Working Unit
+  and state/discovery reads and their frontend ownership.
 - Verified writable parent coverage: **77/98**. Full storage mapping and source
   layout are not full FS882 or application parity.
 - Responsive FS882 presentation is complete across all five source pages,
@@ -277,9 +291,10 @@ Peer-review follow-up is tracked in MIGRATION_PLAN.md C1-C5: C1 session-owned pl
 pool and coordinated ownership and C2 shared catalogue verification cache are delivered;
 cancellation through active bindings/SQL/frontend read promises alongside affected
 paths. Package extraction and optional typed catalogue transport follow incrementally
-between milestones, not as a broad rewrite. C3a scoped and C3b browse/reference reads are delivered;
+between milestones, not as a broad rewrite. C3a scoped, C3b browse/reference and
+C3c shared-catalogue reads are delivered;
 the rest of C3 and C4-C5 are pending. The promoted executable contains verified
-F1-F3 plus C1 pooling/C2 caching/C3a-C3b retrieval cancellation.
+F1-F3 plus C1 pooling/C2 caching/C3a-C3c retrieval cancellation.
 Then resume ordinary surveyor/depth/cover/note fields. The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage has explicit LimitToList=NotDefault and needs a distinct membership

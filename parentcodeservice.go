@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	_ "embed"
 	"errors"
 	"fmt"
@@ -45,17 +46,19 @@ func (s *ParentCodeService) Close() error {
 	return nil
 }
 
-func (s *ParentCodeService) ListChoices(listName string) ([]ParentCodeChoice, error) {
+func (s *ParentCodeService) ListChoices(ctx context.Context, listName string) ([]ParentCodeChoice, error) {
 	maximum, supported := parentCodeListMaximum(listName)
 	if !supported {
 		return nil, fmt.Errorf("unsupported parent code list %q", listName)
 	}
-	s.mu.Lock()
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return nil, err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return nil, errors.New("parent code catalogue is closed")
 	}
-	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.ParentProfile(), "parent code", listName, false)
+	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.ParentProfile(), "parent code", listName, false)
 	if err != nil {
 		return nil, fmt.Errorf("parent code catalogue: %w", err)
 	}
@@ -66,13 +69,15 @@ func (s *ParentCodeService) ListChoices(listName string) ([]ParentCodeChoice, er
 	return result, nil
 }
 
-func (s *ParentCodeService) ReloadCatalogue() error {
-	s.mu.Lock()
+func (s *ParentCodeService) ReloadCatalogue(ctx context.Context) error {
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return errors.New("parent code catalogue is closed")
 	}
-	_, err := s.cache.choices(s.path, s.provenance, listcatalog.ParentProfile(), "parent code", "", true)
+	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.ParentProfile(), "parent code", "", true)
 	return err
 }
 

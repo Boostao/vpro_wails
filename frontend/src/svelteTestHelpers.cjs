@@ -16,6 +16,15 @@ function serverComponent(source, filename, dependencies) {
     module, exports: module.exports,
     require(name) {
       if (name in dependencies) return dependencies[name];
+      if (name === './catalogueLookup' && './qualityEditor' in dependencies) {
+        return loadTypeScript('catalogueLookup.ts', {
+          './qualityEditor': dependencies['./qualityEditor'],
+          './readRequests': { ReadRequests: class {
+            track(request) { return request; }
+            cancelAll() {}
+          } }
+        });
+      }
       if (name === 'svelte' || name.startsWith('svelte/')) return require(name);
       if (name === './FieldGuidance.svelte') return { default: serverComponent(
         readFileSync(path.join(__dirname, 'FieldGuidance.svelte'), 'utf8'), 'FieldGuidance.svelte', {}) };

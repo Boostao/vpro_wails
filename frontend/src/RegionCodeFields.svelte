@@ -3,7 +3,8 @@
   import { RegionCodeService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
   import FieldGuidance from './FieldGuidance.svelte';
-  import { QualityLookup, type PlotQualityChoice } from './qualityEditor';
+  import type { PlotQualityChoice } from './qualityEditor';
+  import { CatalogueLookup } from './catalogueLookup';
   import { regionCodeKey, regionCodeKeys, regionCodeLabels, regionCodeList, regionCodeGroups,
     regionCodeDefinitions, regionCodeSuggestions, regionCodesChanged, regionCodeLengthError,
     regionCodeFieldError, regionCodeWarnings, regionCodeValidation, regionCodeAcknowledged,
@@ -18,15 +19,15 @@
   } = $props();
   const editingEnabled = import.meta.env.VITE_REGION_CODES_EDITING !== 'false';
   const listId = $props.id();
-  const regionLookup = new QualityLookup(async (force) => {
-    if (force) await RegionCodeService.ReloadCatalogue();
-    const rows = await RegionCodeService.ListRegionChoices();
+  const regionLookup = new CatalogueLookup(async (force, requests) => {
+    if (force) await requests.track(RegionCodeService.ReloadCatalogue());
+    const rows = await requests.track(RegionCodeService.ListRegionChoices());
     if (rows === null) throw new Error('Region service did not return choice rows.');
     return rows;
   }, next => { region = next; }, 'Region');
-  const ecosectionLookup = new QualityLookup(async (force) => {
-    if (force) await RegionCodeService.ReloadCatalogue();
-    const rows = await RegionCodeService.ListEcosectionChoices();
+  const ecosectionLookup = new CatalogueLookup(async (force, requests) => {
+    if (force) await requests.track(RegionCodeService.ReloadCatalogue());
+    const rows = await requests.track(RegionCodeService.ListEcosectionChoices());
     if (rows === null) throw new Error('Ecosection service did not return choice rows.');
     return rows;
   }, next => { ecosection = next; }, 'Ecosection');

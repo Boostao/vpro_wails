@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"context"
 	"github.com/boostao/vpro-wails/internal/listcatalog"
 )
 
@@ -45,7 +46,7 @@ func TestCatalogueCacheWarmAllListsAvoidHashesScansAndCloneMetadata(t *testing.T
 			if _, supported := parentCodeListMaximum(definition.Name); !supported {
 				continue
 			}
-			rows, err := service.ListChoices(definition.Name)
+			rows, err := service.ListChoices(context.Background(), definition.Name)
 			if err != nil || len(rows) != definition.Rows {
 				t.Fatalf("warm %s: %d %v", definition.Name, len(rows), err)
 			}
@@ -64,7 +65,7 @@ func TestCatalogueCacheWarmAllListsAvoidHashesScansAndCloneMetadata(t *testing.T
 					*row.Flag = !*row.Flag
 				}
 			}
-			again, err := service.ListChoices(definition.Name)
+			again, err := service.ListChoices(context.Background(), definition.Name)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -85,7 +86,7 @@ func TestCatalogueCacheReplacementMissingFailureRestorationAndForcedRetry(t *tes
 		t.Fatal(err)
 	}
 	defer service.Close()
-	original, err := service.ListBedrockChoices()
+	original, err := service.ListBedrockChoices(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,36 +98,36 @@ func TestCatalogueCacheReplacementMissingFailureRestorationAndForcedRetry(t *tes
 	if err := os.Rename(replacement, service.path); err != nil {
 		t.Fatal("idle catalogue handle prevented replacement", err)
 	}
-	rows, err := service.ListBedrockChoices()
+	rows, err := service.ListBedrockChoices(context.Background())
 	if err != nil || !reflect.DeepEqual(rows, original) || service.cache.checksums != checksums+1 {
 		t.Fatal("replacement was not reverified", err)
 	}
 	if err := os.Remove(service.path); err != nil {
 		t.Fatal("idle catalogue handle prevented removal", err)
 	}
-	if rows, err := service.ListBedrockChoices(); err == nil || rows != nil {
+	if rows, err := service.ListBedrockChoices(context.Background()); err == nil || rows != nil {
 		t.Fatal("missing catalogue returned stale choices")
 	}
 	if err := os.WriteFile(service.path, []byte("corrupt"), 0600); err != nil {
 		t.Fatal(err)
 	}
 	for i := 0; i < 2; i++ {
-		if rows, err := service.ListBedrockChoices(); err == nil || rows != nil || !strings.Contains(err.Error(), "checksum") {
+		if rows, err := service.ListBedrockChoices(context.Background()); err == nil || rows != nil || !strings.Contains(err.Error(), "checksum") {
 			t.Fatal("failed verification returned stale choices", err)
 		}
 	}
 	if err := os.WriteFile(service.path, geologyCodeDatabase, 0600); err != nil {
 		t.Fatal(err)
 	}
-	if err := service.ReloadCatalogue(); err != nil {
+	if err := service.ReloadCatalogue(context.Background()); err != nil {
 		t.Fatal("restoration retry failed", err)
 	}
-	rows, err = service.ListBedrockChoices()
+	rows, err = service.ListBedrockChoices(context.Background())
 	if err != nil || !reflect.DeepEqual(rows, original) {
 		t.Fatal("restored metadata changed", err)
 	}
 	checksums = service.cache.checksums
-	if err := service.ReloadCatalogue(); err != nil || service.cache.checksums != checksums+1 {
+	if err := service.ReloadCatalogue(context.Background()); err != nil || service.cache.checksums != checksums+1 {
 		t.Fatal("explicit Retry did not force verification", err)
 	}
 }
@@ -137,7 +138,7 @@ func TestCatalogueCacheIndistinguishableMetadataNeverReadsUnverifiedRows(t *test
 		t.Fatal(err)
 	}
 	defer service.Close()
-	expected, err := service.ListGreatGroupChoices()
+	expected, err := service.ListGreatGroupChoices(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,14 +152,14 @@ func TestCatalogueCacheIndistinguishableMetadataNeverReadsUnverifiedRows(t *test
 	if err != nil {
 		t.Fatal(err)
 	}
-	actual, err := service.ListGreatGroupChoices()
+	actual, err := service.ListGreatGroupChoices(context.Background())
 	if err != nil || !reflect.DeepEqual(expected, actual) {
 		t.Fatal("warm lookup queried unverified disk data", err)
 	}
-	if err := service.ReloadCatalogue(); err == nil || !strings.Contains(err.Error(), "checksum") {
+	if err := service.ReloadCatalogue(context.Background()); err == nil || !strings.Contains(err.Error(), "checksum") {
 		t.Fatal("forced verification hid indistinguishable-metadata corruption", err)
 	}
-	if rows, err := service.ListGreatGroupChoices(); err == nil || rows != nil {
+	if rows, err := service.ListGreatGroupChoices(context.Background()); err == nil || rows != nil {
 		t.Fatal("failed Retry returned a stale successful snapshot")
 	}
 }
@@ -177,12 +178,12 @@ func TestCatalogueCacheConcurrentLookupReloadAndClose(t *testing.T) {
 		warm.Add(1)
 		go func() {
 			defer wait.Done()
-			if _, err := service.ListRegionChoices(); err != nil {
+			if _, err := service.ListRegionChoices(context.Background()); err != nil {
 				warm.Done()
 				errs <- err
 				return
 			}
-			if err := service.ReloadCatalogue(); err != nil {
+			if err := service.ReloadCatalogue(context.Background()); err != nil {
 				warm.Done()
 				errs <- err
 				return
@@ -190,12 +191,12 @@ func TestCatalogueCacheConcurrentLookupReloadAndClose(t *testing.T) {
 			warm.Done()
 			<-start
 			for i := 0; i < 20; i++ {
-				_, err := service.ListRegionChoices()
+				_, err := service.ListRegionChoices(context.Background())
 				if err != nil && !strings.Contains(err.Error(), "closed") {
 					errs <- err
 					return
 				}
-				if err := service.ReloadCatalogue(); err != nil && !strings.Contains(err.Error(), "closed") {
+				if err := service.ReloadCatalogue(context.Background()); err != nil && !strings.Contains(err.Error(), "closed") {
 					errs <- err
 					return
 				}
@@ -215,7 +216,7 @@ func TestCatalogueCacheConcurrentLookupReloadAndClose(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	if err := service.ReloadCatalogue(); err == nil || !strings.Contains(err.Error(), "closed") {
+	if err := service.ReloadCatalogue(context.Background()); err == nil || !strings.Contains(err.Error(), "closed") {
 		t.Fatal("closed cache reloaded")
 	}
 }
@@ -235,11 +236,11 @@ func BenchmarkCatalogueCacheParentChoices(b *testing.B) {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				if force {
-					if err := service.ReloadCatalogue(); err != nil {
+					if err := service.ReloadCatalogue(context.Background()); err != nil {
 						b.Fatal(err)
 					}
 				}
-				if _, err := service.ListChoices("HumusForm"); err != nil {
+				if _, err := service.ListChoices(context.Background(), "HumusForm"); err != nil {
 					b.Fatal(err)
 				}
 			}

@@ -3,7 +3,8 @@
   import { SiteCodeService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
   import FieldGuidance from './FieldGuidance.svelte';
-  import { QualityLookup, type PlotQualityChoice } from './qualityEditor';
+  import type { PlotQualityChoice } from './qualityEditor';
+  import { CatalogueLookup } from './catalogueLookup';
   import { siteCodeKey, siteCodeKeys, siteCodeLabels, siteCodeList, siteCodeGroups, siteCodeDefinitions,
     siteCodeSuggestions, siteCodesChanged, siteCodeLengthError, siteCodeFieldError, siteCodeWarnings,
     siteCodeValidation, siteCodeAcknowledged, rememberSiteCodeAcknowledgement, type SiteCodes } from './siteCodeEditor';
@@ -17,15 +18,15 @@
   } = $props();
   const editingEnabled = import.meta.env.VITE_SITE_CODES_EDITING !== 'false';
   const listId = $props.id();
-  const disturbanceLookup = new QualityLookup(async (force) => {
-    if (force) await SiteCodeService.ReloadCatalogue();
-    const rows = await SiteCodeService.ListSiteDisturbanceChoices();
+  const disturbanceLookup = new CatalogueLookup(async (force, requests) => {
+    if (force) await requests.track(SiteCodeService.ReloadCatalogue());
+    const rows = await requests.track(SiteCodeService.ListSiteDisturbanceChoices());
     if (rows === null) throw new Error('Disturbance service did not return choice rows.');
     return rows;
   }, next => { disturbance = next; }, 'Disturbance');
-  const exposureLookup = new QualityLookup(async (force) => {
-    if (force) await SiteCodeService.ReloadCatalogue();
-    const rows = await SiteCodeService.ListExposureChoices();
+  const exposureLookup = new CatalogueLookup(async (force, requests) => {
+    if (force) await requests.track(SiteCodeService.ReloadCatalogue());
+    const rows = await requests.track(SiteCodeService.ListExposureChoices());
     if (rows === null) throw new Error('Exposure service did not return choice rows.');
     return rows;
   }, next => { exposure = next; }, 'Exposure');

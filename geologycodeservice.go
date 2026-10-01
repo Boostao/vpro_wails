@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	_ "embed"
 	"errors"
 	"sync"
@@ -44,13 +45,15 @@ func (s *GeologyCodeService) Close() error {
 	return nil
 }
 
-func (s *GeologyCodeService) ListBedrockChoices() ([]GeologyCodeChoice, error) {
-	s.mu.Lock()
+func (s *GeologyCodeService) ListBedrockChoices(ctx context.Context) ([]GeologyCodeChoice, error) {
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return nil, err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return nil, errors.New("geology code catalogue is closed")
 	}
-	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.GeologyProfile(), "geology code", "BedrockType", false)
+	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.GeologyProfile(), "geology code", "BedrockType", false)
 	if err != nil {
 		return nil, err
 	}
@@ -70,12 +73,14 @@ func (s *GeologyCodeService) ListBedrockChoices() ([]GeologyCodeChoice, error) {
 	return result, nil
 }
 
-func (s *GeologyCodeService) ReloadCatalogue() error {
-	s.mu.Lock()
+func (s *GeologyCodeService) ReloadCatalogue(ctx context.Context) error {
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return errors.New("geology code catalogue is closed")
 	}
-	_, err := s.cache.choices(s.path, s.provenance, listcatalog.GeologyProfile(), "geology code", "", true)
+	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.GeologyProfile(), "geology code", "", true)
 	return err
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	_ "embed"
 	"errors"
 	"sync"
@@ -48,13 +49,15 @@ func (s *SiteCodeService) Close() error {
 	return nil
 }
 
-func (s *SiteCodeService) listChoices(list string) ([]SiteCodeChoice, error) {
-	s.mu.Lock()
+func (s *SiteCodeService) listChoices(ctx context.Context, list string) ([]SiteCodeChoice, error) {
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return nil, err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return nil, errors.New("site code catalogue is closed")
 	}
-	rows, err := s.cache.choices(s.path, s.provenance, listcatalog.SiteProfile(), "site code", list, false)
+	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SiteProfile(), "site code", list, false)
 	if err != nil {
 		return nil, err
 	}
@@ -84,22 +87,24 @@ func (s *SiteCodeService) listChoices(list string) ([]SiteCodeChoice, error) {
 	return result, nil
 }
 
-func (s *SiteCodeService) ListSiteDisturbanceChoices() ([]SiteCodeChoice, error) {
-	return s.listChoices("SiteDisturbance")
+func (s *SiteCodeService) ListSiteDisturbanceChoices(ctx context.Context) ([]SiteCodeChoice, error) {
+	return s.listChoices(ctx, "SiteDisturbance")
 }
 
-func (s *SiteCodeService) ReloadCatalogue() error {
-	s.mu.Lock()
+func (s *SiteCodeService) ReloadCatalogue(ctx context.Context) error {
+	if err := acquireContextLock(ctx, s.mu.TryLock, s.mu.Lock, s.mu.Unlock); err != nil {
+		return err
+	}
 	defer s.mu.Unlock()
 	if s.closed {
 		return errors.New("site code catalogue is closed")
 	}
-	_, err := s.cache.choices(s.path, s.provenance, listcatalog.SiteProfile(), "site code", "", true)
+	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SiteProfile(), "site code", "", true)
 	return err
 }
 
-func (s *SiteCodeService) ListExposureChoices() ([]SiteCodeChoice, error) {
-	return s.listChoices("Exposure")
+func (s *SiteCodeService) ListExposureChoices(ctx context.Context) ([]SiteCodeChoice, error) {
+	return s.listChoices(ctx, "Exposure")
 }
 
 func (s *PlotService) exposureChoices() ([]SiteCodeChoice, error) {
@@ -107,13 +112,13 @@ func (s *PlotService) exposureChoices() ([]SiteCodeChoice, error) {
 		return nil, s.siteCodesError
 	}
 	if s.siteCodes != nil {
-		return s.siteCodes.ListExposureChoices()
+		return s.siteCodes.ListExposureChoices(s.operationContext())
 	}
 	// Legacy constructors remain guarded without retaining an unowned DB handle.
 	catalogue, err := NewSiteCodeService(s.projects.root)
 	if err != nil {
 		return nil, err
 	}
-	rows, readErr := catalogue.ListExposureChoices()
+	rows, readErr := catalogue.ListExposureChoices(s.operationContext())
 	return rows, errors.Join(readErr, catalogue.Close())
 }

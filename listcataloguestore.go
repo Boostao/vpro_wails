@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -72,6 +73,13 @@ func openListCatalogue(dataDir, filename, label string, database, provenanceJSON
 }
 
 func (c *listCatalogueCache) choices(path string, p listcatalog.Provenance, profile listcatalog.Profile, label, list string, force bool) ([]listcatalog.Choice, error) {
+	return c.choicesContext(context.Background(), path, p, profile, label, list, force)
+}
+
+func (c *listCatalogueCache) choicesContext(ctx context.Context, path string, p listcatalog.Provenance, profile listcatalog.Profile, label, list string, force bool) ([]listcatalog.Choice, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	supported := list == ""
 	for _, definition := range profile.Lists {
 		supported = supported || definition.Name == list
@@ -90,6 +98,9 @@ func (c *listCatalogueCache) choices(path string, p listcatalog.Provenance, prof
 		if err != nil {
 			return nil, fmt.Errorf("%s catalogue: %w", label, err)
 		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		c.checksums++
 		c.bytesRead += int64(len(data))
 		if becHash(data) != p.DatabaseSHA256 {
@@ -100,10 +111,11 @@ func (c *listCatalogueCache) choices(path string, p listcatalog.Provenance, prof
 			return nil, err
 		}
 		c.validations++
-		if err := listcatalog.ValidateDatabaseFor(candidate, p, profile); err != nil {
+		reader := contextPlotDB{db: candidate, ctx: ctx}
+		if err := listcatalog.ValidateDatabaseFor(reader, p, profile); err != nil {
 			return nil, errors.Join(fmt.Errorf("%s catalogue: %w", label, err), candidate.Close())
 		}
-		rows, err := listcatalog.ReadChoicesFor(candidate, "", profile)
+		rows, err := listcatalog.ReadChoicesFor(reader, "", profile)
 		if err != nil {
 			return nil, errors.Join(fmt.Errorf("%s catalogue: %w", label, err), candidate.Close())
 		}
@@ -118,12 +130,18 @@ func (c *listCatalogueCache) choices(path string, p listcatalog.Provenance, prof
 		if err := candidate.Close(); err != nil {
 			return nil, fmt.Errorf("%s catalogue snapshot close: %w", label, err)
 		}
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		c.provenance = p
 		c.provenance.SourceSchema = append([]listcatalog.Column(nil), p.SourceSchema...)
 		c.rows, c.stamp, c.valid = rows, current, true
 	}
 	result := []listcatalog.Choice{}
 	for _, row := range c.rows {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		if list == "" || row.ListName != nil && *row.ListName == list {
 			row.Code, row.ListName, row.ListFilter = cloneCatalogueValue(row.Code), cloneCatalogueValue(row.ListName), cloneCatalogueValue(row.ListFilter)
 			row.Description, row.FieldUsedIn = cloneCatalogueValue(row.Description), cloneCatalogueValue(row.FieldUsedIn)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"strings"
 	"testing"
@@ -22,7 +23,7 @@ func TestCatalogueCacheWindowsChangeTimeDetectsSameSizePreservedModTime(t *testi
 		t.Fatal(err)
 	}
 	restoreCatalogueModTime(t, service.path, info.ModTime())
-	if rows, err := service.ListChoices("HumusForm"); err == nil || rows != nil || !strings.Contains(err.Error(), "checksum") {
+	if rows, err := service.ListChoices(context.Background(), "HumusForm"); err == nil || rows != nil || !strings.Contains(err.Error(), "checksum") {
 		t.Fatal("preserved size/modtime concealed corruption", err)
 	}
 }

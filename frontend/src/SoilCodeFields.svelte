@@ -3,7 +3,8 @@
   import { SoilCodeService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
   import FieldGuidance from './FieldGuidance.svelte';
-  import { QualityLookup, type PlotQualityChoice } from './qualityEditor';
+  import type { PlotQualityChoice } from './qualityEditor';
+  import { CatalogueLookup } from './catalogueLookup';
   import { soilCodeKey, soilCodeKeys, soilCodeColumns, soilCodeLabels, soilCodeList, soilCodeValueError,
     soilCodeDefinitions, soilCodeSuggestions, soilCodeLengthError, soilCodeBusy, soilCodeWarnings,
     soilCodeValidation, soilCodeAcknowledged, rememberSoilCodeAcknowledgement,
@@ -16,15 +17,15 @@
     children: Snippet<[{ columns: readonly string[]; input: Snippet<[PaperControl, string]> } | undefined]>;
   } = $props();
   const editingEnabled = import.meta.env.VITE_SOIL_CODES_EDITING !== 'false';
-  const groupLookup = new QualityLookup(async (force) => {
-    if (force) await SoilCodeService.ReloadCatalogue();
-    const rows = await SoilCodeService.ListGreatGroupChoices();
+  const groupLookup = new CatalogueLookup(async (force, requests) => {
+    if (force) await requests.track(SoilCodeService.ReloadCatalogue());
+    const rows = await requests.track(SoilCodeService.ListGreatGroupChoices());
     if (rows === null) throw new Error('Soil great-group service did not return reference rows.');
     return rows;
   }, next => { group = next; }, 'Soil great group');
-  const subgroupLookup = new QualityLookup(async (force) => {
-    if (force) await SoilCodeService.ReloadCatalogue();
-    const rows = await SoilCodeService.ListSubgroupChoices();
+  const subgroupLookup = new CatalogueLookup(async (force, requests) => {
+    if (force) await requests.track(SoilCodeService.ReloadCatalogue());
+    const rows = await requests.track(SoilCodeService.ListSubgroupChoices());
     if (rows === null) throw new Error('Soil subgroup service did not return reference rows.');
     return rows;
   }, next => { subgroup = next; }, 'Soil subgroup');

@@ -94,7 +94,7 @@ export class QualityLookup {
   private disposed = false;
   private view: QualityView = { choices: [], busy: false, ready: false, error: null };
   constructor(private fetch: (force: boolean) => Promise<PlotQualityChoice[]>, private state: (view: QualityView) => void,
-    private label = 'Quality') {}
+    private label = 'Quality', private cancel?: () => void) {}
   snapshot(): QualityView { return { ...this.view }; }
   private publish(update: Partial<QualityView>): void {
     this.view = { ...this.view, ...update };
@@ -103,6 +103,7 @@ export class QualityLookup {
   async refresh(force = false): Promise<void> {
     if (this.disposed) return;
     const revision = ++this.revision;
+    this.cancel?.();
     this.publish({ choices: [], busy: true, ready: false, error: null });
     try {
       const choices = await this.fetch(force);
@@ -114,5 +115,5 @@ export class QualityLookup {
       this.publish({ busy: false, ready: false, error: `${this.label} choices could not be loaded: ${String(cause)}` });
     }
   }
-  dispose(): void { this.disposed = true; this.revision++; }
+  dispose(): void { this.disposed = true; this.revision++; this.cancel?.(); }
 }
