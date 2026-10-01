@@ -23,12 +23,12 @@ func childFixture(t *testing.T) (*PlotService, *sql.DB) {
 	}
 	service := NewPlotService(projects)
 	service.SetCurrentUser("ChildTester")
-	db, _, err := service.getActiveDB()
+	db, _, release, err := service.getActiveDB()
 	if err != nil {
 		t.Fatal(err)
 	}
 	db.SetMaxOpenConns(1)
-	t.Cleanup(func() { db.Close() })
+	t.Cleanup(release)
 	for _, plot := range []string{"CHILD1", "CHILD2"} {
 		if err := service.CreatePlot(FS882Header{PlotNumber: plot}); err != nil {
 			t.Fatal(err)

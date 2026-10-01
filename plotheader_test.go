@@ -18,12 +18,12 @@ func headerFixture(t *testing.T) (*PlotService, *sql.DB) {
 	service := NewPlotService(projects)
 	service.SetAuditStrength(3)
 	service.SetCurrentUser("HeaderTester")
-	db, _, err := service.getActiveDB()
+	db, _, release, err := service.getActiveDB()
 	if err != nil {
 		t.Fatal(err)
 	}
 	db.SetMaxOpenConns(1)
-	t.Cleanup(func() { db.Close() })
+	t.Cleanup(release)
 	return service, db
 }
 

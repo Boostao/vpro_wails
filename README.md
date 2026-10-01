@@ -29,7 +29,11 @@ uses connection-owned SQLite attachments/TEMP views, without an offline
 extension dependency. See the compact F1-F3 gates in [MIGRATION_PLAN.md](MIGRATION_PLAN.md).
 
 The active bootstrap owns a pinned readonly SQLite coordinator; verified writers
-use separate transactions against the selected project file. ContextService binds
+use a context-owned project pool and separate transactions against the selected
+project file. Plot reads and writes borrow that same pool instead of opening and
+closing it per call. Its two-connection bound, per-connection foreign keys and
+five-second busy policy are tested; switch/shutdown close the pool after leases
+complete. ContextService binds
 editor reads/writes to an immutable context identity and blocks switching while an
 operation is running. Candidate validation and YAML persistence precede publication;
 failure retains the previous context. Legacy unscoped mutation/switch APIs cannot
@@ -137,10 +141,14 @@ Native inspection is off by default. For disposable debugging only,
 `VPRO_WEBVIEW_DEBUG_PORT` accepts a loopback port from 1024 to 65535. Use one isolated
 config/WebView profile per simultaneous instance; never expose the inspector.
 
-Backend pooling, shared catalogue verification caching and end-to-end read
-cancellation are planned follow-ups, not delivered optimizations. The current
-context coordinator is long-lived, but plot operations still open direct project
-pools per call; catalogue lookups still rehash/revalidate. See C1-C5 in
+Session-owned PlotService pooling is implemented and verified. Repeated warm
+header reads reuse one idle connection; a bounded backend benchmark measured
+0.38-0.40ms/read versus3.39-3.69ms for the retained per-operation adapter on this
+machine. This is not a frontend latency or contention guarantee. Native warm
+reads, same-name project switching, stale rejection and close preserve fixture
+data/config/supports; process handles plateau after warmup.
+Shared catalogue verification caching and end-to-end read cancellation remain
+planned; catalogue lookups still rehash/revalidate. See C1-C5 in
 [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for bounded performance/cleanup gates,
 including incremental packages and optional typed catalogue transport consolidation.
 

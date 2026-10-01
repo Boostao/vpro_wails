@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -312,32 +314,59 @@ func (s *PlotService) SetCurrentUser(user string) error {
 	return nil
 }
 
-// getActiveDB returns a writable database connection for the active project.
-func (s *PlotService) getActiveDB() (*sql.DB, string, error) {
+// Callers release the borrow, not the context-owned pool.
+func (s *PlotService) getActiveDB() (*sql.DB, string, func(), error) {
+	release := func() {}
+	if !s.contextScoped {
+		s.projects.operationMu.RLock()
+		var once sync.Once
+		release = func() { once.Do(s.projects.operationMu.RUnlock) }
+	}
+	s.projects.mu.RLock()
+	coordinator := s.projects.sqlite
+	s.projects.mu.RUnlock()
+	if coordinator != nil {
+		db, err := coordinator.projectDatabase(context.Background())
+		if err != nil {
+			release()
+			return nil, "", nil, err
+		}
+		return db, coordinator.selection.Project, release, nil
+	}
 	state, err := s.projects.GetState()
 	if err != nil {
-		return nil, "", err
+		release()
+		return nil, "", nil, err
 	}
 	if state.ActiveProject == "" {
-		return nil, "", errors.New("no active project")
+		release()
+		return nil, "", nil, errors.New("no active project")
 	}
 	dbPath := state.ProjectPath
 	if dbPath == "" {
 		selected := compatibleProject(state.Projects, state.ActiveProject)
 		if selected.Name == "" {
-			return nil, "", errors.New("active project file is unavailable")
+			release()
+			return nil, "", nil, errors.New("active project file is unavailable")
 		}
 		dbPath = s.projects.projectFile(selected)
 	}
 	dbPath, err = filepath.Abs(dbPath)
 	if err != nil {
-		return nil, "", err
+		release()
+		return nil, "", nil, err
 	}
 	db, err := sql.Open("sqlite3", sqliteFileURI(dbPath, "rw")+"&_foreign_keys=on")
 	if err != nil {
-		return nil, "", err
+		release()
+		return nil, "", nil, err
 	}
-	return db, state.ActiveProject, nil
+	return db, state.ActiveProject, func() {
+		defer release()
+		if err := db.Close(); err != nil {
+			log.Printf("Warning: legacy project database could not close: %v", err)
+		}
+	}, nil
 }
 
 // RestoreAuditRecords preserves the legacy API for rows marked Restore.
@@ -352,11 +381,11 @@ func (s *PlotService) RestoreAuditRecords(plotNumber string, removeAuditRows boo
 
 // ListAuditEntries returns the audit trail for a plot.
 func (s *PlotService) ListAuditEntries(plotNumber string) ([]AuditEntry, error) {
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	defer release()
 
 	entries, err := readAuditEntries(db, project, `"PlotNumber" = ?`, plotNumber)
 	if err != nil {

@@ -30,7 +30,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 2 | Finish the staged Soil workflow (complete) | Shared source audit/Lock paths reused. Native Wails proved selection/manual entry, NULL, Undo, Lock, hidden validation, rollback/retry and actual-close lifecycle. Default-on assets match the tested payload byte-for-byte; explicit opt-out builds. Coverage is53/98 with source gaps/adaptations documented. |
 | 3 | Consolidate ordinary code editing (complete) | Shared nullable Unicode/reference grouping/suggestions/draft acknowledgement and Region/Soil write/restore guards preserve public APIs, source positions and field-specific policies. All117 frontend tests/check/build, focused Go/full race and actual Wails rollback/close regression pass. New groups reuse definitions/fixtures, not copied validators. |
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
-| 4a | Bounded backend ownership/performance follow-up (planned) | Complete C1-C2 below with measured pool/hash reuse, preserved corruption/Retry behavior and native switch/close regression. C3 cancellation follows affected retrieval paths; C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve the promoted F1-F3 baseline. |
+| 4a | Bounded backend ownership/performance follow-up (C1 complete; C2 next) | Context-owned plot pooling, measured warm reuse and native switch/close pass. Complete C2 below with measured hash reuse and preserved corruption/Retry behavior. C3 cancellation follows affected retrieval paths; C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines. |
 | 5 | Complete remaining FS882 parent workflows (checkpointed at77/98) | Responsive presentation and21 ordinary-code editors are native-verified and default-on. After the foundation gate, continue remaining21 columns by source/event semantics. Classify controls as verified, intentionally adapted, read-only or blocked; cover calculations, coordinates, notes and pictures explicitly. |
 | 6 | Complete FS882 child workflows | Vegetation/species/cover/height, Humus, Mineral and Other support their actual add/edit/delete/validation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
@@ -211,20 +211,22 @@ Installing a family does not enable its unavailable domain workflows.
 ## Backend peer-review follow-up
 
 Reviewed against the integrated F1-F3 implementation,2026-10-01. These are
-planned improvements, not claims that pooling, checksum caching or cancellation
-are already implemented. Preserve the delivered baseline and keep this work
+bounded improvements. C1 pooling is implemented/verified; checksum caching and
+end-to-end cancellation remain planned. Preserve sealed baselines and keep this work
 bounded; do not reopen the foundation as a general framework rewrite.
 
 ### Confirmed findings and design decisions
 
-- [PlotService.getActiveDB](plotservice.go) still opens a writable `*sql.DB`
-  per operation, and header/child/height/audit callers close it. ContextService
-  already owns identity checks and operation leases, but its immutable PlotService
-  snapshot does not provide a session pool. File-handle churn is confirmed by code;
-  latency and busy/lock improvements must be measured, not assumed.
+- [PlotService.getActiveDB](plotservice.go) now borrows the context's project pool;
+  header/child/height/audit callers release the borrow, not the pool. Scoped
+  snapshots retain the outer operation lease; legacy active-app reads acquire a
+  lease for their borrow without recursive locking. The retained non-context test
+  adapter still owns/closes its per-operation pool explicitly.
 - [sqliteContext](sqlitecontext.go) already owns the pinned readonly coordinator;
-  project-list/hierarchy reads use it. Plot detail/child/audit reads still take the
-  direct-file path. Unify **ownership and access contracts**, not every operation
+  project-list/hierarchy reads use it. Plot detail/child/audit queries intentionally
+  retain physical project semantics through the same context-owned project pool:
+  replacing them with SU-filtered TEMP views would change their existing behavior.
+  Unify **ownership and access contracts**, not every operation
   onto one SQL connection: retain readonly support attachments/TEMP views and a
   separate, session-owned project writer. Data and audits stay in one project
   transaction; no support writes, distributed transaction or journal-mode change.
@@ -249,13 +251,13 @@ bounded; do not reopen the foundation as a general framework rewrite.
 
 | Gate | Bounded implementation | Acceptance and preservation |
 | --- | --- | --- |
-| C1: Session-owned database access | Give the context owner a managed project writer pool, borrowed by scoped PlotService snapshots without caller-owned Close. Move compatible plot reads to readonly coordinator/query interfaces, qualifying physical project names or using the intended TEMP views. Keep legacy test adapters explicit. | Repeated reads/writes reuse the same session pool; configure/test bounded connections and per-connection foreign keys/busy policy. Candidate failure closes only candidate resources; switch/shutdown wait for operation leases and close owned resources once. Test same-name/external/shared-file selection, concurrency, cancellation, data/audit rollback, restoration and stale calls. Record opens/DB stats and Windows handle behavior under a repeatable warm workload. Native Save/Discard/Cancel, locked-config retry and file release/reopen pass. No claim that more pooled connections reduce SQLite contention. |
+| C1: Session-owned database access (complete) | Context owns a lazily initialized project pool; all plot read/write callers release borrows instead of closing it. Filtered browse/hierarchy reads remain on the readonly coordinator; detail/child/audit queries retain physical project scope on its owned pool, avoiding an unverified filter change. Legacy test adapters remain explicit. | Serial100 warm reads/capability calls reuse one idle connection; concurrent24x10 reads remain within two connections. Both connections retain foreign_keys=1/busy_timeout=5000. Failed publication retains the original pool; switch/shutdown retire it after leases; unscoped read borrows block switch and release once. Pooled audit failure rolls back data/history and retry adds exactly one audit. Full race root357.549s and focused pool tests2.304s pass. Native500 reads, managed/external switch, stale rejection and clean close preserve all fixture data/supports and final YAML; handles plateau442/446/446/446 over400 reads. Three100-read backend runs: pooled0.38-0.40ms versus retained adapter3.39-3.69ms. Existing F3 Save/Discard/Cancel UI is unchanged and its proven domain paths are reused; cancellation propagation remains C3, not claimed here. |
 | C2: Shared catalogue verification cache | Cache successful provenance/profile validation at mount; avoid full-file hashing and schema scans for unchanged warm lookups. Invalidate on file identity/size/modtime change and provide forced revalidation for explicit Retry. Use synchronized shared-store ownership; re-open/validate changed files rather than reading an old handle after replacement. | Instrument warm lookups to prove zero additional full-file hashes/profile scans after mount. Preserve typed NULL/empty/duplicate metadata, field-specific selectability and fail-closed errors. Existing corruption/non-overwrite/warm-Retry/restart tests still pass; add concurrent lookup/revalidation/Close, replacement, same-size corruption, missing file and restoration cases. Metadata-only invalidation is not a cryptographic guarantee when size/time are deliberately preserved: define and test that limitation or use an immutable verified snapshot/stronger invalidation policy before changing the current integrity contract. Measure cold/warm latency and bytes read; do not cache failures indefinitely or silently return old choices. |
 | C3: End-to-end retrieval cancellation | Add injected contexts first to active scoped reads, project/hierarchy reads and catalogue reads; pass them through QueryContext/QueryRowContext and helper interfaces. Retain/cancel generated read promises on supersession/unmount, with cancellation-aware lease acquisition where waiting is possible. | Native Wails proves explicit promise cancellation reaches SQLite, closes rows/releases leases and leaves data/audits untouched; subsequent valid reads still succeed and stale results remain rejected. Regenerate real bindings and test argument/model compatibility, remount and context switching. Expected cancelled reads are handled deliberately, not surfaced as permanent draft errors or swallowed as success. Do not automatically cancel Save/Lock mid-commit or add implicit write retries; mutation/switch cancellation requires a separate atomic rollback/commit contract. |
 | C4: Incremental package seams | Between validated milestones, extract shared catalogue storage first, then self-contained config/coordinator/domain logic into internal packages as useful. Keep main for composition/service registration and thin Wails adapters; preserve exported DTOs and existing helpers during migration. | One cohesive extraction per checkpoint, no dependency cycles or global singleton state. Preserve public bindings, localization/errors, embedded asset ownership and legacy adapters; focused tests then full race at integration. No simultaneous package move, API replacement and behavior change. Existing internal/listcatalog is prior art, not something to recreate. |
 | C5: Optional catalogue transport consolidation | After shared internals/policies are stable, evaluate a typed CatalogService with allowlisted domain/list identifiers; retain existing services as compatibility adapters until callers migrate. Implement only if it measurably reduces transport/maintenance duplication. | Unsupported domains/lists fail explicitly; no arbitrary SQL/file selection. Preserve provenance, nullable/duplicate metadata, per-field UTF-16 bounds, strict versus permissive membership, independent failures/Retry and typed return shapes. Real bindings/frontend/native lookup regressions pass; frozen catalogues remain read models, never replacements for the canonical database family. |
 
-Implement C1 and C2 as separate small checkpoints before further editor expansion;
+C1 is complete; implement C2 as the next small checkpoint before further editor expansion;
 wire C3 along affected retrieval paths without coupling it to an all-service rewrite.
 C4/C5 fit between subsequent validated workflows and do not block parent migration
 merely to reduce file/service counts. Run focused Go tests/benchmarks first, full
@@ -330,7 +332,7 @@ Bindings:15 services/99 methods/33 models. Recovery retains configuration and
 requires explicit correction/restart; it is not automatic repair.
 No pending writes or owned native process need continuation.
 
-Next complete the bounded C1/C2 backend follow-up, with C3 cancellation on the
+Next complete the bounded C2 catalogue follow-up, with C3 cancellation on the
 affected retrieval paths, then classify and implement the remaining ordinary surveyor/text/
 depth/cover/note fields from the already sealed source checklist. Do not repeat
 reference capture or field-by-field audit matrices. Remaining21: AirPhotoNum, BECSiteUnit, EnteredBy,

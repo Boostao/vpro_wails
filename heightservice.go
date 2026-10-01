@@ -145,11 +145,11 @@ func (s *PlotService) UpdateHeightRecords(plotNumber string, updates []HeightRec
 	if err != nil {
 		return err
 	}
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return err
 	}
-	defer db.Close()
+	defer release()
 	tx, err := db.Begin()
 	if err != nil {
 		return err

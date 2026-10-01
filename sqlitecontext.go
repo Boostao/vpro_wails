@@ -17,6 +17,7 @@ type sqliteContext struct {
 	mu           sync.Mutex
 	db           *sql.DB
 	conn         *sql.Conn
+	projectDB    *sql.DB
 	selection    desktopSelection
 	attachments  map[string]string
 	descriptions map[string][]map[string]any
@@ -31,6 +32,28 @@ func sqliteFileURI(path, mode string) string {
 	query := url.Values{"mode": {mode}}
 	address.RawQuery = query.Encode()
 	return address.String()
+}
+
+func (c *sqliteContext) projectDatabase(ctx context.Context) (*sql.DB, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.conn == nil {
+		return nil, errors.New("project context is closed")
+	}
+	if c.projectDB != nil {
+		return c.projectDB, nil
+	}
+	db, err := sql.Open("sqlite3", sqliteFileURI(c.selection.ProjectPath, "rw")+"&_foreign_keys=on&_busy_timeout=5000")
+	if err != nil {
+		return nil, err
+	}
+	db.SetMaxOpenConns(2)
+	db.SetMaxIdleConns(2)
+	if err := db.PingContext(ctx); err != nil {
+		return nil, errors.Join(err, db.Close())
+	}
+	c.projectDB = db
+	return db, nil
 }
 
 func existingDatabasePath(path string) (string, error) {
@@ -393,7 +416,12 @@ func (c *sqliteContext) Close() error {
 	if c.conn == nil {
 		return nil
 	}
-	err := errors.Join(c.conn.Close(), c.db.Close())
+	var projectErr error
+	if c.projectDB != nil {
+		projectErr = c.projectDB.Close()
+	}
+	err := errors.Join(projectErr, c.conn.Close(), c.db.Close())
 	c.conn, c.db = nil, nil
+	c.projectDB = nil
 	return err
 }

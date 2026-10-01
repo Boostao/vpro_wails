@@ -62,11 +62,11 @@ func TestPlotService_AtomicSaveAndAudit(t *testing.T) {
 	}
 
 	// 4. Verify audit entries
-	db, _, err := plotService.getActiveDB()
+	db, _, release, err := plotService.getActiveDB()
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer release()
 
 	var auditCount int
 	err = db.QueryRow(`SELECT COUNT(*) FROM "Sample_Audit" WHERE PlotNumber = 'TST001'`).Scan(&auditCount)
@@ -123,11 +123,11 @@ func TestPlotService_RollbackOnFailure(t *testing.T) {
 	}
 
 	// Attempting to insert duplicate manually into one table to simulate constraint collision
-	db, _, err := plotService.getActiveDB()
+	db, _, release, err := plotService.getActiveDB()
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer release()
 
 	var envCount, adminCount int
 	db.QueryRow(`SELECT COUNT(*) FROM "Sample_Env" WHERE PlotNumber = 'TST999'`).Scan(&envCount)

@@ -174,11 +174,11 @@ func headerCapabilities(db headerDB, project string) (map[string]bool, error) {
 // GetHeaderCapabilities returns exact DTO JSON keys, not guessed schema aliases.
 // locked is always false: the Access option is runtime UI state, not stored data.
 func (s *PlotService) GetHeaderCapabilities() (map[string]bool, error) {
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	defer release()
 	return headerCapabilities(db, project)
 }
 
@@ -209,11 +209,11 @@ func readHeader(db headerDB, project, plot string, caps map[string]bool) (*FS882
 
 // GetPlot reads supported nullable fields; unsupported properties remain nil/false.
 func (s *PlotService) GetPlot(plotNumber string) (*FS882Header, error) {
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	defer release()
 	caps, err := headerCapabilities(db, project)
 	if err != nil {
 		return nil, err
@@ -314,11 +314,11 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 	if strings.TrimSpace(h.PlotNumber) == "" {
 		return errors.New("PlotNumber is required")
 	}
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return err
 	}
-	defer db.Close()
+	defer release()
 	if err := validateBECHeaderBeforeTransaction(db, project, h, mode); err != nil {
 		return err
 	}

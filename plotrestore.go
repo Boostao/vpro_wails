@@ -392,11 +392,11 @@ func (s *PlotService) SetAuditRestoreSelection(plotNumber string, rowIDs []strin
 	if err != nil {
 		return err
 	}
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return err
 	}
-	defer db.Close()
+	defer release()
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -454,11 +454,11 @@ func (s *PlotService) restoreAuditSelection(plot string, rowIDs []string, action
 	if !marked && len(ids) == 0 {
 		return &AuditRestoreResult{}, nil
 	}
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	defer release()
 	tx, err := db.Begin()
 	if err != nil {
 		return nil, err

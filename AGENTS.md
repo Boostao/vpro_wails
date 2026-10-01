@@ -68,6 +68,10 @@ archive; consult them for a specific issue, not as a growing default prompt.
 
 ## Learnings
 
+- Scoped operations already hold the context's operation read lease; pool borrows
+  must reuse it rather than recursively taking the same RWMutex read lock, which
+  can deadlock behind a queued switch writer. Only unscoped read borrows acquire
+  their own lifetime lease; test release, queued switch and owned shutdown.
 - Build SQLite file URIs from resolved absolute paths with proper URI escaping
   (`net/url` in Go; `Path.as_uri()` in Python). Raw paths containing `#` can drop
   `mode=ro` and accidentally create a truncated-name file; prove readonly behavior

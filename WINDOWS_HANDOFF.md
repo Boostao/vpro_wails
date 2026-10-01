@@ -38,7 +38,7 @@ between shells.
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current and candidate executables contain the same verified default-on payload:
   `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`, SHA256
-  `f1c9ddd32d5d7d3bd8d1043cf965ff6a7d3085fdd4b4e58881e32c797dd140bf`.
+  `9e293175be924e03bb16cea7b62f292d5e5bb0eece2c003558eeed500f4f8872`.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -70,6 +70,20 @@ between shells.
   `Desktop.DatabasePaths` accepts explicit absolute overrides for the five support
   roles. An absent Desktop.SchemaVersion initializes to1 even with an existing
   partial Desktop overlay; explicit NULL/wrong versions still fail.
+- C1 plot pooling is implemented, tested and promoted. sqliteContext owns the
+  lazy two-connection project pool; every plot read/write releases its borrow
+  rather than closing the owner. Active hot reads no longer rediscover projects
+  per request. Foreign keys and busy_timeout5000 apply to both connections.
+  Full race root357.549s; focused pool tests2.304s pass, including concurrent reuse,
+  failed publication, queued switch, closed-owner rejection and atomic audit
+  rollback/retry. Three100-read benchmarks: pooled0.38-0.40ms versus retained
+  per-operation adapter3.39-3.69ms (backend only).
+  Native500 readonly calls/switch/stale rejection/close preserve the existing
+  managed/external/choices tables, support/user bytes and final YAML. Handle
+  samples442/446/446/446 plateau over the400-read phase; owned PID3052 exited and
+  inspector9392 closed. Receipts pool-readonly/pool-plateau/pool-promotion.json in
+  native-context. Foundation fallback f1c9ddd... is sealed there as
+  vpro-foundation-verified.exe. Frontend/bindings remain unchanged.
 - Verified writable parent coverage: **77/98**. Full storage mapping and source
   layout are not full FS882 or application parity.
 - Responsive FS882 presentation is complete across all five source pages,
@@ -112,7 +126,7 @@ between shells.
 - Cleanup corrected the all-fields test's Soil update samples and the foreign
   audit-plot fixture without weakening foreign-key enforcement.
 - Focused Parent catalogue/write/restore tests pass (root50.045s);
-  latest `go test -race ./...` passes (root361.871s). All137 frontend tests,
+  latest `go test -race ./...` passes (root357.549s). All137 frontend tests,
   Svelte check (0 errors/warnings) and production build
   pass. The existing large-chunk build warning remains. Native CDP tooling uses
   isolated `tools\vpro-native-test-tools` websocket-client 1.9.2, not an app dependency.
@@ -207,12 +221,12 @@ The chosen active context is SQLite with owned/pinned TEMP views; optional DuckD
 must not be an offline dependency. Verification used disposable data/config only;
 no R/Access/production data writes or new Access instance. Foundation promotion
 receipt and sealed fallback are under `evidence/private/native-context`.
-Peer-review follow-up is planned in MIGRATION_PLAN.md C1-C5: session-owned writer
-pool/coordinator read alignment and shared catalogue verification cache next;
+Peer-review follow-up is tracked in MIGRATION_PLAN.md C1-C5: C1 session-owned plot
+pool and coordinated ownership is delivered; shared catalogue verification cache next;
 cancellation through active bindings/SQL/frontend read promises alongside affected
 paths. Package extraction and optional typed catalogue transport follow incrementally
-between milestones, not as a broad rewrite. These changes are not implemented;
-the promoted executable remains the verified F1-F3 baseline.
+between milestones, not as a broad rewrite. C2-C5 are not implemented;
+the promoted executable contains verified F1-F3 plus C1 pooling.
 Then resume ordinary surveyor/depth/cover/note fields. The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage has explicit LimitToList=NotDefault and needs a distinct membership

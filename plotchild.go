@@ -205,11 +205,11 @@ func (s *PlotService) GetChildCapabilities(kind string) (map[string]bool, error)
 	default:
 		return nil, fmt.Errorf("unsupported child kind %q", kind)
 	}
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	defer release()
 	caps, err := childCapabilities(db, project, kind)
 	if err != nil {
 		return nil, err
@@ -223,11 +223,11 @@ func (s *PlotService) GetChildCapabilities(kind string) (map[string]bool, error)
 }
 
 func listChildRecords[T any](s *PlotService, kind, plot string) ([]T, error) {
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	defer release()
 	caps, err := childCapabilities(db, project, kind)
 	if err != nil {
 		return nil, err
@@ -399,11 +399,11 @@ func (s *PlotService) saveChild(kind string, record any, mode childSaveMode) err
 			return fmt.Errorf("%s.%s must be finite", kind, field.column)
 		}
 	}
-	db, project, err := s.getActiveDB()
+	db, project, release, err := s.getActiveDB()
 	if err != nil {
 		return err
 	}
-	defer db.Close()
+	defer release()
 	tx, err := db.Begin()
 	if err != nil {
 		return err
