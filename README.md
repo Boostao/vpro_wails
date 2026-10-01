@@ -13,7 +13,7 @@ Do not use its write workflows on production projects.
 | Working units and hierarchies | Read-only selection/filtering and hierarchy browsing support separate external files. Verified Working Unit editing includes per-user mode preferences; Master authorization editing and bulk actions remain incomplete. |
 | FS882 storage and source relationships | All 98 parent columns and 69 nonidentity XL child bindings plus five legacy extras are mapped. Extracted geometry is retained as evidence; presentation preserves source containment, labels, bindings and embedded-form links. |
 | FS882 responsive presentation | Site, Soil/Terrain, Vegetation, Veg Other and Other use labelled semantic groups and readable 40px controls. Groups reflow with the available width, child tables scroll locally, and project context can collapse. Actual native sizing, resizing, drafts, validation and close recovery are verified. |
-| FS882 ordinary parent editing | **94/98 parent fields are verified writable**, including coordinates, BEC, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock, 21 terrain/classification codes, fourteen surveyor/text/depth/cover/note fields, two nullable source flags and strict SoilDrainage. Four distinct workflows remain unavailable. |
+| FS882 ordinary parent editing | **95/98 parent fields are verified writable**, including coordinates, BEC, source-authorized BEC Master, Working Unit, quality, substrate, disturbance/exposure, Region/Ecosection, Soil classification, Bedrock, 21 terrain/classification codes, fourteen surveyor/text/depth/cover/note fields, two nullable source flags and strict SoilDrainage. Three distinct workflows remain unavailable. |
 | FS882 children and height | Transactional child CRUD/storage and bounded existing-row height drafts work. Species selection, height insertion/deletion, broader child editing, pictures and calculations remain incomplete. |
 | Audit and lifecycle | Data/audit transactions, bounded selective restoration, Undo, and native window/context Save/Discard/Cancel are verified, including hidden-invalid and height drafts, failed save/config publication and stale-context rejection. Cover restoration, broader child dirty-state propagation and multiwindow coordination remain incomplete. |
 | Soil classification | Two independent nullable four-UTF-16-unit editors default on. Native selection/manual entry, NULL, Undo, Lock, hidden validation, atomic rollback/retry and actual window-close recovery are verified, alongside frozen catalogue browsing. |
@@ -159,7 +159,21 @@ and restoration targets require a verified reference; NULL and unchanged histori
 values remain available without it. Invalid drafts survive remount and block
 Save/Lock/close. Native corruption/Retry, rollback/retry and NULL verification
 preserved all15 tables and32 historical audits, adding exactly two drainage audits.
-BECSiteUnit, Photo, XCoord and YCoord remain disabled.
+`VITE_MASTER_BEC_EDITING=false` separately disables BEC Master editing; it defaults on
+only for the source-authorized configured user, `Will MacKenzie` (case-insensitive,
+without trimming). This is a workflow policy tied to the existing audit identity,
+not an authentication boundary. Source Form_Load unlocks that user; the username
+check inside BeforeUpdate is commented out. Desktop Save/Create/Update and audit
+restoration enforce the restriction explicitly as a safer adaptation.
+The nullable Admin.BECSiteUnit TEXT100 editor preserves raw text, NULL, partner fields,
+3504 Master reference rows and duplicate metadata. Newly unmatched/unavailable codes
+require separate draft/value-bound acknowledgement, never Working Unit acknowledgement.
+Unchanged historical invalid values are omitted from unrelated saves, including
+unprivileged saves; restoration targets are validated afresh. Reference-loading
+inputs are disabled. Native raw100/NULL, hidden validation/Lock/close refusal,
+rollback/retry, unprivileged readonly and direct backend refusal preserve all15 tables,
+32 historical audits and restored support/config bytes, adding exactly two Master audits.
+Photo, XCoord and YCoord remain disabled.
 `VITE_EXTERNAL_PROJECTS=false` hides the verified external attachment entry point;
 it defaults on. It does not disable restoration of valid saved external contexts.
 

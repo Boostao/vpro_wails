@@ -9,6 +9,10 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function CanEditMasterBEC(): $CancellablePromise<boolean> {
+    return $Call.ByID(2650897432);
+}
+
 export function CreatePlot(h: $models.FS882Header): $CancellablePromise<void> {
     return $Call.ByID(3262156109, h);
 }

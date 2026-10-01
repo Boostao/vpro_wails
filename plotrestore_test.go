@@ -136,6 +136,9 @@ func TestPlotRestore_AllVerifiedFieldsTypedRoundTrip(t *testing.T) {
 	for _, kind := range []string{"Env", "Admin", "Veg", "Humus", "Mineral", "Other"} {
 		t.Run(kind, func(t *testing.T) {
 			s, db := restoreFixture(t)
+			if err := s.SetCurrentUser("Will MacKenzie"); err != nil {
+				t.Fatal(err)
+			}
 			var fields []childField
 			var record reflect.Value
 			var id *int64

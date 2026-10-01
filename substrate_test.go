@@ -260,6 +260,9 @@ func TestSubstrateSumsNoBalancingAndUnrelatedPreservation(t *testing.T) {
 
 func TestSubstrateAuditLevelsRawValuesAndAtomicRollback(t *testing.T) {
 	s, db := headerFixture(t)
+	if err := s.SetCurrentUser("HeaderTester"); err != nil {
+		t.Fatal(err)
+	}
 	for _, field := range substrateHeaderFields(FS882Header{}) {
 		for strength := 0; strength <= 3; strength++ {
 			s.SetAuditStrength(strength)
@@ -295,6 +298,9 @@ func TestSubstrateAuditLevelsRawValuesAndAtomicRollback(t *testing.T) {
 		}
 	}
 	s.SetAuditStrength(3)
+	if err := s.SetCurrentUser("Will MacKenzie"); err != nil {
+		t.Fatal(err)
+	}
 	h := fullHeader("SUBROLL")
 	if err := s.CreatePlot(h); err != nil {
 		t.Fatal(err)

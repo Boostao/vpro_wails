@@ -21,6 +21,9 @@ const modules = {
   './paperLayout': paper,
   './formPresentation': presentation
 };
+modules['./masterBECEditor'] = loadTypeScript('masterBECEditor.ts', {
+  './workingUnitEditor': modules['./workingUnitEditor'], './referenceCodeEditor': reference
+});
 const noNative = new Proxy({}, { get() { return () => { throw new Error('SSR must not call native services'); }; } });
 const native = {
   BECService: noNative, CoordinateService: noNative, WorkingUnitService: noNative,

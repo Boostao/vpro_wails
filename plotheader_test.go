@@ -17,7 +17,7 @@ func headerFixture(t *testing.T) (*PlotService, *sql.DB) {
 	}
 	service := NewPlotService(projects)
 	service.SetAuditStrength(3)
-	service.SetCurrentUser("HeaderTester")
+	service.SetCurrentUser("Will MacKenzie")
 	db, _, release, err := service.getActiveDB()
 	if err != nil {
 		t.Fatal(err)
@@ -247,7 +247,7 @@ func TestPlotHeader_AllFieldsRoundTripAndAudit(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, entry := range entries {
-		if entry.BeforeEdit != nil || entry.AfterEdit == nil || entry.User != "HeaderTester" ||
+		if entry.BeforeEdit != nil || entry.AfterEdit == nil || entry.User != "Will MacKenzie" ||
 			entry.EditField == "PlotNumber" || entry.EditField == "Plot" {
 			t.Fatalf("invalid initial audit: %#v", entry)
 		}

@@ -24,9 +24,9 @@ test('every editor read and mutation carries the original context identity and u
     const call = calls.at(-1);
     assert.equal(call[0], name);
     assert.equal(call[1], 'original-context');
-    if (name !== 'GetHeaderCapabilities') assert.equal(call[2], payload);
+    if (name !== 'GetHeaderCapabilities' && name !== 'CanEditMasterBEC') assert.equal(call[2], payload);
   }
-  assert.equal(calls.length, 25);
+  assert.equal(calls.length, 26);
   assert.throws(() => output.bindContextPlots('', port), /loaded project context identity/);
 });
 

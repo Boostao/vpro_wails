@@ -31,7 +31,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 3 | Consolidate ordinary code editing (complete) | Shared nullable Unicode/reference grouping/suggestions/draft acknowledgement and Region/Soil write/restore guards preserve public APIs, source positions and field-specific policies. All117 frontend tests/check/build, focused Go/full race and actual Wails rollback/close regression pass. New groups reuse definitions/fixtures, not copied validators. |
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
-| 5 | Complete remaining FS882 parent workflows (checkpointed at94/98) | Responsive presentation,21 ordinary-code editors, fourteen surveyor/text/depth/cover/note editors, two nullable source flags and strict SoilDrainage are native-verified and default-on. Continue the four distinct remaining workflows by source/event semantics; keep unavailable controls disabled. |
+| 5 | Complete remaining FS882 parent workflows (checkpointed at95/98) | Responsive presentation,21 ordinary-code editors, fourteen surveyor/text/depth/cover/note editors, two nullable source flags, strict SoilDrainage and source-authorized BEC Master are native-verified and default-on. Continue the three distinct remaining workflows by source/event semantics; keep unavailable controls disabled. |
 | 6 | Complete FS882 child workflows | Vegetation/species/cover/height, Humus, Mineral and Other support their actual add/edit/delete/validation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
@@ -441,7 +441,26 @@ drainage audits. Default assets exactly match the accepted native payload.
 Evidence/private/native-drainage retains proof/visual/promotion; no Access instance
 or production/source writes.
 
-Next: BECSiteUnit, Photo, XCoord and YCoord. Keep Master BEC authorization, X/Y and pictures
+BEC Master is now separately native-verified/default-on for the source-authorized
+configured user; coverage is95/98, not95 unrestricted fields for every user.
+Static Form_Load unlocks Will MacKenzie; BeforeUpdate contains only commented code.
+Desktop case-insensitive/no-trim identity comparison and backend write/restore
+restriction are explicit adaptations, not claims of active Access BeforeUpdate
+authorization or a new authentication boundary. Physical Admin.TEXT100/raw Unicode,
+historical assignment omission, NULL and exact partner preservation apply.
+The existing Master catalogue/Working Unit lookup is reused, with independent
+Master acknowledgement and scoped cancellable policy reads. Reference-busy controls
+are disabled; the closed failed loading probe/unchanged fixture seal is retained.
+Full race385.848s;159 frontend tests/check0/0/default+optout builds;
+bindings15/106/33. One native fixture verifies raw100/NULL, hidden remount/Save/
+Lock/close refusal, audit rollback/retry, unauthorized readonly and direct scoped
+backend refusal. All15 tables/32 old audits/support bytes are preserved; exactly
+two Master audits; deliberate disposable user preference roundtrip restored exactly.
+Default assets match accepted native payload. Evidence/private/native-master-bec
+retains proof, two representative visuals, cleanup and sealed drainage fallback.
+No Access instance or production/source writes.
+
+Next: Photo, XCoord and YCoord. Keep X/Y and pictures
 as distinct workflows. Reuse sealed
 source evidence and shared lifecycle tests, not field-by-field audit matrices.
 The original42-field checklist is frozen evidence, not current coverage.

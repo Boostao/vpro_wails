@@ -25,7 +25,7 @@
   type Field = { key: NullableTextKey; label: string; kind: 'text' | 'notes'; list?: boolean } |
     { key: NumberKey; label: string; kind: 'number'; step?: string };
 
-  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, editor, additionalEditor }: {
+  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, masterAllowed = false, editor, additionalEditor }: {
     draft: FS882Header;
     original: (BECCodes & WorkingUnitCodes & QualityCodes & SubstrateValues & SiteCodes & RegionCodes) | null;
     capabilities: Record<string, boolean | undefined>;
@@ -34,7 +34,8 @@
     lists: Partial<Record<NullableTextKey, ListItem[]>>;
     onchange: () => void;
     onerror: (message: string) => void;
-    onvalidation: (key: NumberKey | 'bec' | 'workingUnit' | 'quality' | 'substrate' | 'siteCodes' | 'regionCodes', message: string | null) => void;
+    onvalidation: (key: NumberKey | 'bec' | 'workingUnit' | 'masterBEC' | 'quality' | 'substrate' | 'siteCodes' | 'regionCodes', message: string | null) => void;
+    masterAllowed?: boolean;
     onCoordinateBusyChange?: (busy: boolean) => void;
     onWorkingUnitBusyChange?: (busy: boolean) => void;
     onQualityBusyChange?: (busy: boolean) => void;
@@ -157,7 +158,7 @@
 
 <p class="form-status">Verified workflows are editable. Grey fields and actions remain unavailable.</p>
 <WorkingUnitFields bind:draft {original} controls={ordered} {position} {capabilities} {disabled}
-  {onchange} {onerror} {onvalidation} onbusy={onWorkingUnitBusyChange} session={workingUnitSession}>
+  {onchange} {onerror} {onvalidation} {masterAllowed} onbusy={onWorkingUnitBusyChange} session={workingUnitSession}>
 {#snippet children(workingUnitInputs)}
 <QualityFields bind:draft {original} controls={ordered} {position} {capabilities} {disabled}
   {onchange} {onvalidation} onbusy={onQualityBusyChange}>

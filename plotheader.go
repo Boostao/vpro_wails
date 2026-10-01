@@ -311,6 +311,10 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 	if err := s.requireContextEdit(); err != nil {
 		return err
 	}
+	s.mu.RLock()
+	user, strength := s.currentUser, s.auditStrength
+	s.mu.RUnlock()
+	masterAllowed := masterBECAllowed(user)
 	if strings.TrimSpace(h.PlotNumber) == "" {
 		return errors.New("PlotNumber is required")
 	}
@@ -347,6 +351,11 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 		return err
 	}
 	if err := s.validateSoilDrainageBeforeTransaction(db, project, h, mode); err != nil {
+		return err
+	}
+	if err := validateCodeHeaderBeforeTransaction(db, project, h, mode, func(next FS882Header, old *FS882Header) error {
+		return validateMasterBECHeaderValues(next, old, masterAllowed)
+	}); err != nil {
 		return err
 	}
 	tx, err := db.Begin()
@@ -431,6 +440,9 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 	if err := s.validateSoilDrainageHeaderValues(h, qualityOld); err != nil {
 		return err
 	}
+	if err := validateMasterBECHeaderValues(h, qualityOld, masterAllowed); err != nil {
+		return err
+	}
 	for _, table := range []string{"Env", "Admin"} {
 		key := "PlotNumber"
 		if table == "Admin" {
@@ -444,7 +456,7 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 			if field.table != table || field.property == "plotNumber" || !caps[field.property] {
 				continue
 			}
-			if !creating && (field.property == "zone" || field.property == "subZone" || field.property == "siteSeries" || field.property == "userSiteUnit" || field.property == "speciesListComplete" || field.property == "updatedFromCards" || field.property == "soilDrainage" || isQualityProperty(field.property) || isSubstrateProperty(field.property) || isSiteCodeProperty(field.property) || isRegionProperty(field.property) || isSoilProperty(field.property) || isGeologyProperty(field.property) || isParentCodeProperty(field.property) || isOrdinaryProperty(field.property)) &&
+			if !creating && (field.property == "zone" || field.property == "subZone" || field.property == "siteSeries" || field.property == "userSiteUnit" || field.property == "becSiteUnit" || field.property == "speciesListComplete" || field.property == "updatedFromCards" || field.property == "soilDrainage" || isQualityProperty(field.property) || isSubstrateProperty(field.property) || isSiteCodeProperty(field.property) || isRegionProperty(field.property) || isSoilProperty(field.property) || isGeologyProperty(field.property) || isParentCodeProperty(field.property) || isOrdinaryProperty(field.property)) &&
 				reflect.DeepEqual(headerValue(h, field), headerValue(*old, field)) {
 				continue
 			}
@@ -467,9 +479,6 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 			return fmt.Errorf("save %s: %w", table, err)
 		}
 	}
-	s.mu.RLock()
-	user, strength := s.currentUser, s.auditStrength
-	s.mu.RUnlock()
 	if (!creating && strength >= 1) || (creating && strength >= 2) {
 		query := `INSERT INTO ` + quoteHeaderIdentifier(project+"_Audit") +
 			` ("Project","User","PlotNumber","Table","EditField","EditWhen","BeforeEdit","AfterEdit","Restore","Flag") VALUES (?,?,?,?,?,?,?,?,0,0)`

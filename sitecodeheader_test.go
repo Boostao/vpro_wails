@@ -207,6 +207,9 @@ func TestSiteCodeJSONAllOccurrencesCaseFoldEscapedKeysAndUnicode(t *testing.T) {
 
 func TestSiteCodeAuditAllLevelsRawCaseAndNoop(t *testing.T) {
 	s, db := headerFixture(t)
+	if err := s.SetCurrentUser("HeaderTester"); err != nil {
+		t.Fatal(err)
+	}
 	for _, field := range siteCodeHeaderFields(FS882Header{}) {
 		for strength := 0; strength <= 3; strength++ {
 			s.SetAuditStrength(strength)

@@ -4,19 +4,22 @@
   import type { PaperControl } from './paperLayout';
   import { ReadRequests } from './readRequests';
   import FieldGuidance from './FieldGuidance.svelte';
+  import { masterBECAcknowledged, rememberMasterBECAcknowledgement, masterBECValidation, masterBECWarnings } from './masterBECEditor';
   import { WorkingUnitLookup, isWorkingUnitControl, workingUnitAcknowledged, rememberWorkingUnitAcknowledgement,
     workingUnitChanged, workingUnitCopy, workingUnitDefinitions, workingUnitGroups, workingUnitValidation,
     workingUnitWarnings, type WorkingUnitCodes, type WorkingUnitMode, type WorkingUnitCopy, type WorkingUnitSession } from './workingUnitEditor';
 
   let { draft = $bindable(), original, controls, position, capabilities, disabled, onchange, onerror,
-    onvalidation, onbusy, session, children }: {
+    onvalidation, onbusy, session, masterAllowed = false, children }: {
     draft: FS882Header; original: WorkingUnitCodes | null; controls: PaperControl[];
     position: (control: PaperControl) => string; capabilities: Record<string, boolean | undefined>;
     disabled: boolean; onchange: () => void; onerror: (message: string) => void;
-    onvalidation: (key: 'workingUnit', message: string | null) => void;
+    onvalidation: (key: 'workingUnit' | 'masterBEC', message: string | null) => void;
+    masterAllowed?: boolean;
     onbusy?: (busy: boolean) => void; session: WorkingUnitSession; children: Snippet<[Snippet<[PaperControl?]>]>;
   } = $props();
   const editingEnabled = import.meta.env.VITE_WORKING_UNIT_EDITING !== 'false';
+  const masterEditingEnabled = import.meta.env.VITE_MASTER_BEC_EDITING !== 'false';
   const componentId = $props.id();
   const listId = `${componentId}-working-unit`;
   function rows<T>(value: T[] | null): T[] {
@@ -32,6 +35,7 @@
   }, next => { view = next; onbusy?.(next.busy); }, untrack(() => session), () => reads.cancelAll());
   let view = $state(lookup.snapshot());
   let acknowledged = $state(false);
+  let masterAcknowledged = $state(false);
   let notice = $state<string | null>(null);
   let proposal = $state<{ identity: FS882Header; previous: string | null; copy: WorkingUnitCopy } | null>(null);
   const changed = $derived(workingUnitChanged(draft, original));
@@ -39,14 +43,18 @@
   const groups = $derived(workingUnitGroups(view.choices));
   const definitions = $derived(workingUnitDefinitions(view.choices, draft.userSiteUnit));
   const masterDefinitions = $derived(workingUnitDefinitions(view.master, draft.becSiteUnit));
+  const masterWarnings = $derived(masterBECWarnings(draft.becSiteUnit, view));
+  const masterValidation = $derived(masterBECValidation(draft.becSiteUnit, original?.becSiteUnit ?? null, masterAllowed, view, masterAcknowledged));
+  const masterGroups = $derived(workingUnitGroups(view.master));
   const modeControls: Record<string, WorkingUnitMode> = { Option455: 'env', Option457: 'master', Option459: 'su' };
 
   $effect(() => {
     const identity = draft;
-    if (editingEnabled && identity) untrack(() => { void lookup.refresh(); });
+    if ((editingEnabled || masterEditingEnabled) && identity) untrack(() => { void lookup.refresh(); });
   });
   $effect(() => {
     acknowledged = workingUnitAcknowledged(draft, draft.userSiteUnit);
+    masterAcknowledged = masterBECAcknowledged(draft, draft);
     if (proposal && (proposal.identity !== draft || proposal.previous !== draft.userSiteUnit || proposal.copy.value !== draft.becSiteUnit)) {
       proposal = null;
     }
@@ -55,7 +63,31 @@
     const message = editingEnabled ? workingUnitValidation(draft, original, view, acknowledged) : null;
     untrack(() => onvalidation('workingUnit', message));
   });
-  onDestroy(() => { lookup.dispose(); onbusy?.(false); });
+  $effect(() => {
+    const message = masterEditingEnabled ? masterValidation : null;
+    untrack(() => onvalidation('masterBEC', message));
+  });
+  onDestroy(() => {
+    lookup.dispose(); onbusy?.(false);
+    if (masterEditingEnabled) onvalidation('masterBEC', masterBECValidation(draft.becSiteUnit,
+      original?.becSiteUnit ?? null, masterAllowed, { ...view, busy: false }, masterAcknowledged));
+  });
+
+  function masterUnavailable(control: PaperControl): boolean {
+    return !masterEditingEnabled || !masterAllowed || disabled || view.busy || capabilities.becSiteUnit !== true || !control.enabled;
+  }
+  function setMasterCode(raw: string, control: PaperControl): void {
+    if (masterUnavailable(control)) {
+      onerror('BEC Master editing is unavailable while unauthorized, locked, loading or unsupported.');
+      return;
+    }
+    const value = raw === '' ? null : raw;
+    if (draft.becSiteUnit === value) return;
+    draft.becSiteUnit = value;
+    proposal = null;
+    onchange();
+    onvalidation('masterBEC', masterBECValidation(value, original?.becSiteUnit ?? null, masterAllowed, view, masterBECAcknowledged(draft, draft)));
+  }
 
   function unavailable(): boolean {
     return !editingEnabled || disabled || view.busy || capabilities.userSiteUnit !== true;
@@ -103,6 +135,22 @@
     stageCopy(proposal.copy);
   }
 </script>
+
+{#if masterEditingEnabled && masterAllowed}
+  {#if masterValidation}<p role="alert">{masterValidation}</p>{/if}
+  {#if draft.becSiteUnit !== (original?.becSiteUnit ?? null) && masterWarnings.length && !view.busy}
+    <ul aria-label="BEC Master classification warnings">{#each masterWarnings as warning}<li>{warning}</li>{/each}</ul>
+    <label><input id="master-bec-acknowledgement" type="checkbox" checked={masterAcknowledged} disabled={disabled}
+      onchange={event => { rememberMasterBECAcknowledgement(draft, draft, event.currentTarget.checked); masterAcknowledged = event.currentTarget.checked; }} />
+      Keep the unmatched BEC Master code exactly as entered; I have reviewed these warnings.
+    </label>
+  {/if}
+  <datalist id={`${componentId}-master-bec`}>
+    {#each masterGroups as group (group.code)}
+      <option value={group.code}>{group.records.length === 1 ? group.records[0].description ?? group.code : `${group.records.length} Master definitions`}</option>
+    {/each}
+  </datalist>
+{/if}
 
 {#if editingEnabled}
   <div class="working-unit-toolbar" aria-label="Working Unit safety controls">
@@ -177,10 +225,14 @@
         oninput={event => setCode(event.currentTarget.value)} />
     {:else if control.controlName === 'BECSiteUnit'}
       <input class="working-unit-control" id="header-becSiteUnit" data-source-control={control.controlName}
-        data-column="BECSiteUnit" style={position(control)} aria-label="BEC Master" readonly
-        value={draft.becSiteUnit ?? ''} disabled={disabled || capabilities.becSiteUnit !== true}
+        data-column="BECSiteUnit" style={position(control)} aria-label="BEC Master" readonly={!masterEditingEnabled || !masterAllowed}
+        value={draft.becSiteUnit ?? ''} disabled={disabled || capabilities.becSiteUnit !== true || !control.enabled || (masterEditingEnabled && masterAllowed && view.busy)}
+        list={masterEditingEnabled && masterAllowed ? `${componentId}-master-bec` : undefined}
+        aria-invalid={masterEditingEnabled && masterValidation !== null}
         placeholder={capabilities.becSiteUnit === true ? '' : 'Pending'}
-        title="BEC Master remains read-only; ordinary copying does not grant editing or reverse-copy permission." />
+        title={masterEditingEnabled && masterAllowed ? 'Source-authorized nullable Master draft; Save or Undo explicitly.'
+          : 'BEC Master remains read-only; ordinary copying does not grant editing or reverse-copy permission.'}
+        oninput={event => setMasterCode(event.currentTarget.value, control)} />
     {:else if control.controlName === 'btnCoptToWorkingUnit'}
       <button class="working-unit-control" type="button" data-source-control={control.controlName} style={position(control)}
         disabled={unavailable() || capabilities.becSiteUnit !== true || !control.enabled} onclick={copy}>{control.caption.replaceAll('&', '')}</button>

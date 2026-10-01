@@ -6,6 +6,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
   return {
     GetPlot: (plot: string) => port.GetPlot(contextId, plot),
     GetHeaderCapabilities: () => port.GetHeaderCapabilities(contextId),
+    CanEditMasterBEC: () => port.CanEditMasterBEC(contextId),
     GetChildCapabilities: (kind: string) => port.GetChildCapabilities(contextId, kind),
     ListVegRecords: (plot: string) => port.ListVegRecords(contextId, plot),
     ListHumusRecords: (plot: string) => port.ListHumusRecords(contextId, plot),

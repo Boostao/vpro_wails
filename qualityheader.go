@@ -147,6 +147,7 @@ func (h *FS882Header) UnmarshalJSON(data []byte) error {
 		fields = append(fields, parentCodeHeaderFields(FS882Header{})...)
 		fields = append(fields, ordinaryTextFields(FS882Header{})...)
 		fields = append(fields, soilDrainageHeaderField(FS882Header{}))
+		fields = append(fields, masterBECHeaderField(FS882Header{}))
 		for _, field := range fields {
 			if strings.EqualFold(name, field.property) {
 				if err := validateQualityJSONToken(raw); err != nil {

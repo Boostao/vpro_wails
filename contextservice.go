@@ -92,6 +92,12 @@ func (s *ContextService) GetHeaderCapabilities(ctx context.Context, contextID st
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (map[string]bool, error) { return plots.GetHeaderCapabilities() })
 }
 
+func (s *ContextService) CanEditMasterBEC(ctx context.Context, contextID string) (bool, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (bool, error) {
+		return plots.CanEditMasterBEC(), nil
+	})
+}
+
 func (s *ContextService) GetChildCapabilities(ctx context.Context, contextID, kind string) (map[string]bool, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (map[string]bool, error) { return plots.GetChildCapabilities(kind) })
 }

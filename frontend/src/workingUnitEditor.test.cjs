@@ -16,6 +16,13 @@ function load(name, dependencies = {}) {
   return exports;
 }
 const helpers = load('workingUnitEditor.ts', { './becEditor': load('becEditor.ts') });
+const masterHelpers = load('masterBECEditor.ts', {
+  './workingUnitEditor': helpers,
+  './referenceCodeEditor': load('referenceCodeEditor.ts', {
+    './becEditor': load('becEditor.ts'),
+    './qualityEditor': load('qualityEditor.ts', { './becEditor': load('becEditor.ts') })
+  })
+});
 const { WorkingUnitLookup, workingUnitMode, workingUnitLengthError, workingUnitGroups, workingUnitDefinitions,
   workingUnitValidation, workingUnitCopy, workingUnitAcknowledged, rememberWorkingUnitAcknowledgement } = helpers;
 const serialize = value => JSON.parse(JSON.stringify(value));
@@ -35,7 +42,7 @@ const api = overrides => ({
   ...overrides
 });
 
-test('Source-positioned component compiles and gates ordinary copy/editing without master or reverse writes', () => {
+test('Source-positioned component gates ordinary copy and separate authorized Master editing without reverse writes', () => {
   const source = readFileSync(path.join(__dirname, 'WorkingUnitFields.svelte'), 'utf8');
   const result = compile(source, { filename: 'WorkingUnitFields.svelte', generate: 'client' });
   assert.equal(result.warnings.length, 0);
@@ -45,7 +52,10 @@ test('Source-positioned component compiles and gates ordinary copy/editing witho
   assert.match(source, /Confirm draft replacement/);
   assert.match(source, /proposal\.identity !== draft/);
   assert.match(source, /rememberWorkingUnitAcknowledgement\(draft, draft\.userSiteUnit, accepted\)/);
-  assert.doesNotMatch(source, /draft\.becSiteUnit\s*=/);
+  assert.match(source, /VITE_MASTER_BEC_EDITING !== 'false'/);
+  assert.match(source, /!masterEditingEnabled \|\| !masterAllowed \|\| disabled/);
+  assert.match(source, /readonly=\{!masterEditingEnabled \|\| !masterAllowed\}/);
+  assert.match(source, /disabled=\{disabled \|\| capabilities\.becSiteUnit !== true \|\| !control\.enabled \|\| \(masterEditingEnabled && masterAllowed && view\.busy\)\}/);
   assert.doesNotMatch(source, /PlotService|UpdatePlot|CreatePlot|onmousedown|oncontextmenu/);
   for (const file of ['HeaderEditor.svelte', 'FS882Form.svelte']) {
     assert.equal(compile(readFileSync(path.join(__dirname, file), 'utf8'), { filename: file, generate: 'client' }).warnings.length, 0);
@@ -60,6 +70,53 @@ test('Working Unit uses exact nullable raw strings and100 UTF-16 bounds without 
   assert.equal(workingUnitLengthError('😀'.repeat(50)), null);
   assert.match(workingUnitLengthError('😀'.repeat(51)), /100 UTF-16/);
   assert.equal(workingUnitLengthError('old'.repeat(100), 'old'.repeat(100)), null);
+});
+test('Master policy, physical errors and acknowledgements are independent of Working Unit drafts', () => {
+  const view = ready();
+  const { masterBECValidation, masterBECAcknowledged, rememberMasterBECAcknowledgement } = masterHelpers;
+  assert.equal(masterBECValidation('historical'.repeat(20), 'historical'.repeat(20), false, view, false), null);
+  assert.match(masterBECValidation(null, '01', false, view, true), /restricted/);
+  assert.equal(masterBECValidation('01', null, true, view, false), null);
+  for (const raw of ['', '\ud800', 'x'.repeat(101), '😀'.repeat(51)]) {
+    assert.ok(masterBECValidation(raw, null, true, view, true));
+  }
+  assert.match(masterBECValidation('unknown', null, true, view, false), /acknowledge/);
+  assert.equal(masterBECValidation('unknown', null, true, view, true), null);
+  assert.match(masterBECValidation('01', null, true, { ...view, masterReady: false }, false), /acknowledge/);
+  assert.match(masterBECValidation('01', null, true, { ...view, busy: true }, true), /Wait/);
+  const draft = codes('unknown', 'unknown');
+  rememberWorkingUnitAcknowledgement(draft, draft.userSiteUnit, true);
+  assert.equal(masterBECAcknowledged(draft, draft), false);
+  rememberMasterBECAcknowledgement(draft, draft, true);
+  draft.userSiteUnit = 'different';
+  assert.equal(masterBECAcknowledged(draft, draft), true);
+  draft.becSiteUnit = 'different';
+  assert.equal(masterBECAcknowledged(draft, draft), false);
+  assert.equal(masterBECAcknowledged({ ...draft }, draft), false);
+});
+test('Actual source Master input overrides source Locked only under its separate gate and loaded policy', () => {
+  const { serverComponent } = require('./svelteTestHelpers.cjs');
+  const { render } = require('svelte/server');
+  const source = readFileSync(path.join(__dirname, 'WorkingUnitFields.svelte'), 'utf8');
+  for (const [enabled, allowed] of [[true, true], [true, false], [false, true]]) {
+    const Component = serverComponent(source
+      .replace('import.meta.env.VITE_MASTER_BEC_EDITING', enabled ? "'true'" : "'false'")
+      .replace('import.meta.env.VITE_WORKING_UNIT_EDITING', "'false'"), 'WorkingUnitFields.svelte', {
+      './workingUnitEditor': helpers, './masterBECEditor': masterHelpers,
+      '../bindings/github.com/boostao/vpro-wails': { WorkingUnitService: {} }
+    });
+    const fixture = `<script>import Fields from './Fields.svelte';let draft={userSiteUnit:null,becSiteUnit:'old'};</script>
+      <Fields bind:draft original={{userSiteUnit:null,becSiteUnit:'old'}} controls={[{controlId:'master',controlName:'BECSiteUnit',enabled:true,locked:true}]}
+        position={()=>''} capabilities={{becSiteUnit:true}} disabled={false} masterAllowed={${allowed}}
+        onchange={()=>{}} onerror={()=>{}} onvalidation={()=>{}} session={{mode:null}}>
+        {#snippet children(inputs)}{@render inputs()}{/snippet}
+      </Fields>`;
+    const Wrapper = serverComponent(fixture, 'MasterFixture.svelte', { './Fields.svelte': { default: Component } });
+    const html = render(Wrapper).body;
+    assert.equal((html.match(/data-column="BECSiteUnit"/g) || []).length, 1);
+    assert.equal(/\sreadonly(?:\s|=|>)/.test(html), !(enabled && allowed));
+    assert.match(html, /value="old"/);
+  }
 });
 test('Duplicate definitions retain every nullable metadata row and signed-string identity', () => {
   const rows = [row('9007199254740993', '01', 'first'), row('2', '02'), row('3', '01', 'conflicting'),

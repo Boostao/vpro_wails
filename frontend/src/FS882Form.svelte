@@ -71,6 +71,7 @@
   let headerValidation = $state<Record<string, string>>({});
   let capabilities = $state<Record<string, boolean | undefined>>({});
   let capabilitiesReady = $state(false);
+  let masterAllowed = $state(false);
   type ChildKind = 'Veg' | 'Humus' | 'Mineral' | 'Other';
   let childCapabilities = $state<Record<ChildKind, Record<string, boolean | undefined>>>({ Veg: {}, Humus: {}, Mineral: {}, Other: {} });
   let loadRequest = 0;
@@ -373,6 +374,7 @@
     busy = true;
     error = null;
     capabilitiesReady = false;
+    masterAllowed = false;
     heightDrafts = {};
     vegList = [];
     humusList = [];
@@ -381,13 +383,15 @@
     auditList = [];
     childCapabilities = { Veg: {}, Humus: {}, Mineral: {}, Other: {} };
     try {
-      const [fields, res] = await Promise.all([
+      const [fields, res, masterPolicy] = await Promise.all([
         reads.track(PlotService.GetHeaderCapabilities()),
-        p ? reads.track(PlotService.GetPlot(p)) : Promise.resolve(null)
+        p ? reads.track(PlotService.GetPlot(p)) : Promise.resolve(null),
+        reads.track(PlotService.CanEditMasterBEC())
       ]);
       if (request !== loadRequest) return;
       if (fields === null) throw new Error('Header capabilities were not returned.');
       capabilities = fields;
+      masterAllowed = masterPolicy;
       if (p && !res) throw new Error(`Plot ${p} could not be loaded.`);
       if (p) await loadChildData(p);
       if (request !== loadRequest) return;
@@ -948,7 +952,7 @@
           onchange={markDirty} onvalidation={validateHeader}>
         {#snippet children(ordinaryEditor)}
         <HeaderEditor bind:draft {original} {capabilities} disabled={draft.locked || busy || !capabilitiesReady || heightUnsaved}
-          {editor} additionalEditor={ordinaryEditor}
+          {editor} additionalEditor={ordinaryEditor} {masterAllowed}
           existing={original !== null}
           lists={{ moistureRegime: moistureList, nutrientRegime: nutrientList, mesoSlopePos: mesoSlopeList, surfaceShape: surfaceShapeList }}
           onchange={markDirty} onerror={(message) => error = message} onvalidation={validateHeader}
