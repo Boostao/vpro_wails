@@ -375,12 +375,17 @@ func hasCompatibleHierarchy(hierarchies []HierarchyInfo, name, file string) bool
 }
 
 func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error) {
-	database, err := openReadOnly(service.projectFile(project))
+	return service.discoverSUsContext(context.Background(), project)
+}
+
+func (service *ProjectService) discoverSUsContext(ctx context.Context, project ProjectInfo) ([]SUInfo, error) {
+	database, err := openReadOnlyContext(ctx, service.projectFile(project))
 	if err != nil {
 		return nil, err
 	}
 	defer database.Close()
-	rows, err := database.Query("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE '%_SU'")
+	reader := contextPlotDB{db: database, ctx: ctx}
+	rows, err := reader.Query("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE '%_SU'")
 	if err != nil {
 		return nil, err
 	}
@@ -402,14 +407,14 @@ func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error
 	}
 	slices.Sort(names)
 	var hasPolicy bool
-	if err := database.QueryRow("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = '_vpro_su_policy')").Scan(&hasPolicy); err != nil {
+	if err := reader.QueryRow("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = '_vpro_su_policy')").Scan(&hasPolicy); err != nil {
 		return nil, err
 	}
 	sus := make([]SUInfo, 0, len(names))
 	for _, name := range names {
 		su := SUInfo{Name: name, Kind: "ordinary"}
 		if hasPolicy {
-			err := database.QueryRow("SELECT kind FROM _vpro_su_policy WHERE table_name = ?", name+"_SU").Scan(&su.Kind)
+			err := reader.QueryRow("SELECT kind FROM _vpro_su_policy WHERE table_name = ?", name+"_SU").Scan(&su.Kind)
 			if err != nil && !errors.Is(err, sql.ErrNoRows) {
 				return nil, err
 			}
@@ -417,7 +422,7 @@ func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error
 				su.Kind = "ordinary"
 			}
 		}
-		fields, err := database.Query(`PRAGMA table_info("` + name + `_SU")`)
+		fields, err := reader.Query(`PRAGMA table_info("` + name + `_SU")`)
 		if err != nil {
 			return nil, err
 		}
@@ -445,6 +450,13 @@ func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error
 }
 
 func openReadOnly(path string) (*sql.DB, error) {
+	return openReadOnlyContext(context.Background(), path)
+}
+
+func openReadOnlyContext(ctx context.Context, path string) (*sql.DB, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	absolute, err := filepath.Abs(path)
 	if err != nil {
 		return nil, err
@@ -452,7 +464,7 @@ func openReadOnly(path string) (*sql.DB, error) {
 	database, err := sql.Open("sqlite3", sqliteFileURI(absolute, "ro"))
 	if err == nil {
 		database.SetMaxOpenConns(1)
-		err = database.Ping()
+		err = database.PingContext(ctx)
 	}
 	if err != nil {
 		if database != nil {
@@ -464,12 +476,17 @@ func openReadOnly(path string) (*sql.DB, error) {
 }
 
 func inspectFile(path string) ([]ProjectInfo, error) {
-	database, err := openReadOnly(path)
+	return inspectFileContext(context.Background(), path)
+}
+
+func inspectFileContext(ctx context.Context, path string) ([]ProjectInfo, error) {
+	database, err := openReadOnlyContext(ctx, path)
 	if err != nil {
 		return nil, err
 	}
 	defer database.Close()
-	rows, err := database.Query("SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%'")
+	reader := contextPlotDB{db: database, ctx: ctx}
+	rows, err := reader.Query("SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%'")
 	if err != nil {
 		return nil, err
 	}
@@ -500,7 +517,7 @@ func inspectFile(path string) ([]ProjectInfo, error) {
 		}
 		if tables["_table_metadata"] {
 			var version sql.NullString
-			err := database.QueryRow("SELECT description FROM _table_metadata WHERE table_name = ?", table).Scan(&version)
+			err := reader.QueryRow("SELECT description FROM _table_metadata WHERE table_name = ?", table).Scan(&version)
 			if err != nil && !errors.Is(err, sql.ErrNoRows) {
 				return nil, err
 			}
@@ -516,6 +533,13 @@ func inspectFile(path string) ([]ProjectInfo, error) {
 }
 
 func (service *ProjectService) discover() ([]ProjectInfo, []ProjectDiagnostic, error) {
+	return service.discoverContext(context.Background())
+}
+
+func (service *ProjectService) discoverContext(ctx context.Context) ([]ProjectInfo, []ProjectDiagnostic, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
 	files, err := os.ReadDir(filepath.Join(service.root, "projects"))
 	if err != nil {
 		return nil, nil, err
@@ -523,13 +547,19 @@ func (service *ProjectService) discover() ([]ProjectInfo, []ProjectDiagnostic, e
 	projects := []ProjectInfo{}
 	diagnostics := []ProjectDiagnostic{}
 	for _, file := range files {
+		if err := ctx.Err(); err != nil {
+			return nil, nil, err
+		}
 		if !file.Type().IsRegular() || !strings.EqualFold(filepath.Ext(file.Name()), ".db") {
 			continue
 		}
-		found, err := inspectFile(filepath.Join(service.root, "projects", file.Name()))
+		found, err := inspectFileContext(ctx, filepath.Join(service.root, "projects", file.Name()))
 		if err != nil {
+			if ctx.Err() != nil && errors.Is(err, ctx.Err()) {
+				return nil, nil, ctx.Err()
+			}
 			if file.Name() == "Sample.db" {
-				return nil, nil, fmt.Errorf("inspect %s: %w", file.Name(), err)
+				return nil, nil, labelledReadError("inspect "+file.Name(), err)
 			}
 			diagnostics = append(diagnostics, ProjectDiagnostic{File: file.Name(), Message: err.Error()})
 			continue
@@ -542,35 +572,37 @@ func (service *ProjectService) discover() ([]ProjectInfo, []ProjectDiagnostic, e
 			return nil, nil, fmt.Errorf("duplicate project family %q", projects[index].Name)
 		}
 	}
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
 	return projects, diagnostics, nil
 }
 
-func (service *ProjectService) GetState() (ProjectState, error) {
-	service.mu.RLock()
-	if service.sqlite != nil {
-		defer service.mu.RUnlock()
-		return service.sqliteStateLocked()
+func (service *ProjectService) GetState(ctx context.Context) (ProjectState, error) {
+	if err := acquireReadLease(ctx, &service.mu); err != nil {
+		return ProjectState{}, err
 	}
-	service.mu.RUnlock()
-	projects, diagnostics, err := service.discover()
+	defer service.mu.RUnlock()
+	if service.sqlite != nil {
+		return service.sqliteStateContextLocked(ctx)
+	}
+	projects, diagnostics, err := service.discoverContext(ctx)
 	if err != nil {
 		return ProjectState{}, err
 	}
-	service.mu.RLock()
 	active := service.active
 	activeSU := service.activeSU
 	activeHierarchy := service.activeHierarchy
 	hierarchyFile := service.hierarchyFile
-	service.mu.RUnlock()
 	selected := compatibleProject(projects, active)
 	if selected.Name == "" {
 		return ProjectState{}, errors.New("no compatible project is active")
 	}
-	sus, err := service.discoverSUs(selected)
+	sus, err := service.discoverSUsContext(ctx, selected)
 	if err != nil {
 		return ProjectState{}, err
 	}
-	hierarchies, err := discoverHierarchies(filepath.Join(service.root, "projects"))
+	hierarchies, err := discoverHierarchiesContext(ctx, filepath.Join(service.root, "projects"))
 	if err != nil {
 		return ProjectState{}, err
 	}

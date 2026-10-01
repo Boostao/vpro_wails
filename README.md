@@ -184,8 +184,13 @@ successfully cached zones while replacing cancelled pending generations. Working
 Unit cancels choices only: its getter initializes a persistent preference fallback,
 so initialization and setters are deliberately not auto-cancelled or retried.
 Native expensive queries interrupt and recover with identical metadata; invalid
-Quality drafts survive remount. State/discovery cancellation remains pending,
-so C3 is not complete.
+Quality drafts survive remount. State/discovery contexts now reach connection
+opening, project descriptions, SU authorization/schema and hierarchy inspection;
+cancelled inspection is an error, never a partial successful state or diagnostic.
+App refresh generations cancel discovery and reject late publication; context
+switch commits remain untracked. Native metadata SQL cancels/recoveries preserve
+identical state and fixture bytes. C3's planned active retrieval scope is delivered;
+this does not enable the remaining parent fields or unavailable workflows.
 See C1-C5 in
 [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for bounded performance/cleanup gates,
 including incremental packages and optional typed catalogue transport consolidation.

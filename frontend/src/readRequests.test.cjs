@@ -84,7 +84,7 @@ test('browse, hierarchy, reference and species consumers own only their read gen
   assert.match(root, /plotReads\.track\(ProjectService\.ListPlots/);
   assert.match(root, /hierarchyReads\.track\(ProjectService\.GetHierarchyNodes/);
   assert.match(root, /if \(current === hierarchyRequest\) hierarchyNodes/);
-  assert.match(root, /request\+\+;\s+hierarchyRequest\+\+;\s+plotReads\.cancelAll\(\);\s+hierarchyReads\.cancelAll\(\)/);
+  assert.match(root, /request\+\+;\s+hierarchyRequest\+\+;\s+stateRequest\+\+;\s+plotReads\.cancelAll\(\);\s+hierarchyReads\.cancelAll\(\);\s+stateReads\.cancelAll\(\)/);
   assert.match(form, /referenceReads\.track\(ReferenceService\.GetListItems/);
   assert.match(form, /speciesReads\.track\(ReferenceService\.SearchSpecies/);
   assert.match(form, /if \(request !== speciesRequest\) return/);
@@ -198,4 +198,13 @@ test('Working Unit disposal cancels choice reads, never preference initializatio
   await save;
   assert.equal(preferenceCancellations, 0);
   assert.equal(states.length, count);
+});
+
+test('state generations cancel discovery and guard publication without tracking context commits', () => {
+  const source = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
+  assert.match(source, /const stateReads = new ReadRequests\(\)/);
+  assert.match(source, /stateReads\.track\(ProjectService\.GetState\(\)\)/);
+  assert.match(source, /if \(current !== stateRequest\) return;\s*projectState\.set\(state\)/);
+  assert.match(source, /stateRequest\+\+;[\s\S]*stateReads\.cancelAll\(\)/);
+  assert.doesNotMatch(source, /stateReads\.track\(ContextService\.SwitchContext/);
 });

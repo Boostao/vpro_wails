@@ -19,7 +19,7 @@ func contextServiceFixture(t *testing.T) (*ContextService, ProjectState) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	state, err := projects.GetState()
+	state, err := projects.GetState(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +134,7 @@ func TestContextServiceOperationLeaseBlocksSwitchUntilOriginalContextCompletes(t
 			t.Fatal("context operation/switch deadlocked")
 		}
 	}
-	after, err := service.projects.GetState()
+	after, err := service.projects.GetState(context.Background())
 	if err != nil || after.ContextID == before.ContextID {
 		t.Fatal("switch was not published after the operation completed")
 	}

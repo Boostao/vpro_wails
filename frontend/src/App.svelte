@@ -21,8 +21,13 @@
   let request = 0;
   const plotReads = new ReadRequests();
   const hierarchyReads = new ReadRequests();
+  const stateReads = new ReadRequests();
   let hierarchyRequest = 0;
-  onDestroy(() => { request++; hierarchyRequest++; plotReads.cancelAll(); hierarchyReads.cancelAll(); });
+  let stateRequest = 0;
+  onDestroy(() => {
+    request++; hierarchyRequest++; stateRequest++;
+    plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
+  });
   let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882'>('home');
   let contextExpanded = $state(false);
   let editorBusy = $state(false);
@@ -169,21 +174,29 @@
   }
 
   async function refresh() {
+    const current = ++stateRequest;
+    stateReads.cancelAll();
     busy = true;
     error = '';
     try {
-      const startup = await StartupService.GetState();
+      const startup = await stateReads.track(StartupService.GetState());
+      if (current !== stateRequest) return;
       if (!startup.ready) {
         startupFailure = startup;
         busy = false;
         return;
       }
-      projectState.set(await ProjectService.GetState());
+      const state = await stateReads.track(ProjectService.GetState());
+      if (current !== stateRequest) return;
+      projectState.set(state);
       await loadPlots(0);
+      if (current !== stateRequest) return;
       await loadHierarchy();
     } catch (cause) {
-      error = String(cause);
-      busy = false;
+      if (current === stateRequest) {
+        error = String(cause);
+        busy = false;
+      }
     }
   }
 
@@ -209,8 +222,10 @@
   async function switchContext(contextId: string, selection: ContextSelection, next: 'plots' | 'hierarchy') {
     request++;
     hierarchyRequest++;
+    stateRequest++;
     plotReads.cancelAll();
     hierarchyReads.cancelAll();
+    stateReads.cancelAll();
     busy = true;
     error = '';
     try {

@@ -15,7 +15,7 @@ func TestSampleProjectStartupAndPlots(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	state, err := service.GetState()
+	state, err := service.GetState(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,7 +71,7 @@ func TestStartupWithUnrelatedCorruptProject(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	state, err := service.GetState()
+	state, err := service.GetState(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func TestSampleSUSelectionAndRecovery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	state, err = reopened.GetState()
+	state, err = reopened.GetState(context.Background())
 	if err != nil || state.ActiveSU != "Sample" {
 		t.Fatalf("SU selection did not survive restart: %+v: %v", state, err)
 	}
@@ -160,7 +160,7 @@ func TestMasterSUCannotBeSelectedWithoutAuthorization(t *testing.T) {
 	if _, err := service.SelectSU("Sample"); err == nil {
 		t.Fatal("selected a master SU without authorization")
 	}
-	state, err := service.GetState()
+	state, err := service.GetState(context.Background())
 	if err != nil || state.ActiveSU != "None" || len(state.SUs) != 1 || state.SUs[0].Compatible {
 		t.Fatalf("master SU was not disabled: %+v: %v", state, err)
 	}
@@ -234,7 +234,7 @@ func TestHierarchyFileIdentityAndMissingRecovery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	state, err = reopened.GetState()
+	state, err = reopened.GetState(context.Background())
 	if err != nil || state.ActiveHierarchy != "None" || state.HierarchyFile != "" {
 		t.Fatalf("missing hierarchy did not deactivate: %+v: %v", state, err)
 	}
@@ -300,7 +300,7 @@ func TestMissingSelectedProjectPersistsSampleFallback(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	state, err := service.GetState()
+	state, err := service.GetState(context.Background())
 	if err != nil || state.ActiveProject != "Sample" {
 		t.Fatalf("missing project was not replaced with Sample: %+v: %v", state, err)
 	}
@@ -361,7 +361,7 @@ func TestProjectSwitchSurvivesRestart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	state, err = reopened.GetState()
+	state, err = reopened.GetState(context.Background())
 	if err != nil || state.ActiveProject != "Other" || state.ActiveSU != "None" {
 		t.Fatalf("selection was not restored: %+v: %v", state, err)
 	}

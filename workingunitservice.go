@@ -164,6 +164,10 @@ func (s *WorkingUnitService) GetMasterWorkingUnitChoices(ctx context.Context) ([
 
 // Caller holds the project selection read lock through the complete operation.
 func (s *WorkingUnitService) context() (ProjectInfo, string, error) {
+	return s.contextWithCancellation(context.Background())
+}
+
+func (s *WorkingUnitService) contextWithCancellation(ctx context.Context) (ProjectInfo, string, error) {
 	active, su := s.projects.active, s.projects.activeSU
 	if !projectNamePattern.MatchString(active) || (su != "None" && !projectNamePattern.MatchString(su)) {
 		return ProjectInfo{}, "", errors.New("invalid active Working Unit project/SU context")
@@ -176,7 +180,7 @@ func (s *WorkingUnitService) context() (ProjectInfo, string, error) {
 		return ProjectInfo{Name: selection.Project, File: filepath.Base(selection.ProjectPath),
 			Path: selection.ProjectPath, Compatible: true, Version: "VP08"}, selection.SU, nil
 	}
-	projects, _, err := s.projects.discover()
+	projects, _, err := s.projects.discoverContext(ctx)
 	if err != nil {
 		return ProjectInfo{}, "", err
 	}
@@ -185,7 +189,7 @@ func (s *WorkingUnitService) context() (ProjectInfo, string, error) {
 		return ProjectInfo{}, "", errors.New("no compatible Working Unit project is active")
 	}
 	if su != "None" {
-		units, err := s.projects.discoverSUs(selected)
+		units, err := s.projects.discoverSUsContext(ctx, selected)
 		if err != nil {
 			return ProjectInfo{}, "", err
 		}
@@ -267,7 +271,7 @@ func (s *WorkingUnitService) GetWorkingUnitChoices(ctx context.Context, mode str
 		return nil, err
 	}
 	defer s.projects.mu.RUnlock()
-	project, su, err := s.context()
+	project, su, err := s.contextWithCancellation(ctx)
 	if err != nil {
 		return nil, err
 	}

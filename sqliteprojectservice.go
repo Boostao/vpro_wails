@@ -174,21 +174,28 @@ func (service *ProjectService) switchSQLiteLocked(selection desktopSelection) (P
 }
 
 func (service *ProjectService) sqliteStateLocked() (ProjectState, error) {
+	return service.sqliteStateContextLocked(context.Background())
+}
+
+func (service *ProjectService) sqliteStateContextLocked(ctx context.Context) (ProjectState, error) {
 	if service.sqlite.conn == nil {
 		return ProjectState{}, errors.New("project context is closed")
 	}
 	selection := service.sqlite.selection
-	projects, diagnostics, err := service.discover()
+	projects, diagnostics, err := service.discoverContext(ctx)
 	if err != nil {
 		return ProjectState{}, err
 	}
 	for i := range projects {
+		if err := ctx.Err(); err != nil {
+			return ProjectState{}, err
+		}
 		projects[i].Path, err = existingDatabasePath(service.projectFile(projects[i]))
 		if err != nil {
 			return ProjectState{}, err
 		}
 	}
-	found, err := inspectFile(selection.ProjectPath)
+	found, err := inspectFileContext(ctx, selection.ProjectPath)
 	if err != nil {
 		return ProjectState{}, err
 	}
@@ -206,7 +213,7 @@ func (service *ProjectService) sqliteStateLocked() (ProjectState, error) {
 		}
 		return strings.Compare(left.Path, right.Path)
 	})
-	sus, err := service.discoverSUs(ProjectInfo{Path: selection.ProjectPath})
+	sus, err := service.discoverSUsContext(ctx, ProjectInfo{Path: selection.ProjectPath})
 	if err != nil {
 		return ProjectState{}, err
 	}
@@ -214,7 +221,7 @@ func (service *ProjectService) sqliteStateLocked() (ProjectState, error) {
 		sus[i].Path = selection.ProjectPath
 	}
 	if selection.SU != "None" && !sameDesktopPath(selection.SUPath, selection.ProjectPath) {
-		external, err := service.discoverSUs(ProjectInfo{Path: selection.SUPath})
+		external, err := service.discoverSUsContext(ctx, ProjectInfo{Path: selection.SUPath})
 		if err != nil {
 			return ProjectState{}, err
 		}
@@ -227,7 +234,7 @@ func (service *ProjectService) sqliteStateLocked() (ProjectState, error) {
 			}
 		}
 	}
-	hierarchies, err := discoverHierarchies(filepath.Join(service.root, "projects"))
+	hierarchies, err := discoverHierarchiesContext(ctx, filepath.Join(service.root, "projects"))
 	if err != nil {
 		return ProjectState{}, err
 	}
@@ -238,11 +245,11 @@ func (service *ProjectService) sqliteStateLocked() (ProjectState, error) {
 		}
 	}
 	if selection.Hierarchy != "None" {
-		db, err := openReadOnly(selection.HierarchyPath)
+		db, err := openReadOnlyContext(ctx, selection.HierarchyPath)
 		if err != nil {
 			return ProjectState{}, err
 		}
-		external, inspectErr := inspectHierarchies(db, filepath.Base(selection.HierarchyPath))
+		external, inspectErr := inspectHierarchies(contextPlotDB{db: db, ctx: ctx}, filepath.Base(selection.HierarchyPath))
 		inspectErr = errors.Join(inspectErr, db.Close())
 		if inspectErr != nil {
 			return ProjectState{}, inspectErr
@@ -259,6 +266,9 @@ func (service *ProjectService) sqliteStateLocked() (ProjectState, error) {
 	hierarchyFile := ""
 	if selection.Hierarchy != "None" {
 		hierarchyFile = filepath.Base(selection.HierarchyPath)
+	}
+	if err := ctx.Err(); err != nil {
+		return ProjectState{}, err
 	}
 	return ProjectState{ActiveProject: selection.Project, ActiveSU: selection.SU, ActiveHierarchy: selection.Hierarchy,
 		HierarchyFile: hierarchyFile, Projects: projects, SUs: sus, Hierarchies: hierarchies,

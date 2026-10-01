@@ -334,7 +334,7 @@ func (s *PlotService) getActiveDB() (*sql.DB, string, func(), error) {
 		}
 		return db, coordinator.selection.Project, release, nil
 	}
-	state, err := s.projects.GetState()
+	state, err := s.projects.GetState(s.operationContext())
 	if err != nil {
 		release()
 		return nil, "", nil, err

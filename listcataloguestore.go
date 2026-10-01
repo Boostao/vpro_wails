@@ -113,11 +113,11 @@ func (c *listCatalogueCache) choicesContext(ctx context.Context, path string, p 
 		c.validations++
 		reader := contextPlotDB{db: candidate, ctx: ctx}
 		if err := listcatalog.ValidateDatabaseFor(reader, p, profile); err != nil {
-			return nil, errors.Join(fmt.Errorf("%s catalogue: %w", label, err), candidate.Close())
+			return nil, errors.Join(labelledReadError(label+" catalogue", err), candidate.Close())
 		}
 		rows, err := listcatalog.ReadChoicesFor(reader, "", profile)
 		if err != nil {
-			return nil, errors.Join(fmt.Errorf("%s catalogue: %w", label, err), candidate.Close())
+			return nil, errors.Join(labelledReadError(label+" catalogue", err), candidate.Close())
 		}
 		hash, err := listcatalog.TypedHash(rows)
 		if err != nil || hash != p.TypedCellsSHA256 {

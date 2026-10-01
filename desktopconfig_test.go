@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -385,7 +386,7 @@ func TestDesktopConfigDefaultApplicationStartupAndUnavailableSelection(t *testin
 	if err != nil || selected.ProjectPath != filepath.Join(data, "projects", "Sample.db") {
 		t.Fatalf("selected backend path was not established: %#v %v", selected, err)
 	}
-	state, err := projects.GetState()
+	state, err := projects.GetState(context.Background())
 	if err != nil || state.ActiveProject != "Sample" || state.ActiveHierarchy != "Sample" {
 		t.Fatalf("R startup defaults failed: %#v %v", state, err)
 	}

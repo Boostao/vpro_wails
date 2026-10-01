@@ -50,7 +50,7 @@ func switchSQLiteTestSU(t *testing.T, service *ProjectService, name string) (Pro
 
 func TestSQLiteProjectServiceStartupRestoresOwnedContextAndPreservesYAML(t *testing.T) {
 	service, preferences, data, config := sqliteServiceFixture(t)
-	state, err := service.GetState()
+	state, err := service.GetState(context.Background())
 	if err != nil || state.ContextID == "" || state.ProjectPath == "" || state.HierarchyPath == "" ||
 		state.ActiveProject != "Sample" || state.ActiveHierarchy != "Sample" {
 		t.Fatalf("incomplete restored context: %+v %v", state, err)
@@ -79,7 +79,7 @@ func TestSQLiteProjectServiceStartupRestoresOwnedContextAndPreservesYAML(t *test
 	if err != nil || !bytes.Equal(before, after) {
 		t.Fatal("restoration rewrote unchanged configuration")
 	}
-	restored, err := reopened.GetState()
+	restored, err := reopened.GetState(context.Background())
 	if err != nil || restored.ProjectPath != state.ProjectPath || restored.ContextID == state.ContextID {
 		t.Fatalf("restoration lost file identity or reused old context identity: %+v %v", restored, err)
 	}
@@ -87,7 +87,7 @@ func TestSQLiteProjectServiceStartupRestoresOwnedContextAndPreservesYAML(t *test
 
 func TestSQLiteProjectServiceFailedPublishKeepsHandlesSelectionAndPreferences(t *testing.T) {
 	service, preferences, _, _ := sqliteServiceFixture(t)
-	before, err := service.GetState()
+	before, err := service.GetState(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +103,7 @@ func TestSQLiteProjectServiceFailedPublishKeepsHandlesSelectionAndPreferences(t 
 	if service.sqlite != original {
 		t.Fatal("failed publication replaced the old owner")
 	}
-	after, err := service.GetState()
+	after, err := service.GetState(context.Background())
 	if err != nil || after.ContextID != before.ContextID || after.ActiveSU != "None" || service.activeSU != "None" {
 		t.Fatalf("failed publication changed effective selection: %+v %v", after, err)
 	}
@@ -125,7 +125,7 @@ func TestSQLiteProjectServiceFailedPublishKeepsHandlesSelectionAndPreferences(t 
 	if _, err := switchSQLiteTestSU(t, service, "Missing"); err == nil {
 		t.Fatal("unavailable candidate SU was accepted")
 	}
-	still, err := service.GetState()
+	still, err := service.GetState(context.Background())
 	if err != nil || still.ContextID != published.ContextID || still.ActiveSU != "Sample" {
 		t.Fatal("failed validation changed a published context")
 	}
@@ -148,7 +148,7 @@ func TestSQLiteProjectServiceExternalPathsDriveExistingReadsAndWrites(t *testing
 		t.Fatal(err)
 	}
 	defer service.closeSQLiteContext()
-	state, err := service.GetState()
+	state, err := service.GetState(context.Background())
 	if err != nil || len(state.Projects) != 2 || state.HierarchyFile != "" {
 		t.Fatalf("explicit external and managed identities not represented: %+v %v", state, err)
 	}
@@ -249,7 +249,7 @@ func TestSQLiteProjectServiceClosedContextRejectsReads(t *testing.T) {
 	if err := service.closeSQLiteContext(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.GetState(); err == nil {
+	if _, err := service.GetState(context.Background()); err == nil {
 		t.Fatal("closed context returned success-shaped state")
 	}
 	if _, err := service.ListPlots(context.Background(), 0, 25); err == nil {

@@ -3,9 +3,21 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"sync"
 	"time"
 )
+
+func labelledReadError(label string, err error) error {
+	if errors.Is(err, context.Canceled) {
+		return context.Canceled
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return context.DeadlineExceeded
+	}
+	return fmt.Errorf("%s: %w", label, err)
+}
 
 func acquireReadLease(ctx context.Context, mutex *sync.RWMutex) error {
 	return acquireContextLock(ctx, mutex.TryRLock, mutex.RLock, mutex.RUnlock)
