@@ -812,6 +812,49 @@ pre-dialog registry Location are unchanged. Effective properties remain unknown,
 so deletion stays default-disabled; do not repeat this broken oracle mechanism
 or infer properties from IsLoaded. Retain the stopped fixture/evidence.
 
-Next bounded child batch is source vegetation creation with explicit species and
-numeric inputs, without guessed Layer/zero defaults. Keep personal creation
-disabled until its coordinated VUser/project write contract is verified.
+### Guarded source vegetation creation checkpoint
+
+Source exports and Sample_Veg definitions were read before implementation. Active
+forms have no exported insertion events or numeric defaults; ID uses GenUniqueID
+with a nonunique LONG index. Omitted addition properties remain unknown. Creation
+therefore stays default-disabled (`VITE_VEGETATION_CREATE_EDITING=true` opts in),
+and does not imply complete Access metadata/event parity.
+
+Strict scoped transport accepts only explicit form/species/values, with no caller
+ID, parent, Layer or unknown properties. Exact canonical-family species membership,
+source visibility and shared Single bounds reject invalid proposals before writes.
+There are no guessed zero covers, Layer values, totals, aliases or personal codes.
+C/C-height require explicit non-NULL Cover6; A-height permits height-only rows.
+The shared child transaction allocates/reserves identity, inserts, independently
+observes ownership/species/every proposed numeric or NULL value, then audits and
+commits. Species/numeric trigger drift, audit failure and collisions roll back
+data/history/reservations together. Existing writer callers retain their behavior.
+
+Persistent source-tab-ordered labelled drafts use shared numeric parsing and
+canonical references. Cancel/Undo write nothing; raw errors survive remounts and
+gate Save/Lock/native close/context/unrelated edits. Failures retain the draft;
+successful refresh independently verifies returned identity/species. Committed
+refresh failure reports committed state and disables editing, preventing replay.
+
+Focused final Go1.261s,191 frontend tests, check0/0, opt-in/default builds and
+bindings15/128/50 with40 scoped operations pass. Full final `go test -race ./...`
+passes (root478.504s). Native core497c6455... creates IDs2/3/4 with seven audits;
+independent guard694e7ab2... rejects species/numeric trigger drift then creates
+ID5 with two audits. All15 original tables/50 prior audits and original positive
+ID1 survive; only four rows, nine audits and their shared reservations change.
+Support/config/schema are preserved except intentional ledger contents. Harness
+integer-zero/REAL and tuple/JSON-list expectations were corrected without replay.
+The core25-control summary survives; its detailed array was not retained.
+Defaulta7dd1be8... independently verifies25 enabled numeric controls plus
+Species/Collected, readonly review, no creation/deletion controls or implicit
+drafts and every fixture byte unchanged. Owned core/guard/default PID11272/
+6388/12044 exited; inspector9392 closed. Exact tested default is promoted, with
+previous accepted binaries archived. Never replay completed creation proofs.
+
+Next bounded species batch: exported NotInList explicitly uppercases sysNewSpp
+and opens USysAddSpp. Read its bound Code/ScientificName/EnglishName/LifeForm and
+active close/open events, original VUser schema and coordinator ownership before
+implementing a writable family boundary. Preserve NULL/empty metadata, duplicate
+definitions and descriptions; do not assume attached multi-file atomicity or
+change journal modes. Keep personal creation disabled until collision, ownership,
+rollback/retry, aliases and safe project/draft coordination are verified.

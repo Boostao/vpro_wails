@@ -106,6 +106,10 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 		"legacy numbers":      func() error { return service.plots.UpdateVegetationNumbers("stale", nil) },
 		"scoped numbers":      func() error { return service.UpdateVegetationNumbers(stale, "stale", nil) },
 		"scoped deletion":     func() error { return service.DeleteReviewedVegetation(stale, "stale", VegetationDeletionRequest{}) },
+		"scoped creation": func() error {
+			_, err := service.CreateSourceVegetation(stale, "stale", VegetationCreationRequest{})
+			return err
+		},
 		"deletion review": func() error {
 			_, err := service.ReviewVegetationDeletion(context.Background(), stale, "stale", "SubVegAXL_BC", 0)
 			return err

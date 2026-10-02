@@ -124,8 +124,8 @@ test('Deletion review compares independently returned source identity, code, ful
 test('Explicit deletion confirmation owns lifecycle without allowing generic Save, close or prototype bypass',()=>{
   const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   assert.match(source,/VITE_VEGETATION_DELETE_EDITING === 'true'/);
-  assert.match(source,/childUnsaved = \$derived\([^;]*deletionReview !== null\)/);
-  assert.match(source,/childParentDisabled = \$derived\([^;]*deletionReview !== null\)/);
+  assert.match(source,/childUnsaved = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null\)/);
+  assert.match(source,/childParentDisabled = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null\)/);
   assert.match(source,/deletionRequest\+\+; deletionReads\.cancelAll\(\)/);
   assert.match(source,/const species = rows\[0\]\.species/);
   assert.match(source,/const plot = draft\.plotNumber/);
@@ -134,4 +134,50 @@ test('Explicit deletion confirmation owns lifecycle without allowing generic Sav
   assert.match(source,/if \(deletionReview !== null\) \{ void cancelVegetationDeletion\(\); return; \}/);
   assert.match(source,/Vegetation deletion failed; review retained/);
   assert.match(source,/Vegetation deletion committed, but refresh failed/);
+});
+const creation={};
+vm.runInNewContext(ts.transpileModule(readFileSync(path.join(__dirname,'vegetationCreationEditor.ts'),'utf8'),
+  {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,
+  {exports:creation,require:name=>{if(name!=='./heightEditor')throw new Error(`Unexpected dependency ${name}`);return output;}});
+test('Creation preserves source numeric order, canonical literal codes, explicit zero/NULL and no guessed identity or Layer',()=>{
+  let draft=creation.beginVegetationCreation('SubVegAXL_BC',['Species','Cover2','Cover1','Cover2','Collected']);
+  assert.deepEqual(Object.keys(draft.cells),['cover2','cover1']);
+  assert.equal(creation.vegetationCreationErrors(draft,[]).length,2);
+  draft={...creation.stageVegetationCreation(draft,'Cover1','0'),species:'A'};
+  const request=creation.vegetationCreationRequest(draft,[{code:'A'}]);
+  assert.deepEqual(json(request),{form:'SubVegAXL_BC',species:'A',values:{cover2:null,cover1:0}});
+  assert.throws(()=>creation.vegetationCreationRequest({...draft,species:'a'},[{code:'A'}]),/exact canonical/);
+  assert.throws(()=>creation.stageVegetationCreation(draft,'height6','3'),/does not belong/);
+});
+test('Creation reuses raw Single/cover validation and keeps invalid input until valid correction',()=>{
+  let draft={...creation.beginVegetationCreation('SubVegDXL',['Cover7']),species:'D'};
+  draft=creation.stageVegetationCreation(draft,'cover7','100');
+  assert.equal(draft.cells.cover7.raw,'100');
+  assert.match(draft.cells.cover7.error,/less than 100/);
+  assert.throws(()=>creation.vegetationCreationRequest(draft,[{code:'D'}]),/less than 100/);
+  draft=creation.stageVegetationCreation(draft,'cover7','-3.125');
+  assert.equal(draft.cells.cover7.error,null);
+  assert.equal(creation.vegetationCreationRequest(draft,[{code:'D'}]).values.cover7,-3.125);
+});
+test('Height-only A creation stays explicit while C-height still requires source Cover6',()=>{
+  let a={...creation.beginVegetationCreation('SubVegAhtXL',['Cover1','Height1']),species:'A'};
+  a=creation.stageVegetationCreation(a,'height1','-7.123456789');
+  assert.deepEqual(json(creation.vegetationCreationRequest(a,[{code:'A'}]).values),{cover1:null,height1:-7.123456789});
+  let c={...creation.beginVegetationCreation('SubVegChtXL',['Cover6','Height6']),species:'C'};
+  c=creation.stageVegetationCreation(c,'height6','1');
+  assert.throws(()=>creation.vegetationCreationRequest(c,[{code:'C'}]),/no zero cover/);
+  c=creation.stageVegetationCreation(c,'cover6','0');
+  assert.equal(creation.vegetationCreationRequest(c,[{code:'C'}]).values.cover6,0);
+});
+test('Opt-in source creation owns independent persistent lifecycle and fails closed after committed refresh failure',()=>{
+  const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
+  assert.match(source,/VITE_VEGETATION_CREATE_EDITING === 'true'/);
+  assert.match(source,/childUnsaved = \$derived\([^;]*creationDraft !== null\)/);
+  assert.match(source,/childParentDisabled = \$derived\([^;]*creationDraft !== null\)/);
+  assert.match(source,/creationInvalid\.length > 0 \? 'Correct invalid vegetation creation/);
+  assert.match(source,/if \(creationDraft !== null\) \{ await saveVegetationCreation\(\); return; \}/);
+  assert.match(source,/if \(creationDraft !== null\) \{ void cancelVegetationCreation\(\); return; \}/);
+  assert.match(source,/Vegetation creation failed; draft retained/);
+  assert.match(source,/Vegetation creation committed, but refresh or identity verification failed/);
+  assert.match(source,/observed\[0\]\.species !== request\.species/);
 });

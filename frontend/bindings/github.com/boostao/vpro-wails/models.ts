@@ -585,6 +585,12 @@ export interface VegetationAttributeUpdate {
     "expected": { [_ in string]?: number | null } | null;
 }
 
+export interface VegetationCreationRequest {
+    "form": string;
+    "species": string;
+    "values": { [_ in string]?: number | null } | null;
+}
+
 export interface VegetationDeletionRequest {
     "id": number;
     "form": string;

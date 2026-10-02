@@ -34,17 +34,18 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all39 editor operations to immutable identities, leases running operations and
+  all40 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
-  guarded deletion:
-  `d8d51c7fa4d660acc74bebd8e918e7a22d949c5041052ed2892a8173464a6287`.
+  guarded creation/deletion:
+  `a7dd1be85c7ab4b0a8330a923a47f992e136653ef79ce0810bcf9698d86cacb5`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
-  deletion-default delivery is promoted without rebuilding.
+  creation-default delivery is promoted without rebuilding. Previous deletion
+  defaultd8d51c7f... and accepted creation core/guard are archived with hashes.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
   Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
   omission remain intact. Shared expected-value transactions span rows/tables
@@ -534,7 +535,8 @@ The initial schema assertion lacked the expected ledger; sealing replayed no wri
 Defaultd8d51c7f... verifies25 enabled numeric controls/Species/Collected, disabled
 source deletion, readonly review and every fixture byte unchanged. Focused Go0.933s,
 187 frontend tests/check0/0/opt-in+default builds; bindings15/126/49,39 scoped calls;
-full Go race488.272s passes. Exact tested default is current/candidate.
+full Go race488.272s passes. Deletion default is archived; current/candidate now
+contain the exact accepted creation-default delivery below.
 Core PID9676/default1244 exited; inspector9392 closed. No owned Wails app remains.
 Access property capture is blocked: installed-core disposable copy reached an
 unacknowledged relocation dialog despite AutomationSecurity=3. No form opened;
@@ -543,8 +545,30 @@ Location are unchanged; owned windows are gone. Effective omitted deletion/addit
 properties remain unknown. Do not reopen/repeat this broken source probe.
 Evidence is under native-vegetation-species, including stopped source fixture.
 Never rerun completed deletion.py/deletion-delivery.py or numeric/species proofs.
-Next bounded work: source vegetation creation with explicit canonical species and
-numeric inputs; personal VUser creation remains disabled pending its write contract.
+Source creation is implemented/native-Wails-verified, default-disabled with
+VITE_VEGETATION_CREATE_EDITING=true opt-in. Explicit canonical species/numeric/
+NULL values use source order, shared parsing/lifecycle and identity/audit writer;
+no guessed Layer/zeros/totals or caller ID. C/C-height require explicit Cover6;
+A-height permits height-only rows. Independent stored source/species/numeric
+observations precede audit/commit; trigger drift rolls back all writes/reservations.
+Final focused Go1.261s/191 frontend tests/check0/0/opt-in+default builds pass;
+bindings15/128/50,40 scoped calls; full final race478.504s passes.
+Core497c6455... creates2/3/4 with seven audits; independent guard694e7ab2...
+rejects species/numeric drift then creates5 with two audits. Original15 tables/
+50 prior audits/positive ID1/support/config/schema survive apart from intended
+rows/audits/reservations. Typed zero/REAL and tuple/list harness corrections never
+replayed writes. Core25-control summary exists, detailed array was not retained.
+Defaulta7dd1be8... independently verifies25 enabled numeric controls plus
+Species/Collected, readonly review, disabled creation/deletion, no implicit drafts
+and every fixture byte unchanged. Exact accepted default is current/candidate.
+Core11272/guard6388/default12044 exited; inspector9392 closed.
+Accepted binaries are sealed under native-vegetation-species; never rerun
+creation.py/creation-guard.py/creation-delivery.py or their completed continuations.
+Next bounded work is personal species: source NotInList assigns UCase(NewData)
+to sysNewSpp and opens USysAddSpp, whose exported Code/ScientificName/EnglishName/
+LifeForm bindings and active events are identified. Writable VUser/project
+coordination is not implemented; do not infer cross-file atomicity or change
+journal modes. Keep personal creation disabled until its write contract is tested.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage's explicit LimitToList=NotDefault now has a separately verified

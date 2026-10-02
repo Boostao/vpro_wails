@@ -80,6 +80,7 @@ export type {
     StartupState,
     VegRecord,
     VegetationAttributeUpdate,
+    VegetationCreationRequest,
     VegetationDeletionRequest,
     VegetationDeletionReview,
     VegetationNumberUpdate,

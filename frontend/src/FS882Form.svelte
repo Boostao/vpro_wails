@@ -27,7 +27,8 @@
   import NewChild from './NewChild.svelte';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
   import { projectState } from './state';
-  import { embeddedForm, type VegetationMode } from './paperLayout';
+  import { embeddedForm, paperChild, type VegetationMode } from './paperLayout';
+  import { controlLabel } from './formPresentation';
   import type { EditorCloseState } from './closeLifecycle';
   import { heightField, stageHeight, heightDirty, heightErrors, heightUpdates, vegetationNumberUpdates, type HeightDrafts } from './heightEditor';
   import { otherField, stageOther, otherDirty, otherErrors, otherUpdates, type OtherDrafts, type OtherValue } from './otherEditor';
@@ -40,6 +41,7 @@
   import { bindContextPlots } from './contextPlots';
   import { ReadRequests } from './readRequests';
   import { validateDeletionReview } from './vegetationDeletionEditor';
+  import { beginVegetationCreation, stageVegetationCreation, vegetationCreationErrors, vegetationCreationRequest, type VegetationCreationDraft } from './vegetationCreationEditor';
 
   let { plotNumber, contextId, onSaved, onClosed, onBusyChange }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void } = $props();
   const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
@@ -53,6 +55,8 @@
   let deletionBusy = $state(false);
   let deletionReview = $state<VegetationDeletionReview | null>(null);
   const deletionEnabled = import.meta.env.VITE_VEGETATION_DELETE_EDITING === 'true';
+  const creationEnabled = import.meta.env.VITE_VEGETATION_CREATE_EDITING === 'true';
+  let creationDraft = $state<VegetationCreationDraft | null>(null);
   let referenceRequest = 0;
   let speciesRequest = 0;
   let speciesReferenceRequest = 0;
@@ -116,7 +120,8 @@
   let speciesReferenceError = $state<string | null>(null);
   const speciesUnsaved = $derived(speciesDirty(speciesDrafts));
   const speciesInvalid = $derived(speciesErrors(speciesDrafts));
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null);
+  const creationInvalid = $derived(creationDraft ? vegetationCreationErrors(creationDraft, speciesLists[creationDraft.form] ?? []) : []);
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -356,7 +361,7 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
-  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null);
+  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null || creationDraft !== null);
   const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
@@ -452,6 +457,7 @@
     speciesDrafts = {};
     speciesChoices = {};
     deletionReview = null;
+    creationDraft = null;
     vegList = [];
     humusList = [];
     mineralList = [];
@@ -597,7 +603,7 @@
   }
 
   async function loadSpeciesReferences() {
-    if (!speciesEditingEnabled || speciesReferenceBusy) return;
+    if ((!speciesEditingEnabled && !creationEnabled) || speciesReferenceBusy) return;
     const request = speciesReferenceRequest;
     speciesReferenceBusy = true;
     speciesReferenceReady = false;
@@ -785,6 +791,78 @@
       if (committed) capabilitiesReady = false;
       error = committed ? `Collected changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
         : `Collected save failed; drafts retained: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
+  function startVegetationCreation(form: string) {
+    if (!creationEnabled || childParentDisabled || childUnsaved || !speciesReferenceReady || speciesReferenceBusy) {
+      error = 'Finish or cancel other drafts and load canonical species references before starting vegetation creation.';
+      return;
+    }
+    const columns = [...paperChild(form).controls].sort((a, b) => a.tabOrder - b.tabOrder).flatMap(control => control.column ? [control.column] : []);
+    try {
+      creationDraft = beginVegetationCreation(form, columns);
+      error = null;
+      successMsg = null;
+    } catch (cause) {
+      error = `Vegetation creation could not start: ${String(cause)}`;
+    }
+  }
+
+  function stageCreationCell(column: string, raw: string) {
+    if (!creationDraft || busy || headerWorkflowBusy) { error = 'An available creation draft is required before editing.'; return; }
+    try {
+      creationDraft = stageVegetationCreation(creationDraft, column, raw);
+      error = null;
+      successMsg = null;
+    } catch (cause) {
+      error = `Vegetation creation input rejected: ${String(cause)}`;
+    }
+  }
+
+  async function cancelVegetationCreation() {
+    if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling creation.'; return; }
+    creationDraft = null;
+    error = null;
+    successMsg = null;
+    busy = true;
+    try {
+      await loadChildData(draft.plotNumber);
+      successMsg = 'Vegetation creation cancelled. No stored data or history changed; current rows reloaded.';
+    } catch (cause) {
+      capabilitiesReady = false;
+      error = `Creation cancelled, but rows could not be reloaded. Reopen the plot: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function saveVegetationCreation() {
+    const proposed = creationDraft;
+    if (!creationEnabled || !proposed || busy || headerWorkflowBusy || dirty || draft.locked || !capabilitiesReady || original === null || !speciesReferenceReady || speciesReferenceBusy) {
+      error = 'An unlocked available creation draft and canonical references are required before saving.';
+      return;
+    }
+    let committed = false;
+    busy = true;
+    error = null;
+    successMsg = null;
+    try {
+      const request = vegetationCreationRequest(proposed, speciesLists[proposed.form] ?? []);
+      const id = await PlotService.CreateSourceVegetation(draft.plotNumber, request);
+      committed = true;
+      creationDraft = null;
+      if (!Number.isInteger(id) || id <= 0 || id > 2147483647) throw new Error('Creation returned an invalid allocated identity.');
+      await loadChildData(draft.plotNumber);
+      const observed = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
+      if (observed.length !== 1 || observed[0].species !== request.species) throw new Error('Committed creation differs from independently reloaded identity/species.');
+      successMsg = `Vegetation row ${id} created in ${proposed.form}. No Layer or other cover values were inferred.`;
+    } catch (cause) {
+      if (committed) capabilitiesReady = false;
+      error = committed ? `Vegetation creation committed, but refresh or identity verification failed. Reopen the plot before editing: ${String(cause)}`
+        : `Vegetation creation failed; draft retained: ${String(cause)}`;
     } finally {
       busy = false;
     }
@@ -1216,6 +1294,7 @@
       return;
     }
     if (deletionReview !== null) { error = 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review; ordinary Save never deletes rows.'; return; }
+    if (creationDraft !== null) { await saveVegetationCreation(); return; }
     if (heightUnsaved) { await saveHeightDrafts(); return; }
     if (otherUnsaved) { await saveOtherDrafts(); return; }
     if (soilUnsaved) { await saveSoilDrafts(); return; }
@@ -1263,11 +1342,13 @@
   }
 
   export function getCloseState(): EditorCloseState {
-    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0 || attributeInvalid.length > 0 || speciesInvalid.length > 0 || deletionReview !== null;
+    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0 || attributeInvalid.length > 0 || speciesInvalid.length > 0 || deletionReview !== null || creationInvalid.length > 0;
     const invalidChild = Boolean(container?.querySelector('.source-child input:invalid'));
     const saveReason = busy || headerWorkflowBusy || !capabilitiesReady ? 'Wait for the plot to finish loading or header workflow.'
       : draft.locked ? 'Unlock the plot before saving.'
       : deletionReview !== null ? 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review before saving and closing.'
+      : creationInvalid.length > 0 ? 'Correct invalid vegetation creation or Cancel creation before saving.'
+      : creationDraft !== null && (!speciesReferenceReady || speciesReferenceBusy) ? 'Restore canonical species references before saving vegetation creation.'
       : newChild !== null || invalidChild ? 'Finish or cancel child entry before saving and closing.'
       : otherInvalid.length > 0 ? 'Correct invalid Other drafts or Cancel Other drafts before saving.'
       : soilInvalid.length > 0 ? 'Correct invalid soil drafts or Cancel soil drafts before saving.'
@@ -1297,6 +1378,7 @@
       return;
     }
     if (deletionReview !== null) { void cancelVegetationDeletion(); return; }
+    if (creationDraft !== null) { void cancelVegetationCreation(); return; }
     if (heightUnsaved) { void cancelHeightDrafts(); return; }
     if (otherUnsaved) { void cancelOtherDrafts(); return; }
     if (soilUnsaved) { void cancelSoilDrafts(); return; }
@@ -1318,6 +1400,10 @@
   async function toggleLock() {
     if (busy || headerWorkflowBusy) {
       error = 'Wait for the current operation to finish before changing the plot lock.';
+      return;
+    }
+    if (creationDraft !== null) {
+      error = 'Save or Cancel vegetation creation before changing the plot lock.';
       return;
     }
     if (deletionReview !== null) {
@@ -1626,6 +1712,37 @@
         {#each otherInvalid as message}<p role="alert">{message}</p>{/each}
       </div>
     {/if}
+    {#if creationDraft}
+      <section class="vegetation-creation-draft mb-3 rounded border border-amber-300 bg-amber-50 p-3 text-xs" aria-label="New vegetation record">
+        <h3 class="mb-2 font-semibold">New vegetation record - {creationDraft.form} - not yet saved</h3>
+        {#if creationInvalid.length}<p class="mb-2 text-red-700" role="alert">{creationInvalid[0]}</p>{/if}
+        <label class="mb-2 flex flex-col gap-1" for="creation-species">Species code
+          <input id="creation-species" class="rounded border bg-white px-2 py-2" type="text" value={creationDraft.species} list="creation-species-list"
+            disabled={busy || headerWorkflowBusy} aria-invalid={!speciesLists[creationDraft.form]?.some(option => option.code === creationDraft?.species)}
+            oninput={event => { if (creationDraft) { creationDraft = { ...creationDraft, species: event.currentTarget.value }; error = null; successMsg = null; } }} />
+        </label>
+        <datalist id="creation-species-list">
+          {#each speciesLists[creationDraft.form] ?? [] as option, index (index)}
+            {#if option.code !== null}<option value={option.code}>{option.scientificName ?? 'NULL'} | {option.englishName ?? 'NULL'} | Lifeform {option.lifeform ?? 'NULL'}</option>{/if}
+          {/each}
+        </datalist>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {#each Object.entries(creationDraft.cells) as [column, cell] (column)}
+            {@const control = paperChild(creationDraft.form).controls.find(control => control.column?.toLowerCase() === column.toLowerCase())}
+            <label class="flex flex-col gap-1" for={`creation-${column}`}>{control ? controlLabel(control) : column}
+              <input id={`creation-${column}`} class="rounded border bg-white px-2 py-2" type="text" inputmode="decimal" value={cell?.raw ?? ''}
+                disabled={busy || headerWorkflowBusy} aria-invalid={cell?.error != null} title={cell?.error ?? 'Blank is NULL; no zero cover is inferred.'}
+                oninput={event => stageCreationCell(column, event.currentTarget.value)} />
+            </label>
+          {/each}
+        </div>
+        <div class="mt-3 flex gap-2">
+          <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy || creationInvalid.length > 0 || !speciesReferenceReady || speciesReferenceBusy} onclick={() => void saveVegetationCreation()}>Save new vegetation record</button>
+          <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={() => void cancelVegetationCreation()}>Cancel vegetation creation</button>
+        </div>
+        <p class="mt-2">Select an exact canonical code and enter source numeric values explicitly. Blank fields remain NULL; Layer, covers, totals and personal metadata are not inferred. Identity is allocated only by the transactional writer.</p>
+      </section>
+    {/if}
     {#if deletionReview}
       <section class="vegetation-deletion-review mb-3 rounded border border-red-300 bg-red-50 p-3 text-xs" aria-label="Vegetation deletion review">
         <p role="alert">Delete the entire vegetation record for {deletionReview.species ?? 'NULL'}, row {deletionReview.id}, plot {draft.plotNumber}? This removes every stored field from all cover/height/attribute views, not just {deletionReview.form}. The deleted identity remains reserved. Ordinary Save never confirms this action.</p>
@@ -1675,7 +1792,7 @@
         </ParentCodeFields>
       {/key}
     {:else if activeTab === 'veg'}
-      {#if speciesEditingEnabled}
+      {#if speciesEditingEnabled || creationEnabled}
         {#if speciesReferenceBusy}<p role="status">Loading source species lists...</p>{/if}
         {#if speciesReferenceError}<p role="alert">{speciesReferenceError}</p>{/if}
         <button type="button" class="mb-2 px-2 py-1 border rounded" disabled={busy || speciesReferenceBusy || headerWorkflowBusy}
@@ -1689,6 +1806,11 @@
         {#snippet embedded(control)}
           {@const child = embeddedForm(control.controlId)}
           {@const heightGrid = child.form === 'SubVegAhtXL' || child.form === 'SubVegChtXL'}
+          {#if creationEnabled}
+            <button type="button" class="mb-2 rounded border px-2 py-1 text-xs disabled:opacity-50" data-create-source={child.form}
+              disabled={childParentDisabled || childUnsaved || !speciesReferenceReady || speciesReferenceBusy}
+              onclick={() => startVegetationCreation(child.form)}>New vegetation record - {child.form}</button>
+          {/if}
           <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={heightGrid || numberEditingEnabled ? heightEditingDisabled : childEditingDisabled}
             drafts={heightDrafts} onstage={numberEditingEnabled ? (id, column, raw) => stageHeightCell(id, column, raw, child.form) : undefined}
             {collectedDrafts} collectedDisabled={collectedEditingDisabled}
@@ -1704,7 +1826,7 @@
         <p class="mt-2 text-xs text-stone-500">{numberEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain.' : 'Cover/height editing is read-only in this build.'} Switching view does not save or change data.</p>
       {/if}
       {#if collectedEditingEnabled}
-        <p class="mt-2 text-xs text-stone-500">Collected buttons cycle NULL -> C -> V -> NULL using persistent drafts. Other historical values remain unchanged, as in the source click event. Use Save or Cancel; new-row workflows remain unavailable in the source grids.</p>
+        <p class="mt-2 text-xs text-stone-500">Collected buttons cycle NULL -> C -> V -> NULL using persistent drafts. Other historical values remain unchanged, as in the source click event. Use Save or Cancel; {creationEnabled ? 'new rows use a separate explicit source creation draft.' : 'new-row workflows remain unavailable in the source grids.'}</p>
       {/if}
       {#if numberEditingEnabled}
         <p class="mt-2 text-xs text-stone-500">All source cover/total and height fields share persistent drafts. Switching grids retains raw errors and original values; Save checks each field's original source row and commits changes/audits atomically. Clearing cover may remove a row from a source view, never delete the vegetation record.</p>

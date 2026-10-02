@@ -17,6 +17,10 @@ export function CreatePlot(h: $models.FS882Header): $CancellablePromise<void> {
     return $Call.ByID(3262156109, h);
 }
 
+export function CreateSourceVegetation(plot: string, request: $models.VegetationCreationRequest): $CancellablePromise<number> {
+    return $Call.ByID(2964469631, plot, request);
+}
+
 /**
  * DeleteHumusRecord deletes a humus row by ID.
  */

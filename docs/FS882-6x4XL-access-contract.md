@@ -363,6 +363,46 @@ ledger; completed writes were not replayed. Defaultd8d51c7f... delivery preserve
 all fixture bytes and25 enabled numeric controls with deletion disabled.
 Focused Go0.933s,187 frontend tests/check0/0/builds and full race488.272s pass.
 
+### Guarded vegetation creation: verified desktop adaptation
+
+`VITE_VEGETATION_CREATE_EDITING=true` enables a separate persistent source-bound
+draft. Default delivery leaves creation/deletion disabled; omitted Access addition
+properties and complete metadata/events are still unknown. Static insertion
+events/default numeric values are absent from active exported forms; absence is
+not proof of runtime defaults. Species TEXT8 is required and ID uses GenUniqueID;
+there is no inferred Layer or numeric zero assignment.
+
+Explicit form/species/values transport rejects caller identity/parent/Layer,
+unknown properties, raw malformed Unicode, wrong source fields, nonfinite values
+and Single-domain violations. Species must literally match its canonical source
+list, without implicit casing, alias resolution or personal metadata creation.
+C/C-height require non-NULL Cover6, including valid zero. A-height accepts explicit
+height-only rows that need not enter its cover view. Covers/totals retain source
+`<100` rules; heights retain their own physical-domain rules.
+
+The existing child writer owns allocation/reservation, insert and audit/commit.
+It independently observes source visibility, ownership, exact species and every
+provided numeric/NULL value after insertion and before auditing. Trigger drift
+rolls back the entire mutation. Frontend errors/raw input survive tab remounts;
+Cancel/Undo make no writes, failures retain drafts, and Save/Lock/native close/
+context/unrelated operations share lifecycle gates. Committed refresh failure
+clears only the committed draft and disables editing instead of inviting replay.
+
+Native core497c6455... verifies cancellation, raw100/remount/Save/Lock/actual-close
+guards, strict transport, audit rollback/retry, C-height explicit Cover6=0 and
+A-height-only creation. IDs2/3/4 add seven audits. Independent guard694e7ab2...
+rejects species/numeric trigger drift and retries once: ID5 adds two audits.
+All15 original tables/50 prior audits, original ID1, support/config and schema
+remain unchanged except four new rows, nine audits and shared reservations.
+Integer-zero/REAL and tuple/list harness expectations were normalized without
+replaying completed creations. The passed25-control summary remains; detailed
+core observations were not retained. Defaulta7dd1be8... has its own complete
+25-control array, Species/Collected enabled, readonly review and every fixture
+byte unchanged before/after clean close, with creation/deletion disabled.
+Focused final Go1.261s,191 frontend tests/check0/0/builds and full race478.504s pass.
+Personal-list creation remains unavailable pending a verified writable VUser/
+project coordination contract; this checkpoint does not create user definitions.
+
 ## Verified bounded selective restoration
 
 `SetAuditRestoreSelection` atomically stores a verified selection; `RestoreSelectedAuditRecords` accepts exact string row IDs and cancel/retain/prune actions. The legacy marked-row API remains. Typed mapping covers 97 nonidentity parent and 61 non-Cover child fields. Invalid/foreign/missing rows, duplicate identities, unsupported fields, stale history chains, malformed values and failed triggers abort the entire transaction. Restore ordering follows source Table ascending then EditWhen descending, with descending rowid for deterministic timestamp ties.

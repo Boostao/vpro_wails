@@ -410,8 +410,13 @@ func (s *PlotService) saveChild(kind string, record any, mode childSaveMode) err
 }
 
 type childDeleteCheck func(*sql.Tx, string, string, int64) ([]childField, []any, error)
+type childCreateCheck func(*sql.Tx, string, string, int64) error
 
 func (s *PlotService) saveChildWithDeleteCheck(kind string, record any, mode childSaveMode, check childDeleteCheck) error {
+	return s.saveChildWithChecks(kind, record, mode, check, nil)
+}
+
+func (s *PlotService) saveChildWithChecks(kind string, record any, mode childSaveMode, check childDeleteCheck, createCheck childCreateCheck) error {
 	if err := s.requireContextEdit(); err != nil {
 		return err
 	}
@@ -485,6 +490,9 @@ func (s *PlotService) saveChildWithDeleteCheck(kind string, record any, mode chi
 	table := quoteHeaderIdentifier(project + "_" + kind)
 	before := make([]any, len(fields))
 	creating := mode == childSave && id == 0
+	if createCheck != nil && !creating {
+		return errors.New("child creation checks require a new automatically allocated identity")
+	}
 	if creating {
 		id, err = allocateChildID(tx, table)
 		if err != nil {
@@ -634,6 +642,11 @@ func (s *PlotService) saveChildWithDeleteCheck(kind string, record any, mode chi
 	}
 	if affected != 1 {
 		return fmt.Errorf("%s mutation expected one row, found %d", kind, affected)
+	}
+	if createCheck != nil {
+		if err := createCheck(tx, table, plot, id); err != nil {
+			return err
+		}
 	}
 	s.mu.RLock()
 	user, strength := s.currentUser, s.auditStrength
