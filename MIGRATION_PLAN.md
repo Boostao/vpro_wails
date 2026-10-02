@@ -1154,13 +1154,50 @@ opens USysPlotProfiling, whose btnGetSummary_Click calls ProfilePlots(optSubVarS
 in V7mdlPlotProfiling. Do not substitute the older Profile4Presence helper.
 The runner clears USysPlotProfilePlots/USysPlotProfilePlotsTemp and profile counts,
 then evaluates ordered Env/Veg/Lump rules from the selected original `_Profile`
-table. Preserve its nine bound fields and NULL/duplicate physical rules; establish
-database-family ownership before implementation. A compact context-bound read-only
-rule review precedes execution, with original schemas and explicit unsupported
-rules, cancellation/context ownership and immutable-support acceptance tests.
-Run results/counts should belong to owned SQLite TEMP state, not shipped support
-files. This is not a vegetation-display toggle; keep the action unavailable until
-the ordered runner and safe filter lifecycle are verified.
+table. Original-family inspection establishes that Sample_Profile belongs to the
+project, while the scratch tables belong to VPro64. The R module's reactive Value
+grid is not a substitute for these original nine persisted bindings.
+
+The compact project-local read-only review is native-verified behind
+`VITE_PROJECT_PLOT_PROFILE_REVIEW=true`. `ReviewProjectPlotProfile` leases the
+immutable selected context and reads its original `<Project>_Profile` ordered by
+stored Order, with physical rowid as the deterministic display tie-breaker. It
+does not choose another configured/registry profile. Shared typed SQLite storage
+reads preserve NULL/empty text, duplicate Orders, historical extra columns, finite
+reals, hex blobs and integer strings beyond JavaScript's safe range. Metadata's
+existing ID validation remains separate and all affected tests pass.
+The original `_table_metadata` rows/descriptions are read independently, not used
+as an Env compatibility shortcut. Canonical table_name uniqueness remains intact;
+legacy duplicate description behavior is tested on an explicitly varied disposable
+table. No original schema, stored count, scratch table or configuration is changed.
+
+The separately labelled resident read-only panel shows all fields/storage types,
+retains review/errors across tabs, cancels reads on destruction, blocks parent
+transitions during loading and surfaces failures with explicit Reload. Validated
+nonnull table/row types avoid casts or success-shaped empty fallbacks. No editable
+controls or runner are enabled.232 frontend tests/check0/0, opt-in/default builds,
+focused Go7.063s and complete race441.215s pass. Actual bindings15/138/67 and50
+scoped adapter operations. Core4472e161.../owned6856 verifies all eight physical
+rules/nine source fields, original description, actual labels, tab remount/Reload
+and zero writes. Defaultbd8e722c.../owned12880 verifies the gate absent and existing
+Site/Vegetation active with all original bytes unchanged. Separate visual-only
+owned6508 captures actual1524x941/1034x961 viewports, wrapping toolbar and local
+table scrolling without document overflow; no keyboard input or writes replayed.
+All owned apps close. The51-file sealed checkpoint/independent manifest preserves
+previousb7c, exact candidate assets/binaries, source and proof/log/visual receipts.
+Exact accepted defaultbd8e722c... is promoted without rebuilding.
+
+Next: validate typed ordered execution plans against original Env/Veg/Lump source
+branches, including Add/Common/Subtract operations, NULL criteria, cover aggregates,
+subvariety/lump membership and precise scope. The R max-cover helper explicitly
+uses doubles and leaves Access NULL behavior unverified; it is not parity proof
+for the source Single routine. Reject unsupported/ambiguous rules explicitly before
+scratch changes; never pass stored SQL fragments directly to SQLite or silently
+repair literals. Execution results/counts should belong to owned SQLite TEMP state,
+not shipped support files or historical profile PlotCount. Other profile-file
+selection, editing, filters/Save as SU and native acceptance remain separate gates.
+This is not a vegetation-display toggle; keep the runner unavailable until ordered
+execution and safe filter lifecycle are verified.
 
 The implemented metadata review boundary underlies the existing-record editor. The
 context-bound `ReviewProjectMetadata` independently reads the physical selected

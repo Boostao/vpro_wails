@@ -24,9 +24,9 @@ test('every editor read and mutation carries the original context identity and u
     const call = calls.at(-1);
     assert.equal(call[0], name);
     assert.equal(call[1], 'original-context');
-    if (!['GetHeaderCapabilities', 'CanEditMasterBEC', 'ListSoilSuggestions', 'ListVegetationAttributeSuggestions', 'ReviewSpeciesCodes', 'ListProjectMetadataFields'].includes(name)) assert.equal(call[2], payload);
+    if (!['GetHeaderCapabilities', 'CanEditMasterBEC', 'ListSoilSuggestions', 'ListVegetationAttributeSuggestions', 'ReviewSpeciesCodes', 'ListProjectMetadataFields', 'ReviewProjectPlotProfile'].includes(name)) assert.equal(call[2], payload);
   }
-  assert.equal(calls.length, 49);
+  assert.equal(calls.length, 50);
   assert.throws(() => output.bindContextPlots('', port), /loaded project context identity/);
 });
 

@@ -28,6 +28,7 @@
   import PersonalSpeciesFields from './PersonalSpeciesFields.svelte';
   import SpeciesCodeCheck from './SpeciesCodeCheck.svelte';
   import ProjectMetadataEditor from './ProjectMetadataEditor.svelte';
+  import ProjectPlotProfileReview from './ProjectPlotProfileReview.svelte';
   import { navigateSourceEnter } from './enterNavigation';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
   import { projectState } from './state';
@@ -107,8 +108,11 @@
   }
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
+  const profileReviewEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_REVIEW === 'true';
+  let profileReviewOpen = $state(false);
+  let profileReviewBusy = $state(false);
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy);
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -1738,6 +1742,13 @@
     </div>
 
     <div class="fs882-actions flex items-center gap-2">
+      {#if profileReviewEnabled}
+        <button type="button" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
+          disabled={busy || headerWorkflowBusy || profileReviewOpen || !capabilitiesReady}
+          onclick={() => { profileReviewOpen = true; }}>
+          Review project profile (read-only)
+        </button>
+      {/if}
       <button
         type="button"
         onclick={toggleLock}
@@ -1852,6 +1863,10 @@
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if profileReviewOpen}
+      <ProjectPlotProfileReview client={PlotService} onbusy={value => profileReviewBusy = value}
+        onclosed={() => { profileReviewOpen = false; }} />
+    {/if}
     {#if metadataOpen}
       <ProjectMetadataEditor bind:this={metadataEditor} client={PlotService} plot={draft.plotNumber}
         allowCreation={metadataCreationEnabled} allowTemplateCreation={metadataTemplateCreationEnabled}

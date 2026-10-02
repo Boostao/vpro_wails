@@ -108,12 +108,41 @@ type projectMetadataQueryer interface {
 }
 
 func readProjectMetadataRows(ctx context.Context, db projectMetadataQueryer, alias, table string, projectID *string, project bool) (ProjectMetadataTable, error) {
+	result, err := readSQLiteStorageRows(ctx, db, alias, table, "ProjectID", projectID, "")
+	if err != nil || !project {
+		return result, err
+	}
+	idIndex := -1
+	for index, column := range result.Columns {
+		if column.Name == "ID" {
+			idIndex = index
+		}
+	}
+	if idIndex < 0 {
+		return ProjectMetadataTable{}, errors.New("project metadata requires its exact physical ID column")
+	}
+	seen := map[string]bool{}
+	for _, row := range result.Rows {
+		identity := row.Cells[idIndex]
+		if identity.Storage != "integer" || identity.Integer == nil {
+			return ProjectMetadataTable{}, errors.New("project metadata has an unsupported physical ID")
+		}
+		id, err := strconv.ParseInt(*identity.Integer, 10, 32)
+		if err != nil || seen[*identity.Integer] {
+			return ProjectMetadataTable{}, errors.New("project metadata has an invalid or ambiguous signed32 ID")
+		}
+		seen[strconv.FormatInt(id, 10)] = true
+	}
+	return result, nil
+}
+
+// Filter/order identifiers are internal literals; values remain SQL parameters.
+func readSQLiteStorageRows(ctx context.Context, db projectMetadataQueryer, alias, table, filterColumn string, filterValue *string, orderColumn string) (ProjectMetadataTable, error) {
 	schema, err := db.QueryContext(ctx, "PRAGMA "+quoteHeaderIdentifier(alias)+".table_info("+quoteHeaderIdentifier(table)+")")
 	if err != nil {
 		return ProjectMetadataTable{}, err
 	}
 	result := ProjectMetadataTable{Columns: []ProjectMetadataColumn{}, Rows: []ProjectMetadataRow{}}
-	idIndex := -1
 	for schema.Next() {
 		var index, required, primary int
 		var name, kind string
@@ -126,16 +155,10 @@ func readProjectMetadataRows(ctx context.Context, db projectMetadataQueryer, ali
 			schema.Close()
 			return ProjectMetadataTable{}, errors.New("metadata schema contains malformed Unicode")
 		}
-		if name == "ID" {
-			idIndex = len(result.Columns)
-		}
 		result.Columns = append(result.Columns, ProjectMetadataColumn{name, kind})
 	}
 	if err := errors.Join(schema.Err(), schema.Close()); err != nil {
 		return ProjectMetadataTable{}, err
-	}
-	if project && idIndex < 0 {
-		return ProjectMetadataTable{}, errors.New("project metadata requires its exact physical ID column")
 	}
 	fields := []string{"rowid"}
 	for _, column := range result.Columns {
@@ -145,13 +168,22 @@ func readProjectMetadataRows(ctx context.Context, db projectMetadataQueryer, ali
 			" AS REAL) ELSE CAST("+name+" AS BLOB) END")
 	}
 	relation := quoteHeaderIdentifier(alias) + "." + quoteHeaderIdentifier(table)
-	rows, err := db.QueryContext(ctx, "SELECT "+strings.Join(fields, ",")+" FROM "+relation+
-		" WHERE ProjectID COLLATE BINARY IS ? ORDER BY rowid", projectID)
+	query := "SELECT " + strings.Join(fields, ",") + " FROM " + relation
+	var arguments []any
+	if filterColumn != "" {
+		query += " WHERE " + quoteHeaderIdentifier(filterColumn) + " COLLATE BINARY IS ?"
+		arguments = append(arguments, filterValue)
+	}
+	query += " ORDER BY "
+	if orderColumn != "" {
+		query += quoteHeaderIdentifier(orderColumn) + ","
+	}
+	query += "rowid"
+	rows, err := db.QueryContext(ctx, query, arguments...)
 	if err != nil {
 		return ProjectMetadataTable{}, err
 	}
 	defer rows.Close()
-	seen := map[string]bool{}
 	for rows.Next() {
 		var rowID int64
 		storage := make([]string, len(result.Columns))
@@ -171,20 +203,9 @@ func readProjectMetadataRows(ctx context.Context, db projectMetadataQueryer, ali
 			}
 			row.Cells = append(row.Cells, cell)
 		}
-		if project {
-			identity := row.Cells[idIndex]
-			if identity.Storage != "integer" || identity.Integer == nil {
-				return ProjectMetadataTable{}, errors.New("project metadata has an unsupported physical ID")
-			}
-			id, err := strconv.ParseInt(*identity.Integer, 10, 32)
-			if err != nil || seen[*identity.Integer] {
-				return ProjectMetadataTable{}, errors.New("project metadata has an invalid or ambiguous signed32 ID")
-			}
-			seen[strconv.FormatInt(id, 10)] = true
-		}
 		result.Rows = append(result.Rows, row)
 	}
-	if err := rows.Err(); err != nil {
+	if err := errors.Join(rows.Err(), rows.Close()); err != nil {
 		return ProjectMetadataTable{}, err
 	}
 	return result, nil

@@ -5,6 +5,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
   if (!contextId) throw new Error('An editor requires a loaded project context identity.');
   return {
     GetPlot: (plot: string) => port.GetPlot(contextId, plot),
+    ReviewProjectPlotProfile: () => port.ReviewProjectPlotProfile(contextId),
     ReviewProjectMetadata: (plot: string) => port.ReviewProjectMetadata(contextId, plot),
     SaveProjectMetadata: (request: Parameters<typeof port.SaveProjectMetadata>[1]) => port.SaveProjectMetadata(contextId, request),
     CreateBlankProjectMetadata: (request: Parameters<typeof port.CreateBlankProjectMetadata>[1]) => port.CreateBlankProjectMetadata(contextId, request),

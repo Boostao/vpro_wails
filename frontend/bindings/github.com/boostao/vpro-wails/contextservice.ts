@@ -121,6 +121,10 @@ export function ReviewProjectMetadata(contextID: string, plot: string): $Cancell
     return $Call.ByID(90084514, contextID, plot);
 }
 
+export function ReviewProjectPlotProfile(contextID: string): $CancellablePromise<$models.ProjectPlotProfileReview> {
+    return $Call.ByID(922462901, contextID);
+}
+
 export function ReviewSpeciesCodes(contextID: string): $CancellablePromise<$models.SpeciesCodeCheckReview> {
     return $Call.ByID(3045258678, contextID);
 }

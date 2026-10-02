@@ -503,6 +503,13 @@ export interface ProjectMetadataTemplateCreate {
     "values": ProjectMetadataChange[] | null;
 }
 
+export interface ProjectPlotProfileReview {
+    "project": string;
+    "table": string;
+    "rules": ProjectMetadataTable;
+    "descriptions": ProjectMetadataTable;
+}
+
 export interface ProjectState {
     "activeProject": string;
     "activeSU": string;

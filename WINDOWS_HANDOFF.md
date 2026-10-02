@@ -34,14 +34,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all49 editor operations to immutable identities, leases running operations and
+  all50 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `    b7c09b6db6b31211a8595fad97df7b002868301142bbaa503633a50fbe442d53`.
+  `    bd8e722c8692526c76f37e424aa53bb7d022b065aa44324ebb8391c024e05ebf`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -452,7 +452,7 @@ and labels, using the Shiny module as a presentation precedent; no second UI
 framework was installed.
 ParentCodeService's21 physical save/raw-JSON/restore guards and frontend workflow
 are native-verified and default-on (adapted desktop behavior, not unmeasured Access
-input parity). Current bindings are15 services/104 methods/33 models.
+input parity). Current bindings are15 services/138 methods/67 models.
 Architecture clarification is delivered: F1 YAML/legacy migration and F2-F3
 SQLite database-family/external-path context/native safe switching pass.
 Readonly inspection of R's family/config/startup/context and matching Access
@@ -669,7 +669,8 @@ continuations retain byte-preservation evidence, and no completed writes replaye
 Publication includes application source only; private evidence/binaries/dist are
 ignored. Use git HEAD/upstream for the current commit; predecessore71c5da.
 Never replay code-check.py, a-cover-notices.py, cover-notices.py or creation-personal.py completed modes.
-Next: deliberate navigation and separately scoped parent metadata/profiling.
+Current successor: project-local profile review is verified; ordered profiling
+execution and metadata-specific restoration remain open.
 The plan records the metadata prerequisite: project75-column storage, master
 templates42 columns and legacy VUser metadata15 columns are distinct; dates/code
 types and the source wrong-recordset/ambiguous-copy logic must not be guessed.
@@ -836,14 +837,43 @@ unchanged; owned1348 closes. No owned native/race process remains.
 Archives/source-enter-checkpoint seals74 hashed files plus manifest, preceding3db,
 all three accepted binaries/assets, source, original fixture backup and proof/logs.
 Independent manifest verification passes; original project/support/config bytes
-and canonical Sample remain exact. Current/candidate are exact acceptedb7c copies.
+and canonical Sample remain exact. Acceptedb7c is now the sealed profile-review predecessor.
 Never replay source-enter.py prepare/run/restore, source-enter-ready.py,
 source-enter-default.py, their completed tails or seal-source-enter.py.
-Next is bounded readonly original plot-profile rule review, then ordered execution:
-FS882.btnVegProfiling opens USysPlotProfiling; btnGetSummary calls ProfilePlots in
-V7mdlPlotProfiling, not Profile4Presence. Preserve original `_Profile` tables/nine
-bindings and establish family ownership; scratch results/counts belong to owned
-SQLite TEMP state, not shipped supports. Keep the profiling action disabled.
+Project-local plot-profile review is native-verified and separately opt-in:
+VITE_PROJECT_PLOT_PROFILE_REVIEW=true. The context-bound/cancellable method reads
+the selected project's original <Project>_Profile, not a reactive editor catalogue
+or implicitly chosen registry profile. All nine source fields, physical rowids,
+stored Order/duplicates/NULLs, extra historical columns and exact typed cells remain
+distinct. Shared SQLite storage reads retain metadata ID guards. Original object
+descriptions remain separate from Env compatibility (Sample_Profile is VP05-2).
+Canonical table_name uniqueness is retained; duplicate description tests use an
+explicit disposable legacy variation. The resident labelled read-only panel retains
+review/errors across tabs, cancels on destruction, gates transitions during loading
+and removes stale results on Reload. Run/edit/filter/Save as SU remain unavailable.
+232 frontend tests/check0/0, both builds, focused7.063s/full race441.215s pass.
+Bindings15/138/67;50 scoped operations. Core bin/vpro-project-profile-review-core.exe
+SHA2564472e1613c2cfc689917f2718a34265276702ef6f39117e22a5704216e6744ac /
+owned6856 verifies eight physical rules/nine fields, original description, labels,
+tab changes and Reload with zero writes. Default bin/vpro-project-profile-review-default.exe
+SHA256bd8e722c8692526c76f37e424aa53bb7d022b065aa44324ebb8391c024e05ebf /
+owned12880 verifies review gate absent, existing Site/Vegetation active and all bytes
+unchanged. Visual-only owned6508 captures actual1524x941/1034x961 viewports, wrapping
+toolbar/local table scrolling without document overflow, no keyboard/write replay.
+All owned apps close; no native/race process remains. Original project/support/config
+and canonical Sample bytes are unchanged. Archives/project-profile-review-checkpoint
+seals51 hashed files plus manifest; independent verification passes. Previousb7c,
+exact opted-in/default assets/binaries, source and proof/log/visual receipts remain.
+Current/candidate are exact acceptedbd8e copies; never rebuild them in place.
+Never replay project-profile-review.py, default/visual proofs or completed seal.
+Next is typed ordered execution planning: FS882.btnVegProfiling opens USysPlotProfiling;
+btnGetSummary calls ProfilePlots in V7mdlPlotProfiling, not Profile4Presence. Profile
+rules belong to the project; scratch tables belong to VPro64. Preserve nine original
+bindings and reject unsupported/ambiguous SQL fragments explicitly. Validate original
+Env/Veg/Lump and aggregate/NULL/scope behavior, not the R doubles-based precedent.
+Execution results/counts belong to owned SQLite TEMP state, not shipped supports or
+historical PlotCount. Other profile-file selection remains unimplemented. Keep the
+runner disabled until ordered execution/filter lifecycle and native acceptance.
 Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
