@@ -147,6 +147,10 @@ func metadataCreationParents(ctx context.Context, tx *sql.Tx, project, plot stri
 }
 
 func (s *PlotService) createBlankProjectMetadata(request ProjectMetadataCreate) (created ProjectMetadataRow, resultErr error) {
+	return s.createProjectMetadata(request, nil)
+}
+
+func (s *PlotService) createProjectMetadata(request ProjectMetadataCreate, template *ProjectMetadataTemplateCreate) (created ProjectMetadataRow, resultErr error) {
 	if err := s.requireContextEdit(); err != nil {
 		return created, err
 	}
@@ -173,6 +177,15 @@ func (s *PlotService) createBlankProjectMetadata(request ProjectMetadataCreate) 
 		if err := c.conn.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM USysEnv WHERE PlotNumber COLLATE BINARY=?)`, request.PlotNumber).Scan(&member); err != nil || !member {
 			return errors.Join(errors.New("blank metadata parent is outside the selected context"), err)
 		}
+		if template != nil {
+			if c.attachmentInfo["VMetaData"] == nil {
+				return errors.New("template creation requires the identified readonly master metadata database")
+			}
+			if _, err := conn.ExecContext(ctx, `ATTACH DATABASE ? AS "metadataMaster"`,
+				sqliteFileURI(c.attachments["VMetaData"], "ro")); err != nil {
+				return fmt.Errorf("readonly metadata master attachment unavailable: %w", err)
+			}
+		}
 		tx, err := conn.BeginTx(ctx, nil)
 		if err != nil {
 			return err
@@ -196,6 +209,13 @@ func (s *PlotService) createBlankProjectMetadata(request ProjectMetadataCreate) 
 		if !reflect.DeepEqual(current, request.Original) {
 			return errors.New("blank metadata schema/candidates changed; reload before creation")
 		}
+		var templateValues []ProjectMetadataChange
+		if template != nil {
+			templateValues, err = metadataTemplatePlan(ctx, tx, *template)
+			if err != nil {
+				return err
+			}
+		}
 		if err := reserveMetadataIdentities(ctx, tx, c.selection.Project); err != nil {
 			return err
 		}
@@ -209,6 +229,10 @@ func (s *PlotService) createBlankProjectMetadata(request ProjectMetadataCreate) 
 		}
 		cells := make([]ProjectMetadataCell, len(current.Columns))
 		names, values := make([]string, len(cells)), make([]any, len(cells))
+		proposed := map[string]ProjectMetadataCell{}
+		for _, change := range templateValues {
+			proposed[change.Column] = change.Value
+		}
 		for i, column := range current.Columns {
 			names[i] = quoteHeaderIdentifier(column.Name)
 			cells[i].Storage = "null"
@@ -219,6 +243,12 @@ func (s *PlotService) createBlankProjectMetadata(request ProjectMetadataCreate) 
 			} else if column.Name == "ProjectID" {
 				cells[i] = ProjectMetadataCell{Storage: "text", Text: request.ProjectID}
 				values[i] = *request.ProjectID
+			} else if value, present := proposed[column.Name]; present {
+				cells[i] = value
+				values[i], err = validateProjectMetadataAssignment(column.Name, value)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		result, err := tx.ExecContext(ctx, `INSERT INTO `+table+` (`+strings.Join(names, ",")+`) VALUES (`+
@@ -277,6 +307,15 @@ func (s *PlotService) createBlankProjectMetadata(request ProjectMetadataCreate) 
 		}
 		if !reflect.DeepEqual(parents, finalParents) {
 			return errors.New("blank metadata creation changed parent storage/schema/scope; the complete transaction rolled back")
+		}
+		if template != nil {
+			finalValues, err := metadataTemplatePlan(ctx, tx, *template)
+			if err != nil {
+				return err
+			}
+			if !reflect.DeepEqual(templateValues, finalValues) {
+				return errors.New("metadata template assignments changed; creation and audit rolled back")
+			}
 		}
 		if err := c.validateMetadataWriterFiles(); err != nil {
 			return err

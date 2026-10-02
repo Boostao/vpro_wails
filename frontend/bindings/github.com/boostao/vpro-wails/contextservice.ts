@@ -25,6 +25,10 @@ export function CreatePlot(contextID: string, header: $models.FS882Header): $Can
     return $Call.ByID(3214660085, contextID, header);
 }
 
+export function CreateProjectMetadataFromTemplate(contextID: string, request: $models.ProjectMetadataTemplateCreate): $CancellablePromise<$models.ProjectMetadataRow> {
+    return $Call.ByID(598864844, contextID, request);
+}
+
 export function CreateSourceVegetation(contextID: string, plot: string, request: $models.VegetationCreationRequest): $CancellablePromise<number> {
     return $Call.ByID(2288682951, contextID, plot, request);
 }

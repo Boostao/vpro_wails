@@ -1,6 +1,7 @@
 import { wellFormedUTF16 } from './qualityEditor';
 import standardDefaults from '../../resources/project-metadata-standard.json';
-import type { ProjectMetadataCell, ProjectMetadataCreate, ProjectMetadataEdit, ProjectMetadataEditorField, ProjectMetadataReview, ProjectMetadataRow } from '../bindings/github.com/boostao/vpro-wails';
+import templateMapping from '../../resources/project-metadata-template.json';
+import type { ProjectMetadataCell, ProjectMetadataCreate, ProjectMetadataTemplateCreate, ProjectMetadataEdit, ProjectMetadataEditorField, ProjectMetadataReview, ProjectMetadataRow } from '../bindings/github.com/boostao/vpro-wails';
 
 export interface MetadataDraftCell {
   raw: string;
@@ -15,6 +16,12 @@ export interface MetadataDraft {
   cells: Record<string, MetadataDraftCell>;
   standardPopulation: '' | 'keep' | 'populate';
 }
+export interface MetadataTemplateDraft {
+  review: ProjectMetadataReview;
+  original: ProjectMetadataRow;
+  cells: Record<string, MetadataDraftCell>;
+}
+export const metadataTemplateFields: readonly string[] = Object.freeze(templateMapping.slice(1));
 
 export function metadataBlankRequest(review: ProjectMetadataReview): ProjectMetadataCreate {
   const table = review.projectRecords;
@@ -78,13 +85,12 @@ export function metadataFieldValue(draft: MetadataDraft, field: ProjectMetadataE
   })();
 }
 
-export function stageMetadata(draft: MetadataDraft, field: ProjectMetadataEditorField, raw: string, nullValue: boolean): MetadataDraft {
-  const original = sourceCell(draft, field.name);
+function parseMetadataCell(field: ProjectMetadataEditorField, raw: string, nullValue: boolean, original?: ProjectMetadataCell): MetadataDraftCell {
   let value: ProjectMetadataCell = { storage: 'null', text: null, integer: null, real: null, blobHex: null };
   let error: string | null = null;
   if (!nullValue) {
     if (!wellFormedUTF16(raw)) error = `${field.name} contains incomplete Unicode; raw input was not repaired.`;
-    else if (raw === metadataCellText(original) && original.storage !== 'null') value = original;
+    else if (original && raw === metadataCellText(original) && original.storage !== 'null') value = original;
     else if (field.kind === 'text') {
       value = { ...value, storage: 'text', text: raw };
       if (field.maximum > 0 && raw.length > field.maximum) error = `${field.name} exceeds ${field.maximum} UTF-16 units; raw input was not truncated.`;
@@ -100,12 +106,65 @@ export function stageMetadata(draft: MetadataDraft, field: ProjectMetadataEditor
       else value = { ...value, storage: 'integer', integer: raw };
     }
   }
-  const next = { ...draft, cells: { ...draft.cells, [field.name]: { raw, nullValue, value, error } } };
+  return { raw, nullValue, value, error };
+}
+
+export function stageMetadata(draft: MetadataDraft, field: ProjectMetadataEditorField, raw: string, nullValue: boolean): MetadataDraft {
+  const cell = parseMetadataCell(field, raw, nullValue, sourceCell(draft, field.name));
+  const next = { ...draft, cells: { ...draft.cells, [field.name]: cell } };
   if (field.name === 'EcosysCollectionStandard') next.standardPopulation = '';
   return next;
 }
 
-export function metadataErrors(draft: MetadataDraft): string[] {
+export function beginMetadataTemplate(review: ProjectMetadataReview, rowId: string, fields: ProjectMetadataEditorField[]): MetadataTemplateDraft {
+  metadataBlankRequest(review);
+  const table = review.masterTemplates;
+  const rows = table.rows?.filter(row => row.rowId === rowId) ?? [];
+  const row = rows[0];
+  if (!table.columns || new Set(table.columns.map(column => column.name)).size !== table.columns.length ||
+      rows.length !== 1 || !row.cells || row.cells.length !== table.columns.length ||
+      !/^-?(0|[1-9]\d*)$/.test(rowId) || rowId === '-0') {
+    throw new Error('Select one explicit physical master template with its complete unambiguous review.');
+  }
+  const owner = row.cells[table.columns.findIndex(column => column.name === 'ProjectID')];
+  if (owner?.storage !== 'text' || owner.text !== review.projectId) {
+    throw new Error('Master template must have the existing literal parent ProjectID; no identity is assigned or repaired.');
+  }
+  const cells: Record<string, MetadataDraftCell> = {};
+  for (const name of metadataTemplateFields) {
+    const definitions = fields.filter(field => field.name === name);
+    const source = row.cells[table.columns.findIndex(column => column.name === name)];
+    if (definitions.length !== 1 || !source) throw new Error(`Master template field ${name} is missing or ambiguous.`);
+    const field = definitions[0];
+    const cell = parseMetadataCell(field, metadataCellText(source), source.storage === 'null');
+    if (source.storage !== 'null' && (['StartDate', 'EndDate'].includes(name) ||
+        source.storage !== (field.kind === 'text' ? 'text' : 'integer'))) {
+      cell.error = `${name} requires an explicit ${field.kind === 'text' ? 'literal text' : 'signed16 year'} or NULL decision; the source ${source.storage} was not converted.`;
+    }
+    cells[name] = cell;
+  }
+  return { review, original: row, cells };
+}
+
+export function stageMetadataTemplate(draft: MetadataTemplateDraft, field: ProjectMetadataEditorField, raw: string, nullValue: boolean): MetadataTemplateDraft {
+  if (!metadataTemplateFields.includes(field.name) || !draft.cells[field.name]) {
+    throw new Error('Only the32 reviewed ordinary template fields can be staged; identity/stamps are not assigned.');
+  }
+  return { ...draft, cells: { ...draft.cells, [field.name]: parseMetadataCell(field, raw, nullValue) } };
+}
+
+export function metadataTemplateRequest(draft: MetadataTemplateDraft): ProjectMetadataTemplateCreate {
+  const errors = Object.values(draft.cells).flatMap(cell => cell.error ? [cell.error] : []);
+  if (errors.length) throw new Error(errors.join(' '));
+  return { blank: metadataBlankRequest(draft.review), master: draft.review.masterTemplates,
+    rowId: draft.original.rowId, values: metadataTemplateFields.map(column => {
+      const cell = draft.cells[column];
+      if (!cell) throw new Error(`Explicit template field ${column} is missing; no default was inferred.`);
+      return { column, value: cell.value };
+    }) };
+}
+
+export function metadataErrors(draft: Pick<MetadataDraft, 'cells'>): string[] {
   return Object.values(draft.cells).flatMap(cell => cell.error ? [cell.error] : []);
 }
 export function metadataDirty(draft: MetadataDraft): boolean {

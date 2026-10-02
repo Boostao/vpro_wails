@@ -34,14 +34,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all48 editor operations to immutable identities, leases running operations and
+  all49 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `    c22c00fe7bd82914216e2c031e7f2a4e0ec1ec625479a3a54c5b2cf0026f0da4`.
+  `    3db65721cf3775429af712370ac51f93dbd9efc942646186ab884a55f4a8c0f4`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -786,9 +786,38 @@ metadata-blank.py, metadata-blank-guard.py and metadata-blank-default.py complet
 proofs/receipts are sealed; never replay prepare/run/restore modes.
 Archives/metadata-blank-checkpoint seals59 hashed files plus its manifest, preceding
 protected18b5d693..., accepted core/guard/default binaries/assets, source.zip,
-backups and focused/frontend/race/native/restoration receipts. Current/candidate
-are exact acceptedc22c00fe... copies, not rebuilt. No owned native/race process remains.
-Next explicit master-template creation/conversion and metadata-specific restoration;
+backups and focused/frontend/race/native/restoration receipts. Accepted
+blank deliveryc22c00fe... is archived as the predecessor of the template delivery.
+
+Explicit master-template creation is native-verified and separately opt-in:
+`VITE_PROJECT_METADATA_TEMPLATE_CREATION=true` plus the editor flag, independently
+of blank creation. The shared JSON/VBA fixture retains the exact33 source columns;
+one explicitly selected physical master row supplies32 editable ordinary proposals.
+Complete original master candidates/schema and an empty project review guard Create.
+Non-NULL timestamps and incompatible numeric codes require explicit year/text/NULL
+decisions; new bounds/domains reject historical invalid values. No identity repair,
+first-row selection, duplicate bulk copy or wrong-recordset branch is inherited.
+Canonical master uniqueness remains unchanged; legacy duplicates are fixture-tested.
+The existing reserved allocation/full audit/raw-parent transaction is reused, with
+the master attached read-only. All41 unmapped fields/stamps remain NULL. Proposals
+retain remount/close/Undo/error/retry; committed refresh cannot replay creation.
+Focused8.883s,224 frontend tests/check0 errors/0 warnings, both builds and complete
+race560.168s pass; bindings15/137/66 and49 scoped operations.
+Core bin/vpro-project-metadata-template-core.exe SHA256
+b36e97bd7ad29ddf69cc12cf7c06ff5a854854ee34951001a9aade0ed4b896ea
+verifies32 visible labels/nine explicit conversions, parent-drift rollback/retained
+retry, reservedID4, one independently matched75-cell audit and committed-refresh
+recovery without replay. Owned5444 closes; exact project/master fixture bytes restore.
+Default bin/vpro-project-metadata-template-default.exe SHA256
+3db65721cf3775429af712370ac51f93dbd9efc942646186ab884a55f4a8c0f4
+verifies disabled metadata workflows/existing Site/Vegetation with all bytes unchanged;
+owned6668 closes. Inspector9392 is closed. No native/race process remains.
+Archives/metadata-template-checkpoint seals53 hashed files plus manifest, preceding
+c22c00fe..., exact core/default assets/binaries, source.zip, accepted proof/restoration
+receipts/backups and logs. Current/candidate are exact accepted3db65721... copies.
+Never replay metadata-template.py prepare/run/restore, metadata-template-default.py
+or the completed seal-metadata-template.py.
+Next metadata-specific restoration and deliberately gated Enter navigation;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 Navigation/profiling remain open.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind

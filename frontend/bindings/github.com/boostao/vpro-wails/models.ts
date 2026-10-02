@@ -496,6 +496,13 @@ export interface ProjectMetadataTable {
     "rows": ProjectMetadataRow[] | null;
 }
 
+export interface ProjectMetadataTemplateCreate {
+    "blank": ProjectMetadataCreate;
+    "master": ProjectMetadataTable;
+    "rowId": string;
+    "values": ProjectMetadataChange[] | null;
+}
+
 export interface ProjectState {
     "activeProject": string;
     "activeSU": string;

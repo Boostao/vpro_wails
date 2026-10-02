@@ -5,18 +5,21 @@
   import type { EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
   import { beginMetadataDraft, stageMetadata, metadataFieldValue, metadataErrors, metadataDirty, metadataEditRequest,
-    metadataCellText, metadataStandardDecisionRequired, metadataStandardDefaults, populateMetadataStandard, metadataBlankRequest, type MetadataDraft } from './projectMetadataEditor';
+    metadataCellText, metadataStandardDecisionRequired, metadataStandardDefaults, populateMetadataStandard, metadataBlankRequest,
+    beginMetadataTemplate, stageMetadataTemplate, metadataTemplateRequest, metadataTemplateFields, type MetadataDraft, type MetadataTemplateDraft } from './projectMetadataEditor';
   import { metadataGroups, metadataLabel } from './projectMetadataPresentation';
 
-  let { client, plot, onclosed, onbusy, oncommitted, allowCreation = false }: {
+  let { client, plot, onclosed, onbusy, oncommitted, allowCreation = false, allowTemplateCreation = false }: {
     client: ReturnType<typeof bindContextPlots>; plot: string; onclosed: () => void;
     onbusy: (busy: boolean) => void; oncommitted: () => Promise<void>;
     allowCreation?: boolean;
+    allowTemplateCreation?: boolean;
   } = $props();
   let review = $state<ProjectMetadataReview | null>(null);
   let fields = $state<ProjectMetadataEditorField[]>([]);
   let draft = $state<MetadataDraft | null>(null);
   let blank = $state<ProjectMetadataCreate | null>(null);
+  let template = $state<MetadataTemplateDraft | null>(null);
   let reading = $state(false);
   let ready = $state(false);
   let standardPreview = $state(false);
@@ -27,8 +30,8 @@
   let generation = 0;
   const reads = new ReadRequests();
   const busy = $derived(reading || saving);
-  const errors = $derived(draft ? metadataErrors(draft) : []);
-  const dirty = $derived(blank !== null || (draft ? metadataDirty(draft) : false));
+  const errors = $derived(draft ? metadataErrors(draft) : template ? metadataErrors(template) : []);
+  const dirty = $derived(blank !== null || template !== null || (draft ? metadataDirty(draft) : false));
   const standardDecision = $derived(draft ? metadataStandardDecisionRequired(draft) : false);
   const rows = $derived(review?.projectRecords.rows ?? []);
   const available = $derived.by(() => {
@@ -45,7 +48,9 @@
   }
   export function undo() {
     if (busy) { error = 'Wait for the current metadata operation before Undo.'; return; }
-    if (blank) {
+    if (template) {
+      template = null; error = null; success = 'Template creation proposal undone; no record, identity or history was allocated.';
+    } else if (blank) {
       blank = null; error = null; success = 'Blank creation proposal undone; no record, identity or history was allocated.';
     } else if (draft && !committedFailure) {
       draft = beginMetadataDraft(draft.review, draft.original.rowId);
@@ -77,6 +82,38 @@
         committedFailure = true; blank = null; draft = null;
         error = `Metadata creation committed, but refresh/cleanup failed. Reload before another edit; completed writes must not be replayed: ${String(cause)}`;
       } else error = `Blank metadata creation failed; reviewed proposal retained for retry: ${String(cause)}`;
+    } finally { saving = false; }
+  }
+  function reviewTemplate(rowId: string) {
+    if (!allowTemplateCreation || !ready || !review || busy || dirty || committedFailure) {
+      error = 'Reload an available empty metadata review before selecting a master template.'; return;
+    }
+    try { template = beginMetadataTemplate(review, rowId, available); error = null; success = null; }
+    catch (cause) { error = `Template proposal unavailable; no data changed: ${String(cause)}`; }
+  }
+  function stageTemplate(field: ProjectMetadataEditorField, raw: string, nullValue: boolean) {
+    if (!ready || !template || busy || committedFailure) { error = 'Reload available metadata before reviewing template assignments.'; return; }
+    try { template = stageMetadataTemplate(template, field, raw, nullValue); error = null; success = null; }
+    catch (cause) { error = `Template draft failed; proposal retained: ${String(cause)}`; }
+  }
+  async function createTemplate() {
+    if (!allowTemplateCreation || !ready || !template || busy || committedFailure || errors.length) {
+      error = 'Resolve all explicit template assignments before creation; raw errors were retained.'; return;
+    }
+    let committed = false;
+    saving = true; error = null; success = null;
+    try {
+      const created = await client.CreateProjectMetadataFromTemplate(metadataTemplateRequest(template));
+      committed = true; template = null;
+      await oncommitted();
+      const next = await client.ReviewProjectMetadata(plot);
+      review = next; draft = beginMetadataDraft(next, created.rowId);
+      success = 'One reviewed template record and full creation audit committed atomically. Unmapped fields/stamps remain NULL; ordinary editing and Save are separate.';
+    } catch (cause) {
+      if (committed || String(cause).includes('metadata edit committed, but')) {
+        committedFailure = true; template = null; draft = null;
+        error = `Template creation committed, but refresh/cleanup failed. Reload before another edit; completed writes must not be replayed: ${String(cause)}`;
+      } else error = `Template creation failed; reviewed assignments retained for retry: ${String(cause)}`;
     } finally { saving = false; }
   }
   async function reload() {
@@ -145,8 +182,8 @@
     if (busy || dirty || errors.length) { error = 'Save or Undo metadata drafts before closing; invalid raw entries cannot be discarded implicitly.'; return; }
     onclosed();
   }
-  function summary(row: import('../bindings/github.com/boostao/vpro-wails').ProjectMetadataRow) {
-    const index = review?.projectRecords.columns?.findIndex(column => column.name === 'ProjectTitle') ?? -1;
+  function summary(row: import('../bindings/github.com/boostao/vpro-wails').ProjectMetadataRow, master = false) {
+    const index = (master ? review?.masterTemplates : review?.projectRecords)?.columns?.findIndex(column => column.name === 'ProjectTitle') ?? -1;
     const value = row.cells?.[index];
     return value?.storage === 'null' ? 'NULL title' : value?.text === '' ? 'Empty title' : value ? metadataCellText(value) : 'Unavailable title';
   }
@@ -170,10 +207,68 @@
     {#each rows as row (row.rowId)}
       <button type="button" data-metadata-row={row.rowId} aria-pressed={draft?.original.rowId === row.rowId} onclick={() => select(row.rowId)}>Record {row.rowId}: {summary(row)}</button>
     {:else}<p>No matching existing metadata records.
-      {allowCreation ? 'Review explicit blank creation below; template proposals remain unavailable.' : 'New/blank/template proposals remain unavailable.'}</p>{/each}
+      {allowCreation || allowTemplateCreation ? 'Review an explicitly enabled creation proposal below.' : 'New/blank/template proposals remain unavailable.'}</p>{/each}
   </fieldset>
-  {#if allowCreation && rows.length === 0 && !blank}
+  {#if allowCreation && rows.length === 0 && !blank && !template}
     <button type="button" disabled={!ready || busy || dirty || committedFailure} onclick={reviewBlank}>Review blank metadata creation</button>
+  {/if}
+  {#if allowTemplateCreation && rows.length === 0 && !blank && !template}
+    <fieldset disabled={!ready || busy || dirty || committedFailure}><legend>Select one physical master template explicitly</legend>
+      {#each review?.masterTemplates.rows ?? [] as row (row.rowId)}
+        <button type="button" data-metadata-template={row.rowId} onclick={() => reviewTemplate(row.rowId)}>Review master template {row.rowId}: {summary(row, true)}</button>
+      {:else}<p>No matching master templates. No first-row choice, identity assignment or template is inferred.</p>{/each}
+    </fieldset>
+  {/if}
+  {#if template}
+    <fieldset data-metadata-template-proposal><legend>Review32 assignments from master record {template.original.rowId}</legend>
+      <p>Existing Project ID {JSON.stringify(template.review.projectId)} remains unchanged.
+        Source timestamps require an explicit signed16 year or NULL; incompatible codes require literal text or NULL.
+        No source value is silently converted. Unmapped fields and version/date stamps remain NULL.
+        Only one record is created; all other master candidates remain untouched.</p>
+      <div class="metadata-grid">
+        {#each metadataTemplateFields as name (name)}
+          {@const field = available.find(field => field.name === name)}
+          {@const cell = template.cells[name]}
+          {@const index = template.review.masterTemplates.columns?.findIndex(column => column.name === name) ?? -1}
+          {@const source = template.original.cells?.[index]}
+          {#if field && cell}
+            <div class="metadata-field" class:wide={name === 'Notes' || name === 'FieldDataCollectionTeam' || name === 'ProjectPurpose'}>
+              <label for={'metadata-template-' + name}>{metadataLabel(name)}</label>
+              <p>Master source: {source?.storage === 'null' ? 'NULL' : source ? `${source.storage}: ${JSON.stringify(metadataCellText(source))}` : 'Unavailable'}</p>
+              {#if name === 'Notes'}
+                <textarea id={'metadata-template-' + name} rows="4" value={cell.raw}
+                  disabled={!ready || busy || committedFailure || cell.nullValue} aria-invalid={cell.error !== null}
+                  oninput={event => stageTemplate(field, event.currentTarget.value, false)}></textarea>
+              {:else if field.collection}
+                <select id={'metadata-template-' + name} value={cell.raw}
+                  disabled={!ready || busy || committedFailure || cell.nullValue} aria-invalid={cell.error !== null}
+                  onchange={event => stageTemplate(field, event.currentTarget.value, false)}>
+                  {#if !['1', '2', '3'].includes(cell.raw)}<option value={cell.raw}>Unresolved source {cell.raw || 'NULL'}</option>{/if}
+                  <option value="1">Complete</option><option value="2">Partial</option><option value="3">None</option>
+                </select>
+              {:else}
+                <input id={'metadata-template-' + name} type="text" inputmode={field.kind === 'integer' ? 'numeric' : 'text'}
+                  list={field.referenceList ? 'metadata-template-options-' + name : undefined} value={cell.raw}
+                  disabled={!ready || busy || committedFailure || cell.nullValue} aria-invalid={cell.error !== null}
+                  oninput={event => stageTemplate(field, event.currentTarget.value, false)} />
+                {#if field.referenceList}
+                  <datalist id={'metadata-template-options-' + name}>{#each field.options ?? [] as option, i (i)}
+                    {#if option.value !== null}<option value={option.value}>{option.description ?? ''}</option>{/if}
+                  {/each}</datalist>
+                {/if}
+              {/if}
+              <label class="null-option" for={'metadata-template-null-' + name}>
+                <input id={'metadata-template-null-' + name} type="checkbox" checked={cell.nullValue}
+                  disabled={!ready || busy || committedFailure} onchange={event => stageTemplate(field, cell.raw, event.currentTarget.checked)} />
+                Store NULL
+              </label>
+              {#if cell.error}<p class="failure">{cell.error}</p>{/if}
+            </div>
+          {/if}
+        {/each}
+      </div>
+      <button type="button" disabled={!ready || busy || committedFailure || errors.length > 0} onclick={createTemplate}>Create reviewed template metadata record</button>
+    </fieldset>
   {/if}
   {#if blank}
     <fieldset data-metadata-blank-proposal><legend>Confirm one blank record for the existing parent identity</legend>

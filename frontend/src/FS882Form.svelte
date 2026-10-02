@@ -97,6 +97,7 @@
   let codeCheckEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   const metadataEnabled = import.meta.env.VITE_PROJECT_METADATA_EDITING === 'true';
   const metadataCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_CREATION === 'true';
+  const metadataTemplateCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_TEMPLATE_CREATION === 'true';
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
@@ -1844,7 +1845,7 @@
   <div class="fs882-body overflow-y-auto flex-1">
     {#if metadataOpen}
       <ProjectMetadataEditor bind:this={metadataEditor} client={PlotService} plot={draft.plotNumber}
-        allowCreation={metadataCreationEnabled}
+        allowCreation={metadataCreationEnabled} allowTemplateCreation={metadataTemplateCreationEnabled}
         onbusy={value => metadataBusy = value}
         onclosed={() => { metadataOpen = false; error = null; }}
         oncommitted={() => loadChildData(draft.plotNumber)} />

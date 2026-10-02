@@ -6,7 +6,8 @@ const {compile} = require('svelte/compiler');
 const {loadTypeScript} = require('./svelteTestHelpers.cjs');
 const quality = loadTypeScript('qualityEditor.ts', {'./becEditor': loadTypeScript('becEditor.ts')});
 const defaults = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-standard.json'),'utf8'));
-const editor = loadTypeScript('projectMetadataEditor.ts', {'./qualityEditor': quality,'../../resources/project-metadata-standard.json':defaults});
+const mapping = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-template.json'),'utf8'));
+const editor = loadTypeScript('projectMetadataEditor.ts', {'./qualityEditor': quality,'../../resources/project-metadata-standard.json':defaults,'../../resources/project-metadata-template.json':mapping});
 const layout = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-layout.json'),'utf8'));
 const presentation = loadTypeScript('projectMetadataPresentation.ts', {'../../resources/project-metadata-layout.json': layout});
 const json = value => JSON.parse(JSON.stringify(value));
@@ -38,6 +39,47 @@ test('Blank metadata proposal captures empty schema and existing bounded parent 
     {...empty,projectId:'\ud800'},{...empty,projectRecords:{columns:schema,rows:null}}]) {
     assert.throws(()=>editor.metadataBlankRequest(invalid));
   }
+});
+test('Template proposal preserves physical selection and source33 mapping without timestamp/code coercion or historical-invalid inheritance',()=>{
+  const names=presentation.metadataGroups.flatMap(group=>group.names);
+  const schema=['ID','ProjectID','AllSpecs','TableOfLists','DateLastEdited',...names].map(name=>({name,declaredType:'TEXT'}));
+  const sourceNames=['ProjectID',...editor.metadataTemplateFields];
+  const masterRow={rowId:'12',cells:sourceNames.map(name=>name==='ProjectID'?cell('text','Project'):
+    name==='ProjectTitle'?cell('text','  Literal title  '):name==='StartDate'?cell('text','2000-01-02 03:04:05'):
+    name==='GeoRefMethod'?cell('integer','7'):name==='CollectedSite'?cell('integer','-1'):
+    name==='Notes'?cell('text',''):cell('null'))};
+  const empty={...review,projectRecords:{columns:schema,rows:[]},
+    masterTemplates:{columns:sourceNames.map(name=>({name,declaredType:'TEXT'})),rows:[masterRow,{...masterRow,rowId:'13'}]}};
+  const fields=editor.metadataTemplateFields.map(name=>field(name,
+    ['StartDate','EndDate','NumberOfFS882Plots','NumberOfSiteVisits',...editor.metadataTemplateFields.filter(name=>name.startsWith('Collected'))].includes(name)?'integer':'text',
+    name==='NumberOfFS882Plots'?32:name==='Notes'?0:['StartDate','EndDate','NumberOfSiteVisits'].includes(name)?16:255,
+    {collection:name.startsWith('Collected')}));
+  let draft=editor.beginMetadataTemplate(empty,'13',fields);
+  assert.equal(draft.original.rowId,'13');
+  assert.equal(Object.keys(draft.cells).length,32);
+  assert.equal(draft.cells.StartDate.raw,'2000-01-02 03:04:05');
+  assert.match(draft.cells.StartDate.error,/explicit/);
+  assert.match(draft.cells.GeoRefMethod.error,/explicit literal text/);
+  assert.match(draft.cells.CollectedSite.error,/not a BOOLEAN/);
+  assert.throws(()=>editor.metadataTemplateRequest(json(draft)));
+  for(const [name,raw] of [['StartDate','2025'],['GeoRefMethod','Chosen literal'],['CollectedSite','1']]) {
+    draft=editor.stageMetadataTemplate(json(draft),fields.find(field=>field.name===name),raw,false);
+  }
+  let request=editor.metadataTemplateRequest(draft);
+  assert.equal(request.rowId,'13');
+  assert.equal(request.values.length,32);
+  assert.equal(request.values.find(change=>change.column==='ProjectTitle').value.text,'  Literal title  ');
+  assert.equal(request.values.find(change=>change.column==='Notes').value.text,'');
+  assert.equal(request.values.find(change=>change.column==='EndDate').value.storage,'null');
+  assert.equal(request.values.some(change=>['ID','ProjectID','DateLastEdited'].includes(change.column)),false);
+  draft=editor.stageMetadataTemplate(draft,fields.find(field=>field.name==='StartDate'),'32768',false);
+  assert.throws(()=>editor.metadataTemplateRequest(json(draft)));
+  draft=editor.stageMetadataTemplate(draft,fields.find(field=>field.name==='StartDate'),draft.cells.StartDate.raw,true);
+  assert.equal(editor.metadataTemplateRequest(draft).values.find(change=>change.column==='StartDate').value.storage,'null');
+  for(const id of ['', '01','-0','99']) assert.throws(()=>editor.beginMetadataTemplate(empty,id,fields));
+  assert.throws(()=>editor.beginMetadataTemplate(review,'12',fields));
+  assert.throws(()=>editor.beginMetadataTemplate(empty,'12',fields.slice(1)),/missing or ambiguous/);
+  assert.throws(()=>editor.stageMetadataTemplate(draft,field('ID'),'1',false),/identity\/stamps/);
 });
 test('Metadata raw numeric errors survive serialization/remount, gate requests and clear on valid correction or Undo',()=>{
   const start = field('StartDate','integer',16);
@@ -143,6 +185,10 @@ test('Metadata component stays outside remounted tabs and gates ordinary Save/Lo
   assert.match(component,/completed writes must not be replayed/);
   assert.match(component,/Save failed; raw drafts retained/);
   assert.match(form,/VITE_PROJECT_METADATA_CREATION === 'true'/);
+  assert.match(form,/VITE_PROJECT_METADATA_TEMPLATE_CREATION === 'true'/);
+  assert.match(component,/template = beginMetadataTemplate\(review, rowId, available\)/);
+  assert.match(component,/await client\.CreateProjectMetadataFromTemplate\(metadataTemplateRequest\(template\)\)/);
+  assert.match(component,/committed = true; template = null/);
   assert.match(component,/blank = metadataBlankRequest\(review\)/);
   assert.match(component,/await client\.CreateBlankProjectMetadata\(blank\)/);
   assert.match(component,/blank = null; error = null; success = 'Blank creation proposal undone/);

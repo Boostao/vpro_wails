@@ -78,6 +78,7 @@ export type {
     ProjectMetadataReview,
     ProjectMetadataRow,
     ProjectMetadataTable,
+    ProjectMetadataTemplateCreate,
     ProjectState,
     RegionCodeChoice,
     SUInfo,

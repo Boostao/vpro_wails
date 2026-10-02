@@ -1270,9 +1270,41 @@ core/guard/default assets and binaries, source.zip, native/restoration receipts,
 backups and final focused/frontend/race logs. Previous protected18b5d693... is
 archived; exact accepted defaultc22c00fe... is promoted without rebuilding.
 
-Remaining metadata acceptance: explicit physical master-template selection with
-the complete source33-field mapping and original candidate/schema snapshot;
-explicit master timestamp/code conversion decisions; metadata-specific
+Explicit template creation is implemented and native-verified under its separate
+`VITE_PROJECT_METADATA_TEMPLATE_CREATION=true` gate plus the editor flag; it does
+not require blank creation to be enabled. Select one physical matching master row
+and review32 ordinary assignments from the exact source33-field mapping. The
+retained VBA fixture tests both INSERT and SELECT order against the shared JSON.
+Complete master candidates/schema and an empty project review guard the transaction.
+Canonical VMetaData ProjectID uniqueness remains intact; a separately varied
+disposable legacy fixture verifies explicit duplicate selection without bulk copy.
+No wrong-recordset branch, inferred identity or default first-row selection is used.
+Non-NULL timestamp dates require explicit signed16 year/NULL choices. Incompatible
+numeric codes require literal destination text/NULL choices, not guessed catalogue
+mapping or silent stringification. Compatible values are visible editable proposals;
+new bounds/domains apply even to unchanged historical source values. NULL/empty
+and source literals remain distinct. The original master is attached read-only.
+
+Template creation reuses the blank transaction's reserved allocation, complete
+typed75-column audit, original/final row/schema/candidate and raw parent guards.
+All41 unmapped columns/stamps remain NULL; source-standard form population and
+ordinary version/date stamping are not SQL-copy side effects. Resident proposals
+retain raw errors/retry, block unrelated Save/Lock/close/context transitions and
+Undo without allocation. Committed proposals clear before fallible refresh and
+cannot replay; recovery requires an explicit existing-record selection.
+Focused metadata/context8.883s,224 frontend tests/check0 errors/0 warnings,
+opt-in/default builds and complete race560.168s pass; bindings15/137/66 and49
+scoped operations. Nativeb36e97bd.../owned5444 verifies32 visible labelled controls,
+nine explicit conversions, remount/close/Undo, audit-trigger parent-drift rollback,
+retained retry, reservedID4, one independently matched75-cell creation audit and
+committed-refresh recovery without replay. Exact project/master/support/config
+fixture bytes restore. Default3db65721.../owned6668 verifies both creation gates
+and the editor remain unavailable while Site/Vegetation stay active, with zero
+writes. Archives/metadata-template-checkpoint seals53 hashed files plus manifest,
+source.zip, exact assets/binaries/receipts/backups/test logs and precedingc22c00fe....
+Exact accepted default3db65721... is promoted without rebuilding.
+
+Remaining metadata acceptance: metadata-specific
 restoration; reference attachment/master-catalogue writes. Keep these unavailable
 and leave existing-record editing opt-in rather than claiming the full source
 copy action is complete. Navigation and ordered profiling remain separate work.
