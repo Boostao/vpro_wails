@@ -65,6 +65,11 @@ func profileOwnedFiles(c *sqliteContext) error {
 }
 
 func (s *ContextService) RunProjectPlotProfile(ctx context.Context, contextID string, request ProjectPlotProfileRunRequest) (ProjectPlotProfileResult, error) {
+	return s.runProjectPlotProfile(ctx, contextID, request, nil)
+}
+
+func (s *ContextService) runProjectPlotProfile(ctx context.Context, contextID string, request ProjectPlotProfileRunRequest,
+	observe func(*sql.Tx, ProjectPlotProfileResult) error) (ProjectPlotProfileResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (result ProjectPlotProfileResult, resultErr error) {
 		owner := plots.projects.sqlite
 		if err := profileOwnedFiles(owner); err != nil {
@@ -175,6 +180,11 @@ func (s *ContextService) RunProjectPlotProfile(ctx context.Context, contextID st
 		result.PlotNumbers, err = queryProfilePlots(ctx, tx, `SELECT PlotNumber FROM VProProfileRunPlots ORDER BY PlotNumber COLLATE BINARY`, nil)
 		if err != nil {
 			return ProjectPlotProfileResult{}, err
+		}
+		if observe != nil {
+			if err := observe(tx, result); err != nil {
+				return ProjectPlotProfileResult{}, err
+			}
 		}
 		if err := profileOwnedFiles(owner); err != nil {
 			return ProjectPlotProfileResult{}, err

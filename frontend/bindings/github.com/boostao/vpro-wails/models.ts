@@ -524,6 +524,17 @@ export interface ProjectPlotProfileEdit {
     "drafts": ProjectPlotProfileRuleDraft[] | null;
 }
 
+export interface ProjectPlotProfileFilterRequest {
+    "input": ProjectPlotProfileRunRequest;
+    "preview": ProjectPlotProfileResult;
+}
+
+export interface ProjectPlotProfileNavigation {
+    "contextId": string;
+    "result": ProjectPlotProfileResult;
+    "plots": PlotSummary[] | null;
+}
+
 export interface ProjectPlotProfileResult {
     "project": string;
     "table": string;

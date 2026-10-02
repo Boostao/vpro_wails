@@ -12,7 +12,8 @@
     type AuditEntry,
     type ListItem,
     type SpeciesItem,
-    type VegetationDeletionReview
+    type VegetationDeletionReview,
+    type ProjectPlotProfileFilterRequest
   } from '../bindings/github.com/boostao/vpro-wails';
   import { Lock, Unlock, Save, RotateCcw, AlertTriangle, Check, Plus, Trash2, Search, X } from '@lucide/svelte';
   import HeaderEditor from './HeaderEditor.svelte';
@@ -49,7 +50,9 @@
   import { beginVegetationCreation, stageVegetationCreation, stageVegetationCreationSpecies, chooseVegetationCreationSpecies, vegetationCreationSpeciesError, vegetationCreationErrors, vegetationCreationRequest, type VegetationCreationDraft } from './vegetationCreationEditor';
   import { beginPersonalSpecies, beginCreationPersonalSpecies, matchesPersonalSpeciesSource, matchesCreationPersonalSpeciesSource, stagePersonalText, personalSpeciesErrors, personalSpeciesRequest, personalSpeciesMatches, personalSpeciesCommittedError, personalLifeforms, personalTextFields, type PersonalSpeciesDraft } from './personalSpeciesEditor';
 
-  let { plotNumber, contextId, onSaved, onClosed, onBusyChange }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void } = $props();
+  let { plotNumber, contextId, onSaved, onClosed, onBusyChange, onProfileNavigation }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void;
+    onProfileNavigation?: (proposal: ProjectPlotProfileFilterRequest, contextId: string) => Promise<void>;
+  } = $props();
   const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
   const reads = new ReadRequests();
   const referenceReads = new ReadRequests();
@@ -113,6 +116,7 @@
   const profileEditingEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_EDITING === 'true';
   const profileCreationEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_CREATION === 'true';
   const profileDeletionEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_DELETION === 'true';
+  const profileFilteringEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_FILTERING === 'true';
   let profileReviewOpen = $state(false);
   let profileReviewBusy = $state(false);
   let profileReviewBlocked = $state(false);
@@ -1880,6 +1884,10 @@
     {#if profileReviewOpen}
       <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
         allowEditing={profileEditingEnabled} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}
+        allowFiltering={profileFilteringEnabled} onapply={async proposal => {
+          if (!onProfileNavigation) throw new Error('Profile navigation publication is unavailable.');
+          await onProfileNavigation(proposal, contextId);
+        }}
         onblocked={value => profileReviewBlocked = value} onbusy={value => profileReviewBusy = value}
         onclosed={() => { profileReviewOpen = false; }} />
     {/if}

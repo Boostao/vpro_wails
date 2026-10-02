@@ -83,6 +83,8 @@ export type {
     ProjectPlotProfileCreation,
     ProjectPlotProfileDeletion,
     ProjectPlotProfileEdit,
+    ProjectPlotProfileFilterRequest,
+    ProjectPlotProfileNavigation,
     ProjectPlotProfileResult,
     ProjectPlotProfileReview,
     ProjectPlotProfileRuleDraft,

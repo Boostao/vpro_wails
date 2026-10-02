@@ -1,4 +1,5 @@
-import type { ProjectMetadataCell, ProjectMetadataColumn, ProjectMetadataTable, ProjectPlotProfileReview, ProjectPlotProfileResult } from '../bindings/github.com/boostao/vpro-wails';
+import type { ProjectMetadataCell, ProjectMetadataColumn, ProjectMetadataTable, ProjectPlotProfileReview, ProjectPlotProfileResult,
+  ProjectPlotProfileFilterRequest, ProjectPlotProfileNavigation, PlotSummary, PlotPage } from '../bindings/github.com/boostao/vpro-wails';
 import { metadataCellText } from './projectMetadataEditor';
 
 export const plotProfileFields = ['Order', 'Table', 'Field', 'Operator', 'Layer', 'Species', 'Criteria', 'Operation', 'PlotCount'] as const;
@@ -65,7 +66,7 @@ export interface ProfileRunResult {
   steps: { rowId: string; order: number; operation: string; plotCount: number; remaining: number }[];
 }
 
-export function validateProfileRunResult(result: ProjectPlotProfileResult, review: ValidatedProjectPlotProfileReview): ProfileRunResult {
+export function validateProfileRunResult(result: ProjectPlotProfileResult, review: Pick<ValidatedProjectPlotProfileReview, 'project' | 'table' | 'rules'>): ProfileRunResult {
   const { plotNumbers, steps } = result;
   const ids = new Set(review.rules.rows.map(row => row.rowId));
   if (result.project !== review.project || result.table !== review.table || !result.su ||
@@ -92,3 +93,47 @@ export function validateProjectPlotProfileReview(review: ProjectPlotProfileRevie
     rules: validateTable(review.rules, plotProfileFields),
     descriptions: validateTable(review.descriptions, ['table_name', 'description']) };
 }
+
+export interface ProfileNavigation {
+    contextId: string;
+    proposal: ProjectPlotProfileFilterRequest;
+    result: ProfileRunResult;
+    plots: PlotSummary[];
+  }
+
+export function profileFilterUnavailable(result: ProfileRunResult): string | null {
+    return result.plotNumbers.length === 0 ? 'Profile resulted in zero plots; current navigation filter remains unchanged.' :
+      result.plotNumbers.length > 200 ? 'Profile exceeds 200 plots; Save as SU is unavailable. Current navigation filter remains unchanged.' : null;
+  }
+
+export function validateProfileNavigation(navigation: ProjectPlotProfileNavigation, proposal: ProjectPlotProfileFilterRequest,
+      contextId: string): ProfileNavigation {
+    const source = { project: proposal.preview.project, table: proposal.preview.table,
+      rules: validateTable(proposal.input.originalRules, plotProfileFields) };
+    if (!contextId || navigation.contextId !== contextId || source.table !== `${source.project}_Profile`) {
+      throw new Error('Profile navigation belongs to another context/project; current filter remains unchanged.');
+    }
+    const expected = validateProfileRunResult(proposal.preview, source);
+    const result = validateProfileRunResult(navigation.result, source);
+    if (profileFilterUnavailable(result) || result.su !== expected.su || result.totalPlots !== expected.totalPlots ||
+        JSON.stringify(result.plotNumbers) !== JSON.stringify(expected.plotNumbers) ||
+        result.steps.some((step, index) => {
+          const original = expected.steps[index];
+          return step.rowId !== original.rowId || step.order !== original.order || step.operation !== original.operation ||
+            step.plotCount !== original.plotCount || step.remaining !== original.remaining;
+        })) throw new Error('Profile navigation differs from the reviewed execution; rerun before applying.');
+    const plots = navigation.plots;
+    if (!Array.isArray(plots) || plots.length !== result.plotNumbers.length ||
+        plots.some((plot, index) => plot.plotNumber !== result.plotNumbers[index] ||
+          (['fieldNumber', 'plotRepresenting', 'zone', 'subZone', 'siteSeries'] as const).some(name => {
+            const value = plot[name];
+            return value !== null && typeof value !== 'string';
+          }))) throw new Error('Profile navigation requires exactly one complete scoped summary per literal plot identity.');
+    return { contextId, proposal, result, plots };
+  }
+
+export function profileNavigationPage(navigation: ProfileNavigation, contextId: string, offset: number, limit: number): PlotPage {
+    if (navigation.contextId !== contextId || !Number.isInteger(offset) || offset < 0 ||
+        !Number.isInteger(limit) || limit < 1 || limit > 200) throw new Error('Profile navigation page is stale or out of range.');
+    return { total: navigation.plots.length, plots: navigation.plots.slice(offset, offset + limit) };
+  }

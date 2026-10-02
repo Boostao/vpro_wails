@@ -125,6 +125,10 @@ export function LookupSpeciesCodeCheckTarget(contextID: string, lookup: $models.
     return $Call.ByID(1738673856, contextID, lookup);
 }
 
+export function ResolveProjectPlotProfileNavigation(contextID: string, request: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProjectPlotProfileNavigation> {
+    return $Call.ByID(3203258907, contextID, request);
+}
+
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
 }

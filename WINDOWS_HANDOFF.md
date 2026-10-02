@@ -34,14 +34,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all56 editor operations to immutable identities, leases running operations and
+  all57 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `9a5186fcfbc023fe1b3103f740420b3fd400b1eb15f50463c7dbea845c7988be`.
+  `ab0546a1855bdb4fbe38d544be88b99c04e99463f876e388e63b2b9ebf969c45`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -953,16 +953,46 @@ SHA2569a5186fcfbc023fe1b3103f740420b3fd400b1eb15f50463c7dbea845c7988be
 metadata disabled and zero writes. Both owned apps exited; every original fixture
 byte is restored. Archives/project-profile-lifecycle-checkpoint preserves68f5,
 accepted core/default, exact assets, source/proofs/visuals/logs and a sealed manifest.
-Current/candidate are exact accepted9a51 copies; never rebuild protected paths
+Accepted9a51 is the sealed filter predecessor; never rebuild protected paths
 in place. Earlier rules/run/review seals remain immutable, including the two honest
 rule-edit harness corrections. Do not replay completed lifecycle prepare/gates/
 mutations/finish/default/seal modes or earlier completed rule-edit proofs.
-External/current profile-file/table creation/selection, filter application,
-Save as SU and technical-history restoration remain unavailable.
-Next bounded gate is explicit ephemeral profile-result navigation filtering.
-The plan maps original Apply/zero/>200/reset branches and reuses App's verified
-Save/Discard/Cancel publication; no new infrastructure or automatic SU/count
-writes. Source application and native Access execution parity remain unverified.
+Explicit ephemeral profile-result navigation filtering is native-Wails-verified,
+separately opt-in: VITE_PROJECT_PLOT_PROFILE_FILTERING=true plus review/run.
+One scoped Resolve API reuses the isolated runner/transaction to revalidate
+current rules/lump/scoped data and exact result membership/step counts before
+returning complete readonly summaries from that same snapshot. App owns the
+immutable context/project/SU recordset and matching counts/pages/Previous/Next.
+Apply/Clear/Next reuse Save/Discard/Cancel; refresh/navigation revalidate stored
+inputs and preserve the old filter with visible errors on failure. Context/SU
+switch retires it. Ancestor-disabled controls prevent new edits during fallible
+publication; confirmed plot changes remount the editor. Detail/child writer
+authority remains physically project-scoped, not navigation membership.
+Empty/>200 results remain unavailable with explicit warnings and no implicit
+filter clear or SU/count writes. Missing/NULL explicit choices and raw JSON
+Unicode fail before decoder repair. This adapts source zero/overflow/reset behavior.
+Full race496.582s plus final strict/profile race14.806s;243 frontend tests/check0/0/
+both builds pass. Actual bindings15 services/145 methods/77 interfaces/two enums;
+57 context operations. Native core bin/vpro-project-profile-filter-core.exe
+957f28670d010a71943f981dd296907f9422518679aa320a5967c1c6942d32fd
+/owned12136 proves canonical52/11 membership, Apply/Next/Clear Cancel/Discard,
+fresh mounts/narrow controls and exactly one independent SiteSurveyor Save/audit.
+Two-plot SU switching retires the filter and preserves semantic YAML preferences.
+Final bin/vpro-project-profile-filter-final.exe
+8c1f4cc795bef21360ddcf0b0f7df3e8ae8d21bec7aed82e0a6e8c95da0f482c
+/owned6636 proves strict missing/NULL choices and no-write Apply/Next/Clear on the
+accepted checkpoint; the completed parent Save was not replayed.
+Default bin/vpro-project-profile-filter-default.exe
+ab0546a1855bdb4fbe38d544be88b99c04e99463f876e388e63b2b9ebf969c45
+/owned17396 keeps all six profiling gates off, Vegetation active, no persisted
+filter and zero writes. All owned apps exited and every original fixture/support/
+configuration byte is restored. Archives/project-profile-filter-checkpoint retains
+9a51, accepted core/final/default, exact assets/proofs/visuals/logs/source and manifest.
+Current/candidate are exact acceptedab05 default copies; never rebuild them in place.
+Do not replay completed filter prepare/gates/save/scope/finish/final/default/seal.
+External/current profile-file/table creation/selection, Save as SU, restoration
+and native Access execution parity remain unavailable; implement the next bounded
+profile-selection contract without changing canonical database-family storage.
 Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind

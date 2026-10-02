@@ -12,6 +12,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
     ListProjectPlotProfileChoices: () => port.ListProjectPlotProfileChoices(contextId),
     ReviewProjectPlotProfileLump: () => port.ReviewProjectPlotProfileLump(contextId),
     RunProjectPlotProfile: (request: Parameters<typeof port.RunProjectPlotProfile>[1]) => port.RunProjectPlotProfile(contextId, request),
+    ResolveProjectPlotProfileNavigation: (request: Parameters<typeof port.ResolveProjectPlotProfileNavigation>[1]) => port.ResolveProjectPlotProfileNavigation(contextId, request),
     ReviewProjectMetadata: (plot: string) => port.ReviewProjectMetadata(contextId, plot),
     SaveProjectMetadata: (request: Parameters<typeof port.SaveProjectMetadata>[1]) => port.SaveProjectMetadata(contextId, request),
     CreateBlankProjectMetadata: (request: Parameters<typeof port.CreateBlankProjectMetadata>[1]) => port.CreateBlankProjectMetadata(contextId, request),

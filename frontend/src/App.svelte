@@ -2,18 +2,21 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import { Events } from '@wailsio/runtime';
   import { ChevronLeft, ChevronRight, Database, FolderOpen, RefreshCw } from '@lucide/svelte';
-  import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary } from '../bindings/github.com/boostao/vpro-wails';
+  import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary, type ProjectPlotProfileFilterRequest } from '../bindings/github.com/boostao/vpro-wails';
   import { projectState } from './state';
   import FS882Form from './FS882Form.svelte';
   import Navigation from './Navigation.svelte';
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
+  import { validateProfileNavigation, profileNavigationPage, type ProfileNavigation } from './projectPlotProfileReview';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
   let hierarchyNodes = $state<HierarchyNode[]>([]);
   let selected = $state<PlotSummary | null>(null);
+  let profileNavigation = $state<ProfileNavigation | null>(null);
+  const profileIndex = $derived(profileNavigation?.plots.findIndex(plot => plot.plotNumber === editorPlotNumber) ?? -1);
   let editorPlotNumber = $state<string | undefined>(undefined);
   let offset = $state(0);
   let busy = $state(false);
@@ -155,14 +158,70 @@
     });
   }
 
+  async function resolveNavigation(proposal: ProjectPlotProfileFilterRequest, contextId: string): Promise<ProfileNavigation> {
+    const response = await plotReads.track(ContextService.ResolveProjectPlotProfileNavigation(contextId, proposal));
+    if ($projectState?.contextId !== contextId) throw new Error('Project/SU context changed; navigation was not published.');
+    return validateProfileNavigation(response, proposal, contextId);
+  }
+
+  async function applyProfileNavigation(proposal: ProjectPlotProfileFilterRequest, origin: string) {
+    await requestTransition(async contextId => {
+      if (contextId !== origin) throw new Error('Profile proposal belongs to an old context.');
+      busy = true;
+      try {
+        await tick();
+        const next = await resolveNavigation(proposal, contextId);
+        const nextPage = profileNavigationPage(next, contextId, 0, pageSize);
+        request++; plotReads.cancelAll();
+        profileNavigation = next; page = nextPage; offset = 0; selected = null;
+        editorPlotNumber = undefined; view = 'plots'; error = '';
+      } finally { busy = false; }
+    });
+  }
+
+  async function clearProfileNavigation() {
+    await requestTransition(async contextId => {
+      busy = true;
+      try {
+        await tick();
+        const next = await plotReads.track(ProjectService.ListPlots(0, pageSize));
+        const state = await stateReads.track(ProjectService.GetState());
+        if (state.contextId !== contextId || $projectState?.contextId !== contextId) throw new Error('Context changed before clearing navigation.');
+        request++; plotReads.cancelAll();
+        profileNavigation = null; page = next; offset = 0; selected = null;
+        editorPlotNumber = undefined; view = 'plots'; error = '';
+      } finally { busy = false; }
+    });
+  }
+
+  async function navigateProfilePlot(delta: number) {
+    const source = profileNavigation;
+    const target = source?.plots[profileIndex + delta]?.plotNumber;
+    if (!source || !target) { error = 'Select an available plot in the reviewed navigation recordset.'; return; }
+    await requestTransition(async contextId => {
+      if (contextId !== source.contextId) throw new Error('Profile navigation belongs to an old context.');
+      busy = true;
+      try {
+        await tick();
+        const next = await resolveNavigation(source.proposal, contextId);
+        if (!next.plots.some(plot => plot.plotNumber === target)) throw new Error('Reviewed navigation target is no longer available.');
+        profileNavigation = next; editorPlotNumber = target; view = 'fs882'; error = '';
+      } finally { busy = false; }
+    });
+  }
+
   async function loadPlots(nextOffset: number) {
     const current = ++request;
     plotReads.cancelAll();
     busy = true;
     error = '';
     try {
-      const result = await plotReads.track(ProjectService.ListPlots(nextOffset, pageSize));
+      const source = profileNavigation;
+      const next = source ? await resolveNavigation(source.proposal, source.contextId) : null;
+      const result = next ? profileNavigationPage(next, next.contextId, nextOffset, pageSize) :
+        await plotReads.track(ProjectService.ListPlots(nextOffset, pageSize));
       if (current !== request) return;
+      if (next) profileNavigation = next;
       page = result;
       offset = nextOffset;
       selected = null;
@@ -189,6 +248,7 @@
       const state = await stateReads.track(ProjectService.GetState());
       if (current !== stateRequest) return;
       projectState.set(state);
+      if (profileNavigation && profileNavigation.contextId !== state.contextId) profileNavigation = null;
       await loadPlots(0);
       if (current !== stateRequest) return;
       await loadHierarchy();
@@ -232,6 +292,7 @@
       const state = await ContextService.SwitchContext(contextId, selection);
       request++;
       projectState.set(state);
+      profileNavigation = null;
       page = null;
       selected = null;
       hierarchyNodes = [];
@@ -369,6 +430,20 @@
     </aside>
 
     <main class="content">
+      {#if profileNavigation}
+        <section class="m-2 p-2 border rounded flex flex-wrap items-center gap-3" aria-label="Active profile navigation">
+          <span>{profileNavigation.plots.length} of {profileNavigation.result.totalPlots} stored plots in reviewed profile navigation.</span>
+          {#if view === 'fs882'}
+            <span>Record {profileIndex + 1} of {profileNavigation.plots.length}</span>
+            <button type="button" class="px-3 py-1 border rounded disabled:opacity-50" disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || profileIndex <= 0}
+              onclick={() => void navigateProfilePlot(-1)}>Previous profile plot</button>
+            <button type="button" class="px-3 py-1 border rounded disabled:opacity-50" disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || profileIndex < 0 || profileIndex >= profileNavigation.plots.length - 1}
+              onclick={() => void navigateProfilePlot(1)}>Next profile plot</button>
+          {/if}
+          <button type="button" class="px-3 py-1 border rounded disabled:opacity-50" disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
+            onclick={() => void clearProfileNavigation()}>Clear profile navigation</button>
+        </section>
+      {/if}
       {#if $projectState?.diagnostics?.length}
         <div class="project-warning" role="status">
           <strong>Some project files could not be opened.</strong>
@@ -396,7 +471,9 @@
         <div class="h-full flex flex-col p-2">
           <p class="project-warning"><strong>Experimental FS882 editor</strong> Only verified workflows are writable. Use disposable projects only.</p>
           {#if error}<p class="error" role="alert">{error}</p>{/if}
+          <fieldset disabled={busy} class="contents">
           {#key $projectState?.contextId}
+          {#key editorPlotNumber}
           <FS882Form
             bind:this={editor}
             plotNumber={editorPlotNumber}
@@ -404,8 +481,11 @@
             onSaved={async (p) => { editorPlotNumber = p; await loadPlots(offset); }}
             onClosed={() => navigate('plots')}
             onBusyChange={(busy) => { editorBusy = busy; }}
+            onProfileNavigation={applyProfileNavigation}
           />
           {/key}
+          {/key}
+          </fieldset>
         </div>
 
         <CloseConfirm requestId={closeRequest || (pendingTransition ? 'context' : '')}

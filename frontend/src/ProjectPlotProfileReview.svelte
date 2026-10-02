@@ -4,17 +4,19 @@
   import { ReadRequests } from './readRequests';
   import type { EditorCloseState } from './closeLifecycle';
   import ProfileRuleInputs from './ProfileRuleInputs.svelte';
+  import type { ProjectPlotProfileRunRequest, ProjectPlotProfileFilterRequest } from '../bindings/github.com/boostao/vpro-wails';
   import { profileEditableFields, profileRuleValue, profileRuleOptions, stageProfileRule, profileRulesDirty,
     profileRuleErrors, profileRuleEditRequest, validateProfileChoices, beginProfileRuleCreation, stageProfileRuleCreation,
     profileCreationValue, profileCreationOptions, profileCreationErrors, profileRuleCreationRequest, profileRuleDeletionRequest,
     validateCreatedProfileRule, validateProfileLifecycleReview, type ProfileRuleCreationDraft, type ProfileRulesDraft, type ProfileRuleChoices, type ProfileField } from './projectProfileRuleEditor';
   import { profileCellLabel, validateProjectPlotProfileReview, validateProjectProfileLump, validateProfileRunResult,
-    type ValidatedProjectPlotProfileReview, type ProfileReviewTable, type ProfileRunResult } from './projectPlotProfileReview';
+    profileFilterUnavailable, type ValidatedProjectPlotProfileReview, type ProfileReviewTable, type ProfileRunResult } from './projectPlotProfileReview';
 
-  let { client, onclosed, onbusy, onblocked, allowRun = false, allowEditing = false, allowCreation = false, allowDeletion = false }: {
+  let { client, onclosed, onbusy, onblocked, onapply, allowFiltering = false, allowRun = false, allowEditing = false, allowCreation = false, allowDeletion = false }: {
     client: ReturnType<typeof bindContextPlots>; onclosed: () => void; onbusy: (busy: boolean) => void;
     onblocked: (blocked: boolean) => void; allowRun?: boolean; allowEditing?: boolean;
     allowCreation?: boolean; allowDeletion?: boolean;
+    allowFiltering?: boolean; onapply?: (proposal: ProjectPlotProfileFilterRequest) => Promise<void>;
   } = $props();
   let review = $state<ValidatedProjectPlotProfileReview | null>(null);
   let reading = $state(false);
@@ -23,6 +25,7 @@
   let lump = $state<ProfileReviewTable | null>(null);
   let subvarieties = $state(false);
   let result = $state<ProfileRunResult | null>(null);
+  let runInput = $state<ProjectPlotProfileRunRequest | null>(null);
   let draft = $state<ProfileRulesDraft | null>(null);
   let saving = $state(false);
   let committedFailure = $state(false);
@@ -183,12 +186,14 @@
   async function run() {
     if (!allowRun || busy || blocked || !review) return;
     const source = review, request = ++generation;
+    const input = { originalRules: source.rules, projectLump: lump, subvarieties };
     result = null; error = null; reading = true; running = true; onbusy(true);
     try {
-      const preview = await reads.track(client.RunProjectPlotProfile({
-        originalRules: source.rules, projectLump: lump, subvarieties
-      }));
-      if (request === generation) result = validateProfileRunResult(preview, source);
+      const preview = await reads.track(client.RunProjectPlotProfile(input));
+      if (request === generation) {
+        result = validateProfileRunResult(preview, source);
+        runInput = $state.snapshot(input);
+      }
     } catch (cause) {
       if (request === generation) error = `Profile preview failed; no stored rules, counts or filters changed: ${String(cause)}`;
     } finally {
@@ -199,6 +204,15 @@
     generation++; reads.cancelAll();
     running = false; reading = false; result = null; onbusy(false);
     error = 'Profile preview cancelled; reviewed inputs retained. No stored rules, counts or filters changed.';
+  }
+  async function applyNavigation() {
+    if (!allowFiltering || !allowRun || busy || blocked || !result || !runInput || !onapply) {
+      error = 'Run available stored inputs and finish profile drafts before applying navigation.'; return;
+    }
+    const unavailable = profileFilterUnavailable(result);
+    if (unavailable) { error = unavailable; return; }
+    try { await onapply(structuredClone($state.snapshot({ input: runInput, preview: result }))); }
+    catch (cause) { error = `Profile navigation was not applied; preview and current filter retained: ${String(cause)}`; }
   }
 </script>
 
@@ -217,6 +231,14 @@
     </div>
   </div>
   {#if error}<p role="alert" class="mt-3 text-red-800">{error}</p>{/if}
+  {#if allowFiltering && result}
+    <div class="mt-3">
+      <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50"
+        disabled={busy || blocked || profileFilterUnavailable(result) !== null} onclick={() => void applyNavigation()}>Apply reviewed profile navigation</button>
+      {#if profileFilterUnavailable(result)}<p role="alert" class="mt-2 text-red-800">{profileFilterUnavailable(result)}</p>{/if}
+      <p class="mt-2 text-sm">Explicit navigation only; current stored inputs are independently rechecked after Save/Discard/Cancel. No count, SU or configuration write.</p>
+    </div>
+  {/if}
   {#if success}<p role="status" class="mt-3 text-emerald-800">{success}</p>{/if}
   {#if reading}<p role="status" class="mt-3">Reading original inputs or evaluating stored profile rules...</p>{/if}
   {#if (allowRun || allowEditing) && review}
@@ -328,5 +350,5 @@
       </div>
     {/each}
   {/if}
-  <p class="mt-3 text-sm text-stone-600">This uses only stored project-local rules and data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other profile databases, applying filters, restoration and Save as SU remain unavailable. Rule creation/deletion require their separate opt-ins. No stored PlotCount, Access registry preference or shipped scratch table is changed.</p>
+  <p class="mt-3 text-sm text-stone-600">This uses only stored project-local rules and data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other profile databases, restoration and Save as SU remain unavailable. Rule creation/deletion and navigation filtering require their separate opt-ins. No stored PlotCount, Access registry preference or shipped scratch table is changed.</p>
 </section>

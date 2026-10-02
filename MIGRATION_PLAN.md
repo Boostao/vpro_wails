@@ -1419,8 +1419,7 @@ not persisted desktop job state or an editor catalogue.
   cancellation/retry, retained unsaved parent drafts and default-off delivery.
   Disposable canonical-sample bytes and the original active fixture are exactly
   restored; no production, source, support, audit or configuration writes occur.
-- **Next, not implied complete:** external/current profile selection, applying
-  results to form navigation/filters and Save as SU require
+- **Next, not implied complete:** external/current profile selection and Save as SU require
   separately defined ownership/draft/rollback gates. Metadata-specific
   restoration and remaining active calculations/navigation remain in order6.
 
@@ -1460,8 +1459,7 @@ not persisted desktop job state or an editor catalogue.
   original fixture/support/configuration bytes are restored. Default delivery
   keeps review/run/editing disabled. Corrected harness assumptions are recorded
   honestly; no completed write was replayed.
-- **Remaining original lifecycle:** external/current profile selection,
-  filter/navigation application and Save as SU need separate
+- **Remaining original lifecycle:** external/current profile selection and Save as SU need separate
   owned-context draft/rollback acceptance. Technical-history restoration,
   native Access execution parity and remaining source events are not implied.
 
@@ -1503,14 +1501,16 @@ not persisted desktop job state or an editor catalogue.
   draft independence. Four exact commits leave original rules/counts unchanged;
   every original fixture/support/configuration byte is restored. Default native
   delivery has all five profiling gates off and makes zero writes.
-- **Still unavailable:** external/current profile selection, filter/navigation
-  application, Save as SU, technical-history restoration, native Access execution
+- **Still unavailable:** external/current profile selection, Save as SU,
+  technical-history restoration, native Access execution
   parity and remaining calculation events require their own bounded acceptance.
 
-### Next bounded gate: profile-result navigation filter
+### Original profile-result navigation filter
 
-Finish this gate before expanding external profile selection or Save as SU.
-No new database-family/configuration framework is required.
+Delivered and native-Wails-verified, separately default off with
+`VITE_PROJECT_PLOT_PROFILE_FILTERING=true` plus review/run. External profile
+selection and Save as SU remain separate. No database-family/configuration
+framework was added.
 
 - **Source:** `USysPlotProfiling.btnGetSummary` is captioned Apply Plot Profile
   Filter and calls `ProfilePlots`. `V7mdlPlotProfiling.UpdateForms` applies the
@@ -1519,10 +1519,11 @@ No new database-family/configuration framework is required.
   offers creating an SU above200/error2176. Reset also clears stored counts.
   Do not inherit unescaped SQL literals, destructive count resets, automatic SU
   writes or `IsLoaded` as proof of Form view.
-- **Bounded desktop policy:** add a separate default-off filtering gate after
+- **Bounded desktop policy:** the separate default-off filtering gate follows
   reviewed execution. Explicit Apply/Clear owns an ephemeral, immutable
   context/project/SU-bound navigation result; SQLite remains canonical.
-  Parameterized membership must preserve exact plot identities/case/whitespace.
+  A same-snapshot SQLite TEMP relation preserves exact identities/case/whitespace;
+  no OR-literal construction or persistent filter table is used.
   Keep zero-result Apply unavailable with a visible warning and retain any
   existing filter; this deliberately differs from the source's initial
   FilterOn=False. Keep >200 Apply unavailable with an explicit unsupported
@@ -1531,21 +1532,38 @@ No new database-family/configuration framework is required.
 - **Reuse, not parallel lifecycle:** App owns browse pagination, current editor
   and verified Save/Discard/Cancel publication. R FS882's recordset and
   `request_navigation` are layout/navigation precedents, not parity proof.
-  Reuse those existing Wails transition guards before replacing the visible
+  The existing Wails transition guards are reused before replacing the visible
   recordset. Cancel/failure preserves the current editor/draft/filter; a
-  successful Save may change profiling inputs, so independently revalidate
-  the reviewed execution against current stored data before applying.
+  successful Save may change profiling inputs, so the Resolve API independently
+  reruns reviewed execution against current stored data before applying.
   Pending rule proposals/confirmations/errors must be resolved explicitly.
 - **Consistency:** membership/count/pagination/selected plot and form navigation
   must agree. Clear/context or SU switch retires the ephemeral result; late
   reads cannot republish it. Detail/child writers retain physical project
   ownership and all existing identity checks: navigation membership is not
   mutation authorization. Do not silently change hierarchy/report scope.
-- **Acceptance:** focused tests cover literal membership, empty/>200/stale
-  results, changed source rules/data/SU, cancellation, refresh failure,
-  Save/Discard/Cancel, page boundaries and original writer authority. Then full
-  race/frontend/check/build and actual Wails proofs on one disposable fixture:
-  canonical52-plot preview's11-result navigation, retained drafts/cancel,
-  explicit clear, context/SU retirement and no project/support/config/count/
-  audit writes except an independently requested parent Save. Preserve the
-  accepted9a51 baseline and keep the filtering gate disabled until verified.
+- **Implementation:** one scoped Resolve API reuses the existing isolated
+  runner/job transaction and observes summaries before committing TEMP work.
+  It revalidates exact project/SU, original rules/lump, step counts and literal
+  result membership, then returns one readonly summary per selected identity.
+  App owns the ephemeral recordset, matching counts/pages and Previous/Next.
+  Refresh/navigation revalidate stored inputs; failed refresh preserves the
+  current recordset with an explicit error. Clear/context/SU change retires it.
+  Editor controls are ancestor-disabled during fallible publication; a new
+  plot mount occurs only after the shared transition succeeds.
+- **Acceptance:** exact zero/200/201 outputs, literal quoted/whitespace identities,
+  stale/forged scopes/results, missing/NULL explicit choices, raw JSON Unicode,
+  cancellation and unchanged attached bytes pass focused tests. Full Go race
+  root496.582s plus final strict-transport/profile race14.806s,243 frontend tests,
+  check0/0 and both builds pass. Native core12136 proves canonical52/11 navigation,
+  Apply/Next/Clear Cancel/Discard, fresh plot mounts and visible narrow controls.
+  Exactly one independently requested SiteSurveyor Save/audit is observed;
+  navigation is revalidated before moving to the next plot. Explicit two-plot
+  SU switching retires the filter and preserves semantic YAML settings.
+  Final6636 verifies strict missing/NULL choices and no-write Apply/Next/Clear
+  on the accepted checkpoint without replaying the completed parent Save.
+  Default17396 keeps all six profiling gates off, no persisted filter and zero
+  writes. Every original fixture/support/configuration byte is restored.
+- **Remaining:** external/current profile-file/table creation/selection, Save
+  as SU, technical-history restoration and native Access execution parity
+  remain unavailable. Empty/over200 behavior remains explicitly bounded.
