@@ -34,18 +34,18 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all40 editor operations to immutable identities, leases running operations and
+  all41 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
-  guarded creation/deletion:
-  `a7dd1be85c7ab4b0a8330a923a47f992e136653ef79ce0810bcf9698d86cacb5`.
+  guarded personal/source creation/deletion:
+  `bb3652f3d4eae9ec9bb4966a66696e4c770dc48d17c0fad02a167c037019fd56`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
-  creation-default delivery is promoted without rebuilding. Previous deletion
-  defaultd8d51c7f... and accepted creation core/guard are archived with hashes.
+  personal-default delivery is promoted without rebuilding. Previous creation
+  defaulta7dd1be8..., deletiond8d51c7f... and accepted cores/guards are archived.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
   Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
   omission remain intact. Shared expected-value transactions span rows/tables
@@ -560,7 +560,8 @@ rows/audits/reservations. Typed zero/REAL and tuple/list harness corrections nev
 replayed writes. Core25-control summary exists, detailed array was not retained.
 Defaulta7dd1be8... independently verifies25 enabled numeric controls plus
 Species/Collected, readonly review, disabled creation/deletion, no implicit drafts
-and every fixture byte unchanged. Exact accepted default is current/candidate.
+and every fixture byte unchanged. Creation default is archived; current/candidate
+contain the accepted personal-default delivery below.
 Core11272/guard6388/default12044 exited; inspector9392 closed.
 Accepted binaries are sealed under native-vegetation-species; never rerun
 creation.py/creation-guard.py/creation-delivery.py or their completed continuations.
@@ -568,7 +569,42 @@ Next bounded work is personal species: source NotInList assigns UCase(NewData)
 to sysNewSpp and opens USysAddSpp, whose exported Code/ScientificName/EnglishName/
 LifeForm bindings and active events are identified. Writable VUser/project
 coordination is not implemented; do not infer cross-file atomicity or change
-journal modes. Keep personal creation disabled until its write contract is tested.
+journal modes. Original VUser table exports are now read: Code TEXT8 unique,
+ScientificName/EnglishName TEXT255 nullable, LifeForm signed16, Report default1,
+SppNumber/Codetype NULL defaults. USysAddSpp has12 lifeform choices, Open sets
+sysNewSpp then clears it, Close invokes DoCmd.Close and Update is inactive.
+Current personal workflow: personalspecies.go/personalspecies_test.go and
+sqlitecontext.go attachment file identities. Scoped single-VUser
+definition/CreateRecord audit transaction preserves original tables/defaults/
+metadata; VLists is readonly, shared-role user writes reject, and project Save is
+separate. Existing-row unknown-code metadata panel is opt-in only with
+VITE_PERSONAL_SPECIES_EDITING=true. Explicit NULL/name drafts retain raw errors
+through remounts and block plot Save/Lock/close. User Save reloads independent
+metadata then stages a separate existing-personal decision; plot Undo retains
+deliberately saved definitions. Committed cleanup/refresh errors disable replay.
+Final focused race6.224s/scopedGo2.894s; full final race507.979s;195 frontend
+tests/final targeted26/check0/0/builds; bindings15/129/51,41 scoped operations pass.
+Corec9f12600... verifies seven cases, one definition/one user audit and one
+separate project audit. Independent guard verifies metadata/audit trigger drift,
+255 UTF-16 units/Lifeform3/exact names and another definition/user audit without
+project writes. Pre-write C-row0 invisibility (Cover6=NULL) and already-open-editor
+harness stops replayed no writes; guard used actual visible C-row -9.
+All15 project tables/59 prior audits/original user tables/prior audit/schema/
+descriptions/other support/config bytes survive apart from those planned changes.
+Fixture now60 project audits/3 user audits, ZPNAT01 assigned only to row0,
+ZPNAT02 reusable but unassigned. Core17888/guard3976/default12924 exited.
+Defaultbb3652f3... proves25 enabled numeric controls/Species/Collected, readonly
+new-personal lookup/unknown review/Undo, all creation/deletion default-disabled
+and every fixture byte unchanged. Exact accepted default is current/candidate;
+archives/personal-checkpoint holds accepted bytes/hashes and a7dd1be8 fallback.
+No native process, inspector or race command remains. Personal-default checkpoint
+publication includes application source only; private evidence/binaries/dist remain
+ignored. Use git HEAD/upstream for its commit identity;98a2eb4 is the predecessor.
+Never replay personal.py/personal-guard.py/personal-delivery.py or completed proofs.
+Next: explicit personal/old-code decisions in new source-row drafts, then active
+metadata/calculations. Canonical-only new-row creation does not yet accept these
+codes. Source effective properties/full event parity remain unknown; no further
+native Access property probe is authorized by old evidence.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage's explicit LimitToList=NotDefault now has a separately verified

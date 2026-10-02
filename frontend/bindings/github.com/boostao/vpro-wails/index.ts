@@ -62,6 +62,7 @@ export type {
     OtherRecordUpdate,
     OtherTextUpdate,
     ParentCodeChoice,
+    PersonalSpeciesDefinitionRequest,
     PlotPage,
     PlotQualityChoice,
     PlotSummary,

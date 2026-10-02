@@ -257,7 +257,8 @@ personal-list form. Arbitrary DLookup-first behavior is not inherited: Review
 preserves every alias definition and requires explicit replace/keep. Only when
 no non-NULL master alias exists does it offer existing personal-code definitions,
 including NULL metadata outside dropdown lifeform membership. Unknown-code
-personal-list creation stays unavailable. USysAddSpp's Update button exits.
+personal-list creation stays default-disabled; the existing-row opt-in adaptation
+is described below. USysAddSpp's Update button exits.
 
 Existing-row selection/decisions are default-on, not full NotInList parity.
 `VITE_VEGETATION_SPECIES_EDITING=false` retains disabled labelled species controls.
@@ -400,8 +401,55 @@ core observations were not retained. Defaulta7dd1be8... has its own complete
 25-control array, Species/Collected enabled, readonly review and every fixture
 byte unchanged before/after clean close, with creation/deletion disabled.
 Focused final Go1.261s,191 frontend tests/check0/0/builds and full race478.504s pass.
-Personal-list creation remains unavailable pending a verified writable VUser/
-project coordination contract; this checkpoint does not create user definitions.
+This creation checkpoint does not create user definitions or accept explicit
+personal/alias new-row decisions; those remain separate from the existing-row
+personal-definition workflow below.
+
+### Existing-row personal definitions: verified opt-in desktop adaptation
+
+Original VUser exports define Code TEXT8 unique, ScientificName/EnglishName
+TEXT255 nullable, signed16 LifeForm, Report SINGLE default1, and nullable
+SppNumber LONG/Codetype TEXT1 with no default. USysAddSpp binds four fields,
+supplies12 lifeform options, prepopulates sysNewSpp on Open then clears it, and
+Close calls DoCmd.Close. Update is inactive. No Codetype='u' assignment or source
+audit event is exported; native effective properties/full dialog behavior remain
+unmeasured. Do not infer dropdown membership from successful physical storage.
+
+`VITE_PERSONAL_SPECIES_EDITING=true` enables a separate existing-row metadata
+draft after unknown-code review. Code uses the bounded verified ASCII UCase
+event; names retain literal Unicode/case/spacing with raw255-UTF-16-unit guards.
+Explicit NULL switches retain empty names distinctly, source12 lifeforms or NULL
+are selectable, and metadata/error survive remounts. Free manual LifeForm entry
+is not enabled; the backend retains its separately checked signed16 domain.
+Ordinary plot Save/Lock/Save-and-close are blocked during metadata entry.
+
+Explicit definition Save owns only one VUser transaction against original
+USysUserSpp/USysAuditTrail. A CreateRecord JSON snapshot is a desktop audit
+adaptation, not Access audit/restoration parity. Attached file identity/role,
+master/current/usable-old-code/user collisions and readonly VLists are checked.
+NULL aliases stay different from non-NULL empty definitions. Bound values,
+Report=1/SppNumber=NULL/Codetype=NULL and the actual audit snapshot are observed
+after triggers before commit; failure rolls back everything and retains drafts.
+Existing WAL mode is unchanged; no attached multi-file write/atomicity is assumed.
+Independent reload then stages an existing-personal decision; plot Save remains
+separate. Plot Undo deliberately retains a definition the user explicitly saved.
+Known committed cleanup/refresh failures disable editing instead of replaying.
+
+Native corec9f12600... verifies seven cases: raw256/remount/Save/Lock/actual-close,
+Cancel/Undo, strict transport, user audit rollback/retry, explicit user-only save
+and separate project Save. Independent guard verifies255 units, source Lifeform3,
+literal name case/spacing, stored metadata/audit drift rollback/retry and Undo.
+Two pre-write harness stops (C-row0 lacks Cover6; editor already open) changed
+no data or history; visible C-row -9 was used, with no completed write replay.
+Exactly two user definitions/two user snapshot audits and one project species
+audit change. Original15 project tables/59 old project audits, original user
+tables/prior user audit/schema/descriptions and other support/config are preserved.
+Defaultbb3652f3... verifies25 enabled numeric controls/Species/Collected, readonly
+new-definition lookup, unknown-code review/Undo and every fixture byte unchanged,
+with all creation/deletion UI disabled. Core17888/guard3976/default12924 exited.
+Focused final race6.224s/scopedGo2.894s,195 frontend tests/final targeted26/check0/0/
+builds and full integration507.979s pass. New source-row personal/alias decisions
+and active metadata/calculation event parity remain incomplete.
 
 ## Verified bounded selective restoration
 

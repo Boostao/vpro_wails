@@ -14,13 +14,14 @@ import (
 )
 
 type sqliteContext struct {
-	mu           sync.Mutex
-	db           *sql.DB
-	conn         *sql.Conn
-	projectDB    *sql.DB
-	selection    desktopSelection
-	attachments  map[string]string
-	descriptions map[string][]map[string]any
+	mu             sync.Mutex
+	db             *sql.DB
+	conn           *sql.Conn
+	projectDB      *sql.DB
+	selection      desktopSelection
+	attachments    map[string]string
+	attachmentInfo map[string]os.FileInfo
+	descriptions   map[string][]map[string]any
 }
 
 func sqliteFileURI(path, mode string) string {
@@ -93,7 +94,7 @@ func newSQLiteContext(ctx context.Context, selection desktopSelection, support m
 		return nil, err
 	}
 	candidate := &sqliteContext{db: db, conn: conn, selection: selection,
-		attachments: map[string]string{}, descriptions: map[string][]map[string]any{}}
+		attachments: map[string]string{}, attachmentInfo: map[string]os.FileInfo{}, descriptions: map[string][]map[string]any{}}
 	defer func() {
 		if resultErr != nil {
 			resultErr = errors.Join(resultErr, candidate.Close())
@@ -188,10 +189,15 @@ func (c *sqliteContext) attach(ctx context.Context, alias, path string) (string,
 	if _, exists := c.attachments[alias]; exists {
 		return "", fmt.Errorf("attachment alias %q is already owned", alias)
 	}
+	info, err := os.Stat(path)
+	if err != nil {
+		return "", fmt.Errorf("identify attachment %s: %w", alias, err)
+	}
 	if _, err := c.conn.ExecContext(ctx, "ATTACH DATABASE ? AS "+quoteHeaderIdentifier(alias), sqliteFileURI(path, "ro")); err != nil {
 		return "", fmt.Errorf("attach %s: %w", alias, err)
 	}
 	c.attachments[alias] = path
+	c.attachmentInfo[alias] = info
 	rows, err := c.tableDescriptions(ctx, alias)
 	if err != nil {
 		return "", fmt.Errorf("read %s table descriptions: %w", alias, err)

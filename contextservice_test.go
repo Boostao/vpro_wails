@@ -110,6 +110,10 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 			_, err := service.CreateSourceVegetation(stale, "stale", VegetationCreationRequest{})
 			return err
 		},
+		"personal definition": func() error {
+			_, err := service.CreatePersonalSpeciesDefinition(context.Background(), stale, PersonalSpeciesDefinitionRequest{})
+			return err
+		},
 		"deletion review": func() error {
 			_, err := service.ReviewVegetationDeletion(context.Background(), stale, "stale", "SubVegAXL_BC", 0)
 			return err

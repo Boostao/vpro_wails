@@ -858,3 +858,72 @@ implementing a writable family boundary. Preserve NULL/empty metadata, duplicate
 definitions and descriptions; do not assume attached multi-file atomicity or
 change journal modes. Keep personal creation disabled until collision, ownership,
 rollback/retry, aliases and safe project/draft coordination are verified.
+
+#### Personal-definition boundary and opt-in metadata drafts
+
+Original `VUser/Tables_Def/USysUserSpp_CreateSQL.txt` confirms Code TEXT8 with a
+unique index, nullable ScientificName/EnglishName TEXT255, signed16 LifeForm,
+Report SINGLE default1, nullable SppNumber LONG and Codetype TEXT1 with no default.
+USysAddSpp exposes only Code/LifeForm/ScientificName/EnglishName; its value list has
+12 lifeforms. Open prepopulates sysNewSpp then clears it, Close invokes DoCmd.Close,
+and Update exits after "not working". Do not invent a Codetype='u' assignment:
+new NULL-Codetype definitions do not enter normal U/X lists; the existing explicit
+personal-code decision can retrieve them independently.
+
+The scoped boundary owns a single VUser transaction
+for the definition and one explicit CreateRecord snapshot in its original
+USysAuditTrail. It is a desktop audit adaptation, not source audit/restoration
+parity. Original tables/defaults/NULL-versus-empty metadata/descriptions survive.
+It checks attached file identities and rejects a user file shared with another
+role; the writer attaches VLists readonly for master/current/old-code collision
+checks. NULL-code alias rows remain distinguishable from usable non-NULL aliases,
+including empty codes; this reuses existing source-decision availability rules.
+No caller-selected path, hidden fields, ID or project assignment is allowed.
+The transaction independently checks all bound values and hidden defaults after
+audit triggers. This does not promise cross-file atomicity: creating a reusable
+definition is an explicit user-file operation, and assigning it to a plot remains
+a separate conflict-checked draft Save. Existing WAL mode is retained unchanged.
+
+Focused coupled Go race tests pass (final6.224s; scoped binding Go2.894s): exact UTF-16 limits, raw malformed
+Unicode, NULL/empty metadata, all historical user rows and schema/descriptions,
+other family/project/config bytes, master/alias/user collisions, audit failure,
+insert/audit-trigger drift and retry, cancellation while queued/SQL-blocked,
+concurrent duplicate creation, stale/closed contexts and readonly references.
+Final full integration passes (root507.979s); earlier boundary race464.624s is
+retained. Bindings15/129/51 and41 immutable scoped operations are wired.
+Source-linked metadata drafts are native-Wails-verified and opt-in only
+(`VITE_PERSONAL_SPECIES_EDITING=true`). Code/Lifeform are grouped side by side
+when wide; labelled names stack beneath. Explicit NULL switches distinguish
+empty names, source12 lifeforms are selectable without inferred classification,
+and errors survive remounts. Ordinary plot Save never writes VUser; explicit
+definition Save independently reloads metadata before staging an existing-personal
+decision. Cancel/Undo make no new writes; a saved reusable definition deliberately
+survives plot Undo. Known committed cleanup/refresh failures report committed
+state, clear only the committed metadata and disable capabilities to avoid replay.
+
+Native corec9f12600... proves seven cases: raw256/remount/Save/Lock/actual-close
+guards, Cancel/Undo, strict transport, audit rollback/retry, explicit user-only
+Save, independent lookup, saved-definition preservation and separate plot Save.
+Independent guard uses visible C-row -9 (row0 has historical Cover6=NULL), validates
+255 UTF-16 units, source Lifeform3, exact name case/spacing and stored metadata/
+audit trigger drift rollback/retry. Its initial two pre-write harness stops
+(invisible C-row0 and already-open editor) changed no data; no completed writes
+were replayed. Exactly two user definitions/two user snapshot audits and one
+separately committed project species audit change; all15 project tables/59 prior
+project audits and all original user tables/prior user audit/schema/descriptions/
+other family/config bytes survive apart from those explicit changes.
+195 frontend tests, final targeted26/check0/0 and opt-in/default builds pass.
+Defaultbb3652f3... verifies25 enabled numeric controls plus Species/Collected,
+readonly new-personal lookup, unknown review/Undo, disabled personal/source
+creation/deletion and every fixture byte unchanged before/after clean close.
+Core17888/guard3976/default12924 exited; inspector9392 closed. Exact accepted
+default is promoted; prior a7dd1be8... and core/default are archived with hashes.
+Never replay personal.py/personal-guard.py/personal-delivery.py.
+
+Next bounded species batch: add explicit old-code/personal decisions to new
+source-row proposals, reusing the existing decision/reference validator and
+separate user-definition save. Canonical-only creation currently rejects these
+unlisted codes; do not invent Codetype or silently combine user/project writes.
+Then complete active metadata/calculation events. Full Access addition/deletion/
+personal-form effective properties remain unmeasured and source workflows stay
+default-disabled; full species/FS882/application parity is not yet complete.

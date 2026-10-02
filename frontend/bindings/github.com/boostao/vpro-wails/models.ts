@@ -377,6 +377,13 @@ export interface ParentCodeChoice {
     "diagnostic": string;
 }
 
+export interface PersonalSpeciesDefinitionRequest {
+    "entered": string;
+    "scientificName": string | null;
+    "lifeform": number | null;
+    "englishName": string | null;
+}
+
 export interface PlotPage {
     "total": number;
     "plots": PlotSummary[] | null;

@@ -125,7 +125,7 @@ test('Explicit deletion confirmation owns lifecycle without allowing generic Sav
   const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   assert.match(source,/VITE_VEGETATION_DELETE_EDITING === 'true'/);
   assert.match(source,/childUnsaved = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null\)/);
-  assert.match(source,/childParentDisabled = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null\)/);
+  assert.match(source,/childParentDisabled = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null \|\| personalDraft !== null\)/);
   assert.match(source,/deletionRequest\+\+; deletionReads\.cancelAll\(\)/);
   assert.match(source,/const species = rows\[0\]\.species/);
   assert.match(source,/const plot = draft\.plotNumber/);
@@ -173,7 +173,7 @@ test('Opt-in source creation owns independent persistent lifecycle and fails clo
   const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   assert.match(source,/VITE_VEGETATION_CREATE_EDITING === 'true'/);
   assert.match(source,/childUnsaved = \$derived\([^;]*creationDraft !== null\)/);
-  assert.match(source,/childParentDisabled = \$derived\([^;]*creationDraft !== null\)/);
+  assert.match(source,/childParentDisabled = \$derived\([^;]*creationDraft !== null \|\| personalDraft !== null\)/);
   assert.match(source,/creationInvalid\.length > 0 \? 'Correct invalid vegetation creation/);
   assert.match(source,/if \(creationDraft !== null\) \{ await saveVegetationCreation\(\); return; \}/);
   assert.match(source,/if \(creationDraft !== null\) \{ void cancelVegetationCreation\(\); return; \}/);

@@ -1,5 +1,5 @@
 import { ContextService, type FS882Header, type VegRecord, type HumusRecord, type MineralRecord,
-  type OtherRecord, type OtherRecordUpdate, type SoilRecordUpdate, type VegetationAttributeUpdate, type CollectedRecordUpdate, type VegetationSpeciesLookup, type VegetationSpeciesUpdate, type VegetationNumberUpdate, type VegetationDeletionRequest, type VegetationCreationRequest, type HeightRecordUpdate, type AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
+  type OtherRecord, type OtherRecordUpdate, type SoilRecordUpdate, type VegetationAttributeUpdate, type CollectedRecordUpdate, type VegetationSpeciesLookup, type VegetationSpeciesUpdate, type VegetationNumberUpdate, type VegetationDeletionRequest, type VegetationCreationRequest, type PersonalSpeciesDefinitionRequest, type HeightRecordUpdate, type AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
 
 export function bindContextPlots(contextId: string, port = ContextService) {
   if (!contextId) throw new Error('An editor requires a loaded project context identity.');
@@ -42,6 +42,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
     ReviewVegetationDeletion: (plot: string, form: string, id: number) => port.ReviewVegetationDeletion(contextId, plot, form, id),
     DeleteReviewedVegetation: (plot: string, request: VegetationDeletionRequest) => port.DeleteReviewedVegetation(contextId, plot, request),
     CreateSourceVegetation: (plot: string, request: VegetationCreationRequest) => port.CreateSourceVegetation(contextId, plot, request),
+    CreatePersonalSpeciesDefinition: (request: PersonalSpeciesDefinitionRequest) => port.CreatePersonalSpeciesDefinition(contextId, request),
     SetAuditRestoreSelection: (plot: string, rowIds: string[] | null) => port.SetAuditRestoreSelection(contextId, plot, rowIds),
     RestoreSelectedAuditRecords: (plot: string, rowIds: string[] | null, action: AuditRestoreAction) =>
       port.RestoreSelectedAuditRecords(contextId, plot, rowIds, action),

@@ -19,7 +19,7 @@ export function stageSpecies(drafts: SpeciesDrafts, form: string, id: number, ra
     else if (raw.length > 8) error = 'Species exceeds 8 UTF-16 units; the raw entry was not truncated.';
     else if (!lists[form]) error = 'Species references are unavailable; Retry before saving.';
     else if (!lists[form].some(option => option.code !== null && option.code === raw)) {
-      error = 'Select an exact source-list code or review old-code/personal-list choices. Personal-list creation is unavailable.';
+      error = 'Select an exact source-list code or review old-code/personal-list choices before saving the plot.';
     }
   }
   return { ...drafts, [String(id)]: { form, raw, expected, error } };

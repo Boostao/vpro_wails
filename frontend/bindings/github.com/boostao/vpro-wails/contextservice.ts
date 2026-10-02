@@ -13,6 +13,10 @@ export function CanEditMasterBEC(contextID: string): $CancellablePromise<boolean
     return $Call.ByID(3701656016, contextID);
 }
 
+export function CreatePersonalSpeciesDefinition(contextID: string, request: $models.PersonalSpeciesDefinitionRequest): $CancellablePromise<$models.VegetationSpeciesOption> {
+    return $Call.ByID(2624543201, contextID, request);
+}
+
 export function CreatePlot(contextID: string, header: $models.FS882Header): $CancellablePromise<void> {
     return $Call.ByID(3214660085, contextID, header);
 }

@@ -12,6 +12,72 @@ const options = [{ code: 'A', scientificName: null, englishName: '', lifeform: 3
   { code: 'A', scientificName: 'duplicate', englishName: null, lifeform: 3, codeType: 'U' },
   { code: null, scientificName: 'NULL code', englishName: null, lifeform: null, codeType: null }];
 const lists = Object.fromEntries(editor.speciesForms.map(form => [form, options]));
+const personal = loadTypeScript('personalSpeciesEditor.ts', {
+  './vegetationSpeciesEditor': editor,
+  './qualityEditor': loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') }),
+});
+
+test('Personal metadata starts only from the reviewed unknown source and retains original row identity', () => {
+  const drafts = editor.stageSpecies({}, 'SubVegAXL_BC', -9, 'zznew01', 'RAW', lists);
+  assert.doesNotMatch(drafts['-9'].error, /creation is unavailable/);
+  const choices = { form: 'SubVegAXL_BC', entered: 'zznew01', aliases: [], users: [] };
+  const draft = personal.beginPersonalSpecies(-9, drafts['-9'], choices);
+  assert.equal(personal.matchesPersonalSpeciesSource(draft, drafts['-9']), true);
+  assert.equal(personal.matchesPersonalSpeciesSource(draft, { ...drafts['-9'], expected: 'changed' }), false);
+  assert.equal(personal.matchesPersonalSpeciesSource(draft, { ...drafts['-9'], raw: 'changed' }), false);
+  assert.throws(() => personal.beginPersonalSpecies(-9, drafts['-9'], { ...choices, aliases: [{ code: 'MASTER' }] }));
+  assert.throws(() => personal.beginPersonalSpecies(-9, drafts['-9'], { ...choices, users: [{ code: 'USER' }] }));
+  assert.doesNotThrow(() => personal.beginPersonalSpecies(-9, drafts['-9'], { ...choices, aliases: [{ code: null }] }));
+  assert.deepEqual(json(personal.personalSpeciesRequest(draft)), { entered: 'zznew01', scientificName: null, lifeform: null, englishName: null });
+});
+
+test('Personal metadata retains raw errors, UTF-16 bounds and distinct NULL/empty values through remount', () => {
+  const cell = editor.stageSpecies({}, 'SubVegCXL', 0, 'zznew01', 'RAW', lists)['0'];
+  let draft = personal.beginPersonalSpecies(0, cell, { form: cell.form, entered: cell.raw, aliases: [], users: [] });
+  for (const raw of ['\ud800', '😀'.repeat(128)]) {
+    draft = personal.stagePersonalText(draft, 'scientificName', raw, false);
+    const remounted = json(draft);
+    assert.equal(remounted.scientificName.raw, raw);
+    assert.equal(personal.personalSpeciesErrors(remounted).length, 1);
+    assert.throws(() => personal.personalSpeciesRequest(remounted));
+  }
+  draft = personal.stagePersonalText(draft, 'scientificName', '😀'.repeat(127) + 'x', false);
+  draft = personal.stagePersonalText(draft, 'englishName', '', false);
+  assert.equal(personal.personalSpeciesErrors(draft).length, 0);
+  assert.equal(personal.personalSpeciesRequest(draft).englishName, '');
+  draft = personal.stagePersonalText(draft, 'scientificName', '\ud800', true);
+  assert.equal(personal.personalSpeciesErrors(draft).length, 0);
+  assert.equal(personal.personalSpeciesRequest(draft).scientificName, null);
+  assert.equal(draft.scientificName.raw, '\ud800');
+  assert.equal(personal.personalLifeforms.length, 12);
+  assert.throws(() => personal.personalSpeciesRequest({ ...draft, lifeform: 0 }));
+});
+
+test('Personal creation checks independent metadata and only recognizes explicit committed-cleanup errors', () => {
+  const request = { entered: 'zznew01', scientificName: null, lifeform: null, englishName: '' };
+  const option = { code: 'ZZNEW01', scientificName: null, lifeform: null, englishName: '', codeType: null };
+  assert.equal(personal.personalSpeciesMatches(option, request), true);
+  for (const changed of [{ scientificName: '' }, { code: 'zznew01' }, { lifeform: 0 }, { codeType: 'u' }]) {
+    assert.equal(personal.personalSpeciesMatches({ ...option, ...changed }, request), false);
+  }
+  assert.equal(personal.personalSpeciesCommittedError({ message: 'personal species definition committed, but writer cleanup failed; details' }), true);
+  assert.equal(personal.personalSpeciesCommittedError({ message: 'personal species audit failed: personal species definition committed, but writer cleanup failed;' }), false);
+  assert.equal(personal.personalSpeciesCommittedError('network error'), false);
+});
+
+test('Personal definition has separate explicit save, persistent metadata and native close/Undo gates', () => {
+  const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  assert.match(form, /VITE_PERSONAL_SPECIES_EDITING === 'true'/);
+  assert.match(form, /personalDraft !== null \? 'Save the personal definition explicitly/);
+  assert.match(form, /if \(personalDraft !== null\) \{ cancelPersonalSpecies\(\); return; \}/);
+  assert.match(form, /ordinary plot Save never writes the user database/);
+  assert.match(form, /await PlotService\.CreatePersonalSpeciesDefinition\(request\)/);
+  assert.match(form, /users\.filter\(option => personalSpeciesMatches\(option, request\)\)\.length !== 1/);
+  assert.match(form, /committed = committed \|\| personalSpeciesCommittedError\(cause\)/);
+  assert.match(form, /if \(committed\) \{ personalDraft = null; capabilitiesReady = false; \}/);
+  assert.match(form, /personal-species-draft[\s\S]*?Save personal definition only/);
+  assert.doesNotMatch(form, /personal-[\s\S]{0,100}maxlength=/);
+});
 
 test('Species drafts preserve original identity, raw errors and exact list membership across all grids', () => {
   for (const form of editor.speciesForms) {
