@@ -1121,9 +1121,46 @@ Static inspection of `FS882-6x4XL.btnLoadMetadata_Click`, `frmProjectMetaData`,
 Navigation helpers set Access's application-wide Move After Enter to Next Field
 or Next Record. They are not a persistent per-project setting; do not blindly
 import that machine state into YAML or copy automatic focus into disabled draft
-controls. Profiling is also a separate deliverable: its active runner clears
-scratch results/counts and evaluates ordered Env/Veg/Lump rules. It is not merely
-a vegetation-display toggle and must not mutate the shipped support databases.
+controls. The bounded desktop adaptation is now native-verified behind the
+independent `VITE_SOURCE_ENTER_NAVIGATION=true` gate. Plain parent input Enter
+uses available displayed logical field order (not exact Access TabIndex). The
+five statically linked SubVegAXL_BC/SubVegCXL/SubVegDXL/SoilHumusXL/SoilMineralXL
+scopes advance to the next existing record in the same literal column. Source
+exports provide no equivalent current links for height/Veg Other/Other or the
+stale Child162/164/165 handlers; do not infer those policies.
+
+No wrapping, allocation, Save or persisted preference occurs. Real visibility,
+ancestor-aware disabled state, readonly state and raw-invalid checks guard the
+observed focus/target. Native list/select/multiline input, modifiers, repeat, IME
+and dialog behavior remain untouched; memo controls are eligible destinations,
+not intercepted Enter triggers. Lost planned focus surfaces an error while
+retaining drafts.228 frontend tests/check0 errors/0 warnings, both builds,
+focused Go9.549s and complete race480.370s pass. Initial opt-inf2aaa618.../owned3916
+verifies seven no-write cases including all five record scopes, closed-details/
+disabled-fieldset skipping, boundaries and invalid/remount/Undo. A reference-
+readiness failure required a read-only tail, not a replay. Final opt-in9fc42392.../
+owned4524 verifies memo focus/native newline/Undo; corrected selector/readiness
+and independently hit-tested Undo continuations are recorded honestly. Default
+b7c09b6d.../owned1348 verifies unchanged Enter behavior, disabled metadata and
+active Vegetation with zero writes. Four temporary soil rows and all original
+project/support/config bytes restore exactly. All owned apps close.
+The74-file sealed Enter checkpoint preserves the preceding3db65721... baseline,
+initial/final/default binaries and embedded assets, source and proof receipts.
+Exact accepted defaultb7c09b6d... is promoted without rebuilding. Full Access
+focus/list/navigation parity remains open.
+
+Profiling is a separate deliverable. The active parent btnVegProfiling_Click
+opens USysPlotProfiling, whose btnGetSummary_Click calls ProfilePlots(optSubVarSpp)
+in V7mdlPlotProfiling. Do not substitute the older Profile4Presence helper.
+The runner clears USysPlotProfilePlots/USysPlotProfilePlotsTemp and profile counts,
+then evaluates ordered Env/Veg/Lump rules from the selected original `_Profile`
+table. Preserve its nine bound fields and NULL/duplicate physical rules; establish
+database-family ownership before implementation. A compact context-bound read-only
+rule review precedes execution, with original schemas and explicit unsupported
+rules, cancellation/context ownership and immutable-support acceptance tests.
+Run results/counts should belong to owned SQLite TEMP state, not shipped support
+files. This is not a vegetation-display toggle; keep the action unavailable until
+the ordered runner and safe filter lifecycle are verified.
 
 The implemented metadata review boundary underlies the existing-record editor. The
 context-bound `ReviewProjectMetadata` independently reads the physical selected

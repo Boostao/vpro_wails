@@ -41,7 +41,7 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `    3db65721cf3775429af712370ac51f93dbd9efc942646186ab884a55f4a8c0f4`.
+  `    b7c09b6db6b31211a8595fad97df7b002868301142bbaa503633a50fbe442d53`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -814,12 +814,38 @@ verifies disabled metadata workflows/existing Site/Vegetation with all bytes unc
 owned6668 closes. Inspector9392 is closed. No native/race process remains.
 Archives/metadata-template-checkpoint seals53 hashed files plus manifest, preceding
 c22c00fe..., exact core/default assets/binaries, source.zip, accepted proof/restoration
-receipts/backups and logs. Current/candidate are exact accepted3db65721... copies.
+receipts/backups and logs. Accepted3db65721... is now the sealed Enter predecessor.
 Never replay metadata-template.py prepare/run/restore, metadata-template-default.py
 or the completed seal-metadata-template.py.
-Next metadata-specific restoration and deliberately gated Enter navigation;
+Bounded Enter navigation is native-verified, independently opt-in:
+VITE_SOURCE_ENTER_NAVIGATION=true. Plain parent input Enter follows responsive
+displayed logical order, not exact Access TabIndex. Only source-linked A/C/D and
+Humus/Mineral scopes advance to the next existing row in the same literal column.
+No wrap/allocation/Save/YAML option; actual visibility/ancestor-disabled/readonly
+checks skip unavailable destinations and invalid raw input retains focus.
+Lists/selects/multiline/IME/modifiers and other child scopes retain native behavior;
+memo fields can be destinations without intercepting their own newline.
+228 frontend tests/check0/0, both builds, focused9.549s/full race480.370s pass.
+Initialf2aaa618.../owned3916 proves seven zero-write cases/all five record scopes;
+final9fc42392.../owned4524 adds memo destination/newline/Undo. Read-only reference-
+readiness/selector/Undo continuations are retained; completed input is not replayed.
+Default bin/vpro-source-enter-default.exe SHA256
+b7c09b6db6b31211a8595fad97df7b002868301142bbaa503633a50fbe442d53
+verifies unchanged Enter, disabled metadata and active Vegetation with all bytes
+unchanged; owned1348 closes. No owned native/race process remains.
+Archives/source-enter-checkpoint seals74 hashed files plus manifest, preceding3db,
+all three accepted binaries/assets, source, original fixture backup and proof/logs.
+Independent manifest verification passes; original project/support/config bytes
+and canonical Sample remain exact. Current/candidate are exact acceptedb7c copies.
+Never replay source-enter.py prepare/run/restore, source-enter-ready.py,
+source-enter-default.py, their completed tails or seal-source-enter.py.
+Next is bounded readonly original plot-profile rule review, then ordered execution:
+FS882.btnVegProfiling opens USysPlotProfiling; btnGetSummary calls ProfilePlots in
+V7mdlPlotProfiling, not Profile4Presence. Preserve original `_Profile` tables/nine
+bindings and establish family ownership; scratch results/counts belong to owned
+SQLite TEMP state, not shipped supports. Keep the profiling action disabled.
+Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
-Navigation/profiling remain open.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
 unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
 rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a

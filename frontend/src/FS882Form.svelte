@@ -28,6 +28,7 @@
   import PersonalSpeciesFields from './PersonalSpeciesFields.svelte';
   import SpeciesCodeCheck from './SpeciesCodeCheck.svelte';
   import ProjectMetadataEditor from './ProjectMetadataEditor.svelte';
+  import { navigateSourceEnter } from './enterNavigation';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
   import { projectState } from './state';
   import { embeddedForm, paperChild, type VegetationMode } from './paperLayout';
@@ -98,6 +99,12 @@
   const metadataEnabled = import.meta.env.VITE_PROJECT_METADATA_EDITING === 'true';
   const metadataCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_CREATION === 'true';
   const metadataTemplateCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_TEMPLATE_CREATION === 'true';
+  const sourceEnterEnabled = import.meta.env.VITE_SOURCE_ENTER_NAVIGATION === 'true';
+  function sourceEnter(event: KeyboardEvent) {
+    if (!sourceEnterEnabled || !container) return;
+    try { navigateSourceEnter(event, container); }
+    catch (cause) { error = `Source Enter navigation failed; drafts retained: ${String(cause)}`; }
+  }
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
@@ -1712,6 +1719,8 @@
   }
 
 </script>
+
+<svelte:window onkeydown={sourceEnter} />
 
 <div bind:this={container} class="fs882-container bg-white rounded-lg shadow border border-stone-200 flex flex-col h-full text-stone-800 text-sm">
   <!-- Header Bar -->
