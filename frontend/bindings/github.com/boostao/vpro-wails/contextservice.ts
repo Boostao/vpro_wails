@@ -105,6 +105,10 @@ export function RestoreSelectedAuditRecords(contextID: string, plot: string, row
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
 }
 
+export function ReviewProjectMetadata(contextID: string, plot: string): $CancellablePromise<$models.ProjectMetadataReview> {
+    return $Call.ByID(90084514, contextID, plot);
+}
+
 export function ReviewSpeciesCodes(contextID: string): $CancellablePromise<$models.SpeciesCodeCheckReview> {
     return $Call.ByID(3045258678, contextID);
 }

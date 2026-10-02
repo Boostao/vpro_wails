@@ -34,14 +34,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all44 editor operations to immutable identities, leases running operations and
+  all45 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `de15b9c31b832b21782a094b866ee74a3240f82b3431986c498f415bfbd04e1e`.
+  `a8536ad5e213913b6d1299e5689c76d4175feca07efba829149bf80e6c13d61d`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -673,6 +673,27 @@ Next: deliberate navigation and separately scoped parent metadata/profiling.
 The plan records the metadata prerequisite: project75-column storage, master
 templates42 columns and legacy VUser metadata15 columns are distinct; dates/code
 types and the source wrong-recordset/ambiguous-copy logic must not be guessed.
+Metadata work now has a typed readonly backend/context-adapter boundary, not a
+writable editor. Distinct bin/vpro-project-metadata-review.exe is
+a8536ad5e213913b6d1299e5689c76d4175feca07efba829149bf80e6c13d61d;
+current/candidate are promoted exact accepted bytes; previousde15b9c3 is archived.
+Focused metadata/context Go1.367s/full race551.592s,213 frontend tests/check0/0/build pass;
+bindings15/133/60,45 scoped operations. Native unset and populated proofs verify
+75 project/42 master columns, two project candidates/one template, exact typed
+cells, stale rejection, metadata action disabled and35 existing labelled controls.
+Owned13896/16944 exited. Temporary ProjectID/duplicate/template preparation is
+reverted byte-for-byte for both project/VMetaData files; fixture77/5 remains
+unchanged. Receipts/backups/source contract are under native-vegetation-species:
+metadata-review.py, metadata-review*.json, metadata-populated*.json and
+metadata-source-contract.json. Do not replay completed modes. Full race
+metadata-review-race has passed; no owned native/race process remains.
+Archives/metadata-review-checkpoint seals accepted/previous binaries, source
+contract, both native modes, reversible preparation/backups and restoration seals.
+Source parser records198 nodes/74 bindings, including Fixed integer-year fields,
+literal method Items, standard-population prompt and shared Recalc/error events.
+Next implement explicit existing-record selection/editing and separate
+new/blank/template proposals with physical identity/audit/reservation/lifecycle
+guards; never copy master timestamps/numeric codes blindly.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
 unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
 rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a

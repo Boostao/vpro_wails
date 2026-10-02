@@ -427,6 +427,37 @@ export interface ProjectInfo {
     "path"?: string;
 }
 
+export interface ProjectMetadataCell {
+    "storage": string;
+    "text": string | null;
+    "integer": string | null;
+    "real": number | null;
+    "blobHex": string | null;
+}
+
+export interface ProjectMetadataColumn {
+    "name": string;
+    "declaredType": string;
+}
+
+export interface ProjectMetadataReview {
+    "project": string;
+    "plotNumber": string;
+    "projectId": string | null;
+    "projectRecords": ProjectMetadataTable;
+    "masterTemplates": ProjectMetadataTable;
+}
+
+export interface ProjectMetadataRow {
+    "rowId": string;
+    "cells": ProjectMetadataCell[] | null;
+}
+
+export interface ProjectMetadataTable {
+    "columns": ProjectMetadataColumn[] | null;
+    "rows": ProjectMetadataRow[] | null;
+}
+
 export interface ProjectState {
     "activeProject": string;
     "activeSU": string;

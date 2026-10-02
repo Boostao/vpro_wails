@@ -1124,3 +1124,35 @@ import that machine state into YAML or copy automatic focus into disabled draft
 controls. Profiling is also a separate deliverable: its active runner clears
 scratch results/counts and evaluates ordered Env/Veg/Lump rules. It is not merely
 a vegetation-display toggle and must not mutate the shipped support databases.
+
+Metadata review boundary is implemented, not the metadata editor. The
+context-bound `ReviewProjectMetadata` independently reads the physical selected
+plot/ProjectID, all matching project records and original VMetaData templates.
+Typed cells retain SQLite storage, exact integer text (including values beyond
+JavaScript's safe integer range), finite reals, literal UTF-8 text and hex bytes.
+NULL/empty identities remain distinct; missing/ambiguous parents, malformed
+Unicode and invalid/duplicate signed32 metadata IDs fail explicitly. No master
+date/code conversion, record selection, VUser lookup or write is performed.
+
+The existing Access parser captured all198 structural/control nodes and74
+bindings, source containment/labels/geometry and procedure/event evidence.
+StartDate/EndDate are Fixed/zero-decimal textboxes, consistent with project
+SMALLINT year storage; the inactive DTPicker Updated handler does not authorize a
+timestamp-to-year conversion. GeoRefMethod selects literal Items from the
+GeoreferenceMethod list, not the master's numeric code. Standard-based bulk
+population prompts before assigning its source literals; field AfterUpdate
+handlers share Recalc/ProjectID-required error feedback. These behaviors and
+metadata version stamping remain writer/editor acceptance work.
+
+Focused metadata/context Go1.367s/full race551.592s,213 frontend tests/check0/0/build and real
+15/133/60 bindings pass;45 adapter operations carry pinned context identities.
+Readonly native candidatea8536ad5... verifies both an unset identity and a
+temporarily populated fixture with two project candidates/one master template.
+Every transported cell/schema is compared to independent SQLite observations;
+stale calls fail and35 labelled existing controls remain active while metadata
+and other opt-in actions stay disabled. Both fixture databases are restored to
+their preceding accepted bytes after owned windows13896/16944 close. No project/
+user audits or source changes occur. This safely checkpoints review before
+explicit creation/editing, rather than presenting mapped storage as a migration.
+Exact readonly candidatea8536ad5... is promoted after archiving previousde15b9c3
+and all source/native/restoration receipts in archives/metadata-review-checkpoint.

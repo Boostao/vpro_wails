@@ -15,6 +15,7 @@ build/android/gen/
 /data/
 /config/
 /evidence/private/
+/archives/
 # Local tooling, scratch work, validation output and compiled deliverables.
 /tools/
 /tmp/

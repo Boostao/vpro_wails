@@ -5,6 +5,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
   if (!contextId) throw new Error('An editor requires a loaded project context identity.');
   return {
     GetPlot: (plot: string) => port.GetPlot(contextId, plot),
+    ReviewProjectMetadata: (plot: string) => port.ReviewProjectMetadata(contextId, plot),
     GetHeaderCapabilities: () => port.GetHeaderCapabilities(contextId),
     CanEditMasterBEC: () => port.CanEditMasterBEC(contextId),
     GetChildCapabilities: (kind: string) => port.GetChildCapabilities(contextId, kind),
