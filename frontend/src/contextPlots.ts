@@ -16,6 +16,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
     ListVegetationAttributeSuggestions: () => port.ListVegetationAttributeSuggestions(contextId),
     ListVegetationSpecies: (form: string) => port.ListVegetationSpecies(contextId, form),
     ListVegetationSpeciesAliases: (lookup: VegetationSpeciesLookup) => port.ListVegetationSpeciesAliases(contextId, lookup),
+    ListVegetationSpeciesUsers: (lookup: VegetationSpeciesLookup) => port.ListVegetationSpeciesUsers(contextId, lookup),
     ListAuditEntries: (plot: string) => port.ListAuditEntries(contextId, plot),
     CreatePlot: (header: FS882Header) => port.CreatePlot(contextId, header),
     UpdatePlot: (header: FS882Header) => port.UpdatePlot(contextId, header),

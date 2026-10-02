@@ -81,6 +81,10 @@ export function ListVegetationSpeciesAliases(contextID: string, lookup: $models.
     return $Call.ByID(4003025460, contextID, lookup);
 }
 
+export function ListVegetationSpeciesUsers(contextID: string, lookup: $models.VegetationSpeciesLookup): $CancellablePromise<$models.VegetationSpeciesOption[] | null> {
+    return $Call.ByID(3585380524, contextID, lookup);
+}
+
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
 }

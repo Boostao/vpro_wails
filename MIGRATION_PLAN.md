@@ -709,13 +709,31 @@ correction, wrong-list rejection, audit rollback/retained retry and raw/stale
 transport. All15 tables/32 old audits and support/config bytes are preserved
 apart from intended species assignments. Exact-case list selection is a bounded
 desktop adaptation; source NotInList decisions and general Access text comparison
-are not claimed. This preparatory workflow remains default-off
-(`VITE_VEGETATION_SPECIES_EDITING=true` opts in); unrestricted source-grid species
-edits cannot bypass it. Final readonly delivery verifies five disabled labelled
-species controls, preserved Collected availability and all fixture bytes unchanged
-with zero new audits. Final full race passed (root472.744s). Exact default
-4eb0b8af... is promoted; species remains opt-in, not complete source-event parity.
-Explicit
-replace/keep/user choices and personal-list creation remain
-unavailable until integrated and verified. USysAddSpp uses ordinary bound record
-saves; its Update button explicitly says "not working" and exits.
+are not claimed. Preparation was published as f286d74 after final full race
+(root472.744s); its exact default4eb0b8af... remains archived.
+
+Explicit source decisions now extend the same drafts: master OldCode matches
+take precedence, every replacement definition remains selectable, keep retains
+the entered code, and an existing personal Code is offered only without a master
+alias. Review is cancellable and guarded by form/entered/original identity;
+decisions survive remounts, Reload and failed Save. Save independently revalidates
+the reference identities and source event value, with mutation/audit rollback.
+Source UCase is bounded to ASCII for these decisions; non-ASCII event conversion
+is explicitly rejected, while exact literal non-ASCII list selection is allowed.
+Cover1/6/7 source focus transfers are adapted: mutually gated drafts postpone
+unrelated cover editing until Save rather than focusing disabled controls.
+Unknown-code personal-list creation stays disabled. It requires a separately
+bounded writable VUser/project coordination contract, not editor fixtures or
+implicit catalogue mutation. USysAddSpp uses ordinary bound record saves; its
+Update button explicitly says "not working" and exits.
+
+Focused Go1.887s,184 frontend tests/check0/0, generated bindings15/121/46 and36
+scoped adapter operations pass. Native9 cases/5 intended audits preserve all15
+tables/35 prior audits and support/config bytes; default delivery verifies five
+enabled labelled controls, no implicit draft, every fixture byte unchanged and
+zero new audits. Default assets equal the accepted opt-in assets byte-for-byte.
+Exact60575340... is archived/promoted after final integration race passed
+(root517.356s). Species is now
+default-on with `VITE_VEGETATION_SPECIES_EDITING=false` read-only opt-out;
+unrestricted source-grid edits cannot bypass it. Complete remaining cover/height
+creation/deletion/calculation workflows while keeping personal creation disabled.

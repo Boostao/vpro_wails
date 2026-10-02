@@ -244,7 +244,7 @@ apart from exact planned edits. Default readonly delivery proves all bytes
 unchanged and zero new audits. `VITE_VEGETATION_COLLECTED_EDITING=false` disables
 the controls. Evidence/private/native-vegetation-collected; exact156aeb46... promoted.
 
-### Opt-in exact-list species selection preparation
+### Existing-row species selection and explicit source decisions
 
 All five Species combos explicitly export LimitToList=NotDefault. Source
 USysAllSpecies unions five fields from USysAllSpecs/USysUserSpp, excluding S/s.
@@ -253,16 +253,27 @@ Canonical readers preserve NULL/empty metadata and duplicate definitions; the
 three source classes return547/4742/3319 rows. Old-code lookup preserves every
 matching master definition, including two different ACAROSPO replacements.
 Source NotInList asks replace/keep, then checks the user catalogue or opens the
-personal-list form. Arbitrary DLookup-first behavior is not inherited; these
-decision/personal-list paths remain unavailable. USysAddSpp's Update button exits.
+personal-list form. Arbitrary DLookup-first behavior is not inherited: Review
+preserves every alias definition and requires explicit replace/keep. Only when
+no non-NULL master alias exists does it offer existing personal-code definitions,
+including NULL metadata outside dropdown lifeform membership. Unknown-code
+personal-list creation stays unavailable. USysAddSpp's Update button exits.
 
-Existing-row exact-list selection is an opt-in preparatory desktop workflow,
-not full NotInList parity. `VITE_VEGETATION_SPECIES_EDITING=true` enables it;
-default builds retain one disabled labelled species control. Matching requires
+Existing-row selection/decisions are default-on, not full NotInList parity.
+`VITE_VEGETATION_SPECIES_EDITING=false` retains disabled labelled species controls.
+Ordinary list matching requires
 the literal returned code, without trimming, completing or recasing. Exact-case
 matching and explicit Save/Undo/Cancel are adaptations. Malformed/new overlength
 text blocks saving while unchanged historical text is omitted. Draft/error state
-is shared across cover/height grids and survives tab remounts.
+is shared across cover/height grids and survives tab remounts. Review owns
+cancellable reads and checks form/raw entered/original identities before offering
+choices. Explicit decisions retain entered/selected identities through Reload and
+failed Save; new manual input clears the old decision, not its original value.
+Save revalidates reference precedence/identities and independently computes the
+source UCase result. Event conversion is bounded to ASCII and explicitly rejects
+unverified non-ASCII casing; exact literal non-ASCII list selection is allowed.
+Source focus targets Cover1/6/7 differ by form. Desktop drafts intentionally
+postpone unrelated cover editing until Save instead of focusing disabled cells.
 
 The shared child transaction checks original species, row ownership and the
 source-form row predicate before assignment/audit. Canonical membership uses the
@@ -275,8 +286,17 @@ planned species edits. Corrected1b7e408e... opt-in core is archived under
 evidence/private/native-vegetation-species. Default candidate4eb0b8af... passes
 readonly native delivery: five disabled labelled species controls, unchanged
 Collected availability, every fixture byte retained and zero new audits. The
-final full race passes (root472.744s); exact default payload is promoted while
-species remains opt-in pending completion of the source decision paths.
+preparation full race passes (root472.744s); f286d74 published that bounded scope.
+The decision candidate60575340... passes native9 cases/5 intended audits:
+explicit replacement and keep, existing personal UNKNOWN1 with NULL metadata,
+blocked unknown code, multirow rollback/retained retry and unchanged VUser bytes.
+All15 tables/35 prior audits and support/config bytes are preserved apart from
+intended species changes. Default delivery passes five enabled labelled controls,
+no implicit draft and zero writes; every fixture byte remains unchanged.
+Default assets are byte-identical to accepted opt-in assets; the read-only opt-out
+build is distinct and archived. Exact60575340... is sealed in the same private
+evidence directory and promoted after decision integration race passed
+(root517.356s).
 
 ## Verified bounded selective restoration
 

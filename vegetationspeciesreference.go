@@ -65,6 +65,13 @@ func vegetationSpeciesPredicate(form string) (string, error) {
 	return "Codetype COLLATE NOCASE IN ('u','x') AND Lifeform IN (" + lifeforms + ")", nil
 }
 
+func validateVegetationSpeciesLookup(code string) error {
+	if code == "" {
+		return fmt.Errorf("species lookup requires a nonempty literal code")
+	}
+	return validateChildPhysicalText("Veg.Species", code, 8)
+}
+
 func (s *ContextService) ListVegetationSpecies(ctx context.Context, contextID, form string) ([]VegetationSpeciesOption, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) ([]VegetationSpeciesOption, error) {
 		predicate, err := vegetationSpeciesPredicate(form)
@@ -96,10 +103,7 @@ func (s *ContextService) ListVegetationSpecies(ctx context.Context, contextID, f
 func (s *ContextService) ListVegetationSpeciesAliases(ctx context.Context, contextID string, lookup VegetationSpeciesLookup) ([]VegetationSpeciesAlias, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) ([]VegetationSpeciesAlias, error) {
 		code := lookup.Code
-		if code == "" {
-			return nil, fmt.Errorf("species alias lookup requires a nonempty literal code")
-		}
-		if err := validateChildPhysicalText("Veg.Species", code, 8); err != nil {
+		if err := validateVegetationSpeciesLookup(code); err != nil {
 			return nil, err
 		}
 		rows, err := plots.projects.sqlite.conn.QueryContext(ctx, `SELECT Code,ScientificName,Lifeform,EnglishName,Codetype,OldCode
@@ -119,6 +123,33 @@ func (s *ContextService) ListVegetationSpeciesAliases(ctx context.Context, conte
 		}
 		if err := rows.Err(); err != nil {
 			return nil, fmt.Errorf("vegetation species alias read failed: %w", err)
+		}
+		return result, nil
+	})
+}
+
+func (s *ContextService) ListVegetationSpeciesUsers(ctx context.Context, contextID string, lookup VegetationSpeciesLookup) ([]VegetationSpeciesOption, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) ([]VegetationSpeciesOption, error) {
+		if err := validateVegetationSpeciesLookup(lookup.Code); err != nil {
+			return nil, err
+		}
+		rows, err := plots.projects.sqlite.conn.QueryContext(ctx, `SELECT Code,ScientificName,Lifeform,EnglishName,Codetype
+			FROM USysUserSpp WHERE Code COLLATE NOCASE=?
+			ORDER BY Code,ScientificName,EnglishName,Codetype,Lifeform`, lookup.Code)
+		if err != nil {
+			return nil, fmt.Errorf("vegetation personal species references unavailable: %w", err)
+		}
+		defer rows.Close()
+		result := []VegetationSpeciesOption{}
+		for rows.Next() {
+			var option VegetationSpeciesOption
+			if err := rows.Scan(&option.Code, &option.ScientificName, &option.Lifeform, &option.EnglishName, &option.CodeType); err != nil {
+				return nil, fmt.Errorf("vegetation personal species metadata could not be read: %w", err)
+			}
+			result = append(result, option)
+		}
+		if err := rows.Err(); err != nil {
+			return nil, fmt.Errorf("vegetation personal species read failed: %w", err)
 		}
 		return result, nil
 	})

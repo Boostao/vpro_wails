@@ -41,9 +41,20 @@ func TestVegetationSpeciesSourceClassesAndAliasAmbiguity(t *testing.T) {
 	if err != nil || len(missing) != 0 {
 		t.Fatal("literal lookup was trimmed, completed or interpolated:", missing, err)
 	}
+	users, err := service.ListVegetationSpeciesUsers(context.Background(), state.ContextID, VegetationSpeciesLookup{Code: "abie_rk"})
+	if err != nil || len(users) != 1 || users[0].Code == nil || *users[0].Code != "ABIE_RK" {
+		t.Fatal("existing personal code lookup changed source literals:", users, err)
+	}
+	missingUsers, err := service.ListVegetationSpeciesUsers(context.Background(), state.ContextID, VegetationSpeciesLookup{Code: "  raw' "})
+	if err != nil || len(missingUsers) != 0 {
+		t.Fatal("personal lookup trimmed or interpolated literal text:", missingUsers, err)
+	}
 	for _, code := range []string{"", "123456789", string([]byte{0xff})} {
 		if _, err := service.ListVegetationSpeciesAliases(context.Background(), state.ContextID, VegetationSpeciesLookup{Code: code}); err == nil {
 			t.Fatal("invalid raw lookup accepted:", code)
+		}
+		if _, err := service.ListVegetationSpeciesUsers(context.Background(), state.ContextID, VegetationSpeciesLookup{Code: code}); err == nil {
+			t.Fatal("invalid personal lookup accepted:", code)
 		}
 	}
 	if _, err := service.ListVegetationSpecies(context.Background(), state.ContextID, "SubVegAXL"); err == nil {
@@ -56,6 +67,9 @@ func TestVegetationSpeciesSourceClassesAndAliasAmbiguity(t *testing.T) {
 	}
 	if _, err := service.ListVegetationSpeciesAliases(ctx, state.ContextID, VegetationSpeciesLookup{Code: "ACAROSPO"}); !errors.Is(err, context.Canceled) {
 		t.Fatal("cancelled alias lookup accepted:", err)
+	}
+	if _, err := service.ListVegetationSpeciesUsers(ctx, state.ContextID, VegetationSpeciesLookup{Code: "ABIE_RK"}); !errors.Is(err, context.Canceled) {
+		t.Fatal("cancelled personal lookup accepted:", err)
 	}
 	if _, err := service.ListVegetationSpecies(context.Background(), "stale", "SubVegAXL_BC"); err == nil {
 		t.Fatal("stale context reference lookup accepted")

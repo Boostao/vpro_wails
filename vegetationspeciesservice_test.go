@@ -103,6 +103,90 @@ func TestVegetationSpeciesAtomicMembershipSourceRowsAndHistoricalOmission(t *tes
 		INSERT INTO Sample_Veg(PlotNumber,Species,ID,Height1) VALUES ('CHILD1','RAW',-10,0)`); err != nil {
 		t.Fatal(err)
 	}
+
+	t.Run("explicit source decisions and atomic retry", func(t *testing.T) {
+		s, db := childFixture(t)
+		s.SetAuditStrength(3)
+		text := func(value string) *string { return &value }
+		if _, err := db.Exec(`CREATE TABLE USysAllSpecs(Code TEXT,ScientificName TEXT,Lifeform INTEGER,EnglishName TEXT,Codetype TEXT,OldCode TEXT);
+			CREATE TABLE USysUserSpp(Code TEXT,ScientificName TEXT,Lifeform INTEGER,EnglishName TEXT,Codetype TEXT);
+			INSERT INTO USysAllSpecs VALUES
+			('new_a',NULL,99,NULL,'S','olddup'),('NEW_B','other',3,'','U','olddup'),
+			(NULL,NULL,NULL,NULL,NULL,'NULLONLY'),('ÉLI',NULL,1,NULL,'U',NULL);
+			INSERT INTO USysUserSpp VALUES ('Personal',NULL,99,'','S'),('olddup',NULL,1,NULL,'U');
+			INSERT INTO Sample_Veg(PlotNumber,Species,ID,Cover1,Cover6,Cover7) VALUES
+			('CHILD1','RAW',0,0,0,0),('CHILD1','RAW',-9,0,0,0),('CHILD1','RAW',-10,0,0,0)`); err != nil {
+			t.Fatal(err)
+		}
+		replace := VegetationSpeciesUpdate{ID: 0, Form: "SubVegAXL_BC", Expected: "RAW", Value: "NEW_A", Decision: "replace", Entered: text("OLDdup"), Selected: text("new_a")}
+		keep := VegetationSpeciesUpdate{ID: -9, Form: "SubVegCXL", Expected: "RAW", Value: "OLDDUP", Decision: "keep", Entered: text("olddup")}
+		user := VegetationSpeciesUpdate{ID: -10, Form: "SubVegDXL", Expected: "RAW", Value: "PERSONAL", Decision: "user", Entered: text("personal"), Selected: text("Personal")}
+		before := substrateSnapshot(t, db)
+		for _, update := range []VegetationSpeciesUpdate{
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "NEW_A", Entered: text("olddup")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "NEW_A", Decision: "automatic", Entered: text("olddup")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "NEW_A", Decision: "replace", Selected: text("new_a")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "new_a", Decision: "replace", Entered: text("olddup"), Selected: text("new_a")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "NEW_A", Decision: "replace", Entered: text("olddup"), Selected: text("NEW_A")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "PERSONAL", Decision: "replace", Entered: text("olddup"), Selected: text("Personal")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "OLDDUP", Decision: "keep", Entered: text("olddup"), Selected: text("new_a")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "UNKNOWN", Decision: "keep", Entered: text("unknown")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "NULLONLY", Decision: "keep", Entered: text("NULLONLY")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "OLDDUP", Decision: "user", Entered: text("olddup"), Selected: text("olddup")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "PERSONAL", Decision: "user", Entered: text("wrong"), Selected: text("Personal")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "ÉLI", Decision: "replace", Entered: text("olddup"), Selected: text("ÉLI")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "NEW_A", Decision: "replace", Entered: text("é"), Selected: text("new_a")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "NEW_A", Decision: "replace", Entered: text(" olddup "), Selected: text("new_a")},
+			{ID: 0, Form: replace.Form, Expected: "RAW", Value: "NEW_A", Decision: "replace", Entered: text(string([]byte{0xff})), Selected: text("new_a")},
+		} {
+			if err := s.UpdateVegetationSpecies("CHILD1", []VegetationSpeciesUpdate{update}); err == nil {
+				t.Fatal("unavailable or altered source decision accepted:", update)
+			}
+			assertSubstrateSnapshot(t, db, before)
+		}
+		updates := []VegetationSpeciesUpdate{replace, keep, user}
+		if _, err := db.Exec(`CREATE TRIGGER fail_species_decision BEFORE INSERT ON Sample_Audit WHEN NEW.ID=-9
+			BEGIN SELECT RAISE(ABORT,'injected decision audit failure'); END`); err != nil {
+			t.Fatal(err)
+		}
+		if err := s.UpdateVegetationSpecies("CHILD1", updates); err == nil {
+			t.Fatal("partially committed decisions")
+		}
+		assertSubstrateSnapshot(t, db, before)
+		if _, err := db.Exec(`DROP TRIGGER fail_species_decision`); err != nil {
+			t.Fatal(err)
+		}
+		if err := s.UpdateVegetationSpecies("CHILD1", updates); err != nil {
+			t.Fatal("source replacement, keep and out-of-layer personal code rejected:", err)
+		}
+		if auditCount(t, db, "CHILD1") != 3 {
+			t.Fatal("decision audit count differs")
+		}
+		before = substrateSnapshot(t, db)
+		if err := s.UpdateVegetationSpecies("CHILD1", updates); err == nil {
+			t.Fatal("stale decision accepted")
+		}
+		assertSubstrateSnapshot(t, db, before)
+		replace.Expected, replace.Value, replace.Selected = "NEW_A", "NEW_B", text("NEW_B")
+		if _, err := db.Exec(`DELETE FROM USysAllSpecs WHERE Code='NEW_B'`); err != nil {
+			t.Fatal(err)
+		}
+		if err := s.UpdateVegetationSpecies("CHILD1", []VegetationSpeciesUpdate{replace}); err == nil {
+			t.Fatal("replacement changed after review was accepted")
+		}
+		assertSubstrateSnapshot(t, db, before)
+		if err := s.UpdateVegetationSpecies("CHILD1", []VegetationSpeciesUpdate{
+			{ID: 0, Form: "SubVegAXL_BC", Expected: "NEW_A", Value: "ÉLI"},
+		}); err != nil {
+			t.Fatal("literal non-ASCII list selection must not require event case conversion:", err)
+		}
+		for _, property := range []string{"entered", "selected"} {
+			payload := `{"id":0,"form":"SubVegAXL_BC","expected":"RAW","value":"NEW_A","decision":"replace","` + property + `":"\ud800"}`
+			if err := json.Unmarshal([]byte(payload), &VegetationSpeciesUpdate{}); err == nil {
+				t.Fatal("raw decision Unicode repaired:", payload)
+			}
+		}
+	})
 	before := substrateSnapshot(t, db)
 	for _, form := range []string{"SubVegAXL_BC", "SubVegAhtXL", "SubVegCXL", "SubVegChtXL", "SubVegDXL"} {
 		code := "A"

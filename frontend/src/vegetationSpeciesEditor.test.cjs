@@ -71,9 +71,47 @@ test('Species source renderers keep one live labelled control and nullable dupli
   }
 });
 
-test('Opt-in species drafts gate every session and survive tab remount, Save, Undo, Lock and native close', () => {
+test('Explicit replacement, keep and personal choices preserve ambiguity, original entry and source-event case changes', () => {
+  const form = 'SubVegAXL_BC';
+  const choices = { form, entered: 'olddup', aliases: [
+    { ...options[0], code: 'new_a', oldCode: 'olddup' },
+    { ...options[1], code: 'NEW_B', oldCode: 'olddup' },
+    { ...options[2], oldCode: 'olddup' },
+  ], users: [{ ...options[0], code: 'olddup' }] };
+  const drafts = editor.stageSpecies({}, form, 0, 'olddup', 'ORIGINAL', lists);
+  for (const [kind, selected, value] of [['replace', 'new_a', 'NEW_A'], ['replace', 'NEW_B', 'NEW_B'], ['keep', undefined, 'OLDDUP']]) {
+    const chosen = editor.chooseSpecies(json(drafts), 0, choices, kind, selected);
+    assert.equal(chosen['0'].raw, value);
+    assert.equal(chosen['0'].expected, 'ORIGINAL');
+    assert.equal(editor.speciesErrors(chosen).length, 0);
+    assert.deepEqual(json(editor.speciesUpdates(chosen)), [{
+      id: 0, form, expected: 'ORIGINAL', value, decision: kind, entered: 'olddup',
+      ...(selected === undefined ? {} : { selected }),
+    }]);
+    const edited = editor.stageSpecies(chosen, form, 0, 'bad again', 'different server value', lists);
+    assert.equal(edited['0'].expected, 'ORIGINAL');
+    assert.equal(edited['0'].decision, undefined);
+    assert.equal(editor.speciesErrors(edited).length, 1);
+  }
+  assert.throws(() => editor.chooseSpecies(drafts, 0, choices, 'replace', 'NEW_A'));
+  assert.throws(() => editor.chooseSpecies(drafts, 0, choices, 'replace', 'guessed'));
+  assert.throws(() => editor.chooseSpecies(drafts, 0, choices, 'user', 'olddup'));
+  assert.throws(() => editor.chooseSpecies(drafts, 0, { ...choices, entered: 'changed' }, 'keep'));
+  assert.throws(() => editor.chooseSpecies(drafts, 0, { ...choices, form: 'SubVegCXL' }, 'keep'));
+  assert.throws(() => editor.chooseSpecies(drafts, 0, { ...choices, aliases: [choices.aliases[2]] }, 'keep'));
+  const userChoices = { form, entered: 'personal', aliases: [], users: [{ ...options[0], code: 'Personal', lifeform: 99, codeType: 'S' }] };
+  const personal = editor.stageSpecies({}, form, -9, 'personal', 'RAW', lists);
+  const chosen = editor.chooseSpecies(personal, -9, userChoices, 'user', 'Personal');
+  assert.deepEqual(json(editor.speciesUpdates(chosen)), [{
+    id: -9, form, expected: 'RAW', value: 'PERSONAL', decision: 'user', entered: 'personal', selected: 'Personal',
+  }]);
+  for (const code of [null, '', '\ud800', '123456789', 'ÉLI', '😀']) assert.notEqual(editor.speciesEventError(code), null);
+  assert.equal(editor.speciesEventError("  raw' "), null);
+});
+
+test('Species drafts gate every session and survive tab remount, Save, Undo, Lock and native close', () => {
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(form, /VITE_VEGETATION_SPECIES_EDITING === 'true'/);
+  assert.match(form, /VITE_VEGETATION_SPECIES_EDITING !== 'false'/);
   assert.match(form, /let speciesDrafts = \$state<SpeciesDrafts>/);
   assert.match(form, /childUnsaved = \$derived\([^;]*speciesUnsaved\)/);
   for (const name of ['height', 'other', 'soil', 'attribute', 'collected']) {
@@ -89,4 +127,9 @@ test('Opt-in species drafts gate every session and survive tab remount, Save, Un
   assert.match(form, /Species changes committed, but refresh failed/);
   assert.match(form, /onspeciesstage=\{speciesEditingEnabled \? stageSpeciesCell : undefined\}/);
   assert.match(form, /Species requires the source-list draft workflow; unrestricted source-grid edits are unavailable/);
+  assert.match(form, /speciesDecisionBusy = \$state\(false\)/);
+  assert.match(form, /speciesChoiceRequest\+\+; speciesChoiceReads\.cancelAll\(\)/);
+  assert.match(form, /if \(!cell\.decision\) drafts = stageSpecies/);
+  assert.match(form, /const users = aliases\.some\(option => option\.code !== null\) \? \[\]/);
+  assert.match(form, /Personal-list creation is unavailable; correct or Cancel the draft/);
 });

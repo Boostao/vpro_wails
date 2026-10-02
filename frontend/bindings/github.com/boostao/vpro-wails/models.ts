@@ -611,6 +611,9 @@ export interface VegetationSpeciesUpdate {
     "form": string;
     "expected": string;
     "value": string;
+    "decision"?: string;
+    "entered"?: string | null;
+    "selected"?: string | null;
 }
 
 export interface WorkingUnitChoice {

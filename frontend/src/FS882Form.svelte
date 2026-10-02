@@ -33,7 +33,7 @@
   import { soilField, stageSoil, soilDirty, soilErrors, soilUpdates, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import { vegetationAttributeField, stageVegetationAttribute, vegetationAttributeDirty, vegetationAttributeErrors, vegetationAttributeUpdates, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
   import { stageCollected, collectedDirty, collectedUpdates, type CollectedDrafts } from './collectedEditor';
-  import { speciesForms, stageSpecies, speciesDirty, speciesErrors, speciesUpdates, type SpeciesDrafts, type SpeciesLists } from './vegetationSpeciesEditor';
+  import { speciesForms, stageSpecies, speciesDirty, speciesErrors, speciesUpdates, chooseSpecies, speciesEventError, type SpeciesDrafts, type SpeciesLists, type SpeciesChoices, type SpeciesDecisionKind } from './vegetationSpeciesEditor';
   import type { WorkingUnitSession } from './workingUnitEditor';
   import { onDestroy, untrack, tick } from 'svelte';
   import { bindContextPlots } from './contextPlots';
@@ -45,9 +45,13 @@
   const referenceReads = new ReadRequests();
   const speciesReads = new ReadRequests();
   const speciesReferenceReads = new ReadRequests();
+  const speciesChoiceReads = new ReadRequests();
   let referenceRequest = 0;
   let speciesRequest = 0;
   let speciesReferenceRequest = 0;
+  let speciesChoiceRequest = 0;
+  let speciesDecisionBusy = $state(false);
+  let speciesChoices = $state<Record<string, SpeciesChoices>>({});
 
   let activeTab = $state<'site' | 'veg' | 'vegOther' | 'soils' | 'other' | 'audit'>('site');
   async function vegetationNotesTab() {
@@ -67,7 +71,7 @@
   let parentCodeBusy = $state(false);
   let drainageBusy = $state(false);
   const soilCodeEditingEnabled = import.meta.env.VITE_SOIL_CODES_EDITING !== 'false';
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy);
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   let heightDrafts = $state<HeightDrafts>({});
@@ -96,7 +100,7 @@
   const collectedEditingEnabled = import.meta.env.VITE_VEGETATION_COLLECTED_EDITING !== 'false';
   let collectedDrafts = $state<CollectedDrafts>({});
   const collectedUnsaved = $derived(collectedDirty(collectedDrafts));
-  const speciesEditingEnabled = import.meta.env.VITE_VEGETATION_SPECIES_EDITING === 'true';
+  const speciesEditingEnabled = import.meta.env.VITE_VEGETATION_SPECIES_EDITING !== 'false';
   let speciesDrafts = $state<SpeciesDrafts>({});
   let speciesLists = $state<SpeciesLists>({});
   let speciesReferenceReady = $state(false);
@@ -119,6 +123,7 @@
     loadRequest++; referenceRequest++; speciesRequest++;
     reads.cancelAll(); referenceReads.cancelAll(); speciesReads.cancelAll();
     speciesReferenceRequest++; speciesReferenceReads.cancelAll();
+    speciesChoiceRequest++; speciesChoiceReads.cancelAll();
   });
   let container: HTMLDivElement;
 
@@ -436,6 +441,7 @@
     attributeDrafts = {};
     collectedDrafts = {};
     speciesDrafts = {};
+    speciesChoices = {};
     vegList = [];
     humusList = [];
     mineralList = [];
@@ -602,7 +608,7 @@
       speciesLists = lists;
       let drafts = speciesDrafts;
       for (const [id, cell] of Object.entries(drafts)) {
-        drafts = stageSpecies(drafts, cell.form, Number(id), cell.raw, cell.expected, lists);
+        if (!cell.decision) drafts = stageSpecies(drafts, cell.form, Number(id), cell.raw, cell.expected, lists);
       }
       speciesDrafts = drafts;
       speciesReferenceReady = true;
@@ -622,6 +628,9 @@
       const rows = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
       if (rows.length !== 1 || !sourceRows(form).some(row => row.id === id)) throw new Error('Species source row is missing or ambiguous; reload before editing.');
       speciesDrafts = stageSpecies(speciesDrafts, form, id, raw, rows[0].species, speciesLists);
+      const choices = { ...speciesChoices };
+      delete choices[String(id)];
+      speciesChoices = choices;
       successMsg = null;
       if (error?.startsWith('Species ')) error = null;
     } catch (cause) {
@@ -630,9 +639,54 @@
     }
   }
 
+  async function reviewSpeciesChoices(id: number) {
+    if (speciesEditingDisabled) { error = 'Wait for available, unlocked species editing before reviewing choices.'; return; }
+    const cell = speciesDrafts[String(id)];
+    if (!cell || !cell.error || cell.raw === '' || cell.raw.length > 8) { error = 'Enter a nonempty species code of at most eight UTF-16 units before reviewing choices.'; return; }
+    const request = ++speciesChoiceRequest;
+    speciesDecisionBusy = true;
+    error = null;
+    try {
+      const aliases = await speciesChoiceReads.track(PlotService.ListVegetationSpeciesAliases({ code: cell.raw }));
+      if (request !== speciesChoiceRequest) return;
+      if (aliases === null) throw new Error('Species alias metadata was not returned.');
+      const users = aliases.some(option => option.code !== null) ? []
+        : await speciesChoiceReads.track(PlotService.ListVegetationSpeciesUsers({ code: cell.raw }));
+      if (request !== speciesChoiceRequest) return;
+      const current = speciesDrafts[String(id)];
+      if (!current || current.raw !== cell.raw || current.form !== cell.form || current.expected !== cell.expected) {
+        throw new Error('The species editor entry changed during lookup; review it again.');
+      }
+      if (users === null) throw new Error('Species personal-code metadata was not returned.');
+      speciesChoices = { ...speciesChoices, [String(id)]: { form: cell.form, entered: cell.raw, aliases, users } };
+    } catch (cause) {
+      if (request === speciesChoiceRequest) error = `Species choices unavailable; draft retained: ${String(cause)}`;
+    } finally {
+      if (request === speciesChoiceRequest) speciesDecisionBusy = false;
+    }
+  }
+
+  function chooseSpeciesCode(id: number, kind: SpeciesDecisionKind, selected?: string) {
+    try {
+      if (speciesEditingDisabled) throw new Error('Wait for available, unlocked species editing before selecting a decision.');
+      const choices = speciesChoices[String(id)];
+      if (!choices) throw new Error('Review the current species entry before selecting a decision.');
+      speciesDrafts = chooseSpecies(speciesDrafts, id, choices, kind, selected);
+      const next = { ...speciesChoices };
+      delete next[String(id)];
+      speciesChoices = next;
+      error = null;
+      successMsg = null;
+      childRevision++;
+    } catch (cause) {
+      error = `Species decision failed; draft retained: ${String(cause)}`;
+    }
+  }
+
   async function cancelSpeciesDrafts() {
     if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling species drafts.'; return; }
     speciesDrafts = {};
+    speciesChoices = {};
     childRevision++;
     error = null;
     successMsg = null;
@@ -660,6 +714,7 @@
       await PlotService.UpdateVegetationSpecies(draft.plotNumber, updates);
       committed = true;
       speciesDrafts = {};
+      speciesChoices = {};
       await loadChildData(draft.plotNumber);
       successMsg = `Saved ${updates.length} species row drafts atomically.`;
     } catch (cause) {
@@ -1404,6 +1459,48 @@
           <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelSpeciesDrafts}>Cancel species drafts</button>
         </div>
         {#each speciesInvalid as message}<p role="alert">{message}</p>{/each}
+        {#if speciesDecisionBusy}<p role="status">Looking up source species choices...</p>{/if}
+        {#each Object.entries(speciesDrafts) as [id, cell] (id)}
+          {#if cell.error}
+            {@const choices = speciesChoices[id]}
+            <section class="mt-2 border-t border-amber-300 pt-2" aria-label={`Species choices, row ${id}`} data-species-choice-row={id}>
+              <p>Row {id}: entered code "{cell.raw}" ({cell.form}). No assignment is saved by reviewing choices.</p>
+              <button type="button" class="mt-1 px-2 py-1 border rounded bg-white" disabled={speciesEditingDisabled}
+                onclick={() => void reviewSpeciesChoices(Number(id))}>Review species code, row {id}</button>
+              {#if choices && choices.entered === cell.raw && choices.form === cell.form}
+                {@const hasAlias = choices.aliases.some(option => option.code !== null)}
+                {#each choices.aliases as option, index (index)}
+                  <div class="mt-1">
+                    <span>{option.code ?? 'NULL'} | {option.scientificName ?? 'NULL'} | {option.englishName ?? 'NULL'} | Lifeform {option.lifeform ?? 'NULL'} | {option.codeType ?? 'NULL'}</span>
+                    <button type="button" class="ml-2 px-2 py-1 border rounded bg-white"
+                      disabled={speciesEditingDisabled || speciesEventError(cell.raw) !== null || speciesEventError(option.code) !== null}
+                      title={speciesEventError(cell.raw) ?? speciesEventError(option.code) ?? 'Stage the explicit replacement; Save remains separate'}
+                      onclick={() => option.code !== null && chooseSpeciesCode(Number(id), 'replace', option.code)}>Use replacement {option.code ?? 'NULL'}, row {id}</button>
+                  </div>
+                {/each}
+                {#if hasAlias}
+                  <button type="button" class="mt-1 px-2 py-1 border rounded bg-white"
+                    disabled={speciesEditingDisabled || speciesEventError(cell.raw) !== null}
+                    title={speciesEventError(cell.raw) ?? 'Stage the entered code using the source UCase event'}
+                    onclick={() => chooseSpeciesCode(Number(id), 'keep')}>Keep entered code, row {id}</button>
+                {:else}
+                  {#each choices.users as option, index (index)}
+                    <div class="mt-1">
+                      <span>{option.code ?? 'NULL'} | {option.scientificName ?? 'NULL'} | {option.englishName ?? 'NULL'} | Lifeform {option.lifeform ?? 'NULL'} | {option.codeType ?? 'NULL'}</span>
+                      <button type="button" class="ml-2 px-2 py-1 border rounded bg-white"
+                        disabled={speciesEditingDisabled || speciesEventError(cell.raw) !== null || speciesEventError(option.code) !== null}
+                        title={speciesEventError(cell.raw) ?? speciesEventError(option.code) ?? 'Stage the existing personal-list code; no personal-list write'}
+                        onclick={() => option.code !== null && chooseSpeciesCode(Number(id), 'user', option.code)}>Use personal code {option.code ?? 'NULL'}, row {id}</button>
+                    </div>
+                  {:else}
+                    <p role="alert">No source replacement or existing personal code was found. Personal-list creation is unavailable; correct or Cancel the draft.</p>
+                  {/each}
+                {/if}
+                {#if speciesEventError(cell.raw)}<p role="alert">{speciesEventError(cell.raw)}</p>{/if}
+              {/if}
+            </section>
+          {/if}
+        {/each}
       </div>
     {/if}
     {#if collectedUnsaved}
@@ -1515,7 +1612,7 @@
       {#if collectedEditingEnabled}
         <p class="mt-2 text-xs text-stone-500">Collected buttons cycle NULL -> C -> V -> NULL using persistent drafts. Other historical values remain unchanged, as in the source click event. Use Save or Cancel; new-row workflows remain unavailable in the source grids.</p>
       {/if}
-      <p class="mt-2 text-xs text-stone-500">{speciesEditingEnabled ? 'Species selection uses exact canonical source-list codes and persistent Save/Cancel drafts. Old-code decisions and personal-list creation remain unavailable.' : 'Species editing remains read-only pending native verification.'}</p>
+      <p class="mt-2 text-xs text-stone-500">{speciesEditingEnabled ? 'Species selection uses canonical source lists and explicit old-code replace/keep or existing personal-code decisions. Decisions stage the source UCase event; Save remains separate. Personal-list creation remains unavailable.' : 'Species editing remains read-only pending native verification.'}</p>
       <details class="mt-4 border border-stone-200 rounded p-3">
         <summary class="text-xs font-semibold cursor-pointer">Experimental vegetation editing grid</summary>
       <div class="space-y-4">
