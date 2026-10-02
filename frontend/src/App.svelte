@@ -9,7 +9,7 @@
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
-  import { validateProfileNavigation, profileNavigationPage, validatePlotProfileSource, type ProfileNavigation } from './projectPlotProfileReview';
+  import { validateProfileNavigation, profileNavigationPage, validatePlotProfileSource, validateProjectPlotProfileReview, type ValidatedProjectPlotProfileReview, type ProfileNavigation } from './projectPlotProfileReview';
   import { validateProfileSUReview, validateProfileSUCreated, type ReviewedProfileSU } from './profileSU';
 
   const pageSize = 25;
@@ -46,6 +46,10 @@
   let externalPath = $state('');
   const externalProjectsEnabled = import.meta.env.VITE_EXTERNAL_PROJECTS !== 'false';
   const profileSelectionEnabled = import.meta.env.VITE_PLOT_PROFILE_SELECTION === 'true';
+  const profileWriteOwnershipEnabled = import.meta.env.VITE_PLOT_PROFILE_WRITE_OWNERSHIP === 'true';
+  let profileWriteReview = $state<ValidatedProjectPlotProfileReview | null>(null);
+  let profileWriteContext = $state('');
+  let profileWriteError = $state('');
   let profilePath = $state('');
   let profileSources = $state<PlotProfileSourceInfo[]>([]);
   let profileSourceContext = $state('');
@@ -368,6 +372,48 @@
     });
   }
 
+  async function reviewProfileWriteOwnership() {
+    const contextId = $projectState?.contextId;
+    if (!contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
+    busy = true; profileWriteError = '';
+    try {
+      await tick();
+      const review = await stateReads.track(ContextService.ReviewProjectPlotProfile(contextId));
+      if ($projectState?.contextId !== contextId) throw new Error('Profile ownership review belongs to an old context.');
+      profileWriteReview = validateProjectPlotProfileReview(review); profileWriteContext = contextId;
+    } catch (cause) { profileWriteError = `Profile editing authorization unchanged: ${String(cause)}`; }
+    finally { busy = false; }
+  }
+
+  async function publishProfileWriteOwnership() {
+    if (!profileWriteReview || profileWriteContext !== $projectState?.contextId) {
+      profileWriteError = 'Review the current selected profile before changing write authorization.'; return;
+    }
+    const proposal = $state.snapshot({ review: profileWriteReview, enabled: !profileWriteReview.source.writable, confirmed: true });
+    const origin = profileWriteContext;
+    await requestTransition(async contextId => {
+      if (contextId !== origin) throw new Error('Profile ownership review belongs to an old context.');
+      busy = true; profileWriteError = '';
+      let published = false;
+      try {
+        await tick();
+        const state = await ContextService.SetPlotProfileEditing(contextId, proposal);
+        published = true;
+        request++; hierarchyRequest++; stateRequest++;
+        plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
+        projectState.set(state); profileNavigation = null; profileSources = []; profileSourceContext = '';
+        profileWriteReview = null; profileWriteContext = '';
+        selected = null; page = null; editorPlotNumber = undefined; view = 'plots'; error = '';
+        await loadPlots(0);
+        if (error) error = `Profile authorization committed, but refresh failed; do not replay authorization: ${error}`;
+      } catch (cause) {
+        profileWriteError = published ? `Profile authorization committed; do not replay: ${String(cause)}`
+          : `Profile authorization unchanged; review retained for retry: ${String(cause)}`;
+        throw cause;
+      } finally { busy = false; }
+    });
+  }
+
   async function switchContext(contextId: string, selection: ContextSelection, next: 'plots' | 'hierarchy') {
     request++;
     hierarchyRequest++;
@@ -575,7 +621,26 @@
               </li>
             {/each}
           </ul>
-          <p class="mt-2 text-sm">Profile rules are independent of project/SU selection. External and other-table profiles are read-only.</p>
+          {#if profileWriteOwnershipEnabled && $projectState.plotProfile.available &&
+            ($projectState.plotProfile.source.name !== $projectState.activeProject || $projectState.plotProfile.source.path !== $projectState.projectPath)}
+            <button type="button" class="mt-3 px-3 py-2 border rounded disabled:opacity-50"
+              disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
+              onclick={() => void reviewProfileWriteOwnership()}>Review profile write ownership</button>
+            {#if profileWriteReview}
+              <section class="mt-3 p-3 border rounded" aria-label="Reviewed profile write ownership">
+                <p>{profileWriteReview.table} in {profileWriteReview.source.source.path}</p>
+                <p>{profileWriteReview.rules.rows.length} physical rules and {profileWriteReview.descriptions.rows.length} table descriptions reviewed.</p>
+                <p>Authorization applies only to this selected profile file/table for the current session. Context changes or restart clear it. Parent/child writes remain project-owned; support database writes are unavailable.</p>
+                <button type="button" class="mt-2 px-3 py-2 border rounded disabled:opacity-50"
+                  disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || profileWriteContext !== $projectState.contextId}
+                  onclick={() => void publishProfileWriteOwnership()}>{profileWriteReview.source.writable ? 'Stop selected profile editing' : 'Authorize selected profile editing'}</button>
+                <button type="button" class="mt-2 ml-2 px-3 py-2 border rounded" disabled={busy || transitionWorking || pendingTransition !== null}
+                  onclick={() => { profileWriteReview = null; profileWriteError = ''; }}>Dismiss ownership review</button>
+              </section>
+            {/if}
+            {#if profileWriteError}<p role="alert" class="mt-2 text-red-800">{profileWriteError}</p>{/if}
+          {/if}
+          <p class="mt-2 text-sm">Profile rules are independent of project/SU selection. External and other-table profiles are read-only unless explicitly authorized for this session.</p>
         </details>
       {/if}
       {#if profileNavigation}

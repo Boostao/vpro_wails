@@ -66,6 +66,7 @@ export type {
     PlotPage,
     PlotProfileSource,
     PlotProfileSourceInfo,
+    PlotProfileWriteRequest,
     PlotQualityChoice,
     PlotSummary,
     ProfileSUCreated,

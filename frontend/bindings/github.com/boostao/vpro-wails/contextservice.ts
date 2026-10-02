@@ -205,6 +205,10 @@ export function SetAuditRestoreSelection(contextID: string, plot: string, rowIDs
     return $Call.ByID(2095651677, contextID, plot, rowIDs);
 }
 
+export function SetPlotProfileEditing(expectedID: string, request: $models.PlotProfileWriteRequest): $CancellablePromise<$models.ProjectState> {
+    return $Call.ByID(1839630602, expectedID, request);
+}
+
 export function SwitchContext(expectedID: string, requested: $models.ContextSelection): $CancellablePromise<$models.ProjectState> {
     return $Call.ByID(1469329417, expectedID, requested);
 }

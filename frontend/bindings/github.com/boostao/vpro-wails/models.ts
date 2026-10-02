@@ -402,6 +402,12 @@ export interface PlotProfileSourceInfo {
     "reason": string;
 }
 
+export interface PlotProfileWriteRequest {
+    "review": ProjectPlotProfileReview;
+    "enabled": boolean;
+    "confirmed": boolean;
+}
+
 export interface PlotQualityChoice {
     "rowId": string;
     "code": string | null;

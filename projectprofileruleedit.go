@@ -112,7 +112,7 @@ func (c *sqliteContext) mutateProfileRules(ctx context.Context, original Project
 		return err
 	}
 	committed := false
-	err = c.withMetadataWriter(ctx, func(conn *sql.Conn) (resultErr error) {
+	err = c.withProfileWriter(ctx, func(conn *sql.Conn) (resultErr error) {
 		tx, err := conn.BeginTx(ctx, nil)
 		if err != nil {
 			return err
@@ -122,7 +122,7 @@ func (c *sqliteContext) mutateProfileRules(ctx context.Context, original Project
 				resultErr = errors.Join(resultErr, err)
 			}
 		}()
-		tableName := c.selection.Project + "_Profile"
+		tableName := info.Table
 		fresh, err := readSQLiteStorageRows(ctx, tx, "main", tableName, "", nil, "Order")
 		if err != nil {
 			return err
@@ -201,7 +201,7 @@ func (c *sqliteContext) mutateProfileRules(ctx context.Context, original Project
 				return err
 			}
 		}
-		if err := c.validateMetadataWriterFiles(); err != nil {
+		if err := c.validateProfileWriterFiles(); err != nil {
 			return err
 		}
 		if err := tx.Commit(); err != nil {

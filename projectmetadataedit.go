@@ -106,6 +106,11 @@ func (c *sqliteContext) validateMetadataWriterFiles() error {
 }
 
 func (c *sqliteContext) withMetadataWriter(ctx context.Context, operation func(*sql.Conn) error) (resultErr error) {
+	return c.withSelectedFileWriter(ctx, "project", c.validateMetadataWriterFiles, operation)
+}
+
+func (c *sqliteContext) withSelectedFileWriter(ctx context.Context, role string, validate func() error,
+	operation func(*sql.Conn) error) (resultErr error) {
 	if err := acquireMutexLease(ctx, &c.mu); err != nil {
 		return err
 	}
@@ -113,10 +118,10 @@ func (c *sqliteContext) withMetadataWriter(ctx context.Context, operation func(*
 	if c.conn == nil {
 		return errors.New("metadata context is closed")
 	}
-	if err := c.validateMetadataWriterFiles(); err != nil {
+	if err := validate(); err != nil {
 		return err
 	}
-	db, err := sql.Open("sqlite3", sqliteFileURI(c.attachments["project"], "rw")+"&_foreign_keys=on&_busy_timeout=5000&_txlock=immediate")
+	db, err := sql.Open("sqlite3", sqliteFileURI(c.attachments[role], "rw")+"&_foreign_keys=on&_busy_timeout=5000&_txlock=immediate")
 	if err != nil {
 		return err
 	}

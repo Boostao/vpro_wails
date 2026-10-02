@@ -41,7 +41,7 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `df0270cd9aff3f2f1682bef7f9282cef2165e236f0c3570358122813e41e1cdb`.
+  `3809ae165a8a494ec9889f5bf1ea19fabcce46e4bd870978732dbdae04967150`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -1054,9 +1054,33 @@ All apps exited normally and every original fixture/support/config byte is
 restored. Preserve the two completed SU output files and private proof.
 archives/profile-su-checkpoint seals previous3b71, core/final/default,
 exact assets, source, receipts/outputs/visuals/logs and manifest. Protected
-current/candidate are exactdf02 copies; never rebuild them in place.
+current/candidate are exact3809 copies; the df02 predecessor remains sealed.
 Never replay completed SU prepare/gates/selected/finish/final/default/seal.
-Profile-file/table creation, external rule writer ownership, existing-file SU
+Explicit profile writer ownership is implemented/native-verified and separately
+default off with VITE_PLOT_PROFILE_WRITE_OWNERSHIP=true plus selection and the
+existing per-operation flags. Review exact source/rules/descriptions, authorize
+or revoke through Save/Discard/Cancel; grants rotate context identity without
+data/configuration writes and clear on any context switch/restart. Paths in YAML
+retain selection, never write authority. Selected-profile rules/history/reserved
+IDs transact in their selected physical file/table; project/SU Env/Veg/Lump and
+parent/child writers remain independent. Support aliases stay unwritable.
+Core bin/vpro-profile-writer-core.exe
+5af64b2665a4b03aa381f7f4dea1414876ad9dd0453dfb02ef47382127f8f66d
+/owned16444 proves Cancel/Discard, two external rule/history commits, real history
+rollback/retry, one independent parent Save/audit, revocation and600px visible
+labels. Lifecycle9556 verifies restart read-only, NULL create/delete9 then10 and
+four complete transactional histories/reserved deleted IDs, with zero new
+project/support/YAML writes and no completed write replay. The prior external
+two-event checkpoint is restored exactly. Default bin/vpro-profile-writer-default.exe
+3809ae165a8a494ec9889f5bf1ea19fabcce46e4bd870978732dbdae04967150
+/owned14792 proves all nine profiling gates off, Vegetation active and zero writes.
+Focused race7.145s/integration507.301s;251 frontend tests/check0/0/both builds pass.
+Actual bindings15 services/150 methods/84 models/two enums;57 editor operations.
+All owned apps exited and every original fixture/support/configuration byte is
+restored. archives/profile-writer-checkpoint preserves df02, exact accepted
+core/default assets, source, logs, native receipts/outputs and manifest.
+Never replay profile-writer prepare/run, lifecycle prepare/run or default smoke.
+Profile-file/table creation, existing-file SU
 destinations, attachment administration, restoration and native Access parity
 remain open. Continue the next bounded source-first profile workflow without
 a new database-family/configuration framework or production/R/Access writes.

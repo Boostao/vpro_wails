@@ -24,6 +24,7 @@ type sqliteContext struct {
 	descriptions   map[string][]map[string]any
 	profile        *PlotProfileSource
 	profileRole    string
+	profileWrite   bool
 }
 
 func sqliteFileURI(path, mode string) string {

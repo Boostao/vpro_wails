@@ -1625,7 +1625,7 @@ not profile-file/table creation or external rule writes.
   navigation or completed writes. Default9008/restart8988 keep all seven gates
   off, preserve existing Vegetation, persist None correctly and make zero writes.
   Every original fixture/support/configuration byte is restored.
-- **Remaining:** new profile-file/table creation, external rule writer ownership,
+- **Remaining:** new profile-file/table creation,
   attachment administration, existing-file SU destinations, history restoration and native Access
   execution parity remain unavailable. Do not advertise the full profile
   lifecycle as finished.
@@ -1690,3 +1690,49 @@ Implemented and native-Wails-verified, separately default off with
   source constraints. Default8236 keeps all eight gates off with existing
   Vegetation and zero writes; the earlier final/default proofs remain retained.
   All owned apps exited and every original fixture/support/config byte is restored.
+
+### Explicit selected-profile writer ownership
+
+Implemented and native-Wails-verified, separately default off with
+`VITE_PLOT_PROFILE_WRITE_OWNERSHIP=true` plus profile selection and the existing
+per-operation review/editing/creation/deletion gates.
+
+- **Source/adaptation:** exported `V7mdlAttachVegProfile` and
+  `V7mdlAttachOther.AttachProfile` link the explicitly selected physical
+  `<Name>_Profile`. Do not infer effective omitted AllowEdits/AddNew properties.
+  Explicit reviewed desktop authorization is an adaptation, not native Access
+  execution parity.
+- **Ownership:** review the exact selected source, complete rules and typed
+  descriptions. Grant/revoke rotates the immutable context identity and reopens
+  independently observed attachments before publication. Support-role physical
+  aliases remain unwritable. The original project/SU/hierarchy selection and
+  Env/Veg/Lump readers do not follow profile writer ownership.
+- **Lifetime/configuration:** retain existing YAML source selection, but never
+  persist the write grant: file paths alone cannot identify a physical file after
+  restart. Any context/source switch or restart clears the grant. Authorization
+  itself makes zero database/configuration writes; no new configuration framework.
+- **Transactions/lifecycle:** reuse the existing leased file writer and rule
+  mutation/history/reservation helpers, targeting the selected physical file and
+  original table. Deleted IDs/history remain binary table-qualified; two tables
+  in one file do not inherit each other's reservations. Recheck file ownership
+  before commit. Cancel/failure retains parent drafts and review; publication uses
+  shared Save/Discard/Cancel and retires the old editor/navigation only afterward.
+- **Acceptance:** focused ownership/editing/selection race7.145s and integration
+  race507.301s pass;251 frontend tests/check0/0 and opt-in/default builds pass.
+  Tests cover external and other-project-table writes, independent file/data
+  preservation, table-qualified reservations, stale/unconfirmed/cancelled grants,
+  support aliases, late ownership rollback, restoration/retry and strict transport.
+  Native16444 proves Cancel/Discard, two exact external rule/history commits,
+  real history-trigger rollback/retained retry, one independent parent Save/audit,
+  revocation and visible600px labels. Native9556 starts read-only after restart,
+  creates/deletes blank9 then10 without reusing either deleted ID, commits four
+  additional complete lifecycle events and makes zero new project/support/YAML
+  writes. Prior completed writes are not replayed and the external two-event
+  checkpoint is restored exactly. Default14792 keeps all nine gates off and
+  existing Vegetation active with zero writes. All owned apps exited normally
+  and all original fixture/support/configuration bytes are restored.
+- **Next:** new usable profile-file/table creation from the original empty
+  nine-field template. Resolve absent description metadata explicitly without
+  inventing descriptions; do not implement the mismatched legacy population
+  branch blindly. Existing-file SU destinations, attachment administration,
+  restoration and broader migration remain open.

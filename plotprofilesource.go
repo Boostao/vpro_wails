@@ -92,7 +92,8 @@ func (c *sqliteContext) profileInfo(ctx context.Context) (PlotProfileSourceInfo,
 	}
 	info.Reason = profileSchemaReason(columns, metadata)
 	info.Available = info.Reason == ""
-	info.Writable = info.Available && source.Name == c.selection.Project && sameDesktopPath(source.Path, c.selection.ProjectPath)
+	info.Writable = info.Available && (c.profileWrite ||
+		source.Name == c.selection.Project && sameDesktopPath(source.Path, c.selection.ProjectPath))
 	return info, nil
 }
 

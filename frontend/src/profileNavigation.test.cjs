@@ -75,3 +75,38 @@ test('Apply/Clear/Previous/Next reuse transition ownership and revalidation befo
   assert.match(app,/await tick\(\);\s*const next = await resolveNavigation/);
   assert.doesNotMatch(app,/SetProfileFilter|CreateSU|UpdatePlotCount/);
 });
+
+test('Independent profile write authorization is default-off and shared-transition owned, not inferred from selection',()=>{
+  const app=read('App.svelte');
+  assert.match(app,/VITE_PLOT_PROFILE_WRITE_OWNERSHIP === 'true'/);
+  assert.match(app,/aria-label="Reviewed profile write ownership"/);
+  assert.match(app,/Context changes or restart clear it/);
+  assert.match(app,/profileWriteContext !== \$projectState.contextId/);
+  const start=app.indexOf('async function publishProfileWriteOwnership');
+  const action=app.slice(start,app.indexOf('\n  async function ',start+1));
+  assert.match(action,/\$state\.snapshot\(\{ review: profileWriteReview, enabled: !profileWriteReview.source.writable, confirmed: true \}\)/);
+  assert.match(action,/await requestTransition/);
+  assert.match(action,/contextId !== origin/);
+  assert.match(action,/await tick\(\);\s*const state = await ContextService.SetPlotProfileEditing/);
+  assert.match(action,/projectState\.set\(state\); profileNavigation = null/);
+  assert.match(action,/view = 'plots'/);
+  assert.match(action,/do not replay/);
+  assert.doesNotMatch(action,/SwitchContext|SelectPlotProfile|SaveProjectPlotProfile/);
+});
+
+test('Write ownership review preserves exact physical source, typed rules and NULL/empty descriptions',()=>{
+  const source={source:{name:" Other' # ",path:"C:\\profile O'Brien #.db"},table:" Other' # _Profile",available:true,writable:false,reason:''};
+  const review={project:'Sample',table:source.table,rules:structuredClone(rules),
+    descriptions:{columns:[{name:'table_name',declaredType:'TEXT'},{name:'description',declaredType:'TEXT'}],
+      rows:[{rowId:'1',cells:[{storage:'text',text:source.table},nullCell()]},
+        {rowId:'2',cells:[{storage:'text',text:source.table},{storage:'text',text:''}]}]},source};
+  const result=profile.validateProjectPlotProfileReview(review);
+  assert.equal(result.source.source.name,source.source.name);
+  assert.equal(result.descriptions.rows[0].cells[1].storage,'null');
+  assert.equal(result.descriptions.rows[1].cells[1].text,'');
+  for(const alter of [value=>value.table='Sample_Profile',value=>value.source.writable='true',
+    value=>value.rules.rows[1].rowId=value.rules.rows[0].rowId,value=>delete value.descriptions.columns]){
+    const value=structuredClone(review);alter(value);
+    assert.throws(()=>profile.validateProjectPlotProfileReview(value));
+  }
+});
