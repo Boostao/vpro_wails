@@ -99,7 +99,7 @@ test('Actual source table owns eight controls and nullable flag clearing with ra
 test('Other drafts gate hidden Save, Undo, Lock, close, context and unrelated mutations independently', () => {
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(form, /VITE_OTHER_EDITING !== 'false'/);
-  assert.match(form, /childUnsaved = \$derived\(heightUnsaved \|\| otherUnsaved \|\| soilUnsaved \|\| attributeUnsaved \|\| collectedUnsaved \|\| speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen\)/);
+  assert.match(form, /childUnsaved = \$derived\(heightUnsaved \|\| otherUnsaved \|\| soilUnsaved \|\| attributeUnsaved \|\| collectedUnsaved \|\| speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked\)/);
   assert.match(form, /if \(otherUnsaved\) \{ await saveOtherDrafts\(\); return; \}/);
   assert.match(form, /if \(otherUnsaved\) \{ void cancelOtherDrafts\(\); return; \}/);
   assert.match(form, /Save or Cancel Other drafts before changing the plot lock/);

@@ -34,14 +34,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all52 editor operations to immutable identities, leases running operations and
+  all54 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `    42445dd9548a35b427cc6100d7f66f27aa6951b73ac8c43f5791521bb430d974`.
+  `68f5c041c9e2994a5f8c594a71f4ebd9db7d9eaadb5b3b212062365106282df2`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -669,8 +669,9 @@ continuations retain byte-preservation evidence, and no completed writes replaye
 Publication includes application source only; private evidence/binaries/dist are
 ignored. Use git HEAD/upstream for the current commit; predecessore71c5da.
 Never replay code-check.py, a-cover-notices.py, cover-notices.py or creation-personal.py completed modes.
-Current successor: project-local ordered read-only profiling is verified;
-profile editing/filter application and metadata-specific restoration remain open.
+Current successor: project-local ordered preview and existing-rule editing are
+native-verified, separately opt-in. Rule creation/deletion, filter application
+and metadata-specific restoration remain open.
 The plan records the metadata prerequisite: project75-column storage, master
 templates42 columns and legacy VUser metadata15 columns are distinct; dates/code
 types and the source wrong-recordset/ambiguous-copy logic must not be guessed.
@@ -875,7 +876,7 @@ bindings and reject unsupported/ambiguous SQL fragments explicitly. Validate ori
 Env/Veg/Lump and aggregate/NULL/scope behavior, not the R doubles-based precedent.
 Execution results/counts belong to owned SQLite TEMP state, not shipped supports or
 historical PlotCount. Other profile-file selection remains unimplemented. Keep the
-filter application, rule editing and Save as SU disabled; preview is separately
+filter application, rule creation/deletion and Save as SU disabled; preview is separately
 opt-in, not an active filter. Strict schema/physical/order/literal guards,
 snapshot revalidation and isolated TEMP transactions pass168 matrix cases,
 source scalar/combined-lump/set-count tests and metadata regressions.
@@ -894,11 +895,49 @@ SHA25642445dd9548a35b427cc6100d7f66f27aa6951b73ac8c43f5791521bb430d974
 All owned apps exit; original fixture/config/support/canonical Sample bytes are
 restored exactly. Archives/project-profile-run-checkpoint retains previousbd8e,
 accepted core/final/default binaries, exact final/default assets and source/proofs/
-logs plus a hashed manifest. Current/candidate are exact accepted4244 copies.
+logs plus a hashed manifest. Accepted4244 is preserved as the predecessor.
 Do not replay completed project-profile-run prepare/run/lifecycle/default/tail
 modes or the seal. Unsupported locale/date/non-ASCII matching and defective
 Lump/Any/Add equality fail explicitly. Static export fidelity and native Wails
 proofs do not establish native Access execution parity.
+Existing-rule editing is now separately opt-in with
+VITE_PROJECT_PLOT_PROFILE_EDITING=true plus the review gate. Eight labelled
+responsive nullable controls per physical rule retain raw errors across tabs.
+Table-to-Field proposals are visible; only changed assignments are written.
+Signed16 Order,255 UTF-16 text, exact changed Layer/Operator lists, full original
+schema/row/count snapshots, new Order collisions and file-role ownership are
+guarded. Source Option Compare Database keyword dispatch preserves literal
+Table casing; runner compilability remains a distinct decision.
+Env suggestions use selected-project columns, Veg suggestions use grouped
+VLists.USysAllSpecs codes, and Lump suggestions require explicit project-lump
+review. NULL/empty reference codes remain distinguishable. Original extra
+columns/historical invalid values and PlotCount are omitted unchanged.
+Save writes rules and full typed before/after snapshots to project-local
+__VPRO_ProfileHistory in one transaction, with schema/event/final-rule
+observations. This is desktop technical history, not a source audit event.
+Independent Save/Undo never save/discard parent drafts. Raw errors/dirty rules
+block Run/Reload/Lock/close/context; committed cleanup/refresh errors require
+Reload rather than replay.
+Full Go race root499.897s, subsequent boundary/metadata focused race15.055s,
+235 frontend tests/check0/0 and opt-in/default builds pass. Bindings15 services/
+142 methods/73 models;54 context-bound operations.
+Opt-in bin/vpro-project-profile-rules-core.exe
+SHA25672b81fc3dae4778f868833b620dff7ec55ec5cd037ab1094a50475e0641b3e5b
+/owned9852 verifies errors/remount/Lock/native close, explicit proposals,
+collision rejection, actual history rollback/retry and literal/NULL edits.
+Four exact rule/history commits were observed; every other project/support/
+configuration value remained unchanged. All64 controls have actually visible
+labels in the narrow native WebView. The proof records two corrected harness
+assumptions (disabled source Unlock placeholder; initially unused Order=2);
+completed writes were independently adopted, never replayed.
+Default bin/vpro-project-profile-rules-default.exe
+SHA25668f5c041c9e2994a5f8c594a71f4ebd9db7d9eaadb5b3b212062365106282df2
+/owned8572 verifies all profiling gates absent, existing Vegetation active and
+zero writes. Both owned apps exited; every original fixture byte is restored.
+Archives/project-profile-rules-checkpoint preserves4244, accepted core/default,
+exact assets, source/proofs/visuals/logs and a sealed manifest. Current/candidate
+are exact accepted68f5 copies; never rebuild protected paths in place or replay
+completed project-profile-rules preparation/run/resume/tail/default/seal modes.
 Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind

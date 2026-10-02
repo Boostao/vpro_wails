@@ -110,8 +110,11 @@
   let metadataBusy = $state(false);
   const profileReviewEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_REVIEW === 'true';
   const profileRunEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_RUN === 'true';
+  const profileEditingEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_EDITING === 'true';
   let profileReviewOpen = $state(false);
   let profileReviewBusy = $state(false);
+  let profileReviewBlocked = $state(false);
+  let profileEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
@@ -155,7 +158,7 @@
   const creationSpeciesInvalid = $derived(creationDraft ? vegetationCreationSpeciesError(creationDraft, speciesLists[creationDraft.form] ?? []) : null);
   const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen);
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -400,7 +403,7 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
-  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen);
+  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked);
   const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
@@ -1508,6 +1511,7 @@
     }
     if (codeCheckOpen) { error = 'Save replacements or personal metadata explicitly, then close species-code review; ordinary plot Save never applies them.'; return; }
     if (metadataOpen) { error = 'Save or Undo metadata explicitly, then close metadata review; ordinary plot Save never applies it.'; return; }
+    if (profileReviewBlocked) { error = 'Save or Undo profile drafts explicitly; ordinary plot Save never writes profile rules.'; return; }
     if (personalDraft !== null) { error = 'Save the personal definition explicitly or Cancel its entry; ordinary plot Save never writes the user database.'; return; }
     if (deletionReview !== null) { error = 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review; ordinary Save never deletes rows.'; return; }
     if (creationDraft !== null) { await saveVegetationCreation(); return; }
@@ -1558,6 +1562,10 @@
   }
 
   export function getCloseState(): EditorCloseState {
+    if (profileReviewBlocked) return profileEditor?.getCloseState() ?? {
+      unsaved: true, busy: true, canSave: false, error,
+      saveReason: 'Finish profile rules explicitly before saving or closing the plot.',
+    };
     if (metadataOpen) return metadataEditor?.getCloseState() ?? {
       unsaved: true, busy: true, canSave: false, error,
       saveReason: 'Wait for metadata review, then finish or close it before saving or closing the plot.',
@@ -1604,6 +1612,7 @@
     }
     if (codeCheckOpen) { codeCheckEditor?.undo(); return; }
     if (metadataOpen) { metadataEditor?.undo(); return; }
+    if (profileReviewBlocked) { profileEditor?.undo(); return; }
     if (personalDraft !== null) { cancelPersonalSpecies(); return; }
     if (deletionReview !== null) { void cancelVegetationDeletion(); return; }
     if (creationDraft !== null) { void cancelVegetationCreation(); return; }
@@ -1632,6 +1641,7 @@
     }
     if (codeCheckOpen) { error = 'Finish or close species-code review before changing the plot lock.'; return; }
     if (metadataOpen) { error = 'Finish or close metadata review before changing the plot lock.'; return; }
+    if (profileReviewBlocked) { error = 'Finish profile drafts before changing the plot lock.'; return; }
     if (personalDraft !== null) {
       error = 'Save the personal definition explicitly or Cancel its entry before changing the plot lock.';
       return;
@@ -1865,7 +1875,8 @@
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
     {#if profileReviewOpen}
-      <ProjectPlotProfileReview client={PlotService} allowRun={profileRunEnabled} onbusy={value => profileReviewBusy = value}
+      <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
+        allowEditing={profileEditingEnabled} onblocked={value => profileReviewBlocked = value} onbusy={value => profileReviewBusy = value}
         onclosed={() => { profileReviewOpen = false; }} />
     {/if}
     {#if metadataOpen}

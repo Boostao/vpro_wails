@@ -85,6 +85,10 @@ export function ListProjectMetadataFields(contextID: string): $CancellablePromis
     return $Call.ByID(4089336027, contextID);
 }
 
+export function ListProjectPlotProfileChoices(contextID: string): $CancellablePromise<$models.ProjectPlotProfileChoices> {
+    return $Call.ByID(1233139099, contextID);
+}
+
 export function ListSoilSuggestions(contextID: string): $CancellablePromise<$models.SoilSuggestion[] | null> {
     return $Call.ByID(357605878, contextID);
 }
@@ -155,6 +159,10 @@ export function SaveOtherRecord(contextID: string, record: $models.OtherRecord):
 
 export function SaveProjectMetadata(contextID: string, request: $models.ProjectMetadataEdit): $CancellablePromise<void> {
     return $Call.ByID(1214954997, contextID, request);
+}
+
+export function SaveProjectPlotProfile(contextID: string, request: $models.ProjectPlotProfileEdit): $CancellablePromise<void> {
+    return $Call.ByID(853163152, contextID, request);
 }
 
 export function SaveSpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {

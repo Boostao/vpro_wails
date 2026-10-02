@@ -13,6 +13,7 @@ const metadata = loadTypeScript('projectMetadataEditor.ts', {
   '../../resources/project-metadata-template.json':resource('project-metadata-template.json')
 });
 const profile = loadTypeScript('projectPlotProfileReview.ts', {'./projectMetadataEditor':metadata});
+const ruleEditor = loadTypeScript('projectProfileRuleEditor.ts', {'./projectMetadataEditor':metadata,'./projectPlotProfileReview':profile});
 const cell = (storage,value) => ({storage,text:null,integer:null,real:null,blobHex:null,
   ...(storage==='null'?{}:{[storage==='blob'?'blobHex':storage]:value})});
 const columns = Array.from(profile.plotProfileFields,name=>({name,declaredType:'TEXT'}));
@@ -58,7 +59,7 @@ test('Profile review rejects mismatched ownership, incomplete schemas, inconsist
   for(const source of variants) assert.throws(()=>profile.validateProjectPlotProfileReview(source));
 });
 
-test('Project-local profile review is separately gated, resident across tabs, cancellable and strictly read-only',()=>{
+test('Project-local profile review and editing are separately gated, resident across tabs and preserve independent draft ownership',()=>{
   const component=read('ProjectPlotProfileReview.svelte');
   const form=read('FS882Form.svelte');
   assert.equal(compile(component,{filename:'ProjectPlotProfileReview.svelte',generate:'client'}).warnings.length,0);
@@ -66,6 +67,7 @@ test('Project-local profile review is separately gated, resident across tabs, ca
   assert.match(form,/headerWorkflowBusy = \$derived\([^;]*profileReviewBusy/);
   assert.match(form,/\{#if profileReviewOpen\}\s*<ProjectPlotProfileReview/);
   assert.match(component,/reads\.track\(client\.ReviewProjectPlotProfile\(\)\)/);
+  assert.match(component,/allowEditing \? reads\.track\(client\.ListProjectPlotProfileChoices\(\)\)/);
   assert.match(component,/generation\+\+; reads\.cancelAll\(\)/);
   assert.match(component,/review = null; error = null; lump = null; result = null; reading = true/);
   assert.match(component,/request === generation/);
@@ -73,12 +75,22 @@ test('Project-local profile review is separately gated, resident across tabs, ca
   assert.match(component,/disabled title="Ordered profile execution is not implemented."/);
   assert.match(component,/PlotCount is historical storage/);
   assert.match(component,/aria-label=\{`\$\{item\.table\.columns\[index\]\.name\}, record \$\{row\.rowId\}`\}/);
-  assert.doesNotMatch(component,/<select|<textarea|\.Save|\.Create|\.Update|\.Delete|\.Set|\.Restore/);
+  assert.doesNotMatch(component,/\.Create|\.Update|\.Delete|\.Set|\.Restore/);
+  assert.match(form,/VITE_PROJECT_PLOT_PROFILE_EDITING === 'true'/);
+  assert.match(component,/\{#if allowEditing && draft\}/);
+  assert.match(component,/client\.SaveProjectPlotProfile\(profileRuleEditRequest\(draft\)\)/);
+  assert.match(component,/if \(busy \|\| dirty\)/);
+  assert.match(component,/if \(busy \|\| blocked\)/);
+  assert.match(component,/committedFailure = true; draft = null/);
+  assert.match(component,/completed writes must not be replayed/);
+  assert.match(form,/if \(profileReviewBlocked\) return profileEditor\?\.getCloseState/);
+  assert.match(form,/if \(profileReviewBlocked\) \{ profileEditor\?\.undo\(\); return; \}/);
+  assert.match(form,/ordinary plot Save never writes profile rules/);
   assert.match(form,/VITE_PROJECT_PLOT_PROFILE_RUN === 'true'/);
-  assert.match(component,/if \(!allowRun \|\| reading \|\| !review\) return/);
+  assert.match(component,/if \(!allowRun \|\| busy \|\| blocked \|\| !review\) return/);
   assert.match(component,/\{#if allowRun\}[\s\S]*Run stored profile preview[\s\S]*\{:else\}[\s\S]*Run Profile \(unavailable\)/);
   assert.match(component,/originalRules: source\.rules, projectLump: lump, subvarieties/);
-  assert.match(component,/disabled=\{reading \|\| !lump\}/);
+  assert.match(component,/disabled=\{busy \|\| blocked \|\| !lump\}/);
   assert.match(component,/lump = null; subvarieties = false; result = null; error = null/);
   assert.match(component,/function cancelRun\(\) \{\s*generation\+\+; reads\.cancelAll\(\);/);
   assert.match(component,/running = false; reading = false; result = null; onbusy\(false\)/);
@@ -105,4 +117,72 @@ test('Preview validates exact scoped ordered result identities, counts and NULL 
   const lump={columns:['LumpCode','SppCode','Use'].map(name=>({name,declaredType:'TEXT'})),rows:[]};
   assert.equal(JSON.stringify(profile.validateProjectProfileLump(lump)),JSON.stringify(lump));
   assert.throws(()=>profile.validateProjectProfileLump({...lump,columns:lump.columns.slice(1)}),/complete original physical schema/);
+});
+
+test('Stored-rule drafts reuse exact metadata scalars, preserve NULL/empty and apply source Table-to-Field proposals explicitly',()=>{
+  const source=review();
+  const record=source.rules.rows[0];
+  record.cells[0]=cell('integer','1'); record.cells[1]=cell('text','Env');
+  record.cells[2]=cell('text','NutrientRegime'); record.cells[3]=cell('text','=');
+  record.cells[6]=cell('text','c');
+  let draft={review:profile.validateProjectPlotProfileReview(source),cells:{}};
+  assert.equal(ruleEditor.profileRulesDirty(draft),false);
+  draft=ruleEditor.stageProfileRule(draft,'-1','Table','Veg',false);
+  assert.equal(ruleEditor.profileRuleValue(draft,'-1','Field').raw,'Species');
+  const request=ruleEditor.profileRuleEditRequest(draft);
+  assert.deepEqual(JSON.parse(JSON.stringify(request.drafts[0])),{
+    rowId:'-1',changes:[{column:'Table',value:cell('text','Veg')},{column:'Field',value:cell('text','Species')}]
+  });
+  for(const raw of ['32768','-32769','1.0','1e2','-0',' 1']) {
+    const invalid=ruleEditor.stageProfileRule(draft,'-1','Order',raw,false);
+    assert.equal(ruleEditor.profileRuleValue(invalid,'-1','Order').raw,raw);
+    assert.equal(ruleEditor.profileRulesDirty(invalid),true);
+    assert.throws(()=>ruleEditor.profileRuleEditRequest(invalid),/every raw profile error/);
+  }
+  for(const raw of ['a'.repeat(256),'\uD800','😀'.repeat(128)]) {
+    const invalid=ruleEditor.stageProfileRule(draft,'-1','Criteria',raw,false);
+    assert.ok(ruleEditor.profileRuleErrors(invalid).length);
+  }
+  for(const raw of ['a'.repeat(255),'😀'.repeat(127)+'a',"  O'Brien  "]) {
+    const valid=ruleEditor.stageProfileRule(draft,'-1','Criteria',raw,false);
+    assert.equal(ruleEditor.profileRuleValue(valid,'-1','Criteria').value.text,raw);
+    assert.equal(ruleEditor.profileRuleErrors(valid).length,0);
+  }
+  const empty=ruleEditor.stageProfileRule(draft,'-1','Criteria','',false);
+  const nullDraft=ruleEditor.stageProfileRule(draft,'-1','Criteria','',true);
+  assert.equal(ruleEditor.profileRuleValue(empty,'-1','Criteria').value.storage,'text');
+  assert.equal(ruleEditor.profileRuleValue(nullDraft,'-1','Criteria').value.storage,'null');
+  const badLayer=ruleEditor.stageProfileRule(draft,'-1','Layer','SumD',false);
+  assert.ok(ruleEditor.profileRuleErrors(badLayer).length);
+  const corrected=ruleEditor.stageProfileRule(badLayer,'-1','Layer','SumB',false);
+  assert.equal(ruleEditor.profileRuleErrors(corrected).length,0);
+  assert.equal(ruleEditor.profileRuleValue(corrected,'-1','Layer').value.text,'SumB');
+  const envAgain=ruleEditor.stageProfileRule(corrected,'-1','Table','Env',false);
+  assert.ok(ruleEditor.profileRuleValue(envAgain,'-1','Layer').error);
+  assert.throws(()=>ruleEditor.profileRuleEditRequest(envAgain),/every raw profile error/);
+  assert.equal(ruleEditor.profileRuleValue(envAgain,'-1','Criteria').raw,'c');
+});
+
+test('Profile suggestions preserve project/reference ownership and historical omission without restricting free literal inputs',()=>{
+  const source=profile.validateProjectPlotProfileReview(review());
+  source.rules.rows[0].cells[1]=cell('text','env');
+  source.rules.rows[0].cells[6]=cell('text','a'.repeat(400));
+  let draft={review:source,cells:{}};
+  const suggestions=ruleEditor.validateProfileChoices({envFields:['PlotNumber','Quoted field'],species:[cell('text','ABC'),cell('text',''),cell('null')]});
+  assert.equal(JSON.stringify(ruleEditor.profileRuleOptions(draft,'-1','Field',suggestions)),JSON.stringify(suggestions.envFields));
+  assert.throws(()=>ruleEditor.validateProfileChoices({...suggestions,envFields:['P','P']}),/Complete selected-project/);
+  assert.throws(()=>ruleEditor.validateProfileChoices({...suggestions,species:[{storage:'null',text:'invalid'}]}),/inconsistent typed/);
+  const historical=ruleEditor.stageProfileRule(draft,'-1','Criteria','a'.repeat(400),false);
+  assert.equal(ruleEditor.profileRulesDirty(historical),false);
+  assert.equal(ruleEditor.profileRuleErrors(historical).length,0);
+  draft=ruleEditor.stageProfileRule(historical,'-1','Table','vEg',false);
+  assert.equal(ruleEditor.profileRuleValue(draft,'-1','Table').value.text,'vEg');
+  assert.equal(ruleEditor.profileRuleValue(draft,'-1','Field').value.text,'Species');
+  assert.equal(JSON.stringify(ruleEditor.profileRuleOptions(draft,'-1','Species',suggestions)),JSON.stringify(['ABC','']));
+  const request=ruleEditor.profileRuleEditRequest(draft);
+  assert.equal(request.drafts[0].changes.some(change=>change.column==='Criteria'),false);
+  const retained=JSON.parse(JSON.stringify(ruleEditor.stageProfileRule(draft,'-1','Order','oops',false)));
+  assert.equal(ruleEditor.profileRuleValue(retained,'-1','Order').raw,'oops');
+  assert.ok(ruleEditor.profileRuleErrors(retained).length);
+  assert.equal(ruleEditor.profileRulesDirty({review:retained.review,cells:{}}),false);
 });

@@ -6,6 +6,8 @@ export function bindContextPlots(contextId: string, port = ContextService) {
   return {
     GetPlot: (plot: string) => port.GetPlot(contextId, plot),
     ReviewProjectPlotProfile: () => port.ReviewProjectPlotProfile(contextId),
+    SaveProjectPlotProfile: (request: Parameters<typeof port.SaveProjectPlotProfile>[1]) => port.SaveProjectPlotProfile(contextId, request),
+    ListProjectPlotProfileChoices: () => port.ListProjectPlotProfileChoices(contextId),
     ReviewProjectPlotProfileLump: () => port.ReviewProjectPlotProfileLump(contextId),
     RunProjectPlotProfile: (request: Parameters<typeof port.RunProjectPlotProfile>[1]) => port.RunProjectPlotProfile(contextId, request),
     ReviewProjectMetadata: (plot: string) => port.ReviewProjectMetadata(contextId, plot),

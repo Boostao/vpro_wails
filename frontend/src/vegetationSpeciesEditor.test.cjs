@@ -237,7 +237,7 @@ test('Species drafts gate every session and survive tab remount, Save, Undo, Loc
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(form, /VITE_VEGETATION_SPECIES_EDITING !== 'false'/);
   assert.match(form, /let speciesDrafts = \$state<SpeciesDrafts>/);
-  assert.match(form, /childUnsaved = \$derived\([^;]*speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen\)/);
+  assert.match(form, /childUnsaved = \$derived\([^;]*speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked\)/);
   for (const name of ['height', 'other', 'soil', 'attribute', 'collected']) {
     assert.match(form, new RegExp(`const ${name}EditingDisabled = \\$derived\\([^;]*speciesUnsaved\\)`));
   }

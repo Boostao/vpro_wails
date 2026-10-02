@@ -503,6 +503,16 @@ export interface ProjectMetadataTemplateCreate {
     "values": ProjectMetadataChange[] | null;
 }
 
+export interface ProjectPlotProfileChoices {
+    "envFields": string[] | null;
+    "species": ProjectMetadataCell[] | null;
+}
+
+export interface ProjectPlotProfileEdit {
+    "originalRules": ProjectMetadataTable;
+    "drafts": ProjectPlotProfileRuleDraft[] | null;
+}
+
 export interface ProjectPlotProfileResult {
     "project": string;
     "table": string;
@@ -517,6 +527,11 @@ export interface ProjectPlotProfileReview {
     "table": string;
     "rules": ProjectMetadataTable;
     "descriptions": ProjectMetadataTable;
+}
+
+export interface ProjectPlotProfileRuleDraft {
+    "rowId": string;
+    "changes": ProjectMetadataChange[] | null;
 }
 
 export interface ProjectPlotProfileRunRequest {

@@ -1419,7 +1419,49 @@ not persisted desktop job state or an editor catalogue.
   cancellation/retry, retained unsaved parent drafts and default-off delivery.
   Disposable canonical-sample bytes and the original active fixture are exactly
   restored; no production, source, support, audit or configuration writes occur.
-- **Next, not implied complete:** profile-rule editing, external/current profile
+- **Next, not implied complete:** rule creation/deletion, external/current profile
   selection, applying results to form navigation/filters and Save as SU require
   separately defined ownership/draft/rollback gates. Metadata-specific
   restoration and remaining active calculations/navigation remain in order6.
+
+### Original profile rules: existing-row editing
+
+- **Delivered, separately opt-in:** the review gate plus
+  `VITE_PROJECT_PLOT_PROFILE_EDITING=true` enables eight source-bound nullable
+  fields per reviewed physical row. No creation/deletion or hidden PlotCount
+  update occurs. Signed16 Order and255 UTF-16 text domains reuse the proven
+  metadata scalar parser. Unchanged historical invalid/extra values are omitted.
+  Layer/Operator changed assignments use exact source lists. Source ASCII Table
+  keyword case dispatch does not rewrite literal storage or imply runner support
+  for arbitrary stored rules.
+- **Source events and references:** Table changes visibly stage the explicit
+  Veg/Lump Field assignment without clearing unrelated inputs. Env fields belong
+  to the selected project, not the source's hardcoded Sample_Env. Veg suggestions
+  preserve grouped VLists.USysAllSpecs codes, including NULL/empty distinctions;
+  Lump suggestions come from explicitly reviewed project-local definitions.
+  Suggestions do not invent LimitToList for fields lacking effective-property
+  evidence.
+- **Transactional adaptation:** project-local `__VPRO_ProfileHistory` stores
+  complete typed before/after rules alongside assignments in one owned writer
+  transaction. Profile-global rows have no native child audit identity; this
+  technical history is not represented as an Access audit event or restoration
+  workflow. Complete original schema/rules/counts, physical identities, new Order
+  collisions, history schema/insertion/content, final rules and all file roles
+  are independently checked. No-op creates no history. Missing/rewritten history,
+  count drift, cancellation, stale snapshots and support replacement/alias fail
+  without committing. Committed cleanup/refresh failures require Reload.
+- **Lifecycle and acceptance:** independent profile Save/Undo preserve parent
+  drafts. Resident raw errors survive tab remounts and block Run/Reload/Lock/
+  close/context transitions. Full Go race499.897s, extra boundary/metadata race,
+  235 frontend tests/check0/0 and both builds pass. Actual Wails verifies exact
+  literal and NULL saves, Order collision rejection, real history-trigger
+  rollback/retained retry, native-close cancellation and narrow visible labels.
+  Four exact commits occur only on the reversible canonical-sample copy; all
+  original fixture/support/configuration bytes are restored. Default delivery
+  keeps review/run/editing disabled. Corrected harness assumptions are recorded
+  honestly; no completed write was replayed.
+- **Remaining original lifecycle:** creation/deletion need stable physical
+  identity/reservation and full snapshot history contracts; external/current
+  profile selection, filter/navigation application and Save as SU need separate
+  owned-context draft/rollback acceptance. Technical-history restoration,
+  native Access execution parity and remaining source events are not implied.

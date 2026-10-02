@@ -41,7 +41,7 @@ export function metadataCellText(cell: ProjectMetadataCell): string {
   return cell.storage === 'text' ? cell.text ?? '' : cell.storage === 'integer' ? cell.integer ?? ''
     : cell.storage === 'real' ? String(cell.real) : cell.storage === 'blob' ? `hex:${cell.blobHex}` : '';
 }
-function equalCell(left: ProjectMetadataCell, right: ProjectMetadataCell): boolean {
+export function equalCell(left: ProjectMetadataCell, right: ProjectMetadataCell): boolean {
   return left.storage === right.storage && left.text === right.text && left.integer === right.integer &&
     left.real === right.real && left.blobHex === right.blobHex;
 }
@@ -85,7 +85,7 @@ export function metadataFieldValue(draft: MetadataDraft, field: ProjectMetadataE
   })();
 }
 
-function parseMetadataCell(field: ProjectMetadataEditorField, raw: string, nullValue: boolean, original?: ProjectMetadataCell): MetadataDraftCell {
+export function parseMetadataCell(field: ProjectMetadataEditorField, raw: string, nullValue: boolean, original?: ProjectMetadataCell): MetadataDraftCell {
   let value: ProjectMetadataCell = { storage: 'null', text: null, integer: null, real: null, blobHex: null };
   let error: string | null = null;
   if (!nullValue) {
