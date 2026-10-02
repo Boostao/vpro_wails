@@ -251,18 +251,23 @@ func (s *PlotService) saveProjectMetadata(request ProjectMetadataEdit) error {
 	if err != nil {
 		return err
 	}
-	if request.StandardPopulation != "" && request.StandardPopulation != "keep" {
-		return errors.New("metadata source-standard population is unavailable; only an explicit keep-other-fields decision is supported")
+	if request.StandardPopulation != "" && request.StandardPopulation != "keep" && request.StandardPopulation != "populate" {
+		return errors.New("metadata source-standard decision must explicitly keep current drafts or confirm population")
 	}
+	recognizedStandardChanged := false
 	for _, assignment := range assignments {
 		if assignment.column == "EcosysCollectionStandard" && assignment.after.Text != nil {
 			standard := *assignment.after.Text
-			if (len(standard) >= 4 && strings.EqualFold(standard[:4], "DEIF") ||
-				len(standard) >= 3 && strings.EqualFold(standard[:3], "DTE") || strings.EqualFold(standard, "LMH25")) &&
-				request.StandardPopulation != "keep" {
-				return errors.New("metadata collection standard requires an explicit keep-other-fields decision; source-default population is not automatic")
+			recognized := len(standard) >= 4 && strings.EqualFold(standard[:4], "DEIF") ||
+				len(standard) >= 3 && strings.EqualFold(standard[:3], "DTE") || strings.EqualFold(standard, "LMH25")
+			if recognized && request.StandardPopulation == "" {
+				return errors.New("metadata collection standard requires an explicit keep-current-drafts or confirmed population decision; source-default population is not automatic")
 			}
+			recognizedStandardChanged = recognizedStandardChanged || recognized
 		}
+	}
+	if request.StandardPopulation == "populate" && !recognizedStandardChanged {
+		return errors.New("metadata confirmed population requires a changed recognized collection standard")
 	}
 	c := s.projects.sqlite
 	ctx := s.operationContext()

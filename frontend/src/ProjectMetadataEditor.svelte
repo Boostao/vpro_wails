@@ -5,7 +5,7 @@
   import type { EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
   import { beginMetadataDraft, stageMetadata, metadataFieldValue, metadataErrors, metadataDirty, metadataEditRequest,
-    metadataCellText, metadataStandardDecisionRequired, type MetadataDraft } from './projectMetadataEditor';
+    metadataCellText, metadataStandardDecisionRequired, metadataStandardDefaults, populateMetadataStandard, type MetadataDraft } from './projectMetadataEditor';
   import { metadataGroups, metadataLabel } from './projectMetadataPresentation';
 
   let { client, plot, onclosed, onbusy, oncommitted }: {
@@ -17,6 +17,7 @@
   let draft = $state<MetadataDraft | null>(null);
   let reading = $state(false);
   let ready = $state(false);
+  let standardPreview = $state(false);
   let saving = $state(false);
   let committedFailure = $state(false);
   let error = $state<string | null>(null);
@@ -44,7 +45,7 @@
     if (busy) { error = 'Wait for the current metadata operation before Undo.'; return; }
     if (draft && !committedFailure) {
       draft = beginMetadataDraft(draft.review, draft.original.rowId);
-      error = null; success = 'Metadata drafts undone; no data or history changed.';
+      standardPreview = false; error = null; success = 'Metadata drafts undone; no data or history changed.';
     } else onclosed();
   }
   async function reload() {
@@ -59,7 +60,7 @@
       if (!next.projectRecords.columns || !next.projectRecords.rows || !definitions?.length) {
         throw new Error('Complete metadata records and source field definitions are required.');
       }
-      review = next; fields = definitions; draft = null; committedFailure = false; ready = true;
+      review = next; fields = definitions; draft = null; committedFailure = false; ready = true; standardPreview = false;
     } catch (cause) {
       if (request === generation) error = `Metadata review/references unavailable; no data changed: ${String(cause)}`;
     } finally { if (request === generation) reading = false; }
@@ -67,22 +68,37 @@
   function select(rowId: string) {
     if (!ready || !review || busy || dirty || committedFailure) { error = 'Reload available metadata and references, then Save or Undo the existing draft before selecting another physical record.'; return; }
     try {
-      draft = beginMetadataDraft(review, rowId); error = null; success = null;
+      draft = beginMetadataDraft(review, rowId); standardPreview = false; error = null; success = null;
     } catch (cause) { error = `Metadata selection failed: ${String(cause)}`; }
   }
   function stage(field: ProjectMetadataEditorField, raw: string, nullValue: boolean) {
     if (!ready || !draft || busy || committedFailure) { error = 'Reload available metadata and references before editing.'; return; }
-    try { draft = stageMetadata(draft, field, raw, nullValue); error = null; success = null; }
+    try {
+      draft = stageMetadata(draft, field, raw, nullValue);
+      if (field.name === 'EcosysCollectionStandard') standardPreview = false;
+      error = null; success = null;
+    }
     catch (cause) { error = `Metadata draft failed; entry retained: ${String(cause)}`; }
+  }
+  function populateStandard() {
+    if (!ready || !draft || busy || committedFailure || !standardPreview) {
+      error = 'Review the available source defaults before applying them to drafts.'; return;
+    }
+    try {
+      draft = populateMetadataStandard(draft, available);
+      standardPreview = false; error = null;
+      success = '24 source defaults staged, not saved. Other drafts and raw errors were retained; review before Save.';
+    } catch (cause) { error = `Source-default proposal failed; drafts retained: ${String(cause)}`; }
   }
   async function save() {
     if (!ready || !draft || busy || committedFailure) { error = 'Reload available metadata and references, then select an existing record before metadata Save.'; return; }
+    if (standardPreview) { error = 'Apply or cancel the source-default preview before metadata Save.'; return; }
     let committed = false;
     saving = true; error = null; success = null;
     try {
       const request = metadataEditRequest(draft);
       await client.SaveProjectMetadata(request);
-      committed = true; draft = null;
+      committed = true; draft = null; standardPreview = false;
       await oncommitted();
       const next = await client.ReviewProjectMetadata(plot);
       review = next; draft = beginMetadataDraft(next, request.original.rowId);
@@ -116,7 +132,7 @@
   <div class="toolbar">
     <button type="button" onclick={reload} disabled={busy || dirty}>Reload metadata and references</button>
     <button type="button" onclick={undo} disabled={busy || committedFailure}>Undo metadata drafts</button>
-    <button type="button" onclick={save} disabled={!ready || busy || !draft || !dirty || errors.length > 0 || committedFailure || standardDecision && draft?.standardPopulation !== 'keep'}>Save metadata</button>
+    <button type="button" onclick={save} disabled={!ready || busy || !draft || !dirty || errors.length > 0 || committedFailure || standardPreview || standardDecision && !draft?.standardPopulation}>Save metadata</button>
     <button type="button" onclick={close} disabled={busy || dirty || errors.length > 0}>Close metadata review</button>
   </div>
   <fieldset disabled={!ready || busy || dirty || committedFailure}><legend>Select an existing physical record explicitly</legend>
@@ -129,7 +145,23 @@
     {#if standardDecision}
       <label class="decision"><input type="checkbox" data-metadata-standard-keep disabled={!ready || busy || committedFailure}
         checked={draft.standardPopulation === 'keep'} onchange={event => { if (draft) draft = { ...draft, standardPopulation: event.currentTarget.checked ? 'keep' : '' }; }} />
-        Keep other fields unchanged for this collection standard. Automatic source-default population is unavailable.</label>
+        Use current field drafts without further source population.</label>
+      <button type="button" disabled={!ready || busy || committedFailure} onclick={() => standardPreview = true}>Review 24 source defaults</button>
+      {#if draft.standardPopulation === 'populate'}<p>Source defaults were explicitly staged; they remain editable drafts until Save.</p>{/if}
+      {#if standardPreview}
+        <fieldset data-metadata-standard-preview><legend>Confirm replacement of these 24 field drafts</legend>
+          <p>No data has been saved. Apply replaces the listed current drafts, including their raw errors; all other drafts remain unchanged.</p>
+          <dl>{#each Object.entries(metadataStandardDefaults) as [name, value] (name)}
+            {@const field = available.find(field => field.name === name)}
+            <dt>{metadataLabel(name)}</dt><dd>
+              Current: {field ? metadataFieldValue(draft, field).nullValue ? 'NULL' : JSON.stringify(metadataFieldValue(draft, field).raw) : 'Unavailable'};
+              proposed: {JSON.stringify(value)}
+            </dd>
+          {/each}</dl>
+          <button type="button" disabled={!ready || busy || committedFailure} onclick={populateStandard}>Apply 24 source defaults to drafts</button>
+          <button type="button" disabled={busy} onclick={() => standardPreview = false}>Cancel source-default preview</button>
+        </fieldset>
+      {/if}
     {/if}
     {#each metadataGroups as group (group.title)}
       <fieldset><legend>{group.title}</legend><div class="metadata-grid">

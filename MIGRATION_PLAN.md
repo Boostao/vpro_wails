@@ -1173,8 +1173,8 @@ with a final whole-row observation after every audit. Actual retained table-obje
 descriptions supply versions; missing/NULL/malformed/duplicate descriptions stop
 Save instead of inheriting the source Unknown fallback. No-op/historical omission
 does not rewrite stamps or history. Runtime Lock stays a UI lifecycle gate.
-Recognized standards currently support only an explicit keep-other-fields decision;
-source-default proposals need their own confirmation. Metadata audit aliases fail
+Recognized standards require an explicit keep-current-drafts or source-default
+confirmation decision. Metadata audit aliases fail
 closed in the generic restoration workflow until metadata restoration is defined.
 
 Focused metadata/context3.449s/full race564.604s and frontend213/check0/0/build pass;15/134/62 bindings
@@ -1215,8 +1215,31 @@ Exact accepted default04c4291f... is promoted without rebuilding. All proofs use
 the single disposable workflow fixture, not Access/R/production data, and completed
 writes must not be replayed.
 
-Remaining metadata acceptance: confirmed source-standard population; explicit
-new/blank/template proposals with signed32 ID allocation/reservation and audited
+Confirmed source-standard population is implemented for existing records. The
+static `cmbEcosysCollectionStandard_Change` procedure supplies exactly24 ordinary
+text literals for DEIF/DTE/LMH25; a retained source fixture and production JSON
+must match, including the source's literal spelling. The desktop previews current
+and proposed values before explicit Apply, which stages drafts only. Keep and
+cancel do not populate; unrelated drafts/raw errors survive Apply and remounts.
+Undo restores the correct original record. Later manual field edits remain allowed;
+changing the collection standard resets acknowledgement. The server accepts only
+explicit assignments and never invents defaults from the decision flag.
+
+Focused metadata Go5.405s plus source-fixture1.322s,222 frontend tests/check0 errors/
+0 warnings and opt-in/default builds pass. Native opt-inf5b80c3e... verifies source
+literal matching, keep/cancel,24-field preview/application, retained numeric errors,
+tab remount/Undo, second-audit rollback/retained retry and25 explicit fields/3 stamps
+with28 exact audits. Original77 project/5 user audit fixture bytes restore after
+owned PID6608 closes. Default18b5d693... verifies disabled metadata actions and
+unchanged Site/Vegetation without writes; owned PID2040 closes. Full integration
+race passes (root576.719s) against final default assets. Closed archive source
+snapshots are isolated from active Go discovery by a local archive module; new
+snapshots use source.zip. Archives/metadata-standard-checkpoint seals50 hashed
+files, exact assets/binaries/source/receipts and previous04c4291f.... Exact accepted
+default18b5d693... is promoted without rebuilding; default metadata stays disabled.
+
+Remaining metadata acceptance: explicit new/blank/template proposals with signed32
+ID allocation/reservation and audited
 creation; explicit master timestamp/code conversion decisions; metadata-specific
 restoration; reference attachment/master-catalogue writes. Keep these unavailable
 and leave existing-record editing opt-in rather than claiming the full source

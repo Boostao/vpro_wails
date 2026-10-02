@@ -1,4 +1,5 @@
 import { wellFormedUTF16 } from './qualityEditor';
+import standardDefaults from '../../resources/project-metadata-standard.json';
 import type { ProjectMetadataCell, ProjectMetadataEdit, ProjectMetadataEditorField, ProjectMetadataReview, ProjectMetadataRow } from '../bindings/github.com/boostao/vpro-wails';
 
 export interface MetadataDraftCell {
@@ -12,7 +13,7 @@ export interface MetadataDraft {
   original: ProjectMetadataRow;
   id: number;
   cells: Record<string, MetadataDraftCell>;
-  standardPopulation: '' | 'keep';
+  standardPopulation: '' | 'keep' | 'populate';
 }
 
 export function metadataCellText(cell: ProjectMetadataCell): string {
@@ -101,11 +102,24 @@ export function metadataStandardDecisionRequired(draft: MetadataDraft): boolean 
   if (!cell || cell.error || cell.value.text === null || equalCell(cell.value, sourceCell(draft, 'EcosysCollectionStandard'))) return false;
   return /^(DEIF|DTE)/i.test(cell.value.text) || /^LMH25$/i.test(cell.value.text);
 }
+export const metadataStandardDefaults: Readonly<Record<string, string>> = Object.freeze(standardDefaults);
+
+export function populateMetadataStandard(draft: MetadataDraft, fields: ProjectMetadataEditorField[]): MetadataDraft {
+  if (!metadataStandardDecisionRequired(draft)) throw new Error('Source population requires a changed recognized collection standard.');
+  let next = draft;
+  for (const [name, value] of Object.entries(metadataStandardDefaults)) {
+    const matches = fields.filter(field => field.name === name && field.kind === 'text');
+    if (matches.length !== 1) throw new Error(`Source population field ${name} is unavailable or ambiguous; drafts were retained.`);
+    next = stageMetadata(next, matches[0], value, false);
+    if (next.cells[name].error) throw new Error(`Source population was not applied; drafts were retained: ${next.cells[name].error}`);
+  }
+  return { ...next, standardPopulation: 'populate' };
+}
 export function metadataEditRequest(draft: MetadataDraft): ProjectMetadataEdit {
   const errors = metadataErrors(draft);
   if (errors.length) throw new Error(errors[0]);
-  if (metadataStandardDecisionRequired(draft) && draft.standardPopulation !== 'keep') {
-    throw new Error('Explicitly keep other fields for this collection standard; automatic source-default population remains unavailable.');
+  if (metadataStandardDecisionRequired(draft) && draft.standardPopulation !== 'keep' && draft.standardPopulation !== 'populate') {
+    throw new Error('Explicitly keep current drafts or confirm source-default population for this collection standard.');
   }
   const changes = Object.entries(draft.cells).flatMap(([column, cell]) =>
     equalCell(cell.value, sourceCell(draft, column)) ? [] : [{ column, value: cell.value }]);

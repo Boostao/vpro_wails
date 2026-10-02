@@ -5,7 +5,8 @@ const path = require('node:path');
 const {compile} = require('svelte/compiler');
 const {loadTypeScript} = require('./svelteTestHelpers.cjs');
 const quality = loadTypeScript('qualityEditor.ts', {'./becEditor': loadTypeScript('becEditor.ts')});
-const editor = loadTypeScript('projectMetadataEditor.ts', {'./qualityEditor': quality});
+const defaults = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-standard.json'),'utf8'));
+const editor = loadTypeScript('projectMetadataEditor.ts', {'./qualityEditor': quality,'../../resources/project-metadata-standard.json':defaults});
 const layout = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-layout.json'),'utf8'));
 const presentation = loadTypeScript('projectMetadataPresentation.ts', {'../../resources/project-metadata-layout.json': layout});
 const json = value => JSON.parse(JSON.stringify(value));
@@ -84,6 +85,34 @@ test('Metadata source labels/grouping cover each ordinary field once and retain 
   assert.equal(layout.forms[0].fields.filter(field=>field.column).length,74);
   assert.equal(presentation.metadataLabel('CoverB2aDescription'),'B3 layer description');
   assert.equal(presentation.metadataLabel('GeoRefMethodOther'),'Georeference Method — other');
+});
+test('Confirmed source-standard population stages exactly24 literals, preserves other raw errors and permits deliberate later field edits',()=>{
+  const names=presentation.metadataGroups.flatMap(group=>group.names);
+  const complete={...review,projectRecords:{
+    columns:[...columns.slice(0,2),...names.map(name=>({name,declaredType:'TEXT'}))],
+    rows:[{rowId:'-200',cells:[cell('integer','-200'),cell('text','Project'),...names.map(()=>cell('null'))]}],
+  }};
+  const fields=names.map(name=>field(name));
+  let draft=editor.stageMetadata(editor.beginMetadataDraft(complete,'-200'),field('EcosysCollectionStandard'),'DEIF 2024',false);
+  draft=editor.stageMetadata(draft,field('StartDate','integer',16),'1e',false);
+  const original=json(draft);
+  assert.throws(()=>editor.populateMetadataStandard(draft,fields.filter(f=>f.name!=='Datum')),/unavailable/);
+  assert.deepEqual(json(draft),original,'failed population cannot partially replace raw drafts');
+  draft=editor.populateMetadataStandard(draft,fields);
+  assert.equal(Object.keys(defaults).length,24);
+  assert.equal(draft.standardPopulation,'populate');
+  for(const [name,value] of Object.entries(defaults)) assert.equal(draft.cells[name].raw,value);
+  assert.equal(draft.cells.StartDate.raw,'1e');
+  assert.throws(()=>editor.metadataEditRequest(draft),/exact integer/);
+  draft=editor.stageMetadata(draft,field('StartDate','integer',16),'2024',false);
+  draft=editor.stageMetadata(draft,field('CoordinatingAgency'),'Deliberate override',false);
+  assert.equal(editor.metadataEditRequest(draft).standardPopulation,'populate');
+  assert.equal(editor.metadataEditRequest(draft).changes.length,26);
+  assert.equal(draft.cells.CoordinatingAgency.value.text,'Deliberate override');
+  draft=editor.stageMetadata(draft,field('EcosysCollectionStandard'),'DTE later',false);
+  assert.equal(draft.standardPopulation,'');
+  assert.throws(()=>editor.metadataEditRequest(draft),/confirm/);
+  assert.throws(()=>editor.populateMetadataStandard(editor.beginMetadataDraft(complete,'-200'),fields),/changed recognized/);
 });
 test('Metadata component stays outside remounted tabs and gates ordinary Save/Lock/native-close/context while retaining failed writes',()=>{
   const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');

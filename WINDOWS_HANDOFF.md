@@ -41,7 +41,7 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `  04c4291f7bbe37e9d7e9947dd7186cb606fc2fa8fd37c0d09ea16b189a65f250`.
+  `    18b5d6931e4ef45cf33b1079adc2d94fb72d9dcde7f259587aecaa51a5815e45`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -689,8 +689,8 @@ counts/BAPID signed32 and text/memo preserve source UTF-16 bounds and literals.
 Writer checks full originals/schema/physical ID/ProjectID, selected parent scope,
 file ownership and final complete stored row after all updates/audits. It preserves
 unchanged invalid values, stamps actual reference table-object descriptions/date,
-rejects unsupported metadata restore aliases and requires explicit keep-other-fields
-for recognized collection standards. Runtime Lock is not a stored column.
+rejects unsupported metadata restore aliases and requires explicit keep-current-drafts
+or confirmed source population for recognized standards. Runtime Lock is not a stored column.
 Native PID13564 verifies all70 assignments/73 exact audits, eight rejected requests,
 second-audit rollback/retained retry, duplicate-candidate preservation and stable
 no-op Save; metadata action stays disabled. Native window/inspector closed.
@@ -731,10 +731,38 @@ Full race metadata-ui-race passes (root519.188s) against final default assets.
 No owned native/race process remains. Archives/metadata-ui-checkpoint seals81
 hashed files: accepted core/final/default binaries, exact final assets, source,
 proof/restoration receipts/backups and preceding protecteda8536ad5....
-Protected current/candidate are promoted by exact copy to04c4291f...; no rebuilding.
-Next source-default population, new/blank/template creation/reservation and
-metadata-specific restoration; never copy master timestamps/numeric codes blindly
-or enable unavailable controls. Navigation/profiling remain open.
+UI checkpoint default04c4291f... was promoted by exact copy; the current successor
+is the accepted source-standard delivery below.
+Confirmed source-standard population is also implemented in the opt-in editor:
+DEIF/DTE/LMH25 changes require explicit keep-current-drafts or preview/Apply of24
+literal source defaults. Preview/cancel write nothing; Apply stages only those
+fields, preserving unrelated errors/drafts and later manual edits. Standard
+retyping resets acknowledgement. The backend never invents default assignments.
+resources/project-metadata-standard.json matches the retained source procedure
+fixture; source literal spelling is preserved.
+Focused metadata Go5.405s/source-fixture1.322s,222 frontend tests/check0 errors/
+0 warnings and both builds pass; bindings/scoped transport unchanged15/135/64/47.
+Opt-in bin/vpro-project-metadata-standard-core.exe SHA256
+f5b80c3ef7ef6c852759d493e694b43dc844ebaef22e621c3cfb4448fa7b3727
+verifies24 source literals, keep/cancel, preserved errors/remount/Undo and
+second-audit rollback/retained retry followed by25 explicit fields/3 stamps/
+28 exact audits. Owned PID6608 closes and original77 project/5 user audit bytes
+restore. Default bin/vpro-project-metadata-standard-default.exe SHA256
+18b5d6931e4ef45cf33b1079adc2d94fb72d9dcde7f259587aecaa51a5815e45
+verifies disabled metadata action and existing Site/Vegetation without writes;
+owned PID2040 closes. Inspector9392 is closed. metadata-standard.py and
+metadata-standard-default.py receipts are sealed; never replay completed modes.
+Full race metadata-standard-race passes (root576.719s) against final default assets.
+The initial root suite passed511.250s but overall discovery tried compiling partial
+closed archive sources. Ignored archives/go.mod now isolates that subtree; new
+source snapshots use source.zip. The subsequent full suite passes without exclusions.
+Archives/metadata-standard-checkpoint seals50 hashed files: exact core/default
+assets/binaries, native/restoration receipts, source.zip, final/initial test logs
+and preceding protected04c4291f.... Protected current/candidate are promoted by
+exact copy to18b5d693...; no rebuilding. No owned native/race process remains.
+Next new/blank/template creation/reservation and metadata-specific restoration;
+never copy master timestamps/numeric codes blindly or enable unavailable controls.
+Navigation/profiling remain open.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
 unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
 rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a
