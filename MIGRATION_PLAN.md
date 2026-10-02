@@ -952,3 +952,16 @@ Next complete active metadata/calculation events and separately bound new-row
 personal metadata entry without combining user/project writes. Full Access addition/deletion/
 personal-form effective properties remain unmeasured and source workflows stay
 default-disabled; full species/FS882/application parity is not yet complete.
+
+Static follow-through narrows the next event batch: the five XL form update
+handlers call UpdateMetadataSppList, but its exported implementation in
+V7mdlAttachMasterLists immediately branches to MyExit before opening/updating
+project metadata. Do not implement that unreachable write. The A-cover and D
+duplicate-species merge blocks are likewise after unconditional Exit Sub.
+C/C-height NULL Cover6 messages do not set Cancel; A/A-height's cover message is
+in AfterUpdate, not a blocking validation rule. Preserve explicit draft Save and
+source-view removal without turning these messages into rejects or deletions.
+NotInList routes focus to Cover1 (A/A-height), Cover6 (C/C-height), or Cover7 (D);
+reconcile that with the desktop's intentional mutually gated draft workflows
+before claiming event/focus parity. These static findings are not a new native
+Access runtime measurement or permission to repeat the stopped property probe.
