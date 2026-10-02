@@ -670,6 +670,9 @@ Publication includes application source only; private evidence/binaries/dist are
 ignored. Use git HEAD/upstream for the current commit; predecessore71c5da.
 Never replay code-check.py, a-cover-notices.py, cover-notices.py or creation-personal.py completed modes.
 Next: deliberate navigation and separately scoped parent metadata/profiling.
+The plan records the metadata prerequisite: project75-column storage, master
+templates42 columns and legacy VUser metadata15 columns are distinct; dates/code
+types and the source wrong-recordset/ambiguous-copy logic must not be guessed.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
 unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
 rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a

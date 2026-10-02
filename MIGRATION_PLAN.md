@@ -1,6 +1,6 @@
 # VPRO migration plan
 
-Updated 2026-10-01. Finish usable workflows, not isolated fields or ever-larger
+Updated 2026-10-02. Finish usable workflows, not isolated fields or ever-larger
 oracle suites. This plan is the single ordered backlog; current machine state
 belongs in [WINDOWS_HANDOFF.md](WINDOWS_HANDOFF.md).
 
@@ -1093,3 +1093,34 @@ Owned5028/18364 exited;9392 closed. Archives/species-code-check-checkpoint seals
 exact core/default/previouscddefe55 bytes and receipts. No completed native writes
 may be replayed; the readonly harness continuations are sealed separately.
 This completes the bounded checker, not the full child/application migration.
+
+### Next bounded metadata and navigation scope
+
+Static inspection of `FS882-6x4XL.btnLoadMetadata_Click`, `frmProjectMetaData`,
+`UsysMetadata` and the original SQLite family establishes these prerequisites:
+
+- The editor binds the selected project's `<Project>_Metadata`, not the
+  similarly named legacy `VUser.ProjectMetaData`. Master templates belong to
+  `VMetaData.ProjectMetaData`; preserve all three distinct stores.
+- Project metadata has75 columns, signed32 ID and SMALLINT StartDate/EndDate;
+  master metadata uses timestamp dates and numeric method codes where project
+  columns are text. Read and classify actual stored values and source controls
+  before defining any conversion. Do not silently stringify codes, coerce dates
+  or replace the retained schemas.
+- Source lookup ignores StartDate in its non-NULL branch, finds a template through
+  MyRS2 but tests MyRS.NoMatch, and copies33 columns by ProjectID. Do not inherit
+  first-row choice, duplicate copying or the wrong-recordset guard. Desktop review
+  must distinguish existing records, duplicate candidates and explicit new/blank
+  proposals before any audited transaction.
+- Begin with fixture-tested project/master review and complete source-field/event
+  mapping; then wire explicit creation/editing, ID reservation, rollback/retry and
+  draft-safe context/native-close behavior. Keep the parent action disabled until
+  the bounded workflow is native-verified. Metadata version stamping/reference
+  attachment and master-catalogue writes are separately named follow-ups.
+
+Navigation helpers set Access's application-wide Move After Enter to Next Field
+or Next Record. They are not a persistent per-project setting; do not blindly
+import that machine state into YAML or copy automatic focus into disabled draft
+controls. Profiling is also a separate deliverable: its active runner clears
+scratch results/counts and evaluates ordered Env/Veg/Lump rules. It is not merely
+a vegetation-display toggle and must not mutate the shipped support databases.
