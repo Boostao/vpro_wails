@@ -435,9 +435,24 @@ export interface ProjectMetadataCell {
     "blobHex": string | null;
 }
 
+export interface ProjectMetadataChange {
+    "column": string;
+    "value": ProjectMetadataCell;
+}
+
 export interface ProjectMetadataColumn {
     "name": string;
     "declaredType": string;
+}
+
+export interface ProjectMetadataEdit {
+    "plotNumber": string;
+    "projectId": string | null;
+    "id": number;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "changes": ProjectMetadataChange[] | null;
+    "standardPopulation": string;
 }
 
 export interface ProjectMetadataReview {

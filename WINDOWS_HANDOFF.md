@@ -673,27 +673,37 @@ Next: deliberate navigation and separately scoped parent metadata/profiling.
 The plan records the metadata prerequisite: project75-column storage, master
 templates42 columns and legacy VUser metadata15 columns are distinct; dates/code
 types and the source wrong-recordset/ambiguous-copy logic must not be guessed.
-Metadata work now has a typed readonly backend/context-adapter boundary, not a
-writable editor. Distinct bin/vpro-project-metadata-review.exe is
-a8536ad5e213913b6d1299e5689c76d4175feca07efba829149bf80e6c13d61d;
-current/candidate are promoted exact accepted bytes; previousde15b9c3 is archived.
-Focused metadata/context Go1.367s/full race551.592s,213 frontend tests/check0/0/build pass;
-bindings15/133/60,45 scoped operations. Native unset and populated proofs verify
-75 project/42 master columns, two project candidates/one template, exact typed
-cells, stale rejection, metadata action disabled and35 existing labelled controls.
-Owned13896/16944 exited. Temporary ProjectID/duplicate/template preparation is
-reverted byte-for-byte for both project/VMetaData files; fixture77/5 remains
-unchanged. Receipts/backups/source contract are under native-vegetation-species:
-metadata-review.py, metadata-review*.json, metadata-populated*.json and
-metadata-source-contract.json. Do not replay completed modes. Full race
-metadata-review-race has passed; no owned native/race process remains.
-Archives/metadata-review-checkpoint seals accepted/previous binaries, source
-contract, both native modes, reversible preparation/backups and restoration seals.
-Source parser records198 nodes/74 bindings, including Fixed integer-year fields,
-literal method Items, standard-population prompt and shared Recalc/error events.
-Next implement explicit existing-record selection/editing and separate
-new/blank/template proposals with physical identity/audit/reservation/lifecycle
-guards; never copy master timestamps/numeric codes blindly.
+Metadata readonly checkpoint fbb1991 is published and promoted, full race551.592s:
+protected current/candidate SHA256
+a8536ad5e213913b6d1299e5689c76d4175feca07efba829149bf80e6c13d61d.
+Archives/metadata-review-checkpoint retains previousde15b9c3/accepted bytes,
+source contract and unset/populated native/restoration receipts. Do not replay.
+Existing-record writer is now implemented but the desktop editor is unavailable.
+Unpromoted bin/vpro-project-metadata-edit.exe SHA256
+fdbf3c15b3d0abf002aceaea94be712a995dbbb1edb421ca95b1278b5c0f239a.
+Focused metadata/context3.449s/full race564.604s,213 frontend tests/check0/0/build pass;
+bindings15/134/62,46 scoped operations. Source SQL fixture tests all70 ordinary
+columns; nine collection groups use1/2/3, not BOOLEAN. Eight strict quality combos
+bind registered Note from PlotQualitySite; Site remains free. Years stay signed16,
+counts/BAPID signed32 and text/memo preserve source UTF-16 bounds and literals.
+Writer checks full originals/schema/physical ID/ProjectID, selected parent scope,
+file ownership and final complete stored row after all updates/audits. It preserves
+unchanged invalid values, stamps actual reference table-object descriptions/date,
+rejects unsupported metadata restore aliases and requires explicit keep-other-fields
+for recognized collection standards. Runtime Lock is not a stored column.
+Native PID13564 verifies all70 assignments/73 exact audits, eight rejected requests,
+second-audit rollback/retained retry, duplicate-candidate preservation and stable
+no-op Save; metadata action stays disabled. Native window/inspector closed.
+The one fixture is restored to exact preceding77 project/5 user audit bytes.
+metadata-edit.py and metadata-edit-{preparation,progress,native,restored}.json plus
+metadata-edit-project-before.db seal this proof; never replay completed modes.
+Full race metadata-edit-race passed. No owned native/race process remains.
+Archives/metadata-edit-checkpoint seals the accepted unpromoted writer, protected
+readonly baseline, exact assets, source fixture, native receipts/backup and race log.
+Next wire explicit existing-record selection and persistent source-labelled drafts,
+Save/Undo/Lock/native-close/context gates and committed-cleanup protection. Separate
+source-default population, new/blank/template creation/reservation and restoration;
+never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
 unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
 rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a

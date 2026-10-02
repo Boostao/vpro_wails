@@ -129,6 +129,10 @@ export function SaveOtherRecord(contextID: string, record: $models.OtherRecord):
     return $Call.ByID(638265830, contextID, record);
 }
 
+export function SaveProjectMetadata(contextID: string, request: $models.ProjectMetadataEdit): $CancellablePromise<void> {
+    return $Call.ByID(1214954997, contextID, request);
+}
+
 export function SaveSpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(1191229246, contextID, updates);
 }

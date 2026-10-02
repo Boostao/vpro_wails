@@ -1156,3 +1156,35 @@ user audits or source changes occur. This safely checkpoints review before
 explicit creation/editing, rather than presenting mapped storage as a migration.
 Exact readonly candidatea8536ad5... is promoted after archiving previousde15b9c3
 and all source/native/restoration receipts in archives/metadata-review-checkpoint.
+
+Existing-record writer is implemented and native-transport verified, not yet a
+desktop editor. One source-grounded batch covers all70 ordinary columns, preserving
+signed16 years/site visits, signed32 plot counts/BAPID, UTF-16 text bounds and MEMO.
+The nine Collected option groups store1 complete/2 partial/3 none; historical-1
+can remain unchanged but must not become a new BOOLEAN assignment. Eighteen
+reference combos preserve source list/bound columns; eight quality controls are
+strict and store PlotQualitySite.Note, while DataQualitySite remains free.
+Full schema/original-row snapshots and immutable physical ID/ProjectID guard the
+selected existing candidate; repeated properties, stale scope/data, Unicode
+decoder repair and support-file ownership collisions fail explicitly. Changed
+fields and three source version/date stamps share a project/audit transaction,
+with a final whole-row observation after every audit. Actual retained table-object
+descriptions supply versions; missing/NULL/malformed/duplicate descriptions stop
+Save instead of inheriting the source Unknown fallback. No-op/historical omission
+does not rewrite stamps or history. Runtime Lock stays a UI lifecycle gate.
+Recognized standards currently support only an explicit keep-other-fields decision;
+source-default proposals need their own confirmation. Metadata audit aliases fail
+closed in the generic restoration workflow until metadata restoration is defined.
+
+Focused metadata/context3.449s/full race564.604s and frontend213/check0/0/build pass;15/134/62 bindings
+and46 scoped operations carry the writer request. Distinct nativefdbf3c15... proves
+all70 assignments/73 exact field/stamp audits, eight rejected cases, second-audit
+rollback/retained retry, independent candidate preservation and no-op byte stability.
+Owned13564 closes and the fixture restores exactly to preceding77 project/5 user
+audit bytes. Full race metadata-edit-race passed; protecteda8536ad5 remains.
+Archives/metadata-edit-checkpoint seals this accepted writer checkpoint without
+promoting an incomplete desktop editor.
+Remaining acceptance: explicit existing-record UI selection, reference loading and
+source labels/grouping, persistent raw errors/drafts, ordinary Save/Lock/native
+close/context/Undo gates and committed-cleanup protection. New/blank/template
+creation, ID reservation, default population and restoration remain separate work.

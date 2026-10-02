@@ -75,7 +75,7 @@ func TestProjectMetadataReadonlyReviewPreservesShapesTypesAndDuplicateCandidates
 	flag := metadataTestCell(t, review.ProjectRecords, "-200", "CollectedSite")
 	if date.Integer == nil || *date.Integer != "2000" || templateDate.Text == nil || *templateDate.Text != "2000-01-02 03:04:05" ||
 		code.Storage != "integer" || code.Integer == nil || *code.Integer != "7" || flag.Integer == nil || *flag.Integer != "-1" {
-		t.Fatal("dates/codes/true=-1 were implicitly converted")
+		t.Fatal("dates/codes/historical collection options were implicitly converted")
 	}
 	if _, err := json.Marshal(review); err != nil {
 		t.Fatal("typed metadata transport unavailable:", err)

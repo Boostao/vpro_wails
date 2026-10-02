@@ -100,7 +100,15 @@ func readProjectMetadataTable(ctx context.Context, c *sqliteContext, alias, tabl
 	if err := c.requireColumns(ctx, alias, table, required); err != nil {
 		return ProjectMetadataTable{}, err
 	}
-	schema, err := c.conn.QueryContext(ctx, "PRAGMA "+quoteHeaderIdentifier(alias)+".table_info("+quoteHeaderIdentifier(table)+")")
+	return readProjectMetadataRows(ctx, c.conn, alias, table, projectID, project)
+}
+
+type projectMetadataQueryer interface {
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
+}
+
+func readProjectMetadataRows(ctx context.Context, db projectMetadataQueryer, alias, table string, projectID *string, project bool) (ProjectMetadataTable, error) {
+	schema, err := db.QueryContext(ctx, "PRAGMA "+quoteHeaderIdentifier(alias)+".table_info("+quoteHeaderIdentifier(table)+")")
 	if err != nil {
 		return ProjectMetadataTable{}, err
 	}
@@ -126,6 +134,9 @@ func readProjectMetadataTable(ctx context.Context, c *sqliteContext, alias, tabl
 	if err := errors.Join(schema.Err(), schema.Close()); err != nil {
 		return ProjectMetadataTable{}, err
 	}
+	if project && idIndex < 0 {
+		return ProjectMetadataTable{}, errors.New("project metadata requires its exact physical ID column")
+	}
 	fields := []string{"rowid"}
 	for _, column := range result.Columns {
 		name := quoteHeaderIdentifier(column.Name)
@@ -134,7 +145,7 @@ func readProjectMetadataTable(ctx context.Context, c *sqliteContext, alias, tabl
 			" AS REAL) ELSE CAST("+name+" AS BLOB) END")
 	}
 	relation := quoteHeaderIdentifier(alias) + "." + quoteHeaderIdentifier(table)
-	rows, err := c.conn.QueryContext(ctx, "SELECT "+strings.Join(fields, ",")+" FROM "+relation+
+	rows, err := db.QueryContext(ctx, "SELECT "+strings.Join(fields, ",")+" FROM "+relation+
 		" WHERE ProjectID COLLATE BINARY IS ? ORDER BY rowid", projectID)
 	if err != nil {
 		return ProjectMetadataTable{}, err
