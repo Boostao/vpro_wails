@@ -149,6 +149,10 @@ export function ReviewProjectPlotProfileLump(contextID: string): $CancellablePro
     return $Call.ByID(4282519119, contextID);
 }
 
+export function ReviewProjectPlotProfileSU(contextID: string, filter: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProfileSUReview> {
+    return $Call.ByID(729221061, contextID, filter);
+}
+
 export function ReviewSpeciesCodes(contextID: string): $CancellablePromise<$models.SpeciesCodeCheckReview> {
     return $Call.ByID(3045258678, contextID);
 }
@@ -179,6 +183,10 @@ export function SaveProjectMetadata(contextID: string, request: $models.ProjectM
 
 export function SaveProjectPlotProfile(contextID: string, request: $models.ProjectPlotProfileEdit): $CancellablePromise<void> {
     return $Call.ByID(853163152, contextID, request);
+}
+
+export function SaveProjectPlotProfileSU(contextID: string, request: $models.ProfileSUCreation): $CancellablePromise<$models.ProfileSUCreated> {
+    return $Call.ByID(4210909380, contextID, request);
 }
 
 export function SaveSpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {

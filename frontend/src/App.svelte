@@ -10,6 +10,7 @@
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
   import { validateProfileNavigation, profileNavigationPage, validatePlotProfileSource, type ProfileNavigation } from './projectPlotProfileReview';
+  import { validateProfileSUReview, validateProfileSUCreated, type ReviewedProfileSU } from './profileSU';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -49,6 +50,13 @@
   let profileSources = $state<PlotProfileSourceInfo[]>([]);
   let profileSourceContext = $state('');
   let profileSourceError = $state('');
+  let suReview = $state<ReviewedProfileSU | null>(null);
+  let suReviewContext = $state('');
+  let suName = $state('');
+  let suPath = $state('');
+  let suError = $state('');
+  let suSuccess = $state('');
+  let suCommitted = $state(false);
   let startupFailure = $state<StartupState | null>(null);
   const closeState = $derived(view === 'fs882' ? editor?.getCloseState() : undefined);
 
@@ -302,6 +310,46 @@
     finally { busy = false; }
   }
 
+  async function reviewProfileSU(proposal: ProjectPlotProfileFilterRequest, origin: string) {
+    if (busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest ||
+        $projectState?.contextId !== origin) throw new Error('Wait for the current owned operation before reviewing Save as SU.');
+    busy = true; suError = '';
+    try {
+      await tick();
+      const source = await stateReads.track(ContextService.ReviewProjectPlotProfileSU(origin, proposal));
+      if ($projectState?.contextId !== origin) throw new Error('Save as SU review belongs to an old context.');
+      suReview = validateProfileSUReview(source, proposal); suReviewContext = origin;
+      suCommitted = false; suSuccess = '';
+    } finally { busy = false; }
+  }
+
+  async function saveProfileSU() {
+    if (!suReview || suCommitted || suReviewContext !== $projectState?.contextId) {
+      suError = 'Review the current stored profile before creating one new SU file.'; return;
+    }
+    const proposal = $state.snapshot({ review: suReview, name: suName, path: suPath, confirmed: true });
+    const origin = suReviewContext;
+    await requestTransition(async contextId => {
+      if (contextId !== origin) throw new Error('Save as SU proposal belongs to an old context.');
+      busy = true; suError = '';
+      try {
+        await tick();
+        const response = await ContextService.SaveProjectPlotProfileSU(contextId, proposal);
+        suCommitted = true;
+        const created = validateProfileSUCreated(response, proposal.name, proposal.review.plots.length);
+        suSuccess = `Created ${created.name}_SU with ${created.plotCount} stored plots in ${created.path}. Current project/SU selection is unchanged.`;
+        view = 'plots'; editorPlotNumber = undefined;
+        await loadPlots(0);
+        if (error) error = `SU file published, but navigation refresh failed; do not replay creation: ${error}`;
+      } catch (cause) {
+        if (suCommitted || String(cause).includes('Profile SU file published, but')) {
+          suCommitted = true; suError = `SU file published; do not replay creation: ${String(cause)}`;
+        } else suError = `No SU file published; proposal retained for correction or retry: ${String(cause)}`;
+        throw cause;
+      } finally { busy = false; }
+    });
+  }
+
   async function choosePlotProfile(source: PlotProfileSource, origin: string) {
     const proposal = { name: source.name, path: source.path };
     await requestTransition(async contextId => {
@@ -472,6 +520,36 @@
     </aside>
 
     <main class="content">
+      {#if suReview}
+        <section class="m-2 p-3 border rounded" aria-label="Reviewed Save as SU">
+          <h2 class="font-semibold">Save reviewed profile as a new SU file</h2>
+          <p class="mt-2">{suReview.plots.length} stored plots; SiteUnit values {suReview.sourceSU ? 'copied from the independently reviewed selected SU' : 'remain NULL because no SU is selected'}.</p>
+          <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label for="profile-su-name" class="flex flex-col gap-1">New SU name
+              <input id="profile-su-name" class="px-2 py-1 border rounded min-w-0" bind:value={suName} disabled={busy || transitionWorking || pendingTransition !== null || suCommitted} />
+            </label>
+            <label for="profile-su-path" class="flex flex-col gap-1">New SQLite file (absolute .db path)
+              <input id="profile-su-path" class="px-2 py-1 border rounded min-w-0" bind:value={suPath} disabled={busy || transitionWorking || pendingTransition !== null || suCommitted} />
+            </label>
+          </div>
+          {#if suError}<p role="alert" class="mt-2 text-red-800">{suError}</p>{/if}
+          {#if suSuccess}<p role="status" class="mt-2 text-emerald-800">{suSuccess}</p>{/if}
+          <div class="mt-3 overflow-x-auto">
+            <table class="w-full text-sm"><thead><tr><th class="text-left">Plot number</th><th class="text-left">SiteUnit</th></tr></thead>
+              <tbody>{#each suReview.plots.slice(0, 25) as plot}<tr><td>{plot.plotNumber}</td><td>{plot.siteUnit === null ? 'NULL (no value)' : plot.siteUnit === '' ? 'Empty text' : plot.siteUnit}</td></tr>{/each}</tbody>
+            </table>
+            {#if suReview.plots.length > 25}<p>Showing the first25 of {suReview.plots.length} explicitly reviewed rows.</p>{/if}
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button type="button" class="px-3 py-2 border rounded disabled:opacity-50"
+              disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || suCommitted || !suName || !suPath || suReviewContext !== $projectState?.contextId}
+              onclick={() => void saveProfileSU()}>Create reviewed SU file</button>
+            <button type="button" class="px-3 py-2 border rounded disabled:opacity-50" disabled={busy || transitionWorking || pendingTransition !== null}
+              onclick={() => { suReview = null; suError = ''; suSuccess = ''; }}>Dismiss SU review</button>
+          </div>
+          <p class="mt-3 text-sm">Only a new file is supported; existing destinations are never replaced. Stored inputs and SiteUnit values are rechecked after Save/Discard/Cancel. No implicit project/SU switch or original database/configuration write. Names use the existing31-character desktop family policy; None, Sample and master names are reserved.</p>
+        </section>
+      {/if}
       {#if profileSelectionEnabled && $projectState?.contextId}
         <details class="m-2 p-3 border rounded" aria-label="Stored plot profile selection">
           <summary class="font-semibold cursor-pointer">Plot profile: {$projectState.plotProfile.source.name}</summary>
@@ -552,6 +630,7 @@
             onClosed={() => navigate('plots')}
             onBusyChange={(busy) => { editorBusy = busy; }}
             onProfileNavigation={applyProfileNavigation}
+            onProfileSUReview={reviewProfileSU}
           />
           {/key}
           {/key}

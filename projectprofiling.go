@@ -70,6 +70,11 @@ func (s *ContextService) RunProjectPlotProfile(ctx context.Context, contextID st
 
 func (s *ContextService) runProjectPlotProfile(ctx context.Context, contextID string, request ProjectPlotProfileRunRequest,
 	observe func(*sql.Tx, ProjectPlotProfileResult) error) (ProjectPlotProfileResult, error) {
+	return s.runProjectPlotProfileAfter(ctx, contextID, request, observe, nil)
+}
+
+func (s *ContextService) runProjectPlotProfileAfter(ctx context.Context, contextID string, request ProjectPlotProfileRunRequest,
+	observe func(*sql.Tx, ProjectPlotProfileResult) error, after func(*sqliteContext) error) (ProjectPlotProfileResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (result ProjectPlotProfileResult, resultErr error) {
 		owner := plots.projects.sqlite
 		if err := profileOwnedFiles(owner); err != nil {
@@ -194,6 +199,14 @@ func (s *ContextService) runProjectPlotProfile(ctx context.Context, contextID st
 		}
 		if err := tx.Commit(); err != nil {
 			return ProjectPlotProfileResult{}, err
+		}
+		if after != nil {
+			if err := job.Close(); err != nil {
+				return ProjectPlotProfileResult{}, err
+			}
+			if err := after(owner); err != nil {
+				return ProjectPlotProfileResult{}, err
+			}
 		}
 		return result, nil
 	})

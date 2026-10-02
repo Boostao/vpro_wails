@@ -12,11 +12,12 @@
   import { profileCellLabel, validateProjectPlotProfileReview, validateProjectProfileLump, validateProfileRunResult,
     profileFilterUnavailable, type ValidatedProjectPlotProfileReview, type ProfileReviewTable, type ProfileRunResult } from './projectPlotProfileReview';
 
-  let { client, onclosed, onbusy, onblocked, onapply, allowFiltering = false, allowRun = false, allowEditing = false, allowCreation = false, allowDeletion = false }: {
+  let { client, onclosed, onbusy, onblocked, onapply, onsureview, allowSaveSU = false, allowFiltering = false, allowRun = false, allowEditing = false, allowCreation = false, allowDeletion = false }: {
     client: ReturnType<typeof bindContextPlots>; onclosed: () => void; onbusy: (busy: boolean) => void;
     onblocked: (blocked: boolean) => void; allowRun?: boolean; allowEditing?: boolean;
     allowCreation?: boolean; allowDeletion?: boolean;
     allowFiltering?: boolean; onapply?: (proposal: ProjectPlotProfileFilterRequest) => Promise<void>;
+    allowSaveSU?: boolean; onsureview?: (proposal: ProjectPlotProfileFilterRequest) => Promise<void>;
   } = $props();
   let review = $state<ValidatedProjectPlotProfileReview | null>(null);
   let reading = $state(false);
@@ -214,6 +215,13 @@
     try { await onapply(structuredClone($state.snapshot({ input: runInput, preview: result }))); }
     catch (cause) { error = `Profile navigation was not applied; preview and current filter retained: ${String(cause)}`; }
   }
+  async function reviewSaveSU() {
+    if (!allowSaveSU || !allowRun || busy || blocked || !result || !runInput || !onsureview) {
+      error = 'Run stored inputs and finish profile drafts before reviewing Save as SU.'; return;
+    }
+    try { await onsureview(structuredClone($state.snapshot({ input: runInput, preview: result }))); }
+    catch (cause) { error = `Save as SU review failed; preview and drafts retained: ${String(cause)}`; }
+  }
 </script>
 
 <section class="m-3 p-3 border border-stone-300 rounded-lg bg-stone-50" aria-label="Project-local plot profile review">
@@ -231,6 +239,10 @@
     </div>
   </div>
   {#if error}<p role="alert" class="mt-3 text-red-800">{error}</p>{/if}
+  {#if allowSaveSU && result}
+    <button type="button" class="mt-3 px-3 py-2 border rounded bg-white disabled:opacity-50"
+      disabled={busy || blocked} onclick={() => void reviewSaveSU()}>Review Save as SU</button>
+  {/if}
   {#if allowFiltering && result}
     <div class="mt-3">
       <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50"
@@ -350,5 +362,5 @@
       </div>
     {/each}
   {/if}
-  <p class="mt-3 text-sm text-stone-600">This uses only explicitly selected stored rules and project data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other-table/external profile writes, restoration and Save as SU remain unavailable. Profile selection, rule creation/deletion and navigation filtering require their separate opt-ins. No stored PlotCount or shipped scratch table is changed.</p>
+  <p class="mt-3 text-sm text-stone-600">This uses only explicitly selected stored rules and project data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other-table/external profile writes and restoration remain unavailable. Save as SU creates only a new SQLite file after its separate opt-in and explicit review. Profile selection, rule creation/deletion and navigation filtering require their separate opt-ins. No stored PlotCount or shipped scratch table is changed.</p>
 </section>

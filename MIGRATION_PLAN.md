@@ -1626,6 +1626,67 @@ not profile-file/table creation or external rule writes.
   off, preserve existing Vegetation, persist None correctly and make zero writes.
   Every original fixture/support/configuration byte is restored.
 - **Remaining:** new profile-file/table creation, external rule writer ownership,
-  attachment administration, Save as SU, history restoration and native Access
+  attachment administration, existing-file SU destinations, history restoration and native Access
   execution parity remain unavailable. Do not advertise the full profile
   lifecycle as finished.
+
+### Reviewed profile Save as SU
+
+Implemented and native-Wails-verified, separately default off with
+`VITE_PROJECT_PLOT_PROFILE_SAVE_SU=true` plus review/run.
+
+- **Source:** `USysPlotProfiling.btnSaveAsSU_Click` calls
+  `V7mdlPlotProfiling.SaveFilterAsSU` and `CreateSuTable`. Original filtered
+  plot identities are inserted into a copied `USysSuTable`; selected-SU
+  SiteUnit values are joined when an SU is selected, otherwise they stay NULL.
+  The exported template has nullable seven/255-unit text and a unique
+  PlotNumber/nonunique SiteUnit index. The retained VPro64 template has those
+  fields/indexes, is empty and has no `_table_metadata`; do not manufacture a
+  description or discard this metadata when it is actually present.
+- **Bounded destination adaptation:** explicit new absolute SQLite `.db` files
+  only, in an existing directory. Reuse the existing31-character desktop
+  family-name policy rather than introducing incompatible selectable names.
+  None/Sample/master names remain reserved; no source plaintext master-password
+  branch is inherited. Existing-file destinations, automatic attachment,
+  implicit context switching and general SU administration remain unavailable.
+- **Review/write contract:** re-evaluate the complete reviewed profile in the
+  same isolated SQLite snapshot as template/description/SU reads. Preserve
+  matching NULL, empty and literal SiteUnits; ambiguous duplicate matching
+  plots, malformed/new overlength text or changed source/template fail
+  explicitly without trimming, coercion or repair. Physical template defaults,
+  generated/extra fields and missing/changed indexes are unavailable.
+  Complete source-SU, description, rule/count/result and final-row snapshots
+  guard creation independently of navigation's200-result limit.
+- **Publication/provenance:** build a scoped temporary SQLite file in the
+  destination directory, commit exact rows and a complete proposal to
+  `__VPRO_ProfileSUHistory` together, independently observe stored values and
+  descriptions, and close all SQLite/source readers before publication.
+  Hold the existing immutable context operation owner through final file-role/
+  destination-directory checks and atomic no-replace linking. Unsupported
+  publication filesystems fail visibly; never fall back to overwriting.
+  Late cancellation/collision removes the staged database/journal and permits
+  retained retry. Post-publication cleanup/response failures explicitly prevent
+  replay. Technical provenance is a desktop adaptation, not Access audit parity.
+- **Desktop lifecycle:** read-only review retains parent drafts; Create uses
+  existing Save/Discard/Cancel. Capture `$state.snapshot` before publication,
+  disable ancestor controls and wait for a tick. Cancel or failed creation
+  retains proposal/draft/context; success retires the old editor only after
+  the user's decision and leaves project/SU/hierarchy selection unchanged.
+  Separate responsive name/path labels and a typed row review distinguish
+  NULL from empty text; routine guidance stays below fields and safety errors.
+- **Acceptance:** full integration race496.524s plus final focused
+  selection/navigation/SU race23.206s pass;249 frontend tests/check0/0 and
+  opt-in/default builds pass. Exact0/200/201 persisted rows, late cancellation,
+  publication collisions, retry, source metadata NULL/empty/duplicates/extras,
+  original-byte preservation and existing coordinator attachment are tested.
+  Native8008 proves Cancel/collision/Discard11/Save3, original SiteUnits,
+  one independent parent Save/audit and actually visible600px labels.
+  The initial clean-editor Save-readiness harness assumption was corrected
+  before any draft/write; no completed actions were replayed.
+  Final15276 reviews the accepted post-Save checkpoint and rejects an existing
+  output without replaying either SU creation or the parent Save.
+  Strict16700 verifies the exact original-template DDL guard without new writes;
+  changed CHECK/default/generated/index definitions fail rather than losing
+  source constraints. Default8236 keeps all eight gates off with existing
+  Vegetation and zero writes; the earlier final/default proofs remain retained.
+  All owned apps exited and every original fixture/support/config byte is restored.

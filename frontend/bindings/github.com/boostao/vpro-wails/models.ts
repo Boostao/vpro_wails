@@ -427,6 +427,32 @@ export interface PlotSummary {
     "siteSeries": string | null;
 }
 
+export interface ProfileSUCreated {
+    "name": string;
+    "path": string;
+    "plotCount": number;
+}
+
+export interface ProfileSUCreation {
+    "review": ProfileSUReview;
+    "name": string;
+    "path": string;
+    "confirmed": boolean;
+}
+
+export interface ProfileSUPlot {
+    "plotNumber": string;
+    "siteUnit": string | null;
+}
+
+export interface ProfileSUReview {
+    "filter": ProjectPlotProfileFilterRequest;
+    "template": ProjectMetadataTable;
+    "sourceSU": ProjectMetadataTable | null;
+    "descriptions": ProjectMetadataTable | null;
+    "plots": ProfileSUPlot[] | null;
+}
+
 export interface ProjectDiagnostic {
     "file": string;
     "message": string;

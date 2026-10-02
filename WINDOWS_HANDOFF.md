@@ -41,7 +41,7 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `3b71cf1ab7db4028f6e91010d0d0052d5b622c5d86bdef83d339115e861faa6d`.
+  `df0270cd9aff3f2f1682bef7f9282cef2165e236f0c3570358122813e41e1cdb`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -1019,13 +1019,47 @@ Default bin/vpro-plot-profile-selection-default-final.exe
 None persistent/no implicit fallback and zero writes. All apps exited normally;
 every original fixture/support/config byte is restored. The immutable
 archives/plot-profile-selection-checkpoint retains ab05, rejected/final/default
-bytes, assets, source, proofs and manifest; current/candidate use exact accepted
-3b71 default copies, not a rebuild. Never replay completed selection preparation,
+bytes, assets, source, proofs and manifest; the previous protected3b71 default
+is retained, not rebuilt. Never replay completed selection preparation,
 path-helper/fixed/inspection/native/default/restart/seal modes.
-Profile-file/table creation, external rule writer ownership, attachment
-administration, Save as SU, restoration and native Access parity remain open.
-Continue the next bounded source-first profile workflow without a new
-database-family/configuration framework or production/R/Access writes.
+Current bounded profile state: selectionc268cb0 is published; the immutable
+80-file selection seal preserves3b71 and all predecessors. Save as SU now has
+its independent default-off VITE_PROJECT_PLOT_PROFILE_SAVE_SU gate.
+Original SaveFilterAsSU/USysSuTable bindings are implemented as explicitly
+reviewed new-file SQLite publication, never an existing-file overwrite or
+automatic attachment/context switch. Selected SiteUnits and available typed
+description metadata are retained; absent metadata stays absent.
+Native8008 verifies Cancel/collision/Discard11/Save3, one independent parent
+Save/audit, NULL/empty/literal SiteUnits and actual600px labelled inputs.
+An initial clean-editor Save readiness assumption was corrected before writes;
+the no-write continuation and completed actions are preserved, never replayed.
+Accepted core bin/vpro-profile-su-core.exe
+760ed3c7ed39083aca2bc890820df18961b3806362b686bff905228c29b95414.
+Final bin/vpro-profile-su-final.exe
+8dc306e4ea05e821309dde25d8fbfcdd5984538b78e284e11976a7e052cb6014
+/owned15276 reviews accepted post-Save state and rejects an existing output.
+Strict final bin/vpro-profile-su-strict.exe
+7cb47719378517dc874c415ed23f28523814ee74058bda0d63ee866cf36cacc7
+/owned16700 verifies original-template constraint guards with zero writes.
+Neither SU creation nor parent Save is replayed. Default final
+bin/vpro-profile-su-default-strict.exe
+df0270cd9aff3f2f1682bef7f9282cef2165e236f0c3570358122813e41e1cdb
+/owned8236 proves all eight gates off, Vegetation active and zero writes.
+Earlier08c1/default2356 is retained. Full race496.524s/strict focused23.206s;
+249 frontend tests/check0/0/both builds
+pass, including exact0/200/201 stored rows, late cancellation/collision/retry,
+template constraints, metadata distinctions and unchanged original bytes.
+Actual bindings15 services/149 methods/83 models/two enums;57 editor ops.
+All apps exited normally and every original fixture/support/config byte is
+restored. Preserve the two completed SU output files and private proof.
+archives/profile-su-checkpoint seals previous3b71, core/final/default,
+exact assets, source, receipts/outputs/visuals/logs and manifest. Protected
+current/candidate are exactdf02 copies; never rebuild them in place.
+Never replay completed SU prepare/gates/selected/finish/final/default/seal.
+Profile-file/table creation, external rule writer ownership, existing-file SU
+destinations, attachment administration, restoration and native Access parity
+remain open. Continue the next bounded source-first profile workflow without
+a new database-family/configuration framework or production/R/Access writes.
 Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind

@@ -50,8 +50,9 @@
   import { beginVegetationCreation, stageVegetationCreation, stageVegetationCreationSpecies, chooseVegetationCreationSpecies, vegetationCreationSpeciesError, vegetationCreationErrors, vegetationCreationRequest, type VegetationCreationDraft } from './vegetationCreationEditor';
   import { beginPersonalSpecies, beginCreationPersonalSpecies, matchesPersonalSpeciesSource, matchesCreationPersonalSpeciesSource, stagePersonalText, personalSpeciesErrors, personalSpeciesRequest, personalSpeciesMatches, personalSpeciesCommittedError, personalLifeforms, personalTextFields, type PersonalSpeciesDraft } from './personalSpeciesEditor';
 
-  let { plotNumber, contextId, onSaved, onClosed, onBusyChange, onProfileNavigation }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void;
+  let { plotNumber, contextId, onSaved, onClosed, onBusyChange, onProfileNavigation, onProfileSUReview }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void;
     onProfileNavigation?: (proposal: ProjectPlotProfileFilterRequest, contextId: string) => Promise<void>;
+    onProfileSUReview?: (proposal: ProjectPlotProfileFilterRequest, contextId: string) => Promise<void>;
   } = $props();
   const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
   const reads = new ReadRequests();
@@ -117,6 +118,7 @@
   const profileCreationEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_CREATION === 'true';
   const profileDeletionEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_DELETION === 'true';
   const profileFilteringEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_FILTERING === 'true';
+  const profileSaveSUEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_SAVE_SU === 'true';
   let profileReviewOpen = $state(false);
   let profileReviewBusy = $state(false);
   let profileReviewBlocked = $state(false);
@@ -1884,7 +1886,10 @@
     {#if profileReviewOpen}
       <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
         allowEditing={profileEditingEnabled && $projectState?.plotProfile?.writable === true} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}
-        allowFiltering={profileFilteringEnabled} onapply={async proposal => {
+        allowSaveSU={profileSaveSUEnabled} onsureview={async proposal => {
+          if (!onProfileSUReview) throw new Error('Save as SU review is unavailable.');
+          await onProfileSUReview(proposal, contextId);
+        }} allowFiltering={profileFilteringEnabled} onapply={async proposal => {
           if (!onProfileNavigation) throw new Error('Profile navigation publication is unavailable.');
           await onProfileNavigation(proposal, contextId);
         }}

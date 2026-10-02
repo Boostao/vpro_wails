@@ -33,7 +33,7 @@ export function profileCellLabel(cell: ProjectMetadataCell): string {
   return `${cell.storage}: ${key === 'text' ? JSON.stringify(raw) : raw}`;
 }
 
-function validateTable(table: ProjectMetadataTable, required: readonly string[]): ProfileReviewTable {
+export function validateTable(table: ProjectMetadataTable, required: readonly string[]): ProfileReviewTable {
   const { columns, rows } = table;
   if (!Array.isArray(columns) || !Array.isArray(rows) ||
       new Set(columns.map(column => column.name)).size !== columns.length ||
@@ -117,7 +117,7 @@ export interface ProfileNavigation {
 
 export function profileFilterUnavailable(result: ProfileRunResult): string | null {
     return result.plotNumbers.length === 0 ? 'Profile resulted in zero plots; current navigation filter remains unchanged.' :
-      result.plotNumbers.length > 200 ? 'Profile exceeds 200 plots; Save as SU is unavailable. Current navigation filter remains unchanged.' : null;
+      result.plotNumbers.length > 200 ? 'Profile exceeds 200 plots. Current navigation filter remains unchanged; Save as SU requires its separate opt-in and explicit review.' : null;
   }
 
 export function validateProfileNavigation(navigation: ProjectPlotProfileNavigation, proposal: ProjectPlotProfileFilterRequest,

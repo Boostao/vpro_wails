@@ -48,7 +48,7 @@ func (s *ContextService) ResolveProjectPlotProfileNavigation(ctx context.Context
 			return errors.New("profile resulted in zero plots; current navigation filter remains unchanged")
 		}
 		if len(current.PlotNumbers) > 200 {
-			return errors.New("profile exceeds 200 plots; Save as SU is unavailable and current navigation filter remains unchanged")
+			return errors.New("profile exceeds 200 plots; current navigation filter remains unchanged; Save as SU requires its separate explicit review")
 		}
 		rows, err := tx.QueryContext(ctx, `SELECT env.PlotNumber,env.FieldNumber,env.PlotRepresenting,env.Zone,env.SubZone,env.SiteSeries
 			FROM USysEnv AS env JOIN VProProfileRunPlots AS selected
