@@ -21,6 +21,7 @@ build/android/gen/
 /temp/
 /.cache/
 /coverage/
+/.child-test-*/
 *.log
 *.tmp
 *.temp

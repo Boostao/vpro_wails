@@ -180,6 +180,20 @@ The header DTO has all 98 unique stored parent properties (88 Env, 10 Admin) and
   explicitly unsupported. Focused tests39.230s/full race498.416s and actual
   scoped Wails75 rejected requests/two intended DC audits preserve original data,
   history and support/configuration; evidence/private/native-vegetation-domain.
+- USysVegOtherXL now has verified persistent existing-row drafts for LL, AF, DC,
+  UT, VI, PV, PG, FFA, Cultural1/2 and Other1/2. Ten canonical-family suggestion
+  groups preserve145 nullable/duplicate rows; Cultural2 uses Cultural1, AF is
+  a textbox and PV orders by Item (ItemOrder only breaks equal-item ties).
+  Source has no exported BeforeUpdate audit event for this form; transactional
+  desktop attribute audits are a safety adaptation. Omitted combo properties
+  are not inferred: optional raw numeric-code acceptance is a desktop policy.
+  Species and row creation/deletion stay unavailable in this workflow.
+  Full race504.457s/177 frontend tests/check0/0/builds and actual Wails14 cases/
+ 18 audits verify multirow Save, NULL, historical omission, hidden errors,
+  close/context refusal, Undo, stale rejection, rollback and reference Retry.
+  Default-on readonly delivery preserves all fixture bytes with zero audits;
+  `VITE_VEGETATION_ATTRIBUTE_EDITING=false` is an explicit read-only opt-out.
+  Evidence/private/native-vegetation-attributes; exact eb3a009b... promoted.
 - Newly mapped attributes are displayed read-only. Schema capabilities distinguish unsupported columns from supported SQL NULL. Creation supplies explicit null values for the expanded contract; native Cancel creates no row and Create leaves unspecified numeric data NULL.
 - Explicit child Update supports imported zero IDs without invoking compatibility creation. Plot/ID ownership, stale or duplicate identities and NULL Veg identities are guarded. Positive signed32 allocation and a transactionally updated reservation ledger prevent deleted-ID reuse.
 - Data changes, deletion and identity-bearing mapped-field audit share one transaction. Thresholds remain >=1 for changed nonnull values, >=2 for null additions and exactly 3 for deletion. Failed operations refresh and remount the displayed rows so rolled-back values are not left visibly accepted.

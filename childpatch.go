@@ -22,6 +22,8 @@ type childRecordPatch struct {
 
 func childPatchShape(kind string) reflect.Value {
 	switch kind {
+	case "Veg":
+		return reflect.ValueOf(VegRecord{})
 	case "Humus":
 		return reflect.ValueOf(HumusRecord{})
 	case "Mineral":
@@ -62,7 +64,7 @@ func (s *PlotService) updateChildPatches(plot string, updates []childRecordPatch
 	capabilities := map[string]map[string]bool{}
 	when := time.Now().Format("2006-01-02 15:04:05")
 	for _, update := range updates {
-		if update.kind != "Other" && update.kind != "Humus" && update.kind != "Mineral" {
+		if update.kind != "Veg" && update.kind != "Other" && update.kind != "Humus" && update.kind != "Mineral" {
 			return fmt.Errorf("unsupported child draft kind %q", update.kind)
 		}
 		key := identity{update.kind, update.id}
@@ -95,7 +97,10 @@ func (s *PlotService) updateChildPatches(plot string, updates []childRecordPatch
 			}
 			supplied++
 			member := shape.FieldByName(field.member)
-			scalar := member.Type().Elem().Kind()
+			scalar := member.Kind()
+			if scalar == reflect.Pointer {
+				scalar = member.Type().Elem().Kind()
+			}
 			if !caps[strings.ToLower(field.column)] || scalar != change.scalar {
 				return fmt.Errorf("%s property %q is unavailable or has conflicting types", update.kind, property)
 			}

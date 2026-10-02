@@ -4,9 +4,10 @@
   import { heightField, type HeightDrafts } from './heightEditor';
   import { otherField, type OtherDrafts, type OtherValue } from './otherEditor';
   import { soilField, soilCell, type SoilDrafts, type SoilKind } from './soilChildEditor';
+  import { vegetationAttributeField, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
   import type { SoilSuggestion } from '../bindings/github.com/boostao/vpro-wails';
   type Row = { id: number; values: Record<string, string | number | boolean | null | undefined> };
-  let { name, rows, disabled = true, deleteDisabled = false, revision = 0, onedit, ondelete, onstage, drafts = {}, onotherstage, otherDrafts = {}, onsoilstage, soilDrafts = {}, soilSuggestions = [] }: {
+  let { name, rows, disabled = true, deleteDisabled = false, revision = 0, onedit, ondelete, onstage, drafts = {}, onotherstage, otherDrafts = {}, onsoilstage, soilDrafts = {}, soilSuggestions = [], onattributestage, attributeDrafts = {}, attributeSuggestions = [] }: {
     name: string; rows: Row[]; disabled?: boolean; revision?: number;
     onedit?: (name: string, id: number, column: string, value: string) => Promise<void>;
     ondelete?: (name: string, id: number) => Promise<void>;
@@ -17,6 +18,9 @@
     onsoilstage?: (kind: SoilKind, id: number, column: string, value: string) => void;
     soilDrafts?: SoilDrafts;
     soilSuggestions?: SoilSuggestion[];
+    onattributestage?: (id: number, column: string, value: string) => void;
+    attributeDrafts?: VegetationAttributeDrafts;
+    attributeSuggestions?: SoilSuggestion[];
     deleteDisabled?: boolean;
   } = $props();
   const source = $derived(paperChild(name));
@@ -50,8 +54,25 @@
           {@const otherStaged = other ? otherDrafts[String(row.id)]?.[other.key] : undefined}
           {@const soil = soilKind && control.column ? soilField(soilKind, control.column) : undefined}
           {@const soilStaged = soilKind && soil ? soilCell(soilDrafts, soilKind, row.id, soil.key) : undefined}
+          {@const attribute = name === 'USysVegOtherXL' && control.column ? vegetationAttributeField(control.column) : undefined}
+          {@const attributeStaged = attribute ? attributeDrafts[String(row.id)]?.[attribute.key] : undefined}
           <td>
-          {#if mapped && onsoilstage && soilKind && soil && control.column}
+          {#if mapped && onattributestage && attribute && control.column}
+            {@const listId = `veg-attribute-${row.id}-${attribute.key}`}
+            <input class="source-cell" type="text" inputmode="numeric"
+              value={attributeStaged ? attributeStaged.raw : value ?? ''} list={attribute.group ? listId : undefined}
+              disabled={disabled || control.locked || !control.enabled} aria-invalid={attributeStaged?.error != null}
+              aria-label={`${controlLabel(control)}, row ${row.id}`} data-column={control.column}
+              title={attributeStaged?.error ?? 'Unsubmitted draft: use Save vegetation attributes or Cancel vegetation attributes'}
+              oninput={event => onattributestage?.(row.id, control.column ?? '', event.currentTarget.value)} />
+            {#if attribute.group}
+              <datalist id={listId}>
+                {#each attributeSuggestions.filter(entry => entry.listName === attribute.group && entry.item !== null) as entry, index (index)}
+                  <option value={entry.item ?? ''}>{entry.itemDescription ?? ''}</option>
+                {/each}
+              </datalist>
+            {/if}
+          {:else if mapped && onsoilstage && soilKind && soil && control.column}
             {@const listId = `soil-${name}-${row.id}-${soil.key}`}
             {#if soil.kind === 'memo'}
               <textarea class="source-cell" rows="2" value={soilStaged ? soilStaged.raw : String(value ?? '')}

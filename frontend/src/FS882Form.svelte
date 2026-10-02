@@ -31,6 +31,7 @@
   import { heightField, stageHeight, heightDirty, heightErrors, heightUpdates, type HeightDrafts } from './heightEditor';
   import { otherField, stageOther, otherDirty, otherErrors, otherUpdates, type OtherDrafts, type OtherValue } from './otherEditor';
   import { soilField, stageSoil, soilDirty, soilErrors, soilUpdates, type SoilDrafts, type SoilKind } from './soilChildEditor';
+  import { vegetationAttributeField, stageVegetationAttribute, vegetationAttributeDirty, vegetationAttributeErrors, vegetationAttributeUpdates, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
   import type { WorkingUnitSession } from './workingUnitEditor';
   import { onDestroy, untrack, tick } from 'svelte';
   import { bindContextPlots } from './contextPlots';
@@ -80,7 +81,15 @@
   let soilReferenceReady = $state(false);
   let soilReferenceBusy = $state(false);
   let soilReferenceError = $state<string | null>(null);
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved);
+  const attributeEditingEnabled = import.meta.env.VITE_VEGETATION_ATTRIBUTE_EDITING !== 'false';
+  let attributeDrafts = $state<VegetationAttributeDrafts>({});
+  const attributeUnsaved = $derived(vegetationAttributeDirty(attributeDrafts));
+  const attributeInvalid = $derived(vegetationAttributeErrors(attributeDrafts));
+  let attributeSuggestions = $state<SoilSuggestion[]>([]);
+  let attributeReferenceReady = $state(false);
+  let attributeReferenceBusy = $state(false);
+  let attributeReferenceError = $state<string | null>(null);
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -318,9 +327,10 @@
 
   let original = $state<FS882Header | null>(null);
   const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null);
-  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved || soilUnsaved);
-  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved);
-  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved);
+  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved);
+  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved);
+  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved);
+  const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved);
   const childEditingDisabled = $derived(childParentDisabled || childUnsaved);
   const auditRestoreEnabled = import.meta.env.VITE_AUDIT_RESTORE !== 'false';
   const auditProject = $derived($projectState?.activeProject ?? '');
@@ -405,6 +415,7 @@
     heightDrafts = {};
     otherDrafts = {};
     soilDrafts = {};
+    attributeDrafts = {};
     vegList = [];
     humusList = [];
     mineralList = [];
@@ -746,6 +757,86 @@
     }
   }
 
+  async function loadAttributeSuggestions() {
+    if (!attributeEditingEnabled || attributeReferenceBusy) return;
+    const request = referenceRequest;
+    attributeReferenceBusy = true;
+    attributeReferenceReady = false;
+    attributeReferenceError = null;
+    try {
+      const rows = await referenceReads.track(PlotService.ListVegetationAttributeSuggestions());
+      if (request !== referenceRequest) return;
+      if (rows === null) throw new Error('Vegetation attribute reference metadata was not returned.');
+      attributeSuggestions = rows;
+      attributeReferenceReady = true;
+    } catch (cause) {
+      if (request === referenceRequest) attributeReferenceError = `Vegetation attribute references unavailable: ${String(cause)}`;
+    } finally {
+      if (request === referenceRequest) attributeReferenceBusy = false;
+    }
+  }
+
+  $effect(() => { untrack(() => void loadAttributeSuggestions()); });
+
+  function stageAttributeCell(id: number, column: string, raw: string) {
+    try {
+      if (attributeEditingDisabled) throw new Error('Attribute editing is unavailable while loading, locked, busy or another draft is unsaved.');
+      const field = vegetationAttributeField(column);
+      if (!field || childCapabilities.Veg[field.key] !== true) throw new Error(`Attribute column ${column} is unavailable in the active schema.`);
+      const rows = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
+      if (rows.length !== 1) throw new Error('Vegetation row identity is missing or ambiguous; reload before editing.');
+      const stored = new Map(Object.entries(rows[0])).get(field.key);
+      if (stored !== null && stored !== undefined && typeof stored !== 'number') throw new Error('Attribute cell has an unsupported storage type.');
+      attributeDrafts = stageVegetationAttribute(attributeDrafts, id, field, raw, stored ?? null);
+      successMsg = null;
+      if (error?.startsWith('Vegetation attribute ')) error = null;
+    } catch (cause) {
+      error = `Vegetation attribute draft failed: ${String(cause)}`;
+      childRevision++;
+    }
+  }
+
+  async function cancelAttributeDrafts() {
+    if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling attribute drafts.'; return; }
+    attributeDrafts = {};
+    childRevision++;
+    error = null;
+    successMsg = null;
+    busy = true;
+    try {
+      await loadChildData(draft.plotNumber);
+      successMsg = 'Vegetation attribute drafts cancelled. Stored data and history were unchanged; current rows reloaded.';
+    } catch (cause) {
+      capabilitiesReady = false;
+      error = `Vegetation attribute drafts cancelled, but rows could not be reloaded. Reopen the plot: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function saveAttributeDrafts() {
+    if (attributeEditingDisabled) { error = 'Save a clean, unlocked header with available references before saving attribute drafts.'; return; }
+    let committed = false;
+    busy = true;
+    error = null;
+    successMsg = null;
+    try {
+      const updates = vegetationAttributeUpdates(attributeDrafts);
+      if (updates.length === 0) { attributeDrafts = {}; successMsg = 'No vegetation attribute values changed.'; return; }
+      await PlotService.UpdateVegetationAttributes(draft.plotNumber, updates);
+      committed = true;
+      attributeDrafts = {};
+      await loadChildData(draft.plotNumber);
+      successMsg = `Saved ${updates.length} vegetation attribute row drafts atomically.`;
+    } catch (cause) {
+      if (committed) capabilitiesReady = false;
+      error = committed ? `Vegetation attributes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
+        : `Vegetation attribute save failed; drafts retained: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
   async function editSourceChild(name: string, id: number, column: string, raw: string) {
     const key = column.toLowerCase();
     function numeric() {
@@ -828,6 +919,7 @@
     if (heightUnsaved) { await saveHeightDrafts(); return; }
     if (otherUnsaved) { await saveOtherDrafts(); return; }
     if (soilUnsaved) { await saveSoilDrafts(); return; }
+    if (attributeUnsaved) { await saveAttributeDrafts(); return; }
     const invalid = container.querySelector<HTMLInputElement>('.header-editor input:invalid');
     if (invalid) {
       invalid.reportValidity();
@@ -869,7 +961,7 @@
   }
 
   export function getCloseState(): EditorCloseState {
-    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0;
+    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0 || attributeInvalid.length > 0;
     const invalidChild = Boolean(container?.querySelector('.source-child input:invalid'));
     const saveReason = busy || headerWorkflowBusy || !capabilitiesReady ? 'Wait for the plot to finish loading or header workflow.'
       : draft.locked ? 'Unlock the plot before saving.'
@@ -877,6 +969,8 @@
       : otherInvalid.length > 0 ? 'Correct invalid Other drafts or Cancel Other drafts before saving.'
       : soilInvalid.length > 0 ? 'Correct invalid soil drafts or Cancel soil drafts before saving.'
       : soilUnsaved && (!soilReferenceReady || soilReferenceBusy) ? 'Restore available soil references before saving drafts.'
+      : attributeInvalid.length > 0 ? 'Correct invalid vegetation attributes or Cancel attribute drafts before saving.'
+      : attributeUnsaved && (!attributeReferenceReady || attributeReferenceBusy) ? 'Restore available attribute references before saving drafts.'
       : invalid ? 'Correct invalid header inputs or Undo before saving.'
       : !draft.plotNumber.trim() ? 'Plot Number is required before saving.' : '';
     return { unsaved: dirty || childUnsaved || invalid || newChild !== null || invalidChild, busy: busy || headerWorkflowBusy, canSave: saveReason === '', saveReason, error };
@@ -900,6 +994,7 @@
     if (heightUnsaved) { void cancelHeightDrafts(); return; }
     if (otherUnsaved) { void cancelOtherDrafts(); return; }
     if (soilUnsaved) { void cancelSoilDrafts(); return; }
+    if (attributeUnsaved) { void cancelAttributeDrafts(); return; }
     if (original) {
       draft = JSON.parse(JSON.stringify(original));
     } else {
@@ -927,6 +1022,10 @@
     }
     if (soilUnsaved) {
       error = 'Save or Cancel soil drafts before changing the plot lock.';
+      return;
+    }
+    if (attributeUnsaved) {
+      error = 'Save or Cancel vegetation attribute drafts before changing the plot lock.';
       return;
     }
     if (!draft.locked && dirty) {
@@ -1116,6 +1215,16 @@
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if attributeUnsaved}
+      <div class="attribute-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Vegetation attribute draft controls">
+        <span>Vegetation attribute drafts are unsubmitted. Switching tabs never saves them; other editing waits.</span>
+        <div class="flex gap-2 mt-2">
+          <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={attributeEditingDisabled || attributeInvalid.length > 0} onclick={() => void saveAttributeDrafts()}>Save vegetation attributes</button>
+          <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelAttributeDrafts}>Cancel vegetation attributes</button>
+        </div>
+        {#each attributeInvalid as message}<p role="alert">{message}</p>{/each}
+      </div>
+    {/if}
     {#if soilUnsaved}
       <div class="soil-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Soil draft controls">
         <span>Humus/Mineral drafts are unsubmitted. Switching tabs never saves them; other editing waits.</span>
@@ -1559,13 +1668,29 @@
       </div>
       </details>
     {:else if activeTab === 'vegOther'}
-      <p class="mb-3 text-xs text-stone-500">Stored vegetation attributes are read-only; their reference and editing workflows are not yet verified.</p>
+      {#if attributeEditingEnabled}
+        {#if attributeReferenceBusy}<p role="status">Loading vegetation attribute references...</p>{/if}
+        {#if attributeReferenceError}
+          <p role="alert">{attributeReferenceError}</p>
+          <button type="button" disabled={busy || attributeReferenceBusy || headerWorkflowBusy} onclick={() => void loadAttributeSuggestions()}>Retry attribute references</button>
+        {/if}
+      {:else}
+        <p class="mb-3 text-xs text-stone-500">Stored vegetation attributes are read-only; their editing workflow is not enabled.</p>
+      {/if}
       <SourcePage name="Veg Other" values={sourceHeaderValues}>
         {#snippet embedded(control)}
           {@const child = embeddedForm(control.controlId)}
-          <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} />
+          <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={attributeEditingDisabled}
+            onattributestage={attributeEditingEnabled ? stageAttributeCell : undefined} {attributeDrafts} {attributeSuggestions} />
         {/snippet}
       </SourcePage>
+      {#if attributeEditingEnabled}
+        <div class="mt-3 text-xs text-stone-600">
+          <p>Suggestions retain source definitions, including duplicates. AF is free numeric entry; species and row creation remain unavailable here.</p>
+          <button type="button" class="mt-2 px-2 py-1 border rounded" disabled={busy || attributeReferenceBusy || headerWorkflowBusy}
+            onclick={() => void loadAttributeSuggestions()}>Reload attribute references</button>
+        </div>
+      {/if}
     {:else if activeTab === 'other'}
       <button class="mb-3 text-xs" disabled={otherEditingDisabled || otherUnsaved} onclick={() => openNewChild('other')}>Add Other Data</button>
       <SourcePage name="Other" values={sourceHeaderValues}>

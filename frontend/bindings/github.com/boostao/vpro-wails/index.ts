@@ -78,6 +78,7 @@ export type {
     SpeciesItem,
     StartupState,
     VegRecord,
+    VegetationAttributeUpdate,
     WorkingUnitChoice,
     WorkingUnitModeState
 } from "./models.js";

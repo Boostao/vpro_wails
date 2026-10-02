@@ -32,7 +32,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
 | 5 | Complete bounded FS882 parent field editing (complete98/98) | All98 mapped parent fields have a native-verified writable baseline, including source-authorized BEC Master, strict SoilDrainage and final X/Y/Photo scalars. This is not full form/application parity; picture management, projection, bulk/reverse copying and remaining child/calculation events stay separately scoped and unavailable until verified. |
-| 6 | Complete FS882 child workflows (in progress; Other and soil complete) | Other8, Humus12 and Mineral18 source-bound cells and create/delete/draft lifecycle are native-verified. Finish vegetation/species/cover/height and calculation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
+| 6 | Complete FS882 child workflows (in progress; Other, soil and vegetation attributes complete) | Other8, Humus12 and Mineral18 source-bound cells and create/delete/draft lifecycle are native-verified; all12 Veg Other attributes have verified existing-row drafts/suggestions/lifecycle. Finish species/cover/height creation/deletion and calculation/event behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
 | 9 | Implement reports, maps and remaining active modules | Source-driven templates, preview/export, filters, offline assets and administration. Inventory all active entry points; keep placeholders disabled. |
@@ -617,3 +617,43 @@ UpdateMetadataSppList jumps immediately to MyExit. Do not implement those
 unreachable writes as parity requirements. Species NotInList, provincial/user
 catalogue choices and Collected's NULL/C/V click cycle remain distinct events
 to migrate, not ordinary unrestricted text editing.
+
+USysVegOtherXL's12 existing-row numeric attributes are now native-verified and
+default-on; `VITE_VEGETATION_ATTRIBUTE_EDITING=false` is the read-only opt-out.
+They reuse the shared expected-value transactional child writer, with explicit
+nullable values/expected maps shaped like the proven height transport. Only
+these12 properties are allowlisted; species, covers, identity changes and row
+creation/deletion remain unavailable here. Signed32 LL/PV and signed16 attributes
+retain raw integer errors and original expected NULL independently across rows
+and tab remounts. Save/Undo/Cancel/Lock/native close/context and unrelated writers
+share the draft gates; committed-refresh failure cannot invite replay.
+
+Ten canonical-family suggestion groups return145 full nullable/duplicate
+definitions through the shared cancellable pinned SQLite reader. Both Cultural
+controls deliberately use Cultural1; AF is free numeric entry. PV follows
+source ORDER BY Item, with ItemOrder as a deterministic equal-item tie adaptation;
+the other groups use ItemOrder. Source list-name literal casing is resolved to
+canonical family names without changing stored values or metadata. Do not read
+obsolete ignored root-level legacy seed files as the active database family.
+Reload/Retry retains drafts and disables editing/Save on unavailable references.
+No per-field events, LimitToList override or BeforeUpdate audit procedure are
+exported for this form. Optional raw numeric-code acceptance is an explicit
+desktop policy, not omitted-property parity proof; transactional attribute audits
+are a desktop safety adaptation, not a claim of source attribute audit events.
+
+Focused shared backend1.763s/full race504.457s;177 frontend tests/check0/0/
+opt-in/default/opt-out builds pass; bindings15/114/41. Actual Wails14 cases/
+18 intended audits verify all12 fields plus a second row, hidden independent
+errors and lifecycle refusal, remount/Undo, NULL, stale rejection, audit rollback/
+retained-draft retry and reference failure/Retry. All15 original tables/32 old
+audits are preserved apart from exact planned edits; no identity ledger is
+allocated by patches. Support/config/external bytes are restored and the injected
+trigger is removed. Existing owned ID0 is preserved, not replaced during fixture
+preparation. Core PID14488/default-delivery PID3260 exited; inspector9392 closed.
+Default frontend assets are byte-identical to accepted opt-in assets and exactly
+embedded in the same eb3a009b... executable; no untested rebuild or redundant
+integration suite is needed. Final default-on readonly Wails delivery verifies
+all12 live labelled controls/145 reference definitions with every fixture byte
+unchanged and zero audits. Evidence/private/native-vegetation-attributes retains
+the accepted core and115ad838... fallback; exact eb3a009b... is promoted.
+Continue species/Collected/cover/height creation/deletion and calculations next.

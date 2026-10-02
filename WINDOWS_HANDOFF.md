@@ -34,12 +34,12 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all29 editor operations to immutable identities, leases running operations and
+  all31 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the same native-verified complete Other plus Humus12/Mineral18 editor
-  and vegetation physical-domain protection:
-  `115ad8388ee99054b0e0391634b7a6fc5c4f963811ab048a32688888a097f358`.
+  and vegetation physical-domain/12-attribute editing:
+  `eb3a009b5866075f36b5fb32b855ab6cff9fbdd697363043b5ba71e3873509d6`.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
   Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
   omission remain intact. Shared expected-value transactions span rows/tables
@@ -71,6 +71,22 @@ between shells.
   Soil editor96697f18... is archived there. Species/vegetation full drafts and
   event workflows remain incomplete; static metadata/merge code after immediate
   exits must not be inherited as active behavior.
+  All12 USysVegOtherXL existing-row numeric attributes are now default-on with
+  `VITE_VEGETATION_ATTRIBUTE_EDITING=false` read-only opt-out. Shared patches and
+  scoped canonical suggestions retain145 nullable/duplicate definitions; Cultural2
+  uses Cultural1, PV orders by Item and AF remains free numeric. Errors/drafts
+  persist through shared lifecycle and reference Reload/Retry; species and
+  creation/deletion remain unavailable here. Source has no exported attribute
+  audit event; desktop transactional audits/raw-code policy are adaptations.
+  Focused1.763s/full race504.457s;177 frontend tests/check0/0/opt-in/default/opt-out
+  builds; bindings15/114/41. `evidence/private/native-vegetation-attributes`
+  proves14 cases/18 audits, all15 original tables/32 old audits and exact-only
+  changes; no patch identity ledger allocation. Support/config/external bytes
+  restored and rollback trigger removed. Core PID14488/default PID3260 exited;
+  inspector9392 closed. Readonly default delivery preserves every fixture byte,
+  zero audits. Default assets are byte-identical to core assets and embedded in
+  exact promoted eb3a009b...; no later untested rebuild. Core executable and
+ 115ad838... fallback are sealed there. Never replay completed proofs.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -434,8 +450,9 @@ The fourteen ordinary surveyor/depth/cover/note fields are now native-verified.
 The two nullable flags, strict SoilDrainage, source-authorized BEC Master and
 final X/Y/Photo scalar batch complete the98-field writable parent baseline.
 Continue actual FS882 child workflows, not another parent-field inventory.
-Other8/Humus12/Mineral18 workflows are verified/promoted; continue distinct
-vegetation/species/cover/height and calculation events.
+Other8/Humus12/Mineral18 and all12 existing-row vegetation attributes are
+verified/promoted; continue distinct species/Collected/cover/height creation/
+deletion and calculation events.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage's explicit LimitToList=NotDefault now has a separately verified

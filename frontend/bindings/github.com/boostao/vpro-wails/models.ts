@@ -573,6 +573,12 @@ export interface VegRecord {
     "other2": number | null;
 }
 
+export interface VegetationAttributeUpdate {
+    "id": number;
+    "values": { [_ in string]?: number | null } | null;
+    "expected": { [_ in string]?: number | null } | null;
+}
+
 export interface WorkingUnitChoice {
     "rowId": string;
     "origin": string;

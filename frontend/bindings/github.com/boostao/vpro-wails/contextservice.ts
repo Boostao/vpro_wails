@@ -69,6 +69,10 @@ export function ListVegRecords(contextID: string, plot: string): $CancellablePro
     return $Call.ByID(1360779990, contextID, plot);
 }
 
+export function ListVegetationAttributeSuggestions(contextID: string): $CancellablePromise<$models.SoilSuggestion[] | null> {
+    return $Call.ByID(409085583, contextID);
+}
+
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
 }
@@ -127,4 +131,8 @@ export function UpdateSoilRecords(contextID: string, plot: string, updates: $mod
 
 export function UpdateVegRecord(contextID: string, record: $models.VegRecord): $CancellablePromise<void> {
     return $Call.ByID(1523295806, contextID, record);
+}
+
+export function UpdateVegetationAttributes(contextID: string, plot: string, updates: $models.VegetationAttributeUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(4158838458, contextID, plot, updates);
 }

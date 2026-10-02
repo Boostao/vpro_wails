@@ -38,6 +38,9 @@ function serverComponent(source, filename, dependencies) {
         }),
         './numericEditor': loadTypeScript('numericEditor.ts')
       });
+      if (name === './vegetationAttributeEditor') return loadTypeScript('vegetationAttributeEditor.ts', {
+        './numericEditor': loadTypeScript('numericEditor.ts')
+      });
       if (name === './catalogueLookup' && './qualityEditor' in dependencies) {
         return loadTypeScript('catalogueLookup.ts', {
           './qualityEditor': dependencies['./qualityEditor'],

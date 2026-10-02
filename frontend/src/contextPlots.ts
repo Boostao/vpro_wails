@@ -1,5 +1,5 @@
 import { ContextService, type FS882Header, type VegRecord, type HumusRecord, type MineralRecord,
-  type OtherRecord, type OtherRecordUpdate, type SoilRecordUpdate, type HeightRecordUpdate, type AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
+  type OtherRecord, type OtherRecordUpdate, type SoilRecordUpdate, type VegetationAttributeUpdate, type HeightRecordUpdate, type AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
 
 export function bindContextPlots(contextId: string, port = ContextService) {
   if (!contextId) throw new Error('An editor requires a loaded project context identity.');
@@ -13,6 +13,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
     ListMineralRecords: (plot: string) => port.ListMineralRecords(contextId, plot),
     ListOtherRecords: (plot: string) => port.ListOtherRecords(contextId, plot),
     ListSoilSuggestions: () => port.ListSoilSuggestions(contextId),
+    ListVegetationAttributeSuggestions: () => port.ListVegetationAttributeSuggestions(contextId),
     ListAuditEntries: (plot: string) => port.ListAuditEntries(contextId, plot),
     CreatePlot: (header: FS882Header) => port.CreatePlot(contextId, header),
     UpdatePlot: (header: FS882Header) => port.UpdatePlot(contextId, header),
@@ -29,6 +30,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
     UpdateOtherRecord: (record: OtherRecord) => port.UpdateOtherRecord(contextId, record),
     UpdateOtherRecords: (plot: string, updates: OtherRecordUpdate[] | null) => port.UpdateOtherRecords(contextId, plot, updates),
     UpdateSoilRecords: (plot: string, updates: SoilRecordUpdate[] | null) => port.UpdateSoilRecords(contextId, plot, updates),
+    UpdateVegetationAttributes: (plot: string, updates: VegetationAttributeUpdate[] | null) => port.UpdateVegetationAttributes(contextId, plot, updates),
     DeleteOtherRecord: (plot: string, id: number) => port.DeleteOtherRecord(contextId, plot, id),
     UpdateHeightRecords: (plot: string, updates: HeightRecordUpdate[] | null) => port.UpdateHeightRecords(contextId, plot, updates),
     SetAuditRestoreSelection: (plot: string, rowIds: string[] | null) => port.SetAuditRestoreSelection(contextId, plot, rowIds),
