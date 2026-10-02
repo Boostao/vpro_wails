@@ -445,6 +445,12 @@ export interface ProjectMetadataColumn {
     "declaredType": string;
 }
 
+export interface ProjectMetadataCreate {
+    "plotNumber": string;
+    "projectId": string | null;
+    "original": ProjectMetadataTable;
+}
+
 export interface ProjectMetadataEdit {
     "plotNumber": string;
     "projectId": string | null;

@@ -26,7 +26,7 @@ test('every editor read and mutation carries the original context identity and u
     assert.equal(call[1], 'original-context');
     if (!['GetHeaderCapabilities', 'CanEditMasterBEC', 'ListSoilSuggestions', 'ListVegetationAttributeSuggestions', 'ReviewSpeciesCodes', 'ListProjectMetadataFields'].includes(name)) assert.equal(call[2], payload);
   }
-  assert.equal(calls.length, 47);
+  assert.equal(calls.length, 48);
   assert.throws(() => output.bindContextPlots('', port), /loaded project context identity/);
 });
 

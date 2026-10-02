@@ -1,6 +1,6 @@
 import { wellFormedUTF16 } from './qualityEditor';
 import standardDefaults from '../../resources/project-metadata-standard.json';
-import type { ProjectMetadataCell, ProjectMetadataEdit, ProjectMetadataEditorField, ProjectMetadataReview, ProjectMetadataRow } from '../bindings/github.com/boostao/vpro-wails';
+import type { ProjectMetadataCell, ProjectMetadataCreate, ProjectMetadataEdit, ProjectMetadataEditorField, ProjectMetadataReview, ProjectMetadataRow } from '../bindings/github.com/boostao/vpro-wails';
 
 export interface MetadataDraftCell {
   raw: string;
@@ -14,6 +14,20 @@ export interface MetadataDraft {
   id: number;
   cells: Record<string, MetadataDraftCell>;
   standardPopulation: '' | 'keep' | 'populate';
+}
+
+export function metadataBlankRequest(review: ProjectMetadataReview): ProjectMetadataCreate {
+  const table = review.projectRecords;
+  if (!review.plotNumber || !review.projectId || !wellFormedUTF16(review.projectId) || review.projectId.length > 20) {
+    throw new Error('Blank creation requires the selected plot\'s existing literal ProjectID within20 UTF-16 units; no parent identity is inferred.');
+  }
+  if (!table.columns || table.columns.length !== 75 ||
+      new Set(table.columns.map(column => column.name)).size !== 75 ||
+      !table.columns.some(column => column.name === 'ID') || !table.columns.some(column => column.name === 'ProjectID') ||
+      !table.rows || table.rows.length !== 0) {
+    throw new Error('Review a complete empty metadata schema before blank creation; existing candidates must be selected instead.');
+  }
+  return { plotNumber: review.plotNumber, projectId: review.projectId, original: table };
 }
 
 export function metadataCellText(cell: ProjectMetadataCell): string {

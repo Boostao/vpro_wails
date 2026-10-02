@@ -25,6 +25,20 @@ test('Metadata selection is explicit, literal and physical; duplicate candidates
   assert.throws(()=>editor.beginMetadataDraft({...review,projectRecords:{columns,rows:[row,row]}},'-200'),/explicit physical/);
   assert.throws(()=>editor.beginMetadataDraft({...review,projectId:null},'-200'),/literal parent/);
 });
+test('Blank metadata proposal captures empty schema and existing bounded parent identity without inventing a physical ID',()=>{
+  const names=presentation.metadataGroups.flatMap(group=>group.names);
+  const schema=['ID','ProjectID','AllSpecs','TableOfLists','DateLastEdited',...names].map(name=>({name,declaredType:'TEXT'}));
+  const empty={...review,projectRecords:{columns:schema,rows:[]}};
+  const request=editor.metadataBlankRequest(empty);
+  assert.equal(request.projectId,'Project');
+  assert.equal(request.plotNumber,'P1');
+  assert.equal(request.original,empty.projectRecords);
+  assert.equal('id' in request,false);
+  for(const invalid of [review,{...empty,projectId:null},{...empty,projectId:''},{...empty,projectId:'x'.repeat(21)},
+    {...empty,projectId:'\ud800'},{...empty,projectRecords:{columns:schema,rows:null}}]) {
+    assert.throws(()=>editor.metadataBlankRequest(invalid));
+  }
+});
 test('Metadata raw numeric errors survive serialization/remount, gate requests and clear on valid correction or Undo',()=>{
   const start = field('StartDate','integer',16);
   let draft = editor.beginMetadataDraft(review,'-200');
@@ -128,6 +142,12 @@ test('Metadata component stays outside remounted tabs and gates ordinary Save/Lo
   assert.match(component,/metadata edit committed, but/);
   assert.match(component,/completed writes must not be replayed/);
   assert.match(component,/Save failed; raw drafts retained/);
+  assert.match(form,/VITE_PROJECT_METADATA_CREATION === 'true'/);
+  assert.match(component,/blank = metadataBlankRequest\(review\)/);
+  assert.match(component,/await client\.CreateBlankProjectMetadata\(blank\)/);
+  assert.match(component,/blank = null; error = null; success = 'Blank creation proposal undone/);
+  assert.match(component,/reviewed proposal retained for retry/);
+  assert.match(component,/committed = true; blank = null/);
   assert.equal(compile(component,{filename:'ProjectMetadataEditor.svelte',generate:'client'}).warnings.length,0);
 });
 test('Metadata reload invalidates editing readiness until both current records and references load successfully',()=>{

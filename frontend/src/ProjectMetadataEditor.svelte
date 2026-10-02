@@ -1,20 +1,22 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import type { ProjectMetadataEditorField, ProjectMetadataReview } from '../bindings/github.com/boostao/vpro-wails';
+  import type { ProjectMetadataCreate, ProjectMetadataEditorField, ProjectMetadataReview } from '../bindings/github.com/boostao/vpro-wails';
   import type { bindContextPlots } from './contextPlots';
   import type { EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
   import { beginMetadataDraft, stageMetadata, metadataFieldValue, metadataErrors, metadataDirty, metadataEditRequest,
-    metadataCellText, metadataStandardDecisionRequired, metadataStandardDefaults, populateMetadataStandard, type MetadataDraft } from './projectMetadataEditor';
+    metadataCellText, metadataStandardDecisionRequired, metadataStandardDefaults, populateMetadataStandard, metadataBlankRequest, type MetadataDraft } from './projectMetadataEditor';
   import { metadataGroups, metadataLabel } from './projectMetadataPresentation';
 
-  let { client, plot, onclosed, onbusy, oncommitted }: {
+  let { client, plot, onclosed, onbusy, oncommitted, allowCreation = false }: {
     client: ReturnType<typeof bindContextPlots>; plot: string; onclosed: () => void;
     onbusy: (busy: boolean) => void; oncommitted: () => Promise<void>;
+    allowCreation?: boolean;
   } = $props();
   let review = $state<ProjectMetadataReview | null>(null);
   let fields = $state<ProjectMetadataEditorField[]>([]);
   let draft = $state<MetadataDraft | null>(null);
+  let blank = $state<ProjectMetadataCreate | null>(null);
   let reading = $state(false);
   let ready = $state(false);
   let standardPreview = $state(false);
@@ -26,7 +28,7 @@
   const reads = new ReadRequests();
   const busy = $derived(reading || saving);
   const errors = $derived(draft ? metadataErrors(draft) : []);
-  const dirty = $derived(draft ? metadataDirty(draft) : false);
+  const dirty = $derived(blank !== null || (draft ? metadataDirty(draft) : false));
   const standardDecision = $derived(draft ? metadataStandardDecisionRequired(draft) : false);
   const rows = $derived(review?.projectRecords.rows ?? []);
   const available = $derived.by(() => {
@@ -43,10 +45,39 @@
   }
   export function undo() {
     if (busy) { error = 'Wait for the current metadata operation before Undo.'; return; }
-    if (draft && !committedFailure) {
+    if (blank) {
+      blank = null; error = null; success = 'Blank creation proposal undone; no record, identity or history was allocated.';
+    } else if (draft && !committedFailure) {
       draft = beginMetadataDraft(draft.review, draft.original.rowId);
       standardPreview = false; error = null; success = 'Metadata drafts undone; no data or history changed.';
     } else onclosed();
+  }
+  function reviewBlank() {
+    if (!allowCreation || !ready || !review || busy || dirty || committedFailure) {
+      error = 'Reload an available empty metadata review before proposing blank creation.'; return;
+    }
+    try { blank = metadataBlankRequest(review); error = null; success = null; }
+    catch (cause) { error = `Blank creation proposal unavailable; no data changed: ${String(cause)}`; }
+  }
+  async function createBlank() {
+    if (!allowCreation || !ready || !blank || busy || committedFailure) {
+      error = 'Explicitly review the empty metadata proposal before creation.'; return;
+    }
+    let committed = false;
+    saving = true; error = null; success = null;
+    try {
+      const created = await client.CreateBlankProjectMetadata(blank);
+      committed = true; blank = null;
+      await oncommitted();
+      const next = await client.ReviewProjectMetadata(plot);
+      review = next; draft = beginMetadataDraft(next, created.rowId);
+      success = 'Blank metadata record and full creation audit committed atomically. All73 ordinary/stamp fields remain NULL; edit and Save separately.';
+    } catch (cause) {
+      if (committed || String(cause).includes('metadata edit committed, but')) {
+        committedFailure = true; blank = null; draft = null;
+        error = `Metadata creation committed, but refresh/cleanup failed. Reload before another edit; completed writes must not be replayed: ${String(cause)}`;
+      } else error = `Blank metadata creation failed; reviewed proposal retained for retry: ${String(cause)}`;
+    } finally { saving = false; }
   }
   async function reload() {
     if (saving || dirty) { error = 'Save or Undo metadata drafts before reloading; raw errors were retained.'; return; }
@@ -138,8 +169,20 @@
   <fieldset disabled={!ready || busy || dirty || committedFailure}><legend>Select an existing physical record explicitly</legend>
     {#each rows as row (row.rowId)}
       <button type="button" data-metadata-row={row.rowId} aria-pressed={draft?.original.rowId === row.rowId} onclick={() => select(row.rowId)}>Record {row.rowId}: {summary(row)}</button>
-    {:else}<p>No matching existing metadata records. New/blank/template proposals remain unavailable.</p>{/each}
+    {:else}<p>No matching existing metadata records.
+      {allowCreation ? 'Review explicit blank creation below; template proposals remain unavailable.' : 'New/blank/template proposals remain unavailable.'}</p>{/each}
   </fieldset>
+  {#if allowCreation && rows.length === 0 && !blank}
+    <button type="button" disabled={!ready || busy || dirty || committedFailure} onclick={reviewBlank}>Review blank metadata creation</button>
+  {/if}
+  {#if blank}
+    <fieldset data-metadata-blank-proposal><legend>Confirm one blank record for the existing parent identity</legend>
+      <p>Project ID {JSON.stringify(blank.projectId)} is copied literally from the selected plot, never assigned to it.
+        All73 other source fields, including version/date stamps, remain NULL. No master template is copied.
+        A reserved signed32 ID is allocated only by the creation transaction.</p>
+      <button type="button" disabled={!ready || busy || committedFailure} onclick={createBlank}>Create reviewed blank metadata record</button>
+    </fieldset>
+  {/if}
   {#if draft}
     <p>Physical ID {draft.id}; immutable Project ID {JSON.stringify(draft.review.projectId)}. Unchanged historical values are omitted from Save.</p>
     {#if standardDecision}

@@ -34,14 +34,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all47 editor operations to immutable identities, leases running operations and
+  all48 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `    18b5d6931e4ef45cf33b1079adc2d94fb72d9dcde7f259587aecaa51a5815e45`.
+  `    c22c00fe7bd82914216e2c031e7f2a4e0ec1ec625479a3a54c5b2cf0026f0da4`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -758,9 +758,37 @@ closed archive sources. Ignored archives/go.mod now isolates that subtree; new
 source snapshots use source.zip. The subsequent full suite passes without exclusions.
 Archives/metadata-standard-checkpoint seals50 hashed files: exact core/default
 assets/binaries, native/restoration receipts, source.zip, final/initial test logs
-and preceding protected04c4291f.... Protected current/candidate are promoted by
-exact copy to18b5d693...; no rebuilding. No owned native/race process remains.
-Next new/blank/template creation/reservation and metadata-specific restoration;
+and preceding protected04c4291f.... Standard delivery18b5d693... is now the
+archived predecessor of the accepted blank-creation delivery below.
+
+Blank creation is native-verified and independently opt-in:
+`VITE_PROJECT_METADATA_CREATION=true` plus the existing editor flag.
+Source insertion preserves all73 nonidentity fields/stamps as NULL; it is not an
+ordinary form Save. A complete empty75-column review and existing literal parent
+ProjectID within20 UTF-16 units are mandatory. Parent identity is never assigned.
+Shared signed32 allocation reserves stored/deleted/audited metadata IDs. One
+complete typed CreateRecord audit, reservation and row insertion share a transaction;
+final row/schema/candidates, audit, ownership/context and complete raw Env/Admin
+parent storage observations reject hidden or audit-trigger drift.
+Resident proposals/remount/native-close/Undo and failed retry are guarded; committed
+refresh failures cannot replay writes. Ordinary title editing/stamping is separate.
+Bindings15/136/65 and48 scoped operations; final focused9.525s,223 frontend tests,
+check0 errors/0 warnings, both builds and complete race543.668s pass.
+Initial coreb7ac1bbd.../owned16864 and final guarded6c2742a0.../owned10052 each
+verify reserved1/2/3 -> ID4, one creation audit, separate title/four audits,
+rollback/retry and refresh recovery. The guarded core rejects an audit-trigger
+OfficeNotes change. Both exact77 project/5 user audit fixtures are restored.
+Final default bin/vpro-project-metadata-blank-default.exe SHA256
+c22c00fe7bd82914216e2c031e7f2a4e0ec1ec625479a3a54c5b2cf0026f0da4
+verifies default-disabled metadata action/creation and existing Site/Vegetation
+with all fixture/support/config bytes unchanged. Owned4984 closes;9392 is closed.
+metadata-blank.py, metadata-blank-guard.py and metadata-blank-default.py completed
+proofs/receipts are sealed; never replay prepare/run/restore modes.
+Archives/metadata-blank-checkpoint seals59 hashed files plus its manifest, preceding
+protected18b5d693..., accepted core/guard/default binaries/assets, source.zip,
+backups and focused/frontend/race/native/restoration receipts. Current/candidate
+are exact acceptedc22c00fe... copies, not rebuilt. No owned native/race process remains.
+Next explicit master-template creation/conversion and metadata-specific restoration;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 Navigation/profiling remain open.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind

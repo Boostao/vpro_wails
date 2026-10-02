@@ -1238,9 +1238,41 @@ snapshots use source.zip. Archives/metadata-standard-checkpoint seals50 hashed
 files, exact assets/binaries/source/receipts and previous04c4291f.... Exact accepted
 default18b5d693... is promoted without rebuilding; default metadata stays disabled.
 
-Remaining metadata acceptance: explicit new/blank/template proposals with signed32
-ID allocation/reservation and audited
-creation; explicit master timestamp/code conversion decisions; metadata-specific
+Explicit blank creation is implemented and native-verified under an independent
+`VITE_PROJECT_METADATA_CREATION=true` gate, alongside the existing editor gate.
+The source SQL blank branch inserts ProjectID alone; ID uses GenUniqueID(), while
+all73 other columns, including version/date stamps, remain NULL. Desktop creation
+requires the selected plot's existing literal ProjectID within20 UTF-16 units and
+a complete empty matching75-column schema review. It never creates/repairs parent
+identity, guesses a template or selects the first candidate. Shared positive
+signed32 allocation and the identity ledger reserve stored/deleted/audited IDs;
+this allocation policy and one complete typed CreateRecord audit are deliberate
+desktop adaptations. Insertion, reservation and audit share the immediate
+transaction. Independent final row/schema/candidate, audit, scope/file and full
+raw Env/Admin parent observations reject hidden or trigger-induced changes.
+
+The resident proposal survives remount/close guards and retains failed retry.
+Undo allocates no record, ID or audit. After commit, proposals clear before
+fallible refresh; recovery cannot replay completed writes. Existing-record editing
+and its three version/date stamps occur only in a separate ordinary Save.
+Final focused metadata/context Go9.525s,223 frontend tests/check0 errors/0 warnings,
+opt-in/default builds and complete integration race543.668s pass; bindings
+15 services/136 methods/65 models and48 scoped operations. Initial nativeb7ac1bbd...
+and final guarded6c2742a0... each prove ID4 after reserved1/2/3, one complete
+creation audit, proposal/remount/native-close/Undo, rollback/retained retry,
+committed-refresh recovery without replay and a separate title Save/four audits.
+The guarded proof also rejects an audit-trigger parent OfficeNotes change.
+Both owned windows16864/10052 close and restore the exact77 project/5 user audit
+fixture bytes. Defaultc22c00fe... verifies both metadata gates off, existing
+Site/Vegetation controls and zero writes; owned4984 closes. Inspector9392 is closed.
+Archives/metadata-blank-checkpoint seals59 hashed files plus its manifest, exact
+core/guard/default assets and binaries, source.zip, native/restoration receipts,
+backups and final focused/frontend/race logs. Previous protected18b5d693... is
+archived; exact accepted defaultc22c00fe... is promoted without rebuilding.
+
+Remaining metadata acceptance: explicit physical master-template selection with
+the complete source33-field mapping and original candidate/schema snapshot;
+explicit master timestamp/code conversion decisions; metadata-specific
 restoration; reference attachment/master-catalogue writes. Keep these unavailable
 and leave existing-record editing opt-in rather than claiming the full source
 copy action is complete. Navigation and ordered profiling remain separate work.

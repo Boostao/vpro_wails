@@ -71,6 +71,7 @@ export type {
     ProjectMetadataCell,
     ProjectMetadataChange,
     ProjectMetadataColumn,
+    ProjectMetadataCreate,
     ProjectMetadataEdit,
     ProjectMetadataEditorField,
     ProjectMetadataOption,

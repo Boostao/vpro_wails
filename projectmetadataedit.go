@@ -31,7 +31,7 @@ type ProjectMetadataEdit struct {
 	StandardPopulation string                  `json:"standardPopulation"`
 }
 
-func (request *ProjectMetadataEdit) UnmarshalJSON(data []byte) error {
+func validateMetadataDraftJSON(data []byte) error {
 	if !utf8.Valid(data) {
 		return errors.New("metadata draft JSON contains malformed UTF-8")
 	}
@@ -54,6 +54,13 @@ func (request *ProjectMetadataEdit) UnmarshalJSON(data []byte) error {
 				return fmt.Errorf("metadata draft Unicode: %w", err)
 			}
 		}
+	}
+	return nil
+}
+
+func (request *ProjectMetadataEdit) UnmarshalJSON(data []byte) error {
+	if err := validateMetadataDraftJSON(data); err != nil {
+		return err
 	}
 	type plain ProjectMetadataEdit
 	decoder := json.NewDecoder(bytes.NewReader(data))

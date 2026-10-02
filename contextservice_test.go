@@ -113,6 +113,10 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 			_, err := service.ListProjectMetadataFields(context.Background(), stale)
 			return err
 		},
+		"blank metadata creation": func() error {
+			_, err := service.CreateBlankProjectMetadata(context.Background(), stale, ProjectMetadataCreate{})
+			return err
+		},
 		"audit read":          func() error { _, err := service.ListAuditEntries(context.Background(), stale, "stale"); return err },
 		"switch":              func() error { _, err := service.SwitchContext(stale, contextSelection(current)); return err },
 		"legacy header":       func() error { return service.plots.UpdatePlot(FS882Header{PlotNumber: "stale"}) },
