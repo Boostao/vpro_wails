@@ -36,13 +36,67 @@ test('Source NULL Cover6 notice stays nonblocking and distinguishes view removal
 });
 test('Source warning feedback stays visible outside remounted grids and never joins invalid/Save gates',()=>{
   const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
-  assert.match(form,/heightNotices = \$derived\(heightSourceNotices\(heightDrafts\)\)/);
+  assert.match(form,/heightNotices = \$derived\(heightSourceNotices\(heightDrafts, vegList\)\)/);
   assert.match(form,/each heightNotices as message[\s\S]{0,80}role="status"/);
   assert.doesNotMatch(form,/heightNotices\.length[^;\n]*(?:disabled|canSave)|invalid[^;\n]*heightNotices/);
   assert.match(form,/notices\.join\(' '\)/);
   const child=readFileSync(path.join(__dirname,'SourceChild.svelte'),'utf8');
   assert.match(child,/td:focus-within/);
   assert.match(child,/\.source-cell:focus-visible/);
+});
+test('A warning checks every seven-cover combination without treating zero or heights as missing cover',()=>{
+  const fields=['cover1','cover2','cover3','totalA','cover4','cover5','totalB'];
+  for(const form of ['SubVegAXL_BC','SubVegAhtXL']){
+    for(let mask=0;mask<128;mask++){
+      const values=Object.fromEntries(fields.map((field,index)=>[field,mask&(1<<index)?0:null]));
+      values.height1=-1.125;
+      const notice=output.aCoverSourceNotice(form,7,values);
+      assert.equal(notice!==null,mask===0);
+      if(notice)assert.match(notice,/No cover value is inferred; the vegetation record is not deleted/);
+    }
+    assert.ok(output.aCoverSourceNotice(form,'new',{height1:2}));
+    for(const field of fields){
+      assert.equal(output.aCoverSourceNotice(form,7,{[field]:-1.125}),null);
+    }
+  }
+  for(const form of ['SubVegCXL','SubVegChtXL','SubVegDXL','USysVegOtherXL','']){
+    assert.equal(output.aCoverSourceNotice(form,7,{}),null);
+  }
+});
+test('A notices merge changed cover drafts with the full stored row and survive remount but not invalid/no-op edits',()=>{
+  const row={id:7,cover1:0,cover2:0,height1:-1.125};
+  let drafts=stageHeight({},7,'cover1','',0,'SubVegAhtXL');
+  assert.equal(output.heightSourceNotices(drafts,[row]).length,0);
+  drafts=stageHeight(drafts,7,'cover2','',0,'SubVegAhtXL');
+  assert.equal(output.heightSourceNotices(json(drafts),[row]).length,1);
+  drafts=stageHeight(drafts,7,'cover2','bad',0,'SubVegAhtXL');
+  assert.equal(output.heightSourceNotices(drafts,[row]).length,0);
+  drafts=stageHeight(drafts,7,'cover2','0',0,'SubVegAhtXL');
+  assert.equal(output.heightSourceNotices(drafts,[row]).length,0);
+  const heightOnly={id:7,height1:-1.125};
+  drafts=stageHeight({},7,'height1','-2.125',-1.125,'SubVegAhtXL');
+  assert.equal(output.heightSourceNotices(json(drafts),[heightOnly]).length,1);
+  drafts=stageHeight(drafts,7,'height1','-1.125',-1.125,'SubVegAhtXL');
+  assert.equal(output.heightSourceNotices(drafts,[heightOnly]).length,0);
+});
+test('A source notices require unique original row identity and retain form rather than inferring it from values',()=>{
+  const edits=[{id:7,form:'SubVegAhtXL'},{id:7,form:'SubVegAXL_BC'}];
+  assert.equal(output.aCoverSourceNotices(edits,[{id:7,height1:1}]).length,1);
+  assert.throws(()=>output.aCoverSourceNotices(edits,[]),/missing or ambiguous/);
+  assert.throws(()=>output.aCoverSourceNotices(edits,[{id:7},{id:7}]),/missing or ambiguous/);
+  assert.equal(output.aCoverSourceNotices([{id:7,form:'SubVegDXL'}],[{id:7}]).length,0);
+});
+test('A warning is shared by numeric, Species, Collected and creation workflows without weakening Save gates',()=>{
+  const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
+  for(const name of ['speciesNotices','collectedNotices']){
+    assert.match(form,new RegExp(`each ${name} as message[\\s\\S]{0,80}role="status"`));
+    assert.doesNotMatch(form,new RegExp(`${name}\\.length[^;\\n]*(?:disabled|canSave)`));
+  }
+  assert.match(form,/if creationNotice[\s\S]{0,100}role="status"/);
+  assert.match(form,/aCoverSourceNotice\(proposed\.form, id, observed\[0\]\)/);
+  assert.match(form,/aCoverSourceNotices\(updates, vegList\)/);
+  assert.match(form,/aCoverSourceNotices\(sources, vegList\)/);
+  assert.match(form,/stageCollected\(collectedDrafts, id, stored, form\)/);
 });
 test('Source grids stage lexical input while close, view and cancellation guards remain wired',()=>{
   for(const file of ['SourceChild.svelte','FS882Form.svelte','SourcePage.svelte']){

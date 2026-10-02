@@ -36,6 +36,7 @@ test('All five source renderers expose one labelled cycle button, not a free tex
     './paperLayout': paper, './formPresentation': presentation,
     './heightEditor': loadTypeScript('heightEditor.ts', { './numericEditor': loadTypeScript('numericEditor.ts') }),
   });
+
   for (const name of forms) {
     const control = paper.paperChild(name).controls.find(control => control.column === 'Collected');
     assert.equal(control.locked, false);
@@ -52,6 +53,16 @@ test('All five source renderers expose one labelled cycle button, not a free tex
       assert.equal(/data-column="Collected"[^>]* disabled/.test(html), disabled);
     }
   }
+});
+
+test('Collected retains the original warning source through remount and alternate-view clicks without changing transport', () => {
+  let drafts=editor.stageCollected({},7,null,'SubVegAhtXL');
+  drafts=editor.stageCollected(json(drafts),7,null,'SubVegAXL_BC');
+  assert.equal(drafts['7'].form,'SubVegAhtXL');
+  assert.deepEqual(json(editor.collectedUpdates(drafts)),[{id:7,expected:null,clicks:2}]);
+  assert.equal('form' in editor.collectedUpdates(drafts)[0],false);
+  const source=readFileSync(path.join(__dirname,'SourceChild.svelte'),'utf8');
+  assert.match(source,/oncollectedstage\?\.\(row\.id, name\)/);
 });
 
 test('Persistent Collected drafts gate every other session, Save, Undo, Lock and native/context lifecycle', () => {

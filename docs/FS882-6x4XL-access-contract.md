@@ -534,6 +534,31 @@ controls, Species/Collected, disabled unfinished workflows and all fixture bytes
 unchanged. Owned9884/12208 exited;9392 closed. Focused Go0.752s/full race459.824s,
 202 frontend tests/check0/0/default build pass. No native Access oracle was run.
 
+### Shared A/A-height missing-cover warnings
+
+Both exported AfterUpdate handlers concatenate seven A/B covers and test IsNull.
+VBA's [ampersand contract](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/ampersand-operator)
+returns NULL only when all concatenated operands are NULL; any zero is a value.
+The desktop warns without rejection or inference across numeric, Species,
+Collected and opt-in height-only creation. Heights do not supply cover.
+Changed numeric patches merge with the complete original row; malformed/no-op
+drafts do not produce numeric notices. Collected retains its original form through
+remount/alternate-view clicks, without changing its transport. Successful Species/
+Collected/creation messages observe independently reloaded rows.
+Access's automatic next-record/Species focus is not copied across disabled
+mutually gated editors; explicit Save/Undo remains the lifecycle adaptation.
+
+Native corea13aca2c... passes nine cases: visible nonblocking height-only notice,
+malformed/remount/Undo, audit rollback/retry, Species, Collected and creation
+cancellation/Save. Only ID7 Species/Height1/Collected change, and ID10 is created
+with explicit Species/Height1 and all covers/Layer NULL. Five project audits,
+zero user writes and complete original data/history/schema/support preservation
+are verified. Defaultcddefe55... checks25 labelled numeric controls/Species/Collected,
+disabled unfinished workflows and every fixture byte unchanged. Owned7548/7260
+exited;9392 closed. Focused Go3.833s/full race460.449s,207 frontend tests/check0/0/
+core+default builds pass. Source semantics are static/documented, not a new
+native Access runtime measurement.
+
 ## Verified bounded selective restoration
 
 `SetAuditRestoreSelection` atomically stores a verified selection; `RestoreSelectedAuditRecords` accepts exact string row IDs and cancel/retain/prune actions. The legacy marked-row API remains. Typed mapping covers 97 nonidentity parent and 61 non-Cover child fields. Invalid/foreign/missing rows, duplicate identities, unsupported fields, stale history chains, malformed values and failed triggers abort the entire transaction. Restore ordering follows source Table ascending then EditWhen descending, with descending rowid for deterministic timestamp ties.

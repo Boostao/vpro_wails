@@ -41,11 +41,12 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `20a6c3e7b23cbf771b43e11e0ba1412aa49f100484d0af17cfa2eca2ede6f323`.
+  `cddefe55f97ba612d38e52b8a582d16fb84d7489c8ad8ad4660c0d35a6d40ca1`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
-  NULL-cover notice/default delivery is promoted without rebuilding. Previous50866a49...
-  is archived with accepted notice bytes and receipts. Previous8e63916d...
+  complete A/C NULL-cover notice/default delivery is promoted without rebuilding.
+  Previous20a6c3e7... and50866a49... are archived with accepted notice bytes and
+  receipts. Previous8e63916d...
   and accepted core/default hashes are archived. Previous personal
   defaultbb3652f3... is archived with exact accepted core/default hashes. Previous creation
   defaulta7dd1be8..., deletiond8d51c7f... and accepted cores/guards are archived.
@@ -601,7 +602,7 @@ Coreccb31517... verifies eight native cases, ZPNROW01/one VUser audit and separa
 ID9/two project audits. Raw256/remount/Save/Lock/actual-close/two-stage Undo,
 user/project audit rollback/retry and existing-row regression pass. All15 project
 tables/67 prior audits, VUser tables/three old audits, old rows/reservations,
-support/config and schema preserved. Fixture now70 project audits/four user audits.
+support/config and schema preserved. Fixture now75 project audits/four user audits.
 ZPNAT01 remains row0; ZPNAT02 is ID8; ZPNROW01 is ID9. ID8 now retains its physical
 record/species/Height6 with Cover6=NULL and is absent from both C source views.
 Triggers removed.
@@ -610,7 +611,7 @@ saved-personal lookup, all unfinished creation controls disabled and every fixtu
 byte unchanged. This previous default is archived; archives/
 creation-personal-checkpoint seals core/default/previous8e63916d with hashes.
 Older personal/creation-decision proofs and archives remain unchanged.
-Core8104/default14528 exited. Current20a6c3e7... verifies the nonblocking C/C-height
+Core8104/default14528 exited. Previous20a6c3e7... verifies the nonblocking C/C-height
 NULL-cover notice and focus styling. Focused Go0.752s/full race459.824s,202 frontend
 tests/check0/0/default build pass. Native seven-case proof saves only ID8 Cover6=NULL
 and one project audit, retaining its physical record/species/height; malformed input,
@@ -618,12 +619,29 @@ remount/Undo, audit rollback/retained retry and successful feedback pass.
 Independent readonly delivery reopens identical candidate bytes, verifies25 labelled
 numeric controls/Species/Collected, disabled unfinished workflows and every fixture
 byte unchanged. Owned9884/12208 exited; inspector9392 closed. Exact candidate bytes
-are current/candidate; archives/cover-notices-checkpoint seals accepted default,
-previous50866a49 builds and receipts with hashes. No native/race command remains.
+are archived; archives/cover-notices-checkpoint seals accepted default,
+previous50866a49 builds and receipts with hashes.
+Currentcddefe55... adds shared A/A-height all-seven-cover warnings to numeric,
+Species, Collected and opt-in new-row workflows. Zero is not NULL; non-NULL heights
+never infer cover. Original Collected source is retained through remount/alternate
+view clicks and omitted from its unchanged transport. Successful Species/Collected/
+creation notices use independently reloaded rows. No automatic record/focus
+navigation or machine-wide Enter preference is inherited.
+Focused coupled Go3.833s/full race460.449s;207 frontend tests/check0/0/core+default
+builds pass. Corea13aca2c... passes nine native cases: height-only notice, invalid/
+remount/Undo, audit rollback/retry, Species, Collected and separately cancelled/saved
+creation. ID7 becomes ABIE_RK/Height1=-2.125/Collected=C with all seven covers NULL;
+ID10 is ABIE_RK/Height1=-3.125 with no inferred cover/Layer. Exactly five project
+audits and zero user writes; old records/history/reservations/schema/support/config
+preserved. Defaultcddefe55... independently verifies25 enabled labelled numeric
+controls/Species/Collected, disabled unfinished workflows and every fixture byte
+unchanged. Owned7548/7260 exited;9392 closed. Exact default is current/candidate;
+archives/a-cover-notices-checkpoint seals core/default/previous20a6c3e7 and receipts
+with hashes. No native/race command remains.
 Publication includes application source only; private evidence/binaries/dist are
-ignored. Use git HEAD/upstream for the current commit; predecessor3bb5f27.
-Never replay cover-notices.py or creation-personal.py completed modes or prior proofs.
-Next: remaining active warning/navigation and separately scoped parent code-check/metadata/profiling.
+ignored. Use git HEAD/upstream for the current commit; predecessorb94b6eb.
+Never replay a-cover-notices.py, cover-notices.py or creation-personal.py completed modes.
+Next: deliberate navigation and separately scoped parent code-check/metadata/profiling.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
 unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
 rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a

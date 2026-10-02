@@ -30,7 +30,7 @@
   import { embeddedForm, paperChild, type VegetationMode } from './paperLayout';
   import { controlLabel } from './formPresentation';
   import type { EditorCloseState } from './closeLifecycle';
-  import { heightField, stageHeight, heightDirty, heightErrors, heightSourceNotices, heightUpdates, vegetationNumberUpdates, type HeightDrafts } from './heightEditor';
+  import { heightField, stageHeight, heightDirty, heightErrors, heightSourceNotices, aCoverSourceNotice, aCoverSourceNotices, heightUpdates, vegetationNumberUpdates, type HeightDrafts } from './heightEditor';
   import { otherField, stageOther, otherDirty, otherErrors, otherUpdates, type OtherDrafts, type OtherValue } from './otherEditor';
   import { soilField, stageSoil, soilDirty, soilErrors, soilUpdates, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import { vegetationAttributeField, stageVegetationAttribute, vegetationAttributeDirty, vegetationAttributeErrors, vegetationAttributeUpdates, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
@@ -95,7 +95,6 @@
   let heightDrafts = $state<HeightDrafts>({});
   const heightUnsaved = $derived(heightDirty(heightDrafts));
   const heightInvalid = $derived(heightErrors(heightDrafts));
-  const heightNotices = $derived(heightSourceNotices(heightDrafts));
   const otherEditingEnabled = import.meta.env.VITE_OTHER_EDITING !== 'false';
   let otherDrafts = $state<OtherDrafts>({});
   const otherUnsaved = $derived(otherDirty(otherDrafts));
@@ -129,6 +128,8 @@
   const speciesInvalid = $derived(speciesErrors(speciesDrafts));
   const creationInvalid = $derived(creationDraft ? vegetationCreationErrors(creationDraft, speciesLists[creationDraft.form] ?? []) : []);
   const creationSpeciesInvalid = $derived(creationDraft ? vegetationCreationSpeciesError(creationDraft, speciesLists[creationDraft.form] ?? []) : null);
+  const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
+    ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
   const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
@@ -209,6 +210,11 @@
 
   // Child lists
   let vegList = $state<VegRecord[]>([]);
+  const heightNotices = $derived(heightSourceNotices(heightDrafts, vegList));
+  const speciesNotices = $derived(aCoverSourceNotices(Object.entries(speciesDrafts).flatMap(([id, cell]) =>
+    cell.error === null && cell.raw !== cell.expected ? [{ id: Number(id), form: cell.form }] : []), vegList));
+  const collectedNotices = $derived(aCoverSourceNotices(Object.entries(collectedDrafts).flatMap(([id, cell]) =>
+    cell.value !== cell.expected && cell.form ? [{ id: Number(id), form: cell.form }] : []), vegList));
   let humusList = $state<HumusRecord[]>([]);
   let mineralList = $state<MineralRecord[]>([]);
   let otherList = $state<OtherRecord[]>([]);
@@ -817,7 +823,7 @@
       speciesDrafts = {};
       speciesChoices = {};
       await loadChildData(draft.plotNumber);
-      successMsg = `Saved ${updates.length} species row drafts atomically.`;
+      successMsg = [`Saved ${updates.length} species row drafts atomically.`, ...aCoverSourceNotices(updates, vegList)].join(' ');
     } catch (cause) {
       if (committed) capabilitiesReady = false;
       error = committed ? `Species changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
@@ -827,15 +833,16 @@
     }
   }
 
-  function stageCollectedCell(id: number) {
+  function stageCollectedCell(id: number, form: string) {
     try {
       if (collectedEditingDisabled) throw new Error('Collected editing is unavailable while loading, locked, busy or another draft is unsaved.');
       if (childCapabilities.Veg.collected !== true) throw new Error('Collected is unavailable in the active schema.');
       const rows = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
       if (rows.length !== 1) throw new Error('Collected row identity is missing or ambiguous; reload before editing.');
+      if (!sourceRows(form).some(row => row.id === id)) throw new Error('Collected source row is unavailable; reload before editing.');
       // VegRecord omits nil Collected; the empty string remains a distinct value.
       const stored = rows[0].collected ?? null;
-      collectedDrafts = stageCollected(collectedDrafts, id, stored);
+      collectedDrafts = stageCollected(collectedDrafts, id, stored, form);
       successMsg = null;
       if (error?.startsWith('Collected ')) error = null;
     } catch (cause) {
@@ -870,12 +877,13 @@
     successMsg = null;
     try {
       const updates = collectedUpdates(collectedDrafts);
+      const sources = updates.map(({ id }) => ({ id, form: collectedDrafts[String(id)].form ?? '' }));
       if (updates.length === 0) { collectedDrafts = {}; successMsg = 'No Collected values changed.'; return; }
       await PlotService.UpdateCollectedRecords(draft.plotNumber, updates);
       committed = true;
       collectedDrafts = {};
       await loadChildData(draft.plotNumber);
-      successMsg = `Saved ${updates.length} Collected row drafts atomically.`;
+      successMsg = [`Saved ${updates.length} Collected row drafts atomically.`, ...aCoverSourceNotices(sources, vegList)].join(' ');
     } catch (cause) {
       if (committed) capabilitiesReady = false;
       error = committed ? `Collected changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
@@ -1020,7 +1028,8 @@
       await loadChildData(draft.plotNumber);
       const observed = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
       if (observed.length !== 1 || observed[0].species !== request.species) throw new Error('Committed creation differs from independently reloaded identity/species.');
-      successMsg = `Vegetation row ${id} created in ${proposed.form}. No Layer or other cover values were inferred.`;
+      const notice = aCoverSourceNotice(proposed.form, id, observed[0]);
+      successMsg = [`Vegetation row ${id} created in ${proposed.form}. No Layer or other cover values were inferred.`, ...(notice ? [notice] : [])].join(' ');
     } catch (cause) {
       if (committed) capabilitiesReady = false;
       error = committed ? `Vegetation creation committed, but refresh or identity verification failed. Reopen the plot before editing: ${String(cause)}`
@@ -1142,7 +1151,7 @@
     successMsg = null;
     try {
       const updates = heightUpdates(heightDrafts);
-      const notices = heightSourceNotices(heightDrafts);
+      const notices = heightSourceNotices(heightDrafts, vegList);
       if (updates.length === 0) { heightDrafts = {}; successMsg = 'No height values changed.'; return; }
       await PlotService.UpdateVegetationNumbers(draft.plotNumber, vegetationNumberUpdates(heightDrafts));
       committed = true;
@@ -1795,6 +1804,7 @@
       <div class="species-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Species draft controls">
         {#if savedPersonalCodes.length}<p role="status">Saved personal definitions: {savedPersonalCodes.join(', ')}. Plot Undo does not remove these user-database records.</p>{/if}
         <span>Species drafts are unsubmitted. Switching tabs or cover/height views never saves them; other editing waits.</span>
+        {#each speciesNotices as message}<p class="mt-2 font-medium" role="status">{message}</p>{/each}
         <div class="flex gap-2 mt-2">
           <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={speciesEditingDisabled || speciesInvalid.length > 0} onclick={() => void saveSpeciesDrafts()}>Save species drafts</button>
           <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy || personalDraft !== null} onclick={cancelSpeciesDrafts}>Cancel species drafts</button>
@@ -1894,6 +1904,7 @@
     {#if collectedUnsaved}
       <div class="collected-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Collected draft controls">
         <span>Collected drafts are unsubmitted. Switching tabs or cover/height views never saves them; other editing waits.</span>
+        {#each collectedNotices as message}<p class="mt-2 font-medium" role="status">{message}</p>{/each}
         <div class="flex gap-2 mt-2">
           <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={collectedEditingDisabled} onclick={() => void saveCollectedDrafts()}>Save Collected drafts</button>
           <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelCollectedDrafts}>Cancel Collected drafts</button>
@@ -1935,6 +1946,7 @@
         <h3 class="mb-2 font-semibold">New vegetation record - {creationDraft.form} - not yet saved</h3>
         {#if savedPersonalCodes.length}<p class="mb-2" role="status">Saved personal definitions: {savedPersonalCodes.join(', ')}. Cancelling this new-row proposal never removes these user-database records.</p>{/if}
         {#if creationInvalid.length}<p class="mb-2 text-red-700" role="alert">{creationInvalid[0]}</p>{/if}
+        {#if creationNotice}<p class="mb-2 font-medium" role="status">{creationNotice}</p>{/if}
         <label class="mb-2 flex flex-col gap-1" for="creation-species">Species code
           <input id="creation-species" class="rounded border bg-white px-2 py-2" type="text" value={creationDraft.species} list="creation-species-list"
             disabled={busy || headerWorkflowBusy || personalDraft !== null} aria-invalid={creationSpeciesInvalid !== null}

@@ -1022,6 +1022,40 @@ byte unchanged. Owned9884/12208 exited;9392 closed. Exact accepted bytes are pro
 archives/cover-notices-checkpoint preserves them and previous50866a49 builds with
 hashes. Do not replay completed cover-notices.py modes.
 
-Remaining A/A-height warnings, deliberate navigation, parent species checking,
+Remaining deliberate navigation, parent species checking,
 project metadata and profiling remain active deliverables. Neither unreachable
 metadata/merge code nor blanket personal-definition cleanup becomes a requirement.
+
+### Shared A/A-height cover-warning checkpoint
+
+The exported AfterUpdate concatenates Cover1/2/3/TotalA/Cover4/5/TotalB and warns
+when the result is NULL. VBA's [documented ampersand semantics](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/ampersand-operator)
+make this an all-seven-NULL test, not a sum/positive-cover rule. Zero is a value;
+heights do not substitute for cover. The shared desktop helper merges only changed
+numeric drafts with the complete original row and also covers Species, Collected
+and opt-in height-only creation. Malformed/no-op drafts do not create numeric
+notices. Collected keeps its original source form through remount/alternate-view
+clicks without adding it to the backend transport. Notices do not block Save or
+infer cover/Layer/delete records. Successful Species/Collected/creation feedback
+uses independently reloaded physical rows; explicit Save replaces Access's
+automatic next-record/focus navigation.
+
+All256 A/A-height cover-presence combinations plus NULL/zero/heights, identity,
+remount/correction and shared workflow wiring are tested. Focused coupled Go3.833s/
+full race460.449s,207 frontend tests/check0/0/core+default builds pass. Native core
+a13aca2c... passes nine cases, changing only ID7 Species/Height1/Collected and
+creating ID10 with explicit Species/Height1. Five project audits/zero user writes;
+all old tables/history/other fields/reservations/schema/support/config are preserved.
+Independent defaultcddefe55... proves25 labelled numeric controls/Species/Collected,
+disabled unfinished workflows and every fixture byte unchanged. Owned7548/7260
+exited;9392 closed. Exact default is promoted; core/default/previous20a6c3e7 and
+receipts are archived with hashes in archives/a-cover-notices-checkpoint. Do not
+replay completed a-cover-notices.py modes.
+
+Parent code checking is next: the source parent call scans the project or selected
+SU, not merely the visible plot. Source Change All broadens to the entire project,
+and Ignore All writes temporary LifeForm999 user definitions that Close/completion
+blanket-delete. Desktop review must name its scope, make replacement explicit and
+transactional, retain runtime-only ignore decisions and never write/delete those
+temporary user definitions. This is an intentional safety adaptation, not parity
+proof from the R precedent.

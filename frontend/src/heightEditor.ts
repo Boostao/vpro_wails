@@ -18,6 +18,23 @@ export interface HeightCell {
   error: string | null;
 }
 export type HeightDrafts = Record<string, Partial<Record<HeightField, HeightCell>>>;
+type CoverValues = Partial<Record<HeightField, number | null>>;
+export interface CoverSourceEdit { id: number; form: string; values?: CoverValues }
+export type CoverSourceRow = CoverValues & { id: number };
+export function aCoverSourceNotice(form: string, id: number | string, values: CoverValues): string | null {
+  return (form === 'SubVegAXL_BC' || form === 'SubVegAhtXL') &&
+    heightFields.slice(0, 7).every(field => values[field] == null)
+    ? `Vegetation row ${id}: all A/B cover values are NULL. No cover value is inferred; the vegetation record is not deleted.` : null;
+}
+export function aCoverSourceNotices(edits: readonly CoverSourceEdit[], rows: readonly CoverSourceRow[]): string[] {
+  return [...new Set(edits.flatMap(edit => {
+    if (edit.form !== 'SubVegAXL_BC' && edit.form !== 'SubVegAhtXL') return [];
+    const matching = rows.filter(row => row.id === edit.id);
+    if (matching.length !== 1) throw new Error('Cover notice source row is missing or ambiguous; reload before editing.');
+    const notice = aCoverSourceNotice(edit.form, edit.id, { ...matching[0], ...edit.values });
+    return notice ? [notice] : [];
+  }))];
+}
 export function heightField(column: string): HeightField | undefined {
   return heightFields.find(field => field.toLowerCase() === column.toLowerCase());
 }
@@ -44,13 +61,23 @@ export function heightErrors(drafts: HeightDrafts): string[] {
 export function heightDirty(drafts: HeightDrafts): boolean {
   return Object.values(drafts).some(row => Object.values(row).some(cell => cell && (cell.error !== null || cell.value !== cell.expected)));
 }
-export function heightSourceNotices(drafts: HeightDrafts): string[] {
-  return Object.entries(drafts).flatMap(([id, row]) => {
+export function heightSourceNotices(drafts: HeightDrafts, rows?: readonly CoverSourceRow[]): string[] {
+  const notices = Object.entries(drafts).flatMap(([id, row]) => {
     const cover = row.cover6;
     return cover && (cover.form === 'SubVegCXL' || cover.form === 'SubVegChtXL') &&
       cover.error === null && cover.expected !== null && cover.value === null
       ? [`Vegetation row ${id}: Cover6 is NULL. Saving removes this row from C and C-height views; it does not delete the vegetation record.`] : [];
   });
+  if (rows) {
+    const edits = Object.entries(drafts).flatMap(([id, row]) => {
+      if (Object.values(row).some(cell => cell?.error !== null)) return [];
+      const changed = Object.entries(row).filter(([, cell]) => cell && cell.value !== cell.expected);
+      const form = changed.find(([, cell]) => cell?.form === 'SubVegAXL_BC' || cell?.form === 'SubVegAhtXL')?.[1]?.form;
+      return form ? [{ id: Number(id), form, values: Object.fromEntries(changed.map(([field, cell]) => [field, cell?.value])) }] : [];
+    });
+    notices.push(...aCoverSourceNotices(edits, rows));
+  }
+  return notices;
 }
 export function heightUpdates(drafts: HeightDrafts): HeightUpdate[] {
   const errors = heightErrors(drafts);

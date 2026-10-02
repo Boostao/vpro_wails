@@ -23,7 +23,7 @@
     onattributestage?: (id: number, column: string, value: string) => void;
     attributeDrafts?: VegetationAttributeDrafts;
     attributeSuggestions?: SoilSuggestion[];
-    oncollectedstage?: (id: number) => void;
+    oncollectedstage?: (id: number, form: string) => void;
     collectedDrafts?: CollectedDrafts;
     collectedDisabled?: boolean;
     onspeciesstage?: (form: string, id: number, raw: string) => void;
@@ -80,7 +80,7 @@
               disabled={collectedDisabled || control.locked || !control.enabled}
               aria-label={`Cycle Collected, row ${row.id}`}
               title="Click to cycle NULL -> C -> V -> NULL. Other stored values are unchanged."
-              onclick={() => oncollectedstage?.(row.id)}>{(collected ? collected.value : value) ?? 'NULL'}</button>
+              onclick={() => oncollectedstage?.(row.id, name)}>{(collected ? collected.value : value) ?? 'NULL'}</button>
           {:else if mapped && onattributestage && attribute && control.column}
             {@const listId = `veg-attribute-${row.id}-${attribute.key}`}
             <input class="source-cell" type="text" inputmode="numeric"
