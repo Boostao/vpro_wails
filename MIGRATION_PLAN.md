@@ -532,4 +532,25 @@ VLists export for nonempty metadata and normalized BOOLEAN values. This comparis
 does not prove NULL/empty-string equivalence; retain both distinctions in transport.
 FecalAbundance intentionally uses MycelAbundance suggestions;
 RootsAbundance/RootsSize are textboxes, not invented restricted combos.
+Humus12/Mineral18 physical save/restoration guards are implemented and
+native-verified: nullable TEXT bounds in UTF-16 units, unrestricted valid Unicode
+MEMO, Single finite/range and signed16 Integer checks. Share Other's physical
+text validator and existing Single/Integer mechanisms; do not inherit parent
+code membership/nonempty rules or invent pH, percentage, depth or total limits.
+Every source text token is checked before JSON decoder repair, including
+duplicate/case-folded keys. Explicit Unicode-folded NULL remains supplied.
+Unchanged historical invalid values are omitted from assignments; new invalid
+values and fresh restoration targets are rejected across accepted aliases.
+Shared fixtures now use source-sized text, preserving typed roundtrip, identity,
+audit thresholds, NULL and rollback assertions rather than relaxing guards.
+Focused integration74.994s/full Go race432.476s;168 frontend tests/check0/0;
+actual scoped Wails rejects
+24 requests without mutations and proves historical omission/audit rollback/retry,
+with exactly two intended RootsSize edits/audits. Evidence/private/native-soil-domain
+retains one disposable fixture and the sealed ordering fallback; exact accepted
+payload5d69931d... is promoted with native owner/inspector closed.
+This is backend protection, not complete soil editor delivery: persistent
+conflict-checked multirow drafts, reference suggestions and Save/Undo/Lock/close/
+context lifecycle for all soil cells remain the next bounded implementation.
+Do not enable new soil cells merely because their storage/domain is mapped.
 The original42-field checklist is frozen evidence, not current coverage.

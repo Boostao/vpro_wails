@@ -108,7 +108,16 @@ func decodeChildJSON(data []byte, record any) (map[string]bool, error) {
 	}
 	present := make(map[string]bool, len(properties))
 	for key := range properties {
-		present[strings.ToLower(key)] = true
+		name := key
+		fields := reflect.TypeOf(record).Elem()
+		for i := 0; i < fields.NumField(); i++ {
+			tag := strings.Split(fields.Field(i).Tag.Get("json"), ",")[0]
+			if tag != "" && strings.EqualFold(key, tag) {
+				name = tag
+				break
+			}
+		}
+		present[strings.ToLower(name)] = true
 	}
 	return present, nil
 }
@@ -127,6 +136,9 @@ func (r *VegRecord) UnmarshalJSON(data []byte) error {
 
 func (r *HumusRecord) UnmarshalJSON(data []byte) error {
 	type plain HumusRecord
+	if err := validateJSONTextProperties(data, soilChildJSONTextNames("Humus", HumusRecord{})); err != nil {
+		return err
+	}
 	var decoded plain
 	present, err := decodeChildJSON(data, &decoded)
 	if err != nil {
@@ -139,6 +151,9 @@ func (r *HumusRecord) UnmarshalJSON(data []byte) error {
 
 func (r *MineralRecord) UnmarshalJSON(data []byte) error {
 	type plain MineralRecord
+	if err := validateJSONTextProperties(data, soilChildJSONTextNames("Mineral", MineralRecord{})); err != nil {
+		return err
+	}
 	var decoded plain
 	present, err := decodeChildJSON(data, &decoded)
 	if err != nil {
@@ -405,6 +420,9 @@ func (s *PlotService) saveChild(kind string, record any, mode childSaveMode) err
 		if kind == "Veg" && heightProperties[childJSONKey(value, field)] {
 			continue
 		}
+		if kind == "Humus" || kind == "Mineral" {
+			continue
+		}
 		if number, ok := childValue(value, field).(float64); ok && (math.IsNaN(number) || math.IsInf(number, 0)) {
 			return fmt.Errorf("%s.%s must be finite", kind, field.column)
 		}
@@ -515,7 +533,7 @@ func (s *PlotService) saveChild(kind string, record any, mode childSaveMode) err
 			}
 		}
 	}
-	if kind == "Other" && !deleting {
+	if (kind == "Other" || kind == "Humus" || kind == "Mineral") && !deleting {
 		var changedFields []childField
 		var changedColumns []string
 		var changedBefore, changedAfter []any
@@ -523,7 +541,7 @@ func (s *PlotService) saveChild(kind string, record any, mode childSaveMode) err
 			if !creating && reflect.DeepEqual(before[i], after[i]) {
 				continue
 			}
-			if err := validateOtherField(field.column, after[i]); err != nil {
+			if err := validateChildField(kind, field.column, after[i]); err != nil {
 				return err
 			}
 			changedFields = append(changedFields, field)

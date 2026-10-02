@@ -62,7 +62,7 @@ func TestPlotChild_ExplicitZeroIDUpdate(t *testing.T) {
 			}
 			field := childFields[kind][len(childFields[kind])-1]
 			want := childValue(record, field)
-			editChildMember(record.FieldByName(field.member))
+			editChildMember(record.FieldByName(field.member), kind, field)
 			if err := updateChildRecord(s, record); err == nil {
 				t.Fatal("zero-ID update escaped failing audit trigger")
 			}

@@ -37,6 +37,13 @@ func childFixture(t *testing.T) (*PlotService, *sql.DB) {
 	return service, db
 }
 
+func childFixtureText(kind, column, text string) string {
+	if maximum := soilChildTextMaximum[kind][column]; maximum > 0 && len(text) > maximum {
+		return text[:maximum]
+	}
+	return text
+}
+
 func childRecord(kind, plot string, id int64, full bool) reflect.Value {
 	var record any
 	switch kind {
@@ -68,7 +75,7 @@ func childRecord(kind, plot string, id int64, full bool) reflect.Value {
 			case reflect.Bool:
 				data.Elem().SetBool(i%2 == 0)
 			default:
-				data.Elem().SetString("old-'quoted'")
+				data.Elem().SetString(childFixtureText(kind, field.column, "old-'quoted'"))
 			}
 			member.Set(data)
 			present[strings.ToLower(childJSONKey(value, field))] = true
@@ -101,7 +108,7 @@ func childStoredColumn(kind string, field childField) string {
 	return column
 }
 
-func editChildMember(member reflect.Value) {
+func editChildMember(member reflect.Value, kind string, field childField) {
 	if member.Kind() == reflect.Pointer {
 		member = member.Elem()
 	}
@@ -113,7 +120,7 @@ func editChildMember(member reflect.Value) {
 	case reflect.Bool:
 		member.SetBool(!member.Bool())
 	default:
-		member.SetString("new-'quoted'")
+		member.SetString(childFixtureText(kind, field.column, "new-'quoted'"))
 	}
 }
 
@@ -254,7 +261,7 @@ func TestPlotChild_FieldAuditAndNullThresholds(t *testing.T) {
 				}
 				checkChildAudits(t, s, kind, id, nil, nil)
 				for _, field := range childFields[kind] {
-					editChildMember(record.FieldByName(field.member))
+					editChildMember(record.FieldByName(field.member), kind, field)
 				}
 				edited := childValues(kind, record)
 				if err := saveChildRecord(s, record); err != nil {
@@ -546,7 +553,7 @@ func TestPlotChild_TriggerRollback(t *testing.T) {
 					clearChildAudit(t, db)
 					original := childValues(kind, record)
 					for _, field := range childFields[kind] {
-						editChildMember(record.FieldByName(field.member))
+						editChildMember(record.FieldByName(field.member), kind, field)
 					}
 					var trigger string
 					if failing == "audit" {

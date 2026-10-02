@@ -181,7 +181,7 @@ func TestPlotRestore_AllVerifiedFieldsTypedRoundTrip(t *testing.T) {
 				var after any
 				switch member.Kind() {
 				case reflect.String:
-					after = "after-'quoted'"
+					after = childFixtureText(kind, field.column, "after-'quoted'")
 				case reflect.Float64:
 					after = -1.125
 				case reflect.Int:

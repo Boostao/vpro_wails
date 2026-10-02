@@ -8,8 +8,6 @@ import (
 	"reflect"
 	"strings"
 	"time"
-	"unicode/utf16"
-	"unicode/utf8"
 )
 
 var otherTextMaximum = map[string]int{
@@ -26,14 +24,7 @@ func validateOtherField(column string, value any) error {
 		return nil
 	}
 	if maximum, text := otherTextMaximum[column]; text {
-		entry, ok := value.(string)
-		if !ok || !utf8.ValidString(entry) {
-			return fmt.Errorf("Other.%s requires nullable valid Unicode text", column)
-		}
-		if len(utf16.Encode([]rune(entry))) > maximum {
-			return fmt.Errorf("Other.%s exceeds %d UTF-16 units", column, maximum)
-		}
-		return nil
+		return validateChildPhysicalText("Other."+column, value, maximum)
 	}
 	switch column {
 	case "UserFlag1", "UserFlag2", "UserFlag3":

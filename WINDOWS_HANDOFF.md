@@ -37,15 +37,26 @@ between shells.
   all25 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
-  contain the same native-verified Other plus source soil-order payload:
-  `643bed0a7e9e47ef4555b0065b2966653df5b6ec13ddebd5b569de213b94e5dd`.
+  contain the same native-verified Other plus source soil-order/domain payload:
+  `5d69931dcc486dfbde65f8ec57602d0ab3b3929b34ebbe8f948e5b833dacd5b3`.
   Humus UpperDepth DESC/Mineral ASC, deterministic ID ties and missing-column
-  fallback pass focused tests7.074s/full race408.049s. Actual Wails verifies both
+  fallback pass focused tests7.074s. Actual Wails verifies both
   visible orders initially and after tab remount, preserving all15 original
   tables/history and project/support/configuration bytes with zero audits.
   Evidence/promotion: `evidence/private/native-soil-order`; owned PID3600 exited,
   inspector9392 closed. Other payload5975b991... is sealed there before rebuilding.
   Frontend/bindings are unchanged; exact embedded frontend assets were checked.
+  Source physical guards cover all
+  Humus12/Mineral18 mapped fields, raw JSON Unicode/presence and fresh restoration
+  aliases, reusing shared text/Single/Integer helpers and omitting unchanged
+  historical assignments. Focused integration74.994s, full Go race432.476s and
+ 168 frontend tests/check0/0 pass; exact old frontend
+  assets remain embedded. Native-domain evidence rejects24 requests, retains
+  all15 original tables/34 historical audits and only two intended RootsSize edits/
+  audits; fixture ledger and support/configuration remain unchanged.
+  Owned PID12124 exited; inspector9392 closed. Exact tested payload is promoted.
+  Evidence/promotion/ordering fallback: `evidence/private/native-soil-domain`; full soil persistent
+  draft/suggestion/lifecycle editing remains incomplete and no new cells enabled.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.

@@ -290,7 +290,7 @@ func TestPlotChild_UnboundColumnsStayExcluded(t *testing.T) {
 			}
 			clearChildAudit(t, db)
 			for _, field := range childFields[kind] {
-				editChildMember(record.FieldByName(field.member))
+				editChildMember(record.FieldByName(field.member), kind, field)
 			}
 			if err := updateChildRecord(s, record); err != nil {
 				t.Fatal(err)
