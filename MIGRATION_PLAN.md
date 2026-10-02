@@ -32,7 +32,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
 | 5 | Complete bounded FS882 parent field editing (complete98/98) | All98 mapped parent fields have a native-verified writable baseline, including source-authorized BEC Master, strict SoilDrainage and final X/Y/Photo scalars. This is not full form/application parity; picture management, projection, bulk/reverse copying and remaining child/calculation events stay separately scoped and unavailable until verified. |
-| 6 | Complete FS882 child workflows (in progress; Other complete) | Other's eight source-bound cells and create/delete/draft lifecycle are native-verified. Finish vegetation/species/cover/height, Humus and Mineral actual add/edit/delete/validation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
+| 6 | Complete FS882 child workflows (in progress; Other and soil complete) | Other8, Humus12 and Mineral18 source-bound cells and create/delete/draft lifecycle are native-verified. Finish vegetation/species/cover/height and calculation/filtering behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
 | 9 | Implement reports, maps and remaining active modules | Source-driven templates, preview/export, filters, offline assets and administration. Inventory all active entry points; keep placeholders disabled. |
@@ -514,11 +514,11 @@ optout builds; bindings15/108/36. Focused integration15.970s, initial full race
 495.442s and final-source full race418.460s pass. Final native-verified production
 payload5975b991... is promoted; sealed parent fallback retained.
 
-Next bounded groups: Humus12 and Mineral18 actual source-bound fields, including
-physical numeric/text domains, depth row order, nullable codes/suggestions and
-shared persistent drafts. Vegetation species/membership/cover/calculation events
-remain a distinct workflow, not incidental text editing. Storage-bound coverage
-alone never enables unmigrated columns, pictures or bulk operations.
+Humus12 and Mineral18 source-bound fields now have complete physical domains,
+source depth ordering, nullable canonical suggestions and persistent drafts.
+Vegetation species/membership/cover/calculation events remain the next distinct
+workflow, not incidental text editing. Storage-bound coverage alone never enables
+unmigrated columns, pictures or bulk operations.
 Preserve the exported ordering difference: Humus UpperDepth DESC, Mineral
 UpperDepth ASC. This ordering is implemented/native-verified, including visible
 rows after tab remount; ID breaks equal-depth ties deterministically as a desktop
@@ -548,9 +548,40 @@ actual scoped Wails rejects
 24 requests without mutations and proves historical omission/audit rollback/retry,
 with exactly two intended RootsSize edits/audits. Evidence/private/native-soil-domain
 retains one disposable fixture and the sealed ordering fallback; exact accepted
-payload5d69931d... is promoted with native owner/inspector closed.
-This is backend protection, not complete soil editor delivery: persistent
-conflict-checked multirow drafts, reference suggestions and Save/Undo/Lock/close/
-context lifecycle for all soil cells remain the next bounded implementation.
-Do not enable new soil cells merely because their storage/domain is mapped.
+payload5d69931d... is archived as the domain fallback with owner/inspector closed.
+
+Complete soil editor delivery is native-verified and enabled by default, with
+`VITE_SOIL_CHILD_EDITING=false` as an explicit read-only opt-out. All30 source
+fields have one labelled live control, persistent raw numeric/text/memo drafts,
+independent errors and expected-value patches. Other and soil reuse one atomic
+transaction writer; soil batches span both tables and multiple rows, including
+audit, ownership, stale-cell and physical-domain checks. Save/Undo/Cancel/Lock,
+native close, context switching and unrelated mutations share the draft gates.
+Committed writes clear drafts before refresh; refresh failures explicitly report
+committed status and disable capabilities rather than inviting replay.
+
+Suggestions come from the pinned readonly SQLite-family USysTableOfLists view
+through cancellable scoped operations. All10 nullable metadata fields and
+duplicates are retained, BOOLEAN reads normalized, and missing groups fail
+explicitly. Reload/Retry retains drafts. No derived editor catalogue replaces the
+database family. Raw-case/nonmembership acceptance remains an explicit desktop
+policy, not proof of omitted Access effective combo properties. Clearing text
+submits NULL; memo newlines are retained. Creation retains the bounded dialog
+with optional fields editable afterwards. Deleted-ID reservations and audit
+behavior remain desktop safety adaptations.
+
+Focused Go integration1.853s, core race456.021s and final race428.787s pass;
+173 frontend tests/check0/0/default+opt-out builds and bindings15/111/40 pass.
+Actual Wails core evidence verifies12 cases/39 intended audits: all30 fields,
+cross-table/multirow Save and NULL, persistent hidden errors, remount/Undo,
+create, owned cancelled/accepted delete, ID nonreuse and Lock without phantom
+history. Final default-on delivery adds exactly two independent-client audits
+and proves stale rejection, audit rollback and reference failure/Retry retain
+drafts, plus malformed patch Unicode rejection. All15 original tables/32 old
+audits, fixture schema/ledger and support/config/external bytes are preserved
+except the explicitly expected core changes. Owned core PID11148 and final
+PID6780 exited; inspector9392 is closed. Evidence/private/native-soil-editor
+holds the completed fixture, accepted core86032440... and domain fallback.
+Exact final native-tested payload96697f18... is promoted. Do not replay completed
+proofs or treat completed soil cells as vegetation/calculation acceptance.
 The original42-field checklist is frozen evidence, not current coverage.

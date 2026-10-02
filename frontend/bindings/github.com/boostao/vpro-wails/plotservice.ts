@@ -214,6 +214,10 @@ export function UpdatePlot(h: $models.FS882Header): $CancellablePromise<void> {
     return $Call.ByID(2912839176, h);
 }
 
+export function UpdateSoilRecords(plot: string, updates: $models.SoilRecordUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(2904892086, plot, updates);
+}
+
 /**
  * UpdateVegRecord replaces one existing plot/ID pair, including imported ID=0.
  */

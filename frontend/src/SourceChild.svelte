@@ -3,8 +3,10 @@
   import { controlLabel } from './formPresentation';
   import { heightField, type HeightDrafts } from './heightEditor';
   import { otherField, type OtherDrafts, type OtherValue } from './otherEditor';
+  import { soilField, soilCell, type SoilDrafts, type SoilKind } from './soilChildEditor';
+  import type { SoilSuggestion } from '../bindings/github.com/boostao/vpro-wails';
   type Row = { id: number; values: Record<string, string | number | boolean | null | undefined> };
-  let { name, rows, disabled = true, deleteDisabled = false, revision = 0, onedit, ondelete, onstage, drafts = {}, onotherstage, otherDrafts = {} }: {
+  let { name, rows, disabled = true, deleteDisabled = false, revision = 0, onedit, ondelete, onstage, drafts = {}, onotherstage, otherDrafts = {}, onsoilstage, soilDrafts = {}, soilSuggestions = [] }: {
     name: string; rows: Row[]; disabled?: boolean; revision?: number;
     onedit?: (name: string, id: number, column: string, value: string) => Promise<void>;
     ondelete?: (name: string, id: number) => Promise<void>;
@@ -12,9 +14,13 @@
     drafts?: HeightDrafts;
     onotherstage?: (id: number, column: string, value: OtherValue) => void;
     otherDrafts?: OtherDrafts;
+    onsoilstage?: (kind: SoilKind, id: number, column: string, value: string) => void;
+    soilDrafts?: SoilDrafts;
+    soilSuggestions?: SoilSuggestion[];
     deleteDisabled?: boolean;
   } = $props();
   const source = $derived(paperChild(name));
+  const soilKind = $derived(name === 'SoilHumusXL' ? 'Humus' : name === 'SoilMineralXL' ? 'Mineral' : null);
   const columns = $derived(source.controls.filter(control => !['Label', 'Rectangle', 'OptionGroup'].includes(control.type))
     .sort((a, b) => a.tabOrder - b.tabOrder));
   const numeric = new Set(['cover1', 'cover2', 'cover3', 'totala', 'cover4', 'cover5', 'totalb', 'cover6', 'cover7', 'cover8', 'cover9', 'upperdepth', 'lowerdepth', 'humusformph']);
@@ -42,8 +48,33 @@
           {@const staged = stagedField ? drafts[String(row.id)]?.[stagedField] : undefined}
           {@const other = name === 'SubOtherXL' && control.column ? otherField(control.column) : undefined}
           {@const otherStaged = other ? otherDrafts[String(row.id)]?.[other.key] : undefined}
+          {@const soil = soilKind && control.column ? soilField(soilKind, control.column) : undefined}
+          {@const soilStaged = soilKind && soil ? soilCell(soilDrafts, soilKind, row.id, soil.key) : undefined}
           <td>
-          {#if mapped && onotherstage && other && control.column}
+          {#if mapped && onsoilstage && soilKind && soil && control.column}
+            {@const listId = `soil-${name}-${row.id}-${soil.key}`}
+            {#if soil.kind === 'memo'}
+              <textarea class="source-cell" rows="2" value={soilStaged ? soilStaged.raw : String(value ?? '')}
+                disabled={disabled || control.locked || !control.enabled} aria-invalid={soilStaged?.error != null}
+                aria-label={`${controlLabel(control)}, row ${row.id}`} data-column={control.column}
+                title={soilStaged?.error ?? 'Unsubmitted draft: use Save soil drafts or Cancel soil drafts'}
+                oninput={event => onsoilstage?.(soilKind, row.id, control.column ?? '', event.currentTarget.value)}></textarea>
+            {:else}
+              <input class="source-cell" type="text" inputmode={soil.kind === 'single' ? 'decimal' : soil.kind === 'integer' ? 'numeric' : undefined}
+                value={soilStaged ? soilStaged.raw : value ?? ''} list={soil.group ? listId : undefined}
+                disabled={disabled || control.locked || !control.enabled} aria-invalid={soilStaged?.error != null}
+                aria-label={`${controlLabel(control)}, row ${row.id}`} data-column={control.column}
+                title={soilStaged?.error ?? 'Unsubmitted draft: use Save soil drafts or Cancel soil drafts'}
+                oninput={event => onsoilstage?.(soilKind, row.id, control.column ?? '', event.currentTarget.value)} />
+              {#if soil.group}
+                <datalist id={listId}>
+                  {#each soilSuggestions.filter(entry => entry.listName === soil.group && entry.item !== null) as entry, index (index)}
+                    <option value={entry.item ?? ''}>{entry.itemDescription ?? ''}</option>
+                  {/each}
+                </datalist>
+              {/if}
+            {/if}
+          {:else if mapped && onotherstage && other && control.column}
             {#if other.kind === 'flag'}
               {@const flagValue = otherStaged ? otherStaged.value : value}
               <input class="source-cell" type="checkbox" checked={flagValue === true} indeterminate={flagValue == null}

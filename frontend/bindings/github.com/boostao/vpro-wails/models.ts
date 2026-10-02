@@ -484,6 +484,36 @@ export interface SoilCodeChoice {
     "diagnostic": string;
 }
 
+export interface SoilNumberUpdate {
+    "value": number | null;
+    "expected": number | null;
+}
+
+export interface SoilRecordUpdate {
+    "kind": string;
+    "id": number;
+    "text": { [_ in string]?: SoilTextUpdate } | null;
+    "numbers": { [_ in string]?: SoilNumberUpdate } | null;
+}
+
+export interface SoilSuggestion {
+    "listName": string | null;
+    "listFilter": string | null;
+    "itemOrder": number | null;
+    "item": string | null;
+    "itemDescription": string | null;
+    "fieldUsedIn": string | null;
+    "validateLoops": string | null;
+    "validate": boolean | null;
+    "note": string | null;
+    "flag": boolean | null;
+}
+
+export interface SoilTextUpdate {
+    "value": string | null;
+    "expected": string | null;
+}
+
 export interface SpeciesItem {
     "code": string;
     "scientificName": string;

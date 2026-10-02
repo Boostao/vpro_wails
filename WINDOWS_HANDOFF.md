@@ -34,29 +34,29 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all25 editor operations to immutable identities, leases running operations and
+  all29 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
-  contain the same native-verified Other plus source soil-order/domain payload:
-  `5d69931dcc486dfbde65f8ec57602d0ab3b3929b34ebbe8f948e5b833dacd5b3`.
-  Humus UpperDepth DESC/Mineral ASC, deterministic ID ties and missing-column
-  fallback pass focused tests7.074s. Actual Wails verifies both
-  visible orders initially and after tab remount, preserving all15 original
-  tables/history and project/support/configuration bytes with zero audits.
-  Evidence/promotion: `evidence/private/native-soil-order`; owned PID3600 exited,
-  inspector9392 closed. Other payload5975b991... is sealed there before rebuilding.
-  Frontend/bindings are unchanged; exact embedded frontend assets were checked.
-  Source physical guards cover all
-  Humus12/Mineral18 mapped fields, raw JSON Unicode/presence and fresh restoration
-  aliases, reusing shared text/Single/Integer helpers and omitting unchanged
-  historical assignments. Focused integration74.994s, full Go race432.476s and
- 168 frontend tests/check0/0 pass; exact old frontend
-  assets remain embedded. Native-domain evidence rejects24 requests, retains
-  all15 original tables/34 historical audits and only two intended RootsSize edits/
-  audits; fixture ledger and support/configuration remain unchanged.
-  Owned PID12124 exited; inspector9392 closed. Exact tested payload is promoted.
-  Evidence/promotion/ordering fallback: `evidence/private/native-soil-domain`; full soil persistent
-  draft/suggestion/lifecycle editing remains incomplete and no new cells enabled.
+  contain the same native-verified complete Other plus Humus12/Mineral18 editor:
+  `96697f181b8b503b31be47435405e70e10e83c6ca7e2b359510c6947dce3ce55`.
+  Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
+  Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
+  omission remain intact. Shared expected-value transactions span rows/tables
+  and audits. All30 controls retain raw numeric/text/memo errors across remounts
+  and gate Save/Undo/Cancel/Lock/close/context/unrelated writes. Canonical-family
+  nullable suggestions retain duplicates; Reload/Retry retains drafts.
+  Focused Go1.853s/core race456.021s/final race428.787s pass;173 frontend tests,
+  check0/0/default+opt-out builds; bindings15 services/111 methods/40 models.
+  Evidence: `evidence/private/native-soil-editor`. Core12 cases/39 intended audits
+  plus final default delivery/two independent-client audits verify all fields,
+  NULL, stale rejection, rollback, reference failure/Retry, hidden errors,
+  create/delete/ID reservation and Lock without phantom history. All15 original
+  tables/32 old audits and expected-only fixture changes are checked; schema,
+  support/config/external bytes restored. Owned core PID11148/final PID6780
+  exited; inspector9392 closed. Completed proofs must not be replayed.
+  Accepted core86032440... and domain5d69931d... executables are sealed there.
+  Earlier ordering/domain evidence remains preserved in native-soil-order and
+  native-soil-domain. Canonical Sample hash remains e63f0c2a....
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -420,8 +420,8 @@ The fourteen ordinary surveyor/depth/cover/note fields are now native-verified.
 The two nullable flags, strict SoilDrainage, source-authorized BEC Master and
 final X/Y/Photo scalar batch complete the98-field writable parent baseline.
 Continue actual FS882 child workflows, not another parent-field inventory.
-Other's eight-field workflow is verified/promoted; continue Humus/Mineral and
-distinct vegetation/species/cover events.
+Other8/Humus12/Mineral18 workflows are verified/promoted; continue distinct
+vegetation/species/cover/height and calculation events.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage's explicit LimitToList=NotDefault now has a separately verified

@@ -8,6 +8,7 @@
     type HumusRecord,
     type MineralRecord,
     type OtherRecord,
+    type SoilSuggestion,
     type AuditEntry,
     type ListItem,
     type SpeciesItem
@@ -29,6 +30,7 @@
   import type { EditorCloseState } from './closeLifecycle';
   import { heightField, stageHeight, heightDirty, heightErrors, heightUpdates, type HeightDrafts } from './heightEditor';
   import { otherField, stageOther, otherDirty, otherErrors, otherUpdates, type OtherDrafts, type OtherValue } from './otherEditor';
+  import { soilField, stageSoil, soilDirty, soilErrors, soilUpdates, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import type { WorkingUnitSession } from './workingUnitEditor';
   import { onDestroy, untrack, tick } from 'svelte';
   import { bindContextPlots } from './contextPlots';
@@ -70,7 +72,15 @@
   let otherDrafts = $state<OtherDrafts>({});
   const otherUnsaved = $derived(otherDirty(otherDrafts));
   const otherInvalid = $derived(otherErrors(otherDrafts));
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved);
+  const soilEditingEnabled = import.meta.env.VITE_SOIL_CHILD_EDITING !== 'false';
+  let soilDrafts = $state<SoilDrafts>({});
+  const soilUnsaved = $derived(soilDirty(soilDrafts));
+  const soilInvalid = $derived(soilErrors(soilDrafts));
+  let soilSuggestions = $state<SoilSuggestion[]>([]);
+  let soilReferenceReady = $state(false);
+  let soilReferenceBusy = $state(false);
+  let soilReferenceError = $state<string | null>(null);
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -106,11 +116,19 @@
   const newOtherFields = { userItem1: null, userItem2: null, userItem3: null, userFlag1: null, userFlag2: null, userFlag3: null };
   const newVegetationFields = { height1: null, height2: null, height3: null, height4: null, height5: null, height6: null, ll: null, af: null, dc: null, ut: null, vi: null, pv: null, pg: null, ffa: null, cultural1: null, cultural2: null, other1: null, other2: null };
   function openNewChild(kind: 'humus' | 'mineral' | 'other') {
+    if ((kind === 'other' ? otherEditingDisabled || otherUnsaved : soilEditingDisabled || soilUnsaved)) {
+      error = 'Save or cancel drafts and wait for an unlocked, available child workflow before adding a row.';
+      return;
+    }
     error = null;
     newChild = kind;
   }
 
   async function deleteSourceChild(name: string, id: number) {
+    if (childEditingDisabled || (name.startsWith('Soil') && soilEditingDisabled)) {
+      error = 'Save or cancel drafts and wait for an unlocked, available child workflow before deleting a row.';
+      return;
+    }
     if (!window.confirm(`Delete this ${name} record?`)) return;
     if (name.startsWith('SubVeg')) await childOperation(() => PlotService.DeleteVegRecord(draft.plotNumber, id));
     else if (name === 'SoilHumusXL') await childOperation(() => PlotService.DeleteHumusRecord(draft.plotNumber, id));
@@ -300,8 +318,9 @@
 
   let original = $state<FS882Header | null>(null);
   const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null);
-  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved);
-  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved);
+  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved || soilUnsaved);
+  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved);
+  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved);
   const childEditingDisabled = $derived(childParentDisabled || childUnsaved);
   const auditRestoreEnabled = import.meta.env.VITE_AUDIT_RESTORE !== 'false';
   const auditProject = $derived($projectState?.activeProject ?? '');
@@ -384,6 +403,8 @@
     capabilitiesReady = false;
     masterAllowed = false;
     heightDrafts = {};
+    otherDrafts = {};
+    soilDrafts = {};
     vegList = [];
     humusList = [];
     mineralList = [];
@@ -645,6 +666,86 @@
     }
   }
 
+  async function loadSoilSuggestions() {
+    if (!soilEditingEnabled || soilReferenceBusy) return;
+    const request = referenceRequest;
+    soilReferenceBusy = true;
+    soilReferenceReady = false;
+    soilReferenceError = null;
+    try {
+      const rows = await referenceReads.track(PlotService.ListSoilSuggestions());
+      if (request !== referenceRequest) return;
+      if (rows === null) throw new Error('Soil reference metadata was not returned.');
+      soilSuggestions = rows;
+      soilReferenceReady = true;
+    } catch (cause) {
+      if (request === referenceRequest) soilReferenceError = `Soil reference suggestions unavailable: ${String(cause)}`;
+    } finally {
+      if (request === referenceRequest) soilReferenceBusy = false;
+    }
+  }
+
+  $effect(() => { untrack(() => void loadSoilSuggestions()); });
+
+  function stageSoilCell(kind: SoilKind, id: number, column: string, raw: string) {
+    try {
+      if (soilEditingDisabled) throw new Error('Soil editing is unavailable while loading, locked, busy or another draft is unsaved.');
+      const field = soilField(kind, column);
+      if (!field || childCapabilities[kind][field.key] !== true) throw new Error(`Soil column ${column} is unavailable in the active schema.`);
+      const rows = (kind === 'Humus' ? humusList : mineralList).filter(row => row.id === id && row.plotNumber === draft.plotNumber);
+      if (rows.length !== 1) throw new Error('Soil row identity is missing or ambiguous; reload before editing.');
+      const stored = new Map(Object.entries(rows[0])).get(field.key);
+      if (stored !== null && stored !== undefined && typeof stored !== 'string' && typeof stored !== 'number') throw new Error('Soil cell has an unsupported storage type.');
+      soilDrafts = stageSoil(soilDrafts, kind, id, field, raw, stored ?? null);
+      successMsg = null;
+      if (error?.startsWith('Soil ')) error = null;
+    } catch (cause) {
+      error = `Soil draft failed: ${String(cause)}`;
+      childRevision++;
+    }
+  }
+
+  async function cancelSoilDrafts() {
+    if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling soil drafts.'; return; }
+    soilDrafts = {};
+    childRevision++;
+    error = null;
+    successMsg = null;
+    busy = true;
+    try {
+      await loadChildData(draft.plotNumber);
+      successMsg = 'Soil drafts cancelled. Stored data and history were unchanged; current rows reloaded.';
+    } catch (cause) {
+      capabilitiesReady = false;
+      error = `Soil drafts cancelled, but current rows could not be reloaded. Reopen the plot: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function saveSoilDrafts() {
+    if (soilEditingDisabled) { error = 'Save a clean, unlocked header with available references before saving soil drafts.'; return; }
+    let committed = false;
+    busy = true;
+    error = null;
+    successMsg = null;
+    try {
+      const updates = soilUpdates(soilDrafts);
+      if (updates.length === 0) { soilDrafts = {}; successMsg = 'No soil values changed.'; return; }
+      await PlotService.UpdateSoilRecords(draft.plotNumber, updates);
+      committed = true;
+      soilDrafts = {};
+      await loadChildData(draft.plotNumber);
+      successMsg = `Saved ${updates.length} Humus/Mineral row drafts atomically.`;
+    } catch (cause) {
+      if (committed) capabilitiesReady = false;
+      error = committed ? `Soil changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
+        : `Soil save failed; drafts retained: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
   async function editSourceChild(name: string, id: number, column: string, raw: string) {
     const key = column.toLowerCase();
     function numeric() {
@@ -726,6 +827,7 @@
     }
     if (heightUnsaved) { await saveHeightDrafts(); return; }
     if (otherUnsaved) { await saveOtherDrafts(); return; }
+    if (soilUnsaved) { await saveSoilDrafts(); return; }
     const invalid = container.querySelector<HTMLInputElement>('.header-editor input:invalid');
     if (invalid) {
       invalid.reportValidity();
@@ -767,12 +869,14 @@
   }
 
   export function getCloseState(): EditorCloseState {
-    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0;
+    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0;
     const invalidChild = Boolean(container?.querySelector('.source-child input:invalid'));
     const saveReason = busy || headerWorkflowBusy || !capabilitiesReady ? 'Wait for the plot to finish loading or header workflow.'
       : draft.locked ? 'Unlock the plot before saving.'
       : newChild !== null || invalidChild ? 'Finish or cancel child entry before saving and closing.'
       : otherInvalid.length > 0 ? 'Correct invalid Other drafts or Cancel Other drafts before saving.'
+      : soilInvalid.length > 0 ? 'Correct invalid soil drafts or Cancel soil drafts before saving.'
+      : soilUnsaved && (!soilReferenceReady || soilReferenceBusy) ? 'Restore available soil references before saving drafts.'
       : invalid ? 'Correct invalid header inputs or Undo before saving.'
       : !draft.plotNumber.trim() ? 'Plot Number is required before saving.' : '';
     return { unsaved: dirty || childUnsaved || invalid || newChild !== null || invalidChild, busy: busy || headerWorkflowBusy, canSave: saveReason === '', saveReason, error };
@@ -795,6 +899,7 @@
     }
     if (heightUnsaved) { void cancelHeightDrafts(); return; }
     if (otherUnsaved) { void cancelOtherDrafts(); return; }
+    if (soilUnsaved) { void cancelSoilDrafts(); return; }
     if (original) {
       draft = JSON.parse(JSON.stringify(original));
     } else {
@@ -818,6 +923,10 @@
     }
     if (otherUnsaved) {
       error = 'Save or Cancel Other drafts before changing the plot lock.';
+      return;
+    }
+    if (soilUnsaved) {
+      error = 'Save or Cancel soil drafts before changing the plot lock.';
       return;
     }
     if (!draft.locked && dirty) {
@@ -1007,6 +1116,16 @@
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if soilUnsaved}
+      <div class="soil-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Soil draft controls">
+        <span>Humus/Mineral drafts are unsubmitted. Switching tabs never saves them; other editing waits.</span>
+        <div class="flex gap-2 mt-2">
+          <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={soilEditingDisabled || soilInvalid.length > 0} onclick={() => void saveSoilDrafts()}>Save soil drafts</button>
+          <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelSoilDrafts}>Cancel soil drafts</button>
+        </div>
+        {#each soilInvalid as message}<p role="alert">{message}</p>{/each}
+      </div>
+    {/if}
     {#if otherUnsaved}
       <div class="other-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Other draft controls">
         <span>Other drafts are unsubmitted. Switching tabs never saves them; header and other child editing wait.</span>
@@ -1288,10 +1407,17 @@
         </div>
       {/if}
     {:else if activeTab === 'soils'}
+      {#if soilEditingEnabled}
+        {#if soilReferenceBusy}<p role="status">Loading soil reference suggestions...</p>{/if}
+        {#if soilReferenceError}
+          <p role="alert">{soilReferenceError}</p>
+          <button type="button" disabled={busy || soilReferenceBusy || headerWorkflowBusy} onclick={() => void loadSoilSuggestions()}>Retry soil references</button>
+        {/if}
+      {/if}
       {#if !soilCodeEditingEnabled}<SoilCodeReference disabled={busy || headerWorkflowBusy} />{/if}
       <div class="flex gap-2 mb-3 text-xs">
-        <button disabled={childEditingDisabled} onclick={() => openNewChild('humus')}>Add Humus Layer</button>
-        <button disabled={childEditingDisabled} onclick={() => openNewChild('mineral')}>Add Mineral Layer</button>
+        <button disabled={soilEditingDisabled || soilUnsaved} onclick={() => openNewChild('humus')}>Add Humus Layer</button>
+        <button disabled={soilEditingDisabled || soilUnsaved} onclick={() => openNewChild('mineral')}>Add Mineral Layer</button>
       </div>
       <OrdinaryFields bind:draft {original} {capabilities} scope="soils"
         disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
@@ -1316,7 +1442,9 @@
               <SourcePage name="Soil/Terrain" values={sourceHeaderValues} {editor} editors={[...(geologyEditor ? [geologyEditor] : []), ...(parentEditor ? [parentEditor] : []), ...(ordinaryEditor ? [ordinaryEditor] : []), ...(drainageEditor ? [drainageEditor] : [])]}>
                 {#snippet embedded(control)}
                   {@const child = embeddedForm(control.controlId)}
-                  <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={childEditingDisabled} onedit={editSourceChild} ondelete={deleteSourceChild} />
+                  <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={soilEditingDisabled}
+                    deleteDisabled={soilUnsaved} onsoilstage={soilEditingEnabled ? stageSoilCell : undefined}
+                    {soilDrafts} {soilSuggestions} ondelete={deleteSourceChild} />
                 {/snippet}
               </SourcePage>
               {/snippet}
@@ -1329,6 +1457,13 @@
       </DrainageFields>
       {/snippet}
       </OrdinaryFields>
+      {#if soilEditingEnabled}
+        <div class="mt-3 text-xs text-stone-600">
+          <p>Suggestions are optional. Raw text is never completed or case-changed automatically; no soil totals are guessed.</p>
+          <button type="button" class="mt-2 px-2 py-1 border rounded" disabled={busy || soilReferenceBusy || headerWorkflowBusy}
+            onclick={() => void loadSoilSuggestions()}>Reload soil references</button>
+        </div>
+      {/if}
       <details class="mt-4 border border-stone-200 rounded p-3">
         <summary class="text-xs font-semibold cursor-pointer">Experimental soil record actions</summary>
       <div class="space-y-6">
@@ -1339,7 +1474,7 @@
             <button
               type="button"
               onclick={() => openNewChild('humus')}
-              disabled={childEditingDisabled}
+              disabled={soilEditingDisabled || soilUnsaved}
               class="px-2.5 py-1 bg-stone-700 hover:bg-stone-800 text-white rounded text-xs flex items-center gap-1"
             >
               <Plus size={14} /> Add Humus Layer
@@ -1369,7 +1504,7 @@
                       <button
                         type="button"
                         onclick={() => deleteHumus(h.id)}
-                        disabled={childEditingDisabled}
+                        disabled={soilEditingDisabled || soilUnsaved}
                         class="text-red-600 hover:text-red-800 p-1"
                         title="Delete humus row"
                       >

@@ -57,6 +57,7 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 		"save other":     func() error { return service.SaveOtherRecord(stale, OtherRecord{}) },
 		"update other":   func() error { return service.UpdateOtherRecord(stale, OtherRecord{}) },
 		"other drafts":   func() error { return service.UpdateOtherRecords(stale, "stale", nil) },
+		"soil drafts":    func() error { return service.UpdateSoilRecords(stale, "stale", nil) },
 		"delete other":   func() error { return service.DeleteOtherRecord(stale, "stale", 1) },
 		"height":         func() error { return service.UpdateHeightRecords(stale, "stale", nil) },
 		"audit flags":    func() error { return service.SetAuditRestoreSelection(stale, "stale", nil) },
@@ -71,12 +72,14 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 		"humus read":          func() error { _, err := service.ListHumusRecords(context.Background(), stale, "stale"); return err },
 		"mineral read":        func() error { _, err := service.ListMineralRecords(context.Background(), stale, "stale"); return err },
 		"other read":          func() error { _, err := service.ListOtherRecords(context.Background(), stale, "stale"); return err },
+		"soil suggestions":    func() error { _, err := service.ListSoilSuggestions(context.Background(), stale); return err },
 		"audit read":          func() error { _, err := service.ListAuditEntries(context.Background(), stale, "stale"); return err },
 		"switch":              func() error { _, err := service.SwitchContext(stale, contextSelection(current)); return err },
 		"legacy header":       func() error { return service.plots.UpdatePlot(FS882Header{PlotNumber: "stale"}) },
 		"legacy child":        func() error { return service.plots.DeleteVegRecord("stale", 1) },
 		"legacy height":       func() error { return service.plots.UpdateHeightRecords("stale", nil) },
 		"legacy other drafts": func() error { return service.plots.UpdateOtherRecords("stale", nil) },
+		"legacy soil drafts":  func() error { return service.plots.UpdateSoilRecords("stale", nil) },
 		"legacy audit flags":  func() error { return service.plots.SetAuditRestoreSelection("stale", nil) },
 		"legacy restoration": func() error {
 			_, err := service.plots.RestoreSelectedAuditRecords("stale", nil, AuditRestoreRetain)
