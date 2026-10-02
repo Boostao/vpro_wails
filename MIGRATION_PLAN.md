@@ -32,7 +32,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
 | 5 | Complete bounded FS882 parent field editing (complete98/98) | All98 mapped parent fields have a native-verified writable baseline, including source-authorized BEC Master, strict SoilDrainage and final X/Y/Photo scalars. This is not full form/application parity; picture management, projection, bulk/reverse copying and remaining child/calculation events stay separately scoped and unavailable until verified. |
-| 6 | Complete FS882 child workflows (in progress; Other, soil, vegetation attributes and Collected complete) | Other8, Humus12 and Mineral18 source-bound cells and create/delete/draft lifecycle are native-verified; all12 Veg Other attributes have verified existing-row drafts/suggestions/lifecycle. Collected cycles share verified drafts across all five source grids. Finish species/cover/height creation/deletion and calculation/event behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
+| 6 | Complete FS882 child workflows (in progress; Other/soil complete, bounded existing-row vegetation editing verified) | Other8, Humus12 and Mineral18 source-bound cells and create/delete/draft lifecycle are native-verified; all12 Veg Other attributes have verified existing-row drafts/suggestions/lifecycle. Collected, species selection/explicit decisions and source cover/height fields share verified drafts across five grids. Finish vegetation creation/deletion, personal-list creation and calculation/event behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
 | 9 | Implement reports, maps and remaining active modules | Source-driven templates, preview/export, filters, offline assets and administration. Inventory all active entry points; keep placeholders disabled. |
@@ -737,3 +737,43 @@ Exact60575340... is archived/promoted after final integration race passed
 default-on with `VITE_VEGETATION_SPECIES_EDITING=false` read-only opt-out;
 unrestricted source-grid edits cannot bypass it. Complete remaining cover/height
 creation/deletion/calculation workflows while keeping personal creation disabled.
+
+### Existing-row source cover/height drafts
+
+Static active SubVegAXL_BC/CXL/DXL/AhtXL/ChtXL exports confirm eleven cover/total
+fields use `<100 Or Is Null` and CC masks; the six height fields have no individual
+validation rule or conversion events. Reuse proven strict lexical/finite Single
+parsing, preserving float64 precision, negatives, NULL and unchanged historical
+values rather than truncating to the mask. TotalA/B remain manual source fields,
+not invented automatic summation.
+
+All25 source controls now share one persistent numeric session across five grids.
+Each changed field retains its original source form as well as expected value;
+the shared child transaction checks the field allowlist and original source-row
+predicate before mutation/audit. Zero keeps a row in a source view; clearing its
+last applicable cover can remove it from that view without deleting its identity.
+Hidden raw errors block Save/Lock/close/context and unrelated workflows. Failed
+Save retains the whole batch; changed cover/height partners audit only once.
+Legacy height backend transport remains compatible, but active source controls
+use the strict source-aware endpoint.
+
+This workflow defaults on; `VITE_VEGETATION_NUMBER_EDITING=false` or retained
+`VITE_HEIGHT_EDITING=false` makes source numeric controls read-only while leaving
+Species/Collected available. The legacy experimental grid is a read-only preview,
+not a generic write bypass. Unverified vegetation creation/deletion controls are
+disabled pending their separate source-driven workflow.
+
+Focused coupled Go4.194s,185 frontend tests/check0/0/default+opt-out builds and
+bindings15/123/47 with37 scoped operations pass. Native core6 cases/4 audits verify
+all25 controls, Undo, hidden Cover9=100/close/Lock guards, shared partner drafts,
+multirow rollback/retry, source/stale/domain rejection and NULL Cover6 view removal.
+Default delivery verifies25 enabled controls/read-only preview plus one new
+Cover2 audit; opt-out verifies25 disabled controls, retained Species/Collected,
+zero audits and every fixture byte unchanged. All15 tables/40 prior audits and
+support/config bytes are retained except the five intended assignments/audits.
+Core2f8d74bd... and default30199c86... are sealed under the existing private species
+fixture; completed proofs were not replayed. Default assets are restored exactly
+to the accepted default candidate. Final race passes in vegetation-numbers-
+integration (root479.695s); exact default30199c86... is promoted without rebuild.
+Next bounded child batch is source vegetation row creation/deletion; retain
+disabled personal creation until its coordinated user/project contract is verified.

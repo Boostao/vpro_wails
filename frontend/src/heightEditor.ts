@@ -1,8 +1,9 @@
 import { finiteSingleValue } from './numericEditor';
+import type { VegetationNumberUpdate } from '../bindings/github.com/boostao/vpro-wails';
 export { singleMaximum } from './numericEditor';
 
 export const heightFields = ['cover1', 'cover2', 'cover3', 'totalA', 'cover4', 'cover5', 'totalB',
-  'cover6', 'height1', 'height2', 'height3', 'height4', 'height5', 'height6'] as const;
+  'cover6', 'cover7', 'cover8', 'cover9', 'height1', 'height2', 'height3', 'height4', 'height5', 'height6'] as const;
 export type HeightField = typeof heightFields[number];
 export interface HeightUpdate {
   id: number;
@@ -10,6 +11,7 @@ export interface HeightUpdate {
   expected: Record<string, number | null>;
 }
 export interface HeightCell {
+  form?: string;
   raw: string;
   expected: number | null;
   value: number | null;
@@ -28,12 +30,12 @@ export function heightValue(field: HeightField, raw: string): { value: number | 
   }
   return parsed;
 }
-export function stageHeight(drafts: HeightDrafts, id: number, field: HeightField, raw: string, stored: number | null): HeightDrafts {
+export function stageHeight(drafts: HeightDrafts, id: number, field: HeightField, raw: string, stored: number | null, form?: string): HeightDrafts {
   if (!Number.isInteger(id) || id < -2147483648 || id > 2147483647) throw new Error('Height row needs an exact signed32 identity.');
   const previous = drafts[String(id)]?.[field];
   const expected = previous ? previous.expected : stored;
   const parsed = heightValue(field, raw);
-  const row = { ...drafts[String(id)], [field]: { raw, expected, ...parsed } };
+  const row = { ...drafts[String(id)], [field]: { raw, expected, ...parsed, form: previous?.form ?? form } };
   return { ...drafts, [String(id)]: row };
 }
 export function heightErrors(drafts: HeightDrafts): string[] {
@@ -56,5 +58,17 @@ export function heightUpdates(drafts: HeightDrafts): HeightUpdate[] {
       }
     }
     return Object.keys(values).length ? [{ id: Number(id), values, expected }] : [];
+  });
+}
+export function vegetationNumberUpdates(drafts: HeightDrafts): VegetationNumberUpdate[] {
+  return heightUpdates(drafts).map(update => {
+    const forms: Record<string, string> = {};
+    for (const property of Object.keys(update.values)) {
+      const field = heightField(property);
+      const form = field ? drafts[String(update.id)]?.[field]?.form : undefined;
+      if (!form) throw new Error('Vegetation numbers require the original source form for every changed field.');
+      forms[property] = form;
+    }
+    return { ...update, forms };
   });
 }

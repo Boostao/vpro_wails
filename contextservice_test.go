@@ -102,6 +102,8 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 		"legacy attributes":   func() error { return service.plots.UpdateVegetationAttributes("stale", nil) },
 		"legacy collected":    func() error { return service.plots.UpdateCollectedRecords("stale", nil) },
 		"legacy species":      func() error { return service.plots.UpdateVegetationSpecies("stale", nil) },
+		"legacy numbers":      func() error { return service.plots.UpdateVegetationNumbers("stale", nil) },
+		"scoped numbers":      func() error { return service.UpdateVegetationNumbers(stale, "stale", nil) },
 		"legacy audit flags":  func() error { return service.plots.SetAuditRestoreSelection("stale", nil) },
 		"legacy restoration": func() error {
 			_, err := service.plots.RestoreSelectedAuditRecords("stale", nil, AuditRestoreRetain)

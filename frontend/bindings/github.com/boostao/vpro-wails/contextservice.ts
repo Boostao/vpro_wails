@@ -153,6 +153,10 @@ export function UpdateVegetationAttributes(contextID: string, plot: string, upda
     return $Call.ByID(4158838458, contextID, plot, updates);
 }
 
+export function UpdateVegetationNumbers(contextID: string, plot: string, updates: $models.VegetationNumberUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(3656385183, contextID, plot, updates);
+}
+
 export function UpdateVegetationSpecies(contextID: string, plot: string, updates: $models.VegetationSpeciesUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(2708281787, contextID, plot, updates);
 }

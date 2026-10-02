@@ -140,8 +140,11 @@
             <input class="source-cell" type="text" inputmode="decimal"
               value={staged?.raw ?? value ?? ''} disabled={disabled || control.locked || !control.enabled}
               aria-label={`${controlLabel(control)}, row ${row.id}`} aria-invalid={staged?.error != null} data-column={control.column}
-              title={staged?.error ?? 'Unsubmitted draft: use Save height drafts or Cancel height drafts'}
+              title={staged?.error ?? 'Unsubmitted draft: use Save height/cover drafts or Cancel height/cover drafts'}
               oninput={event => onstage?.(row.id, control.column ?? '', event.currentTarget.value)} />
+          {:else if mapped && name.startsWith('SubVeg') && stagedField}
+            <input class="source-cell" type="text" value={value ?? ''} disabled data-column={control.column}
+              aria-label={`${controlLabel(control)}, row ${row.id}`} title="Source cover/height editing is read-only in this build" />
           {:else if mapped && name.startsWith('SubVeg') && control.column?.toLowerCase() === 'species'}
             <input class="source-cell" type="text" value={value ?? ''} disabled data-column={control.column}
               aria-label={`${controlLabel(control)}, row ${row.id}`} title="Species selection is unavailable in this build" />

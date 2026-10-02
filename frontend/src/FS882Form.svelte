@@ -28,7 +28,7 @@
   import { projectState } from './state';
   import { embeddedForm, type VegetationMode } from './paperLayout';
   import type { EditorCloseState } from './closeLifecycle';
-  import { heightField, stageHeight, heightDirty, heightErrors, heightUpdates, type HeightDrafts } from './heightEditor';
+  import { heightField, stageHeight, heightDirty, heightErrors, heightUpdates, vegetationNumberUpdates, type HeightDrafts } from './heightEditor';
   import { otherField, stageOther, otherDirty, otherErrors, otherUpdates, type OtherDrafts, type OtherValue } from './otherEditor';
   import { soilField, stageSoil, soilDirty, soilErrors, soilUpdates, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import { vegetationAttributeField, stageVegetationAttribute, vegetationAttributeDirty, vegetationAttributeErrors, vegetationAttributeUpdates, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
@@ -74,6 +74,7 @@
   const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
+  const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
   let heightDrafts = $state<HeightDrafts>({});
   const heightUnsaved = $derived(heightDirty(heightDrafts));
   const heightInvalid = $derived(heightErrors(heightDrafts));
@@ -348,7 +349,7 @@
 
   let original = $state<FS882Header | null>(null);
   const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null);
-  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved || speciesUnsaved);
@@ -586,10 +587,6 @@
     }
   }
 
-  async function updateVegCover(row: VegRecord) {
-    await childOperation(() => PlotService.UpdateVegRecord(row));
-  }
-
   async function loadSpeciesReferences() {
     if (!speciesEditingEnabled || speciesReferenceBusy) return;
     const request = speciesReferenceRequest;
@@ -784,14 +781,15 @@
     }
   }
 
-  function stageHeightCell(id: number, column: string, raw: string) {
+  function stageHeightCell(id: number, column: string, raw: string, form: string) {
     try {
       if (!heightEditingEnabled || heightEditingDisabled) throw new Error('Height editing is unavailable while loading, locked, busy or the header is unsaved.');
       const field = heightField(column);
       if (!field || childCapabilities.Veg[field] !== true) throw new Error(`Height column ${column} is unavailable in the active schema.`);
       const rows = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
       if (rows.length !== 1) throw new Error('Height row identity is missing or ambiguous; reload before editing.');
-      heightDrafts = stageHeight(heightDrafts, id, field, raw, rows[0][field] ?? null);
+      if (!sourceRows(form).some(row => row.id === id)) throw new Error('Vegetation source row is unavailable; reload before editing.');
+      heightDrafts = stageHeight(heightDrafts, id, field, raw, rows[0][field] ?? null, form);
       successMsg = null;
     } catch (cause) {
       error = `Height draft failed: ${String(cause)}`;
@@ -826,7 +824,7 @@
     try {
       const updates = heightUpdates(heightDrafts);
       if (updates.length === 0) { heightDrafts = {}; successMsg = 'No height values changed.'; return; }
-      await PlotService.UpdateHeightRecords(draft.plotNumber, updates);
+      await PlotService.UpdateVegetationNumbers(draft.plotNumber, vegetationNumberUpdates(heightDrafts));
       committed = true;
       heightDrafts = {};
       await loadChildData(draft.plotNumber);
@@ -1546,8 +1544,8 @@
       <div class="height-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Height draft controls">
         <span>Height/cover drafts are unsubmitted. Switching views never saves them; header and other child editing wait.</span>
         <div class="flex gap-2 mt-2">
-          <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={heightEditingDisabled || heightInvalid.length > 0} onclick={() => void saveHeightDrafts()}>Save height drafts</button>
-          <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelHeightDrafts}>Cancel height drafts</button>
+          <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={heightEditingDisabled || heightInvalid.length > 0} onclick={() => void saveHeightDrafts()}>Save height/cover drafts</button>
+          <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelHeightDrafts}>Cancel height/cover drafts</button>
         </div>
         {#each heightInvalid as message}<p role="alert">{message}</p>{/each}
         {#if Object.values(heightDrafts).some(row => row.cover6?.value === null && row.cover6?.expected !== null)}
@@ -1595,26 +1593,29 @@
         {#snippet embedded(control)}
           {@const child = embeddedForm(control.controlId)}
           {@const heightGrid = child.form === 'SubVegAhtXL' || child.form === 'SubVegChtXL'}
-          <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={heightGrid ? heightEditingDisabled : childEditingDisabled}
-            drafts={heightDrafts} onstage={heightGrid && heightEditingEnabled ? stageHeightCell : undefined}
+          <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={heightGrid || numberEditingEnabled ? heightEditingDisabled : childEditingDisabled}
+            drafts={heightDrafts} onstage={numberEditingEnabled ? (id, column, raw) => stageHeightCell(id, column, raw, child.form) : undefined}
             {collectedDrafts} collectedDisabled={collectedEditingDisabled}
             oncollectedstage={collectedEditingEnabled ? stageCollectedCell : undefined}
             {speciesDrafts} {speciesLists} speciesDisabled={speciesEditingDisabled}
             onspeciesstage={speciesEditingEnabled ? stageSpeciesCell : undefined}
-            onedit={heightGrid ? undefined : editSourceChild} ondelete={heightGrid ? undefined : deleteSourceChild} />
+            onedit={undefined} ondelete={undefined} />
         {/snippet}
       </SourcePage>
       {/snippet}
       </OrdinaryFields>
       {#if vegetationMode === 'height'}
-        <p class="mt-2 text-xs text-stone-500">{heightEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain.' : 'Cover/height editing is gated until native Wails verification.'} Switching view does not save or change data.</p>
+        <p class="mt-2 text-xs text-stone-500">{numberEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain.' : 'Cover/height editing is read-only in this build.'} Switching view does not save or change data.</p>
       {/if}
       {#if collectedEditingEnabled}
         <p class="mt-2 text-xs text-stone-500">Collected buttons cycle NULL -> C -> V -> NULL using persistent drafts. Other historical values remain unchanged, as in the source click event. Use Save or Cancel; new-row workflows remain unavailable in the source grids.</p>
       {/if}
+      {#if numberEditingEnabled}
+        <p class="mt-2 text-xs text-stone-500">All source cover/total and height fields share persistent drafts. Switching grids retains raw errors and original values; Save checks each field's original source row and commits changes/audits atomically. Clearing cover may remove a row from a source view, never delete the vegetation record.</p>
+      {/if}
       <p class="mt-2 text-xs text-stone-500">{speciesEditingEnabled ? 'Species selection uses canonical source lists and explicit old-code replace/keep or existing personal-code decisions. Decisions stage the source UCase event; Save remains separate. Personal-list creation remains unavailable.' : 'Species editing remains read-only pending native verification.'}</p>
       <details class="mt-4 border border-stone-200 rounded p-3">
-        <summary class="text-xs font-semibold cursor-pointer">Experimental vegetation editing grid</summary>
+        <summary class="text-xs font-semibold cursor-pointer">Vegetation record preview (read-only)</summary>
       <div class="space-y-4">
         <!-- Live Stratum Cover Summaries -->
         <div class="grid grid-cols-4 gap-3 bg-stone-50 border border-stone-200 rounded p-3 text-xs">
@@ -1641,7 +1642,7 @@
           <button
             type="button"
             onclick={() => showSpeciesModal = true}
-            disabled={childEditingDisabled || ['species', 'layer', 'cover1', 'totalA'].some(key => childCapabilities.Veg[key] !== true)}
+            disabled
             class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs flex items-center gap-1"
           >
             <Plus size={14} /> Add Species (BC Catalog)
@@ -1673,8 +1674,7 @@
                     <input
                       type="text"
                       bind:value={row.layer}
-                      onchange={() => updateVegCover(row)}
-                      disabled={childEditingDisabled || childCapabilities.Veg.layer !== true}
+                      disabled
                       class="w-10 border border-stone-200 rounded px-1 py-0.5 text-xs text-center"
                     />
                   </td>
@@ -1683,8 +1683,7 @@
                       type="number"
                       step="0.1"
                       bind:value={row.cover1}
-                      onchange={() => updateVegCover(row)}
-                      disabled={childEditingDisabled || childCapabilities.Veg.cover1 !== true}
+                      disabled
                       class="w-14 border border-stone-200 rounded px-1 py-0.5 text-xs text-right"
                     />
                   </td>
@@ -1693,8 +1692,7 @@
                       type="number"
                       step="0.1"
                       bind:value={row.cover2}
-                      onchange={() => updateVegCover(row)}
-                      disabled={childEditingDisabled || childCapabilities.Veg.cover2 !== true}
+                      disabled
                       class="w-14 border border-stone-200 rounded px-1 py-0.5 text-xs text-right"
                     />
                   </td>
@@ -1704,8 +1702,7 @@
                       type="number"
                       step="0.1"
                       bind:value={row.cover4}
-                      onchange={() => updateVegCover(row)}
-                      disabled={childEditingDisabled || childCapabilities.Veg.cover4 !== true}
+                      disabled
                       class="w-14 border border-stone-200 rounded px-1 py-0.5 text-xs text-right"
                     />
                   </td>
@@ -1714,8 +1711,7 @@
                       type="number"
                       step="0.1"
                       bind:value={row.cover5}
-                      onchange={() => updateVegCover(row)}
-                      disabled={childEditingDisabled || childCapabilities.Veg.cover5 !== true}
+                      disabled
                       class="w-14 border border-stone-200 rounded px-1 py-0.5 text-xs text-right"
                     />
                   </td>
@@ -1725,8 +1721,7 @@
                       type="number"
                       step="0.1"
                       bind:value={row.cover6}
-                      onchange={() => updateVegCover(row)}
-                      disabled={childEditingDisabled || childCapabilities.Veg.cover6 !== true}
+                      disabled
                       class="w-14 border border-stone-200 rounded px-1 py-0.5 text-xs text-right"
                     />
                   </td>
@@ -1735,8 +1730,7 @@
                       type="number"
                       step="0.1"
                       bind:value={row.cover7}
-                      onchange={() => updateVegCover(row)}
-                      disabled={childEditingDisabled || childCapabilities.Veg.cover7 !== true}
+                      disabled
                       class="w-14 border border-stone-200 rounded px-1 py-0.5 text-xs text-right"
                     />
                   </td>
@@ -1744,7 +1738,7 @@
                     <button
                       type="button"
                       onclick={() => deleteVeg(row.id)}
-                      disabled={childEditingDisabled}
+                      disabled
                       class="text-red-600 hover:text-red-800 p-1"
                       title="Delete entry"
                     >

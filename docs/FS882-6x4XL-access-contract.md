@@ -298,6 +298,36 @@ build is distinct and archived. Exact60575340... is sealed in the same private
 evidence directory and promoted after decision integration race passed
 (root517.356s).
 
+### Source cover/height draft boundary
+
+Active AXL_BC/CXL/DXL/AhtXL/ChtXL exports bind25 numeric controls to eleven
+cover/total fields and six heights. Every bound cover/total exports
+`ValidationRule="<100 Or Is Null"` and InputMask CC. Heights export no individual
+conversion events/rules. Strict desktop numeric input deliberately retains
+fractions/negative values and raw invalid text instead of mask truncation.
+TotalA/B are explicitly entered source fields, not automatically recalculated.
+
+The shared height parser/session now spans all five grids. Per-field original
+source forms and expected values accompany changed numbers; the shared child
+transaction checks source bindings/row predicates, conflict and physical domains
+before mutation/audit. Unchanged historical invalid fields are omitted. Failed
+batch Save retains raw partner drafts for retry. Clearing Cover6 removes a row
+from C/C-height views but does not delete its vegetation identity. Source A/D
+duplicate merge code remains unreachable; inactive metadata writes are not added.
+
+Native core2f8d74bd... verifies25 visible labelled controls, Undo without writes,
+hidden Cover9=100 blocking Save/Lock/actual close, multirow cover/height rollback/
+retry and NULL view removal (6 cases/4 audits). Default30199c86... delivery verifies
+25 enabled controls and one independent Cover2 assignment/audit. Read-only opt-out
+verifies25 disabled numeric controls, enabled Species/Collected and zero writes/
+all fixture bytes unchanged. All15 tables/40 old audits and support/config bytes
+are retained apart from the five intended numeric changes. The old experimental
+grid is a read-only preview, and unverified creation/deletion controls are disabled.
+`VITE_VEGETATION_NUMBER_EDITING=false` or retained `VITE_HEIGHT_EDITING=false`
+disables numbers without enabling a generic write fallback. Final integration
+race passes (root479.695s); exact default30199c86... is promoted, with the prior
+species60575340... baseline preserved in the private archive.
+
 ## Verified bounded selective restoration
 
 `SetAuditRestoreSelection` atomically stores a verified selection; `RestoreSelectedAuditRecords` accepts exact string row IDs and cancel/retain/prune actions. The legacy marked-row API remains. Typed mapping covers 97 nonidentity parent and 61 non-Cover child fields. Invalid/foreign/missing rows, duplicate identities, unsupported fields, stale history chains, malformed values and failed triggers abort the entire transaction. Restore ordering follows source Table ascending then EditWhen descending, with descending rowid for deterministic timestamp ties.

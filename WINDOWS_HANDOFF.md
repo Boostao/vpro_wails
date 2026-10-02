@@ -34,14 +34,15 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all32 editor operations to immutable identities, leases running operations and
+  all37 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
-  plus native-verified default-on species selection/explicit decisions:
-  `605753407955bf4f4910c279db8b325f4eec337d80263f22d16d3c825568d445`.
-  Published preparation4eb0b8af... remains sealed in the private species archive.
+  plus default-on species decisions and source cover/height drafts:
+  `30199c867825af37b5e2a2f4f37ae08126aa05d8db1a1ef82107b1624fccd9b5`.
+  Published species60575340... and preparation4eb0b8af... remain sealed in the
+  private species archive. Exact numeric default is promoted without rebuilding.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
   Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
   omission remain intact. Shared expected-value transactions span rows/tables
@@ -504,6 +505,23 @@ publication follows the ordinary commit/push path. Unknown-code
 personal creation needs a bounded VUser/project write contract. Remaining
 cover/height creation/deletion/calculations follow. Never replay completed
 proof.py, delivery.py, decisions.py or decisions-delivery.py.
+Species decisions were published as e251bf3 with a clean0/0 upstream state.
+Current numeric batch: eleven cover/total fields plus six heights share drafts
+across all25 source controls. Original forms/values gate the shared transaction;
+NULL view removal is not row deletion. Default-on; VITE_VEGETATION_NUMBER_EDITING
+or retained VITE_HEIGHT_EDITING set to false provides readonly numeric controls.
+Species/Collected remain available. The experimental grid is readonly and
+unverified vegetation creation/deletion controls are disabled, not generic bypasses.
+Focused Go4.194s/185 frontend tests/check0/0/default+opt-out builds pass; bindings
+15/123/47 and37 scoped operations. Native core6 cases/4 audits, default25 controls/
+1 audit and opt-out25 disabled controls/zero writes preserve15 tables/40 prior
+audits plus support/config bytes apart from intended changes. Core2f8d74bd...,
+default30199c86... and opt-out assets/binaries remain sealed under the same
+private species fixture. Default assets restored exactly; no untested rebuild.
+Core PID15460/default14804/opt-out8040 exited; inspector9392 closed. Final race
+vegetation-numbers-integration passed (root479.695s); exact default30199c86... is
+promoted. Publish application-only changes normally; next bounded work is source
+vegetation row creation/deletion. Never rerun numbers.py or numbers-delivery.py.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage's explicit LimitToList=NotDefault now has a separately verified
