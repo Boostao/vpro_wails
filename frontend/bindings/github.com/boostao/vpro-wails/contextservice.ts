@@ -97,8 +97,16 @@ export function ListVegetationSpeciesUsers(contextID: string, lookup: $models.Ve
     return $Call.ByID(3585380524, contextID, lookup);
 }
 
+export function LookupSpeciesCodeCheckTarget(contextID: string, lookup: $models.VegetationSpeciesLookup): $CancellablePromise<$models.SpeciesCodeCheckOption[] | null> {
+    return $Call.ByID(1738673856, contextID, lookup);
+}
+
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
+}
+
+export function ReviewSpeciesCodes(contextID: string): $CancellablePromise<$models.SpeciesCodeCheckReview> {
+    return $Call.ByID(3045258678, contextID);
 }
 
 export function ReviewVegetationDeletion(contextID: string, plot: string, form: string, id: number): $CancellablePromise<$models.VegetationDeletionReview> {
@@ -115,6 +123,10 @@ export function SaveMineralRecord(contextID: string, record: $models.MineralReco
 
 export function SaveOtherRecord(contextID: string, record: $models.OtherRecord): $CancellablePromise<void> {
     return $Call.ByID(638265830, contextID, record);
+}
+
+export function SaveSpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(1191229246, contextID, updates);
 }
 
 export function SaveVegRecord(contextID: string, record: $models.VegRecord): $CancellablePromise<void> {

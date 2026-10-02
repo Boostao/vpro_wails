@@ -93,6 +93,15 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 			_, err := service.ListVegetationSpeciesUsers(context.Background(), stale, VegetationSpeciesLookup{Code: "RAW"})
 			return err
 		},
+		"species check review": func() error {
+			_, err := service.ReviewSpeciesCodes(context.Background(), stale)
+			return err
+		},
+		"species check target": func() error {
+			_, err := service.LookupSpeciesCodeCheckTarget(context.Background(), stale, VegetationSpeciesLookup{Code: "ABIE_RK"})
+			return err
+		},
+		"species check save":  func() error { return service.SaveSpeciesCodeCheck(stale, nil) },
 		"audit read":          func() error { _, err := service.ListAuditEntries(context.Background(), stale, "stale"); return err },
 		"switch":              func() error { _, err := service.SwitchContext(stale, contextSelection(current)); return err },
 		"legacy header":       func() error { return service.plots.UpdatePlot(FS882Header{PlotNumber: "stale"}) },

@@ -25,6 +25,8 @@
   import DrainageFields from './DrainageFields.svelte';
   import SourceChild from './SourceChild.svelte';
   import NewChild from './NewChild.svelte';
+  import PersonalSpeciesFields from './PersonalSpeciesFields.svelte';
+  import SpeciesCodeCheck from './SpeciesCodeCheck.svelte';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
   import { projectState } from './state';
   import { embeddedForm, paperChild, type VegetationMode } from './paperLayout';
@@ -88,7 +90,11 @@
   let parentCodeBusy = $state(false);
   let drainageBusy = $state(false);
   const soilCodeEditingEnabled = import.meta.env.VITE_SOIL_CODES_EDITING !== 'false';
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy);
+  const codeCheckEnabled = import.meta.env.VITE_SPECIES_CODE_CHECK_EDITING === 'true';
+  let codeCheckOpen = $state(false);
+  let codeCheckBusy = $state(false);
+  let codeCheckEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -130,7 +136,7 @@
   const creationSpeciesInvalid = $derived(creationDraft ? vegetationCreationSpeciesError(creationDraft, speciesLists[creationDraft.form] ?? []) : null);
   const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null);
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -375,7 +381,7 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
-  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null);
+  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen);
   const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
@@ -390,6 +396,14 @@
     : draft.locked ? 'Unlock the plot before restoring fields.'
     : dirty || Object.keys(headerValidation).length > 0 ? 'Save valid header changes or Undo before restoring fields.'
     : 'Save the plot before restoring fields.');
+
+  function openSpeciesCodeCheck() {
+    if (!codeCheckEnabled || childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0) {
+      error = 'Finish or Undo existing drafts and unlock the available plot before reviewing species codes.';
+      return;
+    }
+    codeCheckOpen = true; error = null; successMsg = null;
+  }
 
   async function refreshAfterRestore(plot: string, request: number) {
     const header = await reads.track(PlotService.GetPlot(plot));
@@ -757,7 +771,7 @@
   function personalSourceMatches(proposed: PersonalSpeciesDraft): boolean {
     return proposed.source.kind === 'existing'
       ? matchesPersonalSpeciesSource(proposed, speciesDrafts[String(proposed.source.id)])
-      : creationEnabled && matchesCreationPersonalSpeciesSource(proposed, creationDraft);
+      : proposed.source.kind === 'creation' && creationEnabled && matchesCreationPersonalSpeciesSource(proposed, creationDraft);
   }
 
   async function savePersonalSpecies() {
@@ -1465,6 +1479,7 @@
       error = 'Wait for the current operation to finish before saving.';
       return;
     }
+    if (codeCheckOpen) { error = 'Save replacements or personal metadata explicitly, then close species-code review; ordinary plot Save never applies them.'; return; }
     if (personalDraft !== null) { error = 'Save the personal definition explicitly or Cancel its entry; ordinary plot Save never writes the user database.'; return; }
     if (deletionReview !== null) { error = 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review; ordinary Save never deletes rows.'; return; }
     if (creationDraft !== null) { await saveVegetationCreation(); return; }
@@ -1515,6 +1530,10 @@
   }
 
   export function getCloseState(): EditorCloseState {
+    if (codeCheckOpen) return codeCheckEditor?.getCloseState() ?? {
+      unsaved: true, busy: true, canSave: false, error,
+      saveReason: 'Wait for species-code review to load, then finish or close it before saving or closing the plot.',
+    };
     const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0 || attributeInvalid.length > 0 || speciesInvalid.length > 0 || deletionReview !== null || creationInvalid.length > 0;
     const invalidChild = Boolean(container?.querySelector('.source-child input:invalid'));
     const saveReason = busy || headerWorkflowBusy || !capabilitiesReady ? 'Wait for the plot to finish loading or header workflow.'
@@ -1551,6 +1570,7 @@
       error = 'Wait for the current operation to finish before undoing changes.';
       return;
     }
+    if (codeCheckOpen) { codeCheckEditor?.undo(); return; }
     if (personalDraft !== null) { cancelPersonalSpecies(); return; }
     if (deletionReview !== null) { void cancelVegetationDeletion(); return; }
     if (creationDraft !== null) { void cancelVegetationCreation(); return; }
@@ -1577,6 +1597,7 @@
       error = 'Wait for the current operation to finish before changing the plot lock.';
       return;
     }
+    if (codeCheckOpen) { error = 'Finish or close species-code review before changing the plot lock.'; return; }
     if (personalDraft !== null) {
       error = 'Save the personal definition explicitly or Cancel its entry before changing the plot lock.';
       return;
@@ -1800,6 +1821,12 @@
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if codeCheckOpen}
+      <SpeciesCodeCheck bind:this={codeCheckEditor} client={PlotService}
+        onbusy={value => codeCheckBusy = value}
+        onclosed={() => { codeCheckOpen = false; error = null; }}
+        oncommitted={() => loadChildData(draft.plotNumber)} />
+    {/if}
     {#if speciesUnsaved}
       <div class="species-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Species draft controls">
         {#if savedPersonalCodes.length}<p role="status">Saved personal definitions: {savedPersonalCodes.join(', ')}. Plot Undo does not remove these user-database records.</p>{/if}
@@ -1866,32 +1893,8 @@
         <h3 class="mb-2 font-semibold">New personal species definition - not yet saved</h3>
         <p class="mb-2" role="status">Saving here creates a reusable user-database definition and audit only. The plot assignment or new-row proposal remains unsaved. A later plot Undo does not delete a saved definition.</p>
         {#each personalInvalid as message}<p class="mb-2 text-red-700" role="alert">{message}</p>{/each}
-        <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label class="flex flex-col gap-1" for="personal-code">Code
-            <input id="personal-code" class="rounded border bg-white px-2 py-2" readonly value={personalDraft.entered.toUpperCase()} />
-          </label>
-          <label class="flex flex-col gap-1" for="personal-lifeform">Lifeform
-            <select id="personal-lifeform" class="rounded border bg-white px-2 py-2" value={personalDraft.lifeform ?? ''}
-              disabled={busy || headerWorkflowBusy} onchange={event => { if (personalDraft) { personalDraft = { ...personalDraft, lifeform: event.currentTarget.value === '' ? null : Number(event.currentTarget.value) }; error = null; successMsg = null; } }}>
-              <option value="">NULL - not classified</option>
-              {#each personalLifeforms as [value, label]}<option {value}>{label}</option>{/each}
-            </select>
-          </label>
-        </div>
-        {#each personalTextFields as {field, label} (field)}
-          <div class="mb-3">
-            <label class="flex flex-col gap-1" for={`personal-${field}`}>{label}
-              <input id={`personal-${field}`} class="rounded border bg-white px-2 py-2" type="text" value={personalDraft[field].raw}
-                disabled={busy || headerWorkflowBusy || personalDraft[field].isNull} aria-invalid={personalDraft[field].error !== null}
-                oninput={event => { if (personalDraft) { personalDraft = stagePersonalText(personalDraft, field, event.currentTarget.value, false); error = null; successMsg = null; } }} />
-            </label>
-            <label class="mt-1 flex items-center gap-2" for={`personal-null-${field}`}>
-              <input id={`personal-null-${field}`} type="checkbox" checked={personalDraft[field].isNull} disabled={busy || headerWorkflowBusy}
-                onchange={event => { if (personalDraft) { personalDraft = stagePersonalText(personalDraft, field, personalDraft[field].raw, event.currentTarget.checked); error = null; successMsg = null; } }} />
-              {label} - store NULL, not an empty string
-            </label>
-          </div>
-        {/each}
+        <PersonalSpeciesFields draft={personalDraft} disabled={busy || headerWorkflowBusy}
+          onchange={value => { personalDraft = value; error = null; successMsg = null; }} />
         <div class="flex gap-2">
           <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy || personalInvalid.length > 0}
             onclick={() => void savePersonalSpecies()}>Save personal definition only</button>
@@ -2076,7 +2079,8 @@
         disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
         onchange={markDirty} onvalidation={validateHeader} onVegNotesTab={vegetationNotesTab}>
       {#snippet children(ordinaryEditor)}
-      <SourcePage name="Vegetation" values={sourceHeaderValues} {vegetationMode} editor={ordinaryEditor} onHeightToggle={() => vegetationMode = vegetationMode === 'height' ? 'cover' : 'height'}>
+      <SourcePage name="Vegetation" values={sourceHeaderValues} {vegetationMode} editor={ordinaryEditor} onHeightToggle={() => vegetationMode = vegetationMode === 'height' ? 'cover' : 'height'}
+        onSpeciesCheck={codeCheckEnabled ? openSpeciesCodeCheck : undefined} speciesCheckDisabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}>
         {#snippet embedded(control)}
           {@const child = embeddedForm(control.controlId)}
           {@const heightGrid = child.form === 'SubVegAhtXL' || child.form === 'SubVegChtXL'}

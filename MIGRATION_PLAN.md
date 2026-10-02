@@ -32,7 +32,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
 | 5 | Complete bounded FS882 parent field editing (complete98/98) | All98 mapped parent fields have a native-verified writable baseline, including source-authorized BEC Master, strict SoilDrainage and final X/Y/Photo scalars. This is not full form/application parity; picture management, projection, bulk/reverse copying and remaining child/calculation events stay separately scoped and unavailable until verified. |
-| 6 | Complete FS882 child workflows (in progress; Other/soil complete, bounded existing-row vegetation editing verified) | Other8, Humus12 and Mineral18 source-bound cells and create/delete/draft lifecycle are native-verified; all12 Veg Other attributes have verified existing-row drafts/suggestions/lifecycle. Collected, species selection/explicit decisions and source cover/height fields share verified drafts across five grids. Finish vegetation creation/deletion, personal-list creation and calculation/event behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
+| 6 | Complete FS882 child workflows (in progress; bounded source vegetation workflows verified) | Other8, Humus12 and Mineral18 cells/create/delete, Veg Other12 attributes, Collected, species decisions and cover/height drafts are native-verified. Guarded creation/deletion, independent personal definitions and named-scope parent code checking are verified opt-in adaptations. Finish remaining active navigation, parent metadata/profiling and calculation/event behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
 | 9 | Implement reports, maps and remaining active modules | Source-driven templates, preview/export, filters, offline assets and administration. Inventory all active entry points; keep placeholders disabled. |
@@ -1022,7 +1022,7 @@ byte unchanged. Owned9884/12208 exited;9392 closed. Exact accepted bytes are pro
 archives/cover-notices-checkpoint preserves them and previous50866a49 builds with
 hashes. Do not replay completed cover-notices.py modes.
 
-Remaining deliberate navigation, parent species checking,
+Remaining deliberate navigation,
 project metadata and profiling remain active deliverables. Neither unreachable
 metadata/merge code nor blanket personal-definition cleanup becomes a requirement.
 
@@ -1052,10 +1052,44 @@ exited;9392 closed. Exact default is promoted; core/default/previous20a6c3e7 and
 receipts are archived with hashes in archives/a-cover-notices-checkpoint. Do not
 replay completed a-cover-notices.py modes.
 
-Parent code checking is next: the source parent call scans the project or selected
-SU, not merely the visible plot. Source Change All broadens to the entire project,
-and Ignore All writes temporary LifeForm999 user definitions that Close/completion
-blanket-delete. Desktop review must name its scope, make replacement explicit and
-transactional, retain runtime-only ignore decisions and never write/delete those
-temporary user definitions. This is an intentional safety adaptation, not parity
-proof from the R precedent.
+### Named-scope parent species-code checking
+
+The source parent call scans the project or selected SU, not merely the visible
+plot. Source Change All broadens to the entire project; Ignore All writes
+temporary LifeForm999 definitions that Close/completion blanket-delete. The
+verified desktop adaptation instead names its context-selected project/SU scope,
+reviews physical rows and literal master/user targets, and applies explicit
+replacements only within that scope. Ignore/Ignore All stay runtime-only.
+Existing LifeForm999 definitions are preserved. No temporary definitions or
+cross-file atomicity are claimed.
+
+Multi-plot patches reuse the existing child transaction, ownership, lock, physical
+domain and audit helpers. Final observations run after every mutation/audit,
+including later-row/audit-trigger effects. Strict transport preserves explicit
+NULL originals, rejects malformed Unicode/caller scope and omits no-op assignments.
+Target review retains duplicate definitions and NULL/empty metadata, independently
+of child dropdown membership. A persistent paginated panel owns raw errors,
+proposals and close/context/Save/Lock/Undo gates. Shared personal fields preserve
+their labels/IDs; separate VUser Save verifies the original source and reloaded
+definition, and Undo retains the saved definition. Committed refresh failures
+disable replay.
+
+`VITE_SPECIES_CODE_CHECK_EDITING=true` remains opt-in. Personal entry additionally
+requires `VITE_PERSONAL_SPECIES_EDITING=true`. Focused Go6.230s/full race478.834s,
+213 frontend tests/check0/0 and distinct core/default builds pass; bindings are
+15 services/132 methods/55 models,44 scoped adapter operations. Coreffc0b393...
+passes eight native cases: whole-project scope, three distinct target definitions,
+pagination/remount/raw errors, actual-close/context/generic Save/Lock refusal,
+runtime-only Ignore All, second-plot audit rollback/retained retry, independent
+personal Save and Undo/reload. Only two Species assignments/two project audits
+and one user definition/one user audit are committed. Old tables/rows/history,
+LifeForm999 sentinel, schema, reference/config bytes are preserved. Go tests also
+cover selected-SU exclusion, NULL originals, stale/cancelled requests, malformed
+storage and later-trigger drift.
+
+Defaultde15b9c3... independently verifies35 labelled existing vegetation controls,
+disabled checker/creation/personal workflows and every fixture byte unchanged.
+Owned5028/18364 exited;9392 closed. Archives/species-code-check-checkpoint seals
+exact core/default/previouscddefe55 bytes and receipts. No completed native writes
+may be replayed; the readonly harness continuations are sealed separately.
+This completes the bounded checker, not the full child/application migration.

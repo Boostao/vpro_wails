@@ -20,6 +20,12 @@ type childRecordPatch struct {
 	id       int
 	cells    map[string]childExpectedValue
 	validate func(*sql.Tx, string, string) error
+	observe  func(*sql.Tx, string, string) error
+}
+
+type childPlotPatch struct {
+	plot  string
+	patch childRecordPatch
 }
 
 func childPatchShape(kind string) reflect.Value {
@@ -36,10 +42,18 @@ func childPatchShape(kind string) reflect.Value {
 }
 
 func (s *PlotService) updateChildPatches(plot string, updates []childRecordPatch) error {
+	patches := make([]childPlotPatch, len(updates))
+	for i, update := range updates {
+		patches[i] = childPlotPatch{plot, update}
+	}
+	return s.updateChildPlotPatches(patches)
+}
+
+func (s *PlotService) updateChildPlotPatches(updates []childPlotPatch) error {
 	if err := s.requireContextEdit(); err != nil {
 		return err
 	}
-	if strings.TrimSpace(plot) == "" || len(updates) == 0 {
+	if len(updates) == 0 {
 		return errors.New("child drafts require a plot and at least one row")
 	}
 	s.mu.RLock()
@@ -55,17 +69,26 @@ func (s *PlotService) updateChildPatches(plot string, updates []childRecordPatch
 		return err
 	}
 	defer tx.Rollback()
-	if err := childParent(tx, project, plot); err != nil {
-		return err
-	}
 	type identity struct {
 		kind string
 		id   int
 	}
 	seen := map[identity]bool{}
 	capabilities := map[string]map[string]bool{}
+	parents := map[string]bool{}
+	var observations []childPlotPatch
 	when := time.Now().Format("2006-01-02 15:04:05")
-	for _, update := range updates {
+	for _, scoped := range updates {
+		plot, update := scoped.plot, scoped.patch
+		if strings.TrimSpace(plot) == "" {
+			return errors.New("child drafts require a plot and at least one row")
+		}
+		if !parents[plot] {
+			if err := childParent(tx, project, plot); err != nil {
+				return err
+			}
+			parents[plot] = true
+		}
 		if update.kind != "Veg" && update.kind != "Other" && update.kind != "Humus" && update.kind != "Mineral" {
 			return fmt.Errorf("unsupported child draft kind %q", update.kind)
 		}
@@ -163,7 +186,19 @@ func (s *PlotService) updateChildPatches(plot string, updates []childRecordPatch
 		if affected, err := result.RowsAffected(); err != nil || affected != 1 {
 			return fmt.Errorf("%s mutation expected one row: affected=%d error=%v", update.kind, affected, err)
 		}
+		if update.observe != nil {
+			observations = append(observations, scoped)
+		}
 		if err := auditChildFields(tx, project, update.kind, plot, int64(update.id), fields, before, after, user, strength, when); err != nil {
+			return err
+		}
+	}
+	for _, scoped := range observations {
+		table := quoteHeaderIdentifier(project + "_" + scoped.patch.kind)
+		if err := requireChildIdentity(tx, table, scoped.patch.kind, scoped.plot, int64(scoped.patch.id)); err != nil {
+			return err
+		}
+		if err := scoped.patch.observe(tx, table, scoped.plot); err != nil {
 			return err
 		}
 	}

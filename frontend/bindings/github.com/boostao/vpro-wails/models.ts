@@ -527,6 +527,35 @@ export interface SoilTextUpdate {
     "expected": string | null;
 }
 
+export interface SpeciesCodeCheckOption {
+    "code": string | null;
+    "scientificName": string | null;
+    "lifeform": number | null;
+    "englishName": string | null;
+    "codeType": string | null;
+    "source": string;
+}
+
+export interface SpeciesCodeCheckReview {
+    "project": string;
+    "su": string;
+    "rows": SpeciesCodeCheckRow[] | null;
+}
+
+export interface SpeciesCodeCheckRow {
+    "id": number;
+    "plotNumber": string;
+    "code": string | null;
+    "status": string;
+}
+
+export interface SpeciesCodeCheckUpdate {
+    "id": number;
+    "plotNumber": string;
+    "expected": string | null;
+    "value": string;
+}
+
 export interface SpeciesItem {
     "code": string;
     "scientificName": string;

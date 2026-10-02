@@ -34,17 +34,18 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all41 editor operations to immutable identities, leases running operations and
+  all44 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `cddefe55f97ba612d38e52b8a582d16fb84d7489c8ad8ad4660c0d35a6d40ca1`.
+  `de15b9c31b832b21782a094b866ee74a3240f82b3431986c498f415bfbd04e1e`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
-  complete A/C NULL-cover notice/default delivery is promoted without rebuilding.
+  complete A/C NULL-cover notice/default delivery is archived; the accepted
+  default checker-gated delivery is promoted without rebuilding.
   Previous20a6c3e7... and50866a49... are archived with accepted notice bytes and
   receipts. Previous8e63916d...
   and accepted core/default hashes are archived. Previous personal
@@ -602,7 +603,7 @@ Coreccb31517... verifies eight native cases, ZPNROW01/one VUser audit and separa
 ID9/two project audits. Raw256/remount/Save/Lock/actual-close/two-stage Undo,
 user/project audit rollback/retry and existing-row regression pass. All15 project
 tables/67 prior audits, VUser tables/three old audits, old rows/reservations,
-support/config and schema preserved. Fixture now75 project audits/four user audits.
+support/config and schema preserved. Current fixture has77 project audits/five user audits.
 ZPNAT01 remains row0; ZPNAT02 is ID8; ZPNROW01 is ID9. ID8 now retains its physical
 record/species/Height6 with Cover6=NULL and is absent from both C source views.
 Triggers removed.
@@ -621,7 +622,7 @@ numeric controls/Species/Collected, disabled unfinished workflows and every fixt
 byte unchanged. Owned9884/12208 exited; inspector9392 closed. Exact candidate bytes
 are archived; archives/cover-notices-checkpoint seals accepted default,
 previous50866a49 builds and receipts with hashes.
-Currentcddefe55... adds shared A/A-height all-seven-cover warnings to numeric,
+Archivedcddefe55... adds shared A/A-height all-seven-cover warnings to numeric,
 Species, Collected and opt-in new-row workflows. Zero is not NULL; non-NULL heights
 never infer cover. Original Collected source is retained through remount/alternate
 view clicks and omitted from its unchanged transport. Successful Species/Collected/
@@ -635,13 +636,40 @@ ID10 is ABIE_RK/Height1=-3.125 with no inferred cover/Layer. Exactly five projec
 audits and zero user writes; old records/history/reservations/schema/support/config
 preserved. Defaultcddefe55... independently verifies25 enabled labelled numeric
 controls/Species/Collected, disabled unfinished workflows and every fixture byte
-unchanged. Owned7548/7260 exited;9392 closed. Exact default is current/candidate;
+unchanged. Owned7548/7260 exited;9392 closed. Previous default is archived;
 archives/a-cover-notices-checkpoint seals core/default/previous20a6c3e7 and receipts
-with hashes. No native/race command remains.
+with hashes.
+Currentde15b9c3... preserves those warnings and adds the verified, opt-in
+named-scope parent checker. `VITE_SPECIES_CODE_CHECK_EDITING=true` enables it;
+personal entry additionally requires `VITE_PERSONAL_SPECIES_EDITING=true`.
+Readonly physical review names project/selected SU and preserves duplicate
+master/user definitions and NULL/empty metadata. Explicit replacements span
+plots atomically using the shared child/audit transaction and final stored-value
+observations after all triggers. Ignore decisions are runtime-only; no LifeForm999
+cleanup or hidden project-wide expansion is inherited.
+Coreffc0b3931253596adcc118283311e4518772d505dd5f254789bc165e4c3535ce passes
+eight native cases: named scope/three definitions, pagination/raw errors/remount,
+actual-close/context/Save/Lock guards, Ignore All, cross-plot rollback/retry,
+independent personal Save and Undo/reload. Only fixture IDs-200/-201 become
+ACAROSPO, adding two project audits. Separately ZCKNEW02 saves NULL science/lifeform
+and empty English with original defaults, adding one user audit. ID-202 stays
+unchanged; the prepared ZCKSEN99 LifeForm999 definition is retained. Preparation
+added29 explicitly named test rows, a sentinel and one duplicate target definition
+after sealing the preceding accepted75/4 boundary; it never changed source files.
+All old data/history/schema/reservations/other support/config bytes are preserved.
+Go also verifies selected-SU exclusion, NULL originals, stale/cancelled requests,
+malformed storage/transport and later/audit-trigger drift.
+Focused Go6.230s/full race478.834s,213 frontend tests/check0/0/core+default builds
+pass. Bindings15/132/55;44 scoped operations. Independent defaultde15b9c3...
+verifies35 labelled numeric/Species/Collected controls, disabled opt-in workflows
+and every fixture byte unchanged. Owned5028/18364 exited;9392 closed. No active
+native/race process remains. Archives/species-code-check-checkpoint seals exact
+core/default/previouscddefe55 builds and receipts; three readonly harness
+continuations retain byte-preservation evidence, and no completed writes replayed.
 Publication includes application source only; private evidence/binaries/dist are
-ignored. Use git HEAD/upstream for the current commit; predecessorb94b6eb.
-Never replay a-cover-notices.py, cover-notices.py or creation-personal.py completed modes.
-Next: deliberate navigation and separately scoped parent code-check/metadata/profiling.
+ignored. Use git HEAD/upstream for the current commit; predecessore71c5da.
+Never replay code-check.py, a-cover-notices.py, cover-notices.py or creation-personal.py completed modes.
+Next: deliberate navigation and separately scoped parent metadata/profiling.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
 unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
 rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a

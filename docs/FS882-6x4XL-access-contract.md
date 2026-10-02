@@ -559,6 +559,41 @@ exited;9392 closed. Focused Go3.833s/full race460.449s,207 frontend tests/check0
 core+default builds pass. Source semantics are static/documented, not a new
 native Access runtime measurement.
 
+### Parent species-code checker: verified named-scope adaptation
+
+Static `V7mdlSpellCheckSppCodes`/`USysCodeCheck` evidence distinguishes initial
+project/current-SU scanning from Change All's entire-project update. Ignore All
+adds LifeForm999 user rows; source completion/Close deletes all such definitions.
+The desktop deliberately does neither destructive cleanup nor hidden scope
+broadening. Context selects an explicitly named project/SU scope; review reads
+physical vegetation rows rather than DISTINCT projections. Registered literal
+targets preserve duplicate master/user definitions and NULL/empty metadata,
+including definitions outside child dropdown lifeform membership.
+
+Explicit changed assignments share one project transaction across plots and
+audits. Original values, identities, locks, context scope and target availability
+are revalidated. Final observations run after all row/audit-trigger side effects;
+any mismatch rolls back the batch. NULL originals remain explicit in strict
+transport; malformed raw Unicode is rejected without decoder repair. Ignore and
+Ignore All are local review decisions only. Persistent raw errors and reviewed
+proposals gate ordinary Save/Lock/actual-close/context switching. Personal metadata
+uses shared source labels/controls and a separate VUser definition/audit transaction;
+project assignment remains separate, and Undo never deletes the saved definition.
+
+Opt-in coreffc0b393... passes eight native cases and commits only two project
+Species audits plus one independent user definition/audit. Every old project/user
+row and audit, original schema, LifeForm999 sentinel and other support/config bytes
+is preserved. Three physical target definitions retain differing provenance and
+NULL/empty metadata. Readonly defaultde15b9c3... verifies35 labelled numeric/
+Species/Collected controls, disabled unfinished/opt-in actions and all fixture bytes
+unchanged. Owned5028/18364 exited;9392 closed. Full race478.834s,213 frontend tests,
+check0/0/core+default builds pass. Selected-SU exclusion, explicit NULL originals,
+malformed storage/transport, stale/cancelled reads and later/audit-trigger drift
+are fast-test evidence, not additional Access runtime measurements.
+`VITE_SPECIES_CODE_CHECK_EDITING=true` enables the verified adaptation; personal
+entry also requires `VITE_PERSONAL_SPECIES_EDITING=true`. Full Access checker
+collation, automatic navigation and destructive cleanup parity are not claimed.
+
 ## Verified bounded selective restoration
 
 `SetAuditRestoreSelection` atomically stores a verified selection; `RestoreSelectedAuditRecords` accepts exact string row IDs and cancel/retain/prune actions. The legacy marked-row API remains. Typed mapping covers 97 nonidentity parent and 61 non-Cover child fields. Invalid/foreign/missing rows, duplicate identities, unsupported fields, stale history chains, malformed values and failed triggers abort the entire transaction. Restore ordering follows source Table ascending then EditWhen descending, with descending rowid for deterministic timestamp ties.

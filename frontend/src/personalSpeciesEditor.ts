@@ -1,7 +1,7 @@
 import { wellFormedUTF16 } from './qualityEditor';
 import { speciesEventError, type SpeciesCell, type SpeciesChoices } from './vegetationSpeciesEditor';
 import type { VegetationCreationDraft } from './vegetationCreationEditor';
-import type { PersonalSpeciesDefinitionRequest, VegetationSpeciesOption } from '../bindings/github.com/boostao/vpro-wails';
+import type { PersonalSpeciesDefinitionRequest, SpeciesCodeCheckRow, VegetationSpeciesOption } from '../bindings/github.com/boostao/vpro-wails';
 
 export const personalLifeforms = [
   [1, 'Coniferous trees - TREE/SHRUB/SEEDLINGS'], [2, 'Broad-leaved trees - TREE/SHRUB/SEEDLINGS'],
@@ -16,7 +16,8 @@ export const personalTextFields = [
 
 interface PersonalTextCell { raw: string; isNull: boolean; error: string | null }
 export interface PersonalSpeciesDraft {
-  source: { kind: 'existing'; id: number; expected: string } | { kind: 'creation'; editorKey: string };
+  source: { kind: 'existing'; id: number; expected: string } | { kind: 'creation'; editorKey: string }
+    | { kind: 'codecheck'; id: number; plotNumber: string; expected: string };
   form: string;
   entered: string;
   scientificName: PersonalTextCell;
@@ -34,6 +35,19 @@ export function beginPersonalSpecies(id: number, cell: SpeciesCell, choices: Spe
 export function beginCreationPersonalSpecies(draft: VegetationCreationDraft, choices: SpeciesChoices): PersonalSpeciesDraft {
   if (!draft.editorKey || draft.decision) throw new Error('Review the unresolved new-row species entry before creating metadata.');
   return beginPersonalMetadata({ kind: 'creation', editorKey: draft.editorKey }, draft.form, draft.species, choices);
+}
+
+export function beginCodeCheckPersonalSpecies(row: SpeciesCodeCheckRow, choices: SpeciesChoices): PersonalSpeciesDraft {
+  if (row.code === null || row.status !== 'unlisted' || !Number.isInteger(row.id) || !row.plotNumber) {
+    throw new Error('Review an unknown physical code-check row before creating metadata.');
+  }
+  return beginPersonalMetadata({ kind: 'codecheck', id: row.id, plotNumber: row.plotNumber, expected: row.code },
+    'USysCodeCheck', row.code, choices);
+}
+
+export function matchesCodeCheckPersonalSpeciesSource(draft: PersonalSpeciesDraft, row: SpeciesCodeCheckRow | undefined): boolean {
+  return draft.source.kind === 'codecheck' && row !== undefined && row.id === draft.source.id &&
+    row.plotNumber === draft.source.plotNumber && row.code === draft.source.expected && row.code === draft.entered;
 }
 
 function beginPersonalMetadata(source: PersonalSpeciesDraft['source'], form: string, entered: string, choices: SpeciesChoices): PersonalSpeciesDraft {
