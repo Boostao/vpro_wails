@@ -195,7 +195,9 @@
   th { background: #e9efeb; color: #365c48; text-align: left; font-size: .875rem; font-weight: 600; white-space: normal; }
   th, td { padding: .5rem; min-width: 7rem; max-width: 18rem; border-bottom: 1px solid #d1dcd4; }
   td { overflow: visible; white-space: normal; }
+  td:focus-within { background: #ecfdf5; }
   .source-cell { display: block; box-sizing: border-box; width: 100%; min-height: 40px; border: 1px solid #b7cfc0; border-radius: 4px; padding: .5rem; font: inherit; line-height: 1.4; overflow-wrap: anywhere; }
+  .source-cell:focus-visible { outline: 2px solid #047857; outline-offset: 2px; }
   input[type="checkbox"] { width: 1.2rem; min-height: 1.2rem; }
   .pending { color: #78716c; background: #f5f5f4; }
   .delete { min-height: 40px; color: #b91c1c; padding: .5rem .75rem; border: 1px solid #d6d3d1; border-radius: 4px; }

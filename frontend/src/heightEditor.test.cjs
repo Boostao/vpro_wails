@@ -14,6 +14,36 @@ vm.runInNewContext(ts.transpileModule(readFileSync(path.join(__dirname,'heightEd
   {exports:output,require:name=>{if(name!=='./numericEditor')throw new Error(`Unexpected dependency ${name}`);return numeric;}});
 const {heightField,heightValue,stageHeight,heightErrors,heightDirty,heightUpdates,vegetationNumberUpdates,singleMaximum}=output;
 const json = value => JSON.parse(JSON.stringify(value));
+test('Source NULL Cover6 notice stays nonblocking and distinguishes view removal from physical deletion',()=>{
+  for(const form of ['SubVegCXL','SubVegChtXL']){
+    let drafts=stageHeight({},-9,'cover6','',0,form);
+    assert.equal(heightErrors(drafts).length,0);
+    assert.equal(output.heightSourceNotices(drafts).length,1);
+    assert.match(output.heightSourceNotices(drafts)[0],/does not delete the vegetation record/);
+    assert.equal(json(vegetationNumberUpdates(drafts))[0].values.cover6,null);
+    assert.equal(output.heightSourceNotices(json(drafts)).length,1);
+    drafts=stageHeight(drafts,-9,'cover6','bad',0,form);
+    assert.equal(output.heightSourceNotices(drafts).length,0);
+    drafts=stageHeight(drafts,-9,'cover6','0',0,form);
+    assert.equal(output.heightSourceNotices(drafts).length,0);
+  }
+  for(const [field,raw,expected,form] of [
+    ['cover6','',null,'SubVegCXL'],['height6','',1,'SubVegChtXL'],
+    ['cover1','',1,'SubVegAXL_BC'],['cover6','',1,'SubVegDXL'],
+  ]){
+    assert.equal(output.heightSourceNotices(stageHeight({},0,field,raw,expected,form)).length,0);
+  }
+});
+test('Source warning feedback stays visible outside remounted grids and never joins invalid/Save gates',()=>{
+  const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
+  assert.match(form,/heightNotices = \$derived\(heightSourceNotices\(heightDrafts\)\)/);
+  assert.match(form,/each heightNotices as message[\s\S]{0,80}role="status"/);
+  assert.doesNotMatch(form,/heightNotices\.length[^;\n]*(?:disabled|canSave)|invalid[^;\n]*heightNotices/);
+  assert.match(form,/notices\.join\(' '\)/);
+  const child=readFileSync(path.join(__dirname,'SourceChild.svelte'),'utf8');
+  assert.match(child,/td:focus-within/);
+  assert.match(child,/\.source-cell:focus-visible/);
+});
 test('Source grids stage lexical input while close, view and cancellation guards remain wired',()=>{
   for(const file of ['SourceChild.svelte','FS882Form.svelte','SourcePage.svelte']){
     const source=readFileSync(path.join(__dirname,file),'utf8');

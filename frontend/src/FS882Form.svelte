@@ -30,7 +30,7 @@
   import { embeddedForm, paperChild, type VegetationMode } from './paperLayout';
   import { controlLabel } from './formPresentation';
   import type { EditorCloseState } from './closeLifecycle';
-  import { heightField, stageHeight, heightDirty, heightErrors, heightUpdates, vegetationNumberUpdates, type HeightDrafts } from './heightEditor';
+  import { heightField, stageHeight, heightDirty, heightErrors, heightSourceNotices, heightUpdates, vegetationNumberUpdates, type HeightDrafts } from './heightEditor';
   import { otherField, stageOther, otherDirty, otherErrors, otherUpdates, type OtherDrafts, type OtherValue } from './otherEditor';
   import { soilField, stageSoil, soilDirty, soilErrors, soilUpdates, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import { vegetationAttributeField, stageVegetationAttribute, vegetationAttributeDirty, vegetationAttributeErrors, vegetationAttributeUpdates, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
@@ -95,6 +95,7 @@
   let heightDrafts = $state<HeightDrafts>({});
   const heightUnsaved = $derived(heightDirty(heightDrafts));
   const heightInvalid = $derived(heightErrors(heightDrafts));
+  const heightNotices = $derived(heightSourceNotices(heightDrafts));
   const otherEditingEnabled = import.meta.env.VITE_OTHER_EDITING !== 'false';
   let otherDrafts = $state<OtherDrafts>({});
   const otherUnsaved = $derived(otherDirty(otherDrafts));
@@ -1141,12 +1142,13 @@
     successMsg = null;
     try {
       const updates = heightUpdates(heightDrafts);
+      const notices = heightSourceNotices(heightDrafts);
       if (updates.length === 0) { heightDrafts = {}; successMsg = 'No height values changed.'; return; }
       await PlotService.UpdateVegetationNumbers(draft.plotNumber, vegetationNumberUpdates(heightDrafts));
       committed = true;
       heightDrafts = {};
       await loadChildData(draft.plotNumber);
-      successMsg = `Saved ${updates.length} height/cover row drafts atomically.`;
+      successMsg = `Saved ${updates.length} height/cover row drafts atomically.${notices.length ? ' ' + notices.join(' ') : ''}`;
     } catch (cause) {
       if (committed) capabilitiesReady = false;
       error = committed ? `Height changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
@@ -2015,6 +2017,7 @@
     {#if heightUnsaved}
       <div class="height-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Height draft controls">
         <span>Height/cover drafts are unsubmitted. Switching views never saves them; header and other child editing wait.</span>
+        {#each heightNotices as message}<p class="mt-2 font-medium" role="status">{message}</p>{/each}
         <div class="flex gap-2 mt-2">
           <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={heightEditingDisabled || heightInvalid.length > 0} onclick={() => void saveHeightDrafts()}>Save height/cover drafts</button>
           <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelHeightDrafts}>Cancel height/cover drafts</button>

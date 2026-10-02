@@ -1001,3 +1001,27 @@ draft Save, not unreachable metadata/duplicate-merge code. Parent code-check,
 project-metadata and profiling entrypoints remain separate workflow deliverables.
 CheckSpeciesCodes actively includes a blanket VUser LifeForm999 deletion; do not
 inherit that destructive cleanup as a desktop requirement.
+
+### Nonblocking C/C-height source notice checkpoint
+
+Changed existing-row Cover6 values from non-NULL to NULL now produce the source's
+nonblocking warning, adapted to explicit draft Save. The notice explains removal
+from both C source views without physical deletion. Invalid numeric input remains
+blocking, not a NULL assignment. Correction/Undo clear the notice; remount and failed
+Save retain it, and successful feedback captures it before drafts clear.
+Shared source cells highlight actual focus with the existing visual vocabulary and
+keep a keyboard outline; this does not claim automatic Access focus navigation.
+
+Focused Go0.752s/full race459.824s,202 frontend tests/check0/0/default build pass.
+Native seven-case proof checks actual focus styling, warnings, remount/correction/
+Undo, audit rollback/retained retry and physical-row retention after view removal.
+Only ID8 Cover6 becomes NULL, adding one project audit and no VUser audit.
+Independent readonly delivery of the same20a6c3e7... bytes verifies25 labelled
+numeric controls, Species/Collected, disabled unfinished workflows and every fixture
+byte unchanged. Owned9884/12208 exited;9392 closed. Exact accepted bytes are promoted;
+archives/cover-notices-checkpoint preserves them and previous50866a49 builds with
+hashes. Do not replay completed cover-notices.py modes.
+
+Remaining A/A-height warnings, deliberate navigation, parent species checking,
+project metadata and profiling remain active deliverables. Neither unreachable
+metadata/merge code nor blanket personal-definition cleanup becomes a requirement.

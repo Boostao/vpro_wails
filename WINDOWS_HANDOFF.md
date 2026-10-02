@@ -41,10 +41,11 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `50866a498e2930b28ae2dbf4aff9a6c761c924d4a7c7e5dd9b0deafa3d96add9`.
+  `20a6c3e7b23cbf771b43e11e0ba1412aa49f100484d0af17cfa2eca2ede6f323`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
-  new-row personal-default delivery is promoted without rebuilding. Previous8e63916d...
+  NULL-cover notice/default delivery is promoted without rebuilding. Previous50866a49...
+  is archived with accepted notice bytes and receipts. Previous8e63916d...
   and accepted core/default hashes are archived. Previous personal
   defaultbb3652f3... is archived with exact accepted core/default hashes. Previous creation
   defaulta7dd1be8..., deletiond8d51c7f... and accepted cores/guards are archived.
@@ -600,18 +601,29 @@ Coreccb31517... verifies eight native cases, ZPNROW01/one VUser audit and separa
 ID9/two project audits. Raw256/remount/Save/Lock/actual-close/two-stage Undo,
 user/project audit rollback/retry and existing-row regression pass. All15 project
 tables/67 prior audits, VUser tables/three old audits, old rows/reservations,
-support/config and schema preserved. Fixture now69 project audits/four user audits.
-ZPNAT01 remains row0; ZPNAT02 is ID8; ZPNROW01 is ID9. Triggers removed.
+support/config and schema preserved. Fixture now70 project audits/four user audits.
+ZPNAT01 remains row0; ZPNAT02 is ID8; ZPNROW01 is ID9. ID8 now retains its physical
+record/species/Height6 with Cover6=NULL and is absent from both C source views.
+Triggers removed.
 Default50866a49... proves25 enabled numeric controls/Species/Collected, readonly
 saved-personal lookup, all unfinished creation controls disabled and every fixture
-byte unchanged. Exact accepted default is current/candidate; archives/
+byte unchanged. This previous default is archived; archives/
 creation-personal-checkpoint seals core/default/previous8e63916d with hashes.
 Older personal/creation-decision proofs and archives remain unchanged.
-Core8104/default14528 exited; inspector9392 closed. No native/race command remains.
+Core8104/default14528 exited. Current20a6c3e7... verifies the nonblocking C/C-height
+NULL-cover notice and focus styling. Focused Go0.752s/full race459.824s,202 frontend
+tests/check0/0/default build pass. Native seven-case proof saves only ID8 Cover6=NULL
+and one project audit, retaining its physical record/species/height; malformed input,
+remount/Undo, audit rollback/retained retry and successful feedback pass.
+Independent readonly delivery reopens identical candidate bytes, verifies25 labelled
+numeric controls/Species/Collected, disabled unfinished workflows and every fixture
+byte unchanged. Owned9884/12208 exited; inspector9392 closed. Exact candidate bytes
+are current/candidate; archives/cover-notices-checkpoint seals accepted default,
+previous50866a49 builds and receipts with hashes. No native/race command remains.
 Publication includes application source only; private evidence/binaries/dist are
-ignored. Use git HEAD/upstream for the current commit; predecessoreaf71a6.
-Never replay creation-personal.py completed modes or prior personal/creation proofs.
-Next: active warning/focus UX and separately scoped parent code-check/metadata/profiling.
+ignored. Use git HEAD/upstream for the current commit; predecessor3bb5f27.
+Never replay cover-notices.py or creation-personal.py completed modes or prior proofs.
+Next: remaining active warning/navigation and separately scoped parent code-check/metadata/profiling.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
 unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
 rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a

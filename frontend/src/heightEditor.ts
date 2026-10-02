@@ -44,6 +44,14 @@ export function heightErrors(drafts: HeightDrafts): string[] {
 export function heightDirty(drafts: HeightDrafts): boolean {
   return Object.values(drafts).some(row => Object.values(row).some(cell => cell && (cell.error !== null || cell.value !== cell.expected)));
 }
+export function heightSourceNotices(drafts: HeightDrafts): string[] {
+  return Object.entries(drafts).flatMap(([id, row]) => {
+    const cover = row.cover6;
+    return cover && (cover.form === 'SubVegCXL' || cover.form === 'SubVegChtXL') &&
+      cover.error === null && cover.expected !== null && cover.value === null
+      ? [`Vegetation row ${id}: Cover6 is NULL. Saving removes this row from C and C-height views; it does not delete the vegetation record.`] : [];
+  });
+}
 export function heightUpdates(drafts: HeightDrafts): HeightUpdate[] {
   const errors = heightErrors(drafts);
   if (errors.length) throw new Error(errors[0]);

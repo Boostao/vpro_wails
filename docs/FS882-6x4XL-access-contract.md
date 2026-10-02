@@ -513,6 +513,27 @@ fixture byte unchanged. Core8104/default14528 exited;9392 closed.
 Focused Go2.511s/full race488.508s,200 frontend tests/check0/0/builds pass.
 Original R/Access/production sources were not written; no source oracle was run.
 
+### C/C-height NULL-cover notices and source focus styling
+
+Exported C/C-height BeforeUpdate handlers warn about NULL Cover6 without setting
+Cancel. The desktop emits a nonblocking notice for changed non-NULL Cover6 drafts,
+explaining that Save removes both C source-view memberships without deleting the
+physical record. Malformed numeric input remains an error, never a NULL assignment.
+The notice survives remount/failed Save, clears on original correction/Undo and
+appears in successful Save feedback. Focused cells use the existing emerald styling
+and a keyboard outline; explicit Save and mutually gated editors remain intentional
+adaptations, not automatic Access focus-transfer parity.
+
+Native20a6c3e7... passes seven cases, including actual activeElement/background/
+outline observations, visible notices, remount/invalid correction/Undo and audit
+rollback/retry. Only ID8 Cover6 changes to NULL with one project audit; its physical
+row/species/Height6 persist while C/C-height source views omit it. Original tables,
+prior history/reservations, schema and support/config bytes remain intact.
+Independent readonly delivery of identical bytes verifies25 labelled numeric
+controls, Species/Collected, disabled unfinished workflows and all fixture bytes
+unchanged. Owned9884/12208 exited;9392 closed. Focused Go0.752s/full race459.824s,
+202 frontend tests/check0/0/default build pass. No native Access oracle was run.
+
 ## Verified bounded selective restoration
 
 `SetAuditRestoreSelection` atomically stores a verified selection; `RestoreSelectedAuditRecords` accepts exact string row IDs and cancel/retain/prune actions. The legacy marked-row API remains. Typed mapping covers 97 nonidentity parent and 61 non-Cover child fields. Invalid/foreign/missing rows, duplicate identities, unsupported fields, stale history chains, malformed values and failed triggers abort the entire transaction. Restore ordering follows source Table ascending then EditWhen descending, with descending rowid for deterministic timestamp ties.
