@@ -194,10 +194,10 @@ The header DTO has all 98 unique stored parent properties (88 Env, 10 Admin) and
   Default-on readonly delivery preserves all fixture bytes with zero audits;
   `VITE_VEGETATION_ATTRIBUTE_EDITING=false` is an explicit read-only opt-out.
   Evidence/private/native-vegetation-attributes; exact eb3a009b... promoted.
-- Newly mapped attributes are displayed read-only. Schema capabilities distinguish unsupported columns from supported SQL NULL. Creation supplies explicit null values for the expanded contract; native Cancel creates no row and Create leaves unspecified numeric data NULL.
+- Remaining unverified child controls are read-only. Schema capabilities distinguish unsupported columns from supported SQL NULL. Creation supplies explicit null values for the expanded contract; native Cancel creates no row and Create leaves unspecified numeric data NULL.
 - Explicit child Update supports imported zero IDs without invoking compatibility creation. Plot/ID ownership, stale or duplicate identities and NULL Veg identities are guarded. Positive signed32 allocation and a transactionally updated reservation ledger prevent deleted-ID reuse.
 - Data changes, deletion and identity-bearing mapped-field audit share one transaction. Thresholds remain >=1 for changed nonnull values, >=2 for null additions and exactly 3 for deletion. Failed operations refresh and remount the displayed rows so rolled-back values are not left visibly accepted.
-- `Queries/USysVegOther.txt` selects the attribute columns from `UsysVeg` without a nonnull-attribute predicate. The read-only Veg Other page therefore includes every vegetation row for the current plot. Normal A/C/D grid membership is based on nonnull covers, including zero, and can show the same record in multiple grids.
+- `Queries/USysVegOther.txt` selects the attribute columns from `UsysVeg` without a nonnull-attribute predicate. The Veg Other page therefore includes every vegetation row for the current plot. Normal A/C/D grid membership is based on nonnull covers, including zero, and can show the same record in multiple grids.
 - The child VBA does not recompute `TotalA`/`TotalB` after a cover edit; desktop edits preserve these independently stored fields.
 - Access BOOLEAN values require explicit normalization: true `-1`, false `0`, and NULL remain distinct. Both parent and child readers bypass the SQLite driver's BOOLEAN affinity conversion; writes/audits serialize true as `-1`. Native testing reproduced the former false conversion and verified its fix, legacy-edit preservation, and exact SQL values.
 - Native evidence under ignored `evidence/private/expanded-child-parity/` verifies all four child families, new attributes, zero/NULL membership, true/false/NULL flags and creation cancellation. These checks supplement Go full-field/schema/audit/rollback tests; they are not native Access proof of the remaining child reference, addition, metadata or deletion workflows.
@@ -216,7 +216,33 @@ Source: `FS882-6x4XL.btnCoverAndHeight_Click`, and the inline RecordSource SQL i
 | Dirty | false | false | false |
 | Env/Admin/Veg/Audit rows | 52/52/1633/389 | unchanged | unchanged |
 
-Desktop viewing preserves these source positions, including the distinct initial/returned D position and the wider content's horizontal scrolling. The action never saves. A-height includes nonnull cover/total fields or Height1-5; C-height still requires nonnull Cover6, including zero. Native Wails tests verify a height-only row appears only in A-height, the zero-cover C row remains, and an exact all-seven-table SQL digest stays unchanged. Existing-row height/cover editing is now verified separately below; species/Collected and insertion/deletion in those grids remain unavailable.
+Desktop viewing preserves these source positions, including the distinct initial/returned D position and the wider content's horizontal scrolling. The action never saves. A-height includes nonnull cover/total fields or Height1-5; C-height still requires nonnull Cover6, including zero. Native Wails tests verify a height-only row appears only in A-height, the zero-cover C row remains, and an exact all-seven-table SQL digest stays unchanged. Existing-row height/cover editing and Collected cycles are verified separately; species and insertion/deletion in those grids remain unavailable.
+
+### Verified shared Collected click
+
+All five active XL vegetation forms export identical Collected_Click branches:
+NULL -> C -> V -> NULL, with no branch changing other stored strings. Their
+Option Compare Database uses case/width-equivalent C/V values; readonly DAO
+evidence on a disposable exact source copy confirms ASCII case/fullwidth
+equivalence and rejects accented C. General locale collation is not extrapolated;
+the unsupported DAO StrComp expression was not used as event proof.
+
+Desktop buttons stage the source click rather than permit unrestricted text.
+Explicit ID/nullable expected/click-count transport preserves imported zero IDs,
+empty text and nil-omitting legacy transport. Shared multirow data/audit patches
+reject stale ownership and omit unchanged historical assignments. Multiple clicks
+audit only the saved final value; a full roundtrip has no audit. Explicit Save/
+Undo/Cancel and retained drafts across tabs/views are deliberate desktop lifecycle
+adaptations. Source BeforeUpdate audit paths are reused conceptually; unreachable
+metadata/duplicate merges are not inherited.
+
+Full race493.062s/180 frontend tests/check0/0/default+opt-out builds and native
+Wails13 cases/8 audits verify five live controls, shared row state, NULL, unknown
+history, fullwidth clicks, lifecycle, stale rejection and second-row rollback/
+retry. All15 tables/32 old audits/schema/support/config/external bytes are retained
+apart from exact planned edits. Default readonly delivery proves all bytes
+unchanged and zero new audits. `VITE_VEGETATION_COLLECTED_EDITING=false` disables
+the controls. Evidence/private/native-vegetation-collected; exact156aeb46... promoted.
 
 ## Verified bounded selective restoration
 

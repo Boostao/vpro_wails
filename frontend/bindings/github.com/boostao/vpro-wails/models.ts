@@ -96,6 +96,12 @@ export interface BECZone {
     "description": string | null;
 }
 
+export interface CollectedRecordUpdate {
+    "id": number;
+    "expected": string | null;
+    "clicks": number;
+}
+
 export interface ContextSelection {
     "project": string;
     "projectPath": string;

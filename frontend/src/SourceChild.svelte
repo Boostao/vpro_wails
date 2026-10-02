@@ -5,9 +5,10 @@
   import { otherField, type OtherDrafts, type OtherValue } from './otherEditor';
   import { soilField, soilCell, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import { vegetationAttributeField, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
+  import type { CollectedDrafts } from './collectedEditor';
   import type { SoilSuggestion } from '../bindings/github.com/boostao/vpro-wails';
   type Row = { id: number; values: Record<string, string | number | boolean | null | undefined> };
-  let { name, rows, disabled = true, deleteDisabled = false, revision = 0, onedit, ondelete, onstage, drafts = {}, onotherstage, otherDrafts = {}, onsoilstage, soilDrafts = {}, soilSuggestions = [], onattributestage, attributeDrafts = {}, attributeSuggestions = [] }: {
+  let { name, rows, disabled = true, deleteDisabled = false, revision = 0, onedit, ondelete, onstage, drafts = {}, onotherstage, otherDrafts = {}, onsoilstage, soilDrafts = {}, soilSuggestions = [], onattributestage, attributeDrafts = {}, attributeSuggestions = [], oncollectedstage, collectedDrafts = {}, collectedDisabled = true }: {
     name: string; rows: Row[]; disabled?: boolean; revision?: number;
     onedit?: (name: string, id: number, column: string, value: string) => Promise<void>;
     ondelete?: (name: string, id: number) => Promise<void>;
@@ -21,6 +22,9 @@
     onattributestage?: (id: number, column: string, value: string) => void;
     attributeDrafts?: VegetationAttributeDrafts;
     attributeSuggestions?: SoilSuggestion[];
+    oncollectedstage?: (id: number) => void;
+    collectedDrafts?: CollectedDrafts;
+    collectedDisabled?: boolean;
     deleteDisabled?: boolean;
   } = $props();
   const source = $derived(paperChild(name));
@@ -57,7 +61,14 @@
           {@const attribute = name === 'USysVegOtherXL' && control.column ? vegetationAttributeField(control.column) : undefined}
           {@const attributeStaged = attribute ? attributeDrafts[String(row.id)]?.[attribute.key] : undefined}
           <td>
-          {#if mapped && onattributestage && attribute && control.column}
+          {#if mapped && oncollectedstage && control.column?.toLowerCase() === 'collected'}
+            {@const collected = collectedDrafts[String(row.id)]}
+            <button class="source-cell" type="button" data-column={control.column}
+              disabled={collectedDisabled || control.locked || !control.enabled}
+              aria-label={`Cycle Collected, row ${row.id}`}
+              title="Click to cycle NULL -> C -> V -> NULL. Other stored values are unchanged."
+              onclick={() => oncollectedstage?.(row.id)}>{(collected ? collected.value : value) ?? 'NULL'}</button>
+          {:else if mapped && onattributestage && attribute && control.column}
             {@const listId = `veg-attribute-${row.id}-${attribute.key}`}
             <input class="source-cell" type="text" inputmode="numeric"
               value={attributeStaged ? attributeStaged.raw : value ?? ''} list={attribute.group ? listId : undefined}

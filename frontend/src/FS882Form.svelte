@@ -32,6 +32,7 @@
   import { otherField, stageOther, otherDirty, otherErrors, otherUpdates, type OtherDrafts, type OtherValue } from './otherEditor';
   import { soilField, stageSoil, soilDirty, soilErrors, soilUpdates, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import { vegetationAttributeField, stageVegetationAttribute, vegetationAttributeDirty, vegetationAttributeErrors, vegetationAttributeUpdates, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
+  import { stageCollected, collectedDirty, collectedUpdates, type CollectedDrafts } from './collectedEditor';
   import type { WorkingUnitSession } from './workingUnitEditor';
   import { onDestroy, untrack, tick } from 'svelte';
   import { bindContextPlots } from './contextPlots';
@@ -89,7 +90,10 @@
   let attributeReferenceReady = $state(false);
   let attributeReferenceBusy = $state(false);
   let attributeReferenceError = $state<string | null>(null);
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved);
+  const collectedEditingEnabled = import.meta.env.VITE_VEGETATION_COLLECTED_EDITING !== 'false';
+  let collectedDrafts = $state<CollectedDrafts>({});
+  const collectedUnsaved = $derived(collectedDirty(collectedDrafts));
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -327,10 +331,11 @@
 
   let original = $state<FS882Header | null>(null);
   const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null);
-  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved);
-  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved);
-  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved);
-  const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved);
+  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
+  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
+  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved);
+  const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved);
+  const collectedEditingDisabled = $derived(!collectedEditingEnabled || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved);
   const childEditingDisabled = $derived(childParentDisabled || childUnsaved);
   const auditRestoreEnabled = import.meta.env.VITE_AUDIT_RESTORE !== 'false';
   const auditProject = $derived($projectState?.activeProject ?? '');
@@ -416,6 +421,7 @@
     otherDrafts = {};
     soilDrafts = {};
     attributeDrafts = {};
+    collectedDrafts = {};
     vegList = [];
     humusList = [];
     mineralList = [];
@@ -562,6 +568,64 @@
 
   async function updateVegCover(row: VegRecord) {
     await childOperation(() => PlotService.UpdateVegRecord(row));
+  }
+
+  function stageCollectedCell(id: number) {
+    try {
+      if (collectedEditingDisabled) throw new Error('Collected editing is unavailable while loading, locked, busy or another draft is unsaved.');
+      if (childCapabilities.Veg.collected !== true) throw new Error('Collected is unavailable in the active schema.');
+      const rows = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
+      if (rows.length !== 1) throw new Error('Collected row identity is missing or ambiguous; reload before editing.');
+      // VegRecord omits nil Collected; the empty string remains a distinct value.
+      const stored = rows[0].collected ?? null;
+      collectedDrafts = stageCollected(collectedDrafts, id, stored);
+      successMsg = null;
+      if (error?.startsWith('Collected ')) error = null;
+    } catch (cause) {
+      error = `Collected draft failed: ${String(cause)}`;
+      childRevision++;
+    }
+  }
+
+  async function cancelCollectedDrafts() {
+    if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling Collected drafts.'; return; }
+    collectedDrafts = {};
+    childRevision++;
+    error = null;
+    successMsg = null;
+    busy = true;
+    try {
+      await loadChildData(draft.plotNumber);
+      successMsg = 'Collected drafts cancelled. Stored data and history were unchanged; current rows reloaded.';
+    } catch (cause) {
+      capabilitiesReady = false;
+      error = `Collected drafts cancelled, but current rows could not be reloaded. Reopen the plot: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function saveCollectedDrafts() {
+    if (collectedEditingDisabled) { error = 'Save a clean, unlocked header before saving Collected drafts.'; return; }
+    let committed = false;
+    busy = true;
+    error = null;
+    successMsg = null;
+    try {
+      const updates = collectedUpdates(collectedDrafts);
+      if (updates.length === 0) { collectedDrafts = {}; successMsg = 'No Collected values changed.'; return; }
+      await PlotService.UpdateCollectedRecords(draft.plotNumber, updates);
+      committed = true;
+      collectedDrafts = {};
+      await loadChildData(draft.plotNumber);
+      successMsg = `Saved ${updates.length} Collected row drafts atomically.`;
+    } catch (cause) {
+      if (committed) capabilitiesReady = false;
+      error = committed ? `Collected changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
+        : `Collected save failed; drafts retained: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
   }
 
   function stageHeightCell(id: number, column: string, raw: string) {
@@ -920,6 +984,7 @@
     if (otherUnsaved) { await saveOtherDrafts(); return; }
     if (soilUnsaved) { await saveSoilDrafts(); return; }
     if (attributeUnsaved) { await saveAttributeDrafts(); return; }
+    if (collectedUnsaved) { await saveCollectedDrafts(); return; }
     const invalid = container.querySelector<HTMLInputElement>('.header-editor input:invalid');
     if (invalid) {
       invalid.reportValidity();
@@ -995,6 +1060,7 @@
     if (otherUnsaved) { void cancelOtherDrafts(); return; }
     if (soilUnsaved) { void cancelSoilDrafts(); return; }
     if (attributeUnsaved) { void cancelAttributeDrafts(); return; }
+    if (collectedUnsaved) { void cancelCollectedDrafts(); return; }
     if (original) {
       draft = JSON.parse(JSON.stringify(original));
     } else {
@@ -1026,6 +1092,10 @@
     }
     if (attributeUnsaved) {
       error = 'Save or Cancel vegetation attribute drafts before changing the plot lock.';
+      return;
+    }
+    if (collectedUnsaved) {
+      error = 'Save or Cancel Collected drafts before changing the plot lock.';
       return;
     }
     if (!draft.locked && dirty) {
@@ -1215,6 +1285,15 @@
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if collectedUnsaved}
+      <div class="collected-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Collected draft controls">
+        <span>Collected drafts are unsubmitted. Switching tabs or cover/height views never saves them; other editing waits.</span>
+        <div class="flex gap-2 mt-2">
+          <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={collectedEditingDisabled} onclick={() => void saveCollectedDrafts()}>Save Collected drafts</button>
+          <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelCollectedDrafts}>Cancel Collected drafts</button>
+        </div>
+      </div>
+    {/if}
     {#if attributeUnsaved}
       <div class="attribute-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Vegetation attribute draft controls">
         <span>Vegetation attribute drafts are unsubmitted. Switching tabs never saves them; other editing waits.</span>
@@ -1294,13 +1373,18 @@
           {@const heightGrid = child.form === 'SubVegAhtXL' || child.form === 'SubVegChtXL'}
           <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={heightGrid ? heightEditingDisabled : childEditingDisabled}
             drafts={heightDrafts} onstage={heightGrid && heightEditingEnabled ? stageHeightCell : undefined}
+            {collectedDrafts} collectedDisabled={collectedEditingDisabled}
+            oncollectedstage={collectedEditingEnabled ? stageCollectedCell : undefined}
             onedit={heightGrid ? undefined : editSourceChild} ondelete={heightGrid ? undefined : deleteSourceChild} />
         {/snippet}
       </SourcePage>
       {/snippet}
       </OrdinaryFields>
       {#if vegetationMode === 'height'}
-        <p class="mt-2 text-xs text-stone-500">{heightEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain. Species and collected workflows remain read-only here.' : 'Cover/height editing is gated until native Wails verification.'} Switching view does not save or change data.</p>
+        <p class="mt-2 text-xs text-stone-500">{heightEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain. Species remains read-only here.' : 'Cover/height editing is gated until native Wails verification.'} Switching view does not save or change data.</p>
+      {/if}
+      {#if collectedEditingEnabled}
+        <p class="mt-2 text-xs text-stone-500">Collected buttons cycle NULL -> C -> V -> NULL using persistent drafts. Other historical values remain unchanged, as in the source click event. Use Save or Cancel; species and new-row workflows remain unavailable in the source grids.</p>
       {/if}
       <details class="mt-4 border border-stone-200 rounded p-3">
         <summary class="text-xs font-semibold cursor-pointer">Experimental vegetation editing grid</summary>

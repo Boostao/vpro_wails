@@ -173,6 +173,10 @@ export function SetCurrentUser(user: string): $CancellablePromise<void> {
     return $Call.ByID(1759884188, user);
 }
 
+export function UpdateCollectedRecords(plot: string, updates: $models.CollectedRecordUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(1064168316, plot, updates);
+}
+
 /**
  * UpdateHeightRecords atomically patches one plot's existing rows and audits.
  * It neither allocates/reserves IDs nor inserts/deletes vegetation records.

@@ -59,6 +59,7 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 		"other drafts":          func() error { return service.UpdateOtherRecords(stale, "stale", nil) },
 		"soil drafts":           func() error { return service.UpdateSoilRecords(stale, "stale", nil) },
 		"vegetation attributes": func() error { return service.UpdateVegetationAttributes(stale, "stale", nil) },
+		"collected drafts":      func() error { return service.UpdateCollectedRecords(stale, "stale", nil) },
 		"delete other":          func() error { return service.DeleteOtherRecord(stale, "stale", 1) },
 		"height":                func() error { return service.UpdateHeightRecords(stale, "stale", nil) },
 		"audit flags":           func() error { return service.SetAuditRestoreSelection(stale, "stale", nil) },
@@ -86,6 +87,7 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 		"legacy other drafts": func() error { return service.plots.UpdateOtherRecords("stale", nil) },
 		"legacy soil drafts":  func() error { return service.plots.UpdateSoilRecords("stale", nil) },
 		"legacy attributes":   func() error { return service.plots.UpdateVegetationAttributes("stale", nil) },
+		"legacy collected":    func() error { return service.plots.UpdateCollectedRecords("stale", nil) },
 		"legacy audit flags":  func() error { return service.plots.SetAuditRestoreSelection("stale", nil) },
 		"legacy restoration": func() error {
 			_, err := service.plots.RestoreSelectedAuditRecords("stale", nil, AuditRestoreRetain)

@@ -34,12 +34,12 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all31 editor operations to immutable identities, leases running operations and
+  all32 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the same native-verified complete Other plus Humus12/Mineral18 editor
-  and vegetation physical-domain/12-attribute editing:
-  `eb3a009b5866075f36b5fb32b855ab6cff9fbdd697363043b5ba71e3873509d6`.
+  and vegetation physical-domain/12-attribute/Collected cycle editing:
+  `156aeb46ed0c2e435d64c9de23403ff7726ae0306c5e8329e64116374c94798b`.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
   Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
   omission remain intact. Shared expected-value transactions span rows/tables
@@ -87,6 +87,21 @@ between shells.
   zero audits. Default assets are byte-identical to core assets and embedded in
   exact promoted eb3a009b...; no later untested rebuild. Core executable and
  115ad838... fallback are sealed there. Never replay completed proofs.
+  Collected is default-on across all five cover/height source grids;
+  `VITE_VEGETATION_COLLECTED_EDITING=false` disables it. Source NULL/C/V clicks,
+  ASCII case/fullwidth database-equivalent variants and unchanged noncycle
+  history use explicit expected-value/click-count patches, final-value audits
+  and persistent mutually gated drafts. Existing nil-omitting VegRecord transport
+  is preserved without losing empty strings. Focused0.651s/full race493.062s;
+ 180 frontend tests/check0/0/default+opt-out; bindings15/116/42. Native13 cases/
+ 8 audits preserve15 tables/32 prior audits/schema/support/config/external bytes.
+  Stale rejection and second-row audit rollback retain drafts; Retry commits
+  once. The no-write initial rejection/harness continuations never replayed
+  writes. Core PID13356/default PID15216 exited; inspector9392 closed.
+  Readonly default delivery proves five visible labelled controls/all bytes
+  unchanged/zero audits. Default assets equal accepted opt-in bytes; exact
+ 156aeb46... is promoted. Evidence/private/native-vegetation-collected seals
+  core/rejected executables, source readonly collation copy and eb3a009b fallback.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
@@ -450,8 +465,8 @@ The fourteen ordinary surveyor/depth/cover/note fields are now native-verified.
 The two nullable flags, strict SoilDrainage, source-authorized BEC Master and
 final X/Y/Photo scalar batch complete the98-field writable parent baseline.
 Continue actual FS882 child workflows, not another parent-field inventory.
-Other8/Humus12/Mineral18 and all12 existing-row vegetation attributes are
-verified/promoted; continue distinct species/Collected/cover/height creation/
+Other8/Humus12/Mineral18, all12 existing-row vegetation attributes and the shared
+five-grid Collected cycle are verified/promoted; continue distinct species/cover/height creation/
 deletion and calculation events.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.

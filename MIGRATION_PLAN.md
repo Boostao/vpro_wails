@@ -32,7 +32,7 @@ broadcasts coordination messages. Native Access has one exclusive owner.
 | 4 | Integrate database family, context and configuration (complete) | F1-F3 pass: retained JSON-to-YAML migration, preserved SQLite family/descriptions, active external-path ownership/compatibility and offline TEMP views, native safe switching/reopen/recovery. Final full race,137 frontend tests/check/build and default-on native delivery pass. |
 | 4a | Bounded backend ownership/performance follow-up (C1-C3 complete) | Context-owned pooling, verified catalogue snapshots and active retrieval cancellation pass full race/frontend/native gates. Warm lookups avoid repeated hashing/scans; corruption, replacement and Retry preserve metadata/drafts/data. C4-C5 structural cleanup is incremental, not a new expansion-blocking rewrite. Preserve sealed baselines and resume parent workflows. |
 | 5 | Complete bounded FS882 parent field editing (complete98/98) | All98 mapped parent fields have a native-verified writable baseline, including source-authorized BEC Master, strict SoilDrainage and final X/Y/Photo scalars. This is not full form/application parity; picture management, projection, bulk/reverse copying and remaining child/calculation events stay separately scoped and unavailable until verified. |
-| 6 | Complete FS882 child workflows (in progress; Other, soil and vegetation attributes complete) | Other8, Humus12 and Mineral18 source-bound cells and create/delete/draft lifecycle are native-verified; all12 Veg Other attributes have verified existing-row drafts/suggestions/lifecycle. Finish species/cover/height creation/deletion and calculation/event behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
+| 6 | Complete FS882 child workflows (in progress; Other, soil, vegetation attributes and Collected complete) | Other8, Humus12 and Mineral18 source-bound cells and create/delete/draft lifecycle are native-verified; all12 Veg Other attributes have verified existing-row drafts/suggestions/lifecycle. Collected cycles share verified drafts across all five source grids. Finish species/cover/height creation/deletion and calculation/event behavior. Test identity ownership, NULL, audit, rollback and parent/context lifecycle. Storage mapping alone is not completion. |
 | 7 | Complete project and administrative domain workflows | Build on the foundation rather than postponing it: project creation/conversion, SU/hierarchy authorization and editing, user/reference/metadata writes and bulk operations. Add multiwindow behavior only when coordination is verified. |
 | 8 | Implement data interchange | SQLite/CSV/Excel/archive boundaries first as supported by the source workflows. Access reading belongs to the separate go-mdbtools effort and enters only through fixture-tested import adapters. Validate roundtrip, collision, cancellation and rollback. |
 | 9 | Implement reports, maps and remaining active modules | Source-driven templates, preview/export, filters, offline assets and administration. Inventory all active entry points; keep placeholders disabled. |
@@ -656,4 +656,35 @@ integration suite is needed. Final default-on readonly Wails delivery verifies
 all12 live labelled controls/145 reference definitions with every fixture byte
 unchanged and zero audits. Evidence/private/native-vegetation-attributes retains
 the accepted core and115ad838... fallback; exact eb3a009b... is promoted.
-Continue species/Collected/cover/height creation/deletion and calculations next.
+Collected_Click is now default-on across SubVegAXL_BC/CXL/DXL/AhtXL/ChtXL;
+`VITE_VEGETATION_COLLECTED_EDITING=false` is the read-only opt-out. All five
+exported events agree: NULL -> C -> V -> NULL; other values do nothing, rather
+than clear to NULL. Readonly native DAO on a disposable exact source copy
+confirms ASCII case/fullwidth C/V database equivalence, not accent equivalence.
+Those explicit variants are recognized only on an intentional click; unchanged
+values are never recased or repaired. General locale collation is not invented.
+The attempted DAO StrComp expression is unsupported and not event parity proof.
+
+Explicit signed32 identity, expected nullable text and bounded click-count
+transport reuse the shared child patch/audit transaction. Three clicks returning
+to the original value create no audit; a multi-click Save audits only its final
+value. Historical noncycle values remain untouched. Legacy VegRecord omits NULL
+Collected; the draft adapter retains that contract without conflating empty text.
+Drafts persist across all cover/height views and tabs and gate other editing,
+Save/Undo/Cancel/Lock/native close/context. Failed Save retains drafts; committed
+refresh failure reports the commit and disables editing.
+
+Focused Go0.651s/full race493.062s;180 frontend tests/check0/0/default+opt-out
+builds; bindings15/116/42 pass. Actual Wails13 cases/8 intended audits prove
+shared five-grid rendering, roundtrip/history no-ops, multirow/NULL/fullwidth
+events, remount/Undo/Cancel/Lock/close/context, stale rejection and complete
+second-row audit rollback/retry. All15 original tables/32 historical audits,
+schema and support/config/external bytes are preserved except exact planned edits.
+The initial nullable-transport rejection and modal/startup harness continuations
+were sealed before any writes; no completed writes were replayed.
+Final default readonly delivery verifies five controls with every fixture byte
+unchanged and zero audits. Default assets match accepted opt-in assets exactly;
+exact156aeb46... is promoted, not a later untested rebuild. Core PID13356/default
+PID15216 exited; inspector9392 closed. Evidence/private/native-vegetation-collected
+retains accepted/rejected executables and eb3a009b... fallback.
+Continue species/cover/height creation/deletion and calculations next.

@@ -46,6 +46,7 @@ export type {
     BECSiteSeries,
     BECSubZone,
     BECZone,
+    CollectedRecordUpdate,
     ContextSelection,
     CoordinateParts,
     FS882Header,

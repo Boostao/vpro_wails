@@ -9,7 +9,7 @@
     "build": "vite build --mode production",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test": "node --test src/paperLayout.test.cjs src/formPresentation.test.cjs src/sourcePageEditor.test.cjs src/soilCodeReference.test.cjs src/soilCodeEditor.test.cjs src/geologyCodeEditor.test.cjs src/parentCodeEditor.test.cjs src/ordinaryEditor.test.cjs src/otherEditor.test.cjs src/soilChildEditor.test.cjs src/vegetationAttributeEditor.test.cjs src/AuditRestore.test.cjs src/closeLifecycle.test.cjs src/coordinateEditor.test.cjs src/becEditor.test.cjs src/heightEditor.test.cjs src/workingUnitEditor.test.cjs src/qualityEditor.test.cjs src/substrateEditor.test.cjs src/siteCodeEditor.test.cjs src/regionCodeEditor.test.cjs src/contextPlots.test.cjs src/readRequests.test.cjs",
+    "test": "node --test src/paperLayout.test.cjs src/formPresentation.test.cjs src/sourcePageEditor.test.cjs src/soilCodeReference.test.cjs src/soilCodeEditor.test.cjs src/geologyCodeEditor.test.cjs src/parentCodeEditor.test.cjs src/ordinaryEditor.test.cjs src/otherEditor.test.cjs src/soilChildEditor.test.cjs src/vegetationAttributeEditor.test.cjs src/collectedEditor.test.cjs src/AuditRestore.test.cjs src/closeLifecycle.test.cjs src/coordinateEditor.test.cjs src/becEditor.test.cjs src/heightEditor.test.cjs src/workingUnitEditor.test.cjs src/qualityEditor.test.cjs src/substrateEditor.test.cjs src/siteCodeEditor.test.cjs src/regionCodeEditor.test.cjs src/contextPlots.test.cjs src/readRequests.test.cjs",
     "test:context": "node --test src/contextPlots.test.cjs src/readRequests.test.cjs",
     "test:paper-layout": "node --test src/paperLayout.test.cjs"
   },

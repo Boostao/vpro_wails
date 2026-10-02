@@ -1,5 +1,5 @@
 import { ContextService, type FS882Header, type VegRecord, type HumusRecord, type MineralRecord,
-  type OtherRecord, type OtherRecordUpdate, type SoilRecordUpdate, type VegetationAttributeUpdate, type HeightRecordUpdate, type AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
+  type OtherRecord, type OtherRecordUpdate, type SoilRecordUpdate, type VegetationAttributeUpdate, type CollectedRecordUpdate, type HeightRecordUpdate, type AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
 
 export function bindContextPlots(contextId: string, port = ContextService) {
   if (!contextId) throw new Error('An editor requires a loaded project context identity.');
@@ -31,6 +31,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
     UpdateOtherRecords: (plot: string, updates: OtherRecordUpdate[] | null) => port.UpdateOtherRecords(contextId, plot, updates),
     UpdateSoilRecords: (plot: string, updates: SoilRecordUpdate[] | null) => port.UpdateSoilRecords(contextId, plot, updates),
     UpdateVegetationAttributes: (plot: string, updates: VegetationAttributeUpdate[] | null) => port.UpdateVegetationAttributes(contextId, plot, updates),
+    UpdateCollectedRecords: (plot: string, updates: CollectedRecordUpdate[] | null) => port.UpdateCollectedRecords(contextId, plot, updates),
     DeleteOtherRecord: (plot: string, id: number) => port.DeleteOtherRecord(contextId, plot, id),
     UpdateHeightRecords: (plot: string, updates: HeightRecordUpdate[] | null) => port.UpdateHeightRecords(contextId, plot, updates),
     SetAuditRestoreSelection: (plot: string, rowIds: string[] | null) => port.SetAuditRestoreSelection(contextId, plot, rowIds),

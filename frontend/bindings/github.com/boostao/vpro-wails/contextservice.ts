@@ -101,6 +101,10 @@ export function SwitchContext(expectedID: string, requested: $models.ContextSele
     return $Call.ByID(1469329417, expectedID, requested);
 }
 
+export function UpdateCollectedRecords(contextID: string, plot: string, updates: $models.CollectedRecordUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(3289076996, contextID, plot, updates);
+}
+
 export function UpdateHeightRecords(contextID: string, plot: string, updates: $models.HeightRecordUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(1221733762, contextID, plot, updates);
 }
