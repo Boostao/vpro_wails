@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VPRO - Vegetation Processor Desktop Application</title>
+  <meta name="description" content="Download VPRO: the modern cross-platform desktop application for vegetation and ecosystem survey processing.">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Tailwind CSS via CDN for standalone GitHub Pages static deployment -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            forest: {
+              50: '#f2f8f4',
+              100: '#e1efe5',
+              200: '#c5dfce',
+              600: '#2d6a4f',
+              700: '#1b4332',
+              800: '#081c15',
+              900: '#04100c',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .gradient-hero {
+      background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 50%, #40916c 100%);
+    }
+    .badge-os {
+      @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Navigation Bar -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="text-2xl">🌲</span>
+        <div>
+          <span class="text-xl font-bold tracking-tight text-forest-700">VPRO</span>
+          <span class="text-xs uppercase px-1.5 py-0.5 ml-1 bg-forest-100 text-forest-700 font-semibold rounded">Wails Edition</span>
+        </div>
+      </div>
+      <nav class="flex items-center space-x-6 text-sm font-medium">
+        <a href="#downloads" class="text-gray-600 hover:text-forest-600 transition">Downloads</a>
+        <a href="#installation" class="text-gray-600 hover:text-forest-600 transition">Installation Guide</a>
+        <a href="#about" class="text-gray-600 hover:text-forest-600 transition">About VPRO</a>
+        <a href="https://github.com/Boostao/vpro_wails" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-gray-900 flex items-center gap-1">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          GitHub
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section with Automatic Platform Detection -->
+  <section class="gradient-hero text-white py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto text-center">
+      <span class="inline-block py-1 px-3 rounded-full text-xs font-semibold bg-emerald-500/30 text-emerald-100 border border-emerald-400/30 mb-4">
+        Successor to Classic VPRO 6.x & vprouser.ca
+      </span>
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
+        Vegetation and Ecosystem Data Processing Made Modern
+      </h1>
+      <p class="text-lg sm:text-xl text-emerald-100 max-w-2xl mx-auto mb-8 leading-relaxed">
+        Fast, lightweight, native desktop application for botanical, ecological, and forest survey processing. No MS Access runtime required.
+      </p>
+
+      <!-- Primary Dynamic Download Button -->
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 max-w-lg mx-auto border border-white/20 shadow-xl">
+        <div id="detected-platform-banner" class="text-sm text-emerald-200 mb-3 flex items-center justify-center gap-2">
+          <span>Detected platform:</span>
+          <strong id="detected-platform-name" class="text-white font-semibold">Detecting...</strong>
+        </div>
+
+        <a id="primary-download-btn" href="#downloads" 
+           class="inline-flex items-center justify-center w-full px-6 py-4 rounded-xl text-base sm:text-lg font-bold bg-white text-forest-700 hover:bg-emerald-50 shadow-lg transform active:scale-98 transition duration-150">
+          <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span id="primary-download-text">Download Latest Release</span>
+        </a>
+
+        <div class="mt-4 text-xs text-emerald-100 flex items-center justify-between">
+          <span id="release-version-tag">Version: Loading...</span>
+          <a href="#downloads" class="underline hover:text-white transition">View all platforms & architectures</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- All Downloads Section -->
+  <section id="downloads" class="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto w-full">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold text-gray-900">All Platform Downloads</h2>
+      <p class="text-gray-600 mt-2">Choose the installer or standalone executable for your operating system.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      
+      <!-- Windows Card -->
+      <div id="card-windows" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col justify-between hover:border-forest-600 transition">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="text-3xl">🪟</span>
+              <h3 class="text-xl font-bold text-gray-900">Windows</h3>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-medium">Win 10 / 11</span>
+          </div>
+          <p class="text-sm text-gray-600 mb-6">Built natively with WebView2 and SQLite storage engine.</p>
+          
+          <div class="space-y-3">
+            <div>
+              <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">x86_64 (Standard 64-bit)</div>
+              <div class="flex flex-col gap-1.5">
+                <a id="dl-win-x64-installer" href="https://github.com/Boostao/vpro_wails/releases/latest" 
+                   class="download-link flex items-center justify-between px-3.5 py-2 rounded-lg bg-gray-50 hover:bg-forest-50 border border-gray-200 text-sm font-medium text-gray-800 transition">
+                  <span>Installer (.exe)</span>
+                  <span class="text-xs text-forest-600">Recommended</span>
+                </a>
+                <a id="dl-win-x64-zip" href="https://github.com/Boostao/vpro_wails/releases/latest" 
+                   class="download-link flex items-center justify-between px-3.5 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-sm font-medium text-gray-700 transition">
+                  <span>Portable (.zip)</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">ARM64 (Snapdragon / Surface Pro)</div>
+              <div class="flex flex-col gap-1.5">
+                <a id="dl-win-arm64-installer" href="https://github.com/Boostao/vpro_wails/releases/latest" 
+                   class="download-link flex items-center justify-between px-3.5 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-sm font-medium text-gray-700 transition">
+                  <span>Installer (.exe)</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-gray-100 text-xs text-gray-500">
+          Requires Microsoft Edge WebView2 runtime (preinstalled on Windows 10/11).
+        </div>
+      </div>
+
+      <!-- macOS Card -->
+      <div id="card-macos" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col justify-between hover:border-forest-600 transition">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="text-3xl">🍎</span>
+              <h3 class="text-xl font-bold text-gray-900">macOS</h3>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-medium">macOS 12+</span>
+          </div>
+          <p class="text-sm text-gray-600 mb-6">Universal binary supporting both Apple Silicon (M1/M2/M3/M4) and Intel Macs.</p>
+          
+          <div class="space-y-3">
+            <div>
+              <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Universal (Apple Silicon & Intel)</div>
+              <div class="flex flex-col gap-1.5">
+                <a id="dl-mac-dmg" href="https://github.com/Boostao/vpro_wails/releases/latest" 
+                   class="download-link flex items-center justify-between px-3.5 py-2 rounded-lg bg-gray-50 hover:bg-forest-50 border border-gray-200 text-sm font-medium text-gray-800 transition">
+                  <span>Disk Image (.dmg)</span>
+                  <span class="text-xs text-forest-600">Recommended</span>
+                </a>
+                <a id="dl-mac-zip" href="https://github.com/Boostao/vpro_wails/releases/latest" 
+                   class="download-link flex items-center justify-between px-3.5 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-sm font-medium text-gray-700 transition">
+                  <span>App Archive (.zip)</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-gray-100 text-xs text-gray-500">
+          Native WebKit runtime. Works seamlessly on ARM64 and x86_64 architectures.
+        </div>
+      </div>
+
+      <!-- Linux Card -->
+      <div id="card-linux" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col justify-between hover:border-forest-600 transition">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="text-3xl">🐧</span>
+              <h3 class="text-xl font-bold text-gray-900">Linux</h3>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-medium">GTK4 / WebKit</span>
+          </div>
+          <p class="text-sm text-gray-600 mb-6">Distro-independent AppImage or standard Debian/Ubuntu packages.</p>
+          
+          <div class="space-y-3">
+            <div>
+              <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">x86_64 (Standard 64-bit)</div>
+              <div class="flex flex-col gap-1.5">
+                <a id="dl-linux-appimage" href="https://github.com/Boostao/vpro_wails/releases/latest" 
+                   class="download-link flex items-center justify-between px-3.5 py-2 rounded-lg bg-gray-50 hover:bg-forest-50 border border-gray-200 text-sm font-medium text-gray-800 transition">
+                  <span>Standalone AppImage</span>
+                  <span class="text-xs text-forest-600">Recommended</span>
+                </a>
+                <a id="dl-linux-deb" href="https://github.com/Boostao/vpro_wails/releases/latest" 
+                   class="download-link flex items-center justify-between px-3.5 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-sm font-medium text-gray-700 transition">
+                  <span>Debian / Ubuntu (.deb)</span>
+                </a>
+                <a id="dl-linux-tar" href="https://github.com/Boostao/vpro_wails/releases/latest" 
+                   class="download-link flex items-center justify-between px-3.5 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-sm font-medium text-gray-700 transition">
+                  <span>Binary Tarball (.tar.gz)</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-gray-100 text-xs text-gray-500">
+          Requires GTK4 & WebKitGTK 6.0 packages on modern distributions.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Installation Documentation Section -->
+  <section id="installation" class="py-16 bg-white border-t border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Installation & Setup Guide</h2>
+
+      <div class="space-y-8">
+        
+        <!-- Windows Guide -->
+        <div class="border border-gray-200 rounded-xl p-6 bg-gray-50">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-3">
+            <span>🪟</span> Installing on Windows
+          </h3>
+          <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 leading-relaxed">
+            <li>Download the <strong>vpro-windows-amd64-installer.exe</strong> installer above.</li>
+            <li>Double-click the downloaded file. If Windows SmartScreen displays a warning ("Windows protected your PC"), click <em>More info</em> and then <em>Run anyway</em>.</li>
+            <li>Follow the on-screen installation wizard. VPRO will be installed to your Start Menu and Desktop.</li>
+            <li>Launch <strong>VPRO</strong> from your desktop shortcut or Start Menu.</li>
+          </ol>
+        </div>
+
+        <!-- macOS Guide -->
+        <div class="border border-gray-200 rounded-xl p-6 bg-gray-50">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-3">
+            <span>🍎</span> Installing on macOS
+          </h3>
+          <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 leading-relaxed">
+            <li>Download the <strong>vpro-macos-universal.dmg</strong> file.</li>
+            <li>Double-click the <code class="bg-gray-200 px-1 rounded">.dmg</code> file to mount it, then drag the <strong>VPRO.app</strong> icon into your <strong>Applications</strong> folder.</li>
+            <li>If macOS Gatekeeper shows a warning that the app cannot be opened because it is from an unidentified developer:
+              <ul class="list-disc list-inside ml-5 mt-1 text-xs text-gray-600 space-y-1">
+                <li>Right-click (or Control-click) on <strong>VPRO.app</strong> in your Applications folder and select <strong>Open</strong>.</li>
+                <li>In the dialog that appears, click <strong>Open</strong> to confirm. (You only need to do this once).</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Linux Guide -->
+        <div class="border border-gray-200 rounded-xl p-6 bg-gray-50">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-3">
+            <span>🐧</span> Running on Linux
+          </h3>
+          <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 leading-relaxed">
+            <li>Download the <strong>vpro-linux-amd64.AppImage</strong> package.</li>
+            <li>Open your terminal and grant execute permissions:
+              <pre class="bg-gray-900 text-gray-100 rounded-lg p-3 my-2 text-xs overflow-x-auto">chmod +x vpro-linux-amd64.AppImage</pre>
+            </li>
+            <li>Execute the AppImage directly:
+              <pre class="bg-gray-900 text-gray-100 rounded-lg p-3 my-2 text-xs overflow-x-auto">./vpro-linux-amd64.AppImage</pre>
+            </li>
+            <li>Or for Debian/Ubuntu systems:
+              <pre class="bg-gray-900 text-gray-100 rounded-lg p-3 my-2 text-xs overflow-x-auto">sudo dpkg -i vpro-linux-amd64.deb</pre>
+            </li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900">About VPRO Wails</h2>
+      <p class="text-gray-600 mt-2">Modern ecosystem data processing without 32-bit legacy constraints.</p>
+    </div>
+    <div class="prose prose-emerald mx-auto text-sm text-gray-700 space-y-4">
+      <p>
+        <strong>VPRO</strong> is the standard software suite used across British Columbia and Western Canada for managing, validating, and analyzing vegetation survey plots, BEC (Biogeoclimatic Ecosystem Classification) codes, soil taxonomy, site descriptions, and species inventory.
+      </p>
+      <p>
+        This next-generation cross-platform release replaces legacy 32-bit Microsoft Access runtime dependencies with a high-performance Go and Wails v3 architecture, canonical SQLite project storage, and responsive modern Svelte user interfaces.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-forest-900 text-gray-400 py-8 mt-auto border-t border-forest-800 text-xs">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <p>&copy; 2026 VPRO Development Team. Open Source Software.</p>
+        <p class="text-gray-500 mt-1">Repository: <a href="https://github.com/Boostao/vpro_wails" class="text-emerald-400 hover:underline">Boostao/vpro_wails</a></p>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="#downloads" class="hover:text-white transition">Downloads</a>
+        <a href="#installation" class="hover:text-white transition">Documentation</a>
+        <a href="https://github.com/Boostao/vpro_wails/issues" class="hover:text-white transition">Report an Issue</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Dynamic Platform Detection and GitHub Releases Auto-Handler -->
+  <script>
+    (function() {
+      const REPO = 'Boostao/vpro_wails';
+      const GITHUB_API_URL = `https://api.github.com/repos/${REPO}/releases/latest`;
+
+      // 1. Detect User Platform
+      function detectPlatform() {
+        const ua = navigator.userAgent.toLowerCase();
+        const platform = (navigator.userAgentData && navigator.userAgentData.platform) 
+                          ? navigator.userAgentData.platform.toLowerCase() 
+                          : navigator.platform.toLowerCase();
+
+        let os = 'unknown';
+        let arch = 'amd64';
+
+        if (/mac|iphone|ipad|ipod/.test(platform) || /macintosh|mac os x/.test(ua)) {
+          os = 'darwin';
+          // Check for Apple Silicon if available in modern userAgentData
+          if (navigator.userAgentData && navigator.userAgentData.brands) {
+            // default universal
+          }
+        } else if (/win/.test(platform) || /windows/.test(ua)) {
+          os = 'windows';
+          if (/arm64|aarch64/.test(ua)) {
+            arch = 'arm64';
+          }
+        } else if (/linux/.test(platform) || /linux/.test(ua)) {
+          os = 'linux';
+          if (/arm64|aarch64/.test(ua)) {
+            arch = 'arm64';
+          }
+        }
+
+        return { os, arch };
+      }
+
+      const client = detectPlatform();
+      const platformNameEl = document.getElementById('detected-platform-name');
+      const primaryBtn = document.getElementById('primary-download-btn');
+      const primaryBtnText = document.getElementById('primary-download-text');
+      const versionTagEl = document.getElementById('release-version-tag');
+
+      // Highlight recommended card
+      if (client.os === 'windows') {
+        platformNameEl.textContent = `Windows (${client.arch === 'arm64' ? 'ARM64' : '64-bit'})`;
+        primaryBtnText.textContent = 'Download for Windows';
+        document.getElementById('card-windows')?.classList.add('ring-2', 'ring-forest-600', 'bg-forest-50/20');
+      } else if (client.os === 'darwin') {
+        platformNameEl.textContent = 'macOS (Universal - Apple Silicon & Intel)';
+        primaryBtnText.textContent = 'Download for macOS (.dmg)';
+        document.getElementById('card-macos')?.classList.add('ring-2', 'ring-forest-600', 'bg-forest-50/20');
+      } else if (client.os === 'linux') {
+        platformNameEl.textContent = `Linux (${client.arch === 'arm64' ? 'ARM64' : 'x86_64'})`;
+        primaryBtnText.textContent = 'Download AppImage for Linux';
+        document.getElementById('card-linux')?.classList.add('ring-2', 'ring-forest-600', 'bg-forest-50/20');
+      } else {
+        platformNameEl.textContent = 'Platform not detected';
+        primaryBtnText.textContent = 'Browse All Downloads';
+      }
+
+      // 2. Fetch Latest Release Assets from GitHub API
+      fetch(GITHUB_API_URL)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(release => {
+          const version = release.tag_name || 'Latest';
+          versionTagEl.textContent = `Latest Release: ${version}`;
+
+          const assets = release.assets || [];
+
+          function findAsset(pattern) {
+            const found = assets.find(a => pattern.test(a.name));
+            return found ? found.browser_download_url : null;
+          }
+
+          const winInstaller = findAsset(/windows.*installer.*\.exe$/i) || findAsset(/windows.*\.exe$/i);
+          const winZip = findAsset(/windows.*\.zip$/i);
+          const macDmg = findAsset(/macos.*\.dmg$/i);
+          const macZip = findAsset(/macos.*\.zip$/i);
+          const linuxAppImage = findAsset(/linux.*\.appimage$/i);
+          const linuxDeb = findAsset(/linux.*\.deb$/i);
+          const linuxTar = findAsset(/linux.*\.tar\.gz$/i);
+
+          // Update individual link targets
+          if (winInstaller) document.getElementById('dl-win-x64-installer').href = winInstaller;
+          if (winZip) document.getElementById('dl-win-x64-zip').href = winZip;
+          if (macDmg) document.getElementById('dl-mac-dmg').href = macDmg;
+          if (macZip) document.getElementById('dl-mac-zip').href = macZip;
+          if (linuxAppImage) document.getElementById('dl-linux-appimage').href = linuxAppImage;
+          if (linuxDeb) document.getElementById('dl-linux-deb').href = linuxDeb;
+          if (linuxTar) document.getElementById('dl-linux-tar').href = linuxTar;
+
+          // Wire primary button to detected platform's recommended asset
+          let recommendedUrl = release.html_url;
+          if (client.os === 'windows' && winInstaller) {
+            recommendedUrl = winInstaller;
+          } else if (client.os === 'darwin' && macDmg) {
+            recommendedUrl = macDmg;
+          } else if (client.os === 'linux' && linuxAppImage) {
+            recommendedUrl = linuxAppImage;
+          }
+
+          if (recommendedUrl) {
+            primaryBtn.href = recommendedUrl;
+          }
+        })
+        .catch(err => {
+          console.warn('Could not fetch releases from GitHub API:', err);
+          versionTagEl.textContent = 'Version: Latest';
+        });
+    })();
+  </script>
+</body>
+</html>

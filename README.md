@@ -299,6 +299,8 @@ including incremental packages and optional typed catalogue transport consolidat
 
 ## Migration references
 
+- [Distribution & Releases](.github/workflows/release.yml): Multi-platform CI workflow building artifacts for Windows, macOS, and Linux across AMD64 and ARM64 architectures.
+- [Download Portal (GitHub Pages)](docs/index.html): Web portal with automatic OS/architecture detection, download links, and installation guide (successor to legacy vprouser.ca).
 - [MIGRATION_PLAN.md](MIGRATION_PLAN.md): one ordered, workflow-based backlog.
 - [WINDOWS_HANDOFF.md](WINDOWS_HANDOFF.md): current local state, paths and next gate.
 - [Access contract](docs/FS882-6x4XL-access-contract.md): detailed source and measured
