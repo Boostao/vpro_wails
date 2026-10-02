@@ -34,14 +34,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all45 editor operations to immutable identities, leases running operations and
+  all47 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `a8536ad5e213913b6d1299e5689c76d4175feca07efba829149bf80e6c13d61d`.
+  `  04c4291f7bbe37e9d7e9947dd7186cb606fc2fa8fd37c0d09ea16b189a65f250`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -673,12 +673,12 @@ Next: deliberate navigation and separately scoped parent metadata/profiling.
 The plan records the metadata prerequisite: project75-column storage, master
 templates42 columns and legacy VUser metadata15 columns are distinct; dates/code
 types and the source wrong-recordset/ambiguous-copy logic must not be guessed.
-Metadata readonly checkpoint fbb1991 is published and promoted, full race551.592s:
-protected current/candidate SHA256
+Metadata readonly checkpoint fbb1991 is published, full race551.592s; previous
+protected SHA256
 a8536ad5e213913b6d1299e5689c76d4175feca07efba829149bf80e6c13d61d.
-Archives/metadata-review-checkpoint retains previousde15b9c3/accepted bytes,
+Archives/metadata-review-checkpoint retains previousde15b9c3/accepted readonly bytes,
 source contract and unset/populated native/restoration receipts. Do not replay.
-Existing-record writer is now implemented but the desktop editor is unavailable.
+Existing-record writer and opt-in desktop editor are now native-verified.
 Unpromoted bin/vpro-project-metadata-edit.exe SHA256
 fdbf3c15b3d0abf002aceaea94be712a995dbbb1edb421ca95b1278b5c0f239a.
 Focused metadata/context3.449s/full race564.604s,213 frontend tests/check0/0/build pass;
@@ -697,13 +697,44 @@ no-op Save; metadata action stays disabled. Native window/inspector closed.
 The one fixture is restored to exact preceding77 project/5 user audit bytes.
 metadata-edit.py and metadata-edit-{preparation,progress,native,restored}.json plus
 metadata-edit-project-before.db seal this proof; never replay completed modes.
-Full race metadata-edit-race passed. No owned native/race process remains.
+Full race metadata-edit-race passed. No owned native process remains.
 Archives/metadata-edit-checkpoint seals the accepted unpromoted writer, protected
 readonly baseline, exact assets, source fixture, native receipts/backup and race log.
-Next wire explicit existing-record selection and persistent source-labelled drafts,
-Save/Undo/Lock/native-close/context gates and committed-cleanup protection. Separate
-source-default population, new/blank/template creation/reservation and restoration;
-never copy master timestamps/numeric codes blindly or enable unavailable controls.
+Existing-record UI is opt-in with `VITE_PROJECT_METADATA_EDITING=true`; default
+metadata action remains disabled. `resources/project-metadata-layout.json` retains
+246 source nodes/74 bindings; six responsive groups provide70 labelled controls.
+Eighteen canonical references and ten history combos preserve source ownership,
+literal bound Items/Notes, duplicate/NULL/empty definitions and free history entry.
+Resident nullable text/numeric/collection drafts survive tab remounts; ordinary
+Save/Lock/native-close/context switching cannot bypass review ownership. Failed
+reference reload disables stale editing/selection/Save, and Undo waits for reads.
+Committed refresh/cleanup errors clear proposals and block completed-write replay.
+Focused Go4.352s,221 frontend tests/check0 errors/0 warnings and opt-in/default
+production builds pass; bindings15/135/64 and47 scoped operations.
+Native UI core bin/vpro-project-metadata-ui-core.exe SHA256
+4a727dee4f78763d453b043d0745b7344e63bc00a5b8925bfc5a2b428727a6a6
+proves all70 live fields/73 audits, rollback/retry, NULL/empty, numeric errors and
+actual close/context/Save/Lock gates; committed-refresh recovery adds only2 audits.
+Final opt-in bin/vpro-project-metadata-ui-ready.exe SHA256
+7088f1702040436fe0c2557f84ad9f78c0383982cc3a2ce1ed716913647dd0ec
+proves70 visible/labelled controls and responsive native stacking, failed-reference
+readiness, UTF-16 overlength/remount/Undo and recovered Save with only4 audits.
+Native PIDs6208/17656 close, exact original77 project/5 user audit fixture bytes restore.
+Default bin/vpro-project-metadata-ui-default.exe SHA256
+04c4291f7bbe37e9d7e9947dd7186cb606fc2fa8fd37c0d09ea16b189a65f250
+verifies default-disabled metadata action and existing Site/Vegetation without writes.
+Owned default PID12136 closes; inspector9392 is closed. The sole fixture is restored.
+metadata-ui.py, metadata-ui-ready.py and metadata-ui-default.py receipts seal the
+proofs; never replay completed modes. Initial UI wait corrections were read-only
+continuations, not repeated writes.
+Full race metadata-ui-race passes (root519.188s) against final default assets.
+No owned native/race process remains. Archives/metadata-ui-checkpoint seals81
+hashed files: accepted core/final/default binaries, exact final assets, source,
+proof/restoration receipts/backups and preceding protecteda8536ad5....
+Protected current/candidate are promoted by exact copy to04c4291f...; no rebuilding.
+Next source-default population, new/blank/template creation/reservation and
+metadata-specific restoration; never copy master timestamps/numeric codes blindly
+or enable unavailable controls. Navigation/profiling remain open.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
 unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
 rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a

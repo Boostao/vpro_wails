@@ -25,7 +25,7 @@
   type Field = { key: NullableTextKey; label: string; kind: 'text' | 'notes'; list?: boolean } |
     { key: NumberKey; label: string; kind: 'number'; step?: string };
 
-  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, masterAllowed = false, editor, additionalEditor }: {
+  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, masterAllowed = false, editor, additionalEditor, onMetadata, metadataDisabled = true }: {
     draft: FS882Header;
     original: (BECCodes & WorkingUnitCodes & QualityCodes & SubstrateValues & SiteCodes & RegionCodes) | null;
     capabilities: Record<string, boolean | undefined>;
@@ -44,6 +44,8 @@
     workingUnitSession: WorkingUnitSession;
     editor?: { columns: readonly string[]; input: Snippet<[PaperControl, string]> };
     additionalEditor?: { columns: readonly string[]; input: Snippet<[PaperControl, string]> };
+    onMetadata?: () => void;
+    metadataDisabled?: boolean;
   } = $props();
 
   let coordinateMode = $state<CoordinateDisplayMode>('dd');
@@ -240,7 +242,11 @@
               oninput={(event) => setText(field.key, event.currentTarget.value)} />
           {/if}
         {:else if control.type === 'CommandButton' || control.type === 'ToggleButton'}
-          <button class="paper-control pending" data-source-control={control.controlName} disabled title="Workflow not yet migrated">{controlLabel(control)}</button>
+          {#if control.controlName === 'btnLoadMetadata' && onMetadata}
+            <button class="paper-control" data-source-control={control.controlName} disabled={metadataDisabled} onclick={onMetadata}>{controlLabel(control)}</button>
+          {:else}
+            <button class="paper-control pending" data-source-control={control.controlName} disabled title="Workflow not yet migrated">{controlLabel(control)}</button>
+          {/if}
         {:else if control.type === 'CheckBox' || control.type === 'OptionButton'}
           <input class="paper-control pending" id={inputId(control)} data-column={control.column} data-source-control={control.controlName} type={control.type === 'OptionButton' ? 'radio' : 'checkbox'} checked={stored === true} disabled aria-label={controlLabel(control)} />
         {:else if control.type === 'Subform'}

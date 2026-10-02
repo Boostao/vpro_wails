@@ -455,6 +455,23 @@ export interface ProjectMetadataEdit {
     "standardPopulation": string;
 }
 
+export interface ProjectMetadataEditorField {
+    "name": string;
+    "kind": string;
+    "maximum": number;
+    "collection": boolean;
+    "referenceList": string;
+    "referenceColumn": string;
+    "limitToList": boolean;
+    "options": ProjectMetadataOption[] | null;
+}
+
+export interface ProjectMetadataOption {
+    "rowId": string;
+    "value": string | null;
+    "description": string | null;
+}
+
 export interface ProjectMetadataReview {
     "project": string;
     "plotNumber": string;

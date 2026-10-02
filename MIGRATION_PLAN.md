@@ -1094,7 +1094,7 @@ exact core/default/previouscddefe55 bytes and receipts. No completed native writ
 may be replayed; the readonly harness continuations are sealed separately.
 This completes the bounded checker, not the full child/application migration.
 
-### Next bounded metadata and navigation scope
+### Metadata workflow and remaining navigation scope
 
 Static inspection of `FS882-6x4XL.btnLoadMetadata_Click`, `frmProjectMetaData`,
 `UsysMetadata` and the original SQLite family establishes these prerequisites:
@@ -1125,7 +1125,7 @@ controls. Profiling is also a separate deliverable: its active runner clears
 scratch results/counts and evaluates ordered Env/Veg/Lump rules. It is not merely
 a vegetation-display toggle and must not mutate the shipped support databases.
 
-Metadata review boundary is implemented, not the metadata editor. The
+The implemented metadata review boundary underlies the existing-record editor. The
 context-bound `ReviewProjectMetadata` independently reads the physical selected
 plot/ProjectID, all matching project records and original VMetaData templates.
 Typed cells retain SQLite storage, exact integer text (including values beyond
@@ -1134,7 +1134,7 @@ NULL/empty identities remain distinct; missing/ambiguous parents, malformed
 Unicode and invalid/duplicate signed32 metadata IDs fail explicitly. No master
 date/code conversion, record selection, VUser lookup or write is performed.
 
-The existing Access parser captured all198 structural/control nodes and74
+The production source-layout resource captures246 source nodes and74
 bindings, source containment/labels/geometry and procedure/event evidence.
 StartDate/EndDate are Fixed/zero-decimal textboxes, consistent with project
 SMALLINT year storage; the inactive DTPicker Updated handler does not authorize a
@@ -1142,7 +1142,8 @@ timestamp-to-year conversion. GeoRefMethod selects literal Items from the
 GeoreferenceMethod list, not the master's numeric code. Standard-based bulk
 population prompts before assigning its source literals; field AfterUpdate
 handlers share Recalc/ProjectID-required error feedback. These behaviors and
-metadata version stamping remain writer/editor acceptance work.
+metadata version stamping are implemented by the guarded writer/editor. Automatic
+standard population remains a separately confirmed proposal workflow.
 
 Focused metadata/context Go1.367s/full race551.592s,213 frontend tests/check0/0/build and real
 15/133/60 bindings pass;45 adapter operations carry pinned context identities.
@@ -1157,8 +1158,8 @@ explicit creation/editing, rather than presenting mapped storage as a migration.
 Exact readonly candidatea8536ad5... is promoted after archiving previousde15b9c3
 and all source/native/restoration receipts in archives/metadata-review-checkpoint.
 
-Existing-record writer is implemented and native-transport verified, not yet a
-desktop editor. One source-grounded batch covers all70 ordinary columns, preserving
+Existing-record writer and opt-in desktop editor are implemented and native-verified.
+One source-grounded batch covers all70 ordinary columns, preserving
 signed16 years/site visits, signed32 plot counts/BAPID, UTF-16 text bounds and MEMO.
 The nine Collected option groups store1 complete/2 partial/3 none; historical-1
 can remain unchanged but must not become a new BOOLEAN assignment. Eighteen
@@ -1184,7 +1185,39 @@ Owned13564 closes and the fixture restores exactly to preceding77 project/5 user
 audit bytes. Full race metadata-edit-race passed; protecteda8536ad5 remains.
 Archives/metadata-edit-checkpoint seals this accepted writer checkpoint without
 promoting an incomplete desktop editor.
-Remaining acceptance: explicit existing-record UI selection, reference loading and
-source labels/grouping, persistent raw errors/drafts, ordinary Save/Lock/native
-close/context/Undo gates and committed-cleanup protection. New/blank/template
-creation, ID reservation, default population and restoration remain separate work.
+The resident desktop editor uses explicit physical-record selection, never an
+automatic first row. All70 source-labelled controls follow six responsive logical
+groups rather than Access pixel geometry. Eighteen original reference combos
+retain duplicates and NULL/empty metadata; ten history combos read the original
+project or master store without turning suggestions into membership requirements.
+Nullable text, signed16/32 integers and collection1/2/3 drafts retain exact originals,
+raw errors and source-standard acknowledgement outside remounted tabs. Ordinary
+Save/Lock/native-close/context switching and unrelated writes cannot bypass this
+ownership; explicit Undo never changes stored data. A reference reload invalidates
+editing readiness before either read starts and restores it only after both succeed.
+Failed Save retains retry; committed cleanup/refresh failure clears proposals and
+blocks replay until recovery reload and explicit selection.
+
+Focused Go4.352s,221 frontend tests, check0 errors/0 warnings and opt-in/default
+production builds pass; bindings15 services/135 methods/64 models and47 scoped
+operations. Native UI core4a727dee... verifies all70 controls, responsive stacking,
+numeric/remount/close/context/Save/Lock gates,73-audit Save, second-audit rollback,
+NULL/empty and committed-refresh protection (75 total audits), then exact restoration.
+Final opt-in7088f170... additionally verifies disabled stale controls after reference
+failure, loading/Undo gates, UTF-16 overlength/remount/Undo and recovered title Save
+with only four expected audits. Both fixtures restore to the accepted77 project/
+5 user audit baseline after owned windows close. Default04c4291f... preserves the
+disabled metadata action and existing Site/Vegetation controls without writes.
+Full integration race passes (root519.188s) against final default assets.
+Archives/metadata-ui-checkpoint seals exact opt-in/default assets, binaries,
+source, native/restoration receipts and previous protecteda8536ad5... with hashes.
+Exact accepted default04c4291f... is promoted without rebuilding. All proofs use
+the single disposable workflow fixture, not Access/R/production data, and completed
+writes must not be replayed.
+
+Remaining metadata acceptance: confirmed source-standard population; explicit
+new/blank/template proposals with signed32 ID allocation/reservation and audited
+creation; explicit master timestamp/code conversion decisions; metadata-specific
+restoration; reference attachment/master-catalogue writes. Keep these unavailable
+and leave existing-record editing opt-in rather than claiming the full source
+copy action is complete. Navigation and ordered profiling remain separate work.

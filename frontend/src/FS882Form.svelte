@@ -27,6 +27,7 @@
   import NewChild from './NewChild.svelte';
   import PersonalSpeciesFields from './PersonalSpeciesFields.svelte';
   import SpeciesCodeCheck from './SpeciesCodeCheck.svelte';
+  import ProjectMetadataEditor from './ProjectMetadataEditor.svelte';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
   import { projectState } from './state';
   import { embeddedForm, paperChild, type VegetationMode } from './paperLayout';
@@ -94,7 +95,11 @@
   let codeCheckOpen = $state(false);
   let codeCheckBusy = $state(false);
   let codeCheckEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy);
+  const metadataEnabled = import.meta.env.VITE_PROJECT_METADATA_EDITING === 'true';
+  let metadataOpen = $state(false);
+  let metadataBusy = $state(false);
+  let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -136,7 +141,7 @@
   const creationSpeciesInvalid = $derived(creationDraft ? vegetationCreationSpeciesError(creationDraft, speciesLists[creationDraft.form] ?? []) : null);
   const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen);
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -381,7 +386,7 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
-  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen);
+  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen);
   const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
@@ -403,6 +408,14 @@
       return;
     }
     codeCheckOpen = true; error = null; successMsg = null;
+  }
+
+  function openProjectMetadata() {
+    if (!metadataEnabled || childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0) {
+      error = 'Finish or Undo existing drafts and unlock the available plot before reviewing project metadata.';
+      return;
+    }
+    metadataOpen = true; error = null; successMsg = null;
   }
 
   async function refreshAfterRestore(plot: string, request: number) {
@@ -1480,6 +1493,7 @@
       return;
     }
     if (codeCheckOpen) { error = 'Save replacements or personal metadata explicitly, then close species-code review; ordinary plot Save never applies them.'; return; }
+    if (metadataOpen) { error = 'Save or Undo metadata explicitly, then close metadata review; ordinary plot Save never applies it.'; return; }
     if (personalDraft !== null) { error = 'Save the personal definition explicitly or Cancel its entry; ordinary plot Save never writes the user database.'; return; }
     if (deletionReview !== null) { error = 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review; ordinary Save never deletes rows.'; return; }
     if (creationDraft !== null) { await saveVegetationCreation(); return; }
@@ -1530,6 +1544,10 @@
   }
 
   export function getCloseState(): EditorCloseState {
+    if (metadataOpen) return metadataEditor?.getCloseState() ?? {
+      unsaved: true, busy: true, canSave: false, error,
+      saveReason: 'Wait for metadata review, then finish or close it before saving or closing the plot.',
+    };
     if (codeCheckOpen) return codeCheckEditor?.getCloseState() ?? {
       unsaved: true, busy: true, canSave: false, error,
       saveReason: 'Wait for species-code review to load, then finish or close it before saving or closing the plot.',
@@ -1571,6 +1589,7 @@
       return;
     }
     if (codeCheckOpen) { codeCheckEditor?.undo(); return; }
+    if (metadataOpen) { metadataEditor?.undo(); return; }
     if (personalDraft !== null) { cancelPersonalSpecies(); return; }
     if (deletionReview !== null) { void cancelVegetationDeletion(); return; }
     if (creationDraft !== null) { void cancelVegetationCreation(); return; }
@@ -1598,6 +1617,7 @@
       return;
     }
     if (codeCheckOpen) { error = 'Finish or close species-code review before changing the plot lock.'; return; }
+    if (metadataOpen) { error = 'Finish or close metadata review before changing the plot lock.'; return; }
     if (personalDraft !== null) {
       error = 'Save the personal definition explicitly or Cancel its entry before changing the plot lock.';
       return;
@@ -1821,6 +1841,12 @@
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if metadataOpen}
+      <ProjectMetadataEditor bind:this={metadataEditor} client={PlotService} plot={draft.plotNumber}
+        onbusy={value => metadataBusy = value}
+        onclosed={() => { metadataOpen = false; error = null; }}
+        oncommitted={() => loadChildData(draft.plotNumber)} />
+    {/if}
     {#if codeCheckOpen}
       <SpeciesCodeCheck bind:this={codeCheckEditor} client={PlotService}
         onbusy={value => codeCheckBusy = value}
@@ -2054,6 +2080,7 @@
           onchange={markDirty} onvalidation={validateHeader}>
         {#snippet children(ordinaryEditor)}
         <HeaderEditor bind:draft {original} {capabilities} disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
+          onMetadata={metadataEnabled ? openProjectMetadata : undefined} metadataDisabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
           {editor} additionalEditor={ordinaryEditor} {masterAllowed}
           existing={original !== null}
           lists={{ moistureRegime: moistureList, nutrientRegime: nutrientList, mesoSlopePos: mesoSlopeList, surfaceShape: surfaceShapeList }}

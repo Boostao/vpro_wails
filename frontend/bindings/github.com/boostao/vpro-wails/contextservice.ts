@@ -73,6 +73,10 @@ export function ListOtherRecords(contextID: string, plot: string): $CancellableP
     return $Call.ByID(989824098, contextID, plot);
 }
 
+export function ListProjectMetadataFields(contextID: string): $CancellablePromise<$models.ProjectMetadataEditorField[] | null> {
+    return $Call.ByID(4089336027, contextID);
+}
+
 export function ListSoilSuggestions(contextID: string): $CancellablePromise<$models.SoilSuggestion[] | null> {
     return $Call.ByID(357605878, contextID);
 }
