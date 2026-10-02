@@ -38,6 +38,10 @@ export function DeleteOtherRecord(plotNumber: string, id: number): $CancellableP
     return $Call.ByID(2407169624, plotNumber, id);
 }
 
+export function DeleteReviewedVegetation(plot: string, request: $models.VegetationDeletionRequest): $CancellablePromise<void> {
+    return $Call.ByID(4118956792, plot, request);
+}
+
 /**
  * DeleteVegRecord deletes a vegetation entry by ID.
  */

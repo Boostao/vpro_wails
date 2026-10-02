@@ -775,5 +775,43 @@ Core2f8d74bd... and default30199c86... are sealed under the existing private spe
 fixture; completed proofs were not replayed. Default assets are restored exactly
 to the accepted default candidate. Final race passes in vegetation-numbers-
 integration (root479.695s); exact default30199c86... is promoted without rebuild.
-Next bounded child batch is source vegetation row creation/deletion; retain
-disabled personal creation until its coordinated user/project contract is verified.
+### Guarded source vegetation deletion checkpoint
+
+The existing shared child writer now supports a checked deletion boundary, not a
+second mutation implementation. Scoped readonly review captures source form, ID,
+species, every physical column and a typed raw-byte fingerprint including rowid,
+NULL/empty distinctions and hidden values. Unsupported BLOBs and undisplayable
+species reject explicitly. Confirmation revalidates source membership and the
+whole snapshot within the reservation/deletion/full-field audit transaction.
+Known Flag BOOLEAN audits normalize true=-1. Deleted identities remain reserved.
+
+The opt-in UI (`VITE_VEGETATION_DELETE_EDITING=true`) owns a persistent review,
+explicit Confirm/Cancel and cancellable readonly lookup. Ordinary Save and
+Save-and-close never confirm deletion. Undo/Cancel reload current rows without
+writes; failed mutation retains review; committed refresh failure disables editing
+and reports committed state. Remount, parent Lock/context and unrelated writers
+share the existing lifecycle gates. Generic preview deletion remains unavailable.
+
+Focused deletion/child/context Go0.933s,187 frontend tests, check0/0, opt-in/default
+builds, bindings15/126/49 and39 scoped operations pass. Full integration
+`go test -race ./...` passes (root488.272s). Native coref2b6c939... verifies eight
+cases/sealing checks, one intended row deletion and exactly five field audits:
+Species, three covers and hidden Flag. All15 original tables/45 historical audits
+and support/config bytes are preserved except that deletion/history and the
+standard shared identity-ledger table/index/reservation. Temporary trigger/schema
+changes are restored; seven completed scenarios were sealed without replaying writes.
+Defaultd8d51c7f... verifies25 existing numeric controls plus Species/Collected,
+readonly scoped review, disabled source deletion and every fixture byte unchanged.
+Owned core/default PID9676/1244 exited; inspector9392 closed.
+
+Access exports omit AllowDeletions/AllowAdditions and deletion events. The bounded
+disposable installed-core property probe reached a startup relocation dialog
+despite AutomationSecurity=3; it was not acknowledged and no source form opened.
+Only verified owned Access PID6008 was stopped. Canonical core bytes and the
+pre-dialog registry Location are unchanged. Effective properties remain unknown,
+so deletion stays default-disabled; do not repeat this broken oracle mechanism
+or infer properties from IsLoaded. Retain the stopped fixture/evidence.
+
+Next bounded child batch is source vegetation creation with explicit species and
+numeric inputs, without guessed Layer/zero defaults. Keep personal creation
+disabled until its coordinated VUser/project write contract is verified.

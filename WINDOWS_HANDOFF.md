@@ -1,6 +1,6 @@
 # Windows continuation
 
-Updated 2026-10-01. Read [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for priorities and
+Updated 2026-10-02. Read [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for priorities and
 [README.md](README.md) for delivered capabilities. This file describes current
 state only; it is not a chronological execution log.
 
@@ -34,15 +34,17 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all37 editor operations to immutable identities, leases running operations and
+  all39 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
-  plus default-on species decisions and source cover/height drafts:
-  `30199c867825af37b5e2a2f4f37ae08126aa05d8db1a1ef82107b1624fccd9b5`.
+  plus default-on species decisions/source cover/height drafts and default-disabled
+  guarded deletion:
+  `d8d51c7fa4d660acc74bebd8e918e7a22d949c5041052ed2892a8173464a6287`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
-  private species archive. Exact numeric default is promoted without rebuilding.
+  private species archive. Numeric30199c86... remains archived; exact verified
+  deletion-default delivery is promoted without rebuilding.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
   Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
   omission remain intact. Shared expected-value transactions span rows/tables
@@ -506,22 +508,43 @@ personal creation needs a bounded VUser/project write contract. Remaining
 cover/height creation/deletion/calculations follow. Never replay completed
 proof.py, delivery.py, decisions.py or decisions-delivery.py.
 Species decisions were published as e251bf3 with a clean0/0 upstream state.
-Current numeric batch: eleven cover/total fields plus six heights share drafts
+Current numeric workflow: eleven cover/total fields plus six heights share drafts
 across all25 source controls. Original forms/values gate the shared transaction;
 NULL view removal is not row deletion. Default-on; VITE_VEGETATION_NUMBER_EDITING
 or retained VITE_HEIGHT_EDITING set to false provides readonly numeric controls.
 Species/Collected remain available. The experimental grid is readonly and
-unverified vegetation creation/deletion controls are disabled, not generic bypasses.
+generic vegetation creation/deletion controls are disabled, not generic bypasses.
 Focused Go4.194s/185 frontend tests/check0/0/default+opt-out builds pass; bindings
 15/123/47 and37 scoped operations. Native core6 cases/4 audits, default25 controls/
 1 audit and opt-out25 disabled controls/zero writes preserve15 tables/40 prior
 audits plus support/config bytes apart from intended changes. Core2f8d74bd...,
 default30199c86... and opt-out assets/binaries remain sealed under the same
-private species fixture. Default assets restored exactly; no untested rebuild.
-Core PID15460/default14804/opt-out8040 exited; inspector9392 closed. Final race
-vegetation-numbers-integration passed (root479.695s); exact default30199c86... is
-promoted. Publish application-only changes normally; next bounded work is source
-vegetation row creation/deletion. Never rerun numbers.py or numbers-delivery.py.
+private species fixture. Numeric delivery remains sealed; completed numeric proofs
+must never be replayed. Core PID15460/default14804/opt-out8040 exited.
+Guarded deletion is implemented/native-Wails-verified but remains default-disabled;
+VITE_VEGETATION_DELETE_EDITING=true enables the reviewed explicit-confirmation UI.
+Full physical raw-byte snapshots/source membership gate the shared deletion,
+reservation and mapped/hidden-field audit transaction. Review/error persist through
+remount, ordinary Save/Lock/Save-and-close guards and failed deletion; Undo/Cancel
+write nothing. Native coref2b6c939... verifies eight cases/sealing checks, one
+intended row (-10) deletion, five audits and reserved ID. All15 original tables/
+45 prior audits and support/config are preserved except intended changes and the
+standard identity-ledger materialization; temporary trigger/schema restored.
+The initial schema assertion lacked the expected ledger; sealing replayed no writes.
+Defaultd8d51c7f... verifies25 enabled numeric controls/Species/Collected, disabled
+source deletion, readonly review and every fixture byte unchanged. Focused Go0.933s,
+187 frontend tests/check0/0/opt-in+default builds; bindings15/126/49,39 scoped calls;
+full Go race488.272s passes. Exact tested default is current/candidate.
+Core PID9676/default1244 exited; inspector9392 closed. No owned Wails app remains.
+Access property capture is blocked: installed-core disposable copy reached an
+unacknowledged relocation dialog despite AutomationSecurity=3. No form opened;
+only verified owned Access PID6008 was stopped. Source bytes and original registry
+Location are unchanged; owned windows are gone. Effective omitted deletion/addition
+properties remain unknown. Do not reopen/repeat this broken source probe.
+Evidence is under native-vegetation-species, including stopped source fixture.
+Never rerun completed deletion.py/deletion-delivery.py or numeric/species proofs.
+Next bounded work: source vegetation creation with explicit canonical species and
+numeric inputs; personal VUser creation remains disabled pending its write contract.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage's explicit LimitToList=NotDefault now has a separately verified

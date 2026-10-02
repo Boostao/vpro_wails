@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -104,7 +105,15 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 		"legacy species":      func() error { return service.plots.UpdateVegetationSpecies("stale", nil) },
 		"legacy numbers":      func() error { return service.plots.UpdateVegetationNumbers("stale", nil) },
 		"scoped numbers":      func() error { return service.UpdateVegetationNumbers(stale, "stale", nil) },
-		"legacy audit flags":  func() error { return service.plots.SetAuditRestoreSelection("stale", nil) },
+		"scoped deletion":     func() error { return service.DeleteReviewedVegetation(stale, "stale", VegetationDeletionRequest{}) },
+		"deletion review": func() error {
+			_, err := service.ReviewVegetationDeletion(context.Background(), stale, "stale", "SubVegAXL_BC", 0)
+			return err
+		},
+		"legacy deletion": func() error {
+			return service.plots.DeleteReviewedVegetation("stale", VegetationDeletionRequest{Expected: strings.Repeat("0", 64)})
+		},
+		"legacy audit flags": func() error { return service.plots.SetAuditRestoreSelection("stale", nil) },
 		"legacy restoration": func() error {
 			_, err := service.plots.RestoreSelectedAuditRecords("stale", nil, AuditRestoreRetain)
 			return err

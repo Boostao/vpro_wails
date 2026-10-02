@@ -107,7 +107,31 @@ test('All eleven source covers/totals and six heights share strict numeric parsi
   const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   assert.match(source,/VITE_VEGETATION_NUMBER_EDITING !== 'false'/);
   assert.match(source,/onstage=\{numberEditingEnabled \?/);
-  assert.match(source,/onedit=\{undefined\} ondelete=\{undefined\}/);
+  assert.match(source,/onedit=\{undefined\} ondelete=\{deletionEnabled \? reviewVegetationDeletion : undefined\}/);
   assert.match(source,/Vegetation record preview \(read-only\)/);
   assert.doesNotMatch(source,/updateVegCover/);
+});
+test('Deletion review compares independently returned source identity, code, full-row digest and physical columns',()=>{
+  const deletion={};
+  vm.runInNewContext(ts.transpileModule(readFileSync(path.join(__dirname,'vegetationDeletionEditor.ts'),'utf8'),
+    {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:deletion});
+  const review={id:0,form:'SubVegAXL_BC',species:'RAW',expected:'a'.repeat(64),columns:['ID','PlotNumber','Species','HiddenText']};
+  assert.equal(deletion.validateDeletionReview(review,review.form,0,'RAW'),review);
+  for(const change of [{id:-9},{form:'SubVegCXL'},{species:'changed'},{expected:''},{expected:'A'.repeat(64)},{columns:null},{columns:['ID']}])
+    assert.throws(()=>deletion.validateDeletionReview({...review,...change},review.form,0,'RAW'),/planned source row/);
+  assert.throws(()=>deletion.validateDeletionReview(review,review.form,2147483648,'RAW'));
+});
+test('Explicit deletion confirmation owns lifecycle without allowing generic Save, close or prototype bypass',()=>{
+  const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
+  assert.match(source,/VITE_VEGETATION_DELETE_EDITING === 'true'/);
+  assert.match(source,/childUnsaved = \$derived\([^;]*deletionReview !== null\)/);
+  assert.match(source,/childParentDisabled = \$derived\([^;]*deletionReview !== null\)/);
+  assert.match(source,/deletionRequest\+\+; deletionReads\.cancelAll\(\)/);
+  assert.match(source,/const species = rows\[0\]\.species/);
+  assert.match(source,/const plot = draft\.plotNumber/);
+  assert.match(source,/ordinary Save never deletes rows/);
+  assert.match(source,/saveReason[\s\S]*deletionReview !== null \? 'Confirm reviewed vegetation deletion explicitly/);
+  assert.match(source,/if \(deletionReview !== null\) \{ void cancelVegetationDeletion\(\); return; \}/);
+  assert.match(source,/Vegetation deletion failed; review retained/);
+  assert.match(source,/Vegetation deletion committed, but refresh failed/);
 });

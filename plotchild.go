@@ -406,6 +406,12 @@ const (
 // Identity is the plot/ID pair: imported Veg IDs may repeat across plots, but
 // ambiguous duplicates within one plot must not be edited or deleted.
 func (s *PlotService) saveChild(kind string, record any, mode childSaveMode) error {
+	return s.saveChildWithDeleteCheck(kind, record, mode, nil)
+}
+
+type childDeleteCheck func(*sql.Tx, string, string, int64) ([]childField, []any, error)
+
+func (s *PlotService) saveChildWithDeleteCheck(kind string, record any, mode childSaveMode, check childDeleteCheck) error {
 	if err := s.requireContextEdit(); err != nil {
 		return err
 	}
@@ -535,6 +541,21 @@ func (s *PlotService) saveChild(kind string, record any, mode childSaveMode) err
 				}
 			}
 		}
+	}
+	if check != nil {
+		if !deleting {
+			return errors.New("child deletion checks require a deletion")
+		}
+		extraFields, extraBefore, err := check(tx, table, plot, id)
+		if err != nil {
+			return err
+		}
+		if len(extraFields) != len(extraBefore) {
+			return errors.New("child deletion audit fields do not match their values")
+		}
+		fields = append(fields, extraFields...)
+		before = append(before, extraBefore...)
+		after = append(after, make([]any, len(extraFields))...)
 	}
 	if !deleting {
 		var changedFields []childField

@@ -11,7 +11,8 @@
     type SoilSuggestion,
     type AuditEntry,
     type ListItem,
-    type SpeciesItem
+    type SpeciesItem,
+    type VegetationDeletionReview
   } from '../bindings/github.com/boostao/vpro-wails';
   import { Lock, Unlock, Save, RotateCcw, AlertTriangle, Check, Plus, Trash2, Search, X } from '@lucide/svelte';
   import HeaderEditor from './HeaderEditor.svelte';
@@ -38,6 +39,7 @@
   import { onDestroy, untrack, tick } from 'svelte';
   import { bindContextPlots } from './contextPlots';
   import { ReadRequests } from './readRequests';
+  import { validateDeletionReview } from './vegetationDeletionEditor';
 
   let { plotNumber, contextId, onSaved, onClosed, onBusyChange }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void } = $props();
   const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
@@ -46,6 +48,11 @@
   const speciesReads = new ReadRequests();
   const speciesReferenceReads = new ReadRequests();
   const speciesChoiceReads = new ReadRequests();
+  const deletionReads = new ReadRequests();
+  let deletionRequest = 0;
+  let deletionBusy = $state(false);
+  let deletionReview = $state<VegetationDeletionReview | null>(null);
+  const deletionEnabled = import.meta.env.VITE_VEGETATION_DELETE_EDITING === 'true';
   let referenceRequest = 0;
   let speciesRequest = 0;
   let speciesReferenceRequest = 0;
@@ -71,7 +78,7 @@
   let parentCodeBusy = $state(false);
   let drainageBusy = $state(false);
   const soilCodeEditingEnabled = import.meta.env.VITE_SOIL_CODES_EDITING !== 'false';
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy);
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -109,7 +116,7 @@
   let speciesReferenceError = $state<string | null>(null);
   const speciesUnsaved = $derived(speciesDirty(speciesDrafts));
   const speciesInvalid = $derived(speciesErrors(speciesDrafts));
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -125,6 +132,7 @@
     reads.cancelAll(); referenceReads.cancelAll(); speciesReads.cancelAll();
     speciesReferenceRequest++; speciesReferenceReads.cancelAll();
     speciesChoiceRequest++; speciesChoiceReads.cancelAll();
+    deletionRequest++; deletionReads.cancelAll();
   });
   let container: HTMLDivElement;
 
@@ -348,7 +356,7 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
-  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null);
+  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null);
   const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
@@ -443,6 +451,7 @@
     collectedDrafts = {};
     speciesDrafts = {};
     speciesChoices = {};
+    deletionReview = null;
     vegList = [];
     humusList = [];
     mineralList = [];
@@ -776,6 +785,76 @@
       if (committed) capabilitiesReady = false;
       error = committed ? `Collected changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
         : `Collected save failed; drafts retained: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function reviewVegetationDeletion(form: string, id: number) {
+    if (!deletionEnabled || childParentDisabled || childUnsaved) {
+      error = 'Finish or cancel other drafts before reviewing vegetation deletion.';
+      return;
+    }
+    const rows = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
+    if (rows.length !== 1 || !sourceRows(form).some(row => row.id === id)) {
+      error = 'Vegetation deletion source row is missing or ambiguous; reload before reviewing.';
+      return;
+    }
+    const species = rows[0].species;
+    const plot = draft.plotNumber;
+    const request = ++deletionRequest;
+    deletionBusy = true;
+    error = null;
+    successMsg = null;
+    try {
+      const reviewed = await deletionReads.track(PlotService.ReviewVegetationDeletion(plot, form, id));
+      if (request !== deletionRequest) return;
+      if (draft.plotNumber !== plot) throw new Error('Vegetation deletion plot changed during lookup; reload before reviewing.');
+      deletionReview = validateDeletionReview(reviewed, form, id, species);
+    } catch (cause) {
+      if (request === deletionRequest) error = `Vegetation deletion review failed; no data changed: ${String(cause)}`;
+    } finally {
+      if (request === deletionRequest) deletionBusy = false;
+    }
+  }
+
+  async function cancelVegetationDeletion() {
+    if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling deletion review.'; return; }
+    deletionReview = null;
+    error = null;
+    successMsg = null;
+    busy = true;
+    try {
+      await loadChildData(draft.plotNumber);
+      successMsg = 'Vegetation deletion cancelled. No stored data or history changed; current rows reloaded.';
+    } catch (cause) {
+      capabilitiesReady = false;
+      error = `Deletion review cancelled, but rows could not be reloaded. Reopen the plot: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function confirmVegetationDeletion() {
+    const reviewed = deletionReview;
+    if (!deletionEnabled || !reviewed || busy || headerWorkflowBusy || dirty || draft.locked || !capabilitiesReady || original === null) {
+      error = 'Review an available, unlocked vegetation row before explicitly confirming deletion.';
+      return;
+    }
+    let committed = false;
+    busy = true;
+    error = null;
+    successMsg = null;
+    try {
+      await PlotService.DeleteReviewedVegetation(draft.plotNumber, { id: reviewed.id, form: reviewed.form, expected: reviewed.expected });
+      committed = true;
+      deletionReview = null;
+      await loadChildData(draft.plotNumber);
+      successMsg = `Vegetation row ${reviewed.id} deleted from all views. Its identity remains reserved.`;
+    } catch (cause) {
+      if (committed) capabilitiesReady = false;
+      error = committed ? `Vegetation deletion committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
+        : `Vegetation deletion failed; review retained: ${String(cause)}`;
     } finally {
       busy = false;
     }
@@ -1136,6 +1215,7 @@
       error = 'Wait for the current operation to finish before saving.';
       return;
     }
+    if (deletionReview !== null) { error = 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review; ordinary Save never deletes rows.'; return; }
     if (heightUnsaved) { await saveHeightDrafts(); return; }
     if (otherUnsaved) { await saveOtherDrafts(); return; }
     if (soilUnsaved) { await saveSoilDrafts(); return; }
@@ -1183,10 +1263,11 @@
   }
 
   export function getCloseState(): EditorCloseState {
-    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0 || attributeInvalid.length > 0 || speciesInvalid.length > 0;
+    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0 || attributeInvalid.length > 0 || speciesInvalid.length > 0 || deletionReview !== null;
     const invalidChild = Boolean(container?.querySelector('.source-child input:invalid'));
     const saveReason = busy || headerWorkflowBusy || !capabilitiesReady ? 'Wait for the plot to finish loading or header workflow.'
       : draft.locked ? 'Unlock the plot before saving.'
+      : deletionReview !== null ? 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review before saving and closing.'
       : newChild !== null || invalidChild ? 'Finish or cancel child entry before saving and closing.'
       : otherInvalid.length > 0 ? 'Correct invalid Other drafts or Cancel Other drafts before saving.'
       : soilInvalid.length > 0 ? 'Correct invalid soil drafts or Cancel soil drafts before saving.'
@@ -1215,6 +1296,7 @@
       error = 'Wait for the current operation to finish before undoing changes.';
       return;
     }
+    if (deletionReview !== null) { void cancelVegetationDeletion(); return; }
     if (heightUnsaved) { void cancelHeightDrafts(); return; }
     if (otherUnsaved) { void cancelOtherDrafts(); return; }
     if (soilUnsaved) { void cancelSoilDrafts(); return; }
@@ -1236,6 +1318,10 @@
   async function toggleLock() {
     if (busy || headerWorkflowBusy) {
       error = 'Wait for the current operation to finish before changing the plot lock.';
+      return;
+    }
+    if (deletionReview !== null) {
+      error = 'Confirm or Cancel vegetation deletion review before changing the plot lock.';
       return;
     }
     if (heightUnsaved) {
@@ -1540,6 +1626,16 @@
         {#each otherInvalid as message}<p role="alert">{message}</p>{/each}
       </div>
     {/if}
+    {#if deletionReview}
+      <section class="vegetation-deletion-review mb-3 rounded border border-red-300 bg-red-50 p-3 text-xs" aria-label="Vegetation deletion review">
+        <p role="alert">Delete the entire vegetation record for {deletionReview.species ?? 'NULL'}, row {deletionReview.id}, plot {draft.plotNumber}? This removes every stored field from all cover/height/attribute views, not just {deletionReview.form}. The deleted identity remains reserved. Ordinary Save never confirms this action.</p>
+        <details class="mt-2"><summary>Stored columns being removed</summary><p>{deletionReview.columns?.join(', ')}</p></details>
+        <div class="mt-2 flex gap-2">
+          <button type="button" class="rounded border bg-red-700 px-2 py-1 text-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={() => void confirmVegetationDeletion()}>Confirm deletion of row {deletionReview.id}</button>
+          <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={() => void cancelVegetationDeletion()}>Cancel deletion review</button>
+        </div>
+      </section>
+    {/if}
     {#if heightUnsaved}
       <div class="height-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Height draft controls">
         <span>Height/cover drafts are unsubmitted. Switching views never saves them; header and other child editing wait.</span>
@@ -1599,7 +1695,7 @@
             oncollectedstage={collectedEditingEnabled ? stageCollectedCell : undefined}
             {speciesDrafts} {speciesLists} speciesDisabled={speciesEditingDisabled}
             onspeciesstage={speciesEditingEnabled ? stageSpeciesCell : undefined}
-            onedit={undefined} ondelete={undefined} />
+            onedit={undefined} ondelete={deletionEnabled ? reviewVegetationDeletion : undefined} deleteDisabled={childUnsaved} />
         {/snippet}
       </SourcePage>
       {/snippet}

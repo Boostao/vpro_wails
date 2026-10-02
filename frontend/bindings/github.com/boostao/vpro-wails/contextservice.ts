@@ -29,6 +29,10 @@ export function DeleteOtherRecord(contextID: string, plot: string, id: number): 
     return $Call.ByID(3941385392, contextID, plot, id);
 }
 
+export function DeleteReviewedVegetation(contextID: string, plot: string, request: $models.VegetationDeletionRequest): $CancellablePromise<void> {
+    return $Call.ByID(4082659024, contextID, plot, request);
+}
+
 export function DeleteVegRecord(contextID: string, plot: string, id: number): $CancellablePromise<void> {
     return $Call.ByID(1524181516, contextID, plot, id);
 }
@@ -87,6 +91,10 @@ export function ListVegetationSpeciesUsers(contextID: string, lookup: $models.Ve
 
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
+}
+
+export function ReviewVegetationDeletion(contextID: string, plot: string, form: string, id: number): $CancellablePromise<$models.VegetationDeletionReview> {
+    return $Call.ByID(2363268444, contextID, plot, form, id);
 }
 
 export function SaveHumusRecord(contextID: string, record: $models.HumusRecord): $CancellablePromise<void> {

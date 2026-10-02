@@ -328,6 +328,41 @@ disables numbers without enabling a generic write fallback. Final integration
 race passes (root479.695s); exact default30199c86... is promoted, with the prior
 species60575340... baseline preserved in the private archive.
 
+### Guarded vegetation deletion: verified desktop adaptation
+
+Source deletion is opt-in only with `VITE_VEGETATION_DELETE_EDITING=true`; omitted
+AllowDeletions/AllowAdditions and native deletion events remain unmeasured.
+The disposable installed-core property probe stopped on the unknown VPro
+relocation dialog, without acknowledging it or opening source forms. Macro
+automation security did not suppress that startup. The owned process was stopped;
+canonical core bytes and the pre-dialog registry Location remain unchanged.
+No exact native Access deletion-UX/default-property claim is made.
+
+Review captures every physical column, source identity, rowid and raw typed bytes,
+including hidden values and NULL/empty distinctions. Malformed species cannot be
+silently repaired for display; unsupported BLOBs reject explicitly. The shared
+writer checks source predicate/full fingerprint before deleting, reserving the ID
+and auditing mapped plus extra physical fields in one transaction. Flag true
+audits as -1. Changing form/ID/fingerprint or any hidden value invalidates review.
+Historical non-species text is hashed without JSON decoder repair.
+
+The review persists independently of active tabs. Only its explicit Confirm can
+delete; ordinary Save/Save-and-close, Lock and unrelated edits cannot bypass it.
+Undo/Cancel reload without writes; failed deletion retains review and its error;
+successful deletion followed by failed refresh reports committed state and
+disables further editing. A stale review must be cancelled and recreated.
+
+Native Wails coref2b6c939... verifies review/remount/Save/Lock/actual-close guards,
+Undo/Cancel, hidden Flag drift, wrong transport, hidden-field audit rollback,
+retained retry, removal from all five views and replay rejection. Exactly one
+row (-10) and five field audits changed. All15 original tables/45 prior audits,
+support/config bytes and temporary schema are preserved; the standard shared
+identity-ledger table/index and one reserved ID are the intentional schema/data
+adaptation. The initial schema assertion was corrected to include that proven
+ledger; completed writes were not replayed. Defaultd8d51c7f... delivery preserves
+all fixture bytes and25 enabled numeric controls with deletion disabled.
+Focused Go0.933s,187 frontend tests/check0/0/builds and full race488.272s pass.
+
 ## Verified bounded selective restoration
 
 `SetAuditRestoreSelection` atomically stores a verified selection; `RestoreSelectedAuditRecords` accepts exact string row IDs and cancel/retain/prune actions. The legacy marked-row API remains. Typed mapping covers 97 nonidentity parent and 61 non-Cover child fields. Invalid/foreign/missing rows, duplicate identities, unsupported fields, stale history chains, malformed values and failed triggers abort the entire transaction. Restore ordering follows source Table ascending then EditWhen descending, with descending rowid for deterministic timestamp ties.
