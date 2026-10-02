@@ -36,6 +36,10 @@ export function chooseSpecies(drafts: SpeciesDrafts, id: number, choices: Specie
   if (!cell || cell.form !== choices.form || cell.raw !== choices.entered || cell.decision) {
     throw new Error('Species choice no longer matches the original editor entry; review it again.');
   }
+  const resolved = resolveSpeciesDecision(choices, kind, selected);
+  return { ...drafts, [String(id)]: { ...cell, raw: resolved.value, error: null, decision: resolved.decision } };
+}
+export function resolveSpeciesDecision(choices: SpeciesChoices, kind: SpeciesDecisionKind, selected?: string): { value: string; decision: SpeciesDecision } {
   const aliases = choices.aliases.filter(option => option.code !== null);
   if ((kind === 'keep' && (aliases.length === 0 || selected !== undefined)) ||
       (kind === 'replace' && !aliases.some(option => option.code === selected)) ||
@@ -46,9 +50,7 @@ export function chooseSpecies(drafts: SpeciesDrafts, id: number, choices: Specie
   const target = kind === 'keep' ? choices.entered : selected;
   const targetError = speciesEventError(target ?? null);
   if (enteredError || targetError || target === undefined) throw new Error(enteredError ?? targetError ?? 'Select an explicit species code.');
-  return { ...drafts, [String(id)]: {
-    ...cell, raw: target.toUpperCase(), error: null, decision: { kind, entered: choices.entered, ...(selected === undefined ? {} : { selected }) },
-  } };
+  return { value: target.toUpperCase(), decision: { kind, entered: choices.entered, ...(selected === undefined ? {} : { selected }) } };
 }
 export function speciesErrors(drafts: SpeciesDrafts): string[] {
   return Object.entries(drafts).flatMap(([id, cell]) => cell.error ? [`Vegetation row ${id}: ${cell.error}`] : []);

@@ -41,10 +41,11 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `bb3652f3d4eae9ec9bb4966a66696e4c770dc48d17c0fad02a167c037019fd56`.
+  `8e63916d0affcd4e84e5adb235ac4e6f6fd2310d7f695c753d6bdeb1750bc87f`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
-  personal-default delivery is promoted without rebuilding. Previous creation
+  creation-decision default delivery is promoted without rebuilding. Previous personal
+  defaultbb3652f3... is archived with exact accepted core/default hashes. Previous creation
   defaulta7dd1be8..., deletiond8d51c7f... and accepted cores/guards are archived.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
   Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
@@ -565,10 +566,10 @@ contain the accepted personal-default delivery below.
 Core11272/guard6388/default12044 exited; inspector9392 closed.
 Accepted binaries are sealed under native-vegetation-species; never rerun
 creation.py/creation-guard.py/creation-delivery.py or their completed continuations.
-Next bounded work is personal species: source NotInList assigns UCase(NewData)
+Personal source NotInList assigns UCase(NewData)
 to sysNewSpp and opens USysAddSpp, whose exported Code/ScientificName/EnglishName/
-LifeForm bindings and active events are identified. Writable VUser/project
-coordination is not implemented; do not infer cross-file atomicity or change
+LifeForm bindings and active events are identified. VUser definition Save and
+project Save are separate; do not infer cross-file atomicity or change
 journal modes. Original VUser table exports are now read: Code TEXT8 unique,
 ScientificName/EnglishName TEXT255 nullable, LifeForm signed16, Report default1,
 SppNumber/Codetype NULL defaults. USysAddSpp has12 lifeform choices, Open sets
@@ -582,28 +583,31 @@ VITE_PERSONAL_SPECIES_EDITING=true. Explicit NULL/name drafts retain raw errors
 through remounts and block plot Save/Lock/close. User Save reloads independent
 metadata then stages a separate existing-personal decision; plot Undo retains
 deliberately saved definitions. Committed cleanup/refresh errors disable replay.
-Final focused race6.224s/scopedGo2.894s; full final race507.979s;195 frontend
-tests/final targeted26/check0/0/builds; bindings15/129/51,41 scoped operations pass.
-Corec9f12600... verifies seven cases, one definition/one user audit and one
-separate project audit. Independent guard verifies metadata/audit trigger drift,
-255 UTF-16 units/Lifeform3/exact names and another definition/user audit without
-project writes. Pre-write C-row0 invisibility (Cover6=NULL) and already-open-editor
-harness stops replayed no writes; guard used actual visible C-row -9.
-All15 project tables/59 prior audits/original user tables/prior audit/schema/
-descriptions/other support/config bytes survive apart from those planned changes.
-Fixture now60 project audits/3 user audits, ZPNAT01 assigned only to row0,
-ZPNAT02 reusable but unassigned. Core17888/guard3976/default12924 exited.
-Defaultbb3652f3... proves25 enabled numeric controls/Species/Collected, readonly
-new-personal lookup/unknown review/Undo, all creation/deletion default-disabled
-and every fixture byte unchanged. Exact accepted default is current/candidate;
-archives/personal-checkpoint holds accepted bytes/hashes and a7dd1be8 fallback.
-No native process, inspector or race command remains. Personal-default checkpoint
-publication includes application source only; private evidence/binaries/dist remain
-ignored. Use git HEAD/upstream for its commit identity;98a2eb4 is the predecessor.
-Never replay personal.py/personal-guard.py/personal-delivery.py or completed proofs.
-Next: explicit personal/old-code decisions in new source-row drafts, then active
-metadata/calculations. Canonical-only new-row creation does not yet accept these
-codes. Source effective properties/full event parity remain unknown; no further
+Source creation now reuses existing species decision/reference validators for
+explicit old-code replace/keep and existing-personal decisions. Reviewed original
+form/raw entry is persistent; retyping Species invalidates review/decision, while
+numeric edits/remounts/failed Save retain it. New-row Save never writes VUser.
+Nullable-Codetype personal definitions remain reusable without invented dropdown
+membership. Unknown-code metadata creation from a new-row proposal stays disabled.
+Focused coupled Go2.888s/full integration race475.761s;197 frontend tests/check0/0/
+opt-in+default builds pass; bindings15/129/51,41 scoped operations.
+Core8e2dde81... verifies seven native cases and IDs6/7/8, exactly seven project
+audits, zero user audits; review/Save/Lock/actual-close guards, Cancel, scoped
+invalid/stale requests and audit rollback/retained retry pass. All15 project
+tables/60 prior audits, old rows/reservations, support/config and schema preserved.
+Fixture now67 project audits/3 user audits. ZPNAT01 remains assigned only to row0;
+ZPNAT02 is reused only by new ID8. Temporary trigger removed; no source writes.
+Default8e63916d... proves25 enabled numeric controls/Species/Collected, readonly
+saved-personal lookup, all unfinished creation controls disabled and every fixture
+byte unchanged. Exact accepted default is current/candidate; archives/
+creation-decisions-checkpoint seals core/default/previous bb3652f3 with hashes.
+Personal proofs and archives/personal-checkpoint remain unchanged.
+Core5568/default9904 exited; inspector9392 closed. No native/race command remains.
+Publication includes application source only; private evidence/binaries/dist are
+ignored. Use git HEAD/upstream for the current commit; personal predecessorb8e8499.
+Never replay creation-decisions.py completed modes or prior personal/creation proofs.
+Next: active metadata/calculations and separately bounded new-row metadata entry.
+Source effective properties/full event parity remain unknown; no further
 native Access property probe is authorized by old evidence.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.

@@ -401,9 +401,9 @@ core observations were not retained. Defaulta7dd1be8... has its own complete
 25-control array, Species/Collected enabled, readonly review and every fixture
 byte unchanged before/after clean close, with creation/deletion disabled.
 Focused final Go1.261s,191 frontend tests/check0/0/builds and full race478.504s pass.
-This creation checkpoint does not create user definitions or accept explicit
-personal/alias new-row decisions; those remain separate from the existing-row
-personal-definition workflow below.
+This initial creation checkpoint did not create user definitions or accept explicit
+personal/alias new-row decisions. The later explicit-decision checkpoint below
+extends proposals without combining project and user-definition saves.
 
 ### Existing-row personal definitions: verified opt-in desktop adaptation
 
@@ -448,8 +448,42 @@ Defaultbb3652f3... verifies25 enabled numeric controls/Species/Collected, readon
 new-definition lookup, unknown-code review/Undo and every fixture byte unchanged,
 with all creation/deletion UI disabled. Core17888/guard3976/default12924 exited.
 Focused final race6.224s/scopedGo2.894s,195 frontend tests/final targeted26/check0/0/
-builds and full integration507.979s pass. New source-row personal/alias decisions
-and active metadata/calculation event parity remain incomplete.
+builds and full integration507.979s pass. Creating personal metadata directly from
+a new source-row proposal and active metadata/calculation event parity remain incomplete.
+
+### New-row species decisions: verified opt-in desktop adaptation
+
+The five active exported NotInList handlers first look up USysAllSpecs.OldCode,
+ask replacement/keep, and assign source UCase. Only absent usable master aliases
+fall through to USysUserSpp; unknown-code metadata opens USysAddSpp separately.
+New-row drafts now reuse the same explicit decision/reference validators as
+existing rows, without a phantom editor identity or automatic alias selection.
+Duplicate aliases and nullable descriptions remain observable; NULL Code aliases
+are unusable, unlike non-NULL empty codes. Source case conversion remains ASCII
+bounded, while exact non-ASCII canonical-list selection remains unchanged.
+
+Review captures original form/raw code. Retyping Species removes review/decision;
+numeric edits, remounts and failed Save retain it. Strict transport permits only
+form/species/values and optional decision/entered/selected provenance. The shared
+writer checks the actual current alias/personal reference and independently stored
+row after insertion, before project audits/commit. Collision, source-reference
+drift, numeric/species drift and audit failures roll back row/history/reservations.
+Saved nullable-Codetype personal definitions are reusable without list membership
+or another VUser write. Creating personal metadata from a new-row proposal remains
+unavailable; default source creation/deletion/personal-definition flags stay off.
+
+Native core8e2dde81... verifies seven cases, including ambiguous review,
+unresolved remount/Save/Lock/actual-close guards, cancellation without writes,
+invalid/stale scoped requests, explicit replace/keep/personal creation and retained
+audit rollback/retry. New IDs6/7/8 add seven project audits and zero user audits.
+All15 original tables/60 prior audits and all original rows, user/reference/config
+bytes and schema are preserved apart from those rows/audits/reservations.
+Default8e63916d... independently verifies25 labelled enabled numeric controls,
+Species/Collected, readonly personal lookup, disabled unfinished creation and
+every fixture byte unchanged. Core5568/default9904 exited; inspector9392 closed.
+Focused Go2.888s/full race475.761s,197 frontend tests/check0/0/builds pass.
+Protected binaries are exact accepted default bytes; prior builds are archived
+with hashes. No Access oracle or production/R/Access source writes were used.
 
 ## Verified bounded selective restoration
 

@@ -920,10 +920,35 @@ Core17888/guard3976/default12924 exited; inspector9392 closed. Exact accepted
 default is promoted; prior a7dd1be8... and core/default are archived with hashes.
 Never replay personal.py/personal-guard.py/personal-delivery.py.
 
-Next bounded species batch: add explicit old-code/personal decisions to new
-source-row proposals, reusing the existing decision/reference validator and
-separate user-definition save. Canonical-only creation currently rejects these
-unlisted codes; do not invent Codetype or silently combine user/project writes.
-Then complete active metadata/calculation events. Full Access addition/deletion/
+### Explicit species decisions in source creation checkpoint
+
+New source-row proposals now support reviewed old-code replace/keep and existing
+personal-code decisions, reusing the existing source UCase/reference validators
+and shared allocation/reservation/audit transaction. Strict transport adds only
+decision/entered/selected provenance; caller identities/paths/hidden fields remain
+unavailable. Retyping Species invalidates the decision and reviewed choices;
+numeric edits and remounts retain them. NULL alias codes are unusable, duplicate
+definitions remain separate, master aliases retain precedence, and saved personal
+definitions with Codetype=NULL do not acquire invented dropdown membership.
+New-row Save writes only the project; personal-definition Save remains separate.
+Unknown-code metadata creation directly from a new-row proposal is still disabled.
+
+Focused coupled Go2.888s and full `go test -race ./...` root475.761s pass.
+197 frontend tests, check0/0, opt-in/default builds and bindings15/129/51 pass.
+Native core8e2dde81... verifies seven cases: ambiguous review, unresolved remount/
+Save/Lock/actual-close refusal, Cancel with zero writes, scoped invalid/stale
+requests, explicit replacement/keep/personal creation and audit rollback/retry.
+IDs6/7/8 add exactly seven project audits and zero user audits. All15 original
+project tables/60 prior audits, existing rows/reservations, user/reference/config
+bytes and schema survive apart from intended project changes/reservations.
+Default8e63916d... verifies25 enabled numeric controls plus Species/Collected,
+readonly saved-personal lookup, all unfinished creation controls disabled and
+every fixture byte unchanged. Core5568/default9904 closed; inspector9392 closed.
+Exact accepted default is promoted; builds and previous bb3652f3... are archived
+with hashes under native-vegetation-species/archives/creation-decisions-checkpoint.
+Never replay creation-decisions.py completed modes or prior proofs.
+
+Next complete active metadata/calculation events and separately bound new-row
+personal metadata entry without combining user/project writes. Full Access addition/deletion/
 personal-form effective properties remain unmeasured and source workflows stay
 default-disabled; full species/FS882/application parity is not yet complete.

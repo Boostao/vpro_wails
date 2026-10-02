@@ -41,7 +41,7 @@
   import { bindContextPlots } from './contextPlots';
   import { ReadRequests } from './readRequests';
   import { validateDeletionReview } from './vegetationDeletionEditor';
-  import { beginVegetationCreation, stageVegetationCreation, vegetationCreationErrors, vegetationCreationRequest, type VegetationCreationDraft } from './vegetationCreationEditor';
+  import { beginVegetationCreation, stageVegetationCreation, stageVegetationCreationSpecies, chooseVegetationCreationSpecies, vegetationCreationSpeciesError, vegetationCreationErrors, vegetationCreationRequest, type VegetationCreationDraft } from './vegetationCreationEditor';
   import { beginPersonalSpecies, matchesPersonalSpeciesSource, stagePersonalText, personalSpeciesErrors, personalSpeciesRequest, personalSpeciesMatches, personalSpeciesCommittedError, personalLifeforms, personalTextFields, type PersonalSpeciesDraft } from './personalSpeciesEditor';
 
   let { plotNumber, contextId, onSaved, onClosed, onBusyChange }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void } = $props();
@@ -58,6 +58,7 @@
   const deletionEnabled = import.meta.env.VITE_VEGETATION_DELETE_EDITING === 'true';
   const creationEnabled = import.meta.env.VITE_VEGETATION_CREATE_EDITING === 'true';
   let creationDraft = $state<VegetationCreationDraft | null>(null);
+  let creationChoices = $state<SpeciesChoices | null>(null);
   const personalSpeciesEnabled = import.meta.env.VITE_PERSONAL_SPECIES_EDITING === 'true';
   let personalDraft = $state<PersonalSpeciesDraft | null>(null);
   let savedPersonalCodes = $state<string[]>([]);
@@ -126,6 +127,7 @@
   const speciesUnsaved = $derived(speciesDirty(speciesDrafts));
   const speciesInvalid = $derived(speciesErrors(speciesDrafts));
   const creationInvalid = $derived(creationDraft ? vegetationCreationErrors(creationDraft, speciesLists[creationDraft.form] ?? []) : []);
+  const creationSpeciesInvalid = $derived(creationDraft ? vegetationCreationSpeciesError(creationDraft, speciesLists[creationDraft.form] ?? []) : null);
   const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
@@ -463,6 +465,7 @@
     speciesChoices = {};
     deletionReview = null;
     creationDraft = null;
+    creationChoices = null;
     personalDraft = null;
     savedPersonalCodes = [];
     vegList = [];
@@ -877,6 +880,7 @@
     const columns = [...paperChild(form).controls].sort((a, b) => a.tabOrder - b.tabOrder).flatMap(control => control.column ? [control.column] : []);
     try {
       creationDraft = beginVegetationCreation(form, columns);
+      creationChoices = null;
       error = null;
       successMsg = null;
     } catch (cause) {
@@ -895,9 +899,63 @@
     }
   }
 
+  function stageCreationSpecies(raw: string) {
+    if (!creationDraft || busy || headerWorkflowBusy) { error = 'An available creation draft is required before editing species.'; return; }
+    creationDraft = stageVegetationCreationSpecies(creationDraft, raw);
+    creationChoices = null;
+    error = null;
+    successMsg = null;
+  }
+
+  async function reviewCreationSpeciesChoices() {
+    const proposed = creationDraft;
+    if (!creationEnabled || !proposed || proposed.decision || busy || headerWorkflowBusy || draft.locked ||
+        !capabilitiesReady || !speciesReferenceReady || speciesReferenceBusy || !creationSpeciesInvalid) {
+      error = 'An available unresolved creation species entry is required before reviewing choices.';
+      return;
+    }
+    if (speciesEventError(proposed.species)) { error = speciesEventError(proposed.species); return; }
+    const request = ++speciesChoiceRequest;
+    speciesDecisionBusy = true;
+    creationChoices = null;
+    error = null;
+    try {
+      const aliases = await speciesChoiceReads.track(PlotService.ListVegetationSpeciesAliases({ code: proposed.species }));
+      if (request !== speciesChoiceRequest) return;
+      if (aliases === null) throw new Error('Species alias metadata was not returned.');
+      const users = aliases.some(option => option.code !== null) ? []
+        : await speciesChoiceReads.track(PlotService.ListVegetationSpeciesUsers({ code: proposed.species }));
+      if (request !== speciesChoiceRequest) return;
+      if (!creationDraft || creationDraft.form !== proposed.form || creationDraft.species !== proposed.species || creationDraft.decision) {
+        throw new Error('The original creation species entry changed during lookup; review it again.');
+      }
+      if (users === null) throw new Error('Species personal-code metadata was not returned.');
+      creationChoices = { form: proposed.form, entered: proposed.species, aliases, users };
+    } catch (cause) {
+      if (request === speciesChoiceRequest) error = `Creation species choices unavailable; draft retained: ${String(cause)}`;
+    } finally {
+      if (request === speciesChoiceRequest) speciesDecisionBusy = false;
+    }
+  }
+
+  function chooseCreationSpecies(kind: SpeciesDecisionKind, selected?: string) {
+    try {
+      if (!creationEnabled || !creationDraft || !creationChoices || busy || headerWorkflowBusy || draft.locked || !capabilitiesReady) {
+        throw new Error('Review the available unlocked creation entry before selecting a decision.');
+      }
+      creationDraft = chooseVegetationCreationSpecies(creationDraft, creationChoices, kind, selected);
+      creationChoices = null;
+      error = null;
+      successMsg = null;
+    } catch (cause) {
+      error = `Creation species decision failed; draft retained: ${String(cause)}`;
+    }
+  }
+
   async function cancelVegetationCreation() {
     if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling creation.'; return; }
     creationDraft = null;
+    creationChoices = null;
     error = null;
     successMsg = null;
     busy = true;
@@ -927,6 +985,7 @@
       const id = await PlotService.CreateSourceVegetation(draft.plotNumber, request);
       committed = true;
       creationDraft = null;
+      creationChoices = null;
       if (!Number.isInteger(id) || id <= 0 || id > 2147483647) throw new Error('Creation returned an invalid allocated identity.');
       await loadChildData(draft.plotNumber);
       const observed = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
@@ -1845,14 +1904,50 @@
         {#if creationInvalid.length}<p class="mb-2 text-red-700" role="alert">{creationInvalid[0]}</p>{/if}
         <label class="mb-2 flex flex-col gap-1" for="creation-species">Species code
           <input id="creation-species" class="rounded border bg-white px-2 py-2" type="text" value={creationDraft.species} list="creation-species-list"
-            disabled={busy || headerWorkflowBusy} aria-invalid={!speciesLists[creationDraft.form]?.some(option => option.code === creationDraft?.species)}
-            oninput={event => { if (creationDraft) { creationDraft = { ...creationDraft, species: event.currentTarget.value }; error = null; successMsg = null; } }} />
+            disabled={busy || headerWorkflowBusy} aria-invalid={creationSpeciesInvalid !== null}
+            oninput={event => stageCreationSpecies(event.currentTarget.value)} />
         </label>
         <datalist id="creation-species-list">
           {#each speciesLists[creationDraft.form] ?? [] as option, index (index)}
             {#if option.code !== null}<option value={option.code}>{option.scientificName ?? 'NULL'} | {option.englishName ?? 'NULL'} | Lifeform {option.lifeform ?? 'NULL'}</option>{/if}
           {/each}
         </datalist>
+        {#if creationDraft.decision}
+          <p class="mb-2" role="status">Explicit {creationDraft.decision.kind} decision for "{creationDraft.decision.entered}" stages "{creationDraft.species}". No new row or personal definition is saved yet.</p>
+        {:else if creationSpeciesInvalid}
+          <section class="mb-3 border-t border-amber-300 pt-2" aria-label="New vegetation species choices">
+            <button type="button" class="rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || !speciesReferenceReady || speciesReferenceBusy || speciesEventError(creationDraft.species) !== null}
+              title={speciesEventError(creationDraft.species) ?? 'Review source definitions without saving'}
+              onclick={() => void reviewCreationSpeciesChoices()}>Review new vegetation species code</button>
+            {#if speciesDecisionBusy}<p role="status">Looking up source species choices...</p>{/if}
+            {#if creationChoices && creationChoices.form === creationDraft.form && creationChoices.entered === creationDraft.species}
+              {@const hasAlias = creationChoices.aliases.some(option => option.code !== null)}
+              {#each creationChoices.aliases as option, index (index)}
+                <div class="mt-1">
+                  <span>{option.code ?? 'NULL'} | {option.scientificName ?? 'NULL'} | {option.englishName ?? 'NULL'} | Lifeform {option.lifeform ?? 'NULL'} | {option.codeType ?? 'NULL'}</span>
+                  <button type="button" class="ml-2 rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || speciesEventError(option.code) !== null}
+                    title={speciesEventError(option.code) ?? 'Stage explicit replacement; Save remains separate'}
+                    onclick={() => option.code !== null && chooseCreationSpecies('replace', option.code)}>Use replacement {option.code ?? 'NULL'} for new row</button>
+                </div>
+              {/each}
+              {#if hasAlias}
+                <button type="button" class="mt-1 rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy}
+                  onclick={() => chooseCreationSpecies('keep')}>Keep entered code for new row</button>
+              {:else}
+                {#each creationChoices.users as option, index (index)}
+                  <div class="mt-1">
+                    <span>{option.code ?? 'NULL'} | {option.scientificName ?? 'NULL'} | {option.englishName ?? 'NULL'} | Lifeform {option.lifeform ?? 'NULL'} | {option.codeType ?? 'NULL'}</span>
+                    <button type="button" class="ml-2 rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || speciesEventError(option.code) !== null}
+                      title={speciesEventError(option.code) ?? 'Stage an existing personal code; no user-database write'}
+                      onclick={() => option.code !== null && chooseCreationSpecies('user', option.code)}>Use personal code {option.code ?? 'NULL'} for new row</button>
+                  </div>
+                {:else}
+                  <p role="alert">No source replacement or existing personal code was found. Creating personal metadata from a new-row proposal remains unavailable; correct or Cancel this proposal. Personal definitions saved separately remain reusable.</p>
+                {/each}
+              {/if}
+            {/if}
+          </section>
+        {/if}
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {#each Object.entries(creationDraft.cells) as [column, cell] (column)}
             {@const control = paperChild(creationDraft.form).controls.find(control => control.column?.toLowerCase() === column.toLowerCase())}
@@ -1867,7 +1962,7 @@
           <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy || creationInvalid.length > 0 || !speciesReferenceReady || speciesReferenceBusy} onclick={() => void saveVegetationCreation()}>Save new vegetation record</button>
           <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={() => void cancelVegetationCreation()}>Cancel vegetation creation</button>
         </div>
-        <p class="mt-2">Select an exact canonical code and enter source numeric values explicitly. Blank fields remain NULL; Layer, covers, totals and personal metadata are not inferred. Identity is allocated only by the transactional writer.</p>
+        <p class="mt-2">Select an exact canonical code or explicitly review replacement, keep or existing personal-code decisions. Enter source numeric values explicitly. Blank fields remain NULL; Layer, covers, totals and personal metadata are not inferred. Identity is allocated only by the transactional writer; saving a new row never writes the user database.</p>
       </section>
     {/if}
     {#if deletionReview}

@@ -9,13 +9,19 @@ import (
 )
 
 type VegetationCreationRequest struct {
-	Form    string              `json:"form"`
-	Species string              `json:"species"`
-	Values  map[string]*float64 `json:"values"`
+	Form     string              `json:"form"`
+	Species  string              `json:"species"`
+	Values   map[string]*float64 `json:"values"`
+	Decision string              `json:"decision,omitempty"`
+	Entered  *string             `json:"entered,omitempty"`
+	Selected *string             `json:"selected,omitempty"`
 }
 
 func (request *VegetationCreationRequest) UnmarshalJSON(data []byte) error {
-	if err := validateJSONTextProperties(data, map[string]string{"form": "Vegetation creation form", "species": "Vegetation creation species"}); err != nil {
+	if err := validateJSONTextProperties(data, map[string]string{
+		"form": "Vegetation creation form", "species": "Vegetation creation species",
+		"decision": "Species decision", "entered": "Species entered code", "selected": "Species selected code",
+	}); err != nil {
 		return err
 	}
 	var properties map[string]json.RawMessage
@@ -28,13 +34,25 @@ func (request *VegetationCreationRequest) UnmarshalJSON(data []byte) error {
 			return fmt.Errorf("vegetation creation requires explicit non-NULL %s", property)
 		}
 	}
+	if value, present := properties["decision"]; present && strings.TrimSpace(string(value)) == "null" {
+		return errors.New("vegetation creation species decision must not be NULL")
+	}
 	for property := range properties {
-		if property != "form" && property != "species" && property != "values" {
+		switch property {
+		case "form", "species", "values", "decision", "entered", "selected":
+		default:
 			return fmt.Errorf("vegetation creation property %q is unavailable; identity and parent are assigned by the source context", property)
 		}
 	}
 	type plain VegetationCreationRequest
 	return json.Unmarshal(data, (*plain)(request))
+}
+
+func (request VegetationCreationRequest) speciesUpdate() VegetationSpeciesUpdate {
+	return VegetationSpeciesUpdate{
+		Form: request.Form, Value: request.Species, Decision: request.Decision,
+		Entered: request.Entered, Selected: request.Selected,
+	}
 }
 
 func prepareVegetationCreation(plot string, request VegetationCreationRequest) (VegRecord, string, string, error) {
@@ -48,6 +66,9 @@ func prepareVegetationCreation(plot string, request VegetationCreationRequest) (
 		return empty, "", "", err
 	}
 	if err := validateVegetationSpeciesLookup(request.Species); err != nil {
+		return empty, "", "", err
+	}
+	if err := validateVegetationSpeciesDecision(request.speciesUpdate()); err != nil {
 		return empty, "", "", err
 	}
 	if len(request.Values) == 0 {
@@ -94,7 +115,7 @@ func (s *PlotService) CreateSourceVegetation(plot string, request VegetationCrea
 	var identity int64
 	err = s.saveChildWithChecks("Veg", record, childSave, nil,
 		func(tx *sql.Tx, table, parent string, id int64) error {
-			if err := s.validateVegetationSpeciesReference(tx, VegetationSpeciesUpdate{Form: request.Form, Value: request.Species}, predicate); err != nil {
+			if err := s.validateVegetationSpeciesReference(tx, request.speciesUpdate(), predicate); err != nil {
 				return err
 			}
 			condition := rowPredicate + ` AND Species COLLATE BINARY=?`

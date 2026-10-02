@@ -596,6 +596,9 @@ export interface VegetationCreationRequest {
     "form": string;
     "species": string;
     "values": { [_ in string]?: number | null } | null;
+    "decision"?: string;
+    "entered"?: string | null;
+    "selected"?: string | null;
 }
 
 export interface VegetationDeletionRequest {

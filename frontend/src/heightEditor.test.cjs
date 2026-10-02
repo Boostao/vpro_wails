@@ -136,9 +136,17 @@ test('Explicit deletion confirmation owns lifecycle without allowing generic Sav
   assert.match(source,/Vegetation deletion committed, but refresh failed/);
 });
 const creation={};
+const { loadTypeScript } = require('./svelteTestHelpers.cjs');
+const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
+const species = loadTypeScript('vegetationSpeciesEditor.ts', { './qualityEditor': quality });
 vm.runInNewContext(ts.transpileModule(readFileSync(path.join(__dirname,'vegetationCreationEditor.ts'),'utf8'),
   {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,
-  {exports:creation,require:name=>{if(name!=='./heightEditor')throw new Error(`Unexpected dependency ${name}`);return output;}});
+  {exports:creation,require:name=>{
+    if(name==='./heightEditor')return output;
+    if(name==='./qualityEditor')return quality;
+    if(name==='./vegetationSpeciesEditor')return species;
+    throw new Error(`Unexpected dependency ${name}`);
+  }});
 test('Creation preserves source numeric order, canonical literal codes, explicit zero/NULL and no guessed identity or Layer',()=>{
   let draft=creation.beginVegetationCreation('SubVegAXL_BC',['Species','Cover2','Cover1','Cover2','Collected']);
   assert.deepEqual(Object.keys(draft.cells),['cover2','cover1']);
@@ -180,4 +188,44 @@ test('Opt-in source creation owns independent persistent lifecycle and fails clo
   assert.match(source,/Vegetation creation failed; draft retained/);
   assert.match(source,/Vegetation creation committed, but refresh or identity verification failed/);
   assert.match(source,/observed\[0\]\.species !== request\.species/);
+  assert.match(source,/creationChoices\.form === creationDraft\.form && creationChoices\.entered === creationDraft\.species/);
+  assert.match(source,/Creation species choices unavailable; draft retained/);
+  assert.match(source,/saving a new row never writes the user database/);
+});
+test('Creation decisions share source UCase, alias precedence and NULL-code rules without phantom row identity',()=>{
+  for(const [kind,entered,selected,aliases,users,value] of [
+    ['replace','olddup','new_a',[{code:'new_a'},{code:'NEW_B'}],[],'NEW_A'],
+    ['keep','olddup',undefined,[{code:'NEW_A'}],[],'OLDDUP'],
+    ['user','personal','Personal',[{code:null}],[{code:'Personal',codeType:null}],'PERSONAL'],
+  ]){
+    let draft=creation.stageVegetationCreation(creation.beginVegetationCreation('SubVegAXL_BC',['Cover1']),'Cover1','0');
+    draft=creation.stageVegetationCreationSpecies(draft,entered);
+    const choices={form:draft.form,entered,aliases,users};
+    const resolved=creation.chooseVegetationCreationSpecies(draft,choices,kind,selected);
+    const request=creation.vegetationCreationRequest(resolved,[]);
+    assert.deepEqual(json(request),{form:draft.form,species:value,decision:kind,entered,
+      ...(selected===undefined?{}:{selected}),values:{cover1:0}});
+    assert.throws(()=>creation.chooseVegetationCreationSpecies(resolved,choices,kind,selected),/original creation entry/);
+    assert.equal(creation.stageVegetationCreationSpecies(resolved,value).decision,undefined);
+    assert.notEqual(creation.vegetationCreationSpeciesError(creation.stageVegetationCreationSpecies(resolved,value),[]),null);
+    assert.deepEqual(json(resolved.cells),json(draft.cells));
+  }
+});
+test('Creation decisions reject stale source identity, implicit choices, precedence bypass and unsupported Unicode events',()=>{
+  let draft=creation.stageVegetationCreationSpecies(creation.beginVegetationCreation('SubVegCXL',['Cover6']),'old');
+  const choices={form:draft.form,entered:'old',aliases:[{code:'NEW'}],users:[{code:'old'}]};
+  for(const current of [{...choices,form:'SubVegDXL'},{...choices,entered:'other'}]){
+    assert.throws(()=>creation.chooseVegetationCreationSpecies(draft,current,'keep'),/original creation entry/);
+  }
+  assert.throws(()=>creation.chooseVegetationCreationSpecies(draft,choices,'user','old'),/not available/);
+  assert.throws(()=>creation.chooseVegetationCreationSpecies(draft,choices,'replace','new'),/not available/);
+  assert.throws(()=>creation.chooseVegetationCreationSpecies(draft,choices,'keep','NEW'),/not available/);
+  assert.throws(()=>creation.chooseVegetationCreationSpecies(draft,{...choices,aliases:[{code:null}]},'keep'),/not available/);
+  assert.throws(()=>creation.chooseVegetationCreationSpecies(draft,{...choices,aliases:[{code:'É'}]},'replace','É'),/non-ASCII/);
+  assert.match(creation.vegetationCreationSpeciesError({...draft,species:'\ud800'},[]),/incomplete Unicode/);
+  assert.match(creation.vegetationCreationSpeciesError({...draft,species:'😀'.repeat(5)},[]),/8 UTF-16/);
+  const chosen=creation.chooseVegetationCreationSpecies(draft,choices,'keep');
+  assert.match(creation.vegetationCreationSpeciesError({...chosen,species:'old'},[]),/explicit creation decision/);
+  assert.match(creation.vegetationCreationSpeciesError({...chosen,decision:{...chosen.decision,selected:'NEW'}},[]),/explicit creation decision/);
+  assert.equal(creation.vegetationCreationSpeciesError({...draft,species:'É'},[{code:'É'}]),null);
 });
