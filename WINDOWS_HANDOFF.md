@@ -34,14 +34,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all50 editor operations to immutable identities, leases running operations and
+  all52 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `    bd8e722c8692526c76f37e424aa53bb7d022b065aa44324ebb8391c024e05ebf`.
+  `    42445dd9548a35b427cc6100d7f66f27aa6951b73ac8c43f5791521bb430d974`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -669,8 +669,8 @@ continuations retain byte-preservation evidence, and no completed writes replaye
 Publication includes application source only; private evidence/binaries/dist are
 ignored. Use git HEAD/upstream for the current commit; predecessore71c5da.
 Never replay code-check.py, a-cover-notices.py, cover-notices.py or creation-personal.py completed modes.
-Current successor: project-local profile review is verified; ordered profiling
-execution and metadata-specific restoration remain open.
+Current successor: project-local ordered read-only profiling is verified;
+profile editing/filter application and metadata-specific restoration remain open.
 The plan records the metadata prerequisite: project75-column storage, master
 templates42 columns and legacy VUser metadata15 columns are distinct; dates/code
 types and the source wrong-recordset/ambiguous-copy logic must not be guessed.
@@ -850,9 +850,11 @@ descriptions remain separate from Env compatibility (Sample_Profile is VP05-2).
 Canonical table_name uniqueness is retained; duplicate description tests use an
 explicit disposable legacy variation. The resident labelled read-only panel retains
 review/errors across tabs, cancels on destruction, gates transitions during loading
-and removes stale results on Reload. Run/edit/filter/Save as SU remain unavailable.
-232 frontend tests/check0/0, both builds, focused7.063s/full race441.215s pass.
-Bindings15/138/67;50 scoped operations. Core bin/vpro-project-profile-review-core.exe
+and removes stale results on Reload. Ordered preview now has the additional
+VITE_PROJECT_PLOT_PROFILE_RUN=true gate; editing/filter/Save as SU stay unavailable.
+233 frontend tests/check0/0, both builds, full race469.582s plus subsequent focused
+external-SU race1.927s pass. Bindings15/140/70;52 scoped operations.
+Preceding review core bin/vpro-project-profile-review-core.exe
 SHA2564472e1613c2cfc689917f2718a34265276702ef6f39117e22a5704216e6744ac /
 owned6856 verifies eight physical rules/nine fields, original description, labels,
 tab changes and Reload with zero writes. Default bin/vpro-project-profile-review-default.exe
@@ -864,16 +866,39 @@ All owned apps close; no native/race process remains. Original project/support/c
 and canonical Sample bytes are unchanged. Archives/project-profile-review-checkpoint
 seals51 hashed files plus manifest; independent verification passes. Previousb7c,
 exact opted-in/default assets/binaries, source and proof/log/visual receipts remain.
-Current/candidate are exact acceptedbd8e copies; never rebuild them in place.
+Precedingbd8e remains sealed there; never rebuild protected current paths in place.
 Never replay project-profile-review.py, default/visual proofs or completed seal.
-Next is typed ordered execution planning: FS882.btnVegProfiling opens USysPlotProfiling;
+Ordered preview is native-verified: FS882.btnVegProfiling opens USysPlotProfiling;
 btnGetSummary calls ProfilePlots in V7mdlPlotProfiling, not Profile4Presence. Profile
 rules belong to the project; scratch tables belong to VPro64. Preserve nine original
 bindings and reject unsupported/ambiguous SQL fragments explicitly. Validate original
 Env/Veg/Lump and aggregate/NULL/scope behavior, not the R doubles-based precedent.
 Execution results/counts belong to owned SQLite TEMP state, not shipped supports or
 historical PlotCount. Other profile-file selection remains unimplemented. Keep the
-runner disabled until ordered execution/filter lifecycle and native acceptance.
+filter application, rule editing and Save as SU disabled; preview is separately
+opt-in, not an active filter. Strict schema/physical/order/literal guards,
+snapshot revalidation and isolated TEMP transactions pass168 matrix cases,
+source scalar/combined-lump/set-count tests and metadata regressions.
+Native original-sample core4b3f8e4c.../owned15492 verifies all eight physical
+steps, both explicit subvariety modes, total52/final11 and exact source run counts
+13/0/0/0/0/0/35/24 without stored writes. Final opted-in
+bin/vpro-project-profile-run-lifecycle.exe
+SHA256cb955f3c10ae90da91b9b373c6e9fbd88fce93934438eba13b95822e05719fa4
+/owned1060 verifies actual cancellation under an external read blocker,
+retained-input retry and parent draft retention across tab remounts. Returning
+the header text to its original value leaves its edit stamp dirty; the known
+native Discard draft and close path was explicitly selected, without writes.
+Default bin/vpro-project-profile-run-default.exe
+SHA25642445dd9548a35b427cc6100d7f66f27aa6951b73ac8c43f5791521bb430d974
+/owned11452 verifies both gates absent and existing Vegetation active.
+All owned apps exit; original fixture/config/support/canonical Sample bytes are
+restored exactly. Archives/project-profile-run-checkpoint retains previousbd8e,
+accepted core/final/default binaries, exact final/default assets and source/proofs/
+logs plus a hashed manifest. Current/candidate are exact accepted4244 copies.
+Do not replay completed project-profile-run prepare/run/lifecycle/default/tail
+modes or the seal. Unsupported locale/date/non-ASCII matching and defective
+Lump/Any/Add equality fail explicitly. Static export fidelity and native Wails
+proofs do not establish native Access execution parity.
 Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind

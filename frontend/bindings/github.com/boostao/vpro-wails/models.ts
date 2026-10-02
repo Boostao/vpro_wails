@@ -503,11 +503,34 @@ export interface ProjectMetadataTemplateCreate {
     "values": ProjectMetadataChange[] | null;
 }
 
+export interface ProjectPlotProfileResult {
+    "project": string;
+    "table": string;
+    "su": string;
+    "totalPlots": number;
+    "plotNumbers": string[] | null;
+    "steps": ProjectPlotProfileStep[] | null;
+}
+
 export interface ProjectPlotProfileReview {
     "project": string;
     "table": string;
     "rules": ProjectMetadataTable;
     "descriptions": ProjectMetadataTable;
+}
+
+export interface ProjectPlotProfileRunRequest {
+    "originalRules": ProjectMetadataTable;
+    "projectLump": ProjectMetadataTable | null;
+    "subvarieties": boolean;
+}
+
+export interface ProjectPlotProfileStep {
+    "rowId": string;
+    "order": number;
+    "operation": string;
+    "plotCount": number;
+    "remaining": number;
 }
 
 export interface ProjectState {

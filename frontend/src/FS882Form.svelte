@@ -109,6 +109,7 @@
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
   const profileReviewEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_REVIEW === 'true';
+  const profileRunEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_RUN === 'true';
   let profileReviewOpen = $state(false);
   let profileReviewBusy = $state(false);
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
@@ -1864,7 +1865,7 @@
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
     {#if profileReviewOpen}
-      <ProjectPlotProfileReview client={PlotService} onbusy={value => profileReviewBusy = value}
+      <ProjectPlotProfileReview client={PlotService} allowRun={profileRunEnabled} onbusy={value => profileReviewBusy = value}
         onclosed={() => { profileReviewOpen = false; }} />
     {/if}
     {#if metadataOpen}

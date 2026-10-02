@@ -138,28 +138,11 @@ func readProjectMetadataRows(ctx context.Context, db projectMetadataQueryer, ali
 
 // Filter/order identifiers are internal literals; values remain SQL parameters.
 func readSQLiteStorageRows(ctx context.Context, db projectMetadataQueryer, alias, table, filterColumn string, filterValue *string, orderColumn string) (ProjectMetadataTable, error) {
-	schema, err := db.QueryContext(ctx, "PRAGMA "+quoteHeaderIdentifier(alias)+".table_info("+quoteHeaderIdentifier(table)+")")
+	columns, err := readSQLiteStorageColumns(ctx, db, alias, table)
 	if err != nil {
 		return ProjectMetadataTable{}, err
 	}
-	result := ProjectMetadataTable{Columns: []ProjectMetadataColumn{}, Rows: []ProjectMetadataRow{}}
-	for schema.Next() {
-		var index, required, primary int
-		var name, kind string
-		var defaultValue sql.NullString
-		if err := schema.Scan(&index, &name, &kind, &required, &defaultValue, &primary); err != nil {
-			schema.Close()
-			return ProjectMetadataTable{}, err
-		}
-		if !utf8.ValidString(name) || !utf8.ValidString(kind) {
-			schema.Close()
-			return ProjectMetadataTable{}, errors.New("metadata schema contains malformed Unicode")
-		}
-		result.Columns = append(result.Columns, ProjectMetadataColumn{name, kind})
-	}
-	if err := errors.Join(schema.Err(), schema.Close()); err != nil {
-		return ProjectMetadataTable{}, err
-	}
+	result := ProjectMetadataTable{Columns: columns, Rows: []ProjectMetadataRow{}}
 	fields := []string{"rowid"}
 	for _, column := range result.Columns {
 		name := quoteHeaderIdentifier(column.Name)
@@ -209,6 +192,32 @@ func readSQLiteStorageRows(ctx context.Context, db projectMetadataQueryer, alias
 		return ProjectMetadataTable{}, err
 	}
 	return result, nil
+}
+
+func readSQLiteStorageColumns(ctx context.Context, db projectMetadataQueryer, alias, table string) ([]ProjectMetadataColumn, error) {
+	schema, err := db.QueryContext(ctx, "PRAGMA "+quoteHeaderIdentifier(alias)+".table_info("+quoteHeaderIdentifier(table)+")")
+	if err != nil {
+		return nil, err
+	}
+	columns := []ProjectMetadataColumn{}
+	for schema.Next() {
+		var index, required, primary int
+		var name, kind string
+		var defaultValue sql.NullString
+		if err := schema.Scan(&index, &name, &kind, &required, &defaultValue, &primary); err != nil {
+			schema.Close()
+			return nil, err
+		}
+		if !utf8.ValidString(name) || !utf8.ValidString(kind) {
+			schema.Close()
+			return nil, errors.New("metadata schema contains malformed Unicode")
+		}
+		columns = append(columns, ProjectMetadataColumn{name, kind})
+	}
+	if err := errors.Join(schema.Err(), schema.Close()); err != nil {
+		return nil, err
+	}
+	return columns, nil
 }
 
 func projectMetadataCell(storage string, value any) (ProjectMetadataCell, error) {

@@ -67,11 +67,42 @@ test('Project-local profile review is separately gated, resident across tabs, ca
   assert.match(form,/\{#if profileReviewOpen\}\s*<ProjectPlotProfileReview/);
   assert.match(component,/reads\.track\(client\.ReviewProjectPlotProfile\(\)\)/);
   assert.match(component,/generation\+\+; reads\.cancelAll\(\)/);
-  assert.match(component,/review = null; error = null; reading = true/);
+  assert.match(component,/review = null; error = null; lump = null; result = null; reading = true/);
   assert.match(component,/request === generation/);
   assert.match(component,/no rules, counts or filters changed/);
   assert.match(component,/disabled title="Ordered profile execution is not implemented."/);
   assert.match(component,/PlotCount is historical storage/);
   assert.match(component,/aria-label=\{`\$\{item\.table\.columns\[index\]\.name\}, record \$\{row\.rowId\}`\}/);
-  assert.doesNotMatch(component,/<input|<select|<textarea|\.Save|\.Create|\.Update|\.Delete|\.Set|\.Run|\.Restore/);
+  assert.doesNotMatch(component,/<select|<textarea|\.Save|\.Create|\.Update|\.Delete|\.Set|\.Restore/);
+  assert.match(form,/VITE_PROJECT_PLOT_PROFILE_RUN === 'true'/);
+  assert.match(component,/if \(!allowRun \|\| reading \|\| !review\) return/);
+  assert.match(component,/\{#if allowRun\}[\s\S]*Run stored profile preview[\s\S]*\{:else\}[\s\S]*Run Profile \(unavailable\)/);
+  assert.match(component,/originalRules: source\.rules, projectLump: lump, subvarieties/);
+  assert.match(component,/disabled=\{reading \|\| !lump\}/);
+  assert.match(component,/lump = null; subvarieties = false; result = null; error = null/);
+  assert.match(component,/function cancelRun\(\) \{\s*generation\+\+; reads\.cancelAll\(\);/);
+  assert.match(component,/running = false; reading = false; result = null; onbusy\(false\)/);
+  assert.match(component,/Profile preview cancelled; reviewed inputs retained/);
+});
+
+test('Preview validates exact scoped ordered result identities, counts and NULL transport without applying filters',()=>{
+  const source=profile.validateProjectPlotProfileReview(review());
+  const result={project:'Sample',table:'Sample_Profile',su:'None',totalPlots:4,plotNumbers:['P','Z'],
+    steps:[{rowId:'-1',order:1,operation:'Add plots',plotCount:4,remaining:4},
+      {rowId:'2',order:2,operation:'Subtract plots',plotCount:2,remaining:2}]};
+  assert.equal(JSON.stringify(profile.validateProfileRunResult(result,source)),JSON.stringify(result));
+  const bad=[
+    {...result,project:'Else'}, {...result,table:'Else_Profile'}, {...result,su:''},
+    {...result,plotNumbers:null}, {...result,plotNumbers:['P','P']}, {...result,plotNumbers:['']},
+    {...result,totalPlots:1}, {...result,totalPlots:NaN}, {...result,steps:null}, {...result,steps:[]},
+    {...result,steps:[result.steps[0],result.steps[0]]},
+    {...result,steps:[result.steps[0],{...result.steps[1],order:1}]},
+    {...result,steps:[result.steps[0],{...result.steps[1],plotCount:5}]},
+    {...result,steps:[result.steps[0],{...result.steps[1],remaining:1}]},
+    {...result,steps:[result.steps[0],{...result.steps[1],operation:'Filter'}]}
+  ];
+  for(const value of bad) assert.throws(()=>profile.validateProfileRunResult(value,source),/inconsistent scoped result/);
+  const lump={columns:['LumpCode','SppCode','Use'].map(name=>({name,declaredType:'TEXT'})),rows:[]};
+  assert.equal(JSON.stringify(profile.validateProjectProfileLump(lump)),JSON.stringify(lump));
+  assert.throws(()=>profile.validateProjectProfileLump({...lump,columns:lump.columns.slice(1)}),/complete original physical schema/);
 });

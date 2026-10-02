@@ -1,4 +1,4 @@
-import type { ProjectMetadataCell, ProjectMetadataColumn, ProjectMetadataTable, ProjectPlotProfileReview } from '../bindings/github.com/boostao/vpro-wails';
+import type { ProjectMetadataCell, ProjectMetadataColumn, ProjectMetadataTable, ProjectPlotProfileReview, ProjectPlotProfileResult } from '../bindings/github.com/boostao/vpro-wails';
 import { metadataCellText } from './projectMetadataEditor';
 
 export const plotProfileFields = ['Order', 'Table', 'Field', 'Operator', 'Layer', 'Species', 'Criteria', 'Operation', 'PlotCount'] as const;
@@ -50,6 +50,38 @@ function validateTable(table: ProjectMetadataTable, required: readonly string[])
     return { rowId: row.rowId, cells };
   });
   return { columns, rows: validatedRows };
+}
+
+export function validateProjectProfileLump(table: ProjectMetadataTable): ProfileReviewTable {
+  return validateTable(table, ['LumpCode', 'SppCode', 'Use']);
+}
+
+export interface ProfileRunResult {
+  project: string;
+  table: string;
+  su: string;
+  totalPlots: number;
+  plotNumbers: string[];
+  steps: { rowId: string; order: number; operation: string; plotCount: number; remaining: number }[];
+}
+
+export function validateProfileRunResult(result: ProjectPlotProfileResult, review: ValidatedProjectPlotProfileReview): ProfileRunResult {
+  const { plotNumbers, steps } = result;
+  const ids = new Set(review.rules.rows.map(row => row.rowId));
+  if (result.project !== review.project || result.table !== review.table || !result.su ||
+      !Number.isInteger(result.totalPlots) || result.totalPlots < 0 ||
+      !Array.isArray(plotNumbers) || plotNumbers.some(plot => typeof plot !== 'string' || !plot) ||
+      new Set(plotNumbers).size !== plotNumbers.length || plotNumbers.length > result.totalPlots ||
+      !Array.isArray(steps) || steps.length !== ids.size || new Set(steps.map(step => step.rowId)).size !== ids.size ||
+      steps.some(step => !ids.has(step.rowId) || !Number.isInteger(step.order) || step.order < -32768 || step.order > 32767 ||
+        !['Add plots', 'Subtract plots', 'Common plots'].includes(step.operation) ||
+        !Number.isInteger(step.plotCount) || step.plotCount < 0 || step.plotCount > result.totalPlots ||
+        !Number.isInteger(step.remaining) || step.remaining < 0 || step.remaining > result.totalPlots) ||
+      steps.some((step, index) => index > 0 && step.order <= steps[index - 1].order) ||
+      steps.length === 0 || steps[steps.length - 1].remaining !== plotNumbers.length) {
+    throw new Error('Profile run returned an inconsistent scoped result; no filter was applied.');
+  }
+  return { project: result.project, table: result.table, su: result.su, totalPlots: result.totalPlots, plotNumbers, steps };
 }
 
 export function validateProjectPlotProfileReview(review: ProjectPlotProfileReview): ValidatedProjectPlotProfileReview {

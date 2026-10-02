@@ -1381,4 +1381,45 @@ Exact accepted default3db65721... is promoted without rebuilding.
 Remaining metadata acceptance: metadata-specific
 restoration; reference attachment/master-catalogue writes. Keep these unavailable
 and leave existing-record editing opt-in rather than claiming the full source
-copy action is complete. Navigation and ordered profiling remain separate work.
+copy action is complete. Full navigation and profile editing/filter application
+remain separate work; the read-only ordered preview below is verified.
+
+## Ordered plot profiling: bounded read-only execution
+
+FS882.btnVegProfiling opens USysPlotProfiling; btnGetSummary calls
+V7mdlPlotProfiling.ProfilePlots, not the older Profile4Presence. The project's
+original nine-field profile table remains canonical; VPro64 scratch tables are
+not persisted desktop job state or an editor catalogue.
+
+- **Delivered, separately opt-in:** typed original review plus strict ordered
+  Env/Veg/Lump execution on a fresh context-owned SQLite connection/transaction.
+  Project/SU views reuse the foundation, including external quoted/Unicode paths.
+  Reviewed rule and project-lump snapshots must still match exactly. Results
+  expose physical rowid/Order, run-only counts, remaining counts and final plot
+  identities; historical PlotCount and every support database remain untouched.
+- **Preserved from static source:** fourteen layers, Add/Common/Subtract,
+  Single-rounding MadMax with zero initialization/NULL handling, direct lump
+  membership without implicit Use filtering, explicit subvariety UNION semantics,
+  BOOLEAN normalization and the source's asymmetric SumB/absence/subtraction
+  branches. Parameter binding replaces raw SQL string interpolation.
+- **Adapted or unavailable:** TEMP unique plot sets deliberately exclude source
+  duplicate scratch-row artifacts. No implicit registry/global lump selection.
+  Duplicate/NULL Orders fail instead of choosing FindFirst. The defective
+  Lump/Any/Add equality branch, locale/date conversion, non-ASCII comparisons and
+  complex Access Like patterns require separate evidence rather than guesses.
+  These differences are not claimed as native Access runtime parity.
+- **Acceptance passed:** 168 equivalent layer/operation/threshold cases, strict
+  compiler boundaries, scalar NULL/BOOLEAN/literal tests, combined-lump overrides,
+  exact set counts, stale snapshots/cancellation, failed-job isolation/retry and
+  external project/SU scope. Metadata regressions pass after schema-reader reuse.
+  233 frontend tests, check0/0, both builds and complete Go race (root469.582s)
+  pass; the subsequently added external-scope test also passes focused race.
+  Actual Wails verifies the original eight rules in both subvariety modes
+  (52 total, step counts13/0/0/0/0/0/35/24, final11), explicit lump selection,
+  cancellation/retry, retained unsaved parent drafts and default-off delivery.
+  Disposable canonical-sample bytes and the original active fixture are exactly
+  restored; no production, source, support, audit or configuration writes occur.
+- **Next, not implied complete:** profile-rule editing, external/current profile
+  selection, applying results to form navigation/filters and Save as SU require
+  separately defined ownership/draft/rollback gates. Metadata-specific
+  restoration and remaining active calculations/navigation remain in order6.

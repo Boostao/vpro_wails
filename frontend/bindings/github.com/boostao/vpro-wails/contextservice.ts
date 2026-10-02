@@ -125,12 +125,20 @@ export function ReviewProjectPlotProfile(contextID: string): $CancellablePromise
     return $Call.ByID(922462901, contextID);
 }
 
+export function ReviewProjectPlotProfileLump(contextID: string): $CancellablePromise<$models.ProjectMetadataTable> {
+    return $Call.ByID(4282519119, contextID);
+}
+
 export function ReviewSpeciesCodes(contextID: string): $CancellablePromise<$models.SpeciesCodeCheckReview> {
     return $Call.ByID(3045258678, contextID);
 }
 
 export function ReviewVegetationDeletion(contextID: string, plot: string, form: string, id: number): $CancellablePromise<$models.VegetationDeletionReview> {
     return $Call.ByID(2363268444, contextID, plot, form, id);
+}
+
+export function RunProjectPlotProfile(contextID: string, request: $models.ProjectPlotProfileRunRequest): $CancellablePromise<$models.ProjectPlotProfileResult> {
+    return $Call.ByID(2115295500, contextID, request);
 }
 
 export function SaveHumusRecord(contextID: string, record: $models.HumusRecord): $CancellablePromise<void> {
