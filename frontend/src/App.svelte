@@ -12,6 +12,7 @@
   import { validateProfileNavigation, profileNavigationPage, validatePlotProfileSource, validateProjectPlotProfileReview, type ValidatedProjectPlotProfileReview, type ProfileNavigation } from './projectPlotProfileReview';
   import { validateProfileSUReview, validateProfileSUCreated, type ReviewedProfileSU } from './profileSU';
   import { validateProfileFileReview, validateProfileFileCreated, type ReviewedProfileFile } from './profileFile';
+  import { validateProfileTableReview, validateProfileTableCreated, type ReviewedProfileTable } from './profileTable';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -49,6 +50,13 @@
   const profileSelectionEnabled = import.meta.env.VITE_PLOT_PROFILE_SELECTION === 'true';
   const profileWriteOwnershipEnabled = import.meta.env.VITE_PLOT_PROFILE_WRITE_OWNERSHIP === 'true';
   const profileFileCreationEnabled = import.meta.env.VITE_PLOT_PROFILE_FILE_CREATION === 'true';
+  const profileTableCreationEnabled = import.meta.env.VITE_PLOT_PROFILE_TABLE_CREATION === 'true';
+  let profileTableReview = $state<ReviewedProfileTable | null>(null);
+  let profileTableContext = $state('');
+  let profileTableName = $state('');
+  let profileTableError = $state('');
+  let profileTableSuccess = $state('');
+  let profileTableCommitted = $state(false);
   let profileFileReview = $state<ReviewedProfileFile | null>(null);
   let profileFileContext = $state('');
   let profileFileName = $state('');
@@ -497,6 +505,50 @@
     });
   }
 
+  async function reviewBlankProfileTable() {
+    const contextId = $projectState?.contextId;
+    if (!contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+      profileTableError = 'Wait for the current operation or decision before reviewing an existing-file profile.'; return;
+    }
+    busy = true; profileTableError = '';
+    try {
+      await tick();
+      const response = await stateReads.track(ContextService.ReviewPlotProfileTableCreation(contextId));
+      if ($projectState?.contextId !== contextId) throw new Error('Existing-file profile review belongs to an old context.');
+      profileTableReview = validateProfileTableReview(response); profileTableContext = contextId;
+      profileTableCommitted = false; profileTableSuccess = '';
+    } catch (cause) { profileTableError = `No profile table created; review failed: ${String(cause)}`; }
+    finally { busy = false; }
+  }
+
+  async function createBlankProfileTable() {
+    if (!profileTableReview || profileTableCommitted || profileTableContext !== $projectState?.contextId) {
+      profileTableError = 'Review current selected-profile ownership and the original template before creating one table.'; return;
+    }
+    const proposal = $state.snapshot({ review: profileTableReview, name: profileTableName, confirmed: true });
+    const origin = profileTableContext;
+    await requestTransition(async contextId => {
+      if (contextId !== origin) throw new Error('Existing-file profile proposal belongs to an old context.');
+      busy = true; profileTableError = '';
+      try {
+        await tick();
+        const response = await ContextService.CreatePlotProfileTable(contextId, proposal);
+        profileTableCommitted = true;
+        const created = validateProfileTableCreated(response, proposal.name, proposal.review.profile.source.source.path);
+        profileTableSuccess = `Created ${created.table} with zero rules in ${created.source.path}. Existing data/descriptions and current selection are unchanged. Inspect and select it explicitly; selection clears external session grants.`;
+        profilePath = created.source.path;
+        view = 'plots'; editorPlotNumber = undefined;
+        await loadPlots(0);
+        if (error) error = `Profile table committed, but navigation refresh failed; do not replay creation: ${error}`;
+      } catch (cause) {
+        if (profileTableCommitted || String(cause).includes('Profile table committed, but')) {
+          profileTableCommitted = true; profileTableError = `Profile table committed; do not replay creation: ${String(cause)}`;
+        } else profileTableError = `No profile table created; proposal retained for correction or retry: ${String(cause)}`;
+        throw cause;
+      } finally { busy = false; }
+    });
+  }
+
   async function chooseProject(project: ProjectInfo) {
     await requestTransition(async (contextId) => {
       if (!project.path) throw new Error('Choose a project with an explicit file identity.');
@@ -723,6 +775,32 @@
               </section>
             {/if}
             {#if profileFileError}<p role="alert" class="mt-2 text-red-800">{profileFileError}</p>{/if}
+          {/if}
+          {#if profileTableCreationEnabled && $projectState.plotProfile.writable}
+            <button type="button" class="mt-3 px-3 py-2 border rounded disabled:opacity-50"
+              disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
+              onclick={() => void reviewBlankProfileTable()}>Review blank profile in selected file</button>
+            {#if profileTableReview}
+              <section class="mt-3 p-3 border rounded" aria-label="Reviewed existing-file profile creation">
+                <h2 class="font-semibold">Create one empty profile in the owned selected file</h2>
+                <p class="break-words">Destination: {profileTableReview.profile.source.source.path}</p>
+                <p>Current ownership, selected rules/descriptions and the original empty nine-field template are reviewed independently.</p>
+                <label for="profile-table-name" class="mt-3 flex flex-col gap-1">New profile table name
+                  <input id="profile-table-name" class="px-2 py-1 border rounded min-w-0" bind:value={profileTableName}
+                    disabled={busy || transitionWorking || pendingTransition !== null || profileTableCommitted} />
+                </label>
+                {#if profileTableSuccess}<p role="status" class="mt-2 text-emerald-800 break-words">{profileTableSuccess}</p>{/if}
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button type="button" class="px-3 py-2 border rounded disabled:opacity-50"
+                    disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || profileTableCommitted || !profileTableName || profileTableContext !== $projectState.contextId}
+                    onclick={() => void createBlankProfileTable()}>Create reviewed profile in selected file</button>
+                  <button type="button" class="px-3 py-2 border rounded" disabled={busy || transitionWorking || pendingTransition !== null}
+                    onclick={() => { profileTableReview = null; profileTableError = ''; profileTableSuccess = ''; }}>Dismiss existing-file profile review</button>
+                </div>
+                <p class="mt-3 text-sm">Adds one table and transactional creation provenance; never replaces existing objects or creates descriptions. No automatic selection/attachment or new write grant. Arbitrary unselected destinations and legacy population remain unavailable. The existing desktop name policy applies.</p>
+              </section>
+            {/if}
+            {#if profileTableError}<p role="alert" class="mt-2 text-red-800">{profileTableError}</p>{/if}
           {/if}
         </details>
       {/if}

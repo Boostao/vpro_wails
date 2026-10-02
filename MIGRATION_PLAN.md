@@ -1788,6 +1788,51 @@ still require explicit selection/session authorization and their individual gate
   visible. Default14860 keeps all ten gates off and Vegetation active with zero
   writes. All owned apps exited and every original fixture/support/configuration
   byte is restored; the completed created file remains preserved.
-- **Remaining:** existing-file table creation/attachment administration, existing
+- **Remaining:** arbitrary existing-file destinations/attachment administration, existing
   SU destinations, numeric-looking text criterion semantics, restoration and the
   broader migration/replacement gates remain separately scoped.
+
+### Blank profile insertion in an owned existing file
+
+Implemented and native-Wails-verified. Independently default off with
+`VITE_PLOT_PROFILE_TABLE_CREATION=true` plus selection and current selected-profile
+write ownership. This completes only a bounded original CreateProfileTable branch,
+not arbitrary destination/attachment administration.
+
+- **Source:** original CreateProfileTable copies USysProfileTable to a chosen file,
+  rejects existing attached names and the current application file, then attaches
+  the result. Reuse the verified retained empty nine-field template and existing
+  selected-file writer rather than introducing a destination/catalogue framework.
+- **Adaptations:** the destination is the currently owned selected-profile file
+  only; core/support aliases are rejected. Name collisions use SQLite's physical
+  case-insensitive object namespace. Existing desktop naming bounds apply.
+  Automatic attachment is intentionally replaced by independent explicit
+  inspection/selection; external grants clear on selecting the new table.
+- **Transaction:** new schema and complete template/selected-profile proposal commit
+  together to the existing creation-provenance format. Independent observations
+  guard original rules/descriptions, the system template and physical ownership.
+  Existing malformed or indexed/triggered provenance is not repaired or executed.
+  No existing data/descriptions are changed and no metadata is synthesized.
+- **Desktop:** a labelled immutable destination and responsive name input within
+  profile selection; shared Save/Discard/Cancel and retained errors/proposals.
+  No automatic context/configuration/selection/grant change; committed responses
+  prevent replay even if navigation refresh or writer cleanup fails.
+- **Fast acceptance:** focused coupled race12.936s,256 frontend tests and check0/0
+  pass. Tests preserve all original tables/schema/descriptions and independent
+  files/YAML, append complete provenance, reject stale ownership/rules/metadata/
+  template, check case/view collisions and incompatible history, and prove late
+  cancellation/ownership rollback with retained retry and usable explicit rules.
+- **Integration acceptance:** full race494.660s and opt-in/default production
+  builds pass; bindings15 services/154 methods/89 models/two enums. Native15004
+  proves Cancel/collision/incompatible-provenance rollback and retained retry,
+  one table/creation event plus one independent parent Save/audit, fresh explicit
+  selection/grant/rule preview against canonical52 Env and actual600px labels.
+  Default15156 leaves all eleven gates off, existing Vegetation active and every
+  byte unchanged. All owned apps exited and every original fixture/support/
+  configuration byte is restored; preserve the completed external output.
+  Immutable55-file checkpoint plus manifest preserves the f585 predecessor and
+  exact accepted core/default binaries/assets/source/tests/output/visuals;
+  accepted1ed45cb2... default bytes are promoted without rebuilding.
+- **Remaining:** arbitrary unselected destinations/automatic attachment, existing
+  SU destinations, legacy population, restoration, numeric-looking text criterion
+  semantics and the broader active-event/migration/replacement gates remain open.

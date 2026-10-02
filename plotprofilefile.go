@@ -25,6 +25,17 @@ const originalProfileTemplateSQL = `CREATE TABLE "USysProfileTable" (
   "PlotCount" INTEGER
 )`
 
+const profileCreationHistorySQL = `CREATE TABLE "__VPRO_ProfileCreationHistory"(ID INTEGER PRIMARY KEY,Created TEXT NOT NULL,Proposal TEXT NOT NULL)`
+
+func validateNewProfileName(name string, confirmed bool) error {
+	if !confirmed || !projectNamePattern.MatchString(name) ||
+		strings.EqualFold(name, "None") || strings.EqualFold(name, "Sample") ||
+		strings.Contains(strings.ToLower(name), "master") {
+		return errors.New("confirm a literal desktop family name (letter first, ASCII letters/digits/underscore, at most31 characters); None, Sample and master names are reserved")
+	}
+	return nil
+}
+
 type PlotProfileFileReview struct {
 	Template       ProjectMetadataTable `json:"template"`
 	MetadataAbsent bool                 `json:"metadataAbsent"`
@@ -112,10 +123,8 @@ func (s *ContextService) ReviewPlotProfileFileCreation(ctx context.Context, cont
 }
 
 func (s *ContextService) CreatePlotProfileFile(ctx context.Context, contextID string, request PlotProfileFileCreation) (_ PlotProfileFileCreated, resultErr error) {
-	if !request.Confirmed || !projectNamePattern.MatchString(request.Name) ||
-		strings.EqualFold(request.Name, "None") || strings.EqualFold(request.Name, "Sample") ||
-		strings.Contains(strings.ToLower(request.Name), "master") {
-		return PlotProfileFileCreated{}, errors.New("confirm a literal desktop family name (letter first, ASCII letters/digits/underscore, at most31 characters); None, Sample and master names are reserved")
+	if err := validateNewProfileName(request.Name, request.Confirmed); err != nil {
+		return PlotProfileFileCreated{}, err
 	}
 	path, parent, err := freshSQLiteDestination(request.Path, "Profile")
 	if err != nil {
@@ -201,31 +210,71 @@ func writePlotProfileFile(ctx context.Context, path string, request PlotProfileF
 			resultErr = errors.Join(resultErr, err)
 		}
 	}()
-	definition := strings.Replace(originalProfileTemplateSQL, quoteHeaderIdentifier("USysProfileTable"),
-		quoteHeaderIdentifier(request.Name+"_Profile"), 1)
-	if _, err := tx.ExecContext(ctx, definition+`;
-		CREATE TABLE "__VPRO_ProfileCreationHistory"(ID INTEGER PRIMARY KEY,Created TEXT NOT NULL,Proposal TEXT NOT NULL)`); err != nil {
-		return err
-	}
 	proposal, err := json.Marshal(request)
 	if err != nil {
 		return err
 	}
-	if _, err := tx.ExecContext(ctx, `INSERT INTO "__VPRO_ProfileCreationHistory"(Created,Proposal) VALUES(?,?)`,
-		time.Now().UTC().Format(time.RFC3339Nano), string(proposal)); err != nil {
+	if err := createBlankProfileTable(ctx, tx, request.Name, request.Review.Template, string(proposal)); err != nil {
 		return err
-	}
-	stored, err := readSQLiteStorageRows(ctx, tx, "main", request.Name+"_Profile", "", nil, "")
-	if err != nil || !reflect.DeepEqual(stored, request.Review.Template) {
-		return errors.Join(err, errors.New("new profile schema/empty rules differ from the independently reviewed template"))
-	}
-	var observed string
-	if err := tx.QueryRowContext(ctx, `SELECT Proposal FROM "__VPRO_ProfileCreationHistory" WHERE ID=1`).Scan(&observed); err != nil || observed != string(proposal) {
-		return errors.Join(err, errors.New("new profile technical history differs from its complete proposal"))
 	}
 	var metadata bool
 	if err := tx.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name='_table_metadata')`).Scan(&metadata); err != nil || metadata {
 		return errors.Join(err, errors.New("new profile synthesized description metadata"))
 	}
 	return tx.Commit()
+}
+
+func createBlankProfileTable(ctx context.Context, tx *sql.Tx, name string, template ProjectMetadataTable, proposal string) error {
+	var collision int
+	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM sqlite_master WHERE name=? COLLATE NOCASE`, name+"_Profile").Scan(&collision); err != nil {
+		return err
+	}
+	if collision != 0 {
+		return errors.New("profile destination name already belongs to a physical SQLite object; no replacement")
+	}
+	if _, err := tx.ExecContext(ctx, strings.Replace(originalProfileTemplateSQL, quoteHeaderIdentifier("USysProfileTable"),
+		quoteHeaderIdentifier(name+"_Profile"), 1)); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, strings.Replace(profileCreationHistorySQL, "CREATE TABLE ", "CREATE TABLE IF NOT EXISTS ", 1)); err != nil {
+		return err
+	}
+	var definition string
+	if err := tx.QueryRowContext(ctx, `SELECT sql FROM sqlite_master
+		WHERE type='table' AND name COLLATE BINARY='__VPRO_ProfileCreationHistory'`).Scan(&definition); err != nil {
+		return fmt.Errorf("physical profile creation provenance unavailable: %w", err)
+	}
+	if strings.Join(strings.Fields(definition), " ") != strings.Join(strings.Fields(profileCreationHistorySQL), " ") {
+		return errors.New("profile creation provenance schema differs; no existing history overwritten")
+	}
+	var extras int
+	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM sqlite_master
+		WHERE tbl_name COLLATE NOCASE='__VPRO_ProfileCreationHistory' AND type<>'table'`).Scan(&extras); err != nil {
+		return err
+	}
+	if extras != 0 {
+		return errors.New("profile creation provenance has unreviewed indexes/triggers; no history appended")
+	}
+	when := time.Now().UTC().Format(time.RFC3339Nano)
+	inserted, err := tx.ExecContext(ctx, `INSERT INTO "__VPRO_ProfileCreationHistory"(Created,Proposal) VALUES(?,?)`, when, proposal)
+	if err != nil {
+		return err
+	}
+	if count, err := inserted.RowsAffected(); err != nil || count != 1 {
+		return errors.Join(err, errors.New("profile creation provenance did not insert exactly one event"))
+	}
+	id, err := inserted.LastInsertId()
+	if err != nil {
+		return err
+	}
+	var observed, observedWhen string
+	if err := tx.QueryRowContext(ctx, `SELECT Created,Proposal FROM "__VPRO_ProfileCreationHistory" WHERE ID=?`, id).
+		Scan(&observedWhen, &observed); err != nil || observed != proposal || observedWhen != when {
+		return errors.Join(err, errors.New("new profile technical history differs from its complete proposal"))
+	}
+	stored, err := readSQLiteStorageRows(ctx, tx, "main", name+"_Profile", "", nil, "")
+	if err != nil || !reflect.DeepEqual(stored, template) {
+		return errors.Join(err, errors.New("new profile schema/empty rules differ from the independently reviewed template"))
+	}
+	return nil
 }

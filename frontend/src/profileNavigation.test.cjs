@@ -10,6 +10,7 @@ const metadata = loadTypeScript('projectMetadataEditor.ts',{'./qualityEditor':qu
   '../../resources/project-metadata-template.json':resource('project-metadata-template.json')});
 const profile = loadTypeScript('projectPlotProfileReview.ts',{'./projectMetadataEditor':metadata});
 const profileFile = loadTypeScript('profileFile.ts',{'./projectPlotProfileReview':profile});
+const profileTable = loadTypeScript('profileTable.ts',{'./profileFile':profileFile,'./projectPlotProfileReview':profile});
 const read = name => readFileSync(path.join(__dirname,name),'utf8');
 const nullCell = () => ({storage:'null',text:null,integer:null,real:null,blobHex:null});
 const rules = {columns:Array.from(profile.plotProfileFields,name=>({name,declaredType:'TEXT'})),
@@ -157,4 +158,44 @@ test('New profile-file publication is separately default-off, shared-transition 
   assert.match(action,/view = 'plots'; editorPlotNumber = undefined/);
   assert.doesNotMatch(action,/SetPlotProfileEditing|SelectPlotProfile|SwitchContext/);
   assert.match(app,/profileFileCommitted \|\| !profileFileName \|\| !profileFilePath \|\| profileFileContext !== \$projectState.contextId/);
+});
+
+test('Existing-file profile creation requires exact original template and current selected-file writer ownership',()=>{
+  const source={source:{name:'Owned',path:"C:\\owned O'Brien #.db"},table:'Owned_Profile',available:true,writable:true,reason:''};
+  const review={template:{metadataAbsent:true,template:{columns:profile.plotProfileFields.map((name,index)=>({
+    name,declaredType:index===0?'SMALLINT':index===8?'INTEGER':'VARCHAR'})),rows:[]}},
+    profile:{project:'Sample',table:source.table,rules:structuredClone(rules),descriptions:{columns:[],rows:[]},source}};
+  assert.equal(profileTable.validateProfileTableReview(review).profile.source.source.path,source.source.path);
+  for(const alter of [value=>value.profile.source.writable=false,value=>value.profile.source.available=false,
+    value=>value.profile.table='Foreign_Profile',value=>value.template.metadataAbsent=false,
+    value=>value.profile.descriptions=null,value=>value.template.template.columns.pop()]){
+    const invalid=structuredClone(review);alter(invalid);
+    assert.throws(()=>profileTable.validateProfileTableReview(invalid));
+  }
+  const result={source:{name:'New',path:source.source.path},table:'New_Profile',ruleCount:0};
+  assert.equal(profileTable.validateProfileTableCreated(result,'New',source.source.path),result);
+  for(const response of [{...result,ruleCount:1},{...result,table:'Foreign_Profile'},
+    {...result,source:{name:'New',path:'C:\\another.db'}}]){
+    assert.throws(()=>profileTable.validateProfileTableCreated(response,'New',source.source.path),/do not replay/);
+  }
+});
+
+test('Existing-file creation is separately gated inside profile selection, shares draft transitions and never switches or grants',()=>{
+  const app=read('App.svelte');
+  assert.match(app,/VITE_PLOT_PROFILE_TABLE_CREATION === 'true'/);
+  assert.match(app,/\{#if profileTableCreationEnabled && \$projectState.plotProfile.writable\}/);
+  const panel=app.indexOf('aria-label="Reviewed existing-file profile creation"');
+  assert.ok(panel>app.indexOf('aria-label="Stored plot profile selection"'));
+  assert.match(app,/<label for="profile-table-name"/);
+  assert.match(app,/profileTableReview.profile.source.source.path/);
+  const start=app.indexOf('async function createBlankProfileTable');
+  const action=app.slice(start,app.indexOf('\n  async function ',start+1));
+  assert.match(action,/\$state\.snapshot\(\{ review: profileTableReview, name: profileTableName, confirmed: true \}\)/);
+  assert.match(action,/await requestTransition/);
+  assert.match(action,/contextId !== origin/);
+  assert.match(action,/await tick\(\);\s*const response = await ContextService.CreatePlotProfileTable/);
+  assert.match(action,/profileTableCommitted = true/);
+  assert.match(action,/do not replay creation/);
+  assert.match(action,/view = 'plots'; editorPlotNumber = undefined/);
+  assert.doesNotMatch(action,/SetPlotProfileEditing|SelectPlotProfile|SwitchContext/);
 });

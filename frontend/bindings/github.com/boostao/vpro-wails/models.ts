@@ -420,6 +420,17 @@ export interface PlotProfileSourceInfo {
     "reason": string;
 }
 
+export interface PlotProfileTableCreation {
+    "review": PlotProfileTableReview;
+    "name": string;
+    "confirmed": boolean;
+}
+
+export interface PlotProfileTableReview {
+    "template": PlotProfileFileReview;
+    "profile": ProjectPlotProfileReview;
+}
+
 export interface PlotProfileWriteRequest {
     "review": ProjectPlotProfileReview;
     "enabled": boolean;

@@ -41,7 +41,7 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `f5852c79b4be6da4854311570fcb7e7e3a14c668a8443b0836248ba15820aa5d`.
+  `1ed45cb2db8225d3f56aac97179cfaab27c210f633e154d501289b65e3ca2690`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -1109,10 +1109,37 @@ restored; preserve the completed profile-file-created.db and its receipts.
 archives/profile-file-checkpoint preserves3809 and exact accepted core/default
 bytes, assets, source, logs, output, continuations/visual and manifest.
 Never replay profile-file prepare/run/continue/finish or default smoke/seal.
-Existing-file profile table insertion, existing-file SU
-destinations, attachment administration, restoration and native Access parity
-remain open. Continue the next bounded source-first profile workflow without
-a new database-family/configuration framework or production/R/Access writes.
+Blank profile insertion in an owned existing selected file is implemented/
+native-verified, independently default off with VITE_PLOT_PROFILE_TABLE_CREATION=true
+plus selection and current selected-profile write ownership. Original template
+and complete selected rules/descriptions/ownership are reviewed independently.
+New schema and complete creation provenance share one selected-file transaction;
+case/view collisions, malformed/indexed/triggered provenance, stale review and
+late cancellation/ownership failures reject or roll back with retained retry.
+Existing data/descriptions/schema/indexes/views/triggers remain unchanged.
+No implicit selection/attachment/grant; external grants clear on new-table selection.
+Arbitrary unselected destinations and legacy population remain unavailable.
+Core bin/vpro-profile-table-core.exe
+7a467a0d3c6c4c79baa4997c74ed9400d7f0e4336f407ffc88f12ea4e6d79d59
+/owned15004 proves Cancel/collision/provenance rollback/retry, one table/creation
+event and one independent parent Save/audit, explicit new-table selection/fresh
+grant/one rule history, independent52-plot Env preview and actually visible600px
+name/label. Default bin/vpro-profile-table-default.exe
+1ed45cb2db8225d3f56aac97179cfaab27c210f633e154d501289b65e3ca2690
+/owned15156 keeps all eleven profiling gates off, Vegetation active and zero
+writes. Focused12.936s/full race494.660s;256 frontend tests/check0/0/both builds.
+Bindings15 services/154 methods/89 models/two enums;57 editor operations unchanged.
+All owned apps exited and every original fixture/support/configuration byte is
+restored; preserve profile-table-external.db and its exact output/provenance.
+archives/profile-table-checkpoint seals55 files plus manifest, protected f585
+predecessor, exact core/default assets/bytes, source, complete test logs, original
+and after-output, native receipts and representative narrow visual. Exact accepted
+1ed4 default bytes are promoted to current/candidate without rebuilding.
+Never replay profile-table prepare/run/default/seal modes.
+Existing-file SU destinations, arbitrary attachment administration, restoration,
+numeric-looking text criterion semantics and native Access parity remain open.
+Continue the next bounded source-first workflow without a new database-family/
+configuration framework or production/R/Access writes.
 Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind

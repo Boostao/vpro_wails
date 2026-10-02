@@ -69,6 +69,8 @@ export type {
     PlotProfileFileReview,
     PlotProfileSource,
     PlotProfileSourceInfo,
+    PlotProfileTableCreation,
+    PlotProfileTableReview,
     PlotProfileWriteRequest,
     PlotQualityChoice,
     PlotSummary,
