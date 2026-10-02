@@ -80,6 +80,8 @@ export type {
     ProjectMetadataTable,
     ProjectMetadataTemplateCreate,
     ProjectPlotProfileChoices,
+    ProjectPlotProfileCreation,
+    ProjectPlotProfileDeletion,
     ProjectPlotProfileEdit,
     ProjectPlotProfileResult,
     ProjectPlotProfileReview,

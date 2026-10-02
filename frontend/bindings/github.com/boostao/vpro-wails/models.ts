@@ -508,6 +508,17 @@ export interface ProjectPlotProfileChoices {
     "species": ProjectMetadataCell[] | null;
 }
 
+export interface ProjectPlotProfileCreation {
+    "originalRules": ProjectMetadataTable;
+    "values": ProjectMetadataChange[] | null;
+}
+
+export interface ProjectPlotProfileDeletion {
+    "originalRules": ProjectMetadataTable;
+    "rowId": string;
+    "confirmed": boolean;
+}
+
 export interface ProjectPlotProfileEdit {
     "originalRules": ProjectMetadataTable;
     "drafts": ProjectPlotProfileRuleDraft[] | null;

@@ -111,6 +111,8 @@
   const profileReviewEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_REVIEW === 'true';
   const profileRunEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_RUN === 'true';
   const profileEditingEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_EDITING === 'true';
+  const profileCreationEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_CREATION === 'true';
+  const profileDeletionEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_DELETION === 'true';
   let profileReviewOpen = $state(false);
   let profileReviewBusy = $state(false);
   let profileReviewBlocked = $state(false);
@@ -1755,7 +1757,8 @@
     <div class="fs882-actions flex items-center gap-2">
       {#if profileReviewEnabled}
         <button type="button" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
-          disabled={busy || headerWorkflowBusy || profileReviewOpen || !capabilitiesReady}
+          disabled={busy || headerWorkflowBusy || profileReviewOpen || !capabilitiesReady ||
+            (profileEditingEnabled && (metadataOpen || codeCheckOpen || personalDraft !== null || deletionReview !== null || creationDraft !== null))}
           onclick={() => { profileReviewOpen = true; }}>
           Review project profile (read-only)
         </button>
@@ -1876,7 +1879,8 @@
   <div class="fs882-body overflow-y-auto flex-1">
     {#if profileReviewOpen}
       <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
-        allowEditing={profileEditingEnabled} onblocked={value => profileReviewBlocked = value} onbusy={value => profileReviewBusy = value}
+        allowEditing={profileEditingEnabled} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}
+        onblocked={value => profileReviewBlocked = value} onbusy={value => profileReviewBusy = value}
         onclosed={() => { profileReviewOpen = false; }} />
     {/if}
     {#if metadataOpen}

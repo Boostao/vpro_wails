@@ -3,14 +3,18 @@
   import type { bindContextPlots } from './contextPlots';
   import { ReadRequests } from './readRequests';
   import type { EditorCloseState } from './closeLifecycle';
+  import ProfileRuleInputs from './ProfileRuleInputs.svelte';
   import { profileEditableFields, profileRuleValue, profileRuleOptions, stageProfileRule, profileRulesDirty,
-    profileRuleErrors, profileRuleEditRequest, validateProfileChoices, type ProfileRulesDraft, type ProfileRuleChoices, type ProfileField } from './projectProfileRuleEditor';
+    profileRuleErrors, profileRuleEditRequest, validateProfileChoices, beginProfileRuleCreation, stageProfileRuleCreation,
+    profileCreationValue, profileCreationOptions, profileCreationErrors, profileRuleCreationRequest, profileRuleDeletionRequest,
+    validateCreatedProfileRule, validateProfileLifecycleReview, type ProfileRuleCreationDraft, type ProfileRulesDraft, type ProfileRuleChoices, type ProfileField } from './projectProfileRuleEditor';
   import { profileCellLabel, validateProjectPlotProfileReview, validateProjectProfileLump, validateProfileRunResult,
     type ValidatedProjectPlotProfileReview, type ProfileReviewTable, type ProfileRunResult } from './projectPlotProfileReview';
 
-  let { client, onclosed, onbusy, onblocked, allowRun = false, allowEditing = false }: {
+  let { client, onclosed, onbusy, onblocked, allowRun = false, allowEditing = false, allowCreation = false, allowDeletion = false }: {
     client: ReturnType<typeof bindContextPlots>; onclosed: () => void; onbusy: (busy: boolean) => void;
     onblocked: (blocked: boolean) => void; allowRun?: boolean; allowEditing?: boolean;
+    allowCreation?: boolean; allowDeletion?: boolean;
   } = $props();
   let review = $state<ValidatedProjectPlotProfileReview | null>(null);
   let reading = $state(false);
@@ -24,9 +28,11 @@
   let committedFailure = $state(false);
   let success = $state<string | null>(null);
   let choices = $state<ProfileRuleChoices | null>(null);
+  let creation = $state<ProfileRuleCreationDraft | null>(null);
+  let deletion = $state<string | null>(null);
   const dirty = $derived(draft ? profileRulesDirty(draft) : false);
-  const errors = $derived(draft ? profileRuleErrors(draft) : []);
-  const blocked = $derived(dirty || committedFailure);
+  const errors = $derived(creation ? profileCreationErrors(creation) : draft ? profileRuleErrors(draft) : []);
+  const blocked = $derived(dirty || creation !== null || deletion !== null || committedFailure);
   const busy = $derived(reading || saving);
   let generation = 0;
   const reads = new ReadRequests();
@@ -40,16 +46,17 @@
   }
   export function undo() {
     if (busy || committedFailure) { error = 'Wait for the operation or Reload committed rules before Undo.'; return; }
+    creation = null; deletion = null;
     if (draft) draft = { review: draft.review, cells: {} };
     error = null; success = 'Profile drafts undone; no rules, counts or history changed.';
   }
   function stage(rowId: string, name: ProfileField, raw: string, nullValue: boolean) {
-    if (!allowEditing || !draft || busy || committedFailure) { error = 'Reload available profile rules before editing.'; return; }
+    if (!allowEditing || !draft || busy || committedFailure || creation || deletion !== null) { error = 'Finish the current profile proposal before editing existing rules.'; return; }
     try { draft = stageProfileRule(draft, rowId, name, raw, nullValue); error = null; success = null; result = null; }
     catch (cause) { error = `Profile draft failed; existing drafts retained: ${String(cause)}`; }
   }
   async function saveRules() {
-    if (!allowEditing || !draft || busy || committedFailure || !dirty || errors.length) {
+    if (!allowEditing || !draft || busy || committedFailure || creation || deletion !== null || !dirty || errors.length) {
       error = 'Correct or Undo profile errors before saving reviewed changes.'; return;
     }
     let committed = false;
@@ -72,8 +79,74 @@
     onclosed();
   }
 
+  function proposeCreation() {
+    if (!allowEditing || !allowCreation || busy || blocked || !review) { error = 'Finish existing drafts before proposing one new rule.'; return; }
+    try { creation = beginProfileRuleCreation(review); error = null; success = null; result = null; }
+    catch (cause) { error = `New rule proposal unavailable; no identity allocated: ${String(cause)}`; }
+  }
+  function stageCreation(name: ProfileField, raw: string, nullValue: boolean) {
+    if (!creation || busy || committedFailure) { error = 'Review an available new-rule proposal before editing.'; return; }
+    try { creation = stageProfileRuleCreation(creation, name, raw, nullValue); error = null; success = null; }
+    catch (cause) { error = `New rule draft failed; proposal retained: ${String(cause)}`; }
+  }
+  async function createRule() {
+    if (!allowEditing || !allowCreation || !creation || busy || committedFailure || errors.length) {
+      error = 'Correct or Undo the explicit new-rule proposal before allocating identity.'; return;
+    }
+    const source = creation;
+    let committed = false;
+    saving = true; onbusy(true); error = null; success = null;
+    try {
+      const created = await client.CreateProjectPlotProfileRule(profileRuleCreationRequest(source));
+      committed = true; creation = null; result = null; lump = null; subvarieties = false;
+      validateCreatedProfileRule(created, source);
+      const next = validateProjectPlotProfileReview(await client.ReviewProjectPlotProfile());
+      validateProfileLifecycleReview(source.review, next, { created });
+      const observed = next.rules.rows.find(row => row.rowId === created.rowId);
+      if (!observed) throw new Error('Created physical rule is missing from independent review.');
+      validateCreatedProfileRule(observed, source);
+      review = next; draft = { review: next, cells: {} };
+      success = `Physical rule ${created.rowId} and typed creation history committed atomically. No Order, criteria, layer or PlotCount was inferred.`;
+    } catch (cause) {
+      if (committed || String(cause).includes('Profile rule changes committed, but')) {
+        committedFailure = true; creation = null; draft = null; result = null; lump = null; subvarieties = false;
+        error = `Profile creation committed, but refresh/cleanup failed. Reload before another proposal; completed writes must not be replayed: ${String(cause)}`;
+      } else error = `Profile creation failed; nullable/raw proposal retained for retry: ${String(cause)}`;
+    } finally { saving = false; onbusy(false); }
+  }
+  function reviewDeletion(rowId: string) {
+    if (!allowEditing || !allowDeletion || busy || blocked || !review ||
+        review.rules.rows.filter(row => row.rowId === rowId).length !== 1) {
+      error = 'Finish drafts before reviewing one original physical rule for deletion.'; return;
+    }
+    deletion = rowId; error = null; success = null; result = null;
+  }
+  async function deleteRule() {
+    if (!allowEditing || !allowDeletion || deletion === null || !review || busy || committedFailure) {
+      error = 'Explicitly review one physical rule before confirming deletion.'; return;
+    }
+    const rowId = deletion;
+    const source = review;
+    let committed = false;
+    saving = true; onbusy(true); error = null; success = null;
+    try {
+      await client.DeleteProjectPlotProfileRule(profileRuleDeletionRequest(source, rowId, true));
+      committed = true; deletion = null; result = null; lump = null; subvarieties = false;
+      const next = validateProjectPlotProfileReview(await client.ReviewProjectPlotProfile());
+      validateProfileLifecycleReview(source, next, { deleted: rowId });
+      if (next.rules.rows.some(row => row.rowId === rowId)) throw new Error('Deleted physical rule remains in independent review.');
+      review = next; draft = { review: next, cells: {} };
+      success = `Physical rule ${rowId} deleted with full typed history; its identity remains reserved. Surviving rules/counts and plot drafts were not changed.`;
+    } catch (cause) {
+      if (committed || String(cause).includes('Profile rule changes committed, but')) {
+        committedFailure = true; deletion = null; draft = null; result = null; lump = null; subvarieties = false;
+        error = `Profile deletion committed, but refresh/cleanup failed. Reload before another review; completed writes must not be replayed: ${String(cause)}`;
+      } else error = `Profile deletion failed; original confirmation retained for retry: ${String(cause)}`;
+    } finally { saving = false; onbusy(false); }
+  }
+
   async function reload() {
-    if (busy || dirty) { error = 'Save or Undo profile drafts before reloading; raw errors were retained.'; return; }
+    if (busy || dirty || creation || deletion !== null) { error = 'Save or Undo profile drafts before reloading; raw errors were retained.'; return; }
     const request = ++generation;
     draft = null; choices = null;
     review = null; error = null; lump = null; result = null; reading = true; onbusy(true);
@@ -133,7 +206,7 @@
   <div class="flex flex-wrap gap-2 items-center justify-between">
     <h2 class="font-semibold text-stone-800">Project-local plot profile {allowEditing ? 'rules' : 'review (read-only)'}</h2>
     <div class="flex flex-wrap gap-2">
-      <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50" disabled={busy || dirty} onclick={() => void reload()}>Reload profile review</button>
+      <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50" disabled={busy || dirty || creation !== null || deletion !== null} onclick={() => void reload()}>Reload profile review</button>
       {#if allowRun}
         <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50" disabled={busy || blocked || !review} onclick={() => void run()}>Run stored profile preview</button>
         {#if running}<button type="button" class="px-3 py-2 border rounded bg-white" onclick={cancelRun}>Cancel profile preview</button>{/if}
@@ -163,30 +236,53 @@
     <section class="mt-3" aria-label="Stored profile rule editor">
       <div class="flex flex-wrap gap-2">
         <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50"
-          disabled={busy || committedFailure || !dirty || errors.length > 0} onclick={() => void saveRules()}>Save profile rules</button>
+          disabled={busy || committedFailure || creation !== null || deletion !== null || !dirty || errors.length > 0} onclick={() => void saveRules()}>Save profile rules</button>
         <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50"
-          disabled={busy || committedFailure || !dirty} onclick={undo}>Undo profile drafts</button>
+          disabled={busy || committedFailure || !blocked} onclick={undo}>Undo profile drafts</button>
+        {#if allowCreation}
+          <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50"
+            disabled={busy || blocked} onclick={proposeCreation}>Review new profile rule</button>
+        {/if}
       </div>
-      {#each draft.review.rules.rows as row (row.rowId)}
+      {#if creation}
+        {@const proposal = creation}
         <fieldset class="mt-3 p-3 border rounded bg-white" disabled={busy || committedFailure}>
+          <legend class="font-semibold">New rule proposal (no physical identity allocated)</legend>
+          <ProfileRuleInputs prefix="new-profile-rule" identityLabel="new proposal"
+            fields={profileEditableFields.map(name => ({ name, cell: profileCreationValue(proposal, name), options: profileCreationOptions(proposal, name, choices, lump) }))}
+            onstage={stageCreation} />
+          <p class="mt-3 text-sm">Eight explicit nullable assignments; PlotCount remains NULL. Create allocates one unused physical identity and complete typed history. Rule completeness for preview is a separate decision.</p>
+          <button type="button" class="mt-3 px-3 py-2 border rounded bg-white disabled:opacity-50"
+            disabled={errors.length > 0} onclick={() => void createRule()}>Create reviewed profile rule</button>
+        </fieldset>
+      {/if}
+      {#if deletion !== null}
+        {@const row = review?.rules.rows.find(row => row.rowId === deletion)}
+        <section class="mt-3 p-3 border border-red-300 rounded bg-white" aria-label="Profile rule deletion confirmation">
+          <h3 class="font-semibold">Delete reviewed physical rule {deletion}?</h3>
+          {#if row && review}
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">{#each row.cells as cell, index}
+              <div><dt class="font-medium">{review.rules.columns[index].name}</dt><dd class="whitespace-pre-wrap break-words">{profileCellLabel(cell)}</dd></div>
+            {/each}</dl>
+          {/if}
+          <p class="mt-3">One rule only. Surviving rules and historical counts remain unchanged. Full typed deletion history and the reserved physical identity commit together; restoration is unavailable.</p>
+          <button type="button" class="mt-3 px-3 py-2 border rounded bg-white disabled:opacity-50" disabled={busy || committedFailure}
+            onclick={() => void deleteRule()}>Confirm profile rule deletion</button>
+          <button type="button" class="mt-3 ml-2 px-3 py-2 border rounded bg-white disabled:opacity-50" disabled={busy || committedFailure}
+            onclick={undo}>Cancel profile deletion</button>
+        </section>
+      {/if}
+      {#each draft.review.rules.rows as row (row.rowId)}
+        {@const sourceDraft = draft}
+        <fieldset class="mt-3 p-3 border rounded bg-white" disabled={busy || committedFailure || creation !== null || deletion !== null}>
           <legend class="font-semibold">Physical rule {row.rowId}</legend>
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-            {#each profileEditableFields as name}
-              {@const cell = profileRuleValue(draft, row.rowId, name)}
-              {@const id = `profile-${row.rowId}-${name}`}
-              <div class="min-w-0">
-                <label class="block text-sm font-medium" for={id}>{name}</label>
-                <input id={id} class="w-full min-w-0 border rounded px-2 py-1" type="text" value={cell.raw}
-                  list={`${id}-choices`} disabled={cell.nullValue} aria-invalid={cell.error !== null}
-                  aria-describedby={cell.error ? `${id}-error` : undefined}
-                  oninput={event => stage(row.rowId, name, event.currentTarget.value, false)} />
-                <datalist id={`${id}-choices`}>{#each profileRuleOptions(draft, row.rowId, name, choices, lump) as option}<option value={option}></option>{/each}</datalist>
-                <label class="flex gap-2 items-center text-xs mt-1"><input type="checkbox" checked={cell.nullValue}
-                  onchange={event => stage(row.rowId, name, cell.raw, event.currentTarget.checked)} />NULL {name}, rule {row.rowId}</label>
-                {#if cell.error}<p id={`${id}-error`} role="alert" class="text-xs text-red-800 mt-1">{cell.error}</p>{/if}
-              </div>
-            {/each}
-          </div>
+          <ProfileRuleInputs prefix={`profile-${row.rowId}`} identityLabel={`rule ${row.rowId}`}
+            fields={profileEditableFields.map(name => ({ name, cell: profileRuleValue(sourceDraft, row.rowId, name), options: profileRuleOptions(sourceDraft, row.rowId, name, choices, lump) }))}
+            onstage={(name, raw, nullValue) => stage(row.rowId, name, raw, nullValue)} />
+          {#if allowDeletion}
+            <button type="button" class="mt-3 px-3 py-2 border rounded bg-white disabled:opacity-50"
+              disabled={dirty} onclick={() => reviewDeletion(row.rowId)}>Review deletion of rule {row.rowId}</button>
+          {/if}
         </fieldset>
       {/each}
       <p class="mt-3 text-sm text-stone-600">Existing rules only. Table changes to Veg/Lump visibly propose Field=Species/LumpCode; no Layer, Species or Criteria is cleared. NULL differs from empty text. Only changed assignments are saved; stored PlotCount is read-only. Env field suggestions come from this project; Veg species suggestions use grouped VLists codes, and Lump species suggestions require explicit lump review. Suggestions do not restrict those literal fields.</p>
@@ -232,5 +328,5 @@
       </div>
     {/each}
   {/if}
-  <p class="mt-3 text-sm text-stone-600">This uses only stored project-local rules and data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other profile databases, rule creation/deletion, applying filters and Save as SU remain unavailable. No stored PlotCount, Access registry preference or shipped scratch table is changed.</p>
+  <p class="mt-3 text-sm text-stone-600">This uses only stored project-local rules and data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other profile databases, applying filters, restoration and Save as SU remain unavailable. Rule creation/deletion require their separate opt-ins. No stored PlotCount, Access registry preference or shipped scratch table is changed.</p>
 </section>

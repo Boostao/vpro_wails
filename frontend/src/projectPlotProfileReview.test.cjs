@@ -3,7 +3,8 @@ const {test} = require('node:test');
 const {readFileSync} = require('node:fs');
 const path = require('node:path');
 const {compile} = require('svelte/compiler');
-const {loadTypeScript} = require('./svelteTestHelpers.cjs');
+const {loadTypeScript, serverComponent} = require('./svelteTestHelpers.cjs');
+const {render} = require('svelte/server');
 const read = name => readFileSync(path.join(__dirname,name),'utf8');
 const quality = loadTypeScript('qualityEditor.ts', {'./becEditor':loadTypeScript('becEditor.ts')});
 const resource = name => JSON.parse(readFileSync(path.join(__dirname,'..','..','resources',name),'utf8'));
@@ -75,11 +76,11 @@ test('Project-local profile review and editing are separately gated, resident ac
   assert.match(component,/disabled title="Ordered profile execution is not implemented."/);
   assert.match(component,/PlotCount is historical storage/);
   assert.match(component,/aria-label=\{`\$\{item\.table\.columns\[index\]\.name\}, record \$\{row\.rowId\}`\}/);
-  assert.doesNotMatch(component,/\.Create|\.Update|\.Delete|\.Set|\.Restore/);
+  assert.doesNotMatch(component,/\.Update|\.Set|\.Restore/);
   assert.match(form,/VITE_PROJECT_PLOT_PROFILE_EDITING === 'true'/);
   assert.match(component,/\{#if allowEditing && draft\}/);
   assert.match(component,/client\.SaveProjectPlotProfile\(profileRuleEditRequest\(draft\)\)/);
-  assert.match(component,/if \(busy \|\| dirty\)/);
+  assert.match(component,/if \(busy \|\| dirty \|\| creation \|\| deletion !== null\)/);
   assert.match(component,/if \(busy \|\| blocked\)/);
   assert.match(component,/committedFailure = true; draft = null/);
   assert.match(component,/completed writes must not be replayed/);
@@ -186,3 +187,95 @@ test('Profile suggestions preserve project/reference ownership and historical om
   assert.ok(ruleEditor.profileRuleErrors(retained).length);
   assert.equal(ruleEditor.profileRulesDirty({review:retained.review,cells:{}}),false);
 });
+
+test('Rule lifecycle proposals never allocate fake IDs/defaults and share raw/dependent validation with existing rules',()=>{
+  const source=profile.validateProjectPlotProfileReview(review());
+  let creation=ruleEditor.beginProfileRuleCreation(source);
+  const blank=ruleEditor.profileRuleCreationRequest(creation);
+  assert.equal(blank.values.length,8);
+  assert.equal(blank.values.every(change=>change.value.storage==='null'),true);
+  assert.equal(Object.hasOwn(blank,'rowId'),false);
+  assert.equal(blank.values.some(change=>change.column==='PlotCount'),false);
+  creation=ruleEditor.stageProfileRuleCreation(creation,'Table','Veg',false);
+  assert.equal(ruleEditor.profileCreationValue(creation,'Field').value.text,'Species');
+  creation=ruleEditor.stageProfileRuleCreation(creation,'Layer','SumB',false);
+  const bad=ruleEditor.stageProfileRuleCreation(creation,'Order','32768',false);
+  assert.throws(()=>ruleEditor.profileRuleCreationRequest(bad),/every raw creation error/);
+  const retained=JSON.parse(JSON.stringify(bad));
+  assert.equal(ruleEditor.profileCreationValue(retained,'Order').raw,'32768');
+  const changedTable=ruleEditor.stageProfileRuleCreation(creation,'Table','Env',false);
+  assert.ok(ruleEditor.profileCreationErrors(changedTable).length);
+  const cells=source.rules.columns.map(column=>{
+    const input=ruleEditor.profileEditableFields.find(name=>name===column.name);
+    return input ? ruleEditor.profileCreationValue(creation,input).value : cell('null');
+  });
+  ruleEditor.validateCreatedProfileRule({rowId:'3',cells},creation);
+  for(const rowId of ['-1','2','03','9223372036854775808']) assert.throws(()=>ruleEditor.validateCreatedProfileRule({rowId,cells},creation),/identity\/schema/);
+  assert.throws(()=>ruleEditor.validateCreatedProfileRule({rowId:'3',cells:[...cells.slice(0,8),cell('integer','0')]},creation),/differs/);
+  assert.throws(()=>ruleEditor.profileRuleDeletionRequest(source,'-1',false),/Explicitly confirm/);
+  assert.throws(()=>ruleEditor.profileRuleDeletionRequest(source,'unreviewed',true),/Explicitly confirm/);
+  assert.equal(JSON.stringify(ruleEditor.profileRuleDeletionRequest(source,'-1',true)),
+    JSON.stringify({originalRules:source.rules,rowId:'-1',confirmed:true}));
+  assert.throws(()=>ruleEditor.beginProfileRuleCreation({...source,rules:{...source.rules,columns:[...source.rules.columns,{name:'Extra'}]}}),/unmapped/);
+});
+
+test('Lifecycle refresh independently preserves ownership, exact surviving typed values/counts and the one intended identity change',()=>{
+    const source=profile.validateProjectPlotProfileReview(review());
+    const created=row('3');
+    const next={...source,rules:{...source.rules,rows:[created,...source.rules.rows]}};
+    ruleEditor.validateProfileLifecycleReview(source,next,{created});
+    const removed={...source,rules:{...source.rules,rows:source.rules.rows.filter(row=>row.rowId!=='-1')}};
+    ruleEditor.validateProfileLifecycleReview(source,removed,{deleted:'-1'});
+    const drift=structuredClone(next);
+    drift.rules.rows[1].cells[8]=cell('integer','123');
+    for(const changed of [drift,{...next,project:'Other'},{...next,table:'Other_Profile'},
+      {...next,rules:{...next.rules,rows:source.rules.rows}},
+      {...next,rules:{...next.rules,columns:[...next.rules.columns].reverse()}}]) {
+      assert.throws(()=>ruleEditor.validateProfileLifecycleReview(source,changed,{created}));
+    }
+    assert.throws(()=>ruleEditor.validateProfileLifecycleReview(source,source,{deleted:'-1'}));
+  });
+
+  test('Shared responsive proposal/existing inputs retain visible associated labels, exact raw errors and explicit NULL controls',()=>{
+    const component=serverComponent(read('ProfileRuleInputs.svelte'),'ProfileRuleInputs.svelte',{});
+    const proposal=ruleEditor.stageProfileRuleCreation(ruleEditor.beginProfileRuleCreation(
+      profile.validateProjectPlotProfileReview(review())),'Order','oops',false);
+    const fields=ruleEditor.profileEditableFields.map(name=>({name,cell:ruleEditor.profileCreationValue(proposal,name),options:[]}));
+    const html=render(component,{props:{prefix:'new-profile-rule',identityLabel:'new proposal',fields,onstage(){}}}).body;
+    assert.equal((html.match(/type="text"/g)||[]).length,8);
+    assert.equal((html.match(/type="checkbox"/g)||[]).length,8);
+    for(const name of ruleEditor.profileEditableFields) {
+      assert.ok(html.includes(`for="new-profile-rule-${name}"`));
+      assert.ok(html.includes(`id="new-profile-rule-${name}"`));
+      assert.ok(html.includes(`NULL ${name}, new proposal`));
+    }
+    assert.match(html,/value="oops"/);
+    assert.match(html,/aria-invalid="true"/);
+    assert.match(html,/role="alert"/);
+    assert.match(html,/sm:grid-cols-2 xl:grid-cols-4/);
+  });
+
+  test('Creation/deletion controls are separately default-off, resident and own parent gates without replaying committed writes',()=>{
+    const component=read('ProjectPlotProfileReview.svelte'),form=read('FS882Form.svelte');
+    assert.match(component,/allowCreation = false, allowDeletion = false/);
+    assert.match(form,/VITE_PROJECT_PLOT_PROFILE_CREATION === 'true'/);
+    assert.match(form,/VITE_PROJECT_PLOT_PROFILE_DELETION === 'true'/);
+    assert.match(form,/allowCreation=\{profileCreationEnabled\} allowDeletion=\{profileDeletionEnabled\}/);
+    assert.match(form,/profileEditingEnabled && \(metadataOpen \|\| codeCheckOpen \|\| personalDraft !== null/);
+    assert.match(component,/blocked = \$derived\(dirty \|\| creation !== null \|\| deletion !== null \|\| committedFailure\)/);
+    assert.match(component,/creation = null; deletion = null/);
+    assert.match(component,/if \(!allowEditing \|\| !allowCreation/);
+    assert.match(component,/if \(!allowEditing \|\| !allowDeletion/);
+    assert.match(component,/client\.CreateProjectPlotProfileRule\(profileRuleCreationRequest\(source\)\)/);
+    assert.match(component,/client\.DeleteProjectPlotProfileRule\(profileRuleDeletionRequest\(source, rowId, true\)\)/);
+    assert.match(component,/committed = true; creation = null/);
+    assert.match(component,/committed = true; deletion = null/);
+    assert.match(component,/validateProfileLifecycleReview\(source\.review, next, \{ created \}\)/);
+    assert.match(component,/validateProfileLifecycleReview\(source, next, \{ deleted: rowId \}\)/);
+    assert.match(component,/nullable\/raw proposal retained for retry/);
+    assert.match(component,/original confirmation retained for retry/);
+    assert.match(component,/no physical identity allocated/);
+    assert.match(component,/Profile rule deletion confirmation/);
+    assert.match(component,/profileCellLabel\(cell\)/);
+    assert.match(component,/Cancel profile deletion/);
+  });

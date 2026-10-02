@@ -16,6 +16,8 @@ type ProjectPlotProfileRuleDraft struct {
 
 type profileRuleDraft = ProjectPlotProfileRuleDraft
 
+var profileRuleColumns = [...]string{"Order", "Table", "Field", "Operator", "Layer", "Species", "Criteria", "Operation", "PlotCount"}
+
 type profileRuleAssignment struct {
 	rowID  int64
 	column string
@@ -33,7 +35,7 @@ func prepareProfileRuleDrafts(original ProjectMetadataTable, drafts []profileRul
 		}
 		indices[column.Name] = index
 	}
-	for _, name := range []string{"Order", "Table", "Field", "Operator", "Layer", "Species", "Criteria", "Operation", "PlotCount"} {
+	for _, name := range profileRuleColumns {
 		if _, present := indices[name]; !present {
 			return ProjectMetadataTable{}, nil, fmt.Errorf("profile rule schema is missing %s", name)
 		}
@@ -60,7 +62,7 @@ func prepareProfileRuleDrafts(original ProjectMetadataTable, drafts []profileRul
 		fields := map[string]bool{}
 		for _, change := range draft.Changes {
 			column, present := indices[change.Column]
-			if !present || !slices.Contains([]string{"Order", "Table", "Field", "Operator", "Layer", "Species", "Criteria", "Operation"}, change.Column) || fields[change.Column] {
+			if !present || !slices.Contains(profileRuleColumns[:8], change.Column) || fields[change.Column] {
 				return ProjectMetadataTable{}, nil, errors.New("profile draft repeats or changes an unavailable field")
 			}
 			fields[change.Column] = true

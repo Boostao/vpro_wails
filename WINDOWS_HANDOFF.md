@@ -34,14 +34,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all54 editor operations to immutable identities, leases running operations and
+  all56 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `68f5c041c9e2994a5f8c594a71f4ebd9db7d9eaadb5b3b212062365106282df2`.
+  `9a5186fcfbc023fe1b3103f740420b3fd400b1eb15f50463c7dbea845c7988be`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -918,26 +918,47 @@ observations. This is desktop technical history, not a source audit event.
 Independent Save/Undo never save/discard parent drafts. Raw errors/dirty rules
 block Run/Reload/Lock/close/context; committed cleanup/refresh errors require
 Reload rather than replay.
-Full Go race root499.897s, subsequent boundary/metadata focused race15.055s,
-235 frontend tests/check0/0 and opt-in/default builds pass. Bindings15 services/
-142 methods/73 models;54 context-bound operations.
-Opt-in bin/vpro-project-profile-rules-core.exe
-SHA25672b81fc3dae4778f868833b620dff7ec55ec5cd037ab1094a50475e0641b3e5b
-/owned9852 verifies errors/remount/Lock/native close, explicit proposals,
-collision rejection, actual history rollback/retry and literal/NULL edits.
-Four exact rule/history commits were observed; every other project/support/
-configuration value remained unchanged. All64 controls have actually visible
-labels in the narrow native WebView. The proof records two corrected harness
-assumptions (disabled source Unlock placeholder; initially unused Order=2);
-completed writes were independently adopted, never replayed.
-Default bin/vpro-project-profile-rules-default.exe
-SHA25668f5c041c9e2994a5f8c594a71f4ebd9db7d9eaadb5b3b212062365106282df2
-/owned8572 verifies all profiling gates absent, existing Vegetation active and
-zero writes. Both owned apps exited; every original fixture byte is restored.
-Archives/project-profile-rules-checkpoint preserves4244, accepted core/default,
-exact assets, source/proofs/visuals/logs and a sealed manifest. Current/candidate
-are exact accepted68f5 copies; never rebuild protected paths in place or replay
-completed project-profile-rules preparation/run/resume/tail/default/seal modes.
+Rule creation/deletion are now independently opt-in with review/editing plus
+VITE_PROJECT_PLOT_PROFILE_CREATION=true or VITE_PROJECT_PLOT_PROFILE_DELETION=true.
+Shared responsive inputs review eight explicit nullable assignments without a
+fake physical identity or inferred Order/layer/criteria/count. The original nine
+columns are required; unmapped/default/generated extras make creation unavailable.
+Source exports do not establish effective AddNew defaults: explicit nullable
+proposals are a desktop adaptation, not native Access default parity. Deletion
+shows all typed stored values/counts and requires separate confirmation.
+Scoped APIs share the existing transaction/history path. Signed64 physical IDs
+are durably reserved from current rules, prior ledger and full typed history in
+__VPRO_ProfileIdentity. Deleted IDs are not reused; exhaustion/malformed historical
+aliases fail. Independently planned reservations precede rule SQL and are checked
+after history, detecting rule/history-trigger drift. Rules/reservations/history
+share one transaction. Proposals/confirmations own Run/Reload/Lock/native close/
+context guards; failed operations retain retry state, committed cleanup/refresh
+failures clear replayable proposals and require Reload. Refresh checks complete
+surviving values/counts, ownership/schema and the one intended identity change.
+Full Go race root480.428s and additional focused lifecycle/ownership/history/
+deletion-retry race5.778s pass. 239 frontend tests/check0/0 and opt-in/default builds
+pass. Actual bindings15 services/144 methods/75 interfaces plus two enums;
+56 context-bound operations.
+Opt-in bin/vpro-project-profile-lifecycle-core.exe
+SHA2565a64a33cfe44ae49a840a7706ba5b71182f4518525b457e58ebee147f8c8fa1a
+/owned4648 verifies raw error remount, actual native-close/Lock gates, eight actually
+visible narrow proposal labels, source Table-to-Field proposal, real Order=1
+collision, creation/deletion history-trigger rollback/retained retry, explicit
+Cancel/Undo, NULL creation, deleted-ID nonreuse and independent parent draft.
+Four exact lifecycle/history commits leave original rules/counts unchanged.
+Every unrelated project/support/configuration value remains unchanged.
+Default bin/vpro-project-profile-lifecycle-default.exe
+SHA2569a5186fcfbc023fe1b3103f740420b3fd400b1eb15f50463c7dbea845c7988be
+/owned9544 verifies all five profiling gates absent, existing Vegetation active,
+metadata disabled and zero writes. Both owned apps exited; every original fixture
+byte is restored. Archives/project-profile-lifecycle-checkpoint preserves68f5,
+accepted core/default, exact assets, source/proofs/visuals/logs and a sealed manifest.
+Current/candidate are exact accepted9a51 copies; never rebuild protected paths
+in place. Earlier rules/run/review seals remain immutable, including the two honest
+rule-edit harness corrections. Do not replay completed lifecycle prepare/gates/
+mutations/finish/default/seal modes or earlier completed rule-edit proofs.
+External/current profile-file/table creation/selection, filter application,
+Save as SU and technical-history restoration remain unavailable.
 Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind

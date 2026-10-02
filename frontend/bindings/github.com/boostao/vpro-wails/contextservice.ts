@@ -29,6 +29,10 @@ export function CreateProjectMetadataFromTemplate(contextID: string, request: $m
     return $Call.ByID(598864844, contextID, request);
 }
 
+export function CreateProjectPlotProfileRule(contextID: string, request: $models.ProjectPlotProfileCreation): $CancellablePromise<$models.ProjectMetadataRow> {
+    return $Call.ByID(1762638127, contextID, request);
+}
+
 export function CreateSourceVegetation(contextID: string, plot: string, request: $models.VegetationCreationRequest): $CancellablePromise<number> {
     return $Call.ByID(2288682951, contextID, plot, request);
 }
@@ -43,6 +47,10 @@ export function DeleteMineralRecord(contextID: string, plot: string, id: number)
 
 export function DeleteOtherRecord(contextID: string, plot: string, id: number): $CancellablePromise<void> {
     return $Call.ByID(3941385392, contextID, plot, id);
+}
+
+export function DeleteProjectPlotProfileRule(contextID: string, request: $models.ProjectPlotProfileDeletion): $CancellablePromise<void> {
+    return $Call.ByID(66266464, contextID, request);
 }
 
 export function DeleteReviewedVegetation(contextID: string, plot: string, request: $models.VegetationDeletionRequest): $CancellablePromise<void> {

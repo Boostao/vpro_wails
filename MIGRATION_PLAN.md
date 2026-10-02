@@ -1460,8 +1460,49 @@ not persisted desktop job state or an editor catalogue.
   original fixture/support/configuration bytes are restored. Default delivery
   keeps review/run/editing disabled. Corrected harness assumptions are recorded
   honestly; no completed write was replayed.
-- **Remaining original lifecycle:** creation/deletion need stable physical
-  identity/reservation and full snapshot history contracts; external/current
-  profile selection, filter/navigation application and Save as SU need separate
+- **Remaining original lifecycle:** external/current profile selection,
+  filter/navigation application and Save as SU need separate
   owned-context draft/rollback acceptance. Technical-history restoration,
   native Access execution parity and remaining source events are not implied.
+
+### Original profile rules: row creation/deletion
+
+- **Delivered, independently opt-in:** the review/editing gates plus
+  `VITE_PROJECT_PLOT_PROFILE_CREATION=true` or
+  `VITE_PROJECT_PLOT_PROFILE_DELETION=true` enable one reviewed row operation.
+  Shared responsive inputs and scalar validation preserve eight explicit nullable
+  assignments, raw errors, literal case, NULL/empty distinctions and the source
+  Table-to-Field proposal. Creation has no fake row identity and writes NULL
+  PlotCount. Extra/default/generated fields outside the original nine-column
+  schema make creation unavailable rather than silently inheriting values.
+- **Source boundary/adaptations:** exported controls and bare table DEFAULT
+  placeholders do not establish effective Access AddNew defaults. Explicit
+  nullable proposals are a desktop adaptation, not native-default parity.
+  `CreateProfileTable` copies a template into a selected external database;
+  this deliverable does not implement that separate file/table-selection action.
+  Deletion shows every typed original field/count and requires explicit
+  confirmation; Cancel/Undo never saves or discards independent plot drafts.
+- **Transactions and identities:** shared owned mutation/history checks preserve
+  existing edits and verify complete original/final rules. Signed64 physical IDs
+  are reserved in project-local `__VPRO_ProfileIdentity`, seeded from current rows,
+  prior reservations and complete typed history. Deleted IDs are never reused;
+  exhaustion and malformed historical aliases fail explicitly. Reservation plans
+  precede rule SQL and are independently observed after history, so rule/history
+  triggers cannot redefine the expected reservation state. Mutation, reservations
+  and complete typed history share one transaction.
+- **Lifecycle and acceptance:** proposal/confirmation ownership blocks unrelated
+  rule edits, Run/Reload/Lock/native close/context transitions. Failed operations
+  retain raw proposals/confirmations; committed cleanup/refresh failures clear
+  replayable proposals and require Reload. Independent refresh checks exact
+  ownership/schema, intended identity change and every surviving value/count.
+  Full Go race and additional focused lifecycle/ownership/deletion-retry race pass;
+  239 frontend tests/check0/0 and opt-in/default builds pass. Native Wails proves
+  signed16 raw-error remount, actual close/Lock gates, eight visible narrow labels,
+  real Order collision, creation/deletion history-trigger rollback/retained retry,
+  explicit cancellation, blank nullable creation, deleted-ID nonreuse and parent
+  draft independence. Four exact commits leave original rules/counts unchanged;
+  every original fixture/support/configuration byte is restored. Default native
+  delivery has all five profiling gates off and makes zero writes.
+- **Still unavailable:** external/current profile selection, filter/navigation
+  application, Save as SU, technical-history restoration, native Access execution
+  parity and remaining calculation events require their own bounded acceptance.

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -17,25 +16,10 @@ type ProjectPlotProfileEdit struct {
 }
 
 func (request *ProjectPlotProfileEdit) UnmarshalJSON(data []byte) error {
-	if err := validateMetadataDraftJSON(data); err != nil {
-		return fmt.Errorf("profile draft JSON: %w", err)
-	}
 	type plain ProjectPlotProfileEdit
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	var decoded plain
-	if err := decoder.Decode(&decoded); err != nil {
-		return err
-	}
-	var properties map[string]json.RawMessage
-	if err := json.Unmarshal(data, &properties); err != nil {
-		return err
-	}
-	for _, name := range []string{"originalRules", "drafts"} {
-		value, present := properties[name]
-		if !present || bytes.Equal(bytes.TrimSpace(value), []byte("null")) {
-			return fmt.Errorf("profile draft requires explicit non-NULL %s", name)
-		}
+	if err := decodeProfileLifecycleJSON(data, &decoded, "originalRules", "drafts"); err != nil {
+		return fmt.Errorf("profile draft: %w", err)
 	}
 	for _, draft := range decoded.Drafts {
 		if draft.RowID == "" || draft.Changes == nil {
@@ -90,11 +74,35 @@ func (c *sqliteContext) saveProfileRuleDrafts(ctx context.Context, original Proj
 	if err != nil {
 		return err
 	}
+	return c.mutateProfileRules(ctx, original, user, func(tx *sql.Tx, table string, fresh ProjectMetadataTable) (*ProjectMetadataTable, error) {
+		if len(assignments) == 0 {
+			return nil, nil
+		}
+		for _, assignment := range assignments {
+			result, err := tx.ExecContext(ctx, `UPDATE `+quoteHeaderIdentifier(table)+` SET `+
+				quoteHeaderIdentifier(assignment.column)+`=? WHERE rowid=?`, assignment.value, assignment.rowID)
+			if err != nil {
+				return nil, err
+			}
+			if count, err := result.RowsAffected(); err != nil || count != 1 {
+				return nil, errors.Join(fmt.Errorf("profile mutation expected one physical row, found %d", count), err)
+			}
+		}
+		return &planned, nil
+	}, nil)
+}
+
+func (c *sqliteContext) mutateProfileRules(ctx context.Context, original ProjectMetadataTable, user string,
+	mutation func(*sql.Tx, string, ProjectMetadataTable) (*ProjectMetadataTable, error),
+	finalCheck func(*sql.Tx) error) error {
+	if _, _, err := prepareProfileRuleDrafts(original, nil); err != nil {
+		return err
+	}
 	if err := validateChildPhysicalText("Profile edit user", user, 255); err != nil {
 		return err
 	}
 	committed := false
-	err = c.withMetadataWriter(ctx, func(conn *sql.Conn) (resultErr error) {
+	err := c.withMetadataWriter(ctx, func(conn *sql.Conn) (resultErr error) {
 		tx, err := conn.BeginTx(ctx, nil)
 		if err != nil {
 			return err
@@ -112,7 +120,11 @@ func (c *sqliteContext) saveProfileRuleDrafts(ctx context.Context, original Proj
 		if !sameProfileStorageRows(original, fresh) {
 			return errors.New("profile rules/schema/counts changed since review; reload before saving")
 		}
-		if len(assignments) == 0 {
+		planned, err := mutation(tx, tableName, fresh)
+		if err != nil {
+			return err
+		}
+		if planned == nil {
 			return nil
 		}
 		if _, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS "__VPRO_ProfileHistory"(
@@ -127,21 +139,11 @@ func (c *sqliteContext) saveProfileRuleDrafts(ctx context.Context, original Proj
 		if err := validateProfileHistorySchema(ctx, tx); err != nil {
 			return err
 		}
-		for _, assignment := range assignments {
-			result, err := tx.ExecContext(ctx, `UPDATE `+quoteHeaderIdentifier(tableName)+` SET `+
-				quoteHeaderIdentifier(assignment.column)+`=? WHERE rowid=?`, assignment.value, assignment.rowID)
-			if err != nil {
-				return err
-			}
-			if count, err := result.RowsAffected(); err != nil || count != 1 {
-				return errors.Join(fmt.Errorf("profile mutation expected one physical row, found %d", count), err)
-			}
-		}
 		observed, err := readSQLiteStorageRows(ctx, tx, "main", tableName, "", nil, "Order")
 		if err != nil {
 			return err
 		}
-		if !sameProfileStorageRows(planned, observed) {
+		if !sameProfileStorageRows(*planned, observed) {
 			return errors.New("profile final stored rules differ from the complete plan; changes/history rolled back")
 		}
 		before, err := json.Marshal(original)
@@ -181,8 +183,13 @@ func (c *sqliteContext) saveProfileRuleDrafts(ctx context.Context, original Proj
 			return err
 		}
 
-		if !sameProfileStorageRows(planned, final) {
+		if !sameProfileStorageRows(*planned, final) {
 			return errors.New("profile history insertion changed observed rules; mutation/history rolled back")
+		}
+		if finalCheck != nil {
+			if err := finalCheck(tx); err != nil {
+				return err
+			}
 		}
 		if err := c.validateMetadataWriterFiles(); err != nil {
 			return err
