@@ -520,6 +520,16 @@ shared persistent drafts. Vegetation species/membership/cover/calculation events
 remain a distinct workflow, not incidental text editing. Storage-bound coverage
 alone never enables unmigrated columns, pictures or bulk operations.
 Preserve the exported ordering difference: Humus UpperDepth DESC, Mineral
-UpperDepth ASC. FecalAbundance intentionally uses MycelAbundance suggestions;
+UpperDepth ASC. This ordering is implemented/native-verified, including visible
+rows after tab remount; ID breaks equal-depth ties deterministically as a desktop
+adaptation. Missing UpperDepth retains ID ordering without advertising the field.
+Focused child/context tests7.074s and full Go race408.049s pass. Readonly Wails
+evidence/private/native-soil-order preserves all15 original tables, audit history
+and project/support/configuration bytes with zero new audits; exact tested
+payload643bed0a... is promoted, with the accepted Other fallback sealed.
+All110 rows in the nine soil suggestion groups match the static Windows-1252
+VLists export for nonempty metadata and normalized BOOLEAN values. This comparison
+does not prove NULL/empty-string equivalence; retain both distinctions in transport.
+FecalAbundance intentionally uses MycelAbundance suggestions;
 RootsAbundance/RootsSize are textboxes, not invented restricted combos.
 The original42-field checklist is frozen evidence, not current coverage.

@@ -247,6 +247,13 @@ func listChildRecords[T any](s *PlotService, kind, plot string) ([]T, error) {
 	order := `"ID"`
 	if kind == "Veg" && caps["species"] {
 		order = `"Species"`
+	} else if caps["upperdepth"] {
+		switch kind {
+		case "Humus":
+			order = `"UpperDepth" DESC, "ID"`
+		case "Mineral":
+			order = `"UpperDepth", "ID"`
+		}
 	}
 	rows, err := s.readDB(db).Query(`SELECT `+strings.Join(columns, ",")+` FROM `+
 		quoteHeaderIdentifier(project+"_"+kind)+` WHERE "PlotNumber" = ? ORDER BY `+order, plot)
