@@ -170,6 +170,16 @@ The header DTO has all 98 unique stored parent properties (88 Env, 10 Admin) and
 ## Verified bounded desktop child implementation
 
 - All nonidentity stored XL bindings are mapped: Veg 31, Humus 12, Mineral 18 and Other 8. Five retained legacy Veg fields bring the writable backend counts to 36/12/18/8. Heights, vegetation attributes, humus structure/abundance, mineral descriptors and auxiliary user fields are nullable typed data, not guessed defaults.
+- Vegetation physical writes now enforce exported Species TEXT8 (required),
+  Layer TEXT2, Collected TEXT1,21 Single fields, LL/PV signed32 Long and ten
+  signed16 Integer attributes. All mapped text tokens are checked before JSON
+  repair; unchanged historical assignments are omitted. Fresh restoration uses
+  the same physical bounds across accepted table/column aliases. This does not
+  enable new controls or replace species membership/event policies. The existing
+  bounded height-grid cover rule remains separate; Cover restoration remains
+  explicitly unsupported. Focused tests39.230s/full race498.416s and actual
+  scoped Wails75 rejected requests/two intended DC audits preserve original data,
+  history and support/configuration; evidence/private/native-vegetation-domain.
 - Newly mapped attributes are displayed read-only. Schema capabilities distinguish unsupported columns from supported SQL NULL. Creation supplies explicit null values for the expanded contract; native Cancel creates no row and Create leaves unspecified numeric data NULL.
 - Explicit child Update supports imported zero IDs without invoking compatibility creation. Plot/ID ownership, stale or duplicate identities and NULL Veg identities are guarded. Positive signed32 allocation and a transactionally updated reservation ledger prevent deleted-ID reuse.
 - Data changes, deletion and identity-bearing mapped-field audit share one transaction. Thresholds remain >=1 for changed nonnull values, >=2 for null additions and exactly 3 for deletion. Failed operations refresh and remount the displayed rows so rolled-back values are not left visibly accepted.

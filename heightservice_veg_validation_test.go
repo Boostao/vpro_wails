@@ -123,19 +123,23 @@ func TestHeight_VegHistoricalInvalidPreserveClearAndActualOldRead(t *testing.T) 
 	}
 }
 
-func TestHeight_VegSharedBoundaryPreservesPrecisionAndLegacyFields(t *testing.T) {
+func TestHeight_VegSharedBoundaryPreservesPrecisionAndHistoricalFields(t *testing.T) {
 	s, db := childFixture(t)
 	seedHeight(t, db, "CHILD1", 0)
+	if _, err := db.Exec(`UPDATE Sample_Veg SET Cover10=1e40 WHERE PlotNumber='CHILD1';
+		CREATE TRIGGER forbid_historical_cover10 BEFORE UPDATE OF Cover10 ON Sample_Veg
+		BEGIN SELECT RAISE(ABORT,'unchanged history must be omitted'); END`); err != nil {
+		t.Fatal(err)
+	}
 	record := loadHeightVeg(t, s)
 	record.Cover1 = heightFloat(99.99)
 	record.TotalA = heightFloat(-125)
 	record.Height1 = heightFloat(1.234567890123)
 	record.Height2 = heightFloat(-math.MaxFloat32)
 	record.Height3 = heightFloat(math.Copysign(0, -1))
-	// Covers outside the verified surface retain their existing finite-only
-	// semantics; the new domain must not leak into these legacy attributes.
+	// Physical Single bounds do not introduce the height grid's <100 rule here.
+	// An unchanged historical overflow is omitted, not reassigned or repaired.
 	record.Cover7 = heightFloat(1000)
-	record.Cover10 = heightFloat(1e40)
 	if err := s.UpdateVegRecord(record); err != nil {
 		t.Fatal(err)
 	}

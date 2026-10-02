@@ -85,6 +85,9 @@ func validateSoilChildField(kind, column string, value any) error {
 }
 
 func validateChildField(kind, column string, value any) error {
+	if kind == "Veg" {
+		return validateVegetationField(column, value)
+	}
 	if kind == "Other" {
 		return validateOtherField(column, value)
 	}

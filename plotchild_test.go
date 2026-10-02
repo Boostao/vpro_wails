@@ -38,7 +38,11 @@ func childFixture(t *testing.T) (*PlotService, *sql.DB) {
 }
 
 func childFixtureText(kind, column, text string) string {
-	if maximum := soilChildTextMaximum[kind][column]; maximum > 0 && len(text) > maximum {
+	maximum := soilChildTextMaximum[kind][column]
+	if kind == "Veg" {
+		maximum = vegetationTextMaximum[column]
+	}
+	if maximum > 0 && len(text) > maximum {
 		return text[:maximum]
 	}
 	return text
@@ -308,7 +312,7 @@ func TestPlotChild_FieldAuditAndNullThresholds(t *testing.T) {
 				clearChildAudit(t, db)
 				readded := childRecord(kind, "CHILD1", id, true)
 				if kind == "Veg" {
-					readded.FieldByName("Species").SetString("new-'quoted'")
+					readded.FieldByName("Species").SetString(childFixtureText("Veg", "Species", "new-'quoted'"))
 				}
 				if err := saveChildRecord(s, readded); err != nil {
 					t.Fatal(err)

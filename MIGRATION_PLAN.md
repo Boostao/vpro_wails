@@ -585,3 +585,35 @@ holds the completed fixture, accepted core86032440... and domain fallback.
 Exact final native-tested payload96697f18... is promoted. Do not replay completed
 proofs or treat completed soil cells as vegetation/calculation acceptance.
 The original42-field checklist is frozen evidence, not current coverage.
+
+Vegetation physical boundaries are now delivered for all36 mapped fields:
+Species TEXT8 required, Layer TEXT2, Collected TEXT1,21 Single fields,
+LL/PV signed32 Long and ten signed16 Integers. Raw text tokens are rejected
+before JSON repair. Create, explicit Update, compatibility Save and fresh
+restoration aliases share the physical guards; unchanged historical assignments
+are omitted. Existing height-grid cover `<100 Or Is Null` policy remains
+separate from physical Single bounds; it is not invented for other covers.
+Cover restoration remains explicitly unavailable. The old precision fixture now
+seeds Cover10 overflow as historical data rather than asking a fresh writer to
+create invalid storage, and tests omission with a forbidding trigger.
+
+Focused coupled child/height/restoration tests39.230s and full race498.416s pass.
+Actual scoped Wails rejects75 exact-reason requests, including create/update,
+raw Unicode, fresh restoration aliases and audit rollback. Only two intended
+DC edits/audits occur; data returns to the baseline. All15 original tables,
+56 fixture/historical audits, ledger and support/configuration bytes remain
+preserved. The injected audit trigger is removed; original triggers and the
+planned historical guard remain. A no-write visual timeout is sealed from the
+exact two-write checkpoint without replaying Save. Owned PID5860 exited;
+inspector9392 closed. Native-tested payload115ad838... is promoted, with
+soil editor96697f18... sealed under evidence/private/native-vegetation-domain.
+Frontend assets/bindings are unchanged. This is protection, not species,
+vegetation draft, attribute, creation or calculation workflow acceptance.
+
+Static executable-event evidence also matters for the next workflow:
+USysVegA/C/D membership is based on non-NULL covers, including zero.
+SubVegA/D BeforeUpdate exits before the duplicate-species merge code;
+UpdateMetadataSppList jumps immediately to MyExit. Do not implement those
+unreachable writes as parity requirements. Species NotInList, provincial/user
+catalogue choices and Collected's NULL/C/V click cycle remain distinct events
+to migrate, not ordinary unrestricted text editing.

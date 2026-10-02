@@ -124,6 +124,9 @@ func decodeChildJSON(data []byte, record any) (map[string]bool, error) {
 
 func (r *VegRecord) UnmarshalJSON(data []byte) error {
 	type plain VegRecord
+	if err := validateJSONTextProperties(data, vegetationTextJSONNames); err != nil {
+		return err
+	}
 	var decoded plain
 	present, err := decodeChildJSON(data, &decoded)
 	if err != nil {
@@ -533,7 +536,7 @@ func (s *PlotService) saveChild(kind string, record any, mode childSaveMode) err
 			}
 		}
 	}
-	if (kind == "Other" || kind == "Humus" || kind == "Mineral") && !deleting {
+	if !deleting {
 		var changedFields []childField
 		var changedColumns []string
 		var changedBefore, changedAfter []any

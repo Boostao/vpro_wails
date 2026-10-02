@@ -301,7 +301,7 @@ func (s *PlotService) restorePlans(tx *sql.Tx, project, plot string, entries []A
 		if err := s.validateMasterBECRestoreValue(plan.table, plan.column, plan.before); err != nil {
 			return nil, fmt.Errorf("audit rowId %s: %w", entry.RowID, err)
 		}
-		if plan.table == "Other" || plan.table == "Humus" || plan.table == "Mineral" {
+		if plan.table == "Veg" || plan.table == "Other" || plan.table == "Humus" || plan.table == "Mineral" {
 			if err := validateChildField(plan.table, plan.column, plan.before); err != nil {
 				return nil, fmt.Errorf("audit rowId %s: %w", entry.RowID, err)
 			}

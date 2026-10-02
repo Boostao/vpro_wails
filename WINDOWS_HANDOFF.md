@@ -37,8 +37,9 @@ between shells.
   all29 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
-  contain the same native-verified complete Other plus Humus12/Mineral18 editor:
-  `96697f181b8b503b31be47435405e70e10e83c6ca7e2b359510c6947dce3ce55`.
+  contain the same native-verified complete Other plus Humus12/Mineral18 editor
+  and vegetation physical-domain protection:
+  `115ad8388ee99054b0e0391634b7a6fc5c4f963811ab048a32688888a097f358`.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
   Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
   omission remain intact. Shared expected-value transactions span rows/tables
@@ -57,6 +58,19 @@ between shells.
   Accepted core86032440... and domain5d69931d... executables are sealed there.
   Earlier ordering/domain evidence remains preserved in native-soil-order and
   native-soil-domain. Canonical Sample hash remains e63f0c2a....
+  Vegetation's36 mapped fields now have physical create/update/restoration
+  guards, raw JSON Unicode checks and historical assignment omission, without
+  enabling new controls or changing the existing height-grid `<100` rule.
+  Source LL/PV are Long, not Integer; all other mapped integer attributes are
+  signed16. Focused39.230s/full race498.416s pass; exact existing frontend
+  assets/bindings remain embedded. `evidence/private/native-vegetation-domain`
+  verifies75 rejected requests and only two intended DC edits/audits, returning
+  data to the baseline. All15 original tables/56 old audits/ledger/support/config
+  preserved; rollback trigger removed. Owned PID5860 exited/inspector9392 closed.
+  Exact no-write visual checkpoint was sealed without replaying completed writes.
+  Soil editor96697f18... is archived there. Species/vegetation full drafts and
+  event workflows remain incomplete; static metadata/merge code after immediate
+  exits must not be inherited as active behavior.
   The active source bootstrap shares `config.yml` across selection, coordinates,
   Working Unit and audit/user preferences. Defaults preserve R vocabulary;
   all three JSON sources remain untouched and are hash-recorded/idempotent.
