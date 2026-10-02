@@ -73,6 +73,14 @@ export function ListVegetationAttributeSuggestions(contextID: string): $Cancella
     return $Call.ByID(409085583, contextID);
 }
 
+export function ListVegetationSpecies(contextID: string, form: string): $CancellablePromise<$models.VegetationSpeciesOption[] | null> {
+    return $Call.ByID(3698188052, contextID, form);
+}
+
+export function ListVegetationSpeciesAliases(contextID: string, lookup: $models.VegetationSpeciesLookup): $CancellablePromise<$models.VegetationSpeciesAlias[] | null> {
+    return $Call.ByID(4003025460, contextID, lookup);
+}
+
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
 }
@@ -139,4 +147,8 @@ export function UpdateVegRecord(contextID: string, record: $models.VegRecord): $
 
 export function UpdateVegetationAttributes(contextID: string, plot: string, updates: $models.VegetationAttributeUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(4158838458, contextID, plot, updates);
+}
+
+export function UpdateVegetationSpecies(contextID: string, plot: string, updates: $models.VegetationSpeciesUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(2708281787, contextID, plot, updates);
 }

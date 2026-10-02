@@ -585,6 +585,34 @@ export interface VegetationAttributeUpdate {
     "expected": { [_ in string]?: number | null } | null;
 }
 
+export interface VegetationSpeciesAlias {
+    "code": string | null;
+    "scientificName": string | null;
+    "lifeform": number | null;
+    "englishName": string | null;
+    "codeType": string | null;
+    "oldCode": string | null;
+}
+
+export interface VegetationSpeciesLookup {
+    "code": string;
+}
+
+export interface VegetationSpeciesOption {
+    "code": string | null;
+    "scientificName": string | null;
+    "lifeform": number | null;
+    "englishName": string | null;
+    "codeType": string | null;
+}
+
+export interface VegetationSpeciesUpdate {
+    "id": number;
+    "form": string;
+    "expected": string;
+    "value": string;
+}
+
 export interface WorkingUnitChoice {
     "rowId": string;
     "origin": string;

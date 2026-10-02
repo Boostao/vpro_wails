@@ -60,6 +60,7 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 		"soil drafts":           func() error { return service.UpdateSoilRecords(stale, "stale", nil) },
 		"vegetation attributes": func() error { return service.UpdateVegetationAttributes(stale, "stale", nil) },
 		"collected drafts":      func() error { return service.UpdateCollectedRecords(stale, "stale", nil) },
+		"species drafts":        func() error { return service.UpdateVegetationSpecies(stale, "stale", nil) },
 		"delete other":          func() error { return service.DeleteOtherRecord(stale, "stale", 1) },
 		"height":                func() error { return service.UpdateHeightRecords(stale, "stale", nil) },
 		"audit flags":           func() error { return service.SetAuditRestoreSelection(stale, "stale", nil) },
@@ -79,6 +80,14 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 			_, err := service.ListVegetationAttributeSuggestions(context.Background(), stale)
 			return err
 		},
+		"species references": func() error {
+			_, err := service.ListVegetationSpecies(context.Background(), stale, "SubVegAXL_BC")
+			return err
+		},
+		"species aliases": func() error {
+			_, err := service.ListVegetationSpeciesAliases(context.Background(), stale, VegetationSpeciesLookup{Code: "ACAROSPO"})
+			return err
+		},
 		"audit read":          func() error { _, err := service.ListAuditEntries(context.Background(), stale, "stale"); return err },
 		"switch":              func() error { _, err := service.SwitchContext(stale, contextSelection(current)); return err },
 		"legacy header":       func() error { return service.plots.UpdatePlot(FS882Header{PlotNumber: "stale"}) },
@@ -88,6 +97,7 @@ func TestContextServiceRejectsStaleReadsEveryMutationAndLegacyBypass(t *testing.
 		"legacy soil drafts":  func() error { return service.plots.UpdateSoilRecords("stale", nil) },
 		"legacy attributes":   func() error { return service.plots.UpdateVegetationAttributes("stale", nil) },
 		"legacy collected":    func() error { return service.plots.UpdateCollectedRecords("stale", nil) },
+		"legacy species":      func() error { return service.plots.UpdateVegetationSpecies("stale", nil) },
 		"legacy audit flags":  func() error { return service.plots.SetAuditRestoreSelection("stale", nil) },
 		"legacy restoration": func() error {
 			_, err := service.plots.RestoreSelectedAuditRecords("stale", nil, AuditRestoreRetain)

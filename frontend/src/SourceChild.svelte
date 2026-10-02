@@ -6,9 +6,10 @@
   import { soilField, soilCell, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import { vegetationAttributeField, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
   import type { CollectedDrafts } from './collectedEditor';
+  import type { SpeciesDrafts, SpeciesLists } from './vegetationSpeciesEditor';
   import type { SoilSuggestion } from '../bindings/github.com/boostao/vpro-wails';
   type Row = { id: number; values: Record<string, string | number | boolean | null | undefined> };
-  let { name, rows, disabled = true, deleteDisabled = false, revision = 0, onedit, ondelete, onstage, drafts = {}, onotherstage, otherDrafts = {}, onsoilstage, soilDrafts = {}, soilSuggestions = [], onattributestage, attributeDrafts = {}, attributeSuggestions = [], oncollectedstage, collectedDrafts = {}, collectedDisabled = true }: {
+  let { name, rows, disabled = true, deleteDisabled = false, revision = 0, onedit, ondelete, onstage, drafts = {}, onotherstage, otherDrafts = {}, onsoilstage, soilDrafts = {}, soilSuggestions = [], onattributestage, attributeDrafts = {}, attributeSuggestions = [], oncollectedstage, collectedDrafts = {}, collectedDisabled = true, onspeciesstage, speciesDrafts = {}, speciesLists = {}, speciesDisabled = true }: {
     name: string; rows: Row[]; disabled?: boolean; revision?: number;
     onedit?: (name: string, id: number, column: string, value: string) => Promise<void>;
     ondelete?: (name: string, id: number) => Promise<void>;
@@ -25,6 +26,10 @@
     oncollectedstage?: (id: number) => void;
     collectedDrafts?: CollectedDrafts;
     collectedDisabled?: boolean;
+    onspeciesstage?: (form: string, id: number, raw: string) => void;
+    speciesDrafts?: SpeciesDrafts;
+    speciesLists?: SpeciesLists;
+    speciesDisabled?: boolean;
     deleteDisabled?: boolean;
   } = $props();
   const source = $derived(paperChild(name));
@@ -61,7 +66,15 @@
           {@const attribute = name === 'USysVegOtherXL' && control.column ? vegetationAttributeField(control.column) : undefined}
           {@const attributeStaged = attribute ? attributeDrafts[String(row.id)]?.[attribute.key] : undefined}
           <td>
-          {#if mapped && oncollectedstage && control.column?.toLowerCase() === 'collected'}
+          {#if mapped && onspeciesstage && control.column?.toLowerCase() === 'species'}
+            {@const species = speciesDrafts[String(row.id)]}
+            {@const listId = `species-${name}`}
+            <input class="source-cell" type="text" value={species ? species.raw : value ?? ''} list={listId}
+              disabled={speciesDisabled || control.locked || !control.enabled} aria-invalid={species?.error != null}
+              aria-label={`${controlLabel(control)}, row ${row.id}`} data-column={control.column}
+              title={species?.error ?? 'Unsubmitted draft: select an exact list code, then Save or Cancel species drafts'}
+              oninput={event => onspeciesstage?.(name, row.id, event.currentTarget.value)} />
+          {:else if mapped && oncollectedstage && control.column?.toLowerCase() === 'collected'}
             {@const collected = collectedDrafts[String(row.id)]}
             <button class="source-cell" type="button" data-column={control.column}
               disabled={collectedDisabled || control.locked || !control.enabled}
@@ -129,6 +142,9 @@
               aria-label={`${controlLabel(control)}, row ${row.id}`} aria-invalid={staged?.error != null} data-column={control.column}
               title={staged?.error ?? 'Unsubmitted draft: use Save height drafts or Cancel height drafts'}
               oninput={event => onstage?.(row.id, control.column ?? '', event.currentTarget.value)} />
+          {:else if mapped && name.startsWith('SubVeg') && control.column?.toLowerCase() === 'species'}
+            <input class="source-cell" type="text" value={value ?? ''} disabled data-column={control.column}
+              aria-label={`${controlLabel(control)}, row ${row.id}`} title="Species selection is unavailable in this build" />
           {:else if mapped && onedit && control.column && editable.has(control.column.toLowerCase())}
             <input class="source-cell" type={numeric.has(control.column.toLowerCase()) ? 'number' : 'text'} step="any"
               value={value ?? ''} disabled={disabled || control.locked || !control.enabled}
@@ -159,6 +175,15 @@
     {/each}
     </tbody>
   </table>
+  {#if onspeciesstage}
+    <datalist id={`species-${name}`}>
+      {#each speciesLists[name] ?? [] as option, index (index)}
+        {#if option.code !== null}
+          <option value={option.code}>{option.scientificName ?? 'NULL'} | {option.englishName ?? 'NULL'} | Lifeform {option.lifeform ?? 'NULL'} | {option.codeType ?? 'NULL'}</option>
+        {/if}
+      {/each}
+    </datalist>
+  {/if}
 </div>
 
 <style>

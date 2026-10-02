@@ -37,9 +37,10 @@ between shells.
   all32 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
-  contain the same native-verified complete Other plus Humus12/Mineral18 editor
+  contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing:
-  `156aeb46ed0c2e435d64c9de23403ff7726ae0306c5e8329e64116374c94798b`.
+  plus default-off species integration preparation:
+  `4eb0b8afc468f9ca85e8bd9be274d4d37abd3cbf40e2ec3cea89a84ec290fdf6`.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
   Source Humus DESC/Mineral ASC depth ordering, physical domains and historical
   omission remain intact. Shared expected-value transactions span rows/tables
@@ -468,6 +469,30 @@ Continue actual FS882 child workflows, not another parent-field inventory.
 Other8/Humus12/Mineral18, all12 existing-row vegetation attributes and the shared
 five-grid Collected cycle are verified/promoted; continue distinct species/cover/height creation/
 deletion and calculation events.
+Species integration preparation is verified/promoted, not complete. Cancellable
+canonical five-field UNION/alias readers return exact547/4742/3319 source classes,
+nullable metadata and ambiguous aliases; reference-preparation full race passed
+(root502.078s). Existing-row exact-list species drafts remain default-off behind
+`VITE_VEGETATION_SPECIES_EDITING=true`. All five grids share persistent raw errors,
+Save/Undo/Cancel/Lock/close/context gates and atomic expected-value patches.
+Canonical membership uses the leased readonly family connection, not the
+project-only writer pool; source-row predicates are checked in the transaction.
+Focused Go1.525s;183 frontend tests/check0/0/default+opt-in builds; bindings15/
+120/46 and35 scoped adapter operations. Native8 cases/3 intended audits preserve
+15 tables/32 prior audits and support/config bytes. The rejected no-write writer
+alias candidate5526fb0f... was closed/sealed; corrected1b7e408e... is archived
+with opt-in assets under evidence/private/native-vegetation-species. Corrected
+PID11648 and rejected PID4880 exited; inspector9392 closed. No writes replayed.
+Default source-grid species controls cannot fall through to unrestricted edits.
+Prior156aeb46... stays archived. Current/candidate4eb0b8af... embed the exact current
+default assets; native readonly delivery verifies five disabled labelled species
+controls, unchanged Collected availability, every fixture byte retained and zero
+new audits. Delivery PID12492 exited; inspector9392 closed. Final full race passed
+(root472.744s); exact default payload4eb0b8af... is promoted and archived as
+vpro-species-default-verified.exe. Exact-case selection is
+a provisional desktop policy, not source text-matching/event acceptance.
+Old-code replace/keep, out-of-layer user choices and personal-list writes remain
+unavailable. Completed core cases must not be replayed.
 The original42-field checklist and readonly
 15-list/260-row capture are sealed under `evidence/private/workflow-fs882-parent`.
 SoilDrainage's explicit LimitToList=NotDefault now has a separately verified

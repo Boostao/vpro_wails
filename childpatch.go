@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"math"
@@ -15,9 +16,10 @@ type childExpectedValue struct {
 }
 
 type childRecordPatch struct {
-	kind  string
-	id    int
-	cells map[string]childExpectedValue
+	kind     string
+	id       int
+	cells    map[string]childExpectedValue
+	validate func(*sql.Tx, string, string) error
 }
 
 func childPatchShape(kind string) reflect.Value {
@@ -147,6 +149,11 @@ func (s *PlotService) updateChildPatches(plot string, updates []childRecordPatch
 		}
 		if len(fields) == 0 {
 			continue
+		}
+		if update.validate != nil {
+			if err := update.validate(tx, table, plot); err != nil {
+				return err
+			}
 		}
 		result, err := tx.Exec(`UPDATE `+table+` SET `+strings.Join(assignments, ",")+
 			` WHERE "PlotNumber" = ? AND "ID" = ?`, append(args, plot, update.id)...)

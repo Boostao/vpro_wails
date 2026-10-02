@@ -688,3 +688,34 @@ exact156aeb46... is promoted, not a later untested rebuild. Core PID13356/defaul
 PID15216 exited; inspector9392 closed. Evidence/private/native-vegetation-collected
 retains accepted/rejected executables and eb3a009b... fallback.
 Continue species/cover/height creation/deletion and calculations next.
+
+The species batch starts with source-driven, read-only canonical references,
+not the lossy derived Species browse DTO. All five combos explicitly export
+LimitToList and share three list classes: A/A-height lifeforms1-4, C/C-height
+5-8/12, D1/2/9-11; source U/X types are compared case-insensitively while returned
+metadata retains its literals. USysAllSpecies's five-field UNION yields547/
+4742/3319 rows from VLists/VUser, excluding S/s and preserving NULL/empty values.
+Old-code lookup retains every matching definition, including two distinct
+ACAROSPO replacements;217 duplicate OldCode groups forbid silently guessing the
+first mapping. Scoped cancellable readers, raw lookup transport and immutable
+client adapter are implemented/tested. The reference-preparation full race passed
+(root502.078s). Existing-row exact-list selection now has opt-in persistent drafts
+across all five grids. The shared writer verifies source-row membership inside
+the project transaction; canonical membership reads use the context-owned readonly
+family connection, not the project-only writer pool. Mutation and audit remain
+one transaction. Native8 cases/3 intended audits verify lists/ambiguous aliases,
+Undo, raw overlength/hidden error remounts, Save/Lock/native close guards,
+correction, wrong-list rejection, audit rollback/retained retry and raw/stale
+transport. All15 tables/32 old audits and support/config bytes are preserved
+apart from intended species assignments. Exact-case list selection is a bounded
+desktop adaptation; source NotInList decisions and general Access text comparison
+are not claimed. This preparatory workflow remains default-off
+(`VITE_VEGETATION_SPECIES_EDITING=true` opts in); unrestricted source-grid species
+edits cannot bypass it. Final readonly delivery verifies five disabled labelled
+species controls, preserved Collected availability and all fixture bytes unchanged
+with zero new audits. Final full race passed (root472.744s). Exact default
+4eb0b8af... is promoted; species remains opt-in, not complete source-event parity.
+Explicit
+replace/keep/user choices and personal-list creation remain
+unavailable until integrated and verified. USysAddSpp uses ordinary bound record
+saves; its Update button explicitly says "not working" and exits.

@@ -232,3 +232,7 @@ export function UpdateVegRecord(r: $models.VegRecord): $CancellablePromise<void>
 export function UpdateVegetationAttributes(plot: string, updates: $models.VegetationAttributeUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(4041328338, plot, updates);
 }
+
+export function UpdateVegetationSpecies(plot: string, updates: $models.VegetationSpeciesUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(3323664195, plot, updates);
+}

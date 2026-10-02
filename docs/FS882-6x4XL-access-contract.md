@@ -244,6 +244,40 @@ apart from exact planned edits. Default readonly delivery proves all bytes
 unchanged and zero new audits. `VITE_VEGETATION_COLLECTED_EDITING=false` disables
 the controls. Evidence/private/native-vegetation-collected; exact156aeb46... promoted.
 
+### Opt-in exact-list species selection preparation
+
+All five Species combos explicitly export LimitToList=NotDefault. Source
+USysAllSpecies unions five fields from USysAllSpecs/USysUserSpp, excluding S/s.
+A/A-height lists accept U/X lifeforms1-4, C/C-height5-8/12 and D1/2/9-11.
+Canonical readers preserve NULL/empty metadata and duplicate definitions; the
+three source classes return547/4742/3319 rows. Old-code lookup preserves every
+matching master definition, including two different ACAROSPO replacements.
+Source NotInList asks replace/keep, then checks the user catalogue or opens the
+personal-list form. Arbitrary DLookup-first behavior is not inherited; these
+decision/personal-list paths remain unavailable. USysAddSpp's Update button exits.
+
+Existing-row exact-list selection is an opt-in preparatory desktop workflow,
+not full NotInList parity. `VITE_VEGETATION_SPECIES_EDITING=true` enables it;
+default builds retain one disabled labelled species control. Matching requires
+the literal returned code, without trimming, completing or recasing. Exact-case
+matching and explicit Save/Undo/Cancel are adaptations. Malformed/new overlength
+text blocks saving while unchanged historical text is omitted. Draft/error state
+is shared across cover/height grids and survives tab remounts.
+
+The shared child transaction checks original species, row ownership and the
+source-form row predicate before assignment/audit. Canonical membership uses the
+leased readonly family connection: project writer pools intentionally do not
+own support aliases. Native8 cases/3 audits cover all five lists, alias ambiguity,
+Undo, hidden raw errors, Save/Lock/close, valid correction, wrong-list rejection,
+multirow audit rollback/retained retry and stale/raw transport rejection.
+All15 tables/32 old audits and support/config bytes are preserved apart from the
+planned species edits. Corrected1b7e408e... opt-in core is archived under
+evidence/private/native-vegetation-species. Default candidate4eb0b8af... passes
+readonly native delivery: five disabled labelled species controls, unchanged
+Collected availability, every fixture byte retained and zero new audits. The
+final full race passes (root472.744s); exact default payload is promoted while
+species remains opt-in pending completion of the source decision paths.
+
 ## Verified bounded selective restoration
 
 `SetAuditRestoreSelection` atomically stores a verified selection; `RestoreSelectedAuditRecords` accepts exact string row IDs and cancel/retain/prune actions. The legacy marked-row API remains. Typed mapping covers 97 nonidentity parent and 61 non-Cover child fields. Invalid/foreign/missing rows, duplicate identities, unsupported fields, stale history chains, malformed values and failed triggers abort the entire transaction. Restore ordering follows source Table ascending then EditWhen descending, with descending rowid for deterministic timestamp ties.

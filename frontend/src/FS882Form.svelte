@@ -33,6 +33,7 @@
   import { soilField, stageSoil, soilDirty, soilErrors, soilUpdates, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import { vegetationAttributeField, stageVegetationAttribute, vegetationAttributeDirty, vegetationAttributeErrors, vegetationAttributeUpdates, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
   import { stageCollected, collectedDirty, collectedUpdates, type CollectedDrafts } from './collectedEditor';
+  import { speciesForms, stageSpecies, speciesDirty, speciesErrors, speciesUpdates, type SpeciesDrafts, type SpeciesLists } from './vegetationSpeciesEditor';
   import type { WorkingUnitSession } from './workingUnitEditor';
   import { onDestroy, untrack, tick } from 'svelte';
   import { bindContextPlots } from './contextPlots';
@@ -43,8 +44,10 @@
   const reads = new ReadRequests();
   const referenceReads = new ReadRequests();
   const speciesReads = new ReadRequests();
+  const speciesReferenceReads = new ReadRequests();
   let referenceRequest = 0;
   let speciesRequest = 0;
+  let speciesReferenceRequest = 0;
 
   let activeTab = $state<'site' | 'veg' | 'vegOther' | 'soils' | 'other' | 'audit'>('site');
   async function vegetationNotesTab() {
@@ -93,7 +96,15 @@
   const collectedEditingEnabled = import.meta.env.VITE_VEGETATION_COLLECTED_EDITING !== 'false';
   let collectedDrafts = $state<CollectedDrafts>({});
   const collectedUnsaved = $derived(collectedDirty(collectedDrafts));
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
+  const speciesEditingEnabled = import.meta.env.VITE_VEGETATION_SPECIES_EDITING === 'true';
+  let speciesDrafts = $state<SpeciesDrafts>({});
+  let speciesLists = $state<SpeciesLists>({});
+  let speciesReferenceReady = $state(false);
+  let speciesReferenceBusy = $state(false);
+  let speciesReferenceError = $state<string | null>(null);
+  const speciesUnsaved = $derived(speciesDirty(speciesDrafts));
+  const speciesInvalid = $derived(speciesErrors(speciesDrafts));
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -107,6 +118,7 @@
   onDestroy(() => {
     loadRequest++; referenceRequest++; speciesRequest++;
     reads.cancelAll(); referenceReads.cancelAll(); speciesReads.cancelAll();
+    speciesReferenceRequest++; speciesReferenceReads.cancelAll();
   });
   let container: HTMLDivElement;
 
@@ -331,11 +343,12 @@
 
   let original = $state<FS882Header | null>(null);
   const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null);
-  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
-  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
-  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved);
-  const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved);
-  const collectedEditingDisabled = $derived(!collectedEditingEnabled || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved);
+  const heightEditingDisabled = $derived(childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved || speciesUnsaved);
+  const collectedEditingDisabled = $derived(!collectedEditingEnabled || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || speciesUnsaved);
+  const speciesEditingDisabled = $derived(!speciesEditingEnabled || !speciesReferenceReady || speciesReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
   const childEditingDisabled = $derived(childParentDisabled || childUnsaved);
   const auditRestoreEnabled = import.meta.env.VITE_AUDIT_RESTORE !== 'false';
   const auditProject = $derived($projectState?.activeProject ?? '');
@@ -422,6 +435,7 @@
     soilDrafts = {};
     attributeDrafts = {};
     collectedDrafts = {};
+    speciesDrafts = {};
     vegList = [];
     humusList = [];
     mineralList = [];
@@ -568,6 +582,93 @@
 
   async function updateVegCover(row: VegRecord) {
     await childOperation(() => PlotService.UpdateVegRecord(row));
+  }
+
+  async function loadSpeciesReferences() {
+    if (!speciesEditingEnabled || speciesReferenceBusy) return;
+    const request = speciesReferenceRequest;
+    speciesReferenceBusy = true;
+    speciesReferenceReady = false;
+    speciesReferenceError = null;
+    try {
+      const rows = await Promise.all(speciesForms.map(form => speciesReferenceReads.track(PlotService.ListVegetationSpecies(form))));
+      if (request !== speciesReferenceRequest) return;
+      const lists: SpeciesLists = {};
+      speciesForms.forEach((form, index) => {
+        const options = rows[index];
+        if (options === null) throw new Error(`Species metadata for ${form} was not returned.`);
+        lists[form] = options;
+      });
+      speciesLists = lists;
+      let drafts = speciesDrafts;
+      for (const [id, cell] of Object.entries(drafts)) {
+        drafts = stageSpecies(drafts, cell.form, Number(id), cell.raw, cell.expected, lists);
+      }
+      speciesDrafts = drafts;
+      speciesReferenceReady = true;
+    } catch (cause) {
+      if (request === speciesReferenceRequest) speciesReferenceError = `Species references unavailable: ${String(cause)}`;
+    } finally {
+      if (request === speciesReferenceRequest) speciesReferenceBusy = false;
+    }
+  }
+
+  $effect(() => { untrack(() => void loadSpeciesReferences()); });
+
+  function stageSpeciesCell(form: string, id: number, raw: string) {
+    try {
+      if (speciesEditingDisabled) throw new Error('Species editing is unavailable while loading, locked, busy or another draft is unsaved.');
+      if (childCapabilities.Veg.species !== true) throw new Error('Species is unavailable in the active schema.');
+      const rows = vegList.filter(row => row.id === id && row.plotNumber === draft.plotNumber);
+      if (rows.length !== 1 || !sourceRows(form).some(row => row.id === id)) throw new Error('Species source row is missing or ambiguous; reload before editing.');
+      speciesDrafts = stageSpecies(speciesDrafts, form, id, raw, rows[0].species, speciesLists);
+      successMsg = null;
+      if (error?.startsWith('Species ')) error = null;
+    } catch (cause) {
+      error = `Species draft failed: ${String(cause)}`;
+      childRevision++;
+    }
+  }
+
+  async function cancelSpeciesDrafts() {
+    if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling species drafts.'; return; }
+    speciesDrafts = {};
+    childRevision++;
+    error = null;
+    successMsg = null;
+    busy = true;
+    try {
+      await loadChildData(draft.plotNumber);
+      successMsg = 'Species drafts cancelled. Stored data and history were unchanged; current rows reloaded.';
+    } catch (cause) {
+      capabilitiesReady = false;
+      error = `Species drafts cancelled, but rows could not be reloaded. Reopen the plot: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
+  }
+
+  async function saveSpeciesDrafts() {
+    if (speciesEditingDisabled) { error = 'Save a clean, unlocked header with available species references before saving.'; return; }
+    let committed = false;
+    busy = true;
+    error = null;
+    successMsg = null;
+    try {
+      const updates = speciesUpdates(speciesDrafts);
+      if (updates.length === 0) { speciesDrafts = {}; successMsg = 'No species values changed.'; return; }
+      await PlotService.UpdateVegetationSpecies(draft.plotNumber, updates);
+      committed = true;
+      speciesDrafts = {};
+      await loadChildData(draft.plotNumber);
+      successMsg = `Saved ${updates.length} species row drafts atomically.`;
+    } catch (cause) {
+      if (committed) capabilitiesReady = false;
+      error = committed ? `Species changes committed, but refresh failed. Reopen the plot before editing: ${String(cause)}`
+        : `Species save failed; drafts retained: ${String(cause)}`;
+    } finally {
+      busy = false;
+    }
   }
 
   function stageCollectedCell(id: number) {
@@ -919,8 +1020,10 @@
         };
         const numberKey = numbers[key];
         if (numberKey) await childOperation(() => PlotService.UpdateVegRecord({ ...row, [numberKey]: numeric() }));
-        else if (key === 'species' || key === 'collected') {
-          await childOperation(() => PlotService.UpdateVegRecord({ ...row, [key]: raw || (key === 'species' ? '' : undefined) }));
+        else if (key === 'species') {
+          throw new Error('Species requires the source-list draft workflow; unrestricted source-grid edits are unavailable.');
+        } else if (key === 'collected') {
+          await childOperation(() => PlotService.UpdateVegRecord({ ...row, collected: raw || undefined }));
         } else throw new Error(`Vegetation column ${column} is not migrated.`);
       } else if (name === 'SoilHumusXL') {
         const row = humusList.find(record => record.id === id);
@@ -985,6 +1088,7 @@
     if (soilUnsaved) { await saveSoilDrafts(); return; }
     if (attributeUnsaved) { await saveAttributeDrafts(); return; }
     if (collectedUnsaved) { await saveCollectedDrafts(); return; }
+    if (speciesUnsaved) { await saveSpeciesDrafts(); return; }
     const invalid = container.querySelector<HTMLInputElement>('.header-editor input:invalid');
     if (invalid) {
       invalid.reportValidity();
@@ -1026,7 +1130,7 @@
   }
 
   export function getCloseState(): EditorCloseState {
-    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0 || attributeInvalid.length > 0;
+    const invalid = Object.keys(headerValidation).length > 0 || heightInvalid.length > 0 || otherInvalid.length > 0 || soilInvalid.length > 0 || attributeInvalid.length > 0 || speciesInvalid.length > 0;
     const invalidChild = Boolean(container?.querySelector('.source-child input:invalid'));
     const saveReason = busy || headerWorkflowBusy || !capabilitiesReady ? 'Wait for the plot to finish loading or header workflow.'
       : draft.locked ? 'Unlock the plot before saving.'
@@ -1036,6 +1140,8 @@
       : soilUnsaved && (!soilReferenceReady || soilReferenceBusy) ? 'Restore available soil references before saving drafts.'
       : attributeInvalid.length > 0 ? 'Correct invalid vegetation attributes or Cancel attribute drafts before saving.'
       : attributeUnsaved && (!attributeReferenceReady || attributeReferenceBusy) ? 'Restore available attribute references before saving drafts.'
+      : speciesInvalid.length > 0 ? 'Correct invalid species drafts or Cancel species drafts before saving.'
+      : speciesUnsaved && (!speciesReferenceReady || speciesReferenceBusy) ? 'Restore available species references before saving drafts.'
       : invalid ? 'Correct invalid header inputs or Undo before saving.'
       : !draft.plotNumber.trim() ? 'Plot Number is required before saving.' : '';
     return { unsaved: dirty || childUnsaved || invalid || newChild !== null || invalidChild, busy: busy || headerWorkflowBusy, canSave: saveReason === '', saveReason, error };
@@ -1061,6 +1167,7 @@
     if (soilUnsaved) { void cancelSoilDrafts(); return; }
     if (attributeUnsaved) { void cancelAttributeDrafts(); return; }
     if (collectedUnsaved) { void cancelCollectedDrafts(); return; }
+    if (speciesUnsaved) { void cancelSpeciesDrafts(); return; }
     if (original) {
       draft = JSON.parse(JSON.stringify(original));
     } else {
@@ -1096,6 +1203,10 @@
     }
     if (collectedUnsaved) {
       error = 'Save or Cancel Collected drafts before changing the plot lock.';
+      return;
+    }
+    if (speciesUnsaved) {
+      error = 'Save or Cancel species drafts before changing the plot lock.';
       return;
     }
     if (!draft.locked && dirty) {
@@ -1285,6 +1396,16 @@
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if speciesUnsaved}
+      <div class="species-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Species draft controls">
+        <span>Species drafts are unsubmitted. Switching tabs or cover/height views never saves them; other editing waits.</span>
+        <div class="flex gap-2 mt-2">
+          <button type="button" class="px-2 py-1 border rounded bg-emerald-700 text-white disabled:opacity-50" disabled={speciesEditingDisabled || speciesInvalid.length > 0} onclick={() => void saveSpeciesDrafts()}>Save species drafts</button>
+          <button type="button" class="px-2 py-1 border border-stone-300 rounded bg-white disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={cancelSpeciesDrafts}>Cancel species drafts</button>
+        </div>
+        {#each speciesInvalid as message}<p role="alert">{message}</p>{/each}
+      </div>
+    {/if}
     {#if collectedUnsaved}
       <div class="collected-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Collected draft controls">
         <span>Collected drafts are unsubmitted. Switching tabs or cover/height views never saves them; other editing waits.</span>
@@ -1363,6 +1484,12 @@
         </ParentCodeFields>
       {/key}
     {:else if activeTab === 'veg'}
+      {#if speciesEditingEnabled}
+        {#if speciesReferenceBusy}<p role="status">Loading source species lists...</p>{/if}
+        {#if speciesReferenceError}<p role="alert">{speciesReferenceError}</p>{/if}
+        <button type="button" class="mb-2 px-2 py-1 border rounded" disabled={busy || speciesReferenceBusy || headerWorkflowBusy}
+          onclick={() => void loadSpeciesReferences()}>{speciesReferenceError ? 'Retry species references' : 'Reload species references'}</button>
+      {/if}
       <OrdinaryFields bind:draft {original} {capabilities} scope="veg"
         disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
         onchange={markDirty} onvalidation={validateHeader} onVegNotesTab={vegetationNotesTab}>
@@ -1375,17 +1502,20 @@
             drafts={heightDrafts} onstage={heightGrid && heightEditingEnabled ? stageHeightCell : undefined}
             {collectedDrafts} collectedDisabled={collectedEditingDisabled}
             oncollectedstage={collectedEditingEnabled ? stageCollectedCell : undefined}
+            {speciesDrafts} {speciesLists} speciesDisabled={speciesEditingDisabled}
+            onspeciesstage={speciesEditingEnabled ? stageSpeciesCell : undefined}
             onedit={heightGrid ? undefined : editSourceChild} ondelete={heightGrid ? undefined : deleteSourceChild} />
         {/snippet}
       </SourcePage>
       {/snippet}
       </OrdinaryFields>
       {#if vegetationMode === 'height'}
-        <p class="mt-2 text-xs text-stone-500">{heightEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain. Species remains read-only here.' : 'Cover/height editing is gated until native Wails verification.'} Switching view does not save or change data.</p>
+        <p class="mt-2 text-xs text-stone-500">{heightEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain.' : 'Cover/height editing is gated until native Wails verification.'} Switching view does not save or change data.</p>
       {/if}
       {#if collectedEditingEnabled}
-        <p class="mt-2 text-xs text-stone-500">Collected buttons cycle NULL -> C -> V -> NULL using persistent drafts. Other historical values remain unchanged, as in the source click event. Use Save or Cancel; species and new-row workflows remain unavailable in the source grids.</p>
+        <p class="mt-2 text-xs text-stone-500">Collected buttons cycle NULL -> C -> V -> NULL using persistent drafts. Other historical values remain unchanged, as in the source click event. Use Save or Cancel; new-row workflows remain unavailable in the source grids.</p>
       {/if}
+      <p class="mt-2 text-xs text-stone-500">{speciesEditingEnabled ? 'Species selection uses exact canonical source-list codes and persistent Save/Cancel drafts. Old-code decisions and personal-list creation remain unavailable.' : 'Species editing remains read-only pending native verification.'}</p>
       <details class="mt-4 border border-stone-200 rounded p-3">
         <summary class="text-xs font-semibold cursor-pointer">Experimental vegetation editing grid</summary>
       <div class="space-y-4">

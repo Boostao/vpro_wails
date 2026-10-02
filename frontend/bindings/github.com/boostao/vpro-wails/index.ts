@@ -80,6 +80,10 @@ export type {
     StartupState,
     VegRecord,
     VegetationAttributeUpdate,
+    VegetationSpeciesAlias,
+    VegetationSpeciesLookup,
+    VegetationSpeciesOption,
+    VegetationSpeciesUpdate,
     WorkingUnitChoice,
     WorkingUnitModeState
 } from "./models.js";

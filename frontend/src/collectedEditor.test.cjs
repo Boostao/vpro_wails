@@ -58,9 +58,9 @@ test('Persistent Collected drafts gate every other session, Save, Undo, Lock and
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(form, /let collectedDrafts = \$state<CollectedDrafts>/);
   assert.match(form, /const stored = rows\[0\]\.collected \?\? null/);
-  assert.match(form, /childUnsaved = \$derived\([^;]*collectedUnsaved\)/);
+  assert.match(form, /childUnsaved = \$derived\([^;]*collectedUnsaved[^;]*\)/);
   for (const name of ['height', 'other', 'soil', 'attribute']) {
-    assert.match(form, new RegExp(`const ${name}EditingDisabled = \\$derived\\([^;]*collectedUnsaved\\)`));
+    assert.match(form, new RegExp(`const ${name}EditingDisabled = \\$derived\\([^;]*collectedUnsaved[^;]*\\)`));
   }
   assert.match(form, /if \(collectedUnsaved\) \{ await saveCollectedDrafts\(\); return; \}/);
   assert.match(form, /if \(collectedUnsaved\) \{ void cancelCollectedDrafts\(\); return; \}/);
