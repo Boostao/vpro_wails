@@ -88,7 +88,11 @@ func newSQLiteProjectService(root, config string, preferences *desktopConfig) (_
 			}
 		}
 	}
-	candidate, err := newSQLiteContext(context.Background(), selection, support)
+	profile, err := preferences.plotProfileSelection()
+	if err != nil {
+		return nil, err
+	}
+	candidate, err := newSQLiteContext(context.Background(), selection, support, profile)
 	if err != nil {
 		return nil, fmt.Errorf("configured context could not be opened; YAML was retained: %w", err)
 	}
@@ -105,7 +109,7 @@ func newSQLiteProjectService(root, config string, preferences *desktopConfig) (_
 	if err != nil {
 		return nil, err
 	}
-	if err := service.persistSQLiteSelection(candidate.selection); err != nil {
+	if err := service.persistSQLiteContext(candidate); err != nil {
 		return nil, err
 	}
 	service.publishSQLiteSelection(candidate, id)
@@ -120,21 +124,6 @@ func newContextIdentity() (string, error) {
 	return hex.EncodeToString(entropy[:]), nil
 }
 
-func (service *ProjectService) persistSQLiteSelection(selection desktopSelection) error {
-	current, err := service.preferences.selection()
-	if err != nil {
-		return err
-	}
-	if current == selection {
-		return nil
-	}
-	return service.preferences.update("Current", map[string]any{
-		"CurrProject": selection.Project, "ProjectPath": selection.ProjectPath,
-		"CurrPlotlist": selection.SU, "SUPath": selection.SUPath,
-		"CurrHierarchy": selection.Hierarchy, "HierarchyPath": selection.HierarchyPath,
-	})
-}
-
 func (service *ProjectService) publishSQLiteSelection(candidate *sqliteContext, id string) {
 	service.sqlite, service.contextID = candidate, id
 	service.active, service.activeSU = candidate.selection.Project, candidate.selection.SU
@@ -145,10 +134,17 @@ func (service *ProjectService) publishSQLiteSelection(candidate *sqliteContext, 
 }
 
 func (service *ProjectService) switchSQLiteLocked(selection desktopSelection) (ProjectState, error) {
+	if service.sqlite == nil {
+		return ProjectState{}, errors.New("project context is closed")
+	}
+	return service.switchSQLiteProfileLocked(selection, service.sqlite.profile)
+}
+
+func (service *ProjectService) switchSQLiteProfileLocked(selection desktopSelection, profile *PlotProfileSource) (ProjectState, error) {
 	if service.sqlite == nil || service.sqlite.conn == nil {
 		return ProjectState{}, errors.New("project context is closed")
 	}
-	candidate, err := newSQLiteContext(context.Background(), selection, service.supportPaths)
+	candidate, err := newSQLiteContext(context.Background(), selection, service.supportPaths, profile)
 	if err != nil {
 		return ProjectState{}, err
 	}
@@ -163,7 +159,7 @@ func (service *ProjectService) switchSQLiteLocked(selection desktopSelection) (P
 	if err != nil {
 		return ProjectState{}, errors.Join(err, candidate.Close())
 	}
-	if err := service.persistSQLiteSelection(candidate.selection); err != nil {
+	if err := service.persistSQLiteContext(candidate); err != nil {
 		return ProjectState{}, errors.Join(err, candidate.Close())
 	}
 	service.publishSQLiteSelection(candidate, id)
@@ -270,10 +266,14 @@ func (service *ProjectService) sqliteStateContextLocked(ctx context.Context) (Pr
 	if err := ctx.Err(); err != nil {
 		return ProjectState{}, err
 	}
+	profile, err := service.sqlite.profileInfo(ctx)
+	if err != nil {
+		return ProjectState{}, err
+	}
 	return ProjectState{ActiveProject: selection.Project, ActiveSU: selection.SU, ActiveHierarchy: selection.Hierarchy,
 		HierarchyFile: hierarchyFile, Projects: projects, SUs: sus, Hierarchies: hierarchies,
 		Diagnostics: diagnostics, ContextID: service.contextID, ProjectPath: selection.ProjectPath,
-		SUPath: selection.SUPath, HierarchyPath: selection.HierarchyPath}, nil
+		SUPath: selection.SUPath, HierarchyPath: selection.HierarchyPath, PlotProfile: profile}, nil
 }
 
 func (service *ProjectService) sqlitePlotsLocked(ctx context.Context, offset, limit int) (PlotPage, error) {

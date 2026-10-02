@@ -2,14 +2,14 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import { Events } from '@wailsio/runtime';
   import { ChevronLeft, ChevronRight, Database, FolderOpen, RefreshCw } from '@lucide/svelte';
-  import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary, type ProjectPlotProfileFilterRequest } from '../bindings/github.com/boostao/vpro-wails';
+  import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary, type ProjectPlotProfileFilterRequest, type PlotProfileSource, type PlotProfileSourceInfo } from '../bindings/github.com/boostao/vpro-wails';
   import { projectState } from './state';
   import FS882Form from './FS882Form.svelte';
   import Navigation from './Navigation.svelte';
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
-  import { validateProfileNavigation, profileNavigationPage, type ProfileNavigation } from './projectPlotProfileReview';
+  import { validateProfileNavigation, profileNavigationPage, validatePlotProfileSource, type ProfileNavigation } from './projectPlotProfileReview';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -44,6 +44,11 @@
   let externalProject = $state('');
   let externalPath = $state('');
   const externalProjectsEnabled = import.meta.env.VITE_EXTERNAL_PROJECTS !== 'false';
+  const profileSelectionEnabled = import.meta.env.VITE_PLOT_PROFILE_SELECTION === 'true';
+  let profilePath = $state('');
+  let profileSources = $state<PlotProfileSourceInfo[]>([]);
+  let profileSourceContext = $state('');
+  let profileSourceError = $state('');
   let startupFailure = $state<StartupState | null>(null);
   const closeState = $derived(view === 'fs882' ? editor?.getCloseState() : undefined);
 
@@ -279,6 +284,42 @@
       hierarchy: state.activeHierarchy, hierarchyPath: state.hierarchyPath ?? '' };
   }
 
+  async function inspectProfileSources() {
+    const contextId = $projectState?.contextId;
+    if (!contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+      profileSourceError = 'Wait for the current operation or decision before inspecting profile sources.'; return;
+    }
+    busy = true; profileSourceError = '';
+    try {
+      await tick();
+      const sources = await stateReads.track(ContextService.ListPlotProfileSources(contextId, profilePath));
+      if ($projectState?.contextId !== contextId) throw new Error('Profile inspection belongs to an old context; inspect again.');
+      if (!Array.isArray(sources)) throw new Error('Profile source inspection returned an incomplete collection.');
+      const next = sources.map(validatePlotProfileSource);
+      profileSources = next; profileSourceContext = contextId;
+      if (next.length === 0) profileSourceError = 'No original physical *_Profile tables were found; selection remains unchanged.';
+    } catch (cause) { profileSourceError = `Profile sources were not replaced: ${String(cause)}`; }
+    finally { busy = false; }
+  }
+
+  async function choosePlotProfile(source: PlotProfileSource, origin: string) {
+    const proposal = { name: source.name, path: source.path };
+    await requestTransition(async contextId => {
+      if (contextId !== origin) throw new Error('Profile source belongs to an old context; inspect again.');
+      busy = true;
+      try {
+        await tick();
+        const state = await ContextService.SelectPlotProfile(contextId, proposal);
+        request++; hierarchyRequest++; stateRequest++;
+        plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
+        projectState.set(state); profileNavigation = null; profileSources = []; profileSourceContext = '';
+        selected = null; page = null; editorPlotNumber = undefined; view = 'plots'; error = '';
+        await loadPlots(0);
+        if (error) error = `Profile selection committed, but refresh failed; do not replay selection: ${error}`;
+      } finally { busy = false; }
+    });
+  }
+
   async function switchContext(contextId: string, selection: ContextSelection, next: 'plots' | 'hierarchy') {
     request++;
     hierarchyRequest++;
@@ -293,6 +334,7 @@
       request++;
       projectState.set(state);
       profileNavigation = null;
+      profileSources = []; profileSourceContext = '';
       page = null;
       selected = null;
       hierarchyNodes = [];
@@ -430,6 +472,34 @@
     </aside>
 
     <main class="content">
+      {#if profileSelectionEnabled && $projectState?.contextId}
+        <details class="m-2 p-3 border rounded" aria-label="Stored plot profile selection">
+          <summary class="font-semibold cursor-pointer">Plot profile: {$projectState.plotProfile.source.name}</summary>
+          <p class="mt-2 text-sm">Select only disposable SQLite files during migration.</p>
+          <div class="mt-2 flex flex-wrap items-end gap-2">
+            <label for="plot-profile-path" class="flex flex-col gap-1 flex-1 min-w-0">SQLite profile database path (blank inspects project and core)
+              <input id="plot-profile-path" class="px-2 py-1 border rounded min-w-0" bind:value={profilePath} disabled={busy || transitionWorking || pendingTransition !== null} />
+            </label>
+            <button type="button" class="px-3 py-1 border rounded disabled:opacity-50" disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
+              onclick={() => void inspectProfileSources()}>Inspect stored profiles</button>
+            <button type="button" class="px-3 py-1 border rounded disabled:opacity-50" disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
+              onclick={() => void choosePlotProfile({name: 'None', path: ''}, $projectState?.contextId ?? '')}>Select no profile</button>
+          </div>
+          {#if profileSourceError}<p role="alert" class="mt-2 text-red-800">{profileSourceError}</p>{/if}
+          <ul class="mt-2 space-y-2">
+            {#each profileSources as info}
+              <li class="flex flex-wrap items-center gap-2">
+                <span>{info.table} - {info.source.path} ({info.writable ? 'project-owned editing' : 'read-only'})</span>
+                <button type="button" class="px-3 py-1 border rounded disabled:opacity-50"
+                  disabled={!info.available || profileSourceContext !== $projectState.contextId || busy || editorBusy || transitionWorking || pendingTransition !== null}
+                  onclick={() => void choosePlotProfile(info.source, profileSourceContext)}>Select {info.table}</button>
+                {#if !info.available}<span role="alert">{info.reason}</span>{/if}
+              </li>
+            {/each}
+          </ul>
+          <p class="mt-2 text-sm">Profile rules are independent of project/SU selection. External and other-table profiles are read-only.</p>
+        </details>
+      {/if}
       {#if profileNavigation}
         <section class="m-2 p-2 border rounded flex flex-wrap items-center gap-3" aria-label="Active profile navigation">
           <span>{profileNavigation.plots.length} of {profileNavigation.result.totalPlots} stored plots in reviewed profile navigation.</span>

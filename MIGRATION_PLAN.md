@@ -1419,7 +1419,7 @@ not persisted desktop job state or an editor catalogue.
   cancellation/retry, retained unsaved parent drafts and default-off delivery.
   Disposable canonical-sample bytes and the original active fixture are exactly
   restored; no production, source, support, audit or configuration writes occur.
-- **Next, not implied complete:** external/current profile selection and Save as SU require
+- **Next, not implied complete:** new profile tables, external rule writes and Save as SU require
   separately defined ownership/draft/rollback gates. Metadata-specific
   restoration and remaining active calculations/navigation remain in order6.
 
@@ -1459,7 +1459,7 @@ not persisted desktop job state or an editor catalogue.
   original fixture/support/configuration bytes are restored. Default delivery
   keeps review/run/editing disabled. Corrected harness assumptions are recorded
   honestly; no completed write was replayed.
-- **Remaining original lifecycle:** external/current profile selection and Save as SU need separate
+- **Remaining original lifecycle:** new profile tables, external rule writes and Save as SU need separate
   owned-context draft/rollback acceptance. Technical-history restoration,
   native Access execution parity and remaining source events are not implied.
 
@@ -1501,7 +1501,7 @@ not persisted desktop job state or an editor catalogue.
   draft independence. Four exact commits leave original rules/counts unchanged;
   every original fixture/support/configuration byte is restored. Default native
   delivery has all five profiling gates off and makes zero writes.
-- **Still unavailable:** external/current profile selection, Save as SU,
+- **Still unavailable:** new profile tables, external rule writes, Save as SU,
   technical-history restoration, native Access execution
   parity and remaining calculation events require their own bounded acceptance.
 
@@ -1564,6 +1564,68 @@ framework was added.
   on the accepted checkpoint without replaying the completed parent Save.
   Default17396 keeps all six profiling gates off, no persisted filter and zero
   writes. Every original fixture/support/configuration byte is restored.
-- **Remaining:** external/current profile-file/table creation/selection, Save
+- **Remaining:** profile-file/table creation and external rule writes, Save
   as SU, technical-history restoration and native Access execution parity
   remain unavailable. Empty/over200 behavior remains explicitly bounded.
+
+### Independent stored plot-profile selection
+
+Implemented and native-Wails-verified, separately default off with
+`VITE_PLOT_PROFILE_SELECTION=true`. This completes existing-table selection,
+not profile-file/table creation or external rule writes.
+
+- **Source:** `USysPlotProfiling.cmbProfileList_Change/GotFocus` lists attached
+  `*_Profile` tables independently of project selection and has an explicit
+  None branch. `clsVProReg.CurrVegProfile` stores the chosen prefix.
+  `V7mdlAttachVegProfile` and `V7mdlAttachOther.AttachProfile` link a selected
+  physical table from a selected database. The exported Sample/SampleVeg
+  schemas have the same nine original plot-profile fields.
+  `CreateProfileTable` instead copies `USysProfileTable` and contains a
+  mismatched legacy six-field population branch; do not blindly inherit it.
+  The R profiling module's transient criteria UI is not original-table parity.
+- **Owned context, no new storage framework:** inspect the selected project/core
+  or one explicit existing absolute SQLite file. Preserve literal table prefixes,
+  physical rows/extra columns and duplicate/NULL/empty `_table_metadata`
+  descriptions. Show incomplete physical schemas as unavailable with reasons;
+  never offer a view as writable storage or synthesize an editor catalogue.
+  Selection rebuilds the existing owned SQLite coordinator with a readonly
+  attachment, reuses an already-owned physical role when appropriate, and
+  rotates the immutable editor identity without switching project/SU/hierarchy.
+  The isolated runner reads the selected profile while Env/Veg/Lump remain
+  scoped to the selected project/SU; navigation membership remains separate
+  from physical writer authorization.
+- **Configuration adaptation:** reuse `Current.CurrVegProfile` and persist
+  an explicit `Current.ProfilePath` in the existing shared runtime YAML.
+  Absence of ProfilePath preserves the prior project-local desktop behavior
+  and the previously retained, unimplemented CurrVegProfile value; no automatic
+  activation or silent setting discard occurs. Explicit None stores an empty
+  path and survives restart without fallback. Profile and context preferences
+  publish in one atomic YAML update before replacing the old owner. Failed
+  compatibility/config publication leaves the old context/YAML open for retry.
+  Existing JSON migrations and unrelated YAML settings remain intact.
+- **Draft/write policy:** capture the literal proposal before the existing
+  Save/Discard/Cancel transition. Cancel/failure retains the editor/draft/filter;
+  successful publication invalidates old source lists and retires navigation.
+  Ancestor-disable controls during publication. Existing project-owned rule
+  editing is restored only for the canonical project table in its owned file.
+  Other-table/external edit/create/delete remain disabled in UI and rejected
+  independently by the backend. Ordinary parent/child writers do not follow
+  the readonly profile attachment. New/Attach/Unattach administration and
+  Save as SU remain separate workflows.
+- **Acceptance:** focused selection/lifecycle/navigation race12.197s and full
+  integration race493.932s pass;246 frontend tests/check0/0/both builds pass.
+  Tests cover literal quoted paths/table names, description distinctions,
+  unavailable physical schemas, cancellation, stale identities, failed YAML
+  publication/retry, reopening and parent writer ownership. Native fixed13440
+  proves Cancel/Discard/Save, readonly canonical52/11 execution/navigation,
+  one independently requested SiteSurveyor Save/audit, explicit local/None
+  selection, actually visible narrow labels and unrelated YAML preservation.
+  Rejected8900 captures the Svelte-proxy cloning defect before any stored write;
+  scalar capture fixes it. The no-write inspection continuation does not replay
+  navigation or completed writes. Default9008/restart8988 keep all seven gates
+  off, preserve existing Vegetation, persist None correctly and make zero writes.
+  Every original fixture/support/configuration byte is restored.
+- **Remaining:** new profile-file/table creation, external rule writer ownership,
+  attachment administration, Save as SU, history restoration and native Access
+  execution parity remain unavailable. Do not advertise the full profile
+  lifecycle as finished.

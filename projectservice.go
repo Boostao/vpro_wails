@@ -34,18 +34,19 @@ type ProjectInfo struct {
 }
 
 type ProjectState struct {
-	ActiveProject   string              `json:"activeProject"`
-	ActiveSU        string              `json:"activeSU"`
-	ActiveHierarchy string              `json:"activeHierarchy"`
-	HierarchyFile   string              `json:"hierarchyFile"`
-	Projects        []ProjectInfo       `json:"projects"`
-	SUs             []SUInfo            `json:"sus"`
-	Hierarchies     []HierarchyInfo     `json:"hierarchies"`
-	Diagnostics     []ProjectDiagnostic `json:"diagnostics"`
-	ContextID       string              `json:"contextId,omitempty"`
-	ProjectPath     string              `json:"projectPath,omitempty"`
-	SUPath          string              `json:"suPath,omitempty"`
-	HierarchyPath   string              `json:"hierarchyPath,omitempty"`
+	ActiveProject   string                `json:"activeProject"`
+	ActiveSU        string                `json:"activeSU"`
+	ActiveHierarchy string                `json:"activeHierarchy"`
+	HierarchyFile   string                `json:"hierarchyFile"`
+	Projects        []ProjectInfo         `json:"projects"`
+	SUs             []SUInfo              `json:"sus"`
+	Hierarchies     []HierarchyInfo       `json:"hierarchies"`
+	Diagnostics     []ProjectDiagnostic   `json:"diagnostics"`
+	ContextID       string                `json:"contextId,omitempty"`
+	ProjectPath     string                `json:"projectPath,omitempty"`
+	SUPath          string                `json:"suPath,omitempty"`
+	HierarchyPath   string                `json:"hierarchyPath,omitempty"`
+	PlotProfile     PlotProfileSourceInfo `json:"plotProfile"`
 }
 
 type SUInfo struct {

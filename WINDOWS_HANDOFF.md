@@ -41,7 +41,7 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `ab0546a1855bdb4fbe38d544be88b99c04e99463f876e388e63b2b9ebf969c45`.
+  `3b71cf1ab7db4028f6e91010d0d0052d5b622c5d86bdef83d339115e861faa6d`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -988,11 +988,44 @@ ab0546a1855bdb4fbe38d544be88b99c04e99463f876e388e63b2b9ebf969c45
 filter and zero writes. All owned apps exited and every original fixture/support/
 configuration byte is restored. Archives/project-profile-filter-checkpoint retains
 9a51, accepted core/final/default, exact assets/proofs/visuals/logs/source and manifest.
-Current/candidate are exact acceptedab05 default copies; never rebuild them in place.
+The filter predecessorab05 is retained; never rebuild protected binaries in place.
 Do not replay completed filter prepare/gates/save/scope/finish/final/default/seal.
-External/current profile-file/table creation/selection, Save as SU, restoration
-and native Access execution parity remain unavailable; implement the next bounded
-profile-selection contract without changing canonical database-family storage.
+Stored-profile selection is now independently default off with
+VITE_PLOT_PROFILE_SELECTION=true. Original project/core or explicit absolute
+SQLite paths are inspected readonly; incomplete physical schemas have visible
+reasons. The existing owned coordinator reads the selected literal *_Profile
+and descriptions, while Env/Veg/Lump and parent/child writers remain project/SU
+scoped. Only the canonical project-owned profile permits existing rule writes;
+other-table/external editing/creation/deletion remain rejected and disabled.
+Select uses the existing Save/Discard/Cancel publication, rotates the editor
+identity, preserves project/SU/hierarchy and retires stale lists/navigation.
+Shared YAML atomically stores Current.CurrVegProfile/ProfilePath. Missing
+ProfilePath preserves the previous inactive preference/project-local baseline;
+explicit None persists without silent fallback. Unrelated settings stay intact.
+Focused race12.197s/full race493.932s;246 frontend tests/check0/0/both builds pass.
+Actual bindings15 services/147 methods/79 models/two enums;57 bound editor ops.
+Rejected core b297fc83446602368892583814c65e325e8b37a12928475ac6dc996031ce223e
+/owned8900 records reactive structuredClone failure before any write; closed
+with exact prepared bytes intact. Scalar capture fixes the app bug.
+Accepted final bin/vpro-plot-profile-selection-final.exe
+1df07937e4bd4da732cf51091a3cfe8e37b6417b141d277443eb2bbe66924766
+/owned13440 proves Cancel/Discard/Save, readonly52/11 navigation, external rule
+controls absent, explicit canonical/None selection, narrow actual visibility
+and one independent SiteSurveyor Save/audit. A pre-Save inspection helper
+continuation retains the draft and never replays completed navigation/writes.
+Default bin/vpro-plot-profile-selection-default-final.exe
+3b71cf1ab7db4028f6e91010d0d0052d5b622c5d86bdef83d339115e861faa6d
+/owned9008/restart8988 keep all seven profiling gates off, Vegetation active,
+None persistent/no implicit fallback and zero writes. All apps exited normally;
+every original fixture/support/config byte is restored. The immutable
+archives/plot-profile-selection-checkpoint retains ab05, rejected/final/default
+bytes, assets, source, proofs and manifest; current/candidate use exact accepted
+3b71 default copies, not a rebuild. Never replay completed selection preparation,
+path-helper/fixed/inspection/native/default/restart/seal modes.
+Profile-file/table creation, external rule writer ownership, attachment
+administration, Save as SU, restoration and native Access parity remain open.
+Continue the next bounded source-first profile workflow without a new
+database-family/configuration framework or production/R/Access writes.
 Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind

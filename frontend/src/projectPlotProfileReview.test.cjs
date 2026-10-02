@@ -20,6 +20,7 @@ const cell = (storage,value) => ({storage,text:null,integer:null,real:null,blobH
 const columns = Array.from(profile.plotProfileFields,name=>({name,declaredType:'TEXT'}));
 const row = id => ({rowId:id,cells:columns.map(()=>cell('null'))});
 const review = () => ({project:'Sample',table:'Sample_Profile',rules:{columns,rows:[row('-1'),row('2')]},
+  source:{source:{name:'Sample',path:'C:\\fixture\\Sample.db'},table:'Sample_Profile',available:true,writable:true,reason:''},
   descriptions:{columns:[{name:'table_name',declaredType:'TEXT'},{name:'description',declaredType:'TEXT'}],
     rows:[{rowId:'1',cells:[cell('text','Sample_Profile'),cell('text','VP05-2')]}]}});
 
@@ -41,10 +42,10 @@ test('Readonly profile review preserves physical duplicate Orders and historical
   for(const record of source.rules.rows) record.cells.push(cell('blob',''));
   source.descriptions.rows.push({rowId:'2',cells:[cell('text','Sample_Profile'),cell('null')]},
     {rowId:'3',cells:[cell('text','Sample_Profile'),cell('text','')]});
-  assert.equal(JSON.stringify(profile.validateProjectPlotProfileReview(source)),JSON.stringify(source));
+  assert.deepEqual(JSON.parse(JSON.stringify(profile.validateProjectPlotProfileReview(source))),source);
   source.rules.rows=[];
   source.descriptions.rows=[];
-  assert.equal(JSON.stringify(profile.validateProjectPlotProfileReview(source)),JSON.stringify(source));
+  assert.deepEqual(JSON.parse(JSON.stringify(profile.validateProjectPlotProfileReview(source))),source);
 });
 
 test('Profile review rejects mismatched ownership, incomplete schemas, inconsistent rows and ambiguous physical identities',()=>{
@@ -58,6 +59,54 @@ test('Profile review rejects mismatched ownership, incomplete schemas, inconsist
     {...review(),descriptions:{columns:[],rows:[]}}
   ];
   for(const source of variants) assert.throws(()=>profile.validateProjectPlotProfileReview(source));
+});
+
+test('Explicit source identity supports other-table/external readonly rules without changing project identity',()=>{
+  const source=review();
+  source.table="Odd ' #_Profile";
+  source.source={source:{name:"Odd ' #",path:"C:\\external O'Brien\\profiles.db"},
+    table:source.table,available:true,writable:false,reason:''};
+  const validated=profile.validateProjectPlotProfileReview(source);
+  assert.equal(validated.project,'Sample');
+  assert.equal(validated.table,source.table);
+  assert.equal(validated.source.writable,false);
+  assert.equal(validated.source.source.path,source.source.source.path);
+  for(const alter of [
+    value=>value.source.source.name='Other', value=>delete value.source.source.path,
+    value=>value.source.available=false, value=>delete value.source.writable,
+    value=>value.source.source.path=null
+  ]) {
+    const bad=structuredClone(source); alter(bad);
+    assert.throws(()=>profile.validateProjectPlotProfileReview(bad));
+  }
+});
+
+test('Source availability, None and write authority require complete explicit metadata rather than fallback repair',()=>{
+  const none={source:{name:'None',path:''},table:'',available:false,writable:false,reason:'No profile selected'};
+  assert.equal(profile.validatePlotProfileSource(none).source.name,'None');
+  const unavailable={source:{name:'Old',path:'C:\\fixture\\old.db'},table:'Old_Profile',
+    available:false,writable:false,reason:'Original schema is unavailable'};
+  assert.equal(profile.validatePlotProfileSource(unavailable).available,false);
+  for(const bad of [
+    {...none,available:true}, {...none,source:{name:'None',path:'C:\\x.db'}},
+    {...unavailable,writable:true}, {...unavailable,reason:''}, {...unavailable,available:null}
+  ]) assert.throws(()=>profile.validatePlotProfileSource(bad));
+});
+
+test('Profile selection is independently default-off and uses shared draft publication with readonly editor gating',()=>{
+  const app=read('App.svelte'),form=read('FS882Form.svelte');
+  assert.match(app,/VITE_PLOT_PROFILE_SELECTION === 'true'/);
+  const start=app.indexOf('async function choosePlotProfile');
+  const action=app.slice(start,app.indexOf('\n  async function ',start+1));
+  assert.match(action,/const proposal = \{ name: source\.name, path: source\.path \}/);
+  assert.doesNotMatch(action,/structuredClone\(source\)/);
+  assert.match(action,/await requestTransition/);
+  assert.match(action,/await tick\(\);\s*const state = await ContextService.SelectPlotProfile/);
+  assert.match(action,/projectState\.set\(state\); profileNavigation = null; profileSources = \[\]/);
+  assert.match(action,/selection committed, but refresh failed; do not replay selection/);
+  assert.match(app,/profileSourceContext !== \$projectState\.contextId/);
+  assert.match(app,/sources\.map\(validatePlotProfileSource\)/);
+  assert.match(form,/allowEditing=\{profileEditingEnabled && \$projectState\?\.plotProfile\?\.writable === true\}/);
 });
 
 test('Project-local profile review and editing are separately gated, resident across tabs and preserve independent draft ownership',()=>{
@@ -261,7 +310,7 @@ test('Lifecycle refresh independently preserves ownership, exact surviving typed
     assert.match(form,/VITE_PROJECT_PLOT_PROFILE_CREATION === 'true'/);
     assert.match(form,/VITE_PROJECT_PLOT_PROFILE_DELETION === 'true'/);
     assert.match(form,/allowCreation=\{profileCreationEnabled\} allowDeletion=\{profileDeletionEnabled\}/);
-    assert.match(form,/profileEditingEnabled && \(metadataOpen \|\| codeCheckOpen \|\| personalDraft !== null/);
+    assert.match(form,/profileEditingEnabled && \$projectState\?\.plotProfile\?\.writable === true && \(metadataOpen \|\| codeCheckOpen \|\| personalDraft !== null/);
     assert.match(component,/blocked = \$derived\(dirty \|\| creation !== null \|\| deletion !== null \|\| committedFailure\)/);
     assert.match(component,/creation = null; deletion = null/);
     assert.match(component,/if \(!allowEditing \|\| !allowCreation/);

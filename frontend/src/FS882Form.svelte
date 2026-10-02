@@ -1762,7 +1762,7 @@
       {#if profileReviewEnabled}
         <button type="button" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
           disabled={busy || headerWorkflowBusy || profileReviewOpen || !capabilitiesReady ||
-            (profileEditingEnabled && (metadataOpen || codeCheckOpen || personalDraft !== null || deletionReview !== null || creationDraft !== null))}
+            (profileEditingEnabled && $projectState?.plotProfile?.writable === true && (metadataOpen || codeCheckOpen || personalDraft !== null || deletionReview !== null || creationDraft !== null))}
           onclick={() => { profileReviewOpen = true; }}>
           Review project profile (read-only)
         </button>
@@ -1883,7 +1883,7 @@
   <div class="fs882-body overflow-y-auto flex-1">
     {#if profileReviewOpen}
       <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
-        allowEditing={profileEditingEnabled} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}
+        allowEditing={profileEditingEnabled && $projectState?.plotProfile?.writable === true} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}
         allowFiltering={profileFilteringEnabled} onapply={async proposal => {
           if (!onProfileNavigation) throw new Error('Profile navigation publication is unavailable.');
           await onProfileNavigation(proposal, contextId);

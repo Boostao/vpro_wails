@@ -75,7 +75,7 @@ func (s *ContextService) runProjectPlotProfile(ctx context.Context, contextID st
 		if err := profileOwnedFiles(owner); err != nil {
 			return result, err
 		}
-		job, err := newSQLiteContext(ctx, owner.selection, plots.projects.supportPaths)
+		job, err := newSQLiteContext(ctx, owner.selection, plots.projects.supportPaths, owner.profile)
 		if err != nil {
 			return result, err
 		}
@@ -101,8 +101,11 @@ func (s *ContextService) runProjectPlotProfile(ctx context.Context, contextID st
 				result = ProjectPlotProfileResult{}
 			}
 		}()
-		table := job.selection.Project + "_Profile"
-		fresh, err := readSQLiteStorageRows(ctx, tx, "project", table, "", nil, "Order")
+		role, table, err := job.profileLocation()
+		if err != nil {
+			return result, err
+		}
+		fresh, err := readSQLiteStorageRows(ctx, tx, role, table, "", nil, "Order")
 		if err != nil {
 			return result, err
 		}

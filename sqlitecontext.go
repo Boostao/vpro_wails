@@ -22,6 +22,8 @@ type sqliteContext struct {
 	attachments    map[string]string
 	attachmentInfo map[string]os.FileInfo
 	descriptions   map[string][]map[string]any
+	profile        *PlotProfileSource
+	profileRole    string
 }
 
 func sqliteFileURI(path, mode string) string {
@@ -77,7 +79,10 @@ func existingDatabasePath(path string) (string, error) {
 	return absolute, nil
 }
 
-func newSQLiteContext(ctx context.Context, selection desktopSelection, support map[string]string) (_ *sqliteContext, resultErr error) {
+func newSQLiteContext(ctx context.Context, selection desktopSelection, support map[string]string, profile ...*PlotProfileSource) (_ *sqliteContext, resultErr error) {
+	if len(profile) > 1 {
+		return nil, errors.New("one explicit plot-profile source may be selected")
+	}
 	for _, name := range []string{selection.Project, selection.SU, selection.Hierarchy} {
 		if !projectNamePattern.MatchString(name) {
 			return nil, fmt.Errorf("invalid context family name %q", name)
@@ -177,6 +182,11 @@ func newSQLiteContext(ctx context.Context, selection desktopSelection, support m
 	}
 	if err := candidate.createViews(ctx); err != nil {
 		return nil, err
+	}
+	if len(profile) == 1 {
+		if err := candidate.attachProfile(ctx, profile[0]); err != nil {
+			return nil, err
+		}
 	}
 	return candidate, nil
 }

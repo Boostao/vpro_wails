@@ -389,6 +389,19 @@ export interface PlotPage {
     "plots": PlotSummary[] | null;
 }
 
+export interface PlotProfileSource {
+    "name": string;
+    "path": string;
+}
+
+export interface PlotProfileSourceInfo {
+    "source": PlotProfileSource;
+    "table": string;
+    "available": boolean;
+    "writable": boolean;
+    "reason": string;
+}
+
 export interface PlotQualityChoice {
     "rowId": string;
     "code": string | null;
@@ -549,6 +562,7 @@ export interface ProjectPlotProfileReview {
     "table": string;
     "rules": ProjectMetadataTable;
     "descriptions": ProjectMetadataTable;
+    "source": PlotProfileSourceInfo;
 }
 
 export interface ProjectPlotProfileRuleDraft {
@@ -583,6 +597,7 @@ export interface ProjectState {
     "projectPath"?: string;
     "suPath"?: string;
     "hierarchyPath"?: string;
+    "plotProfile": PlotProfileSourceInfo;
 }
 
 export interface RegionCodeChoice {

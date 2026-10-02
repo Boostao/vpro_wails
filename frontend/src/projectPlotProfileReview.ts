@@ -1,5 +1,5 @@
 import type { ProjectMetadataCell, ProjectMetadataColumn, ProjectMetadataTable, ProjectPlotProfileReview, ProjectPlotProfileResult,
-  ProjectPlotProfileFilterRequest, ProjectPlotProfileNavigation, PlotSummary, PlotPage } from '../bindings/github.com/boostao/vpro-wails';
+  ProjectPlotProfileFilterRequest, ProjectPlotProfileNavigation, PlotSummary, PlotPage, PlotProfileSourceInfo } from '../bindings/github.com/boostao/vpro-wails';
 import { metadataCellText } from './projectMetadataEditor';
 
 export const plotProfileFields = ['Order', 'Table', 'Field', 'Operator', 'Layer', 'Species', 'Criteria', 'Operation', 'PlotCount'] as const;
@@ -13,6 +13,7 @@ export interface ValidatedProjectPlotProfileReview {
   table: string;
   rules: ProfileReviewTable;
   descriptions: ProfileReviewTable;
+  source: PlotProfileSourceInfo;
 }
 
 export function profileCellLabel(cell: ProjectMetadataCell): string {
@@ -86,12 +87,25 @@ export function validateProfileRunResult(result: ProjectPlotProfileResult, revie
 }
 
 export function validateProjectPlotProfileReview(review: ProjectPlotProfileReview): ValidatedProjectPlotProfileReview {
-  if (!review.project || review.table !== `${review.project}_Profile`) {
-    throw new Error('Profile review must identify the selected project-owned source table.');
+  const source = validatePlotProfileSource(review.source);
+  if (!review.project || !source.available || review.table !== source.table) {
+    throw new Error('Profile review must identify the explicitly selected source table.');
   }
   return { project: review.project, table: review.table,
     rules: validateTable(review.rules, plotProfileFields),
-    descriptions: validateTable(review.descriptions, ['table_name', 'description']) };
+    descriptions: validateTable(review.descriptions, ['table_name', 'description']), source };
+}
+
+export function validatePlotProfileSource(info: PlotProfileSourceInfo): PlotProfileSourceInfo {
+  if (!info || !info.source || typeof info.source.name !== 'string' || !info.source.name ||
+      typeof info.source.path !== 'string' || typeof info.table !== 'string' ||
+      typeof info.available !== 'boolean' || typeof info.writable !== 'boolean' || typeof info.reason !== 'string' ||
+      (info.source.name === 'None' ? info.source.path !== '' || info.table !== '' || info.available || info.writable :
+        !info.source.path || info.table !== `${info.source.name}_Profile` || info.writable && !info.available) ||
+      !info.available && info.source.name !== 'None' && !info.reason) {
+    throw new Error('Profile source requires an exact physical table/path and explicit availability/write authority.');
+  }
+  return info;
 }
 
 export interface ProfileNavigation {
@@ -110,7 +124,7 @@ export function validateProfileNavigation(navigation: ProjectPlotProfileNavigati
       contextId: string): ProfileNavigation {
     const source = { project: proposal.preview.project, table: proposal.preview.table,
       rules: validateTable(proposal.input.originalRules, plotProfileFields) };
-    if (!contextId || navigation.contextId !== contextId || source.table !== `${source.project}_Profile`) {
+    if (!contextId || navigation.contextId !== contextId || !source.table.endsWith('_Profile') || source.table === '_Profile') {
       throw new Error('Profile navigation belongs to another context/project; current filter remains unchanged.');
     }
     const expected = validateProfileRunResult(proposal.preview, source);

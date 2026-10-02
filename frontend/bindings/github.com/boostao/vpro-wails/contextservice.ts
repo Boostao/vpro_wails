@@ -89,6 +89,10 @@ export function ListOtherRecords(contextID: string, plot: string): $CancellableP
     return $Call.ByID(989824098, contextID, plot);
 }
 
+export function ListPlotProfileSources(contextID: string, path: string): $CancellablePromise<$models.PlotProfileSourceInfo[] | null> {
+    return $Call.ByID(4245035728, contextID, path);
+}
+
 export function ListProjectMetadataFields(contextID: string): $CancellablePromise<$models.ProjectMetadataEditorField[] | null> {
     return $Call.ByID(4089336027, contextID);
 }
@@ -183,6 +187,10 @@ export function SaveSpeciesCodeCheck(contextID: string, updates: $models.Species
 
 export function SaveVegRecord(contextID: string, record: $models.VegRecord): $CancellablePromise<void> {
     return $Call.ByID(2006819882, contextID, record);
+}
+
+export function SelectPlotProfile(expectedID: string, requested: $models.PlotProfileSource): $CancellablePromise<$models.ProjectState> {
+    return $Call.ByID(641014026, expectedID, requested);
 }
 
 export function SetAuditRestoreSelection(contextID: string, plot: string, rowIDs: string[] | null): $CancellablePromise<void> {

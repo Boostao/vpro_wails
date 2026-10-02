@@ -95,6 +95,16 @@ func (c *sqliteContext) saveProfileRuleDrafts(ctx context.Context, original Proj
 func (c *sqliteContext) mutateProfileRules(ctx context.Context, original ProjectMetadataTable, user string,
 	mutation func(*sql.Tx, string, ProjectMetadataTable) (*ProjectMetadataTable, error),
 	finalCheck func(*sql.Tx) error) error {
+	info, err := c.profileInfo(ctx)
+	if err != nil {
+		return err
+	}
+	if !info.Available {
+		return errors.New(info.Reason)
+	}
+	if !info.Writable {
+		return errors.New("selected profile is read-only; external/other-table rule writes require separately verified ownership")
+	}
 	if _, _, err := prepareProfileRuleDrafts(original, nil); err != nil {
 		return err
 	}
@@ -102,7 +112,7 @@ func (c *sqliteContext) mutateProfileRules(ctx context.Context, original Project
 		return err
 	}
 	committed := false
-	err := c.withMetadataWriter(ctx, func(conn *sql.Conn) (resultErr error) {
+	err = c.withMetadataWriter(ctx, func(conn *sql.Conn) (resultErr error) {
 		tx, err := conn.BeginTx(ctx, nil)
 		if err != nil {
 			return err

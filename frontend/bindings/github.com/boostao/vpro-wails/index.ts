@@ -64,6 +64,8 @@ export type {
     ParentCodeChoice,
     PersonalSpeciesDefinitionRequest,
     PlotPage,
+    PlotProfileSource,
+    PlotProfileSourceInfo,
     PlotQualityChoice,
     PlotSummary,
     ProjectDiagnostic,

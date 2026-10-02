@@ -218,7 +218,7 @@
 
 <section class="m-3 p-3 border border-stone-300 rounded-lg bg-stone-50" aria-label="Project-local plot profile review">
   <div class="flex flex-wrap gap-2 items-center justify-between">
-    <h2 class="font-semibold text-stone-800">Project-local plot profile {allowEditing ? 'rules' : 'review (read-only)'}</h2>
+    <h2 class="font-semibold text-stone-800">Selected plot profile {allowEditing ? 'rules' : 'review (read-only)'}</h2>
     <div class="flex flex-wrap gap-2">
       <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50" disabled={busy || dirty || creation !== null || deletion !== null} onclick={() => void reload()}>Reload profile review</button>
       {#if allowRun}
@@ -350,5 +350,5 @@
       </div>
     {/each}
   {/if}
-  <p class="mt-3 text-sm text-stone-600">This uses only stored project-local rules and data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other profile databases, restoration and Save as SU remain unavailable. Rule creation/deletion and navigation filtering require their separate opt-ins. No stored PlotCount, Access registry preference or shipped scratch table is changed.</p>
+  <p class="mt-3 text-sm text-stone-600">This uses only explicitly selected stored rules and project data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other-table/external profile writes, restoration and Save as SU remain unavailable. Profile selection, rule creation/deletion and navigation filtering require their separate opt-ins. No stored PlotCount or shipped scratch table is changed.</p>
 </section>
