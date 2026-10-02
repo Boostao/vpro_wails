@@ -41,10 +41,11 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `8e63916d0affcd4e84e5adb235ac4e6f6fd2310d7f695c753d6bdeb1750bc87f`.
+  `50866a498e2930b28ae2dbf4aff9a6c761c924d4a7c7e5dd9b0deafa3d96add9`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
-  creation-decision default delivery is promoted without rebuilding. Previous personal
+  new-row personal-default delivery is promoted without rebuilding. Previous8e63916d...
+  and accepted core/default hashes are archived. Previous personal
   defaultbb3652f3... is archived with exact accepted core/default hashes. Previous creation
   defaulta7dd1be8..., deletiond8d51c7f... and accepted cores/guards are archived.
   Soil is default-on; `VITE_SOIL_CHILD_EDITING=false` is the read-only opt-out.
@@ -578,7 +579,7 @@ Current personal workflow: personalspecies.go/personalspecies_test.go and
 sqlitecontext.go attachment file identities. Scoped single-VUser
 definition/CreateRecord audit transaction preserves original tables/defaults/
 metadata; VLists is readonly, shared-role user writes reject, and project Save is
-separate. Existing-row unknown-code metadata panel is opt-in only with
+separate. Existing-row/new-row unknown-code metadata panel is opt-in only with
 VITE_PERSONAL_SPECIES_EDITING=true. Explicit NULL/name drafts retain raw errors
 through remounts and block plot Save/Lock/close. User Save reloads independent
 metadata then stages a separate existing-personal decision; plot Undo retains
@@ -588,25 +589,33 @@ explicit old-code replace/keep and existing-personal decisions. Reviewed origina
 form/raw entry is persistent; retyping Species invalidates review/decision, while
 numeric edits/remounts/failed Save retain it. New-row Save never writes VUser.
 Nullable-Codetype personal definitions remain reusable without invented dropdown
-membership. Unknown-code metadata creation from a new-row proposal stays disabled.
-Focused coupled Go2.888s/full integration race475.761s;197 frontend tests/check0/0/
+membership. New-row personal metadata uses a unique proposal editor key, not a
+physical row ID. Original form/raw context is matched before/after separate
+VUser Save; proposal mutation/cancellation waits for metadata Save/Cancel. First
+Undo retains the proposal; second cancels it. Explicitly saved definitions survive
+proposal Undo and later project-audit failures. Existing-row identity stays intact.
+Focused coupled Go2.511s/full integration race488.508s;200 frontend tests/check0/0/
 opt-in+default builds pass; bindings15/129/51,41 scoped operations.
-Core8e2dde81... verifies seven native cases and IDs6/7/8, exactly seven project
-audits, zero user audits; review/Save/Lock/actual-close guards, Cancel, scoped
-invalid/stale requests and audit rollback/retained retry pass. All15 project
-tables/60 prior audits, old rows/reservations, support/config and schema preserved.
-Fixture now67 project audits/3 user audits. ZPNAT01 remains assigned only to row0;
-ZPNAT02 is reused only by new ID8. Temporary trigger removed; no source writes.
-Default8e63916d... proves25 enabled numeric controls/Species/Collected, readonly
+Coreccb31517... verifies eight native cases, ZPNROW01/one VUser audit and separate
+ID9/two project audits. Raw256/remount/Save/Lock/actual-close/two-stage Undo,
+user/project audit rollback/retry and existing-row regression pass. All15 project
+tables/67 prior audits, VUser tables/three old audits, old rows/reservations,
+support/config and schema preserved. Fixture now69 project audits/four user audits.
+ZPNAT01 remains row0; ZPNAT02 is ID8; ZPNROW01 is ID9. Triggers removed.
+Default50866a49... proves25 enabled numeric controls/Species/Collected, readonly
 saved-personal lookup, all unfinished creation controls disabled and every fixture
 byte unchanged. Exact accepted default is current/candidate; archives/
-creation-decisions-checkpoint seals core/default/previous bb3652f3 with hashes.
-Personal proofs and archives/personal-checkpoint remain unchanged.
-Core5568/default9904 exited; inspector9392 closed. No native/race command remains.
+creation-personal-checkpoint seals core/default/previous8e63916d with hashes.
+Older personal/creation-decision proofs and archives remain unchanged.
+Core8104/default14528 exited; inspector9392 closed. No native/race command remains.
 Publication includes application source only; private evidence/binaries/dist are
-ignored. Use git HEAD/upstream for the current commit; personal predecessorb8e8499.
-Never replay creation-decisions.py completed modes or prior personal/creation proofs.
-Next: active metadata/calculations and separately bounded new-row metadata entry.
+ignored. Use git HEAD/upstream for the current commit; predecessoreaf71a6.
+Never replay creation-personal.py completed modes or prior personal/creation proofs.
+Next: active warning/focus UX and separately scoped parent code-check/metadata/profiling.
+UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
+unconditional Exit Sub. Source nonblocking NULL-cover messages must not become
+rejects/deletions. CheckSpeciesCodes includes unsafe blanket user cleanup, not a
+desktop requirement; do not blindly translate it.
 Source effective properties/full event parity remain unknown; no further
 native Access property probe is authorized by old evidence.
 The original42-field checklist and readonly

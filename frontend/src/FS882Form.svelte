@@ -42,7 +42,7 @@
   import { ReadRequests } from './readRequests';
   import { validateDeletionReview } from './vegetationDeletionEditor';
   import { beginVegetationCreation, stageVegetationCreation, stageVegetationCreationSpecies, chooseVegetationCreationSpecies, vegetationCreationSpeciesError, vegetationCreationErrors, vegetationCreationRequest, type VegetationCreationDraft } from './vegetationCreationEditor';
-  import { beginPersonalSpecies, matchesPersonalSpeciesSource, stagePersonalText, personalSpeciesErrors, personalSpeciesRequest, personalSpeciesMatches, personalSpeciesCommittedError, personalLifeforms, personalTextFields, type PersonalSpeciesDraft } from './personalSpeciesEditor';
+  import { beginPersonalSpecies, beginCreationPersonalSpecies, matchesPersonalSpeciesSource, matchesCreationPersonalSpeciesSource, stagePersonalText, personalSpeciesErrors, personalSpeciesRequest, personalSpeciesMatches, personalSpeciesCommittedError, personalLifeforms, personalTextFields, type PersonalSpeciesDraft } from './personalSpeciesEditor';
 
   let { plotNumber, contextId, onSaved, onClosed, onBusyChange }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void } = $props();
   const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
@@ -744,13 +744,19 @@
     if (busy || headerWorkflowBusy) { error = 'Wait for the personal definition operation before cancelling entry.'; return; }
     personalDraft = null;
     error = null;
-    successMsg = 'Personal definition entry cancelled without writes. The original plot species draft is retained.';
+    successMsg = 'Personal definition entry cancelled without writes. The original plot species draft or new-row proposal is retained.';
+  }
+
+  function personalSourceMatches(proposed: PersonalSpeciesDraft): boolean {
+    return proposed.source.kind === 'existing'
+      ? matchesPersonalSpeciesSource(proposed, speciesDrafts[String(proposed.source.id)])
+      : creationEnabled && matchesCreationPersonalSpeciesSource(proposed, creationDraft);
   }
 
   async function savePersonalSpecies() {
     const proposed = personalDraft;
     if (!personalSpeciesEnabled || !proposed || busy || headerWorkflowBusy || dirty || draft.locked || !capabilitiesReady ||
-        !matchesPersonalSpeciesSource(proposed, speciesDrafts[String(proposed.id)])) {
+        !personalSourceMatches(proposed)) {
       error = 'An available unlocked personal definition and its unchanged source species draft are required.';
       return;
     }
@@ -772,14 +778,20 @@
       if (users === null || aliases === null || users.filter(option => personalSpeciesMatches(option, request)).length !== 1) {
         throw new Error('Saved personal definition differs from independently reloaded metadata.');
       }
-      if (!matchesPersonalSpeciesSource(proposed, speciesDrafts[String(proposed.id)])) throw new Error('The original plot species draft changed during personal definition save.');
-      speciesDrafts = chooseSpecies(speciesDrafts, proposed.id,
-        { form: proposed.form, entered: proposed.entered, users, aliases }, 'user', definition.code ?? undefined);
-      const choices = { ...speciesChoices };
-      delete choices[String(proposed.id)];
-      speciesChoices = choices;
+      if (!personalSourceMatches(proposed)) throw new Error('The original plot species draft or new-row proposal changed during personal definition save.');
+      const reloaded = { form: proposed.form, entered: proposed.entered, users, aliases };
+      if (proposed.source.kind === 'existing') {
+        speciesDrafts = chooseSpecies(speciesDrafts, proposed.source.id, reloaded, 'user', definition.code ?? undefined);
+        const choices = { ...speciesChoices };
+        delete choices[String(proposed.source.id)];
+        speciesChoices = choices;
+      } else {
+        if (!creationDraft) throw new Error('The original new-row proposal is unavailable after definition save.');
+        creationDraft = chooseVegetationCreationSpecies(creationDraft, reloaded, 'user', definition.code ?? undefined);
+        creationChoices = null;
+      }
       childRevision++;
-      successMsg = `Personal definition ${definition.code} saved in the user database. The plot assignment is still unsaved; Save species drafts commits it. Undo never removes this explicitly saved definition.`;
+      successMsg = `Personal definition ${definition.code} saved in the user database. The plot assignment is still unsaved; ${proposed.source.kind === 'existing' ? 'Save species drafts' : 'Save new vegetation record'} commits it. Undo never removes this explicitly saved definition.`;
     } catch (cause) {
       committed = committed || personalSpeciesCommittedError(cause);
       if (committed) { personalDraft = null; capabilitiesReady = false; }
@@ -889,7 +901,7 @@
   }
 
   function stageCreationCell(column: string, raw: string) {
-    if (!creationDraft || busy || headerWorkflowBusy) { error = 'An available creation draft is required before editing.'; return; }
+    if (!creationDraft || personalDraft !== null || busy || headerWorkflowBusy) { error = 'An available creation draft without personal metadata entry is required before editing.'; return; }
     try {
       creationDraft = stageVegetationCreation(creationDraft, column, raw);
       error = null;
@@ -900,7 +912,7 @@
   }
 
   function stageCreationSpecies(raw: string) {
-    if (!creationDraft || busy || headerWorkflowBusy) { error = 'An available creation draft is required before editing species.'; return; }
+    if (!creationDraft || personalDraft !== null || busy || headerWorkflowBusy) { error = 'An available creation draft without personal metadata entry is required before editing species.'; return; }
     creationDraft = stageVegetationCreationSpecies(creationDraft, raw);
     creationChoices = null;
     error = null;
@@ -909,7 +921,7 @@
 
   async function reviewCreationSpeciesChoices() {
     const proposed = creationDraft;
-    if (!creationEnabled || !proposed || proposed.decision || busy || headerWorkflowBusy || draft.locked ||
+    if (!creationEnabled || !proposed || proposed.decision || personalDraft !== null || busy || headerWorkflowBusy || draft.locked ||
         !capabilitiesReady || !speciesReferenceReady || speciesReferenceBusy || !creationSpeciesInvalid) {
       error = 'An available unresolved creation species entry is required before reviewing choices.';
       return;
@@ -940,7 +952,7 @@
 
   function chooseCreationSpecies(kind: SpeciesDecisionKind, selected?: string) {
     try {
-      if (!creationEnabled || !creationDraft || !creationChoices || busy || headerWorkflowBusy || draft.locked || !capabilitiesReady) {
+      if (!creationEnabled || !creationDraft || !creationChoices || personalDraft !== null || busy || headerWorkflowBusy || draft.locked || !capabilitiesReady) {
         throw new Error('Review the available unlocked creation entry before selecting a decision.');
       }
       creationDraft = chooseVegetationCreationSpecies(creationDraft, creationChoices, kind, selected);
@@ -952,7 +964,22 @@
     }
   }
 
+  function startCreationPersonalSpecies() {
+    try {
+      if (!creationEnabled || !personalSpeciesEnabled || !creationDraft || !creationChoices || !creationSpeciesInvalid ||
+          personalDraft !== null || busy || headerWorkflowBusy || draft.locked || !capabilitiesReady || !speciesReferenceReady || speciesReferenceBusy) {
+        throw new Error('Review the available unlocked unknown creation code before creating its personal definition.');
+      }
+      personalDraft = beginCreationPersonalSpecies(creationDraft, creationChoices);
+      error = null;
+      successMsg = null;
+    } catch (cause) {
+      error = `Creation personal definition could not start: ${String(cause)}`;
+    }
+  }
+
   async function cancelVegetationCreation() {
+    if (personalDraft !== null) { error = 'Cancel personal definition entry before cancelling the new-row proposal.'; return; }
     if (busy || headerWorkflowBusy) { error = 'Wait for the current operation before cancelling creation.'; return; }
     creationDraft = null;
     creationChoices = null;
@@ -961,7 +988,9 @@
     busy = true;
     try {
       await loadChildData(draft.plotNumber);
-      successMsg = 'Vegetation creation cancelled. No stored data or history changed; current rows reloaded.';
+      successMsg = savedPersonalCodes.length
+        ? 'Vegetation creation cancelled. No project data or history changed; explicitly saved personal definitions remain available.'
+        : 'Vegetation creation cancelled. No stored data or history changed; current rows reloaded.';
     } catch (cause) {
       capabilitiesReady = false;
       error = `Creation cancelled, but rows could not be reloaded. Reopen the plot: ${String(cause)}`;
@@ -972,7 +1001,7 @@
 
   async function saveVegetationCreation() {
     const proposed = creationDraft;
-    if (!creationEnabled || !proposed || busy || headerWorkflowBusy || dirty || draft.locked || !capabilitiesReady || original === null || !speciesReferenceReady || speciesReferenceBusy) {
+    if (!creationEnabled || !proposed || personalDraft !== null || busy || headerWorkflowBusy || dirty || draft.locked || !capabilitiesReady || original === null || !speciesReferenceReady || speciesReferenceBusy) {
       error = 'An unlocked available creation draft and canonical references are required before saving.';
       return;
     }
@@ -1820,9 +1849,10 @@
       </div>
     {/if}
     {#if personalDraft}
-      <section class="personal-species-draft mb-3 rounded border border-amber-300 bg-amber-50 p-3 text-xs" aria-label="New personal species definition" data-personal-row-id={personalDraft.id}>
+      <section class="personal-species-draft mb-3 rounded border border-amber-300 bg-amber-50 p-3 text-xs" aria-label="New personal species definition"
+        data-personal-row-id={personalDraft.source.kind === 'existing' ? personalDraft.source.id : undefined} data-personal-editor={personalDraft.source.kind}>
         <h3 class="mb-2 font-semibold">New personal species definition - not yet saved</h3>
-        <p class="mb-2" role="status">Saving here creates a reusable user-database definition and audit only. The plot remains an unsaved species draft. A later plot Undo does not delete a saved definition.</p>
+        <p class="mb-2" role="status">Saving here creates a reusable user-database definition and audit only. The plot assignment or new-row proposal remains unsaved. A later plot Undo does not delete a saved definition.</p>
         {#each personalInvalid as message}<p class="mb-2 text-red-700" role="alert">{message}</p>{/each}
         <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label class="flex flex-col gap-1" for="personal-code">Code
@@ -1901,10 +1931,11 @@
     {#if creationDraft}
       <section class="vegetation-creation-draft mb-3 rounded border border-amber-300 bg-amber-50 p-3 text-xs" aria-label="New vegetation record">
         <h3 class="mb-2 font-semibold">New vegetation record - {creationDraft.form} - not yet saved</h3>
+        {#if savedPersonalCodes.length}<p class="mb-2" role="status">Saved personal definitions: {savedPersonalCodes.join(', ')}. Cancelling this new-row proposal never removes these user-database records.</p>{/if}
         {#if creationInvalid.length}<p class="mb-2 text-red-700" role="alert">{creationInvalid[0]}</p>{/if}
         <label class="mb-2 flex flex-col gap-1" for="creation-species">Species code
           <input id="creation-species" class="rounded border bg-white px-2 py-2" type="text" value={creationDraft.species} list="creation-species-list"
-            disabled={busy || headerWorkflowBusy} aria-invalid={creationSpeciesInvalid !== null}
+            disabled={busy || headerWorkflowBusy || personalDraft !== null} aria-invalid={creationSpeciesInvalid !== null}
             oninput={event => stageCreationSpecies(event.currentTarget.value)} />
         </label>
         <datalist id="creation-species-list">
@@ -1916,7 +1947,7 @@
           <p class="mb-2" role="status">Explicit {creationDraft.decision.kind} decision for "{creationDraft.decision.entered}" stages "{creationDraft.species}". No new row or personal definition is saved yet.</p>
         {:else if creationSpeciesInvalid}
           <section class="mb-3 border-t border-amber-300 pt-2" aria-label="New vegetation species choices">
-            <button type="button" class="rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || !speciesReferenceReady || speciesReferenceBusy || speciesEventError(creationDraft.species) !== null}
+            <button type="button" class="rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || personalDraft !== null || !speciesReferenceReady || speciesReferenceBusy || speciesEventError(creationDraft.species) !== null}
               title={speciesEventError(creationDraft.species) ?? 'Review source definitions without saving'}
               onclick={() => void reviewCreationSpeciesChoices()}>Review new vegetation species code</button>
             {#if speciesDecisionBusy}<p role="status">Looking up source species choices...</p>{/if}
@@ -1925,24 +1956,30 @@
               {#each creationChoices.aliases as option, index (index)}
                 <div class="mt-1">
                   <span>{option.code ?? 'NULL'} | {option.scientificName ?? 'NULL'} | {option.englishName ?? 'NULL'} | Lifeform {option.lifeform ?? 'NULL'} | {option.codeType ?? 'NULL'}</span>
-                  <button type="button" class="ml-2 rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || speciesEventError(option.code) !== null}
+                  <button type="button" class="ml-2 rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || personalDraft !== null || speciesEventError(option.code) !== null}
                     title={speciesEventError(option.code) ?? 'Stage explicit replacement; Save remains separate'}
                     onclick={() => option.code !== null && chooseCreationSpecies('replace', option.code)}>Use replacement {option.code ?? 'NULL'} for new row</button>
                 </div>
               {/each}
               {#if hasAlias}
-                <button type="button" class="mt-1 rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy}
+                <button type="button" class="mt-1 rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || personalDraft !== null}
                   onclick={() => chooseCreationSpecies('keep')}>Keep entered code for new row</button>
               {:else}
                 {#each creationChoices.users as option, index (index)}
                   <div class="mt-1">
                     <span>{option.code ?? 'NULL'} | {option.scientificName ?? 'NULL'} | {option.englishName ?? 'NULL'} | Lifeform {option.lifeform ?? 'NULL'} | {option.codeType ?? 'NULL'}</span>
-                    <button type="button" class="ml-2 rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || speciesEventError(option.code) !== null}
+                    <button type="button" class="ml-2 rounded border bg-white px-2 py-1" disabled={busy || headerWorkflowBusy || personalDraft !== null || speciesEventError(option.code) !== null}
                       title={speciesEventError(option.code) ?? 'Stage an existing personal code; no user-database write'}
                       onclick={() => option.code !== null && chooseCreationSpecies('user', option.code)}>Use personal code {option.code ?? 'NULL'} for new row</button>
                   </div>
                 {:else}
-                  <p role="alert">No source replacement or existing personal code was found. Creating personal metadata from a new-row proposal remains unavailable; correct or Cancel this proposal. Personal definitions saved separately remain reusable.</p>
+                  {#if personalSpeciesEnabled}
+                    <button type="button" class="mt-2 rounded border bg-white px-2 py-1" data-personal-create-source={creationDraft.form}
+                      disabled={busy || headerWorkflowBusy || personalDraft !== null || speciesEventError(creationDraft.species) !== null}
+                      onclick={startCreationPersonalSpecies}>Create personal definition for new row</button>
+                  {:else}
+                    <p role="alert">No source replacement or existing personal code was found. Personal-list creation is unavailable; correct or Cancel this proposal. Personal definitions saved separately remain reusable.</p>
+                  {/if}
                 {/each}
               {/if}
             {/if}
@@ -1953,14 +1990,14 @@
             {@const control = paperChild(creationDraft.form).controls.find(control => control.column?.toLowerCase() === column.toLowerCase())}
             <label class="flex flex-col gap-1" for={`creation-${column}`}>{control ? controlLabel(control) : column}
               <input id={`creation-${column}`} class="rounded border bg-white px-2 py-2" type="text" inputmode="decimal" value={cell?.raw ?? ''}
-                disabled={busy || headerWorkflowBusy} aria-invalid={cell?.error != null} title={cell?.error ?? 'Blank is NULL; no zero cover is inferred.'}
+                disabled={busy || headerWorkflowBusy || personalDraft !== null} aria-invalid={cell?.error != null} title={cell?.error ?? 'Blank is NULL; no zero cover is inferred.'}
                 oninput={event => stageCreationCell(column, event.currentTarget.value)} />
             </label>
           {/each}
         </div>
         <div class="mt-3 flex gap-2">
-          <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy || creationInvalid.length > 0 || !speciesReferenceReady || speciesReferenceBusy} onclick={() => void saveVegetationCreation()}>Save new vegetation record</button>
-          <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy} onclick={() => void cancelVegetationCreation()}>Cancel vegetation creation</button>
+          <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy || personalDraft !== null || creationInvalid.length > 0 || !speciesReferenceReady || speciesReferenceBusy} onclick={() => void saveVegetationCreation()}>Save new vegetation record</button>
+          <button type="button" class="rounded border bg-white px-2 py-1 disabled:opacity-50" disabled={busy || headerWorkflowBusy || personalDraft !== null} onclick={() => void cancelVegetationCreation()}>Cancel vegetation creation</button>
         </div>
         <p class="mt-2">Select an exact canonical code or explicitly review replacement, keep or existing personal-code decisions. Enter source numeric values explicitly. Blank fields remain NULL; Layer, covers, totals and personal metadata are not inferred. Identity is allocated only by the transactional writer; saving a new row never writes the user database.</p>
       </section>

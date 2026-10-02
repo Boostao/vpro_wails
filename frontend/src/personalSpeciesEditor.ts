@@ -1,5 +1,6 @@
 import { wellFormedUTF16 } from './qualityEditor';
 import { speciesEventError, type SpeciesCell, type SpeciesChoices } from './vegetationSpeciesEditor';
+import type { VegetationCreationDraft } from './vegetationCreationEditor';
 import type { PersonalSpeciesDefinitionRequest, VegetationSpeciesOption } from '../bindings/github.com/boostao/vpro-wails';
 
 export const personalLifeforms = [
@@ -15,29 +16,44 @@ export const personalTextFields = [
 
 interface PersonalTextCell { raw: string; isNull: boolean; error: string | null }
 export interface PersonalSpeciesDraft {
-  id: number;
+  source: { kind: 'existing'; id: number; expected: string } | { kind: 'creation'; editorKey: string };
   form: string;
   entered: string;
-  expected: string;
   scientificName: PersonalTextCell;
   englishName: PersonalTextCell;
   lifeform: number | null;
 }
 
 export function beginPersonalSpecies(id: number, cell: SpeciesCell, choices: SpeciesChoices): PersonalSpeciesDraft {
-  if (!Number.isInteger(id) || id < -2147483648 || id > 2147483647 || !cell.error || cell.decision ||
-      cell.form !== choices.form || cell.raw !== choices.entered || speciesEventError(cell.raw) ||
+  if (!Number.isInteger(id) || id < -2147483648 || id > 2147483647 || !cell.error || cell.decision) {
+    throw new Error('Review an unknown existing-row species entry before creating metadata.');
+  }
+  return beginPersonalMetadata({ kind: 'existing', id, expected: cell.expected }, cell.form, cell.raw, choices);
+}
+
+export function beginCreationPersonalSpecies(draft: VegetationCreationDraft, choices: SpeciesChoices): PersonalSpeciesDraft {
+  if (!draft.editorKey || draft.decision) throw new Error('Review the unresolved new-row species entry before creating metadata.');
+  return beginPersonalMetadata({ kind: 'creation', editorKey: draft.editorKey }, draft.form, draft.species, choices);
+}
+
+function beginPersonalMetadata(source: PersonalSpeciesDraft['source'], form: string, entered: string, choices: SpeciesChoices): PersonalSpeciesDraft {
+  if (form !== choices.form || entered !== choices.entered || speciesEventError(entered) ||
       choices.aliases.some(option => option.code !== null) || choices.users.some(option => option.code !== null)) {
     throw new Error('Review an unknown source code with no usable alias or existing personal definition before creating metadata.');
   }
-  return { id, form: cell.form, entered: cell.raw, expected: cell.expected,
+  return { source, form, entered,
     scientificName: { raw: '', isNull: true, error: null },
     englishName: { raw: '', isNull: true, error: null }, lifeform: null };
 }
 
 export function matchesPersonalSpeciesSource(draft: PersonalSpeciesDraft, cell: SpeciesCell | undefined): boolean {
-  return cell !== undefined && cell.form === draft.form && cell.expected === draft.expected &&
+  return draft.source.kind === 'existing' && cell !== undefined && cell.form === draft.form && cell.expected === draft.source.expected &&
     cell.raw === draft.entered && cell.decision === undefined;
+}
+
+export function matchesCreationPersonalSpeciesSource(draft: PersonalSpeciesDraft, proposal: VegetationCreationDraft | null): boolean {
+  return draft.source.kind === 'creation' && proposal !== null && proposal.editorKey === draft.source.editorKey &&
+    proposal.form === draft.form && proposal.species === draft.entered && proposal.decision === undefined;
 }
 
 export function stagePersonalText(draft: PersonalSpeciesDraft, field: 'scientificName' | 'englishName', raw: string, isNull: boolean): PersonalSpeciesDraft {

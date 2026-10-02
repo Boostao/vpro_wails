@@ -948,8 +948,8 @@ Exact accepted default is promoted; builds and previous bb3652f3... are archived
 with hashes under native-vegetation-species/archives/creation-decisions-checkpoint.
 Never replay creation-decisions.py completed modes or prior proofs.
 
-Next complete active metadata/calculation events and separately bound new-row
-personal metadata entry without combining user/project writes. Full Access addition/deletion/
+Next complete active metadata/calculation events. New-row personal metadata is
+separately bound and verified below, without combining user/project writes. Full Access addition/deletion/
 personal-form effective properties remain unmeasured and source workflows stay
 default-disabled; full species/FS882/application parity is not yet complete.
 
@@ -965,3 +965,39 @@ NotInList routes focus to Cover1 (A/A-height), Cover6 (C/C-height), or Cover7 (D
 reconcile that with the desktop's intentional mutually gated draft workflows
 before claiming event/focus parity. These static findings are not a new native
 Access runtime measurement or permission to repeat the stopped property probe.
+
+### Personal metadata from new-row proposals checkpoint
+
+The shared metadata editor now distinguishes an existing row/original expected
+value from a unique new-row proposal key. Neither metadata nor creation transport
+sends that UI identity to the writer or invents a physical ID. Reviewed unknown
+codes preserve original form/raw context before and after explicit VUser Save.
+Metadata entry blocks proposal mutation/cancellation and ordinary Save/Lock/close.
+First Undo cancels metadata without losing the original proposal; second Undo
+cancels the proposal without writes. Known committed cleanup/refresh/source-match
+failures still prevent replay. Independent metadata reload stages the existing
+personal decision; project Save/Undo remain separate and retain saved definitions.
+This uses the existing original-table VUser writer, not a new storage boundary.
+Both creation and personal flags must be enabled; default delivery keeps them off.
+
+Focused coupled Go2.511s/full race488.508s,200 frontend tests, check0/0 and
+opt-in/default builds pass. Native coreccb31517... verifies eight cases: raw256/
+remount/Save/Lock/actual-close/two-stage Undo, user-audit rollback/retained retry,
+explicit user-only Save, proposal Undo retaining the definition, separate project
+audit rollback/retry, and unchanged existing-row metadata identity/cancellation.
+One ZPNROW01 definition adds one VUser snapshot audit; subsequent ID9 creation adds
+two project audits. Original15 project tables/67 prior audits, original VUser
+tables/three prior audits, nullable defaults, schema/descriptions and other
+family/config bytes are preserved apart from those intended changes/reservation.
+Default50866a49... verifies25 enabled numeric controls/Species/Collected,
+readonly saved definition with literal names/NULL metadata, disabled unfinished
+creation and all fixture bytes unchanged. Core8104/default14528 exited;9392 closed.
+Exact accepted default is promoted; current core/default and prior8e63916d...
+are sealed with hashes in archives/creation-personal-checkpoint. Never replay
+completed creation-personal.py modes or preceding proofs.
+
+Next active event UX is bounded to source warnings/focus adapted to explicit
+draft Save, not unreachable metadata/duplicate-merge code. Parent code-check,
+project-metadata and profiling entrypoints remain separate workflow deliverables.
+CheckSpeciesCodes actively includes a blanket VUser LifeForm999 deletion; do not
+inherit that destructive cleanup as a desktop requirement.

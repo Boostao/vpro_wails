@@ -469,8 +469,9 @@ writer checks the actual current alias/personal reference and independently stor
 row after insertion, before project audits/commit. Collision, source-reference
 drift, numeric/species drift and audit failures roll back row/history/reservations.
 Saved nullable-Codetype personal definitions are reusable without list membership
-or another VUser write. Creating personal metadata from a new-row proposal remains
-unavailable; default source creation/deletion/personal-definition flags stay off.
+or another VUser write. At this decision checkpoint, creating personal metadata
+from a new-row proposal was unavailable; the separately saved flow below extends
+it. Default source creation/deletion/personal-definition flags stay off.
 
 Native core8e2dde81... verifies seven cases, including ambiguous review,
 unresolved remount/Save/Lock/actual-close guards, cancellation without writes,
@@ -484,6 +485,33 @@ every fixture byte unchanged. Core5568/default9904 exited; inspector9392 closed.
 Focused Go2.888s/full race475.761s,197 frontend tests/check0/0/builds pass.
 Protected binaries are exact accepted default bytes; prior builds are archived
 with hashes. No Access oracle or production/R/Access source writes were used.
+
+### New-row personal metadata: verified independent-save adaptation
+
+The original USysAddSpp bindings/Open transfer/Close path are reused for reviewed
+unknown new-row codes when both creation/personal flags are enabled. The draft
+source is discriminated: existing row ID/expected value or unique proposal key.
+The key is editor identity only and is omitted from both transports. Original
+form/raw species context is matched before and after the explicit VUser save;
+metadata freezes proposal editing/cancellation and blocks ordinary Save/Lock/close.
+First Undo cancels metadata, retaining the untouched proposal; second cancels the
+proposal. Separate VUser Save reloads observed metadata then stages a user decision,
+without inserting a project row. Proposal Undo retains the deliberately saved
+definition, and later project Save is a distinct transaction. Known committed
+cleanup/refresh/source-match errors prevent retrying the committed definition.
+
+Native coreccb31517... verifies eight cases: raw256/remount/Save/Lock/actual-close/
+Undo, VUser audit rollback/retry, definition-only Save and proposal Undo, separate
+project rollback/retry, and retained existing-row metadata identity/cancellation.
+Exactly one ZPNROW01 definition with literal scientific name, empty English name,
+NULL LifeForm/Codetype and original hidden defaults adds one VUser snapshot audit.
+Later ID9 adds only Species/Cover2 project audits. Original project tables/67
+prior audits, user tables/three old audits, schemas/descriptions and other support/
+config bytes remain intact. Default50866a49... verifies25 numeric controls,
+Species/Collected, readonly new metadata, disabled unfinished creation and every
+fixture byte unchanged. Core8104/default14528 exited;9392 closed.
+Focused Go2.511s/full race488.508s,200 frontend tests/check0/0/builds pass.
+Original R/Access/production sources were not written; no source oracle was run.
 
 ## Verified bounded selective restoration
 

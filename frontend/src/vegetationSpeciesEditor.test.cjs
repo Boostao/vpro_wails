@@ -16,6 +16,64 @@ const personal = loadTypeScript('personalSpeciesEditor.ts', {
   './vegetationSpeciesEditor': editor,
   './qualityEditor': loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') }),
 });
+const creation = loadTypeScript('vegetationCreationEditor.ts', {
+  './heightEditor': loadTypeScript('heightEditor.ts', { './numericEditor': loadTypeScript('numericEditor.ts') }),
+  './vegetationSpeciesEditor': editor,
+  './qualityEditor': loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') }),
+});
+
+test('New-row personal metadata captures a distinct editor identity without inventing a physical row ID', () => {
+  let proposal = creation.stageVegetationCreationSpecies(creation.beginVegetationCreation('SubVegAXL_BC', ['Cover1']), 'zznew02');
+  const choices = { form: proposal.form, entered: proposal.species, aliases: [{ code: null }], users: [] };
+  const metadata = personal.beginCreationPersonalSpecies(proposal, choices);
+  assert.deepEqual(json(metadata.source), { kind: 'creation', editorKey: proposal.editorKey });
+  assert.equal(Object.hasOwn(metadata, 'id'), false);
+  assert.equal(personal.matchesCreationPersonalSpeciesSource(metadata, json(proposal)), true);
+  assert.equal(personal.matchesPersonalSpeciesSource(metadata, { form: proposal.form, raw: proposal.species, expected: '', error: 'unknown' }), false);
+  const other = creation.stageVegetationCreationSpecies(creation.beginVegetationCreation(proposal.form, ['Cover1']), proposal.species);
+  assert.notEqual(other.editorKey, proposal.editorKey);
+  assert.equal(personal.matchesCreationPersonalSpeciesSource(metadata, other), false);
+  assert.equal(personal.matchesCreationPersonalSpeciesSource(metadata, null), false);
+  for (const changed of [{ form: 'SubVegDXL' }, { species: 'changed' }, { decision: { kind: 'keep', entered: proposal.species } }]) {
+    assert.equal(personal.matchesCreationPersonalSpeciesSource(metadata, { ...proposal, ...changed }), false);
+  }
+  assert.throws(() => personal.beginCreationPersonalSpecies(proposal, { ...choices, aliases: [{ code: 'MASTER' }] }));
+  assert.throws(() => personal.beginCreationPersonalSpecies(proposal, { ...choices, users: [{ code: 'USER' }] }));
+  assert.throws(() => personal.beginCreationPersonalSpecies(proposal, { ...choices, entered: 'changed' }));
+  const existing = personal.beginPersonalSpecies(0, { form: proposal.form, raw: proposal.species, expected: 'RAW', error: 'unknown' }, choices);
+  assert.equal(personal.matchesCreationPersonalSpeciesSource(existing, proposal), false);
+});
+
+test('New-row metadata save stages a separate personal decision and transport never sends editor identity', () => {
+  let proposal = creation.stageVegetationCreationSpecies(creation.beginVegetationCreation('SubVegCXL', ['Cover6']), 'zznew02');
+  const choices = { form: proposal.form, entered: proposal.species, aliases: [], users: [] };
+  let metadata = personal.beginCreationPersonalSpecies(proposal, choices);
+  metadata = personal.stagePersonalText(metadata, 'englishName', '', false);
+  metadata = personal.stagePersonalText(metadata, 'scientificName', '  Raw name é  ', false);
+  const request = personal.personalSpeciesRequest(json(metadata));
+  assert.deepEqual(json(request), { entered: 'zznew02', scientificName: '  Raw name é  ', englishName: '', lifeform: null });
+  proposal = creation.stageVegetationCreation(proposal, 'Cover6', '0');
+  assert.equal(personal.matchesCreationPersonalSpeciesSource(metadata, proposal), true);
+  const saved = { code: 'ZZNEW02', scientificName: request.scientificName, englishName: '', lifeform: null, codeType: null };
+  assert.equal(personal.personalSpeciesMatches(saved, request), true);
+  proposal = creation.chooseVegetationCreationSpecies(proposal, { ...choices, users: [saved] }, 'user', saved.code);
+  assert.equal(personal.matchesCreationPersonalSpeciesSource(metadata, proposal), false);
+  assert.deepEqual(json(creation.vegetationCreationRequest(proposal, [])), { form: proposal.form, species: 'ZZNEW02',
+    decision: 'user', entered: 'zznew02', selected: 'ZZNEW02', values: { cover6: 0 } });
+  assert.equal(Object.hasOwn(creation.vegetationCreationRequest(proposal, []), 'editorKey'), false);
+});
+
+test('New-row metadata owns separate Save/Undo gates and retains deliberately saved definitions on proposal cancellation', () => {
+  const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  assert.match(form, /personalSourceMatches\(proposed\)/);
+  assert.match(form, /matchesCreationPersonalSpeciesSource\(proposed, creationDraft\)/);
+  assert.match(form, /data-personal-create-source=\{creationDraft\.form\}/);
+  assert.match(form, /if \(personalDraft !== null\) \{ error = 'Cancel personal definition entry before cancelling the new-row proposal/);
+  assert.match(form, /creationDraft = chooseVegetationCreationSpecies\(creationDraft, reloaded, 'user'/);
+  assert.match(form, /No project data or history changed; explicitly saved personal definitions remain available/);
+  assert.match(form, /Save new vegetation record[\s\S]*?Cancel vegetation creation/);
+  assert.doesNotMatch(form, /proposed\.id|personalDraft\.id/);
+});
 
 test('Personal metadata starts only from the reviewed unknown source and retains original row identity', () => {
   const drafts = editor.stageSpecies({}, 'SubVegAXL_BC', -9, 'zznew01', 'RAW', lists);

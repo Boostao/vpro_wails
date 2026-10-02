@@ -4,11 +4,14 @@ import { resolveSpeciesDecision, speciesEventError, type SpeciesChoices, type Sp
 import type { VegetationCreationRequest, VegetationSpeciesOption } from '../bindings/github.com/boostao/vpro-wails';
 
 export interface VegetationCreationDraft {
+  editorKey: string;
   form: string;
   species: string;
   decision?: SpeciesDecision;
   cells: Partial<Record<HeightField, HeightCell>>;
 }
+
+let creationSequence = 0;
 
 export function stageVegetationCreationSpecies(draft: VegetationCreationDraft, species: string): VegetationCreationDraft {
   return { ...draft, species, decision: undefined };
@@ -46,7 +49,7 @@ export function beginVegetationCreation(form: string, columns: readonly string[]
     return field ? [field] : [];
   }))];
   if (!fields.length) throw new Error('The source form has no supported numeric creation fields.');
-  return { form, species: '', cells: Object.fromEntries(fields.map(field => [field, { raw: '', expected: null, value: null, error: null }])) };
+  return { editorKey: `creation-${++creationSequence}`, form, species: '', cells: Object.fromEntries(fields.map(field => [field, { raw: '', expected: null, value: null, error: null }])) };
 }
 
 export function stageVegetationCreation(draft: VegetationCreationDraft, column: string, raw: string): VegetationCreationDraft {
