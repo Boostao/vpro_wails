@@ -1833,6 +1833,60 @@ not arbitrary destination/attachment administration.
   Immutable55-file checkpoint plus manifest preserves the f585 predecessor and
   exact accepted core/default binaries/assets/source/tests/output/visuals;
   accepted1ed45cb2... default bytes are promoted without rebuilding.
-- **Remaining:** arbitrary unselected destinations/automatic attachment, existing
+- **Remaining:** arbitrary unselected destinations/automatic attachment, arbitrary
   SU destinations, legacy population, restoration, numeric-looking text criterion
   semantics and the broader active-event/migration/replacement gates remain open.
+
+### Reviewed Save as SU in the owned project file
+
+Implemented and native-Wails-verified, independently default off with
+`VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT=true` plus review/run/Save as SU.
+
+- **Source/preserved:** exported `USysPlotProfiling.btnSaveAsSU_Click` and
+  `V7mdlPlotProfiling.SaveFilterAsSU` copy filtered PlotNumber records to the
+  retained `USysSuTable`, joining literal selected SiteUnit values when selected
+  and otherwise leaving them NULL. Reuse the verified SU materializer, original
+  indexes and existing project writer; original database family/naming/YAML and
+  `_table_metadata` table-object descriptions remain intact.
+- **Bounded adaptation:** the immutable destination is the currently owned
+  project SQLite file only. No arbitrary destination framework, automatic
+  attachment/selection, Master authorization or configuration write. Existing
+  desktop names and physical case-insensitive object collision checks apply.
+  Present system-template description metadata rejects explicitly in this
+  branch rather than being silently dropped; the existing new-file path retains
+  its supported metadata copying. Existing project descriptions are reviewed
+  completely and preserved without synthesis.
+- **Atomic boundary:** isolated profile review/read jobs close before acquiring
+  the project writer, avoiding a same-file read/write deadlock. Original
+  Env/Veg/Lump, rules, selected SU, template/descriptions and physical ownership
+  are independently observed across creation. Same-project profile/SU sources
+  are read through the writer transaction, not a competing readonly alias.
+  Schema, indexes, exact rows and full proposal share `__VPRO_ProfileSUHistory`;
+  incompatible indexed/triggered provenance is rejected, not repaired.
+- **Desktop:** labelled immutable destination and responsive name input;
+  shared Save/Discard/Cancel with retained drafts/proposals. Set committed state
+  before response validation. An identity-checked discovery refresh exposes the
+  new table for a separate explicit SU selection; refresh/cleanup failures
+  prevent replay rather than masking a successful commit.
+- **Fast/integration acceptance:** focused coupled race39.789s and final
+  project-SU race23.064s (including independent repeated history appends), full
+  integration race569.642s;258 frontend tests/check0/0 and both production builds
+  pass. Exact0/3/200/201 rows, nullable/literal SiteUnits, descriptions/data/schema/
+  YAML/support preservation, strict transport, stale destination/source,
+  cancellation, collision and staged provenance rollback/retry are tested.
+  Actual bindings15 services/156 methods/91 models/two enums;57 editor operations.
+- **Native acceptance:** precursor18204 verifies Cancel/reserved-name/physical
+  collision/provenance rollback and retained retry,11 NULL rows,3 selected
+  NULL/empty/literal rows, two history events and one independent parent Save/
+  audit. Native testing exposed stale post-commit SU options; fixed10032 creates
+  a third independently named SU on the sealed checkpoint without replaying
+  either prior creation or parent Save, verifies immediate discovery/separate
+  exact-three-plot selection and actual600px labels. Default7232 keeps all twelve
+  gates off, Vegetation active and every original byte unchanged. All owned apps
+  exited and every original fixture/support/configuration byte is restored.
+  Exact final corea4daaf06... and default86b29300... are retained with the
+  unmodified precursor, source/test logs, original/checkpoint/after databases and
+  representative visual; protected1ed45 predecessor is archived before promotion.
+- **Remaining:** arbitrary destinations/automatic attachment, Master authorization,
+  restoration, numeric-looking text criterion semantics, native Access execution
+  parity and the broader migration/replacement gates remain open.

@@ -480,6 +480,19 @@ export interface ProfileSUPlot {
     "siteUnit": string | null;
 }
 
+export interface ProfileSUProjectCreation {
+    "review": ProfileSUProjectReview;
+    "name": string;
+    "confirmed": boolean;
+}
+
+export interface ProfileSUProjectReview {
+    "su": ProfileSUReview;
+    "project": string;
+    "path": string;
+    "metadata": ProjectMetadataTable;
+}
+
 export interface ProfileSUReview {
     "filter": ProjectPlotProfileFilterRequest;
     "template": ProjectMetadataTable;

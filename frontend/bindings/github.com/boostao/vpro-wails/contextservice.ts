@@ -169,6 +169,10 @@ export function ReviewProjectPlotProfileSU(contextID: string, filter: $models.Pr
     return $Call.ByID(729221061, contextID, filter);
 }
 
+export function ReviewProjectPlotProfileSUInProject(contextID: string, filter: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProfileSUProjectReview> {
+    return $Call.ByID(3566405375, contextID, filter);
+}
+
 export function ReviewSpeciesCodes(contextID: string): $CancellablePromise<$models.SpeciesCodeCheckReview> {
     return $Call.ByID(3045258678, contextID);
 }
@@ -203,6 +207,10 @@ export function SaveProjectPlotProfile(contextID: string, request: $models.Proje
 
 export function SaveProjectPlotProfileSU(contextID: string, request: $models.ProfileSUCreation): $CancellablePromise<$models.ProfileSUCreated> {
     return $Call.ByID(4210909380, contextID, request);
+}
+
+export function SaveProjectPlotProfileSUInProject(contextID: string, request: $models.ProfileSUProjectCreation): $CancellablePromise<$models.ProfileSUCreated> {
+    return $Call.ByID(2218873064, contextID, request);
 }
 
 export function SaveSpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {

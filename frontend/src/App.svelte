@@ -13,6 +13,7 @@
   import { validateProfileSUReview, validateProfileSUCreated, type ReviewedProfileSU } from './profileSU';
   import { validateProfileFileReview, validateProfileFileCreated, type ReviewedProfileFile } from './profileFile';
   import { validateProfileTableReview, validateProfileTableCreated, type ReviewedProfileTable } from './profileTable';
+  import { validateProjectSUReview, validateProjectSUCreated, type ReviewedProjectSU } from './profileSUProject';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -78,6 +79,13 @@
   let suError = $state('');
   let suSuccess = $state('');
   let suCommitted = $state(false);
+  const suProjectEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT === 'true';
+  let suProjectReview = $state<ReviewedProjectSU | null>(null);
+  let suProjectContext = $state('');
+  let suProjectName = $state('');
+  let suProjectError = $state('');
+  let suProjectSuccess = $state('');
+  let suProjectCommitted = $state(false);
   let startupFailure = $state<StartupState | null>(null);
   const closeState = $derived(view === 'fs882' ? editor?.getCloseState() : undefined);
 
@@ -366,6 +374,59 @@
         if (suCommitted || String(cause).includes('Profile SU file published, but')) {
           suCommitted = true; suError = `SU file published; do not replay creation: ${String(cause)}`;
         } else suError = `No SU file published; proposal retained for correction or retry: ${String(cause)}`;
+        throw cause;
+      } finally { busy = false; }
+    });
+  }
+
+  async function reviewProfileSUProject() {
+    const state = $projectState;
+    if (!state?.contextId || !suReview || suReviewContext !== state.contextId ||
+        busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+      suProjectError = 'Wait for the current operation and review the current profile before reviewing a project-file SU.'; return;
+    }
+    if (!state.projectPath) {
+      suProjectError = 'Current project has no owned physical destination; no SU table can be created.'; return;
+    }
+    const proposal = $state.snapshot(suReview.filter);
+    busy = true; suProjectError = '';
+    try {
+      await tick();
+      const source = await stateReads.track(ContextService.ReviewProjectPlotProfileSUInProject(state.contextId, proposal));
+      if ($projectState?.contextId !== state.contextId) throw new Error('Project-file SU review belongs to an old context.');
+      suProjectReview = validateProjectSUReview(source, proposal, state.activeProject, state.projectPath);
+      suProjectContext = state.contextId; suProjectCommitted = false; suProjectSuccess = '';
+    } catch (cause) { suProjectError = `No SU table created; review failed: ${String(cause)}`; }
+    finally { busy = false; }
+  }
+
+  async function saveProfileSUProject() {
+    if (!suProjectReview || suProjectCommitted || suProjectContext !== $projectState?.contextId) {
+      suProjectError = 'Review the current project destination before creating one SU table.'; return;
+    }
+    const proposal = $state.snapshot({ review: suProjectReview, name: suProjectName, confirmed: true });
+    const origin = suProjectContext;
+    await requestTransition(async contextId => {
+      if (contextId !== origin) throw new Error('Project-file SU proposal belongs to an old context.');
+      busy = true; suProjectError = '';
+      try {
+        await tick();
+        const response = await ContextService.SaveProjectPlotProfileSUInProject(contextId, proposal);
+        suProjectCommitted = true;
+        const created = validateProjectSUCreated(response, proposal.name, proposal.review.su.plots.length, proposal.review.path);
+        suProjectSuccess = `Created ${created.name}_SU with ${created.plotCount} stored plots in ${created.path}. Existing data/descriptions and project/SU selection are unchanged; select it separately.`;
+        view = 'plots'; editorPlotNumber = undefined;
+        const state = await stateReads.track(ProjectService.GetState());
+        if (state.contextId !== contextId || $projectState?.contextId !== contextId) {
+          throw new Error('SU table committed, but context changed before destination discovery refresh; do not replay creation.');
+        }
+        projectState.set(state);
+        await loadPlots(0);
+        if (error) error = `SU table committed, but navigation refresh failed; do not replay creation: ${error}`;
+      } catch (cause) {
+        if (suProjectCommitted || String(cause).includes('Profile SU table committed, but')) {
+          suProjectCommitted = true; suProjectError = `SU table committed; do not replay creation: ${String(cause)}`;
+        } else suProjectError = `No SU table created; proposal retained for correction or retry: ${String(cause)}`;
         throw cause;
       } finally { busy = false; }
     });
@@ -699,6 +760,32 @@
               onclick={() => { suReview = null; suError = ''; suSuccess = ''; }}>Dismiss SU review</button>
           </div>
           <p class="mt-3 text-sm">Only a new file is supported; existing destinations are never replaced. Stored inputs and SiteUnit values are rechecked after Save/Discard/Cancel. No implicit project/SU switch or original database/configuration write. Names use the existing31-character desktop family policy; None, Sample and master names are reserved.</p>
+          {#if suProjectEnabled}
+            <button type="button" class="mt-3 px-3 py-2 border rounded disabled:opacity-50"
+              disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || suReviewContext !== $projectState?.contextId}
+              onclick={() => void reviewProfileSUProject()}>Review Save as SU in current project file</button>
+            {#if suProjectReview}
+              <section class="mt-3 p-3 border rounded" aria-label="Reviewed project-file SU creation">
+                <h3 class="font-semibold">Add one SU table to the current owned project</h3>
+                <p class="break-words">Destination: {suProjectReview.path}</p>
+                <p>{suProjectReview.su.plots.length} stored plots and {suProjectReview.metadata.rows.length} original table descriptions reviewed. No descriptions are synthesized or removed.</p>
+                <label for="profile-su-project-name" class="mt-3 flex flex-col gap-1">New project-file SU name
+                  <input id="profile-su-project-name" class="px-2 py-1 border rounded min-w-0" bind:value={suProjectName}
+                    disabled={busy || transitionWorking || pendingTransition !== null || suProjectCommitted} />
+                </label>
+                {#if suProjectSuccess}<p role="status" class="mt-2 text-emerald-800 break-words">{suProjectSuccess}</p>{/if}
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button type="button" class="px-3 py-2 border rounded disabled:opacity-50"
+                    disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || suProjectCommitted || !suProjectName || suProjectContext !== $projectState?.contextId}
+                    onclick={() => void saveProfileSUProject()}>Create reviewed SU in project file</button>
+                  <button type="button" class="px-3 py-2 border rounded" disabled={busy || transitionWorking || pendingTransition !== null}
+                    onclick={() => { suProjectReview = null; suProjectError = ''; suProjectSuccess = ''; }}>Dismiss project-file SU review</button>
+                </div>
+                <p class="mt-3 text-sm">Adds only the reviewed SU, its original indexes and transactional creation provenance. No implicit selection/attachment, Master authorization or YAML write. Arbitrary destinations and present template-description copying are unavailable; use new-file creation for present metadata. The existing desktop name policy applies.</p>
+              </section>
+            {/if}
+            {#if suProjectError}<p role="alert" class="mt-2 text-red-800">{suProjectError}</p>{/if}
+          {/if}
         </section>
       {/if}
       {#if profileSelectionEnabled && $projectState?.contextId}

@@ -77,6 +77,8 @@ export type {
     ProfileSUCreated,
     ProfileSUCreation,
     ProfileSUPlot,
+    ProfileSUProjectCreation,
+    ProfileSUProjectReview,
     ProfileSUReview,
     ProjectDiagnostic,
     ProjectInfo,

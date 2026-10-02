@@ -236,27 +236,38 @@ func createBlankProfileTable(ctx context.Context, tx *sql.Tx, name string, templ
 		quoteHeaderIdentifier(name+"_Profile"), 1)); err != nil {
 		return err
 	}
-	if _, err := tx.ExecContext(ctx, strings.Replace(profileCreationHistorySQL, "CREATE TABLE ", "CREATE TABLE IF NOT EXISTS ", 1)); err != nil {
+	if err := appendCreationProvenance(ctx, tx, "__VPRO_ProfileCreationHistory", profileCreationHistorySQL, proposal); err != nil {
+		return err
+	}
+	stored, err := readSQLiteStorageRows(ctx, tx, "main", name+"_Profile", "", nil, "")
+	if err != nil || !reflect.DeepEqual(stored, template) {
+		return errors.Join(err, errors.New("new profile schema/empty rules differ from the independently reviewed template"))
+	}
+	return nil
+}
+
+func appendCreationProvenance(ctx context.Context, tx *sql.Tx, table, expectedDefinition, proposal string) error {
+	if _, err := tx.ExecContext(ctx, strings.Replace(expectedDefinition, "CREATE TABLE ", "CREATE TABLE IF NOT EXISTS ", 1)); err != nil {
 		return err
 	}
 	var definition string
 	if err := tx.QueryRowContext(ctx, `SELECT sql FROM sqlite_master
-		WHERE type='table' AND name COLLATE BINARY='__VPRO_ProfileCreationHistory'`).Scan(&definition); err != nil {
+		WHERE type='table' AND name COLLATE BINARY=?`, table).Scan(&definition); err != nil {
 		return fmt.Errorf("physical profile creation provenance unavailable: %w", err)
 	}
-	if strings.Join(strings.Fields(definition), " ") != strings.Join(strings.Fields(profileCreationHistorySQL), " ") {
+	if strings.Join(strings.Fields(definition), " ") != strings.Join(strings.Fields(expectedDefinition), " ") {
 		return errors.New("profile creation provenance schema differs; no existing history overwritten")
 	}
 	var extras int
 	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM sqlite_master
-		WHERE tbl_name COLLATE NOCASE='__VPRO_ProfileCreationHistory' AND type<>'table'`).Scan(&extras); err != nil {
+		WHERE tbl_name COLLATE NOCASE=? AND type<>'table'`, table).Scan(&extras); err != nil {
 		return err
 	}
 	if extras != 0 {
 		return errors.New("profile creation provenance has unreviewed indexes/triggers; no history appended")
 	}
 	when := time.Now().UTC().Format(time.RFC3339Nano)
-	inserted, err := tx.ExecContext(ctx, `INSERT INTO "__VPRO_ProfileCreationHistory"(Created,Proposal) VALUES(?,?)`, when, proposal)
+	inserted, err := tx.ExecContext(ctx, `INSERT INTO `+quoteHeaderIdentifier(table)+`(Created,Proposal) VALUES(?,?)`, when, proposal)
 	if err != nil {
 		return err
 	}
@@ -268,13 +279,9 @@ func createBlankProfileTable(ctx context.Context, tx *sql.Tx, name string, templ
 		return err
 	}
 	var observed, observedWhen string
-	if err := tx.QueryRowContext(ctx, `SELECT Created,Proposal FROM "__VPRO_ProfileCreationHistory" WHERE ID=?`, id).
+	if err := tx.QueryRowContext(ctx, `SELECT Created,Proposal FROM `+quoteHeaderIdentifier(table)+` WHERE ID=?`, id).
 		Scan(&observedWhen, &observed); err != nil || observed != proposal || observedWhen != when {
 		return errors.Join(err, errors.New("new profile technical history differs from its complete proposal"))
-	}
-	stored, err := readSQLiteStorageRows(ctx, tx, "main", name+"_Profile", "", nil, "")
-	if err != nil || !reflect.DeepEqual(stored, template) {
-		return errors.Join(err, errors.New("new profile schema/empty rules differ from the independently reviewed template"))
 	}
 	return nil
 }

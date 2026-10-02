@@ -41,7 +41,7 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `1ed45cb2db8225d3f56aac97179cfaab27c210f633e154d501289b65e3ca2690`.
+  `86b2930062db5fc739caadd2d95b30b6d8fd66d6be0b58a2d4dae9c2595d0bd7`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -1136,8 +1136,43 @@ predecessor, exact core/default assets/bytes, source, complete test logs, origin
 and after-output, native receipts and representative narrow visual. Exact accepted
 1ed4 default bytes are promoted to current/candidate without rebuilding.
 Never replay profile-table prepare/run/default/seal modes.
-Existing-file SU destinations, arbitrary attachment administration, restoration,
-numeric-looking text criterion semantics and native Access parity remain open.
+Reviewed Save as SU in the current owned project file is implemented/native-
+verified, independently default off with VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT=true
+plus review/run/Save as SU. Reuse the original SU materializer/indexes and owned
+project writer; review full destination descriptions/result/template/selected
+SiteUnits and observe original Env/Veg/Lump, rules/SU, template and physical
+ownership. Same-file sources use the writer transaction; the initial read job
+closes before writer acquisition. Schema/indexes/exact rows/full proposal share
+__VPRO_ProfileSUHistory; incompatible provenance/collision/source drift/late
+cancellation/support aliases reject or roll back with retained retry.
+Existing project tables/data/descriptions/schema remain intact; no implicit
+selection/attachment/grant or YAML write. Present system-template description
+metadata rejects explicitly in this bounded branch; new-file copying stays
+supported. Identity-checked post-commit discovery exposes the new SU immediately
+for separate selection; committed errors prevent replay.
+Focused coupled39.789s/final project-SU23.064s/full race569.642s pass;258 frontend
+tests/check0/0/both builds. Bindings15/156/91/two enums;57 editor operations.
+Precursor18204 proved Cancel/reserved-name/collision/provenance rollback/retry,
+11 NULL plus3 selected literal/empty/NULL rows and one independent parent audit.
+Native caught stale SU options; final10032 creates one separate third table on
+the sealed checkpoint without replaying completed writes, verifies immediate
+discovery/separate three-plot selection and actual600px labels.
+Final core bin/vpro-profile-su-project-core-final.exe
+a4daaf06a14553ebcb9da85f08353ce56feb78041c7c1606617b9db217a69f92;
+default bin/vpro-profile-su-project-default.exe
+86b2930062db5fc739caadd2d95b30b6d8fd66d6be0b58a2d4dae9c2595d0bd7
+/owned7232 keeps all twelve gates off, Vegetation active and zero writes.
+All owned apps exited; every original fixture/support/configuration byte is
+restored. Preserve profile-su-project-project-checkpoint.db/project-after.db,
+all original/continuation receipts and original/core/final/default assets.
+archives/profile-su-project-checkpoint retains protected1ed45 predecessor,
+unmodified precursor plus exact final core/default binaries/assets/source/logs/
+output/receipts/visuals and manifest; exact accepted86b2 default bytes are
+promoted to current/candidate without rebuilding.
+Never replay profile-su-project preparation/run/reserved-name continuation/
+discovery continuation/default/seal completed modes.
+Arbitrary SU destinations/attachment administration, restoration, numeric-looking
+text criterion semantics and native Access parity remain open.
 Continue the next bounded source-first workflow without a new database-family/
 configuration framework or production/R/Access writes.
 Metadata-specific restoration and full navigation/focus parity remain open;

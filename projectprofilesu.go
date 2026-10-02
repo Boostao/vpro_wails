@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
-	"time"
 	"unicode/utf16"
 	"unicode/utf8"
 )
@@ -41,6 +40,8 @@ type ProfileSUCreated struct {
 	PlotCount int    `json:"plotCount"`
 }
 
+const profileSUCreationHistorySQL = `CREATE TABLE "__VPRO_ProfileSUHistory"(ID INTEGER PRIMARY KEY,Created TEXT NOT NULL,Proposal TEXT NOT NULL)`
+
 func (request *ProfileSUCreation) UnmarshalJSON(data []byte) error {
 	type plain ProfileSUCreation
 	var decoded plain
@@ -53,11 +54,19 @@ func (request *ProfileSUCreation) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
-	if err := decodeProfileLifecycleJSON(raw.Review, &decoded.Review, "filter", "template", "plots"); err != nil {
+	if err := decodeProfileSUReviewJSON(raw.Review, &decoded.Review); err != nil {
+		return err
+	}
+	*request = ProfileSUCreation(decoded)
+	return nil
+}
+
+func decodeProfileSUReviewJSON(data []byte, review *ProfileSUReview) error {
+	if err := decodeProfileLifecycleJSON(data, review, "filter", "template", "plots"); err != nil {
 		return err
 	}
 	var properties map[string]json.RawMessage
-	if err := json.Unmarshal(raw.Review, &properties); err != nil {
+	if err := json.Unmarshal(data, &properties); err != nil {
 		return err
 	}
 	for _, key := range []string{"sourceSU", "descriptions"} {
@@ -65,7 +74,6 @@ func (request *ProfileSUCreation) UnmarshalJSON(data []byte) error {
 			return fmt.Errorf("SU creation requires explicit nullable %s", key)
 		}
 	}
-	*request = ProfileSUCreation(decoded)
 	return nil
 }
 
@@ -165,7 +173,10 @@ func validateProfileSUText(value string, maximum int) error {
 	return nil
 }
 
-func validateProfileSUTemplate(ctx context.Context, tx *sql.Tx) (resultErr error) {
+func validateProfileSUTemplate(ctx context.Context, tx interface {
+	projectMetadataQueryer
+	QueryRowContext(context.Context, string, ...any) *sql.Row
+}) (resultErr error) {
 	var physical bool
 	if err := tx.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM VPro64.sqlite_master WHERE type='table' AND name='USysSuTable')`).Scan(&physical); err != nil {
 		return err
@@ -339,11 +350,21 @@ func writeProfileSUFile(ctx context.Context, path string, request ProfileSUCreat
 			resultErr = errors.Join(resultErr, err)
 		}
 	}()
+	proposal, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+	if err := writeProfileSUContents(ctx, tx, request, string(proposal)); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+func writeProfileSUContents(ctx context.Context, tx *sql.Tx, request ProfileSUCreation, proposal string) error {
 	table := quoteHeaderIdentifier(request.Name + "_SU")
 	if _, err := tx.ExecContext(ctx, `CREATE TABLE `+table+`("PlotNumber" VARCHAR,"SiteUnit" VARCHAR);
 		CREATE UNIQUE INDEX `+quoteHeaderIdentifier("uidx_"+request.Name+"_SU_PlotNumber")+` ON `+table+`("PlotNumber");
-		CREATE INDEX `+quoteHeaderIdentifier("idx_"+request.Name+"_SU_SiteUnit")+` ON `+table+`("SiteUnit");
-		CREATE TABLE "__VPRO_ProfileSUHistory"(ID INTEGER PRIMARY KEY,Created TEXT NOT NULL,Proposal TEXT NOT NULL)`); err != nil {
+		CREATE INDEX `+quoteHeaderIdentifier("idx_"+request.Name+"_SU_SiteUnit")+` ON `+table+`("SiteUnit")`); err != nil {
 		return err
 	}
 	for _, plot := range request.Review.Plots {
@@ -379,11 +400,7 @@ func writeProfileSUFile(ctx context.Context, path string, request ProfileSUCreat
 			return errors.New("new SU descriptions differ from the independently planned original typed metadata")
 		}
 	}
-	proposal, err := json.Marshal(request)
-	if err != nil {
-		return err
-	}
-	if _, err := tx.ExecContext(ctx, `INSERT INTO "__VPRO_ProfileSUHistory"(Created,Proposal) VALUES(?,?)`, time.Now().UTC().Format(time.RFC3339Nano), string(proposal)); err != nil {
+	if err := appendCreationProvenance(ctx, tx, "__VPRO_ProfileSUHistory", profileSUCreationHistorySQL, proposal); err != nil {
 		return err
 	}
 	stored, err := readSQLiteStorageRows(ctx, tx, "main", request.Name+"_SU", "", nil, "PlotNumber")
@@ -399,11 +416,7 @@ func writeProfileSUFile(ctx context.Context, path string, request ProfileSUCreat
 			return errors.New("new SU stored values differ from independently planned literal/NULL assignments")
 		}
 	}
-	var observed string
-	if err := tx.QueryRowContext(ctx, `SELECT Proposal FROM "__VPRO_ProfileSUHistory" WHERE ID=1`).Scan(&observed); err != nil || observed != string(proposal) {
-		return errors.Join(err, errors.New("new SU technical history differs from its reviewed proposal"))
-	}
-	return tx.Commit()
+	return nil
 }
 
 func copyProfileSUDescriptions(ctx context.Context, tx *sql.Tx, source ProjectMetadataTable, table string) error {

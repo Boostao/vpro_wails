@@ -10,6 +10,7 @@ const metadata=loadTypeScript('projectMetadataEditor.ts',{'./qualityEditor':qual
   '../../resources/project-metadata-template.json':resource('project-metadata-template.json')});
 const profile=loadTypeScript('projectPlotProfileReview.ts',{'./projectMetadataEditor':metadata});
 const su=loadTypeScript('profileSU.ts',{'./projectPlotProfileReview':profile});
+const projectSU=loadTypeScript('profileSUProject.ts',{'./profileSU':su,'./projectPlotProfileReview':profile});
 const read=name=>readFileSync(path.join(__dirname,name),'utf8');
 const nullCell=()=>({storage:'null',text:null,integer:null,real:null,blobHex:null});
 const rules={columns:profile.plotProfileFields.map(name=>({name,declaredType:'TEXT'})),
@@ -19,6 +20,40 @@ const preview={project:'Sample',table:'External_Profile',su:'None',totalPlots:2,
 const filter={input:{originalRules:rules,projectLump:null,subvarieties:false},preview};
 const review=()=>({filter:structuredClone(filter),template:{columns:['PlotNumber','SiteUnit'].map(name=>({name,declaredType:'VARCHAR'})),rows:[]},
   sourceSU:null,descriptions:null,plots:[{plotNumber:'A',siteUnit:null},{plotNumber:'B',siteUnit:null}]});
+
+test('Project-file SU review preserves complete destination descriptions and rejects foreign paths or inferred metadata',()=>{
+  const source={project:'Sample',path:"C:\\project O'Brien #.db",su:review(),
+    metadata:{columns:[{name:'table_name',declaredType:'TEXT'},{name:'description',declaredType:'TEXT'}],rows:[]}};
+  assert.equal(projectSU.validateProjectSUReview(source,filter,'Sample',source.path).path,source.path);
+  for(const alter of [value=>value.project='Foreign',value=>value.path='C:\\other.db',
+    value=>value.metadata=null,value=>value.su.descriptions={columns:source.metadata.columns,rows:[]},
+    value=>value.su.plots.pop()]){
+    const invalid=structuredClone(source);alter(invalid);
+    assert.throws(()=>projectSU.validateProjectSUReview(invalid,filter,'Sample',source.path));
+  }
+  const created={name:'New',path:source.path,plotCount:2};
+  assert.equal(projectSU.validateProjectSUCreated(created,'New',2,source.path),created);
+  assert.throws(()=>projectSU.validateProjectSUCreated({...created,path:'C:\\other.db'},'New',2,source.path),/do not replay/);
+});
+
+test('Project-file SU insertion is separately gated, immutable-destination reviewed and shared-transition owned',()=>{
+  const app=read('App.svelte');
+  assert.match(app,/VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT === 'true'/);
+  assert.match(app,/aria-label="Reviewed project-file SU creation"/);
+  assert.match(app,/<label for="profile-su-project-name"/);
+  const start=app.indexOf('async function saveProfileSUProject');
+  const action=app.slice(start,app.indexOf('\n  async function ',start+1));
+  assert.match(action,/\$state\.snapshot\(\{ review: suProjectReview, name: suProjectName, confirmed: true \}\)/);
+  assert.match(action,/await requestTransition/);
+  assert.match(action,/contextId !== origin/);
+  assert.match(action,/await tick\(\);\s*const response = await ContextService.SaveProjectPlotProfileSUInProject/);
+  assert.match(action,/suProjectCommitted = true/);
+  assert.match(action,/Profile SU table committed, but/);
+  assert.match(action,/stateReads\.track\(ProjectService\.GetState\(\)\)/);
+  assert.match(action,/state\.contextId !== contextId \|\| \$projectState\?\.contextId !== contextId/);
+  assert.match(action,/projectState\.set\(state\)/);
+  assert.doesNotMatch(action,/SwitchContext|SelectPlotProfile/);
+});
 
 test('SU review preserves exact external-rule membership, explicit absent metadata and NULL/empty/literal SiteUnits',()=>{
   assert.equal(su.validateProfileSUReview(review(),filter).plots.length,2);
