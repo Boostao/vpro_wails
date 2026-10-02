@@ -1419,8 +1419,8 @@ not persisted desktop job state or an editor catalogue.
   cancellation/retry, retained unsaved parent drafts and default-off delivery.
   Disposable canonical-sample bytes and the original active fixture are exactly
   restored; no production, source, support, audit or configuration writes occur.
-- **Next, not implied complete:** rule creation/deletion, external/current profile
-  selection, applying results to form navigation/filters and Save as SU require
+- **Next, not implied complete:** external/current profile selection, applying
+  results to form navigation/filters and Save as SU require
   separately defined ownership/draft/rollback gates. Metadata-specific
   restoration and remaining active calculations/navigation remain in order6.
 
@@ -1506,3 +1506,46 @@ not persisted desktop job state or an editor catalogue.
 - **Still unavailable:** external/current profile selection, filter/navigation
   application, Save as SU, technical-history restoration, native Access execution
   parity and remaining calculation events require their own bounded acceptance.
+
+### Next bounded gate: profile-result navigation filter
+
+Finish this gate before expanding external profile selection or Save as SU.
+No new database-family/configuration framework is required.
+
+- **Source:** `USysPlotProfiling.btnGetSummary` is captioned Apply Plot Profile
+  Filter and calls `ProfilePlots`. `V7mdlPlotProfiling.UpdateForms` applies the
+  result to loaded FS882 variants. `WriteVegProfile2Filter` turns the old filter
+  off, builds literal OR terms for at most200 results, warns on zero results and
+  offers creating an SU above200/error2176. Reset also clears stored counts.
+  Do not inherit unescaped SQL literals, destructive count resets, automatic SU
+  writes or `IsLoaded` as proof of Form view.
+- **Bounded desktop policy:** add a separate default-off filtering gate after
+  reviewed execution. Explicit Apply/Clear owns an ephemeral, immutable
+  context/project/SU-bound navigation result; SQLite remains canonical.
+  Parameterized membership must preserve exact plot identities/case/whitespace.
+  Keep zero-result Apply unavailable with a visible warning and retain any
+  existing filter; this deliberately differs from the source's initial
+  FilterOn=False. Keep >200 Apply unavailable with an explicit unsupported
+  Save-as-SU notice until that separate workflow is implemented. Neither path
+  creates a success-shaped empty/all-plots fallback.
+- **Reuse, not parallel lifecycle:** App owns browse pagination, current editor
+  and verified Save/Discard/Cancel publication. R FS882's recordset and
+  `request_navigation` are layout/navigation precedents, not parity proof.
+  Reuse those existing Wails transition guards before replacing the visible
+  recordset. Cancel/failure preserves the current editor/draft/filter; a
+  successful Save may change profiling inputs, so independently revalidate
+  the reviewed execution against current stored data before applying.
+  Pending rule proposals/confirmations/errors must be resolved explicitly.
+- **Consistency:** membership/count/pagination/selected plot and form navigation
+  must agree. Clear/context or SU switch retires the ephemeral result; late
+  reads cannot republish it. Detail/child writers retain physical project
+  ownership and all existing identity checks: navigation membership is not
+  mutation authorization. Do not silently change hierarchy/report scope.
+- **Acceptance:** focused tests cover literal membership, empty/>200/stale
+  results, changed source rules/data/SU, cancellation, refresh failure,
+  Save/Discard/Cancel, page boundaries and original writer authority. Then full
+  race/frontend/check/build and actual Wails proofs on one disposable fixture:
+  canonical52-plot preview's11-result navigation, retained drafts/cancel,
+  explicit clear, context/SU retirement and no project/support/config/count/
+  audit writes except an independently requested parent Save. Preserve the
+  accepted9a51 baseline and keep the filtering gate disabled until verified.

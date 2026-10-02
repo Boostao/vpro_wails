@@ -959,6 +959,10 @@ rule-edit harness corrections. Do not replay completed lifecycle prepare/gates/
 mutations/finish/default/seal modes or earlier completed rule-edit proofs.
 External/current profile-file/table creation/selection, filter application,
 Save as SU and technical-history restoration remain unavailable.
+Next bounded gate is explicit ephemeral profile-result navigation filtering.
+The plan maps original Apply/zero/>200/reset branches and reuses App's verified
+Save/Discard/Cancel publication; no new infrastructure or automatic SU/count
+writes. Source application and native Access execution parity remain unverified.
 Metadata-specific restoration and full navigation/focus parity remain open;
 never copy master timestamps/numeric codes blindly or enable unavailable controls.
 UpdateMetadataSppList is an immediate GoTo MyExit; duplicate merges are behind
