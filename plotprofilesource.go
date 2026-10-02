@@ -86,7 +86,7 @@ func (c *sqliteContext) profileInfo(ctx context.Context) (PlotProfileSourceInfo,
 	if err != nil {
 		return info, err
 	}
-	metadata, err := readSQLiteStorageColumns(ctx, c.conn, role, "_table_metadata")
+	metadata, err := profileMetadataColumns(ctx, c.conn, role)
 	if err != nil {
 		return info, err
 	}
@@ -102,6 +102,13 @@ func profileSchemaReason(columns, metadata []ProjectMetadataColumn) string {
 		if !slices.ContainsFunc(columns, func(column ProjectMetadataColumn) bool { return column.Name == required }) {
 			return fmt.Sprintf("Missing original plot-profile column %s; no repair or inferred defaults", required)
 		}
+	}
+	return profileMetadataReason(metadata)
+}
+
+func profileMetadataReason(metadata []ProjectMetadataColumn) string {
+	if metadata == nil {
+		return ""
 	}
 	for _, required := range []string{"table_name", "description"} {
 		if !slices.ContainsFunc(metadata, func(column ProjectMetadataColumn) bool { return column.Name == required }) {
@@ -151,6 +158,13 @@ func (c *sqliteContext) attachProfile(ctx context.Context, requested *PlotProfil
 	}
 	if err := c.requireColumns(ctx, c.profileRole, table, plotProfileColumns); err != nil {
 		return err
+	}
+	metadata, err := profileMetadataColumns(ctx, c.conn, c.profileRole)
+	if err != nil {
+		return err
+	}
+	if metadata == nil {
+		return nil
 	}
 	return c.requireColumns(ctx, c.profileRole, "_table_metadata", []string{"table_name", "description"})
 }
@@ -270,7 +284,7 @@ func inspectPlotProfileSources(ctx context.Context, owner *sqliteContext, path s
 		if err != nil {
 			return nil, err
 		}
-		metadata, err := readSQLiteStorageColumns(ctx, db, "main", "_table_metadata")
+		metadata, err := profileMetadataColumns(ctx, db, "main")
 		if err != nil {
 			return nil, err
 		}

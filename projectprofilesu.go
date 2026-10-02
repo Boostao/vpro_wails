@@ -245,20 +245,24 @@ func profileSUDestination(request ProfileSUCreation) (string, os.FileInfo, error
 		strings.EqualFold(request.Name, "Sample") || strings.Contains(strings.ToLower(request.Name), "master") {
 		return "", nil, errors.New("confirm a literal desktop family name (letter first, ASCII letters/digits/underscore, at most31 characters); None, Sample and master names are reserved")
 	}
-	if !utf8.ValidString(request.Path) || !filepath.IsAbs(request.Path) || !strings.EqualFold(filepath.Ext(request.Path), ".db") {
-		return "", nil, errors.New("SU destination must be an explicit absolute new SQLite .db file")
+	return freshSQLiteDestination(request.Path, "SU")
+}
+
+func freshSQLiteDestination(requested, kind string) (string, os.FileInfo, error) {
+	if !utf8.ValidString(requested) || !filepath.IsAbs(requested) || !strings.EqualFold(filepath.Ext(requested), ".db") {
+		return "", nil, fmt.Errorf("%s destination must be an explicit absolute new SQLite .db file", kind)
 	}
-	parent, err := filepath.EvalSymlinks(filepath.Dir(request.Path))
+	parent, err := filepath.EvalSymlinks(filepath.Dir(requested))
 	if err != nil {
 		return "", nil, err
 	}
 	info, err := os.Stat(parent)
 	if err != nil || !info.IsDir() {
-		return "", nil, errors.Join(err, errors.New("SU destination parent must be an existing directory"))
+		return "", nil, errors.Join(err, fmt.Errorf("%s destination parent must be an existing directory", kind))
 	}
-	path := filepath.Join(parent, filepath.Base(request.Path))
+	path := filepath.Join(parent, filepath.Base(requested))
 	if _, err := os.Lstat(path); !errors.Is(err, os.ErrNotExist) {
-		return "", nil, errors.Join(err, errors.New("SU destination already exists or cannot be checked; existing files are never replaced"))
+		return "", nil, errors.Join(err, fmt.Errorf("%s destination already exists or cannot be checked; existing files are never replaced", kind))
 	}
 	return path, info, nil
 }

@@ -11,6 +11,7 @@
   import { ReadRequests } from './readRequests';
   import { validateProfileNavigation, profileNavigationPage, validatePlotProfileSource, validateProjectPlotProfileReview, type ValidatedProjectPlotProfileReview, type ProfileNavigation } from './projectPlotProfileReview';
   import { validateProfileSUReview, validateProfileSUCreated, type ReviewedProfileSU } from './profileSU';
+  import { validateProfileFileReview, validateProfileFileCreated, type ReviewedProfileFile } from './profileFile';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -47,6 +48,14 @@
   const externalProjectsEnabled = import.meta.env.VITE_EXTERNAL_PROJECTS !== 'false';
   const profileSelectionEnabled = import.meta.env.VITE_PLOT_PROFILE_SELECTION === 'true';
   const profileWriteOwnershipEnabled = import.meta.env.VITE_PLOT_PROFILE_WRITE_OWNERSHIP === 'true';
+  const profileFileCreationEnabled = import.meta.env.VITE_PLOT_PROFILE_FILE_CREATION === 'true';
+  let profileFileReview = $state<ReviewedProfileFile | null>(null);
+  let profileFileContext = $state('');
+  let profileFileName = $state('');
+  let profileFilePath = $state('');
+  let profileFileError = $state('');
+  let profileFileSuccess = $state('');
+  let profileFileCommitted = $state(false);
   let profileWriteReview = $state<ValidatedProjectPlotProfileReview | null>(null);
   let profileWriteContext = $state('');
   let profileWriteError = $state('');
@@ -444,6 +453,50 @@
     }
   }
 
+  async function reviewBlankProfileFile() {
+    const contextId = $projectState?.contextId;
+    if (!contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+      profileFileError = 'Wait for the current operation or decision before reviewing a new profile file.'; return;
+    }
+    busy = true; profileFileError = '';
+    try {
+      await tick();
+      const response = await stateReads.track(ContextService.ReviewPlotProfileFileCreation(contextId));
+      if ($projectState?.contextId !== contextId) throw new Error('Blank profile review belongs to an old context.');
+      profileFileReview = validateProfileFileReview(response); profileFileContext = contextId;
+      profileFileCommitted = false; profileFileSuccess = '';
+    } catch (cause) { profileFileError = `No profile file created; review failed: ${String(cause)}`; }
+    finally { busy = false; }
+  }
+
+  async function createBlankProfileFile() {
+    if (!profileFileReview || profileFileCommitted || profileFileContext !== $projectState?.contextId) {
+      profileFileError = 'Review the current original empty template before creating one new profile file.'; return;
+    }
+    const proposal = $state.snapshot({ review: profileFileReview, name: profileFileName, path: profileFilePath, confirmed: true });
+    const origin = profileFileContext;
+    await requestTransition(async contextId => {
+      if (contextId !== origin) throw new Error('Blank profile proposal belongs to an old context.');
+      busy = true; profileFileError = '';
+      try {
+        await tick();
+        const response = await ContextService.CreatePlotProfileFile(contextId, proposal);
+        profileFileCommitted = true;
+        const created = validateProfileFileCreated(response, proposal.name);
+        profileFileSuccess = `Created ${created.table} with zero rules in ${created.source.path}. Inspect, select and authorize it explicitly to begin editing; current context selection is unchanged.`;
+        profilePath = created.source.path;
+        view = 'plots'; editorPlotNumber = undefined;
+        await loadPlots(0);
+        if (error) error = `Profile file published, but navigation refresh failed; do not replay creation: ${error}`;
+      } catch (cause) {
+        if (profileFileCommitted || String(cause).includes('Profile file published, but')) {
+          profileFileCommitted = true; profileFileError = `Profile file published; do not replay creation: ${String(cause)}`;
+        } else profileFileError = `No profile file published; proposal retained for correction or retry: ${String(cause)}`;
+        throw cause;
+      } finally { busy = false; }
+    });
+  }
+
   async function chooseProject(project: ProjectInfo) {
     await requestTransition(async (contextId) => {
       if (!project.path) throw new Error('Choose a project with an explicit file identity.');
@@ -630,6 +683,7 @@
               <section class="mt-3 p-3 border rounded" aria-label="Reviewed profile write ownership">
                 <p>{profileWriteReview.table} in {profileWriteReview.source.source.path}</p>
                 <p>{profileWriteReview.rules.rows.length} physical rules and {profileWriteReview.descriptions.rows.length} table descriptions reviewed.</p>
+                {#if profileWriteReview.descriptions.columns.length === 0}<p>Description metadata is absent; no descriptions are inferred or created.</p>{/if}
                 <p>Authorization applies only to this selected profile file/table for the current session. Context changes or restart clear it. Parent/child writes remain project-owned; support database writes are unavailable.</p>
                 <button type="button" class="mt-2 px-3 py-2 border rounded disabled:opacity-50"
                   disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || profileWriteContext !== $projectState.contextId}
@@ -641,6 +695,35 @@
             {#if profileWriteError}<p role="alert" class="mt-2 text-red-800">{profileWriteError}</p>{/if}
           {/if}
           <p class="mt-2 text-sm">Profile rules are independent of project/SU selection. External and other-table profiles are read-only unless explicitly authorized for this session.</p>
+          {#if profileFileCreationEnabled}
+            <button type="button" class="mt-3 px-3 py-2 border rounded disabled:opacity-50"
+              disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
+              onclick={() => void reviewBlankProfileFile()}>Review new blank profile file</button>
+            {#if profileFileReview}
+              <section class="mt-3 p-3 border rounded" aria-label="Reviewed blank profile file creation">
+                <h2 class="font-semibold">Create one new empty profile file</h2>
+                <p>Original nine nullable fields, zero rules, no template indexes/triggers and absent description metadata. No descriptions or legacy population values are invented.</p>
+                <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label for="profile-file-name" class="flex flex-col gap-1">New profile name
+                    <input id="profile-file-name" class="px-2 py-1 border rounded min-w-0" bind:value={profileFileName} disabled={busy || transitionWorking || pendingTransition !== null || profileFileCommitted} />
+                  </label>
+                  <label for="profile-file-path" class="flex flex-col gap-1">New SQLite file (absolute .db path)
+                    <input id="profile-file-path" class="px-2 py-1 border rounded min-w-0" bind:value={profileFilePath} disabled={busy || transitionWorking || pendingTransition !== null || profileFileCommitted} />
+                  </label>
+                </div>
+                {#if profileFileSuccess}<p role="status" class="mt-2 text-emerald-800 break-words">{profileFileSuccess}</p>{/if}
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button type="button" class="px-3 py-2 border rounded disabled:opacity-50"
+                    disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || profileFileCommitted || !profileFileName || !profileFilePath || profileFileContext !== $projectState.contextId}
+                    onclick={() => void createBlankProfileFile()}>Create reviewed blank profile file</button>
+                  <button type="button" class="px-3 py-2 border rounded" disabled={busy || transitionWorking || pendingTransition !== null}
+                    onclick={() => { profileFileReview = null; profileFileError = ''; profileFileSuccess = ''; }}>Dismiss blank profile review</button>
+                </div>
+                <p class="mt-3 text-sm">Only a new file is supported; existing files are never replaced. Names use the existing31-character ASCII desktop family policy; None, Sample and master names are reserved. Creation makes no implicit selection, write grant or original data/configuration write.</p>
+              </section>
+            {/if}
+            {#if profileFileError}<p role="alert" class="mt-2 text-red-800">{profileFileError}</p>{/if}
+          {/if}
         </details>
       {/if}
       {#if profileNavigation}

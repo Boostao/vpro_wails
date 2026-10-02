@@ -344,7 +344,9 @@
   {/if}
   {#if review}
     <p class="my-3">Source: {review.project} / {review.table}. Rules follow stored Order; duplicate Orders retain distinct physical records. PlotCount is historical storage, not a recalculated result.</p>
-    {#each [{ title: 'Original profile rules', table: review.rules }, { title: 'Original table-object descriptions', table: review.descriptions },
+    {#if review.descriptions.columns.length === 0}<p class="my-3">Original description metadata table is absent; no descriptions are inferred or created.</p>{/if}
+    {#each [{ title: 'Original profile rules', table: review.rules },
+      ...(review.descriptions.columns.length > 0 ? [{ title: 'Original table-object descriptions', table: review.descriptions }] : []),
       ...((allowRun || allowEditing) && lump ? [{ title: 'Explicitly selected project-local lump definitions', table: lump }] : [])] as item}
       <div class="overflow-x-auto mt-3">
         <table class="w-full border-collapse text-xs">
@@ -362,5 +364,5 @@
       </div>
     {/each}
   {/if}
-  <p class="mt-3 text-sm text-stone-600">This uses only explicitly selected stored rules and project data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other-table/external profile writes and restoration remain unavailable. Save as SU creates only a new SQLite file after its separate opt-in and explicit review. Profile selection, rule creation/deletion and navigation filtering require their separate opt-ins. No stored PlotCount or shipped scratch table is changed.</p>
+  <p class="mt-3 text-sm text-stone-600">This uses only explicitly selected stored rules and project data, never unsaved plot drafts. Preview runs use isolated SQLite TEMP results and source-scoped Env/Veg/Lump operations; text matching supports ASCII literals and simple * / ? patterns only. Unsupported rules fail explicitly. Other-table/external writes require separate current-session authorization; restoration remains unavailable. Save as SU creates only a new SQLite file after its separate opt-in and explicit review. Profile selection, rule creation/deletion and navigation filtering require their separate opt-ins. No stored PlotCount or shipped scratch table is changed.</p>
 </section>

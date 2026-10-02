@@ -91,9 +91,12 @@ export function validateProjectPlotProfileReview(review: ProjectPlotProfileRevie
   if (!review.project || !source.available || review.table !== source.table) {
     throw new Error('Profile review must identify the explicitly selected source table.');
   }
+  const descriptions = review.descriptions;
+  const absent = Array.isArray(descriptions?.columns) && descriptions.columns.length === 0 &&
+    Array.isArray(descriptions.rows) && descriptions.rows.length === 0;
   return { project: review.project, table: review.table,
     rules: validateTable(review.rules, plotProfileFields),
-    descriptions: validateTable(review.descriptions, ['table_name', 'description']), source };
+    descriptions: absent ? { columns: [], rows: [] } : validateTable(descriptions, ['table_name', 'description']), source };
 }
 
 export function validatePlotProfileSource(info: PlotProfileSourceInfo): PlotProfileSourceInfo {

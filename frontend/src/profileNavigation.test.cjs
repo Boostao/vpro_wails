@@ -9,6 +9,7 @@ const metadata = loadTypeScript('projectMetadataEditor.ts',{'./qualityEditor':qu
   '../../resources/project-metadata-standard.json':resource('project-metadata-standard.json'),
   '../../resources/project-metadata-template.json':resource('project-metadata-template.json')});
 const profile = loadTypeScript('projectPlotProfileReview.ts',{'./projectMetadataEditor':metadata});
+const profileFile = loadTypeScript('profileFile.ts',{'./projectPlotProfileReview':profile});
 const read = name => readFileSync(path.join(__dirname,name),'utf8');
 const nullCell = () => ({storage:'null',text:null,integer:null,real:null,blobHex:null});
 const rules = {columns:Array.from(profile.plotProfileFields,name=>({name,declaredType:'TEXT'})),
@@ -109,4 +110,51 @@ test('Write ownership review preserves exact physical source, typed rules and NU
     const value=structuredClone(review);alter(value);
     assert.throws(()=>profile.validateProjectPlotProfileReview(value));
   }
+});
+
+test('Genuine absent description metadata differs from an empty physical metadata table or malformed response',()=>{
+  const source={source:{name:'Bare',path:'C:\\bare.db'},table:'Bare_Profile',available:true,writable:false,reason:''};
+  const review={project:'Sample',table:source.table,rules:structuredClone(rules),
+    descriptions:{columns:[],rows:[]},source};
+  assert.deepEqual(JSON.parse(JSON.stringify(profile.validateProjectPlotProfileReview(review).descriptions)),{columns:[],rows:[]});
+  review.descriptions={columns:[{name:'table_name',declaredType:'TEXT'},{name:'description',declaredType:'TEXT'}],rows:[]};
+  assert.equal(profile.validateProjectPlotProfileReview(review).descriptions.columns.length,2);
+  for(const descriptions of [null,{columns:null,rows:[]},{columns:[],rows:null},
+    {columns:[],rows:[{rowId:'1',cells:[]}]},{columns:[{name:'table_name',declaredType:'TEXT'}],rows:[]}]){
+    assert.throws(()=>profile.validateProjectPlotProfileReview({...review,descriptions}));
+  }
+});
+
+test('Blank profile-file creation preserves the exact original template and rejects partial or populated proposals',()=>{
+  const review={metadataAbsent:true,template:{columns:profile.plotProfileFields.map((name,index)=>({
+    name,declaredType:index===0?'SMALLINT':index===8?'INTEGER':'VARCHAR'})),rows:[]}};
+  assert.equal(profileFile.validateProfileFileReview(review).template.columns.length,9);
+  for(const alter of [value=>delete value.metadataAbsent,value=>value.metadataAbsent=false,
+    value=>value.template.rows=[rules.rows[0]],value=>value.template.columns.reverse(),
+    value=>value.template.columns[0].declaredType='INTEGER',value=>value.template.columns.pop()]){
+    const invalid=structuredClone(review);alter(invalid);
+    assert.throws(()=>profileFile.validateProfileFileReview(invalid));
+  }
+  const result={source:{name:'NewBlank',path:"C:\\new O'Brien #.db"},table:'NewBlank_Profile',ruleCount:0};
+  assert.equal(profileFile.validateProfileFileCreated(result,'NewBlank'),result);
+  for(const value of [{...result,ruleCount:1},{...result,table:'Other_Profile'},{...result,source:{name:'NewBlank',path:''}}])
+    assert.throws(()=>profileFile.validateProfileFileCreated(value,'NewBlank'),/do not replay/);
+});
+
+test('New profile-file publication is separately default-off, shared-transition owned and never an implicit attach or grant',()=>{
+  const app=read('App.svelte');
+  assert.match(app,/VITE_PLOT_PROFILE_FILE_CREATION === 'true'/);
+  assert.match(app,/aria-label="Reviewed blank profile file creation"/);
+  assert.match(app,/<label for="profile-file-name"/);
+  assert.match(app,/<label for="profile-file-path"/);
+  const start=app.indexOf('async function createBlankProfileFile');
+  const action=app.slice(start,app.indexOf('\n  async function ',start+1));
+  assert.match(action,/\$state\.snapshot\(\{ review: profileFileReview, name: profileFileName, path: profileFilePath, confirmed: true \}\)/);
+  assert.match(action,/await requestTransition/);
+  assert.match(action,/await tick\(\);\s*const response = await ContextService.CreatePlotProfileFile/);
+  assert.match(action,/profileFileCommitted = true/);
+  assert.match(action,/do not replay creation/);
+  assert.match(action,/view = 'plots'; editorPlotNumber = undefined/);
+  assert.doesNotMatch(action,/SetPlotProfileEditing|SelectPlotProfile|SwitchContext/);
+  assert.match(app,/profileFileCommitted \|\| !profileFileName \|\| !profileFilePath \|\| profileFileContext !== \$projectState.contextId/);
 });

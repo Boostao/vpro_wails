@@ -270,6 +270,7 @@ func TestProfileSUDescriptionNullEmptyDuplicatesAndExtraStoragePreserved(t *test
 type profileSUStagedContext struct {
 	context.Context
 	directory string
+	prefix    string
 	once      sync.Once
 	action    func()
 }
@@ -278,7 +279,7 @@ func (ctx *profileSUStagedContext) Err() error {
 	files, err := os.ReadDir(ctx.directory)
 	if err == nil {
 		for _, file := range files {
-			if !strings.HasPrefix(file.Name(), ".vpro-profile-su-") {
+			if !strings.HasPrefix(file.Name(), ctx.prefix) {
 				continue
 			}
 			info, err := file.Info()
@@ -299,7 +300,7 @@ func TestProfileSULateCancellationAndPublicationCollisionRemoveStagedFiles(t *te
 			defer cancel()
 			foreign := []byte("Independently created destination must remain untouched")
 			var actionErr error
-			hooked := &profileSUStagedContext{Context: ctx, directory: filepath.Dir(request.Path)}
+			hooked := &profileSUStagedContext{Context: ctx, directory: filepath.Dir(request.Path), prefix: ".vpro-profile-su-"}
 			hooked.action = func() {
 				if cancelLate {
 					cancel()

@@ -56,7 +56,7 @@ test('Profile review rejects mismatched ownership, incomplete schemas, inconsist
     {...review(),rules:{columns,rows:[row('1'),row('1')]}},
     {...review(),rules:{columns,rows:[{...row('1'),cells:[]}]}},
     {...review(),rules:{columns,rows:[row('1.5')]}},
-    {...review(),descriptions:{columns:[],rows:[]}}
+    {...review(),descriptions:{columns:[],rows:[{rowId:'1',cells:[]}]}}
   ];
   for(const source of variants) assert.throws(()=>profile.validateProjectPlotProfileReview(source));
 });

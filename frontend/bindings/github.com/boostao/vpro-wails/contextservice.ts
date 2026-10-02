@@ -25,6 +25,10 @@ export function CreatePlot(contextID: string, header: $models.FS882Header): $Can
     return $Call.ByID(3214660085, contextID, header);
 }
 
+export function CreatePlotProfileFile(contextID: string, request: $models.PlotProfileFileCreation): $CancellablePromise<$models.PlotProfileFileCreated> {
+    return $Call.ByID(3970127352, contextID, request);
+}
+
 export function CreateProjectMetadataFromTemplate(contextID: string, request: $models.ProjectMetadataTemplateCreate): $CancellablePromise<$models.ProjectMetadataRow> {
     return $Call.ByID(598864844, contextID, request);
 }
@@ -135,6 +139,10 @@ export function ResolveProjectPlotProfileNavigation(contextID: string, request: 
 
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
+}
+
+export function ReviewPlotProfileFileCreation(contextID: string): $CancellablePromise<$models.PlotProfileFileReview> {
+    return $Call.ByID(1138163877, contextID);
 }
 
 export function ReviewProjectMetadata(contextID: string, plot: string): $CancellablePromise<$models.ProjectMetadataReview> {

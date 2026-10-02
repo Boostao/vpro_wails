@@ -389,6 +389,24 @@ export interface PlotPage {
     "plots": PlotSummary[] | null;
 }
 
+export interface PlotProfileFileCreated {
+    "source": PlotProfileSource;
+    "table": string;
+    "ruleCount": number;
+}
+
+export interface PlotProfileFileCreation {
+    "review": PlotProfileFileReview;
+    "name": string;
+    "path": string;
+    "confirmed": boolean;
+}
+
+export interface PlotProfileFileReview {
+    "template": ProjectMetadataTable;
+    "metadataAbsent": boolean;
+}
+
 export interface PlotProfileSource {
     "name": string;
     "path": string;

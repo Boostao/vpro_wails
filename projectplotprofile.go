@@ -36,7 +36,7 @@ func readProjectPlotProfile(ctx context.Context, c *sqliteContext) (ProjectPlotP
 	if err != nil {
 		return ProjectPlotProfileReview{}, fmt.Errorf("project-local plot profile rules unavailable: %w", err)
 	}
-	descriptions, err := readSQLiteStorageRows(ctx, c.conn, role, "_table_metadata", "table_name", &table, "")
+	descriptions, err := readProfileDescriptions(ctx, c.conn, role, table)
 	if err != nil {
 		return ProjectPlotProfileReview{}, fmt.Errorf("plot profile table-object descriptions unavailable: %w", err)
 	}

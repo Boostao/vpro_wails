@@ -1731,8 +1731,63 @@ per-operation review/editing/creation/deletion gates.
   checkpoint is restored exactly. Default14792 keeps all nine gates off and
   existing Vegetation active with zero writes. All owned apps exited normally
   and all original fixture/support/configuration bytes are restored.
-- **Next:** new usable profile-file/table creation from the original empty
-  nine-field template. Resolve absent description metadata explicitly without
-  inventing descriptions; do not implement the mismatched legacy population
-  branch blindly. Existing-file SU destinations, attachment administration,
-  restoration and broader migration remain open.
+- **Next:** reviewed new-file creation is implemented below. Existing-file
+  destinations/table insertion, attachment administration, restoration and
+  broader migration remain open.
+
+### Usable reviewed blank profile-file creation
+
+Implemented and native-Wails-verified, independently default off with
+`VITE_PLOT_PROFILE_FILE_CREATION=true` plus selection. Subsequent rule edits
+still require explicit selection/session authorization and their individual gates.
+
+- **Source:** `V7mdlCreateTables.CreateProfileTable` without ProfileRecords copies
+  the original empty `USysProfileTable`. Its nine fields are Order SMALLINT,
+  seven VARCHAR fields and PlotCount INTEGER in retained SQLite. Original
+  template DDL, emptiness and absence of indexes/triggers are independently
+  checked; changed constraints/defaults/generated fields are not discarded.
+  The optional population branch references Source/Cover/LumpTable missing from
+  the original template and remains unavailable.
+- **Descriptions:** genuine absence of `_table_metadata` is readable/selectable,
+  represented by explicit empty description columns/rows and labelled as absent.
+  An empty physical metadata table retains its schema and is distinct. Present
+  malformed/view metadata fails explicitly; NULL/empty/duplicates/extras remain
+  preserved in existing metadata tables. New-file creation requires the retained
+  system template's genuinely absent metadata; present metadata is not silently
+  discarded or replaced with invented descriptions.
+- **Publication:** review the complete original template before naming an absolute
+  new `.db` file. Reuse existing resolved-directory/no-overwrite checks and atomic
+  no-replace linking. The original empty schema and complete creation proposal
+  commit together to the staged file, with independent stored observations before
+  closed-handle publication. Cancellation, late collision, source change and
+  cleanup errors remain explicit/retryable; published responses block replay.
+  Existing destinations are never mutated. No implicit attachment, context change,
+  write grant or original database/configuration write.
+- **Adaptations:** creation uses the existing31-character ASCII desktop family
+  name policy, including underscore and reserved None/Sample/master names,
+  instead of reproducing Access's under40 hint/underscore rejection. Provenance
+  is technical desktop history, not native Access audit parity.
+- **Desktop:** responsive labelled name/path inputs, raw retained review/errors and
+  shared Save/Discard/Cancel. Successful publication retires the old editor and
+  offers the new path for independent inspection; selection/grant remain explicit.
+  A created file supports normal rule creation, preview, deletion and reserved IDs,
+  not merely a storage mapping or synthetic catalogue.
+- **Acceptance:** focused coupled race24.556s and full integration499.712s pass;
+  254 frontend tests/check0/0, actual bindings15/152/87/two enums and opt-in/default
+  builds pass. Bare-file availability, malformed metadata, absence-to-presence
+  drift, literal paths, original-byte preservation, complete provenance, changed
+  templates, strict Unicode transport, late cancellation/collision/cleanup/retry
+  and usable independent selection/grant/rule creation are tested.
+  Native16776 verifies Cancel, existing-destination rejection, Discard publication,
+  one independent parent Save/audit during explicit grant, absent-metadata review,
+  five complete rule histories and reserved deleted1/2. A read-only numeric-text
+  criterion rejection remains explicit; the user-equivalent correction to108050x
+  executes against the independent canonical52-plot project without replaying the
+  first creation or completed writes. Home navigation/retained-failure-modal harness
+  corrections occurred before publication. Native600px inputs/labels are actually
+  visible. Default14860 keeps all ten gates off and Vegetation active with zero
+  writes. All owned apps exited and every original fixture/support/configuration
+  byte is restored; the completed created file remains preserved.
+- **Remaining:** existing-file table creation/attachment administration, existing
+  SU destinations, numeric-looking text criterion semantics, restoration and the
+  broader migration/replacement gates remain separately scoped.

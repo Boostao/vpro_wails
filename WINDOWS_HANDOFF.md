@@ -41,7 +41,7 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `3809ae165a8a494ec9889f5bf1ea19fabcce46e4bd870978732dbdae04967150`.
+  `f5852c79b4be6da4854311570fcb7e7e3a14c668a8443b0836248ba15820aa5d`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -1054,7 +1054,7 @@ All apps exited normally and every original fixture/support/config byte is
 restored. Preserve the two completed SU output files and private proof.
 archives/profile-su-checkpoint seals previous3b71, core/final/default,
 exact assets, source, receipts/outputs/visuals/logs and manifest. Protected
-current/candidate are exact3809 copies; the df02 predecessor remains sealed.
+current/candidate are exactf585 copies; df02/3809 predecessors remain sealed.
 Never replay completed SU prepare/gates/selected/finish/final/default/seal.
 Explicit profile writer ownership is implemented/native-verified and separately
 default off with VITE_PLOT_PROFILE_WRITE_OWNERSHIP=true plus selection and the
@@ -1080,7 +1080,36 @@ All owned apps exited and every original fixture/support/configuration byte is
 restored. archives/profile-writer-checkpoint preserves df02, exact accepted
 core/default assets, source, logs, native receipts/outputs and manifest.
 Never replay profile-writer prepare/run, lifecycle prepare/run or default smoke.
-Profile-file/table creation, existing-file SU
+Blank profile-file creation is implemented/native-verified and independently
+default off with VITE_PLOT_PROFILE_FILE_CREATION=true plus selection. Exact
+original empty nine-field USysProfileTable DDL/no-index/no-trigger guards,
+genuine absent metadata and complete technical provenance precede atomic new-file
+publication. No implicit selection/grant/data/configuration write; existing-file
+destinations and mismatched legacy population remain unavailable.
+Absent profile description metadata is explicitly represented/labelled, not
+fabricated; empty physical metadata tables retain schema, malformed/view metadata
+fails, and existing NULL/empty/duplicate/extra description storage stays intact.
+Core bin/vpro-profile-file-core.exe
+67ac927f8fde53d49f61d21d12e0525d0bf214c7167a12a88e0e5caa5bd70790
+/owned16776 verifies Cancel/collision/Discard, one created file, independent
+selection/grant and one parent Save/audit, five typed rule histories, valid
+108050x preview against canonical52 Env and deleted1/2 reservations.
+Initial home navigation and retained failed-modal harness expectations were
+corrected before publication. A numeric-text criterion preview rejected safely;
+only explicit108050x correction plus remaining actions continued. Completed
+creation/parent/rule writes were not replayed. Actual600px file inputs/labels
+were visible. Completed native modes must never be replayed.
+Default bin/vpro-profile-file-default.exe
+f5852c79b4be6da4854311570fcb7e7e3a14c668a8443b0836248ba15820aa5d
+/owned14860 verifies all ten profiling gates off, existing Vegetation and zero
+writes. Focused24.556s/full race499.712s;254 frontend tests/check0/0/both builds.
+Actual bindings15 services/152 methods/87 models/two enums;57 editor operations.
+All owned apps exited and every original fixture/support/configuration byte is
+restored; preserve the completed profile-file-created.db and its receipts.
+archives/profile-file-checkpoint preserves3809 and exact accepted core/default
+bytes, assets, source, logs, output, continuations/visual and manifest.
+Never replay profile-file prepare/run/continue/finish or default smoke/seal.
+Existing-file profile table insertion, existing-file SU
 destinations, attachment administration, restoration and native Access parity
 remain open. Continue the next bounded source-first profile workflow without
 a new database-family/configuration framework or production/R/Access writes.
