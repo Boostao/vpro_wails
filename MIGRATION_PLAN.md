@@ -40,6 +40,7 @@ source writes. Exact default remains promoted; opt-in workflows remain off.
 | Reviewed adaptations | Guarded vegetation creation/deletion/personal definitions; named-scope code check; metadata review/edit/create/typed restoration; Enter/Find; ordered profiles/editing/navigation/file ownership/Save as SU | Complete Access execution parity; arbitrary destination/administration/history restoration |
 | Forward/reverse environment-SU | Selected owned-project SU; independent typed whole-scope reviews, atomic changes/provenance, drift/trigger rollback, retry/replay protection; reverse master/personal name precedence | Separate-file SU writes, personal-definition creation; source bulk SQL is not inherited indiscriminately |
 | Long Environment | Owned read-only native preview; selected project/SU including external SU, exact72 rows, typed values and explicit orphan/name candidates; draft-safe navigation/cancellable reads | Independent default-off gate; title edits preview-only, file export/Excel/summary unavailable |
+| Long Vegetation preparation | Pure typed selected-SU MAX reduction and LayerCode-driven non-NULL layer conversion, physical memberships and source-row provenance | Go-tested input preparation only; no report service/UI/native claim, quality/statistics/strata/lifeform/reference joins or export |
 | Shared CHARS presentation | One XL extended-shrub option, exact SubVegAXL labels/order, existing Cover5a/b/c storage and A membership, persistent hidden drafts/errors, atomic audited numeric edits | Independent default-off gate; cover-only presentation, no preference persistence or full variant/menu equivalence |
 
 Detailed source/behavior boundaries remain in the [Access contract](docs/FS882-6x4XL-access-contract.md),
@@ -97,12 +98,24 @@ vertical slice.
    summary options before implementing them; do not infer them from environment.
    Static source confirms `LVConstantSppList` bypasses both presence and
    mean-cover thresholds (`V7mdlReportsLongVeg`, lines264-280). The client
-   marked calculation/list options provisionally; decide whether to retain
-   that behavior, adapt it explicitly or keep constant-list mode unavailable.
-   Do not silently override the retained YAML default (-1). Source grouping,
+   marked calculation/list options provisionally. With the user unavailable,
+   conservative continuation provisionally retains that behavior; this is not
+   client approval or report enablement. Do not silently override the retained
+   YAML default (-1). Source grouping,
    quality filtering, MAX-per-plot/species reduction, denominator and effective
    no-op rounding were traced read-only; R quick/all-veg rows are different
-   precedents, not a substitute for this report contract.
+   precedents, not a substitute for this report contract. The bounded pure
+   preparation now preserves physical SU memberships/provenance, MAX-reduces
+   all15 original cover/total fields, and uses original LayerCode metadata for
+   non-NULL layer observations, including zero/negative and extended covers.
+   It does not perform the later SU/reference joins or quality/threshold filters.
+   Duplicate memberships/layer definitions remain distinguishable; raw identity
+   matching, stable order and numeric-tie storage are explicit adaptations.
+   Next gate: verify the source crosstab's `Count([MyCover])` presence expression
+   using a selective disposable Access query, rather than assuming COUNT of
+   observations or distinct plots. Physical SU denominator multiplicity alone
+   does not prove that numerator. Keep report service/UI unavailable until
+   quality/reference/grouping/denominator/numerator behavior is accepted.
 5. Define a small versioned headless interchange/automation contract using
    existing R functions as precedents. R may automate independently owned data;
    it must not bypass desktop leases/audits or write a live desktop project.

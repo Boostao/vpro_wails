@@ -32,6 +32,9 @@ Do not replace embedded frontend assets during compilation/tests.
 
 - Branch/upstream: `agents/access-parity-windows-handoff` /
   `origin/agents/access-parity-windows-handoff`.
+- Latest native application checkpoint: `5925cd2` shared CHARS, locally committed;
+  no push. Closed opt-in/default proof binaries removed only after exact shrub
+  archive comparison. Current/candidate remain the sealed10c5 default.
 - Published forward predecessor: `35d9302`; accepted reverse SU Into Env local
   commit `96dca8d`, with assessment/documentation ancestor `6ac6f77`.
 - Current extended-shrub acceptance: focused/coupled race9.482s; full race
@@ -73,6 +76,17 @@ Do not replace embedded frontend assets during compilation/tests.
   no-write cases were retained, then only the unfinished tail continued.
   No successful write was replayed. Source SubVegAXL metadata packaged read-only;
   checkbox is presentation-only, height interaction explicitly cover-only.
+- Long Vegetation preparation is a pure Go successor, not a new executable or
+  native report. It uses typed snapshots, original15-field MAX reduction,
+  physical SU memberships/provenance and original LayerCode layer conversion.
+  Six focused tests cover independent disposable SQLite MAX, read-only bundled
+  metadata, zero/negative/extended/historical values, exact integers, duplicates,
+  permutation/output independence, cancellation and malformed storage.
+  No service/bindings/UI changes; no native suite or production/source writes.
+  Focused/shared race1.261s and full integration root672.153s passed.
+  `archives\long-vegetation-preparation-checkpoint`:nine files plus manifest,
+  source/schema/layer contracts and exact focused/full receipts. The57-file
+  shrub predecessor and current/candidate executable remain unchanged.
 
 ## Cleanup and evidence
 
@@ -105,6 +119,13 @@ Do not replace embedded frontend assets during compilation/tests.
 
 ## Resume gate
 
+Long Vegetation: user was unavailable for the constant-list decision, so retain
+Access's threshold bypass and YAML=-1 provisionally, not as client approval.
+Do not substitute R quick/all-veg or assumed distinct-plot formulas.
+The source crosstab's `Count([MyCover])` numerator still needs selective
+disposable Access query evidence before statistics/report UI expansion.
+Current protected executable is unchanged by the pure preparation checkpoint.
+
 Reverse transfer is implemented/native-verified, independently default-off.
 The first late-trigger byte assertion stopped the harness without saved before
 hashes; its original discrepancy remains unknown. Independent full-table/no-history
@@ -117,10 +138,11 @@ historical Shiny/cloud agreement. Unmarked screenshots are candidate retain,
 not approved as-is; colour-only decisions and SU append/new-table semantics remain
 open in [client scope](docs/CLIENT_SCOPE.md).
 
-Next: resolve Long Vegetation constant-list/threshold scope, then its owned
-report slice and FS1333/priority locations. Source LongVeg currently bypasses
-presence/mean-cover thresholds when constant-list is on; retained YAML default
-is -1. No new Long Vegetation implementation or native suite was launched.
+Next: verify Long Vegetation presence-query semantics, then its owned report
+slice and FS1333/priority locations. Source LongVeg bypasses presence/mean-cover
+thresholds when constant-list is on; retained YAML default is -1. That behavior
+is provisionally retained while the user is unavailable. Pure preparation is
+Go-tested; no owned Long Vegetation service/UI or native suite was launched.
 Static contracts reside under session
 `files\overnight-form-contract` and `files\overnight-long-report`; they are not
 runtime parity proof. Do not resume stale

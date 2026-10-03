@@ -20,6 +20,7 @@ UI-free core automation, not a second data-entry UI.
 | Find/Enter | Source-bound explicit Enter navigation and exact scoped Find with safe Open lifecycle | Opt-in adaptations; no Access Find-dialog emulation |
 | Env Into SU / SU Into Env | Independent reviews of all matching selected-SU plots; owned-project file only; atomic typed provenance, drift/trigger rollback/retry and history replay guards | Independently opt-in; separate-file SU and personal-definition writes unavailable |
 | Long Environment | Owned read-only native preview: exact72 source rows, selected-SU membership, transposed per-plot values and explicit orphan/name diagnostics | Independently opt-in; external SU reads supported; preview-only title edits, file export/Excel/summary unavailable |
+| Long Vegetation preparation | Pure Go selected-SU MAX-per-plot/species reduction and original LayerCode-driven layer observations; exact typed memberships/source-row provenance | Calculation input only; no service/UI, quality filter, species/reference join, strata/lifeform statistics or export |
 | Other forms/reports/interchange | Navigation inventory and original resources provide precedents | FS1333/SIVI/two-page/CHARS equivalence, usable client-priority reports/locations and complete import/export not delivered |
 
 Current extended-shrub acceptance: full Go race (root858.736s),280 frontend
@@ -28,6 +29,27 @@ zero-write default proof. Report-preview predecessor is `e763e23`.
 Native acceptance used disposable data/configuration and restored original bytes.
 Feature implementation/native verification does not mean a default-off workflow
 is enabled or its Access execution parity is complete.
+
+Long Vegetation's first preparation slice is source-mapped and Go-tested, not a
+native-verified report. It preserves all physical SU memberships (including
+duplicates/orphans and NULL/empty unit identities), independently MAX-reduces
+the original15 cover/total fields, and emits only non-NULL covers selected by
+the original `LayerCode.LayerText` metadata. Zero/negative covers, extended
+shrubs and layers8/9/10 remain observations; totals are not invented as layers. Duplicate layer
+definitions and NULL/empty species remain distinguishable. Literal identity
+matching, deterministic ordering and deterministic numeric-tie storage are
+explicit desktop adaptations, not Access collation/Single-coercion parity.
+No persistent tables, configuration, production data or UI gates change.
+Six focused preparation tests and shared environment regressions passed with
+race1.261s; full Go race integration passed (root672.153s). The accepted native
+executable remains unchanged; there is no new frontend/native acceptance claim.
+
+Unattended continuation provisionally retains Access's constant-species-list
+threshold bypass and existing YAML default (-1), rather than silently adapting
+it. Client option scope remains provisional. Presence calculation is still
+unverified: the original crosstab uses `Count([MyCover])`, not an explicitly
+distinct plot count. Resolve that expression with selective disposable Access
+query evidence before claiming statistics parity or exposing the report.
 
 ## Architecture and safety
 
