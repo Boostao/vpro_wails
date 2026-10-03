@@ -40,7 +40,7 @@ definitions and NULL/empty species remain distinguishable. Literal identity
 matching, deterministic ordering and deterministic numeric-tie storage are
 explicit desktop adaptations, not Access collation/Single-coercion parity.
 No persistent tables, configuration, production data or UI gates change.
-Six focused preparation tests and shared environment regressions passed with
+Five focused preparation tests and shared environment regressions passed with
 race1.261s; full Go race integration passed (root672.153s). The accepted native
 executable remains unchanged; there is no new frontend/native acceptance claim.
 

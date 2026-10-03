@@ -79,7 +79,7 @@ Do not replace embedded frontend assets during compilation/tests.
 - Long Vegetation preparation is a pure Go successor, not a new executable or
   native report. It uses typed snapshots, original15-field MAX reduction,
   physical SU memberships/provenance and original LayerCode layer conversion.
-  Six focused tests cover independent disposable SQLite MAX, read-only bundled
+  Five focused tests cover independent disposable SQLite MAX, read-only bundled
   metadata, zero/negative/extended/historical values, exact integers, duplicates,
   permutation/output independence, cancellation and malformed storage.
   No service/bindings/UI changes; no native suite or production/source writes.
