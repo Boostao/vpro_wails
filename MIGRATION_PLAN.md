@@ -1890,3 +1890,45 @@ Implemented and native-Wails-verified, independently default off with
 - **Remaining:** arbitrary destinations/automatic attachment, Master authorization,
   restoration, numeric-looking text criterion semantics, native Access execution
   parity and the broader migration/replacement gates remain open.
+
+### Source Find Plot: scoped lookup and safe navigation
+
+Implemented and native-Wails-verified, independently default off with
+`VITE_SOURCE_PLOT_FIND=true`. Original `FS882-6x4XL.btnFindPlot_Click` focuses
+VegPlotNumber and invokes the Access Find dialog. Preserve its Find Plot caption;
+wire the original Vegetation action and local form-toolbar shortcut to one panel
+rather than expanding the application top menu.
+
+- **Desktop adaptation:** exact literal identity only, not an emulation of
+  Access's configurable partial/wildcard/direction dialog. Lookup reads current
+  `USysEnv` project/SU membership and requires exactly one physical Env and Admin
+  record, including duplicates hidden by DISTINCT. Preserve spaces, case, quotes,
+  Unicode and historical long identifiers; no trimming, coercion or new records.
+- **Ownership/lifecycle:** identity-bound cancellable coordinator read transaction
+  and existing attached-file observations. Read-only Find retains every draft;
+  explicit Open captures the complete found summary and revalidates after shared
+  Save/Discard/Cancel. Same-plot Open is unavailable, avoiding phantom discard or
+  remount. A reviewed profile navigation recordset is revalidated and retained;
+  neither SU nor profile filters may be escaped or silently cleared.
+- **Acceptance:** final focused race3.199s,262 frontend tests/check0/0 and both
+  builds pass; bindings15/157/93/two enums,57 editor operations unchanged.
+  The initial full race hit the default600s overall suite timeout during an
+  active SU201 case; its log is retained. Full `go test -race -timeout 20m ./...`
+  passes (root762.959s), including all final lookup tests. Literal Unicode/quotes/
+  case/historical long IDs, exact SU exclusion, physical duplicate ambiguity,
+  strict raw transport, stale identity, no writes and queued cancellation are
+  tested without production/R/Access writes.
+- **Native:** core16084/ac326632... proves nine cases: current/case mismatch,
+  original Vegetation action, off-pageR3039/Cancel, independent target drift/
+  retained retry, one separate parent Save/audit, Discard without another write,
+  two-plot SU exclusion, one-plot reviewed profile exclusion without clearing
+  filters, and actual600px field/label visibility. A no-write tab-caption
+  continuation uses the observed Site & Location caption, without replaying
+  completed cases. Default4588/1541669e... keeps both Find surfaces unavailable,
+  Vegetation active and all bytes unchanged. All owned apps exit and every
+  original fixture/support/configuration byte is restored. Exact core/default
+  assets/source/logs/receipts/output and protected86b29300 predecessor are sealed
+  before exact default-byte promotion.
+- **Remaining:** Access's configurable Find-dialog and automatic focus behavior
+  are not measured or emulated; broad active navigation/restoration, administration,
+  interchange/reports/maps and replacement acceptance remain open.

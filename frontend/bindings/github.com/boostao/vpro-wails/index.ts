@@ -107,6 +107,8 @@ export type {
     ProjectState,
     RegionCodeChoice,
     SUInfo,
+    ScopedPlotLookup,
+    ScopedPlotLookupResult,
     SiteCodeChoice,
     SoilCodeChoice,
     SoilNumberUpdate,

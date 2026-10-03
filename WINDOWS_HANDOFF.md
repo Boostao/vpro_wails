@@ -41,7 +41,7 @@ between shells.
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `86b2930062db5fc739caadd2d95b30b6d8fd66d6be0b58a2d4dae9c2595d0bd7`.
+  `1541669e56a398fb10e90e9835b8fa5529748b5ebe80757866985b274ad426d7`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
@@ -1171,6 +1171,35 @@ output/receipts/visuals and manifest; exact accepted86b2 default bytes are
 promoted to current/candidate without rebuilding.
 Never replay profile-su-project preparation/run/reserved-name continuation/
 discovery continuation/default/seal completed modes.
+Source Find Plot is implemented/native-Wails-verified, independently default off
+with VITE_SOURCE_PLOT_FIND=true. Original labelled Vegetation action and local
+toolbar shortcut share one exact lookup panel; application top menu is unchanged.
+Context-bound cancellable readonly lookup uses current USysEnv SU membership and
+exact physical Env/Admin uniqueness, including duplicates hidden by DISTINCT.
+Literal spaces/case/quotes/Unicode/historical long IDs are preserved. Read-only
+Find retains drafts; explicit Open rechecks the immutable complete found summary
+after shared Save/Discard/Cancel. Same-plot Open is unavailable; current reviewed
+profile navigation is revalidated without clearing SU/profile filters.
+Focused3.199s/full race762.959s;262 frontend tests/check0/0/both builds pass.
+The first full race hit the default600s suite cap in an active SU201 case; retain
+plot-find-race-timeout.txt. Final -timeout20m integration passes all packages.
+Bindings15/157/93/two enums;57 editor operations unchanged.
+Core bin/vpro-plot-find-core.exe
+ac32663203e88f5e9b5598143039851400dc3950b535a85349464993af933d4b
+/owned16084 verifies nine cases: exact/current/source action, off-pageR3039/
+Cancel, independent target drift/retained retry, one parent Save/audit, Discard,
+two-plot SU/one-plot profile exclusion and actually visible600px input/label.
+No-write Site & Location tab-caption continuation did not replay completed cases.
+Default bin/vpro-plot-find-default.exe
+1541669e56a398fb10e90e9835b8fa5529748b5ebe80757866985b274ad426d7
+/owned4588 keeps Find unavailable on both surfaces, Vegetation active and zero
+writes. All owned apps exited; every original fixture/support/configuration byte
+is restored. Preserve plot-find-project-after.db/config-after.yml and all proof.
+archives/plot-find-checkpoint retains protected86b29300 predecessor, exact accepted
+core/default bytes/assets/source/logs (including timeout)/receipts/output/narrow
+visual and manifest. Exact accepted1541 default bytes are promoted without rebuild.
+Never replay plot-find prepare/run/tab continuation/default/seal completed modes.
+Access configurable Find-dialog/automatic focus parity remains unverified.
 Arbitrary SU destinations/attachment administration, restoration, numeric-looking
 text criterion semantics and native Access parity remain open.
 Continue the next bounded source-first workflow without a new database-family/

@@ -14,6 +14,7 @@
   import { validateProfileFileReview, validateProfileFileCreated, type ReviewedProfileFile } from './profileFile';
   import { validateProfileTableReview, validateProfileTableCreated, type ReviewedProfileTable } from './profileTable';
   import { validateProjectSUReview, validateProjectSUCreated, type ReviewedProjectSU } from './profileSUProject';
+  import { plotLookupInputError, validateScopedPlotLookup } from './scopedPlotLookup';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -86,6 +87,11 @@
   let suProjectError = $state('');
   let suProjectSuccess = $state('');
   let suProjectCommitted = $state(false);
+  const plotFindEnabled = import.meta.env.VITE_SOURCE_PLOT_FIND === 'true';
+  let plotFindOpen = $state(false);
+  let plotFindQuery = $state('');
+  let plotFindResult = $state<Awaited<ReturnType<typeof ContextService.LookupScopedPlot>> | null>(null);
+  let plotFindError = $state('');
   let startupFailure = $state<StartupState | null>(null);
   const closeState = $derived(view === 'fs882' ? editor?.getCloseState() : undefined);
 
@@ -232,6 +238,60 @@
         request++; plotReads.cancelAll();
         profileNavigation = null; page = next; offset = 0; selected = null;
         editorPlotNumber = undefined; view = 'plots'; error = '';
+      } finally { busy = false; }
+    });
+  }
+
+  async function lookupPlot(number: string, contextId: string) {
+    const invalid = plotLookupInputError(number);
+    if (invalid) throw new Error(invalid);
+    const source = profileNavigation;
+    if (source) {
+      if (source.contextId !== contextId) throw new Error('Reviewed profile navigation belongs to an old context.');
+      const next = await resolveNavigation(source.proposal, contextId);
+      if (!next.plots.some(plot => plot.plotNumber === number)) {
+        throw new Error('Literal plot is outside the reviewed profile navigation; current filter is unchanged.');
+      }
+    }
+    const result = await stateReads.track(ContextService.LookupScopedPlot(contextId, { plotNumber: number }));
+    if ($projectState?.contextId !== contextId) throw new Error('Find belongs to an old context; current editor is unchanged.');
+    return validateScopedPlotLookup(result, number, contextId);
+  }
+
+  async function findScopedPlot() {
+    const contextId = $projectState?.contextId;
+    if (!plotFindEnabled || !contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
+    const number = plotFindQuery;
+    busy = true; plotFindError = ''; plotFindResult = null;
+    try {
+      await tick();
+      plotFindResult = await lookupPlot(number, contextId);
+    } catch (cause) { plotFindError = `No navigation or data change; find failed: ${String(cause)}`; }
+    finally { busy = false; }
+  }
+
+  async function openFoundPlot() {
+    if (!plotFindEnabled || !plotFindResult || plotFindResult.contextId !== $projectState?.contextId) {
+      plotFindError = 'Find an available plot in the current scope before opening it.'; return;
+    }
+    const proposal = $state.snapshot(plotFindResult);
+    if (proposal.plot.plotNumber === editorPlotNumber) {
+      plotFindError = 'Found plot is already open; no draft or navigation change.'; return;
+    }
+    await requestTransition(async contextId => {
+      if (contextId !== proposal.contextId) throw new Error('Found plot belongs to an old context; find again.');
+      busy = true; plotFindError = '';
+      try {
+        await tick();
+        const current = await lookupPlot(proposal.plot.plotNumber, contextId);
+        if (JSON.stringify(current) !== JSON.stringify(proposal)) {
+          throw new Error('Found plot summary changed since review; find again before opening.');
+        }
+        editorPlotNumber = current.plot.plotNumber; view = 'fs882'; selected = null;
+        plotFindOpen = false; plotFindResult = null; error = '';
+      } catch (cause) {
+        plotFindError = `Navigation failed; current editor and filters retained: ${String(cause)}`;
+        throw cause;
       } finally { busy = false; }
     });
   }
@@ -932,6 +992,30 @@
         <div class="h-full flex flex-col p-2">
           <p class="project-warning"><strong>Experimental FS882 editor</strong> Only verified workflows are writable. Use disposable projects only.</p>
           {#if error}<p class="error" role="alert">{error}</p>{/if}
+          {#if plotFindEnabled && plotFindOpen}
+            <section aria-label="Find scoped plot" class="mb-2 p-3 border rounded">
+              <form onsubmit={(event) => { event.preventDefault(); void findScopedPlot(); }} class="flex flex-wrap items-end gap-2">
+                <label for="find-scoped-plot" class="flex flex-col gap-1 flex-1 min-w-0">Exact plot number
+                  <input id="find-scoped-plot" class="px-2 py-1 border rounded min-w-0" bind:value={plotFindQuery}
+                    oninput={() => { plotFindResult = null; plotFindError = ''; }}
+                    disabled={busy || editorBusy || transitionWorking || pendingTransition !== null} />
+                </label>
+                <button type="submit" class="px-3 py-1 border rounded disabled:opacity-50"
+                  disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}>Find in current scope</button>
+                <button type="button" class="px-3 py-1 border rounded disabled:opacity-50"
+                  disabled={busy || transitionWorking || pendingTransition !== null}
+                  onclick={() => { plotFindOpen = false; plotFindResult = null; plotFindError = ''; }}>Dismiss find</button>
+              </form>
+              {#if plotFindError}<p role="alert" class="mt-2 text-red-800">{plotFindError}</p>{/if}
+              {#if plotFindResult}
+                <p role="status" class="mt-2">Found literal plot {JSON.stringify(plotFindResult.plot.plotNumber)} in the current recordset.</p>
+                <button type="button" class="mt-2 px-3 py-1 border rounded disabled:opacity-50"
+                  disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || plotFindResult.contextId !== $projectState?.contextId || plotFindResult.plot.plotNumber === editorPlotNumber}
+                  onclick={() => void openFoundPlot()}>Open found plot</button>
+              {/if}
+              <p class="mt-2 text-sm">Find is read-only. Exact spaces and case are preserved, including historical long identifiers. Current SU and reviewed profile filters stay in effect. Open rechecks the target after Save/Discard/Cancel; no record is created.</p>
+            </section>
+          {/if}
           <fieldset disabled={busy} class="contents">
           {#key $projectState?.contextId}
           {#key editorPlotNumber}
@@ -944,6 +1028,7 @@
             onBusyChange={(busy) => { editorBusy = busy; }}
             onProfileNavigation={applyProfileNavigation}
             onProfileSUReview={reviewProfileSU}
+            onFindPlot={plotFindEnabled ? () => { plotFindOpen = true; } : undefined}
           />
           {/key}
           {/key}

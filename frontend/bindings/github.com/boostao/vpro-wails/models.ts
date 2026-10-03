@@ -697,6 +697,15 @@ export interface SUInfo {
     "path"?: string;
 }
 
+export interface ScopedPlotLookup {
+    "plotNumber": string;
+}
+
+export interface ScopedPlotLookupResult {
+    "contextId": string;
+    "plot": PlotSummary;
+}
+
 export interface SiteCodeChoice {
     "rowId": string;
     "code": string | null;

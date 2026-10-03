@@ -3,10 +3,11 @@
   import { accessCaption, paperPage, type PaperControl, type VegetationMode } from './paperLayout';
   import { controlLabel, presentationGroups, wideControl } from './formPresentation';
   type Editor = { columns: readonly string[]; input: Snippet<[PaperControl, string]> };
-  let { name, embedded, values = new Map<string, unknown>(), vegetationMode = 'initial', onHeightToggle, onSpeciesCheck, speciesCheckDisabled = true, editor, editors = [] }: {
+  let { name, embedded, values = new Map<string, unknown>(), vegetationMode = 'initial', onHeightToggle, onSpeciesCheck, speciesCheckDisabled = true, onFindPlot, findPlotDisabled = true, editor, editors = [] }: {
     name: string; embedded: Snippet<[PaperControl]>; values?: Map<string, unknown>;
     vegetationMode?: VegetationMode; onHeightToggle?: () => void;
     onSpeciesCheck?: () => void; speciesCheckDisabled?: boolean;
+    onFindPlot?: () => void; findPlotDisabled?: boolean;
     editor?: Editor; editors?: readonly Editor[];
   } = $props();
   const activeEditors = $derived.by(() => {
@@ -42,6 +43,8 @@
                 <button type="button" data-source-control={control.controlName} aria-pressed={vegetationMode === 'height'} onclick={onHeightToggle}>{accessCaption(control.caption)}</button>
               {:else if control.controlName === 'btnCheckSppCodes' && onSpeciesCheck}
                 <button type="button" data-source-control={control.controlName} disabled={speciesCheckDisabled} onclick={onSpeciesCheck}>{controlLabel(control)}</button>
+              {:else if control.controlName === 'btnFindPlot' && onFindPlot}
+                <button type="button" data-source-control={control.controlName} disabled={findPlotDisabled} onclick={onFindPlot}>{controlLabel(control)}</button>
               {:else}
                 <button type="button" disabled title="Source workflow not migrated" data-source-control={control.controlName}>{controlLabel(control)}</button>
               {/if}

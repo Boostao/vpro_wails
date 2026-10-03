@@ -133,6 +133,10 @@ export function ListVegetationSpeciesUsers(contextID: string, lookup: $models.Ve
     return $Call.ByID(3585380524, contextID, lookup);
 }
 
+export function LookupScopedPlot(contextID: string, request: $models.ScopedPlotLookup): $CancellablePromise<$models.ScopedPlotLookupResult> {
+    return $Call.ByID(25132359, contextID, request);
+}
+
 export function LookupSpeciesCodeCheckTarget(contextID: string, lookup: $models.VegetationSpeciesLookup): $CancellablePromise<$models.SpeciesCodeCheckOption[] | null> {
     return $Call.ByID(1738673856, contextID, lookup);
 }

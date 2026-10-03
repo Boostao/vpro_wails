@@ -42,6 +42,21 @@ test('Source checkbox editors take ownership while unavailable checkbox partners
   assert.doesNotMatch(html, /data-column="SpeciesListComplete"/);
 });
 
+test('Source Find Plot shares the explicit callback while unavailable and busy actions remain disabled', () => {
+  const findPage = { ...page, controls: [{ ...control('btnFindPlot', 'CommandButton', 0), column: '', caption: 'Find Plot' }] };
+  const FindPage = serverComponent(source, 'SourcePage.svelte', {
+    './paperLayout': { paperPage: () => findPage, accessCaption: value => value },
+    './formPresentation': presentation
+  });
+  for (const [props, disabled] of [[{}, true], [{ onFindPlot: () => {}, findPlotDisabled: true }, true],
+    [{ onFindPlot: () => {}, findPlotDisabled: false }, false]]) {
+    const html = render(FindPage, { props: { name: 'Vegetation', embedded: () => {}, ...props } }).body;
+    const button = html.match(/<button\b[^>]*>Find Plot<\/button>/)?.[0];
+    assert.ok(button);
+    assert.equal(/\bdisabled\b/.test(button), disabled);
+  }
+});
+
 const SourcePage = serverComponent(source, 'SourcePage.svelte', {
   './paperLayout': { paperPage: () => page, accessCaption: value => value },
   './formPresentation': presentation
