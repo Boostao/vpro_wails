@@ -16,9 +16,9 @@
 - Preserve the R SQLite database family, per-project physical names and
   `_table_metadata` as native table Description storage, not just a version flag.
   Frozen editor catalogues are read models, never substitutes for that family.
-  Complete MIGRATION_PLAN.md foundation F1-F3 before expanding more editors:
-  default-init/runtime YAML with explicit lossless JSON migration, SQLite-owned
-  external-path contexts/TEMP views and draft-safe switching. R is architectural
+  Foundation F1-F3 is complete: reuse default-init/runtime YAML with explicit
+  lossless JSON migration, SQLite-owned external-path contexts/TEMP views and
+  draft-safe switching. Do not restart that infrastructure. R is architectural
   precedent, not parity proof; do not import obsolete paths or require DuckDB
   extensions for offline startup.
 
@@ -67,6 +67,13 @@ forensic instructions and execution notes remain in the ignored maintenance
 archive; consult them for a specific issue, not as a growing default prompt.
 
 ## Learnings
+
+- Client captions establish scope intent; unmarked screenshots are candidate
+  retain, not approved as-is parity, and colour-only marks need a legend before
+  excluding functionality. Help/manual explain domain intent, not current Access
+  execution or new constraints on historical data. The current target is a
+  Go/Wails desktop plus UI-free R automation; historical Shiny/cloud outcomes
+  remain separate scope tracks in docs/CLIENT_SCOPE.md.
 
 - Scoped operations already hold the context's operation read lease; pool borrows
   must reuse it rather than recursively taking the same RWMutex read lock, which
