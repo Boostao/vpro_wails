@@ -56,7 +56,7 @@ instructions.
 | 6 | Entry forms and active workflow behavior | In progress: forward/reverse transfer accepted; static FS1333/SIVI/two-page/CHARS contracts mapped, implementations unavailable; close remaining calculation/navigation/profile gaps |
 | 7 | Project, standards, SU and hierarchy administration | Incomplete: source-driven project new/save/splinter/merge/compare; controlled references/user metadata; classification ownership; hierarchy flat-table redesign lower priority |
 | 8 | Interchange and companion automation boundaries | Incomplete: fixture-tested Access import through go-mdbtools; table CSV/RDS and client-requested TurboVeg boundary; reviewed collision, roundtrip, cancellation and rollback |
-| 9 | Priority reports and locations, then other active modules | Incomplete: long/summary vegetation/environment, consolidated options and location outputs first; remaining agreed reports/maps/analysis after |
+| 9 | Priority reports and locations, then other active modules | Incomplete: Long Environment72-row pure typed planner fixture-tested; snapshot/preview/export unavailable. Long/summary vegetation, consolidated options and location outputs next; remaining agreed reports/maps/analysis after |
 | 10 | Replacement acceptance | Installation/upgrades/recovery/offline/performance and representative projects; every retained workflow verified or explicitly excluded |
 
 Orders express dependencies, not a requirement to finish every administrative
@@ -70,14 +70,18 @@ vertical slice.
    ribbon/form entrypoints with retained/modified/provisional requirements.
    Record each as mapped, draft, native-verified, unavailable or excluded;
    no menu label or screenshot alone proves implementation.
-2. Implement the first read-only **Long Environment** slice from the completed
-   static contract: selected project/SU, explicit title, 72 ordered rows (67
+2. Integrate the fixture-tested pure Go **Long Environment** draft through an
+   owned readonly context snapshot and preview/table output: selected project/SU,
+   explicit title, 72 ordered rows (67
    fields/five headings), per-plot unit grouping, typed zero/empty/NULL and
    missing-row/name diagnostics. No quality filter or summary formula exists
    in this source handler. Deterministic ordering and ambiguity diagnostics are
    explicit adaptations; preview/table output precedes Excel/publication work.
-   Acceptance covers exact row order, membership/orphans, duplicates, raw quoted
-   codes, permutation invariance, cancellation and unchanged data/configuration.
+   Planner acceptance covers exact row order, membership/orphans, duplicates,
+   raw quoted codes, permutation invariance, cancellation and independent typed
+   outputs. All67 fields exist in canonical Sample. Add ownership/context-switch,
+   external-SU scope, lifecycle and native zero-write/configuration acceptance;
+   the pure planner alone is not an available report or ownership proof.
 3. Implement a shared extended-shrub option only after covering existing
    Cover5a/b/c storage, A membership, hidden drafts/errors and height-mode
    interaction. Normal and CHARS A queries already include extended covers;

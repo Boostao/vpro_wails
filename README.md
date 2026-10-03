@@ -19,7 +19,8 @@ UI-free core automation, not a second data-entry UI.
 | Profiles and navigation | Ordered preview, rule edit/create/delete, explicit result navigation, independent selection/writer ownership, usable blank files/tables and reviewed Save as SU | Opt-in; arbitrary-file administration, broad history restoration and some criterion semantics open |
 | Find/Enter | Source-bound explicit Enter navigation and exact scoped Find with safe Open lifecycle | Opt-in adaptations; no Access Find-dialog emulation |
 | Env Into SU / SU Into Env | Independent reviews of all matching selected-SU plots; owned-project file only; atomic typed provenance, drift/trigger rollback/retry and history replay guards | Independently opt-in; separate-file SU and personal-definition writes unavailable |
-| Other forms/reports/interchange | Navigation inventory and original resources provide precedents | FS1333/SIVI/two-page/CHARS equivalence, client-priority reports/locations and complete import/export not delivered |
+| Long Environment | Pure typed Go draft: exact72 source rows, selected-SU membership, transposed per-plot values and explicit orphan/name diagnostics | Fixture-tested planner only; owned readonly snapshot adapter, UI, export and native acceptance unavailable |
+| Other forms/reports/interchange | Navigation inventory and original resources provide precedents | FS1333/SIVI/two-page/CHARS equivalence, usable client-priority reports/locations and complete import/export not delivered |
 
 Current reverse-transfer acceptance: full Go race (root654.285s),273 frontend
 tests, check0/0, opt-in/default production builds, seven native cases and a
@@ -92,6 +93,18 @@ definitions and changes to locked/unverifiably unlocked plots reject. These
 guards, technical history and selected-SU names instead of source hard-coded
 `Sample_SU` are explicit desktop adaptations, not blanket Access execution parity.
 
+The Long Environment draft preserves67 original Env/Admin fields and five heading
+rows from `V7mdlReportsEnv.EnvReport`, including labels/punctuation. It groups by
+selected SU, not Admin.UserSiteUnit or profile navigation, and adds no quality
+filter or summary calculations. Numeric zero, empty text, NULL and historical
+storage remain typed; missing Env/Admin retain membership with blank projections.
+Deterministic raw ordering, duplicate-membership counts and explicit conflicting/
+unsupported name diagnostics replace arbitrary `First()` selection. Reference
+candidate IDs, NULL/empty names and duplicates remain distinguishable. This pure
+planner does not establish ownership or launch Access/Excel, create files, write
+data/configuration or expose a report menu; those integration boundaries remain
+unavailable.
+
 ## Feature gates
 
 These are build-time Vite flags, not user permissions or hidden backend grants.
@@ -153,9 +166,10 @@ Use native Wails with disposable data/config for binding/lifecycle acceptance.
   [download portal](docs/index.html): distribution surfaces, not replacement
   acceptance for every platform.
 
-Next: a bounded read-only Long Environment report, followed by FS1333/two-page/
+Next: wire owned readonly snapshots and preview/table output for the Long
+Environment draft, followed by FS1333/two-page/
 CHARS implementation and priority vegetation reports/locations. Static form/report
-contracts are mapped, not implemented or native-verified. The historical agreement's
+contracts and the report planner do not prove native execution parity. The historical agreement's
 cloud/public-map/BECWeb/publication tracks remain visible but separately scoped.
 Private native evidence, original documentation snapshots and closed-build hash
 maps are retained outside app assets; no client PDFs or temporary tools are bundled.

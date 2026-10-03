@@ -107,6 +107,18 @@ func cloneSiteUnitCell(cell ProjectMetadataCell) ProjectMetadataCell {
 		text := *cell.Text
 		cell.Text = &text
 	}
+	if cell.Integer != nil {
+		integer := *cell.Integer
+		cell.Integer = &integer
+	}
+	if cell.Real != nil {
+		real := *cell.Real
+		cell.Real = &real
+	}
+	if cell.BlobHex != nil {
+		blob := *cell.BlobHex
+		cell.BlobHex = &blob
+	}
 	return cell
 }
 

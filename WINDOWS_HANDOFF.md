@@ -32,8 +32,8 @@ Do not replace embedded frontend assets during compilation/tests.
 
 - Branch/upstream: `agents/access-parity-windows-handoff` /
   `origin/agents/access-parity-windows-handoff`.
-- Published forward predecessor: `35d9302`; reverse SU Into Env is now accepted.
-  Assessment/documentation commit `6ac6f77` remains its local ancestor.
+- Published forward predecessor: `35d9302`; accepted reverse SU Into Env local
+  commit `96dca8d`, with assessment/documentation ancestor `6ac6f77`.
 - Reverse acceptance: coupled race19.946s; full race root654.285s;273 frontend
   tests, check0 errors/warnings; opt-in/default builds, seven native cases and
   zero-write default proof passed. Bindings15 services/164 methods/105 models/
@@ -48,10 +48,18 @@ Do not replace embedded frontend assets during compilation/tests.
   exact core/default assets/binaries, source/logs/native receipts and before/after
   data; verifies the49-file metadata predecessor and preserves old protected build.
   Older metadata75/Find59/SU84 evidence remains intact.
-- Reverse successor: `archives\su-environment-checkpoint`, exact binaries/
+- Reverse successor: `archives\su-environment-checkpoint`:59 files plus manifest,
+  exact binaries/
   assets, source/logs/native receipts, rollback diagnostic, data/visual and
   restoration proof. Prior forward seal and protected default preserved before
   promotion; never rebuild the accepted default during promotion.
+- Pure Go Long Environment planner is a fixture-tested draft only. No new binding/
+  frontend surface, report menu, native report proof or default promotion. Keep
+  the accepted reverse executable baseline while wiring later report integration.
+  Focused/coupled race23.414s; full race root666.610s passed.
+  `archives\long-environment-planner-checkpoint`:six files plus manifest,
+  exact source/schema contract, source and focused/full receipts; reverse59-file
+  predecessor and protected executable unchanged.
 
 ## Cleanup and evidence
 
@@ -92,8 +100,9 @@ historical Shiny/cloud agreement. Unmarked screenshots are candidate retain,
 not approved as-is; colour-only decisions and SU append/new-table semantics remain
 open in [client scope](docs/CLIENT_SCOPE.md).
 
-Next: implement the bounded read-only Long Environment contract (72 ordered rows,
-no invented quality/summary options), then shared CHARS/FS1333 behavior and priority
+Next: wire owned readonly context snapshots and preview/table output for the
+Long Environment draft (72 ordered rows, no invented quality/summary options),
+then shared CHARS/FS1333 behavior and priority
 vegetation reports. Static contracts reside under session
 `files\overnight-form-contract` and `files\overnight-long-report`; they are not
 runtime parity proof. Do not resume stale
