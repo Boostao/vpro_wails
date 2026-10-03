@@ -22,6 +22,7 @@ UI-free core automation, not a second data-entry UI.
 | Long Environment | Owned read-only native preview: exact72 source rows, selected-SU membership, transposed per-plot values and explicit orphan/name diagnostics | Independently opt-in; external SU reads supported; preview-only title edits, file export/Excel/summary unavailable |
 | Long Vegetation preparation | Pure Go selected-SU MAX-per-plot/species reduction and original LayerCode-driven layer observations; exact typed memberships/source-row provenance | Calculation input only; no service/UI, quality filter, species/reference join, strata/lifeform statistics or export |
 | Long Vegetation crosstab | ACE-probed plot-column presence, duplicate-weighted sums/observation averages and strict thresholds/constant-list bypass | Pure calculation kernel for already joined/grouped inputs; reference/quality/grouping integration and owned report UI remain unavailable |
+| Long Vegetation layer preview | Internal owned selected-SU read path, external SU support, original master-species/layer joins and English-name grouping; strict retained YAML options | Go-tested internal boundary only, not a Wails service/UI or full native report; quality filtering, non-layer grouping, summaries and export remain unavailable |
 | Other forms/reports/interchange | Navigation inventory and original resources provide precedents | FS1333/SIVI/two-page/CHARS equivalence, usable client-priority reports/locations and complete import/export not delivered |
 
 Current extended-shrub acceptance: full Go race (root858.736s),280 frontend
@@ -71,6 +72,43 @@ behavior remains unknown and is not inherited as a desktop requirement.
 Four crosstab tests plus five preparation regressions passed with race1.241s;
 final full Go race integration passed (root664.970s). No frontend/binding change
 or new native desktop build was needed; the accepted executable is unchanged.
+
+The internal layer preview now reads original physical project Veg, selected
+SU, VLists.USysAllSpecs and VPro64.LayerCode through the existing coordinator,
+immutable context lease and read-only transaction. It does not substitute the
+editor's master/personal species UNION. Missing master codes retain raw Species;
+non-NULL ScientificName (including empty text) supplies the source display
+name, and synonym CodeType S/s is excluded. Duplicate reference definitions
+multiply joins as in the source and produce explicit diagnostics.
+
+EnglishName participates in source grouping. The constant-list join matches
+only Layer and displayed species, not EnglishName: different names can fan out
+into several rows. Both the list name and matched report name remain visible
+in the internal result rather than silently picking one definition. An
+eight-row selective ACE fixture verifies this behavior. The shared crosstab
+has an explicit unfiltered intermediate mode; its ordinary/constant-list
+threshold behavior remains unchanged.
+
+Named-unit denominators count physical SiteUnit rows, including duplicate
+memberships and NULL PlotNumber rows; unassigned denominators count only
+non-NULL PlotNumber rows. Orphan-only named units do not appear as invented
+reports. Empty identities remain literal, and per-unit pivot columns come
+only from joined cover observations. The desktop explicitly permits an
+unassigned-only preview instead of inheriting Access's early no-named-unit
+exit; no Excel250-plot cap or generated sheet-name rewrite is imposed.
+Long unit names are not calculated in this internal slice.
+
+The decoder preserves the default title, average10, constant list=-1, English
+names1 and ordering20. Unsupported strata/lifeform/group modes, alternative
+unit selection or requested quality filtering fail explicitly; they do not
+silently fall back. Summary and publication preferences remain stored and
+untouched, not falsely presented as computed output. This internal preview
+has no binding, feature gate or UI entrypoint yet; no report is made available
+by its backend acceptance.
+Combined acceptance:22 focused Go tests passed with race5.224s; full Go race
+integration passed (root659.145s). Independent read-only review found no
+significant defects; it correctly distinguishes selective ACE fixtures from
+full native report/Wails acceptance, which remains unavailable.
 
 ## Architecture and safety
 

@@ -1,0 +1,10 @@
+[
+  {"Layer":"A1","Spp":"Scientific A","EnglishName":"English A","MatchedName":"English A","P":0.5,"MC":1,"P1":4,"P2":0},
+  {"Layer":"A1","Spp":"Scientific A","EnglishName":"English A","MatchedName":"Other English","P":0.5,"MC":1,"P1":4,"P2":0},
+  {"Layer":"A1","Spp":"Scientific A","EnglishName":"Other English","MatchedName":"English A","P":0.5,"MC":1,"P1":4,"P2":0},
+  {"Layer":"A1","Spp":"Scientific A","EnglishName":"Other English","MatchedName":"Other English","P":0.5,"MC":1,"P1":4,"P2":0},
+  {"Layer":"A2","Spp":"Scientific A","EnglishName":"English A","MatchedName":"English A","P":0.25,"MC":1.5,"P1":6,"P2":null},
+  {"Layer":"A2","Spp":"Scientific A","EnglishName":"English A","MatchedName":"Other English","P":0.25,"MC":1.5,"P1":6,"P2":null},
+  {"Layer":"A2","Spp":"Scientific A","EnglishName":"Other English","MatchedName":"English A","P":0.25,"MC":1.5,"P1":6,"P2":null},
+  {"Layer":"A2","Spp":"Scientific A","EnglishName":"Other English","MatchedName":"Other English","P":0.25,"MC":1.5,"P1":6,"P2":null}
+]

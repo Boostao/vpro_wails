@@ -224,6 +224,7 @@ func TestVegetationCrosstabInvalidInputsOverflowAndCancellation(t *testing.T) {
 	inputs, keys := vegetationPresenceInputs(fixture, true)
 	for _, options := range []vegetationCrosstabOptions{
 		{Average: ""}, {Average: "unknown"},
+		{Average: "all-plots", ConstantSpeciesList: true, Unfiltered: true},
 		{Average: "all-plots", PresenceGreaterThan: math.NaN()},
 		{Average: "all-plots", MeanCoverGreaterThan: math.Inf(1)},
 	} {

@@ -24,6 +24,7 @@ type vegetationCrosstabOptions struct {
 	Average              string
 	Ungrouped            bool
 	ConstantSpeciesList  bool
+	Unfiltered           bool
 	PresenceGreaterThan  float64
 	MeanCoverGreaterThan float64
 }
@@ -57,6 +58,9 @@ func calculateVegetationCrosstab(ctx context.Context, inputs []vegetationCrossta
 	}
 	if !options.ConstantSpeciesList && len(constantKeys) > 0 {
 		return nil, errors.New("constant species keys require explicit constant-list mode")
+	}
+	if options.Unfiltered && options.ConstantSpeciesList {
+		return nil, errors.New("unfiltered intermediate crosstab cannot apply a constant-list join")
 	}
 	type identity struct{ group, species string }
 	keyIdentity := func(key vegetationCrosstabKey) (identity, error) {
@@ -201,7 +205,7 @@ func calculateVegetationCrosstab(ctx context.Context, inputs []vegetationCrossta
 			}
 		}
 		// Source applies strict thresholds only outside constant-list mode.
-		if options.ConstantSpeciesList || row.MeanCover != nil &&
+		if options.Unfiltered || options.ConstantSpeciesList || row.MeanCover != nil &&
 			*row.MeanCover > options.MeanCoverGreaterThan && *row.Presence > options.PresenceGreaterThan/100 {
 			result = append(result, row)
 		}

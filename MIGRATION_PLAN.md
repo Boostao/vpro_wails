@@ -42,6 +42,7 @@ source writes. Exact default remains promoted; opt-in workflows remain off.
 | Long Environment | Owned read-only native preview; selected project/SU including external SU, exact72 rows, typed values and explicit orphan/name candidates; draft-safe navigation/cancellable reads | Independent default-off gate; title edits preview-only, file export/Excel/summary unavailable |
 | Long Vegetation preparation | Pure typed selected-SU MAX reduction and LayerCode-driven non-NULL layer conversion, physical memberships and source-row provenance | Go-tested input preparation only; no report service/UI/native claim, quality/statistics/strata/lifeform/reference joins or export |
 | Long Vegetation crosstab | Selective ACE-verified non-NULL pivot-column presence and duplicate-weighted sums/means; strict species thresholds and constant-list bypass | Pure kernel for already joined/grouped observations; not a full native report or owned service/UI |
+| Long Vegetation owned layer preview | Internal coordinator/lease/read-only snapshot, strict retained YAML options, source master-reference/layer/English grouping and constant-list fanout | Internal Go acceptance only; no Wails binding/UI, quality filtering, strata/lifeform modes, unit long names, summaries or publication |
 | Shared CHARS presentation | One XL extended-shrub option, exact SubVegAXL labels/order, existing Cover5a/b/c storage and A membership, persistent hidden drafts/errors, atomic audited numeric edits | Independent default-off gate; cover-only presentation, no preference persistence or full variant/menu equivalence |
 
 Detailed source/behavior boundaries remain in the [Access contract](docs/FS882-6x4XL-access-contract.md),
@@ -126,12 +127,31 @@ vertical slice.
    Identity wrapper omission and
    rational intermediates/double output are documented adaptations; no source
    application, Excel or production database was opened.
-   Next bounded slice: owned selected-SU layer-mode planner with exact original
-   reference joins/display grouping, visible ambiguity/multiplicity diagnostics,
-   typed physical denominator including unassigned units, and explicit guards
-   for quality filtering/lumping/non-layer grouping until implemented. Read the
-   retained YAML defaults without silently ignoring requested inactive options.
-   Keep report service/UI unavailable until that integrated behavior is accepted.
+   The owned selected-SU layer-mode planner now reads original physical Veg,
+   SU, master USysAllSpecs and LayerCode through the coordinator/lease/read-only
+   transaction, including external SU paths. Master/personal editor UNION is
+   not substituted. ScientificName/raw-code fallback and EnglishName grouping
+   preserve NULL/empty; duplicate references/memberships retain source join
+   multiplication with diagnostics. Eight selective ACE rows verify constant
+   list fanout across different English names: the final join uses Layer/Spp,
+   not EnglishName. Both list and matched names remain distinguishable.
+   Named units count physical SiteUnit rows; unassigned counts non-NULL
+   PlotNumber. Empty/orphan memberships remain explicit. Unassigned-only
+   output and no Excel250-plot cap are deliberate preview adaptations.
+   Strict YAML decoding retains defaults and rejects requested inactive
+   quality/strata/lifeform/unit-selection modes. Summary/publication settings
+   are preserved, not pretended to be computed. Taxon lumping has no active
+   desktop selection in this slice; no lumping equivalence is claimed.
+   Next bounded slice: expose a cancellable read-only options/preview service
+   with path/context identity, then responsive report UI using existing
+   Save/Discard/Cancel and native-close guards. Keep default-off until native
+   acceptance verifies actual visibility, drafts, repeated reads and zero writes.
+   Unit long names, quality filtering, non-layer modes, summary/title persistence
+   and file publication remain separate bounded deliverables.
+   At acceptance gates, use one bounded independent read-only reviewer,
+   distinct from an implementation delegate. The primary integrates findings
+   and owns fixes/native actions; do not launch overlapping editors or nested
+   agents. Current layer review found no significant defects; full race passed.
 5. Define a small versioned headless interchange/automation contract using
    existing R functions as precedents. R may automate independently owned data;
    it must not bypass desktop leases/audits or write a live desktop project.

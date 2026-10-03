@@ -160,12 +160,33 @@ historical Shiny/cloud agreement. Unmarked screenshots are candidate retain,
 not approved as-is; colour-only decisions and SU append/new-table semantics remain
 open in [client scope](docs/CLIENT_SCOPE.md).
 
-Next: integrate Long Vegetation owned layer-mode planning/reference joins and
-explicit quality/lumping guards, then its report UI and FS1333/priority locations.
+Current successor: internal Long Vegetation layer planner and owned read-only
+helper integrate original physical Veg/selected SU/master USysAllSpecs/LayerCode,
+including external SU. One independent delegated task owned only the strict
+YAML options decoder/tests; the primary integrated planner/ownership/evidence.
+Native ACE in the same sole disposable query fixture verified eight rows of
+English grouping and constant-list Layer/Spp-only fanout. Exact results:
+`layer-join-results.json`, matched by tracked testdata fixture. Never replay
+`probe-layer-join.ps1`; the original crosstab14-file predecessor remains sealed.
+No Access application, production/source data, frontend/bindings/native desktop
+build was changed. Internal Go method is not Wails-exposed.
+Combined22 focused tests passed race5.224s; full Go race root659.145s passed.
+Independent read-only review found no significant defects. Its pending-race
+acceptance note is now resolved by the completed/read full result; its lack
+of full native report/Wails acceptance remains an explicit boundary.
+`archives\long-vegetation-layer-checkpoint`:18 files plus manifest, exact
+source/fixture/contracts and focused/full receipts. The14-file crosstab
+predecessor and protected current/candidate10c5 executable remain unchanged.
+
+Next: expose typed context/path-bound Long Vegetation options/preview service,
+then responsive default-off report UI with existing draft/navigation/close
+guards and native zero-write acceptance. Preserve source defaults and explicit
+inactive-option errors; unit long names, quality/non-layer modes, summary/title
+persistence and publication remain separate work.
 Source LongVeg bypasses presence/mean-cover
 thresholds when constant-list is on; retained YAML default is -1. That behavior
 is provisionally retained while the user is unavailable. Pure preparation is
-Go-tested and presence kernel selectively ACE-probed; no owned Long Vegetation
+Go-tested and source joins selectively ACE-probed; no public Long Vegetation
 service/UI or native application suite was launched.
 Static contracts reside under session
 `files\overnight-form-contract` and `files\overnight-long-report`; they are not
