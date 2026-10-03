@@ -1,0 +1,53 @@
+{
+  "oracle": "DAO.DBEngine.120 / ACE on a newly created disposable accdb",
+  "adaptation": "Original TRANSFORM Sum(Cover) AS MyCover and Count([MyCover])/4. Identity vpRoundUp wrapper omitted. No VPRO source database or Access application opened.",
+  "memberships": ["P1", "P1", "P2", "P3"],
+  "observations": [
+    {"plot":"P1","layer":"1","species":"A","cover":2},
+    {"plot":"P1","layer":"2","species":"A","cover":3},
+    {"plot":"P2","layer":"1","species":"A","cover":0},
+    {"plot":"P1","layer":"1","species":"B","cover":-2},
+    {"plot":"P2","layer":"1","species":"B","cover":2},
+    {"plot":"P1","layer":"1","species":"N","cover":null}
+  ],
+  "cases": [
+    {
+      "grouped": true,
+      "average":"all-plots",
+      "rows":[
+        {"layer":"1","species":"A","presence":0.5,"meanCover":1,"plots":[4,0]},
+        {"layer":"1","species":"B","presence":0.5,"meanCover":-0.5,"plots":[-4,2]},
+        {"layer":"1","species":"N","presence":0,"meanCover":null,"plots":[null,null]},
+        {"layer":"2","species":"A","presence":0.25,"meanCover":1.5,"plots":[6,null]}
+      ]
+    },
+    {
+      "grouped": true,
+      "average":"observations",
+      "rows":[
+        {"layer":"1","species":"A","presence":0.5,"meanCover":1.3333333333333333,"plots":[4,0]},
+        {"layer":"1","species":"B","presence":0.5,"meanCover":-0.6666666666666666,"plots":[-4,2]},
+        {"layer":"1","species":"N","presence":0,"meanCover":null,"plots":[null,null]},
+        {"layer":"2","species":"A","presence":0.25,"meanCover":3,"plots":[6,null]}
+      ]
+    },
+    {
+      "grouped": false,
+      "average":"all-plots",
+      "rows":[
+        {"layer":null,"species":"A","presence":0.5,"meanCover":2.5,"plots":[10,0]},
+        {"layer":null,"species":"B","presence":0.5,"meanCover":-0.5,"plots":[-4,2]},
+        {"layer":null,"species":"N","presence":0,"meanCover":null,"plots":[null,null]}
+      ]
+    },
+    {
+      "grouped": false,
+      "average":"observations",
+      "rows":[
+        {"layer":null,"species":"A","presence":0.5,"meanCover":2,"plots":[10,0]},
+        {"layer":null,"species":"B","presence":0.5,"meanCover":-0.6666666666666666,"plots":[-4,2]},
+        {"layer":null,"species":"N","presence":0,"meanCover":null,"plots":[null,null]}
+      ]
+    }
+  ]
+}

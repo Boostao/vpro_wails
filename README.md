@@ -21,6 +21,7 @@ UI-free core automation, not a second data-entry UI.
 | Env Into SU / SU Into Env | Independent reviews of all matching selected-SU plots; owned-project file only; atomic typed provenance, drift/trigger rollback/retry and history replay guards | Independently opt-in; separate-file SU and personal-definition writes unavailable |
 | Long Environment | Owned read-only native preview: exact72 source rows, selected-SU membership, transposed per-plot values and explicit orphan/name diagnostics | Independently opt-in; external SU reads supported; preview-only title edits, file export/Excel/summary unavailable |
 | Long Vegetation preparation | Pure Go selected-SU MAX-per-plot/species reduction and original LayerCode-driven layer observations; exact typed memberships/source-row provenance | Calculation input only; no service/UI, quality filter, species/reference join, strata/lifeform statistics or export |
+| Long Vegetation crosstab | ACE-probed plot-column presence, duplicate-weighted sums/observation averages and strict thresholds/constant-list bypass | Pure calculation kernel for already joined/grouped inputs; reference/quality/grouping integration and owned report UI remain unavailable |
 | Other forms/reports/interchange | Navigation inventory and original resources provide precedents | FS1333/SIVI/two-page/CHARS equivalence, usable client-priority reports/locations and complete import/export not delivered |
 
 Current extended-shrub acceptance: full Go race (root858.736s),280 frontend
@@ -44,12 +45,32 @@ Five focused preparation tests and shared environment regressions passed with
 race1.261s; full Go race integration passed (root672.153s). The accepted native
 executable remains unchanged; there is no new frontend/native acceptance claim.
 
-Unattended continuation provisionally retains Access's constant-species-list
-threshold bypass and existing YAML default (-1), rather than silently adapting
-it. Client option scope remains provisional. Presence calculation is still
-unverified: the original crosstab uses `Count([MyCover])`, not an explicitly
-distinct plot count. Resolve that expression with selective disposable Access
-query evidence before claiming statistics parity or exposing the report.
+Continuation retains Access's constant-species-list threshold bypass and
+existing YAML default (-1), rather than silently adapting it. Client option
+scope remains provisional. A selective `DAO.DBEngine.120` ACE query on a new
+disposable database verified that `Count([MyCover])` counts non-NULL pivot plot
+columns, including zero and negative sums. Repeated SU rows multiply covers,
+but not that numerator; physical SU rows remain the independent denominator.
+`all-plots` divides the joined sum by that denominator; `observations` averages
+non-NULL joined observations, not plot sums. Missing constant-list species have
+NULL statistics/cells, not zero. Constant-list SQL equality does not match
+NULL group/species keys; empty text still matches. Both thresholds are strict and apply only
+outside constant-list mode. The probe omitted the identity `vpRoundUp` wrapper;
+it did not run VPRO report code, Excel, application startup or production data.
+
+The kernel accepts already joined/grouped observations, preserves literal
+NULL/empty identities and computes exact rational intermediate sums with finite
+double outputs. This avoids order-dependent cancellation but does not claim
+Access Single/Val coercion parity. Four oracle cases are retained in
+[the presence fixture](testdata/long-vegetation-presence.json). No quality,
+species/reference/layer-label join, taxon lumping, summary or report UI is
+enabled by that calculation evidence. A second three-case physical ACE probe
+verified constant-list NULL/empty equality. Its initial constant-expression
+saved-query variant unexpectedly dropped the NULL left row; that optimizer
+behavior remains unknown and is not inherited as a desktop requirement.
+Four crosstab tests plus five preparation regressions passed with race1.241s;
+final full Go race integration passed (root664.970s). No frontend/binding change
+or new native desktop build was needed; the accepted executable is unchanged.
 
 ## Architecture and safety
 

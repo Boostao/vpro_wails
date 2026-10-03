@@ -41,6 +41,7 @@ source writes. Exact default remains promoted; opt-in workflows remain off.
 | Forward/reverse environment-SU | Selected owned-project SU; independent typed whole-scope reviews, atomic changes/provenance, drift/trigger rollback, retry/replay protection; reverse master/personal name precedence | Separate-file SU writes, personal-definition creation; source bulk SQL is not inherited indiscriminately |
 | Long Environment | Owned read-only native preview; selected project/SU including external SU, exact72 rows, typed values and explicit orphan/name candidates; draft-safe navigation/cancellable reads | Independent default-off gate; title edits preview-only, file export/Excel/summary unavailable |
 | Long Vegetation preparation | Pure typed selected-SU MAX reduction and LayerCode-driven non-NULL layer conversion, physical memberships and source-row provenance | Go-tested input preparation only; no report service/UI/native claim, quality/statistics/strata/lifeform/reference joins or export |
+| Long Vegetation crosstab | Selective ACE-verified non-NULL pivot-column presence and duplicate-weighted sums/means; strict species thresholds and constant-list bypass | Pure kernel for already joined/grouped observations; not a full native report or owned service/UI |
 | Shared CHARS presentation | One XL extended-shrub option, exact SubVegAXL labels/order, existing Cover5a/b/c storage and A membership, persistent hidden drafts/errors, atomic audited numeric edits | Independent default-off gate; cover-only presentation, no preference persistence or full variant/menu equivalence |
 
 Detailed source/behavior boundaries remain in the [Access contract](docs/FS882-6x4XL-access-contract.md),
@@ -111,11 +112,26 @@ vertical slice.
    It does not perform the later SU/reference joins or quality/threshold filters.
    Duplicate memberships/layer definitions remain distinguishable; raw identity
    matching, stable order and numeric-tie storage are explicit adaptations.
-   Next gate: verify the source crosstab's `Count([MyCover])` presence expression
-   using a selective disposable Access query, rather than assuming COUNT of
-   observations or distinct plots. Physical SU denominator multiplicity alone
-   does not prove that numerator. Keep report service/UI unavailable until
-   quality/reference/grouping/denominator/numerator behavior is accepted.
+   The source crosstab's `Count([MyCover])` presence expression is now selectively
+   ACE-probed on a new disposable database: count non-NULL pivot plot columns,
+   including zero/negative sums, not joined observation count. Duplicate SU
+   rows multiply cover sums and weight observation averages, but not that
+   numerator. The pure kernel uses the independent physical denominator and
+   preserves NULL statistics for missing constant-list species; both strict
+   thresholds are bypassed in constant-list mode. Constant-list equality does
+   not match NULL grouped identities, while empty text does. A three-case
+   physical ACE probe verifies this; its initial constant-expression query
+   variant dropped a NULL left row unexpectedly. That saved-query optimizer
+   behavior remains unknown, not a desktop deletion requirement.
+   Identity wrapper omission and
+   rational intermediates/double output are documented adaptations; no source
+   application, Excel or production database was opened.
+   Next bounded slice: owned selected-SU layer-mode planner with exact original
+   reference joins/display grouping, visible ambiguity/multiplicity diagnostics,
+   typed physical denominator including unassigned units, and explicit guards
+   for quality filtering/lumping/non-layer grouping until implemented. Read the
+   retained YAML defaults without silently ignoring requested inactive options.
+   Keep report service/UI unavailable until that integrated behavior is accepted.
 5. Define a small versioned headless interchange/automation contract using
    existing R functions as precedents. R may automate independently owned data;
    it must not bypass desktop leases/audits or write a live desktop project.
@@ -123,8 +139,9 @@ vertical slice.
 
 Before implementing decisions about colour-only exclusions, SU append versus
 new-table classification, report statistics or legacy-format retirement,
-obtain explicit scope decisions. Current assessment grants no native Access
-write/oracle run or production write permission.
+obtain explicit scope decisions. The user's investigation request permits
+selective disposable query evidence; it grants no production write permission
+or broad native suite/source-application execution.
 
 ## Preserved architecture and invariants
 

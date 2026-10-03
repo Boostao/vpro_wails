@@ -119,12 +119,34 @@ Do not replace embedded frontend assets during compilation/tests.
 
 ## Resume gate
 
-Long Vegetation: user was unavailable for the constant-list decision, so retain
-Access's threshold bypass and YAML=-1 provisionally, not as client approval.
-Do not substitute R quick/all-veg or assumed distinct-plot formulas.
-The source crosstab's `Count([MyCover])` numerator still needs selective
-disposable Access query evidence before statistics/report UI expansion.
-Current protected executable is unchanged by the pure preparation checkpoint.
+Long Vegetation: user's investigation request was used for one selective ACE
+query probe on a newly created disposable accdb. `DAO.DBEngine.120` opened no
+source VPRO database or Access application and spawned no native owner.
+No registry/application-preference changes were requested.
+Four grouped/ungrouped and all-plot/observation-average
+cases verify non-NULL pivot-column presence, zero/negative covers, duplicate
+SU weights and NULL cover output. Identity vpRoundUp wrapper was omitted.
+`evidence\private\native-long-vegetation\presence-query-results.json` retains
+exact SQL/results; `presence-query.accdb` is solely disposable. Never replay
+`probe-presence.ps1` against that existing fixture; it rejects overwrite.
+`constant-null-query-results.json` verifies NULL group/species do not match
+and empty text does, using physical typed tables in the same owned fixture.
+Its first constant-expression saved-query variant unexpectedly dropped a NULL
+left row; that optimizer behavior remains unknown. Two attempts only, no
+broader oracle debugging. Do not replay `probe-null-list.ps1`.
+The pure crosstab kernel matches all four cases, keeps independent denominator,
+strict thresholds and constant-list bypass, and NULL missing-list statistics.
+The first integration run was stopped before completion to correct constant-list
+NULL equality; only the final post-correction integration receipt is acceptance.
+Final focused race1.241s (four crosstab/five preparation tests) and full Go race
+root664.970s passed. `archives\long-vegetation-crosstab-checkpoint` preserves14
+files plus manifest: exact code/fixture/source contracts, seven selective ACE
+cases, disposable database and focused/full logs. Preparation's immutable
+nine-file seal, original bundled layer database and current/candidate10c5
+executable remain unchanged. No frontend/binding/build/native-desktop action.
+No quality/reference/grouping/lumping integration or report service/UI claim.
+Current protected executable remains unchanged. Retain YAML=-1/source behavior;
+do not substitute R quick/all-veg formulas or silently ignore inactive options.
 
 Reverse transfer is implemented/native-verified, independently default-off.
 The first late-trigger byte assertion stopped the harness without saved before
@@ -138,11 +160,13 @@ historical Shiny/cloud agreement. Unmarked screenshots are candidate retain,
 not approved as-is; colour-only decisions and SU append/new-table semantics remain
 open in [client scope](docs/CLIENT_SCOPE.md).
 
-Next: verify Long Vegetation presence-query semantics, then its owned report
-slice and FS1333/priority locations. Source LongVeg bypasses presence/mean-cover
+Next: integrate Long Vegetation owned layer-mode planning/reference joins and
+explicit quality/lumping guards, then its report UI and FS1333/priority locations.
+Source LongVeg bypasses presence/mean-cover
 thresholds when constant-list is on; retained YAML default is -1. That behavior
 is provisionally retained while the user is unavailable. Pure preparation is
-Go-tested; no owned Long Vegetation service/UI or native suite was launched.
+Go-tested and presence kernel selectively ACE-probed; no owned Long Vegetation
+service/UI or native application suite was launched.
 Static contracts reside under session
 `files\overnight-form-contract` and `files\overnight-long-report`; they are not
 runtime parity proof. Do not resume stale
