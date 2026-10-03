@@ -115,7 +115,9 @@
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
   const environmentSUEnabled = import.meta.env.VITE_SOURCE_ENV_SU_TRANSFER === 'true';
+  const siteUnitEnvironmentEnabled = import.meta.env.VITE_SOURCE_SU_ENV_TRANSFER === 'true';
   let environmentSUOpen = $state(false);
+  let environmentSUDirection = $state<'forward' | 'reverse'>('forward');
   let environmentSUEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   const profileReviewEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_REVIEW === 'true';
   const profileRunEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_RUN === 'true';
@@ -448,13 +450,13 @@
     metadataOpen = true; error = null; successMsg = null;
   }
 
-  function openEnvironmentSU() {
-    if (!environmentSUEnabled || childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 ||
+  function openEnvironmentSU(direction: 'forward' | 'reverse' = 'forward') {
+    if (!(direction === 'reverse' ? siteUnitEnvironmentEnabled : environmentSUEnabled) || childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 ||
         !$projectState?.activeSU || $projectState.activeSU === 'None' || !original) {
       error = 'Select an owned-project SU, finish or Undo all drafts and unlock the available plot before reviewing Env Into SU.';
       return;
     }
-    environmentSUOpen = true; error = null; successMsg = null;
+    environmentSUDirection = direction; environmentSUOpen = true; error = null; successMsg = null;
   }
 
   async function refreshAfterRestore(plot: string, request: number) {
@@ -1783,7 +1785,12 @@
       {#if environmentSUEnabled}
         <button type="button" data-source-control="btnEnvIntoSu" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
           disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 || $projectState?.activeSU === 'None'}
-          onclick={openEnvironmentSU}>Env Into SU</button>
+          onclick={() => openEnvironmentSU()}>Env Into SU</button>
+      {/if}
+      {#if siteUnitEnvironmentEnabled}
+        <button type="button" data-source-control="btnSuIntoEnv" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
+          disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 || $projectState?.activeSU === 'None'}
+          onclick={() => openEnvironmentSU('reverse')}>SU Into Env</button>
       {/if}
       {#if onFindPlot}
         <button type="button" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
@@ -1914,7 +1921,8 @@
     {#if environmentSUOpen && $projectState?.projectPath}
       <EnvironmentSUTransfer bind:this={environmentSUEditor} client={PlotService} {contextId}
         project={$projectState.activeProject} su={$projectState.activeSU} path={$projectState.projectPath}
-        onclosed={() => { environmentSUOpen = false; error = null; }} />
+        direction={environmentSUDirection}
+        onclosed={() => { environmentSUOpen = false; error = null; if (environmentSUDirection === 'reverse') void load(original?.plotNumber); }} />
     {/if}
     {#if profileReviewOpen}
       <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}

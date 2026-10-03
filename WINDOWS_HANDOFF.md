@@ -32,20 +32,26 @@ Do not replace embedded frontend assets during compilation/tests.
 
 - Branch/upstream: `agents/access-parity-windows-handoff` /
   `origin/agents/access-parity-windows-handoff`.
-- Last published application milestone: `35d9302` forward Env Into SU;
-  metadata restoration predecessor `392ec99`.
-- Acceptance: focused race9.700s; full race root629.894s;269 frontend tests,
-  check0 errors/warnings; opt-in/default builds and six native cases passed.
-  Bindings15 services/162 methods/101 models/two enums;62 context operations.
-- Top-level `bin` contains only current baseline and candidate:
+- Published forward predecessor: `35d9302`; reverse SU Into Env is now accepted.
+  Assessment/documentation commit `6ac6f77` remains its local ancestor.
+- Reverse acceptance: coupled race19.946s; full race root654.285s;273 frontend
+  tests, check0 errors/warnings; opt-in/default builds, seven native cases and
+  zero-write default proof passed. Bindings15 services/164 methods/105 models/
+  two enums;64 context operations.
+- Protected exact accepted default/candidate:
   `vpro-current.exe`, `vpro-current-candidate.exe`, both SHA256
-  `ddbc793d3d177b8cfef16b37fa4cfa1f891f1b2fa7213939949fa372cdf0fd75`.
-  The accepted forward-transfer core is archived, not a current default build.
+  `5c47ac3d2620f418306507db0e321cc3a5ae34fa4f39b913139d9bcaec03389f`.
+  Reverse opt-in core SHA256:
+  `a290af57facc6a058dd06f171c4f7d42e1447bbcb0bb1da9907248ff1648208c`.
   Independent feature gates remain off; no unavailable workflow was enabled.
-- Immutable `archives\environment-su-checkpoint`:51 files plus manifest,
+- Immutable forward `archives\environment-su-checkpoint`:51 files plus manifest,
   exact core/default assets/binaries, source/logs/native receipts and before/after
   data; verifies the49-file metadata predecessor and preserves old protected build.
   Older metadata75/Find59/SU84 evidence remains intact.
+- Reverse successor: `archives\su-environment-checkpoint`, exact binaries/
+  assets, source/logs/native receipts, rollback diagnostic, data/visual and
+  restoration proof. Prior forward seal and protected default preserved before
+  promotion; never rebuild the accepted default during promotion.
 
 ## Cleanup and evidence
 
@@ -63,9 +69,10 @@ Do not replace embedded frontend assets during compilation/tests.
   excludes private evidence, archives, runtime data/config, tools and builds.
   The large private evidence corpus was retained; unknowns are not deletion targets.
 - Current sole vegetation fixture: `evidence\private\native-vegetation-species`.
-  Both accepted SU native owners exited normally; original project/support/config
+  Reverse opt-in/default native owners exited normally; original project/support/config
   bytes restored. No pending native write or suite needs continuation.
-  **Never replay completed** environment-su.py prepare/run/default or older
+  **Never replay completed** su-environment.py prepare/run/finish/default,
+  environment-su.py prepare/run/default or older
   metadata/profile/Find/vegetation modes.
 - No owned bin process was observed during cleanup. No Access process was
   touched. Before any future native action inspect current PID/start/path/owned
@@ -73,15 +80,22 @@ Do not replace embedded frontend assets during compilation/tests.
 
 ## Resume gate
 
-This round was assessment/documentation/archived-build cleanup only. No application
-behavior, fixture settings, production data or gates changed; no new native suite.
+Reverse transfer is implemented/native-verified, independently default-off.
+The first late-trigger byte assertion stopped the harness without saved before
+hashes; its original discrepancy remains unknown. Independent full-table/no-history
+observation and one retained rejected-action diagnostic verified settled exact
+byte rollback. A later harness-only NameError required post-commit read-only
+cleanup continuation; the successful transfer was never replayed. All original
+fixture bytes are restored and both owners closed. No production/source writes.
 The current desktop target and UI-free companion R package are distinct from the
 historical Shiny/cloud agreement. Unmarked screenshots are candidate retain,
 not approved as-is; colour-only decisions and SU append/new-table semantics remain
 open in [client scope](docs/CLIENT_SCOPE.md).
 
-Next round: review the scope ledger, finish the bounded reverse SU Into Env
-contract/implementation, inventory FS1333/two-page/CHARS differences, then a
-priority read-only long vegetation/environment report slice. Do not resume stale
+Next: implement the bounded read-only Long Environment contract (72 ordered rows,
+no invented quality/summary options), then shared CHARS/FS1333 behavior and priority
+vegetation reports. Static contracts reside under session
+`files\overnight-form-contract` and `files\overnight-long-report`; they are not
+runtime parity proof. Do not resume stale
 parent-field inventories, broad infrastructure refactors or unapproved Access
 oracle debugging. Full migration and deliverables6-10 remain open.

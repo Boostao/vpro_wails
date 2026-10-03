@@ -26,8 +26,9 @@ references are indexed in [client scope](docs/CLIENT_SCOPE.md).
 
 ## Delivered baseline
 
-Published `35d9302`: full Go race (root629.894s),269 frontend tests, check0/0,
-opt-in/default builds and native forward-SU acceptance. No production/R/Access
+Forward predecessor `35d9302`; reverse SU Into Env now accepted with full Go race
+(root654.285s),273 frontend tests, check0/0, opt-in/default builds, seven native
+cases and a zero-write default proof. No production/R/Access
 source writes. Exact default remains promoted; opt-in workflows remain off.
 
 | Area | Delivered | Still outside the claim |
@@ -37,7 +38,7 @@ source writes. Exact default remains promoted; opt-in workflows remain off.
 | FS882 parent |98/98 mapped columns writable; responsive source grouping, audit/Lock/draft/close gates | All other forms, picture manager/projection, every active calculation/event |
 | FS882 children | Other8/Humus12/Mineral18 CRUD; Veg Other12, Collected, species decisions,11 covers/6 heights | Effective omitted source defaults, remaining calculations, complete restoration |
 | Reviewed adaptations | Guarded vegetation creation/deletion/personal definitions; named-scope code check; metadata review/edit/create/typed restoration; Enter/Find; ordered profiles/editing/navigation/file ownership/Save as SU | Complete Access execution parity; arbitrary destination/administration/history restoration |
-| Forward Env Into SU | Selected owned-project SU; typed whole-scope review, atomic changes/provenance, drift/trigger rollback, retry/replay protection | Reverse, separate-file SU writes, personal-definition creation |
+| Forward/reverse environment-SU | Selected owned-project SU; independent typed whole-scope reviews, atomic changes/provenance, drift/trigger rollback, retry/replay protection; reverse master/personal name precedence | Separate-file SU writes, personal-definition creation; source bulk SQL is not inherited indiscriminately |
 
 Detailed source/behavior boundaries remain in the [Access contract](docs/FS882-6x4XL-access-contract.md),
 fixture-tested resources and application tests. Prior full documentation was
@@ -52,7 +53,7 @@ instructions.
 | 4 | Database/context/configuration F1-F3 | Complete bounded foundation; reuse it, do not build another family/config framework |
 | 4a | Ownership/performance C1-C3 | Complete; C4-C5 only when a concrete next workflow benefits |
 | 5 | FS882 parent fields | Complete98/98; field counts do not enable unavailable events |
-| 6 | Entry forms and active workflow behavior | In progress: finish bounded reverse transfer; inventory FS1333/SIVI, two-page and CHARS differences against client scope; close remaining calculation/navigation/profile gaps |
+| 6 | Entry forms and active workflow behavior | In progress: forward/reverse transfer accepted; static FS1333/SIVI/two-page/CHARS contracts mapped, implementations unavailable; close remaining calculation/navigation/profile gaps |
 | 7 | Project, standards, SU and hierarchy administration | Incomplete: source-driven project new/save/splinter/merge/compare; controlled references/user metadata; classification ownership; hierarchy flat-table redesign lower priority |
 | 8 | Interchange and companion automation boundaries | Incomplete: fixture-tested Access import through go-mdbtools; table CSV/RDS and client-requested TurboVeg boundary; reviewed collision, roundtrip, cancellation and rollback |
 | 9 | Priority reports and locations, then other active modules | Incomplete: long/summary vegetation/environment, consolidated options and location outputs first; remaining agreed reports/maps/analysis after |
@@ -69,21 +70,24 @@ vertical slice.
    ribbon/form entrypoints with retained/modified/provisional requirements.
    Record each as mapped, draft, native-verified, unavailable or excluded;
    no menu label or screenshot alone proves implementation.
-2. Complete the existing reverse **SU Into Env** batch without expansion:
-   selected owned-project SU; Admin.UserSiteUnit TEXT100, short/long names
-   TEXT50/100, exact NULL/text and physical links; master/personal ambiguity
-   review; no inherited hard-coded `Sample_SU` destination. Reuse forward
-   ownership, transaction/provenance, drift/rollback/retry and draft gates.
-   Keep it disabled until focused/full/frontend/native acceptance passes.
-3. Inventory FS1333/SIVI and two-page/CHARS source differences as one bounded
-   contract task. Client proposes an extended-shrub option instead of separate
-   CHARS menus; prove schema/event differences before sharing implementations.
-   Do not start another field-by-field native suite or rewrite the current form.
-4. Define the first read-only **long vegetation/environment report** slice:
-   original selected project/SU scope, quality/NULL exclusions, species/layer
-   grouping, output rows and denominators with exact fixtures. Keep plot filtering
-   separate from species filtering and taxon aggregation. Target preview/table
-   export before publication formatting or a broad reporting framework.
+2. Implement the first read-only **Long Environment** slice from the completed
+   static contract: selected project/SU, explicit title, 72 ordered rows (67
+   fields/five headings), per-plot unit grouping, typed zero/empty/NULL and
+   missing-row/name diagnostics. No quality filter or summary formula exists
+   in this source handler. Deterministic ordering and ambiguity diagnostics are
+   explicit adaptations; preview/table output precedes Excel/publication work.
+   Acceptance covers exact row order, membership/orphans, duplicates, raw quoted
+   codes, permutation invariance, cancellation and unchanged data/configuration.
+3. Implement a shared extended-shrub option only after covering existing
+   Cover5a/b/c storage, A membership, hidden drafts/errors and height-mode
+   interaction. Normal and CHARS A queries already include extended covers;
+   Aht does not. Preserve independent totals; do not clone unrelated CHARS
+   parent event drift or create duplicate menus. FS1333 has distinct aggregate
+   height children/options, not full FS882. No exported 6x4-CHARS form was found.
+4. Then address client-priority Long Vegetation: distinguish plot-quality
+   filtering from species presence/mean-cover thresholds, strata/lifeform/taxon
+   aggregation, rounding and denominators. Resolve undecided statistics and
+   summary options before implementing them; do not infer them from environment.
 5. Define a small versioned headless interchange/automation contract using
    existing R functions as precedents. R may automate independently owned data;
    it must not bypass desktop leases/audits or write a live desktop project.

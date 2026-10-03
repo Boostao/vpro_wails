@@ -18,11 +18,12 @@ UI-free core automation, not a second data-entry UI.
 | Project metadata | Review/all-field drafts, blank/master-template creation and dedicated typed provenance restoration | Opt-in, distinct project/master/user storage; generic metadata restore unavailable |
 | Profiles and navigation | Ordered preview, rule edit/create/delete, explicit result navigation, independent selection/writer ownership, usable blank files/tables and reviewed Save as SU | Opt-in; arbitrary-file administration, broad history restoration and some criterion semantics open |
 | Find/Enter | Source-bound explicit Enter navigation and exact scoped Find with safe Open lifecycle | Opt-in adaptations; no Access Find-dialog emulation |
-| Env Into SU | Explicit review of all matching selected-SU plots; owned-project file only; atomic typed provenance, drift/trigger rollback/retry and history replay guard | Independently opt-in; reverse/separate-file/personal-definition writes unavailable |
+| Env Into SU / SU Into Env | Independent reviews of all matching selected-SU plots; owned-project file only; atomic typed provenance, drift/trigger rollback/retry and history replay guards | Independently opt-in; separate-file SU and personal-definition writes unavailable |
 | Other forms/reports/interchange | Navigation inventory and original resources provide precedents | FS1333/SIVI/two-page/CHARS equivalence, client-priority reports/locations and complete import/export not delivered |
 
-Last application milestone `35d9302`: full Go race (root629.894s),269 frontend
-tests, check0/0, opt-in/default production builds and six native SU cases.
+Current reverse-transfer acceptance: full Go race (root654.285s),273 frontend
+tests, check0/0, opt-in/default production builds, seven native cases and a
+zero-write default proof. Forward predecessor is `35d9302`.
 Native acceptance used disposable data/configuration and restored original bytes.
 Feature implementation/native verification does not mean a default-off workflow
 is enabled or its Access execution parity is complete.
@@ -81,8 +82,15 @@ Forward Env Into SU copies Admin.UserSiteUnit through original Env/Admin links
 into SiteUnit TEXT255, over the whole selected SU rather than only current plot/
 profile navigation. Matching duplicate physical links reject. The SU must be the
 owned project file. Reviewed NULL and empty text remain distinct; unrelated
-tables/schema/history are independently checked before commit. Reverse remains
-unavailable, including source hard-coded `Sample_SU` name updates.
+tables/schema/history are independently checked before commit.
+
+Reverse SU Into Env copies selected SU.SiteUnit into Admin.UserSiteUnit TEXT100.
+Uniquely matching master then personal definitions supply short/long names
+TEXT50/100; personal definitions override master, missing definitions preserve
+names, and NULL/empty codes stay distinct. Overlength assignments, ambiguous
+definitions and changes to locked/unverifiably unlocked plots reject. These
+guards, technical history and selected-SU names instead of source hard-coded
+`Sample_SU` are explicit desktop adaptations, not blanket Access execution parity.
 
 ## Feature gates
 
@@ -98,7 +106,7 @@ Set default-on flags to `false` for read-only opt-out; set default-off flags to
 | On: bounded infrastructure | `VITE_EXTERNAL_PROJECTS`, `VITE_AUDIT_RESTORE` |
 | Off: lifecycle/checking | `VITE_VEGETATION_CREATE_EDITING`, `VITE_VEGETATION_DELETE_EDITING`, `VITE_PERSONAL_SPECIES_EDITING`, `VITE_SPECIES_CODE_CHECK_EDITING` |
 | Off: metadata | `VITE_PROJECT_METADATA_EDITING`, `VITE_PROJECT_METADATA_CREATION`, `VITE_PROJECT_METADATA_TEMPLATE_CREATION`, `VITE_PROJECT_METADATA_RESTORE` |
-| Off: navigation/transfer | `VITE_SOURCE_ENTER_NAVIGATION`, `VITE_SOURCE_PLOT_FIND`, `VITE_SOURCE_ENV_SU_TRANSFER` |
+| Off: navigation/transfer | `VITE_SOURCE_ENTER_NAVIGATION`, `VITE_SOURCE_PLOT_FIND`, `VITE_SOURCE_ENV_SU_TRANSFER`, `VITE_SOURCE_SU_ENV_TRANSFER` |
 | Off: profile rules/results | `VITE_PROJECT_PLOT_PROFILE_REVIEW`, `VITE_PROJECT_PLOT_PROFILE_RUN`, `VITE_PROJECT_PLOT_PROFILE_EDITING`, `VITE_PROJECT_PLOT_PROFILE_CREATION`, `VITE_PROJECT_PLOT_PROFILE_DELETION`, `VITE_PROJECT_PLOT_PROFILE_FILTERING`, `VITE_PROJECT_PLOT_PROFILE_SAVE_SU`, `VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT` |
 | Off: stored profile ownership | `VITE_PLOT_PROFILE_SELECTION`, `VITE_PLOT_PROFILE_WRITE_OWNERSHIP`, `VITE_PLOT_PROFILE_FILE_CREATION`, `VITE_PLOT_PROFILE_TABLE_CREATION` |
 | Off: read-only catalogue | `VITE_SOIL_CODES_REFERENCE` |
@@ -145,8 +153,9 @@ Use native Wails with disposable data/config for binding/lifecycle acceptance.
   [download portal](docs/index.html): distribution surfaces, not replacement
   acceptance for every platform.
 
-Next: bounded reverse SU transfer, FS1333/two-page/CHARS scope reconciliation and
-priority long vegetation/environment reports/locations. The historical agreement's
+Next: a bounded read-only Long Environment report, followed by FS1333/two-page/
+CHARS implementation and priority vegetation reports/locations. Static form/report
+contracts are mapped, not implemented or native-verified. The historical agreement's
 cloud/public-map/BECWeb/publication tracks remain visible but separately scoped.
 Private native evidence, original documentation snapshots and closed-build hash
 maps are retained outside app assets; no client PDFs or temporary tools are bundled.

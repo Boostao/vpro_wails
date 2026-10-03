@@ -2,7 +2,7 @@ import type { EnvironmentSiteUnitReview, EnvironmentSiteUnitTransfer, Environmen
 import { completeCell, exactSigned64 } from './projectMetadataRestore';
 import { equalCell } from './projectMetadataEditor';
 
-function columns(table: ProjectMetadataTable, required: readonly string[]): Map<string, number> {
+export function transferColumns(table: ProjectMetadataTable, required: readonly string[]): Map<string, number> {
   if (!table || !Array.isArray(table.columns) || !Array.isArray(table.rows)) throw new Error('Complete original transfer tables were not returned.');
   const index = new Map(table.columns.map((column, i) => [column.name, i]));
   if (index.size !== table.columns.length || table.columns.some(column => !column.name || typeof column.declaredType !== 'string') ||
@@ -20,9 +20,9 @@ export function validateEnvironmentSUReview(review: EnvironmentSiteUnitReview, c
       typeof review.historyHash !== 'string' || review.historyHash !== '' && !/^[0-9a-f]{64}$/.test(review.historyHash)) {
     throw new Error('Transfer review does not belong to the explicitly selected owned project and SU.');
   }
-  const env = columns(review.env, ['PlotNumber']);
-  const admin = columns(review.admin, ['Plot', 'UserSiteUnit']);
-  const target = columns(review.target, ['PlotNumber', 'SiteUnit']);
+  const env = transferColumns(review.env, ['PlotNumber']);
+  const admin = transferColumns(review.admin, ['Plot', 'UserSiteUnit']);
+  const target = transferColumns(review.target, ['PlotNumber', 'SiteUnit']);
   const seen = new Set<string>();
   for (const change of review.changes) {
     const source = review.env.rows!.filter(row => row.cells![env.get('PlotNumber')!].text === change.plotNumber);

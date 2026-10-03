@@ -786,6 +786,42 @@ export interface SiteCodeChoice {
     "diagnostic": string;
 }
 
+export interface SiteUnitEnvironmentChange {
+    "plotNumber": string;
+    "envRowId": string;
+    "adminRowId": string;
+    "suRowId": string;
+    "field": string;
+    "origin": string;
+    "before": ProjectMetadataCell;
+    "after": ProjectMetadataCell;
+}
+
+export interface SiteUnitEnvironmentResult {
+    "changedRows": number;
+    "changedCells": number;
+    "historyId": string;
+}
+
+export interface SiteUnitEnvironmentReview {
+    "contextId": string;
+    "project": string;
+    "su": string;
+    "path": string;
+    "env": ProjectMetadataTable;
+    "admin": ProjectMetadataTable;
+    "source": ProjectMetadataTable;
+    "master": ProjectMetadataTable;
+    "personal": ProjectMetadataTable;
+    "changes": SiteUnitEnvironmentChange[] | null;
+    "historyHash": string;
+}
+
+export interface SiteUnitEnvironmentTransfer {
+    "review": SiteUnitEnvironmentReview;
+    "confirmed": boolean;
+}
+
 export interface SoilCodeChoice {
     "rowId": string;
     "code": string | null;

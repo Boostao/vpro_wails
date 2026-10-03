@@ -36,32 +36,15 @@ func planEnvironmentSiteUnits(env, admin, su ProjectMetadataTable) ([]Environmen
 	if err != nil {
 		return nil, fmt.Errorf("environment transfer SU target: %w", err)
 	}
-	index := func(table ProjectMetadataTable, column int) (map[string][]ProjectMetadataRow, error) {
-		result := map[string][]ProjectMetadataRow{}
-		for _, row := range table.Rows {
-			cell := row.Cells[column]
-			if _, err := metadataCellValue(cell); err != nil {
-				return nil, err
-			}
-			if cell.Storage == "null" {
-				continue
-			}
-			if cell.Storage != "text" {
-				return nil, errors.New("transfer plot identities require original text storage; no coercion")
-			}
-			result[*cell.Text] = append(result[*cell.Text], row)
-		}
-		return result, nil
-	}
-	envRows, err := index(env, envColumns["PlotNumber"])
+	envRows, err := siteUnitTransferIndex(env, envColumns["PlotNumber"])
 	if err != nil {
 		return nil, err
 	}
-	adminRows, err := index(admin, adminColumns["Plot"])
+	adminRows, err := siteUnitTransferIndex(admin, adminColumns["Plot"])
 	if err != nil {
 		return nil, err
 	}
-	suRows, err := index(su, suColumns["PlotNumber"])
+	suRows, err := siteUnitTransferIndex(su, suColumns["PlotNumber"])
 	if err != nil {
 		return nil, err
 	}
@@ -95,17 +78,36 @@ func planEnvironmentSiteUnits(env, admin, su ProjectMetadataTable) ([]Environmen
 		if after.Text != nil && (strings.ContainsRune(*after.Text, 0) || len(utf16.Encode([]rune(*after.Text))) > 255) {
 			return nil, errors.New("environment/SU transfer requires new SiteUnit text within the source 255 UTF-16-unit bound and without NUL")
 		}
-		clone := func(cell ProjectMetadataCell) ProjectMetadataCell {
-			if cell.Text != nil {
-				text := *cell.Text
-				cell.Text = &text
-			}
-			return cell
-		}
 		changes = append(changes, EnvironmentSiteUnitChange{
-			plot, sources[0].RowID, parents[0].RowID, target.RowID, clone(before), clone(after)})
+			plot, sources[0].RowID, parents[0].RowID, target.RowID, cloneSiteUnitCell(before), cloneSiteUnitCell(after)})
 	}
 	return changes, nil
+}
+
+func siteUnitTransferIndex(table ProjectMetadataTable, column int) (map[string][]ProjectMetadataRow, error) {
+	result := map[string][]ProjectMetadataRow{}
+	for _, row := range table.Rows {
+		cell := row.Cells[column]
+		if _, err := metadataCellValue(cell); err != nil {
+			return nil, err
+		}
+		if cell.Storage == "null" {
+			continue
+		}
+		if cell.Storage != "text" {
+			return nil, errors.New("transfer identities require original text storage; no coercion")
+		}
+		result[*cell.Text] = append(result[*cell.Text], row)
+	}
+	return result, nil
+}
+
+func cloneSiteUnitCell(cell ProjectMetadataCell) ProjectMetadataCell {
+	if cell.Text != nil {
+		text := *cell.Text
+		cell.Text = &text
+	}
+	return cell
 }
 
 type EnvironmentSiteUnitReview struct {
@@ -325,41 +327,9 @@ func (s *ContextService) TransferEnvironmentSiteUnits(ctx context.Context, conte
 			if err != nil {
 				return err
 			}
-			for name, before := range original {
-				switch name {
-				case fresh.SU + "_SU":
-					before = expected
-				case environmentSiteUnitHistory:
-					after := observed[name]
-					if !reflect.DeepEqual(after.Columns, before.Columns) || len(after.Rows) != len(before.Rows)+1 ||
-						!reflect.DeepEqual(after.Rows[:len(before.Rows)], before.Rows) {
-						return errors.New("original environment/SU history changed; transfer rolled back")
-					}
-					continue
-				case "sqlite_master":
-					filter := func(schema ProjectMetadataTable) ProjectMetadataTable {
-						schema.Rows = append([]ProjectMetadataRow(nil), schema.Rows...)
-						rows := schema.Rows[:0]
-						for _, row := range schema.Rows {
-							if row.Cells[2].Text == nil || *row.Cells[2].Text != environmentSiteUnitHistory {
-								rows = append(rows, row)
-							}
-						}
-						schema.Rows = rows
-						return schema
-					}
-					before = filter(before)
-					if !reflect.DeepEqual(filter(observed[name]), before) {
-						return errors.New("original project schema changed during environment/SU transfer; all changes rolled back")
-					}
-					continue
-				}
-				if !reflect.DeepEqual(observed[name], before) {
-					return fmt.Errorf("project table %s differs from the reviewed environment/SU plan; all changes rolled back", name)
-				}
-			}
-			if len(observed) != len(original) && !(len(observed) == len(original)+1 && original[environmentSiteUnitHistory].Columns == nil) {
-				return errors.New("environment/SU transfer introduced unexpected project tables; all changes rolled back")
+			if err := verifySiteUnitTransferTables(original, observed,
+				map[string]ProjectMetadataTable{fresh.SU + "_SU": expected}, environmentSiteUnitHistory); err != nil {
+				return err
 			}
 			if err := tx.QueryRowContext(ctx, `SELECT CAST(ID AS TEXT) FROM __VPRO_EnvironmentSUHistory ORDER BY ID DESC LIMIT 1`).
 				Scan(&result.HistoryID); err != nil {
@@ -409,4 +379,44 @@ func siteUnitTransferColumns(table ProjectMetadataTable, required ...string) (ma
 		seen[row.RowID] = true
 	}
 	return index, nil
+}
+
+func verifySiteUnitTransferTables(original, observed, expected map[string]ProjectMetadataTable, history string) error {
+	for name, before := range original {
+		if planned, changed := expected[name]; changed {
+			before = planned
+		}
+		switch name {
+		case history:
+			after := observed[name]
+			if !reflect.DeepEqual(after.Columns, before.Columns) || len(after.Rows) != len(before.Rows)+1 ||
+				!reflect.DeepEqual(after.Rows[:len(before.Rows)], before.Rows) {
+				return errors.New("original SU transfer history changed; all changes rolled back")
+			}
+			continue
+		case "sqlite_master":
+			filter := func(schema ProjectMetadataTable) ProjectMetadataTable {
+				schema.Rows = append([]ProjectMetadataRow(nil), schema.Rows...)
+				rows := schema.Rows[:0]
+				for _, row := range schema.Rows {
+					if row.Cells[2].Text == nil || *row.Cells[2].Text != history {
+						rows = append(rows, row)
+					}
+				}
+				schema.Rows = rows
+				return schema
+			}
+			if !reflect.DeepEqual(filter(observed[name]), filter(before)) {
+				return errors.New("original project schema changed during SU transfer; all changes rolled back")
+			}
+			continue
+		}
+		if !reflect.DeepEqual(observed[name], before) {
+			return fmt.Errorf("project table %s differs from the reviewed SU transfer plan; all changes rolled back", name)
+		}
+	}
+	if len(observed) != len(original) && !(len(observed) == len(original)+1 && original[history].Columns == nil) {
+		return errors.New("SU transfer introduced unexpected project tables; all changes rolled back")
+	}
+	return nil
 }

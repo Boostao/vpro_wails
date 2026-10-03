@@ -193,6 +193,10 @@ export function ReviewProjectPlotProfileSUInProject(contextID: string, filter: $
     return $Call.ByID(3566405375, contextID, filter);
 }
 
+export function ReviewSiteUnitEnvironment(contextID: string): $CancellablePromise<$models.SiteUnitEnvironmentReview> {
+    return $Call.ByID(2910868168, contextID);
+}
+
 export function ReviewSpeciesCodes(contextID: string): $CancellablePromise<$models.SpeciesCodeCheckReview> {
     return $Call.ByID(3045258678, contextID);
 }
@@ -259,6 +263,10 @@ export function SwitchContext(expectedID: string, requested: $models.ContextSele
 
 export function TransferEnvironmentSiteUnits(contextID: string, request: $models.EnvironmentSiteUnitTransfer): $CancellablePromise<$models.EnvironmentSiteUnitResult | null> {
     return $Call.ByID(1924456504, contextID, request);
+}
+
+export function TransferSiteUnitEnvironment(contextID: string, request: $models.SiteUnitEnvironmentTransfer): $CancellablePromise<$models.SiteUnitEnvironmentResult | null> {
+    return $Call.ByID(2917528945, contextID, request);
 }
 
 export function UpdateCollectedRecords(contextID: string, plot: string, updates: $models.CollectedRecordUpdate[] | null): $CancellablePromise<void> {
