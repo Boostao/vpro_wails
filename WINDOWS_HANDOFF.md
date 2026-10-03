@@ -34,15 +34,15 @@ Do not replace embedded frontend assets during compilation/tests.
   `origin/agents/access-parity-windows-handoff`.
 - Published forward predecessor: `35d9302`; accepted reverse SU Into Env local
   commit `96dca8d`, with assessment/documentation ancestor `6ac6f77`.
-- Reverse acceptance: coupled race19.946s; full race root654.285s;273 frontend
-  tests, check0 errors/warnings; opt-in/default builds, seven native cases and
-  zero-write default proof passed. Bindings15 services/164 methods/105 models/
-  two enums;64 context operations.
+- Current report-preview acceptance: focused race3.015s; full race root942.439s;
+  276 frontend tests, check0 errors/warnings; opt-in/default builds, five native
+  cases and zero-write default proof passed. Bindings15 services/166 methods/
+  114 models/two enums.
 - Protected exact accepted default/candidate:
   `vpro-current.exe`, `vpro-current-candidate.exe`, both SHA256
-  `5c47ac3d2620f418306507db0e321cc3a5ae34fa4f39b913139d9bcaec03389f`.
-  Reverse opt-in core SHA256:
-  `a290af57facc6a058dd06f171c4f7d42e1447bbcb0bb1da9907248ff1648208c`.
+  `144b48d3504683e90a73da9f8ec81889bc5db73749218ebbd1a0d31b6e7f0316`.
+  Report-preview opt-in core SHA256:
+  `43209c78fc743e93cea1bf7908653a8cbb7a43ae4c540b35b502a99791de0cea`.
   Independent feature gates remain off; no unavailable workflow was enabled.
 - Immutable forward `archives\environment-su-checkpoint`:51 files plus manifest,
   exact core/default assets/binaries, source/logs/native receipts and before/after
@@ -53,13 +53,17 @@ Do not replace embedded frontend assets during compilation/tests.
   assets, source/logs/native receipts, rollback diagnostic, data/visual and
   restoration proof. Prior forward seal and protected default preserved before
   promotion; never rebuild the accepted default during promotion.
-- Pure Go Long Environment planner is a fixture-tested draft only. No new binding/
-  frontend surface, report menu, native report proof or default promotion. Keep
-  the accepted reverse executable baseline while wiring later report integration.
+- Pure Go Long Environment planner predecessor: `7fa2436`.
   Focused/coupled race23.414s; full race root666.610s passed.
   `archives\long-environment-planner-checkpoint`:six files plus manifest,
   exact source/schema contract, source and focused/full receipts; reverse59-file
-  predecessor and protected executable unchanged.
+  predecessor and protected executable unchanged at that checkpoint.
+- Report preview successor: `archives\long-environment-preview-checkpoint`.
+  Exact core/default assets/binaries, source/logs/native receipts and600px visual;
+  planner/reverse seals verified unchanged, reverse protected default retained
+  before exact promotion. Owned read-only whole selected-SU scope supports
+  external SU paths. No profile filtering, export or summary calculation.
+  Initial YAML title retained; title edits are explicitly preview-only.
 
 ## Cleanup and evidence
 
@@ -77,9 +81,11 @@ Do not replace embedded frontend assets during compilation/tests.
   excludes private evidence, archives, runtime data/config, tools and builds.
   The large private evidence corpus was retained; unknowns are not deletion targets.
 - Current sole vegetation fixture: `evidence\private\native-vegetation-species`.
-  Reverse opt-in/default native owners exited normally; original project/support/config
-  bytes restored. No pending native write or suite needs continuation.
-  **Never replay completed** su-environment.py prepare/run/finish/default,
+  Report opt-in/default native owners exited normally; all16 original project/
+  support/config file hashes restored and temporary external SU removed.
+  No pending native write or suite needs continuation.
+  **Never replay completed** long-environment-preview.py prepare/run/default,
+  su-environment.py prepare/run/finish/default,
   environment-su.py prepare/run/default or older
   metadata/profile/Find/vegetation modes.
 - No owned bin process was observed during cleanup. No Access process was
@@ -100,9 +106,7 @@ historical Shiny/cloud agreement. Unmarked screenshots are candidate retain,
 not approved as-is; colour-only decisions and SU append/new-table semantics remain
 open in [client scope](docs/CLIENT_SCOPE.md).
 
-Next: wire owned readonly context snapshots and preview/table output for the
-Long Environment draft (72 ordered rows, no invented quality/summary options),
-then shared CHARS/FS1333 behavior and priority
+Next: shared CHARS extended-shrub behavior, then FS1333 and priority
 vegetation reports. Static contracts reside under session
 `files\overnight-form-contract` and `files\overnight-long-report`; they are not
 runtime parity proof. Do not resume stale

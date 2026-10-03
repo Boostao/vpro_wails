@@ -19,12 +19,12 @@ UI-free core automation, not a second data-entry UI.
 | Profiles and navigation | Ordered preview, rule edit/create/delete, explicit result navigation, independent selection/writer ownership, usable blank files/tables and reviewed Save as SU | Opt-in; arbitrary-file administration, broad history restoration and some criterion semantics open |
 | Find/Enter | Source-bound explicit Enter navigation and exact scoped Find with safe Open lifecycle | Opt-in adaptations; no Access Find-dialog emulation |
 | Env Into SU / SU Into Env | Independent reviews of all matching selected-SU plots; owned-project file only; atomic typed provenance, drift/trigger rollback/retry and history replay guards | Independently opt-in; separate-file SU and personal-definition writes unavailable |
-| Long Environment | Pure typed Go draft: exact72 source rows, selected-SU membership, transposed per-plot values and explicit orphan/name diagnostics | Fixture-tested planner only; owned readonly snapshot adapter, UI, export and native acceptance unavailable |
+| Long Environment | Owned read-only native preview: exact72 source rows, selected-SU membership, transposed per-plot values and explicit orphan/name diagnostics | Independently opt-in; external SU reads supported; preview-only title edits, file export/Excel/summary unavailable |
 | Other forms/reports/interchange | Navigation inventory and original resources provide precedents | FS1333/SIVI/two-page/CHARS equivalence, usable client-priority reports/locations and complete import/export not delivered |
 
-Current reverse-transfer acceptance: full Go race (root654.285s),273 frontend
-tests, check0/0, opt-in/default production builds, seven native cases and a
-zero-write default proof. Forward predecessor is `35d9302`.
+Current report-preview acceptance: full Go race (root942.439s),276 frontend
+tests, check0/0, opt-in/default production builds, five native cases and a
+zero-write default proof. Reverse-transfer predecessor is `96dca8d`.
 Native acceptance used disposable data/configuration and restored original bytes.
 Feature implementation/native verification does not mean a default-off workflow
 is enabled or its Access execution parity is complete.
@@ -93,17 +93,22 @@ definitions and changes to locked/unverifiably unlocked plots reject. These
 guards, technical history and selected-SU names instead of source hard-coded
 `Sample_SU` are explicit desktop adaptations, not blanket Access execution parity.
 
-The Long Environment draft preserves67 original Env/Admin fields and five heading
+The Long Environment preview preserves67 original Env/Admin fields and five heading
 rows from `V7mdlReportsEnv.EnvReport`, including labels/punctuation. It groups by
 selected SU, not Admin.UserSiteUnit or profile navigation, and adds no quality
 filter or summary calculations. Numeric zero, empty text, NULL and historical
 storage remain typed; missing Env/Admin retain membership with blank projections.
 Deterministic raw ordering, duplicate-membership counts and explicit conflicting/
 unsupported name diagnostics replace arbitrary `First()` selection. Reference
-candidate IDs, NULL/empty names and duplicates remain distinguishable. This pure
-planner does not establish ownership or launch Access/Excel, create files, write
-data/configuration or expose a report menu; those integration boundaries remain
-unavailable.
+candidate IDs, NULL/empty names and duplicates remain distinguishable. Owned
+read-only transactions use the original physical project/SU/reference tables,
+including external selected-SU files, with cancellation and file/context identity
+checks. Navigation reuses Save/Discard/Cancel; native close is guarded during
+reads. The configured YAML `ReportOptions.LEReportTitle` is preserved and read
+without fallback on malformed configuration. Title edits affect this preview
+only: source registry-title persistence remains an explicit adaptation/gap.
+The preview writes no data, audits or configuration and does not launch
+Access/Excel, create export files or implement summary calculations.
 
 ## Feature gates
 
@@ -123,6 +128,7 @@ Set default-on flags to `false` for read-only opt-out; set default-off flags to
 | Off: profile rules/results | `VITE_PROJECT_PLOT_PROFILE_REVIEW`, `VITE_PROJECT_PLOT_PROFILE_RUN`, `VITE_PROJECT_PLOT_PROFILE_EDITING`, `VITE_PROJECT_PLOT_PROFILE_CREATION`, `VITE_PROJECT_PLOT_PROFILE_DELETION`, `VITE_PROJECT_PLOT_PROFILE_FILTERING`, `VITE_PROJECT_PLOT_PROFILE_SAVE_SU`, `VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT` |
 | Off: stored profile ownership | `VITE_PLOT_PROFILE_SELECTION`, `VITE_PLOT_PROFILE_WRITE_OWNERSHIP`, `VITE_PLOT_PROFILE_FILE_CREATION`, `VITE_PLOT_PROFILE_TABLE_CREATION` |
 | Off: read-only catalogue | `VITE_SOIL_CODES_REFERENCE` |
+| Off: read-only reports | `VITE_LONG_ENVIRONMENT_REPORT` |
 
 `VITE_HEIGHT_EDITING=false` also disables numeric vegetation editing.
 Master edits additionally require source authorization; reference membership,
@@ -166,10 +172,9 @@ Use native Wails with disposable data/config for binding/lifecycle acceptance.
   [download portal](docs/index.html): distribution surfaces, not replacement
   acceptance for every platform.
 
-Next: wire owned readonly snapshots and preview/table output for the Long
-Environment draft, followed by FS1333/two-page/
-CHARS implementation and priority vegetation reports/locations. Static form/report
-contracts and the report planner do not prove native execution parity. The historical agreement's
+Next: shared CHARS extended-shrub behavior, then FS1333/two-page
+implementation and priority vegetation reports/locations. Static form/report
+contracts alone do not prove native execution parity. The historical agreement's
 cloud/public-map/BECWeb/publication tracks remain visible but separately scoped.
 Private native evidence, original documentation snapshots and closed-build hash
 maps are retained outside app assets; no client PDFs or temporary tools are bundled.

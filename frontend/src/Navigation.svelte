@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882';
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment';
   type Item = { name: string; icon: typeof House; view?: View };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate }: { view: View; onnavigate: (view: View) => void } = $props();
@@ -29,7 +29,7 @@
         { name: 'Summary Vegetation', icon: ChartColumn }
       ] },
       { label: 'Environment', items: [
-        { name: 'Long Environment', icon: TableProperties },
+        { name: 'Long Environment', icon: TableProperties, view: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' ? 'long-environment' : undefined },
         { name: 'Summary Environment', icon: ChartColumn }
       ] },
       { label: 'Others', items: [

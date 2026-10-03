@@ -26,8 +26,8 @@ references are indexed in [client scope](docs/CLIENT_SCOPE.md).
 
 ## Delivered baseline
 
-Forward predecessor `35d9302`; reverse SU Into Env now accepted with full Go race
-(root654.285s),273 frontend tests, check0/0, opt-in/default builds, seven native
+Reverse-transfer predecessor `96dca8d`; Long Environment preview accepted with full Go race
+(root942.439s),276 frontend tests, check0/0, opt-in/default builds, five native
 cases and a zero-write default proof. No production/R/Access
 source writes. Exact default remains promoted; opt-in workflows remain off.
 
@@ -39,6 +39,7 @@ source writes. Exact default remains promoted; opt-in workflows remain off.
 | FS882 children | Other8/Humus12/Mineral18 CRUD; Veg Other12, Collected, species decisions,11 covers/6 heights | Effective omitted source defaults, remaining calculations, complete restoration |
 | Reviewed adaptations | Guarded vegetation creation/deletion/personal definitions; named-scope code check; metadata review/edit/create/typed restoration; Enter/Find; ordered profiles/editing/navigation/file ownership/Save as SU | Complete Access execution parity; arbitrary destination/administration/history restoration |
 | Forward/reverse environment-SU | Selected owned-project SU; independent typed whole-scope reviews, atomic changes/provenance, drift/trigger rollback, retry/replay protection; reverse master/personal name precedence | Separate-file SU writes, personal-definition creation; source bulk SQL is not inherited indiscriminately |
+| Long Environment | Owned read-only native preview; selected project/SU including external SU, exact72 rows, typed values and explicit orphan/name candidates; draft-safe navigation/cancellable reads | Independent default-off gate; title edits preview-only, file export/Excel/summary unavailable |
 
 Detailed source/behavior boundaries remain in the [Access contract](docs/FS882-6x4XL-access-contract.md),
 fixture-tested resources and application tests. Prior full documentation was
@@ -56,7 +57,7 @@ instructions.
 | 6 | Entry forms and active workflow behavior | In progress: forward/reverse transfer accepted; static FS1333/SIVI/two-page/CHARS contracts mapped, implementations unavailable; close remaining calculation/navigation/profile gaps |
 | 7 | Project, standards, SU and hierarchy administration | Incomplete: source-driven project new/save/splinter/merge/compare; controlled references/user metadata; classification ownership; hierarchy flat-table redesign lower priority |
 | 8 | Interchange and companion automation boundaries | Incomplete: fixture-tested Access import through go-mdbtools; table CSV/RDS and client-requested TurboVeg boundary; reviewed collision, roundtrip, cancellation and rollback |
-| 9 | Priority reports and locations, then other active modules | Incomplete: Long Environment72-row pure typed planner fixture-tested; snapshot/preview/export unavailable. Long/summary vegetation, consolidated options and location outputs next; remaining agreed reports/maps/analysis after |
+| 9 | Priority reports and locations, then other active modules | Incomplete: Long Environment72-row owned read-only preview native-verified and opt-in; export/title persistence unavailable. Long/summary vegetation, consolidated options and location outputs next; remaining agreed reports/maps/analysis after |
 | 10 | Replacement acceptance | Installation/upgrades/recovery/offline/performance and representative projects; every retained workflow verified or explicitly excluded |
 
 Orders express dependencies, not a requirement to finish every administrative
@@ -70,18 +71,15 @@ vertical slice.
    ribbon/form entrypoints with retained/modified/provisional requirements.
    Record each as mapped, draft, native-verified, unavailable or excluded;
    no menu label or screenshot alone proves implementation.
-2. Integrate the fixture-tested pure Go **Long Environment** draft through an
-   owned readonly context snapshot and preview/table output: selected project/SU,
-   explicit title, 72 ordered rows (67
-   fields/five headings), per-plot unit grouping, typed zero/empty/NULL and
-   missing-row/name diagnostics. No quality filter or summary formula exists
-   in this source handler. Deterministic ordering and ambiguity diagnostics are
-   explicit adaptations; preview/table output precedes Excel/publication work.
-   Planner acceptance covers exact row order, membership/orphans, duplicates,
-   raw quoted codes, permutation invariance, cancellation and independent typed
-   outputs. All67 fields exist in canonical Sample. Add ownership/context-switch,
-   external-SU scope, lifecycle and native zero-write/configuration acceptance;
-   the pure planner alone is not an available report or ownership proof.
+2. Preserve the accepted **Long Environment** read-only preview: owned physical
+   snapshots, external-SU scope,72 ordered rows (67 fields/five headings),
+   per-plot grouping, typed zero/empty/NULL and explicit orphan/name diagnostics.
+   No quality filter or summary formula exists in this handler. Deterministic
+   ordering and ambiguity diagnostics are explicit adaptations. YAML supplies
+   the initial title; edits remain preview-only rather than persisting source
+   registry preferences. Native acceptance verified draft Cancel/Discard,
+   repeated reads/title correction,600px actual visibility and zero database/
+   configuration writes. File export/publication remains a separate slice.
 3. Implement a shared extended-shrub option only after covering existing
    Cover5a/b/c storage, A membership, hidden drafts/errors and height-mode
    interaction. Normal and CHARS A queries already include extended covers;

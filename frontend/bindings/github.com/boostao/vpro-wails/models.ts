@@ -129,6 +129,48 @@ export interface CoordinateParts {
     "negative": boolean;
 }
 
+export interface EnvironmentReport {
+    "project": string;
+    "su": string;
+    "title": string;
+    "fields": EnvironmentReportField[] | null;
+    "units": EnvironmentReportUnit[] | null;
+    "diagnostics": EnvironmentReportDiagnostic[] | null;
+}
+
+export interface EnvironmentReportDiagnostic {
+    "code": string;
+    "unit": string | null;
+    "plotNumber": string | null;
+    "count": number;
+}
+
+export interface EnvironmentReportField {
+    "source": string;
+    "key": string;
+    "label": string;
+    "heading": boolean;
+}
+
+export interface EnvironmentReportName {
+    "rowId": string;
+    "value": ProjectMetadataCell;
+}
+
+export interface EnvironmentReportPlot {
+    "plotNumber": string;
+    "status": string;
+    "values": ProjectMetadataCell[] | null;
+}
+
+export interface EnvironmentReportUnit {
+    "code": string;
+    "longName": string | null;
+    "nameStatus": string;
+    "nameCandidates": EnvironmentReportName[] | null;
+    "plots": EnvironmentReportPlot[] | null;
+}
+
 export interface EnvironmentSiteUnitChange {
     "plotNumber": string;
     "envRowId": string;
@@ -332,6 +374,22 @@ export interface ListItem {
     "itemDescription": string;
     "itemOrder"?: number | null;
     "fieldUsedIn"?: string;
+}
+
+export interface LongEnvironmentOptions {
+    "contextId": string;
+    "title": string;
+}
+
+export interface LongEnvironmentPreview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "report": EnvironmentReport;
+}
+
+export interface LongEnvironmentRequest {
+    "title": string;
 }
 
 /**

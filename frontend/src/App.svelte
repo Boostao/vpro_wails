@@ -6,6 +6,7 @@
   import { projectState } from './state';
   import FS882Form from './FS882Form.svelte';
   import Navigation from './Navigation.svelte';
+  import LongEnvironmentReport from './LongEnvironmentReport.svelte';
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
@@ -36,7 +37,7 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment'>('home');
   let contextExpanded = $state(false);
   let editorBusy = $state(false);
   let editor: { getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean> } | undefined = $state();
@@ -102,7 +103,7 @@
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       await tick();
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      const disposition = closeDisposition(state, busy || transitionWorking || pendingTransition !== null || (view === 'fs882' && !editor));
+      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || pendingTransition !== null || (view === 'fs882' && !editor));
       if (disposition === 'busy') {
         await CloseService.CancelClose(requestId);
         error = 'Wait for the current operation to finish before closing VPRO.';
@@ -1041,6 +1042,12 @@
           saveReason={closeState?.saveReason ?? 'Return to the FS882 editor before saving.'}
           error={closeRequest ? closeError : transitionError}
           onrespond={closeRequest ? respondToClose : respondToTransition} />
+      {:else if view === 'long-environment' && import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' && $projectState}
+        {#key $projectState.contextId}
+          <LongEnvironmentReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+            onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
       {:else if view === 'hierarchy'}
       <div class="content-heading">
         <div><div class="eyebrow">{$projectState?.hierarchyFile ?? 'HIERARCHY'}</div><h1>Hierarchy</h1></div>
