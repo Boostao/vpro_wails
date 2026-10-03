@@ -26,8 +26,8 @@ references are indexed in [client scope](docs/CLIENT_SCOPE.md).
 
 ## Delivered baseline
 
-Reverse-transfer predecessor `96dca8d`; Long Environment preview accepted with full Go race
-(root942.439s),276 frontend tests, check0/0, opt-in/default builds, five native
+Report-preview predecessor `e763e23`; shared extended shrubs accepted with full Go race
+(root858.736s),280 frontend tests, check0/0, opt-in/default builds, eight native
 cases and a zero-write default proof. No production/R/Access
 source writes. Exact default remains promoted; opt-in workflows remain off.
 
@@ -36,10 +36,11 @@ source writes. Exact default remains promoted; opt-in workflows remain off.
 | Foundation F1-F3 | Original SQLite family; default-init/runtime YAML with explicit retained JSON migration; owned external-path contexts, offline TEMP views, safe switching/recovery | Project conversion/administration, arbitrary support writes, multiwindow coordination |
 | Backend C1-C3 | Owned pooling, verified catalogue caching, active binding/SQL/read cancellation | C4 package extraction/C5 typed catalogue transport: incremental, nonblocking |
 | FS882 parent |98/98 mapped columns writable; responsive source grouping, audit/Lock/draft/close gates | All other forms, picture manager/projection, every active calculation/event |
-| FS882 children | Other8/Humus12/Mineral18 CRUD; Veg Other12, Collected, species decisions,11 covers/6 heights | Effective omitted source defaults, remaining calculations, complete restoration |
+| FS882 children | Other8/Humus12/Mineral18 CRUD; Veg Other12, Collected, species decisions,11 ordinary covers/6 heights and three opt-in extended shrub covers | Effective omitted source defaults, remaining calculations, complete restoration |
 | Reviewed adaptations | Guarded vegetation creation/deletion/personal definitions; named-scope code check; metadata review/edit/create/typed restoration; Enter/Find; ordered profiles/editing/navigation/file ownership/Save as SU | Complete Access execution parity; arbitrary destination/administration/history restoration |
 | Forward/reverse environment-SU | Selected owned-project SU; independent typed whole-scope reviews, atomic changes/provenance, drift/trigger rollback, retry/replay protection; reverse master/personal name precedence | Separate-file SU writes, personal-definition creation; source bulk SQL is not inherited indiscriminately |
 | Long Environment | Owned read-only native preview; selected project/SU including external SU, exact72 rows, typed values and explicit orphan/name candidates; draft-safe navigation/cancellable reads | Independent default-off gate; title edits preview-only, file export/Excel/summary unavailable |
+| Shared CHARS presentation | One XL extended-shrub option, exact SubVegAXL labels/order, existing Cover5a/b/c storage and A membership, persistent hidden drafts/errors, atomic audited numeric edits | Independent default-off gate; cover-only presentation, no preference persistence or full variant/menu equivalence |
 
 Detailed source/behavior boundaries remain in the [Access contract](docs/FS882-6x4XL-access-contract.md),
 fixture-tested resources and application tests. Prior full documentation was
@@ -54,7 +55,7 @@ instructions.
 | 4 | Database/context/configuration F1-F3 | Complete bounded foundation; reuse it, do not build another family/config framework |
 | 4a | Ownership/performance C1-C3 | Complete; C4-C5 only when a concrete next workflow benefits |
 | 5 | FS882 parent fields | Complete98/98; field counts do not enable unavailable events |
-| 6 | Entry forms and active workflow behavior | In progress: forward/reverse transfer accepted; static FS1333/SIVI/two-page/CHARS contracts mapped, implementations unavailable; close remaining calculation/navigation/profile gaps |
+| 6 | Entry forms and active workflow behavior | In progress: forward/reverse transfer and shared XL CHARS option accepted; static FS1333/SIVI/two-page contracts mapped, entrypoints unavailable; close remaining calculation/navigation/profile gaps |
 | 7 | Project, standards, SU and hierarchy administration | Incomplete: source-driven project new/save/splinter/merge/compare; controlled references/user metadata; classification ownership; hierarchy flat-table redesign lower priority |
 | 8 | Interchange and companion automation boundaries | Incomplete: fixture-tested Access import through go-mdbtools; table CSV/RDS and client-requested TurboVeg boundary; reviewed collision, roundtrip, cancellation and rollback |
 | 9 | Priority reports and locations, then other active modules | Incomplete: Long Environment72-row owned read-only preview native-verified and opt-in; export/title persistence unavailable. Long/summary vegetation, consolidated options and location outputs next; remaining agreed reports/maps/analysis after |
@@ -80,16 +81,28 @@ vertical slice.
    registry preferences. Native acceptance verified draft Cancel/Discard,
    repeated reads/title correction,600px actual visibility and zero database/
    configuration writes. File export/publication remains a separate slice.
-3. Implement a shared extended-shrub option only after covering existing
-   Cover5a/b/c storage, A membership, hidden drafts/errors and height-mode
-   interaction. Normal and CHARS A queries already include extended covers;
-   Aht does not. Preserve independent totals; do not clone unrelated CHARS
-   parent event drift or create duplicate menus. FS1333 has distinct aggregate
-   height children/options, not full FS882. No exported 6x4-CHARS form was found.
+3. Preserve the accepted shared XL extended-shrub option: normal A retains
+   extended-only rows; hiding the three editors preserves raw drafts/errors.
+   Enabling extended presentation explicitly selects cover mode and disables
+   height switching until turned off; hidden height drafts remain intact.
+   Totals and the source seven-standard-cover notice remain independent.
+   Eight native cases cover labelled controls, parent-A Enter, remount/error
+   gates, correction/Cancel, exact-byte late-audit rollback, one three-cell/
+   three-audit retry and600px visibility. No duplicated menus or unrelated
+   CHARS parent event drift. FS1333 still needs distinct aggregate-height
+   children/options, not full FS882. No exported 6x4-CHARS form was found.
 4. Then address client-priority Long Vegetation: distinguish plot-quality
    filtering from species presence/mean-cover thresholds, strata/lifeform/taxon
    aggregation, rounding and denominators. Resolve undecided statistics and
    summary options before implementing them; do not infer them from environment.
+   Static source confirms `LVConstantSppList` bypasses both presence and
+   mean-cover thresholds (`V7mdlReportsLongVeg`, lines264-280). The client
+   marked calculation/list options provisionally; decide whether to retain
+   that behavior, adapt it explicitly or keep constant-list mode unavailable.
+   Do not silently override the retained YAML default (-1). Source grouping,
+   quality filtering, MAX-per-plot/species reduction, denominator and effective
+   no-op rounding were traced read-only; R quick/all-veg rows are different
+   precedents, not a substitute for this report contract.
 5. Define a small versioned headless interchange/automation contract using
    existing R functions as precedents. R may automate independently owned data;
    it must not bypass desktop leases/audits or write a live desktop project.

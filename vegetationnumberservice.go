@@ -32,6 +32,8 @@ func (update *VegetationNumberUpdate) UnmarshalJSON(data []byte) error {
 }
 
 var vegetationNumberForms = map[string]map[string]bool{
+	"SubVegAXL": {"cover1": true, "cover2": true, "cover3": true, "totalA": true,
+		"cover4": true, "cover5": true, "cover5a": true, "cover5b": true, "cover5c": true, "totalB": true},
 	"SubVegAXL_BC": {"cover1": true, "cover2": true, "cover3": true, "totalA": true,
 		"cover4": true, "cover5": true, "totalB": true},
 	"SubVegCXL": {"cover6": true},

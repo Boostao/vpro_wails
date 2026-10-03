@@ -19,6 +19,9 @@ function load(mutate = () => {}) {
   vm.runInNewContext(compiled, {
     exports,
     require: name => {
+      if (name === '../../resources/fs882-extended-shrub-layout.json') {
+        return JSON.parse(readFileSync(path.join(__dirname, '..', '..', 'resources', 'fs882-extended-shrub-layout.json'), 'utf8'));
+      }
       assert.equal(name, '../../resources/fs882-xl-layout.json');
       return definition;
     }

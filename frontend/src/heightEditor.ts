@@ -3,7 +3,8 @@ import type { VegetationNumberUpdate } from '../bindings/github.com/boostao/vpro
 export { singleMaximum } from './numericEditor';
 
 export const heightFields = ['cover1', 'cover2', 'cover3', 'totalA', 'cover4', 'cover5', 'totalB',
-  'cover6', 'cover7', 'cover8', 'cover9', 'height1', 'height2', 'height3', 'height4', 'height5', 'height6'] as const;
+  'cover6', 'cover7', 'cover8', 'cover9', 'height1', 'height2', 'height3', 'height4', 'height5', 'height6',
+  'cover5a', 'cover5b', 'cover5c'] as const;
 export type HeightField = typeof heightFields[number];
 export interface HeightUpdate {
   id: number;
@@ -22,13 +23,13 @@ type CoverValues = Partial<Record<HeightField, number | null>>;
 export interface CoverSourceEdit { id: number; form: string; values?: CoverValues }
 export type CoverSourceRow = CoverValues & { id: number };
 export function aCoverSourceNotice(form: string, id: number | string, values: CoverValues): string | null {
-  return (form === 'SubVegAXL_BC' || form === 'SubVegAhtXL') &&
+  return (form === 'SubVegAXL_BC' || form === 'SubVegAXL' || form === 'SubVegAhtXL') &&
     heightFields.slice(0, 7).every(field => values[field] == null)
     ? `Vegetation row ${id}: all A/B cover values are NULL. No cover value is inferred; the vegetation record is not deleted.` : null;
 }
 export function aCoverSourceNotices(edits: readonly CoverSourceEdit[], rows: readonly CoverSourceRow[]): string[] {
   return [...new Set(edits.flatMap(edit => {
-    if (edit.form !== 'SubVegAXL_BC' && edit.form !== 'SubVegAhtXL') return [];
+    if (edit.form !== 'SubVegAXL_BC' && edit.form !== 'SubVegAXL' && edit.form !== 'SubVegAhtXL') return [];
     const matching = rows.filter(row => row.id === edit.id);
     if (matching.length !== 1) throw new Error('Cover notice source row is missing or ambiguous; reload before editing.');
     const notice = aCoverSourceNotice(edit.form, edit.id, { ...matching[0], ...edit.values });
@@ -72,7 +73,7 @@ export function heightSourceNotices(drafts: HeightDrafts, rows?: readonly CoverS
     const edits = Object.entries(drafts).flatMap(([id, row]) => {
       if (Object.values(row).some(cell => cell?.error !== null)) return [];
       const changed = Object.entries(row).filter(([, cell]) => cell && cell.value !== cell.expected);
-      const form = changed.find(([, cell]) => cell?.form === 'SubVegAXL_BC' || cell?.form === 'SubVegAhtXL')?.[1]?.form;
+      const form = changed.find(([, cell]) => cell?.form === 'SubVegAXL_BC' || cell?.form === 'SubVegAXL' || cell?.form === 'SubVegAhtXL')?.[1]?.form;
       return form ? [{ id: Number(id), form, values: Object.fromEntries(changed.map(([field, cell]) => [field, cell?.value])) }] : [];
     });
     notices.push(...aCoverSourceNotices(edits, rows));

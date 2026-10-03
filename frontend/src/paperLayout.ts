@@ -1,4 +1,5 @@
 import definition from '../../resources/fs882-xl-layout.json';
+import extendedDefinition from '../../resources/fs882-extended-shrub-layout.json';
 
 export interface SourceValue {
   value?: string;
@@ -213,7 +214,11 @@ export function embeddedForm(controlId: string) {
 }
 
 export function paperChild(name: string) {
-  const child = layout.forms.find(item => item.name === name);
+  const extended: SourceLayout = extendedDefinition;
+  if (extended.root !== 'SubVegAXL' || extended.geometryUnit !== 'twips' || extended.forms.length !== 1) {
+    throw new Error('Invalid packaged extended-shrub layout metadata');
+  }
+  const child = (name === 'SubVegAXL' ? extended.forms : layout.forms).find(item => item.name === name);
   if (!child) throw new Error(`Source child form ${name} is missing`);
   const root = child.controls.find(control => control.type === 'Form');
   const detail = child.controls.find(control => control.type === 'Section' && control.controlName?.startsWith('Detail'));
@@ -231,9 +236,19 @@ export function paperChild(name: string) {
     }
     return false;
   }
-  const controls = paperControls(child, child.controls.filter(control => inSection(control, detail) &&
+  let controls = paperControls(child, child.controls.filter(control => inSection(control, detail) &&
     !['ID', 'PlotNumber'].includes(control.properties.ControlSource?.value ?? '')), 0, 0);
   const headerControls = header ? paperControls(child, child.controls.filter(control => inSection(control, header)), 0, 0) : [];
+  if (name === 'SubVegAXL') {
+    const labels: Record<string, string> = { Cover5a: 'lblB2a', Cover5b: 'lblB2b', Cover5c: 'lblB2c' };
+    controls = controls.map(control => {
+      const labelName = control.column ? labels[control.column] : undefined;
+      if (!labelName) return control;
+      const label = headerControls.find(item => item.controlName === labelName);
+      if (!label?.caption) throw new Error(`Missing extended-shrub label for ${control.column}`);
+      return { ...control, caption: label.caption };
+    });
+  }
   const headerHeight = header ? number(header.properties, 'Height', 0) / 15 : 0;
   const width = number(root.properties, 'Width', 0) / 15;
   const rowHeight = number(detail.properties, 'Height', 0) / 15;

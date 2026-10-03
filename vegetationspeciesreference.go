@@ -46,7 +46,7 @@ const vegetationSpeciesUnion = `SELECT Code,ScientificName,Lifeform,EnglishName,
 
 func vegetationSpeciesLifeforms(form string) (string, error) {
 	switch form {
-	case "SubVegAXL_BC", "SubVegAhtXL":
+	case "SubVegAXL_BC", "SubVegAXL", "SubVegAhtXL":
 		return "1,2,3,4", nil
 	case "SubVegCXL", "SubVegChtXL":
 		return "5,6,7,8,12", nil

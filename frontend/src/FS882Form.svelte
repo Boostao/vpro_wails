@@ -87,6 +87,8 @@
     document.querySelector<HTMLInputElement>('#header-soilSurveyor')?.focus();
   }
   let vegetationMode = $state<VegetationMode>('initial');
+  const extendedShrubsEnabled = import.meta.env.VITE_EXTENDED_SHRUBS === 'true';
+  let extendedShrubs = $state(false);
   let busy = $state(false);
   let coordinateBusy = $state(false);
   let workingUnitBusy = $state(false);
@@ -281,8 +283,8 @@
     return values;
   }
   function sourceRows(name: string) {
-    if (['SubVegAXL_BC', 'SubVegCXL', 'SubVegDXL', 'SubVegAhtXL', 'SubVegChtXL'].includes(name)) {
-      const records = vegList.filter(row => name === 'SubVegAXL_BC'
+    if (['SubVegAXL_BC', 'SubVegAXL', 'SubVegCXL', 'SubVegDXL', 'SubVegAhtXL', 'SubVegChtXL'].includes(name)) {
+      const records = vegList.filter(row => name === 'SubVegAXL_BC' || name === 'SubVegAXL'
         ? treeColumns.some(key => row[key] != null)
         : name === 'SubVegAhtXL' ? heightTreeColumns.some(key => row[key] != null)
         : name === 'SubVegCXL' || name === 'SubVegChtXL' ? row.cover6 != null
@@ -2194,6 +2196,16 @@
         </ParentCodeFields>
       {/key}
     {:else if activeTab === 'veg'}
+      {#if extendedShrubsEnabled}
+        <label class="mb-3 flex items-center gap-2">
+          <input type="checkbox" data-extended-shrubs checked={extendedShrubs} disabled={busy || headerWorkflowBusy}
+            onchange={(event) => { extendedShrubs = event.currentTarget.checked; if (extendedShrubs) vegetationMode = 'cover'; }} />
+          Show extended shrub layers (CHARS)
+        </label>
+        {#if extendedShrubs}
+          <p class="mb-3 text-sm" role="status">Extended shrubs use cover mode. Turn this option off to use height mode; hidden values, drafts and errors are retained.</p>
+        {/if}
+      {/if}
       {#if speciesEditingEnabled || creationEnabled}
         {#if speciesReferenceBusy}<p role="status">Loading source species lists...</p>{/if}
         {#if speciesReferenceError}<p role="alert">{speciesReferenceError}</p>{/if}
@@ -2205,10 +2217,12 @@
         onchange={markDirty} onvalidation={validateHeader} onVegNotesTab={vegetationNotesTab}>
       {#snippet children(ordinaryEditor)}
       <SourcePage name="Vegetation" values={sourceHeaderValues} {vegetationMode} editor={ordinaryEditor} onHeightToggle={() => vegetationMode = vegetationMode === 'height' ? 'cover' : 'height'}
+        heightToggleDisabled={extendedShrubs || busy || headerWorkflowBusy}
         {onFindPlot} findPlotDisabled={busy || headerWorkflowBusy || !capabilitiesReady}
         onSpeciesCheck={codeCheckEnabled ? openSpeciesCodeCheck : undefined} speciesCheckDisabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}>
         {#snippet embedded(control)}
-          {@const child = embeddedForm(control.controlId)}
+          {@const originalChild = embeddedForm(control.controlId)}
+          {@const child = { ...originalChild, form: extendedShrubs && originalChild.form === 'SubVegAXL_BC' ? 'SubVegAXL' : originalChild.form }}
           {@const heightGrid = child.form === 'SubVegAhtXL' || child.form === 'SubVegChtXL'}
           {#if creationEnabled}
             <button type="button" class="mb-2 rounded border px-2 py-1 text-xs disabled:opacity-50" data-create-source={child.form}

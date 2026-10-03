@@ -20,7 +20,7 @@ func TestVegetationSpeciesSourceClassesAndAliasAmbiguity(t *testing.T) {
 		form  string
 		count int
 	}{
-		{"SubVegAXL_BC", 547}, {"SubVegAhtXL", 547},
+		{"SubVegAXL_BC", 547}, {"SubVegAXL", 547}, {"SubVegAhtXL", 547},
 		{"SubVegCXL", 4742}, {"SubVegChtXL", 4742}, {"SubVegDXL", 3319},
 	} {
 		options, err := service.ListVegetationSpecies(context.Background(), state.ContextID, entry.form)
@@ -57,7 +57,7 @@ func TestVegetationSpeciesSourceClassesAndAliasAmbiguity(t *testing.T) {
 			t.Fatal("invalid personal lookup accepted:", code)
 		}
 	}
-	if _, err := service.ListVegetationSpecies(context.Background(), state.ContextID, "SubVegAXL"); err == nil {
+	if _, err := service.ListVegetationSpecies(context.Background(), state.ContextID, "SubVegA"); err == nil {
 		t.Fatal("inactive generic A form silently substituted")
 	}
 	ctx, cancel := context.WithCancel(context.Background())

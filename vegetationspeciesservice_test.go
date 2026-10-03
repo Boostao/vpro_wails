@@ -204,7 +204,7 @@ func TestVegetationSpeciesAtomicMembershipSourceRowsAndHistoricalOmission(t *tes
 	}
 	for _, batch := range [][]VegetationSpeciesUpdate{
 		nil,
-		{{ID: 0, Form: "SubVegAXL", Expected: "RAW", Value: "A"}},
+		{{ID: 0, Form: "SubVegA", Expected: "RAW", Value: "A"}},
 		{{ID: 0, Form: "SubVegAXL_BC", Expected: "RAW", Value: "C"}},
 		{{ID: 0, Form: "SubVegAXL_BC", Expected: "RAW", Value: "a"}},
 		{{ID: 0, Form: "SubVegAXL_BC", Expected: "RAW", Value: " A"}},

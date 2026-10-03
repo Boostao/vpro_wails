@@ -34,15 +34,15 @@ Do not replace embedded frontend assets during compilation/tests.
   `origin/agents/access-parity-windows-handoff`.
 - Published forward predecessor: `35d9302`; accepted reverse SU Into Env local
   commit `96dca8d`, with assessment/documentation ancestor `6ac6f77`.
-- Current report-preview acceptance: focused race3.015s; full race root942.439s;
-  276 frontend tests, check0 errors/warnings; opt-in/default builds, five native
+- Current extended-shrub acceptance: focused/coupled race9.482s; full race
+  root858.736s;280 frontend tests, check0 errors/warnings; opt-in/default builds, eight native
   cases and zero-write default proof passed. Bindings15 services/166 methods/
   114 models/two enums.
 - Protected exact accepted default/candidate:
   `vpro-current.exe`, `vpro-current-candidate.exe`, both SHA256
-  `144b48d3504683e90a73da9f8ec81889bc5db73749218ebbd1a0d31b6e7f0316`.
-  Report-preview opt-in core SHA256:
-  `43209c78fc743e93cea1bf7908653a8cbb7a43ae4c540b35b502a99791de0cea`.
+  `10c5b9bdd753cff08ad251ac83fa72a2c865e892d3041d862c68611a72e83e0d`.
+  Extended-shrub opt-in core SHA256:
+  `e39d5027e8ccbac9580f4a012652a20a3c924019a4c24cf2bd2c3d0a2dccc4be`.
   Independent feature gates remain off; no unavailable workflow was enabled.
 - Immutable forward `archives\environment-su-checkpoint`:51 files plus manifest,
   exact core/default assets/binaries, source/logs/native receipts and before/after
@@ -64,6 +64,15 @@ Do not replace embedded frontend assets during compilation/tests.
   before exact promotion. Owned read-only whole selected-SU scope supports
   external SU paths. No profile filtering, export or summary calculation.
   Initial YAML title retained; title edits are explicitly preview-only.
+- Shared extended-shrub successor: `archives\extended-shrubs-checkpoint`.
+  Exact core/default assets/binaries, source/logs/native receipts, whole-project/
+  exact three-audit differences and600px visual; report51-file predecessor
+  unchanged, report protected default retained before exact promotion.
+  One native three-cell write; original16 hashes restored. The initial harness
+  tried Cancel after a semantic no-op correctly hid the toolbar; four verified
+  no-write cases were retained, then only the unfinished tail continued.
+  No successful write was replayed. Source SubVegAXL metadata packaged read-only;
+  checkbox is presentation-only, height interaction explicitly cover-only.
 
 ## Cleanup and evidence
 
@@ -81,10 +90,12 @@ Do not replace embedded frontend assets during compilation/tests.
   excludes private evidence, archives, runtime data/config, tools and builds.
   The large private evidence corpus was retained; unknowns are not deletion targets.
 - Current sole vegetation fixture: `evidence\private\native-vegetation-species`.
-  Report opt-in/default native owners exited normally; all16 original project/
-  support/config file hashes restored and temporary external SU removed.
+  Extended-shrub opt-in/default native owners exited normally; all16 original
+  project/support/config file hashes restored. Temporary report external SU
+  remains absent.
   No pending native write or suite needs continuation.
-  **Never replay completed** long-environment-preview.py prepare/run/default,
+  **Never replay completed** extended-shrubs.py prepare/run/continue/default,
+  long-environment-preview.py prepare/run/default,
   su-environment.py prepare/run/finish/default,
   environment-su.py prepare/run/default or older
   metadata/profile/Find/vegetation modes.
@@ -106,8 +117,11 @@ historical Shiny/cloud agreement. Unmarked screenshots are candidate retain,
 not approved as-is; colour-only decisions and SU append/new-table semantics remain
 open in [client scope](docs/CLIENT_SCOPE.md).
 
-Next: shared CHARS extended-shrub behavior, then FS1333 and priority
-vegetation reports. Static contracts reside under session
+Next: resolve Long Vegetation constant-list/threshold scope, then its owned
+report slice and FS1333/priority locations. Source LongVeg currently bypasses
+presence/mean-cover thresholds when constant-list is on; retained YAML default
+is -1. No new Long Vegetation implementation or native suite was launched.
+Static contracts reside under session
 `files\overnight-form-contract` and `files\overnight-long-report`; they are not
 runtime parity proof. Do not resume stale
 parent-field inventories, broad infrastructure refactors or unapproved Access

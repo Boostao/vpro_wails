@@ -30,7 +30,7 @@ test('Source Enter record navigation retains the literal column and physical for
   assert.throws(()=>navigation.nextEnterPosition([position({column:''})],0,'field'),/literal column/);
 });
 
-test('Only the five statically linked next-record event paths are enabled; omitted and stale handlers are not inferred',()=>{
+test('Five linked next-record paths and the shared extended A presentation are enabled; stale handlers are not inferred',()=>{
   const fixture=readFileSync(path.join(__dirname,'..','..','testdata','navigation','enter-mode.vba'),'utf8').replace(/\r\n/g,'\n');
   const source=JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','fs882-xl-layout.json'),'utf8')).forms[0];
   assert.match(fixture,/RunEnterKeyActionNF\(\)[\s\S]*?Application\.SetOption "Move After Enter", 1/);
@@ -42,9 +42,9 @@ test('Only the five statically linked next-record event paths are enabled; omitt
       linked.push(control.properties.SourceObject.value.replace(/^Form\./,''));
     }
   }
-  assert.deepEqual([...linked].sort(),[...navigation.sourceNextRecordForms].sort());
+  assert.deepEqual([...linked, 'SubVegAXL'].sort(),[...navigation.sourceNextRecordForms].sort());
   assert.equal(navigation.enterNavigationMode(null),'field');
-  for(const form of ['SubVegAXL_BC','SubVegCXL','SubVegDXL','SoilHumusXL','SoilMineralXL']) {
+  for(const form of ['SubVegAXL_BC','SubVegAXL','SubVegCXL','SubVegDXL','SoilHumusXL','SoilMineralXL']) {
     assert.equal(navigation.enterNavigationMode(form),'record');
   }
   for(const form of ['SubVegAhtXL','SubVegChtXL','USysVegOtherXL','SubOtherXL','Child162','Child164','Child165']) {

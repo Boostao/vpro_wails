@@ -8,7 +8,7 @@ export interface EnterPosition {
 }
 
 export const sourceNextRecordForms: ReadonlySet<string> = new Set([
-  'SubVegAXL_BC', 'SubVegCXL', 'SubVegDXL', 'SoilHumusXL', 'SoilMineralXL',
+  'SubVegAXL_BC', 'SubVegAXL', 'SubVegCXL', 'SubVegDXL', 'SoilHumusXL', 'SoilMineralXL',
 ]);
 
 export function enterNavigationMode(form: string | null): 'field' | 'record' | null {

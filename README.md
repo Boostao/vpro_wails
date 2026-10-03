@@ -12,7 +12,7 @@ UI-free core automation, not a second data-entry UI.
 | Database/context/configuration | Original SQLite family, YAML defaults/runtime and retained JSON migration; non-overwrite installation, external attachment/compatibility, offline TEMP views, draft-safe switching and visible recovery | Active; conversion/administration/multiwindow not complete |
 | Project selection and browsing | Managed/external project paths, Working Unit/SU filtering and read-only hierarchy browsing | Attachment is not copying/conversion or full SU/hierarchy editing |
 | FS882 parent |98/98 mapped parent fields native-verified writable, responsive source labels/groups/links and shared draft/audit/Lock/close behavior | Bounded baseline, not all forms/events/pictures/projection |
-| FS882 children | Other8/Humus12/Mineral18 CRUD; Veg Other12 attributes, Collected, species decisions,11 cover/total fields and6 heights across source grids | Default-on editors; remaining calculations/effective source defaults and full restoration incomplete |
+| FS882 children | Other8/Humus12/Mineral18 CRUD; Veg Other12 attributes, Collected, species decisions,11 ordinary cover/total fields and6 heights; shared three-field CHARS option | Ordinary editors default-on; extended shrubs independently opt-in; remaining calculations/effective source defaults and full restoration incomplete |
 | Guarded vegetation lifecycle | Reviewed full-row deletion/reserved IDs; creation with explicit species/numeric/NULL decisions; independent personal definitions | Opt-in adaptations; no guessed defaults, invented U/X membership or hidden VUser write |
 | Standards checking | Whole-project/selected-WU reviewed species-code replacements; exact source membership and all physical rows | Opt-in; broader standards/environment compliance remains open |
 | Project metadata | Review/all-field drafts, blank/master-template creation and dedicated typed provenance restoration | Opt-in, distinct project/master/user storage; generic metadata restore unavailable |
@@ -22,9 +22,9 @@ UI-free core automation, not a second data-entry UI.
 | Long Environment | Owned read-only native preview: exact72 source rows, selected-SU membership, transposed per-plot values and explicit orphan/name diagnostics | Independently opt-in; external SU reads supported; preview-only title edits, file export/Excel/summary unavailable |
 | Other forms/reports/interchange | Navigation inventory and original resources provide precedents | FS1333/SIVI/two-page/CHARS equivalence, usable client-priority reports/locations and complete import/export not delivered |
 
-Current report-preview acceptance: full Go race (root942.439s),276 frontend
-tests, check0/0, opt-in/default production builds, five native cases and a
-zero-write default proof. Reverse-transfer predecessor is `96dca8d`.
+Current extended-shrub acceptance: full Go race (root858.736s),280 frontend
+tests, check0/0, opt-in/default production builds, eight native cases and a
+zero-write default proof. Report-preview predecessor is `e763e23`.
 Native acceptance used disposable data/configuration and restored original bytes.
 Feature implementation/native verification does not mean a default-off workflow
 is enabled or its Access execution parity is complete.
@@ -72,6 +72,18 @@ decisions; non-ASCII exact selection is allowed without claiming general Access
 collation parity. C/C-height NULL Cover6 removes view membership, not the record;
 A/A-height missing-cover notices do not infer covers or delete height-only rows.
 Source creation does not save personal definitions implicitly.
+
+The shared FS882 XL CHARS option uses exported `SubVegAXL` controls and source
+B3/B4/B5 labels bound to existing Cover5a/b/c. Normal A membership already includes
+extended-only rows; hiding fields never clears values, drafts or errors. Extended
+presentation explicitly uses cover mode, disabling the height toggle until the
+option is turned off; height drafts are retained. Totals remain independent,
+and the existing source missing-cover notice still checks its original seven
+standard A/B cover/total fields, not the extended covers. Shared Species,
+Collected, numeric/audit, creation/deletion and parent-A Enter paths retain their
+original ownership/lifecycle guards. The checkbox is an in-memory presentation
+choice, not a YAML preference write, duplicate menu or complete CHARS-form
+equivalence claim. FS1333/SIVI/other-size entrypoints remain unavailable.
 
 Metadata's supplemental typed history is a desktop adaptation: old plaintext
 audits cannot establish historical SQLite storage classes. Dedicated restoration
@@ -129,6 +141,7 @@ Set default-on flags to `false` for read-only opt-out; set default-off flags to
 | Off: stored profile ownership | `VITE_PLOT_PROFILE_SELECTION`, `VITE_PLOT_PROFILE_WRITE_OWNERSHIP`, `VITE_PLOT_PROFILE_FILE_CREATION`, `VITE_PLOT_PROFILE_TABLE_CREATION` |
 | Off: read-only catalogue | `VITE_SOIL_CODES_REFERENCE` |
 | Off: read-only reports | `VITE_LONG_ENVIRONMENT_REPORT` |
+| Off: extended shrub presentation | `VITE_EXTENDED_SHRUBS` |
 
 `VITE_HEIGHT_EDITING=false` also disables numeric vegetation editing.
 Master edits additionally require source authorization; reference membership,
@@ -172,8 +185,10 @@ Use native Wails with disposable data/config for binding/lifecycle acceptance.
   [download portal](docs/index.html): distribution surfaces, not replacement
   acceptance for every platform.
 
-Next: shared CHARS extended-shrub behavior, then FS1333/two-page
-implementation and priority vegetation reports/locations. Static form/report
+Next: source-bound Long Vegetation options/calculations, FS1333/two-page
+implementation and priority reports/locations. Constant-species-list versus
+species-threshold behavior needs an explicit scope decision before report expansion.
+Static form/report
 contracts alone do not prove native execution parity. The historical agreement's
 cloud/public-map/BECWeb/publication tracks remain visible but separately scoped.
 Private native evidence, original documentation snapshots and closed-build hash

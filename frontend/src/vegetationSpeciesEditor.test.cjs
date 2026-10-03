@@ -159,7 +159,7 @@ test('Species drafts preserve original identity, raw errors and exact list membe
     assert.match(unavailable['0'].error, /references are unavailable/);
   }
   for (const id of [0.5, 2147483648, -2147483649, NaN]) assert.throws(() => editor.stageSpecies({}, 'SubVegCXL', id, 'A', 'RAW', lists));
-  assert.throws(() => editor.stageSpecies({}, 'SubVegAXL', 0, 'A', 'RAW', lists));
+  assert.throws(() => editor.stageSpecies({}, 'SubVegA', 0, 'A', 'RAW', lists));
   let drafts = editor.stageSpecies({}, 'SubVegAXL_BC', 0, 'A', 'RAW', lists);
   drafts = editor.stageSpecies(drafts, 'SubVegAhtXL', 0, 'A', 'changed elsewhere', lists);
   assert.equal(drafts['0'].expected, 'RAW');

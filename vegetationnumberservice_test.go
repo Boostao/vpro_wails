@@ -31,14 +31,14 @@ func TestVegetationNumbersSourceFieldsAtomicRollbackAndHistoricalOmission(t *tes
 			}
 		}
 	}
-	if auditCount(t, db, "CHILD1") != 17 {
+	if auditCount(t, db, "CHILD1") != 20 {
 		t.Fatal("source partners generated phantom numeric audits")
 	}
 	before := substrateSnapshot(t, db)
 	for _, update := range []VegetationNumberUpdate{
 		makeUpdate(0, "SubVegCXL", "cover1", number(-1.234567890123), number(2)),
 		makeUpdate(0, "SubVegDXL", "height6", number(-1.234567890123), number(2)),
-		makeUpdate(0, "SubVegAXL", "cover1", number(-1.234567890123), number(2)),
+		makeUpdate(0, "SubVegAXL_BC", "cover5a", number(-1.234567890123), number(2)),
 		makeUpdate(-10, "SubVegCXL", "cover6", nil, number(0)),
 		makeUpdate(-10, "SubVegDXL", "cover7", nil, number(0)),
 		makeUpdate(-10, "SubVegAhtXL", "height1", nil, number(0)),

@@ -36,7 +36,7 @@
   const soilKind = $derived(name === 'SoilHumusXL' ? 'Humus' : name === 'SoilMineralXL' ? 'Mineral' : null);
   const columns = $derived(source.controls.filter(control => !['Label', 'Rectangle', 'OptionGroup'].includes(control.type))
     .sort((a, b) => a.tabOrder - b.tabOrder));
-  const numeric = new Set(['cover1', 'cover2', 'cover3', 'totala', 'cover4', 'cover5', 'totalb', 'cover6', 'cover7', 'cover8', 'cover9', 'upperdepth', 'lowerdepth', 'humusformph']);
+  const numeric = new Set(['cover1', 'cover2', 'cover3', 'totala', 'cover4', 'cover5', 'cover5a', 'cover5b', 'cover5c', 'totalb', 'cover6', 'cover7', 'cover8', 'cover9', 'upperdepth', 'lowerdepth', 'humusformph']);
   const editable = new Set([...numeric, 'species', 'collected', 'horizon', 'comment', 'comments', 'texture', 'colour', 'dataname', 'dataitem']);
 </script>
 

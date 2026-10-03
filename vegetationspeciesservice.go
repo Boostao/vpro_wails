@@ -47,7 +47,7 @@ func (update *VegetationSpeciesUpdate) UnmarshalJSON(data []byte) error {
 func vegetationSpeciesRowPredicate(form string) (string, error) {
 	var columns []string
 	switch form {
-	case "SubVegAXL_BC":
+	case "SubVegAXL_BC", "SubVegAXL":
 		columns = []string{"Cover1", "Cover2", "Cover3", "TotalA", "Cover4", "Cover5", "TotalB", "Cover5a", "Cover5b", "Cover5c"}
 	case "SubVegAhtXL":
 		columns = []string{"Cover1", "Height1", "Cover2", "Height2", "Cover3", "Height3", "TotalA", "Cover4", "Height4", "Cover5", "Height5", "TotalB"}

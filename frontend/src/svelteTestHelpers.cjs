@@ -68,7 +68,8 @@ function loadTypeScript(filename, dependencies = {}) {
 }
 function presentationHelpers() {
   const paper = loadTypeScript('paperLayout.ts', {
-    '../../resources/fs882-xl-layout.json': JSON.parse(readFileSync(path.join(__dirname, '..', '..', 'resources', 'fs882-xl-layout.json'), 'utf8'))
+    '../../resources/fs882-xl-layout.json': JSON.parse(readFileSync(path.join(__dirname, '..', '..', 'resources', 'fs882-xl-layout.json'), 'utf8')),
+    '../../resources/fs882-extended-shrub-layout.json': JSON.parse(readFileSync(path.join(__dirname, '..', '..', 'resources', 'fs882-extended-shrub-layout.json'), 'utf8'))
   });
   return { paper, presentation: loadTypeScript('formPresentation.ts', { './paperLayout': paper }) };
 }

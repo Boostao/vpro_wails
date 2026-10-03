@@ -46,7 +46,7 @@ counts. Full corpus/text/renders remain local, not shipped as application assets
 | --- | --- | --- | --- |
 | 1 | Session dashboard selects active files | Single-page entry struck; exact retained presentations unclear | Owned project/SU/hierarchy selection active; FS1333/two-page incomplete |
 | 2 | Retain most other forms with differing priority | Green/orange/red meanings, Message Board/GIF/Herbarium/User Log unresolved | Do not add or remove workflows from marks alone |
-| 3 | Replace separate CHARS forms with extended-shrub option | Caption's "only difference" needs source verification | Shared mode is direction, not proven equivalence |
+| 3 | Replace separate CHARS forms with extended-shrub option | Caption's "only difference" does not authorize unrelated parent-variant event drift | Shared XL cover-only option native-verified and opt-in; full other-form equivalence unavailable |
 | 4 | Redundant classification navigation moves to dashboard | Retain underlying classification tasks; Add/Remove Units location open | Keep top menu compact; ownership remains explicit |
 | 5 | Project tasks mostly priority; rethink metadata/BECMaster provenance and downloads | Backup entry struck; exceptions and authoritative metadata contract open | Foundation delivered; new/save/splinter/merge/compare incomplete |
 | 6 | Query/form filtering on data forms; environmental fields add units to existing SU | Append versus new-table behavior conflicts with old menu/help; assignment collisions unknown | Reviewed forward transfer delivered, not this classification workflow |
@@ -57,7 +57,7 @@ counts. Full corpus/text/renders remain local, not shipped as application assets
 | 11 | Basic standards-library compliance retained; different presentation allowed | Other tests/repair/optimization tabs not automatically approved | Species checker is bounded; environment compliance incomplete |
 | 12 | Quality filters plots from SU; possible suffix/user-phrase filters; environment headers lower priority | Tentative suffix grammar, denominator/classes/lumping and safe filter syntax open | Do not implement speculative filters or raw SQL from screenshots |
 | 13 | Unit Groups define worksheets; quality filters plots, presence/mean cover filters species; regroup code/lumping controls | Struck calculation/order/list options require confirmation | Keep plot filtering, species filtering and aggregation separate |
-| 14 | Long/summary environment priority; combine content through consolidated options | Per-plot versus unit-summary combination open | Reports are priority, not delivered capabilities |
+| 14 | Long/summary environment priority; combine content through consolidated options | Per-plot versus unit-summary combination open | Long Environment read-only preview native-verified and opt-in; summaries/export unavailable |
 | 15 | Location functions priority; other outputs useful but lower priority | PC-ORD marked; map/viewer/export/CRS/privacy contract open | Desktop locations distinct from historical public Shiny map |
 | 16-18 | No added prose or decision marks | Summary statistics, standards/reference attachment, user/path settings are candidate retain | No approved as-is defaults, linked-table mechanics or path import |
 | 19 | No prose; help/recovery menu | Orange marks and Close all forms strike unresolved | Native recovery must retain drafts; do not recreate Access workarounds |

@@ -3,9 +3,9 @@
   import { accessCaption, paperPage, type PaperControl, type VegetationMode } from './paperLayout';
   import { controlLabel, presentationGroups, wideControl } from './formPresentation';
   type Editor = { columns: readonly string[]; input: Snippet<[PaperControl, string]> };
-  let { name, embedded, values = new Map<string, unknown>(), vegetationMode = 'initial', onHeightToggle, onSpeciesCheck, speciesCheckDisabled = true, onFindPlot, findPlotDisabled = true, editor, editors = [] }: {
+  let { name, embedded, values = new Map<string, unknown>(), vegetationMode = 'initial', onHeightToggle, heightToggleDisabled = false, onSpeciesCheck, speciesCheckDisabled = true, onFindPlot, findPlotDisabled = true, editor, editors = [] }: {
     name: string; embedded: Snippet<[PaperControl]>; values?: Map<string, unknown>;
-    vegetationMode?: VegetationMode; onHeightToggle?: () => void;
+    vegetationMode?: VegetationMode; onHeightToggle?: () => void; heightToggleDisabled?: boolean;
     onSpeciesCheck?: () => void; speciesCheckDisabled?: boolean;
     onFindPlot?: () => void; findPlotDisabled?: boolean;
     editor?: Editor; editors?: readonly Editor[];
@@ -40,7 +40,7 @@
           {:else if control.type === 'CommandButton' || control.type === 'ToggleButton'}
             <div class="form-field action-field">
               {#if control.controlName === 'btnCoverAndHeight' && onHeightToggle}
-                <button type="button" data-source-control={control.controlName} aria-pressed={vegetationMode === 'height'} onclick={onHeightToggle}>{accessCaption(control.caption)}</button>
+                <button type="button" data-source-control={control.controlName} disabled={heightToggleDisabled} aria-pressed={vegetationMode === 'height'} onclick={onHeightToggle}>{accessCaption(control.caption)}</button>
               {:else if control.controlName === 'btnCheckSppCodes' && onSpeciesCheck}
                 <button type="button" data-source-control={control.controlName} disabled={speciesCheckDisabled} onclick={onSpeciesCheck}>{controlLabel(control)}</button>
               {:else if control.controlName === 'btnFindPlot' && onFindPlot}
