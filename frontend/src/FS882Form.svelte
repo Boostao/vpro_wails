@@ -29,6 +29,7 @@
   import PersonalSpeciesFields from './PersonalSpeciesFields.svelte';
   import SpeciesCodeCheck from './SpeciesCodeCheck.svelte';
   import ProjectMetadataEditor from './ProjectMetadataEditor.svelte';
+  import EnvironmentSUTransfer from './EnvironmentSUTransfer.svelte';
   import ProjectPlotProfileReview from './ProjectPlotProfileReview.svelte';
   import { navigateSourceEnter } from './enterNavigation';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
@@ -113,6 +114,9 @@
   }
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
+  const environmentSUEnabled = import.meta.env.VITE_SOURCE_ENV_SU_TRANSFER === 'true';
+  let environmentSUOpen = $state(false);
+  let environmentSUEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   const profileReviewEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_REVIEW === 'true';
   const profileRunEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_RUN === 'true';
   const profileEditingEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_EDITING === 'true';
@@ -125,7 +129,7 @@
   let profileReviewBlocked = $state(false);
   let profileEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy);
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy || environmentSUOpen);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -167,7 +171,7 @@
   const creationSpeciesInvalid = $derived(creationDraft ? vegetationCreationSpeciesError(creationDraft, speciesLists[creationDraft.form] ?? []) : null);
   const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked);
+  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || environmentSUOpen);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -442,6 +446,15 @@
       return;
     }
     metadataOpen = true; error = null; successMsg = null;
+  }
+
+  function openEnvironmentSU() {
+    if (!environmentSUEnabled || childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 ||
+        !$projectState?.activeSU || $projectState.activeSU === 'None' || !original) {
+      error = 'Select an owned-project SU, finish or Undo all drafts and unlock the available plot before reviewing Env Into SU.';
+      return;
+    }
+    environmentSUOpen = true; error = null; successMsg = null;
   }
 
   async function refreshAfterRestore(plot: string, request: number) {
@@ -1571,6 +1584,10 @@
   }
 
   export function getCloseState(): EditorCloseState {
+    if (environmentSUOpen) return environmentSUEditor?.getCloseState() ?? {
+      unsaved: true, busy: true, canSave: false, error,
+      saveReason: 'Wait for SU transfer review, then finish or dismiss and close it explicitly.',
+    };
     if (profileReviewBlocked) return profileEditor?.getCloseState() ?? {
       unsaved: true, busy: true, canSave: false, error,
       saveReason: 'Finish profile rules explicitly before saving or closing the plot.',
@@ -1615,6 +1632,7 @@
   }
 
   function undo() {
+    if (environmentSUOpen) { environmentSUEditor?.undo(); return; }
     if (busy || headerWorkflowBusy) {
       error = 'Wait for the current operation to finish before undoing changes.';
       return;
@@ -1762,6 +1780,11 @@
     </div>
 
     <div class="fs882-actions flex items-center gap-2">
+      {#if environmentSUEnabled}
+        <button type="button" data-source-control="btnEnvIntoSu" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
+          disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 || $projectState?.activeSU === 'None'}
+          onclick={openEnvironmentSU}>Env Into SU</button>
+      {/if}
       {#if onFindPlot}
         <button type="button" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
           disabled={busy || headerWorkflowBusy || !capabilitiesReady} onclick={onFindPlot}>Find Plot</button>
@@ -1888,6 +1911,11 @@
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if environmentSUOpen && $projectState?.projectPath}
+      <EnvironmentSUTransfer bind:this={environmentSUEditor} client={PlotService} {contextId}
+        project={$projectState.activeProject} su={$projectState.activeSU} path={$projectState.projectPath}
+        onclosed={() => { environmentSUOpen = false; error = null; }} />
+    {/if}
     {#if profileReviewOpen}
       <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
         allowEditing={profileEditingEnabled && $projectState?.plotProfile?.writable === true} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}

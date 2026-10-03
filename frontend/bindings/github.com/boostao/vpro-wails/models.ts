@@ -129,6 +129,37 @@ export interface CoordinateParts {
     "negative": boolean;
 }
 
+export interface EnvironmentSiteUnitChange {
+    "plotNumber": string;
+    "envRowId": string;
+    "adminRowId": string;
+    "suRowId": string;
+    "before": ProjectMetadataCell;
+    "after": ProjectMetadataCell;
+}
+
+export interface EnvironmentSiteUnitResult {
+    "changedRows": number;
+    "historyId": string;
+}
+
+export interface EnvironmentSiteUnitReview {
+    "contextId": string;
+    "project": string;
+    "su": string;
+    "path": string;
+    "env": ProjectMetadataTable;
+    "admin": ProjectMetadataTable;
+    "target": ProjectMetadataTable;
+    "changes": EnvironmentSiteUnitChange[] | null;
+    "historyHash": string;
+}
+
+export interface EnvironmentSiteUnitTransfer {
+    "review": EnvironmentSiteUnitReview;
+    "confirmed": boolean;
+}
+
 /**
  * FS882Header captures the unified Env + Admin join record for a plot.
  */

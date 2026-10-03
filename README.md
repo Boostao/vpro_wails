@@ -209,8 +209,27 @@ fresh restoration guards and draft/original-bound numeric errors are shared.
 Native two-error remount/Save/Lock/close refusal, raw50/non-rounded Single values,
 rollback/retry, NULL, Undo and Lock preserve all15 tables,32 historical audits
 and support/config bytes, adding exactly six intended scalar audits.
-The picture manager, picture display, projection and bulk/reverse-copy actions
+The picture manager, picture display, projection and reverse-copy actions
 remain unavailable. Parent-field coverage does not enable those workflows.
+The forward **Env Into SU** workflow is implemented and native-Wails-verified,
+independently default off (`VITE_SOURCE_ENV_SU_TRANSFER=true`). Its original
+toolbar action opens explicit review/Confirm/Dismiss/Reload without expanding
+top navigation. It copies matching plots across the entire selected SU, not
+just the current plot or profile-navigation subset. The SU must physically
+belong to the owned project file. Source `UserSiteUnit` belongs to Admin through
+the original Env/Admin join; original table names, NULL versus empty text,
+literal identities, historical omission and new SiteUnit TEXT255 UTF-16 bounds
+are preserved. Physical duplicate links reject rather than disappear in DISTINCT.
+Shared parent/child drafts block opening; the review blocks Save/Lock/close and
+context switching. Independent target drift retains the proposal for correction.
+Changes and one typed `__VPRO_EnvironmentSUHistory` event share a transaction;
+complete project/schema observations reject unrelated trigger mutations, and a
+history revision prevents completed-review replay. This technical provenance is
+a desktop adaptation, not parity with Access's unaudited bulk SQL. Native
+acceptance proves late-trigger rollback, retained retry with exactly two changes/
+one event, default zero writes and complete fixture/configuration restoration.
+Reverse copying, independent-file SU writes and personal-definition creation
+remain unavailable.
 
 Other editing defaults on; `VITE_OTHER_EDITING=false` makes its source grid and
 create/delete actions read-only. The eight exported SubOtherXL bindings are

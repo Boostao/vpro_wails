@@ -1,6 +1,6 @@
 # Windows continuation
 
-Updated 2026-10-02. Read [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for priorities and
+Updated 2026-10-03. Read [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for priorities and
 [README.md](README.md) for delivered capabilities. This file describes current
 state only; it is not a chronological execution log.
 
@@ -24,7 +24,32 @@ between shells.
 
 ## Current implementation
 
-- Current verified delivery: typed metadata audit provenance and dedicated
+- Active continuation after published392ec99: scoped forward environment/SU
+  transfer is implemented/native verified, independently default off with
+  `VITE_SOURCE_ENV_SU_TRANSFER=true`. UserSiteUnit physically belongs to Admin;
+  original Env/Admin/SU links and all selected-SU matching plots are reviewed,
+  not only the current plot/profile subset. SU must belong to the owned project
+  file. Shared drafts exclude opening; review blocks Save/Lock/native close/
+  switching. Changes plus typed technical provenance are atomic; final complete
+  project/schema observations reject trigger mutations and history revision
+  prevents replay. Original audits/descriptions remain unchanged.
+  Focused coupled race9.700s,269 frontend tests/check0/0,15/162/101 bindings/
+  two enums/62 adapters and opt-in/default builds pass. Core40839b91.../owned18004
+  proves six cases including drift, non-aborting trigger rollback, retained retry
+  with exactly two changes/one history event and actual600px visibility.
+  Defaultddbc793d.../owned4488 keeps the action unavailable with zero writes.
+  Both apps closed normally and every original fixture/support/config byte is
+  restored. Full `go test -race -timeout 20m ./...` passes (root629.894s).
+  Immutable51-file archives/environment-su-checkpoint plus manifest seals exact
+  accepted binaries/assets, source/logs/native receipts and before/after data,
+  verifies the unchanged49-file metadata predecessor and archives protected
+  f5b4ad58... before promoting exact accepted defaultddbc793d... without rebuilding.
+  Application-only publication completes this checkpoint. Do not replay native
+  actions or replace the immutable seals.
+  Reverse copying, arbitrary destinations and personal-definition writes stay
+  unavailable. After this checkpoint, reverse is the next bounded source-first
+  batch; no new infrastructure detour or Access oracle grant.
+- Published preceding delivery: typed metadata audit provenance and dedicated
   restoration. Corrected final whole-row observation follows every audit prune:
   non-aborting AFTER DELETE trigger mutation rejects and rolls back exact bytes.
   Focused coupled race15.293s/full race554.927s,265 frontend tests/check0/0,
@@ -57,14 +82,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all60 editor operations to immutable identities, leases running operations and
+  all62 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `f5b4ad58171776b028f3effa2b8916804a777fcfbb9b307782c27e3b5ebc92b1`.
+  `ddbc793d3d177b8cfef16b37fa4cfa1f891f1b2fa7213939949fa372cdf0fd75`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted

@@ -2,13 +2,13 @@ import type { AuditRestoreAction, AuditRestoreResult, ProjectMetadataCell, Proje
 import { beginMetadataDraft, equalCell } from './projectMetadataEditor';
 import { wellFormedUTF16 } from './qualityEditor';
 
-function exactSigned64(value: string): boolean {
+export function exactSigned64(value: string): boolean {
   if (typeof value !== 'string' || !/^-?(0|[1-9]\d*)$/.test(value)) return false;
   const number = BigInt(value);
   return number.toString() === value && number >= -(1n << 63n) && number < (1n << 63n);
 }
 
-function completeCell(cell: ProjectMetadataCell): boolean {
+export function completeCell(cell: ProjectMetadataCell): boolean {
   if (!cell) return false;
   const { storage, text, integer, real, blobHex } = cell;
   if (storage === 'null') return text === null && integer === null && real === null && blobHex === null;

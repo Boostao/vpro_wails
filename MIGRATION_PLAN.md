@@ -1940,6 +1940,67 @@ Implemented and native-Wails-verified, independently default off with
   restoration, numeric-looking text criterion semantics, native Access execution
   parity and the broader migration/replacement gates remain open.
 
+### Scoped environment/SU transfer follow-up
+
+Source `btnEnvIntoSu_Click` calls `V7mdlSUTableTools1.InsertEnvSuIntoSu`;
+`btnSuIntoEnv_Click` calls `InsertSuIntoEnv`. Both require an explicitly selected
+SU. The forward direction joins the current `USysEnv` to that SU and copies
+`UserSiteUnit` into its original `SiteUnit` field. Its later personal-definition
+creation prompt is a separate VUser write, not an atomic project/SU requirement.
+The joined view's `UserSiteUnit` physically belongs to `<Project>_Admin`, not
+`<Project>_Env`; both original table exports and retained SQLite bindings agree.
+The reverse direction copies SU values into `UserSiteUnit`, then resolves short/
+long names against master and personal definitions. Source name updates hard-code
+`Sample_SU`; do not inherit that destination bug or silently choose ambiguous
+definitions. Source bulk SQL does not call the form's BeforeUpdate audit event.
+
+The forward workflow is **implemented and native-Wails-verified**, independently
+default off with `VITE_SOURCE_ENV_SU_TRANSFER=true`. It consumes original typed
+Env/Admin/SU rows, retains physical rowids,
+distinguishes NULL/empty, omits unchanged historical invalid values and bounds new
+SU text at255 UTF-16 units. Literal SQLite joins preserve case/spaces without
+Access coercion claims; matching duplicate physical links cannot be hidden by
+DISTINCT. Foreign/unlinked rows remain untouched.
+
+- **Scope/ownership:** original Env Into SU toolbar entrypoint, explicit review
+  of every matching plot in the selected SU (not a current-plot/profile subset),
+  Confirm/Dismiss/Reload, immutable ContextService identity and existing writer
+  leases/attachment checks. SU must be the owned project file; no independent-file
+  transaction or new database-family/configuration framework.
+- **Atomicity:** changed typed SU cells and one supplemental
+  `__VPRO_EnvironmentSUHistory` event share the immediate transaction. Observe
+  every original project table and schema after all mutations/history insertion;
+  reject unrelated changes, including non-aborting triggers. Preserve original
+  audits/descriptions/data and existing history. History revision prevents replay
+  even if an independent actor resets target values. Technical provenance is an
+  explicit desktop adaptation, not Access bulk-audit execution parity.
+- **Lifecycle:** opening requires no parent/child/metadata/profile drafts or
+  validation errors. Review survives errors and blocks Save/Lock/native close/
+  context switching; Undo/dismiss delegate to the panel. Known commits retire
+  proposals before result validation; committed cleanup failures require Reload,
+  never a success-shaped fallback or automatic replay.
+- **Acceptance:** focused coupled race9.700s;269 frontend tests, check0 errors/
+  warnings, generated15 services/162 methods/101 models/two enums and62 adapter
+  operations; opt-in/default production builds pass. Full
+  `go test -race -timeout 20m ./...` passes (root629.894s).
+- **Native:** core40839b91.../owned18004 proves six cases: parent-draft exclusion,
+  review Save/Lock/close refusal and no-write dismissal, independent target drift,
+  late-trigger whole-project rollback, retained retry with exactly two typed
+  changes/one history event, and zero-assignment Reload/600px visibility.
+  Defaultddbc793d.../owned4488 keeps the action unavailable and writes nothing.
+  Both owners exited normally and all original fixture/support/config bytes
+  are restored. Completed native actions must not be replayed.
+- **Checkpoint:** immutable51-file `archives/environment-su-checkpoint` plus
+  manifest preserves exact accepted binaries/assets, source, tests/logs, native
+  receipts and before/after data. It verifies the unchanged49-file metadata
+  predecessor and archives protectedf5b4ad58... before promoting exact accepted
+  defaultddbc793d... bytes without rebuilding.
+
+Arbitrary SU paths, personal-definition writes and the reverse direction remain
+unavailable. Reverse is the next bounded source-first batch: validate Admin
+UserSiteUnit bounds and definition ambiguity, do not inherit hard-coded Sample_SU,
+and retain the same review/ownership/transaction/lifecycle acceptance boundary.
+
 ### Source Find Plot: scoped lookup and safe navigation
 
 Implemented and native-Wails-verified, independently default off with

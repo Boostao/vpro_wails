@@ -157,6 +157,10 @@ export function RestoreSelectedAuditRecords(contextID: string, plot: string, row
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
 }
 
+export function ReviewEnvironmentSiteUnits(contextID: string): $CancellablePromise<$models.EnvironmentSiteUnitReview> {
+    return $Call.ByID(1114788839, contextID);
+}
+
 export function ReviewPlotProfileFileCreation(contextID: string): $CancellablePromise<$models.PlotProfileFileReview> {
     return $Call.ByID(1138163877, contextID);
 }
@@ -251,6 +255,10 @@ export function SetPlotProfileEditing(expectedID: string, request: $models.PlotP
 
 export function SwitchContext(expectedID: string, requested: $models.ContextSelection): $CancellablePromise<$models.ProjectState> {
     return $Call.ByID(1469329417, expectedID, requested);
+}
+
+export function TransferEnvironmentSiteUnits(contextID: string, request: $models.EnvironmentSiteUnitTransfer): $CancellablePromise<$models.EnvironmentSiteUnitResult | null> {
+    return $Call.ByID(1924456504, contextID, request);
 }
 
 export function UpdateCollectedRecords(contextID: string, plot: string, updates: $models.CollectedRecordUpdate[] | null): $CancellablePromise<void> {
