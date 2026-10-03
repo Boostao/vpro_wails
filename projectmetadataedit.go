@@ -384,7 +384,8 @@ func (s *PlotService) saveProjectMetadata(request ProjectMetadataEdit) error {
 		if affected, err := result.RowsAffected(); err != nil || affected != 1 {
 			return errors.Join(fmt.Errorf("metadata mutation expected one row, found %d", affected), err)
 		}
-		if err := auditChildFields(tx, project, "Metadata", request.PlotNumber, request.ID, fields, before, after, user, strength, when); err != nil {
+		audits, err := auditChildFieldsTracked(tx, project, "Metadata", request.PlotNumber, request.ID, fields, before, after, user, strength, when)
+		if err != nil {
 			return err
 		}
 		if err := metadataParentObservation(ctx, tx, project, request.PlotNumber, request.ProjectID); err != nil {
@@ -396,6 +397,12 @@ func (s *PlotService) saveProjectMetadata(request ProjectMetadataEdit) error {
 		}
 		if !reflect.DeepEqual(observed, planned) {
 			return errors.New("metadata final stored row differs from the complete plan; mutation and audits rolled back")
+		}
+		if err := appendProjectMetadataEditHistory(ctx, tx, projectMetadataEditHistory{
+			Project: project, PlotNumber: request.PlotNumber, ProjectID: request.ProjectID, ID: request.ID,
+			User: user, EditWhen: when, Columns: current.Columns, Original: row, Committed: observed, Audits: audits,
+		}); err != nil {
+			return err
 		}
 		if err := c.validateMetadataWriterFiles(); err != nil {
 			return err

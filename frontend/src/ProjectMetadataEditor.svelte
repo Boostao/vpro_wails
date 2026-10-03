@@ -8,12 +8,14 @@
     metadataCellText, metadataStandardDecisionRequired, metadataStandardDefaults, populateMetadataStandard, metadataBlankRequest,
     beginMetadataTemplate, stageMetadataTemplate, metadataTemplateRequest, metadataTemplateFields, type MetadataDraft, type MetadataTemplateDraft } from './projectMetadataEditor';
   import { metadataGroups, metadataLabel } from './projectMetadataPresentation';
+  import ProjectMetadataRestore from './ProjectMetadataRestore.svelte';
 
-  let { client, plot, onclosed, onbusy, oncommitted, allowCreation = false, allowTemplateCreation = false }: {
-    client: ReturnType<typeof bindContextPlots>; plot: string; onclosed: () => void;
+  let { client, contextId, plot, onclosed, onbusy, oncommitted, allowCreation = false, allowTemplateCreation = false, allowRestoration = false }: {
+    client: ReturnType<typeof bindContextPlots>; contextId: string; plot: string; onclosed: () => void;
     onbusy: (busy: boolean) => void; oncommitted: () => Promise<void>;
     allowCreation?: boolean;
     allowTemplateCreation?: boolean;
+    allowRestoration?: boolean;
   } = $props();
   let review = $state<ProjectMetadataReview | null>(null);
   let fields = $state<ProjectMetadataEditorField[]>([]);
@@ -27,9 +29,12 @@
   let committedFailure = $state(false);
   let error = $state<string | null>(null);
   let success = $state<string | null>(null);
+  let restorationOpen = $state(false);
+  let restorationBusy = $state(false);
+  let restorationEditor: ProjectMetadataRestore | undefined = $state();
   let generation = 0;
   const reads = new ReadRequests();
-  const busy = $derived(reading || saving);
+  const busy = $derived(reading || saving || restorationBusy);
   const errors = $derived(draft ? metadataErrors(draft) : template ? metadataErrors(template) : []);
   const dirty = $derived(blank !== null || template !== null || (draft ? metadataDirty(draft) : false));
   const standardDecision = $derived(draft ? metadataStandardDecisionRequired(draft) : false);
@@ -43,10 +48,14 @@
   onDestroy(() => { generation++; reads.cancelAll(); onbusy(false); });
 
   export function getCloseState(): EditorCloseState {
+    if (restorationOpen) return restorationEditor?.getCloseState() ?? {
+      unsaved: true, busy, canSave: false, error, saveReason: 'Finish or dismiss metadata restoration before closing.'
+    };
     return { unsaved: true, busy, canSave: false, error,
       saveReason: 'Save or Undo metadata explicitly, then close metadata review before saving or closing the plot.' };
   }
   export function undo() {
+    if (restorationOpen) { restorationEditor?.undo(); return; }
     if (busy) { error = 'Wait for the current metadata operation before Undo.'; return; }
     if (template) {
       template = null; error = null; success = 'Template creation proposal undone; no record, identity or history was allocated.';
@@ -197,7 +206,21 @@
   {#if success}<p class="success" role="status">{success}</p>{/if}
   {#if errors.length}<ul class="failure" role="alert">{#each errors as message}<li>{message}</li>{/each}</ul>{/if}
   {#if busy}<p role="status">{saving ? 'Saving metadata transaction…' : 'Loading metadata records and source references…'}</p>{/if}
+  {#if restorationOpen}
+    <ProjectMetadataRestore bind:this={restorationEditor} {client} {contextId} {plot}
+      onbusy={value => restorationBusy = value}
+      onclosed={() => { restorationOpen = false; error = null; }}
+      oncommitted={async rowId => {
+        await oncommitted();
+        const next = await client.ReviewProjectMetadata(plot);
+        review = next; draft = beginMetadataDraft(next, rowId); standardPreview = false;
+      }} />
+  {:else}
   <div class="toolbar">
+    {#if allowRestoration}
+      <button type="button" disabled={!ready || busy || dirty || errors.length > 0 || committedFailure || standardPreview}
+        onclick={() => { restorationOpen = true; error = null; success = null; }}>Review typed metadata restoration</button>
+    {/if}
     <button type="button" onclick={reload} disabled={busy || dirty}>Reload metadata and references</button>
     <button type="button" onclick={undo} disabled={busy || committedFailure}>Undo metadata drafts</button>
     <button type="button" onclick={save} disabled={!ready || busy || !draft || !dirty || errors.length > 0 || committedFailure || standardPreview || standardDecision && !draft?.standardPopulation}>Save metadata</button>
@@ -357,6 +380,7 @@
       </dl>
     {:else}<p>No matching master templates.</p>{/each}
   </details>
+  {/if}
 </section>
 
 <style>

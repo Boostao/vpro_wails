@@ -105,6 +105,10 @@ export function ListProjectMetadataFields(contextID: string): $CancellablePromis
     return $Call.ByID(4089336027, contextID);
 }
 
+export function ListProjectMetadataRestoreHistory(contextID: string, plot: string): $CancellablePromise<$models.ProjectMetadataRestoreHistory> {
+    return $Call.ByID(618860380, contextID, plot);
+}
+
 export function ListProjectPlotProfileChoices(contextID: string): $CancellablePromise<$models.ProjectPlotProfileChoices> {
     return $Call.ByID(1233139099, contextID);
 }
@@ -145,6 +149,10 @@ export function ResolveProjectPlotProfileNavigation(contextID: string, request: 
     return $Call.ByID(3203258907, contextID, request);
 }
 
+export function RestoreProjectMetadata(contextID: string, request: $models.ProjectMetadataRestore): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(685958956, contextID, request);
+}
+
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
 }
@@ -159,6 +167,10 @@ export function ReviewPlotProfileTableCreation(contextID: string): $CancellableP
 
 export function ReviewProjectMetadata(contextID: string, plot: string): $CancellablePromise<$models.ProjectMetadataReview> {
     return $Call.ByID(90084514, contextID, plot);
+}
+
+export function ReviewProjectMetadataRestoration(contextID: string, plot: string, historyID: string): $CancellablePromise<$models.ProjectMetadataRestoreReview> {
+    return $Call.ByID(659636998, contextID, plot, historyID);
 }
 
 export function ReviewProjectPlotProfile(contextID: string): $CancellablePromise<$models.ProjectPlotProfileReview> {

@@ -1248,8 +1248,57 @@ descriptions supply versions; missing/NULL/malformed/duplicate descriptions stop
 Save instead of inheriting the source Unknown fallback. No-op/historical omission
 does not rewrite stamps or history. Runtime Lock stays a UI lifecycle gate.
 Recognized standards require an explicit keep-current-drafts or source-default
-confirmation decision. Metadata audit aliases fail
-closed in the generic restoration workflow until metadata restoration is defined.
+confirmation decision. Metadata audit aliases remain fail-closed in generic
+restoration; the dedicated typed restoration draft below never guesses legacy
+plaintext storage classes.
+
+Current bounded restoration (corrected integration/native acceptance complete; independently opt-in):
+Final inspection reproduced a non-aborting audit DELETE trigger changing metadata
+after the writer's whole-row observation. The corrected observation follows all
+prune deletes; focused coupled race15.293s/full race554.927s,265 frontend tests/
+check0/0 and distinct builds pass. Core56decf8e.../owned9540 proves one new Save,
+exact-byte late-trigger rollback and retained retry restoring the original75-cell
+row/pruning only five audits with one receipt. Defaultf5b4ad58.../owned7216 leaves
+both gates off with zero writes. Both owners exited and all original bytes restore.
+The successor metadata-restoration-prune-guard-checkpoint archives protected
+1ebf22b1... and exact accepted bytes/source/logs/receipts/data before promotion.
+Earlier completed actions are never replayed; the75-file predecessor seal and
+all older seals remain unchanged.
+`frmProjectMetaData` updates source stamps but does not call `AuditTrail`.
+Desktop metadata auditing/restoration is therefore an explicit adaptation.
+New applicable audits retain exact rowid/ID/ProjectID, all75 tagged before/after
+cells, physical schema and independently observed inserted audit rows in
+`__VPRO_MetadataEditHistory`, sharing the existing project writer transaction.
+Original table names, data/descriptions and the database family remain canonical;
+this supplemental technical history is not an editor catalogue or replacement.
+An explicit typed edit review changes only proven audited columns, including
+stamps when actually audited; audit-strength omissions are not silently undone.
+Current whole-row, parent/SU ownership, allowed audit aliases, reference membership,
+schema/file identities and original text/integer domains are independently checked.
+Retain/prune acts only on proven audit rows, preserves typed original provenance,
+and records a same-transaction no-replay receipt. Legacy/untyped creation history,
+identity assignments and new invalid historical values remain unsupported.
+`VITE_PROJECT_METADATA_RESTORE=true` is independent/default off and requires the
+existing opt-in metadata editor. Proposal/errors block ordinary Save/Lock/close;
+known committed response/refresh failures retire the proposal before recovery.
+Focused coupled race15.013s/full race579.476s,265 frontend tests/check0/0 and
+actual15/160/97 bindings pass;60 editor adapter operations retain their original
+context identity. Distinct opt-in/default builds pass. Native precursor3528
+completes one independent Save/five audits, then exposes the Svelte-proxy clone
+boundary before either attempted restore reaches backend. Use `$state.snapshot`
+before immutable request construction; preserve the first-Save checkpoint.
+Corrected core2e412091.../owned15448 resumes without replaying that Save and
+verifies target drift/retry, retain, second Save/empty versus NULL, prune rollback/
+retry, two no-replay receipts, original75-cell table restoration and600px visuals.
+No parent, other candidate, descriptions, master/support/configuration change.
+Default1ebf22b1.../owned11872 leaves both metadata/restoration surfaces unavailable,
+Vegetation active and every original byte intact. All owned applications exited;
+original fixture bytes restored. Old precursor912bd37f.../defaultfa36a62e... remain
+preserved, not overwritten by corrected builds. Native Access restoration is not claimed.
+Independent archives/metadata-restoration-checkpoint seals75 files plus manifest,
+previous1541669e... and unmodified precursor/final bytes, exact assets, original/
+first-Save/output databases, no-replay continuations, source and complete logs.
+Exact accepted default1ebf22b1... is promoted without rebuilding; older seals remain.
 
 Focused metadata/context3.449s/full race564.604s and frontend213/check0/0/build pass;15/134/62 bindings
 and46 scoped operations carry the writer request. Distinct nativefdbf3c15... proves
@@ -1378,8 +1427,8 @@ writes. Archives/metadata-template-checkpoint seals53 hashed files plus manifest
 source.zip, exact assets/binaries/receipts/backups/test logs and precedingc22c00fe....
 Exact accepted default3db65721... is promoted without rebuilding.
 
-Remaining metadata acceptance: metadata-specific
-restoration; reference attachment/master-catalogue writes. Keep these unavailable
+Remaining metadata acceptance: reference attachment/master-catalogue writes;
+legacy/untyped creation-history restoration. Keep these unavailable
 and leave existing-record editing opt-in rather than claiming the full source
 copy action is complete. Full navigation and profile editing/filter application
 remain separate work; the read-only ordered preview below is verified.

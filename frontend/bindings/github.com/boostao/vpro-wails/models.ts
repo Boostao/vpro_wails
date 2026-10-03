@@ -565,6 +565,39 @@ export interface ProjectMetadataOption {
     "description": string | null;
 }
 
+export interface ProjectMetadataRestore {
+    "review": ProjectMetadataRestoreReview;
+    "action": AuditRestoreAction;
+    "confirmed": boolean;
+}
+
+export interface ProjectMetadataRestoreEvent {
+    "historyId": string;
+    "created": string;
+    "rowId": string;
+    "id": number;
+    "fields": string[] | null;
+    "restored": boolean;
+}
+
+export interface ProjectMetadataRestoreHistory {
+    "historyPresent": boolean;
+    "events": ProjectMetadataRestoreEvent[] | null;
+}
+
+export interface ProjectMetadataRestoreReview {
+    "contextId": string;
+    "historyId": string;
+    "project": string;
+    "plotNumber": string;
+    "projectId": string | null;
+    "id": number;
+    "columns": ProjectMetadataColumn[] | null;
+    "current": ProjectMetadataRow;
+    "restored": ProjectMetadataRow;
+    "audits": AuditEntry[] | null;
+}
+
 export interface ProjectMetadataReview {
     "project": string;
     "plotNumber": string;

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -346,17 +347,37 @@ func requireChildIdentity(tx *sql.Tx, table, kind, plot string, id int64) error 
 }
 
 func auditChildFields(tx *sql.Tx, project, kind, plot string, id int64, fields []childField, before, after []any, user string, strength int, when string) error {
+	_, err := auditChildFieldsTracked(tx, project, kind, plot, id, fields, before, after, user, strength, when)
+	return err
+}
+
+type childAuditIdentity struct {
+	RowID  string `json:"rowId"`
+	Column string `json:"column"`
+}
+
+func auditChildFieldsTracked(tx *sql.Tx, project, kind, plot string, id int64, fields []childField, before, after []any, user string, strength int, when string) ([]childAuditIdentity, error) {
+	identities := []childAuditIdentity{}
 	for i, field := range fields {
 		if !auditHeaderChange(before[i], after[i], strength) {
 			continue
 		}
-		if _, err := tx.Exec(`INSERT INTO `+quoteHeaderIdentifier(project+"_Audit")+
+		inserted, err := tx.Exec(`INSERT INTO `+quoteHeaderIdentifier(project+"_Audit")+
 			` ("Project","User","PlotNumber","Table","EditField","EditWhen","BeforeEdit","AfterEdit","Restore","Flag","ID") VALUES (?,?,?,?,?,?,?,?,0,0,?)`,
-			project, user, plot, "_"+kind, field.column, when, headerAuditValue(before[i]), headerAuditValue(after[i]), id); err != nil {
-			return err
+			project, user, plot, "_"+kind, field.column, when, headerAuditValue(before[i]), headerAuditValue(after[i]), id)
+		if err != nil {
+			return nil, err
 		}
+		if count, err := inserted.RowsAffected(); err != nil || count != 1 {
+			return nil, errors.Join(err, errors.New("child audit did not insert exactly one row"))
+		}
+		rowID, err := inserted.LastInsertId()
+		if err != nil {
+			return nil, err
+		}
+		identities = append(identities, childAuditIdentity{strconv.FormatInt(rowID, 10), field.column})
 	}
-	return nil
+	return identities, nil
 }
 
 // Veg.ID is not a primary key. Allocate an unused positive ID without changing

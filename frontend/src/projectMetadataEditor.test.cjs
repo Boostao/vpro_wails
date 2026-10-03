@@ -8,6 +8,7 @@ const quality = loadTypeScript('qualityEditor.ts', {'./becEditor': loadTypeScrip
 const defaults = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-standard.json'),'utf8'));
 const mapping = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-template.json'),'utf8'));
 const editor = loadTypeScript('projectMetadataEditor.ts', {'./qualityEditor': quality,'../../resources/project-metadata-standard.json':defaults,'../../resources/project-metadata-template.json':mapping});
+const restoration = loadTypeScript('projectMetadataRestore.ts', {'./qualityEditor': quality, './projectMetadataEditor': editor});
 const layout = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-layout.json'),'utf8'));
 const presentation = loadTypeScript('projectMetadataPresentation.ts', {'../../resources/project-metadata-layout.json': layout});
 const json = value => JSON.parse(JSON.stringify(value));
@@ -16,6 +17,74 @@ const columns = ['ID','ProjectID','ProjectTitle','StartDate','CollectedSite','Da
 const row = {rowId:'-200',cells:[cell('integer','-200'),cell('text','Project'),cell('text','Historical'),cell('integer','2000'),cell('integer','-1'),cell('text','OLD'),cell('text','OLD'),cell('null')]};
 const review = {project:'Sample',plotNumber:'P1',projectId:'Project',projectRecords:{columns,rows:[row,{...row,rowId:'-201',cells:[cell('integer','-201'),...row.cells.slice(1)]}]},masterTemplates:{columns:[],rows:[]}};
 const field = (name,kind='text',maximum=255,extra={})=>({name,kind,maximum,collection:false,referenceList:'',referenceColumn:'',limitToList:false,options:[],...extra});
+
+function restorationReview() {
+  const current=json(row), restored=json(row);
+  current.cells[2]=cell('text','');
+  const audit={rowId:'9007199254740993',project:'Sample',user:'Tester',plotNumber:'P1',table:'_Metadata',
+    editField:'ProjectTitle',editWhen:'2026-10-02 01:02:03',beforeEdit:'Historical',afterEdit:'',restore:false,flag:false,id:-200};
+  return {contextId:'original-context',historyId:'9007199254740994',project:'Sample',plotNumber:'P1',projectId:'Project',id:-200,
+    columns,current,restored,audits:[audit]};
+}
+test('Typed restoration preserves NULL, empty and historical unchanged cells; payloads are independent exact snapshots',()=>{
+  const source=restorationReview();
+  const request=restoration.metadataRestorationRequest(source,'retain','original-context','P1');
+  assert.equal(request.confirmed,true);
+  assert.equal(request.review.historyId,'9007199254740994');
+  assert.equal(request.review.current.cells[2].text,'');
+  assert.equal(request.review.restored.cells[2].text,'Historical');
+  assert.equal(request.review.restored.cells[4].integer,'-1');
+  source.restored.cells[2].text='Later mutation';
+  assert.equal(request.review.restored.cells[2].text,'Historical');
+  assert.throws(()=>restoration.metadataRestorationRequest(source,'cancel','original-context','P1'),/Explicit retain/);
+  for(const [property,value] of [['contextId','stale'],['plotNumber','P2'],['id',-201],['historyId','01']]) {
+    assert.throws(()=>restoration.validateMetadataRestorationReview({...restorationReview(),[property]:value},'original-context','P1'));
+  }
+  for(const mutate of [
+    r=>r.restored.rowId='-201', r=>r.restored.cells[0]=cell('integer','-201'),
+    r=>r.restored.cells[7]=cell('text','Unaudited change'), r=>r.audits.push({...r.audits[0]}),
+    r=>r.audits[0].editField='ID',r=>r.audits[0].table='_Env',
+    r=>r.restored.cells[2].text='\ud800',r=>r.restored.cells[2].integer='7',
+    r=>r.restored.cells[1]=cell('text','project')
+  ]) {
+    const bad=restorationReview();mutate(bad);
+    assert.throws(()=>restoration.validateMetadataRestorationReview(bad,'original-context','P1'));
+  }
+});
+test('Typed history distinguishes absence, exact events and retirement; committed result shape prevents replay',()=>{
+  const history={historyPresent:true,events:[{historyId:'9007199254740994',created:'2026-10-02T01:02:03Z',rowId:'-200',id:-200,fields:['ProjectTitle'],restored:false}]};
+  assert.equal(restoration.validateMetadataRestorationHistory(history),history);
+  assert.doesNotThrow(()=>restoration.validateMetadataRestorationHistory({historyPresent:false,events:[]}));
+  for(const bad of [{...history,historyPresent:false},{...history,events:null},
+    {...history,events:[history.events[0],history.events[0]]},
+    {...history,events:[{...history.events[0],historyId:'+1'}]},
+    {...history,events:[{...history.events[0],restored:undefined}]}]) {
+    assert.throws(()=>restoration.validateMetadataRestorationHistory(bad));
+  }
+  for(const action of ['retain','prune']) {
+    const request=restoration.metadataRestorationRequest(restorationReview(),action,'original-context','P1');
+    const result={cancelled:false,restoredRows:1,prunedAuditRows:action==='prune'?1:0,cleanedVegRows:0};
+    assert.doesNotThrow(()=>restoration.validateMetadataRestorationResult(result,request));
+    for(const bad of [{...result,cancelled:undefined},{...result,restoredRows:0},{...result,prunedAuditRows:2},{...result,cleanedVegRows:1}]) {
+      assert.throws(()=>restoration.validateMetadataRestorationResult(bad,request),/committed.*reload/);
+    }
+  }
+});
+test('Metadata restoration is independently default-off and preserves explicit lifecycle and commit boundaries',()=>{
+  const component=readFileSync(path.join(__dirname,'ProjectMetadataRestore.svelte'),'utf8');
+  const parent=readFileSync(path.join(__dirname,'ProjectMetadataEditor.svelte'),'utf8');
+  const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
+  assert.equal(compile(component,{filename:'ProjectMetadataRestore.svelte',generate:'client'}).warnings.length,0);
+  assert.match(form,/VITE_PROJECT_METADATA_RESTORE === 'true'/);
+  assert.match(parent,/allowRestoration = false/);
+  assert.match(parent,/if \(restorationOpen\) return restorationEditor\?\.getCloseState/);
+  assert.match(component,/committed = true;[\s\S]*?proposal = null;[\s\S]*?validateMetadataRestorationResult/);
+  assert.match(component,/metadataRestorationRequest\(\$state\.snapshot\(proposal\)/);
+  assert.match(component,/committedFailure && committedRow !== null/);
+  assert.match(component,/proposal retained for retry/);
+  assert.match(component,/disabled=\{event\.restored\}/);
+  assert.match(component,/Older plaintext audit rows/);
+});
 
 test('Metadata selection is explicit, literal and physical; duplicate candidates never imply first-row choice',()=>{
   const draft = editor.beginMetadataDraft(review,'-201');
@@ -209,5 +278,5 @@ test('Metadata reload invalidates editing readiness until both current records a
     'disabled={!ready || busy || committedFailure}',
     'disabled={!ready || busy || !draft || !dirty',
   ]) assert.ok(component.includes(guard),guard);
-  assert.match(component,/export function undo\(\) \{\s*if \(busy\)/);
+  assert.match(component,/export function undo\(\) \{[\s\S]*?if \(busy\)/);
 });

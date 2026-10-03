@@ -104,6 +104,7 @@
   const metadataEnabled = import.meta.env.VITE_PROJECT_METADATA_EDITING === 'true';
   const metadataCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_CREATION === 'true';
   const metadataTemplateCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_TEMPLATE_CREATION === 'true';
+  const metadataRestorationEnabled = import.meta.env.VITE_PROJECT_METADATA_RESTORE === 'true';
   const sourceEnterEnabled = import.meta.env.VITE_SOURCE_ENTER_NAVIGATION === 'true';
   function sourceEnter(event: KeyboardEvent) {
     if (!sourceEnterEnabled || !container) return;
@@ -1901,8 +1902,9 @@
         onclosed={() => { profileReviewOpen = false; }} />
     {/if}
     {#if metadataOpen}
-      <ProjectMetadataEditor bind:this={metadataEditor} client={PlotService} plot={draft.plotNumber}
+      <ProjectMetadataEditor bind:this={metadataEditor} client={PlotService} {contextId} plot={draft.plotNumber}
         allowCreation={metadataCreationEnabled} allowTemplateCreation={metadataTemplateCreationEnabled}
+        allowRestoration={metadataRestorationEnabled}
         onbusy={value => metadataBusy = value}
         onclosed={() => { metadataOpen = false; error = null; }}
         oncommitted={() => loadChildData(draft.plotNumber)} />

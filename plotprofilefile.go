@@ -247,24 +247,15 @@ func createBlankProfileTable(ctx context.Context, tx *sql.Tx, name string, templ
 }
 
 func appendCreationProvenance(ctx context.Context, tx *sql.Tx, table, expectedDefinition, proposal string) error {
+	return appendTechnicalProvenance(ctx, tx, table, expectedDefinition, proposal, "profile creation")
+}
+
+func appendTechnicalProvenance(ctx context.Context, tx *sql.Tx, table, expectedDefinition, proposal, purpose string) error {
 	if _, err := tx.ExecContext(ctx, strings.Replace(expectedDefinition, "CREATE TABLE ", "CREATE TABLE IF NOT EXISTS ", 1)); err != nil {
 		return err
 	}
-	var definition string
-	if err := tx.QueryRowContext(ctx, `SELECT sql FROM sqlite_master
-		WHERE type='table' AND name COLLATE BINARY=?`, table).Scan(&definition); err != nil {
-		return fmt.Errorf("physical profile creation provenance unavailable: %w", err)
-	}
-	if strings.Join(strings.Fields(definition), " ") != strings.Join(strings.Fields(expectedDefinition), " ") {
-		return errors.New("profile creation provenance schema differs; no existing history overwritten")
-	}
-	var extras int
-	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM sqlite_master
-		WHERE tbl_name COLLATE NOCASE=? AND type<>'table'`, table).Scan(&extras); err != nil {
+	if err := verifyTechnicalProvenance(ctx, tx, table, expectedDefinition, purpose); err != nil {
 		return err
-	}
-	if extras != 0 {
-		return errors.New("profile creation provenance has unreviewed indexes/triggers; no history appended")
 	}
 	when := time.Now().UTC().Format(time.RFC3339Nano)
 	inserted, err := tx.ExecContext(ctx, `INSERT INTO `+quoteHeaderIdentifier(table)+`(Created,Proposal) VALUES(?,?)`, when, proposal)
@@ -272,7 +263,7 @@ func appendCreationProvenance(ctx context.Context, tx *sql.Tx, table, expectedDe
 		return err
 	}
 	if count, err := inserted.RowsAffected(); err != nil || count != 1 {
-		return errors.Join(err, errors.New("profile creation provenance did not insert exactly one event"))
+		return errors.Join(err, fmt.Errorf("%s provenance did not insert exactly one event", purpose))
 	}
 	id, err := inserted.LastInsertId()
 	if err != nil {
@@ -281,7 +272,27 @@ func appendCreationProvenance(ctx context.Context, tx *sql.Tx, table, expectedDe
 	var observed, observedWhen string
 	if err := tx.QueryRowContext(ctx, `SELECT Created,Proposal FROM `+quoteHeaderIdentifier(table)+` WHERE ID=?`, id).
 		Scan(&observedWhen, &observed); err != nil || observed != proposal || observedWhen != when {
-		return errors.Join(err, errors.New("new profile technical history differs from its complete proposal"))
+		return errors.Join(err, fmt.Errorf("new %s technical history differs from its complete proposal", purpose))
+	}
+	return nil
+}
+
+func verifyTechnicalProvenance(ctx context.Context, tx *sql.Tx, table, expectedDefinition, purpose string) error {
+	var definition string
+	if err := tx.QueryRowContext(ctx, `SELECT sql FROM sqlite_master
+		WHERE type='table' AND name COLLATE BINARY=?`, table).Scan(&definition); err != nil {
+		return fmt.Errorf("physical %s provenance unavailable: %w", purpose, err)
+	}
+	if strings.Join(strings.Fields(definition), " ") != strings.Join(strings.Fields(expectedDefinition), " ") {
+		return fmt.Errorf("%s provenance schema differs; no existing history overwritten", purpose)
+	}
+	var extras int
+	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM sqlite_master
+		WHERE tbl_name COLLATE NOCASE=? AND type<>'table'`, table).Scan(&extras); err != nil {
+		return err
+	}
+	if extras != 0 {
+		return fmt.Errorf("%s provenance has unreviewed indexes/triggers; no history appended", purpose)
 	}
 	return nil
 }

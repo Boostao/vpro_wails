@@ -24,6 +24,29 @@ between shells.
 
 ## Current implementation
 
+- Current verified delivery: typed metadata audit provenance and dedicated
+  restoration. Corrected final whole-row observation follows every audit prune:
+  non-aborting AFTER DELETE trigger mutation rejects and rolls back exact bytes.
+  Focused coupled race15.293s/full race554.927s,265 frontend tests/check0/0,
+  actual15/160/97 bindings/60 adapter operations and both builds pass.
+  Core56decf8e.../owned9540 proves one new independent Save/five audits, late
+  trigger rollback and retained retry restoring the original75-cell row,
+  exclusively pruning five audits and sealing one no-replay receipt.
+  Defaultf5b4ad58.../owned7216 leaves both gates off with zero writes.
+  Both applications exited normally; all original fixture/support/configuration
+  bytes restored. The successor archives/metadata-restoration-prune-guard-checkpoint
+  preserves exact binaries/assets, source/logs/native receipts and before/after
+  data, verifies the unchanged75-file metadata-restoration-checkpoint predecessor,
+  and archives protected1ebf22b1... before exact accepted-default promotion.
+  Earlier native remount/close/retain/prune/narrow acceptance remains sealed,
+  never replayed. Prior59/84-file seals are unchanged. This delivery follows
+  published source Find8dd149c and owned-project SUb12107e.
+  No Access oracle was launched.
+  Plaintext metadata audits cannot prove historical SQLite storage classes.
+  New metadata edits append complete tagged rows/exact audit observations in
+  `__VPRO_MetadataEditHistory`; restore retains provenance and transactionally
+  retires the event. Original project/support/configuration and Access/R sources
+  are untouched. Generic metadata restoration remains disabled.
 - Foundation F1-F3 is **active, native-verified and promoted**:
   `databasefamily.go` embeds sealed original VPro64/VLists/VUser/VMetaData/
   VMessageBoard bytes separately from derived catalogues and installs missing
@@ -34,14 +57,14 @@ between shells.
   missing/ambiguous/old versions, incomplete schemas, unauthorized SU and close.
   URI helpers escape filenames and resolve writer paths absolutely.
   Active bootstrap/reads/writers now use the owned context. ContextService binds
-  all57 editor operations to immutable identities, leases running operations and
+  all60 editor operations to immutable identities, leases running operations and
   rejects stale calls or legacy unscoped mutation/switch bypasses.
 - Current/candidate `bin/vpro-current.exe` and `bin/vpro-current-candidate.exe`
   contain the native-verified complete Other plus Humus12/Mineral18 editor
   and vegetation physical-domain/12-attribute/Collected cycle editing,
   plus default-on species decisions/source cover/height drafts and default-disabled
   guarded personal/source creation/deletion:
-  `1541669e56a398fb10e90e9835b8fa5529748b5ebe80757866985b274ad426d7`.
+  `f5b4ad58171776b028f3effa2b8916804a777fcfbb9b307782c27e3b5ebc92b1`.
   Published species60575340... and preparation4eb0b8af... remain sealed in the
   private species archive. Numeric30199c86... remains archived; exact verified
   complete A/C NULL-cover notice/default delivery is archived; the accepted
