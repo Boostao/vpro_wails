@@ -1269,6 +1269,16 @@ export interface SiteUnitSummaryMembership {
     "status": string;
 }
 
+export interface SiteUnitSummaryOptions {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "method": number;
+    "siteUnitType": number;
+}
+
 export interface SiteUnitSummaryPlot {
     "plotNumber": string;
     "suRowId": string;

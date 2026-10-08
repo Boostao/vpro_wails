@@ -221,11 +221,17 @@ categories, but all matching concatenations contribute their counts.
 
 Runtime `VPRO_SITE_UNIT_SUMMARY=true` and build
 `VITE_SITE_UNIT_SUMMARY=true` are independent opt-in gates. The panel explicitly
-requests normal-SU/layer-cover/no-species scope; Mean is its initial preview
-choice. It neither reads nor changes historical summary-mode preferences,
-registry values or source temporary queries. Method edits affect preview only.
+requests normal-SU/layer-cover/no-species scope. The initialization successor
+maps active `USysSuDetailReport.Form_Load` to owned reads of retained
+`ReportOptions.SEOptValueMethod` and `SESuType`, preserving saved Interquartile.
+Missing, NULL, text or out-of-range saved values fail without inferred defaults.
+Hierarchy/field-derived values are retained and displayed as unavailable;
+Create Report is disabled rather than silently switching scope. Method edits
+affect preview only; explicit Reload restores the saved method/scope.
+No registry values or source temporary queries are read or written.
 Hierarchy/field-derived units, lifeform covers and species/publication controls
-are not enabled. Saved-option initialization/persistence remains a separate gap.
+are not enabled. The active AfterUpdate saved-option persistence remains a gap;
+loading saved options is not evidence of that write path.
 
 Focused/shared Go race3.082s,20 frontend summary/report/read/close tests and
 Svelte check0 errors/warnings pass; the full frontend suite passes441 tests
@@ -243,3 +249,18 @@ this bounded preview, not full forms/reports parity or production promotion.
 One coherent full race integration passes with fresh root794.606s/all packages,
 against611 unchanged pinned Go/frontend identities. The sealed desktop successor
 is [the summary checkpoint](../archives/site-unit-summary-desktop-checkpoint/evidence-manifest.json).
+
+The saved-initialization successor passes focused/shared Go race3.125s,
+22 targeted frontend tests,444 complete frontend tests/check0/0 and isolated
+enabled/default frontend/Wails builds. Twelve real Wails cases/three normally
+closed owners verify actual saved quartile/full context dispatch, weighted
+arithmetic, unsaved preview Mean/Reload, both unsupported scopes without repair,
+malformed-method refusal, real held initialization with report/navigation/native
+close barriers and cancellation/remount/retry, actual1400/600px labels and
+independent default/backend denial. All16 database/config hashes restore.
+Only the driver changes/restores fixture options; no application writes occur.
+Full coherent race passes with fresh root797.541s/all packages against613
+unchanged Go/frontend identities. The
+[initialization successor](../archives/summary-options-desktop-checkpoint/evidence-manifest.json)
+preserves the42-file None and48-file original summary predecessors. This
+initialization does not implement AfterUpdate preference writes or overall parity.

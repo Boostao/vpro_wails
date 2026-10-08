@@ -1,4 +1,4 @@
-import type { SiteUnitSummaryPreview, SiteUnitSummaryReport, SiteUnitSummaryUnit } from '../bindings/github.com/boostao/vpro-wails';
+import type { SiteUnitSummaryOptions, SiteUnitSummaryPreview, SiteUnitSummaryReport, SiteUnitSummaryUnit } from '../bindings/github.com/boostao/vpro-wails';
 import { completeCell, exactSigned64 } from './projectMetadataRestore';
 import { validateReportUnitNames } from './reportUnitNames';
 
@@ -15,6 +15,16 @@ const keys = ['Zone', 'SubZone', 'Elevation', 'Aspect', 'SlopeGradient', 'MesoSl
 function completeText(value: unknown): value is string {
   return typeof value === 'string' && completeCell({ storage: 'text', text: value,
     integer: null, real: null, blobHex: null });
+}
+
+export function validateSiteUnitSummaryOptions(value: SiteUnitSummaryOptions | null, contextId: string,
+  project: string, projectPath: string, su: string, suPath: string): SiteUnitSummaryOptions {
+  if (!value || value.contextId !== contextId || value.project !== project ||
+      value.projectPath !== projectPath || value.su !== su || value.suPath !== suPath || su === 'None' ||
+      ![1, 2].includes(value.method) || ![1, 2, 3].includes(value.siteUnitType)) {
+    throw new Error('Saved summary options are incomplete or belong to another owned context; no defaults applied.');
+  }
+  return value;
 }
 
 export type ValidatedSiteUnitSummary = Omit<SiteUnitSummaryPreview, 'report'> & {

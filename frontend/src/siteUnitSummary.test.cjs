@@ -55,5 +55,28 @@ test('summary component is independently gated, cancellable and enters shared dr
   assert.match(panel,/onDestroy\(cancel\)/);assert.match(panel,/request !== generation/);
   assert.match(panel,/onBusyChange\(true\)/);assert.match(panel,/onBusyChange\(false\)/);
   assert.match(panel,/bind:group=\{method\}/);assert.match(panel,/validateSiteUnitSummary/);
-  assert.doesNotMatch(panel,/Save|Export|localStorage/);
+  assert.match(panel,/onMount\(\(\) => \{ void options\(\); \}\)/);
+  assert.match(panel,/GetSiteUnitSummaryOptions/);
+  assert.match(panel,/disabled=\{busy \|\| !ready \|\| su === 'None'\}/);
+  assert.match(panel,/ready = siteUnitType === 1/);
+  assert.doesNotMatch(panel,/<button[^>]*>Save|<button[^>]*>Export|localStorage/);
+});
+test('saved summary options retain quartile initialization and unavailable source scopes',()=>{
+  for (const siteUnitType of [1,2,3]) {
+    const value={contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
+      su:'Selected',suPath:'C:\\external.db',method:2,siteUnitType};
+    assert.deepEqual(summary.validateSiteUnitSummaryOptions(value,'owned','Sample','C:\\project.db','Selected','C:\\external.db'),value);
+  }
+});
+test('saved summary options reject stale, missing, malformed or guessed values',()=>{
+  const value={contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
+    su:'Selected',suPath:'C:\\external.db',method:2,siteUnitType:1};
+  const check=v=>summary.validateSiteUnitSummaryOptions(v,'owned','Sample','C:\\project.db','Selected','C:\\external.db');
+  assert.throws(()=>check(null));
+  for(const mutate of [
+    v=>v.contextId='stale',v=>v.project='Else',v=>v.projectPath='elsewhere',
+    v=>v.su='None',v=>v.suPath='elsewhere',v=>delete v.method,v=>v.method=null,
+    v=>v.method='2',v=>v.method=3,v=>v.method=1.5,v=>delete v.siteUnitType,
+    v=>v.siteUnitType=null,v=>v.siteUnitType='1',v=>v.siteUnitType=4
+  ]) { const invalid=structuredClone(value);mutate(invalid);assert.throws(()=>check(invalid)); }
 });

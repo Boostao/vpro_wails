@@ -1,23 +1,41 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { ContextService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
-  import { validateSiteUnitSummary, type ValidatedSiteUnitSummary } from './siteUnitSummary';
+  import { validateSiteUnitSummary, validateSiteUnitSummaryOptions, type ValidatedSiteUnitSummary } from './siteUnitSummary';
   import { reportCellText } from './longEnvironmentReport';
 
   let { contextId, project, projectPath, su, suPath, onBusyChange }: {
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
     onBusyChange: (busy: boolean) => void;
   } = $props();
-  let method = $state(1);
+  let method = $state<number | null>(null);
+  let siteUnitType = $state<number | null>(null);
+  let ready = $state(false);
   let busy = $state(false);
   let error = $state('');
   let preview = $state<ValidatedSiteUnitSummary | null>(null);
   const reads = new ReadRequests();
   let generation = 0;
   function cancel() { generation++; reads.cancelAll(); busy = false; onBusyChange(false); }
+  async function options() {
+    cancel(); const request = generation;
+    ready = false; error = ''; preview = null; busy = true; onBusyChange(true);
+    try {
+      const value = await reads.track(ContextService.GetSiteUnitSummaryOptions(contextId));
+      if (request !== generation) return;
+      const configured = validateSiteUnitSummaryOptions(value, contextId, project, projectPath, su, suPath);
+      method = configured.method; siteUnitType = configured.siteUnitType;
+      ready = siteUnitType === 1;
+      if (!ready) error = `Saved site-unit type ${siteUnitType} is unavailable in this normal-SU preview; no saved options were reset.`;
+    } catch (cause) {
+      if (request === generation) error = `Summary options unavailable; no defaults or configuration writes: ${String(cause)}`;
+    } finally {
+      if (request === generation) { busy = false; onBusyChange(false); }
+    }
+  }
   async function show() {
-    if (busy || su === 'None') return;
+    if (busy || !ready || su === 'None' || (method !== 1 && method !== 2)) return;
     cancel(); const request = generation; const requestedMethod = method;
     error = ''; preview = null; busy = true; onBusyChange(true);
     try {
@@ -30,6 +48,7 @@
       if (request === generation) { busy = false; onBusyChange(false); }
     }
   }
+  onMount(() => { void options(); });
   onDestroy(cancel);
 </script>
 
@@ -37,16 +56,21 @@
   <h1>Summary Environment</h1>
   {#if error}<p role="alert" class="error">{error}</p>{/if}
   <p>Project {project}; selected normal SU {su}. Profile navigation does not filter this report.</p>
-  <fieldset disabled={busy} data-source-control="optValueMethod">
+  <fieldset disabled={busy || !ready} data-source-control="optValueMethod">
     <legend>Quantitative Values</legend>
     <label><input type="radio" name="summary-method" value={1} bind:group={method} onchange={() => { preview = null; error = ''; }} />Mean</label>
     <label><input type="radio" name="summary-method" value={2} bind:group={method} onchange={() => { preview = null; error = ''; }} />Interquartile (25% - 50% - 75%)</label>
   </fieldset>
+  <p data-source-control="optSiteUnitType">Saved site-unit type:
+    {siteUnitType === 1 ? 'Normal SU' : siteUnitType === 2 ? 'Hierarchy (unavailable)' :
+      siteUnitType === 3 ? 'Field-derived units (unavailable)' : 'not loaded'}.</p>
   <div class="actions">
-    <button data-source-control="btnCreateReport" disabled={busy || su === 'None'} onclick={show}>Create Report</button>
-    {#if busy}<button data-summary-cancel onclick={cancel}>Cancel report read</button><p role="status">Reading owned summary snapshots...</p>{/if}
+    <button data-source-control="btnCreateReport" disabled={busy || !ready || su === 'None'} onclick={show}>Create Report</button>
+    <button data-summary-options-reload disabled={busy} onclick={options}>Reload summary options</button>
+    {#if busy}<button data-summary-cancel onclick={cancel}>Cancel report read</button><p role="status">Reading owned summary options or snapshots...</p>{/if}
   </div>
-  <p class="guidance">Read-only normal-SU report with layer covers, without a species summary. Options are preview-only; no registry or saved-preference changes.
+  <p class="guidance">Read-only normal-SU report with layer covers, without a species summary. Saved calculation method and site-unit type load from configuration.
+    Calculation changes are preview-only; Reload restores saved options. No registry or saved-preference changes.
     Hierarchy/field-derived units, lifeform covers, species summaries and Excel/file publication are unavailable.</p>
   <p class="guidance">Counts preserve every physical SU/Env/Admin join, including duplicate weights. Text equality/order is literal.
     Numeric formatting uses the measured English locale; unsupported historical text in numeric fields is refused, not repaired.

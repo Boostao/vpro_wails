@@ -191,6 +191,7 @@ export type {
     SiteUnitEnvironmentTransfer,
     SiteUnitSummaryField,
     SiteUnitSummaryMembership,
+    SiteUnitSummaryOptions,
     SiteUnitSummaryPlot,
     SiteUnitSummaryPreview,
     SiteUnitSummaryReport,

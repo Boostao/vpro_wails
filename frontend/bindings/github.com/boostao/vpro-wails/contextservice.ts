@@ -125,6 +125,10 @@ export function GetSIVIVegetation(contextID: string, plot: string, extended: boo
     return $Call.ByID(2362715051, contextID, plot, extended);
 }
 
+export function GetSiteUnitSummaryOptions(contextID: string): $CancellablePromise<$models.SiteUnitSummaryOptions> {
+    return $Call.ByID(1799826469, contextID);
+}
+
 export function ListAuditEntries(contextID: string, plot: string): $CancellablePromise<$models.AuditEntry[] | null> {
     return $Call.ByID(2687960619, contextID, plot);
 }
