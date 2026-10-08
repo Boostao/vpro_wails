@@ -2,10 +2,11 @@
 
 ## Status
 
-Source-mapped preparation for project administration, not an enabled new-project
-writer or an Access runtime-parity claim. Existing context ownership, YAML and
-file-publication helpers are precedents to reuse; they are not permission to
-overwrite a project or infer template defaults.
+Source-mapped preparation and a private owned read-only template observer for
+project administration, not an enabled new-project writer or an Access runtime-
+parity claim. Existing context ownership, YAML and file-publication helpers are
+precedents to reuse; they are not permission to overwrite a project or infer
+template defaults.
 
 Client screenshot page5 identifies project administration as a priority.
 Original ribbon `V7mdlRibbonOnAction.Sb03OnAction`, control `sb03btn01`, and
@@ -56,6 +57,12 @@ audit is not its destination. Actual implicit Boolean defaults and timestamp
 storage are not established by this static trace; a desktop plan must make
 those assignments explicit and verify the full new-file snapshot atomically.
 Reference descriptions must be observed independently, not silently completed.
+Original `AllSpecsVersion` and `TableOfListsVersion` read the linked table-object
+Description of `USysAllSpecs` and `USysTableOfLists`, respectively. Their source
+error paths return `"Unknown"`; this success-shaped fallback is not inherited.
+A physical referenced-table description is not automatically proof of the
+linked-object property. Retain provenance/absence/NULL/empty/duplicates and
+resolve ambiguity before planning creation audits, without guessing a version.
 
 `V7mdlRelationships.CreateRelationship` then requests Env.PlotNumber links to
 Veg, Humus, Mineral, Other and Audit, using update/delete cascade attributes.
@@ -78,6 +85,42 @@ Names are subject to the existing desktop literal family-name policy, with an
 explicitly documented stricter adaptation to the source's advisory prompt.
 Do not trim or recase names, change existing identities, use Sample as a new
 project, or interpret a missing destination as overwrite permission.
+
+## Private owned template observation
+
+[projectcreationtemplates.go](../projectcreationtemplates.go) observes all eight
+literal physical VPro64 template tables in one existing context-owned pinned
+read-only snapshot. It preserves ordered columns/explicit empty rows, raw table,
+index and trigger definitions (including NULL implicit-index SQL), constraints
+and defaults as evidence, and physical Description metadata/candidates. The
+observed original column/index cardinalities are required; they are not schema
+authentication or permission to execute the observed DDL.
+
+The [shared schema reader](../sqliteschema.go) extracts the prior SIVI assignment
+schema query without changing literal BINARY filtering/order or history JSON/
+digest representation. No SQL text is executed by this new observation surface.
+No destination name/file, audit rows, relationships, new context, public method,
+binding, UI or feature enablement is introduced.
+
+Focused/coupled Go race51.423s passes. Tests independently compare original
+table/index SQL and explicit empty shapes, detach caller mutations, distinguish
+absent/present-empty/nullable/duplicate descriptions with extra typed cells,
+reject missing/views/nonempty/extra-column/malformed/index-deficient templates,
+and verify ownership/stale context/cancellation after partial observation and
+while waiting for the held snapshot mutex, followed by retry. A golden digest
+protects the existing SIVI history format; its coupled assignment suite passes.
+Independent review found no significant defects; fresh full integration passes
+(root804.895s, all packages). No creator or Access runtime-parity acceptance follows from this
+preparatory reader.
+
+A selective DAO description/default probe on a disposable canonical-core copy
+was time-boxed and rejected: the unstarted core has no `USysAllSpecs` linked
+object, so the probe failed before property/default reads or cancelled AddNew.
+No application/startup/source module/link change or row commit occurred. The
+DAO child closed, the copy was exclusively readable, and source/copy hashes
+remain identical. This is cleanup evidence, not a native version/default claim.
+Runtime linked-property and implicit Boolean/date behavior remain unresolved;
+no `"Unknown"` substitute or inferred version is accepted.
 
 ## Source evidence
 

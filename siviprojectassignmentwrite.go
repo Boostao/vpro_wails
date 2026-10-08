@@ -18,23 +18,18 @@ var siviProjectAssignmentHistoryDomain = siviParentHistoryDomain{
 	siviProjectAssignmentHistoryTable, siviProjectAssignmentHistorySQL, "SIVI ProjectID assignment", siviProjectAssignmentHistoryAssignments,
 }
 
-type siviProjectMetadataSchemaObject struct {
-	Type, Name, Table string
-	SQL               *string
-}
-
 type siviProjectAssignmentHistory struct {
 	Selection    siviProjectSelection
 	Choices      SIVIProjectChoices
 	Columns      []ProjectMetadataColumn
-	Schema       []siviProjectMetadataSchemaObject
+	Schema       []sqliteSchemaObject
 	SchemaSHA256 string
 }
 
-func siviProjectAssignmentSchemaDigest(columns []ProjectMetadataColumn, schema []siviProjectMetadataSchemaObject) (string, error) {
+func siviProjectAssignmentSchemaDigest(columns []ProjectMetadataColumn, schema []sqliteSchemaObject) (string, error) {
 	data, err := json.Marshal(struct {
 		Columns []ProjectMetadataColumn
-		Schema  []siviProjectMetadataSchemaObject
+		Schema  []sqliteSchemaObject
 	}{columns, schema})
 	if err != nil {
 		return "", err
@@ -83,21 +78,8 @@ func readSIVIProjectAssignmentEvidence(ctx context.Context, owner *sqliteContext
 	if err != nil {
 		return nil, err
 	}
-	rows, err := tx.QueryContext(ctx, `SELECT type,name,tbl_name,sql FROM `+quoteHeaderIdentifier(alias)+
-		`.sqlite_master WHERE tbl_name COLLATE BINARY=? ORDER BY type COLLATE BINARY,name COLLATE BINARY`, choices.Table)
+	schema, err := readSQLiteSchemaObjects(ctx, tx, alias, choices.Table)
 	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	schema := []siviProjectMetadataSchemaObject{}
-	for rows.Next() {
-		var object siviProjectMetadataSchemaObject
-		if err := rows.Scan(&object.Type, &object.Name, &object.Table, &object.SQL); err != nil {
-			return nil, err
-		}
-		schema = append(schema, object)
-	}
-	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 	digest, err := siviProjectAssignmentSchemaDigest(table.Columns, schema)
