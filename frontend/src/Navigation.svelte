@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager';
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
   type Item = { name: string; icon: typeof House; view?: View };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate }: { view: View; onnavigate: (view: View) => void } = $props();
@@ -39,6 +39,7 @@
         { name: 'Hierarchy table', icon: Network, view: 'hierarchy' },
         { name: 'Hierarchy Diagram', icon: Network },
         { name: 'Print a Plot Label', icon: Tag },
+        { name: 'Saved plot label preview — Read-only', icon: Tag, view: import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' ? 'plot-label-preview' : undefined },
         { name: 'Plot location review', icon: FileText, view: import.meta.env.VITE_PLOT_LOCATION_REVIEW === 'true' ? 'plot-locations' : undefined },
         { name: 'Google Earth location preparation', icon: Globe, view: import.meta.env.VITE_GOOGLE_EARTH_REVIEW === 'true' ? 'google-earth-review' : undefined },
         { name: 'Create Plot Locations File', icon: FileText },

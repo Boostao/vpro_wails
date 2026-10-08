@@ -13,6 +13,7 @@
   import ProjectTableCSVReview from './ProjectTableCSVReview.svelte';
   import PlotLocationReview from './PlotLocationReview.svelte';
   import PictureManager from './PictureManager.svelte';
+  import PlotLabelPreview from './PlotLabelPreview.svelte';
   import GoogleEarthReview from './GoogleEarthReview.svelte';
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
@@ -51,8 +52,9 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
   let pictureManagerPlot = $state('');
+  let plotLabelNumber = $state('');
   let contextExpanded = $state(false);
   let editorBusy = $state(false);
   let archivePublicationBusy = $state(false);
@@ -285,6 +287,13 @@
           return;
         }
         pictureManagerPlot = selected?.plotNumber ?? '';
+      }
+      if (next === 'plot-label-preview') {
+        if (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'true') {
+          error = 'Saved plot label preview is disabled in this build.';
+          return;
+        }
+        plotLabelNumber = (view === 'fs882' ? editorPlotNumber : selected?.plotNumber) ?? '';
       }
       view = next;
     });
@@ -1179,6 +1188,12 @@
         {#key $projectState.contextId}
           <ProjectTableCSVReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'plot-label-preview' && import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <PlotLabelPreview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            initialPlot={plotLabelNumber} onBusyChange={(value) => { editorBusy = value; }} />
         {/key}
       {:else if view === 'picture-manager' && import.meta.env.VITE_PICTURE_MANAGER === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
