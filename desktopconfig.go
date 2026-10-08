@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	_ "embed"
 	"encoding/json"
@@ -414,6 +415,7 @@ func (s *desktopConfig) update(section string, changes map[string]any) error {
 	if err != nil {
 		return err
 	}
+
 	for key, value := range changes {
 		if err := setConfigValue(values, section, key, value, false); err != nil {
 			return err
@@ -429,6 +431,43 @@ func (s *desktopConfig) update(section string, changes map[string]any) error {
 	return s.commit(data)
 }
 
+func (s *desktopConfig) compareAndSetProjectIDSource(ctx context.Context, expected, source int) error {
+	if source != 1 && source != 2 {
+		return errors.New("ProjectID source must be Env (1) or Master (2)")
+	}
+	if err := acquireMutexLease(ctx, &s.mu); err != nil {
+		return err
+	}
+	defer s.mu.Unlock()
+	values, err := s.readLocked()
+	if err != nil {
+		return err
+	}
+	current, err := configInt(values, "Current", "ProjectIdSource", 1, 2)
+	if err != nil {
+		return err
+	}
+	if current != expected {
+		return errors.New("ProjectID source changed; reload choices before switching")
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if current == source {
+		return nil
+	}
+	if err := setConfigValue(values, "Current", "ProjectIdSource", source, false); err != nil {
+		return err
+	}
+	data, err := yaml.Marshal(values)
+	if err != nil {
+		return err
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	return s.commit(data)
+}
 func (s *desktopConfig) commit(data []byte) (err error) {
 	file, err := os.CreateTemp(filepath.Dir(s.path), ".config-*.yml")
 	if err != nil {

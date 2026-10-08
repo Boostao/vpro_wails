@@ -9,7 +9,11 @@ import (
 const siviHeightFeatureEnvironment = "VPRO_SIVI_HEIGHT_EDITING"
 
 func siviHeightFeature(lookup func(string) (string, bool)) (bool, error) {
-	value, present := lookup(siviHeightFeatureEnvironment)
+	return siviFeature(siviHeightFeatureEnvironment, lookup)
+}
+
+func siviFeature(name string, lookup func(string) (string, bool)) (bool, error) {
+	value, present := lookup(name)
 	if !present {
 		return false, nil
 	}
@@ -19,7 +23,7 @@ func siviHeightFeature(lookup func(string) (string, bool)) (bool, error) {
 	case "false":
 		return false, nil
 	default:
-		return false, fmt.Errorf("%s requires literal true or false", siviHeightFeatureEnvironment)
+		return false, fmt.Errorf("%s requires literal true or false", name)
 	}
 }
 

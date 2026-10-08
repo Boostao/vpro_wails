@@ -18,6 +18,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	siviParentReviewEnabled, err := siviParentReviewFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	siviParentEditingEnabled, err := siviParentEditingFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	dataDir, err := userDataDir()
 	if err != nil {
 		log.Fatal(err)
@@ -49,6 +57,8 @@ func main() {
 		log.Fatal(err)
 	}
 	contextService.siviHeightEnabled = siviHeightEnabled
+	contextService.siviParentReviewEnabled = siviParentReviewEnabled
+	contextService.siviParentEditingEnabled = siviParentEditingEnabled
 	coordinates, err := newCoordinateService(configDir, preferences)
 	if err != nil {
 		log.Fatal(err)

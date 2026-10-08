@@ -253,6 +253,10 @@ func (s *ContextService) restoreSIVIHeights(ctx context.Context, contextID, plot
 }
 
 func verifySIVIPhysicalAudit(table ProjectMetadataTable, record AuditEntry, project string) error {
+	return verifySIVIPhysicalTableAudit(table, record, project, "_Veg")
+}
+
+func verifySIVIPhysicalTableAudit(table ProjectMetadataTable, record AuditEntry, project, suffix string) error {
 	expected, err := appendSIVIPlannedAudits(ProjectMetadataTable{Columns: table.Columns}, []AuditEntry{record})
 	if err != nil {
 		return err
@@ -267,7 +271,7 @@ func verifySIVIPhysicalAudit(table ProjectMetadataTable, record AuditEntry, proj
 		}
 		alias := row.Cells[columns["Table"]]
 		if alias.Storage != "text" || alias.Text == nil ||
-			(!strings.EqualFold(*alias.Text, "_Veg") && !strings.EqualFold(*alias.Text, project+"_Veg")) {
+			(!strings.EqualFold(*alias.Text, suffix) && !strings.EqualFold(*alias.Text, project+suffix)) {
 			return errors.New("SIVI physical audit has an unsupported table alias/storage")
 		}
 		row.Cells = append([]ProjectMetadataCell{}, row.Cells...)

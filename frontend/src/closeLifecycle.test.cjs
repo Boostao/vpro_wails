@@ -45,7 +45,8 @@ test('native close dialog compiles and exposes explicit accessible decisions', (
 test('form refuses save-and-close on invalid, locked, loading or incomplete child entry', () => {
   const source = read('FS882Form.svelte');
   assert.match(source, /export function getCloseState\(\): EditorCloseState/);
-  assert.match(source, /childUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved \|\| otherUnsaved \|\| soilUnsaved \|\| attributeUnsaved \|\| collectedUnsaved \|\| speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
+  assert.match(source, /nonParentChildUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved \|\| otherUnsaved \|\| soilUnsaved \|\| attributeUnsaved \|\| collectedUnsaved \|\| speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
+  assert.match(source, /childUnsaved = \$derived\(nonParentChildUnsaved \|\| siviParentWriteUnsaved\)/);
   assert.match(source, /unsaved: dirty \|\| childUnsaved \|\| invalid \|\| newChild !== null \|\| invalidChild/);
   assert.match(source, /const invalid = Object\.keys\(headerValidation\)\.length > 0 \|\| heightInvalid\.length > 0 \|\| otherInvalid\.length > 0/);
   assert.match(source, /if \(!state\.canSave\)/);

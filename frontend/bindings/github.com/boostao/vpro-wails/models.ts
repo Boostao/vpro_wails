@@ -928,6 +928,77 @@ export interface SIVIHeightWriteResult {
     "HistoryID": string;
 }
 
+export interface SIVIParentBinding {
+    "ControlID": string;
+    "Binding": string;
+    "Table": string;
+    "Column": number;
+    "Implicit": boolean;
+}
+
+export interface SIVIParentCellEdit {
+    "contextId": string;
+    "table": string;
+    "rowId": string;
+    "column": string;
+    "expected": ProjectMetadataCell;
+    "value": ProjectMetadataCell;
+}
+
+export interface SIVIParentDirectWrite {
+    "original": SIVIParentProjection | null;
+    "scalars": SIVIParentCellEdit[] | null;
+    "options": SIVIParentCellEdit[] | null;
+    "text": SIVIParentCellEdit[] | null;
+    "categorical": SIVIParentCellEdit[] | null;
+}
+
+export interface SIVIParentJoinReview {
+    "ContextID": string;
+    "Project": string;
+    "Plot": string;
+    "Scope": string;
+    "Diagnostic": string;
+    "Verified": boolean;
+    "EnvRowIDs": string[] | null;
+    "AdminRowIDs": string[] | null;
+}
+
+export interface SIVIParentProjection {
+    "ContextID": string;
+    "Project": string;
+    "Plot": string;
+    "Form": string;
+    "Query": string;
+    "Membership": string;
+    "EnvTable": string;
+    "AdminTable": string;
+    "EnvColumns": ProjectMetadataColumn[] | null;
+    "AdminColumns": ProjectMetadataColumn[] | null;
+    "Bindings": SIVIParentBinding[] | null;
+    "Rows": SIVIParentRow[] | null;
+}
+
+export interface SIVIParentRow {
+    "Env": ProjectMetadataRow;
+    "Admin": ProjectMetadataRow;
+}
+
+export interface SIVIParentWriteResult {
+    "ChangedCells": number;
+    "HistoryID": string;
+}
+
+export interface SIVIProjectChoices {
+    "ContextID": string;
+    "Project": string;
+    "Source": string;
+    "Alias": string;
+    "Table": string;
+    "SourceOption": number;
+    "Choices": ProjectMetadataTable;
+}
+
 export interface SIVIVegetationProjection {
     "Form": string;
     "Query": string;

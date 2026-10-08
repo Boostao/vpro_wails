@@ -108,5 +108,8 @@
   {:else if !view.busy}
     <p class="text-sm text-stone-600">Load the original source rows before editing.</p>
   {/if}
-  <p class="text-xs text-stone-600">Numeric heights may be cleared to NULL; Ht B retains literal text up to255 UTF-16 units, including empty text. No height units, totals or metadata updates are inferred. Changing shrub presentation never saves or resets drafts.</p>
+  {#if view.extended}
+    <p class="text-xs text-stone-600" data-sivi-extended-guidance>Extended shrub presentation shows B3/B4/B5 cover context; aggregate height editing remains available. Switching presentation never saves or resets drafts.</p>
+  {/if}
+  <p class="text-xs text-stone-600">Numeric heights may be cleared to NULL; Ht B retains literal text up to 255 UTF-16 units, including empty text. No height units, totals or metadata updates are inferred. Changing shrub presentation never saves or resets drafts.</p>
 </section>

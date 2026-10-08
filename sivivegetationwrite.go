@@ -267,14 +267,18 @@ func appendSIVIPlannedAudits(original ProjectMetadataTable, records []AuditEntry
 	}
 	planned := ProjectMetadataTable{Columns: original.Columns, Rows: append([]ProjectMetadataRow{}, original.Rows...)}
 	for _, record := range records {
-		id, zero := strconv.FormatInt(*record.ID, 10), "0"
+		zero := "0"
 		values := map[string]ProjectMetadataCell{
 			"Project": {Storage: "text", Text: &record.Project}, "User": {Storage: "text", Text: &record.User},
 			"PlotNumber": {Storage: "text", Text: &record.PlotNumber}, "Table": {Storage: "text", Text: &record.Table},
 			"EditField": {Storage: "text", Text: &record.EditField}, "EditWhen": {Storage: "text", Text: &record.EditWhen},
 			"BeforeEdit": {Storage: "null"}, "AfterEdit": {Storage: "null"},
 			"Restore": {Storage: "integer", Integer: &zero}, "Flag": {Storage: "integer", Integer: &zero},
-			"ID": {Storage: "integer", Integer: &id},
+			"ID": {Storage: "null"},
+		}
+		if record.ID != nil {
+			id := strconv.FormatInt(*record.ID, 10)
+			values["ID"] = ProjectMetadataCell{Storage: "integer", Integer: &id}
 		}
 		if record.BeforeEdit != nil {
 			values["BeforeEdit"] = ProjectMetadataCell{Storage: "text", Text: record.BeforeEdit}

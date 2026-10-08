@@ -231,7 +231,7 @@ test('Concurrent preference writes refused explicitly and disposal never publish
 });
 test('Header lifecycle and all mutation gates include Working Unit preference/lookup ownership', () => {
   const source = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(source, /headerWorkflowBusy = \$derived\(coordinateBusy \|\| workingUnitBusy \|\| qualityBusy \|\| siteCodeBusy \|\| regionCodeBusy \|\| soilCodeBusy \|\| geologyCodeBusy \|\| parentCodeBusy \|\| drainageBusy \|\| speciesDecisionBusy \|\| deletionBusy \|\| codeCheckBusy \|\| metadataBusy \|\| profileReviewBusy \|\| environmentSUOpen \|\| siviBusy\)/);
+  assert.match(source, /headerWorkflowBusy = \$derived\(coordinateBusy \|\| workingUnitBusy \|\| qualityBusy \|\| siteCodeBusy \|\| regionCodeBusy \|\| soilCodeBusy \|\| geologyCodeBusy \|\| parentCodeBusy \|\| drainageBusy \|\| speciesDecisionBusy \|\| deletionBusy \|\| codeCheckBusy \|\| metadataBusy \|\| profileReviewBusy \|\| environmentSUOpen \|\| siviParentBusy \|\| siviBusy\)/);
   assert.match(source, /onWorkingUnitBusyChange=\{\(pending\) => workingUnitBusy = pending\}/);
   assert.match(source, /busy: busy \|\| headerWorkflowBusy/);
   assert.doesNotMatch(source, /busy \|\| coordinateBusy/);

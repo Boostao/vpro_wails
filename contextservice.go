@@ -15,9 +15,11 @@ type ContextSelection struct {
 }
 
 type ContextService struct {
-	projects          *ProjectService
-	plots             *PlotService
-	siviHeightEnabled bool
+	projects                 *ProjectService
+	plots                    *PlotService
+	siviHeightEnabled        bool
+	siviParentReviewEnabled  bool
+	siviParentEditingEnabled bool
 }
 
 func NewContextService(projects *ProjectService, plots *PlotService) (*ContextService, error) {

@@ -85,7 +85,7 @@ test('Code-check scope and raw errors remain outside remounted tabs and explicit
   const component=readFileSync(path.join(__dirname,'SpeciesCodeCheck.svelte'),'utf8');
   const page=readFileSync(path.join(__dirname,'SourcePage.svelte'),'utf8');
   assert.match(form,/VITE_SPECIES_CODE_CHECK_EDITING === 'true'/);
-  assert.match(form,/childUnsaved = \$derived\([^;]*codeCheckOpen/);
+  assert.match(form,/nonParentChildUnsaved = \$derived\([^;]*codeCheckOpen/);
   assert.match(form,/childParentDisabled = \$derived\([^;]*codeCheckOpen/);
   assert.match(form,/if \(codeCheckOpen\) return codeCheckEditor\?\.getCloseState/);
   assert.match(form,/if \(codeCheckOpen\) \{ codeCheckEditor\?\.undo\(\); return; \}/);

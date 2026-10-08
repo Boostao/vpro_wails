@@ -121,6 +121,76 @@ func TestFS1333HeightBRemainsPhysicalTextNotNumericCoercion(t *testing.T) {
 	}
 }
 
+func TestFS1333ParentBindingsAndEventOwnershipRemainDistinct(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("resources", "fs1333-sivi-layout.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var layout fs882layout.Layout
+	if err := json.Unmarshal(data, &layout); err != nil {
+		t.Fatal(err)
+	}
+	parent := layout.Forms[0]
+	expectedEvents := map[string][]string{
+		"frmSIVIsite":            {"OnCurrent:Form_Current", "OnLoad:Form_Load"},
+		"optPlotType":            {"AfterUpdate:optPlotType_AfterUpdate"},
+		"btnClose2":              {"OnClick:btnClose2_Click"},
+		"ProjectID":              {"OnGotFocus:ProjectID_GotFocus", "OnNotInList:ProjectID_NotInList"},
+		"btnEditMetadata":        {"OnClick:btnEditMetadata_Click"},
+		"optSpeciesListComplete": {"AfterUpdate:optSpeciesListComplete_AfterUpdate"},
+		"optProjectID":           {"AfterUpdate:optProjectID_AfterUpdate"},
+	}
+	actualEvents := map[string][]string{}
+	for _, control := range parent.Controls {
+		for _, event := range control.Events {
+			if !event.Resolved {
+				t.Fatal("parent event lost its source procedure", control.ControlName, event)
+			}
+			actualEvents[control.ControlName] = append(actualEvents[control.ControlName], event.Property+":"+event.Procedure)
+		}
+	}
+	if !reflect.DeepEqual(actualEvents, expectedEvents) {
+		t.Fatal("SIVI parent events drifted or inherited XL Lock/audit events", actualEvents)
+	}
+	path, err := filepath.Abs(filepath.Join("resources", "Sample.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	db, err := sql.Open("sqlite3", "file:"+filepath.ToSlash(path)+"?mode=ro")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	bound := map[string]bool{}
+	for _, field := range parent.Fields {
+		if field.Binding == "" {
+			continue
+		}
+		if !field.ReadOnly || field.Implementation != "unmapped" || bound[strings.ToLower(field.Binding)] {
+			t.Fatal("parent binding was duplicated or enabled without its workflow", field)
+		}
+		bound[strings.ToLower(field.Binding)] = true
+		var definitions int
+		if err := db.QueryRow(`SELECT COUNT(*) FROM (
+			SELECT name FROM pragma_table_info('Sample_Env')
+			UNION ALL SELECT name FROM pragma_table_info('Sample_Admin')
+		) WHERE name=? COLLATE NOCASE`, field.Binding).Scan(&definitions); err != nil {
+			t.Fatal(err)
+		}
+		if definitions != 1 {
+			t.Fatal("source USysEnv binding is unavailable or has ambiguous physical ownership", field.Binding, definitions)
+		}
+	}
+	if len(bound) != 77 {
+		t.Fatal("source parent binding count changed", len(bound))
+	}
+	for _, name := range []string{"sv_polygonnumber", "sv_floodplain", "sv_standheight", "sv_ahorizondepth", "sv_rootzonetexture", "humusthickness", "stratacovertotal", "plotnumber", "plottype", "startdate"} {
+		if !bound[name] {
+			t.Fatal("distinct SIVI parent storage binding lost", name)
+		}
+	}
+}
+
 func TestFS1333ExtendedChildOnlyAddsThreeShrubCoverBindings(t *testing.T) {
 	load := func(name string) fs882layout.Layout {
 		t.Helper()

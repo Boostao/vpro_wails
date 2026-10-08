@@ -243,7 +243,7 @@ test('Metadata component stays outside remounted tabs and gates ordinary Save/Lo
   const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   const component=readFileSync(path.join(__dirname,'ProjectMetadataEditor.svelte'),'utf8');
   assert.match(form,/VITE_PROJECT_METADATA_EDITING === 'true'/);
-  assert.match(form,/childUnsaved = \$derived\([^;]*metadataOpen/);
+  assert.match(form,/nonParentChildUnsaved = \$derived\([^;]*metadataOpen/);
   assert.match(form,/childParentDisabled = \$derived\([^;]*metadataOpen/);
   assert.match(form,/if \(metadataOpen\) return metadataEditor\?\.getCloseState/);
   assert.match(form,/if \(metadataOpen\) \{ metadataEditor\?\.undo\(\); return; \}/);

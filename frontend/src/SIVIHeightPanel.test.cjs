@@ -32,6 +32,7 @@ test('SIVI responsive source panel has one visibly labelled control per height a
   assert.match(markup, /Dr\/Dw/);
   assert.match(markup, /NULL \(distinct from empty text\)/);
   assert.doesNotMatch(markup, /<dt[^>]*>B3</);
+  assert.doesNotMatch(markup, /data-sivi-extended-guidance/);
   assert.doesNotMatch(markup, /data-sivi-column="(?:Species|Cover\d|Collected)"/);
   assert.match(source, /grid-cols-1 gap-3 sm:grid-cols-2/);
   assert.match(source, /w-full min-w-0/);
@@ -45,6 +46,8 @@ test('SIVI extended presentation exposes source B3/B4/B5 without resetting or hi
   assert.match(markup, /aria-invalid="true"/);
   assert.match(markup, /overlength retained/);
   assert.match(markup, /aria-describedby="sivi-9007199254740993-HeightB-error"/);
+  assert.match(markup, /aggregate height editing remains available/);
+  assert.ok(markup.indexOf('data-sivi-extended-guidance') > markup.lastIndexOf('data-sivi-column='));
 });
 test('SIVI safety feedback stays above fields and ordinary guidance below all fields', () => {
   const markup = html({ blocked: true, error: 'Do not replay the committed operation.' });
@@ -58,13 +61,14 @@ test('SIVI parent keeps the owner outside tabs and wires busy/dirty/safety gates
   assert.match(parent, /VITE_SIVI_HEIGHT_EDITING === 'true'/);
   assert.match(parent, /const siviContextId = untrack\(\(\) => contextId\)/);
   assert.match(parent, /headerWorkflowBusy = \$derived\([^\n]*\|\| siviBusy\)/);
-  assert.match(parent, /childUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved/);
+  assert.match(parent, /nonParentChildUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved/);
   for (const gate of ['height', 'other', 'soil', 'attribute', 'collected', 'species']) {
     assert.match(parent, new RegExp(`${gate}EditingDisabled = \\$derived\\([^\\n]*\\|\\| siviUnsaved`));
   }
   assert.match(parent, /if \(siviUnsaved\) \{ await siviOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviUnsaved\) \{ void siviOperation\('undo'\); return; \}/);
-  assert.match(parent, /blocked: siviClose\?\.blocked \?\? false/);
+  assert.match(parent, /blocked: \(siviClose\?\.blocked \?\? false\) \|\| \(siviParentWriteClose\?\.blocked \?\? false\)/);
   assert.match(parent, /siviSession\?\.dispose\(\);[\s\S]{0,60}siviReads\.cancelAll\(\)/);
   assert.match(parent, /\{#if siviPanelOpen && siviView\}[\s\S]*?<SIVIHeightPanel[\s\S]*?\{:else\}[\s\S]*?<SourcePage name="Vegetation"/);
+  assert.match(parent, /\{#if extendedShrubs && !siviPanelOpen\}[\s\S]*?Extended shrubs use cover mode/);
 });
