@@ -159,7 +159,7 @@
         <h3 class="font-semibold">{group.name}</h3>
         <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {#each fields.filter(field => ('pageId' in field ? field.pageId ?? null : null) === group.page &&
-            !sharedEditor?.liveColumns.some(column => column === field.binding)) as field (field.controlId)}
+            !sharedEditor?.liveColumns.some(column => (column === 'SiteNotes' ? 'siteNotes' : column) === field.binding)) as field (field.controlId)}
             {@const binding = original.Bindings.find(binding => binding.ControlID === field.controlId)}
             {#if binding}
               {@const cell = original.Rows[0][binding.Table === original.EnvTable ? 'Env' : 'Admin'].cells[binding.Column]}

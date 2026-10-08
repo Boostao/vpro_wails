@@ -30,7 +30,7 @@
   import SIVIHeightPanel from './SIVIHeightPanel.svelte';
   import SIVIParentReadPanel from './SIVIParentReadPanel.svelte';
   import SIVIParentSharedFields from './SIVIParentSharedFields.svelte';
-  import { SIVIParentSharedSession, type SIVIParentSharedColumn, type SIVIParentSharedInput } from './siviParentSharedSession';
+  import { SIVIParentSharedSession, siviParentSharedFieldsFor, type SIVIParentSharedColumn, type SIVIParentSharedInput } from './siviParentSharedSession';
   import { SIVIParentReadSession } from './siviParentReadSession';
   import { SIVIParentSourceSession } from './siviParentSourceSession';
   import { SIVIParentWriteSession, isSIVIParentDirectColumn } from './siviParentWriteSession';
@@ -75,9 +75,9 @@
   const siviParentReviewEnabled = import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
   const siviParentEditingEnabled = siviParentReviewEnabled && import.meta.env.VITE_SIVI_PARENT_EDITING === 'true';
   const siviParentSharedEnabled = siviParentReviewEnabled && import.meta.env.VITE_SIVI_PARENT_SHARED_EDITING === 'true';
-  const siviParentSharedColumns: readonly SIVIParentSharedColumn[] = [
-    'AirPhotoNum', 'XCoord', 'YCoord', 'StrataCoverTree', 'StrataCoverShrub', 'StrataCoverHerb', 'StrataCoverMoss', 'VegNotes',
-  ];
+  const siviParentReferenceEnabled = siviParentSharedEnabled && import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING === 'true';
+  const siviParentSharedColumns: readonly SIVIParentSharedColumn[] =
+    siviParentSharedFieldsFor(siviParentReferenceEnabled).map(field => field.column);
   const siviParentSharedReads = new ReadRequests();
   let siviParentSharedSession = $state<SIVIParentSharedSession | null>(null);
   let siviParentSharedRevision = $state(0);
@@ -1013,11 +1013,12 @@
             siviParentSharedSession = new SIVIParentSharedSession(
               { contextId: siviContextId, project: $projectState.activeProject, plot }, {
                 read: () => siviParentSharedReads.track(SIVIParentSharedService.GetOriginal(siviContextId, plot)),
+                readReferences: zone => siviParentSharedReads.track(SIVIParentSharedService.GetReferences(siviContextId, plot, zone)),
                 cancelRead: () => siviParentSharedReads.cancelAll(),
                 save: request => SIVIParentSharedService.Save(siviContextId, plot, request),
                 restore: (historyId, action) => SIVIParentSharedService.Restore(siviContextId, plot, historyId, action),
                 refreshParent: () => refreshSIVIParent(plot, [siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession]),
-              }, () => siviParentSharedRevision++);
+              }, () => siviParentSharedRevision++, siviParentReferenceEnabled);
             siviParentSharedRevision++;
           }
           siviParentSourceRevision++;
@@ -2439,6 +2440,7 @@
         <SIVIParentSharedFields view={siviParentSharedView} disabled={siviParentSharedEditingDisabled}
           canSave={siviParentSharedClose?.canSave ?? false} onstage={stageSIVIParentShared}
           onoperation={operation => { void siviParentSharedOperation(operation); }}
+          onreferences={() => { void siviParentSharedSession?.refreshReferences(); }}
           oncancel={() => siviParentSharedSession?.cancel()} />
       {/if}
     {/snippet}

@@ -67,14 +67,32 @@ export function isCoordinateControl(name: string | undefined) {
 }
 export function isCoordinateMode(mode: string): mode is CoordinateDisplayMode { return ['dd', 'dm', 'dms'].includes(mode); }
 
+function coordinatePartValue(axis: CoordinateAxis, part: CoordinatePart, text: string): number | null {
+  if (text === '') return null;
+  if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(text) || !Number.isFinite(Number(text))) {
+    throw new Error(`Enter a finite ${axis} ${part}.`);
+  }
+  return Number(text);
+}
+
+export function coordinateDecimalValue(axis: CoordinateAxis, raw: string, unchanged: number | null):
+  { raw: string; value: number | null; error: string | null } {
+  try {
+    const value = coordinatePartValue(axis, 'degrees', raw);
+    if (value !== unchanged) {
+      coordinateParts(axis, 'dd', { degrees: raw, minutes: '', seconds: '', negative: false });
+    }
+    return { raw, value, error: null };
+  } catch (cause) {
+    return { raw, value: null, error: cause instanceof Error ? cause.message : String(cause) };
+  }
+}
+
 export function coordinateParts(axis: CoordinateAxis, mode: CoordinateDisplayMode, buffers: CoordinateBuffers): CoordinateParts {
   const parts: CoordinateParts = { degrees: null, minutes: null, seconds: null, negative: mode !== 'dd' && buffers.negative };
   const required: CoordinatePart[] = mode === 'dd' ? ['degrees'] : mode === 'dm' ? ['degrees', 'minutes'] : ['degrees', 'minutes', 'seconds'];
   for (const part of required) {
-    const text = buffers[part];
-    if (text === '') continue;
-    if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(text) || !Number.isFinite(Number(text))) throw new Error(`Enter a finite ${axis} ${part}.`);
-    parts[part] = Number(text);
+    parts[part] = coordinatePartValue(axis, part, buffers[part]);
   }
   if (required.every(part => parts[part] === null)) return parts;
   if (required.some(part => parts[part] === null)) throw new Error(`Complete all ${axis} ${mode.toUpperCase()} parts, or clear all parts.`);

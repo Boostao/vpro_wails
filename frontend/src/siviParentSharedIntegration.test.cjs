@@ -22,3 +22,11 @@ test('shared SIVI state joins Save Undo Lock close ownership and sibling refresh
   assert.match(parent, /refreshSIVIParent\(plot, \[siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession\]\)/);
   assert.match(parent, /siviParentSharedSession\?\.dispose\(\)/);
 });
+test('reference editing is independently gated and its owned reads share cancellation and persistent session lifetime', () => {
+  assert.match(parent, /siviParentSharedEnabled && import\.meta\.env\.VITE_SIVI_PARENT_REFERENCE_EDITING === 'true'/);
+  assert.match(parent, /readReferences: zone => siviParentSharedReads\.track\(SIVIParentSharedService\.GetReferences\(siviContextId, plot, zone\)\)/);
+  assert.match(parent, /\(\) => siviParentSharedRevision\+\+, siviParentReferenceEnabled\)/);
+  assert.match(parent, /cancelRead: \(\) => siviParentSharedReads\.cancelAll\(\)/);
+  assert.match(parent, /siviParentSharedFieldsFor\(siviParentReferenceEnabled\)\.map\(field => field\.column\)/);
+  assert.match(parent, /onreferences=\{\(\) => \{ void siviParentSharedSession\?\.refreshReferences\(\); \}\}/);
+});

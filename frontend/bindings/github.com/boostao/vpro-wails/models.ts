@@ -1138,6 +1138,33 @@ export interface SIVIParentRow {
     "Admin": ProjectMetadataRow;
 }
 
+export interface SIVIParentSharedReference {
+    "column": string;
+    "listName": string;
+    "required": boolean;
+    "source": string;
+    "available": boolean;
+    "diagnostic": string;
+    "definitions": ProjectMetadataTable;
+    "choices": SIVIParentSharedReferenceChoice[] | null;
+}
+
+export interface SIVIParentSharedReferenceChoice {
+    "rowId": string;
+    "code": string | null;
+    "description": string | null;
+    "selectable": boolean;
+    "diagnostic": string;
+}
+
+export interface SIVIParentSharedReferences {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "zone": ProjectMetadataCell;
+    "fields": SIVIParentSharedReference[] | null;
+}
+
 export interface SIVIParentSharedWrite {
     "original": SIVIParentProjection | null;
     "edits": SIVIParentCellEdit[] | null;

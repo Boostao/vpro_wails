@@ -3,7 +3,7 @@
 ## Status
 
 Static source contract plus separately gated native parent review, fourteen
-directly bound editors, eight shared-storage controls, two normal source actions and existing physical ProjectID
+directly bound editors, sixty shared-storage controls, two normal source actions and existing physical ProjectID
 assignment/restoration, not a full-form entrypoint. The shared current-project
 metadata editor now has a separately gated SIVI entry action and measured
 edit/restoration/refresh recovery and independent current-ID blank/template
@@ -1208,12 +1208,14 @@ continued under that same verified owner; Save was never replayed. The failed
 Save-refresh injection is not claimed: measured failure was during restoration.
 No Access execution, protected data/default promotion or complete FS1333 claim.
 
-## Eight shared source fields in the native parent panel
+## Thirty-two shared source fields in the native parent panel
 
 The independently gated shared editor adds AirPhotoNum, XCoord, YCoord,
-StrataCoverTree/Shrub/Herb/Moss and VegNotes. These are normal-parent bindings
+StrataCoverTree/Shrub/Herb/Moss, VegNotes and four SOIL measurements.
+These are normal-parent bindings
 that share storage/ordinary validation with FS882; VegSurveyor is not a normal
-parent binding and is excluded. This implements eight of the62 shared bindings,
+parent binding and is excluded. Nine further Env text/memo controls below bring
+this to21; eleven further numeric/date controls bring it to32 of the62 shared bindings,
 not full77-field editing or a standalone complete-form entrypoint.
 
 Runtime `VPRO_SIVI_PARENT_SHARED_EDITING` and build
@@ -1230,8 +1232,44 @@ replacement is unavailable. Explicit Save/Undo/restore is a desktop safety
 adaptation, not literal parent callback parity or automatic StrataCoverTotal
 calculation.
 
+The SOIL group preserves source order and labels: HumusThickness ("Thickness"),
+SeepageDepth ("Seepage depth (cm)"), RootingDepth ("Rooting Depth") and
+RootRestrictingDepth ("Root Restricting Depth", separate source Label601).
+HumusThickness is nullable Single on the certified Admin row, not Env.
+The three depths are nullable Access Integer on Env; changed assignments use
+canonical exact INTEGER strings in the signed -32768..32767 domain.
+Existing ordinary policies are reused without positive-only depth limits, unit
+conversion, guessed calculations or reference assignments. No field-specific
+callback, RowSource, explicit Format or InputMask is exported on these four;
+omitted properties are not runtime-default proof.
+
+The nine text/memo bindings have exact source UTF-16 bounds:
+
+| Physical column | Source label | Storage/bound |
+|---|---|---|
+| SiteSurveyor | Site Surveyors | TEXT(30) |
+| FieldNumber | Field Number | TEXT(50) |
+| Location | Plot Location | TEXT(255) |
+| NtsMapSheet | Map Sheet | TEXT(8) |
+| UTMZone | UTM Zone | TEXT(2) |
+| PlotRepresenting | Plot Representing | TEXT(255) |
+| SiteSeries | Site Unit | TEXT(5) |
+| MapUnit | Map Unit | TEXT(15) |
+| SiteNotes | Notes | MEMO, no arbitrary text cap |
+
+All are directly bound TextBoxes without exported events, InputMask, explicit
+Format or RowSource. UTMZone DecimalPlaces0 does not change its TEXT storage.
+Notes EnterKeyBehavior/ScrollBars support multiline editing. Its literal source
+binding `siteNotes` is explicitly mapped to physical/request/audit/history
+`SiteNotes`; other casing variants are not silently accepted.
+The existing bounded/memo predicates are reused through typed descriptors,
+after unchanged raw-value omission. NULL uses explicit Clear; no empty-to-NULL,
+trimming, completion or recasing. SiteSeries does not inherit XL/BGC lookup actions.
+Unchanged browser memo display preserves original CRLF; deliberate edited LF
+remains literal. Existing raw DTO decoding checks Unicode before decoder repair.
+
 The context/plot session lives outside tab remounts. Source-labelled Site
-description and Vegetation controls preserve meaningful order, nullable storage,
+description, SOIL, Vegetation and Notes controls preserve meaningful order, nullable storage,
 visible associated labels and errors. Corresponding read-only rows are suppressed
 only after owned controls load. Sibling parent/child/metadata work serializes with
 shared drafts; source/editor refresh replaces only clean peer originals.
@@ -1240,17 +1278,185 @@ include the shared state. Invalid entries survive remount and block navigation/
 Save/Lock/native close; explicit Undo reloads the original. Uncertain write
 transport enters conservative observation/recovery, never automatic replay.
 
-Focused combined Go race9.649s,57 coupled frontend/real-wire tests,461 complete
-frontend tests/check0/0 and isolated enabled/independent-off Wails builds pass.
-Twelve native cases/four normally closed owners prove exact bindings/eight
-controls, invalid remount/error/Undo barriers, one four-field Save, typed audit
-prune restoring every original data/audit table,1400/600px actual visibility,
-held real read cancellation/retry, invalid Lock/native-close denial and independent
-presentation/backend refusal. The harness resumed only unfinished pre-write
-phases after correcting guessed tab/error text and transient-null waits; no
-completed Save or restoration was replayed. Closed event/history data remain
+Focused Go race13.577s includes the actual original wire DTO;482 complete frontend
+tests/check0/0, two real-wire tests and exclusively embedded enabled/default
+production Wails builds pass. Twelve native cases/four normally closed owners
+prove21 controls and nine simultaneous overlength/malformed-Unicode draft errors
+through remount. An actual valid typed no-op and injected raw-SDK lone high surrogate
+verify guarded ingestion/no data/audit/history writes. One eleven-field mixed
+text/soil Save preserves astral UTF-16 bounds, spaces/case, leading-zero TEXT and
+literal multiline notes. Typed audit prune restores every original data/audit table.
+Actual1400/600px exact labels, held21-field read cancellation/retry and malformed
+memo Lock/native-close denial pass. Default presentation remains absent even
+with explicitly enabled runtime reads; enabled presentation/backend-off denies
+actual public reads. No completed Save/restoration was replayed. Closed event/history data remain
 preserved; the owned disposable project is then restored byte-for-byte from its
 checked baseline, returning all16 fixture hashes. No canonical Access/data writes.
-Coherent full race integration with summary preferences passes791.377s/all packages
-against626 unchanged source identities; the immutable successor is
+The eight-field/preferences predecessor full race passes791.377s/all packages
+against626 unchanged source identities; its immutable successor is
 `archives\forms-reports-shared-checkpoint\evidence-manifest.json`.
+Twelve-field predecessor coherent integration passes795.293s/all packages against626
+unchanged identities; immutable successor:
+`archives\sivi-soil-desktop-checkpoint\evidence-manifest.json`.
+Twenty-one-field coherent integration passes800.909s/all packages against626
+unchanged identities; immutable successor:
+`archives\sivi-text-desktop-checkpoint\evidence-manifest.json`.
+
+### Numeric and Date continuation
+
+| Binding | Physical owner/type | Exact source label |
+|---|---|---|
+| UTMEasting | Env SINGLE | East |
+| UTMNorthing | Env SINGLE | North |
+| Latitude | Env DOUBLE | Latitude |
+| Longitude | Env DOUBLE | Longitude |
+| LocationAccuracy | Env DAO Integer | +/-m |
+| Elevation | Env DAO Integer | Elevation(m) |
+| SlopeGradient | Env SINGLE | Slope% |
+| Aspect | Env DAO Integer | Aspect |
+| StandAge | Env DAO Integer | Stand Age |
+| StartDate | Admin DAO Integer | Yr. |
+| Date | Env DATETIME | Date |
+
+These are directly bound TextBoxes with no exported field-specific event,
+InputMask, RowSource or validation rule. Latitude/Longitude export Fixed/six
+decimals; Elevation/StandAge export DecimalPlaces0; Date exports Medium Date.
+Omitted properties are not runtime-default proof. Full editable precision is
+retained rather than rounding persisted geographic values.
+
+Local exporter Module2 maps dbInteger to INTEGER and dbLong to LONG; it is
+friendly DAO vocabulary, not executable Access SQL synonym proof. Retained
+`substrate-native/.../native-env-schema.json` and
+`data-quality-native/.../native-admin-schema.json` record DAO Type3/Size2 for the
+five new integer fields and the three depths. Signed16 storage is independently
+corroborated; SQLite INTEGER affinity is not source-width evidence.
+
+Nullable Singles reuse finite/maxFloat32 predicates without float32 rounding.
+Integer transport is canonical exact decimal-string INTEGER, with -32768..32767
+bounds. No positive-only UTM/accuracy/age, Aspect0..360, Slope0..100 or year rules
+are invented. StartDate does not select/change metadata or change Env.Date;
+StandAge does not change the separate Est./Meas. option.
+Changed-only DD geographic validation reuses existing helpers with ±90 latitude
+and ±180 longitude as an explicit desktop safety adaptation. Stored sign is
+direct; no west inversion, hemisphere inference, DM/DMS, preference or XL paths.
+Historical out-of-range/malformed/nonstrict storage remains omitted when unchanged.
+
+Date deliberately accepts only exact full neutral wallclock text
+`YYYY-MM-DD HH:MM:SS[.fraction]`, with1..9 optional fraction digits, or explicit NULL.
+The documented Access DATETIME range is0100..9999
+([Microsoft SQL types](https://learn.microsoft.com/en-us/office/client-developer/access/desktop-database-reference/sql-data-types)).
+Pure Go/TS Gregorian validators reject impossible dates/times, timezone syntax,
+surrounding whitespace, incomplete/date-only and localized input. They do not
+rewrite text, round fractions or infer timezone/DST. This is a lossless desktop
+entry adaptation to imported representation, not Access localized-entry proof.
+Full raw timestamp presentation replaces Medium Date hiding time/precision;
+routine guidance stays below the fields. Unchanged historical cells and typed
+authoritative restoration preserve raw values/storage classes.
+
+Focused combined Go race38.211s,503 frontend tests/check0/0,two real-wire tests and
+isolated enabled/default production builds pass. Twelve native cases/four normally
+closed owners prove32 controls, eleven Single/Integer/DD/calendar errors through
+remount, one11-field numeric/date Admin/Env Save with direct signs/full Double
+precision/exact timestamp nanos, typed prune restoring every original data/audit
+table, exact1400/600px labels, independent gates and actual memo Lock/close/
+held32-field cancellation/retry. All16 fixture hashes restore; closed history
+bytes remain. Full integration passes941.447s/all packages against630 unchanged
+identities; immutable successor:
+`archives\sivi-numeric-date-desktop-checkpoint\evidence-manifest.json`.
+
+### Reference continuation: source contract and native acceptance
+
+The next28 bindings are nullable Env TEXT, not numeric codes:
+
+| Binding | UTF-16 bound | Source catalogue |
+|---|---:|---|
+| FSRegionDistrict |7|Region|
+| Zone |4|USysZoneList.Zone|
+| SubZone |8|USysZoneList.SubZone, filtered by cmbZone|
+| RealmClass |5|realmclass|
+| MoistureRegime |3|MoistureRegime|
+| NutrientRegime |2|NutrientRegime|
+| MesoSlopePosition |3|MesoSlopePosition|
+| SurfaceShape |3|surfaceshape|
+| Exposure1 / Exposure2 |2|Exposure|
+| SiteDisturbance1 / 2 / 3 |8|SiteDisturbance|
+| StructuralStage |6|StructuralStage|
+| SuccessionalStatus |3|SuccessionalStatus|
+| TerrainTextureSurf / SubSurf |3|TerrainTexture|
+| SurficialMaterialSurf / SubSurf |6|SurficialMaterial|
+| SurfaceExpSurf / SubSurf |3|SurfaceExp|
+| GeoMorProSurf / SubSurf |3|GeoMorPro|
+| BedrockGeology1 / 2 |4|BedrockType|
+| HumusForm |4|HumusForm|
+| SoilDrainage |5|SoilDrainage|
+| RootRestrictingType |1|RootRestrictingType|
+
+Source list SQL selects Item/ItemDescription, filters ListName only and orders
+ItemOrder. Multiple definitions are not a dictionary. All28 omit field events,
+Format and InputMask. Exposure1/2, SuccessionalStatus and SoilDrainage explicitly
+export nondefault LimitToList; the other24 omit that property.
+[Microsoft documents the default as No](https://learn.microsoft.com/en-us/office/vba/api/access.combobox.limittolist).
+The continuation retains physically valid free entry on those24, with advisory
+catalogue mismatch rather than automatic rejection or mandatory acknowledgement.
+Four required-list fields use exact canonical membership as the existing desktop
+adaptation; this does not establish Access collation equivalence. Suggestions must
+not autocomplete, trim, recase or insert catalogue rows. Historical invalid,
+nonmember or nontext storage is omitted when unchanged and restored authoritatively.
+NULL uses an explicit action; empty text is not silently NULL.
+
+Twenty-two fields have existing typed verified catalogue surfaces. The six other
+lists exist in the full imported VLists.USysTableOfLists with all ten source columns,
+physical rowids and61 rows, including six NULL Items: MoistureRegime10,
+NutrientRegime7, MesoSlopePosition9, SurfaceShape4, StructuralStage21 and
+SuccessionalStatus10. Legacy Lists expose only55 non-NULL flattened definitions
+and are not an equivalent boundary. The bundled VLists image is sealed with SHA256
+`dd80135e45878d92dee626701ba29bd4cc1d69549d6784c2a91dc276f6a79a51`.
+Configured-family ownership and fresh snapshot/schema validation are not frozen
+DAO provenance; imported BOOLEAN integer1 remains raw, without manufacturing -1.
+Six-specific fixture tests verify the owned schema/read boundary; they do not
+upgrade configured-family provenance into a fresh DAO capture.
+
+Zone changes refresh SubZone suggestions only. NULL Zone means no dependent
+suggestions, not the existing helper's nil-means-all-zones behavior. No implicit
+SubZone, SiteSeries, realm or metadata assignments/cascades are authorized.
+Independent runtime/build reference-editing gates remain default off; accepted
+thirty-two-field behavior remains unchanged when these new gates are off.
+
+The owned shared facade returns28 detached catalogue fields with explicit
+availability/diagnostics, raw definitions and target-specific selectable choices.
+Borrowed readers have one host-owned lifetime; the shared service never closes
+them. Required membership is rechecked in the owned write transaction, while
+authoritative history restoration remains independent of current catalogue
+availability. The persistent session owns reference loading/errors/advisories,
+explicit retry and stale/cancelled response suppression. Gate-off controls remain
+32 with all28 reference rows still visible read-only; gate-on controls are60.
+Reference denial does not prevent accepted32-field Save. Suggestions use one
+editable input per field and preserve distinct definitions rather than a dictionary.
+
+Focused primary race54.400s,546 complete frontend tests (114 pretest +432 runner),
+check0 errors/warnings, two actual emitted Go/Svelte wire tests and exclusively
+embedded enabled/reference-default production Wails builds pass. Interface-mode
+bindings are261 packages/23 services/205 methods/177 models.
+
+Four normally closed/restored native owners complete14 cases. Actual catalogue
+reads prove all28 fields and the six61-row ten-cell raw lists. Four SDK required-
+member refusals and malformed/overlength drafts survive remount without writes.
+NULL Zone yields no SubZone suggestions or implicit value changes. One29-field
+reference/Admin Save stores24 literal advisory codes, four independently observed
+canonical choices and HumusThickness. Exact physical owners and29 audits link to
+history; typed prune restores all16 original physical data/audit tables. Wide/narrow
+1400/600px controls have visible associated labels. Independent default/backend
+gates, required-draft Lock/native-close refusal and held actual reference read
+cancellation/retry pass. All16 baseline file hashes return after closed history is
+preserved and the disposable project restored byte-for-byte.
+
+The native harness initially expected audit suffixes Env/Admin rather than the
+actual _Env/_Admin. Read-only comparison verified project/plot, Env row1/Admin
+row46, NULL business IDs and all29 history/audit links before correcting that
+guard. The same owner completed restoration and layout checks; Save was not
+replayed. Full coherent integration passes fresh root996.700s/all packages with
+635 unchanged pinned identities. Immutable successor:
+`archives\sivi-reference-desktop-checkpoint\evidence-manifest.json`.
+This is60 of62 shared controls, not standalone full77-binding entry or overall
+forms/reports completion. PlotNumber identity and the separate ProjectID workflow
+are not silently authorized by the shared editor.

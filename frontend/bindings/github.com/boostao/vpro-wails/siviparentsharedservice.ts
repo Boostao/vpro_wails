@@ -19,6 +19,10 @@ export function GetOriginal(contextID: string, plot: string): $CancellablePromis
     return $Call.ByID(3762076060, contextID, plot);
 }
 
+export function GetReferences(contextID: string, plot: string, zone: $models.ProjectMetadataCell): $CancellablePromise<$models.SIVIParentSharedReferences | null> {
+    return $Call.ByID(3073922741, contextID, plot, zone);
+}
+
 export function Restore(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(3759121201, contextID, plot, historyID, action);
 }

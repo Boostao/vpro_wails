@@ -159,6 +159,10 @@ func main() {
 	if err != nil {
 		log.Printf("Warning: failed to initialize ParentCodeService: %v", err)
 	}
+	siviParentShared.references = siviParentSharedReferenceReaders{
+		site: siteCodes, region: regionCodes, parent: parentCodes,
+		geology: geologyCodes, bec: becService,
+	}
 	workingUnits, err := NewWorkingUnitService(projects, configDir)
 	if err != nil {
 		log.Printf("Warning: failed to initialize WorkingUnitService: %v", err)
@@ -240,6 +244,21 @@ func main() {
 			if soilCodes != nil {
 				if err := soilCodes.Close(); err != nil {
 					log.Printf("Warning: failed to close SoilCodeService: %v", err)
+				}
+			}
+			if regionCodes != nil {
+				if err := regionCodes.Close(); err != nil {
+					log.Printf("Warning: failed to close RegionCodeService: %v", err)
+				}
+			}
+			if siteCodes != nil {
+				if err := siteCodes.Close(); err != nil {
+					log.Printf("Warning: failed to close SiteCodeService: %v", err)
+				}
+			}
+			if becService != nil {
+				if err := becService.Close(); err != nil {
+					log.Printf("Warning: failed to close BECService: %v", err)
 				}
 			}
 		},
