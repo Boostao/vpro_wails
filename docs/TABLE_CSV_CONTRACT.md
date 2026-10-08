@@ -126,6 +126,114 @@ Fresh full Go integration for this successor passes (root826.279s, all packages)
 883.751s remains the kernel predecessor. No default promotion or full
 export/import acceptance follows from native review acceptance.
 
+## Private single-artifact preparation
+
+A private in-memory container is implemented for the existing version1 CSV
+document. Two loose files cannot be published atomically as one operation;
+the preparation uses a conventional ZIP Store container with exact `table.csv`
+and `manifest.json` members so a future owned no-replace writer can publish one
+complete artifact. This is an implementation adaptation, not client approval
+of ZIP delivery, a plain-value CSV/RDS replacement or enabled publication.
+
+The container must preserve exact CSV bytes and every supplied manifest field,
+reject ambiguous members/JSON, verify integrity and accept an explicit positive
+caller byte budget. No compression, extraction to disk, inferred metadata or
+database reconstruction is authorized. Existing description candidates do not
+prove the physical metadata table exists: the owned review's separate presence
+flag and full original schema are still outside a generic version1 document.
+The private `encodeTableCSVBundle` and `decodeTableCSVBundle` validate the
+existing codec's document, snapshot all caller-owned bytes/manifest slices and
+Description pointers before fallible context checks, and return no partial
+result on invalid input or cancellation. The decoder takes an explicit positive
+byte budget and rejects unsupported or ambiguous members, headers, integrity,
+JSON properties and raw Unicode before repair. Existing table identities,
+storage tags, literal text and description candidates are not inferred or
+renamed. These APIs still authorize no file/database write.
+
+Final corrected bundle plus predecessor codec race5.278s and package vet pass.
+Regression tests independently inspect ZIP bytes, enforce exact budget versus
+size-1, preserve deterministic roundtrips, cover malformed/ambiguous members/
+manifest/CRC and mutate caller aliases at each context checkpoint. Independent
+review is closed; full integration passes root833.343s/all packages.
+This is not accepted publication.
+
+Bundle review identified and closed a metadata correction: JSON
+`declaredType:null` was silently decoded as the valid empty declared type.
+Raw validation now rejects null/non-string values before typed decoding while
+explicit `""` remains valid and roundtrip-preserved. Final focused race5.278s
+and vet pass; the5.096s receipt is the retained pre-correction state. Independent
+reviewer inspects only the fix/direct tests and reports zero unresolved findings.
+Reviewer runtime tests lacked the proper CGO environment; supplied implementation
+receipts are the runtime evidence. Fresh full integration passes root833.343s/
+all packages with unchanged bundle source. No file publication or final client-
+format approval is claimed.
+
+The [exact private bundle checkpoint](../archives/table-csv-bundle-checkpoint/evidence-manifest.json)
+retains16 source/review/validation files, verifies its18-file predecessor and
+records364 Go integration hashes. It does not enable publication.
+
+A separate private fresh-path publisher uses the existing atomic no-replace
+hard-link pattern. It stages one validated artifact in an observed existing
+parent, verifies current owned identities/bytes, preserves collision targets
+and unowned aliases, and surfaces cancellation/cleanup errors.
+Successful linking is the commit boundary: later errors report committed
+status without deleting the published target or encouraging replay. Tests are
+disposable; this helper alone establishes no project lease, source-reobservation,
+cross-process data coordination, desktop action or client output-format approval.
+The private writer draft passes eight test groups, coupled CSV/bundle race5.567s
+and vet. Two Windows symlink cases are privilege-skipped, not runtime-verified;
+requested0600 does not establish Windows POSIX-like owner-only ACLs.
+Independent review closed a Windows identity gap: path `os.Stat` deferred
+physical file-ID acquisition and could accept a replacement parent introduced
+during encoding before staging. Parent acceptance now freezes identity from an
+opened directory handle, propagates stat/close errors and checks that identity
+before stage creation. A real Windows regression reproduces the old failure
+and now rejects replacement while preserving original/unowned contents.
+Final nine publication groups/coupled race5.672s and vet pass; reviewer reports
+zero unresolved findings and independently runs replacement regressions with
+Windows race1.199s. Fresh full integration passes root828.253s/all packages;
+source remained unchanged throughout. No public publication is claimed.
+Path observations remain neither a hostile handle-relative filesystem guarantee
+nor a project/source ownership coordinator.
+The [accepted publication checkpoint](../archives/table-csv-publication-checkpoint/evidence-manifest.json)
+retains27 exact files, verifies its16-file bundle predecessor and records366
+Go integration hashes.
+
+## Private source-owned publication candidate
+
+The unexported `publishOwnedProjectTableCSV` composes the existing owned review
+and no-replace publisher. It detaches the expected review before fallible
+callbacks, checks literal context/project/path/table identities, and compares
+the complete document plus the separate physical metadata-presence bit.
+Independent read transactions finish before staging, immediately before the
+publisher's final artifact/filesystem checks, and after committed publication.
+Read/transaction-cleanup errors before linking block publication; observable
+source drift or cleanup errors after linking preserve `Published`, path and
+hash with an explicit do-not-replay error. No business rows or audits are written.
+
+The context operation lease pins the selection. Holding the source owner's
+mutex serializes owner-mutex writers and new pool borrows, but ordinary
+header/child writers can already hold borrowed pools and execute transactions
+outside that mutex. External connections are likewise not excluded. The
+guarantee is an equal, independently fresh, completed prelink snapshot, not
+source equality at the instantaneous hard link or detection of every transient
+change. Postcommit observation does not turn this into cross-process atomicity.
+The generic version1 artifact still omits physical metadata-table presence and
+full original schema constraints; comparing that presence during orchestration
+does not add it to the bundle.
+
+Candidate focused CSV/owned-publication/bundle race passes12.798s with237
+cases/subcases; package vet passes. Independent inspection-only review reports
+zero significant findings and verifies the baseline diffs, callback ordering,
+alias detachment and committed-result preservation; reviewer runtime tests
+were not executed. Fresh full integration passes root849.089s/all packages
+against368 captured Go source hashes. Candidate receipts under
+`archives/table-csv-owned-publication-checkpoint` are unsealed implementation
+evidence, not acceptance. The helper remains private/unwired: no feature flag,
+public method, desktop/native export or final ZIP/CSV/RDS approval is added.
+The reviewed private source-owned successor is ready for exact archival
+acceptance; its source-observation limitations remain unchanged.
+
 ## Access reader platform
 
 Access reading remains the responsibility of `meztez/go-mdbtools`. The existing
@@ -136,5 +244,6 @@ review closed three defects; embedded source-text NUL is explicitly rejected.
 The [native scalar boundary](ACCESS_IMPORT_CONTRACT.md) and isolated consumer
 preserve Access true=-1 without introducing an application reader dependency,
 duplicate parser, source rewrite or elevated machine installation.
-Access import stays disabled until a supported,
-fixture-tested reader boundary is available.
+Access import stays disabled until complete owned staging/schema/metadata and
+transactional publication boundaries are verified; tested reader/value kernels
+do not authorize a conversion or canonical-data replacement.
