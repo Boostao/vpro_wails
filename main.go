@@ -74,6 +74,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	siteUnitSummaryPreferencesEnabled, err := siteUnitSummaryPreferencesFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	dataDir, err := userDataDir()
 	if err != nil {
 		log.Fatal(err)
@@ -113,6 +117,10 @@ func main() {
 	contextService.plotLocationReviewEnabled = plotLocationReviewEnabled
 	contextService.siteUnitSummaryEnabled = siteUnitSummaryEnabled
 	contextService.longVegetationNoneEnabled = longVegetationNoneEnabled
+	siviParentShared, err := NewSIVIParentSharedService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	coordinates, err := newCoordinateService(configDir, preferences)
 	if err != nil {
 		log.Fatal(err)
@@ -166,6 +174,8 @@ func main() {
 		application.NewService(NewGoogleEarthKMLExportService(contextService, googleEarthKMLExportEnabled)),
 		application.NewService(NewGoogleEarthPreferencesService(contextService, googleEarthPreferencesEnabled)),
 		application.NewService(NewLongEnvironmentPreferencesService(contextService, longEnvironmentPreferencesEnabled)),
+		application.NewService(NewSiteUnitSummaryPreferencesService(contextService, siteUnitSummaryPreferencesEnabled)),
+		application.NewService(siviParentShared),
 		application.NewService(NewTableCSVArchiveService(contextService, tableCSVArchiveEnabled)),
 		application.NewService(coordinates),
 	}

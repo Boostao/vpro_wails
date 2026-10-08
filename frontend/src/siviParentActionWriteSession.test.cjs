@@ -208,8 +208,8 @@ test('mounted source actions join Save/Undo/Lock/close ownership and refresh onl
   assert.match(parent, /Undo SIVI source-action drafts\/recovery before changing the plot lock/);
   assert.match(parent, /siviParentActionSession\.closeState\(\)\.unsaved/);
   assert.match(parent, /\|\| \(siviParentActionClose\?\.blocked \?\? false\)/);
-  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentWriteSession, siviProjectAssignmentSession\]\)/);
-  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentActionSession, siviProjectAssignmentSession\]\)/);
+  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentWriteSession, siviProjectAssignmentSession, siviParentSharedSession\]\)/);
+  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentActionSession, siviProjectAssignmentSession, siviParentSharedSession\]\)/);
   assert.match(parent, /peer\.closeState\(\)\.unsaved \|\| peer\.closeState\(\)\.busy/);
   assert.match(parent, /peer && \(peer\.view\(\)\.original \|\| peer\.view\(\)\.error\) && !await peer\.load\(\)/);
 });

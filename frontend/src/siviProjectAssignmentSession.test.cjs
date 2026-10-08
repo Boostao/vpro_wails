@@ -375,9 +375,9 @@ test('FS882 candidate owns assignment across Save/Undo/Lock/close/remount/source
   assert.match(parent, /Undo ProjectID selection\/recovery before changing the plot lock/);
   assert.match(parent, /siviProjectAssignmentSession\.closeState\(\)\.unsaved/);
   assert.match(parent, /\|\| \(siviProjectAssignmentClose\?\.blocked \?\? false\)/);
-  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentWriteSession, siviParentActionSession\]\)/);
-  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentActionSession, siviProjectAssignmentSession\]\)/);
-  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentWriteSession, siviProjectAssignmentSession\]\)/);
+  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentWriteSession, siviParentActionSession, siviParentSharedSession\]\)/);
+  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentActionSession, siviProjectAssignmentSession, siviParentSharedSession\]\)/);
+  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentWriteSession, siviProjectAssignmentSession, siviParentSharedSession\]\)/);
   assert.match(parent, /onSourceChange=\{source => \{ void changeSIVIProjectSource\(source\); \}\}/);
   assert.match(parent, /onSourceReload=\{\(\) => \{ void reloadSIVIProjectSource\(\); \}\}/);
   assert.match(parent, /Boolean\(siviParentSourceView\?\.error\)/);
@@ -409,7 +409,7 @@ test('SIVI metadata reuses the existing guarded editor and commit recovery inste
   assert.match(parent, /metadataDisabled=\{childParentDisabled \|\| childUnsaved \|\| Object\.keys\(headerValidation\)\.length > 0\}/);
   assert.match(parent, /oncommitted=\{refreshProjectMetadata\}/);
   const refresh = parent.slice(parent.indexOf('async function refreshProjectMetadata()'), parent.indexOf('async function refreshProjectMetadata()') + 700);
-  assert.match(refresh, /refreshSIVIParent\(draft\.plotNumber, \[siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession\]\)/);
+  assert.match(refresh, /refreshSIVIParent\(draft\.plotNumber, \[siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession, siviParentSharedSession\]\)/);
   assert.match(refresh, /siviParentSourceSession\.load\(\)/);
   assert.match(refresh, /siviParentSession\?\.view\(\)\.error/);
   assert.match(refresh, /siviParentSourceSession\.view\(\)\.error/);

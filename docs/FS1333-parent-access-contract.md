@@ -3,7 +3,7 @@
 ## Status
 
 Static source contract plus separately gated native parent review, fourteen
-directly bound editors, two normal source actions and existing physical ProjectID
+directly bound editors, eight shared-storage controls, two normal source actions and existing physical ProjectID
 assignment/restoration, not a full-form entrypoint. The shared current-project
 metadata editor now has a separately gated SIVI entry action and measured
 edit/restoration/refresh recovery and independent current-ID blank/template
@@ -1207,3 +1207,50 @@ captured before any further action. Only the unfinished restore/recovery tail
 continued under that same verified owner; Save was never replayed. The failed
 Save-refresh injection is not claimed: measured failure was during restoration.
 No Access execution, protected data/default promotion or complete FS1333 claim.
+
+## Eight shared source fields in the native parent panel
+
+The independently gated shared editor adds AirPhotoNum, XCoord, YCoord,
+StrataCoverTree/Shrub/Herb/Moss and VegNotes. These are normal-parent bindings
+that share storage/ordinary validation with FS882; VegSurveyor is not a normal
+parent binding and is excluded. This implements eight of the62 shared bindings,
+not full77-field editing or a standalone complete-form entrypoint.
+
+Runtime `VPRO_SIVI_PARENT_SHARED_EDITING` and build
+`VITE_SIVI_PARENT_SHARED_EDITING` default off and additionally require parent
+review. The owned facade calls the existing scoped SIVI writer, not whole-header
+Save or inherited XL callbacks. One certified physical Env/Admin pair, selected
+SU membership, exact raw reviewed projection, expected cells and owned context
+are independently checked inside the transaction. Changed-only assignments,
+audits and isolated `__VPRO_SIVIParentSharedHistory` provenance commit together.
+Typed restoration verifies physical ownership and original/committed projections,
+rejecting collision/replay while preserving context-restoration aliases.
+Historical raw storage remains unchanged unless explicitly corrected; BLOB
+replacement is unavailable. Explicit Save/Undo/restore is a desktop safety
+adaptation, not literal parent callback parity or automatic StrataCoverTotal
+calculation.
+
+The context/plot session lives outside tab remounts. Source-labelled Site
+description and Vegetation controls preserve meaningful order, nullable storage,
+visible associated labels and errors. Corresponding read-only rows are suppressed
+only after owned controls load. Sibling parent/child/metadata work serializes with
+shared drafts; source/editor refresh replaces only clean peer originals.
+Save/Undo/Lock/close/navigation, plot replacement, cancellation and disposal all
+include the shared state. Invalid entries survive remount and block navigation/
+Save/Lock/native close; explicit Undo reloads the original. Uncertain write
+transport enters conservative observation/recovery, never automatic replay.
+
+Focused combined Go race9.649s,57 coupled frontend/real-wire tests,461 complete
+frontend tests/check0/0 and isolated enabled/independent-off Wails builds pass.
+Twelve native cases/four normally closed owners prove exact bindings/eight
+controls, invalid remount/error/Undo barriers, one four-field Save, typed audit
+prune restoring every original data/audit table,1400/600px actual visibility,
+held real read cancellation/retry, invalid Lock/native-close denial and independent
+presentation/backend refusal. The harness resumed only unfinished pre-write
+phases after correcting guessed tab/error text and transient-null waits; no
+completed Save or restoration was replayed. Closed event/history data remain
+preserved; the owned disposable project is then restored byte-for-byte from its
+checked baseline, returning all16 fixture hashes. No canonical Access/data writes.
+Coherent full race integration with summary preferences passes791.377s/all packages
+against626 unchanged source identities; the immutable successor is
+`archives\forms-reports-shared-checkpoint\evidence-manifest.json`.

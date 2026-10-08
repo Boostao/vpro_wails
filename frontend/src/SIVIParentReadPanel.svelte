@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+  import type { SIVIParentSharedColumn } from './siviParentSharedSession';
   import source from '../../resources/fs1333-sivi-layout.json';
   import { metadataCellText } from './projectMetadataEditor';
   import { siviParentActionDisplay } from './siviParentTransport';
@@ -21,7 +23,8 @@
     onMetadata = undefined, metadataDisabled = true,
     assignmentView = null, assignmentDisabled = true, assignmentCanSave = false,
     onAssignmentOperation = (_operation: 'load' | 'save' | 'undo' | 'retain' | 'prune') => {},
-    onAssignmentStage = (_input: SIVIProjectAssignmentInput) => {}, onAssignmentCancel = () => {} }: {
+    onAssignmentStage = (_input: SIVIProjectAssignmentInput) => {}, onAssignmentCancel = () => {},
+    sharedEditor = null }: {
     view: SIVIParentReadView; onreload: () => void; oncancel: () => void; reloadDisabled: boolean;
     sourceView?: SIVIParentSourceView | null; onSourceReload?: () => void; onSourceCancel?: () => void;
     onSourceChange?: (source: number) => void;
@@ -35,6 +38,7 @@
     assignmentView?: SIVIProjectAssignmentView | null; assignmentDisabled?: boolean; assignmentCanSave?: boolean;
     onAssignmentOperation?: (operation: 'load' | 'save' | 'undo' | 'retain' | 'prune') => void;
     onAssignmentStage?: (input: SIVIProjectAssignmentInput) => void; onAssignmentCancel?: () => void;
+    sharedEditor?: { liveColumns: readonly SIVIParentSharedColumn[]; content: Snippet; busy: boolean; unsaved: boolean } | null;
   } = $props();
   const fields = source.forms[0].fields.filter(field => field.binding);
   const groups = [
@@ -50,6 +54,7 @@
 </script>
 
 <section class="space-y-4 rounded border border-stone-200 bg-white p-4" data-sivi-parent-panel aria-label={writeView ? 'SIVI parent bounded editing' : 'SIVI parent read-only'}>
+  <fieldset class="min-w-0 space-y-4 border-0 p-0" disabled={Boolean(sharedEditor?.busy || sharedEditor?.unsaved)}>
   <header>
     <h2 class="font-semibold">SIVI / FS1333 parent — {writeView ? 'directly bound fields' : 'read-only'}</h2>
     <p class="text-sm text-stone-600">Persisted original values, not unsaved FS882 drafts.
@@ -153,7 +158,8 @@
       <section class="space-y-2" aria-label={group.name}>
         <h3 class="font-semibold">{group.name}</h3>
         <dl class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {#each fields.filter(field => ('pageId' in field ? field.pageId ?? null : null) === group.page) as field (field.controlId)}
+          {#each fields.filter(field => ('pageId' in field ? field.pageId ?? null : null) === group.page &&
+            !sharedEditor?.liveColumns.some(column => column === field.binding)) as field (field.controlId)}
             {@const binding = original.Bindings.find(binding => binding.ControlID === field.controlId)}
             {#if binding}
               {@const cell = original.Rows[0][binding.Table === original.EnvTable ? 'Env' : 'Admin'].cells[binding.Column]}
@@ -270,4 +276,6 @@
       Neither action implicitly saves other drafts. Normal-form NULL Plot Type remains unavailable; this is not the CHARS Variant callback.</p>{/if}
     <p class="text-xs text-stone-600">Literal SQLite parent membership is a labelled adaptation, not full Access join or write authorization. NULL, empty text and historical storage classes are retained.</p>
   {/if}
+  </fieldset>
+  {#if sharedEditor}{@render sharedEditor.content()}{/if}
 </section>

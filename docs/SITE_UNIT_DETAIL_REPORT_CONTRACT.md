@@ -230,8 +230,9 @@ Create Report is disabled rather than silently switching scope. Method edits
 affect preview only; explicit Reload restores the saved method/scope.
 No registry values or source temporary queries are read or written.
 Hierarchy/field-derived units, lifeform covers and species/publication controls
-are not enabled. The active AfterUpdate saved-option persistence remains a gap;
-loading saved options is not evidence of that write path.
+are not enabled. The separately gated reviewed-preference successor below
+implements an explicit desktop adaptation of the active AfterUpdate persistence;
+loading saved options alone is not evidence of that write path.
 
 Focused/shared Go race3.082s,20 frontend summary/report/read/close tests and
 Svelte check0 errors/warnings pass; the full frontend suite passes441 tests
@@ -264,3 +265,45 @@ unchanged Go/frontend identities. The
 [initialization successor](../archives/summary-options-desktop-checkpoint/evidence-manifest.json)
 preserves the42-file None and48-file original summary predecessors. This
 initialization does not implement AfterUpdate preference writes or overall parity.
+
+## Reviewed summary-option persistence
+
+Original active optValueMethod/optSiteUnitType AfterUpdate routes write
+`clsRepOpt.SEOptValueMethod` and `SESuType`. The successor replaces immediate
+registry writes with explicit reviewed Load/Save/Undo in retained YAML.
+Runtime `VPRO_SITE_UNIT_SUMMARY_PREFERENCES` and build
+`VITE_SITE_UNIT_SUMMARY_PREFERENCES` remain separately default off.
+Only normal-SU proposals are accepted; retained hierarchy/field values remain
+readable but require explicit normal-SU selection before Save. This does not
+enable either unavailable report scope.
+
+Shared typed report CAS retains the accepted Google Earth/Long Environment
+string path while adding strict integer reads. Both keys are observed before
+collision checks; unchanged assignments are omitted. Atomic replacement follows
+owned snapshot cleanup and preserves a committed receipt outside callbacks.
+Rollback/replacement failure, cancellation, stale context, invalid raw JSON,
+unknown/duplicate/missing/NULL keys and concurrent preferences reject explicitly.
+No database, audit, source temporary table or registry writes occur.
+
+Persistent context/path-keyed drafts preserve invalid errors, unknown authority
+and receipts through remount. Reads are cancellable/generation-checked; Save is
+not. Busy/blocked/unknown/error state enters shared navigation/native-close gates.
+Committed warnings do not authorize replay. Contradictory/missing receipts remain
+unknown after acknowledgement; only explicit owned Load recovers authority,
+without rewriting the unknown ledger.
+
+Focused shared preferences/SIVI Go race9.649s,28 summary frontend tests and the
+complete461-test frontend suite/check0/0 pass. Isolated enabled/default
+frontend/Wails builds and13 actual Wails cases/three closed owners verify
+four planned YAML writes, unchanged no-op, independent collision, valid draft
+remount/Undo, held real committed write with lost acknowledgement, explicit
+authority reload, retained unsupported scope correction and responsive labels.
+All16 fixture hashes restore. The default owner closed normally before a
+concurrent accidental frontend build tripped protected-asset verification.
+Its cases were not replayed: all17 protected assets were restored exactly from
+the accepted archive after preserving the overwritten build, and fresh fixture/
+owner/protected checks sealed its cleanup. The incident does not establish a
+production promotion or canonical-data change.
+Coherent full race integration passes791.377s/all packages against626 unchanged
+source identities. The combined immutable successor is
+`archives\forms-reports-shared-checkpoint\evidence-manifest.json`.

@@ -17,7 +17,9 @@ import * as ProjectService from "./projectservice.js";
 import * as QualityService from "./qualityservice.js";
 import * as ReferenceService from "./referenceservice.js";
 import * as RegionCodeService from "./regioncodeservice.js";
+import * as SIVIParentSharedService from "./siviparentsharedservice.js";
 import * as SiteCodeService from "./sitecodeservice.js";
+import * as SiteUnitSummaryPreferencesService from "./siteunitsummarypreferencesservice.js";
 import * as SoilCodeService from "./soilcodeservice.js";
 import * as StartupService from "./startupservice.js";
 import * as TableCSVArchiveService from "./tablecsvarchiveservice.js";
@@ -39,7 +41,9 @@ export {
     QualityService,
     ReferenceService,
     RegionCodeService,
+    SIVIParentSharedService,
     SiteCodeService,
+    SiteUnitSummaryPreferencesService,
     SoilCodeService,
     StartupService,
     TableCSVArchiveService,
@@ -175,6 +179,7 @@ export type {
     SIVIParentJoinReview,
     SIVIParentProjection,
     SIVIParentRow,
+    SIVIParentSharedWrite,
     SIVIParentWriteResult,
     SIVIProjectAssignmentOriginal,
     SIVIProjectAssignmentWrite,
@@ -193,6 +198,7 @@ export type {
     SiteUnitSummaryMembership,
     SiteUnitSummaryOptions,
     SiteUnitSummaryPlot,
+    SiteUnitSummaryPreferencesOutcome,
     SiteUnitSummaryPreview,
     SiteUnitSummaryReport,
     SiteUnitSummaryRequest,

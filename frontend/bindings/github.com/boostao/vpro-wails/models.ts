@@ -1138,6 +1138,11 @@ export interface SIVIParentRow {
     "Admin": ProjectMetadataRow;
 }
 
+export interface SIVIParentSharedWrite {
+    "original": SIVIParentProjection | null;
+    "edits": SIVIParentCellEdit[] | null;
+}
+
 export interface SIVIParentWriteResult {
     "ChangedCells": number;
     "HistoryID": string;
@@ -1284,6 +1289,13 @@ export interface SiteUnitSummaryPlot {
     "suRowId": string;
     "envRowId": string;
     "adminRowId": string;
+}
+
+export interface SiteUnitSummaryPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
 }
 
 export interface SiteUnitSummaryPreview {

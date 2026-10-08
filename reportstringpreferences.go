@@ -8,31 +8,42 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type reportStringPreferenceChange struct {
+type reportPreferenceChange[T comparable] struct {
 	Key      string
-	Expected string
-	Proposed string
+	Expected T
+	Proposed T
 }
 
-type configStringPreferenceUpdate struct {
+type reportStringPreferenceChange = reportPreferenceChange[string]
+
+type reportPreferenceUpdate struct {
 	Changed   bool
 	Committed bool
 }
 
+type configStringPreferenceUpdate = reportPreferenceUpdate
+
 func (s *desktopConfig) compareAndSetReportStrings(ctx context.Context, label string, changes []reportStringPreferenceChange) (configStringPreferenceUpdate, error) {
+	return compareAndSetReportPreferences(s, ctx, label, changes, func(values configValues, key string) (string, error) {
+		return configString(values, "ReportOptions", key)
+	})
+}
+
+func compareAndSetReportPreferences[T comparable](s *desktopConfig, ctx context.Context, label string,
+	changes []reportPreferenceChange[T], read func(configValues, string) (T, error)) (reportPreferenceUpdate, error) {
 	if ctx == nil {
 		return configStringPreferenceUpdate{}, fmt.Errorf("%s changes require a context", label)
 	}
 	if s == nil {
 		return configStringPreferenceUpdate{}, fmt.Errorf("%s configuration is unavailable", label)
 	}
-	if label == "" || len(changes) == 0 {
-		return configStringPreferenceUpdate{}, errors.New("report string preference changes require explicit keys and a label")
+	if label == "" || len(changes) == 0 || read == nil {
+		return reportPreferenceUpdate{}, errors.New("report preference changes require explicit keys, a label and a typed reader")
 	}
 	seen := make(map[string]bool, len(changes))
 	for _, change := range changes {
 		if change.Key == "" || seen[change.Key] {
-			return configStringPreferenceUpdate{}, errors.New("report string preference keys are empty or duplicated")
+			return reportPreferenceUpdate{}, errors.New("report preference keys are empty or duplicated")
 		}
 		seen[change.Key] = true
 	}
@@ -45,9 +56,9 @@ func (s *desktopConfig) compareAndSetReportStrings(ctx context.Context, label st
 		return configStringPreferenceUpdate{}, err
 	}
 	changed := false
-	currentValues := make([]string, len(changes))
+	currentValues := make([]T, len(changes))
 	for i, change := range changes {
-		current, err := configString(values, "ReportOptions", change.Key)
+		current, err := read(values, change.Key)
 		if err != nil {
 			return configStringPreferenceUpdate{}, err
 		}

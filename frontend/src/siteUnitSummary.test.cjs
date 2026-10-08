@@ -52,14 +52,15 @@ test('summary component is independently gated, cancellable and enters shared dr
   assert.match(read('Navigation.svelte'),/VITE_SITE_UNIT_SUMMARY === 'true' \? 'summary-environment' : undefined/);
   assert.match(read('App.svelte'),/view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true'/);
   const panel=read('SiteUnitSummary.svelte');
-  assert.match(panel,/onDestroy\(cancel\)/);assert.match(panel,/request !== generation/);
-  assert.match(panel,/onBusyChange\(true\)/);assert.match(panel,/onBusyChange\(false\)/);
-  assert.match(panel,/bind:group=\{method\}/);assert.match(panel,/validateSiteUnitSummary/);
-  assert.match(panel,/onMount\(\(\) => \{ void options\(\); \}\)/);
+  assert.match(panel,/onDestroy\(\(\) => \{ unsubscribe\?\.\(\); cancel\(\); \}\)/);assert.match(panel,/request !== generation/);
+  assert.match(panel,/onBusyChange\(busy \|\| preferenceBarrier\)/);
+  assert.match(panel,/checked=\{method === 1\}/);assert.match(panel,/validateSiteUnitSummary/);
+  assert.match(panel,/if \(!preferencesEnabled\) void options\(\)/);
   assert.match(panel,/GetSiteUnitSummaryOptions/);
-  assert.match(panel,/disabled=\{busy \|\| !ready \|\| su === 'None'\}/);
+  assert.match(panel,/disabled=\{busy \|\| preferenceBarrier \|\| !ready \|\| su === 'None'\}/);
   assert.match(panel,/ready = siteUnitType === 1/);
-  assert.doesNotMatch(panel,/<button[^>]*>Save|<button[^>]*>Export|localStorage/);
+  assert.match(panel,/VITE_SITE_UNIT_SUMMARY_PREFERENCES === 'true'/);
+  assert.doesNotMatch(panel,/<button[^>]*>Export|localStorage/);
 });
 test('saved summary options retain quartile initialization and unavailable source scopes',()=>{
   for (const siteUnitType of [1,2,3]) {
