@@ -33,7 +33,7 @@ func main() {
 	if _, err := siviFeature(siviIdentityFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
-	for _, name := range []string{siviDeletionWritingFeatureEnvironment, siviDeletionRestoringFeatureEnvironment} {
+	for _, name := range []string{siviDeletionWritingFeatureEnvironment, siviDeletionRestoringFeatureEnvironment, siviCreationUndoFeatureEnvironment} {
 		if _, err := siviFeature(name, os.LookupEnv); err != nil {
 			log.Fatal(err)
 		}
@@ -215,6 +215,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	siviCreationUndo, err := NewSIVICreationUndoService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	siviDeletion, err := NewSIVIDeletionService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -351,6 +355,7 @@ func main() {
 		application.NewService(siviSpecies),
 		application.NewService(siviIdentity),
 		application.NewService(siviCreation),
+		application.NewService(siviCreationUndo),
 		application.NewService(siviDeletion),
 		application.NewService(pictures),
 		application.NewService(pictureMetadata),

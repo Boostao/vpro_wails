@@ -37,7 +37,7 @@ function sameOriginal(value: unknown, request: SIVIDeletionRequest): boolean {
     equalCell(original.original.cells[index], request.original.cells[index]));
 }
 
-function auditText(column: ProjectMetadataColumn, cell: ProjectMetadataCell): string | null {
+export function siviSourceAuditText(column: ProjectMetadataColumn, cell: ProjectMetadataCell): string | null {
   if (cell.storage === 'null') return null;
   if (cell.storage === 'text') return cell.text;
   if (cell.storage === 'integer') {
@@ -81,7 +81,7 @@ export function siviDeletionReceiptFromWire(wire: unknown, request: SIVIDeletion
   if (wire.auditStrength === 3) {
     for (const [index, column] of request.columns.entries()) {
       if (['ID', 'PlotNumber'].includes(column.name)) continue;
-      const value = auditText(column, request.original.cells[index]);
+      const value = siviSourceAuditText(column, request.original.cells[index]);
       if (value !== null) expected.set(column.name, value);
     }
   }

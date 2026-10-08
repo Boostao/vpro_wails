@@ -8,19 +8,20 @@ const root = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
 const requestId = '00000000-0000-4000-8000-000000000001';
 function host(kind, overrides = {}) {
   return componentFunctions('FS882Form.svelte', ['siviLifecycleOperation', 'stageSIVILifecycle',
-    'refreshSIVIChildEditors', 'save', 'undo', 'getCloseState', 'load', 'toggleLock'], {
+    'refreshSIVIChildEditors', 'refreshSIVILifecycleLists', 'save', 'undo', 'getCloseState', 'load', 'toggleLock'], {
     busy: false, headerWorkflowBusy: false, siviLifecycleHostBusy: false, siviSourceAuthorityUnknown: false,
     siviDeletionEnabled: true, siviRestorationEnabled: true,
     siviDeletionRecoveryDisabled: false, siviRestorationRecoveryDisabled: false,
     siviDeletionEditingDisabled: false, siviRestorationEditingDisabled: false,
-    siviDeletionPending: kind === 'deletion', siviRestorationPending: kind === 'restoration',
+    siviDeletionPending: kind === 'deletion', siviRestorationPending: kind === 'restoration', siviCreationUndoPending: false,
     siviDeletionClose: { unsaved: true, busy: false, blocked: false, canSave: true, saveReason: '', error: null },
     siviRestorationClose: { unsaved: true, busy: false, blocked: false, canSave: true, saveReason: '', error: null },
-    siviDeletionSession: null, siviRestorationSession: null, siviCreationPending: false,
+    siviDeletionSession: null, siviRestorationSession: null, siviCreationUndoSession: null, siviCreationPending: false,
     siviSession: null, siviCoverSession: null, siviCombinedSession: null, siviCollectedSession: null,
     siviSpeciesSession: null, siviIdentitySession: null,
     twoPageOpen: false, environmentSUOpen: false, codeCheckOpen: false, metadataOpen: false,
     profileReviewBlocked: false, personalDraft: null, deletionReview: null, creationDraft: null,
+    pictureMetadataPending: false, siviParentSourceView: null,
     draft: { locked: false }, error: null, successMsg: null, capabilitiesReady: true,
     crypto: { randomUUID: () => requestId }, loadChildData: async () => {},
     ...overrides,
@@ -108,12 +109,24 @@ test('parent Undo delegates only to the retained known review; unknown authority
   }
 });
 
+test('known lifecycle review cannot mask pre-existing unknown parent source authority on native close', () => {
+  for (const kind of ['deletion', 'restoration']) {
+    const current = host(kind, { siviParentSourceView: { authorityUnknown: true, busy: false, error: 'Lost parent source receipt' } });
+    const close = current.actions.getCloseState();
+    assert.equal(close.blocked, true);
+    assert.equal(close.unsaved, true);
+    assert.equal(close.canSave, false);
+    assert.equal(close.error, 'Lost parent source receipt');
+    assert.match(close.saveReason, /observe the source preference outcome/);
+  }
+});
+
 test('recovery remains possible on a locked invalid parent while peers and host refresh prevent competition', () => {
   const state = { siviDeletionEnabled: true, siviRestorationEnabled: true,
     busy: false, siviLifecycleHostBusy: false, otherHeaderWorkflowBusy: false,
     siviDeletionClose: { busy: false }, siviRestorationClose: { busy: false },
     pictureBusy: false, pictureMetadataPending: false, siviCreationPeerUnsaved: false,
-    siviCreationPending: false, siviDeletionPending: false, siviRestorationPending: false,
+    siviCreationPending: false, siviDeletionPending: false, siviRestorationPending: false, siviCreationUndoPending: false,
     siviParentWriteUnsaved: false, siviParentActionUnsaved: false, siviProjectAssignmentUnsaved: false,
     siviParentSharedUnsaved: false, capabilitiesReady: false, draft: { locked: true },
     siviSourceBarrier: true, dirty: true, original: {}, personalDraft: null, headerValidation: { invalid: 'raw error' } };

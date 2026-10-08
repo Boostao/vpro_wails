@@ -17,7 +17,7 @@ function host(overrides = {}) {
     'siviCollectedOperation', 'cycleSIVICollected', 'showSIVICollectedPanel', 'refreshSIVIChildEditors', 'load',
   ], {
     ...Object.fromEntries(guards.map(name => [name, false])), pictureMetadataPending: false, siviCreationPending: false,
-    siviDeletionPending: false, siviRestorationPending: false,
+    siviDeletionPending: false, siviRestorationPending: false, siviCreationUndoPending: false,
     ...Object.fromEntries(peers.map(name => [name, null])),
     error: null, successMsg: null, siviCollectedEnabled: true, siviCollectedEditingDisabled: false,
     siviCollectedUnsaved: false, siviCollectedReading: false, siviCollectedPanelOpen: false,
@@ -49,7 +49,7 @@ test('Collected owns root Save Undo Lock close busy and every mutually exclusive
   assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviCollectedBusy/);
   assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
   assert.match(parent, /siviCreationPeerUnsaved = \$derived\([^\n]*\|\| siviCollectedUnsaved/);
-  assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending\)/);
+  assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending \|\| siviCreationUndoPending\)/);
   assert.match(parent, /if \(siviCollectedUnsaved\) \{ await siviCollectedOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviCollectedUnsaved\) \{ void siviCollectedOperation\('undo'\); return; \}/);
   assert.match(parent, /\|\| \(siviCollectedClose\?\.blocked \?\? false\)/);

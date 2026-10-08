@@ -1156,6 +1156,12 @@ export interface SIVICoverWriteResult {
 
 export type SIVICreationResult = siviCreationResult;
 
+export type SIVICreationUndoHistoryList = siviCreationUndoHistoryList;
+
+export type SIVICreationUndoResult = siviCreationUndoResult;
+
+export type SIVICreationUndoReview = siviCreationUndoReview;
+
 export type SIVIDeletionHistoryList = siviDeletionHistoryList;
 
 export type SIVIDeletionOriginal = siviDeletionOriginal;
@@ -2059,6 +2065,83 @@ export interface siviCreationResult {
     "request": siviCreationRequest;
     "didCommit": boolean;
     "replayed": boolean;
+}
+
+export interface siviCreationUndoHistoryEvent {
+    "historyId": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "species": string;
+    "actor": string;
+    "editWhen": string;
+    "undone": boolean;
+    "consumed": boolean;
+    "reviewAvailable": boolean;
+    "unavailableReason": string | null;
+}
+
+export interface siviCreationUndoHistoryList {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyPresent": boolean;
+    "events": siviCreationUndoHistoryEvent[] | null;
+}
+
+export interface siviCreationUndoRequest {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "action": AuditRestoreAction;
+    "expected": string;
+}
+
+export interface siviCreationUndoResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "expected": string;
+    "undoId": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "action": AuditRestoreAction;
+    "actor": string;
+    "auditStrength": number;
+    "editWhen": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "committed": ProjectMetadataRow;
+    "creation": siviCreationResult;
+    "request": siviCreationUndoRequest;
+    "auditColumns": ProjectMetadataColumn[] | null;
+    "auditsBefore": ProjectMetadataRow[] | null;
+    "auditsAfter": ProjectMetadataRow[] | null;
+    "cancelled": boolean;
+    "removedRows": number;
+    "prunedAuditRows": number;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface siviCreationUndoReview {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "expected": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "columns": ProjectMetadataColumn[] | null;
+    "committed": ProjectMetadataRow;
+    "creation": siviCreationResult;
+    "auditColumns": ProjectMetadataColumn[] | null;
+    "auditsBefore": ProjectMetadataRow[] | null;
 }
 
 export interface siviDeletionHistoryEvent {

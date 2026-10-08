@@ -41,6 +41,8 @@
   import SIVICreationPanel from './SIVICreationPanel.svelte';
   import SIVIDeletionPanel from './SIVIDeletionPanel.svelte';
   import SIVIDeletionRestorationPanel from './SIVIDeletionRestorationPanel.svelte';
+  import SIVICreationUndoPanel from './SIVICreationUndoPanel.svelte';
+  import { siviCreationUndoSession as ownedSIVICreationUndoSession } from './siviCreationUndoSessions';
   import { siviDeletionSession as ownedSIVIDeletionSession,
     siviDeletionRestorationSession as ownedSIVIRestorationSession } from './siviDeletionSessions';
   import { siviCreationSession as ownedSIVICreationSession } from './siviCreationSessions';
@@ -115,6 +117,7 @@
   const siviCreationEnabled = import.meta.env.VITE_SIVI_CREATION_WRITING === 'true';
   const siviDeletionEnabled = import.meta.env.VITE_SIVI_DELETION_WRITING === 'true';
   const siviRestorationEnabled = import.meta.env.VITE_SIVI_DELETION_RESTORING === 'true';
+  const siviCreationUndoEnabled = import.meta.env.VITE_SIVI_CREATION_UNDO === 'true';
   const pictureReadingEnabled = import.meta.env.VITE_PICTURE_READING === 'true';
   const siviChildSourceNoticesEnabled = import.meta.env.VITE_SIVI_CHILD_SOURCE_NOTICES === 'true';
   const siviParentReviewEnabled = import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
@@ -300,20 +303,28 @@
     ? ownedSIVIDeletionSession({ contextId: siviContextId, project: $projectState.activeProject, plot: original.plotNumber }) : undefined);
   const siviRestorationSession = $derived.by(() => siviRestorationEnabled && siviContextId && $projectState?.activeProject && original?.plotNumber
     ? ownedSIVIRestorationSession({ contextId: siviContextId, project: $projectState.activeProject, plot: original.plotNumber }) : undefined);
+  const siviCreationUndoSession = $derived.by(() => siviCreationUndoEnabled && siviContextId && $projectState?.activeProject && original?.plotNumber
+    ? ownedSIVICreationUndoSession({ contextId: siviContextId, project: $projectState.activeProject, plot: original.plotNumber }) : undefined);
   let siviDeletionRevision = $state(0);
   let siviRestorationRevision = $state(0);
+  let siviCreationUndoRevision = $state(0);
   let siviLifecycleHostBusy = $state(false);
   $effect(() => siviDeletionSession?.subscribe(() => untrack(() => siviDeletionRevision++)));
   $effect(() => siviRestorationSession?.subscribe(() => untrack(() => siviRestorationRevision++)));
+  $effect(() => siviCreationUndoSession?.subscribe(() => untrack(() => siviCreationUndoRevision++)));
   const siviDeletionView = $derived.by(() => { siviDeletionRevision; return siviDeletionSession?.view(); });
   const siviDeletionClose = $derived.by(() => { siviDeletionRevision; return siviDeletionSession?.closeState(); });
   const siviRestorationView = $derived.by(() => { siviRestorationRevision; return siviRestorationSession?.view(); });
   const siviRestorationClose = $derived.by(() => { siviRestorationRevision; return siviRestorationSession?.closeState(); });
+  const siviCreationUndoView = $derived.by(() => { siviCreationUndoRevision; return siviCreationUndoSession?.view(); });
+  const siviCreationUndoClose = $derived.by(() => { siviCreationUndoRevision; return siviCreationUndoSession?.closeState(); });
   const siviDeletionPending = $derived(!!siviDeletionClose &&
     (siviDeletionClose.unsaved || siviDeletionClose.blocked || siviDeletionClose.busy));
   const siviRestorationPending = $derived(!!siviRestorationClose &&
     (siviRestorationClose.unsaved || siviRestorationClose.blocked || siviRestorationClose.busy));
-  const siviLifecycleBusy = $derived(siviLifecycleHostBusy || (siviDeletionClose?.busy ?? false) || (siviRestorationClose?.busy ?? false));
+  const siviCreationUndoPending = $derived(!!siviCreationUndoClose &&
+    (siviCreationUndoClose.unsaved || siviCreationUndoClose.blocked || siviCreationUndoClose.busy));
+  const siviLifecycleBusy = $derived(siviLifecycleHostBusy || (siviDeletionClose?.busy ?? false) || (siviRestorationClose?.busy ?? false) || (siviCreationUndoClose?.busy ?? false));
   const siviRestorationTargets = $derived((siviRestorationView?.history?.events ?? []).map(event => ({
     historyId: event.historyId, restored: event.consumed,
     label: `${event.form}; Species ${event.species === null ? 'NULL' : event.species === '' ? '(empty text)' : event.species}; application ID ${event.id}; physical row ${event.rowId}; ${event.editWhen}`,
@@ -393,7 +404,7 @@
   const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
   const siviCreationPeerUnsaved = $derived(heightUnsaved || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || environmentSUOpen);
-  const nonParentChildUnsaved = $derived(siviCreationPeerUnsaved || siviCreationPending || siviDeletionPending || siviRestorationPending);
+  const nonParentChildUnsaved = $derived(siviCreationPeerUnsaved || siviCreationPending || siviDeletionPending || siviRestorationPending || siviCreationUndoPending);
   const childUnsaved = $derived(nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || twoPageOpen);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
@@ -661,17 +672,23 @@
 
   let original = $state<FS882Header | null>(null);
   const headerInputsDisabled = $derived(draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved || pictureBusy || pictureMetadataPending);
-  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || siviSourceBarrier || dirty || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || siviCreationPending || siviDeletionPending || siviRestorationPending);
+  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || siviSourceBarrier || dirty || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || siviCreationPending || siviDeletionPending || siviRestorationPending || siviCreationUndoPending);
   const siviCreationRecoveryDisabled = $derived(!siviCreationEnabled || busy || siviCreationHostBusy || otherHeaderWorkflowBusy && !(siviCreationClose?.busy ?? false) ||
-    pictureBusy || pictureMetadataPending || siviCreationPeerUnsaved || siviDeletionPending || siviRestorationPending || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved);
+    pictureBusy || pictureMetadataPending || siviCreationPeerUnsaved || siviDeletionPending || siviRestorationPending || siviCreationUndoPending || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved);
   const siviDeletionRecoveryDisabled = $derived(!siviDeletionEnabled || busy || siviLifecycleHostBusy ||
     otherHeaderWorkflowBusy && !(siviDeletionClose?.busy ?? false) || pictureBusy || pictureMetadataPending ||
-    siviCreationPeerUnsaved || siviCreationPending || siviRestorationPending ||
+    siviCreationPeerUnsaved || siviCreationPending || siviRestorationPending || siviCreationUndoPending ||
     siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved);
   const siviRestorationRecoveryDisabled = $derived(!siviRestorationEnabled || busy || siviLifecycleHostBusy ||
     otherHeaderWorkflowBusy && !(siviRestorationClose?.busy ?? false) || pictureBusy || pictureMetadataPending ||
-    siviCreationPeerUnsaved || siviCreationPending || siviDeletionPending ||
+    siviCreationPeerUnsaved || siviCreationPending || siviDeletionPending || siviCreationUndoPending ||
     siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved);
+  const siviCreationUndoRecoveryDisabled = $derived(!siviCreationUndoEnabled || busy || siviLifecycleHostBusy ||
+    otherHeaderWorkflowBusy && !(siviCreationUndoClose?.busy ?? false) || pictureBusy || pictureMetadataPending ||
+    siviCreationPeerUnsaved || siviCreationPending || siviDeletionPending || siviRestorationPending ||
+    siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved);
+  const siviCreationUndoEditingDisabled = $derived(siviCreationUndoRecoveryDisabled || !capabilitiesReady || draft.locked || siviSourceBarrier ||
+    dirty || original === null || personalDraft !== null || Object.keys(headerValidation).length > 0);
   const siviDeletionEditingDisabled = $derived(siviDeletionRecoveryDisabled || !capabilitiesReady || draft.locked || siviSourceBarrier ||
     dirty || original === null || personalDraft !== null || Object.keys(headerValidation).length > 0);
   const siviRestorationEditingDisabled = $derived(siviRestorationRecoveryDisabled || !capabilitiesReady || draft.locked || siviSourceBarrier ||
@@ -1013,9 +1030,9 @@
     }
   }
 
-  async function refreshSIVIChildEditors(plot: string, owner: 'height' | 'cover' | 'combined' | 'collected' | 'species' | 'identity' | 'creation' | 'deletion' | 'restoration'): Promise<void> {
+  async function refreshSIVIChildEditors(plot: string, owner: 'height' | 'cover' | 'combined' | 'collected' | 'species' | 'identity' | 'creation' | 'deletion' | 'restoration' | 'creationUndo'): Promise<void> {
     if (owner !== 'creation' && siviCreationPending || owner !== 'deletion' && siviDeletionPending ||
-      owner !== 'restoration' && siviRestorationPending) {
+      owner !== 'restoration' && siviRestorationPending || owner !== 'creationUndo' && siviCreationUndoPending) {
       throw new Error('SIVI lifecycle peer owns an unresolved review; no peer originals were reset.');
     }
     const peers = [owner !== 'height' ? siviSession : null, owner !== 'cover' ? siviCoverSession : null,
@@ -1033,6 +1050,15 @@
         throw new Error('SIVI peer originals failed to refresh; reload explicitly before continuing.');
       }
     }
+  }
+
+  async function refreshSIVILifecycleLists(owner: 'creation' | 'deletion' | 'restoration' | 'creationUndo'): Promise<void> {
+    if (siviDeletionSession && (owner === 'deletion' || siviDeletionSession.view().targets !== null) &&
+      !await siviDeletionSession.loadTargets()) throw new Error('Reload deletion source targets explicitly.');
+    if (siviRestorationSession && (owner === 'restoration' || siviRestorationSession.view().history !== null) &&
+      !await siviRestorationSession.loadHistory()) throw new Error('Reload owned deletion history explicitly.');
+    if (siviCreationUndoSession && (owner === 'creationUndo' || siviCreationUndoSession.view().history !== null) &&
+      !await siviCreationUndoSession.loadHistory()) throw new Error('Reload owned creation Undo history explicitly.');
   }
 
   async function siviCreationOperation(operation: 'load' | 'start' | 'save' | 'undo' | 'resolve' | 'cancel', form?: SIVICreationForm): Promise<boolean> {
@@ -1060,13 +1086,15 @@
         if (!receipt || session !== siviCreationSession) throw new Error('The verified creation owner changed before peer refresh.');
         siviCreationHostBusy = true;
         await refreshSIVIChildEditors(receipt.plot, 'creation');
+        await refreshSIVILifecycleLists('creation');
         successMsg = `SIVI creation ${receipt.id} verified; ${receipt.replayed ? 'read-only resolution, no mutation repeated' : 'one row committed'}.`;
       }
       return true;
     } catch (cause) {
-      error = session.view().revision > revision
-        ? `SIVI creation is already verified; peer refresh failed. Reload originals without repeating Create: ${String(cause)}`
-        : `SIVI creation operation failed; retained owner state unchanged: ${String(cause)}`;
+      if (session.view().revision > revision) {
+        capabilitiesReady = false;
+        error = `SIVI creation is already verified; peer refresh failed. Reload originals without repeating Create: ${String(cause)}`;
+      } else error = `SIVI creation operation failed; retained owner state unchanged: ${String(cause)}`;
       return false;
     } finally { siviCreationHostBusy = false; }
   }
@@ -1119,8 +1147,7 @@
         }
         siviLifecycleHostBusy = true;
         await refreshSIVIChildEditors(receipt.plot, kind);
-        if (siviDeletionSession && !await siviDeletionSession.loadTargets()) throw new Error('Reload deletion source targets explicitly.');
-        if (siviRestorationSession && !await siviRestorationSession.loadHistory()) throw new Error('Reload owned deletion history explicitly.');
+        await refreshSIVILifecycleLists(kind);
         successMsg = `SIVI ${kind} ${receipt.id} verified; ${receipt.replayed ? 'read-only resolution, no mutation repeated' : 'one exact physical row committed'}.`;
       } else throw new Error('Unsupported source lifecycle operation; no action was inferred.');
       return true;
@@ -1147,6 +1174,57 @@
       }
       successMsg = null;
     } catch (cause) { error = `SIVI ${kind} confirmation failed; retained review unchanged: ${String(cause)}`; }
+  }
+
+  async function siviCreationUndoOperation(operation: 'history' | 'review' | 'undo' | 'discard' | 'resolve' | 'cancel',
+    historyId?: string): Promise<boolean> {
+    const session = siviCreationUndoSession;
+    if (!session || !siviCreationUndoEnabled) { error = 'SIVI creation Undo is unavailable for this owned parent.'; return false; }
+    if (operation === 'cancel') { session.cancel(); return true; }
+    if (siviCreationUndoRecoveryDisabled || operation !== 'discard' && operation !== 'resolve' && siviCreationUndoEditingDisabled) {
+      error = 'SIVI creation Undo requires its clean available owner and no conflicting drafts or operation.';
+      return false;
+    }
+    const revision = session.view().revision;
+    error = null;
+    successMsg = null;
+    try {
+      if (operation === 'discard') session.discard();
+      else if (operation === 'history') {
+        if (!await session.loadHistory()) { error = session.view().error; return false; }
+      } else if (operation === 'review') {
+        if (!historyId) throw new Error('Choose an explicit available owned historical creation.');
+        if (!await session.review(historyId)) { error = session.view().error; return false; }
+      } else {
+        if (!await (operation === 'undo' ? session.undo(crypto.randomUUID()) : session.resolve())) {
+          error = session.view().error;
+          return false;
+        }
+        const receipt = session.view().receipt;
+        if (!receipt || session !== siviCreationUndoSession) throw new Error('The verified creation Undo owner changed before peer refresh.');
+        siviLifecycleHostBusy = true;
+        await refreshSIVIChildEditors(receipt.plot, 'creationUndo');
+        await refreshSIVILifecycleLists('creationUndo');
+        successMsg = `SIVI creation Undo ${receipt.id} verified; ${receipt.replayed ? 'read-only resolution, no mutation repeated' : 'one exact created row removed'}.`;
+      }
+      return true;
+    } catch (cause) {
+      if (session.view().revision > revision) {
+        capabilitiesReady = false;
+        error = `SIVI creation Undo is already verified; source refresh failed. Reload the owned plot without repeating Undo: ${String(cause)}`;
+      } else error = `SIVI creation Undo failed; retained owner state unchanged: ${String(cause)}`;
+      return false;
+    } finally { siviLifecycleHostBusy = false; }
+  }
+
+  function stageSIVICreationUndo(confirmed: boolean, action?: 'retain' | 'prune') {
+    try {
+      if (!siviCreationUndoSession || siviCreationUndoEditingDisabled) throw new Error('Unlock the clean owned parent before confirming creation Undo.');
+      if (action) siviCreationUndoSession.choose(action);
+      else siviCreationUndoSession.confirm(confirmed);
+      error = siviCreationUndoSession.view().error;
+      successMsg = null;
+    } catch (cause) { error = `SIVI creation Undo confirmation failed; retained review unchanged: ${String(cause)}`; }
   }
 
   function stageSIVICoverCell(rowId: string, column: SIVICoverColumn, raw: string, nullValue: boolean) {
@@ -1555,8 +1633,8 @@
   }
 
   async function load(p?: string) {
-    if (siviDeletionPending || siviRestorationPending) {
-      error = 'Finish the source deletion/restoration review or resolve its exact retained request before replacing the plot owner.';
+    if (siviDeletionPending || siviRestorationPending || siviCreationUndoPending) {
+      error = 'Finish the source deletion/restoration/creation Undo review or resolve its exact retained request before replacing the plot owner.';
       return;
     }
     if (siviCreationPending) {
@@ -2815,8 +2893,8 @@
       error = 'Wait for the current operation to finish before saving.';
       return;
     }
-    if (siviDeletionPending || siviRestorationPending) {
-      error = 'Confirm deletion/restoration explicitly in its reviewed panel or Undo the unsubmitted review; ordinary Save never performs it.';
+    if (siviDeletionPending || siviRestorationPending || siviCreationUndoPending) {
+      error = 'Confirm deletion/restoration/creation Undo explicitly in its reviewed panel or discard the unsubmitted review; ordinary Save never performs it.';
       return;
     }
     if (codeCheckOpen) { error = 'Save replacements or personal metadata explicitly, then close species-code review; ordinary plot Save never applies them.'; return; }
@@ -2883,10 +2961,6 @@
   }
 
   export function getCloseState(): EditorCloseState {
-    const lifecycle = siviDeletionPending ? siviDeletionClose : siviRestorationPending ? siviRestorationClose : null;
-    if (lifecycle) return { ...lifecycle, canSave: false, busy: busy || headerWorkflowBusy || lifecycle.busy,
-      saveReason: lifecycle.blocked || lifecycle.busy ? lifecycle.saveReason
-        : 'Finish source deletion/restoration explicitly or Undo its unsubmitted review before parent Save, Lock or close.' };
     if (pictureMetadataPending && pictureMetadataClose) return {
       ...pictureMetadataClose, canSave: false,
       saveReason: pictureMetadataClose.blocked || pictureMetadataClose.busy ? pictureMetadataClose.saveReason
@@ -2897,6 +2971,12 @@
       saveReason: 'Reload owned ProjectID choices to observe the source preference outcome before saving or closing.',
       error: siviParentSourceView.error ?? 'ProjectID source preference outcome is unknown.',
     };
+    const lifecycle = siviCreationUndoPending && siviCreationUndoClose?.blocked ? siviCreationUndoClose
+      : siviDeletionPending ? siviDeletionClose : siviRestorationPending ? siviRestorationClose
+      : siviCreationUndoPending ? siviCreationUndoClose : null;
+    if (lifecycle) return { ...lifecycle, canSave: false, busy: busy || headerWorkflowBusy || lifecycle.busy,
+      saveReason: lifecycle.blocked || lifecycle.busy ? lifecycle.saveReason
+        : 'Finish source deletion/restoration/creation Undo explicitly or discard its unsubmitted review before parent Save, Lock or close.' };
     if (twoPageOpen) return twoPageEditor?.getCloseState() ?? {
       unsaved: true, busy: true, blocked: true, canSave: false, error,
       saveReason: 'Wait for two-page field review, then finish and close it explicitly.',
@@ -2980,6 +3060,7 @@
     if (creationDraft !== null) { void cancelVegetationCreation(); return; }
     if (siviDeletionPending) { void siviLifecycleOperation('deletion', 'undo'); return; }
     if (siviRestorationPending) { void siviLifecycleOperation('restoration', 'undo'); return; }
+    if (siviCreationUndoPending) { void siviCreationUndoOperation('discard'); return; }
     if (siviCreationPending) { void siviCreationOperation('undo'); return; }
     if (siviParentActionUnsaved) { void siviParentActionOperation('undo'); return; }
     if (siviProjectAssignmentUnsaved) { void siviProjectAssignmentOperation('undo'); return; }
@@ -3010,8 +3091,8 @@
   }
 
   async function toggleLock() {
-    if (siviDeletionPending || siviRestorationPending) {
-      error = 'Finish or resolve source deletion/restoration before changing the plot lock.';
+    if (siviDeletionPending || siviRestorationPending || siviCreationUndoPending) {
+      error = 'Finish or resolve source deletion/restoration/creation Undo before changing the plot lock.';
       return;
     }
     if (siviSourceAuthorityUnknown) {
@@ -3731,6 +3812,14 @@
           onchoose={action => stageSIVILifecycle('restoration', false, action)}
           onconfirm={confirmed => stageSIVILifecycle('restoration', confirmed)}
           onoperation={operation => void siviLifecycleOperation('restoration', operation)} />
+      {/if}
+      {#if siviCreationUndoEnabled && siviCreationUndoView && siviCreationUndoClose}
+        <SIVICreationUndoPanel view={siviCreationUndoView} close={siviCreationUndoClose}
+          disabled={siviCreationUndoEditingDisabled} recoveryDisabled={siviCreationUndoRecoveryDisabled}
+          onreview={historyId => void siviCreationUndoOperation('review', historyId)}
+          onchoose={action => stageSIVICreationUndo(false, action)}
+          onconfirm={confirmed => stageSIVICreationUndo(confirmed)}
+          onoperation={operation => void siviCreationUndoOperation(operation)} />
       {/if}
       {#if siviCreationEnabled && siviCreationSession && siviCreationView && siviCreationClose}
         <SIVICreationPanel view={siviCreationView} close={siviCreationClose}

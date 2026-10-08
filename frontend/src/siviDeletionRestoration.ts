@@ -86,6 +86,8 @@ function auditTable(columns: unknown, rows: unknown): Table {
     table.columns.some(column => !auditNames.includes(column.name))) throw new Error('Restoration audit schema differs from the complete source table.');
   return table;
 }
+export { sameColumns as sameSIVIHistoricalColumns, sameRow as sameSIVIHistoricalRow,
+  auditTable as siviHistoricalAuditTable };
 function validateAuditBefore(table: Table, deletion: SIVIDeletionReceipt) {
   if (table.rows.length !== deletion.audits.length) throw new Error('Restoration audit evidence is incomplete.');
   const seen = new Set<string>();

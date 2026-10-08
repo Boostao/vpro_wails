@@ -316,7 +316,65 @@ pitfall: copying immutable baseline file attributes made the disposable project
 read-only. Its failed attempt/profile are preserved separately. Restoration now
 copies bytes without inheriting baseline attributes and checks the exact
 candidate's write attribute while closed; baseline/canonical attributes are never changed.
-Deletion/historical restoration and default promotion are not granted.
+This creation checkpoint does not certify the separately gated deletion/
+restoration successor below or default promotion.
+
+### Historical creation Undo draft
+
+This is a desktop safety adaptation, not `RestoreAuditRecords` or destructive
+`CleanVegPlot` parity. The independently reviewed private kernel binds a strict
+seven-property request (`requestId`, `contextId`, `project`, `plot`, `historyId`,
+`action`, `expected`) to immutable creation evidence through SHA256 CAS inside
+the transaction. Retain/prune removes only the exact current created physical
+row and all44 unchanged cells; permanent logical reservations remain. Only exact
+creation audit rows change, including explicitly permitted `_Veg`/project table
+aliases. Separate immutable unique-creation Undo history records one winner even
+when no source audits were emitted. Cancel is read-only and does not consume
+creation history. Missing receipt remains unresolved; lookup never retries Undo.
+
+The13-property review carries `committed` and `creation`, rather than deletion's
+`original` and `deletion`. The26-property receipt carries `undoId`, `removedRows`
+and complete before/after audit evidence; it does not claim a restored row.
+Coherent immutable empty-cover historical creation can authorize an orphan row;
+clearing covers after ordinary creation cannot. The accepted creation writer
+still requires source membership and does not generate that historical case.
+
+Independent private-kernel review found no significant issues.14 new tests and
+coupled creation/deletion race-vet453.869s pass. Owned history discovery plus
+independently default-off `VPRO_SIVI_CREATION_UNDO` exposes four actual methods:
+GetHistory, Review, Undo, LookupReceipt. Global canonical creation/Undo history
+validation precedes owner filtering; missing history differs from an existing
+empty table, and consumption is historical fact, not current eligibility.
+Six facade/history race-vet tests9.114s, production compile and actual production
+interface bindings pass. Historical events have11 properties, including
+`reviewAvailable` and nullable `unavailableReason`: coherent legacy non-UUID
+creation IDs remain visible unavailable, while UUID events can request fresh
+review only when unconsumed. This is not current physical eligibility. Shared
+history parsing preserves Go UTF8 lexical ordering for valid Unicode legacy IDs.
+Strict frontend producers reuse existing historical-row/audit validators and Go
+numeric formatting. Persistent sessions/panel and independently default-off
+`VITE_SIVI_CREATION_UNDO` root integration now pass119 focused/949 complete tests,
+check0/0/isolated enabled/default actual-main builds. Known reviews block parent
+editing, Save, Lock, replacement and implicit Save-and-close; parent Undo discards
+only known unsubmitted reviews. Unknown requests retain their exact identity and
+resolve read-only. Child peers/loaded histories refresh under a host barrier;
+postcommit refresh failure disables editing and forbids mutation replay.
+Independent facade/transport/session review is clean. Actual disposable Wails
+exposed an unloaded optional-peer refresh crossing an independently disabled
+backend after read-only delivery recovery. The root now shares owner/loaded-peer
+list refresh across Create/Delete/Restore/creation Undo, preserving empty loaded
+lists and explicit failures for previously loaded peers.30 targeted/952 complete
+frontend tests/check0/0 and corrected isolated builds pass; both pre-fix owners
+normally closed/all16/22 restored, with closed evidence preserved. Corrected
+native work completes eight normal/two delivery cycles and independent
+default/backend-off/undo-only denial modes across five normally closed/restored
+owners. Explicit pre-Undo physical evidence is retained every cycle; recovered
+editing/consumed history no longer depend on initializing unavailable peers.
+Independent integration/evidence review reports no significant issues after
+actual raw/audit/history/candidate/closure hash checks. Full Go race passes
+root2423.962s/all packages/EXIT0 against597 unchanged Go files; corrected frontend
+was separately validated during that Go-only proof. Distinct successor sealing
+is separate; no default promotion or overall migration completion is claimed.
 
 ### Source-scoped deletion and typed restoration desktop successor
 
@@ -372,8 +430,22 @@ actual1400/600px client widths. All16 prepared identities restore and22 protecte
 identities remain unchanged. Closed committed data/profiles are retained.
 Independent native-evidence review found no significant issues and reproduced
 closed-history integrity/identity/asset checks. Fresh full integration race passes
-root2206.226s/all packages with970 frozen application identities/592 Go files,
-ready for successor sealing, not complete combined-form/default acceptance.
+root2206.226s/all packages. The independently verified2179-file
+[desktop checkpoint](../archives/_sivi-deletion-desktop-checkpoint/evidence-manifest.json)
+preserves970 source identities/592 Go files; manifest SHA256
+`578085021c4a4a9eddf18c5058e8d882c208e4543b4f5e1d13601e560b20139c`.
+Never replay its mutations or reseal it.
+
+A two-source close-priority correction keeps pre-existing unknown parent source
+authority above a known lifecycle review.75 focused/899 complete frontend tests,
+check0/0 and isolated builds pass. One further normally closed read-only native
+owner verifies four known reviewed rows cannot Save-and-close, plus1400/600px
+labels/containment; all16 prepared/22 protected identities stay unchanged.
+Composite unknown-parent priority is an executed actual-root fast regression,
+not an injected native source claim. The592 Go files remain identical to the
+full-race predecessor. [56-file priority checkpoint](../archives/_sivi-deletion-close-priority-checkpoint/evidence-manifest.json)
+has SHA256 `f743145db338b172f95bcec39d9d8880e5a356d3904eccff0b25706bed7aa742`.
+This is not complete combined-form/default acceptance.
 Eight shared real-audit fixtures verify the actual Go producer and frontend
 consumer, including different scientific-format thresholds and signed zero.
 The restoration request must carry an exact SHA256 review token, rechecked
