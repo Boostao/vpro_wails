@@ -29,11 +29,16 @@ type siviProjectAssignmentPlan struct {
 
 func planSIVIProjectAssignment(ctx context.Context, contextID, project, plot string, env, admin ProjectMetadataTable,
 	choices SIVIProjectChoices, selection siviProjectSelection) (*siviProjectAssignmentPlan, error) {
+	return planSourceProjectAssignment(ctx, "form:frmSIVIsite/ProjectID", contextID, project, plot, env, admin, choices, selection)
+}
+
+func planSourceProjectAssignment(ctx context.Context, controlID, contextID, project, plot string, env, admin ProjectMetadataTable,
+	choices SIVIProjectChoices, selection siviProjectSelection) (*siviProjectAssignmentPlan, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if choices.ContextID != contextID || choices.Project != project || selection.ContextID != contextID ||
-		selection.ControlID != "form:frmSIVIsite/ProjectID" || selection.SourceOption != choices.SourceOption ||
+	if controlID == "" || choices.ContextID != contextID || choices.Project != project || selection.ContextID != contextID ||
+		selection.ControlID != controlID || selection.SourceOption != choices.SourceOption ||
 		selection.MetadataAlias != choices.Alias || selection.MetadataTable != choices.Table {
 		return nil, errors.New("SIVI ProjectID selection changed its owned source, preference or control identity")
 	}

@@ -69,6 +69,10 @@ func planSIVIParentSourceCells(ctx context.Context, contextID, project, plot str
 	if err != nil {
 		return nil, err
 	}
+	return planProjectedParentCells(ctx, contextID, project, parent, edits, owners, implicit, validate)
+}
+
+func planProjectedParentCells(ctx context.Context, contextID, project string, parent *siviParentProjection, edits []siviParentScalarEdit, owners map[string]string, implicit map[string]bool, validate func(string, ProjectMetadataCell) error) ([]siviParentScalarAssignment, error) {
 	if len(parent.Rows) != 1 {
 		return nil, errors.New("SIVI parent planning requires one unambiguous physical Env/Admin pair")
 	}
@@ -127,10 +131,12 @@ func planSIVIParentSourceCells(ctx context.Context, contextID, project, plot str
 
 func planSIVIParentOptions(ctx context.Context, contextID, project, plot string, env, admin ProjectMetadataTable, edits []siviParentScalarEdit) ([]siviParentScalarAssignment, error) {
 	owners := map[string]string{"SV_StandAgeEstMeas": "Env", "SV_StandHeightEstMeas": "Env"}
-	return planSIVIParentCells(ctx, contextID, project, plot, env, admin, edits, owners, func(column string, value ProjectMetadataCell) error {
-		if value.Storage != "null" && (value.Storage != "text" || value.Text == nil || (*value.Text != "1" && *value.Text != "2")) {
-			return fmt.Errorf("SIVI %s requires explicit NULL or source option TEXT1/2", column)
-		}
-		return nil
-	})
+	return planSIVIParentCells(ctx, contextID, project, plot, env, admin, edits, owners, validateSIVIParentOption)
+}
+
+func validateSIVIParentOption(column string, value ProjectMetadataCell) error {
+	if value.Storage != "null" && (value.Storage != "text" || value.Text == nil || (*value.Text != "1" && *value.Text != "2")) {
+		return fmt.Errorf("SIVI %s requires explicit NULL or source option TEXT1/2", column)
+	}
+	return nil
 }

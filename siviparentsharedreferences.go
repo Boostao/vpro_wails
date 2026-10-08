@@ -163,6 +163,30 @@ func readSIVISharedFamilyReference(ctx context.Context, tx *sql.Tx, alias, list 
 	return result, nil
 }
 
+func projectSIVIReferenceCatalogue(result *SIVIParentSharedReference, field siviParentSharedReferencePolicy, rows []listcatalog.Choice) error {
+	if len(rows) == 0 {
+		return fmt.Errorf("borrowed %s catalogue is empty", field.list)
+	}
+	result.Definitions = siviReferenceDefinitions(rows)
+	for _, row := range rows {
+		choice := SIVIParentSharedReferenceChoice{RowID: row.RowID, Code: row.Code, Description: row.Description}
+		if row.ListName == nil || *row.ListName != field.list || row.Code == nil {
+			choice.Diagnostic = "Item is NULL or belongs to another list"
+		} else if !row.Selectable {
+			choice.Diagnostic = row.Diagnostic
+			if choice.Diagnostic == "" {
+				choice.Diagnostic = "Item is not selectable in the verified source catalogue"
+			}
+		} else if err := validateSiteCodeText(field.column, row.Code, field.maximum); err != nil {
+			choice.Diagnostic = err.Error()
+		} else {
+			choice.Selectable = true
+		}
+		result.Choices = append(result.Choices, choice)
+	}
+	return nil
+}
+
 func (s *SIVIParentSharedService) readReference(ctx context.Context, tx *sql.Tx, alias string, field siviParentSharedReferencePolicy, zone ProjectMetadataCell) (SIVIParentSharedReference, error) {
 	result := SIVIParentSharedReference{Column: field.column, ListName: field.list, Required: field.required,
 		Source: "frozen-DAO-catalogue; source-ordinal identities", Definitions: ProjectMetadataTable{Columns: []ProjectMetadataColumn{}, Rows: []ProjectMetadataRow{}},
@@ -288,25 +312,8 @@ func (s *SIVIParentSharedService) readReference(ctx context.Context, tx *sql.Tx,
 		return result, errors.New("unknown SIVI reference reader")
 	}
 	if field.reader != "family" && field.reader != "bec" {
-		if len(rows) == 0 {
-			return result, fmt.Errorf("borrowed %s catalogue is empty", field.list)
-		}
-		result.Definitions = siviReferenceDefinitions(rows)
-		for _, row := range rows {
-			choice := SIVIParentSharedReferenceChoice{RowID: row.RowID, Code: row.Code, Description: row.Description}
-			if row.ListName == nil || *row.ListName != field.list || row.Code == nil {
-				choice.Diagnostic = "Item is NULL or belongs to another list"
-			} else if !row.Selectable {
-				choice.Diagnostic = row.Diagnostic
-				if choice.Diagnostic == "" {
-					choice.Diagnostic = "Item is not selectable in the verified source catalogue"
-				}
-			} else if err := validateSiteCodeText(field.column, row.Code, field.maximum); err != nil {
-				choice.Diagnostic = err.Error()
-			} else {
-				choice.Selectable = true
-			}
-			result.Choices = append(result.Choices, choice)
+		if err := projectSIVIReferenceCatalogue(&result, field, rows); err != nil {
+			return result, err
 		}
 	}
 	result.Available = true

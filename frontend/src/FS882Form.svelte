@@ -47,12 +47,19 @@
   import PersonalSpeciesFields from './PersonalSpeciesFields.svelte';
   import SpeciesCodeCheck from './SpeciesCodeCheck.svelte';
   import ProjectMetadataEditor from './ProjectMetadataEditor.svelte';
+  import TwoPageParentEditor from './TwoPageParentEditor.svelte';
+  import TwoPageParentCommonEditor from './TwoPageParentCommonEditor.svelte';
+  import TwoPageEntryEditor from './TwoPageEntryEditor.svelte';
+  import type { TwoPageEntrySessionCache } from './twoPageEntrySession';
+  import type { TwoPageParentSessionCache } from './twoPageParentSession';
+  import type { TwoPageParentCommonSessionCache } from './twoPageParentCommonSession';
+  import type { TwoPageEntryChild } from './twoPageEntryProjection';
   import EnvironmentSUTransfer from './EnvironmentSUTransfer.svelte';
   import ProjectPlotProfileReview from './ProjectPlotProfileReview.svelte';
   import { navigateSourceEnter } from './enterNavigation';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
   import { projectState } from './state';
-  import { embeddedForm, paperChild, type VegetationMode } from './paperLayout';
+  import { embeddedForm, paperChild, type VegetationMode, type PaperControl } from './paperLayout';
   import { controlLabel } from './formPresentation';
   import type { EditorCloseState } from './closeLifecycle';
   import { heightField, stageHeight, heightDirty, heightErrors, heightSourceNotices, aCoverSourceNotice, aCoverSourceNotices, heightUpdates, vegetationNumberUpdates, type HeightDrafts } from './heightEditor';
@@ -201,6 +208,19 @@
   }
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
+  const twoPageReviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW === 'true';
+  const twoPageSourceLayoutEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT === 'true';
+  const twoPageCommonReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW === 'true';
+  const twoPageEntryReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW === 'true';
+  let twoPageOpen = $state(false);
+  let twoPageScope = $state<'extra' | 'common' | 'entry'>('extra');
+  let twoPageBusy = $state(false);
+  let twoPageProject = $state<string | null>(null);
+  const twoPageSessions: TwoPageParentSessionCache = new Map();
+  const twoPageCommonSessions: TwoPageParentCommonSessionCache = new Map();
+  const twoPageEntrySessions: TwoPageEntrySessionCache = new Map();
+  let twoPageRevision = $state(0);
+  let twoPageEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   const environmentSUEnabled = import.meta.env.VITE_SOURCE_ENV_SU_TRANSFER === 'true';
   const siteUnitEnvironmentEnabled = import.meta.env.VITE_SOURCE_SU_ENV_TRANSFER === 'true';
   let environmentSUOpen = $state(false);
@@ -218,7 +238,7 @@
   let profileReviewBlocked = $state(false);
   let profileEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCoverBusy);
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || twoPageOpen || twoPageBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCoverBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -261,7 +281,7 @@
   const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
   const nonParentChildUnsaved = $derived(heightUnsaved || siviUnsaved || siviCoverUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || environmentSUOpen);
-  const childUnsaved = $derived(nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved);
+  const childUnsaved = $derived(nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || twoPageOpen);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -273,6 +293,9 @@
   let childCapabilities = $state<Record<ChildKind, Record<string, boolean | undefined>>>({ Veg: {}, Humus: {}, Mineral: {}, Other: {} });
   let loadRequest = 0;
   onDestroy(() => {
+    for (const variants of twoPageSessions.values()) for (const owned of variants.values()) owned.dispose();
+    for (const variants of twoPageCommonSessions.values()) for (const owned of variants.values()) owned.dispose();
+    for (const variants of twoPageEntrySessions.values()) for (const owned of variants.values()) owned.dispose();
     siviParentSession?.dispose();
     siviParentSourceSession?.dispose();
     siviParentWriteSession?.dispose();
@@ -887,6 +910,54 @@
       return;
     }
     metadataOpen = true; error = null; successMsg = null;
+  }
+
+  function openTwoPageReview() {
+    const project = $projectState?.activeProject;
+    if (!project || $projectState?.contextId !== siviContextId || !twoPageReviewEnabled || siviStandalone || childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0) {
+      error = 'Finish or Undo existing drafts and unlock the available plot before reviewing two-page additional fields.';
+      return;
+    }
+    twoPageScope = 'extra';
+    twoPageProject = project; twoPageOpen = true; error = null; successMsg = null;
+  }
+
+  function openTwoPageCommonReview() {
+    if (twoPageOpen) {
+      error = 'Finish and close the current two-page field review before changing its scope.';
+      return;
+    }
+    if (!twoPageCommonReviewEnabled) {
+      error = 'Two-page common-field review is independently disabled.';
+      return;
+    }
+    openTwoPageReview();
+    if (twoPageOpen) twoPageScope = 'common';
+  }
+
+  function openTwoPageEntryReview() {
+    if (twoPageOpen || !twoPageEntryReviewEnabled) {
+      error = 'Complete-entry review is disabled or another two-page owner is still open.';
+      return;
+    }
+    openTwoPageReview();
+    if (twoPageOpen) twoPageScope = 'entry';
+  }
+
+  async function refreshTwoPagePeers(scope: 'extra' | 'common' | 'entry') {
+    await refreshSIVIParent(draft.plotNumber, [siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession, siviParentSharedSession]);
+    for (const cohort of [{ scope: 'extra', cache: twoPageSessions }, { scope: 'common', cache: twoPageCommonSessions },
+      { scope: 'entry', cache: twoPageEntrySessions }]) {
+      if (cohort.scope === scope) continue;
+      const variants = cohort.cache.get(JSON.stringify({ contextId, project: twoPageProject, plot: draft.plotNumber }));
+      if (!variants) continue;
+      for (const peer of variants.values()) {
+        if (!peer.view().original) continue;
+        if (peer.closeState().unsaved || peer.closeState().busy || !await peer.load()) {
+          throw new Error(peer.view().error ?? 'Another two-page field scope could not be refreshed; no write was replayed.');
+        }
+      }
+    }
   }
 
   async function refreshProjectMetadata() {
@@ -2198,6 +2269,10 @@
       saveReason: 'Reload owned ProjectID choices to observe the source preference outcome before saving or closing.',
       error: siviParentSourceView.error ?? 'ProjectID source preference outcome is unknown.',
     };
+    if (twoPageOpen) return twoPageEditor?.getCloseState() ?? {
+      unsaved: true, busy: true, blocked: true, canSave: false, error,
+      saveReason: 'Wait for two-page field review, then finish and close it explicitly.',
+    };
     if (environmentSUOpen) return environmentSUEditor?.getCloseState() ?? {
       unsaved: true, busy: true, canSave: false, error,
       saveReason: 'Wait for SU transfer review, then finish or dismiss and close it explicitly.',
@@ -2253,6 +2328,7 @@
   }
 
   function undo() {
+    if (twoPageOpen) { twoPageEditor?.undo(); return; }
     if (environmentSUOpen) { environmentSUEditor?.undo(); return; }
     if (busy || headerWorkflowBusy) {
       error = 'Wait for the current operation to finish before undoing changes.';
@@ -2435,6 +2511,21 @@
     </div>
 
     <div class="fs882-actions flex items-center gap-2">
+      {#if twoPageReviewEnabled && !siviStandalone}
+        <button type="button" data-two-page-review class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
+          disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
+          onclick={openTwoPageReview}>Two-page additional fields</button>
+      {/if}
+      {#if twoPageCommonReviewEnabled && !siviStandalone}
+        <button type="button" data-two-page-common-review class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
+          disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
+          onclick={openTwoPageCommonReview}>Two-page common fields</button>
+      {/if}
+      {#if twoPageEntryReviewEnabled && !siviStandalone}
+        <button type="button" data-two-page-entry-review class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
+          disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
+          onclick={openTwoPageEntryReview}>Complete two-page entry</button>
+      {/if}
       {#if environmentSUEnabled && !siviStandalone}
         <button type="button" data-source-control="btnEnvIntoSu" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
           disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 || $projectState?.activeSU === 'None'}
@@ -2657,6 +2748,30 @@
         }}
         onblocked={value => profileReviewBlocked = value} onbusy={value => profileReviewBusy = value}
         onclosed={() => { profileReviewOpen = false; }} />
+    {/if}
+    {#snippet twoPageLinkedChild(child: TwoPageEntryChild, _control: PaperControl)}
+      <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={true} />
+    {/snippet}
+    {#if twoPageOpen && twoPageProject !== null}
+      {#if twoPageScope === 'entry'}
+        <TwoPageEntryEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
+          cache={twoPageEntrySessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
+          onbusy={value => twoPageBusy = value}
+          onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
+          oncommitted={() => refreshTwoPagePeers('entry')} embedded={twoPageLinkedChild} />
+      {:else if twoPageScope === 'common'}
+        <TwoPageParentCommonEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
+          cache={twoPageCommonSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
+          onbusy={value => twoPageBusy = value}
+          onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
+          oncommitted={() => refreshTwoPagePeers('common')} embedded={twoPageLinkedChild} />
+      {:else}
+        <TwoPageParentEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
+          cache={twoPageSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
+          onbusy={value => twoPageBusy = value}
+          onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
+          oncommitted={() => refreshTwoPagePeers('extra')} embedded={twoPageLinkedChild} />
+      {/if}
     {/if}
     {#if metadataOpen}
       <ProjectMetadataEditor bind:this={metadataEditor} client={PlotService} {contextId} plot={draft.plotNumber}
@@ -2888,6 +3003,7 @@
         {/if}
       </div>
     {/if}
+    <div hidden={twoPageOpen && (twoPageScope === 'entry' || twoPageSourceLayoutEnabled)} data-two-page-ordinary-host>
     {#if activeTab === 'site' && !siviStandalone}
       {#key headerRevision}
         <ParentCodeFields bind:draft {original} {capabilities} scope="site"
@@ -3418,6 +3534,7 @@
         capabilities={{ header: capabilities, children: childCapabilities }} enabled={auditRestoreEnabled}
         disabled={auditBlocked} gateReason={auditGateReason} revision={childRevision} onrestore={restoreAudit} />
     {/if}
+    </div>
     {#if newChild}
       <NewChild kind={newChild} {busy} {error} oncreate={createChild} oncancel={() => newChild = null} />
     {/if}

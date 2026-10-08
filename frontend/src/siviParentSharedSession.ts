@@ -194,16 +194,16 @@ export function siviParentSharedRequest(original: SIVIParentOriginal, drafts: SI
 
 // Rejected transport promises cannot establish rollback. Reuse the proven
 // lifecycle's commit-uncertainty recovery path, retiring requests before replay.
-function conservativePort(port: SIVIParentWritePort<SIVIParentSharedWrite>): SIVIParentWritePort<SIVIParentSharedWrite> {
+export function conservativePort<Request>(port: SIVIParentWritePort<Request>, label = 'SIVI parent'): SIVIParentWritePort<Request> {
   return {
     read: () => port.read(), cancelRead: () => port.cancelRead(), refreshParent: () => port.refreshParent(),
     save: async request => {
       try { return await port.save(request); }
-      catch (cause) { throw new Error(`SIVI parent edit committed but cleanup failed; outcome unknown; reload, never replay: ${String(cause)}`); }
+      catch (cause) { throw new Error(`${label} edit committed but cleanup failed; outcome unknown; reload, never replay: ${String(cause)}`); }
     },
     restore: async (history, action) => {
       try { return await port.restore(history, action); }
-      catch (cause) { throw new Error(`SIVI parent restoration committed but cleanup failed; outcome unknown; reload, never replay: ${String(cause)}`); }
+      catch (cause) { throw new Error(`${label} restoration committed but cleanup failed; outcome unknown; reload, never replay: ${String(cause)}`); }
     },
   };
 }

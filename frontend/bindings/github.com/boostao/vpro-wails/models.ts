@@ -1706,6 +1706,64 @@ export interface TableCSVManifest {
     "sha256": string;
 }
 
+export interface TwoPageEntryCodeAcknowledgement {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "table": string;
+    "rowId": string;
+    "column": string;
+    "expected": ProjectMetadataCell;
+    "value": ProjectMetadataCell;
+    "reference": SIVIParentSharedReference;
+}
+
+export interface TwoPageEntryFieldPolicy {
+    "column": string;
+    "owner": string;
+    "kind": string;
+    "maximum": number;
+}
+
+export interface TwoPageEntryReferenceFilters {
+    "zone": ProjectMetadataCell;
+    "subZone": ProjectMetadataCell;
+}
+
+export interface TwoPageEntryReferenceSnapshot {
+    "Original": siviParentProjection | null;
+    "ProjectSource": number;
+    "WorkingSource": number;
+    "Zone": ProjectMetadataCell;
+    "SubZone": ProjectMetadataCell;
+    "Fields": SIVIParentSharedReference[] | null;
+    "Policies": TwoPageEntryFieldPolicy[] | null;
+    "MasterEditingAvailable": boolean;
+    "ProjectChoices": SIVIProjectChoices | null;
+    "ProjectAssignmentAvailable": boolean;
+    "ProjectAssignmentDiagnostic": string;
+}
+
+export interface TwoPageParentCommonWrite {
+    "original": SIVIParentProjection | null;
+    "edits": SIVIParentCellEdit[] | null;
+}
+
+export interface TwoPageParentEntryWrite {
+    "original": SIVIParentProjection | null;
+    "edits": SIVIParentCellEdit[] | null;
+    "projectSource": number;
+    "workingSource": number;
+    "acknowledgements": TwoPageEntryCodeAcknowledgement[] | null;
+    "projectSelection": SIVIProjectSelection | null;
+}
+
+export interface TwoPageParentExtraWrite {
+    "original": SIVIParentProjection | null;
+    "edits": SIVIParentCellEdit[] | null;
+}
+
 /**
  * VegRecord represents a vegetation entry (Layer A-D).
  */
@@ -1885,3 +1943,5 @@ export interface WorkingUnitModeState {
     "mode": string;
     "warning": string | null;
 }
+
+export type siviParentProjection = SIVIParentProjection;

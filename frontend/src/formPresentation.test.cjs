@@ -36,6 +36,12 @@ for (const name of ['BECFields', 'CoordinateFields', 'WorkingUnitFields', 'Quali
     read(`${name}.svelte`).replace(/import\.meta\.env\.VITE_[A-Z_]+/g, 'undefined'), `${name}.svelte`, dependencies) };
 }
 const HeaderEditor = serverComponent(read('HeaderEditor.svelte'), 'HeaderEditor.svelte', dependencies);
+test('Exact source captions and binding aliases take precedence only for explicitly supplied source pages', () => {
+  const control = { controlName: 'SoilClassGroup', column: 'SoilClassSubGroup', caption: 'S. &Group' };
+  assert.equal(presentation.controlLabel(control), 'Soil great group');
+  assert.equal(presentation.controlLabel(control, true), 'S. Group');
+  assert.equal(presentation.controlLabel({ ...control, caption: '' }, true), 'Soil subgroup');
+});
 function headerProps(overrides = {}) {
   const draft = {
     plotNumber: 'RESPONSIVE', locked: false, latitude: null, longitude: null,

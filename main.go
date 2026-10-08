@@ -30,6 +30,11 @@ func main() {
 	if _, err := siviFeature(siteUnitSummaryExtendedWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
+	for _, name := range []string{twoPageParentReviewEnvironment, twoPageParentExtraEditingEnvironment, twoPageParentCommonEditingEnvironment, twoPageParentEntryEditingEnvironment} {
+		if _, err := siviFeature(name, os.LookupEnv); err != nil {
+			log.Fatal(err)
+		}
+	}
 	siviParentReviewEnabled, err := siviParentReviewFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -158,6 +163,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	twoPageParentExtra, err := NewTwoPageParentExtraService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	twoPageParentCommon, err := NewTwoPageParentCommonService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	siviCovers, err := NewSIVICoverService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -232,6 +245,34 @@ func main() {
 		site: siteCodes, region: regionCodes, parent: parentCodes,
 		geology: geologyCodes, bec: becService,
 	}
+	entryReaders := twoPageEntryReferenceReaders{}
+	if siteCodes != nil {
+		entryReaders.shared.site = siteCodes
+	}
+	if regionCodes != nil {
+		entryReaders.shared.region = regionCodes
+		entryReaders.ecosection = regionCodes
+	}
+	if parentCodes != nil {
+		entryReaders.shared.parent = parentCodes
+	}
+	if geologyCodes != nil {
+		entryReaders.shared.geology = geologyCodes
+	}
+	if becService != nil {
+		entryReaders.shared.bec = becService
+		entryReaders.series = becService
+	}
+	if qualityService != nil {
+		entryReaders.quality = qualityService
+	}
+	if soilCodes != nil {
+		entryReaders.soil = soilCodes
+	}
+	twoPageParentEntry, err := NewTwoPageParentEntryService(contextService, entryReaders, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	workingUnits, err := NewWorkingUnitService(projects, configDir)
 	if err != nil {
 		log.Printf("Warning: failed to initialize WorkingUnitService: %v", err)
@@ -249,6 +290,9 @@ func main() {
 		application.NewService(NewLongEnvironmentPreferencesService(contextService, longEnvironmentPreferencesEnabled)),
 		application.NewService(NewSiteUnitSummaryPreferencesService(contextService, siteUnitSummaryPreferencesEnabled)),
 		application.NewService(siviParentShared),
+		application.NewService(twoPageParentExtra),
+		application.NewService(twoPageParentCommon),
+		application.NewService(twoPageParentEntry),
 		application.NewService(siviCovers),
 		application.NewService(lifeformSummary),
 		application.NewService(speciesAttributeSummary),

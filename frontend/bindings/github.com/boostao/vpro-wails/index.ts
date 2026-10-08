@@ -30,6 +30,9 @@ import * as SoilCodeService from "./soilcodeservice.js";
 import * as SpeciesAttributeSummaryService from "./speciesattributesummaryservice.js";
 import * as StartupService from "./startupservice.js";
 import * as TableCSVArchiveService from "./tablecsvarchiveservice.js";
+import * as TwoPageParentCommonService from "./twopageparentcommonservice.js";
+import * as TwoPageParentEntryService from "./twopageparententryservice.js";
+import * as TwoPageParentExtraService from "./twopageparentextraservice.js";
 import * as VegetationWorkbookService from "./vegetationworkbookservice.js";
 import * as WorkingUnitService from "./workingunitservice.js";
 export {
@@ -62,6 +65,9 @@ export {
     SpeciesAttributeSummaryService,
     StartupService,
     TableCSVArchiveService,
+    TwoPageParentCommonService,
+    TwoPageParentEntryService,
+    TwoPageParentExtraService,
     VegetationWorkbookService,
     WorkingUnitService
 };
@@ -265,6 +271,13 @@ export type {
     TableCSVArchiveReview,
     TableCSVDescription,
     TableCSVManifest,
+    TwoPageEntryCodeAcknowledgement,
+    TwoPageEntryFieldPolicy,
+    TwoPageEntryReferenceFilters,
+    TwoPageEntryReferenceSnapshot,
+    TwoPageParentCommonWrite,
+    TwoPageParentEntryWrite,
+    TwoPageParentExtraWrite,
     VegRecord,
     VegetationAttributeUpdate,
     VegetationCreationRequest,

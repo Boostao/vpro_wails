@@ -35,13 +35,16 @@ type siviParentHistory struct {
 	Original, Committed *siviParentProjection
 	Changes             []siviParentHistoryChange
 	ProjectAssignment   *siviProjectAssignmentHistory `json:",omitempty"`
+	EntryPlan           []siviParentScalarEdit        `json:",omitempty"`
 }
 
 type siviParentWriteHooks struct {
-	prepare  func(*sql.Conn) (func(), error)
-	verify   func(*sql.Tx) error
-	plan     func(*sql.Tx, *siviParentProjection) ([]siviParentScalarAssignment, error)
-	decorate func(*siviParentHistory)
+	authorize func(*PlotService) error
+	read      func(context.Context, *sql.Tx, *sqliteContext, string, string, string) (*siviParentProjection, error)
+	prepare   func(*sql.Conn) (func(), error)
+	verify    func(*sql.Tx) error
+	plan      func(*sql.Tx, *siviParentProjection) ([]siviParentScalarAssignment, error)
+	decorate  func(*siviParentHistory)
 }
 
 type siviParentHistoryDomain struct {
@@ -80,12 +83,20 @@ func planSIVIParentDirectEdits(ctx context.Context, original *siviParentProjecti
 	return assignments, nil
 }
 
-func siviParentWriterSU(ctx context.Context, conn *sql.Conn, owner *sqliteContext) (string, error) {
+func sourceParentWriterSUAlias(owner *sqliteContext) string {
 	if owner.selection.SU == "None" {
-		return "", nil
+		return ""
 	}
 	if owner.attachments["su"] == owner.attachments["project"] {
-		return "main", nil
+		return "main"
+	}
+	return "sivi_su"
+}
+
+func siviParentWriterSU(ctx context.Context, conn *sql.Conn, owner *sqliteContext) (string, error) {
+	alias := sourceParentWriterSUAlias(owner)
+	if alias != "sivi_su" {
+		return alias, nil
 	}
 	if _, err := conn.ExecContext(ctx, `ATTACH DATABASE ? AS "sivi_su"`, sqliteFileURI(owner.attachments["su"], "ro")); err != nil {
 		return "", fmt.Errorf("SIVI selected SU attachment unavailable: %w", err)
@@ -93,7 +104,13 @@ func siviParentWriterSU(ctx context.Context, conn *sql.Conn, owner *sqliteContex
 	return "sivi_su", nil
 }
 
+type sourceParentProjector func(context.Context, string, string, string, ProjectMetadataTable, ProjectMetadataTable) (*siviParentProjection, error)
+
 func readSIVIParentForWrite(ctx context.Context, tx *sql.Tx, owner *sqliteContext, suAlias, contextID, plot string) (*siviParentProjection, error) {
+	return readSourceParentForWrite(ctx, tx, owner, suAlias, contextID, plot, projectSIVIParent)
+}
+
+func readSourceParentForWrite(ctx context.Context, tx *sql.Tx, owner *sqliteContext, suAlias, contextID, plot string, projectParent sourceParentProjector) (*siviParentProjection, error) {
 	project := owner.selection.Project
 	join, err := readSIVIParentJoin(ctx, tx, "main", contextID, project, plot)
 	if err != nil {
@@ -133,7 +150,7 @@ func readSIVIParentForWrite(ctx context.Context, tx *sql.Tx, owner *sqliteContex
 	if err != nil {
 		return nil, err
 	}
-	parent, err := projectSIVIParent(ctx, contextID, project, plot, env, admin)
+	parent, err := projectParent(ctx, contextID, project, plot, env, admin)
 	if err != nil {
 		return nil, err
 	}
@@ -210,9 +227,18 @@ func (s *ContextService) writeSIVIParentPlanned(ctx context.Context, contextID, 
 }
 
 func (s *ContextService) writeSIVIParentPlannedWithHooks(ctx context.Context, contextID, plot string, original *siviParentProjection, history siviParentHistoryDomain, plan func(*siviParentProjection) ([]siviParentScalarAssignment, error), hooks siviParentWriteHooks) (*siviParentWriteResult, error) {
+	read := readSIVIParentForWrite
+	if hooks.read != nil {
+		read = hooks.read
+	}
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*siviParentWriteResult, error) {
 		if err := plots.requireContextEdit(); err != nil {
 			return nil, err
+		}
+		if hooks.authorize != nil {
+			if err := hooks.authorize(plots); err != nil {
+				return nil, err
+			}
 		}
 		if history.table == siviProjectAssignmentHistoryTable && plots.currentUser == "" {
 			return nil, errors.New("SIVI parent writing requires an explicit audit user")
@@ -223,7 +249,7 @@ func (s *ContextService) writeSIVIParentPlannedWithHooks(ctx context.Context, co
 		owner := plots.projects.sqlite
 		result := &siviParentWriteResult{}
 		err := withSIVIParentWriteTransaction(ctx, owner, "parent edit", func(tx *sql.Tx, suAlias string) error {
-			observed, err := readSIVIParentForWrite(ctx, tx, owner, suAlias, contextID, plot)
+			observed, err := read(ctx, tx, owner, suAlias, contextID, plot)
 			if err != nil {
 				return err
 			}
@@ -264,7 +290,7 @@ func (s *ContextService) writeSIVIParentPlannedWithHooks(ctx context.Context, co
 			if err := verifySiteUnitTransferTables(before, after, expected, ""); err != nil {
 				return fmt.Errorf("SIVI parent transaction differs from its complete plan: %w", err)
 			}
-			fresh, err := readSIVIParentForWrite(ctx, tx, owner, suAlias, contextID, plot)
+			fresh, err := read(ctx, tx, owner, suAlias, contextID, plot)
 			if err != nil {
 				return err
 			}

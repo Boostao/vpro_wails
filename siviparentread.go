@@ -31,18 +31,26 @@ func withOwnedSIVIParentRead[T any](ctx context.Context, plots *PlotService, con
 }
 
 func readSIVIParentSnapshot(ctx context.Context, owner *sqliteContext, tx *sql.Tx, contextID, plot string) (*siviParentProjection, error) {
-	tables := []ProjectMetadataTable{}
+	tables, err := readSourceParentTables(ctx, owner, tx, plot)
+	if err != nil {
+		return nil, err
+	}
+	return projectSIVIParent(ctx, contextID, owner.selection.Project, plot, tables[0], tables[1])
+}
+
+func readSourceParentTables(ctx context.Context, owner *sqliteContext, tx *sql.Tx, plot string) ([2]ProjectMetadataTable, error) {
+	var tables [2]ProjectMetadataTable
 	for i, suffix := range []string{"_Env", "_Admin"} {
 		table := owner.selection.Project + suffix
 		var count int
 		if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM project.sqlite_master WHERE type='table' AND name COLLATE BINARY=?`, table).Scan(&count); err != nil {
-			return nil, err
+			return tables, err
 		}
 		if count != 1 {
-			return nil, fmt.Errorf("SIVI parent requires original physical project table %q", table)
+			return tables, fmt.Errorf("SIVI parent requires original physical project table %q", table)
 		}
 		if err := validateSIVIPhysicalSchema(ctx, tx, "project", table, "parent originals"); err != nil {
-			return nil, err
+			return tables, err
 		}
 		column := "PlotNumber"
 		if i == 1 {
@@ -50,11 +58,11 @@ func readSIVIParentSnapshot(ctx context.Context, owner *sqliteContext, tx *sql.T
 		}
 		rows, err := readSQLiteStorageRows(ctx, tx, "project", table, column, &plot, "")
 		if err != nil {
-			return nil, err
+			return tables, err
 		}
-		tables = append(tables, rows)
+		tables[i] = rows
 	}
-	return projectSIVIParent(ctx, contextID, owner.selection.Project, plot, tables[0], tables[1])
+	return tables, nil
 }
 
 type siviParentProposal struct {

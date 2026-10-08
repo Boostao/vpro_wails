@@ -76,6 +76,14 @@ var siviParentSourceBindings = sync.OnceValues(func() ([]siviParentBinding, erro
 // Literal BINARY membership is a SQLite adaptation, not proof of Access
 // Unicode collation/DISTINCTROW behavior. Every matching physical pair survives.
 func projectSIVIParent(ctx context.Context, contextID, project, plot string, env, admin ProjectMetadataTable) (*siviParentProjection, error) {
+	source, err := siviParentSourceBindings()
+	if err != nil {
+		return nil, err
+	}
+	return projectSourceParent(ctx, contextID, project, plot, "frmSIVIsite", source, env, admin)
+}
+
+func projectSourceParent(ctx context.Context, contextID, project, plot, form string, source []siviParentBinding, env, admin ProjectMetadataTable) (*siviParentProjection, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
@@ -110,12 +118,8 @@ func projectSIVIParent(ctx context.Context, contextID, project, plot string, env
 		}
 		indexes[i] = index
 	}
-	source, err := siviParentSourceBindings()
-	if err != nil {
-		return nil, err
-	}
 	result := &siviParentProjection{
-		ContextID: contextID, Project: project, Plot: plot, Form: "frmSIVIsite", Query: "USysEnv",
+		ContextID: contextID, Project: project, Plot: plot, Form: form, Query: "USysEnv",
 		Membership: "literal-binary-inner-pairs", EnvTable: project + "_Env", AdminTable: project + "_Admin",
 		EnvColumns:   append([]ProjectMetadataColumn(nil), env.Columns...),
 		AdminColumns: append([]ProjectMetadataColumn(nil), admin.Columns...),

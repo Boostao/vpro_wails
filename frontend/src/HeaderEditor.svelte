@@ -25,7 +25,8 @@
   type Field = { key: NullableTextKey; label: string; kind: 'text' | 'notes'; list?: boolean } |
     { key: NumberKey; label: string; kind: 'number'; step?: string };
 
-  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, masterAllowed = false, editor, additionalEditor, onMetadata, metadataDisabled = true }: {
+  type HeaderSlot = { columns: readonly string[]; controls: readonly string[]; input: Snippet<[PaperControl, string]>; labelled: true };
+  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, masterAllowed = false, editor, additionalEditor, onMetadata, metadataDisabled = true, sourcePage, coordinateMode = $bindable<CoordinateDisplayMode>('dd'), children: layoutContent }: {
     draft: FS882Header;
     original: (BECCodes & WorkingUnitCodes & QualityCodes & SubstrateValues & SiteCodes & RegionCodes) | null;
     capabilities: Record<string, boolean | undefined>;
@@ -46,11 +47,13 @@
     additionalEditor?: { columns: readonly string[]; input: Snippet<[PaperControl, string]> };
     onMetadata?: () => void;
     metadataDisabled?: boolean;
+    sourcePage?: ReturnType<typeof paperPage>;
+    coordinateMode?: CoordinateDisplayMode;
+    children?: Snippet<[HeaderSlot, CoordinateDisplayMode]>;
   } = $props();
 
-  let coordinateMode = $state<CoordinateDisplayMode>('dd');
-  const page = $derived(paperPage('Site', 'initial', coordinateMode));
-  const groups = $derived(presentationGroups('Site', page.controls));
+  const page = $derived(sourcePage ?? paperPage('Site', 'initial', coordinateMode));
+  const groups = $derived(presentationGroups(sourcePage ? 'Site/Veg' : 'Site', page.controls));
 
   const sections: { title: string; fields: Field[] }[] = [
     { title: 'Identity and survey', fields: [
@@ -110,6 +113,23 @@
   const byColumn = new Map(sections.flatMap(section => section.fields).map(field => [columns[field.key], field]));
   const storedValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
   const ordered = $derived(page.controls);
+  const ownedColumns = $derived([...new Set(ordered.flatMap(control => {
+    const column = control.column;
+    if (!column || column === 'PlotNumber') return [];
+    return isCoordinateControl(control.controlName) || isWorkingUnitControl(control.controlName) ||
+      becKey(column) || qualityKey(column) || substrateKey(column) || siteCodeKey(column) || regionCodeKey(column) ||
+      additionalEditor?.columns.includes(column) || editor?.columns.includes(column) || byColumn.has(column) ? [column] : [];
+  }))]);
+  const ownedControls = $derived(ordered.filter(control => !control.column &&
+    isCoordinateControl(control.controlName) && control.controlName !== 'optCoordMethod2').map(control => control.controlId));
+  function inputOwner(control: PaperControl): PaperControl {
+    const source = ordered.find(source => source.controlId === control.controlId && source.column === control.column);
+    if (!(control.column ? ownedColumns.includes(control.column) : ownedControls.includes(control.controlId)) ||
+        !source) {
+      throw new Error(`Header input ${control.controlName} has no exact source field owner.`);
+    }
+    return source;
+  }
   function position(control: PaperControl) {
     if (['CheckBox', 'OptionButton'].includes(control.type)) return 'box-sizing:border-box;';
     return 'box-sizing:border-box;width:100%;min-width:0;min-height:40px;font:inherit;';
@@ -179,18 +199,12 @@
 <CoordinateFields bind:draft bind:mode={coordinateMode} controls={ordered} {position} {capabilities} {disabled}
   {onchange} {onerror} {onvalidation} onbusy={onCoordinateBusyChange}>
 {#snippet children(coordinateInputs)}
-<div class="responsive-form header-editor" data-source-page="Site">
-  {#each groups as group (group.title)}
-    <fieldset class="form-group">
-      <legend>{group.title}</legend>
-      <div class="field-grid">
-      {#each group.controls as control (control.controlId)}
+{#snippet fieldInput(control: PaperControl)}
         {@const field = byColumn.get(control.column ?? '')}
         {@const stored = control.column ? storedValues.get(control.column.toLowerCase()) : undefined}
         {@const unavailable = disabled || !control.enabled || control.locked}
         {@const action = control.type === 'CommandButton' || control.type === 'ToggleButton' || control.type === 'Subform'}
-        <div class="form-field" class:full-width={wideControl(control)} class:action-field={action}>
-        {#if !action}<label class="field-label" for={inputId(control)}>{controlLabel(control)}</label>{/if}
+        {#if !action}<label class="field-label" for={inputId(control)}>{controlLabel(control, Boolean(sourcePage))}</label>{/if}
         {#if isCoordinateControl(control.controlName)}
           {@render coordinateInputs(control)}
         {:else if isWorkingUnitControl(control.controlName)}
@@ -254,12 +268,29 @@
         {:else if control.type === 'TextBox' || control.type === 'ComboBox'}
           <input class="paper-control pending" id={inputId(control)} data-column={control.column} data-source-control={control.controlName} disabled value={typeof stored === 'string' || typeof stored === 'number' ? stored : ''} placeholder={stored !== undefined ? '' : 'Pending'} title={`${controlLabel(control)}: workflow not yet verified`} aria-label={controlLabel(control)} />
         {/if}
+{/snippet}
+{#snippet input(control: PaperControl, _position: string)}
+  {@render fieldInput(inputOwner(control))}
+{/snippet}
+{#if layoutContent}
+  {@render layoutContent({ columns: ownedColumns, controls: ownedControls, input, labelled: true }, coordinateMode)}
+{:else}
+<div class="responsive-form header-editor" data-source-page={sourcePage ? 'Site/Veg' : 'Site'}>
+  {#each groups as group (group.title)}
+    <fieldset class="form-group">
+      <legend>{group.title}</legend>
+      <div class="field-grid">
+      {#each group.controls as control (control.controlId)}
+        {@const action = control.type === 'CommandButton' || control.type === 'ToggleButton' || control.type === 'Subform'}
+        <div class="form-field" class:full-width={wideControl(control)} class:action-field={action}>
+        {@render fieldInput(control)}
         </div>
       {/each}
       </div>
     </fieldset>
   {/each}
 </div>
+{/if}
 {/snippet}
 </CoordinateFields>
 {/snippet}

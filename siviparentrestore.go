@@ -12,6 +12,10 @@ import (
 )
 
 func validateSIVIParentHistoryOriginal(ctx context.Context, event siviParentHistory, project, plot string) (*siviParentProjection, error) {
+	return validateSourceParentHistoryOriginal(ctx, event, project, plot, projectSIVIParent)
+}
+
+func validateSourceParentHistoryOriginal(ctx context.Context, event siviParentHistory, project, plot string, projectParent sourceParentProjector) (*siviParentProjection, error) {
 	if event.Original == nil || event.Committed == nil || len(event.Changes) == 0 ||
 		event.Original.ContextID == "" || event.Original.ContextID != event.Committed.ContextID ||
 		event.Original.Project != project || event.Original.Plot != plot ||
@@ -26,7 +30,7 @@ func validateSIVIParentHistoryOriginal(ctx context.Context, event siviParentHist
 		original.Rows[0].Admin.RowID != event.Committed.Rows[0].Admin.RowID {
 		return nil, errors.New("typed SIVI parent history changed physical identities")
 	}
-	rebuilt, err := projectSIVIParent(ctx, original.ContextID, project, plot,
+	rebuilt, err := projectParent(ctx, original.ContextID, project, plot,
 		ProjectMetadataTable{Columns: original.EnvColumns, Rows: []ProjectMetadataRow{original.Rows[0].Env}},
 		ProjectMetadataTable{Columns: original.AdminColumns, Rows: []ProjectMetadataRow{original.Rows[0].Admin}})
 	if err != nil || !reflect.DeepEqual(rebuilt, original) {
@@ -36,7 +40,7 @@ func validateSIVIParentHistoryOriginal(ctx context.Context, event siviParentHist
 }
 
 func siviParentHistoryAssignments(ctx context.Context, event siviParentHistory, project, plot string) ([]siviParentScalarAssignment, error) {
-	if event.ProjectAssignment != nil {
+	if event.ProjectAssignment != nil || event.EntryPlan != nil {
 		return nil, errors.New("ProjectID assignment history is not direct parent history")
 	}
 	original, err := validateSIVIParentHistoryOriginal(ctx, event, project, plot)
@@ -73,6 +77,14 @@ func (s *ContextService) restoreSIVIParentDirect(ctx context.Context, contextID,
 }
 
 func (s *ContextService) restoreSIVIParentHistory(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction, historyDomain siviParentHistoryDomain) (*AuditRestoreResult, error) {
+	return s.restoreSourceParentHistory(ctx, contextID, plot, historyID, action, historyDomain, readSIVIParentForWrite)
+}
+
+func (s *ContextService) restoreSourceParentHistory(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction, historyDomain siviParentHistoryDomain, read func(context.Context, *sql.Tx, *sqliteContext, string, string, string) (*siviParentProjection, error)) (*AuditRestoreResult, error) {
+	return s.restoreSourceParentHistoryAuthorized(ctx, contextID, plot, historyID, action, historyDomain, read, nil)
+}
+
+func (s *ContextService) restoreSourceParentHistoryAuthorized(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction, historyDomain siviParentHistoryDomain, read func(context.Context, *sql.Tx, *sqliteContext, string, string, string) (*siviParentProjection, error), authorize func(*PlotService) error) (*AuditRestoreResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*AuditRestoreResult, error) {
 		if action != AuditRestoreCancel && action != AuditRestoreRetain && action != AuditRestorePrune {
 			return nil, errors.New("SIVI parent restoration requires cancel, retain or prune")
@@ -82,6 +94,11 @@ func (s *ContextService) restoreSIVIParentHistory(ctx context.Context, contextID
 		}
 		if err := plots.requireContextEdit(); err != nil {
 			return nil, err
+		}
+		if authorize != nil {
+			if err := authorize(plots); err != nil {
+				return nil, err
+			}
 		}
 		ids, err := auditRowIDs([]string{historyID})
 		if err != nil {
@@ -115,13 +132,16 @@ func (s *ContextService) restoreSIVIParentHistory(ctx context.Context, contextID
 				return err
 			}
 			project := owner.selection.Project
-			if historyDomain.table != siviProjectAssignmentHistoryTable && event.ProjectAssignment != nil {
+			if event.EntryPlan != nil && !twoPageEntryProjectHistoryTable(historyDomain.table) {
+				return errors.New("complete-entry source plans belong only to their exact entry history")
+			}
+			if historyDomain.table != siviProjectAssignmentHistoryTable && !twoPageEntryProjectHistoryTable(historyDomain.table) && event.ProjectAssignment != nil {
 				return errors.New("ProjectID assignment provenance belongs only to its isolated history")
 			}
 			if _, err := historyDomain.assignments(ctx, event, project, plot); err != nil {
 				return err
 			}
-			fresh, err := readSIVIParentForWrite(ctx, tx, owner, suAlias, contextID, plot)
+			fresh, err := read(ctx, tx, owner, suAlias, contextID, plot)
 			if err != nil {
 				return err
 			}
@@ -280,7 +300,7 @@ func (s *ContextService) restoreSIVIParentHistory(ctx context.Context, contextID
 			if err := verifySiteUnitTransferTables(before, after, expected, ""); err != nil {
 				return fmt.Errorf("SIVI parent restoration differs from its complete plan: %w", err)
 			}
-			if _, err := readSIVIParentForWrite(ctx, tx, owner, suAlias, contextID, plot); err != nil {
+			if _, err := read(ctx, tx, owner, suAlias, contextID, plot); err != nil {
 				return err
 			}
 			return nil

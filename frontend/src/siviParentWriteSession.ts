@@ -70,6 +70,7 @@ export const siviParentWriteDraftScope: SIVIParentWriteDraftScope<SIVIParentColu
 };
 
 export interface SIVIParentWriteScope<Column extends string, Request, Drafts = SIVIParentDrafts, Input = SIVIParentInput> {
+  label?: string;
   accepts(value: string): value is Column;
   unavailable: string;
   drafts: SIVIParentWriteDraftScope<Column, Drafts, Input>;
@@ -85,6 +86,7 @@ export class SIVIParentScopedWriteSession<Column extends string, Request, Drafts
   private disposed = false;
   private generation = 0;
   private historyMaximum = 0;
+  private get label() { return this.scope.label ?? 'SIVI parent'; }
 
   constructor(owner: SIVIParentOwner, private readonly port: SIVIParentWritePort<Request>, private readonly notify: () => void,
     private readonly scope: SIVIParentWriteScope<Column, Request, Drafts, Input>) {
@@ -97,15 +99,15 @@ export class SIVIParentScopedWriteSession<Column extends string, Request, Drafts
   view(): SIVIParentWriteView<Drafts> { return structuredClone(this.state); }
   closeState(): EditorCloseState {
     const invalid = this.scope.drafts.errors(this.state.drafts);
-    const saveReason = this.state.busy ? 'Wait for the SIVI parent operation to finish.'
-      : this.state.blocked ? 'Recover SIVI parent acknowledgement/refresh explicitly with Undo/reload; do not replay.'
-      : invalid[0] ?? (!this.state.original ? 'Load owned SIVI parent originals before editing.' : '');
+    const saveReason = this.state.busy ? `Wait for the ${this.label} operation to finish.`
+      : this.state.blocked ? `Recover ${this.label} acknowledgement/refresh explicitly with Undo/reload; do not replay.`
+      : invalid[0] ?? (!this.state.original ? `Load owned ${this.label} originals before editing.` : '');
     return { unsaved: this.state.blocked || this.scope.drafts.dirty(this.state.drafts), busy: this.state.busy,
       blocked: this.state.blocked || invalid.length > 0, canSave: saveReason === '', saveReason, error: this.state.error };
   }
   private idle() {
-    if (this.disposed) throw new Error('SIVI parent editor ownership ended.');
-    if (this.state.busy) throw new Error('Wait for the SIVI parent operation to finish.');
+    if (this.disposed) throw new Error(`${this.label} editor ownership ended.`);
+    if (this.state.busy) throw new Error(`Wait for the ${this.label} operation to finish.`);
   }
   private changed() { if (!this.disposed) this.notify(); }
   stage(column: Column, input: Input) {
@@ -119,7 +121,7 @@ export class SIVIParentScopedWriteSession<Column extends string, Request, Drafts
   }
   async load(): Promise<boolean> {
     this.idle();
-    if (this.closeState().unsaved) throw new Error('Save or Undo SIVI parent drafts before reloading originals.');
+    if (this.closeState().unsaved) throw new Error(`Save or Undo ${this.label} drafts before reloading originals.`);
     return this.reload(false);
   }
   private async readCurrent(generation: number) {
@@ -143,7 +145,7 @@ export class SIVIParentScopedWriteSession<Column extends string, Request, Drafts
       return true;
     } catch (cause) {
       if (this.disposed || this.generation !== generation) return false;
-      this.state.error = `SIVI parent reload failed: ${String(cause)}`;
+      this.state.error = `${this.label} reload failed: ${String(cause)}`;
       return false;
     } finally {
       if (!this.disposed && this.generation === generation) {
@@ -161,12 +163,12 @@ export class SIVIParentScopedWriteSession<Column extends string, Request, Drafts
     this.state.original = null;
     this.state.busy = false;
     this.state.operation = null;
-    this.state.error = 'SIVI parent read cancelled; reload explicitly.';
+    this.state.error = `${this.label} read cancelled; reload explicitly.`;
     this.changed();
   }
   private idleUnlessRead() {
     if (this.disposed || this.state.busy && this.state.operation !== 'read') {
-      throw new Error('SIVI parent commit/recovery cannot be cancelled or disposed.');
+      throw new Error(`${this.label} commit/recovery cannot be cancelled or disposed.`);
     }
   }
   async undo(): Promise<boolean> {
@@ -198,24 +200,24 @@ export class SIVIParentScopedWriteSession<Column extends string, Request, Drafts
       this.state.historyId = null;
       if (!record(result) || result.ChangedCells !== count || typeof result.HistoryID !== 'string' ||
         result.HistoryID !== '' && (!exactSigned64(result.HistoryID) || BigInt(result.HistoryID) <= 0)) {
-        throw new Error('SIVI parent Save acknowledgement is incomplete; observe current storage, never replay.');
+        throw new Error(`${this.label} Save acknowledgement is incomplete; observe current storage, never replay.`);
       }
       this.scope.verifyAcknowledgement?.(result, request);
       this.state.historyId = result.HistoryID || null;
       this.historyMaximum = count;
       await this.port.refreshParent();
-      if (!await this.readCurrent(this.generation)) throw new Error('SIVI parent ownership ended after Save.');
+      if (!await this.readCurrent(this.generation)) throw new Error(`${this.label} ownership ended after Save.`);
       return true;
     } catch (cause) {
-      const cleanup = String(cause).includes('SIVI parent edit committed but cleanup failed;');
+      const cleanup = String(cause).includes(`${this.label} edit committed but cleanup failed;`);
       if (cleanup) {
         this.state.drafts = this.scope.drafts.empty();
         this.state.historyId = null;
       }
       this.state.blocked ||= committed || cleanup;
       this.state.error = committed || cleanup
-        ? `SIVI parent changes committed or acknowledged, but verification failed; Undo/reload, do not replay: ${String(cause)}`
-        : `SIVI parent Save failed; drafts retained: ${String(cause)}`;
+        ? `${this.label} changes committed or acknowledged, but verification failed; Undo/reload, do not replay: ${String(cause)}`
+        : `${this.label} Save failed; drafts retained: ${String(cause)}`;
       return false;
     } finally {
       this.state.busy = false;
@@ -241,18 +243,18 @@ export class SIVIParentScopedWriteSession<Column extends string, Request, Drafts
       if (!record(result) || !Number.isSafeInteger(result.restoredRows) || typeof result.restoredRows !== 'number' ||
         result.restoredRows <= 0 || result.restoredRows > this.historyMaximum || result.cleanedVegRows !== 0 ||
         result.cancelled !== false || result.prunedAuditRows !== (action === 'prune' ? result.restoredRows : 0)) {
-        throw new Error('SIVI parent restoration acknowledgement is incomplete; observe current storage, never replay.');
+        throw new Error(`${this.label} restoration acknowledgement is incomplete; observe current storage, never replay.`);
       }
       await this.port.refreshParent();
-      if (!await this.readCurrent(this.generation)) throw new Error('SIVI parent ownership ended after restoration.');
+      if (!await this.readCurrent(this.generation)) throw new Error(`${this.label} ownership ended after restoration.`);
       return true;
     } catch (cause) {
-      const cleanup = String(cause).includes('SIVI parent restoration committed but cleanup failed;');
+      const cleanup = String(cause).includes(`${this.label} restoration committed but cleanup failed;`);
       if (cleanup) this.state.historyId = null;
       this.state.blocked ||= committed || cleanup;
       this.state.error = committed || cleanup
-        ? `SIVI parent restoration committed or acknowledged, but verification failed; Undo/reload, do not replay: ${String(cause)}`
-        : `SIVI parent restoration failed; history retained: ${String(cause)}`;
+        ? `${this.label} restoration committed or acknowledged, but verification failed; Undo/reload, do not replay: ${String(cause)}`
+        : `${this.label} restoration failed; history retained: ${String(cause)}`;
       return false;
     } finally {
       this.state.busy = false;

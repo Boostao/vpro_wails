@@ -165,6 +165,9 @@ func (s *ContextService) siviProjectAssignmentWriteHooks(ctx context.Context, co
 }
 
 func siviProjectAssignmentHistoryAssignments(ctx context.Context, event siviParentHistory, project, plot string) ([]siviParentScalarAssignment, error) {
+	if event.EntryPlan != nil {
+		return nil, errors.New("complete-entry source plans are not standalone ProjectID assignment history")
+	}
 	original, err := validateSIVIParentHistoryOriginal(ctx, event, project, plot)
 	if err != nil {
 		return nil, err
@@ -173,11 +176,39 @@ func siviProjectAssignmentHistoryAssignments(ctx context.Context, event siviPare
 	if evidence == nil || len(event.Changes) != 1 {
 		return nil, errors.New("typed ProjectID history requires one audited assignment and its original source evidence")
 	}
+	change := event.Changes[0]
+	planned, err := validateSourceProjectAssignmentHistory(ctx, original, change, evidence, "form:frmSIVIsite/ProjectID")
+	if err != nil {
+		return nil, err
+	}
+	env := ProjectMetadataTable{Columns: original.EnvColumns, Rows: []ProjectMetadataRow{original.Rows[0].Env}}
+	admin := ProjectMetadataTable{Columns: original.AdminColumns, Rows: []ProjectMetadataRow{original.Rows[0].Admin}}
+	columns, err := siteUnitTransferColumns(env, "ProjectID")
+	if err != nil {
+		return nil, err
+	}
+	env.Rows = append([]ProjectMetadataRow{}, env.Rows...)
+	env.Rows[0].Cells = append([]ProjectMetadataCell{}, env.Rows[0].Cells...)
+	env.Rows[0].Cells[columns["ProjectID"]] = cloneSiteUnitCell(change.After)
+	committed, err := projectSIVIParent(ctx, original.ContextID, project, plot, env, admin)
+	if err != nil || !reflect.DeepEqual(committed, event.Committed) {
+		return nil, errors.Join(err, errors.New("typed ProjectID history changed unrelated parent values"))
+	}
+	return planned, nil
+}
+
+func validateSourceProjectAssignmentHistory(ctx context.Context, original *siviParentProjection, change siviParentHistoryChange,
+	evidence *siviProjectAssignmentHistory, controlID string) ([]siviParentScalarAssignment, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if original == nil || len(original.Rows) != 1 || evidence == nil {
+		return nil, errors.New("typed ProjectID history requires an exact original and source evidence")
+	}
 	digest, err := siviProjectAssignmentSchemaDigest(evidence.Columns, evidence.Schema)
 	if err != nil || digest != evidence.SchemaSHA256 {
 		return nil, errors.Join(err, errors.New("typed ProjectID history metadata schema evidence is incomplete or changed"))
 	}
-	change := event.Changes[0]
 	if change.Column != "ProjectID" || change.Table != original.EnvTable ||
 		change.RowID != original.Rows[0].Env.RowID || evidence.Selection.ContextID != original.ContextID ||
 		!reflect.DeepEqual(change.Before, evidence.Selection.Expected) ||
@@ -203,21 +234,10 @@ func siviProjectAssignmentHistoryAssignments(ctx context.Context, event siviPare
 	}
 	env := ProjectMetadataTable{Columns: original.EnvColumns, Rows: []ProjectMetadataRow{original.Rows[0].Env}}
 	admin := ProjectMetadataTable{Columns: original.AdminColumns, Rows: []ProjectMetadataRow{original.Rows[0].Admin}}
-	planned, err := planSIVIProjectAssignment(ctx, original.ContextID, project, plot, env, admin, evidence.Choices, evidence.Selection)
+	planned, err := planSourceProjectAssignment(ctx, controlID, original.ContextID, original.Project, original.Plot, env, admin, evidence.Choices, evidence.Selection)
 	if err != nil || len(planned.Assignments) != 1 || !reflect.DeepEqual(planned.Assignments[0].After, change.After) ||
 		planned.Assignments[0].Table != change.Table || planned.Assignments[0].RowID != change.RowID {
 		return nil, errors.Join(err, errors.New("typed ProjectID history differs from its physical choice assignment"))
-	}
-	columns, err := siteUnitTransferColumns(env, "ProjectID")
-	if err != nil {
-		return nil, err
-	}
-	env.Rows = append([]ProjectMetadataRow{}, env.Rows...)
-	env.Rows[0].Cells = append([]ProjectMetadataCell{}, env.Rows[0].Cells...)
-	env.Rows[0].Cells[columns["ProjectID"]] = cloneSiteUnitCell(change.After)
-	committed, err := projectSIVIParent(ctx, original.ContextID, project, plot, env, admin)
-	if err != nil || !reflect.DeepEqual(committed, event.Committed) {
-		return nil, errors.Join(err, errors.New("typed ProjectID history changed unrelated parent values"))
 	}
 	return planned.Assignments, nil
 }

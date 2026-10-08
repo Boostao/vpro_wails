@@ -62,11 +62,16 @@ function originalShape(value: unknown): value is SIVIParentOriginal {
 }
 
 export function siviParentOriginalFromWire(wire: unknown, owner: SIVIParentOwner): SIVIParentOriginal {
+  return sourceParentOriginalFromWire(wire, owner, validateSIVIParentOriginal);
+}
+
+export function sourceParentOriginalFromWire(wire: unknown, owner: SIVIParentOwner,
+  validate: (original: SIVIParentOriginal) => SIVIParentOriginal): SIVIParentOriginal {
   if (!originalShape(wire)) throw new Error('Complete raw SIVI parent original transport was not returned.');
   if (wire.ContextID !== owner.contextId || wire.Project !== owner.project || wire.Plot !== owner.plot) {
     throw new Error('SIVI parent response belongs to another active context/project/plot; no drafts were initialized.');
   }
-  return validateSIVIParentOriginal(wire);
+  return validate(wire);
 }
 
 export function siviParentSessionFromWire(editorId: string, wire: unknown, owner: SIVIParentOwner): SIVIParentSession {
