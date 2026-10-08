@@ -63,11 +63,12 @@ function source(review: SIVIProjection[], rowId: string, column: SIVICoverColumn
   return { group, original: rows[0].cells[index] };
 }
 
-export function stageSIVICover(review: SIVIProjection[], drafts: SIVICoverDrafts, rowId: string,
-  column: SIVICoverColumn, raw: string, nullValue: boolean): SIVICoverDrafts {
-  const { original } = source(review, rowId, column);
-  const expected = structuredClone(drafts[rowId]?.[column]?.expected ?? original);
-  if (!equalCell(original, expected)) throw new Error('SIVI original cover changed; drafts retained, reload explicitly.');
+export function parseSIVICover(column: SIVICoverColumn, raw: string, nullValue: boolean,
+  original: ProjectMetadataCell): SIVICoverCell {
+  if (!siviCoverColumns.includes(column) || typeof raw !== 'string' || typeof nullValue !== 'boolean' || !completeCell(original)) {
+    throw new Error('SIVI cover parsing requires a source column, literal text, explicit NULL choice and complete original cell.');
+  }
+  const expected = structuredClone(original);
   let value: ProjectMetadataCell = { storage: 'null', text: null, integer: null, real: null, blobHex: null };
   let error: string | null = null;
   if (!nullValue) {
@@ -87,7 +88,16 @@ export function stageSIVICover(review: SIVIProjection[], drafts: SIVICoverDrafts
   if (expected.storage === 'blob' && !equalCell(expected, value)) {
     error = 'Historical SIVI BLOB correction is unavailable; retain the unchanged original.';
   }
-  return { ...drafts, [rowId]: { ...drafts[rowId], [column]: { raw, nullValue, expected, value, error } } };
+  return { raw, nullValue, expected, value, error };
+}
+
+export function stageSIVICover(review: SIVIProjection[], drafts: SIVICoverDrafts, rowId: string,
+  column: SIVICoverColumn, raw: string, nullValue: boolean): SIVICoverDrafts {
+  const { original } = source(review, rowId, column);
+  const expected = drafts[rowId]?.[column]?.expected ?? original;
+  if (!equalCell(original, expected)) throw new Error('SIVI original cover changed; drafts retained, reload explicitly.');
+  const cell = parseSIVICover(column, raw, nullValue, expected);
+  return { ...drafts, [rowId]: { ...drafts[rowId], [column]: cell } };
 }
 
 export function siviCoverErrors(drafts: SIVICoverDrafts): string[] {

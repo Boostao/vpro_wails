@@ -60,7 +60,8 @@ test('SIVI parent keeps the owner outside tabs and wires busy/dirty/safety gates
   const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(parent, /VITE_SIVI_HEIGHT_EDITING === 'true'/);
   assert.match(parent, /const siviContextId = untrack\(\(\) => contextId\)/);
-  assert.match(parent, /headerWorkflowBusy = \$derived\([^\n]*\|\| siviBusy \|\| siviCombinedBusy \|\| siviCoverBusy \|\| siviCollectedBusy \|\| siviSpeciesBusy \|\| siviIdentityBusy\)/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviBusy \|\| siviCombinedBusy \|\| siviCoverBusy \|\| siviCollectedBusy \|\| siviSpeciesBusy \|\| siviIdentityBusy\)/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
   assert.match(parent, /nonParentChildUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved/);
   for (const gate of ['height', 'other', 'soil', 'attribute', 'collected', 'species']) {
     assert.match(parent, new RegExp(`${gate}EditingDisabled = \\$derived\\([^\\n]*\\|\\| siviUnsaved`));

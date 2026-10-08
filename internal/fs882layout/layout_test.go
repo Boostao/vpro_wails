@@ -27,6 +27,94 @@ func writeForm(t *testing.T, root, name, text string) {
 	}
 }
 
+func TestReportRootPreservesSourceDefaultsAndUnknowns(t *testing.T) {
+	root := fixture(t)
+	if err := os.MkdirAll(filepath.Join(root, "Reports"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	source := `Begin Report
+	RecordSource ="BecLabels"
+	Width =4954
+	PrtMip = Begin
+	0x01020304
+	End
+	Begin TextBox
+	FontName ="Arial"
+	End
+	Begin
+	Begin Section
+	Name ="Detail"
+	Height =7260
+	Begin
+	Begin TextBox
+	Name ="MyPlotNumber"
+	ControlSource ="=Trim([PlotNumber1])"
+	Left =72
+	Top =60
+	Width =1213
+	End
+	Begin TextBox
+	Name ="Date"
+	ControlSource ="=""Label Date: "" & Format(Now(),""Long Date"")"
+	Height =180
+	End
+	End
+	End
+	End
+	End
+	CodeBehindForm
+	Option Explicit
+	`
+	if err := os.WriteFile(filepath.Join(root, "Reports", "Labels.txt"), []byte(source), 0644); err != nil {
+		t.Fatal(err)
+	}
+	writeForm(t, root, "Labels", "Begin Form\nRecordSource =\"DifferentTable\"\nEnd\n")
+	layout, err := BuildReport(root, "Labels")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(layout.Forms) != 1 || layout.Forms[0].RecordSource != "BecLabels" ||
+		layout.Forms[0].Controls[0].Type != "Report" || !strings.Contains(layout.LayoutPolicy, "no physical print") {
+		t.Fatalf("wrong report root: %+v", layout)
+	}
+	found := false
+	for _, field := range layout.Forms[0].Fields {
+		if _, ok := field.Properties["PrtMip"]; ok {
+			t.Fatal("opaque printer metadata leaked into UI facts")
+		}
+		if field.ControlName == "MyPlotNumber" {
+			found = true
+			if value := field.Properties["FontName"]; value.Value != "Arial" || !value.Inherited ||
+				field.Binding != "=Trim([PlotNumber1])" || field.BindingKind != "computed" ||
+				field.Properties["Top"].Value != "60" {
+				t.Fatalf("source properties lost: %+v", field)
+			}
+			for _, omitted := range []string{"Height", "FontSize"} {
+				if _, ok := field.Properties[omitted]; ok {
+					t.Fatalf("invented report built-in default %s", omitted)
+				}
+			}
+		}
+	}
+	if !found {
+		t.Fatal("report control missing")
+	}
+	form, err := Build(root, "Labels")
+	if err != nil || form.Forms[0].RecordSource != "DifferentTable" {
+		t.Fatalf("report support changed same-name form selection: %+v, %v", form, err)
+	}
+	if _, err := BuildReport(root, "Missing"); err == nil {
+		t.Fatal("missing report accepted")
+	}
+	if err := os.WriteFile(filepath.Join(root, "Reports", "FS882-6x4XL.txt"), []byte(source), 0644); err != nil {
+		t.Fatal(err)
+	}
+	sameName, err := BuildReport(root, "FS882-6x4XL")
+	if err != nil || sameName.GeometryInference != "" {
+		t.Fatalf("report inherited a form-specific coordinate inference: %+v, %v", sameName, err)
+	}
+}
+
 const parentFixture = `Begin Form
     RecordSource ="HEADER"
     Width =15000

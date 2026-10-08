@@ -18,7 +18,7 @@ function host(overrides = {}) {
   const code = functions.map(node => node.getText(ast)).join('\n') +
     `\nglobalThis.api = {${names.join(',')}};`;
   const context = {
-    error: null, successMsg: null, siviCoverEnabled: true, busy: false, headerWorkflowBusy: false,
+    error: null, successMsg: null, siviCoverEnabled: true, busy: false, headerWorkflowBusy: false, pictureMetadataPending: false,
     siviUnsaved: false, heightUnsaved: false, otherUnsaved: false, soilUnsaved: false,
     attributeUnsaved: false, collectedUnsaved: false, speciesUnsaved: false,
     siviParentWriteUnsaved: false, siviParentActionUnsaved: false,
@@ -66,7 +66,8 @@ test('literal default-off source notice gate is forwarded to all owned child wri
 });
 
 test('cover owner contributes dirty busy blocked Save Undo Lock and peer-editor barriers', () => {
-  assert.match(parent, /headerWorkflowBusy = \$derived\([^\n]*\|\| siviCoverBusy(?: \|\| [a-zA-Z]+)*\)/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviCoverBusy(?: \|\| [a-zA-Z]+)*\)/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
   assert.match(parent, /nonParentChildUnsaved = \$derived\([^\n]*\|\| siviCoverUnsaved/);
   assert.match(parent, /if \(siviCoverUnsaved\) \{ await siviCoverOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviCoverUnsaved\) \{ void siviCoverOperation\('undo'\); return; \}/);

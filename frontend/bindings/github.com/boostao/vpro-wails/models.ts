@@ -777,6 +777,8 @@ export type PictureImage = pictureImage;
 
 export type PictureMetadataReview = pictureMetadataReview;
 
+export type PictureMetadataWriteResult = pictureMetadataWriteResult;
+
 export interface PlotLocationReport {
     "project": string;
     "su": string;
@@ -1979,6 +1981,27 @@ export interface pictureMetadataReview {
     "project": string;
     "plotNumber": string;
     "records": ProjectMetadataTable;
+}
+
+export interface pictureMetadataWriteResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "requestedSource": string;
+    "source": string;
+    "ownedFiles": { [_ in string]?: string } | null;
+    "actor": string;
+    "auditStrength": number;
+    "id": number;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "committed": ProjectMetadataRow;
+    "changes": ProjectMetadataChange[] | null;
+    "editWhen": string;
+    "historyId": string;
+    "didCommit": boolean;
+    "replayed": boolean;
 }
 
 export type siviParentProjection = SIVIParentProjection;

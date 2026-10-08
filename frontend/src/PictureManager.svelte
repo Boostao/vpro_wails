@@ -2,6 +2,7 @@
   import { untrack } from 'svelte';
   import PicturePanel from './PicturePanel.svelte';
   import { plotLookupInputError } from './scopedPlotLookup';
+  import { pictureMetadataSession } from './pictureMetadataSessions';
 
   let { contextId, project, initialPlot = '', onBusyChange }: {
     contextId: string; project: string; initialPlot?: string; onBusyChange: (busy: boolean) => void;
@@ -11,9 +12,21 @@
   let selected = $state(startingPlot);
   let error = $state('');
   let busy = $state(false);
+  const metadataWritingEnabled = import.meta.env.VITE_PICTURE_METADATA_WRITING === 'true';
+  const metadataSession = $derived(metadataWritingEnabled && selected && contextId && project
+    ? pictureMetadataSession({ contextId, project, plotNumber: selected }) : undefined);
+  let metadataRevision = $state(0);
+  const metadataBlocked = $derived.by(() => {
+    metadataRevision;
+    const close = metadataSession?.closeState();
+    return !!close && (close.unsaved || close.busy || close.blocked === true);
+  });
+  $effect(() => metadataSession?.subscribe(() => metadataRevision++));
+  $effect(() => { onBusyChange(busy || metadataBlocked); });
 
   function selectPlot() {
     if (busy) { error = 'Wait for or cancel the current picture read before selecting another plot.'; return; }
+    if (metadataBlocked) { error = 'Finish or explicitly discard the retained picture metadata draft before replacing its literal parent.'; return; }
     const invalid = plotLookupInputError(plot);
     if (invalid) { error = invalid; return; }
     error = '';
@@ -21,7 +34,7 @@
   }
   function reading(value: boolean) {
     busy = value;
-    onBusyChange(value);
+    onBusyChange(value || metadataBlocked);
   }
 </script>
 
@@ -31,19 +44,21 @@
   <p>Owned project {project}. Select an exact parent; Load checks its literal membership in the current context.</p>
   <form onsubmit={event => { event.preventDefault(); selectPlot(); }}>
     <label for="picture-manager-plot">Plot number
-      <input id="picture-manager-plot" bind:value={plot} disabled={busy} />
+      <input id="picture-manager-plot" bind:value={plot} disabled={busy || metadataBlocked} />
     </label>
-    <button type="submit" disabled={busy}>Select exact plot</button>
+    <button type="submit" disabled={busy || metadataBlocked}>Select exact plot</button>
   </form>
   {#if selected}
     <p data-picture-manager-parent>Selected literal parent: {JSON.stringify(selected)}</p>
     {#key selected}
-      <PicturePanel {contextId} {project} plotNumber={selected} view="manager" onBusyChange={reading} />
+      <PicturePanel {contextId} {project} plotNumber={selected} view="manager" onBusyChange={reading} {metadataSession} />
     {/key}
   {/if}
   <p class="guidance">Read-only adaptation of frmPlotPictureMaster / frmPlotPictures. Parent and child link by PlotNumber.
     This review does not apply current SU or profile filters. Selecting or loading never changes the parent or picture metadata.
-    Add a Picture, deletion, metadata editing, external directories and automatic installation remain unavailable.</p>
+    {#if metadataWritingEnabled}Add a Picture, deletion, external directories and automatic installation remain unavailable.
+      Existing metadata editing requires its independent backend permission.
+    {:else}Add a Picture, deletion, metadata editing, external directories and automatic installation remain unavailable.{/if}</p>
 </section>
 
 <style>

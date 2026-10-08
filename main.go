@@ -210,6 +210,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	pictureMetadata, err := NewPictureMetadataService(pictures, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	lifeformSummary, err := NewLifeformSummaryService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -334,6 +338,7 @@ func main() {
 		application.NewService(siviSpecies),
 		application.NewService(siviIdentity),
 		application.NewService(pictures),
+		application.NewService(pictureMetadata),
 		application.NewService(lifeformSummary),
 		application.NewService(speciesAttributeSummary),
 		application.NewService(lifeformWorkbook),

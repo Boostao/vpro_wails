@@ -124,7 +124,8 @@ test('panel safety feedback precedes fields and parent owner sits outside tab li
   assert.match(parent, /VITE_SIVI_PARENT_REVIEW === 'true'/);
   assert.match(parent, /siviParentSession\?\.dispose\(\)/);
   assert.match(parent, /GetSIVIParentOriginal\(siviContextId, plot\)/);
-  assert.match(parent, /headerWorkflowBusy = \$derived\([^\n]*siviParentBusy/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*siviParentBusy/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
   assert.match(parent, /dirty \|\| nonParentChildUnsaved \|\| !siviParentSession/);
 });
 test('source preference updates only its owned choice snapshot and survives remount without reinitialization', async () => {
@@ -198,7 +199,7 @@ test('source preference unknown authority survives failed and cancelled recovery
 });
 test('actual parent Save Lock and close authority block unknown source preference even with other editor surfaces open', async () => {
   const context = componentFunctions('FS882Form.svelte', ['getCloseState', 'save', 'toggleLock'], {
-    siviParentSourceView: { authorityUnknown: true, busy: false, error: 'lost preference receipt' },
+    siviParentSourceView: { authorityUnknown: true, busy: false, error: 'lost preference receipt' }, pictureMetadataPending: false,
     siviSourceAuthorityUnknown: true, environmentSUOpen: true, metadataOpen: true, error: '',
   });
   const state = context.actions.getCloseState();
@@ -215,13 +216,16 @@ test('actual nested soil and terrain control permissions preserve source observa
   const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   const values = { draft: { locked: false }, busy: false, siviSourceBarrier: true, capabilitiesReady: true,
     childUnsaved: false, coordinateBusy: false, workingUnitBusy: false, qualityBusy: false,
-    siteCodeBusy: false, regionCodeBusy: false, soilCodeBusy: false, geologyCodeBusy: false };
+    siteCodeBusy: false, regionCodeBusy: false, soilCodeBusy: false, geologyCodeBusy: false,
+    pictureBusy: false, pictureMetadataPending: false };
+  const header = parent.match(/const headerInputsDisabled = \$derived\(([^;\n]+)\);/)[1];
+  const permissions = state => ({ ...state, headerInputsDisabled: vm.runInNewContext(header, state) });
   for (const name of ['DrainageFields', 'SoilCodeFields', 'GeologyCodeFields', 'ParentCodeFields']) {
     const controls = [...parent.matchAll(new RegExp(`<${name}\\b[^>]*disabled=\\{([^}]+)\\}`, 'g'))];
     assert.ok(controls.length, name);
     for (const control of controls) {
-      assert.equal(vm.runInNewContext(control[1], values), true, `${name} must be blocked`);
-      assert.equal(vm.runInNewContext(control[1], { ...values, siviSourceBarrier: false }), false,
+      assert.equal(vm.runInNewContext(control[1], permissions(values)), true, `${name} must be blocked`);
+      assert.equal(vm.runInNewContext(control[1], permissions({ ...values, siviSourceBarrier: false })), false,
         `${name} must remain available after observation`);
     }
   }

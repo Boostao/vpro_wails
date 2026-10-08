@@ -300,7 +300,7 @@ test('actual controller factories retain variant histories across remounts and r
 test('actual root guards delegate additional-field errors and refuse ordinary Save/Lock while review owns the plot', async () => {
   const invalid = { unsaved: true, busy: false, blocked: true, canSave: false, error: 'Integer invalid', saveReason: 'Correct Integer' };
   const root = componentFunctions('FS882Form.svelte', ['getCloseState', 'save', 'toggleLock', 'undo'], {
-    siviParentSourceView: null, siviSourceAuthorityUnknown: false, twoPageOpen: true,
+    siviParentSourceView: null, siviSourceAuthorityUnknown: false, twoPageOpen: true, pictureMetadataPending: false,
     twoPageEditor: { getCloseState: () => invalid, undo() { root.undone = true; } },
     busy: false, headerWorkflowBusy: true, error: null,
   });
@@ -325,7 +325,8 @@ test('additional-field review excludes ordinary parent drafts until its owner is
   for (const owner of Object.keys(clean)) {
     assert.equal(runInNewContext(expression, { ...clean, [owner]: true }), true, owner);
   }
+  assert.match(source, /const headerInputsDisabled = \$derived\([^;]*childUnsaved/);
   for (const component of ['HeaderEditor', 'ParentCodeFields', 'OrdinaryFields']) {
-    assert.match(source, new RegExp(`<${component}[^>]*disabled=\\{[^}]*childUnsaved`));
+    assert.match(source, new RegExp(`<${component}[^>]*disabled=\\{headerInputsDisabled\\}`));
   }
 });

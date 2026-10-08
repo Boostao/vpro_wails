@@ -103,7 +103,7 @@ func Build(root string) (*Inventory, error) {
 	} {
 		dir := filepath.Join(root, folder.name)
 		entries, err := os.ReadDir(dir)
-		if os.IsNotExist(err) && folder.kind != "form" {
+		if os.IsNotExist(err) {
 			result.Diagnostics = append(result.Diagnostics, Diagnostic{Code: "missing-export-folder", Source: folder.name, Message: "No exports supplied; dependencies cannot be fully resolved"})
 			continue
 		}
@@ -183,7 +183,7 @@ func Build(root string) (*Inventory, error) {
 		}
 	}
 	if len(result.Forms) == 0 {
-		return nil, fmt.Errorf("%s: no form exports found", root)
+		return nil, fmt.Errorf("%s: no form or report exports found", root)
 	}
 	resolve(result, symbols)
 	return result, nil
@@ -403,13 +403,21 @@ func procedures(code string, startLine int) []Procedure {
 
 // ReachableForms follows subform instances, while retaining each form definition once.
 func (inventory *Inventory) ReachableForms(name string) ([]Form, error) {
+	return inventory.reachable("form", name)
+}
+
+func (inventory *Inventory) ReachableReport(name string) ([]Form, error) {
+	return inventory.reachable("report", name)
+}
+
+func (inventory *Inventory) reachable(kind, name string) ([]Form, error) {
 	byID := make(map[string]Form)
 	for _, form := range inventory.Forms {
 		byID[strings.ToLower(objectID(form.Kind, form.Name))] = form
 	}
-	id := objectID("form", name)
+	id := objectID(kind, name)
 	if _, ok := byID[strings.ToLower(id)]; !ok {
-		return nil, fmt.Errorf("form %q not found", name)
+		return nil, fmt.Errorf("%s %q not found", kind, name)
 	}
 	var result []Form
 	seen := make(map[string]bool)

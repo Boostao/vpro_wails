@@ -3,11 +3,15 @@
   import { PictureService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { pictureMetadataFromWire, pictureImageFromWire, pictureCellLabel, type PictureReview, type PicturePreview } from './pictureRead';
+  import PictureMetadataEditor from './PictureMetadataEditor.svelte';
+  import type { PictureMetadataSession } from './pictureMetadataSession';
 
-  let { contextId, project, plotNumber, view = 'child', disabled = false, onBusyChange }: {
+  let { contextId, project, plotNumber, view = 'child', disabled = false, metadataDisabled, onBusyChange, metadataSession }: {
     contextId: string; project: string; plotNumber: string; disabled?: boolean;
+    metadataDisabled?: boolean;
     view?: 'child' | 'manager';
     onBusyChange: (busy: boolean) => void;
+    metadataSession?: PictureMetadataSession;
   } = $props();
   const reads = new ReadRequests();
   let generation = 0;
@@ -23,6 +27,34 @@
   const currentReview = $derived(reviewKey === ownerKey ? review : null);
   const currentImage = $derived(reviewKey === ownerKey ? image : null);
   const row = $derived(currentReview?.records.rows.find(item => item.rowId === selected));
+  let metadataRevision = $state(0);
+  $effect(() => metadataSession?.subscribe(() => metadataRevision++));
+  const metadataClose = $derived.by(() => { metadataRevision; return metadataSession?.closeState(); });
+  const metadataView = $derived.by(() => { metadataRevision; return metadataSession?.view(); });
+  const metadataPending = $derived(!!metadataClose && (metadataClose.unsaved || metadataClose.busy));
+  let appliedMetadataSession: PictureMetadataSession | undefined;
+  let appliedMetadataRevision = 0;
+  function synchronizeMetadataOriginal() {
+    if (metadataSession !== appliedMetadataSession) {
+      appliedMetadataSession = metadataSession;
+      appliedMetadataRevision = 0;
+    }
+    const update = metadataView?.originalUpdate;
+    if (!update || update.revision === appliedMetadataRevision) return;
+    appliedMetadataRevision = update.revision;
+    if (!review || reviewKey !== ownerKey || update.contextId !== contextId ||
+        update.project !== project || update.plotNumber !== plotNumber) return;
+    review = { ...review, records: { ...review.records,
+      rows: review.records.rows.map(item => item.rowId === update.original.rowId ? update.original : item) } };
+    image = null; viewerOpen = false;
+  }
+  $effect(synchronizeMetadataOriginal);
+
+  function editMetadata() {
+    if (!metadataSession || !currentReview || !row || disabled || busy || metadataPending) return;
+    try { metadataSession.select(currentReview, row.rowId); error = ''; }
+    catch (cause) { error = `Picture metadata editing unavailable: ${String(cause)}`; }
+  }
 
   function cancel() {
     generation++;
@@ -31,7 +63,7 @@
     onBusyChange(false);
   }
   async function load() {
-    if (disabled || busy) return;
+    if (disabled || busy || metadataPending) return;
     cancel();
     const request = generation, key = ownerKey, owner = { contextId, project, plotNumber };
     busy = true; error = ''; review = null; image = null; selected = ''; viewerOpen = false;
@@ -49,6 +81,7 @@
     }
   }
   function select(value: string) {
+    if (metadataPending) { error = 'Finish or discard the retained picture metadata draft before changing selection.'; return; }
     cancel();
     selected = value; image = null; error = ''; viewerOpen = false;
   }
@@ -91,7 +124,7 @@
   <h3>Pictures</h3>
   {#if error}<p role="alert" class="error">{error}</p>{/if}
   <div class="actions">
-    <button onclick={load} disabled={disabled || busy}>Load linked pictures</button>
+    <button onclick={load} disabled={disabled || busy || metadataPending}>Load linked pictures</button>
     {#if busy}<button onclick={cancel}>Cancel picture read</button><span role="status">Reading owned pictures…</span>{/if}
   </div>
   {#if currentReview}
@@ -99,7 +132,7 @@
       <p>No linked picture metadata for this literal plot.</p>
     {:else}
       <label for="picture-record">Linked picture record</label>
-      <select id="picture-record" value={selected} disabled={busy || disabled} onchange={event => select(event.currentTarget.value)}>
+      <select id="picture-record" value={selected} disabled={busy || disabled || metadataPending} onchange={event => select(event.currentTarget.value)}>
         {#each currentReview.records.rows as item (item.rowId)}
           <option value={item.rowId}>{pictureCellLabel(item.cells[2])} — ID {pictureCellLabel(item.cells[0])}; physical row {item.rowId}</option>
         {/each}
@@ -111,8 +144,12 @@
           <div><dt>PicComment</dt><dd>{pictureCellLabel(row.cells[4])}</dd></div>
         </dl>
         <button onclick={preview} disabled={disabled || busy}>Preview selected picture</button>
+        {#if metadataSession}<button onclick={editMetadata} disabled={disabled || busy || metadataPending}>Edit selected picture metadata</button>{/if}
       {/if}
     {/if}
+  {/if}
+  {#if metadataSession}
+    <PictureMetadataEditor session={metadataSession} disabled={(metadataDisabled ?? disabled) || busy} />
   {/if}
   {#if currentImage}
     <button class="preview" aria-label="Open full-size picture" ondblclick={() => viewerOpen = true} onclick={() => viewerOpen = true}>
@@ -123,7 +160,9 @@
   <p class="guidance">Read-only linked metadata and JPEG/PNG preview. Each selected row uses its own PicDir.
     {#if view === 'manager'}Default uses the explicitly authorized manager directory, not the FS882 child directory.
     {:else}Default uses the explicitly authorized child directory, not the manager PictureDir.{/if}
-    External directories, adding/deleting records and metadata editing remain unavailable. Files are never copied or repaired.</p>
+    {#if metadataSession}External directories and adding/deleting records remain unavailable.
+    {:else}External directories, adding/deleting records and metadata editing remain unavailable.{/if}
+    Files are never copied or repaired.</p>
 </section>
 {#if viewerOpen && currentImage}
     <dialog bind:this={viewer} class="viewer" aria-label="Pictures viewer" oncancel={() => viewerOpen = false} onclose={() => viewerOpen = false}>

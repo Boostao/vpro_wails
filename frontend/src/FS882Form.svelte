@@ -39,6 +39,7 @@
   import SIVISpeciesPanel from './SIVISpeciesPanel.svelte';
   import SIVIIdentityPanel from './SIVIIdentityPanel.svelte';
   import PicturePanel from './PicturePanel.svelte';
+  import { pictureMetadataSession as ownedPictureMetadataSession } from './pictureMetadataSessions';
   import SIVIParentReadPanel from './SIVIParentReadPanel.svelte';
   import SIVIParentSharedFields from './SIVIParentSharedFields.svelte';
   import { SIVIParentSharedSession, siviParentSharedFieldsFor, type SIVIParentSharedColumn, type SIVIParentSharedInput } from './siviParentSharedSession';
@@ -267,6 +268,14 @@
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
   let pictureBusy = $state(false);
+  const pictureMetadataWritingEnabled = import.meta.env.VITE_PICTURE_METADATA_WRITING === 'true';
+  const pictureMetadataSession = $derived.by(() => pictureMetadataWritingEnabled && siviContextId && $projectState?.activeProject && original?.plotNumber
+    ? ownedPictureMetadataSession({ contextId: siviContextId, project: $projectState.activeProject, plotNumber: original.plotNumber }) : undefined);
+  let pictureMetadataRevision = $state(0);
+  $effect(() => pictureMetadataSession?.subscribe(() => pictureMetadataRevision++));
+  const pictureMetadataClose = $derived.by(() => { pictureMetadataRevision; return pictureMetadataSession?.closeState(); });
+  const pictureMetadataPending = $derived(!!pictureMetadataClose &&
+    (pictureMetadataClose.unsaved || pictureMetadataClose.blocked || pictureMetadataClose.busy));
   const twoPageReviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW === 'true';
   const twoPageSourceLayoutEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT === 'true';
   const twoPageCommonReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW === 'true';
@@ -297,7 +306,9 @@
   let profileReviewBlocked = $state(false);
   let profileEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || pictureBusy || twoPageOpen || twoPageBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy || siviIdentityBusy);
+  const otherHeaderWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || twoPageOpen || twoPageBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy || siviIdentityBusy);
+  const headerWorkflowBusy = $derived(otherHeaderWorkflowBusy || pictureBusy || pictureMetadataPending);
+  const tabWorkflowBusy = $derived(otherHeaderWorkflowBusy || pictureBusy || (pictureMetadataClose?.busy ?? false));
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -606,6 +617,7 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
+  const headerInputsDisabled = $derived(draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved || pictureBusy || pictureMetadataPending);
   const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || siviSourceBarrier || dirty || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked);
   const siviParentSharedEditingDisabled = $derived(!siviParentSharedEnabled || !capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty ||
     original === null || nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved ||
@@ -1365,6 +1377,10 @@
   }
 
   async function load(p?: string) {
+    if (pictureMetadataPending) {
+      error = 'Finish or explicitly discard picture metadata drafts/recovery before replacing their plot owner.';
+      return;
+    }
     if (siviParentSharedSession && (siviParentSharedSession.closeState().unsaved || siviParentSharedSession.closeState().busy)) {
       error = 'Finish or explicitly Undo shared SIVI drafts/recovery before replacing their plot owner.';
       return;
@@ -2676,6 +2692,11 @@
   }
 
   export function getCloseState(): EditorCloseState {
+    if (pictureMetadataPending && pictureMetadataClose) return {
+      ...pictureMetadataClose, canSave: false,
+      saveReason: pictureMetadataClose.blocked || pictureMetadataClose.busy ? pictureMetadataClose.saveReason
+        : 'Save picture metadata explicitly or discard its draft before parent Save, Lock or close.',
+    };
     if (siviParentSourceView?.authorityUnknown) return {
       unsaved: true, busy: siviParentSourceView.busy, blocked: true, canSave: false,
       saveReason: 'Reload owned ProjectID choices to observe the source preference outcome before saving or closing.',
@@ -3060,7 +3081,7 @@
     {#if siviStandalone}
       <button type="button" data-sivi-site-tab aria-current={activeTab === 'siviParent' ? 'page' : undefined}
         class="px-4 py-2 border-b-2 {activeTab === 'siviParent' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
-        disabled={headerWorkflowBusy || !siviStandaloneEnabled}
+        disabled={tabWorkflowBusy || !siviStandaloneEnabled}
         onclick={() => { activeTab = 'siviParent'; siviParentOpen = true; }}>
         Plot &amp; Site Description
       </button>
@@ -3069,7 +3090,7 @@
       aria-current={activeTab === 'site' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'site' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'site'}
-      disabled={headerWorkflowBusy}
+      disabled={tabWorkflowBusy}
     >
       Site & Location
     </button>
@@ -3078,7 +3099,7 @@
       aria-current={activeTab === 'veg' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'veg' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'veg'}
-      disabled={headerWorkflowBusy || siviStandalone && !siviStandaloneEnabled}
+      disabled={tabWorkflowBusy || siviStandalone && !siviStandaloneEnabled}
     >
       Vegetation
     </button>
@@ -3087,7 +3108,7 @@
       aria-current={activeTab === 'vegOther' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'vegOther' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'vegOther'}
-      disabled={headerWorkflowBusy}
+      disabled={tabWorkflowBusy}
     >
       Veg Other
     </button>
@@ -3095,7 +3116,7 @@
       aria-current={activeTab === 'soils' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'soils' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'soils'}
-      disabled={headerWorkflowBusy}
+      disabled={tabWorkflowBusy}
     >
       Soils (Humus & Mineral)
     </button>
@@ -3103,7 +3124,7 @@
       aria-current={activeTab === 'other' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'other' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'other'}
-      disabled={headerWorkflowBusy}
+      disabled={tabWorkflowBusy}
     >
       Other Data
     </button>
@@ -3111,7 +3132,7 @@
       aria-current={activeTab === 'audit' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'audit' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'audit'}
-      disabled={headerWorkflowBusy}
+      disabled={tabWorkflowBusy}
     >
       Audit Trail
     </button>
@@ -3449,14 +3470,14 @@
     {#if activeTab === 'site' && !siviStandalone}
       {#key headerRevision}
         <ParentCodeFields bind:draft {original} {capabilities} scope="site"
-          disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
+          disabled={headerInputsDisabled}
           onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => parentCodeBusy = pending}>
         {#snippet children(editor)}
         <OrdinaryFields bind:draft {original} {capabilities} scope="site"
-          disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
+          disabled={headerInputsDisabled}
           onchange={markDirty} onvalidation={validateHeader}>
         {#snippet children(ordinaryEditor)}
-        <HeaderEditor bind:draft {original} {capabilities} disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
+        <HeaderEditor bind:draft {original} {capabilities} disabled={headerInputsDisabled}
           onMetadata={metadataEnabled ? openProjectMetadata : undefined} metadataDisabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
           {editor} additionalEditor={ordinaryEditor} {masterAllowed}
           existing={original !== null}
@@ -3473,8 +3494,9 @@
         {#snippet linkedPictures()}
           {#if $projectState && original}
             <PicturePanel contextId={siviContextId} project={$projectState.activeProject} plotNumber={original.plotNumber}
-              disabled={busy || headerWorkflowBusy || !capabilitiesReady || dirty || childUnsaved}
-              onBusyChange={(pending) => pictureBusy = pending} />
+              disabled={busy || otherHeaderWorkflowBusy || !capabilitiesReady || dirty || childUnsaved}
+              metadataDisabled={busy || otherHeaderWorkflowBusy || !capabilitiesReady || !pictureMetadataPending && (dirty || childUnsaved)}
+              onBusyChange={(pending) => pictureBusy = pending} metadataSession={pictureMetadataSession} />
           {:else}
             <p role="status">Save and reload an owned plot before reading linked pictures.</p>
           {/if}
@@ -3585,7 +3607,7 @@
           onclick={() => void loadSpeciesReferences()}>{speciesReferenceError ? 'Retry species references' : 'Reload species references'}</button>
       {/if}
       <OrdinaryFields bind:draft {original} {capabilities} scope="veg"
-        disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
+        disabled={headerInputsDisabled}
         onchange={markDirty} onvalidation={validateHeader} onVegNotesTab={vegetationNotesTab}>
       {#snippet children(ordinaryEditor)}
       <SourcePage name="Vegetation" values={sourceHeaderValues} {vegetationMode} editor={ordinaryEditor} onHeightToggle={() => vegetationMode = vegetationMode === 'height' ? 'cover' : 'height'}
@@ -3843,23 +3865,23 @@
         <button disabled={soilEditingDisabled || soilUnsaved} onclick={() => openNewChild('mineral')}>Add Mineral Layer</button>
       </div>
       <OrdinaryFields bind:draft {original} {capabilities} scope="soils"
-        disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
+        disabled={headerInputsDisabled}
         onchange={markDirty} onvalidation={validateHeader}>
       {#snippet children(ordinaryEditor)}
       <DrainageFields bind:draft {original} {capabilities}
-        disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
+        disabled={headerInputsDisabled}
         onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => drainageBusy = pending}>
       {#snippet children(drainageEditor)}
       <SoilCodeFields bind:draft {original} {capabilities}
-        disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || geologyCodeBusy}
+        disabled={headerInputsDisabled || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || geologyCodeBusy}
         onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => soilCodeBusy = pending}>
         {#snippet children(editor)}
           <GeologyCodeFields bind:draft {original} {capabilities}
-            disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy}
+            disabled={headerInputsDisabled || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy}
             onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => geologyCodeBusy = pending}>
             {#snippet children(geologyEditor)}
               <ParentCodeFields bind:draft {original} {capabilities} scope="soils"
-                disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
+                disabled={headerInputsDisabled}
                 onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => parentCodeBusy = pending}>
               {#snippet children(parentEditor)}
               <SourcePage name="Soil/Terrain" values={sourceHeaderValues} {editor} editors={[...(geologyEditor ? [geologyEditor] : []), ...(parentEditor ? [parentEditor] : []), ...(ordinaryEditor ? [ordinaryEditor] : []), ...(drainageEditor ? [drainageEditor] : [])]}>

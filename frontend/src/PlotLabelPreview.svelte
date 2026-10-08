@@ -77,7 +77,7 @@
     </details>
   {/if}
   <p class="guidance">Read-only adaptation of the single-plot label preview. No BecLabels rows, database, audits,
-    configuration, files or printer jobs are changed. Source report designs and printer geometry are not available;
+    configuration, files or printer jobs are changed. Source report designs are mapped; physical printer output is not verified;
     six-position printing and Print All Plots remain unavailable. SU/profile filters are not applied to this exact lookup.</p>
 </section>
 

@@ -137,30 +137,7 @@ func withPictureLibrarySnapshot[T any](ctx context.Context, source *ownedPicture
 			resultErr = errors.Join(resultErr, err)
 		}
 	}()
-	var count int
-	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM main.sqlite_master WHERE type='table' AND name COLLATE BINARY='tblVPics'`).Scan(&count); err != nil {
-		return result, fmt.Errorf("picture library SQLite schema unavailable: %w", err)
-	}
-	if count != 1 {
-		return result, errors.New("picture library requires the original physical tblVPics table; staging tables and views are not published libraries")
-	}
-	if err := validateSIVIPhysicalSchema(ctx, tx, "main", "tblVPics", "picture metadata"); err != nil {
-		return result, err
-	}
-	columns, err := readSQLiteStorageColumns(ctx, tx, "main", "tblVPics")
-	if err != nil {
-		return result, err
-	}
-	names := []string{"ID", "PicDir", "PicName", "PlotNumber", "PicComment"}
-	if len(columns) != len(names) {
-		return result, errors.New("picture library requires the five original source columns; no missing or additional binding was inferred")
-	}
-	for index, name := range names {
-		if columns[index].Name != name {
-			return result, fmt.Errorf("picture library source column %d must be %q; no binding was repaired", index, name)
-		}
-	}
-	records, err := readSQLiteLiteralTextRows(ctx, tx, "main", "tblVPics", "PlotNumber", plot, "")
+	records, err := readPictureLibraryRows(ctx, tx, plot)
 	if err != nil {
 		return zero, err
 	}
@@ -178,4 +155,31 @@ func withPictureLibrarySnapshot[T any](ctx context.Context, source *ownedPicture
 		return zero, err
 	}
 	return result, nil
+}
+
+func readPictureLibraryRows(ctx context.Context, tx *sql.Tx, plot string) (ProjectMetadataTable, error) {
+	var count int
+	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM main.sqlite_master WHERE type='table' AND name COLLATE BINARY='tblVPics'`).Scan(&count); err != nil {
+		return ProjectMetadataTable{}, fmt.Errorf("picture library SQLite schema unavailable: %w", err)
+	}
+	if count != 1 {
+		return ProjectMetadataTable{}, errors.New("picture library requires the original physical tblVPics table; staging tables and views are not published libraries")
+	}
+	if err := validateSIVIPhysicalSchema(ctx, tx, "main", "tblVPics", "picture metadata"); err != nil {
+		return ProjectMetadataTable{}, err
+	}
+	columns, err := readSQLiteStorageColumns(ctx, tx, "main", "tblVPics")
+	if err != nil {
+		return ProjectMetadataTable{}, err
+	}
+	names := []string{"ID", "PicDir", "PicName", "PlotNumber", "PicComment"}
+	if len(columns) != len(names) {
+		return ProjectMetadataTable{}, errors.New("picture library requires the five original source columns; no missing or additional binding was inferred")
+	}
+	for index, name := range names {
+		if columns[index].Name != name {
+			return ProjectMetadataTable{}, fmt.Errorf("picture library source column %d must be %q; no binding was repaired", index, name)
+		}
+	}
+	return readSQLiteLiteralTextRows(ctx, tx, "main", "tblVPics", "PlotNumber", plot, "")
 }

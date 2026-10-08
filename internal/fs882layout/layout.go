@@ -116,11 +116,24 @@ func column(source string) string {
 // Build uses the inventory for closure, hashes and event references, and the
 // layout tree for anonymous groups which the inventory deliberately flattens.
 func Build(source, root string) (*Layout, error) {
+	return build(source, root, false)
+}
+
+func BuildReport(source, root string) (*Layout, error) {
+	return build(source, root, true)
+}
+
+func build(source, root string, report bool) (*Layout, error) {
 	inventory, err := accessinventory.Build(source)
 	if err != nil {
 		return nil, err
 	}
-	reachable, err := inventory.ReachableForms(root)
+	var reachable []accessinventory.Form
+	if report {
+		reachable, err = inventory.ReachableReport(root)
+	} else {
+		reachable, err = inventory.ReachableForms(root)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +145,10 @@ func Build(source, root string) (*Layout, error) {
 		CoordinateRule: "raw-export; coordinate spaces unverified; do not infer offsets from structural attachment",
 		LayoutPolicy:   "preserve Access source positions; maximum fit scale 1, minimum fit scale 0.9, then horizontal scroll; no card regrouping or copied paper artwork",
 		Forms:          []Form{}}
-	if strings.EqualFold(result.Root, "FS882-6x4XL") {
+	if report {
+		result.LayoutPolicy = "static report evidence only; preserve explicit/inherited/omitted source properties; no physical print, pagination or built-in default inference"
+	}
+	if !report && strings.EqualFold(result.Root, "FS882-6x4XL") {
 		result.GeometryInference = "Observed FS882 parent export suggests form-absolute child positions: PlotNumber Left12510/Top720 minus Site Left135/Top450 gives x825/y18 CSS pixels; Width1887 gives right950.8 within Site Width14265 (951 pixels). This is an inference, not verified coordinate semantics; never add ancestor offsets, including attached labels"
 	}
 	for _, form := range reachable {

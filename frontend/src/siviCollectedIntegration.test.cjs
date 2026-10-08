@@ -16,7 +16,7 @@ function host(overrides = {}) {
   return componentFunctions('FS882Form.svelte', [
     'siviCollectedOperation', 'cycleSIVICollected', 'showSIVICollectedPanel', 'refreshSIVIChildEditors', 'load',
   ], {
-    ...Object.fromEntries(guards.map(name => [name, false])),
+    ...Object.fromEntries(guards.map(name => [name, false])), pictureMetadataPending: false,
     ...Object.fromEntries(peers.map(name => [name, null])),
     error: null, successMsg: null, siviCollectedEnabled: true, siviCollectedEditingDisabled: false,
     siviCollectedUnsaved: false, siviCollectedReading: false, siviCollectedPanelOpen: false,
@@ -45,7 +45,8 @@ test('Collected has independent literal frontend/backend gates and actual native
 });
 
 test('Collected owns root Save Undo Lock close busy and every mutually exclusive editor guard', () => {
-  assert.match(parent, /headerWorkflowBusy = \$derived\([^\n]*\|\| siviCollectedBusy/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviCollectedBusy/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
   assert.match(parent, /nonParentChildUnsaved = \$derived\([^\n]*\|\| siviCollectedUnsaved/);
   assert.match(parent, /if \(siviCollectedUnsaved\) \{ await siviCollectedOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviCollectedUnsaved\) \{ void siviCollectedOperation\('undo'\); return; \}/);
