@@ -6,6 +6,7 @@ import {
   siviHeightErrors, siviHeightEdits, type SIVIProjection, type SIVIHeightDrafts,
   type SIVIHeightColumn, type SIVIHeightEdit,
 } from './siviHeightEditor';
+import { siviChildSourceNotices, type SIVIChildSourceNotice } from './siviChildSourceNotices';
 
 export interface SIVIHeightPort {
   read(extended: boolean): PromiseLike<SIVIVegetationProjection[] | null>;
@@ -21,6 +22,8 @@ export interface SIVIHeightView {
   blocked: boolean;
   error: string | null;
   historyId: string | null;
+  sourceNotices: SIVIChildSourceNotice[];
+  sourceNoticesSaved: boolean;
 }
 
 export function siviProjectionFromWire(wire: SIVIVegetationProjection[] | null, plot: string, extended: boolean): SIVIProjection[] {
@@ -43,12 +46,19 @@ export class SIVIHeightSession {
   private disposed = false;
 
   constructor(private readonly plot: string, private readonly port: SIVIHeightPort,
-    private readonly notify: () => void, extended = false) {
-    this.state = { review: null, drafts: {}, extended, busy: false, blocked: false, error: null, historyId: null };
+    private readonly notify: () => void, extended = false, private readonly sourceNotices = false) {
+    this.state = { review: null, drafts: {}, extended, busy: false, blocked: false, error: null, historyId: null,
+      sourceNotices: [], sourceNoticesSaved: false };
   }
 
   view(): SIVIHeightView {
-    return structuredClone(this.state);
+    const view = structuredClone(this.state);
+    if (this.disposed) view.sourceNotices = [];
+    else if (this.sourceNotices && view.review && !view.blocked && siviHeightDirty(view.drafts) && !siviHeightErrors(view.drafts).length) {
+      view.sourceNotices = siviChildSourceNotices(view.review, siviHeightEdits(view.review, view.drafts));
+      view.sourceNoticesSaved = false;
+    }
+    return view;
   }
 
   closeState(): EditorCloseState {
@@ -86,10 +96,12 @@ export class SIVIHeightSession {
     this.changed();
   }
 
-  async load(): Promise<boolean> {
+  load(): Promise<boolean> { return this.loadSource(false); }
+  refreshSource(): Promise<boolean> { return this.loadSource(true); }
+  private async loadSource(preserveNotices: boolean): Promise<boolean> {
     this.requireIdle();
     if (this.closeState().unsaved) throw new Error('Finish or Undo SIVI drafts before reloading original rows.');
-    return this.reload(false);
+    return this.reload(false, preserveNotices);
   }
 
   private async readCurrent() {
@@ -99,7 +111,7 @@ export class SIVIHeightSession {
     this.state.review = siviProjectionFromWire(wire, this.plot, this.state.extended);
   }
 
-  private async reload(refreshParent: boolean): Promise<boolean> {
+  private async reload(refreshParent: boolean, preserveNotices = false): Promise<boolean> {
     this.state.busy = true;
     this.changed();
     try {
@@ -107,6 +119,10 @@ export class SIVIHeightSession {
       await this.readCurrent();
       this.state.blocked = false;
       this.state.error = null;
+      if (!preserveNotices) {
+        this.state.sourceNotices = [];
+        this.state.sourceNoticesSaved = false;
+      }
       return true;
     } catch (cause) {
       this.state.review = null;
@@ -132,9 +148,12 @@ export class SIVIHeightSession {
     if (!edits.length) {
       this.state.drafts = {};
       this.state.error = null;
+      this.state.sourceNotices = [];
+      this.state.sourceNoticesSaved = false;
       this.changed();
       return true;
     }
+    const sourceNotices = this.sourceNotices ? siviChildSourceNotices(this.state.review, edits) : [];
     this.state.busy = true;
     this.state.error = null;
     this.changed();
@@ -151,6 +170,8 @@ export class SIVIHeightSession {
       this.state.historyId = result.HistoryID || null;
       this.state.drafts = {};
       if (this.disposed) throw new Error('SIVI editor ownership ended after Save committed.');
+      this.state.sourceNotices = sourceNotices;
+      this.state.sourceNoticesSaved = true;
       await this.port.refreshParent();
       await this.readCurrent();
       return true;
@@ -188,6 +209,8 @@ export class SIVIHeightSession {
       }
       committed = true;
       this.state.historyId = null;
+      this.state.sourceNotices = [];
+      this.state.sourceNoticesSaved = false;
       if (this.disposed) throw new Error('SIVI editor ownership ended after restoration committed.');
       await this.port.refreshParent();
       await this.readCurrent();

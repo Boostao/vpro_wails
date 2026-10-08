@@ -26,9 +26,12 @@ const editor = loadTypeScript('siviCoverEditor.ts', {
   './projectMetadataRestore': restoration, './projectMetadataEditor': metadata,
   './qualityEditor': quality, './numericEditor': numeric, './siviHeightEditor': height,
 });
-const session = loadTypeScript('siviCoverSession.ts', {
-  './siviCoverEditor': editor, './projectMetadataRestore': restoration,
+const childSession = loadTypeScript('siviChildWriteSession.ts', {
+  './projectMetadataRestore': restoration,
   './siviHeightEditor': height, './siviHeightSession': heightSession,
+});
+const session = loadTypeScript('siviCoverSession.ts', {
+  './siviCoverEditor': editor, './siviChildWriteSession': childSession,
 });
 const id = '9007199254740993';
 const copy = value => JSON.parse(JSON.stringify(value));

@@ -112,7 +112,9 @@ test('standalone host uses the existing editor owner/close guards, not a duplica
   assert.match(host, /No FS882 fallback|no FS882 fallback/);
   assert.match(host, /async function loadSIVIParentOriginals/);
   assert.match(host, /siviStandalone && siviStandaloneEnabled && siviParentSession/);
-  assert.match(host, /combined cover\/height editing remain unavailable/);
+  assert.match(host, /VITE_SIVI_COMBINED_EDITING === 'true'/);
+  assert.match(host, /\{#if siviCombinedEnabled\}/);
+  assert.match(host, /Species creation\/deletion and original species-list callbacks remain unavailable/);
   assert.match(host, /Close SIVI form/);
   assert.match(host, /siviStandalone && !getCloseState\(\)\.canSave/);
   assert.match(host, /!siviStandaloneEnabled \|\| !siviParentView\?\.original \|\| Boolean\(siviParentView\?\.error\) \|\| childUnsaved \|\| siviSourceBarrier/);

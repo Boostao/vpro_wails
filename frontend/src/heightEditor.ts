@@ -22,14 +22,15 @@ export type HeightDrafts = Record<string, Partial<Record<HeightField, HeightCell
 type CoverValues = Partial<Record<HeightField, number | null>>;
 export interface CoverSourceEdit { id: number; form: string; values?: CoverValues }
 export type CoverSourceRow = CoverValues & { id: number };
+const aCoverNoticeForms = new Set(['SubVegAXL_BC', 'SubVegAXL', 'SubVegAhtXL', 'SubVegA-SIVI_BC', 'SubVegA-SIVI']);
 export function aCoverSourceNotice(form: string, id: number | string, values: CoverValues): string | null {
-  return (form === 'SubVegAXL_BC' || form === 'SubVegAXL' || form === 'SubVegAhtXL') &&
+  return aCoverNoticeForms.has(form) &&
     heightFields.slice(0, 7).every(field => values[field] == null)
     ? `Vegetation row ${id}: all A/B cover values are NULL. No cover value is inferred; the vegetation record is not deleted.` : null;
 }
 export function aCoverSourceNotices(edits: readonly CoverSourceEdit[], rows: readonly CoverSourceRow[]): string[] {
   return [...new Set(edits.flatMap(edit => {
-    if (edit.form !== 'SubVegAXL_BC' && edit.form !== 'SubVegAXL' && edit.form !== 'SubVegAhtXL') return [];
+    if (!aCoverNoticeForms.has(edit.form)) return [];
     const matching = rows.filter(row => row.id === edit.id);
     if (matching.length !== 1) throw new Error('Cover notice source row is missing or ambiguous; reload before editing.');
     const notice = aCoverSourceNotice(edit.form, edit.id, { ...matching[0], ...edit.values });

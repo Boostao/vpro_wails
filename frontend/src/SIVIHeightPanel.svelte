@@ -3,6 +3,7 @@
   import { metadataCellText } from './projectMetadataEditor';
   import { siviHeightDirty, type SIVIHeightColumn, type SIVIProjection, type SIVIRow } from './siviHeightEditor';
   import type { SIVIHeightView } from './siviHeightSession';
+  import SIVIChildSourceNotices from './SIVIChildSourceNotices.svelte';
 
   let { view, disabled, canSave, onstage, onsave, onundo, onreload, onrestore }: {
     view: SIVIHeightView;
@@ -108,6 +109,7 @@
   {:else if !view.busy}
     <p class="text-sm text-stone-600">Load the original source rows before editing.</p>
   {/if}
+  <SIVIChildSourceNotices notices={view.sourceNotices ?? []} saved={view.sourceNoticesSaved ?? false} />
   {#if view.extended}
     <p class="text-xs text-stone-600" data-sivi-extended-guidance>Extended shrub presentation shows B3/B4/B5 cover context; aggregate height editing remains available. Switching presentation never saves or resets drafts.</p>
   {/if}

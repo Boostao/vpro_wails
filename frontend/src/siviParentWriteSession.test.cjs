@@ -223,7 +223,7 @@ test('parent draft owner joins global lifecycle and permits remount without impl
   const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(parent, /VITE_SIVI_PARENT_EDITING === 'true'/);
   assert.match(parent, /childUnsaved = \$derived\(nonParentChildUnsaved \|\| siviParentWriteUnsaved \|\| siviParentActionUnsaved \|\| siviProjectAssignmentUnsaved \|\| siviParentSharedUnsaved \|\| twoPageOpen\)/);
-  assert.match(parent, /blocked: \(siviClose\?\.blocked \?\? false\) \|\| \(siviCoverClose\?\.blocked \?\? false\) \|\| \(siviParentWriteClose\?\.blocked \?\? false\)/);
+  assert.match(parent, /blocked: \(siviClose\?\.blocked \?\? false\) \|\| \(siviCoverClose\?\.blocked \?\? false\) \|\| \(siviCombinedClose\?\.blocked \?\? false\) \|\| \(siviParentWriteClose\?\.blocked \?\? false\)/);
   assert.match(parent, /if \(siviParentWriteUnsaved\) \{ await siviParentWriteOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviParentWriteUnsaved\) \{ void siviParentWriteOperation\('undo'\); return; \}/);
   assert.match(parent, /Save or explicitly Undo SIVI parent drafts\/recovery before changing the plot lock/);

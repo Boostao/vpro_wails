@@ -21,6 +21,9 @@ func main() {
 	if _, err := siviFeature(siviCoverFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
+	if _, err := siviFeature(siviCombinedFeatureEnvironment, os.LookupEnv); err != nil {
+		log.Fatal(err)
+	}
 	if _, err := siviFeature(lifeformWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
@@ -175,6 +178,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	siviCombined, err := NewSIVICombinedService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	lifeformSummary, err := NewLifeformSummaryService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -294,6 +301,7 @@ func main() {
 		application.NewService(twoPageParentCommon),
 		application.NewService(twoPageParentEntry),
 		application.NewService(siviCovers),
+		application.NewService(siviCombined),
 		application.NewService(lifeformSummary),
 		application.NewService(speciesAttributeSummary),
 		application.NewService(lifeformWorkbook),

@@ -50,6 +50,8 @@ function serverComponent(source, filename, dependencies) {
       if (name === 'svelte' || name.startsWith('svelte/')) return require(name);
       if (name === './FieldGuidance.svelte') return { default: serverComponent(
         readFileSync(path.join(__dirname, 'FieldGuidance.svelte'), 'utf8'), 'FieldGuidance.svelte', {}) };
+      if (name === './SIVIChildSourceNotices.svelte') return { default: serverComponent(
+        readFileSync(path.join(__dirname, 'SIVIChildSourceNotices.svelte'), 'utf8'), 'SIVIChildSourceNotices.svelte', {}) };
       throw new Error(`Unexpected renderer dependency ${name}`);
     }
   });
@@ -62,6 +64,19 @@ function loadTypeScript(filename, dependencies = {}, globals = {}) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true }
   }).outputText, { ...globals, module, exports: module.exports, structuredClone, require(name) {
     if (name in dependencies) return dependencies[name];
+    if (name === './siviChildSourceNotices') {
+      const quality = dependencies['./qualityEditor'] || loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
+      const metadata = dependencies['./projectMetadataEditor'] || loadTypeScript('projectMetadataEditor.ts', {
+        './qualityEditor': quality, '../../resources/project-metadata-standard.json': [], '../../resources/project-metadata-template.json': [],
+      });
+      return loadTypeScript('siviChildSourceNotices.ts', {
+        './heightEditor': loadTypeScript('heightEditor.ts', { './numericEditor': loadTypeScript('numericEditor.ts') }),
+        './projectMetadataEditor': metadata,
+        './projectMetadataRestore': dependencies['./projectMetadataRestore'] || loadTypeScript('projectMetadataRestore.ts', {
+          './qualityEditor': quality, './projectMetadataEditor': metadata,
+        }),
+      });
+    }
     throw new Error(`Unexpected TypeScript dependency ${name}`);
   } });
   return module.exports;
