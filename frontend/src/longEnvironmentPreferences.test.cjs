@@ -184,11 +184,16 @@ test('rendered title has one labelled conditional control: enabled two-row texta
   session.apply(review(saved));
   for (const enabled of [true, false]) {
     const component = serverComponent(source.replace(
-      "import.meta.env.VITE_LONG_ENVIRONMENT_PREFERENCES === 'true'", String(enabled)),
+      "import.meta.env.VITE_LONG_ENVIRONMENT_PREFERENCES === 'true'", String(enabled))
+      .replace("import.meta.env.VITE_LONG_ENVIRONMENT_WORKBOOK === 'true'", 'false'),
     'LongEnvironmentReport.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { ContextService: {}, LongEnvironmentPreferencesService: {} },
       './longEnvironmentPreferences': { longEnvironmentPreferencesSession: () => session },
       './longEnvironmentReport': { reportTitleError: () => null },
+      './environmentWorkbook': { environmentWorkbookPublicationSession: () => ({
+        view: () => ({ busy: false, blocked: false, outcome: null, error: '', requestedDestination: '' }),
+        subscribe: () => () => {},
+      }) },
     });
     const { body } = render(component, { props: { ...scope, onBusyChange: () => {} } });
     const controls = body.match(/<(?:input|textarea)\b[^>]*id="long-environment-title"[^>]*>/g) ?? [];
@@ -204,7 +209,7 @@ test('rendered title has one labelled conditional control: enabled two-row texta
       assert.doesNotMatch(body, /<textarea/);
     }
   }
-  assert.match(source, /\{#if preferencesEnabled\}\s*<textarea[\s\S]*?\{:else\}\s*<input[^>]*disabled=\{busy \|\| !ready\}/);
+  assert.match(source, /\{#if preferencesEnabled\}\s*<textarea[\s\S]*?\{:else\}\s*<input[^>]*disabled=\{busy \|\| !ready \|\| workbookBarrier\}/);
   assert.equal((source.match(/const value = event.currentTarget.value; editTitle\(value\)/g) ?? []).length, 2);
   assert.match(source, /input, textarea \{[^}]*width: 100%/);
 });

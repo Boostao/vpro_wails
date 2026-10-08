@@ -202,6 +202,27 @@ export interface EnvironmentSiteUnitTransfer {
     "confirmed": boolean;
 }
 
+export interface EnvironmentWorkbookOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface EnvironmentWorkbookReview {
+    "preview": LongEnvironmentPreview;
+    "sheets": EnvironmentWorkbookSheet[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
+export interface EnvironmentWorkbookSheet {
+    "unit": string;
+    "name": string;
+}
+
 /**
  * FS882Header captures the unified Env + Admin join record for a plot.
  */

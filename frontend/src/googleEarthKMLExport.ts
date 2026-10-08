@@ -2,6 +2,7 @@ import type { GoogleEarthKMLExportReview, GoogleEarthKMLExportOutcome } from '..
 import { ownedScope, type GoogleEarthScope } from './googleEarthReview';
 import { validateGoogleEarthKMLReview } from './googleEarthKMLReview';
 import { wellFormedUTF16 } from './qualityEditor';
+import { PublicationSession, type PublicationView } from './publicationSession';
 
 const hash = (value: unknown): value is string => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
 const text = (value: unknown): value is string => typeof value === 'string' && wellFormedUTF16(value) && !value.includes('\0');
@@ -37,52 +38,29 @@ export function validateGoogleEarthKMLExportOutcome(value: GoogleEarthKMLExportO
   return value;
 }
 
-export interface KMLPublicationView {
-  busy: boolean;
-  blocked: boolean;
-  outcome: GoogleEarthKMLExportOutcome | null;
-  error: string;
-  requestedDestination: string;
-}
+export type KMLPublicationView = PublicationView<GoogleEarthKMLExportOutcome>;
 
 export class GoogleEarthKMLPublicationSession {
-  private state: KMLPublicationView = { busy: false, blocked: false, outcome: null, error: '', requestedDestination: '' };
-  private listeners = new Set<() => void>();
+  private receipt = new PublicationSession<GoogleEarthKMLExportOutcome>('KML file', 'KML');
   private readonly scope: GoogleEarthScope;
   constructor(scope: GoogleEarthScope) { this.scope = structuredClone(scope); }
-  view(): KMLPublicationView { return structuredClone(this.state); }
+  view(): KMLPublicationView { return this.receipt.view(); }
   subscribe(listener: () => void): () => void {
-    this.listeners.add(listener);
-    listener();
-    return () => this.listeners.delete(listener);
+    return this.receipt.subscribe(listener);
   }
-  private notify() { for (const listener of this.listeners) listener(); }
   async publish(review: GoogleEarthKMLExportReview, destination: string,
     port: (request: { descriptionField: string; title: string; approvalHash: string; destination: string }) =>
       PromiseLike<GoogleEarthKMLExportOutcome | null>): Promise<void> {
-    if (this.state.busy || this.state.blocked) throw new Error('Acknowledge the prior KML file outcome before a new publication.');
+    if (this.receipt.view().busy || this.receipt.view().blocked) throw new Error('Acknowledge the prior KML file outcome before a new publication.');
     if (!ownedScope(review.review, this.scope) || !hash(review.approvalHash) || !hash(review.kmlSHA256) ||
         !text(destination) || !destination) throw new Error('KML publication requires the owned review and an explicit literal destination.');
     const requested = structuredClone({ descriptionField: review.review.descriptionField, title: review.review.title,
       approvalHash: review.approvalHash, destination });
     const expectedHash = review.kmlSHA256;
-    this.state = { busy: true, blocked: true, outcome: null, error: '', requestedDestination: destination };
-    this.notify();
-    try {
-      this.state.outcome = validateGoogleEarthKMLExportOutcome(await port(requested), destination, expectedHash);
-      this.state.error = this.state.outcome.errorMessage;
-    } catch (cause) {
-      this.state.error = `KML file outcome unknown. Do not repeat this destination; retain and inspect it before proceeding: ${String(cause)}`;
-    } finally {
-      this.state.busy = false;
-      this.notify();
-    }
+    await this.receipt.publish(requested, destination, port,
+      value => validateGoogleEarthKMLExportOutcome(value, destination, expectedHash));
   }
-  acknowledge() {
-    if (this.state.busy) throw new Error('Wait for KML publication to return; publication cannot be cancelled or replayed.');
-    this.state.blocked = false;
-    this.notify();
-  }
+  acknowledge() { this.receipt.acknowledge(); }
 }
 
 const sessions = new Map<string, { scope: GoogleEarthScope; session: GoogleEarthKMLPublicationSession }>();

@@ -61,7 +61,7 @@ test('report view is independently gated, scoped, cancellable and participates i
   }
   const panel=read('LongEnvironmentReport.svelte'), root=read('App.svelte');
   assert.match(read('Navigation.svelte'),/VITE_LONG_ENVIRONMENT_REPORT === 'true'/);
-  assert.match(panel,/onDestroy\(\(\) => \{ unsubscribe\?\.\(\); cancel\(\); \}\)/);
+  assert.match(panel,/onDestroy\(\(\) => \{ unsubscribe\?\.\(\); unsubscribeWorkbook\(\); cancel\(\); \}\)/);
   assert.match(panel,/request !== generation/);
   assert.match(panel,/ContextService\.PreviewLongEnvironment\(contextId/);
   assert.match(panel,/data-source-control="rptSvTitle"/);

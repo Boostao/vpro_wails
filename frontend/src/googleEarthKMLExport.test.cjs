@@ -16,6 +16,7 @@ const xml = '<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://earth.go
 const sha = createHash('sha256').update(xml).digest('hex');
 const destination = 'C:\\fixture\\ Literal.kml';
 const exportsModule = loadTypeScript('googleEarthKMLExport.ts', {
+  './publicationSession': loadTypeScript('publicationSession.ts'),
   './qualityEditor': quality, './googleEarthReview': earth,
   './googleEarthKMLReview': { async validateGoogleEarthKMLReview(value, owner, field, title) {
     assert.equal(value.contextId, owner.contextId); assert.equal(value.descriptionField, field); assert.equal(value.title, title);

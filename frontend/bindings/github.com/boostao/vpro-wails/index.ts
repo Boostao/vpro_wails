@@ -5,6 +5,7 @@ import * as BECService from "./becservice.js";
 import * as CloseService from "./closeservice.js";
 import * as ContextService from "./contextservice.js";
 import * as CoordinateService from "./coordinateservice.js";
+import * as EnvironmentWorkbookService from "./environmentworkbookservice.js";
 import * as GeologyCodeService from "./geologycodeservice.js";
 import * as GoogleEarthKMLExportService from "./googleearthkmlexportservice.js";
 import * as GoogleEarthKMLService from "./googleearthkmlservice.js";
@@ -31,6 +32,7 @@ export {
     CloseService,
     ContextService,
     CoordinateService,
+    EnvironmentWorkbookService,
     GeologyCodeService,
     GoogleEarthKMLExportService,
     GoogleEarthKMLService,
@@ -79,6 +81,9 @@ export type {
     EnvironmentSiteUnitResult,
     EnvironmentSiteUnitReview,
     EnvironmentSiteUnitTransfer,
+    EnvironmentWorkbookOutcome,
+    EnvironmentWorkbookReview,
+    EnvironmentWorkbookSheet,
     FS882Header,
     GeologyCodeChoice,
     GoogleEarthDescriptionFields,

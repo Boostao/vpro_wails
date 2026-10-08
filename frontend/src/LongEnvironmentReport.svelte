@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { ContextService, LongEnvironmentPreferencesService, type LongEnvironmentPreview } from '../bindings/github.com/boostao/vpro-wails';
+  import { onMount, onDestroy, untrack } from 'svelte';
+  import { ContextService, LongEnvironmentPreferencesService, EnvironmentWorkbookService, type LongEnvironmentPreview } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { reportTitleError, reportCellText, validateLongEnvironmentPreview } from './longEnvironmentReport';
   import { longEnvironmentPreferencesSession } from './longEnvironmentPreferences';
+  import { environmentWorkbookPublicationSession, validateEnvironmentWorkbookReview, type ValidatedEnvironmentWorkbookReview } from './environmentWorkbook';
 
   let { contextId, project, projectPath, su, suPath, onBusyChange }: {
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
@@ -14,26 +15,38 @@
   let busy = $state(false);
   let error = $state('');
   let preview = $state<LongEnvironmentPreview | null>(null);
+  let workbookReview = $state.raw<ValidatedEnvironmentWorkbookReview | null>(null);
+  let destination = $state('');
   const titleError = $derived(reportTitleError(title));
   const reads = new ReadRequests();
   let generation = 0;
   const preferencesEnabled = import.meta.env.VITE_LONG_ENVIRONMENT_PREFERENCES === 'true';
+  const workbookEnabled = import.meta.env.VITE_LONG_ENVIRONMENT_WORKBOOK === 'true';
+  const workbookOwner = untrack(() => ({ contextId, project, projectPath, su, suPath }));
+  const workbookSession = environmentWorkbookPublicationSession(workbookOwner);
+  let publication = $state(workbookSession.view());
+  const workbookBarrier = $derived(publication.busy || publication.blocked);
   const ownedPreferences = () => longEnvironmentPreferencesSession({ contextId, project, projectPath, su, suPath });
   const preferences = preferencesEnabled ? ownedPreferences() : null;
   let preferenceView = $state(preferences?.view() ?? null);
   const preferenceBarrier = $derived(!!preferenceView && (preferenceView.busy || preferenceView.blocked ||
     preferenceView.authorityUnknown || !!preferenceView.draftError));
-  function reportBusy() { onBusyChange(busy || preferenceBarrier); }
+  function reportBusy() { onBusyChange(busy || preferenceBarrier || workbookBarrier); }
+  const unsubscribeWorkbook = workbookSession.subscribe(() => {
+    publication = workbookSession.view();
+    reportBusy();
+  });
   const unsubscribe = preferences?.subscribe(() => {
-    preferenceView = preferences.view(); title = preferenceView.draft.title; ready = preferenceView.initialized; preview = null;
-    onBusyChange(busy || preferenceView.busy || preferenceView.blocked || preferenceView.authorityUnknown || !!preferenceView.draftError);
+    preferenceView = preferences.view(); title = preferenceView.draft.title; ready = preferenceView.initialized; preview = null; workbookReview = null;
+    onBusyChange(busy || preferenceView.busy || preferenceView.blocked || preferenceView.authorityUnknown || !!preferenceView.draftError || workbookBarrier);
   });
 
   function cancel() {
     generation++; reads.cancelAll(); preferences?.cancelLoad(); busy = false; reportBusy();
   }
   async function options() {
-    cancel(); const request = generation; ready = false; error = ''; preview = null;
+    if (workbookBarrier) return;
+    cancel(); const request = generation; ready = false; error = ''; preview = null; workbookReview = null;
     busy = true; reportBusy();
     try {
       const value = await reads.track(ContextService.GetLongEnvironmentOptions(contextId));
@@ -50,8 +63,8 @@
     }
   }
   async function show() {
-    if (busy || preferenceBarrier || !ready || titleError || su === 'None') return;
-    cancel(); const request = generation; const requestedTitle = title; error = ''; preview = null;
+    if (busy || preferenceBarrier || workbookBarrier || !ready || titleError || su === 'None') return;
+    cancel(); const request = generation; const requestedTitle = title; error = ''; preview = null; workbookReview = null;
     busy = true; reportBusy();
     try {
       const value = await reads.track(ContextService.PreviewLongEnvironment(contextId, { title: requestedTitle }));
@@ -64,7 +77,7 @@
     }
   }
   async function loadSavedTitle() {
-    if (!preferences || preferenceView?.busy || preferenceView?.blocked) return;
+    if (!preferences || preferenceView?.busy || preferenceView?.blocked || workbookBarrier) return;
     cancel(); const request = generation; const token = preferences.beginLoad(); error = ''; busy = true; reportBusy();
     try {
       const value = await reads.track(LongEnvironmentPreferencesService.GetLongEnvironmentPreferences(contextId));
@@ -77,7 +90,7 @@
     }
   }
   async function saveTitle() {
-    if (!preferences || busy || preferenceView?.busy || preferenceView?.blocked) return;
+    if (!preferences || busy || preferenceView?.busy || preferenceView?.blocked || workbookBarrier) return;
     cancel(); error = '';
     try {
       await preferences.save(request => LongEnvironmentPreferencesService.SaveLongEnvironmentPreferences(contextId, JSON.stringify(request)));
@@ -86,10 +99,37 @@
   function editTitle(value: string) {
     if (preferences) { cancel(); preferences.edit(value); }
     else title = value;
-    preview = null; if (!reportTitleError(title)) error = '';
+    preview = null; workbookReview = null; if (!reportTitleError(title)) error = '';
+  }
+  async function reviewWorkbook() {
+    if (!workbookEnabled || busy || preferenceBarrier || workbookBarrier || !ready || titleError || su === 'None' || su === 'USysSuTableDynamic') return;
+    cancel(); const request = generation, requestedTitle = title;
+    error = ''; preview = null; workbookReview = null; busy = true; reportBusy();
+    try {
+      const value = await reads.track(EnvironmentWorkbookService.GetReview(contextId, JSON.stringify({ title: requestedTitle })));
+      if (request !== generation) return;
+      workbookReview = validateEnvironmentWorkbookReview(value, workbookOwner, requestedTitle);
+      preview = workbookReview.preview;
+    } catch (cause) {
+      if (request === generation) error = `Workbook review unavailable; no file published: ${String(cause)}`;
+    } finally {
+      if (request === generation) { busy = false; reportBusy(); }
+    }
+  }
+  async function publishWorkbook() {
+    if (!workbookEnabled || busy || preferenceBarrier || workbookBarrier || !workbookReview) return;
+    cancel(); error = '';
+    try {
+      await workbookSession.publish(workbookReview, destination, request =>
+        EnvironmentWorkbookService.ExportReviewed(contextId, JSON.stringify(request)));
+    } catch (cause) { error = String(cause); }
+  }
+  function acknowledgeWorkbook() {
+    workbookSession.acknowledge();
+    workbookReview = null;
   }
   onMount(() => { if (!preferencesEnabled) void options(); });
-  onDestroy(() => { unsubscribe?.(); cancel(); });
+  onDestroy(() => { unsubscribe?.(); unsubscribeWorkbook(); cancel(); });
 </script>
 
 <section class="report" data-long-environment-report aria-label="Long Environment report">
@@ -98,31 +138,52 @@
   {#if titleError}<p class="error" role="alert">{titleError}</p>{/if}
   {#if preferenceView?.draftError}<p class="error" role="alert">{preferenceView.draftError}</p>{/if}
   {#if preferenceView?.error}<p class="error" role="alert">{preferenceView.error}</p>{/if}
+  {#if publication.error}<p class="error" role="alert">{publication.error}</p>{/if}
+  {#if publication.busy}<p role="status">Publishing the reviewed workbook; publication cannot be cancelled.</p>{/if}
+  {#if publication.outcome}
+    <p data-environment-workbook-receipt role="status">Workbook receipt: {publication.outcome.status}.
+      Requested {publication.requestedDestination}; observed {publication.outcome.path || '(no committed file)'}.
+      SHA256 {publication.outcome.sha256 || '(none)'}.</p>
+  {:else if publication.blocked && !publication.busy}
+    <p data-environment-workbook-unknown role="status">Workbook outcome unknown. Retain and inspect {publication.requestedDestination}; never replay blindly.</p>
+  {/if}
+  {#if publication.blocked && !publication.busy}
+    <button onclick={acknowledgeWorkbook}>Acknowledge workbook outcome</button>
+  {/if}
   <p>Project {project}; selected SU {su}. Whole selected-SU scope; profile navigation does not filter this report.</p>
   <label for="long-environment-title">Title</label>
   {#if preferencesEnabled}
     <textarea id="long-environment-title" data-source-control="rptSvTitle" rows="2" value={title}
-      disabled={!!preferenceView?.busy || !!preferenceView?.blocked}
+      disabled={!!preferenceView?.busy || !!preferenceView?.blocked || workbookBarrier}
       oninput={(event) => { const value = event.currentTarget.value; editTitle(value); }}></textarea>
   {:else}
-    <input id="long-environment-title" data-source-control="rptSvTitle" value={title} disabled={busy || !ready}
+    <input id="long-environment-title" data-source-control="rptSvTitle" value={title} disabled={busy || !ready || workbookBarrier}
       oninput={(event) => { const value = event.currentTarget.value; editTitle(value); }} />
   {/if}
   <div class="actions">
-    <button data-source-control="btnViewReport" disabled={busy || preferenceBarrier || !ready || !!titleError || su === 'None'} onclick={show}>View Report</button>
+    <button data-source-control="btnViewReport" disabled={busy || preferenceBarrier || workbookBarrier || !ready || !!titleError || su === 'None'} onclick={show}>View Report</button>
+    <button disabled={!workbookEnabled || busy || preferenceBarrier || workbookBarrier || !ready || !!titleError || su === 'None' || su === 'USysSuTableDynamic'} onclick={reviewWorkbook}>Review XLSX workbook (no file yet)</button>
     {#if preferencesEnabled}
-      <button data-long-environment-preferences-load disabled={!!preferenceView?.busy || !!preferenceView?.blocked} onclick={loadSavedTitle}>Load saved title</button>
-      <button data-long-environment-preferences-save disabled={busy || !!preferenceView?.busy || !!preferenceView?.blocked || !!preferenceView?.draftError || !preferenceView?.saved}
+      <button data-long-environment-preferences-load disabled={!!preferenceView?.busy || !!preferenceView?.blocked || workbookBarrier} onclick={loadSavedTitle}>Load saved title</button>
+      <button data-long-environment-preferences-save disabled={busy || !!preferenceView?.busy || !!preferenceView?.blocked || !!preferenceView?.draftError || !preferenceView?.saved || workbookBarrier}
         onclick={saveTitle}>Save reviewed title</button>
-      <button data-long-environment-preferences-undo disabled={!!preferenceView?.busy || !!preferenceView?.blocked || !preferenceView?.saved} onclick={() => { cancel(); preferences?.undo(); }}>Undo title</button>
+      <button data-long-environment-preferences-undo disabled={!!preferenceView?.busy || !!preferenceView?.blocked || !preferenceView?.saved || workbookBarrier} onclick={() => { cancel(); preferences?.undo(); }}>Undo title</button>
       {#if preferenceView?.blocked}
         <button data-long-environment-preferences-acknowledge disabled={preferenceView.busy} onclick={() => preferences?.acknowledge()}>Acknowledge preference outcome</button>
       {/if}
     {:else}
-      <button disabled={busy} onclick={options}>Reload report options</button>
+      <button disabled={busy || workbookBarrier} onclick={options}>Reload report options</button>
     {/if}
     {#if busy}<button onclick={cancel}>Cancel report read</button><p role="status">Reading owned report snapshots…</p>{/if}
   </div>
+  {#if workbookReview}
+    <p>Reviewed workbook: {workbookReview.sheets.length} source unit sheets; {workbookReview.bytes} bytes;
+      SHA256 {workbookReview.workbookSHA256}. Hidden lossless source metadata preserves typed NULL/empty values and diagnostics.</p>
+    <ul>{#each workbookReview.sheets as sheet}<li>Unit “{sheet.unit}” → worksheet “{sheet.name}”</li>{/each}</ul>
+    <label for="environment-workbook-destination">New XLSX output file (existing files are never replaced)</label>
+    <textarea id="environment-workbook-destination" rows="2" disabled={busy || preferenceBarrier || workbookBarrier} bind:value={destination}></textarea>
+    <button disabled={busy || preferenceBarrier || workbookBarrier || !destination || !/\.xlsx$/i.test(destination)} onclick={publishWorkbook}>Publish reviewed XLSX workbook</button>
+  {/if}
   {#if preferenceView?.busy}<p role="status">Saving reviewed title; this preference write cannot be cancelled.</p>{/if}
   {#each preferenceView?.receipts ?? [] as receipt}
     {#if receipt.kind === 'known'}
@@ -169,13 +230,14 @@
   <p class="guidance">Read-only experimental preview.
     {#if !preferencesEnabled}Title starts from ReportOptions.LEReportTitle in YAML; edits affect only this preview, not saved preferences.{/if}
     NULL, empty text and historical storage remain distinct. Missing rows and conflicting names are shown, not repaired.
-    No quality filtering, summaries, Excel automation or file export is implemented.</p>
+    No quality filtering, summaries or Excel automation is implemented.
+    Workbook review and explicit no-replace XLSX publication require their separate gate; report preparation never publishes a file.</p>
 </section>
 
 <style>
-  .report { display: grid; gap: .75rem; }
+  .report { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; overflow-wrap: anywhere; gap: .75rem; }
   h1 { font-size: 1.5rem; } h2 { font-size: 1.25rem; } h3 { font-weight: 600; }
-  input, textarea { border: 1px solid #cbd5e1; border-radius: .4rem; padding: .6rem; width: 100%; }
+  input, textarea { box-sizing: border-box; min-width: 0; border: 1px solid #cbd5e1; border-radius: .4rem; padding: .6rem; width: 100%; }
   .actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
   button { border: 1px solid #cbd5e1; border-radius: .4rem; padding: .5rem .75rem; background: white; }
   button:disabled { opacity: .5; }

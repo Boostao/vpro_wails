@@ -144,6 +144,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	environmentWorkbook, err := NewEnvironmentWorkbookService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	coordinates, err := newCoordinateService(configDir, preferences)
 	if err != nil {
 		log.Fatal(err)
@@ -205,6 +209,7 @@ func main() {
 		application.NewService(siviParentShared),
 		application.NewService(lifeformSummary),
 		application.NewService(speciesAttributeSummary),
+		application.NewService(environmentWorkbook),
 		application.NewService(NewTableCSVArchiveService(contextService, tableCSVArchiveEnabled)),
 		application.NewService(coordinates),
 	}
