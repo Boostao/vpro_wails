@@ -41,6 +41,7 @@ export interface SIVIParentSourceView {
   choices: SIVIProjectChoices | null;
   busy: boolean;
   saving: boolean;
+  authorityUnknown: boolean;
   error: string | null;
 }
 export interface SIVIParentSourcePort {
@@ -50,7 +51,7 @@ export interface SIVIParentSourcePort {
   cancel(): void;
 }
 export class SIVIParentSourceSession {
-  private state: SIVIParentSourceView = { join: null, choices: null, busy: false, saving: false, error: null };
+  private state: SIVIParentSourceView = { join: null, choices: null, busy: false, saving: false, authorityUnknown: false, error: null };
   private generation = 0;
   private disposed = false;
   private readonly owner: SIVIParentOwner;
@@ -65,13 +66,15 @@ export class SIVIParentSourceSession {
   async load(): Promise<boolean> {
     this.ready();
     const generation = ++this.generation;
-    this.state = { join: null, choices: null, busy: true, saving: false, error: null };
+    const authorityUnknown = this.state.authorityUnknown;
+    this.state = { join: null, choices: null, busy: true, saving: false, authorityUnknown, error: null };
     this.notify();
     try {
       const [join, choices] = await Promise.all([this.port.join(), this.port.choices()]);
       if (this.disposed || generation !== this.generation) return false;
       this.state.join = joinFromWire(join, this.owner);
       this.state.choices = siviProjectChoicesFromWire(choices, this.owner);
+      this.state.authorityUnknown = false;
       return true;
     } catch (cause) {
       if (this.disposed || generation !== this.generation) return false;
@@ -97,6 +100,7 @@ export class SIVIParentSourceSession {
       return true;
     } catch (cause) {
       this.state.choices = null;
+      this.state.authorityUnknown = true;
       this.state.error = `SIVI source preference failed: ${String(cause)} Reload to observe the current setting.`;
       return false;
     } finally {
@@ -109,11 +113,13 @@ export class SIVIParentSourceSession {
     if (!this.state.busy) return;
     this.generation++;
     this.port.cancel();
-    this.state = { join: null, choices: null, busy: false, saving: false, error: 'SIVI source read cancelled. Reload explicitly.' };
+    this.state = { join: null, choices: null, busy: false, saving: false,
+      authorityUnknown: this.state.authorityUnknown, error: 'SIVI source read cancelled. Reload explicitly.' };
     this.notify();
   }
   dispose() {
     if (this.state.saving) throw new Error('Wait for the source preference commit before ending ownership.');
+    if (this.state.authorityUnknown) throw new Error('Reload owned ProjectID choices to observe the source preference outcome before ending ownership.');
     this.disposed = true;
     this.generation++;
     this.port.cancel();

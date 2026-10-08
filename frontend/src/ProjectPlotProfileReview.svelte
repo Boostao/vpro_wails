@@ -12,10 +12,10 @@
   import { profileCellLabel, validateProjectPlotProfileReview, validateProjectProfileLump, validateProfileRunResult,
     profileFilterUnavailable, type ValidatedProjectPlotProfileReview, type ProfileReviewTable, type ProfileRunResult } from './projectPlotProfileReview';
 
-  let { client, onclosed, onbusy, onblocked, onapply, onsureview, allowSaveSU = false, allowFiltering = false, allowRun = false, allowEditing = false, allowCreation = false, allowDeletion = false }: {
+  let { client, onclosed, onbusy, onblocked, onapply, onsureview, authorityBlocked = false, allowSaveSU = false, allowFiltering = false, allowRun = false, allowEditing = false, allowCreation = false, allowDeletion = false }: {
     client: ReturnType<typeof bindContextPlots>; onclosed: () => void; onbusy: (busy: boolean) => void;
     onblocked: (blocked: boolean) => void; allowRun?: boolean; allowEditing?: boolean;
-    allowCreation?: boolean; allowDeletion?: boolean;
+    allowCreation?: boolean; allowDeletion?: boolean; authorityBlocked?: boolean;
     allowFiltering?: boolean; onapply?: (proposal: ProjectPlotProfileFilterRequest) => Promise<void>;
     allowSaveSU?: boolean; onsureview?: (proposal: ProjectPlotProfileFilterRequest) => Promise<void>;
   } = $props();
@@ -54,12 +54,19 @@
     if (draft) draft = { review: draft.review, cells: {} };
     error = null; success = 'Profile drafts undone; no rules, counts or history changed.';
   }
+  function mutationAuthorized(): boolean {
+    if (!authorityBlocked) return true;
+    error = 'Observe the ProjectID source preference outcome before changing profile rules; existing drafts are retained.';
+    return false;
+  }
   function stage(rowId: string, name: ProfileField, raw: string, nullValue: boolean) {
+    if (!mutationAuthorized()) return;
     if (!allowEditing || !draft || busy || committedFailure || creation || deletion !== null) { error = 'Finish the current profile proposal before editing existing rules.'; return; }
     try { draft = stageProfileRule(draft, rowId, name, raw, nullValue); error = null; success = null; result = null; }
     catch (cause) { error = `Profile draft failed; existing drafts retained: ${String(cause)}`; }
   }
   async function saveRules() {
+    if (!mutationAuthorized()) return;
     if (!allowEditing || !draft || busy || committedFailure || creation || deletion !== null || !dirty || errors.length) {
       error = 'Correct or Undo profile errors before saving reviewed changes.'; return;
     }
@@ -84,16 +91,19 @@
   }
 
   function proposeCreation() {
+    if (!mutationAuthorized()) return;
     if (!allowEditing || !allowCreation || busy || blocked || !review) { error = 'Finish existing drafts before proposing one new rule.'; return; }
     try { creation = beginProfileRuleCreation(review); error = null; success = null; result = null; }
     catch (cause) { error = `New rule proposal unavailable; no identity allocated: ${String(cause)}`; }
   }
   function stageCreation(name: ProfileField, raw: string, nullValue: boolean) {
+    if (!mutationAuthorized()) return;
     if (!creation || busy || committedFailure) { error = 'Review an available new-rule proposal before editing.'; return; }
     try { creation = stageProfileRuleCreation(creation, name, raw, nullValue); error = null; success = null; }
     catch (cause) { error = `New rule draft failed; proposal retained: ${String(cause)}`; }
   }
   async function createRule() {
+    if (!mutationAuthorized()) return;
     if (!allowEditing || !allowCreation || !creation || busy || committedFailure || errors.length) {
       error = 'Correct or Undo the explicit new-rule proposal before allocating identity.'; return;
     }
@@ -119,6 +129,7 @@
     } finally { saving = false; onbusy(false); }
   }
   function reviewDeletion(rowId: string) {
+    if (!mutationAuthorized()) return;
     if (!allowEditing || !allowDeletion || busy || blocked || !review ||
         review.rules.rows.filter(row => row.rowId === rowId).length !== 1) {
       error = 'Finish drafts before reviewing one original physical rule for deletion.'; return;
@@ -126,6 +137,7 @@
     deletion = rowId; error = null; success = null; result = null;
   }
   async function deleteRule() {
+    if (!mutationAuthorized()) return;
     if (!allowEditing || !allowDeletion || deletion === null || !review || busy || committedFailure) {
       error = 'Explicitly review one physical rule before confirming deletion.'; return;
     }
@@ -270,24 +282,24 @@
     <section class="mt-3" aria-label="Stored profile rule editor">
       <div class="flex flex-wrap gap-2">
         <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50"
-          disabled={busy || committedFailure || creation !== null || deletion !== null || !dirty || errors.length > 0} onclick={() => void saveRules()}>Save profile rules</button>
+          disabled={authorityBlocked || busy || committedFailure || creation !== null || deletion !== null || !dirty || errors.length > 0} onclick={() => void saveRules()}>Save profile rules</button>
         <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50"
           disabled={busy || committedFailure || !blocked} onclick={undo}>Undo profile drafts</button>
         {#if allowCreation}
           <button type="button" class="px-3 py-2 border rounded bg-white disabled:opacity-50"
-            disabled={busy || blocked} onclick={proposeCreation}>Review new profile rule</button>
+            disabled={authorityBlocked || busy || blocked} onclick={proposeCreation}>Review new profile rule</button>
         {/if}
       </div>
       {#if creation}
         {@const proposal = creation}
-        <fieldset class="mt-3 p-3 border rounded bg-white" disabled={busy || committedFailure}>
+        <fieldset class="mt-3 p-3 border rounded bg-white" disabled={authorityBlocked || busy || committedFailure}>
           <legend class="font-semibold">New rule proposal (no physical identity allocated)</legend>
           <ProfileRuleInputs prefix="new-profile-rule" identityLabel="new proposal"
             fields={profileEditableFields.map(name => ({ name, cell: profileCreationValue(proposal, name), options: profileCreationOptions(proposal, name, choices, lump) }))}
             onstage={stageCreation} />
           <p class="mt-3 text-sm">Eight explicit nullable assignments; PlotCount remains NULL. Create allocates one unused physical identity and complete typed history. Rule completeness for preview is a separate decision.</p>
           <button type="button" class="mt-3 px-3 py-2 border rounded bg-white disabled:opacity-50"
-            disabled={errors.length > 0} onclick={() => void createRule()}>Create reviewed profile rule</button>
+            disabled={authorityBlocked || errors.length > 0} onclick={() => void createRule()}>Create reviewed profile rule</button>
         </fieldset>
       {/if}
       {#if deletion !== null}
@@ -300,7 +312,7 @@
             {/each}</dl>
           {/if}
           <p class="mt-3">One rule only. Surviving rules and historical counts remain unchanged. Full typed deletion history and the reserved physical identity commit together; restoration is unavailable.</p>
-          <button type="button" class="mt-3 px-3 py-2 border rounded bg-white disabled:opacity-50" disabled={busy || committedFailure}
+          <button type="button" class="mt-3 px-3 py-2 border rounded bg-white disabled:opacity-50" disabled={authorityBlocked || busy || committedFailure}
             onclick={() => void deleteRule()}>Confirm profile rule deletion</button>
           <button type="button" class="mt-3 ml-2 px-3 py-2 border rounded bg-white disabled:opacity-50" disabled={busy || committedFailure}
             onclick={undo}>Cancel profile deletion</button>
@@ -308,14 +320,14 @@
       {/if}
       {#each draft.review.rules.rows as row (row.rowId)}
         {@const sourceDraft = draft}
-        <fieldset class="mt-3 p-3 border rounded bg-white" disabled={busy || committedFailure || creation !== null || deletion !== null}>
+        <fieldset class="mt-3 p-3 border rounded bg-white" disabled={authorityBlocked || busy || committedFailure || creation !== null || deletion !== null}>
           <legend class="font-semibold">Physical rule {row.rowId}</legend>
           <ProfileRuleInputs prefix={`profile-${row.rowId}`} identityLabel={`rule ${row.rowId}`}
             fields={profileEditableFields.map(name => ({ name, cell: profileRuleValue(sourceDraft, row.rowId, name), options: profileRuleOptions(sourceDraft, row.rowId, name, choices, lump) }))}
             onstage={(name, raw, nullValue) => stage(row.rowId, name, raw, nullValue)} />
           {#if allowDeletion}
             <button type="button" class="mt-3 px-3 py-2 border rounded bg-white disabled:opacity-50"
-              disabled={dirty} onclick={() => reviewDeletion(row.rowId)}>Review deletion of rule {row.rowId}</button>
+              disabled={authorityBlocked || dirty} onclick={() => reviewDeletion(row.rowId)}>Review deletion of rule {row.rowId}</button>
           {/if}
         </fieldset>
       {/each}

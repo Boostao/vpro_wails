@@ -228,6 +228,7 @@ test('parent draft owner joins global lifecycle and permits remount without impl
   assert.match(parent, /if \(siviParentWriteUnsaved\) \{ void siviParentWriteOperation\('undo'\); return; \}/);
   assert.match(parent, /Save or explicitly Undo SIVI parent drafts\/recovery before changing the plot lock/);
   assert.match(parent, /dirty \|\| nonParentChildUnsaved \|\| !siviParentSession/);
-  assert.match(parent, /if \(!siviParentWriteUnsaved && !siviParentActionUnsaved && !siviProjectAssignmentUnsaved && !siviParentSharedUnsaved && siviParentSourceSession/);
+  assert.match(parent, /if \(!siviParentWriteUnsaved && !siviParentActionUnsaved && !siviProjectAssignmentUnsaved && !siviParentSharedUnsaved &&\s+siviParentSourceSession/);
+  assert.match(parent, /!siviParentSourceView\?\.error &&\s+!siviParentSourceView\?\.authorityUnknown\) void siviParentSourceSession\.load\(\)/);
   assert.match(parent, /siviParentWriteSession\.closeState\(\)\.unsaved/);
 });

@@ -65,6 +65,11 @@
   </header>
   {#if view.error}<p role="alert" class="text-sm text-red-700">{view.error}</p>{/if}
   {#if sourceView?.error}<p role="alert" class="text-sm text-red-700">{sourceView.error}</p>{/if}
+  {#if sourceView?.authorityUnknown}
+    <p data-sivi-source-unknown role="alert" class="text-sm text-red-700">ProjectID source preference outcome is unknown.
+      Save, Lock, close and navigation remain blocked. Read ProjectID choices explicitly to observe the current setting;
+      cancelling or failing that read does not authorize another preference change.</p>
+  {/if}
   {#if writeView?.error}<p role="alert" class="text-sm text-red-700">{writeView.error}</p>{/if}
   {#if actionView?.error}<p role="alert" class="text-sm text-red-700">{actionView.error}</p>{/if}
   {#if assignmentView?.error}<p role="alert" class="text-sm text-red-700">{assignmentView.error}</p>{/if}

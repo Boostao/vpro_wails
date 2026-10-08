@@ -735,7 +735,37 @@ wire identity, source, table, signed rowids and complete tagged cells. Failed
 parallel reads cancel their outstanding peer; late/disposed responses cannot
 repopulate state. Preference commits block close/navigation, cancellation and
 owner disposal. Errors survive remount and require explicit observation/reload
-before another source change. The panel presents Env/Master source buttons,
+before another source change. A later lifecycle candidate now explicitly retains
+unknown preference authority after failed or malformed setter delivery. Failed/
+cancelled observation and tab remount cannot clear it, and owner disposal is
+refused. Only complete owned join/choice observation clears the barrier; remount
+does not silently start recovery. Source commits and unknown outcomes prevent
+new parent/child drafts, and root Save/Lock/close/navigation remain guarded.
+The recovery read remains reachable. Four nested soil/terrain editors receive
+the blocker independently of their outer wrapper. Profile opening and an
+already-mounted profile receive the same reactive authority; all seven
+mutation/staging/proposal handlers refuse calls without discarding drafts.
+Undo, local profile close and read recovery retain their prior permissions.
+636 complete frontend tests/check0/0 and corrected isolated production build
+pass; coupled source backend race59.799s and all-package race root1524.592s
+pass. Go inputs are unchanged through the frontend review corrections.
+Five initial-candidate disposable Wails cases prove a real CAS with injected lost delivery,
+tab/error retention, native close/Home/Lock/replay refusal, explicit observation
+and restoration of the original preference and all16/22 identities.
+Four corrected-candidate cases separately verify mounted writable profile
+blocking/value retention/local close, blocked reopening, five actually visible
+soil/terrain controls covering all four nested wrappers, and explicit recovery.
+This second transport failure is injected before the backend: no preference
+commit or database/audit write, not another postcommit proof. Two guarded
+resumptions correct observed caption/binding spelling without source replay.
+The profile enumeration/count was not persisted before the harness stop;
+assertions and visual remain, not an exhaustive native control inventory.
+Both owners close normally and all16/22 identities restore. Independent review
+closes both mutation findings and the bounded native evidence;40 focused tests
+are independently reproduced. Corrected714 application identities/17 exact
+embedded assets remain distinct from the archived initial candidate.
+It introduces no new service/gate/bindings or complete-form claim.
+The panel presents Env/Master source buttons,
 original read-only ProjectID/title definitions and join diagnostics; assignment,
 metadata edit/create and defective NotInList/Refresh paths stay unavailable.
 

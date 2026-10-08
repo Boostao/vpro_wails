@@ -72,9 +72,11 @@ function componentFunctions(filename, names, values) {
   const ast = ts.createSourceFile(filename + '.ts', script, ts.ScriptTarget.Latest, true);
   const selected = ast.statements.filter(node => ts.isFunctionDeclaration(node) && names.includes(node.name.text));
   assert.equal(selected.length, names.length);
-  const context = vm.createContext(values);
+  const context = vm.createContext({ exports: {}, ...values });
   const code = selected.map(node => node.getText(ast)).join('\n') + `\nthis.actions = {${names.join(',')}};`;
-  vm.runInContext(ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText, context);
+  vm.runInContext(ts.transpileModule(code, { compilerOptions: {
+    module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022
+  } }).outputText, context);
   return context;
 }
 function presentationHelpers() {

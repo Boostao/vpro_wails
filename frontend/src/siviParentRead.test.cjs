@@ -2,8 +2,9 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { readFileSync } = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 const { render } = require('svelte/server');
-const { loadTypeScript, serverComponent } = require('./svelteTestHelpers.cjs');
+const { loadTypeScript, serverComponent, componentFunctions } = require('./svelteTestHelpers.cjs');
 const { transport, original, cell, setCell, source, metadata, restoration, writeSession, editor } = require('./siviParentTestHelpers.cjs');
 const { SIVIParentReadSession } = loadTypeScript('siviParentReadSession.ts', { './siviParentTransport': transport });
 const owner = { contextId: 'context:owned', project: 'Project', plot: 'P' };
@@ -155,10 +156,100 @@ test('source commits block cancel disposal and concurrent operations; failed res
   pending.reject(new Error('source changed'));
   assert.equal(await saving, false);
   assert.equal(session.view().choices, null);
+  assert.equal(session.view().authorityUnknown, true);
+  assert.throws(() => session.dispose(), /observe the source preference outcome/);
   assert.match(session.view().error, /Reload to observe/);
   await assert.rejects(() => session.setSource(1), /Reload owned/);
   assert.equal(await session.load(), true);
   assert.equal(session.view().error, null);
+  assert.equal(session.view().authorityUnknown, false);
+});
+test('source preference unknown authority survives failed and cancelled recovery, then clears only on complete owned observation', async () => {
+  let mode = 'ready', pending;
+  const session = new SIVIParentSourceSession(owner, {
+    join: async () => join(),
+    choices: () => mode === 'failed' ? Promise.reject(new Error('read failed'))
+      : mode === 'held' ? pending.promise : Promise.resolve(choices(1)),
+    setSource: async () => { throw new Error('lost response after commit'); }, cancel() {},
+  }, () => {});
+  assert.equal(await session.load(), true);
+  assert.equal(await session.setSource(2), false);
+  const remount = session.view();
+  remount.authorityUnknown = false;
+  assert.equal(session.view().authorityUnknown, true);
+  mode = 'failed';
+  assert.equal(await session.load(), false);
+  assert.equal(session.view().authorityUnknown, true);
+  assert.throws(() => session.dispose(), /observe/);
+  mode = 'held'; pending = deferred();
+  const loading = session.load();
+  assert.equal(session.view().authorityUnknown, true);
+  session.cancel();
+  assert.equal(session.view().authorityUnknown, true);
+  pending.resolve(choices(2));
+  assert.equal(await loading, false);
+  assert.equal(session.view().choices, null);
+  await assert.rejects(() => session.setSource(1), /Reload owned/);
+  mode = 'ready';
+  assert.equal(await session.load(), true);
+  assert.equal(session.view().choices.SourceOption, 1);
+  assert.equal(session.view().authorityUnknown, false);
+  session.dispose();
+});
+test('actual parent Save Lock and close authority block unknown source preference even with other editor surfaces open', async () => {
+  const context = componentFunctions('FS882Form.svelte', ['getCloseState', 'save', 'toggleLock'], {
+    siviParentSourceView: { authorityUnknown: true, busy: false, error: 'lost preference receipt' },
+    siviSourceAuthorityUnknown: true, environmentSUOpen: true, metadataOpen: true, error: '',
+  });
+  const state = context.actions.getCloseState();
+  assert.equal(state.unsaved, true); assert.equal(state.blocked, true);
+  assert.equal(state.canSave, false); assert.equal(state.busy, false);
+  assert.equal(state.error, 'lost preference receipt');
+  assert.match(state.saveReason, /observe/);
+  context.siviParentSourceView.busy = true;
+  assert.equal(context.actions.getCloseState().busy, true);
+  await context.actions.save(); assert.match(context.error, /observe.*before saving/);
+  await context.actions.toggleLock(); assert.match(context.error, /observe.*before changing the plot lock/);
+});
+test('actual nested soil and terrain control permissions preserve source observation reachability', () => {
+  const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  const values = { draft: { locked: false }, busy: false, siviSourceBarrier: true, capabilitiesReady: true,
+    childUnsaved: false, coordinateBusy: false, workingUnitBusy: false, qualityBusy: false,
+    siteCodeBusy: false, regionCodeBusy: false, soilCodeBusy: false, geologyCodeBusy: false };
+  for (const name of ['DrainageFields', 'SoilCodeFields', 'GeologyCodeFields', 'ParentCodeFields']) {
+    const controls = [...parent.matchAll(new RegExp(`<${name}\\b[^>]*disabled=\\{([^}]+)\\}`, 'g'))];
+    assert.ok(controls.length, name);
+    for (const control of controls) {
+      assert.equal(vm.runInNewContext(control[1], values), true, `${name} must be blocked`);
+      assert.equal(vm.runInNewContext(control[1], { ...values, siviSourceBarrier: false }), false,
+        `${name} must remain available after observation`);
+    }
+  }
+  assert.match(parent, /<ProjectPlotProfileReview[\s\S]*?authorityBlocked=\{siviSourceBarrier\}/);
+});
+test('already mounted profile handlers refuse every mutation under source authority without resetting drafts or disabling Undo', async () => {
+  let writes = 0;
+  const context = componentFunctions('ProjectPlotProfileReview.svelte',
+    ['mutationAuthorized', 'stage', 'saveRules', 'proposeCreation', 'stageCreation',
+      'createRule', 'reviewDeletion', 'deleteRule', 'undo'], {
+      authorityBlocked: true, error: null, busy: false, committedFailure: false,
+      draft: { review: { identity: 'original' }, cells: { retained: 'draft' } },
+      creation: null, deletion: null, success: null,
+      client: { SaveProjectPlotProfile() { writes++; }, CreateProjectPlotProfileRule() { writes++; },
+        DeleteProjectPlotProfileRule() { writes++; } },
+    });
+  const before = JSON.stringify(context.draft);
+  for (const name of ['stage', 'saveRules', 'proposeCreation', 'stageCreation', 'createRule', 'reviewDeletion', 'deleteRule']) {
+    await context.actions[name]('1', 'Field', 'raw', false);
+    assert.match(context.error, /Observe the ProjectID source preference outcome/);
+    assert.equal(JSON.stringify(context.draft), before);
+    assert.equal(writes, 0);
+  }
+  context.actions.undo();
+  assert.equal(JSON.stringify(context.draft.cells), '{}');
+  assert.equal(context.draft.review.identity, 'original');
+  context.authorityBlocked = false;
+  assert.equal(context.actions.mutationAuthorized(), true);
 });
 test('source wire rejects foreign identities partial sparse rows bad typed cells and false certification', async () => {
   for (const change of [

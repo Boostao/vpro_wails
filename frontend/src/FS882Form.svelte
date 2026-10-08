@@ -114,6 +114,8 @@
   let siviParentSourceSession = $state<SIVIParentSourceSession | null>(null);
   let siviParentSourceRevision = $state(0);
   const siviParentSourceView = $derived.by(() => { siviParentSourceRevision; return siviParentSourceSession?.view() ?? null; });
+  const siviSourceAuthorityUnknown = $derived(siviParentSourceView?.authorityUnknown ?? false);
+  const siviSourceBarrier = $derived(siviParentSourceView?.saving || siviSourceAuthorityUnknown);
   let siviParentSession = $state<SIVIParentReadSession | null>(null);
   let siviParentRevision = $state(0);
   let siviParentOpen = $state(false);
@@ -286,7 +288,7 @@
   });
   let container: HTMLDivElement;
 
-  $effect(() => { onBusyChange?.(busy || headerWorkflowBusy); });
+  $effect(() => { onBusyChange?.(busy || headerWorkflowBusy || siviSourceAuthorityUnknown); });
 
   // Reference lists for dropdowns
   let moistureList = $state<ListItem[]>([]);
@@ -511,17 +513,17 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
-  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked);
+  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || siviSourceBarrier || dirty || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked);
   const siviParentSharedEditingDisabled = $derived(!siviParentSharedEnabled || !capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty ||
     original === null || nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved ||
-    personalDraft !== null || Object.keys(headerValidation).length > 0 || (siviParentSharedView?.blocked ?? false));
+    personalDraft !== null || siviSourceAuthorityUnknown || Object.keys(headerValidation).length > 0 || (siviParentSharedView?.blocked ?? false));
   const siviParentWriteEditingDisabled = $derived(!siviParentEditingEnabled || !capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty ||
-    original === null || nonParentChildUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || personalDraft !== null || Object.keys(headerValidation).length > 0 || (siviParentWriteView?.blocked ?? false));
+    original === null || nonParentChildUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || personalDraft !== null || siviSourceAuthorityUnknown || Object.keys(headerValidation).length > 0 || (siviParentWriteView?.blocked ?? false));
   const siviParentActionEditingDisabled = $derived(!siviParentActionEditingEnabled || !capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty ||
-    original === null || nonParentChildUnsaved || siviParentWriteUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || personalDraft !== null || Object.keys(headerValidation).length > 0 || (siviParentActionView?.blocked ?? false));
+    original === null || nonParentChildUnsaved || siviParentWriteUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || personalDraft !== null || siviSourceAuthorityUnknown || Object.keys(headerValidation).length > 0 || (siviParentActionView?.blocked ?? false));
   const siviProjectAssignmentEditingDisabled = $derived(!siviProjectAssignmentEnabled || !capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty ||
     original === null || nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviParentSharedUnsaved || personalDraft !== null ||
-    Object.keys(headerValidation).length > 0 || Boolean(siviParentSourceView?.error) || (siviProjectAssignmentView?.blocked ?? false));
+    Object.keys(headerValidation).length > 0 || siviSourceAuthorityUnknown || Boolean(siviParentSourceView?.error) || (siviProjectAssignmentView?.blocked ?? false));
   const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
@@ -2095,6 +2097,10 @@
   }
 
   async function save() {
+    if (siviSourceAuthorityUnknown) {
+      error = 'Read owned ProjectID choices to observe the source preference outcome before saving.';
+      return;
+    }
     if (busy || headerWorkflowBusy) {
       error = 'Wait for the current operation to finish before saving.';
       return;
@@ -2158,6 +2164,11 @@
   }
 
   export function getCloseState(): EditorCloseState {
+    if (siviParentSourceView?.authorityUnknown) return {
+      unsaved: true, busy: siviParentSourceView.busy, blocked: true, canSave: false,
+      saveReason: 'Reload owned ProjectID choices to observe the source preference outcome before saving or closing.',
+      error: siviParentSourceView.error ?? 'ProjectID source preference outcome is unknown.',
+    };
     if (environmentSUOpen) return environmentSUEditor?.getCloseState() ?? {
       unsaved: true, busy: true, canSave: false, error,
       saveReason: 'Wait for SU transfer review, then finish or dismiss and close it explicitly.',
@@ -2249,6 +2260,10 @@
   }
 
   async function toggleLock() {
+    if (siviSourceAuthorityUnknown) {
+      error = 'Read owned ProjectID choices to observe the source preference outcome before changing the plot lock.';
+      return;
+    }
     if (busy || headerWorkflowBusy) {
       error = 'Wait for the current operation to finish before changing the plot lock.';
       return;
@@ -2407,9 +2422,12 @@
       {/if}
       {#if profileReviewEnabled}
         <button type="button" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
-          disabled={busy || headerWorkflowBusy || profileReviewOpen || !capabilitiesReady ||
+          disabled={busy || headerWorkflowBusy || siviSourceBarrier || profileReviewOpen || !capabilitiesReady ||
             (profileEditingEnabled && $projectState?.plotProfile?.writable === true && (metadataOpen || codeCheckOpen || personalDraft !== null || deletionReview !== null || creationDraft !== null))}
-          onclick={() => { profileReviewOpen = true; }}>
+          onclick={() => {
+            if (siviSourceBarrier) { error = 'Observe the ProjectID source preference outcome before opening profile rules.'; return; }
+            profileReviewOpen = true;
+          }}>
           Review project profile (read-only)
         </button>
       {/if}
@@ -2533,7 +2551,9 @@
           activeTab = 'siviParent';
           siviParentOpen = true;
           if (siviParentSession && !siviParentView?.original) void siviParentSession.load();
-          if (!siviParentWriteUnsaved && !siviParentActionUnsaved && !siviProjectAssignmentUnsaved && !siviParentSharedUnsaved && siviParentSourceSession && !siviParentSourceView?.choices) void siviParentSourceSession.load();
+          if (!siviParentWriteUnsaved && !siviParentActionUnsaved && !siviProjectAssignmentUnsaved && !siviParentSharedUnsaved &&
+              siviParentSourceSession && !siviParentSourceView?.choices && !siviParentSourceView?.error &&
+              !siviParentSourceView?.authorityUnknown) void siviParentSourceSession.load();
         }}>SIVI parent (read-only)</button>
     </div>
   {/if}
@@ -2588,6 +2608,7 @@
     {/if}
     {#if profileReviewOpen}
       <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
+        authorityBlocked={siviSourceBarrier}
         allowEditing={profileEditingEnabled && $projectState?.plotProfile?.writable === true} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}
         allowSaveSU={profileSaveSUEnabled} onsureview={async proposal => {
           if (!onProfileSUReview) throw new Error('Save as SU review is unavailable.');
@@ -2832,14 +2853,14 @@
     {#if activeTab === 'site'}
       {#key headerRevision}
         <ParentCodeFields bind:draft {original} {capabilities} scope="site"
-          disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
+          disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
           onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => parentCodeBusy = pending}>
         {#snippet children(editor)}
         <OrdinaryFields bind:draft {original} {capabilities} scope="site"
-          disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
+          disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
           onchange={markDirty} onvalidation={validateHeader}>
         {#snippet children(ordinaryEditor)}
-        <HeaderEditor bind:draft {original} {capabilities} disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
+        <HeaderEditor bind:draft {original} {capabilities} disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
           onMetadata={metadataEnabled ? openProjectMetadata : undefined} metadataDisabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
           {editor} additionalEditor={ordinaryEditor} {masterAllowed}
           existing={original !== null}
@@ -2896,7 +2917,7 @@
           onclick={() => void loadSpeciesReferences()}>{speciesReferenceError ? 'Retry species references' : 'Reload species references'}</button>
       {/if}
       <OrdinaryFields bind:draft {original} {capabilities} scope="veg"
-        disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
+        disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
         onchange={markDirty} onvalidation={validateHeader} onVegNotesTab={vegetationNotesTab}>
       {#snippet children(ordinaryEditor)}
       <SourcePage name="Vegetation" values={sourceHeaderValues} {vegetationMode} editor={ordinaryEditor} onHeightToggle={() => vegetationMode = vegetationMode === 'height' ? 'cover' : 'height'}
@@ -3154,23 +3175,23 @@
         <button disabled={soilEditingDisabled || soilUnsaved} onclick={() => openNewChild('mineral')}>Add Mineral Layer</button>
       </div>
       <OrdinaryFields bind:draft {original} {capabilities} scope="soils"
-        disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
+        disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
         onchange={markDirty} onvalidation={validateHeader}>
       {#snippet children(ordinaryEditor)}
       <DrainageFields bind:draft {original} {capabilities}
-        disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
+        disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
         onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => drainageBusy = pending}>
       {#snippet children(drainageEditor)}
       <SoilCodeFields bind:draft {original} {capabilities}
-        disabled={draft.locked || busy || !capabilitiesReady || childUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || geologyCodeBusy}
+        disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || geologyCodeBusy}
         onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => soilCodeBusy = pending}>
         {#snippet children(editor)}
           <GeologyCodeFields bind:draft {original} {capabilities}
-            disabled={draft.locked || busy || !capabilitiesReady || childUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy}
+            disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved || coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy}
             onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => geologyCodeBusy = pending}>
             {#snippet children(geologyEditor)}
               <ParentCodeFields bind:draft {original} {capabilities} scope="soils"
-                disabled={draft.locked || busy || !capabilitiesReady || childUnsaved}
+                disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
                 onchange={markDirty} onvalidation={validateHeader} onbusy={(pending) => parentCodeBusy = pending}>
               {#snippet children(parentEditor)}
               <SourcePage name="Soil/Terrain" values={sourceHeaderValues} {editor} editors={[...(geologyEditor ? [geologyEditor] : []), ...(parentEditor ? [parentEditor] : []), ...(ordinaryEditor ? [ordinaryEditor] : []), ...(drainageEditor ? [drainageEditor] : [])]}>
