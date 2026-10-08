@@ -15,7 +15,7 @@ export type ValidatedPlotLocationReview = Omit<PlotLocationReview, 'report'> & {
   };
 };
 
-function exactLongitudeNegation(original: ProjectMetadataCell, converted: ProjectMetadataCell): boolean {
+export function exactLongitudeNegation(original: ProjectMetadataCell, converted: ProjectMetadataCell): boolean {
   if (original.storage === 'real' && converted.storage === 'real' && original.real !== null && converted.real !== null) {
     return Object.is(converted.real, -original.real);
   }

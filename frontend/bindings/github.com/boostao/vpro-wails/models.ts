@@ -323,6 +323,88 @@ export interface GeologyCodeChoice {
     "diagnostic": string;
 }
 
+export interface GoogleEarthDescriptionFields {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "envTable": string;
+    "fields": ProjectMetadataColumn[] | null;
+}
+
+export interface GoogleEarthKMLExportOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface GoogleEarthKMLExportReview {
+    "review": GoogleEarthKMLReview;
+    "approvalHash": string;
+    "kmlSHA256": string;
+}
+
+export interface GoogleEarthKMLReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "descriptionField": string;
+    "title": string;
+    "placemarkCount": number;
+    "byteCount": number;
+    "kml": string;
+}
+
+export interface GoogleEarthPreferenceValues {
+    "title": string;
+    "descriptionField": string;
+}
+
+export interface GoogleEarthPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface GoogleEarthPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": GoogleEarthPreferenceValues;
+}
+
+export interface GoogleEarthReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "descriptionField": string;
+    "fields": EnvironmentReportField[] | null;
+    "offset": number;
+    "limit": number;
+    "totalRows": number;
+    "rows": GoogleEarthReviewRow[] | null;
+}
+
+export interface GoogleEarthReviewRow {
+    "envRowId": string;
+    "membershipRowId": string;
+    "plotNumber": ProjectMetadataCell;
+    "storedLongitude": ProjectMetadataCell;
+    "longitude": ProjectMetadataCell;
+    "latitude": ProjectMetadataCell;
+    "description": ProjectMetadataCell;
+}
+
 /**
  * HeightRecordUpdate patches existing vegetation values; nil explicitly means
  * SQL NULL. Expected contains the same keys, using values returned by SQLite.

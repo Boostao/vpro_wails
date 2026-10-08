@@ -468,10 +468,21 @@ func (s *desktopConfig) compareAndSetProjectIDSource(ctx context.Context, expect
 	}
 	return s.commit(data)
 }
-func (s *desktopConfig) commit(data []byte) (err error) {
+func (s *desktopConfig) commit(data []byte) error {
+	_, err := s.commitWithContext(context.Background(), data)
+	return err
+}
+
+func (s *desktopConfig) commitWithContext(ctx context.Context, data []byte) (committed bool, err error) {
+	if ctx == nil {
+		return false, errors.New("configuration commit requires a context")
+	}
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
 	file, err := os.CreateTemp(filepath.Dir(s.path), ".config-*.yml")
 	if err != nil {
-		return err
+		return false, err
 	}
 	name := file.Name()
 	defer func() {
@@ -484,23 +495,26 @@ func (s *desktopConfig) commit(data []byte) (err error) {
 		}
 	}()
 	if err := file.Chmod(0600); err != nil {
-		return err
+		return false, err
 	}
 	if _, err := file.Write(data); err != nil {
-		return err
+		return false, err
 	}
 	if err := file.Sync(); err != nil {
-		return err
+		return false, err
 	}
 	closeErr := file.Close()
 	file = nil
 	if closeErr != nil {
-		return closeErr
+		return false, closeErr
+	}
+	if err := ctx.Err(); err != nil {
+		return false, err
 	}
 	if err := s.replace(name, s.path); err != nil {
-		return fmt.Errorf("commit runtime YAML: %w", err)
+		return false, fmt.Errorf("commit runtime YAML: %w", err)
 	}
-	return nil
+	return true, ctx.Err()
 }
 
 func coordinatePreferenceNumber(mode CoordinateMode) int {

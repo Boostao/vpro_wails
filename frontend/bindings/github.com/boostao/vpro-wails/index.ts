@@ -6,6 +6,10 @@ import * as CloseService from "./closeservice.js";
 import * as ContextService from "./contextservice.js";
 import * as CoordinateService from "./coordinateservice.js";
 import * as GeologyCodeService from "./geologycodeservice.js";
+import * as GoogleEarthKMLExportService from "./googleearthkmlexportservice.js";
+import * as GoogleEarthKMLService from "./googleearthkmlservice.js";
+import * as GoogleEarthPreferencesService from "./googleearthpreferencesservice.js";
+import * as GoogleEarthReviewService from "./googleearthreviewservice.js";
 import * as ParentCodeService from "./parentcodeservice.js";
 import * as PlotService from "./plotservice.js";
 import * as ProjectService from "./projectservice.js";
@@ -22,6 +26,10 @@ export {
     ContextService,
     CoordinateService,
     GeologyCodeService,
+    GoogleEarthKMLExportService,
+    GoogleEarthKMLService,
+    GoogleEarthPreferencesService,
+    GoogleEarthReviewService,
     ParentCodeService,
     PlotService,
     ProjectService,
@@ -61,6 +69,15 @@ export type {
     EnvironmentSiteUnitTransfer,
     FS882Header,
     GeologyCodeChoice,
+    GoogleEarthDescriptionFields,
+    GoogleEarthKMLExportOutcome,
+    GoogleEarthKMLExportReview,
+    GoogleEarthKMLReview,
+    GoogleEarthPreferenceValues,
+    GoogleEarthPreferencesOutcome,
+    GoogleEarthPreferencesReview,
+    GoogleEarthReview,
+    GoogleEarthReviewRow,
     HeightRecordUpdate,
     HierarchyInfo,
     HierarchyNode,

@@ -56,11 +56,11 @@ function serverComponent(source, filename, dependencies) {
   return module.exports.default;
 }
 
-function loadTypeScript(filename, dependencies = {}) {
+function loadTypeScript(filename, dependencies = {}, globals = {}) {
   const module = { exports: {} };
   vm.runInNewContext(ts.transpileModule(readFileSync(path.join(__dirname, filename), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true }
-  }).outputText, { module, exports: module.exports, structuredClone, require(name) {
+  }).outputText, { ...globals, module, exports: module.exports, structuredClone, require(name) {
     if (name in dependencies) return dependencies[name];
     throw new Error(`Unexpected TypeScript dependency ${name}`);
   } });

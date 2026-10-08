@@ -170,20 +170,7 @@ func snapshotTableCSVBundleDocument(document tableCSVDocument) tableCSVDocument 
 	return document
 }
 
-type tableCSVBundleReader struct {
-	ctx    context.Context
-	source io.Reader
-}
-
-func (reader tableCSVBundleReader) Read(data []byte) (int, error) {
-	if err := reader.ctx.Err(); err != nil {
-		return 0, err
-	}
-	if len(data) > 32*1024 {
-		data = data[:32*1024]
-	}
-	return reader.source.Read(data)
-}
+type tableCSVBundleReader = artifactPublicationReader
 
 type tableCSVBundleReaderAt struct {
 	ctx    context.Context

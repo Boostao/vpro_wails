@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'long-vegetation' | 'table-csv' | 'plot-locations';
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'long-vegetation' | 'table-csv' | 'plot-locations' | 'google-earth-review';
   type Item = { name: string; icon: typeof House; view?: View };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate }: { view: View; onnavigate: (view: View) => void } = $props();
@@ -38,6 +38,7 @@
         { name: 'Hierarchy Diagram', icon: Network },
         { name: 'Print a Plot Label', icon: Tag },
         { name: 'Plot location review', icon: FileText, view: import.meta.env.VITE_PLOT_LOCATION_REVIEW === 'true' ? 'plot-locations' : undefined },
+        { name: 'Google Earth location preparation', icon: Globe, view: import.meta.env.VITE_GOOGLE_EARTH_REVIEW === 'true' ? 'google-earth-review' : undefined },
         { name: 'Create Plot Locations File', icon: FileText },
         { name: 'Show Plot Locations in Google Earth', icon: Globe }
       ] }

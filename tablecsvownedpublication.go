@@ -83,49 +83,9 @@ func (s *ContextService) publishOwnedProjectTableCSVWithHooks(ctx context.Contex
 // Never publish inside a generic snapshot callback: read cleanup may zero its
 // result. Here each fresh snapshot is fully closed before the file commit.
 func readOwnedTableCSVPublicationSnapshot(ctx context.Context, owner *sqliteContext, contextID, table string, hooks tableCSVOwnedPublicationHooks) (result ownedTableCSVReview, resultErr error) {
-	if err := profileOwnedFiles(owner); err != nil {
-		return result, err
-	}
-	tx, err := owner.beginReadSnapshot(ctx)
-	if err != nil {
-		return result, err
-	}
-	defer func() {
-		err := tx.Rollback()
-		if errors.Is(err, sql.ErrTxDone) {
-			err = nil
-		}
-		if hooks.rollbackRead != nil {
-			err = errors.Join(err, hooks.rollbackRead(tx))
-		}
-		resultErr = errors.Join(resultErr, err)
-		if resultErr != nil {
-			result = ownedTableCSVReview{}
-		}
-	}()
-	result, err = readOwnedProjectTableCSV(ctx, owner, tx, contextID, table)
-	if err != nil {
-		return ownedTableCSVReview{}, err
-	}
-	if err := profileOwnedFiles(owner); err != nil {
-		return ownedTableCSVReview{}, err
-	}
-	if err := ctx.Err(); err != nil {
-		return ownedTableCSVReview{}, err
-	}
-	if hooks.commitRead != nil {
-		if err := hooks.commitRead(tx); err != nil {
-			return ownedTableCSVReview{}, err
-		}
-	}
-	if err := ctx.Err(); err != nil {
-		return ownedTableCSVReview{}, err
-	}
-	if err := tx.Commit(); err != nil {
-		return ownedTableCSVReview{}, err
-	}
-	if err := ctx.Err(); err != nil {
-		return ownedTableCSVReview{}, err
-	}
-	return result, nil
+	return withPublicationReadSnapshot(ctx, owner, publicationReadSnapshotHooks{
+		commitRead: hooks.commitRead, rollbackRead: hooks.rollbackRead,
+	}, func(tx *sql.Tx) (ownedTableCSVReview, error) {
+		return readOwnedProjectTableCSV(ctx, owner, tx, contextID, table)
+	})
 }

@@ -42,6 +42,22 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	googleEarthReviewEnabled, err := googleEarthReviewFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	googleEarthKMLEnabled, err := googleEarthKMLFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	googleEarthKMLExportEnabled, err := googleEarthKMLExportFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	googleEarthPreferencesEnabled, err := googleEarthPreferencesFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	dataDir, err := userDataDir()
 	if err != nil {
 		log.Fatal(err)
@@ -127,6 +143,10 @@ func main() {
 		application.NewService(projects),
 		application.NewService(plots),
 		application.NewService(contextService),
+		application.NewService(NewGoogleEarthReviewService(contextService, googleEarthReviewEnabled)),
+		application.NewService(NewGoogleEarthKMLService(contextService, googleEarthKMLEnabled)),
+		application.NewService(NewGoogleEarthKMLExportService(contextService, googleEarthKMLExportEnabled)),
+		application.NewService(NewGoogleEarthPreferencesService(contextService, googleEarthPreferencesEnabled)),
 		application.NewService(coordinates),
 	}
 	if refService != nil {
