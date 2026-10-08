@@ -54,6 +54,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	longVegetationLifeformEnabled, err := siviFeature(longVegetationLifeformFeatureEnvironment, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	longVegetationStrataEnabled, err := siviFeature(longVegetationStrataFeatureEnvironment, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	longVegetationCodeEnabled, err := siviFeature(longVegetationCodeFeatureEnvironment, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	googleEarthReviewEnabled, err := googleEarthReviewFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -117,6 +129,9 @@ func main() {
 	contextService.plotLocationReviewEnabled = plotLocationReviewEnabled
 	contextService.siteUnitSummaryEnabled = siteUnitSummaryEnabled
 	contextService.longVegetationNoneEnabled = longVegetationNoneEnabled
+	contextService.longVegetationLifeformEnabled = longVegetationLifeformEnabled
+	contextService.longVegetationStrataEnabled = longVegetationStrataEnabled
+	contextService.longVegetationCodeEnabled = longVegetationCodeEnabled
 	siviParentShared, err := NewSIVIParentSharedService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)

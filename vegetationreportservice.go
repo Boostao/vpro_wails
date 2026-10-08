@@ -14,6 +14,7 @@ type LongVegetationSettings struct {
 	MeanCoverGreaterThan float64                        `json:"meanCoverGreaterThan"`
 	Order                string                         `json:"order"`
 	ShowEnglishName      bool                           `json:"showEnglishName"`
+	ShowSpeciesCode      bool                           `json:"showSpeciesCode"`
 	Quality              *LongVegetationQualitySettings `json:"quality"`
 }
 
@@ -121,11 +122,15 @@ func vegetationSettings(options longVegetationOptions) LongVegetationSettings {
 	settings := LongVegetationSettings{
 		Title: options.Title, Average: options.Average, ConstantSpeciesList: options.ConstantSpeciesList,
 		PresenceGreaterThan: options.PresenceGreaterThan, MeanCoverGreaterThan: options.MeanCoverGreaterThan,
-		Order: options.Order, ShowEnglishName: options.ShowEnglishName,
+		Order: options.Order, ShowEnglishName: options.ShowEnglishName, ShowSpeciesCode: options.ShowSpeciesCode,
 	}
 	settings.Grouping = "layer"
 	if options.NoneGrouping {
 		settings.Grouping = "none"
+	} else if options.LifeformGrouping {
+		settings.Grouping = "lifeform"
+	} else if options.StrataGrouping {
+		settings.Grouping = "strata"
 	}
 	if options.Quality != nil {
 		criteria := *options.Quality

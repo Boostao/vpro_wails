@@ -9,6 +9,8 @@ import (
 	"unicode/utf8"
 )
 
+const longVegetationStrataFeatureEnvironment = "VPRO_LONG_VEGETATION_STRATA"
+
 type vegetationStratumObservation struct {
 	PlotNumber   string
 	Species      ProjectMetadataCell
@@ -17,9 +19,8 @@ type vegetationStratumObservation struct {
 	SourceRowIDs []string
 }
 
-// Private typed-numeric draft only: Access Nz/Val and SINGLE conversion are not
-// calibrated. Do not wire this into the report yet. Layer is an insertion code,
-// not a physical reference ID; the later Strata join is separate.
+// Typed numeric projection only; the runtime wrapper applies SINGLE assignments.
+// Access Nz/Val text and locale coercion remain outside this boundary.
 func prepareLongVegetationStrata(ctx context.Context, prepared VegetationReportPreparation) ([]vegetationStratumObservation, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
@@ -125,4 +126,87 @@ func prepareLongVegetationStrata(ctx context.Context, prepared VegetationReportP
 		return nil, err
 	}
 	return result, nil
+}
+
+func prepareLongVegetationStrataSingle(ctx context.Context, prepared VegetationReportPreparation) (VegetationReportPreparation, error) {
+	fail := func(err error) (VegetationReportPreparation, error) { return VegetationReportPreparation{}, err }
+	held := prepared
+	held.ReducedRows = append([]VegetationReportReducedRow{}, prepared.ReducedRows...)
+	for i, row := range held.ReducedRows {
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		held.ReducedRows[i].Covers = append([]ProjectMetadataCell{}, row.Covers...)
+		for j, cell := range row.Covers {
+			number, err := vegetationReportNumber(cell)
+			if err != nil {
+				return fail(err)
+			}
+			if number == nil {
+				continue
+			}
+			value, err := lifeformSummarySingle(number)
+			if err != nil {
+				return fail(fmt.Errorf("Long Vegetation Strata held SINGLE: %w", err))
+			}
+			held.ReducedRows[i].Covers[j] = ProjectMetadataCell{Storage: "real", Real: &value}
+		}
+	}
+	observations, err := prepareLongVegetationStrata(ctx, held)
+	if err != nil {
+		return fail(err)
+	}
+	result := prepared
+	result.Observations = []VegetationReportObservation{}
+	for _, row := range observations {
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		number, err := vegetationReportNumber(row.Cover)
+		if err != nil {
+			return fail(err)
+		}
+		value, err := lifeformSummarySingle(number)
+		if err != nil {
+			return fail(fmt.Errorf("Long Vegetation Strata inserted SINGLE: %w", err))
+		}
+		result.Observations = append(result.Observations, VegetationReportObservation{
+			PlotNumber: row.PlotNumber, Species: cloneSiteUnitCell(row.Species),
+			LayerRowID: "strata:" + row.Layer, Layer: row.Layer,
+			Cover: ProjectMetadataCell{Storage: "real", Real: &value},
+		})
+	}
+	return result, nil
+}
+
+func planLongVegetationStrata(ctx context.Context, prepared VegetationReportPreparation,
+	species, layers ProjectMetadataTable, options longVegetationOptions) (vegetationLayerReport, error) {
+	fail := func(err error) (vegetationLayerReport, error) { return vegetationLayerReport{}, err }
+	if err := ctx.Err(); err != nil {
+		return fail(err)
+	}
+	columns, err := siteUnitTransferColumns(layers, "Layer1234567", "Strata")
+	if err != nil {
+		return fail(err)
+	}
+	labels := ProjectMetadataTable{
+		Columns: []ProjectMetadataColumn{{Name: "Layer1234567"}, {Name: "Layer"}},
+		Rows:    []ProjectMetadataRow{},
+	}
+	for _, row := range layers.Rows {
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		labels.Rows = append(labels.Rows, ProjectMetadataRow{RowID: row.RowID,
+			Cells: []ProjectMetadataCell{
+				cloneSiteUnitCell(row.Cells[columns["Layer1234567"]]),
+				cloneSiteUnitCell(row.Cells[columns["Strata"]]),
+			},
+		})
+	}
+	converted, err := prepareLongVegetationStrataSingle(ctx, prepared)
+	if err != nil {
+		return fail(err)
+	}
+	return planLongVegetationLayers(ctx, converted, species, labels, options)
 }

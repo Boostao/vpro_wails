@@ -98,10 +98,10 @@ func TestDecodeLongVegetationOptionsDefaults(t *testing.T) {
 }
 
 func TestDecodeLongVegetationOptionsSourceEnums(t *testing.T) {
-	// USysLongVegOptions: Calculate 10/20; Order 10/20; Show 0/1.
+	// USysLongVegOptions: Calculate 10/20; Order 10/20; Show 0/1/2.
 	for _, average := range []int{10, 20} {
 		for _, order := range []int{10, 20} {
-			for _, show := range []int{0, 1} {
+			for _, show := range []int{0, 1, 2} {
 				for _, constant := range []any{-1, 0, true, false} {
 					t.Run(fmt.Sprintf("%d/%d/%d/%v", average, order, show, constant), func(t *testing.T) {
 						values := longVegetationOptionsFixture(t)
@@ -112,7 +112,7 @@ func TestDecodeLongVegetationOptionsSourceEnums(t *testing.T) {
 						wantConstant := constant == -1 || constant == true
 						if err != nil || got.Average != map[int]string{10: "all-plots", 20: "observations"}[average] ||
 							got.Order != map[int]string{10: "species", 20: "presence"}[order] ||
-							got.ShowEnglishName != (show == 1) || got.ConstantSpeciesList != wantConstant {
+							got.ShowEnglishName != (show == 1) || got.ShowSpeciesCode != (show == 2) || got.ConstantSpeciesList != wantConstant {
 							t.Fatalf("source modes: %#v, %v", got, err)
 						}
 					})
@@ -131,8 +131,8 @@ func TestDecodeLongVegetationOptionsSourceEnums(t *testing.T) {
 
 func TestDecodeLongVegetationOptionsUnavailableModes(t *testing.T) {
 	for key, modes := range map[string][]any{
-		"LVGroupBy": {2, 3}, "LVUnitGroups": {2, 3},
-		"LVShowEnglishName": {2, 4},
+		"LVUnitGroups":      {2, 3},
+		"LVShowEnglishName": {4},
 	} {
 		for _, mode := range modes {
 			t.Run(fmt.Sprintf("%s/%v", key, mode), func(t *testing.T) {

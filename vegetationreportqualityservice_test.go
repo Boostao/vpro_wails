@@ -70,9 +70,68 @@ func TestLongVegetationQualityServiceOwnedFanoutNullExclusionAndRetry(t *testing
 					t.Fatal("qualified occurrence denominator lost original physical IDs", unit)
 				}
 			}
+			service.longVegetationLifeformEnabled = true
+			if err := service.projects.preferences.update("ReportOptions", map[string]any{"LVGroupBy": 3}); err != nil {
+				t.Fatal(err)
+			}
+			lifeform, err := service.PreviewLongVegetation(context.Background(), state.ContextID)
+			if err != nil || lifeform.Settings.Grouping != "lifeform" ||
+				!reflect.DeepEqual(lifeform.Report.Quality, preview.Report.Quality) ||
+				len(lifeform.Report.Units) != len(preview.Report.Units) {
+				t.Fatal("Lifeform reader changed quality source indices or qualification", lifeform, err)
+			}
+			for i, unit := range lifeform.Report.Units {
+				if unit.NumPlots != preview.Report.Units[i].NumPlots ||
+					!reflect.DeepEqual(unit.MembershipIDs, preview.Report.Units[i].MembershipIDs) {
+					t.Fatal("Lifeform conversion lost qualified weights or physical ownership", unit)
+				}
+				for _, row := range unit.Rows {
+					if row.Layer.Storage != "integer" && row.Layer.Storage != "null" {
+						t.Fatal("quality-qualified Lifeform report used Layer fallback", row)
+					}
+				}
+			}
+			service.longVegetationStrataEnabled = true
+			if err := service.projects.preferences.update("ReportOptions", map[string]any{"LVGroupBy": 2}); err != nil {
+				t.Fatal(err)
+			}
+			strata, err := service.PreviewLongVegetation(context.Background(), state.ContextID)
+			if err != nil || strata.Settings.Grouping != "strata" ||
+				!reflect.DeepEqual(strata.Report.Quality, preview.Report.Quality) ||
+				len(strata.Report.Units) != len(preview.Report.Units) {
+				t.Fatal("Strata reader changed source quality qualification", strata, err)
+			}
+			for i, unit := range strata.Report.Units {
+				if unit.NumPlots != preview.Report.Units[i].NumPlots ||
+					!reflect.DeepEqual(unit.MembershipIDs, preview.Report.Units[i].MembershipIDs) {
+					t.Fatal("Strata lost quality weights/physical identities", unit)
+				}
+			}
+			if err := service.projects.preferences.update("ReportOptions", map[string]any{"LVGroupBy": 1}); err != nil {
+				t.Fatal(err)
+			}
 			again, err := service.PreviewLongVegetation(context.Background(), state.ContextID)
 			if err != nil || !reflect.DeepEqual(preview, again) {
 				t.Fatal("repeated qualified reads differ", err)
+			}
+			service.longVegetationCodeEnabled = true
+			if err := service.projects.preferences.update("ReportOptions", map[string]any{"LVShowEnglishName": 2}); err != nil {
+				t.Fatal(err)
+			}
+			codes, err := service.PreviewLongVegetation(context.Background(), state.ContextID)
+			if err != nil || !codes.Settings.ShowSpeciesCode || codes.Settings.ShowEnglishName ||
+				!reflect.DeepEqual(codes.Report.Quality, preview.Report.Quality) ||
+				len(codes.Report.Units) != len(preview.Report.Units) {
+				t.Fatal("supplementary Code changed quality qualification", codes, err)
+			}
+			for i, unit := range codes.Report.Units {
+				if unit.NumPlots != preview.Report.Units[i].NumPlots ||
+					!reflect.DeepEqual(unit.MembershipIDs, preview.Report.Units[i].MembershipIDs) {
+					t.Fatal("Code mode lost physical/qualified weights", unit)
+				}
+			}
+			if err := service.projects.preferences.update("ReportOptions", map[string]any{"LVShowEnglishName": 1}); err != nil {
+				t.Fatal(err)
 			}
 			assertProfileSUFiles(t, service, before)
 			after, err := os.ReadFile(service.projects.preferences.path)

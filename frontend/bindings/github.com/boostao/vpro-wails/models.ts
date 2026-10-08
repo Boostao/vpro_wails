@@ -639,6 +639,7 @@ export interface LongVegetationSettings {
     "meanCoverGreaterThan": number;
     "order": string;
     "showEnglishName": boolean;
+    "showSpeciesCode": boolean;
     "quality": LongVegetationQualitySettings | null;
 }
 

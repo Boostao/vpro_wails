@@ -20,10 +20,11 @@ export type ValidatedLongVegetationPreview = Omit<LongVegetationPreview, 'report
 
 function validateSettings(settings: LongVegetationSettings): void {
   if (!settings || typeof settings.title !== 'string' || reportTitleError(settings.title) ||
-      !['layer', 'none'].includes(settings.grouping) ||
+      !['layer', 'none', 'lifeform', 'strata'].includes(settings.grouping) ||
       !['all-plots', 'observations'].includes(settings.average) ||
       !['species', 'presence'].includes(settings.order) ||
       typeof settings.constantSpeciesList !== 'boolean' || typeof settings.showEnglishName !== 'boolean' ||
+      typeof settings.showSpeciesCode !== 'boolean' || settings.showEnglishName && settings.showSpeciesCode ||
       typeof settings.presenceGreaterThan !== 'number' || !Number.isFinite(settings.presenceGreaterThan) ||
       typeof settings.meanCoverGreaterThan !== 'number' || !Number.isFinite(settings.meanCoverGreaterThan)) {
     throw new Error('Long Vegetation settings are incomplete or unsupported; no defaults were inferred.');
@@ -40,6 +41,26 @@ function validateSettings(settings: LongVegetationSettings): void {
 
 function identityCell(cell: ProjectMetadataCell): boolean {
   return completeCell(cell) && (cell.storage === 'null' || cell.storage === 'text');
+}
+
+function groupCell(cell: ProjectMetadataCell, grouping: string): boolean {
+  if (grouping !== 'lifeform') return identityCell(cell);
+  return completeCell(cell) && (cell.storage === 'null' ||
+    cell.storage === 'integer' && typeof cell.integer === 'string' && exactSigned64(cell.integer) &&
+      BigInt(cell.integer) >= -32768n && BigInt(cell.integer) <= 32767n);
+}
+
+export function requireLongVegetationGrouping(settings: LongVegetationSettings, lifeformEnabled: boolean, strataEnabled = false, codeEnabled = false): void {
+  validateSettings(settings);
+  if (settings.grouping === 'lifeform' && !lifeformEnabled) {
+    throw new Error('Long Vegetation Lifeform grouping is disabled in this build; retained LVGroupBy=3 was not reset.');
+  }
+  if (settings.grouping === 'strata' && !strataEnabled) {
+    throw new Error('Long Vegetation Strata grouping is disabled in this build; retained LVGroupBy=2 was not reset.');
+  }
+  if (settings.showSpeciesCode && !codeEnabled) {
+    throw new Error('Long Vegetation species Code display is disabled in this build; retained LVShowEnglishName=2 was not reset.');
+  }
 }
 
 function finiteOrNull(value: number | null): boolean {
@@ -220,11 +241,13 @@ function assertLongVegetationPreview(value: LongVegetationPreview, contextId: st
     }
     let columns: string[] | undefined;
     for (const row of unit.rows) {
-      if (!row || ![row.layer, row.species, row.englishName, row.matchedName].every(identityCell) ||
+      if (!row || !groupCell(row.layer, value.settings.grouping) ||
+          ![row.species, row.englishName, row.matchedName].every(identityCell) ||
           !finiteOrNull(row.presence) || !finiteOrNull(row.meanCover) ||
           (row.presence === null) !== (row.meanCover === null) || !Array.isArray(row.plots) ||
-          !value.settings.showEnglishName && (row.englishName.storage !== 'null' || row.matchedName.storage !== 'null')) {
-        throw new Error('Long Vegetation row lost NULL/text identities, names or finite statistics.');
+          !value.settings.showEnglishName && !value.settings.showSpeciesCode &&
+            (row.englishName.storage !== 'null' || row.matchedName.storage !== 'null')) {
+        throw new Error('Long Vegetation row lost typed grouping/identity, names or finite statistics.');
       }
       const plots = new Set<string>();
       for (const plot of row.plots) {

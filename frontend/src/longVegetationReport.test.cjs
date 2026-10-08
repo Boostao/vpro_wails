@@ -20,7 +20,7 @@ const report = loadTypeScript('longVegetationReport.ts', {
 const cell = text => ({storage:text===null?'null':'text',text,integer:null,real:null,blobHex:null});
 function settings() {
   return {title:'  Title \u00e9  ',grouping:'layer',average:'all-plots',constantSpeciesList:true,
-    presenceGreaterThan:95,meanCoverGreaterThan:99,order:'species',showEnglishName:true,quality:null};
+    presenceGreaterThan:95,meanCoverGreaterThan:99,order:'species',showEnglishName:true,showSpeciesCode:false,quality:null};
 }
 function fixture() {
   return {contextId:'owned',projectPath:'C:\\project.db',suPath:'C:\\external.db',settings:settings(),report:{
@@ -59,6 +59,10 @@ function qualifiedFixture() {
 }
 const validate = value => report.validateLongVegetationPreview(value,'owned','Sample','C:\\project.db','Selected','C:\\external.db');
 const validateOptions = value => report.validateLongVegetationOptions(value,'owned','Sample','C:\\project.db','Selected','C:\\external.db');
+const buildSource = (source, enabled = false, strataEnabled = false, codeEnabled = false) => source.replace(
+  "import.meta.env.VITE_LONG_VEGETATION_LIFEFORM === 'true'", String(enabled)).replace(
+  "import.meta.env.VITE_LONG_VEGETATION_STRATA === 'true'", String(strataEnabled)).replace(
+  "import.meta.env.VITE_LONG_VEGETATION_CODE === 'true'", String(codeEnabled));
 function options() {
   return {contextId:'owned',project:'Sample',projectPath:'C:\\project.db',su:'Selected',suPath:'C:\\external.db',settings:settings()};
 }
@@ -67,13 +71,37 @@ test('None ordering remains explicit while preserving separate source layer stat
   assert.equal(validate(value),value);
   const configured=options();configured.settings.grouping='none';
   assert.equal(validateOptions(configured).settings.grouping,'none');
-  for(const grouping of [undefined,null,'strata','lifeform',4]) {
+  for(const grouping of [undefined,null,'unsupported',4]) {
     const invalid=fixture();invalid.settings.grouping=grouping;assert.throws(()=>validate(invalid));
   }
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
   assert.match(source,/None mode changes row ordering, not cover aggregation/);
   assert.match(source,/constant species list retains its source layer-first order/);
   assert.match(source,/settings.grouping === 'none'/);
+});
+test('lifeform transport preserves nullable exact INTEGER groups without widening layer or species identities',()=>{
+  const value=fixture();value.settings.grouping='lifeform';
+  const integer=n=>({storage:'integer',integer:n,text:null,real:null,blobHex:null});
+  value.report.units[0].rows[0].layer=integer('1');
+  value.report.units[0].rows[1].layer=integer('-2');
+  assert.equal(validate(value),value);
+  for(const invalid of [cell('1'),{...integer('1'),integer:'+1'},
+    integer('32768'),integer('-32769'),{...integer('1'),integer:'9223372036854775808'},
+    {storage:'real',real:1,text:null,integer:null,blobHex:null}]) {
+    const rejected=structuredClone(value);rejected.report.units[0].rows[0].layer=invalid;
+    assert.throws(()=>validate(rejected));
+  }
+  const layer=structuredClone(value);layer.settings.grouping='layer';assert.throws(()=>validate(layer));
+  const species=structuredClone(value);species.report.units[0].rows[0].species=integer('1');assert.throws(()=>validate(species));
+  const configured=options();configured.settings.grouping='lifeform';
+  assert.equal(validateOptions(configured).settings.grouping,'lifeform');
+  assert.throws(()=>report.requireLongVegetationGrouping(configured.settings,false),/disabled in this build/);
+  assert.doesNotThrow(()=>report.requireLongVegetationGrouping(configured.settings,true));
+  assert.doesNotThrow(()=>report.requireLongVegetationGrouping(settings(),false));
+  const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
+  assert.match(source,/VITE_LONG_VEGETATION_LIFEFORM === 'true'/);
+  assert.equal((source.match(/requireLongVegetationGrouping\(candidate\.?(?:settings)?, lifeformEnabled, strataEnabled, codeEnabled\)/g)||[]).length,2);
+  assert.match(source,/<th scope="col">\{groupLabel\}<\/th>/);
 });
 test('vegetation transport preserves constant-list threshold bypass, fanout, NULL/empty and zero/negative covers',()=>{
   const value = fixture();
@@ -84,6 +112,21 @@ test('vegetation transport preserves constant-list threshold bypass, fanout, NUL
   value.report.units=[];
   value.report.diagnostics=[];
   assert.doesNotThrow(()=>validate(value));
+});
+test('Strata grouping preserves text NULL cells and independently refuses disabled builds',()=>{
+  const value=fixture();value.settings.grouping='strata';
+  assert.equal(validate(value),value);
+  const configured=options();configured.settings.grouping='strata';
+  assert.equal(validateOptions(configured).settings.grouping,'strata');
+  assert.throws(()=>report.requireLongVegetationGrouping(configured.settings,true,false),/disabled in this build/);
+  assert.throws(()=>report.requireLongVegetationGrouping(configured.settings,false),/disabled in this build/);
+  assert.doesNotThrow(()=>report.requireLongVegetationGrouping(configured.settings,false,true));
+  const malformed=structuredClone(value);
+  malformed.report.units[0].rows[0].layer={storage:'integer',integer:'1',text:null,real:null,blobHex:null};
+  assert.throws(()=>validate(malformed));
+  const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
+  assert.match(source,/VITE_LONG_VEGETATION_STRATA === 'true'/);
+  assert.equal((source.match(/requireLongVegetationGrouping\(candidate\.?(?:settings)?, lifeformEnabled, strataEnabled, codeEnabled\)/g)||[]).length,2);
 });
 test('quality transport preserves physical IDs and recomputes denominators from complete distinct reference occurrences',()=>{
   const value=qualifiedFixture();
@@ -225,14 +268,16 @@ test('vegetation bindings are cancellable and report UI is independently default
   assert.match(panel,/onDestroy\(cancel\)/);
   assert.match(panel,/request !== generation/);
   assert.match(panel,/reads\.track\(ContextService\.PreviewLongVegetation\(contextId\)\)/);
-  assert.match(panel,/preview = validateLongVegetationPreview/);
-  assert.match(panel,/settings = preview\.settings/);
+  assert.match(panel,/const candidate = validateLongVegetationPreview/);
+  assert.match(panel,/requireLongVegetationGrouping\(candidate\.settings, lifeformEnabled, strataEnabled, codeEnabled\)/);
+  assert.match(panel,/preview = candidate/);
+  assert.match(panel,/settings = candidate\.settings/);
   assert.match(panel,/data-source-control="btnViewReport"/);
   assert.doesNotMatch(panel,/SavePlot|SavePreferences|oninput=|bind:value/);
 });
 test('vegetation report uses responsive labelled read-only settings, separate names and literal nullable statistics',()=>{
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
-  const component=serverComponent(source,'LongVegetationReport.svelte',{
+  const component=serverComponent(buildSource(source),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
     './longEnvironmentReport':environment,'./longVegetationReport':report
   });
@@ -259,7 +304,7 @@ test('quality presentation retains literal criteria, NULL ranks versus missing j
       `let settings = $state<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
     .replace('let preview = $state<ValidatedLongVegetationPreview | null>(null);',
       `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
-  const component=serverComponent(source,'LongVegetationReport.svelte',{
+  const component=serverComponent(buildSource(source),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
     './longEnvironmentReport':environment,'./longVegetationReport':report
   });
@@ -274,4 +319,84 @@ test('quality presentation retains literal criteria, NULL ranks versus missing j
     assert.ok(result.body.includes(text),`missing quality presentation: ${text}`);
   }
   assert.ok(!result.body.includes('joined sum / physical SU denominator'));
+});
+test('lifeform presentation labels typed group and source-specific conversion instead of claiming standalone summary',()=>{
+  const value=fixture();value.settings.grouping='lifeform';
+  for(const row of value.report.units[0].rows) {
+    if(row.layer.storage==='text') row.layer={storage:'integer',integer:'1',text:null,real:null,blobHex:null};
+  }
+  validate(value);
+  const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8')
+    .replace('let settings = $state<LongVegetationSettings | null>(null);',
+      `let settings = $state<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
+    .replace('let preview = $state<ValidatedLongVegetationPreview | null>(null);',
+      `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
+  const component=serverComponent(buildSource(source,true),'LongVegetationReport.svelte',{
+    '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
+    './longEnvironmentReport':environment,'./longVegetationReport':report
+  });
+  const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
+    su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});
+  assert.match(result.body.replace(/<!--[\s\S]*?-->/g,''),/<th\b[^>]*scope="col"[^>]*>Lifeform<\/th>/);
+  for(const text of ['Lifeform, then species','99.9 cap',
+    'Cover10 is not part of this conversion','not the standalone Lifeform Summary']) {
+    assert.ok(result.body.includes(text),`missing lifeform presentation: ${text}`);
+  }
+});
+test('Strata presentation labels original totals fallback cap and independent child criteria',()=>{
+  const value=fixture();value.settings.grouping='strata';
+  validate(value);
+  const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8')
+    .replace('let settings = $state<LongVegetationSettings | null>(null);',
+      `let settings = $state<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
+    .replace('let preview = $state<ValidatedLongVegetationPreview | null>(null);',
+      `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
+  const component=serverComponent(buildSource(source,false,true),'LongVegetationReport.svelte',{
+    '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
+    './longEnvironmentReport':environment,'./longVegetationReport':report
+  });
+  const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
+    su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});
+  assert.match(result.body.replace(/<!--[\s\S]*?-->/g,''),/<th\b[^>]*scope="col"[^>]*>Strata<\/th>/);
+  for(const text of ['Strata, then species','TotalA/TotalB','capped at 99','Extended B covers',
+    'Only positive A/B','zero or negative values','Cover8/9/10']) {
+    assert.ok(result.body.includes(text),`missing Strata presentation: ${text}`);
+  }
+});
+test('supplementary Code metadata is explicit nullable text and independently gated',()=>{
+  const value=fixture();value.settings.showEnglishName=false;value.settings.showSpeciesCode=true;
+  value.report.units[0].rows[0].englishName=cell('  LongerThanEight  ');
+  assert.equal(validate(value),value);
+  const configured=options();configured.settings.showEnglishName=false;configured.settings.showSpeciesCode=true;
+  assert.equal(validateOptions(configured).settings.showSpeciesCode,true);
+  assert.throws(()=>report.requireLongVegetationGrouping(configured.settings,true,true),/disabled in this build/);
+  assert.doesNotThrow(()=>report.requireLongVegetationGrouping(configured.settings,false,false,true));
+  for(const mutate of [
+    x=>delete x.settings.showSpeciesCode,x=>x.settings.showSpeciesCode=2,
+    x=>x.settings.showEnglishName=true,
+    x=>x.report.units[0].rows[0].englishName={storage:'integer',integer:'1',text:null,real:null,blobHex:null}
+  ]) {
+    const invalid=structuredClone(value);mutate(invalid);assert.throws(()=>validate(invalid));
+  }
+  const bindings=readFileSync(path.join(__dirname,'..','bindings','github.com','boostao','vpro-wails','models.ts'),'utf8');
+  assert.match(bindings,/"showSpeciesCode": boolean/);
+});
+test('Code presentation preserves source caption but labels literal list/matched master codes',()=>{
+  const value=fixture();value.settings.showEnglishName=false;value.settings.showSpeciesCode=true;
+  validate(value);
+  const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8')
+    .replace('let settings = $state<LongVegetationSettings | null>(null);',
+      `let settings = $state<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
+    .replace('let preview = $state<ValidatedLongVegetationPreview | null>(null);',
+      `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
+  const component=serverComponent(buildSource(source,false,false,true),'LongVegetationReport.svelte',{
+    '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
+    './longEnvironmentReport':environment,'./longVegetationReport':report
+  });
+  const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
+    su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});
+  for(const text of ['Show 8 char. code','List Code','Matched report Code','literal values are not truncated']) {
+    assert.ok(result.body.includes(text),`missing Code presentation: ${text}`);
+  }
+  assert.ok(!result.body.includes('List English name'));
 });

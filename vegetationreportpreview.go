@@ -56,6 +56,11 @@ func readLongVegetationLayers(ctx context.Context, plots *PlotService, options l
 			struct{ role, table string }{"project", owner.selection.Project + "_Admin"},
 			struct{ role, table string }{"VLists", "USysTableOfLists"})
 	}
+	personalIndex := -1
+	if options.LifeformGrouping {
+		personalIndex = len(sources)
+		sources = append(sources, struct{ role, table string }{"VUser", "USysUserSpp"})
+	}
 	tables := make([]ProjectMetadataTable, len(sources))
 	for i, source := range sources {
 		var count int
@@ -85,7 +90,21 @@ func readLongVegetationLayers(ctx context.Context, plots *PlotService, options l
 	if options.Quality != nil && len(quality.Occurrences) == 0 {
 		return result, errors.New("Sorry, no plots. Please adjust your plot quality standards or use a different site unit table")
 	}
-	result, err = planLongVegetationLayers(ctx, prepared, tables[2], tables[3], options)
+	reportSpecies, reportOptions, err := longVegetationCodeReferences(ctx, tables[2], options)
+	if err != nil {
+		return result, err
+	}
+	if options.LifeformGrouping {
+		references, referenceErr := prepareVegetationLifeformReferences(ctx, tables[2], tables[personalIndex])
+		if referenceErr != nil {
+			return result, referenceErr
+		}
+		result, err = planLongVegetationLifeforms(ctx, prepared, reportSpecies, references.Table, tables[3], reportOptions)
+	} else if options.StrataGrouping {
+		result, err = planLongVegetationStrata(ctx, prepared, reportSpecies, tables[3], reportOptions)
+	} else {
+		result, err = planLongVegetationLayers(ctx, prepared, reportSpecies, tables[3], reportOptions)
+	}
 	if err != nil {
 		return result, err
 	}

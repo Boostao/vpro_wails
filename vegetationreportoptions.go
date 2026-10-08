@@ -15,7 +15,10 @@ type longVegetationOptions struct {
 	MeanCoverGreaterThan float64
 	Order                string
 	ShowEnglishName      bool
+	ShowSpeciesCode      bool
 	NoneGrouping         bool
+	LifeformGrouping     bool
+	StrataGrouping       bool
 	Quality              *[3]vegetationQualityCriterion
 }
 
@@ -36,10 +39,12 @@ func decodeLongVegetationOptions(values configValues) (longVegetationOptions, er
 	}
 	switch group {
 	case 1:
+	case 2:
+		options.StrataGrouping = true
+	case 3:
+		options.LifeformGrouping = true
 	case 4:
 		options.NoneGrouping = true
-	default:
-		return fail(fmt.Errorf("Long Vegetation LVGroupBy=%d conversion is unavailable; only Layer (1) and None (4) are implemented", group))
 	}
 	if _, err := configInt(values, "ReportOptions", "LVUnitGroups", 1, 1); err != nil {
 		return fail(fmt.Errorf("Long Vegetation preview supports only LVUnitGroups=1 (selected SU): %w", err))
@@ -81,11 +86,12 @@ func decodeLongVegetationOptions(values configValues) (longVegetationOptions, er
 	default:
 		return fail(fmt.Errorf("ReportOptions.LVOrderBy must be 10 (species) or 20 (presence)"))
 	}
-	show, err := configInt(values, "ReportOptions", "LVShowEnglishName", 0, 1)
+	show, err := configInt(values, "ReportOptions", "LVShowEnglishName", 0, 2)
 	if err != nil {
-		return fail(fmt.Errorf("Long Vegetation preview supports only LVShowEnglishName=0 or 1; code and selected-field modes are unavailable: %w", err))
+		return fail(fmt.Errorf("Long Vegetation preview supports LVShowEnglishName=0, 1 and independently gated Code=2; selected-field mode remains unavailable: %w", err))
 	}
 	options.ShowEnglishName = show == 1
+	options.ShowSpeciesCode = show == 2
 	options.ConstantSpeciesList, err = longVegetationConfigBool(values, "LVConstantSppList")
 	if err != nil {
 		return fail(err)

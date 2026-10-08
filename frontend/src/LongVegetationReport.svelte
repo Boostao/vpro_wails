@@ -3,7 +3,7 @@
   import { ContextService, type LongVegetationSettings } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { reportCellText } from './longEnvironmentReport';
-  import { validateLongVegetationOptions, validateLongVegetationPreview, type ValidatedLongVegetationPreview } from './longVegetationReport';
+  import { requireLongVegetationGrouping, validateLongVegetationOptions, validateLongVegetationPreview, type ValidatedLongVegetationPreview } from './longVegetationReport';
 
   let { contextId, project, projectPath, su, suPath, onBusyChange }: {
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
@@ -15,6 +15,10 @@
   let preview = $state<ValidatedLongVegetationPreview | null>(null);
   const reads = new ReadRequests();
   let generation = 0;
+  const lifeformEnabled = import.meta.env.VITE_LONG_VEGETATION_LIFEFORM === 'true';
+  const strataEnabled = import.meta.env.VITE_LONG_VEGETATION_STRATA === 'true';
+  const codeEnabled = import.meta.env.VITE_LONG_VEGETATION_CODE === 'true';
+  const groupLabel = $derived(settings?.grouping === 'lifeform' ? 'Lifeform' : settings?.grouping === 'strata' ? 'Strata' : 'Layer');
 
   function cancel() {
     generation++; reads.cancelAll(); busy = false; onBusyChange(false);
@@ -25,7 +29,9 @@
     try {
       const value = await reads.track(ContextService.GetLongVegetationOptions(contextId));
       if (request !== generation) return;
-      settings = validateLongVegetationOptions(value, contextId, project, projectPath, su, suPath).settings;
+      const candidate = validateLongVegetationOptions(value, contextId, project, projectPath, su, suPath).settings;
+      requireLongVegetationGrouping(candidate, lifeformEnabled, strataEnabled, codeEnabled);
+      settings = candidate;
     } catch (cause) {
       if (request === generation) error = `Report options unavailable: ${String(cause)}`;
     } finally {
@@ -39,8 +45,10 @@
     try {
       const value = await reads.track(ContextService.PreviewLongVegetation(contextId));
       if (request !== generation) return;
-      preview = validateLongVegetationPreview(value, contextId, project, projectPath, su, suPath);
-      settings = preview.settings;
+      const candidate = validateLongVegetationPreview(value, contextId, project, projectPath, su, suPath);
+      requireLongVegetationGrouping(candidate.settings, lifeformEnabled, strataEnabled, codeEnabled);
+      preview = candidate;
+      settings = candidate.settings;
     } catch (cause) {
       if (request === generation) error = `Report unavailable; no data or configuration written: ${String(cause)}`;
     } finally {
@@ -64,15 +72,17 @@
   {#if settings}
     <dl class="settings" aria-label="Read-only report options">
       <div><dt>Report Title</dt><dd data-source-control="rptLvTitle">{settings.title === '' ? '"" (empty title)' : settings.title}</dd></div>
-      <div><dt>Group by</dt><dd>{settings.grouping === 'none' ? 'None (source layer observations retained)' : 'Layer'}</dd></div>
+      <div><dt>Group by</dt><dd>{settings.grouping === 'none' ? 'None (source layer observations retained)' : groupLabel}</dd></div>
       <div><dt>Average</dt><dd>{settings.average === 'all-plots' ? (settings.quality ? 'By n Plots — joined sum / qualified SU denominator' : 'By n Plots — joined sum / physical SU denominator') : 'Characteristic — mean of joined non-NULL observations'}</dd></div>
       <div><dt>Constant species list</dt><dd>{settings.constantSpeciesList ? 'On — same selected-SU list; thresholds bypassed' : 'Off — strict presence and mean-cover thresholds apply'}</dd></div>
       <div><dt>Show species with presence &gt; than</dt><dd>{settings.presenceGreaterThan}%{settings.constantSpeciesList ? ' (not applied)' : ''}</dd></div>
       <div><dt>Show species with mean cover &gt; than</dt><dd>{settings.meanCoverGreaterThan}%{settings.constantSpeciesList ? ' (not applied)' : ''}</dd></div>
-      <div><dt>Order by</dt><dd>{settings.constantSpeciesList ? 'Layer, then species (constant-list source order)' :
+      <div><dt>Order by</dt><dd>{settings.constantSpeciesList ? `${groupLabel}, then species (constant-list source order)` :
         settings.grouping === 'none' ? (settings.order === 'presence' ? 'Descending presence, then species' : 'Species') :
-        settings.order === 'presence' ? 'Layer, then descending presence' : 'Layer, then species'}</dd></div>
-      <div><dt>English names</dt><dd>{settings.showEnglishName ? 'List and matched report names shown separately' : 'Not shown'}</dd></div>
+        settings.order === 'presence' ? `${groupLabel}, then descending presence` : `${groupLabel}, then species`}</dd></div>
+      <div><dt>{settings.showSpeciesCode ? 'Show 8 char. code' : 'English names'}</dt><dd>{settings.showSpeciesCode ?
+        'List and matched master codes shown separately; literal values are not truncated' :
+        settings.showEnglishName ? 'List and matched report names shown separately' : 'Not shown'}</dd></div>
       <div><dt>Plot-quality filter</dt><dd data-source-control="optEnforceQC">{settings.quality ? 'On — selected-SU qualification' : 'Off — all physical selected-SU memberships'}</dd></div>
       {#if settings.quality}
         {#each [{label:'Site',field:'SitePlotQuality',value:settings.quality.site},
@@ -93,6 +103,13 @@
   {#if settings?.grouping === 'none'}<p class="notice">The source's None mode changes row ordering, not cover aggregation.
     Layer observations remain separate and labelled; equal source sort keys use a deterministic layer/name tie-break.
     A constant species list retains its source layer-first order.</p>{/if}
+  {#if settings?.grouping === 'lifeform'}<p class="notice">Lifeform conversion uses the original master/personal UNION,
+    extended covers and the source's 99.9 cap before grouped insertion. Cover10 is not part of this conversion.
+    Later master definitions and physical memberships retain their separate join weights; this is not the standalone Lifeform Summary.</p>{/if}
+  {#if settings?.grouping === 'strata'}<p class="notice">Strata A/B use retained TotalA/TotalB when present;
+    otherwise source cover sums are capped at 99. Extended B covers participate.
+    Only positive A/B results are inserted; C/D retain every non-NULL cover, including zero or negative values.
+    Physical Strata definitions retain their original join weights; Cover8/9/10 do not enter this conversion.</p>{/if}
   {#if preview}
     <h2>{preview.report.title === '' ? '"" (empty title)' : preview.report.title}</h2>
     <p role="status">{preview.report.units.length} units. No data, audits or configuration written.</p>
@@ -131,21 +148,22 @@
         <p>{preview.settings.quality ? 'Qualified denominator' : 'Physical denominator'}: {unit.numPlots}; retained physical membership rows: {unit.membershipIds.length}.</p>
         <details><summary>Physical membership row IDs ({unit.membershipIds.length})</summary><p>{unit.membershipIds.join(', ')}</p></details>
         {#if unit.rows.length === 0}
-          <p>No layer/species rows satisfy the current report settings.</p>
+          <p>No {groupLabel.toLowerCase()}/species rows satisfy the current report settings.</p>
         {:else}
           <div class="table-scroll" role="region" aria-label={`Vegetation table for unit ${reportCellText(unit.code)}`}>
             <table>
               <caption>Vegetation Table — Site Unit {reportCellText(unit.code)}</caption>
               <thead><tr>
-                <th scope="col">Layer</th><th scope="col">Species</th>
-                {#if preview.settings.showEnglishName}<th scope="col">List English name</th><th scope="col">Matched report English name</th>{/if}
+                <th scope="col">{groupLabel}</th><th scope="col">Species</th>
+                {#if preview.settings.showSpeciesCode}<th scope="col">List Code</th><th scope="col">Matched report Code</th>
+                {:else if preview.settings.showEnglishName}<th scope="col">List English name</th><th scope="col">Matched report English name</th>{/if}
                 <th scope="col">Presence (%)</th><th scope="col">Mean cover (%)</th>
                 {#each unit.rows[0].plots as plot}<th scope="col">Plot {JSON.stringify(plot.plotNumber)}</th>{/each}
               </tr></thead>
               <tbody>{#each unit.rows as row}
                 <tr>
                   <td>{reportCellText(row.layer)}</td><th scope="row">{reportCellText(row.species)}</th>
-                  {#if preview.settings.showEnglishName}<td>{reportCellText(row.englishName)}</td><td>{reportCellText(row.matchedName)}</td>{/if}
+                  {#if preview.settings.showEnglishName || preview.settings.showSpeciesCode}<td>{reportCellText(row.englishName)}</td><td>{reportCellText(row.matchedName)}</td>{/if}
                   <td>{presenceText(row.presence)}</td><td>{numberText(row.meanCover)}</td>
                   {#each row.plots as plot}<td>{numberText(plot.cover)}</td>{/each}
                 </tr>
@@ -156,10 +174,10 @@
       </section>
     {/each}
   {/if}
-  <p class="guidance">Read-only experimental layer preview. Options are loaded from YAML and cannot be edited here.
+  <p class="guidance">Read-only experimental vegetation preview. Options are loaded from YAML and cannot be edited here.
     NULL, empty text, zero and absent statistics remain distinct. Source reference/membership multiplicities and English-name fanout are reported, not deduplicated.
     Unit-name candidates preserve original reference rows; conflicting or unsupported names are not chosen arbitrarily.
-    No strata/lifeform grouping, taxon lumping, summaries, title persistence, Excel automation or file export is implemented.</p>
+    No strata grouping, taxon lumping, summaries, title persistence, Excel automation or file export is implemented.</p>
 </section>
 
 <style>
