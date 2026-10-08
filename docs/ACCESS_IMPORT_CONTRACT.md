@@ -151,6 +151,30 @@ files, authorize destination overwrites or bypass project ownership.
 
 ## Required before an enabled importer
 
+A separate Windows reader timestamp candidate has reproduced upstream
+fractional-second loss and negative-date failure using disposable MDB/ACCDB
+cells. Source binary64 days do not establish fixed millisecond precision:
+day45000 has an approximately628.643ns representable step. The candidate prefers
+whole seconds only when they reconstruct the source double, otherwise
+reconstructible nanoseconds, and explicitly rejects unrepresentable/nonfinite
+values. Negative OLE day/fraction aliases map to neutral UTC calendar values;
+this does not preserve distinct raw aliases as separate `time.Time` identities.
+
+Corrected native/public-Go focused MDB3.891s/ACCDB1.647s, clone full10.163s/
+race28.134s/vet and primary932-cell SQLite consumer1.442s pass. Independent
+review closed the native small-bind-buffer formatting defect with40 actual
+direct/bound-column cases: fractional `.123456633` needs30 bytes including NUL,
+canonical `.5` needs22, ordinary seconds20 and date-only11; size-1 explicitly
+fails without truncated success. Exact synthetic native-to-SQLite integration
+also passes1.450s: the reader's123456633ns becomes TEXT
+`2023-03-15 00:00:00.123456633`, unchanged through all scalar/schema/complete-row
+boundaries and real SQLite storage. Only one planned eight-byte cell of a
+disposable public-MDB copy differs; canonical/public fixtures remain unchanged.
+Exact archival acceptance is next. No Access runtime/display,
+DATETIME Extended or Linux claim follows, and the production dependency remains
+unchanged. The accepted earlier adapter cannot recover fractions already lost
+by an uncorrected reader.
+
 - Observe local versus linked tables without automatically following links.
 - Inventory source names/types and retain missing/NULL/empty descriptions where
   the reader can distinguish them. Its current plain Description string is not
@@ -159,8 +183,9 @@ files, authorize destination overwrites or bypass project ownership.
   boundary. It does not authorize canonical VPRO schema reconstruction; original
   constraints and identity/storage policy require separate source evidence.
 - Preserve physical rows and independently verify schema, storage, counts and
-  representative values. Reader dates currently omit fractional seconds; the
-  adapter cannot recover source precision already lost upstream.
+  representative values. Use the corrected native timestamp boundary only
+  after its platform/source ownership prerequisites are met; unrepresentable
+  subnanosecond values explicitly fail, rather than losing precision silently.
 - Import only into an exclusively owned new/disposable destination with
   transactions, cancellation, rollback, retry, collision and publication tests.
   Errors from inventory, reading, conversion, close and validation must block
