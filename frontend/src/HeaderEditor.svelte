@@ -26,7 +26,7 @@
     { key: NumberKey; label: string; kind: 'number'; step?: string };
 
   type HeaderSlot = { columns: readonly string[]; controls: readonly string[]; input: Snippet<[PaperControl, string]>; labelled: true };
-  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, masterAllowed = false, editor, additionalEditor, onMetadata, metadataDisabled = true, sourcePage, coordinateMode = $bindable<CoordinateDisplayMode>('dd'), children: layoutContent }: {
+  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, masterAllowed = false, editor, additionalEditor, onMetadata, metadataDisabled = true, pictureEditor, sourcePage, coordinateMode = $bindable<CoordinateDisplayMode>('dd'), children: layoutContent }: {
     draft: FS882Header;
     original: (BECCodes & WorkingUnitCodes & QualityCodes & SubstrateValues & SiteCodes & RegionCodes) | null;
     capabilities: Record<string, boolean | undefined>;
@@ -47,6 +47,7 @@
     additionalEditor?: { columns: readonly string[]; input: Snippet<[PaperControl, string]> };
     onMetadata?: () => void;
     metadataDisabled?: boolean;
+    pictureEditor?: Snippet;
     sourcePage?: ReturnType<typeof paperPage>;
     coordinateMode?: CoordinateDisplayMode;
     children?: Snippet<[HeaderSlot, CoordinateDisplayMode]>;
@@ -264,7 +265,11 @@
         {:else if control.type === 'CheckBox' || control.type === 'OptionButton'}
           <input class="paper-control pending" id={inputId(control)} data-column={control.column} data-source-control={control.controlName} type={control.type === 'OptionButton' ? 'radio' : 'checkbox'} checked={stored === true} disabled aria-label={controlLabel(control)} />
         {:else if control.type === 'Subform'}
+          {#if pictureEditor && control.controlName === 'frmVPics' && control.properties.SourceObject?.value === 'Form.frmVPicsXL'}
+            <div class="embedded" data-source-control={control.controlName}>{@render pictureEditor()}</div>
+          {:else}
           <div class="pending embedded" data-source-control={control.controlName} title="Embedded workflow not yet migrated">Pictures: pending</div>
+          {/if}
         {:else if control.type === 'TextBox' || control.type === 'ComboBox'}
           <input class="paper-control pending" id={inputId(control)} data-column={control.column} data-source-control={control.controlName} disabled value={typeof stored === 'string' || typeof stored === 'number' ? stored : ''} placeholder={stored !== undefined ? '' : 'Pending'} title={`${controlLabel(control)}: workflow not yet verified`} aria-label={controlLabel(control)} />
         {/if}

@@ -138,6 +138,17 @@ func readProjectMetadataRows(ctx context.Context, db projectMetadataQueryer, ali
 
 // Filter/order identifiers are internal literals; values remain SQL parameters.
 func readSQLiteStorageRows(ctx context.Context, db projectMetadataQueryer, alias, table, filterColumn string, filterValue *string, orderColumn string) (ProjectMetadataTable, error) {
+	return readSQLiteStorageRowsScoped(ctx, db, alias, table, filterColumn, filterValue, orderColumn, false)
+}
+
+func readSQLiteLiteralTextRows(ctx context.Context, db projectMetadataQueryer, alias, table, filterColumn, filterValue, orderColumn string) (ProjectMetadataTable, error) {
+	if filterColumn == "" {
+		return ProjectMetadataTable{}, errors.New("literal text storage scope requires an explicit column")
+	}
+	return readSQLiteStorageRowsScoped(ctx, db, alias, table, filterColumn, &filterValue, orderColumn, true)
+}
+
+func readSQLiteStorageRowsScoped(ctx context.Context, db projectMetadataQueryer, alias, table, filterColumn string, filterValue *string, orderColumn string, literalText bool) (ProjectMetadataTable, error) {
 	columns, err := readSQLiteStorageColumns(ctx, db, alias, table)
 	if err != nil {
 		return ProjectMetadataTable{}, err
@@ -154,7 +165,12 @@ func readSQLiteStorageRows(ctx context.Context, db projectMetadataQueryer, alias
 	query := "SELECT " + strings.Join(fields, ",") + " FROM " + relation
 	var arguments []any
 	if filterColumn != "" {
-		query += " WHERE " + quoteHeaderIdentifier(filterColumn) + " COLLATE BINARY IS ?"
+		column := quoteHeaderIdentifier(filterColumn)
+		if literalText {
+			query += " WHERE typeof(" + column + ")='text' AND CAST(" + column + " AS BLOB)=CAST(? AS BLOB)"
+		} else {
+			query += " WHERE " + column + " COLLATE BINARY IS ?"
+		}
 		arguments = append(arguments, filterValue)
 	}
 	query += " ORDER BY "

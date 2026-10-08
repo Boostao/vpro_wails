@@ -38,6 +38,7 @@
   import SIVICollectedPanel from './SIVICollectedPanel.svelte';
   import SIVISpeciesPanel from './SIVISpeciesPanel.svelte';
   import SIVIIdentityPanel from './SIVIIdentityPanel.svelte';
+  import PicturePanel from './PicturePanel.svelte';
   import SIVIParentReadPanel from './SIVIParentReadPanel.svelte';
   import SIVIParentSharedFields from './SIVIParentSharedFields.svelte';
   import { SIVIParentSharedSession, siviParentSharedFieldsFor, type SIVIParentSharedColumn, type SIVIParentSharedInput } from './siviParentSharedSession';
@@ -103,6 +104,7 @@
   const siviCollectedEnabled = import.meta.env.VITE_SIVI_COLLECTED_EDITING === 'true';
   const siviSpeciesEnabled = import.meta.env.VITE_SIVI_SPECIES_EDITING === 'true';
   const siviIdentityEnabled = import.meta.env.VITE_SIVI_IDENTITY_EDITING === 'true';
+  const pictureReadingEnabled = import.meta.env.VITE_PICTURE_READING === 'true';
   const siviChildSourceNoticesEnabled = import.meta.env.VITE_SIVI_CHILD_SOURCE_NOTICES === 'true';
   const siviParentReviewEnabled = import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
   const siviStandalone = untrack(() => entryForm === 'sivi');
@@ -264,6 +266,7 @@
   }
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
+  let pictureBusy = $state(false);
   const twoPageReviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW === 'true';
   const twoPageSourceLayoutEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT === 'true';
   const twoPageCommonReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW === 'true';
@@ -294,7 +297,7 @@
   let profileReviewBlocked = $state(false);
   let profileEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || twoPageOpen || twoPageBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy || siviIdentityBusy);
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || pictureBusy || twoPageOpen || twoPageBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy || siviIdentityBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -3463,9 +3466,19 @@
           onWorkingUnitBusyChange={(pending) => workingUnitBusy = pending}
           onQualityBusyChange={(pending) => qualityBusy = pending}
           onSiteCodeBusyChange={(pending) => siteCodeBusy = pending}
-          onRegionCodeBusyChange={(pending) => regionCodeBusy = pending} {workingUnitSession} />
+          onRegionCodeBusyChange={(pending) => regionCodeBusy = pending} {workingUnitSession}
+          pictureEditor={pictureReadingEnabled ? linkedPictures : undefined} />
         {/snippet}
         </OrdinaryFields>
+        {#snippet linkedPictures()}
+          {#if $projectState && original}
+            <PicturePanel contextId={siviContextId} project={$projectState.activeProject} plotNumber={original.plotNumber}
+              disabled={busy || headerWorkflowBusy || !capabilitiesReady || dirty || childUnsaved}
+              onBusyChange={(pending) => pictureBusy = pending} />
+          {:else}
+            <p role="status">Save and reload an owned plot before reading linked pictures.</p>
+          {/if}
+        {/snippet}
         {/snippet}
         </ParentCodeFields>
       {/key}

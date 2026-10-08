@@ -773,6 +773,10 @@ export interface PersonalSpeciesDefinitionRequest {
     "englishName": string | null;
 }
 
+export type PictureImage = pictureImage;
+
+export type PictureMetadataReview = pictureMetadataReview;
+
 export interface PlotLocationReport {
     "project": string;
     "su": string;
@@ -1956,6 +1960,25 @@ export interface WorkingUnitChoice {
 export interface WorkingUnitModeState {
     "mode": string;
     "warning": string | null;
+}
+
+export interface pictureImage {
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "rowId": string;
+    "mime": string;
+    "width": number;
+    "height": number;
+    "sha256": string;
+    "dataUrl": string;
+}
+
+export interface pictureMetadataReview {
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "records": ProjectMetadataTable;
 }
 
 export type siviParentProjection = SIVIParentProjection;

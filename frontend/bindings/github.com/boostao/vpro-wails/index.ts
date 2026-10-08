@@ -15,6 +15,7 @@ import * as LifeformSummaryService from "./lifeformsummaryservice.js";
 import * as LifeformWorkbookService from "./lifeformworkbookservice.js";
 import * as LongEnvironmentPreferencesService from "./longenvironmentpreferencesservice.js";
 import * as ParentCodeService from "./parentcodeservice.js";
+import * as PictureService from "./pictureservice.js";
 import * as PlotService from "./plotservice.js";
 import * as ProjectService from "./projectservice.js";
 import * as QualityService from "./qualityservice.js";
@@ -54,6 +55,7 @@ export {
     LifeformWorkbookService,
     LongEnvironmentPreferencesService,
     ParentCodeService,
+    PictureService,
     PlotService,
     ProjectService,
     QualityService,
@@ -158,6 +160,8 @@ export type {
     OtherTextUpdate,
     ParentCodeChoice,
     PersonalSpeciesDefinitionRequest,
+    PictureImage,
+    PictureMetadataReview,
     PlotLocationReport,
     PlotLocationReview,
     PlotLocationRow,

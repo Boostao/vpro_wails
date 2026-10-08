@@ -78,21 +78,28 @@ func sourceChildRowsJSON(data []byte, operation string) error {
 		return err
 	}
 	for _, raw := range rows {
-		properties, err := sourceChildJSONObject(raw, operation, []string{"rowId", "cells"}, nil)
-		if err != nil {
+		if err := sourceChildRowJSON(raw, operation); err != nil {
 			return err
 		}
-		if err := sourceChildJSONNonNull(properties, operation, "rowId", "cells"); err != nil {
+	}
+	return nil
+}
+
+func sourceChildRowJSON(data []byte, operation string) error {
+	properties, err := sourceChildJSONObject(data, operation, []string{"rowId", "cells"}, nil)
+	if err != nil {
+		return err
+	}
+	if err := sourceChildJSONNonNull(properties, operation, "rowId", "cells"); err != nil {
+		return err
+	}
+	var cells []json.RawMessage
+	if err := json.Unmarshal(properties["cells"], &cells); err != nil {
+		return err
+	}
+	for _, cell := range cells {
+		if err := sourceChildCellJSON(cell, operation); err != nil {
 			return err
-		}
-		var cells []json.RawMessage
-		if err := json.Unmarshal(properties["cells"], &cells); err != nil {
-			return err
-		}
-		for _, cell := range cells {
-			if err := sourceChildCellJSON(cell, operation); err != nil {
-				return err
-			}
 		}
 	}
 	return nil
