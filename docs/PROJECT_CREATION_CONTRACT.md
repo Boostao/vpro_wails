@@ -8,6 +8,36 @@ parity claim. Existing context ownership, YAML and file-publication helpers are
 precedents to reuse; they are not permission to overwrite a project or infer
 template defaults.
 
+The private schema-only `planNewProjectDDL` now maps the observed eight empty
+SQLite templates to literal desktop project names. Only the exact quoted CREATE
+table/index header is replaced; body bytes, column names, defaults, comments,
+expressions, predicates and collations remain unchanged. Explicit index names
+are project/table-prefixed and retain the original name as provenance. NULL
+SQLite implicit-index definitions remain NULL with no inferred executable SQL.
+Unsupported headers, triggers, duplicate/foreign/incomplete objects, reordered
+or populated templates and cancellation return no partial plan.
+
+This is a detached pure preparation, not an execution authorization. It does
+not parse arbitrary SQL bodies, decide destination collision/overwrite or
+reserved-name policy, re-prove ownership after the observation, create a file,
+execute DDL in an application database, plan audits/relationships/descriptions,
+switch context or expose a public API. A future materializer must independently
+validate the complete destination and observed schema under its transaction.
+The existing literal desktop identifier policy is reused without trimming,
+case repair or name completion; original Access naming prompts are not treated
+as a general SQL authorization.
+
+Focused mapping/observer race2.873s passes. Tests execute the mapped original
+DDL only in disposable memory and independently compare all eight column
+types/defaults/NOT NULL/PK and index uniqueness/key/collation properties against
+the read-only canonical templates. Literals/comments/quoted identifiers remain
+intact; source/mapped SQL pointers are detached and canonical bytes unchanged.
+The independent source-only in-memory preparation also passed all eight
+templates. Independent review found no significant issues; fresh full Go race
+passes root801.140s/all packages. Exact private-mapping sealing is in progress;
+location race775.988s does not validate these later Go additions. Native defaults,
+linked version properties and the enabled creator remain unresolved.
+
 Client screenshot page5 identifies project administration as a priority.
 Original ribbon `V7mdlRibbonOnAction.Sb03OnAction`, control `sb03btn01`, and
 `frmMainMenuFloat.cmbCurrProject_Change`, choice `New`, both call
