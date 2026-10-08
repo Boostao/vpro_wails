@@ -25,7 +25,8 @@ test('root Save/Lock/close and replacement retain picture errors and require exp
   const close = { unsaved: true, busy: false, blocked: true, canSave: false, saveReason: 'retained invalid picture',
     error: 'raw error' };
   const root = componentFunctions('FS882Form.svelte', ['getCloseState', 'load'], {
-    pictureMetadataPending: true, pictureMetadataClose: close, siviCreationPending: false, error: null,
+    pictureMetadataPending: true, pictureMetadataClose: close, siviCreationPending: false,
+    siviDeletionPending: false, siviRestorationPending: false, error: null,
   });
   const state = root.actions.getCloseState();
   assert.equal(state.blocked, true);

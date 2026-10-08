@@ -306,13 +306,85 @@ proof of in-flight SQL cancellation. Seven accepted owners normally closed;
 closed committed data/history remain before exact16-file restoration, all22
 protected identities unchanged. All four source presentations pass actual
 1400/600px client visibility/associated-label/horizontal-containment checks.
-Independent frontend/backend denials pass. Final evidence review/seal is pending.
+Independent frontend/backend denials pass. Bounded independent evidence review
+finds no concrete gaps; the3119-file creation checkpoint is independently
+rehashed at `archives/_sivi-creation-desktop-checkpoint/evidence-manifest.json`,
+SHA256 `b4d359383f6879bdb03b204ed911e44310c710503a3635a4a4b387979396ab1d`.
+No accepted native mutation or this seal may be replayed.
 An additional rejected no-commit candidate exposed a fixture-only restoration
 pitfall: copying immutable baseline file attributes made the disposable project
 read-only. Its failed attempt/profile are preserved separately. Restoration now
 copies bytes without inheriting baseline attributes and checks the exact
 candidate's write attribute while closed; baseline/canonical attributes are never changed.
 Deletion/historical restoration and default promotion are not granted.
+
+### Source-scoped deletion and typed restoration desktop successor
+
+The private frontend boundary preserves all44 cells and the physical schema
+order; logical ID never substitutes for physical row identity. Exact parent,
+context, project, source form and A/C/D query membership are validated before
+request construction. Hidden Cover5a/b/c and literal zero establish A membership;
+height-only/species-only rows do not. Historical overlength text and raw BOOLEAN
+storage remain unchanged. NULL/non-signed32 logical IDs and BLOB audit values
+produce explicit unavailable diagnostics rather than inferred repairs.
+
+One strict lowercase UUIDv4 and explicit confirmation bind the reviewed
+original. The UUID helper is shared with creation without changing its accepted
+behavior. The owned Go deletion kernel now atomically deletes one exact physical
+row, permanently reserves its logical ID and records source audits plus complete
+typed durable history. Canonical/internal history authority and shared-file
+cross-project guards apply before replay. Read-only lookup verifies vacancy,
+reservation and exact source audits; a missing receipt remains unresolved.
+Independent kernel review finds no significant issues; coupled deletion/creation/
+identity race passes201.106s.
+
+Private receipt/session validation checks the actual17-property lower-camel
+producer shape with UUID history and literal local seconds, exact raw original
+and complete audits. BOOLEAN audit values normalize true to -1 while raw Flag1
+stays1; real audit text follows Go g-format, not JavaScript number formatting.
+Lost/cancelled acknowledgements retain the exact original/request and resolve
+read-only without repeating Delete. The actual form's independently gated panel
+displays all44 raw historical fields and a row-specific confirmation; errors
+precede fields and routine guidance follows them. Typed undelete is implemented
+and independently reviewed with no significant issues. It preserves exact
+physical/logical identities, permanently reserved ID and all44 historical cells;
+both identities must be vacant. Separate immutable history consumes the deletion
+once. Retain/prune affects only proven source audits with explicitly permitted
+table aliases. Primary coupled deletion/undelete/creation/identity race passes
+325.751s; the newer integrated coupled race passes371.847s. Restoration
+review/request/27-property receipt/session, owned history/target discovery and
+actual-main/cache/root integration pass74 focused/898 complete frontend tests,
+check0/0 and isolated default/enabled frontend/production Wails builds.
+Eight SDK methods independently gate WRITING and RESTORING. Missing history
+does not mean a pending mutation failed; an existing empty owned list is presented
+separately. Parent Save and Save-and-close cannot perform Delete/Restore.
+Known reviews allow explicit Undo; unknown requests cannot be discarded.
+Peer drafts and host refresh block competing actions, while read-only recovery
+does not require a clean/unlocked parent. A verified commit followed by refresh
+failure disables further editing until explicit reload, never mutation replay.
+
+Six normally closed disposable native owners verify nine deletes/nine restores,
+all44 raw fields/physical identities, exact retain/prune audit changes, permanent
+reservations, action reconfirmation, lost/cancelled no-replay recovery, parent/
+remount/native-close guards and independent frontend/backend denials.
+Four forms preserve visible historical labels/confirmation and containment at
+actual1400/600px client widths. All16 prepared identities restore and22 protected
+identities remain unchanged. Closed committed data/profiles are retained.
+Independent native-evidence review found no significant issues and reproduced
+closed-history integrity/identity/asset checks. Fresh full integration race passes
+root2206.226s/all packages with970 frozen application identities/592 Go files,
+ready for successor sealing, not complete combined-form/default acceptance.
+Eight shared real-audit fixtures verify the actual Go producer and frontend
+consumer, including different scientific-format thresholds and signed zero.
+The restoration request must carry an exact SHA256 review token, rechecked
+against immutable historical evidence inside the write transaction; a history
+UUID alone cannot bind the reviewed44 cells when no source audits were emitted.
+
+Canonical `V7mdlAudit.RestoreAuditRecords` skips missing rows, Cover edits,
+ID and PlotNumber; it is not undelete. Its `CleanVegPlot` omits extended covers
+and performs destructive cleanup. A separately defined typed historical
+restoration must preserve identities, reservations and full-row occupancy
+without inheriting that cleanup or claiming it is original Access behavior.
 
 Active Form_BeforeUpdate calls `AuditTrail Me, , Me.ID`, then
 `UpdateMetadataSppList Me.PlotNumber`. The shared V7mdlAudit routine explicitly

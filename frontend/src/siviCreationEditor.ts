@@ -5,6 +5,7 @@ import { parseSIVICover, siviCoverGroups, type SIVICoverColumn, type SIVICoverCe
 import { validateSIVISpeciesReferences, siviSpeciesListed, siviSpeciesChoices,
   type SIVISpeciesOwner, type SIVISpeciesReferences } from './siviSpeciesEditor';
 import { resolveSpeciesDecision, type SpeciesDecision, type SpeciesDecisionKind } from './vegetationSpeciesEditor';
+import { validSIVIRequestId } from './siviRequestId';
 
 export type SIVICreationForm = 'SubVegA-SIVI' | 'SubVegA-SIVI_BC' | 'SubVegC-SIVI' | 'SubVegD-SIVI';
 export interface SIVICreationDraft extends SIVISpeciesOwner {
@@ -119,7 +120,7 @@ export function siviCreationPlan(draft: SIVICreationDraft, references: SIVISpeci
 
 export function siviCreationRequest(draft: SIVICreationDraft, references: SIVISpeciesReferences,
   owner: SIVISpeciesOwner, requestId: string): SIVICreationRequest {
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(requestId)) {
+  if (!validSIVIRequestId(requestId)) {
     throw new Error('SIVI creation requires one stable request identity; no retry or identity was inferred.');
   }
   return { requestId, ...siviCreationPlan(draft, references, owner) };

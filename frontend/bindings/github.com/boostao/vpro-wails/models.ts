@@ -1156,6 +1156,18 @@ export interface SIVICoverWriteResult {
 
 export type SIVICreationResult = siviCreationResult;
 
+export type SIVIDeletionHistoryList = siviDeletionHistoryList;
+
+export type SIVIDeletionOriginal = siviDeletionOriginal;
+
+export type SIVIDeletionRestorationResult = siviDeletionRestorationResult;
+
+export type SIVIDeletionRestorationReview = siviDeletionRestorationReview;
+
+export type SIVIDeletionResult = siviDeletionResult;
+
+export type SIVIDeletionTargets = siviDeletionTargets;
+
 export interface SIVIHeightEdit {
     "rowId": string;
     "form": string;
@@ -2047,6 +2059,129 @@ export interface siviCreationResult {
     "request": siviCreationRequest;
     "didCommit": boolean;
     "replayed": boolean;
+}
+
+export interface siviDeletionHistoryEvent {
+    "historyId": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "species": string | null;
+    "actor": string;
+    "editWhen": string;
+    "restored": boolean;
+    "consumed": boolean;
+}
+
+export interface siviDeletionHistoryList {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyPresent": boolean;
+    "events": siviDeletionHistoryEvent[] | null;
+}
+
+export interface siviDeletionOriginal {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+}
+
+export interface siviDeletionRequest {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+}
+
+export interface siviDeletionRestorationRequest {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "action": AuditRestoreAction;
+    "expected": string;
+}
+
+export interface siviDeletionRestorationResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "expected": string;
+    "restorationId": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "action": AuditRestoreAction;
+    "actor": string;
+    "auditStrength": number;
+    "editWhen": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "restored": ProjectMetadataRow | null;
+    "deletion": siviDeletionResult;
+    "request": siviDeletionRestorationRequest;
+    "auditColumns": ProjectMetadataColumn[] | null;
+    "auditsBefore": ProjectMetadataRow[] | null;
+    "auditsAfter": ProjectMetadataRow[] | null;
+    "cancelled": boolean;
+    "restoredRows": number;
+    "prunedAuditRows": number;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface siviDeletionRestorationReview {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "expected": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "deletion": siviDeletionResult;
+    "auditColumns": ProjectMetadataColumn[] | null;
+    "auditsBefore": ProjectMetadataRow[] | null;
+}
+
+export interface siviDeletionResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "historyId": string;
+    "actor": string;
+    "auditStrength": number;
+    "editWhen": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "request": siviDeletionRequest;
+    "audits": AuditEntry[] | null;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface siviDeletionTargets {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "rows": ProjectMetadataRow[] | null;
 }
 
 export type siviParentProjection = SIVIParentProjection;

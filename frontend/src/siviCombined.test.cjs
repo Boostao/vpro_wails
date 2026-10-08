@@ -475,6 +475,7 @@ test('every opted-in writer retains acknowledged warning feedback and clears it 
     assert.equal(owner.view().sourceNotices[0].species, 'RAW');
     assert.equal(owner.closeState().unsaved, false);
     const context = componentFunctions('FS882Form.svelte', ['refreshSIVIChildEditors'], {
+      siviCreationPending: false, siviDeletionPending: false, siviRestorationPending: false,
       siviSession: Writer === heightSession.SIVIHeightSession ? owner : null,
       siviCoverSession: Writer === coverSession.SIVICoverSession ? owner : null,
       siviCombinedSession: Writer === session.SIVICombinedSession ? owner : null,

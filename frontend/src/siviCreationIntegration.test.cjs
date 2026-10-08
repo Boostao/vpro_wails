@@ -12,7 +12,8 @@ const flags = ['busy', 'headerWorkflowBusy', 'siviSourceAuthorityUnknown', 'code
   'profileReviewBlocked', 'siviParentActionUnsaved', 'siviProjectAssignmentUnsaved', 'siviParentWriteUnsaved',
   'siviParentSharedUnsaved', 'siviUnsaved', 'siviCoverUnsaved', 'siviCombinedUnsaved', 'siviCollectedUnsaved',
   'siviSpeciesUnsaved', 'siviIdentityUnsaved', 'heightUnsaved', 'otherUnsaved', 'soilUnsaved',
-  'attributeUnsaved', 'collectedUnsaved', 'speciesUnsaved', 'pictureMetadataPending', 'twoPageOpen', 'environmentSUOpen'];
+  'attributeUnsaved', 'collectedUnsaved', 'speciesUnsaved', 'pictureMetadataPending', 'twoPageOpen', 'environmentSUOpen',
+  'siviDeletionPending', 'siviRestorationPending'];
 function host(overrides = {}) {
   return componentFunctions('FS882Form.svelte', ['siviCreationOperation', 'stageSIVICreation',
     'refreshSIVIChildEditors', 'save', 'undo', 'getCloseState', 'load', 'toggleLock'], {
@@ -36,7 +37,7 @@ function derived(name, state) {
 test('actual client subscription settles, notifies once and detaches when its owner changes', async () => {
   const client = await import('svelte/internal/client');
   const { compile } = require('svelte/compiler');
-  for (const prefix of ['siviCreation', 'pictureMetadata']) {
+  for (const prefix of ['siviCreation', 'pictureMetadata', 'siviDeletion', 'siviRestoration']) {
     const subscription = root.split('\n').find(line => line.includes(`${prefix}Session?.subscribe`));
     assert.ok(subscription, prefix);
     const compiled = compile(`<script>
@@ -111,7 +112,7 @@ test('creation independently gates actual root/main registration and binds only 
 });
 
 test('shared pending guards preserve ordinary/source/parent barriers while draft-only layout remount stays available', () => {
-  const state = { siviCreationPeerUnsaved: false, siviCreationPending: true,
+  const state = { siviCreationPeerUnsaved: false, siviCreationPending: true, siviDeletionPending: false, siviRestorationPending: false,
     capabilitiesReady: true, draft: { locked: false }, busy: false, headerWorkflowBusy: false,
     siviSourceBarrier: false, dirty: false, original: {}, deletionReview: null, creationDraft: null,
     personalDraft: null, codeCheckOpen: false, metadataOpen: false, profileReviewBlocked: false,
@@ -127,7 +128,7 @@ test('shared pending guards preserve ordinary/source/parent barriers while draft
 });
 
 test('unknown request recovery permission is separate from ordinary editing and retains every peer-operation guard', () => {
-  const state = { siviCreationEnabled: true, busy: false, siviCreationHostBusy: false,
+  const state = { siviCreationEnabled: true, busy: false, siviCreationHostBusy: false, siviDeletionPending: false, siviRestorationPending: false,
     otherHeaderWorkflowBusy: false, siviCreationClose: { busy: false }, pictureBusy: false,
     pictureMetadataPending: false, siviCreationPeerUnsaved: false, siviParentWriteUnsaved: false,
     siviParentActionUnsaved: false, siviProjectAssignmentUnsaved: false, siviParentSharedUnsaved: false };

@@ -26,6 +26,7 @@ import * as SIVICollectedService from "./sivicollectedservice.js";
 import * as SIVICombinedService from "./sivicombinedservice.js";
 import * as SIVICoverService from "./sivicoverservice.js";
 import * as SIVICreationService from "./sivicreationservice.js";
+import * as SIVIDeletionService from "./sivideletionservice.js";
 import * as SIVIIdentityService from "./siviidentityservice.js";
 import * as SIVIParentSharedService from "./siviparentsharedservice.js";
 import * as SIVISpeciesService from "./sivispeciesservice.js";
@@ -68,6 +69,7 @@ export {
     SIVICombinedService,
     SIVICoverService,
     SIVICreationService,
+    SIVIDeletionService,
     SIVIIdentityService,
     SIVIParentSharedService,
     SIVISpeciesService,
@@ -220,6 +222,12 @@ export type {
     RegionCodeChoice,
     SIVICoverWriteResult,
     SIVICreationResult,
+    SIVIDeletionHistoryList,
+    SIVIDeletionOriginal,
+    SIVIDeletionRestorationResult,
+    SIVIDeletionRestorationReview,
+    SIVIDeletionResult,
+    SIVIDeletionTargets,
     SIVIHeightEdit,
     SIVIHeightWriteResult,
     SIVIParentActionInput,

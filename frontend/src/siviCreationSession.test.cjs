@@ -20,6 +20,7 @@ const species = loadTypeScript('siviSpeciesEditor.ts', {
 const editor = loadTypeScript('siviCreationEditor.ts', {
   './projectMetadataEditor': metadata, './qualityEditor': quality, './siviCoverEditor': cover,
   './siviSpeciesEditor': species, './vegetationSpeciesEditor': decisions,
+  './siviRequestId': loadTypeScript('siviRequestId.ts'),
 });
 const defaults = require('../../resources/sivi-new-row-defaults.json');
 const receipts = loadTypeScript('siviCreationReceipt.ts', {

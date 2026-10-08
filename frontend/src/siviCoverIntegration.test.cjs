@@ -19,6 +19,7 @@ function host(overrides = {}) {
     `\nglobalThis.api = {${names.join(',')}};`;
   const context = {
     error: null, successMsg: null, siviCoverEnabled: true, busy: false, headerWorkflowBusy: false, pictureMetadataPending: false, siviCreationPending: false,
+    siviDeletionPending: false, siviRestorationPending: false,
     siviUnsaved: false, heightUnsaved: false, otherUnsaved: false, soilUnsaved: false,
     attributeUnsaved: false, collectedUnsaved: false, speciesUnsaved: false,
     siviParentWriteUnsaved: false, siviParentActionUnsaved: false,
@@ -69,7 +70,7 @@ test('cover owner contributes dirty busy blocked Save Undo Lock and peer-editor 
   assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviCoverBusy(?: \|\| [a-zA-Z]+)*\)/);
   assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
   assert.match(parent, /siviCreationPeerUnsaved = \$derived\([^\n]*\|\| siviCoverUnsaved/);
-  assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending\)/);
+  assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending\)/);
   assert.match(parent, /if \(siviCoverUnsaved\) \{ await siviCoverOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviCoverUnsaved\) \{ void siviCoverOperation\('undo'\); return; \}/);
   assert.match(parent, /\|\| \(siviCoverClose\?\.blocked \?\? false\)/);

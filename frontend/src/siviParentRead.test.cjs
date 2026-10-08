@@ -199,6 +199,7 @@ test('source preference unknown authority survives failed and cancelled recovery
 });
 test('actual parent Save Lock and close authority block unknown source preference even with other editor surfaces open', async () => {
   const context = componentFunctions('FS882Form.svelte', ['getCloseState', 'save', 'toggleLock'], {
+    siviDeletionPending: false, siviRestorationPending: false,
     siviParentSourceView: { authorityUnknown: true, busy: false, error: 'lost preference receipt' }, pictureMetadataPending: false,
     siviSourceAuthorityUnknown: true, environmentSUOpen: true, metadataOpen: true, error: '',
   });
