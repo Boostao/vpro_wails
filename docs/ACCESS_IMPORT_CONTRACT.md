@@ -151,6 +151,31 @@ files, authorize destination overwrites or bypass project ownership.
 
 ## Required before an enabled importer
 
+The separate additive reader `DB.TableDescriptions()` now observes catalog-local
+`MSysObjects.LvProp` without loading linked physical targets. A complete parsed
+supported sequence distinguishes recorded table-scope Description entries from
+missing entries. Unavailable metadata stays unavailable: absent, NULL and
+zero-length LvProp are not separated. Ordered duplicates, block/entry/name
+positions, native type/flag bytes and detached raw value bytes are retained
+before compatibility lookup; named column blocks do not leak into table
+descriptions. Existing `Table.Description` compatibility is unchanged.
+
+NULL state, DAO type semantics and authored/inherited/default definition origin
+remain explicitly unknown. Zero raw bytes are neither NULL proof nor confirmed
+empty-string semantics. This is not an entire lossless property envelope.
+Malformed/truncated/unsupported native property sequences fail explicitly and
+prevent partial successful inventory/scan; untested format variants remain gaps.
+
+Focused1.302s, fresh clone full11.412s/race28.930s/vet and independent
+inspection-only review pass. The reviewer verified11 candidate hashes and35
+unchanged pre-hashed files but ran no runtime tests. Primary native consumer
+1.544s independently checks nine public table observations, literal Shippers
+description/type10/flags1/positions, unknown semantic states, compatibility and
+detached bytes, alongside932 exact native-to-SQLite cells and123456633ns date
+preservation. MDB/ACCDB/source-copy hashes remain unchanged. Actual linked-table
+and unavailable-metadata fixtures, DAO NULL semantics and Linux are unverified.
+Exact archival acceptance is next; no production importer/dependency is added.
+
 A separate Windows reader timestamp candidate has reproduced upstream
 fractional-second loss and negative-date failure using disposable MDB/ACCDB
 cells. Source binary64 days do not establish fixed millisecond precision:
@@ -170,15 +195,19 @@ also passes1.450s: the reader's123456633ns becomes TEXT
 `2023-03-15 00:00:00.123456633`, unchanged through all scalar/schema/complete-row
 boundaries and real SQLite storage. Only one planned eight-byte cell of a
 disposable public-MDB copy differs; canonical/public fixtures remain unchanged.
-Exact archival acceptance is next. No Access runtime/display,
+The [exact timestamp successor](../archives/access-reader-datetime-checkpoint/evidence-manifest.json)
+retains76 files, verifies its22-file application predecessor and42 reader
+baseline files from the62-file memo/18-file Jet4 seals, and confirms368 application
+Go hashes unchanged. No Access runtime/display,
 DATETIME Extended or Linux claim follows, and the production dependency remains
 unchanged. The accepted earlier adapter cannot recover fractions already lost
 by an uncorrected reader.
 
 - Observe local versus linked tables without automatically following links.
-- Inventory source names/types and retain missing/NULL/empty descriptions where
-  the reader can distinguish them. Its current plain Description string is not
-  proof of that distinction; do not silently complete metadata.
+- Inventory source names/types and use catalog-local observation provenance
+  rather than the compatibility Description string as evidence. Preserve
+  unavailable/unknown states; prove semantic NULL/empty and linked-object
+  behavior before claiming those distinctions or silently completing metadata.
 - Apply and verify the private value-storage affinity plan in an owned staging
   boundary. It does not authorize canonical VPRO schema reconstruction; original
   constraints and identity/storage policy require separate source evidence.
