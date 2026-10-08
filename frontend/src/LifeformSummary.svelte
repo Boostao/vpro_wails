@@ -1,34 +1,40 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { LifeformSummaryService } from '../bindings/github.com/boostao/vpro-wails';
+  import { LifeformSummaryService, SpeciesAttributeSummaryService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { validateLifeformSummary, lifeformCellText, lifeformRatioText, type LifeformSummaryPreview } from './lifeformSummary';
+  import { validateSpeciesAttributeSummary, speciesAttributeCountText, type SpeciesAttributeSummaryPreview } from './speciesAttributeSummary';
 
   let { contextId, project, projectPath, su, suPath, onBusyChange }: {
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
     onBusyChange: (busy: boolean) => void;
   } = $props();
   const enabled = import.meta.env.VITE_LIFEFORM_SUMMARY === 'true';
+  const attributesEnabled = import.meta.env.VITE_SPECIES_ATTRIBUTE_SUMMARY === 'true';
   const reads = new ReadRequests();
   let generation = 0;
   let busy = $state(false);
   let error = $state('');
   let preview = $state<LifeformSummaryPreview | null>(null);
+  let attributePreview = $state<SpeciesAttributeSummaryPreview | null>(null);
   const ownerKey = $derived(JSON.stringify([contextId, project, projectPath, su, suPath]));
   let previewKey = $state('');
   const currentPreview = $derived(previewKey === ownerKey ? preview : null);
+  const currentAttributes = $derived(previewKey === ownerKey ? attributePreview : null);
   function cancel() { generation++; reads.cancelAll(); busy = false; onBusyChange(false); }
-  async function show() {
-    if (!enabled || busy || su === 'None' || su === 'USysSuTableDynamic') return;
+  async function show(kind: 'lifeform' | 'attributes') {
+    if (!enabled || kind === 'attributes' && !attributesEnabled || busy || su === 'None' || su === 'USysSuTableDynamic') return;
     cancel(); const request = generation, key = ownerKey;
     const owner = { contextId, project, projectPath, su, suPath };
-    busy = true; error = ''; preview = null; onBusyChange(true);
+    busy = true; error = ''; preview = null; attributePreview = null; onBusyChange(true);
     try {
-      const value = await reads.track(LifeformSummaryService.Preview(contextId));
+      const value = await reads.track<unknown>(kind === 'attributes' ? SpeciesAttributeSummaryService.Preview(contextId) : LifeformSummaryService.Preview(contextId));
       if (request !== generation || key !== ownerKey) return;
-      preview = validateLifeformSummary(value, owner); previewKey = key;
+      if (kind === 'attributes') attributePreview = validateSpeciesAttributeSummary(value, owner);
+      else preview = validateLifeformSummary(value, owner);
+      previewKey = key;
     } catch (cause) {
-      if (request === generation && key === ownerKey) error = `Lifeform Summary unavailable; no data or configuration writes: ${String(cause)}`;
+      if (request === generation && key === ownerKey) error = `${kind === 'attributes' ? 'Species attribute summary' : 'Lifeform Summary'} unavailable; no data or configuration writes: ${String(cause)}`;
     } finally {
       if (request === generation) { busy = false; onBusyChange(false); }
     }
@@ -43,7 +49,8 @@
   {#if !enabled}<p>This preview is disabled in this build.</p>{/if}
   {#if su === 'None' || su === 'USysSuTableDynamic'}<p>A selected normal SU is required. Hierarchy and dynamic breaks are unavailable.</p>{/if}
   <div class="actions">
-    <button onclick={show} disabled={!enabled || busy || su === 'None' || su === 'USysSuTableDynamic'}>Preview Lifeform Summary</button>
+    <button onclick={() => show('lifeform')} disabled={!enabled || busy || su === 'None' || su === 'USysSuTableDynamic'}>Preview Lifeform Summary</button>
+    <button onclick={() => show('attributes')} disabled={!enabled || !attributesEnabled || busy || su === 'None' || su === 'USysSuTableDynamic'}>Preview species attribute summaries</button>
     {#if busy}<button onclick={cancel}>Cancel preview</button><p role="status">Reading owned project and SU…</p>{/if}
   </div>
   {#if currentPreview}
@@ -72,7 +79,32 @@
     {/each}
     {#if currentPreview.report.units.length === 0}<p>No physical SU memberships.</p>{/if}
   {/if}
-  <p class="guidance">Read-only preview: no database, configuration or Excel writes. Global inserted rows rejoin SU by PlotNumber, retaining duplicate and cross-unit weights. NULL means stay NULL. Catalogue rows use deterministic physical row order, not a claim about Access collation. Zero denominators are shown as NULL instead of evaluating division by zero. Attribute summaries, hierarchy breaks and export remain unavailable.</p>
+  {#if currentAttributes}
+    {#each currentAttributes.report.units as unit}
+      <article data-species-attribute-summary>
+        <h2>Species attributes — Unit: {lifeformCellText(unit.code)}</h2>
+        <p>nPlots (physical non-NULL PlotNumber count): {unit.nPlots}</p>
+        <div class="table-scroll">
+          <table>
+            <caption>Attribute counts for {lifeformCellText(unit.code)}</caption>
+            <thead><tr><th scope="col">Attribute</th><th scope="col">Count</th><th scope="col">Number of plot occurrences</th></tr></thead>
+            <tbody>{#each unit.rows as row, i}<tr><th scope="row">{currentAttributes.report.definitions[i].label}</th><td>{speciesAttributeCountText(row.count)}</td><td>{row.plotOccurrences}</td></tr>{/each}</tbody>
+          </table>
+        </div>
+        {#each unit.rows as row, i}
+          <div class="table-scroll">
+            <table>
+              <caption>{currentAttributes.report.definitions[i].label} details for {lifeformCellText(unit.code)}</caption>
+              <thead><tr>{#each currentAttributes.report.definitions[i].categories as category}<th scope="col">{category}</th>{/each}</tr></thead>
+              <tbody><tr>{#each row.categories as count}<td>{speciesAttributeCountText(count)}</td>{/each}</tr></tbody>
+            </table>
+          </div>
+        {/each}
+      </article>
+    {/each}
+    {#if currentAttributes.report.units.length === 0}<p>No physical SU memberships.</p>{/if}
+  {/if}
+  <p class="guidance">Read-only preview: no database, configuration or Excel writes. Lifeform global inserted rows rejoin SU by PlotNumber, retaining duplicate and cross-unit weights. Attribute summaries instead join raw physical vegetation/SU/attribute rows; repeated observations and definitions retain their weights. NULL counts stay NULL; totals include non-pivot values. All six detail families are displayed without changing saved report options. Literal identities are not a claim about Access collation. Zero Lifeform denominators are shown as NULL instead of evaluating division by zero. Attribute summaries have an independent default-off gate; hierarchy breaks and export remain unavailable.</p>
 </section>
 
 <style>

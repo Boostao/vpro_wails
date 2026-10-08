@@ -1456,6 +1456,52 @@ export interface SoilTextUpdate {
     "expected": string | null;
 }
 
+export interface SpeciesAttributeCount {
+    "field": string;
+    "count": number | null;
+    "plotOccurrences": number;
+    "categories": (number | null)[] | null;
+}
+
+export interface SpeciesAttributeDefinition {
+    "field": string;
+    "label": string;
+    "categories": string[] | null;
+}
+
+export interface SpeciesAttributeMatch {
+    "suRowId": string;
+    "vegRowId": string;
+    "attributeRowId": string;
+    "plotNumber": string;
+    "species": string;
+    "values": ProjectMetadataCell[] | null;
+}
+
+export interface SpeciesAttributeSummaryPreview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "report": SpeciesAttributeSummaryReport;
+}
+
+export interface SpeciesAttributeSummaryReport {
+    "project": string;
+    "su": string;
+    "querySource": string;
+    "definitions": SpeciesAttributeDefinition[] | null;
+    "memberships": VegetationReportMembership[] | null;
+    "matches": SpeciesAttributeMatch[] | null;
+    "units": SpeciesAttributeUnit[] | null;
+}
+
+export interface SpeciesAttributeUnit {
+    "code": ProjectMetadataCell;
+    "nPlots": number;
+    "suRowIds": string[] | null;
+    "rows": SpeciesAttributeCount[] | null;
+}
+
 export interface SpeciesCodeCheckOption {
     "code": string | null;
     "scientificName": string | null;

@@ -22,6 +22,7 @@ import * as SIVIParentSharedService from "./siviparentsharedservice.js";
 import * as SiteCodeService from "./sitecodeservice.js";
 import * as SiteUnitSummaryPreferencesService from "./siteunitsummarypreferencesservice.js";
 import * as SoilCodeService from "./soilcodeservice.js";
+import * as SpeciesAttributeSummaryService from "./speciesattributesummaryservice.js";
 import * as StartupService from "./startupservice.js";
 import * as TableCSVArchiveService from "./tablecsvarchiveservice.js";
 import * as WorkingUnitService from "./workingunitservice.js";
@@ -47,6 +48,7 @@ export {
     SiteCodeService,
     SiteUnitSummaryPreferencesService,
     SoilCodeService,
+    SpeciesAttributeSummaryService,
     StartupService,
     TableCSVArchiveService,
     WorkingUnitService
@@ -219,6 +221,12 @@ export type {
     SoilRecordUpdate,
     SoilSuggestion,
     SoilTextUpdate,
+    SpeciesAttributeCount,
+    SpeciesAttributeDefinition,
+    SpeciesAttributeMatch,
+    SpeciesAttributeSummaryPreview,
+    SpeciesAttributeSummaryReport,
+    SpeciesAttributeUnit,
     SpeciesCodeCheckOption,
     SpeciesCodeCheckReview,
     SpeciesCodeCheckRow,

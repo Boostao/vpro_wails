@@ -15,8 +15,10 @@ SiteUnitDetailReport `SuDetailStep1.MyCover` helper. Its source wrapper uses
 argument 1 for normal SU and 0 for dynamic hierarchy preparation. The desktop
 does not invoke that wrapper or build dynamic tables: it explicitly selects the
 owned ordinary SU. Neither the generic Summary Vegetation menu item nor hierarchy
-breaks, species/attribute summaries, saved report options or publication becomes
-available through this slice.
+breaks, saved report options or publication becomes available through this slice.
+The separate [attribute-count successor](SPECIES_ATTRIBUTE_SUMMARY_CONTRACT.md)
+adds six independently gated raw-vegetation query families in the same host;
+its native acceptance does not reinterpret the Lifeform calculation below.
 
 Canonical Access and imported databases remain unchanged. Access is not opened.
 The implementation uses existing owned SQLite readers, not a second Access
@@ -98,8 +100,9 @@ write report tables or export a workbook.
   boundaries remain represented rather than silently promoted away.
 - Percent formatting is display-only; emitted ratios retain their numeric
   precision and distinguish NULL from a very small nonzero value.
-- Hierarchy/field-derived units, species and attribute modes, source workbook
-  layout and publication remain unavailable.
+- Hierarchy/field-derived units, other species modes, source workbook layout and
+  publication remain unavailable. Attribute counts have a separate contract,
+  gate and acceptance scope; they do not inherit this cover planner.
 - The separate SiteUnitDetailReport MyCover path is unresolved and must not reuse
   this planner as parity proof.
 

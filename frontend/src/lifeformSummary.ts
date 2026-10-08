@@ -26,6 +26,8 @@ export type LifeformSummaryPreview = {
 };
 export type LifeformSummaryOwner = { contextId: string; project: string; projectPath: string; su: string; suPath: string };
 
+export { text as lifeformText, shape as lifeformShape, cell as lifeformCell, count as lifeformCount, id as lifeformRowID };
+
 function text(value: unknown): value is string {
   if (typeof value !== 'string' || value.includes('\0')) return false;
   for (let i = 0; i < value.length; i++) {
