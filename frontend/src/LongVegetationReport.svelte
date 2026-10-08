@@ -1,31 +1,47 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { ContextService, type LongVegetationSettings } from '../bindings/github.com/boostao/vpro-wails';
+  import { onMount, onDestroy, untrack } from 'svelte';
+  import { ContextService, VegetationWorkbookService, type LongVegetationSettings } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { reportCellText } from './longEnvironmentReport';
   import { requireLongVegetationGrouping, validateLongVegetationOptions, validateLongVegetationPreview, type ValidatedLongVegetationPreview } from './longVegetationReport';
+  import { vegetationWorkbookPublicationSession, VegetationWorkbookPublicationSession, type ValidatedVegetationWorkbookReview } from './vegetationWorkbook';
 
-  let { contextId, project, projectPath, su, suPath, onBusyChange }: {
+  let { contextId, project, projectPath, su, suPath, operationHeld = false, onBusyChange }: {
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
+    operationHeld?: boolean;
     onBusyChange: (busy: boolean) => void;
   } = $props();
   let settings = $state<LongVegetationSettings | null>(null);
   let busy = $state(false);
   let error = $state('');
   let preview = $state<ValidatedLongVegetationPreview | null>(null);
+  let workbookReview = $state.raw<ValidatedVegetationWorkbookReview | null>(null);
+  let destination = $state('');
   const reads = new ReadRequests();
   let generation = 0;
   const lifeformEnabled = import.meta.env.VITE_LONG_VEGETATION_LIFEFORM === 'true';
   const strataEnabled = import.meta.env.VITE_LONG_VEGETATION_STRATA === 'true';
   const codeEnabled = import.meta.env.VITE_LONG_VEGETATION_CODE === 'true';
+  const workbookEnabled = import.meta.env.VITE_LONG_VEGETATION_WORKBOOK === 'true';
+  const workbookOwner = untrack(() => ({ contextId, project, projectPath, su, suPath }));
+  const workbookSession = workbookEnabled ? vegetationWorkbookPublicationSession(workbookOwner) : new VegetationWorkbookPublicationSession(workbookOwner);
+  let publication = $state(workbookSession.view());
+  const workbookBarrier = $derived(publication.busy || publication.blocked);
   const groupLabel = $derived(settings?.grouping === 'lifeform' ? 'Lifeform' : settings?.grouping === 'strata' ? 'Strata' : 'Layer');
+  function reportBusy() { onBusyChange(busy || workbookBarrier); }
+  const unsubscribeWorkbook = workbookSession.subscribe(() => {
+    publication = workbookSession.view();
+    if (publication.blocked) workbookReview = null;
+    reportBusy();
+  });
 
   function cancel() {
-    generation++; reads.cancelAll(); busy = false; onBusyChange(false);
+    generation++; reads.cancelAll(); busy = false; reportBusy();
   }
   async function options() {
-    cancel(); const request = generation; settings = null; error = ''; preview = null;
-    busy = true; onBusyChange(true);
+    if (busy || operationHeld || workbookBarrier) return;
+    cancel(); const request = generation; settings = null; error = ''; preview = null; workbookReview = null;
+    busy = true; reportBusy();
     try {
       const value = await reads.track(ContextService.GetLongVegetationOptions(contextId));
       if (request !== generation) return;
@@ -35,13 +51,13 @@
     } catch (cause) {
       if (request === generation) error = `Report options unavailable: ${String(cause)}`;
     } finally {
-      if (request === generation) { busy = false; onBusyChange(false); }
+      if (request === generation) { busy = false; reportBusy(); }
     }
   }
   async function show() {
-    if (busy || !settings || su === 'None') return;
-    cancel(); const request = generation; error = ''; preview = null;
-    busy = true; onBusyChange(true);
+    if (busy || operationHeld || workbookBarrier || !settings || su === 'None') return;
+    cancel(); const request = generation; error = ''; preview = null; workbookReview = null;
+    busy = true; reportBusy();
     try {
       const value = await reads.track(ContextService.PreviewLongVegetation(contextId));
       if (request !== generation) return;
@@ -52,18 +68,61 @@
     } catch (cause) {
       if (request === generation) error = `Report unavailable; no data or configuration written: ${String(cause)}`;
     } finally {
-      if (request === generation) { busy = false; onBusyChange(false); }
+      if (request === generation) { busy = false; reportBusy(); }
     }
+  }
+  async function reviewWorkbook() {
+    if (!workbookEnabled || busy || operationHeld || workbookBarrier || !settings || su === 'None' || su === 'USysSuTableDynamic') return;
+    cancel(); const request = generation;
+    error = ''; preview = null; workbookReview = null; busy = true; reportBusy();
+    try {
+      const value = await reads.track(VegetationWorkbookService.GetReview(contextId, JSON.stringify({ scope: 'unlumped' })));
+      if (request !== generation) return;
+      if (!value) throw new Error('No owned workbook review returned.');
+      const reviewed = workbookSession.prepare(value);
+      requireLongVegetationGrouping(reviewed.preview.settings, lifeformEnabled, strataEnabled, codeEnabled);
+      workbookReview = reviewed;
+      preview = reviewed.preview;
+      settings = reviewed.preview.settings;
+    } catch (cause) {
+      if (request === generation) error = `Workbook review unavailable; no file published: ${String(cause)}`;
+    } finally {
+      if (request === generation) { busy = false; reportBusy(); }
+    }
+  }
+  async function publishWorkbook() {
+    if (!workbookEnabled || busy || operationHeld || workbookBarrier || !workbookReview) return;
+    cancel(); error = '';
+    try {
+      await workbookSession.publish(workbookReview, destination, request =>
+        VegetationWorkbookService.ExportReviewed(contextId, JSON.stringify(request)));
+    } catch (cause) { error = String(cause); }
+  }
+  function acknowledgeWorkbook() {
+    workbookSession.acknowledge();
+    workbookReview = null;
   }
   const numberText = (value: number | null) => value === null ? 'NULL' : String(value);
   const presenceText = (value: number | null) => value === null ? 'NULL' : `${value * 100}%`;
   onMount(() => { void options(); });
-  onDestroy(cancel);
+  onDestroy(() => { unsubscribeWorkbook(); cancel(); });
 </script>
 
 <section class="report" data-long-vegetation-report aria-label="Long Vegetation report">
   <h1>Long Vegetation</h1>
   {#if error}<p class="error" role="alert">{error}</p>{/if}
+  {#if publication.error}<p class="error" role="alert">{publication.error}</p>{/if}
+  {#if publication.busy}<p role="status">Publishing the reviewed unlumped workbook; publication cannot be cancelled.</p>{/if}
+  {#if publication.outcome}
+    <p data-vegetation-workbook-receipt role="status">Workbook receipt: {publication.outcome.status}.
+      Requested {publication.requestedDestination}; observed {publication.outcome.path || '(no committed file)'}.
+      SHA256 {publication.outcome.sha256 || '(none)'}.</p>
+  {:else if publication.requestedDestination && !publication.busy}
+    <p data-vegetation-workbook-unknown role="alert">Workbook outcome unknown. Retain and inspect {publication.requestedDestination}; never replay blindly.</p>
+  {/if}
+  {#if publication.blocked && !publication.busy}
+    <button onclick={acknowledgeWorkbook}>Acknowledge workbook outcome</button>
+  {/if}
   <p>Project {project}; selected SU {su}. Whole selected-SU scope; the current plot and profile navigation do not filter this report.</p>
   <dl class="scope">
     <div><dt>Project database</dt><dd>{projectPath}</dd></div>
@@ -94,10 +153,43 @@
     </dl>
   {/if}
   <div class="actions">
-    <button data-source-control="btnViewReport" disabled={busy || !settings || su === 'None'} onclick={show}>View Report</button>
-    <button disabled={busy} onclick={options}>Reload report options</button>
+    <button data-source-control="btnViewReport" disabled={busy || operationHeld || workbookBarrier || !settings || su === 'None'} onclick={show}>View Report</button>
+    <button disabled={busy || operationHeld || workbookBarrier} onclick={options}>Reload report options</button>
+    {#if workbookEnabled}
+      <button disabled={busy || operationHeld || workbookBarrier || !settings || su === 'None' || su === 'USysSuTableDynamic'} onclick={reviewWorkbook}>Review unlumped XLSX workbook (no file yet)</button>
+    {/if}
     {#if busy}<button onclick={cancel}>Cancel report read</button><p role="status">Reading owned report snapshots...</p>{/if}
   </div>
+  {#if workbookReview}
+    <section class="workbook" aria-label="Reviewed unlumped workbook">
+      <h2>Reviewed workbook — explicit unlumped scope</h2>
+      <dl class="settings">
+        <div><dt>Reviewed creation date</dt><dd>{workbookReview.createdDate} (reused at publication)</dd></div>
+        <div><dt>Quick report</dt><dd>{workbookReview.options.quickReport ? 'On' : 'Off — source print layout retained'}</dd></div>
+        <div><dt>Space between groups</dt><dd>{workbookReview.options.spaceBetweenGroups ? 'On' : 'Off'}</dd></div>
+        <div><dt>Report summary</dt><dd>{workbookReview.options.reportSummary ? 'On' : 'Off'}</dd></div>
+        <div><dt>Reviewed bytes</dt><dd>{workbookReview.bytes}; SHA256 {workbookReview.workbookSHA256}</dd></div>
+        <div><dt>Source approval</dt><dd>{workbookReview.approvalHash}</dd></div>
+      </dl>
+      <ul>{#each workbookReview.sheets as sheet}<li>Unit {reportCellText(sheet.unit)} → worksheet “{sheet.name}”</li>{/each}</ul>
+      {#each workbookReview.skippedUnits as skipped}<p>Skipped unit {reportCellText(skipped.unit)}: {skipped.reason}.</p>{/each}
+      {#if workbookReview.summary}
+        <p>ReportSummary: original Env rows {workbookReview.summary.environmentRows};
+          {workbookReview.preview.report.quality ? 'qualified weighted join occurrences' : 'non-NULL selected-SU PlotNumber rows'} {workbookReview.summary.selectedPlotRows}.
+          AllSpecs version {reportCellText(workbookReview.summary.speciesVersion)}; metadata status {workbookReview.summary.versionStatus}.</p>
+        <details><summary>Original AllSpecs Description definitions</summary>
+          {#each workbookReview.summary.versionDefinitions.rows ?? [] as row}
+            <p>Physical row {row.rowId}: {row.cells?.map(reportCellText).join('; ')}</p>
+          {:else}<p>No Description definitions; absence remains distinct from NULL or empty text.</p>{/each}
+        </details>
+      {/if}
+      <label for="vegetation-workbook-destination">New XLSX output file (existing files are never replaced)</label>
+      <textarea id="vegetation-workbook-destination" rows="2" disabled={busy || operationHeld || workbookBarrier} bind:value={destination}></textarea>
+      <button disabled={busy || operationHeld || workbookBarrier || !destination || !/\.xlsx$/i.test(destination)} onclick={publishWorkbook}>Publish reviewed unlumped XLSX workbook</button>
+      <p class="guidance">Source settings/layout are read-only. Hidden lossless source metadata retains typed identities, reference candidates and diagnostics.
+        Publication never replaces an existing file. Every returned or unknown outcome clears preparation; acknowledge it and explicitly obtain a new review before retrying.</p>
+    </section>
+  {/if}
   {#if su === 'None'}<p>Select an SU in Projects &amp; context before viewing the report.</p>{/if}
   {#if settings?.constantSpeciesList}<p class="notice">Constant species list is enabled in retained YAML. Presence and mean-cover thresholds are bypassed, as in the source report; missing combinations have NULL statistics, not zero.</p>{/if}
   {#if settings?.grouping === 'none'}<p class="notice">The source's None mode changes row ordering, not cover aggregation.
@@ -177,11 +269,14 @@
   <p class="guidance">Read-only experimental vegetation preview. Options are loaded from YAML and cannot be edited here.
     NULL, empty text, zero and absent statistics remain distinct. Source reference/membership multiplicities and English-name fanout are reported, not deduplicated.
     Unit-name candidates preserve original reference rows; conflicting or unsupported names are not chosen arbitrarily.
-    No strata grouping, taxon lumping, summaries, title persistence, Excel automation or file export is implemented.</p>
+    Taxon lumping, combined variants, Source4 attributes, title persistence and Excel automation remain unavailable.
+    Workbook review and explicit no-replace XLSX publication require their separate default-off gate.</p>
 </section>
 
 <style>
-  .report { display: grid; gap: .75rem; min-width: 0; }
+  .report { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; min-width: 0; overflow-wrap: anywhere; }
+  .workbook { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; min-width: 0; }
+  textarea { box-sizing: border-box; min-width: 0; border: 1px solid #cbd5e1; border-radius: .4rem; padding: .6rem; width: 100%; }
   h1 { font-size: 1.5rem; } h2 { font-size: 1.25rem; } h3, dt { font-weight: 600; }
   .scope, .settings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: .75rem 1.5rem; }
   .scope > div, .settings > div { min-width: 0; display: grid; gap: .25rem; align-content: start; }

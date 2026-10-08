@@ -1716,6 +1716,52 @@ export interface VegetationSpeciesUpdate {
     "selected"?: string | null;
 }
 
+export interface VegetationWorkbookOptions {
+    "quickReport": boolean;
+    "spaceBetweenGroups": boolean;
+    "reportSummary": boolean;
+}
+
+export interface VegetationWorkbookOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface VegetationWorkbookReview {
+    "preview": LongVegetationPreview;
+    "options": VegetationWorkbookOptions;
+    "summary": VegetationWorkbookSummary | null;
+    "scope": string;
+    "createdDate": string;
+    "sheets": VegetationWorkbookSheet[] | null;
+    "skippedUnits": VegetationWorkbookSkippedUnit[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
+export interface VegetationWorkbookSheet {
+    "unit": ProjectMetadataCell;
+    "name": string;
+}
+
+export interface VegetationWorkbookSkippedUnit {
+    "unit": ProjectMetadataCell;
+    "reason": string;
+}
+
+export interface VegetationWorkbookSummary {
+    "createdDate": string;
+    "environmentRows": number;
+    "selectedPlotRows": number;
+    "speciesVersion": ProjectMetadataCell;
+    "versionStatus": string;
+    "versionDefinitions": ProjectMetadataTable;
+}
+
 export interface WorkingUnitChoice {
     "rowId": string;
     "origin": string;

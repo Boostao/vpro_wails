@@ -17,6 +17,10 @@ const environment = loadTypeScript('longEnvironmentReport.ts', {'./projectMetada
 const report = loadTypeScript('longVegetationReport.ts', {
   './projectMetadataRestore':restoration, './longEnvironmentReport':environment, './qualityEditor':quality,'./reportUnitNames':names
 });
+const workbook = loadTypeScript('vegetationWorkbook.ts', {
+  './longVegetationReport':report, './projectMetadataRestore':restoration,
+  './lifeformSummary':loadTypeScript('lifeformSummary.ts'), './publicationSession':loadTypeScript('publicationSession.ts')
+});
 const cell = text => ({storage:text===null?'null':'text',text,integer:null,real:null,blobHex:null});
 function settings() {
   return {title:'  Title \u00e9  ',grouping:'layer',average:'all-plots',constantSpeciesList:true,
@@ -62,7 +66,8 @@ const validateOptions = value => report.validateLongVegetationOptions(value,'own
 const buildSource = (source, enabled = false, strataEnabled = false, codeEnabled = false) => source.replace(
   "import.meta.env.VITE_LONG_VEGETATION_LIFEFORM === 'true'", String(enabled)).replace(
   "import.meta.env.VITE_LONG_VEGETATION_STRATA === 'true'", String(strataEnabled)).replace(
-  "import.meta.env.VITE_LONG_VEGETATION_CODE === 'true'", String(codeEnabled));
+  "import.meta.env.VITE_LONG_VEGETATION_CODE === 'true'", String(codeEnabled)).replace(
+  "import.meta.env.VITE_LONG_VEGETATION_WORKBOOK === 'true'", 'false');
 function options() {
   return {contextId:'owned',project:'Sample',projectPath:'C:\\project.db',su:'Selected',suPath:'C:\\external.db',settings:settings()};
 }
@@ -265,7 +270,7 @@ test('vegetation bindings are cancellable and report UI is independently default
   assert.match(source('App.svelte'),/\{#key \$projectState\.contextId\}[\s\S]*<LongVegetationReport/);
   assert.match(source('App.svelte'),/closeDisposition\(state, busy \|\| editorBusy/);
   const panel=source('LongVegetationReport.svelte');
-  assert.match(panel,/onDestroy\(cancel\)/);
+  assert.match(panel,/onDestroy\(\(\) => \{ unsubscribeWorkbook\(\); cancel\(\); \}\)/);
   assert.match(panel,/request !== generation/);
   assert.match(panel,/reads\.track\(ContextService\.PreviewLongVegetation\(contextId\)\)/);
   assert.match(panel,/const candidate = validateLongVegetationPreview/);
@@ -273,13 +278,14 @@ test('vegetation bindings are cancellable and report UI is independently default
   assert.match(panel,/preview = candidate/);
   assert.match(panel,/settings = candidate\.settings/);
   assert.match(panel,/data-source-control="btnViewReport"/);
-  assert.doesNotMatch(panel,/SavePlot|SavePreferences|oninput=|bind:value/);
+  assert.doesNotMatch(panel,/SavePlot|SavePreferences|oninput=/);
+  assert.equal((panel.match(/bind:value=/g)||[]).length,1);
 });
 test('vegetation report uses responsive labelled read-only settings, separate names and literal nullable statistics',()=>{
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
   const component=serverComponent(buildSource(source),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
-    './longEnvironmentReport':environment,'./longVegetationReport':report
+    './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook
   });
   const result=render(component,{props:{
     contextId:'owned',project:'Sample',projectPath:'C:\\quoted <project>.db',
@@ -306,7 +312,7 @@ test('quality presentation retains literal criteria, NULL ranks versus missing j
       `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
   const component=serverComponent(buildSource(source),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
-    './longEnvironmentReport':environment,'./longVegetationReport':report
+    './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook
   });
   const result=render(component,{props:{
     contextId:'owned',project:'Sample',projectPath:'C:\\project.db',su:'Selected',
@@ -333,7 +339,7 @@ test('lifeform presentation labels typed group and source-specific conversion in
       `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
   const component=serverComponent(buildSource(source,true),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
-    './longEnvironmentReport':environment,'./longVegetationReport':report
+    './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook
   });
   const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
     su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});
@@ -353,7 +359,7 @@ test('Strata presentation labels original totals fallback cap and independent ch
       `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
   const component=serverComponent(buildSource(source,false,true),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
-    './longEnvironmentReport':environment,'./longVegetationReport':report
+    './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook
   });
   const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
     su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});
@@ -391,7 +397,7 @@ test('Code presentation preserves source caption but labels literal list/matched
       `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
   const component=serverComponent(buildSource(source,false,false,true),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
-    './longEnvironmentReport':environment,'./longVegetationReport':report
+    './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook
   });
   const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
     su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});

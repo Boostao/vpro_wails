@@ -308,7 +308,8 @@ test('actual App close handlers and navigation transition refuse pending/unackno
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const close = loadTypeScript('closeLifecycle.ts');
   const session = new archive.TableCSVArchivePublicationSession(owner, storage()), gate = deferred(), started = deferred();
-  const context = { editorBusy: false, archivePublicationBusy: false, busy: false, transitionWorking: false, pendingTransition: null,
+  const context = { editorBusy: false, archivePublicationBusy: false, vegetationPublicationBusy: false,
+    busy: false, transitionWorking: false, pendingTransition: null,
     closeWorking: false, closeRequest: '', view: 'table-csv', editor: null, error: '', transitionError: '',
     closeError: '', $projectState: { contextId: owner.contextId }, calls: { cancelled: 0, confirmed: 0, navigated: 0 },
     document: { activeElement: null }, HTMLElement: class {}, tick: async () => {}, closeDisposition: close.closeDisposition };
@@ -335,6 +336,17 @@ test('actual App close handlers and navigation transition refuse pending/unackno
   await context.handleCloseRequest('owned-close');
   await context.requestTransition(async () => { context.calls.navigated++; });
   assert.equal(context.calls.confirmed, 1); assert.equal(context.calls.navigated, 1);
+  context.vegetationPublicationBusy = true;
+  await context.handleCloseRequest('owned-close');
+  await context.requestTransition(async () => { context.calls.navigated++; });
+  assert.equal(context.calls.cancelled, 3); assert.equal(context.calls.confirmed, 1); assert.equal(context.calls.navigated, 1);
+  context.closeRequest = 'owned-close';
+  await context.respondToClose('discard');
+  assert.equal(context.calls.confirmed, 1); context.closeRequest = '';
+  context.vegetationPublicationBusy = false;
+  await context.handleCloseRequest('owned-close');
+  await context.requestTransition(async () => { context.calls.navigated++; });
+  assert.equal(context.calls.confirmed, 2); assert.equal(context.calls.navigated, 2);
 });
 
 test('UI literal opt-in, labels, receipts above fields and existing app native/navigation close guards remain integrated', async () => {

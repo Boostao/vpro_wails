@@ -26,6 +26,7 @@ import * as SoilCodeService from "./soilcodeservice.js";
 import * as SpeciesAttributeSummaryService from "./speciesattributesummaryservice.js";
 import * as StartupService from "./startupservice.js";
 import * as TableCSVArchiveService from "./tablecsvarchiveservice.js";
+import * as VegetationWorkbookService from "./vegetationworkbookservice.js";
 import * as WorkingUnitService from "./workingunitservice.js";
 export {
     BECService,
@@ -53,6 +54,7 @@ export {
     SpeciesAttributeSummaryService,
     StartupService,
     TableCSVArchiveService,
+    VegetationWorkbookService,
     WorkingUnitService
 };
 
@@ -253,6 +255,12 @@ export type {
     VegetationSpeciesLookup,
     VegetationSpeciesOption,
     VegetationSpeciesUpdate,
+    VegetationWorkbookOptions,
+    VegetationWorkbookOutcome,
+    VegetationWorkbookReview,
+    VegetationWorkbookSheet,
+    VegetationWorkbookSkippedUnit,
+    VegetationWorkbookSummary,
     WorkingUnitChoice,
     WorkingUnitModeState
 } from "./models.js";
