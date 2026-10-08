@@ -6,8 +6,9 @@ Static source contract plus separately gated native parent review, fourteen
 directly bound editors, two normal source actions and existing physical ProjectID
 assignment/restoration, not a full-form entrypoint. The shared current-project
 metadata editor now has a separately gated SIVI entry action and measured
-edit/restoration/refresh recovery. New-ID completion and SIVI metadata creation
-remain unavailable. Normal source actions use explicit desktop Save/reload.
+edit/restoration/refresh recovery and independent current-ID blank/template
+creation acceptance. New-ID completion and typed creation restoration remain
+unavailable. Normal source actions use explicit desktop Save/reload.
 The separately gated SIVI height panel is a bounded adaptation mounted under
 FS882; it does not implement this parent form. Exported coordinates are evidence,
 not a requirement to reproduce fixed Access pixels.
