@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'long-vegetation';
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'long-vegetation' | 'table-csv';
   type Item = { name: string; icon: typeof House; view?: View };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate }: { view: View; onnavigate: (view: View) => void } = $props();
@@ -39,6 +39,11 @@
         { name: 'Print a Plot Label', icon: Tag },
         { name: 'Create Plot Locations File', icon: FileText },
         { name: 'Show Plot Locations in Google Earth', icon: Globe }
+      ] }
+    ] },
+    { label: 'Interchange', icon: Table, groups: [
+      { label: 'Read-only preparation', items: [
+        { name: 'Project table CSV review', icon: Table, view: import.meta.env.VITE_TABLE_CSV_REVIEW === 'true' ? 'table-csv' : undefined }
       ] }
     ] },
     { label: 'Help', icon: HelpCircle, groups: [

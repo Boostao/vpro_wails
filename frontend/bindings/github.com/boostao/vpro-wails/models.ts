@@ -899,6 +899,15 @@ export interface ProjectState {
     "plotProfile": PlotProfileSourceInfo;
 }
 
+export interface ProjectTableCSVReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "descriptionMetadataPresent": boolean;
+    "manifest": TableCSVManifest;
+    "csv": string;
+}
+
 export interface RegionCodeChoice {
     "rowId": string;
     "code": string | null;
@@ -1207,6 +1216,21 @@ export interface StartupState {
     "ready": boolean;
     "message": string;
     "configPath": string;
+}
+
+export interface TableCSVDescription {
+    "rowId": string;
+    "value": ProjectMetadataCell;
+}
+
+export interface TableCSVManifest {
+    "version": number;
+    "table": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "rowIds": string[] | null;
+    "storage": (string[] | null)[] | null;
+    "descriptions": TableCSVDescription[] | null;
+    "sha256": string;
 }
 
 /**

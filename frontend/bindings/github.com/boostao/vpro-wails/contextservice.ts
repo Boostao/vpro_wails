@@ -89,6 +89,10 @@ export function GetPlot(contextID: string, plot: string): $CancellablePromise<$m
     return $Call.ByID(2787654197, contextID, plot);
 }
 
+export function GetProjectTableCSVReview(contextID: string, table: string): $CancellablePromise<$models.ProjectTableCSVReview | null> {
+    return $Call.ByID(1325296887, contextID, table);
+}
+
 export function GetSIVIParentActionOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentProjection | null> {
     return $Call.ByID(3334566454, contextID, plot);
 }
