@@ -9,6 +9,8 @@ const { transport, metadata, cell } = require('./siviParentTestHelpers.cjs');
 const picture = loadTypeScript('pictureRead.ts', {
   './siviParentTransport': transport, './projectMetadataEditor': metadata,
 });
+const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
+const lookup = loadTypeScript('scopedPlotLookup.ts', { './qualityEditor': quality });
 const owner = { contextId: 'owned', project: 'Sample', plotNumber: ' literal plot ' };
 function review() {
   return { ...owner, records: {
@@ -25,7 +27,7 @@ function image(rowId = review().records.rows[0].rowId) {
 function host(service = {}) {
   const calls = [], busy = [];
   const context = componentFunctions('PicturePanel.svelte', ['cancel', 'load', 'select', 'preview'], {
-    ...owner, ownerKey: 'owner', reviewKey: '', generation: 0, busy: false, disabled: false,
+    ...owner, view: 'child', ownerKey: 'owner', reviewKey: '', generation: 0, busy: false, disabled: false,
     error: '', review: null, image: null, selected: '', viewerOpen: false, row: null,
     structuredClone, JSON, $state: { snapshot: client.snapshot },
     pictureMetadataFromWire: picture.pictureMetadataFromWire, pictureImageFromWire: picture.pictureImageFromWire,
@@ -189,4 +191,95 @@ test('picture panel renders honest read-only guidance and cancellation-aware con
   assert.match(output, /Read-only linked metadata/);
   assert.match(output, /External directories, adding\/deleting records and metadata editing remain unavailable/);
   assert.doesNotMatch(output, />Save|>Add|>Delete/);
+});
+
+test('manager previews use explicit manager policy without inheriting child authority', async () => {
+  const { context, calls } = host();
+  context.view = 'manager';
+  await context.actions.load();
+  context.row = context.review.records.rows[0];
+  await context.actions.preview();
+  const command = calls.find(call => Array.isArray(call) && call[0] === 'image');
+  assert.deepEqual(JSON.parse(command[3]), { view: 'manager', original: review().records.rows[0] });
+  assert.equal(context.image.sha256, image().sha256);
+  const source = readFileSync(path.join(__dirname, 'PicturePanel.svelte'), 'utf8');
+  assert.match(source, /JSON\.stringify\(\[contextId, project, plotNumber, view\]\)/);
+});
+
+test('manager policy changes discard held image results rather than displaying another grant', async () => {
+  let release;
+  const { context } = host({ image: () => new Promise(resolve => release = resolve) });
+  context.view = 'manager';
+  await context.actions.load();
+  context.row = context.review.records.rows[0];
+  const pending = context.actions.preview();
+  context.view = 'child'; context.ownerKey = 'child-owner';
+  release(image());
+  await pending;
+  assert.equal(context.image, null);
+  assert.equal(context.busy, false);
+});
+
+test('manager literal parent selection preserves text and explicitly rejects malformed input', () => {
+  const context = componentFunctions('PictureManager.svelte', ['selectPlot', 'reading'], {
+    plot: '', selected: 'original', error: '', busy: false,
+    plotLookupInputError: lookup.plotLookupInputError, onBusyChange() {},
+  });
+  for (const invalid of ['', '\ud800', '\udc00', '\0']) {
+    context.plot = invalid; context.actions.selectPlot();
+    assert.equal(context.selected, 'original');
+    assert.match(context.error, /complete literal plot/);
+  }
+  for (const literal of [" A' # ", '00337', '108050', 'É😀', 'historical long plot identifier']) {
+    context.plot = literal; context.actions.selectPlot();
+    assert.equal(context.selected, literal);
+    assert.equal(context.error, '');
+  }
+});
+
+test('manager pending reads block parent changes and aggregate root busy state', () => {
+  const changes = [];
+  const context = componentFunctions('PictureManager.svelte', ['selectPlot', 'reading'], {
+    plot: 'next', selected: 'original', error: '', busy: false,
+    plotLookupInputError: lookup.plotLookupInputError, onBusyChange(value) { changes.push(value); },
+  });
+  context.actions.reading(true);
+  context.actions.selectPlot();
+  assert.equal(context.selected, 'original');
+  assert.match(context.error, /cancel the current picture read/);
+  context.actions.reading(false);
+  context.actions.selectPlot();
+  assert.equal(context.selected, 'next');
+  assert.deepEqual(changes, [true, false]);
+});
+
+test('standalone manager has independent default-off navigation and shares root transition/close ownership', () => {
+  const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
+  const nav = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
+  const manager = readFileSync(path.join(__dirname, 'PictureManager.svelte'), 'utf8');
+  assert.match(nav, /VITE_PICTURE_MANAGER === 'true' \? 'picture-manager' : undefined/);
+  assert.match(app, /view === 'picture-manager' && import\.meta\.env\.VITE_PICTURE_MANAGER === 'true'/);
+  assert.match(app, /if \(import\.meta\.env\.VITE_PICTURE_MANAGER !== 'true'\)/);
+  assert.match(app, /<PictureManager[^>]*onBusyChange=\{\(value\) => \{ editorBusy = value; \}\}/s);
+  assert.match(manager, /<PicturePanel[^>]*view="manager" onBusyChange=\{reading\}/);
+  assert.match(manager, /disabled=\{busy\}/);
+  assert.match(manager, /\{#key selected\}/);
+  assert.doesNotMatch(manager, /CreatePlot|SwitchContext|\.trim\(|\.toUpperCase\(/);
+});
+
+test('manager server render retains source caption, literal parent and separate directory guidance', () => {
+  const panel = serverComponent(readFileSync(path.join(__dirname, 'PicturePanel.svelte'), 'utf8'), 'PicturePanel.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': { PictureService: {} }, './pictureRead': picture,
+  });
+  const manager = serverComponent(readFileSync(path.join(__dirname, 'PictureManager.svelte'), 'utf8'), 'PictureManager.svelte', {
+    './PicturePanel.svelte': { default: panel }, './scopedPlotLookup': lookup,
+  });
+  const output = render(manager, { props: { contextId: owner.contextId, project: owner.project,
+    initialPlot: owner.plotNumber, onBusyChange() {} } }).body;
+  assert.match(output, /Plot Pictures/);
+  assert.match(output, /for="picture-manager-plot"/);
+  assert.match(output, /Selected literal parent/);
+  assert.match(output, /explicitly authorized manager directory, not the FS882 child directory/);
+  assert.match(output, /Add a Picture, deletion, metadata editing/);
+  assert.doesNotMatch(output, />Save|>Add a Picture|>Delete/);
 });

@@ -12,6 +12,7 @@
   import LifeformSummary from './LifeformSummary.svelte';
   import ProjectTableCSVReview from './ProjectTableCSVReview.svelte';
   import PlotLocationReview from './PlotLocationReview.svelte';
+  import PictureManager from './PictureManager.svelte';
   import GoogleEarthReview from './GoogleEarthReview.svelte';
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
@@ -50,7 +51,8 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager'>('home');
+  let pictureManagerPlot = $state('');
   let contextExpanded = $state(false);
   let editorBusy = $state(false);
   let archivePublicationBusy = $state(false);
@@ -277,6 +279,13 @@
     void requestTransition(async () => {
       error = '';
       if (next === 'fs882') { editorPlotNumber = selected?.plotNumber; editorEntryForm = 'fs882'; }
+      if (next === 'picture-manager') {
+        if (import.meta.env.VITE_PICTURE_MANAGER !== 'true') {
+          error = 'The read-only picture manager is disabled in this build.';
+          return;
+        }
+        pictureManagerPlot = selected?.plotNumber ?? '';
+      }
       view = next;
     });
   }
@@ -1170,6 +1179,12 @@
         {#key $projectState.contextId}
           <ProjectTableCSVReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'picture-manager' && import.meta.env.VITE_PICTURE_MANAGER === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <PictureManager contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            initialPlot={pictureManagerPlot} onBusyChange={(value) => { editorBusy = value; }} />
         {/key}
       {:else if view === 'plot-locations' && import.meta.env.VITE_PLOT_LOCATION_REVIEW === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}

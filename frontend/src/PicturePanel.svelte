@@ -4,8 +4,9 @@
   import { ReadRequests } from './readRequests';
   import { pictureMetadataFromWire, pictureImageFromWire, pictureCellLabel, type PictureReview, type PicturePreview } from './pictureRead';
 
-  let { contextId, project, plotNumber, disabled = false, onBusyChange }: {
+  let { contextId, project, plotNumber, view = 'child', disabled = false, onBusyChange }: {
     contextId: string; project: string; plotNumber: string; disabled?: boolean;
+    view?: 'child' | 'manager';
     onBusyChange: (busy: boolean) => void;
   } = $props();
   const reads = new ReadRequests();
@@ -17,7 +18,7 @@
   let selected = $state('');
   let viewerOpen = $state(false);
   let viewer = $state<HTMLDialogElement>();
-  const ownerKey = $derived(JSON.stringify([contextId, project, plotNumber]));
+  const ownerKey = $derived(JSON.stringify([contextId, project, plotNumber, view]));
   let reviewKey = $state('');
   const currentReview = $derived(reviewKey === ownerKey ? review : null);
   const currentImage = $derived(reviewKey === ownerKey ? image : null);
@@ -59,7 +60,7 @@
     onBusyChange(true);
     try {
       const original = $state.snapshot(row);
-      const value = await reads.track(PictureService.GetImage(contextId, plotNumber, JSON.stringify({ view: 'child', original })));
+      const value = await reads.track(PictureService.GetImage(contextId, plotNumber, JSON.stringify({ view, original })));
       if (request !== generation || key !== ownerKey || selected !== original.rowId) return;
       image = pictureImageFromWire(value, owner, original.rowId);
     } catch (cause) {
@@ -105,8 +106,8 @@
       </select>
       {#if row}
         <dl class="metadata">
-          <div><dt>PicName</dt><dd>{pictureCellLabel(row.cells[2])}</dd></div>
-          <div><dt>PicDir</dt><dd>{pictureCellLabel(row.cells[1])}</dd></div>
+          <div><dt>{view === 'manager' ? 'Picture File Name' : 'PicName'}</dt><dd>{pictureCellLabel(row.cells[2])}</dd></div>
+          <div><dt>{view === 'manager' ? 'Picture Directory' : 'PicDir'}</dt><dd>{pictureCellLabel(row.cells[1])}</dd></div>
           <div><dt>PicComment</dt><dd>{pictureCellLabel(row.cells[4])}</dd></div>
         </dl>
         <button onclick={preview} disabled={disabled || busy}>Preview selected picture</button>
@@ -119,7 +120,10 @@
     </button>
     <p>{currentImage.width} × {currentImage.height}; verified {currentImage.mime}. Click or double-click to open the viewer.</p>
   {/if}
-  <p class="guidance">Read-only linked metadata and JPEG/PNG preview. Each selected row uses its own PicDir. Default uses the explicitly authorized child directory, not the manager PictureDir. External directories, adding/deleting records and metadata editing remain unavailable. Files are never copied or repaired.</p>
+  <p class="guidance">Read-only linked metadata and JPEG/PNG preview. Each selected row uses its own PicDir.
+    {#if view === 'manager'}Default uses the explicitly authorized manager directory, not the FS882 child directory.
+    {:else}Default uses the explicitly authorized child directory, not the manager PictureDir.{/if}
+    External directories, adding/deleting records and metadata editing remain unavailable. Files are never copied or repaired.</p>
 </section>
 {#if viewerOpen && currentImage}
     <dialog bind:this={viewer} class="viewer" aria-label="Pictures viewer" oncancel={() => viewerOpen = false} onclose={() => viewerOpen = false}>

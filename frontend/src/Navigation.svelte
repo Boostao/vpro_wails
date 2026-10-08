@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review';
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager';
   type Item = { name: string; icon: typeof House; view?: View };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate }: { view: View; onnavigate: (view: View) => void } = $props();
@@ -18,6 +18,7 @@
         { name: 'Metadata', icon: Table },
         { name: 'Combine Species', icon: Link },
         { name: 'Herbarium', icon: Leaf },
+        { name: 'Plot Pictures — Read-only', icon: FileText, view: import.meta.env.VITE_PICTURE_MANAGER === 'true' ? 'picture-manager' : undefined },
         { name: 'Colour-theme', icon: Palette },
         { name: 'User setup', icon: UserCog },
         { name: 'User log', icon: History }
