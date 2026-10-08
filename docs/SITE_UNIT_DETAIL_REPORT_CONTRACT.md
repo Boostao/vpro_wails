@@ -2,7 +2,7 @@
 
 ## Status
 
-Source-mapped only; no summary calculation, public service, native preview,
+Source-mapped with private normal-SU scope preparation; no summary calculation, public service, native preview,
 Excel automation or export is accepted. This is distinct from the accepted
 per-plot Long Environment preview. The client's consolidated per-plot versus
 unit-summary presentation remains open in [client scope](CLIENT_SCOPE.md).
@@ -18,6 +18,7 @@ without opening Access or modifying source/data:
 | `Modules/V7mdlReportsEnv.txt` | `8917bcd43c6e8001585795aa525562b77cb4ecd9d74b65350a01796ee69cb8a9` |
 | `Modules/V7mdlReportsSiteUnitDetail.txt` | `af23d63350c845dc40a151135a147a312a6504c7de8c9d948ce7e1904b6bee98` |
 | `Modules/V7mdlSetCurrent.txt` | `4f27c6021b480b4ddc56607b0a518801f7afc83b7f28d106bfae6790f3607d66` |
+| `Modules/V7mdlShortCutToolBarCmds.txt` | `ce0c276fd78e43e6eb97ed36eceec988c6d26a4a06c837a1a2728dbf2e8feb9c` |
 | `Tables_Def/USysSuTableDynamic_SU_CreateSQL.txt` | `6872acec48de25df984ebb68577df1257106f907fc2b84a5decc64e9837e65b1` |
 
 The form export is UTF-16. Its commented event bodies are evidence of inactive
@@ -108,3 +109,70 @@ The ready implementation boundary is a read-only normal-SU scope/provenance
 preparation followed by batched, source-specific environmental summaries. It
 does not authorize hierarchy/field-derived units, species aggregation, report
 publication, canonical writes or enabling the summary entrypoint.
+
+## Private normal-SU preparation
+
+[The scope planner](../siteunitdetailscope.go) composes existing physical schema,
+signed64 row identity, tagged cell and clone guards rather than introducing
+another decoder or table reader. It accepts only explicit ordinary project
+Env/Admin or current-selected-SU filtered provenance; unknown filters,
+hierarchy/field-derived scopes and unselected SU fail without partial output.
+
+Both accepted inputs join Env and Admin before weighting each normal-SU
+membership. The selected-SU filter must not multiply this final join a second
+time. Every physical SU/Env/Admin combination remains identifiable; missing Env,
+missing Admin, NULL plot and NULL unit memberships remain explicit diagnostics.
+Empty plot/unit strings can join and are not silently repaired. A positive
+caller-provided joined-row budget succeeds at the exact limit and refuses the
+next combination, without returning a truncated scope.
+
+Ordering and key equality are exact literal SQLite-style comparisons, not a
+claim about Access locale/collation. Physical row identifiers remain exact
+strings and ordering is deterministic, not a numeric ranking. Outputs are
+detached; cancellation, malformed tagged identities and schema/physical-ID
+errors return the zero result. This preparation does not resolve names or
+validate unused numeric summary fields.
+
+Focused/shared race3.937s passes. An independent disposable SQLite join checks
+actual 2 Env x 2 Admin x 2 SU weighting, the additional empty-unit membership,
+and physical triples. Tests cover exact nine-row budget success/eight-row
+refusal, excluded-row reasons, literal apostrophe/CRLF/NUL/Unicode identities,
+permutations/output ownership, unknown provenance, malformed inputs and
+deterministic mid-plan cancellation. These are private kernel receipts,
+not Access/native report parity or full application integration.
+
+The private owned reader additionally uses existing context leases, physical
+table checks and checked read-snapshot cleanup. Project and external selected
+SU paths are supported without TEMP-view substitution or persisted selection
+changes. Shared race6.433s/vet and independent review (focused race2.276s) pass;
+tests cover current paths, repeated zero-write reads, stale/None/unowned
+contexts, view substitution, lease deadline, commit/rollback cleanup failure,
+post-read cancellation and clean retry. Full406-file race integration passes
+(fresh root979.552s; unchanged packages may be cached), with all reviewed code,
+eight original exports and192 frontend/dependency identities unchanged.
+The [private scope successor](../archives/site-unit-detail-scope-checkpoint/evidence-manifest.json)
+retains source, review, focused/full receipts and the350-file accepted saved-title
+predecessor identity. No service authorization, binding/frontend change, new
+report/native claim or production/default promotion follows.
+
+## Language references for the next arithmetic boundary
+
+Microsoft's [Val reference](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/val-function)
+documents period-only decimal recognition, stopping at commas/currency symbols,
+stripping selected whitespace, radix prefixes and type-suffix errors.
+[Format](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/format-function-visual-basic-for-applications)
+is internationally aware. Their composition in GroundCover extrema is not
+equivalent to either raw numeric extrema or a locale-aware generic parser.
+
+The source uses legacy [Quartile](https://learn.microsoft.com/en-us/office/vba/api/excel.worksheetfunction.quartile),
+not a chosen R quantile convention. Public documentation describes index/error
+semantics; the [inclusive replacement's example](https://support.microsoft.com/en-us/excel/functions/quartile-inc-function)
+is useful expected-vector evidence, not proof of installed legacy behavior,
+DAO array handling, source formatting or a full report.
+
+A minimal ordinary/filtered duplicate-weight ACE probe was prepared under the
+sole disposable `native-site-unit-detail` fixture but did not execute:
+this machine refused PowerShell script execution. No execution-policy change,
+Access application, database creation or canonical/source mutation followed.
+The weight evidence above therefore remains actual SQLite/private Go evidence,
+not a successful ACE probe. Arithmetic and Access collation remain unverified.
