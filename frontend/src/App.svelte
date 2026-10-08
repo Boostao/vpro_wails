@@ -7,6 +7,7 @@
   import FS882Form from './FS882Form.svelte';
   import Navigation from './Navigation.svelte';
   import LongEnvironmentReport from './LongEnvironmentReport.svelte';
+  import LongVegetationReport from './LongVegetationReport.svelte';
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
@@ -37,7 +38,7 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'long-vegetation'>('home');
   let contextExpanded = $state(false);
   let editorBusy = $state(false);
   let editor: { getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean> } | undefined = $state();
@@ -1043,8 +1044,16 @@
           error={closeRequest ? closeError : transitionError}
           onrespond={closeRequest ? respondToClose : respondToTransition} />
       {:else if view === 'long-environment' && import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <LongEnvironmentReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+            onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'long-vegetation' && import.meta.env.VITE_LONG_VEGETATION_REPORT === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <LongVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             onBusyChange={(value) => { editorBusy = value; }} />
         {/key}

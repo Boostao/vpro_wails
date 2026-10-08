@@ -81,6 +81,10 @@ export function GetLongEnvironmentOptions(contextID: string): $CancellablePromis
     return $Call.ByID(3203512685, contextID);
 }
 
+export function GetLongVegetationOptions(contextID: string): $CancellablePromise<$models.LongVegetationOptions> {
+    return $Call.ByID(2160778518, contextID);
+}
+
 export function GetPlot(contextID: string, plot: string): $CancellablePromise<$models.FS882Header | null> {
     return $Call.ByID(2787654197, contextID, plot);
 }
@@ -151,6 +155,10 @@ export function LookupSpeciesCodeCheckTarget(contextID: string, lookup: $models.
 
 export function PreviewLongEnvironment(contextID: string, request: $models.LongEnvironmentRequest): $CancellablePromise<$models.LongEnvironmentPreview> {
     return $Call.ByID(3771463957, contextID, request);
+}
+
+export function PreviewLongVegetation(contextID: string): $CancellablePromise<$models.LongVegetationPreview> {
+    return $Call.ByID(3202635744, contextID);
 }
 
 export function ResolveProjectPlotProfileNavigation(contextID: string, request: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProjectPlotProfileNavigation> {

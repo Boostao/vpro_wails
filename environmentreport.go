@@ -212,36 +212,12 @@ func planLongEnvironment(ctx context.Context, project, suName, title string, env
 		if err := ctx.Err(); err != nil {
 			return fail(err)
 		}
-		unit := EnvironmentReportUnit{Code: code, NameStatus: "missing", NameCandidates: []EnvironmentReportName{}, Plots: []EnvironmentReportPlot{}}
-		names, unsupported := map[string]bool{}, false
-		for _, row := range masterRows[code] {
-			if err := ctx.Err(); err != nil {
-				return fail(err)
-			}
-			cell := row.Cells[masterColumns["SiteSeriesLongName"]]
-			if _, err := metadataCellValue(cell); err != nil {
-				return fail(fmt.Errorf("Long Environment master name value: %w", err))
-			}
-			unit.NameCandidates = append(unit.NameCandidates, EnvironmentReportName{row.RowID, cloneSiteUnitCell(cell)})
-			switch cell.Storage {
-			case "text":
-				names[*cell.Text] = true
-			case "null":
-			default:
-				unsupported = true
-			}
+		names, err := resolveReportUnitNames(ctx, masterRows[code], masterColumns["SiteSeriesLongName"], "Long Environment")
+		if err != nil {
+			return fail(err)
 		}
-		sort.Slice(unit.NameCandidates, func(i, j int) bool { return unit.NameCandidates[i].RowID < unit.NameCandidates[j].RowID })
-		switch {
-		case unsupported:
-			unit.NameStatus = "unsupported_storage"
-		case len(names) > 1:
-			unit.NameStatus = "conflicting"
-		case len(names) == 1:
-			unit.NameStatus = "unique"
-			name := sortedEnvironmentReportKeys(names)[0]
-			unit.LongName = &name
-		}
+		unit := EnvironmentReportUnit{Code: code, LongName: names.LongName, NameStatus: names.Status,
+			NameCandidates: names.Candidates, Plots: []EnvironmentReportPlot{}}
 		if unit.NameStatus != "unique" {
 			report.Diagnostics = append(report.Diagnostics, EnvironmentReportDiagnostic{Code: "unit_name_" + unit.NameStatus, Unit: &unit.Code, Count: len(unit.NameCandidates)})
 		}

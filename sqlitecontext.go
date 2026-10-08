@@ -27,6 +27,23 @@ type sqliteContext struct {
 	profileWrite   bool
 }
 
+// database/sql discards a pinned SQLite connection when a transaction's context
+// is cancelled. Keep cleanup caller-owned; every query still uses the request
+// context, and callers must check it before committing the read snapshot.
+func (c *sqliteContext) beginReadSnapshot(ctx context.Context) (*sql.Tx, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	tx, err := c.conn.BeginTx(context.WithoutCancel(ctx), &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, errors.Join(err, tx.Rollback())
+	}
+	return tx, nil
+}
+
 func sqliteFileURI(path, mode string) string {
 	clean := filepath.ToSlash(filepath.Clean(path))
 	if !strings.HasPrefix(clean, "/") {

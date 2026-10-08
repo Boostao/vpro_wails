@@ -1,5 +1,6 @@
 import type { LongEnvironmentPreview, ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
-import { completeCell, exactSigned64 } from './projectMetadataRestore';
+import { completeCell } from './projectMetadataRestore';
+import { validateReportUnitNames } from './reportUnitNames';
 
 export function reportTitleError(title: string): string | null {
   return completeCell({ storage: 'text', text: title, integer: null, real: null, blobHex: null }) && !title.includes('\0')
@@ -44,11 +45,7 @@ export function validateLongEnvironmentPreview(value: LongEnvironmentPreview, co
         !Array.isArray(unit.nameCandidates) || !['unique', 'missing', 'conflicting', 'unsupported_storage'].includes(unit.nameStatus) ||
         (unit.nameStatus === 'unique' ? typeof unit.longName !== 'string' : unit.longName !== null)) throw new Error('Report unit/name metadata is incomplete.');
     units.add(unit.code);
-    const candidates = new Set<string>();
-    for (const candidate of unit.nameCandidates) {
-      if (!exactSigned64(candidate.rowId) || candidates.has(candidate.rowId) || !completeCell(candidate.value)) throw new Error('Report name candidate lost typed storage or identity.');
-      candidates.add(candidate.rowId);
-    }
+    validateReportUnitNames(unit);
     for (const plot of unit.plots) {
       if (typeof plot.plotNumber !== 'string' || plots.has(plot.plotNumber) ||
           !['complete', 'missing_env', 'missing_admin', 'missing_env_and_admin'].includes(plot.status) ||

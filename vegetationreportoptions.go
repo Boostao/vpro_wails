@@ -15,6 +15,7 @@ type longVegetationOptions struct {
 	MeanCoverGreaterThan float64
 	Order                string
 	ShowEnglishName      bool
+	Quality              *[3]vegetationQualityCriterion
 }
 
 func decodeLongVegetationOptions(values configValues) (longVegetationOptions, error) {
@@ -38,7 +39,11 @@ func decodeLongVegetationOptions(values configValues) (longVegetationOptions, er
 		return fail(err)
 	}
 	if enforce {
-		return fail(fmt.Errorf("ReportOptions.DataQualityFilterEnforceLV is unavailable in Long Vegetation preview"))
+		criteria, err := decodeLongVegetationQualityCriteria(values)
+		if err != nil {
+			return fail(err)
+		}
+		options.Quality = &criteria
 	}
 	average, err := configInt(values, "ReportOptions", "LVAvgType", 10, 20)
 	if err != nil {
@@ -104,6 +109,45 @@ func longVegetationConfigBool(values configValues, key string) (bool, error) {
 		}
 	}
 	return false, fmt.Errorf("ReportOptions.%s must be a YAML boolean or source integer -1/0, not NULL or an implicit default", key)
+}
+
+func decodeLongVegetationQualityCriteria(values configValues) ([3]vegetationQualityCriterion, error) {
+	fail := func(err error) ([3]vegetationQualityCriterion, error) { return [3]vegetationQualityCriterion{}, err }
+	fields, err := configSection(values, "ReportOptions")
+	if err != nil {
+		return fail(err)
+	}
+	var criteria [3]vegetationQualityCriterion
+	for i, domain := range [3]string{"Site", "Veg", "Soil"} {
+		minimumKey := "DataQualityFilter" + domain + "LV"
+		minimum, err := configString(values, "ReportOptions", minimumKey)
+		if err != nil {
+			return fail(err)
+		}
+		if strings.ContainsRune(minimum, 0) {
+			return fail(fmt.Errorf("ReportOptions.%s must not contain NUL", minimumKey))
+		}
+		nullKey := "DataQualityFilter" + domain + "NullLV"
+		var includeNull bool
+		if literal, legacy := fields[nullKey].(string); legacy {
+			// Default-init preserves the source's string-typed soil/veg flags.
+			switch literal {
+			case "True":
+				includeNull = true
+			case "False":
+				includeNull = false
+			default:
+				return fail(fmt.Errorf("ReportOptions.%s legacy string must be exactly True or False", nullKey))
+			}
+		} else {
+			includeNull, err = longVegetationConfigBool(values, nullKey)
+			if err != nil {
+				return fail(err)
+			}
+		}
+		criteria[i] = vegetationQualityCriterion{Minimum: minimum, IncludeNull: includeNull}
+	}
+	return criteria, nil
 }
 
 func longVegetationConfigNumber(values configValues, key string) (float64, error) {

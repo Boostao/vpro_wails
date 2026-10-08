@@ -19,10 +19,13 @@ type vegetationLayerRow struct {
 }
 
 type vegetationLayerUnit struct {
-	Code          ProjectMetadataCell
-	NumPlots      int
-	MembershipIDs []string
-	Rows          []vegetationLayerRow
+	Code           ProjectMetadataCell
+	LongName       *string
+	NameStatus     string
+	NameCandidates []EnvironmentReportName
+	NumPlots       int
+	MembershipIDs  []string
+	Rows           []vegetationLayerRow
 }
 
 type vegetationLayerDiagnostic struct {
@@ -34,6 +37,7 @@ type vegetationLayerReport struct {
 	Project, SU, Title string
 	Units              []vegetationLayerUnit
 	Diagnostics        []vegetationLayerDiagnostic
+	Quality            *vegetationQualitySelection
 }
 
 func vegetationTextKey(cell ProjectMetadataCell) string {
@@ -105,6 +109,8 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 		inputs []joined
 	}
 	units, memberships := map[string]*unitState{}, map[string][]string{}
+	physicalCounts := map[string]int{}
+	qualityDiagnostics := []vegetationLayerDiagnostic{}
 	for _, member := range prepared.Memberships {
 		if err := ctx.Err(); err != nil {
 			return fail(err)
@@ -121,12 +127,28 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 		}
 		state := units[id]
 		state.unit.MembershipIDs = append(state.unit.MembershipIDs, member.RowID)
+		weight := 1
+		if prepared.qualityMembershipCounts != nil {
+			weight = prepared.qualityMembershipCounts[member.RowID]
+			if weight <= 0 {
+				return fail(errors.New("quality-qualified preparation lost a physical membership weight"))
+			}
+			if weight > 1 {
+				qualityDiagnostics = append(qualityDiagnostics, vegetationLayerDiagnostic{"quality_reference_multiplicity", member.RowID, weight})
+			}
+		}
 		// Named PlotCount counts SiteUnit; unassigned DCount counts PlotNumber.
 		if member.SiteUnit.Text != nil || member.PlotNumber.Text != nil {
-			state.unit.NumPlots++
+			state.unit.NumPlots += weight
 		}
 		if member.PlotNumber.Text != nil {
-			memberships[*member.PlotNumber.Text] = append(memberships[*member.PlotNumber.Text], id)
+			physicalCounts[*member.PlotNumber.Text]++
+			for i := 0; i < weight; i++ {
+				if err := ctx.Err(); err != nil {
+					return fail(err)
+				}
+				memberships[*member.PlotNumber.Text] = append(memberships[*member.PlotNumber.Text], id)
+			}
 		}
 	}
 	active := map[string]bool{}
@@ -140,9 +162,12 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 	diagnose := func(code, identity string, count int) {
 		diagnostics[code+"\x00"+identity] = vegetationLayerDiagnostic{code, identity, count}
 	}
-	for plot, matches := range memberships {
-		if len(matches) > 1 {
-			diagnose("physical_membership_multiplicity", plot, len(matches))
+	for _, diagnostic := range qualityDiagnostics {
+		diagnose(diagnostic.Code, diagnostic.Identity, diagnostic.Count)
+	}
+	for plot, count := range physicalCounts {
+		if count > 1 {
+			diagnose("physical_membership_multiplicity", plot, count)
 		}
 	}
 	for _, observation := range prepared.Observations {

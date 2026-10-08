@@ -19,6 +19,71 @@ func longVegetationOptionsFixture(t *testing.T) configValues {
 	return values
 }
 
+func TestDecodeLongVegetationQualityCriteriaPreservesDefaultInitAndRuntimeTypes(t *testing.T) {
+	values := longVegetationOptionsFixture(t)
+	before, err := yaml.Marshal(values)
+	if err != nil {
+		t.Fatal(err)
+	}
+	criteria, err := decodeLongVegetationQualityCriteria(values)
+	if err != nil || criteria != vegetationQualityCriteria("Poor", 7) {
+		t.Fatal("source minimum/NULL defaults lost", criteria, err)
+	}
+	after, err := yaml.Marshal(values)
+	if err != nil || !reflect.DeepEqual(before, after) {
+		t.Fatal("quality decoder rewrote stored YAML types", err)
+	}
+	for i, domain := range []string{"Site", "Veg", "Soil"} {
+		for _, value := range []any{true, false, -1, 0, "True", "False"} {
+			values := longVegetationOptionsFixture(t)
+			fields := values["ReportOptions"].(map[string]any)
+			fields["DataQualityFilter"+domain+"NullLV"] = value
+			criteria, err := decodeLongVegetationQualityCriteria(values)
+			want := value == true || value == -1 || value == "True"
+			if err != nil || criteria[i].IncludeNull != want || fields["DataQualityFilter"+domain+"NullLV"] != value {
+				t.Fatal("explicit source bool/string flag lost or normalized in storage", domain, value, criteria, err)
+			}
+		}
+		for _, label := range []string{"", "   ", "Good", strings.Repeat("x", 270), "  Literal \u00e9  "} {
+			values := longVegetationOptionsFixture(t)
+			values["ReportOptions"].(map[string]any)["DataQualityFilter"+domain+"LV"] = label
+			criteria, err := decodeLongVegetationQualityCriteria(values)
+			if err != nil || criteria[i].Minimum != label {
+				t.Fatal("quality minimum label trimmed/coerced/bounded without source evidence", criteria, err)
+			}
+		}
+	}
+}
+
+func TestDecodeLongVegetationQualityCriteriaRejectsMissingNullAndMalformedSettings(t *testing.T) {
+	for _, domain := range []string{"Site", "Veg", "Soil"} {
+		for suffix, badValues := range map[string][]any{
+			"NullLV": {nil, 1, "true", "FALSE", " True ", uint64(0), float64(0), []string{"True"}},
+			"LV":     {nil, 1, true, []string{"Poor"}, string([]byte{0xff}), "Poor\x00"},
+		} {
+			key := "DataQualityFilter" + domain + suffix
+			for _, invalid := range badValues {
+				values := longVegetationOptionsFixture(t)
+				values["ReportOptions"].(map[string]any)[key] = invalid
+				criteria, err := decodeLongVegetationQualityCriteria(values)
+				if err == nil || !strings.Contains(err.Error(), key) || criteria != ([3]vegetationQualityCriterion{}) {
+					t.Fatal("invalid criterion accepted or leaked partial settings", key, invalid, criteria, err)
+				}
+			}
+			values := longVegetationOptionsFixture(t)
+			delete(values["ReportOptions"].(map[string]any), key)
+			if criteria, err := decodeLongVegetationQualityCriteria(values); err == nil || criteria != ([3]vegetationQualityCriterion{}) {
+				t.Fatal("missing quality preference silently defaulted", key, criteria, err)
+			}
+		}
+	}
+	values := longVegetationOptionsFixture(t)
+	values["ReportOptions"].(map[string]any)["DataQualityFilterSiteNullLV"] = nil
+	if _, err := decodeLongVegetationOptions(values); err != nil {
+		t.Fatal("inactive quality criteria caused unrelated default preview failure", err)
+	}
+}
+
 func TestDecodeLongVegetationOptionsDefaults(t *testing.T) {
 	values := longVegetationOptionsFixture(t)
 	got, err := decodeLongVegetationOptions(values)
@@ -67,7 +132,7 @@ func TestDecodeLongVegetationOptionsSourceEnums(t *testing.T) {
 func TestDecodeLongVegetationOptionsUnavailableModes(t *testing.T) {
 	for key, modes := range map[string][]any{
 		"LVGroupBy": {2, 3, 4}, "LVUnitGroups": {2, 3},
-		"LVShowEnglishName": {2, 4}, "DataQualityFilterEnforceLV": {true, -1},
+		"LVShowEnglishName": {2, 4},
 	} {
 		for _, mode := range modes {
 			t.Run(fmt.Sprintf("%s/%v", key, mode), func(t *testing.T) {

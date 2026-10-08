@@ -12,7 +12,45 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
+
+func TestSQLitePinnedReadSnapshotCancellationPreservesContext(t *testing.T) {
+	selection, support := sqliteContextFixture(t)
+	owner, err := newSQLiteContext(context.Background(), selection, support)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer owner.Close()
+	before := databaseBytes(t, owner.attachments)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer cancel()
+	tx, err := owner.beginReadSnapshot(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var sum int64
+	err = tx.QueryRowContext(ctx, `WITH RECURSIVE numbers(x) AS (
+		SELECT 1 UNION ALL SELECT x+1 FROM numbers WHERE x<100000000)
+		SELECT SUM(x) FROM numbers`).Scan(&sum)
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatal("in-flight snapshot query was not cancelled", err)
+	}
+	if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+		t.Fatal(err)
+	}
+	var count int
+	if err := owner.conn.QueryRowContext(context.Background(), "SELECT COUNT(*) FROM USysEnv").Scan(&count); err != nil {
+		t.Fatal("cancelled read discarded the pinned coordinator and its views", err)
+	}
+	if count == 0 {
+		t.Fatal("context scope was lost")
+	}
+	after := databaseBytes(t, owner.attachments)
+	if !reflect.DeepEqual(before, after) {
+		t.Fatal("cancelled snapshot changed attached files")
+	}
+}
 
 func sqliteContextFixture(t *testing.T) (desktopSelection, map[string]string) {
 	t.Helper()

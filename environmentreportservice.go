@@ -68,7 +68,7 @@ func (s *ContextService) PreviewLongEnvironment(ctx context.Context, contextID s
 		if err := profileOwnedFiles(owner); err != nil {
 			return result, err
 		}
-		tx, err := owner.conn.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+		tx, err := owner.beginReadSnapshot(ctx)
 		if err != nil {
 			return result, err
 		}
@@ -105,6 +105,9 @@ func (s *ContextService) PreviewLongEnvironment(ctx context.Context, contextID s
 			return result, err
 		}
 		if err := profileOwnedFiles(owner); err != nil {
+			return result, err
+		}
+		if err := ctx.Err(); err != nil {
 			return result, err
 		}
 		if err := tx.Commit(); err != nil {

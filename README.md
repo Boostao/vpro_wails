@@ -1,276 +1,42 @@
-# VPRO Desktop
+# VPRO desktop migration
 
-Access-to-Go/Wails v3 beta.26/Svelte5 migration with SQLite canonical.
-**Incomplete, experimental; not a production Access replacement.**
-Use disposable projects for writes. The companion R package is planned as
-UI-free core automation, not a second data-entry UI.
+Go/Wails/Svelte provides the desktop boundary; SQLite is canonical and DuckDB is
+optional. The predecessor's reviewed data-family, context, reference and editing
+boundaries are retained. Unavailable workflows remain unavailable.
 
-## Current capabilities
+## Current capability contract
 
-| Workflow | Delivered boundary | Availability/gaps |
-| --- | --- | --- |
-| Database/context/configuration | Original SQLite family, YAML defaults/runtime and retained JSON migration; non-overwrite installation, external attachment/compatibility, offline TEMP views, draft-safe switching and visible recovery | Active; conversion/administration/multiwindow not complete |
-| Project selection and browsing | Managed/external project paths, Working Unit/SU filtering and read-only hierarchy browsing | Attachment is not copying/conversion or full SU/hierarchy editing |
-| FS882 parent |98/98 mapped parent fields native-verified writable, responsive source labels/groups/links and shared draft/audit/Lock/close behavior | Bounded baseline, not all forms/events/pictures/projection |
-| FS882 children | Other8/Humus12/Mineral18 CRUD; Veg Other12 attributes, Collected, species decisions,11 ordinary cover/total fields and6 heights; shared three-field CHARS option | Ordinary editors default-on; extended shrubs independently opt-in; remaining calculations/effective source defaults and full restoration incomplete |
-| Guarded vegetation lifecycle | Reviewed full-row deletion/reserved IDs; creation with explicit species/numeric/NULL decisions; independent personal definitions | Opt-in adaptations; no guessed defaults, invented U/X membership or hidden VUser write |
-| Standards checking | Whole-project/selected-WU reviewed species-code replacements; exact source membership and all physical rows | Opt-in; broader standards/environment compliance remains open |
-| Project metadata | Review/all-field drafts, blank/master-template creation and dedicated typed provenance restoration | Opt-in, distinct project/master/user storage; generic metadata restore unavailable |
-| Profiles and navigation | Ordered preview, rule edit/create/delete, explicit result navigation, independent selection/writer ownership, usable blank files/tables and reviewed Save as SU | Opt-in; arbitrary-file administration, broad history restoration and some criterion semantics open |
-| Find/Enter | Source-bound explicit Enter navigation and exact scoped Find with safe Open lifecycle | Opt-in adaptations; no Access Find-dialog emulation |
-| Env Into SU / SU Into Env | Independent reviews of all matching selected-SU plots; owned-project file only; atomic typed provenance, drift/trigger rollback/retry and history replay guards | Independently opt-in; separate-file SU and personal-definition writes unavailable |
-| Long Environment | Owned read-only native preview: exact72 source rows, selected-SU membership, transposed per-plot values and explicit orphan/name diagnostics | Independently opt-in; external SU reads supported; preview-only title edits, file export/Excel/summary unavailable |
-| Long Vegetation preparation | Pure Go selected-SU MAX-per-plot/species reduction and original LayerCode-driven layer observations; exact typed memberships/source-row provenance | Calculation input only; no service/UI, quality filter, species/reference join, strata/lifeform statistics or export |
-| Long Vegetation crosstab | ACE-probed plot-column presence, duplicate-weighted sums/observation averages and strict thresholds/constant-list bypass | Pure calculation kernel for already joined/grouped inputs; reference/quality/grouping integration and owned report UI remain unavailable |
-| Long Vegetation layer preview | Internal owned selected-SU read path, external SU support, original master-species/layer joins and English-name grouping; strict retained YAML options | Go-tested internal boundary only, not a Wails service/UI or full native report; quality filtering, non-layer grouping, summaries and export remain unavailable |
-| Other forms/reports/interchange | Navigation inventory and original resources provide precedents | FS1333/SIVI/two-page/CHARS equivalence, usable client-priority reports/locations and complete import/export not delivered |
+Long Vegetation now has an **owned Wails preview UI and quality-qualified layer
+criteria** for an explicitly selected site unit. The UI remains default-off:
+`VITE_LONG_VEGETATION_REPORT` must be the literal `true`. Owned context and source
+scope checks remain required; this is not a source mutation or printing grant.
+See [the preview](frontend/src/LongVegetationReport.svelte),
+[the service](vegetationreportservice.go) and
+[quality semantics](vegetationreportquality.go).
 
-Current extended-shrub acceptance: full Go race (root858.736s),280 frontend
-tests, check0/0, opt-in/default production builds, eight native cases and a
-zero-write default proof. Report-preview predecessor is `e763e23`.
-Native acceptance used disposable data/configuration and restored original bytes.
-Feature implementation/native verification does not mean a default-off workflow
-is enabled or its Access execution parity is complete.
+[Feature capabilities](docs/FEATURE_CAPABILITIES.md) is the cumulative source
+contract for this revision. Each entry states its implemented or private-only
+boundary, entry/gate locators and exclusions. It is a capability read model, not
+a chronology, test log or claim that a default-off surface is generally enabled.
+Later capabilities must be read from that table rather than inferred from an
+early preview or preparation entry.
 
-Long Vegetation's first preparation slice is source-mapped and Go-tested, not a
-native-verified report. It preserves all physical SU memberships (including
-duplicates/orphans and NULL/empty unit identities), independently MAX-reduces
-the original15 cover/total fields, and emits only non-NULL covers selected by
-the original `LayerCode.LayerText` metadata. Zero/negative covers, extended
-shrubs and layers8/9/10 remain observations; totals are not invented as layers. Duplicate layer
-definitions and NULL/empty species remain distinguishable. Literal identity
-matching, deterministic ordering and deterministic numeric-tie storage are
-explicit desktop adaptations, not Access collation/Single-coercion parity.
-No persistent tables, configuration, production data or UI gates change.
-Five focused preparation tests and shared environment regressions passed with
-race1.261s; full Go race integration passed (root672.153s). The accepted native
-executable remains unchanged; there is no new frontend/native acceptance claim.
+## Safety boundaries
 
-Continuation retains Access's constant-species-list threshold bypass and
-existing YAML default (-1), rather than silently adapting it. Client option
-scope remains provisional. A selective `DAO.DBEngine.120` ACE query on a new
-disposable database verified that `Count([MyCover])` counts non-NULL pivot plot
-columns, including zero and negative sums. Repeated SU rows multiply covers,
-but not that numerator; physical SU rows remain the independent denominator.
-`all-plots` divides the joined sum by that denominator; `observations` averages
-non-NULL joined observations, not plot sums. Missing constant-list species have
-NULL statistics/cells, not zero. Constant-list SQL equality does not match
-NULL group/species keys; empty text still matches. Both thresholds are strict and apply only
-outside constant-list mode. The probe omitted the identity `vpRoundUp` wrapper;
-it did not run VPRO report code, Excel, application startup or production data.
+- Preserve the SQLite database family, per-project physical names and native
+  `_table_metadata` Description storage.
+- Use owned contexts, literal physical witnesses, retained validation and
+  operation-specific transaction/history rules. NULL and empty stay distinct.
+- Private Access adapters and prepared images are not public import workflows;
+  project-template preparation is not installed project creation.
+- No source4, physical printing, picture creation or unavailable callback is
+  enabled by this capability catalogue.
+- Native acceptance and publication authorization are separate gates. Source
+  contracts and passing unit tests do not constitute new native parity claims.
 
-The kernel accepts already joined/grouped observations, preserves literal
-NULL/empty identities and computes exact rational intermediate sums with finite
-double outputs. This avoids order-dependent cancellation but does not claim
-Access Single/Val coercion parity. Four oracle cases are retained in
-[the presence fixture](testdata/long-vegetation-presence.json). No quality,
-species/reference/layer-label join, taxon lumping, summary or report UI is
-enabled by that calculation evidence. A second three-case physical ACE probe
-verified constant-list NULL/empty equality. Its initial constant-expression
-saved-query variant unexpectedly dropped the NULL left row; that optimizer
-behavior remains unknown and is not inherited as a desktop requirement.
-Four crosstab tests plus five preparation regressions passed with race1.241s;
-final full Go race integration passed (root664.970s). No frontend/binding change
-or new native desktop build was needed; the accepted executable is unchanged.
+## Build and focused validation
 
-The internal layer preview now reads original physical project Veg, selected
-SU, VLists.USysAllSpecs and VPro64.LayerCode through the existing coordinator,
-immutable context lease and read-only transaction. It does not substitute the
-editor's master/personal species UNION. Missing master codes retain raw Species;
-non-NULL ScientificName (including empty text) supplies the source display
-name, and synonym CodeType S/s is excluded. Duplicate reference definitions
-multiply joins as in the source and produce explicit diagnostics.
-
-EnglishName participates in source grouping. The constant-list join matches
-only Layer and displayed species, not EnglishName: different names can fan out
-into several rows. Both the list name and matched report name remain visible
-in the internal result rather than silently picking one definition. An
-eight-row selective ACE fixture verifies this behavior. The shared crosstab
-has an explicit unfiltered intermediate mode; its ordinary/constant-list
-threshold behavior remains unchanged.
-
-Named-unit denominators count physical SiteUnit rows, including duplicate
-memberships and NULL PlotNumber rows; unassigned denominators count only
-non-NULL PlotNumber rows. Orphan-only named units do not appear as invented
-reports. Empty identities remain literal, and per-unit pivot columns come
-only from joined cover observations. The desktop explicitly permits an
-unassigned-only preview instead of inheriting Access's early no-named-unit
-exit; no Excel250-plot cap or generated sheet-name rewrite is imposed.
-Long unit names are not calculated in this internal slice.
-
-The decoder preserves the default title, average10, constant list=-1, English
-names1 and ordering20. Unsupported strata/lifeform/group modes, alternative
-unit selection or requested quality filtering fail explicitly; they do not
-silently fall back. Summary and publication preferences remain stored and
-untouched, not falsely presented as computed output. This internal preview
-has no binding, feature gate or UI entrypoint yet; no report is made available
-by its backend acceptance.
-Combined acceptance:22 focused Go tests passed with race5.224s; full Go race
-integration passed (root659.145s). Independent read-only review found no
-significant defects; it correctly distinguishes selective ACE fixtures from
-full native report/Wails acceptance, which remains unavailable.
-
-## Architecture and safety
-
-- Retain VPro64/VLists/VUser/VMetaData/VMessageBoard and per-project physical
-  table naming. Bundled [Sample](resources/Sample.db) is byte-identical to the
-  R SQLite seed, including tables/indexes/views/`_table_metadata`; SHA256
-  `e63f0c2a051761701bdad3c81bcfde4067ab322883c7e4ac84a3541ae8578ad8`.
-  Descriptions are native Access table-object metadata, not only version flags.
-  Derived editor catalogues are read models, not replacement databases.
-- Missing support files install under `<dataDir>/database-family` without
-  replacing existing files. `Desktop.DatabasePaths` retains explicit absolute
-  family overrides. Project/SU/hierarchy selections keep independent paths;
-  selected existing files are not silently copied or converted.
-- `config.init.yml` initializes persistent `config.yml`. Shared preference
-  ownership serializes selection/coordinate/Working Unit/audit/user changes.
-  Unknown/inactive settings retain values/types. Three old JSON files are
-  validated/imported together, retained and hash-recorded; conflicts, changed
-  inputs and malformed data fail explicitly. Failed replacement preserves
-  prior bytes/effective settings. Obsolete Access machine paths are not imported.
-- SQLite owns readonly attachments/TEMP views and separate transactional writers.
-  Immutable context IDs, file observations, leases and draft-safe switching
-  prevent stale calls. DuckDB remains optional; offline startup needs no
-  unprovisioned extension.
-- Errors/proposals retain editor/original identity through tab remounts and block
-  Save/Lock/native close/context/unrelated writes. Data and audits/provenance
-  share transactions; cancellation, drift, collisions, rollback and retry are
-  tested. Known commits retire proposals before refresh; do not replay failures
-  explicitly reported as already committed.
-- Preserve raw text, NULL/empty, duplicate reference metadata, BOOLEAN true=-1,
-  UTF-16 bounds and unchanged historical invalid values. Do not trim, recase,
-  infer defaults, silently repair raw JSON Unicode or enforce new field-manual
-  recommendations on historical projects. No phantom audits/destructive restore.
-- Configuration/path failures open visible recovery with editors disabled.
-  Correct the reported YAML/path and restart; automatic repair and production
-  write approval are absent. Set `VPRO_DATA_DIR`/`VPRO_CONFIG_DIR` to disposable
-  directories for validation.
-
-## Workflow boundaries worth retaining
-
-Species changes preserve alias precedence and explicit replace/keep/personal-code
-decisions; non-ASCII exact selection is allowed without claiming general Access
-collation parity. C/C-height NULL Cover6 removes view membership, not the record;
-A/A-height missing-cover notices do not infer covers or delete height-only rows.
-Source creation does not save personal definitions implicitly.
-
-The shared FS882 XL CHARS option uses exported `SubVegAXL` controls and source
-B3/B4/B5 labels bound to existing Cover5a/b/c. Normal A membership already includes
-extended-only rows; hiding fields never clears values, drafts or errors. Extended
-presentation explicitly uses cover mode, disabling the height toggle until the
-option is turned off; height drafts are retained. Totals remain independent,
-and the existing source missing-cover notice still checks its original seven
-standard A/B cover/total fields, not the extended covers. Shared Species,
-Collected, numeric/audit, creation/deletion and parent-A Enter paths retain their
-original ownership/lifecycle guards. The checkbox is an in-memory presentation
-choice, not a YAML preference write, duplicate menu or complete CHARS-form
-equivalence claim. FS1333/SIVI/other-size entrypoints remain unavailable.
-
-Metadata's supplemental typed history is a desktop adaptation: old plaintext
-audits cannot establish historical SQLite storage classes. Dedicated restoration
-retains provenance and checks the final row after all pruning. Source bulk
-environment/SU SQL bypasses form audits; new atomic technical transfer history
-does not claim Access bulk-audit parity.
-
-Forward Env Into SU copies Admin.UserSiteUnit through original Env/Admin links
-into SiteUnit TEXT255, over the whole selected SU rather than only current plot/
-profile navigation. Matching duplicate physical links reject. The SU must be the
-owned project file. Reviewed NULL and empty text remain distinct; unrelated
-tables/schema/history are independently checked before commit.
-
-Reverse SU Into Env copies selected SU.SiteUnit into Admin.UserSiteUnit TEXT100.
-Uniquely matching master then personal definitions supply short/long names
-TEXT50/100; personal definitions override master, missing definitions preserve
-names, and NULL/empty codes stay distinct. Overlength assignments, ambiguous
-definitions and changes to locked/unverifiably unlocked plots reject. These
-guards, technical history and selected-SU names instead of source hard-coded
-`Sample_SU` are explicit desktop adaptations, not blanket Access execution parity.
-
-The Long Environment preview preserves67 original Env/Admin fields and five heading
-rows from `V7mdlReportsEnv.EnvReport`, including labels/punctuation. It groups by
-selected SU, not Admin.UserSiteUnit or profile navigation, and adds no quality
-filter or summary calculations. Numeric zero, empty text, NULL and historical
-storage remain typed; missing Env/Admin retain membership with blank projections.
-Deterministic raw ordering, duplicate-membership counts and explicit conflicting/
-unsupported name diagnostics replace arbitrary `First()` selection. Reference
-candidate IDs, NULL/empty names and duplicates remain distinguishable. Owned
-read-only transactions use the original physical project/SU/reference tables,
-including external selected-SU files, with cancellation and file/context identity
-checks. Navigation reuses Save/Discard/Cancel; native close is guarded during
-reads. The configured YAML `ReportOptions.LEReportTitle` is preserved and read
-without fallback on malformed configuration. Title edits affect this preview
-only: source registry-title persistence remains an explicit adaptation/gap.
-The preview writes no data, audits or configuration and does not launch
-Access/Excel, create export files or implement summary calculations.
-
-## Feature gates
-
-These are build-time Vite flags, not user permissions or hidden backend grants.
-Keep independent gates; do not turn on unavailable workflows as part of cleanup.
-Set default-on flags to `false` for read-only opt-out; set default-off flags to
-`true` only for their verified experimental surfaces.
-
-| Default | Flags |
-| --- | --- |
-| On: parent groups | `VITE_COORDINATE_EDITING`, `VITE_BEC_EDITING`, `VITE_WORKING_UNIT_EDITING`, `VITE_MASTER_BEC_EDITING`, `VITE_QUALITY_EDITING`, `VITE_SUBSTRATE_EDITING`, `VITE_SITE_CODES_EDITING`, `VITE_REGION_CODES_EDITING`, `VITE_SOIL_CODES_EDITING`, `VITE_GEOLOGY_CODES_EDITING`, `VITE_PARENT_CODES_EDITING`, `VITE_ORDINARY_PARENT_EDITING`, `VITE_PARENT_FLAGS_EDITING`, `VITE_SOIL_DRAINAGE_EDITING`, `VITE_ADDITIONAL_PARENT_EDITING` |
-| On: child groups | `VITE_OTHER_EDITING`, `VITE_SOIL_CHILD_EDITING`, `VITE_VEGETATION_ATTRIBUTE_EDITING`, `VITE_VEGETATION_COLLECTED_EDITING`, `VITE_VEGETATION_SPECIES_EDITING`, `VITE_HEIGHT_EDITING`, `VITE_VEGETATION_NUMBER_EDITING` |
-| On: bounded infrastructure | `VITE_EXTERNAL_PROJECTS`, `VITE_AUDIT_RESTORE` |
-| Off: lifecycle/checking | `VITE_VEGETATION_CREATE_EDITING`, `VITE_VEGETATION_DELETE_EDITING`, `VITE_PERSONAL_SPECIES_EDITING`, `VITE_SPECIES_CODE_CHECK_EDITING` |
-| Off: metadata | `VITE_PROJECT_METADATA_EDITING`, `VITE_PROJECT_METADATA_CREATION`, `VITE_PROJECT_METADATA_TEMPLATE_CREATION`, `VITE_PROJECT_METADATA_RESTORE` |
-| Off: navigation/transfer | `VITE_SOURCE_ENTER_NAVIGATION`, `VITE_SOURCE_PLOT_FIND`, `VITE_SOURCE_ENV_SU_TRANSFER`, `VITE_SOURCE_SU_ENV_TRANSFER` |
-| Off: profile rules/results | `VITE_PROJECT_PLOT_PROFILE_REVIEW`, `VITE_PROJECT_PLOT_PROFILE_RUN`, `VITE_PROJECT_PLOT_PROFILE_EDITING`, `VITE_PROJECT_PLOT_PROFILE_CREATION`, `VITE_PROJECT_PLOT_PROFILE_DELETION`, `VITE_PROJECT_PLOT_PROFILE_FILTERING`, `VITE_PROJECT_PLOT_PROFILE_SAVE_SU`, `VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT` |
-| Off: stored profile ownership | `VITE_PLOT_PROFILE_SELECTION`, `VITE_PLOT_PROFILE_WRITE_OWNERSHIP`, `VITE_PLOT_PROFILE_FILE_CREATION`, `VITE_PLOT_PROFILE_TABLE_CREATION` |
-| Off: read-only catalogue | `VITE_SOIL_CODES_REFERENCE` |
-| Off: read-only reports | `VITE_LONG_ENVIRONMENT_REPORT` |
-| Off: extended shrub presentation | `VITE_EXTENDED_SHRUBS` |
-
-`VITE_HEIGHT_EDITING=false` also disables numeric vegetation editing.
-Master edits additionally require source authorization; reference membership,
-availability and physical validity remain separate checks. Profile sub-actions
-require their parent workflow/selected ownership, not just a flag.
-
-## Run and validate
-
-Install Go, Node/npm and platform Wails prerequisites:
-
-```sh
-go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.26
-wails3 dev
-```
-
-The native development window uses Vite at `http://127.0.0.1:9245/`.
-A browser preview cannot prove Go bindings/lifecycle. Release: `wails3 build`.
-Windows executable/tool paths are in [WINDOWS_HANDOFF.md](WINDOWS_HANDOFF.md).
-
-```sh
-go test -race -timeout 20m ./...
-cd frontend
-npm test
-npm run check
-npm run build
-```
-
-On Windows use `npm.cmd`. Focused tests during implementation; full validation
-at integration. New frontend tests must be added to explicit package selectors.
-Use native Wails with disposable data/config for binding/lifecycle acceptance.
-
-## References and next work
-
-- [Migration plan](MIGRATION_PLAN.md): ordered deliverables and bounded next round.
-- [Client scope/domain index](docs/CLIENT_SCOPE.md): page-cited scope decisions,
-  uncertainties, companion R boundary and help/manual reference locators.
-- [Access contract](docs/FS882-6x4XL-access-contract.md): source/measured behavior
-  and explicit adaptations; not proof of all workflows.
-- [Development instructions](AGENTS.md): source-first safety and work budget.
-- [Release workflow](.github/workflows/release.yml) /
-  [download portal](docs/index.html): distribution surfaces, not replacement
-  acceptance for every platform.
-
-Next: source-bound Long Vegetation options/calculations, FS1333/two-page
-implementation and priority reports/locations. Constant-species-list versus
-species-threshold behavior needs an explicit scope decision before report expansion.
-Static form/report
-contracts alone do not prove native execution parity. The historical agreement's
-cloud/public-map/BECWeb/publication tracks remain visible but separately scoped.
-Private native evidence, original documentation snapshots and closed-build hash
-maps are retained outside app assets; no client PDFs or temporary tools are bundled.
+Use existing dependencies and disposable data/configuration for tests. In
+`frontend`, run `npm run test`, `npm run check` and `npm run build`. Go changes
+require focused behavioral tests; `go test -run '^$' ./...` checks compilation
+only. Keep native lifecycle verification separate from browser previews.

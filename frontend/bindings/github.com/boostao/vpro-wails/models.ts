@@ -392,6 +392,109 @@ export interface LongEnvironmentRequest {
     "title": string;
 }
 
+export interface LongVegetationDiagnostic {
+    "code": string;
+    "identity": string;
+    "count": number;
+}
+
+export interface LongVegetationOptions {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "settings": LongVegetationSettings;
+}
+
+export interface LongVegetationPlot {
+    "plotNumber": string;
+    "cover": number | null;
+}
+
+export interface LongVegetationPreview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "settings": LongVegetationSettings;
+    "report": LongVegetationReport;
+}
+
+export interface LongVegetationQualityCriterion {
+    "minimum": string;
+    "includeNull": boolean;
+}
+
+export interface LongVegetationQualityOccurrence {
+    "membershipId": string;
+    "plotNumber": ProjectMetadataCell;
+    "siteUnit": ProjectMetadataCell;
+    "envRowId": string;
+    "adminRowId": string;
+    "listRowIds": (string | null)[];
+    "values": ProjectMetadataCell[];
+}
+
+export interface LongVegetationQualityReference {
+    "rowId": string;
+    "item": ProjectMetadataCell;
+    "listName": ProjectMetadataCell;
+    "itemOrder": ProjectMetadataCell;
+}
+
+export interface LongVegetationQualitySelection {
+    "thresholdRowIds": (string[] | null)[];
+    "occurrences": LongVegetationQualityOccurrence[] | null;
+    "excludedMembershipIds": string[] | null;
+    "references": LongVegetationQualityReference[] | null;
+}
+
+export interface LongVegetationQualitySettings {
+    "site": LongVegetationQualityCriterion;
+    "veg": LongVegetationQualityCriterion;
+    "soil": LongVegetationQualityCriterion;
+}
+
+export interface LongVegetationReport {
+    "project": string;
+    "su": string;
+    "title": string;
+    "units": LongVegetationUnit[] | null;
+    "diagnostics": LongVegetationDiagnostic[] | null;
+    "quality": LongVegetationQualitySelection | null;
+}
+
+export interface LongVegetationRow {
+    "layer": ProjectMetadataCell;
+    "species": ProjectMetadataCell;
+    "englishName": ProjectMetadataCell;
+    "matchedName": ProjectMetadataCell;
+    "presence": number | null;
+    "meanCover": number | null;
+    "plots": LongVegetationPlot[] | null;
+}
+
+export interface LongVegetationSettings {
+    "title": string;
+    "average": string;
+    "constantSpeciesList": boolean;
+    "presenceGreaterThan": number;
+    "meanCoverGreaterThan": number;
+    "order": string;
+    "showEnglishName": boolean;
+    "quality": LongVegetationQualitySettings | null;
+}
+
+export interface LongVegetationUnit {
+    "code": ProjectMetadataCell;
+    "longName": string | null;
+    "nameStatus": string;
+    "nameCandidates": EnvironmentReportName[] | null;
+    "numPlots": number;
+    "membershipIds": string[] | null;
+    "rows": LongVegetationRow[] | null;
+}
+
 /**
  * MineralRecord represents a soil mineral layer entry.
  */
