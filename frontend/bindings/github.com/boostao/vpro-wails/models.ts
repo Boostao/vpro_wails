@@ -1252,6 +1252,59 @@ export interface SiteUnitEnvironmentTransfer {
     "confirmed": boolean;
 }
 
+export interface SiteUnitSummaryField {
+    "source": string;
+    "key": string;
+    "label": string;
+    "section": string;
+    "kind": string;
+}
+
+export interface SiteUnitSummaryMembership {
+    "rowId": string;
+    "plotNumber": ProjectMetadataCell;
+    "siteUnit": ProjectMetadataCell;
+    "joinedRows": number;
+    "status": string;
+}
+
+export interface SiteUnitSummaryPlot {
+    "plotNumber": string;
+    "suRowId": string;
+    "envRowId": string;
+    "adminRowId": string;
+}
+
+export interface SiteUnitSummaryPreview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "report": SiteUnitSummaryReport;
+}
+
+export interface SiteUnitSummaryReport {
+    "project": string;
+    "su": string;
+    "method": number;
+    "querySource": string;
+    "fields": SiteUnitSummaryField[] | null;
+    "units": SiteUnitSummaryUnit[] | null;
+    "memberships": SiteUnitSummaryMembership[] | null;
+}
+
+export interface SiteUnitSummaryRequest {
+    "method": number;
+}
+
+export interface SiteUnitSummaryUnit {
+    "code": string;
+    "longName": string | null;
+    "nameStatus": string;
+    "nameCandidates": EnvironmentReportName[] | null;
+    "plots": SiteUnitSummaryPlot[] | null;
+    "values": string[] | null;
+}
+
 export interface SoilCodeChoice {
     "rowId": string;
     "code": string | null;

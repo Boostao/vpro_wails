@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'long-vegetation' | 'table-csv' | 'plot-locations' | 'google-earth-review';
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'table-csv' | 'plot-locations' | 'google-earth-review';
   type Item = { name: string; icon: typeof House; view?: View };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate }: { view: View; onnavigate: (view: View) => void } = $props();
@@ -30,7 +30,7 @@
       ] },
       { label: 'Environment', items: [
         { name: 'Long Environment', icon: TableProperties, view: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' ? 'long-environment' : undefined },
-        { name: 'Summary Environment', icon: ChartColumn }
+        { name: 'Summary Environment', icon: ChartColumn, view: import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true' ? 'summary-environment' : undefined }
       ] },
       { label: 'Others', items: [
         { name: 'Subzone Matrix of Units', icon: Table },

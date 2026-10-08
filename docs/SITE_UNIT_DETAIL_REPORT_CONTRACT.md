@@ -2,11 +2,14 @@
 
 ## Status
 
-Source-mapped with private normal-SU scope preparation; no summary calculation, public service, native preview,
-Excel automation or export is accepted. This is distinct from the accepted
-per-plot Long Environment preview. The client's consolidated per-plot versus
-unit-summary presentation remains open in [client scope](CLIENT_SCOPE.md).
-Shared report options must not turn on this unavailable workflow.
+An independently default-off normal-SU, layer-cover Summary Environment preview
+now implements the39 source summary fields in SITE/VEGETATION/SOILS order,
+with Mean and Interquartile choices. Its owned service, generated bindings and
+responsive desktop panel pass focused tests and disposable Wails checks.
+Full integration passes (fresh root794.606s/all packages). Species/lifeform summaries, hierarchy/field-derived
+units, saved options and Excel/file publication remain unavailable. This is
+distinct from the per-plot Long Environment preview; the consolidated client
+presentation remains open in [client scope](CLIENT_SCOPE.md).
 
 The local reference root is
 `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`. Static exports were read
@@ -153,7 +156,7 @@ eight original exports and192 frontend/dependency identities unchanged.
 The [private scope successor](../archives/site-unit-detail-scope-checkpoint/evidence-manifest.json)
 retains source, review, focused/full receipts and the350-file accepted saved-title
 predecessor identity. No service authorization, binding/frontend change, new
-report/native claim or production/default promotion follows.
+report/native claim or production/default promotion follows from that predecessor.
 
 ## Language references for the next arithmetic boundary
 
@@ -175,4 +178,68 @@ sole disposable `native-site-unit-detail` fixture but did not execute:
 this machine refused PowerShell script execution. No execution-policy change,
 Access application, database creation or canonical/source mutation followed.
 The weight evidence above therefore remains actual SQLite/private Go evidence,
-not a successful ACE probe. Arithmetic and Access collation remain unverified.
+not a successful ACE weight probe. Access collation remains unverified.
+
+## Normal-SU summary desktop successor
+
+[The summary planner](../siteunitdetailreport.go) reuses the accepted physical
+scope and shared name-candidate resolver. It transports every physical
+SU/Env/Admin triple and all memberships/exclusion reasons, including empty units
+and duplicate weights. A one-million joined-row budget refuses overflow without
+truncation. Missing Env/Admin memberships are excluded from the source inner
+join, not displayed as invented observations. Name ambiguity is explicit rather
+than inheriting arbitrary `First()`. The39 fields retain labels, section order,
+Admin.HumusThickness and the duplicated SiteDisturbance2 binding.
+
+The [numeric helper](../siteunitdetailnumeric.go) batches the three distinct
+source arithmetic families. Elevation/StandAge use minimum/two-digit mean/maximum;
+Slope uses raw numeric extrema and an integer-format mean; GroundCover uses
+format-before-Val extrema and one-decimal mean. Its maximum query alone includes
+NULL formatted to empty and converted to zero. All-NULL early returns remain
+different: Mean Elevation/StandAge retain the NULL suffix, while Slope/GroundCover
+and Interquartile return the source empty result. Inclusive quartiles preserve
+physical weights and do not invent an `"N/A"` error fallback.
+
+A fresh disposable DAO database measured half-away-from-zero Format ties,
+English thousands commas terminating Val, Format(NULL)/Val zero and NULL
+concatenation. A separately owned Excel instance confirmed legacy
+WorksheetFunction.Quartile results3/6/9 for a DAO-shaped rank-two array0/4/8/12.
+The first Application.Quartile dispatch attempt was unavailable in PowerShell;
+the successful replacement proves the installed legacy calculation, not the
+original Application dispatch or entire report. Normal Quit initially retained
+the process at500ms; a later independent observation confirmed PID10852 absent.
+No further oracle attempts were made. Exact primary observations are retained
+in the disposable fixture, separate from the unexecuted scope probe.
+
+Explicit adaptations/limits: English-locale formatting and deterministic Go
+shortest numeric rendering, not arbitrary VBA CStr precision; numeric/NULL
+storage only, with historical numeric text/blob explicitly refused; literal
+SQLite key equality/category ordering, not Access collation. Moisture codes and
+source Single aspect boundaries remain source-specific. BGC unit counting
+retains the two-query asymmetry: only non-NULL Zone concatenations establish
+categories, but all matching concatenations contribute their counts.
+
+Runtime `VPRO_SITE_UNIT_SUMMARY=true` and build
+`VITE_SITE_UNIT_SUMMARY=true` are independent opt-in gates. The panel explicitly
+requests normal-SU/layer-cover/no-species scope; Mean is its initial preview
+choice. It neither reads nor changes historical summary-mode preferences,
+registry values or source temporary queries. Method edits affect preview only.
+Hierarchy/field-derived units, lifeform covers and species/publication controls
+are not enabled. Saved-option initialization/persistence remains a separate gap.
+
+Focused/shared Go race3.082s,20 frontend summary/report/read/close tests and
+Svelte check0 errors/warnings pass; the full frontend suite passes441 tests
+(13 pretest plus428 runner). Isolated enabled/default frontend and production
+Wails builds leave protected assets unchanged. Independent review
+`83df75df-a614-4d3e-998c-2a0e781da988` found no significant issues.
+Four normally closed disposable Wails owners pass14 cases: independent UI/
+backend/default denial, exact SQLite physical triples/weighted mean/quartiles,
+actual1400/600px labels/values, held real read responses with cancellation/
+remount/retry and native-close/navigation barriers, plus existing FS882 valid/
+invalid draft Cancel/Discard/Undo behavior without replaying Save. All16
+database/config hashes are unchanged after each close. These receipts accept
+this bounded preview, not full forms/reports parity or production promotion.
+
+One coherent full race integration passes with fresh root794.606s/all packages,
+against611 unchanged pinned Go/frontend identities. The sealed desktop successor
+is [the summary checkpoint](../archives/site-unit-summary-desktop-checkpoint/evidence-manifest.json).

@@ -46,6 +46,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	siteUnitSummaryEnabled, err := siviFeature(siteUnitSummaryFeatureEnvironment, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	googleEarthReviewEnabled, err := googleEarthReviewFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -103,6 +107,7 @@ func main() {
 	contextService.siviProjectAssignmentEnabled = siviProjectAssignmentEnabled
 	contextService.tableCSVReviewEnabled = tableCSVReviewEnabled
 	contextService.plotLocationReviewEnabled = plotLocationReviewEnabled
+	contextService.siteUnitSummaryEnabled = siteUnitSummaryEnabled
 	coordinates, err := newCoordinateService(configDir, preferences)
 	if err != nil {
 		log.Fatal(err)

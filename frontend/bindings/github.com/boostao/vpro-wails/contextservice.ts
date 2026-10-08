@@ -197,6 +197,10 @@ export function PreviewLongVegetation(contextID: string): $CancellablePromise<$m
     return $Call.ByID(3202635744, contextID);
 }
 
+export function PreviewSiteUnitSummary(contextID: string, request: $models.SiteUnitSummaryRequest): $CancellablePromise<$models.SiteUnitSummaryPreview> {
+    return $Call.ByID(639495149, contextID, request);
+}
+
 export function ResolveProjectPlotProfileNavigation(contextID: string, request: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProjectPlotProfileNavigation> {
     return $Call.ByID(3203258907, contextID, request);
 }
