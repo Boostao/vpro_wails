@@ -72,7 +72,7 @@ test('Apply/Clear/Previous/Next reuse transition ownership and revalidation befo
   assert.match(app,/const next = source \? await resolveNavigation\(source\.proposal, source\.contextId\)/);
   assert.match(app,/if \(profileNavigation && profileNavigation\.contextId !== state\.contextId\) profileNavigation = null/);
   assert.match(app,/projectState\.set\(state\);\s*profileNavigation = null/);
-  assert.match(app,/\{#key \$projectState\?\.contextId\}\s*\{#key editorPlotNumber\}/);
+  assert.match(app,/\{#key \$projectState\?\.contextId\}\s*\{#key editorEntryForm\}\s*\{#key editorPlotNumber\}/);
   assert.match(app,/<fieldset disabled=\{busy\} class="contents">/);
   assert.match(app,/await tick\(\);\s*const next = await resolveNavigation/);
   assert.doesNotMatch(app,/SetProfileFilter|CreateSU|UpdatePlotCount/);

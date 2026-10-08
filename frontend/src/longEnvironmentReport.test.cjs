@@ -11,7 +11,8 @@ const editor = loadTypeScript('projectMetadataEditor.ts', {
   '../../resources/project-metadata-template.json':JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-template.json')))
 });
 const restoration = loadTypeScript('projectMetadataRestore.ts', {'./qualityEditor':quality,'./projectMetadataEditor':editor});
-const report = loadTypeScript('longEnvironmentReport.ts', {'./projectMetadataRestore':restoration});
+const names = loadTypeScript('reportUnitNames.ts', {'./projectMetadataRestore':restoration});
+const report = loadTypeScript('longEnvironmentReport.ts', {'./projectMetadataRestore':restoration,'./reportUnitNames':names});
 const cell = text => ({storage:text===null?'null':'text',text,integer:null,real:null,blobHex:null});
 function fixture() {
   const fields = readFileSync(path.join(__dirname,'..','..','testdata','long-environment-fields.txt'),'utf8').trimEnd().split(/\r?\n/).map(line=>{
@@ -60,7 +61,7 @@ test('report view is independently gated, scoped, cancellable and participates i
   }
   const panel=read('LongEnvironmentReport.svelte'), root=read('App.svelte');
   assert.match(read('Navigation.svelte'),/VITE_LONG_ENVIRONMENT_REPORT === 'true'/);
-  assert.match(panel,/onDestroy\(cancel\)/);
+  assert.match(panel,/onDestroy\(\(\) => \{ unsubscribe\?\.\(\); unsubscribeWorkbook\(\); cancel\(\); \}\)/);
   assert.match(panel,/request !== generation/);
   assert.match(panel,/ContextService\.PreviewLongEnvironment\(contextId/);
   assert.match(panel,/data-source-control="rptSvTitle"/);

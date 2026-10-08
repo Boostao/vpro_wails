@@ -1,0 +1,20 @@
+{
+  "source": "VPics.accdb/tblVPics",
+  "sourceSHA256": "b84312d7f19f5a84b54b98be80f6b46fd86223a24eb168d11a0a90b570debcea",
+  "evidence": "Read-only DAO TableDef/Field/Index metadata on an exact disposable copy; no recordsets or rows read",
+  "logicalFieldOrder": ["ID", "PlotNumber", "PicDir", "PicName", "PicComment"],
+  "nativeStorageOrder": ["ID", "PicDir", "PicName", "PlotNumber", "PicComment"],
+  "fields": [
+    {"name": "ID", "daoType": 4, "size": 4, "attributes": 17, "required": false, "allowZeroLength": false, "defaultValue": "GenUniqueID()", "validationRule": "", "validationText": ""},
+    {"name": "PlotNumber", "daoType": 10, "size": 7, "attributes": 2, "required": false, "allowZeroLength": false, "defaultValue": "", "validationRule": "", "validationText": ""},
+    {"name": "PicDir", "daoType": 10, "size": 255, "attributes": 2, "required": false, "allowZeroLength": true, "defaultValue": "", "validationRule": "", "validationText": ""},
+    {"name": "PicName", "daoType": 10, "size": 255, "attributes": 2, "required": false, "allowZeroLength": false, "defaultValue": "", "validationRule": "", "validationText": ""},
+    {"name": "PicComment", "daoType": 10, "size": 255, "attributes": 2, "required": false, "allowZeroLength": false, "defaultValue": "", "validationRule": "", "validationText": ""}
+  ],
+  "indexes": [
+    {"name": "PlotNumber", "primary": false, "unique": false, "required": false, "ignoreNulls": false, "fields": ["PlotNumber"]},
+    {"name": "PrimaryKey", "primary": true, "unique": true, "required": true, "ignoreNulls": false, "fields": ["ID"]}
+  ],
+  "mappedExistingEdits": ["PicDir", "PicName"],
+  "unavailable": ["ID allocation", "implicit PlotNumber reassignment", "metadata mutation until audited ownership/lifecycle acceptance", "physical image copying/import", "external directory grants"]
+}

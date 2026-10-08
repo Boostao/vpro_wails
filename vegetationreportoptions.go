@@ -15,6 +15,11 @@ type longVegetationOptions struct {
 	MeanCoverGreaterThan float64
 	Order                string
 	ShowEnglishName      bool
+	ShowSpeciesCode      bool
+	NoneGrouping         bool
+	LifeformGrouping     bool
+	StrataGrouping       bool
+	Quality              *[3]vegetationQualityCriterion
 }
 
 func decodeLongVegetationOptions(values configValues) (longVegetationOptions, error) {
@@ -28,17 +33,32 @@ func decodeLongVegetationOptions(values configValues) (longVegetationOptions, er
 	if strings.ContainsRune(options.Title, 0) {
 		return fail(fmt.Errorf("ReportOptions.LVReportTitle must not contain NUL"))
 	}
-	for _, key := range []string{"LVGroupBy", "LVUnitGroups"} {
-		if _, err := configInt(values, "ReportOptions", key, 1, 1); err != nil {
-			return fail(fmt.Errorf("Long Vegetation preview supports only %s=1 (layers and selected SU): %w", key, err))
-		}
+	group, err := configInt(values, "ReportOptions", "LVGroupBy", 1, 4)
+	if err != nil {
+		return fail(err)
+	}
+	switch group {
+	case 1:
+	case 2:
+		options.StrataGrouping = true
+	case 3:
+		options.LifeformGrouping = true
+	case 4:
+		options.NoneGrouping = true
+	}
+	if _, err := configInt(values, "ReportOptions", "LVUnitGroups", 1, 1); err != nil {
+		return fail(fmt.Errorf("Long Vegetation preview supports only LVUnitGroups=1 (selected SU): %w", err))
 	}
 	enforce, err := longVegetationConfigBool(values, "DataQualityFilterEnforceLV")
 	if err != nil {
 		return fail(err)
 	}
 	if enforce {
-		return fail(fmt.Errorf("ReportOptions.DataQualityFilterEnforceLV is unavailable in Long Vegetation preview"))
+		criteria, err := decodeLongVegetationQualityCriteria(values)
+		if err != nil {
+			return fail(err)
+		}
+		options.Quality = &criteria
 	}
 	average, err := configInt(values, "ReportOptions", "LVAvgType", 10, 20)
 	if err != nil {
@@ -66,11 +86,12 @@ func decodeLongVegetationOptions(values configValues) (longVegetationOptions, er
 	default:
 		return fail(fmt.Errorf("ReportOptions.LVOrderBy must be 10 (species) or 20 (presence)"))
 	}
-	show, err := configInt(values, "ReportOptions", "LVShowEnglishName", 0, 1)
+	show, err := configInt(values, "ReportOptions", "LVShowEnglishName", 0, 2)
 	if err != nil {
-		return fail(fmt.Errorf("Long Vegetation preview supports only LVShowEnglishName=0 or 1; code and selected-field modes are unavailable: %w", err))
+		return fail(fmt.Errorf("Long Vegetation preview supports LVShowEnglishName=0, 1 and independently gated Code=2; selected-field mode remains unavailable: %w", err))
 	}
 	options.ShowEnglishName = show == 1
+	options.ShowSpeciesCode = show == 2
 	options.ConstantSpeciesList, err = longVegetationConfigBool(values, "LVConstantSppList")
 	if err != nil {
 		return fail(err)
@@ -104,6 +125,45 @@ func longVegetationConfigBool(values configValues, key string) (bool, error) {
 		}
 	}
 	return false, fmt.Errorf("ReportOptions.%s must be a YAML boolean or source integer -1/0, not NULL or an implicit default", key)
+}
+
+func decodeLongVegetationQualityCriteria(values configValues) ([3]vegetationQualityCriterion, error) {
+	fail := func(err error) ([3]vegetationQualityCriterion, error) { return [3]vegetationQualityCriterion{}, err }
+	fields, err := configSection(values, "ReportOptions")
+	if err != nil {
+		return fail(err)
+	}
+	var criteria [3]vegetationQualityCriterion
+	for i, domain := range [3]string{"Site", "Veg", "Soil"} {
+		minimumKey := "DataQualityFilter" + domain + "LV"
+		minimum, err := configString(values, "ReportOptions", minimumKey)
+		if err != nil {
+			return fail(err)
+		}
+		if strings.ContainsRune(minimum, 0) {
+			return fail(fmt.Errorf("ReportOptions.%s must not contain NUL", minimumKey))
+		}
+		nullKey := "DataQualityFilter" + domain + "NullLV"
+		var includeNull bool
+		if literal, legacy := fields[nullKey].(string); legacy {
+			// Default-init preserves the source's string-typed soil/veg flags.
+			switch literal {
+			case "True":
+				includeNull = true
+			case "False":
+				includeNull = false
+			default:
+				return fail(fmt.Errorf("ReportOptions.%s legacy string must be exactly True or False", nullKey))
+			}
+		} else {
+			includeNull, err = longVegetationConfigBool(values, nullKey)
+			if err != nil {
+				return fail(err)
+			}
+		}
+		criteria[i] = vegetationQualityCriterion{Minimum: minimum, IncludeNull: includeNull}
+	}
+	return criteria, nil
 }
 
 func longVegetationConfigNumber(values configValues, key string) (float64, error) {

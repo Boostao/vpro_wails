@@ -42,6 +42,29 @@ test('Text bounds use UTF16 without trimming, case changes or arbitrary memo lim
   }
 });
 
+test('shared typed text policies preserve ordinary messages without adding header descriptors', () => {
+  const policy = { kind: 'text', label: 'UTM Zone', maximum: 2 };
+  assert.equal(ordinaryField('UTMZone'), undefined);
+  assert.equal(ordinaryTextError(policy, '01', null), null);
+  assert.equal(ordinaryTextError(policy, ' x', null), null);
+  assert.equal(ordinaryTextError(policy, '', null), 'Clear UTM Zone to NULL instead of an empty string.');
+  assert.equal(ordinaryTextError(policy, '\udfff', null), 'UTM Zone contains an incomplete Unicode character.');
+  assert.equal(ordinaryTextError(policy, '😀x', null),
+    'UTM Zone must be at most 2 UTF-16 characters; the entry has not been truncated.');
+  assert.equal(ordinaryTextError(policy, 'historic', 'historic'), null);
+  assert.equal(ordinaryTextError({ kind: 'memo', label: 'Notes' }, 'x'.repeat(100000), null), null);
+});
+test('shared typed numeric policies preserve ordinary domains/messages without adding header descriptors', () => {
+  assert.equal(ordinaryField('StartDate'), undefined);
+  const year = { label: 'Yr.', kind: 'integer' };
+  assert.equal(ordinaryNumberValue(year, '-32768', null).value, -32768);
+  assert.equal(ordinaryNumberValue(year, '32767', null).value, 32767);
+  assert.equal(ordinaryNumberValue(year, '32768', null).error, 'Yr. requires an integer from -32768 to 32767 or NULL.');
+  const slope = { label: 'Slope%', kind: 'single' };
+  assert.equal(ordinaryNumberValue(slope, '-101.125', null).value, -101.125);
+  assert.equal(ordinaryNumberValue(slope, '1.1234567890123', null).value, 1.1234567890123);
+});
+
 test('Integer depths and Single summaries retain raw errors and physical domains, not guessed clinical limits', () => {
   for (const field of ordinaryFields.filter(field => ['integer', 'single'].includes(field.kind))) {
     for (const raw of ['', '-1', '0', '100', '101', '2e1']) {

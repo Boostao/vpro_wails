@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { CloseDecision } from './closeLifecycle';
 
-  let { requestId, working, canSave, saveReason, error, onrespond, purpose = 'close' }: {
+  let { requestId, working, canSave, saveReason, error, onrespond, purpose = 'close', editorLabel = 'FS882' }: {
     requestId: string;
     working: boolean;
     canSave: boolean;
@@ -9,6 +9,7 @@
     error: string;
     onrespond: (decision: CloseDecision) => Promise<void>;
     purpose?: 'close' | 'context';
+    editorLabel?: 'FS882' | 'SIVI / FS1333';
   } = $props();
   let dialog: HTMLDialogElement;
 
@@ -22,8 +23,8 @@
   oncancel={(event) => { event.preventDefault(); if (!working) void onrespond('cancel'); }}>
   <h2 id="close-title">{purpose === 'close' ? 'Save changes before closing VPRO?' : 'Save changes before changing context?'}</h2>
   <p id="close-description">{purpose === 'close'
-    ? 'FS882 has an unsaved draft or incomplete entry. Cancel keeps the application open. Discard closes without saving this draft; completed child edits remain saved.'
-    : 'FS882 has an unsaved draft or incomplete entry. Save writes to the current project before switching. Cancel keeps the current context and draft. Discard removes this draft only after the switch succeeds; completed child edits remain saved.'}</p>
+    ? `${editorLabel} has an unsaved draft or incomplete entry. Cancel keeps the application open. Discard closes without saving this draft; completed child edits remain saved.`
+    : `${editorLabel} has an unsaved draft or incomplete entry. Save writes to the current project before switching. Cancel keeps the current context and draft. Discard removes this draft only after the switch succeeds; completed child edits remain saved.`}</p>
   {#if error}<p role="alert">{error}</p>{/if}
   {#if !canSave}<p role="status">{saveReason}</p>{/if}
   <div class="actions">

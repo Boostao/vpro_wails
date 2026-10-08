@@ -1,0 +1,60 @@
+{
+  "contextId": "C",
+  "project": "Sample",
+  "plot": "P",
+  "master": {
+    "columns": [
+      { "name": "Code", "declaredType": "TEXT" },
+      { "name": "ScientificName", "declaredType": "TEXT" },
+      { "name": "Lifeform", "declaredType": "INTEGER" },
+      { "name": "EnglishName", "declaredType": "TEXT" },
+      { "name": "Codetype", "declaredType": "TEXT" },
+      { "name": "OldCode", "declaredType": "TEXT" }
+    ],
+    "rows": [
+      {
+        "rowId": "9223372036854775807",
+        "cells": [
+          { "storage": "text", "text": "TREE", "integer": null, "real": null, "blobHex": null },
+          { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null },
+          { "storage": "integer", "text": null, "integer": "1", "real": null, "blobHex": null },
+          { "storage": "text", "text": "", "integer": null, "real": null, "blobHex": null },
+          { "storage": "text", "text": "u", "integer": null, "real": null, "blobHex": null },
+          { "storage": "text", "text": "old", "integer": null, "real": null, "blobHex": null }
+        ]
+      },
+      {
+        "rowId": "-9223372036854775808",
+        "cells": [
+          { "storage": "text", "text": "MOSS", "integer": null, "real": null, "blobHex": null },
+          { "storage": "text", "text": "", "integer": null, "real": null, "blobHex": null },
+          { "storage": "integer", "text": null, "integer": "9", "real": null, "blobHex": null },
+          { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null },
+          { "storage": "text", "text": "x", "integer": null, "real": null, "blobHex": null },
+          { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null }
+        ]
+      }
+    ]
+  },
+  "personal": {
+    "columns": [
+      { "name": "Code", "declaredType": "TEXT" },
+      { "name": "ScientificName", "declaredType": "TEXT" },
+      { "name": "LifeForm", "declaredType": "INTEGER" },
+      { "name": "EnglishName", "declaredType": "TEXT" },
+      { "name": "Codetype", "declaredType": "TEXT" }
+    ],
+    "rows": [
+      {
+        "rowId": "1",
+        "cells": [
+          { "storage": "text", "text": "MINE", "integer": null, "real": null, "blobHex": null },
+          { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null },
+          { "storage": "integer", "text": null, "integer": "99", "real": null, "blobHex": null },
+          { "storage": "text", "text": "", "integer": null, "real": null, "blobHex": null },
+          { "storage": "text", "text": "s", "integer": null, "real": null, "blobHex": null }
+        ]
+      }
+    ]
+  }
+}

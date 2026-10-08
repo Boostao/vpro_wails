@@ -50,21 +50,49 @@ function serverComponent(source, filename, dependencies) {
       if (name === 'svelte' || name.startsWith('svelte/')) return require(name);
       if (name === './FieldGuidance.svelte') return { default: serverComponent(
         readFileSync(path.join(__dirname, 'FieldGuidance.svelte'), 'utf8'), 'FieldGuidance.svelte', {}) };
+      if (name === './SIVIChildSourceNotices.svelte') return { default: serverComponent(
+        readFileSync(path.join(__dirname, 'SIVIChildSourceNotices.svelte'), 'utf8'), 'SIVIChildSourceNotices.svelte', {}) };
       throw new Error(`Unexpected renderer dependency ${name}`);
     }
   });
   return module.exports.default;
 }
 
-function loadTypeScript(filename, dependencies = {}) {
+function loadTypeScript(filename, dependencies = {}, globals = {}) {
   const module = { exports: {} };
   vm.runInNewContext(ts.transpileModule(readFileSync(path.join(__dirname, filename), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true }
-  }).outputText, { module, exports: module.exports, structuredClone, require(name) {
+  }).outputText, { ...globals, module, exports: module.exports, structuredClone, require(name) {
     if (name in dependencies) return dependencies[name];
+    if (name === './siviChildSourceNotices') {
+      const quality = dependencies['./qualityEditor'] || loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
+      const metadata = dependencies['./projectMetadataEditor'] || loadTypeScript('projectMetadataEditor.ts', {
+        './qualityEditor': quality, '../../resources/project-metadata-standard.json': [], '../../resources/project-metadata-template.json': [],
+      });
+      return loadTypeScript('siviChildSourceNotices.ts', {
+        './heightEditor': loadTypeScript('heightEditor.ts', { './numericEditor': loadTypeScript('numericEditor.ts') }),
+        './projectMetadataEditor': metadata,
+        './projectMetadataRestore': dependencies['./projectMetadataRestore'] || loadTypeScript('projectMetadataRestore.ts', {
+          './qualityEditor': quality, './projectMetadataEditor': metadata,
+        }),
+      });
+    }
     throw new Error(`Unexpected TypeScript dependency ${name}`);
   } });
   return module.exports;
+}
+function componentFunctions(filename, names, values) {
+  const source = readFileSync(path.join(__dirname, filename), 'utf8');
+  const script = source.match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  const ast = ts.createSourceFile(filename + '.ts', script, ts.ScriptTarget.Latest, true);
+  const selected = ast.statements.filter(node => ts.isFunctionDeclaration(node) && names.includes(node.name.text));
+  assert.equal(selected.length, names.length);
+  const context = vm.createContext({ exports: {}, ...values });
+  const code = selected.map(node => node.getText(ast)).join('\n') + `\nthis.actions = {${names.join(',')}};`;
+  vm.runInContext(ts.transpileModule(code, { compilerOptions: {
+    module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022
+  } }).outputText, context);
+  return context;
 }
 function presentationHelpers() {
   const paper = loadTypeScript('paperLayout.ts', {
@@ -74,4 +102,4 @@ function presentationHelpers() {
   return { paper, presentation: loadTypeScript('formPresentation.ts', { './paperLayout': paper }) };
 }
 
-module.exports = { serverComponent, loadTypeScript, presentationHelpers };
+module.exports = { serverComponent, loadTypeScript, componentFunctions, presentationHelpers };

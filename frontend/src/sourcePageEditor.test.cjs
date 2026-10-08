@@ -62,6 +62,45 @@ const SourcePage = serverComponent(source, 'SourcePage.svelte', {
   './formPresentation': presentation
 });
 
+test('An explicit source page bypasses XL lookup and retains bound option-group editor ownership', () => {
+  const ExactPage = serverComponent(source, 'SourcePage.svelte', {
+    './paperLayout': { paperPage: () => { throw new Error('Must not fall back to XL metadata'); }, accessCaption: value => value },
+    './formPresentation': presentation
+  });
+  const projected = { ...page, controls: [control('SV_StandAgeEstMeas', 'OptionGroup', 10),
+    control('HistoricalOption', 'OptionGroup', 30)] };
+  const fixture = `<script>import ExactPage from './ExactPage.svelte'; export let projected;</script>
+    {#snippet option(control, position)}<select data-option-editor={control.column} style={position}><option>Est.</option></select>{/snippet}
+    <ExactPage name="Site/Veg" sourcePage={projected} values={new Map([['historicaloption', '0']])}
+      editor={{columns:['SV_StandAgeEstMeas'],input:option}}>
+      {#snippet embedded(control)}{/snippet}
+    </ExactPage>`;
+  const Component = serverComponent(fixture, 'ExactSourceFixture.svelte', { './ExactPage.svelte': { default: ExactPage } });
+  const html = render(Component, { props: { projected } }).body;
+  assert.equal((html.match(/data-option-editor="SV_StandAgeEstMeas"/g) || []).length, 1);
+  assert.doesNotMatch(html, /data-column="SV_StandAgeEstMeas"/);
+  assert.match(html, /data-column="HistoricalOption"[^>]*disabled[^>]*value="0"/);
+  assert.match(html, /<legend>Site conditions and stand<\/legend>/);
+});
+test('Explicit source readonly BOOLEAN fields normalize Access true=-1 without repairing historical values', () => {
+  const projected = { ...page, controls: [control('SV_FloodPlain', 'CheckBox', 10)] };
+  for (const [stored, checked, historical] of [
+    [-1, true, false], ['-1', true, false], [true, true, false],
+    [0, false, false], ['0', false, false], [false, false, false], [null, false, false],
+    [1, false, true], ['historical', false, true],
+  ]) {
+    const html = render(SourcePage, { props: { name: 'Soil/Terrain', sourcePage: projected, embedded: () => {},
+      values: new Map([['sv_floodplain', stored]]) } }).body;
+    const input = html.match(/<input\b[^>]*>/)[0];
+    assert.match(input, /disabled/);
+    assert.equal(/\bchecked\b/.test(input), checked, String(stored));
+    assert.equal(html.includes('Historical '), historical, String(stored));
+  }
+  const defaultHtml = render(SourcePage, { props: { name: 'Soil/Terrain', embedded: () => {},
+    values: new Map([['sv_floodplain', -1]]) } }).body;
+  assert.doesNotMatch(defaultHtml, /Historical /);
+});
+
 function renderPage(withEditor, extra = '') {
   const fixture = `
     <script>
@@ -92,6 +131,26 @@ test('Independent editor slots compose without changing readonly partners or gro
 test('Overlapping source-slot ownership fails explicitly instead of choosing an arbitrary editor', () => {
   assert.throws(() => renderPage(true, "editors={[{ columns: ['SoilClassGroup'], input }]}"),
     /Multiple source editors own SoilClassGroup/);
+});
+
+test('unbound display controls use exact source identities without claiming physical fields or actions', () => {
+  const display = { ...control('Check369', 'OptionButton', 0), column: undefined };
+  const projected = { ...page, controls: [display, control('FieldNumber', 'TextBox', 10),
+    { ...control('Action', 'CommandButton', 20), column: undefined }] };
+  const fixture = `<script>import SourcePage from './SourcePage.svelte'; export let page; export let ids; export let duplicate = false;</script>
+    {#snippet input(control,position)}<input data-display-owner={control.controlId} type="radio"/>{/snippet}
+    <SourcePage name="Site/Veg" sourcePage={page} editors={[
+      {columns:[],controls:ids,input}, ...(duplicate ? [{columns:[],controls:ids,input}] : [])]}>
+      {#snippet embedded(control)}{/snippet}
+    </SourcePage>`;
+  const Component = serverComponent(fixture, 'DisplayControlFixture.svelte', { './SourcePage.svelte': { default: SourcePage } });
+  const props = { page: projected, ids: ['Check369'] };
+  const html = render(Component, { props }).body;
+  assert.equal((html.match(/data-display-owner="Check369"/g) || []).length, 1);
+  assert.match(html, /data-column="FieldNumber"[^>]*disabled/);
+  assert.throws(() => render(Component, { props: { ...props, duplicate: true } }).body, /Multiple source editors own control/);
+  assert.throws(() => render(Component, { props: { ...props, ids: ['FieldNumber'] } }).body, /must be owned by its column/);
+  assert.throws(() => render(Component, { props: { ...props, ids: ['Action'] } }).body, /cannot be owned by a field editor/);
 });
 
 test('Default source rendering remains readonly with stored values and embedded children', () => {

@@ -114,7 +114,8 @@ test('Project-local profile review and editing are separately gated, resident ac
   const form=read('FS882Form.svelte');
   assert.equal(compile(component,{filename:'ProjectPlotProfileReview.svelte',generate:'client'}).warnings.length,0);
   assert.match(form,/VITE_PROJECT_PLOT_PROFILE_REVIEW === 'true'/);
-  assert.match(form,/headerWorkflowBusy = \$derived\([^;]*profileReviewBusy/);
+  assert.match(form,/otherHeaderWorkflowBusy = \$derived\([^;]*profileReviewBusy/);
+  assert.match(form,/headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
   assert.match(form,/\{#if profileReviewOpen\}\s*<ProjectPlotProfileReview/);
   assert.match(component,/reads\.track\(client\.ReviewProjectPlotProfile\(\)\)/);
   assert.match(component,/allowEditing \? reads\.track\(client\.ListProjectPlotProfileChoices\(\)\)/);

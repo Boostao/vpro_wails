@@ -51,12 +51,13 @@
     if (restorationOpen) return restorationEditor?.getCloseState() ?? {
       unsaved: true, busy, canSave: false, error, saveReason: 'Finish or dismiss metadata restoration before closing.'
     };
-    return { unsaved: true, busy, canSave: false, error,
+    return { unsaved: true, busy, canSave: false, error, blocked: committedFailure || errors.length > 0,
       saveReason: 'Save or Undo metadata explicitly, then close metadata review before saving or closing the plot.' };
   }
   export function undo() {
     if (restorationOpen) { restorationEditor?.undo(); return; }
     if (busy) { error = 'Wait for the current metadata operation before Undo.'; return; }
+    if (committedFailure) { error = 'Reload the committed metadata refresh before Undo or close; completed writes must not be replayed.'; return; }
     if (template) {
       template = null; error = null; success = 'Template creation proposal undone; no record, identity or history was allocated.';
     } else if (blank) {
@@ -130,6 +131,8 @@
     const request = ++generation;
     reads.cancelAll(); reading = true; ready = false; error = null;
     try {
+      if (committedFailure) await oncommitted();
+      if (request !== generation) return;
       const [next, definitions] = await Promise.all([
         reads.track(client.ReviewProjectMetadata(plot)), reads.track(client.ListProjectMetadataFields()),
       ]);
@@ -188,7 +191,7 @@
     } finally { saving = false; }
   }
   function close() {
-    if (busy || dirty || errors.length) { error = 'Save or Undo metadata drafts before closing; invalid raw entries cannot be discarded implicitly.'; return; }
+    if (busy || dirty || errors.length || committedFailure) { error = 'Save or Undo metadata drafts, or reload the committed refresh before closing; invalid raw entries and recovery cannot be discarded implicitly.'; return; }
     onclosed();
   }
   function summary(row: import('../bindings/github.com/boostao/vpro-wails').ProjectMetadataRow, master = false) {
@@ -224,7 +227,7 @@
     <button type="button" onclick={reload} disabled={busy || dirty}>Reload metadata and references</button>
     <button type="button" onclick={undo} disabled={busy || committedFailure}>Undo metadata drafts</button>
     <button type="button" onclick={save} disabled={!ready || busy || !draft || !dirty || errors.length > 0 || committedFailure || standardPreview || standardDecision && !draft?.standardPopulation}>Save metadata</button>
-    <button type="button" onclick={close} disabled={busy || dirty || errors.length > 0}>Close metadata review</button>
+    <button type="button" onclick={close} disabled={busy || dirty || errors.length > 0 || committedFailure}>Close metadata review</button>
   </div>
   <fieldset disabled={!ready || busy || dirty || committedFailure}><legend>Select an existing physical record explicitly</legend>
     {#each rows as row (row.rowId)}

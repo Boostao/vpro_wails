@@ -25,11 +25,12 @@ func run(args []string, output io.Writer) error {
 	source := flags.String("source", "", "Read-only Access SaveAsText export root")
 	out := flags.String("out", "", "JSON output outside the source subtree (existing directory)")
 	form := flags.String("form", "", "Root form definition, e.g. FS882-6x4XL")
+	report := flags.String("report", "", "Root report definition; mutually exclusive with -form")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
-	if *source == "" || *out == "" || *form == "" || flags.NArg() != 0 {
-		return fmt.Errorf("usage: fs882layout -source EXPORT_ROOT -out LAYOUT.json -form FS882-6x4XL")
+	if *source == "" || *out == "" || (*form == "") == (*report == "") || flags.NArg() != 0 {
+		return fmt.Errorf("usage: fs882layout -source EXPORT_ROOT -out LAYOUT.json (-form FORM | -report REPORT)")
 	}
 	sourcePath, err := filepath.Abs(*source)
 	if err != nil {
@@ -43,7 +44,12 @@ func run(args []string, output io.Writer) error {
 	if err != nil {
 		return err
 	}
-	layout, err := fs882layout.Build(sourcePath, *form)
+	var layout *fs882layout.Layout
+	if *report != "" {
+		layout, err = fs882layout.BuildReport(sourcePath, *report)
+	} else {
+		layout, err = fs882layout.Build(sourcePath, *form)
+	}
 	if err != nil {
 		return err
 	}

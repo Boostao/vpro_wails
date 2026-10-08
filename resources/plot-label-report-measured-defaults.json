@@ -1,0 +1,464 @@
+{
+  "geometryUnit": "twips",
+  "provenance": "Measured missing built-in properties in macro-disabled Access Design view; no printer output",
+  "exportedFactsPreservedSeparately": true,
+  "reports": [
+    {
+      "name": "USysBecLabels",
+      "sourceSHA256": "b5779398241ed783a9a3c5011861cb695605c05d5201e21ec2af009c7113d94f",
+      "controls": [
+        {
+          "name": "MyPlotNumber",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "MyRepresenting",
+          "properties": {}
+        },
+        {
+          "name": "Zone",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Date",
+          "properties": {}
+        },
+        {
+          "name": "ProjectID",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "RK",
+          "properties": {
+            "FontWeight": 400
+          }
+        }
+      ]
+    },
+    {
+      "name": "USysBecLabelsAll",
+      "sourceSHA256": "ecbc1ffbe01e0cd2d66836c4301ed1e173de7e468cd4743d27ef9b4ac038f1c2",
+      "controls": [
+        {
+          "name": "MyPlotNumber",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "MyRepresenting",
+          "properties": {}
+        },
+        {
+          "name": "Zone",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Date",
+          "properties": {}
+        },
+        {
+          "name": "ProjectID",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "RK",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text6",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text7",
+          "properties": {}
+        },
+        {
+          "name": "Text8",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text9",
+          "properties": {}
+        },
+        {
+          "name": "Text10",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label11",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text12",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text13",
+          "properties": {}
+        },
+        {
+          "name": "Text14",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text15",
+          "properties": {}
+        },
+        {
+          "name": "Text16",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label17",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text18",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text19",
+          "properties": {}
+        },
+        {
+          "name": "Text20",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text21",
+          "properties": {}
+        },
+        {
+          "name": "Text22",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label23",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text24",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text25",
+          "properties": {}
+        },
+        {
+          "name": "Text26",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text27",
+          "properties": {}
+        },
+        {
+          "name": "Text28",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label29",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text30",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text31",
+          "properties": {}
+        },
+        {
+          "name": "Text32",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text33",
+          "properties": {}
+        },
+        {
+          "name": "Text34",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label35",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text36",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text37",
+          "properties": {}
+        },
+        {
+          "name": "Text38",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text39",
+          "properties": {}
+        },
+        {
+          "name": "Text40",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label41",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text42",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text43",
+          "properties": {}
+        },
+        {
+          "name": "Text44",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text45",
+          "properties": {}
+        },
+        {
+          "name": "Text46",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label47",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text48",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text49",
+          "properties": {}
+        },
+        {
+          "name": "Text50",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text51",
+          "properties": {}
+        },
+        {
+          "name": "Text52",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label53",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text54",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text55",
+          "properties": {}
+        },
+        {
+          "name": "Text56",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text57",
+          "properties": {}
+        },
+        {
+          "name": "Text58",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label59",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text60",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text61",
+          "properties": {}
+        },
+        {
+          "name": "Text62",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text63",
+          "properties": {}
+        },
+        {
+          "name": "Text64",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label65",
+          "properties": {
+            "FontWeight": 400
+          }
+        },
+        {
+          "name": "Text66",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text67",
+          "properties": {}
+        },
+        {
+          "name": "Text68",
+          "properties": {
+            "Height": 240
+          }
+        },
+        {
+          "name": "Text69",
+          "properties": {}
+        },
+        {
+          "name": "Text70",
+          "properties": {
+            "Height": 240,
+            "FontSize": 8,
+            "TextAlign": 0
+          }
+        },
+        {
+          "name": "Label71",
+          "properties": {
+            "FontWeight": 400
+          }
+        }
+      ]
+    }
+  ],
+  "matchedExportedProperties": 546,
+  "measuredOmittedProperties": 78,
+  "noPrintPreviewOrDataWrites": true
+}

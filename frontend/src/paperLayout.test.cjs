@@ -29,6 +29,50 @@ function load(mutate = () => {}) {
   return exports;
 }
 
+test('source page projection accepts exact two-page metadata without inheriting XL switching geometry', () => {
+  const api = load();
+  const before = JSON.stringify(api.paperPage('Vegetation', 'height'));
+  for (const [file, form] of [['fs882-two-page-layout.json', 'FS882-8x6XL'],
+    ['fs882-two-page-chars-layout.json', 'FS882-8x6XL-CHARS']]) {
+    const definition = JSON.parse(readFileSync(path.join(__dirname, '..', '..', 'resources', file), 'utf8'));
+    const parent = definition.forms.find(source => source.name === form);
+    for (const name of ['Site/Veg', 'Soil/Terrain']) {
+      const page = api.sourcePaperPage(parent, name);
+      assert.equal(page.sha256, parent.sha256);
+      assert.equal(page.source, parent.source);
+      assert.ok(page.width > 0 && page.height > 0);
+      assert.ok(page.controls.length > 0);
+      assert.ok(page.controls.every(control => control.pageId === `form:${form}/${name}`));
+      assert.equal(JSON.stringify(api.sourcePaperPage(parent, name, 'height')), JSON.stringify(page),
+        'two-page source must not inherit XL cover/height layout transformations');
+    }
+    const site = api.sourcePaperPage(parent, 'Site/Veg');
+    assert.ok(site.controls.some(control => control.column === 'PlotType' && control.type === 'ComboBox'));
+    assert.ok(site.controls.some(control => control.column === 'SV_StandAgeEstMeas' && control.type === 'OptionGroup'));
+    assert.equal(site.controls.some(control => control.column === 'SV_StandHeightEstMeas'), form.endsWith('-CHARS'));
+    assert.equal(site.controls.some(control => control.column === 'EnteredBy' || control.column === 'UpdatedFromCards'), form.endsWith('-CHARS'));
+    assert.throws(() => api.sourcePaperPage(parent, 'Vegetation'), /missing/);
+  }
+  assert.equal(JSON.stringify(api.paperPage('Vegetation', 'height')), before);
+});
+
+test('two-page source coordinate visibility reuses only the accepted coordinate mode overrides', () => {
+  const api = load();
+  const parent = JSON.parse(readFileSync(path.join(__dirname, '..', '..', 'resources', 'fs882-two-page-layout.json'), 'utf8')).forms[0];
+  const original = JSON.stringify(parent);
+  for (const [mode, present, absent] of [
+    ['dd', ['Latitude', 'Longitude'], ['LatD', 'LatMD']],
+    ['dm', ['LatD2', 'LatMD', 'LonD2', 'LonMD'], ['Latitude', 'Longitude', 'LatS']],
+    ['dms', ['LatD', 'LatM', 'LatS', 'LonD', 'LonM', 'LonS'], ['Latitude', 'Longitude', 'LatMD']],
+  ]) {
+    const page = api.sourcePaperPage(parent, 'Site/Veg', 'initial', mode);
+    for (const name of present) assert.ok(page.controls.some(control => control.controlName === name), `${mode}:${name}`);
+    for (const name of absent) assert.ok(!page.controls.some(control => control.controlName === name), `${mode}:${name}`);
+  }
+  assert.equal(JSON.stringify(parent), original, 'projection must not rewrite packaged source metadata');
+  assert.throws(() => api.sourcePaperPage(parent, 'Site/Veg', 'initial', 'unknown'), /Invalid coordinate/);
+});
+
 test('Site retains source bounds, attached labels and omitted built-in extents', () => {
   const page = load().paperPage('Site');
   assert.equal(page.width, 951);

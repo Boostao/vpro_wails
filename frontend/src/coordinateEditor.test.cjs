@@ -9,7 +9,7 @@ const source = readFileSync(path.join(__dirname, 'coordinateEditor.ts'), 'utf8')
 const moduleExports = {};
 vm.runInNewContext(ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText,
   { exports: moduleExports, structuredClone });
-const { CoordinateEditor, coordinateParts, isCoordinateControl, coordinateSession, rememberCoordinateSession, coordinateBusy } = moduleExports;
+const { CoordinateEditor, coordinateParts, coordinateDecimalValue, isCoordinateControl, coordinateSession, rememberCoordinateSession, coordinateBusy } = moduleExports;
 const buffers = (degrees = '', minutes = '', seconds = '', negative = false) => ({ degrees, minutes, seconds, negative });
 const tick = () => new Promise(resolve => setImmediate(resolve));
 function deferred() { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; }
@@ -54,6 +54,26 @@ test('typed parts preserve signed DD, NULL and whole-magnitude sign', () => {
   }
   for (const text of [' ', '1e', 'Infinity', '91', 'not-number']) assert.throws(() => coordinateParts('latitude', 'dd', buffers(text)));
   assert.equal(coordinateParts('longitude', 'dd', buffers('-180')).degrees, -180);
+});
+test('scoped DD parsing preserves raw precision and unchanged historical values without a preference lifecycle', () => {
+  for (const [axis, limit] of [['latitude', 90], ['longitude', 180]]) {
+    for (const raw of ['', String(limit), String(-limit), '-0', '+1.1234567890123', '1e1']) {
+      const parsed = coordinateDecimalValue(axis, raw, null);
+      assert.equal(parsed.raw, raw);
+      assert.equal(parsed.error, null);
+      assert.equal(parsed.value, raw === '' ? null : Number(raw));
+    }
+    assert.equal(Object.is(coordinateDecimalValue(axis, '-0', null).value, -0), true);
+    assert.equal(coordinateDecimalValue(axis, '4e2', 400).value, 400);
+    for (const raw of [' ', '0x10', '1e', 'NaN', 'Infinity', '1e309', String(limit + .000001)]) {
+      const parsed = coordinateDecimalValue(axis, raw, null);
+      assert.equal(parsed.raw, raw);
+      assert.equal(parsed.value, null);
+      assert.ok(parsed.error);
+    }
+    assert.equal(coordinateDecimalValue(axis, '0x10', 16).error, `Enter a finite ${axis} degrees.`);
+    assert.equal(coordinateDecimalValue(axis, '1e', null).error, `Enter a finite ${axis} degrees.`);
+  }
 });
 test('preference and decomposition never change draft values or mark dirty', async () => {
   const { editor, events } = setup();

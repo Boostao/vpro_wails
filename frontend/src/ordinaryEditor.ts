@@ -35,7 +35,9 @@ export type OrdinaryField = typeof allOrdinaryFields[number];
 export type OrdinaryScope = OrdinaryField['scope'];
 export type OrdinaryKey = OrdinaryField['key'];
 export type OrdinaryTextField = Extract<OrdinaryField, { kind: 'text' | 'memo' }>;
+export type OrdinaryTextPolicy = { label: string; kind: 'text'; maximum: number } | { label: string; kind: 'memo' };
 export type OrdinaryNumberField = Extract<OrdinaryField, { kind: 'integer' | 'single' }>;
+export type OrdinaryNumberPolicy = { label: string; kind: 'integer' | 'single' };
 export type OrdinaryValues = Pick<FS882Header, OrdinaryKey>;
 export interface OrdinaryCell { raw: string; value: number | null; error: string | null }
 export type OrdinaryDrafts = Partial<Record<OrdinaryNumberField['key'], OrdinaryCell>>;
@@ -43,7 +45,7 @@ export type OrdinaryDrafts = Partial<Record<OrdinaryNumberField['key'], Ordinary
 export function ordinaryField(column: string | undefined): OrdinaryField | undefined {
   return allOrdinaryFields.find(field => field.column === column);
 }
-export function ordinaryTextError(field: OrdinaryTextField, value: string | null, original: string | null): string | null {
+export function ordinaryTextError(field: OrdinaryTextPolicy, value: string | null, original: string | null): string | null {
   if (value === null || value === original) return null;
   if (value === '') return `Clear ${field.label} to NULL instead of an empty string.`;
   if (!wellFormedUTF16(value)) return `${field.label} contains an incomplete Unicode character.`;
@@ -52,7 +54,7 @@ export function ordinaryTextError(field: OrdinaryTextField, value: string | null
   }
   return null;
 }
-export function ordinaryNumberValue(field: OrdinaryNumberField, raw: string, original: number | null): OrdinaryCell {
+export function ordinaryNumberValue(field: OrdinaryNumberPolicy, raw: string, original: number | null): OrdinaryCell {
   const parsed = finiteSingleValue(field.label, raw, original);
   if (field.kind === 'integer' && parsed.error === null && parsed.value !== null &&
     (!Number.isInteger(parsed.value) || (parsed.value !== original && (parsed.value < -32768 || parsed.value > 32767)))) {

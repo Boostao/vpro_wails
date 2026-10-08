@@ -39,13 +39,14 @@ type VegetationReportObservation struct {
 }
 
 type VegetationReportPreparation struct {
-	Project      string                        `json:"project"`
-	SU           string                        `json:"su"`
-	CoverColumns []string                      `json:"coverColumns"`
-	Memberships  []VegetationReportMembership  `json:"memberships"`
-	Layers       []VegetationReportLayer       `json:"layers"`
-	ReducedRows  []VegetationReportReducedRow  `json:"reducedRows"`
-	Observations []VegetationReportObservation `json:"observations"`
+	Project                 string                        `json:"project"`
+	SU                      string                        `json:"su"`
+	CoverColumns            []string                      `json:"coverColumns"`
+	Memberships             []VegetationReportMembership  `json:"memberships"`
+	Layers                  []VegetationReportLayer       `json:"layers"`
+	ReducedRows             []VegetationReportReducedRow  `json:"reducedRows"`
+	Observations            []VegetationReportObservation `json:"observations"`
+	qualityMembershipCounts map[string]int
 }
 
 func longVegetationCoverColumns() []string {

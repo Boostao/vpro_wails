@@ -81,8 +81,56 @@ export function GetLongEnvironmentOptions(contextID: string): $CancellablePromis
     return $Call.ByID(3203512685, contextID);
 }
 
+export function GetLongVegetationOptions(contextID: string): $CancellablePromise<$models.LongVegetationOptions> {
+    return $Call.ByID(2160778518, contextID);
+}
+
 export function GetPlot(contextID: string, plot: string): $CancellablePromise<$models.FS882Header | null> {
     return $Call.ByID(2787654197, contextID, plot);
+}
+
+export function GetPlotLocationReview(contextID: string): $CancellablePromise<$models.PlotLocationReview | null> {
+    return $Call.ByID(4147890270, contextID);
+}
+
+export function GetProjectTableCSVReview(contextID: string, table: string): $CancellablePromise<$models.ProjectTableCSVReview | null> {
+    return $Call.ByID(1325296887, contextID, table);
+}
+
+export function GetSIVIParentActionOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentProjection | null> {
+    return $Call.ByID(3334566454, contextID, plot);
+}
+
+export function GetSIVIParentDirectOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentProjection | null> {
+    return $Call.ByID(4106383313, contextID, plot);
+}
+
+export function GetSIVIParentJoinReview(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentJoinReview | null> {
+    return $Call.ByID(4016192195, contextID, plot);
+}
+
+export function GetSIVIParentOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentProjection | null> {
+    return $Call.ByID(1022342976, contextID, plot);
+}
+
+export function GetSIVIProjectAssignmentOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIProjectAssignmentOriginal | null> {
+    return $Call.ByID(1326648454, contextID, plot);
+}
+
+export function GetSIVIProjectIDChoices(contextID: string): $CancellablePromise<$models.SIVIProjectChoices | null> {
+    return $Call.ByID(3430452039, contextID);
+}
+
+export function GetSIVIVegetation(contextID: string, plot: string, extended: boolean): $CancellablePromise<$models.SIVIVegetationProjection[] | null> {
+    return $Call.ByID(2362715051, contextID, plot, extended);
+}
+
+export function GetSiteUnitSummaryOptions(contextID: string): $CancellablePromise<$models.SiteUnitSummaryOptions> {
+    return $Call.ByID(1799826469, contextID);
+}
+
+export function GetVegetationReadAvailability(contextID: string, plot: string): $CancellablePromise<$models.VegetationReadAvailability | null> {
+    return $Call.ByID(2293660121, contextID, plot);
 }
 
 export function ListAuditEntries(contextID: string, plot: string): $CancellablePromise<$models.AuditEntry[] | null> {
@@ -153,12 +201,44 @@ export function PreviewLongEnvironment(contextID: string, request: $models.LongE
     return $Call.ByID(3771463957, contextID, request);
 }
 
+export function PreviewLongVegetation(contextID: string): $CancellablePromise<$models.LongVegetationPreview> {
+    return $Call.ByID(3202635744, contextID);
+}
+
+export function PreviewSiteUnitSummary(contextID: string, request: $models.SiteUnitSummaryRequest): $CancellablePromise<$models.SiteUnitSummaryPreview> {
+    return $Call.ByID(639495149, contextID, request);
+}
+
+export function PreviewSiteUnitSummaryLifeforms(contextID: string, request: $models.SiteUnitSummaryRequest): $CancellablePromise<$models.SiteUnitSummaryPreview> {
+    return $Call.ByID(747248442, contextID, request);
+}
+
+export function PreviewSiteUnitSummarySpecies(contextID: string, request: $models.SiteUnitSpeciesListRequest): $CancellablePromise<$models.SiteUnitSpeciesListPreview> {
+    return $Call.ByID(927926337, contextID, request);
+}
+
 export function ResolveProjectPlotProfileNavigation(contextID: string, request: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProjectPlotProfileNavigation> {
     return $Call.ByID(3203258907, contextID, request);
 }
 
 export function RestoreProjectMetadata(contextID: string, request: $models.ProjectMetadataRestore): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(685958956, contextID, request);
+}
+
+export function RestoreSIVIHeights(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(2974312123, contextID, plot, historyID, action);
+}
+
+export function RestoreSIVIParentActions(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(2453265924, contextID, plot, historyID, action);
+}
+
+export function RestoreSIVIParentDirect(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(2012647100, contextID, plot, historyID, action);
+}
+
+export function RestoreSIVIProjectAssignment(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(1243337619, contextID, plot, historyID, action);
 }
 
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
@@ -245,6 +325,22 @@ export function SaveProjectPlotProfileSUInProject(contextID: string, request: $m
     return $Call.ByID(2218873064, contextID, request);
 }
 
+export function SaveSIVIHeights(contextID: string, plot: string, extended: boolean, original: $models.SIVIVegetationProjection[] | null, edits: $models.SIVIHeightEdit[] | null): $CancellablePromise<$models.SIVIHeightWriteResult | null> {
+    return $Call.ByID(4150680302, contextID, plot, extended, original, edits);
+}
+
+export function SaveSIVIParentActions(contextID: string, plot: string, request: $models.SIVIParentActionWrite): $CancellablePromise<$models.SIVIParentActionSaveResult | null> {
+    return $Call.ByID(633791945, contextID, plot, request);
+}
+
+export function SaveSIVIParentDirect(contextID: string, plot: string, request: $models.SIVIParentDirectWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {
+    return $Call.ByID(2639883219, contextID, plot, request);
+}
+
+export function SaveSIVIProjectAssignment(contextID: string, plot: string, request: $models.SIVIProjectAssignmentWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {
+    return $Call.ByID(3061670770, contextID, plot, request);
+}
+
 export function SaveSpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(1191229246, contextID, updates);
 }
@@ -263,6 +359,10 @@ export function SetAuditRestoreSelection(contextID: string, plot: string, rowIDs
 
 export function SetPlotProfileEditing(expectedID: string, request: $models.PlotProfileWriteRequest): $CancellablePromise<$models.ProjectState> {
     return $Call.ByID(1839630602, expectedID, request);
+}
+
+export function SetSIVIProjectIDSource(contextID: string, expected: number, source: number): $CancellablePromise<$models.SIVIProjectChoices | null> {
+    return $Call.ByID(3729314756, contextID, expected, source);
 }
 
 export function SwitchContext(expectedID: string, requested: $models.ContextSelection): $CancellablePromise<$models.ProjectState> {

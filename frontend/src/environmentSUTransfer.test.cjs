@@ -64,7 +64,8 @@ test('SU transfer remains independently gated and shared lifecycle guards preven
   }
   const panel=read('EnvironmentSUTransfer.svelte'), root=read('FS882Form.svelte');
   assert.match(root,/VITE_SOURCE_ENV_SU_TRANSFER === 'true'/);
-  assert.match(root,/headerWorkflowBusy = \$derived\([^;]+environmentSUOpen/);
+  assert.match(root,/otherHeaderWorkflowBusy = \$derived\([^;]+environmentSUOpen/);
+  assert.match(root,/headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
   assert.match(root,/if \(environmentSUOpen\) return environmentSUEditor\?\.getCloseState/);
   assert.match(root,/if \(environmentSUOpen\) \{ environmentSUEditor\?\.undo/);
   assert.match(root,/data-source-control="btnEnvIntoSu"/);

@@ -202,6 +202,27 @@ export interface EnvironmentSiteUnitTransfer {
     "confirmed": boolean;
 }
 
+export interface EnvironmentWorkbookOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface EnvironmentWorkbookReview {
+    "preview": LongEnvironmentPreview;
+    "sheets": EnvironmentWorkbookSheet[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
+export interface EnvironmentWorkbookSheet {
+    "unit": string;
+    "name": string;
+}
+
 /**
  * FS882Header captures the unified Env + Admin join record for a plot.
  */
@@ -323,6 +344,88 @@ export interface GeologyCodeChoice {
     "diagnostic": string;
 }
 
+export interface GoogleEarthDescriptionFields {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "envTable": string;
+    "fields": ProjectMetadataColumn[] | null;
+}
+
+export interface GoogleEarthKMLExportOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface GoogleEarthKMLExportReview {
+    "review": GoogleEarthKMLReview;
+    "approvalHash": string;
+    "kmlSHA256": string;
+}
+
+export interface GoogleEarthKMLReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "descriptionField": string;
+    "title": string;
+    "placemarkCount": number;
+    "byteCount": number;
+    "kml": string;
+}
+
+export interface GoogleEarthPreferenceValues {
+    "title": string;
+    "descriptionField": string;
+}
+
+export interface GoogleEarthPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface GoogleEarthPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": GoogleEarthPreferenceValues;
+}
+
+export interface GoogleEarthReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "descriptionField": string;
+    "fields": EnvironmentReportField[] | null;
+    "offset": number;
+    "limit": number;
+    "totalRows": number;
+    "rows": GoogleEarthReviewRow[] | null;
+}
+
+export interface GoogleEarthReviewRow {
+    "envRowId": string;
+    "membershipRowId": string;
+    "plotNumber": ProjectMetadataCell;
+    "storedLongitude": ProjectMetadataCell;
+    "longitude": ProjectMetadataCell;
+    "latitude": ProjectMetadataCell;
+    "description": ProjectMetadataCell;
+}
+
 /**
  * HeightRecordUpdate patches existing vegetation values; nil explicitly means
  * SQL NULL. Expected contains the same keys, using values returned by SQLite.
@@ -368,6 +471,78 @@ export interface HumusRecord {
     "vonPost": number | null;
 }
 
+export interface LifeformSummaryCatalogueRow {
+    "rowId": string;
+    "lifeform": number;
+    "label": ProjectMetadataCell;
+    "definition": ProjectMetadataCell;
+    "shortName": ProjectMetadataCell;
+}
+
+export interface LifeformSummaryEntry {
+    "plotNumber": string;
+    "species": string;
+    "lifeform": number;
+    "cover": number;
+    "insertSuRowId": string;
+    "speciesRowId": string;
+    "projectId": ProjectMetadataCell;
+}
+
+export interface LifeformSummaryPreview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "report": LifeformSummaryReport;
+}
+
+export interface LifeformSummaryReport {
+    "project": string;
+    "su": string;
+    "querySource": string;
+    "ordering": string;
+    "memberships": VegetationReportMembership[] | null;
+    "entries": LifeformSummaryEntry[] | null;
+    "catalogue": LifeformSummaryCatalogueRow[] | null;
+    "units": LifeformSummaryUnit[] | null;
+}
+
+export interface LifeformSummaryRow {
+    "catalogueRowId": string;
+    "lifeform": number;
+    "plotGroups": number;
+    "coverCount": number;
+    "presence": number | null;
+    "meanCover": number | null;
+}
+
+export interface LifeformSummaryUnit {
+    "code": ProjectMetadataCell;
+    "nPlots": number;
+    "suRowIds": string[] | null;
+    "uniqueSpecies": number;
+    "occurrences": number;
+    "rows": LifeformSummaryRow[] | null;
+}
+
+export interface LifeformWorkbookOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface LifeformWorkbookReview {
+    "lifeform": LifeformSummaryPreview;
+    "attributes": SpeciesAttributeSummaryPreview;
+    "details": boolean[] | null;
+    "sheets": VegetationWorkbookSheet[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
 export interface ListItem {
     "listName": string;
     "item": string;
@@ -381,6 +556,26 @@ export interface LongEnvironmentOptions {
     "title": string;
 }
 
+export interface LongEnvironmentPreferenceValues {
+    "title": string;
+}
+
+export interface LongEnvironmentPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface LongEnvironmentPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": LongEnvironmentPreferenceValues;
+}
+
 export interface LongEnvironmentPreview {
     "contextId": string;
     "projectPath": string;
@@ -390,6 +585,111 @@ export interface LongEnvironmentPreview {
 
 export interface LongEnvironmentRequest {
     "title": string;
+}
+
+export interface LongVegetationDiagnostic {
+    "code": string;
+    "identity": string;
+    "count": number;
+}
+
+export interface LongVegetationOptions {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "settings": LongVegetationSettings;
+}
+
+export interface LongVegetationPlot {
+    "plotNumber": string;
+    "cover": number | null;
+}
+
+export interface LongVegetationPreview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "settings": LongVegetationSettings;
+    "report": LongVegetationReport;
+}
+
+export interface LongVegetationQualityCriterion {
+    "minimum": string;
+    "includeNull": boolean;
+}
+
+export interface LongVegetationQualityOccurrence {
+    "membershipId": string;
+    "plotNumber": ProjectMetadataCell;
+    "siteUnit": ProjectMetadataCell;
+    "envRowId": string;
+    "adminRowId": string;
+    "listRowIds": (string | null)[];
+    "values": ProjectMetadataCell[];
+}
+
+export interface LongVegetationQualityReference {
+    "rowId": string;
+    "item": ProjectMetadataCell;
+    "listName": ProjectMetadataCell;
+    "itemOrder": ProjectMetadataCell;
+}
+
+export interface LongVegetationQualitySelection {
+    "thresholdRowIds": (string[] | null)[];
+    "occurrences": LongVegetationQualityOccurrence[] | null;
+    "excludedMembershipIds": string[] | null;
+    "references": LongVegetationQualityReference[] | null;
+}
+
+export interface LongVegetationQualitySettings {
+    "site": LongVegetationQualityCriterion;
+    "veg": LongVegetationQualityCriterion;
+    "soil": LongVegetationQualityCriterion;
+}
+
+export interface LongVegetationReport {
+    "project": string;
+    "su": string;
+    "title": string;
+    "units": LongVegetationUnit[] | null;
+    "diagnostics": LongVegetationDiagnostic[] | null;
+    "quality": LongVegetationQualitySelection | null;
+}
+
+export interface LongVegetationRow {
+    "layer": ProjectMetadataCell;
+    "species": ProjectMetadataCell;
+    "englishName": ProjectMetadataCell;
+    "matchedName": ProjectMetadataCell;
+    "presence": number | null;
+    "meanCover": number | null;
+    "plots": LongVegetationPlot[] | null;
+}
+
+export interface LongVegetationSettings {
+    "title": string;
+    "grouping": string;
+    "average": string;
+    "constantSpeciesList": boolean;
+    "presenceGreaterThan": number;
+    "meanCoverGreaterThan": number;
+    "order": string;
+    "showEnglishName": boolean;
+    "showSpeciesCode": boolean;
+    "quality": LongVegetationQualitySettings | null;
+}
+
+export interface LongVegetationUnit {
+    "code": ProjectMetadataCell;
+    "longName": string | null;
+    "nameStatus": string;
+    "nameCandidates": EnvironmentReportName[] | null;
+    "numPlots": number;
+    "membershipIds": string[] | null;
+    "rows": LongVegetationRow[] | null;
 }
 
 /**
@@ -471,6 +771,34 @@ export interface PersonalSpeciesDefinitionRequest {
     "scientificName": string | null;
     "lifeform": number | null;
     "englishName": string | null;
+}
+
+export type PictureImage = pictureImage;
+
+export type PictureMetadataReview = pictureMetadataReview;
+
+export type PictureMetadataWriteResult = pictureMetadataWriteResult;
+
+export interface PlotLocationReport {
+    "project": string;
+    "su": string;
+    "fields": EnvironmentReportField[] | null;
+    "rows": PlotLocationRow[] | null;
+}
+
+export interface PlotLocationReview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "report": PlotLocationReport;
+}
+
+export interface PlotLocationRow {
+    "envRowId": string;
+    "adminRowId": string;
+    "membershipRowIds": string[] | null;
+    "storedLongitude": ProjectMetadataCell;
+    "values": ProjectMetadataCell[] | null;
 }
 
 export interface PlotPage {
@@ -796,6 +1124,15 @@ export interface ProjectState {
     "plotProfile": PlotProfileSourceInfo;
 }
 
+export interface ProjectTableCSVReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "descriptionMetadataPresent": boolean;
+    "manifest": TableCSVManifest;
+    "csv": string;
+}
+
 export interface RegionCodeChoice {
     "rowId": string;
     "code": string | null;
@@ -810,6 +1147,207 @@ export interface RegionCodeChoice {
     "flag": boolean | null;
     "selectable": boolean;
     "diagnostic": string;
+}
+
+export interface SIVICoverWriteResult {
+    "ChangedCells": number;
+    "HistoryID": string;
+}
+
+export type SIVICreationResult = siviCreationResult;
+
+export type SIVICreationUndoHistoryList = siviCreationUndoHistoryList;
+
+export type SIVICreationUndoResult = siviCreationUndoResult;
+
+export type SIVICreationUndoReview = siviCreationUndoReview;
+
+export type SIVIDeletionHistoryList = siviDeletionHistoryList;
+
+export type SIVIDeletionOriginal = siviDeletionOriginal;
+
+export type SIVIDeletionRestorationResult = siviDeletionRestorationResult;
+
+export type SIVIDeletionRestorationReview = siviDeletionRestorationReview;
+
+export type SIVIDeletionResult = siviDeletionResult;
+
+export type SIVIDeletionTargets = siviDeletionTargets;
+
+export interface SIVIHeightEdit {
+    "rowId": string;
+    "form": string;
+    "column": string;
+    "expected": ProjectMetadataCell;
+    "value": ProjectMetadataCell;
+}
+
+export interface SIVIHeightWriteResult {
+    "ChangedCells": number;
+    "HistoryID": string;
+}
+
+export interface SIVIParentActionInput {
+    "contextId": string;
+    "controlId": string;
+    "table": string;
+    "rowId": string;
+    "expected": ProjectMetadataCell;
+    "option": number | null;
+}
+
+export interface SIVIParentActionSaveResult {
+    "ChangedCells": number;
+    "HistoryID": string;
+    "SourceRefreshRequired": boolean;
+}
+
+export interface SIVIParentActionWrite {
+    "original": SIVIParentProjection | null;
+    "actions": SIVIParentActionInput[] | null;
+}
+
+export interface SIVIParentBinding {
+    "ControlID": string;
+    "Binding": string;
+    "Table": string;
+    "Column": number;
+    "Implicit": boolean;
+}
+
+export interface SIVIParentCellEdit {
+    "contextId": string;
+    "table": string;
+    "rowId": string;
+    "column": string;
+    "expected": ProjectMetadataCell;
+    "value": ProjectMetadataCell;
+}
+
+export interface SIVIParentDirectWrite {
+    "original": SIVIParentProjection | null;
+    "scalars": SIVIParentCellEdit[] | null;
+    "options": SIVIParentCellEdit[] | null;
+    "text": SIVIParentCellEdit[] | null;
+    "categorical": SIVIParentCellEdit[] | null;
+}
+
+export interface SIVIParentJoinReview {
+    "ContextID": string;
+    "Project": string;
+    "Plot": string;
+    "Scope": string;
+    "Diagnostic": string;
+    "Verified": boolean;
+    "EnvRowIDs": string[] | null;
+    "AdminRowIDs": string[] | null;
+}
+
+export interface SIVIParentProjection {
+    "ContextID": string;
+    "Project": string;
+    "Plot": string;
+    "Form": string;
+    "Query": string;
+    "Membership": string;
+    "EnvTable": string;
+    "AdminTable": string;
+    "EnvColumns": ProjectMetadataColumn[] | null;
+    "AdminColumns": ProjectMetadataColumn[] | null;
+    "Bindings": SIVIParentBinding[] | null;
+    "Rows": SIVIParentRow[] | null;
+}
+
+export interface SIVIParentRow {
+    "Env": ProjectMetadataRow;
+    "Admin": ProjectMetadataRow;
+}
+
+export interface SIVIParentSharedReference {
+    "column": string;
+    "listName": string;
+    "required": boolean;
+    "source": string;
+    "available": boolean;
+    "diagnostic": string;
+    "definitions": ProjectMetadataTable;
+    "choices": SIVIParentSharedReferenceChoice[] | null;
+}
+
+export interface SIVIParentSharedReferenceChoice {
+    "rowId": string;
+    "code": string | null;
+    "description": string | null;
+    "selectable": boolean;
+    "diagnostic": string;
+}
+
+export interface SIVIParentSharedReferences {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "zone": ProjectMetadataCell;
+    "fields": SIVIParentSharedReference[] | null;
+}
+
+export interface SIVIParentSharedWrite {
+    "original": SIVIParentProjection | null;
+    "edits": SIVIParentCellEdit[] | null;
+}
+
+export interface SIVIParentWriteResult {
+    "ChangedCells": number;
+    "HistoryID": string;
+}
+
+export interface SIVIProjectAssignmentOriginal {
+    "Original": SIVIParentProjection | null;
+    "Choices": SIVIProjectChoices | null;
+    "AssignmentAvailable": boolean;
+    "AssignmentDiagnostic": string;
+}
+
+export interface SIVIProjectAssignmentWrite {
+    "original": SIVIParentProjection | null;
+    "selection": SIVIProjectSelection;
+}
+
+export interface SIVIProjectChoices {
+    "ContextID": string;
+    "Project": string;
+    "Source": string;
+    "Alias": string;
+    "Table": string;
+    "SourceOption": number;
+    "Choices": ProjectMetadataTable;
+}
+
+export interface SIVIProjectSelection {
+    "contextId": string;
+    "controlId": string;
+    "table": string;
+    "rowId": string;
+    "expected": ProjectMetadataCell;
+    "sourceOption": number;
+    "metadataAlias": string;
+    "metadataTable": string;
+    "metadataColumns": ProjectMetadataColumn[] | null;
+    "metadataOriginal": ProjectMetadataRow;
+}
+
+export interface SIVISpeciesReferences {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "master": ProjectMetadataTable;
+    "personal": ProjectMetadataTable;
+}
+
+export interface SIVIVegetationProjection {
+    "Form": string;
+    "Query": string;
+    "Columns": string[] | null;
+    "Rows": ProjectMetadataRow[] | null;
 }
 
 export interface SUInfo {
@@ -880,6 +1418,160 @@ export interface SiteUnitEnvironmentTransfer {
     "confirmed": boolean;
 }
 
+export interface SiteUnitSpeciesListGroup {
+    "index": number;
+    "caption": string;
+    "rows": SiteUnitSpeciesListRow[] | null;
+}
+
+export interface SiteUnitSpeciesListPreview {
+    "environment": SiteUnitSummaryPreview;
+    "options": SiteUnitSpeciesListRequest;
+    "units": SiteUnitSpeciesListUnit[] | null;
+}
+
+export interface SiteUnitSpeciesListRequest {
+    "method": number;
+    "orderBy": number;
+    "coverCalculation": number;
+    "andOr": number;
+    "presenceGreaterThan": number;
+    "coverGreaterThan": number;
+}
+
+export interface SiteUnitSpeciesListRow {
+    "species": string;
+    "scientificName": ProjectMetadataCell;
+    "englishName": ProjectMetadataCell;
+    "codeType": ProjectMetadataCell | null;
+    "cover": string;
+    "presence": string;
+    "physicalValues": number;
+    "included": boolean;
+    "referenceRowIds": string[] | null;
+}
+
+export interface SiteUnitSpeciesListUnit {
+    "code": string;
+    "nPlots": number;
+    "groups": SiteUnitSpeciesListGroup[] | null;
+}
+
+export interface SiteUnitSummaryExtendedWorkbookOptions {
+    "method": number;
+    "orderBy": number;
+    "includeSpecies": number;
+    "coverCalculation": number;
+    "andOr": number;
+    "presenceGreaterThan": number;
+    "coverGreaterThan": number;
+}
+
+export interface SiteUnitSummaryExtendedWorkbookReview {
+    "environment": SiteUnitSummaryPreview;
+    "species": SiteUnitSpeciesListPreview | null;
+    "scope": SiteUnitSummaryWorkbookScope;
+    "options": SiteUnitSummaryExtendedWorkbookOptions;
+    "sheets": VegetationWorkbookSheet[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
+export interface SiteUnitSummaryField {
+    "source": string;
+    "key": string;
+    "label": string;
+    "section": string;
+    "kind": string;
+}
+
+export interface SiteUnitSummaryMembership {
+    "rowId": string;
+    "plotNumber": ProjectMetadataCell;
+    "siteUnit": ProjectMetadataCell;
+    "joinedRows": number;
+    "status": string;
+}
+
+export interface SiteUnitSummaryOptions {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "method": number;
+    "siteUnitType": number;
+}
+
+export interface SiteUnitSummaryPlot {
+    "plotNumber": string;
+    "suRowId": string;
+    "envRowId": string;
+    "adminRowId": string;
+}
+
+export interface SiteUnitSummaryPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface SiteUnitSummaryPreview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "report": SiteUnitSummaryReport;
+}
+
+export interface SiteUnitSummaryReport {
+    "project": string;
+    "su": string;
+    "method": number;
+    "querySource": string;
+    "fields": SiteUnitSummaryField[] | null;
+    "units": SiteUnitSummaryUnit[] | null;
+    "memberships": SiteUnitSummaryMembership[] | null;
+}
+
+export interface SiteUnitSummaryRequest {
+    "method": number;
+}
+
+export interface SiteUnitSummaryUnit {
+    "code": string;
+    "longName": string | null;
+    "nameStatus": string;
+    "nameCandidates": EnvironmentReportName[] | null;
+    "plots": SiteUnitSummaryPlot[] | null;
+    "values": string[] | null;
+}
+
+export interface SiteUnitSummaryWorkbookOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface SiteUnitSummaryWorkbookReview {
+    "preview": SiteUnitSummaryPreview;
+    "scope": SiteUnitSummaryWorkbookScope;
+    "sheets": VegetationWorkbookSheet[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
+export interface SiteUnitSummaryWorkbookScope {
+    "savedMethod": number;
+    "siteUnitType": number;
+    "orderBy": number;
+    "includeSpecies": number;
+}
+
 export interface SoilCodeChoice {
     "rowId": string;
     "code": string | null;
@@ -926,6 +1618,52 @@ export interface SoilTextUpdate {
     "expected": string | null;
 }
 
+export interface SpeciesAttributeCount {
+    "field": string;
+    "count": number | null;
+    "plotOccurrences": number;
+    "categories": (number | null)[] | null;
+}
+
+export interface SpeciesAttributeDefinition {
+    "field": string;
+    "label": string;
+    "categories": string[] | null;
+}
+
+export interface SpeciesAttributeMatch {
+    "suRowId": string;
+    "vegRowId": string;
+    "attributeRowId": string;
+    "plotNumber": string;
+    "species": string;
+    "values": ProjectMetadataCell[] | null;
+}
+
+export interface SpeciesAttributeSummaryPreview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "report": SpeciesAttributeSummaryReport;
+}
+
+export interface SpeciesAttributeSummaryReport {
+    "project": string;
+    "su": string;
+    "querySource": string;
+    "definitions": SpeciesAttributeDefinition[] | null;
+    "memberships": VegetationReportMembership[] | null;
+    "matches": SpeciesAttributeMatch[] | null;
+    "units": SpeciesAttributeUnit[] | null;
+}
+
+export interface SpeciesAttributeUnit {
+    "code": ProjectMetadataCell;
+    "nPlots": number;
+    "suRowIds": string[] | null;
+    "rows": SpeciesAttributeCount[] | null;
+}
+
 export interface SpeciesCodeCheckOption {
     "code": string | null;
     "scientificName": string | null;
@@ -968,6 +1706,96 @@ export interface StartupState {
     "ready": boolean;
     "message": string;
     "configPath": string;
+}
+
+export interface TableCSVArchiveOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface TableCSVArchiveReview {
+    "review": ProjectTableCSVReview;
+    "approvalHash": string;
+    "archiveSHA256": string;
+    "byteCount": number;
+    "format": string;
+    "version": number;
+}
+
+export interface TableCSVDescription {
+    "rowId": string;
+    "value": ProjectMetadataCell;
+}
+
+export interface TableCSVManifest {
+    "version": number;
+    "table": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "rowIds": string[] | null;
+    "storage": (string[] | null)[] | null;
+    "descriptions": TableCSVDescription[] | null;
+    "sha256": string;
+}
+
+export interface TwoPageEntryCodeAcknowledgement {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "table": string;
+    "rowId": string;
+    "column": string;
+    "expected": ProjectMetadataCell;
+    "value": ProjectMetadataCell;
+    "reference": SIVIParentSharedReference;
+}
+
+export interface TwoPageEntryFieldPolicy {
+    "column": string;
+    "owner": string;
+    "kind": string;
+    "maximum": number;
+}
+
+export interface TwoPageEntryReferenceFilters {
+    "zone": ProjectMetadataCell;
+    "subZone": ProjectMetadataCell;
+}
+
+export interface TwoPageEntryReferenceSnapshot {
+    "Original": siviParentProjection | null;
+    "ProjectSource": number;
+    "WorkingSource": number;
+    "Zone": ProjectMetadataCell;
+    "SubZone": ProjectMetadataCell;
+    "Fields": SIVIParentSharedReference[] | null;
+    "Policies": TwoPageEntryFieldPolicy[] | null;
+    "MasterEditingAvailable": boolean;
+    "ProjectChoices": SIVIProjectChoices | null;
+    "ProjectAssignmentAvailable": boolean;
+    "ProjectAssignmentDiagnostic": string;
+}
+
+export interface TwoPageParentCommonWrite {
+    "original": SIVIParentProjection | null;
+    "edits": SIVIParentCellEdit[] | null;
+}
+
+export interface TwoPageParentEntryWrite {
+    "original": SIVIParentProjection | null;
+    "edits": SIVIParentCellEdit[] | null;
+    "projectSource": number;
+    "workingSource": number;
+    "acknowledgements": TwoPageEntryCodeAcknowledgement[] | null;
+    "projectSelection": SIVIProjectSelection | null;
+}
+
+export interface TwoPageParentExtraWrite {
+    "original": SIVIParentProjection | null;
+    "edits": SIVIParentCellEdit[] | null;
 }
 
 /**
@@ -1050,6 +1878,18 @@ export interface VegetationNumberUpdate {
     "forms": { [_ in string]?: string } | null;
 }
 
+export interface VegetationReadAvailability {
+    "available": boolean;
+    "reason": string;
+    "records": VegRecord[] | null;
+}
+
+export interface VegetationReportMembership {
+    "rowId": string;
+    "plotNumber": ProjectMetadataCell;
+    "siteUnit": ProjectMetadataCell;
+}
+
 export interface VegetationSpeciesAlias {
     "code": string | null;
     "scientificName": string | null;
@@ -1081,6 +1921,52 @@ export interface VegetationSpeciesUpdate {
     "selected"?: string | null;
 }
 
+export interface VegetationWorkbookOptions {
+    "quickReport": boolean;
+    "spaceBetweenGroups": boolean;
+    "reportSummary": boolean;
+}
+
+export interface VegetationWorkbookOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface VegetationWorkbookReview {
+    "preview": LongVegetationPreview;
+    "options": VegetationWorkbookOptions;
+    "summary": VegetationWorkbookSummary | null;
+    "scope": string;
+    "createdDate": string;
+    "sheets": VegetationWorkbookSheet[] | null;
+    "skippedUnits": VegetationWorkbookSkippedUnit[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
+export interface VegetationWorkbookSheet {
+    "unit": ProjectMetadataCell;
+    "name": string;
+}
+
+export interface VegetationWorkbookSkippedUnit {
+    "unit": ProjectMetadataCell;
+    "reason": string;
+}
+
+export interface VegetationWorkbookSummary {
+    "createdDate": string;
+    "environmentRows": number;
+    "selectedPlotRows": number;
+    "speciesVersion": ProjectMetadataCell;
+    "versionStatus": string;
+    "versionDefinitions": ProjectMetadataTable;
+}
+
 export interface WorkingUnitChoice {
     "rowId": string;
     "origin": string;
@@ -1097,3 +1983,288 @@ export interface WorkingUnitModeState {
     "mode": string;
     "warning": string | null;
 }
+
+export interface pictureImage {
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "rowId": string;
+    "mime": string;
+    "width": number;
+    "height": number;
+    "sha256": string;
+    "dataUrl": string;
+}
+
+export interface pictureMetadataReview {
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "records": ProjectMetadataTable;
+}
+
+export interface pictureMetadataWriteResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "requestedSource": string;
+    "source": string;
+    "ownedFiles": { [_ in string]?: string } | null;
+    "actor": string;
+    "auditStrength": number;
+    "id": number;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "committed": ProjectMetadataRow;
+    "changes": ProjectMetadataChange[] | null;
+    "editWhen": string;
+    "historyId": string;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface siviCreationCover {
+    "column": string;
+    "value": ProjectMetadataCell;
+}
+
+export interface siviCreationDecision {
+    "kind": string;
+    "entered": string;
+    "selected"?: string | null;
+}
+
+export interface siviCreationRequest {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "species": string;
+    "decision"?: siviCreationDecision | null;
+    "covers": siviCreationCover[] | null;
+}
+
+export interface siviCreationResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "rowId": string;
+    "historyId": string;
+    "id": number;
+    "actor": string;
+    "auditStrength": number;
+    "editWhen": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "committed": ProjectMetadataRow;
+    "covers": siviCreationCover[] | null;
+    "request": siviCreationRequest;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface siviCreationUndoHistoryEvent {
+    "historyId": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "species": string;
+    "actor": string;
+    "editWhen": string;
+    "undone": boolean;
+    "consumed": boolean;
+    "reviewAvailable": boolean;
+    "unavailableReason": string | null;
+}
+
+export interface siviCreationUndoHistoryList {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyPresent": boolean;
+    "events": siviCreationUndoHistoryEvent[] | null;
+}
+
+export interface siviCreationUndoRequest {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "action": AuditRestoreAction;
+    "expected": string;
+}
+
+export interface siviCreationUndoResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "expected": string;
+    "undoId": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "action": AuditRestoreAction;
+    "actor": string;
+    "auditStrength": number;
+    "editWhen": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "committed": ProjectMetadataRow;
+    "creation": siviCreationResult;
+    "request": siviCreationUndoRequest;
+    "auditColumns": ProjectMetadataColumn[] | null;
+    "auditsBefore": ProjectMetadataRow[] | null;
+    "auditsAfter": ProjectMetadataRow[] | null;
+    "cancelled": boolean;
+    "removedRows": number;
+    "prunedAuditRows": number;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface siviCreationUndoReview {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "expected": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "columns": ProjectMetadataColumn[] | null;
+    "committed": ProjectMetadataRow;
+    "creation": siviCreationResult;
+    "auditColumns": ProjectMetadataColumn[] | null;
+    "auditsBefore": ProjectMetadataRow[] | null;
+}
+
+export interface siviDeletionHistoryEvent {
+    "historyId": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "species": string | null;
+    "actor": string;
+    "editWhen": string;
+    "restored": boolean;
+    "consumed": boolean;
+}
+
+export interface siviDeletionHistoryList {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyPresent": boolean;
+    "events": siviDeletionHistoryEvent[] | null;
+}
+
+export interface siviDeletionOriginal {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+}
+
+export interface siviDeletionRequest {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+}
+
+export interface siviDeletionRestorationRequest {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "action": AuditRestoreAction;
+    "expected": string;
+}
+
+export interface siviDeletionRestorationResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "expected": string;
+    "restorationId": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "action": AuditRestoreAction;
+    "actor": string;
+    "auditStrength": number;
+    "editWhen": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "restored": ProjectMetadataRow | null;
+    "deletion": siviDeletionResult;
+    "request": siviDeletionRestorationRequest;
+    "auditColumns": ProjectMetadataColumn[] | null;
+    "auditsBefore": ProjectMetadataRow[] | null;
+    "auditsAfter": ProjectMetadataRow[] | null;
+    "cancelled": boolean;
+    "restoredRows": number;
+    "prunedAuditRows": number;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface siviDeletionRestorationReview {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "historyId": string;
+    "expected": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "deletion": siviDeletionResult;
+    "auditColumns": ProjectMetadataColumn[] | null;
+    "auditsBefore": ProjectMetadataRow[] | null;
+}
+
+export interface siviDeletionResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "rowId": string;
+    "id": number;
+    "historyId": string;
+    "actor": string;
+    "auditStrength": number;
+    "editWhen": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "request": siviDeletionRequest;
+    "audits": AuditEntry[] | null;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface siviDeletionTargets {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "rows": ProjectMetadataRow[] | null;
+}
+
+export type siviParentProjection = SIVIParentProjection;

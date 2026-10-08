@@ -11,11 +11,59 @@ import (
 )
 
 func TestExplicitArgumentsAndSourceGuard(t *testing.T) {
-	for _, args := range [][]string{nil, {"-source", ".", "-out", "x"}, {"-source", ".", "-form", "Parent"}} {
+	for _, args := range [][]string{nil, {"-source", ".", "-out", "x"}, {"-source", ".", "-form", "Parent"},
+		{"-source", ".", "-out", "x", "-form", "Parent", "-report", "Parent"}} {
 		if err := run(args, &bytes.Buffer{}); err == nil {
 			t.Fatalf("accepted incomplete args: %v", args)
 		}
 	}
+}
+
+func TestReportRootUsesExistingSourceAndOutputGuards(t *testing.T) {
+	root := filepath.Join(".", "test-work-"+t.Name())
+	if err := os.MkdirAll(filepath.Join(root, "Reports"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { os.RemoveAll(root) })
+	source := filepath.Join(root, "Reports", "Labels.txt")
+	original := []byte("Begin Report\nRecordSource =\"BecLabels\"\nBegin\nBegin Section\nName =\"Detail\"\nEnd\nEnd\nEnd\n")
+	if err := os.WriteFile(source, original, 0644); err != nil {
+		t.Fatal(err)
+	}
+	out := filepath.Join(".", "test-layout-"+t.Name()+".json")
+	t.Cleanup(func() { os.Remove(out) })
+	if err := run([]string{"-source", root, "-out", out, "-report", "Labels"}, &bytes.Buffer{}); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var layout fs882layout.Layout
+	if err := json.Unmarshal(data, &layout); err != nil || layout.Root != "Labels" || len(layout.Forms) != 1 ||
+		layout.Forms[0].Controls[0].Type != "Report" {
+		t.Fatalf("report output: %+v, %v", layout, err)
+	}
+	for _, args := range [][]string{
+		{"-source", root, "-out", source, "-report", "Labels"},
+		{"-source", root, "-out", out, "-form", "Labels"},
+		{"-source", root, "-out", out, "-report", "Missing"},
+	} {
+		if err := run(args, &bytes.Buffer{}); err == nil {
+			t.Fatalf("accepted report misuse: %v", args)
+		}
+	}
+	current, err := os.ReadFile(source)
+	if err != nil || !bytes.Equal(current, original) {
+		t.Fatalf("report source changed: %v", err)
+	}
+	current, err = os.ReadFile(out)
+	if err != nil || !bytes.Equal(current, data) {
+		t.Fatalf("failed report extraction replaced accepted output: %v", err)
+	}
+}
+
+func TestFormSourceGuard(t *testing.T) {
 	root := filepath.Join(".", "test-work-"+t.Name())
 	if err := os.MkdirAll(filepath.Join(root, "Forms"), 0755); err != nil {
 		t.Fatal(err)

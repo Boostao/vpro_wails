@@ -5,32 +5,88 @@ import * as BECService from "./becservice.js";
 import * as CloseService from "./closeservice.js";
 import * as ContextService from "./contextservice.js";
 import * as CoordinateService from "./coordinateservice.js";
+import * as EnvironmentWorkbookService from "./environmentworkbookservice.js";
 import * as GeologyCodeService from "./geologycodeservice.js";
+import * as GoogleEarthKMLExportService from "./googleearthkmlexportservice.js";
+import * as GoogleEarthKMLService from "./googleearthkmlservice.js";
+import * as GoogleEarthPreferencesService from "./googleearthpreferencesservice.js";
+import * as GoogleEarthReviewService from "./googleearthreviewservice.js";
+import * as LifeformSummaryService from "./lifeformsummaryservice.js";
+import * as LifeformWorkbookService from "./lifeformworkbookservice.js";
+import * as LongEnvironmentPreferencesService from "./longenvironmentpreferencesservice.js";
 import * as ParentCodeService from "./parentcodeservice.js";
+import * as PictureMetadataService from "./picturemetadataservice.js";
+import * as PictureService from "./pictureservice.js";
 import * as PlotService from "./plotservice.js";
 import * as ProjectService from "./projectservice.js";
 import * as QualityService from "./qualityservice.js";
 import * as ReferenceService from "./referenceservice.js";
 import * as RegionCodeService from "./regioncodeservice.js";
+import * as SIVICollectedService from "./sivicollectedservice.js";
+import * as SIVICombinedService from "./sivicombinedservice.js";
+import * as SIVICoverService from "./sivicoverservice.js";
+import * as SIVICreationService from "./sivicreationservice.js";
+import * as SIVICreationUndoService from "./sivicreationundoservice.js";
+import * as SIVIDeletionService from "./sivideletionservice.js";
+import * as SIVIIdentityService from "./siviidentityservice.js";
+import * as SIVIParentSharedService from "./siviparentsharedservice.js";
+import * as SIVISpeciesService from "./sivispeciesservice.js";
 import * as SiteCodeService from "./sitecodeservice.js";
+import * as SiteUnitSummaryExtendedWorkbookService from "./siteunitsummaryextendedworkbookservice.js";
+import * as SiteUnitSummaryPreferencesService from "./siteunitsummarypreferencesservice.js";
+import * as SiteUnitSummaryWorkbookService from "./siteunitsummaryworkbookservice.js";
 import * as SoilCodeService from "./soilcodeservice.js";
+import * as SpeciesAttributeSummaryService from "./speciesattributesummaryservice.js";
 import * as StartupService from "./startupservice.js";
+import * as TableCSVArchiveService from "./tablecsvarchiveservice.js";
+import * as TwoPageParentCommonService from "./twopageparentcommonservice.js";
+import * as TwoPageParentEntryService from "./twopageparententryservice.js";
+import * as TwoPageParentExtraService from "./twopageparentextraservice.js";
+import * as VegetationWorkbookService from "./vegetationworkbookservice.js";
 import * as WorkingUnitService from "./workingunitservice.js";
 export {
     BECService,
     CloseService,
     ContextService,
     CoordinateService,
+    EnvironmentWorkbookService,
     GeologyCodeService,
+    GoogleEarthKMLExportService,
+    GoogleEarthKMLService,
+    GoogleEarthPreferencesService,
+    GoogleEarthReviewService,
+    LifeformSummaryService,
+    LifeformWorkbookService,
+    LongEnvironmentPreferencesService,
     ParentCodeService,
+    PictureMetadataService,
+    PictureService,
     PlotService,
     ProjectService,
     QualityService,
     ReferenceService,
     RegionCodeService,
+    SIVICollectedService,
+    SIVICombinedService,
+    SIVICoverService,
+    SIVICreationService,
+    SIVICreationUndoService,
+    SIVIDeletionService,
+    SIVIIdentityService,
+    SIVIParentSharedService,
+    SIVISpeciesService,
     SiteCodeService,
+    SiteUnitSummaryExtendedWorkbookService,
+    SiteUnitSummaryPreferencesService,
+    SiteUnitSummaryWorkbookService,
     SoilCodeService,
+    SpeciesAttributeSummaryService,
     StartupService,
+    TableCSVArchiveService,
+    TwoPageParentCommonService,
+    TwoPageParentEntryService,
+    TwoPageParentExtraService,
+    VegetationWorkbookService,
     WorkingUnitService
 };
 
@@ -59,16 +115,52 @@ export type {
     EnvironmentSiteUnitResult,
     EnvironmentSiteUnitReview,
     EnvironmentSiteUnitTransfer,
+    EnvironmentWorkbookOutcome,
+    EnvironmentWorkbookReview,
+    EnvironmentWorkbookSheet,
     FS882Header,
     GeologyCodeChoice,
+    GoogleEarthDescriptionFields,
+    GoogleEarthKMLExportOutcome,
+    GoogleEarthKMLExportReview,
+    GoogleEarthKMLReview,
+    GoogleEarthPreferenceValues,
+    GoogleEarthPreferencesOutcome,
+    GoogleEarthPreferencesReview,
+    GoogleEarthReview,
+    GoogleEarthReviewRow,
     HeightRecordUpdate,
     HierarchyInfo,
     HierarchyNode,
     HumusRecord,
+    LifeformSummaryCatalogueRow,
+    LifeformSummaryEntry,
+    LifeformSummaryPreview,
+    LifeformSummaryReport,
+    LifeformSummaryRow,
+    LifeformSummaryUnit,
+    LifeformWorkbookOutcome,
+    LifeformWorkbookReview,
     ListItem,
     LongEnvironmentOptions,
+    LongEnvironmentPreferenceValues,
+    LongEnvironmentPreferencesOutcome,
+    LongEnvironmentPreferencesReview,
     LongEnvironmentPreview,
     LongEnvironmentRequest,
+    LongVegetationDiagnostic,
+    LongVegetationOptions,
+    LongVegetationPlot,
+    LongVegetationPreview,
+    LongVegetationQualityCriterion,
+    LongVegetationQualityOccurrence,
+    LongVegetationQualityReference,
+    LongVegetationQualitySelection,
+    LongVegetationQualitySettings,
+    LongVegetationReport,
+    LongVegetationRow,
+    LongVegetationSettings,
+    LongVegetationUnit,
     MineralRecord,
     OtherFlagUpdate,
     OtherRecord,
@@ -76,6 +168,12 @@ export type {
     OtherTextUpdate,
     ParentCodeChoice,
     PersonalSpeciesDefinitionRequest,
+    PictureImage,
+    PictureMetadataReview,
+    PictureMetadataWriteResult,
+    PlotLocationReport,
+    PlotLocationReview,
+    PlotLocationRow,
     PlotPage,
     PlotProfileFileCreated,
     PlotProfileFileCreation,
@@ -122,7 +220,41 @@ export type {
     ProjectPlotProfileRunRequest,
     ProjectPlotProfileStep,
     ProjectState,
+    ProjectTableCSVReview,
     RegionCodeChoice,
+    SIVICoverWriteResult,
+    SIVICreationResult,
+    SIVICreationUndoHistoryList,
+    SIVICreationUndoResult,
+    SIVICreationUndoReview,
+    SIVIDeletionHistoryList,
+    SIVIDeletionOriginal,
+    SIVIDeletionRestorationResult,
+    SIVIDeletionRestorationReview,
+    SIVIDeletionResult,
+    SIVIDeletionTargets,
+    SIVIHeightEdit,
+    SIVIHeightWriteResult,
+    SIVIParentActionInput,
+    SIVIParentActionSaveResult,
+    SIVIParentActionWrite,
+    SIVIParentBinding,
+    SIVIParentCellEdit,
+    SIVIParentDirectWrite,
+    SIVIParentJoinReview,
+    SIVIParentProjection,
+    SIVIParentRow,
+    SIVIParentSharedReference,
+    SIVIParentSharedReferenceChoice,
+    SIVIParentSharedReferences,
+    SIVIParentSharedWrite,
+    SIVIParentWriteResult,
+    SIVIProjectAssignmentOriginal,
+    SIVIProjectAssignmentWrite,
+    SIVIProjectChoices,
+    SIVIProjectSelection,
+    SIVISpeciesReferences,
+    SIVIVegetationProjection,
     SUInfo,
     ScopedPlotLookup,
     ScopedPlotLookupResult,
@@ -131,27 +263,71 @@ export type {
     SiteUnitEnvironmentResult,
     SiteUnitEnvironmentReview,
     SiteUnitEnvironmentTransfer,
+    SiteUnitSpeciesListGroup,
+    SiteUnitSpeciesListPreview,
+    SiteUnitSpeciesListRequest,
+    SiteUnitSpeciesListRow,
+    SiteUnitSpeciesListUnit,
+    SiteUnitSummaryExtendedWorkbookOptions,
+    SiteUnitSummaryExtendedWorkbookReview,
+    SiteUnitSummaryField,
+    SiteUnitSummaryMembership,
+    SiteUnitSummaryOptions,
+    SiteUnitSummaryPlot,
+    SiteUnitSummaryPreferencesOutcome,
+    SiteUnitSummaryPreview,
+    SiteUnitSummaryReport,
+    SiteUnitSummaryRequest,
+    SiteUnitSummaryUnit,
+    SiteUnitSummaryWorkbookOutcome,
+    SiteUnitSummaryWorkbookReview,
+    SiteUnitSummaryWorkbookScope,
     SoilCodeChoice,
     SoilNumberUpdate,
     SoilRecordUpdate,
     SoilSuggestion,
     SoilTextUpdate,
+    SpeciesAttributeCount,
+    SpeciesAttributeDefinition,
+    SpeciesAttributeMatch,
+    SpeciesAttributeSummaryPreview,
+    SpeciesAttributeSummaryReport,
+    SpeciesAttributeUnit,
     SpeciesCodeCheckOption,
     SpeciesCodeCheckReview,
     SpeciesCodeCheckRow,
     SpeciesCodeCheckUpdate,
     SpeciesItem,
     StartupState,
+    TableCSVArchiveOutcome,
+    TableCSVArchiveReview,
+    TableCSVDescription,
+    TableCSVManifest,
+    TwoPageEntryCodeAcknowledgement,
+    TwoPageEntryFieldPolicy,
+    TwoPageEntryReferenceFilters,
+    TwoPageEntryReferenceSnapshot,
+    TwoPageParentCommonWrite,
+    TwoPageParentEntryWrite,
+    TwoPageParentExtraWrite,
     VegRecord,
     VegetationAttributeUpdate,
     VegetationCreationRequest,
     VegetationDeletionRequest,
     VegetationDeletionReview,
     VegetationNumberUpdate,
+    VegetationReadAvailability,
+    VegetationReportMembership,
     VegetationSpeciesAlias,
     VegetationSpeciesLookup,
     VegetationSpeciesOption,
     VegetationSpeciesUpdate,
+    VegetationWorkbookOptions,
+    VegetationWorkbookOutcome,
+    VegetationWorkbookReview,
+    VegetationWorkbookSheet,
+    VegetationWorkbookSkippedUnit,
+    VegetationWorkbookSummary,
     WorkingUnitChoice,
     WorkingUnitModeState
 } from "./models.js";

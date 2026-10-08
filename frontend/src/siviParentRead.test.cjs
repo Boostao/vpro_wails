@@ -1,0 +1,322 @@
+const assert = require('node:assert/strict');
+const { test } = require('node:test');
+const { readFileSync } = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const { render } = require('svelte/server');
+const { loadTypeScript, serverComponent, componentFunctions } = require('./svelteTestHelpers.cjs');
+const { transport, original, cell, setCell, source, metadata, restoration, writeSession, editor } = require('./siviParentTestHelpers.cjs');
+const { SIVIParentReadSession } = loadTypeScript('siviParentReadSession.ts', { './siviParentTransport': transport });
+const owner = { contextId: 'context:owned', project: 'Project', plot: 'P' };
+const { SIVIParentSourceSession } = loadTypeScript('siviParentSourceSession.ts', {
+  './siviParentTransport': transport, './projectMetadataRestore': restoration,
+});
+const join = () => ({ ContextID: owner.contextId, Project: owner.project, Plot: owner.plot,
+  Scope: 'DAO-General1033-ASCII-alphanumeric-TEXT7', Diagnostic: 'Not write authorization', Verified: true,
+  EnvRowIDs: ['1'], AdminRowIDs: ['2'] });
+function choices(option = 2) {
+  return { ContextID: owner.contextId, Project: owner.project, SourceOption: option,
+    Source: option === 1 ? 'Env' : 'Master', Alias: option === 1 ? 'project' : 'VMetaData',
+    Table: option === 1 ? 'Project_Metadata' : 'ProjectMetadata', Choices: {
+      columns: [{ name: 'ProjectID', declaredType: 'TEXT' }, { name: 'ProjectTitle', declaredType: 'TEXT' }],
+      rows: [{ rowId: '1', cells: [cell('text', 'DUP'), cell('null')] },
+        { rowId: '2', cells: [cell('text', 'DUP'), cell('text', '')] }],
+    } };
+}
+function deferred() { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; }
+test('read-only owner validates response and keeps clones across panel remounts', async () => {
+  const r = original(), captured = { ...owner };
+  const session = new SIVIParentReadSession(captured, () => Promise.resolve(r), () => {}, () => {});
+  captured.plot = 'foreign';
+  assert.equal(await session.load(), true);
+  const remount = session.view(); remount.original.Plot = 'caller';
+  assert.equal(session.view().original.Plot, 'P');
+  assert.equal(session.view().busy, false);
+  for (const mutate of [r => r.ContextID = 'old', r => r.Plot = 'old', r => r.Project = 'old']) {
+    const foreign = original(); mutate(foreign);
+    const failed = new SIVIParentReadSession(owner, () => Promise.resolve(foreign), () => {}, () => {});
+    assert.equal(await failed.load(), false);
+    assert.equal(failed.view().original, null);
+    assert.match(failed.view().error, /another active context/);
+  }
+});
+test('cancellation disposal late completion and retry never replace the current reader', async () => {
+  const first = deferred(), second = deferred(); let count = 0, cancelled = 0, notified = 0;
+  const session = new SIVIParentReadSession(owner, () => ++count === 1 ? first.promise : second.promise,
+    () => cancelled++, () => notified++);
+  const pending = session.load();
+  assert.equal(session.view().busy, true);
+  await assert.rejects(() => session.load(), /cancel the current/);
+  session.cancel();
+  assert.equal(cancelled, 1);
+  assert.equal(session.view().busy, false);
+  assert.match(session.view().error, /cancelled/);
+  const retry = session.load(); second.resolve(original());
+  assert.equal(await retry, true);
+  first.resolve(null);
+  assert.equal(await pending, false);
+  assert.equal(session.view().original.Plot, 'P');
+  assert.equal(session.view().error, null);
+  const late = deferred();
+  const disposed = new SIVIParentReadSession(owner, () => late.promise, () => cancelled++, () => notified++);
+  const old = disposed.load(); disposed.dispose();
+  const notices = notified; late.reject(new Error('late backend failure'));
+  assert.equal(await old, false);
+  assert.equal(notified, notices);
+  await assert.rejects(() => disposed.load(), /ownership ended/);
+});
+test('failed reads clear old originals show explicit errors and allow clean retry', async () => {
+  let fail = false;
+  const session = new SIVIParentReadSession(owner, () => fail ? Promise.reject(new Error('locked source')) : Promise.resolve(original()),
+    () => {}, () => {});
+  assert.equal(await session.load(), true); fail = true;
+  assert.equal(await session.load(), false);
+  assert.equal(session.view().original, null);
+  assert.match(session.view().error, /locked source/);
+  fail = false; assert.equal(await session.load(), true);
+  assert.equal(session.view().error, null);
+});
+const panelSource = readFileSync(path.join(__dirname, 'SIVIParentReadPanel.svelte'), 'utf8');
+const DirectField = serverComponent(readFileSync(path.join(__dirname, 'SIVIParentDirectField.svelte'), 'utf8'), 'SIVIParentDirectField.svelte', {
+  './projectMetadataEditor': metadata,
+});
+const ActionField = serverComponent(readFileSync(path.join(__dirname, 'SIVIParentActionField.svelte'), 'utf8'), 'SIVIParentActionField.svelte', {
+  './projectMetadataEditor': metadata,
+});
+const Panel = serverComponent(panelSource, 'SIVIParentReadPanel.svelte', {
+  '../../resources/fs1333-sivi-layout.json': { default: source }, './projectMetadataEditor': metadata,
+  './siviParentTransport': transport,
+  './siviParentWriteSession': writeSession, './siviParentEditor': editor,
+  './SIVIParentDirectField.svelte': { default: DirectField },
+  './SIVIParentActionField.svelte': { default: ActionField },
+  './siviProjectAssignmentSession': require('./siviParentTestHelpers.cjs').assignmentSession,
+  './SIVIProjectAssignmentField.svelte': { default: require('./siviParentTestHelpers.cjs').assignmentField },
+});
+test('read-only source panel has all77 labels/groups and distinct raw storage without editing controls', () => {
+  const r = original(); setCell(r, 'SV_PolygonNumber', cell('text', ''));
+  setCell(r, 'SV_CanopyComposition', cell('text', '  literal  '));
+  setCell(r, 'SpeciesListComplete', cell('integer', '-1'));
+  const markup = render(Panel, { props: { view: { original: r, busy: false, error: null },
+    reloadDisabled: false, onreload() {}, oncancel() {} } }).body;
+  assert.equal((markup.match(/data-sivi-parent-field=/g) || []).length, 77);
+  for (const field of source.forms[0].fields.filter(field => field.binding)) {
+    assert.match(markup, new RegExp(`data-sivi-parent-field="${field.binding}"`));
+    const label = (field.caption || field.controlName).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    assert.ok(markup.includes(label), field.controlId);
+  }
+  assert.match(markup, /Plot &amp; location/);
+  assert.match(markup, /Site description/);
+  assert.match(markup, /Vegetation/);
+  assert.match(markup, /\(empty text\)/);
+  assert.match(markup, /data-storage="null">NULL/);
+  assert.match(markup, /  literal  /);
+  assert.match(markup, /Species list complete:[\s\S]*?original -1/);
+  assert.doesNotMatch(markup, /<(?:input|textarea|select)\b|Save parent/);
+});
+test('panel safety feedback precedes fields and parent owner sits outside tab lifetime', () => {
+  const markup = render(Panel, { props: { view: { original: null, busy: true, error: 'Foreign context rejected' },
+    reloadDisabled: false, onreload() {}, oncancel() {} } }).body;
+  assert.match(markup, /Foreign context rejected/);
+  assert.match(markup, /data-sivi-parent-cancel/);
+  assert.match(markup, /data-sivi-parent-reload[^>]*disabled/);
+  assert.doesNotMatch(markup, /data-sivi-parent-field=/);
+  const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  assert.match(parent, /VITE_SIVI_PARENT_REVIEW === 'true'/);
+  assert.match(parent, /siviParentSession\?\.dispose\(\)/);
+  assert.match(parent, /GetSIVIParentOriginal\(siviContextId, plot\)/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*siviParentBusy/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
+  assert.match(parent, /dirty \|\| nonParentChildUnsaved \|\| !siviParentSession/);
+});
+test('source preference updates only its owned choice snapshot and survives remount without reinitialization', async () => {
+  const calls = [];
+  const session = new SIVIParentSourceSession(owner, {
+    join: async () => join(), choices: async () => choices(),
+    setSource: async (expected, source) => { calls.push([expected, source]); return choices(source); }, cancel() {},
+  }, () => {});
+  assert.equal(await session.load(), true);
+  const remount = session.view(); remount.choices.Choices.rows[0].cells[0].text = 'caller';
+  assert.equal(session.view().choices.Choices.rows[0].cells[0].text, 'DUP');
+  assert.equal(await session.setSource(1), true);
+  assert.equal(session.view().choices.SourceOption, 1);
+  assert.deepEqual(calls, [[2, 1]]);
+  assert.equal(session.view().join.Verified, true);
+  await assert.rejects(() => session.setSource(3), /Env or Master/);
+});
+test('source commits block cancel disposal and concurrent operations; failed responses require observation before retry', async () => {
+  const pending = deferred();
+  const session = new SIVIParentSourceSession(owner, {
+    join: async () => join(), choices: async () => choices(), setSource: () => pending.promise, cancel() {},
+  }, () => {});
+  await session.load();
+  const saving = session.setSource(1);
+  assert.equal(session.view().saving, true);
+  assert.throws(() => session.cancel(), /cannot be cancelled/);
+  assert.throws(() => session.dispose(), /before ending ownership/);
+  await assert.rejects(() => session.load(), /current SIVI source operation/);
+  pending.reject(new Error('source changed'));
+  assert.equal(await saving, false);
+  assert.equal(session.view().choices, null);
+  assert.equal(session.view().authorityUnknown, true);
+  assert.throws(() => session.dispose(), /observe the source preference outcome/);
+  assert.match(session.view().error, /Reload to observe/);
+  await assert.rejects(() => session.setSource(1), /Reload owned/);
+  assert.equal(await session.load(), true);
+  assert.equal(session.view().error, null);
+  assert.equal(session.view().authorityUnknown, false);
+});
+test('source preference unknown authority survives failed and cancelled recovery, then clears only on complete owned observation', async () => {
+  let mode = 'ready', pending;
+  const session = new SIVIParentSourceSession(owner, {
+    join: async () => join(),
+    choices: () => mode === 'failed' ? Promise.reject(new Error('read failed'))
+      : mode === 'held' ? pending.promise : Promise.resolve(choices(1)),
+    setSource: async () => { throw new Error('lost response after commit'); }, cancel() {},
+  }, () => {});
+  assert.equal(await session.load(), true);
+  assert.equal(await session.setSource(2), false);
+  const remount = session.view();
+  remount.authorityUnknown = false;
+  assert.equal(session.view().authorityUnknown, true);
+  mode = 'failed';
+  assert.equal(await session.load(), false);
+  assert.equal(session.view().authorityUnknown, true);
+  assert.throws(() => session.dispose(), /observe/);
+  mode = 'held'; pending = deferred();
+  const loading = session.load();
+  assert.equal(session.view().authorityUnknown, true);
+  session.cancel();
+  assert.equal(session.view().authorityUnknown, true);
+  pending.resolve(choices(2));
+  assert.equal(await loading, false);
+  assert.equal(session.view().choices, null);
+  await assert.rejects(() => session.setSource(1), /Reload owned/);
+  mode = 'ready';
+  assert.equal(await session.load(), true);
+  assert.equal(session.view().choices.SourceOption, 1);
+  assert.equal(session.view().authorityUnknown, false);
+  session.dispose();
+});
+test('actual parent Save Lock and close authority block unknown source preference even with other editor surfaces open', async () => {
+  const context = componentFunctions('FS882Form.svelte', ['getCloseState', 'save', 'toggleLock'], {
+    siviDeletionPending: false, siviRestorationPending: false, siviCreationUndoPending: false,
+    siviParentSourceView: { authorityUnknown: true, busy: false, error: 'lost preference receipt' }, pictureMetadataPending: false,
+    siviSourceAuthorityUnknown: true, environmentSUOpen: true, metadataOpen: true, error: '',
+  });
+  const state = context.actions.getCloseState();
+  assert.equal(state.unsaved, true); assert.equal(state.blocked, true);
+  assert.equal(state.canSave, false); assert.equal(state.busy, false);
+  assert.equal(state.error, 'lost preference receipt');
+  assert.match(state.saveReason, /observe/);
+  context.siviParentSourceView.busy = true;
+  assert.equal(context.actions.getCloseState().busy, true);
+  await context.actions.save(); assert.match(context.error, /observe.*before saving/);
+  await context.actions.toggleLock(); assert.match(context.error, /observe.*before changing the plot lock/);
+});
+test('actual nested soil and terrain control permissions preserve source observation reachability', () => {
+  const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  const values = { draft: { locked: false }, busy: false, siviSourceBarrier: true, capabilitiesReady: true,
+    childUnsaved: false, coordinateBusy: false, workingUnitBusy: false, qualityBusy: false,
+    siteCodeBusy: false, regionCodeBusy: false, soilCodeBusy: false, geologyCodeBusy: false,
+    pictureBusy: false, pictureMetadataPending: false };
+  const header = parent.match(/const headerInputsDisabled = \$derived\(([^;\n]+)\);/)[1];
+  const permissions = state => ({ ...state, headerInputsDisabled: vm.runInNewContext(header, state) });
+  for (const name of ['DrainageFields', 'SoilCodeFields', 'GeologyCodeFields', 'ParentCodeFields']) {
+    const controls = [...parent.matchAll(new RegExp(`<${name}\\b[^>]*disabled=\\{([^}]+)\\}`, 'g'))];
+    assert.ok(controls.length, name);
+    for (const control of controls) {
+      assert.equal(vm.runInNewContext(control[1], permissions(values)), true, `${name} must be blocked`);
+      assert.equal(vm.runInNewContext(control[1], permissions({ ...values, siviSourceBarrier: false })), false,
+        `${name} must remain available after observation`);
+    }
+  }
+  assert.match(parent, /<ProjectPlotProfileReview[\s\S]*?authorityBlocked=\{siviSourceBarrier\}/);
+});
+test('already mounted profile handlers refuse every mutation under source authority without resetting drafts or disabling Undo', async () => {
+  let writes = 0;
+  const context = componentFunctions('ProjectPlotProfileReview.svelte',
+    ['mutationAuthorized', 'stage', 'saveRules', 'proposeCreation', 'stageCreation',
+      'createRule', 'reviewDeletion', 'deleteRule', 'undo'], {
+      authorityBlocked: true, error: null, busy: false, committedFailure: false,
+      draft: { review: { identity: 'original' }, cells: { retained: 'draft' } },
+      creation: null, deletion: null, success: null,
+      client: { SaveProjectPlotProfile() { writes++; }, CreateProjectPlotProfileRule() { writes++; },
+        DeleteProjectPlotProfileRule() { writes++; } },
+    });
+  const before = JSON.stringify(context.draft);
+  for (const name of ['stage', 'saveRules', 'proposeCreation', 'stageCreation', 'createRule', 'reviewDeletion', 'deleteRule']) {
+    await context.actions[name]('1', 'Field', 'raw', false);
+    assert.match(context.error, /Observe the ProjectID source preference outcome/);
+    assert.equal(JSON.stringify(context.draft), before);
+    assert.equal(writes, 0);
+  }
+  context.actions.undo();
+  assert.equal(JSON.stringify(context.draft.cells), '{}');
+  assert.equal(context.draft.review.identity, 'original');
+  context.authorityBlocked = false;
+  assert.equal(context.actions.mutationAuthorized(), true);
+});
+test('source wire rejects foreign identities partial sparse rows bad typed cells and false certification', async () => {
+  for (const change of [
+    value => value.ContextID = 'foreign',
+    value => value.Source = 'Env',
+    value => delete value.Choices.rows[0],
+    value => value.Choices.rows[1].rowId = '1',
+    value => value.Choices.rows[0].cells[1] = cell('integer', '01'),
+    value => value.Choices.columns.pop(),
+  ]) {
+    const wire = choices(); change(wire);
+    const session = new SIVIParentSourceSession(owner, {
+      join: async () => join(), choices: async () => wire, setSource: async () => wire, cancel() {},
+    }, () => {});
+    assert.equal(await session.load(), false);
+    assert.match(session.view().error, /incomplete|another|identities|not returned/);
+  }
+  const bad = join(); bad.AdminRowIDs = [];
+  const session = new SIVIParentSourceSession(owner, {
+    join: async () => bad, choices: async () => choices(), setSource: async () => choices(), cancel() {},
+  }, () => {});
+  assert.equal(await session.load(), false);
+  assert.equal(session.view().choices, null);
+});
+test('source cancelled/disposed reads cannot repopulate another owner or erase errors', async () => {
+  const late = deferred(); let cancellations = 0;
+  const session = new SIVIParentSourceSession(owner, {
+    join: () => late.promise, choices: async () => choices(), setSource: async () => choices(),
+    cancel: () => cancellations++,
+  }, () => {});
+  const loading = session.load(); session.cancel(); late.resolve(join());
+  assert.equal(await loading, false);
+  assert.equal(session.view().choices, null);
+  assert.match(session.view().error, /cancelled/);
+  assert.equal(cancellations, 1);
+  session.dispose();
+  await assert.rejects(() => session.load(), /ownership ended/);
+});
+test('a failed parallel source read cancels its outstanding peer before releasing busy state', async () => {
+  const pending = deferred(); let cancelled = 0;
+  const session = new SIVIParentSourceSession(owner, {
+    join: () => pending.promise, choices: async () => { throw new Error('invalid retained source'); },
+    setSource: async () => choices(), cancel: () => cancelled++,
+  }, () => {});
+  assert.equal(await session.load(), false);
+  assert.equal(cancelled, 1);
+  assert.equal(session.view().busy, false);
+  assert.match(session.view().error, /invalid retained source/);
+  pending.resolve(join());
+  await Promise.resolve();
+  assert.equal(session.view().join, null);
+});
+test('native source presentation distinguishes duplicate NULL/empty metadata and exposes only preference actions', () => {
+  const markup = render(Panel, { props: { view: { original: original(), busy: false, error: null },
+    sourceView: { join: join(), choices: choices(), busy: false, saving: false, error: null },
+    reloadDisabled: false, onreload() {}, oncancel() {} } }).body;
+  assert.match(markup, /data-sivi-source-env/);
+  assert.match(markup, /data-sivi-source-master/);
+  assert.equal((markup.match(/data-sivi-project-choice-row=/g) || []).length, 2);
+  assert.match(markup, /Not write authorization/);
+  assert.match(markup, /\(empty text\)/);
+  assert.match(markup, /data-storage="null"/);
+  assert.doesNotMatch(markup, /<(?:input|textarea|select)\b/);
+  assert.match(markup, /ProjectID assignment remains unavailable/);
+});

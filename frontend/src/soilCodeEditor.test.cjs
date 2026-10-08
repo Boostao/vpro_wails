@@ -331,5 +331,8 @@ test('Parent integrates hidden validation, lifecycle/reset gates and default-on/
   assert.doesNotMatch(source, /maxlength|\.slice\(|\.substring\(|\.trim\(|\.toUpperCase\(|PlotService|UpdatePlot|CreatePlot|<datalist/);
   const disabled = form.match(/<SoilCodeFields[\s\S]*?onchange=/)[0];
   assert.doesNotMatch(disabled, /headerWorkflowBusy|soilCodeBusy/);
-  assert.match(disabled, /draft.locked.*busy.*!capabilitiesReady/);
+  assert.match(disabled, /headerInputsDisabled/);
+  const header = form.match(/const headerInputsDisabled = \$derived\(([^;\n]+)\);/)[1];
+  assert.match(header, /draft.locked.*busy.*!capabilitiesReady/);
+  assert.doesNotMatch(header, /headerWorkflowBusy|soilCodeBusy/);
 });

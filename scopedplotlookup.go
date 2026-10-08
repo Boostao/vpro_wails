@@ -40,7 +40,7 @@ func (s *ContextService) LookupScopedPlot(ctx context.Context, contextID string,
 		if err := profileOwnedFiles(owner); err != nil {
 			return result, err
 		}
-		tx, err := owner.conn.BeginTx(ctx, nil)
+		tx, err := owner.beginReadSnapshot(ctx)
 		if err != nil {
 			return result, err
 		}
@@ -73,6 +73,9 @@ func (s *ContextService) LookupScopedPlot(ctx context.Context, contextID string,
 			return result, err
 		}
 		if err := profileOwnedFiles(owner); err != nil {
+			return result, err
+		}
+		if err := ctx.Err(); err != nil {
 			return result, err
 		}
 		if err := tx.Commit(); err != nil {

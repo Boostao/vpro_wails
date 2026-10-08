@@ -299,7 +299,7 @@ func listChildRecords[T any](s *PlotService, kind, plot string) ([]T, error) {
 			if kind == "Veg" {
 				detail = fmt.Sprintf(" species %q", value.FieldByName("Species").String())
 			}
-			return nil, fmt.Errorf("%s row for plot %q%s has unsupported NULL ID; repair its identity before editing", kind, plot, detail)
+			return nil, &childNullIdentityError{kind: kind, plot: plot, detail: detail}
 		}
 		value.FieldByName("ID").SetInt(id.Int64)
 		setChildPresence(&record, present)

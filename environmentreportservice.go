@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"unicode/utf8"
 )
 
 type LongEnvironmentRequest struct {
@@ -37,11 +36,7 @@ type LongEnvironmentPreview struct {
 
 func (s *ContextService) GetLongEnvironmentOptions(ctx context.Context, contextID string) (LongEnvironmentOptions, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (LongEnvironmentOptions, error) {
-		values, err := plots.projects.preferences.snapshot()
-		if err != nil {
-			return LongEnvironmentOptions{}, err
-		}
-		title, err := configString(values, "ReportOptions", "LEReportTitle")
+		title, err := plots.projects.preferences.readLongEnvironmentPreference(ctx)
 		if err != nil {
 			return LongEnvironmentOptions{}, err
 		}
@@ -53,8 +48,8 @@ func (s *ContextService) GetLongEnvironmentOptions(ctx context.Context, contextI
 }
 
 func (s *ContextService) PreviewLongEnvironment(ctx context.Context, contextID string, request LongEnvironmentRequest) (LongEnvironmentPreview, error) {
-	if !utf8.ValidString(request.Title) || strings.ContainsRune(request.Title, 0) {
-		return LongEnvironmentPreview{}, errors.New("Long Environment title requires complete Unicode without NUL; no repair or normalization")
+	if err := validateLongEnvironmentTitle(request.Title); err != nil {
+		return LongEnvironmentPreview{}, err
 	}
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (result LongEnvironmentPreview, resultErr error) {
 		owner := plots.projects.sqlite
@@ -68,7 +63,7 @@ func (s *ContextService) PreviewLongEnvironment(ctx context.Context, contextID s
 		if err := profileOwnedFiles(owner); err != nil {
 			return result, err
 		}
-		tx, err := owner.conn.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+		tx, err := owner.beginReadSnapshot(ctx)
 		if err != nil {
 			return result, err
 		}
@@ -105,6 +100,9 @@ func (s *ContextService) PreviewLongEnvironment(ctx context.Context, contextID s
 			return result, err
 		}
 		if err := profileOwnedFiles(owner); err != nil {
+			return result, err
+		}
+		if err := ctx.Err(); err != nil {
 			return result, err
 		}
 		if err := tx.Commit(); err != nil {

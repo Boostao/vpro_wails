@@ -28,7 +28,7 @@
   onDestroy(() => { generation++; reads.cancelAll(); onbusy(false); });
 
   export function getCloseState(): EditorCloseState {
-    return { unsaved: true, busy, canSave: false, error,
+    return { unsaved: true, busy, canSave: false, error, blocked: committedFailure,
       saveReason: 'Restore or explicitly dismiss metadata restoration before closing; ordinary Save never applies this proposal.' };
   }
   export function undo() {

@@ -22,7 +22,7 @@ interface SourceField extends SourceControl {
   caption?: string;
 }
 
-interface SourceForm {
+export interface SourceForm {
   name: string;
   source: string;
   sha256: string;
@@ -176,15 +176,20 @@ function paperControls(source: SourceForm, candidates: SourceControl[], originX:
 }
 
 export function paperPage(name: string, vegetationMode: VegetationMode = 'initial', coordinateMode: CoordinateDisplayMode = 'dd') {
-  const page = form.pages.find(item => item.name?.replaceAll('&', '') === name || item.caption?.replaceAll('&', '') === name);
+  return sourcePaperPage(form, name, vegetationMode, coordinateMode);
+}
+
+export function sourcePaperPage(source: SourceForm, name: string, vegetationMode: VegetationMode = 'initial',
+  coordinateMode: CoordinateDisplayMode = 'dd') {
+  const page = source.pages.find(item => item.name?.replaceAll('&', '') === name || item.caption?.replaceAll('&', '') === name);
   if (!page) throw new Error(`Source page ${name} is missing`);
   const originX = number(page.properties, 'Left', 0);
   const originY = number(page.properties, 'Top', 0);
   const switching = name === 'Vegetation' && vegetationMode !== 'initial';
   const isHeight = vegetationMode === 'height';
-  const visibility = name === 'Site' ? coordinateVisibility(coordinateMode)
+  const visibility = name === 'Site' || name === 'Site/Veg' ? coordinateVisibility(coordinateMode)
     : switching ? { SubVegA: !isHeight, SubVegAht: isHeight, SubVegC: !isHeight, SubVegCht: isHeight } : {};
-  let controls = paperControls(form, form.controls.filter(control => control.pageId === page.controlId), originX, originY, visibility);
+  let controls = paperControls(source, source.controls.filter(control => control.pageId === page.controlId), originX, originY, visibility);
   if (switching) {
     // FS882 btnCoverAndHeight_Click; verified on a clean disposable Access form.
     controls = controls.map(control => {
@@ -198,8 +203,8 @@ export function paperPage(name: string, vegetationMode: VegetationMode = 'initia
   const height = number(page.properties, 'Height', 0) / 15;
   if (width <= 0 || height <= 0) throw new Error(`Missing source dimensions for ${name}`);
   return {
-    source: form.source,
-    sha256: form.sha256,
+    source: source.source,
+    sha256: source.sha256,
     width,
     contentWidth: Math.max(width, ...controls.map(control => control.x + control.width)),
     height,

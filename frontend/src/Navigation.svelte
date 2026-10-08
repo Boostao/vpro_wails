@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment';
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
   type Item = { name: string; icon: typeof House; view?: View };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate }: { view: View; onnavigate: (view: View) => void } = $props();
@@ -18,6 +18,7 @@
         { name: 'Metadata', icon: Table },
         { name: 'Combine Species', icon: Link },
         { name: 'Herbarium', icon: Leaf },
+        { name: 'Plot Pictures — Read-only', icon: FileText, view: import.meta.env.VITE_PICTURE_MANAGER === 'true' ? 'picture-manager' : undefined },
         { name: 'Colour-theme', icon: Palette },
         { name: 'User setup', icon: UserCog },
         { name: 'User log', icon: History }
@@ -25,20 +26,29 @@
     ] },
     { label: 'Reports', icon: ChartColumn, groups: [
       { label: 'Vegetation', items: [
-        { name: 'Long Vegetation', icon: TableProperties },
+        { name: 'Long Vegetation', icon: TableProperties, view: import.meta.env.VITE_LONG_VEGETATION_REPORT === 'true' ? 'long-vegetation' : undefined },
+        { name: 'Lifeform Summary', icon: Leaf, view: import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' ? 'lifeform-summary' : undefined },
         { name: 'Summary Vegetation', icon: ChartColumn }
       ] },
       { label: 'Environment', items: [
         { name: 'Long Environment', icon: TableProperties, view: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' ? 'long-environment' : undefined },
-        { name: 'Summary Environment', icon: ChartColumn }
+        { name: 'Summary Environment', icon: ChartColumn, view: import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true' ? 'summary-environment' : undefined }
       ] },
       { label: 'Others', items: [
         { name: 'Subzone Matrix of Units', icon: Table },
         { name: 'Hierarchy table', icon: Network, view: 'hierarchy' },
         { name: 'Hierarchy Diagram', icon: Network },
         { name: 'Print a Plot Label', icon: Tag },
+        { name: 'Saved plot label preview — Read-only', icon: Tag, view: import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' ? 'plot-label-preview' : undefined },
+        { name: 'Plot location review', icon: FileText, view: import.meta.env.VITE_PLOT_LOCATION_REVIEW === 'true' ? 'plot-locations' : undefined },
+        { name: 'Google Earth location preparation', icon: Globe, view: import.meta.env.VITE_GOOGLE_EARTH_REVIEW === 'true' ? 'google-earth-review' : undefined },
         { name: 'Create Plot Locations File', icon: FileText },
         { name: 'Show Plot Locations in Google Earth', icon: Globe }
+      ] }
+    ] },
+    { label: 'Interchange', icon: Table, groups: [
+      { label: 'Read-only preparation', items: [
+        { name: 'Project table CSV review', icon: Table, view: import.meta.env.VITE_TABLE_CSV_REVIEW === 'true' ? 'table-csv' : undefined }
       ] }
     ] },
     { label: 'Help', icon: HelpCircle, groups: [

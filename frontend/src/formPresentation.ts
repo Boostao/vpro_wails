@@ -50,6 +50,24 @@ const groups: Record<string, readonly Group[]> = {
     { title: 'User defined data', fields: ['SubOther'] }
   ]
 };
+const twoPageSiteFields: Record<string, readonly string[]> = {
+  'Identity and survey': ['PlotType', 'PlotSize', 'SV_PolygonNumber'],
+  Project: ['Option304', 'Option306', 'Option290', 'Option292'],
+  'BEC Master and Working Unit': ['Option217', 'Option213', 'Option215', 'btnCopyToUserSU', 'GIS_BGC', 'GIS_BGC_VER', 'BEC_Use', 'SiteUnitLongName'],
+  Location: ['LocationAccuracy', 'ProvinceStateTerritory'],
+  'Site conditions and stand': ['SV_StandAgeEstMeas', 'SV_StandHeight', 'SV_StandHeightEstMeas', 'SV_CanopyComposition'],
+  'Entry and source actions': ['Toggle196', 'Toggle197', 'PlotList']
+};
+groups['Site/Veg'] = [
+  ...groups.Site.map(group => ({ ...group, fields: [...group.fields, ...(twoPageSiteFields[group.title] ?? [])] })),
+  ...groups.Vegetation.map(group => ({ ...group, fields: [...group.fields,
+    ...(group.title === 'Stratum cover (%)' ? ['StrataCoverTotal'] :
+      group.title === 'Vegetation actions' ? ['SV_FullCruiseCard'] : [])] }))
+];
+groups['Soil/Terrain'] = groups['Soil/Terrain'].map(group => ({ ...group, fields: [...group.fields,
+  ...(group.title === 'Soil classification' ? ['SV_AhorizonType', 'SV_AhorizonDepth'] :
+    group.title === 'Rooting and restricting layer' ? ['SV_RootZoneTexture', 'SV_SoilDepth', 'SV_PercentCoarseFrags', 'ActiveLayerDepth'] :
+    group.title === 'Water and drainage' ? ['SV_GleyingMottlingCM', 'SV_FloodPlain', 'SV_WaterTableCM'] : [])] }));
 const labels: Record<string, string> = {
   BECSiteUnit: 'BEC Master', UserSiteUnit: 'Working Unit', Zone: 'BEC zone', SubZone: 'BEC subzone',
   TransDistrib: 'Transition / distribution', MoistureRegime: 'Moisture regime', NutrientRegime: 'Nutrient regime',
@@ -83,14 +101,17 @@ const labels: Record<string, string> = {
   PercentCoarseFragsStones: 'Coarse fragments: stones (%)', PercentCoarseFragsTotal: 'Coarse fragments: total (%)',
   PercentCoarseFragsShape: 'Coarse fragments: shape', RootsAbundance: 'Roots abundance', RootsSize: 'Roots size'
 };
-export function controlLabel(control: PaperControl): string {
+export function controlLabel(control: PaperControl, preferSourceCaption = false): string {
   const token = control.controlName ?? control.column ?? '';
-  return labels[token] ?? labels[control.column ?? ''] ??
-    (accessCaption(control.caption).replace(/\s+/g, ' ').trim() ||
+  const caption = accessCaption(control.caption).replace(/\s+/g, ' ').trim();
+  return (preferSourceCaption && caption ? caption : undefined) ??
+    (preferSourceCaption ? labels[control.column ?? ''] ?? labels[token] : labels[token] ?? labels[control.column ?? '']) ??
+    (caption ||
       (control.column ?? token).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/([a-zA-Z])(\d)/g, '$1 $2') || 'Source field');
 }
 export function presentationGroups(name: string, controls: PaperControl[]) {
-  const remaining = new Set(controls.filter(control => !['Label', 'Rectangle', 'OptionGroup'].includes(control.type)));
+  const remaining = new Set(controls.filter(control => !['Label', 'Rectangle', 'Line'].includes(control.type) &&
+    (control.type !== 'OptionGroup' || Boolean(control.column))));
   const result = (groups[name] ?? []).map(group => {
     const members = group.fields.flatMap(token => [...remaining].filter(control => control.controlName === token || control.column === token));
     const unique = [...new Set(members)];

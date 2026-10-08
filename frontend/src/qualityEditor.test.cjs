@@ -41,7 +41,7 @@ test('Native-verified quality source renderer compiles, preserves lexical input,
   assert.match(parent, /onbusy=\{onQualityBusyChange\}/);
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(form, /coordinateBusy \|\| workingUnitBusy \|\| qualityBusy/);
-  assert.match(form, /onclick=\{toggleLock\}\s+disabled=\{busy \|\| headerWorkflowBusy \|\| !capabilitiesReady\}/);
+  assert.match(form, /onclick=\{toggleLock\}\s+disabled=\{busy \|\| headerWorkflowBusy \|\| !capabilitiesReady \|\| siviStandalone &&/);
 });
 test('All three raw nullable Admin columns have15 UTF-16 bounds without silent truncation', () => {
   assert.deepEqual(plain(qualityKeys), ['sitePlotQuality', 'vegPlotQuality', 'soilPlotQuality']);

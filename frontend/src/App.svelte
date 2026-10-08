@@ -7,6 +7,14 @@
   import FS882Form from './FS882Form.svelte';
   import Navigation from './Navigation.svelte';
   import LongEnvironmentReport from './LongEnvironmentReport.svelte';
+  import SiteUnitSummary from './SiteUnitSummary.svelte';
+  import LongVegetationReport from './LongVegetationReport.svelte';
+  import LifeformSummary from './LifeformSummary.svelte';
+  import ProjectTableCSVReview from './ProjectTableCSVReview.svelte';
+  import PlotLocationReview from './PlotLocationReview.svelte';
+  import PictureManager from './PictureManager.svelte';
+  import PlotLabelPreview from './PlotLabelPreview.svelte';
+  import GoogleEarthReview from './GoogleEarthReview.svelte';
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
@@ -16,6 +24,11 @@
   import { validateProfileTableReview, validateProfileTableCreated, type ReviewedProfileTable } from './profileTable';
   import { validateProjectSUReview, validateProjectSUCreated, type ReviewedProjectSU } from './profileSUProject';
   import { plotLookupInputError, validateScopedPlotLookup } from './scopedPlotLookup';
+  import { tableCSVArchivePublicationSession } from './tableCSVArchiveExport';
+  import { vegetationWorkbookPublicationSession } from './vegetationWorkbook';
+  import { lifeformWorkbookPublicationSession } from './lifeformWorkbook';
+  import { siteUnitSummaryWorkbookPublicationSession } from './siteUnitSummaryWorkbook';
+  import { extendedSummaryWorkbookPublicationSession } from './siteUnitSummaryExtendedWorkbook';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -24,6 +37,8 @@
   let profileNavigation = $state<ProfileNavigation | null>(null);
   const profileIndex = $derived(profileNavigation?.plots.findIndex(plot => plot.plotNumber === editorPlotNumber) ?? -1);
   let editorPlotNumber = $state<string | undefined>(undefined);
+  let editorEntryForm = $state<'fs882' | 'sivi'>('fs882');
+  const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE === 'true' && import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
   let offset = $state(0);
   let busy = $state(false);
   let error = $state('');
@@ -37,9 +52,72 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
+  let pictureManagerPlot = $state('');
+  let plotLabelNumber = $state('');
   let contextExpanded = $state(false);
   let editorBusy = $state(false);
+  let archivePublicationBusy = $state(false);
+  let vegetationPublicationBusy = $state(false);
+  let lifeformPublicationBusy = $state(false);
+  let summaryPublicationBusy = $state(false);
+  $effect(() => {
+    const state = $projectState;
+    if (import.meta.env.VITE_LONG_VEGETATION_WORKBOOK !== 'true' || import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'true' ||
+        !state?.contextId || state.activeSU === 'None' || !state.suPath) { vegetationPublicationBusy = false; return; }
+    const session = vegetationWorkbookPublicationSession({ contextId: state.contextId,
+      project: state.activeProject, projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath });
+    return session.subscribe(() => {
+      const publication = session.view();
+      vegetationPublicationBusy = publication.busy || publication.blocked;
+      if (publication.blocked && view === 'home') view = 'long-vegetation';
+    });
+  });
+  $effect(() => {
+    const state = $projectState;
+    if (import.meta.env.VITE_LIFEFORM_WORKBOOK !== 'true' || import.meta.env.VITE_LIFEFORM_SUMMARY !== 'true' ||
+        !state?.contextId || state.activeSU === 'None' || !state.suPath) { lifeformPublicationBusy = false; return; }
+    const session = lifeformWorkbookPublicationSession({ contextId: state.contextId,
+      project: state.activeProject, projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath });
+    return session.subscribe(() => {
+      const publication = session.view();
+      lifeformPublicationBusy = publication.busy || publication.blocked;
+      if (publication.blocked && view === 'home') view = 'lifeform-summary';
+    });
+  });
+  $effect(() => {
+    const state = $projectState;
+    if (import.meta.env.VITE_TABLE_CSV_ARCHIVE_EXPORT !== 'true' || import.meta.env.VITE_TABLE_CSV_REVIEW !== 'true' ||
+        !state?.contextId) { archivePublicationBusy = false; return; }
+    const session = tableCSVArchivePublicationSession({ contextId: state.contextId,
+      project: state.activeProject, projectPath: state.projectPath ?? '' });
+    return session.subscribe(() => {
+      const publication = session.view();
+      archivePublicationBusy = publication.busy || publication.blocked;
+      // Reloaded unacknowledged attempts must be visible even before this tab has mounted.
+      if (publication.blocked && view === 'home') view = 'table-csv';
+    });
+  });
+  $effect(() => {
+    const state = $projectState;
+    if ((import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'true' && import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'true') ||
+        import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'true' ||
+        !state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryPublicationBusy = false; return; }
+    const owner = { contextId: state.contextId, project: state.activeProject,
+      projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath };
+    const sessions: Array<ReturnType<typeof siteUnitSummaryWorkbookPublicationSession> |
+      ReturnType<typeof extendedSummaryWorkbookPublicationSession>> = [];
+    if (import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'true') sessions.push(siteUnitSummaryWorkbookPublicationSession(owner));
+    if (import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK === 'true') sessions.push(extendedSummaryWorkbookPublicationSession(owner));
+    const update = () => {
+      const states = sessions.map(session => session.view());
+      const publication = { busy: states.some(state => state.busy), blocked: states.some(state => state.blocked) };
+      summaryPublicationBusy = publication.busy || publication.blocked;
+      if (publication.blocked && view === 'home') view = 'summary-environment';
+    };
+    const unsubscribe = sessions.map(session => session.subscribe(update));
+    return () => { for (const stop of unsubscribe) stop(); };
+  });
   let editor: { getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean> } | undefined = $state();
   let closeRequest = $state('');
   let closeWorking = $state(false);
@@ -103,7 +181,7 @@
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       await tick();
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || pendingTransition !== null || (view === 'fs882' && !editor));
+      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor));
       if (disposition === 'busy') {
         await CloseService.CancelClose(requestId);
         error = 'Wait for the current operation to finish before closing VPRO.';
@@ -130,7 +208,7 @@
         return;
       }
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      if (closeDisposition(state, busy || (view === 'fs882' && !editor)) === 'busy') {
+      if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor)) === 'busy') {
         closeError = 'Wait for the current operation to finish before closing VPRO.';
         return;
       }
@@ -158,7 +236,7 @@
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     await tick();
     const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-    if (closeDisposition(state, busy || editorBusy || transitionWorking || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
+    if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
       error = 'Wait for the current operation or decision before changing context.';
       return;
     }
@@ -181,7 +259,7 @@
     transitionError = '';
     try {
       const state = editor?.getCloseState();
-      if (!state || closeDisposition(state, busy) === 'busy') {
+      if (!state || closeDisposition(state, busy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy) === 'busy') {
         transitionError = 'Wait for the current editor operation to finish.';
         return;
       }
@@ -202,8 +280,34 @@
     if (next === view) return;
     void requestTransition(async () => {
       error = '';
-      if (next === 'fs882') editorPlotNumber = selected?.plotNumber;
+      if (next === 'fs882') { editorPlotNumber = selected?.plotNumber; editorEntryForm = 'fs882'; }
+      if (next === 'picture-manager') {
+        if (import.meta.env.VITE_PICTURE_MANAGER !== 'true') {
+          error = 'The read-only picture manager is disabled in this build.';
+          return;
+        }
+        pictureManagerPlot = selected?.plotNumber ?? '';
+      }
+      if (next === 'plot-label-preview') {
+        if (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'true') {
+          error = 'Saved plot label preview is disabled in this build.';
+          return;
+        }
+        plotLabelNumber = (view === 'fs882' ? editorPlotNumber : selected?.plotNumber) ?? '';
+      }
       view = next;
+    });
+  }
+
+  async function openSIVI() {
+    if (!siviStandaloneEnabled || !selected || !$projectState?.contextId) {
+      error = 'Standalone SIVI requires its independent entry gate, parent review and a selected owned plot.';
+      return;
+    }
+    const plot = selected.plotNumber;
+    await requestTransition(async () => {
+      if (selected?.plotNumber !== plot) throw new Error('Selected plot changed before opening SIVI; no owner replaced.');
+      editorPlotNumber = plot; editorEntryForm = 'sivi'; view = 'fs882'; error = '';
     });
   }
 
@@ -261,7 +365,7 @@
 
   async function findScopedPlot() {
     const contextId = $projectState?.contextId;
-    if (!plotFindEnabled || !contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
+    if (!plotFindEnabled || !contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
     const number = plotFindQuery;
     busy = true; plotFindError = ''; plotFindResult = null;
     try {
@@ -314,6 +418,7 @@
   }
 
   async function loadPlots(nextOffset: number) {
+    if (vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
     const current = ++request;
     plotReads.cancelAll();
     busy = true;
@@ -336,6 +441,7 @@
   }
 
   async function refresh() {
+    if (vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
     const current = ++stateRequest;
     stateReads.cancelAll();
     busy = true;
@@ -364,6 +470,7 @@
   }
 
   async function loadHierarchy() {
+    if (vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
     const current = ++hierarchyRequest;
     hierarchyReads.cancelAll();
     try {
@@ -384,7 +491,7 @@
 
   async function inspectProfileSources() {
     const contextId = $projectState?.contextId;
-    if (!contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
       profileSourceError = 'Wait for the current operation or decision before inspecting profile sources.'; return;
     }
     busy = true; profileSourceError = '';
@@ -401,7 +508,7 @@
   }
 
   async function reviewProfileSU(proposal: ProjectPlotProfileFilterRequest, origin: string) {
-    if (busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest ||
+    if (busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest ||
         $projectState?.contextId !== origin) throw new Error('Wait for the current owned operation before reviewing Save as SU.');
     busy = true; suError = '';
     try {
@@ -443,7 +550,7 @@
   async function reviewProfileSUProject() {
     const state = $projectState;
     if (!state?.contextId || !suReview || suReviewContext !== state.contextId ||
-        busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+        busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
       suProjectError = 'Wait for the current operation and review the current profile before reviewing a project-file SU.'; return;
     }
     if (!state.projectPath) {
@@ -513,7 +620,7 @@
 
   async function reviewProfileWriteOwnership() {
     const contextId = $projectState?.contextId;
-    if (!contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
+    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
     busy = true; profileWriteError = '';
     try {
       await tick();
@@ -585,7 +692,7 @@
 
   async function reviewBlankProfileFile() {
     const contextId = $projectState?.contextId;
-    if (!contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
       profileFileError = 'Wait for the current operation or decision before reviewing a new profile file.'; return;
     }
     busy = true; profileFileError = '';
@@ -629,7 +736,7 @@
 
   async function reviewBlankProfileTable() {
     const contextId = $projectState?.contextId;
-    if (!contextId || busy || editorBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
       profileTableError = 'Wait for the current operation or decision before reviewing an existing-file profile.'; return;
     }
     busy = true; profileTableError = '';
@@ -991,7 +1098,7 @@
         <p class="home-count">{page?.total ?? 0} plots in the current project. Select a project on the left to browse its plots.</p>
       {:else if view === 'fs882'}
         <div class="h-full flex flex-col p-2">
-          <p class="project-warning"><strong>Experimental FS882 editor</strong> Only verified workflows are writable. Use disposable projects only.</p>
+          <p class="project-warning"><strong>Experimental {editorEntryForm === 'sivi' ? 'SIVI / FS1333 entrypoint' : 'FS882 editor'}</strong> Only verified workflows are writable. Use disposable projects only.</p>
           {#if error}<p class="error" role="alert">{error}</p>{/if}
           {#if plotFindEnabled && plotFindOpen}
             <section aria-label="Find scoped plot" class="mb-2 p-3 border rounded">
@@ -1019,11 +1126,13 @@
           {/if}
           <fieldset disabled={busy} class="contents">
           {#key $projectState?.contextId}
+          {#key editorEntryForm}
           {#key editorPlotNumber}
           <FS882Form
             bind:this={editor}
             plotNumber={editorPlotNumber}
             contextId={$projectState?.contextId ?? ''}
+            entryForm={editorEntryForm}
             onSaved={async (p) => { editorPlotNumber = p; await loadPlots(offset); }}
             onClosed={() => navigate('plots')}
             onBusyChange={(busy) => { editorBusy = busy; }}
@@ -1033,18 +1142,76 @@
           />
           {/key}
           {/key}
+          {/key}
           </fieldset>
         </div>
 
         <CloseConfirm requestId={closeRequest || (pendingTransition ? 'context' : '')}
           purpose={closeRequest ? 'close' : 'context'}
+          editorLabel={editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882'}
           working={closeWorking || transitionWorking} canSave={closeState?.canSave ?? false}
-          saveReason={closeState?.saveReason ?? 'Return to the FS882 editor before saving.'}
+          saveReason={closeState?.saveReason ?? `Return to the ${editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882'} editor before saving.`}
           error={closeRequest ? closeError : transitionError}
           onrespond={closeRequest ? respondToClose : respondToTransition} />
+      {:else if view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <SiteUnitSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU}
+            suPath={$projectState.suPath ?? ''} onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
       {:else if view === 'long-environment' && import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <LongEnvironmentReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+            onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'long-vegetation' && import.meta.env.VITE_LONG_VEGETATION_REPORT === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <LongVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+            operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
+            onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'lifeform-summary' && import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <LifeformSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+            onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'table-csv' && import.meta.env.VITE_TABLE_CSV_REVIEW === 'true' && $projectState}
+        <!-- Archive export uses this existing review navigation; its separate UI and backend gates remain default-off. -->
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <ProjectTableCSVReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'plot-label-preview' && import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <PlotLabelPreview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            initialPlot={plotLabelNumber} onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'picture-manager' && import.meta.env.VITE_PICTURE_MANAGER === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <PictureManager contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            initialPlot={pictureManagerPlot} onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'plot-locations' && import.meta.env.VITE_PLOT_LOCATION_REVIEW === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <PlotLocationReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+            onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'google-earth-review' && import.meta.env.VITE_GOOGLE_EARTH_REVIEW === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <GoogleEarthReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             onBusyChange={(value) => { editorBusy = value; }} />
         {/key}
@@ -1112,6 +1279,12 @@
           >
             Open in FS882 Editor (Experimental)
           </button>
+          {#if siviStandaloneEnabled}
+            <button type="button" data-sivi-standalone-open
+              class="mt-2 w-full py-1.5 px-3 border rounded text-xs font-semibold"
+              disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
+              onclick={() => void openSIVI()}>Open SIVI / FS1333 (Experimental)</button>
+          {/if}
         </div>
       </aside>
     {/if}

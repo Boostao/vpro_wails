@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "sourceSHA256": "01481b94569c7172f32a812e65365f78cea5e440dd63220d91a37dade5778423",
+  "table": "Sample_Veg",
+  "scope": "DAO zero-row AddNew buffer, CancelUpdate and transaction rollback; not a committed insert or form event acceptance",
+  "noExistingRowsRead": true,
+  "noAccessApplicationStarted": true,
+  "noFormsOrCallbacksExecuted": true,
+  "noRecordUpdateIssued": true,
+  "addBufferCancelled": true,
+  "transactionRolledBack": true,
+  "canonicalAndRegistryUnchanged": true,
+  "initialNullColumns": [
+    "PlotNumber", "Species", "Layer", "Cover1", "Height1", "Cover2",
+    "Height2", "Cover3", "Height3", "TotalA", "HeightA", "Cover4",
+    "Height4", "Cover5", "Height5", "Cover5a", "Height5a", "Cover5b",
+    "Height5b", "Cover5c", "Height5c", "TotalB", "HeightB", "Cover6",
+    "Height6", "Cover7", "Cover8", "Cover9", "Cover10", "Collected",
+    "LL", "AF", "DC", "UT", "VI", "PV", "PG", "FFA",
+    "Cultural1", "Cultural2", "Other1", "Other2"
+  ],
+  "initialBoolean": { "column": "Flag", "integer": "0" },
+  "identity": {
+    "column": "ID",
+    "daoType": 4,
+    "size": 4,
+    "attributes": 17,
+    "defaultValue": "GenUniqueID()",
+    "observedStorage": "integer",
+    "allocationAlgorithmVerified": false
+  },
+  "requiredText": [
+    { "column": "PlotNumber", "maximum": 7, "allowZeroLength": false },
+    { "column": "Species", "maximum": 8, "allowZeroLength": false }
+  ],
+  "membershipQueries": [
+    {
+      "name": "USysVegA",
+      "sourceSHA256": "31201a5de346fbdd048c92bfa2a429859ab7d3ecc462f3dd338893b18f467e71",
+      "anyNonNull": ["Cover1", "Cover2", "Cover3", "TotalA", "Cover4", "Cover5", "TotalB", "Cover5a", "Cover5b", "Cover5c"]
+    },
+    {
+      "name": "USysVegC",
+      "sourceSHA256": "f2cf482f8d1091085cbe36aff19403d7040720465e0672f3de47b3aa4c55653a",
+      "anyNonNull": ["Cover6"]
+    },
+    {
+      "name": "USysVegD",
+      "sourceSHA256": "ef60252e92606ca72c9341127600c2c01f3baaec4300beebd3a6d46a0bb1ead6",
+      "anyNonNull": ["Cover7", "Cover8", "Cover9"]
+    }
+  ]
+}
