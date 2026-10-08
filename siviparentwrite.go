@@ -36,6 +36,15 @@ type siviParentHistory struct {
 	Changes             []siviParentHistoryChange
 }
 
+type siviParentHistoryDomain struct {
+	table, schema, label string
+	assignments          func(context.Context, siviParentHistory, string, string) ([]siviParentScalarAssignment, error)
+}
+
+var siviParentDirectHistory = siviParentHistoryDomain{
+	siviParentHistoryTable, siviParentHistorySQL, "SIVI parent", siviParentHistoryAssignments,
+}
+
 func planSIVIParentDirectEdits(ctx context.Context, original *siviParentProjection, edits siviParentDirectEdits) ([]siviParentScalarAssignment, error) {
 	if original == nil || len(original.Rows) != 1 ||
 		len(edits.Scalars)+len(edits.Options)+len(edits.Text)+len(edits.Categorical) == 0 {
@@ -167,6 +176,12 @@ func withSIVIParentWriteTransaction(ctx context.Context, owner *sqliteContext, p
 }
 
 func (s *ContextService) writeSIVIParentDirect(ctx context.Context, contextID, plot string, original *siviParentProjection, edits siviParentDirectEdits) (*siviParentWriteResult, error) {
+	return s.writeSIVIParentPlanned(ctx, contextID, plot, original, siviParentDirectHistory, func(observed *siviParentProjection) ([]siviParentScalarAssignment, error) {
+		return planSIVIParentDirectEdits(ctx, observed, edits)
+	})
+}
+
+func (s *ContextService) writeSIVIParentPlanned(ctx context.Context, contextID, plot string, original *siviParentProjection, history siviParentHistoryDomain, plan func(*siviParentProjection) ([]siviParentScalarAssignment, error)) (*siviParentWriteResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*siviParentWriteResult, error) {
 		if err := plots.requireContextEdit(); err != nil {
 			return nil, err
@@ -184,7 +199,7 @@ func (s *ContextService) writeSIVIParentDirect(ctx context.Context, contextID, p
 			if !reflect.DeepEqual(original, observed) {
 				return errors.New("SIVI original physical parents changed; undo and reload before writing")
 			}
-			assignments, err := planSIVIParentDirectEdits(ctx, observed, edits)
+			assignments, err := plan(observed)
 			if err != nil {
 				return err
 			}
@@ -222,11 +237,11 @@ func (s *ContextService) writeSIVIParentDirect(ctx context.Context, contextID, p
 				if err != nil {
 					return err
 				}
-				if err := appendTechnicalProvenance(ctx, tx, siviParentHistoryTable, siviParentHistorySQL, string(proposal), "SIVI parent"); err != nil {
+				if err := appendTechnicalProvenance(ctx, tx, history.table, history.schema, string(proposal), history.label); err != nil {
 					return err
 				}
 				var id int64
-				if err := tx.QueryRowContext(ctx, `SELECT MAX(ID) FROM "__VPRO_SIVIParentHistory"`).Scan(&id); err != nil {
+				if err := tx.QueryRowContext(ctx, `SELECT MAX(ID) FROM `+quoteHeaderIdentifier(history.table)).Scan(&id); err != nil {
 					return err
 				}
 				result.HistoryID = strconv.FormatInt(id, 10)
@@ -234,7 +249,7 @@ func (s *ContextService) writeSIVIParentDirect(ctx context.Context, contextID, p
 				if err != nil {
 					return err
 				}
-				if err := verifySiteUnitTransferTables(before, after, expected, siviParentHistoryTable); err != nil {
+				if err := verifySiteUnitTransferTables(before, after, expected, history.table); err != nil {
 					return fmt.Errorf("SIVI parent provenance differs from its complete plan: %w", err)
 				}
 			}

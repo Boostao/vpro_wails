@@ -79,11 +79,15 @@ const panelSource = readFileSync(path.join(__dirname, 'SIVIParentReadPanel.svelt
 const DirectField = serverComponent(readFileSync(path.join(__dirname, 'SIVIParentDirectField.svelte'), 'utf8'), 'SIVIParentDirectField.svelte', {
   './projectMetadataEditor': metadata,
 });
+const ActionField = serverComponent(readFileSync(path.join(__dirname, 'SIVIParentActionField.svelte'), 'utf8'), 'SIVIParentActionField.svelte', {
+  './projectMetadataEditor': metadata,
+});
 const Panel = serverComponent(panelSource, 'SIVIParentReadPanel.svelte', {
   '../../resources/fs1333-sivi-layout.json': { default: source }, './projectMetadataEditor': metadata,
   './siviParentTransport': transport,
   './siviParentWriteSession': writeSession, './siviParentEditor': editor,
   './SIVIParentDirectField.svelte': { default: DirectField },
+  './SIVIParentActionField.svelte': { default: ActionField },
 });
 test('read-only source panel has all77 labels/groups and distinct raw storage without editing controls', () => {
   const r = original(); setCell(r, 'SV_PolygonNumber', cell('text', ''));

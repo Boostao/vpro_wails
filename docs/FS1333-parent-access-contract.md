@@ -880,3 +880,89 @@ The39-file private predecessor, protected binaries/embedded assets, bundled
 Sample, original form and canonical Access data remain unchanged.
 No Access runtime, default promotion, source callback/Refresh, ProjectID write,
 metadata lifecycle, full Unicode collation or complete FS1333 replacement is claimed.
+
+## Private source-action storage
+
+The normal source callback was re-read directly: PlotType captures an Integer,
+maps1..5 to Ground/Visual/Note/FS882/Other through a String, assigns the field,
+restores the captured option and calls Refresh. Its NULL Else is not widened
+into an accepted clear path. Species-list-complete maps1/2/Else through Variant
+to true/false/NULL with no Refresh. Form_Current invokes only the separate
+display setters. UsysEnv remains the original DISTINCTROW Env/Admin inner join;
+clsFormInfo ProjectIdSource remains an independent preference property.
+
+[Private action storage](../siviparentactionwrite.go) uses the existing
+[source planner](../siviparentactions.go) without changing its allowlist.
+The accepted writer/restorer transaction is shared through a private
+history-domain configuration, not a new public generic writer. Direct history
+still validates only its fourteen fields. Action history is separately stored
+in __VPRO_SIVIParentActionHistory and replans only the two resolved normal source
+controls. Raw original/committed pairs, typed audits, aliases, ownership,
+selected SU, complete project effects and replay checks are unchanged.
+
+The descriptive SourceRefreshRequired bit identifies a planned normal PlotType
+callback (even an explicitly invoked no-op). No Access callback, UI Refresh,
+implicit other-draft commit, display audit or form promotion is implemented by
+this bit. Source action persistence is an explicit audited desktop transaction,
+not proof of the native callback's timing or full lifecycle.
+
+Focused coupled race160.585s and independent read-only review pass. All15 source
+choice pairs are tested on local/external fixtures, alongside action subsets/
+strengths0-3, historical2 restoration, direct-history isolation, NULL semantics,
+retain/prune replay rejection, malformed/wrong-domain history, pre-cancellation,
+no-op, complete-original drift and atomic second-audit/BLOB failure/retry.
+Unaudited NULL deletion is retained during restoration rather than restored
+from the original snapshot. Full integration race768.342s/all packages passes.
+Source and receipts are sealed in the
+[action storage checkpoint](../archives/sivi-parent-action-storage-checkpoint/evidence-manifest.json).
+That private checkpoint does not claim mounted behavior. The successor below
+adds it separately; the642-file native predecessor and protected delivery/source
+are not replaced.
+
+## Mounted normal source actions
+
+The [public action service](../siviparentactionservice.go) adds strict owned
+original/Save/Restore APIs with explicit nullable `option` transport. Unknown
+domains/properties, omitted/null required originals/actions, malformed Unicode,
+fractional/string options and foreign identities are rejected. All three
+independent backend flags (parent review, direct editing, action editing) must
+be literal true; frontend flags separately control presentation. Default is off.
+
+The [action session](../frontend/src/siviParentActionWriteSession.ts) reuses
+the accepted scoped writer lifecycle. The transport includes only the two
+resolved source control identities/physical targets; direct requests still
+exclude callbacks. Resolved Save retires drafts/history before checking both
+the common acknowledgement and exact source Refresh directive. A malformed/
+mismatched directive blocks explicit recovery and cannot replay Save.
+
+Normal Plot Type preserves Grnd/Visual/Note/Full/Other captions with explanatory
+Ground/FS882 values. Spp List preserves Comp./Part. and explicitly nullable
+selection. Retain original/initialization never stages normalization or audits;
+there is no NULL PlotType control. This is not the CHARS Variant handler.
+One live control replaces PlotType's original read-only slot; the implicit Spp
+List control sits with Vegetation, without a second bound textbox.
+
+Both persistent owners participate in shared Save/Undo/Lock/close/context
+guards. Another scope's dirty/invalid/blocked state prevents staging or Undo
+through the wrong owner. After commit/recovery, clean peer originals reload
+without discarding their typed restoration handle. Native coupled events prove
+the direct scalar history survives action Save and action prune, then independently
+prunes its own cell. Action restore preserves unaudited direct changes/history.
+This audited Save + owned reload is a desktop adaptation, not literal
+AfterUpdate/Me.Refresh timing and not an implicit save of other drafts.
+
+Focused SIVI/FS1333 race169.690s, full race770.171s/all packages,353 frontend
+tests/check0/0, isolated builds and independent review pass. Actual Wails checks
+visible associated labels/options at1400px/600px, zero initialization writes,
+remount/Lock/close/mutual ownership, coupled Save/prune, distinct species-only NULL
+Save and remounted retain (Restore=-1), replay denial, actual action read
+cancellation/retry and default-mounted/backend-off denial. All16 fixture hashes
+restore; every owned process exits normally. A navigation-helper stop after
+completed coupled restoration required only the unfinished WRITE02 tail under
+a fresh context; no successful mutation was repeated.
+
+Source, candidates, typed whole-project/audit/history evidence and cleanup are
+sealed in the [mounted action checkpoint](../archives/sivi-parent-action-mounted-checkpoint/evidence-manifest.json).
+Full Unicode collation, ProjectID assignment/metadata creation and complete
+FS1333 remain unavailable. Protected defaults/assets/data/exports are unchanged;
+no Access execution, commit, push or default promotion.

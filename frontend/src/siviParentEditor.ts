@@ -162,6 +162,10 @@ function target(original: SIVIParentOriginal, column: SIVIParentColumn) {
   return { controlId: controlId(column), table: binding.Table, rowId: row.rowId, expected: row.cells[binding.Column] };
 }
 
+export function siviParentOriginalCell(original: SIVIParentOriginal, column: SIVIParentColumn): ProjectMetadataCell {
+  return structuredClone(target(original, column).expected);
+}
+
 function parseInput(column: SIVIParentColumn, expected: ProjectMetadataCell, input: SIVIParentInput) {
   const policy = policies[column];
   let value = nullCell();

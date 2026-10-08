@@ -928,6 +928,26 @@ export interface SIVIHeightWriteResult {
     "HistoryID": string;
 }
 
+export interface SIVIParentActionInput {
+    "contextId": string;
+    "controlId": string;
+    "table": string;
+    "rowId": string;
+    "expected": ProjectMetadataCell;
+    "option": number | null;
+}
+
+export interface SIVIParentActionSaveResult {
+    "ChangedCells": number;
+    "HistoryID": string;
+    "SourceRefreshRequired": boolean;
+}
+
+export interface SIVIParentActionWrite {
+    "original": SIVIParentProjection | null;
+    "actions": SIVIParentActionInput[] | null;
+}
+
 export interface SIVIParentBinding {
     "ControlID": string;
     "Binding": string;

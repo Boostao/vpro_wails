@@ -16,10 +16,10 @@ export type SIVIParentDirectColumn = typeof siviParentDirectColumns[number];
 export function isSIVIParentDirectColumn(value: string): value is SIVIParentDirectColumn {
   return siviParentDirectColumns.some(column => column === value);
 }
-export interface SIVIParentWritePort {
+export interface SIVIParentWritePort<Request = SIVIParentDirectWrite> {
   read(): PromiseLike<unknown>;
   cancelRead(): void;
-  save(request: SIVIParentDirectWrite): PromiseLike<unknown>;
+  save(request: Request): PromiseLike<unknown>;
   restore(historyId: string, action: AuditRestoreAction): PromiseLike<unknown>;
   refreshParent(): PromiseLike<void>;
 }
@@ -36,7 +36,7 @@ export interface SIVIParentWriteView {
 const record = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value);
 
-function directErrors(drafts: SIVIParentDrafts): string[] {
+export function siviParentWriteErrors(drafts: SIVIParentDrafts): string[] {
   return [...siviParentErrors(drafts), ...Object.values(drafts).flatMap(draft =>
     draft?.expected.storage === 'blob' && siviParentDirty({ [draft.column]: draft })
       ? [`${draft.column} historical BLOB replacement has no lossless source audit representation; retain original storage.`] : [])];
@@ -46,7 +46,7 @@ export function siviParentDirectRequest(original: SIVIParentOriginal, drafts: SI
   if (Object.keys(drafts).some(column => !isSIVIParentDirectColumn(column))) {
     throw new Error('SIVI directly bound writes exclude callback actions and ProjectID assignment.');
   }
-  const invalid = directErrors(drafts)[0];
+  const invalid = siviParentWriteErrors(drafts)[0];
   if (invalid) throw new Error(invalid);
   const proposal = siviParentProposal(original, drafts);
   if (proposal.actions.length) throw new Error('SIVI source callbacks remain unavailable.');
@@ -58,7 +58,15 @@ export function siviParentDirectRequest(original: SIVIParentOriginal, drafts: SI
     text: cells(proposal.text), categorical: cells(proposal.categorical) };
 }
 
-export class SIVIParentWriteSession {
+export interface SIVIParentWriteScope<Column extends SIVIParentColumn, Request> {
+  accepts(value: string): value is Column;
+  unavailable: string;
+  request(original: SIVIParentOriginal, drafts: SIVIParentDrafts): Request;
+  count(request: Request): number;
+  verifyAcknowledgement?(result: Record<string, unknown>, request: Request): void;
+}
+
+export class SIVIParentScopedWriteSession<Column extends SIVIParentColumn, Request> {
   private state: SIVIParentWriteView = {
     original: null, drafts: {}, busy: false, operation: null, blocked: false, error: null, historyId: null,
   };
@@ -67,13 +75,14 @@ export class SIVIParentWriteSession {
   private generation = 0;
   private historyMaximum = 0;
 
-  constructor(owner: SIVIParentOwner, private readonly port: SIVIParentWritePort, private readonly notify: () => void) {
+  constructor(owner: SIVIParentOwner, private readonly port: SIVIParentWritePort<Request>, private readonly notify: () => void,
+    private readonly scope: SIVIParentWriteScope<Column, Request>) {
     this.owner = structuredClone(owner);
   }
 
   view(): SIVIParentWriteView { return structuredClone(this.state); }
   closeState(): EditorCloseState {
-    const invalid = directErrors(this.state.drafts);
+    const invalid = siviParentWriteErrors(this.state.drafts);
     const saveReason = this.state.busy ? 'Wait for the SIVI parent operation to finish.'
       : this.state.blocked ? 'Recover SIVI parent acknowledgement/refresh explicitly with Undo/reload; do not replay.'
       : invalid[0] ?? (!this.state.original ? 'Load owned SIVI parent originals before editing.' : '');
@@ -85,13 +94,13 @@ export class SIVIParentWriteSession {
     if (this.state.busy) throw new Error('Wait for the SIVI parent operation to finish.');
   }
   private changed() { if (!this.disposed) this.notify(); }
-  stage(column: SIVIParentDirectColumn, input: SIVIParentInput) {
+  stage(column: Column, input: SIVIParentInput) {
     this.idle();
-    if (!isSIVIParentDirectColumn(column) || this.state.blocked || !this.state.original) {
-      throw new Error('SIVI directly bound source is unavailable; callback actions remain disabled.');
+    if (!this.scope.accepts(column) || this.state.blocked || !this.state.original) {
+      throw new Error(this.scope.unavailable);
     }
     this.state.drafts = stageSIVIParent(this.state.original, this.state.drafts, column, input);
-    this.state.error = directErrors(this.state.drafts)[0] ?? null;
+    this.state.error = siviParentWriteErrors(this.state.drafts)[0] ?? null;
     this.changed();
   }
   async load(): Promise<boolean> {
@@ -154,8 +163,8 @@ export class SIVIParentWriteSession {
     this.idle();
     const close = this.closeState();
     if (!close.canSave || !this.state.original) throw new Error(close.saveReason);
-    const request = siviParentDirectRequest(this.state.original, this.state.drafts);
-    const count = [request.scalars, request.options, request.text, request.categorical].reduce((sum, edits) => sum + (edits?.length ?? 0), 0);
+    const request = this.scope.request(this.state.original, this.state.drafts);
+    const count = this.scope.count(request);
     if (count === 0) {
       this.state.drafts = {};
       this.state.error = null;
@@ -176,6 +185,7 @@ export class SIVIParentWriteSession {
         result.HistoryID !== '' && (!exactSigned64(result.HistoryID) || BigInt(result.HistoryID) <= 0)) {
         throw new Error('SIVI parent Save acknowledgement is incomplete; observe current storage, never replay.');
       }
+      this.scope.verifyAcknowledgement?.(result, request);
       this.state.historyId = result.HistoryID || null;
       this.historyMaximum = count;
       await this.port.refreshParent();
@@ -198,6 +208,7 @@ export class SIVIParentWriteSession {
       this.changed();
     }
   }
+
   async restore(action: AuditRestoreAction): Promise<boolean> {
     this.idle();
     if (action !== 'retain' && action !== 'prune' || this.closeState().unsaved || !this.state.historyId || !this.state.original) {
@@ -239,5 +250,17 @@ export class SIVIParentWriteSession {
     this.disposed = true;
     this.generation++;
     this.port.cancelRead();
+  }
+}
+
+export class SIVIParentWriteSession extends SIVIParentScopedWriteSession<SIVIParentDirectColumn, SIVIParentDirectWrite> {
+  constructor(owner: SIVIParentOwner, port: SIVIParentWritePort, notify: () => void) {
+    super(owner, port, notify, {
+      accepts: isSIVIParentDirectColumn,
+      unavailable: 'SIVI directly bound source is unavailable; callback actions remain disabled.',
+      request: siviParentDirectRequest,
+      count: request => [request.scalars, request.options, request.text, request.categorical]
+        .reduce((sum, edits) => sum + (edits?.length ?? 0), 0),
+    });
   }
 }

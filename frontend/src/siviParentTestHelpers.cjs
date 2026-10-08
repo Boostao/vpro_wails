@@ -22,6 +22,9 @@ const transport = loadTypeScript('siviParentTransport.ts', {
 const writeSession = loadTypeScript('siviParentWriteSession.ts', {
   './siviParentEditor': editor, './siviParentTransport': transport, './projectMetadataRestore': restoration,
 });
+const actionWriteSession = loadTypeScript('siviParentActionWriteSession.ts', {
+  './siviParentEditor': editor, './siviParentWriteSession': writeSession,
+});
 const cell = (storage = 'null', value = null) => ({
   storage, text: storage === 'text' ? value : null, integer: storage === 'integer' ? value : null,
   real: storage === 'real' ? value : null, blobHex: storage === 'blob' ? value : null,
@@ -50,4 +53,4 @@ function setCell(review, column, value) {
   const binding = review.Bindings.find(binding => binding.Binding === column);
   review.Rows[0][binding.Table.endsWith('_Admin') ? 'Admin' : 'Env'].cells[binding.Column] = value;
 }
-module.exports = { editor, SIVIParentSession, transport, writeSession, source, original, cell, setCell, metadata, restoration };
+module.exports = { editor, SIVIParentSession, transport, writeSession, actionWriteSession, source, original, cell, setCell, metadata, restoration };

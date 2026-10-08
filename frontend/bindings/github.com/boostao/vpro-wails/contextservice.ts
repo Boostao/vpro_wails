@@ -89,6 +89,10 @@ export function GetPlot(contextID: string, plot: string): $CancellablePromise<$m
     return $Call.ByID(2787654197, contextID, plot);
 }
 
+export function GetSIVIParentActionOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentProjection | null> {
+    return $Call.ByID(3334566454, contextID, plot);
+}
+
 export function GetSIVIParentDirectOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentProjection | null> {
     return $Call.ByID(4106383313, contextID, plot);
 }
@@ -193,6 +197,10 @@ export function RestoreSIVIHeights(contextID: string, plot: string, historyID: s
     return $Call.ByID(2974312123, contextID, plot, historyID, action);
 }
 
+export function RestoreSIVIParentActions(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(2453265924, contextID, plot, historyID, action);
+}
+
 export function RestoreSIVIParentDirect(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(2012647100, contextID, plot, historyID, action);
 }
@@ -283,6 +291,10 @@ export function SaveProjectPlotProfileSUInProject(contextID: string, request: $m
 
 export function SaveSIVIHeights(contextID: string, plot: string, extended: boolean, original: $models.SIVIVegetationProjection[] | null, edits: $models.SIVIHeightEdit[] | null): $CancellablePromise<$models.SIVIHeightWriteResult | null> {
     return $Call.ByID(4150680302, contextID, plot, extended, original, edits);
+}
+
+export function SaveSIVIParentActions(contextID: string, plot: string, request: $models.SIVIParentActionWrite): $CancellablePromise<$models.SIVIParentActionSaveResult | null> {
+    return $Call.ByID(633791945, contextID, plot, request);
 }
 
 export function SaveSIVIParentDirect(contextID: string, plot: string, request: $models.SIVIParentDirectWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {

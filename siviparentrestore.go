@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func siviParentHistoryAssignments(ctx context.Context, event siviParentHistory, project, plot string) ([]siviParentScalarAssignment, error) {
+func validateSIVIParentHistoryOriginal(ctx context.Context, event siviParentHistory, project, plot string) (*siviParentProjection, error) {
 	if event.Original == nil || event.Committed == nil || len(event.Changes) == 0 ||
 		event.Original.ContextID == "" || event.Original.ContextID != event.Committed.ContextID ||
 		event.Original.Project != project || event.Original.Plot != plot ||
@@ -31,6 +31,14 @@ func siviParentHistoryAssignments(ctx context.Context, event siviParentHistory, 
 		ProjectMetadataTable{Columns: original.AdminColumns, Rows: []ProjectMetadataRow{original.Rows[0].Admin}})
 	if err != nil || !reflect.DeepEqual(rebuilt, original) {
 		return nil, errors.Join(err, errors.New("typed SIVI original projection differs from its physical rows"))
+	}
+	return original, nil
+}
+
+func siviParentHistoryAssignments(ctx context.Context, event siviParentHistory, project, plot string) ([]siviParentScalarAssignment, error) {
+	original, err := validateSIVIParentHistoryOriginal(ctx, event, project, plot)
+	if err != nil {
+		return nil, err
 	}
 	edits := siviParentDirectEdits{}
 	for _, change := range event.Changes {
@@ -58,6 +66,10 @@ func siviParentHistoryAssignments(ctx context.Context, event siviParentHistory, 
 }
 
 func (s *ContextService) restoreSIVIParentDirect(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction) (*AuditRestoreResult, error) {
+	return s.restoreSIVIParentHistory(ctx, contextID, plot, historyID, action, siviParentDirectHistory)
+}
+
+func (s *ContextService) restoreSIVIParentHistory(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction, historyDomain siviParentHistoryDomain) (*AuditRestoreResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*AuditRestoreResult, error) {
 		if action != AuditRestoreCancel && action != AuditRestoreRetain && action != AuditRestorePrune {
 			return nil, errors.New("SIVI parent restoration requires cancel, retain or prune")
@@ -75,12 +87,12 @@ func (s *ContextService) restoreSIVIParentDirect(ctx context.Context, contextID,
 		owner := plots.projects.sqlite
 		result := &AuditRestoreResult{}
 		err = withSIVIParentWriteTransaction(ctx, owner, "parent restoration", func(tx *sql.Tx, suAlias string) error {
-			if err := verifyTechnicalProvenance(ctx, tx, siviParentHistoryTable, siviParentHistorySQL, "SIVI parent"); err != nil {
+			if err := verifyTechnicalProvenance(ctx, tx, historyDomain.table, historyDomain.schema, historyDomain.label); err != nil {
 				return err
 			}
 			var proposal string
 			var restored *string
-			if err := tx.QueryRowContext(ctx, `SELECT Proposal,Restored FROM "__VPRO_SIVIParentHistory" WHERE ID=?`, ids[0]).
+			if err := tx.QueryRowContext(ctx, `SELECT Proposal,Restored FROM `+quoteHeaderIdentifier(historyDomain.table)+` WHERE ID=?`, ids[0]).
 				Scan(&proposal, &restored); err != nil {
 				return err
 			}
@@ -100,7 +112,7 @@ func (s *ContextService) restoreSIVIParentDirect(ctx context.Context, contextID,
 				return err
 			}
 			project := owner.selection.Project
-			if _, err := siviParentHistoryAssignments(ctx, event, project, plot); err != nil {
+			if _, err := historyDomain.assignments(ctx, event, project, plot); err != nil {
 				return err
 			}
 			fresh, err := readSIVIParentForWrite(ctx, tx, owner, suAlias, contextID, plot)
@@ -235,14 +247,14 @@ func (s *ContextService) restoreSIVIParentDirect(ctx context.Context, contextID,
 			}
 			expected[project+"_Audit"] = audit
 			when := time.Now().UTC().Format(time.RFC3339Nano)
-			updated, err := tx.ExecContext(ctx, `UPDATE "__VPRO_SIVIParentHistory" SET Restored=? WHERE ID=? AND Restored IS NULL`, when, ids[0])
+			updated, err := tx.ExecContext(ctx, `UPDATE `+quoteHeaderIdentifier(historyDomain.table)+` SET Restored=? WHERE ID=? AND Restored IS NULL`, when, ids[0])
 			if err != nil {
 				return err
 			}
 			if count, err := updated.RowsAffected(); err != nil || count != 1 {
 				return errors.Join(err, errors.New("SIVI parent history restoration did not affect exactly one event"))
 			}
-			history := before[siviParentHistoryTable]
+			history := before[historyDomain.table]
 			history.Rows = append([]ProjectMetadataRow{}, history.Rows...)
 			historyColumns, err := siteUnitTransferColumns(history, "Restored")
 			if err != nil {
@@ -254,7 +266,7 @@ func (s *ContextService) restoreSIVIParentDirect(ctx context.Context, contextID,
 					history.Rows[i].Cells[historyColumns["Restored"]] = ProjectMetadataCell{Storage: "text", Text: &when}
 				}
 			}
-			expected[siviParentHistoryTable] = history
+			expected[historyDomain.table] = history
 			after, err := environmentSiteUnitTables(ctx, tx)
 			if err != nil {
 				return err
