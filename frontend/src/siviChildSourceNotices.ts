@@ -2,8 +2,15 @@ import { aCoverSourceNotice } from './heightEditor';
 import { completeCell } from './projectMetadataRestore';
 import { equalCell, metadataCellText } from './projectMetadataEditor';
 import type { ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
-import type { SIVICoverEdit } from './siviCoverEditor';
-import type { SIVIHeightEdit, SIVIProjection, SIVIRow } from './siviHeightEditor';
+import type { SIVIProjection, SIVIRow } from './siviHeightEditor';
+
+export interface SIVIChildSourceEdit {
+  rowId: string;
+  form: string;
+  column: string;
+  expected: ProjectMetadataCell;
+  value: ProjectMetadataCell;
+}
 
 export interface SIVIChildSourceNotice {
   rowId: string;
@@ -16,7 +23,7 @@ export interface SIVIChildSourceNotice {
 
 const aColumns = ['Cover1', 'Cover2', 'Cover3', 'TotalA', 'Cover4', 'Cover5', 'TotalB'] as const;
 
-export function siviChildSourceNotices(review: readonly SIVIProjection[], edits: readonly (SIVICoverEdit | SIVIHeightEdit)[]): SIVIChildSourceNotice[] {
+export function siviChildSourceNotices(review: readonly SIVIProjection[], edits: readonly SIVIChildSourceEdit[]): SIVIChildSourceNotice[] {
   const effective = new Map<string, Map<string, ProjectMetadataCell>>();
   const changedForms = new Map<string, { rowId: string; form: string; group: SIVIProjection; row: SIVIRow }>();
   const assignments = new Set<string>();

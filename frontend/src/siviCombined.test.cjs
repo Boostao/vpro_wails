@@ -478,6 +478,7 @@ test('every opted-in writer retains acknowledged warning feedback and clears it 
       siviSession: Writer === heightSession.SIVIHeightSession ? owner : null,
       siviCoverSession: Writer === coverSession.SIVICoverSession ? owner : null,
       siviCombinedSession: Writer === session.SIVICombinedSession ? owner : null,
+      siviCollectedSession: null,
       loadChildData: async () => {},
     });
     await context.actions.refreshSIVIChildEditors('P', Writer === session.SIVICombinedSession ? 'height' : 'combined');

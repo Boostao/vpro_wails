@@ -20,6 +20,7 @@ import * as ProjectService from "./projectservice.js";
 import * as QualityService from "./qualityservice.js";
 import * as ReferenceService from "./referenceservice.js";
 import * as RegionCodeService from "./regioncodeservice.js";
+import * as SIVICollectedService from "./sivicollectedservice.js";
 import * as SIVICombinedService from "./sivicombinedservice.js";
 import * as SIVICoverService from "./sivicoverservice.js";
 import * as SIVIParentSharedService from "./siviparentsharedservice.js";
@@ -56,6 +57,7 @@ export {
     QualityService,
     ReferenceService,
     RegionCodeService,
+    SIVICollectedService,
     SIVICombinedService,
     SIVICoverService,
     SIVIParentSharedService,

@@ -60,15 +60,15 @@ test('SIVI parent keeps the owner outside tabs and wires busy/dirty/safety gates
   const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(parent, /VITE_SIVI_HEIGHT_EDITING === 'true'/);
   assert.match(parent, /const siviContextId = untrack\(\(\) => contextId\)/);
-  assert.match(parent, /headerWorkflowBusy = \$derived\([^\n]*\|\| siviBusy \|\| siviCombinedBusy \|\| siviCoverBusy\)/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\([^\n]*\|\| siviBusy \|\| siviCombinedBusy \|\| siviCoverBusy \|\| siviCollectedBusy\)/);
   assert.match(parent, /nonParentChildUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved/);
   for (const gate of ['height', 'other', 'soil', 'attribute', 'collected', 'species']) {
     assert.match(parent, new RegExp(`${gate}EditingDisabled = \\$derived\\([^\\n]*\\|\\| siviUnsaved`));
   }
   assert.match(parent, /if \(siviUnsaved\) \{ await siviOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviUnsaved\) \{ void siviOperation\('undo'\); return; \}/);
-  assert.match(parent, /blocked: \(siviClose\?\.blocked \?\? false\) \|\| \(siviCoverClose\?\.blocked \?\? false\) \|\| \(siviCombinedClose\?\.blocked \?\? false\) \|\| \(siviParentWriteClose\?\.blocked \?\? false\)/);
+  assert.match(parent, /blocked: \(siviClose\?\.blocked \?\? false\) \|\| \(siviCoverClose\?\.blocked \?\? false\) \|\| \(siviCombinedClose\?\.blocked \?\? false\) \|\| \(siviCollectedClose\?\.blocked \?\? false\) \|\| \(siviParentWriteClose\?\.blocked \?\? false\)/);
   assert.match(parent, /siviSession\?\.dispose\(\);[\s\S]{0,60}siviReads\.cancelAll\(\)/);
   assert.match(parent, /\{:else if siviPanelOpen && siviView\}[\s\S]*?<SIVIHeightPanel[\s\S]*?\{:else\}[\s\S]*?<SourcePage name="Vegetation"/);
-  assert.match(parent, /\{#if extendedShrubs && !siviPanelOpen && !siviCoverPanelOpen && !siviCombinedPanelOpen\}[\s\S]*?Extended shrubs use cover mode/);
+  assert.match(parent, /\{#if extendedShrubs && !siviPanelOpen && !siviCoverPanelOpen && !siviCombinedPanelOpen && !siviCollectedPanelOpen\}[\s\S]*?Extended shrubs use cover mode/);
 });

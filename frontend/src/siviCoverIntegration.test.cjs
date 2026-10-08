@@ -29,6 +29,7 @@ function host(overrides = {}) {
     siviCombinedSession: null, siviCombinedEnabled: true, siviCombinedUnsaved: false,
     siviCombinedEditingDisabled: false, siviCombinedPanelOpen: false, siviCombinedReading: false,
     siviCombinedView: { review: [{}] },
+    siviCollectedSession: null, siviCollectedUnsaved: false, siviCollectedPanelOpen: false,
     siviParentSharedSession: null, siviProjectAssignmentSession: null, siviParentActionSession: null,
     siviParentWriteSession: null, siviParentSourceView: null, siviParentSession: null,
     AuditRestoreAction: { AuditRestoreRetain: 'retain', AuditRestorePrune: 'prune' },
@@ -54,16 +55,16 @@ test('cover facade and source panel are independently gated without widening hei
   assert.match(parent, /siviCoverSession = new SIVICoverSession/);
 });
 
-test('literal default-off source notice gate is forwarded to all three owned child writers without granting backend authority', () => {
+test('literal default-off source notice gate is forwarded to all owned child writers without granting backend authority', () => {
   assert.match(parent, /siviChildSourceNoticesEnabled = import\.meta\.env\.VITE_SIVI_CHILD_SOURCE_NOTICES === 'true'/);
-  for (const [Writer, revision] of [['Height', 'siviRevision'], ['Cover', 'siviCoverRevision'], ['Combined', 'siviCombinedRevision']]) {
+  for (const [Writer, revision] of [['Height', 'siviRevision'], ['Cover', 'siviCoverRevision'], ['Combined', 'siviCombinedRevision'], ['Collected', 'siviCollectedRevision']]) {
     assert.match(parent, new RegExp(`new SIVI${Writer}Session\\(plot, \\{[\\s\\S]*?\\}, \\(\\) => ${revision}\\+\\+, extendedShrubs, siviChildSourceNoticesEnabled\\)`));
   }
-  assert.doesNotMatch(parent, /sivi(?:Height|Cover|Combined)Enabled[^;\n]*siviChildSourceNoticesEnabled/);
+  assert.doesNotMatch(parent, /sivi(?:Height|Cover|Combined|Collected)Enabled[^;\n]*siviChildSourceNoticesEnabled/);
 });
 
 test('cover owner contributes dirty busy blocked Save Undo Lock and peer-editor barriers', () => {
-  assert.match(parent, /headerWorkflowBusy = \$derived\([^\n]*\|\| siviCoverBusy\)/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\([^\n]*\|\| siviCoverBusy(?: \|\| [a-zA-Z]+)*\)/);
   assert.match(parent, /nonParentChildUnsaved = \$derived\([^\n]*\|\| siviCoverUnsaved/);
   assert.match(parent, /if \(siviCoverUnsaved\) \{ await siviCoverOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviCoverUnsaved\) \{ void siviCoverOperation\('undo'\); return; \}/);
@@ -76,7 +77,7 @@ test('cover owner contributes dirty busy blocked Save Undo Lock and peer-editor 
 });
 
 test('cover operations reject every peer draft and never invoke mutation during another operation', async () => {
-  for (const guard of ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCombinedUnsaved', 'heightUnsaved', 'otherUnsaved',
+  for (const guard of ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCombinedUnsaved', 'siviCollectedUnsaved', 'heightUnsaved', 'otherUnsaved',
     'soilUnsaved', 'attributeUnsaved', 'collectedUnsaved', 'speciesUnsaved', 'siviParentWriteUnsaved',
     'siviParentActionUnsaved', 'siviProjectAssignmentUnsaved', 'siviParentSharedUnsaved']) {
     let calls = 0;
@@ -178,7 +179,7 @@ test('acknowledged child changes refresh only an already-loaded peer and preserv
     });
 
     test('combined actions reject conflicting owners including recovery; read cancellation never advertises a mutation', async () => {
-      for (const guard of ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCoverUnsaved', 'heightUnsaved',
+      for (const guard of ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCoverUnsaved', 'siviCollectedUnsaved', 'heightUnsaved',
         'otherUnsaved', 'soilUnsaved', 'attributeUnsaved', 'collectedUnsaved', 'speciesUnsaved',
         'siviParentWriteUnsaved', 'siviParentActionUnsaved', 'siviProjectAssignmentUnsaved', 'siviParentSharedUnsaved']) {
         let calls = 0;
