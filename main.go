@@ -121,6 +121,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	lifeformSummary, err := NewLifeformSummaryService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	coordinates, err := newCoordinateService(configDir, preferences)
 	if err != nil {
 		log.Fatal(err)
@@ -180,6 +184,7 @@ func main() {
 		application.NewService(NewLongEnvironmentPreferencesService(contextService, longEnvironmentPreferencesEnabled)),
 		application.NewService(NewSiteUnitSummaryPreferencesService(contextService, siteUnitSummaryPreferencesEnabled)),
 		application.NewService(siviParentShared),
+		application.NewService(lifeformSummary),
 		application.NewService(NewTableCSVArchiveService(contextService, tableCSVArchiveEnabled)),
 		application.NewService(coordinates),
 	}

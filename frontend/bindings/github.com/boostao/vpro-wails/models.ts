@@ -450,6 +450,60 @@ export interface HumusRecord {
     "vonPost": number | null;
 }
 
+export interface LifeformSummaryCatalogueRow {
+    "rowId": string;
+    "lifeform": number;
+    "label": ProjectMetadataCell;
+    "definition": ProjectMetadataCell;
+    "shortName": ProjectMetadataCell;
+}
+
+export interface LifeformSummaryEntry {
+    "plotNumber": string;
+    "species": string;
+    "lifeform": number;
+    "cover": number;
+    "insertSuRowId": string;
+    "speciesRowId": string;
+    "projectId": ProjectMetadataCell;
+}
+
+export interface LifeformSummaryPreview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "report": LifeformSummaryReport;
+}
+
+export interface LifeformSummaryReport {
+    "project": string;
+    "su": string;
+    "querySource": string;
+    "ordering": string;
+    "memberships": VegetationReportMembership[] | null;
+    "entries": LifeformSummaryEntry[] | null;
+    "catalogue": LifeformSummaryCatalogueRow[] | null;
+    "units": LifeformSummaryUnit[] | null;
+}
+
+export interface LifeformSummaryRow {
+    "catalogueRowId": string;
+    "lifeform": number;
+    "plotGroups": number;
+    "coverCount": number;
+    "presence": number | null;
+    "meanCover": number | null;
+}
+
+export interface LifeformSummaryUnit {
+    "code": ProjectMetadataCell;
+    "nPlots": number;
+    "suRowIds": string[] | null;
+    "uniqueSpecies": number;
+    "occurrences": number;
+    "rows": LifeformSummaryRow[] | null;
+}
+
 export interface ListItem {
     "listName": string;
     "item": string;
@@ -1555,6 +1609,12 @@ export interface VegetationNumberUpdate {
     "values": { [_ in string]?: number | null } | null;
     "expected": { [_ in string]?: number | null } | null;
     "forms": { [_ in string]?: string } | null;
+}
+
+export interface VegetationReportMembership {
+    "rowId": string;
+    "plotNumber": ProjectMetadataCell;
+    "siteUnit": ProjectMetadataCell;
 }
 
 export interface VegetationSpeciesAlias {

@@ -10,6 +10,7 @@ import * as GoogleEarthKMLExportService from "./googleearthkmlexportservice.js";
 import * as GoogleEarthKMLService from "./googleearthkmlservice.js";
 import * as GoogleEarthPreferencesService from "./googleearthpreferencesservice.js";
 import * as GoogleEarthReviewService from "./googleearthreviewservice.js";
+import * as LifeformSummaryService from "./lifeformsummaryservice.js";
 import * as LongEnvironmentPreferencesService from "./longenvironmentpreferencesservice.js";
 import * as ParentCodeService from "./parentcodeservice.js";
 import * as PlotService from "./plotservice.js";
@@ -34,6 +35,7 @@ export {
     GoogleEarthKMLService,
     GoogleEarthPreferencesService,
     GoogleEarthReviewService,
+    LifeformSummaryService,
     LongEnvironmentPreferencesService,
     ParentCodeService,
     PlotService,
@@ -90,6 +92,12 @@ export type {
     HierarchyInfo,
     HierarchyNode,
     HumusRecord,
+    LifeformSummaryCatalogueRow,
+    LifeformSummaryEntry,
+    LifeformSummaryPreview,
+    LifeformSummaryReport,
+    LifeformSummaryRow,
+    LifeformSummaryUnit,
     ListItem,
     LongEnvironmentOptions,
     LongEnvironmentPreferenceValues,
@@ -227,6 +235,7 @@ export type {
     VegetationDeletionRequest,
     VegetationDeletionReview,
     VegetationNumberUpdate,
+    VegetationReportMembership,
     VegetationSpeciesAlias,
     VegetationSpeciesLookup,
     VegetationSpeciesOption,

@@ -9,6 +9,7 @@
   import LongEnvironmentReport from './LongEnvironmentReport.svelte';
   import SiteUnitSummary from './SiteUnitSummary.svelte';
   import LongVegetationReport from './LongVegetationReport.svelte';
+  import LifeformSummary from './LifeformSummary.svelte';
   import ProjectTableCSVReview from './ProjectTableCSVReview.svelte';
   import PlotLocationReview from './PlotLocationReview.svelte';
   import GoogleEarthReview from './GoogleEarthReview.svelte';
@@ -43,7 +44,7 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'table-csv' | 'plot-locations' | 'google-earth-review'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review'>('home');
   let contextExpanded = $state(false);
   let editorBusy = $state(false);
   let archivePublicationBusy = $state(false);
@@ -1080,6 +1081,13 @@
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <LongVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+            onBusyChange={(value) => { editorBusy = value; }} />
+        {/key}
+      {:else if view === 'lifeform-summary' && import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <LifeformSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             onBusyChange={(value) => { editorBusy = value; }} />
         {/key}

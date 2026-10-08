@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'table-csv' | 'plot-locations' | 'google-earth-review';
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review';
   type Item = { name: string; icon: typeof House; view?: View };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate }: { view: View; onnavigate: (view: View) => void } = $props();
@@ -26,6 +26,7 @@
     { label: 'Reports', icon: ChartColumn, groups: [
       { label: 'Vegetation', items: [
         { name: 'Long Vegetation', icon: TableProperties, view: import.meta.env.VITE_LONG_VEGETATION_REPORT === 'true' ? 'long-vegetation' : undefined },
+        { name: 'Lifeform Summary', icon: Leaf, view: import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' ? 'lifeform-summary' : undefined },
         { name: 'Summary Vegetation', icon: ChartColumn }
       ] },
       { label: 'Environment', items: [
