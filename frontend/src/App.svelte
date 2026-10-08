@@ -35,6 +35,8 @@
   let profileNavigation = $state<ProfileNavigation | null>(null);
   const profileIndex = $derived(profileNavigation?.plots.findIndex(plot => plot.plotNumber === editorPlotNumber) ?? -1);
   let editorPlotNumber = $state<string | undefined>(undefined);
+  let editorEntryForm = $state<'fs882' | 'sivi'>('fs882');
+  const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE === 'true' && import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
   let offset = $state(0);
   let busy = $state(false);
   let error = $state('');
@@ -274,8 +276,20 @@
     if (next === view) return;
     void requestTransition(async () => {
       error = '';
-      if (next === 'fs882') editorPlotNumber = selected?.plotNumber;
+      if (next === 'fs882') { editorPlotNumber = selected?.plotNumber; editorEntryForm = 'fs882'; }
       view = next;
+    });
+  }
+
+  async function openSIVI() {
+    if (!siviStandaloneEnabled || !selected || !$projectState?.contextId) {
+      error = 'Standalone SIVI requires its independent entry gate, parent review and a selected owned plot.';
+      return;
+    }
+    const plot = selected.plotNumber;
+    await requestTransition(async () => {
+      if (selected?.plotNumber !== plot) throw new Error('Selected plot changed before opening SIVI; no owner replaced.');
+      editorPlotNumber = plot; editorEntryForm = 'sivi'; view = 'fs882'; error = '';
     });
   }
 
@@ -1066,7 +1080,7 @@
         <p class="home-count">{page?.total ?? 0} plots in the current project. Select a project on the left to browse its plots.</p>
       {:else if view === 'fs882'}
         <div class="h-full flex flex-col p-2">
-          <p class="project-warning"><strong>Experimental FS882 editor</strong> Only verified workflows are writable. Use disposable projects only.</p>
+          <p class="project-warning"><strong>Experimental {editorEntryForm === 'sivi' ? 'SIVI / FS1333 entrypoint' : 'FS882 editor'}</strong> Only verified workflows are writable. Use disposable projects only.</p>
           {#if error}<p class="error" role="alert">{error}</p>{/if}
           {#if plotFindEnabled && plotFindOpen}
             <section aria-label="Find scoped plot" class="mb-2 p-3 border rounded">
@@ -1094,11 +1108,13 @@
           {/if}
           <fieldset disabled={busy} class="contents">
           {#key $projectState?.contextId}
+          {#key editorEntryForm}
           {#key editorPlotNumber}
           <FS882Form
             bind:this={editor}
             plotNumber={editorPlotNumber}
             contextId={$projectState?.contextId ?? ''}
+            entryForm={editorEntryForm}
             onSaved={async (p) => { editorPlotNumber = p; await loadPlots(offset); }}
             onClosed={() => navigate('plots')}
             onBusyChange={(busy) => { editorBusy = busy; }}
@@ -1108,13 +1124,15 @@
           />
           {/key}
           {/key}
+          {/key}
           </fieldset>
         </div>
 
         <CloseConfirm requestId={closeRequest || (pendingTransition ? 'context' : '')}
           purpose={closeRequest ? 'close' : 'context'}
+          editorLabel={editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882'}
           working={closeWorking || transitionWorking} canSave={closeState?.canSave ?? false}
-          saveReason={closeState?.saveReason ?? 'Return to the FS882 editor before saving.'}
+          saveReason={closeState?.saveReason ?? `Return to the ${editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882'} editor before saving.`}
           error={closeRequest ? closeError : transitionError}
           onrespond={closeRequest ? respondToClose : respondToTransition} />
       {:else if view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true' && $projectState}
@@ -1231,6 +1249,12 @@
           >
             Open in FS882 Editor (Experimental)
           </button>
+          {#if siviStandaloneEnabled}
+            <button type="button" data-sivi-standalone-open
+              class="mt-2 w-full py-1.5 px-3 border rounded text-xs font-semibold"
+              disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
+              onclick={() => void openSIVI()}>Open SIVI / FS1333 (Experimental)</button>
+          {/if}
         </div>
       </aside>
     {/if}

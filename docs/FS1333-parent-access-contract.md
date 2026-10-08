@@ -4,13 +4,14 @@
 
 Static source contract plus separately gated native parent review, fourteen
 directly bound editors, sixty shared-storage controls, two normal source actions and existing physical ProjectID
-assignment/restoration, not a full-form entrypoint. The shared current-project
+assignment/restoration, plus a separately gated standalone entry presentation,
+not complete original-form execution. The shared current-project
 metadata editor now has a separately gated SIVI entry action and measured
 edit/restoration/refresh recovery and independent current-ID blank/template
 creation acceptance. New-ID completion and typed creation restoration remain
 unavailable. Normal source actions use explicit desktop Save/reload.
-The separately gated SIVI height panel is a bounded adaptation mounted under
-FS882; it does not implement this parent form. Exported coordinates are evidence,
+The separately gated SIVI height/cover panels reuse the same owned controller
+under FS882 or the standalone SIVI presentation. Exported coordinates are evidence,
 not a requirement to reproduce fixed Access pixels.
 
 Sources were read directly from the local `VPro64_forAI` exports. The R form is
@@ -19,6 +20,51 @@ preserves the normal parent, source labels, control relationships, events and
 three PlotNumber-linked children. Parent fields are read-only unless the separate
 editing gates explicitly load their fourteen direct/two action controls. Mapped original
 storage is not source-equivalent join/callback/write authorization.
+
+### Standalone entry candidate
+
+`VITE_SIVI_STANDALONE` independently defaults off and requires the parent-review
+frontend gate. It adds no backend authorization: each existing parent, direct,
+shared/reference, source-action, assignment, cover and height runtime gate still
+applies independently. The selected exact plot enters through the established
+owned transition. Presentation is keyed separately from context/plot identity;
+normal FS882 navigation resets it. The existing root editor owns close, Save,
+Undo, Lock and disposal, rather than another controller.
+
+Normal SIVI retains77 unique bound source controls and the three exact
+PlotNumber-linked A/C/D child relationships. SpeciesListComplete remains an
+implicit separate source action, not an invented78th bound field. The normal
+Site/Soils/Other FS882 bodies never serve as a standalone fallback. Parent
+originals and ProjectID source choices load through the shared guarded opener.
+No choice reload runs after failed/late old-owner original capture or while
+choice authority is unknown.
+
+655 frontend tests and check0 errors/warnings pass. Isolated enabled/off
+production Wails builds preserve protected dist/data. Five normally closed
+native owners complete20 cases on sixteen copied, verified fixture identities
+with six configuration paths rebound and no database seed writes. Actual
+1400/600px visibility proves the77 source labels and74 single live direct/shared
+controls, including both Notes textareas. Invalid drafts survive tab remount,
+disable root Save/Lock and block navigation/native close. Corrected valid drafts
+restore Save and the SIVI-labelled existing Save/Discard/Cancel dialogs.
+
+One actual root Save changes only the planned directly bound Stand Height;
+typed prune restores all original physical data/audit tables. The consumed
+restoration history remains with its explicit Restored marker. Committed and
+closed history bytes are retained before exact disposable project restoration.
+Normal32-cover A/C/D controls, strict100 errors, exclusive height-peer readiness
+and no ordinary FS882/species-creation fallback are measured. Independent
+entry/parent/child denials and automatic parent-original cancellation/retry pass.
+Cancellation holds actual completed-response delivery, not in-flight SQL.
+All16 fixture/22 protected hashes restore; no live native owner remains.
+
+Fresh full integration passes root1959.435s/all packages; all742 source identities
+and exact embedded assets remain unchanged. Five current PID/start/path checks
+independently confirm the accepted native owners absent. The integration
+candidate is not yet immutably sealed. Combined
+cover/height grids, species creation/deletion, full original event execution and
+two-page entrypoints remain unavailable. This is not overall forms/reports
+completion or a default promotion.
 
 | Export | SHA256 |
 |---|---|
@@ -764,6 +810,9 @@ Both owners close normally and all16/22 identities restore. Independent review
 closes both mutation findings and the bounded native evidence;40 focused tests
 are independently reproduced. Corrected714 application identities/17 exact
 embedded assets remain distinct from the archived initial candidate.
+The [127-file authority successor](../archives/sivi-source-authority-desktop-checkpoint/evidence-manifest.json)
+is separately hash/size verified and immutable; completed native modes must not
+be replayed.
 It introduces no new service/gate/bindings or complete-form claim.
 The panel presents Env/Master source buttons,
 original read-only ProjectID/title definitions and join diagnostics; assignment,

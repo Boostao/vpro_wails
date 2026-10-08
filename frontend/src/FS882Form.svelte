@@ -69,7 +69,8 @@
   import { beginVegetationCreation, stageVegetationCreation, stageVegetationCreationSpecies, chooseVegetationCreationSpecies, vegetationCreationSpeciesError, vegetationCreationErrors, vegetationCreationRequest, type VegetationCreationDraft } from './vegetationCreationEditor';
   import { beginPersonalSpecies, beginCreationPersonalSpecies, matchesPersonalSpeciesSource, matchesCreationPersonalSpeciesSource, stagePersonalText, personalSpeciesErrors, personalSpeciesRequest, personalSpeciesMatches, personalSpeciesCommittedError, personalLifeforms, personalTextFields, type PersonalSpeciesDraft } from './personalSpeciesEditor';
 
-  let { plotNumber, contextId, onSaved, onClosed, onBusyChange, onProfileNavigation, onProfileSUReview, onFindPlot }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void; onFindPlot?: () => void;
+  let { plotNumber, contextId, onSaved, onClosed, onBusyChange, onProfileNavigation, onProfileSUReview, onFindPlot, entryForm = 'fs882' }: { plotNumber?: string; contextId: string; onSaved?: (p: string) => void | Promise<void>; onClosed?: () => void; onBusyChange?: (busy: boolean) => void; onFindPlot?: () => void;
+    entryForm?: 'fs882' | 'sivi';
     onProfileNavigation?: (proposal: ProjectPlotProfileFilterRequest, contextId: string) => Promise<void>;
     onProfileSUReview?: (proposal: ProjectPlotProfileFilterRequest, contextId: string) => Promise<void>;
   } = $props();
@@ -78,6 +79,8 @@
   const siviHeightEnabled = import.meta.env.VITE_SIVI_HEIGHT_EDITING === 'true';
   const siviCoverEnabled = import.meta.env.VITE_SIVI_COVER_EDITING === 'true';
   const siviParentReviewEnabled = import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
+  const siviStandalone = untrack(() => entryForm === 'sivi');
+  const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE === 'true' && siviParentReviewEnabled;
   const siviParentEditingEnabled = siviParentReviewEnabled && import.meta.env.VITE_SIVI_PARENT_EDITING === 'true';
   const siviParentSharedEnabled = siviParentReviewEnabled && import.meta.env.VITE_SIVI_PARENT_SHARED_EDITING === 'true';
   const siviParentReferenceEnabled = siviParentSharedEnabled && import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING === 'true';
@@ -729,6 +732,26 @@
     }
   }
 
+  async function showSIVIParentPanel() {
+    if (!siviParentReviewEnabled || busy || headerWorkflowBusy || dirty || nonParentChildUnsaved || !siviParentSession) {
+      error = 'SIVI parent requires a clean available owned plot and its parent-review gate.';
+      return;
+    }
+    activeTab = 'siviParent';
+    siviParentOpen = true;
+    await loadSIVIParentOriginals();
+  }
+
+  async function loadSIVIParentOriginals() {
+    const parent = siviParentSession;
+    if (!parent) throw new Error('SIVI parent originals have no current owned session.');
+    if (!parent.view().original && !await parent.load()) return;
+    if (siviParentSession !== parent) return;
+    if (!siviParentWriteUnsaved && !siviParentActionUnsaved && !siviProjectAssignmentUnsaved && !siviParentSharedUnsaved &&
+        siviParentSourceSession && !siviParentSourceView?.choices && !siviParentSourceView?.error &&
+        !siviParentSourceView?.authorityUnknown) await siviParentSourceSession.load();
+  }
+
   function stageSIVIParentCell(column: string, input: SIVIParentInput) {
     try {
       if (!siviParentWriteSession || siviParentWriteEditingDisabled || !isSIVIParentDirectColumn(column)) {
@@ -1141,6 +1164,12 @@
         headerValidation = {};
       }
       capabilitiesReady = true;
+      if (siviStandalone && siviStandaloneEnabled && siviParentSession) {
+        activeTab = 'siviParent';
+        siviParentOpen = true;
+        await loadSIVIParentOriginals();
+        if (request !== loadRequest) return;
+      }
     } catch (e) {
       if (request === loadRequest) error = String(e);
     } finally {
@@ -2394,7 +2423,7 @@
   <!-- Header Bar -->
   <header class="fs882-toolbar p-3 bg-stone-100 border-b border-stone-200 flex justify-between items-center">
     <div class="flex items-center gap-3">
-      <h2 class="font-bold text-stone-900 text-base">FS882-6x4XL: Ecosystem Field Form</h2>
+      <h2 class="font-bold text-stone-900 text-base">{siviStandalone ? 'SIVI / FS1333: Site Visit' : 'FS882-6x4XL: Ecosystem Field Form'}</h2>
       <span class="px-2 py-0.5 rounded text-xs font-semibold {dirty || childUnsaved ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-600'}">
         {dirty || childUnsaved ? 'Draft Unsaved' : 'Clean'}
       </span>
@@ -2406,12 +2435,12 @@
     </div>
 
     <div class="fs882-actions flex items-center gap-2">
-      {#if environmentSUEnabled}
+      {#if environmentSUEnabled && !siviStandalone}
         <button type="button" data-source-control="btnEnvIntoSu" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
           disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 || $projectState?.activeSU === 'None'}
           onclick={() => openEnvironmentSU()}>Env Into SU</button>
       {/if}
-      {#if siteUnitEnvironmentEnabled}
+      {#if siteUnitEnvironmentEnabled && !siviStandalone}
         <button type="button" data-source-control="btnSuIntoEnv" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
           disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 || $projectState?.activeSU === 'None'}
           onclick={() => openEnvironmentSU('reverse')}>SU Into Env</button>
@@ -2434,7 +2463,8 @@
       <button
         type="button"
         onclick={toggleLock}
-        disabled={busy || headerWorkflowBusy || !capabilitiesReady}
+        disabled={busy || headerWorkflowBusy || !capabilitiesReady || siviStandalone &&
+          (!siviStandaloneEnabled || !siviParentView?.original || Boolean(siviParentView?.error) || childUnsaved || siviSourceBarrier)}
         class="px-3 py-1 rounded text-xs font-medium border flex items-center gap-1 {draft.locked ? 'bg-stone-200 hover:bg-stone-300 border-stone-300' : 'bg-stone-100 hover:bg-stone-200 border-stone-300'}"
         title={draft.locked ? 'Unlock Form' : 'Lock Form'}
       >
@@ -2457,7 +2487,8 @@
       <button
         type="button"
         onclick={save}
-        disabled={(!dirty && !childUnsaved) || draft.locked || busy || headerWorkflowBusy || !capabilitiesReady}
+        disabled={(!dirty && !childUnsaved) || draft.locked || busy || headerWorkflowBusy || !capabilitiesReady ||
+          siviStandalone && !getCloseState().canSave}
         class="px-3 py-1 rounded text-xs font-medium bg-emerald-700 hover:bg-emerald-800 text-white disabled:opacity-50 flex items-center gap-1"
       >
         <Save size={14} /> Save
@@ -2466,7 +2497,7 @@
       {#if onClosed}
         <button
           type="button"
-          aria-label="Close FS882 form"
+          aria-label={siviStandalone ? 'Close SIVI form' : 'Close FS882 form'}
           disabled={busy || headerWorkflowBusy}
           onclick={onClosed}
           class="px-2 py-1 text-stone-500 hover:text-stone-800 font-bold ml-2"
@@ -2492,7 +2523,15 @@
   {/if}
 
   <!-- Navigation Tabs -->
-  <nav aria-label="FS882 sections" class="fs882-tabs flex border-b border-stone-200 bg-stone-50 px-3 text-xs font-medium">
+  <nav aria-label={siviStandalone ? 'SIVI sections' : 'FS882 sections'} class="fs882-tabs flex border-b border-stone-200 bg-stone-50 px-3 text-xs font-medium">
+    {#if siviStandalone}
+      <button type="button" data-sivi-site-tab aria-current={activeTab === 'siviParent' ? 'page' : undefined}
+        class="px-4 py-2 border-b-2 {activeTab === 'siviParent' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
+        disabled={headerWorkflowBusy || !siviStandaloneEnabled}
+        onclick={() => { activeTab = 'siviParent'; siviParentOpen = true; }}>
+        Plot &amp; Site Description
+      </button>
+    {:else}
     <button
       aria-current={activeTab === 'site' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'site' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
@@ -2501,14 +2540,16 @@
     >
       Site & Location
     </button>
+    {/if}
     <button
       aria-current={activeTab === 'veg' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'veg' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'veg'}
-      disabled={headerWorkflowBusy}
+      disabled={headerWorkflowBusy || siviStandalone && !siviStandaloneEnabled}
     >
       Vegetation
     </button>
+    {#if !siviStandalone}
     <button
       aria-current={activeTab === 'vegOther' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'vegOther' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
@@ -2541,25 +2582,22 @@
     >
       Audit Trail
     </button>
+    {/if}
   </nav>
-  {#if siviParentReviewEnabled}
+  {#if siviParentReviewEnabled && !siviStandalone}
     <div class="border-b border-stone-200 px-4 py-2">
       <button type="button" data-sivi-parent-open aria-pressed={activeTab === 'siviParent'}
         class="rounded border px-3 py-1 text-sm disabled:opacity-50"
         disabled={busy || headerWorkflowBusy || dirty || nonParentChildUnsaved || !siviParentSession}
-        onclick={() => {
-          activeTab = 'siviParent';
-          siviParentOpen = true;
-          if (siviParentSession && !siviParentView?.original) void siviParentSession.load();
-          if (!siviParentWriteUnsaved && !siviParentActionUnsaved && !siviProjectAssignmentUnsaved && !siviParentSharedUnsaved &&
-              siviParentSourceSession && !siviParentSourceView?.choices && !siviParentSourceView?.error &&
-              !siviParentSourceView?.authorityUnknown) void siviParentSourceSession.load();
-        }}>SIVI parent (read-only)</button>
+        onclick={() => void showSIVIParentPanel()}>SIVI parent (read-only)</button>
     </div>
   {/if}
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
+    {#if siviStandalone && !siviStandaloneEnabled}
+      <p role="alert" class="p-4">Standalone SIVI is unavailable. Its independent entry gate and parent-review gate are required; no FS882 fallback is presented.</p>
+    {/if}
     {#snippet sharedSIVIFields()}
       {#if siviParentSharedView}
         <SIVIParentSharedFields view={siviParentSharedView} disabled={siviParentSharedEditingDisabled}
@@ -2569,7 +2607,7 @@
           oncancel={() => siviParentSharedSession?.cancel()} />
       {/if}
     {/snippet}
-    {#if activeTab === 'siviParent' && siviParentOpen && siviParentView && !metadataOpen}
+    {#if activeTab === 'siviParent' && siviParentOpen && siviParentView && !metadataOpen && (!siviStandalone || siviStandaloneEnabled)}
       <SIVIParentReadPanel view={siviParentView} sourceView={siviParentSourceView}
         sharedEditor={siviParentSharedView ? {
           liveColumns: siviParentSharedView.original ? siviParentSharedColumns : [],
@@ -2850,7 +2888,7 @@
         {/if}
       </div>
     {/if}
-    {#if activeTab === 'site'}
+    {#if activeTab === 'site' && !siviStandalone}
       {#key headerRevision}
         <ParentCodeFields bind:draft {original} {capabilities} scope="site"
           disabled={draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved}
@@ -2876,16 +2914,16 @@
         {/snippet}
         </ParentCodeFields>
       {/key}
-    {:else if activeTab === 'veg'}
+    {:else if activeTab === 'veg' && (!siviStandalone || siviStandaloneEnabled)}
       {#if siviHeightEnabled}
         <button type="button" class="mb-3 rounded border px-3 py-1 disabled:opacity-50" data-sivi-open
           disabled={busy || headerWorkflowBusy || !siviPanelOpen && siviEditingDisabled && !siviUnsaved}
-          onclick={() => void showSIVIPanel()}>{siviPanelOpen ? 'Return to FS882 vegetation' : 'Show SIVI aggregate heights (height-only)'}</button>
+          onclick={() => void showSIVIPanel()}>{siviPanelOpen ? (siviStandalone ? 'Close height view' : 'Return to FS882 vegetation') : 'Show SIVI aggregate heights (height-only)'}</button>
       {/if}
       {#if siviCoverEnabled}
         <button type="button" class="mb-3 rounded border px-3 py-1 disabled:opacity-50" data-sivi-cover-open
           disabled={busy || headerWorkflowBusy || !siviCoverPanelOpen && siviCoverEditingDisabled && !siviCoverUnsaved}
-          onclick={() => void showSIVICoverPanel()}>{siviCoverPanelOpen ? 'Return to FS882 vegetation' : 'Show SIVI source covers'}</button>
+          onclick={() => void showSIVICoverPanel()}>{siviCoverPanelOpen ? (siviStandalone ? 'Close cover view' : 'Return to FS882 vegetation') : 'Show SIVI source covers'}</button>
       {/if}
       {#if extendedShrubsEnabled}
         <label class="mb-3 flex items-center gap-2">
@@ -2909,6 +2947,9 @@
         <SIVICoverPanel view={siviCoverView} disabled={siviCoverEditingDisabled} canSave={siviCoverClose?.canSave ?? false}
           onstage={stageSIVICoverCell} onsave={() => void siviCoverOperation('save')} onundo={() => void siviCoverOperation('undo')}
           onreload={() => void siviCoverOperation('load')} onrestore={(action) => void siviCoverOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+      {:else if siviStandalone}
+        <p role="status" class="p-4">SIVI vegetation preserves the three PlotNumber-linked source groups: A (trees/shrubs), C and D.
+          Choose the independently enabled cover or height view above. Species creation/deletion and combined cover/height editing remain unavailable.</p>
       {:else}
       {#if speciesEditingEnabled || creationEnabled}
         {#if speciesReferenceBusy}<p role="status">Loading source species lists...</p>{/if}
