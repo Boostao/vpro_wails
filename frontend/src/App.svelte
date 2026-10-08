@@ -20,6 +20,7 @@
   import { validateProfileTableReview, validateProfileTableCreated, type ReviewedProfileTable } from './profileTable';
   import { validateProjectSUReview, validateProjectSUCreated, type ReviewedProjectSU } from './profileSUProject';
   import { plotLookupInputError, validateScopedPlotLookup } from './scopedPlotLookup';
+  import { tableCSVArchivePublicationSession } from './tableCSVArchiveExport';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -44,6 +45,20 @@
   let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'long-vegetation' | 'table-csv' | 'plot-locations' | 'google-earth-review'>('home');
   let contextExpanded = $state(false);
   let editorBusy = $state(false);
+  let archivePublicationBusy = $state(false);
+  $effect(() => {
+    const state = $projectState;
+    if (import.meta.env.VITE_TABLE_CSV_ARCHIVE_EXPORT !== 'true' || import.meta.env.VITE_TABLE_CSV_REVIEW !== 'true' ||
+        !state?.contextId) { archivePublicationBusy = false; return; }
+    const session = tableCSVArchivePublicationSession({ contextId: state.contextId,
+      project: state.activeProject, projectPath: state.projectPath ?? '' });
+    return session.subscribe(() => {
+      const publication = session.view();
+      archivePublicationBusy = publication.busy || publication.blocked;
+      // Reloaded unacknowledged attempts must be visible even before this tab has mounted.
+      if (publication.blocked && view === 'home') view = 'table-csv';
+    });
+  });
   let editor: { getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean> } | undefined = $state();
   let closeRequest = $state('');
   let closeWorking = $state(false);
@@ -107,7 +122,7 @@
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       await tick();
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || pendingTransition !== null || (view === 'fs882' && !editor));
+      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor));
       if (disposition === 'busy') {
         await CloseService.CancelClose(requestId);
         error = 'Wait for the current operation to finish before closing VPRO.';
@@ -134,7 +149,7 @@
         return;
       }
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      if (closeDisposition(state, busy || (view === 'fs882' && !editor)) === 'busy') {
+      if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor)) === 'busy') {
         closeError = 'Wait for the current operation to finish before closing VPRO.';
         return;
       }
@@ -162,7 +177,7 @@
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     await tick();
     const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-    if (closeDisposition(state, busy || editorBusy || transitionWorking || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
+    if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
       error = 'Wait for the current operation or decision before changing context.';
       return;
     }
@@ -1061,6 +1076,7 @@
             onBusyChange={(value) => { editorBusy = value; }} />
         {/key}
       {:else if view === 'table-csv' && import.meta.env.VITE_TABLE_CSV_REVIEW === 'true' && $projectState}
+        <!-- Archive export uses this existing review navigation; its separate UI and backend gates remain default-off. -->
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <ProjectTableCSVReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}

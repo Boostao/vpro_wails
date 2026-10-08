@@ -164,7 +164,19 @@ func (s *GoogleEarthKMLExportService) exportReviewedGoogleEarthKML(ctx context.C
 }
 
 func googleEarthKMLExportOutcome(requested string, result artifactPublication, err error) *GoogleEarthKMLExportOutcome {
-	outcome := &GoogleEarthKMLExportOutcome{RequestedDestination: requested, Path: result.Path, SHA256: result.SHA256}
+	receipt := artifactPublicationOutcome(requested, result, err, "Google Earth KML")
+	return &GoogleEarthKMLExportOutcome{
+		Status: receipt.Status, RequestedDestination: receipt.RequestedDestination,
+		Path: receipt.Path, SHA256: receipt.SHA256, ErrorMessage: receipt.ErrorMessage,
+	}
+}
+
+type artifactPublicationReceipt struct {
+	Status, RequestedDestination, Path, SHA256, ErrorMessage string
+}
+
+func artifactPublicationOutcome(requested string, result artifactPublication, err error, label string) artifactPublicationReceipt {
+	outcome := artifactPublicationReceipt{RequestedDestination: requested, Path: result.Path, SHA256: result.SHA256}
 	switch {
 	case result.Published && err == nil:
 		outcome.Status = "published"
@@ -174,7 +186,7 @@ func googleEarthKMLExportOutcome(requested string, result artifactPublication, e
 		outcome.Status = "not-published"
 	default:
 		outcome.Status = "not-published"
-		err = errors.New("Google Earth KML publication returned no committed artifact")
+		err = fmt.Errorf("%s publication returned no committed artifact", label)
 	}
 	if err != nil {
 		outcome.ErrorMessage = err.Error()

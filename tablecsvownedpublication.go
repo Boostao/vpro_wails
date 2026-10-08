@@ -21,6 +21,22 @@ type tableCSVOwnedPublicationHooks struct {
 }
 
 func (s *ContextService) publishOwnedProjectTableCSVWithHooks(ctx context.Context, contextID string, expected ownedTableCSVReview, requested string, hooks tableCSVOwnedPublicationHooks) (tableCSVPublication, error) {
+	return s.publishOwnedProjectTableCSVUsing(ctx, contextID, expected, requested, hooks,
+		func(ctx context.Context, requested string, review ownedTableCSVReview, validate func() error, hooks tableCSVPublicationHooks) (tableCSVPublication, error) {
+			return publishTableCSVBundleChecked(ctx, requested, review.Document, validate, hooks)
+		})
+}
+
+func (s *ContextService) publishOwnedProjectTableCSVArchive(ctx context.Context, contextID string, expected ownedTableCSVReview, requested string) (tableCSVPublication, error) {
+	return s.publishOwnedProjectTableCSVArchiveWithHooks(ctx, contextID, expected, requested, tableCSVOwnedPublicationHooks{})
+}
+
+func (s *ContextService) publishOwnedProjectTableCSVArchiveWithHooks(ctx context.Context, contextID string, expected ownedTableCSVReview, requested string, hooks tableCSVOwnedPublicationHooks) (tableCSVPublication, error) {
+	return s.publishOwnedProjectTableCSVUsing(ctx, contextID, expected, requested, hooks, publishOwnedTableCSVArchiveChecked)
+}
+
+func (s *ContextService) publishOwnedProjectTableCSVUsing(ctx context.Context, contextID string, expected ownedTableCSVReview, requested string, hooks tableCSVOwnedPublicationHooks,
+	publish func(context.Context, string, ownedTableCSVReview, func() error, tableCSVPublicationHooks) (tableCSVPublication, error)) (tableCSVPublication, error) {
 	// Detach every nested slice and tagged-value pointer before any lease,
 	// cancellation or fault callback can execute caller code.
 	expected.Document = snapshotTableCSVBundleDocument(expected.Document)
@@ -66,7 +82,7 @@ func (s *ContextService) publishOwnedProjectTableCSVWithHooks(ctx context.Contex
 		if err := observe("validated"); err != nil {
 			return result, err
 		}
-		result, resultErr = publishTableCSVBundleChecked(ctx, requested, expected.Document, func() error {
+		result, resultErr = publish(ctx, requested, expected, func() error {
 			if err := observe("precommit"); err != nil {
 				return err
 			}

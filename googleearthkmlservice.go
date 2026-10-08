@@ -40,6 +40,10 @@ func (request *GoogleEarthKMLRequest) UnmarshalJSON(data []byte) error {
 }
 
 func decodeGoogleEarthKMLJSON(data []byte, target any, operation string, properties ...string) error {
+	return decodeStrictRequiredJSON(data, target, operation, properties...)
+}
+
+func decodeStrictRequiredJSON(data []byte, target any, operation string, properties ...string) error {
 	if err := decodeProfileLifecycleJSON(data, target, properties...); err != nil {
 		return fmt.Errorf("%s request: %w", operation, err)
 	}

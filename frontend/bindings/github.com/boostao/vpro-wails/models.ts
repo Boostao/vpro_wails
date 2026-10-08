@@ -1342,6 +1342,23 @@ export interface StartupState {
     "configPath": string;
 }
 
+export interface TableCSVArchiveOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface TableCSVArchiveReview {
+    "review": ProjectTableCSVReview;
+    "approvalHash": string;
+    "archiveSHA256": string;
+    "byteCount": number;
+    "format": string;
+    "version": number;
+}
+
 export interface TableCSVDescription {
     "rowId": string;
     "value": ProjectMetadataCell;

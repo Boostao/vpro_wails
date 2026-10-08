@@ -29,12 +29,16 @@ func encodeTableCSVBundle(ctx context.Context, document tableCSVDocument) ([]byt
 	if err := validateTableCSVBundleManifest(ctx, manifest); err != nil {
 		return nil, fmt.Errorf("table CSV bundle manifest: %w", err)
 	}
+	return encodeTableCSVBundleMembers(ctx, document.Data, manifest)
+}
+
+func encodeTableCSVBundleMembers(ctx context.Context, csv, manifest []byte) ([]byte, error) {
 	var output bytes.Buffer
 	writer := zip.NewWriter(&output)
 	for _, member := range []struct {
 		name string
 		data []byte
-	}{{"table.csv", document.Data}, {"manifest.json", manifest}} {
+	}{{"table.csv", csv}, {"manifest.json", manifest}} {
 		if err := ctx.Err(); err != nil {
 			return nil, fmt.Errorf("table CSV bundle encode: %w", err)
 		}
@@ -62,6 +66,29 @@ func encodeTableCSVBundle(ctx context.Context, document tableCSVDocument) ([]byt
 
 func decodeTableCSVBundle(ctx context.Context, encoded []byte, byteBudget int64) (tableCSVDocument, error) {
 	var zero tableCSVDocument
+	contents, err := decodeTableCSVBundleMembers(ctx, encoded, byteBudget)
+	if err != nil {
+		return zero, err
+	}
+	if err := validateTableCSVBundleManifest(ctx, contents["manifest.json"]); err != nil {
+		return zero, fmt.Errorf("table CSV bundle manifest: %w", err)
+	}
+	var manifest TableCSVManifest
+	if err := json.Unmarshal(contents["manifest.json"], &manifest); err != nil {
+		return zero, fmt.Errorf("table CSV bundle manifest decode: %w", err)
+	}
+	document := tableCSVDocument{Manifest: manifest, Data: contents["table.csv"]}
+	if _, err := decodeTableCSV(ctx, document); err != nil {
+		return zero, fmt.Errorf("table CSV bundle document: %w", err)
+	}
+	if err := ctx.Err(); err != nil {
+		return zero, fmt.Errorf("table CSV bundle decode: %w", err)
+	}
+	return document, nil
+}
+
+func decodeTableCSVBundleMembers(ctx context.Context, encoded []byte, byteBudget int64) (map[string][]byte, error) {
+	var zero map[string][]byte
 	if byteBudget <= 0 || uint64(len(encoded)) > uint64(byteBudget) {
 		return zero, errors.New("table CSV bundle requires a positive byte budget covering the raw archive")
 	}
@@ -119,21 +146,10 @@ func decodeTableCSVBundle(ctx context.Context, encoded []byte, byteBudget int64)
 		}
 		contents[name] = data
 	}
-	if err := validateTableCSVBundleManifest(ctx, contents["manifest.json"]); err != nil {
-		return zero, fmt.Errorf("table CSV bundle manifest: %w", err)
-	}
-	var manifest TableCSVManifest
-	if err := json.Unmarshal(contents["manifest.json"], &manifest); err != nil {
-		return zero, fmt.Errorf("table CSV bundle manifest decode: %w", err)
-	}
-	document := tableCSVDocument{Manifest: manifest, Data: contents["table.csv"]}
-	if _, err := decodeTableCSV(ctx, document); err != nil {
-		return zero, fmt.Errorf("table CSV bundle document: %w", err)
-	}
 	if err := ctx.Err(); err != nil {
 		return zero, fmt.Errorf("table CSV bundle decode: %w", err)
 	}
-	return document, nil
+	return contents, nil
 }
 
 // Snapshot before context callbacks or validation. A JSON roundtrip here could
@@ -303,6 +319,10 @@ func validateTableCSVBundleHeaders(ctx context.Context, data []byte, members []*
 // Bounded to the four object shapes in this manifest, not an application-wide
 // JSON policy. Inspect every raw string before encoding/json can repair Unicode.
 func validateTableCSVBundleManifest(ctx context.Context, raw []byte) error {
+	return validateTableCSVBundleJSON(ctx, raw, "manifest")
+}
+
+func validateTableCSVBundleJSON(ctx context.Context, raw []byte, shape string) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
@@ -335,7 +355,7 @@ func validateTableCSVBundleManifest(ctx context.Context, raw []byte) error {
 			return fmt.Errorf("manifest string Unicode: %w", err)
 		}
 	}
-	return validateTableCSVBundleObject(ctx, raw, "manifest")
+	return validateTableCSVBundleObject(ctx, raw, shape)
 }
 
 func validateTableCSVBundleObject(ctx context.Context, raw []byte, shape string) error {
@@ -343,6 +363,8 @@ func validateTableCSVBundleObject(ctx context.Context, raw []byte, shape string)
 	switch shape {
 	case "manifest":
 		fields = []string{"version", "table", "columns", "rowIds", "storage", "descriptions", "sha256"}
+	case "owned-manifest":
+		fields = []string{"format", "version", "descriptionMetadataPresent", "document"}
 	case "column":
 		fields = []string{"name", "declaredType"}
 	case "description":
@@ -391,6 +413,15 @@ func validateTableCSVBundleObject(ctx context.Context, raw []byte, shape string)
 			}
 		}
 		switch {
+		case shape == "owned-manifest" && key == "descriptionMetadataPresent":
+			literal := bytes.TrimSpace(value)
+			if !bytes.Equal(literal, []byte("true")) && !bytes.Equal(literal, []byte("false")) {
+				return errors.New("descriptionMetadataPresent must be an explicit JSON boolean")
+			}
+		case shape == "owned-manifest" && key == "document":
+			if err := validateTableCSVBundleObject(ctx, value, "manifest"); err != nil {
+				return fmt.Errorf("owned document: %w", err)
+			}
 		case shape == "manifest" && (key == "columns" || key == "descriptions"):
 			child := "column"
 			if key == "descriptions" {

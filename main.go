@@ -38,6 +38,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	tableCSVArchiveEnabled, err := tableCSVArchiveFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	plotLocationReviewEnabled, err := plotLocationReviewFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -152,6 +156,7 @@ func main() {
 		application.NewService(NewGoogleEarthKMLExportService(contextService, googleEarthKMLExportEnabled)),
 		application.NewService(NewGoogleEarthPreferencesService(contextService, googleEarthPreferencesEnabled)),
 		application.NewService(NewLongEnvironmentPreferencesService(contextService, longEnvironmentPreferencesEnabled)),
+		application.NewService(NewTableCSVArchiveService(contextService, tableCSVArchiveEnabled)),
 		application.NewService(coordinates),
 	}
 	if refService != nil {

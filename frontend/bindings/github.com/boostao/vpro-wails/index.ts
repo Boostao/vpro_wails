@@ -20,6 +20,7 @@ import * as RegionCodeService from "./regioncodeservice.js";
 import * as SiteCodeService from "./sitecodeservice.js";
 import * as SoilCodeService from "./soilcodeservice.js";
 import * as StartupService from "./startupservice.js";
+import * as TableCSVArchiveService from "./tablecsvarchiveservice.js";
 import * as WorkingUnitService from "./workingunitservice.js";
 export {
     BECService,
@@ -41,6 +42,7 @@ export {
     SiteCodeService,
     SoilCodeService,
     StartupService,
+    TableCSVArchiveService,
     WorkingUnitService
 };
 
@@ -198,6 +200,8 @@ export type {
     SpeciesCodeCheckUpdate,
     SpeciesItem,
     StartupState,
+    TableCSVArchiveOutcome,
+    TableCSVArchiveReview,
     TableCSVDescription,
     TableCSVManifest,
     VegRecord,

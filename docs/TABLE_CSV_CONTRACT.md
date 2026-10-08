@@ -231,8 +231,181 @@ against368 captured Go source hashes. Candidate receipts under
 `archives/table-csv-owned-publication-checkpoint` are unsealed implementation
 evidence, not acceptance. The helper remains private/unwired: no feature flag,
 public method, desktop/native export or final ZIP/CSV/RDS approval is added.
-The reviewed private source-owned successor is ready for exact archival
-acceptance; its source-observation limitations remain unchanged.
+The [reviewed private source-owned successor](../archives/table-csv-owned-publication-reviewed-checkpoint/evidence-manifest.json)
+retains22 exact files, verifies all27 publication-predecessor files and records368
+unchanged integration source hashes. Its source-observation limitations remain
+unchanged.
+
+## Private owned archive successor
+
+[Owned archive preparation](../tablecsvownedarchive.go) preserves the physical
+Description metadata-presence bit inside the artifact, rather than only comparing
+it while publishing. ZIP Store still has exactly `table.csv` and `manifest.json`.
+The latter is now a separately identified envelope (the document body below
+is abbreviated, not a decodable fixture):
+
+```json
+{
+  "format": "vpro-owned-table-csv",
+  "version": 1,
+  "descriptionMetadataPresent": false,
+  "document": { "...": "the unchanged complete version1 table manifest" }
+}
+```
+
+The envelope's version is independent of the table document's version. Metadata
+absence and present-but-empty produce different bytes; NULL, empty and duplicate
+physical candidates remain in the complete nested document. Absent metadata with
+nonempty candidates is rejected, never repaired. The boolean is required and
+must be a literal JSON boolean; missing, NULL and inferred defaults are invalid.
+This does not capture the entire metadata table, its constraints, or database
+indexes/defaults/triggers. It is not a SQLite database reconstructor.
+
+The unchanged generic version1 bundle and this owned envelope deliberately reject
+each other's manifests; no historical artifact is silently upgraded or assigned
+metadata-presence authority. Both reuse the same deterministic ZIP writer,
+strict bounded member/header/CRC checks and raw Unicode/object-shape validation.
+Owned publication reuses the existing context lease, fresh source observations,
+checked read cleanup and no-replace single-artifact writer. Its existing
+already-borrowed/external-writer limitations remain unchanged.
+
+ZIP delivery is a provisional engineering choice while the user is unavailable,
+not client approval of an ordinary analysis CSV/RDS format. This successor is
+private: no desktop binding, feature flag, download/import control or native
+export behavior is enabled. Final focused legacy/shared/owned race12.453s and
+package vet pass. Tests independently inspect the envelope and cover absent/
+present-empty/nullable duplicate states, malformed and missing properties,
+Unicode, integrity/budget refusal, every cancellation checkpoint, detached
+aliases, collisions, source drift, clean retry and preserved postcommit warnings.
+Fresh full Go race integration passes root962.800s/all packages against408
+pinned Go files and192 unchanged frontend/dependency identities. Primary boundary
+inspection and tests are recorded; no new independent-review or native-export
+claim is made. The
+[private owned archive checkpoint](../archives/table-csv-owned-archive-checkpoint/evidence-manifest.json)
+retains exact code, source and receipts and verifies the39-file scope predecessor.
+The next vertical is separately gated desktop review/approval, destination
+picker and irreversible publication receipt/lifecycle handling.
+
+## Private source-bound approval facade
+
+[Archive approval preparation](../tablecsvarchiveservice.go) provides a private,
+unregistered facade for that desktop successor. Its independent literal
+`VPRO_TABLE_CSV_ARCHIVE_EXPORT` parser defaults off and does not inherit the
+existing read-only review flag. The service is not registered in the application;
+there are no new Wails bindings or UI/native export controls.
+
+`GetTableCSVArchiveReview` accepts exactly `{"table":"literal core table"}`.
+It returns the complete owned table review plus the separate source approval,
+archive SHA256, archive byte count, explicit format and envelope version.
+The domain-separated approval hash binds the complete detached owned review:
+context/project/path, original ordered schema, physical row IDs/storage tags,
+exact CSV bytes and nullable/duplicate Description candidates plus physical
+metadata presence. Identical CSV is not sufficient approval when metadata or
+ownership changes. This checksum is neither authentication nor import permission.
+
+`ExportReviewedTableCSVArchive` requires exactly `table`, `approvalHash` and
+`destination` strings. Invalid UTF-8, raw unpaired JSON Unicode, missing/NULL
+properties, duplicate/escaped aliases, case aliases and extra fields are rejected
+before decoder repair. Identities and destination are explicit nonempty Unicode
+without NUL; nothing is trimmed, case-normalized or inferred. Publication first
+reads the owned source again and compares the exact lowercase64-hex approval,
+then uses the already-tested owned archive writer and fresh pre/postlink
+observations. A new review is required after observable source/schema/metadata
+drift. A stale context or arbitrary/support/view table never grants publication.
+
+Errors before entering publication remain explicit request errors. Once the
+publisher returns, its outcome is a typed `published`, `published-with-errors`
+or `not-published` receipt retaining requested destination, observed canonical
+path, artifact SHA256 and error text. A cleanup/drift error after linking must not
+become an ordinary RPC failure or lose the committed artifact. Requested paths
+can retain Windows short-name spelling while observed paths use the canonical
+long-name spelling. No implicit extension, replacement, launch or preference
+save is performed.
+
+The prior KML strict request decoder and publication-receipt logic are extracted
+as shared helpers with their existing behavior and public DTOs preserved.
+Focused coupled race16.047s and package vet pass, covering all eight physical
+core tables, raw ownership/schema/metadata/row drift, stale and malformed
+approvals, every hash cancellation checkpoint, detached aliases, collision,
+read cleanup refusal/retry, real committed cleanup warning and existing KML
+regressions. An initial test incorrectly compared canonical long paths to
+requested Windows short paths; corrected tests independently resolve the actual
+path while checking the literal request separately. A misplaced test-function
+insertion was corrected before the passing receipt. Both failed receipts remain
+retained; no application failure or native acceptance is inferred from them.
+Fresh full Go race integration passes root982.703s/all packages against410
+pinned Go files/192 unchanged frontend identities and the35-file owned archive
+predecessor. The
+[private approval checkpoint](../archives/table-csv-archive-approval-checkpoint/evidence-manifest.json)
+retains exact code/source/failed and passing receipts. This is primary-tested
+private preparation, not independent-review or native desktop acceptance.
+
+## Independently gated desktop migration archive
+
+The registered [archive service](../tablecsvarchiveservice.go) now has actual
+generated Wails bindings and an independently default-off desktop surface in
+[the table review panel](../frontend/src/ProjectTableCSVReview.svelte).
+Backend `VPRO_TABLE_CSV_ARCHIVE_EXPORT` accepts only literal `true`/`false`.
+Frontend export controls require exactly `VITE_TABLE_CSV_ARCHIVE_EXPORT=true`;
+the existing table-review navigation also requires `VITE_TABLE_CSV_REVIEW=true`.
+The archive backend does not inherit `VPRO_TABLE_CSV_REVIEW`: native proof
+confirms archive review with that original backend flag off. Production defaults
+are not promoted.
+
+Explicit preparation displays the exact whole physical table, schema, value CSV,
+metadata presence/candidates, source approval and archive hash/size/format.
+Frontend validation detaches before asynchronous CSV checksum validation and
+checks planned context/project/path/table identities. It does not claim to
+independently derive the server's source-approval or ZIP hash. A literal
+destination textarea and optional native `Dialogs.SaveFile` chooser are separate
+from the reviewed Export action; neither typing nor choosing a file publishes.
+Picker cancellation preserves the prior literal destination, creates no file
+and releases its close/navigation barrier. Picker errors remain explicit.
+There is no extension completion, silent text repair, replacement or viewer
+launch. This is a migration archive, not an ordinary analysis CSV or RDS product.
+
+[Persistent publication sessions](../frontend/src/tableCSVArchiveExport.ts)
+retain every known and unknown attempt across acknowledgement, reload, tab
+remount and subsequent attempts. Unknown transport after invoked publication
+does not invent committed/changed booleans. Acknowledgement releases the barrier
+and invalidates approval without erasing evidence or automatically replaying a
+write. Publication is not cancellable or tracked as a read; held writes and
+unacknowledged outcomes block navigation/native close. Literal owned identity
+checks prevent receipt reassignment to another project/path.
+
+Primary frontend validation passes438 tests (10 pretest plus428 runner cases),
+check0 errors/warnings and isolated opt-in/default-off builds. Vite retains its
+existing large-chunk warning; no build error or protected-dist replacement.
+Actual production Wails builds use verified exclusive embed overlays. Twenty
+native cases across four fresh normally closed owners verify:
+
+- Independent frontend-default-off and backend-off gates and actual bindings.
+- Exact owned Env review against independent physical SQLite/CSV observations.
+- One actually visible destination control and associated label at1400/600px.
+- Cancellation of the actual owned standard Windows SaveFile picker.
+- Exact two-member ZIP bytes/manifest/hash/size at the explicit destination.
+- Collision refusal with the original artifact unchanged.
+- Noncancellable held responses after real commits, navigation/native-close
+  barriers, known warnings and unknown transport outcomes with historical
+  receipts retained across acknowledgement/remount; known receipts also survive
+  subsequent native attempts. Fast session tests cover unknown receipts through
+  subsequent attempts without another native write.
+- Existing FS882 valid/invalid draft Cancel/Discard/Undo and disabled invalid
+  Save behavior, without replaying a successful business write.
+
+Four planned export files are retained. The native warning/unknown cases
+instrument only delivery of a real committed response; actual source-cleanup
+warnings are separately exercised by Go facade tests, not claimed as native
+Access faults. All16 source/config fixture hashes restore after every close;
+no SQLite/audit/config/canonical/registry or protected-default writes occur.
+Fresh full desktop Go race integration passes root931.623s/all packages against
+410 pinned Go files and195 frontend/dependency identities. The
+[desktop archive checkpoint](../archives/table-csv-archive-desktop-checkpoint/evidence-manifest.json)
+retains exact builds, four outputs, native/source/validation receipts and verifies
+the36-file approval predecessor. Primary/native verification and frontend
+implementation-agent tests are recorded; no separate independent-review claim
+is made. No import/RDS/TurboVeg, database
+reconstruction or final client plain-analysis format approval follows.
 
 ## Access reader platform
 
