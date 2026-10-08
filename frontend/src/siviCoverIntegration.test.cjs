@@ -31,6 +31,7 @@ function host(overrides = {}) {
     siviCombinedView: { review: [{}] },
     siviCollectedSession: null, siviCollectedUnsaved: false, siviCollectedPanelOpen: false,
     siviSpeciesSession: null, siviSpeciesUnsaved: false, siviSpeciesPanelOpen: false,
+    siviIdentitySession: null, siviIdentityUnsaved: false, siviIdentityPanelOpen: false,
     siviParentSharedSession: null, siviProjectAssignmentSession: null, siviParentActionSession: null,
     siviParentWriteSession: null, siviParentSourceView: null, siviParentSession: null,
     AuditRestoreAction: { AuditRestoreRetain: 'retain', AuditRestorePrune: 'prune' },

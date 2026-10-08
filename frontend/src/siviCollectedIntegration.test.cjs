@@ -7,8 +7,8 @@ const { componentFunctions } = require('./svelteTestHelpers.cjs');
 
 const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
 const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
-const peers = ['siviSession', 'siviCoverSession', 'siviCombinedSession', 'siviCollectedSession', 'siviSpeciesSession'];
-const guards = ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCoverUnsaved', 'siviCombinedUnsaved', 'siviSpeciesUnsaved',
+const peers = ['siviSession', 'siviCoverSession', 'siviCombinedSession', 'siviCollectedSession', 'siviSpeciesSession', 'siviIdentitySession'];
+const guards = ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCoverUnsaved', 'siviCombinedUnsaved', 'siviSpeciesUnsaved', 'siviIdentityUnsaved',
   'heightUnsaved', 'otherUnsaved', 'soilUnsaved', 'attributeUnsaved', 'collectedUnsaved', 'speciesUnsaved',
   'siviParentWriteUnsaved', 'siviParentActionUnsaved', 'siviProjectAssignmentUnsaved', 'siviParentSharedUnsaved'];
 
@@ -21,6 +21,7 @@ function host(overrides = {}) {
     error: null, successMsg: null, siviCollectedEnabled: true, siviCollectedEditingDisabled: false,
     siviCollectedUnsaved: false, siviCollectedReading: false, siviCollectedPanelOpen: false,
     siviSpeciesPanelOpen: false,
+    siviIdentityPanelOpen: false,
     siviCollectedView: { review: [{}] }, siviPanelOpen: true, siviCoverPanelOpen: true, siviCombinedPanelOpen: true,
     siviParentSharedSession: null, siviProjectAssignmentSession: null, siviParentActionSession: null,
     siviParentWriteSession: null, siviParentSourceView: null, siviParentSession: null,

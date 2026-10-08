@@ -28,13 +28,14 @@ export interface SIVIChildWriteScope<Column extends string, Drafts> {
   pluralLabel: string;
   empty(): Drafts;
   stage(review: SIVIProjection[], drafts: Drafts, rowId: string, column: Column, raw: string, nullValue: boolean): Drafts;
-  errors(drafts: Drafts): string[];
+  errors(drafts: Drafts, review?: readonly SIVIProjection[]): string[];
   dirty(drafts: Drafts): boolean;
   hidden(drafts: Drafts, extended: boolean): boolean;
   count(review: SIVIProjection[], drafts: Drafts): number;
   requestJSON(review: SIVIProjection[], drafts: Drafts): string;
   sourceNotices?(review: SIVIProjection[], drafts: Drafts): SIVIChildSourceNotice[];
   conservativeFailures?: boolean;
+  auditFreeHistory?: boolean;
 }
 
 export class SIVIChildWriteSession<Column extends string, Drafts> {
@@ -51,14 +52,14 @@ export class SIVIChildWriteSession<Column extends string, Drafts> {
   view(): SIVIChildWriteView<Drafts> {
     const view = structuredClone(this.state);
     if (this.disposed) view.sourceNotices = [];
-    else if (view.review && !view.blocked && this.scope.dirty(view.drafts) && !this.scope.errors(view.drafts).length) {
+    else if (view.review && !view.blocked && this.scope.dirty(view.drafts) && !this.scope.errors(view.drafts, view.review).length) {
       view.sourceNotices = this.scope.sourceNotices?.(view.review, view.drafts) ?? [];
       view.sourceNoticesSaved = false;
     }
     return view;
   }
   closeState(): EditorCloseState {
-    const invalid = this.scope.errors(this.state.drafts);
+    const invalid = this.scope.errors(this.state.drafts, this.state.review ?? undefined);
     const hidden = this.scope.hidden(this.state.drafts, this.state.extended);
     const saveReason = this.state.busy ? `Wait for the ${this.label} operation to finish.`
       : this.state.blocked ? `${this.label} acknowledgement or refresh failed. Undo/reload explicitly; do not replay.`
@@ -80,7 +81,7 @@ export class SIVIChildWriteSession<Column extends string, Drafts> {
     this.requireIdle();
     if (this.state.blocked || !this.state.review) throw new Error(`${this.label} source is unavailable; Undo/reload before editing.`);
     this.state.drafts = this.scope.stage(this.state.review, this.state.drafts, rowId, column, raw, nullValue);
-    this.state.error = this.scope.errors(this.state.drafts)[0] ?? null;
+    this.state.error = this.scope.errors(this.state.drafts, this.state.review)[0] ?? null;
     this.changed();
   }
   presentation(extended: boolean) {
@@ -162,6 +163,7 @@ export class SIVIChildWriteSession<Column extends string, Drafts> {
       }
       this.requireOwned();
       if (!result || result.ChangedCells !== count || typeof result.HistoryID !== 'string' ||
+          this.scope.auditFreeHistory === true && result.HistoryID === '' ||
           result.HistoryID !== '' && (!exactSigned64(result.HistoryID) || BigInt(result.HistoryID) <= 0)) {
         this.state.blocked = true;
         this.state.historyId = null;
@@ -206,7 +208,8 @@ export class SIVIChildWriteSession<Column extends string, Drafts> {
       }
       this.requireOwned();
       if (!result || !Number.isSafeInteger(result.restoredRows) || result.restoredRows <= 0 || result.cleanedVegRows !== 0 ||
-          result.cancelled !== false || result.prunedAuditRows !== (action === 'prune' ? result.restoredRows : 0)) {
+          result.cancelled !== false || result.prunedAuditRows !==
+            (action === 'prune' && this.scope.auditFreeHistory !== true ? result.restoredRows : 0)) {
         this.state.blocked = true;
         this.state.historyId = null;
         throw new Error(`${this.label} restoration acknowledgement is incomplete; Undo/reload, never replay.`);

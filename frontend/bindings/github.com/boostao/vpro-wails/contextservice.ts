@@ -129,6 +129,10 @@ export function GetSiteUnitSummaryOptions(contextID: string): $CancellablePromis
     return $Call.ByID(1799826469, contextID);
 }
 
+export function GetVegetationReadAvailability(contextID: string, plot: string): $CancellablePromise<$models.VegetationReadAvailability | null> {
+    return $Call.ByID(2293660121, contextID, plot);
+}
+
 export function ListAuditEntries(contextID: string, plot: string): $CancellablePromise<$models.AuditEntry[] | null> {
     return $Call.ByID(2687960619, contextID, plot);
 }

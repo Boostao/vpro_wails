@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"reflect"
 )
 
@@ -39,94 +37,19 @@ type SIVISpeciesWrite struct {
 // Validate each raw object before decoding: encoding/json otherwise accepts
 // duplicate authority and recased properties, and repairs invalid Unicode.
 func siviSpeciesObject(data []byte, required, optional []string) (map[string]json.RawMessage, error) {
-	if err := validateMetadataDraftJSON(data); err != nil {
-		return nil, err
-	}
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	start, err := decoder.Token()
-	if err != nil || start != json.Delim('{') {
-		return nil, errors.New("Species authority requires an object")
-	}
-	allowed := map[string]bool{}
-	for _, name := range append(append([]string{}, required...), optional...) {
-		allowed[name] = true
-	}
-	result := map[string]json.RawMessage{}
-	for decoder.More() {
-		token, err := decoder.Token()
-		if err != nil {
-			return nil, err
-		}
-		name, ok := token.(string)
-		if !ok || !allowed[name] || result[name] != nil {
-			return nil, fmt.Errorf("unknown or duplicate Species property %q", token)
-		}
-		var value json.RawMessage
-		if err := decoder.Decode(&value); err != nil {
-			return nil, err
-		}
-		result[name] = value
-	}
-	for _, name := range required {
-		if result[name] == nil {
-			return nil, fmt.Errorf("Species requires explicit %s", name)
-		}
-	}
-	return result, nil
+	return sourceChildJSONObject(data, "Species", required, optional)
 }
 
 func siviSpeciesNonNull(properties map[string]json.RawMessage, names ...string) error {
-	for _, name := range names {
-		if raw, present := properties[name]; present && bytes.Equal(bytes.TrimSpace(raw), []byte("null")) {
-			return fmt.Errorf("Species authority %s must not be NULL", name)
-		}
-	}
-	return nil
+	return sourceChildJSONNonNull(properties, "Species", names...)
 }
 
 func siviSpeciesCellJSON(data []byte) error {
-	properties, err := siviSpeciesObject(data, []string{"storage", "text", "integer", "real", "blobHex"}, nil)
-	if err != nil {
-		return err
-	}
-	if err := siviSpeciesNonNull(properties, "storage"); err != nil {
-		return err
-	}
-	var cell ProjectMetadataCell
-	if err := json.Unmarshal(data, &cell); err != nil {
-		return err
-	}
-	_, err = metadataCellValue(cell)
-	return err
+	return sourceChildCellJSON(data, "Species")
 }
 
 func siviSpeciesRowsJSON(data []byte) error {
-	if bytes.Equal(bytes.TrimSpace(data), []byte("null")) {
-		return errors.New("Species reviewed rows must not be NULL")
-	}
-	var rows []json.RawMessage
-	if err := json.Unmarshal(data, &rows); err != nil {
-		return err
-	}
-	for _, raw := range rows {
-		properties, err := siviSpeciesObject(raw, []string{"rowId", "cells"}, nil)
-		if err != nil {
-			return err
-		}
-		if err := siviSpeciesNonNull(properties, "rowId", "cells"); err != nil {
-			return err
-		}
-		var cells []json.RawMessage
-		if err := json.Unmarshal(properties["cells"], &cells); err != nil {
-			return err
-		}
-		for _, cell := range cells {
-			if err := siviSpeciesCellJSON(cell); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
+	return sourceChildRowsJSON(data, "Species")
 }
 
 func siviSpeciesTableJSON(data []byte) error {

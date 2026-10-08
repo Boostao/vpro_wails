@@ -7,7 +7,7 @@ const { componentFunctions } = require('./svelteTestHelpers.cjs');
 const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
 const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
 const guards = ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCoverUnsaved', 'siviCombinedUnsaved',
-  'siviCollectedUnsaved', 'heightUnsaved', 'otherUnsaved', 'soilUnsaved', 'attributeUnsaved',
+  'siviCollectedUnsaved', 'siviIdentityUnsaved', 'heightUnsaved', 'otherUnsaved', 'soilUnsaved', 'attributeUnsaved',
   'collectedUnsaved', 'speciesUnsaved', 'siviParentWriteUnsaved', 'siviParentActionUnsaved',
   'siviProjectAssignmentUnsaved', 'siviParentSharedUnsaved'];
 function host(overrides = {}) {
@@ -22,6 +22,7 @@ function host(overrides = {}) {
     siviParentSharedSession: null, siviProjectAssignmentSession: null, siviParentActionSession: null,
     siviParentWriteSession: null, siviParentSourceView: null, siviSession: null, siviCoverSession: null,
     siviCombinedSession: null, siviCollectedSession: null,
+    siviIdentitySession: null, siviIdentityPanelOpen: false,
     AuditRestoreAction: { AuditRestoreRetain: 'retain', AuditRestorePrune: 'prune' },
     ...overrides,
   });

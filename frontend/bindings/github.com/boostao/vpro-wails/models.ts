@@ -1852,6 +1852,12 @@ export interface VegetationNumberUpdate {
     "forms": { [_ in string]?: string } | null;
 }
 
+export interface VegetationReadAvailability {
+    "available": boolean;
+    "reason": string;
+    "records": VegRecord[] | null;
+}
+
 export interface VegetationReportMembership {
     "rowId": string;
     "plotNumber": ProjectMetadataCell;

@@ -7,6 +7,7 @@
     SIVICombinedService,
     SIVICollectedService,
     SIVISpeciesService,
+    SIVIIdentityService,
     AuditRestoreAction,
     ReferenceService,
     type FS882Header,
@@ -36,6 +37,7 @@
   import SIVICombinedPanel from './SIVICombinedPanel.svelte';
   import SIVICollectedPanel from './SIVICollectedPanel.svelte';
   import SIVISpeciesPanel from './SIVISpeciesPanel.svelte';
+  import SIVIIdentityPanel from './SIVIIdentityPanel.svelte';
   import SIVIParentReadPanel from './SIVIParentReadPanel.svelte';
   import SIVIParentSharedFields from './SIVIParentSharedFields.svelte';
   import { SIVIParentSharedSession, siviParentSharedFieldsFor, type SIVIParentSharedColumn, type SIVIParentSharedInput } from './siviParentSharedSession';
@@ -52,6 +54,8 @@
   import { SIVICombinedSession } from './siviCombinedSession';
   import { SIVICollectedSession } from './siviCollectedSession';
   import { SIVISpeciesSession } from './siviSpeciesSession';
+  import { SIVIIdentitySession } from './siviIdentitySession';
+  import { vegetationReadAvailability } from './vegetationReadAvailability';
   import type { SIVICombinedColumn } from './siviCombinedEditor';
   import NewChild from './NewChild.svelte';
   import PersonalSpeciesFields from './PersonalSpeciesFields.svelte';
@@ -98,6 +102,7 @@
   const siviCombinedEnabled = import.meta.env.VITE_SIVI_COMBINED_EDITING === 'true';
   const siviCollectedEnabled = import.meta.env.VITE_SIVI_COLLECTED_EDITING === 'true';
   const siviSpeciesEnabled = import.meta.env.VITE_SIVI_SPECIES_EDITING === 'true';
+  const siviIdentityEnabled = import.meta.env.VITE_SIVI_IDENTITY_EDITING === 'true';
   const siviChildSourceNoticesEnabled = import.meta.env.VITE_SIVI_CHILD_SOURCE_NOTICES === 'true';
   const siviParentReviewEnabled = import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
   const siviStandalone = untrack(() => entryForm === 'sivi');
@@ -189,6 +194,16 @@
   const siviSpeciesClose = $derived.by(() => { siviSpeciesRevision; return siviSpeciesSession?.closeState() ?? null; });
   const siviSpeciesUnsaved = $derived(siviSpeciesClose?.unsaved ?? false);
   const siviSpeciesBusy = $derived(siviSpeciesClose?.busy ?? false);
+  const siviIdentityReads = new ReadRequests();
+  let siviIdentitySession: SIVIIdentitySession | null = null;
+  let siviIdentityRevision = $state(0);
+  let siviIdentityPanelOpen = $state(false);
+  let siviIdentityReading = $state(false);
+  const siviIdentityView = $derived.by(() => { siviIdentityRevision; return siviIdentitySession?.view() ?? null; });
+  const siviIdentityClose = $derived.by(() => { siviIdentityRevision; return siviIdentitySession?.closeState() ?? null; });
+  const siviIdentityUnsaved = $derived(siviIdentityClose?.unsaved ?? false);
+  const siviIdentityBusy = $derived(siviIdentityClose?.busy ?? false);
+  let vegetationReadUnavailable = $state<string | null>(null);
   const reads = new ReadRequests();
   const referenceReads = new ReadRequests();
   const speciesReads = new ReadRequests();
@@ -279,7 +294,7 @@
   let profileReviewBlocked = $state(false);
   let profileEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || twoPageOpen || twoPageBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy);
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || twoPageOpen || twoPageBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy || siviIdentityBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -321,7 +336,7 @@
   const creationSpeciesInvalid = $derived(creationDraft ? vegetationCreationSpeciesError(creationDraft, speciesLists[creationDraft.form] ?? []) : null);
   const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
-  const nonParentChildUnsaved = $derived(heightUnsaved || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || environmentSUOpen);
+  const nonParentChildUnsaved = $derived(heightUnsaved || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || environmentSUOpen);
   const childUnsaved = $derived(nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || twoPageOpen);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
@@ -353,6 +368,8 @@
     siviCollectedReads.cancelAll();
     siviSpeciesSession?.dispose();
     siviSpeciesReads.cancelAll();
+    siviIdentitySession?.dispose();
+    siviIdentityReads.cancelAll();
     loadRequest++; referenceRequest++; speciesRequest++;
     reads.cancelAll(); referenceReads.cancelAll(); speciesReads.cancelAll();
     speciesReferenceRequest++; speciesReferenceReads.cancelAll();
@@ -597,17 +614,18 @@
   const siviProjectAssignmentEditingDisabled = $derived(!siviProjectAssignmentEnabled || !capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty ||
     original === null || nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviParentSharedUnsaved || personalDraft !== null ||
     Object.keys(headerValidation).length > 0 || siviSourceAuthorityUnknown || Boolean(siviParentSourceView?.error) || (siviProjectAssignmentView?.blocked ?? false));
-  const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
-  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
-  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
-  const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved || speciesUnsaved);
-  const collectedEditingDisabled = $derived(!collectedEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || speciesUnsaved);
-  const speciesEditingDisabled = $derived(!speciesEditingEnabled || !speciesReferenceReady || speciesReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
-  const siviEditingDisabled = $derived(!siviHeightEnabled || childParentDisabled || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviView?.blocked ?? false));
-  const siviCoverEditingDisabled = $derived(!siviCoverEnabled || childParentDisabled || siviUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviCoverView?.blocked ?? false));
-  const siviCombinedEditingDisabled = $derived(!siviCombinedEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviCombinedView?.blocked ?? false));
-  const siviCollectedEditingDisabled = $derived(!siviCollectedEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviCollectedView?.blocked ?? false));
-  const siviSpeciesEditingDisabled = $derived(!siviSpeciesEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviSpeciesView?.blocked ?? false));
+  const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved || speciesUnsaved);
+  const collectedEditingDisabled = $derived(!collectedEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || speciesUnsaved);
+  const speciesEditingDisabled = $derived(!speciesEditingEnabled || !speciesReferenceReady || speciesReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
+  const siviEditingDisabled = $derived(!siviHeightEnabled || childParentDisabled || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviView?.blocked ?? false));
+  const siviCoverEditingDisabled = $derived(!siviCoverEnabled || childParentDisabled || siviUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviCoverView?.blocked ?? false));
+  const siviCombinedEditingDisabled = $derived(!siviCombinedEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviCombinedView?.blocked ?? false));
+  const siviCollectedEditingDisabled = $derived(!siviCollectedEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviCollectedView?.blocked ?? false));
+  const siviSpeciesEditingDisabled = $derived(!siviSpeciesEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviSpeciesView?.blocked ?? false));
+  const siviIdentityEditingDisabled = $derived(!siviIdentityEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviIdentityView?.blocked ?? false));
   const childEditingDisabled = $derived(childParentDisabled || childUnsaved);
   const auditRestoreEnabled = import.meta.env.VITE_AUDIT_RESTORE !== 'false';
   const auditProject = $derived($projectState?.activeProject ?? '');
@@ -839,7 +857,7 @@
   }
 
   async function siviOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
-    if (!siviSession || !siviHeightEnabled || busy || headerWorkflowBusy || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || operation !== 'undo' && siviEditingDisabled) {
+    if (!siviSession || !siviHeightEnabled || busy || headerWorkflowBusy || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || operation !== 'undo' && siviEditingDisabled) {
       error = 'SIVI requires an available clean, unlocked parent and no conflicting operation or unresolved acknowledgement.';
       return false;
     }
@@ -885,11 +903,12 @@
     siviCombinedPanelOpen = false;
     siviCollectedPanelOpen = false;
     siviSpeciesPanelOpen = false;
+    siviIdentityPanelOpen = false;
     if (!siviView?.review && !siviUnsaved) await siviOperation('load');
   }
 
   async function siviCoverOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
-    if (!siviCoverSession || !siviCoverEnabled || busy || headerWorkflowBusy || siviUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved ||
+    if (!siviCoverSession || !siviCoverEnabled || busy || headerWorkflowBusy || siviUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved ||
         otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved ||
         siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved ||
         operation !== 'undo' && siviCoverEditingDisabled) {
@@ -920,10 +939,10 @@
     }
   }
 
-  async function refreshSIVIChildEditors(plot: string, owner: 'height' | 'cover' | 'combined' | 'collected' | 'species'): Promise<void> {
+  async function refreshSIVIChildEditors(plot: string, owner: 'height' | 'cover' | 'combined' | 'collected' | 'species' | 'identity'): Promise<void> {
     const peers = [owner !== 'height' ? siviSession : null, owner !== 'cover' ? siviCoverSession : null,
       owner !== 'combined' ? siviCombinedSession : null, owner !== 'collected' ? siviCollectedSession : null,
-      owner !== 'species' ? siviSpeciesSession : null];
+      owner !== 'species' ? siviSpeciesSession : null, owner !== 'identity' ? siviIdentitySession : null];
     for (const peer of peers) {
       if (peer?.closeState().unsaved || peer?.closeState().busy) {
         throw new Error('SIVI peer owns unresolved drafts or an operation; no peer originals were reset.');
@@ -958,11 +977,12 @@
     siviCombinedPanelOpen = false;
     siviCollectedPanelOpen = false;
     siviSpeciesPanelOpen = false;
+    siviIdentityPanelOpen = false;
     if (!siviCoverView?.review && !siviCoverUnsaved) await siviCoverOperation('load');
   }
 
   async function siviCombinedOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
-    if (!siviCombinedSession || !siviCombinedEnabled || busy || headerWorkflowBusy || siviUnsaved || siviCoverUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved ||
+    if (!siviCombinedSession || !siviCombinedEnabled || busy || headerWorkflowBusy || siviUnsaved || siviCoverUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved ||
         heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved ||
         siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved ||
         operation !== 'undo' && siviCombinedEditingDisabled) {
@@ -1016,11 +1036,12 @@
     siviCoverPanelOpen = false;
     siviCollectedPanelOpen = false;
     siviSpeciesPanelOpen = false;
+    siviIdentityPanelOpen = false;
     if (!siviCombinedView?.review && !siviCombinedUnsaved) await siviCombinedOperation('load');
   }
 
   async function siviCollectedOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
-    if (!siviCollectedSession || !siviCollectedEnabled || busy || headerWorkflowBusy || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviSpeciesUnsaved ||
+    if (!siviCollectedSession || !siviCollectedEnabled || busy || headerWorkflowBusy || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved ||
         heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved ||
         siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved ||
         operation !== 'undo' && siviCollectedEditingDisabled) {
@@ -1074,11 +1095,12 @@
     siviCoverPanelOpen = false;
     siviCombinedPanelOpen = false;
     siviSpeciesPanelOpen = false;
+    siviIdentityPanelOpen = false;
     if (!siviCollectedView?.review && !siviCollectedUnsaved) await siviCollectedOperation('load');
   }
 
   async function siviSpeciesOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
-    if (!siviSpeciesSession || !siviSpeciesEnabled || busy || headerWorkflowBusy || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved ||
+    if (!siviSpeciesSession || !siviSpeciesEnabled || busy || headerWorkflowBusy || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviIdentityUnsaved ||
         heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved ||
         siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved ||
         operation !== 'undo' && siviSpeciesEditingDisabled) {
@@ -1132,7 +1154,63 @@
     siviCoverPanelOpen = false;
     siviCombinedPanelOpen = false;
     siviCollectedPanelOpen = false;
+    siviIdentityPanelOpen = false;
     if (!siviSpeciesView?.review && !siviSpeciesUnsaved) await siviSpeciesOperation('load');
+  }
+
+  async function siviIdentityOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
+    if (!siviIdentitySession || !siviIdentityEnabled || busy || headerWorkflowBusy || siviUnsaved || siviCoverUnsaved ||
+        siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || heightUnsaved || otherUnsaved || soilUnsaved ||
+        attributeUnsaved || collectedUnsaved || speciesUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved ||
+        siviProjectAssignmentUnsaved || siviParentSharedUnsaved || operation !== 'undo' && siviIdentityEditingDisabled) {
+      error = 'SIVI ID editing requires a clean, unlocked available parent and no conflicting drafts or operation.';
+      return false;
+    }
+    error = null; successMsg = null;
+    siviIdentityReading = operation === 'load';
+    const owner = siviIdentitySession;
+    try {
+      const ok = operation === 'load' ? await owner.load()
+        : operation === 'save' ? await owner.save()
+        : operation === 'undo' ? await owner.undo()
+        : await owner.restore(operation === 'retain' ? AuditRestoreAction.AuditRestoreRetain : AuditRestoreAction.AuditRestorePrune);
+      if (owner !== siviIdentitySession) return false;
+      if (!ok) { error = owner.view().error; return false; }
+      successMsg = operation === 'save' ? 'SIVI IDs saved with technical restoration history; no source field audits were created.'
+        : operation === 'retain' || operation === 'prune' ? 'Original IDs restored without source audit pruning or vegetation deletion.'
+        : 'Owned SIVI ID source rows reloaded. No mutation was replayed.';
+      return true;
+    } catch (cause) {
+      if (owner !== siviIdentitySession) return false;
+      error = `SIVI ID operation failed; owner state retained: ${String(cause)}`;
+      return false;
+    } finally {
+      if (owner === siviIdentitySession) siviIdentityReading = false;
+    }
+  }
+
+  function stageSIVIIdentity(rowId: string, raw: string, nullValue: boolean) {
+    try {
+      if (!siviIdentitySession || siviIdentityEditingDisabled) throw new Error('Unlock the clean available parent before editing SIVI IDs.');
+      siviIdentitySession.stage(rowId, 'ID', raw, nullValue);
+      const message = siviIdentitySession.view().error;
+      if (message) error = `SIVI ID ${message}`;
+      else if (error?.startsWith('SIVI ID ')) error = null;
+      successMsg = null;
+    } catch (cause) {
+      error = `SIVI ID draft failed; original/raw state retained: ${String(cause)}`;
+    }
+  }
+
+  async function showSIVIIdentityPanel() {
+    if (siviIdentityPanelOpen) { siviIdentityPanelOpen = false; return; }
+    if (siviIdentityEditingDisabled && !siviIdentityUnsaved) {
+      error = 'SIVI IDs require a clean, unlocked available parent.'; return;
+    }
+    siviIdentityPanelOpen = true;
+    siviPanelOpen = false; siviCoverPanelOpen = false; siviCombinedPanelOpen = false;
+    siviCollectedPanelOpen = false; siviSpeciesPanelOpen = false;
+    if (!siviIdentityView?.review && !siviIdentityUnsaved) await siviIdentityOperation('load');
   }
 
   function openSpeciesCodeCheck() {
@@ -1324,6 +1402,10 @@
       error = 'SIVI Species drafts or operations must finish or be explicitly undone before replacing their plot owner.';
       return;
     }
+    if (siviIdentitySession && (siviIdentitySession.closeState().unsaved || siviIdentitySession.closeState().busy)) {
+      error = 'SIVI ID drafts or operations must finish or be explicitly undone before replacing their plot owner.';
+      return;
+    }
     siviParentSession?.dispose();
     siviParentSession = null;
     siviParentSourceSession?.dispose();
@@ -1369,6 +1451,11 @@
     siviSpeciesReads.cancelAll();
     siviSpeciesRevision++;
     siviSpeciesPanelOpen = false;
+    siviIdentitySession?.dispose();
+    siviIdentitySession = null;
+    siviIdentityReads.cancelAll();
+    siviIdentityRevision++;
+    siviIdentityPanelOpen = false;
     const request = ++loadRequest;
     reads.cancelAll();
     if (workingUnitSession.plot !== (p ?? '')) workingUnitSession.mode = null;
@@ -1390,6 +1477,7 @@
     personalDraft = null;
     savedPersonalCodes = [];
     vegList = [];
+    vegetationReadUnavailable = null;
     humusList = [];
     mineralList = [];
     otherList = [];
@@ -1532,6 +1620,16 @@
           }, () => siviSpeciesRevision++, extendedShrubs, siviChildSourceNoticesEnabled);
           siviSpeciesRevision++;
         }
+        if (siviIdentityEnabled) {
+          const plot = res.plotNumber;
+          siviIdentitySession = new SIVIIdentitySession(plot, {
+            read: extended => siviIdentityReads.track(SIVIIdentityService.GetOriginal(siviContextId, plot, extended)),
+            save: (extended, request) => SIVIIdentityService.SaveReviewed(siviContextId, plot, extended, request),
+            restore: (historyId, action) => SIVIIdentityService.RestoreReviewed(siviContextId, plot, historyId, action),
+            refreshParent: () => refreshSIVIChildEditors(plot, 'identity'),
+          }, () => siviIdentityRevision++, extendedShrubs, siviChildSourceNoticesEnabled);
+          siviIdentityRevision++;
+        }
       } else {
         draft = newDraft();
         original = null;
@@ -1556,7 +1654,9 @@
     const request = loadRequest;
     try {
       const [v, h, m, o, a, vc, hc, mc, oc] = await Promise.all([
-        reads.track(PlotService.ListVegRecords(p)),
+        siviIdentityEnabled
+          ? reads.track(ContextService.GetVegetationReadAvailability(siviContextId, p)).then(vegetationReadAvailability)
+          : reads.track(PlotService.ListVegRecords(p)).then(records => ({ records: records ?? [], reason: null })),
         reads.track(PlotService.ListHumusRecords(p)),
         reads.track(PlotService.ListMineralRecords(p)),
         reads.track(PlotService.ListOtherRecords(p)),
@@ -1569,7 +1669,8 @@
       if (request !== loadRequest) return;
       if (vc === null || hc === null || mc === null || oc === null) throw new Error('Child capabilities were not returned.');
       childCapabilities = { Veg: vc, Humus: hc, Mineral: mc, Other: oc };
-      vegList = v ?? [];
+      vegList = v.records;
+      vegetationReadUnavailable = v.reason;
       humusList = h ?? [];
       mineralList = m ?? [];
       otherList = o ?? [];
@@ -2524,6 +2625,7 @@
     if (siviCombinedUnsaved) { await siviCombinedOperation('save'); return; }
     if (siviCollectedUnsaved) { await siviCollectedOperation('save'); return; }
     if (siviSpeciesUnsaved) { await siviSpeciesOperation('save'); return; }
+    if (siviIdentityUnsaved) { await siviIdentityOperation('save'); return; }
     if (heightUnsaved) { await saveHeightDrafts(); return; }
     if (otherUnsaved) { await saveOtherDrafts(); return; }
     if (soilUnsaved) { await saveSoilDrafts(); return; }
@@ -2609,6 +2711,7 @@
       : siviCombinedUnsaved && !siviCombinedClose?.canSave ? siviCombinedClose?.saveReason ?? 'Correct or Undo unresolved combined SIVI drafts.'
       : siviCollectedUnsaved && !siviCollectedClose?.canSave ? siviCollectedClose?.saveReason ?? 'Correct or Undo unresolved SIVI Collected cycles.'
       : siviSpeciesUnsaved && !siviSpeciesClose?.canSave ? siviSpeciesClose?.saveReason ?? 'Correct or Undo unresolved SIVI Species drafts.'
+      : siviIdentityUnsaved && !siviIdentityClose?.canSave ? siviIdentityClose?.saveReason ?? 'Correct or Undo unresolved SIVI ID drafts.'
       : personalDraft !== null ? 'Save the personal definition explicitly or Cancel its entry before saving the plot or closing.'
       : deletionReview !== null ? 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review before saving and closing.'
       : creationInvalid.length > 0 ? 'Correct invalid vegetation creation or Cancel creation before saving.'
@@ -2624,7 +2727,7 @@
       : invalid ? 'Correct invalid header inputs or Undo before saving.'
       : !draft.plotNumber.trim() ? 'Plot Number is required before saving.' : '';
     return { unsaved: dirty || childUnsaved || invalid || newChild !== null || invalidChild, busy: busy || headerWorkflowBusy,
-      blocked: (siviClose?.blocked ?? false) || (siviCoverClose?.blocked ?? false) || (siviCombinedClose?.blocked ?? false) || (siviCollectedClose?.blocked ?? false) || (siviSpeciesClose?.blocked ?? false) || (siviParentWriteClose?.blocked ?? false) || (siviParentActionClose?.blocked ?? false) || (siviProjectAssignmentClose?.blocked ?? false) || (siviParentSharedClose?.blocked ?? false), canSave: saveReason === '', saveReason, error };
+      blocked: (siviClose?.blocked ?? false) || (siviCoverClose?.blocked ?? false) || (siviCombinedClose?.blocked ?? false) || (siviCollectedClose?.blocked ?? false) || (siviSpeciesClose?.blocked ?? false) || (siviIdentityClose?.blocked ?? false) || (siviParentWriteClose?.blocked ?? false) || (siviParentActionClose?.blocked ?? false) || (siviProjectAssignmentClose?.blocked ?? false) || (siviParentSharedClose?.blocked ?? false), canSave: saveReason === '', saveReason, error };
   }
 
   export async function saveForClose(): Promise<boolean> {
@@ -2659,6 +2762,7 @@
     if (siviCombinedUnsaved) { void siviCombinedOperation('undo'); return; }
     if (siviCollectedUnsaved) { void siviCollectedOperation('undo'); return; }
     if (siviSpeciesUnsaved) { void siviSpeciesOperation('undo'); return; }
+    if (siviIdentityUnsaved) { void siviIdentityOperation('undo'); return; }
     if (heightUnsaved) { void cancelHeightDrafts(); return; }
     if (otherUnsaved) { void cancelOtherDrafts(); return; }
     if (soilUnsaved) { void cancelSoilDrafts(); return; }
@@ -2739,6 +2843,10 @@
     }
     if (siviSpeciesUnsaved) {
       error = 'SIVI Species or unresolved acknowledgements must be saved or explicitly undone before changing the plot lock.';
+      return;
+    }
+    if (siviIdentityUnsaved) {
+      error = 'SIVI IDs or unresolved acknowledgements must be saved or explicitly undone before changing the plot lock.';
       return;
     }
     if (otherUnsaved) {
@@ -2930,6 +3038,12 @@
       <AlertTriangle size={14} class="text-red-600 shrink-0" />
       <span>{error}</span>
     </div>
+  {/if}
+  {#if vegetationReadUnavailable}
+    <p role="alert" class="p-2 bg-amber-50 text-amber-900 text-sm" data-vegetation-unavailable>
+      Ordinary ID-keyed vegetation is unavailable: {vegetationReadUnavailable}
+      Use independently enabled physical-row source views. Ordinary vegetation rows, totals and actions are not presented as an empty result.
+    </p>
   {/if}
   {#if successMsg}
     <div class="p-2 bg-emerald-50 border-b border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
@@ -3381,17 +3495,31 @@
           disabled={busy || headerWorkflowBusy || !siviSpeciesPanelOpen && siviSpeciesEditingDisabled && !siviSpeciesUnsaved}
           onclick={() => void showSIVISpeciesPanel()}>{siviSpeciesPanelOpen ? 'Close Species view' : 'Show SIVI Species'}</button>
       {/if}
+      {#if siviIdentityEnabled}
+        <button type="button" class="rounded border px-3 py-1 disabled:opacity-50" data-sivi-identity-open
+          disabled={busy || headerWorkflowBusy || !siviIdentityPanelOpen && siviIdentityEditingDisabled && !siviIdentityUnsaved}
+          onclick={() => void showSIVIIdentityPanel()}>{siviIdentityPanelOpen ? 'Close ID view' : 'Show SIVI IDs'}</button>
+      {/if}
       {#if extendedShrubsEnabled}
         <label class="mb-3 flex items-center gap-2">
           <input type="checkbox" data-extended-shrubs checked={extendedShrubs} disabled={busy || headerWorkflowBusy}
-            onchange={(event) => { extendedShrubs = event.currentTarget.checked; siviSession?.presentation(extendedShrubs); siviCoverSession?.presentation(extendedShrubs); siviCombinedSession?.presentation(extendedShrubs); siviCollectedSession?.presentation(extendedShrubs); siviSpeciesSession?.presentation(extendedShrubs); if (extendedShrubs) vegetationMode = 'cover'; }} />
+            onchange={(event) => { extendedShrubs = event.currentTarget.checked; siviSession?.presentation(extendedShrubs); siviCoverSession?.presentation(extendedShrubs); siviCombinedSession?.presentation(extendedShrubs); siviCollectedSession?.presentation(extendedShrubs); siviSpeciesSession?.presentation(extendedShrubs); siviIdentitySession?.presentation(extendedShrubs); if (extendedShrubs) vegetationMode = 'cover'; }} />
           Show extended shrub layers (CHARS)
         </label>
-        {#if extendedShrubs && !siviPanelOpen && !siviCoverPanelOpen && !siviCombinedPanelOpen && !siviCollectedPanelOpen && !siviSpeciesPanelOpen}
+        {#if extendedShrubs && !siviPanelOpen && !siviCoverPanelOpen && !siviCombinedPanelOpen && !siviCollectedPanelOpen && !siviSpeciesPanelOpen && !siviIdentityPanelOpen}
           <p class="mb-3 text-sm" role="status">Extended shrubs use cover mode. Turn this option off to use height mode; hidden values, drafts and errors are retained.</p>
         {/if}
       {/if}
-      {#if siviSpeciesPanelOpen && siviSpeciesView}
+      {#if siviIdentityPanelOpen && siviIdentityView}
+        {#if siviIdentityReading && siviIdentityBusy}
+          <button type="button" class="rounded border px-3 py-1" data-sivi-identity-cancel-read
+            onclick={() => siviIdentityReads.cancelAll()}>Cancel ID source read</button>
+        {/if}
+        <SIVIIdentityPanel view={siviIdentityView} disabled={siviIdentityEditingDisabled} canSave={siviIdentityClose?.canSave ?? false}
+          onstage={stageSIVIIdentity} onsave={() => void siviIdentityOperation('save')} onundo={() => void siviIdentityOperation('undo')}
+          onreload={() => void siviIdentityOperation('load')}
+          onrestore={(action) => void siviIdentityOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+      {:else if siviSpeciesPanelOpen && siviSpeciesView}
         {#if siviSpeciesReading && siviSpeciesBusy}
           <button type="button" class="rounded border px-3 py-1" data-sivi-species-cancel-read
             onclick={() => siviSpeciesReads.cancelAll()}>Cancel Species source/reference read</button>
@@ -3430,6 +3558,9 @@
         <SIVICoverPanel view={siviCoverView} disabled={siviCoverEditingDisabled} canSave={siviCoverClose?.canSave ?? false}
           onstage={stageSIVICoverCell} onsave={() => void siviCoverOperation('save')} onundo={() => void siviCoverOperation('undo')}
           onreload={() => void siviCoverOperation('load')} onrestore={(action) => void siviCoverOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+      {:else if vegetationReadUnavailable}
+        <p role="alert" class="p-4">Ordinary ID-keyed vegetation is unavailable: {vegetationReadUnavailable}
+          Independently enabled physical-row SIVI views remain available; no NULL identity is converted to zero and no row is omitted from an ordinary result.</p>
       {:else if siviStandalone}
         <p role="status" class="p-4">SIVI vegetation preserves the three PlotNumber-linked source groups: A (trees/shrubs), C and D.
           Choose an independently enabled source view above. Species creation/deletion and original species-list callbacks remain unavailable.</p>
@@ -3838,6 +3969,9 @@
       </div>
       </details>
     {:else if activeTab === 'vegOther'}
+      {#if vegetationReadUnavailable}
+        <p role="alert">Vegetation attribute editing requires exact unique ordinary IDs. Use the physical-row source views; historical NULL/duplicates are preserved.</p>
+      {:else}
       {#if attributeEditingEnabled}
         {#if attributeReferenceBusy}<p role="status">Loading vegetation attribute references...</p>{/if}
         {#if attributeReferenceError}
@@ -3860,6 +3994,7 @@
           <button type="button" class="mt-2 px-2 py-1 border rounded" disabled={busy || attributeReferenceBusy || headerWorkflowBusy}
             onclick={() => void loadAttributeSuggestions()}>Reload attribute references</button>
         </div>
+      {/if}
       {/if}
     {:else if activeTab === 'other'}
       <button class="mb-3 text-xs" disabled={otherEditingDisabled || otherUnsaved} onclick={() => openNewChild('other')}>Add Other Data</button>

@@ -23,6 +23,7 @@ import * as RegionCodeService from "./regioncodeservice.js";
 import * as SIVICollectedService from "./sivicollectedservice.js";
 import * as SIVICombinedService from "./sivicombinedservice.js";
 import * as SIVICoverService from "./sivicoverservice.js";
+import * as SIVIIdentityService from "./siviidentityservice.js";
 import * as SIVIParentSharedService from "./siviparentsharedservice.js";
 import * as SIVISpeciesService from "./sivispeciesservice.js";
 import * as SiteCodeService from "./sitecodeservice.js";
@@ -61,6 +62,7 @@ export {
     SIVICollectedService,
     SIVICombinedService,
     SIVICoverService,
+    SIVIIdentityService,
     SIVIParentSharedService,
     SIVISpeciesService,
     SiteCodeService,
@@ -291,6 +293,7 @@ export type {
     VegetationDeletionRequest,
     VegetationDeletionReview,
     VegetationNumberUpdate,
+    VegetationReadAvailability,
     VegetationReportMembership,
     VegetationSpeciesAlias,
     VegetationSpeciesLookup,

@@ -480,6 +480,7 @@ test('every opted-in writer retains acknowledged warning feedback and clears it 
       siviCombinedSession: Writer === session.SIVICombinedSession ? owner : null,
       siviCollectedSession: null,
       siviSpeciesSession: null,
+      siviIdentitySession: null,
       loadChildData: async () => {},
     });
     await context.actions.refreshSIVIChildEditors('P', Writer === session.SIVICombinedSession ? 'height' : 'combined');
