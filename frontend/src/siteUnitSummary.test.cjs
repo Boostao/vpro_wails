@@ -53,11 +53,11 @@ test('summary component is independently gated, cancellable and enters shared dr
   assert.match(read('App.svelte'),/view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true'/);
   const panel=read('SiteUnitSummary.svelte');
   assert.match(panel,/onDestroy\(\(\) => \{ unsubscribe\?\.\(\); cancel\(\); \}\)/);assert.match(panel,/request !== generation/);
-  assert.match(panel,/onBusyChange\(busy \|\| preferenceBarrier\)/);
+  assert.match(panel,/onBusyChange\(busy \|\| preferenceBarrier \|\| workbookBusy\)/);
   assert.match(panel,/checked=\{method === 1\}/);assert.match(panel,/validateSiteUnitSummary/);
   assert.match(panel,/if \(!preferencesEnabled\) void options\(\)/);
   assert.match(panel,/GetSiteUnitSummaryOptions/);
-  assert.match(panel,/disabled=\{busy \|\| preferenceBarrier \|\| !ready \|\| su === 'None'\}/);
+  assert.match(panel,/disabled=\{busy \|\| workbookBusy \|\| preferenceBarrier \|\| !ready \|\| su === 'None'\}/);
   assert.match(panel,/ready = siteUnitType === 1/);
   assert.match(panel,/VITE_SITE_UNIT_SUMMARY_PREFERENCES === 'true'/);
   assert.doesNotMatch(panel,/<button[^>]*>Export|localStorage/);

@@ -25,6 +25,7 @@
   import { tableCSVArchivePublicationSession } from './tableCSVArchiveExport';
   import { vegetationWorkbookPublicationSession } from './vegetationWorkbook';
   import { lifeformWorkbookPublicationSession } from './lifeformWorkbook';
+  import { siteUnitSummaryWorkbookPublicationSession } from './siteUnitSummaryWorkbook';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -52,6 +53,7 @@
   let archivePublicationBusy = $state(false);
   let vegetationPublicationBusy = $state(false);
   let lifeformPublicationBusy = $state(false);
+  let summaryPublicationBusy = $state(false);
   $effect(() => {
     const state = $projectState;
     if (import.meta.env.VITE_LONG_VEGETATION_WORKBOOK !== 'true' || import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'true' ||
@@ -87,6 +89,18 @@
       archivePublicationBusy = publication.busy || publication.blocked;
       // Reloaded unacknowledged attempts must be visible even before this tab has mounted.
       if (publication.blocked && view === 'home') view = 'table-csv';
+    });
+  });
+  $effect(() => {
+    const state = $projectState;
+    if (import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'true' || import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'true' ||
+        !state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryPublicationBusy = false; return; }
+    const session = siteUnitSummaryWorkbookPublicationSession({ contextId: state.contextId,
+      project: state.activeProject, projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath });
+    return session.subscribe(() => {
+      const publication = session.view();
+      summaryPublicationBusy = publication.busy || publication.blocked;
+      if (publication.blocked && view === 'home') view = 'summary-environment';
     });
   });
   let editor: { getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean> } | undefined = $state();
@@ -152,7 +166,7 @@
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       await tick();
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor));
+      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor));
       if (disposition === 'busy') {
         await CloseService.CancelClose(requestId);
         error = 'Wait for the current operation to finish before closing VPRO.';
@@ -179,7 +193,7 @@
         return;
       }
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor)) === 'busy') {
+      if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor)) === 'busy') {
         closeError = 'Wait for the current operation to finish before closing VPRO.';
         return;
       }
@@ -207,7 +221,7 @@
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     await tick();
     const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-    if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
+    if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
       error = 'Wait for the current operation or decision before changing context.';
       return;
     }
@@ -230,7 +244,7 @@
     transitionError = '';
     try {
       const state = editor?.getCloseState();
-      if (!state || closeDisposition(state, busy || vegetationPublicationBusy || lifeformPublicationBusy) === 'busy') {
+      if (!state || closeDisposition(state, busy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy) === 'busy') {
         transitionError = 'Wait for the current editor operation to finish.';
         return;
       }
@@ -310,7 +324,7 @@
 
   async function findScopedPlot() {
     const contextId = $projectState?.contextId;
-    if (!plotFindEnabled || !contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
+    if (!plotFindEnabled || !contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
     const number = plotFindQuery;
     busy = true; plotFindError = ''; plotFindResult = null;
     try {
@@ -363,7 +377,7 @@
   }
 
   async function loadPlots(nextOffset: number) {
-    if (vegetationPublicationBusy || lifeformPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary') && editorBusy) return;
+    if (vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
     const current = ++request;
     plotReads.cancelAll();
     busy = true;
@@ -386,7 +400,7 @@
   }
 
   async function refresh() {
-    if (vegetationPublicationBusy || lifeformPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary') && editorBusy) return;
+    if (vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
     const current = ++stateRequest;
     stateReads.cancelAll();
     busy = true;
@@ -415,7 +429,7 @@
   }
 
   async function loadHierarchy() {
-    if (vegetationPublicationBusy || lifeformPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary') && editorBusy) return;
+    if (vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
     const current = ++hierarchyRequest;
     hierarchyReads.cancelAll();
     try {
@@ -436,7 +450,7 @@
 
   async function inspectProfileSources() {
     const contextId = $projectState?.contextId;
-    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
       profileSourceError = 'Wait for the current operation or decision before inspecting profile sources.'; return;
     }
     busy = true; profileSourceError = '';
@@ -453,7 +467,7 @@
   }
 
   async function reviewProfileSU(proposal: ProjectPlotProfileFilterRequest, origin: string) {
-    if (busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest ||
+    if (busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest ||
         $projectState?.contextId !== origin) throw new Error('Wait for the current owned operation before reviewing Save as SU.');
     busy = true; suError = '';
     try {
@@ -495,7 +509,7 @@
   async function reviewProfileSUProject() {
     const state = $projectState;
     if (!state?.contextId || !suReview || suReviewContext !== state.contextId ||
-        busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+        busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
       suProjectError = 'Wait for the current operation and review the current profile before reviewing a project-file SU.'; return;
     }
     if (!state.projectPath) {
@@ -565,7 +579,7 @@
 
   async function reviewProfileWriteOwnership() {
     const contextId = $projectState?.contextId;
-    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
+    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
     busy = true; profileWriteError = '';
     try {
       await tick();
@@ -637,7 +651,7 @@
 
   async function reviewBlankProfileFile() {
     const contextId = $projectState?.contextId;
-    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
       profileFileError = 'Wait for the current operation or decision before reviewing a new profile file.'; return;
     }
     busy = true; profileFileError = '';
@@ -681,7 +695,7 @@
 
   async function reviewBlankProfileTable() {
     const contextId = $projectState?.contextId;
-    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
+    if (!contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) {
       profileTableError = 'Wait for the current operation or decision before reviewing an existing-file profile.'; return;
     }
     busy = true; profileTableError = '';

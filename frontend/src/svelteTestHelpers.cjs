@@ -66,6 +66,17 @@ function loadTypeScript(filename, dependencies = {}, globals = {}) {
   } });
   return module.exports;
 }
+function componentFunctions(filename, names, values) {
+  const source = readFileSync(path.join(__dirname, filename), 'utf8');
+  const script = source.match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  const ast = ts.createSourceFile(filename + '.ts', script, ts.ScriptTarget.Latest, true);
+  const selected = ast.statements.filter(node => ts.isFunctionDeclaration(node) && names.includes(node.name.text));
+  assert.equal(selected.length, names.length);
+  const context = vm.createContext(values);
+  const code = selected.map(node => node.getText(ast)).join('\n') + `\nthis.actions = {${names.join(',')}};`;
+  vm.runInContext(ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText, context);
+  return context;
+}
 function presentationHelpers() {
   const paper = loadTypeScript('paperLayout.ts', {
     '../../resources/fs882-xl-layout.json': JSON.parse(readFileSync(path.join(__dirname, '..', '..', 'resources', 'fs882-xl-layout.json'), 'utf8')),
@@ -74,4 +85,4 @@ function presentationHelpers() {
   return { paper, presentation: loadTypeScript('formPresentation.ts', { './paperLayout': paper }) };
 }
 
-module.exports = { serverComponent, loadTypeScript, presentationHelpers };
+module.exports = { serverComponent, loadTypeScript, componentFunctions, presentationHelpers };

@@ -1454,6 +1454,30 @@ export interface SiteUnitSummaryUnit {
     "values": string[] | null;
 }
 
+export interface SiteUnitSummaryWorkbookOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface SiteUnitSummaryWorkbookReview {
+    "preview": SiteUnitSummaryPreview;
+    "scope": SiteUnitSummaryWorkbookScope;
+    "sheets": VegetationWorkbookSheet[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
+export interface SiteUnitSummaryWorkbookScope {
+    "savedMethod": number;
+    "siteUnitType": number;
+    "orderBy": number;
+    "includeSpecies": number;
+}
+
 export interface SoilCodeChoice {
     "rowId": string;
     "code": string | null;

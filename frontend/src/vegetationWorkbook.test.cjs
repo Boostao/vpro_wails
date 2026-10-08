@@ -225,7 +225,7 @@ test('actual root transition and both native-close paths reject unresolved publi
   let confirmed = 0, cancelled = 0, navigated = 0;
   const context = vm.createContext({
     closeWorking: false, closeRequest: '', closeError: '', error: '', view: 'home', editor: undefined,
-    busy: false, editorBusy: false, transitionWorking: false, archivePublicationBusy: false, vegetationPublicationBusy: true, lifeformPublicationBusy: false,
+    busy: false, editorBusy: false, transitionWorking: false, archivePublicationBusy: false, vegetationPublicationBusy: true, lifeformPublicationBusy: false, summaryPublicationBusy: false,
     pendingTransition: null, transitionError: '', $projectState: { contextId: owner.contextId },
     document: { activeElement: null }, HTMLElement: class {}, tick: async () => {},
     closeDisposition: loadTypeScript('closeLifecycle.ts').closeDisposition,

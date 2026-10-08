@@ -134,7 +134,11 @@ export function lifeformWorkbookPublicationSession(owner: LifeformSummaryOwner):
     if (existing.key !== key) throw new Error('Lifeform workbook receipt belongs to different owned paths.');
     return existing.session;
   }
+
   const session = new LifeformWorkbookPublicationSession(owner);
   sessions.set(owner.contextId, { key, session });
   return session;
 }
+
+export { worksheetName as workbookWorksheetName, foldedName as workbookFoldedName, workbookText,
+  freeze as freezeWorkbookReview };

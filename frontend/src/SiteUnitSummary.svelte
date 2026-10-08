@@ -5,6 +5,7 @@
   import { validateSiteUnitSummary, validateSiteUnitSummaryOptions, type ValidatedSiteUnitSummary } from './siteUnitSummary';
   import { reportCellText } from './longEnvironmentReport';
   import { siteUnitSummaryPreferencesSession } from './siteUnitSummaryPreferences';
+  import SiteUnitSummaryWorkbookPanel from './SiteUnitSummaryWorkbookPanel.svelte';
 
   let { contextId, project, projectPath, su, suPath, onBusyChange }: {
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
@@ -14,6 +15,7 @@
   let siteUnitType = $state<number | null>(null);
   let ready = $state(false);
   let busy = $state(false);
+  let workbookBusy = $state(false);
   let error = $state('');
   let preview = $state<ValidatedSiteUnitSummary | null>(null);
   const reads = new ReadRequests();
@@ -24,16 +26,17 @@
   let preferenceView = $state(preferences?.view() ?? null);
   const preferenceBarrier = $derived(!!preferenceView && (preferenceView.busy || preferenceView.blocked ||
     preferenceView.authorityUnknown || !!preferenceView.draftError));
-  function reportBusy() { onBusyChange(busy || preferenceBarrier); }
+  function reportBusy() { onBusyChange(busy || preferenceBarrier || workbookBusy); }
   const unsubscribe = preferences?.subscribe(() => {
     preferenceView = preferences.view(); method = preferenceView.draft?.method ?? null;
     siteUnitType = preferenceView.draft?.siteUnitType ?? null;
     ready = (method === 1 || method === 2) && siteUnitType === 1 && !preferenceView.authorityUnknown;
     preview = null;
-    onBusyChange(busy || preferenceView.busy || preferenceView.blocked || preferenceView.authorityUnknown || !!preferenceView.draftError);
+    reportBusy();
   });
   function cancel() { generation++; reads.cancelAll(); preferences?.cancelLoad(); busy = false; reportBusy(); }
   async function options() {
+    if (workbookBusy) return;
     cancel(); const request = generation;
     ready = false; error = ''; preview = null; busy = true; reportBusy();
     try {
@@ -50,7 +53,7 @@
     }
   }
   async function show() {
-    if (busy || preferenceBarrier || !ready || su === 'None' || (method !== 1 && method !== 2)) return;
+    if (busy || workbookBusy || preferenceBarrier || !ready || su === 'None' || (method !== 1 && method !== 2)) return;
     cancel(); const request = generation; const requestedMethod = method;
     error = ''; preview = null; busy = true; reportBusy();
     try {
@@ -64,7 +67,7 @@
     }
   }
   async function loadPreferences() {
-    if (!preferences || preferenceView?.busy || preferenceView?.blocked) return;
+    if (workbookBusy || !preferences || preferenceView?.busy || preferenceView?.blocked) return;
     cancel(); const request = generation; const token = preferences.beginLoad();
     error = ''; busy = true; reportBusy();
     try {
@@ -78,6 +81,7 @@
     }
   }
   async function savePreferences() {
+    if (workbookBusy) return;
     if (!preferences || busy || preferenceView?.busy || preferenceView?.blocked) return;
     cancel(); error = '';
     try {
@@ -85,6 +89,7 @@
     } catch (cause) { error = String(cause); }
   }
   function editMethod(value: number) {
+    if (workbookBusy) return;
     cancel(); error = ''; preview = null;
     if (preferences) preferences.editMethod(value);
     else method = value;
@@ -102,7 +107,7 @@
   {#if preferenceView?.error}<p role="alert" class="error">{preferenceView.error}</p>{/if}
   {#if preferenceView?.draftError}<p role="alert" class="error">{preferenceView.draftError}</p>{/if}
   <p>Project {project}; selected normal SU {su}. Profile navigation does not filter this report.</p>
-  <fieldset disabled={busy || preferenceView?.busy || preferenceView?.blocked || !ready} data-source-control="optValueMethod">
+  <fieldset disabled={busy || workbookBusy || preferenceView?.busy || preferenceView?.blocked || !ready} data-source-control="optValueMethod">
     <legend>Quantitative Values</legend>
     <label><input type="radio" name="summary-method" value={1} checked={method === 1} onchange={() => editMethod(1)} />Mean</label>
     <label><input type="radio" name="summary-method" value={2} checked={method === 2} onchange={() => editMethod(2)} />Interquartile (25% - 50% - 75%)</label>
@@ -111,25 +116,31 @@
     {siteUnitType === 1 ? 'Normal SU' : siteUnitType === 2 ? 'Hierarchy (unavailable)' :
       siteUnitType === 3 ? 'Field-derived units (unavailable)' : 'not loaded'}.</p>
   <div class="actions">
-    <button data-source-control="btnCreateReport" disabled={busy || preferenceBarrier || !ready || su === 'None'} onclick={show}>Create Report</button>
+    <button data-source-control="btnCreateReport" disabled={busy || workbookBusy || preferenceBarrier || !ready || su === 'None'} onclick={show}>Create Report</button>
     {#if preferencesEnabled}
-      <button data-summary-preferences-load disabled={!!preferenceView?.busy || !!preferenceView?.blocked} onclick={loadPreferences}>Load saved summary options</button>
-      <button data-summary-preferences-save disabled={busy || !!preferenceView?.busy || !!preferenceView?.blocked || !!preferenceView?.draftError ||
+      <button data-summary-preferences-load disabled={workbookBusy || !!preferenceView?.busy || !!preferenceView?.blocked} onclick={loadPreferences}>Load saved summary options</button>
+      <button data-summary-preferences-save disabled={busy || workbookBusy || !!preferenceView?.busy || !!preferenceView?.blocked || !!preferenceView?.draftError ||
         !preferenceView?.saved || !ready} onclick={savePreferences}>Save reviewed summary options</button>
-      <button data-summary-preferences-undo disabled={!!preferenceView?.busy || !!preferenceView?.blocked || !preferenceView?.saved}
-        onclick={() => { cancel(); preferences?.undo(); }}>Undo summary options</button>
+      <button data-summary-preferences-undo disabled={workbookBusy || !!preferenceView?.busy || !!preferenceView?.blocked || !preferenceView?.saved}
+        onclick={() => { if (workbookBusy) return; cancel(); preferences?.undo(); }}>Undo summary options</button>
       {#if siteUnitType !== 1}
-        <button data-summary-preferences-normal disabled={!!preferenceView?.busy || !!preferenceView?.blocked || !preferenceView?.draft}
-          onclick={() => { cancel(); preferences?.selectNormalSU(); }}>Select normal SU</button>
+        <button data-summary-preferences-normal disabled={workbookBusy || !!preferenceView?.busy || !!preferenceView?.blocked || !preferenceView?.draft}
+          onclick={() => { if (workbookBusy) return; cancel(); preferences?.selectNormalSU(); }}>Select normal SU</button>
       {/if}
       {#if preferenceView?.blocked}
-        <button data-summary-preferences-acknowledge disabled={preferenceView.busy} onclick={() => preferences?.acknowledge()}>Acknowledge summary preference outcome</button>
+        <button data-summary-preferences-acknowledge disabled={workbookBusy || preferenceView.busy}
+          onclick={() => { if (!workbookBusy) preferences?.acknowledge(); }}>Acknowledge summary preference outcome</button>
       {/if}
     {:else}
-      <button data-summary-options-reload disabled={busy} onclick={options}>Reload summary options</button>
+      <button data-summary-options-reload disabled={busy || workbookBusy} onclick={options}>Reload summary options</button>
     {/if}
     {#if busy}<button data-summary-cancel onclick={cancel}>Cancel report read</button><p role="status">Reading owned summary options or snapshots...</p>{/if}
   </div>
+  {#if import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'true'}
+    <SiteUnitSummaryWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }} {method}
+      disabled={busy || preferenceBarrier || !ready || su === 'None'}
+      onBusyChange={(held) => { workbookBusy = held; reportBusy(); }} />
+  {/if}
   {#if preferenceView?.busy}<p role="status">Saving reviewed summary options; this preference write cannot be cancelled.</p>{/if}
   {#each preferenceView?.receipts ?? [] as receipt}
     {#if receipt.kind === 'known'}

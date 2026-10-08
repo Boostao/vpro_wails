@@ -102,26 +102,11 @@ func (s *ContextService) readSiteUnitSummary(ctx context.Context, contextID stri
 	}
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (SiteUnitSummaryPreview, error) {
 		return withOwnedPreferenceSnapshot(ctx, plots, hooks, func(owner *sqliteContext, tx *sql.Tx) (SiteUnitSummaryPreview, error) {
-			if owner.selection.SU == "None" {
-				return SiteUnitSummaryPreview{}, errors.New("Summary Environment requires an explicitly selected normal SU")
-			}
-			tables := make([]ProjectMetadataTable, 4)
-			for i, source := range []struct{ role, table string }{
-				{"project", owner.selection.Project + "_Env"}, {"project", owner.selection.Project + "_Admin"},
-				{"su", owner.selection.SU + "_SU"}, {"VLists", "MasterSiteUnitList"},
-			} {
-				table, err := readPhysicalLocationTable(ctx, tx, source.role, source.table)
-				if err != nil {
-					return SiteUnitSummaryPreview{}, err
-				}
-				tables[i] = table
-			}
-			report, err := planSiteUnitSummary(ctx, owner.selection.Project, owner.selection.SU, request.Method, 1000000,
-				tables[0], tables[1], tables[2], tables[3])
+			input, err := readSiteUnitSummaryWorkbookSource(ctx, owner, tx, contextID, request.Method)
 			if err != nil {
 				return SiteUnitSummaryPreview{}, err
 			}
-			return SiteUnitSummaryPreview{contextID, owner.selection.ProjectPath, owner.selection.SUPath, report}, nil
+			return input.Preview, nil
 		})
 	})
 }

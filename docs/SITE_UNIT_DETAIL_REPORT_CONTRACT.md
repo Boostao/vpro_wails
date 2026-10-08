@@ -7,9 +7,78 @@ now implements the39 source summary fields in SITE/VEGETATION/SOILS order,
 with Mean and Interquartile choices. Its owned service, generated bindings and
 responsive desktop panel pass focused tests and disposable Wails checks.
 Full integration passes (fresh root794.606s/all packages). Species/lifeform summaries, hierarchy/field-derived
-units, saved options and Excel/file publication remain unavailable. This is
+units remain unavailable. Saved Mean/Interquartile and normal-SU options have a
+separately gated reviewed preferences workflow; workbook publication is the
+independent candidate described below, not part of the accepted preview. This is
 distinct from the per-plot Long Environment preview; the consolidated client
 presentation remains open in [client scope](CLIENT_SCOPE.md).
+
+The next source-traced no-species/layer-cover workbook candidate retains exact
+source A/B columns,39 fields, SITE6/VEGETATION29/SOILS37 headers, raw unit/name/
+physical-count/method captions and removal of the temporary Summary worksheet.
+Private owned input now shares the existing preview's single four-table capture
+and preserves complete raw Env/Admin/SU/MasterSiteUnitList approval evidence.
+Focused owned/preview race4.232s and coupled kernel/owned/accepted-scope tests
+race8.841s pass internal/external paths, detachment, cancellation, cleanup,
+ownership, retry and no-partial-source refusal. The registered candidate is
+independently default-off under `VPRO_SITE_UNIT_SUMMARY_WORKBOOK`; strict flag
+validation precedes startup data work. Its review and no-replace publication
+facade passes coupled race18.072s and has actual generated bindings
+(300 packages/30 services/218 methods/205 models). Integrated frontend passes632
+complete tests/check0 errors/warnings and isolated enabled/frontend-off production
+builds. Independent review resolved an unreachable root-authority subscription;
+actual top-level effect coverage and5/5 independent follow-up pass.
+Four normally closed disposable Wails owners complete14 native cases and retain
+three actual outputs, with all16 fixture/22 protected identities unchanged.
+Independent desktop/native evidence review found no high-confidence discrepancies.
+Fresh714 source identities and exact17 embedded assets per binary remain unchanged
+through passing all-package race (root1502.269s). The seal is pending; no default
+promotion is claimed. The unresolved
+MyCover/species/lifeform paths are not inferred from this environment-only output.
+
+### Workbook adaptation and approval boundary
+
+Labels occupy column A and literal helper-produced summary strings column B at
+rows7-27,30-35 and38-49. A1 preserves raw unit identity, A2 displays the resolved
+long name (NULL renders blank but remains typed in provenance), and A3 counts
+physical joined Plots. A4 preserves the source Mean or Interquartile caption.
+Both disturbance rows deliberately retain the source SiteDisturbance2 binding.
+The temporary Summary worksheet is deleted; no ReportSummary is invented.
+The very-hidden `_VPRO_Source` sheet retains the complete typed preview.
+
+Requested method1/2 is an explicit read-only override, not a preference write.
+Approval includes exact deterministic workbook bytes, all four raw physical
+tables, sheet mappings and all four retained source options (saved method,
+SU type, order, species inclusion). A change to an unrendered source value or
+saved scope invalidates approval even if workbook bytes remain identical.
+Only normal SU, no species and stored layer-cover order1/3 are available;
+historical unavailable values are refused without configuration repair.
+
+Source worksheet-name collisions silently skip units; this candidate instead
+refuses duplicate sanitized names before publication. Literal OOXML escape
+strings use an unformatted rich-text run and verified exact roundtrip.
+Representable strings such as `_x0001_` remain literal; non-roundtrippable
+strings such as `_xD800_` are explicitly refused, never repaired or partially
+published. Publication reuses the existing checked no-replace boundary and
+irreversible receipt contract; committed errors explicitly prohibit replay.
+
+### Bounded desktop acceptance
+
+Both Mean and Interquartile reviews match independent physical SU/Env/Admin
+joins and helper-specific weighted elevation/disturbance observations. Actual
+published XLSX bytes match each reviewed hash/size and all39 source rows,
+section/header captions and complete typed hidden preview. Visible table row
+and column labels are checked with `checkVisibility()` at1400/600px.
+Publication of known, lost-delivery and warning receipts blocks native close,
+navigation, preview reads, method edits and preferences until explicit
+acknowledgement. Collision leaves original output bytes unchanged.
+Acknowledged lost/warning receipts survive remount; unacknowledged retained
+authority is covered by session/root tests rather than a forced native remount.
+Warning/lost-receipt transport behavior is injected after real successful
+commits, not actual backend publication failures.
+Held-response cancellation suppresses late results and allows a fresh retry;
+it does not establish in-flight SQL cancellation. Frontend-off and backend-off
+owners prove independent gate denial while the accepted preview remains usable.
 
 The local reference root is
 `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`. Static exports were read
