@@ -134,3 +134,29 @@ root937.495s/all packages against370 captured Go source hashes. Remote-icon/priv
 naming, XML Unicode rules, destination
 publication, preferences, single-plot ambiguity and viewer launching remain
 separate unavailable boundaries.
+The [19-file exact pure projection successor](../archives/google-earth-projection-checkpoint/evidence-manifest.json)
+verifies all76 timestamp predecessor files/protected hashes and records370
+unchanged integration source hashes. It is not an owned/native KML acceptance.
+
+## Private owned Google Earth read boundary
+
+The unexported `readGoogleEarthLocations` holds one current-context
+operation lease and the existing owned read snapshot. It reads the current
+project's literal physical Env and, when selected, its physical SU table,
+including an owned external SU path. Env rows, memberships and the chosen raw
+description field share one snapshot. No Admin data is required; no caller SQL,
+Sample binding or inferred field selection is used.
+
+The physical-table reader is shared with the existing ReportLocation reader
+without changing its error or Env/Admin scope. Ownership/stale-context,
+malformed schema/values, cancellation and transaction-cleanup failures return
+no partial result. Reads leave project/support/SU/config bytes and selection
+unchanged. Focused owned/pure location suites race2.297s and package vet pass:
+independent direct-Env SQL with empty Admin, external SU three-pair fanout,
+literal fields, detached outputs, physical view impostors and queued
+cancellation/retry are covered. Independent review found no significant issues,
+executed17 focused tests1.545s and owned-location race2.290s after correcting its
+initial system-toolchain link failure. Fresh full integration925.947s/all
+packages passes with372 pinned Go hashes unchanged throughout validation.
+No public method, generated bindings, feature gate, UI, preferences,
+KML serialization/publication or viewer launch is added.

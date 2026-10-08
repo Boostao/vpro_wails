@@ -13,6 +13,18 @@ type PlotLocationReview struct {
 	Report      PlotLocationReport `json:"report"`
 }
 
+func readPhysicalLocationTable(ctx context.Context, tx *sql.Tx, alias, name string) (ProjectMetadataTable, error) {
+	var count int
+	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+quoteHeaderIdentifier(alias)+
+		`.sqlite_master WHERE type='table' AND name COLLATE BINARY=?`, name).Scan(&count); err != nil {
+		return ProjectMetadataTable{}, err
+	}
+	if count != 1 {
+		return ProjectMetadataTable{}, fmt.Errorf("plot locations require original physical table %s.%s", alias, name)
+	}
+	return readSQLiteStorageRows(ctx, tx, alias, name, "", nil, "")
+}
+
 func (s *ContextService) readPlotLocations(ctx context.Context, contextID string) (*PlotLocationReview, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*PlotLocationReview, error) {
 		return withOwnedSIVISnapshot(ctx, plots, func(owner *sqliteContext, tx *sql.Tx) (*PlotLocationReview, error) {
@@ -25,15 +37,7 @@ func (s *ContextService) readPlotLocations(ctx context.Context, contextID string
 			}
 			tables := []ProjectMetadataTable{}
 			for _, source := range sources {
-				var count int
-				if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+quoteHeaderIdentifier(source.alias)+
-					`.sqlite_master WHERE type='table' AND name COLLATE BINARY=?`, source.table).Scan(&count); err != nil {
-					return nil, err
-				}
-				if count != 1 {
-					return nil, fmt.Errorf("plot locations require original physical table %s.%s", source.alias, source.table)
-				}
-				table, err := readSQLiteStorageRows(ctx, tx, source.alias, source.table, "", nil, "")
+				table, err := readPhysicalLocationTable(ctx, tx, source.alias, source.table)
 				if err != nil {
 					return nil, err
 				}
