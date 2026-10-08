@@ -525,6 +525,24 @@ export interface LifeformSummaryUnit {
     "rows": LifeformSummaryRow[] | null;
 }
 
+export interface LifeformWorkbookOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface LifeformWorkbookReview {
+    "lifeform": LifeformSummaryPreview;
+    "attributes": SpeciesAttributeSummaryPreview;
+    "details": boolean[] | null;
+    "sheets": VegetationWorkbookSheet[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
 export interface ListItem {
     "listName": string;
     "item": string;

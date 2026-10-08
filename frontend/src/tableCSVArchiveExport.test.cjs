@@ -308,7 +308,7 @@ test('actual App close handlers and navigation transition refuse pending/unackno
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const close = loadTypeScript('closeLifecycle.ts');
   const session = new archive.TableCSVArchivePublicationSession(owner, storage()), gate = deferred(), started = deferred();
-  const context = { editorBusy: false, archivePublicationBusy: false, vegetationPublicationBusy: false,
+  const context = { editorBusy: false, archivePublicationBusy: false, vegetationPublicationBusy: false, lifeformPublicationBusy: false,
     busy: false, transitionWorking: false, pendingTransition: null,
     closeWorking: false, closeRequest: '', view: 'table-csv', editor: null, error: '', transitionError: '',
     closeError: '', $projectState: { contextId: owner.contextId }, calls: { cancelled: 0, confirmed: 0, navigated: 0 },

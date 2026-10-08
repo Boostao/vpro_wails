@@ -105,7 +105,7 @@ test('standalone lifeform component is gated, read-only, responsive and cancels 
   assert.match(source, /onDestroy\(cancel\)/);
   assert.match(source, /request !== generation \|\| key !== ownerKey/);
   assert.match(source, /previewKey === ownerKey/);
-  assert.match(source, /onBusyChange\(true\)/);
+  assert.match(source, /onBusyChange\(busy \|\| workbookBusy\)/);
   assert.match(source, /reads\.cancelAll\(\)/);
   assert.match(source, /grid-template-columns: repeat\(auto-fit/);
   assert.match(source, /scope="col"/);
@@ -123,12 +123,14 @@ test('lifeform read-only catalogue descriptions preserve numeric labels and NULL
   const source = readFileSync(path.join(__dirname, 'LifeformSummary.svelte'), 'utf8')
     .replace("import.meta.env.VITE_LIFEFORM_SUMMARY === 'true'", 'true')
     .replace("import.meta.env.VITE_SPECIES_ATTRIBUTE_SUMMARY === 'true'", 'false')
+    .replace("import.meta.env.VITE_LIFEFORM_WORKBOOK === 'true'", 'false')
     .replace('let preview = $state<LifeformSummaryPreview | null>(null);',
       `let preview = $state<LifeformSummaryPreview | null>(${JSON.stringify(input)});`)
     .replace("let previewKey = $state('');",
       `let previewKey = $state(${JSON.stringify(JSON.stringify([owner.contextId, owner.project, owner.projectPath, owner.su, owner.suPath]))});`);
   const component = serverComponent(source, 'LifeformSummary.svelte', {
     '../bindings/github.com/boostao/vpro-wails': { LifeformSummaryService: {} },
+    './LifeformWorkbookPanel.svelte': { default() { assert.fail('Disabled workbook panel must not mount'); } },
     './lifeformSummary': summary,
     './speciesAttributeSummary': loadTypeScript('speciesAttributeSummary.ts', { './lifeformSummary': summary })
   });

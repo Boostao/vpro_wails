@@ -19,6 +19,10 @@ breaks, saved report options or publication becomes available through this slice
 The separate [attribute-count successor](SPECIES_ATTRIBUTE_SUMMARY_CONTRACT.md)
 adds six independently gated raw-vegetation query families in the same host;
 its native acceptance does not reinterpret the Lifeform calculation below.
+The [combined workbook successor](LIFEFORM_WORKBOOK_CONTRACT.md) reuses both
+planners from one owned snapshot. Its independently gated desktop/native
+integration passes617 frontend tests and fresh full race1692.501s/all packages;
+it does not enable hierarchy or complete the wider forms/reports migration.
 
 Canonical Access and imported databases remain unchanged. Access is not opened.
 The implementation uses existing owned SQLite readers, not a second Access

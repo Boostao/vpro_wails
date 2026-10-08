@@ -92,12 +92,14 @@ test('attribute preview renders six source families, nullable counts and visible
   const source = readFileSync(path.join(__dirname, 'LifeformSummary.svelte'), 'utf8')
     .replace("import.meta.env.VITE_LIFEFORM_SUMMARY === 'true'", 'true')
     .replace("import.meta.env.VITE_SPECIES_ATTRIBUTE_SUMMARY === 'true'", 'true')
+    .replace("import.meta.env.VITE_LIFEFORM_WORKBOOK === 'true'", 'false')
     .replace('let attributePreview = $state<SpeciesAttributeSummaryPreview | null>(null);',
       `let attributePreview = $state<SpeciesAttributeSummaryPreview | null>(${JSON.stringify(fixture())});`)
     .replace("let previewKey = $state('');",
       `let previewKey = $state(${JSON.stringify(JSON.stringify([owner.contextId, owner.project, owner.projectPath, owner.su, owner.suPath]))});`);
   const component = serverComponent(source, 'LifeformSummary.svelte', {
     '../bindings/github.com/boostao/vpro-wails': { LifeformSummaryService: {}, SpeciesAttributeSummaryService: {} },
+    './LifeformWorkbookPanel.svelte': { default() { assert.fail('Disabled workbook panel must not mount'); } },
     './lifeformSummary': lifeform, './speciesAttributeSummary': summary,
   });
   const html = render(component, { props: { ...owner, onBusyChange() {} } }).body.replace(/\sclass="[^"]*"/g, '');

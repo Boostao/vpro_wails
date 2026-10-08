@@ -4,6 +4,7 @@
   import { ReadRequests } from './readRequests';
   import { validateLifeformSummary, lifeformCellText, lifeformRatioText, type LifeformSummaryPreview } from './lifeformSummary';
   import { validateSpeciesAttributeSummary, speciesAttributeCountText, type SpeciesAttributeSummaryPreview } from './speciesAttributeSummary';
+  import LifeformWorkbookPanel from './LifeformWorkbookPanel.svelte';
 
   let { contextId, project, projectPath, su, suPath, onBusyChange }: {
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
@@ -14,6 +15,7 @@
   const reads = new ReadRequests();
   let generation = 0;
   let busy = $state(false);
+  let workbookBusy = $state(false);
   let error = $state('');
   let preview = $state<LifeformSummaryPreview | null>(null);
   let attributePreview = $state<SpeciesAttributeSummaryPreview | null>(null);
@@ -21,12 +23,13 @@
   let previewKey = $state('');
   const currentPreview = $derived(previewKey === ownerKey ? preview : null);
   const currentAttributes = $derived(previewKey === ownerKey ? attributePreview : null);
-  function cancel() { generation++; reads.cancelAll(); busy = false; onBusyChange(false); }
+  function reportBusy() { onBusyChange(busy || workbookBusy); }
+  function cancel() { generation++; reads.cancelAll(); busy = false; reportBusy(); }
   async function show(kind: 'lifeform' | 'attributes') {
-    if (!enabled || kind === 'attributes' && !attributesEnabled || busy || su === 'None' || su === 'USysSuTableDynamic') return;
+    if (!enabled || kind === 'attributes' && !attributesEnabled || busy || workbookBusy || su === 'None' || su === 'USysSuTableDynamic') return;
     cancel(); const request = generation, key = ownerKey;
     const owner = { contextId, project, projectPath, su, suPath };
-    busy = true; error = ''; preview = null; attributePreview = null; onBusyChange(true);
+    busy = true; error = ''; preview = null; attributePreview = null; reportBusy();
     try {
       const value = await reads.track<unknown>(kind === 'attributes' ? SpeciesAttributeSummaryService.Preview(contextId) : LifeformSummaryService.Preview(contextId));
       if (request !== generation || key !== ownerKey) return;
@@ -36,7 +39,7 @@
     } catch (cause) {
       if (request === generation && key === ownerKey) error = `${kind === 'attributes' ? 'Species attribute summary' : 'Lifeform Summary'} unavailable; no data or configuration writes: ${String(cause)}`;
     } finally {
-      if (request === generation) { busy = false; onBusyChange(false); }
+      if (request === generation) { busy = false; reportBusy(); }
     }
   }
   onDestroy(cancel);
@@ -49,10 +52,14 @@
   {#if !enabled}<p>This preview is disabled in this build.</p>{/if}
   {#if su === 'None' || su === 'USysSuTableDynamic'}<p>A selected normal SU is required. Hierarchy and dynamic breaks are unavailable.</p>{/if}
   <div class="actions">
-    <button onclick={() => show('lifeform')} disabled={!enabled || busy || su === 'None' || su === 'USysSuTableDynamic'}>Preview Lifeform Summary</button>
-    <button onclick={() => show('attributes')} disabled={!enabled || !attributesEnabled || busy || su === 'None' || su === 'USysSuTableDynamic'}>Preview species attribute summaries</button>
+    <button onclick={() => show('lifeform')} disabled={!enabled || busy || workbookBusy || su === 'None' || su === 'USysSuTableDynamic'}>Preview Lifeform Summary</button>
+    <button onclick={() => show('attributes')} disabled={!enabled || !attributesEnabled || busy || workbookBusy || su === 'None' || su === 'USysSuTableDynamic'}>Preview species attribute summaries</button>
     {#if busy}<button onclick={cancel}>Cancel preview</button><p role="status">Reading owned project and SU…</p>{/if}
   </div>
+  {#if import.meta.env.VITE_LIFEFORM_WORKBOOK === 'true'}
+    <LifeformWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }} disabled={busy}
+      onBusyChange={(held) => { workbookBusy = held; reportBusy(); }} />
+  {/if}
   {#if currentPreview}
     {#each currentPreview.report.units as unit}
       <article>
@@ -104,7 +111,7 @@
     {/each}
     {#if currentAttributes.report.units.length === 0}<p>No physical SU memberships.</p>{/if}
   {/if}
-  <p class="guidance">Read-only preview: no database, configuration or Excel writes. Lifeform global inserted rows rejoin SU by PlotNumber, retaining duplicate and cross-unit weights. Attribute summaries instead join raw physical vegetation/SU/attribute rows; repeated observations and definitions retain their weights. NULL counts stay NULL; totals include non-pivot values. All six detail families are displayed without changing saved report options. Literal identities are not a claim about Access collation. Zero Lifeform denominators are shown as NULL instead of evaluating division by zero. Attribute summaries have an independent default-off gate; hierarchy breaks and export remain unavailable.</p>
+  <p class="guidance">Read-only preview: no database, configuration or Excel writes. Lifeform global inserted rows rejoin SU by PlotNumber, retaining duplicate and cross-unit weights. Attribute summaries instead join raw physical vegetation/SU/attribute rows; repeated observations and definitions retain their weights. NULL counts stay NULL; totals include non-pivot values. All six detail families are displayed without changing saved report options. Literal identities are not a claim about Access collation. Zero Lifeform denominators are shown as NULL instead of evaluating division by zero. Attribute summaries have an independent default-off gate. Workbook publication has a separate default-off gate and requires explicit review and a new XLSX destination; hierarchy breaks remain unavailable.</p>
 </section>
 
 <style>

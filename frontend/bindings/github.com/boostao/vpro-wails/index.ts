@@ -12,6 +12,7 @@ import * as GoogleEarthKMLService from "./googleearthkmlservice.js";
 import * as GoogleEarthPreferencesService from "./googleearthpreferencesservice.js";
 import * as GoogleEarthReviewService from "./googleearthreviewservice.js";
 import * as LifeformSummaryService from "./lifeformsummaryservice.js";
+import * as LifeformWorkbookService from "./lifeformworkbookservice.js";
 import * as LongEnvironmentPreferencesService from "./longenvironmentpreferencesservice.js";
 import * as ParentCodeService from "./parentcodeservice.js";
 import * as PlotService from "./plotservice.js";
@@ -41,6 +42,7 @@ export {
     GoogleEarthPreferencesService,
     GoogleEarthReviewService,
     LifeformSummaryService,
+    LifeformWorkbookService,
     LongEnvironmentPreferencesService,
     ParentCodeService,
     PlotService,
@@ -109,6 +111,8 @@ export type {
     LifeformSummaryReport,
     LifeformSummaryRow,
     LifeformSummaryUnit,
+    LifeformWorkbookOutcome,
+    LifeformWorkbookReview,
     ListItem,
     LongEnvironmentOptions,
     LongEnvironmentPreferenceValues,
