@@ -38,6 +38,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	plotLocationReviewEnabled, err := plotLocationReviewFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	dataDir, err := userDataDir()
 	if err != nil {
 		log.Fatal(err)
@@ -74,6 +78,7 @@ func main() {
 	contextService.siviParentActionEditingEnabled = siviParentActionEditingEnabled
 	contextService.siviProjectAssignmentEnabled = siviProjectAssignmentEnabled
 	contextService.tableCSVReviewEnabled = tableCSVReviewEnabled
+	contextService.plotLocationReviewEnabled = plotLocationReviewEnabled
 	coordinates, err := newCoordinateService(configDir, preferences)
 	if err != nil {
 		log.Fatal(err)

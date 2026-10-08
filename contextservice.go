@@ -23,6 +23,7 @@ type ContextService struct {
 	siviParentActionEditingEnabled bool
 	siviProjectAssignmentEnabled   bool
 	tableCSVReviewEnabled          bool
+	plotLocationReviewEnabled      bool
 }
 
 func NewContextService(projects *ProjectService, plots *PlotService) (*ContextService, error) {

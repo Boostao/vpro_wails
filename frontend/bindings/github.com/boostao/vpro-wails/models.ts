@@ -576,6 +576,28 @@ export interface PersonalSpeciesDefinitionRequest {
     "englishName": string | null;
 }
 
+export interface PlotLocationReport {
+    "project": string;
+    "su": string;
+    "fields": EnvironmentReportField[] | null;
+    "rows": PlotLocationRow[] | null;
+}
+
+export interface PlotLocationReview {
+    "contextId": string;
+    "projectPath": string;
+    "suPath": string;
+    "report": PlotLocationReport;
+}
+
+export interface PlotLocationRow {
+    "envRowId": string;
+    "adminRowId": string;
+    "membershipRowIds": string[] | null;
+    "storedLongitude": ProjectMetadataCell;
+    "values": ProjectMetadataCell[] | null;
+}
+
 export interface PlotPage {
     "total": number;
     "plots": PlotSummary[] | null;
