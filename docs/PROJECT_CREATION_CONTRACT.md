@@ -34,7 +34,9 @@ the read-only canonical templates. Literals/comments/quoted identifiers remain
 intact; source/mapped SQL pointers are detached and canonical bytes unchanged.
 The independent source-only in-memory preparation also passed all eight
 templates. Independent review found no significant issues; fresh full Go race
-passes root801.140s/all packages. Exact private-mapping sealing is in progress;
+passes root801.140s/all packages. The
+[16-file private mapping successor](../archives/new-project-ddl-preparation-checkpoint/evidence-manifest.json)
+verifies all122 immutable location-predecessor files and records356 Go source hashes;
 location race775.988s does not validate these later Go additions. Native defaults,
 linked version properties and the enabled creator remain unresolved.
 
@@ -93,6 +95,18 @@ error paths return `"Unknown"`; this success-shaped fallback is not inherited.
 A physical referenced-table description is not automatically proof of the
 linked-object property. Retain provenance/absence/NULL/empty/duplicates and
 resolve ambiguity before planning creation audits, without guessing a version.
+
+A further bounded static trace of `V7mdlAttachMasterLists` confirms that
+`AttachSppList` and `AttachTableOfLists` only call `TransferDatabase acLink`,
+delete the previous local alias and rename the temporary link. There is no
+explicit Description assignment in either attachment helper. Their remote
+version getters read the selected remote TableDef's Description, and the public
+attachment actions separately cache that string through `clsVProReg`.
+`LogNewProject` instead calls the current linked-table Description getters,
+not those cached registry versions. Therefore neither a remote physical
+description nor the cached setting resolves the linked-object property
+inheritance gap. This is source-only evidence; no Access runtime was reopened,
+no missing link was fabricated and no version/default fallback is authorized.
 
 `V7mdlRelationships.CreateRelationship` then requests Env.PlotNumber links to
 Veg, Humus, Mineral, Other and Audit, using update/delete cascade attributes.

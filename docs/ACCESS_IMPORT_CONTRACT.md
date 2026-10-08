@@ -193,7 +193,10 @@ consumer1.503s pass, alongside932 cells,9 descriptions and exact fractional
 timestamps. All three fixtures remain unchanged. Independent review found no
 significant issues, verified46 baseline/38 unchanged reader files and10 candidate
 hashes, and ran focused native tests1.636s without skips. The bounded observation
-boundary is validated; exact successor sealing next. Arbitrary corrupted
+boundary is sealed in the
+[81-file exact successor](../archives/access-reader-columns-checkpoint/evidence-manifest.json),
+verifying18 application predecessor/78 description evidence/46 reader baseline
+files and372 unchanged application Go hashes. Arbitrary corrupted
 formats and Linux remain unverified. No
 production dependency/importer is enabled.
 
@@ -243,6 +246,67 @@ by an uncorrected reader.
 - Headless automation must not bypass desktop leases/audits or mutate a live
   desktop project. No cross-process ownership guarantee is implied by this
   isolated consumer.
+
+## Accepted private owned in-memory table staging
+
+[`PrepareTable`](../internal/accessimport/staging.go) applies the accepted
+column/complete-row adapters to a separately owned in-memory SQLite database.
+It consumes the supplied native reader and closes it exactly once, including
+invalid arguments, cancellation, row/type failures and budget rejection.
+The isolated consumer adapts go-mdbtools' named `Row` type without decoding it
+again; no reader dependency or absolute replacement enters the application.
+
+Callers must supply positive row and explicit byte limits. The supported native
+column count is1..256. The image budget is16384..2147483647 bytes, enforced by a
+4096-byte SQLite page budget and the final serialized length. This bounds the
+staging image, not total process memory or a fallible native `Next` call's runtime.
+Source table/column names remain literal bound metadata, never executable SQL.
+Internal `stage_rows` uses generated `c0..cN` columns and a staging-only physical
+ordinal; `stage_columns` retains ordered literal names, reader types and planned
+affinities. This avoids source `rowid`/`_rowid_`/`oid` collisions without repairing
+names or pretending the generated ordinal is an original Access identity.
+
+All schema/rows are created in one transaction. Source read and close must
+succeed before its in-memory commit. The detached serialized SQLite image is
+reopened independently and its source identity, ordered column mapping, actual
+storage schema, physical row order/count and every tagged stored type/value are
+checked against the complete adapted input. SHA256 includes integer/real bits,
+NULL/text/BLOB tags, lengths and row boundaries; empty BLOB/text/NULL and duplicate
+physical rows remain distinct. SQLite normalizes binary64 negative zero in REAL
+storage, so that source value is explicitly refused rather than silently repaired.
+The output SHA256 covers the exact serialized image, not source authorization.
+Every read/close/rollback/storage/verification/cancellation error clears the whole
+result. No image is returned before both owned SQLite connections are closed.
+
+Focused adapter/staging race1.411s/vet passes, including exact one-row/16384-byte
+and256-column thresholds, rejection just beyond bounds, cancellation/read/close
+failure identities, retry, concurrent isolation and independently modified images.
+The actual isolated go-mdbtools consumer race1.559s independently reads five images
+from three unchanged fixtures: MDB932 cells/89 rows (eight true=-1/five NULL),
+public ACCDB845 cells/65 rows and disposable VPRO service-pack ACCDB5 cells/one row.
+This is1782 measured cells/155 physical rows, not a VPRO project import.
+Independent review identified a final-hash cancellation gap. A post-hash context
+check and deterministic cancellation-during-hash zero-result test correct it.
+Independent focused closure race1.352s and exact five-file hashes confirm
+resolution; the initial reviewer also ran uncached package race/vet and the actual
+three-fixture consumer. Fresh all-package race integration passes
+root954.209s/staging1.248s, with397 Go files unchanged throughout the run.
+Five actual returned images are also captured once in exclusively owned session
+evidence, separately from application preparation. Read-only Python SQLite
+independently checks their exact hashes, integrity, schema, literal mappings,
+155 ordered rows/1782 cells and the MDB eight true=-1/five NULL values; image and
+source hashes remain unchanged. These harness evidence writes are not publication.
+The [exact staging successor](../archives/access-import-staging-checkpoint/evidence-manifest.json)
+preserves reviewed source, consumer, five actual images, independent image checks
+and integration evidence while verifying the359-file preference predecessor,
+accepted reader source/fixture identities and protected defaults.
+
+The image is private staging, not a canonical schema, original metadata/default/
+constraint/identity reconstruction or a client interchange-format decision.
+The caller still owns source-file identity, local-versus-linked authorization and
+coherent multi-table observation; this row interface cannot establish those facts.
+There is no destination file, publication, active context, audit mutation, native
+Access/COM action or production import flag.
 
 Publication, canonical-data replacement, legacy conversion and the companion
 R package remain separate unavailable deliverables.
