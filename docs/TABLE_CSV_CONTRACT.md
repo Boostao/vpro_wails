@@ -129,9 +129,12 @@ export/import acceptance follows from native review acceptance.
 ## Access reader platform
 
 Access reading remains the responsibility of `meztez/go-mdbtools`. The existing
-local404b4116 reader bundles Linux-specific cgo configuration; its Windows
-`go test ./...` fails at `bridge.h` because `mdbtools.h` is unavailable to the
-Windows build. The installed WSL command reports that WSL is not installed.
-No duplicate reader, dependency injection, source rewrite or elevated machine
-installation was introduced. Access import stays disabled until a supported,
+local404b4116 reader remains unchanged. A separate disposable Windows candidate
+now builds bundled MDBTools/fakeglib with local GNU libiconv and passes public
+MDB/ACCDB, copied VPRO, Unicode-path, corruption and conversion tests. Independent
+review closed three defects; embedded source-text NUL is explicitly rejected.
+The [native scalar boundary](ACCESS_IMPORT_CONTRACT.md) and isolated consumer
+preserve Access true=-1 without introducing an application reader dependency,
+duplicate parser, source rewrite or elevated machine installation.
+Access import stays disabled until a supported,
 fixture-tested reader boundary is available.
