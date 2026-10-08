@@ -1154,6 +1154,8 @@ export interface SIVICoverWriteResult {
     "HistoryID": string;
 }
 
+export type SIVICreationResult = siviCreationResult;
+
 export interface SIVIHeightEdit {
     "rowId": string;
     "form": string;
@@ -2000,6 +2002,49 @@ export interface pictureMetadataWriteResult {
     "changes": ProjectMetadataChange[] | null;
     "editWhen": string;
     "historyId": string;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface siviCreationCover {
+    "column": string;
+    "value": ProjectMetadataCell;
+}
+
+export interface siviCreationDecision {
+    "kind": string;
+    "entered": string;
+    "selected"?: string | null;
+}
+
+export interface siviCreationRequest {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "species": string;
+    "decision"?: siviCreationDecision | null;
+    "covers": siviCreationCover[] | null;
+}
+
+export interface siviCreationResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "rowId": string;
+    "historyId": string;
+    "id": number;
+    "actor": string;
+    "auditStrength": number;
+    "editWhen": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+    "committed": ProjectMetadataRow;
+    "covers": siviCreationCover[] | null;
+    "request": siviCreationRequest;
     "didCommit": boolean;
     "replayed": boolean;
 }

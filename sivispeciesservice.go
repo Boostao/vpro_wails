@@ -238,7 +238,11 @@ func (s *SIVISpeciesService) GetReferences(ctx context.Context, contextID, plot 
 	if err := s.require(ctx); err != nil {
 		return SIVISpeciesReferences{}, err
 	}
-	return withContextPlotRequest(ctx, s.contexts, contextID, func(plots *PlotService) (SIVISpeciesReferences, error) {
+	return s.contexts.getSIVISpeciesReferences(ctx, contextID, plot)
+}
+
+func (s *ContextService) getSIVISpeciesReferences(ctx context.Context, contextID, plot string) (SIVISpeciesReferences, error) {
+	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (SIVISpeciesReferences, error) {
 		return withOwnedSIVISnapshot(ctx, plots, func(owner *sqliteContext, tx *sql.Tx) (SIVISpeciesReferences, error) {
 			if err := siviHeightContextParent(ctx, owner, plot); err != nil {
 				return SIVISpeciesReferences{}, err

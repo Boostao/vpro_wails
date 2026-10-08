@@ -25,6 +25,7 @@ import * as RegionCodeService from "./regioncodeservice.js";
 import * as SIVICollectedService from "./sivicollectedservice.js";
 import * as SIVICombinedService from "./sivicombinedservice.js";
 import * as SIVICoverService from "./sivicoverservice.js";
+import * as SIVICreationService from "./sivicreationservice.js";
 import * as SIVIIdentityService from "./siviidentityservice.js";
 import * as SIVIParentSharedService from "./siviparentsharedservice.js";
 import * as SIVISpeciesService from "./sivispeciesservice.js";
@@ -66,6 +67,7 @@ export {
     SIVICollectedService,
     SIVICombinedService,
     SIVICoverService,
+    SIVICreationService,
     SIVIIdentityService,
     SIVIParentSharedService,
     SIVISpeciesService,
@@ -217,6 +219,7 @@ export type {
     ProjectTableCSVReview,
     RegionCodeChoice,
     SIVICoverWriteResult,
+    SIVICreationResult,
     SIVIHeightEdit,
     SIVIHeightWriteResult,
     SIVIParentActionInput,

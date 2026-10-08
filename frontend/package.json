@@ -27,7 +27,8 @@
     "test:earth": "node --test src/googleEarthReview.test.cjs src/googleEarthKMLReview.test.cjs src/plotLocationReview.test.cjs src/googleEarthKMLExport.test.cjs src/googleEarthPreferences.test.cjs",
     "test:sivi-collected": "node --test src/siviCollected.test.cjs src/siviCollectedIntegration.test.cjs src/siviCombined.test.cjs src/siviCover.test.cjs src/siviCoverIntegration.test.cjs src/siviHeightSession.test.cjs",
     "test:sivi-species": "node --test src/siviSpecies.test.cjs src/siviSpeciesIntegration.test.cjs src/siviCollected.test.cjs src/siviCollectedIntegration.test.cjs src/siviCombined.test.cjs src/siviCover.test.cjs src/siviCoverIntegration.test.cjs src/siviHeightSession.test.cjs",
-    "posttest": "node --test src/siviIdentity.test.cjs src/siviIdentityIntegration.test.cjs src/pictureRead.test.cjs src/plotLabelPreview.test.cjs src/plotLabelReportLayout.test.cjs src/pictureMetadataEditor.test.cjs src/pictureMetadataSession.test.cjs src/pictureMetadataIntegration.test.cjs src/siviCreationEditor.test.cjs",
+    "posttest": "node --test src/siviIdentity.test.cjs src/siviIdentityIntegration.test.cjs src/pictureRead.test.cjs src/plotLabelPreview.test.cjs src/plotLabelReportLayout.test.cjs src/pictureMetadataEditor.test.cjs src/pictureMetadataSession.test.cjs src/pictureMetadataIntegration.test.cjs src/siviCreationEditor.test.cjs src/siviCreationSession.test.cjs src/siviCreationIntegration.test.cjs",
+    "test:sivi-creation": "node --test src/siviCreationEditor.test.cjs src/siviCreationSession.test.cjs src/siviCreationIntegration.test.cjs",
     "test:sivi-identity": "node --test src/siviIdentity.test.cjs src/siviIdentityIntegration.test.cjs src/siviSpecies.test.cjs src/siviSpeciesIntegration.test.cjs src/siviCollected.test.cjs src/siviCollectedIntegration.test.cjs src/siviCombined.test.cjs src/siviCoverIntegration.test.cjs src/siviHeightSession.test.cjs"
   },
   "dependencies": {

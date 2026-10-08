@@ -19,6 +19,7 @@ export interface SIVICreationPlan extends SIVISpeciesOwner {
   decision?: SpeciesDecision;
   covers: { column: SIVICoverColumn; value: ProjectMetadataCell }[];
 }
+export interface SIVICreationRequest extends SIVICreationPlan { requestId: string }
 const nullCell = (): ProjectMetadataCell => ({ storage: 'null', text: null, integer: null, real: null, blobHex: null });
 
 function scope(form: SIVICreationForm) {
@@ -114,4 +115,12 @@ export function siviCreationPlan(draft: SIVICreationDraft, references: SIVISpeci
   });
   return { contextId: owner.contextId, project: owner.project, plot: owner.plot, form: draft.form, species: draft.species,
     ...(draft.decision ? { decision: { ...draft.decision } } : {}), covers };
+}
+
+export function siviCreationRequest(draft: SIVICreationDraft, references: SIVISpeciesReferences,
+  owner: SIVISpeciesOwner, requestId: string): SIVICreationRequest {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(requestId)) {
+    throw new Error('SIVI creation requires one stable request identity; no retry or identity was inferred.');
+  }
+  return { requestId, ...siviCreationPlan(draft, references, owner) };
 }

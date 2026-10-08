@@ -14,7 +14,7 @@ function host(overrides = {}) {
   return componentFunctions('FS882Form.svelte', [
     'siviSpeciesOperation', 'stageSIVISpecies', 'showSIVISpeciesPanel', 'load',
   ], {
-    ...Object.fromEntries(guards.map(name => [name, false])), pictureMetadataPending: false,
+    ...Object.fromEntries(guards.map(name => [name, false])), pictureMetadataPending: false, siviCreationPending: false,
     siviSpeciesSession: null, siviSpeciesEnabled: true, siviSpeciesEditingDisabled: false,
     siviSpeciesUnsaved: false, siviSpeciesReading: false, siviSpeciesPanelOpen: false,
     siviSpeciesView: { review: [{}] }, error: null, successMsg: null,
@@ -46,7 +46,8 @@ test('Species independently gates actual main registration and coordinates both 
 test('Species participates in root Save Undo Lock close and all peer/parent barriers', () => {
   assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviSpeciesBusy/);
   assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
-  assert.match(parent, /nonParentChildUnsaved = \$derived\([^\n]*\|\| siviSpeciesUnsaved/);
+  assert.match(parent, /siviCreationPeerUnsaved = \$derived\([^\n]*\|\| siviSpeciesUnsaved/);
+  assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending\)/);
   assert.match(parent, /if \(siviSpeciesUnsaved\) \{ await siviSpeciesOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviSpeciesUnsaved\) \{ void siviSpeciesOperation\('undo'\); return; \}/);
   assert.match(parent, /\|\| \(siviSpeciesClose\?\.blocked \?\? false\)/);

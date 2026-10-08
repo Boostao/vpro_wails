@@ -81,7 +81,7 @@ test('Actual renderer gives12 labelled raw controls, duplicate cultural suggesti
 test('Persistent attribute sessions gate shared lifecycle and clear only committed or explicitly cancelled drafts', () => {
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(form, /let attributeDrafts = \$state<VegetationAttributeDrafts>/);
-  assert.match(form, /nonParentChildUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved \|\| siviCoverUnsaved \|\| siviCombinedUnsaved \|\| siviCollectedUnsaved \|\| siviSpeciesUnsaved \|\| siviIdentityUnsaved \|\| otherUnsaved \|\| soilUnsaved \|\| attributeUnsaved \|\| collectedUnsaved \|\| speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
+  assert.match(form, /siviCreationPeerUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved \|\| siviCoverUnsaved \|\| siviCombinedUnsaved \|\| siviCollectedUnsaved \|\| siviSpeciesUnsaved \|\| siviIdentityUnsaved \|\| otherUnsaved \|\| soilUnsaved \|\| attributeUnsaved \|\| collectedUnsaved \|\| speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
   assert.match(form, /attributeInvalid\.length > 0/);
   assert.match(form, /if \(attributeUnsaved\) \{ await saveAttributeDrafts\(\); return; \}/);
   assert.match(form, /if \(attributeUnsaved\) \{ void cancelAttributeDrafts\(\); return; \}/);

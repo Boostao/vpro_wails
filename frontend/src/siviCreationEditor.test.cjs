@@ -1,6 +1,9 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { loadTypeScript } = require('./svelteTestHelpers.cjs');
+const { loadTypeScript, serverComponent, componentFunctions } = require('./svelteTestHelpers.cjs');
+const { readFileSync } = require('node:fs');
+const path = require('node:path');
+const { render } = require('svelte/server');
 const { cell, metadata, restoration } = require('./siviParentTestHelpers.cjs');
 const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
 const numeric = loadTypeScript('numericEditor.ts');
@@ -36,6 +39,68 @@ function begin(form = 'SubVegA-SIVI') {
 }
 const errors = (draft, refs = references()) => editor.siviCreationErrors(draft, refs, owner);
 const plan = (draft, refs = references()) => editor.siviCreationPlan(draft, refs, owner);
+
+test('private creation fields expose exactly21 source-labelled controls across four forms without identity or write authority', () => {
+  const source = readFileSync(path.join(__dirname, 'SIVICreationFields.svelte'), 'utf8');
+  const component = serverComponent(source, 'SIVICreationFields.svelte', {
+    './siviCoverEditor': cover, './siviSpeciesEditor': species,
+    './vegetationSpeciesEditor': decisions, './siviCreationEditor': editor,
+  });
+  let controls = 0;
+  for (const [form, group, extended] of [['SubVegA-SIVI', 0, true], ['SubVegA-SIVI_BC', 0, false],
+    ['SubVegC-SIVI', 1, false], ['SubVegD-SIVI', 2, false]]) {
+    const draft = begin(form);
+    const output = render(component, { props: { draft, owner, references: references(), onchange() {} } }).body;
+    const columns = cover.siviCoverGroups(group, extended).flat();
+    for (const column of columns) {
+      const id = `sivi-creation-${form}-${column}`;
+      assert.equal([...output.matchAll(new RegExp(`id="${id}"`, 'g'))].length, 1);
+      assert.match(output, new RegExp(`for="${id}"`));
+      assert.match(output, new RegExp(`<input[^>]*id="${id}"[^>]*disabled`));
+      controls++;
+    }
+    assert.equal([...output.matchAll(/<input[^>]*id="sivi-creation-[^"]+"/g)].length, columns.length + 1);
+    assert.ok(output.indexOf('explicit non-NULL') < output.indexOf(`sivi-creation-${form}-species"`));
+    assert.match(output, /No application or physical identity has been assigned/);
+    assert.doesNotMatch(output, /(?:Save|Create).*<\/button>|maxlength|HeightA|HeightB/);
+  }
+  assert.equal(controls, 21);
+  assert.doesNotMatch(source, /bindings|GetImage|CreateSourceVegetation|SIVICreationService/);
+});
+
+test('actual private field handlers reuse raw validation, explicit NULL and source species decisions', () => {
+  let component;
+  component = componentFunctions('SIVICreationFields.svelte', ['cover', 'species', 'choose'], {
+    ...editor, draft: begin(), owner, references: references(), error: '',
+    onchange: next => { component.draft = next; },
+  });
+  component.actions.cover('Cover1', '100', false);
+  component.actions.cover('TotalA', '0', false);
+  assert.equal(component.draft.cells.Cover1.raw, '100');
+  assert.match(errors(component.draft)[0], /100/);
+  component.actions.cover('Cover1', '0', false);
+  assert.equal(errors(component.draft).length, 0);
+  component.actions.cover('Cover1', 'retained raw', true);
+  assert.equal(component.draft.cells.Cover1.value.storage, 'null');
+  assert.equal(component.draft.cells.Cover1.raw, 'retained raw');
+  component.actions.cover('HeightA', '1', false);
+  assert.match(component.error, /hidden|another source/);
+  assert.equal(Object.hasOwn(component.draft.cells, 'HeightA'), false);
+  component.actions.species(' TREE ');
+  assert.equal(component.draft.species, ' TREE ');
+  assert.ok(errors(component.draft).length > 0);
+  component.actions.species('TREE');
+  assert.equal(errors(component.draft).length, 0);
+  component.actions.species('old');
+  component.actions.choose('replace', 'TREE');
+  assert.equal(component.draft.species, 'TREE');
+  assert.equal(component.draft.decision.entered, 'old');
+  component.actions.species('mine');
+  assert.equal(component.draft.decision, undefined);
+  component.actions.choose('user', 'MINE');
+  assert.equal(component.draft.species, 'MINE');
+  assert.equal(errors(component.draft).length, 0);
+});
 
 test('measured44-cell defaults have42 distinct NULLs, false Flag and non-inferred engine identity', () => {
   assert.equal(defaults.initialNullColumns.length, 42);

@@ -23,6 +23,9 @@ function cell(value: unknown): value is ProjectMetadataCell {
   return record(value) && typeof value.storage === 'string' && nullableString(value.text) &&
     nullableString(value.integer) && (value.real === null || typeof value.real === 'number') && nullableString(value.blobHex);
 }
+export function completeMetadataCellFromWire(value: unknown): value is ProjectMetadataCell {
+  return cell(value) && completeCell(value);
+}
 function schema(value: unknown): value is ProjectMetadataColumn[] {
   return Array.isArray(value) && Array.from(value).every(column => record(column) &&
     typeof column.name === 'string' && typeof column.declaredType === 'string');

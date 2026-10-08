@@ -14,6 +14,395 @@ The separately gated SIVI height/cover panels reuse the same owned controller
 under FS882 or the standalone SIVI presentation. Exported coordinates are evidence,
 not a requirement to reproduce fixed Access pixels.
 
+### Accepted bounded combined child editing
+
+The independently default-off `VPRO_SIVI_COMBINED_EDITING` and
+`VITE_SIVI_COMBINED_EDITING` gates expose a separate mixed cover/height owner,
+not additional authority for either standalone writer. Normal A uses
+`SubVegA-SIVI_BC`; extended A uses `SubVegA-SIVI`; C/D retain their source forms.
+All three retain PlotNumber links and cover-non-NULL membership. Height-only
+rows never invent source membership. Normal editing comprises14 columns;
+extended adds only Cover5a/b/c for17.
+
+Existing cover/height planners, CAS originals, strict finite Single domains
+and literal TEXT255/UTF-16 HeightB validation are reused. NULL and empty remain
+distinct, historical unchanged invalid cells are omitted, and mixed edits
+share one business/audit/history transaction. Restoration consumes only
+`__VPRO_SIVICombinedHistory`, never standalone cover/height history.
+
+The responsive panel pairs aggregate heights with related cover groups;
+one live control per field replaces tiny Access coordinates. The extracted
+shared child lifecycle retains draft/error/history identity through remounts,
+blocks unknown outcomes, and permits explicit Undo/reload without write replay.
+Root guards exclude dirty/busy peers, preserve close/Lock barriers, and expose
+cancellation only for source reads. Peer refresh preflights every owner before
+resetting any original. Species, Collected, ID, parent changes, creation/deletion,
+automatic totals and remaining source warning/focus events remain unavailable.
+The active UpdateMetadataSppList call is a source no-op, detailed below; its
+dormant metadata writer is not a missing desktop requirement.
+
+This is a verified bounded slice: focused Go race58.925s,51 final coupled frontend tests
+including actual Svelte output, and check0/0 pass. Full frontend integration passes748 tests; isolated enabled/default frontend
+and actual-main Wails builds pass. Four final normally closed owners prove the
+FS882-hosted combined child slice:40 normal/49 extended live labelled controls
+at1400/600/320px, invalid/hidden draft remounts and peer/parent/Lock/native-close
+guards, one three-field mixed Save/three typed audits, isolated prune and retained
+history across remount, independent denials and completed-response read
+cancellation/retry. All16 owned/22 protected identities restore. The normal-only
+inspection bootstrap is preserved separately with hashes. Separate standalone
+mixed-host execution and original source callbacks are not claimed. Fresh full
+Go race passes root2064.794s/all packages. Independent review's
+owner-replacement finding is resolved: combined unsaved/busy preflight now
+precedes every root disposal, with an actual-root-function regression. The
+read-only follow-up is clean, and revised-root native acceptance uses a distinct
+new three-field plan. Pre-review builds and completed evidence remain
+hash-archived without replay. The independently verified
+[1320-file combined successor](../archives/sivi-combined-desktop-checkpoint/evidence-manifest.json)
+preserves845 application-source identities.
+The entry/standalone predecessors remain unchanged. This successor does not
+grant remaining source callbacks, species creation/deletion or complete form execution.
+
+### Accepted child cover-warning adaptation
+
+The separate literal/default-off `VITE_SIVI_CHILD_SOURCE_NOTICES` presentation
+gate is forwarded to all three existing child writers; it grants no backend
+permission. Source A `AfterUpdate` checks exactly Cover1/2/3, TotalA, Cover4/5
+and TotalB. Extended Cover5a/b/c and all heights are excluded. Source C
+`BeforeUpdate` checks NULL Cover6. Source D exits before its dormant warning.
+Neither active warning sets Cancel or deletes a physical vegetation record.
+The UpdateMetadataSppList call remains the no-op described below.
+
+The desktop adaptation previews warnings for valid effective planned edits,
+not rejected or exact no-op drafts. It uses physical signed64 string identities,
+CAS originals and shared cover-presence policy. All128 normal-cover presence
+combinations are tested for both A source forms, including zero/negative cover,
+extended-only membership, height presence and simultaneous A/C/D edits.
+
+Save remains governed by existing domain/ownership/lifecycle guards. Only a
+complete owned acknowledgement promotes feedback to "acknowledged Save".
+That feedback retains the original Species display and physical identity even
+when clearing cover removes the row from the query or a peer refresh fails.
+It survives panel remount; explicit successful Reload/Undo, verified
+restoration or a later acknowledged/no-op Save replaces or clears it.
+Unresolved acknowledgements remain safety errors, never successful warnings.
+
+Warnings appear below fields, outside invalid/Save gates. Source popup timing
+and automatic GoToControl are not reproduced: an accessible explicit action
+focuses a retained **read-only** Species identity, including after query
+removal, and does not enable species editing or steal focus during typing.
+The warning panel renders no input, textarea or modal. This intentional UX
+adaptation has fresh separate native acceptance; the immutable combined seal
+does not cover these current application changes.
+
+Current checks pass64 coupled tests,761 complete frontend/entry tests and
+check0/0, with isolated enabled/default frontend/actual-main Wails builds.
+Independent review found duplicate/hidden parent feedback and automatic
+peer-refresh clearing; both are fixed and its follow-up is clean. Every actual
+panel is tested with loaded/null originals and one focus target; the actual
+root peer-refresh function is tested with each real writer retaining feedback.
+Automatic refreshSource is distinct from explicit Reload/Undo and preserves
+acknowledged warnings.
+
+Two fresh normally closed native owners restore all16 owned/22 protected
+identities without seed/canonical writes. Enabled acceptance measures two
+nonblocking normal A/C notices, one exact four-cell Save/four typed audits,
+retained Species and focus after C query removal and tab remount, and typed
+prune restoring every original table and clearing feedback. Default-off notices
+do not disable existing valid drafts or leak feedback; Undo leaves all bytes
+unchanged. The native harness initially treated informational role=status as
+loading; after independently observing the complete one-Save receipt, only
+post-commit verification resumed. No write was replayed. Extended A combinations
+and cross-owner refresh are fast-test evidence, not additional native claims.
+Fresh full Go race passes root2130.077s/all packages. The independently
+rehashed [1152-file successor](../archives/sivi-source-notices-desktop-checkpoint/evidence-manifest.json)
+preserves847 application identities and exact enabled/default embedded
+candidates. The1320-file combined predecessor remains immutable. Native warning
+acceptance is the normal combined FS882 host, not separate standalone/legacy
+panel execution or original Access event timing. Remaining child work below
+is not granted by this bounded acceptance.
+
+### Remaining child Collected and Species authority
+
+Canonical normal/extended A and C/D `Collected_Click` handlers have equivalent
+active control flow: NULL becomes `"C"`, `"C"` becomes `"V"`, and `"V"` becomes
+NULL; other stored values have no active assignment. Sample_Veg declares
+Collected TEXT(1). The accepted ordinary `collectedAfterClicks`/`collectedNext`
+behavior is prior art, including its already-tested Access comparison
+adaptation, not independent proof of a new SIVI writer. New source-bound
+Collected editing is now an implemented draft with physical signed64 row/CAS
+authority, reviewed click counts and isolated `__VPRO_SIVICollectedHistory`.
+Independent default-off `VPRO_SIVI_COLLECTED_EDITING` /
+`VITE_SIVI_COLLECTED_EDITING` do not widen the combined cover/height allowlist.
+The strict raw request includes original source groups and row/form/expected
+cell/click-count edits, never a caller-selected value or column. Historical
+unchanged text is omitted; non-text storage is explicitly non-cyclable.
+One live labelled control per physical row preserves source groups without
+duplicating edit authority; presentation changes retain cycle intent and submit
+the current source form. Existing persistent child Save/Undo/Lock/close and
+peer-refresh guards apply. Coupled race71.433s,76 frontend tests, check0/0,
+clean actual bindings and production compilation pass.773 complete frontend/
+entry tests, isolated actual-main frontend/Wails builds and independent code/
+native-evidence review now pass. Four normally closed disposable modes prove
+seven labelled physical controls at1400/600px, unknown historical text noops and
+full cycles, draft/remount/lock/peer guards, one held three-cell Save/three typed
+audits, isolated history, native-close refusal, clean combined refresh, retained
+history and typed prune restoring all original business/audit tables. Independent
+frontend/backend denial and completed-response read cancellation/retry pass;
+all16 owned/22 protected hashes restore. Full integration race passes
+root2321.186s/all packages. The independently rehashed
+[1272-file Collected successor](../archives/sivi-collected-desktop-checkpoint/evidence-manifest.json)
+preserves857 application identities/exact candidates/assets/current-main overlays,
+without changing the1152-file predecessor. Native claims use the normal FS882
+host; extended/cross-group combinations remain fast tests. Passing an application
+ID to the ordinary writer is not this authority or a complete-form grant.
+
+Species combo membership is statically mapped in both A variants:
+Codetype `u`/`x`, Lifeform1/2/3/4; C uses5/6/7/8/12 and D1/2/9/10/11.
+USysAllSpecies unions master/personal definitions excluding Codetype `s`;
+NULL/duplicate definitions must remain distinguishable. Active NotInList
+paths first inspect old-code matches, require an explicit replacement/retained
+entered-code decision, then inspect personal definitions and optionally open
+USysAddSpp. The legacy source's case conversion does not authorize arbitrary
+normalization or unverified Unicode conversion. The canonical attachment
+module identifies USysAllSpecs as an external linked table, not a missing
+exported query; the desktop personal-definition storage is an existing
+implementation precedent. An independently default-off source-bound Species
+writer is now native-verified and immutably sealed as a bounded slice.
+Personal-definition creation and vegetation creation/deletion remain ungranted.
+
+Master `VLists.USysAllSpecs` and personal `VUser.USysUserSpp` are different owned
+readonly reference families during species selection. A source-bound mutation
+must recheck reviewed definitions in its own transaction; a lookup on the
+separate context connection before committing is not a drift guard. Reuse the
+existing strict decision/ASCII event comparison and physical text-bound helpers,
+not the ordinary application-ID writer. Sample_Veg Species is required TEXT(8).
+Unlike Collected, Species lists differ between source groups: a shared physical
+row needs an explicit eligible group context with one live field, not an
+implicitly first-group-only list that loses valid D choices. The integrated draft
+implements these boundaries behind independent `VPRO_SIVI_SPECIES_EDITING` /
+`VITE_SIVI_SPECIES_EDITING`, with separate `__VPRO_SIVISpeciesHistory`.
+The shared production-wire fixture preserves declared column types (`declaredType`),
+typed NULL/empty metadata, duplicate definitions and signed64 identities.
+Species race32.602s/coupled writer race100.460s,791 frontend/entry/wire tests/check0/0,
+actual bindings/isolated builds and independent code/native-evidence review pass.
+Six normally closed/restored seed-free native owners rehash the1272-file Collected
+predecessor and preserve16 owned/22 protected identities. Native proof includes
+seven associated physical controls/explicit contexts at1400/600px, raw/errors/
+remount/Lock/parent/peer barriers, natural old-code/personal decisions, two distinct
+three-cell Saves/typed audits/isolated history/remount/complete typed prune,
+loaded-peer refresh, independent denial and completed-reference-response
+cancellation/retry. The first missed chunked capture retains its honest recovery
+without replay; a distinct fresh owner holds the final19-chunk response and proves
+close refusal. Native is the normal host; extended/decision combinations remain
+fast tests.868 application identities/exact candidates are pinned; full
+integration race passes root2252.464s/all packages. The distinct
+[1306-file successor](../archives/sivi-species-desktop-checkpoint/evidence-manifest.json)
+is sealed and independently rehashed twice against868 application identities;
+manifest SHA256 `f775f2d746f4531fe40f511d195dd532c42d7b9ce3ffa1e6bc89b1ad10655f36`.
+Explicit decision focus is identified as Cover1/6/7, not an implicit writable
+cover grant. Source notices use effective Species values while preserving
+accepted cover/height/Collected warning predicates.
+
+### Next source identity/CRUD boundary
+
+All four canonical A/C/D forms bind an `ID` text control to `ID`, with
+`TabStop = NotDefault`; the inspected blocks do not explicitly set Locked or
+Enabled. Their record sources are USysVegA/C/D. The exports do not explicitly
+override AllowAdditions/AllowDeletions/AllowEdits, and no selected insert/delete
+event procedure was found. These facts do not establish a desktop write grant.
+Sample_Veg declares nullable LONG ID with `GenUniqueID()` default and a nonunique
+ID index; PlotNumber and Species are required. The
+[DAO DefaultValue contract](https://learn.microsoft.com/en-us/office/client-developer/access/desktop-database-reference/field-defaultvalue-property-dao)
+defines GenUniqueID as a special database-engine random Long default, not a
+missing exported VBA module function. Exact allocator/collision/retry behavior
+is still not an inferred R/API guarantee. Reuse the accepted desktop child
+identity/reservation invariants only through a source-specific creation contract;
+this schema/default evidence does not itself enable SIVI creation/deletion.
+
+The separately measured [new-row defaults](../resources/sivi-new-row-defaults.json)
+now resolve the omitted initial values without invoking a form. On one exact
+disposable application copy, a local Sample_Veg zero-row DAO cursor entered
+AddNew, observed all44 pending cells, then CancelUpdate and workspace rollback
+completed. No existing rows, Access.Application, forms, callbacks or Update were
+used; canonical application and VPRO registry remained unchanged. Forty-two
+fields begin NULL, Flag begins false/INTEGER0, and ID receives an engine Long.
+The one observed ID is deliberately excluded from the public policy: it is not
+an allocator, random-distribution, retry or collision proof. In particular, Layer,
+Collected, heights, covers and totals have no inferred zero/empty assignments.
+The private receipt is `<session>/files/sivi-new-row-defaults/receipt.json`;
+the exact baseline and closed candidate remain retained there.
+The closed candidate SHA256 is
+`f2b02e87f60cf12d17c2e65d884477ba30d90b5c6380693a84d8fa7b28ce127d`,
+different from its initial exact copy. No record Update was issued; do not
+claim byte-identical fixture preservation or infer the reason for those engine
+file changes. The exact unchanged baseline is retained, not overwritten.
+
+The canonical query predicates require at least one non-NULL A cover/total,
+Cover6 for C, or Cover7/8/9 for D. Zero is a member; a species-only or height-only
+new row is not. A includes Cover5a/b/c even when the BC form hides those controls;
+hidden fields must not be silently assigned to manufacture membership.
+Source A Form_AfterUpdate contains a narrower concatenated warning expression,
+not the query predicate; it must not replace membership validation. C warns
+before audit when Cover6 is NULL without setting Cancel; D has no equivalent
+cover warning. These source notices do not justify committing an invisible new
+row or dropping the desktop draft. TotalA/TotalB focus callbacks only change
+label colours: creation must not infer a sum or invoke the separately unresolved
+Access Val/strata calibration. Creation still needs its own typed transaction,
+identity reservations, history/restoration, persistent lifecycle and native
+desktop acceptance before a write grant.
+
+Private `siviCreationEditor.ts` now prepares one explicit A/C/D Species plus
+source-visible cover/total plan. It reuses the accepted SINGLE parser, typed
+reference and old-code/personal decisions; rechecks exact active owner and raw
+drafts, omits NULL assignments and rejects hidden/foreign/identity fields.
+All21 visible field/form combinations include literal zero-membership tests.
+Errors remain in raw drafts across unrelated corrections; no partial plan,
+automatic total, height coercion or caller identity/default assignment follows.
+`SIVICreationFields.svelte` reuses those helpers,
+source cover labels/group order and the existing Species decision pattern.
+It renders exactly21 labelled cover/total controls across four forms, explicit
+NULL choices and retained raw validation before fields. No identity or Save
+control is present in the reusable fields themselves. The independently
+default-off creation panel now owns explicit source-form start/Save/Undo and
+read-only receipt resolution, with owner-scoped persistent sessions outside
+tab component lifetimes. Actual main and interface bindings register
+`SIVICreationService`; reference reads remain independent of Species mutation.
+The private transactional core assigns only parent, resolved Species and
+non-NULL visible covers/totals, reserves positive signed32 IDs and atomically
+records audits/history. Its planned preallocation receipt original is43 NULLs
+(including ID) plus Flag0, not the measured DAO buffer with its generated ID.
+All44 original/committed cells, exact source column names, owned request/decision,
+actor/time/history and allocation identity must validate before frontend success.
+Initial creation is `didCommit=true,replayed=false`; lookup proves an earlier
+commit with `didCommit=false,replayed=true`. Top-level context identifies the
+current caller; embedded request context remains the durable original owner.
+Shared-file history validates each row internally before checking matching
+request ownership, preserving separate project families and rejecting foreign
+request-ID reuse or corruption. Independent review closed that correction.
+History identity is exactly the retained request UUID. The source audit time is
+literal local `YYYY-MM-DD HH:MM:SS`, validated as an actual calendar/time value
+without timezone conversion; it is not the picture receipt's UTC timestamp.
+Producer-shaped create/lookup tests reject numeric/foreign history identities,
+UTC/fractional/trailing timestamps and impossible calendar values.
+Client effects subscribing to synchronous initial session notifications must
+increment revisions untracked. The live client regression verifies settling,
+notifications, owner replacement and cleanup for creation and picture sessions.
+Fresh coupled race/vet45.242s,32 focused/856 complete frontend tests, check0/0
+and isolated enabled/default assets pass. Parent/peer editing, Save/Undo/Lock,
+owner replacement and close honor retained errors and unknown authority.
+Unsubmitted drafts can be explicitly undone; unknown requests cannot be silently
+discarded, edited or retried. Missing history is unresolved, not proof of failure.
+Fresh full Go integration passes root1993.776s/all packages. Four native source
+drafts/remount/Undo guards pass. The first write owner committed exactly one row
+with two audits and a reservation, but its frontend rejected the genuine
+UUID/local-time receipt. Its unknown request and committed data are preserved;
+that failed owner was forcibly contained, not normally closed or accepted, and
+all disposable/protected identities restored. Corrected actual-main native runs
+now verify nine scoped creates with all44 cells,18 audits, reserved IDs, explicit
+keep/replace/existing-personal decisions and no master/user-definition mutations.
+Lost/incomplete and cancelled completed-response acknowledgements retain the
+exact request and resolve through byte-identical read-only lookup; this is not
+proof of in-flight SQL cancellation. Seven accepted owners normally closed;
+closed committed data/history remain before exact16-file restoration, all22
+protected identities unchanged. All four source presentations pass actual
+1400/600px client visibility/associated-label/horizontal-containment checks.
+Independent frontend/backend denials pass. Final evidence review/seal is pending.
+An additional rejected no-commit candidate exposed a fixture-only restoration
+pitfall: copying immutable baseline file attributes made the disposable project
+read-only. Its failed attempt/profile are preserved separately. Restoration now
+copies bytes without inheriting baseline attributes and checks the exact
+candidate's write attribute while closed; baseline/canonical attributes are never changed.
+Deletion/historical restoration and default promotion are not granted.
+
+Active Form_BeforeUpdate calls `AuditTrail Me, , Me.ID`, then
+`UpdateMetadataSppList Me.PlotNumber`. The shared V7mdlAudit routine explicitly
+skips controls named `ID` and `PlotNumber` before checking audit strength.
+An identity-only editor therefore must not inherit ordinary changed-cell ID
+audits or treat a new application ID as a new physical row. Source restoration
+and collision/reserved-deleted-ID safety need a separate reviewed boundary.
+The existing source metadata callback remains an established early-exit no-op;
+dormant record-copy code after the form's Exit Sub is not a mutation requirement.
+Private identity planning and owned write/restoration are accepted in
+`sivivegetationidentity*.go`. An independently default-off facade and persistent
+desktop successor are now integrated. The bounded ID-only native workflow is
+verified and independently sealed, not complete-form parity.
+New values require exact nullable signed32 integer storage, while unchanged
+historical invalid values are omitted and unsupported historical ID repair is
+read-only. One physical row can be selected through any of its eligible A/C/D
+contexts; mutable application IDs never become physical row identifiers.
+
+The desktop safety adaptation is stricter than Access's nonunique index: new
+IDs cannot collide with any project row, another batch assignment, deleted/audited
+IDs or the existing child reservation ledger. Implicit swaps are rejected.
+Both old and new non-NULL IDs remain reserved, including after restoration.
+This does not rewrite pre-existing duplicates or imply native generator parity.
+Separate `__VPRO_SIVIIdentityHistory` records every effective identity plan,
+including at audit strength0, without adding ID or PlotNumber field audits.
+Complete source CAS, owned parent/file guards and whole-project transaction
+comparison reject drift, unexpected triggers and physical-row identity changes.
+Restoration checks the full committed physical row and the original peer
+occupancy of returning IDs; unchanged historical duplicates can return, but
+new/deleted/changed peer occupants block restoration. Retain/prune mark only
+this technical history and never prune ordinary source audits or vegetation rows.
+Focused identity/coupled writer race79.395s passes, including real lock-wait
+cancellation/retry and NULL/extended-source roundtrips. Independent review found
+that reduced ID/rowid occupancy could accept a changed or replacement duplicate
+peer. Return occupancy now deep-clones and compares complete peer rows; real
+automatic rowid-reuse and changed-Species cases reject without writes, then permit
+explicit retry after exact source restoration. Focused review follow-up has no
+significant remaining findings. Integration passes root2434.345s/all packages
+against872 frozen application identities under isolated TEMP. The first full race
+reported one unrelated missing workbook-publication parent under shared TEMP;
+three exact focused race repetitions pass. Its root cause remains unknown; the
+distinct successful integration receipt, not those focused retries, establishes
+acceptance. The
+[40-file private successor](../archives/sivi-identity-private-checkpoint/evidence-manifest.json)
+is sealed and independently rehashed twice; manifest SHA256
+`eb185c40d663d1502038bd26dfbd3a8c9757d83535c281c772500a714c5c0fd6`.
+Creation/deletion and generator parity remain
+unimplemented and unavailable. No Access runtime oracle or canonical write was
+run for this trace or private implementation.
+
+The desktop successor uses `VPRO_SIVI_IDENTITY_EDITING` and
+`VITE_SIVI_IDENTITY_EDITING` independently. The strict raw facade rejects
+duplicate/recased/unknown authority properties before decoding; shared guards
+retain existing Species wire behavior. The responsive editor has one labelled
+ID/explicit NULL choice per physical row, exact signed32 text and persistent
+syntax/collision errors. Root Save/Undo/Lock/close, plot replacement, read
+cancellation, exclusive panels and all six physical-source peer refreshes are
+wired. Technical history acknowledgements require an actual history ID and
+zero pruned source audits; audited predecessor scopes retain their exact
+restored-row pruning requirement.
+
+Nullable IDs exposed an ordinary numeric-DTO boundary: the existing legacy
+reader correctly refuses NULL rather than inventing ID=0, but that refusal
+previously prevented physical-source editors from loading or refreshing the
+parent. The identity-enabled root now uses an explicit read-only availability
+result. NULL, duplicate or numerically inexact ordinary IDs disable the entire
+ordinary vegetation result/actions/totals with visible feedback; they never
+yield partial rows or synthetic IDs. Other storage/ownership/cancellation
+failures still propagate. Valid ordinary rows and the default-off legacy route
+remain unchanged. Physical-row SIVI views can continue independently.
+
+Focused facade/Species race33.798s and owned availability/legacy/facade race4.045s
+pass. Standard772 frontend tests, supplemental entry/wire34 and final panel/root15
+pass; check0/0 and isolated enabled/identity-off builds pass. Both exact actual-main
+Wails candidates embed18 assets. Six normally closed native owners independently
+compare ID-only physical rows and unchanged source audits, NULL and signed32
+endpoints, zero-audit retain/prune restoration and reserved-ID refusal. They also
+cover visible1400/600px labels, remount/parent/peer barriers, held actual Save/read
+responses, lost technical-history acknowledgement/no replay/explicit recovery,
+native close/read cancellation/retry and independent frontend/backend denial.
+Cancellation holds a completed backend response, not in-flight SQL. All16 fixture
+and22 protected identities restore; closed histories remain. Independent code and
+native-evidence review found no significant issues/substantive gaps. Full
+all-package integration passes root2258.241s against884 frozen application
+identities under isolated TEMP. The distinct
+[396-file desktop successor](../archives/sivi-identity-desktop-checkpoint/evidence-manifest.json)
+is sealed and independently rehashed twice; manifest SHA256
+`787999baf14488cf1e392431cbcea8de44402af116715e39b6b511b1c3fc8c6f`.
+No default promotion, identity creation/deletion or unavailable generator claim.
+
 Sources were read directly from the local `VPro64_forAI` exports. The R form is
 not parity proof. Existing [packaged metadata](../resources/fs1333-sivi-layout.json)
 preserves the normal parent, source labels, control relationships, events and
@@ -21,7 +410,7 @@ three PlotNumber-linked children. Parent fields are read-only unless the separat
 editing gates explicitly load their fourteen direct/two action controls. Mapped original
 storage is not source-equivalent join/callback/write authorization.
 
-### Standalone entry candidate
+### Standalone entry presentation
 
 `VITE_SIVI_STANDALONE` independently defaults off and requires the parent-review
 frontend gate. It adds no backend authorization: each existing parent, direct,
@@ -60,8 +449,14 @@ All16 fixture/22 protected hashes restore; no live native owner remains.
 
 Fresh full integration passes root1959.435s/all packages; all742 source identities
 and exact embedded assets remain unchanged. Five current PID/start/path checks
-independently confirm the accepted native owners absent. The integration
-candidate is not yet immutably sealed. Combined
+independently confirm the accepted native owners absent. The bounded successor
+is immutably sealed in
+[`sivi-standalone-desktop-checkpoint`](../archives/sivi-standalone-desktop-checkpoint/evidence-manifest.json):
+240 files, independently verified manifest SHA256
+`c7eb918eacdacc3f7bfa82dd76ec3479be9c34cd3d9b2b8f2b7f0838bfedee70`.
+Do not reseal or replay completed native modes/Save/prune. Primary exact-predecessor
+source/diff review is recorded; this does not claim an independent successor review.
+Combined
 cover/height grids, species creation/deletion, full original event execution and
 two-page entrypoints remain unavailable. This is not overall forms/reports
 completion or a default promotion.
@@ -75,6 +470,42 @@ completion or a default promotion.
 | `Tables_Def\Sample_Env_CreateSQL.txt` | `eb1b6e14206256e5a9a02e86b9fed443f3369fff8048722c5f6656df859e01cd` |
 
 ## Storage and ownership
+
+### Active child species-metadata callback is a no-op
+
+Direct canonical source reads resolve the metadata call separately from the
+remaining child warning/focus workflow. Normal and extended A, C and D call
+`UpdateMetadataSppList Me.PlotNumber` in their BeforeUpdate paths after
+`AuditTrail`. A/D immediately exit before dormant manual row-copy code.
+
+`Modules\V7mdlAttachMasterLists.txt`, function beginning at line206, enters
+an unconditional `GoTo MyExit` before database/recordset initialization.
+The metadata AddNew/Edit and AllSpecs assignment are unreachable. Cleanup
+only attempts to close an unopened recordset under the source's error handling.
+The returned value is not consumed by these callers. Source-equivalent desktop
+behavior therefore has no metadata row, schema, audit or version mutation;
+do not add a callback writer just because of its name.
+
+The canonical `Sample_Metadata` schema has `AllSpecs TEXT(255)` but no
+PlotNumber column. The unreachable per-plot search/addition is not authority
+to manufacture such a column or per-plot project metadata. The existing
+reviewed project metadata editor remains a separately owned workflow.
+
+Provenance:
+
+| Canonical export | SHA256 |
+| --- | --- |
+| `Modules\V7mdlAttachMasterLists.txt` | `d3f147c6b7230b9d0d602fcb25cc7b7288eca26405d9e4983d01e63e38ca77fa` |
+| `Tables_Def\Sample_Metadata_CreateSQL.txt` | `3139285edcb2152389eaccb593d25d43ed9596ffe10c0761233023498a59d2cc` |
+
+Independent physical comparison of the accepted revised combined native
+fixture's original and closed Save/prune data proves every Sample_Metadata
+row and its schema unchanged. This supports the desktop no-effect invariant,
+not an Access runtime-oracle claim. A's cover-presence AfterUpdate warning,
+C's NULL Cover6 BeforeUpdate warning/focus, species/Collected/ID/CRUD and
+full original event timing remain separate work. Query membership still
+includes non-NULL extended A covers even when normal controls hide them;
+do not confuse that predicate with A's seven normal-cover warning fields.
 
 ### Private child-cover planning
 

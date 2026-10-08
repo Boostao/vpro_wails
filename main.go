@@ -206,6 +206,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	siviCreation, err := NewSIVICreationService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	pictures, err := NewPictureService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -337,6 +341,7 @@ func main() {
 		application.NewService(siviCollected),
 		application.NewService(siviSpecies),
 		application.NewService(siviIdentity),
+		application.NewService(siviCreation),
 		application.NewService(pictures),
 		application.NewService(pictureMetadata),
 		application.NewService(lifeformSummary),

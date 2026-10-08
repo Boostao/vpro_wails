@@ -14,7 +14,7 @@ function host(overrides = {}) {
   return componentFunctions('FS882Form.svelte', [
     'siviIdentityOperation', 'stageSIVIIdentity', 'showSIVIIdentityPanel', 'refreshSIVIChildEditors', 'load',
   ], {
-    ...Object.fromEntries(guards.map(name => [name, false])), ...Object.fromEntries(peers.map(name => [name, null])), pictureMetadataPending: false,
+    ...Object.fromEntries(guards.map(name => [name, false])), ...Object.fromEntries(peers.map(name => [name, null])), pictureMetadataPending: false, siviCreationPending: false,
     siviIdentityEnabled: true, siviIdentityEditingDisabled: false, siviIdentityUnsaved: false,
     siviIdentityReading: false, siviIdentityPanelOpen: false, siviIdentityView: { review: [{}] },
     siviPanelOpen: true, siviCoverPanelOpen: true, siviCombinedPanelOpen: true,
@@ -42,7 +42,8 @@ test('identity is independently default-off in actual main and uses tracked owne
 test('identity participates in Save Undo Lock close and every ordinary/source/parent draft barrier', () => {
   assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviIdentityBusy/);
   assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
-  assert.match(parent, /nonParentChildUnsaved = \$derived\([^\n]*\|\| siviIdentityUnsaved/);
+  assert.match(parent, /siviCreationPeerUnsaved = \$derived\([^\n]*\|\| siviIdentityUnsaved/);
+  assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending\)/);
   assert.match(parent, /if \(siviIdentityUnsaved\) \{ await siviIdentityOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviIdentityUnsaved\) \{ void siviIdentityOperation\('undo'\); return; \}/);
   assert.match(parent, /\|\| \(siviIdentityClose\?\.blocked \?\? false\)/);

@@ -208,8 +208,8 @@ test('Deletion review compares independently returned source identity, code, ful
 test('Explicit deletion confirmation owns lifecycle without allowing generic Save, close or prototype bypass',()=>{
   const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   assert.match(source,/VITE_VEGETATION_DELETE_EDITING === 'true'/);
-  assert.match(source,/nonParentChildUnsaved = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
-  assert.match(source,/childParentDisabled = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null \|\| personalDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked\)/);
+  assert.match(source,/siviCreationPeerUnsaved = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
+  assert.match(source,/childParentDisabled = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null \|\| personalDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| siviCreationPending\)/);
   assert.match(source,/deletionRequest\+\+; deletionReads\.cancelAll\(\)/);
   assert.match(source,/const species = rows\[0\]\.species/);
   assert.match(source,/const plot = draft\.plotNumber/);
@@ -264,8 +264,8 @@ test('Height-only A creation stays explicit while C-height still requires source
 test('Opt-in source creation owns independent persistent lifecycle and fails closed after committed refresh failure',()=>{
   const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   assert.match(source,/VITE_VEGETATION_CREATE_EDITING === 'true'/);
-  assert.match(source,/nonParentChildUnsaved = \$derived\([^;]*creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
-  assert.match(source,/childParentDisabled = \$derived\([^;]*creationDraft !== null \|\| personalDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked\)/);
+  assert.match(source,/siviCreationPeerUnsaved = \$derived\([^;]*creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
+  assert.match(source,/childParentDisabled = \$derived\([^;]*creationDraft !== null \|\| personalDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| siviCreationPending\)/);
   assert.match(source,/creationInvalid\.length > 0 \? 'Correct invalid vegetation creation/);
   assert.match(source,/if \(creationDraft !== null\) \{ await saveVegetationCreation\(\); return; \}/);
   assert.match(source,/if \(creationDraft !== null\) \{ void cancelVegetationCreation\(\); return; \}/);
