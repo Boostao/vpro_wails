@@ -33,7 +33,7 @@ three actual outputs, with all16 fixture/22 protected identities unchanged.
 Independent desktop/native evidence review found no high-confidence discrepancies.
 Fresh714 source identities and exact17 embedded assets per binary remain unchanged
 through passing all-package race (root1502.269s). The separately reverified
-[181-file successor](../archives/summary-environment-workbook-desktop-checkpoint/evidence-manifest.json)
+[181-file successor](MIGRATION_EVIDENCE.md#snapshot-summary-environment-workbook-desktop-checkpoint)
 has manifest SHA256
 `5a53247bc82bda9006115a859b540fcca1ab1a03c5968abe047babb8ed947125`.
 No default promotion is claimed. The unresolved
@@ -81,7 +81,7 @@ application identities. Independent static source/correctness review finds no
 significant issues and reproduces focused race34.783s; production Wails
 compilation passes without launching or changing protected frontend assets.
 The earlier accepted SIVI authority race is not substituted for this integration.
-The [29-file private successor](../archives/summary-quick-vegetation-private-checkpoint/evidence-manifest.json)
+The [29-file private successor](MIGRATION_EVIDENCE.md#snapshot-summary-quick-vegetation-private-checkpoint)
 is separately hash/size verified and immutable, without a native/public claim.
 
 The subsequent [source caption/format continuation](../siteunitlifeformformat.go)
@@ -149,7 +149,7 @@ fresh all-package focused race1.469s; no remaining significant findings.
 Full aggregate retry passes with cached root under unchanged727 inputs, not a
 substituted older candidate. The formatter/private720-pin seals are not
 substituted. The separately re-hashed233-file
-[current successor](../archives/summary-lifeform-desktop-checkpoint/evidence-manifest.json)
+[current successor](MIGRATION_EVIDENCE.md#snapshot-summary-lifeform-desktop-checkpoint)
 has manifest SHA256
 `1dd7945f5a1c445e4ddff2541e566a53a749c6f3b787d2dfa3f74c4083b534a4`.
 Never reseal or replay its completed native modes. No default promotion or
@@ -271,7 +271,7 @@ arbitrary huge-count arithmetic, rerun the suites or perform native actions.
 Current732 application identities and native-tested binaries/assets are frozen;
 fresh all-package race passes root1445.861s/all packages and all732 hashes are
 separately verified unchanged. The immutable727-pin predecessor does not freeze
-these newer changes. The [bounded successor](../archives/summary-species-desktop-checkpoint/evidence-manifest.json)
+these newer changes. The [bounded successor](MIGRATION_EVIDENCE.md#snapshot-summary-species-desktop-checkpoint)
 retains this distinct candidate; never replay its completed native modes.
 
 ### Private workbook extension: publication unavailable
@@ -352,7 +352,10 @@ identities remain unchanged. Native cancellation holds completed-response
 delivery, not in-flight SQL; warning/unknown injections change transport after
 observing a real committed receipt, not actual backend cleanup.
 741 current application identities and17 exact isolated assets per binary are
-frozen for fresh full race; current integration/seal remain unfinished.
+separately verified unchanged; fresh full race passes root2361.272s/all packages.
+The [180-file successor](MIGRATION_EVIDENCE.md#snapshot-summary-extended-workbook-desktop-checkpoint)
+is immutably sealed and separately verified. Never replay its publications or
+reseal the closed native modes.
 Default promotion and whole-report parity are not claimed.
 
 ### Workbook adaptation and approval boundary
@@ -400,7 +403,7 @@ it does not establish in-flight SQL cancellation. Frontend-off and backend-off
 owners prove independent gate denial while the accepted preview remains usable.
 
 The local reference root is
-`C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`. Static exports were read
+`<private-Access-root>\VPro64_forAI`. Static exports were read
 without opening Access or modifying source/data:
 
 | Source | SHA256 |
@@ -541,7 +544,7 @@ contexts, view substitution, lease deadline, commit/rollback cleanup failure,
 post-read cancellation and clean retry. Full406-file race integration passes
 (fresh root979.552s; unchanged packages may be cached), with all reviewed code,
 eight original exports and192 frontend/dependency identities unchanged.
-The [private scope successor](../archives/site-unit-detail-scope-checkpoint/evidence-manifest.json)
+The [private scope successor](MIGRATION_EVIDENCE.md#snapshot-site-unit-detail-scope-checkpoint)
 retains source, review, focused/full receipts and the350-file accepted saved-title
 predecessor identity. No service authorization, binding/frontend change, new
 report/native claim or production/default promotion follows from that predecessor.
@@ -637,7 +640,7 @@ this bounded preview, not full forms/reports parity or production promotion.
 
 One coherent full race integration passes with fresh root794.606s/all packages,
 against611 unchanged pinned Go/frontend identities. The sealed desktop successor
-is [the summary checkpoint](../archives/site-unit-summary-desktop-checkpoint/evidence-manifest.json).
+is [the summary checkpoint](MIGRATION_EVIDENCE.md#snapshot-site-unit-summary-desktop-checkpoint).
 
 The saved-initialization successor passes focused/shared Go race3.125s,
 22 targeted frontend tests,444 complete frontend tests/check0/0 and isolated
@@ -650,7 +653,7 @@ independent default/backend denial. All16 database/config hashes restore.
 Only the driver changes/restores fixture options; no application writes occur.
 Full coherent race passes with fresh root797.541s/all packages against613
 unchanged Go/frontend identities. The
-[initialization successor](../archives/summary-options-desktop-checkpoint/evidence-manifest.json)
+[initialization successor](MIGRATION_EVIDENCE.md#snapshot-summary-options-desktop-checkpoint)
 preserves the42-file None and48-file original summary predecessors. This
 initialization does not implement AfterUpdate preference writes or overall parity.
 

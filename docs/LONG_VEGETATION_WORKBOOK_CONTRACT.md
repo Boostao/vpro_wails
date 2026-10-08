@@ -126,7 +126,8 @@ only source/review reads are cancellable.
   zero-output candidate was normally closed/hash-archived before replacing it
   with the correctly gated retained Strata/Code candidate.
 - All-package race passes with fresh root1508.347s and680 unchanged frozen source
-  identities. The immutable archive seals the exact integration evidence.
+  identities. The [immutable101-file archive](MIGRATION_EVIDENCE.md#snapshot-vegetation-workbook-desktop-checkpoint)
+  seals the exact integration evidence.
 
 Source4 attributes, lumping, combined variants and empty pivot units remain
 unavailable; no parity claim for those modes. The full forms/reports migration is

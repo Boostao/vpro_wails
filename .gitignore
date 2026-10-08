@@ -34,7 +34,12 @@ __pycache__/
 *.py[cod]
 # Native Access copies are private oracle data, not application resources.
 *.accdb
+*.accda
+*.accde
+*.accdr
 *.mdb
+*.mda
+*.mde
 *.laccdb
 *.ldb
 # Keep resources/*.db, sealed fixture inputs and generated Wails bindings tracked:

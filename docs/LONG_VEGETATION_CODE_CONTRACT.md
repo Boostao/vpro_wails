@@ -23,7 +23,7 @@ Immutable successor:
 ## Static source
 
 Canonical originals were read without Access/data writes:
-`C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
+`<private-Access-root>\VPro64_forAI`.
 
 - Forms/USysLongVegOptions716-718 and750-841: rptLvShowCommon includes source2,
   labelled **Show 8 char. code**. Source Form_Load2054-2056 reads the saved mode.

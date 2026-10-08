@@ -27,7 +27,7 @@ completion.
 ## Source output
 
 Read-only originals are in
-`C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
+`<private-Access-root>\VPro64_forAI`.
 `Modules/V7mdlReportsLifeform.txt` establishes the normal-SU workbook:
 
 - Lines13-16/27-30 distinguish normal SU from dynamic hierarchy.

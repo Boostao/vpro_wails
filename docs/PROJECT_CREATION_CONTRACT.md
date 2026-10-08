@@ -35,7 +35,7 @@ intact; source/mapped SQL pointers are detached and canonical bytes unchanged.
 The independent source-only in-memory preparation also passed all eight
 templates. Independent review found no significant issues; fresh full Go race
 passes root801.140s/all packages. The
-[16-file private mapping successor](../archives/new-project-ddl-preparation-checkpoint/evidence-manifest.json)
+[16-file private mapping successor](MIGRATION_EVIDENCE.md#snapshot-new-project-ddl-preparation-checkpoint)
 verifies all122 immutable location-predecessor files and records356 Go source hashes;
 location race775.988s does not validate these later Go additions. Native defaults,
 linked version properties and the enabled creator remain unresolved.

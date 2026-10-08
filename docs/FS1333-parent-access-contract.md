@@ -57,7 +57,7 @@ precedes every root disposal, with an actual-root-function regression. The
 read-only follow-up is clean, and revised-root native acceptance uses a distinct
 new three-field plan. Pre-review builds and completed evidence remain
 hash-archived without replay. The independently verified
-[1320-file combined successor](../archives/sivi-combined-desktop-checkpoint/evidence-manifest.json)
+[1320-file combined successor](MIGRATION_EVIDENCE.md#snapshot-sivi-combined-desktop-checkpoint)
 preserves845 application-source identities.
 The entry/standalone predecessors remain unchanged. This successor does not
 grant remaining source callbacks, species creation/deletion or complete form execution.
@@ -114,7 +114,7 @@ loading; after independently observing the complete one-Save receipt, only
 post-commit verification resumed. No write was replayed. Extended A combinations
 and cross-owner refresh are fast-test evidence, not additional native claims.
 Fresh full Go race passes root2130.077s/all packages. The independently
-rehashed [1152-file successor](../archives/sivi-source-notices-desktop-checkpoint/evidence-manifest.json)
+rehashed [1152-file successor](MIGRATION_EVIDENCE.md#snapshot-sivi-source-notices-desktop-checkpoint)
 preserves847 application identities and exact enabled/default embedded
 candidates. The1320-file combined predecessor remains immutable. Native warning
 acceptance is the normal combined FS882 host, not separate standalone/legacy
@@ -150,7 +150,7 @@ history and typed prune restoring all original business/audit tables. Independen
 frontend/backend denial and completed-response read cancellation/retry pass;
 all16 owned/22 protected hashes restore. Full integration race passes
 root2321.186s/all packages. The independently rehashed
-[1272-file Collected successor](../archives/sivi-collected-desktop-checkpoint/evidence-manifest.json)
+[1272-file Collected successor](MIGRATION_EVIDENCE.md#snapshot-sivi-collected-desktop-checkpoint)
 preserves857 application identities/exact candidates/assets/current-main overlays,
 without changing the1152-file predecessor. Native claims use the normal FS882
 host; extended/cross-group combinations remain fast tests. Passing an application
@@ -196,7 +196,7 @@ without replay; a distinct fresh owner holds the final19-chunk response and prov
 close refusal. Native is the normal host; extended/decision combinations remain
 fast tests.868 application identities/exact candidates are pinned; full
 integration race passes root2252.464s/all packages. The distinct
-[1306-file successor](../archives/sivi-species-desktop-checkpoint/evidence-manifest.json)
+[1306-file successor](MIGRATION_EVIDENCE.md#snapshot-sivi-species-desktop-checkpoint)
 is sealed and independently rehashed twice against868 application identities;
 manifest SHA256 `f775f2d746f4531fe40f511d195dd532c42d7b9ce3ffa1e6bc89b1ad10655f36`.
 Explicit decision focus is identified as Cover1/6/7, not an implicit writable
@@ -373,8 +373,11 @@ editing/consumed history no longer depend on initializing unavailable peers.
 Independent integration/evidence review reports no significant issues after
 actual raw/audit/history/candidate/closure hash checks. Full Go race passes
 root2423.962s/all packages/EXIT0 against597 unchanged Go files; corrected frontend
-was separately validated during that Go-only proof. Distinct successor sealing
-is separate; no default promotion or overall migration completion is claimed.
+was separately validated during that Go-only proof. The distinct
+[desktop successor](MIGRATION_EVIDENCE.md#snapshot-sivi-creation-undo-desktop-checkpoint)
+is sealed2650 files/987 sources and independently rehashed, manifest SHA256
+`100b90c2273970b49ee1fc7544dffe8f11aae1cc491d5c3361ca3075edbcac79`.
+No default promotion or overall migration completion is claimed.
 
 ### Source-scoped deletion and typed restoration desktop successor
 
@@ -431,7 +434,7 @@ identities remain unchanged. Closed committed data/profiles are retained.
 Independent native-evidence review found no significant issues and reproduced
 closed-history integrity/identity/asset checks. Fresh full integration race passes
 root2206.226s/all packages. The independently verified2179-file
-[desktop checkpoint](../archives/_sivi-deletion-desktop-checkpoint/evidence-manifest.json)
+[desktop checkpoint](MIGRATION_EVIDENCE.md#snapshot-sivi-deletion-desktop-checkpoint)
 preserves970 source identities/592 Go files; manifest SHA256
 `578085021c4a4a9eddf18c5058e8d882c208e4543b4f5e1d13601e560b20139c`.
 Never replay its mutations or reseal it.
@@ -443,7 +446,7 @@ owner verifies four known reviewed rows cannot Save-and-close, plus1400/600px
 labels/containment; all16 prepared/22 protected identities stay unchanged.
 Composite unknown-parent priority is an executed actual-root fast regression,
 not an injected native source claim. The592 Go files remain identical to the
-full-race predecessor. [56-file priority checkpoint](../archives/_sivi-deletion-close-priority-checkpoint/evidence-manifest.json)
+full-race predecessor. [56-file priority checkpoint](MIGRATION_EVIDENCE.md#snapshot-sivi-deletion-close-priority-checkpoint)
 has SHA256 `f743145db338b172f95bcec39d9d8880e5a356d3904eccff0b25706bed7aa742`.
 This is not complete combined-form/default acceptance.
 Eight shared real-audit fixtures verify the actual Go producer and frontend
@@ -500,7 +503,7 @@ reported one unrelated missing workbook-publication parent under shared TEMP;
 three exact focused race repetitions pass. Its root cause remains unknown; the
 distinct successful integration receipt, not those focused retries, establishes
 acceptance. The
-[40-file private successor](../archives/sivi-identity-private-checkpoint/evidence-manifest.json)
+[40-file private successor](MIGRATION_EVIDENCE.md#snapshot-sivi-identity-private-checkpoint)
 is sealed and independently rehashed twice; manifest SHA256
 `eb185c40d663d1502038bd26dfbd3a8c9757d83535c281c772500a714c5c0fd6`.
 Creation/deletion and generator parity remain
@@ -542,7 +545,7 @@ and22 protected identities restore; closed histories remain. Independent code an
 native-evidence review found no significant issues/substantive gaps. Full
 all-package integration passes root2258.241s against884 frozen application
 identities under isolated TEMP. The distinct
-[396-file desktop successor](../archives/sivi-identity-desktop-checkpoint/evidence-manifest.json)
+[396-file desktop successor](MIGRATION_EVIDENCE.md#snapshot-sivi-identity-desktop-checkpoint)
 is sealed and independently rehashed twice; manifest SHA256
 `787999baf14488cf1e392431cbcea8de44402af116715e39b6b511b1c3fc8c6f`.
 No default promotion, identity creation/deletion or unavailable generator claim.
@@ -595,7 +598,7 @@ Fresh full integration passes root1959.435s/all packages; all742 source identiti
 and exact embedded assets remain unchanged. Five current PID/start/path checks
 independently confirm the accepted native owners absent. The bounded successor
 is immutably sealed in
-[`sivi-standalone-desktop-checkpoint`](../archives/sivi-standalone-desktop-checkpoint/evidence-manifest.json):
+[`sivi-standalone-desktop-checkpoint`](MIGRATION_EVIDENCE.md#snapshot-sivi-standalone-desktop-checkpoint):
 240 files, independently verified manifest SHA256
 `c7eb918eacdacc3f7bfa82dd76ec3479be9c34cd3d9b2b8f2b7f0838bfedee70`.
 Do not reseal or replay completed native modes/Save/prune. Primary exact-predecessor
@@ -696,7 +699,7 @@ validation, not a generated service, enabled desktop editor or native acceptance
 Independent storage review finds no significant issues and independently
 reproduces focused race38.091s. Production compilation and all-package race
 (fresh root1524.497s) pass against684 unchanged frozen source identities.
-The [private checkpoint](../archives/sivi-cover-private-checkpoint/evidence-manifest.json)
+The [private checkpoint](MIGRATION_EVIDENCE.md#snapshot-sivi-cover-private-checkpoint)
 preserves this bounded result and the accepted Long Vegetation workbook
 predecessor; it does not authorize a public cover workflow.
 
@@ -734,7 +737,7 @@ no substantive gaps, verifies all four owners absent and matches16 fixture /
 SQL cancellation claim. Fresh desktop all-package race passes root1376.407s
 against692 unchanged frozen application identities; both native-tested binaries
 embed their exact17 isolated assets. The
-[desktop successor](../archives/sivi-cover-desktop-checkpoint/evidence-manifest.json)
+[desktop successor](MIGRATION_EVIDENCE.md#snapshot-sivi-cover-desktop-checkpoint)
 preserves this bounded result separately from the private predecessor.
 The private checkpoint's earlier full-race result is not proof of this later
 public surface. Automatic
@@ -1385,7 +1388,7 @@ Both owners close normally and all16/22 identities restore. Independent review
 closes both mutation findings and the bounded native evidence;40 focused tests
 are independently reproduced. Corrected714 application identities/17 exact
 embedded assets remain distinct from the archived initial candidate.
-The [127-file authority successor](../archives/sivi-source-authority-desktop-checkpoint/evidence-manifest.json)
+The [127-file authority successor](MIGRATION_EVIDENCE.md#snapshot-sivi-source-authority-desktop-checkpoint)
 is separately hash/size verified and immutable; completed native modes must not
 be replayed.
 It introduces no new service/gate/bindings or complete-form claim.
@@ -1572,7 +1575,7 @@ local/external project/SU contexts, schema/alias/collision/trigger failures,
 cancellation, recovery and typed restoration. Full integration race894.016s/all
 packages passes; independent read-only review found no significant issues.
 All ten gates are complete and the source/receipts are sealed in the
-[writer checkpoint](../archives/sivi-parent-direct-writer-checkpoint/evidence-manifest.json).
+[writer checkpoint](MIGRATION_EVIDENCE.md#snapshot-sivi-parent-direct-writer-checkpoint).
 Current machine state is recorded in [WINDOWS_HANDOFF.md](../WINDOWS_HANDOFF.md).
 This immutable private checkpoint makes no public/mounted/native claim; those
 belong exclusively to the following successor. No protected promotion.
@@ -1622,7 +1625,7 @@ The actual default build has no review/editing navigation or controls and reject
 all three editor APIs. Editing-disabled backend with opt-in assets cannot expose
 live controls. All16 disposable data/config hashes restore after verified owned
 closure; typed history and exact before/committed/restored snapshots remain in
-the [mounted writer seal](../archives/sivi-parent-mounted-writer-checkpoint/evidence-manifest.json).
+the [mounted writer seal](MIGRATION_EVIDENCE.md#snapshot-sivi-parent-mounted-writer-checkpoint).
 The39-file private predecessor, protected binaries/embedded assets, bundled
 Sample, original form and canonical Access data remain unchanged.
 No Access runtime, default promotion, source callback/Refresh, ProjectID write,
@@ -1661,7 +1664,7 @@ no-op, complete-original drift and atomic second-audit/BLOB failure/retry.
 Unaudited NULL deletion is retained during restoration rather than restored
 from the original snapshot. Full integration race768.342s/all packages passes.
 Source and receipts are sealed in the
-[action storage checkpoint](../archives/sivi-parent-action-storage-checkpoint/evidence-manifest.json).
+[action storage checkpoint](MIGRATION_EVIDENCE.md#snapshot-sivi-parent-action-storage-checkpoint).
 That private checkpoint does not claim mounted behavior. The successor below
 adds it separately; the642-file native predecessor and protected delivery/source
 are not replaced.
@@ -1709,7 +1712,7 @@ completed coupled restoration required only the unfinished WRITE02 tail under
 a fresh context; no successful mutation was repeated.
 
 Source, candidates, typed whole-project/audit/history evidence and cleanup are
-sealed in the [mounted action checkpoint](../archives/sivi-parent-action-mounted-checkpoint/evidence-manifest.json).
+sealed in the [mounted action checkpoint](MIGRATION_EVIDENCE.md#snapshot-sivi-parent-action-mounted-checkpoint).
 Full Unicode collation, ProjectID assignment/metadata creation and complete
 FS1333 remain unavailable. Protected defaults/assets/data/exports are unchanged;
 no Access execution, commit, push or default promotion.
@@ -1744,7 +1747,7 @@ physical duplicates, NULL/empty title drift, malformed values, exact UTF-16
 bounds, historical no-ops, source drift, stale ownership, cancellation/retry,
 clone safety and byte-for-byte DB/config zero writes. Full Go race734.979s/all
 packages passes. Source and receipts are sealed in the
-[assignment preview checkpoint](../archives/sivi-project-assignment-preview-checkpoint/evidence-manifest.json).
+[assignment preview checkpoint](MIGRATION_EVIDENCE.md#snapshot-sivi-project-assignment-preview-checkpoint).
 No service DTO, bindings,
 frontend, new native candidate, assignment writer or restoration is enabled.
 

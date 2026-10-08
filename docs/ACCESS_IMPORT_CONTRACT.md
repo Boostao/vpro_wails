@@ -174,7 +174,7 @@ description/type10/flags1/positions, unknown semantic states, compatibility and
 detached bytes, alongside932 exact native-to-SQLite cells and123456633ns date
 preservation. MDB/ACCDB/source-copy hashes remain unchanged. Actual linked-table
 and unavailable-metadata fixtures, DAO NULL semantics and Linux are unverified.
-The [78-file exact description successor](../archives/access-reader-description-checkpoint/evidence-manifest.json)
+The [78-file exact description successor](MIGRATION_EVIDENCE.md#snapshot-access-reader-description-checkpoint)
 verifies its19-file application predecessor,76 timestamp evidence files and44
 reader baseline files, with370 application Go hashes unchanged. No production
 importer/dependency is added.
@@ -194,7 +194,7 @@ timestamps. All three fixtures remain unchanged. Independent review found no
 significant issues, verified46 baseline/38 unchanged reader files and10 candidate
 hashes, and ran focused native tests1.636s without skips. The bounded observation
 boundary is sealed in the
-[81-file exact successor](../archives/access-reader-columns-checkpoint/evidence-manifest.json),
+[81-file exact successor](MIGRATION_EVIDENCE.md#snapshot-access-reader-columns-checkpoint),
 verifying18 application predecessor/78 description evidence/46 reader baseline
 files and372 unchanged application Go hashes. Arbitrary corrupted
 formats and Linux remain unverified. No
@@ -219,7 +219,7 @@ also passes1.450s: the reader's123456633ns becomes TEXT
 `2023-03-15 00:00:00.123456633`, unchanged through all scalar/schema/complete-row
 boundaries and real SQLite storage. Only one planned eight-byte cell of a
 disposable public-MDB copy differs; canonical/public fixtures remain unchanged.
-The [exact timestamp successor](../archives/access-reader-datetime-checkpoint/evidence-manifest.json)
+The [exact timestamp successor](MIGRATION_EVIDENCE.md#snapshot-access-reader-datetime-checkpoint)
 retains76 files, verifies its22-file application predecessor and42 reader
 baseline files from the62-file memo/18-file Jet4 seals, and confirms368 application
 Go hashes unchanged. No Access runtime/display,
@@ -296,7 +296,7 @@ evidence, separately from application preparation. Read-only Python SQLite
 independently checks their exact hashes, integrity, schema, literal mappings,
 155 ordered rows/1782 cells and the MDB eight true=-1/five NULL values; image and
 source hashes remain unchanged. These harness evidence writes are not publication.
-The [exact staging successor](../archives/access-import-staging-checkpoint/evidence-manifest.json)
+The [exact staging successor](MIGRATION_EVIDENCE.md#snapshot-access-import-staging-checkpoint)
 preserves reviewed source, consumer, five actual images, independent image checks
 and integration evidence while verifying the359-file preference predecessor,
 accepted reader source/fixture identities and protected defaults.

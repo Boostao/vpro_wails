@@ -98,7 +98,7 @@ preserving first observations/visuals and restoring hooks. No business write,
 successful creation or Save was replayed. Fresh full Go race integration passes
 root775.988s/all packages with the established explicit long-suite timeout.
 The initial default10-minute timeout is preserved as failed runner evidence,
-not acceptance. The [122-file exact successor](../archives/plot-location-owned-review-checkpoint/evidence-manifest.json)
+not acceptance. The [122-file exact successor](MIGRATION_EVIDENCE.md#snapshot-plot-location-owned-review-checkpoint)
 verifies the immutable18-file template and123-file CSV predecessors and records
 354 Go integration source hashes. None of this is native Access/Excel
 publication parity.
@@ -134,7 +134,7 @@ root937.495s/all packages against370 captured Go source hashes. Remote-icon/priv
 naming, XML Unicode rules, destination
 publication, preferences, single-plot ambiguity and viewer launching remain
 separate unavailable boundaries.
-The [19-file exact pure projection successor](../archives/google-earth-projection-checkpoint/evidence-manifest.json)
+The [19-file exact pure projection successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-projection-checkpoint)
 verifies all76 timestamp predecessor files/protected hashes and records370
 unchanged integration source hashes. It is not an owned/native KML acceptance.
 
@@ -196,7 +196,7 @@ Queued/cancelled backend requests are fast-tested; native coverage proves
 remount/draft lifecycle, not every in-flight cancellation schedule.
 Fresh full integration899.304s/all packages passes with374 Go hashes unchanged
 throughout validation. The
-[147-file exact successor](../archives/google-earth-owned-review-checkpoint/evidence-manifest.json)
+[147-file exact successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-owned-review-checkpoint)
 verifies81 reader-column predecessor files, preserves closed native builds and
 captures source/form evidence. This completes the bounded default-off preview,
 not Google Earth export/launch or overall replacement acceptance.
@@ -237,7 +237,7 @@ snapshot-before-callback/cancellation/retry. Primary inspection found no
 significant issues; no independent reviewer execution/disposition is claimed.
 Fresh full application race943.664s/all packages passes against376 pinned Go
 hashes unchanged during validation. The
-[private KML successor](../archives/google-earth-private-kml-checkpoint/evidence-manifest.json)
+[private KML successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-private-kml-checkpoint)
 verifies147 predecessor evidence files/protected hashes. Parsed
 XML shape is not formal KML2.1 schema validity, Google Earth rendering or native
 Access parity. Raw-cell adaptation (see below), unverified non-text/Variant
@@ -302,7 +302,7 @@ claim. An added test initially landed inside another test through an ambiguous
 patch anchor; compilation failure is retained and package-scope correction passes.
 Fresh full integration995.902s/all packages passes against378 Go hashes unchanged
 during validation. The
-[TEXT/NULL KML successor](../archives/google-earth-text-kml-checkpoint/evidence-manifest.json)
+[TEXT/NULL KML successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-text-kml-checkpoint)
 verifies14 private KML predecessor files/protected hashes. No public method,
 binding, UI, files, preferences, icon/network or launch action is enabled.
 
@@ -334,7 +334,7 @@ claim that every such checkpoint was triggered inside the owned wrapper.
 
 Fresh full integration987.040s/all packages passes against380 Go hashes unchanged
 during validation. The
-[owned KML successor](../archives/google-earth-owned-kml-checkpoint/evidence-manifest.json)
+[owned KML successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-owned-kml-checkpoint)
 verifies22 TEXT/NULL predecessor evidence files/protected hashes.
 This adds no public
 service/JSON transport, startup gate, binding, UI or native proof. It neither
@@ -395,7 +395,7 @@ archived with manifest
 before rebuilding. A fresh final-source owner proves seven additional busy/
 WM_CLOSE/cancel/remount/retry/valid-invalid-draft cases with the timer hook
 restored. Fresh full race926.536s/all packages passes against382 unchanged Go
-hashes. The [exact preview successor](../archives/google-earth-kml-preview-checkpoint/evidence-manifest.json)
+hashes. The [exact preview successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-kml-preview-checkpoint)
 verifies18 owned-byte predecessor files/protected hashes and exact review identity.
 
 This capability publishes no file, changes no data/audit/preferences, loads no
@@ -445,7 +445,7 @@ spaces and absolute Windows path, UTF-8 LF including final LF:
 `c69424a9a675528c6f796f10a1d3657de6ab9c76d2fd9e70a6936285567763ba`.
 Fresh full race881.906s/all packages passes against386 Go hashes unchanged
 throughout validation. The
-[private publication successor](../archives/google-earth-private-publication-checkpoint/evidence-manifest.json)
+[private publication successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-private-publication-checkpoint)
 verifies139 predecessor files,36 closed initial build files and protected hashes.
 
 No owned source snapshot revalidation, public gate/action, preference persistence,
@@ -504,7 +504,7 @@ SiteUnit fixture failures are retained with corrections; no successful write
 or native observation was replayed to recover them.
 Fresh full race962.046s/all packages passes against389 Go hashes unchanged
 throughout validation. The
-[owned publication successor](../archives/google-earth-owned-publication-checkpoint/evidence-manifest.json)
+[owned publication successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-owned-publication-checkpoint)
 verifies26 predecessor files/protected hashes and exact review identity.
 
 This is private file preparation, not a public export service, startup gate,
@@ -563,7 +563,7 @@ XML and refuses the stale file. All16 fixture data/config hashes are restored af
 closing; three KML outputs and one byte-identical collision sentinel are retained.
 Fresh full Go race920.120s/all packages passes against391 source hashes unchanged
 throughout integration. The
-[desktop export successor](../archives/google-earth-desktop-export-checkpoint/evidence-manifest.json)
+[desktop export successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-desktop-export-checkpoint)
 preserves exact reviewed source/generated interfaces/isolated builds/native
 output/restoration and validation evidence, verifying31 predecessor files and
 protected hashes.
@@ -643,7 +643,7 @@ another config/file write. Warning/unknown response delivery is deliberately
 injected after real commits; actual postcommit cancellation is separately tested
 through the Go facade. All16 fixture data/config hashes are restored.
 Fresh full integration916.340s/all packages passes against395 unchanged Go
-sources. The [saved-preference successor](../archives/google-earth-preferences-checkpoint/evidence-manifest.json)
+sources. The [saved-preference successor](MIGRATION_EVIDENCE.md#snapshot-google-earth-preferences-checkpoint)
 retains exact reviewed source/bindings/builds/native/restoration/integration
 evidence and verifies the357-file export predecessor and protected defaults.
 No default promotion, registry/canonical

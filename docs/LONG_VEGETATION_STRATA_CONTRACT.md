@@ -33,7 +33,7 @@ No new public Wails methods, DTO models or binding shapes are introduced.
 ## Original source
 
 Read-only originals:
-`C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
+`<private-Access-root>\VPro64_forAI`.
 
 - Forms/USysLongVegOptions: Group by → Strata, option2;
   rptLvGroupBy_AfterUpdate2209-2213 stores LVGroupBy directly. Retained source

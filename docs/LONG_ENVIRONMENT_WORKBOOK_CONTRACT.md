@@ -129,7 +129,7 @@ replayed. No live Wails/Access/Excel owner remains.
 
 Independent read-only review found no significant issues. Full all-package Go
 race passes with fresh root 1206.963s against 668 unchanged source identities.
-The [immutable integration successor](../archives/environment-workbook-desktop-checkpoint/evidence-manifest.json)
+The [immutable integration successor](MIGRATION_EVIDENCE.md#snapshot-environment-workbook-desktop-checkpoint)
 verifies the accepted attribute predecessor, closed candidate hashes, final
 restoration, output identities and every archived hash/size. Production promotion
 and the wider forms/reports migration remain outside this bounded workflow.

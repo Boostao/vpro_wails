@@ -24,7 +24,7 @@ summaries, saved report preferences, workbook layout or publication.
 ## Static source boundary
 
 Canonical source was read without opening Access or writing data:
-`C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
+`<private-Access-root>\VPro64_forAI`.
 
 | Export | SHA256 |
 | --- | --- |

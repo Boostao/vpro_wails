@@ -19,7 +19,7 @@ against660 unchanged source identities. Immutable successor:
 ## Original source
 
 Canonical exports were read without opening Access or changing its data:
-`C:\Users\BrunoTremblay\Work\VPRO_ACCESS`.
+`<private-Access-root>`.
 
 - VPro64_forAI/Forms/USysSppAttributeReportOptions: SU Table versus Hierarchy
   Breakpoints, Include Details controls and captions SRank Detail, Wetland

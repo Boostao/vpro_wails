@@ -87,7 +87,7 @@ It is a private staging image, not an installed/published canonical picture libr
 Pictures remain default-off: there is no installed canonical SQLite picture
 family. The optional owned metadata/image desktop candidate now has disposable
 native proof, full integration and independent evidence review, with a
-[distinct485-file seal](../archives/picture-read-desktop-checkpoint/evidence-manifest.json).
+[distinct485-file seal](MIGRATION_EVIDENCE.md#snapshot-picture-read-desktop-checkpoint).
 Reuse the
 existing fixture-tested Access import boundary rather than a second reader.
 Metadata/image read-only preparation can proceed independently; metadata writes
@@ -235,7 +235,7 @@ replacement during active image reading/decoding is not yet an observed claim.
 
 The read-only manager successor is implemented and natively exercised; independent
 native-evidence review is clean. Its distinct
-[322-file seal](../archives/picture-manager-desktop-checkpoint/evidence-manifest.json)
+[322-file seal](MIGRATION_EVIDENCE.md#snapshot-picture-manager-desktop-checkpoint)
 is independently rehashed twice; manifest SHA256
 `360237b3d9ffdc54a3c5d9412f8d11f0e783a322dafc01370e5f9720441f8f5b`.
 `frmPlotPictureMaster` has caption `Plot Pictures`, binds `USysEnv`, and links
@@ -451,7 +451,7 @@ The combined native evidence is20 cases/seven closed owners, not a replay of
 the original Save/prune.783 source identities and exact isolated embedded assets
 are frozen; Go sources are unchanged across this frontend-only repair.
 
-The accepted [1012-file seal](../archives/two-page-extra-desktop-checkpoint/evidence-manifest.json)
+The accepted [1012-file seal](MIGRATION_EVIDENCE.md#snapshot-two-page-extra-desktop-checkpoint)
 has manifest SHA256
 `df8efcd0362ffc965ff5ec047510561dd5a402e0f38427fcf19d697594fac4cf`.
 It preserves all783 source identities and the closed build/native evidence.
@@ -496,7 +496,7 @@ establish native layout. Combined27 cases/seven closed owners,792 frozen source
 identities and exact embedded assets. Fresh all-package race1853.589s passes;
 Go is unchanged across the frontend-only layout repair.
 
-The independently verified [1052-file common-field seal](../archives/two-page-common-desktop-checkpoint/evidence-manifest.json)
+The independently verified [1052-file common-field seal](MIGRATION_EVIDENCE.md#snapshot-two-page-common-desktop-checkpoint)
 has manifest SHA256
 `3e883ea12b32c875118e97a1ab8aa50b5365177f6f200978743dafbf07ea6556`.
 Never reseal it or replay completed native mutations. Remaining work is complete source
@@ -560,7 +560,7 @@ and default denial. All16 fixture/22 protected identities remain unchanged.
 The792-source common-field seal remains an immutable predecessor. Full XL editing
 inside this source layout and remaining child/event/picture behavior are still
 unfinished. Do not replay sealed Common/Extra writes or these completed guard modes.
-The [890-file source-layout seal](../archives/two-page-entry-layout-desktop-checkpoint/evidence-manifest.json)
+The [890-file source-layout seal](MIGRATION_EVIDENCE.md#snapshot-two-page-entry-layout-desktop-checkpoint)
 preserves794 application-source identities, both exact embedded builds and
 closed native receipts. Manifest SHA256 is
 `4a75e6c74c50da12d5d9c7783ecd30140f8215b5e2b232ee2b06685dded7e8f6`.
@@ -597,7 +597,7 @@ invalid XCoord draft and correction/Undo. All16 fixture/22 protected identities
 remain unchanged; the owner closed normally. This is private full-source XL
 composition preparation, not a mounted whole-form editor. Fresh all-package Go
 race passes root2041.922s/all packages against794 pinned sources/exact assets.
-The [860-file header-composition checkpoint](../archives/two-page-header-composition-checkpoint/evidence-manifest.json)
+The [860-file header-composition checkpoint](MIGRATION_EVIDENCE.md#snapshot-two-page-header-composition-checkpoint)
 preserves the exact candidate and closed evidence. Manifest SHA256:
 `c1aee275d83d668e45bbf9cd24207a6de95003f8096a95c188eea1e437b14cba`.
 
@@ -644,7 +644,7 @@ packages. Independent bounded read-only review found no substantive issues;
 800 application-source identities/17 exact embedded assets are pinned and all
 16 closed fixture/22 protected identities remain unchanged. No new native actions
 were performed; compile-only verification is not live whole-form acceptance.
-The [838-file private atomic-entry checkpoint](../archives/two-page-entry-atomic-checkpoint/evidence-manifest.json)
+The [838-file private atomic-entry checkpoint](MIGRATION_EVIDENCE.md#snapshot-two-page-entry-atomic-checkpoint)
 preserves this800-source successor; neither predecessor may be repinned.
 
 There is no registered facade, bindings or UI write grant. Physical validity
@@ -872,7 +872,7 @@ pass. The separately default-off complete-entry desktop now uses its actual
 generated bindings; fresh full successor integration passes root2091.501s/all
 packages. The measured835-source successor includes twenty-eight newer Go files,
 seven frontend/binding files and shared changes; the frozen800-source predecessor
-remains unchanged. The [1529-file desktop successor](../archives/two-page-entry-desktop-checkpoint/evidence-manifest.json)
+remains unchanged. The [1529-file desktop successor](MIGRATION_EVIDENCE.md#snapshot-two-page-entry-desktop-checkpoint)
 is immutably sealed and independently hash-verified.
 
 ### Complete-entry desktop lifecycle

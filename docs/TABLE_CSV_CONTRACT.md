@@ -168,7 +168,7 @@ receipts are the runtime evidence. Fresh full integration passes root833.343s/
 all packages with unchanged bundle source. No file publication or final client-
 format approval is claimed.
 
-The [exact private bundle checkpoint](../archives/table-csv-bundle-checkpoint/evidence-manifest.json)
+The [exact private bundle checkpoint](MIGRATION_EVIDENCE.md#snapshot-table-csv-bundle-checkpoint)
 retains16 source/review/validation files, verifies its18-file predecessor and
 records364 Go integration hashes. It does not enable publication.
 
@@ -195,7 +195,7 @@ Windows race1.199s. Fresh full integration passes root828.253s/all packages;
 source remained unchanged throughout. No public publication is claimed.
 Path observations remain neither a hostile handle-relative filesystem guarantee
 nor a project/source ownership coordinator.
-The [accepted publication checkpoint](../archives/table-csv-publication-checkpoint/evidence-manifest.json)
+The [accepted publication checkpoint](MIGRATION_EVIDENCE.md#snapshot-table-csv-publication-checkpoint)
 retains27 exact files, verifies its16-file bundle predecessor and records366
 Go integration hashes.
 
@@ -231,7 +231,7 @@ against368 captured Go source hashes. Candidate receipts under
 `archives/table-csv-owned-publication-checkpoint` are unsealed implementation
 evidence, not acceptance. The helper remains private/unwired: no feature flag,
 public method, desktop/native export or final ZIP/CSV/RDS approval is added.
-The [reviewed private source-owned successor](../archives/table-csv-owned-publication-reviewed-checkpoint/evidence-manifest.json)
+The [reviewed private source-owned successor](MIGRATION_EVIDENCE.md#snapshot-table-csv-owned-publication-reviewed-checkpoint)
 retains22 exact files, verifies all27 publication-predecessor files and records368
 unchanged integration source hashes. Its source-observation limitations remain
 unchanged.
@@ -281,7 +281,7 @@ Fresh full Go race integration passes root962.800s/all packages against408
 pinned Go files and192 unchanged frontend/dependency identities. Primary boundary
 inspection and tests are recorded; no new independent-review or native-export
 claim is made. The
-[private owned archive checkpoint](../archives/table-csv-owned-archive-checkpoint/evidence-manifest.json)
+[private owned archive checkpoint](MIGRATION_EVIDENCE.md#snapshot-table-csv-owned-archive-checkpoint)
 retains exact code, source and receipts and verifies the39-file scope predecessor.
 The next vertical is separately gated desktop review/approval, destination
 picker and irreversible publication receipt/lifecycle handling.
@@ -336,7 +336,7 @@ retained; no application failure or native acceptance is inferred from them.
 Fresh full Go race integration passes root982.703s/all packages against410
 pinned Go files/192 unchanged frontend identities and the35-file owned archive
 predecessor. The
-[private approval checkpoint](../archives/table-csv-archive-approval-checkpoint/evidence-manifest.json)
+[private approval checkpoint](MIGRATION_EVIDENCE.md#snapshot-table-csv-archive-approval-checkpoint)
 retains exact code/source/failed and passing receipts. This is primary-tested
 private preparation, not independent-review or native desktop acceptance.
 
@@ -400,7 +400,7 @@ Access faults. All16 source/config fixture hashes restore after every close;
 no SQLite/audit/config/canonical/registry or protected-default writes occur.
 Fresh full desktop Go race integration passes root931.623s/all packages against
 410 pinned Go files and195 frontend/dependency identities. The
-[desktop archive checkpoint](../archives/table-csv-archive-desktop-checkpoint/evidence-manifest.json)
+[desktop archive checkpoint](MIGRATION_EVIDENCE.md#snapshot-table-csv-archive-desktop-checkpoint)
 retains exact builds, four outputs, native/source/validation receipts and verifies
 the36-file approval predecessor. Primary/native verification and frontend
 implementation-agent tests are recorded; no separate independent-review claim

@@ -4,7 +4,7 @@ This is a source trace plus limited native evidence, not proof of complete write
 
 ## Fixture and isolation
 
-- Access source database: [VPro64.accdb](../../VPRO_ACCESS/VPro64/VPro64.accdb), copied from the local `VPRO_ACCESS` checkout. The source file SHA-256 was `01481B94569C7172F32A812E65365F78CEA5E440DD63220D91A37DADE5778423`.
+- Access source database: VPro64.accdb (private source locator `../../VPRO_ACCESS/VPro64/VPro64.accdb`), copied from the local `VPRO_ACCESS` checkout. The source file SHA-256 was `01481B94569C7172F32A812E65365F78CEA5E440DD63220D91A37DADE5778423`.
 - The copy was opened with Access 16.0. DAO reported zero linked TableDefs. The local `Sample_Env`, `Sample_Admin`, and other Sample tables are in the same file, so one full-file copy isolated this probe.
 - Project: `Sample`. Registry settings under `HKCU\Software\VB and VBA Program Settings\VPro64` were snapshotted before opening the copy and restored after Access closed. The original Access file was not edited.
 - The initial Sample row counts were Env 52, Admin 52, Audit 389, Veg 1633, Humus 65, Mineral 99, and Other 1. `AuditStrength` was 1. `Sample_Env.PlotNumber` is required and unique; `Sample_Admin.Plot` is required and unique.
@@ -13,7 +13,7 @@ This is a source trace plus limited native evidence, not proof of complete write
 
 ## Source trace
 
-Sources are the SaveAsText export and R module: [FS882-6x4XL.txt](../../VPRO_ACCESS/VPro64_forAI/Forms/FS882-6x4XL.txt), [V7mdlSetCurrent.txt](../../VPRO_ACCESS/VPro64_forAI/Modules/V7mdlSetCurrent.txt), [V7mdlAudit.txt](../../VPRO_ACCESS/VPro64_forAI/Modules/V7mdlAudit.txt), and [mod_fs882_6x4xl.R](../../vpro/R/mod_fs882_6x4xl.R).
+Sources are the SaveAsText export and R module: FS882-6x4XL.txt (private source locator `../../VPRO_ACCESS/VPro64_forAI/Forms/FS882-6x4XL.txt`), V7mdlSetCurrent.txt (private source locator `../../VPRO_ACCESS/VPro64_forAI/Modules/V7mdlSetCurrent.txt`), V7mdlAudit.txt (private source locator `../../VPRO_ACCESS/VPro64_forAI/Modules/V7mdlAudit.txt`), and mod_fs882_6x4xl.R (private source locator `../../vpro/R/mod_fs882_6x4xl.R`).
 
 - The parent Access form is bound to `USysEnv`. `SetCurrentProject` creates this query as an inner join of `<Project>_Env` and `<Project>_Admin` on `Env.PlotNumber = Admin.Plot`.
 - `PlotNumber_AfterUpdate` calls `DoCmd.RunCommand acCmdSaveRecord`. `PlotNumber_LostFocus` sets a blank `StartDate` to `Year(Now)`, immediately sets it back to `Null`, saves again, and jumps to `MyExit`. The older Admin lookup/insert code below that jump is unreachable in the exported procedure.

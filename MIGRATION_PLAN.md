@@ -1,213 +1,107 @@
 # VPRO migration plan
 
-Updated 2026-10-03. This is the current workflow backlog, not an execution log.
-Machine state belongs in [WINDOWS_HANDOFF.md](WINDOWS_HANDOFF.md); capability
-and availability belong in [README.md](README.md). Client decisions and domain
-references are indexed in [client scope](docs/CLIENT_SCOPE.md).
+Current deliverables and availability, not an execution chronology.
+[README](README.md) describes capabilities,
+[client scope](docs/CLIENT_SCOPE.md) records the agreed tracks, and
+[portable evidence](docs/MIGRATION_EVIDENCE.md) distinguishes bounded acceptance
+from overall migration completion. The cumulative
+[feature capability contract](docs/FEATURE_CAPABILITIES.md) records each
+feature-sized revision's entry points, guards and exclusions.
 
-## Target and evidence
+## Target
 
-- **Desktop:** Go/Wails/Svelte, SQLite canonical, useful offline workflows.
-  Preserve original project tables, descriptions, source relationships and
-  meaningful field/label order; adapt presentation rather than copying pixels.
-- **Companion R package:** UI-free core automation over related data. Identify
-  reusable read/validate/filter/classify/report calculations and explicit
-  interchange boundaries. No parallel Shiny UI or package scaffolding yet.
-- **Wider agreement:** controlled cloud synchronization, public BECMaster access,
-  BECWeb, publication products and analysis integration remain separate scope
-  tracks. They are not silently removed, implemented or made desktop prerequisites.
-- Explicit current user direction establishes the technology target. Client
-  captions establish scope intent; coloured marks without a legend and unmarked
-  screenshots remain provisional. Access exports establish bindings/events;
-  selective native evidence establishes measured behavior. Help/manual establish
-  intent, not runtime parity. R implementations are architectural precedents.
-- Completion means a client-relevant usable workflow with evidence or an agreed
-  exclusion.98/98 parent fields is one bounded baseline, not overall completion.
-
-## Delivered baseline
-
-Report-preview predecessor `e763e23`; shared extended shrubs accepted with full Go race
-(root858.736s),280 frontend tests, check0/0, opt-in/default builds, eight native
-cases and a zero-write default proof. No production/R/Access
-source writes. Exact default remains promoted; opt-in workflows remain off.
-
-| Area | Delivered | Still outside the claim |
-| --- | --- | --- |
-| Foundation F1-F3 | Original SQLite family; default-init/runtime YAML with explicit retained JSON migration; owned external-path contexts, offline TEMP views, safe switching/recovery | Project conversion/administration, arbitrary support writes, multiwindow coordination |
-| Backend C1-C3 | Owned pooling, verified catalogue caching, active binding/SQL/read cancellation | C4 package extraction/C5 typed catalogue transport: incremental, nonblocking |
-| FS882 parent |98/98 mapped columns writable; responsive source grouping, audit/Lock/draft/close gates | All other forms, picture manager/projection, every active calculation/event |
-| FS882 children | Other8/Humus12/Mineral18 CRUD; Veg Other12, Collected, species decisions,11 ordinary covers/6 heights and three opt-in extended shrub covers | Effective omitted source defaults, remaining calculations, complete restoration |
-| Reviewed adaptations | Guarded vegetation creation/deletion/personal definitions; named-scope code check; metadata review/edit/create/typed restoration; Enter/Find; ordered profiles/editing/navigation/file ownership/Save as SU | Complete Access execution parity; arbitrary destination/administration/history restoration |
-| Forward/reverse environment-SU | Selected owned-project SU; independent typed whole-scope reviews, atomic changes/provenance, drift/trigger rollback, retry/replay protection; reverse master/personal name precedence | Separate-file SU writes, personal-definition creation; source bulk SQL is not inherited indiscriminately |
-| Long Environment | Owned read-only native preview; selected project/SU including external SU, exact72 rows, typed values and explicit orphan/name candidates; draft-safe navigation/cancellable reads | Independent default-off gate; title edits preview-only, file export/Excel/summary unavailable |
-| Long Vegetation preparation | Pure typed selected-SU MAX reduction and LayerCode-driven non-NULL layer conversion, physical memberships and source-row provenance | Go-tested input preparation only; no report service/UI/native claim, quality/statistics/strata/lifeform/reference joins or export |
-| Long Vegetation crosstab | Selective ACE-verified non-NULL pivot-column presence and duplicate-weighted sums/means; strict species thresholds and constant-list bypass | Pure kernel for already joined/grouped observations; not a full native report or owned service/UI |
-| Long Vegetation owned layer preview | Internal coordinator/lease/read-only snapshot, strict retained YAML options, source master-reference/layer/English grouping and constant-list fanout | Internal Go acceptance only; no Wails binding/UI, quality filtering, strata/lifeform modes, unit long names, summaries or publication |
-| Shared CHARS presentation | One XL extended-shrub option, exact SubVegAXL labels/order, existing Cover5a/b/c storage and A membership, persistent hidden drafts/errors, atomic audited numeric edits | Independent default-off gate; cover-only presentation, no preference persistence or full variant/menu equivalence |
-
-Detailed source/behavior boundaries remain in the [Access contract](docs/FS882-6x4XL-access-contract.md),
-fixture-tested resources and application tests. Prior full documentation was
-preserved byte-for-byte before consolidation; historical recipes are not resume
-instructions.
+- Go/Wails/Svelte desktop with SQLite canonical and useful offline workflows.
+  Preserve source bindings, labels, logical grouping, child links, event paths,
+  physical database families and descriptions. Exported geometry is evidence,
+  not a fixed desktop pixel requirement.
+- Planned UI-free R automation over related data. R is architectural precedent,
+  not Access runtime parity evidence; a second Shiny data-entry UI is not the
+  current target.
+- Cloud synchronization, public BECMaster/BECWeb, publication products and
+  analysis integration remain separate client scope tracks, not implicit desktop
+  dependencies or silently excluded deliverables.
+- Completion requires a usable, validated workflow or an explicitly agreed
+  exclusion. Passing a bounded batch or matching all parent fields does not
+  complete the work order.
 
 ## Ordered deliverables
 
-| Order | Deliverable | Status and exit gate |
-| --- | --- | --- |
-| 1-3 | Stabilization, Soil and shared ordinary editors | Complete bounded baseline; preserve measured domains, nullable metadata and shared lifecycle |
-| 4 | Database/context/configuration F1-F3 | Complete bounded foundation; reuse it, do not build another family/config framework |
-| 4a | Ownership/performance C1-C3 | Complete; C4-C5 only when a concrete next workflow benefits |
-| 5 | FS882 parent fields | Complete98/98; field counts do not enable unavailable events |
-| 6 | Entry forms and active workflow behavior | In progress: forward/reverse transfer and shared XL CHARS option accepted; static FS1333/SIVI/two-page contracts mapped, entrypoints unavailable; close remaining calculation/navigation/profile gaps |
-| 7 | Project, standards, SU and hierarchy administration | Incomplete: source-driven project new/save/splinter/merge/compare; controlled references/user metadata; classification ownership; hierarchy flat-table redesign lower priority |
-| 8 | Interchange and companion automation boundaries | Incomplete: fixture-tested Access import through go-mdbtools; table CSV/RDS and client-requested TurboVeg boundary; reviewed collision, roundtrip, cancellation and rollback |
-| 9 | Priority reports and locations, then other active modules | Incomplete: Long Environment72-row owned read-only preview native-verified and opt-in; export/title persistence unavailable. Long/summary vegetation, consolidated options and location outputs next; remaining agreed reports/maps/analysis after |
-| 10 | Replacement acceptance | Installation/upgrades/recovery/offline/performance and representative projects; every retained workflow verified or explicitly excluded |
+| Order | Deliverable | Current boundary | Remaining completion condition |
+| --- | --- | --- | --- |
+| 1 | Stabilization, ordinary editors and soil | Bounded mapped editor baseline accepted | Preserve nullable metadata, historical values and existing lifecycle behavior |
+| 2 | Database/context/configuration | F1-F3 original family, YAML migration, external paths/TEMP views and draft-safe switching complete | Reuse, do not restart the foundation; administration remains separate |
+| 3 | Ownership/performance | Pooling, catalogue caching and cancellation implemented | Extract packages/typed catalogue seams only for a demonstrated next-workflow benefit |
+| 4 | FS882 parent | 98 mapped fields native-verified writable | Keep source-event and variant gaps explicit |
+| 5 | SIVI parent/children | Direct/shared fields, references, source actions, identity, covers/heights/Collected/species and standalone presentation accepted within independent gates | Complete remaining callbacks, calculations/navigation and combined FS1333/SIVI execution |
+| 6 | SIVI lifecycle | Creation, physical-row deletion/typed restoration and historical creation Undo accepted with permanent reservations/read-only recovery | Preserve safety adaptations; no implicit Access destructive cleanup or default promotion |
+| 7 | Two-page forms | Layouts, common/additional parent fields, reference approval and atomic mixed-field entry accepted | Complete linked-child editing, pictures and unsupported source callbacks, then whole-form acceptance |
+| 8 | Pictures | Owned reading, manager/child preview and existing metadata editing accepted | Source-bound Add, allocation/selected-file authority, deletion and typed historical restoration |
+| 9 | Profiles/navigation/transfers | Bounded profiles, ownership, Find/Enter and owned-project Env/SU transfers accepted | Remaining criterion semantics, separate-file and administration gaps |
+| 10 | Priority reports/locations | Supported environment/vegetation/summary previews, reviewed XLSX/KML and saved preferences accepted | Remaining agreed variants/options and end-to-end report workflows |
+| 11 | Label reports | Source-defined owned label preview accepted | Physical printing/Print All, regional date and printer calibration; no speculative enabling |
+| 12 | Interchange/project preparation | Fixture-tested private Access reader/staging, table archive and project template/DDL boundaries | Client analysis format and production import/conversion/creator authorization remain separate |
+| 13 | Final replacement acceptance | Ongoing | Reconcile every ordered deliverable with verified outcomes or agreed exclusions, then platform/package acceptance |
 
-Orders express dependencies, not a requirement to finish every administrative
-feature before a read-only report. Reports/locations are explicit client
-priorities; lower-priority hierarchy redesign must not block their first
-vertical slice.
+## Next forms/report work
 
-## Next bounded round
+1. Complete source-bound picture creation. The live manager Add action selects
+   one file, stores the literal parent, filename and directory prefix, leaves ID
+   to the source engine default and does not copy image bytes. Allocation is a
+   separate desktop adaptation; saving a path does not authorize image reads.
+2. Complete picture deletion and typed historical restoration with physical
+   ownership, complete-row evidence, permanent ID reservations and explicit
+   audit policy.
+3. Close the remaining two-page/CHARS linked-child and combined FS1333/SIVI
+   source-event/navigation/calculation gaps without weakening ordinary editors.
+4. Finish remaining supported reports and printing where a safe source contract
+   is available. Source4/Access Val calibration is unresolved and stopped;
+   unavailable paths must remain disabled rather than be guessed.
+5. Perform whole-workflow replacement acceptance and record agreed exclusions.
 
-1. Review [client scope](docs/CLIENT_SCOPE.md), then reconcile the active
-   ribbon/form entrypoints with retained/modified/provisional requirements.
-   Record each as mapped, draft, native-verified, unavailable or excluded;
-   no menu label or screenshot alone proves implementation.
-2. Preserve the accepted **Long Environment** read-only preview: owned physical
-   snapshots, external-SU scope,72 ordered rows (67 fields/five headings),
-   per-plot grouping, typed zero/empty/NULL and explicit orphan/name diagnostics.
-   No quality filter or summary formula exists in this handler. Deterministic
-   ordering and ambiguity diagnostics are explicit adaptations. YAML supplies
-   the initial title; edits remain preview-only rather than persisting source
-   registry preferences. Native acceptance verified draft Cancel/Discard,
-   repeated reads/title correction,600px actual visibility and zero database/
-   configuration writes. File export/publication remains a separate slice.
-3. Preserve the accepted shared XL extended-shrub option: normal A retains
-   extended-only rows; hiding the three editors preserves raw drafts/errors.
-   Enabling extended presentation explicitly selects cover mode and disables
-   height switching until turned off; hidden height drafts remain intact.
-   Totals and the source seven-standard-cover notice remain independent.
-   Eight native cases cover labelled controls, parent-A Enter, remount/error
-   gates, correction/Cancel, exact-byte late-audit rollback, one three-cell/
-   three-audit retry and600px visibility. No duplicated menus or unrelated
-   CHARS parent event drift. FS1333 still needs distinct aggregate-height
-   children/options, not full FS882. No exported 6x4-CHARS form was found.
-4. Then address client-priority Long Vegetation: distinguish plot-quality
-   filtering from species presence/mean-cover thresholds, strata/lifeform/taxon
-   aggregation, rounding and denominators. Resolve undecided statistics and
-   summary options before implementing them; do not infer them from environment.
-   Static source confirms `LVConstantSppList` bypasses both presence and
-   mean-cover thresholds (`V7mdlReportsLongVeg`, lines264-280). The client
-   marked calculation/list options provisionally. With the user unavailable,
-   conservative continuation provisionally retains that behavior; this is not
-   client approval or report enablement. Do not silently override the retained
-   YAML default (-1). Source grouping,
-   quality filtering, MAX-per-plot/species reduction, denominator and effective
-   no-op rounding were traced read-only; R quick/all-veg rows are different
-   precedents, not a substitute for this report contract. The bounded pure
-   preparation now preserves physical SU memberships/provenance, MAX-reduces
-   all15 original cover/total fields, and uses original LayerCode metadata for
-   non-NULL layer observations, including zero/negative and extended covers.
-   It does not perform the later SU/reference joins or quality/threshold filters.
-   Duplicate memberships/layer definitions remain distinguishable; raw identity
-   matching, stable order and numeric-tie storage are explicit adaptations.
-   The source crosstab's `Count([MyCover])` presence expression is now selectively
-   ACE-probed on a new disposable database: count non-NULL pivot plot columns,
-   including zero/negative sums, not joined observation count. Duplicate SU
-   rows multiply cover sums and weight observation averages, but not that
-   numerator. The pure kernel uses the independent physical denominator and
-   preserves NULL statistics for missing constant-list species; both strict
-   thresholds are bypassed in constant-list mode. Constant-list equality does
-   not match NULL grouped identities, while empty text does. A three-case
-   physical ACE probe verifies this; its initial constant-expression query
-   variant dropped a NULL left row unexpectedly. That saved-query optimizer
-   behavior remains unknown, not a desktop deletion requirement.
-   Identity wrapper omission and
-   rational intermediates/double output are documented adaptations; no source
-   application, Excel or production database was opened.
-   The owned selected-SU layer-mode planner now reads original physical Veg,
-   SU, master USysAllSpecs and LayerCode through the coordinator/lease/read-only
-   transaction, including external SU paths. Master/personal editor UNION is
-   not substituted. ScientificName/raw-code fallback and EnglishName grouping
-   preserve NULL/empty; duplicate references/memberships retain source join
-   multiplication with diagnostics. Eight selective ACE rows verify constant
-   list fanout across different English names: the final join uses Layer/Spp,
-   not EnglishName. Both list and matched names remain distinguishable.
-   Named units count physical SiteUnit rows; unassigned counts non-NULL
-   PlotNumber. Empty/orphan memberships remain explicit. Unassigned-only
-   output and no Excel250-plot cap are deliberate preview adaptations.
-   Strict YAML decoding retains defaults and rejects requested inactive
-   quality/strata/lifeform/unit-selection modes. Summary/publication settings
-   are preserved, not pretended to be computed. Taxon lumping has no active
-   desktop selection in this slice; no lumping equivalence is claimed.
-   Next bounded slice: expose a cancellable read-only options/preview service
-   with path/context identity, then responsive report UI using existing
-   Save/Discard/Cancel and native-close guards. Keep default-off until native
-   acceptance verifies actual visibility, drafts, repeated reads and zero writes.
-   Unit long names, quality filtering, non-layer modes, summary/title persistence
-   and file publication remain separate bounded deliverables.
-   At acceptance gates, use one bounded independent read-only reviewer,
-   distinct from an implementation delegate. The primary integrates findings
-   and owns fixes/native actions; do not launch overlapping editors or nested
-   agents. Current layer review found no significant defects; full race passed.
-5. Define a small versioned headless interchange/automation contract using
-   existing R functions as precedents. R may automate independently owned data;
-   it must not bypass desktop leases/audits or write a live desktop project.
-   No claimed cross-process atomicity or duplicated validation engine.
+The private picture-creation draft begun after historical SIVI creation Undo is
+not part of the accepted publication snapshot. Focused tests alone do not grant
+a registered service, UI, selected-directory authority or native acceptance.
 
-Before implementing decisions about colour-only exclusions, SU append versus
-new-table classification, report statistics or legacy-format retirement,
-obtain explicit scope decisions. The user's investigation request permits
-selective disposable query evidence; it grants no production write permission
-or broad native suite/source-application execution.
+## Invariants and acceptance
 
-## Preserved architecture and invariants
+- Preserve the original SQLite family, per-project physical names,
+  `_table_metadata` descriptions, duplicate definitions and NULL/empty values.
+  Derived catalogues never replace canonical data.
+- Use immutable contexts, explicit file observations and owned transaction
+  leases. Data and history/audits commit together. Test cancellation, collision,
+  ownership replacement, rollback, retry and restoration aliases.
+- Preserve Access BOOLEAN true=-1, UTF-16 bounds and unchanged historical
+  invalid values. Reject malformed raw Unicode before decoder repair; do not
+  silently trim, complete, recase or infer source defaults.
+- Draft errors and unknown mutation requests survive remounts and block
+  unsafe Save/Lock/close/owner changes. Known committed results survive refresh
+  failures; recovery must not repeat the mutation.
+- Separate source scope/physical validity/reference membership. Source action
+  guards compare planned focus/value/context with independent observations.
+- Define each implementation contract, owned files, exclusions and measurable
+  checks before editing. Keep application complexity separate from test volume;
+  helper extraction requires a demonstrated invariant, not a helper quota.
+- Focused Go tests first; full `go test -race -timeout 60m ./...` at integration.
+  Frontend changes require tests, check and build. Bindings/lifecycle require
+  actual Wails with disposable data, not browser preview.
+- Nontrivial changes require independent read-only review, resolved findings
+  and rerun affected checks. Missing review is an unreviewed checkpoint, not
+  acceptance. Native evidence is scoped to exact source/assets and recorded
+  owners; completed-response cancellation is not SQL-in-flight proof.
+- Continue to the next safe ready deliverable after a checkpoint. Stop for a
+  user pause, concrete permission/safety blocker or a decision blocking all safe
+  work, not for routine technical verification.
 
-- Embed/install VPro64/VLists/VUser/VMetaData/VMessageBoard separately from
-  derived editor catalogues. Never replace per-project storage with fixtures.
-  Bundled Sample SHA256:
-  `e63f0c2a051761701bdad3c81bcfde4067ab322883c7e4ac84a3541ae8578ad8`.
-  Preserve tables/indexes/views and `_table_metadata` descriptions, including
-  duplicates, extra columns and NULL/empty metadata.
-- SQLite coordinator owns pinned connections/readonly attachments and TEMP
-  views. Project/SU/hierarchy paths are independently persisted, compatibility
-  checked and identity observed. DuckDB is optional, not an offline dependency.
-  Existing authorized writers use separate owned transactions.
-- `config.init.yml` initializes persistent `config.yml`. Import all three legacy
-  JSON preferences explicitly, retain files/hashes, reject conflicts/malformed
-  settings and preserve inactive/unknown settings. Failed persistence changes
-  neither stored bytes nor effective selection. Do not import obsolete machine
-  paths or turn inactive settings into available workflows.
-- Use immutable ContextService identities, operation leases and file ownership.
-  Mutations and technical/audit history share transactions. Test cancellation,
-  duplicate/collision, ownership replacement, rollback, retry and final-state
-  observations; reserved deleted child IDs remain reserved.
-- Preserve BOOLEAN true=-1. Omit unchanged historical invalid assignments;
-  reject new malformed/overlength UTF-16 or raw JSON Unicode before repair.
-  No silent trimming, completion, recasing, guessed covers or stricter field
-  manual rules applied to historical projects.
-- Persistent raw errors/proposals retain editor/original identity through remount;
-  gate Save/Lock/native close/context/unrelated writes. Known commits retire
-  proposals before refresh/result validation; committed failures require recovery,
-  not replay. No phantom option audits or destructive restoration.
+## Publication
 
-## Acceptance and work budget
+Preserve private evidence, binaries, profiles and source copies locally. Commit
+reproducible product source/tests/resources, matching bindings and directly
+related contracts in coherent feature-sized revisions. Shared root/model/index
+changes must match the services in each revision. Validate each intermediate
+revision; old receipts are not proof of a differently composed snapshot.
 
-- One primary integrates. At most one independent focused delegate runs alongside
-  it with exclusive outputs; no nested agents. Review large corpora in bounded,
-  sequential scopes and compile page-cited reports, not duplicated investigations.
-- Read Forms/Queries/Modules/Tables_Def first. Batch equivalent source properties/
-  events, reuse proven behavior and probe differences. Read static exports before
-  Access; oracle troubleshooting stops after20 minutes or two attempts.
-- Focused Go tests first, full `go test -race -timeout 20m ./...` at integration.
-  Frontend changes require tests/check/build; lifecycle/bindings require Wails,
-  not a browser preview. Documentation-only consolidation needs structural/link
-  and evidence checks, not a new mutation/native suite.
-- One active disposable fixture per workflow, one current baseline/candidate.
-  Keep complete typed differences plus representative actual-visible visuals.
-  Verify current PID/start/path/windows before native work; never trust old IDs.
-- Hash/seal closed builds before removing exact duplicate paths. Preserve unknown
-  evidence and original source files; no broad directory deletion or cache purge.
-  Replace stale active status, keep historical receipts in private archives.
+Assemble publication in an isolated integration worktree when live work has
+multiple owners. Preserve preceding commits and unfinished work, inspect exact
+staged scope and provenance, and do not rewrite or force-push without explicit
+authorization. Publish a review branch/PR rather than treating migration
+progress as a production release.

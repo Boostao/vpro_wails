@@ -2,6 +2,7 @@
 
 Assessed 2026-10-03. This is a compact traceability ledger, not approval of
 every visible Access control or a legal amendment of the historical agreement.
+Forms/report implementation alignment updated 2026-10-05.
 See the [migration plan](../MIGRATION_PLAN.md) for execution order.
 
 ## Authority and interpretation
@@ -26,7 +27,7 @@ entrypoints rather than removal of its underlying data/function.
 
 ## Sources
 
-External local corpus under `C:\Users\BrunoTremblay\Work\VPRO_ACCESS`:
+External local corpus under `<private-Access-root>`:
 
 - `_BEC_data_system_fs1a_schedule_of_services_v2 (13).md`: Services1-6 and outcomes.
 - `Links for BEC data systems.md`: pointers to predecessor projects, not parity proof.
@@ -44,7 +45,7 @@ counts. Full corpus/text/renders remain local, not shipped as application assets
 
 | Pages | Explicit caption intent | Graphical inference / unresolved | Current alignment |
 | --- | --- | --- | --- |
-| 1 | Session dashboard selects active files | Single-page entry struck; exact retained presentations unclear | Owned project/SU/hierarchy selection active; FS1333/two-page incomplete |
+| 1 | Session dashboard selects active files | Single-page entry struck; exact retained presentations unclear | Owned project/SU/hierarchy selection active;60 shared SIVI controls native-verified; standalone FS1333/two-page incomplete |
 | 2 | Retain most other forms with differing priority | Green/orange/red meanings, Message Board/GIF/Herbarium/User Log unresolved | Do not add or remove workflows from marks alone |
 | 3 | Replace separate CHARS forms with extended-shrub option | Caption's "only difference" does not authorize unrelated parent-variant event drift | Shared XL cover-only option native-verified and opt-in; full other-form equivalence unavailable |
 | 4 | Redundant classification navigation moves to dashboard | Retain underlying classification tasks; Add/Remove Units location open | Keep top menu compact; ownership remains explicit |
@@ -53,11 +54,11 @@ counts. Full corpus/text/renders remain local, not shipped as application assets
 | 7 | Hierarchy editable flat table; most functions needed, different approach, lower priority | Backup/Save Under Breaks marked; parent/level/merge/orphan rules open | Browsing exists; editing/redesign incomplete and not report blocker |
 | 8 | Consolidate exports; add TurboVeg; table RDS/CSV for R | Legacy output strikes tentative; exact formats/versions open | Add fixture-tested interchange boundary, not Access wrappers |
 | 9 | Most old imports may retire; add TurboVeg | VENUS5.0 unmarked candidate; standards imports and required migration formats open | go-mdbtools owns Access reading; no silent legacy retirement |
-| 10 | Long/summary vegetation priority; attributes become summary options | Exact aggregation/output requirements open | Priority report vertical slice, not implemented |
+| 10 | Long/summary vegetation priority; attributes become summary options | Exact aggregation/output requirements open | Long layer/None/Lifeform, standalone Lifeform Summary, typed Strata, supplementary Code and six standalone raw-vegetation attribute families Wails/full-race verified (not Access Val calibration); [explicit unlumped XLSX/ReportSummary](LONG_VEGETATION_WORKBOOK_CONTRACT.md) passes12 Wails cases/580 frontend/check/builds, separate reviews and full race1508.347s/all packages. Long selected attributes, lumping/combined variants/empty pivots and wider summaries remain incomplete |
 | 11 | Basic standards-library compliance retained; different presentation allowed | Other tests/repair/optimization tabs not automatically approved | Species checker is bounded; environment compliance incomplete |
 | 12 | Quality filters plots from SU; possible suffix/user-phrase filters; environment headers lower priority | Tentative suffix grammar, denominator/classes/lumping and safe filter syntax open | Do not implement speculative filters or raw SQL from screenshots |
 | 13 | Unit Groups define worksheets; quality filters plots, presence/mean cover filters species; regroup code/lumping controls | Struck calculation/order/list options require confirmation | Keep plot filtering, species filtering and aggregation separate |
-| 14 | Long/summary environment priority; combine content through consolidated options | Per-plot versus unit-summary combination open | Long Environment read-only preview native-verified and opt-in; summaries/export unavailable |
+| 14 | Long/summary environment priority; combine content through consolidated options | Per-plot versus unit-summary combination open | Long Environment and normal-SU summary previews native-verified and opt-in; reviewed summary preferences implemented; Long Environment XLSX publication passes12 Wails cases/569 frontend/check/builds, independent review and full race1206.963s/all packages with exact seal; hierarchy/field-derived scopes and wider publication incomplete |
 | 15 | Location functions priority; other outputs useful but lower priority | PC-ORD marked; map/viewer/export/CRS/privacy contract open | Desktop locations distinct from historical public Shiny map |
 | 16-18 | No added prose or decision marks | Summary statistics, standards/reference attachment, user/path settings are candidate retain | No approved as-is defaults, linked-table mechanics or path import |
 | 19 | No prose; help/recovery menu | Orange marks and Close all forms strike unresolved | Native recovery must retain drafts; do not recreate Access workarounds |

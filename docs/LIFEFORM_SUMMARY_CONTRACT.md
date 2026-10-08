@@ -31,7 +31,7 @@ importer, registry mutation, source temporary tables or Excel automation.
 ## Source preparation and physical weights
 
 Local read-only source root:
-`C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
+`<private-Access-root>\VPro64_forAI`.
 
 | Export | SHA256 |
 | --- | --- |
