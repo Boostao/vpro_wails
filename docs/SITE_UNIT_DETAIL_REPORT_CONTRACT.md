@@ -6,8 +6,8 @@ An independently default-off normal-SU, layer-cover Summary Environment preview
 now implements the39 source summary fields in SITE/VEGETATION/SOILS order,
 with Mean and Interquartile choices. Its owned service, generated bindings and
 responsive desktop panel pass focused tests and disposable Wails checks.
-Full integration passes (fresh root794.606s/all packages). Species/lifeform summaries, hierarchy/field-derived
-units remain unavailable. Saved Mean/Interquartile and normal-SU options have a
+Full integration passes (fresh root794.606s/all packages). Species summaries and hierarchy/field-derived
+units remain unavailable; the separately gated lifeform candidate is described below. Saved Mean/Interquartile and normal-SU options have a
 separately gated reviewed preferences workflow; workbook publication is the
 independent candidate described below, not part of the accepted preview. This is
 distinct from the per-plot Long Environment preview; the consolidated client
@@ -32,9 +32,328 @@ Four normally closed disposable Wails owners complete14 native cases and retain
 three actual outputs, with all16 fixture/22 protected identities unchanged.
 Independent desktop/native evidence review found no high-confidence discrepancies.
 Fresh714 source identities and exact17 embedded assets per binary remain unchanged
-through passing all-package race (root1502.269s). The seal is pending; no default
-promotion is claimed. The unresolved
+through passing all-package race (root1502.269s). The separately reverified
+[181-file successor](../archives/summary-environment-workbook-desktop-checkpoint/evidence-manifest.json)
+has manifest SHA256
+`5a53247bc82bda9006115a859b540fcca1ab1a03c5968abe047babb8ed947125`.
+No default promotion is claimed. The unresolved
 MyCover/species/lifeform paths are not inferred from this environment-only output.
+
+### Private species preparation continuation
+
+The distinct [QuickVeg preparation](../siteunitquickvegetation.go) now implements
+the static `V7mdlReportsCommonCode.QuickVegRecords` nine-cover insertion and
+`V7mdlReportsEnv` non-strata `SuDetailStep1` plot/species grouping. It does not
+borrow Long Vegetation's MAX reduction or standalone Lifeform's ten-cover sum.
+Every non-NULL Cover1..9 creates one SINGLE assignment per physical matching SU
+row, including zero/negative history. Duplicate Veg and SU rows retain their
+multiplicity; Cover10, extended shrubs and totals do not participate. The
+grouped MyCover uses the source strict `sum > 99` cap, not per-entry clamping.
+Entry provenance retains layer, Veg rowid and insertion SU rowid; cloned
+memberships retain NULL/empty/unassigned distinctions.
+
+This private pure preparation uses the proven strict numeric/NULL reader and
+SINGLE assignment helper; text/blob, invalid inserted identities and overflow
+fail without partial output. Binary joins and exact rational accumulation before
+the final double are explicit adaptations, not calibrated Access collation or
+SQL SUM traversal rounding. Strata requires its separate physical LayerCode
+join and is refused.
+
+The [private owned capture](../siteunitquickvegetationread.go) reuses one pinned
+snapshot for the accepted four-table Environment input and three additional
+physical Veg/master/personal tables. The proven five-cell whole-row
+USysAllSpecies UNION filters S/NULL CodeType before either helper join; duplicate
+definitions differing in another projected cell retain their weight.
+The [private fourteen-lifeform scalar planner](../siteunitlifeformcovers.go)
+implements the separate second SU join, DISTINCT-plot minimum guard against
+physical SU plot count, per-species MyCover extrema and SUM/owned Environment
+plot-count mean. Missing lifeforms remain absent values, not guessed zeros.
+Source LifeformCoverSummary always uses these statistics independently of the
+Environment Mean/Interquartile option. Scalar values are not yet source-formatted
+one-decimal caption strings; they do not enable species-threshold output or
+native/public workbook publication. No existing service, report preference or UI
+gate changes.
+Tests cover physical weights, source cover bounds, ignored malformed unused
+history, cloning, SINGLE assignment, strict cap, cancellation, ownership,
+rollback/cleanup, internal/external SU and retry. Coupled focused race49.072s
+passes. Fresh all-package race root1805.135s passes against720 unchanged
+application identities. Independent static source/correctness review finds no
+significant issues and reproduces focused race34.783s; production Wails
+compilation passes without launching or changing protected frontend assets.
+The earlier accepted SIVI authority race is not substituted for this integration.
+The [29-file private successor](../archives/summary-quick-vegetation-private-checkpoint/evidence-manifest.json)
+is separately hash/size verified and immutable, without a native/public claim.
+
+The subsequent [source caption/format continuation](../siteunitlifeformformat.go)
+now uses the existing `siteUnitFixedNumber` helper, not a second rounding engine.
+A fresh standalone DAO16/General1033 database verifies30 cases for the actual
+`Format(value,"0.0")` mask: positive/negative midpoints round away from zero,
+rounded negative zero renders `0.0`, and NULL renders blank. No Access form,
+registry change or canonical data mutation occurs. The helper's literal
+incomplete-plot minimum is `0---`, distinct from a measured `0.0---`; all14
+LifeformCode2Description captions are retained. Coupled focused race48.699s
+passes formatting, scalar, owned capture and accepted shared engines.
+This later candidate changes the scalar row shape and postdates the720-pin
+private seal. Its fresh all-package race root1785.887s passes against722
+separately verified unchanged application identities; that predecessor's race
+is not substituted. No public/native report acceptance is claimed.
+
+### Separately gated lifeform desktop candidate
+
+`VPRO_SITE_UNIT_SUMMARY_LIFEFORMS` and
+`VITE_SITE_UNIT_SUMMARY_LIFEFORMS` independently default off. The public
+[owned method](../siteunitlifeformservice.go) reuses the seven-table input and
+returns49 fields: the original35 non-cover fields and fourteen `Lifeform0` to
+`Lifeform13` caption/value rows instead of the four stored layer covers.
+The explicit mode is read-only: it never changes saved grouping, species-list
+options, calculation preferences, plot data or audits. Both Environment methods
+are supported; lifeform values remain source minimum/mean/maximum under either.
+Missing lifeforms are blank. Physical unit membership/count/provenance remains
+the Environment snapshot's exact physical join, not a distinct plot count.
+
+The [shared panel](../frontend/src/SiteUnitSummary.svelte) validates the mode's
+exact registry, query source and provenance. Mode changes discard only the
+preview, not preference drafts; busy/unknown publication and preference
+authority block switching. Layer-only workbook publication is unmounted only
+after these barriers permit a switch, and is unavailable in lifeform mode.
+No lifeform workbook or species-threshold output is implied.
+
+Focused public/coupled Go race65.231s,638 complete frontend tests/check0
+errors/warnings and isolated enabled/frontend-off production Wails builds pass.
+One fresh fixture copied sixteen verified predecessor identities, rebinding
+exactly six config paths without database seed writes. Four normally closed
+owners complete nine native cases: both methods/independent raw nine-cover and
+second-SU/reference-weighted arithmetic, unchanged35 fields/provenance,
+1400/600px actual labelled visibility, layer workbook return, held completed-read
+delivery/navigation/native-close/mode barriers, cancellation/remount/retry and
+independent frontend/backend denial. This does not claim in-flight SQL
+cancellation. All16 fixture and22 protected identities remain byte-identical.
+Driver: `<session>/files/summary-lifeform-desktop-native.py`.
+Initial724 application identities and17 exact embedded assets per binary remain
+unchanged through full race1584.791s; independent review has no significant
+findings and reproduces7/7 frontend tests. Subsequent species/adjacent-DOUBLE
+probes expose a shared Format precision gap, so that initial candidate is not
+final source-format acceptance. Its77 closed build/evidence identities are
+hash-preserved before correction. Current727 frozen identities include the
+corrected helper and private species kernel; promoted coupled race79.117s and
+original numeric/extremes race1.274s pass. A fresh normally closed precision
+owner completes5 cases with both methods/1400/600 actual labels/layer workbook
+return and unchanged16 fixture/22 protected identities. One read-only receipt
+collision resumes under independently verified same-owner/pre-preview state
+with new mode-prefixed names; no writes replay. Corrected full root race passes
+1605.911s. The first aggregate attempt fails only a new archive-packaging setup:
+copied embed overlays were incorrectly discovered as a Go package. The entire
+archive is moved under `_closed-initial-decimal-build`, preserving all77 hashes
+and manifest bytes. Independent review verifies exact integrity/discovery and
+fresh all-package focused race1.469s; no remaining significant findings.
+Full aggregate retry passes with cached root under unchanged727 inputs, not a
+substituted older candidate. The formatter/private720-pin seals are not
+substituted. The separately re-hashed233-file
+[current successor](../archives/summary-lifeform-desktop-checkpoint/evidence-manifest.json)
+has manifest SHA256
+`1dd7945f5a1c445e4ddff2541e566a53a749c6f3b787d2dfa3f74c4083b534a4`.
+Never reseal or replay its completed native modes. No default promotion or
+whole-report parity claim.
+
+### Species-list source and sealed private preparation
+
+`V7mdlReportsEnv.SiteUnitDetailReport` lines377-524 must not be replaced by the
+Long Vegetation crosstab. The intermediate `SuDetailStep2` groups species after
+a second physical SU join; it supplies species membership, not the final
+threshold-filtered list. Final queries retain their own joins and reference
+groupings. The whole-row species UNION is already available, but reference
+differences outside final GROUP BY can still multiply cover/count inside one
+output row. NULL scientific/common names must remain distinguishable from
+empty text and duplicate reference definitions.
+
+| Order | Final input and grouping | Source reporting range |
+| --- | --- | --- |
+| Layer1 | Raw QuickVeg entries, second SU join and species references; species/scientific/common name/layer | Layers1..7 only, despite inserting Cover1..9 |
+| Lifeform2 | Capped plot/species MyCover, second SU join and species references; species/scientific/common name/unit/CodeType/lifeform | Lifeforms0..13 |
+| Strata3 | Separate physical LayerCode join before capped plot/species/strata grouping, then second SU/reference joins | Four source strata; not implemented by the current non-strata preparer |
+
+All-plot cover uses SUM divided by the owned Environment plot count; present
+cover uses AVG of physical final joined values. Presence is physical COUNT
+divided by that same owned plot count, multiplied by100, not DISTINCT plot
+presence. The source formats cover to`0.00` and presence to`0.0` **before**
+applying strict greater-than tests against integer thresholds. AndOr1 uses AND;
+the source's other branch uses OR. Explicit desktop options should accept only
+the intended1/2 choices, rather than silently inheriting arbitrary historical
+values as OR. Do not reuse raw pre-format threshold comparison from another
+report. Group headers can exist when all rows subsequently fail thresholds.
+The exported legacy species-options AfterUpdate/Form_Load assignments are
+commented; their existence does not prove an active saved-preference event.
+
+One fresh standalone DAO16/General1033 fixture calibrates31 NULL/zero/negative/
+midpoint/large-number cases for both masks. Cover midpoints round away from
+zero; rounded negative zero is`0.00`; NULL is blank. The existing
+`siteUnitFixedNumber` helper is the reuse boundary. This formatting probe does
+not establish VBA variant comparison, Access final GROUP BY/collation,
+SUM traversal order or full report parity. Canonical Access SHA256 stays
+`01481b94569c7172f32a812e65365f78cea5e440dd63220d91a37dade5778423`.
+Receipt: `<session>/files/summary-species-format-oracle/results.json`.
+The source declares both thresholds `As Integer`; the formatted DAO field
+value is a numeric-convertible string Variant. Microsoft's
+[comparison rules](https://learn.microsoft.com/en-us/office/vba/language/reference/user-interface-help/comparison-operators)
+specify numeric comparison for this typed-numeric/convertible-Variant pair,
+not the different numeric-Variant/string-Variant ordering rule. This language
+reference supports comparing the formatted decimal numerically; it is not
+a claim that an Access report/field-handler runtime was executed.
+Further DAO42 adjacent-DOUBLE and30 `CStr`/Format conversion cases establish the
+necessary precision boundary: DOUBLE first becomes fifteen significant decimal
+digits, then Format rounds half-away. Binary multiply/round gives `1.00` rather
+than source `1.01` for`1.005`, and incorrectly rounds the DOUBLE just below`0.15`
+to`0.1` rather than`0.2`. The shared helper is corrected with rational decimal
+rounding, preserving width, signed zero and original extrema behavior. Tests
+retain the actual below-precision values that must still round down; no blanket
+epsilon adjustment is used.
+
+The [private planner](../siteunitspecieslist.go) now implements layer/lifeform
+final grouping, second physical SU/reference weights, both averages, tagged
+nullable names, deterministic literal ordering, pre-threshold headers and
+format-before-strict-AND/OR qualification. CodeType is a grouping identity only
+in lifeform mode; layer rows retain all contributing reference IDs rather than
+inventing one definition's CodeType for a combined group. Signed16 source
+threshold bounds and explicit1/2 choices refuse malformed options atomically.
+Cancellation, cloning/ownership, retry, raw versus capped covers, layer8/9
+exclusion, duplicate whole-row definitions, presence above100 and exact rounded
+threshold equality are fast tests. Promoted coupled race79.117s passes.
+Current727-pin corrected root full race1605.911s, independent review and
+archive-excluded full aggregate retry pass; retry root is cached under unchanged
+inputs. The discovered archive setup issue is resolved, not masked.
+That sealed private milestone introduced no Access UI, registry changes,
+application gate or public species-list output; strata and workbook extension
+remain distinct unfinished work.
+
+### Accepted bounded public species preview
+
+Independent default-off `VPRO_SITE_UNIT_SUMMARY_SPECIES` and
+`VITE_SITE_UNIT_SUMMARY_SPECIES` expose the private layer/lifeform planner through
+one owned seven-table capture. The strict request requires method, grouping,
+cover calculation, comparison and both signed16 thresholds; missing, duplicate,
+NULL, fractional, malformed-Unicode and unsupported values fail explicitly.
+Lifeform grouping additionally requires the independent lifeform backend gate.
+The response includes its exact39/49-field Environment, explicit criteria,
+pre-threshold group headers, qualifying rows and excluded-row/physical-reference
+diagnostics. Neither preview path writes database, audit or configuration.
+
+Criteria deliberately begin at preview-only all plots, AND and zero thresholds;
+they do not infer, load or save the commented source species-preference events.
+Raw threshold text and errors belong to the owned context and survive remount.
+Invalid criteria block Create Report, preference Save, grouping/inclusion
+changes, navigation and native close. Valid correction or explicit criteria
+reset clears that barrier; correction/reset remain possible when saved report
+scope makes the preview unavailable, without enabling that workflow.
+Busy/unknown workbook or preference authority prevents criteria changes.
+Species inclusion removes the layer-only workbook panel, never relabelling
+its publication as species output. Species/lifeform workbook extension is
+unavailable.
+
+Focused public/private/format service race15.289s, actual interface bindings
+(220 methods/210 models),642 frontend tests (200 pretests +442 main) and
+check0 errors/warnings pass. Isolated enabled/species-off production Wails builds
+embed their exact17 assets without replacing protected dist/binaries.
+Six normally closed owners in one no-seed/six-rebound-path disposable fixture
+complete57 cases:24 independent arithmetic combinations and24 actual UI
+method/group/average/AND-OR/threshold combinations, including empty qualifying
+lists with retained group headers and tagged NULL/empty rendering. Remaining
+cases prove local errors, saved-option reload/correction/remount/native-close/
+navigation guards,1400/600 actual visibility/labels/accessible table headers,
+held actual workbook review and species read/cancel/remount/retry, plus
+independent frontend/backend/lifeform denial. All16 fixture/22 protected hashes
+remain unchanged; no workbook publication was replayed. Cancellation holds
+completed-response delivery, not in-flight SQL.
+
+Independent source/correctness review closes with no significant findings.
+Its separate12M+ exact-rational versus sequential-DOUBLE formatting-pair probe
+finds no mismatch for plots1-5000/counts1-through-plots; this does not establish
+arbitrary huge-count arithmetic, rerun the suites or perform native actions.
+Current732 application identities and native-tested binaries/assets are frozen;
+fresh all-package race passes root1445.861s/all packages and all732 hashes are
+separately verified unchanged. The immutable727-pin predecessor does not freeze
+these newer changes. The [bounded successor](../archives/summary-species-desktop-checkpoint/evidence-manifest.json)
+retains this distinct candidate; never replay its completed native modes.
+
+### Private workbook extension: publication unavailable
+
+The newer [private extension](../siteunitsummaryextendedworkbook.go) reuses the
+accepted workbook writer and species DTO projection, not a second formatting or
+XLSX engine. The original39-field wrapper remains layer-only. No-species
+lifeform output keeps Environment A/B with14 cover rows32-45 and SOILS47/
+rows48-59. Species output uses source A-D headings at row4 and group rows from5;
+Environment moves to F/G, including the method caption at F4. Final A3 remains
+the plot-count caption, which overwrites the source's earlier Vegetation text.
+Layer group headings are plain; lifeform headings are bold. Headers remain
+when no rows qualify. NULL name cells stay blank in visible XLSX while tagged
+NULL/empty definitions, excluded rows, criteria and provenance remain distinct
+in the very-hidden typed source.
+
+Explicit literal strings preserve the source formatting masks without inheriting
+Excel's automatic numeric/formula interpretation. Readable column widths and
+Excel's row limit are presentation/safety adaptations; legacy Integer cursor
+overflow is not inherited. Source worksheet sanitization/collision refusal,
+owned provenance, cancellation and no-partial-output behavior remain shared.
+
+Isolated coupled race79.566s/final extension race73.184s and promoted public/
+legacy/new-kernel race103.536s pass. Both methods, both averages, AND/OR criteria,
+49-field positions, exact species cells/styles and hidden provenance,
+deterministic bytes, internal/external capture, cancellation/refusal/retry and
+unchanged input/data/config are covered. A separate12-case exact comparison
+against the immutable original writer proves identical39-field XLSX bytes and
+sheet identity (race1.747s). No new publication service, UI, flag or binding is
+enabled; raw-source approval/host lifecycle and native/full integration for the
+extension remain unfinished. The187-file accepted species preview seal is a
+predecessor, not evidence of this newer private kernel's desktop publication.
+
+The subsequent [private owned publication](../siteunitsummaryextendedpublication.go)
+uses strict seven-field review/nine-field export transport and the shared
+seven-table reader. No-species lifeforms require explicit inactive criteria
+defaults; species/lifeform authorization remains independently denied without
+the existing gates. Saved normal-SU scope is captured, not rewritten.
+Approval binds the whole raw seven-table input, saved four-key scope, requested
+options, sheet identities and exact output bytes under a distinct versioned
+domain. Unused saved species criteria are not input to this explicit adaptation.
+Established no-replace staging, source revalidation, cancellation, completion/
+cleanup errors and irreversible published receipts are reused. Private-boundary coupled
+publication/reader/species/legacy-service race481.535s passes both methods/three
+output modes/internal-external ownership, deterministic approval/bytes,
+collision/no-replace, all seven unrendered table/schema drift witnesses and
+independent gates/strict transport. Six injected completion/cleanup/cancellation
+phases retain known no-file versus committed-with-errors receipts and safe retry
+only for known failures. Data/config stay unchanged; only named disposable test
+XLSX outputs are written. Private integration passes fresh all-package race
+root2620.443s/all packages against736 separately verified unchanged identities;
+that freeze predates the following public candidate.
+
+The registered [extended service](../siteunitsummaryextendedservice.go) requires
+independent default-off `VPRO_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK`; existing
+species/lifeform gates remain additional requirements, not aliases.
+`VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK` independently enables the three
+implemented combinations in the existing workbook panel. Both publication
+sessions reuse the same persistent receipt engine; root navigation/native-close
+authority aggregates their busy/blocked state even with panels unmounted.
+Lifeform grouping is restored for a held extension on tab remount.
+Frontend validates the exact seven requested options, complete39/49 Environment
+registry and original physical source/sheet evidence; included species must
+carry the identical Environment projection, exact shapes and matching criteria.
+No-species lifeform requests use explicit inactive defaults; dormant species
+drafts do not silently become workbook input. Original layer/no-species
+publication still uses its original strict service/validator.
+Actual production bindings expose31 services/222 methods/212 models.
+Focused facade publication/collision/cancellation race20.314s,649 frontend tests,
+check0 errors/warnings, isolated production builds and independent review pass.
+Seven normally closed production Wails owners complete22 cases, with12 retained
+artifacts independently checked for exact source cells/group styles/hidden
+provenance, both methods/three modes/species calculations and physical arithmetic.
+Responsive1400/600 visible labels, collision, committed unknown/warning delivery
+and acknowledgement/remount receipts, read cancellation/retry and independent
+frontend/extended/species/lifeform gates pass. All16 fixture/22 protected
+identities remain unchanged. Native cancellation holds completed-response
+delivery, not in-flight SQL; warning/unknown injections change transport after
+observing a real committed receipt, not actual backend cleanup.
+741 current application identities and17 exact isolated assets per binary are
+frozen for fresh full race; current integration/seal remain unfinished.
+Default promotion and whole-report parity are not claimed.
 
 ### Workbook adaptation and approval boundary
 

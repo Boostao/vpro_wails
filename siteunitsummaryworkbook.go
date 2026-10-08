@@ -20,12 +20,24 @@ type siteUnitSummaryWorkbook struct {
 }
 
 func validateSiteUnitSummaryWorkbook(ctx context.Context, preview SiteUnitSummaryPreview) ([]vegetationWorkbookSheet, error) {
+	return validateSiteUnitSummaryWorkbookProjection(ctx, preview, 1)
+}
+
+func validateSiteUnitSummaryWorkbookProjection(ctx context.Context, preview SiteUnitSummaryPreview, grouping int) ([]vegetationWorkbookSheet, error) {
 	report := preview.Report
+	fields, err := siteUnitSummaryWorkbookFields(grouping)
+	if err != nil {
+		return nil, err
+	}
+	querySource := string(siteUnitDetailSelectedSU)
+	if grouping == 2 {
+		querySource = "selected-su-filtered-env-admin-quickveg-lifeform"
+	}
 	if preview.ContextID == "" || preview.ProjectPath == "" || preview.SUPath == "" ||
 		report.Project == "" || report.SU == "" || report.SU == "None" || report.SU == "USysSuTableDynamic" ||
-		(report.Method != 1 && report.Method != 2) || report.QuerySource != string(siteUnitDetailSelectedSU) ||
-		!reflect.DeepEqual(report.Fields, siteUnitSummaryFields()) || len(report.Units) == 0 || len(report.Memberships) == 0 {
-		return nil, errors.New("Summary Environment workbook requires a complete owned normal-SU preview, explicit method and original 39-field schema")
+		(report.Method != 1 && report.Method != 2) || report.QuerySource != querySource ||
+		!reflect.DeepEqual(report.Fields, fields) || len(report.Units) == 0 || len(report.Memberships) == 0 {
+		return nil, errors.New("Summary Environment workbook requires a complete owned normal-SU preview, explicit method and exact grouping field schema")
 	}
 	if err := lifeformWorkbookSourceValue(reflect.ValueOf(preview)); err != nil {
 		return nil, err
@@ -63,7 +75,7 @@ func validateSiteUnitSummaryWorkbook(ctx context.Context, preview SiteUnitSummar
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
-		if i > 0 && report.Units[i-1].Code <= unit.Code || len(unit.Values) != 39 ||
+		if i > 0 && report.Units[i-1].Code <= unit.Code || len(unit.Values) != len(fields) ||
 			len(unit.Plots) == 0 || unit.NameCandidates == nil {
 			return nil, errors.New("Summary Environment requires descending distinct literal units, physical plots and complete values/name evidence")
 		}
@@ -156,15 +168,25 @@ func validateSiteUnitSummaryWorkbook(ctx context.Context, preview SiteUnitSummar
 }
 
 func prepareSiteUnitSummaryWorkbook(ctx context.Context, preview SiteUnitSummaryPreview) (result siteUnitSummaryWorkbook, resultErr error) {
+	return prepareSiteUnitSummaryWorkbookProjection(ctx, preview, 1, nil)
+}
+
+func prepareSiteUnitSummaryWorkbookProjection(ctx context.Context, preview SiteUnitSummaryPreview, grouping int,
+	species *SiteUnitSpeciesListPreview) (result siteUnitSummaryWorkbook, resultErr error) {
 	if ctx == nil {
 		return result, errors.New("Summary Environment workbook requires a context")
 	}
 	if err := ctx.Err(); err != nil {
 		return result, err
 	}
-	sheets, err := validateSiteUnitSummaryWorkbook(ctx, preview)
+	sheets, err := validateSiteUnitSummaryWorkbookProjection(ctx, preview, grouping)
 	if err != nil {
 		return result, err
+	}
+	if species != nil {
+		if err := lifeformWorkbookSourceValue(reflect.ValueOf(*species)); err != nil {
+			return result, err
+		}
 	}
 	book := excelize.NewFile()
 	defer func() {
@@ -203,8 +225,28 @@ func prepareSiteUnitSummaryWorkbook(ctx context.Context, preview SiteUnitSummary
 	if preview.Report.Method == 2 {
 		method = "Quantitative values summarized as: Interquartile 25% - 50% - 75%"
 	}
-	rows := [...]int{7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
-		30, 31, 32, 33, 34, 35, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49}
+	rows := make([]int, 0, len(preview.Report.Fields))
+	for row := 7; row <= 27; row++ {
+		rows = append(rows, row)
+	}
+	vegetationEnd, soilsHeader := 35, 37
+	if grouping == 2 {
+		vegetationEnd, soilsHeader = 45, 47
+	}
+	for row := 30; row <= vegetationEnd; row++ {
+		rows = append(rows, row)
+	}
+	for row := soilsHeader + 1; row <= soilsHeader+12; row++ {
+		rows = append(rows, row)
+	}
+	labelColumn, valueColumn := "A", "B"
+	if species != nil {
+		if !reflect.DeepEqual(species.Environment, preview) || species.Options.OrderBy != grouping ||
+			len(species.Units) != len(preview.Report.Units) {
+			return result, errors.New("Summary species workbook projection and Environment ownership differ")
+		}
+		labelColumn, valueColumn = "F", "G"
+	}
 	for i, unit := range preview.Report.Units {
 		if err := ctx.Err(); err != nil {
 			return result, err
@@ -223,7 +265,11 @@ func prepareSiteUnitSummaryWorkbook(ctx context.Context, preview SiteUnitSummary
 			longName = *unit.LongName
 		}
 		for j, value := range []string{unit.Code, longName, "Plots in unit: " + strconv.Itoa(len(unit.Plots)), method} {
-			if err := text(name, fmt.Sprintf("A%d", j+1), value); err != nil {
+			column := "A"
+			if j == 3 {
+				column = labelColumn
+			}
+			if err := text(name, fmt.Sprintf("%s%d", column, j+1), value); err != nil {
 				return result, err
 			}
 		}
@@ -231,7 +277,7 @@ func prepareSiteUnitSummaryWorkbook(ctx context.Context, preview SiteUnitSummary
 			return result, err
 		}
 		for j, heading := range []string{"SITE", "VEGETATION", "SOILS"} {
-			cell := fmt.Sprintf("A%d", [...]int{6, 29, 37}[j])
+			cell := fmt.Sprintf("%s%d", labelColumn, [...]int{6, 29, soilsHeader}[j])
 			if err := text(name, cell, heading); err != nil {
 				return result, err
 			}
@@ -243,18 +289,23 @@ func prepareSiteUnitSummaryWorkbook(ctx context.Context, preview SiteUnitSummary
 			if err := ctx.Err(); err != nil {
 				return result, err
 			}
-			if err := text(name, fmt.Sprintf("A%d", rows[j]), field.Label); err != nil {
+			if err := text(name, fmt.Sprintf("%s%d", labelColumn, rows[j]), field.Label); err != nil {
 				return result, err
 			}
 			// Helper-produced summaries remain literal strings, including numeric-looking text.
-			if err := text(name, fmt.Sprintf("B%d", rows[j]), unit.Values[j]); err != nil {
+			if err := text(name, fmt.Sprintf("%s%d", valueColumn, rows[j]), unit.Values[j]); err != nil {
 				return result, err
 			}
 		}
-		if err := book.SetColWidth(name, "A", "A", 34); err != nil {
+		if species != nil {
+			if err := writeSiteUnitSummarySpeciesCells(ctx, book, name, species.Units[i], unit, grouping, bold, text); err != nil {
+				return result, err
+			}
+		}
+		if err := book.SetColWidth(name, labelColumn, labelColumn, 34); err != nil {
 			return result, err
 		}
-		if err := book.SetColWidth(name, "B", "B", 60); err != nil {
+		if err := book.SetColWidth(name, valueColumn, valueColumn, 60); err != nil {
 			return result, err
 		}
 	}
@@ -262,6 +313,9 @@ func prepareSiteUnitSummaryWorkbook(ctx context.Context, preview SiteUnitSummary
 		return result, err
 	}
 	source, err := json.Marshal(preview)
+	if species != nil {
+		source, err = json.Marshal(species)
+	}
 	if err != nil {
 		return result, err
 	}

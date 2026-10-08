@@ -30,7 +30,9 @@ test('actual top-level Summary authority effect subscribes and reopens a retaine
     });
     context.$effect = run => { context.cleanup = run(); };
     const code = effect[0].getText(ast).replaceAll("import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK",
-      JSON.stringify(enabled ? 'true' : 'false')).replaceAll("import.meta.env.VITE_SITE_UNIT_SUMMARY", "'true'");
+      JSON.stringify(enabled ? 'true' : 'false'))
+      .replaceAll("import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK", "'false'")
+      .replaceAll("import.meta.env.VITE_SITE_UNIT_SUMMARY", "'true'");
     vm.runInContext(ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText, context);
     assert.equal(subscribed, enabled ? 1 : 0);
     assert.equal(context.summaryPublicationBusy, enabled);
@@ -89,7 +91,7 @@ test('actual Summary parent prevents method, preview and preference changes whil
   const held = [];
   const context = componentFunctions('SiteUnitSummary.svelte',
     ['reportBusy', 'cancel', 'options', 'show', 'loadPreferences', 'savePreferences', 'editMethod'], {
-      workbookBusy: true, busy: false, preferenceBarrier: false, method: 1,
+      workbookBusy: true, busy: false, preferenceBarrier: false, speciesBarrier: false, method: 1,
       generation: 0, onBusyChange: value => held.push(value),
       reads: { cancelAll() {} }, preferences: { cancelLoad() {} },
     });
@@ -109,7 +111,7 @@ test('actual Summary parent prevents method, preview and preference changes whil
 test('Summary root and parent wire independent default-off gates and persistent publication authority', () => {
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const parent = readFileSync(path.join(__dirname, 'SiteUnitSummary.svelte'), 'utf8');
-  assert.match(app, /VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'true' \|\| import\.meta\.env\.VITE_SITE_UNIT_SUMMARY !== 'true'/);
+  assert.match(app, /VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'true' && import\.meta\.env\.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'true'/);
   assert.match(app, /summaryPublicationBusy = publication.busy \|\| publication.blocked/);
   assert.match(app, /publication.blocked && view === 'home'\) view = 'summary-environment'/);
   assert.match(parent, /VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'true'/);

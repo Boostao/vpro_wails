@@ -119,20 +119,32 @@ func siteUnitNumericString(value float64) string {
 }
 
 func siteUnitFixedNumber(value float64, decimals, width int) string {
-	scale := math.Pow10(decimals)
-	rounded := value
-	if math.Abs(value) <= math.MaxFloat64/scale {
-		// The disposable ACE oracle confirms half-away-from-zero Format
-		// rounding, rather than VBA Round's banker's rounding (en-US).
-		rounded = math.Round(value*scale) / scale
+	if math.IsNaN(value) || math.IsInf(value, 0) {
+		return strconv.FormatFloat(value, 'f', decimals, 64)
 	}
-	if rounded == 0 {
-		rounded = 0
+	// DAO first converts DOUBLE to fifteen significant decimal digits.
+	// Round that decimal half-away, without binary multiplication error.
+	decimal, _ := new(big.Rat).SetString(strconv.FormatFloat(value, 'g', 15, 64))
+	negative := decimal.Sign() < 0
+	decimal.Abs(decimal)
+	scale := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(decimals)), nil)
+	decimal.Mul(decimal, new(big.Rat).SetInt(scale))
+	remainder := new(big.Int)
+	rounded := new(big.Int)
+	rounded.QuoRem(decimal.Num(), decimal.Denom(), remainder)
+	if new(big.Int).Lsh(remainder, 1).Cmp(decimal.Denom()) >= 0 {
+		rounded.Add(rounded, big.NewInt(1))
 	}
-	text := strconv.FormatFloat(rounded, 'f', decimals, 64)
+	text := rounded.String()
+	if decimals > 0 {
+		if len(text) <= decimals {
+			text = strings.Repeat("0", decimals+1-len(text)) + text
+		}
+		text = text[:len(text)-decimals] + "." + text[len(text)-decimals:]
+	}
 	sign := ""
-	if strings.HasPrefix(text, "-") {
-		sign, text = "-", text[1:]
+	if negative && rounded.Sign() != 0 {
+		sign = "-"
 	}
 	integerWidth := len(strings.SplitN(text, ".", 2)[0])
 	if integerWidth < width {

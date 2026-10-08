@@ -27,6 +27,9 @@ func main() {
 	if _, err := siviFeature(siteUnitSummaryWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
+	if _, err := siviFeature(siteUnitSummaryExtendedWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
+		log.Fatal(err)
+	}
 	siviParentReviewEnabled, err := siviParentReviewFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -56,6 +59,14 @@ func main() {
 		log.Fatal(err)
 	}
 	siteUnitSummaryEnabled, err := siviFeature(siteUnitSummaryFeatureEnvironment, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	siteUnitSummaryLifeformsEnabled, err := siviFeature(siteUnitSummaryLifeformFeatureEnvironment, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	siteUnitSummarySpeciesEnabled, err := siviFeature(siteUnitSummarySpeciesFeatureEnvironment, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -137,6 +148,8 @@ func main() {
 	contextService.tableCSVReviewEnabled = tableCSVReviewEnabled
 	contextService.plotLocationReviewEnabled = plotLocationReviewEnabled
 	contextService.siteUnitSummaryEnabled = siteUnitSummaryEnabled
+	contextService.siteUnitSummaryLifeformsEnabled = siteUnitSummaryLifeformsEnabled
+	contextService.siteUnitSummarySpeciesEnabled = siteUnitSummarySpeciesEnabled
 	contextService.longVegetationNoneEnabled = longVegetationNoneEnabled
 	contextService.longVegetationLifeformEnabled = longVegetationLifeformEnabled
 	contextService.longVegetationStrataEnabled = longVegetationStrataEnabled
@@ -162,6 +175,10 @@ func main() {
 		log.Fatal(err)
 	}
 	siteUnitSummaryWorkbook, err := NewSiteUnitSummaryWorkbookService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	siteUnitSummaryExtendedWorkbook, err := NewSiteUnitSummaryExtendedWorkbookService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -237,6 +254,7 @@ func main() {
 		application.NewService(speciesAttributeSummary),
 		application.NewService(lifeformWorkbook),
 		application.NewService(siteUnitSummaryWorkbook),
+		application.NewService(siteUnitSummaryExtendedWorkbook),
 		application.NewService(environmentWorkbook),
 		application.NewService(vegetationWorkbook),
 		application.NewService(NewTableCSVArchiveService(contextService, tableCSVArchiveEnabled)),

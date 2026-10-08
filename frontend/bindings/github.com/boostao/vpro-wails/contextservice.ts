@@ -205,6 +205,14 @@ export function PreviewSiteUnitSummary(contextID: string, request: $models.SiteU
     return $Call.ByID(639495149, contextID, request);
 }
 
+export function PreviewSiteUnitSummaryLifeforms(contextID: string, request: $models.SiteUnitSummaryRequest): $CancellablePromise<$models.SiteUnitSummaryPreview> {
+    return $Call.ByID(747248442, contextID, request);
+}
+
+export function PreviewSiteUnitSummarySpecies(contextID: string, request: $models.SiteUnitSpeciesListRequest): $CancellablePromise<$models.SiteUnitSpeciesListPreview> {
+    return $Call.ByID(927926337, contextID, request);
+}
+
 export function ResolveProjectPlotProfileNavigation(contextID: string, request: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProjectPlotProfileNavigation> {
     return $Call.ByID(3203258907, contextID, request);
 }

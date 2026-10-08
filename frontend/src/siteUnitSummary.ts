@@ -12,6 +12,11 @@ const keys = ['Zone', 'SubZone', 'Elevation', 'Aspect', 'SlopeGradient', 'MesoSl
   'RootZoneParticleSize', 'RootingDepth', 'RootRestrictingType', 'BedrockGeology1',
   'BedrockGeology2', 'BedrockGeology3'];
 
+export const summaryLifeformCaptions = ['Genus-level and mixed', 'Coniferous Tree', 'Deciduous Tree',
+  'Evergreen Shrub', 'Deciduous Shrub', 'Ferns or Fern-ally', 'Graminoid', 'Forb',
+  'Parasite or Saprophyte', 'Moss', 'Liverwort', 'Lichen', 'Dwarf woody plant', 'Macroalgae'] as const;
+export type SiteUnitSummaryMode = 'layer' | 'lifeform';
+
 function completeText(value: unknown): value is string {
   return typeof value === 'string' && completeCell({ storage: 'text', text: value,
     integer: null, real: null, blobHex: null });
@@ -46,21 +51,31 @@ function hasSummaryArrays(value: SiteUnitSummaryPreview): value is ValidatedSite
 }
 
 export function validateSiteUnitSummary(value: SiteUnitSummaryPreview, contextId: string,
-  project: string, projectPath: string, su: string, suPath: string, method: number): ValidatedSiteUnitSummary {
+  project: string, projectPath: string, su: string, suPath: string, method: number,
+  mode: SiteUnitSummaryMode = 'layer'): ValidatedSiteUnitSummary {
+  if (mode !== 'layer' && mode !== 'lifeform') throw new Error('Summary mode is unavailable.');
   if (!hasSummaryArrays(value)) throw new Error('Summary arrays are incomplete.');
   const report = value.report;
+  const lifeform = mode === 'lifeform';
+  const expectedKeys = lifeform ? [...keys.slice(0, 23),
+    ...summaryLifeformCaptions.map((_, form) => `Lifeform${form}`), ...keys.slice(27)] : keys;
+  const vegetationEnd = lifeform ? 37 : 27;
   if (!value || value.contextId !== contextId || value.projectPath !== projectPath || value.suPath !== suPath ||
       !report || report.project !== project || report.su !== su || su === 'None' ||
-      ![1, 2].includes(method) || report.method !== method || report.querySource !== 'selected-su-filtered-env-admin' ||
-      !Array.isArray(report.fields) || report.fields.length !== keys.length ||
+      ![1, 2].includes(method) || report.method !== method ||
+      report.querySource !== (lifeform ? 'selected-su-filtered-env-admin-quickveg-lifeform' : 'selected-su-filtered-env-admin') ||
+      !Array.isArray(report.fields) || report.fields.length !== expectedKeys.length ||
       !Array.isArray(report.units) || !Array.isArray(report.memberships)) {
     throw new Error('Summary belongs to a different or incomplete context/method.');
   }
-  for (let i = 0; i < keys.length; i++) {
+  for (let i = 0; i < expectedKeys.length; i++) {
     const field = report.fields[i];
-    if (!field || field.key !== keys[i] || field.source !== (i === 29 ? 'Admin' : 'Env') ||
-        field.section !== (i < 21 ? 'SITE' : i < 27 ? 'VEGETATION' : 'SOILS') ||
-        !completeText(field.label) || !['category', 'bgc-unit', 'numeric', 'aspect', 'moisture'].includes(field.kind)) {
+    const cover = lifeform && i >= 23 && i < 37;
+    if (!field || field.key !== expectedKeys[i] ||
+        field.source !== (cover ? 'Lifeform' : i === vegetationEnd + 2 ? 'Admin' : 'Env') ||
+        field.section !== (i < 21 ? 'SITE' : i < vegetationEnd ? 'VEGETATION' : 'SOILS') ||
+        !completeText(field.label) || (cover ? field.label !== summaryLifeformCaptions[i - 23] || field.kind !== 'lifeform-cover' :
+          !['category', 'bgc-unit', 'numeric', 'aspect', 'moisture'].includes(field.kind))) {
       throw new Error('Summary field registry differs from the source report.');
     }
   }
@@ -84,7 +99,7 @@ export function validateSiteUnitSummary(value: SiteUnitSummaryPreview, contextId
   const units = new Set<string>(), triples = new Set<string>(), counts = new Map<string, number>();
   for (const unit of report.units) {
     if (!unit || !completeText(unit.code) || units.has(unit.code) || !Array.isArray(unit.plots) || unit.plots.length === 0 ||
-        !Array.isArray(unit.values) || unit.values.length !== keys.length || !unit.values.every(completeText)) {
+        !Array.isArray(unit.values) || unit.values.length !== expectedKeys.length || !unit.values.every(completeText)) {
       throw new Error('Summary unit values or joined plot scope are incomplete.');
     }
     units.add(unit.code); validateReportUnitNames(unit);

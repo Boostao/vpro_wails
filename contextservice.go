@@ -15,20 +15,22 @@ type ContextSelection struct {
 }
 
 type ContextService struct {
-	projects                       *ProjectService
-	plots                          *PlotService
-	siviHeightEnabled              bool
-	siviParentReviewEnabled        bool
-	siviParentEditingEnabled       bool
-	siviParentActionEditingEnabled bool
-	siviProjectAssignmentEnabled   bool
-	tableCSVReviewEnabled          bool
-	plotLocationReviewEnabled      bool
-	siteUnitSummaryEnabled         bool
-	longVegetationNoneEnabled      bool
-	longVegetationLifeformEnabled  bool
-	longVegetationStrataEnabled    bool
-	longVegetationCodeEnabled      bool
+	projects                        *ProjectService
+	plots                           *PlotService
+	siviHeightEnabled               bool
+	siviParentReviewEnabled         bool
+	siviParentEditingEnabled        bool
+	siviParentActionEditingEnabled  bool
+	siviProjectAssignmentEnabled    bool
+	tableCSVReviewEnabled           bool
+	plotLocationReviewEnabled       bool
+	siteUnitSummaryEnabled          bool
+	siteUnitSummaryLifeformsEnabled bool
+	siteUnitSummarySpeciesEnabled   bool
+	longVegetationNoneEnabled       bool
+	longVegetationLifeformEnabled   bool
+	longVegetationStrataEnabled     bool
+	longVegetationCodeEnabled       bool
 }
 
 func NewContextService(projects *ProjectService, plots *PlotService) (*ContextService, error) {

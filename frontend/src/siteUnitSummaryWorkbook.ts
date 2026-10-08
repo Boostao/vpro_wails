@@ -1,6 +1,6 @@
 import type { SiteUnitSummaryWorkbookReview, SiteUnitSummaryWorkbookOutcome } from '../bindings/github.com/boostao/vpro-wails';
 import type { GoogleEarthScope } from './googleEarthReview';
-import { validateSiteUnitSummary, type ValidatedSiteUnitSummary } from './siteUnitSummary';
+import { validateSiteUnitSummary, summaryLifeformCaptions, type SiteUnitSummaryMode, type ValidatedSiteUnitSummary } from './siteUnitSummary';
 import { completeCell } from './projectMetadataRestore';
 import { lifeformShape as shape } from './lifeformSummary';
 import { workbookWorksheetName, workbookFoldedName, workbookText, freezeWorkbookReview } from './lifeformWorkbook';
@@ -65,9 +65,9 @@ function reject(): never {
 }
 const hash = (value: unknown) => typeof value === 'string' && /^[0-9a-f]{64}$/.test(value);
 const ownerKey = (owner: GoogleEarthScope) => JSON.stringify([owner.contextId, owner.project, owner.projectPath, owner.su, owner.suPath]);
-function sourceSafe(value: unknown): void {
+export function validateSummaryWorkbookText(value: unknown): void {
   if (typeof value === 'string') { if (!workbookText(value)) reject(); }
-  else if (value && typeof value === 'object') for (const child of Object.values(value)) sourceSafe(child);
+  else if (value && typeof value === 'object') for (const child of Object.values(value)) validateSummaryWorkbookText(child);
 }
 function cellShape(value: unknown): boolean {
   return shape(value, ['storage', 'text', 'integer', 'real', 'blobHex']);
@@ -85,6 +85,11 @@ function ordered(keys: string[][]): boolean {
 
 export function validateSiteUnitSummaryWorkbookReview(value: SiteUnitSummaryWorkbookReview | null,
   owner: GoogleEarthScope, requestedMethod: number): ValidatedSiteUnitSummaryWorkbookReview {
+  return validateSiteUnitSummaryWorkbookEvidence(value, owner, requestedMethod, 'layer', false);
+}
+
+export function validateSiteUnitSummaryWorkbookEvidence(value: SiteUnitSummaryWorkbookReview | null,
+  owner: GoogleEarthScope, requestedMethod: number, mode: SiteUnitSummaryMode, extended: boolean): ValidatedSiteUnitSummaryWorkbookReview {
   value = value ? structuredClone(value) : null;
   if (![owner.contextId, owner.project, owner.projectPath, owner.su, owner.suPath].every(v => workbookText(v) && v !== '') ||
       owner.su === 'None' || owner.su === 'USysSuTableDynamic' ||
@@ -93,17 +98,25 @@ export function validateSiteUnitSummaryWorkbookReview(value: SiteUnitSummaryWork
       !Number.isSafeInteger(value.bytes) || value.bytes <= 0 ||
       !shape(value.scope, ['savedMethod', 'siteUnitType', 'orderBy', 'includeSpecies']) ||
       ![1, 2].includes(value.scope.savedMethod) || value.scope.siteUnitType !== 1 ||
-      ![1, 3].includes(value.scope.orderBy) || value.scope.includeSpecies !== 0 ||
+      !(extended ? [1, 2, 3] : [1, 3]).includes(value.scope.orderBy) ||
+      !(extended ? [0, 1] : [0]).includes(value.scope.includeSpecies) ||
       !shape(value.preview, ['contextId', 'projectPath', 'suPath', 'report']) ||
       !shape(value.preview.report, ['project', 'su', 'method', 'querySource', 'fields', 'memberships', 'units']) ||
       !Array.isArray(value.sheets)) reject();
-  sourceSafe(value);
+  validateSummaryWorkbookText(value);
   const preview = validateSiteUnitSummary(value.preview, owner.contextId, owner.project,
-    owner.projectPath, owner.su, owner.suPath, requestedMethod);
+    owner.projectPath, owner.su, owner.suPath, requestedMethod, mode);
   const report = preview.report;
+  const fields = mode === 'layer' ? siteUnitSummaryWorkbookFields : [
+    ...siteUnitSummaryWorkbookFields.slice(0, 23),
+    ...summaryLifeformCaptions.map((label, index) => ({
+      source: 'Lifeform', key: `Lifeform${index}`, label, kind: 'lifeform-cover', section: 'VEGETATION',
+    })),
+    ...siteUnitSummaryWorkbookFields.slice(27),
+  ];
   if (!report.units.length || !report.memberships.length || value.sheets.length !== report.units.length) reject();
   for (const [i, field] of report.fields.entries()) {
-    const expected = siteUnitSummaryWorkbookFields[i];
+    const expected = fields[i];
     if (!shape(field, ['source', 'key', 'label', 'section', 'kind']) ||
         Object.entries(expected).some(([key, item]) => field[key] !== item)) reject();
   }

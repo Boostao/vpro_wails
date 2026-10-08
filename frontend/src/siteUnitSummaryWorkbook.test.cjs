@@ -244,7 +244,7 @@ test('panel compiles with accessible scoped source tables, default-off gate, cur
   assert.match(text, /reads\.track\(SiteUnitSummaryWorkbookService\.GetReview/);
   assert.doesNotMatch(text, /reads\.track\(SiteUnitSummaryWorkbookService\.ExportReviewed/);
   assert.match(text, /disposed \|\| requestGeneration !== generation/);
-  assert.match(text, /session\.publish\(review, destination/);
+  assert.match(text, /originalSession\.publish\(review, destination/);
   assert.match(text, /session\.acknowledge\(\); review = null/);
   assert.match(text, /<caption>/); assert.match(text, /scope="row"/); assert.match(text, /scope="col"/);
   assert.match(text, /'SITE', 'VEGETATION', 'SOILS'/);
@@ -260,10 +260,13 @@ test('panel compiles with accessible scoped source tables, default-off gate, cur
 test('actual server-rendered panel exposes label, disabled gate and explicit remount unknown alert above controls', () => {
   const owned = { ...owner, contextId: 'unknown-remount' };
   const Panel = serverComponent(source().replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK", "'false'")
+    .replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK", "'false'")
     .replace('structuredClone(owner)', '({ ...owner })'),
     'SiteUnitSummaryWorkbookPanel.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { SiteUnitSummaryWorkbookService: {} },
       './siteUnitSummaryWorkbook': workbook,
+      './siteUnitSummaryExtendedWorkbook': {},
+      './longEnvironmentReport': {},
     });
   let held;
   const html = render(Panel, { props: { owner: owned, method: 1, disabled: false, onBusyChange: v => held = v } }).body;
@@ -282,10 +285,11 @@ function panelScript(owned) {
   let script = source().match(/<script lang="ts">([\s\S]*?)<\/script>/)[1]
     .replace(/\r/g, '')
     .replace(/^\s*import[\s\S]*?;\n/gm, '')
-    .replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK", "'true'");
+    .replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK", "'true'")
+    .replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK", "'false'");
   script = ts.transpileModule(script, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText;
   const getters = [];
-  script = script.replace(/const (\w+) = \$derived\((.*)\);/g, (_, name, expression) => {
+  script = script.replace(/const (\w+) = \$derived\(([\s\S]*?)\);/g, (_, name, expression) => {
     getters.push([name, expression]); return '';
   });
   for (const [name] of getters) script = script.replace(new RegExp(`\\b${name}\\b`, 'g'), `derived.${name}`);

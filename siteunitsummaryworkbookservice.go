@@ -118,6 +118,10 @@ func (s *SiteUnitSummaryWorkbookService) authorize(ctx context.Context, method i
 }
 
 func readSiteUnitSummaryWorkbookScope(ctx context.Context, config *desktopConfig) (SiteUnitSummaryWorkbookScope, error) {
+	return readSiteUnitSummaryPublicationScope(ctx, config, false)
+}
+
+func readSiteUnitSummaryPublicationScope(ctx context.Context, config *desktopConfig, extended bool) (SiteUnitSummaryWorkbookScope, error) {
 	if err := acquireMutexLease(ctx, &config.mu); err != nil {
 		return SiteUnitSummaryWorkbookScope{}, err
 	}
@@ -142,7 +146,7 @@ func readSiteUnitSummaryWorkbookScope(ctx context.Context, config *desktopConfig
 			return SiteUnitSummaryWorkbookScope{}, err
 		}
 	}
-	if scope.SiteUnitType != 1 || scope.OrderBy == 2 || scope.IncludeSpecies != 0 {
+	if scope.SiteUnitType != 1 || !extended && (scope.OrderBy == 2 || scope.IncludeSpecies != 0) {
 		return SiteUnitSummaryWorkbookScope{}, errors.New("Saved Summary Environment hierarchy/field-derived/lifeform/species scope is unavailable; no options were reset")
 	}
 	return scope, ctx.Err()

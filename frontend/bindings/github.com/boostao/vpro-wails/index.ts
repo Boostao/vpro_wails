@@ -23,6 +23,7 @@ import * as RegionCodeService from "./regioncodeservice.js";
 import * as SIVICoverService from "./sivicoverservice.js";
 import * as SIVIParentSharedService from "./siviparentsharedservice.js";
 import * as SiteCodeService from "./sitecodeservice.js";
+import * as SiteUnitSummaryExtendedWorkbookService from "./siteunitsummaryextendedworkbookservice.js";
 import * as SiteUnitSummaryPreferencesService from "./siteunitsummarypreferencesservice.js";
 import * as SiteUnitSummaryWorkbookService from "./siteunitsummaryworkbookservice.js";
 import * as SoilCodeService from "./soilcodeservice.js";
@@ -54,6 +55,7 @@ export {
     SIVICoverService,
     SIVIParentSharedService,
     SiteCodeService,
+    SiteUnitSummaryExtendedWorkbookService,
     SiteUnitSummaryPreferencesService,
     SiteUnitSummaryWorkbookService,
     SoilCodeService,
@@ -223,6 +225,13 @@ export type {
     SiteUnitEnvironmentResult,
     SiteUnitEnvironmentReview,
     SiteUnitEnvironmentTransfer,
+    SiteUnitSpeciesListGroup,
+    SiteUnitSpeciesListPreview,
+    SiteUnitSpeciesListRequest,
+    SiteUnitSpeciesListRow,
+    SiteUnitSpeciesListUnit,
+    SiteUnitSummaryExtendedWorkbookOptions,
+    SiteUnitSummaryExtendedWorkbookReview,
     SiteUnitSummaryField,
     SiteUnitSummaryMembership,
     SiteUnitSummaryOptions,

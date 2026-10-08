@@ -1384,6 +1384,66 @@ export interface SiteUnitEnvironmentTransfer {
     "confirmed": boolean;
 }
 
+export interface SiteUnitSpeciesListGroup {
+    "index": number;
+    "caption": string;
+    "rows": SiteUnitSpeciesListRow[] | null;
+}
+
+export interface SiteUnitSpeciesListPreview {
+    "environment": SiteUnitSummaryPreview;
+    "options": SiteUnitSpeciesListRequest;
+    "units": SiteUnitSpeciesListUnit[] | null;
+}
+
+export interface SiteUnitSpeciesListRequest {
+    "method": number;
+    "orderBy": number;
+    "coverCalculation": number;
+    "andOr": number;
+    "presenceGreaterThan": number;
+    "coverGreaterThan": number;
+}
+
+export interface SiteUnitSpeciesListRow {
+    "species": string;
+    "scientificName": ProjectMetadataCell;
+    "englishName": ProjectMetadataCell;
+    "codeType": ProjectMetadataCell | null;
+    "cover": string;
+    "presence": string;
+    "physicalValues": number;
+    "included": boolean;
+    "referenceRowIds": string[] | null;
+}
+
+export interface SiteUnitSpeciesListUnit {
+    "code": string;
+    "nPlots": number;
+    "groups": SiteUnitSpeciesListGroup[] | null;
+}
+
+export interface SiteUnitSummaryExtendedWorkbookOptions {
+    "method": number;
+    "orderBy": number;
+    "includeSpecies": number;
+    "coverCalculation": number;
+    "andOr": number;
+    "presenceGreaterThan": number;
+    "coverGreaterThan": number;
+}
+
+export interface SiteUnitSummaryExtendedWorkbookReview {
+    "environment": SiteUnitSummaryPreview;
+    "species": SiteUnitSpeciesListPreview | null;
+    "scope": SiteUnitSummaryWorkbookScope;
+    "options": SiteUnitSummaryExtendedWorkbookOptions;
+    "sheets": VegetationWorkbookSheet[] | null;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
 export interface SiteUnitSummaryField {
     "source": string;
     "key": string;

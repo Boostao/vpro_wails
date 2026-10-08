@@ -141,4 +141,4 @@ export function lifeformWorkbookPublicationSession(owner: LifeformSummaryOwner):
 }
 
 export { worksheetName as workbookWorksheetName, foldedName as workbookFoldedName, workbookText,
-  freeze as freezeWorkbookReview };
+  freeze as freezeWorkbookReview, same as sameWorkbookSource };
