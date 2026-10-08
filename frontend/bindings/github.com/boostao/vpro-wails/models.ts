@@ -915,6 +915,26 @@ export interface RegionCodeChoice {
     "diagnostic": string;
 }
 
+export interface SIVIHeightEdit {
+    "rowId": string;
+    "form": string;
+    "column": string;
+    "expected": ProjectMetadataCell;
+    "value": ProjectMetadataCell;
+}
+
+export interface SIVIHeightWriteResult {
+    "ChangedCells": number;
+    "HistoryID": string;
+}
+
+export interface SIVIVegetationProjection {
+    "Form": string;
+    "Query": string;
+    "Columns": string[] | null;
+    "Rows": ProjectMetadataRow[] | null;
+}
+
 export interface SUInfo {
     "name": string;
     "kind": string;

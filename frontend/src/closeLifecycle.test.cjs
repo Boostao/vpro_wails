@@ -26,6 +26,12 @@ test('busy takes precedence over an unsaved draft and dirty requires a decision'
   assert.equal(closeDisposition(state({ unsaved: true, busy: true }), false), 'busy');
   assert.equal(closeDisposition(state({ unsaved: true, canSave: false }), false), 'dirty');
 });
+test('explicit SIVI safety blocks stop native close and context discard without pretending Undo is busy', () => {
+  assert.equal(closeDisposition(state({ unsaved: true, blocked: true }), false), 'busy');
+  assert.equal(closeDisposition(state({ blocked: true, busy: false }), false), 'busy');
+  assert.equal(closeDisposition(state({ unsaved: true, blocked: false }), false), 'dirty');
+  assert.equal(closeDisposition(state({ blocked: false }), false), 'clean');
+});
 test('native close dialog compiles and exposes explicit accessible decisions', () => {
   const source = read('CloseConfirm.svelte');
   const result = compile(source, { filename: 'CloseConfirm.svelte', generate: 'client' });
@@ -39,7 +45,7 @@ test('native close dialog compiles and exposes explicit accessible decisions', (
 test('form refuses save-and-close on invalid, locked, loading or incomplete child entry', () => {
   const source = read('FS882Form.svelte');
   assert.match(source, /export function getCloseState\(\): EditorCloseState/);
-  assert.match(source, /childUnsaved = \$derived\(heightUnsaved \|\| otherUnsaved \|\| soilUnsaved \|\| attributeUnsaved \|\| collectedUnsaved \|\| speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
+  assert.match(source, /childUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved \|\| otherUnsaved \|\| soilUnsaved \|\| attributeUnsaved \|\| collectedUnsaved \|\| speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
   assert.match(source, /unsaved: dirty \|\| childUnsaved \|\| invalid \|\| newChild !== null \|\| invalidChild/);
   assert.match(source, /const invalid = Object\.keys\(headerValidation\)\.length > 0 \|\| heightInvalid\.length > 0 \|\| otherInvalid\.length > 0/);
   assert.match(source, /if \(!state\.canSave\)/);

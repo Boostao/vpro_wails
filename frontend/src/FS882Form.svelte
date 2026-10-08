@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     PlotService as LegacyPlotService,
+    ContextService,
     AuditRestoreAction,
     ReferenceService,
     type FS882Header,
@@ -25,6 +26,9 @@
   import OrdinaryFields from './OrdinaryFields.svelte';
   import DrainageFields from './DrainageFields.svelte';
   import SourceChild from './SourceChild.svelte';
+  import SIVIHeightPanel from './SIVIHeightPanel.svelte';
+  import { SIVIHeightSession } from './siviHeightSession';
+  import type { SIVIHeightColumn } from './siviHeightEditor';
   import NewChild from './NewChild.svelte';
   import PersonalSpeciesFields from './PersonalSpeciesFields.svelte';
   import SpeciesCodeCheck from './SpeciesCodeCheck.svelte';
@@ -56,6 +60,16 @@
     onProfileSUReview?: (proposal: ProjectPlotProfileFilterRequest, contextId: string) => Promise<void>;
   } = $props();
   const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
+  const siviContextId = untrack(() => contextId);
+  const siviHeightEnabled = import.meta.env.VITE_SIVI_HEIGHT_EDITING === 'true';
+  const siviReads = new ReadRequests();
+  let siviSession: SIVIHeightSession | null = null;
+  let siviRevision = $state(0);
+  let siviPanelOpen = $state(false);
+  const siviView = $derived.by(() => { siviRevision; return siviSession?.view() ?? null; });
+  const siviClose = $derived.by(() => { siviRevision; return siviSession?.closeState() ?? null; });
+  const siviUnsaved = $derived(siviClose?.unsaved ?? false);
+  const siviBusy = $derived(siviClose?.busy ?? false);
   const reads = new ReadRequests();
   const referenceReads = new ReadRequests();
   const speciesReads = new ReadRequests();
@@ -133,7 +147,7 @@
   let profileReviewBlocked = $state(false);
   let profileEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy || environmentSUOpen);
+  const headerWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy || environmentSUOpen || siviBusy);
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
   const numberEditingEnabled = heightEditingEnabled && import.meta.env.VITE_VEGETATION_NUMBER_EDITING !== 'false';
@@ -175,7 +189,7 @@
   const creationSpeciesInvalid = $derived(creationDraft ? vegetationCreationSpeciesError(creationDraft, speciesLists[creationDraft.form] ?? []) : null);
   const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
-  const childUnsaved = $derived(heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || environmentSUOpen);
+  const childUnsaved = $derived(heightUnsaved || siviUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || environmentSUOpen);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -187,6 +201,8 @@
   let childCapabilities = $state<Record<ChildKind, Record<string, boolean | undefined>>>({ Veg: {}, Humus: {}, Mineral: {}, Other: {} });
   let loadRequest = 0;
   onDestroy(() => {
+    siviSession?.dispose();
+    siviReads.cancelAll();
     loadRequest++; referenceRequest++; speciesRequest++;
     reads.cancelAll(); referenceReads.cancelAll(); speciesReads.cancelAll();
     speciesReferenceRequest++; speciesReferenceReads.cancelAll();
@@ -421,12 +437,13 @@
 
   let original = $state<FS882Header | null>(null);
   const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked);
-  const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
-  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
-  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
-  const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved || speciesUnsaved);
-  const collectedEditingDisabled = $derived(!collectedEditingEnabled || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || speciesUnsaved);
-  const speciesEditingDisabled = $derived(!speciesEditingEnabled || !speciesReferenceReady || speciesReferenceBusy || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
+  const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || siviUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || siviUnsaved || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || siviUnsaved || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || siviUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved || speciesUnsaved);
+  const collectedEditingDisabled = $derived(!collectedEditingEnabled || childParentDisabled || siviUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || speciesUnsaved);
+  const speciesEditingDisabled = $derived(!speciesEditingEnabled || !speciesReferenceReady || speciesReferenceBusy || childParentDisabled || siviUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
+  const siviEditingDisabled = $derived(!siviHeightEnabled || childParentDisabled || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || Object.keys(headerValidation).length > 0 || (siviView?.blocked ?? false));
   const childEditingDisabled = $derived(childParentDisabled || childUnsaved);
   const auditRestoreEnabled = import.meta.env.VITE_AUDIT_RESTORE !== 'false';
   const auditProject = $derived($projectState?.activeProject ?? '');
@@ -435,6 +452,52 @@
     : draft.locked ? 'Unlock the plot before restoring fields.'
     : dirty || Object.keys(headerValidation).length > 0 ? 'Save valid header changes or Undo before restoring fields.'
     : 'Save the plot before restoring fields.');
+
+  async function siviOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
+    if (!siviSession || !siviHeightEnabled || busy || headerWorkflowBusy || operation !== 'undo' && siviEditingDisabled) {
+      error = 'SIVI requires an available clean, unlocked parent and no conflicting operation or unresolved acknowledgement.';
+      return false;
+    }
+    error = null;
+    successMsg = null;
+    try {
+      const ok = operation === 'load' ? await siviSession.load()
+        : operation === 'save' ? await siviSession.save()
+        : operation === 'undo' ? await siviSession.undo()
+        : await siviSession.restore(operation === 'retain' ? AuditRestoreAction.AuditRestoreRetain : AuditRestoreAction.AuditRestorePrune);
+      if (!ok) {
+        error = siviSession.view().error;
+        return false;
+      }
+      successMsg = operation === 'save' ? 'SIVI aggregate heights saved; current rows and audits reloaded.'
+        : operation === 'retain' || operation === 'prune' ? 'SIVI typed height restoration completed; current rows and audits reloaded.'
+        : 'SIVI source rows reloaded. No height mutation was replayed.';
+      return true;
+    } catch (cause) {
+      error = `SIVI operation failed; owner state retained: ${String(cause)}`;
+      return false;
+    }
+  }
+
+  function stageSIVICell(rowId: string, column: SIVIHeightColumn, raw: string, nullValue: boolean) {
+    try {
+      if (!siviSession || siviEditingDisabled) throw new Error('Unlock the clean available parent before editing SIVI heights.');
+      siviSession.stage(rowId, column, raw, nullValue);
+      const message = siviSession.view().error;
+      if (message) error = `SIVI ${message}`;
+      else if (error?.startsWith('SIVI ')) error = null;
+      successMsg = null;
+    } catch (cause) {
+      error = `SIVI draft failed; original/raw state retained: ${String(cause)}`;
+    }
+  }
+
+  async function showSIVIPanel() {
+    if (siviPanelOpen) { siviPanelOpen = false; return; }
+    if (siviEditingDisabled && !siviUnsaved) { error = 'SIVI requires a clean, unlocked available parent.'; return; }
+    siviPanelOpen = true;
+    if (!siviView?.review && !siviUnsaved) await siviOperation('load');
+  }
 
   function openSpeciesCodeCheck() {
     if (!codeCheckEnabled || childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0) {
@@ -525,6 +588,15 @@
   }
 
   async function load(p?: string) {
+    if (siviSession && (siviSession.closeState().unsaved || siviSession.closeState().busy)) {
+      error = 'SIVI drafts or operations must finish or be explicitly undone before replacing their plot owner.';
+      return;
+    }
+    siviSession?.dispose();
+    siviSession = null;
+    siviReads.cancelAll();
+    siviRevision++;
+    siviPanelOpen = false;
     const request = ++loadRequest;
     reads.cancelAll();
     if (workingUnitSession.plot !== (p ?? '')) workingUnitSession.mode = null;
@@ -569,6 +641,16 @@
         original = JSON.parse(JSON.stringify(res));
         dirty = false;
         headerValidation = {};
+        if (siviHeightEnabled) {
+          const plot = res.plotNumber;
+          siviSession = new SIVIHeightSession(plot, {
+            read: extended => siviReads.track(ContextService.GetSIVIVegetation(siviContextId, plot, extended)),
+            save: (extended, review, edits) => ContextService.SaveSIVIHeights(siviContextId, plot, extended, review, edits),
+            restore: (historyId, action) => ContextService.RestoreSIVIHeights(siviContextId, plot, historyId, action),
+            refreshParent: () => loadChildData(plot),
+          }, () => siviRevision++, extendedShrubs);
+          siviRevision++;
+        }
       } else {
         draft = newDraft();
         original = null;
@@ -612,7 +694,8 @@
   }
 
   $effect(() => {
-    void load(plotNumber);
+    const plot = plotNumber;
+    untrack(() => void load(plot));
   });
 
   async function loadReferenceLists() {
@@ -1541,6 +1624,7 @@
     if (personalDraft !== null) { error = 'Save the personal definition explicitly or Cancel its entry; ordinary plot Save never writes the user database.'; return; }
     if (deletionReview !== null) { error = 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review; ordinary Save never deletes rows.'; return; }
     if (creationDraft !== null) { await saveVegetationCreation(); return; }
+    if (siviUnsaved) { await siviOperation('save'); return; }
     if (heightUnsaved) { await saveHeightDrafts(); return; }
     if (otherUnsaved) { await saveOtherDrafts(); return; }
     if (soilUnsaved) { await saveSoilDrafts(); return; }
@@ -1608,6 +1692,7 @@
     const invalidChild = Boolean(container?.querySelector('.source-child input:invalid'));
     const saveReason = busy || headerWorkflowBusy || !capabilitiesReady ? 'Wait for the plot to finish loading or header workflow.'
       : draft.locked ? 'Unlock the plot before saving.'
+      : siviUnsaved && !siviClose?.canSave ? siviClose?.saveReason ?? 'Correct or Undo unresolved SIVI heights.'
       : personalDraft !== null ? 'Save the personal definition explicitly or Cancel its entry before saving the plot or closing.'
       : deletionReview !== null ? 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review before saving and closing.'
       : creationInvalid.length > 0 ? 'Correct invalid vegetation creation or Cancel creation before saving.'
@@ -1622,7 +1707,8 @@
       : speciesUnsaved && (!speciesReferenceReady || speciesReferenceBusy) ? 'Restore available species references before saving drafts.'
       : invalid ? 'Correct invalid header inputs or Undo before saving.'
       : !draft.plotNumber.trim() ? 'Plot Number is required before saving.' : '';
-    return { unsaved: dirty || childUnsaved || invalid || newChild !== null || invalidChild, busy: busy || headerWorkflowBusy, canSave: saveReason === '', saveReason, error };
+    return { unsaved: dirty || childUnsaved || invalid || newChild !== null || invalidChild, busy: busy || headerWorkflowBusy,
+      blocked: siviClose?.blocked ?? false, canSave: saveReason === '', saveReason, error };
   }
 
   export async function saveForClose(): Promise<boolean> {
@@ -1647,6 +1733,7 @@
     if (personalDraft !== null) { cancelPersonalSpecies(); return; }
     if (deletionReview !== null) { void cancelVegetationDeletion(); return; }
     if (creationDraft !== null) { void cancelVegetationCreation(); return; }
+    if (siviUnsaved) { void siviOperation('undo'); return; }
     if (heightUnsaved) { void cancelHeightDrafts(); return; }
     if (otherUnsaved) { void cancelOtherDrafts(); return; }
     if (soilUnsaved) { void cancelSoilDrafts(); return; }
@@ -1687,6 +1774,10 @@
     }
     if (heightUnsaved) {
       error = 'Save or Cancel height drafts before changing the plot lock.';
+      return;
+    }
+    if (siviUnsaved) {
+      error = 'SIVI heights or unresolved acknowledgements must be saved or explicitly undone before changing the plot lock.';
       return;
     }
     if (otherUnsaved) {
@@ -2196,16 +2287,26 @@
         </ParentCodeFields>
       {/key}
     {:else if activeTab === 'veg'}
+      {#if siviHeightEnabled}
+        <button type="button" class="mb-3 rounded border px-3 py-1 disabled:opacity-50" data-sivi-open
+          disabled={busy || headerWorkflowBusy || !siviPanelOpen && siviEditingDisabled && !siviUnsaved}
+          onclick={() => void showSIVIPanel()}>{siviPanelOpen ? 'Return to FS882 vegetation' : 'Show SIVI aggregate heights (height-only)'}</button>
+      {/if}
       {#if extendedShrubsEnabled}
         <label class="mb-3 flex items-center gap-2">
           <input type="checkbox" data-extended-shrubs checked={extendedShrubs} disabled={busy || headerWorkflowBusy}
-            onchange={(event) => { extendedShrubs = event.currentTarget.checked; if (extendedShrubs) vegetationMode = 'cover'; }} />
+            onchange={(event) => { extendedShrubs = event.currentTarget.checked; siviSession?.presentation(extendedShrubs); if (extendedShrubs) vegetationMode = 'cover'; }} />
           Show extended shrub layers (CHARS)
         </label>
         {#if extendedShrubs}
           <p class="mb-3 text-sm" role="status">Extended shrubs use cover mode. Turn this option off to use height mode; hidden values, drafts and errors are retained.</p>
         {/if}
       {/if}
+      {#if siviPanelOpen && siviView}
+        <SIVIHeightPanel view={siviView} disabled={siviEditingDisabled} canSave={siviClose?.canSave ?? false}
+          onstage={stageSIVICell} onsave={() => void siviOperation('save')} onundo={() => void siviOperation('undo')}
+          onreload={() => void siviOperation('load')} onrestore={(action) => void siviOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+      {:else}
       {#if speciesEditingEnabled || creationEnabled}
         {#if speciesReferenceBusy}<p role="status">Loading source species lists...</p>{/if}
         {#if speciesReferenceError}<p role="alert">{speciesReferenceError}</p>{/if}
@@ -2240,6 +2341,7 @@
       </SourcePage>
       {/snippet}
       </OrdinaryFields>
+      {/if}
       {#if vegetationMode === 'height'}
         <p class="mt-2 text-xs text-stone-500">{numberEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain.' : 'Cover/height editing is read-only in this build.'} Switching view does not save or change data.</p>
       {/if}

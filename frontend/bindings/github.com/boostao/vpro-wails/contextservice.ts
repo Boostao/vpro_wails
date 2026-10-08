@@ -89,6 +89,10 @@ export function GetPlot(contextID: string, plot: string): $CancellablePromise<$m
     return $Call.ByID(2787654197, contextID, plot);
 }
 
+export function GetSIVIVegetation(contextID: string, plot: string, extended: boolean): $CancellablePromise<$models.SIVIVegetationProjection[] | null> {
+    return $Call.ByID(2362715051, contextID, plot, extended);
+}
+
 export function ListAuditEntries(contextID: string, plot: string): $CancellablePromise<$models.AuditEntry[] | null> {
     return $Call.ByID(2687960619, contextID, plot);
 }
@@ -167,6 +171,10 @@ export function ResolveProjectPlotProfileNavigation(contextID: string, request: 
 
 export function RestoreProjectMetadata(contextID: string, request: $models.ProjectMetadataRestore): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(685958956, contextID, request);
+}
+
+export function RestoreSIVIHeights(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(2974312123, contextID, plot, historyID, action);
 }
 
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
@@ -251,6 +259,10 @@ export function SaveProjectPlotProfileSU(contextID: string, request: $models.Pro
 
 export function SaveProjectPlotProfileSUInProject(contextID: string, request: $models.ProfileSUProjectCreation): $CancellablePromise<$models.ProfileSUCreated> {
     return $Call.ByID(2218873064, contextID, request);
+}
+
+export function SaveSIVIHeights(contextID: string, plot: string, extended: boolean, original: $models.SIVIVegetationProjection[] | null, edits: $models.SIVIHeightEdit[] | null): $CancellablePromise<$models.SIVIHeightWriteResult | null> {
+    return $Call.ByID(4150680302, contextID, plot, extended, original, edits);
 }
 
 export function SaveSpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {

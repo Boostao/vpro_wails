@@ -14,6 +14,10 @@ import (
 var assets embed.FS
 
 func main() {
+	siviHeightEnabled, err := siviHeightFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	dataDir, err := userDataDir()
 	if err != nil {
 		log.Fatal(err)
@@ -44,6 +48,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	contextService.siviHeightEnabled = siviHeightEnabled
 	coordinates, err := newCoordinateService(configDir, preferences)
 	if err != nil {
 		log.Fatal(err)
