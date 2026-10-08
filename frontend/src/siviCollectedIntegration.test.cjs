@@ -7,8 +7,8 @@ const { componentFunctions } = require('./svelteTestHelpers.cjs');
 
 const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
 const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
-const peers = ['siviSession', 'siviCoverSession', 'siviCombinedSession', 'siviCollectedSession'];
-const guards = ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCoverUnsaved', 'siviCombinedUnsaved',
+const peers = ['siviSession', 'siviCoverSession', 'siviCombinedSession', 'siviCollectedSession', 'siviSpeciesSession'];
+const guards = ['busy', 'headerWorkflowBusy', 'siviUnsaved', 'siviCoverUnsaved', 'siviCombinedUnsaved', 'siviSpeciesUnsaved',
   'heightUnsaved', 'otherUnsaved', 'soilUnsaved', 'attributeUnsaved', 'collectedUnsaved', 'speciesUnsaved',
   'siviParentWriteUnsaved', 'siviParentActionUnsaved', 'siviProjectAssignmentUnsaved', 'siviParentSharedUnsaved'];
 
@@ -20,6 +20,7 @@ function host(overrides = {}) {
     ...Object.fromEntries(peers.map(name => [name, null])),
     error: null, successMsg: null, siviCollectedEnabled: true, siviCollectedEditingDisabled: false,
     siviCollectedUnsaved: false, siviCollectedReading: false, siviCollectedPanelOpen: false,
+    siviSpeciesPanelOpen: false,
     siviCollectedView: { review: [{}] }, siviPanelOpen: true, siviCoverPanelOpen: true, siviCombinedPanelOpen: true,
     siviParentSharedSession: null, siviProjectAssignmentSession: null, siviParentActionSession: null,
     siviParentWriteSession: null, siviParentSourceView: null, siviParentSession: null,
@@ -106,8 +107,8 @@ test('root cycles expose errors and explicit recovery while panel remounts retai
   assert.equal(undos, 1);
 });
 
-test('all four actual source owners preflight every peer before any original or parent reset', async () => {
-  const ownerNames = ['height', 'cover', 'combined', 'collected'];
+test('all five actual source owners preflight every peer before any original or parent reset', async () => {
+  const ownerNames = ['height', 'cover', 'combined', 'collected', 'species'];
   for (const [index, owner] of ownerNames.entries()) {
     const calls = [];
     const contexts = Object.fromEntries(peers.map((name, peerIndex) => [name, {

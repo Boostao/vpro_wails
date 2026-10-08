@@ -41,6 +41,11 @@ type siviVegetationWritePolicy struct {
 	Plan                           func(context.Context, string, bool, ProjectMetadataTable, []siviHeightEdit) ([]siviHeightAssignment, error)
 }
 
+type siviVegetationWriteHooks struct {
+	prepare  func(context.Context, *sql.Conn, *sqliteContext) error
+	validate func(context.Context, *sql.Tx, *sqliteContext, []siviHeightAssignment) error
+}
+
 func siviHeightWritePolicy() siviVegetationWritePolicy {
 	return siviVegetationWritePolicy{"height", siviHeightHistoryTable, siviHeightHistorySQL,
 		[]string{"HeightA", "HeightB", "Height6"}, planSIVIHeightEdits}
@@ -51,6 +56,10 @@ func (s *ContextService) writeSIVIHeights(ctx context.Context, contextID, plot s
 }
 
 func (s *ContextService) writeSIVIVegetationCells(ctx context.Context, contextID, plot string, extended bool, original []siviVegetationProjection, edits []siviHeightEdit, policy siviVegetationWritePolicy) (*siviHeightWriteResult, error) {
+	return s.writeSIVIVegetationCellsWithHooks(ctx, contextID, plot, extended, original, edits, policy, siviVegetationWriteHooks{})
+}
+
+func (s *ContextService) writeSIVIVegetationCellsWithHooks(ctx context.Context, contextID, plot string, extended bool, original []siviVegetationProjection, edits []siviHeightEdit, policy siviVegetationWritePolicy, hooks siviVegetationWriteHooks) (*siviHeightWriteResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*siviHeightWriteResult, error) {
 		if err := plots.requireContextEdit(); err != nil {
 			return nil, err
@@ -64,6 +73,11 @@ func (s *ContextService) writeSIVIVegetationCells(ctx context.Context, contextID
 		err := owner.withMetadataWriter(ctx, func(conn *sql.Conn) (resultErr error) {
 			if err := siviHeightContextParent(ctx, owner, plot); err != nil {
 				return err
+			}
+			if hooks.prepare != nil {
+				if err := hooks.prepare(ctx, conn, owner); err != nil {
+					return err
+				}
 			}
 			tx, err := conn.BeginTx(ctx, nil)
 			if err != nil {
@@ -96,6 +110,11 @@ func (s *ContextService) writeSIVIVegetationCells(ctx context.Context, contextID
 			}
 			if len(assignments) == 0 {
 				return ctx.Err()
+			}
+			if hooks.validate != nil {
+				if err := hooks.validate(ctx, tx, owner, assignments); err != nil {
+					return err
+				}
 			}
 			planned, changes, records, err := applySIVIHeightAssignments(ctx, tx, project, plot, veg, assignments, plots.currentUser, plots.auditStrength)
 			if err != nil {

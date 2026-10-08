@@ -50,6 +50,79 @@ func siviWriteFixture(t *testing.T, external bool, strength int) (*ContextServic
 	}
 }
 
+func TestSIVIWriteHooksRejectBeforeMutationAndRetry(t *testing.T) {
+	service, state, _, original, edits := siviWriteFixture(t, false, 3)
+	before := databaseBytes(t, service.projects.sqlite.attachments)
+	rejected := errors.New("reviewed reference definitions changed")
+	for _, stage := range []string{"prepare", "validate"} {
+		t.Run(stage, func(t *testing.T) {
+			var prepared, validated bool
+			hooks := siviVegetationWriteHooks{
+				prepare: func(ctx context.Context, conn *sql.Conn, owner *sqliteContext) error {
+					prepared = true
+					if owner != service.projects.sqlite || conn == nil || ctx.Err() != nil {
+						t.Fatal("hook lost its leased owner or writer")
+					}
+					if stage == "prepare" {
+						return rejected
+					}
+					return nil
+				},
+				validate: func(ctx context.Context, tx *sql.Tx, owner *sqliteContext, planned []siviHeightAssignment) error {
+					validated = true
+					if owner != service.projects.sqlite || len(planned) != 3 {
+						t.Fatal("validation lost its complete source plan")
+					}
+					var audits int
+					if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM Sample_Audit WHERE ID=10000001`).Scan(&audits); err != nil || audits != 0 {
+						t.Fatal("reference validation ran after audits", audits, err)
+					}
+					if _, err := tx.ExecContext(ctx, `UPDATE Sample_Veg SET HeightA=99 WHERE ID=10000001`); err != nil {
+						t.Fatal(err)
+					}
+					return rejected
+				},
+			}
+			result, err := service.writeSIVIVegetationCellsWithHooks(context.Background(), state.ContextID, "108050",
+				false, original, edits, siviHeightWritePolicy(), hooks)
+			if result != nil || !errors.Is(err, rejected) || !prepared || validated != (stage == "validate") {
+				t.Fatal("hook rejection escaped its boundary", result, err, prepared, validated)
+			}
+			assertProfileSUFiles(t, service, before)
+		})
+	}
+	var validated bool
+	result, err := service.writeSIVIVegetationCellsWithHooks(context.Background(), state.ContextID, "108050",
+		false, original, edits, siviHeightWritePolicy(), siviVegetationWriteHooks{
+			validate: func(context.Context, *sql.Tx, *sqliteContext, []siviHeightAssignment) error {
+				validated = true
+				return nil
+			},
+		})
+	if err != nil || result == nil || result.ChangedCells != 3 || !validated {
+		t.Fatal("verified reference retry failed", result, err, validated)
+	}
+}
+
+func TestSIVIWriteHooksNoopOmitsReferenceValidationAndHistory(t *testing.T) {
+	service, state, _, original, edits := siviWriteFixture(t, false, 3)
+	before := databaseBytes(t, service.projects.sqlite.attachments)
+	for index := range edits {
+		edits[index].Value = cloneSiteUnitCell(edits[index].Expected)
+	}
+	result, err := service.writeSIVIVegetationCellsWithHooks(context.Background(), state.ContextID, "108050",
+		false, original, edits, siviHeightWritePolicy(), siviVegetationWriteHooks{
+			validate: func(context.Context, *sql.Tx, *sqliteContext, []siviHeightAssignment) error {
+				t.Fatal("unchanged assignments inherited phantom reference work")
+				return nil
+			},
+		})
+	if err != nil || result == nil || result.ChangedCells != 0 || result.HistoryID != "" {
+		t.Fatal("noop created a result-shaped mutation", result, err)
+	}
+	assertProfileSUFiles(t, service, before)
+}
+
 func TestSIVIOwnedHeightWritesAuditStrengthsAndTypedRestoration(t *testing.T) {
 	for strength := 0; strength <= 3; strength++ {
 		t.Run(strconv.Itoa(strength), func(t *testing.T) {

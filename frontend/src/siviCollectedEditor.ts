@@ -2,7 +2,7 @@ import type { ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wa
 import { collectedNext } from './collectedEditor';
 import { completeCell, exactSigned64 } from './projectMetadataRestore';
 import { equalCell } from './projectMetadataEditor';
-import { validateSIVIProjection, type SIVIProjection, type SIVIRow } from './siviHeightEditor';
+import { siviChildPhysicalRows, type SIVIProjection, type SIVIRow } from './siviHeightEditor';
 
 export interface SIVICollectedCell {
   expected: ProjectMetadataCell;
@@ -18,17 +18,7 @@ export interface SIVICollectedClick {
 }
 
 export function siviCollectedRows(review: readonly SIVIProjection[]): { group: SIVIProjection; row: SIVIRow }[] {
-  if (!Array.isArray(review)) throw new Error('SIVI Collected source groups are unavailable.');
-  const first = review.flatMap(group => Array.isArray(group?.Rows) ? group.Rows : [])[0];
-  const plot = first?.cells?.[1]?.text;
-  if (typeof plot !== 'string') throw new Error('SIVI Collected source plot is unavailable.');
-  const snapshot = validateSIVIProjection([...review], plot, review[0]?.Form === 'SubVegA-SIVI');
-  const seen = new Set<string>();
-  return snapshot.flatMap(group => group.Rows.flatMap(row => {
-    if (seen.has(row.rowId)) return [];
-    seen.add(row.rowId);
-    return [{ group, row }];
-  }));
+  return siviChildPhysicalRows(review, 'SIVI Collected').map(({ row, contexts }) => ({ group: contexts[0].group, row }));
 }
 
 function original(review: readonly SIVIProjection[], rowId: string) {

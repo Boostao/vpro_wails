@@ -24,6 +24,7 @@ import * as SIVICollectedService from "./sivicollectedservice.js";
 import * as SIVICombinedService from "./sivicombinedservice.js";
 import * as SIVICoverService from "./sivicoverservice.js";
 import * as SIVIParentSharedService from "./siviparentsharedservice.js";
+import * as SIVISpeciesService from "./sivispeciesservice.js";
 import * as SiteCodeService from "./sitecodeservice.js";
 import * as SiteUnitSummaryExtendedWorkbookService from "./siteunitsummaryextendedworkbookservice.js";
 import * as SiteUnitSummaryPreferencesService from "./siteunitsummarypreferencesservice.js";
@@ -61,6 +62,7 @@ export {
     SIVICombinedService,
     SIVICoverService,
     SIVIParentSharedService,
+    SIVISpeciesService,
     SiteCodeService,
     SiteUnitSummaryExtendedWorkbookService,
     SiteUnitSummaryPreferencesService,
@@ -226,6 +228,7 @@ export type {
     SIVIProjectAssignmentWrite,
     SIVIProjectChoices,
     SIVIProjectSelection,
+    SIVISpeciesReferences,
     SIVIVegetationProjection,
     SUInfo,
     ScopedPlotLookup,

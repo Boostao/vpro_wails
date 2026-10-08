@@ -82,6 +82,25 @@ export function siviHeightPresentation(review: SIVIProjection[], plot: string, e
   return result;
 }
 
+export function siviChildPhysicalRows(review: readonly SIVIProjection[], label: string): {
+  row: SIVIRow; contexts: { group: SIVIProjection; index: number }[];
+}[] {
+  if (!Array.isArray(review)) throw new Error(`${label} source groups are unavailable.`);
+  const first = review.flatMap(group => Array.isArray(group?.Rows) ? group.Rows : [])[0];
+  const plot = first?.cells?.[1]?.text;
+  if (typeof plot !== 'string') throw new Error(`${label} source plot is unavailable.`);
+  const snapshot = validateSIVIProjection([...review], plot, review[0]?.Form === 'SubVegA-SIVI');
+  const rows = new Map<string, { row: SIVIRow; contexts: { group: SIVIProjection; index: number }[] }>();
+  snapshot.forEach((group, index) => {
+    for (const row of group.Rows) {
+      const physical = rows.get(row.rowId);
+      if (physical) physical.contexts.push({ group, index });
+      else rows.set(row.rowId, { row, contexts: [{ group, index }] });
+    }
+  });
+  return [...rows.values()];
+}
+
 export function stageSIVIHeight(review: SIVIProjection[], drafts: SIVIHeightDrafts, rowId: string,
   column: SIVIHeightColumn, raw: string, nullValue: boolean): SIVIHeightDrafts {
   const group = review[column === 'Height6' ? 1 : 0];

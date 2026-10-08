@@ -1309,6 +1309,14 @@ export interface SIVIProjectSelection {
     "metadataOriginal": ProjectMetadataRow;
 }
 
+export interface SIVISpeciesReferences {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "master": ProjectMetadataTable;
+    "personal": ProjectMetadataTable;
+}
+
 export interface SIVIVegetationProjection {
     "Form": string;
     "Query": string;
