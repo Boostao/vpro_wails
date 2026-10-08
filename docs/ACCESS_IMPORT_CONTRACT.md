@@ -174,7 +174,28 @@ description/type10/flags1/positions, unknown semantic states, compatibility and
 detached bytes, alongside932 exact native-to-SQLite cells and123456633ns date
 preservation. MDB/ACCDB/source-copy hashes remain unchanged. Actual linked-table
 and unavailable-metadata fixtures, DAO NULL semantics and Linux are unverified.
-Exact archival acceptance is next; no production importer/dependency is added.
+The [78-file exact description successor](../archives/access-reader-description-checkpoint/evidence-manifest.json)
+verifies its19-file application predecessor,76 timestamp evidence files and44
+reader baseline files, with370 application Go hashes unchanged. No production
+importer/dependency is added.
+
+The additive `DB.NativeColumns(table)` candidate reuses the existing native
+table-definition parser through an opt-in observation path. It preserves
+native source-column-number order, decoded names including duplicates, native
+type codes/MDBTools Access-backend labels and raw size/flag bytes before BOOL
+normalization. These are observations, not DDL or constraints: size units,
+required/nullability/defaults/identity and decimal precision/scale remain
+unavailable. Native backend labels differ from legacy Scan affinity labels.
+Unsupported/incomplete/malformed observations fail without partial success;
+links are not followed. The bounded supported count is1..256 columns.
+Fresh clone full16.623s/race34.040s/vet and primary exact three-column source-byte
+consumer1.503s pass, alongside932 cells,9 descriptions and exact fractional
+timestamps. All three fixtures remain unchanged. Independent review found no
+significant issues, verified46 baseline/38 unchanged reader files and10 candidate
+hashes, and ran focused native tests1.636s without skips. The bounded observation
+boundary is validated; exact successor sealing next. Arbitrary corrupted
+formats and Linux remain unverified. No
+production dependency/importer is enabled.
 
 A separate Windows reader timestamp candidate has reproduced upstream
 fractional-second loss and negative-date failure using disposable MDB/ACCDB
