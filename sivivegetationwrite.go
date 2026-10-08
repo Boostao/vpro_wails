@@ -35,7 +35,22 @@ type siviHeightHistory struct {
 	Changes       []siviHeightHistoryChange
 }
 
+type siviVegetationWritePolicy struct {
+	Kind, HistoryTable, HistorySQL string
+	Columns                        []string
+	Plan                           func(context.Context, string, bool, ProjectMetadataTable, []siviHeightEdit) ([]siviHeightAssignment, error)
+}
+
+func siviHeightWritePolicy() siviVegetationWritePolicy {
+	return siviVegetationWritePolicy{"height", siviHeightHistoryTable, siviHeightHistorySQL,
+		[]string{"HeightA", "HeightB", "Height6"}, planSIVIHeightEdits}
+}
+
 func (s *ContextService) writeSIVIHeights(ctx context.Context, contextID, plot string, extended bool, original []siviVegetationProjection, edits []siviHeightEdit) (*siviHeightWriteResult, error) {
+	return s.writeSIVIVegetationCells(ctx, contextID, plot, extended, original, edits, siviHeightWritePolicy())
+}
+
+func (s *ContextService) writeSIVIVegetationCells(ctx context.Context, contextID, plot string, extended bool, original []siviVegetationProjection, edits []siviHeightEdit, policy siviVegetationWritePolicy) (*siviHeightWriteResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*siviHeightWriteResult, error) {
 		if err := plots.requireContextEdit(); err != nil {
 			return nil, err
@@ -75,7 +90,7 @@ func (s *ContextService) writeSIVIHeights(ctx context.Context, contextID, plot s
 			if !reflect.DeepEqual(original, observed) {
 				return errors.New("SIVI original source rows changed; cancel and reload")
 			}
-			assignments, err := planSIVIHeightEdits(ctx, plot, extended, veg, edits)
+			assignments, err := policy.Plan(ctx, plot, extended, veg, edits)
 			if err != nil {
 				return err
 			}
@@ -113,11 +128,11 @@ func (s *ContextService) writeSIVIHeights(ctx context.Context, contextID, plot s
 				if err != nil {
 					return err
 				}
-				if err := appendTechnicalProvenance(ctx, tx, siviHeightHistoryTable, siviHeightHistorySQL, string(proposal), "SIVI height"); err != nil {
+				if err := appendTechnicalProvenance(ctx, tx, policy.HistoryTable, policy.HistorySQL, string(proposal), "SIVI "+policy.Kind); err != nil {
 					return err
 				}
 				var id int64
-				if err := tx.QueryRowContext(ctx, `SELECT MAX(ID) FROM "__VPRO_SIVIHeightHistory"`).Scan(&id); err != nil {
+				if err := tx.QueryRowContext(ctx, `SELECT MAX(ID) FROM `+quoteHeaderIdentifier(policy.HistoryTable)).Scan(&id); err != nil {
 					return err
 				}
 				result.HistoryID = strconv.FormatInt(id, 10)
@@ -125,7 +140,7 @@ func (s *ContextService) writeSIVIHeights(ctx context.Context, contextID, plot s
 				if err != nil {
 					return err
 				}
-				if err := verifySiteUnitTransferTables(before, after, expected, siviHeightHistoryTable); err != nil {
+				if err := verifySiteUnitTransferTables(before, after, expected, policy.HistoryTable); err != nil {
 					return fmt.Errorf("SIVI provenance transaction differs from its plan: %w", err)
 				}
 			}
@@ -147,7 +162,7 @@ func (s *ContextService) writeSIVIHeights(ctx context.Context, contextID, plot s
 		})
 		if err != nil {
 			if committed {
-				return nil, fmt.Errorf("SIVI height edit committed but cleanup failed; reload before retrying: %w", err)
+				return nil, fmt.Errorf("SIVI %s edit committed but cleanup failed; reload before retrying: %w", policy.Kind, err)
 			}
 			return nil, errors.Join(err, ctx.Err())
 		}

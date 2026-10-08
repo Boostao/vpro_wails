@@ -30,6 +30,96 @@ storage is not source-equivalent join/callback/write authorization.
 
 ## Storage and ownership
 
+### Private child-cover planning
+
+The normal parent caption is FS1333; the exported object is `frmSIVIsite`,
+not a separate FS1333-named form. Its A/C/D children link both master and child
+through PlotNumber. The private [cover planner](../sivivegetationcover.go) reuses
+the accepted height planner's physical source projection, expected-cell
+comparison, cancellation, no-op omission and cloning boundary. It does not
+widen the height service or enable a public cover workflow/full-form entrypoint.
+
+Original `SubVegA-SIVI_BC` binds Cover1/2/3, TotalA, Cover4/5 and TotalB.
+`SubVegA-SIVI` additionally binds Cover5a/b/c; C binds Cover6 and D binds
+Cover7/8/9. All are nullable SINGLE columns in Sample_Veg. New assignments
+require finite REAL within SINGLE bounds and the exact exported control rule
+`<100 Or Is Null`, including totals and extended covers. There is no invented
+lower bound, automatic totals or precision rounding; the lossless numeric
+input does not copy D's two-character `CC` input mask. Unchanged validly transported historical
+storage is omitted rather than repaired.
+
+Membership remains the original USysVegA/C/D non-NULL cover predicate:
+zero/negative cover qualifies, a height-only row does not, and an extended-only
+A row remains visible in the normal A query even though its extended controls
+are not editable there. A plan may clear the last qualifying cover to NULL;
+future owned persistence/restoration must handle the resulting disappearance
+without inventing another cover. Species, Collected, identity, creation/deletion,
+metadata callbacks and public/native acceptance remain outside this preparation.
+
+Private owned cover storage now uses the proven height transaction engine with
+a separate `__VPRO_SIVICoverHistory` schema and cover-only restoration whitelist.
+The existing height writer and history retain their original authorization.
+Both paths independently reread the complete reviewed source projection and
+physical family, validate ownership/parent/application-ID uniqueness, commit
+mutations and selected-strength audits together, and reject unexpected trigger
+changes. Restoration uses recorded whole physical rows, not current query
+visibility, so clearing the last qualifying cover does not prevent restoration.
+Typed original values and accepted `_Veg`/project-qualified audit aliases remain
+authoritative; stale/tampered events do not authorize restoration or pruning.
+
+Focused coupled race passes37.746s, including strengths0..3, disappeared rows,
+normal/extended control isolation, retained/pruned audits, both restoration
+whitelists, no-op historical125, stale originals, duplicate IDs, trigger rollback,
+ownership refusal, blocked cancellation and retry. This is private storage
+validation, not a generated service, enabled desktop editor or native acceptance.
+Independent storage review finds no significant issues and independently
+reproduces focused race38.091s. Production compilation and all-package race
+(fresh root1524.497s) pass against684 unchanged frozen source identities.
+The [private checkpoint](../archives/sivi-cover-private-checkpoint/evidence-manifest.json)
+preserves this bounded result and the accepted Long Vegetation workbook
+predecessor; it does not authorize a public cover workflow.
+
+### Gated child-cover desktop successor
+
+The successor [cover facade](../sivicoverservice.go) and
+[persistent session](../frontend/src/siviCoverSession.ts) are implemented behind
+independent default-off `VPRO_SIVI_COVER_EDITING` /
+`VITE_SIVI_COVER_EDITING` flags. Backend flags accept only literal true/false;
+malformed flags stop startup before normal data initialization. Strict raw Save
+decoding rejects duplicate/missing/unknown members and malformed Unicode before
+decoder repair. The height facade retains its separate authorization/history.
+
+The [cover panel](../frontend/src/SIVICoverPanel.svelte) preserves exact source
+groups and labels with responsive grids, one live control per field, persistent
+invalid/hidden drafts, explicit Save/Undo and typed retain/prune restoration.
+Host Save/Lock/close/context and peer-editor guards use the persistent owner.
+Only source loading is cancellable; Save/restoration and postcommit refresh are
+not advertised as cancellable. Unknown acknowledgements or failed committed
+cleanup block replay until explicit recovery. Already-loaded clean height/cover
+peers refresh their originals without replacing session/history identity.
+
+Facade focused race38.990s,604 frontend tests, check0 errors/warnings, isolated
+enabled/default production Wails builds and independent desktop review pass.
+Four normally closed Wails owners verify actual32 normal/41 extended controls,
+visible labels at1400/600px, strict100 and hidden-draft/remount guards,
+Lock/native-close barriers, held six-cell audited Save and exact typed prune,
+last-cover disappearance/restoration, zero membership, clean height-peer refresh,
+held source read cancellation/retry, incomplete committed receipt/explicit
+no-replay recovery and independent frontend/backend denial. All sixteen original
+fixture identities restore after preserving closed data/history bytes; no
+canonical data changes. Independent desktop/native evidence review closes with
+no substantive gaps, verifies all four owners absent and matches16 fixture /
+22 protected identities. Response-held native cancellation is not an in-flight
+SQL cancellation claim. Fresh desktop all-package race passes root1376.407s
+against692 unchanged frozen application identities; both native-tested binaries
+embed their exact17 isolated assets. The
+[desktop successor](../archives/sivi-cover-desktop-checkpoint/evidence-manifest.json)
+preserves this bounded result separately from the private predecessor.
+The private checkpoint's earlier full-race result is not proof of this later
+public surface. Automatic
+metadata callbacks, identity/species/Collected/CRUD, automatic totals and full
+FS1333 event timing remain outside this bounded cover editor.
+
 The original `USysEnv` query selects Env and Admin through an **inner join** of
 Env.PlotNumber to Admin.Plot, using Access DISTINCTROW. This is not permission to
 silently change orphan membership, collapse physical duplicates, create missing

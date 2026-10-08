@@ -1125,6 +1125,11 @@ export interface RegionCodeChoice {
     "diagnostic": string;
 }
 
+export interface SIVICoverWriteResult {
+    "ChangedCells": number;
+    "HistoryID": string;
+}
+
 export interface SIVIHeightEdit {
     "rowId": string;
     "form": string;

@@ -13,6 +13,10 @@ import (
 )
 
 func (s *ContextService) restoreSIVIHeights(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction) (*AuditRestoreResult, error) {
+	return s.restoreSIVIVegetationCells(ctx, contextID, plot, historyID, action, siviHeightWritePolicy())
+}
+
+func (s *ContextService) restoreSIVIVegetationCells(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction, policy siviVegetationWritePolicy) (*AuditRestoreResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*AuditRestoreResult, error) {
 		if action != AuditRestoreCancel && action != AuditRestoreRetain && action != AuditRestorePrune {
 			return nil, errors.New("SIVI restoration requires cancel, retain or prune")
@@ -40,17 +44,17 @@ func (s *ContextService) restoreSIVIHeights(ctx context.Context, contextID, plot
 					resultErr = errors.Join(resultErr, err)
 				}
 			}()
-			if err := verifyTechnicalProvenance(ctx, tx, siviHeightHistoryTable, siviHeightHistorySQL, "SIVI height"); err != nil {
+			if err := verifyTechnicalProvenance(ctx, tx, policy.HistoryTable, policy.HistorySQL, "SIVI "+policy.Kind); err != nil {
 				return err
 			}
 			var proposal string
 			var restored *string
-			if err := tx.QueryRowContext(ctx, `SELECT Proposal,Restored FROM "__VPRO_SIVIHeightHistory" WHERE ID=?`, ids[0]).
+			if err := tx.QueryRowContext(ctx, `SELECT Proposal,Restored FROM `+quoteHeaderIdentifier(policy.HistoryTable)+` WHERE ID=?`, ids[0]).
 				Scan(&proposal, &restored); err != nil {
 				return err
 			}
 			if restored != nil {
-				return errors.New("SIVI height history was already restored; do not replay")
+				return fmt.Errorf("SIVI %s history was already restored; do not replay", policy.Kind)
 			}
 			if err := validateMetadataDraftJSON([]byte(proposal)); err != nil {
 				return err
@@ -76,7 +80,7 @@ func (s *ContextService) restoreSIVIHeights(ctx context.Context, contextID, plot
 			if !reflect.DeepEqual(event.Columns, veg.Columns) {
 				return errors.New("SIVI vegetation schema changed; restoration is unavailable")
 			}
-			columns, err := siteUnitTransferColumns(veg, "ID", "Species", "PlotNumber", "HeightA", "HeightB", "Height6")
+			columns, err := siteUnitTransferColumns(veg, append([]string{"ID", "Species", "PlotNumber"}, policy.Columns...)...)
 			if err != nil {
 				return err
 			}
@@ -100,13 +104,17 @@ func (s *ContextService) restoreSIVIHeights(ctx context.Context, contextID, plot
 			}
 			audit.Rows = append([]ProjectMetadataRow{}, audit.Rows...)
 			seen, seenAudits := map[[2]string]bool{}, map[string]bool{}
+			allowed := map[string]bool{}
+			for _, column := range policy.Columns {
+				allowed[column] = true
+			}
 			for _, change := range event.Changes {
 				if err := ctx.Err(); err != nil {
 					return err
 				}
 				key := [2]string{change.RowID, change.Column}
 				if !owned[change.RowID] || seen[key] || seenAudits[change.Audit.RowID] ||
-					(change.Column != "HeightA" && change.Column != "HeightB" && change.Column != "Height6") {
+					!allowed[change.Column] {
 					return errors.New("typed SIVI restoration has unavailable or repeated cells/audits")
 				}
 				seen[key], seenAudits[change.Audit.RowID] = true, true
@@ -199,14 +207,14 @@ func (s *ContextService) restoreSIVIHeights(ctx context.Context, contextID, plot
 				result.RestoredRows++
 			}
 			when := time.Now().UTC().Format(time.RFC3339Nano)
-			updated, err := tx.ExecContext(ctx, `UPDATE "__VPRO_SIVIHeightHistory" SET Restored=? WHERE ID=? AND Restored IS NULL`, when, ids[0])
+			updated, err := tx.ExecContext(ctx, `UPDATE `+quoteHeaderIdentifier(policy.HistoryTable)+` SET Restored=? WHERE ID=? AND Restored IS NULL`, when, ids[0])
 			if err != nil {
 				return err
 			}
 			if count, err := updated.RowsAffected(); err != nil || count != 1 {
 				return errors.Join(err, errors.New("SIVI history restoration did not mark exactly one event"))
 			}
-			history := before[siviHeightHistoryTable]
+			history := before[policy.HistoryTable]
 			historyColumns, err := siteUnitTransferColumns(history, "ID", "Restored")
 			if err != nil {
 				return err
@@ -223,7 +231,7 @@ func (s *ContextService) restoreSIVIHeights(ctx context.Context, contextID, plot
 				return err
 			}
 			if err := verifySiteUnitTransferTables(before, after, map[string]ProjectMetadataTable{
-				project + "_Veg": planned, project + "_Audit": audit, siviHeightHistoryTable: history,
+				project + "_Veg": planned, project + "_Audit": audit, policy.HistoryTable: history,
 			}, ""); err != nil {
 				return fmt.Errorf("SIVI restoration differs from its complete plan: %w", err)
 			}

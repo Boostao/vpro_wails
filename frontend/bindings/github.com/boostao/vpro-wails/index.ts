@@ -19,6 +19,7 @@ import * as ProjectService from "./projectservice.js";
 import * as QualityService from "./qualityservice.js";
 import * as ReferenceService from "./referenceservice.js";
 import * as RegionCodeService from "./regioncodeservice.js";
+import * as SIVICoverService from "./sivicoverservice.js";
 import * as SIVIParentSharedService from "./siviparentsharedservice.js";
 import * as SiteCodeService from "./sitecodeservice.js";
 import * as SiteUnitSummaryPreferencesService from "./siteunitsummarypreferencesservice.js";
@@ -47,6 +48,7 @@ export {
     QualityService,
     ReferenceService,
     RegionCodeService,
+    SIVICoverService,
     SIVIParentSharedService,
     SiteCodeService,
     SiteUnitSummaryPreferencesService,
@@ -185,6 +187,7 @@ export type {
     ProjectState,
     ProjectTableCSVReview,
     RegionCodeChoice,
+    SIVICoverWriteResult,
     SIVIHeightEdit,
     SIVIHeightWriteResult,
     SIVIParentActionInput,

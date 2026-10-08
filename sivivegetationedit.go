@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"reflect"
 )
@@ -35,12 +34,38 @@ type siviHeightAssignment struct {
 
 // Planning does not authorize a write or enable the unfinished SIVI editor.
 func planSIVIHeightEdits(ctx context.Context, plot string, extended bool, veg ProjectMetadataTable, edits []siviHeightEdit) ([]siviHeightAssignment, error) {
+	return planSIVIChildEdits(ctx, plot, extended, veg, edits, "height",
+		func(group int, column string) bool {
+			return (group == 0 && (column == "HeightA" || column == "HeightB")) ||
+				(group == 1 && column == "Height6")
+		}, validateSIVIHeightCell)
+}
+
+func validateSIVIHeightCell(column string, cell ProjectMetadataCell) error {
+	if column == "HeightB" {
+		value, err := metadataCellValue(cell)
+		if err != nil {
+			return err
+		}
+		return validateChildPhysicalText("Veg.HeightB", value, 255)
+	}
+	return validateSIVIChildSingle(column, cell)
+}
+
+func validateSIVIChildSingle(column string, cell ProjectMetadataCell) error {
+	if cell.Storage != "null" && cell.Storage != "real" {
+		return fmt.Errorf("Veg.%s requires nullable numeric real storage", column)
+	}
+	return validateSingleRangeChange("Veg."+column, nil, cell.Real)
+}
+
+func planSIVIChildEdits(ctx context.Context, plot string, extended bool, veg ProjectMetadataTable, edits []siviHeightEdit, kind string, allowed func(int, string) bool, validate func(string, ProjectMetadataCell) error) ([]siviHeightAssignment, error) {
 	groups, err := projectSIVIVegetation(ctx, plot, extended, veg)
 	if err != nil {
 		return nil, err
 	}
 	if len(edits) == 0 {
-		return nil, errors.New("SIVI height planning requires explicit edits")
+		return nil, fmt.Errorf("SIVI %s planning requires explicit edits", kind)
 	}
 	visible := map[string]map[string]ProjectMetadataRow{}
 	for _, group := range groups {
@@ -58,16 +83,18 @@ func planSIVIHeightEdits(ctx context.Context, plot string, extended bool, veg Pr
 		}
 		key := [2]string{edit.RowID, edit.Column}
 		row, present := visible[edit.Form][edit.RowID]
-		allowed := (edit.Form == groups[0].Form && (edit.Column == "HeightA" || edit.Column == "HeightB")) ||
-			(edit.Form == groups[1].Form && edit.Column == "Height6")
-		if !present || !allowed || seen[key] {
-			return nil, fmt.Errorf("SIVI height edit %s.%s is repeated or unavailable in source form %q", edit.RowID, edit.Column, edit.Form)
+		groupIndex := -1
+		for i, group := range groups {
+			if group.Form == edit.Form {
+				groupIndex = i
+				break
+			}
+		}
+		if !present || groupIndex < 0 || !allowed(groupIndex, edit.Column) || seen[key] {
+			return nil, fmt.Errorf("SIVI %s edit %s.%s is repeated or unavailable in source form %q", kind, edit.RowID, edit.Column, edit.Form)
 		}
 		seen[key] = true
-		group := groups[0]
-		if edit.Form == groups[1].Form {
-			group = groups[1]
-		}
+		group := groups[groupIndex]
 		var before ProjectMetadataCell
 		for i, column := range group.Columns {
 			if column == edit.Column {
@@ -76,29 +103,20 @@ func planSIVIHeightEdits(ctx context.Context, plot string, extended bool, veg Pr
 			}
 		}
 		if _, err := metadataCellValue(edit.Expected); err != nil {
-			return nil, fmt.Errorf("SIVI height expected value: %w", err)
+			return nil, fmt.Errorf("SIVI %s expected value: %w", kind, err)
 		}
 		if !reflect.DeepEqual(before, edit.Expected) {
-			return nil, errors.New("SIVI height source value changed; cancel and reload")
+			return nil, fmt.Errorf("SIVI %s source value changed; cancel and reload", kind)
 		}
 		value, err := metadataCellValue(edit.Value)
 		if err != nil {
-			return nil, fmt.Errorf("SIVI height value: %w", err)
+			return nil, fmt.Errorf("SIVI %s value: %w", kind, err)
 		}
 		if reflect.DeepEqual(before, edit.Value) {
 			continue
 		}
-		if edit.Column == "HeightB" {
-			if err := validateChildPhysicalText("Veg.HeightB", value, 255); err != nil {
-				return nil, err
-			}
-		} else {
-			if edit.Value.Storage != "null" && edit.Value.Storage != "real" {
-				return nil, fmt.Errorf("Veg.%s requires nullable numeric real storage", edit.Column)
-			}
-			if err := validateSingleRangeChange("Veg."+edit.Column, nil, edit.Value.Real); err != nil {
-				return nil, err
-			}
+		if err := validate(edit.Column, edit.Value); err != nil {
+			return nil, err
 		}
 		assignments = append(assignments, siviHeightAssignment{
 			edit.RowID, edit.Column, cloneSiteUnitCell(before), cloneSiteUnitCell(edit.Value), value})
