@@ -19,7 +19,7 @@ const report = loadTypeScript('longVegetationReport.ts', {
 });
 const cell = text => ({storage:text===null?'null':'text',text,integer:null,real:null,blobHex:null});
 function settings() {
-  return {title:'  Title \u00e9  ',average:'all-plots',constantSpeciesList:true,
+  return {title:'  Title \u00e9  ',grouping:'layer',average:'all-plots',constantSpeciesList:true,
     presenceGreaterThan:95,meanCoverGreaterThan:99,order:'species',showEnglishName:true,quality:null};
 }
 function fixture() {
@@ -62,6 +62,19 @@ const validateOptions = value => report.validateLongVegetationOptions(value,'own
 function options() {
   return {contextId:'owned',project:'Sample',projectPath:'C:\\project.db',su:'Selected',suPath:'C:\\external.db',settings:settings()};
 }
+test('None ordering remains explicit while preserving separate source layer statistics',()=>{
+  const value=fixture();value.settings.grouping='none';
+  assert.equal(validate(value),value);
+  const configured=options();configured.settings.grouping='none';
+  assert.equal(validateOptions(configured).settings.grouping,'none');
+  for(const grouping of [undefined,null,'strata','lifeform',4]) {
+    const invalid=fixture();invalid.settings.grouping=grouping;assert.throws(()=>validate(invalid));
+  }
+  const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
+  assert.match(source,/None mode changes row ordering, not cover aggregation/);
+  assert.match(source,/constant species list retains its source layer-first order/);
+  assert.match(source,/settings.grouping === 'none'/);
+});
 test('vegetation transport preserves constant-list threshold bypass, fanout, NULL/empty and zero/negative covers',()=>{
   const value = fixture();
   assert.equal(validate(value),value);

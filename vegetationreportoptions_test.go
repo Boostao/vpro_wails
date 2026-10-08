@@ -131,7 +131,7 @@ func TestDecodeLongVegetationOptionsSourceEnums(t *testing.T) {
 
 func TestDecodeLongVegetationOptionsUnavailableModes(t *testing.T) {
 	for key, modes := range map[string][]any{
-		"LVGroupBy": {2, 3, 4}, "LVUnitGroups": {2, 3},
+		"LVGroupBy": {2, 3}, "LVUnitGroups": {2, 3},
 		"LVShowEnglishName": {2, 4},
 	} {
 		for _, mode := range modes {

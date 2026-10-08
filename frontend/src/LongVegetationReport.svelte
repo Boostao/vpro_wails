@@ -64,12 +64,14 @@
   {#if settings}
     <dl class="settings" aria-label="Read-only report options">
       <div><dt>Report Title</dt><dd data-source-control="rptLvTitle">{settings.title === '' ? '"" (empty title)' : settings.title}</dd></div>
-      <div><dt>Group by</dt><dd>Layer</dd></div>
+      <div><dt>Group by</dt><dd>{settings.grouping === 'none' ? 'None (source layer observations retained)' : 'Layer'}</dd></div>
       <div><dt>Average</dt><dd>{settings.average === 'all-plots' ? (settings.quality ? 'By n Plots — joined sum / qualified SU denominator' : 'By n Plots — joined sum / physical SU denominator') : 'Characteristic — mean of joined non-NULL observations'}</dd></div>
       <div><dt>Constant species list</dt><dd>{settings.constantSpeciesList ? 'On — same selected-SU list; thresholds bypassed' : 'Off — strict presence and mean-cover thresholds apply'}</dd></div>
       <div><dt>Show species with presence &gt; than</dt><dd>{settings.presenceGreaterThan}%{settings.constantSpeciesList ? ' (not applied)' : ''}</dd></div>
       <div><dt>Show species with mean cover &gt; than</dt><dd>{settings.meanCoverGreaterThan}%{settings.constantSpeciesList ? ' (not applied)' : ''}</dd></div>
-      <div><dt>Order by</dt><dd>{settings.constantSpeciesList ? 'Layer, then species (constant-list source order)' : settings.order === 'presence' ? 'Layer, then descending presence' : 'Layer, then species'}</dd></div>
+      <div><dt>Order by</dt><dd>{settings.constantSpeciesList ? 'Layer, then species (constant-list source order)' :
+        settings.grouping === 'none' ? (settings.order === 'presence' ? 'Descending presence, then species' : 'Species') :
+        settings.order === 'presence' ? 'Layer, then descending presence' : 'Layer, then species'}</dd></div>
       <div><dt>English names</dt><dd>{settings.showEnglishName ? 'List and matched report names shown separately' : 'Not shown'}</dd></div>
       <div><dt>Plot-quality filter</dt><dd data-source-control="optEnforceQC">{settings.quality ? 'On — selected-SU qualification' : 'Off — all physical selected-SU memberships'}</dd></div>
       {#if settings.quality}
@@ -88,6 +90,9 @@
   </div>
   {#if su === 'None'}<p>Select an SU in Projects &amp; context before viewing the report.</p>{/if}
   {#if settings?.constantSpeciesList}<p class="notice">Constant species list is enabled in retained YAML. Presence and mean-cover thresholds are bypassed, as in the source report; missing combinations have NULL statistics, not zero.</p>{/if}
+  {#if settings?.grouping === 'none'}<p class="notice">The source's None mode changes row ordering, not cover aggregation.
+    Layer observations remain separate and labelled; equal source sort keys use a deterministic layer/name tie-break.
+    A constant species list retains its source layer-first order.</p>{/if}
   {#if preview}
     <h2>{preview.report.title === '' ? '"" (empty title)' : preview.report.title}</h2>
     <p role="status">{preview.report.units.length} units. No data, audits or configuration written.</p>

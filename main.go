@@ -50,6 +50,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	longVegetationNoneEnabled, err := siviFeature(longVegetationNoneFeatureEnvironment, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	googleEarthReviewEnabled, err := googleEarthReviewFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -108,6 +112,7 @@ func main() {
 	contextService.tableCSVReviewEnabled = tableCSVReviewEnabled
 	contextService.plotLocationReviewEnabled = plotLocationReviewEnabled
 	contextService.siteUnitSummaryEnabled = siteUnitSummaryEnabled
+	contextService.longVegetationNoneEnabled = longVegetationNoneEnabled
 	coordinates, err := newCoordinateService(configDir, preferences)
 	if err != nil {
 		log.Fatal(err)

@@ -13,6 +13,9 @@ func (s *ContextService) previewLongVegetationLayers(ctx context.Context, contex
 		if err != nil {
 			return vegetationLayerReport{}, err
 		}
+		if err := s.checkLongVegetationGrouping(options); err != nil {
+			return vegetationLayerReport{}, err
+		}
 		return readLongVegetationLayers(ctx, plots, options)
 	})
 }

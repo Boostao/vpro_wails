@@ -25,6 +25,7 @@ type ContextService struct {
 	tableCSVReviewEnabled          bool
 	plotLocationReviewEnabled      bool
 	siteUnitSummaryEnabled         bool
+	longVegetationNoneEnabled      bool
 }
 
 func NewContextService(projects *ProjectService, plots *PlotService) (*ContextService, error) {

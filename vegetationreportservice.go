@@ -7,6 +7,7 @@ import (
 
 type LongVegetationSettings struct {
 	Title                string                         `json:"title"`
+	Grouping             string                         `json:"grouping"`
 	Average              string                         `json:"average"`
 	ConstantSpeciesList  bool                           `json:"constantSpeciesList"`
 	PresenceGreaterThan  float64                        `json:"presenceGreaterThan"`
@@ -122,6 +123,10 @@ func vegetationSettings(options longVegetationOptions) LongVegetationSettings {
 		PresenceGreaterThan: options.PresenceGreaterThan, MeanCoverGreaterThan: options.MeanCoverGreaterThan,
 		Order: options.Order, ShowEnglishName: options.ShowEnglishName,
 	}
+	settings.Grouping = "layer"
+	if options.NoneGrouping {
+		settings.Grouping = "none"
+	}
 	if options.Quality != nil {
 		criteria := *options.Quality
 		settings.Quality = &LongVegetationQualitySettings{
@@ -141,6 +146,9 @@ func (s *ContextService) GetLongVegetationOptions(ctx context.Context, contextID
 		}
 		options, err := loadLongVegetationOptions(plots)
 		if err != nil {
+			return LongVegetationOptions{}, err
+		}
+		if err := s.checkLongVegetationGrouping(options); err != nil {
 			return LongVegetationOptions{}, err
 		}
 		if err := acquireMutexLease(ctx, &owner.mu); err != nil {
@@ -164,6 +172,9 @@ func (s *ContextService) PreviewLongVegetation(ctx context.Context, contextID st
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (LongVegetationPreview, error) {
 		options, err := loadLongVegetationOptions(plots)
 		if err != nil {
+			return LongVegetationPreview{}, err
+		}
+		if err := s.checkLongVegetationGrouping(options); err != nil {
 			return LongVegetationPreview{}, err
 		}
 		report, err := readLongVegetationLayers(ctx, plots, options)

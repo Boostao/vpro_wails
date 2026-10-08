@@ -20,6 +20,7 @@ export type ValidatedLongVegetationPreview = Omit<LongVegetationPreview, 'report
 
 function validateSettings(settings: LongVegetationSettings): void {
   if (!settings || typeof settings.title !== 'string' || reportTitleError(settings.title) ||
+      !['layer', 'none'].includes(settings.grouping) ||
       !['all-plots', 'observations'].includes(settings.average) ||
       !['species', 'presence'].includes(settings.order) ||
       typeof settings.constantSpeciesList !== 'boolean' || typeof settings.showEnglishName !== 'boolean' ||

@@ -325,7 +325,7 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 		}
 		sort.Slice(state.unit.Rows, func(i, j int) bool {
 			a, b := state.unit.Rows[i], state.unit.Rows[j]
-			if vegetationTextKey(a.Layer) != vegetationTextKey(b.Layer) {
+			if (!options.NoneGrouping || options.ConstantSpeciesList) && vegetationTextKey(a.Layer) != vegetationTextKey(b.Layer) {
 				return vegetationTextKey(a.Layer) < vegetationTextKey(b.Layer)
 			}
 			if !options.ConstantSpeciesList && options.Order == "presence" && *a.Presence != *b.Presence {
@@ -335,6 +335,9 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 				if vegetationTextKey(pair[0]) != vegetationTextKey(pair[1]) {
 					return vegetationTextKey(pair[0]) < vegetationTextKey(pair[1])
 				}
+			}
+			if options.NoneGrouping {
+				return vegetationTextKey(a.Layer) < vegetationTextKey(b.Layer)
 			}
 			return false
 		})

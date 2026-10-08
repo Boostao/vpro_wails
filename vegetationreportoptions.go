@@ -15,6 +15,7 @@ type longVegetationOptions struct {
 	MeanCoverGreaterThan float64
 	Order                string
 	ShowEnglishName      bool
+	NoneGrouping         bool
 	Quality              *[3]vegetationQualityCriterion
 }
 
@@ -29,10 +30,19 @@ func decodeLongVegetationOptions(values configValues) (longVegetationOptions, er
 	if strings.ContainsRune(options.Title, 0) {
 		return fail(fmt.Errorf("ReportOptions.LVReportTitle must not contain NUL"))
 	}
-	for _, key := range []string{"LVGroupBy", "LVUnitGroups"} {
-		if _, err := configInt(values, "ReportOptions", key, 1, 1); err != nil {
-			return fail(fmt.Errorf("Long Vegetation preview supports only %s=1 (layers and selected SU): %w", key, err))
-		}
+	group, err := configInt(values, "ReportOptions", "LVGroupBy", 1, 4)
+	if err != nil {
+		return fail(err)
+	}
+	switch group {
+	case 1:
+	case 4:
+		options.NoneGrouping = true
+	default:
+		return fail(fmt.Errorf("Long Vegetation LVGroupBy=%d conversion is unavailable; only Layer (1) and None (4) are implemented", group))
+	}
+	if _, err := configInt(values, "ReportOptions", "LVUnitGroups", 1, 1); err != nil {
+		return fail(fmt.Errorf("Long Vegetation preview supports only LVUnitGroups=1 (selected SU): %w", err))
 	}
 	enforce, err := longVegetationConfigBool(values, "DataQualityFilterEnforceLV")
 	if err != nil {

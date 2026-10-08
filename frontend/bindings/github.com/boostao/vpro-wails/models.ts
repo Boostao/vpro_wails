@@ -578,6 +578,7 @@ export interface LongVegetationRow {
 
 export interface LongVegetationSettings {
     "title": string;
+    "grouping": string;
     "average": string;
     "constantSpeciesList": boolean;
     "presenceGreaterThan": number;
