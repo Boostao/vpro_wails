@@ -58,6 +58,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	longEnvironmentPreferencesEnabled, err := longEnvironmentPreferencesFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	dataDir, err := userDataDir()
 	if err != nil {
 		log.Fatal(err)
@@ -147,6 +151,7 @@ func main() {
 		application.NewService(NewGoogleEarthKMLService(contextService, googleEarthKMLEnabled)),
 		application.NewService(NewGoogleEarthKMLExportService(contextService, googleEarthKMLExportEnabled)),
 		application.NewService(NewGoogleEarthPreferencesService(contextService, googleEarthPreferencesEnabled)),
+		application.NewService(NewLongEnvironmentPreferencesService(contextService, longEnvironmentPreferencesEnabled)),
 		application.NewService(coordinates),
 	}
 	if refService != nil {

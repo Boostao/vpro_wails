@@ -69,7 +69,7 @@ func NewGoogleEarthPreferencesService(contexts *ContextService, enabled bool) *G
 	return &GoogleEarthPreferencesService{contexts: contexts, enabled: enabled}
 }
 
-func withGoogleEarthPreferencesSnapshot[T any](ctx context.Context, plots *PlotService, hooks publicationReadSnapshotHooks,
+func withOwnedPreferenceSnapshot[T any](ctx context.Context, plots *PlotService, hooks publicationReadSnapshotHooks,
 	read func(*sqliteContext, *sql.Tx) (T, error)) (T, error) {
 	owner := plots.projects.sqlite
 	if err := acquireMutexLease(ctx, &owner.mu); err != nil {
@@ -101,7 +101,7 @@ func (s *GoogleEarthPreferencesService) GetGoogleEarthPreferences(ctx context.Co
 		return nil, err
 	}
 	return withContextPlotRequest(ctx, s.contexts, contextID, func(plots *PlotService) (*GoogleEarthPreferencesReview, error) {
-		return withGoogleEarthPreferencesSnapshot(ctx, plots, s.snapshot, func(owner *sqliteContext, tx *sql.Tx) (*GoogleEarthPreferencesReview, error) {
+		return withOwnedPreferenceSnapshot(ctx, plots, s.snapshot, func(owner *sqliteContext, tx *sql.Tx) (*GoogleEarthPreferencesReview, error) {
 			values, err := plots.projects.preferences.readGoogleEarthPreferences(ctx)
 			if err != nil {
 				return nil, err
@@ -129,7 +129,7 @@ func (s *GoogleEarthPreferencesService) SaveGoogleEarthPreferences(ctx context.C
 		_, err = withContextPlotRequest(ctx, s.contexts, contextID, func(plots *PlotService) (struct{}, error) {
 			// Complete the physical read and its cleanup before the config commit.
 			// Unchanged historical/unavailable fields do not need new membership.
-			_, readErr := withGoogleEarthPreferencesSnapshot(ctx, plots, s.snapshot, func(owner *sqliteContext, tx *sql.Tx) (struct{}, error) {
+			_, readErr := withOwnedPreferenceSnapshot(ctx, plots, s.snapshot, func(owner *sqliteContext, tx *sql.Tx) (struct{}, error) {
 				if request.Proposed.DescriptionField == request.Expected.DescriptionField {
 					return struct{}{}, nil
 				}

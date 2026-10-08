@@ -463,6 +463,26 @@ export interface LongEnvironmentOptions {
     "title": string;
 }
 
+export interface LongEnvironmentPreferenceValues {
+    "title": string;
+}
+
+export interface LongEnvironmentPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface LongEnvironmentPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": LongEnvironmentPreferenceValues;
+}
+
 export interface LongEnvironmentPreview {
     "contextId": string;
     "projectPath": string;

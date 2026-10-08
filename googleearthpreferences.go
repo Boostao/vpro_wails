@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strings"
 	"unicode/utf8"
-
-	"gopkg.in/yaml.v3"
 )
 
 type googleEarthPreferences struct {
@@ -15,10 +13,7 @@ type googleEarthPreferences struct {
 	DescriptionField string
 }
 
-type googleEarthPreferenceUpdate struct {
-	Changed   bool
-	Committed bool
-}
+type googleEarthPreferenceUpdate = configStringPreferenceUpdate
 
 func decodeGoogleEarthPreferences(values configValues) (googleEarthPreferences, error) {
 	var result googleEarthPreferences
@@ -75,47 +70,8 @@ func (s *desktopConfig) compareAndSetGoogleEarthPreferences(ctx context.Context,
 		(!utf8.ValidString(proposed.DescriptionField) || proposed.DescriptionField == "" || strings.ContainsRune(proposed.DescriptionField, 0)) {
 		return googleEarthPreferenceUpdate{}, errors.New("Google Earth description field requires a literal nonempty Unicode name without NUL")
 	}
-	if err := acquireMutexLease(ctx, &s.mu); err != nil {
-		return googleEarthPreferenceUpdate{}, err
-	}
-	defer s.mu.Unlock()
-	values, err := s.readLocked()
-	if err != nil {
-		return googleEarthPreferenceUpdate{}, err
-	}
-	current, err := decodeGoogleEarthPreferences(values)
-	if err != nil {
-		return googleEarthPreferenceUpdate{}, err
-	}
-	if current != expected {
-		return googleEarthPreferenceUpdate{}, errors.New("Google Earth preferences changed; reload the saved values before updating")
-	}
-	if err := ctx.Err(); err != nil {
-		return googleEarthPreferenceUpdate{}, err
-	}
-	if current == proposed {
-		return googleEarthPreferenceUpdate{}, nil
-	}
-	changes := map[string]string{}
-	if proposed.PlaceName != current.PlaceName {
-		changes["GoogleEarthPlaceName"] = proposed.PlaceName
-	}
-	if proposed.DescriptionField != current.DescriptionField {
-		changes["GoogleEarthDescField"] = proposed.DescriptionField
-	}
-	for key, value := range changes {
-		if err := setConfigValue(values, "ReportOptions", key, value, false); err != nil {
-			return googleEarthPreferenceUpdate{}, err
-		}
-	}
-	data, err := yaml.Marshal(values)
-	if err != nil {
-		return googleEarthPreferenceUpdate{}, err
-	}
-	committed, err := s.commitWithContext(ctx, data)
-	result := googleEarthPreferenceUpdate{Changed: committed, Committed: committed}
-	if committed && err != nil {
-		return result, fmt.Errorf("Google Earth preferences were committed; do not replay the change: %w", err)
-	}
-	return result, err
+	return s.compareAndSetReportStrings(ctx, "Google Earth preferences", []reportStringPreferenceChange{
+		{Key: "GoogleEarthPlaceName", Expected: expected.PlaceName, Proposed: proposed.PlaceName},
+		{Key: "GoogleEarthDescField", Expected: expected.DescriptionField, Proposed: proposed.DescriptionField},
+	})
 }
