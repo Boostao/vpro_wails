@@ -22,39 +22,39 @@ func readOwnedSIVIParent(ctx context.Context, plots *PlotService, contextID, plo
 func withOwnedSIVIParentRead[T any](ctx context.Context, plots *PlotService, contextID, plot string, project func(*siviParentProjection) (T, error)) (T, error) {
 	return withOwnedSIVISnapshot(ctx, plots, func(owner *sqliteContext, tx *sql.Tx) (T, error) {
 		var zero T
-		tables := []ProjectMetadataTable{}
-		for i, suffix := range []string{"_Env", "_Admin"} {
-			table := owner.selection.Project + suffix
-			var count int
-			if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM project.sqlite_master WHERE type='table' AND name COLLATE BINARY=?`, table).Scan(&count); err != nil {
-				return zero, err
-			}
-			if count != 1 {
-				return zero, fmt.Errorf("SIVI parent requires original physical project table %q", table)
-			}
-			if err := validateSIVIPhysicalSchema(ctx, tx, "project", table, "parent originals"); err != nil {
-				return zero, err
-			}
-			column := "PlotNumber"
-			if i == 1 {
-				column = "Plot"
-			}
-			rows, err := readSQLiteStorageRows(ctx, tx, "project", table, column, &plot, "")
-			if err != nil {
-				return zero, err
-			}
-			tables = append(tables, rows)
-		}
-		parent, err := projectSIVIParent(ctx, contextID, owner.selection.Project, plot, tables[0], tables[1])
+		parent, err := readSIVIParentSnapshot(ctx, owner, tx, contextID, plot)
 		if err != nil {
 			return zero, err
 		}
-		result, err := project(parent)
-		if err != nil {
-			return zero, err
-		}
-		return result, nil
+		return project(parent)
 	})
+}
+
+func readSIVIParentSnapshot(ctx context.Context, owner *sqliteContext, tx *sql.Tx, contextID, plot string) (*siviParentProjection, error) {
+	tables := []ProjectMetadataTable{}
+	for i, suffix := range []string{"_Env", "_Admin"} {
+		table := owner.selection.Project + suffix
+		var count int
+		if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM project.sqlite_master WHERE type='table' AND name COLLATE BINARY=?`, table).Scan(&count); err != nil {
+			return nil, err
+		}
+		if count != 1 {
+			return nil, fmt.Errorf("SIVI parent requires original physical project table %q", table)
+		}
+		if err := validateSIVIPhysicalSchema(ctx, tx, "project", table, "parent originals"); err != nil {
+			return nil, err
+		}
+		column := "PlotNumber"
+		if i == 1 {
+			column = "Plot"
+		}
+		rows, err := readSQLiteStorageRows(ctx, tx, "project", table, column, &plot, "")
+		if err != nil {
+			return nil, err
+		}
+		tables = append(tables, rows)
+	}
+	return projectSIVIParent(ctx, contextID, owner.selection.Project, plot, tables[0], tables[1])
 }
 
 type siviParentProposal struct {

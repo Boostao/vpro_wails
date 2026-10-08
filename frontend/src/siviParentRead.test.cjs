@@ -88,6 +88,8 @@ const Panel = serverComponent(panelSource, 'SIVIParentReadPanel.svelte', {
   './siviParentWriteSession': writeSession, './siviParentEditor': editor,
   './SIVIParentDirectField.svelte': { default: DirectField },
   './SIVIParentActionField.svelte': { default: ActionField },
+  './siviProjectAssignmentSession': require('./siviParentTestHelpers.cjs').assignmentSession,
+  './SIVIProjectAssignmentField.svelte': { default: require('./siviParentTestHelpers.cjs').assignmentField },
 });
 test('read-only source panel has all77 labels/groups and distinct raw storage without editing controls', () => {
   const r = original(); setCell(r, 'SV_PolygonNumber', cell('text', ''));
@@ -220,5 +222,5 @@ test('native source presentation distinguishes duplicate NULL/empty metadata and
   assert.match(markup, /\(empty text\)/);
   assert.match(markup, /data-storage="null"/);
   assert.doesNotMatch(markup, /<(?:input|textarea|select)\b/);
-  assert.match(markup, /ProjectID assignment remain unavailable/);
+  assert.match(markup, /ProjectID assignment remains unavailable/);
 });

@@ -32,6 +32,7 @@
   import { SIVIParentSourceSession } from './siviParentSourceSession';
   import { SIVIParentWriteSession, isSIVIParentDirectColumn } from './siviParentWriteSession';
   import { SIVIParentActionWriteSession, isSIVIParentActionColumn } from './siviParentActionWriteSession';
+  import { SIVIProjectAssignmentSession, type SIVIProjectAssignmentInput } from './siviProjectAssignmentSession';
   import type { SIVIParentInput } from './siviParentEditor';
   import { SIVIHeightSession } from './siviHeightSession';
   import type { SIVIHeightColumn } from './siviHeightEditor';
@@ -83,6 +84,13 @@
   const siviParentActionView = $derived.by(() => { siviParentActionRevision; return siviParentActionSession?.view() ?? null; });
   const siviParentActionClose = $derived.by(() => { siviParentActionRevision; return siviParentActionSession?.closeState() ?? null; });
   const siviParentActionUnsaved = $derived(siviParentActionClose?.unsaved ?? false);
+  const siviProjectAssignmentEnabled = siviParentEditingEnabled && import.meta.env.VITE_SIVI_PROJECT_ASSIGNMENT === 'true';
+  const siviProjectAssignmentReads = new ReadRequests();
+  let siviProjectAssignmentSession = $state<SIVIProjectAssignmentSession | null>(null);
+  let siviProjectAssignmentRevision = $state(0);
+  const siviProjectAssignmentView = $derived.by(() => { siviProjectAssignmentRevision; return siviProjectAssignmentSession?.view() ?? null; });
+  const siviProjectAssignmentClose = $derived.by(() => { siviProjectAssignmentRevision; return siviProjectAssignmentSession?.closeState() ?? null; });
+  const siviProjectAssignmentUnsaved = $derived(siviProjectAssignmentClose?.unsaved ?? false);
   const siviParentReads = new ReadRequests();
   const siviParentSourceReads = new ReadRequests();
   let siviParentSourceSession = $state<SIVIParentSourceSession | null>(null);
@@ -92,7 +100,7 @@
   let siviParentRevision = $state(0);
   let siviParentOpen = $state(false);
   const siviParentView = $derived.by(() => { siviParentRevision; return siviParentSession?.view() ?? null; });
-  const siviParentBusy = $derived((siviParentView?.busy ?? false) || (siviParentSourceView?.busy ?? false) || (siviParentWriteView?.busy ?? false) || (siviParentActionView?.busy ?? false));
+  const siviParentBusy = $derived((siviParentView?.busy ?? false) || (siviParentSourceView?.busy ?? false) || (siviParentWriteView?.busy ?? false) || (siviParentActionView?.busy ?? false) || (siviProjectAssignmentView?.busy ?? false));
   const siviReads = new ReadRequests();
   let siviSession: SIVIHeightSession | null = null;
   let siviRevision = $state(0);
@@ -221,7 +229,7 @@
   const creationNotice = $derived(creationDraft && !Object.values(creationDraft.cells).some(cell => cell?.error !== null)
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
   const nonParentChildUnsaved = $derived(heightUnsaved || siviUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || environmentSUOpen);
-  const childUnsaved = $derived(nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved);
+  const childUnsaved = $derived(nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -237,6 +245,7 @@
     siviParentSourceSession?.dispose();
     siviParentWriteSession?.dispose();
     siviParentActionSession?.dispose();
+    siviProjectAssignmentSession?.dispose();
     siviSession?.dispose();
     siviReads.cancelAll();
     loadRequest++; referenceRequest++; speciesRequest++;
@@ -472,11 +481,14 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
-  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || siviParentWriteUnsaved || siviParentActionUnsaved || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked);
+  const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked);
   const siviParentWriteEditingDisabled = $derived(!siviParentEditingEnabled || !capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty ||
-    original === null || nonParentChildUnsaved || siviParentActionUnsaved || personalDraft !== null || Object.keys(headerValidation).length > 0 || (siviParentWriteView?.blocked ?? false));
+    original === null || nonParentChildUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || personalDraft !== null || Object.keys(headerValidation).length > 0 || (siviParentWriteView?.blocked ?? false));
   const siviParentActionEditingDisabled = $derived(!siviParentActionEditingEnabled || !capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty ||
-    original === null || nonParentChildUnsaved || siviParentWriteUnsaved || personalDraft !== null || Object.keys(headerValidation).length > 0 || (siviParentActionView?.blocked ?? false));
+    original === null || nonParentChildUnsaved || siviParentWriteUnsaved || siviProjectAssignmentUnsaved || personalDraft !== null || Object.keys(headerValidation).length > 0 || (siviParentActionView?.blocked ?? false));
+  const siviProjectAssignmentEditingDisabled = $derived(!siviProjectAssignmentEnabled || !capabilitiesReady || draft.locked || busy || headerWorkflowBusy || dirty ||
+    original === null || nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || personalDraft !== null ||
+    Object.keys(headerValidation).length > 0 || Boolean(siviParentSourceView?.error) || (siviProjectAssignmentView?.blocked ?? false));
   const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || siviUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || siviUnsaved || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || siviUnsaved || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
@@ -494,7 +506,7 @@
     : 'Save the plot before restoring fields.');
 
   async function siviParentWriteOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
-    if (!siviParentWriteSession || busy || headerWorkflowBusy || siviParentActionUnsaved || operation !== 'undo' && siviParentWriteEditingDisabled) {
+    if (!siviParentWriteSession || busy || headerWorkflowBusy || siviParentActionUnsaved || siviProjectAssignmentUnsaved || operation !== 'undo' && siviParentWriteEditingDisabled) {
       error = 'SIVI parent edits require a clean unlocked parent and no conflicting operation; resolve acknowledgements explicitly.';
       return false;
     }
@@ -520,7 +532,7 @@
   }
 
   async function siviParentActionOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
-    if (!siviParentActionSession || busy || headerWorkflowBusy || siviParentWriteUnsaved || operation !== 'undo' && siviParentActionEditingDisabled) {
+    if (!siviParentActionSession || busy || headerWorkflowBusy || siviParentWriteUnsaved || siviProjectAssignmentUnsaved || operation !== 'undo' && siviParentActionEditingDisabled) {
       error = 'SIVI source actions require a clean unlocked parent and no conflicting drafts or operation; resolve acknowledgements explicitly.';
       return false;
     }
@@ -555,9 +567,48 @@
     }
   }
 
-  async function refreshSIVIParent(plot: string, peer: SIVIParentWriteSession | SIVIParentActionWriteSession | null) {
-    if (peer && (peer.closeState().unsaved || peer.closeState().busy)) {
-      throw new Error('Another SIVI parent editor has drafts or an operation; no peer state was replaced.');
+  async function siviProjectAssignmentOperation(operation: 'load' | 'save' | 'undo' | 'retain' | 'prune'): Promise<boolean> {
+    if (!siviProjectAssignmentSession || busy || headerWorkflowBusy || siviParentWriteUnsaved || siviParentActionUnsaved ||
+      operation !== 'undo' && siviProjectAssignmentEditingDisabled) {
+      error = 'ProjectID assignment requires a clean unlocked parent and no conflicting drafts or operation; resolve acknowledgements explicitly.';
+      return false;
+    }
+    error = null;
+    successMsg = null;
+    try {
+      const ok = operation === 'load' ? await siviProjectAssignmentSession.load()
+        : operation === 'save' ? await siviProjectAssignmentSession.save()
+        : operation === 'undo' ? await siviProjectAssignmentSession.undo()
+        : await siviProjectAssignmentSession.restore(operation === 'retain' ? AuditRestoreAction.AuditRestoreRetain : AuditRestoreAction.AuditRestorePrune);
+      if (!ok) { error = siviProjectAssignmentSession.view().error; return false; }
+      successMsg = operation === 'save' ? 'Existing physical ProjectID definition assigned; owned parent and choices reloaded.'
+        : operation === 'retain' || operation === 'prune' ? 'Typed ProjectID restoration completed and reloaded; metadata was not changed.'
+        : 'Owned ProjectID parent and choices reloaded; no mutation was replayed.';
+      return true;
+    } catch (cause) {
+      error = `ProjectID assignment operation failed; owner state retained: ${String(cause)}`;
+      return false;
+    }
+  }
+
+  function stageSIVIProjectAssignment(input: SIVIProjectAssignmentInput) {
+    try {
+      if (!siviProjectAssignmentSession || siviProjectAssignmentEditingDisabled) {
+        throw new Error('Only independently available existing ProjectID definitions can be selected.');
+      }
+      siviProjectAssignmentSession.stage('ProjectID', input);
+      error = siviProjectAssignmentSession.view().error;
+      successMsg = null;
+    } catch (cause) {
+      error = `ProjectID selection failed; existing state retained: ${String(cause)}`;
+    }
+  }
+
+  async function refreshSIVIParent(plot: string, peers: (SIVIParentWriteSession | SIVIParentActionWriteSession | SIVIProjectAssignmentSession | null)[]) {
+    for (const peer of peers) {
+      if (peer && (peer.closeState().unsaved || peer.closeState().busy)) {
+        throw new Error('Another SIVI parent editor has drafts or an operation; no peer state was replaced.');
+      }
     }
     const header = await reads.track(ContextService.GetPlot(siviContextId, plot));
     if (!header || $projectState?.contextId !== siviContextId || header.plotNumber !== plot) {
@@ -571,8 +622,48 @@
     if (siviParentSession && !await siviParentSession.load()) {
       throw new Error(siviParentSession.view().error ?? 'Owned SIVI parent refresh did not finish.');
     }
-    if (peer?.view().original && !await peer.load()) {
-      throw new Error(peer.view().error ?? 'Peer SIVI parent original refresh did not finish.');
+    for (const peer of peers) {
+      if (peer && (peer.view().original || peer.view().error) && !await peer.load()) {
+        throw new Error(peer.view().error ?? 'Peer SIVI parent original refresh did not finish.');
+      }
+    }
+  }
+
+  async function changeSIVIProjectSource(source: number) {
+    if (!siviParentSourceSession || busy || headerWorkflowBusy || dirty || childUnsaved) {
+      error = 'Finish or Undo owned plot/selection drafts before changing ProjectID source.';
+      return;
+    }
+    error = null;
+    try {
+      if (!await siviParentSourceSession.setSource(source)) {
+        error = siviParentSourceSession.view().error;
+        return;
+      }
+      if (siviProjectAssignmentSession?.view().original && !await siviProjectAssignmentSession.load()) {
+        error = siviProjectAssignmentSession.view().error;
+      }
+    } catch (cause) {
+      error = `ProjectID source change failed; owned state retained: ${String(cause)}`;
+    }
+  }
+
+  async function reloadSIVIProjectSource() {
+    if (!siviParentSourceSession || busy || headerWorkflowBusy || dirty || childUnsaved) {
+      error = 'Finish or Undo owned plot/selection drafts before reloading ProjectID source.';
+      return;
+    }
+    error = null;
+    try {
+      if (!await siviParentSourceSession.load()) {
+        error = siviParentSourceSession.view().error;
+        return;
+      }
+      if (siviProjectAssignmentSession?.view().original && !await siviProjectAssignmentSession.load()) {
+        error = siviProjectAssignmentSession.view().error;
+      }
+    } catch (cause) {
+      error = `ProjectID source reload failed; owned state retained: ${String(cause)}`;
     }
   }
 
@@ -651,6 +742,18 @@
     metadataOpen = true; error = null; successMsg = null;
   }
 
+  async function refreshProjectMetadata() {
+    if (!siviParentSession?.view().original && !siviParentSession?.view().error) {
+      await loadChildData(draft.plotNumber);
+      return;
+    }
+    await refreshSIVIParent(draft.plotNumber, [siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession]);
+    if (siviParentSourceSession && (siviParentSourceSession.view().choices || siviParentSourceSession.view().error) &&
+      !await siviParentSourceSession.load()) {
+      throw new Error(siviParentSourceSession.view().error ?? 'ProjectID choices did not refresh after the metadata commit.');
+    }
+  }
+
   function openEnvironmentSU(direction: 'forward' | 'reverse' = 'forward') {
     if (!(direction === 'reverse' ? siteUnitEnvironmentEnabled : environmentSUEnabled) || childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 ||
         !$projectState?.activeSU || $projectState.activeSU === 'None' || !original) {
@@ -724,6 +827,10 @@
   }
 
   async function load(p?: string) {
+    if (siviProjectAssignmentSession && (siviProjectAssignmentSession.closeState().unsaved || siviProjectAssignmentSession.closeState().busy)) {
+      error = 'Finish or explicitly Undo ProjectID selection/recovery before replacing its plot owner.';
+      return;
+    }
     if (siviParentActionSession && (siviParentActionSession.closeState().unsaved || siviParentActionSession.closeState().busy)) {
       error = 'Finish or explicitly Undo SIVI source-action drafts/recovery before replacing their plot owner.';
       return;
@@ -748,6 +855,9 @@
     siviParentWriteSession = null;
     siviParentActionSession?.dispose();
     siviParentActionSession = null;
+    siviProjectAssignmentSession?.dispose();
+    siviProjectAssignmentSession = null;
+    siviProjectAssignmentRevision++;
     siviParentActionRevision++;
     siviParentWriteRevision++;
     siviParentSourceRevision++;
@@ -823,7 +933,7 @@
                 cancelRead: () => siviParentWriteReads.cancelAll(),
                 save: request => ContextService.SaveSIVIParentDirect(siviContextId, plot, request),
                 restore: (historyId, action) => ContextService.RestoreSIVIParentDirect(siviContextId, plot, historyId, action),
-                refreshParent: () => refreshSIVIParent(plot, siviParentActionSession),
+                refreshParent: () => refreshSIVIParent(plot, [siviParentActionSession, siviProjectAssignmentSession]),
               }, () => siviParentWriteRevision++);
             siviParentWriteRevision++;
           }
@@ -834,9 +944,20 @@
                 cancelRead: () => siviParentActionReads.cancelAll(),
                 save: request => ContextService.SaveSIVIParentActions(siviContextId, plot, request),
                 restore: (historyId, action) => ContextService.RestoreSIVIParentActions(siviContextId, plot, historyId, action),
-                refreshParent: () => refreshSIVIParent(plot, siviParentWriteSession),
+                refreshParent: () => refreshSIVIParent(plot, [siviParentWriteSession, siviProjectAssignmentSession]),
               }, () => siviParentActionRevision++);
             siviParentActionRevision++;
+          }
+          if (siviProjectAssignmentEnabled) {
+            siviProjectAssignmentSession = new SIVIProjectAssignmentSession(
+              { contextId: siviContextId, project: $projectState.activeProject, plot }, {
+                read: () => siviProjectAssignmentReads.track(ContextService.GetSIVIProjectAssignmentOriginal(siviContextId, plot)),
+                cancelRead: () => siviProjectAssignmentReads.cancelAll(),
+                save: request => ContextService.SaveSIVIProjectAssignment(siviContextId, plot, request),
+                restore: (historyId, action) => ContextService.RestoreSIVIProjectAssignment(siviContextId, plot, historyId, action),
+                refreshParent: () => refreshSIVIParent(plot, [siviParentWriteSession, siviParentActionSession]),
+              }, () => siviProjectAssignmentRevision++);
+            siviProjectAssignmentRevision++;
           }
           siviParentSourceRevision++;
           siviParentRevision++;
@@ -1825,6 +1946,7 @@
     if (deletionReview !== null) { error = 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review; ordinary Save never deletes rows.'; return; }
     if (creationDraft !== null) { await saveVegetationCreation(); return; }
     if (siviParentActionUnsaved) { await siviParentActionOperation('save'); return; }
+    if (siviProjectAssignmentUnsaved) { await siviProjectAssignmentOperation('save'); return; }
     if (siviParentWriteUnsaved) { await siviParentWriteOperation('save'); return; }
     if (siviUnsaved) { await siviOperation('save'); return; }
     if (heightUnsaved) { await saveHeightDrafts(); return; }
@@ -1896,6 +2018,7 @@
       : draft.locked ? 'Unlock the plot before saving.'
       : siviParentActionUnsaved && !siviParentActionClose?.canSave ? siviParentActionClose?.saveReason ?? 'Correct or Undo unresolved SIVI source actions.'
       : siviParentWriteUnsaved && !siviParentWriteClose?.canSave ? siviParentWriteClose?.saveReason ?? 'Correct or Undo unresolved SIVI parent drafts.'
+      : siviProjectAssignmentUnsaved && !siviProjectAssignmentClose?.canSave ? siviProjectAssignmentClose?.saveReason ?? 'Correct or Undo unresolved ProjectID selections.'
       : siviUnsaved && !siviClose?.canSave ? siviClose?.saveReason ?? 'Correct or Undo unresolved SIVI heights.'
       : personalDraft !== null ? 'Save the personal definition explicitly or Cancel its entry before saving the plot or closing.'
       : deletionReview !== null ? 'Confirm reviewed vegetation deletion explicitly or Cancel deletion review before saving and closing.'
@@ -1912,7 +2035,7 @@
       : invalid ? 'Correct invalid header inputs or Undo before saving.'
       : !draft.plotNumber.trim() ? 'Plot Number is required before saving.' : '';
     return { unsaved: dirty || childUnsaved || invalid || newChild !== null || invalidChild, busy: busy || headerWorkflowBusy,
-      blocked: (siviClose?.blocked ?? false) || (siviParentWriteClose?.blocked ?? false) || (siviParentActionClose?.blocked ?? false), canSave: saveReason === '', saveReason, error };
+      blocked: (siviClose?.blocked ?? false) || (siviParentWriteClose?.blocked ?? false) || (siviParentActionClose?.blocked ?? false) || (siviProjectAssignmentClose?.blocked ?? false), canSave: saveReason === '', saveReason, error };
   }
 
   export async function saveForClose(): Promise<boolean> {
@@ -1938,6 +2061,7 @@
     if (deletionReview !== null) { void cancelVegetationDeletion(); return; }
     if (creationDraft !== null) { void cancelVegetationCreation(); return; }
     if (siviParentActionUnsaved) { void siviParentActionOperation('undo'); return; }
+    if (siviProjectAssignmentUnsaved) { void siviProjectAssignmentOperation('undo'); return; }
     if (siviParentWriteUnsaved) { void siviParentWriteOperation('undo'); return; }
     if (siviUnsaved) { void siviOperation('undo'); return; }
     if (heightUnsaved) { void cancelHeightDrafts(); return; }
@@ -1988,6 +2112,10 @@
     }
     if (siviParentActionUnsaved) {
       error = 'Save or explicitly Undo SIVI source-action drafts/recovery before changing the plot lock.';
+      return;
+    }
+    if (siviProjectAssignmentUnsaved) {
+      error = 'Save or explicitly Undo ProjectID selection/recovery before changing the plot lock.';
       return;
     }
     if (siviUnsaved) {
@@ -2231,15 +2359,17 @@
           activeTab = 'siviParent';
           siviParentOpen = true;
           if (siviParentSession && !siviParentView?.original) void siviParentSession.load();
-          if (!siviParentWriteUnsaved && !siviParentActionUnsaved && siviParentSourceSession && !siviParentSourceView?.choices) void siviParentSourceSession.load();
+          if (!siviParentWriteUnsaved && !siviParentActionUnsaved && !siviProjectAssignmentUnsaved && siviParentSourceSession && !siviParentSourceView?.choices) void siviParentSourceSession.load();
         }}>SIVI parent (read-only)</button>
     </div>
   {/if}
 
   <!-- Tab Contents -->
   <div class="fs882-body overflow-y-auto flex-1">
-    {#if activeTab === 'siviParent' && siviParentOpen && siviParentView}
+    {#if activeTab === 'siviParent' && siviParentOpen && siviParentView && !metadataOpen}
       <SIVIParentReadPanel view={siviParentView} sourceView={siviParentSourceView}
+        onMetadata={metadataEnabled ? openProjectMetadata : undefined}
+        metadataDisabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
         writeView={siviParentWriteView} writeDisabled={siviParentWriteEditingDisabled}
         writeCanSave={siviParentWriteClose?.canSave ?? false}
         onWriteOperation={operation => { void siviParentWriteOperation(operation); }}
@@ -2250,11 +2380,16 @@
         onActionOperation={operation => { void siviParentActionOperation(operation); }}
         onActionStage={stageSIVIParentAction}
         onActionCancel={() => siviParentActionSession?.cancel()}
+        assignmentView={siviProjectAssignmentView} assignmentDisabled={siviProjectAssignmentEditingDisabled}
+        assignmentCanSave={siviProjectAssignmentClose?.canSave ?? false}
+        onAssignmentOperation={operation => { void siviProjectAssignmentOperation(operation); }}
+        onAssignmentStage={stageSIVIProjectAssignment}
+        onAssignmentCancel={() => siviProjectAssignmentSession?.cancel()}
         reloadDisabled={busy || dirty || childUnsaved || siviParentBusy}
         onreload={() => { if (siviParentSession) void siviParentSession.load(); }}
-        onSourceReload={() => { if (siviParentSourceSession) void siviParentSourceSession.load(); }}
+        onSourceReload={() => { void reloadSIVIProjectSource(); }}
         onSourceCancel={() => siviParentSourceSession?.cancel()}
-        onSourceChange={source => { if (siviParentSourceSession) void siviParentSourceSession.setSource(source); }}
+        onSourceChange={source => { void changeSIVIProjectSource(source); }}
         oncancel={() => siviParentSession?.cancel()} />
     {/if}
     {#if environmentSUOpen && $projectState?.projectPath}
@@ -2282,7 +2417,7 @@
         allowRestoration={metadataRestorationEnabled}
         onbusy={value => metadataBusy = value}
         onclosed={() => { metadataOpen = false; error = null; }}
-        oncommitted={() => loadChildData(draft.plotNumber)} />
+        oncommitted={refreshProjectMetadata} />
     {/if}
     {#if codeCheckOpen}
       <SpeciesCodeCheck bind:this={codeCheckEditor} client={PlotService}

@@ -6,6 +6,8 @@
   import type { SIVIParentSourceView } from './siviParentSourceSession';
   import SIVIParentDirectField from './SIVIParentDirectField.svelte';
   import SIVIParentActionField from './SIVIParentActionField.svelte';
+  import SIVIProjectAssignmentField from './SIVIProjectAssignmentField.svelte';
+  import { siviProjectAssignmentDirty, type SIVIProjectAssignmentInput, type SIVIProjectAssignmentView } from './siviProjectAssignmentSession';
   import { isSIVIParentDirectColumn, type SIVIParentWriteView } from './siviParentWriteSession';
   import { siviParentDirty, siviParentOriginalCell, type SIVIParentInput } from './siviParentEditor';
   let { view, onreload, oncancel, reloadDisabled, sourceView = null,
@@ -15,7 +17,11 @@
     onWriteStage = (_column: string, _input: SIVIParentInput) => {}, onWriteCancel = () => {},
     actionView = null, actionDisabled = true, actionCanSave = false,
     onActionOperation = (_operation: 'load' | 'save' | 'undo' | 'retain' | 'prune') => {},
-    onActionStage = (_column: string, _input: SIVIParentInput) => {}, onActionCancel = () => {} }: {
+    onActionStage = (_column: string, _input: SIVIParentInput) => {}, onActionCancel = () => {},
+    onMetadata = undefined, metadataDisabled = true,
+    assignmentView = null, assignmentDisabled = true, assignmentCanSave = false,
+    onAssignmentOperation = (_operation: 'load' | 'save' | 'undo' | 'retain' | 'prune') => {},
+    onAssignmentStage = (_input: SIVIProjectAssignmentInput) => {}, onAssignmentCancel = () => {} }: {
     view: SIVIParentReadView; onreload: () => void; oncancel: () => void; reloadDisabled: boolean;
     sourceView?: SIVIParentSourceView | null; onSourceReload?: () => void; onSourceCancel?: () => void;
     onSourceChange?: (source: number) => void;
@@ -25,6 +31,10 @@
     actionView?: SIVIParentWriteView | null; actionDisabled?: boolean; actionCanSave?: boolean;
     onActionOperation?: (operation: 'load' | 'save' | 'undo' | 'retain' | 'prune') => void;
     onActionStage?: (column: string, input: SIVIParentInput) => void; onActionCancel?: () => void;
+    onMetadata?: () => void; metadataDisabled?: boolean;
+    assignmentView?: SIVIProjectAssignmentView | null; assignmentDisabled?: boolean; assignmentCanSave?: boolean;
+    onAssignmentOperation?: (operation: 'load' | 'save' | 'undo' | 'retain' | 'prune') => void;
+    onAssignmentStage?: (input: SIVIProjectAssignmentInput) => void; onAssignmentCancel?: () => void;
   } = $props();
   const fields = source.forms[0].fields.filter(field => field.binding);
   const groups = [
@@ -32,9 +42,10 @@
     { name: 'Site description', page: 'form:frmSIVIsite/Site' },
     { name: 'Vegetation', page: 'form:frmSIVIsite/Veg' },
   ];
-  const displayedOriginal = $derived(writeView?.original ?? actionView?.original ?? view.original);
+  const displayedOriginal = $derived(assignmentView?.original ?? writeView?.original ?? actionView?.original ?? view.original);
   const writeUnsaved = $derived(writeView?.blocked || writeView && siviParentDirty(writeView.drafts));
   const actionUnsaved = $derived(actionView?.blocked || actionView && siviParentDirty(actionView.drafts));
+  const assignmentUnsaved = $derived(Boolean(assignmentView?.blocked || assignmentView && siviProjectAssignmentDirty(assignmentView.drafts)));
   const actions = $derived(displayedOriginal ? siviParentActionDisplay(displayedOriginal) : []);
 </script>
 
@@ -44,19 +55,29 @@
     <p class="text-sm text-stone-600">Persisted original values, not unsaved FS882 drafts.
       {writeView ? 'Only fourteen directly bound fields can be drafted; Save independently rechecks physical source membership.' : 'Parent editing remains unavailable.'}
       {actionView ? 'Two independently enabled source actions use a separate audited Save and restoration history.' : 'Source callback workflows remain unavailable.'}
-      ProjectID assignment remains unavailable. The explicit ProjectID choice-source preference only changes YAML, not plot data.</p>
+      {assignmentView ? 'Existing physical ProjectID selection uses its independently enabled audited Save and history.' : 'ProjectID assignment remains unavailable.'}
+      The explicit ProjectID choice-source preference only changes YAML, not plot data.</p>
   </header>
   {#if view.error}<p role="alert" class="text-sm text-red-700">{view.error}</p>{/if}
   {#if sourceView?.error}<p role="alert" class="text-sm text-red-700">{sourceView.error}</p>{/if}
   {#if writeView?.error}<p role="alert" class="text-sm text-red-700">{writeView.error}</p>{/if}
   {#if actionView?.error}<p role="alert" class="text-sm text-red-700">{actionView.error}</p>{/if}
+  {#if assignmentView?.error}<p role="alert" class="text-sm text-red-700">{assignmentView.error}</p>{/if}
+  {#if assignmentView?.original && !assignmentView.available}
+    <p role="status" class="text-sm text-amber-800" data-sivi-assignment-unavailable>{assignmentView.diagnostic}</p>
+  {/if}
   {#if view.busy}<p role="status">Loading owned SIVI parent originals...</p>{/if}
-  <div class="flex gap-2">
+  <div class="flex flex-wrap gap-2">
     <button type="button" class="rounded border px-3 py-1 disabled:opacity-50" data-sivi-parent-reload
       disabled={reloadDisabled || view.busy} onclick={onreload}>Reload parent originals</button>
+    {#if onMetadata}
+      <button type="button" class="rounded border px-3 py-1 disabled:opacity-50" data-sivi-metadata-open
+        disabled={metadataDisabled || view.busy || Boolean(writeView?.busy || actionView?.busy || assignmentView?.busy || writeUnsaved || actionUnsaved || assignmentUnsaved)}
+        onclick={onMetadata}>Edit metadata</button>
+    {/if}
     {#if view.busy}
       <button type="button" class="rounded border px-3 py-1" data-sivi-parent-cancel
-        disabled={Boolean(writeView?.busy || actionView?.busy)} onclick={oncancel}>Cancel parent read</button>
+        disabled={Boolean(writeView?.busy || actionView?.busy || assignmentView?.busy)} onclick={oncancel}>Cancel parent read</button>
     {/if}
     {#if actionView}
       <div class="flex flex-wrap gap-2" data-sivi-action-toolbar>
@@ -64,7 +85,7 @@
           class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onActionOperation('load')}>Load source-action editor</button>
         <button type="button" data-sivi-action-save disabled={actionDisabled || !actionCanSave}
           class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onActionOperation('save')}>Save SIVI source actions</button>
-        <button type="button" data-sivi-action-undo disabled={actionView.busy || Boolean(writeUnsaved)}
+        <button type="button" data-sivi-action-undo disabled={actionView.busy || Boolean(writeUnsaved || assignmentUnsaved)}
           class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onActionOperation('undo')}>Undo / reload source actions</button>
         {#if actionView.historyId}
           <button type="button" data-sivi-action-retain disabled={actionDisabled || !actionCanSave || Boolean(actionUnsaved)}
@@ -73,7 +94,7 @@
             class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onActionOperation('prune')}>Restore actions (prune audits)</button>
         {/if}
         {#if actionView.busy && actionView.operation === 'read'}
-          <button type="button" data-sivi-action-cancel disabled={Boolean(writeView?.busy)}
+          <button type="button" data-sivi-action-cancel disabled={Boolean(writeView?.busy || assignmentView?.busy)}
             class="rounded border px-3 py-1" onclick={onActionCancel}>Cancel action editor read</button>
         {/if}
       </div>
@@ -86,7 +107,7 @@
         class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onWriteOperation('load')}>Load directly bound editor</button>
       <button type="button" data-sivi-direct-save disabled={writeDisabled || !writeCanSave}
         class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onWriteOperation('save')}>Save SIVI parent drafts</button>
-      <button type="button" data-sivi-direct-undo disabled={writeView.busy || Boolean(actionUnsaved)}
+      <button type="button" data-sivi-direct-undo disabled={writeView.busy || Boolean(actionUnsaved || assignmentUnsaved)}
         class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onWriteOperation('undo')}>Undo / reload parent</button>
       {#if writeView.historyId}
         <button type="button" data-sivi-direct-retain disabled={writeDisabled || !writeCanSave || Boolean(writeUnsaved)}
@@ -95,11 +116,34 @@
           class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onWriteOperation('prune')}>Restore parent (prune audits)</button>
       {/if}
       {#if writeView.busy && writeView.operation === 'read'}
-        <button type="button" data-sivi-direct-cancel disabled={Boolean(actionView?.busy)}
+        <button type="button" data-sivi-direct-cancel disabled={Boolean(actionView?.busy || assignmentView?.busy)}
           class="rounded border px-3 py-1" onclick={onWriteCancel}>Cancel editor read</button>
       {/if}
     </div>
     {#if writeView.busy}<p role="status">SIVI parent operation: {writeView.operation}...</p>{/if}
+  {/if}
+  {#if assignmentView}
+        <div class="flex flex-wrap gap-2" data-sivi-assignment-toolbar>
+          <button type="button" data-sivi-assignment-load disabled={assignmentDisabled || assignmentView.busy || assignmentUnsaved}
+            class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onAssignmentOperation('load')}>Load existing ProjectID editor</button>
+          <button type="button" data-sivi-assignment-save disabled={assignmentDisabled || !assignmentCanSave}
+            class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onAssignmentOperation('save')}>Save ProjectID selection</button>
+          <button type="button" data-sivi-assignment-undo disabled={assignmentView.busy || Boolean(writeUnsaved || actionUnsaved)}
+            class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onAssignmentOperation('undo')}>Undo / reload ProjectID selection</button>
+          {#if assignmentView.historyId}
+            <button type="button" data-sivi-assignment-retain
+              disabled={assignmentDisabled || assignmentView.busy || assignmentUnsaved || !assignmentView.original}
+              class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onAssignmentOperation('retain')}>Restore ProjectID (retain audits)</button>
+            <button type="button" data-sivi-assignment-prune
+              disabled={assignmentDisabled || assignmentView.busy || assignmentUnsaved || !assignmentView.original}
+              class="rounded border px-3 py-1 disabled:opacity-50" onclick={() => onAssignmentOperation('prune')}>Restore ProjectID (prune audits)</button>
+          {/if}
+          {#if assignmentView.busy && assignmentView.operation === 'read'}
+            <button type="button" data-sivi-assignment-cancel disabled={Boolean(writeView?.busy || actionView?.busy)}
+              class="rounded border px-3 py-1" onclick={onAssignmentCancel}>Cancel ProjectID editor read</button>
+          {/if}
+        </div>
+        {#if assignmentView.busy}<p role="status">ProjectID assignment operation: {assignmentView.operation}...</p>{/if}
   {/if}
   {#if displayedOriginal}
     {@const original = displayedOriginal}
@@ -115,13 +159,19 @@
               {@const cell = original.Rows[0][binding.Table === original.EnvTable ? 'Env' : 'Admin'].cells[binding.Column]}
               <div class="min-w-0 rounded border border-stone-100 p-2" data-sivi-parent-field={binding.Binding}>
                 <dt class="text-sm font-medium">
-                  {#if actionView?.original && binding.Binding === 'PlotType'}
+                  {#if assignmentView?.original && assignmentView.choices && binding.Binding === 'ProjectID'}
+                    <label for="sivi-project-assignment">{field.caption || field.controlName || binding.Binding}</label>
+                  {:else if actionView?.original && binding.Binding === 'PlotType'}
                     <label for="sivi-action-PlotType">Plot Type</label>
                   {:else if writeView?.original && isSIVIParentDirectColumn(binding.Binding)}
                     <label for={`sivi-direct-${binding.Binding}`}>{field.caption || field.controlName || binding.Binding}</label>
                   {:else}{field.caption || field.controlName}{/if}
                 </dt>
-                {#if actionView?.original && binding.Binding === 'PlotType'}
+                {#if assignmentView?.original && assignmentView.choices && binding.Binding === 'ProjectID'}
+                  <SIVIProjectAssignmentField original={cell} choices={assignmentView.choices} drafts={assignmentView.drafts}
+                    disabled={assignmentDisabled || assignmentView.busy || assignmentView.blocked || !assignmentView.available}
+                    onstage={onAssignmentStage} />
+                {:else if actionView?.original && binding.Binding === 'PlotType'}
                   <SIVIParentActionField column="PlotType"
                     original={siviParentOriginalCell(actionView.original, 'PlotType')} draft={actionView.drafts.PlotType}
                     disabled={actionDisabled || actionView.busy || actionView.blocked} onstage={input => onActionStage('PlotType', input)} />
@@ -205,8 +255,15 @@
           </div>
         {/if}
         <p class="text-xs text-stone-600">Switching Env/Master is an immediate shared source preference, not an unsaved plot draft.
-          Metadata creation, automatic NotInList completion and ProjectID assignment remain unavailable.</p>
+          Metadata creation and automatic NotInList completion remain unavailable.
+          {assignmentView ? 'Assignment requires the separately loaded existing-definition editor.' : 'ProjectID assignment remains unavailable.'}</p>
       </section>
+    {/if}
+    {#if assignmentView?.choices}
+      <p class="text-xs text-stone-600">ProjectID selection uses {assignmentView.choices.Source}:
+        {assignmentView.choices.Alias}.{assignmentView.choices.Table}. Physical duplicates and NULL/empty titles remain distinct.
+        {assignmentView.diagnostic} Availability is not membership or commit authorization.
+        Explicit audited Save/reload is a desktop adaptation, not NotInList completion or metadata creation.</p>
     {/if}
     {#if actionView}<p class="text-xs text-stone-600">Desktop adaptation: explicit audited Save, then owned parent reload.
       Plot Type carries the verified source Refresh directive; Spp List does not.

@@ -30,6 +30,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	siviProjectAssignmentEnabled, err := siviProjectAssignmentFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	dataDir, err := userDataDir()
 	if err != nil {
 		log.Fatal(err)
@@ -64,6 +68,7 @@ func main() {
 	contextService.siviParentReviewEnabled = siviParentReviewEnabled
 	contextService.siviParentEditingEnabled = siviParentEditingEnabled
 	contextService.siviParentActionEditingEnabled = siviParentActionEditingEnabled
+	contextService.siviProjectAssignmentEnabled = siviProjectAssignmentEnabled
 	coordinates, err := newCoordinateService(configDir, preferences)
 	if err != nil {
 		log.Fatal(err)

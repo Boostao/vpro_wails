@@ -105,6 +105,10 @@ export function GetSIVIParentOriginal(contextID: string, plot: string): $Cancell
     return $Call.ByID(1022342976, contextID, plot);
 }
 
+export function GetSIVIProjectAssignmentOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIProjectAssignmentOriginal | null> {
+    return $Call.ByID(1326648454, contextID, plot);
+}
+
 export function GetSIVIProjectIDChoices(contextID: string): $CancellablePromise<$models.SIVIProjectChoices | null> {
     return $Call.ByID(3430452039, contextID);
 }
@@ -205,6 +209,10 @@ export function RestoreSIVIParentDirect(contextID: string, plot: string, history
     return $Call.ByID(2012647100, contextID, plot, historyID, action);
 }
 
+export function RestoreSIVIProjectAssignment(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(1243337619, contextID, plot, historyID, action);
+}
+
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
 }
@@ -299,6 +307,10 @@ export function SaveSIVIParentActions(contextID: string, plot: string, request: 
 
 export function SaveSIVIParentDirect(contextID: string, plot: string, request: $models.SIVIParentDirectWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {
     return $Call.ByID(2639883219, contextID, plot, request);
+}
+
+export function SaveSIVIProjectAssignment(contextID: string, plot: string, request: $models.SIVIProjectAssignmentWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {
+    return $Call.ByID(3061670770, contextID, plot, request);
 }
 
 export function SaveSpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {

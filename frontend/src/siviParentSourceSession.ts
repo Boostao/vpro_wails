@@ -18,7 +18,10 @@ function joinFromWire(wire: unknown, owner: SIVIParentOwner): SIVIParentJoinRevi
   return { ContextID: owner.contextId, Project: owner.project, Plot: owner.plot, Scope: wire.Scope,
     Diagnostic: wire.Diagnostic, Verified: wire.Verified, EnvRowIDs: [...wire.EnvRowIDs], AdminRowIDs: [...wire.AdminRowIDs] };
 }
-function choicesFromWire(wire: unknown, owner: SIVIParentOwner): SIVIProjectChoices {
+export type SIVIProjectPhysicalChoices = Omit<SIVIProjectChoices, 'Choices'> & {
+  Choices: ReturnType<typeof siviMetadataTableFromWire>;
+};
+export function siviProjectChoicesFromWire(wire: unknown, owner: SIVIParentOwner): SIVIProjectPhysicalChoices {
   if (!record(wire) || wire.ContextID !== owner.contextId || wire.Project !== owner.project ||
     (wire.SourceOption !== 1 && wire.SourceOption !== 2) || typeof wire.Table !== 'string' ||
     (wire.SourceOption === 1 ? wire.Source !== 'Env' || wire.Alias !== 'project' || wire.Table !== `${owner.project}_Metadata`
@@ -68,7 +71,7 @@ export class SIVIParentSourceSession {
       const [join, choices] = await Promise.all([this.port.join(), this.port.choices()]);
       if (this.disposed || generation !== this.generation) return false;
       this.state.join = joinFromWire(join, this.owner);
-      this.state.choices = choicesFromWire(choices, this.owner);
+      this.state.choices = siviProjectChoicesFromWire(choices, this.owner);
       return true;
     } catch (cause) {
       if (this.disposed || generation !== this.generation) return false;
@@ -88,7 +91,7 @@ export class SIVIParentSourceSession {
     this.state.error = null;
     this.notify();
     try {
-      const choices = choicesFromWire(await this.port.setSource(expected, source), this.owner);
+      const choices = siviProjectChoicesFromWire(await this.port.setSource(expected, source), this.owner);
       if (choices.SourceOption !== source) throw new Error('Committed source differs from the requested option; reload.');
       this.state.choices = choices;
       return true;

@@ -36,6 +36,9 @@ func validateSIVIParentHistoryOriginal(ctx context.Context, event siviParentHist
 }
 
 func siviParentHistoryAssignments(ctx context.Context, event siviParentHistory, project, plot string) ([]siviParentScalarAssignment, error) {
+	if event.ProjectAssignment != nil {
+		return nil, errors.New("ProjectID assignment history is not direct parent history")
+	}
 	original, err := validateSIVIParentHistoryOriginal(ctx, event, project, plot)
 	if err != nil {
 		return nil, err
@@ -112,6 +115,9 @@ func (s *ContextService) restoreSIVIParentHistory(ctx context.Context, contextID
 				return err
 			}
 			project := owner.selection.Project
+			if historyDomain.table != siviProjectAssignmentHistoryTable && event.ProjectAssignment != nil {
+				return errors.New("ProjectID assignment provenance belongs only to its isolated history")
+			}
 			if _, err := historyDomain.assignments(ctx, event, project, plot); err != nil {
 				return err
 			}

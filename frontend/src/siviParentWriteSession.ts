@@ -24,9 +24,9 @@ export interface SIVIParentWritePort<Request = SIVIParentDirectWrite> {
   refreshParent(): PromiseLike<void>;
 }
 type Operation = 'read' | 'save' | 'restore' | 'recover' | null;
-export interface SIVIParentWriteView {
+export interface SIVIParentWriteView<Drafts = SIVIParentDrafts> {
   original: SIVIParentOriginal | null;
-  drafts: SIVIParentDrafts;
+  drafts: Drafts;
   busy: boolean;
   operation: Operation;
   blocked: boolean;
@@ -58,35 +58,49 @@ export function siviParentDirectRequest(original: SIVIParentOriginal, drafts: SI
     text: cells(proposal.text), categorical: cells(proposal.categorical) };
 }
 
-export interface SIVIParentWriteScope<Column extends SIVIParentColumn, Request> {
+export interface SIVIParentWriteDraftScope<Column extends string, Drafts, Input> {
+  empty(): Drafts;
+  stage(original: SIVIParentOriginal, drafts: Drafts, column: Column, input: Input): Drafts;
+  errors(drafts: Drafts): string[];
+  dirty(drafts: Drafts): boolean;
+}
+
+export const siviParentWriteDraftScope: SIVIParentWriteDraftScope<SIVIParentColumn, SIVIParentDrafts, SIVIParentInput> = {
+  empty: () => ({}), stage: stageSIVIParent, errors: siviParentWriteErrors, dirty: siviParentDirty,
+};
+
+export interface SIVIParentWriteScope<Column extends string, Request, Drafts = SIVIParentDrafts, Input = SIVIParentInput> {
   accepts(value: string): value is Column;
   unavailable: string;
-  request(original: SIVIParentOriginal, drafts: SIVIParentDrafts): Request;
+  drafts: SIVIParentWriteDraftScope<Column, Drafts, Input>;
+  request(original: SIVIParentOriginal, drafts: Drafts): Request;
   count(request: Request): number;
+  decodeOriginal?(wire: unknown, owner: SIVIParentOwner): SIVIParentOriginal;
   verifyAcknowledgement?(result: Record<string, unknown>, request: Request): void;
 }
 
-export class SIVIParentScopedWriteSession<Column extends SIVIParentColumn, Request> {
-  private state: SIVIParentWriteView = {
-    original: null, drafts: {}, busy: false, operation: null, blocked: false, error: null, historyId: null,
-  };
+export class SIVIParentScopedWriteSession<Column extends string, Request, Drafts = SIVIParentDrafts, Input = SIVIParentInput> {
+  private state: SIVIParentWriteView<Drafts>;
   private readonly owner: SIVIParentOwner;
   private disposed = false;
   private generation = 0;
   private historyMaximum = 0;
 
   constructor(owner: SIVIParentOwner, private readonly port: SIVIParentWritePort<Request>, private readonly notify: () => void,
-    private readonly scope: SIVIParentWriteScope<Column, Request>) {
+    private readonly scope: SIVIParentWriteScope<Column, Request, Drafts, Input>) {
     this.owner = structuredClone(owner);
+    this.state = {
+      original: null, drafts: scope.drafts.empty(), busy: false, operation: null, blocked: false, error: null, historyId: null,
+    };
   }
 
-  view(): SIVIParentWriteView { return structuredClone(this.state); }
+  view(): SIVIParentWriteView<Drafts> { return structuredClone(this.state); }
   closeState(): EditorCloseState {
-    const invalid = siviParentWriteErrors(this.state.drafts);
+    const invalid = this.scope.drafts.errors(this.state.drafts);
     const saveReason = this.state.busy ? 'Wait for the SIVI parent operation to finish.'
       : this.state.blocked ? 'Recover SIVI parent acknowledgement/refresh explicitly with Undo/reload; do not replay.'
       : invalid[0] ?? (!this.state.original ? 'Load owned SIVI parent originals before editing.' : '');
-    return { unsaved: this.state.blocked || siviParentDirty(this.state.drafts), busy: this.state.busy,
+    return { unsaved: this.state.blocked || this.scope.drafts.dirty(this.state.drafts), busy: this.state.busy,
       blocked: this.state.blocked || invalid.length > 0, canSave: saveReason === '', saveReason, error: this.state.error };
   }
   private idle() {
@@ -94,13 +108,13 @@ export class SIVIParentScopedWriteSession<Column extends SIVIParentColumn, Reque
     if (this.state.busy) throw new Error('Wait for the SIVI parent operation to finish.');
   }
   private changed() { if (!this.disposed) this.notify(); }
-  stage(column: Column, input: SIVIParentInput) {
+  stage(column: Column, input: Input) {
     this.idle();
     if (!this.scope.accepts(column) || this.state.blocked || !this.state.original) {
       throw new Error(this.scope.unavailable);
     }
-    this.state.drafts = stageSIVIParent(this.state.original, this.state.drafts, column, input);
-    this.state.error = siviParentWriteErrors(this.state.drafts)[0] ?? null;
+    this.state.drafts = this.scope.drafts.stage(this.state.original, this.state.drafts, column, input);
+    this.state.error = this.scope.drafts.errors(this.state.drafts)[0] ?? null;
     this.changed();
   }
   async load(): Promise<boolean> {
@@ -111,7 +125,8 @@ export class SIVIParentScopedWriteSession<Column extends SIVIParentColumn, Reque
   private async readCurrent(generation: number) {
     const wire = await this.port.read();
     if (this.disposed || this.generation !== generation) return false;
-    this.state.original = siviParentOriginalFromWire(wire, this.owner);
+    this.state.original = this.scope.decodeOriginal
+      ? this.scope.decodeOriginal(wire, this.owner) : siviParentOriginalFromWire(wire, this.owner);
     return true;
   }
   private async reload(recover: boolean): Promise<boolean> {
@@ -156,7 +171,7 @@ export class SIVIParentScopedWriteSession<Column extends SIVIParentColumn, Reque
   }
   async undo(): Promise<boolean> {
     this.idle();
-    this.state.drafts = {};
+    this.state.drafts = this.scope.drafts.empty();
     return this.reload(true);
   }
   async save(): Promise<boolean> {
@@ -166,7 +181,7 @@ export class SIVIParentScopedWriteSession<Column extends SIVIParentColumn, Reque
     const request = this.scope.request(this.state.original, this.state.drafts);
     const count = this.scope.count(request);
     if (count === 0) {
-      this.state.drafts = {};
+      this.state.drafts = this.scope.drafts.empty();
       this.state.error = null;
       this.changed();
       return true;
@@ -179,7 +194,7 @@ export class SIVIParentScopedWriteSession<Column extends SIVIParentColumn, Reque
     try {
       const result = await this.port.save(request);
       committed = true;
-      this.state.drafts = {};
+      this.state.drafts = this.scope.drafts.empty();
       this.state.historyId = null;
       if (!record(result) || result.ChangedCells !== count || typeof result.HistoryID !== 'string' ||
         result.HistoryID !== '' && (!exactSigned64(result.HistoryID) || BigInt(result.HistoryID) <= 0)) {
@@ -194,7 +209,7 @@ export class SIVIParentScopedWriteSession<Column extends SIVIParentColumn, Reque
     } catch (cause) {
       const cleanup = String(cause).includes('SIVI parent edit committed but cleanup failed;');
       if (cleanup) {
-        this.state.drafts = {};
+        this.state.drafts = this.scope.drafts.empty();
         this.state.historyId = null;
       }
       this.state.blocked ||= committed || cleanup;
@@ -257,6 +272,7 @@ export class SIVIParentWriteSession extends SIVIParentScopedWriteSession<SIVIPar
   constructor(owner: SIVIParentOwner, port: SIVIParentWritePort, notify: () => void) {
     super(owner, port, notify, {
       accepts: isSIVIParentDirectColumn,
+      drafts: siviParentWriteDraftScope,
       unavailable: 'SIVI directly bound source is unavailable; callback actions remain disabled.',
       request: siviParentDirectRequest,
       count: request => [request.scalars, request.options, request.text, request.categorical]

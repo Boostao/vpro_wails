@@ -1009,6 +1009,18 @@ export interface SIVIParentWriteResult {
     "HistoryID": string;
 }
 
+export interface SIVIProjectAssignmentOriginal {
+    "Original": SIVIParentProjection | null;
+    "Choices": SIVIProjectChoices | null;
+    "AssignmentAvailable": boolean;
+    "AssignmentDiagnostic": string;
+}
+
+export interface SIVIProjectAssignmentWrite {
+    "original": SIVIParentProjection | null;
+    "selection": SIVIProjectSelection;
+}
+
 export interface SIVIProjectChoices {
     "ContextID": string;
     "Project": string;
@@ -1017,6 +1029,19 @@ export interface SIVIProjectChoices {
     "Table": string;
     "SourceOption": number;
     "Choices": ProjectMetadataTable;
+}
+
+export interface SIVIProjectSelection {
+    "contextId": string;
+    "controlId": string;
+    "table": string;
+    "rowId": string;
+    "expected": ProjectMetadataCell;
+    "sourceOption": number;
+    "metadataAlias": string;
+    "metadataTable": string;
+    "metadataColumns": ProjectMetadataColumn[] | null;
+    "metadataOriginal": ProjectMetadataRow;
 }
 
 export interface SIVIVegetationProjection {

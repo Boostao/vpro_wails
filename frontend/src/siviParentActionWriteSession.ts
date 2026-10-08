@@ -2,7 +2,7 @@ import type { SIVIParentActionWrite } from '../bindings/github.com/boostao/vpro-
 import type { SIVIParentColumn, SIVIParentDrafts, SIVIParentOriginal } from './siviParentEditor';
 import { siviParentProposal } from './siviParentEditor';
 import type { SIVIParentOwner } from './siviParentTransport';
-import { SIVIParentScopedWriteSession, siviParentWriteErrors, type SIVIParentWritePort } from './siviParentWriteSession';
+import { SIVIParentScopedWriteSession, siviParentWriteDraftScope, siviParentWriteErrors, type SIVIParentWritePort } from './siviParentWriteSession';
 
 export const siviParentActionColumns = ['PlotType', 'SpeciesListComplete'] as const satisfies readonly SIVIParentColumn[];
 export type SIVIParentActionColumn = typeof siviParentActionColumns[number];
@@ -30,6 +30,7 @@ export class SIVIParentActionWriteSession extends SIVIParentScopedWriteSession<S
   constructor(owner: SIVIParentOwner, port: SIVIParentWritePort<SIVIParentActionWrite>, notify: () => void) {
     super(owner, port, notify, {
       accepts: isSIVIParentActionColumn,
+      drafts: siviParentWriteDraftScope,
       unavailable: 'SIVI source action editing is unavailable; load the independently enabled owned editor.',
       request: siviParentActionRequest,
       count: request => request.actions?.length ?? 0,

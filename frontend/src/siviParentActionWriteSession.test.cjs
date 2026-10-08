@@ -4,7 +4,8 @@ const { readFileSync } = require('node:fs');
 const path = require('node:path');
 const { render } = require('svelte/server');
 const { serverComponent } = require('./svelteTestHelpers.cjs');
-const { actionWriteSession, writeSession, editor, original, cell, setCell, transport, source, metadata } = require('./siviParentTestHelpers.cjs');
+const { actionWriteSession, writeSession, editor, original, cell, setCell, transport, source, metadata,
+  assignmentSession, assignmentField } = require('./siviParentTestHelpers.cjs');
 const { SIVIParentActionWriteSession, siviParentActionRequest } = actionWriteSession;
 const owner = { contextId: 'context:owned', project: 'Project', plot: 'P' };
 const plots = ['Ground', 'Visual', 'Note', 'FS882', 'Other'];
@@ -158,6 +159,7 @@ const Panel = serverComponent(readFileSync(path.join(__dirname, 'SIVIParentReadP
   '../../resources/fs1333-sivi-layout.json': { default: source }, './projectMetadataEditor': metadata,
   './siviParentTransport': transport, './siviParentWriteSession': writeSession, './siviParentEditor': editor,
   './SIVIParentDirectField.svelte': { default: DirectField }, './SIVIParentActionField.svelte': { default: ActionField },
+  './siviProjectAssignmentSession': assignmentSession, './SIVIProjectAssignmentField.svelte': { default: assignmentField },
 });
 test('normal source action controls have literal labels/options without initialization or NULL PlotType', async () => {
   const { session, calls } = fixture(); await session.load();
@@ -206,8 +208,8 @@ test('mounted source actions join Save/Undo/Lock/close ownership and refresh onl
   assert.match(parent, /Undo SIVI source-action drafts\/recovery before changing the plot lock/);
   assert.match(parent, /siviParentActionSession\.closeState\(\)\.unsaved/);
   assert.match(parent, /\|\| \(siviParentActionClose\?\.blocked \?\? false\)/);
-  assert.match(parent, /refreshSIVIParent\(plot, siviParentWriteSession\)/);
-  assert.match(parent, /refreshSIVIParent\(plot, siviParentActionSession\)/);
+  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentWriteSession, siviProjectAssignmentSession\]\)/);
+  assert.match(parent, /refreshSIVIParent\(plot, \[siviParentActionSession, siviProjectAssignmentSession\]\)/);
   assert.match(parent, /peer\.closeState\(\)\.unsaved \|\| peer\.closeState\(\)\.busy/);
-  assert.match(parent, /peer\?\.view\(\)\.original && !await peer\.load\(\)/);
+  assert.match(parent, /peer && \(peer\.view\(\)\.original \|\| peer\.view\(\)\.error\) && !await peer\.load\(\)/);
 });

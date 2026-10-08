@@ -1,4 +1,6 @@
-const { loadTypeScript } = require('./svelteTestHelpers.cjs');
+const { loadTypeScript, serverComponent } = require('./svelteTestHelpers.cjs');
+const { readFileSync } = require('node:fs');
+const path = require('node:path');
 const source = require('../../resources/fs1333-sivi-layout.json');
 const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
 const metadata = loadTypeScript('projectMetadataEditor.ts', {
@@ -25,6 +27,17 @@ const writeSession = loadTypeScript('siviParentWriteSession.ts', {
 const actionWriteSession = loadTypeScript('siviParentActionWriteSession.ts', {
   './siviParentEditor': editor, './siviParentWriteSession': writeSession,
 });
+const sourceSession = loadTypeScript('siviParentSourceSession.ts', {
+  './siviParentTransport': transport, './projectMetadataRestore': restoration,
+});
+const assignmentSession = loadTypeScript('siviProjectAssignmentSession.ts', {
+  './siviParentEditor': editor, './siviParentWriteSession': writeSession, './siviParentTransport': transport,
+  './siviParentSourceSession': sourceSession, './projectMetadataEditor': metadata, './qualityEditor': quality,
+});
+const assignmentField = serverComponent(readFileSync(path.join(__dirname, 'SIVIProjectAssignmentField.svelte'), 'utf8'),
+  'SIVIProjectAssignmentField.svelte', {
+    './siviProjectAssignmentSession': assignmentSession, './projectMetadataEditor': metadata,
+  });
 const cell = (storage = 'null', value = null) => ({
   storage, text: storage === 'text' ? value : null, integer: storage === 'integer' ? value : null,
   real: storage === 'real' ? value : null, blobHex: storage === 'blob' ? value : null,
@@ -53,4 +66,5 @@ function setCell(review, column, value) {
   const binding = review.Bindings.find(binding => binding.Binding === column);
   review.Rows[0][binding.Table.endsWith('_Admin') ? 'Admin' : 'Env'].cells[binding.Column] = value;
 }
-module.exports = { editor, SIVIParentSession, transport, writeSession, actionWriteSession, source, original, cell, setCell, metadata, restoration };
+module.exports = { editor, SIVIParentSession, transport, writeSession, actionWriteSession, assignmentSession, assignmentField, sourceSession,
+  source, original, cell, setCell, metadata, restoration };

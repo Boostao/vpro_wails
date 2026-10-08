@@ -76,45 +76,60 @@ func readOwnedSIVIProjectChoicesAtSource(ctx context.Context, plots *PlotService
 		return nil, errors.New("SIVI ProjectID source must be Env (1) or Master (2)")
 	}
 	return withOwnedSIVISnapshot(ctx, plots, func(owner *sqliteContext, tx *sql.Tx) (*SIVIProjectChoices, error) {
-		result := &siviProjectChoices{ContextID: contextID, Project: owner.selection.Project, SourceOption: source,
-			Source: "Env", Alias: "project", Table: owner.selection.Project + "_Metadata"}
-		collation := "BINARY"
-		if source == 2 {
-			result.Source, result.Alias, result.Table = "Master", "VMetaData", "ProjectMetadata"
-			collation = "NOCASE"
-		}
-		// Access identifiers are case-insensitive; retain the master's actual physical
-		// spelling, never synthesize a view or silently select the other source.
-		matches, err := tx.QueryContext(ctx, `SELECT name FROM `+quoteHeaderIdentifier(result.Alias)+
-			`.sqlite_master WHERE type='table' AND name COLLATE `+collation+`=?`, result.Table)
-		if err != nil {
-			return nil, err
-		}
-		count := 0
-		for matches.Next() {
-			if err := matches.Scan(&result.Table); err != nil {
-				matches.Close()
-				return nil, err
-			}
-			count++
-		}
-		if err := errors.Join(matches.Err(), matches.Close()); err != nil {
-			return nil, err
-		}
-		if count != 1 {
-			return nil, fmt.Errorf("SIVI ProjectID source %s requires one original physical metadata table", result.Source)
-		}
-		if err := validateSIVIPhysicalSchema(ctx, tx, result.Alias, result.Table, "ProjectID choices"); err != nil {
-			return nil, err
-		}
-		original, err := readSQLiteStorageRows(ctx, tx, result.Alias, result.Table, "", nil, "")
-		if err != nil {
-			return nil, err
-		}
-		result.Choices, err = projectSIVIProjectChoices(ctx, original)
-		if err != nil {
-			return nil, err
-		}
-		return result, nil
+		return readSIVIProjectChoicesSnapshot(ctx, owner, tx, contextID, source)
 	})
+}
+
+func readSIVIProjectChoicesSnapshot(ctx context.Context, owner *sqliteContext, tx *sql.Tx, contextID string, source int) (*SIVIProjectChoices, error) {
+	return readSIVIProjectChoicesAtAlias(ctx, owner, tx, contextID, source, "project")
+}
+
+func readSIVIProjectChoicesAtAlias(ctx context.Context, owner *sqliteContext, tx *sql.Tx, contextID string, source int, projectAlias string) (*SIVIProjectChoices, error) {
+	if source != 1 && source != 2 {
+		return nil, errors.New("SIVI ProjectID source must be Env (1) or Master (2)")
+	}
+	result := &siviProjectChoices{ContextID: contextID, Project: owner.selection.Project, SourceOption: source,
+		Source: "Env", Alias: "project", Table: owner.selection.Project + "_Metadata"}
+	collation := "BINARY"
+	if source == 2 {
+		result.Source, result.Alias, result.Table = "Master", "VMetaData", "ProjectMetadata"
+		collation = "NOCASE"
+	}
+	sqlAlias := projectAlias
+	if source == 2 {
+		sqlAlias = result.Alias
+	}
+	// Access identifiers are case-insensitive; retain the master's actual physical
+	// spelling, never synthesize a view or silently select the other source.
+	matches, err := tx.QueryContext(ctx, `SELECT name FROM `+quoteHeaderIdentifier(sqlAlias)+
+		`.sqlite_master WHERE type='table' AND name COLLATE `+collation+`=?`, result.Table)
+	if err != nil {
+		return nil, err
+	}
+	count := 0
+	for matches.Next() {
+		if err := matches.Scan(&result.Table); err != nil {
+			matches.Close()
+			return nil, err
+		}
+		count++
+	}
+	if err := errors.Join(matches.Err(), matches.Close()); err != nil {
+		return nil, err
+	}
+	if count != 1 {
+		return nil, fmt.Errorf("SIVI ProjectID source %s requires one original physical metadata table", result.Source)
+	}
+	if err := validateSIVIPhysicalSchema(ctx, tx, sqlAlias, result.Table, "ProjectID choices"); err != nil {
+		return nil, err
+	}
+	original, err := readSQLiteStorageRows(ctx, tx, sqlAlias, result.Table, "", nil, "")
+	if err != nil {
+		return nil, err
+	}
+	result.Choices, err = projectSIVIProjectChoices(ctx, original)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

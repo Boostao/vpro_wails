@@ -34,6 +34,14 @@ type siviParentHistoryChange struct {
 type siviParentHistory struct {
 	Original, Committed *siviParentProjection
 	Changes             []siviParentHistoryChange
+	ProjectAssignment   *siviProjectAssignmentHistory `json:",omitempty"`
+}
+
+type siviParentWriteHooks struct {
+	prepare  func(*sql.Conn) (func(), error)
+	verify   func(*sql.Tx) error
+	plan     func(*sql.Tx, *siviParentProjection) ([]siviParentScalarAssignment, error)
+	decorate func(*siviParentHistory)
 }
 
 type siviParentHistoryDomain struct {
@@ -135,9 +143,18 @@ func readSIVIParentForWrite(ctx context.Context, tx *sql.Tx, owner *sqliteContex
 	return parent, nil
 }
 
-func withSIVIParentWriteTransaction(ctx context.Context, owner *sqliteContext, purpose string, operation func(*sql.Tx, string) error) error {
+func withSIVIParentWriteTransaction(ctx context.Context, owner *sqliteContext, purpose string, operation func(*sql.Tx, string) error, hooks ...siviParentWriteHooks) error {
 	committed := false
 	err := owner.withMetadataWriter(ctx, func(conn *sql.Conn) (resultErr error) {
+		for _, hook := range hooks {
+			if hook.prepare != nil {
+				release, err := hook.prepare(conn)
+				if err != nil {
+					return err
+				}
+				defer release()
+			}
+		}
 		suAlias, err := siviParentWriterSU(ctx, conn, owner)
 		if err != nil {
 			return err
@@ -153,6 +170,13 @@ func withSIVIParentWriteTransaction(ctx context.Context, owner *sqliteContext, p
 		}()
 		if err := operation(tx, suAlias); err != nil {
 			return err
+		}
+		for _, hook := range hooks {
+			if hook.verify != nil {
+				if err := hook.verify(tx); err != nil {
+					return err
+				}
+			}
 		}
 		if err := owner.validateMetadataWriterFiles(); err != nil {
 			return err
@@ -182,9 +206,16 @@ func (s *ContextService) writeSIVIParentDirect(ctx context.Context, contextID, p
 }
 
 func (s *ContextService) writeSIVIParentPlanned(ctx context.Context, contextID, plot string, original *siviParentProjection, history siviParentHistoryDomain, plan func(*siviParentProjection) ([]siviParentScalarAssignment, error)) (*siviParentWriteResult, error) {
+	return s.writeSIVIParentPlannedWithHooks(ctx, contextID, plot, original, history, plan, siviParentWriteHooks{})
+}
+
+func (s *ContextService) writeSIVIParentPlannedWithHooks(ctx context.Context, contextID, plot string, original *siviParentProjection, history siviParentHistoryDomain, plan func(*siviParentProjection) ([]siviParentScalarAssignment, error), hooks siviParentWriteHooks) (*siviParentWriteResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*siviParentWriteResult, error) {
 		if err := plots.requireContextEdit(); err != nil {
 			return nil, err
+		}
+		if history.table == siviProjectAssignmentHistoryTable && plots.currentUser == "" {
+			return nil, errors.New("SIVI parent writing requires an explicit audit user")
 		}
 		if err := validateChildPhysicalText("SIVI parent audit user", plots.currentUser, 100); err != nil {
 			return nil, err
@@ -199,7 +230,12 @@ func (s *ContextService) writeSIVIParentPlanned(ctx context.Context, contextID, 
 			if !reflect.DeepEqual(original, observed) {
 				return errors.New("SIVI original physical parents changed; undo and reload before writing")
 			}
-			assignments, err := plan(observed)
+			var assignments []siviParentScalarAssignment
+			if hooks.plan != nil {
+				assignments, err = hooks.plan(tx, observed)
+			} else {
+				assignments, err = plan(observed)
+			}
 			if err != nil {
 				return err
 			}
@@ -233,7 +269,11 @@ func (s *ContextService) writeSIVIParentPlanned(ctx context.Context, contextID, 
 				return err
 			}
 			if len(changes) != 0 {
-				proposal, err := json.Marshal(siviParentHistory{Original: observed, Committed: fresh, Changes: changes})
+				event := siviParentHistory{Original: observed, Committed: fresh, Changes: changes}
+				if hooks.decorate != nil {
+					hooks.decorate(&event)
+				}
+				proposal, err := json.Marshal(event)
 				if err != nil {
 					return err
 				}
@@ -255,7 +295,7 @@ func (s *ContextService) writeSIVIParentPlanned(ctx context.Context, contextID, 
 			}
 			result.ChangedCells = len(assignments)
 			return nil
-		})
+		}, hooks)
 		if err != nil {
 			return nil, err
 		}

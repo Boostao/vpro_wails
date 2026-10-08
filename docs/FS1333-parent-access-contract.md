@@ -2,10 +2,12 @@
 
 ## Status
 
-Static source contract plus separately gated native parent review and fourteen
-directly bound parent editors/restoration, not an enabled full-form entrypoint.
-The private writer checkpoint and public/mounted successor are distinguished
-below; callback actions, ProjectID assignment and metadata creation stay disabled.
+Static source contract plus separately gated native parent review, fourteen
+directly bound editors, two normal source actions and existing physical ProjectID
+assignment/restoration, not a full-form entrypoint. The shared current-project
+metadata editor now has a separately gated SIVI entry action and measured
+edit/restoration/refresh recovery. New-ID completion and SIVI metadata creation
+remain unavailable. Normal source actions use explicit desktop Save/reload.
 The separately gated SIVI height panel is a bounded adaptation mounted under
 FS882; it does not implement this parent form. Exported coordinates are evidence,
 not a requirement to reproduce fixed Access pixels.
@@ -14,7 +16,7 @@ Sources were read directly from the local `VPro64_forAI` exports. The R form is
 not parity proof. Existing [packaged metadata](../resources/fs1333-sivi-layout.json)
 preserves the normal parent, source labels, control relationships, events and
 three PlotNumber-linked children. Parent fields are read-only unless the separate
-editing gates explicitly load the fourteen approved controls. Mapped original
+editing gates explicitly load their fourteen direct/two action controls. Mapped original
 storage is not source-equivalent join/callback/write authorization.
 
 | Export | SHA256 |
@@ -966,3 +968,241 @@ sealed in the [mounted action checkpoint](../archives/sivi-parent-action-mounted
 Full Unicode collation, ProjectID assignment/metadata creation and complete
 FS1333 remain unavailable. Protected defaults/assets/data/exports are unchanged;
 no Access execution, commit, push or default promotion.
+
+## Private ProjectID choice-planning candidate
+
+The normal ProjectID ComboBox binds Env.ProjectID and has two choice columns;
+GotFocus selects master ProjectMetadata or current-project Metadata. Its
+NotInList path invokes metadata editing, concatenates raw input into RowSource,
+requests SaveRecord and Refresh. It is not a safe free-text assignment/create
+shortcut and is not implemented by this candidate.
+
+The [selection planner](../siviprojectassignment.go) requires an explicit
+physical metadata row with its raw ID/title pair, exact source preference/
+alias/table/context and normal control identity. Duplicate IDs do not choose a
+definition implicitly. Changed assignments are only existing nonempty TEXT,
+bounded by Env.ProjectID's30 UTF-16 units (not new metadata's20). NULL/empty/
+non-TEXT choices remain visible as storage evidence but are not new assignment
+or completion paths. Unchanged historical invalid values are omitted.
+No trimming, recasing, metadata edits, parent identity changes or audits occur.
+
+The [private owned proposal](../siviprojectassignmentproposal.go) reuses one
+pinned read-only transaction for the complete physical parent and metadata
+choice. Existing parent/choice readers use the same extracted snapshot helpers.
+It carries the complete original, selected source/row/title and exact proposed
+parent cell, not write authorization. The YAML preference is observed before
+this read; it is not an atomic source-preference guard for a later commit.
+
+Pure focused race1.360s and coupled reader/source/proposal race65.741s pass,
+including local/external projects, both sources, exact signed IDs beyond2^53,
+physical duplicates, NULL/empty title drift, malformed values, exact UTF-16
+bounds, historical no-ops, source drift, stale ownership, cancellation/retry,
+clone safety and byte-for-byte DB/config zero writes. Full Go race734.979s/all
+packages passes. Source and receipts are sealed in the
+[assignment preview checkpoint](../archives/sivi-project-assignment-preview-checkpoint/evidence-manifest.json).
+No service DTO, bindings,
+frontend, new native candidate, assignment writer or restoration is enabled.
+
+Next storage must independently recheck complete parent/schema/selected-SU,
+metadata definition and source preference while preserving ownership through
+commit; attach master metadata read-only, keep audits/history in the project
+transaction, and keep assignment history separate from direct/action events.
+Do not call the existing planner from a writer without those transaction guards.
+
+### Accepted private assignment storage
+
+The [private assignment transaction](../siviprojectassignmentwrite.go) uses the
+shared parent writer/restorer with source-specific hooks, without broadening
+direct14/action2 authorization. The existing metadata choice projection can
+read the writer's `main` SQL alias while retaining original `project` provenance.
+Selections now explicitly carry original projected column names/declared types;
+schema-only drift is distinct from equal ID/title/row values.
+
+Under the owned context/parent leases, acquire the shared preference mutex and
+hold it until commit/rollback finishes. Read/recheck the literal1/2 source with
+the locked config reader, never a self-deadlocking snapshot call. Env metadata
+is in the project transaction. Master is attached read-only; rollback-journal
+read locks protect its selected definition and schema through project commit.
+Master WAL/memory modes are explicitly unavailable because a read-only snapshot
+cannot exclude a concurrent metadata commit. Do not silently convert journal modes.
+
+Before and after planned effects, independently capture selected physical
+metadata, actual schema columns/objects and digest; drift rolls back. The shared
+writer still rechecks full parent original, certified join, selected SU, every
+owned file, complete project effects and typed audits. No-op/unchanged assignments
+produce no audit/history; an explicit audit user is required in this new domain.
+
+`__VPRO_SIVIProjectAssignmentHistory` carries complete original/committed parents,
+raw metadata/source/schema evidence and typed audited cells. Its restorer
+replans only the ProjectID cell and validates stored schema provenance and
+unchanged unrelated parent state. Direct/action namespaces reject assignment
+provenance; assignment rejects their events. Restoration does not reselect or
+recreate metadata or change the current source preference: it restores only
+recorded audited parent storage, including historical values, with the existing
+retain/prune/replay/alias/ownership and unaudited-deletion protections.
+
+Local/external source/strength matrices, exact UTF-16/malformed values, original/
+metadata/schema/source drift, ownership/cancellation/collision, triggers/rollback/
+retry, commit-held preference exclusion, history isolation, malformed events
+and unaudited changes/deletions are tested. Independent read-only review finds
+no significant issues. Primary coupled race184.245s and full Go race814.398s pass.
+The immutable storage checkpoint preserves both the36-file read-only preview
+and191-file mounted action predecessors; no public/native assignment or metadata
+creation is enabled.
+
+### Independently gated assignment transport and default denial
+
+The [assignment facade](../siviprojectassignmentservice.go) exposes three methods:
+owned original plus metadata choices, explicit existing physical selection Save,
+and isolated audited-only Restore. All require the review/editing prerequisites
+and independent literal `VPRO_SIVI_PROJECT_ASSIGNMENT=true`. The action flag
+neither authorizes assignment nor becomes its prerequisite. All default off.
+
+Transport requires every target/control/context, expected parent cell, source
+option, literal metadata alias/table, projected names/declared types and selected
+physical row with raw ID/title. Missing/NULL nested schema/row properties,
+unknown fields, numeric/string coercion and malformed raw JSON Unicode are
+rejected before decoder repair. Physical identities remain signed-decimal strings,
+including values beyond2^53; duplicate IDs and NULL/empty titles are not collapsed.
+The complete parent and metadata original share a pinned read transaction.
+Preference observation before that read is not a later commit guard: Save uses
+the accepted transaction-held preference/metadata/schema/parent/SU/file checks.
+Private history serialization stays unchanged; only the explicit public DTO
+has the new transport decoder.
+
+Focused assignment race49.946s/full Go race811.644s/all packages pass, including
+local/external source1/2 public save/prune/replay, partial feature masks,
+cancellation, stale context/source and exact initialization zero writes.
+Generated bindings15 services/184 methods/144 models/two enums/one event,
+frontend353/353, check0/0 and isolated production/Wails builds pass.
+
+On a fresh disposable fixture, actual Wails denies complete valid transport at
+all three APIs when only assignment is off (review/editing/action are on).
+The actual default FS882 editor mounts with no opt-in navigation/assignment
+controls. Full project/support/config hashes restore and both fresh owners close.
+The first harness incorrectly passed reader arguments as one array; it stopped
+before an assignment request or business mutation, closed normally, and only
+the unfinished zero-write proof continued under a fresh process.
+The facade/default-denial checkpoint preserves the44-file storage predecessor
+and protected data/assets/source/default builds. This is not enabled mounted
+assignment, literal Access callback timing, NULL/empty completion or metadata
+creation acceptance. Persistent selection lifecycle and mounted Save/Restore
+were the separate unavailable successor at that checkpoint.
+
+### Accepted mounted existing-definition assignment
+
+The [physical selection owner](../frontend/src/siviProjectAssignmentSession.ts)
+reuses the parent writer's acknowledgement/history/cancellation/recovery lifecycle
+through typed draft hooks. The sixteen-field draft policies, direct14 and action2
+adapters are unchanged; ProjectID has a separate selection-only model rather
+than being added to a generic free-text editor. Parent/metadata tokens are loaded
+together. Each observed row retains its signed string identity, literal ID/title,
+source alias/table and projected columns. A duplicate with equal parent storage
+is a semantic no-op; unchanged historical invalid values are omitted.
+
+New assignments require existing nonempty TEXT within30 UTF-16 units and a
+lossless original audit representation. NULL/empty/non-TEXT/overlength and
+historical-BLOB replacement options remain visible but disabled. Their raw
+definitions are evidence, not membership or completion authorization. Model
+errors remain scoped to the original owner and survive view cloning/remount;
+correction, Save or explicit Undo clears them without resetting another editor.
+
+`AssignmentAvailable`/`AssignmentDiagnostic` are read in the pinned snapshot
+using the same source-specific journal guard as the writer. Availability is
+observational, never later commit permission. Master rollback journals support
+the existing read-only transaction guard; WAL/memory remain unavailable. The
+mounted selector/Save are disabled, feedback precedes fields, and complete valid
+native Save transport is independently rejected. No journal conversion is
+performed. Typed restoration does not depend on current metadata availability
+or the current source preference.
+
+One associated ProjectID selector is rendered in its source field group; no
+duplicate live field or free-text metadata creation is introduced. Backend and
+presentation each require parent review/editing plus independent assignment
+flags, default off; action editing is neither permission nor prerequisite.
+FS882 owns the model across tab remounts and wires drafts/errors into Save/Undo/
+Lock/OS-close/context/source safety. Direct/action/assignment peers cannot clear
+one another's drafts. Clean peer/source loads refresh full originals and choices
+while retaining each independent history handle.
+
+Focused50.977s/full Go race825.824s, frontend368/368/check0/0, actual generated
+bindings15/184/144, isolated opt-in/current-default Wails builds and independent
+review pass. Nine actual native cases cover visible1400px/600px labels/geometry,
+initialization zero writes, selection remount and peer/source/Lock/close guards,
+direct-error ownership, blocked read cancellation/retry, coupled direct/action/
+Env assignment, Master assignment/restoration after switching back to Env,
+Master WAL disabled UI/writer denial and current-default mounted denial.
+Four successful events change exactly five audited cells in three separate
+history domains. Full project/audit/history differences are independently
+checked at each commit/restoration. All16 original DB/config hashes restore
+after fresh owned closure, with retired histories preserved offline.
+
+The first coupled harness expected clean peer Save readiness while its selection
+correctly disabled peers; it stopped before any business write. Its known
+unsaved close dialog was independently discarded, ownership/zero-write hashes
+verified, then a fresh process continued. The first current-default proof
+shadowed CLI args after successful denial/mount; its clean owner was closed and
+only that zero-write proof continued. No successful mutation was replayed.
+The mounted checkpoint preserves the307-file public facade predecessor and
+protected source/data/default delivery. This is explicit audited desktop
+Save/reload, not literal Access callback timing, defective NotInList completion,
+metadata creation, full Unicode collation or complete FS1333 replacement.
+
+### Shared metadata entry and refresh recovery
+
+Re-read normal `frmSIVIsite.btnEditMetadata_Click`/`ProjectID_NotInList`,
+`frmProjectMetaData`, `UsysMetadata`, `UsysEnv`, `clsFormInfo` and the original
+Metadata table definitions before this successor. The source "Edit Metadata"
+action opens `frmProjectMetaData`/`UsysMetadata`, hence current-project metadata,
+regardless of the Env/Master choice-source preference. It does not authorize
+changing a parent ID to new input. Its NULL-StartDate lookup asymmetry, wrong
+recordset NoMatch test and concatenated NotInList SQL remain defects, not
+requirements to silently pick/copy/create a record.
+
+Reuse the existing [metadata editor](../frontend/src/ProjectMetadataEditor.svelte),
+exact physical review,75-column schema, ordinary field policies,20-unit blank
+creation bound,33-field template mapping/32 explicit assignments, transactional
+audit and typed restoration. No parallel backend/editor or new Wails methods.
+All literal matching records, including NULL/non-NULL dates and duplicate IDs,
+remain explicit choices; no first row, stamp, new ID or master copy is inferred.
+Creation/template/restoration keep their existing independent flags. This
+SIVI-entry acceptance enables only existing-record editing/typed restoration;
+it neither implements NotInList nor validates SIVI creation.
+
+The [parent panel](../frontend/src/SIVIParentReadPanel.svelte) shows the action
+only under the existing literal default-off `VITE_PROJECT_METADATA_EDITING`.
+FS882 supplies its existing ownership/Lock/parent/peer draft/busy/error guards.
+While metadata is open, its shared editor replaces the parent presentation,
+not its persistent direct/action/assignment owners. An acknowledged metadata
+commit refreshes the already attempted parent/three peer/source reads and
+retains history handles. Failed reads clear originals; explicit retry must use
+their retained error/attempt state too, rather than forever skipping them.
+
+Coupled recovery fixes make raw metadata validation and acknowledged refresh
+failures hard native/context close barriers. Save acknowledgement retires the
+draft before fallible refresh. Undo/manual close cannot dismiss a committed
+failure. Reload retries only the refresh callback before reading metadata/
+definitions and clears recovery only on complete success. Typed restoration
+propagates the same hard barrier to FS882; no completed mutation is replayed.
+
+Coupled backend race71.848s passes; Go source is unchanged from full825.824s
+integration. Frontend371/371/check0/0 and isolated opt-in/independent-off Wails
+builds pass. Six native cases verify current-project provenance under Master
+source, explicit duplicates/dates, actual1400px/600px labels, peer/remount/raw
+errors and OS close, independent presentation-off absence, one Title/stamp
+edit/four exact audits and typed prune/choice refresh. An actual Master read
+lock during restoration lets its transaction commit, then rejects peer refresh.
+Manual Undo/close and native discard stay blocked. Explicit refresh-only retry
+recovers failed/null originals with exact unchanged already-restored storage.
+Full project/audit/history effects are independently checked and all16 fixture
+hashes restore after verified closure; retired technical history is preserved.
+
+Initial zero-write probes exposed retained absolute fixture paths and an
+incorrect attempt to reopen the guarded parent reader during metadata entry.
+Their owner/cleanup/source-and-target hashes remain preserved. The corrected
+harness then called `NativePage.wait` with an unsupported timeout argument after
+Save. Its actual committed event and known close dialog were independently
+captured before any further action. Only the unfinished restore/recovery tail
+continued under that same verified owner; Save was never replayed. The failed
+Save-refresh injection is not claimed: measured failure was during restoration.
+No Access execution, protected data/default promotion or complete FS1333 claim.
