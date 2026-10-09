@@ -32,6 +32,11 @@
   import OrdinaryFields from './OrdinaryFields.svelte';
   import DrainageFields from './DrainageFields.svelte';
   import SourceChild from './SourceChild.svelte';
+  import TwoPageSoilPanel from './TwoPageSoilPanel.svelte';
+  import { subscribeTwoPageSoilActivity, twoPageSoilReviewEnabled } from './twoPageSoilSessions';
+  import TwoPageVegetationPanel from './TwoPageVegetationPanel.svelte';
+  import { subscribeTwoPageVegetationActivity, twoPageVegetationActivity, twoPageVegetationReviewEnabled } from './twoPageVegetationSessions';
+  import type { TwoPageVegetationForm } from './twoPageVegetationWire';
   import SIVIHeightPanel from './SIVIHeightPanel.svelte';
   import SIVICoverPanel from './SIVICoverPanel.svelte';
   import SIVICombinedPanel from './SIVICombinedPanel.svelte';
@@ -333,6 +338,12 @@
   const twoPageSourceLayoutEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT === 'true';
   const twoPageCommonReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW === 'true';
   const twoPageEntryReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW === 'true';
+  const ordinarySoilUnavailable = twoPageSoilReviewEnabled && twoPageEntryReviewEnabled
+    ? 'Ordinary numeric-ID soil rows, counts and actions are unavailable in this experimental physical-soil review profile. Use complete-entry linked soil review; historical rows are not absent or discarded.'
+    : null;
+  const ordinaryVegetationUnavailable = twoPageVegetationReviewEnabled && twoPageEntryReviewEnabled
+    ? 'Ordinary numeric-ID vegetation rows, counts, totals and actions are unavailable in this experimental physical-vegetation review profile. Use complete-entry linked vegetation review; historical rows are not absent or discarded.'
+    : null;
   let twoPageOpen = $state(false);
   let twoPageScope = $state<'extra' | 'common' | 'entry'>('extra');
   let twoPageBusy = $state(false);
@@ -341,7 +352,19 @@
   const twoPageCommonSessions: TwoPageParentCommonSessionCache = new Map();
   const twoPageEntrySessions: TwoPageEntrySessionCache = new Map();
   let twoPageRevision = $state(0);
-  let twoPageEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
+  let twoPageEditor = $state<{ getCloseState(): EditorCloseState; getDraftState?(): EditorCloseState; undo(): void }>();
+  let twoPageSoilBusy = $state(false);
+  let twoPageSoilBlocked = $state(false);
+  $effect(() => subscribeTwoPageSoilActivity(activity => {
+    twoPageSoilBusy = activity.busy; twoPageSoilBlocked = activity.blocked;
+  }));
+  let twoPageVegetationBusy = $state(false);
+  let twoPageVegetationBlocked = $state(false);
+  let twoPageVegetationActivityRevision = $state(0);
+  $effect(() => subscribeTwoPageVegetationActivity(activity => {
+    twoPageVegetationBusy = activity.busy; twoPageVegetationBlocked = activity.blocked;
+    untrack(() => twoPageVegetationActivityRevision++);
+  }));
   const environmentSUEnabled = import.meta.env.VITE_SOURCE_ENV_SU_TRANSFER === 'true';
   const siteUnitEnvironmentEnabled = import.meta.env.VITE_SOURCE_SU_ENV_TRANSFER === 'true';
   let environmentSUOpen = $state(false);
@@ -359,8 +382,9 @@
   let profileReviewBlocked = $state(false);
   let profileEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const otherHeaderWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || twoPageOpen || twoPageBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy || siviIdentityBusy || siviCreationBusy || siviLifecycleBusy);
-  const headerWorkflowBusy = $derived(otherHeaderWorkflowBusy || pictureBusy || pictureMetadataPending);
+  const independentHeaderWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy || siviIdentityBusy || siviCreationBusy || siviLifecycleBusy);
+  const otherHeaderWorkflowBusy = $derived(independentHeaderWorkflowBusy || twoPageOpen || twoPageBusy);
+  const headerWorkflowBusy = $derived(otherHeaderWorkflowBusy || pictureBusy || pictureMetadataPending || twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked);
   const tabWorkflowBusy = $derived(otherHeaderWorkflowBusy || pictureBusy || (pictureMetadataClose?.busy ?? false));
   const workingUnitSession: WorkingUnitSession & { plot: string } = { mode: null, plot: '' };
   const heightEditingEnabled = import.meta.env.VITE_HEIGHT_EDITING !== 'false';
@@ -405,7 +429,7 @@
     ? aCoverSourceNotice(creationDraft.form, 'new', Object.fromEntries(Object.entries(creationDraft.cells).map(([field, cell]) => [field, cell?.value]))) : null);
   const siviCreationPeerUnsaved = $derived(heightUnsaved || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved || deletionReview !== null || creationDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || environmentSUOpen);
   const nonParentChildUnsaved = $derived(siviCreationPeerUnsaved || siviCreationPending || siviDeletionPending || siviRestorationPending || siviCreationUndoPending);
-  const childUnsaved = $derived(nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || twoPageOpen);
+  const childUnsaved = $derived(nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || twoPageOpen || twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked);
   let error = $state<string | null>(null);
   let successMsg = $state<string | null>(null);
   let dirty = $state(false);
@@ -488,6 +512,10 @@
 
   async function createChild(first: string, second: string) {
     const kind = newChild;
+    if (ordinarySoilUnavailable && (kind === 'humus' || kind === 'mineral')) {
+      error = ordinarySoilUnavailable;
+      return;
+    }
     let saved = false;
     if (kind === 'humus') saved = await childOperation(() => PlotService.SaveHumusRecord({
       ...newHumusFields,
@@ -672,6 +700,22 @@
 
   let original = $state<FS882Header | null>(null);
   const headerInputsDisabled = $derived(draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved || pictureBusy || pictureMetadataPending);
+  const twoPageLinkedParentBlocked = $derived.by(() => {
+    twoPageRevision;
+    const parent = twoPageEditor?.getDraftState?.();
+    return !twoPageOpen || twoPageScope !== 'entry' || !parent || parent.unsaved || parent.busy || !!parent.blocked ||
+      draft.locked || busy || dirty || !capabilitiesReady || !original || siviSourceBarrier || independentHeaderWorkflowBusy ||
+      pictureBusy || pictureMetadataPending || nonParentChildUnsaved || siviParentWriteUnsaved || siviParentActionUnsaved ||
+      siviProjectAssignmentUnsaved || siviParentSharedUnsaved || deletionReview !== null || creationDraft !== null || personalDraft !== null;
+  });
+  const twoPageSoilParentBlocked = $derived(twoPageLinkedParentBlocked || twoPageVegetationBusy || twoPageVegetationBlocked);
+  const twoPageVegetationParentBlocked = $derived(twoPageLinkedParentBlocked || twoPageSoilBusy || twoPageSoilBlocked);
+  function linkedVegetationParentBlocked(form: TwoPageVegetationForm): boolean {
+    twoPageVegetationActivityRevision;
+    if (twoPageVegetationParentBlocked || twoPageProject === null) return true;
+    const others = twoPageVegetationActivity({ contextId, project: twoPageProject, plot: draft.plotNumber, form });
+    return others.busy || others.blocked;
+  }
   const childParentDisabled = $derived(!capabilitiesReady || draft.locked || busy || headerWorkflowBusy || siviSourceBarrier || dirty || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved || original === null || deletionReview !== null || creationDraft !== null || personalDraft !== null || codeCheckOpen || metadataOpen || profileReviewBlocked || siviCreationPending || siviDeletionPending || siviRestorationPending || siviCreationUndoPending);
   const siviCreationRecoveryDisabled = $derived(!siviCreationEnabled || busy || siviCreationHostBusy || otherHeaderWorkflowBusy && !(siviCreationClose?.busy ?? false) ||
     pictureBusy || pictureMetadataPending || siviCreationPeerUnsaved || siviDeletionPending || siviRestorationPending || siviCreationUndoPending || siviParentWriteUnsaved || siviParentActionUnsaved || siviProjectAssignmentUnsaved || siviParentSharedUnsaved);
@@ -707,7 +751,7 @@
     Object.keys(headerValidation).length > 0 || siviSourceAuthorityUnknown || Boolean(siviParentSourceView?.error) || (siviProjectAssignmentView?.blocked ?? false));
   const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
-  const soilEditingDisabled = $derived(!soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const soilEditingDisabled = $derived(!!ordinarySoilUnavailable || !soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved || speciesUnsaved);
   const collectedEditingDisabled = $derived(!collectedEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || speciesUnsaved);
   const speciesEditingDisabled = $derived(!speciesEditingEnabled || !speciesReferenceReady || speciesReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
@@ -1937,11 +1981,11 @@
     const request = loadRequest;
     try {
       const [v, h, m, o, a, vc, hc, mc, oc] = await Promise.all([
-        siviIdentityEnabled
+        ordinaryVegetationUnavailable ? { records: [], reason: ordinaryVegetationUnavailable } : siviIdentityEnabled
           ? reads.track(ContextService.GetVegetationReadAvailability(siviContextId, p)).then(vegetationReadAvailability)
           : reads.track(PlotService.ListVegRecords(p)).then(records => ({ records: records ?? [], reason: null })),
-        reads.track(PlotService.ListHumusRecords(p)),
-        reads.track(PlotService.ListMineralRecords(p)),
+        ordinarySoilUnavailable ? [] : reads.track(PlotService.ListHumusRecords(p)),
+        ordinarySoilUnavailable ? [] : reads.track(PlotService.ListMineralRecords(p)),
         reads.track(PlotService.ListOtherRecords(p)),
         reads.track(PlotService.ListAuditEntries(p)),
         reads.track(PlotService.GetChildCapabilities('Veg')),
@@ -1994,16 +2038,16 @@
   });
 
   let totalTreeCover = $derived(
-    vegList.reduce((sum, r) => sum + (r.totalA || 0), 0)
+    vegetationReadUnavailable ? null : vegList.reduce((sum, r) => sum + (r.totalA || 0), 0)
   );
   let totalShrubCover = $derived(
-    vegList.reduce((sum, r) => sum + (r.totalB || 0), 0)
+    vegetationReadUnavailable ? null : vegList.reduce((sum, r) => sum + (r.totalB || 0), 0)
   );
   let totalHerbCover = $derived(
-    vegList.reduce((sum, r) => sum + (r.cover6 || 0), 0)
+    vegetationReadUnavailable ? null : vegList.reduce((sum, r) => sum + (r.cover6 || 0), 0)
   );
   let totalMossCover = $derived(
-    vegList.reduce((sum, r) => sum + (r.cover7 || 0), 0)
+    vegetationReadUnavailable ? null : vegList.reduce((sum, r) => sum + (r.cover7 || 0), 0)
   );
 
   async function searchSpecies() {
@@ -2649,7 +2693,7 @@
   }
 
   async function loadSoilSuggestions() {
-    if (!soilEditingEnabled || soilReferenceBusy) return;
+    if (ordinarySoilUnavailable || !soilEditingEnabled || soilReferenceBusy) return;
     const request = referenceRequest;
     soilReferenceBusy = true;
     soilReferenceReady = false;
@@ -2809,6 +2853,14 @@
   }
 
   async function editSourceChild(name: string, id: number, column: string, raw: string) {
+    if (ordinaryVegetationUnavailable && name.startsWith('SubVeg')) {
+      error = ordinaryVegetationUnavailable;
+      return;
+    }
+    if (ordinarySoilUnavailable && (name === 'SoilHumusXL' || name === 'SoilMineralXL')) {
+      error = ordinarySoilUnavailable;
+      return;
+    }
     const key = column.toLowerCase();
     function numeric() {
       if (raw === '') return undefined;
@@ -2961,6 +3013,14 @@
   }
 
   export function getCloseState(): EditorCloseState {
+    if (twoPageVegetationBusy || twoPageVegetationBlocked) return {
+      unsaved: true, busy: twoPageVegetationBusy, blocked: true, canSave: false, error,
+      saveReason: 'Finish retained linked-vegetation drafts/operations, recover unknown outcomes and acknowledge receipts before parent Save, Lock or close.',
+    };
+    if (twoPageSoilBusy || twoPageSoilBlocked) return {
+      unsaved: true, busy: twoPageSoilBusy, blocked: true, canSave: false, error,
+      saveReason: 'Finish retained linked-soil drafts/operations, recover unknown outcomes and acknowledge receipts before parent Save, Lock or close.',
+    };
     if (pictureMetadataPending && pictureMetadataClose) return {
       ...pictureMetadataClose, canSave: false,
       saveReason: pictureMetadataClose.blocked || pictureMetadataClose.busy ? pictureMetadataClose.saveReason
@@ -3506,12 +3566,29 @@
         onclosed={() => { profileReviewOpen = false; }} />
     {/if}
     {#snippet twoPageLinkedChild(child: TwoPageEntryChild, _control: PaperControl)}
-      <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={true} />
+      {#if twoPageSoilReviewEnabled && twoPageScope === 'entry' && twoPageProject !== null &&
+        (child.form === 'SoilHumusXL' || child.form === 'SoilMineralXL')}
+        <TwoPageSoilPanel {contextId} project={twoPageProject} plot={draft.plotNumber} form={child.form}
+          parentBlocked={twoPageSoilParentBlocked} />
+      {:else if twoPageVegetationReviewEnabled && twoPageScope === 'entry' && twoPageProject !== null &&
+        (child.form === 'SubVegAXL_BC' || child.form === 'SubVegAXL' || child.form === 'SubVegCXL' || child.form === 'SubVegDXL')}
+        {#key JSON.stringify([contextId, twoPageProject, draft.plotNumber, child.form])}
+          <TwoPageVegetationPanel {contextId} project={twoPageProject} plot={draft.plotNumber} form={child.form}
+            parentBlocked={linkedVegetationParentBlocked(child.form)} />
+        {/key}
+      {:else if ordinaryVegetationUnavailable && child.form.startsWith('SubVeg')}
+        <p role="status" data-vegetation-ordinary-unavailable={child.form}>{ordinaryVegetationUnavailable}</p>
+      {:else if ordinarySoilUnavailable && (child.form === 'SoilHumusXL' || child.form === 'SoilMineralXL')}
+        <p role="status" data-soil-ordinary-unavailable={child.form}>{ordinarySoilUnavailable}</p>
+      {:else}
+        <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={true} />
+      {/if}
     {/snippet}
     {#if twoPageOpen && twoPageProject !== null}
       {#if twoPageScope === 'entry'}
         <TwoPageEntryEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
           cache={twoPageEntrySessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
+          childBlocked={twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked}
           onbusy={value => twoPageBusy = value}
           onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
           oncommitted={() => refreshTwoPagePeers('entry')} embedded={twoPageLinkedChild} />
@@ -3974,19 +4051,19 @@
         <div class="grid grid-cols-4 gap-3 bg-stone-50 border border-stone-200 rounded p-3 text-xs">
           <div class="flex flex-col">
             <span class="text-stone-500 font-medium">Tree Layer (A)</span>
-            <span class="font-bold text-stone-900 text-sm">{totalTreeCover.toFixed(1)}%</span>
+            <span class="font-bold text-stone-900 text-sm">{totalTreeCover === null ? 'unavailable' : `${totalTreeCover.toFixed(1)}%`}</span>
           </div>
           <div class="flex flex-col">
             <span class="text-stone-500 font-medium">Shrub Layer (B)</span>
-            <span class="font-bold text-stone-900 text-sm">{totalShrubCover.toFixed(1)}%</span>
+            <span class="font-bold text-stone-900 text-sm">{totalShrubCover === null ? 'unavailable' : `${totalShrubCover.toFixed(1)}%`}</span>
           </div>
           <div class="flex flex-col">
             <span class="text-stone-500 font-medium">Herb Layer (C)</span>
-            <span class="font-bold text-stone-900 text-sm">{totalHerbCover.toFixed(1)}%</span>
+            <span class="font-bold text-stone-900 text-sm">{totalHerbCover === null ? 'unavailable' : `${totalHerbCover.toFixed(1)}%`}</span>
           </div>
           <div class="flex flex-col">
             <span class="text-stone-500 font-medium">Moss/Lichen (D)</span>
-            <span class="font-bold text-stone-900 text-sm">{totalMossCover.toFixed(1)}%</span>
+            <span class="font-bold text-stone-900 text-sm">{totalMossCover === null ? 'unavailable' : `${totalMossCover.toFixed(1)}%`}</span>
           </div>
         </div>
 
@@ -4174,7 +4251,8 @@
         </div>
       {/if}
     {:else if activeTab === 'soils'}
-      {#if soilEditingEnabled}
+      {#if ordinarySoilUnavailable}<p role="status" data-soil-ordinary-unavailable>{ordinarySoilUnavailable}</p>{/if}
+      {#if soilEditingEnabled && !ordinarySoilUnavailable}
         {#if soilReferenceBusy}<p role="status">Loading soil reference suggestions...</p>{/if}
         {#if soilReferenceError}
           <p role="alert">{soilReferenceError}</p>
@@ -4209,9 +4287,13 @@
               <SourcePage name="Soil/Terrain" values={sourceHeaderValues} {editor} editors={[...(geologyEditor ? [geologyEditor] : []), ...(parentEditor ? [parentEditor] : []), ...(ordinaryEditor ? [ordinaryEditor] : []), ...(drainageEditor ? [drainageEditor] : [])]}>
                 {#snippet embedded(control)}
                   {@const child = embeddedForm(control.controlId)}
-                  <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={soilEditingDisabled}
+                  {#if ordinarySoilUnavailable}
+                    <p role="status" data-soil-ordinary-unavailable={child.form}>{ordinarySoilUnavailable}</p>
+                  {:else}
+                    <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={soilEditingDisabled}
                     deleteDisabled={soilUnsaved} onsoilstage={soilEditingEnabled ? stageSoilCell : undefined}
                     {soilDrafts} {soilSuggestions} ondelete={deleteSourceChild} />
+                  {/if}
                 {/snippet}
               </SourcePage>
               {/snippet}
@@ -4224,13 +4306,14 @@
       </DrainageFields>
       {/snippet}
       </OrdinaryFields>
-      {#if soilEditingEnabled}
+      {#if soilEditingEnabled && !ordinarySoilUnavailable}
         <div class="mt-3 text-xs text-stone-600">
           <p>Suggestions are optional. Raw text is never completed or case-changed automatically; no soil totals are guessed.</p>
           <button type="button" class="mt-2 px-2 py-1 border rounded" disabled={busy || soilReferenceBusy || headerWorkflowBusy}
             onclick={() => void loadSoilSuggestions()}>Reload soil references</button>
         </div>
       {/if}
+      {#if !ordinarySoilUnavailable}
       <details class="mt-4 border border-stone-200 rounded p-3">
         <summary class="text-xs font-semibold cursor-pointer">Experimental soil record actions</summary>
       <div class="space-y-6">
@@ -4325,6 +4408,7 @@
         </div>
       </div>
       </details>
+      {/if}
     {:else if activeTab === 'vegOther'}
       {#if vegetationReadUnavailable}
         <p role="alert">Vegetation attribute editing requires exact unique ordinary IDs. Use the physical-row source views; historical NULL/duplicates are preserved.</p>

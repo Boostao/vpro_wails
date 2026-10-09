@@ -46,8 +46,9 @@ test('Collected has independent literal frontend/backend gates and actual native
 });
 
 test('Collected owns root Save Undo Lock close busy and every mutually exclusive editor guard', () => {
-  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviCollectedBusy/);
-  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
+  assert.match(parent, /independentHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviCollectedBusy/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\(independentHeaderWorkflowBusy \|\| twoPageOpen \|\| twoPageBusy\)/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);
   assert.match(parent, /siviCreationPeerUnsaved = \$derived\([^\n]*\|\| siviCollectedUnsaved/);
   assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending \|\| siviCreationUndoPending\)/);
   assert.match(parent, /if \(siviCollectedUnsaved\) \{ await siviCollectedOperation\('save'\); return; \}/);

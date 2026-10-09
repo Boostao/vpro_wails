@@ -1,0 +1,95 @@
+{
+  "owner": {"contextId": "vegetation-wire-context", "project": "Sample", "plot": "108050", "form": "SubVegAXL"},
+  "columnAliases": [
+    {"left": "Species", "right": "\u017fPECIES", "equal": true},
+    {"left": "K", "right": "\u212a", "equal": true},
+    {"left": "\u03a3", "right": "\u03c2", "equal": true},
+    {"left": "\u00b5", "right": "\u039c", "equal": true},
+    {"left": "I", "right": "\u0131", "equal": false},
+    {"left": "I", "right": "\u0130", "equal": false},
+    {"left": "\u00df", "right": "\u1e9e", "equal": true},
+    {"left": "ss", "right": "\u00df", "equal": false},
+    {"left": "\u0390", "right": "\u1fd3", "equal": false},
+    {"left": "\u03b0", "right": "\u1fe3", "equal": false},
+    {"left": "\ufb05", "right": "\ufb06", "equal": false}
+  ],
+  "request": {
+    "requestId": "b0cbfa00-1234-4123-8123-000000000001",
+    "original": {
+      "contextId": "vegetation-wire-context", "project": "Sample", "plot": "108050", "form": "SubVegAXL",
+      "recordSource": "USysVegA", "table": "Sample_Veg",
+      "records": {
+        "columns": [
+          {"name": "ID", "declaredType": "INTEGER"}, {"name": "PlotNumber", "declaredType": "TEXT"},
+          {"name": "Species", "declaredType": "TEXT"}, {"name": "Cover1", "declaredType": "REAL"},
+          {"name": "Cover2", "declaredType": "REAL"}, {"name": "cover3", "declaredType": "REAL"},
+          {"name": "TotalA", "declaredType": "REAL"}, {"name": "Cover4", "declaredType": "REAL"},
+          {"name": "Cover5", "declaredType": "REAL"}, {"name": "TotalB", "declaredType": "REAL"},
+          {"name": "Cover5a", "declaredType": "REAL"}, {"name": "Cover5b", "declaredType": "REAL"},
+          {"name": "Cover5c", "declaredType": "REAL"}, {"name": "Cover6", "declaredType": "REAL"},
+          {"name": "Cover7", "declaredType": "REAL"}, {"name": "Cover8", "declaredType": "REAL"},
+          {"name": "Cover9", "declaredType": "REAL"}, {"name": "Collected", "declaredType": "TEXT"},
+          {"name": "HeightB", "declaredType": "TEXT"}, {"name": "Unmapped", "declaredType": "BLOB"}
+        ],
+        "rows": [
+          {"rowId": "-7", "cells": [
+            {"storage": "integer", "text": null, "integer": "42", "real": null, "blobHex": null},
+            {"storage": "text", "text": "108050", "integer": null, "real": null, "blobHex": null},
+            {"storage": "text", "text": "historical overlength", "integer": null, "real": null, "blobHex": null},
+            {"storage": "real", "text": null, "integer": null, "real": 0, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "integer", "text": null, "integer": "0", "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "text", "text": "", "integer": null, "real": null, "blobHex": null},
+            {"storage": "text", "text": "raw height", "integer": null, "real": null, "blobHex": null},
+            {"storage": "blob", "text": null, "integer": null, "real": null, "blobHex": "ff00"}
+          ]},
+          {"rowId": "9223372036854775807", "cells": [
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "text", "text": "108050", "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "real", "text": null, "integer": null, "real": -0, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+            {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null}
+          ]}
+        ]
+      },
+      "sourceRowIds": ["-7", "9223372036854775807"]
+    },
+    "edits": [
+      {"contextId": "vegetation-wire-context", "form": "SubVegAXL", "rowId": "-7", "column": "Cover1",
+       "expected": {"storage": "real", "text": null, "integer": null, "real": 0, "blobHex": null},
+       "value": {"storage": "real", "text": null, "integer": null, "real": 5, "blobHex": null}},
+      {"contextId": "vegetation-wire-context", "form": "SubVegAXL", "rowId": "-7", "column": "Collected",
+       "expected": {"storage": "text", "text": "", "integer": null, "real": null, "blobHex": null},
+       "value": {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null}},
+      {"contextId": "vegetation-wire-context", "form": "SubVegAXL", "rowId": "-7", "column": "Cover5c",
+       "expected": {"storage": "integer", "text": null, "integer": "0", "real": null, "blobHex": null},
+       "value": {"storage": "real", "text": null, "integer": null, "real": 99.5, "blobHex": null}}
+    ]
+  }
+}

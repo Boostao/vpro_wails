@@ -16,7 +16,7 @@ test('standalone lifeform preview is independently gated without enabling incomp
 
 test('lifeform preview borrows the owned context lifetime and reports busy state to navigation and native close', () => {
   assert.match(app, /\{#key \$projectState\.contextId\}\s*<LifeformSummary contextId=\{\$projectState\.contextId \?\? ''\} project=\{\$projectState\.activeProject\}/);
-  assert.match(app, /<LifeformSummary[\s\S]*?su=\{\$projectState\.activeSU\} suPath=\{\$projectState\.suPath \?\? ''\}[\s\S]*?onBusyChange=\{\(value\) => \{ editorBusy = value; \}\}/);
+  assert.match(app, /<LifeformSummary[\s\S]*?su=\{\$projectState\.activeSU\} suPath=\{\$projectState\.suPath \?\? ''\}[\s\S]*?onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/);
   assert.match(app, /closeDisposition\(state, busy \|\| editorBusy \|\| transitionWorking/);
   assert.match(app, /void requestTransition\(async \(\) =>/);
 });

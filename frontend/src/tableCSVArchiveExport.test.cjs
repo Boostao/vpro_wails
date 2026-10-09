@@ -365,7 +365,7 @@ test('UI literal opt-in, labels, receipts above fields and existing app native/n
   assert.match(componentSource, /not independently verified by browser/);
   assert.match(componentSource, /not independently computed by browser/);
   assert.match(app, /view === 'table-csv' && import\.meta\.env\.VITE_TABLE_CSV_REVIEW === 'true'/);
-  assert.match(app, /ProjectTableCSVReview[\s\S]*?onBusyChange=\{\(value\) => \{ editorBusy = value; \}\}/);
+  assert.match(app, /ProjectTableCSVReview[\s\S]*?onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/);
   assert.match(app, /function navigate[\s\S]*?requestTransition/);
   assert.match(app, /closeDisposition\(state, busy \|\| editorBusy \|\| transitionWorking/);
   assert.match(app, /archivePublicationBusy = publication\.busy \|\| publication\.blocked/);

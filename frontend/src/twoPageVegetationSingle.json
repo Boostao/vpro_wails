@@ -1,0 +1,13 @@
+{
+  "scope": "Disposable source-equivalent Access bound SINGLE textbox and <100 Or Is Null; original VPRO callbacks not claimed",
+  "cases": [
+    {"raw": "5.25", "nativeAccepted": true, "nativeValue": 5.25, "singleHex": "0000a840", "clientAccepted": true},
+    {"raw": "99.99999", "nativeAccepted": true, "nativeValue": 99.99999237060547, "singleHex": "ffffc742", "clientAccepted": true},
+    {"raw": "99.999996", "nativeAccepted": true, "nativeValue": 99.99999237060547, "singleHex": "ffffc742", "clientAccepted": true},
+    {"raw": "99.999999", "nativeAccepted": false, "nativeValue": null, "singleHex": null, "clientAccepted": false},
+    {"raw": "100", "nativeAccepted": false, "nativeValue": null, "singleHex": null, "clientAccepted": false},
+    {"raw": "-1", "nativeAccepted": true, "nativeValue": -1, "singleHex": "000080bf", "clientAccepted": true},
+    {"raw": "1e-46", "nativeAccepted": true, "nativeValue": 0, "singleHex": "00000000", "clientAccepted": true},
+    {"raw": "-1e-46", "nativeAccepted": true, "nativeValue": -0, "singleHex": "00000080", "clientAccepted": false}
+  ]
+}

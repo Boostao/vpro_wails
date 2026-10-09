@@ -61,11 +61,19 @@ func planSIVISpeciesCells(ctx context.Context, plot string, extended bool, veg P
 var siviSpeciesMasterColumns = []string{"Code", "ScientificName", "Lifeform", "EnglishName", "Codetype", "OldCode"}
 var siviSpeciesPersonalColumns = []string{"Code", "ScientificName", "LifeForm", "EnglishName", "Codetype"}
 
+func projectSIVISpeciesDefinitions(ctx context.Context, source ProjectMetadataTable, personal bool) (ProjectMetadataTable, error) {
+	return projectPhysicalSpeciesDefinitions(ctx, source, personal, func(cell ProjectMetadataCell) error {
+		_, err := vegetationLifeformInteger(cell)
+		return err
+	})
+}
+
 // Only identifier recasing is allowed. Physical definitions, including duplicate
 // codes, NULLs and empty metadata, retain their original typed cells and rowids.
-func projectSIVISpeciesDefinitions(ctx context.Context, source ProjectMetadataTable, personal bool) (ProjectMetadataTable, error) {
-	if ctx == nil {
-		return ProjectMetadataTable{}, errors.New("Species references require a context")
+func projectPhysicalSpeciesDefinitions(ctx context.Context, source ProjectMetadataTable, personal bool,
+	validateLifeform func(ProjectMetadataCell) error) (ProjectMetadataTable, error) {
+	if ctx == nil || validateLifeform == nil {
+		return ProjectMetadataTable{}, errors.New("Species references require a context and explicit Lifeform policy")
 	}
 	if _, err := siteUnitTransferColumns(source); err != nil {
 		return ProjectMetadataTable{}, err
@@ -101,7 +109,7 @@ func projectSIVISpeciesDefinitions(ctx context.Context, source ProjectMetadataTa
 			cell := row.Cells[index]
 			var err error
 			if i == 2 {
-				_, err = vegetationLifeformInteger(cell)
+				err = validateLifeform(cell)
 			} else {
 				_, err = vegetationReportIdentity(cell)
 			}

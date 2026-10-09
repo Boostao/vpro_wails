@@ -41,8 +41,9 @@ test('identity is independently default-off in actual main and uses tracked owne
   assert.match(parent, /vegetationReadUnavailable[\s\S]*Ordinary vegetation rows, totals and actions/);
 });
 test('identity participates in Save Undo Lock close and every ordinary/source/parent draft barrier', () => {
-  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviIdentityBusy/);
-  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
+  assert.match(parent, /independentHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviIdentityBusy/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\(independentHeaderWorkflowBusy \|\| twoPageOpen \|\| twoPageBusy\)/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);
   assert.match(parent, /siviCreationPeerUnsaved = \$derived\([^\n]*\|\| siviIdentityUnsaved/);
   assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending \|\| siviCreationUndoPending\)/);
   assert.match(parent, /if \(siviIdentityUnsaved\) \{ await siviIdentityOperation\('save'\); return; \}/);

@@ -9,15 +9,15 @@ const serverReads = { ReadRequests: class {
   cancelAll() {}
 } };
 
-function serverComponent(source, filename, dependencies) {
+function serverComponent(source, filename, dependencies, environment = {}) {
   const compiled = compile(source, { filename: path.resolve(__dirname, filename), generate: 'server' });
   assert.equal(compiled.warnings.length, 0);
   const module = { exports: {} };
-  const code = ts.transpileModule(compiled.js.code, {
+  const code = ts.transpileModule(compiled.js.code.replaceAll('import.meta.env', '__testEnvironment'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
   }).outputText;
   vm.runInNewContext(code, {
-    module, exports: module.exports,
+    module, exports: module.exports, __testEnvironment: environment,
     require(name) {
       if (name in dependencies) return dependencies[name];
       if (name === './readRequests') return serverReads;
@@ -87,8 +87,12 @@ function componentFunctions(filename, names, values) {
   const ast = ts.createSourceFile(filename + '.ts', script, ts.ScriptTarget.Latest, true);
   const selected = ast.statements.filter(node => ts.isFunctionDeclaration(node) && names.includes(node.name.text));
   assert.equal(selected.length, names.length);
-  const context = vm.createContext({ exports: {}, ...values });
-  const code = selected.map(node => node.getText(ast)).join('\n') + `\nthis.actions = {${names.join(',')}};`;
+  const defaultSoilReviewProfile = filename === 'App.svelte' || filename === 'FS882Form.svelte'
+    ? { twoPageSoilBusy: false, twoPageSoilBlocked: false, ordinarySoilUnavailable: null,
+      twoPageVegetationBusy: false, twoPageVegetationBlocked: false, ordinaryVegetationUnavailable: null } : {};
+  const context = vm.createContext({ exports: {}, __testEnvironment: {}, ...defaultSoilReviewProfile, ...values });
+  const code = selected.map(node => node.getText(ast)).join('\n').replaceAll('import.meta.env', '__testEnvironment') +
+    `\nthis.actions = {${names.join(',')}};`;
   vm.runInContext(ts.transpileModule(code, { compilerOptions: {
     module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022
   } }).outputText, context);

@@ -1,0 +1,15 @@
+{
+  "review": {
+    "contextId": "quality-null-wire",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "values": { "siteIncludeNulls": true, "vegIncludeNulls": true, "soilIncludeNulls": true }
+  },
+  "request": {
+    "expected": { "siteIncludeNulls": true, "vegIncludeNulls": true, "soilIncludeNulls": true },
+    "proposed": { "siteIncludeNulls": false, "vegIncludeNulls": false, "soilIncludeNulls": false }
+  },
+  "outcome": { "contextId": "quality-null-wire", "changed": true, "committed": true, "errorMessage": "" }
+}

@@ -45,8 +45,9 @@ test('Species independently gates actual main registration and coordinates both 
   assert.match(parent, /siviSpeciesSession\?\.presentation\(extendedShrubs\)/);
 });
 test('Species participates in root Save Undo Lock close and all peer/parent barriers', () => {
-  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviSpeciesBusy/);
-  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
+  assert.match(parent, /independentHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviSpeciesBusy/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\(independentHeaderWorkflowBusy \|\| twoPageOpen \|\| twoPageBusy\)/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);
   assert.match(parent, /siviCreationPeerUnsaved = \$derived\([^\n]*\|\| siviSpeciesUnsaved/);
   assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending \|\| siviCreationUndoPending\)/);
   assert.match(parent, /if \(siviSpeciesUnsaved\) \{ await siviSpeciesOperation\('save'\); return; \}/);

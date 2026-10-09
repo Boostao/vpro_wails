@@ -114,6 +114,11 @@ func TestLongVegetationWorkbookSummarySourceCellsLegendAndProvenance(t *testing.
 	}
 	preview := vegetationWorkbookFixture(t)
 	preview.Settings.Grouping = "lifeform"
+	for unit := range preview.Report.Units {
+		for row := range preview.Report.Units[unit].Rows {
+			preview.Report.Units[unit].Rows[row].Layer = metadataInteger("2")
+		}
+	}
 	preview.Settings.Order = "species"
 	preview.Settings.PresenceGreaterThan = 50
 	layout := vegetationWorkbookLayout{QuickReport: true, ReportSummary: true, Summary: &summary}

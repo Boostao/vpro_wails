@@ -302,6 +302,7 @@ test('actual root guards delegate additional-field errors and refuse ordinary Sa
   const root = componentFunctions('FS882Form.svelte', ['getCloseState', 'save', 'toggleLock', 'undo'], {
     siviDeletionPending: false, siviRestorationPending: false, siviCreationUndoPending: false,
     siviParentSourceView: null, siviSourceAuthorityUnknown: false, twoPageOpen: true, pictureMetadataPending: false,
+    twoPageSoilBusy: false, twoPageSoilBlocked: false,
     twoPageEditor: { getCloseState: () => invalid, undo() { root.undone = true; } },
     busy: false, headerWorkflowBusy: true, error: null,
   });
@@ -321,7 +322,8 @@ test('additional-field review excludes ordinary parent drafts until its owner is
   const expression = source.match(/const childUnsaved = \$derived\(([^;]+)\);/)[1];
   const clean = { nonParentChildUnsaved: false, siviParentWriteUnsaved: false,
     siviParentActionUnsaved: false, siviProjectAssignmentUnsaved: false,
-    siviParentSharedUnsaved: false, twoPageOpen: false };
+    siviParentSharedUnsaved: false, twoPageOpen: false, twoPageSoilBusy: false, twoPageSoilBlocked: false,
+    twoPageVegetationBusy: false, twoPageVegetationBlocked: false };
   assert.equal(runInNewContext(expression, clean), false);
   for (const owner of Object.keys(clean)) {
     assert.equal(runInNewContext(expression, { ...clean, [owner]: true }), true, owner);

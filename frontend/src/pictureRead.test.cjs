@@ -28,7 +28,7 @@ function host(service = {}) {
   const calls = [], busy = [];
   const context = componentFunctions('PicturePanel.svelte', ['cancel', 'load', 'select', 'preview'], {
     ...owner, view: 'child', ownerKey: 'owner', reviewKey: '', generation: 0, busy: false, disabled: false,
-    error: '', review: null, image: null, selected: '', viewerOpen: false, row: null, metadataPending: false,
+    error: '', review: null, image: null, selected: '', viewerOpen: false, row: null, metadataPending: false, lifecyclePending: false,
     structuredClone, JSON, $state: { snapshot: client.snapshot },
     pictureMetadataFromWire: picture.pictureMetadataFromWire, pictureImageFromWire: picture.pictureImageFromWire,
     onBusyChange(value) { busy.push(value); },
@@ -184,13 +184,18 @@ test('picture panel renders honest read-only guidance and cancellation-aware con
   const source = readFileSync(path.join(__dirname, 'PicturePanel.svelte'), 'utf8');
   const component = serverComponent(source, 'PicturePanel.svelte', {
     '../bindings/github.com/boostao/vpro-wails': { PictureService: {} }, './pictureRead': picture,
+    './projectMetadataEditor': metadata,
+    './pictureLifecycleEditor': require('./pictureLifecycleTestHelpers.cjs').editor,
+    './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
+    './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
     './PictureMetadataEditor.svelte': { default: () => { throw new Error('Default-off metadata editor rendered'); } },
   });
   const output = render(component, { props: { ...owner, disabled: true, onBusyChange() {} } }).body;
   assert.match(output, /Linked plot pictures/);
   assert.match(output, /Load linked pictures/);
   assert.match(output, /Read-only linked metadata/);
-  assert.match(output, /External directories, adding\/deleting records and metadata editing remain unavailable/);
+  assert.match(output, /External directories, adding records and metadata editing remain unavailable here/);
+  assert.match(output, /Record deletion remains unavailable here/);
   assert.doesNotMatch(output, />Save|>Add|>Delete/);
 });
 
@@ -223,7 +228,7 @@ test('manager policy changes discard held image results rather than displaying a
 
 test('manager literal parent selection preserves text and explicitly rejects malformed input', () => {
   const context = componentFunctions('PictureManager.svelte', ['selectPlot', 'reading'], {
-    plot: '', selected: 'original', error: '', busy: false, metadataBlocked: false,
+    plot: '', selected: 'original', error: '', busy: false, metadataBlocked: false, creationBlocked: false, lifecycleBlocked: false,
     plotLookupInputError: lookup.plotLookupInputError, onBusyChange() {},
   });
   for (const invalid of ['', '\ud800', '\udc00', '\0']) {
@@ -241,7 +246,7 @@ test('manager literal parent selection preserves text and explicitly rejects mal
 test('manager pending reads block parent changes and aggregate root busy state', () => {
   const changes = [];
   const context = componentFunctions('PictureManager.svelte', ['selectPlot', 'reading'], {
-    plot: 'next', selected: 'original', error: '', busy: false, metadataBlocked: false,
+    plot: 'next', selected: 'original', error: '', busy: false, metadataBlocked: false, creationBlocked: false, lifecycleBlocked: false,
     plotLookupInputError: lookup.plotLookupInputError, onBusyChange(value) { changes.push(value); },
   });
   context.actions.reading(true);
@@ -261,9 +266,10 @@ test('standalone manager has independent default-off navigation and shares root 
   assert.match(nav, /VITE_PICTURE_MANAGER === 'true' \? 'picture-manager' : undefined/);
   assert.match(app, /view === 'picture-manager' && import\.meta\.env\.VITE_PICTURE_MANAGER === 'true'/);
   assert.match(app, /if \(import\.meta\.env\.VITE_PICTURE_MANAGER !== 'true'\)/);
-  assert.match(app, /<PictureManager[^>]*onBusyChange=\{\(value\) => \{ editorBusy = value; \}\}/s);
+  assert.match(app, /<PictureManager[^>]*onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/s);
+  assert.match(app, /editorBusy = \$derived\(localEditorBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy\)/);
   assert.match(manager, /<PicturePanel[^>]*view="manager" onBusyChange=\{reading\}/);
-  assert.match(manager, /disabled=\{busy \|\| metadataBlocked\}/);
+  assert.match(manager, /disabled=\{busy \|\| metadataBlocked \|\| creationBlocked \|\| lifecycleBlocked\}/);
   assert.match(manager, /\{#key selected\}/);
   assert.doesNotMatch(manager, /CreatePlot|SwitchContext|\.trim\(|\.toUpperCase\(/);
 });
@@ -271,12 +277,20 @@ test('standalone manager has independent default-off navigation and shares root 
 test('manager server render retains source caption, literal parent and separate directory guidance', () => {
   const panel = serverComponent(readFileSync(path.join(__dirname, 'PicturePanel.svelte'), 'utf8'), 'PicturePanel.svelte', {
     '../bindings/github.com/boostao/vpro-wails': { PictureService: {} }, './pictureRead': picture,
+    './projectMetadataEditor': metadata,
+    './pictureLifecycleEditor': require('./pictureLifecycleTestHelpers.cjs').editor,
+    './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
+    './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
     './PictureMetadataEditor.svelte': { default: () => { throw new Error('Default-off metadata editor rendered'); } },
   });
   const manager = serverComponent(readFileSync(path.join(__dirname, 'PictureManager.svelte'), 'utf8')
     .replace("import.meta.env.VITE_PICTURE_METADATA_WRITING === 'true'", 'false'), 'PictureManager.svelte', {
     './PicturePanel.svelte': { default: panel }, './scopedPlotLookup': lookup,
     './pictureMetadataSessions': { pictureMetadataSession: () => { throw new Error('Default-off metadata session created'); } },
+    './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
+    './PictureCreationPanel.svelte': { default: () => { throw new Error('Default-off Add panel rendered'); } },
+    './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
+    './PictureLifecyclePanel.svelte': { default: () => { throw new Error('Default-off lifecycle panel rendered'); } },
   });
   const output = render(manager, { props: { contextId: owner.contextId, project: owner.project,
     initialPlot: owner.plotNumber, onBusyChange() {} } }).body;
@@ -284,6 +298,7 @@ test('manager server render retains source caption, literal parent and separate 
   assert.match(output, /for="picture-manager-plot"/);
   assert.match(output, /Selected literal parent/);
   assert.match(output, /explicitly authorized manager directory, not the FS882 child directory/);
-  assert.match(output, /Add a Picture, deletion, metadata editing/);
+  assert.match(output, /Add a Picture remains unavailable/);
+  assert.match(output, /Metadata editing remains unavailable/);
   assert.doesNotMatch(output, /<button[^>]*>\s*(?:Save|Add a Picture|Delete)/);
 });

@@ -1,0 +1,1425 @@
+[
+  {
+    "name": "0",
+    "receipt": {
+      "history": {
+        "Request": {
+          "requestId": "f4b1aa00-1234-4123-8123-000000000001",
+          "original": {
+            "contextId": "owned-context",
+            "project": "Sample",
+            "plot": "0108050",
+            "form": "SoilHumusXL",
+            "recordSource": "UsysHumus",
+            "table": "Sample_Humus",
+            "records": {
+              "columns": [
+                {
+                  "name": "ID",
+                  "declaredType": ""
+                },
+                {
+                  "name": "PlotNumber",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "Horizon",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "UpperDepth",
+                  "declaredType": "REAL"
+                },
+                {
+                  "name": "Comment",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "Unmapped",
+                  "declaredType": "BLOB"
+                }
+              ],
+              "rows": [
+                {
+                  "rowId": "-7",
+                  "cells": [
+                    {
+                      "storage": "integer",
+                      "text": null,
+                      "integer": "-2147483648",
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "0108050",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "real",
+                      "text": null,
+                      "integer": null,
+                      "real": -0.25,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "blob",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": "ff00"
+                    }
+                  ]
+                },
+                {
+                  "rowId": "9223372036854775807",
+                  "cells": [
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "0108050",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "historical overlength",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "blob",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": "00ff"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "edits": [
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "Horizon",
+              "expected": {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "text",
+                "text": "LF",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "UpperDepth",
+              "expected": {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": -0.25,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 5,
+                "blobHex": null
+              }
+            },
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "Comment",
+              "expected": {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        },
+        "Committed": {
+          "columns": [
+            {
+              "name": "ID",
+              "declaredType": ""
+            },
+            {
+              "name": "PlotNumber",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "Horizon",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "UpperDepth",
+              "declaredType": "REAL"
+            },
+            {
+              "name": "Comment",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "Unmapped",
+              "declaredType": "BLOB"
+            }
+          ],
+          "rows": [
+            {
+              "rowId": "-7",
+              "cells": [
+                {
+                  "storage": "integer",
+                  "text": null,
+                  "integer": "-2147483648",
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "0108050",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "LF",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "real",
+                  "text": null,
+                  "integer": null,
+                  "real": 5,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "blob",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": "ff00"
+                }
+              ]
+            },
+            {
+              "rowId": "9223372036854775807",
+              "cells": [
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "0108050",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "historical overlength",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "blob",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": "00ff"
+                }
+              ]
+            }
+          ]
+        },
+        "Actor": "Fixture actor",
+        "AuditStrength": 0,
+        "EditWhen": "2026-10-08 12:34:56",
+        "Audits": []
+      },
+      "didCommit": true,
+      "replayed": false
+    }
+  },
+  {
+    "name": "1",
+    "receipt": {
+      "history": {
+        "Request": {
+          "requestId": "f4b1aa00-1234-4123-8123-000000000001",
+          "original": {
+            "contextId": "owned-context",
+            "project": "Sample",
+            "plot": "0108050",
+            "form": "SoilHumusXL",
+            "recordSource": "UsysHumus",
+            "table": "Sample_Humus",
+            "records": {
+              "columns": [
+                {
+                  "name": "ID",
+                  "declaredType": ""
+                },
+                {
+                  "name": "PlotNumber",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "Horizon",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "UpperDepth",
+                  "declaredType": "REAL"
+                },
+                {
+                  "name": "Comment",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "Unmapped",
+                  "declaredType": "BLOB"
+                }
+              ],
+              "rows": [
+                {
+                  "rowId": "-7",
+                  "cells": [
+                    {
+                      "storage": "integer",
+                      "text": null,
+                      "integer": "-2147483648",
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "0108050",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "real",
+                      "text": null,
+                      "integer": null,
+                      "real": -0.25,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "blob",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": "ff00"
+                    }
+                  ]
+                },
+                {
+                  "rowId": "9223372036854775807",
+                  "cells": [
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "0108050",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "historical overlength",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "blob",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": "00ff"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "edits": [
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "Horizon",
+              "expected": {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "text",
+                "text": "LF",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "UpperDepth",
+              "expected": {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": -0.25,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 5,
+                "blobHex": null
+              }
+            },
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "Comment",
+              "expected": {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        },
+        "Committed": {
+          "columns": [
+            {
+              "name": "ID",
+              "declaredType": ""
+            },
+            {
+              "name": "PlotNumber",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "Horizon",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "UpperDepth",
+              "declaredType": "REAL"
+            },
+            {
+              "name": "Comment",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "Unmapped",
+              "declaredType": "BLOB"
+            }
+          ],
+          "rows": [
+            {
+              "rowId": "-7",
+              "cells": [
+                {
+                  "storage": "integer",
+                  "text": null,
+                  "integer": "-2147483648",
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "0108050",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "LF",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "real",
+                  "text": null,
+                  "integer": null,
+                  "real": 5,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "blob",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": "ff00"
+                }
+              ]
+            },
+            {
+              "rowId": "9223372036854775807",
+              "cells": [
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "0108050",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "historical overlength",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "blob",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": "00ff"
+                }
+              ]
+            }
+          ]
+        },
+        "Actor": "Fixture actor",
+        "AuditStrength": 1,
+        "EditWhen": "2026-10-08 12:34:56",
+        "Audits": [
+          {
+            "rowId": "15",
+            "project": "Sample",
+            "user": "Fixture actor",
+            "plotNumber": "0108050",
+            "table": "_Humus",
+            "editField": "UpperDepth",
+            "editWhen": "2026-10-08 12:34:56",
+            "beforeEdit": "-0.25",
+            "afterEdit": "5",
+            "restore": false,
+            "flag": false,
+            "id": -2147483648
+          }
+        ]
+      },
+      "didCommit": true,
+      "replayed": false
+    }
+  },
+  {
+    "name": "2",
+    "receipt": {
+      "history": {
+        "Request": {
+          "requestId": "f4b1aa00-1234-4123-8123-000000000001",
+          "original": {
+            "contextId": "owned-context",
+            "project": "Sample",
+            "plot": "0108050",
+            "form": "SoilHumusXL",
+            "recordSource": "UsysHumus",
+            "table": "Sample_Humus",
+            "records": {
+              "columns": [
+                {
+                  "name": "ID",
+                  "declaredType": ""
+                },
+                {
+                  "name": "PlotNumber",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "Horizon",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "UpperDepth",
+                  "declaredType": "REAL"
+                },
+                {
+                  "name": "Comment",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "Unmapped",
+                  "declaredType": "BLOB"
+                }
+              ],
+              "rows": [
+                {
+                  "rowId": "-7",
+                  "cells": [
+                    {
+                      "storage": "integer",
+                      "text": null,
+                      "integer": "-2147483648",
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "0108050",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "real",
+                      "text": null,
+                      "integer": null,
+                      "real": -0.25,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "blob",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": "ff00"
+                    }
+                  ]
+                },
+                {
+                  "rowId": "9223372036854775807",
+                  "cells": [
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "0108050",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "historical overlength",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "blob",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": "00ff"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "edits": [
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "Horizon",
+              "expected": {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "text",
+                "text": "LF",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "UpperDepth",
+              "expected": {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": -0.25,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 5,
+                "blobHex": null
+              }
+            },
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "Comment",
+              "expected": {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        },
+        "Committed": {
+          "columns": [
+            {
+              "name": "ID",
+              "declaredType": ""
+            },
+            {
+              "name": "PlotNumber",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "Horizon",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "UpperDepth",
+              "declaredType": "REAL"
+            },
+            {
+              "name": "Comment",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "Unmapped",
+              "declaredType": "BLOB"
+            }
+          ],
+          "rows": [
+            {
+              "rowId": "-7",
+              "cells": [
+                {
+                  "storage": "integer",
+                  "text": null,
+                  "integer": "-2147483648",
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "0108050",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "LF",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "real",
+                  "text": null,
+                  "integer": null,
+                  "real": 5,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "blob",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": "ff00"
+                }
+              ]
+            },
+            {
+              "rowId": "9223372036854775807",
+              "cells": [
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "0108050",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "historical overlength",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "blob",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": "00ff"
+                }
+              ]
+            }
+          ]
+        },
+        "Actor": "Fixture actor",
+        "AuditStrength": 2,
+        "EditWhen": "2026-10-08 12:34:56",
+        "Audits": [
+          {
+            "rowId": "-1",
+            "project": "Sample",
+            "user": "Fixture actor",
+            "plotNumber": "0108050",
+            "table": "_Humus",
+            "editField": "Horizon",
+            "editWhen": "2026-10-08 12:34:56",
+            "beforeEdit": null,
+            "afterEdit": "LF",
+            "restore": false,
+            "flag": false,
+            "id": -2147483648
+          },
+          {
+            "rowId": "15",
+            "project": "Sample",
+            "user": "Fixture actor",
+            "plotNumber": "0108050",
+            "table": "_Humus",
+            "editField": "UpperDepth",
+            "editWhen": "2026-10-08 12:34:56",
+            "beforeEdit": "-0.25",
+            "afterEdit": "5",
+            "restore": false,
+            "flag": false,
+            "id": -2147483648
+          }
+        ]
+      },
+      "didCommit": true,
+      "replayed": false
+    }
+  },
+  {
+    "name": "3",
+    "receipt": {
+      "history": {
+        "Request": {
+          "requestId": "f4b1aa00-1234-4123-8123-000000000001",
+          "original": {
+            "contextId": "owned-context",
+            "project": "Sample",
+            "plot": "0108050",
+            "form": "SoilHumusXL",
+            "recordSource": "UsysHumus",
+            "table": "Sample_Humus",
+            "records": {
+              "columns": [
+                {
+                  "name": "ID",
+                  "declaredType": ""
+                },
+                {
+                  "name": "PlotNumber",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "Horizon",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "UpperDepth",
+                  "declaredType": "REAL"
+                },
+                {
+                  "name": "Comment",
+                  "declaredType": "TEXT"
+                },
+                {
+                  "name": "Unmapped",
+                  "declaredType": "BLOB"
+                }
+              ],
+              "rows": [
+                {
+                  "rowId": "-7",
+                  "cells": [
+                    {
+                      "storage": "integer",
+                      "text": null,
+                      "integer": "-2147483648",
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "0108050",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "real",
+                      "text": null,
+                      "integer": null,
+                      "real": -0.25,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "blob",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": "ff00"
+                    }
+                  ]
+                },
+                {
+                  "rowId": "9223372036854775807",
+                  "cells": [
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "0108050",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "text",
+                      "text": "historical overlength",
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "null",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": null
+                    },
+                    {
+                      "storage": "blob",
+                      "text": null,
+                      "integer": null,
+                      "real": null,
+                      "blobHex": "00ff"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "edits": [
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "Horizon",
+              "expected": {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "text",
+                "text": "LF",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "UpperDepth",
+              "expected": {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": -0.25,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 5,
+                "blobHex": null
+              }
+            },
+            {
+              "contextId": "owned-context",
+              "form": "SoilHumusXL",
+              "rowId": "-7",
+              "column": "Comment",
+              "expected": {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "value": {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        },
+        "Committed": {
+          "columns": [
+            {
+              "name": "ID",
+              "declaredType": ""
+            },
+            {
+              "name": "PlotNumber",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "Horizon",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "UpperDepth",
+              "declaredType": "REAL"
+            },
+            {
+              "name": "Comment",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "Unmapped",
+              "declaredType": "BLOB"
+            }
+          ],
+          "rows": [
+            {
+              "rowId": "-7",
+              "cells": [
+                {
+                  "storage": "integer",
+                  "text": null,
+                  "integer": "-2147483648",
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "0108050",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "LF",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "real",
+                  "text": null,
+                  "integer": null,
+                  "real": 5,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "blob",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": "ff00"
+                }
+              ]
+            },
+            {
+              "rowId": "9223372036854775807",
+              "cells": [
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "0108050",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "historical overlength",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "null",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "blob",
+                  "text": null,
+                  "integer": null,
+                  "real": null,
+                  "blobHex": "00ff"
+                }
+              ]
+            }
+          ]
+        },
+        "Actor": "Fixture actor",
+        "AuditStrength": 3,
+        "EditWhen": "2026-10-08 12:34:56",
+        "Audits": [
+          {
+            "rowId": "-1",
+            "project": "Sample",
+            "user": "Fixture actor",
+            "plotNumber": "0108050",
+            "table": "_Humus",
+            "editField": "Horizon",
+            "editWhen": "2026-10-08 12:34:56",
+            "beforeEdit": null,
+            "afterEdit": "LF",
+            "restore": false,
+            "flag": false,
+            "id": -2147483648
+          },
+          {
+            "rowId": "15",
+            "project": "Sample",
+            "user": "Fixture actor",
+            "plotNumber": "0108050",
+            "table": "_Humus",
+            "editField": "UpperDepth",
+            "editWhen": "2026-10-08 12:34:56",
+            "beforeEdit": "-0.25",
+            "afterEdit": "5",
+            "restore": false,
+            "flag": false,
+            "id": -2147483648
+          },
+          {
+            "rowId": "9223372036854775807",
+            "project": "Sample",
+            "user": "Fixture actor",
+            "plotNumber": "0108050",
+            "table": "_Humus",
+            "editField": "Comment",
+            "editWhen": "2026-10-08 12:34:56",
+            "beforeEdit": "",
+            "afterEdit": null,
+            "restore": false,
+            "flag": false,
+            "id": -2147483648
+          }
+        ]
+      },
+      "didCommit": true,
+      "replayed": false
+    }
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "review": {
+    "contextId": "group-wire",
+    "project": "Sample",
+    "projectPath": "C:\\fixtures\\Sample.sqlite",
+    "su": "None",
+    "suPath": "",
+    "values": { "groupBy": 1 },
+    "availability": { "layer": true, "strata": true, "lifeform": true, "none": true }
+  },
+  "request": { "expected": { "groupBy": 1 }, "proposed": { "groupBy": 2 } },
+  "outcome": { "contextId": "group-wire", "changed": true, "committed": true, "errorMessage": "" }
+}

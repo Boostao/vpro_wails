@@ -129,10 +129,6 @@ func longVegetationConfigBool(values configValues, key string) (bool, error) {
 
 func decodeLongVegetationQualityCriteria(values configValues) ([3]vegetationQualityCriterion, error) {
 	fail := func(err error) ([3]vegetationQualityCriterion, error) { return [3]vegetationQualityCriterion{}, err }
-	fields, err := configSection(values, "ReportOptions")
-	if err != nil {
-		return fail(err)
-	}
 	var criteria [3]vegetationQualityCriterion
 	for i, domain := range [3]string{"Site", "Veg", "Soil"} {
 		minimumKey := "DataQualityFilter" + domain + "LV"
@@ -144,22 +140,9 @@ func decodeLongVegetationQualityCriteria(values configValues) ([3]vegetationQual
 			return fail(fmt.Errorf("ReportOptions.%s must not contain NUL", minimumKey))
 		}
 		nullKey := "DataQualityFilter" + domain + "NullLV"
-		var includeNull bool
-		if literal, legacy := fields[nullKey].(string); legacy {
-			// Default-init preserves the source's string-typed soil/veg flags.
-			switch literal {
-			case "True":
-				includeNull = true
-			case "False":
-				includeNull = false
-			default:
-				return fail(fmt.Errorf("ReportOptions.%s legacy string must be exactly True or False", nullKey))
-			}
-		} else {
-			includeNull, err = longVegetationConfigBool(values, nullKey)
-			if err != nil {
-				return fail(err)
-			}
+		includeNull, err := longVegetationQualityNullOption(values, nullKey)
+		if err != nil {
+			return fail(err)
 		}
 		criteria[i] = vegetationQualityCriterion{Minimum: minimum, IncludeNull: includeNull}
 	}

@@ -217,12 +217,23 @@ func (c *sqliteContext) attach(ctx context.Context, alias, path string) (string,
 	if _, exists := c.attachments[alias]; exists {
 		return "", fmt.Errorf("attachment alias %q is already owned", alias)
 	}
-	info, err := os.Stat(path)
+	file, err := os.Open(path)
 	if err != nil {
 		return "", fmt.Errorf("identify attachment %s: %w", alias, err)
 	}
+	info, statErr := file.Stat()
+	if err := errors.Join(statErr, file.Close()); err != nil {
+		return "", fmt.Errorf("capture attachment %s identity: %w", alias, err)
+	}
 	if _, err := c.conn.ExecContext(ctx, "ATTACH DATABASE ? AS "+quoteHeaderIdentifier(alias), sqliteFileURI(path, "ro")); err != nil {
 		return "", fmt.Errorf("attach %s: %w", alias, err)
+	}
+	current, err := os.Stat(path)
+	if err != nil {
+		return "", fmt.Errorf("verify attached %s identity: %w", alias, err)
+	}
+	if !os.SameFile(info, current) {
+		return "", fmt.Errorf("attachment %s identity changed during attach", alias)
 	}
 	c.attachments[alias] = path
 	c.attachmentInfo[alias] = info

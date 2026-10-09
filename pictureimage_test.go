@@ -46,6 +46,49 @@ func pictureImageFixture(t *testing.T, format string, width, height int) (*owned
 	return owner, data
 }
 
+func TestPictureImageDecoderExactByteLimitAndCancellation(t *testing.T) {
+	_, encoded := pictureImageFixture(t, "png", 4, 3)
+	exact := make([]byte, 32*1024*1024)
+	copy(exact, encoded)
+	preview, err := decodePictureImageBytes(t.Context(), exact)
+	hash := sha256.Sum256(exact)
+	if err != nil || preview.MIME != "image/png" || preview.Width != 4 || preview.Height != 3 ||
+		preview.SHA256 != hex.EncodeToString(hash[:]) ||
+		!strings.HasPrefix(preview.DataURL, "data:image/png;base64,") {
+		t.Fatal("exact 32-MiB boundary lost complete preview output", preview.MIME, err)
+	}
+	decoded, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(preview.DataURL, "data:image/png;base64,"))
+	if err != nil || !bytes.Equal(decoded, exact) {
+		t.Fatal("boundary preview payload was truncated or changed", err)
+	}
+	if got, err := decodePictureImageBytes(t.Context(), append(exact, 0)); err == nil || got != (pictureImage{}) {
+		t.Fatal("size+1 became a successful or partial preview", got.MIME, err)
+	}
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	if got, err := decodePictureImageBytes(ctx, encoded); !errors.Is(err, context.Canceled) || got != (pictureImage{}) {
+		t.Fatal("cancelled decoder returned preview data", got, err)
+	}
+	if got, err := decodePictureImageBytes(nil, encoded); err == nil || got != (pictureImage{}) {
+		t.Fatal("decoder accepted a missing request context", got, err)
+	}
+	if got, err := decodePictureImageBytes(t.Context(), encoded); err != nil || got.Width != 4 || got.Height != 3 {
+		t.Fatal("fresh decoder retry failed after cancellation", got, err)
+	}
+}
+
+func TestPictureImageDecoderExactPixelLimit(t *testing.T) {
+	_, exact := pictureImageFixture(t, "png", 4096, 4096)
+	preview, err := decodePictureImageBytes(t.Context(), exact)
+	if err != nil || preview.Width != 4096 || preview.Height != 4096 || preview.MIME != "image/png" {
+		t.Fatal("exact 16-megapixel image was rejected", preview.Width, preview.Height, err)
+	}
+	_, over := pictureImageFixture(t, "png", 4097, 4096)
+	if got, err := decodePictureImageBytes(t.Context(), over); err == nil || got != (pictureImage{}) {
+		t.Fatal("over-limit pixel dimensions returned preview data", got.Width, got.Height, err)
+	}
+}
+
 func TestPictureImageOwnedRowAndIndependentDefaultDirectories(t *testing.T) {
 	service, state := reportServiceFixture(t, false)
 	source, path := pictureLibraryFixture(t, pictureFixtureSchema)

@@ -3,6 +3,10 @@
   import PicturePanel from './PicturePanel.svelte';
   import { plotLookupInputError } from './scopedPlotLookup';
   import { pictureMetadataSession } from './pictureMetadataSessions';
+  import { pictureCreationSession } from './pictureCreationSessions';
+  import PictureCreationPanel from './PictureCreationPanel.svelte';
+  import { pictureLifecycleSession } from './pictureLifecycleSessions';
+  import PictureLifecyclePanel from './PictureLifecyclePanel.svelte';
 
   let { contextId, project, initialPlot = '', onBusyChange }: {
     contextId: string; project: string; initialPlot?: string; onBusyChange: (busy: boolean) => void;
@@ -13,6 +17,26 @@
   let error = $state('');
   let busy = $state(false);
   const metadataWritingEnabled = import.meta.env.VITE_PICTURE_METADATA_WRITING === 'true';
+  const creationEnabled = import.meta.env.VITE_PICTURE_CREATION_WRITING === 'true';
+  const lifecycleEnabled = import.meta.env.VITE_PICTURE_DELETION_WRITING === 'true' || import.meta.env.VITE_PICTURE_DELETION_RESTORING === 'true';
+  const lifecycleSession = $derived(lifecycleEnabled && selected && contextId && project
+    ? pictureLifecycleSession({ contextId, project, plotNumber: selected }) : undefined);
+  let lifecycleRevision = $state(0);
+  $effect(() => lifecycleSession?.subscribe(() => untrack(() => lifecycleRevision++)));
+  const lifecycleBlocked = $derived.by(() => {
+    lifecycleRevision;
+    const close = lifecycleSession?.closeState();
+    return !!close && (close.busy || close.blocked || close.unsaved);
+  });
+  const creationSession = $derived(creationEnabled && selected && contextId && project
+    ? pictureCreationSession({ contextId, project, plotNumber: selected }) : undefined);
+  let creationRevision = $state(0);
+  $effect(() => creationSession?.subscribe(() => untrack(() => creationRevision++)));
+  const creationBlocked = $derived.by(() => {
+    creationRevision;
+    const close = creationSession?.closeState();
+    return !!close && (close.busy || close.blocked || close.unsaved);
+  });
   const metadataSession = $derived(metadataWritingEnabled && selected && contextId && project
     ? pictureMetadataSession({ contextId, project, plotNumber: selected }) : undefined);
   let metadataRevision = $state(0);
@@ -21,12 +45,14 @@
     const close = metadataSession?.closeState();
     return !!close && (close.unsaved || close.busy || close.blocked === true);
   });
-  $effect(() => metadataSession?.subscribe(() => metadataRevision++));
-  $effect(() => { onBusyChange(busy || metadataBlocked); });
+  $effect(() => metadataSession?.subscribe(() => untrack(() => metadataRevision++)));
+  $effect(() => { onBusyChange(busy || metadataBlocked || creationBlocked || lifecycleBlocked); });
 
   function selectPlot() {
     if (busy) { error = 'Wait for or cancel the current picture read before selecting another plot.'; return; }
     if (metadataBlocked) { error = 'Finish or explicitly discard the retained picture metadata draft before replacing its literal parent.'; return; }
+    if (creationBlocked) { error = 'Resolve the retained picture selection or creation receipt before replacing its literal parent.'; return; }
+    if (lifecycleBlocked) { error = 'Finish the retained picture lifecycle review or resolve/acknowledge its receipt before replacing its literal parent.'; return; }
     const invalid = plotLookupInputError(plot);
     if (invalid) { error = invalid; return; }
     error = '';
@@ -34,7 +60,7 @@
   }
   function reading(value: boolean) {
     busy = value;
-    onBusyChange(value || metadataBlocked);
+    onBusyChange(value || metadataBlocked || creationBlocked || lifecycleBlocked);
   }
 </script>
 
@@ -44,21 +70,28 @@
   <p>Owned project {project}. Select an exact parent; Load checks its literal membership in the current context.</p>
   <form onsubmit={event => { event.preventDefault(); selectPlot(); }}>
     <label for="picture-manager-plot">Plot number
-      <input id="picture-manager-plot" bind:value={plot} disabled={busy || metadataBlocked} />
+      <input id="picture-manager-plot" bind:value={plot} disabled={busy || metadataBlocked || creationBlocked || lifecycleBlocked} />
     </label>
-    <button type="submit" disabled={busy || metadataBlocked}>Select exact plot</button>
+    <button type="submit" disabled={busy || metadataBlocked || creationBlocked || lifecycleBlocked}>Select exact plot</button>
   </form>
   {#if selected}
     <p data-picture-manager-parent>Selected literal parent: {JSON.stringify(selected)}</p>
     {#key selected}
-      <PicturePanel {contextId} {project} plotNumber={selected} view="manager" onBusyChange={reading} {metadataSession} />
+      {#if creationSession}<PictureCreationPanel session={creationSession} disabled={busy || metadataBlocked || lifecycleBlocked} />{/if}
+      {#if lifecycleSession}<PictureLifecyclePanel session={lifecycleSession} disabled={busy || metadataBlocked || creationBlocked} />{/if}
+      <PicturePanel {contextId} {project} plotNumber={selected} view="manager" onBusyChange={reading} {metadataSession}
+        disabled={creationBlocked} />
     {/key}
   {/if}
-  <p class="guidance">Read-only adaptation of frmPlotPictureMaster / frmPlotPictures. Parent and child link by PlotNumber.
+  <p class="guidance">Adaptation of frmPlotPictureMaster / frmPlotPictures. Parent and child link by PlotNumber.
     This review does not apply current SU or profile filters. Selecting or loading never changes the parent or picture metadata.
-    {#if metadataWritingEnabled}Add a Picture, deletion, external directories and automatic installation remain unavailable.
-      Existing metadata editing requires its independent backend permission.
-    {:else}Add a Picture, deletion, metadata editing, external directories and automatic installation remain unavailable.{/if}</p>
+    {#if creationEnabled}Add a Picture requires its independent backend permission and native chooser; it grants only the selected file.
+    {:else}Add a Picture remains unavailable.{/if}
+    {#if metadataWritingEnabled}Existing metadata editing requires its independent backend permission.
+    {:else}Metadata editing remains unavailable.{/if}
+    {#if lifecycleEnabled}Reference deletion/restoration requires independent backend permissions and complete physical review; source GUI confirmation remains unverified.
+    {:else}Deletion/restoration remains unavailable.{/if}
+    Directory-wide access and automatic installation remain unavailable.</p>
 </section>
 
 <style>

@@ -41,6 +41,11 @@ func main() {
 	if _, err := siviFeature(pictureReadingEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
+	for _, name := range []string{pictureCreationWritingEnvironment, pictureDeletionWritingEnvironment, pictureDeletionRestoringEnvironment} {
+		if _, err := siviFeature(name, os.LookupEnv); err != nil {
+			log.Fatal(err)
+		}
+	}
 	if _, err := siviFeature(lifeformWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
@@ -128,6 +133,30 @@ func main() {
 		log.Fatal(err)
 	}
 	longEnvironmentPreferencesEnabled, err := longEnvironmentPreferencesFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	longVegetationPreferencesEnabled, err := longVegetationPreferencesFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	longVegetationStatisticsPreferencesEnabled, err := longVegetationStatisticsPreferencesFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	longVegetationSwitchPreferencesEnabled, err := longVegetationSwitchPreferencesFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	longVegetationThresholdPreferencesEnabled, err := longVegetationThresholdPreferencesFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	longVegetationGroupPreferencesEnabled, err := longVegetationGroupPreferencesFeature(os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	longVegetationQualityNullPreferencesEnabled, err := longVegetationQualityNullPreferencesFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -231,6 +260,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	pictureCreation, err := NewPictureCreationService(pictures, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pictureDeletion, err := NewPictureDeletionService(pictures, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	lifeformSummary, err := NewLifeformSummaryService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -329,6 +366,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	twoPageSoil, err := NewTwoPageSoilService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
+	twoPageVegetation, err := NewTwoPageVegetationService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	workingUnits, err := NewWorkingUnitService(projects, configDir)
 	if err != nil {
 		log.Printf("Warning: failed to initialize WorkingUnitService: %v", err)
@@ -344,11 +389,19 @@ func main() {
 		application.NewService(NewGoogleEarthKMLExportService(contextService, googleEarthKMLExportEnabled)),
 		application.NewService(NewGoogleEarthPreferencesService(contextService, googleEarthPreferencesEnabled)),
 		application.NewService(NewLongEnvironmentPreferencesService(contextService, longEnvironmentPreferencesEnabled)),
+		application.NewService(NewLongVegetationPreferencesService(contextService, longVegetationPreferencesEnabled)),
+		application.NewService(NewLongVegetationStatisticsPreferencesService(contextService, longVegetationStatisticsPreferencesEnabled)),
+		application.NewService(NewLongVegetationSwitchPreferencesService(contextService, longVegetationSwitchPreferencesEnabled)),
+		application.NewService(NewLongVegetationThresholdPreferencesService(contextService, longVegetationThresholdPreferencesEnabled)),
+		application.NewService(NewLongVegetationGroupPreferencesService(contextService, longVegetationGroupPreferencesEnabled)),
+		application.NewService(NewLongVegetationQualityNullPreferencesService(contextService, longVegetationQualityNullPreferencesEnabled)),
 		application.NewService(NewSiteUnitSummaryPreferencesService(contextService, siteUnitSummaryPreferencesEnabled)),
 		application.NewService(siviParentShared),
 		application.NewService(twoPageParentExtra),
 		application.NewService(twoPageParentCommon),
 		application.NewService(twoPageParentEntry),
+		application.NewService(twoPageSoil),
+		application.NewService(twoPageVegetation),
 		application.NewService(siviCovers),
 		application.NewService(siviCombined),
 		application.NewService(siviCollected),
@@ -359,6 +412,8 @@ func main() {
 		application.NewService(siviDeletion),
 		application.NewService(pictures),
 		application.NewService(pictureMetadata),
+		application.NewService(pictureCreation),
+		application.NewService(pictureDeletion),
 		application.NewService(lifeformSummary),
 		application.NewService(speciesAttributeSummary),
 		application.NewService(lifeformWorkbook),

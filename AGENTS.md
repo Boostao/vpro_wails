@@ -117,10 +117,72 @@ archive; consult them for a specific issue, not as a growing default prompt.
   Preserve AutoIncr/default/index distinctions; this alone does not prove allocator
   compatibility, collision/retry/deleted-ID behavior or grant desktop creation.
 
+- Bound control ValidationRule is independent of the table's storage type/range
+  and query membership; catalogue it for every live binding before acceptance.
+  For example, vegetation `<100 Or Is Null` rejects100 but does not imply a zero
+  lower bound, and unchanged historical out-of-rule values still omit assignments.
+  A binary64 value just below100 can narrow to SINGLE100; draft boundary tests
+  do not establish source conversion/validation timing without native calibration.
+
+- Source-equivalent vegetation SINGLE calibration narrows before the control
+  rule:99.999996 stores99.99999237060547,99.999999 rejects, and negative underflow
+  becomes source negative zero. Prepare new canonical typed assignments without
+  reinterpreting old binary64 receipts; unchanged historical omission and readonly
+  request/history validation must precede or remain separate from new-write rules.
+
+- Access database text comparison/UNION is not byte ownership or JavaScript
+  case conversion. The bounded LCID1033 Species probe equates case variants and
+  trailing spaces but distinguishes E/accented E; UCase preserves sharp-s,
+  dotless-i and long-s instead of JS/Go Unicode mappings. Preserve physical
+  definitions and NULL/empty metadata; do not infer a stable UNION representative,
+  whole-Unicode equivalence or original callback parity from these engine cases.
+
+- An Access combo's COM Text setter can invoke NotInList/modal callbacks before
+  a subsequent focus change. Record source state and intent first; dispatch the
+  setter on the owned marshalled COM worker so exact known dialogs remain
+  observable. A retained prompt can continue once from that checkpoint without
+  replaying Text assignment; use native PID/start/path/window checks during modal
+  observation rather than another potentially blocked host COM property read.
+
+- Original Species NotInList decisions can intentionally retain codes absent
+  from the displayed layer/union: alias No, same-code/layer confirmation and
+  existing-personal paths are separate authorization decisions. Missing-code No
+  can retain typed BASE/raw input/focus while the COM setter returns Access3021;
+  preserve the error/draft distinction, never an empty value or success fallback.
+
+- Species physical sources have distinct widths: master USysAllSpecs.Lifeform
+  is LONG/signed32, personal USysUserSpp.LifeForm is INTEGER/signed16. Imported
+  SQLite INTEGER declarations do not erase that distinction. Reuse projection/
+  read invariants with explicit source policies; never silently widen an
+  independently accepted legacy consumer while correcting a new workflow.
+
+- Original A/CHARS concatenated-NULL cover warnings execute after physical Save
+  and can navigate to a clean new-record buffer without insertion; they are
+  not Save cancellation rules. An immediate independent ACE read after C
+  Dirty=False can lag final closed storage. Retain both observations and never
+  replay a completed Save to align a delayed read or recover failed capture.
+
+- Access COM ActiveControl/SetFocus is not Windows foreground/UIA focus.
+  A global GetFocusedElement can identify the VSCode document while the source
+  reports Collected. Verify the actual owned native PID/control/display before
+  input; a rejected foreign provider does not prove source inaccessibility.
+
 - Svelte deep-reactive rows are proxies, not cloneable plain objects. Use
   `$state.snapshot` inside the guarded operation before serializing a reviewed
   row. Extracted-function tests with plain objects cannot prove this path;
   exercise an actual client-runtime proxy, in that runtime's object realm.
+
+- Svelte server rendering can be lazy: consume `render(...).body` and assert
+  callback execution before claiming compiled flag/profile coverage. DOM test
+  doubles placed in deep-reactive state need nonproxied class instances, like
+  real DOM nodes; plain-object mocks can cache raw dataset changes and falsely
+  hide an independently observed owner/row mismatch.
+
+- Read exact production prerequisite flag names before building a native
+  profile; a successful Vite build can still leave the intended panel gated.
+  For example, vegetation also requires `VITE_TWO_PAGE_PARENT_REVIEW` and
+  `VITE_TWO_PAGE_PARENT_ENTRY_REVIEW`, not guessed shorter aliases. Preserve
+  a failed candidate/profile and verify zero writes before correcting it.
 
 - SQLite BINARY collation alone does not establish literal text ownership:
   column affinity can still coerce numeric or leading-zero identities. For a
@@ -183,6 +245,13 @@ archive; consult them for a specific issue, not as a growing default prompt.
   Unicode pairs such as `S`/long-s and can silently reuse/overwrite an existing
   worksheet. Compare all allocated and reserved names with EqualFold and require
   zero-output refusal in tests.
+
+- JavaScript casing is not a version-independent Go `strings.EqualFold` contract.
+  For strict client identifier ownership, generate and pin compiler SimpleFold
+  classes and check every rune against that compiler, not just selected aliases.
+  Verify reviewer witnesses on the target: Greek/ligature pairs introduced in
+  newer Unicode can remain distinct in Go1.25/Unicode15. Never fold data values
+  merely because schema identifiers need this comparison.
 
 - Client captions establish scope intent; unmarked screenshots are candidate
   retain, not approved as-is parity, and colour-only marks need a legend before
@@ -301,3 +370,11 @@ archive; consult them for a specific issue, not as a growing default prompt.
   only string bodies can miss a successful Save. Reassemble chunks by their
   upload ID and hold the final actual response. If capture was missed, inspect
   owned physical history/data first and never replay the completed mutation.
+- Native COM wrappers must keep HWND/state outside native interface memory and
+  pass the receiver plus every argument; a compiling public binding can still
+  crash in Release, as go-common-file-dialog v1.2.0 did.
+  Interpret HRESULT as signed32, classify normal Cancel only from Show's
+  ERROR_CANCELLED, and remember that IUnknown.Release returns a reference count,
+  not HRESULT. Balance successful STA initialization after releasing interface/
+  path resources; fake-dialog tests do not replace actual owned native Cancel
+  and literal-selection acceptance.

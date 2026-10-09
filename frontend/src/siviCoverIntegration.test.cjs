@@ -67,8 +67,9 @@ test('literal default-off source notice gate is forwarded to all owned child wri
 });
 
 test('cover owner contributes dirty busy blocked Save Undo Lock and peer-editor barriers', () => {
-  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviCoverBusy(?: \|\| [a-zA-Z]+)*\)/);
-  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
+  assert.match(parent, /independentHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviCoverBusy(?: \|\| [a-zA-Z]+)*\)/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\(independentHeaderWorkflowBusy \|\| twoPageOpen \|\| twoPageBusy\)/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);
   assert.match(parent, /siviCreationPeerUnsaved = \$derived\([^\n]*\|\| siviCoverUnsaved/);
   assert.match(parent, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending \|\| siviCreationUndoPending\)/);
   assert.match(parent, /if \(siviCoverUnsaved\) \{ await siviCoverOperation\('save'\); return; \}/);

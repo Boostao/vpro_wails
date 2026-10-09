@@ -1,0 +1,20 @@
+{
+  "review": {
+    "contextId": "statistics-wire",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "values": { "avgType": 10, "orderBy": 20 }
+  },
+  "request": {
+    "expected": { "avgType": 10, "orderBy": 20 },
+    "proposed": { "avgType": 20, "orderBy": 10 }
+  },
+  "outcome": {
+    "contextId": "statistics-wire",
+    "changed": true,
+    "committed": true,
+    "errorMessage": ""
+  }
+}

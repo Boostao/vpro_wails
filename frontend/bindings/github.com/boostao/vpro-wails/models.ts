@@ -593,6 +593,34 @@ export interface LongVegetationDiagnostic {
     "count": number;
 }
 
+export interface LongVegetationGroupAvailability {
+    "layer": boolean;
+    "strata": boolean;
+    "lifeform": boolean;
+    "none": boolean;
+}
+
+export interface LongVegetationGroupPreferenceValues {
+    "groupBy": number;
+}
+
+export interface LongVegetationGroupPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface LongVegetationGroupPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": LongVegetationGroupPreferenceValues;
+    "availability": LongVegetationGroupAvailability;
+}
+
 export interface LongVegetationOptions {
     "contextId": string;
     "project": string;
@@ -607,6 +635,26 @@ export interface LongVegetationPlot {
     "cover": number | null;
 }
 
+export interface LongVegetationPreferenceValues {
+    "title": string;
+}
+
+export interface LongVegetationPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface LongVegetationPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": LongVegetationPreferenceValues;
+}
+
 export interface LongVegetationPreview {
     "contextId": string;
     "projectPath": string;
@@ -618,6 +666,28 @@ export interface LongVegetationPreview {
 export interface LongVegetationQualityCriterion {
     "minimum": string;
     "includeNull": boolean;
+}
+
+export interface LongVegetationQualityNullPreferenceValues {
+    "siteIncludeNulls": boolean;
+    "vegIncludeNulls": boolean;
+    "soilIncludeNulls": boolean;
+}
+
+export interface LongVegetationQualityNullPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface LongVegetationQualityNullPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": LongVegetationQualityNullPreferenceValues;
 }
 
 export interface LongVegetationQualityOccurrence {
@@ -680,6 +750,71 @@ export interface LongVegetationSettings {
     "showEnglishName": boolean;
     "showSpeciesCode": boolean;
     "quality": LongVegetationQualitySettings | null;
+}
+
+export interface LongVegetationStatisticsPreferenceValues {
+    "avgType": number;
+    "orderBy": number;
+}
+
+export interface LongVegetationStatisticsPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface LongVegetationStatisticsPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": LongVegetationStatisticsPreferenceValues;
+}
+
+export interface LongVegetationSwitchPreferenceValues {
+    "quickReport": boolean;
+    "spaceBetweenGroups": boolean;
+    "reportSummary": boolean;
+    "constantSpeciesList": boolean;
+}
+
+export interface LongVegetationSwitchPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface LongVegetationSwitchPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": LongVegetationSwitchPreferenceValues;
+}
+
+export interface LongVegetationThresholdPreferenceValues {
+    "presenceGreaterThan": number;
+    "meanCoverGreaterThan": number;
+}
+
+export interface LongVegetationThresholdPreferencesOutcome {
+    "contextId": string;
+    "changed": boolean;
+    "committed": boolean;
+    "errorMessage": string;
+}
+
+export interface LongVegetationThresholdPreferencesReview {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "values": LongVegetationThresholdPreferenceValues;
 }
 
 export interface LongVegetationUnit {
@@ -773,11 +908,47 @@ export interface PersonalSpeciesDefinitionRequest {
     "englishName": string | null;
 }
 
+export type PictureCreationResult = pictureCreationResult;
+
+export interface PictureCreationSelection {
+    "token": string;
+    "selectedPath": string;
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "windowId": number;
+}
+
+export interface PictureDeletionHistoryEvent {
+    "deletion": pictureDeletionResult;
+    "restoration": pictureRestorationResult | null;
+}
+
+export interface PictureDeletionHistoryList {
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "events": PictureDeletionHistoryEvent[] | null;
+}
+
+export type PictureDeletionResult = pictureDeletionResult;
+
 export type PictureImage = pictureImage;
 
 export type PictureMetadataReview = pictureMetadataReview;
 
 export type PictureMetadataWriteResult = pictureMetadataWriteResult;
+
+export type PictureRestorationResult = pictureRestorationResult;
+
+export interface PictureRestorationReview {
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "historyId": string;
+    "deletion": pictureDeletionResult;
+    "peers": ProjectMetadataRow[] | null;
+}
 
 export interface PlotLocationReport {
     "project": string;
@@ -1798,6 +1969,36 @@ export interface TwoPageParentExtraWrite {
     "edits": SIVIParentCellEdit[] | null;
 }
 
+export interface TwoPageSoilAttemptOutcome {
+    "contextId": string;
+    "requestId": string;
+    "requestJSON": string;
+    "status": string;
+    "reason": string;
+    "receipt": TwoPageSoilWriteResult | null;
+}
+
+export type TwoPageSoilOriginal = twoPageSoilOriginal;
+
+export type TwoPageSoilReferences = twoPageSoilReferences;
+
+export type TwoPageSoilWriteResult = twoPageSoilWriteResult;
+
+export interface TwoPageVegetationAttemptOutcome {
+    "contextId": string;
+    "requestId": string;
+    "requestJSON": string;
+    "status": string;
+    "reason": string;
+    "receipt": TwoPageVegetationWriteResult | null;
+}
+
+export type TwoPageVegetationOriginal = twoPageVegetationOriginal;
+
+export type TwoPageVegetationSpeciesReferences = twoPageVegetationSpeciesReferences;
+
+export type TwoPageVegetationWriteResult = twoPageVegetationWriteResult;
+
 /**
  * VegRecord represents a vegetation entry (Layer A-D).
  */
@@ -1984,6 +2185,50 @@ export interface WorkingUnitModeState {
     "warning": string | null;
 }
 
+export interface pictureCreationResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "selectedPath": string;
+    "requestedSource": string;
+    "source": string;
+    "ownedFiles": { [_ in string]?: string } | null;
+    "actor": string;
+    "auditStrength": number;
+    "id": number;
+    "rowId": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "committed": ProjectMetadataRow;
+    "createdWhen": string;
+    "historyId": string;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface pictureDeletionRequest {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "columns": ProjectMetadataColumn[] | null;
+    "original": ProjectMetadataRow;
+}
+
+export interface pictureDeletionResult {
+    "request": pictureDeletionRequest;
+    "id": number;
+    "requestedSource": string;
+    "source": string;
+    "ownedFiles": { [_ in string]?: string } | null;
+    "actor": string;
+    "auditStrength": number;
+    "deletedWhen": string;
+    "historyId": string;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
 export interface pictureImage {
     "contextId": string;
     "project": string;
@@ -2020,6 +2265,24 @@ export interface pictureMetadataWriteResult {
     "changes": ProjectMetadataChange[] | null;
     "editWhen": string;
     "historyId": string;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface pictureRestorationRequest {
+    "requestId": string;
+    "contextId": string;
+    "historyId": string;
+    "deletion": pictureDeletionRequest;
+    "peers": ProjectMetadataRow[] | null;
+}
+
+export interface pictureRestorationResult {
+    "request": pictureRestorationRequest;
+    "deletion": pictureDeletionResult;
+    "actor": string;
+    "auditStrength": number;
+    "restoredWhen": string;
     "didCommit": boolean;
     "replayed": boolean;
 }
@@ -2268,3 +2531,109 @@ export interface siviDeletionTargets {
 }
 
 export type siviParentProjection = SIVIParentProjection;
+
+export interface twoPageSoilEdit {
+    "contextId": string;
+    "form": string;
+    "rowId": string;
+    "column": string;
+    "expected": ProjectMetadataCell;
+    "value": ProjectMetadataCell;
+}
+
+export interface twoPageSoilHistory {
+    "Request": twoPageSoilRequest;
+    "Committed": ProjectMetadataTable;
+    "Actor": string;
+    "AuditStrength": number;
+    "EditWhen": string;
+    "Audits": AuditEntry[] | null;
+}
+
+export interface twoPageSoilOriginal {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "recordSource": string;
+    "table": string;
+    "records": ProjectMetadataTable;
+}
+
+export interface twoPageSoilReference {
+    "column": string;
+    "listName": string;
+    "definitions": ProjectMetadataTable;
+}
+
+export interface twoPageSoilReferences {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "source": string;
+    "fields": twoPageSoilReference[] | null;
+}
+
+export interface twoPageSoilRequest {
+    "requestId": string;
+    "original": twoPageSoilOriginal | null;
+    "edits": twoPageSoilEdit[] | null;
+}
+
+export interface twoPageSoilWriteResult {
+    "history": twoPageSoilHistory;
+    "didCommit": boolean;
+    "replayed": boolean;
+}
+
+export interface twoPageVegetationEdit {
+    "contextId": string;
+    "form": string;
+    "rowId": string;
+    "column": string;
+    "expected": ProjectMetadataCell;
+    "value": ProjectMetadataCell;
+}
+
+export interface twoPageVegetationHistory {
+    "Request": twoPageVegetationRequest;
+    "Committed": ProjectMetadataTable;
+    "Actor": string;
+    "AuditStrength": number;
+    "EditWhen": string;
+    "Audits": AuditEntry[] | null;
+}
+
+export interface twoPageVegetationOriginal {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "recordSource": string;
+    "table": string;
+    "records": ProjectMetadataTable;
+    "sourceRowIds": string[] | null;
+}
+
+export interface twoPageVegetationRequest {
+    "requestId": string;
+    "original": twoPageVegetationOriginal | null;
+    "edits": twoPageVegetationEdit[] | null;
+}
+
+export interface twoPageVegetationSpeciesReferences {
+    "contextId": string;
+    "project": string;
+    "plot": string;
+    "form": string;
+    "source": string;
+    "master": ProjectMetadataTable;
+    "personal": ProjectMetadataTable;
+}
+
+export interface twoPageVegetationWriteResult {
+    "history": twoPageVegetationHistory;
+    "didCommit": boolean;
+    "replayed": boolean;
+}

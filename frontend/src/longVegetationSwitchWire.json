@@ -1,0 +1,35 @@
+{
+  "review": {
+    "contextId": "switch-wire",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "values": {
+      "quickReport": true,
+      "spaceBetweenGroups": false,
+      "reportSummary": true,
+      "constantSpeciesList": true
+    }
+  },
+  "request": {
+    "expected": {
+      "quickReport": true,
+      "spaceBetweenGroups": false,
+      "reportSummary": true,
+      "constantSpeciesList": true
+    },
+    "proposed": {
+      "quickReport": false,
+      "spaceBetweenGroups": true,
+      "reportSummary": false,
+      "constantSpeciesList": false
+    }
+  },
+  "outcome": {
+    "contextId": "switch-wire",
+    "changed": true,
+    "committed": true,
+    "errorMessage": ""
+  }
+}

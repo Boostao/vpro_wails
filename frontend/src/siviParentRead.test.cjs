@@ -124,8 +124,9 @@ test('panel safety feedback precedes fields and parent owner sits outside tab li
   assert.match(parent, /VITE_SIVI_PARENT_REVIEW === 'true'/);
   assert.match(parent, /siviParentSession\?\.dispose\(\)/);
   assert.match(parent, /GetSIVIParentOriginal\(siviContextId, plot\)/);
-  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\([^\n]*siviParentBusy/);
-  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
+  assert.match(parent, /independentHeaderWorkflowBusy = \$derived\([^\n]*siviParentBusy/);
+  assert.match(parent, /otherHeaderWorkflowBusy = \$derived\(independentHeaderWorkflowBusy \|\| twoPageOpen \|\| twoPageBusy\)/);
+  assert.match(parent, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);
   assert.match(parent, /dirty \|\| nonParentChildUnsaved \|\| !siviParentSession/);
 });
 test('source preference updates only its owned choice snapshot and survives remount without reinitialization', async () => {
@@ -202,6 +203,7 @@ test('actual parent Save Lock and close authority block unknown source preferenc
     siviDeletionPending: false, siviRestorationPending: false, siviCreationUndoPending: false,
     siviParentSourceView: { authorityUnknown: true, busy: false, error: 'lost preference receipt' }, pictureMetadataPending: false,
     siviSourceAuthorityUnknown: true, environmentSUOpen: true, metadataOpen: true, error: '',
+    twoPageSoilBusy: false, twoPageSoilBlocked: false,
   });
   const state = context.actions.getCloseState();
   assert.equal(state.unsaved, true); assert.equal(state.blocked, true);

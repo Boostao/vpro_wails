@@ -1,10 +1,16 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onDestroy, untrack } from 'svelte';
   import { PictureService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { pictureMetadataFromWire, pictureImageFromWire, pictureCellLabel, type PictureReview, type PicturePreview } from './pictureRead';
   import PictureMetadataEditor from './PictureMetadataEditor.svelte';
   import type { PictureMetadataSession } from './pictureMetadataSession';
+  import { pictureCreationSession } from './pictureCreationSessions';
+  import type { PictureCreationReceipt } from './pictureCreationEditor';
+  import { equalCell } from './projectMetadataEditor';
+  import { pictureLifecycleSession } from './pictureLifecycleSessions';
+  import type { PictureLifecycleCommit, PictureLifecycleSession } from './pictureLifecycleSession';
+  import { pictureLifecycleOriginalMatches } from './pictureLifecycleEditor';
 
   let { contextId, project, plotNumber, view = 'child', disabled = false, metadataDisabled, onBusyChange, metadataSession }: {
     contextId: string; project: string; plotNumber: string; disabled?: boolean;
@@ -27,8 +33,27 @@
   const currentReview = $derived(reviewKey === ownerKey ? review : null);
   const currentImage = $derived(reviewKey === ownerKey ? image : null);
   const row = $derived(currentReview?.records.rows.find(item => item.rowId === selected));
+  const creationSession = $derived(import.meta.env.VITE_PICTURE_CREATION_WRITING === 'true' && contextId && project && plotNumber
+    ? pictureCreationSession({ contextId, project, plotNumber }) : undefined);
+  let creationRevision = $state(0);
+  $effect(() => creationSession?.subscribe(() => untrack(() => creationRevision++)));
+  const creationView = $derived.by(() => { creationRevision; return creationSession?.view(); });
+  let appliedCreationRequest = '';
+  const deletionEnabled = import.meta.env.VITE_PICTURE_DELETION_WRITING === 'true';
+  const lifecycleSession = $derived((deletionEnabled || import.meta.env.VITE_PICTURE_DELETION_RESTORING === 'true') && contextId && project && plotNumber
+    ? pictureLifecycleSession({ contextId, project, plotNumber }) : undefined);
+  let lifecycleRevision = $state(0);
+  $effect(() => lifecycleSession?.subscribe(() => untrack(() => lifecycleRevision++)));
+  const lifecycleView = $derived.by(() => { lifecycleRevision; return lifecycleSession?.view(); });
+  const lifecyclePending = $derived.by(() => {
+    lifecycleRevision;
+    const close = lifecycleSession?.closeState();
+    return !!close && (close.unsaved || close.busy || close.blocked);
+  });
+  let appliedLifecycleSession: PictureLifecycleSession | undefined;
+  let appliedLifecycleRevision = 0;
   let metadataRevision = $state(0);
-  $effect(() => metadataSession?.subscribe(() => metadataRevision++));
+  $effect(() => metadataSession?.subscribe(() => untrack(() => metadataRevision++)));
   const metadataClose = $derived.by(() => { metadataRevision; return metadataSession?.closeState(); });
   const metadataView = $derived.by(() => { metadataRevision; return metadataSession?.view(); });
   const metadataPending = $derived(!!metadataClose && (metadataClose.unsaved || metadataClose.busy));
@@ -50,8 +75,83 @@
   }
   $effect(synchronizeMetadataOriginal);
 
+  async function refreshCreated(receipt: PictureCreationReceipt) {
+    cancel();
+    const request = generation, key = ownerKey, owner = { contextId, project, plotNumber };
+    busy = true; error = ''; image = null; viewerOpen = false;
+    onBusyChange(true);
+    try {
+      const value = await reads.track(PictureService.GetMetadata(contextId, plotNumber));
+      if (request !== generation || key !== ownerKey) return;
+      const refreshed = pictureMetadataFromWire(value, owner);
+      const committed = refreshed.records.rows.find(item => item.rowId === receipt.rowId);
+      if (!committed || committed.cells.some((cell, index) => !equalCell(cell, receipt.committed.cells[index]))) {
+        throw new Error('The complete committed physical row differs from the refreshed owned picture list.');
+      }
+      review = refreshed; reviewKey = key; selected = receipt.rowId;
+    } catch (cause) {
+      if (request === generation && key === ownerKey) error = `Picture creation committed; linked-list refresh failed and receipt is retained: ${String(cause)}`;
+    } finally {
+      if (request === generation) { busy = false; onBusyChange(false); }
+    }
+  }
+  $effect(() => {
+    const receipt = creationView?.receipts.at(-1);
+    if (!receipt || metadataPending || receipt.requestId === appliedCreationRequest ||
+        receipt.contextId !== contextId || receipt.project !== project || receipt.plotNumber !== plotNumber) return;
+    appliedCreationRequest = receipt.requestId;
+    void refreshCreated(receipt);
+  });
+
+  async function refreshLifecycle(commit: PictureLifecycleCommit) {
+    cancel();
+    const request = generation, key = ownerKey, owner = { contextId, project, plotNumber };
+    busy = true; error = ''; review = null; reviewKey = ''; selected = ''; image = null; viewerOpen = false;
+    onBusyChange(true);
+    try {
+      const value = await reads.track(PictureService.GetMetadata(contextId, plotNumber));
+      if (request !== generation || key !== ownerKey) return;
+      const refreshed = pictureMetadataFromWire(value, owner);
+      const original = commit.kind === 'delete' ? commit.receipt.request.original : commit.receipt.request.deletion.original;
+      if (commit.kind === 'delete') {
+        if (refreshed.records.rows.some(row => row.rowId === original.rowId ||
+            row.cells[0].storage === 'integer' && row.cells[0].integer === original.cells[0].integer)) {
+          throw new Error('The deleted physical row/identity reappeared; no replacement is inferred.');
+        }
+      } else {
+        const expected = [...commit.receipt.request.peers, original].sort((left, right) =>
+          BigInt(left.rowId) < BigInt(right.rowId) ? -1 : BigInt(left.rowId) > BigInt(right.rowId) ? 1 : 0);
+        if (refreshed.records.rows.length !== expected.length ||
+            refreshed.records.rows.some((row, index) => !pictureLifecycleOriginalMatches(row, expected[index]))) {
+          throw new Error('The complete restored physical row/peers differ from the retained committed plan.');
+        }
+        selected = original.rowId;
+      }
+      review = refreshed; reviewKey = key;
+    } catch (cause) {
+      if (request === generation && key === ownerKey) error = `Picture lifecycle committed; linked-list refresh failed and irreversible receipt is retained: ${String(cause)}`;
+    } finally {
+      if (request === generation) { busy = false; onBusyChange(false); }
+    }
+  }
+  $effect(() => {
+    if (appliedLifecycleSession !== lifecycleSession) {
+      appliedLifecycleSession = lifecycleSession; appliedLifecycleRevision = 0;
+    }
+    const state = lifecycleView, commit = state?.receipts.at(-1);
+    if (!state || !commit || metadataPending || state.revision === appliedLifecycleRevision) return;
+    appliedLifecycleRevision = state.revision;
+    void refreshLifecycle(commit);
+  });
+
+  async function reviewDeletion() {
+    if (!lifecycleSession || !row || !deletionEnabled || view !== 'manager' || disabled || busy || metadataPending || lifecyclePending) return;
+    try { await lifecycleSession.reviewDeletion(row.rowId); error = ''; }
+    catch (cause) { error = `Picture deletion review unavailable: ${String(cause)}`; }
+  }
+
   function editMetadata() {
-    if (!metadataSession || !currentReview || !row || disabled || busy || metadataPending) return;
+    if (!metadataSession || !currentReview || !row || disabled || busy || metadataPending || lifecyclePending) return;
     try { metadataSession.select(currentReview, row.rowId); error = ''; }
     catch (cause) { error = `Picture metadata editing unavailable: ${String(cause)}`; }
   }
@@ -63,7 +163,7 @@
     onBusyChange(false);
   }
   async function load() {
-    if (disabled || busy || metadataPending) return;
+    if (disabled || busy || metadataPending || lifecyclePending) return;
     cancel();
     const request = generation, key = ownerKey, owner = { contextId, project, plotNumber };
     busy = true; error = ''; review = null; image = null; selected = ''; viewerOpen = false;
@@ -82,11 +182,12 @@
   }
   function select(value: string) {
     if (metadataPending) { error = 'Finish or discard the retained picture metadata draft before changing selection.'; return; }
+    if (lifecyclePending) { error = 'Finish the retained picture lifecycle review or resolve/acknowledge its receipt before changing selection.'; return; }
     cancel();
     selected = value; image = null; error = ''; viewerOpen = false;
   }
   async function preview() {
-    if (disabled || busy || !row) return;
+    if (disabled || busy || !row || lifecyclePending) return;
     cancel();
     const request = generation, key = ownerKey, owner = { contextId, project, plotNumber };
     busy = true; error = ''; image = null; viewerOpen = false;
@@ -124,7 +225,7 @@
   <h3>Pictures</h3>
   {#if error}<p role="alert" class="error">{error}</p>{/if}
   <div class="actions">
-    <button onclick={load} disabled={disabled || busy || metadataPending}>Load linked pictures</button>
+    <button onclick={load} disabled={disabled || busy || metadataPending || lifecyclePending}>Load linked pictures</button>
     {#if busy}<button onclick={cancel}>Cancel picture read</button><span role="status">Reading owned pictures…</span>{/if}
   </div>
   {#if currentReview}
@@ -132,7 +233,7 @@
       <p>No linked picture metadata for this literal plot.</p>
     {:else}
       <label for="picture-record">Linked picture record</label>
-      <select id="picture-record" value={selected} disabled={busy || disabled || metadataPending} onchange={event => select(event.currentTarget.value)}>
+      <select id="picture-record" value={selected} disabled={busy || disabled || metadataPending || lifecyclePending} onchange={event => select(event.currentTarget.value)}>
         {#each currentReview.records.rows as item (item.rowId)}
           <option value={item.rowId}>{pictureCellLabel(item.cells[2])} — ID {pictureCellLabel(item.cells[0])}; physical row {item.rowId}</option>
         {/each}
@@ -143,13 +244,16 @@
           <div><dt>{view === 'manager' ? 'Picture Directory' : 'PicDir'}</dt><dd>{pictureCellLabel(row.cells[1])}</dd></div>
           <div><dt>PicComment</dt><dd>{pictureCellLabel(row.cells[4])}</dd></div>
         </dl>
-        <button onclick={preview} disabled={disabled || busy}>Preview selected picture</button>
-        {#if metadataSession}<button onclick={editMetadata} disabled={disabled || busy || metadataPending}>Edit selected picture metadata</button>{/if}
+        <button onclick={preview} disabled={disabled || busy || lifecyclePending}>Preview selected picture</button>
+        {#if metadataSession}<button onclick={editMetadata} disabled={disabled || busy || metadataPending || lifecyclePending}>Edit selected picture metadata</button>{/if}
+        {#if deletionEnabled && view === 'manager'}
+          <button data-picture-delete-review onclick={reviewDeletion} disabled={disabled || busy || metadataPending || lifecyclePending}>Review deletion of selected picture reference</button>
+        {/if}
       {/if}
     {/if}
   {/if}
   {#if metadataSession}
-    <PictureMetadataEditor session={metadataSession} disabled={(metadataDisabled ?? disabled) || busy} />
+    <PictureMetadataEditor session={metadataSession} disabled={(metadataDisabled ?? disabled) || busy || lifecyclePending} />
   {/if}
   {#if currentImage}
     <button class="preview" aria-label="Open full-size picture" ondblclick={() => viewerOpen = true} onclick={() => viewerOpen = true}>
@@ -160,8 +264,10 @@
   <p class="guidance">Read-only linked metadata and JPEG/PNG preview. Each selected row uses its own PicDir.
     {#if view === 'manager'}Default uses the explicitly authorized manager directory, not the FS882 child directory.
     {:else}Default uses the explicitly authorized child directory, not the manager PictureDir.{/if}
-    {#if metadataSession}External directories and adding/deleting records remain unavailable.
-    {:else}External directories, adding/deleting records and metadata editing remain unavailable.{/if}
+    {#if deletionEnabled && view === 'manager'}Deletion requires the separate lifecycle review and backend permission.
+    {:else}Record deletion remains unavailable here.{/if}
+    {#if metadataSession}External directories and adding records remain unavailable here.
+    {:else}External directories, adding records and metadata editing remain unavailable here.{/if}
     Files are never copied or repaired.</p>
 </section>
 {#if viewerOpen && currentImage}

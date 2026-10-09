@@ -1,0 +1,105 @@
+{
+  "owner": {
+    "contextId": "owned-context",
+    "project": "Sample",
+    "plot": "0108050",
+    "form": "SoilHumusXL"
+  },
+  "peerIDs": [
+    { "id": "-2147483648", "storage": "integer", "value": "-2147483648", "collides": true },
+    { "id": "-2147483648", "storage": "real", "value": -2147483648, "collides": true },
+    { "id": "-2147483648", "storage": "text", "value": " -2147483648 ", "collides": true },
+    { "id": "-2147483648", "storage": "text", "value": "-2.147483648e9", "collides": true },
+    { "id": "-2147483648", "storage": "text", "value": "-2_147_483_648", "collides": true },
+    { "id": "-2147483648", "storage": "text", "value": "-0x1p31", "collides": true },
+    { "id": "-2147483648", "storage": "text", "value": "\u0085-2147483648\u0085", "collides": true },
+    { "id": "-2147483648", "storage": "text", "value": "\ufeff-2147483648", "collides": false },
+    { "id": "-2147483648", "storage": "text", "value": "-0x80000000", "collides": false },
+    { "id": "-2147483648", "storage": "integer", "value": "-2147483647", "collides": false },
+    { "id": "2147483647", "storage": "text", "value": "2147483647.00000001", "collides": true },
+    { "id": "2147483647", "storage": "text", "value": "0x7fffffff00000001p-32", "collides": true },
+    { "id": "1", "storage": "text", "value": "0x_1p0", "collides": true },
+    { "id": "1", "storage": "text", "value": "0x_.1p4", "collides": false },
+    { "id": "1", "storage": "text", "value": "+01.", "collides": true },
+    { "id": "1", "storage": "text", "value": "0x1.00000000000008p0", "collides": true },
+    { "id": "1", "storage": "text", "value": "0x1.000000000000080001p0", "collides": false },
+    { "id": "1", "storage": "text", "value": "0x1.00000000000018p0", "collides": false },
+    { "id": "1", "storage": "text", "value": "0x0.fffffffffffffcp0", "collides": true },
+    { "id": "0", "storage": "text", "value": "", "collides": false },
+    { "id": "0", "storage": "text", "value": " ", "collides": false },
+    { "id": "0", "storage": "text", "value": "0b0", "collides": false },
+    { "id": "0", "storage": "text", "value": "-0", "collides": true },
+    { "id": "0", "storage": "text", "value": "1e-9999", "collides": true },
+    { "id": "0", "storage": "text", "value": "0x0p1000000", "collides": true },
+    { "id": "0", "storage": "text", "value": "0x1p-1075", "collides": true },
+    { "id": "0", "storage": "text", "value": "0x1.00000000000001p-1075", "collides": false },
+    { "id": "0", "storage": "text", "value": "-0x1p-1075", "collides": true },
+    { "id": "0", "storage": "text", "value": "-0x1.00000000000001p-1075", "collides": false },
+    { "id": "0", "storage": "text", "value": "0x1p-1074", "collides": false },
+    { "id": "0", "storage": "text", "value": "0x1p-9999", "collides": true },
+    { "id": "0", "storage": "null", "value": null, "collides": false },
+    { "id": "0", "storage": "blob", "value": "30", "collides": false }
+  ],
+  "request": {
+    "requestId": "f4b1aa00-1234-4123-8123-000000000001",
+    "original": {
+      "contextId": "owned-context",
+      "project": "Sample",
+      "plot": "0108050",
+      "form": "SoilHumusXL",
+      "recordSource": "UsysHumus",
+      "table": "Sample_Humus",
+      "records": {
+        "columns": [
+          { "name": "ID", "declaredType": "" },
+          { "name": "PlotNumber", "declaredType": "TEXT" },
+          { "name": "Horizon", "declaredType": "TEXT" },
+          { "name": "UpperDepth", "declaredType": "REAL" },
+          { "name": "Comment", "declaredType": "TEXT" },
+          { "name": "Unmapped", "declaredType": "BLOB" }
+        ],
+        "rows": [
+          {
+            "rowId": "-7",
+            "cells": [
+              { "storage": "integer", "text": null, "integer": "-2147483648", "real": null, "blobHex": null },
+              { "storage": "text", "text": "0108050", "integer": null, "real": null, "blobHex": null },
+              { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null },
+              { "storage": "real", "text": null, "integer": null, "real": -0.25, "blobHex": null },
+              { "storage": "text", "text": "", "integer": null, "real": null, "blobHex": null },
+              { "storage": "blob", "text": null, "integer": null, "real": null, "blobHex": "ff00" }
+            ]
+          },
+          {
+            "rowId": "9223372036854775807",
+            "cells": [
+              { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null },
+              { "storage": "text", "text": "0108050", "integer": null, "real": null, "blobHex": null },
+              { "storage": "text", "text": "historical overlength", "integer": null, "real": null, "blobHex": null },
+              { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null },
+              { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null },
+              { "storage": "blob", "text": null, "integer": null, "real": null, "blobHex": "00ff" }
+            ]
+          }
+        ]
+      }
+    },
+    "edits": [
+      {
+        "contextId": "owned-context", "form": "SoilHumusXL", "rowId": "-7", "column": "Horizon",
+        "expected": { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null },
+        "value": { "storage": "text", "text": "LF", "integer": null, "real": null, "blobHex": null }
+      },
+      {
+        "contextId": "owned-context", "form": "SoilHumusXL", "rowId": "-7", "column": "UpperDepth",
+        "expected": { "storage": "real", "text": null, "integer": null, "real": -0.25, "blobHex": null },
+        "value": { "storage": "real", "text": null, "integer": null, "real": 5, "blobHex": null }
+      },
+      {
+        "contextId": "owned-context", "form": "SoilHumusXL", "rowId": "-7", "column": "Comment",
+        "expected": { "storage": "text", "text": "", "integer": null, "real": null, "blobHex": null },
+        "value": { "storage": "null", "text": null, "integer": null, "real": null, "blobHex": null }
+      }
+    ]
+  }
+}

@@ -47,7 +47,7 @@ test('form refuses save-and-close on invalid, locked, loading or incomplete chil
   assert.match(source, /export function getCloseState\(\): EditorCloseState/);
   assert.match(source, /siviCreationPeerUnsaved = \$derived\(heightUnsaved \|\| siviUnsaved \|\| siviCoverUnsaved \|\| siviCombinedUnsaved \|\| siviCollectedUnsaved \|\| siviSpeciesUnsaved \|\| siviIdentityUnsaved \|\| otherUnsaved \|\| soilUnsaved \|\| attributeUnsaved \|\| collectedUnsaved \|\| speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
   assert.match(source, /nonParentChildUnsaved = \$derived\(siviCreationPeerUnsaved \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending \|\| siviCreationUndoPending\)/);
-  assert.match(source, /childUnsaved = \$derived\(nonParentChildUnsaved \|\| siviParentWriteUnsaved \|\| siviParentActionUnsaved \|\| siviProjectAssignmentUnsaved \|\| siviParentSharedUnsaved \|\| twoPageOpen\)/);
+  assert.match(source, /childUnsaved = \$derived\(nonParentChildUnsaved \|\| siviParentWriteUnsaved \|\| siviParentActionUnsaved \|\| siviProjectAssignmentUnsaved \|\| siviParentSharedUnsaved \|\| twoPageOpen \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);
   assert.match(source, /unsaved: dirty \|\| childUnsaved \|\| invalid \|\| newChild !== null \|\| invalidChild/);
   assert.match(source, /const invalid = Object\.keys\(headerValidation\)\.length > 0 \|\| heightInvalid\.length > 0 \|\| otherInvalid\.length > 0/);
   assert.match(source, /if \(!state\.canSave\)/);

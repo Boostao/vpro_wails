@@ -6,20 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strings"
 )
 
 func requireTwoPageEntryReferenceReadLock(ctx context.Context, tx *sql.Tx, alias string) error {
-	var journal string
-	if err := tx.QueryRowContext(ctx, `PRAGMA `+quoteHeaderIdentifier(alias)+`.journal_mode`).Scan(&journal); err != nil {
-		return err
-	}
-	switch strings.ToLower(journal) {
-	case "delete", "truncate", "persist":
-		return nil
-	default:
-		return fmt.Errorf("complete-entry %s references require rollback-journal read locks through commit", alias)
-	}
+	return requireRollbackJournalReadLock(ctx, tx, alias, "complete-entry "+alias+" references")
 }
 
 func (s *ContextService) writeTwoPageEntryWithOwnedReferences(ctx context.Context, contextID, plot, form string,

@@ -31,6 +31,8 @@ type ContextService struct {
 	longVegetationLifeformEnabled   bool
 	longVegetationStrataEnabled     bool
 	longVegetationCodeEnabled       bool
+	twoPageSoilAttempts             twoPageSoilAttemptLedger
+	twoPageVegetationAttempts       twoPageVegetationAttemptLedger
 }
 
 func NewContextService(projects *ProjectService, plots *PlotService) (*ContextService, error) {

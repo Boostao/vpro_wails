@@ -49,8 +49,8 @@ at1400/600/320px, invalid/hidden draft remounts and peer/parent/Lock/native-clos
 guards, one three-field mixed Save/three typed audits, isolated prune and retained
 history across remount, independent denials and completed-response read
 cancellation/retry. All16 owned/22 protected identities restore. The normal-only
-inspection bootstrap is preserved separately with hashes. Separate standalone
-mixed-host execution and original source callbacks are not claimed. Fresh full
+inspection bootstrap is preserved separately with hashes. Original source
+callbacks are not claimed. Fresh full
 Go race passes root2064.794s/all packages. Independent review's
 owner-replacement finding is resolved: combined unsaved/busy preflight now
 precedes every root disposal, with an actual-root-function regression. The
@@ -61,6 +61,22 @@ hash-archived without replay. The independently verified
 preserves845 application-source identities.
 The entry/standalone predecessors remain unchanged. This successor does not
 grant remaining source callbacks, species creation/deletion or complete form execution.
+
+The later current-source standalone mixed-host owner also closes normally with
+all16 fixture files/22 protected identities restored and324 files sealed.
+Focused frontend41/41 and Go race20.266s pass. Native checks cover40 normal/
+49 extended labelled controls at1400/600/320, retained normal/hidden-extended
+invalid drafts through real tab remount, live parent/peer/Lock/native-close
+barriers and valid correction/Undo. One uniquely checkpointed three-field Save
+produces three independently checked strength3 audits and isolated history;
+history survives native remount and typed prune restores complete business/
+historical audit rows while consuming only this history once. The standalone
+parent has eleven text inputs and three SELECTs, not fourteen text inputs.
+Harness-only host-tab recovery resumes the sealed committed response without
+replaying Save. The1078 frozen current application inputs, predecessor and
+accepted embedded assets remain unchanged. Full current-source integration
+passes in3216.339s with exit0/unchanged inputs and discovery; no original
+callback or default promotion follows.
 
 ### Accepted child cover-warning adaptation
 

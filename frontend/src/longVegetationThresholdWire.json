@@ -1,0 +1,20 @@
+{
+  "review": {
+    "contextId": "threshold-wire",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "values": { "presenceGreaterThan": 0, "meanCoverGreaterThan": 0 }
+  },
+  "request": {
+    "expected": { "presenceGreaterThan": 0, "meanCoverGreaterThan": 0 },
+    "proposed": { "presenceGreaterThan": -1, "meanCoverGreaterThan": 1.5 }
+  },
+  "outcome": {
+    "contextId": "threshold-wire",
+    "changed": true,
+    "committed": true,
+    "errorMessage": ""
+  }
+}

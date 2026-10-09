@@ -1,0 +1,24 @@
+{
+  "contextId": "vegetation-reference-wire-context",
+  "project": "Sample",
+  "plot": "108050",
+  "form": "SubVegAXL",
+  "source": "configured-owned-imported-SQLite VLists.USysAllSpecs/VUser.USysUserSpp; physical definitions, not source union membership",
+  "master": {
+    "columns": [{"name":"Code","declaredType":"TEXT"},{"name":"ScientificName","declaredType":"TEXT"},{"name":"Lifeform","declaredType":"INTEGER"},{"name":"EnglishName","declaredType":"TEXT"},{"name":"Codetype","declaredType":"TEXT"},{"name":"OldCode","declaredType":"TEXT"}],
+    "rows": [
+      {"rowId":"-9","cells":[{"storage":"text","text":"DUP","integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},{"storage":"integer","text":null,"integer":"-2147483648","real":null,"blobHex":null},{"storage":"text","text":"","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"U","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"OLD ","integer":null,"real":null,"blobHex":null}]},
+      {"rowId":"7","cells":[{"storage":"text","text":"DUP","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"","integer":null,"real":null,"blobHex":null},{"storage":"integer","text":null,"integer":"2147483647","real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},{"storage":"text","text":"x","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"","integer":null,"real":null,"blobHex":null}]},
+      {"rowId":"8","cells":[{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},{"storage":"text","text":"historical","integer":null,"real":null,"blobHex":null},{"storage":"integer","text":null,"integer":"32768","real":null,"blobHex":null},{"storage":"text","text":"","integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null}]},
+      {"rowId":"9","cells":[{"storage":"text","text":"LONG NULL","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Unicode \ud83e\udeb4","integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},{"storage":"text","text":"case  ","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"historical codetype","integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null}]}
+    ]
+  },
+  "personal": {
+    "columns": [{"name":"Code","declaredType":"TEXT"},{"name":"ScientificName","declaredType":"TEXT"},{"name":"LifeForm","declaredType":"INTEGER"},{"name":"EnglishName","declaredType":"TEXT"},{"name":"Codetype","declaredType":"TEXT"}],
+    "rows": [
+      {"rowId":"1","cells":[{"storage":"text","text":"MIN","integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},{"storage":"integer","text":null,"integer":"-32768","real":null,"blobHex":null},{"storage":"text","text":"","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"s","integer":null,"real":null,"blobHex":null}]},
+      {"rowId":"2","cells":[{"storage":"text","text":"MAX","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"","integer":null,"real":null,"blobHex":null},{"storage":"integer","text":null,"integer":"32767","real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},{"storage":"text","text":"s","integer":null,"real":null,"blobHex":null}]},
+      {"rowId":"3","cells":[{"storage":"text","text":"P NULL","integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},{"storage":"text","text":"","integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null}]}
+    ]
+  }
+}

@@ -98,6 +98,13 @@ func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPr
 	if err != nil {
 		return result, err
 	}
+	lifeformStyle := 0
+	if settings.Grouping == "lifeform" {
+		lifeformStyle, err = book.NewStyle(&excelize.Style{NumFmt: 1})
+		if err != nil {
+			return result, err
+		}
+	}
 	setText := func(sheet, address, value string) error {
 		if err := environmentWorkbookText(value); err != nil {
 			return err
@@ -253,7 +260,16 @@ func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPr
 				return result, err
 			}
 			group := ""
-			if row.Layer.Text != nil {
+			var lifeform *int
+			if settings.Grouping == "lifeform" {
+				lifeform, err = vegetationLifeformInteger(row.Layer)
+				if err != nil {
+					return result, err
+				}
+				if lifeform != nil {
+					group = strconv.Itoa(*lifeform)
+				}
+			} else if row.Layer.Text != nil {
 				group = *row.Layer.Text
 			}
 			if layout.SpaceBetweenGroups && index >= 2 && scanGaps && gapScans < 1000 {
@@ -272,8 +288,18 @@ func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPr
 			if outputRow > 1048576 {
 				return result, errors.New("Long Vegetation workbook exceeds Excel's row limit")
 			}
-			if err := setCell(name, "A"+strconv.Itoa(outputRow), row.Layer); err != nil {
-				return result, err
+			groupAddress := "A" + strconv.Itoa(outputRow)
+			if lifeform != nil {
+				if err := book.SetCellInt(name, groupAddress, int64(*lifeform)); err != nil {
+					return result, err
+				}
+				if err := book.SetCellStyle(name, groupAddress, groupAddress, lifeformStyle); err != nil {
+					return result, err
+				}
+			} else {
+				if err := setCell(name, groupAddress, row.Layer); err != nil {
+					return result, err
+				}
 			}
 			if err := setCell(name, "B"+strconv.Itoa(outputRow), row.Species); err != nil {
 				return result, err

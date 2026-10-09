@@ -41,7 +41,7 @@ test('root Save/Lock/close and replacement retain picture errors and require exp
 test('manager retains pending metadata through cancelled picture reads and rejects parent replacement', () => {
   const changes = [];
   const manager = componentFunctions('PictureManager.svelte', ['selectPlot', 'reading'], {
-    busy: false, metadataBlocked: true, error: '', selected: 'P', plot: 'other',
+    busy: false, metadataBlocked: true, creationBlocked: false, lifecycleBlocked: false, error: '', selected: 'P', plot: 'other',
     onBusyChange: value => changes.push(value),
   });
   manager.actions.reading(false);
@@ -82,6 +82,10 @@ test('remounted picture panel exposes retained correction and recovery before it
     '../bindings/github.com/boostao/vpro-wails': { PictureService: {} },
     './readRequests': { ReadRequests: class { cancelAll() {} } },
     './pictureRead': picture, './PictureMetadataEditor.svelte': { default: metadataEditor },
+    './projectMetadataEditor': metadata,
+    './pictureLifecycleEditor': require('./pictureLifecycleTestHelpers.cjs').editor,
+    './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
+    './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
   });
   const output = render(panel, { props: { ...owner, onBusyChange() {}, metadataSession: {
     subscribe: () => () => {},
@@ -101,7 +105,7 @@ test('metadata wiring does not broaden image, creation/deletion or parent write 
   const root = source('FS882Form.svelte'), panel = source('PicturePanel.svelte'), manager = source('PictureManager.svelte');
   assert.match(root, /VITE_PICTURE_METADATA_WRITING === 'true'/);
   assert.match(manager, /VITE_PICTURE_METADATA_WRITING === 'true'/);
-  assert.match(root, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending\)/);
+  assert.match(root, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);
   assert.match(root, /disabled=\{busy \|\| otherHeaderWorkflowBusy \|\| !capabilitiesReady \|\| dirty \|\| childUnsaved\}/);
   assert.match(panel, /metadataPending/);
   assert.match(panel, /if \(!update \|\| update.revision === appliedMetadataRevision\) return/);
@@ -129,7 +133,7 @@ test('every ordinary parent editor waits for picture ownership while retained pi
   assert.equal(vm.runInNewContext(recovery, state), true);
   assert.equal(vm.runInNewContext(recovery, { ...state, pictureMetadataPending: true }), false);
   assert.equal(vm.runInNewContext(recovery, { ...state, pictureMetadataPending: true, otherHeaderWorkflowBusy: true }), true);
-  assert.match(source('PicturePanel.svelte'), /disabled=\{\(metadataDisabled \?\? disabled\) \|\| busy\}/);
+  assert.match(source('PicturePanel.svelte'), /disabled=\{\(metadataDisabled \?\? disabled\) \|\| busy \|\| lifecyclePending\}/);
   const tabs = root.match(/const tabWorkflowBusy = \$derived\(([^;\n]+)\);/)[1];
   const idle = { otherHeaderWorkflowBusy: false, pictureBusy: false, pictureMetadataClose: { busy: false, unsaved: true, blocked: true } };
   assert.equal(vm.runInNewContext(tabs, idle), false);
@@ -152,7 +156,7 @@ test('successful reload synchronizes selectable original and clears preview with
     ...owner, ownerKey: 'owned', reviewKey: 'owned', review, metadataSession: session,
     metadataView: { originalUpdate: { ...owner, revision: 1, original: refreshed } },
     appliedMetadataSession: undefined, appliedMetadataRevision: 0,
-    image: { sha256: 'old-preview' }, viewerOpen: true, disabled: false, busy: false, metadataPending: false,
+    image: { sha256: 'old-preview' }, viewerOpen: true, disabled: false, busy: false, metadataPending: false, lifecyclePending: false,
   });
   panel.actions.synchronizeMetadataOriginal();
   assert.equal(panel.review.records.rows[0].cells[2].text, refreshed.cells[2].text);

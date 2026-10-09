@@ -44,6 +44,1076 @@ or CHARS `SubVegAXL`, then `SubVegCXL`, `SubVegDXL`, `frmVPicsXL`,
 `SoilHumusXL` and `SoilMineralXL`. Metadata resolution does not authorize
 pictures or complete child execution.
 
+### Linked vegetation source differences (execution unavailable)
+
+Normal `SubVegAXL_BC` and CHARS `SubVegAXL` share `USysVegA`, Species,
+Cover1/2/3, TotalA, Cover4/5, TotalB and Collected bindings. Only CHARS has
+live Cover5a/5b/5c controls; similarly named normal focus procedures do not
+create missing controls. `cover3` binding recasing is a VBA identifier
+difference, not a different field. C binds Species/Cover6/Collected through
+`USysVegC`; D binds Species/Cover7/8/9/Collected through `USysVegD`.
+The A query admits any non-NULL Cover1/2/3/4/5/5a/5b/5c/TotalA/TotalB,
+including zero and CHARS-only values in normal mode. C admits non-NULL Cover6;
+D admits any non-NULL Cover7/8/9. These overlapping queries are not exclusive
+strata assignments. Physical-row evidence must not disappear merely because
+clearing a cover moves a row out of one source query.
+
+Every live bound cover/total control explicitly has `ValidationRule =
+"<100 Or Is Null"`:7 normal A/BC,10 CHARS A,1 C and3 D. The control rule is
+additional to the table's SINGLE type/range, rejects100 itself, and has no lower
+bound or sum constraint. Species and Collected have no explicit control rule.
+Unchanged historical100/>100 values must be omitted rather than repaired.
+Binary64-neighbor checks do not prove the source's SINGLE narrowing/validation
+timing; the later source-equivalent bound-control calibration below establishes
+numeric engine behavior, not original callback timing.
+
+All four source Species combos are LimitToList and have active NotInList
+handlers; this is different from the soil free-entry choices. Collected Click
+cycles NULL to `C`, `C` to `V`, then `V` to NULL. Current focuses Species.
+
+The Species row source projects Code, ScientificName, Codetype, Lifeform and
+EnglishName from `USysAllSpecies`, ordered by Code. That query unions master
+`USysAllSpecs` and personal `USysUserSpp` five-column projections, excluding
+Codetype `s`; it is not an identity-preserving physical definition catalogue.
+Source layer criteria are:
+
+| Form | Codetype | Lifeforms | NotInList focus |
+| --- | --- | --- | --- |
+| Normal A/BC | `u` or `x` | 1,2,3,4 | Cover1 |
+| CHARS A | `U` or `X` | 1,2,3,4 | Cover1 |
+| C | `u` or `x` | 5,6,7,8,12 | Cover6 |
+| D | `u` or `x` | 1,2,9,10,11 | Cover7 |
+
+Literal recasing in these SQL criteria does not prove case-sensitive source
+comparison. Keep physical duplicates and NULL/empty metadata separately from
+the union's displayed tuples; do not silently choose a DLookup duplicate.
+The shared SIVI physical definition projection is a reuse precedent, not XL
+callback or collation acceptance.
+
+All four NotInList bodies first assign `DATA_ERRCONTINUE`, then look up master
+Code by OldCode. A match prompts either for replacement or same-code/layer
+confirmation; Yes assigns `UCase(Dusty)`, No assigns `UCase(NewData)`, then
+focuses the first cover and exits. Without an alias, personal Code lookup
+precedes the missing-code prompt. Missing personal codes prompt with default No;
+Yes assigns the uppercase entered code, sets `sysNewSpp` and opens `USysAddSpp`.
+An existing personal match temporarily disables LimitToList, focuses the first
+cover, restores LimitToList and assigns its uppercase matched code. Do not
+replace this modal event path with an automatic personal-list write or claim
+locale/Unicode UCase equivalence. Species edits remain unavailable until the
+owned references, decisions and event/lifecycle acceptance are implemented.
+
+A/BC BeforeUpdate calls AuditTrail and the reviewed no-op
+UpdateMetadataSppList, then unconditionally exits before its dormant peer merge.
+D likewise exits before its merge. No peer overwrite follows from those bodies.
+A/BC AfterUpdate contains the source concatenated-cover `IsNull` warning and
+next-record navigation; it is not a BeforeUpdate cancellation rule. C warns
+when Cover6 is NULL without setting Cancel, then audits; its Species AfterUpdate
+body is commented-only. Exact runtime criteria/event timing still need acceptance.
+
+The canonical `Sample_Veg` DDL has a nonunique ID index, unlike the unique
+Humus/Mineral ID indexes. Do not transfer soil uniqueness/default assumptions,
+invent an ID for historical NULL or grant editing through legacy numeric readers.
+These source observations prepare the remaining child contract; no linked
+vegetation write or whole-form grant follows.
+
+#### Source-equivalent Species query/lookup engine calibration
+
+One fresh disposable Access database executes the original exported UNION and
+all four complete combo RowSource SQL strings, without rewriting their literals.
+Master/personal projected fields use the source TEXT255/Code TEXT8 and LONG/
+INTEGER distinctions and the personal unique Code index. Explicit fixture-only
+AllowZeroLength supports historical empty metadata; this is not a claim about
+the original tables' AllowZeroLength settings. All107 master and4 personal
+physical definitions remain distinct; the source UNION yields46 display tuples.
+Normal/CHARS A each return16 identical ordered tuples; C returns11 and D19.
+
+The bounded LCID1033 observations establish case-insensitive layer criteria and
+alias/personal lookup. Source database text comparison treats case variants
+and trailing spaces as equal, but E/accented E as different. UNION collapses
+case/trailing-space-equivalent complete tuples, including identical master/
+personal duplicates, while NULL and empty metadata remain distinguishable.
+The retained literal representative is not a stable physical-definition choice:
+the controlled case-paired lifeform rows return mixed retained code casing.
+Do not replace physical references with the displayed union or silently pick
+one ambiguous definition.
+
+Source UCase preserves sharp-s, dotless-i and long-s in these cases, uppercases
+accented lowercase E, preserves trailing spaces, and leaves a combining dot
+after capitalizing i. JavaScript `toUpperCase` or Go Unicode uppercasing is not
+source-equivalent for this boundary. These representative results do not
+establish whole-Unicode collation/casing or original NotInList dialogs/focus.
+The source owner is absent, canonical/export hashes match, and six evidence
+files are sealed. Species writing remains unavailable; no application source changed during the
+separate1071-input SINGLE integration run.
+
+#### Original Current and old-code Yes callback proof
+
+A disposable full original database copy disables startup and every original
+linked table before opening any Form view. Local source-shaped Veg/master/
+personal tables contain one existing controlled BASE record; default expressions
+are removed only for this explicit existing-row fixture. Original form code,
+bindings and query SQL remain unchanged. All four actual source forms open in
+CurrentView1 with Species focus, correct BASE/CAL001 values, no dirty/new-record
+state and unchanged physical data. Before/after form exports are byte-identical.
+The owner normally closes and the entire clone is byte-restored;24 files retain
+the adapted proof and original baseline.
+
+A successor executes the original old-code NotInList Yes branch on all four
+forms. Typed `old` matches OldCode OLD, the exact source replacement prompt
+offers NEW, and only that planned Yes is invoked. Each actual form retains
+Species NEW, dirty state, restored LimitToList and first-cover focus
+(Cover1/Cover1/Cover6/Cover7) without a physical Save. Explicit Undo/normal close
+leave every complete physical Veg cell unchanged. The source registry and
+protected canonical/export files remain unchanged.
+
+The first attempt stalls because the COM Text setter itself invokes the modal
+NotInList event before the planned focus call. Its exact known prompt is observed
+and resolved once, without replaying Text assignment; NEW/Cover1 state is captured,
+undone and normally closed. The second guarded attempt dispatches Text assignment
+on the owned COM worker, records intent before that fallible call, and completes
+all four original branches. Both clones are byte-restored;7 first-attempt files
+and18 completed-attempt files are sealed, and no native source owner remains.
+Successors now verify old-code No across all four forms: uppercase OLD is retained
+with first-cover focus even though OLD is not a displayed union member. The
+same-code/wrong-layer Yes and No branches both retain OTHER and first-cover focus;
+an existing personal PERS excluded by Codetype also becomes an uppercase dirty
+draft without a prompt. All12 latter cases execute the original callbacks with
+unchanged physical data. Do not invent a layer/union-membership requirement for
+these explicitly confirmed source paths.
+
+Missing-code No is observed on all four forms: physical/typed Species remains
+BASE, raw `missing` remains in the focused Species control, and the form is dirty.
+The native COM setter reports explicit Access3021 (`No current record`) after
+the known No decision; it is retained as a source error, not a successful edit
+or an empty-field fallback. Undo/close restores the complete original rows.
+The12-case successor retains its final missing-No stop; the second targeted
+missing-No observer completes all four known-error cases. Closed clones are
+byte-restored, with18 alias-No,41 partial-successor and22 completed missing-No
+files sealed. No source owner remains.
+
+Missing-code Yes/USysAddSpp is still unaccepted after two bounded attempts.
+The first known Yes returns explicit source3270 (`Property not found`); the
+second reaches the expected opened child before its Report Recordset read raises
+Access3021 on the new-record buffer. The original handler's OnError Resume Next
+must not become an application success fallback. Both attempts Undo/close with
+unchanged complete physical Veg/personal rows, protected sources/registry and
+byte-restored clones;9+8 files are sealed. No third debugging attempt or source
+creation grant follows. Remaining creation/save/validation, warnings/navigation
+and callback audit timing stay pending. No Species/default/whole-form grant follows.
+
+The private [vegetation original reader](../twopagevegetationread.go) now
+returns complete tagged physical rows independently of source-query membership,
+with separate physical `sourceRowIds`. NULL/duplicate/text logical IDs, unmapped
+cells, HeightB text and overlapping zero/nontext cover membership are preserved.
+The [shared child read scope](../twopagechildreadscope.go) extracts only the
+demonstrated-equivalent selected/literal physical parent guard; soil errors and
+callers remain unchanged. Physical views, missing parent/filter columns,
+generated/shadowed identities and malformed text refuse explicitly.
+
+Coupled vegetation/soil/reference race14.428s, production compilation and vet
+pass. Tests include1024 A and8 D cover masks, both SU attachments, six affinities,
+physical-parent failures, correction/retry, queued cancellation and actual
+context rotation across all four forms. Two fixture-only failures are retained:
+Env rename invalidated an existing report view, and a partial/lowercase Veg
+fixture could not satisfy ordinary context initialization. No application
+fallback was added. Independent exact-four-file review reports no significant
+issues and accepts the bounded readonly prerequisite; its test rerun was blocked
+by local DuckDB/CGO constraints, not counted as an independent pass.
+This readonly prerequisite alone grants no editing or native acceptance.
+
+The private [vegetation draft planner](../twopagevegetationplan.go) now covers
+the existing bound cover/Collected subset:8 normal A/BC,11 CHARS A,2 C and4 D
+assignable fields. Species remains explicitly unavailable until its owned
+reference/NotInList callback contract is complete. Plans check current source
+membership independently of physical-row retention, exact original parent/
+context/form/expected cells and complete distinct physical rowids. Duplicate
+signed32 logical IDs are valid peers, not invented uniqueness constraints;
+NULL/noninteger edited IDs remain unavailable without repair.
+
+Unchanged historical invalid assignments are omitted. New Collected values
+retain nullable/empty/manual TEXT1 semantics and UTF-16 bounds without trimming,
+case changes or invented C/V membership. Cover changes reuse existing nullable
+REAL/SINGLE-range draft adaptation with the strict source `<100` control bound.
+The later calibrated candidate below narrows new drafts before that bound,
+without rewriting prior historical assignments or receipts.
+Original-form callback/timing parity is not claimed. Clearing a last cover may leave the source query and is not
+rejected as a new membership rule. Complete typed assignments detach their
+before/after cells, without changing any original or peer.
+
+Coupled planner/reader/soil/reference race15.955s, production compilation/vet
+and independent exact-three-file review pass with no significant issues.
+Tests cover all25 editable bindings, NULL, duplicate-ID peers, raw Unicode/
+UTF-16 bounds, exact/escaped duplicate JSON properties, expected/owner/member/
+physical witness refusals, unchanged omission and cancellation. Those initial
+reviews did not catch the additional cover-control rule. Facade/client lifecycle
+and actual Wails/source calibration remain next;
+these are implemented drafts, not a desktop write grant.
+
+The private [vegetation writer](../twopagevegetationwrite.go) now commits the
+reviewed cover/Collected plan, source audits and full typed stable-UUID
+[history](../twopagevegetationhistory.go) together. Its strict
+[request](../twopagevegetationrequest.go) retains complete originals and rejects
+duplicate/escaped JSON keys and repaired Unicode. Exact replay and read-only
+receipt recovery retain irreversible provenance after later source drift.
+Nonunique logical-ID peers are never merged or overwritten; unchanged
+historical rows and unrelated project tables remain distinct.
+
+The equivalent selected-parent writer query is shared with soil without
+changing its messages. Initial/final membership stays on the writer transaction,
+and external SU rollback-journal reads remain reserved through commit; WAL is
+refused with correction/retry available. Precommit cancellation/refusal rolls
+back audits/history; postcommit completion errors retain the committed result.
+Every audit strength retains the complete typed committed plan, including
+legitimate unaudited changes.
+
+Exact REAL bits are checked separately from Go's ordinary numeric equality.
+New negative-zero values remain unavailable pending lossless source/storage
+calibration; different signed-zero originals/expected values/UUID payloads
+cannot masquerade as exact witnesses. INTEGER-affinity normalization of a
+planned REAL is refused and rolled back; REAL physical storage passes.
+This hardening is confined to the new vegetation path, not unrelated legacy
+editors. Coupled new vegetation/soil writer/spill/reader/reference race87.805s,
+production compilation/vet and independent exact-eight-file review pass with
+no significant issues. Formatting failures from nested test insertions were
+corrected before the accepted compilation and remain recorded as failures.
+Whole integration of retained client lifecycle and native
+acceptance remain required; Species, creation/deletion/restoration and source
+SINGLE conversion are not granted.
+
+The additional cover-control correction is a bounded three-file follow-up:
+the planner checks changed non-NULL covers strictly below100, while explicit
+tests enumerate all21 source bindings independently of implementation lists.
+Expanded exact/adjacent100,
+negative/NULL, unchanged100/>100, zero-output rejected Save, correction/replay
+and historical-receipt validation pass in coupled race103.270s; all-package
+production compilation and root vet pass. Independent exact-three-file
+follow-up reports no significant issues or meaningful coverage gaps, limited
+to this correction; its test execution was CGO-blocked, not counted as a pass.
+The705-input full integration was stopped before frozen inputs changed and
+retained as unaccepted partial runner evidence; a fresh freeze/run is required.
+No facade/client or desktop write grant follows from this correction.
+The fresh corrected full integration passes exit0 with707 unchanged frozen
+inputs and unchanged ordinary/production package/embed discovery.
+
+The next private [owned Species-reference reader](../twopagevegetationspeciesreferences.go)
+returns master/personal tagged physical definitions with explicit context,
+project, literal plot and source form. It reuses the existing strict SIVI
+projection, preserving physical rowids, aliases, duplicates, NULL/empty and
+historical overlength metadata rather than replacing them with union choices.
+Both attached source tables must be physical, without shadowed/generated
+identities. This reader does not grant Species edits or interpret DLookup,
+Access union ordering/collation, UCase or modal events.
+
+Coupled reader/shared-SIVI/soil-reference race47.367s, final all-package production
+compilation/vet and independent exact-two-file review pass with no significant
+issues or meaningful coverage gaps. Tests include all four form
+owners and both SU arrangements, both reference families, raw malformed UTF8
+correction/retry, schema refusal, actual context rotation, complete no-write
+bytes and in-flight cancellation followed by successful pinned-coordinator
+retry. Initial fixture failures are retained: canonical personal Code is
+unique/NOT NULL; duplicate/NULL personal definitions require an explicitly
+weakened disposable legacy fixture. Context rotation uses the complete canonical
+Veg shape, not the lowercased replacement test schema. Duplicate Admin ownership
+uses an explicitly copied disposable parent without its canonical unique Plot
+constraint. No application fallback or canonical rewrite was added.
+
+The independently default-off [vegetation facade](../twopagevegetationservice.go)
+and [server-owned attempt ledger](../twopagevegetationattempt.go) are now
+implemented and independently reviewed. Review uses
+`VPRO_TWO_PAGE_VEGETATION_REVIEW`; cover/Collected Save additionally requires
+`VPRO_TWO_PAGE_VEGETATION_WRITING`. Original and physical Species reference
+reads plus receipt/outcome recovery need review, not writing. No Species
+decision/write, creation/deletion/restoration or native conversion grant follows.
+
+Strict existing request decoding precedes registration. The context-owned
+ledger retains canonical immutable payload strings, including distinct REAL
+signed-zero witnesses, rather than caller-owned pointers or ordinary numeric
+equality. Active facade calls prevent absence certification. Sealing an
+inactive request permanently excludes unseen late matching dispatch in this
+server session; changed payloads collide explicitly. Exact committed replay
+remains read-only. Original-context missing history can become `notCommitted`
+only after sealing and a successful owned physical read; missing history in a
+rotated context remains `unknown`. Read errors/cancellation never unseal the
+request or certify absence. Once irreversible history commits, a later
+completion error retains its truthful result and permits readonly recovery.
+
+Coupled vegetation/soil/SIVI-Species/context race154.269s, all-package production
+compilation and vet pass. Independent exact-nine-file baseline review reports
+no significant correctness/source-alignment/logic or coverage issues. Actual
+main registration and isolated interface-mode generation change exactly3
+planned binding files with no generator warnings.43 client lifecycle/reference
+regressions, check0 errors/0 warnings and isolated default bundle13.09s pass;
+accepted embedded assets are unchanged. The partial rotation fixture's missing
+HeightA failure is retained and corrected with the complete canonical Veg shape.
+The initial npm.ps1 execution-policy refusal is retained; npm.cmd succeeds
+without changing machine policy.
+
+Strict [client originals](../frontend/src/twoPageVegetationWire.ts) and
+[drafts](../frontend/src/twoPageVegetationEditor.ts) now implement all25 source
+bindings. Validated scalar copying detaches actual Svelte proxies; membership
+remains separate from complete physical rows. Nonunique signed32 IDs remain
+editable without peer writes; NULL/noninteger IDs remain unavailable, not zero.
+Unchanged historical values omit before new bounds; nullable/manual Collected
+retains NULL/empty, UTF-16 limits and raw Unicode refusal. A dedicated serializer
+preserves negative-zero source witnesses, without authorizing new negative zero.
+Shared strict-Go fixtures, seven exhaustive client cases, coupled
+fixture/planner/soil-wire/compiler-fold race6.375s, check0/0 and isolated default
+bundle5.04s pass. Initial VM-realm assertion failures were corrected by
+structuredClone, preserving actual proxy inputs and REAL bits.
+
+Identifier keys use1424 generated Unicode15.0.0 SimpleFold classes, not browser
+case conversion. An exhaustive compiler test checks version, unique ordered
+membership, EqualFold equivalence and every rune's SimpleFold closure/coverage.
+Client tests exercise every class and complete-original collision/noncollision
+refusals. The initial review's Greek/ligature pairs U+0390/U+1FD3,
+U+03B0/U+1FE3 and U+FB05/U+FB06 are nonaliases in target Go1.25.0; the
+equal:true shared witnesses failed Go validation and are retained as failed
+evidence. Corrected independent nonalias expectations pass. A distinct focused
+reviewer reconciles this compiler-version distinction, independently reruns
+Go/client tests and reports no significant issues. This table affects identifier
+ownership only, not Species values, source collation or UCase.
+
+The strict [client receipt/outcome validator](../frontend/src/twoPageVegetationReceipt.ts)
+now confirms exact retained requests, complete committed physical tables and
+ordered source audits, including unchanged nonunique/NULL peers and unrelated
+cells. Five shared actual-Go atomic-writer receipts cover strengths0-3 and
+last Cover6 removal. The latter recomputes source membership without dropping
+its physical row or its Collected write. Four production-Go outcome shapes
+prove the wire contract, not a new native protocol acceptance: exact request
+bytes/status/owner, readonly committed receipts and original-context sealed
+absence remain required; rotated absence remains unknown.
+
+Actual Svelte proxy receipts detach through scalar copying. Typed INTEGER/REAL
+changes do not reconstruct unavailable raw input; historical BLOB audits use
+Go byte-slice text. REAL signed-zero witnesses remain exact in requests and
+committed peers. Source-audit equality is deliberately different: Go
+`reflect.DeepEqual` treats negative/positive zero equally, so a permitted
+negative-to-positive zero assignment stays in complete typed history but has
+no source audit at any strength. Independent Go and actual-editor client cases
+check this distinction and readonly recovery without implicit sign repair.
+Review found the initial audit mismatch and an exclusive fixture generator
+nested in a validation loop. Both are corrected; the separate top-level output
+probe completes once and matches the existing fixture hash. Focused race7.063s,
+14 client cases, check0/0 and private build6.10s pass. Distinct focused review
+closes both findings with no significant issues; failures remain evidence.
+
+The [retained session](../frontend/src/twoPageVegetationSession.ts) and
+[exact-owner registry](../frontend/src/twoPageVegetationSessions.ts) are now
+independently reviewed. Original coupled batches pass59/39 cases, check0/0
+and private default builds5.07s/5.32s. Stable lossless requests, validation-yield
+generation checks, original-context absence certification and permanent receipt
+retention survive remounts. Unknown delivery refuses new writes and Undo;
+readonly physical selection cannot replace its retained request.
+
+The default-off [linked panel](../frontend/src/TwoPageVegetationPanel.svelte)
+now presents all25 fields once in source-bound A/BC, CHARS A, C and D groups.
+Labels and relationships are retained using responsive groups rather than fixed
+Access geometry. NULL, historical storage, readonly Species and physical rows
+outside source membership remain visible. Session-owned selection survives
+last-cover Save/reload/remount; a missing selected row does not select a peer.
+Current-owner correction remains live, with only the exact owner excluded from
+aggregate blockers. Other-owner drafts, busy operations, unknown requests and
+unacknowledged receipts block parent/root lifecycle and background reads.
+
+The enabled complete-entry review profile explicitly bypasses ordinary numeric
+vegetation readers/actions/totals; default calls are unchanged. All8 compiled
+flag combinations and nullable totals are tested. An independently observed
+row/control/display guard drives an explicit Collected staging button, with no
+implicit Save. Physical reader order and the explicit button are adaptations:
+source Species collation, Current/Enter, callback warnings and NotInList remain
+unverified. Creation/deletion/restoration remains unavailable.
+
+Final1102 registered frontend tests pass309+448+345, check0/0 and isolated
+default/enabled builds5.19s/5.55s pass. Exact-baseline independent live review
+reports no significant issues. Earlier fixture/SSR failures remain evidence;
+lazy server rendering must consume its body to execute production flag probes.
+Fresh immutable integration now passes full race exit0 in60m24s with1069
+unchanged Go/frontend/manifest/embed inputs and unchanged ordinary/production
+discovery. Four normally closed actual-main owners prove default legacy
+NULL-ID refusal, all25 live bindings, six normal/CHARS layouts at1400/600/320,
+visible associated labels/interactive buttons, scrolled viewport containment
+and historical NULL-ID readonly reachability.
+
+One distinct native lifecycle proves invalid100 correction/Undo/native-close
+and parent-variant barriers, pinned physical remount selection and a once-only
+Cover1 REAL5.25/Collected TEXT C Save on row910401. Independently reopened
+complete physical peers/unmapped cells remain unchanged. Exactly two source
+audits at independently frozen strength3 and one complete typed UUID history
+commit together. Actual held-response cancellation, unknown-close refusal,
+readonly recovery, acknowledgement and immutable receipt remount do not replay.
+The committed database is retained; all16 baseline identities plus protected/
+predecessor sources restore, with535 sealed files and no active native owner.
+
+The first enabled candidate used incorrect parent prerequisite flag names and
+never exposed source panels or dispatched Save; it remains zero-write failed
+evidence. Correct exact flags build15.27s. Two harness remount waits read the
+panel before parent readiness; continuation is restricted to the exact final
+checkpoint, never a repeated staging/Save/recovery. These are not application
+fallbacks. A fifth normally closed owner proves exact C predispatch refusal
+and readonly certified absence with zero writes. A distinct new UUID then clears
+only Cover6 on C-only physical row910404, creating one strength3 source audit
+and full typed history. The failed UUID is independently absent from history;
+the actual C source predicate excludes the retained physical row. Readonly
+recovery and remount retain its selection/receipt without replay or peer changes.
+All16 identities/protected originals restore and twelve new C files are sealed.
+The preceding535-file proof plus seal is byte-archived outside Go discovery;
+ordinary/production discovery remains17 packages with unchanged embeds.
+### Original master LONG and personal INTEGER reference boundaries
+
+The original master `USysAllSpecs.Lifeform` is LONG (signed32), while personal
+`USysUserSpp.LifeForm` is INTEGER (signed16). These are separate physical-read
+policies even when the imported SQLite columns both declare INTEGER. The
+two-page reader had reused the legacy SIVI signed16 master projection; an actual
+facade consumer first reproduces refusal of a valid source master LONG.
+
+The corrected shared projection/read loop now takes explicit source policies:
+two-page master nullable signed32, personal nullable signed16. Existing
+SIVI/report policy remains unchanged. Complete physical rows/duplicate codes,
+NULL/empty metadata, declared types and detached tagged cells are retained.
+Master32768 and signed32 endpoints succeed; master overflow and personal32768
+fail without partial output, coercion or writes. Malformed-source correction,
+fresh reads, owned contexts/parents, cancellation and caller coverage remain
+in the coupled tests.
+
+Focused race10.340s, coupled race102.656s and production build/vet pass.
+Independent exact-baseline review verifies canonical widths and reports no
+significant issues/coverage gaps; its targeted race passes in10.538s. A normally
+closed actual-main Wails owner independently reads all four form references,
+verifies source range refusals/corrected retry and foreign scopes, and proves
+writing remains disabled. All16 fixture/protected/predecessor identities
+restore;219 files retain the readonly acceptance. Fresh1073-input full race
+passes in3335.517s at2026-10-09T05:36:10Z, exit0 with unchanged inputs/discovery;
+the explicit source-width read boundary is accepted. No new Species writing, callback, creation or
+whole-form permission follows.
+
+### Read-only physical Species review in the linked desktop panels
+
+The accepted physical reader is now reachable from each independently enabled
+vegetation panel through an explicit read-only action. Master LONG/signed32 and
+personal INTEGER/signed16 remain separate policies, irrespective of SQLite
+declared types. The strict client wire retains original column names/types,
+signed physical identities, duplicate codes, NULL/empty and historical long
+text. Tagged scalars are copied rather than cloning Svelte proxies.
+
+The exact-owner retained session shares operation/cancel/native-close/context
+barriers without clearing numeric drafts, validation or committed receipts.
+Validation yields every128 rows and before publication; an awaited old generation
+cannot populate a fresh read. Responsive metadata pages contain20 physical rows
+per source. Paging is an adaptation, not Access sorting/UNION membership or a
+Species choice/editing grant.
+
+Independent exact-baseline review closes one npm test-registration finding.
+Actual-client owner resolve/reject and independent/clamped paging regressions
+close its coverage findings; focused59/59 and all1117 registered tests
+(309+448+360), check0/0, private default/enabled builds13.42s/5.86s and actual-Go
+strict facade/shared-wire race3.359s pass. Independent follow-up2/2 reports no
+significant remaining issues. The initial1106 lifecycle receipt omitted the
+new reference tests and is superseded, not acceptance of that coverage.
+
+One actual-main Wails owner proves all four readers and six normal/CHARS
+presentations at1400/600/320, retained typed seed metadata against reopened
+SQLite, native paging, source error/correction, real held validation-yield
+cancellation/fresh read/stale-result refusal, remount, native-close refusal and
+invalid numeric-draft retention/Undo. No Save is dispatched and backend writing
+remains disabled. The harness initially expected signed16 wording instead of
+the actual source INTEGER error; continuation resumes the same observed error
+checkpoint. Explicitly closing the clean complete-entry review is also required
+before normal native shutdown, as the existing lifecycle intends. Both recovery
+receipts are retained without replaying successful writes or relaunching Access.
+All16 baseline/protected/predecessor identities restore and335 files are sealed.
+Fresh1078-input full race passes in3216.339s at2026-10-09T06:54:07Z:
+exit0/unchanged inputs and ordinary/production discovery.
+
+### Original cover warning and focus observations (bounded)
+
+Two normally closed, byte-restored original-form fixtures retain14+23 sealed
+files. Original normal A and CHARS A save all live cover/total controls as NULL,
+then display the exact informational message
+`You must enter some cover value for this species`. Complete independent physical
+reads while that message is still open prove the Save already committed. After
+the planned OK, the original callback moves to a clean new-record buffer with
+Species focus; no new physical row is created. Normal A still has its unmapped
+Cover5a/b/c values, while the cleared CHARS row leaves the A query. The source
+concatenated-NULL predicate must not be replaced by an assumed ordinary-string
+result, and this postcommit message is not a Save cancellation rule.
+
+The normal A observation initially stopped because the warning was incorrectly
+predicted absent. Only the now-observed original informational OK was later
+acknowledged for normal cleanup, without replaying the completed Save. CHARS
+capture stopped on missing Pillow; the dependency was installed and the same
+owner continued from its exact committed checkpoint, again without replay.
+Measured original GotFocus/LostFocus label colors cover18/21 live bindings:
+seven normal A, ten CHARS A and one C. The remaining D controls were not reached.
+
+Original C displays the same message in BeforeUpdate. Its immediate independent
+ACE read still showed the old Cover6, so acceptance stopped; final normally
+closed storage contains the planned NULL. This timing discrepancy remains
+explicitly unresolved, not a cancelled Save or successful complete C acceptance.
+The D Save was never dispatched. Complete peers, unmapped cells and personal
+rows remain unchanged in retained storage. Effective source audit strength1
+produces zero deletion audits; this does not calibrate strength3.
+
+No third debugging launch follows these two attempts. C publication/after-state,
+D Save/focus and complete callback lifecycle remain unavailable. Canonical
+exports/data and registry are unchanged; no native owner remains and no
+Species/default/whole-form permission follows.
+
+### Original Collected click observation remains unavailable
+
+Two bounded attempts stop before any actual native mouse click. Source COM
+ActiveControl reports Collected, but this alone does not identify the Windows
+focused element. The second observed global UIA focus belongs to the foreign
+VSCode Agents document, not the owned Access PID/control/value; guards reject
+it before input. The first Value-pattern read failed before sufficient native
+provider evidence. Neither establishes a source accessibility-provider defect
+or original Click acceptance. No guard is relaxed and no third debug launch
+follows.
+
+Both owners normally close after Undo, complete physical Veg/personal rows
+remain unchanged, original bindings/code and canonical/registry hashes are
+preserved, and9+11 files retain sealed byte-restored clones. Fixture-only
+AllowZeroLength was enabled to prepare historical-empty observations but no
+empty case or Click was reached; it is not an original table-property claim.
+Existing reviewed/native desktop Collected/shared-helper behavior remains
+separate evidence. No original-source Click, creation or whole-form grant follows.
+
+### Calibrated vegetation SINGLE assignment candidate
+
+Two fresh disposable source-equivalent Access bound-control/storage attempts
+retain the first expected-rejection stop and the successful eight-case run.
+The successful owner is absent; canonical/export hashes remain unchanged.
+The [shared scalar fixture](../frontend/src/twoPageVegetationSingle.json) records
+independently observed SINGLE bytes:5.25,99.99999,99.999996,-1 and signed underflow;
+99.999999/100 reject before saving and preserve the physical prior1.
+This is the matching DAO SINGLE/textbox `<100 Or Is Null` engine contract,
+not copied original VPRO callbacks, focus ordering or whole-form execution.
+
+The candidate client preserves exact unchanged historical values first,
+then narrows new assignments with `Math.fround` before the source bound.
+99.99999/99.999996 prepare REAL99.99999237060547;99.999999 rejects because its
+SINGLE is100. Positive underflow prepares+0; negative underflow remains explicitly
+refused because SQLite cannot losslessly preserve new negative zero.
+Raw text and correction/Undo/lifecycle barriers remain intact.
+The new-write planner requires canonical SINGLE-as-binary64 typed REAL values
+rather than silently normalizing transport intent. Request decoding/detachment,
+durable history validation and readonly recovery retain the historical validation
+policy; old noncanonical binary64 commitments/replays remain exact.
+
+All21 numeric controls use the same independent eight-case fixture; midpoint
+neighbors and0.1 have explicit independent expected client values. New-write
+refusals leave data/audits/history unchanged; corrected retry, exact canonical
+storage, complete peers and historical recovery have focused race coverage.
+47 focused client tests, all coupled vegetation Go race tests70.792s,
+check0/0 and private enabled build5.67s pass. All1105 registered frontend tests
+(309+448+348) pass. Independent exact-baseline read-only review finds no significant
+issues; original Access callbacks/timing and fresh full integration are excluded
+from that disposition. Subsequent fresh1071-input full race passes in3360.692s
+at2026-10-09T04:15:47Z: exit0, no changed frozen inputs or discovery.
+
+One normally closed disposable actual-main owner proves all eight draft cases,
+zero writes before Save, native-close refusal with correction/Undo live, and clean
+remount retaining physical row910401. One exact Save prepares raw99.999996,0.1
+and1e-46 as Cover1 REAL99.99999237060547,Cover2 REAL0.10000000149011612
+and Cover3 REAL+0. Independent reopened storage tags/scalars, all three retained
+typed edits, exactly three strength3 source audits and full UUID history agree.
+Complete peers/unmapped cells and all other tables are unchanged. The held actual
+response is cancelled once; readonly recovery/acknowledgement/remount preserve
+its immutable receipt and physical identity without replay. The committed DB is
+retained, all16 baseline identities/protected originals restore, and219 files
+are sealed. No native owner remains. Calibrated SINGLE integration is accepted.
+No Species/callback/default/whole-form grant follows.
+
+### Linked soil physical-read prerequisite
+
+The private [soil original reader](../twopagesoilread.go) preserves complete
+ordinary physical Humus/Mineral columns and tagged rows for one exact literal
+parent. It reuses the owned SQLite context, caller-owned pinned snapshot,
+literal-text storage filter and ordinary/unshadowed schema guard. Selected
+context membership, actual physical parent-column existence and unique physical
+Env/Admin parents are checked within the snapshot; TEMP shadows and project views cannot substitute for source
+tables. NULL, empty text, BLOBs, unmapped cells and historical invalid/nullable
+logical IDs are retained without inventing editable identities.
+
+Both normal and CHARS link the same `SoilHumusXL` / `SoilMineralXL` source
+forms. Their `UsysHumus` / `UsysMineral` queries select the complete original
+tables; BeforeUpdate calls `AuditTrail`, Current focuses Horizon and the
+focus helpers select Enter's Next Record/Next Field behavior. Humus source
+presentation orders UpperDepth descending and Mineral ascending. The new
+reader deliberately returns physical-rowid order for review evidence, not
+source presentation-order parity.
+
+Ten top-level race tests and matrix subcases pass, including six affinities,
+embedded/external families, raw invalid/nullable identities, physical-schema
+and duplicate-parent refusals, malformed UTF-8 correction, actual context
+switching and actual in-flight SQLite cancellation followed by a successful
+read on the retained coordinator. Coupled reader/parent-owned race passes,
+root14.334s; vet and production compilation pass. Independent review found
+SQLite's double-quoted missing-column fallback could produce empty success or
+expose unrelated rows for a parent literally named `PlotNumber`. Physical
+Env/Admin/soil parent columns are now required before predicates. Both soil
+families, embedded/external storage, the literal-name trap, mutation-free refusal,
+schema correction/retry and missing Env/Admin columns are covered. Focused
+independent follow-up closes the finding with no significant issues and reruns
+the regression matrix under race, root3.374s. This is a private read boundary only: no
+service/main/bindings, UI permission, mutation, audit or metadata repair is
+introduced. The two-page linked-child host remains explicitly read-only.
+Its ordinary soil handlers reject the open parent workflow, so enabling the
+host or bypassing those guards is not an implementation. A reviewed shared
+parent/child draft boundary and stable unknown-mutation receipt handling
+remain necessary before existing-row editing; creation/deletion and whole-form
+acceptance are separate unresolved boundaries.
+
+### Existing soil assignment planning
+
+The next private prerequisite is [existing-row assignment planning](../twopagesoilplan.go),
+not a writer. Its owned files are that planner and its
+[tests](../twopagesoilplan_test.go). Canonical Forms, Queries and Tables_Def were
+read before implementation. Exactly12 Humus and18 Mineral visible data bindings
+reuse the existing `childFields` and physical soil validators; ID, PlotNumber,
+Flag and other unbound physical cells are not edit permissions. Both variants
+share these exact soil forms. No active per-field soil callbacks or exported
+LimitToList override adds a new membership restriction.
+
+The contract checks original source identity, complete canonical tagged rows,
+literal parent storage, exact physical rowids, edited signed32 logical IDs and
+same-parent peer collisions. Every draft carries its original context/form and
+expected tagged cell. Unchanged historical invalid values are omitted before
+domain validation. Changed cells preserve NULL/empty distinctions and enforce
+UTF-16 text bounds, finite SINGLE-range REAL and signed16 INTEGER storage using
+the existing adaptation that retains binary64 precision within SINGLE range.
+Strict nested transport rejects unknown/duplicate decoded keys and malformed
+raw Unicode before decoder repair. Assignments detach caller-owned cell pointers.
+
+Acceptance requires independent expected results for all30 bindings, physical
+domain/transport/ownership failures, actual original-reader/no-write integration,
+coupled existing soil regressions, vet/production compilation and independent
+read-only review. Validation passes under race, root40.039s, with vet and
+production compilation passing. Independent review reports no significant
+issues; its reviewer could not rerun tests because Go was absent from its
+session PATH. This does not
+prove current live context authority, uniqueness outside the scoped original,
+SQL mutation/trigger behavior or native child editing. A separately contracted
+transactional writer must reread the complete physical sources, prove global ID
+ownership, atomically commit mutation/audit/stable-request provenance and retain
+committed receipts across cancellation/cleanup errors. No facade, bindings,
+frontend ownership, creation/deletion/restoration or depth-order/navigation
+behavior is introduced by planning.
+
+### Private transactional soil writer
+
+The next owned batch is [the private stable-request writer](../twopagesoilwrite.go)
+and its [tests](../twopagesoilwrite_test.go). No existing editor, facade, main,
+bindings or frontend file is owned by this batch. A lowercase UUIDv4 request
+contains the complete tagged original and explicit expected-value edits. An
+owned context operation lease and the existing immediate selected-file writer
+freeze context ownership and serialize project transactions. The writer proves
+literal selected membership, physical ordinary Env/Admin/soil tables, unique
+physical parents and global numeric/text logical-ID peer ownership. It does not
+call the legacy affine-parent/ID mutator or the SIVI wrapper that discards
+postcommit results.
+
+New requests compare the complete scoped schema/rows, then update exactly the
+physical rowid and literal parent. Mutation, operation-specific child audits and
+`__VPRO_TwoPageSoilHistory` commit together. Full-project before/after snapshots
+verify planned soil/audit changes and exclude trigger/affinity drift; the exact
+technical history append is reread in the same transaction and
+validated before commit. Technical provenance records the full changed plan even
+when source audit strength0/1 leaves legitimate changes unaudited.
+
+Exact UUID replay and a separate read-only receipt lookup never replay SQL
+updates. Absence remains unresolved without creating tables; corrupt,
+substituted, shadowed or differently scoped history explicitly refuses. Receipts
+retain immutable original context, actor, audit policy, complete committed rows
+and actual audits after later legitimate source changes or context rotation.
+Postcommit cancellation/completion errors retain the committed result and direct
+the caller to recover its exact request rather than retry the mutation.
+
+Acceptance covers both physical families/forms, all30 data bindings, all four
+audit strengths and explicit NULL/empty audit outputs; complete source/peer
+replacement, global aliases, generated/shadowed schema, trigger/history errors,
+rollback/retry and INTEGER affinity normalization; strict request/raw-Go
+Unicode, UUID collision/concurrency, historical receipt corruption/correction
+and actual context rotation. An independent database connection proves staging
+is uncommitted before in-flight cancellation and proves visibility before
+postcommit cancellation/error. Coupled new/read/plan/parent-owned/legacy soil
+race tests pass, root77.674s; vet/production compilation pass. Independent
+writer review reports no significant issues and reruns all11 writer tests under
+race, root30.561s, and the coupled matrix, root95.587s. Its scope excludes
+unrelated dirty changes, repeated vet/production checks and native actions.
+This is not native acceptance or a UI/write grant.
+Creation/deletion/restoration, source depth ordering/focus/navigation and shared
+parent/child draft ownership remain outside this private writer batch.
+
+### Independently gated soil facade
+
+The next bounded facade owns only [the service](../twopagesoilservice.go) and its
+[tests](../twopagesoilservice_test.go), not main registration, bindings or frontend.
+`VPRO_TWO_PAGE_SOIL_REVIEW` and `VPRO_TWO_PAGE_SOIL_WRITING` use the existing
+literal `true`/`false` feature parser and are absent/off by default. Writing alone
+cannot grant review; read-only review can recover a committed exact request even
+when writing is disabled. GetOriginal retains the complete physical DTO and its
+`declaredType`/tagged-cell wire. Save and RecoverReceipt accept the retained
+request JSON through the reviewed strict decoder rather than decoding a repaired
+or permissive property map.
+
+Three facade tests cover default/explicit-false/read-only/writing-only/enabled
+states without source writes, malformed feature values, nil/cancelled/stale scope,
+exact original/result round trips through the actual kernel, mixed audit-strength1
+provenance, duplicate/escaped keys and raw-Unicode refusal. Coupled private soil
+race passes, root37.863s; vet and production compilation pass. Independent review
+reports no significant issues and independently runs all three facade tests under
+race. No source child editing, references, identity changes, lifecycle or
+native authority is enabled. Actual Wails registration/interface bindings and
+persistent parent/child draft/error/irreversible-receipt ownership require the
+separate following integration batch.
+
+The facade is now constructed and registered in actual main with repository-standard
+startup error handling. Interface-style Wails generation (`-ts -i`) adds exactly
+the soil service module, its index export and nullable interface models; all other
+binding bytes are unchanged against the privately preserved pre-integration
+baseline. No generation warnings occur. Actual-main production compilation,
+all1002 registered frontend tests, Svelte check0 errors/0 warnings and an isolated
+production build pass without replacing accepted assets. Independent registration/
+binding review compared the exact preserved baseline and reports no significant
+issues. Registration is not a child editor: the embedded host
+is still disabled, and actual Wails lifecycle/mutation acceptance remains required.
+
+### Typed soil client drafts
+
+The bounded [client draft boundary](../frontend/src/twoPageSoilEditor.ts) owns
+only original decoding, edit eligibility, field staging and complete request
+construction, its [client tests](../frontend/src/twoPageSoilEditor.test.cjs),
+the shared [wire fixture](../frontend/src/twoPageSoilWire.json) and its
+[strict Go consumer](../twopagesoilwire_test.go). Session/registry/panel/root
+wiring, source navigation and native acceptance are excluded.
+
+Originals require exact context/project/parent/form/source, complete columns
+with `declaredType`, canonical tagged cells and literal TEXT parent ownership.
+Physical rowids remain signed64 strings; selected IDs must be actual signed32
+INTEGER storage, never inferred from NULL. Validated scalar copying detaches
+actual Svelte client-runtime proxies without `structuredClone` on a proxy.
+All12 Humus/18 Mineral fields reuse existing source policies, preserve unchanged
+historical storage by omission and distinguish explicit NULL from empty text.
+New values reject malformed Unicode, UTF-16 overlength text, invalid signed16
+integers and nonfinite/out-of-SINGLE-range numbers without whitespace repair.
+Requests recompute raw drafts and refuse changed expected values, inconsistent
+owners, duplicate assignments and invalid UUIDs.
+
+The shared strict-Go round trip passes under race, root1.204s; independent
+expected assignments retain negative signed32 IDs and max signed64 peer rowids.
+All1009 registered frontend tests pass (309+448+252), Svelte check reports
+0 errors/0 warnings and the final isolated production build passes5.87s.
+Vet and production compilation pass. The initial check failed because generated
+private model names are not index exports; types now derive from the public
+result alias without modifying generated files. Failed runner evidence is retained.
+Independent draft review found a peer collision mismatch: exact tagged equality
+missed REAL/TEXT aliases accepted by the Go identity guard. The corrected client
+guard follows Go decimal/hexadecimal float grammar, rounding and Unicode spaces
+without JavaScript-only coercion.33 shared independent witnesses exercise both
+the client request and actual Go planner, including normal halfway/adjacent values
+and signed subnormal boundaries. Coupled strict-wire/planner race passes5.005s.
+Focused independent follow-up closes the finding with no significant concerns.
+This prerequisite grants no child editing or native lifecycle authority.
+
+### Retained soil sessions and receipt boundary
+
+The private [soil session](../frontend/src/twoPageSoilSession.ts) and
+[receipt validator](../frontend/src/twoPageSoilReceipt.ts) add persistent
+in-memory originals, drafts/errors, exact attempted request JSON and immutable
+receipt logs. Registry/root/panel/native wiring remains excluded.
+Unknown delivery blocks editing, Undo, reload, new Save and disposal; read-only
+recovery uses the original bytes, never repeated mutation or matching source
+values. A transport settlement barrier prevents premature recovery.
+Missing history remains unresolved: promise settlement alone is not proof of
+backend quiescence and cannot authorize replay or discard. A server-owned
+no-commit certification was excluded from this boundary; the separately reviewed
+server-owned protocol below now provides it.
+
+Committed results require the exact retained request, complete physical source
+plan including unchanged peers/unmapped cells, actor/time and policy-specific
+source audits. The full typed plan remains separate from that audited subset.
+INTEGER-to-REAL changes with identical audit text remain real typed assignments;
+receipt validation never reconstructs raw input and accidentally omits them.
+Existing calibrated Go audit text handles numeric fields; historical BLOB cells
+retain Go byte-slice audit notation. Validated scalar copying detaches actual
+Svelte proxy receipts, and acknowledgement/reload/disposal retain receipt logs.
+
+The [shared receipt fixture](../frontend/src/twoPageSoilReceiptWire.json) was
+generated by actual Go serialization and history validation for all four audit
+strengths; its temporary generator is removed. The
+[Go consumer](../twopagesoilreceiptwire_test.go) verifies independent committed
+cells/counts/provenance, strict round trips, typed storage transitions and BLOB
+audits. Coupled private soil race passes54.832s, vet/production compilation pass;
+1021 frontend tests and check0/0 pass, isolated build5.62s.
+Independent read-only review reports no significant issues and independently
+runs24 client cases and uncached strict-Go race1.371s. Two additional tests close
+the noted load/recovery validation-yield coverage gap; all26 focused cases pass.
+None of these checks establishes native linked-child lifecycle acceptance.
+
+### Persistent soil registry
+
+The private [registry](../frontend/src/twoPageSoilSessions.ts) retains sessions
+by exact literal context/project/parent/source-form keys. Normal and CHARS share
+their actual soil form owners. Frontend `VITE_TWO_PAGE_SOIL_REVIEW` and
+`VITE_TWO_PAGE_SOIL_WRITING` are independently default-off and intersect the
+backend gates; writing alone cannot grant review. Review-only sessions refuse
+staging/Save before transport without inventing an unknown mutation.
+Bindings use actual GetOriginal/Save/RecoverReceipt signatures and preserve
+the exact retained request JSON.
+
+Aggregated activity includes busy operations, raw draft errors, unknown outcomes
+and unacknowledged receipts across owners/remounts. Clean zero-receipt entries may
+be explicitly released; acknowledgement and release never erase receipt-owning
+entries.32 focused cases and all1029 registered frontend tests
+(309+448+272) pass, check0/0 and isolated build4.92s pass. Independent read-only
+review reports no significant issues and reruns31 focused cases; an added
+multi-owner/unsubscribe/resubscribe case closes its coverage suggestion.
+Root parent/child interlocks, live panel, source ordering/focus and native
+acceptance remain excluded; the old child host is still disabled.
+
+### Server-owned soil attempt sealing and outcomes
+
+The [attempt ledger](../twopagesoilattempt.go) belongs to the context service,
+not individual facade instances. Exact UUID/payload registrations count all
+active public soil Save calls. Read-only RecoverOutcome reports running while
+an attempt is active. Otherwise it seals the request before reading history,
+including unseen requests: a late RPC can thereafter only recover an existing
+receipt or explicitly refuse, never dispatch another mutation.
+Successful original-context owned history absence can therefore certify
+`notCommitted`; absence after context rotation remains unknown. Positive
+history preserves the original committed provenance and existing explicit replay.
+Sealing is in-memory coordination, not a database write or new audit row.
+The legacy RecoverReceipt remains available without treating its NULL as proof.
+
+The [client outcome decoder](../frontend/src/twoPageSoilReceipt.ts) requires
+the exact context/UUID/retained request bytes, status/reason and nullable receipt.
+Only explicit server certification releases an unknown attempt, retaining drafts
+for correction/Undo and retiring its UUID. New Save is explicit with a new UUID,
+never automatic replay. Both committed and no-commit validation recheck their
+generation after yielding. The registry uses actual RecoverOutcome bindings.
+The [shared outcome fixture](../frontend/src/twoPageSoilOutcomeWire.json) and
+[Go consumer](../twopagesoiloutcomewire_test.go) prove the actual wire; its
+temporary generator is removed.
+
+No-commit ownership exposed a tightly coupled Windows file-ID issue:
+[SQLite attachment capture](../sqlitecontext.go) now uses an opened handle's
+Stat and surfaces stat/close failures, then verifies identity after ATTACH.
+Path-based Stat could lazily adopt a renamed replacement during SameFile.
+Actual same-path replacement after closing disposable handles proves frozen
+identity/profile refusal; this is not a timed replacement-during-ATTACH probe.
+The existing family/configuration/TEMP-view infrastructure is unchanged.
+
+Tests cover shared-facade concurrency, payload collisions, unseen/late dispatch,
+rollback/correction/new UUID, context rotation, physical retarget/correction,
+lease cancellation and exact pre/postcommit facade observations. Independent
+SQLite reads prove staged invisibility and actual committed visibility.
+Cancelled sealed recovery keeps late dispatch refused; postcommit completion
+errors retain the committed result and release registration before read-only
+recovery. Coupled soil/SQLite context race65.043s, vet/production compilation,
+1033 frontend tests (309+448+276),36 focused cases, check0/0 and isolated
+build5.17s pass. Interface generation has no warnings and changes only index,
+models and the soil service against the exact preserved baseline.
+Independent backend, focused cancellation follow-up and client/binding reviews
+report no significant issues and rerun their bounded race/client tests.
+The frozen687-input full integration race passes with unchanged inputs and
+ordinary/production package/embed discovery. It does not accept the separately
+built candidate UI's native lifecycle.
+
+### Experimental live soil host and ownership barriers
+
+The default-off review flag now mounts
+[TwoPageSoilPanel](../frontend/src/TwoPageSoilPanel.svelte) in complete-entry
+review only, for `SoilHumusXL`/`SoilMineralXL`. Other children keep their disabled
+ordinary `SourceChild` host. Writing still
+requires the independent client and server flags.
+
+When soil review and complete-entry review are both enabled, the parent does
+not dispatch legacy numeric-ID Humus/Mineral readers or ordinary soil suggestion
+reads. Those readers reject historical NULL IDs and cannot represent all tagged
+physical storage. Ordinary soil rows, counts and actions (including partial
+parent review scopes) instead display an explicit unavailable-profile notice,
+never empty-record or zero-count claims. Complete-entry physical `GetOriginal`
+remains independent. Other required reads/capabilities still run and their
+errors propagate; header Soil/Terrain editing remains independent. With either
+review flag off, legacy soil reads and presentation remain unchanged. This is
+an intentional default-off read-profile adaptation, not a legacy DTO conversion
+or a new write grant. All1051 frontend tests, check0/0, isolated builds and
+independent exact-baseline review pass. A compiled production flag matrix covers
+all8 combinations; independent focused rerun18/18 closes its coverage gap.
+Disposable Wails default/enabled read acceptance proves preserved legacy
+refusal, parent readiness, all30 live bindings and NULL-ID read-only physical
+reachability. The fixture explicitly removes only the copied INTEGER ID's
+primary-key rowid alias to represent nullable historical IDs, retaining field
+types, FK and indexes; Mineral includes a BLOB-depth diagnostic witness.
+Both owners close normally, with all16 owned identities/protected originals
+unchanged. This read acceptance does not establish responsive layout, mutation,
+keyboard/lifecycle or complete source parity; those remain pending.
+
+Subsequent disposable acceptance passes normal/CHARS at1400/600/320 with all30
+associated labels/fields and interactive buttons, actual visibility/containment
+and scrolled viewport checks. Partial scopes show unavailable notices instead
+of empty/count claims, while ordinary Soil/Terrain header inputs remain live.
+Actual Enter changes existing-record Horizon focus without saving. Invalid
+draft correction/Undo and parent/native-close guards pass. One Humus Save
+commits three fields, three audits under the original configured strength3 and
+complete typed history; held actual-response cancellation/read-only recovery
+does not replay it. Separate actual chunked final-upload refusal is certified
+no-commit; correction/Undo and immutable receipt remount/acknowledgement pass.
+
+A distinct chunked Mineral Memo attempt and one explicitly new UUID after
+no-commit certification both fail at the final parent-scope check. The writer
+queries the coordinator connection after its own large write has spilled the
+SQLite cache and acquired an exclusive project lock. A focused Go regression
+reproduces this on both forms and embedded/external SU contexts. The candidate
+fix performs initial/final source-equivalent Env/Admin/SU membership checks on
+the write transaction, not a second reader; external SU membership requires a
+rollback-journal read reservation through commit (WAL/memory/off unavailable).
+The reservation invariant is shared with complete-entry reference writing,
+without changing its operation-specific errors. Focused race tests pass,
+including large committed recovery, final uncommitted scope refusal, competing
+SU writer blocking, WAL correction and cancellation/rollback/retry. Independent
+exact-five-file baseline review reports no significant issues; shared journal-mode/
+scope race28.878s and production/vet checks pass. Fresh690-input full integration
+passes with unchanged inputs/discovery. A distinct corrected actual-main candidate
+passes the previously failing actual chunked Mineral Memo case: one Comments
+commit, one source audit at frozen strength3, complete typed history and no
+unrelated/NULL-ID/BLOB peer changes. The final actual chunk response is held;
+cancellation, unknown-outcome native-close refusal, read-only committed recovery
+without replay/extra audits and retained acknowledged receipt all pass.
+All five native owners are closed and16 identities/protected originals restored;
+the new committed database and accepted/rejected cases remain separate.
+The corrected seal verifies all453 predecessor files before launch and records
+418 unchanged after close plus35 disposable WebView profile changes, with the
+predecessor owner identity archived byte-exactly. This accepts only the bounded
+existing-row soil host; source lists/mixed-storage calibration and creation/
+deletion/restoration remain unavailable. No full/default-on grant follows.
+
+The next private reference reader follows the six Humus and four Mineral combo
+bindings from the exported forms. In particular, `FecalAbundance` and
+`MycelAbundance` both query `MycelAbundance`; `ASP` uses `MinSoilAspect`, `Texture`
+uses `SoilTexture` and `vonPost` uses `vonPost`. These source Items remain tagged
+TEXT definitions, including numeric-looking Items, not invented bound-value
+coercions. The reader uses the actual configured physical
+`VLists.USysTableOfLists`, never the ordinary TEMP view or a frozen catalogue.
+All ten physical columns, rowids, NULL/empty metadata, duplicate definitions and
+Access BOOLEAN integer storage remain distinguishable. Source `ItemOrder` is
+retained; rowid is the explicit stable-tie adaptation.
+
+The same selected/literal/physical parent guard now protects original and
+reference reads with unchanged original-reader errors. Missing groups and
+malformed text fail the complete result; corrected physical metadata can be
+retried. Coupled race10.179s, production compilation/vet and independent
+exact-three-file review/focused coverage follow-up pass. Actual cancellation
+during parent SQL followed by successful reference reading retains pinned
+attachments/TEMP views. Reference-file replacement, concurrent catalogue
+changes and cancellation specifically during VLists retrieval remain
+uncalibrated shared-helper cases.
+
+The next candidate exposes readonly `GetReferences` behind the existing
+independent review flag, with additive interface-style bindings. A shared actual
+Go facade fixture proves the client wire's `declaredType` schema and complete
+tagged cells. Exact owner/source/field mappings and physical definition identity
+are validated before UI state; raw snapshots detach actual Svelte proxies without
+`structuredClone` on reactive input. A per-panel cancellable lookup refuses late
+cancelled, superseded or disposed/remounted delivery. Failures remain explicit
+and retryable, never success-shaped empty choices.
+
+Each source definition has a separate physical-ID disclosure and selection
+button, retaining duplicate codes, NULL versus empty descriptions, all ten
+metadata columns and true=-1 storage. This is an explicit responsive desktop
+adaptation of the source's two-column combos, not fixed Access geometry.
+Selecting observes the current target physical row/form and current definition
+identity/value, then uses existing guarded TEXT/NULL draft staging. Numeric
+Items pass through the existing Integer parser; no extra Access coercion,
+membership restriction, trimming/completion/case change or automatic Save is
+introduced. Unavailable/historical nontext Items cannot be chosen; manual entry
+and existing correction/Undo remain independent.
+
+Independent exact-thirteen-file baseline review reports no significant issues
+and reruns24/24 focused tests. Additional direct actual-Svelte tests cover both
+ASP/vonPost TEXT-to-parser staging, NULL versus empty selection and wrong-form
+refusal;25/25 pass. All1058 frontend tests/check0/0, coupled Go race11.204s,
+production/vet and private final default/enabled builds11.04s/11.13s pass.
+The695-input full race passes in58m05s: exit0, unchanged inputs and ordinary/
+production discovery. A sixth actual-main Wails owner accepts all6/4
+disclosures in six normal/CHARS layouts at1400/600/320. Actual visibility,
+opened metadata, scrolled viewport intersection and containment are checked;
+duplicate physical definitions retain NULL/empty descriptions and -1/0 flags.
+Mycel/Fecal share the actual source group; ASP/vonPost TEXT choices use the
+existing Integer parser, and NULL versus empty remains explicit. An invalid
+`+1` fixture choice blocks Save, parent disposal/variant changes and native
+close, survives source refresh, and remains correctable/undoable.
+An actual held reference response is cancelled before parent close/remount;
+late delivery cannot populate the new panel, while a fresh read succeeds.
+Malformed fixture Note UTF8 refuses all usable definitions before transport;
+restoring that fixture cell and retrying succeeds without a project write.
+One planned MycelAbundance/vonPost choice Save commits exact TEXT `A`/INTEGER
+`1`, two source audits at independently frozen strength3 and complete durable
+typed history. Unresolved-response cancellation/native-close refusal, read-only
+recovery and acknowledgement/actual parent remount preserve the receipt with
+no replay or unrelated physical changes. Normal close restores all16 baseline
+identities/protected sources; the committed DB and fresh profile are retained.
+The seal records220 new files and16 unchanged preceding sealed files.
+This accepts bounded existing-row source choices, not mixed-storage source
+calibration, creation/deletion/restoration, whole-form or default editing.
+
+All12/18 visible source fields retain labels and logical responsive groups.
+IDs and parent links are read-only physical provenance; nullable/noninteger/
+colliding application IDs never become ordinary ID0. The host uses explicit
+NULL controls, distinct from empty text, and preserves raw drafts/errors and
+immutable receipts across row selection and tab remount. A missing source
+column explicitly makes the row read-only instead of inventing it.
+
+The parent's actual aggregate draft/reference/operation state is separate from
+the intentionally always-unsaved review-open close wrapper. Actual parent
+ownership and Lock block new child staging/Save. Child ownership blocks new
+parent staging, Save/restoration, variant changes and review close. Existing
+parent correction/Undo and child Undo, cancellation, read-only recovery and
+receipt acknowledgement remain available without replay or implicit disposal.
+The registry also owns root close/context/navigation/Lock barriers.
+
+The canonical source specifies Humus descending and
+Mineral ascending UpperDepth, Horizon focus on Current, and utility application
+options Next Record while focused/Next Field on loss. The host now sorts exact
+INTEGER/finite REAL/NULL depth storage in those directions without converting
+numeric-looking TEXT. NULL sorts first ascending/last descending; ties keep
+physical reader order. Missing or historical TEXT/BLOB depth explicitly reports
+physical-order presentation. These are stated desktop ordering adaptations,
+not mixed-storage Access calibration, and never reorder the immutable original
+or complete technical receipt/request plan.
+
+Explicit load pins the selected physical record so a committed depth resort
+does not implicitly change its identity. Selection/load focus the selected
+record's visible editable Horizon; unmodified Enter moves to the next existing
+record's Horizon after checking actual
+panel/record/focus/value observations. Enter never Save/creates or wraps; source
+validation/unknown/busy/acknowledgement and parent ownership stop it with a
+visible diagnostic. Modifiers preserve normal control behavior. No global
+application preference is written on focus/loss; this is a scoped desktop
+explicit-Save adaptation. Browser newline display normalization is used only
+for independent navigation observation, never to rewrite original source bytes
+or stage unchanged assignments. NULL inputs stay editable with an explicit NULL
+marker; typing creates a deliberate non-NULL assignment.
+
+Source combo suggestions use the accepted bounded choice workflow above.
+Creation/deletion/restoration are not enabled. Real DOM/keyboard/native
+existing-row order/focus and source-choice acceptance are verified above;
+this is not complete source creation or automatic-Save behavior.
+
+SSR and actual Svelte client-script acceptance cover all30 bindings, NULL-ID/
+missing-column refusal, error remount/correction/Undo, once-only mocked Save/
+immutable acknowledgement, unknown remount/certified no-commit recovery and
+parent/child guards. This is not real DOM/Wails or complete source parity.
+The live-host/root batch passes1041 frontend tests, check0/0, isolated default/
+enabled builds and independent review with no significant issues. The subsequent
+depth/Enter batch passes1047 frontend cases, check0/0 and corrected isolated
+default/enabled builds10.36s/11.21s. Independent review reproduced a successful
+depth Save switching current record after a retained-draft remount; synchronous
+attachment selection fixes it. Primary reproduction/fix and both focused
+regressions plus independent follow-up close that finding. The source3-file
+baseline and failed reproduction are retained. Disposable native lifecycle/
+layout/mutation acceptance remains required before this host can be accepted.
+
 ### Picture source preparation
 
 The local linked picture library is a separate owned data family, not a project
@@ -154,8 +1224,205 @@ evidence of a live child Add event. Their exported BeforeInsert handlers only
 display PlotNumber. Future creation must keep stored selected-directory literals
 distinct from the existing owned reader's `Default` authorization: saving a path
 cannot authorize that directory, rewrite it to `Default`, copy its file or imply
-that an unsupported preview succeeded. Creation/allocation and selected-file
-authorization remain unimplemented, separate boundaries.
+that an unsupported preview succeeded. Desktop creation and selected-file
+authorization remain unavailable, separate boundaries.
+
+The private, unregistered [creation kernel](../picturecreation.go) prepares an
+exact owned parent and literal Windows filename/directory prefix, appends the
+five native-order tagged cells with NULL PicComment, and commits dedicated
+technical history and permanent library-wide identity reservations atomically.
+Positive smallest-safe signed32 allocation is a documented desktop adaptation,
+not Access's random `GenUniqueID()` sequence. Numeric aliases and deleted
+reservations cannot silently reuse an identity. This kernel neither copies nor
+reads the selected file, grants its directory, infers source audits or accepts
+that a native chooser ran.
+
+Twenty focused race tests pass, root 22.030 seconds, and vet passes. Independent
+SQL expectations cover exact append/NULL/storage, full read-only UUID recovery,
+postcommit cancellation/enclosing read-finalization receipt preservation, and
+same/different-UUID completion both through owned callers and independent
+library transactions. Initial independent review found no demonstrated defect;
+focused reliability follow-up closed both coverage gaps without further
+findings. No service, binding, picker, preview authority, UI, default promotion
+or native acceptance follows.
+
+The private [selected-file authority](../pictureselection.go) freezes identity
+with an opened handle, preserves the chosen literal separately from its resolved
+target and rechecks both paths around a bounded image read. Actual disposable
+Windows junction cases verify alias retargeting, physical replacement and
+after-read rejection without elevated privileges or skips; focused race passes
+in 2.350 seconds and vet passes. Identity/size/time checks do not establish
+immutable bytes against same-size changes with restored timestamps. The reused
+[image decoder](../pictureimage.go) retains JPEG/PNG, 32-MiB and 16-megapixel
+limits; exact-limit and limit-plus-one cases preserve ordinary owned-directory
+read behavior. No directory or sibling read authority follows from selection.
+
+The private [native chooser adapter](../picturenativechooser.go) requires Wails'
+actual request window, its live native handle and exact application registration.
+It attaches a single-file dialog to that owner, retains the literal result and
+rechecks owner/context after the modal returns. Invalid/nonlive/cancelled request
+tests pass under race in 1.226 seconds and vet passes. An already-open native
+dialog is dismissed through its own Cancel action, not by pretending promise
+cancellation closes it. Coupled picture race tests pass in 55.220 seconds; vet
+and production compilation pass. Independent selection/decoder/chooser review
+reports no significant issues within this private boundary. No registered
+facade, UI or actual native modal acceptance exists yet.
+
+The private [creation facade](../picturecreationservice.go) independently gates
+creation behind `VPRO_PICTURE_CREATION_WRITING` and owned reading, not existing
+metadata-writing permission. Opaque tokens bind the selected object to the
+actual native app/window/handle and literal context/project/parent. `Choose`
+Cancel returns no selection and performs no append. `RecoverSelection` reads
+the retained same-scope capability after lost delivery without opening a
+chooser, changing lifecycle state or granting another file. `Create` accepts
+only the strict five-key owned request matching that token and refuses
+automatic re-entry after writer entry. `LookupReceipt` is read-only and needs
+no surviving file token. Selected preview requires a matching durable complete
+physical row and returns complete owner/row/image identity; preview failures do
+not erase a metadata commit. Release and acknowledgement relinquish only file
+authority, never history or reservations.
+
+Private [client validation](../frontend/src/pictureCreationEditor.ts) and
+[retained sessions](../frontend/src/pictureCreationSession.ts) preserve literal
+paths, raw Unicode/source bounds, stable request identity and all five committed
+cells including unassigned NULL PicComment. Open native dialogs cannot be
+dismissed by cancelling a promise. Late Create delivery cannot replace cancelled
+client state; recovery reads history instead of repeating the mutation.
+Acknowledgement and subsequent Add attempts retain earlier immutable receipts.
+The actual strict-Go selection/request/receipt/image fixture passes these client
+validators, including `declaredType` columns and nullable transport fields.
+Independent review identified premature null receipt recovery while Create was
+running and subscriber cancellation before request registration. Public recovery
+now refuses matching in-flight activity and observes request activity across
+the read; internal preflight remains separate. Client generations are captured
+before subscriber notification and rechecked before dispatch. Focused review
+closes both defects without further significant issues. Final coupled Go race
+passes in 58.112 seconds; primary focused race 9.749 seconds, vet and
+production-tag compilation pass. Client 60 coupled/966 full tests/check and an
+isolated fixed Vite build pass.
+
+Actual main registration and nullable interface bindings now connect the manager
+candidate behind independent `VITE_PICTURE_CREATION_WRITING`, still absent/off
+by default. The source live child Add remains unavailable. A per-parent session
+registry keeps modal/unknown outcomes visible to root close/context/navigation
+guards even when a reader or panel is disposed. Successful Add attempts preview
+only the selected object and prompt loaded peers to re-read the complete committed
+physical row; a changed or missing row is a refresh error, not invented success.
+Receipt acknowledgement and new Add attempts retain earlier immutable receipts.
+Integration review found a real immediate-subscription effect loop and missing
+behavioral coverage. Creation and coupled metadata revision notifications are
+now untracked, preserving session identity tracking and cleanup. New idle session
+construction suppresses only its unchanged initial aggregate notification,
+avoiding reactive mutation inside the manager's derived owner selection. Thirteen
+integration cases exercise installed client effects, actual receipt-triggered
+two-peer refresh, complete-row drift and cancellation/disposal/owner-change late
+rejection, once-only Add/Cancel0 and retained root close/context/navigation/
+decision barriers. Focused independent follow-up closes both findings.
+All979 frontend tests/check0/0 and rebuilt isolated default/enabled assets pass;
+corrected coupled Go race66.967s, vet and production compile pass.
+Read-only selection recovery remains available under independently enabled
+owned reading when creation writing is off; every write/selection/image grant
+keeps its existing gate and scope checks. Actual Wails verifies backend refusal
+followed by absence recovery and normal close.
+The Windows prompt uses documented IFileOpenDialog/IShellItem interfaces via
+existing go-ole. Owner state is a separate Go object, not native COM memory.
+Complete native argument lists and signed HRESULT checks preserve errors;
+only Show's ERROR_CANCELLED produces typed normal Cancel. Path decoding rejects
+malformed UTF-16 instead of repairing a selected identity. Acquired interface
+references and allocated path memory release before balanced STA uninitialization.
+The public CFD v1.2.0 trial crashed before chooser observation and was rejected
+for ABI/owner-memory/error-classification defects; its dependency is removed.
+Its failed owner absence, unchanged protected bytes and archived build are
+retained as failure evidence, never acceptance. Focused independent review of
+the replacement closes all three findings with no significant issues.
+Three actual attached Windows Cancels return immediately to ready Add without
+recovery, error, receipt or physical library/history/allocation changes.
+One literal spaced/#100% selection commits exactly one row; independent reopening
+checks all five physical cells, durable history and permanent reservation.
+Native selected-only preview/hash/sibling refusal, complete-row peer refresh,
+read-only receipt recovery, Home/native-close barriers,1400/600px actual
+visibility/viewport containment and replacement refusal pass. Acknowledgement
+retains the commit receipt; the owner normally closes. The committed private
+database is hash-archived before fixture restoration;117 protected identities
+and all owned originals remain unchanged. Candidate pins cover920 source inputs,
+including manifests; closed predecessor/failed candidates are archived without
+deletion. Final full integration race passes all packages, root3220.593s;
+all658 package-discovered ordinary/production source/manifest/embed inputs
+rehash unchanged. Earlier interrupted runners remain unaccepted evidence.
+Selective disposable source calibration stopped within its two-attempt budget
+at a private instrumentation compiler error before Add dispatch. Stopped
+snapshots were archived before full fixture restoration; the exact stalled
+owner required forced closure after normal-cleanup COM failures. Canonical
+data/registry remained unchanged. This failed oracle establishes no save/default
+parity. Native implementation results do not resolve source
+`DoCmd.Save` is an observed callback, not independent proof of physical save timing.
+The picker uses the system-maintained initial location; source default-directory
+behavior remains uncalibrated. No default promotion, source Add acceptance or
+whole-picture parity is claimed.
+
+#### Private picture deletion/restoration boundary
+
+Canonical `frmPlotPictures` binds `tblVPics` and declares only Form_Current;
+`frmVPics`/`frmVPicsXL` declare BeforeInsert, Current, private Add and image
+double-click/test procedures, not a custom deletion callback. None exports
+AllowDeletions or deletion confirmation events. Export absence is not live
+permission or confirmation proof. The separate `clsPicture.DeletePicture`
+operates on `tblPictureBlob`/`USysPictureBlob`, not this five-cell path library;
+its behavior must not be imported into this workflow.
+
+The private implementation remains unavailable: one existing physical
+row, complete typed schema/cells, literal parent/context/project and an
+unambiguous signed32 identity. Deletion/history/permanent ID reservation share
+one transaction; image files are never deleted or newly authorized.
+Read-only receipt recovery distinguishes no commit from unknown delivery.
+Historical restoration refuses occupied/reused rowids, numeric ID aliases,
+changed complete physical peer snapshots and owner drift without pruning
+history/reservations. Explicit rowid/five-cell insertion preserves historical
+NULL, empty, BLOB and signed identities; typed restoration acknowledgements
+consume a deletion once while repeated cycles retain the first ID reservation.
+Independent review corrected a first-reservation provenance gap: rebinding
+the ledger to a later deletion cycle now refuses recovery, restoration and
+creation allocation without writes. Combined deletion/restoration/creation
+race coverage initially passed 48 top-level tests with no significant
+independent follow-up findings. A subsequent historical-context correction
+separates current operation context from immutable deletion context, recording
+the current restoration actor/policy independently. Two actual context switches
+prove stale-write refusal and read-only historical recovery. Current49-test
+race coverage passes root51.147s; vet/production compilation pass; focused
+independent review of this correction reports no significant issues. This
+accepts the private kernel only; lifecycle facade integration is a separate batch.
+
+Two bounded fresh-source attempts preserved form code/bindings and normally
+closed, archived observed copies and restored originals, with594 protected
+family/image/export identities and VPRO registry unchanged. Exported subform
+SourceObject includes `Form.`; the actual runtime property omits that prefix.
+The final child reports AllowDeletions/AllowEdits/Confirm Record Changes true.
+One owned automation delete command removed exactly the planned physical row
+without showing confirmation; no Cancel/Yes was invoked and the planned Cancel
+checkpoint stopped without replay. This establishes a bounded automation
+observation, not source GUI confirmation or postdelete Current/preview behavior.
+The two-attempt source budget is exhausted; no routine retry is authorized.
+No deletion/restoration availability or parity is
+claimed from private kernel tests. Facade/UI integration and actual Wails
+acceptance remain separate from that source observation. The separately gated
+facade has passed independent review and is registered with nullable interface
+bindings. Its desktop session/workbench is an unaccepted integration candidate:
+client-runtime tests exercise retained reviews/unknown requests, readonly
+recovery, irreversible acknowledgement, complete-row refresh and root ownership
+barriers. Fresh independent desktop review reports no significant issues.
+Actual disposable Wails verifies default refusal, one Delete, held-response
+cancellation/read-only recovery, irreversible receipts across acknowledgement
+and manager remount, occupied-ID refusal/exact recovery, one complete typed
+Restore, permanent first-deletion reservation/consumed history, restored preview,
+owner/Home/native-close barriers and1400/600px visibility/viewport containment.
+Both owners normally close; committed library is archived before fixture
+restoration and146 protected identities remain unchanged. Final frozen full
+integration passes all packages, root3347.641s, with669 unchanged ordinary/
+production source/manifest/embed inputs and unchanged package/embed discovery.
+This accepts the bounded default-off desktop implementation; none of these checks closes the sealed source
+GUI confirmation/Current gap.
+No source audit
+pruning, image-file mutation, BLOB library or broken Add oracle is included.
 
 A private [existing-picture draft](../frontend/src/pictureMetadataEditor.ts)
 reuses tagged metadata parsing for only PicDir/PicName. It requires independently

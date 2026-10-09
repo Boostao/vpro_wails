@@ -14,7 +14,15 @@ import * as GoogleEarthReviewService from "./googleearthreviewservice.js";
 import * as LifeformSummaryService from "./lifeformsummaryservice.js";
 import * as LifeformWorkbookService from "./lifeformworkbookservice.js";
 import * as LongEnvironmentPreferencesService from "./longenvironmentpreferencesservice.js";
+import * as LongVegetationGroupPreferencesService from "./longvegetationgrouppreferencesservice.js";
+import * as LongVegetationPreferencesService from "./longvegetationpreferencesservice.js";
+import * as LongVegetationQualityNullPreferencesService from "./longvegetationqualitynullpreferencesservice.js";
+import * as LongVegetationStatisticsPreferencesService from "./longvegetationstatisticspreferencesservice.js";
+import * as LongVegetationSwitchPreferencesService from "./longvegetationswitchpreferencesservice.js";
+import * as LongVegetationThresholdPreferencesService from "./longvegetationthresholdpreferencesservice.js";
 import * as ParentCodeService from "./parentcodeservice.js";
+import * as PictureCreationService from "./picturecreationservice.js";
+import * as PictureDeletionService from "./picturedeletionservice.js";
 import * as PictureMetadataService from "./picturemetadataservice.js";
 import * as PictureService from "./pictureservice.js";
 import * as PlotService from "./plotservice.js";
@@ -42,6 +50,8 @@ import * as TableCSVArchiveService from "./tablecsvarchiveservice.js";
 import * as TwoPageParentCommonService from "./twopageparentcommonservice.js";
 import * as TwoPageParentEntryService from "./twopageparententryservice.js";
 import * as TwoPageParentExtraService from "./twopageparentextraservice.js";
+import * as TwoPageSoilService from "./twopagesoilservice.js";
+import * as TwoPageVegetationService from "./twopagevegetationservice.js";
 import * as VegetationWorkbookService from "./vegetationworkbookservice.js";
 import * as WorkingUnitService from "./workingunitservice.js";
 export {
@@ -58,7 +68,15 @@ export {
     LifeformSummaryService,
     LifeformWorkbookService,
     LongEnvironmentPreferencesService,
+    LongVegetationGroupPreferencesService,
+    LongVegetationPreferencesService,
+    LongVegetationQualityNullPreferencesService,
+    LongVegetationStatisticsPreferencesService,
+    LongVegetationSwitchPreferencesService,
+    LongVegetationThresholdPreferencesService,
     ParentCodeService,
+    PictureCreationService,
+    PictureDeletionService,
     PictureMetadataService,
     PictureService,
     PlotService,
@@ -86,6 +104,8 @@ export {
     TwoPageParentCommonService,
     TwoPageParentEntryService,
     TwoPageParentExtraService,
+    TwoPageSoilService,
+    TwoPageVegetationService,
     VegetationWorkbookService,
     WorkingUnitService
 };
@@ -149,10 +169,20 @@ export type {
     LongEnvironmentPreview,
     LongEnvironmentRequest,
     LongVegetationDiagnostic,
+    LongVegetationGroupAvailability,
+    LongVegetationGroupPreferenceValues,
+    LongVegetationGroupPreferencesOutcome,
+    LongVegetationGroupPreferencesReview,
     LongVegetationOptions,
     LongVegetationPlot,
+    LongVegetationPreferenceValues,
+    LongVegetationPreferencesOutcome,
+    LongVegetationPreferencesReview,
     LongVegetationPreview,
     LongVegetationQualityCriterion,
+    LongVegetationQualityNullPreferenceValues,
+    LongVegetationQualityNullPreferencesOutcome,
+    LongVegetationQualityNullPreferencesReview,
     LongVegetationQualityOccurrence,
     LongVegetationQualityReference,
     LongVegetationQualitySelection,
@@ -160,6 +190,15 @@ export type {
     LongVegetationReport,
     LongVegetationRow,
     LongVegetationSettings,
+    LongVegetationStatisticsPreferenceValues,
+    LongVegetationStatisticsPreferencesOutcome,
+    LongVegetationStatisticsPreferencesReview,
+    LongVegetationSwitchPreferenceValues,
+    LongVegetationSwitchPreferencesOutcome,
+    LongVegetationSwitchPreferencesReview,
+    LongVegetationThresholdPreferenceValues,
+    LongVegetationThresholdPreferencesOutcome,
+    LongVegetationThresholdPreferencesReview,
     LongVegetationUnit,
     MineralRecord,
     OtherFlagUpdate,
@@ -168,9 +207,16 @@ export type {
     OtherTextUpdate,
     ParentCodeChoice,
     PersonalSpeciesDefinitionRequest,
+    PictureCreationResult,
+    PictureCreationSelection,
+    PictureDeletionHistoryEvent,
+    PictureDeletionHistoryList,
+    PictureDeletionResult,
     PictureImage,
     PictureMetadataReview,
     PictureMetadataWriteResult,
+    PictureRestorationResult,
+    PictureRestorationReview,
     PlotLocationReport,
     PlotLocationReview,
     PlotLocationRow,
@@ -310,6 +356,14 @@ export type {
     TwoPageParentCommonWrite,
     TwoPageParentEntryWrite,
     TwoPageParentExtraWrite,
+    TwoPageSoilAttemptOutcome,
+    TwoPageSoilOriginal,
+    TwoPageSoilReferences,
+    TwoPageSoilWriteResult,
+    TwoPageVegetationAttemptOutcome,
+    TwoPageVegetationOriginal,
+    TwoPageVegetationSpeciesReferences,
+    TwoPageVegetationWriteResult,
     VegRecord,
     VegetationAttributeUpdate,
     VegetationCreationRequest,

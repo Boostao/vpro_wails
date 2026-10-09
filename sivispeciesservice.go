@@ -216,6 +216,14 @@ func (s *SIVISpeciesService) GetOriginal(ctx context.Context, contextID, plot st
 }
 
 func readSIVISpeciesReferences(ctx context.Context, db projectMetadataQueryer, contextID, project, plot, masterAlias, personalAlias string) (SIVISpeciesReferences, error) {
+	return readPhysicalSpeciesReferences(ctx, db, contextID, project, plot, masterAlias, personalAlias, projectSIVISpeciesDefinitions)
+}
+
+func readPhysicalSpeciesReferences(ctx context.Context, db projectMetadataQueryer, contextID, project, plot, masterAlias, personalAlias string,
+	projectDefinitions func(context.Context, ProjectMetadataTable, bool) (ProjectMetadataTable, error)) (SIVISpeciesReferences, error) {
+	if ctx == nil || projectDefinitions == nil {
+		return SIVISpeciesReferences{}, errors.New("Species references require a context and explicit physical projection")
+	}
 	result := SIVISpeciesReferences{ContextID: contextID, Project: project, Plot: plot}
 	for _, source := range []struct {
 		alias, table string
@@ -226,7 +234,7 @@ func readSIVISpeciesReferences(ctx context.Context, db projectMetadataQueryer, c
 		if err != nil {
 			return SIVISpeciesReferences{}, err
 		}
-		*source.target, err = projectSIVISpeciesDefinitions(ctx, raw, source.personal)
+		*source.target, err = projectDefinitions(ctx, raw, source.personal)
 		if err != nil {
 			return SIVISpeciesReferences{}, err
 		}

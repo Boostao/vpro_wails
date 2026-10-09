@@ -185,25 +185,9 @@ func readAuthorizedPictureImage(ctx context.Context, directory *ownedPictureDire
 	if err != nil {
 		return result, err
 	}
-	if len(data) > pictureImageMaxBytes {
-		return result, errors.New("picture image exceeds 32 MiB")
-	}
-	config, format, err := image.DecodeConfig(bytes.NewReader(data))
+	preview, err := decodePictureImageBytes(ctx, data)
 	if err != nil {
-		return result, fmt.Errorf("picture image header is invalid or unsupported: %w", err)
-	}
-	if format != "jpeg" && format != "png" {
-		return result, errors.New("picture preview supports verified JPEG and PNG images only")
-	}
-	if config.Width <= 0 || config.Height <= 0 || config.Width > pictureImageMaxPixels/config.Height {
-		return result, errors.New("picture image dimensions exceed the 16-megapixel preview limit")
-	}
-	decoded, decodedFormat, err := image.Decode(artifactPublicationReader{ctx, bytes.NewReader(data)})
-	if err != nil {
-		return result, fmt.Errorf("picture image data is invalid: %w", err)
-	}
-	if decodedFormat != format || decoded.Bounds().Dx() != config.Width || decoded.Bounds().Dy() != config.Height {
-		return result, errors.New("picture image header and decoded dimensions disagree")
+		return result, err
 	}
 	after, err := root.Stat(name)
 	if err != nil {
@@ -217,6 +201,39 @@ func readAuthorizedPictureImage(ctx context.Context, directory *ownedPictureDire
 	}
 	if err := ctx.Err(); err != nil {
 		return result, err
+	}
+	return preview, nil
+}
+
+func decodePictureImageBytes(ctx context.Context, data []byte) (pictureImage, error) {
+	if ctx == nil {
+		return pictureImage{}, errors.New("picture preview requires a request context")
+	}
+	if err := ctx.Err(); err != nil {
+		return pictureImage{}, err
+	}
+	if len(data) > pictureImageMaxBytes {
+		return pictureImage{}, errors.New("picture image exceeds 32 MiB")
+	}
+	config, format, err := image.DecodeConfig(bytes.NewReader(data))
+	if err != nil {
+		return pictureImage{}, fmt.Errorf("picture image header is invalid or unsupported: %w", err)
+	}
+	if format != "jpeg" && format != "png" {
+		return pictureImage{}, errors.New("picture preview supports verified JPEG and PNG images only")
+	}
+	if config.Width <= 0 || config.Height <= 0 || config.Width > pictureImageMaxPixels/config.Height {
+		return pictureImage{}, errors.New("picture image dimensions exceed the 16-megapixel preview limit")
+	}
+	decoded, decodedFormat, err := image.Decode(artifactPublicationReader{ctx, bytes.NewReader(data)})
+	if err != nil {
+		return pictureImage{}, fmt.Errorf("picture image data is invalid: %w", err)
+	}
+	if decodedFormat != format || decoded.Bounds().Dx() != config.Width || decoded.Bounds().Dy() != config.Height {
+		return pictureImage{}, errors.New("picture image header and decoded dimensions disagree")
+	}
+	if err := ctx.Err(); err != nil {
+		return pictureImage{}, err
 	}
 	hash := sha256.Sum256(data)
 	return pictureImage{

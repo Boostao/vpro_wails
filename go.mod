@@ -4,6 +4,7 @@ go 1.25.0
 
 require (
 	github.com/duckdb/duckdb-go/v2 v2.10505.0
+	github.com/go-ole/go-ole v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.52
 	github.com/wailsapp/wails/v3 v3.0.0-beta.26
 	github.com/xuri/excelize/v2 v2.10.1
@@ -20,7 +21,6 @@ require (
 	github.com/duckdb/duckdb-go-bindings/lib/linux-amd64 v0.10505.0 // indirect
 	github.com/duckdb/duckdb-go-bindings/lib/linux-arm64 v0.10505.0 // indirect
 	github.com/duckdb/duckdb-go-bindings/lib/windows-amd64 v0.10505.0 // indirect
-	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect

@@ -72,7 +72,7 @@ test('actual Summary root guards refuse native close and context changes with an
 test('actual Summary publication blocks background plot, hierarchy, state and profile reads', async () => {
   const context = componentFunctions('App.svelte', ['loadPlots', 'refresh', 'loadHierarchy', 'inspectProfileSources',
     'reviewProfileSU', 'findScopedPlot', 'reviewProfileWriteOwnership', 'reviewBlankProfileFile', 'reviewBlankProfileTable'], {
-    summaryPublicationBusy: true, lifeformPublicationBusy: false, vegetationPublicationBusy: false,
+    summaryPublicationBusy: true, lifeformPublicationBusy: false, vegetationPublicationBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false, twoPageSoilBusy: false,
     view: 'home', editorBusy: false, busy: false, transitionWorking: false, pendingTransition: null,
     closeRequest: '', request: 0, stateRequest: 0, hierarchyRequest: 0, plotFindEnabled: true,
     $projectState: { contextId: 'owned' }, profileSourceError: '', profileFileError: '', profileTableError: '',

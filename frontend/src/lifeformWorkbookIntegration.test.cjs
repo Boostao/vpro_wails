@@ -32,7 +32,7 @@ test('actual root native close and context transition reject retained summary pu
 test('actual background plot state hierarchy and profile reads cannot overlap retained summary publication', async () => {
   const context = functions('App.svelte', ['loadPlots', 'refresh', 'loadHierarchy', 'inspectProfileSources',
     'reviewProfileSU', 'findScopedPlot', 'reviewProfileWriteOwnership', 'reviewBlankProfileFile', 'reviewBlankProfileTable'], {
-    lifeformPublicationBusy: true, summaryPublicationBusy: false, vegetationPublicationBusy: false, view: 'home', editorBusy: false,
+    lifeformPublicationBusy: true, summaryPublicationBusy: false, vegetationPublicationBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false, twoPageSoilBusy: false, view: 'home', editorBusy: false,
     busy: false, transitionWorking: false, pendingTransition: null, closeRequest: '',
     request: 0, stateRequest: 0, hierarchyRequest: 0, plotFindEnabled: true,
     $projectState: { contextId: 'owned' }, profileSourceError: '', profileFileError: '', profileTableError: '',

@@ -13,10 +13,11 @@
   import { controlLabel, wideControl } from './formPresentation';
   import type { PaperControl } from './paperLayout';
 
-  let { contextId, project, plot, cache, revision, onchange, onbusy, onclosed, oncommitted, embedded: childContent }: {
+  let { contextId, project, plot, cache, revision, onchange, onbusy, onclosed, oncommitted, embedded: childContent, childBlocked = false }: {
     contextId: string; project: string; plot: string; cache: TwoPageEntrySessionCache; revision: number;
     onchange: () => void; onbusy: (busy: boolean) => void; onclosed: () => void; oncommitted: () => Promise<void>;
     embedded: Snippet<[TwoPageEntryChild, PaperControl]>;
+    childBlocked?: boolean;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot }));
   const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW === 'true'
@@ -65,9 +66,14 @@
     return { ...close, unsaved: true, canSave: false, error: error ?? close.error,
       saveReason: 'Save or Undo complete-entry drafts explicitly, then close their review before saving or closing the plot.' };
   }
+  export function getDraftState(): EditorCloseState {
+    const states = [...sessions.values()].map(owned => owned.closeState());
+    return { ...close, unsaved: states.some(state => state.unsaved), busy: states.some(state => state.busy),
+      blocked: !view.original || !!view.referenceError || states.some(state => state.blocked) };
+  }
   export function undo() { void operation('undo'); }
   async function chooseForm(next: TwoPageParentForm) {
-    if (close.unsaved || close.busy || close.blocked) {
+    if (childBlocked || close.unsaved || close.busy || close.blocked) {
       error = 'Save or Undo the owned complete-entry draft before changing source variant.'; return;
     }
     form = next; session = makeSession(next); onchange();
@@ -77,6 +83,9 @@
     try {
       if (!reviewEnabled || !editingEnabled && action !== 'load' && action !== 'undo' && action !== 'references') {
         throw new Error('Complete-entry review/editing is independently disabled.');
+      }
+      if (childBlocked && action !== 'undo' && action !== 'references') {
+        throw new Error('Resolve retained linked-soil drafts/operations/receipts before changing the parent.');
       }
       error = null;
       const ok = action === 'load' ? await session.load() : action === 'save' ? await session.save()
@@ -88,12 +97,14 @@
   function stage(column: string, input: TwoPageEntryInput) {
     try {
       if (!editingEnabled) throw new Error('Complete-entry editing is independently disabled.');
+      if (childBlocked && !view.drafts[column]) throw new Error('Resolve linked-soil ownership before new parent staging.');
       session.stage(column, input); error = session.view().error;
     } catch (cause) { error = `Complete-entry draft refused; owned state retained: ${String(cause)}`; }
   }
   function selectProject(rowId: string | null) {
     try {
       if (!editingEnabled) throw new Error('Complete-entry editing is independently disabled.');
+      if (childBlocked && !view.drafts.ProjectID) throw new Error('Resolve linked-soil ownership before new parent staging.');
       session.selectProject(rowId); error = session.view().error;
     } catch (cause) { error = `Physical ProjectID selection refused: ${String(cause)}`; }
   }
@@ -108,7 +119,7 @@
     catch (cause) { error = `Complete-entry cancellation refused: ${String(cause)}`; }
   }
   function closeReview() {
-    if (close.unsaved || close.busy || close.blocked) {
+    if (childBlocked || close.unsaved || close.busy || close.blocked) {
       error = close.saveReason || 'Save or Undo complete-entry drafts before closing their review.'; return;
     }
     onclosed();
@@ -127,25 +138,25 @@
   {#if view.blocked}<p role="alert">Write outcome or refresh is unresolved. Undo / reload explicitly; never replay Save.</p>{/if}
   {#if view.busy || view.referencesBusy}<p role="status">Complete-entry {view.operation ?? 'reference read'} in progress...</p>{/if}
   <div class="flex flex-wrap gap-2">
-    <button type="button" disabled={close.unsaved || close.busy || close.blocked} aria-pressed={form === 'FS882-8x6XL'}
+    <button type="button" disabled={childBlocked || close.unsaved || close.busy || close.blocked} aria-pressed={form === 'FS882-8x6XL'}
       onclick={() => chooseForm('FS882-8x6XL')}>Normal two-page source</button>
-    <button type="button" disabled={close.unsaved || close.busy || close.blocked} aria-pressed={form === 'FS882-8x6XL-CHARS'}
+    <button type="button" disabled={childBlocked || close.unsaved || close.busy || close.blocked} aria-pressed={form === 'FS882-8x6XL-CHARS'}
       onclick={() => chooseForm('FS882-8x6XL-CHARS')}>CHARS two-page source</button>
-    <button type="button" disabled={!reviewEnabled || close.unsaved || close.busy || close.blocked}
+    <button type="button" disabled={childBlocked || !reviewEnabled || close.unsaved || close.busy || close.blocked}
       onclick={() => operation('load')}>Load complete entry</button>
-    <button type="button" disabled={!editingEnabled || !close.canSave || close.busy || close.blocked}
+    <button type="button" disabled={childBlocked || !editingEnabled || !close.canSave || close.busy || close.blocked}
       onclick={() => operation('save')}>Save complete entry</button>
     <button type="button" disabled={close.busy} onclick={() => operation('undo')}>Undo / reload</button>
     <button type="button" disabled={!reviewEnabled || close.busy || !view.original || view.blocked}
       onclick={() => operation('references')}>Refresh draft choices</button>
-    <button type="button" disabled={close.unsaved || close.busy || close.blocked} onclick={closeReview}>Close complete-entry review</button>
+    <button type="button" disabled={childBlocked || close.unsaved || close.busy || close.blocked} onclick={closeReview}>Close complete-entry review</button>
     {#if view.busy && view.operation === 'read' || view.referencesBusy}
       <button type="button" onclick={cancel}>Cancel entry read</button>
     {/if}
     {#if view.historyId}
-      <button type="button" disabled={!editingEnabled || close.unsaved || close.busy || close.blocked}
+      <button type="button" disabled={childBlocked || !editingEnabled || close.unsaved || close.busy || close.blocked}
         onclick={() => operation('retain')}>Restore (retain audits)</button>
-      <button type="button" disabled={!editingEnabled || close.unsaved || close.busy || close.blocked}
+      <button type="button" disabled={childBlocked || !editingEnabled || close.unsaved || close.busy || close.blocked}
         onclick={() => operation('prune')}>Restore (prune audits)</button>
     {/if}
   </div>
@@ -176,7 +187,7 @@
     {@const raw = draft?.input.kind === 'text' ? draft.input.raw : value.storage === 'null' ? '' : metadataCellText(value)}
     {@const reference = view.snapshot.Fields.find(field => field.column === column)}
     {@const id = `complete-entry-${column}`}
-    {@const unavailable = !editingEnabled || close.busy || view.blocked || column === 'BECSiteUnit' && !view.snapshot.MasterEditingAvailable}
+    {@const unavailable = !editingEnabled || close.busy || view.blocked || childBlocked && !draft || column === 'BECSiteUnit' && !view.snapshot.MasterEditingAvailable}
     <div class="min-w-0 space-y-1" data-two-page-entry-field={column} data-source-control={control.controlId}>
       <label class="block text-sm font-medium" for={id}>{controlLabel(control, true)}</label>
       {#if column === 'ProjectID'}

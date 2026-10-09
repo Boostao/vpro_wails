@@ -29,6 +29,10 @@
   import { lifeformWorkbookPublicationSession } from './lifeformWorkbook';
   import { siteUnitSummaryWorkbookPublicationSession } from './siteUnitSummaryWorkbook';
   import { extendedSummaryWorkbookPublicationSession } from './siteUnitSummaryExtendedWorkbook';
+  import { subscribePictureCreationActivity } from './pictureCreationSessions';
+  import { subscribePictureLifecycleActivity } from './pictureLifecycleSessions';
+  import { subscribeTwoPageSoilActivity } from './twoPageSoilSessions';
+  import { subscribeTwoPageVegetationActivity } from './twoPageVegetationSessions';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -56,7 +60,40 @@
   let pictureManagerPlot = $state('');
   let plotLabelNumber = $state('');
   let contextExpanded = $state(false);
-  let editorBusy = $state(false);
+  let localEditorBusy = $state(false);
+  let pictureCreationBusy = $state(false);
+  let pictureLifecycleBusy = $state(false);
+  let twoPageSoilBusy = $state(false);
+  let twoPageVegetationBusy = $state(false);
+  const editorBusy = $derived(localEditorBusy || pictureCreationBusy || pictureLifecycleBusy || twoPageSoilBusy || twoPageVegetationBusy);
+  $effect(() => subscribeTwoPageSoilActivity(activity => { twoPageSoilBusy = activity.busy || activity.blocked; }));
+  $effect(() => subscribeTwoPageVegetationActivity(activity => { twoPageVegetationBusy = activity.busy || activity.blocked; }));
+  $effect(() => {
+    if (import.meta.env.VITE_PICTURE_DELETION_WRITING !== 'true' && import.meta.env.VITE_PICTURE_DELETION_RESTORING !== 'true') return;
+    const state = $projectState;
+    return subscribePictureLifecycleActivity(activity => {
+      pictureLifecycleBusy = activity.busy || activity.blocked;
+      if (activity.owner && activity.owner.contextId === state?.contextId &&
+          activity.owner.project === state.activeProject && view === 'home' &&
+          import.meta.env.VITE_PICTURE_MANAGER === 'true') {
+        pictureManagerPlot = activity.owner.plotNumber;
+        view = 'picture-manager';
+      }
+    });
+  });
+  $effect(() => {
+    if (import.meta.env.VITE_PICTURE_CREATION_WRITING !== 'true') return;
+    const state = $projectState;
+    return subscribePictureCreationActivity(activity => {
+      pictureCreationBusy = activity.busy || activity.blocked;
+      if (activity.owner && activity.owner.contextId === state?.contextId &&
+          activity.owner.project === state.activeProject && view === 'home' &&
+          import.meta.env.VITE_PICTURE_MANAGER === 'true') {
+        pictureManagerPlot = activity.owner.plotNumber;
+        view = 'picture-manager';
+      }
+    });
+  });
   let archivePublicationBusy = $state(false);
   let vegetationPublicationBusy = $state(false);
   let lifeformPublicationBusy = $state(false);
@@ -259,7 +296,7 @@
     transitionError = '';
     try {
       const state = editor?.getCloseState();
-      if (!state || closeDisposition(state, busy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy) === 'busy') {
+      if (!state || closeDisposition(state, busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy) === 'busy') {
         transitionError = 'Wait for the current editor operation to finish.';
         return;
       }
@@ -418,7 +455,7 @@
   }
 
   async function loadPlots(nextOffset: number) {
-    if (vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
+    if (twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
     const current = ++request;
     plotReads.cancelAll();
     busy = true;
@@ -441,7 +478,7 @@
   }
 
   async function refresh() {
-    if (vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
+    if (twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
     const current = ++stateRequest;
     stateReads.cancelAll();
     busy = true;
@@ -470,7 +507,7 @@
   }
 
   async function loadHierarchy() {
-    if (vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
+    if (twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
     const current = ++hierarchyRequest;
     hierarchyReads.cancelAll();
     try {
@@ -1135,7 +1172,7 @@
             entryForm={editorEntryForm}
             onSaved={async (p) => { editorPlotNumber = p; await loadPlots(offset); }}
             onClosed={() => navigate('plots')}
-            onBusyChange={(busy) => { editorBusy = busy; }}
+            onBusyChange={(busy) => { localEditorBusy = busy; }}
             onProfileNavigation={applyProfileNavigation}
             onProfileSUReview={reviewProfileSU}
             onFindPlot={plotFindEnabled ? () => { plotFindOpen = true; } : undefined}
@@ -1158,14 +1195,14 @@
         {#key $projectState.contextId}
           <SiteUnitSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU}
-            suPath={$projectState.suPath ?? ''} onBusyChange={(value) => { editorBusy = value; }} />
+            suPath={$projectState.suPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'long-environment' && import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <LongEnvironmentReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            onBusyChange={(value) => { editorBusy = value; }} />
+            onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'long-vegetation' && import.meta.env.VITE_LONG_VEGETATION_REPORT === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
@@ -1173,47 +1210,47 @@
           <LongVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
-            onBusyChange={(value) => { editorBusy = value; }} />
+            onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'lifeform-summary' && import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <LifeformSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            onBusyChange={(value) => { editorBusy = value; }} />
+            onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'table-csv' && import.meta.env.VITE_TABLE_CSV_REVIEW === 'true' && $projectState}
         <!-- Archive export uses this existing review navigation; its separate UI and backend gates remain default-off. -->
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <ProjectTableCSVReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} onBusyChange={(value) => { editorBusy = value; }} />
+            projectPath={$projectState.projectPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'plot-label-preview' && import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <PlotLabelPreview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            initialPlot={plotLabelNumber} onBusyChange={(value) => { editorBusy = value; }} />
+            initialPlot={plotLabelNumber} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'picture-manager' && import.meta.env.VITE_PICTURE_MANAGER === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <PictureManager contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            initialPlot={pictureManagerPlot} onBusyChange={(value) => { editorBusy = value; }} />
+            initialPlot={pictureManagerPlot} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'plot-locations' && import.meta.env.VITE_PLOT_LOCATION_REVIEW === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <PlotLocationReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            onBusyChange={(value) => { editorBusy = value; }} />
+            onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'google-earth-review' && import.meta.env.VITE_GOOGLE_EARTH_REVIEW === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <GoogleEarthReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            onBusyChange={(value) => { editorBusy = value; }} />
+            onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'hierarchy'}
       <div class="content-heading">

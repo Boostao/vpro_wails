@@ -1,0 +1,5748 @@
+[
+  {
+    "history": {
+      "Request": {
+        "requestId": "b0cbfa00-1234-4123-8123-000000000001",
+        "original": {
+          "contextId": "f04d49c7cb7df45f23c823c562c82ccb",
+          "project": "Sample",
+          "plot": "108050",
+          "form": "SubVegAXL",
+          "recordSource": "USysVegA",
+          "table": "Sample_Veg",
+          "records": {
+            "columns": [
+              {
+                "name": "ID",
+                "declaredType": ""
+              },
+              {
+                "name": "PlotNumber",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Species",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Cover1",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover2",
+                "declaredType": ""
+              },
+              {
+                "name": "cover3",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalA",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover4",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalB",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5a",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5b",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5c",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover6",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover7",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover8",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover9",
+                "declaredType": ""
+              },
+              {
+                "name": "Collected",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "HeightB",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Unmapped",
+                "declaredType": ""
+              }
+            ],
+            "rows": [
+              {
+                "rowId": "-7",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "TEST",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "ff00"
+                  }
+                ]
+              },
+              {
+                "rowId": "3",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "PEER",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "V",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "00ff"
+                  }
+                ]
+              },
+              {
+                "rowId": "8",
+                "cells": [
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "NULLID",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              }
+            ]
+          },
+          "sourceRowIds": [
+            "-7",
+            "3",
+            "8"
+          ]
+        },
+        "edits": [
+          {
+            "contextId": "f04d49c7cb7df45f23c823c562c82ccb",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Cover1",
+            "expected": {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          },
+          {
+            "contextId": "f04d49c7cb7df45f23c823c562c82ccb",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Cover2",
+            "expected": {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          },
+          {
+            "contextId": "f04d49c7cb7df45f23c823c562c82ccb",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Collected",
+            "expected": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "text",
+              "text": "C",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      "Committed": {
+        "columns": [
+          {
+            "name": "ID",
+            "declaredType": ""
+          },
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Species",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Cover1",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover2",
+            "declaredType": ""
+          },
+          {
+            "name": "cover3",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalA",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover4",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalB",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5a",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5b",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5c",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover6",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover7",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover8",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover9",
+            "declaredType": ""
+          },
+          {
+            "name": "Collected",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "HeightB",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": ""
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "-7",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "TEST",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 5,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "C",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "ff00"
+              }
+            ]
+          },
+          {
+            "rowId": "3",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "PEER",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "V",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          },
+          {
+            "rowId": "8",
+            "cells": [
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "NULLID",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        ]
+      },
+      "Actor": "vegetation-review",
+      "AuditStrength": 0,
+      "EditWhen": "2026-10-08 20:55:06",
+      "Audits": []
+    },
+    "didCommit": true,
+    "replayed": false
+  },
+  {
+    "history": {
+      "Request": {
+        "requestId": "b0cbfa00-1234-4123-8123-000000000001",
+        "original": {
+          "contextId": "ab8c4cb31c037f2fe88df716f509a8b0",
+          "project": "Sample",
+          "plot": "108050",
+          "form": "SubVegAXL",
+          "recordSource": "USysVegA",
+          "table": "Sample_Veg",
+          "records": {
+            "columns": [
+              {
+                "name": "ID",
+                "declaredType": ""
+              },
+              {
+                "name": "PlotNumber",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Species",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Cover1",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover2",
+                "declaredType": ""
+              },
+              {
+                "name": "cover3",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalA",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover4",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalB",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5a",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5b",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5c",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover6",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover7",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover8",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover9",
+                "declaredType": ""
+              },
+              {
+                "name": "Collected",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "HeightB",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Unmapped",
+                "declaredType": ""
+              }
+            ],
+            "rows": [
+              {
+                "rowId": "-7",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "TEST",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "ff00"
+                  }
+                ]
+              },
+              {
+                "rowId": "3",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "PEER",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "V",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "00ff"
+                  }
+                ]
+              },
+              {
+                "rowId": "8",
+                "cells": [
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "NULLID",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              }
+            ]
+          },
+          "sourceRowIds": [
+            "-7",
+            "3",
+            "8"
+          ]
+        },
+        "edits": [
+          {
+            "contextId": "ab8c4cb31c037f2fe88df716f509a8b0",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Cover1",
+            "expected": {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          },
+          {
+            "contextId": "ab8c4cb31c037f2fe88df716f509a8b0",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Cover2",
+            "expected": {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          },
+          {
+            "contextId": "ab8c4cb31c037f2fe88df716f509a8b0",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Collected",
+            "expected": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "text",
+              "text": "C",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      "Committed": {
+        "columns": [
+          {
+            "name": "ID",
+            "declaredType": ""
+          },
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Species",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Cover1",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover2",
+            "declaredType": ""
+          },
+          {
+            "name": "cover3",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalA",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover4",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalB",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5a",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5b",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5c",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover6",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover7",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover8",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover9",
+            "declaredType": ""
+          },
+          {
+            "name": "Collected",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "HeightB",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": ""
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "-7",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "TEST",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 5,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "C",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "ff00"
+              }
+            ]
+          },
+          {
+            "rowId": "3",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "PEER",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "V",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          },
+          {
+            "rowId": "8",
+            "cells": [
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "NULLID",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        ]
+      },
+      "Actor": "vegetation-review",
+      "AuditStrength": 1,
+      "EditWhen": "2026-10-08 20:55:06",
+      "Audits": [
+        {
+          "rowId": "390",
+          "project": "Sample",
+          "user": "vegetation-review",
+          "plotNumber": "108050",
+          "table": "_Veg",
+          "editField": "Cover1",
+          "editWhen": "2026-10-08 20:55:06",
+          "beforeEdit": "0",
+          "afterEdit": "5",
+          "restore": false,
+          "flag": false,
+          "id": 42
+        }
+      ]
+    },
+    "didCommit": true,
+    "replayed": false
+  },
+  {
+    "history": {
+      "Request": {
+        "requestId": "b0cbfa00-1234-4123-8123-000000000001",
+        "original": {
+          "contextId": "7228f7159c5f080c05a706a1dec4d95c",
+          "project": "Sample",
+          "plot": "108050",
+          "form": "SubVegAXL",
+          "recordSource": "USysVegA",
+          "table": "Sample_Veg",
+          "records": {
+            "columns": [
+              {
+                "name": "ID",
+                "declaredType": ""
+              },
+              {
+                "name": "PlotNumber",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Species",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Cover1",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover2",
+                "declaredType": ""
+              },
+              {
+                "name": "cover3",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalA",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover4",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalB",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5a",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5b",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5c",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover6",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover7",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover8",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover9",
+                "declaredType": ""
+              },
+              {
+                "name": "Collected",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "HeightB",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Unmapped",
+                "declaredType": ""
+              }
+            ],
+            "rows": [
+              {
+                "rowId": "-7",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "TEST",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "ff00"
+                  }
+                ]
+              },
+              {
+                "rowId": "3",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "PEER",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "V",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "00ff"
+                  }
+                ]
+              },
+              {
+                "rowId": "8",
+                "cells": [
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "NULLID",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              }
+            ]
+          },
+          "sourceRowIds": [
+            "-7",
+            "3",
+            "8"
+          ]
+        },
+        "edits": [
+          {
+            "contextId": "7228f7159c5f080c05a706a1dec4d95c",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Cover1",
+            "expected": {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          },
+          {
+            "contextId": "7228f7159c5f080c05a706a1dec4d95c",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Cover2",
+            "expected": {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          },
+          {
+            "contextId": "7228f7159c5f080c05a706a1dec4d95c",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Collected",
+            "expected": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "text",
+              "text": "C",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      "Committed": {
+        "columns": [
+          {
+            "name": "ID",
+            "declaredType": ""
+          },
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Species",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Cover1",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover2",
+            "declaredType": ""
+          },
+          {
+            "name": "cover3",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalA",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover4",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalB",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5a",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5b",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5c",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover6",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover7",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover8",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover9",
+            "declaredType": ""
+          },
+          {
+            "name": "Collected",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "HeightB",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": ""
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "-7",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "TEST",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 5,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "C",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "ff00"
+              }
+            ]
+          },
+          {
+            "rowId": "3",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "PEER",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "V",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          },
+          {
+            "rowId": "8",
+            "cells": [
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "NULLID",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        ]
+      },
+      "Actor": "vegetation-review",
+      "AuditStrength": 2,
+      "EditWhen": "2026-10-08 20:55:07",
+      "Audits": [
+        {
+          "rowId": "390",
+          "project": "Sample",
+          "user": "vegetation-review",
+          "plotNumber": "108050",
+          "table": "_Veg",
+          "editField": "Cover1",
+          "editWhen": "2026-10-08 20:55:07",
+          "beforeEdit": "0",
+          "afterEdit": "5",
+          "restore": false,
+          "flag": false,
+          "id": 42
+        },
+        {
+          "rowId": "391",
+          "project": "Sample",
+          "user": "vegetation-review",
+          "plotNumber": "108050",
+          "table": "_Veg",
+          "editField": "Collected",
+          "editWhen": "2026-10-08 20:55:07",
+          "beforeEdit": null,
+          "afterEdit": "C",
+          "restore": false,
+          "flag": false,
+          "id": 42
+        }
+      ]
+    },
+    "didCommit": true,
+    "replayed": false
+  },
+  {
+    "history": {
+      "Request": {
+        "requestId": "b0cbfa00-1234-4123-8123-000000000001",
+        "original": {
+          "contextId": "1ff9fa2e5d7cf067362e781baef61893",
+          "project": "Sample",
+          "plot": "108050",
+          "form": "SubVegAXL",
+          "recordSource": "USysVegA",
+          "table": "Sample_Veg",
+          "records": {
+            "columns": [
+              {
+                "name": "ID",
+                "declaredType": ""
+              },
+              {
+                "name": "PlotNumber",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Species",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Cover1",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover2",
+                "declaredType": ""
+              },
+              {
+                "name": "cover3",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalA",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover4",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalB",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5a",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5b",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5c",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover6",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover7",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover8",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover9",
+                "declaredType": ""
+              },
+              {
+                "name": "Collected",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "HeightB",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Unmapped",
+                "declaredType": ""
+              }
+            ],
+            "rows": [
+              {
+                "rowId": "-7",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "TEST",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "ff00"
+                  }
+                ]
+              },
+              {
+                "rowId": "3",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "PEER",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "V",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "00ff"
+                  }
+                ]
+              },
+              {
+                "rowId": "8",
+                "cells": [
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "NULLID",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              }
+            ]
+          },
+          "sourceRowIds": [
+            "-7",
+            "3",
+            "8"
+          ]
+        },
+        "edits": [
+          {
+            "contextId": "1ff9fa2e5d7cf067362e781baef61893",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Cover1",
+            "expected": {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          },
+          {
+            "contextId": "1ff9fa2e5d7cf067362e781baef61893",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Cover2",
+            "expected": {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          },
+          {
+            "contextId": "1ff9fa2e5d7cf067362e781baef61893",
+            "form": "SubVegAXL",
+            "rowId": "-7",
+            "column": "Collected",
+            "expected": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "text",
+              "text": "C",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      "Committed": {
+        "columns": [
+          {
+            "name": "ID",
+            "declaredType": ""
+          },
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Species",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Cover1",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover2",
+            "declaredType": ""
+          },
+          {
+            "name": "cover3",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalA",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover4",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalB",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5a",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5b",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5c",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover6",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover7",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover8",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover9",
+            "declaredType": ""
+          },
+          {
+            "name": "Collected",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "HeightB",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": ""
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "-7",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "TEST",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 5,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "C",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "ff00"
+              }
+            ]
+          },
+          {
+            "rowId": "3",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "PEER",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "V",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          },
+          {
+            "rowId": "8",
+            "cells": [
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "NULLID",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        ]
+      },
+      "Actor": "vegetation-review",
+      "AuditStrength": 3,
+      "EditWhen": "2026-10-08 20:55:07",
+      "Audits": [
+        {
+          "rowId": "390",
+          "project": "Sample",
+          "user": "vegetation-review",
+          "plotNumber": "108050",
+          "table": "_Veg",
+          "editField": "Cover1",
+          "editWhen": "2026-10-08 20:55:07",
+          "beforeEdit": "0",
+          "afterEdit": "5",
+          "restore": false,
+          "flag": false,
+          "id": 42
+        },
+        {
+          "rowId": "391",
+          "project": "Sample",
+          "user": "vegetation-review",
+          "plotNumber": "108050",
+          "table": "_Veg",
+          "editField": "Cover2",
+          "editWhen": "2026-10-08 20:55:07",
+          "beforeEdit": "0",
+          "afterEdit": null,
+          "restore": false,
+          "flag": false,
+          "id": 42
+        },
+        {
+          "rowId": "392",
+          "project": "Sample",
+          "user": "vegetation-review",
+          "plotNumber": "108050",
+          "table": "_Veg",
+          "editField": "Collected",
+          "editWhen": "2026-10-08 20:55:07",
+          "beforeEdit": null,
+          "afterEdit": "C",
+          "restore": false,
+          "flag": false,
+          "id": 42
+        }
+      ]
+    },
+    "didCommit": true,
+    "replayed": false
+  },
+  {
+    "history": {
+      "Request": {
+        "requestId": "b0cbfa00-1234-4123-8123-000000000001",
+        "original": {
+          "contextId": "4e1d80d2ec659a233ca0ce012bbdaa24",
+          "project": "Sample",
+          "plot": "108050",
+          "form": "SubVegCXL",
+          "recordSource": "USysVegC",
+          "table": "Sample_Veg",
+          "records": {
+            "columns": [
+              {
+                "name": "ID",
+                "declaredType": ""
+              },
+              {
+                "name": "PlotNumber",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Species",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Cover1",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover2",
+                "declaredType": ""
+              },
+              {
+                "name": "cover3",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalA",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover4",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5",
+                "declaredType": ""
+              },
+              {
+                "name": "TotalB",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5a",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5b",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover5c",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover6",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover7",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover8",
+                "declaredType": ""
+              },
+              {
+                "name": "Cover9",
+                "declaredType": ""
+              },
+              {
+                "name": "Collected",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "HeightB",
+                "declaredType": "TEXT"
+              },
+              {
+                "name": "Unmapped",
+                "declaredType": ""
+              }
+            ],
+            "rows": [
+              {
+                "rowId": "-7",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "TEST",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "ff00"
+                  }
+                ]
+              },
+              {
+                "rowId": "3",
+                "cells": [
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "42",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "PEER",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "V",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "blob",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": "00ff"
+                  }
+                ]
+              },
+              {
+                "rowId": "8",
+                "cells": [
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "108050",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "NULLID",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "integer",
+                    "text": null,
+                    "integer": "0",
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              }
+            ]
+          },
+          "sourceRowIds": [
+            "-7",
+            "3",
+            "8"
+          ]
+        },
+        "edits": [
+          {
+            "contextId": "4e1d80d2ec659a233ca0ce012bbdaa24",
+            "form": "SubVegCXL",
+            "rowId": "-7",
+            "column": "Cover6",
+            "expected": {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          },
+          {
+            "contextId": "4e1d80d2ec659a233ca0ce012bbdaa24",
+            "form": "SubVegCXL",
+            "rowId": "-7",
+            "column": "Collected",
+            "expected": {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "value": {
+              "storage": "text",
+              "text": "C",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      "Committed": {
+        "columns": [
+          {
+            "name": "ID",
+            "declaredType": ""
+          },
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Species",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Cover1",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover2",
+            "declaredType": ""
+          },
+          {
+            "name": "cover3",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalA",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover4",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5",
+            "declaredType": ""
+          },
+          {
+            "name": "TotalB",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5a",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5b",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover5c",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover6",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover7",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover8",
+            "declaredType": ""
+          },
+          {
+            "name": "Cover9",
+            "declaredType": ""
+          },
+          {
+            "name": "Collected",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "HeightB",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": ""
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "-7",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "TEST",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "C",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "ff00"
+              }
+            ]
+          },
+          {
+            "rowId": "3",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "42",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "PEER",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "V",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          },
+          {
+            "rowId": "8",
+            "cells": [
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "NULLID",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        ]
+      },
+      "Actor": "vegetation-review",
+      "AuditStrength": 3,
+      "EditWhen": "2026-10-08 20:55:07",
+      "Audits": [
+        {
+          "rowId": "390",
+          "project": "Sample",
+          "user": "vegetation-review",
+          "plotNumber": "108050",
+          "table": "_Veg",
+          "editField": "Cover6",
+          "editWhen": "2026-10-08 20:55:07",
+          "beforeEdit": "0",
+          "afterEdit": null,
+          "restore": false,
+          "flag": false,
+          "id": 42
+        },
+        {
+          "rowId": "391",
+          "project": "Sample",
+          "user": "vegetation-review",
+          "plotNumber": "108050",
+          "table": "_Veg",
+          "editField": "Collected",
+          "editWhen": "2026-10-08 20:55:07",
+          "beforeEdit": null,
+          "afterEdit": "C",
+          "restore": false,
+          "flag": false,
+          "id": 42
+        }
+      ]
+    },
+    "didCommit": true,
+    "replayed": false
+  }
+]

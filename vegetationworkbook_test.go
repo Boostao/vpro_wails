@@ -160,11 +160,19 @@ func TestLongVegetationWorkbookOptionalColumnsAndOriginalUnitNaming(t *testing.T
 		for _, mode := range []string{"none", "english", "code"} {
 			preview := vegetationWorkbookFixture(t)
 			preview.Settings.Grouping = grouping
+			if grouping == "lifeform" {
+				for unit := range preview.Report.Units {
+					for row := range preview.Report.Units[unit].Rows {
+						preview.Report.Units[unit].Rows[row].Layer = metadataInteger("2")
+					}
+				}
+			}
 			preview.Settings.ShowEnglishName, preview.Settings.ShowSpeciesCode = mode == "english", mode == "code"
 			result, err := prepareLongVegetationWorkbook(context.Background(), preview, vegetationWorkbookLayout{QuickReport: true})
 			if err != nil {
 				t.Fatal(grouping, mode, err)
 			}
+
 			book, err := excelize.OpenReader(bytes.NewReader(result.Bytes))
 			if err != nil {
 				t.Fatal(err)

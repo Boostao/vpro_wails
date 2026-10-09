@@ -1,0 +1,42 @@
+{
+  "owner": {"contextId": "owned", "project": "Sample", "plotNumber": "00337"},
+  "deletion": {
+    "request": {
+      "requestId": "16fe3d56-d75d-4a74-9507-000000000001",
+      "contextId": "owned",
+      "project": "Sample",
+      "plotNumber": "00337",
+      "columns": [
+        {"name": "ID", "declaredType": ""},
+        {"name": "PicDir", "declaredType": ""},
+        {"name": "PicName", "declaredType": ""},
+        {"name": "PlotNumber", "declaredType": ""},
+        {"name": "PicComment", "declaredType": ""}
+      ],
+      "original": {
+        "rowId": "-7",
+        "cells": [
+          {"storage": "integer", "text": null, "integer": "-1", "real": null, "blobHex": null},
+          {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+          {"storage": "text", "text": "", "integer": null, "real": null, "blobHex": null},
+          {"storage": "text", "text": "00337", "integer": null, "real": null, "blobHex": null},
+          {"storage": "blob", "text": null, "integer": null, "real": null, "blobHex": "ff00"}
+        ]
+      }
+    },
+    "id": -1,
+    "requestedSource": "Q:\\Pictures.sqlite",
+    "source": "Q:\\Pictures.sqlite",
+    "ownedFiles": {"environment": "Q:\\Env.sqlite", "pictures": "Q:\\Pictures.sqlite"},
+    "actor": "original actor",
+    "auditStrength": 3,
+    "deletedWhen": "2026-10-08T12:00:00.123456789Z",
+    "historyId": "1",
+    "didCommit": true,
+    "replayed": false
+  },
+  "restorationRequestId": "16fe3d56-d75d-4a74-9507-000000000002",
+  "restoringActor": "later actor",
+  "restoringAuditStrength": 0,
+  "restoredWhen": "2026-10-08T12:10:00.123456789Z"
+}

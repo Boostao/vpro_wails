@@ -1,0 +1,20 @@
+{
+  "review": {
+    "contextId": "title-wire",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "values": { "title": "Long Vegetation Report" }
+  },
+  "request": {
+    "expected": { "title": "Long Vegetation Report" },
+    "proposed": { "title": " Literal <&\ud83c\udf32\r\n title " }
+  },
+  "outcome": {
+    "contextId": "title-wire",
+    "changed": true,
+    "committed": true,
+    "errorMessage": ""
+  }
+}

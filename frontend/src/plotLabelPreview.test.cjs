@@ -162,6 +162,6 @@ test('saved-label server render and navigation remain independently default-off/
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   assert.match(nav, /VITE_PLOT_LABEL_PREVIEW === 'true' \? 'plot-label-preview' : undefined/);
   assert.match(app, /view === 'plot-label-preview' && import\.meta\.env\.VITE_PLOT_LABEL_PREVIEW === 'true'/);
-  assert.match(app, /<PlotLabelPreview[^>]*onBusyChange=\{\(value\) => \{ editorBusy = value; \}\}/s);
+  assert.match(app, /<PlotLabelPreview[^>]*onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/s);
   assert.match(source, /onDestroy\(cancel\)/);
 });

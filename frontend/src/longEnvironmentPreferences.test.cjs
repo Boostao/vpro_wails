@@ -11,7 +11,8 @@ const locations = loadTypeScript('plotLocationReview.ts', { './projectMetadataRe
 const earth = loadTypeScript('googleEarthReview.ts', {
   './projectMetadataRestore': cells, './qualityEditor': quality, './plotLocationReview': locations,
 });
-const prefs = loadTypeScript('longEnvironmentPreferences.ts', { './qualityEditor': quality, './googleEarthReview': earth });
+const titlePreferences = loadTypeScript('reportTitlePreferences.ts', { './qualityEditor': quality, './googleEarthReview': earth });
+const prefs = loadTypeScript('longEnvironmentPreferences.ts', { './reportTitlePreferences': titlePreferences });
 const scope = { contextId: 'owned-title', project: 'Sample', projectPath: 'C:\\fixture\\Sample.db', su: 'None', suPath: '' };
 const review = (title = 'Long Evironment Report', owner = scope) => ({ ...owner, values: { title } });
 const outcome = (committed = true, errorMessage = '', owner = scope) => ({ contextId: owner.contextId, changed: committed, committed, errorMessage });
