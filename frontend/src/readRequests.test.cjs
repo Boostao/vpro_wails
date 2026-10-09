@@ -1,0 +1,210 @@
+const assert = require('node:assert/strict');
+const { readFileSync } = require('node:fs');
+const path = require('node:path');
+const { test } = require('node:test');
+const { pathToFileURL } = require('node:url');
+const vm = require('node:vm');
+const ts = require('typescript');
+const compiled = ts.transpileModule(readFileSync(path.join(__dirname, 'readRequests.ts'), 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+}).outputText;
+function load(sdk, RuntimeError) {
+  const output = {};
+  vm.runInNewContext(compiled, { exports: output, require: () => ({ ...sdk, Call: { RuntimeError } }) });
+  return output;
+}
+const runtime = () => import(pathToFileURL(path.join(__dirname, '..', 'node_modules',
+  '@wailsio', 'runtime', 'dist', 'cancellable.js')).href);
+
+test('read ownership cancels actual Wails promises once and permits a fresh generation', async () => {
+  const { CancellablePromise, CancelError } = await runtime();
+  const output = load(await runtime());
+  const requests = new output.ReadRequests();
+  let cancelled = 0;
+  const first = new CancellablePromise(() => {}, () => { cancelled++; });
+  const second = new CancellablePromise(() => {}, () => { cancelled++; });
+  const a = requests.track(first);
+  const b = requests.track(second);
+  const outcomes = Promise.allSettled([a, b]);
+  await Promise.resolve();
+  requests.cancelAll();
+  requests.cancelAll();
+  for (const outcome of await outcomes) {
+    assert.equal(outcome.status, 'rejected');
+    assert.ok(outcome.reason instanceof CancelError);
+  }
+  assert.equal(cancelled, 2);
+  assert.equal(await requests.track(CancellablePromise.resolve('fresh')), 'fresh');
+});
+
+test('settled reads leave the ownership set and operational failures are not swallowed', async () => {
+  const { CancellablePromise } = await runtime();
+  const output = load(await runtime());
+  const requests = new output.ReadRequests();
+  const completed = CancellablePromise.resolve('done');
+  let cancelled = 0;
+  completed.cancel = () => { cancelled++; };
+  assert.equal(await requests.track(completed), 'done');
+  await assert.rejects(requests.track(CancellablePromise.reject(new Error('read failure'))), /read failure/);
+  requests.cancelAll();
+  assert.equal(cancelled, 0);
+  const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  assert.match(form, /loadRequest\+\+;[\s\S]*?reads\.cancelAll\(\)/);
+  assert.match(form, /const request = \+\+loadRequest;\s+reads\.cancelAll\(\)/);
+  for (const name of ['GetPlot', 'GetHeaderCapabilities', 'GetChildCapabilities', 'ListVegRecords',
+    'ListHumusRecords', 'ListMineralRecords', 'ListOtherRecords', 'ListAuditEntries']) {
+    assert.match(form, new RegExp(`reads\\.track\\(PlotService\\.${name}\\(`));
+  }
+  assert.doesNotMatch(form, /reads\.track\(PlotService\.(?:Update|Save|Create|Delete|Restore|Set)/);
+});
+
+test('only owned cancelled read acknowledgements are handled, including after editor disposal', async () => {
+  const sdk = await runtime();
+  const { RuntimeError } = await import(pathToFileURL(path.join(__dirname, '..', 'node_modules',
+    '@wailsio', 'runtime', 'dist', 'runtime.js')).href);
+  const output = load(sdk, RuntimeError);
+  const requests = new output.ReadRequests();
+  const owned = new sdk.CancellablePromise(() => {});
+  const outcome = requests.track(owned).catch(() => {});
+  requests.cancelAll();
+  await outcome;
+  const error = cause => new sdk.CancelledRejectionError(owned, cause);
+  assert.equal(output.expectedReadCancellation(error(new RuntimeError('context canceled'))), true);
+  assert.equal(output.expectedReadCancellation(error(new RuntimeError('database corrupt'))), false);
+  assert.equal(output.expectedReadCancellation(error(new Error('context canceled'))), false);
+  assert.equal(output.expectedReadCancellation(new RuntimeError('context canceled')), false);
+  const unowned = new sdk.CancellablePromise(() => {});
+  assert.equal(output.expectedReadCancellation(new sdk.CancelledRejectionError(unowned,
+    new RuntimeError('context canceled'))), false);
+});
+
+test('browse, hierarchy, reference and species consumers own only their read generations', () => {
+  const root = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
+  const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  assert.match(root, /plotReads\.track\(ProjectService\.ListPlots/);
+  assert.match(root, /hierarchyReads\.track\(ProjectService\.GetHierarchyNodes/);
+  assert.match(root, /if \(current === hierarchyRequest\) hierarchyNodes/);
+  assert.match(root, /request\+\+;\s+hierarchyRequest\+\+;\s+stateRequest\+\+;\s+plotReads\.cancelAll\(\);\s+hierarchyReads\.cancelAll\(\);\s+stateReads\.cancelAll\(\)/);
+  assert.match(form, /referenceReads\.track\(ReferenceService\.GetListItems/);
+  assert.match(form, /speciesReads\.track\(ReferenceService\.SearchSpecies/);
+  assert.match(form, /if \(request !== speciesRequest\) return/);
+  assert.match(form, /if \(request === speciesRequest\) searchingSpecies = false/);
+  assert.doesNotMatch(root, /Reads\.track\(ContextService\.SwitchContext/);
+});
+
+test('catalogue lookup cancels superseded reloads and disposal without publishing stale errors', async () => {
+  const sdk = await runtime();
+  const { loadTypeScript } = require('./svelteTestHelpers.cjs');
+  const reads = load(sdk);
+  const bec = loadTypeScript('becEditor.ts');
+  const quality = loadTypeScript('qualityEditor.ts', { './becEditor': bec });
+  const { CatalogueLookup } = loadTypeScript('catalogueLookup.ts',
+    { './qualityEditor': quality, './readRequests': reads });
+  const pending = [];
+  let cancelled = 0;
+  const states = [];
+  const lookup = new CatalogueLookup(async (force, requests) => {
+    const read = sdk.CancellablePromise.withResolvers();
+    read.oncancelled = () => { cancelled++; };
+    pending.push({ ...read, force });
+    return requests.track(read.promise);
+  }, view => states.push(view), 'Catalogue');
+  const old = lookup.refresh(true);
+  const current = lookup.refresh();
+  pending[1].resolve([]);
+  await current; await old;
+  assert.equal(cancelled, 1);
+  assert.equal(pending[0].force, true);
+  assert.equal(lookup.snapshot().ready, true);
+  assert.equal(lookup.snapshot().error, null);
+  const disposed = lookup.refresh(true);
+  const count = states.length;
+  lookup.dispose();
+  await disposed;
+  assert.equal(cancelled, 2);
+  assert.equal(states.length, count);
+});
+
+test('BEC cancellation replaces pending zones but retains successfully cached zones', async () => {
+  const sdk = await runtime();
+  const { loadTypeScript } = require('./svelteTestHelpers.cjs');
+  const { ReadRequests } = load(sdk);
+  const { BECLookup } = loadTypeScript('becEditor.ts');
+  const reads = new ReadRequests();
+  const pending = [];
+  let cancellations = 0;
+  const fetch = () => {
+    const request = sdk.CancellablePromise.withResolvers();
+    request.oncancelled = () => cancellations++;
+    pending.push(request);
+    return reads.track(request.promise);
+  };
+  const states = [];
+  const lookup = new BECLookup({ zones: fetch, subZones: fetch, siteSeries: fetch },
+    state => states.push(state), () => reads.cancelAll());
+  const first = lookup.refresh('BG', 'xh1');
+  const second = lookup.refresh('CMA', 'wh');
+  assert.equal(pending.length, 6);
+  for (const request of pending.slice(3)) request.resolve([]);
+  await Promise.all([first, second]);
+  assert.equal(cancellations, 3);
+  assert.equal(lookup.snapshot().ready, true);
+  const third = lookup.refresh('BG', 'xh1');
+  assert.equal(pending.length, 8, 'successful zones remain cached after late cancelled rejection');
+  const count = states.length;
+  lookup.dispose();
+  await third;
+  assert.equal(cancellations, 5);
+  assert.equal(states.length, count);
+});
+
+test('Working Unit disposal cancels choice reads, never preference initialization or commits', async () => {
+  const sdk = await runtime();
+  const { loadTypeScript } = require('./svelteTestHelpers.cjs');
+  const { ReadRequests } = load(sdk);
+  const bec = loadTypeScript('becEditor.ts');
+  const { WorkingUnitLookup } = loadTypeScript('workingUnitEditor.ts', { './becEditor': bec });
+  const reads = new ReadRequests();
+  let preferenceCancellations = 0;
+  let readCancellations = 0;
+  const preference = () => {
+    const request = sdk.CancellablePromise.withResolvers();
+    request.oncancelled = () => preferenceCancellations++;
+    return request;
+  };
+  const initial = preference(), commit = preference();
+  let readCount = 0, markStarted;
+  const started = new Promise(resolve => { markStarted = resolve; });
+  const choices = () => {
+    const request = sdk.CancellablePromise.withResolvers();
+    request.oncancelled = () => readCancellations++;
+    if (++readCount === 2) markStarted();
+    return reads.track(request.promise);
+  };
+  const states = [];
+  const api = { getMode: () => initial.promise, setMode: () => commit.promise, choices, master: choices };
+  const lookup = new WorkingUnitLookup(api, state => states.push(state), { mode: null }, () => reads.cancelAll());
+  const loading = lookup.refresh();
+  initial.resolve({ mode: 'master', warning: null });
+  await started;
+  lookup.dispose();
+  await loading;
+  assert.equal(readCancellations, 2);
+  const writing = new WorkingUnitLookup(api, state => states.push(state), { mode: null }, () => reads.cancelAll());
+  const save = writing.refresh('env');
+  const count = states.length;
+  writing.dispose();
+  commit.resolve({ mode: 'env', warning: null });
+  await save;
+  assert.equal(preferenceCancellations, 0);
+  assert.equal(states.length, count);
+});
+
+test('state generations cancel discovery and guard publication without tracking context commits', () => {
+  const source = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
+  assert.match(source, /const stateReads = new ReadRequests\(\)/);
+  assert.match(source, /stateReads\.track\(ProjectService\.GetState\(\)\)/);
+  assert.match(source, /if \(current !== stateRequest\) return;\s*projectState\.set\(state\)/);
+  assert.match(source, /stateRequest\+\+;[\s\S]*stateReads\.cancelAll\(\)/);
+  assert.doesNotMatch(source, /stateReads\.track\(ContextService\.SwitchContext/);
+});

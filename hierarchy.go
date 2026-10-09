@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -15,6 +16,7 @@ type HierarchyInfo struct {
 	File       string `json:"file"`
 	Version    string `json:"version"`
 	Compatible bool   `json:"compatible"`
+	Path       string `json:"path,omitempty"`
 }
 
 type HierarchyNode struct {
@@ -24,7 +26,7 @@ type HierarchyNode struct {
 	Level  *int64  `json:"level"`
 }
 
-func hierarchyCompatible(database *sql.DB, table string) (bool, error) {
+func hierarchyCompatible(database headerDB, table string) (bool, error) {
 	rows, err := database.Query(`PRAGMA table_info("` + table + `")`)
 	if err != nil {
 		return false, err
@@ -51,34 +53,54 @@ func hierarchyCompatible(database *sql.DB, table string) (bool, error) {
 }
 
 func discoverHierarchies(projectsDir string) ([]HierarchyInfo, error) {
+	return discoverHierarchiesContext(context.Background(), projectsDir)
+}
+
+func discoverHierarchiesContext(ctx context.Context, projectsDir string) ([]HierarchyInfo, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	files, err := os.ReadDir(projectsDir)
 	if err != nil {
 		return nil, err
 	}
 	hierarchies := []HierarchyInfo{}
 	for _, file := range files {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		if !file.Type().IsRegular() || !strings.EqualFold(filepath.Ext(file.Name()), ".db") {
 			continue
 		}
-		database, err := openReadOnly(filepath.Join(projectsDir, file.Name()))
+		database, err := openReadOnlyContext(ctx, filepath.Join(projectsDir, file.Name()))
 		if err != nil {
+			if ctx.Err() != nil && errors.Is(err, ctx.Err()) {
+				return nil, ctx.Err()
+			}
 			if file.Name() == "Sample.db" {
-				return nil, fmt.Errorf("inspect %s: %w", file.Name(), err)
+				return nil, labelledReadError("inspect "+file.Name(), err)
 			}
 			continue
 		}
 		var schemaVersion int
-		if err := database.QueryRow("PRAGMA schema_version").Scan(&schemaVersion); err != nil {
+		reader := contextPlotDB{db: database, ctx: ctx}
+		if err := reader.QueryRow("PRAGMA schema_version").Scan(&schemaVersion); err != nil {
 			database.Close()
+			if ctx.Err() != nil && errors.Is(err, ctx.Err()) {
+				return nil, ctx.Err()
+			}
 			if file.Name() == "Sample.db" {
-				return nil, fmt.Errorf("inspect %s: %w", file.Name(), err)
+				return nil, labelledReadError("inspect "+file.Name(), err)
 			}
 			continue
 		}
-		found, err := inspectHierarchies(database, file.Name())
+		found, err := inspectHierarchies(reader, file.Name())
 		database.Close()
 		if err != nil {
-			return nil, fmt.Errorf("inspect %s: %w", file.Name(), err)
+			if ctx.Err() != nil && errors.Is(err, ctx.Err()) {
+				return nil, ctx.Err()
+			}
+			return nil, labelledReadError("inspect "+file.Name(), err)
 		}
 		hierarchies = append(hierarchies, found...)
 	}
@@ -88,10 +110,13 @@ func discoverHierarchies(projectsDir string) ([]HierarchyInfo, error) {
 		}
 		return strings.Compare(left.File, right.File)
 	})
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	return hierarchies, nil
 }
 
-func inspectHierarchies(database *sql.DB, file string) ([]HierarchyInfo, error) {
+func inspectHierarchies(database headerDB, file string) ([]HierarchyInfo, error) {
 	rows, err := database.Query("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE '%_Hierarchy'")
 	if err != nil {
 		return nil, err
@@ -140,30 +165,34 @@ func inspectHierarchies(database *sql.DB, file string) ([]HierarchyInfo, error) 
 }
 
 func listHierarchyNodes(path, name string) ([]HierarchyNode, error) {
+	return listHierarchyNodesContext(context.Background(), path, name)
+}
+
+func listHierarchyNodesContext(ctx context.Context, path, name string) ([]HierarchyNode, error) {
 	if !projectNamePattern.MatchString(name) {
 		return nil, fmt.Errorf("invalid hierarchy name %q", name)
 	}
-	database, err := openReadOnly(path)
+	database, err := openReadOnlyContext(ctx, path)
 	if err != nil {
 		return nil, err
 	}
 	defer database.Close()
 	table := name + "_Hierarchy"
 	var exists bool
-	if err := database.QueryRow("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?)", table).Scan(&exists); err != nil {
+	if err := database.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?)", table).Scan(&exists); err != nil {
 		return nil, err
 	}
 	if !exists {
 		return nil, fmt.Errorf("hierarchy table %q does not exist", table)
 	}
-	compatible, err := hierarchyCompatible(database, table)
+	compatible, err := hierarchyCompatible(contextPlotDB{db: database, ctx: ctx}, table)
 	if err != nil {
 		return nil, err
 	}
 	if !compatible {
 		return nil, fmt.Errorf("hierarchy table %q has incompatible fields", table)
 	}
-	rows, err := database.Query(`SELECT ID, Name, Parent, Level FROM "` + table + `" ORDER BY ID`)
+	rows, err := database.QueryContext(ctx, `SELECT ID, Name, Parent, Level FROM "`+table+`" ORDER BY ID`)
 	if err != nil {
 		return nil, err
 	}

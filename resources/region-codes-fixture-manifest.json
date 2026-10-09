@@ -1,0 +1,14 @@
+{
+  "path": "C:\\Users\\BrunoTremblay\\Work\\vpro_wails.worktrees\\access-parity-windows-handoff\\evidence\\private\\region-ecosection-native\\region-ecosection.reference.json",
+  "sha256": "73661609828f78625b083327a750e10819dc05a1a20e78e8c9c91b177ae739ee",
+  "nativeRows": 164,
+  "nativeCells": 1640,
+  "canonicalSourceSHA256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "sourceReadonly": true,
+  "listCounts": {
+    "Region": 27,
+    "Ecosection": 137
+  },
+  "actualListNameCasePreserved": true,
+  "ecosectionOrder": "observed native unsorted query order"
+}

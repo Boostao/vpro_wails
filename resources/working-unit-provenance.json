@@ -1,0 +1,291 @@
+{
+  "version": 1,
+  "exporter": "native-access-dao-working-unit-v1",
+  "snapshotSha256": "f5f7ad951e46e0c4c031067199781a72037917715a8bbd9bd0f199c6c3eba0f3",
+  "databaseSha256": "94475866a0732284d4b4cdbc8e1dd977777b2b312cf35b6b9594d6496a5f7de3",
+  "masterSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "userSha256": "dab83cabc8436e31bcb25d78fc0d766bb6f00683279a0959d2c988974b03bfb0",
+  "masterRows": 3504,
+  "userRows": 4,
+  "masterDuplicates": 34,
+  "userDuplicates": 1,
+  "typedCellsSha256": "b50c467ba2ebb8b3bff153f55371bd2dca0a5fd6b0e9be29f10c3031a485b432",
+  "sourceCopies": [
+    {
+      "Path": "C:\\Users\\BrunoTremblay\\Work\\VPRO_ACCESS\\VPro64\\VLists.accda",
+      "Hash": "2A5AD098CF4665991ACFBBCA5F011C9488AFCBB8272140AD262FE4F7B58F084D"
+    },
+    {
+      "Path": "C:\\Users\\BrunoTremblay\\Work\\VPRO_ACCESS\\VPro64\\VMessageBoard.accda",
+      "Hash": "8C1C4BABC458367808C7342AD559A12CEB9E87A1C3AFA49AE676546424268C00"
+    },
+    {
+      "Path": "C:\\Users\\BrunoTremblay\\Work\\VPRO_ACCESS\\VPro64\\VMetaData.accda",
+      "Hash": "CFFCA7C365561923A68384F88B487AED501A9995AD630FF4E16F64DC5F25B6DB"
+    },
+    {
+      "Path": "C:\\Users\\BrunoTremblay\\Work\\VPRO_ACCESS\\VPro64\\VPro64.accdb",
+      "Hash": "01481B94569C7172F32A812E65365F78CEA5E440DD63220D91A37DADE5778423"
+    },
+    {
+      "Path": "C:\\Users\\BrunoTremblay\\Work\\VPRO_ACCESS\\VPro64\\VUser.accda",
+      "Hash": "DAB83CABC8436E31BCB25D78FC0D766BB6F00683279A0959D2C988974B03BFB0"
+    }
+  ],
+  "sourceSchema": {
+    "MasterSiteUnitList": [
+      {
+        "kind": "schema-table",
+        "table": "MasterSiteUnitList",
+        "name": "",
+        "connect": "",
+        "sourceTable": "",
+        "type": 0,
+        "size": 0,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "MasterSiteUnitList",
+        "name": "ID",
+        "connect": "",
+        "sourceTable": "",
+        "type": 4,
+        "size": 4,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "GenUniqueID()",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "MasterSiteUnitList",
+        "name": "SiteSeries",
+        "connect": "",
+        "sourceTable": "",
+        "type": 10,
+        "size": 50,
+        "required": false,
+        "allowZeroLength": true,
+        "default": "",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "MasterSiteUnitList",
+        "name": "SiteSeriesLongName",
+        "connect": "",
+        "sourceTable": "",
+        "type": 10,
+        "size": 120,
+        "required": false,
+        "allowZeroLength": true,
+        "default": "",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "MasterSiteUnitList",
+        "name": "SiteSeriesScientificName",
+        "connect": "",
+        "sourceTable": "",
+        "type": 10,
+        "size": 255,
+        "required": false,
+        "allowZeroLength": true,
+        "default": "",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "MasterSiteUnitList",
+        "name": "Level",
+        "connect": "",
+        "sourceTable": "",
+        "type": 3,
+        "size": 2,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "11",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-index",
+        "table": "MasterSiteUnitList",
+        "name": "ID",
+        "connect": "",
+        "sourceTable": "",
+        "type": 0,
+        "size": 0,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "",
+        "unique": true,
+        "primary": false,
+        "fields": [
+          "ID"
+        ]
+      },
+      {
+        "kind": "schema-index",
+        "table": "MasterSiteUnitList",
+        "name": "PrimaryKey",
+        "connect": "",
+        "sourceTable": "",
+        "type": 0,
+        "size": 0,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "",
+        "unique": true,
+        "primary": true,
+        "fields": [
+          "ID"
+        ]
+      }
+    ],
+    "UserSiteUnitList": [
+      {
+        "kind": "schema-table",
+        "table": "UserSiteUnitList",
+        "name": "",
+        "connect": "",
+        "sourceTable": "",
+        "type": 0,
+        "size": 0,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "UserSiteUnitList",
+        "name": "ID",
+        "connect": "",
+        "sourceTable": "",
+        "type": 4,
+        "size": 4,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "GenUniqueID()",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "UserSiteUnitList",
+        "name": "SiteSeries",
+        "connect": "",
+        "sourceTable": "",
+        "type": 10,
+        "size": 50,
+        "required": false,
+        "allowZeroLength": true,
+        "default": "",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "UserSiteUnitList",
+        "name": "SiteSeriesLongName",
+        "connect": "",
+        "sourceTable": "",
+        "type": 10,
+        "size": 120,
+        "required": false,
+        "allowZeroLength": true,
+        "default": "",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "UserSiteUnitList",
+        "name": "SiteSeriesScientificName",
+        "connect": "",
+        "sourceTable": "",
+        "type": 10,
+        "size": 255,
+        "required": false,
+        "allowZeroLength": true,
+        "default": "",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-field",
+        "table": "UserSiteUnitList",
+        "name": "Level",
+        "connect": "",
+        "sourceTable": "",
+        "type": 3,
+        "size": 2,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "11",
+        "unique": false,
+        "primary": false,
+        "fields": null
+      },
+      {
+        "kind": "schema-index",
+        "table": "UserSiteUnitList",
+        "name": "ID",
+        "connect": "",
+        "sourceTable": "",
+        "type": 0,
+        "size": 0,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "",
+        "unique": false,
+        "primary": false,
+        "fields": [
+          "ID"
+        ]
+      },
+      {
+        "kind": "schema-index",
+        "table": "UserSiteUnitList",
+        "name": "PrimaryKey",
+        "connect": "",
+        "sourceTable": "",
+        "type": 0,
+        "size": 0,
+        "required": false,
+        "allowZeroLength": false,
+        "default": "",
+        "unique": true,
+        "primary": true,
+        "fields": [
+          "ID"
+        ]
+      }
+    ]
+  },
+  "identityEncoding": "exact signed32 string, not float; frozen exact sourceOrdinal string retained",
+  "sourceContext": "USysMasterSiteUnitList direct link to owned VLists.MasterSiteUnitList; USysUserSiteUnitList direct link to owned VUser.UserSiteUnitList"
+}

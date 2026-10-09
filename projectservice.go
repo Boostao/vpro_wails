@@ -1,13 +1,13 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"embed"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -30,23 +30,30 @@ type ProjectInfo struct {
 	File       string `json:"file"`
 	Version    string `json:"version"`
 	Compatible bool   `json:"compatible"`
+	Path       string `json:"path,omitempty"`
 }
 
 type ProjectState struct {
-	ActiveProject   string              `json:"activeProject"`
-	ActiveSU        string              `json:"activeSU"`
-	ActiveHierarchy string              `json:"activeHierarchy"`
-	HierarchyFile   string              `json:"hierarchyFile"`
-	Projects        []ProjectInfo       `json:"projects"`
-	SUs             []SUInfo            `json:"sus"`
-	Hierarchies     []HierarchyInfo     `json:"hierarchies"`
-	Diagnostics     []ProjectDiagnostic `json:"diagnostics"`
+	ActiveProject   string                `json:"activeProject"`
+	ActiveSU        string                `json:"activeSU"`
+	ActiveHierarchy string                `json:"activeHierarchy"`
+	HierarchyFile   string                `json:"hierarchyFile"`
+	Projects        []ProjectInfo         `json:"projects"`
+	SUs             []SUInfo              `json:"sus"`
+	Hierarchies     []HierarchyInfo       `json:"hierarchies"`
+	Diagnostics     []ProjectDiagnostic   `json:"diagnostics"`
+	ContextID       string                `json:"contextId,omitempty"`
+	ProjectPath     string                `json:"projectPath,omitempty"`
+	SUPath          string                `json:"suPath,omitempty"`
+	HierarchyPath   string                `json:"hierarchyPath,omitempty"`
+	PlotProfile     PlotProfileSourceInfo `json:"plotProfile"`
 }
 
 type SUInfo struct {
 	Name       string `json:"name"`
 	Kind       string `json:"kind"`
 	Compatible bool   `json:"compatible"`
+	Path       string `json:"path,omitempty"`
 }
 
 type ProjectDiagnostic struct {
@@ -69,6 +76,7 @@ type PlotPage struct {
 }
 
 type ProjectService struct {
+	operationMu     sync.RWMutex
 	mu              sync.RWMutex
 	root            string
 	config          string
@@ -76,6 +84,10 @@ type ProjectService struct {
 	activeSU        string
 	activeHierarchy string
 	hierarchyFile   string
+	preferences     *desktopConfig
+	sqlite          *sqliteContext
+	supportPaths    map[string]string
+	contextID       string
 }
 
 func userDataDir() (string, error) {
@@ -125,6 +137,10 @@ func NewProjectService(root string) (*ProjectService, error) {
 }
 
 func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
+	return newProjectServiceWithPreferences(root, config, nil)
+}
+
+func newProjectServiceWithPreferences(root, config string, preferences *desktopConfig) (*ProjectService, error) {
 	if err := os.MkdirAll(filepath.Join(root, "projects"), 0700); err != nil {
 		return nil, err
 	}
@@ -132,7 +148,33 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 		return nil, err
 	}
 	service := &ProjectService{root: root, config: config, active: "Sample", activeSU: "None", activeHierarchy: "None"}
-	settings, err := os.ReadFile(filepath.Join(config, "desktop-selection.json"))
+	service.preferences = preferences
+	var configured desktopSelection
+	var settings []byte
+	var err error
+	if preferences != nil {
+		configured, err = preferences.selection()
+		if err != nil {
+			return nil, err
+		}
+		service.active, service.activeSU, service.activeHierarchy = configured.Project, configured.SU, configured.Hierarchy
+		if configured.HierarchyPath != "" {
+			path, err := filepath.Abs(configured.HierarchyPath)
+			if err != nil {
+				return nil, err
+			}
+			directory, err := filepath.Abs(filepath.Join(root, "projects"))
+			if err != nil {
+				return nil, err
+			}
+			if !sameDesktopPath(filepath.Dir(path), directory) {
+				return nil, errors.New("configured external hierarchy path requires foundation F2; YAML was retained")
+			}
+			service.hierarchyFile = filepath.Base(path)
+		}
+	} else {
+		settings, err = os.ReadFile(filepath.Join(config, "desktop-selection.json"))
+	}
 	if errors.Is(err, os.ErrNotExist) && config != root {
 		settings, err = os.ReadFile(filepath.Join(root, "desktop-selection.json"))
 	}
@@ -165,6 +207,9 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 		return nil, err
 	}
 	if !hasCompatible(projects, service.active) {
+		if preferences != nil {
+			return nil, fmt.Errorf("configured project %q is unavailable; YAML selection was retained", service.active)
+		}
 		service.active = "Sample"
 		service.activeSU = "None"
 		if len(settings) > 0 {
@@ -179,9 +224,31 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 			return nil, err
 		}
 		if !hasCompatibleSU(sus, service.activeSU) {
+			if preferences != nil {
+				return nil, fmt.Errorf("configured SU %q is unavailable; YAML selection was retained", service.activeSU)
+			}
 			service.activeSU = "None"
 			if err := service.saveSelection(service.active, "None"); err != nil {
 				return nil, err
+			}
+		}
+	}
+	if preferences != nil {
+		selected := compatibleProject(projects, service.active)
+		expected, err := filepath.Abs(filepath.Join(root, "projects", selected.File))
+		if err != nil {
+			return nil, err
+		}
+		for _, path := range []string{configured.ProjectPath, configured.SUPath} {
+			if path == "" {
+				continue
+			}
+			actual, err := filepath.Abs(path)
+			if err != nil {
+				return nil, err
+			}
+			if !sameDesktopPath(actual, expected) {
+				return nil, errors.New("configured external project/SU path requires foundation F2; YAML was retained")
 			}
 		}
 	}
@@ -190,7 +257,20 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 		if err != nil {
 			return nil, err
 		}
+		if preferences != nil && service.hierarchyFile == "" {
+			for _, candidate := range hierarchies {
+				if candidate.Name == service.activeHierarchy && candidate.Compatible {
+					if service.hierarchyFile != "" {
+						return nil, errors.New("configured hierarchy name is ambiguous; YAML was retained")
+					}
+					service.hierarchyFile = candidate.File
+				}
+			}
+		}
 		if !hasCompatibleHierarchy(hierarchies, service.activeHierarchy, service.hierarchyFile) {
+			if preferences != nil {
+				return nil, fmt.Errorf("configured hierarchy %q is unavailable; YAML selection was retained", service.activeHierarchy)
+			}
 			service.activeHierarchy = "None"
 			service.hierarchyFile = ""
 			if err := service.saveSelection(service.active, service.activeSU); err != nil {
@@ -198,7 +278,32 @@ func NewProjectServiceWithConfig(root, config string) (*ProjectService, error) {
 			}
 		}
 	}
+	if preferences != nil && (configured.ProjectPath == "" ||
+		(service.activeHierarchy != "None" && configured.HierarchyPath == "")) {
+		path, err := filepath.Abs(filepath.Join(root, "projects", compatibleProject(projects, service.active).File))
+		if err != nil {
+			return nil, err
+		}
+		paths := map[string]any{"ProjectPath": path}
+		if service.activeHierarchy != "None" && configured.HierarchyPath == "" {
+			hierarchyPath, err := filepath.Abs(filepath.Join(root, "projects", service.hierarchyFile))
+			if err != nil {
+				return nil, err
+			}
+			paths["HierarchyPath"] = hierarchyPath
+		}
+		if err := preferences.update("Current", paths); err != nil {
+			return nil, err
+		}
+	}
 	return service, nil
+}
+
+func sameDesktopPath(left, right string) bool {
+	if runtime.GOOS == "windows" {
+		return strings.EqualFold(left, right)
+	}
+	return left == right
 }
 
 func installSample(destination string) error {
@@ -271,12 +376,17 @@ func hasCompatibleHierarchy(hierarchies []HierarchyInfo, name, file string) bool
 }
 
 func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error) {
-	database, err := openReadOnly(filepath.Join(service.root, "projects", project.File))
+	return service.discoverSUsContext(context.Background(), project)
+}
+
+func (service *ProjectService) discoverSUsContext(ctx context.Context, project ProjectInfo) ([]SUInfo, error) {
+	database, err := openReadOnlyContext(ctx, service.projectFile(project))
 	if err != nil {
 		return nil, err
 	}
 	defer database.Close()
-	rows, err := database.Query("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE '%_SU'")
+	reader := contextPlotDB{db: database, ctx: ctx}
+	rows, err := reader.Query("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE '%_SU'")
 	if err != nil {
 		return nil, err
 	}
@@ -298,14 +408,14 @@ func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error
 	}
 	slices.Sort(names)
 	var hasPolicy bool
-	if err := database.QueryRow("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = '_vpro_su_policy')").Scan(&hasPolicy); err != nil {
+	if err := reader.QueryRow("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = '_vpro_su_policy')").Scan(&hasPolicy); err != nil {
 		return nil, err
 	}
 	sus := make([]SUInfo, 0, len(names))
 	for _, name := range names {
 		su := SUInfo{Name: name, Kind: "ordinary"}
 		if hasPolicy {
-			err := database.QueryRow("SELECT kind FROM _vpro_su_policy WHERE table_name = ?", name+"_SU").Scan(&su.Kind)
+			err := reader.QueryRow("SELECT kind FROM _vpro_su_policy WHERE table_name = ?", name+"_SU").Scan(&su.Kind)
 			if err != nil && !errors.Is(err, sql.ErrNoRows) {
 				return nil, err
 			}
@@ -313,7 +423,7 @@ func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error
 				su.Kind = "ordinary"
 			}
 		}
-		fields, err := database.Query(`PRAGMA table_info("` + name + `_SU")`)
+		fields, err := reader.Query(`PRAGMA table_info("` + name + `_SU")`)
 		if err != nil {
 			return nil, err
 		}
@@ -341,11 +451,21 @@ func (service *ProjectService) discoverSUs(project ProjectInfo) ([]SUInfo, error
 }
 
 func openReadOnly(path string) (*sql.DB, error) {
-	address := (&url.URL{Scheme: "file", Path: path, RawQuery: "mode=ro"}).String()
-	database, err := sql.Open("sqlite3", address)
+	return openReadOnlyContext(context.Background(), path)
+}
+
+func openReadOnlyContext(ctx context.Context, path string) (*sql.DB, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	absolute, err := filepath.Abs(path)
+	if err != nil {
+		return nil, err
+	}
+	database, err := sql.Open("sqlite3", sqliteFileURI(absolute, "ro"))
 	if err == nil {
 		database.SetMaxOpenConns(1)
-		err = database.Ping()
+		err = database.PingContext(ctx)
 	}
 	if err != nil {
 		if database != nil {
@@ -357,12 +477,17 @@ func openReadOnly(path string) (*sql.DB, error) {
 }
 
 func inspectFile(path string) ([]ProjectInfo, error) {
-	database, err := openReadOnly(path)
+	return inspectFileContext(context.Background(), path)
+}
+
+func inspectFileContext(ctx context.Context, path string) ([]ProjectInfo, error) {
+	database, err := openReadOnlyContext(ctx, path)
 	if err != nil {
 		return nil, err
 	}
 	defer database.Close()
-	rows, err := database.Query("SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%'")
+	reader := contextPlotDB{db: database, ctx: ctx}
+	rows, err := reader.Query("SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%'")
 	if err != nil {
 		return nil, err
 	}
@@ -393,7 +518,7 @@ func inspectFile(path string) ([]ProjectInfo, error) {
 		}
 		if tables["_table_metadata"] {
 			var version sql.NullString
-			err := database.QueryRow("SELECT description FROM _table_metadata WHERE table_name = ?", table).Scan(&version)
+			err := reader.QueryRow("SELECT description FROM _table_metadata WHERE table_name = ?", table).Scan(&version)
 			if err != nil && !errors.Is(err, sql.ErrNoRows) {
 				return nil, err
 			}
@@ -409,6 +534,13 @@ func inspectFile(path string) ([]ProjectInfo, error) {
 }
 
 func (service *ProjectService) discover() ([]ProjectInfo, []ProjectDiagnostic, error) {
+	return service.discoverContext(context.Background())
+}
+
+func (service *ProjectService) discoverContext(ctx context.Context) ([]ProjectInfo, []ProjectDiagnostic, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
 	files, err := os.ReadDir(filepath.Join(service.root, "projects"))
 	if err != nil {
 		return nil, nil, err
@@ -416,13 +548,19 @@ func (service *ProjectService) discover() ([]ProjectInfo, []ProjectDiagnostic, e
 	projects := []ProjectInfo{}
 	diagnostics := []ProjectDiagnostic{}
 	for _, file := range files {
+		if err := ctx.Err(); err != nil {
+			return nil, nil, err
+		}
 		if !file.Type().IsRegular() || !strings.EqualFold(filepath.Ext(file.Name()), ".db") {
 			continue
 		}
-		found, err := inspectFile(filepath.Join(service.root, "projects", file.Name()))
+		found, err := inspectFileContext(ctx, filepath.Join(service.root, "projects", file.Name()))
 		if err != nil {
+			if ctx.Err() != nil && errors.Is(err, ctx.Err()) {
+				return nil, nil, ctx.Err()
+			}
 			if file.Name() == "Sample.db" {
-				return nil, nil, fmt.Errorf("inspect %s: %w", file.Name(), err)
+				return nil, nil, labelledReadError("inspect "+file.Name(), err)
 			}
 			diagnostics = append(diagnostics, ProjectDiagnostic{File: file.Name(), Message: err.Error()})
 			continue
@@ -435,29 +573,37 @@ func (service *ProjectService) discover() ([]ProjectInfo, []ProjectDiagnostic, e
 			return nil, nil, fmt.Errorf("duplicate project family %q", projects[index].Name)
 		}
 	}
+	if err := ctx.Err(); err != nil {
+		return nil, nil, err
+	}
 	return projects, diagnostics, nil
 }
 
-func (service *ProjectService) GetState() (ProjectState, error) {
-	projects, diagnostics, err := service.discover()
+func (service *ProjectService) GetState(ctx context.Context) (ProjectState, error) {
+	if err := acquireReadLease(ctx, &service.mu); err != nil {
+		return ProjectState{}, err
+	}
+	defer service.mu.RUnlock()
+	if service.sqlite != nil {
+		return service.sqliteStateContextLocked(ctx)
+	}
+	projects, diagnostics, err := service.discoverContext(ctx)
 	if err != nil {
 		return ProjectState{}, err
 	}
-	service.mu.RLock()
 	active := service.active
 	activeSU := service.activeSU
 	activeHierarchy := service.activeHierarchy
 	hierarchyFile := service.hierarchyFile
-	service.mu.RUnlock()
 	selected := compatibleProject(projects, active)
 	if selected.Name == "" {
 		return ProjectState{}, errors.New("no compatible project is active")
 	}
-	sus, err := service.discoverSUs(selected)
+	sus, err := service.discoverSUsContext(ctx, selected)
 	if err != nil {
 		return ProjectState{}, err
 	}
-	hierarchies, err := discoverHierarchies(filepath.Join(service.root, "projects"))
+	hierarchies, err := discoverHierarchiesContext(ctx, filepath.Join(service.root, "projects"))
 	if err != nil {
 		return ProjectState{}, err
 	}
@@ -465,6 +611,12 @@ func (service *ProjectService) GetState() (ProjectState, error) {
 }
 
 func (service *ProjectService) SelectProject(name string) (ProjectState, error) {
+	service.mu.Lock()
+	if service.sqlite != nil {
+		defer service.mu.Unlock()
+		return ProjectState{}, errors.New("use an identity-bound context switch for the active SQLite application")
+	}
+	service.mu.Unlock()
 	if !projectNamePattern.MatchString(name) {
 		return ProjectState{}, errors.New("invalid VPRO project name")
 	}
@@ -494,6 +646,12 @@ func (service *ProjectService) SelectProject(name string) (ProjectState, error) 
 }
 
 func (service *ProjectService) SelectSU(name string) (ProjectState, error) {
+	service.mu.Lock()
+	if service.sqlite != nil {
+		defer service.mu.Unlock()
+		return ProjectState{}, errors.New("use an identity-bound context switch for the active SQLite application")
+	}
+	service.mu.Unlock()
 	if name != "None" && !projectNamePattern.MatchString(name) {
 		return ProjectState{}, errors.New("invalid VPRO SU name")
 	}
@@ -526,6 +684,12 @@ func (service *ProjectService) SelectSU(name string) (ProjectState, error) {
 }
 
 func (service *ProjectService) SelectHierarchy(name, file string) (ProjectState, error) {
+	service.mu.Lock()
+	if service.sqlite != nil {
+		defer service.mu.Unlock()
+		return ProjectState{}, errors.New("use an identity-bound context switch for the active SQLite application")
+	}
+	service.mu.Unlock()
 	if name != "None" && !projectNamePattern.MatchString(name) {
 		return ProjectState{}, errors.New("invalid VPRO hierarchy name")
 	}
@@ -562,7 +726,15 @@ func (service *ProjectService) SelectHierarchy(name, file string) (ProjectState,
 	return ProjectState{ActiveProject: service.active, ActiveSU: service.activeSU, ActiveHierarchy: name, HierarchyFile: file, Projects: projects, SUs: sus, Hierarchies: hierarchies, Diagnostics: diagnostics}, nil
 }
 
-func (service *ProjectService) GetHierarchyNodes() ([]HierarchyNode, error) {
+func (service *ProjectService) GetHierarchyNodes(ctx context.Context) ([]HierarchyNode, error) {
+	if err := acquireReadLease(ctx, &service.mu); err != nil {
+		return nil, err
+	}
+	if service.sqlite != nil {
+		defer service.mu.RUnlock()
+		return service.sqliteHierarchyLocked(ctx)
+	}
+	service.mu.RUnlock()
 	service.mu.RLock()
 	name, file := service.activeHierarchy, service.hierarchyFile
 	service.mu.RUnlock()
@@ -576,7 +748,7 @@ func (service *ProjectService) GetHierarchyNodes() ([]HierarchyNode, error) {
 	if !hasCompatibleHierarchy(hierarchies, name, file) {
 		return nil, errors.New("active hierarchy is no longer available")
 	}
-	return listHierarchyNodes(filepath.Join(service.root, "projects", file), name)
+	return listHierarchyNodesContext(ctx, filepath.Join(service.root, "projects", file), name)
 }
 
 func (service *ProjectService) saveSelection(name, su string) error {
@@ -584,6 +756,34 @@ func (service *ProjectService) saveSelection(name, su string) error {
 }
 
 func (service *ProjectService) saveSelectionWithHierarchy(name, su, hierarchy, file string) error {
+	if service.preferences != nil {
+		projects, _, err := service.discover()
+		if err != nil {
+			return err
+		}
+		selected := compatibleProject(projects, name)
+		if selected.Name == "" {
+			return errors.New("cannot persist an unavailable project")
+		}
+		path, err := filepath.Abs(filepath.Join(service.root, "projects", selected.File))
+		if err != nil {
+			return err
+		}
+		suPath, hierarchyPath := "", ""
+		if su != "None" {
+			suPath = path
+		}
+		if hierarchy != "None" {
+			hierarchyPath, err = filepath.Abs(filepath.Join(service.root, "projects", file))
+			if err != nil {
+				return err
+			}
+		}
+		return service.preferences.update("Current", map[string]any{
+			"CurrProject": name, "ProjectPath": path, "CurrPlotlist": su, "SUPath": suPath,
+			"CurrHierarchy": hierarchy, "HierarchyPath": hierarchyPath,
+		})
+	}
 	if su == "None" {
 		su = ""
 	}
@@ -625,10 +825,21 @@ func (service *ProjectService) saveSelectionWithHierarchy(name, su, hierarchy, f
 	return nil
 }
 
-func (service *ProjectService) ListPlots(offset, limit int) (PlotPage, error) {
+func (service *ProjectService) ListPlots(ctx context.Context, offset, limit int) (PlotPage, error) {
+	if err := ctx.Err(); err != nil {
+		return PlotPage{}, err
+	}
 	if offset < 0 || limit < 1 || limit > 200 {
 		return PlotPage{}, errors.New("plot page requires a nonnegative offset and a limit from 1 to 200")
 	}
+	if err := acquireReadLease(ctx, &service.mu); err != nil {
+		return PlotPage{}, err
+	}
+	if service.sqlite != nil {
+		defer service.mu.RUnlock()
+		return service.sqlitePlotsLocked(ctx, offset, limit)
+	}
+	service.mu.RUnlock()
 	service.mu.RLock()
 	active := service.active
 	activeSU := service.activeSU
@@ -659,10 +870,10 @@ func (service *ProjectService) ListPlots(offset, limit int) (PlotPage, error) {
 		from += ` AND EXISTS (SELECT 1 FROM "` + activeSU + `_SU" AS su WHERE su.PlotNumber = env.PlotNumber)`
 	}
 	page := PlotPage{Plots: []PlotSummary{}}
-	if err := database.QueryRow("SELECT COUNT(*)" + from).Scan(&page.Total); err != nil {
+	if err := database.QueryRowContext(ctx, "SELECT COUNT(*)"+from).Scan(&page.Total); err != nil {
 		return PlotPage{}, err
 	}
-	rows, err := database.Query("SELECT env.PlotNumber, env.FieldNumber, env.PlotRepresenting, env.Zone, env.SubZone, env.SiteSeries"+from+" ORDER BY env.PlotNumber LIMIT ? OFFSET ?", limit, offset)
+	rows, err := database.QueryContext(ctx, "SELECT env.PlotNumber, env.FieldNumber, env.PlotRepresenting, env.Zone, env.SubZone, env.SiteSeries"+from+" ORDER BY env.PlotNumber LIMIT ? OFFSET ?", limit, offset)
 	if err != nil {
 		return PlotPage{}, err
 	}

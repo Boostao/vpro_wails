@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "exporter": "native-access-dao-site-codes-v1",
+  "sourceSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "snapshotSha256": "099af9fd9347e2b8d908000928cb03f033e8510399a24da9ba94d240031b6887",
+  "databaseSha256": "d6bb8beb21066a04203b8f453c595a080b6f6751503d14a67df1cbd35693fb89",
+  "typedCellsSha256": "7f681c7f0bfc5133d58e87fc576a3d7f2bda57f635fa085e202af0bf5a2724dc",
+  "rows": 139,
+  "cells": 1390,
+  "sourceTable": "USysTableOfLists",
+  "sql": "SELECT * FROM USysTableOfLists WHERE ListName IN (\"SiteDisturbance\",\"Exposure\") ORDER BY ListName,ItemOrder",
+  "sourceSchema": [
+    {
+      "name": "ListName",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ListFilter",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemOrder",
+      "daoType": 7,
+      "size": 8
+    },
+    {
+      "name": "Item",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemDescription",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "FieldUsedIn",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ValidateLoops",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Validate",
+      "daoType": 1,
+      "size": 1
+    },
+    {
+      "name": "Note",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Flag",
+      "daoType": 1,
+      "size": 1
+    }
+  ],
+  "itemOrderEncoding": "nullable IEEE754 binary64 big-endian 8-byte BLOB; native source ordinal order"
+}

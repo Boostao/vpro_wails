@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "exporter": "current-readonly-dao-bedrock-codes-v1",
+  "sourceSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "snapshotSha256": "2e8585380babdb7110615a43321900edeac882d573f25c99ed1780f93e0956f6",
+  "databaseSha256": "80cd267bf6e4fa594483d8158268eaad7f2e358d15a534230c19ee44aaf4f29e",
+  "typedCellsSha256": "ee70085e50b388fe3c140909ec7885544ad23a7afee2fa3e699ada875925a615",
+  "rows": 87,
+  "cells": 870,
+  "sourceTable": "USysTableOfLists",
+  "sql": "SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='BedrockType' ORDER BY [ItemOrder];",
+  "sourceSchema": [
+    {
+      "name": "ListName",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ListFilter",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemOrder",
+      "daoType": 7,
+      "size": 8
+    },
+    {
+      "name": "Item",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemDescription",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "FieldUsedIn",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ValidateLoops",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Validate",
+      "daoType": 1,
+      "size": 1
+    },
+    {
+      "name": "Note",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Flag",
+      "daoType": 1,
+      "size": 1
+    }
+  ],
+  "itemOrderEncoding": "nullable IEEE754 binary64 big-endian 8-byte BLOB; native source ordinal order"
+}

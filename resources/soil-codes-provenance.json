@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "exporter": "current-readonly-dao-soil-codes-v1",
+  "sourceSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "snapshotSha256": "20e309d5e34445109d2024406e451e601257b2d94d877c54dd9a87e8b79d0f5d",
+  "databaseSha256": "31fa3688dcb60766308f9f79ecf190a9b95242eec569d7cc3c0c14965920e65a",
+  "typedCellsSha256": "6c5c6341f23b4a2df6af9ef4d5c29d36900e59899029c3ea95549c56da5300dc",
+  "rows": 101,
+  "cells": 1010,
+  "sourceTable": "USysTableOfLists",
+  "sql": "SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='SoilClassGroup' ORDER BY [ItemOrder]; SELECT [ListName],[ListFilter],[ItemOrder],[Item],[ItemDescription],[FieldUsedIn],[ValidateLoops],[Validate],[Note],[Flag] FROM [USysTableOfLists] WHERE [ListName]='SoilClassSubgroup' ORDER BY [ItemOrder];",
+  "sourceSchema": [
+    {
+      "name": "ListName",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ListFilter",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemOrder",
+      "daoType": 7,
+      "size": 8
+    },
+    {
+      "name": "Item",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ItemDescription",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "FieldUsedIn",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "ValidateLoops",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Validate",
+      "daoType": 1,
+      "size": 1
+    },
+    {
+      "name": "Note",
+      "daoType": 10,
+      "size": 255
+    },
+    {
+      "name": "Flag",
+      "daoType": 1,
+      "size": 1
+    }
+  ],
+  "itemOrderEncoding": "nullable IEEE754 binary64 big-endian 8-byte BLOB; native source ordinal order"
+}

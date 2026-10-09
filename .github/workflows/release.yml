@@ -1,0 +1,328 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v0.1.0 or 0.1.0)'
+        required: true
+        default: 'v0.1.0'
+      prerelease:
+        description: 'Publish as Pre-release'
+        type: boolean
+        required: false
+        default: false
+      draft:
+        description: 'Create as Draft Release'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  # ============================================================================
+  # 1. BUILD WINDOWS (amd64 and arm64)
+  # ============================================================================
+  build-windows:
+    name: Build Windows (${{ matrix.arch }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Wails v3 CLI
+        shell: bash
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.26
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install NSIS
+        shell: pwsh
+        run: |
+          choco install nsis -y --no-progress
+          $nsisPath = "C:\Program Files (x86)\NSIS"
+          if (Test-Path $nsisPath) {
+            echo "$nsisPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
+
+      - name: Install Frontend Dependencies
+        shell: bash
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build Windows Binary & Installer
+        shell: bash
+        run: |
+          mkdir -p bin
+          task windows:build ARCH=${{ matrix.arch }}
+          task windows:create:nsis:installer ARCH=${{ matrix.arch }} || true
+
+      - name: Prepare Windows Artifacts
+        shell: pwsh
+        run: |
+          $ver = "${{ github.event.inputs.version }}".TrimStart('v')
+          $arch = "${{ matrix.arch }}"
+          New-Item -ItemType Directory -Path "dist-artifacts" -Force
+
+          # Copy .exe if built
+          if (Test-Path "bin/vpro-wails.exe") {
+            Copy-Item "bin/vpro-wails.exe" -Destination "dist-artifacts/vpro-windows-$arch.exe"
+            Compress-Archive -Path "bin/vpro-wails.exe" -DestinationPath "dist-artifacts/vpro-windows-$arch.zip"
+          }
+
+          # Copy NSIS installer if generated
+          $installer = Get-ChildItem -Path "bin" -Filter "*installer*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($installer) {
+            Copy-Item $installer.FullName -Destination "dist-artifacts/vpro-windows-$arch-installer.exe"
+          }
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.arch }}
+          path: dist-artifacts/*
+          if-no-files-found: error
+
+  # ============================================================================
+  # 2. BUILD MACOS (Universal dmg + app zip)
+  # ============================================================================
+  build-macos:
+    name: Build macOS (Universal arm64 + amd64)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Wails v3 CLI
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.26
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build macOS Universal Binary & Bundle
+        run: |
+          mkdir -p bin
+          task darwin:package:universal
+          task darwin:package:dmg || true
+
+      - name: Package macOS Artifacts
+        run: |
+          mkdir -p dist-artifacts
+          if [ -d "bin/vpro-wails.app" ]; then
+            ditto -c -k --keepParent "bin/vpro-wails.app" "dist-artifacts/vpro-macos-universal.zip"
+          fi
+          if [ -f "bin/vpro-wails.dmg" ]; then
+            cp "bin/vpro-wails.dmg" "dist-artifacts/vpro-macos-universal.dmg"
+          fi
+
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-universal
+          path: dist-artifacts/*
+          if-no-files-found: error
+
+  # ============================================================================
+  # 3. BUILD LINUX (amd64 and arm64 AppImage & deb)
+  # ============================================================================
+  build-linux:
+    name: Build Linux (${{ matrix.arch }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+          - arch: arm64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Linux GTK/WebKit Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libgtk-4-dev \
+            libwebkitgtk-6.0-dev \
+            pkg-config \
+            build-essential
+
+      - name: Install Wails v3 CLI
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@v3.0.0-beta.26
+          echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Frontend Dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build Linux Binary
+        run: |
+          mkdir -p bin
+          if [ "${{ matrix.arch }}" = "amd64" ]; then
+            task linux:build ARCH=amd64
+            task linux:create:appimage ARCH=amd64 || true
+            task linux:create:deb ARCH=amd64 || true
+          else
+            # For cross-compilation linux arm64 using zig or wails-cross
+            GOARCH=arm64 CC=aarch64-linux-gnu-gcc task linux:build ARCH=arm64 || true
+          fi
+
+      - name: Package Linux Artifacts
+        run: |
+          mkdir -p dist-artifacts
+          ARCH="${{ matrix.arch }}"
+          
+          # Check for binary
+          if [ -f "bin/vpro-wails" ]; then
+            tar -czf "dist-artifacts/vpro-linux-${ARCH}.tar.gz" -C bin vpro-wails
+          fi
+
+          # Check for AppImage
+          for f in bin/*.AppImage; do
+            if [ -f "$f" ]; then
+              cp "$f" "dist-artifacts/vpro-linux-${ARCH}.AppImage"
+              break
+            fi
+          done
+
+          # Check for deb
+          for f in bin/*.deb; do
+            if [ -f "$f" ]; then
+              cp "$f" "dist-artifacts/vpro-linux-${ARCH}.deb"
+              break
+            fi
+          done
+
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.arch }}
+          path: dist-artifacts/*
+          if-no-files-found: warn
+
+  # ============================================================================
+  # 4. AGGREGATE & CREATE GITHUB RELEASE
+  # ============================================================================
+  release:
+    name: Create GitHub Release
+    needs: [build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Compute Checksums
+        run: |
+          cd release-assets
+          ls -la
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: "VPRO ${{ github.event.inputs.version }}"
+          draft: ${{ github.event.inputs.draft }}
+          prerelease: ${{ github.event.inputs.prerelease }}
+          files: |
+            release-assets/*
+          body: |
+            ## VPRO Desktop Application (${{ github.event.inputs.version }})
+
+            Automated multi-platform distribution build.
+
+            ### Downloads by Platform
+            - **Windows**:
+              - Installer: `vpro-windows-amd64-installer.exe`
+              - Portable Executable / Zip: `vpro-windows-amd64.zip`
+            - **macOS (Apple Silicon & Intel Universal)**:
+              - Disk Image: `vpro-macos-universal.dmg`
+              - Application Archive: `vpro-macos-universal.zip`
+            - **Linux**:
+              - AppImage: `vpro-linux-amd64.AppImage`
+              - Debian Package: `vpro-linux-amd64.deb`
+              - Archive: `vpro-linux-amd64.tar.gz`
+
+            ### Verification
+            All file SHA256 hashes are listed in `SHA256SUMS.txt`.

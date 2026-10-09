@@ -1,0 +1,14 @@
+{
+  "snapshot": "soil-codes-fixture.json.gz",
+  "snapshotSha256": "20e309d5e34445109d2024406e451e601257b2d94d877c54dd9a87e8b79d0f5d",
+  "sourceSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "nativeDAOCellsSha256": "db6ff589a8a393877b7a3fcc82bd1886b3603181d5dd0a7c64920c4a8a04558f",
+  "evidence": "Current readonly DAO.DBEngine.120 export from closed owned VLists copy, not SourceForm or native Wails proof",
+  "rows": 101,
+  "cells": 1010,
+  "listCounts": {"SoilClassGroup":39,"SoilClassSubgroup":62},
+  "emptyCodeRows": {"SoilClassGroup":1,"SoilClassSubgroup":1},
+  "order": "Observed ORDER BY ItemOrder, source ordinal strings per exact query; no secondary sort or deduplication",
+  "storedParentColumns": ["SoilClassGroup","SoilClassSubGroup"],
+  "unmeasured": ["Form effective properties","membership/write policy","AutoExpand","NULL and keyboard behavior","partner callbacks","native Wails"]
+}
