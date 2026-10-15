@@ -58,6 +58,7 @@ import * as SiteUnitSummaryWorkbookService from "./siteunitsummaryworkbookservic
 import * as SoilCodeService from "./soilcodeservice.js";
 import * as SpeciesAttributeSummaryService from "./speciesattributesummaryservice.js";
 import * as StartupService from "./startupservice.js";
+import * as SubzoneMatrixService from "./subzonematrixservice.js";
 import * as SummaryVegetationEnvironmentalLifeformService from "./summaryvegetationenvironmentallifeformservice.js";
 import * as SummaryVegetationEnvironmentalService from "./summaryvegetationenvironmentalservice.js";
 import * as SummaryVegetationFieldListService from "./summaryvegetationfieldlistservice.js";
@@ -139,6 +140,7 @@ export {
     SoilCodeService,
     SpeciesAttributeSummaryService,
     StartupService,
+    SubzoneMatrixService,
     SummaryVegetationEnvironmentalLifeformService,
     SummaryVegetationEnvironmentalService,
     SummaryVegetationFieldListService,
@@ -441,6 +443,10 @@ export type {
     SpeciesCodeCheckUpdate,
     SpeciesItem,
     StartupState,
+    SubzoneMatrixPreview,
+    SubzoneMatrixRow,
+    SubzoneMatrixWorkbookOutcome,
+    SubzoneMatrixWorkbookReview,
     SummaryVegetationEnvironmentalLifeformPreview,
     SummaryVegetationEnvironmentalNumericPreview,
     SummaryVegetationEnvironmentalNumericRow,

@@ -190,7 +190,7 @@ test('creation panel retains receipts and safety feedback while unknown writes e
 
 test('root aggregates persistent creation ownership rather than letting a disposed read clear native-close and transition guards', () => {
   const app = source('App.svelte');
-  assert.match(app, /editorBusy = \$derived\(localEditorBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy \|\| externalSUEnvironmentBusy \|\| summaryPreferenceBusy \|\| summaryFieldListBusy \|\| summaryEnvironmentalBusy \|\| projectReportBusy\)/);
+  assert.match(app, /editorBusy = \$derived\(localEditorBusy \|\| matrixPublicationBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy \|\| externalSUEnvironmentBusy \|\| summaryPreferenceBusy \|\| summaryFieldListBusy \|\| summaryEnvironmentalBusy \|\| projectReportBusy\)/);
   assert.match(app, /pictureCreationBusy = activity\.busy \|\| activity\.blocked/);
   assert.match(app, /subscribePictureCreationActivity/);
   assert.match(app, /pictureManagerPlot = activity\.owner\.plotNumber/);
@@ -259,9 +259,9 @@ test('retained chooser and unknown writes block actual root close/context/naviga
     },
   });
   const expression = source('App.svelte').match(/const editorBusy = \$derived\(([^;]+)\);/)[1];
-  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', 'summaryPreferenceBusy', 'summaryFieldListBusy', 'summaryEnvironmentalBusy', 'projectReportBusy', 'externalSUEnvironmentBusy', `return ${expression}`);
+  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', 'summaryPreferenceBusy', 'summaryFieldListBusy', 'summaryEnvironmentalBusy', 'projectReportBusy', 'externalSUEnvironmentBusy', 'matrixPublicationBusy', `return ${expression}`);
   Object.defineProperty(context, 'editorBusy', {
-    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy, context.summaryPreferenceBusy, context.summaryFieldListBusy, context.summaryEnvironmentalBusy, context.projectReportBusy, context.externalSUEnvironmentBusy),
+    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy, context.summaryPreferenceBusy, context.summaryFieldListBusy, context.summaryEnvironmentalBusy, context.projectReportBusy, context.externalSUEnvironmentBusy, false),
   });
   let observe = registry.subscribePictureCreationActivity(activity => {
     context.pictureCreationBusy = activity.busy || activity.blocked;

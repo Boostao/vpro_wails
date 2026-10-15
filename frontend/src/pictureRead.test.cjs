@@ -420,7 +420,7 @@ test('standalone manager has independent default-off navigation and shares root 
   assert.match(app, /view === 'picture-manager' && import\.meta\.env\.VITE_PICTURE_MANAGER === 'true'/);
   assert.match(app, /if \(import\.meta\.env\.VITE_PICTURE_MANAGER !== 'true'\)/);
   assert.match(app, /<PictureManager[^>]*onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/s);
-  assert.match(app, /editorBusy = \$derived\(localEditorBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy \|\| externalSUEnvironmentBusy \|\| summaryPreferenceBusy \|\| summaryFieldListBusy \|\| summaryEnvironmentalBusy \|\| projectReportBusy\)/);
+  assert.match(app, /editorBusy = \$derived\(localEditorBusy \|\| matrixPublicationBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy \|\| externalSUEnvironmentBusy \|\| summaryPreferenceBusy \|\| summaryFieldListBusy \|\| summaryEnvironmentalBusy \|\| projectReportBusy\)/);
   assert.match(manager, /<PicturePanel[^>]*view="manager" onBusyChange=\{reading\}/);
   assert.match(manager, /disabled=\{busy \|\| metadataBlocked \|\| creationBlocked \|\| lifecycleBlocked\}/);
   assert.match(manager, /\{#key selected\}/);

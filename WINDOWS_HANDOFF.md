@@ -111,14 +111,77 @@ Full User log integration passes exit0, UTC2026-10-15T03:03:45.295460 to
 owners are freshly absent. The strict receipt accepts without an exception and
 releases the source freeze. Do not duplicate this completed suite.
 
-Next: persist the accepted successor under the standing commit authorization,
-then continue Subzone Matrix report implementation. Its private
+The accepted User log successor is committed locally as `608195c` on main,
+with the required co-author and clean immediate postcommit status. No push
+occurred. The Subzone Matrix successor has now passed complete-source
+integration below; no push or demo promotion is authorized by that acceptance.
+
+The Subzone Matrix report successor is integrated. Its private
 `subzone-matrix-source` contract seals eleven extracted-query ACE1033 cases,
 eight unchanged canonical hashes and normal DAO closure/no lock. No Access UI,
 Excel or app write occurred. Preserve label-driven joins, the no-label/empty-
 hierarchy distinction, NULL/empty pivot `<>` and orphan-parent SS. Unordered
 First chose04 rather than insertion-first01; differing ambiguous values must
-not be guessed. No original callback/workbook/report availability is granted.
+not be guessed. A996-probe/1658-pair comparison extension qualifies bounded
+printable-ASCII equality, not general Unicode/locale.
+
+The new internal pure planner and private owned snapshot reader are independently
+accepted after resolving parent-name fanout and generated-column accounting.
+The32MiB/99,999-child fanout test passes0.57s; exact input/output/original bounds
+and actual SQLite cancellation/pinned retry pass. Reader focused race10.394s,
+vet and production compile pass with explicitly confirmed `production,sqliteonly`.
+The first driver's ineffective `sqlite_only` tag is retained as default-profile
+evidence only. Private streamed XLSX preparation is independently accepted
+after correcting Excelize's silent stream-cleanup errors with an owned TmpDir
+and explicit removal/error propagation. Actual1,000,000-cell spill, full
+worksheet XML, in-flight cancellation and Windows denied-delete on successful
+and cancelled preparations pass; ten candidate hashes/logs/binary are reviewed.
+Directory-entry size observations initially missed open Windows writes; the
+retained failed tests are superseded by opened-handle statistics.
+The service is independently accepted at its unregistered boundary with no
+significant findings. It adds independent literal backend denial,
+bounded camelCase preview paging without XLSX serialization, separate exact
+workbook review and shared no-overwrite publication/irreversible receipts.
+Focused physical service race4.726s and coupled planner/reader/workbook
+race/vet/production compile pass, with twelve exact input hashes retained.
+The same reader snapshot body
+and original-hash calculation are extracted without new storage or recursive
+leases. The subsequent registered default-off desktop candidate wires the
+panel/menu, paged actual-Go DTOs and retained publication/close barriers.
+Focused96 coupled client tests, check0/0 and isolated default/enabled builds
+pass. System Go1.27 caused ten binding warnings in a retained first attempt;
+qualified Go1.25 PATH plus `-ts -i` regenerates exactly three binding files
+without warnings. Independent desktop review accepts source/check/build with
+no significant issues and freshly verifies all1814 source/19 protected files.
+Actual Wails default/client-off/backend-off/enabled plus supplement pass on one
+disposable16-file fixture:31-row literal matrix and paging, source orphan/NULL/
+empty/formula-looking text, reviewed XLSX hash/length/reopened XML, actual UI
+collision with completed output unchanged, retained acknowledgement/remount,
+held actual read/Cancel/stale-remount refusal/fresh retry and exact native-close
+cancellation acknowledgement before altering barriers. Every planned caption/
+header/control and wrapped path/hash/associated label is actually visible,
+viewport-intersecting and contained at1400/760/420 widths. Five owners normally
+close. Seven tightly coupled root harness corrections preserve existing guard
+coverage with an explicit inactive matrix peer. Both focused runners and all1963
+registered frontend executions pass. Independent follow-up finds no significant
+issues and verifies exact12 post-native deltas: seven tests/five status docs,
+with application/bindings/19 protected assets unchanged.
+
+Full default-profile Go race passes exit0, UTC2026-10-15T06:35:37.130447 to
+07:50:05.527306; root4172.205s. All1814 inputs,2439 artifacts and package/embed
+discovery are unchanged. All five original native owners are freshly absent;
+the source freeze is released. Do not duplicate the completed suite.
+No accepted assets, demo ZIP or
+default feature flag is promoted.
+No original callback/workbook/report availability is granted.
+Next: Hierarchy Diagram source calibration. Eight unchanged canonical inputs
+and both ribbon callbacks are sealed privately in `hierarchy-diagram-source`.
+The active `?` child branch exits its whole sibling loop; all roots assign A1.
+Reference UNION/FindFirst order, cutoff conversion and actual Excel shapes/output
+remain unqualified. No native operation or application change occurred in this
+static phase. Use one disposable Access/Excel owner, at most two broken-oracle
+attempts or20 minutes; do not invent parity or activate dormant orphan/highlight
+code. The next native calibration is pending.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated

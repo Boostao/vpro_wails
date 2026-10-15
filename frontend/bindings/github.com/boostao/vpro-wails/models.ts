@@ -2230,6 +2230,39 @@ export interface StartupState {
     "configPath": string;
 }
 
+export interface SubzoneMatrixPreview {
+    "contextId": string;
+    "hierarchy": string;
+    "hierarchyPath": string;
+    "labelsPath": string;
+    "sourceSHA256": string;
+    "columns": string[] | null;
+    "rows": SubzoneMatrixRow[] | null;
+    "total": number;
+    "offset": number;
+    "limit": number;
+}
+
+export interface SubzoneMatrixRow {
+    "name": string | null;
+    "values": (string | null)[] | null;
+}
+
+export interface SubzoneMatrixWorkbookOutcome {
+    "status": string;
+    "requestedDestination": string;
+    "path": string;
+    "sha256": string;
+    "errorMessage": string;
+}
+
+export interface SubzoneMatrixWorkbookReview {
+    "preview": SubzoneMatrixPreview;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
 export interface SummaryVegetationEnvironmentalLifeformPreview {
     "vegetation": SummaryVegetationPreview;
     "fieldList": ProjectMetadataTable;

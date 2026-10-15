@@ -73,7 +73,7 @@ function root(value) {
   const compiled = compiler.compileModule(`
     let localEditorBusy = $state(false), pictureCreationBusy = false, pictureLifecycleBusy = false,
       twoPageSoilBusy = false, twoPageVegetationBusy = false, summaryPreferenceBusy = false, projectReportBusy = false,
-      summaryEnvironmentalBusy = false, externalSUEnvironmentBusy = false;
+      summaryEnvironmentalBusy = false, externalSUEnvironmentBusy = false, matrixPublicationBusy = false;
     let summaryFieldListBusy = $state(false), view = 'home';
     ${derived}
     ${effect.replace('$effect(', 'installEffect(')}

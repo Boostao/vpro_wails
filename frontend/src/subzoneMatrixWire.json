@@ -1,0 +1,163 @@
+{
+  "empty": {
+    "contextId": "matrix-context",
+    "hierarchy": "Sample",
+    "hierarchyPath": "C:\\fixture\\hierarchy.db",
+    "labelsPath": "C:\\fixture\\VPro64.db",
+    "sourceSHA256": "d5ae2582a496d824a26f40fc7fecba85fe81379a0364b0eafd7288a12dd5ba56",
+    "columns": [],
+    "rows": [],
+    "total": 0,
+    "offset": 0,
+    "limit": 25
+  },
+  "end": {
+    "contextId": "matrix-context",
+    "hierarchy": "Sample",
+    "hierarchyPath": "C:\\fixture\\hierarchy.db",
+    "labelsPath": "C:\\fixture\\VPro64.db",
+    "sourceSHA256": "41ad51492254fa4e2f927d9d7b9917f70fdeabc7700a77681b8dd43c056f3b26",
+    "columns": [
+      "AAAAAAAAA",
+      "BBBBBBBBB",
+      "ZZZZZZZZZ"
+    ],
+    "rows": [],
+    "total": 3,
+    "offset": 3,
+    "limit": 25
+  },
+  "first": {
+    "contextId": "matrix-context",
+    "hierarchy": "Sample",
+    "hierarchyPath": "C:\\fixture\\hierarchy.db",
+    "labelsPath": "C:\\fixture\\VPro64.db",
+    "sourceSHA256": "41ad51492254fa4e2f927d9d7b9917f70fdeabc7700a77681b8dd43c056f3b26",
+    "columns": [
+      "AAAAAAAAA",
+      "BBBBBBBBB",
+      "ZZZZZZZZZ"
+    ],
+    "rows": [
+      {
+        "name": null,
+        "values": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "name": "Association Alpha",
+        "values": [
+          "01",
+          "02",
+          null
+        ]
+      },
+      {
+        "name": "Association Beta",
+        "values": [
+          "03",
+          null,
+          null
+        ]
+      }
+    ],
+    "total": 3,
+    "offset": 0,
+    "limit": 25
+  },
+  "notPublished": {
+    "status": "not-published",
+    "requestedDestination": "C:\\fixture\\matrix.xlsx",
+    "path": "",
+    "sha256": "",
+    "errorMessage": "Subzone Matrix workbook destination exists or cannot be checked; never replace"
+  },
+  "page": {
+    "contextId": "matrix-context",
+    "hierarchy": "Sample",
+    "hierarchyPath": "C:\\fixture\\hierarchy.db",
+    "labelsPath": "C:\\fixture\\VPro64.db",
+    "sourceSHA256": "41ad51492254fa4e2f927d9d7b9917f70fdeabc7700a77681b8dd43c056f3b26",
+    "columns": [
+      "AAAAAAAAA",
+      "BBBBBBBBB",
+      "ZZZZZZZZZ"
+    ],
+    "rows": [
+      {
+        "name": "Association Alpha",
+        "values": [
+          "01",
+          "02",
+          null
+        ]
+      }
+    ],
+    "total": 3,
+    "offset": 1,
+    "limit": 1
+  },
+  "published": {
+    "status": "published",
+    "requestedDestination": "C:\\fixture\\matrix.xlsx",
+    "path": "C:\\fixture\\matrix.xlsx",
+    "sha256": "b997cbd7ce7d9e68567ca367a2b8460781ecc8a1bdc82fe022ace4d823e5bdfa",
+    "errorMessage": ""
+  },
+  "publishedWithErrors": {
+    "status": "published-with-errors",
+    "requestedDestination": "C:\\fixture\\matrix.xlsx",
+    "path": "C:\\fixture\\matrix.xlsx",
+    "sha256": "b997cbd7ce7d9e68567ca367a2b8460781ecc8a1bdc82fe022ace4d823e5bdfa",
+    "errorMessage": "Workbook published; do not replay: held original-source cleanup failure"
+  },
+  "review": {
+    "preview": {
+      "contextId": "matrix-context",
+      "hierarchy": "Sample",
+      "hierarchyPath": "C:\\fixture\\hierarchy.db",
+      "labelsPath": "C:\\fixture\\VPro64.db",
+      "sourceSHA256": "41ad51492254fa4e2f927d9d7b9917f70fdeabc7700a77681b8dd43c056f3b26",
+      "columns": [
+        "AAAAAAAAA",
+        "BBBBBBBBB",
+        "ZZZZZZZZZ"
+      ],
+      "rows": [
+        {
+          "name": null,
+          "values": [
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "name": "Association Alpha",
+          "values": [
+            "01",
+            "02",
+            null
+          ]
+        },
+        {
+          "name": "Association Beta",
+          "values": [
+            "03",
+            null,
+            null
+          ]
+        }
+      ],
+      "total": 3,
+      "offset": 0,
+      "limit": 25
+    },
+    "approvalHash": "45f222b151a3f5a42971eace5d699a5d835d0722a04db7d1fd901fef0540b504",
+    "workbookSHA256": "b997cbd7ce7d9e68567ca367a2b8460781ecc8a1bdc82fe022ace4d823e5bdfa",
+    "bytes": 8035
+  }
+}

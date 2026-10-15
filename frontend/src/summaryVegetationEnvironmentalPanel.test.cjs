@@ -290,7 +290,7 @@ test('actual root derived hold survives pane teardown until cancelled dispatch s
   const compiled = compiler.compileModule(`
     let localEditorBusy = $state(false), pictureCreationBusy = false, pictureLifecycleBusy = false,
       twoPageSoilBusy = false, twoPageVegetationBusy = false, summaryPreferenceBusy = false,
-      summaryFieldListBusy = false, projectReportBusy = false, externalSUEnvironmentBusy = false;
+      summaryFieldListBusy = false, projectReportBusy = false, externalSUEnvironmentBusy = false, matrixPublicationBusy = false;
     let summaryEnvironmentalBusy = $state(false), view = 'home';
     ${derived}
     ${effect.replace('$effect(', 'installEffect(')}

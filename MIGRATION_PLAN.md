@@ -111,7 +111,7 @@ root4055.713s, with all1697 core inputs, separately pinned HTML,209 artifacts an
 package/embed discovery unchanged. All seven original owners are freshly absent;
 the source freeze is released.
 
-Next independent report work is Subzone Matrix of Units, routed through
+The Subzone Matrix of Units successor is integrated, routed through
 `Sb12OnAction`/`sb12btn03`. Eleven exact extracted-query scenarios on a disposable
 ACE1033 fixture qualify label-driven joins, Level11 hierarchy rows, ten-character
 unit matching and nine-character pivot headers. Duplicate labels, NULL/empty
@@ -121,8 +121,36 @@ and orphan nonnull Parent values remain distinct. Unordered `First(Value)` chose
 with rowid-first. Eight canonical source/database hashes remain unchanged and
 DAO closes normally without a lock, Access UI or Excel owner. This is query
 qualification, not original callback/workbook parity or report enablement.
-Define the bounded implementation and reuse existing snapshot/XLSX/publication
-boundaries before registration; differing ambiguous cells must not be guessed.
+The bounded pure planner, owned reader, private streamed XLSX preparation and
+unregistered publication service are independently reviewed. Performance
+fanout, generated-column accounting and silent Excelize stream-cleanup findings
+are resolved with exact bounds, actual spill and Windows denied-delete tests.
+The registered default-off desktop candidate now uses separate bounded preview
+and full-workbook review, strict actual-Go wire, existing retained publication
+receipts and independent frontend/runtime flags. Focused client tests, check
+and isolated default/enabled builds pass. Independent desktop review and
+disposable actual Wails default/frontend-off/backend-off/enabled acceptance
+pass, including three-width label/field containment, literal paging, exact
+XLSX publication/collision, retained receipts and exact native-close
+cancellation before releasing held reads. All1,963 registered frontend
+executions pass. Independent follow-up accepts seven coupled root harness
+corrections, preserving prior guard coverage without application/binding/asset
+changes. Full default-profile Go race integration passes exit0, root4172.205s,
+with all1,814 inputs,2,439 artifacts and package/embed discovery unchanged.
+All five original native owners are freshly absent; the freeze is released.
+Accepted demo assets are not
+replaced. No original Excel callback/formatting or whole-report parity is
+granted; differing ambiguous cells are not guessed. The current contract is
+[Subzone Matrix](docs/SUBZONE_MATRIX_CONTRACT.md).
+
+Next independent report work is Hierarchy Diagram. Read-only static tracing
+seals eight unchanged canonical inputs and both original ribbon actions.
+The active child-name `?` path exits the whole current sibling loop; every root
+assigns A1, even when its shape advances. Full-row master/personal UNION and
+FindFirst ordering, cutoff conversion and actual Excel output still require
+bounded disposable native calibration. Dormant orphan/highlight code is not
+a write or display requirement. Static evidence does not enable the workflow
+or establish runtime parity.
 
 The mapped normal/CHARS single-plot Google Earth successor is integrated. Its
 registered independently gated candidate previews one saved literal Env plot, not the existing

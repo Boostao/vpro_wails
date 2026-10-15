@@ -61,6 +61,30 @@ is not in the qualified Friday ZIP below. Full Go race integration passes with
 all1697 core inputs, separately pinned HTML,209 artifacts and package/embed
 discovery unchanged; all seven native owners are freshly absent.
 
+**Reports > Subzone Matrix of Units** has a default-off desktop successor,
+reviewed, disposable-native-accepted and full-race integrated. It requires
+`VITE_SUBZONE_MATRIX_WORKBOOK=true` at frontend build time and independent
+`VPRO_SUBZONE_MATRIX_WORKBOOK=true` at runtime. It reads the selected physical
+hierarchy and preserved VPro64 labels, not the project/SU implied by the old
+ribbon description. Independently reviewed planner, reader, streamed XLSX
+preparation and publication service retain literal text, NULL/empty values and
+complete-original source witnesses. Differing unordered First candidates and
+unsupported comparisons refuse rather than guess. Preview paging avoids XLSX
+serialization; full review and no-overwrite publication are separate operations
+with retained irreversible receipts. Technical ordering, heuristic widths and
+portable `.xlsx` are explicit adaptations, not original Excel-host or `.xls`
+parity. See [the report contract](docs/SUBZONE_MATRIX_CONTRACT.md). Both flags
+remain default-off; the qualified demo and accepted frontend assets are unchanged.
+Actual Wails default/frontend-off/backend-off/enabled modes pass, along with
+literal paging, exact XLSX publication/no-overwrite, retained receipts,
+Cancel/remount and exact native-close cancellation acknowledgements.
+All1,963 registered frontend executions pass. Seven coupled root harnesses
+explicitly preserve the new default-off publication peer; independent follow-up
+review finds no significant issues, with application/bindings/assets unchanged.
+Full default-profile Go race integration passes with all1,814 inputs,
+2,439 artifacts and package/embed discovery unchanged. All five original native
+owners are freshly absent; the source freeze is released.
+
 The qualified private Windows demo is
 `build\bin\VPRO-Friday-Demo-2026-10-16-menu.zip` (17,273,336 bytes;
 SHA256 `450313ae2b111312190f939f75d4b69e3d2cc57695b0b92615e907eb0a7ac013`).

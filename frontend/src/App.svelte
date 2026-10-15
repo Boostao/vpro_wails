@@ -19,6 +19,8 @@
   import { summaryEnvironmentalDesktop, summaryEnvironmentalEnabled } from './summaryVegetationEnvironmentalDesktop';
   import ProjectTableCSVReview from './ProjectTableCSVReview.svelte';
   import UserLogReview from './UserLogReview.svelte';
+  import SubzoneMatrixReport from './SubzoneMatrixReport.svelte';
+  import { matrixPublicationSession } from './subzoneMatrixReport';
   import PlotLocationReview from './PlotLocationReview.svelte';
   import PictureManager from './PictureManager.svelte';
   import PlotLabelPreview from './PlotLabelPreview.svelte';
@@ -66,11 +68,12 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
   let pictureManagerPlot = $state('');
   let plotLabelNumber = $state('');
   let contextExpanded = $state(false);
   let localEditorBusy = $state(false);
+  let matrixPublicationBusy = $state(false);
   let pictureCreationBusy = $state(false);
   let pictureLifecycleBusy = $state(false);
   let twoPageSoilBusy = $state(false);
@@ -80,7 +83,19 @@
   let summaryPreferenceBusy = $state(false);
   let summaryFieldListBusy = $state(false);
   let summaryEnvironmentalBusy = $state(false);
-  const editorBusy = $derived(localEditorBusy || pictureCreationBusy || pictureLifecycleBusy || twoPageSoilBusy || twoPageVegetationBusy || externalSUEnvironmentBusy || summaryPreferenceBusy || summaryFieldListBusy || summaryEnvironmentalBusy || projectReportBusy);
+  const editorBusy = $derived(localEditorBusy || matrixPublicationBusy || pictureCreationBusy || pictureLifecycleBusy || twoPageSoilBusy || twoPageVegetationBusy || externalSUEnvironmentBusy || summaryPreferenceBusy || summaryFieldListBusy || summaryEnvironmentalBusy || projectReportBusy);
+  $effect(() => {
+    const state = $projectState;
+    if (import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'true' || !state?.contextId ||
+        state.activeHierarchy === 'None' || !state.hierarchyPath) { matrixPublicationBusy = false; return; }
+    const session = matrixPublicationSession({ contextId: state.contextId,
+      hierarchy: state.activeHierarchy, hierarchyPath: state.hierarchyPath });
+    return session.subscribe(() => {
+      const publication = session.view();
+      matrixPublicationBusy = publication.busy || publication.blocked;
+      if (publication.blocked && view === 'home') view = 'subzone-matrix';
+    });
+  });
   $effect(() => {
     if (!summaryEnvironmentalEnabled) return;
     return summaryEnvironmentalDesktop.subscribe(() => {
@@ -543,7 +558,7 @@
   }
 
   async function loadPlots(nextOffset: number) {
-    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
     const current = ++request;
     plotReads.cancelAll();
     busy = true;
@@ -566,7 +581,7 @@
   }
 
   async function refresh() {
-    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
     const current = ++stateRequest;
     stateReads.cancelAll();
     busy = true;
@@ -595,7 +610,7 @@
   }
 
   async function loadHierarchy() {
-    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
     const current = ++hierarchyRequest;
     hierarchyReads.cancelAll();
     try {
@@ -1360,6 +1375,12 @@
           <GoogleEarthReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             onBusyChange={(value) => { localEditorBusy = value; }} />
+        {/key}
+      {:else if view === 'subzone-matrix' && import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <SubzoneMatrixReport contextId={$projectState.contextId ?? ''} hierarchy={$projectState.activeHierarchy}
+            hierarchyPath={$projectState.hierarchyPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'hierarchy'}
       <div class="content-heading">

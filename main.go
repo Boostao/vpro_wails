@@ -49,6 +49,9 @@ func main() {
 	if _, err := siviFeature(lifeformWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
+	if _, err := siviFeature(subzoneMatrixFeatureEnvironment, os.LookupEnv); err != nil {
+		log.Fatal(err)
+	}
 	if _, err := siviFeature(siteUnitSummaryWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
@@ -364,6 +367,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	subzoneMatrix, err := NewSubzoneMatrixService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	siteUnitSummaryWorkbook, err := NewSiteUnitSummaryWorkbookService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -564,6 +571,7 @@ func main() {
 		application.NewService(lifeformSummary),
 		application.NewService(speciesAttributeSummary),
 		application.NewService(lifeformWorkbook),
+		application.NewService(subzoneMatrix),
 		application.NewService(siteUnitSummaryWorkbook),
 		application.NewService(siteUnitSummaryExtendedWorkbook),
 		application.NewService(environmentWorkbook),
