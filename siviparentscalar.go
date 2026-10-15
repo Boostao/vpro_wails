@@ -73,6 +73,13 @@ func planSIVIParentSourceCells(ctx context.Context, contextID, project, plot str
 }
 
 func planProjectedParentCells(ctx context.Context, contextID, project string, parent *siviParentProjection, edits []siviParentScalarEdit, owners map[string]string, implicit map[string]bool, validate func(string, ProjectMetadataCell) error) ([]siviParentScalarAssignment, error) {
+	return planPreparedParentCells(ctx, contextID, project, parent, edits, owners, implicit, nil,
+		func(left, right ProjectMetadataCell) bool { return reflect.DeepEqual(left, right) }, validate)
+}
+
+func planPreparedParentCells(ctx context.Context, contextID, project string, parent *siviParentProjection, edits []siviParentScalarEdit, owners map[string]string, implicit map[string]bool,
+	prepare func(string, ProjectMetadataCell) (ProjectMetadataCell, error), equal func(ProjectMetadataCell, ProjectMetadataCell) bool,
+	validate func(string, ProjectMetadataCell) error) ([]siviParentScalarAssignment, error) {
 	if len(parent.Rows) != 1 {
 		return nil, errors.New("SIVI parent planning requires one unambiguous physical Env/Admin pair")
 	}
@@ -105,22 +112,36 @@ func planProjectedParentCells(ctx context.Context, contextID, project string, pa
 		if _, err := metadataCellValue(edit.Expected); err != nil {
 			return nil, fmt.Errorf("SIVI scalar expected value: %w", err)
 		}
-		if !reflect.DeepEqual(before, edit.Expected) {
+		if !equal(before, edit.Expected) {
 			return nil, errors.New("SIVI scalar source value changed; reload before planning")
 		}
 		value, err := metadataCellValue(edit.Value)
 		if err != nil {
 			return nil, fmt.Errorf("SIVI scalar proposed value: %w", err)
 		}
-		if reflect.DeepEqual(before, edit.Value) {
+		if equal(before, edit.Value) {
 			continue
 		}
-		if err := validate(edit.Column, edit.Value); err != nil {
+		after := edit.Value
+		if prepare != nil {
+			after, err = prepare(edit.Column, after)
+			if err != nil {
+				return nil, err
+			}
+			value, err = metadataCellValue(after)
+			if err != nil {
+				return nil, fmt.Errorf("SIVI scalar prepared value: %w", err)
+			}
+			if equal(before, after) {
+				continue
+			}
+		}
+		if err := validate(edit.Column, after); err != nil {
 			return nil, err
 		}
 		assignments = append(assignments, siviParentScalarAssignment{
 			ContextID: contextID, Table: edit.Table, RowID: row.RowID, Column: edit.Column,
-			Before: cloneSiteUnitCell(before), After: cloneSiteUnitCell(edit.Value), Value: value,
+			Before: cloneSiteUnitCell(before), After: cloneSiteUnitCell(after), Value: value,
 		})
 	}
 	if err := ctx.Err(); err != nil {

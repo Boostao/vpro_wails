@@ -66,6 +66,41 @@ unchanged, with no lock remaining. These are table-engine witnesses, not
 bound-control, callback, reference-membership, default or original-form proof.
 Do not widen old accepted consumers or inherit vegetation's `<100` rule for Water.
 
+### CHARS direct-field planning (internal, unexposed)
+
+The pure CHARS planner composes 68 explicitly owned direct-field domains from
+the existing scalar, option, text, shared and reference policies plus the two
+distinct CHARS fields. PlotNumber, ProjectID, PlotType and the implicit
+SpeciesListComplete/action groups remain outside this scope. Physical planning
+does not approve reference membership or authorize a write. No service, history,
+menu, frontend gate or native desktop availability is added.
+
+A readonly DAO observation of all 71 template bindings plus the implicit target
+provides independent type/width/nullable/empty/rule evidence in the source-only
+test fixture. It also identifies Admin.StartDate's `Between 1900 And 2500` table
+rule. The CHARS planner enforces that rule for changed values without widening
+or reinterpreting previously accepted normal consumers. Finite source DOUBLE
+Latitude/Longitude are not assigned an invented geographic range.
+
+Canonical projection/binding identities and typed expected originals precede
+new-write rules. Unchanged historical invalid cells omit before preparation;
+changed SINGLE values narrow before range validation, retain their exact
+historical Before and omit if narrowing produces unchanged storage. New
+negative zero (including underflow) refuses explicitly rather than normalize
+SQLite REAL's unsupported sign. NULL/empty, UTF-16 limits, literal case/spaces,
+raw Unicode and source empty permissions remain distinct.
+
+The shared preparation boundary preserves legacy parent comparison/validation
+behavior; CHARS uses exact REAL bits, reused from the vegetation cell invariant.
+All188 coupled parent/metadata/vegetation race cases pass (root246.232s),
+as do production SQLite-only vet/build. All1839 inputs,12 canonical sources
+and19 protected assets match before/after validation and distinct ten-path
+review. The reviewer accepts this internal pure-planner scope without
+significant findings. Complete-source integration now covers the coherent entry
+successor below; no public authority follows this internal review.
+Bound-control/callback timing, reference approval, draft/lifecycle,
+public writer/restoration and actual desktop acceptance remain separate deliverables.
+
 ### Accepted bounded combined child editing
 
 The independently default-off `VPRO_SIVI_COMBINED_EDITING` and
@@ -90,6 +125,80 @@ Root guards exclude dirty/busy peers, preserve close/Lock barriers, and expose
 cancellation only for source reads. Peer refresh preflights every owner before
 resetting any original. Species, Collected, ID, parent changes, creation/deletion,
 automatic totals and remaining source warning/focus events remain unavailable.
+
+### CHARS reference-source boundary
+
+The existing SaveAsText parser independently extracts all32 bound ComboBoxes
+from each original SIVI parent. The31 common controls have identical literal
+queries and selected event/membership properties; five differences are column
+widths only. CHARS substitutes RootZoneParticleSize for the normal
+SV_RootZoneTexture. The source-only fixture
+[chars-sivi-reference-source.json](../testdata/chars-sivi-reference-source.json)
+retains both original sets and their hashes, not executable runtime SQL.
+
+The internal [owned reference snapshot](../sivicharsparentreferences.go) reuses
+the28 normal shared policies/readers and adds RootZoneParticleSize (parent
+catalogue, TEXT6), SnowCoverRegime (owned VLists family, TEXT1) and the literal
+Ah/Ae/blank list (TEXT5). Source query literals `realmclass` and `surfaceshape`
+remain recorded exactly; reused catalogue selectors remain the accepted
+`RealmClass`/`SurfaceShape` adaptations, not new Unicode or byte-ownership proof.
+All references and the one physical CHARS parent pair share the current-context
+lease and SQLite read snapshot. Other read/schema/cancellation/malformed-text
+failures return errors without a partial result; raw NULL/empty/duplicates and
+metadata remain distinct, with detached definitions/choice pointers.
+
+Two qualifications intentionally limit this internal scope:
+
+- The original CHARS SubZone SQL names `[forms]![frmSIVIsite]![cmbZone]`,
+  not its CHARS parent. No active parent class path repairs that RowSource.
+  Runtime resolution is not qualified. SubZone explicitly remains unavailable;
+  neither own-CHARS Zone nor the two-page helper's NULL/All behavior is invented.
+- The explicit blank Ahorizon choice remains visible but nonselectable, with
+  a diagnostic, until original bound NULL/empty assignment is qualified.
+
+This is an unexposed reference read model, not source membership authorization,
+writer/history/frontend availability or native callback parity. All195 coupled
+race cases pass (root256.098s), as do production SQLite-only vet/build.
+All1842 inputs,12 canonical sources and19 protected assets match throughout
+validation and distinct seven-path review; the reviewer accepts the bounded
+internal reference-only scope without significant findings. Complete-source
+integration now covers the coherent internal entry successor below.
+
+### CHARS private typed mutation boundary
+
+The internal [CHARS writer](../sivicharsparentwrite.go) reuses the existing owned
+source-parent transaction, physical-pair/SU checks, complete-table verification,
+audits and technical provenance. It requires independent source/reference
+approval and the exact CHARS projector; it is not registered as a public
+service. The67 currently qualified direct domains exclude changed SubZone.
+New empty Ahorizon assignments are likewise refused; unchanged historical
+values omit before either restriction.
+
+The isolated `__VPRO_SIVICHARSParentEntryHistory` records the complete prepared
+typed plan separately from its audited subset. At audit strength1, a NULL
+addition can commit without an audit while another field produces history;
+restoration reverses only audited changes. Full-plan membership/rebuilt-row
+invariants are shared with the existing two-page history without changing its
+project-provenance rules, error order or legacy REAL comparison policy. CHARS
+compares exact REAL bits at reviewed write CAS, full-plan history validation
+and the pre-restoration committed comparison; the final post-restoration read
+remains a physical-source check, not a replay of the pre-mutation comparison.
+
+Focused physical tests pass across all67 domains, local/external contexts,
+retained/pruned/cancelled restoration, source aliases, approval/cancellation/
+invalid-tail rollback and retry, prepared SINGLE no-op omission, strength1
+NULL provenance, signed-zero CAS and forged-history/source-drift refusal.
+All201 coupled race cases pass (root275.951s), as do production SQLite-only
+vet/build. All1846 inputs,12 canonical sources and19 protected assets match
+through validation and distinct ten-path review; the reviewer accepts only
+the bounded internal mutation/history scope without significant findings.
+Coherent complete-source race integration passes exit0 (root4308.862s),
+UTC2026-10-15T13:03:56.034915 to14:19:42.902748, with all1846 inputs/109 sealed
+artifacts and package/embed discovery unchanged. Four predecessor owners are
+freshly absent; the source freeze is released. All12 canonical sources,
+19 protected assets and prior accepted frontend/demo inputs remain unchanged.
+No frontend, lifecycle, binding, menu, default enablement or native bound-control
+authority is granted by these internal mutation tests.
 The active UpdateMetadataSppList call is a source no-op, detailed below; its
 dormant metadata writer is not a missing desktop requirement.
 

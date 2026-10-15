@@ -113,6 +113,34 @@ Complete-source Go race integration passes with all1,836 inputs,57 artifacts
 and package/embed discovery unchanged. Four predecessor native owners are
 freshly absent; this is not CHARS native-form acceptance.
 See [the SIVI source boundary](docs/FS1333-parent-access-contract.md).
+The internal CHARS direct-field planner now covers68 editable domains while
+excluding identity/ProjectID/PlotType/action paths. It preserves unchanged
+historical values and prepares new SINGLE values without changing normal
+writers. All188 coupled race cases and production vet/build pass, and distinct
+read-only review accepts this internal scope. This is not write or reference-
+membership authority; complete-source integration now covers the internal successor below.
+
+The internal CHARS reference successor covers31 non-ProjectID ComboBoxes within
+one owned parent/reference snapshot, reusing28 source-equivalent normal policies.
+RootZoneParticleSize, SnowCoverRegime and Ah/Ae/blank retain their distinct sources.
+Original CHARS SubZone SQL points to the normal form's cmbZone, so its choices
+remain explicitly unavailable pending runtime qualification; blank Ahorizon
+assignment likewise remains unqualified. This does not enable CHARS editing.
+All195 coupled race cases plus production vet/build pass, with distinct
+read-only acceptance of this internal reference scope. Complete-source integration
+covers this read model; native entry acceptance remains outstanding.
+
+An unregistered CHARS typed writer/restorer now reuses the owned source-parent
+transaction machinery and requires independent approval. Its isolated history
+keeps the full prepared plan separate from the audited subset; SubZone changes
+and new blank Ahorizon assignments remain refused. All67 qualified domains pass
+focused physical write/restoration tests. All201 coupled race cases and
+production vet/build pass, with distinct acceptance of this internal scope.
+Complete-source Go race integration passes (root4308.862s), with all1,846 inputs,
+109 sealed artifacts and package/embed discovery unchanged. All12 canonical
+sources/19 protected assets and the accepted frontend/demo remain unchanged.
+CHARS desktop entry stays unavailable pending explicit proposal/reference
+authorization, lifecycle/UI wiring and actual native acceptance.
 
 The qualified private Windows demo is
 `build\bin\VPRO-Friday-Demo-2026-10-16-menu.zip` (17,273,336 bytes;

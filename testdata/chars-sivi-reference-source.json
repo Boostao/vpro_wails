@@ -1,0 +1,661 @@
+{
+  "scope": "Source-only effective properties of32 direct ComboBoxes in each original form. Generated with existing internal/accesslayout parser; not runtime SQL, membership or callback authority.",
+  "canonicalInputSHA256": {
+    "frmSIVIsite-CHARS.txt": "14e5bf440431009fe4eca7c7282ed63263cc05852d9ac43ef301581fa7801df7",
+    "frmSIVIsite.txt": "49ec8926aea92c21c57cb99ab571cd3b55ac2f64940060e23c6b7d9c9230a85a"
+  },
+  "forms": {
+    "frmSIVIsite": {
+      "BedrockGeology1": {
+        "Name": "BedrockGeology1",
+        "Binding": "BedrockGeology1",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;4680",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"BedrockType\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "BedrockGeology2": {
+        "Name": "BedrockGeology2",
+        "Binding": "BedrockGeology2",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;4680",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"BedrockType\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "Exposure1": {
+        "Name": "Exposure1",
+        "Binding": "Exposure1",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;2160",
+          "LimitToList": "NotDefault",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"Exposure\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "Exposure2": {
+        "Name": "Exposure2",
+        "Binding": "Exposure2",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;2160",
+          "LimitToList": "NotDefault",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"Exposure\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "FSRegionDistrict": {
+        "Name": "FSRegionDistrict",
+        "Binding": "FSRegionDistrict",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "864;2448",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"Region\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "GeoMorProSubSurf": {
+        "Name": "GeoMorProSubSurf",
+        "Binding": "GeoMorProSubSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;2304",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"GeoMorPro\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "GeoMorProSurf": {
+        "Name": "GeoMorProSurf",
+        "Binding": "GeoMorProSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;2304",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"GeoMorPro\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "HumusForm": {
+        "Name": "HumusForm",
+        "Binding": "HumusForm",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;1440",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"HumusForm\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "MesoSlopePosition": {
+        "Name": "MesoSlopePosition",
+        "Binding": "MesoSlopePosition",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;1440",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"MesoSlopePosition\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "MoistureRegime": {
+        "Name": "MoistureRegime",
+        "Binding": "MoistureRegime",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "432;1728",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"MoistureRegime\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "NutrientRegime": {
+        "Name": "NutrientRegime",
+        "Binding": "NutrientRegime",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "432;2448",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"NutrientRegime\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "ProjectID": {
+        "Name": "ProjectID",
+        "Binding": "ProjectID",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "1440;7200",
+          "OnNotInList": "[Event Procedure]",
+          "RowSource": "SELECT UsysMetadata.ProjectID, UsysMetadata.ProjectTitle FROM UsysMetadata;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "RealmClass": {
+        "Name": "RealmClass",
+        "Binding": "RealmClass",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "570;4575",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"realmclass\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "RootRestrictingType": {
+        "Name": "RootRestrictingType",
+        "Binding": "RootRestrictingType",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "690;2850",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"RootRestrictingType\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SV_AhorizonType": {
+        "Name": "AhorizonType",
+        "Binding": "SV_AhorizonType",
+        "Properties": {
+          "ColumnWidths": "576",
+          "RowSource": "Ah;Ae;\"\"",
+          "RowSourceType": "Value List"
+        }
+      },
+      "SV_RootZoneTexture": {
+        "Name": "RootZoneTexture",
+        "Binding": "SV_RootZoneTexture",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "432;2880",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SoilTexture\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SiteDisturbance1": {
+        "Name": "SiteDisturbance1",
+        "Binding": "SiteDisturbance1",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;2880",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SiteDisturbance\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SiteDisturbance2": {
+        "Name": "SiteDisturbance2",
+        "Binding": "SiteDisturbance2",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;2880",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SiteDisturbance\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SiteDisturbance3": {
+        "Name": "SiteDisturbance3",
+        "Binding": "SiteDisturbance3",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;2880",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SiteDisturbance\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SnowCoverregime": {
+        "Name": "SnowCoverregime",
+        "Binding": "SnowCoverregime",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "432;1728",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SnowCoverRegime\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SoilDrainage": {
+        "Name": "SoilDrainage",
+        "Binding": "SoilDrainage",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;2160",
+          "LimitToList": "NotDefault",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SoilDrainage\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "StructuralStage": {
+        "Name": "StructuralStage",
+        "Binding": "StructuralStage",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;2448",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"StructuralStage\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SubZone": {
+        "Name": "SubZone",
+        "Binding": "SubZone",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "570;4575",
+          "RowSource": "SELECT USysZoneList.SubZone, USysZoneList.SubZoneVarDescription FROM USysZoneList WHERE (((USysZoneList.Zone)=[forms]![frmSIVIsite]![cmbZone])) ORDER BY USysZoneList.SubZone, USysZoneList.SubZoneVarDescription;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SuccessionalStatus": {
+        "Name": "SuccessionalStatus",
+        "Binding": "SuccessionalStatus",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;2160",
+          "LimitToList": "NotDefault",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SuccessionalStatus\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurfaceExpSubSurf": {
+        "Name": "SurfaceExpSubSurf",
+        "Binding": "SurfaceExpSubSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;2304",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SurfaceExp\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurfaceExpSurf": {
+        "Name": "SurfaceExpSurf",
+        "Binding": "SurfaceExpSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;2304",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SurfaceExp\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurfaceShape": {
+        "Name": "SurfaceShape",
+        "Binding": "SurfaceShape",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;1440",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"surfaceshape\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurficialMaterialSubSurf": {
+        "Name": "SurficialMaterialSubSurf",
+        "Binding": "SurficialMaterialSubSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;2160",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SurficialMaterial\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurficialMaterialSurf": {
+        "Name": "Combo560",
+        "Binding": "SurficialMaterialSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;2160",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SurficialMaterial\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "TerrainTextureSubSurf": {
+        "Name": "TerrainTextureSubSurf",
+        "Binding": "TerrainTextureSubSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;1584",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"TerrainTexture\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "TerrainTextureSurf": {
+        "Name": "TerrainTextureSurf",
+        "Binding": "TerrainTextureSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;1584",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"TerrainTexture\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "Zone": {
+        "Name": "cmbZone",
+        "Binding": "Zone",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;2880",
+          "RowSource": "SELECT DISTINCT USysZoneList.Zone, USysZoneList.ZoneDescription FROM USysZoneList ORDER BY USysZoneList.Zone, USysZoneList.ZoneDescription; ",
+          "RowSourceType": "Table/Query"
+        }
+      }
+    },
+    "frmSIVIsite-CHARS": {
+      "BedrockGeology1": {
+        "Name": "BedrockGeology1",
+        "Binding": "BedrockGeology1",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;3960",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"BedrockType\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "BedrockGeology2": {
+        "Name": "BedrockGeology2",
+        "Binding": "BedrockGeology2",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;3960",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"BedrockType\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "Exposure1": {
+        "Name": "Exposure1",
+        "Binding": "Exposure1",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;2160",
+          "LimitToList": "NotDefault",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"Exposure\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "Exposure2": {
+        "Name": "Exposure2",
+        "Binding": "Exposure2",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;2160",
+          "LimitToList": "NotDefault",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"Exposure\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "FSRegionDistrict": {
+        "Name": "FSRegionDistrict",
+        "Binding": "FSRegionDistrict",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "864;2448",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"Region\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "GeoMorProSubSurf": {
+        "Name": "GeoMorProSubSurf",
+        "Binding": "GeoMorProSubSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;2304",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"GeoMorPro\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "GeoMorProSurf": {
+        "Name": "GeoMorProSurf",
+        "Binding": "GeoMorProSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;2304",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"GeoMorPro\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "HumusForm": {
+        "Name": "HumusForm",
+        "Binding": "HumusForm",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;1440",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"HumusForm\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "MesoSlopePosition": {
+        "Name": "MesoSlopePosition",
+        "Binding": "MesoSlopePosition",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;1440",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"MesoSlopePosition\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "MoistureRegime": {
+        "Name": "MoistureRegime",
+        "Binding": "MoistureRegime",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "432;1728",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"MoistureRegime\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "NutrientRegime": {
+        "Name": "NutrientRegime",
+        "Binding": "NutrientRegime",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "432;2448",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"NutrientRegime\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "ProjectID": {
+        "Name": "ProjectID",
+        "Binding": "ProjectID",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "1440;7200",
+          "OnNotInList": "[Event Procedure]",
+          "RowSource": "SELECT UsysMetadata.ProjectID, UsysMetadata.ProjectTitle FROM UsysMetadata;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "RealmClass": {
+        "Name": "RealmClass",
+        "Binding": "RealmClass",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "570;4575",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"realmclass\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "RootRestrictingType": {
+        "Name": "RootRestrictingType",
+        "Binding": "RootRestrictingType",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "690;2850",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"RootRestrictingType\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "RootZoneParticleSize": {
+        "Name": "RootZoneParticleSize",
+        "Binding": "RootZoneParticleSize",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "432;1800",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"RootZoneParticleSize\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SV_AhorizonType": {
+        "Name": "AhorizonType",
+        "Binding": "SV_AhorizonType",
+        "Properties": {
+          "ColumnWidths": "576",
+          "RowSource": "Ah;Ae;\"\"",
+          "RowSourceType": "Value List"
+        }
+      },
+      "SiteDisturbance1": {
+        "Name": "SiteDisturbance1",
+        "Binding": "SiteDisturbance1",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;2880",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SiteDisturbance\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SiteDisturbance2": {
+        "Name": "SiteDisturbance2",
+        "Binding": "SiteDisturbance2",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;2880",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SiteDisturbance\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SiteDisturbance3": {
+        "Name": "SiteDisturbance3",
+        "Binding": "SiteDisturbance3",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;2880",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SiteDisturbance\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SnowCoverregime": {
+        "Name": "SnowCoverregime",
+        "Binding": "SnowCoverregime",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "432;1728",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SnowCoverRegime\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SoilDrainage": {
+        "Name": "SoilDrainage",
+        "Binding": "SoilDrainage",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;1728",
+          "LimitToList": "NotDefault",
+          "RowSource": "SELECT DISTINCTROW USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SoilDrainage\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "StructuralStage": {
+        "Name": "StructuralStage",
+        "Binding": "StructuralStage",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;2448",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"StructuralStage\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SubZone": {
+        "Name": "SubZone",
+        "Binding": "SubZone",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "570;4575",
+          "RowSource": "SELECT USysZoneList.SubZone, USysZoneList.SubZoneVarDescription FROM USysZoneList WHERE (((USysZoneList.Zone)=[forms]![frmSIVIsite]![cmbZone])) ORDER BY USysZoneList.SubZone, USysZoneList.SubZoneVarDescription;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SuccessionalStatus": {
+        "Name": "SuccessionalStatus",
+        "Binding": "SuccessionalStatus",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "720;2160",
+          "LimitToList": "NotDefault",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SuccessionalStatus\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurfaceExpSubSurf": {
+        "Name": "SurfaceExpSubSurf",
+        "Binding": "SurfaceExpSubSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;2304",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SurfaceExp\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurfaceExpSurf": {
+        "Name": "SurfaceExpSurf",
+        "Binding": "SurfaceExpSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;2304",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SurfaceExp\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurfaceShape": {
+        "Name": "SurfaceShape",
+        "Binding": "SurfaceShape",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "360;1440",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"surfaceshape\")) ORDER BY USysTableOfLists.ItemOrder;",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurficialMaterialSubSurf": {
+        "Name": "SurficialMaterialSubSurf",
+        "Binding": "SurficialMaterialSubSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;1584",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SurficialMaterial\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "SurficialMaterialSurf": {
+        "Name": "Combo560",
+        "Binding": "SurficialMaterialSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;1584",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"SurficialMaterial\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "TerrainTextureSubSurf": {
+        "Name": "TerrainTextureSubSurf",
+        "Binding": "TerrainTextureSubSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;1584",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"TerrainTexture\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "TerrainTextureSurf": {
+        "Name": "TerrainTextureSurf",
+        "Binding": "TerrainTextureSurf",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "288;1584",
+          "RowSource": "SELECT USysTableOfLists.Item, USysTableOfLists.ItemDescription FROM USysTableOfLists WHERE (((USysTableOfLists.ListName)=\"TerrainTexture\")) ORDER BY USysTableOfLists.ItemOrder; ",
+          "RowSourceType": "Table/Query"
+        }
+      },
+      "Zone": {
+        "Name": "cmbZone",
+        "Binding": "Zone",
+        "Properties": {
+          "ColumnCount": "2",
+          "ColumnWidths": "576;2880",
+          "RowSource": "SELECT DISTINCT USysZoneList.Zone, USysZoneList.ZoneDescription FROM USysZoneList ORDER BY USysZoneList.Zone, USysZoneList.ZoneDescription; ",
+          "RowSourceType": "Table/Query"
+        }
+      }
+    }
+  }
+}

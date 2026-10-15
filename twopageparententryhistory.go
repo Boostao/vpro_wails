@@ -47,14 +47,8 @@ func twoPageEntryHistoryAssignments(ctx context.Context, form string, masterAllo
 	if err != nil || len(planned) != len(event.EntryPlan) {
 		return nil, errors.Join(err, errors.New("complete-entry history has a repeated, unchanged or malformed full source plan"))
 	}
-	for _, assignment := range audited {
-		found := false
-		for _, committed := range planned {
-			found = found || reflect.DeepEqual(assignment, committed)
-		}
-		if !found {
-			return nil, errors.New("complete-entry audited change differs from the full committed source plan")
-		}
+	if err := verifySourceParentAuditedSubset(audited, planned, "complete-entry"); err != nil {
+		return nil, err
 	}
 	var projectChange *siviParentHistoryChange
 	for _, assignment := range planned {
@@ -82,26 +76,9 @@ func twoPageEntryHistoryAssignments(ctx context.Context, form string, masterAllo
 			return nil, errors.New("complete-entry ProjectID source proof differs from its mixed assignment")
 		}
 	}
-	env := ProjectMetadataTable{Columns: original.EnvColumns, Rows: []ProjectMetadataRow{
-		{RowID: original.Rows[0].Env.RowID, Cells: append([]ProjectMetadataCell{}, original.Rows[0].Env.Cells...)},
-	}}
-	admin := ProjectMetadataTable{Columns: original.AdminColumns, Rows: []ProjectMetadataRow{
-		{RowID: original.Rows[0].Admin.RowID, Cells: append([]ProjectMetadataCell{}, original.Rows[0].Admin.Cells...)},
-	}}
-	for _, assignment := range planned {
-		table := &env
-		if assignment.Table == original.AdminTable {
-			table = &admin
-		}
-		columns, err := siteUnitTransferColumns(*table, assignment.Column)
-		if err != nil {
-			return nil, err
-		}
-		table.Rows[0].Cells[columns[assignment.Column]] = cloneSiteUnitCell(assignment.After)
-	}
-	committed, err := projectParent(ctx, original.ContextID, project, plot, env, admin)
-	if err != nil || !reflect.DeepEqual(committed, event.Committed) {
-		return nil, errors.Join(err, errors.New("complete-entry history changed unrelated physical parent values"))
+	if err := verifySourceParentEntryPlan(ctx, original, event.Committed, planned, projectParent,
+		func(left, right *siviParentProjection) bool { return reflect.DeepEqual(left, right) }, "complete-entry"); err != nil {
+		return nil, err
 	}
 	return audited, nil
 }

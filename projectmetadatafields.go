@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -80,6 +81,11 @@ var projectMetadataFields = func() map[string]projectMetadataField {
 	}
 	return fields
 }()
+
+func metadataCellEqual(left, right ProjectMetadataCell) bool {
+	return reflect.DeepEqual(left, right) && (left.Real == nil ||
+		math.Float64bits(*left.Real) == math.Float64bits(*right.Real))
+}
 
 func metadataCellValue(cell ProjectMetadataCell) (any, error) {
 	var value any

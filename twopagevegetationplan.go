@@ -225,8 +225,7 @@ func planTwoPageVegetationQualifiedEdits(ctx context.Context, original *twoPageV
 }
 
 func twoPageVegetationCellEqual(left, right ProjectMetadataCell) bool {
-	return reflect.DeepEqual(left, right) && (left.Real == nil ||
-		math.Float64bits(*left.Real) == math.Float64bits(*right.Real))
+	return metadataCellEqual(left, right)
 }
 
 func twoPageVegetationTableEqual(left, right ProjectMetadataTable) bool {

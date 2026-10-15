@@ -231,8 +231,11 @@ accepts all eight scoped paths with no significant findings; all1836 inputs,
 passes exit0, UTC2026-10-15T10:25:41.019676 to11:38:36.421901; root4126.154s.
 All1836 inputs,57 artifacts and package/embed discovery match, with four
 predecessor owners freshly absent; source freeze released. Do not repeat this
-completed integration. Next safe implementation is
-explicit CHARS entry-domain policy/planning, not an alias of normal writers.
+completed source-owner integration. Its explicit CHARS entry-domain planner,
+references and private mutation/history successor are now integrated below,
+not aliased to normal writers.
+The nine-path read-owner successor is committed locally as `c277922` on main,
+with required co-author and clean immediate postcommit status; no push.
 No CHARS native acceptance or write/menu enablement is granted.
 Private `chars-sivi-entry-storage` retains seventeen DAO16/ACE1033 field cases
 and a separate closed readonly observer with unchanged canonical/fixture bytes
@@ -242,6 +245,70 @@ six UTF-16 units/spaces preserve, seven/eight refuse. Water SINGLE narrows
 Negative underflow persists as negative zero. Do not inherit vegetation's
 `<100` rule, widen old consumers or silently normalize unsupported SQLite zero
 signs. No bound-control/callback/default/reference-membership proof is granted.
+The same closed fixture's readonly all72-template-field observation is in
+`chars-sivi-entry-storage\entry-field-metadata.json`; it identifies Admin.StartDate
+1900..2500 and distinct source empty permissions. The unexposed68-domain CHARS
+planner is implemented with source-only test metadata and focused tests.
+Three shared helper changes retain legacy parent comparisons and vegetation
+exact-cell equality while adding an explicit preparation boundary for CHARS.
+All188 coupled race cases pass (root246.232s), as do production vet/SQLite build.
+Distinct ten-path read-only review accepts the internal planner without
+significant issues; all1839 inputs/12 canonical/19 protected assets match.
+Private `chars-sivi-entry-planner\receipt.json` and `review-disposition.json`
+seal that acceptance. There are32 source ComboBoxes,31 excluding ProjectID.
+The reference successor below reuses28 normal readers and separately qualifies
+RootZoneParticleSize, SnowCoverregime and SV_AhorizonType. Unknown callbacks
+remain unavailable; no public/frontend/native authority follows the planner.
+
+Current internal CHARS reference successor captures all32 original ComboBoxes
+in both forms with the existing parser, then exposes31 non-ProjectID read-model
+policies in one owned snapshot. Five common properties differ only in widths.
+Original literals `realmclass`/`surfaceshape` stay exact in the source fixture;
+normal catalogue selectors retain their existing explicit adaptations.
+CHARS SubZone SQL targets `[forms]![frmSIVIsite]![cmbZone]`: runtime resolution
+is unknown, so SubZone choices are explicitly unavailable. Do not invent an
+own-CHARS or two-page NULL/All filter. Ah/Ae/blank is retained, with blank
+nonselectable pending bound NULL/empty qualification. Other read errors cannot
+become per-field unavailable successes. All195 coupled race cases pass
+(root256.098s), with production vet/build and distinct seven-path read-only
+acceptance; all1842 inputs/12 canonical/19 protected assets remain unchanged.
+Private `chars-sivi-reference-validation\receipt.json` (SHA256
+`fb7493dfa9dd688c4dd29081fe92dd3a18ecc6b7137c25efbdba9567a1f55921`)
+and `review-disposition.json` (SHA256
+`ccffa0d593c30ee366c47b9e369ad31d8b1cbe1cbe073557f6a9a5a1e7d8b09d`)
+seal the accepted internal reference scope. The coherent internal mutation
+successor below is now integrated; no default/native availability follows.
+Private `chars-sivi-reference-source\source-properties.json` seals the literal
+parser output; packaged source-only `testdata\chars-sivi-reference-source.json`
+contains no data rows or private paths. No native form or SQL was executed.
+
+Current unexposed CHARS writer/restorer reuses source-parent transactions/audits
+and requires independent approval. New files `sivicharsparentwrite.go`,
+`sivicharsparenthistory.go`, `sourceparententryhistory.go` and
+`sivicharsparentwrite_test.go`; tightly coupled changes are the equivalent
+two-page full-plan invariant extraction and explicit CHARS EntryPlan/REAL
+comparator seams in `siviparentrestore.go`. All67 qualified domains pass physical
+write/history/restoration in local/external contexts. Source SubZone changes
+and new blank Ahorizon refuse; unchanged historical omission stays live.
+Strength1 NULL additions retain full-plan provenance but are not implicitly
+restored. Focused tests pass root8.550s;201 coupled races pass root275.951s,
+with production vet/build and distinct ten-path internal mutation/history
+acceptance. All1846 inputs/12 canonical/19 protected assets remain unchanged.
+Private `chars-sivi-write-validation\receipt.json` (SHA256
+`437750ee991c831ef17291b1e554bfbc85f5e5f843d971b386c0a045a9378975`)
+and `review-disposition.json` (SHA256
+`1fd9d3ec4a314128fd789d7b261d5b6864bb3b7b88c16dbb2c0fdc5421f0b938`)
+seal the bounded acceptance. Coherent full integration passes exit0,
+UTC2026-10-15T13:03:56.034915 to14:19:42.902748, root4308.862s. All1846 inputs,
+109 sealed artifacts and package/embed discovery match with zero drift.
+Four predecessor owners are freshly absent; source freeze released.
+Private `chars-sivi-entry-integration\receipt.json` and `full-race.txt` seal
+the result; race log SHA256
+`ed7e8c9239480a66210174b80735a9f526700d202303a2614f289d60694e0be9`.
+Do not rerun this accepted integration. Next implement explicit owned
+proposal/reference authorization, lifecycle/UI wiring and disposable actual
+Wails acceptance; preserve disabled SubZone/blank-Ahorizon unknowns.
+No public service, bindings/frontend/native availability.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated

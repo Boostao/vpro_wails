@@ -1,0 +1,727 @@
+{
+  "sourceSHA256": "01481b94569c7172f32a812e65365f78cea5e440dd63220d91a37dade5778423",
+  "metadataReceiptSHA256": "45b13df160b1735da8df88b0328596925379cc6720bcab692fe482769cf7a0a5",
+  "scope": "DAO template field metadata only; no rows, control timing or reference membership",
+  "fields": [
+    {
+      "binding": "siteNotes",
+      "column": "SiteNotes",
+      "owner": "Env",
+      "type": 12,
+      "size": 0,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "Location",
+      "column": "Location",
+      "owner": "Env",
+      "type": 10,
+      "size": 255,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "Latitude",
+      "column": "Latitude",
+      "owner": "Env",
+      "type": 7,
+      "size": 8,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "Longitude",
+      "column": "Longitude",
+      "owner": "Env",
+      "type": 7,
+      "size": 8,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "LocationAccuracy",
+      "column": "LocationAccuracy",
+      "owner": "Env",
+      "type": 3,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "Elevation",
+      "column": "Elevation",
+      "owner": "Env",
+      "type": 3,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "FSRegionDistrict",
+      "column": "FSRegionDistrict",
+      "owner": "Env",
+      "type": 10,
+      "size": 7,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "NtsMapSheet",
+      "column": "NtsMapSheet",
+      "owner": "Env",
+      "type": 10,
+      "size": 8,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_PolygonNumber",
+      "column": "SV_PolygonNumber",
+      "owner": "Env",
+      "type": 10,
+      "size": 25,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "PlotRepresenting",
+      "column": "PlotRepresenting",
+      "owner": "Env",
+      "type": 10,
+      "size": 255,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "Zone",
+      "column": "Zone",
+      "owner": "Env",
+      "type": 10,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SubZone",
+      "column": "SubZone",
+      "owner": "Env",
+      "type": 10,
+      "size": 8,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SiteSeries",
+      "column": "SiteSeries",
+      "owner": "Env",
+      "type": 10,
+      "size": 5,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "RealmClass",
+      "column": "RealmClass",
+      "owner": "Env",
+      "type": 10,
+      "size": 5,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "MapUnit",
+      "column": "MapUnit",
+      "owner": "Env",
+      "type": 10,
+      "size": 15,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "MoistureRegime",
+      "column": "MoistureRegime",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "NutrientRegime",
+      "column": "NutrientRegime",
+      "owner": "Env",
+      "type": 10,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SnowCoverregime",
+      "column": "SnowCoverregime",
+      "owner": "Env",
+      "type": 10,
+      "size": 1,
+      "required": false,
+      "allowZeroLength": true,
+      "validationRule": ""
+    },
+    {
+      "binding": "SlopeGradient",
+      "column": "SlopeGradient",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "Aspect",
+      "column": "Aspect",
+      "owner": "Env",
+      "type": 3,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "MesoSlopePosition",
+      "column": "MesoSlopePosition",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SurfaceShape",
+      "column": "SurfaceShape",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "Exposure1",
+      "column": "Exposure1",
+      "owner": "Env",
+      "type": 10,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "Exposure2",
+      "column": "Exposure2",
+      "owner": "Env",
+      "type": 10,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SiteDisturbance1",
+      "column": "SiteDisturbance1",
+      "owner": "Env",
+      "type": 10,
+      "size": 8,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SiteDisturbance2",
+      "column": "SiteDisturbance2",
+      "owner": "Env",
+      "type": 10,
+      "size": 8,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SiteDisturbance3",
+      "column": "SiteDisturbance3",
+      "owner": "Env",
+      "type": 10,
+      "size": 8,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_FloodPlain",
+      "column": "SV_FloodPlain",
+      "owner": "Env",
+      "type": 1,
+      "size": 1,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "StandAge",
+      "column": "StandAge",
+      "owner": "Env",
+      "type": 3,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_StandHeight",
+      "column": "SV_StandHeight",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_CanopyComposition",
+      "column": "SV_CanopyComposition",
+      "owner": "Env",
+      "type": 10,
+      "size": 50,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_StandAgeEstMeas",
+      "column": "SV_StandAgeEstMeas",
+      "owner": "Env",
+      "type": 10,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": true,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_StandHeightEstMeas",
+      "column": "SV_StandHeightEstMeas",
+      "owner": "Env",
+      "type": 10,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": true,
+      "validationRule": ""
+    },
+    {
+      "binding": "SuccessionalStatus",
+      "column": "SuccessionalStatus",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "StructuralStage",
+      "column": "StructuralStage",
+      "owner": "Env",
+      "type": 10,
+      "size": 6,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "TerrainTextureSurf",
+      "column": "TerrainTextureSurf",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "TerrainTextureSubSurf",
+      "column": "TerrainTextureSubSurf",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SurficialMaterialSurf",
+      "column": "SurficialMaterialSurf",
+      "owner": "Env",
+      "type": 10,
+      "size": 6,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SurficialMaterialSubSurf",
+      "column": "SurficialMaterialSubSurf",
+      "owner": "Env",
+      "type": 10,
+      "size": 6,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SurfaceExpSurf",
+      "column": "SurfaceExpSurf",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SurfaceExpSubSurf",
+      "column": "SurfaceExpSubSurf",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "GeoMorProSurf",
+      "column": "GeoMorProSurf",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "GeoMorProSubSurf",
+      "column": "GeoMorProSubSurf",
+      "owner": "Env",
+      "type": 10,
+      "size": 3,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "BedrockGeology1",
+      "column": "BedrockGeology1",
+      "owner": "Env",
+      "type": 10,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "BedrockGeology2",
+      "column": "BedrockGeology2",
+      "owner": "Env",
+      "type": 10,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "HumusForm",
+      "column": "HumusForm",
+      "owner": "Env",
+      "type": 10,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "HumusThickness",
+      "column": "HumusThickness",
+      "owner": "Admin",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_AhorizonType",
+      "column": "SV_AhorizonType",
+      "owner": "Env",
+      "type": 10,
+      "size": 5,
+      "required": false,
+      "allowZeroLength": true,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_AhorizonDepth",
+      "column": "SV_AhorizonDepth",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "SoilDrainage",
+      "column": "SoilDrainage",
+      "owner": "Env",
+      "type": 10,
+      "size": 5,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_WaterTableCM",
+      "column": "SV_WaterTableCM",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_GleyingMottlingCM",
+      "column": "SV_GleyingMottlingCM",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "RootZoneParticleSize",
+      "column": "RootZoneParticleSize",
+      "owner": "Env",
+      "type": 10,
+      "size": 6,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_PercentCoarseFrags",
+      "column": "SV_PercentCoarseFrags",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "SV_SoilDepth",
+      "column": "SV_SoilDepth",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "RootingDepth",
+      "column": "RootingDepth",
+      "owner": "Env",
+      "type": 3,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "RootRestrictingType",
+      "column": "RootRestrictingType",
+      "owner": "Env",
+      "type": 10,
+      "size": 1,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "RootRestrictingDepth",
+      "column": "RootRestrictingDepth",
+      "owner": "Env",
+      "type": 3,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "StrataCoverTree",
+      "column": "StrataCoverTree",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "StrataCoverShrub",
+      "column": "StrataCoverShrub",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "StrataCoverHerb",
+      "column": "StrataCoverHerb",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "StrataCoverMoss",
+      "column": "StrataCoverMoss",
+      "owner": "Env",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "StrataCoverTotal",
+      "column": "StrataCoverTotal",
+      "owner": "Admin",
+      "type": 6,
+      "size": 4,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "VegNotes",
+      "column": "VegNotes",
+      "owner": "Env",
+      "type": 12,
+      "size": 0,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "PlotNumber",
+      "column": "PlotNumber",
+      "owner": "Env",
+      "type": 10,
+      "size": 7,
+      "required": true,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "Date",
+      "column": "Date",
+      "owner": "Env",
+      "type": 8,
+      "size": 8,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    },
+    {
+      "binding": "SiteSurveyor",
+      "column": "SiteSurveyor",
+      "owner": "Env",
+      "type": 10,
+      "size": 30,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "ProjectID",
+      "column": "ProjectID",
+      "owner": "Env",
+      "type": 10,
+      "size": 30,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "FieldNumber",
+      "column": "FieldNumber",
+      "owner": "Env",
+      "type": 10,
+      "size": 50,
+      "required": false,
+      "allowZeroLength": false,
+      "validationRule": ""
+    },
+    {
+      "binding": "PlotType",
+      "column": "PlotType",
+      "owner": "Admin",
+      "type": 10,
+      "size": 10,
+      "required": false,
+      "allowZeroLength": true,
+      "validationRule": ""
+    },
+    {
+      "binding": "StartDate",
+      "column": "StartDate",
+      "owner": "Admin",
+      "type": 3,
+      "size": 2,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": "Between 1900 And 2500"
+    },
+    {
+      "binding": "SpeciesListComplete",
+      "column": "SpeciesListComplete",
+      "owner": "Env",
+      "type": 1,
+      "size": 1,
+      "required": false,
+      "allowZeroLength": null,
+      "validationRule": ""
+    }
+  ]
+}

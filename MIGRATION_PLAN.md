@@ -194,9 +194,48 @@ Complete source callbacks, per-variant drafts/references and actual desktop
 acceptance remain ordered deliverables, not exclusions.
 Seventeen independently closed/reopened DAO storage cases qualify TEXT6
 empty/UTF-16 refusal and SINGLE narrowing/adjacent maximum/negative-zero behavior.
-These do not qualify bound-control timing. Next implement explicit CHARS entry
-policies/planning with historical omission and SQLite representability guards,
-not an alias of normal writers or an unmodified raw-range helper.
+These do not qualify bound-control timing. Explicit CHARS entry policies/planning
+now preserve historical omission and SQLite representability without aliasing
+normal writers or using an unmodified raw-range helper.
+The internal68-domain planner is implemented with an independent all72-template-
+field metadata fixture and focused tests. Admin.StartDate's actual1900..2500
+table rule is enforced only for changed CHARS assignments; legacy consumers
+remain unchanged. Canonical source identities/CAS precede preparation, exact
+REAL bits distinguish zero signs and post-narrow unchanged values omit.
+All188 coupled race cases pass (root246.232s), as do production vet/build.
+Distinct ten-path review accepts the internal planner with all1839 inputs,
+12 canonical sources and19 protected assets unchanged. No public writer/reference/
+desktop availability follows this internal planner; its source-qualified reference
+and mutation successor is now complete-source integrated below.
+
+CHARS reference successor is implemented internally:31 non-ProjectID ComboBox
+policies,28 reused source-equivalent normal readers plus the distinct particle,
+SnowCoverRegime and Ah/Ae/blank sources. All32 original combos in each form are
+captured through the existing parser; five common differences are widths only.
+SubZone source SQL names normal frmSIVIsite.cmbZone, not CHARS: keep it explicitly
+unavailable until runtime resolution is qualified, never inherit two-page
+NULL/All behavior. Blank Ahorizon choice is retained, not approved for assignment.
+All other read/schema/cancellation/malformed-text errors propagate. Owned
+reference snapshot passes195 coupled race cases (root256.098s), production
+vet/build and distinct seven-path review. All1842 inputs/12 canonical/19
+protected assets match throughout. No public availability follows this reader;
+complete-source integration now covers the coherent internal entry successor.
+
+Private CHARS mutation successor is implemented, not exposed:67 qualified
+direct domains through the existing owned source-parent writer, explicit
+independent approval, exact CHARS projector, isolated typed full-plan history
+and audited-subset restoration. Changed SubZone/new blank Ahorizon remain
+unavailable; unchanged historical omission remains live. REAL-bit CAS/history
+checks do not alter older consumers. Focused physical tests and201 coupled race
+cases pass (root275.951s), as do production
+vet/build. Distinct ten-path review accepts the internal mutation/history scope
+with all1846 inputs/12 canonical/19 protected assets unchanged. Coherent full
+Go race integration passes exit0 (root4308.862s), UTC2026-10-15T13:03:56.034915
+to14:19:42.902748. All1846 inputs/109 artifacts/package and embed discovery
+remain unchanged; four predecessor native owners are freshly absent and the
+source freeze is released. Next implement explicit owned proposal/reference
+authorization and lifecycle/UI integration; native source-control timing and
+public availability remain outstanding, not implicitly accepted by these tests.
 
 The mapped normal/CHARS single-plot Google Earth successor is integrated. Its
 registered independently gated candidate previews one saved literal Env plot, not the existing

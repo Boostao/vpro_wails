@@ -34,6 +34,26 @@ and observer fixture bytes remain exact; no lock, UI or callback run occurred.
 Bound-control timing, reference membership/defaults and SQLite sign preservation
 are not established by this engine calibration.
 
+The coherent internal CHARS entry successor now includes68 prepared direct-field
+domains,31 owned ComboBox reference policies and67 currently qualified direct
+mutation domains with isolated full-plan history/audited-subset restoration.
+Three distinct read-only reviews accept the planner, references and mutation
+scopes. All201 coupled races pass (root275.951s), with production SQLite-only
+vet/build;1846 inputs/12 canonical sources/19 protected assets match.
+Final focused receipt SHA256:
+`437750ee991c831ef17291b1e554bfbc85f5e5f843d971b386c0a045a9378975`;
+mutation review disposition SHA256:
+`1fd9d3ec4a314128fd789d7b261d5b6864bb3b7b88c16dbb2c0fdc5421f0b938`.
+Full default-profile Go race passes exit0, UTC2026-10-15T13:03:56.034915 to
+14:19:42.902748, root4308.862s. All1846 inputs/109 artifacts/discovery remain
+unchanged, four predecessor owners are freshly absent and the freeze released.
+Full-race log SHA256:
+`ed7e8c9239480a66210174b80735a9f526700d202303a2614f289d60694e0be9`.
+Prior accepted frontend/demo assets remain unchanged. Original CHARS SubZone's
+normal-form reference and blank Ahorizon NULL/empty assignment remain
+unqualified/disabled. Proposal/reference authorization, public UI/lifecycle
+and native bound-control/desktop acceptance remain separate ordered work.
+
 PC-ORD Break Report has thirteen exact extracted-query DAO cases and an
 independently reviewed bounded planner/owned reader/service/actual-Go wire.
 Backend review found a mutable-owner pre-lease race: the old-reader overlay

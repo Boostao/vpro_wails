@@ -85,6 +85,11 @@ func (s *ContextService) restoreSourceParentHistory(ctx context.Context, context
 }
 
 func (s *ContextService) restoreSourceParentHistoryAuthorized(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction, historyDomain siviParentHistoryDomain, read func(context.Context, *sql.Tx, *sqliteContext, string, string, string) (*siviParentProjection, error), authorize func(*PlotService) error) (*AuditRestoreResult, error) {
+	return s.restoreSourceParentHistoryCompared(ctx, contextID, plot, historyID, action, historyDomain, read, authorize,
+		func(left, right *siviParentProjection) bool { return reflect.DeepEqual(left, right) })
+}
+
+func (s *ContextService) restoreSourceParentHistoryCompared(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction, historyDomain siviParentHistoryDomain, read func(context.Context, *sql.Tx, *sqliteContext, string, string, string) (*siviParentProjection, error), authorize func(*PlotService) error, equal func(*siviParentProjection, *siviParentProjection) bool) (*AuditRestoreResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*AuditRestoreResult, error) {
 		if action != AuditRestoreCancel && action != AuditRestoreRetain && action != AuditRestorePrune {
 			return nil, errors.New("SIVI parent restoration requires cancel, retain or prune")
@@ -132,7 +137,8 @@ func (s *ContextService) restoreSourceParentHistoryAuthorized(ctx context.Contex
 				return err
 			}
 			project := owner.selection.Project
-			if event.EntryPlan != nil && !twoPageEntryProjectHistoryTable(historyDomain.table) {
+			if event.EntryPlan != nil && !twoPageEntryProjectHistoryTable(historyDomain.table) &&
+				historyDomain.table != siviCHARSParentEntryHistoryTable {
 				return errors.New("complete-entry source plans belong only to their exact entry history")
 			}
 			if historyDomain.table != siviProjectAssignmentHistoryTable && !twoPageEntryProjectHistoryTable(historyDomain.table) && event.ProjectAssignment != nil {
@@ -147,7 +153,7 @@ func (s *ContextService) restoreSourceParentHistoryAuthorized(ctx context.Contex
 			}
 			expectedParent := *event.Committed
 			expectedParent.ContextID = contextID
-			if !reflect.DeepEqual(fresh, &expectedParent) {
+			if !equal(fresh, &expectedParent) {
 				return errors.New("SIVI physical parents changed since the typed edit; no restoration or pruning")
 			}
 			if err := validateSIVIPhysicalSchema(ctx, tx, "main", project+"_Audit", "parent restoration audits"); err != nil {
