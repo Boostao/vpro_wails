@@ -78,6 +78,7 @@ import * as TwoPageSourceAuditService from "./twopagesourceauditservice.js";
 import * as TwoPageVegetationService from "./twopagevegetationservice.js";
 import * as TwoPageVegetationSpeciesListService from "./twopagevegetationspecieslistservice.js";
 import * as TwoPageVegetationTableService from "./twopagevegetationtableservice.js";
+import * as UserLogService from "./userlogservice.js";
 import * as VegetationWorkbookService from "./vegetationworkbookservice.js";
 import * as WorkingUnitService from "./workingunitservice.js";
 export {
@@ -158,6 +159,7 @@ export {
     TwoPageVegetationService,
     TwoPageVegetationSpeciesListService,
     TwoPageVegetationTableService,
+    UserLogService,
     VegetationWorkbookService,
     WorkingUnitService
 };
@@ -494,6 +496,7 @@ export type {
     TwoPageVegetationTableReview,
     TwoPageVegetationTableRow,
     TwoPageVegetationWriteResult,
+    UserLogReview,
     VegRecord,
     VegetationAttributeUpdate,
     VegetationCreationRequest,

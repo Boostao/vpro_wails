@@ -20,7 +20,7 @@ its guard. Use a disposable project/configuration for a demo with writes.
 | Forms | FS882 mapped parent/children; bounded SIVI, two-page, picture and restoration workflows | Whole-form linked callbacks, remaining calculations/navigation, picture timing and printer-dependent events |
 | Reports | Long Environment/Vegetation, Site Unit/Lifeform summaries, raw Summary inspection and qualified exports; independently gated bounded numeric environmental inspection | Complete combined/formatted Summary output, broader lifeform/numeric environmental cases, remaining grouping/lumping variants, printing |
 | Data management | Original SQLite family, physical project names/descriptions, YAML configuration, external contexts, draft-safe switching and reviewed transfers | Production project creation/import/conversion, merge/splinter/compare and broader administration |
-| Other workflows | Hierarchy browsing, bounded species checking, location preparation and read-only label preview | Hierarchy editing/diagram, Herbarium, broader standards compliance, user/log/theme and TurboVeg |
+| Other workflows | Hierarchy browsing, bounded species checking, location preparation, read-only label preview and integrated saved User log inspection | Hierarchy editing/diagram, Herbarium, broader standards compliance, user/session administration, theme and TurboVeg |
 
 UI-free R automation, cloud/public BEC products and wider publication/analysis
 remain separate scope tracks, not delivered desktop functionality. See
@@ -45,6 +45,21 @@ It shares the existing metadata guards rather than adding a separate controller
 or silently choosing a physical record. Global metadata administration and
 implicit Access Save behavior are not granted; other metadata operation flags
 and backend ownership checks remain unchanged.
+
+**Forms > User log - Read-only** has a reviewed, disposable-native-verified
+integrated successor. It requires `VITE_USER_LOG_REVIEW=true` when
+building the frontend and independent `VPRO_USER_LOG_REVIEW=true` at runtime.
+The explicit Review reads the current context's preserved VPro64
+`USysUserLog`, not project audit history or live Wails sessions. Original User,
+Login, OutTime and Local Machine captions remain; Show Current defaults to2 and
+means only stored NULL OutTime, while Show All is1. NULL/empty text, duplicate
+physical rows and raw temporal values remain distinct. Technical rowid ordering,
+50-row pages and explicit refusal above10,000 physical rows are desktop
+adaptations. No login/logout recording, source editing/deletion, datetime or
+timezone repair, new storage or default enablement is granted. This successor
+is not in the qualified Friday ZIP below. Full Go race integration passes with
+all1697 core inputs, separately pinned HTML,209 artifacts and package/embed
+discovery unchanged; all seven native owners are freshly absent.
 
 The qualified private Windows demo is
 `build\bin\VPRO-Friday-Demo-2026-10-16-menu.zip` (17,273,336 bytes;
@@ -122,6 +137,7 @@ measurements do not prove that every reported performance issue is fixed.
 | Guarded vegetation lifecycle | Reviewed full-row deletion/reserved IDs; creation with explicit species/numeric/NULL decisions; independent personal definitions | Opt-in adaptations; no guessed defaults, invented U/X membership or hidden VUser write |
 | Standards checking | Whole-project/selected-WU reviewed species-code replacements; exact source membership and all physical rows | Opt-in; broader standards/environment compliance remains open |
 | Project metadata | Review/all-field drafts, blank/master-template creation and dedicated typed provenance restoration | Opt-in, distinct project/master/user storage; generic metadata restore unavailable |
+| Saved User log | Reviewed/native-verified and full-race-integrated read-only four-column VPro64 inspection, NULL-only Current/All, physical duplicates and paging | Independent default-off frontend/backend gates; not session recording, editing/deletion or live-user presence |
 | Profiles and navigation | Ordered preview, rule edit/create/delete, explicit result navigation, independent selection/writer ownership, usable blank files/tables and reviewed Save as SU | Opt-in; arbitrary-file administration, broad history restoration and some criterion semantics open |
 | Find/Enter | Source-bound explicit Enter navigation and exact scoped Find with safe Open lifecycle | Opt-in adaptations; no Access Find-dialog emulation |
 | Env Into SU / SU Into Env | Independent reviews of all matching selected-SU plots; owned-project file only; atomic typed provenance, drift/trigger rollback/retry and history replay guards | Independently opt-in; separate-file SU and personal-definition writes unavailable |

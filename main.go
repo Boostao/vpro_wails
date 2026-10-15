@@ -474,6 +474,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	userLog, err := NewUserLogService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	twoPageProfiling, err := NewTwoPageProfilingService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -533,6 +537,7 @@ func main() {
 		application.NewService(twoPageVegetationTable),
 		application.NewService(twoPageEnvironmentTable),
 		application.NewService(twoPageProjectMetadata),
+		application.NewService(userLog),
 		application.NewService(twoPageProfiling),
 		application.NewService(profileSpeciesPresence),
 		application.NewService(twoPageVegetation),

@@ -91,6 +91,39 @@ pass. Exact-current-binary synthetic10,052-plot paging passes ten62-78ms reads
 against250ms. This is a private disposable demo, not default promotion or
 completion of the forms/reports/ribbon work.
 
+The saved User log successor is materialized and full-race integrated.
+Its exact16-file private source review,74 focused frontend cases,
+check0/0, physical race and separate frontend/Wails builds pass. Actual Wails
+default/frontend-off/backend-off/enabled modes verify independent gates,
+Current53/All55, duplicate physical rows, raw blob/NULL/empty storage, paging,
+three-width visible caption/header ranges and held actual response with exact
+native-close cancellation acknowledgement before Cancel/remount/release/retry.
+All seven owners normally close, including a focused actual held-context attempt/
+foreign-context backend refusal follow-up; two caption-box harness failures and a
+prelaunch profile-key failure remain retained. The source table's original four captions,
+default Current2/All1 and NULL-only filtering are preserved. Read-only rowid
+paging/10,000-row bound are adaptations, not session recording, bound
+editing/deletion or live-user parity. Both new flags remain default-off; the
+qualified Friday ZIP and accepted frontend assets are unchanged.
+Materialized validation passes all1867 registered frontend cases, check/build,
+focused race and production compilation. Complete Go race passes exit0,
+root4055.713s, with all1697 core inputs, separately pinned HTML,209 artifacts and
+package/embed discovery unchanged. All seven original owners are freshly absent;
+the source freeze is released.
+
+Next independent report work is Subzone Matrix of Units, routed through
+`Sb12OnAction`/`sb12btn03`. Eleven exact extracted-query scenarios on a disposable
+ACE1033 fixture qualify label-driven joins, Level11 hierarchy rows, ten-character
+unit matching and nine-character pivot headers. Duplicate labels, NULL/empty
+pivot `<>`, an all-NULL row for empty hierarchy versus zero rows for no labels,
+and orphan nonnull Parent values remain distinct. Unordered `First(Value)` chose
+04 rather than insertion-first01 in one ambiguous cell: do not approximate it
+with rowid-first. Eight canonical source/database hashes remain unchanged and
+DAO closes normally without a lock, Access UI or Excel owner. This is query
+qualification, not original callback/workbook parity or report enablement.
+Define the bounded implementation and reuse existing snapshot/XLSX/publication
+boundaries before registration; differing ambiguous cells must not be guessed.
+
 The mapped normal/CHARS single-plot Google Earth successor is integrated. Its
 registered independently gated candidate previews one saved literal Env plot, not the existing
 all-project/selected-SU report expansion. Paired-parent/current-context ownership,

@@ -2710,6 +2710,16 @@ export interface TwoPageVegetationTableRow {
 
 export type TwoPageVegetationWriteResult = twoPageVegetationWriteResult;
 
+export interface UserLogReview {
+    "contextId": string;
+    "sourcePath": string;
+    "mode": number;
+    "offset": number;
+    "limit": number;
+    "total": number;
+    "table": ProjectMetadataTable;
+}
+
 /**
  * VegRecord represents a vegetation entry (Layer A-D).
  */

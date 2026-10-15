@@ -70,8 +70,8 @@ guarantee or Access parity. Whole forms/reports/ribbon remain unfinished.
 
 ## Next successor and continuation
 
-Private read-only saved User log is reviewed and native-accepted, but is not
-materialized in the live application. It excludes source editing/deletion,
+Read-only saved User log is reviewed, native-accepted and materialized as the
+exact16-path successor; complete-source integration passes. It excludes source editing/deletion,
 login/logout recording and live-user claims. Source captions/default Current2/
 All1 and NULL-only Current semantics are preserved; rowid paging and a10,000
 physical-row bound are explicit adaptations. It reuses the preserved VPro64
@@ -85,16 +85,41 @@ blob/NULL/empty distinctions, paging, visible caption/four headers at three
 widths, held actual response/Cancel/remount/retry and exact native-close
 cancellation acknowledgement before releasing the barrier.
 
-All six owners, including two retained caption-box harness failures, normally
+All seven owners, including two retained caption-box harness failures, normally
 close and are freshly absent. The shared intentional630px table scrolls
 horizontally; visible label ranges, not offscreen blank caption-box space,
 establish containment. A prelaunch profile-key harness failure is retained.
 No application change was needed for those harness corrections.
 
-Next: finish the authorized source commit, materialize only the exact accepted
-User log successor with directly related capability docs, then validate/integrate
-that successor. Preserve the qualified demo and unrelated work. Continue the
-ordered forms/report backlog rather than treating this slice as completion.
+The authorized predecessor snapshot is committed locally on main as `0ff29fe`,
+with the required co-author and clean pre-successor status; it was not pushed.
+All1831 registered frontend and24 release-tool tests pass. Two coupled CJS-only
+harness updates seed/assert the new presence result and exercise the shared
+metadata predicate; no application behavior changed after the predecessor's
+1687-input acceptance. Their exact hashes are retained in the successor lineage.
+
+Materialized validation passes all1867 registered frontend cases, check/build,
+focused race and production SQLite compilation without changing accepted
+frontend assets or the sixteen reviewed paths. A focused seventh native owner
+also verifies an actual context handler is blocked while the response is held,
+the owned context/16-file family remain unchanged, the actual backend rejects a
+foreign context and Cancel/remount/release/fresh retry succeeds.
+
+Full User log integration passes exit0, UTC2026-10-15T03:03:45.295460 to
+04:14:46.061757; root4055.713s. All1697 core inputs, separately pinned HTML,
+209 artifacts and package/embed discovery are unchanged; all seven original
+owners are freshly absent. The strict receipt accepts without an exception and
+releases the source freeze. Do not duplicate this completed suite.
+
+Next: persist the accepted successor under the standing commit authorization,
+then continue Subzone Matrix report implementation. Its private
+`subzone-matrix-source` contract seals eleven extracted-query ACE1033 cases,
+eight unchanged canonical hashes and normal DAO closure/no lock. No Access UI,
+Excel or app write occurred. Preserve label-driven joins, the no-label/empty-
+hierarchy distinction, NULL/empty pivot `<>` and orphan-parent SS. Unordered
+First chose04 rather than insertion-first01; differing ambiguous values must
+not be guessed. No original callback/workbook/report availability is granted.
+Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated
 Go overlays and verify exact embed discovery. Generate Wails bindings with

@@ -1,0 +1,451 @@
+{
+  "all": {
+    "contextId": "owned-context",
+    "sourcePath": "C:\\fixtures\\saved '# log\\VPro64.db",
+    "mode": 1,
+    "offset": 0,
+    "limit": 50,
+    "total": 5,
+    "table": {
+      "columns": [
+        {
+          "name": "User",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "InTime",
+          "declaredType": "TIMESTAMP"
+        },
+        {
+          "name": "OutTime",
+          "declaredType": "TIMESTAMP"
+        },
+        {
+          "name": "LocalMachine",
+          "declaredType": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "rowId": "1",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "A",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "2024-01-02 03:04:05",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "PC",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "2",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "3",
+          "cells": [
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "2024-01-03 04:05:06",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "blob",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": "00ff"
+            }
+          ]
+        },
+        {
+          "rowId": "4",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "A",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "2024-01-02 03:04:05",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "PC",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "5",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "historical username longer than fifty UTF16 code units",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 1.125,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "M",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "current": {
+    "contextId": "owned-context",
+    "sourcePath": "C:\\fixtures\\saved '# log\\VPro64.db",
+    "mode": 2,
+    "offset": 0,
+    "limit": 50,
+    "total": 3,
+    "table": {
+      "columns": [
+        {
+          "name": "User",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "InTime",
+          "declaredType": "TIMESTAMP"
+        },
+        {
+          "name": "OutTime",
+          "declaredType": "TIMESTAMP"
+        },
+        {
+          "name": "LocalMachine",
+          "declaredType": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "rowId": "1",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "A",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "2024-01-02 03:04:05",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "PC",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "4",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "A",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "2024-01-02 03:04:05",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "PC",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "5",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "historical username longer than fifty UTF16 code units",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 1.125,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "M",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "end": {
+    "contextId": "owned-context",
+    "sourcePath": "C:\\fixtures\\saved '# log\\VPro64.db",
+    "mode": 2,
+    "offset": 10,
+    "limit": 50,
+    "total": 3,
+    "table": {
+      "columns": [
+        {
+          "name": "User",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "InTime",
+          "declaredType": "TIMESTAMP"
+        },
+        {
+          "name": "OutTime",
+          "declaredType": "TIMESTAMP"
+        },
+        {
+          "name": "LocalMachine",
+          "declaredType": "TEXT"
+        }
+      ],
+      "rows": []
+    }
+  },
+  "page": {
+    "contextId": "owned-context",
+    "sourcePath": "C:\\fixtures\\saved '# log\\VPro64.db",
+    "mode": 1,
+    "offset": 1,
+    "limit": 2,
+    "total": 5,
+    "table": {
+      "columns": [
+        {
+          "name": "User",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "InTime",
+          "declaredType": "TIMESTAMP"
+        },
+        {
+          "name": "OutTime",
+          "declaredType": "TIMESTAMP"
+        },
+        {
+          "name": "LocalMachine",
+          "declaredType": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "rowId": "2",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "3",
+          "cells": [
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "2024-01-03 04:05:06",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "blob",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": "00ff"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
