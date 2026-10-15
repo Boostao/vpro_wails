@@ -237,6 +237,54 @@ source freeze is released. Next implement explicit owned proposal/reference
 authorization and lifecycle/UI integration; native source-control timing and
 public availability remain outstanding, not implicitly accepted by these tests.
 
+The owned CHARS proposal service is implemented and independently default-off:
+strict decoded-key/raw-Unicode wire, current-lease project/VLists identity
+checks using opened-file Stat, four mandatory source catalogues and family
+rollback-journal lock through commit. Unchanged/NULL reference assignments omit
+lookups and optional codes do not inherit two-page callback acknowledgements.
+All257 coupled race cases pass (root406.640s), as do production vet/build,
+with distinct fourteen-path review and all1852 inputs/12 canonical/19
+protected assets unchanged. The source-policy/client successor is independently
+accepted with259 coupled races (root406.680s),68 frontend cases, check/build
+and production vet/build; all1858 inputs/12 canonical/19 protected assets match.
+The independently reviewed candidate adds source-grouped71-binding presentation, owned session/
+close/navigation reuse, exact independent server/client gates and qualified
+interface bindings. All200 affected frontend cases,2310 standard executions,
+check0/0, production vet and private default/enabled Wails builds pass.
+The actual Go/client fixture covers all31 reference receipts, distinguishing
+literal/value identities from physical rowids. Distinct desktop and focused
+corrective reviews accept without significant findings. Disposable Wails
+default/client-off/backend-off/read/write modes pass:71 source bindings,
+67 unlocked controls, actual1384/744/544px client layouts, invalid/valid draft
+and native-close decisions, cancelled held-read/stale-remount refusal, one
+five-field mixed Save/five exact audits, actual prune and distinct P1/P2/P1
+saved reload. The560px native-window minimum precludes a claimed420px client
+test. All original non-audit rows and389 historical audits remain unchanged;
+three consumed histories and one intentionally retained restored audit remain.
+History selection ends with the editor mount; explicit owned native restoration
+is not persistent UI selection. The held-recovery harness failure was released
+once only after the exact native-close cancellation, normally closed and
+proved byte-unchanged before the successful initial-read lifecycle attempt.
+Full race was stopped before acceptance on exact DAO evidence: SV_FloodPlain
+NULL assignments become No, not SQLite NULL. The corrective candidate refuses
+new Boolean NULL explicitly, preserving historical NULL omission/restoration
+and explicit Yes (-1)/No (0). Corrective validation now passes2311 frontend executions,201 affected cases,
+262 fresh coupled Go races, check0/0, production vet and default/enabled Wails
+builds. Distinct12-path review and current-binary gate/read/Boolean native
+acceptance pass. Real Yes/No Saves, NULL refusal/close acknowledgement,
+historical NULL omission and UI restoration preserve exact baseline source/
+audits and existing histories, adding only three consumed histories. The
+historical witness is one explicitly prepared disposable P3 NULL, not a source
+new-write claim. Two postcommit harness mismatches were recovered from actual
+closed history with no replay. Fresh complete Go race integration passes exit0
+(UTC2026-10-15T16:50:47 to18:16:18), with1863 inputs/149 artifacts/discovery,
+canonical/protected assets and closed native family unchanged;18 original
+owners are freshly absent and the source freeze is released. The stopped
+pre-correction run remains unaccepted. No default/demo promotion or whole-form
+completion follows this acceptance.
+Preserve SubZone/blank-Ahorizon,
+child and implicit-action exclusions while continuing the ordered backlog.
+
 The mapped normal/CHARS single-plot Google Earth successor is integrated. Its
 registered independently gated candidate previews one saved literal Env plot, not the existing
 all-project/selected-SU report expansion. Paired-parent/current-context ownership,

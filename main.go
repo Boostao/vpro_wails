@@ -82,6 +82,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	siviCHARSParentEntryEnabled, err := siviFeature("VPRO_SIVI_CHARS_PARENT_ENTRY", os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	tableCSVReviewEnabled, err := tableCSVReviewFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -432,6 +436,10 @@ func main() {
 		site: siteCodes, region: regionCodes, parent: parentCodes,
 		geology: geologyCodes, bec: becService,
 	}
+	siviCHARSParentEntry, err := newSIVICHARSParentEntryService(contextService, siviParentShared.references, siviCHARSParentEntryEnabled)
+	if err != nil {
+		log.Fatal(err)
+	}
 	entryReaders := twoPageEntryReferenceReaders{}
 	if siteCodes != nil {
 		entryReaders.shared.site = siteCodes
@@ -542,6 +550,7 @@ func main() {
 		application.NewService(NewLongVegetationProjectWorkbookService(contextService, longVegetationProjectScopeEnabled, vegetationWorkbook.private.enabled)),
 		application.NewService(NewSiteUnitSummaryPreferencesService(contextService, siteUnitSummaryPreferencesEnabled)),
 		application.NewService(siviParentShared),
+		application.NewService(siviCHARSParentEntry),
 		application.NewService(twoPageParentExtra),
 		application.NewService(twoPageParentCommon),
 		application.NewService(twoPageParentEntry),

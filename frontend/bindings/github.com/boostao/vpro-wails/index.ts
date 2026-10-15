@@ -43,6 +43,7 @@ import * as ProjectService from "./projectservice.js";
 import * as QualityService from "./qualityservice.js";
 import * as ReferenceService from "./referenceservice.js";
 import * as RegionCodeService from "./regioncodeservice.js";
+import * as SIVICHARSParentEntryService from "./sivicharsparententryservice.js";
 import * as SIVICollectedService from "./sivicollectedservice.js";
 import * as SIVICombinedService from "./sivicombinedservice.js";
 import * as SIVICoverService from "./sivicoverservice.js";
@@ -126,6 +127,7 @@ export {
     QualityService,
     ReferenceService,
     RegionCodeService,
+    SIVICHARSParentEntryService,
     SIVICollectedService,
     SIVICombinedService,
     SIVICoverService,
@@ -368,6 +370,9 @@ export type {
     ProjectState,
     ProjectTableCSVReview,
     RegionCodeChoice,
+    SIVICHARSParentEntryPolicy,
+    SIVICHARSParentEntryReview,
+    SIVICHARSParentEntryWrite,
     SIVICoverWriteResult,
     SIVICreationResult,
     SIVICreationUndoHistoryList,

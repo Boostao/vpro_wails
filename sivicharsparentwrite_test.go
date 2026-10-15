@@ -40,6 +40,109 @@ func charsWrittenHistory(t *testing.T, db *sql.DB, id string) siviParentHistory 
 	return event
 }
 
+func TestSIVICHARSBooleanNewNullRefusesBeforeApprovalAndMutation(t *testing.T) {
+	for _, initial := range []string{"0", "-1"} {
+		t.Run(initial, func(t *testing.T) {
+			service, state, db, _ := charsWriteFixture(t, false, 3)
+			if _, err := db.Exec(`UPDATE Sample_Env SET SV_FloodPlain=? WHERE PlotNumber='108050'`, initial); err != nil {
+				t.Fatal(err)
+			}
+			parent, err := service.readSIVICHARSParent(context.Background(), state.ContextID, "108050")
+			if err != nil {
+				t.Fatal(err)
+			}
+			var beforeAudit, afterAudit int
+			if err := db.QueryRow(`SELECT COUNT(*) FROM Sample_Audit`).Scan(&beforeAudit); err != nil {
+				t.Fatal(err)
+			}
+			approved := false
+			result, err := service.writeSIVICHARSParentEntry(context.Background(), state.ContextID, parent.Plot, parent,
+				[]siviParentScalarEdit{charsEntryEdit(t, parent, "RootZoneParticleSize", metadataText("FINE")),
+					charsEntryEdit(t, parent, "SV_FloodPlain", ProjectMetadataCell{Storage: "null"})},
+				func(*sql.Tx, *siviParentProjection, []siviParentScalarAssignment) error { approved = true; return nil })
+			if err == nil || result != nil || approved {
+				t.Fatal("new Boolean NULL reached approval or mutation", result, err, approved)
+			}
+			current, readErr := service.readSIVICHARSParent(context.Background(), state.ContextID, parent.Plot)
+			if readErr != nil || !sourceParentProjectionStorageEqual(parent, current) {
+				t.Fatal("rejected mixed Boolean NULL changed physical storage", readErr)
+			}
+			if err := db.QueryRow(`SELECT COUNT(*) FROM Sample_Audit`).Scan(&afterAudit); err != nil || beforeAudit != afterAudit {
+				t.Fatal("rejected Boolean NULL changed audits", err, beforeAudit, afterAudit)
+			}
+			var histories int
+			if err := db.QueryRow(`SELECT COUNT(*) FROM sqlite_master WHERE name='__VPRO_SIVICHARSParentEntryHistory'`).Scan(&histories); err != nil || histories != 0 {
+				t.Fatal("rejected Boolean NULL created history", histories, err)
+			}
+		})
+	}
+}
+
+func TestSIVICHARSBooleanHistoricalNullOmissionYesNoAndRestoration(t *testing.T) {
+	for _, value := range []string{"0", "-1"} {
+		t.Run(value, func(t *testing.T) {
+			service, state, db, _ := charsWriteFixture(t, false, 3)
+			if _, err := db.Exec(`UPDATE Sample_Env SET SV_FloodPlain=NULL WHERE PlotNumber='108050'`); err != nil {
+				t.Fatal(err)
+			}
+			parent, err := service.readSIVICHARSParent(context.Background(), state.ContextID, "108050")
+			if err != nil {
+				t.Fatal(err)
+			}
+			unchanged, err := service.writeSIVICHARSParentEntry(context.Background(), state.ContextID, parent.Plot, parent,
+				[]siviParentScalarEdit{charsEntryEdit(t, parent, "SV_FloodPlain", ProjectMetadataCell{Storage: "null"})},
+				charsWriteApprovePhysical)
+			if err != nil || unchanged == nil || unchanged.ChangedCells != 0 || unchanged.HistoryID != "" {
+				t.Fatal("unchanged historical NULL was reinterpreted", unchanged, err)
+			}
+			written, err := service.writeSIVICHARSParentEntry(context.Background(), state.ContextID, parent.Plot, parent,
+				[]siviParentScalarEdit{charsEntryEdit(t, parent, "SV_FloodPlain", metadataInteger(value))}, charsWriteApprovePhysical)
+			if err != nil || written == nil || written.ChangedCells != 1 || written.HistoryID == "" {
+				t.Fatal("explicit Yes/No was not writable", written, err)
+			}
+			restored, err := service.restoreSIVICHARSParentEntry(context.Background(), state.ContextID, parent.Plot, written.HistoryID, AuditRestorePrune)
+			if err != nil || restored == nil || restored.RestoredRows != 1 || restored.PrunedAuditRows != 1 {
+				t.Fatal("historical NULL restoration was treated as a new write", restored, err)
+			}
+			current, err := service.readSIVICHARSParent(context.Background(), state.ContextID, parent.Plot)
+			if err != nil || !sourceParentProjectionStorageEqual(parent, current) {
+				t.Fatal("Yes/No restoration lost original NULL", err)
+			}
+		})
+	}
+}
+
+func TestSIVICHARSBooleanLegacyNullAfterHistoryRemainsRestorable(t *testing.T) {
+	service, state, db, _ := charsWriteFixture(t, false, 3)
+	if _, err := db.Exec(`UPDATE Sample_Env SET SV_FloodPlain=-1 WHERE PlotNumber='108050'`); err != nil {
+		t.Fatal(err)
+	}
+	parent, err := service.readSIVICHARSParent(context.Background(), state.ContextID, "108050")
+	if err != nil {
+		t.Fatal(err)
+	}
+	edits := []siviParentScalarEdit{charsEntryEdit(t, parent, "SV_FloodPlain", ProjectMetadataCell{Storage: "null"})}
+	legacy, err := service.writeSIVIParentPlannedWithHooks(context.Background(), state.ContextID, parent.Plot, parent,
+		siviCHARSParentEntryHistory, nil, siviParentWriteHooks{
+			read: readSIVICHARSParentForWrite,
+			plan: func(_ *sql.Tx, observed *siviParentProjection) ([]siviParentScalarAssignment, error) {
+				return planSIVICHARSParentWritableEntry(context.Background(), observed, edits)
+			},
+			decorate: func(event *siviParentHistory) { event.EntryPlan = edits },
+		})
+	if err != nil || legacy == nil || legacy.ChangedCells != 1 {
+		t.Fatal("legacy NULL-after fixture could not be constructed", legacy, err)
+	}
+	restored, err := service.restoreSIVICHARSParentEntry(context.Background(), state.ContextID, parent.Plot, legacy.HistoryID, AuditRestorePrune)
+	if err != nil || restored == nil || restored.RestoredRows != 1 || restored.PrunedAuditRows != 1 {
+		t.Fatal("new-write guard reinterpreted the legacy NULL-after receipt", restored, err)
+	}
+	current, err := service.readSIVICHARSParent(context.Background(), state.ContextID, parent.Plot)
+	if err != nil || !sourceParentProjectionStorageEqual(parent, current) {
+		t.Fatal("legacy NULL-after receipt lost original Yes", err)
+	}
+}
+
 func TestSIVICHARSWriteAllQualifiedDomainsPhysicalHistoryAndRestoration(t *testing.T) {
 	for _, external := range []bool{false, true} {
 		t.Run(map[bool]string{false: "local", true: "external"}[external], func(t *testing.T) {

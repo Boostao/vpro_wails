@@ -308,7 +308,99 @@ the result; race log SHA256
 Do not rerun this accepted integration. Next implement explicit owned
 proposal/reference authorization, lifecycle/UI wiring and disposable actual
 Wails acceptance; preserve disabled SubZone/blank-Ahorizon unknowns.
+The20-path internal entry successor is committed locally on main as `de5f68e`,
+with required co-author and clean immediate postcommit status; no push.
 No public service, bindings/frontend/native availability.
+
+Current owned proposal/service successor adds `sivicharsparentapproval.go`,
+`sivicharsparententryservice.go` and tests, plus proven equivalent shared entry
+lifecycle/recursive JSON collision invariants. Writer reference aliases verify
+both project/VLists opened-handle identities and retain mandatory family
+rollback-journal locks. Four changed non-NULL LimitToList fields require exact
+selectable membership; unchanged/NULL omit lookups. Optional values do not
+inherit two-page acknowledgements. Unregistered independently gated service
+Review/Save/Restore and strict wire tests pass, including actual competing family
+writer/read-lock release and concurrent Save CAS. Focused root5.052s;257
+coupled races pass root406.640s including all affected two-page entry tests.
+Production vet/build and distinct fourteen-path review pass; all1852 inputs/
+12 canonical/19 protected assets remain unchanged. Private
+`chars-sivi-proposal-validation\receipt.json` SHA256
+`211715e403c812f1059bfb6ffbd58bde9783a11a327594934f505860f636fe49`
+and `review-disposition.json` SHA256
+`d528724af6487e75dcbf50fd289418e1fd8a9caef1e6f23a3fdb5d300899f7ae`
+seal the internal acceptance. Continue source-policy/client lifecycle wiring,
+then coherent full integration/native acceptance, not another full suite per
+helper. The68-policy/67-writable client boundary is now separately accepted:
+259 coupled races root406.680s,68 frontend cases, zero-diagnostic check,
+isolated frontend build and production vet/build;1858 inputs/12 canonical/
+19 protected assets unchanged. Private `chars-sivi-client-policy-validation`
+receipt SHA256 `30cc7de34458b30ec6fba614e1787016c67d7a63cc89672b555c7e1cea0e4661`,
+distinct nine-path review SHA256
+`de697b392f32e58a32bc1fd59ea0e49c8b7f130a3267b7ba0c384eb532c89bee`.
+Client drafts use source-specific DOUBLE/SINGLE/INTEGER rules and reprepare
+source-owned requests; actual Go/client fixture guards the wire. Shared
+intent/text/date/Boolean parsing preserves existing two-page numeric behavior.
+The next desktop candidate implements the owned session,71-binding responsive
+presentation and existing App native-close/navigation interface. Literal
+`VPRO_SIVI_CHARS_PARENT_ENTRY`/`VITE_SIVI_CHARS_PARENT_ENTRY` flags are independent
+and default off; qualified Go1.25/Wails `-ts -i` generation reports zero warnings.
+The Forms item is explicitly parent-only. The pre-correction reviewed candidate is
+private `chars-sivi-desktop-reference-fix`:1863 inputs,12 canonical sources and
+19 protected assets unchanged;2310 standard frontend executions,200 affected
+cases, check0/0, production vet and separate default/enabled Wails builds pass.
+The259 coupled backend races remain qualified by exact unchanged application
+Go/resources/dependencies; the sole changed Go wire test passes race again.
+Distinct19-path desktop, six-path literal and five-path value-identity reviews
+accept without significant findings. Actual Go/client wire covers all31
+references: Ahorizon keeps exact literal ordinals/Ah/Ae/empty TEXT; BEC Zone
+keeps value identities/empty rowids, not invented physical IDs. Physical
+metadata identity validation remains unchanged. Both earlier zero-write native
+read failures and immutable candidates remain preserved.
+
+Current actual Wails default/client-off/backend-off/enabled-read/enabled-write
+acceptance passes. All71 bindings/labels and67 unlocked controls, actual client
+widths1384/744/544px, validation/Lock/navigation/native-close decisions, exact
+CancelClose acknowledgements, cancelled final initial Review and stale P1-to-P2
+delivery refusal pass. Requested420px outer windows clamp at the560px minimum;
+do not report420px client coverage. The initial lifecycle harness incorrectly
+treated Undo/recover as cancellable initial read; its held response was released
+once after exact native-close cancellation, then normally closed with16-file
+constancy. The successful `enabled-write-initial-read` attempt never replayed a
+mutation: one five-field mixed Save/five audits, actual prune, distinct P1/P2
+FieldNumber Saves and P1/P2/P1 saved reload pass. Editor remount intentionally
+ends history selection; explicit native binding restoration is separately
+identified, not claimed as retained UI selection. All original non-audit rows
+and389 historical audits remain exact; three consumed technical histories and
+one restored retained audit (-1) remain. The other15 family files are unchanged.
+Every owned process normally closed. The subsequent full race was deliberately
+stopped before acceptance and before corrective edits: exact disposable DAO
+SV_FloodPlain calibration proves NULL becomes No at assignment, including
+true/false-to-NULL. An independent readonly process verifies all12 closed
+option/Boolean cases without changing either fixture. The corrective candidate
+refuses changed Boolean SQLite NULL explicitly; Yes (-1)/No (0), unchanged
+historical NULL omission and typed-history restoration stay available.
+Current immutable `chars-sivi-desktop-boolean-fix` passes2311 standard frontend
+executions,201 affected cases,262 fresh coupled Go races, check0/0, production
+vet and both Wails profiles. Distinct12-path review accepts without findings.
+All four current gate/read modes and `enabled-write-boolean-final` pass.
+The same disposable fixture has one explicitly prepared P3 historical NULL.
+Real Yes/No Saves, changed NULL client/backend refusal, exact native-close
+acknowledgement before correction, historical NULL omission and actual UI
+restoration pass. Two harness postcommit expectations (clean Save remains
+enabled; restore JSON is lower-camel) were recovered from complete closed
+physical history and continued from that checkpoint, never replayed. Baseline
+source/audit/history rows are exact; three additional consumed histories remain.
+All seven current owners normally close. Fresh full Go race passes exit0,
+UTC2026-10-15T16:50:47.987936 to18:16:18.135937. All1863 inputs/149 sealed
+artifacts/discovery,12 canonical/19 protected assets and the closed native
+family remain unchanged; all18 predecessor/current owners are freshly absent.
+Private `chars-sivi-desktop-boolean-integration/receipt.json` is accepted;
+the prior stopped integration remains unaccepted. The source freeze is released.
+Proceed with the authorized local commit, then source-qualified CHARS
+SpeciesListComplete options1/2 and the recorded existing Boolean NULL follow-up;
+never invent a PlotType writer from its unwired procedure. No push. No
+default/demo availability has changed;
+SubZone/new blank Ahorizon and whole-form/native parity remain unavailable.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated

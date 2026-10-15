@@ -1676,6 +1676,31 @@ export interface RegionCodeChoice {
     "diagnostic": string;
 }
 
+export interface SIVICHARSParentEntryPolicy {
+    "column": string;
+    "binding": string;
+    "controlId": string;
+    "owner": string;
+    "kind": string;
+    "maximum": number;
+    "allowEmpty": boolean;
+    "lower": number | null;
+    "upper": number | null;
+    "writable": boolean;
+    "diagnostic": string;
+}
+
+export interface SIVICHARSParentEntryReview {
+    "Original": siviParentProjection | null;
+    "Fields": SIVIParentSharedReference[] | null;
+    "Policies": SIVICHARSParentEntryPolicy[] | null;
+}
+
+export interface SIVICHARSParentEntryWrite {
+    "original": SIVIParentProjection | null;
+    "edits": SIVIParentCellEdit[] | null;
+}
+
 export interface SIVICoverWriteResult {
     "ChangedCells": number;
     "HistoryID": string;

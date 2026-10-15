@@ -38,11 +38,12 @@ export const siviReferenceBuildEnabled = (value: unknown): boolean => value === 
 export interface SIVIReferenceChoice {
   rowId: string; code: string | null; description: string | null; selectable: boolean; diagnostic: string;
 }
-export interface SIVIReferenceField {
-  column: SIVIReferenceColumn; listName: string; required: boolean; source: string;
+export interface SourceParentReferenceField<Column extends string = string> {
+  column: Column; listName: string; required: boolean; source: string;
   available: boolean; diagnostic: string;
   definitions: ReturnType<typeof siviMetadataTableFromWire>; choices: SIVIReferenceChoice[];
 }
+export type SIVIReferenceField = SourceParentReferenceField<SIVIReferenceColumn>;
 export interface SIVIReferences {
   contextId: string; project: string; plot: string; zone: ProjectMetadataCell; fields: SIVIReferenceField[];
 }
@@ -52,6 +53,18 @@ const nullableText = (value: unknown): value is string | null => value === null 
 function choice(value: unknown): value is SIVIReferenceChoice {
   return record(value) && typeof value.rowId === 'string' && nullableText(value.code) &&
     nullableText(value.description) && typeof value.selectable === 'boolean' && typeof value.diagnostic === 'string';
+}
+export function sourceParentReferenceFromWire<Column extends string>(field: unknown,
+  policy: { column: Column; list: string; required: boolean }, label: string,
+  definitionsFromWire = siviMetadataTableFromWire): SourceParentReferenceField<Column> {
+  if (!record(field) || field.column !== policy.column || field.listName !== policy.list || field.required !== policy.required ||
+      typeof field.source !== 'string' || typeof field.available !== 'boolean' || typeof field.diagnostic !== 'string' ||
+      !field.available && !field.diagnostic || !Array.isArray(field.choices) || !field.choices.every(choice)) {
+    throw new Error(`${label} ${policy.column} reference policy/receipt is incomplete.`);
+  }
+  return { column: policy.column, listName: policy.list, required: policy.required, source: field.source,
+    available: field.available, diagnostic: field.diagnostic,
+    definitions: definitionsFromWire(field.definitions), choices: structuredClone(field.choices) };
 }
 export function siviReferencesFromWire(wire: unknown, owner: SIVIParentOwner, zone: ProjectMetadataCell): SIVIReferences {
   if (!record(wire) || wire.contextId !== owner.contextId || wire.project !== owner.project ||
@@ -65,14 +78,10 @@ export function siviReferencesFromWire(wire: unknown, owner: SIVIParentOwner, zo
   const fields = siviReferencePolicies.map(policy => {
     const matches = receivedFields.filter((field: unknown) => record(field) && field.column === policy.column);
     const field: unknown = matches[0];
-    if (matches.length !== 1 || !record(field) || field.listName !== policy.list || field.required !== policy.required ||
-        typeof field.source !== 'string' || typeof field.available !== 'boolean' || typeof field.diagnostic !== 'string' ||
-        !field.available && !field.diagnostic || !Array.isArray(field.choices) || !field.choices.every(choice)) {
+    if (matches.length !== 1) {
       throw new Error(`SIVI ${policy.column} reference policy/receipt is incomplete.`);
     }
-    return { column: policy.column, listName: policy.list, required: policy.required, source: field.source,
-      available: field.available, diagnostic: field.diagnostic,
-      definitions: siviMetadataTableFromWire(field.definitions), choices: structuredClone(field.choices) };
+    return sourceParentReferenceFromWire(field, policy, 'SIVI');
   });
   return { ...owner, zone: structuredClone(receivedZone), fields };
 }

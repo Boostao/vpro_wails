@@ -7,10 +7,13 @@ import (
 	"fmt"
 )
 
-type siviCHARSParentReferenceSnapshot struct {
+type SIVICHARSParentEntryReview struct {
 	Original *siviParentProjection
 	Fields   []SIVIParentSharedReference
+	Policies []SIVICHARSParentEntryPolicy
 }
+
+type siviCHARSParentReferenceSnapshot = SIVICHARSParentEntryReview
 
 func siviCHARSParentReferenceFields() ([]siviParentSharedReferencePolicy, error) {
 	layout, err := siviCHARSParentSourceLayout()
@@ -50,11 +53,19 @@ func siviCHARSParentReferenceFields() ([]siviParentSharedReferencePolicy, error)
 
 func readSIVICHARSParentReference(ctx context.Context, tx *sql.Tx, readers siviParentSharedReferenceReaders,
 	field siviParentSharedReferencePolicy) (SIVIParentSharedReference, error) {
+	return readSIVICHARSParentReferenceAtAlias(ctx, tx, "VLists", readers, field)
+}
+
+func readSIVICHARSParentReferenceAtAlias(ctx context.Context, tx *sql.Tx, alias string, readers siviParentSharedReferenceReaders,
+	field siviParentSharedReferencePolicy) (SIVIParentSharedReference, error) {
 	if err := ctx.Err(); err != nil {
 		return SIVIParentSharedReference{}, err
 	}
 	if tx == nil {
 		return SIVIParentSharedReference{}, errors.New("CHARS references require the owned read transaction")
+	}
+	if alias != "VLists" && alias != "chars_entry_refs" {
+		return SIVIParentSharedReference{}, errors.New("CHARS references require the exact review or writer attachment alias")
 	}
 	fields, err := siviCHARSParentReferenceFields()
 	if err != nil {
@@ -95,7 +106,7 @@ func readSIVICHARSParentReference(ctx context.Context, tx *sql.Tx, readers siviP
 	default:
 		shared := SIVIParentSharedService{references: readers}
 		var err error
-		result, err = shared.readReference(ctx, tx, "VLists", field, ProjectMetadataCell{Storage: "null"})
+		result, err = shared.readReference(ctx, tx, alias, field, ProjectMetadataCell{Storage: "null"})
 		if err != nil {
 			return SIVIParentSharedReference{}, fmt.Errorf("CHARS %s reference read: %w", field.column, err)
 		}
@@ -148,6 +159,10 @@ func (s *ContextService) readSIVICHARSParentReferences(ctx context.Context, cont
 	if err != nil {
 		return nil, err
 	}
+	policies, err := siviCHARSParentEntryPolicies()
+	if err != nil {
+		return nil, err
+	}
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*siviCHARSParentReferenceSnapshot, error) {
 		return withOwnedSIVISnapshot(ctx, plots, func(owner *sqliteContext, tx *sql.Tx) (*siviCHARSParentReferenceSnapshot, error) {
 			tables, err := readSourceParentTables(ctx, owner, tx, plot)
@@ -161,7 +176,7 @@ func (s *ContextService) readSIVICHARSParentReferences(ctx context.Context, cont
 			if len(parent.Rows) != 1 {
 				return nil, errors.New("CHARS entry references require one physical Env/Admin pair")
 			}
-			result := &siviCHARSParentReferenceSnapshot{Original: parent, Fields: []SIVIParentSharedReference{}}
+			result := &siviCHARSParentReferenceSnapshot{Original: parent, Fields: []SIVIParentSharedReference{}, Policies: policies}
 			for _, field := range fields {
 				reference, err := readSIVICHARSParentReference(ctx, tx, readers, field)
 				if err != nil {

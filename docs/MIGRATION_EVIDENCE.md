@@ -8,7 +8,35 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
-CHARS SIVI internal source ownership is independently reviewed:71 direct
+The CHARS parent-only desktop is independently reviewed, native-accepted and
+full-race integrated behind separate default-off server/client gates. All71
+source bindings,67 writable domains, complete31-reference Go/client wire,
+draft/close/navigation ownership and typed restoration are covered. Exact DAO
+Boolean calibration exposed a new-NULL mismatch; the corrected writer/client
+refuse changed SQLite NULL explicitly while preserving Yes/No, unchanged
+historical NULL and old receipts. Corrective validation passes2311 frontend
+executions,201 affected cases,262 coupled races, check0/0, vet and default/enabled
+Wails builds; distinct12-path review accepts without significant findings.
+Native proof includes gate isolation, mixed Saves/exact audits, saved P1/P2/P1
+navigation, actual1384/744/544px client layouts, specific native-close
+acknowledgements, held-read cancellation/stale-remount refusal, Yes/No Saves,
+NULL refusal and historical omission/UI restoration. The P3 historical NULL
+witness is an explicit disposable preparation, not an Access new-write claim.
+Two postcommit harness expectations were recovered from closed complete physical
+history without replay. Three additional consumed histories remain; baseline
+source/audits/existing histories are exact. Fresh full race passes exit0,
+UTC2026-10-15T16:50:47.987936 to18:16:18.135937, with1863 inputs/149 artifacts/
+discovery,12 canonical/19 protected assets and the closed native family unchanged.
+All18 original owners are freshly absent; the freeze is released.
+Full-race log SHA256:
+`70961aea833ac27842f024751f4be040fcd795724f52c85ff13d063ba0fd798b`.
+Integration receipt SHA256:
+`dbb9460abc70a25326656596d1ed2dfed492bbf75b5bfd7e34690708fad0be27`.
+The earlier stopped race remains unaccepted. SubZone, new blank Ahorizon,
+ProjectID/implicit actions, child/whole-form execution and broader ribbon parity
+remain unavailable; no default or qualified-demo promotion occurred.
+
+Predecessor CHARS SIVI internal source ownership is independently reviewed:71 direct
 bindings plus distinct implicit SpeciesListComplete, original four-form
 catalogue and current-owner physical Env/Admin read reuse. Normal77 contracts
 remain unchanged; source TEXT6 particle size/SINGLE water depth are not aliases.

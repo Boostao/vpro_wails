@@ -33,6 +33,12 @@ func planSIVICHARSParentWritableEntry(ctx context.Context, original *siviParentP
 
 func (s *ContextService) writeSIVICHARSParentEntry(ctx context.Context, contextID, plot string,
 	original *siviParentProjection, edits []siviParentScalarEdit, approve siviCHARSParentEntryApproval) (*siviParentWriteResult, error) {
+	return s.writeSIVICHARSParentEntryWithLifecycle(ctx, contextID, plot, original, edits, approve, sourceParentEntryLifecycle{})
+}
+
+func (s *ContextService) writeSIVICHARSParentEntryWithLifecycle(ctx context.Context, contextID, plot string,
+	original *siviParentProjection, edits []siviParentScalarEdit, approve siviCHARSParentEntryApproval,
+	lifecycle sourceParentEntryLifecycle) (*siviParentWriteResult, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
@@ -40,7 +46,12 @@ func (s *ContextService) writeSIVICHARSParentEntry(ctx context.Context, contextI
 		return nil, errors.New("CHARS entry requires independent source/reference approval")
 	}
 	var entryPlan []siviParentScalarEdit
+	var requestPlots *PlotService
 	hooks := siviParentWriteHooks{
+		authorize: func(plots *PlotService) error {
+			requestPlots = plots
+			return nil
+		},
 		read: readSIVICHARSParentForWrite,
 		plan: func(tx *sql.Tx, observed *siviParentProjection) ([]siviParentScalarAssignment, error) {
 			if !sourceParentProjectionStorageEqual(original, observed) {
@@ -49,6 +60,11 @@ func (s *ContextService) writeSIVICHARSParentEntry(ctx context.Context, contextI
 			assignments, err := planSIVICHARSParentWritableEntry(ctx, observed, edits)
 			if err != nil {
 				return nil, err
+			}
+			for _, assignment := range assignments {
+				if assignment.Column == "SV_FloodPlain" && assignment.After.Storage == "null" {
+					return nil, errors.New("CHARS source Yes/No converts NULL to No; select No explicitly instead of writing SQLite NULL")
+				}
 			}
 			if err := approve(tx, observed, assignments); err != nil {
 				return nil, fmt.Errorf("CHARS entry approval: %w", err)
@@ -60,7 +76,28 @@ func (s *ContextService) writeSIVICHARSParentEntry(ctx context.Context, contextI
 			}
 			return assignments, nil
 		},
-		decorate: func(event *siviParentHistory) { event.EntryPlan = entryPlan },
+		decorate: func(event *siviParentHistory) {
+			event.EntryPlan = entryPlan
+			if lifecycle.decorate != nil {
+				lifecycle.decorate(event)
+			}
+		},
+	}
+	if lifecycle.prepare != nil {
+		hooks.prepare = func(conn *sql.Conn) (func(), error) {
+			if requestPlots == nil {
+				return nil, errors.New("CHARS preparation requires the immutable owned request")
+			}
+			return lifecycle.prepare(requestPlots, conn)
+		}
+	}
+	if lifecycle.verify != nil {
+		hooks.verify = func(tx *sql.Tx) error {
+			if requestPlots == nil {
+				return errors.New("CHARS verification requires the immutable owned request")
+			}
+			return lifecycle.verify(requestPlots, tx)
+		}
 	}
 	return s.writeSIVIParentPlannedWithHooks(ctx, contextID, plot, original, siviCHARSParentEntryHistory, nil, hooks)
 }

@@ -9,7 +9,7 @@
     error: string;
     onrespond: (decision: CloseDecision) => Promise<void>;
     purpose?: 'close' | 'context';
-    editorLabel?: 'FS882' | 'SIVI / FS1333';
+    editorLabel?: 'FS882' | 'SIVI / FS1333' | 'CHARS SIVI parent';
   } = $props();
   let dialog: HTMLDialogElement;
 

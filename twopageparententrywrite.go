@@ -9,11 +9,7 @@ import (
 
 type twoPageEntryApproval func(*sql.Tx, *siviParentProjection, []siviParentScalarAssignment) error
 
-type twoPageEntryLifecycle struct {
-	prepare  func(*PlotService, *sql.Conn) (func(), error)
-	verify   func(*PlotService, *sql.Tx) error
-	decorate func(*siviParentHistory)
-}
+type twoPageEntryLifecycle = sourceParentEntryLifecycle
 
 func twoPageEntryHistory(form string, masterAllowed bool) (siviParentHistoryDomain, error) {
 	return twoPageEntryHistoryAuthority(form, func() bool { return masterAllowed })

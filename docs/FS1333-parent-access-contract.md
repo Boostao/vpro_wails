@@ -14,7 +14,7 @@ The separately gated SIVI height/cover panels reuse the same owned controller
 under FS882 or the standalone SIVI presentation. Exported coordinates are evidence,
 not a requirement to reproduce fixed Access pixels.
 
-### CHARS SIVI source owner (not desktop availability)
+### CHARS SIVI source owner
 
 The separately named internal CHARS reader/projection uses the original
 `frmSIVIsite-CHARS` catalogue: 71 direct bindings and the distinct implicit
@@ -22,7 +22,9 @@ SpeciesListComplete target. It reuses the normal parent's binding invariant,
 physical Env/Admin projection, current-context operation lease and caller-owned
 read snapshot, not a second database family or a frozen replacement for data.
 Normal SIVI retains its original 77 direct bindings, writer and service identity.
-No public method, menu route, frontend gate or write authority is added.
+That internal source-owner prerequisite adds no public authority by itself.
+The independently gated parent-only desktop successor is described below;
+neither boundary establishes complete CHARS form parity.
 
 CHARS adds Env.RootZoneParticleSize (source TEXT6, caption R. Z. Particle Size)
 and Env.SV_WaterTableCM (source SINGLE, caption Water Table Depth). Neither is an
@@ -35,10 +37,13 @@ CHARS Latitude/Longitude do not export that formatting.
 Its three original PlotNumber child links resolve to SubVegA-SIVI,
 SubVegC-SIVI and SubVegD-SIVI. Complete child-A VBA is identical to the normal
 SubVegA-SIVI_BC class, although the extended presentation adds Cover5a/b/c.
-This does not widen normal child membership or editing. CHARS PlotType uses a
-Variant result without normal's option restoration/Refresh; native NULL,
-conversion and callback timing remain unqualified. Whole CHARS presentation,
-draft ownership, references, editing and native acceptance remain unavailable.
+This does not widen normal child membership or editing. CHARS has a private
+PlotType procedure using a Variant result without normal's option restoration/
+Refresh, but its optPlotType control has no exported AfterUpdate binding.
+Do not invent a writer from this unwired procedure. SpeciesListComplete does
+have a resolved AfterUpdate binding; original-form callback timing remains
+unqualified. Parent-only desktop observations below do not qualify these actions
+or whole-form/child execution.
 
 All136 coupled CHARS/normal/two-page parent race cases pass (root215.282s),
 as do source-tool races and actual production SQLite-only compilation with
@@ -72,8 +77,8 @@ The pure CHARS planner composes 68 explicitly owned direct-field domains from
 the existing scalar, option, text, shared and reference policies plus the two
 distinct CHARS fields. PlotNumber, ProjectID, PlotType and the implicit
 SpeciesListComplete/action groups remain outside this scope. Physical planning
-does not approve reference membership or authorize a write. No service, history,
-menu, frontend gate or native desktop availability is added.
+does not approve reference membership or authorize a write. This pure-planner prerequisite itself adds no service, history, menu, frontend
+gate or native desktop authority; the later bounded successor remains separate.
 
 A readonly DAO observation of all 71 template bindings plus the implicit target
 provides independent type/width/nullable/empty/rule evidence in the source-only
@@ -199,6 +204,100 @@ freshly absent; the source freeze is released. All12 canonical sources,
 19 protected assets and prior accepted frontend/demo inputs remain unchanged.
 No frontend, lifecycle, binding, menu, default enablement or native bound-control
 authority is granted by these internal mutation tests.
+
+### CHARS owned proposal and mandatory reference boundary
+
+The [entry service](../sivicharsparententryservice.go) wraps the
+owned review/save/restore paths with an explicit independent disabled/enabled
+constructor gate. Its strict write transport reuses recursive decoded-key
+collision checks and exact required-property decoding, rejecting unknown or
+recased top-level keys, nested duplicates, malformed Unicode and missing/null
+required members before publication.
+
+The [owned approval boundary](../sivicharsparentapproval.go) captures the context
+only after the operation lease and attaches its configured VLists readonly on
+the writer connection. Both project and reference aliases must match frozen
+physical file identities observed through opened handles, not path-only Stat.
+The four original LimitToList controls (Exposure1/2, SuccessionalStatus and
+SoilDrainage) require changed non-NULL values to belong to their exact selectable
+catalogue. SuccessionalStatus uses the same owned transaction's family definitions
+and a rollback-journal read lock through commit. Unchanged historical values and
+NULL assignments do not invent lookups; optional nonmembers do not inherit the
+two-page form's separate callback/acknowledgement workflow.
+
+Only proven identical entry lifecycle and recursive JSON collision invariants
+are shared with the two-page service; its source policies and errors stay
+unchanged. Focused service/wire/real-file-ID/read-lock/competing-Save tests pass.
+All257 coupled race cases pass (root406.640s), including the complete affected
+two-page entry cohort, as do production SQLite-only vet/build. All1852 inputs,
+12 canonical sources and19 protected assets match throughout validation and
+distinct fourteen-path review, which found no significant issues.
+The source-ordered68-policy/67-writable read model and strict client draft
+boundary also pass259 coupled races (root406.680s),68 frontend cases,
+zero-diagnostic check, isolated build and distinct nine-path review. An actual
+Go wire/request fixture checks strict decoding, prepared source plans and client
+output rather than mock-only shapes. Equivalent intent/text/date/Boolean parsing
+is shared; existing two-page numeric behavior is unchanged.
+The independently reviewed desktop candidate registers that service behind the independent
+literal `VPRO_SIVI_CHARS_PARENT_ENTRY` flag and requires the separate
+`VITE_SIVI_CHARS_PARENT_ENTRY` client flag. Both default off. Qualified interface
+bindings and a source-grouped parent-only editor reuse existing owned drafts,
+close/navigation, reference DTO validation and conservative mutation receipts.
+All71 bindings render once;67 domains can be edited. The source's ProjectID/
+PlotType and implicit actions, child workflows and whole-form parity are not
+enabled by this candidate. The new menu caption explicitly identifies the
+parent-only experimental adaptation rather than claiming full CHARS ribbon
+parity.
+
+Exact disposable DAO tests of SV_FloodPlain show new NULL, true-to-NULL and
+false-to-NULL becoming No at assignment and storing 0; Yes stores -1. A second
+readonly process verifies both closed option/Boolean fixtures (12 cases).
+These are engine/storage observations, not original-form callback authority.
+The corrective new-write boundary refuses changed Boolean SQLite NULL with an
+explicit No alternative; it does not silently normalize user intent. Unchanged
+historical NULL omits before that guard. Old typed receipts and restoration of
+historical NULL remain independent of new-write validation. Client drafts and
+command availability follow the same boundary. Corrective validation passes
+2311 standard frontend executions,201 affected cases and262 fresh coupled Go
+races, check0/0, production vet and both Wails profiles. Distinct12-path review
+accepts without significant findings. Current-binary gate/read and real Yes/No
+native Saves, NULL refusal/native-close acknowledgement, historical omission
+and UI restoration pass. The historical witness is one explicit disposable
+P3 NULL preparation. Two harness postcommit expectations were recovered from
+actual closed history without replay. All baseline source/audit/history rows
+remain exact with three additional consumed histories. Fresh full integration
+passes exit0, UTC2026-10-15T16:50:47 to18:16:18, with all1863 inputs/149 artifacts,
+package/embed discovery,12 canonical/19 protected assets and closed native
+family unchanged. All18 original native owners are freshly absent and the
+freeze is released. The earlier stopped race remains unaccepted.
+
+The pre-correction candidate passes200 affected frontend cases and2310 standard frontend executions,
+check0/0, production vet and private default/enabled Wails builds pass.
+Its complete actual-Go reference fixture distinguishes physical catalogue
+rowids, Ahorizon `source-value-list:0/1/2` ordinals and BEC Zone's value-only
+choices with empty rowids/no physical definitions. The literal decoder does not
+relax ordinary physical-row validation; duplicate values and NULL/empty
+descriptions remain distinguishable.
+Owned Wails verifies independent default/client-off/backend-off denial,
+71 source labels/fields and67 unlocked controls, corrected draft errors,
+Save/Lock/navigation/native-close barriers, and exact CancelClose completion
+before releasing a held operation or correcting a blocked draft. A held final
+initial Review is cancelled; its later delivery cannot replace remounted P2.
+One five-field Save independently reopens exact source rows and five audits:
+TEXT6 RootZoneParticleSize, narrowed SINGLE water table, finite DOUBLE
+Latitude91, Admin StartDate2026 and narrowed Admin total cover100. Actual UI
+prune restores all original source rows and removes precisely those five audits.
+Two distinct FieldNumber Saves survive P1/P2/P1 navigation. Editor remount ends
+history selection; separate explicit owned native Restore calls verify retain
+and prune without pretending the UI selection persisted. All389 old audits
+remain exact; one restored retained audit uses Access true=-1, and three
+technical histories are consumed. No completed mutation is replayed.
+Actual client widths1384/744/544px qualify source groups and interactive
+controls, including disclosed restoration controls. The560px native minimum
+clamps a requested420px window; no420px client claim follows from that request.
+Coherent full integration is still required; this does not grant default
+availability, original callback timing or whole-form authority.
+Changed SubZone and new blank Ahorizon remain explicitly unavailable.
 The active UpdateMetadataSppList call is a source no-op, detailed below; its
 dormant metadata writer is not a missing desktop requirement.
 

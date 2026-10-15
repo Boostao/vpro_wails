@@ -130,7 +130,7 @@ All195 coupled race cases plus production vet/build pass, with distinct
 read-only acceptance of this internal reference scope. Complete-source integration
 covers this read model; native entry acceptance remains outstanding.
 
-An unregistered CHARS typed writer/restorer now reuses the owned source-parent
+The internal CHARS typed writer/restorer reuses the owned source-parent
 transaction machinery and requires independent approval. Its isolated history
 keeps the full prepared plan separate from the audited subset; SubZone changes
 and new blank Ahorizon assignments remain refused. All67 qualified domains pass
@@ -139,8 +139,61 @@ production vet/build pass, with distinct acceptance of this internal scope.
 Complete-source Go race integration passes (root4308.862s), with all1,846 inputs,
 109 sealed artifacts and package/embed discovery unchanged. All12 canonical
 sources/19 protected assets and the accepted frontend/demo remain unchanged.
-CHARS desktop entry stays unavailable pending explicit proposal/reference
-authorization, lifecycle/UI wiring and actual native acceptance.
+CHARS desktop acceptance stays outstanding; internal writer acceptance alone
+does not grant public form parity.
+
+The CHARS service supplies strict review/save/restore
+transport, owned reference-file identity checks and the four source-mandatory
+catalogues inside the writer transaction. Optional codes do not inherit
+two-page acknowledgements. All257 coupled races and production vet/build pass,
+with distinct fourteen-path read-only acceptance. Its source-policy/client
+boundary now has259 coupled race cases,68 frontend cases, zero-diagnostic
+check, isolated build and distinct nine-path acceptance. CHARS keeps its own
+finite DOUBLE coordinates, SINGLE narrowing and source year bounds; the shared
+intent/text/date/Boolean parser does not change two-page numeric rules.
+The independently reviewed desktop candidate wires the existing close/navigation owner,
+source-grouped71-binding presentation, reference-safe drafts and explicit
+Save/Undo/history behind independent `VPRO_SIVI_CHARS_PARENT_ENTRY` and
+`VITE_SIVI_CHARS_PARENT_ENTRY` literal flags (both default off). The Forms item
+is explicitly parent-only: child workflows, ProjectID/PlotType and other
+implicit actions remain unavailable, as do changed SubZone and blank Ahorizon.
+All200 affected frontend cases,2310 standard frontend lifecycle executions,
+zero-diagnostic check, production vet and isolated default/enabled Wails builds
+pass. Actual Go/client fixtures cover all31 references, including Ahorizon
+literal ordinals and BEC Zone value identities without fabricated physical IDs.
+Owned Wails acceptance covers independent gate combinations,71 labels/fields,
+67 unlocked controls, validation/Lock/navigation/native-close barriers, held-read
+cancellation and stale-remount refusal, a five-field mixed physical Save with
+five exact audits, actual prune restoration and distinct P1/P2/P1 saved reload.
+All original physical non-audit rows and389 pre-existing audits remain unchanged;
+three consumed histories and one deliberately retained restored audit remain.
+Remount ends this editor's history selection; explicit owned native restoration
+was separately verified, not represented as retained UI selection.
+Layout is verified at actual client widths1384/744/544px; the560px minimum
+native window clamps a requested420px window, so420px client coverage is not
+claimed. Full Go race integration was stopped before acceptance when exact DAO
+calibration exposed a new Boolean NULL-write mismatch. Source SV_FloodPlain
+converts NULL to No at assignment; the corrected candidate explicitly refuses
+changed SQLite NULL and offers No (0), without silently normalizing a request.
+Unchanged historical NULL and typed-history restoration remain supported.
+The immutable corrective candidate passes2311 standard frontend executions,
+201 affected client cases,262 fresh coupled Go race cases, check0/0,
+production vet and default/enabled Wails builds. Distinct12-path review accepts
+without significant findings. Current-binary default/client-off/backend-off/
+read and Boolean write acceptance pass: real Yes/No Saves and exact audits,
+unsupported NULL client/backend refusal, exact native-close cancellation before
+correction, historical NULL omission and actual UI restoration. One explicitly
+prepared disposable P3 NULL is the historical witness, not an Access new-write
+claim. Two harness postcommit expectations were recovered from closed physical
+history without replaying any Save/restoration. Three additional consumed
+technical histories remain; all baseline source/audit/history rows are exact.
+Fresh complete Go race integration passes exit0 (UTC2026-10-15T16:50:47 to
+18:16:18):1863 inputs,149 sealed artifacts, package/embed discovery,12 canonical
+sources/19 protected assets and the closed native family remain unchanged;
+all18 original native owners are freshly absent. The source freeze is released.
+The earlier stopped integration remains unaccepted. No default/demo availability
+or whole-form/ribbon parity follows this bounded parent acceptance.
+No default or qualified demo availability has changed.
 
 The qualified private Windows demo is
 `build\bin\VPRO-Friday-Demo-2026-10-16-menu.zip` (17,273,336 bytes;

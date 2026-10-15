@@ -5,6 +5,7 @@
   import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary, type ProjectPlotProfileFilterRequest, type PlotProfileSource, type PlotProfileSourceInfo } from '../bindings/github.com/boostao/vpro-wails';
   import { projectState } from './state';
   import FS882Form from './FS882Form.svelte';
+  import SIVICHARSParentForm from './SIVICHARSParentForm.svelte';
   import Navigation from './Navigation.svelte';
   import DemoReadiness from './DemoReadiness.svelte';
   import LongEnvironmentReport from './LongEnvironmentReport.svelte';
@@ -54,8 +55,10 @@
   let profileNavigation = $state<ProfileNavigation | null>(null);
   const profileIndex = $derived(profileNavigation?.plots.findIndex(plot => plot.plotNumber === editorPlotNumber) ?? -1);
   let editorPlotNumber = $state<string | undefined>(undefined);
-  let editorEntryForm = $state<'fs882' | 'sivi'>('fs882');
+  let editorEntryForm = $state<'fs882' | 'sivi' | 'sivi-chars'>('fs882');
+  const editorLabel = $derived(editorEntryForm === 'sivi-chars' ? 'CHARS SIVI parent' : editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882');
   const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE === 'true' && import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
+  const siviCHARSParentEntryEnabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true';
   let offset = $state(0);
   let busy = $state(false);
   let error = $state('');
@@ -424,15 +427,21 @@
     });
   }
 
-  async function openSIVI() {
-    if (!siviStandaloneEnabled || !selected || !$projectState?.contextId) {
-      error = 'Standalone SIVI requires its independent entry gate, parent review and a selected owned plot.';
+  async function openSIVI(form: 'sivi' | 'sivi-chars' = 'sivi') {
+    const enabled = form === 'sivi' ? siviStandaloneEnabled : siviCHARSParentEntryEnabled;
+    if (!enabled || !selected || !$projectState?.contextId) {
+      error = form === 'sivi' ? 'Standalone SIVI requires its independent entry gate, parent review and a selected owned plot.'
+        : 'CHARS parent entry requires its independent gate and a selected owned plot.';
       return;
     }
     const plot = selected.plotNumber;
+    const context = $projectState.contextId, project = $projectState.activeProject;
     await requestTransition(async () => {
       if (selected?.plotNumber !== plot) throw new Error('Selected plot changed before opening SIVI; no owner replaced.');
-      editorPlotNumber = plot; editorEntryForm = 'sivi'; view = 'fs882'; error = '';
+      if (form === 'sivi-chars' && ($projectState?.contextId !== context || $projectState.activeProject !== project)) {
+        throw new Error('CHARS context/project changed before opening; no owner replaced.');
+      }
+      editorPlotNumber = plot; editorEntryForm = form; view = 'fs882'; error = '';
     });
   }
 
@@ -992,6 +1001,8 @@
     {#if !startupFailure}<Navigation {view} onnavigate={navigate}
       siviAvailable={siviStandaloneEnabled && !!selected && !!$projectState?.contextId}
       onopensivi={() => void openSIVI()}
+      charsAvailable={siviCHARSParentEntryEnabled && !!selected && !!$projectState?.contextId}
+      onopenchars={() => void openSIVI('sivi-chars')}
       metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
       onopenmetadata={() => void openProjectMetadata()} />{/if}
     <div class="topbar-context"><Database size={16} strokeWidth={1.8} /><span>{$projectState?.activeProject ?? 'No project'}</span></div>
@@ -1244,7 +1255,7 @@
         <DemoReadiness />
       {:else if view === 'fs882'}
         <div class="h-full flex flex-col p-2">
-          <p class="project-warning"><strong>Experimental {editorEntryForm === 'sivi' ? 'SIVI / FS1333 entrypoint' : 'FS882 editor'}</strong> Only verified workflows are writable. Use disposable projects only.</p>
+          <p class="project-warning"><strong>Experimental {editorLabel} editor</strong> Only verified workflows are writable. Use disposable projects only.</p>
           {#if error}<p class="error" role="alert">{error}</p>{/if}
           {#if plotFindEnabled && plotFindOpen}
             <section aria-label="Find scoped plot" class="mb-2 p-3 border rounded">
@@ -1274,6 +1285,12 @@
           {#key $projectState?.contextId}
           {#key editorEntryForm}
           {#key editorPlotNumber}
+          {#if editorEntryForm === 'sivi-chars'}
+          <SIVICHARSParentForm bind:this={editor}
+            contextId={$projectState?.contextId ?? ''} project={$projectState?.activeProject ?? ''} plotNumber={editorPlotNumber ?? ''}
+            onSaved={async (p) => { editorPlotNumber = p; await loadPlots(offset); }}
+            onBusyChange={(busy) => { localEditorBusy = busy; }} />
+          {:else}
           <FS882Form
             bind:this={editor}
             plotNumber={editorPlotNumber}
@@ -1286,6 +1303,7 @@
             onProfileSUReview={reviewProfileSU}
             onFindPlot={plotFindEnabled ? () => { plotFindOpen = true; } : undefined}
           />
+          {/if}
           {/key}
           {/key}
           {/key}
@@ -1294,9 +1312,9 @@
 
         <CloseConfirm requestId={closeRequest || (pendingTransition ? 'context' : '')}
           purpose={closeRequest ? 'close' : 'context'}
-          editorLabel={editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882'}
+          {editorLabel}
           working={closeWorking || transitionWorking} canSave={closeState?.canSave ?? false}
-          saveReason={closeState?.saveReason ?? `Return to the ${editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882'} editor before saving.`}
+          saveReason={closeState?.saveReason ?? `Return to the ${editorLabel} editor before saving.`}
           error={closeRequest ? closeError : transitionError}
           onrespond={closeRequest ? respondToClose : respondToTransition} />
       {:else if view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true' && $projectState}
@@ -1459,6 +1477,12 @@
               class="mt-2 w-full py-1.5 px-3 border rounded text-xs font-semibold"
               disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
               onclick={() => void openSIVI()}>Open SIVI / FS1333 (Experimental)</button>
+          {/if}
+          {#if siviCHARSParentEntryEnabled}
+            <button type="button" data-chars-standalone-open
+              class="mt-2 w-full py-1.5 px-3 border rounded text-xs font-semibold"
+              disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
+              onclick={() => void openSIVI('sivi-chars')}>Open CHARS SIVI parent (Experimental)</button>
           {/if}
         </div>
       </aside>

@@ -6,8 +6,12 @@ const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScri
 const ordinary = loadTypeScript('ordinaryEditor.ts', {
   './qualityEditor': quality, './numericEditor': loadTypeScript('numericEditor.ts'),
 });
-const loaded = loadTypeScript('twoPageEntryDraft.ts', {
+const sharedDraft = loadTypeScript('sourceParentEntryDraft.ts', {
   './projectMetadataEditor': metadata, './qualityEditor': quality, './ordinaryEditor': ordinary,
+  './siviDateTimestamp': loadTypeScript('siviDateTimestamp.ts'),
+});
+const loaded = loadTypeScript('twoPageEntryDraft.ts', {
+  './sourceParentEntryDraft': sharedDraft, './ordinaryEditor': ordinary,
   './coordinateEditor': loadTypeScript('coordinateEditor.ts'),
   './siviDateTimestamp': loadTypeScript('siviDateTimestamp.ts'),
 });

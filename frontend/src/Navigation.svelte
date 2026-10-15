@@ -2,11 +2,13 @@
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
   type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'break-report' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
-  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'metadata' };
+  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'sivi-chars' | 'metadata' };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
-  let { view, onnavigate, siviAvailable = false, onopensivi, metadataAvailable = false, onopenmetadata }: {
+  let { view, onnavigate, siviAvailable = false, onopensivi, charsAvailable = false, onopenchars,
+    metadataAvailable = false, onopenmetadata }: {
     view: View; onnavigate: (view: View) => void;
     siviAvailable?: boolean; onopensivi?: () => void;
+    charsAvailable?: boolean; onopenchars?: () => void;
     metadataAvailable?: boolean; onopenmetadata?: () => void;
   } = $props();
   let navigation: HTMLElement;
@@ -16,7 +18,8 @@
     { label: 'Forms', icon: ClipboardList, groups: [
       { label: 'Data Entry', items: [
         { name: 'FS882 Data Forms (6x4) — Experimental', icon: ClipboardList, view: 'fs882' },
-        { name: 'Enter/Edit SIVI Data', icon: Tent, action: 'sivi' }
+        { name: 'Enter/Edit SIVI Data', icon: Tent, action: 'sivi' },
+        { name: 'CHARS SIVI parent — Experimental', icon: Tent, action: 'sivi-chars' }
       ] },
       { label: 'Others', items: [
         { name: 'Metadata', icon: Table, action: 'metadata' },
@@ -92,6 +95,7 @@
 
   function itemEnabled(item: Item) {
     if (item.action === 'sivi') return siviAvailable && !!onopensivi;
+    if (item.action === 'sivi-chars') return charsAvailable && !!onopenchars;
     if (item.action === 'metadata') return metadataAvailable && !!onopenmetadata;
     return !!item.view;
   }
@@ -101,6 +105,9 @@
     if (item.action === 'sivi' && onopensivi) {
       closeMenu(true);
       onopensivi();
+    } else if (item.action === 'sivi-chars' && onopenchars) {
+      closeMenu(true);
+      onopenchars();
     } else if (item.action === 'metadata' && onopenmetadata) {
       closeMenu(true);
       onopenmetadata();
@@ -144,6 +151,9 @@
                 title={item.action === 'sivi'
                   ? itemEnabled(item) ? 'Experimental normal SIVI / FS1333 for the selected plot. Existing draft and close guards apply. Use disposable projects only.'
                     : 'Select a plot and enable the independent SIVI standalone and parent-review gates.'
+                  : item.action === 'sivi-chars'
+                    ? itemEnabled(item) ? 'Experimental CHARS parent-only entry. Child workflows and implicit actions remain unavailable. Existing draft and close guards apply.'
+                      : 'Select a plot and enable the independent CHARS parent-entry gate.'
                   : item.action === 'metadata'
                     ? 'Project metadata for the open plot. Requires the existing metadata gate and a clean, unlocked editor; finish or Undo drafts first.'
                   : item.view === 'fs882' ? 'Experimental: only verified workflows are writable. Use disposable projects only.' : item.view ? item.name : 'Not yet available in the desktop app'}

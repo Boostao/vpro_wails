@@ -165,7 +165,8 @@ test('standalone host uses the existing editor owner/close guards, not a duplica
   }
   assert.match(app, /VITE_SIVI_STANDALONE === 'true' && import\.meta\.env\.VITE_SIVI_PARENT_REVIEW === 'true'/);
   assert.match(app, /entryForm=\{editorEntryForm\}/);
-  assert.match(app, /editorLabel=\{editorEntryForm === 'sivi' \? 'SIVI \/ FS1333' : 'FS882'\}/);
+  assert.match(app, /const editorLabel = \$derived\(editorEntryForm === 'sivi-chars' \? 'CHARS SIVI parent' : editorEntryForm === 'sivi' \? 'SIVI \/ FS1333' : 'FS882'\)/);
+  assert.match(app, /\{editorLabel\}/);
   const close = source('CloseConfirm.svelte');
   assert.match(close, /editorLabel = 'FS882'/);
   assert.match(close, /\$\{editorLabel\} has an unsaved draft/g);
