@@ -1,0 +1,2653 @@
+{
+  "vegetation": {
+    "contextId": "summary-numeric-wire",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "su": "Report",
+    "suPath": "C:\\fixture\\Sample.db",
+    "average": 1,
+    "display": 6,
+    "source": "literal-normal-su-layer",
+    "ordering": "literal-null-first-layer-species",
+    "memberships": [
+      {
+        "rowId": "1",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "2",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "3",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "4",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P5",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "5",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "B",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "6",
+        "plotNumber": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "7",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P9",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "8",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P6",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "Orphan",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      }
+    ],
+    "units": [
+      {
+        "code": "A",
+        "numPlots": 4,
+        "membershipIds": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "6"
+        ],
+        "rawVegRowIds": [
+          "1",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "code": "B",
+        "numPlots": 1,
+        "membershipIds": [
+          "5"
+        ],
+        "rawVegRowIds": [
+          "3"
+        ]
+      }
+    ],
+    "columns": [
+      "A",
+      "B"
+    ],
+    "rows": [
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "Alpha",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "5.00",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "10.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "5.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "1",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "2",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "3",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "2"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 20,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "4",
+            "conversionLayerId": "1",
+            "membershipId": "5",
+            "unit": "B",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "3"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "S",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "0.50",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "0.50",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "2",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [],
+            "rawVegRowIds": [
+              "4"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "fieldList": {
+    "columns": [
+      {
+        "name": "Order",
+        "declaredType": "INTEGER"
+      },
+      {
+        "name": "Source",
+        "declaredType": "TEXT(255)"
+      },
+      {
+        "name": "Label",
+        "declaredType": "TEXT(255)"
+      },
+      {
+        "name": "Item",
+        "declaredType": "TEXT(255)"
+      },
+      {
+        "name": "Report",
+        "declaredType": "BIT"
+      },
+      {
+        "name": "FunctionName",
+        "declaredType": "TEXT(255)"
+      },
+      {
+        "name": "FieldNumber",
+        "declaredType": "TEXT(255)"
+      }
+    ],
+    "rows": [
+      {
+        "rowId": "1",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "0",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "n Plots",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVnPlots",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "2",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Nutrient",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "NutrientRegime",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSnr",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "3",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "disabled",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "0",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "unknown",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "4",
+        "cells": [
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Seepage",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSeepage",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "5",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "2",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Root",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVRootingDepth",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "6",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "3",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Age",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStandAge",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "7",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "4",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Elevation",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVElevation",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "8",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "5",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Slope",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSlope",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "9",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "6",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "DecWood",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "DecWood",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "10",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "7",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "BedRock",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "BedRock",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "11",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "8",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Rocks",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Rocks",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "12",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "9",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "MineralSoil",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "MineralSoil",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "13",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "10",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "OrganicMatter",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "OrganicMatter",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "14",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "11",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Water",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Water",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "15",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "12",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Tree",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStrataCover",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Tree",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "16",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "13",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Shrub",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStrataCover",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Shrub",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "17",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "14",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Herb",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStrataCover",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Herb",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      {
+        "rowId": "18",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "15",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Moss",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStrataCover",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Moss",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "field": {
+        "rowId": "4",
+        "cells": [
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Seepage",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSeepage",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "1 - 2.3 - 5",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "1",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "0",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "n Plots",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVnPlots",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 3,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "integer",
+            "text": null,
+            "integer": "4",
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "integer",
+            "text": null,
+            "integer": "1",
+            "real": null,
+            "blobHex": null
+          }
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "2",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Nutrient",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "NutrientRegime",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSnr",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "M(2)  N(1)  ",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "(Null 1)",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "5",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "2",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Root",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVRootingDepth",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "2 - 3.3 - 6",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "6",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "3",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Age",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStandAge",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "3 - 04 - 7",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "(Null 1)",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "7",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "4",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Elevation",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVElevation",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "4 - 05 - 8",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "  (Null 1)",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "8",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "5",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Slope",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSlope",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "1.25 - 3 - 5.75",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "9",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "6",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "DecWood",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "DecWood",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "1.25 - 2.8 - 5.75",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "10",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "7",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "BedRock",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "BedRock",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "2.5 - 2.5 - 2.5",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "11",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "8",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Rocks",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Rocks",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "4 - 4.0 - 4",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "12",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "9",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "MineralSoil",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "MineralSoil",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "5 - 5.0 - 5",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "13",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "10",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "OrganicMatter",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "OrganicMatter",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "6 - 6.0 - 6",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "14",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "11",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Water",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVSubstrate",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Water",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "7 - 7.0 - 7",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "15",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "12",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Tree",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStrataCover",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Tree",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "8 - 8.0 - 8",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "16",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "13",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Shrub",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStrataCover",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Shrub",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "9 - 9.0 - 9",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "17",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "14",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Herb",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStrataCover",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Herb",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "10 - 10.0 - 10",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    },
+    {
+      "field": {
+        "rowId": "18",
+        "cells": [
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "15",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Env",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Moss",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "integer",
+            "text": null,
+            "integer": "-1",
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "SVStrataCover",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "Moss",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ]
+      },
+      "labelColumn": 2,
+      "values": [
+        {
+          "kind": "cell",
+          "cell": {
+            "storage": "text",
+            "text": "11 - 11.0 - 11",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        },
+        {
+          "kind": "empty",
+          "cell": null
+        }
+      ]
+    }
+  ],
+  "sourcePath": "C:\\fixture\\VPro64.db",
+  "envSourcePath": "C:\\fixture\\Sample.db",
+  "source": "one owned SQLite snapshot: raw Summary units, physical SU counts, selected field-list and needed Env; literal scope adaptation; explicit numeric Empty; no formatted workbook"
+}

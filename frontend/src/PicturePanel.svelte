@@ -12,12 +12,14 @@
   import type { PictureLifecycleCommit, PictureLifecycleSession } from './pictureLifecycleSession';
   import { pictureLifecycleOriginalMatches } from './pictureLifecycleEditor';
 
-  let { contextId, project, plotNumber, view = 'child', disabled = false, metadataDisabled, onBusyChange, metadataSession }: {
+  let { contextId, project, plotNumber, view = 'child', disabled = false, metadataDisabled, onBusyChange, metadataSession,
+    observeMutationReceipts = true }: {
     contextId: string; project: string; plotNumber: string; disabled?: boolean;
     metadataDisabled?: boolean;
     view?: 'child' | 'manager';
     onBusyChange: (busy: boolean) => void;
     metadataSession?: PictureMetadataSession;
+    observeMutationReceipts?: boolean;
   } = $props();
   const reads = new ReadRequests();
   let generation = 0;
@@ -33,14 +35,14 @@
   const currentReview = $derived(reviewKey === ownerKey ? review : null);
   const currentImage = $derived(reviewKey === ownerKey ? image : null);
   const row = $derived(currentReview?.records.rows.find(item => item.rowId === selected));
-  const creationSession = $derived(import.meta.env.VITE_PICTURE_CREATION_WRITING === 'true' && contextId && project && plotNumber
+  const creationSession = $derived(observeMutationReceipts && import.meta.env.VITE_PICTURE_CREATION_WRITING === 'true' && contextId && project && plotNumber
     ? pictureCreationSession({ contextId, project, plotNumber }) : undefined);
   let creationRevision = $state(0);
   $effect(() => creationSession?.subscribe(() => untrack(() => creationRevision++)));
   const creationView = $derived.by(() => { creationRevision; return creationSession?.view(); });
   let appliedCreationRequest = '';
   const deletionEnabled = import.meta.env.VITE_PICTURE_DELETION_WRITING === 'true';
-  const lifecycleSession = $derived((deletionEnabled || import.meta.env.VITE_PICTURE_DELETION_RESTORING === 'true') && contextId && project && plotNumber
+  const lifecycleSession = $derived(observeMutationReceipts && (deletionEnabled || import.meta.env.VITE_PICTURE_DELETION_RESTORING === 'true') && contextId && project && plotNumber
     ? pictureLifecycleSession({ contextId, project, plotNumber }) : undefined);
   let lifecycleRevision = $state(0);
   $effect(() => lifecycleSession?.subscribe(() => untrack(() => lifecycleRevision++)));

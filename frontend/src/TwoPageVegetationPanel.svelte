@@ -1,11 +1,12 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { twoPageVegetationSession, twoPageVegetationWritingEnabled } from './twoPageVegetationSessions';
+  import { twoPageVegetationSession, twoPageVegetationWritingEnabled, twoPageVegetationSpeciesListEnabled } from './twoPageVegetationSessions';
   import { vegetationColumnIndex, vegetationSourceCell, type TwoPageVegetationForm } from './twoPageVegetationWire';
   import { metadataCellText } from './projectMetadataEditor';
   import { collectedNext } from './collectedEditor';
   import { twoPageVegetationGroups, twoPageVegetationStoredText, twoPageVegetationRowDiagnostic, twoPageVegetationHasColumn } from './twoPageVegetationPresentation';
   import VegetationSpeciesReferences from './VegetationSpeciesReferences.svelte';
+  import { vegetationSpeciesListOptions, vegetationSpeciesListHasCommonCover } from './twoPageVegetationSpeciesList';
 
   let { contextId, project, plot, form, parentBlocked }: {
     contextId: string; project: string; plot: string; form: TwoPageVegetationForm; parentBlocked: boolean;
@@ -24,6 +25,24 @@
   const diagnostic = $derived(view.original && row ? twoPageVegetationRowDiagnostic(view.original, row.rowId) : null);
   const fieldsDisabled = $derived(parentBlocked || !twoPageVegetationWritingEnabled || view.busy ||
     view.blocked || view.acknowledgementRequired || !!diagnostic);
+  const speciesListAvailable = $derived(twoPageVegetationSpeciesListEnabled && (form === 'SubVegAXL_BC' || form === 'SubVegAXL'));
+  const speciesOptions = $derived(speciesListAvailable && view.references
+    ? vegetationSpeciesListOptions(view.references, { contextId, project, plot, form }) : []);
+  const speciesWarningUnavailable = $derived(speciesListAvailable && view.original && row
+    ? !vegetationSpeciesListHasCommonCover(view.original, row.rowId) : false);
+
+  function pickSpecies(plannedRow: string, event: Event) {
+    try {
+      const select = event.currentTarget;
+      if (!speciesListAvailable || speciesWarningUnavailable || fieldsDisabled || !row || row.rowId !== plannedRow || !panel ||
+        panel.dataset.vegetationCurrentRow !== plannedRow || !(select instanceof HTMLSelectElement) ||
+        select.disabled || !select.checkVisibility() || !panel.contains(select) ||
+        !speciesOptions.some(option => option.code === select.value)) {
+        throw new Error('Observed Species list control, physical row or exact code differs from the planned selection.');
+      }
+      stage('Species', select.value, false);
+    } catch (cause) { error = `Species list selection refused without mutation: ${String(cause)}`; }
+  }
 
   function selectRow(rowId: string) {
     try {
@@ -119,6 +138,28 @@
       <p class="break-words text-sm">Application ID {twoPageVegetationStoredText(view.original, row.rowId, 'ID')}; physical row {row.rowId}; parent {plot}</p>
       {#if diagnostic}<p role="alert">{diagnostic}</p>{/if}
       <p class="break-words text-sm">Species (read only): {twoPageVegetationHasColumn(view.original, 'Species') ? twoPageVegetationStoredText(view.original, row.rowId, 'Species') : '(source column unavailable)'}</p>
+      {#if speciesListAvailable && twoPageVegetationHasColumn(view.original, 'Species')}
+        {@const speciesDraft = view.drafts[JSON.stringify([row.rowId, 'Species'])]}
+        {@const speciesId = `${form}-${row.rowId}-Species-list`}
+        {@const plannedRow = row.rowId}
+        <div class="min-w-0 space-y-1" data-vegetation-column="Species">
+          <label class="block text-sm font-medium" for={speciesId}>Species: existing list selection</label>
+          <select id={speciesId} class="w-full min-w-0 rounded border p-2" value={speciesDraft?.raw ?? ''}
+            disabled={fieldsDisabled || speciesWarningUnavailable || !view.references || !speciesOptions.length} aria-invalid={!!speciesDraft?.error}
+            aria-describedby={speciesDraft?.error ? `${speciesId}-error` : undefined} onchange={event => pickSpecies(plannedRow, event)}>
+            <option value="">Select an exact existing list code</option>
+            {#each speciesOptions as option (`${option.role}:${option.rowId}`)}
+              <option value={option.code}>{option.code} | {option.cells[1].storage === 'null' ? 'NULL' : JSON.stringify(option.cells[1].text)} |
+                {option.cells[4].text} | {option.cells[2].integer} |
+                {option.cells[3].storage === 'null' ? 'NULL' : JSON.stringify(option.cells[3].text)} | {option.role} row {option.rowId}</option>
+            {/each}
+          </select>
+          {#if speciesDraft?.error}<p id={`${speciesId}-error`} role="alert" class="text-sm text-red-700">{speciesDraft.error}</p>{/if}
+          {#if speciesWarningUnavailable}<p role="status" class="text-sm">Species selection is unavailable: all seven original common covers are NULL; the source warning/advance route is not qualified.</p>{/if}
+          {#if !view.references}<p role="status" class="text-sm">Review physical Species definitions before selecting a list code.</p>
+          {:else if !speciesOptions.length}<p role="status" class="text-sm">No qualified exact A/CHARS list codes are available.</p>{/if}
+        </div>
+      {/if}
       {#each twoPageVegetationGroups(form) as group}
         <fieldset class="min-w-0 rounded border p-3">
           <legend class="text-sm font-semibold">{group.label}</legend>
@@ -162,5 +203,10 @@
   {/each}
   {#if view.receipts.length}<p role="status">{view.receipts.length} immutable committed vegetation receipt(s) retained across remounts.</p>{/if}
   {#if view.references}<VegetationSpeciesReferences references={view.references} />{/if}
-  <p class="text-xs text-gray-600">Experimental existing-row cover/Collected review and read-only Species metadata. New numeric drafts use calibrated SINGLE conversion before validation; unchanged historical values are not silently repaired. Physical reader order is a desktop adaptation, not source Species sorting. Species decisions, automatic Current/Enter navigation, creation, deletion and restoration remain unavailable. Save is explicit, never triggered by changing rows or cycling Collected. NULL is not empty text.</p>
+  <p class="text-xs text-gray-600">Experimental existing-row cover/Collected review and physical Species metadata.
+    {#if speciesListAvailable}Species selection is limited to exact existing A/CHARS list codes; common-seven-cover-empty warning/advance remains unavailable.{/if}
+    New numeric drafts use calibrated SINGLE conversion before validation; unchanged historical values are not silently repaired.
+    Physical reader order is a desktop adaptation, not source Species sorting. Manual/alias/NotInList/personal creation decisions,
+    automatic Current/Enter navigation, creation, deletion and restoration remain unavailable.
+    Save is explicit, never triggered by changing rows, selecting Species or cycling Collected. NULL is not empty text.</p>
 </section>

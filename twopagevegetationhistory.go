@@ -46,7 +46,7 @@ func twoPageVegetationPlannedTable(original ProjectMetadataTable, assignments []
 }
 
 func validateTwoPageVegetationHistory(ctx context.Context, history twoPageVegetationHistory) error {
-	plan, err := planTwoPageVegetationHistoricalEdits(ctx, history.Request.Original, history.Request.Edits)
+	plan, err := planTwoPageVegetationRequest(ctx, history.Request, false)
 	if err != nil || len(plan) == 0 || !siviDeletionUUID.MatchString(history.Request.RequestID) {
 		return errors.Join(err, errors.New("two-page vegetation history requires a complete changed source plan"))
 	}

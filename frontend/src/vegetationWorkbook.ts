@@ -20,7 +20,7 @@ export type ValidatedVegetationWorkbookReview = Omit<VegetationWorkbookReview, '
   skippedUnits: NonNullable<VegetationWorkbookReview['skippedUnits']>;
 };
 
-function calendarDate(value: string): boolean {
+export function workbookCalendarDate(value: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number(value.slice(0, 4)) < 100) return false;
   const date = new Date(`${value}T00:00:00Z`);
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
@@ -36,6 +36,21 @@ function validateSummary(value: VegetationWorkbookReview, preview: ValidatedLong
       summary.createdDate !== value.createdDate || !count(summary.environmentRows) || !count(summary.selectedPlotRows) ||
       !identity(summary.speciesVersion) ||
       !shape(summary.versionDefinitions, ['columns', 'rows'])) throw new Error('Workbook summary evidence is incomplete.');
+  validateWorkbookVersionEvidence(summary);
+  if (preview.settings.unitGrouping === 'all-plots' ?
+        summary.selectedPlotRows !== preview.report.noneUnits!.length :
+        preview.settings.unitGrouping === 'selected-fields' ?
+        summary.selectedPlotRows !== preview.report.selectedUnits!.filter(row => row.plotNumber.storage !== 'null').length :
+        preview.report.quality && summary.selectedPlotRows !== preview.report.quality.occurrences.length) {
+    throw new Error('Workbook summary contradicts original version/quality evidence.');
+  }
+}
+
+export function validateWorkbookVersionEvidence(summary: Pick<NonNullable<VegetationWorkbookReview['summary']>,
+  'speciesVersion' | 'versionStatus' | 'versionDefinitions'>): void {
+  if (!identity(summary.speciesVersion) || !shape(summary.versionDefinitions, ['columns', 'rows'])) {
+    throw new Error('Workbook summary evidence is incomplete.');
+  }
   const { columns, rows } = summary.versionDefinitions;
   if (columns !== null && !Array.isArray(columns) || rows !== null && !Array.isArray(rows)) {
     throw new Error('Workbook version definitions have malformed nullable arrays.');
@@ -66,17 +81,16 @@ function validateSummary(value: VegetationWorkbookReview, preview: ValidatedLong
     expectedStatus = version.storage === 'null' ? 'null' : 'literal';
     expectedVersion = version;
   }
-  if (summary.versionStatus !== expectedStatus || cellKey(summary.speciesVersion) !== cellKey(expectedVersion) ||
-      preview.report.quality && summary.selectedPlotRows !== preview.report.quality.occurrences.length) {
+  if (summary.versionStatus !== expectedStatus || cellKey(summary.speciesVersion) !== cellKey(expectedVersion)) {
     throw new Error('Workbook summary contradicts original version/quality evidence.');
   }
 }
 
 export function validateVegetationWorkbookReview(value: VegetationWorkbookReview | null,
-  owner: LifeformSummaryOwner): ValidatedVegetationWorkbookReview {
+  owner: LifeformSummaryOwner, selectedUnitsEnabled = false): ValidatedVegetationWorkbookReview {
   value = value ? structuredClone(value) : null;
   if (!shape(value, ['preview', 'options', 'summary', 'scope', 'createdDate', 'sheets', 'skippedUnits', 'approvalHash', 'workbookSHA256', 'bytes']) ||
-      value.scope !== 'unlumped' || !text(value.createdDate) || !calendarDate(value.createdDate) ||
+      value.scope !== 'unlumped' || !text(value.createdDate) || !workbookCalendarDate(value.createdDate) ||
       !hash(value.approvalHash) || !hash(value.workbookSHA256) || !count(value.bytes) || value.bytes === 0 ||
       !Array.isArray(value.sheets) || !Array.isArray(value.skippedUnits) ||
       !shape(value.options, ['quickReport', 'spaceBetweenGroups', 'reportSummary']) ||
@@ -84,8 +98,19 @@ export function validateVegetationWorkbookReview(value: VegetationWorkbookReview
       typeof value.options.reportSummary !== 'boolean' || owner.su === 'USysSuTableDynamic') {
     throw new Error('Workbook review has incomplete or unsupported unlumped source approval/layout.');
   }
-  const preview = validateLongVegetationPreview(value.preview, owner.contextId, owner.project, owner.projectPath, owner.su, owner.suPath);
+  const preview = validateLongVegetationPreview(value.preview, owner.contextId, owner.project, owner.projectPath, owner.su, owner.suPath, selectedUnitsEnabled);
   validateSummary(value, preview);
+  validateWorkbookWorksheetEvidence(value, preview);
+  const validated = { ...value, preview, sheets: value.sheets, skippedUnits: value.skippedUnits };
+  freeze(validated);
+  return validated;
+}
+
+export function validateWorkbookWorksheetEvidence(value: Pick<VegetationWorkbookReview, 'options' | 'sheets' | 'skippedUnits'>,
+  preview: ValidatedLongVegetationPreview): void {
+  if (!Array.isArray(value.sheets) || !Array.isArray(value.skippedUnits)) {
+    throw new Error('Workbook review has incomplete worksheet evidence.');
+  }
   if (!preview.report.units.length || value.sheets.length !== preview.report.units.length) {
     throw new Error('Workbook review omits complete original unit worksheets.');
   }
@@ -110,9 +135,6 @@ export function validateVegetationWorkbookReview(value: VegetationWorkbookReview
         units.has(cellKey(skipped.unit))) throw new Error('Workbook skipped-unit evidence is malformed or repeated.');
     units.add(cellKey(skipped.unit));
   }
-  const validated = { ...value, preview, sheets: value.sheets, skippedUnits: value.skippedUnits };
-  freeze(validated);
-  return validated;
 }
 
 export function validateVegetationWorkbookOutcome(value: VegetationWorkbookOutcome | null,
@@ -133,12 +155,14 @@ export function validateVegetationWorkbookOutcome(value: VegetationWorkbookOutco
 export class VegetationWorkbookPublicationSession {
   private receipt = new PublicationSession<VegetationWorkbookOutcome>('Long Vegetation workbook');
   private consumed = new Set<string>();
-  constructor(private readonly owner: LifeformSummaryOwner) { this.owner = structuredClone(owner); }
+  constructor(private readonly owner: LifeformSummaryOwner, private readonly selectedUnitsEnabled = false) {
+    this.owner = structuredClone(owner);
+  }
   view() { return this.receipt.view(); }
   subscribe(listener: () => void) { return this.receipt.subscribe(listener); }
   prepare(review: VegetationWorkbookReview) {
     if (this.view().busy || this.view().blocked) throw new Error('Acknowledge the prior workbook outcome before reviewing again.');
-    const validated = validateVegetationWorkbookReview(review, this.owner);
+    const validated = validateVegetationWorkbookReview(review, this.owner, this.selectedUnitsEnabled);
     this.consumed.delete(validated.approvalHash);
     return validated;
   }
@@ -147,7 +171,7 @@ export class VegetationWorkbookPublicationSession {
     if (!text(destination) || !destination || !/\.xlsx$/i.test(destination)) {
       throw new Error('Workbook publication requires an explicit literal .xlsx destination.');
     }
-    const validated = validateVegetationWorkbookReview(review, this.owner);
+    const validated = validateVegetationWorkbookReview(review, this.owner, this.selectedUnitsEnabled);
     if (this.view().busy || this.view().blocked) throw new Error('Acknowledge the prior workbook outcome before a new publication.');
     if (this.consumed.has(validated.approvalHash)) throw new Error('Obtain a fresh explicit workbook review before retrying.');
     this.consumed.add(validated.approvalHash);
@@ -158,14 +182,14 @@ export class VegetationWorkbookPublicationSession {
   acknowledge() { this.receipt.acknowledge(); }
 }
 
-const sessions = new Map<string, { key: string; session: VegetationWorkbookPublicationSession }>();
-export function vegetationWorkbookPublicationSession(owner: LifeformSummaryOwner): VegetationWorkbookPublicationSession {
+const sessions = new Map<string, { key: string; enabled: boolean; session: VegetationWorkbookPublicationSession }>();
+export function vegetationWorkbookPublicationSession(owner: LifeformSummaryOwner, selectedUnitsEnabled = false): VegetationWorkbookPublicationSession {
   const key = ownerKey(owner), existing = sessions.get(owner.contextId);
   if (existing) {
-    if (existing.key !== key) throw new Error('Workbook receipt belongs to different owned paths.');
+    if (existing.key !== key || existing.enabled !== selectedUnitsEnabled) throw new Error('Workbook receipt belongs to different owned paths or consumer availability.');
     return existing.session;
   }
-  const session = new VegetationWorkbookPublicationSession(owner);
-  sessions.set(owner.contextId, { key, session });
+  const session = new VegetationWorkbookPublicationSession(owner, selectedUnitsEnabled);
+  sessions.set(owner.contextId, { key, enabled: selectedUnitsEnabled, session });
   return session;
 }

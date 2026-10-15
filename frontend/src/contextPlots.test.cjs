@@ -17,16 +17,20 @@ test('every editor read and mutation carries the original context identity and u
     calls.push([method, ...args]);
     return Promise.resolve('result');
   } });
-  const client = output.bindContextPlots('original-context', port);
+  const client = output.bindContextPlots('original-context', port, port);
   for (const [name, invoke] of Object.entries(client)) {
     const payload = { name, raw: "don't trim  " };
     assert.equal(await invoke(payload, ['row'], 'retain'), 'result');
     const call = calls.at(-1);
-    assert.equal(call[0], name);
+    assert.equal(call[0], name === 'PreviewProjectProfileSpeciesPresence' ? 'Preview' : name);
     assert.equal(call[1], 'original-context');
+    if (name === 'PreviewProjectProfileSpeciesPresence') {
+      assert.deepEqual(JSON.parse(call[2]), payload);
+      continue;
+    }
     if (!['GetHeaderCapabilities', 'CanEditMasterBEC', 'ListSoilSuggestions', 'ListVegetationAttributeSuggestions', 'ReviewSpeciesCodes', 'ListProjectMetadataFields', 'ReviewProjectPlotProfile', 'ReviewProjectPlotProfileLump', 'ListProjectPlotProfileChoices', 'ReviewEnvironmentSiteUnits', 'ReviewSiteUnitEnvironment'].includes(name)) assert.equal(call[2], payload);
   }
-  assert.equal(calls.length, 64);
+  assert.equal(calls.length, 66);
   assert.throws(() => output.bindContextPlots('', port), /loaded project context identity/);
 });
 
@@ -53,4 +57,27 @@ test('verified external attachment defaults on and project choices visibly ident
   assert.match(root, /class="project-location"/);
   assert.match(root, /item\.name === project\.name/);
   assert.match(root, /\? project\.file : project\.path/);
+});
+
+test('actual editor service merge scopes nullable Audit and rejects a delayed read after context switching', async () => {
+  const calls = [];
+  let active = 'original-context', release;
+  const held = new Promise(resolve => release = resolve);
+  const scoped = output.bindContextPlots('original-context', {
+    ListAuditReadEntries(contextId, plot) {
+      calls.push(['scoped', contextId, plot]);
+      return held.then(() => {
+        if (contextId !== active) throw new Error('stale context; no history returned');
+        return [];
+      });
+    },
+  });
+  const merged = { ListAuditReadEntries(plot) { calls.push(['legacy', plot]); return Promise.resolve([]); }, ...scoped };
+  const pending = merged.ListAuditReadEntries(' literal plot ');
+  active = 'next-context'; release();
+  await assert.rejects(pending, /stale context/);
+  assert.deepEqual(calls, [['scoped', 'original-context', ' literal plot ']]);
+  const root = read('FS882Form.svelte');
+  assert.match(root, /const PlotService = \{ \.\.\.LegacyPlotService, \.\.\.bindContextPlots\(untrack\(\(\) => contextId\)\) \}/);
+  assert.match(root, /reads\.track\(PlotService\.ListAuditReadEntries\(p\)\)/);
 });

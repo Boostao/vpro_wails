@@ -58,7 +58,7 @@ export class ReportPreferencesSession<Values, Draft, Review> {
     this.listeners.add(listener); listener();
     return () => this.listeners.delete(listener);
   }
-  private notify() { for (const listener of this.listeners) listener(); }
+  protected notify() { for (const listener of this.listeners) listener(); }
   private unlocked() {
     if (this.state.busy || this.state.blocked) throw new Error('Wait for and acknowledge the preference save outcome first.');
   }
@@ -76,16 +76,18 @@ export class ReportPreferencesSession<Values, Draft, Review> {
   }
   cancelLoad() { this.loadGeneration++; }
   beginLoad(): number { this.unlocked(); return ++this.loadGeneration; }
-  applyLoaded(value: Review | null, generation: number): boolean {
+  applyLoaded(value: Review | null, generation: number, preserveDraft = false): boolean {
     if (generation !== this.loadGeneration) return false;
-    this.apply(value); return true;
+    this.apply(value, preserveDraft); return true;
   }
-  apply(value: Review | null) {
+  apply(value: Review | null, preserveDraft = false) {
     this.unlocked();
     const values = this.policy.review(value, this.scope);
-    this.cancelLoad(); this.state.saved = structuredClone(values); this.state.draft = this.policy.draft(values);
+    this.cancelLoad(); this.state.saved = structuredClone(values);
+    if (!preserveDraft) this.state.draft = this.policy.draft(values);
     this.state.initialized = true;
-    this.state.draftError = ''; this.state.authorityUnknown = false; this.state.error = ''; this.notify();
+    this.state.draftError = preserveDraft ? this.policy.validate(this.state.draft, this.state.saved) : '';
+    this.state.authorityUnknown = false; this.state.error = ''; this.notify();
   }
   async save(port: (request: ReportPreferenceRequest<Values>) =>
     PromiseLike<ReportTitlePreferencesOutcome | null>): Promise<void> {

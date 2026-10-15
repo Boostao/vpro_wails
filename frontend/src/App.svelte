@@ -6,10 +6,17 @@
   import { projectState } from './state';
   import FS882Form from './FS882Form.svelte';
   import Navigation from './Navigation.svelte';
+  import DemoReadiness from './DemoReadiness.svelte';
   import LongEnvironmentReport from './LongEnvironmentReport.svelte';
   import SiteUnitSummary from './SiteUnitSummary.svelte';
   import LongVegetationReport from './LongVegetationReport.svelte';
   import LifeformSummary from './LifeformSummary.svelte';
+  import SummaryVegetationReport from './SummaryVegetationReport.svelte';
+  import { summaryVegetationPreferenceSession } from './summaryVegetationPreferenceSessions';
+  import { summaryVegetationQualityPreferenceSession } from './summaryVegetationQualityPreferenceSessions';
+  import { summaryVegetationPresentationPreferenceSession } from './summaryVegetationPresentationPreferenceSessions';
+  import { summaryVegetationFieldListDesktop } from './summaryVegetationFieldListDesktop';
+  import { summaryEnvironmentalDesktop, summaryEnvironmentalEnabled } from './summaryVegetationEnvironmentalDesktop';
   import ProjectTableCSVReview from './ProjectTableCSVReview.svelte';
   import PlotLocationReview from './PlotLocationReview.svelte';
   import PictureManager from './PictureManager.svelte';
@@ -26,6 +33,7 @@
   import { plotLookupInputError, validateScopedPlotLookup } from './scopedPlotLookup';
   import { tableCSVArchivePublicationSession } from './tableCSVArchiveExport';
   import { vegetationWorkbookPublicationSession } from './vegetationWorkbook';
+  import { projectReportWorkspace } from './longVegetationProjectWorkspaces';
   import { lifeformWorkbookPublicationSession } from './lifeformWorkbook';
   import { siteUnitSummaryWorkbookPublicationSession } from './siteUnitSummaryWorkbook';
   import { extendedSummaryWorkbookPublicationSession } from './siteUnitSummaryExtendedWorkbook';
@@ -33,6 +41,7 @@
   import { subscribePictureLifecycleActivity } from './pictureLifecycleSessions';
   import { subscribeTwoPageSoilActivity } from './twoPageSoilSessions';
   import { subscribeTwoPageVegetationActivity } from './twoPageVegetationSessions';
+  import { subscribeExternalSUEnvironmentActivity } from './externalSUEnvironment';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -56,7 +65,7 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
   let pictureManagerPlot = $state('');
   let plotLabelNumber = $state('');
   let contextExpanded = $state(false);
@@ -65,9 +74,67 @@
   let pictureLifecycleBusy = $state(false);
   let twoPageSoilBusy = $state(false);
   let twoPageVegetationBusy = $state(false);
-  const editorBusy = $derived(localEditorBusy || pictureCreationBusy || pictureLifecycleBusy || twoPageSoilBusy || twoPageVegetationBusy);
+  let externalSUEnvironmentBusy = $state(false);
+  let projectReportBusy = $state(false);
+  let summaryPreferenceBusy = $state(false);
+  let summaryFieldListBusy = $state(false);
+  let summaryEnvironmentalBusy = $state(false);
+  const editorBusy = $derived(localEditorBusy || pictureCreationBusy || pictureLifecycleBusy || twoPageSoilBusy || twoPageVegetationBusy || externalSUEnvironmentBusy || summaryPreferenceBusy || summaryFieldListBusy || summaryEnvironmentalBusy || projectReportBusy);
+  $effect(() => {
+    if (!summaryEnvironmentalEnabled) return;
+    return summaryEnvironmentalDesktop.subscribe(() => {
+      summaryEnvironmentalBusy = summaryEnvironmentalDesktop.activity().busy;
+      if (summaryEnvironmentalBusy && view === 'home') view = 'summary-vegetation';
+    });
+  });
+  $effect(() => {
+    if (!summaryVegetationFieldListDesktop.enabled) return;
+    return summaryVegetationFieldListDesktop.subscribe(() => {
+      const activity = summaryVegetationFieldListDesktop.activity();
+      summaryFieldListBusy = activity.busy || activity.blocked;
+      if (summaryFieldListBusy && view === 'home') view = 'summary-vegetation';
+    });
+  });
+  $effect(() => {
+    const state = $projectState;
+    if ((!summaryVegetationPreferenceSession && !summaryVegetationQualityPreferenceSession && !summaryVegetationPresentationPreferenceSession) ||
+        !state?.contextId || !state.projectPath || !state.suPath) {
+      summaryPreferenceBusy = false; return;
+    }
+    const owner = { contextId: state.contextId, project: state.activeProject,
+      projectPath: state.projectPath, su: state.activeSU, suPath: state.suPath };
+    const preferences = summaryVegetationPreferenceSession?.(owner);
+    const quality = summaryVegetationQualityPreferenceSession?.(owner);
+    const presentation = summaryVegetationPresentationPreferenceSession?.(owner);
+    const changed = () => {
+      const views = [preferences?.view(), quality?.view(), presentation?.view()];
+      summaryPreferenceBusy = views.some(current => !!current && (current.busy || current.blocked || !!current.draftError));
+      if (summaryPreferenceBusy && view === 'home') view = 'summary-vegetation';
+    };
+    const releasePreferences = preferences?.subscribe(changed), releaseQuality = quality?.subscribe(changed),
+      releasePresentation = presentation?.subscribe(changed);
+    return () => { releasePreferences?.(); releaseQuality?.(); releasePresentation?.(); };
+  });
+  $effect(() => {
+    const state = $projectState;
+    if (!projectReportWorkspace || import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'true' ||
+        !state?.contextId || !state.projectPath || state.activeSU !== 'None' && !state.suPath) {
+      projectReportBusy = false;
+      return;
+    }
+    const workspace = projectReportWorkspace({ contextId: state.contextId,
+      project: state.activeProject, projectPath: state.projectPath, su: state.activeSU, suPath: state.suPath ?? '' });
+    return workspace.subscribe(() => {
+      projectReportBusy = workspace.view().closeBlocked;
+      if (projectReportBusy && view === 'home') view = 'long-vegetation';
+    });
+  });
   $effect(() => subscribeTwoPageSoilActivity(activity => { twoPageSoilBusy = activity.busy || activity.blocked; }));
   $effect(() => subscribeTwoPageVegetationActivity(activity => { twoPageVegetationBusy = activity.busy || activity.blocked; }));
+  $effect(() => {
+    if (import.meta.env.VITE_EXTERNAL_SU_ENVIRONMENT_EDITING !== 'true') return;
+    return subscribeExternalSUEnvironmentActivity(activity => { externalSUEnvironmentBusy = activity.busy || activity.blocked; });
+  });
   $effect(() => {
     if (import.meta.env.VITE_PICTURE_DELETION_WRITING !== 'true' && import.meta.env.VITE_PICTURE_DELETION_RESTORING !== 'true') return;
     const state = $projectState;
@@ -103,7 +170,8 @@
     if (import.meta.env.VITE_LONG_VEGETATION_WORKBOOK !== 'true' || import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'true' ||
         !state?.contextId || state.activeSU === 'None' || !state.suPath) { vegetationPublicationBusy = false; return; }
     const session = vegetationWorkbookPublicationSession({ contextId: state.contextId,
-      project: state.activeProject, projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath });
+      project: state.activeProject, projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath },
+      import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNITS === 'true');
     return session.subscribe(() => {
       const publication = session.view();
       vegetationPublicationBusy = publication.busy || publication.blocked;
@@ -155,7 +223,10 @@
     const unsubscribe = sessions.map(session => session.subscribe(update));
     return () => { for (const stop of unsubscribe) stop(); };
   });
-  let editor: { getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean> } | undefined = $state();
+  let editor: {
+    getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean>;
+    canOpenProjectMetadata: () => boolean; openProjectMetadata: () => void;
+  } | undefined = $state();
   let closeRequest = $state('');
   let closeWorking = $state(false);
   let closeError = $state('');
@@ -326,7 +397,7 @@
         pictureManagerPlot = selected?.plotNumber ?? '';
       }
       if (next === 'plot-label-preview') {
-        if (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'true') {
+        if (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'true' && import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'true') {
           error = 'Saved plot label preview is disabled in this build.';
           return;
         }
@@ -345,6 +416,22 @@
     await requestTransition(async () => {
       if (selected?.plotNumber !== plot) throw new Error('Selected plot changed before opening SIVI; no owner replaced.');
       editorPlotNumber = plot; editorEntryForm = 'sivi'; view = 'fs882'; error = '';
+    });
+  }
+
+  async function openProjectMetadata() {
+    if (view !== 'fs882' || !editor || !$projectState?.contextId || !editor.canOpenProjectMetadata()) {
+      error = 'Project metadata requires its existing gate and a clean, unlocked open plot; finish or Undo drafts first.';
+      return;
+    }
+    const owner = editor;
+    const contextId = $projectState.contextId;
+    await requestTransition(async currentContext => {
+      if (view !== 'fs882' || editor !== owner || currentContext !== contextId ||
+          $projectState?.contextId !== contextId || !owner.canOpenProjectMetadata()) {
+        throw new Error('Project metadata owner or availability changed; no editor replaced.');
+      }
+      owner.openProjectMetadata();
     });
   }
 
@@ -455,7 +542,7 @@
   }
 
   async function loadPlots(nextOffset: number) {
-    if (twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation') && editorBusy) return;
     const current = ++request;
     plotReads.cancelAll();
     busy = true;
@@ -478,7 +565,7 @@
   }
 
   async function refresh() {
-    if (twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation') && editorBusy) return;
     const current = ++stateRequest;
     stateReads.cancelAll();
     busy = true;
@@ -507,7 +594,7 @@
   }
 
   async function loadHierarchy() {
-    if (twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation') && editorBusy) return;
     const current = ++hierarchyRequest;
     hierarchyReads.cancelAll();
     try {
@@ -885,7 +972,11 @@
   <header class="topbar">
     <div class="brand"><span class="brand-symbol" aria-hidden="true">V</span><span>VPRO</span></div>
     <button class="context-toggle" type="button" disabled={startupFailure !== null} aria-expanded={contextExpanded} aria-controls="project-context" onclick={() => contextExpanded = !contextExpanded}>Projects &amp; context</button>
-    {#if !startupFailure}<Navigation {view} onnavigate={navigate} />{/if}
+    {#if !startupFailure}<Navigation {view} onnavigate={navigate}
+      siviAvailable={siviStandaloneEnabled && !!selected && !!$projectState?.contextId}
+      onopensivi={() => void openSIVI()}
+      metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
+      onopenmetadata={() => void openProjectMetadata()} />{/if}
     <div class="topbar-context"><Database size={16} strokeWidth={1.8} /><span>{$projectState?.activeProject ?? 'No project'}</span></div>
   </header>
 
@@ -1133,6 +1224,7 @@
           <button class="open-plots" onclick={() => view = 'plots'}>View plots <ChevronRight size={16} /></button>
         </div>
         <p class="home-count">{page?.total ?? 0} plots in the current project. Select a project on the left to browse its plots.</p>
+        <DemoReadiness />
       {:else if view === 'fs882'}
         <div class="h-full flex flex-col p-2">
           <p class="project-warning"><strong>Experimental {editorEntryForm === 'sivi' ? 'SIVI / FS1333 entrypoint' : 'FS882 editor'}</strong> Only verified workflows are writable. Use disposable projects only.</p>
@@ -1212,6 +1304,14 @@
             operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
             onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
+      {:else if view === 'summary-vegetation' && import.meta.env.VITE_SUMMARY_VEGETATION === 'true' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <SummaryVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+            operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
+            onBusyChange={(value) => { localEditorBusy = value; }} />
+        {/key}
       {:else if view === 'lifeform-summary' && import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
@@ -1226,10 +1326,11 @@
           <ProjectTableCSVReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'plot-label-preview' && import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' && $projectState}
+      {:else if view === 'plot-label-preview' && (import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT === 'true') && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <PlotLabelPreview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             initialPlot={plotLabelNumber} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
       {:else if view === 'picture-manager' && import.meta.env.VITE_PICTURE_MANAGER === 'true' && $projectState}

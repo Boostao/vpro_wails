@@ -1,0 +1,31 @@
+{
+  "review": {
+    "contextId": "quality-minimum-context",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "values": { "siteMinimum": "Poor", "vegMinimum": "Poor", "soilMinimum": "Poor" },
+    "source": "configured-owned-imported-SQLite VLists.USysTableOfLists; PlotQualitySite; ItemOrder then physical rowid; suggestions only",
+    "definitions": {
+      "columns": [
+        { "name": "ListName", "declaredType": "TEXT" },
+        { "name": "ListFilter", "declaredType": "TEXT" },
+        { "name": "ItemOrder", "declaredType": "REAL" },
+        { "name": "Item", "declaredType": "TEXT" },
+        { "name": "ItemDescription", "declaredType": "TEXT" },
+        { "name": "FieldUsedIn", "declaredType": "TEXT" },
+        { "name": "ValidateLoops", "declaredType": "TEXT" },
+        { "name": "Validate", "declaredType": "BOOLEAN" },
+        { "name": "Note", "declaredType": "TEXT" },
+        { "name": "Flag", "declaredType": "BOOLEAN" }
+      ],
+      "rows": []
+    }
+  },
+  "request": {
+    "expected": { "siteMinimum": "Poor", "vegMinimum": "Poor", "soilMinimum": "Poor" },
+    "proposed": { "siteMinimum": " custom ", "vegMinimum": "", "soilMinimum": "Poor" }
+  },
+  "outcome": { "contextId": "quality-minimum-context", "changed": true, "committed": true, "errorMessage": "" }
+}

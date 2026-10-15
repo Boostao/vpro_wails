@@ -288,6 +288,48 @@ func profileMax(values ...any) (float64, error) {
 	return float64(maximum), nil
 }
 
+func profileSingleSum(values ...any) (float64, error) {
+	sum, _, err := profileSingleSumNumber(values...)
+	return sum, err
+}
+
+func profileSingleSumNumber(values ...any) (float64, int, error) {
+	var sum float64
+	precision := 7
+	for _, value := range values {
+		raw, err := profileNumeric(value)
+		if err != nil {
+			return 0, 0, err
+		}
+		if profileDriverNull(raw) {
+			continue
+		}
+		number := float32(raw.(float64))
+		if math.IsInf(float64(number), 0) {
+			return 0, 0, errors.New("source SINGLE cover value overflow")
+		}
+		next := sum + float64(number)
+		if precision == 7 {
+			narrowed := float32(next)
+			if math.IsInf(float64(narrowed), 0) {
+				precision = 15
+			} else {
+				next = float64(narrowed)
+			}
+		}
+		sum = next
+	}
+	return sum, precision, nil
+}
+
+func profileSingleSumDecimalCompare(literal string, values ...any) (any, error) {
+	sum, precision, err := profileSingleSumNumber(values...)
+	if err != nil {
+		return nil, err
+	}
+	return sourceProfileDecimalCompare(sum, literal, precision, 255)
+}
+
 func registerProfileFunctions(conn *sql.Conn) error {
 	return conn.Raw(func(raw any) error {
 		driver, valid := raw.(*sqlite3.SQLiteConn)
@@ -299,6 +341,11 @@ func registerProfileFunctions(conn *sql.Conn) error {
 			run  any
 		}{
 			{"vpro_profile_number", profileNumeric}, {"vpro_profile_max", profileMax},
+			{"vpro_profile_env_decimal_compare", profileEnvDecimalCompare},
+			{"vpro_profile_cover_decimal_compare", profileCoverDecimalCompare},
+			{"vpro_profile_cover_single_decimal_compare", profileCoverSingleDecimalCompare},
+			{"vpro_profile_single_sum", profileSingleSum},
+			{"vpro_profile_single_sum_decimal_compare", profileSingleSumDecimalCompare},
 			{"vpro_profile_text", func(raw any) (any, error) {
 				if profileDriverNull(raw) {
 					return nil, nil
@@ -366,6 +413,13 @@ func profileMatchQuery(rule plotProfileRule, env []ProjectMetadataColumn, lump s
 			}
 		}
 		operator, value := rule.operator, rule.criterion
+		if numeric, valid := value.(profileSQLNumber); valid {
+			if numeric.decimal != "" {
+				return `SELECT PlotNumber FROM USysEnv WHERE vpro_profile_env_decimal_compare(` + field +
+					",?) " + operator + " 0", []any{numeric.decimal}
+			}
+			value = numeric.value
+		}
 		if operator == "Like" || operator == "Not Like" {
 			// Only the source ASCII * and ? subset is accepted by the planner.
 			field = "lower(" + field + ")"
@@ -395,16 +449,37 @@ func profileMatchQuery(rule plotProfileRule, env []ProjectMetadataColumn, lump s
 	if rule.table == "Lump" {
 		base += " GROUP BY e.PlotNumber"
 	}
-	expression := profileCoverExpression(rule.layer, false)
-	query := "WITH covered AS (" + base + ") SELECT DISTINCT PlotNumber FROM covered WHERE " + expression + " " + rule.operator + " ?"
-	args := []any{rule.species, rule.criterion}
+	expression := profileCoverExpression(rule.layer, false, rule.table == "Veg")
+	value := rule.criterion
+	predicate := expression + " " + rule.operator + " ?"
+	if numeric, valid := value.(profileSQLNumber); valid {
+		value = numeric.value
+		if numeric.decimal != "" {
+			function := "vpro_profile_cover_decimal_compare"
+			if rule.table == "Veg" || rule.layer == "Any" {
+				function = "vpro_profile_cover_single_decimal_compare"
+			}
+			predicate = function + "(" + expression + ",?) " + rule.operator + " 0"
+			if rule.table == "Veg" && (rule.layer == "SumAll" || rule.layer == "SumA" || rule.layer == "SumB") {
+				columns := profileLayerColumns(rule.layer, false)
+				parts := make([]string, len(columns))
+				for index, column := range columns {
+					parts[index] = quoteHeaderIdentifier(column)
+				}
+				predicate = "vpro_profile_single_sum_decimal_compare(?," + strings.Join(parts, ",") + ") " + rule.operator + " 0"
+			}
+			value = numeric.decimal
+		}
+	}
+	query := "WITH covered AS (" + base + ") SELECT DISTINCT PlotNumber FROM covered WHERE " + predicate
+	args := []any{rule.species, value}
 	if rule.operation == "Add plots" && rule.operator == "<" {
 		if rule.layer == "Any" || rule.layer == "SumAll" {
 			// Source absence is based on species membership, not an invented zero cover.
 			pool := `SELECT DISTINCT e.PlotNumber FROM ` + from
 			query += " UNION SELECT PlotNumber FROM (" + pool + ") pool WHERE NOT EXISTS(SELECT 1 FROM covered WHERE covered.PlotNumber COLLATE BINARY=pool.PlotNumber COLLATE BINARY)"
 		} else {
-			absence := profileCoverExpression(rule.layer, true)
+			absence := profileCoverExpression(rule.layer, true, rule.table == "Veg")
 			pool := `SELECT DISTINCT e.PlotNumber FROM USysEnv e INNER JOIN USysVeg v ON e.PlotNumber COLLATE BINARY=v.PlotNumber COLLATE BINARY`
 			positive := "SELECT PlotNumber FROM covered GROUP BY PlotNumber HAVING SUM(" + absence + ")>0"
 			query += " UNION SELECT PlotNumber FROM (" + pool + ") pool WHERE NOT EXISTS(SELECT 1 FROM (" + positive + ") p WHERE p.PlotNumber COLLATE BINARY=pool.PlotNumber COLLATE BINARY)"
@@ -419,13 +494,20 @@ func profileMatchQuery(rule plotProfileRule, env []ProjectMetadataColumn, lump s
 	return query, args
 }
 
-func profileCoverExpression(layer string, absence bool) string {
+func profileCoverExpression(layer string, absence, single bool) string {
 	columns := profileLayerColumns(layer, absence)
 	if layer == "Any" && !absence {
 		return "vpro_profile_max(" + strings.Join(columns, ",") + ")"
 	}
 	if len(columns) == 1 && !absence {
 		return quoteHeaderIdentifier(columns[0])
+	}
+	if single {
+		parts := make([]string, len(columns))
+		for index, column := range columns {
+			parts[index] = quoteHeaderIdentifier(column)
+		}
+		return "vpro_profile_single_sum(" + strings.Join(parts, ",") + ")"
 	}
 	parts := []string{}
 	for _, column := range columns {

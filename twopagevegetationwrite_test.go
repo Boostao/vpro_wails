@@ -42,7 +42,7 @@ func vegetationWriteFixture(t *testing.T, external bool, form string, strength i
 	} else if form == "SubVegDXL" {
 		column = "Cover7"
 	}
-	request := twoPageVegetationRequest{vegetationWriteUUID, original, []twoPageVegetationEdit{
+	request := twoPageVegetationRequest{RequestID: vegetationWriteUUID, Original: original, Edits: []twoPageVegetationEdit{
 		vegetationPlanEdit(original, column, siviReal(5)),
 		vegetationPlanEdit(original, "Collected", metadataText("C")),
 	}}
@@ -397,7 +397,7 @@ func TestTwoPageVegetationWriteLosslessAffinity(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			request := twoPageVegetationRequest{vegetationWriteUUID, original, []twoPageVegetationEdit{
+			request := twoPageVegetationRequest{RequestID: vegetationWriteUUID, Original: original, Edits: []twoPageVegetationEdit{
 				vegetationPlanEdit(original, "Cover6", siviReal(5)),
 			}}
 			before := databaseBytes(t, service.projects.sqlite.attachments)

@@ -1,0 +1,13 @@
+{
+  "review": {
+    "contextId": "unit-wire",
+    "project": "Sample",
+    "projectPath": "C:\\project.db",
+    "su": "Report",
+    "suPath": "C:\\external.db",
+    "values": {"unitGroups": 1},
+    "availability": {"siteUnitTable": true, "selectedFields": false, "none": true}
+  },
+  "request": {"expected": {"unitGroups": 1}, "proposed": {"unitGroups": 3}},
+  "outcome": {"contextId": "unit-wire", "changed": true, "committed": true, "errorMessage": ""}
+}

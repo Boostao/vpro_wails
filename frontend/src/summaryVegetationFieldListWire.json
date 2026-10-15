@@ -1,0 +1,1902 @@
+{
+  "review": {
+    "contextId": "7d363ed781085c3b1da5f22084835066",
+    "project": "Sample",
+    "projectPath": "C:\\Users\\BrunoTremblay\\AppData\\Local\\Temp\\TestSummaryVegetationFieldListEmitActualWire1427902224\\001\\data\\projects\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "sourcePath": "C:\\Users\\BrunoTremblay\\AppData\\Local\\Temp\\TestSummaryVegetationFieldListEmitActualWire1427902224\\001\\data\\database-family\\VPro64.db",
+    "source": "owned imported SQLite VPro64.USysShortVegSummaryFieldList; complete physical rows; Label read-only",
+    "physical": {
+      "columns": [
+        {
+          "name": "Order",
+          "declaredType": "INTEGER"
+        },
+        {
+          "name": "Source",
+          "declaredType": "TEXT(255)"
+        },
+        {
+          "name": "Label",
+          "declaredType": "TEXT(255)"
+        },
+        {
+          "name": "Item",
+          "declaredType": "TEXT(255)"
+        },
+        {
+          "name": "Report",
+          "declaredType": "BIT"
+        },
+        {
+          "name": "FunctionName",
+          "declaredType": "TEXT(255)"
+        },
+        {
+          "name": "FieldNumber",
+          "declaredType": "TEXT(255)"
+        }
+      ],
+      "rows": [
+        {
+          "rowId": "1",
+          "cells": [
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Env",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "duplicate",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "A",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "sum",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "F1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "2",
+          "cells": [
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Env",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "duplicate",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "A",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "sum",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "F1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "3",
+          "cells": [
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "-1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Admin",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "hidden",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "-1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "H",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "4",
+          "cells": [
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "NULL order",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "-1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "5",
+          "cells": [
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "2",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Env",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "F2",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "request": {
+    "requestId": "2e6b14c0-77b2-49e7-8fa5-9d1b4bb6a854",
+    "review": {
+      "contextId": "7d363ed781085c3b1da5f22084835066",
+      "project": "Sample",
+      "projectPath": "C:\\Users\\BrunoTremblay\\AppData\\Local\\Temp\\TestSummaryVegetationFieldListEmitActualWire1427902224\\001\\data\\projects\\Sample.db",
+      "su": "None",
+      "suPath": "",
+      "sourcePath": "C:\\Users\\BrunoTremblay\\AppData\\Local\\Temp\\TestSummaryVegetationFieldListEmitActualWire1427902224\\001\\data\\database-family\\VPro64.db",
+      "source": "owned imported SQLite VPro64.USysShortVegSummaryFieldList; complete physical rows; Label read-only",
+      "physical": {
+        "columns": [
+          {
+            "name": "Order",
+            "declaredType": "INTEGER"
+          },
+          {
+            "name": "Source",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "Label",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "Item",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "Report",
+            "declaredType": "BIT"
+          },
+          {
+            "name": "FunctionName",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "FieldNumber",
+            "declaredType": "TEXT(255)"
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "2",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "3",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Admin",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "hidden",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "H",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "4",
+            "cells": [
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "NULL order",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "5",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "2",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F2",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "actions": [
+      {
+        "kind": "all",
+        "rowId": "",
+        "selected": true
+      }
+    ]
+  },
+  "outcome": {
+    "contextId": "7d363ed781085c3b1da5f22084835066",
+    "requestId": "2e6b14c0-77b2-49e7-8fa5-9d1b4bb6a854",
+    "changed": true,
+    "committed": true,
+    "replayed": false,
+    "verified": true,
+    "plan": {
+      "original": {
+        "columns": [
+          {
+            "name": "Order",
+            "declaredType": "INTEGER"
+          },
+          {
+            "name": "Source",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "Label",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "Item",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "Report",
+            "declaredType": "BIT"
+          },
+          {
+            "name": "FunctionName",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "FieldNumber",
+            "declaredType": "TEXT(255)"
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "2",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "3",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Admin",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "hidden",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "H",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "4",
+            "cells": [
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "NULL order",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "5",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "2",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F2",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        ]
+      },
+      "proposed": {
+        "columns": [
+          {
+            "name": "Order",
+            "declaredType": "INTEGER"
+          },
+          {
+            "name": "Source",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "Label",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "Item",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "Report",
+            "declaredType": "BIT"
+          },
+          {
+            "name": "FunctionName",
+            "declaredType": "TEXT(255)"
+          },
+          {
+            "name": "FieldNumber",
+            "declaredType": "TEXT(255)"
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "2",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "3",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Admin",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "hidden",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "H",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "4",
+            "cells": [
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "NULL order",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "5",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "2",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F2",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        ]
+      },
+      "assignments": [
+        {
+          "before": {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          "after": {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        },
+        {
+          "before": {
+            "rowId": "2",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          "after": {
+            "rowId": "2",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "duplicate",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "sum",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        },
+        {
+          "before": {
+            "rowId": "5",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "2",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F2",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          "after": {
+            "rowId": "5",
+            "cells": [
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "2",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Env",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "F2",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "errorMessage": ""
+  },
+  "after": {
+    "contextId": "7d363ed781085c3b1da5f22084835066",
+    "project": "Sample",
+    "projectPath": "C:\\Users\\BrunoTremblay\\AppData\\Local\\Temp\\TestSummaryVegetationFieldListEmitActualWire1427902224\\001\\data\\projects\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "sourcePath": "C:\\Users\\BrunoTremblay\\AppData\\Local\\Temp\\TestSummaryVegetationFieldListEmitActualWire1427902224\\001\\data\\database-family\\VPro64.db",
+    "source": "owned imported SQLite VPro64.USysShortVegSummaryFieldList; complete physical rows; Label read-only",
+    "physical": {
+      "columns": [
+        {
+          "name": "Order",
+          "declaredType": "INTEGER"
+        },
+        {
+          "name": "Source",
+          "declaredType": "TEXT(255)"
+        },
+        {
+          "name": "Label",
+          "declaredType": "TEXT(255)"
+        },
+        {
+          "name": "Item",
+          "declaredType": "TEXT(255)"
+        },
+        {
+          "name": "Report",
+          "declaredType": "BIT"
+        },
+        {
+          "name": "FunctionName",
+          "declaredType": "TEXT(255)"
+        },
+        {
+          "name": "FieldNumber",
+          "declaredType": "TEXT(255)"
+        }
+      ],
+      "rows": [
+        {
+          "rowId": "1",
+          "cells": [
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Env",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "duplicate",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "A",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "-1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "sum",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "F1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "2",
+          "cells": [
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Env",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "duplicate",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "A",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "-1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "sum",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "F1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "3",
+          "cells": [
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "-1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Admin",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "hidden",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "-1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "H",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "4",
+          "cells": [
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "NULL order",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "-1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "5",
+          "cells": [
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "2",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Env",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "-1",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "F2",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

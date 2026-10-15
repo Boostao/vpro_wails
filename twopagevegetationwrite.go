@@ -89,6 +89,9 @@ func (s *ContextService) writeTwoPageVegetationObserved(ctx context.Context, con
 			if original.Project != owner.selection.Project {
 				return errors.New("two-page vegetation request belongs to another current project")
 			}
+			if err := prepareTwoPageVegetationSpeciesListWriter(ctx, conn, owner, request); err != nil {
+				return err
+			}
 			suAlias, err := siviParentWriterSU(ctx, conn, owner)
 			if err != nil {
 				return fmt.Errorf("two-page vegetation selected SU attachment: %w", err)
@@ -169,7 +172,10 @@ func (s *ContextService) writeTwoPageVegetationObserved(ctx context.Context, con
 			if err != nil || !twoPageVegetationTableEqual(fresh, original.Records) {
 				return errors.Join(err, errors.New("two-page vegetation complete original/schema changed; cancel and reload"))
 			}
-			plan, err := planTwoPageVegetationEdits(ctx, original, request.Edits)
+			if err := observeTwoPageVegetationSpeciesListWriter(ctx, tx, request); err != nil {
+				return err
+			}
+			plan, err := planTwoPageVegetationRequest(ctx, request, true)
 			if err != nil || len(plan) == 0 {
 				return errors.Join(err, errors.New("two-page vegetation mutation requires a nonempty changed source plan"))
 			}

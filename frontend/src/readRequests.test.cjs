@@ -52,7 +52,7 @@ test('settled reads leave the ownership set and operational failures are not swa
   assert.match(form, /loadRequest\+\+;[\s\S]*?reads\.cancelAll\(\)/);
   assert.match(form, /const request = \+\+loadRequest;\s+reads\.cancelAll\(\)/);
   for (const name of ['GetPlot', 'GetHeaderCapabilities', 'GetChildCapabilities', 'ListVegRecords',
-    'ListHumusRecords', 'ListMineralRecords', 'ListOtherRecords', 'ListAuditEntries']) {
+    'ListHumusRecords', 'ListMineralRecords', 'ListOtherRecords', 'ListAuditReadEntries']) {
     assert.match(form, new RegExp(`reads\\.track\\(PlotService\\.${name}\\(`));
   }
   assert.doesNotMatch(form, /reads\.track\(PlotService\.(?:Update|Save|Create|Delete|Restore|Set)/);

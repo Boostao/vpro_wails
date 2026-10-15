@@ -1,10 +1,14 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
-  type Item = { name: string; icon: typeof House; view?: View };
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'table-csv' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
+  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'metadata' };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
-  let { view, onnavigate }: { view: View; onnavigate: (view: View) => void } = $props();
+  let { view, onnavigate, siviAvailable = false, onopensivi, metadataAvailable = false, onopenmetadata }: {
+    view: View; onnavigate: (view: View) => void;
+    siviAvailable?: boolean; onopensivi?: () => void;
+    metadataAvailable?: boolean; onopenmetadata?: () => void;
+  } = $props();
   let navigation: HTMLElement;
   let openMenu = $state<string | null>(null);
 
@@ -12,10 +16,10 @@
     { label: 'Forms', icon: ClipboardList, groups: [
       { label: 'Data Entry', items: [
         { name: 'FS882 Data Forms (6x4) — Experimental', icon: ClipboardList, view: 'fs882' },
-        { name: 'Enter/Edit SIVI Data', icon: Tent }
+        { name: 'Enter/Edit SIVI Data', icon: Tent, action: 'sivi' }
       ] },
       { label: 'Others', items: [
-        { name: 'Metadata', icon: Table },
+        { name: 'Metadata', icon: Table, action: 'metadata' },
         { name: 'Combine Species', icon: Link },
         { name: 'Herbarium', icon: Leaf },
         { name: 'Plot Pictures — Read-only', icon: FileText, view: import.meta.env.VITE_PICTURE_MANAGER === 'true' ? 'picture-manager' : undefined },
@@ -28,7 +32,7 @@
       { label: 'Vegetation', items: [
         { name: 'Long Vegetation', icon: TableProperties, view: import.meta.env.VITE_LONG_VEGETATION_REPORT === 'true' ? 'long-vegetation' : undefined },
         { name: 'Lifeform Summary', icon: Leaf, view: import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' ? 'lifeform-summary' : undefined },
-        { name: 'Summary Vegetation', icon: ChartColumn }
+        { name: 'Summary Vegetation', icon: ChartColumn, view: import.meta.env.VITE_SUMMARY_VEGETATION === 'true' ? 'summary-vegetation' : undefined }
       ] },
       { label: 'Environment', items: [
         { name: 'Long Environment', icon: TableProperties, view: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' ? 'long-environment' : undefined },
@@ -39,7 +43,8 @@
         { name: 'Hierarchy table', icon: Network, view: 'hierarchy' },
         { name: 'Hierarchy Diagram', icon: Network },
         { name: 'Print a Plot Label', icon: Tag },
-        { name: 'Saved plot label preview — Read-only', icon: Tag, view: import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' ? 'plot-label-preview' : undefined },
+        { name: import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT === 'true' ? 'Saved plot label PDF — Portable' : 'Saved plot label preview — Read-only', icon: Tag,
+          view: (import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT === 'true') ? 'plot-label-preview' : undefined },
         { name: 'Plot location review', icon: FileText, view: import.meta.env.VITE_PLOT_LOCATION_REVIEW === 'true' ? 'plot-locations' : undefined },
         { name: 'Google Earth location preparation', icon: Globe, view: import.meta.env.VITE_GOOGLE_EARTH_REVIEW === 'true' ? 'google-earth-review' : undefined },
         { name: 'Create Plot Locations File', icon: FileText },
@@ -83,6 +88,25 @@
     closeMenu(true);
     onnavigate(next);
   }
+
+  function itemEnabled(item: Item) {
+    if (item.action === 'sivi') return siviAvailable && !!onopensivi;
+    if (item.action === 'metadata') return metadataAvailable && !!onopenmetadata;
+    return !!item.view;
+  }
+
+  function activate(item: Item) {
+    if (!itemEnabled(item)) return;
+    if (item.action === 'sivi' && onopensivi) {
+      closeMenu(true);
+      onopensivi();
+    } else if (item.action === 'metadata' && onopenmetadata) {
+      closeMenu(true);
+      onopenmetadata();
+    } else if (item.view) {
+      navigate(item.view);
+    }
+  }
 </script>
 
 <svelte:window onpointerdown={dismissOutside} onfocusin={dismissOnFocus} onkeydowncapture={escape} />
@@ -113,11 +137,16 @@
             <h2 class="nav-group-label" id={`nav-${menu.label}-${group.label.replaceAll(' ', '-')}`}>{group.label}</h2>
             {#each group.items as item (item.name)}
               <button
-                disabled={!item.view}
+                disabled={!itemEnabled(item)}
                 class:current={item.view === view}
                 aria-current={item.view === view ? 'page' : undefined}
-                title={item.view === 'fs882' ? 'Experimental: saves only a subset of fields. Use disposable projects only.' : item.view ? item.name : 'Not yet available in the desktop app'}
-                onclick={() => { if (item.view) navigate(item.view); }}
+                title={item.action === 'sivi'
+                  ? itemEnabled(item) ? 'Experimental normal SIVI / FS1333 for the selected plot. Existing draft and close guards apply. Use disposable projects only.'
+                    : 'Select a plot and enable the independent SIVI standalone and parent-review gates.'
+                  : item.action === 'metadata'
+                    ? 'Project metadata for the open plot. Requires the existing metadata gate and a clean, unlocked editor; finish or Undo drafts first.'
+                  : item.view === 'fs882' ? 'Experimental: only verified workflows are writable. Use disposable projects only.' : item.view ? item.name : 'Not yet available in the desktop app'}
+                onclick={() => activate(item)}
               >
                 <item.icon size={16} aria-hidden="true" />
                 <span>{item.name}</span>

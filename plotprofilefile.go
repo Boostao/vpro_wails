@@ -278,8 +278,12 @@ func appendTechnicalProvenance(ctx context.Context, tx *sql.Tx, table, expectedD
 }
 
 func verifyTechnicalProvenance(ctx context.Context, tx *sql.Tx, table, expectedDefinition, purpose string) error {
+	return verifyTechnicalProvenanceIn(ctx, tx, "main", table, expectedDefinition, purpose)
+}
+
+func verifyTechnicalProvenanceIn(ctx context.Context, tx *sql.Tx, alias, table, expectedDefinition, purpose string) error {
 	var definition string
-	if err := tx.QueryRowContext(ctx, `SELECT sql FROM sqlite_master
+	if err := tx.QueryRowContext(ctx, `SELECT sql FROM `+quoteHeaderIdentifier(alias)+`.sqlite_master
 		WHERE type='table' AND name COLLATE BINARY=?`, table).Scan(&definition); err != nil {
 		return fmt.Errorf("physical %s provenance unavailable: %w", purpose, err)
 	}
@@ -287,7 +291,7 @@ func verifyTechnicalProvenance(ctx context.Context, tx *sql.Tx, table, expectedD
 		return fmt.Errorf("%s provenance schema differs; no existing history overwritten", purpose)
 	}
 	var extras int
-	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM sqlite_master
+	if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+quoteHeaderIdentifier(alias)+`.sqlite_master
 		WHERE tbl_name COLLATE NOCASE=? AND type<>'table'`, table).Scan(&extras); err != nil {
 		return err
 	}

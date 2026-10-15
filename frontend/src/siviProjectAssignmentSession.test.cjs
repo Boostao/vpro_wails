@@ -3,7 +3,7 @@ const { test } = require('node:test');
 const { readFileSync } = require('node:fs');
 const path = require('node:path');
 const { render } = require('svelte/server');
-const { serverComponent } = require('./svelteTestHelpers.cjs');
+const { serverComponent, componentFunctions } = require('./svelteTestHelpers.cjs');
 const { assignmentSession, assignmentField, original, cell, setCell, writeSession, actionWriteSession, editor,
   source, metadata, transport } = require('./siviParentTestHelpers.cjs');
 const { SIVIProjectAssignmentSession } = assignmentSession;
@@ -406,7 +406,13 @@ test('SIVI metadata reuses the existing guarded editor and commit recovery inste
   const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.match(parent, /siviParentView && !metadataOpen/);
   assert.match(parent, /onMetadata=\{metadataEnabled \? openProjectMetadata : undefined\}/);
-  assert.match(parent, /metadataDisabled=\{childParentDisabled \|\| childUnsaved \|\| Object\.keys\(headerValidation\)\.length > 0\}/);
+  assert.match(parent, /metadataDisabled=\{!canOpenProjectMetadata\(\)\}/);
+  const clean = { metadataEnabled: true, childParentDisabled: false, childUnsaved: false, headerValidation: {} };
+  for (const [change, expected] of [[{}, true], [{ metadataEnabled: false }, false],
+    [{ childParentDisabled: true }, false], [{ childUnsaved: true }, false], [{ headerValidation: { fieldNo: 'invalid' } }, false]]) {
+    const context = componentFunctions('FS882Form.svelte', ['canOpenProjectMetadata'], { ...clean, ...change });
+    assert.equal(context.actions.canOpenProjectMetadata(), expected);
+  }
   assert.match(parent, /oncommitted=\{refreshProjectMetadata\}/);
   const refresh = parent.slice(parent.indexOf('async function refreshProjectMetadata()'), parent.indexOf('async function refreshProjectMetadata()') + 700);
   assert.match(refresh, /refreshSIVIParent\(draft\.plotNumber, \[siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession, siviParentSharedSession\]\)/);

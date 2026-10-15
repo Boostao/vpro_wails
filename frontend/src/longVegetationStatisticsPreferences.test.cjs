@@ -115,8 +115,8 @@ test('actual statistics handlers cancel borrowed reads, suppress stale loads and
   let release, cancellations = 0, saves = 0;
   const context = componentFunctions('LongVegetationReport.svelte',
     ['cancel', 'loadSavedStatistics', 'saveStatistics', 'editAverage', 'editOrder'], {
-      preferences: null, statistics: session, statisticsView: session.view(), busy: false, operationHeld: false,
-      workbookBarrier: false, preferenceBarrier: false, titleBarrier: false, switchBarrier: false, thresholdBarrier: false, groupBarrier: false, qualityNullBarrier: false, generation: 0, error: '',
+      preferences: null, statistics: session, statisticsView: session.view(), busy: false, operationHeld: false, projectWorkspace: null,
+      workbookBarrier: false, preferenceBarrier: false, titleBarrier: false, switchBarrier: false, thresholdBarrier: false, groupBarrier: false, qualityNullBarrier: false, qualityMinimumBarrier: false, namingBarrier: false, selectedFieldBarrier: false, enforcementBarrier: false, unitBarrier: false, unitMutationHeld: false, generation: 0, error: '',
       reads: new ReadRequests(), contextId: scope.contextId, reportBusy() {},
       LongVegetationStatisticsPreferencesService: {
         GetLongVegetationStatisticsPreferences() {
@@ -146,6 +146,12 @@ test('independent default/title/statistics gates render live labelled choices an
         './longVegetationSwitchPreferences': {},
         './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
         './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
         './LongVegetationSwitchPreferences.svelte': { default() {} },
         './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
           view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }

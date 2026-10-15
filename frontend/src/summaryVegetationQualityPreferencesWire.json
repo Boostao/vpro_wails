@@ -1,0 +1,1268 @@
+{
+  "review": {
+    "contextId": "b79bbe7938817c757471ee4be1b5fded",
+    "project": "Sample",
+    "projectPath": "C:\\Users\\BrunoTremblay\\AppData\\Local\\Temp\\TestSummaryQualityFacadeEmitActualGoWire231599709\\001\\data\\projects\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "values": {
+      "enforce": false,
+      "siteMinimum": "Poor",
+      "vegMinimum": "Poor",
+      "soilMinimum": "Poor",
+      "becMinimum": "True",
+      "siteIncludeNulls": true,
+      "vegIncludeNulls": true,
+      "soilIncludeNulls": true,
+      "becIncludeNulls": true
+    },
+    "source": "configured-owned-imported-SQLite VLists.USysTableOfLists; PlotQualitySite and BEC_Use; ItemOrder then physical rowid; suggestions only, not DataQuality qualification",
+    "qualityDefinitions": {
+      "columns": [
+        {
+          "name": "ListName",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "ListFilter",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "ItemOrder",
+          "declaredType": "REAL"
+        },
+        {
+          "name": "Item",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "ItemDescription",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "FieldUsedIn",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "ValidateLoops",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "Validate",
+          "declaredType": "BOOLEAN"
+        },
+        {
+          "name": "Note",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "Flag",
+          "declaredType": "BOOLEAN"
+        }
+      ],
+      "rows": [
+        {
+          "rowId": "674",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "PlotQualitySite",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 1,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "NA",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "null",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "675",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "PlotQualitySite",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Excellent",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Excellent - FS882 Full detail",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "E",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "677",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "PlotQualitySite",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 3,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Good",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Good - FS882 Partial or Lower quality",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "G",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "676",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "PlotQualitySite",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 4,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Fair",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Fair - Ground Call / SIVI",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "F",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "678",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "PlotQualitySite",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Poor",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Poor - Visuals, Notes, Low quality",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "P",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        }
+      ]
+    },
+    "becDefinitions": {
+      "columns": [
+        {
+          "name": "ListName",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "ListFilter",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "ItemOrder",
+          "declaredType": "REAL"
+        },
+        {
+          "name": "Item",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "ItemDescription",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "FieldUsedIn",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "ValidateLoops",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "Validate",
+          "declaredType": "BOOLEAN"
+        },
+        {
+          "name": "Note",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "Flag",
+          "declaredType": "BOOLEAN"
+        }
+      ],
+      "rows": [
+        {
+          "rowId": "44",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 1,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Biodiversity: Intensive plots where full species list has been verified.",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "45",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "2",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Classification: Complete list of species but generally without vouchers and likely missing uncommon non-vasculars",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "46",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 3,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "3",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Support: Species list complete enough for accurate assessment of site units but not complete enough for use in site unit development",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "47",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 4,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "4",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Insufficient: Plots missing key information that maybe retrievable",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "48",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 4.1,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "4.1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Insufficient: Georeferencing missing or inaccurate",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "49",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 4.2,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "4.2",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Insufficient: Unidentified major species",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "50",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 4.3,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "4.3",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Insufficient: Lacking environmental information",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "51",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "5",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Poor quality: Major species not identified, very limited species lists etc.",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "52",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 6,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "6",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Visuals: Limited data but georeferenced site unit calls. Should be removed from BECMaster to a locations dataset",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        },
+        {
+          "rowId": "53",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 7,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "7",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Remove: Plots are substandard and of limited value",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "BEC_Use",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "null",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "integer",
+              "text": null,
+              "integer": "0",
+              "real": null,
+              "blobHex": null
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "request": {
+    "expected": {
+      "enforce": false,
+      "siteMinimum": "Poor",
+      "vegMinimum": "Poor",
+      "soilMinimum": "Poor",
+      "becMinimum": "True",
+      "siteIncludeNulls": true,
+      "vegIncludeNulls": true,
+      "soilIncludeNulls": true,
+      "becIncludeNulls": true
+    },
+    "proposed": {
+      "enforce": false,
+      "siteMinimum": " literal nonmember ",
+      "vegMinimum": "Poor",
+      "soilMinimum": "Poor",
+      "becMinimum": "10",
+      "siteIncludeNulls": true,
+      "vegIncludeNulls": true,
+      "soilIncludeNulls": true,
+      "becIncludeNulls": false
+    }
+  },
+  "outcome": {
+    "contextId": "b79bbe7938817c757471ee4be1b5fded",
+    "changed": true,
+    "committed": true,
+    "errorMessage": ""
+  }
+}

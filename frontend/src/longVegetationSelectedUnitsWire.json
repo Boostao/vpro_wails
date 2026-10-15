@@ -1,0 +1,45 @@
+{
+  "contextId":"owned","projectPath":"C:\\project.db","suPath":"C:\\external.db",
+  "settings":{
+    "title":"Selected units","average":"all-plots","constantSpeciesList":false,
+    "presenceGreaterThan":-100,"meanCoverGreaterThan":-100,"order":"species",
+    "showEnglishName":false,"showSpeciesCode":false,"grouping":"layer","quality":null,
+    "unitGrouping":"selected-fields","unitFields":["Zone"]
+  },
+  "report":{
+    "project":"Sample","su":"Selected","title":"Selected units","quality":null,
+    "units":[
+      {"code":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null},
+       "longName":null,"nameStatus":"missing","nameCandidates":[],"numPlots":4,"membershipIds":["1","2"],
+       "rows":[{"layer":{"storage":"text","text":"Tree","integer":null,"real":null,"blobHex":null},
+                "species":{"storage":"text","text":"SP","integer":null,"real":null,"blobHex":null},
+                "englishName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},
+                "matchedName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},
+                "presence":0.25,"meanCover":2,"plots":[{"plotNumber":"P1","cover":8}]}]},
+      {"code":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null},
+       "longName":null,"nameStatus":"missing","nameCandidates":[],"numPlots":4,"membershipIds":["1","2"],
+       "rows":[{"layer":{"storage":"text","text":"Tree","integer":null,"real":null,"blobHex":null},
+                "species":{"storage":"text","text":"SP","integer":null,"real":null,"blobHex":null},
+                "englishName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},
+                "matchedName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},
+                "presence":0.25,"meanCover":2,"plots":[{"plotNumber":"P1","cover":8}]}]}
+    ],
+    "diagnostics":[
+      {"code":"physical_membership_multiplicity","identity":"P1","count":2},
+      {"code":"selected_unit_join_multiplicity","identity":"1","count":4},
+      {"code":"selected_unit_join_multiplicity","identity":"2","count":4},
+      {"code":"unit_name_missing","identity":"text:Alpha","count":0},
+      {"code":"unit_name_missing","identity":"text:Beta","count":0}
+    ],
+    "selectedUnits":[
+      {"membershipId":"1","envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"1","envRowId":"11","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"1","envRowId":"12","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"1","envRowId":"12","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"2","envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"2","envRowId":"11","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"2","envRowId":"12","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"2","envRowId":"12","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}}
+    ]
+  }
+}

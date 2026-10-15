@@ -23,6 +23,12 @@ const ready = (groupBy = 1, availability = all, frontend = client) => {
 const source = name => readFileSync(path.join(__dirname, name), 'utf8');
 const child = () => serverComponent(source('LongVegetationGroupPreferences.svelte'), 'LongVegetationGroupPreferences.svelte', {
   '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': prefs,
+  './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+  './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+  './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
 });
 
 test('strict-Go grouping wire detaches actual reactive proxies before transport', async () => {
@@ -140,6 +146,12 @@ test('actual parent module retains grouping validation across remount without re
     'LongVegetationReport.svelte', {
       '../bindings/github.com/boostao/vpro-wails': {},
       './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': { createLongVegetationGroupPreferencesRegistry() { created++; return registry; } },
+      './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+      './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+      './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
       './LongVegetationGroupPreferences.svelte': { default: child() },
       './longVegetationPreferences': {}, './longVegetationStatisticsPreferences': {},
       './longVegetationSwitchPreferences': {}, './LongVegetationSwitchPreferences.svelte': { default() {} },

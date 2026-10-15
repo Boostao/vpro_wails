@@ -1,0 +1,42 @@
+{
+  "request": {
+    "originalRules": {
+      "columns": [
+        {"name": "Order", "declaredType": "INTEGER"},
+        {"name": "Table", "declaredType": "TEXT"},
+        {"name": "Field", "declaredType": "TEXT"},
+        {"name": "Operator", "declaredType": "TEXT"},
+        {"name": "Layer", "declaredType": "TEXT"},
+        {"name": "Species", "declaredType": "TEXT"},
+        {"name": "Criteria", "declaredType": "TEXT"},
+        {"name": "Operation", "declaredType": "TEXT"},
+        {"name": "PlotCount", "declaredType": "INTEGER"}
+      ],
+      "rows": [{
+        "rowId": "1",
+        "cells": [
+          {"storage": "integer", "text": null, "integer": "1", "real": null, "blobHex": null},
+          {"storage": "text", "text": "Veg", "integer": null, "real": null, "blobHex": null},
+          {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+          {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+          {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+          {"storage": "text", "text": "TARGET", "integer": null, "real": null, "blobHex": null},
+          {"storage": "text", "text": "0e309", "integer": null, "real": null, "blobHex": null},
+          {"storage": "null", "text": null, "integer": null, "real": null, "blobHex": null},
+          {"storage": "integer", "text": null, "integer": "99", "real": null, "blobHex": null}
+        ]
+      }]
+    },
+    "projectLump": null,
+    "subvarieties": false
+  },
+  "response": {
+    "contextId": "owned-context",
+    "mode": "saved-species-only-readonly",
+    "project": "Sample",
+    "table": "Sample_Profile",
+    "su": "None",
+    "totalPlots": 52,
+    "plotNumbers": ["108050"]
+  }
+}

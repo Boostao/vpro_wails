@@ -1,7 +1,7 @@
-import { ContextService, type FS882Header, type VegRecord, type HumusRecord, type MineralRecord,
+import { ContextService, ProjectProfileSpeciesPresenceService, type ProjectPlotProfileRunRequest, type FS882Header, type VegRecord, type HumusRecord, type MineralRecord,
   type OtherRecord, type OtherRecordUpdate, type SoilRecordUpdate, type VegetationAttributeUpdate, type CollectedRecordUpdate, type VegetationSpeciesLookup, type VegetationSpeciesUpdate, type VegetationNumberUpdate, type VegetationDeletionRequest, type VegetationCreationRequest, type PersonalSpeciesDefinitionRequest, type SpeciesCodeCheckUpdate, type HeightRecordUpdate, type AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
 
-export function bindContextPlots(contextId: string, port = ContextService) {
+export function bindContextPlots(contextId: string, port = ContextService, presencePort = ProjectProfileSpeciesPresenceService) {
   if (!contextId) throw new Error('An editor requires a loaded project context identity.');
   return {
     GetPlot: (plot: string) => port.GetPlot(contextId, plot),
@@ -16,6 +16,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
     ListProjectPlotProfileChoices: () => port.ListProjectPlotProfileChoices(contextId),
     ReviewProjectPlotProfileLump: () => port.ReviewProjectPlotProfileLump(contextId),
     RunProjectPlotProfile: (request: Parameters<typeof port.RunProjectPlotProfile>[1]) => port.RunProjectPlotProfile(contextId, request),
+    PreviewProjectProfileSpeciesPresence: (request: ProjectPlotProfileRunRequest) => presencePort.Preview(contextId, JSON.stringify(request)),
     ResolveProjectPlotProfileNavigation: (request: Parameters<typeof port.ResolveProjectPlotProfileNavigation>[1]) => port.ResolveProjectPlotProfileNavigation(contextId, request),
     ReviewProjectMetadata: (plot: string) => port.ReviewProjectMetadata(contextId, plot),
     SaveProjectMetadata: (request: Parameters<typeof port.SaveProjectMetadata>[1]) => port.SaveProjectMetadata(contextId, request),
@@ -38,6 +39,7 @@ export function bindContextPlots(contextId: string, port = ContextService) {
     ListVegetationSpeciesAliases: (lookup: VegetationSpeciesLookup) => port.ListVegetationSpeciesAliases(contextId, lookup),
     ListVegetationSpeciesUsers: (lookup: VegetationSpeciesLookup) => port.ListVegetationSpeciesUsers(contextId, lookup),
     ListAuditEntries: (plot: string) => port.ListAuditEntries(contextId, plot),
+    ListAuditReadEntries: (plot: string) => port.ListAuditReadEntries(contextId, plot),
     CreatePlot: (header: FS882Header) => port.CreatePlot(contextId, header),
     UpdatePlot: (header: FS882Header) => port.UpdatePlot(contextId, header),
     SaveVegRecord: (record: VegRecord) => port.SaveVegRecord(contextId, record),

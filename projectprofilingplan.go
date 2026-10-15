@@ -161,6 +161,14 @@ func compilePlotProfileRules(table ProjectMetadataTable, env []ProjectMetadataCo
 					return rule, errors.New("numeric Like coercion remains unavailable")
 				}
 				rule.criterion = number
+				if rule.table == "Env" {
+					rule.criterion, err = profileEnvNumberCriterion(number)
+				} else {
+					rule.criterion, err = profileSQLNumberCriterion(raw)
+				}
+				if err != nil {
+					return rule, err
+				}
 			} else if rule.table == "Env" {
 				if !profileASCII(raw) || (rule.operator == "Like" || rule.operator == "Not Like") && strings.ContainsAny(raw, "[]#") ||
 					strings.Contains(raw, ",") && strings.IndexAny(strings.TrimLeft(raw, "+- \t\r\n"), "0123456789") == 0 ||

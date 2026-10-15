@@ -1,0 +1,56 @@
+{
+  "review": {
+    "preview": {
+      "contextId": "owned-context",
+      "plotNumber": "P01",
+      "header": {
+        "plotNumber": "P01",
+        "zone": "A",
+        "subZone": "B",
+        "siteSeries": "",
+        "plotRepresenting": "  represented plot 1  ",
+        "projectId": "ID-1"
+      },
+      "labelDate": "Monday, October 12, 2026",
+      "isoDate": "2026-10-12",
+      "locale": "en-US",
+      "pattern": "dddd, MMMM d, yyyy",
+      "source": "windows-user-long-date"
+    },
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "su": "Sample",
+    "suPath": "C:\\fixture\\Sample_SU.db",
+    "approvalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "pdfSHA256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "layout": "portable-letter-single-fixed-ascii-v1",
+    "sessionId": "TEST_SERVICE_OWNER"
+  },
+  "request": {
+    "plotNumber": "P01",
+    "approvalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "destination": "C:\\fixture\\label.pdf",
+    "requestId": "00000000-0000-4000-8000-000000000001",
+    "sessionId": "TEST_SERVICE_OWNER"
+  },
+  "outcome": {
+    "status": "published",
+    "requestedDestination": "C:\\fixture\\label.pdf",
+    "path": "C:\\fixture\\label.pdf",
+    "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "errorMessage": ""
+  },
+  "recovery": {
+    "contextId": "owned-context",
+    "requestId": "00000000-0000-4000-8000-000000000001",
+    "status": "completed",
+    "reason": "Exact request is sealed.",
+    "outcome": {
+      "status": "published",
+      "requestedDestination": "C:\\fixture\\label.pdf",
+      "path": "C:\\fixture\\label.pdf",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "errorMessage": ""
+    }
+  }
+}

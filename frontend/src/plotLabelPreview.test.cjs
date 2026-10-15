@@ -7,15 +7,17 @@ const { loadTypeScript, componentFunctions, serverComponent } = require('./svelt
 const quality = loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
 const lookup = loadTypeScript('scopedPlotLookup.ts', { './qualityEditor': quality });
 const labels = loadTypeScript('plotLabelPreview.ts', { './qualityEditor': quality, './scopedPlotLookup': lookup });
+const regional = loadTypeScript('plotLabelRegional.ts', { './qualityEditor': quality, './plotLabelPreview': labels });
 function header() {
   return { plotNumber: '00337', zone: 'CWH', subZone: 'dm', siteSeries: '01',
     plotRepresenting: '  Original representing  ', projectId: ' literal ID ' };
 }
 function host(operation = () => Promise.resolve(header())) {
   const calls = [], changes = [];
-  const context = componentFunctions('PlotLabelPreview.svelte', ['cancel', 'load'], {
+  const context = componentFunctions('PlotLabelPreview.svelte', ['cancel', 'load', 'updateBusy'], {
     contextId: 'owned', project: 'Sample', ownerKey: 'owned-Sample', plot: '00337',
-    preview: null, labelDate: '', error: '', busy: false, generation: 0,
+    preview: null, labelDate: '', regionalEvidence: null, regionalDateEnabled: false, error: '', busy: false, generation: 0,
+    pdfEnabled: false, pdfReview: null, publication: { busy: false, blocked: false },
     plotLookupInputError: lookup.plotLookupInputError, plotLabelFromHeader: labels.plotLabelFromHeader,
     Date, onBusyChange(value) { changes.push(value); },
     reads: { track(value) { return value; }, cancelAll() { calls.push('cancel'); } },
@@ -152,7 +154,8 @@ test('saved-label server render and navigation remain independently default-off/
   const source = readFileSync(path.join(__dirname, 'PlotLabelPreview.svelte'), 'utf8');
   const component = serverComponent(source, 'PlotLabelPreview.svelte', {
     '../bindings/github.com/boostao/vpro-wails': { ContextService: {} },
-    './scopedPlotLookup': lookup, './plotLabelPreview': labels,
+    './scopedPlotLookup': lookup, './plotLabelPreview': labels, './plotLabelRegional': regional,
+    './plotLabelPDFExport': {},
   });
   const body = render(component, { props: { contextId: 'owned', project: 'Sample', onBusyChange() {} } }).body;
   assert.match(body, /VPro Plot Labels/);
@@ -160,8 +163,8 @@ test('saved-label server render and navigation remain independently default-off/
   assert.match(body, /six-position printing and Print All Plots remain unavailable/);
   const nav = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
-  assert.match(nav, /VITE_PLOT_LABEL_PREVIEW === 'true' \? 'plot-label-preview' : undefined/);
-  assert.match(app, /view === 'plot-label-preview' && import\.meta\.env\.VITE_PLOT_LABEL_PREVIEW === 'true'/);
+  assert.match(nav, /VITE_PLOT_LABEL_PREVIEW === 'true' \|\| import\.meta\.env\.VITE_PLOT_LABEL_PDF_EXPORT === 'true'\) \? 'plot-label-preview' : undefined/);
+  assert.match(app, /view === 'plot-label-preview' && \(import\.meta\.env\.VITE_PLOT_LABEL_PREVIEW === 'true' \|\| import\.meta\.env\.VITE_PLOT_LABEL_PDF_EXPORT === 'true'\)/);
   assert.match(app, /<PlotLabelPreview[^>]*onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/s);
-  assert.match(source, /onDestroy\(cancel\)/);
+  assert.match(source, /onDestroy\(\(\) => \{ unsubscribe\?\.\(\); cancel\(\); \}\)/);
 });

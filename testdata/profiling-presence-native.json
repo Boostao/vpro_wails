@@ -1,0 +1,1250 @@
+{
+  "sourceSHA256": {
+    "Forms\\USysPlotProfiling.txt": "e5b726ec24b192fb712605f3d02111baef8c1d9de94fa559703ba1f685d1fbe3",
+    "Modules\\V7mdlPlotProfiling.txt": "a5023ccc013003c3e4bb2800ae0ad3078ca77caa126170ec2d400f274550409f",
+    "Queries\\USysTVeg.txt": "7ab14107c2a477cf0da43a81c1cc14ab4d50fea1e2158d60db4e9d68b99a3133",
+    "Queries\\UsysVeg.txt": "7d0c37a2356bbbbce3b95ffa92fa8965b5afe4bf0d4d65b4e2a707d8f43aa67b",
+    "Queries\\UsysEnv.txt": "95b5c319dd9ce294d90989aa81f0fb0c8b26c248c148dbad353720b7434cad2d",
+    "Tables_Def\\Sample_Profile_CreateSQL.txt": "9b7a44415e2ebd572193443f7ee29b83a39cbab1531af6353b28155275e2e330",
+    "Tables_Def\\Sample_Veg_CreateSQL.txt": "b7586e462eb591a9047b5b7bf82e9fab973626670381bde55beb7f6480f229db"
+  },
+  "scope": [
+    "EMPTY",
+    "MIX",
+    "NEG",
+    "NUL",
+    "ORPH",
+    "P00",
+    "P01",
+    "P02",
+    "P03",
+    "P04",
+    "P05",
+    "P06",
+    "P07",
+    "P08",
+    "P09",
+    "P10",
+    "P11",
+    "P12",
+    "P13",
+    "P14",
+    "TA",
+    "TB",
+    "ZER"
+  ],
+  "selectedRules": [
+    [
+      "Veg",
+      "TARGET"
+    ],
+    [
+      "Lump",
+      "LT"
+    ],
+    [
+      "unknown",
+      null
+    ]
+  ],
+  "vegMatches": {
+    "TARGET": [
+      "MIX",
+      "P00",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08"
+    ],
+    "OTHER": [
+      "MIX"
+    ],
+    "NULLONLY": [],
+    "ZERO": [
+      "ZER"
+    ],
+    "NEGATIVE": [
+      "NEG"
+    ],
+    "TOTALA": [
+      "TA"
+    ],
+    "TOTALB": [
+      "TB"
+    ],
+    "EXCLUDED": [],
+    "ORPHAN": [
+      "ORPH"
+    ],
+    "target": [
+      "MIX",
+      "P00",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08"
+    ],
+    "": [],
+    "TARGET ": [
+      "MIX",
+      "P00",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08"
+    ],
+    "TARGET  ": [
+      "MIX",
+      "P00",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08"
+    ],
+    " TARGET": [],
+    "TARGET\t": [],
+    "\tTARGET": [],
+    "TARGET\r": [],
+    "TARGET\n": [],
+    "TARGET\u0001": [],
+    "TARGET\u007f": [],
+    "TARGET*": [],
+    "TARGET?": [],
+    "TAR GET": []
+  },
+  "lumpMatches": {
+    "LT": [
+      "MIX",
+      "P00",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08"
+    ],
+    "LM": [
+      "MIX",
+      "P00",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08"
+    ],
+    "LF": [],
+    "LN": [],
+    "LZ": [
+      "ZER"
+    ],
+    "LE": [],
+    "lt": [
+      "MIX",
+      "P00",
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08"
+    ],
+    "missing": [],
+    "": []
+  },
+  "physical": {
+    "Sample_Env": {
+      "columns": [
+        "PlotNumber"
+      ],
+      "rows": [
+        [
+          "EMPTY"
+        ],
+        [
+          "EXCL"
+        ],
+        [
+          "MIX"
+        ],
+        [
+          "NEG"
+        ],
+        [
+          "NUL"
+        ],
+        [
+          "ORPH"
+        ],
+        [
+          "P00"
+        ],
+        [
+          "P01"
+        ],
+        [
+          "P02"
+        ],
+        [
+          "P03"
+        ],
+        [
+          "P04"
+        ],
+        [
+          "P05"
+        ],
+        [
+          "P06"
+        ],
+        [
+          "P07"
+        ],
+        [
+          "P08"
+        ],
+        [
+          "P09"
+        ],
+        [
+          "P10"
+        ],
+        [
+          "P11"
+        ],
+        [
+          "P12"
+        ],
+        [
+          "P13"
+        ],
+        [
+          "P14"
+        ],
+        [
+          "TA"
+        ],
+        [
+          "TB"
+        ],
+        [
+          "ZER"
+        ],
+        [
+          "MIX"
+        ]
+      ]
+    },
+    "Sample_Admin": {
+      "columns": [
+        "Plot"
+      ],
+      "rows": [
+        [
+          "EMPTY"
+        ],
+        [
+          "MIX"
+        ],
+        [
+          "NEG"
+        ],
+        [
+          "NUL"
+        ],
+        [
+          "ORPH"
+        ],
+        [
+          "P00"
+        ],
+        [
+          "P01"
+        ],
+        [
+          "P02"
+        ],
+        [
+          "P03"
+        ],
+        [
+          "P04"
+        ],
+        [
+          "P05"
+        ],
+        [
+          "P06"
+        ],
+        [
+          "P07"
+        ],
+        [
+          "P08"
+        ],
+        [
+          "P09"
+        ],
+        [
+          "P10"
+        ],
+        [
+          "P11"
+        ],
+        [
+          "P12"
+        ],
+        [
+          "P13"
+        ],
+        [
+          "P14"
+        ],
+        [
+          "TA"
+        ],
+        [
+          "TB"
+        ],
+        [
+          "ZER"
+        ],
+        [
+          "MIX"
+        ]
+      ]
+    },
+    "Sample_Veg": {
+      "columns": [
+        "PlotNumber",
+        "Species",
+        "Cover1",
+        "Cover2",
+        "Cover3",
+        "Cover4",
+        "Cover5",
+        "Cover6",
+        "Cover7",
+        "TotalA",
+        "TotalB",
+        "Cover5a",
+        "Cover5b",
+        "Cover5c",
+        "Cover8",
+        "Cover9",
+        "Cover10"
+      ],
+      "rows": [
+        [
+          "P00",
+          "TARGET",
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P01",
+          "TARGET",
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P02",
+          "TARGET",
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P03",
+          "TARGET",
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P04",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P05",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P06",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P07",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P08",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P09",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P10",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "P11",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null
+        ],
+        [
+          "P12",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null
+        ],
+        [
+          "P13",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null
+        ],
+        [
+          "P14",
+          "TARGET",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0
+        ],
+        [
+          "NUL",
+          "NULLONLY",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "ZER",
+          "ZERO",
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "NEG",
+          "NEGATIVE",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          -2.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "TA",
+          "TOTALA",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "TB",
+          "TOTALB",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          -1.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "MIX",
+          "TARGET",
+          1.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "MIX",
+          "OTHER",
+          null,
+          2.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "MIX",
+          "TARGET",
+          1.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "EXCL",
+          "EXCLUDED",
+          1.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        [
+          "ORPH",
+          "ORPHAN",
+          1.0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    "Sample_Lump": {
+      "columns": [
+        "LumpCode",
+        "SppCode",
+        "Use"
+      ],
+      "rows": [
+        [
+          "LT",
+          "TARGET",
+          true
+        ],
+        [
+          "LT",
+          "TARGET",
+          true
+        ],
+        [
+          "LM",
+          "TARGET",
+          true
+        ],
+        [
+          "LM",
+          "OTHER",
+          true
+        ],
+        [
+          "LF",
+          "OTHER",
+          false
+        ],
+        [
+          "LN",
+          "OTHER",
+          false
+        ],
+        [
+          "LZ",
+          "ZERO",
+          true
+        ],
+        [
+          "LE",
+          "EXCLUDED",
+          true
+        ]
+      ]
+    },
+    "Sample_Profile": {
+      "columns": [
+        "Order",
+        "Table",
+        "Species"
+      ],
+      "rows": [
+        [
+          1,
+          "Env",
+          null
+        ],
+        [
+          2,
+          "Veg",
+          "TARGET"
+        ],
+        [
+          3,
+          "Lump",
+          "LT"
+        ],
+        [
+          4,
+          null,
+          "TARGET"
+        ],
+        [
+          5,
+          "unknown",
+          null
+        ],
+        [
+          6,
+          "env",
+          null
+        ],
+        [
+          7,
+          "Env ",
+          null
+        ]
+      ]
+    },
+    "USysPlotProfilePlots": {
+      "columns": [
+        "PlotNumber"
+      ],
+      "rows": [
+        [
+          "EMPTY"
+        ],
+        [
+          "MIX"
+        ],
+        [
+          "NEG"
+        ],
+        [
+          "NUL"
+        ],
+        [
+          "ORPH"
+        ],
+        [
+          "P00"
+        ],
+        [
+          "P01"
+        ],
+        [
+          "P02"
+        ],
+        [
+          "P03"
+        ],
+        [
+          "P04"
+        ],
+        [
+          "P05"
+        ],
+        [
+          "P06"
+        ],
+        [
+          "P07"
+        ],
+        [
+          "P08"
+        ],
+        [
+          "P09"
+        ],
+        [
+          "P10"
+        ],
+        [
+          "P11"
+        ],
+        [
+          "P12"
+        ],
+        [
+          "P13"
+        ],
+        [
+          "P14"
+        ],
+        [
+          "TA"
+        ],
+        [
+          "TB"
+        ],
+        [
+          "ZER"
+        ]
+      ]
+    }
+  },
+  "scopeOfEvidence": "Readonly original matching SELECT SQL/exported queries, not original VBA callbacks or complete SpeciesCodeFilter execution",
+  "textComparisons": [
+    {
+      "literal": "TARGET",
+      "plots": [
+        "MIX",
+        "P00",
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08"
+      ],
+      "bothDirections": [
+        {
+          "value": -1,
+          "daoType": 3
+        },
+        {
+          "value": -1,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "target",
+      "plots": [
+        "MIX",
+        "P00",
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08"
+      ],
+      "bothDirections": [
+        {
+          "value": -1,
+          "daoType": 3
+        },
+        {
+          "value": -1,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TARGET ",
+      "plots": [
+        "MIX",
+        "P00",
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08"
+      ],
+      "bothDirections": [
+        {
+          "value": -1,
+          "daoType": 3
+        },
+        {
+          "value": -1,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TARGET  ",
+      "plots": [
+        "MIX",
+        "P00",
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08"
+      ],
+      "bothDirections": [
+        {
+          "value": -1,
+          "daoType": 3
+        },
+        {
+          "value": -1,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": " TARGET",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TARGET\t",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "\tTARGET",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TARGET\r",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TARGET\n",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TARGET\u0001",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TARGET\u007f",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TARGET*",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TARGET?",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    },
+    {
+      "literal": "TAR GET",
+      "plots": [],
+      "bothDirections": [
+        {
+          "value": 0,
+          "daoType": 3
+        },
+        {
+          "value": 0,
+          "daoType": 3
+        }
+      ]
+    }
+  ]
+}

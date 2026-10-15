@@ -1,0 +1,57 @@
+{
+  "locale": "en-US",
+  "pattern": "dddd, MMMM d, yyyy",
+  "calendar": "1",
+  "originalExpression": "=\"Label Date: \" & Format(Now(),\"Long Date\")",
+  "sourceFormSHA256": "bcccb264525b790a6bd3a7d4ba38e72ad3c2dcdbeea7e12a50e2c75e3daaa7b8",
+  "cases": [
+    {
+      "isoDate": "1900-03-01",
+      "actual": "Label Date: Thursday, March 1, 1900"
+    },
+    {
+      "isoDate": "2000-02-29",
+      "actual": "Label Date: Tuesday, February 29, 2000"
+    },
+    {
+      "isoDate": "2008-01-03",
+      "actual": "Label Date: Thursday, January 3, 2008"
+    },
+    {
+      "isoDate": "2024-02-29",
+      "actual": "Label Date: Thursday, February 29, 2024"
+    },
+    {
+      "isoDate": "2026-01-01",
+      "actual": "Label Date: Thursday, January 1, 2026"
+    },
+    {
+      "isoDate": "2026-03-08",
+      "actual": "Label Date: Sunday, March 8, 2026"
+    },
+    {
+      "isoDate": "2026-10-11",
+      "actual": "Label Date: Sunday, October 11, 2026"
+    },
+    {
+      "isoDate": "2026-11-01",
+      "actual": "Label Date: Sunday, November 1, 2026"
+    },
+    {
+      "isoDate": "2026-12-31",
+      "actual": "Label Date: Thursday, December 31, 2026"
+    },
+    {
+      "isoDate": "2027-01-01",
+      "actual": "Label Date: Friday, January 1, 2027"
+    },
+    {
+      "isoDate": "2099-12-31",
+      "actual": "Label Date: Thursday, December 31, 2099"
+    },
+    {
+      "isoDate": "9999-12-31",
+      "actual": "Label Date: Friday, December 31, 9999"
+    }
+  ]
+}

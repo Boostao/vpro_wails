@@ -44,6 +44,39 @@ or CHARS `SubVegAXL`, then `SubVegCXL`, `SubVegDXL`, `frmVPicsXL`,
 `SoilHumusXL` and `SoilMineralXL`. Metadata resolution does not authorize
 pictures or complete child execution.
 
+The mapped picture child has a separate readonly candidate. Actual parent
+controls named `frmVPics` link `Form.frmVPicsXL` by literal PlotNumber on both
+sides. The child binds PicName/PicDir over tblVPics and imgCtl double-click opens
+the source viewer. The candidate reuses existing owned child-policy JPEG/PNG
+preview and modal viewer behind `VITE_PICTURE_READING`, with explicit Load/
+Preview rather than automatic Current file reads. Each selected physical row
+uses its own directory; no arbitrary first-row/current-name directory mixing,
+unbound AddPic, manager mutation or new source-form grant is inherited.
+No metadataSession is attached. The ordinary picture snippet is absent while
+complete-entry owns the source; picture pending activity holds parent fields/
+actions/variant/review close and peer editors while Cancel remains live.
+75 targeted/1571 counted registered frontend executions, check0/0, default build,
+owned-picture race16.022s and production/isolated Wails builds pass. Exact
+independent nine-file follow-up closes receipt auto-read and upstream layout
+dispatch findings. The source explicitly opts out of retained mutation receipts;
+default-false reader availability bypasses the layout fallback only for its exact
+frmVPicsXL control. Common/extra/default-off callers remain unavailable.
+Six closed disposable Wails owners accept normal/CHARS selected PNG/JPEG bytes,
+viewer, typed NULL/empty/duplicate-ID metadata, unapproved external-directory and
+invalid-path refusal, cancellation/remount and late-result rejection, source/
+parent/native-close barriers and three-width containment. Two joint owners prove
+actual humus/vegetation draft and pending-picture peer holds. All19 files remain
+unchanged per owner; four rejected owners are closed and retained. Complete1594-input
+successor race passes without input/discovery drift; final association rehashes2113
+artifacts and all10 closed owners, accepting this bounded reader and releasing
+its freeze. Whole-picture/form execution is not accepted.
+
+The exported `btnManagePictures` controls in both two-page forms have no OnClick
+binding (normal control lines5729-5752; CHARS5935-5959). Their private
+`btnManagePictures_Click` bodies would open the manager filtered by PlotNumber,
+but a named dormant procedure is not an active source event. Those mapped buttons
+remain unavailable; ordinary manager capabilities are separate adaptations.
+
 ### Linked vegetation source differences (execution unavailable)
 
 Normal `SubVegAXL_BC` and CHARS `SubVegAXL` share `USysVegA`, Species,
@@ -115,6 +148,82 @@ Humus/Mineral ID indexes. Do not transfer soil uniqueness/default assumptions,
 invent an ID for historical NULL or grant editing through legacy numeric readers.
 These source observations prepare the remaining child contract; no linked
 vegetation write or whole-form grant follows.
+
+#### Existing A/CHARS literal list-selection draft
+
+The canonical A/BC and CHARS A exports have Species `LimitToList =
+NotDefault` and no `Species_AfterUpdate` procedure. Their active BeforeUpdate
+audits and calls `UpdateMetadataSppList`, then exits before peer merging.
+The metadata helper itself jumps unconditionally to `MyExit` before mutation.
+
+The private [list-selection policy](../twopagevegetationspecieslist.go) reuses
+the physical reference projection and existing vegetation planner invariants.
+It qualifies byte-exact, nonempty TEXT8 codes with ASCII `u/U/x/X` Codetype and
+Lifeform1-4, preserving all matching master/personal physical definitions,
+duplicate rows and NULL/empty metadata. It does not normalize entered codes,
+resolve aliases or extrapolate source locale/width equivalence. Master LONG
+and personal INTEGER bounds retain their distinct existing policies.
+
+Private planning checks exact reference/original ownership, physical source
+membership, expected cells and signed32 application ID. It omits unchanged
+historical invalid Species and refuses a changed Species when either original
+or planned state has all seven common covers NULL; CHARS-only covers do not
+authorize the unavailable warning/advance route. Numeric/Collected planning
+remains shared, not synthesized as a no-op ownership check.
+
+This bounded existing-list workflow is implemented and surfaced only behind
+independent default-off backend and client capabilities.
+The optional `speciesList` request carries the complete strict physical-reference
+snapshot. The omitted legacy envelope is unchanged, and legacy public Save
+still denies Species selection authority. The registered
+selection service requires review, writing and its independently default-off
+`VPRO_TWO_PAGE_VEGETATION_SPECIES_LIST` gate. It reuses the existing attempt
+ledger, atomic writer and typed durable history rather than a second engine.
+Both readonly reference attachments require rollback journaling and remain
+reserved through commit; their complete observations must equal the reviewed
+snapshot. Recovery reads original durable provenance after later reference drift,
+without writing or requiring the selection gate.
+
+The backend batch passes coupled vegetation/selection race85.006s and production
+compilation. Independent review found no implementation defect but requested
+reference-reservation acceptance. Both master and personal tests now prove actual
+WAL refusal without writes, DELETE correction/retry, a competing precommit write
+blocked, and release after commit (focused race5.709s); focused review closes
+that coverage finding. Retained client drafts and bindings/service registration
+pass independent desktop review,68 focused/1515 registered frontend cases,
+check0/0 and isolated Wails builds. Actual strict-Go receipts and Svelte proxy
+tests cover the production wire rather than plain-object-only transports.
+Disposable normal/CHARS Wails owners each prove exact Species+cover Save,
+complete physical peer preservation, two source audits/one durable history and
+unchanged support/config files. Actual successful final responses, including
+UTF-8 chunked requests, are held through native-close refusal and Cancel;
+late responses cannot resolve retained unknown state, readonly recovery does
+not replay Save, and immutable receipts survive subsequent tab/panel remount.
+Additional zero-write owners prove full duplicate tuples and NULL/empty
+metadata, three-width visibility/label/viewport containment, original
+common-cover-empty/NULL-ID refusal, coupled off-row errors with live correction,
+client-off/backend-off refusal and actual C/D read-only Species observations.
+Complete-entry review retains its existing regular-tab/close barrier while
+active; this is not a new source implicit-navigation grant. Failed navigation/
+cleanup and Python numeric audit-text expectations remain rejected receipts.
+The completed mutation was sealed and recovered on its same owner, not repeated.
+Complete1551-input race integration now passes exit0 in5120.640562s with unchanged
+inputs and ordinary/production package/embed discovery. Final association
+rehashes541 artifacts,20 canonical sources and34 reviewed inputs, verifies all13
+source/native owners normally closed, and releases the freeze without default
+promotion.
+Separate zero-write joint-profile acceptance preserves the existing normal/
+CHARS literal PlotNumber links to both soil forms and A vegetation. Both soil
+forms/all30 fields are actually loaded; a Species draft blocks soil staging, a
+soil draft blocks Species staging, and each active owner retains correction/
+Undo. Nine-unit Horizon input independently exercises the source eight-unit
+bound, blocking parent Save/Lock/close and native close without disabling valid
+correction. Two normal/CHARS owners preserve all16 files and supply180 labelled
+three-width soil measurements. No application source, implicit callback or
+picture/SubOther workflow is added by that private flag combination.
+NotInList/manual/alias/personal creation, C/D selection, creation/deletion/
+restoration, implicit focus Save, peer merging and default promotion remain
+excluded.
 
 #### Source-equivalent Species query/lookup engine calibration
 
@@ -1773,6 +1882,732 @@ standalone SIVI evidence remains immutable. Neither the additional-field panel
 nor its native proof establishes complete two-page forms/reports parity.
 
 ## Current live scoped source presentation
+
+### Single-plot Google Earth backend draft
+
+Both source variants have `btnGoogleEarth`, tip `Plot on Google Earth` and
+resolved `btnGoogleEarth_Click`: SaveRecord, NULL-coordinate message, then
+SinglePlotPlotInGE for the current PlotNumber. GetSinglePlot reads current-project
+Env only, prefixes minus to stored longitude, uses GoogleEarthDescField and
+appends a description period. BuildKmlFile uses GoogleEarthPlaceName/KML2.1;
+WriteKML overwrites configured VProPlotLocations.kml before the external shell.
+
+The independently gated readonly candidate explicitly previews saved data instead.
+It requires one literal paired Env/Admin parent in the selected context, retains
+the complete original Env row and produces one placemark without SU expansion.
+Accepted offline XML/HTML escaping and numeric formatting are reused; the remote
+icon is not fetched. Negative original longitude, missing/NULL/out-of-range
+coordinates and malformed/unsupported text fail explicitly, without data repair
+or an empty success document. NULL/empty description remains distinct in the
+original DTO while both retain the source's final-period semantics.
+Backend race10.444s and production compilation pass; independent exact review/
+focused follow-up race10.098s finds no significant issues and closes membership/
+None/retired-context and numeric-boundary/integer-storage coverage gaps.
+The registered mapped desktop successor adds owned saved options, temporary
+preview-only corrections, raw immutable DTOs and parent/peer/lifecycle barriers.
+Independent desktop review found HTML textarea normalization incorrectly rejected
+valid multiline descriptions. Direct lossless escaped-original comparison replaces
+HTML reparsing; five actual-Go cases retain LF, CRLF, CR and entities/Unicode.
+Corrected wire/options pass race11.197s/production compile;118 focused/1628
+registered frontend executions, check0/0 and default build pass. -ts -i generates
+74 services/353 methods/379 models without warnings. Exact20-file/14-base desktop
+v2 independent closure resolves the finding, including nine rejected altered
+associations. Twelve normally closed disposable Wails owners preserve16 fixture
+files each. Actual mapped normal/CHARS action, independent physical Env rows,
+LF/CRLF/CR/NULL/empty/entities, parent/humus/vegetation draft holds, held actual
+response and validation Cancel/remount/late rejection, close/Return holds,
+labelled controls/data at1400/600/320 and both backend/client off-gates pass.
+The2418-artifact native seal is verified. Complete1613-input race passes exit0
+without input/discovery drift. Final association revalidates exact20 candidates/
+14 bases, canonical/source/predecessor lineage and all twelve absent original
+owners; the freeze is released.
+Preference writes, file publication, implicit parent Save and external launch
+remain unavailable. Acceptance is the readonly saved-plot adaptation, not the
+source's implicit-save/overwrite/external-launch callback.
+
+### View Veg Table source boundary
+
+Both exact active `btnViewVegTable` controls caption View Veg Table and bind
+`btnViewVegTable_Click`. Normal projects17 columns: PlotNumber, Species, A1,
+A2, A3, Total A, B1, B2, CHARS shrubs a/b/c, Total B, C, D, Dr/Dw, Ep and
+Cover10. CHARS projects the first14 only. Both sort PlotNumber ascending and
+Cover1/2/3, TotalA, Cover4/5, TotalB, Cover6/7 descending; normal also sorts
+Cover8/9/10. Cover5a/b/c are displayed but not ordering keys.
+
+CurrProject and CurrPlotlist read registry context. None queries the entire
+current-project Veg table; otherwise an ordinary PlotNumber INNER JOIN expands
+duplicate SU membership. Neither branch filters to the current parent, excludes
+all-NULL covers or depends on an application ID. Source deletes/recreates/saves
+TempVegView and opens an editable datasheet, then adjusts widths. Those mutations
+are not implicit authority for a readonly successor.
+
+Four exact extracted queries execute on a controlled disposable ACE1033 fixture:
+15 all-project rows and28 selected rows in each variant. All-NULL-cover rows
+remain present; A/a join case-insensitively and tied CHARS rows have unspecified
+relative order. This is query calibration, not original callback execution or
+proof of other project locales. Existing literal SQLite joins are explicit read-
+model adaptations, not an equivalent source-collation implementation. Both DAO hosts are closed
+and unlocked; canonical/catalogue hashes and active1613 integration inputs are
+unchanged. The failed field-factory attempt remains retained.
+
+The independently default-off backend draft now declares controlled English-
+ignore-case membership/order, exact numeric/NULL cover ordering and deterministic
+physical-row ties. The cached comparator matches966 controlled native relations;
+`GeneralLocaleVerified` remains false. Literal opening-parent ownership stays
+byte-exact and separate from the broader collection. Same-snapshot preflight
+limits each Veg/SU physical input to100000 rows, refusing max+1 without truncation.
+Duplicate expansion is counted/paged virtually; each1..200-row page retains the
+complete typed original rows needed for its unique physical witnesses. NULL and
+duplicate application IDs do not invent identity. Exact thresholds, a fifty-
+million virtual join,17/14 variants, embedded/external/None/retired contexts,
+historical storage, Unicode refusals and actual cancellation/retry pass combined
+Google Earth regression race22.353s and production compile. Exact3-file independent
+backend review found no significant issues and accepts the saved-data draft.
+Candidate/base/source/validation hashes match; tests were not independently
+rerun. Its registered default-off desktop successor uses the exact mapped
+normal/CHARS control, immutable paginated read panel and strict production Go
+wires (normal/CHARS/page/end/None and real50/20 pagination). Current-context/
+project/SU paths, complete page originals and joined physical witnesses are
+validated without inventing application identity. Parent/peer/child drafts and
+errors refuse opening; an open source review suspends edits, peer actions,
+variant switching and close, with pending reads blocking Return until Cancel.
+Actual Svelte Cancel/destroy/remount rejects late successful responses.
+Focused race58.226s,153 focused/1671 registered frontend executions, check0/0,
+default build and production compile pass. Exact15-file/9-base independent
+review finds no significant issues; retained checks were hash-verified, not
+independently rerun. Nine normally closed disposable Wails owners retain all16
+fixture files each, qualifying normal/CHARS selected/None, full independent
+physical originals, actual first/next/previous pages, real parent/humus/vegetation
+draft barriers, held actual-response Cancel/variant/remount rejection, native
+close/Return holds and labelled columns/controls/disclosed fields at1400/600/320.
+The1760-artifact seal passes. A pre-owner NULL PlotNumber seed hit the family's
+NOT NULL constraint; retry retains original schema rather than weakening it.
+Nullable legacy PlotNumber remains backend-only evidence.
+Complete1621-input integration passes `go test -race -timeout 120m ./...`,
+exit0 without input/discovery drift. Final association rechecks1760 native
+artifacts, reviewed candidate/base/backend/source lineage and nine absent
+original owners; the freeze is released. Runtime
+`VPRO_TWO_PAGE_VEGETATION_TABLE_REVIEW` and build
+`VITE_TWO_PAGE_VEGETATION_TABLE_REVIEW` remain independently default-off.
+Query DDL, editable datasheets, implicit Save/export, original source callback
+execution and general locale parity are not accepted or enabled.
+
+### Mapped vegetation profiling opener source boundary
+
+Both `btnVegProfile_Click` bodies are exact equivalents: open USysPlotProfiling
+with an empty stLinkCriteria, without explicit parent Save or invoking-plot
+criteria. The target's Load is **not read-only**. It deletes result scratch
+USysPlotProfilePlots, counts USysEnv through MoveLast, displays filtered count0,
+reads registry CurrLump/CurrVegProfile and binds the selected `<name>_Profile`
+ordered by Order. Empty USysEnv can interrupt this initialization; loaded-target
+reuse is separately unknown. Stored MyOrder ordering becomes Order on Load.
+
+The private target read model preserves51 nodes and nine exact bound instances/
+physical columns from Sample_Profile/USysProfileTable. Eighteen exported event
+routes resolve; declared Criteria_AfterUpdate does not have an exported body.
+The separate Frame53_AfterUpdate body is empty and unbound, not an active route.
+Reset defaults to2 (no plots), subvariety treatment to0, while Load replaces the
+control's declared Sample profile with registry selection. Exact option sources,
+labels and callback bodies remain sealed rather than recreated from the editor.
+
+Run Recalc/Refresh calls ProfilePlots: clear both result scratch tables, NULL
+physical profile PlotCount, construct lump/variant queries, evaluate ordered
+Env/Veg/Lump steps, update counts/labels and loaded entry forms. Species-only
+ignores Env steps and intersects grouped initial USysEnv plots with Veg/Lump
+presence. Reset button instead starts all/no plots and writes PlotCount0.
+Changing reset choice asks confirmation, but No does not set Cancel; no control
+value rollback is invented.
+
+UpdateForms visits seven IsLoaded form names. WriteVegProfile2Filter disables
+FilterOn first; up to200 results become literal PlotNumber OR criteria, zero
+matches leaves filtering off, and larger results/error2176 offer SU creation.
+SaveFilterAsSU creates a table and copies result plots, joining current SU to
+retain SiteUnit when applicable. Profile Attach/New/Unattach, lump Edit/Attach/
+New, reference selection and local PDF help are distinct workflows, not an
+implicit current-plot filter.
+
+This source contract accepts dispatch/bindings/entry control flow only, not
+original native execution, all module predicates or unqualified external
+workflows. The existing owned native profile engine/editor is reuse precedent.
+A mapped successor must explicitly adapt opening to avoid scratch deletion and
+reconcile source-parent ownership, drafts, late results, close and filter
+application; unresolved edits/runs/creation must remain unavailable.
+
+Read-only prior-art reconciliation seals eleven current inputs and seven
+non-equivalent boundaries without changing the metadata integration freeze.
+The standalone selector ignores CurrVegProfile when ProfilePath is absent;
+its nil-source fallback to the current project must not be presented as the
+source's selected profile. A mapped successor needs explicit owned name/path
+authority. Existing preview commits isolated TEMP work without source scratch/
+PlotCount writes, while the source Run resets/persists counts and filters loaded
+forms. Reset/species-only are not ordinary-preview aliases; zero/over200
+navigation retention is an explicit adaptation, not source FilterOn behavior.
+The standalone review also auto-loads on mount; it is not the proposed explicit
+readonly Load/paging/lifecycle transport. Reuse physical readers/Description
+metadata/operation leases, not unqualified mutators. All nine source fields
+remain in the proposed bounded parent/profile/description snapshot; historical
+duplicate Order must remain visible even though execution refuses ambiguity.
+Full predicate reconciliation, original lifecycle and external selector/help
+workflows remain unaccepted. The initial static receipt's TEMP-rollback wording
+is retained and corrected by its hashed successor.
+
+### Mapped project metadata opener source boundary
+
+Normal `btnLoadMetadata` is captioned `Edit Project Metadata`; CHARS is
+`Edit Metadata`. Both bind the resolved `btnLoadMetadata_Click`. Their exact
+bodies differ only by one completely empty line. They open `frmProjectMetaData`,
+focus ProjectID and search its recordset using the invoking parent's
+`Me.ProjectID.Value`. Both StartDate branches use ProjectID only; the date
+criteria are comments. There is no explicit Save or filter on the existing-row
+path. A preloaded target's state is not established by this static trace.
+
+The target binds `UsysMetadata`. Its exported query uses Sample_Metadata;
+SetCurrentProject rebuilds it against `<current project>_Metadata`, not a generic
+metadata catalogue or the global template table. All74 bound instances uniquely
+resolve, retaining original binding spelling, to75 columns shared by the
+Sample_Metadata/USysMetadataTable definitions. The unbound physical ID has
+LONG `GenUniqueID()` default and a unique index; ProjectID is nonunique.
+These project rows are separate from SQLite `_table_metadata` Description
+storage. The global ProjectMetaData/ProjectMetaDataCodes are external MetaDataDB
+links; USysProjectMetadata is not evidence of their current physical schema.
+
+An unmatched target, or error3021, enters the Add prompt. Yes searches global
+ProjectMetadata using MyRS2 but then tests **Not MyRS.NoMatch**, not MyRS2.NoMatch.
+The two branches perform a33-field global SELECT insert or a ProjectID-only
+insert, then Refresh and a ProjectID filter. The empty-target error path and
+ordinary unmatched path must not be assumed equivalent. No repaired copy rule,
+deduplication, apostrophe escaping, NULL criterion, collation or native outcome
+is invented from this callback.
+
+All eleven active target event routes are sealed. BeforeUpdate stamps Now and
+the reference TableDef.Description versions only when Dirty; AfterUpdate stamps
+Now only if still Dirty. Current and ProjectID_BeforeUpdate are comment-only:
+there is no active plot-ID cascade. ProjectID_GotFocus captures CurrentProjectID;
+title/region events Recalc, with title error3058 redirecting to ProjectID.
+Collection-standard Change asks for DEIF*/DTE*/LMH25 and on Yes applies its exact
+source defaults, versions and date. Close uses DoCmd.Close. The two attachment
+buttons invoke distinct confirmation/file-selection/link-replacement workflows,
+not metadata-row updates.
+
+This accepts static dispatch, physical associations and active control flow
+only. Existing reviewed standalone metadata services are reuse precedents, not
+mapped opener or original target lifecycle proof. Add/copy/attachments remain
+unavailable until separately qualified; no source bug repair, application
+implementation, native action or canonical mutation was performed.
+
+The subsequent controlled General1033 DAO primitive oracle covers nine lookup
+and three branch cases. Case/terminal ASCII-space aliases match and007/7 remain
+distinct. Unescaped apostrophe errors3077. DAO expression concatenation with
+Null produces ProjectID='' and selects the empty row, but original Me.Value/
+form execution was not proved. Ordinary unmatched MyRS.NoMatchTrue chooses the
+ProjectID-only branch even with a master match. Empty MoveFirst3021 leaves
+MyRS.NoMatchFalse and chooses SELECT even with a master miss. No Add prompt,
+insert/copy or allocator was executed. Seven artifacts are sealed with normal
+fixture close/unlock, absent original DAO host and unchanged canonical hashes.
+
+An independently default-off readonly successor backend now
+passes combined metadata/environment/vegetation race95.434s, fresh production
+compile and exact two-file independent review with no significant issues
+(tests not independently rerun). It reuses owned pinned snapshots and literal
+unique selected Env/Admin parents, returns complete parent witnesses plus
+current-project physical metadata pages, and bounds100000 source rows/page
+1..200/offset0..100000. Controlled ASCII alphanumeric/space comparison ignores
+case/terminal U0020 only in derived keys; original values remain unchanged.
+NULL parent and unsupported source membership are unavailable, not silently
+converted/omitted. Complete historical IDs/storage/NULL/empty/blobs/extra
+columns remain available without signed32-ID repair. Physical-row ordering is
+an adaptation, not source first-match cursor proof. Existing-record review
+does not touch/depend on master templates; Add/copy/edit/DDL/audits/config and
+original native lifecycle remain excluded.
+
+The registered mapped desktop has an independent default-off client gate,
+exact normal/CHARS source captions and callback identities, immutable50-row
+pages and all74 source-bound labelled fields using existing metadata groups.
+Complete physical originals preserve historical IDs and extra columns; missing
+historical fields are explicitly unavailable. Parent/variant/peer/child/draft/
+reference/retained-error barriers and pending-read Return/native-close holds
+are wired. Strict actual-Go fixtures cover empty identities, beyond-total empty
+pages, None and50/20 pagination. It passes202 focused/1763 registered frontend
+executions, check0/0/default build, focused race91.337s, wire roundtrip and
+production compile; -ts -i generation is warning-free at77 services/356 methods/
+385 models. Exact15-file/nine-base independent review finds no significant
+issues and verifies physical fixtures/associations, without rerunning primary
+suites. Eight normally closed Wails owners qualify normal/CHARS selected/None,
+both off-gates, complete74-field/physical disclosures, paging/draft/lifecycle/
+native-close and all planned selectors at1400/600/320. The2056-artifact seal
+rehashes with ten absent originals and sixteen unchanged fixture files each.
+Two independent-display expectation failures remain retained; no application
+change was needed. Complete1638-input race integration passes exit0 in85m08s
+with unchanged inputs and package/embed discovery. Final association reverified
+2056 artifacts, exact15 candidates/nine bases and source/backend/review/DAO/
+predecessor lineage; the freeze is released. Gates remain default-off;
+registered readonly adaptation is not original editable callback parity.
+
+The subsequent [mapped profiling backend draft](../twopageprofilingservice.go)
+is independently default-off. It explicitly refuses legacy
+implicit project fallback and None profile selection. Literal selected paired
+opening parents establish owner intent only; they do not filter the profile
+rules. One pinned snapshot retains complete parent witnesses, all nine profile
+fields/extra columns and Description originals. Physical row order is an
+explicit adaptation, not source Order execution; duplicate/NULL/historical Order
+is retained, not compiled. Profile and Description sources each have an exact
+100000-row bound; pages require1..200 with legitimate empty beyond-end pages.
+Description absence, NULL, empty and duplicate rows are distinguishable with
+literal TEXT table identities. Source scratch deletion, count writes, registry,
+editing/run/reset/species-only/filter/SU/attachment/help effects are excluded.
+Combined predecessor race93.489s and production compilation pass, including
+actual concurrent WAL witness consistency and in-flight cancellation/retry.
+The sealed exact two-file/source/predecessor independent review finds no
+significant issues: hashes/helpers verified, primary checks not independently
+rerun. The registered desktop candidate retains the exact normal/CHARS opener,
+all nine source captions and header order, explicit50-rule pages and immutable
+complete original DTOs. Chunked validation yields for cancellation/remount and
+rechecks generation afterward. Lazy original disclosures show50 Description
+rows locally from the same snapshot; no source definitions are discarded or
+reread. Parent/variant/peer/linked-child/draft/reference/error/staging/
+acknowledgement/Return/native-close barriers remain held throughout.
+It passes213 focused/1815 registered frontend executions, check0/0/default build,
+production compile and wire/predecessor race124.657s; warning-free -ts -i
+bindings are78/357/386. The public nine-field read model is checked against
+sealed source captions/bindings/header order. Exact16-file/nine-base independent
+desktop review finds no significant issues; reviewer independently reruns213
+focused tests and check0/0. Isolated candidates retain reviewed inputs and default
+assets. Eight native owners qualify the readonly normal/CHARS selected/None
+and independent off-gate boundaries, complete physical witnesses, paging/drafts,
+held actual response and candidate-associated validation-yield retirement,
+native-close/Return and57 planned three-width combinations per enabled owner.
+The2095-artifact seal retains ten normally closed absent owners with sixteen
+unchanged fixture files each. Full race integration passes exit0 without runner
+input/discovery drift; final association reverified2095 artifacts and1647
+protected inputs, releasing the freeze. This does not qualify original editing,
+Run/reset, selectors, filters or scratch writes; both gates remain default-off.
+
+### Species-only profiling SQL boundary
+
+The active btnSppOnlyProfile callback recalculates then calls SpeciesCodeFilter
+with the SubVarSpp option. That procedure clears scratch/counts, prepares Lump
+state and selects Table/Species where Table is not Env. Zero selected rows exits
+with an empty result; otherwise it seeds grouped project plots. Each Veg or
+available Lump branch intersects the existing result with matching USysTVeg
+presence. Unknown tables have no matching branch but still cause seeding.
+Env/case/trailing-space and NULL Table exclusions are source SQL observations,
+not inferred NULL-to-empty conversions.
+
+The exact exported USysTVeg UNION exposes Cover1..7 and stored TotalA/TotalB
+only when each column is non-NULL. Zero/negative values establish presence;
+Cover5a/5b/5c/8/9/10 alone do not. Duplicate parents, vegetation records and Lump
+mappings do not multiply grouped output. Lump requires Use=True. Three exact
+query exports,25 physical vegetation rows,20 initial match observations and
+six independent physical/schema reopens qualify this SQL boundary. A separate
+readonly comparison fixture supplies14 ASCII text cases/28 directional
+Integer(-1/0) observations: terminal spaces compare equal in both directions,
+while leading spaces, tabs/CR/LF/control characters and literal */? do not.
+The portable corpus retains32 unique match cases and23 scope plots.
+
+The private compiler/executor does not interpret Order, Criteria, Layer,
+Operator or Operation and never writes source scratch/counts. It uses a
+caller-owned snapshot and request context, comparison-only terminal space
+handling, complete physical-row identities and explicit unavailable-domain
+errors. Literal identity differences/case-ambiguous scope, unqualified active
+Table spellings, non-ASCII/raw-SQL Species and missing explicit project-local
+Lump ownership refuse rather than repair or inherit stale global state.
+Refusing a missing Lump relation is a conservative desktop boundary, not the
+source None_Lump branch, which skips that intersection. Initial source text
+comparison failures reproduce before correction;32 native match cases,
+complete readonly typed preservation, irrelevant-field isolation, Boolean/
+identity refusals and explicit correction/cancellation retry pass coupled
+race69.765s, vet and production compilation. Exact independent review accepts
+the private kernel with no significant issues and verifies all candidate/live/
+canonical/evidence hashes. Its kernel pre-cancellation limitation is addressed
+by a separate unexported owned-context successor: actual matching-query
+in-flight cancellation/owned retry, exact original rules/schema/count/Lump
+witnesses and retired-context/complete file preservation pass coupled
+race74.139s, vet and production build. Distinct exact context-level review
+accepts with no significant issues and verifies all27 artifact hashes/sizes and
+unchanged kernel basis. Full integration passes exit0 over1680 protected inputs/
+all51 resources/38 sealed artifacts without input/source/package/embed drift.
+Original source owners are freshly absent; final association releases the
+freeze. This integrates five private prerequisites, not application-default,
+registered desktop or original callback availability.
+This is an unregistered kernel: no original VBA call, source callback timing,
+subvariety preparation, service/binding/client or whole workflow acceptance
+follows. Closed suggestion/public-dispatch work units are not replayed.
+
+### Profiling edit and suggestion event boundary
+
+A separate source-only contract resolves the exact Table AfterUpdate and four
+Field/Layer/Operator/Species GotFocus routes. Table changes to Veg/Lump assign
+Field=Species/LumpCode; Env/other values preserve Field. Field suggestions use
+literal Sample_Env for Env, not the selected project's Env schema; an unmatched
+Table preserves the previous Field suggestion state. Layer and Operator empty
+their suggestion lists for unsupported tables without clearing stored values.
+Only Layer and Operator have explicit LimitToList declarations in this export;
+the base ComboBox declaration adds no such restriction.
+
+Species focus for Env empties suggestions without clearing Species; Veg reads
+grouped USysAllSpecs.Code with no explicit ordering. Lump uses the exact
+registry-named grouped/ordered query, preserving the spaces between SQL clauses.
+The unmatched-Table branch instead assigns bound Species NULL and RowSource NULL.
+These focus-time mutations and retained suggestion states are not equivalent to
+stateless selectors. The standalone choices reader uses selected-project Env and
+explicit BINARY species ordering, and its writer requires explicit coupled
+Table/Field values; those remain precedents, not mapped event acceptance.
+Criteria_AfterUpdate is still declared but unresolved. Five active routes,
+six raw combo declarations and prior-art/source hashes are sealed with all1646
+integration inputs unchanged. No native callback execution or mapped editing
+is enabled by this static contract.
+
+Two disposable copied-body host/dispatch attempts did not qualify these routes.
+CreateForm supplies a module header, while AddFromString automatically wires
+named event procedures. The corrected fixture replaces that header and disables
+the import-created bindings before opening its actual bound six-combo Form view.
+All five private bodies are exact, but the first explicit fixture dispatch fails
+with DISP_E_BADPARAMCOUNT. Zero explicit calls completed; zero partial execution
+is not established. Both owners normally quit, both locks are absent and the
+canonical/static inputs plus1673 frozen application/resource inputs are unchanged.
+The work unit is time-boxed after two attempts; no third retry, original event
+timing, whole-form execution or mapped editing is accepted.
+
+A separate pure-sentinel dispatch prerequisite also stops after two attempts.
+Ordinary Run reproduces BADPARAMCOUNT without any original source procedure.
+Explicit optional-slot dispatch instead returns a mismatched result whose value
+was not retained; later routes/Eval were not qualified. No validated sentinel call
+completed and partial fixture execution is unknown. Installed static type-library
+metadata declares a VARIANT return and thirty optional input/output
+pointer-to-VARIANT arguments, not an accepted runtime wire. Twenty-nine sealed
+artifacts retain both normally closed/absent owners, absent locks and unchanged
+canonical/base/current1673 inputs. No third source-focus or dispatch retry is
+authorized by this prerequisite.
+
+### Profiling Env criterion conversion boundary
+
+The active private ChangeType first attempts CDbl and, on error, surrounds the
+input with single quotes without escaping embedded apostrophes. ProfileEnv calls
+it before its NULL checks and concatenates the resulting Variant into SQL; that
+is not automatically equivalent to binding the initially converted DOUBLE.
+
+A disposable General1033 DAO fixture calibrates twenty conversion/concatenation
+cases and independently reads eight complete binary64 witnesses. The input
+`1.0000000000000002` converts to the DOUBLE immediately above1 but concatenates
+as `1`. The controlled concatenated `>1` query selects the adjacent row and16;
+binding the original converted DOUBLE selects only16. Spaces, leading zero,
+exponent, comma, hexadecimal/octal, NULL, empty and rejected conversion cases
+remain explicit in the sealed receipt. This qualifies controlled DAO expressions,
+not the original VBA ChangeType/ProfileEnv callback, general locale behavior or
+new mapped execution. The owned DAO host normally exited, its fixture lock is
+absent, and canonical source/all1646 runner inputs remain unchanged. The existing
+strict standalone compiler and its refusals are not silently broadened.
+
+An additional owned Access fixture now executes the unchanged private ChangeType
+body through two explicit fixture-only public callers. Reexport comparisons
+before and after twenty actual VBA cases preserve the complete original body;
+all value types, converted bits, fallback quote strings and concatenated literals
+match the controlled DAO expectations. Numeric predicates reproduce the adjacent
+DOUBLE threshold difference, and the copied eight physical witnesses remain
+unchanged. The19-artifact seal verifies both original Access owners normally
+closed with no fixture locks or canonical/frozen drift. The first attempt stopped
+before execution because its comparator omitted `As Variant`; the corrected
+comparator also proves that first reexport was unchanged. This qualifies the
+private conversion helper on this machine, not the original ProfileEnv/form
+callback, general locale behavior, scratch/count writes or mapped Run.
+
+Additional controlled SQL evidence distinguishes source LONG32, DECIMAL96 with
+scale at most28, and DOUBLE literals. `0.1` is a DECIMAL literal: all three
+adjacent DOUBLE witnesses compare equal, unlike a bound DOUBLE. Integral1 is
+LONG and keeps exact DOUBLE comparison. Larger integral literals can be DECIMAL;
+out-of-range or unrepresentable-scale literals use DOUBLE. Fifty-five observed
+literal cases and480 independent comparisons are sealed across five accepted
+readonly fixtures plus one normally closed unsupported-CDec-query attempt.
+The physical eight-row witnesses remain unchanged and all six hosts are absent.
+
+DECIMAL row conversion is distinct from the existing fixed-mask formatter:
+binary scaling and half-even rounding are capped at scale28. The adjacent
+DOUBLE above2.5e-28 rounds to3e-28 while its predecessor and2.5e-28 round to2e-28.
+Formatting these values to fifteen decimal digits first loses that distinction.
+The [numeric candidate](../sourcefloatdecimal.go) therefore shares only the
+demonstrated fifteen-significant-digit criterion/Format boundary, and uses a
+separate DECIMAL comparison for accepted Env numeric rules. LONG/DOUBLE retain
+bound numeric comparisons; Veg/Lump retain raw criteria. Numeric Like, date,
+locale and malformed-storage refusals remain, and source literal overflow is
+an explicit refusal. Focused race78.536s and production compilation pass,
+including all480 source expectations through compiled production SQLite
+queries and a full service readonly/cancellation test. Independent exact
+five-path/three-base review accepts this bounded change with no significant
+issues, verifying source hashes and encoded expectations without rerunning tests.
+One normally closed disposable Wails owner passes69 independently expected
+predicates across138 rules through the actual standalone preview wire. Complete
+typed review, stored counts, physical data/history and all16 files are unchanged.
+The2367-artifact seal pins source, review, native and readonly predecessor
+lineage. Full1671-input race integration, including all51 resources, passes
+exit0 without input/package/embed discovery drift. Final association reverified
+2367 artifacts and the exact review/absent native owner, releasing the freeze.
+This is not original
+ProfileEnv, scratch/count, form callback, editable mapped lifecycle or general
+locale acceptance.
+
+A subsequent unchanged-private-ProfileEnv probe is retained as failed evidence,
+not procedure acceptance. Its isolated fixture-only registry/Recalc host is not
+the original form lifecycle. Two attempts stop before any original call: fixture
+identifier recasing is corrected without changing either private body, then
+unsaved-host Save naming fails. Both original Access owners normally quit with
+warnings restored and no locks;17 sealed artifacts retain contracts, exports
+and failures. All1671 frozen application inputs and canonical source remain
+unchanged. The native debugging time-box is reached; qualify the host lifecycle
+separately before any later procedure attempt. Scratch/count/form effects remain
+unqualified rather than inferred from the accepted numeric wire.
+
+The separate blank-host lifecycle is now qualified without another original
+procedure attempt. `CreateForm` supplies a generated open name: save that name,
+close it, rename the saved form, then open the intended name. Actual Design and
+Form views, persisted unbound CurrVegProfile/default, physical database reopen,
+Recalc and byte-identical before/after form exports pass. The owner normally
+closed with no lock, eleven sealed artifacts and unchanged1671 application/five
+canonical inputs. No source module was imported or ProfileEnv call executed.
+
+### Cover literal and arithmetic successor
+
+Original ProfileVeg takes Criteria directly from its TEXT255 rule cell and
+concatenates it without ChangeType. Preserve that literal text; applying Env's
+fifteen-digit formatting would invent another threshold. Raw SINGLE covers,
+original MadMax results and ordinary Nz sums use seven-significant-digit DECIMAL
+coercion. The DAO field descriptor may report DOUBLE even while comparisons
+retain SINGLE runtime precision. Lump SUM aggregates instead use fifteen-digit
+DOUBLE coercion; calling MadMax on those aggregates still returns SINGLE.
+
+Veg Nz additions are left-associated SINGLE arithmetic. Source `.1+.2` becomes
+`.30000001192092896`; `-.3+.1+.3` becomes `.09999999403953552`; `16777216+1+.1`
+becomes16777216. Arithmetic overflow promotes to DOUBLE rather than failing,
+and subsequent cancellation does not restore SINGLE precision. The independently
+observed `MaxSingle+MaxSingle-MaxSingle-MaxSingle+.1` result matches the literal
+`.100000001490116`, not `.1`. Unsupported individual SINGLE values and malformed
+historical storage still produce explicit errors; no stored value is rewritten.
+
+The [portable source corpus](../testdata/profiling-cover-native.json) supplies405
+native predicate sets,144 adjacent SINGLE midpoint comparisons and20 independent
+sum values. Original MadMax bodies are reexported exactly before/after; no private
+ProfileVeg/ProfileEnv or original callback is invoked. All owned Access hosts
+normally close; the failed unqualified aggregate alias is retained separately.
+The six-path compiler/query/helper/test candidate reproduces failures before
+the fix, then passes coupled profile/formatter race70.047s and production
+compilation, including readonly full-service/cancellation/retry and typed
+rule/schema/count/file preservation. Exact six-path/four-base independent review
+accepts the bounded candidate without significant findings, verifying all60
+source artifacts/encoded expectations and hashes without rerunning tests/native.
+Actual disposable Wails wire passes431 predicates across1293 physical rules/59
+parents. Complete typed review/counts/schema/data/history and16 files remain
+unchanged, and the original owner normally closes. The2652-artifact seal retains
+accepted Env/source/review/native lineage. Complete-source/resource full race
+passes exit0, UTC2026-10-13T14:49:16.625227 to2026-10-13T16:06:43.669853,
+with1673 protected inputs/all51 resources and no input/package/embed discovery
+drift. Final association reverified2652 artifacts and exact reviewed/native/source
+lineage, releasing the freeze. Source absence/set handling,
+NULL criteria, Env conversion, grammar refusals, frontend/bindings/resources and
+default gates remain unchanged. This is not full source Run or editable lifecycle
+acceptance.
+
+The broader raw-literal domain remains a separate successor. Six readonly DAO
+fixtures qualify106 direct lexical observations and30 boundary-search queries:
+negative exponent1073741819 is accepted,1073741820 refused, and leading zeros
+retain that boundary. Finite zero underflow and a syntax refusal are distinct.
+Positive zero exponents can return anomalous nonzero DOUBLE values; those are not
+desktop requirements. The47-artifact association rechecks all six absent owners,
+unchanged/lock-free fixtures and canonical/current1673 inputs. No application
+correction or general literal parity is claimed; precise refusal/domain changes
+are now implemented in the following reviewed/native-accepted successor.
+
+The three-path/one-preimage domain correction validates the measured exponent
+bound before accepting zero. Supported underflow/leading zeros remain available;
+existing Env conversion is unchanged. Positive-exponent zero above28 instead
+produces an explicit unavailable-domain error. This conservative adaptation also
+refuses source-valid0e29/0e100 and must not be described as native syntax failure
+or general literal parity. The106 independently encoded native cases and
+compiler/service readonly refusal/correction/retry checks pass coupled
+race68.876s and production compilation. Exact independent review finds no
+significant issues and verifies all47 source artifacts/106 direct/30 search
+observations and live/candidate/preimage hashes; tests/native not rerun by reviewer.
+Six disposable Wails owners qualify both Veg/Lump refusal branches and supported
+underflow through actual public bindings, preserving complete typed review/counts/
+data/history and16 files each. All normally close and are absent. The3686-artifact
+seal retains source/review/native/accepted-cover lineage; complete1675-input/
+all51-resource race passes exit0, UTC2026-10-13T16:32:16.515840 to
+2026-10-13T18:00:13.236306, without input/package/embed discovery drift. Final
+association reverified3686 artifacts and exact candidate/preimage/source/
+six-absent-owner lineage, releasing the freeze. Defaults remain unchanged.
+
+### Remaining SU/filter/close static dispatch boundary
+
+Both source variants resolve identical `btnCreateSuFromFilter_Click`,
+`btnEnvIntoSu_Click` and `btnG2MainMenu_Click` procedures. The sealed private
+nine-input source/prior-art association is static evidence only.
+
+`GetFilteredFormRecords` requires an allowed active entry form and consumes
+its `RecordsetClone`, not just the invoking plot or arbitrary profile results.
+USysFilter2SuList is unbound: new-list choice2 is the default, modify-current is1,
+and include-existing defaults1. Continue publishes the two controls to globals;
+Cancel sets3. Window-close behavior is unqualified. Modify physically deletes
+current rows absent from the clone and adds missing cloned plots. New creation
+uses CreateSuTable's name/destination/template export/attachment paths, including
+possible remote database creation, then inserts cloned plots. Existing
+assignments use a copied/imported FilterQuerySu and a subsequent join. That
+scratch copy precedes the caller's Cancel branch; cleanup deletes scratch even
+on exit. This is neither a simple export nor proof of side-effect-free Cancel.
+
+`InsertEnvSuIntoSu` warns before transferring USysEnv.UserSiteUnit to the
+current SU.SiteUnit, then separately offers missing personal definitions and
+optional loaded personal-list editing. The guarded local physical
+[transfer](../siteunittransfer.go) is prior art, not acceptance of those source
+opener/offer effects. Source Close closes frmPictures, calls Hide (sets the
+current form invisible, not closed), opens the main menu and restores display.
+The current Return adaptation does not prove that hidden loaded-form lifecycle.
+Original clone/filter membership, source locale, empty/large records, remote
+creation/attachment/selection, cancellation cleanup and personal-list/hidden
+lifecycle remain unqualified. No native source action or mapped mutation was
+enabled by this trace.
+
+### View Env Table dynamic datasheet source boundary
+
+Both active normal/CHARS `btnViewEnvTable` controls caption View Env Table.
+Their callback opens `FormSet(), acFormDS` and shows VProFV. There is no explicit
+parent Save, current-plot query or raw Env-only export in this handler.
+FormSet reads Current.DataFormName; the source registry getter's missing-setting
+default is FS882-6x4. This is not necessarily the invoking form.
+
+The four known FS882-6x4, FS882-6x4XL, FS882-8x6XL and CHARS targets bind USysEnv.
+SetCurrentProject creates that query as DISTINCTROW current-project Env.*
+INNER JOIN Admin.* on PlotNumber=Plot, without an SU/opening-parent filter or
+explicit order. An exact extracted query on a disposable ACE1033 fixture
+produces12 physical pairs:3x3 A/a membership plus B,007 and7. Four identical
+complete pair values remain, rather than being collapsed by DISTINCTROW.
+Orphan Env/Admin rows are excluded; leading-zero text remains distinct.
+This is controlled SQL calibration, not original callback/form execution.
+
+Target Open sets the project/SU caption; Current prepares coordinate display;
+Load initializes coordinate/project/assigned-SU controls. Assigned-SU AfterUpdate
+writes registry and modifies UserSiteUnit's choice RowSource, not the collection
+RecordSource. Those lifecycle mutations are not readonly desktop authority.
+The15-artifact seal verifies13 source/catalogue hashes, normally closed/unlocked
+DAO host and all1621 active integration inputs unchanged. Effective datasheet
+column presentation and unsupported dynamic form targets remain unqualified;
+no original callback/native or general locale acceptance is claimed.
+Supplemental static target qualification preserves a meaningful distinction:
+the USysEnv query has no ORDER BY, but the forms export OrderByOn=NotDefault.
+Default FS882-6x4 orders RootingDepth and SeepageDepth descending, then PlotNumber;
+XL/normal/CHARS order PlotNumber. All export FilterOnLoad=0. Stored nutrient/
+date filters must not silently become active criteria. Effective ordering/
+filtering when switching an already-loaded form remains a runtime unknown.
+
+The independently default-off, unregistered readonly backend draft reads
+Current.DataFormName from owned YAML, retaining the source missing-setting
+default only when absent. Explicit NULL, malformed type, empty and unsupported
+values fail without silent repair or persistence. Four supported targets keep
+their declared order; loaded-instance state and general ACE locale equivalence
+are not inferred. The saved-data collection is whole-project Env/Admin physical
+pairs; selected SU and opening parent are ownership context, not row filters.
+Each physical source is bounded at100000 rows in the same owned snapshot, with
+virtual duplicate paging at1..200 and complete tagged originals for page pairs.
+Nullable/historical application IDs, true=-1, blobs and empty text stay intact.
+Exact100000/max+1 source and200/max+1 page thresholds,9,999,800,002 virtual pairs,
+all target orders, selected/None/external/retired contexts, raw text refusal,
+readonly config/data and actual in-flight cancellation/coordinator retry pass
+combined focused race76.036s and production compile. Exact two-file independent
+review finds no significant issues and verifies38 hashes; tests were not
+independently rerun. The initial incomplete disposable-schema switch failure is
+retained; retry preserves original fixture columns. Registration, UI projection,
+datasheet presentation and native lifecycle remain pending. No implicit Save,
+editing, DDL, registry/toolbar mutation or default promotion is authorized.
+
+The registered independently gated desktop successor uses immutable50-row pair
+pages and strict actual-Go ownership/target/order/witness validation. All446
+root source binding instances across four targets retain attached form captions
+and page groups as an explicit presentation adaptation. Complete physical
+originals remain separately disclosed; missing/ambiguous legacy bindings are
+explicitly unavailable rather than invented. Generated interfaces are76
+services/355 methods/384 models, warning-free with -ts -i. Four-target/None/end/
+50+20 wires pass race2.764s; combined predecessor race122.934s,194 focused/
+1712 registered frontend executions, check0/0/default build/production compile
+and exact16-file/nine-base independent review pass. Tests were not independently
+rerun because reviewer Node PATH was unavailable.
+Ten normally closed disposable Wails owners verify four saved targets, mapped
+normal/CHARS selected/None actions, independent full physical pair originals and
+source-labelled disclosures, paging, actual parent/humus/vegetation draft holds,
+held successful response Cancel/variant/remount rejection, native close/Return,
+every planned source/control selector at1400/600/320 and both off-gates. Sixty
+new unselected historical-date/nutrient rows remain included despite saved
+filters. The2387-artifact seal verifies all twelve original owners, including
+two failed runner profiles, absent and16 fixture files unchanged each. Failed
+owner capture and ordinary None launcher pagination were corrected without
+application changes or source mutation replay; their unchanged cleanup is
+retained. Full1630-input integration first hit Windows ThreadSanitizer allocation
+error1455 after3555.054s; its unchanged-input/discovery failed receipt is retained.
+The exact candidate retry passed root5607.056s with bounded Go heap/concurrency
+(CGO1/GOMEMLIMIT1GiB/GOGC50/GOMAXPROCS2), without reducing race instrumentation.
+All1630 inputs/discovery are unchanged. Exact final association rehashed2387
+artifacts, sixteen candidates/nine bases, backend/source/predecessor lineage and
+twelve absent owners with sixteen unchanged fixture files each. Integration is
+accepted and the freeze is released.
+Runtime
+`VPRO_TWO_PAGE_ENVIRONMENT_TABLE_REVIEW` and build
+`VITE_TWO_PAGE_ENVIRONMENT_TABLE_REVIEW` remain default-off. This does not accept
+original Access callback execution, loaded-form state, native datasheet headers/
+visibility/order, computed/unbound behavior or general ACE locale equivalence.
+
+### Readonly source Audit candidate
+
+The nullable ordinary presentation successor adds distinct ListAuditReadEntries
+DTOs/endpoints without changing strict legacy AuditEntry/ListAuditEntries
+restoration/provenance. Shared exact schema/query/order/flag policy feeds both
+scanners. The actual ordinary form reads NULL User/EditWhen without inventing
+strings/timestamps; displayed NULL/empty values remain distinct, with unsupported
+NULL actor/date restoration explicitly nonselectable. Malformed UTF-8 fails
+before JSON repair. Focused race7.062s, production compile, real Go round-trip
+fixture,73 focused/1597 registered frontend executions, check0/0 and default
+build pass. Independent review found the actual merged-service adapter omitted
+captured-context forwarding. The fix and delayed-read/stale-context coverage
+are independently accepted; exact18-file/15-base successor review finds no
+significant issues. Six accepted/two rejected normally closed disposable Wails
+owners preserve all16 files each and prove initial-NULL ordinary reading/source
+launch in normal/CHARS, explicit strict restoration refusal, parent/peer drafts,
+held-response cancellation/remount, native-close/Return, three-width visibility
+and independent source gates. The1710-artifact native seal is verified.
+Complete1605-input race passes exit0, UTC19:52:59.449269 to21:28:05.794068,
+without input/discovery drift. Exact final association rehashes1710 artifacts,
+18 candidates/15 bases and canonical/predecessor lineage, confirms all eight
+original owners absent and releases the freeze.
+
+Both normal/CHARS exported `btnAudit` controls have the resolved
+`btnAudit_Click` OnClick event, opening USysAuditXL filtered by literal
+PlotNumber. Its UsysAuditTrail query reads the current project's Audit table.
+The independently default-off candidate retains the eleven bound source fields
+and every physical tagged column/row. Unlike the legacy ordinary audit DTO, it
+requires actual text storage and byte-exact plot/project ownership; malformed
+UTF-8, foreign ownership and missing bindings fail explicitly.
+
+The panel pins context/project/plot/form, loads only on request and preserves
+NULL, empty text, nullable IDs and BOOLEAN -1/0. SQLite EditWhen/rowid storage
+ordering is an explicit adaptation rather than Access coercion parity.
+Parent/current/loaded-peer drafts, reference errors and pending child ownership
+block opening. The open panel suspends the parent/children; pending reads block
+Return while Cancel remains live. Generation/destroy guards reject late results.
+Restore/Flag editing, the source registry audit-strength option and restoration
+remain unavailable; Load and Return never implicitly save or prune.
+
+Backend focused race5.421s and production compile, shared real Go wire fixture,
+54 focused/1595 registered frontend executions, check0/0 and default build pass.
+Initial backend and exact22-file desktop reviews found no significant issues.
+Six accepted/eight normally closed native owners preserve16 files each, proving
+mapped normal/CHARS typed history, actual parent/humus/vegetation draft holds,
+held response cancellation/remount, native-close/Return barriers, three-width
+labelled cards and independent backend/client-off refusal. Native seal rehashes
+1802 artifacts. Complete1602-input race passes exit0, UTC17:26:26.719054 to
+19:04:18.773109, without input/discovery drift. Final association rehashes1802
+artifacts, exact review/base/source lineage and all eight closed owners; freeze
+released. The bounded readonly source Audit workflow is integrated, not promoted.
+The first rejected fixture exposed legacy ordinary Audit NULL User string
+scanning before source mounting; EditWhen has the same strict string boundary.
+Qualified native fixtures keep User/EditWhen valid. Backend raw NULL reading is
+not NULL-user/date desktop launch parity. The separately scoped nullable ordinary
+successor above now proves initial-NULL native launch while preserving strict
+restoration/provenance; its complete integration is independently accepted.
 
 [twoPageEntryProjection](../frontend/src/twoPageEntryProjection.ts) is a private
 source assembly, not a complete native workflow. It partitions118 normal/120 CHARS

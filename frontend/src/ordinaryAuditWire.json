@@ -1,0 +1,16 @@
+[
+  {
+    "rowId": "1",
+    "project": "Sample",
+    "user": null,
+    "plotNumber": "108050",
+    "table": "_Env",
+    "editField": "SiteNotes",
+    "editWhen": null,
+    "beforeEdit": null,
+    "afterEdit": "",
+    "restore": true,
+    "flag": false,
+    "id": null
+  }
+]

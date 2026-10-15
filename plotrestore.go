@@ -96,7 +96,7 @@ func auditRestoreValue(raw *string, member reflect.Value) (any, error) {
 	return nil, errors.New("unsupported audit value type")
 }
 
-func readAuditEntries(db headerDB, project, predicate string, args ...any) ([]AuditEntry, error) {
+func queryAuditEntries(db headerDB, project, predicate string, args ...any) (*sql.Rows, error) {
 	if !projectNamePattern.MatchString(project) {
 		return nil, errors.New("invalid project name")
 	}
@@ -131,7 +131,11 @@ func readAuditEntries(db headerDB, project, predicate string, args ...any) ([]Au
 		headerReadColumn(`"Restore"`, flag) + `, ` + headerReadColumn(`"Flag"`, flag) + `, "ID"
 		FROM ` + quoteHeaderIdentifier(project+"_Audit") + ` WHERE ` + predicate +
 		` ORDER BY "EditWhen" DESC, rowid DESC`
-	rows, err := db.Query(query, args...)
+	return db.Query(query, args...)
+}
+
+func readAuditEntries(db headerDB, project, predicate string, args ...any) ([]AuditEntry, error) {
+	rows, err := queryAuditEntries(db, project, predicate, args...)
 	if err != nil {
 		return nil, err
 	}

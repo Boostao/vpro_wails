@@ -15,6 +15,18 @@ vars:
   CROSS_IMAGE: wails-cross
 
 tasks:
+  build:sqliteonly:
+    summary: Builds an explicit SQLite-only Windows profile without optional DuckDB linkage
+    cmds:
+      - task: build
+        vars:
+          ARCH: '{{.ARCH}}'
+          DEV: '{{.DEV}}'
+          EXTRA_TAGS: 'sqliteonly{{if .EXTRA_TAGS}},{{.EXTRA_TAGS}}{{end}}'
+          OBFUSCATED: '{{.OBFUSCATED}}'
+          GARBLE_ARGS: '{{.GARBLE_ARGS}}'
+          CGO_ENABLED: '{{.CGO_ENABLED | default "1"}}'
+
   build:
     summary: Builds the application for Windows
     cmds:

@@ -131,6 +131,12 @@ test('actual parent/child composition keeps threshold gate independent and propa
         './longVegetationSwitchPreferences': {}, './LongVegetationSwitchPreferences.svelte': { default() {} },
         './longVegetationThresholdPreferences': prefs, './LongVegetationThresholdPreferences.svelte': { default: child() },
         './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
         './longEnvironmentReport': {}, './longVegetationReport': {},
         './vegetationWorkbook': { VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } } },
       });

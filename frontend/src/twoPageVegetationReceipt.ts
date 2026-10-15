@@ -7,6 +7,8 @@ import { singleMaximum } from './numericEditor';
 import { validSIVIRequestId } from './siviRequestId';
 import { siviSourceAuditText } from './siviDeletionReceipt';
 import { twoPageVegetationFields, twoPageVegetationEditableID } from './twoPageVegetationEditor';
+import { vegetationReferencesFromWire, type VegetationReferences } from './twoPageVegetationReferences';
+import { vegetationSpeciesListOptions, requireVegetationSpeciesListCovers } from './twoPageVegetationSpeciesList';
 import {
   equalVegetationCell, vegetationColumnIndex, vegetationSourceCell, twoPageVegetationSource,
   twoPageVegetationOriginalFromWire, serializeTwoPageVegetationRequest,
@@ -37,22 +39,29 @@ const cell = (value: unknown): value is ProjectMetadataCell =>
   record(value) && exact(value, ['storage', 'text', 'integer', 'real', 'blobHex']) && completeMetadataCellFromWire(value);
 const diagnostic = 'Vegetation receipt differs from its exact retained request/source plan; recover durable history without replay.';
 
-function confirmedRequest(wire: unknown, owner: TwoPageVegetationOwner): TwoPageVegetationRequest {
-  if (!record(wire) || !exact(wire, ['requestId', 'original', 'edits']) || typeof wire.requestId !== 'string' ||
+function confirmedRequest(wire: unknown, owner: TwoPageVegetationOwner, references?: VegetationReferences): TwoPageVegetationRequest {
+  if (!record(wire) || !exact(wire, references ? ['requestId', 'original', 'edits', 'speciesList'] : ['requestId', 'original', 'edits']) ||
+    references && JSON.stringify(wire.speciesList) !== JSON.stringify(references) || typeof wire.requestId !== 'string' ||
     !validSIVIRequestId(wire.requestId) || !Array.isArray(wire.edits) || !wire.edits.length) throw new Error(diagnostic);
   const original = twoPageVegetationOriginalFromWire(wire.original, owner);
   const request: TwoPageVegetationRequest = { requestId: wire.requestId, original, edits: [] };
+  if (references) request.speciesList = references;
   const seen = new Set<string>();
   for (const edit of wire.edits) {
     if (!record(edit) || !exact(edit, ['contextId', 'form', 'rowId', 'column', 'expected', 'value']) ||
       edit.contextId !== owner.contextId || edit.form !== owner.form ||
       typeof edit.rowId !== 'string' || typeof edit.column !== 'string' ||
-      !twoPageVegetationFields(original).includes(edit.column) || !cell(edit.expected) || !cell(edit.value)) throw new Error(diagnostic);
+      !(twoPageVegetationFields(original).includes(edit.column) || references && edit.column === 'Species') ||
+      !cell(edit.expected) || !cell(edit.value)) throw new Error(diagnostic);
     const key = JSON.stringify([edit.rowId, edit.column]);
     twoPageVegetationEditableID(original, edit.rowId);
     if (seen.has(key) || !equalVegetationCell(vegetationSourceCell(original, edit.rowId, edit.column), edit.expected) ||
       equalVegetationCell(edit.expected, edit.value)) throw new Error(diagnostic);
-    if (edit.value.storage !== 'null') {
+    if (edit.column === 'Species') {
+      if (!references || edit.value.storage !== 'text' || edit.value.text === null) throw new Error(diagnostic);
+      const code = edit.value.text;
+      if (!vegetationSpeciesListOptions(references, owner).some(option => option.code === code)) throw new Error(diagnostic);
+    } else if (edit.value.storage !== 'null') {
       if (edit.column === 'Collected') {
         if (edit.value.storage !== 'text' || edit.value.text === null || edit.value.text.length > 1) throw new Error(diagnostic);
       } else if (edit.value.storage !== 'real' || edit.value.real === null || Object.is(edit.value.real, -0) ||
@@ -61,6 +70,10 @@ function confirmedRequest(wire: unknown, owner: TwoPageVegetationOwner): TwoPage
     seen.add(key);
     request.edits.push({ contextId: owner.contextId, form: owner.form, rowId: edit.rowId, column: edit.column,
       expected: { ...edit.expected }, value: { ...edit.value } });
+  }
+  if (references) {
+    if (!request.edits.some(edit => edit.column === 'Species')) throw new Error(diagnostic);
+    requireVegetationSpeciesListCovers(original, request.edits);
   }
   return request;
 }
@@ -78,13 +91,19 @@ function auditText(column: string, value: ProjectMetadataCell): string | null {
 
 export function twoPageVegetationReceiptFromWire(wire: unknown, retained: TwoPageVegetationRequest,
   owner: TwoPageVegetationOwner, recovery = false): TwoPageVegetationReceipt {
-  const request = confirmedRequest(retained, owner);
+  return vegetationReceiptFromWire(wire, retained, owner, recovery);
+}
+
+function vegetationReceiptFromWire(wire: unknown, retained: TwoPageVegetationRequest,
+  owner: TwoPageVegetationOwner, recovery: boolean,
+  references?: { retained: VegetationReferences; history: VegetationReferences }): TwoPageVegetationReceipt {
+  const request = confirmedRequest(retained, owner, references?.retained);
   if (!record(wire) || !exact(wire, ['history', 'didCommit', 'replayed']) ||
     !(wire.didCommit === true && wire.replayed === false || wire.didCommit === false && wire.replayed === true) ||
     recovery && wire.didCommit !== false || !record(wire.history) ||
     !exact(wire.history, ['Request', 'Committed', 'Actor', 'AuditStrength', 'EditWhen', 'Audits'])) throw new Error(diagnostic);
   const history = wire.history;
-  if (serializeTwoPageVegetationRequest(confirmedRequest(history.Request, owner)) !== serializeTwoPageVegetationRequest(request) ||
+  if (serializeTwoPageVegetationRequest(confirmedRequest(history.Request, owner, references?.history)) !== serializeTwoPageVegetationRequest(request) ||
     typeof history.Actor !== 'string' || !history.Actor || history.Actor.length > 100 || !wellFormedUTF16(history.Actor) ||
     typeof history.AuditStrength !== 'number' || !Number.isInteger(history.AuditStrength) ||
     history.AuditStrength < 0 || history.AuditStrength > 3 ||
@@ -132,16 +151,29 @@ export function twoPageVegetationReceiptFromWire(wire: unknown, retained: TwoPag
     AuditStrength: strength, EditWhen: history.EditWhen, Audits: audits }, didCommit: wire.didCommit, replayed: wire.replayed };
 }
 
+export async function twoPageVegetationSpeciesListReceiptFromWire(wire: unknown, retained: TwoPageVegetationRequest,
+  owner: TwoPageVegetationOwner, recovery = false, validationYield?: () => PromiseLike<void>): Promise<TwoPageVegetationReceipt> {
+  const retainedReferences = await vegetationReferencesFromWire(retained.speciesList, owner, validationYield);
+  if (!record(wire) || !record(wire.history) || !record(wire.history.Request)) throw new Error(diagnostic);
+  const historyReferences = await vegetationReferencesFromWire(wire.history.Request.speciesList, owner, validationYield);
+  return vegetationReceiptFromWire(wire, retained, owner, recovery, { retained: retainedReferences, history: historyReferences });
+}
+
 export function twoPageVegetationCommittedOriginal(receipt: TwoPageVegetationReceipt, owner: TwoPageVegetationOwner): TwoPageVegetationOriginal {
   const original = receipt.history.Request.original;
   return twoPageVegetationOriginalFromWire({ ...original, records: receipt.history.Committed,
     sourceRowIds: sourceRows(original, receipt.history.Committed) }, owner);
 }
 
-export function twoPageVegetationOutcomeFromWire(wire: unknown, request: TwoPageVegetationRequest,
-  requestJSON: string, owner: TwoPageVegetationOwner): TwoPageVegetationOutcome {
+function vegetationOutcomeHeader(wire: unknown, request: TwoPageVegetationRequest,
+  requestJSON: string, owner: TwoPageVegetationOwner, references?: VegetationReferences): {
+    header: Omit<TwoPageVegetationOutcome, 'receipt'>;
+    confirmed: TwoPageVegetationRequest;
+    retainedOwner: TwoPageVegetationOwner;
+    receipt: unknown;
+  } {
   const retainedOwner = { ...owner, contextId: request.original.contextId };
-  const confirmed = confirmedRequest(request, retainedOwner);
+  const confirmed = confirmedRequest(request, retainedOwner, references);
   if (serializeTwoPageVegetationRequest(confirmed) !== requestJSON || !record(wire) ||
     !exact(wire, ['contextId', 'requestId', 'requestJSON', 'status', 'reason', 'receipt']) ||
     wire.contextId !== owner.contextId || wire.requestId !== request.requestId || wire.requestJSON !== requestJSON ||
@@ -149,6 +181,21 @@ export function twoPageVegetationOutcomeFromWire(wire: unknown, request: TwoPage
     !(wire.status === 'running' || wire.status === 'unknown' || wire.status === 'notCommitted' || wire.status === 'committed') ||
     wire.status === 'notCommitted' && request.original.contextId !== owner.contextId ||
     wire.status !== 'committed' && wire.receipt !== null) throw new Error('Vegetation outcome does not certify the exact retained attempt and owner.');
-  return { contextId: owner.contextId, requestId: request.requestId, requestJSON, status: wire.status, reason: wire.reason,
-    receipt: wire.status === 'committed' ? twoPageVegetationReceiptFromWire(wire.receipt, confirmed, retainedOwner, true) : null };
+  return { header: { contextId: owner.contextId, requestId: request.requestId, requestJSON, status: wire.status, reason: wire.reason },
+    confirmed, retainedOwner, receipt: wire.receipt };
+}
+
+export function twoPageVegetationOutcomeFromWire(wire: unknown, request: TwoPageVegetationRequest,
+  requestJSON: string, owner: TwoPageVegetationOwner): TwoPageVegetationOutcome {
+  const observed = vegetationOutcomeHeader(wire, request, requestJSON, owner);
+  return { ...observed.header, receipt: observed.header.status === 'committed'
+    ? twoPageVegetationReceiptFromWire(observed.receipt, observed.confirmed, observed.retainedOwner, true) : null };
+}
+
+export async function twoPageVegetationSpeciesListOutcomeFromWire(wire: unknown, request: TwoPageVegetationRequest,
+  requestJSON: string, owner: TwoPageVegetationOwner, validationYield?: () => PromiseLike<void>): Promise<TwoPageVegetationOutcome> {
+  const references = await vegetationReferencesFromWire(request.speciesList, { ...owner, contextId: request.original.contextId }, validationYield);
+  const observed = vegetationOutcomeHeader(wire, request, requestJSON, owner, references);
+  return { ...observed.header, receipt: observed.header.status === 'committed'
+    ? await twoPageVegetationSpeciesListReceiptFromWire(observed.receipt, observed.confirmed, observed.retainedOwner, true, validationYield) : null };
 }

@@ -1,0 +1,63 @@
+[
+  {
+    "scope":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"None","suPath":"","sourceKind":"project-selected-fields","revision":"3","fields":["Zone"],"buildCurrent":true,
+      "build":{"approvalHash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","projectTuples":[
+        {"envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"11","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"12","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"12","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}}
+      ]}},
+    "catalogue":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"None","suPath":"","sourceKind":"project-selected-fields","revision":"3","definitions":[
+      {"table":"Env","name":"PlotNumber","declaredType":"TEXT","available":true,"reason":""},
+      {"table":"Env","name":"Zone","declaredType":"TEXT","available":true,"reason":""},
+      {"table":"Admin","name":"Plot","declaredType":"TEXT","available":true,"reason":""}
+    ]},
+    "unitPreferences":{"scope":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"None","suPath":"","sourceKind":"project-selected-fields","revision":"3","fields":["Zone"],"buildCurrent":true,
+      "build":{"approvalHash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","projectTuples":[
+        {"envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"11","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"12","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"12","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}}
+      ]}},
+      "preferences":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"None","suPath":"","values":{"unitGroups":1},"availability":{"siteUnitTable":false,"selectedFields":true,"none":false}}},
+    "outcome":{"sourceKind":"project-selected-fields","revision":"3","outcome":{"contextId":"owned","changed":true,"committed":true,"errorMessage":""}}
+  },
+  {
+    "scope":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"None","suPath":"","sourceKind":"project-all-plots","revision":"3","fields":["MissingField"],"buildCurrent":true,
+      "build":{"approvalHash":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","projectTuples":[
+        {"envRowId":"11","adminRowId":null,"plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"12","adminRowId":null,"plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null}}
+      ]}},
+    "catalogue":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"None","suPath":"","sourceKind":"project-all-plots","revision":"3","definitions":[
+      {"table":"Env","name":"PlotNumber","declaredType":"TEXT","available":true,"reason":""},
+      {"table":"Env","name":"Zone","declaredType":"TEXT","available":true,"reason":""},
+      {"table":"Admin","name":"Plot","declaredType":"TEXT","available":true,"reason":""}
+    ]},
+    "unitPreferences":{"scope":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"None","suPath":"","sourceKind":"project-all-plots","revision":"3","fields":["MissingField"],"buildCurrent":true,
+      "build":{"approvalHash":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","projectTuples":[
+        {"envRowId":"11","adminRowId":null,"plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"12","adminRowId":null,"plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null}}
+      ]}},
+      "preferences":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"None","suPath":"","values":{"unitGroups":1},"availability":{"siteUnitTable":false,"selectedFields":false,"none":true}}},
+    "outcome":{"sourceKind":"project-all-plots","revision":"3","outcome":{"contextId":"owned","changed":true,"committed":true,"errorMessage":""}}
+  },
+  {
+    "scope":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"Selected","suPath":"C:\\external.db","sourceKind":"project-selected-fields","revision":"3","fields":["Zone"],"buildCurrent":true,
+      "build":{"approvalHash":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","projectTuples":[
+        {"envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"13","adminRowId":"23","plotNumber":{"storage":"text","text":"P2","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Orphan","integer":null,"real":null,"blobHex":null}}
+      ]}},
+    "catalogue":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"Selected","suPath":"C:\\external.db","sourceKind":"project-selected-fields","revision":"3","definitions":[
+      {"table":"Env","name":"PlotNumber","declaredType":"TEXT","available":true,"reason":""},
+      {"table":"Env","name":"Zone","declaredType":"TEXT","available":true,"reason":""},
+      {"table":"Admin","name":"Plot","declaredType":"TEXT","available":true,"reason":""}
+    ]},
+    "unitPreferences":{"scope":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"Selected","suPath":"C:\\external.db","sourceKind":"project-selected-fields","revision":"3","fields":["Zone"],"buildCurrent":true,
+      "build":{"approvalHash":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","projectTuples":[
+        {"envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"13","adminRowId":"23","plotNumber":{"storage":"text","text":"P2","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Orphan","integer":null,"real":null,"blobHex":null}}
+      ]}},
+      "preferences":{"contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"Selected","suPath":"C:\\external.db","values":{"unitGroups":1},"availability":{"siteUnitTable":false,"selectedFields":true,"none":false}}},
+    "outcome":{"sourceKind":"project-selected-fields","revision":"3","outcome":{"contextId":"owned","changed":true,"committed":true,"errorMessage":""}}
+  }
+]

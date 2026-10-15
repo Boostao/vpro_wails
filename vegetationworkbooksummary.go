@@ -21,14 +21,26 @@ type vegetationWorkbookSummary struct {
 }
 
 type vegetationWorkbookMembership struct {
-	RowID      string
-	PlotNumber ProjectMetadataCell
-	SiteUnit   ProjectMetadataCell
-	Quality    *LongVegetationQualityOccurrence
+	RowID        string
+	PlotNumber   ProjectMetadataCell
+	SiteUnit     ProjectMetadataCell
+	Quality      *LongVegetationQualityOccurrence
+	NoneUnit     *LongVegetationNoneUnitOccurrence
+	SelectedUnit *LongVegetationSelectedUnitOccurrence
 }
 
-func prepareVegetationWorkbookSummary(ctx context.Context, createdDate string, env, su, descriptions ProjectMetadataTable) (vegetationWorkbookSummary, error) {
-	fail := func(err error) (vegetationWorkbookSummary, error) { return vegetationWorkbookSummary{}, err }
+type vegetationWorkbookSummaryHeader struct {
+	CreatedDate        string
+	EnvironmentRows    int
+	SpeciesVersion     ProjectMetadataCell
+	VersionStatus      string
+	VersionDefinitions ProjectMetadataTable
+}
+
+func prepareVegetationWorkbookSummaryHeader(ctx context.Context, createdDate string, env, descriptions ProjectMetadataTable) (vegetationWorkbookSummaryHeader, error) {
+	fail := func(err error) (vegetationWorkbookSummaryHeader, error) {
+		return vegetationWorkbookSummaryHeader{}, err
+	}
 	if ctx == nil {
 		return fail(errors.New("Long Vegetation summary requires a context"))
 	}
@@ -42,34 +54,13 @@ func prepareVegetationWorkbookSummary(ctx context.Context, createdDate string, e
 	if _, err := siteUnitTransferColumns(env); err != nil {
 		return fail(err)
 	}
-	columns, err := siteUnitTransferColumns(su, "PlotNumber", "SiteUnit")
-	if err != nil {
-		return fail(err)
-	}
 	unknownVersion := "Unknown"
-	result := vegetationWorkbookSummary{
+	result := vegetationWorkbookSummaryHeader{
 		CreatedDate: createdDate, EnvironmentRows: len(env.Rows), SpeciesVersion: ProjectMetadataCell{Storage: "text", Text: &unknownVersion},
-		VersionStatus: "missing-definition", VersionDefinitions: descriptions, Memberships: []vegetationWorkbookMembership{},
+		VersionStatus: "missing-definition", VersionDefinitions: descriptions,
 	}
 	if len(descriptions.Columns) == 0 {
 		result.VersionStatus = "metadata-unavailable"
-	}
-	for _, row := range su.Rows {
-		if err := ctx.Err(); err != nil {
-			return fail(err)
-		}
-		plot, unit := row.Cells[columns["PlotNumber"]], row.Cells[columns["SiteUnit"]]
-		for _, cell := range []ProjectMetadataCell{plot, unit} {
-			if _, err := vegetationReportIdentity(cell); err != nil {
-				return fail(err)
-			}
-		}
-		if plot.Storage != "null" {
-			result.SelectedPlotRows++
-		}
-		result.Memberships = append(result.Memberships, vegetationWorkbookMembership{
-			RowID: row.RowID, PlotNumber: cloneSiteUnitCell(plot), SiteUnit: cloneSiteUnitCell(unit),
-		})
 	}
 	if len(descriptions.Rows) > 1 {
 		return fail(errors.New("Long Vegetation AllSpecs version has duplicate definitions; no inferred Description"))
@@ -104,10 +95,92 @@ func prepareVegetationWorkbookSummary(ctx context.Context, createdDate string, e
 			return fail(fmt.Errorf("Long Vegetation AllSpecs Description has unsupported %s storage", cell.Storage))
 		}
 	}
+	if descriptions.Columns != nil {
+		result.VersionDefinitions.Columns = append([]ProjectMetadataColumn{}, descriptions.Columns...)
+	}
+	if descriptions.Rows != nil {
+		result.VersionDefinitions.Rows = make([]ProjectMetadataRow, len(descriptions.Rows))
+		for i, row := range descriptions.Rows {
+			cells := make([]ProjectMetadataCell, len(row.Cells))
+			for j, cell := range row.Cells {
+				cells[j] = cloneSiteUnitCell(cell)
+			}
+			result.VersionDefinitions.Rows[i] = ProjectMetadataRow{RowID: row.RowID, Cells: cells}
+		}
+	}
 	return result, nil
 }
 
+func prepareVegetationWorkbookSummary(ctx context.Context, createdDate string, env, su, descriptions ProjectMetadataTable) (vegetationWorkbookSummary, error) {
+	fail := func(err error) (vegetationWorkbookSummary, error) { return vegetationWorkbookSummary{}, err }
+	header, err := prepareVegetationWorkbookSummaryHeader(ctx, createdDate, env, descriptions)
+	if err != nil {
+		return fail(err)
+	}
+	columns, err := siteUnitTransferColumns(su, "PlotNumber", "SiteUnit")
+	if err != nil {
+		return fail(err)
+	}
+	result := vegetationWorkbookSummary{
+		CreatedDate: header.CreatedDate, EnvironmentRows: header.EnvironmentRows,
+		SpeciesVersion: header.SpeciesVersion, VersionStatus: header.VersionStatus, VersionDefinitions: header.VersionDefinitions,
+		Memberships: []vegetationWorkbookMembership{},
+	}
+	for _, row := range su.Rows {
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		plot, unit := row.Cells[columns["PlotNumber"]], row.Cells[columns["SiteUnit"]]
+		for _, cell := range []ProjectMetadataCell{plot, unit} {
+			if _, err := vegetationReportIdentity(cell); err != nil {
+				return fail(err)
+			}
+		}
+		if plot.Storage != "null" {
+			result.SelectedPlotRows++
+		}
+		result.Memberships = append(result.Memberships, vegetationWorkbookMembership{
+			RowID: row.RowID, PlotNumber: cloneSiteUnitCell(plot), SiteUnit: cloneSiteUnitCell(unit),
+		})
+	}
+	return result, nil
+}
+
+type vegetationWorkbookSummaryRow struct {
+	PlotNumber ProjectMetadataCell
+	SiteUnit   ProjectMetadataCell
+}
+
 func writeVegetationWorkbookSummary(ctx context.Context, book *excelize.File, preview LongVegetationPreview, summary vegetationWorkbookSummary) error {
+	rows := make([]vegetationWorkbookSummaryRow, len(summary.Memberships))
+	for i, member := range summary.Memberships {
+		rows[i] = vegetationWorkbookSummaryRow{member.PlotNumber, member.SiteUnit}
+	}
+	header := vegetationWorkbookSummaryHeader{summary.CreatedDate, summary.EnvironmentRows, summary.SpeciesVersion,
+		summary.VersionStatus, summary.VersionDefinitions}
+	return writeVegetationWorkbookSummaryData(ctx, book, preview, header, summary.SelectedPlotRows, rows)
+}
+
+func writeVegetationProjectWorkbookSummary(ctx context.Context, book *excelize.File, preview LongVegetationPreview, summary vegetationProjectWorkbookSummary) error {
+	rows := make([]vegetationWorkbookSummaryRow, len(summary.ProjectTuples))
+	count := 0
+	for i, tuple := range summary.ProjectTuples {
+		rows[i] = vegetationWorkbookSummaryRow{tuple.PlotNumber, tuple.SiteUnit}
+		if tuple.PlotNumber.Storage != "null" {
+			count++
+		}
+	}
+	if count != summary.SourcePlotRows {
+		return errors.New("project summary non-NULL plot count differs from its original tuples")
+	}
+	if err := writeVegetationWorkbookSummaryData(ctx, book, preview, summary.Header, summary.SourcePlotRows, rows); err != nil {
+		return err
+	}
+	return book.SetCellStr("ReportSummary", "D3", "Original project report tuples (desktop adaptation)")
+}
+
+func writeVegetationWorkbookSummaryData(ctx context.Context, book *excelize.File, preview LongVegetationPreview,
+	header vegetationWorkbookSummaryHeader, plotRows int, rows []vegetationWorkbookSummaryRow) error {
 	const sheet = "ReportSummary"
 	if _, err := book.NewSheet(sheet); err != nil {
 		return err
@@ -128,18 +201,22 @@ func writeVegetationWorkbookSummary(ctx context.Context, book *excelize.File, pr
 		}
 		return setText(address, *text)
 	}
-	date, err := time.Parse("2006-01-02", summary.CreatedDate)
-	if err != nil || date.Format("2006-01-02") != summary.CreatedDate || date.Year() < 100 || summary.EnvironmentRows < 0 || summary.SelectedPlotRows < 0 ||
-		summary.SelectedPlotRows > len(summary.Memberships) || len(summary.Memberships) > 1048572 {
+	date, err := time.Parse("2006-01-02", header.CreatedDate)
+	if err != nil || date.Format("2006-01-02") != header.CreatedDate || date.Year() < 100 || header.EnvironmentRows < 0 || plotRows < 0 ||
+		plotRows > len(rows) || len(rows) > 1048572 {
 		return errors.New("Long Vegetation summary requires valid reviewed date, counts and bounded memberships")
 	}
 	settings := preview.Settings
+	unitTable := preview.Report.SU + "_SU"
+	if settings.UnitGrouping == "all-plots" || settings.UnitGrouping == "selected-fields" {
+		unitTable = "USysSuTableDynamic_SU"
+	}
 	group := map[string]string{"layer": "Layer", "strata": "Strata", "lifeform": "Lifeform", "none": "None"}[settings.Grouping]
 	order := map[string]string{"species": "Species", "presence": "Presence"}[settings.Order]
 	for _, entry := range []struct{ address, value string }{
-		{"A1", preview.Report.Title}, {"A2", "Date created: " + summary.CreatedDate},
+		{"A1", preview.Report.Title}, {"A2", "Date created: " + header.CreatedDate},
 		{"A4", "Vegetation table:"}, {"B4", preview.Report.Project + "_Env"},
-		{"A5", "Site unit table:"}, {"B5", preview.Report.SU + "_SU"},
+		{"A5", "Site unit table:"}, {"B5", unitTable},
 		{"A6", "Lumping table:"}, {"B6", "None_Lump"},
 		{"A7", "Data grouped by:"}, {"B7", group}, {"A8", "Data ordered by:"}, {"B8", order},
 		{"A9", "Presence > than:"}, {"A10", "Mean cover > than:"},
@@ -161,15 +238,15 @@ func writeVegetationWorkbookSummary(ctx context.Context, book *excelize.File, pr
 	for _, entry := range []struct {
 		address string
 		value   int
-	}{{"B11", summary.EnvironmentRows}, {"B12", summary.SelectedPlotRows}} {
+	}{{"B11", header.EnvironmentRows}, {"B12", plotRows}} {
 		if err := book.SetCellInt(sheet, entry.address, int64(entry.value)); err != nil {
 			return err
 		}
 	}
-	if err := setIdentity("B13", summary.SpeciesVersion); err != nil {
+	if err := setIdentity("B13", header.SpeciesVersion); err != nil {
 		return err
 	}
-	for index, member := range summary.Memberships {
+	for index, member := range rows {
 		if err := ctx.Err(); err != nil {
 			return err
 		}

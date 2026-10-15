@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"slices"
 	"strings"
-
-	_ "github.com/duckdb/duckdb-go/v2"
 )
 
 type Coordinator struct {
@@ -19,6 +17,9 @@ type Coordinator struct {
 func NewCoordinator(ctx context.Context, path, project string) (_ *Coordinator, err error) {
 	if !projectNamePattern.MatchString(project) {
 		return nil, errors.New("invalid VPRO project name")
+	}
+	if !duckDBDriverAvailable {
+		return nil, fmt.Errorf("optional DuckDB coordinator is unavailable %s; canonical SQLite remains available", duckDBDriverUnavailableReason)
 	}
 	database, err := sql.Open("duckdb", "")
 	if err != nil {

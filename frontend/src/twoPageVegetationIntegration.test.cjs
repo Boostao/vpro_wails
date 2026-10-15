@@ -7,7 +7,7 @@ const { compile } = require('svelte/compiler');
 const { render } = require('svelte/server');
 const client = require('svelte/internal/client');
 const { loadTypeScript, serverComponent, componentFunctions } = require('./svelteTestHelpers.cjs');
-const { TwoPageVegetationSession, wire, editor, cell } = require('./twoPageVegetationTestHelpers.cjs');
+const { TwoPageVegetationSession, wire, editor, cell, speciesList } = require('./twoPageVegetationTestHelpers.cjs');
 const { metadata } = require('./siviParentTestHelpers.cjs');
 const fixtures = require('./twoPageVegetationReceipts.json');
 const read = name => readFileSync(path.join(__dirname, name), 'utf8');
@@ -32,17 +32,18 @@ function source(sourceForm = form) {
   original.recordSource = wire.twoPageVegetationSource(sourceForm).source;
   return original;
 }
-function owned(original = source(), ports = {}) {
+function owned(original = source(), ports = {}, speciesListEnabled = false) {
   const { contextId, project, plot, form } = original;
   return new TwoPageVegetationSession({ contextId, project, plot, form }, {
     read: () => operation(client.proxy(original)),
     save: () => { throw new Error('Unexpected Save'); }, outcome: () => { throw new Error('Unexpected recovery'); }, ...ports,
-  }, true);
+  }, true, speciesListEnabled);
 }
 const dependencies = session => ({
-  './twoPageVegetationSessions': { twoPageVegetationSession: () => session, twoPageVegetationWritingEnabled: true },
+  './twoPageVegetationSessions': { twoPageVegetationSession: () => session, twoPageVegetationWritingEnabled: true, twoPageVegetationSpeciesListEnabled: false },
   './twoPageVegetationWire': wire, './projectMetadataEditor': metadata,
   './collectedEditor': collected, './twoPageVegetationPresentation': presentation,
+  './twoPageVegetationSpeciesList': speciesList,
   './VegetationSpeciesReferences.svelte': { default: serverComponent(read('VegetationSpeciesReferences.svelte'), 'VegetationSpeciesReferences.svelte', {}) },
 });
 
@@ -64,6 +65,35 @@ test('all four source presentations retain every25 field exactly once with label
     assert.match(html, /Review Species definitions \(read only\)/);
     assert.match(html, /creation, deletion and restoration remain unavailable/);
   }
+});
+
+test('enabled A/CHARS picker has one labelled control full tuple options and explicit common-cover unavailability', async () => {
+  const receipt = structuredClone(require('./twoPageVegetationSpeciesListReceipts.json')[7]);
+  const request = receipt.history.Request;
+  const session = owned(request.original, { references: () => operation(client.proxy(request.speciesList)) }, true);
+  await session.load(); await session.loadReferences();
+  const dependenciesEnabled = { ...dependencies(session), './twoPageVegetationSessions': {
+    twoPageVegetationSession: () => session, twoPageVegetationWritingEnabled: true, twoPageVegetationSpeciesListEnabled: true,
+  } };
+  const Component = serverComponent(read('TwoPageVegetationPanel.svelte'), 'TwoPageVegetationPanel.svelte', dependenciesEnabled);
+  const scoped = { ...request.original, parentBlocked: false };
+  let html = render(Component, { props: scoped }).body;
+  assert.equal((html.match(/data-vegetation-column="Species"/g) ?? []).length, 1);
+  assert.match(html, /for="SubVegAXL--7-Species-list"/);
+  assert.match(html, /id="SubVegAXL--7-Species-list"/);
+  assert.equal((html.match(/<option value="A"/g) ?? []).length, 3);
+  assert.match(html, /master row -9/); assert.match(html, /personal row 1/);
+  assert.match(html, /NULL/); assert.match(html, /""/);
+  const empty = structuredClone(request.original);
+  for (const column of ['Cover1', 'Cover2', 'Cover3', 'TotalA', 'Cover4', 'Cover5', 'TotalB']) {
+    empty.records.rows[0].cells[wire.vegetationColumnIndex(empty, column)] = cell('null');
+  }
+  const unavailable = owned(empty, { references: () => operation(client.proxy(request.speciesList)) }, true);
+  await unavailable.load(); await unavailable.loadReferences();
+  dependenciesEnabled['./twoPageVegetationSessions'].twoPageVegetationSession = () => unavailable;
+  html = render(serverComponent(read('TwoPageVegetationPanel.svelte'), 'TwoPageVegetationPanel.svelte', dependenciesEnabled), { props: scoped }).body;
+  assert.match(html, /<select[^>]+disabled/);
+  assert.match(html, /all seven original common covers are NULL/);
 });
 
 test('physical aliases NULL IDs and missing source controls remain distinct without inventing zero or writable rows', async () => {
@@ -279,7 +309,7 @@ test('ordinary vegetation read profile bypasses numeric readers only when both r
       PlotService: {
         ListVegRecords: () => { ordinary++; return readPort([{ id: 42 }]); },
         ListHumusRecords: () => readPort([]), ListMineralRecords: () => readPort([]), ListOtherRecords: () => readPort([]),
-        ListAuditEntries: () => readPort([]), GetChildCapabilities: () => readPort({}),
+        ListAuditReadEntries: () => readPort([]), GetChildCapabilities: () => readPort({}),
       }, ContextService: { GetVegetationReadAvailability: () => { availability++; throw new Error('Unexpected fallback'); } },
     });
     await context.actions.loadChildData(plot);
@@ -293,7 +323,7 @@ test('ordinary vegetation read profile bypasses numeric readers only when both r
 test('actual root native-close and context transition barriers survive unmounted failed vegetation Save and certified absence', async () => {
   const cancellations = [], transitions = [];
   const context = componentFunctions('App.svelte', ['handleCloseRequest', 'requestTransition', 'loadPlots', 'refresh', 'loadHierarchy'], {
-    view: 'fs882', localEditorBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false,
+    view: 'fs882', localEditorBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false, summaryEnvironmentalBusy: false, projectReportBusy: false,
     busy: false, editor: { getCloseState: () => ({ busy: false, blocked: false, unsaved: false, canSave: false, error: null }) },
     transitionWorking: false, archivePublicationBusy: false,
     vegetationPublicationBusy: false, lifeformPublicationBusy: false, summaryPublicationBusy: false,
@@ -304,9 +334,9 @@ test('actual root native-close and context transition barriers survive unmounted
     CloseService: { CancelClose: id => { cancellations.push(id); }, GetPendingCloseRequest: () => operation('vegetation-close') },
   });
   const expression = read('App.svelte').match(/const editorBusy = \$derived\(([^;]+)\);/)[1];
-  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', `return ${expression}`);
+  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', 'summaryPreferenceBusy', 'summaryFieldListBusy', 'summaryEnvironmentalBusy', 'projectReportBusy', 'externalSUEnvironmentBusy', `return ${expression}`);
   Object.defineProperty(context, 'editorBusy', {
-    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy),
+    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy, context.summaryPreferenceBusy, context.summaryFieldListBusy, context.summaryEnvironmentalBusy, context.projectReportBusy, context.externalSUEnvironmentBusy),
   });
   const session = owned(source(), {
     save: () => Promise.reject(new Error('unknown delivery')),

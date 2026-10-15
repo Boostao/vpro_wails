@@ -16,7 +16,7 @@
     type MineralRecord,
     type OtherRecord,
     type SoilSuggestion,
-    type AuditEntry,
+    type OrdinaryAuditReadEntry,
     type ListItem,
     type SpeciesItem,
     type VegetationDeletionReview,
@@ -81,10 +81,12 @@
   import TwoPageParentCommonEditor from './TwoPageParentCommonEditor.svelte';
   import TwoPageEntryEditor from './TwoPageEntryEditor.svelte';
   import type { TwoPageEntrySessionCache } from './twoPageEntrySession';
-  import type { TwoPageParentSessionCache } from './twoPageParentSession';
+  import type { TwoPageParentSessionCache, TwoPageParentForm } from './twoPageParentSession';
   import type { TwoPageParentCommonSessionCache } from './twoPageParentCommonSession';
   import type { TwoPageEntryChild } from './twoPageEntryProjection';
   import EnvironmentSUTransfer from './EnvironmentSUTransfer.svelte';
+  import ExternalSUEnvironmentTransfer from './ExternalSUEnvironmentTransfer.svelte';
+  import { externalSUEnvironmentSession, subscribeExternalSUEnvironmentActivity } from './externalSUEnvironment';
   import ProjectPlotProfileReview from './ProjectPlotProfileReview.svelte';
   import { navigateSourceEnter } from './enterNavigation';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
@@ -346,6 +348,7 @@
     : null;
   let twoPageOpen = $state(false);
   let twoPageScope = $state<'extra' | 'common' | 'entry'>('extra');
+  let twoPageEntryInitialForm = $state<TwoPageParentForm>('FS882-8x6XL');
   let twoPageBusy = $state(false);
   let twoPageProject = $state<string | null>(null);
   const twoPageSessions: TwoPageParentSessionCache = new Map();
@@ -368,10 +371,34 @@
   const environmentSUEnabled = import.meta.env.VITE_SOURCE_ENV_SU_TRANSFER === 'true';
   const siteUnitEnvironmentEnabled = import.meta.env.VITE_SOURCE_SU_ENV_TRANSFER === 'true';
   let environmentSUOpen = $state(false);
-  let environmentSUDirection = $state<'forward' | 'reverse'>('forward');
+  let environmentSUDirection = $state<'forward' | 'reverse' | 'external-reverse'>('forward');
   let environmentSUEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
+  const externalSUEnvironmentEnabled = import.meta.env.VITE_EXTERNAL_SU_ENVIRONMENT_EDITING === 'true';
+  let externalSUEnvironmentBusy = $state(false);
+  let externalSUEnvironmentBlocked = $state(false);
+  const separateSUSelected = $derived(Boolean($projectState?.activeSU && $projectState.activeSU !== 'None' &&
+    $projectState.suPath && $projectState.suPath !== $projectState.projectPath));
+  $effect(() => {
+    if (!externalSUEnvironmentEnabled || siviStandalone) return;
+    const state = $projectState;
+    const unsubscribe = subscribeExternalSUEnvironmentActivity(activity => {
+      externalSUEnvironmentBusy = activity.busy; externalSUEnvironmentBlocked = activity.blocked;
+    });
+    if (state?.projectPath && state.suPath && separateSUSelected) {
+      const retained = externalSUEnvironmentSession({ contextId, project: state.activeProject,
+        projectPath: state.projectPath, su: state.activeSU, suPath: state.suPath });
+      if (untrack(() => retained.view().blocked)) {
+        const sourceForm = retained.requestSourceForm();
+        if (sourceForm && twoPageEntryReviewEnabled) {
+          twoPageEntryInitialForm = sourceForm; twoPageScope = 'entry'; twoPageProject = state.activeProject; twoPageOpen = true;
+        } else { environmentSUDirection = 'external-reverse'; environmentSUOpen = true; }
+      }
+    }
+    return unsubscribe;
+  });
   const profileReviewEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_REVIEW === 'true';
   const profileRunEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_RUN === 'true';
+  const profileSpeciesPresenceEnabled = import.meta.env.VITE_PROFILE_SPECIES_PRESENCE_PREVIEW === 'true';
   const profileEditingEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_EDITING === 'true';
   const profileCreationEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_CREATION === 'true';
   const profileDeletionEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_DELETION === 'true';
@@ -382,7 +409,7 @@
   let profileReviewBlocked = $state(false);
   let profileEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const independentHeaderWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy || environmentSUOpen || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy || siviIdentityBusy || siviCreationBusy || siviLifecycleBusy);
+  const independentHeaderWorkflowBusy = $derived(coordinateBusy || workingUnitBusy || qualityBusy || siteCodeBusy || regionCodeBusy || soilCodeBusy || geologyCodeBusy || parentCodeBusy || drainageBusy || speciesDecisionBusy || deletionBusy || codeCheckBusy || metadataBusy || profileReviewBusy || environmentSUOpen || externalSUEnvironmentBusy || externalSUEnvironmentBlocked || siviParentBusy || siviBusy || siviCombinedBusy || siviCoverBusy || siviCollectedBusy || siviSpeciesBusy || siviIdentityBusy || siviCreationBusy || siviLifecycleBusy);
   const otherHeaderWorkflowBusy = $derived(independentHeaderWorkflowBusy || twoPageOpen || twoPageBusy);
   const headerWorkflowBusy = $derived(otherHeaderWorkflowBusy || pictureBusy || pictureMetadataPending || twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked);
   const tabWorkflowBusy = $derived(otherHeaderWorkflowBusy || pictureBusy || (pictureMetadataClose?.busy ?? false));
@@ -542,7 +569,7 @@
   let humusList = $state<HumusRecord[]>([]);
   let mineralList = $state<MineralRecord[]>([]);
   let otherList = $state<OtherRecord[]>([]);
-  let auditList = $state<AuditEntry[]>([]);
+  let auditList = $state<OrdinaryAuditReadEntry[]>([]);
   let childRevision = $state(0);
   let headerRevision = $state(0);
 
@@ -1536,8 +1563,12 @@
     codeCheckOpen = true; error = null; successMsg = null;
   }
 
-  function openProjectMetadata() {
-    if (!metadataEnabled || childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0) {
+  export function canOpenProjectMetadata() {
+    return metadataEnabled && !childParentDisabled && !childUnsaved && Object.keys(headerValidation).length === 0;
+  }
+
+  export function openProjectMetadata() {
+    if (!canOpenProjectMetadata()) {
       error = 'Finish or Undo existing drafts and unlock the available plot before reviewing project metadata.';
       return;
     }
@@ -1611,6 +1642,22 @@
       return;
     }
     environmentSUDirection = direction; environmentSUOpen = true; error = null; successMsg = null;
+  }
+
+  function openExternalSUEnvironment() {
+    if (!externalSUEnvironmentEnabled || siviStandalone || !separateSUSelected || childParentDisabled ||
+        childUnsaved || Object.keys(headerValidation).length > 0 || !original) {
+      error = 'Select a separate SU file and finish or Undo all drafts before reviewing SU Into Env.';
+      return;
+    }
+    const state = $projectState;
+    if (!state?.projectPath || !state.suPath) {
+      error = 'Selected project and SU paths are unavailable; no transfer review was opened.';
+      return;
+    }
+    externalSUEnvironmentSession({ contextId, project: state.activeProject, projectPath: state.projectPath,
+      su: state.activeSU, suPath: state.suPath }).reviewSourceForm(null);
+    environmentSUDirection = 'external-reverse'; environmentSUOpen = true; error = null; successMsg = null;
   }
 
   async function refreshAfterRestore(plot: string, request: number) {
@@ -1987,7 +2034,7 @@
         ordinarySoilUnavailable ? [] : reads.track(PlotService.ListHumusRecords(p)),
         ordinarySoilUnavailable ? [] : reads.track(PlotService.ListMineralRecords(p)),
         reads.track(PlotService.ListOtherRecords(p)),
-        reads.track(PlotService.ListAuditEntries(p)),
+        reads.track(PlotService.ListAuditReadEntries(p)),
         reads.track(PlotService.GetChildCapabilities('Veg')),
         reads.track(PlotService.GetChildCapabilities('Humus')),
         reads.track(PlotService.GetChildCapabilities('Mineral')),
@@ -3341,10 +3388,15 @@
           disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 || $projectState?.activeSU === 'None'}
           onclick={() => openEnvironmentSU()}>Env Into SU</button>
       {/if}
-      {#if siteUnitEnvironmentEnabled && !siviStandalone}
+      {#if siteUnitEnvironmentEnabled && !siviStandalone && !(externalSUEnvironmentEnabled && separateSUSelected)}
         <button type="button" data-source-control="btnSuIntoEnv" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
           disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0 || $projectState?.activeSU === 'None'}
           onclick={() => openEnvironmentSU('reverse')}>SU Into Env</button>
+      {/if}
+      {#if externalSUEnvironmentEnabled && separateSUSelected && !siviStandalone && !twoPageOpen}
+        <button type="button" data-source-control="btnSuIntoEnv" data-external-su-environment-open class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
+          disabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
+          onclick={openExternalSUEnvironment}>SU Into Env: separate file</button>
       {/if}
       {#if onFindPlot}
         <button type="button" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
@@ -3522,7 +3574,7 @@
           unsaved: siviParentSharedUnsaved || (siviParentSharedClose?.blocked ?? false),
         } : null}
         onMetadata={metadataEnabled ? openProjectMetadata : undefined}
-        metadataDisabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
+        metadataDisabled={!canOpenProjectMetadata()}
         writeView={siviParentWriteView} writeDisabled={siviParentWriteEditingDisabled}
         writeCanSave={siviParentWriteClose?.canSave ?? false}
         onWriteOperation={operation => { void siviParentWriteOperation(operation); }}
@@ -3545,14 +3597,21 @@
         onSourceChange={source => { void changeSIVIProjectSource(source); }}
         oncancel={() => siviParentSession?.cancel()} />
     {/if}
-    {#if environmentSUOpen && $projectState?.projectPath}
+    {#if environmentSUOpen && environmentSUDirection !== 'external-reverse' && $projectState?.projectPath}
       <EnvironmentSUTransfer bind:this={environmentSUEditor} client={PlotService} {contextId}
         project={$projectState.activeProject} su={$projectState.activeSU} path={$projectState.projectPath}
-        direction={environmentSUDirection}
+        direction={environmentSUDirection === 'reverse' ? 'reverse' : 'forward'}
         onclosed={() => { environmentSUOpen = false; error = null; if (environmentSUDirection === 'reverse') void load(original?.plotNumber); }} />
+    {/if}
+    {#if environmentSUOpen && environmentSUDirection === 'external-reverse' && $projectState?.projectPath && $projectState.suPath}
+      <ExternalSUEnvironmentTransfer bind:this={environmentSUEditor} {contextId}
+        project={$projectState.activeProject} projectPath={$projectState.projectPath}
+        su={$projectState.activeSU} suPath={$projectState.suPath}
+        onclosed={() => { environmentSUOpen = false; error = null; void load(original?.plotNumber); }} />
     {/if}
     {#if profileReviewOpen}
       <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
+        allowPresence={profileSpeciesPresenceEnabled && $projectState !== null} {contextId} activeSU={$projectState?.activeSU}
         authorityBlocked={siviSourceBarrier}
         allowEditing={profileEditingEnabled && $projectState?.plotProfile?.writable === true} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}
         allowSaveSU={profileSaveSUEnabled} onsureview={async proposal => {
@@ -3576,6 +3635,14 @@
           <TwoPageVegetationPanel {contextId} project={twoPageProject} plot={draft.plotNumber} form={child.form}
             parentBlocked={linkedVegetationParentBlocked(child.form)} />
         {/key}
+      {:else if pictureReadingEnabled && twoPageScope === 'entry' && twoPageProject !== null && child.form === 'frmVPicsXL'}
+        <div data-two-page-picture-child={child.form} data-source-control={_control.controlId}
+          data-source-image-control="form:frmVPicsXL/imgCtl">
+          <PicturePanel {contextId} project={twoPageProject} plotNumber={draft.plotNumber} view="child"
+            observeMutationReceipts={false}
+            disabled={twoPageLinkedParentBlocked || twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked}
+            onBusyChange={(pending) => pictureBusy = pending} />
+        </div>
       {:else if ordinaryVegetationUnavailable && child.form.startsWith('SubVeg')}
         <p role="status" data-vegetation-ordinary-unavailable={child.form}>{ordinaryVegetationUnavailable}</p>
       {:else if ordinarySoilUnavailable && (child.form === 'SoilHumusXL' || child.form === 'SoilMineralXL')}
@@ -3587,8 +3654,23 @@
     {#if twoPageOpen && twoPageProject !== null}
       {#if twoPageScope === 'entry'}
         <TwoPageEntryEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
+          initialForm={twoPageEntryInitialForm}
+          pictureReaderAvailable={pictureReadingEnabled}
+          auditReaderAvailable={import.meta.env.VITE_TWO_PAGE_SOURCE_AUDIT_REVIEW === 'true'}
+          googleEarthReaderAvailable={import.meta.env.VITE_TWO_PAGE_GOOGLE_EARTH_REVIEW === 'true'}
+          vegetationTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_VEGETATION_TABLE_REVIEW === 'true'}
+          environmentTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_ENVIRONMENT_TABLE_REVIEW === 'true'}
+          projectMetadataReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROJECT_METADATA_REVIEW === 'true'}
+          profilingReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROFILING_REVIEW === 'true'}
+          profilingSource={$projectState?.plotProfile?.source ?? null}
+          vegetationTableSU={$projectState?.activeSU ?? ''}
+          vegetationTableSUPath={$projectState?.suPath ?? ''}
+          sourceProjectPath={$projectState?.projectPath ?? ''}
+          externalScope={externalSUEnvironmentEnabled && separateSUSelected && !siviStandalone && $projectState?.projectPath && $projectState.suPath
+            ? { contextId, project: $projectState.activeProject, projectPath: $projectState.projectPath, su: $projectState.activeSU, suPath: $projectState.suPath } : null}
+          sourceBlocked={twoPageLinkedParentBlocked || twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked}
           cache={twoPageEntrySessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
-          childBlocked={twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked}
+          childBlocked={twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked || pictureBusy || pictureMetadataPending}
           onbusy={value => twoPageBusy = value}
           onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
           oncommitted={() => refreshTwoPagePeers('entry')} embedded={twoPageLinkedChild} />
@@ -3848,7 +3930,7 @@
           onchange={markDirty} onvalidation={validateHeader}>
         {#snippet children(ordinaryEditor)}
         <HeaderEditor bind:draft {original} {capabilities} disabled={headerInputsDisabled}
-          onMetadata={metadataEnabled ? openProjectMetadata : undefined} metadataDisabled={childParentDisabled || childUnsaved || Object.keys(headerValidation).length > 0}
+          onMetadata={metadataEnabled ? openProjectMetadata : undefined} metadataDisabled={!canOpenProjectMetadata()}
           {editor} additionalEditor={ordinaryEditor} {masterAllowed}
           existing={original !== null}
           lists={{ moistureRegime: moistureList, nutrientRegime: nutrientList, mesoSlopePos: mesoSlopeList, surfaceShape: surfaceShapeList }}
@@ -3858,7 +3940,7 @@
           onQualityBusyChange={(pending) => qualityBusy = pending}
           onSiteCodeBusyChange={(pending) => siteCodeBusy = pending}
           onRegionCodeBusyChange={(pending) => regionCodeBusy = pending} {workingUnitSession}
-          pictureEditor={pictureReadingEnabled ? linkedPictures : undefined} />
+          pictureEditor={pictureReadingEnabled && !twoPageOpen ? linkedPictures : undefined} />
         {/snippet}
         </OrdinaryFields>
         {#snippet linkedPictures()}

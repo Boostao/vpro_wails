@@ -228,7 +228,7 @@ func TestTwoPageVegetationAttemptRotatedAbsenceIsUnknownAndLedgerCancellation(t 
 	if err != nil {
 		t.Fatal(err)
 	}
-	request := twoPageVegetationRequest{vegetationWriteUUID, original, []twoPageVegetationEdit{
+	request := twoPageVegetationRequest{RequestID: vegetationWriteUUID, Original: original, Edits: []twoPageVegetationEdit{
 		{ContextID: state.ContextID, Form: "SubVegDXL", RowID: rowID, Column: "Cover7",
 			Expected: *vegetationPlanCell(original, rowID, "Cover7"), Value: siviReal(5)},
 	}}

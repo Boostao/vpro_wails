@@ -19,13 +19,14 @@ type vegetationLayerRow struct {
 }
 
 type vegetationLayerUnit struct {
-	Code           ProjectMetadataCell
-	LongName       *string
-	NameStatus     string
-	NameCandidates []EnvironmentReportName
-	NumPlots       int
-	MembershipIDs  []string
-	Rows           []vegetationLayerRow
+	Code               ProjectMetadataCell
+	LongName           *string
+	NameStatus         string
+	NameCandidates     []EnvironmentReportName
+	NumPlots           int
+	MembershipIDs      []string
+	ProjectUnitIndexes []int
+	Rows               []vegetationLayerRow
 }
 
 type vegetationLayerDiagnostic struct {
@@ -35,9 +36,13 @@ type vegetationLayerDiagnostic struct {
 
 type vegetationLayerReport struct {
 	Project, SU, Title string
+	SelectedFieldType  string
 	Units              []vegetationLayerUnit
 	Diagnostics        []vegetationLayerDiagnostic
 	Quality            *vegetationQualitySelection
+	NoneUnits          []vegetationNoneUnitOccurrence
+	SelectedUnits      []vegetationSelectedUnitOccurrence
+	ProjectUnits       []vegetationProjectUnitInput
 }
 
 func vegetationTextKey(cell ProjectMetadataCell) string {
@@ -52,6 +57,10 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 	fail := func(err error) (vegetationLayerReport, error) { return vegetationLayerReport{}, err }
 	if err := ctx.Err(); err != nil {
 		return fail(err)
+	}
+	if prepared.projectUnitInputs != nil && (len(prepared.Memberships) != 0 ||
+		prepared.selectedUnitOccurrences != nil || prepared.noneUnitMembershipCounts != nil || prepared.qualityMembershipCounts != nil) {
+		return fail(errors.New("project report units cannot carry selected-SU memberships or occurrence weights"))
 	}
 	if prepared.Project == "" || prepared.SU == "" || options.Average != "all-plots" && options.Average != "observations" ||
 		options.Order != "species" && options.Order != "presence" {
@@ -111,7 +120,14 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 	units, memberships := map[string]*unitState{}, map[string][]string{}
 	physicalCounts := map[string]int{}
 	qualityDiagnostics := []vegetationLayerDiagnostic{}
-	for _, member := range prepared.Memberships {
+	reportMemberships, err := selectedUnitReportMemberships(ctx, prepared)
+	if err != nil {
+		return fail(err)
+	}
+	selectedIDs := map[string]map[string]bool{}
+	selectedCounts := map[string]int{}
+	selectedOrder := []string{}
+	for _, member := range reportMemberships {
 		if err := ctx.Err(); err != nil {
 			return fail(err)
 		}
@@ -126,8 +142,34 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 				inputs: []joined{}}
 		}
 		state := units[id]
-		state.unit.MembershipIDs = append(state.unit.MembershipIDs, member.RowID)
+		if prepared.selectedUnitOccurrences == nil {
+			state.unit.MembershipIDs = append(state.unit.MembershipIDs, member.RowID)
+		} else {
+			if selectedCounts[member.RowID] == 0 {
+				selectedOrder = append(selectedOrder, member.RowID)
+			}
+			selectedCounts[member.RowID]++
+			if selectedIDs[id] == nil {
+				selectedIDs[id] = map[string]bool{}
+			}
+			if !selectedIDs[id][member.RowID] {
+				state.unit.MembershipIDs = append(state.unit.MembershipIDs, member.RowID)
+				selectedIDs[id][member.RowID] = true
+			}
+		}
 		weight := 1
+		if prepared.noneUnitMembershipCounts != nil {
+			if prepared.qualityMembershipCounts != nil {
+				return fail(errors.New("None report unit preparation must not apply quality weights twice"))
+			}
+			weight = prepared.noneUnitMembershipCounts[member.RowID]
+			if weight <= 0 {
+				return fail(errors.New("None report unit preparation lost its derived Env/current-list join count"))
+			}
+			if weight > 1 {
+				qualityDiagnostics = append(qualityDiagnostics, vegetationLayerDiagnostic{"none_unit_join_multiplicity", member.RowID, weight})
+			}
+		}
 		if prepared.qualityMembershipCounts != nil {
 			weight = prepared.qualityMembershipCounts[member.RowID]
 			if weight <= 0 {
@@ -142,12 +184,47 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 			state.unit.NumPlots += weight
 		}
 		if member.PlotNumber.Text != nil {
-			physicalCounts[*member.PlotNumber.Text]++
+			if prepared.selectedUnitOccurrences == nil || selectedCounts[member.RowID] == 1 {
+				physicalCounts[*member.PlotNumber.Text]++
+			}
 			for i := 0; i < weight; i++ {
 				if err := ctx.Err(); err != nil {
 					return fail(err)
 				}
 				memberships[*member.PlotNumber.Text] = append(memberships[*member.PlotNumber.Text], id)
+			}
+		}
+	}
+	for _, id := range selectedOrder {
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		if selectedCounts[id] > 1 {
+			qualityDiagnostics = append(qualityDiagnostics, vegetationLayerDiagnostic{"selected_unit_join_multiplicity", id, selectedCounts[id]})
+		}
+	}
+	if prepared.projectUnitInputs != nil {
+		report.ProjectUnits, err = validateProjectUnitInputs(ctx, prepared.projectUnitInputs)
+		if err != nil {
+			return fail(err)
+		}
+		for i, row := range report.ProjectUnits {
+			if err := ctx.Err(); err != nil {
+				return fail(err)
+			}
+			id := vegetationTextKey(row.SiteUnit)
+			if units[id] == nil {
+				units[id] = &unitState{unit: vegetationLayerUnit{Code: cloneSiteUnitCell(row.SiteUnit),
+					MembershipIDs: []string{}, ProjectUnitIndexes: []int{}, Rows: []vegetationLayerRow{}}, inputs: []joined{}}
+			}
+			state := units[id]
+			state.unit.ProjectUnitIndexes = append(state.unit.ProjectUnitIndexes, i)
+			if row.SiteUnit.Text != nil || row.PlotNumber.Text != nil {
+				state.unit.NumPlots++
+			}
+			if row.PlotNumber.Text != nil {
+				physicalCounts[*row.PlotNumber.Text]++
+				memberships[*row.PlotNumber.Text] = append(memberships[*row.PlotNumber.Text], id)
 			}
 		}
 	}
@@ -167,7 +244,11 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 	}
 	for plot, count := range physicalCounts {
 		if count > 1 {
-			diagnose("physical_membership_multiplicity", plot, count)
+			code := "physical_membership_multiplicity"
+			if prepared.projectUnitInputs != nil {
+				code = "project_unit_join_multiplicity"
+			}
+			diagnose(code, plot, count)
 		}
 	}
 	for _, observation := range prepared.Observations {
@@ -212,6 +293,11 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 				}
 				if options.ShowEnglishName {
 					english = ref.Cells[sc["EnglishName"]]
+				}
+			}
+			if options.selectedFieldGrouping != nil && len(memberships[observation.PlotNumber]) != 0 {
+				if err := options.selectedFieldGrouping.observeProjected(ctx, name, english); err != nil {
+					return fail(err)
 				}
 			}
 			for _, layerRef := range layerRefs {
@@ -263,7 +349,11 @@ func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPrep
 		state := units[id]
 		// Orphan-only named units are absent from SnRecords' inner Veg join.
 		if state.unit.NumPlots == 0 || state.unit.Code.Text != nil && !active[id] {
-			diagnose("excluded_unit_without_vegetation", id, len(state.unit.MembershipIDs))
+			count := len(state.unit.MembershipIDs)
+			if prepared.projectUnitInputs != nil {
+				count = len(state.unit.ProjectUnitIndexes)
+			}
+			diagnose("excluded_unit_without_vegetation", id, count)
 			continue
 		}
 		buckets, names := map[string][]vegetationCrosstabInput{}, map[string]ProjectMetadataCell{}

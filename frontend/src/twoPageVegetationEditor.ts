@@ -3,6 +3,8 @@ import { exactSigned64 } from './projectMetadataRestore';
 import { wellFormedUTF16 } from './qualityEditor';
 import { finiteSingleValue } from './numericEditor';
 import { validSIVIRequestId } from './siviRequestId';
+import type { VegetationReferences } from './twoPageVegetationReferences';
+import { stageVegetationSpeciesList, requireVegetationSpeciesListCovers } from './twoPageVegetationSpeciesList';
 import {
   equalVegetationCell, vegetationNullCell, vegetationSourceCell, twoPageVegetationSource,
   twoPageVegetationOriginalFromWire, type TwoPageVegetationEdit, type TwoPageVegetationOriginal,
@@ -32,8 +34,9 @@ export function twoPageVegetationEditableID(original: TwoPageVegetationOriginal,
 }
 
 export function stageTwoPageVegetation(original: TwoPageVegetationOriginal, rowId: string, column: string,
-  raw: string, nullValue: boolean): TwoPageVegetationDraft {
+  raw: string, nullValue: boolean, speciesList?: VegetationReferences): TwoPageVegetationDraft {
   twoPageVegetationEditableID(original, rowId);
+  if (column === 'Species' && speciesList) return stageVegetationSpeciesList(original, rowId, raw, nullValue, speciesList);
   if (!twoPageVegetationFields(original).includes(column)) {
     throw new Error('Vegetation field is outside its source bindings; Species callbacks remain unavailable.');
   }
@@ -63,12 +66,12 @@ export function stageTwoPageVegetation(original: TwoPageVegetationOriginal, rowI
 }
 
 export function twoPageVegetationRequest(original: TwoPageVegetationOriginal, owner: TwoPageVegetationOwner,
-  drafts: TwoPageVegetationDrafts, requestId: string): TwoPageVegetationRequest {
+  drafts: TwoPageVegetationDrafts, requestId: string, speciesList?: VegetationReferences): TwoPageVegetationRequest {
   const reviewed = twoPageVegetationOriginalFromWire(original, owner);
   if (!validSIVIRequestId(requestId)) throw new Error('Vegetation Save requires a retained lowercase UUIDv4.');
   const edits: TwoPageVegetationEdit[] = [], seen = new Set<string>();
   for (const draft of Object.values(drafts)) {
-    const staged = stageTwoPageVegetation(reviewed, draft.rowId, draft.column, draft.raw, draft.nullValue);
+    const staged = stageTwoPageVegetation(reviewed, draft.rowId, draft.column, draft.raw, draft.nullValue, speciesList);
     const key = JSON.stringify([draft.rowId, draft.column]);
     if (draft.contextId !== owner.contextId || draft.form !== owner.form || seen.has(key) ||
       !equalVegetationCell(draft.expected, staged.expected) || draft.error || staged.error ||
@@ -81,5 +84,10 @@ export function twoPageVegetationRequest(original: TwoPageVegetationOriginal, ow
       expected: { ...staged.expected }, value: { ...staged.value } });
   }
   if (!edits.length) throw new Error('Vegetation Save requires at least one explicit changed data cell.');
+  if (edits.some(edit => edit.column === 'Species')) {
+    if (!speciesList) throw new Error('Species selection requires retained physical references.');
+    requireVegetationSpeciesListCovers(reviewed, edits);
+    return { requestId, original: reviewed, edits, speciesList };
+  }
   return { requestId, original: reviewed, edits };
 }

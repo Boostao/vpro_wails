@@ -39,14 +39,24 @@ type VegetationReportObservation struct {
 }
 
 type VegetationReportPreparation struct {
-	Project                 string                        `json:"project"`
-	SU                      string                        `json:"su"`
-	CoverColumns            []string                      `json:"coverColumns"`
-	Memberships             []VegetationReportMembership  `json:"memberships"`
-	Layers                  []VegetationReportLayer       `json:"layers"`
-	ReducedRows             []VegetationReportReducedRow  `json:"reducedRows"`
-	Observations            []VegetationReportObservation `json:"observations"`
-	qualityMembershipCounts map[string]int
+	Project                  string                        `json:"project"`
+	SU                       string                        `json:"su"`
+	CoverColumns             []string                      `json:"coverColumns"`
+	Memberships              []VegetationReportMembership  `json:"memberships"`
+	Layers                   []VegetationReportLayer       `json:"layers"`
+	ReducedRows              []VegetationReportReducedRow  `json:"reducedRows"`
+	Observations             []VegetationReportObservation `json:"observations"`
+	qualityMembershipCounts  map[string]int
+	noneUnitMembershipCounts map[string]int
+	selectedUnitOccurrences  []vegetationSelectedUnitOccurrence
+	projectUnitInputs        []vegetationProjectUnitInput
+}
+
+type vegetationReportEntries struct {
+	CoverColumns []string
+	Layers       []VegetationReportLayer
+	ReducedRows  []VegetationReportReducedRow
+	Observations []VegetationReportObservation
 }
 
 func longVegetationCoverColumns() []string {
@@ -97,6 +107,22 @@ func prepareLongVegetation(ctx context.Context, project, suName string, veg, su,
 			scope[*plot.Text] = true
 		}
 	}
+	entries, err := reduceLongVegetationEntries(ctx, veg, layers, vegColumns, layerColumns, scope)
+	if err != nil {
+		return fail(err)
+	}
+	result.CoverColumns, result.Layers = entries.CoverColumns, entries.Layers
+	result.ReducedRows, result.Observations = entries.ReducedRows, entries.Observations
+	sort.Slice(result.Memberships, func(i, j int) bool { return result.Memberships[i].RowID < result.Memberships[j].RowID })
+	return result, nil
+}
+
+func reduceLongVegetationEntries(ctx context.Context, veg, layers ProjectMetadataTable,
+	vegColumns, layerColumns map[string]int, scope map[string]bool) (vegetationReportEntries, error) {
+	fail := func(err error) (vegetationReportEntries, error) { return vegetationReportEntries{}, err }
+	result := vegetationReportEntries{CoverColumns: longVegetationCoverColumns(),
+		Layers: []VegetationReportLayer{}, ReducedRows: []VegetationReportReducedRow{},
+		Observations: []VegetationReportObservation{}}
 	for _, row := range layers.Rows {
 		if err := ctx.Err(); err != nil {
 			return fail(err)
@@ -194,7 +220,6 @@ func prepareLongVegetation(ctx context.Context, project, suName string, veg, su,
 		}
 		return a.Species.Text != nil && *a.Species.Text < *b.Species.Text
 	})
-	sort.Slice(result.Memberships, func(i, j int) bool { return result.Memberships[i].RowID < result.Memberships[j].RowID })
 	sort.Slice(result.Layers, func(i, j int) bool { return result.Layers[i].RowID < result.Layers[j].RowID })
 	coverIndex := map[string]int{}
 	for i, column := range result.CoverColumns {

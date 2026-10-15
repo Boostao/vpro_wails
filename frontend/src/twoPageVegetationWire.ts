@@ -4,6 +4,7 @@ import { exactSigned64 } from './projectMetadataRestore';
 import { equalCell } from './projectMetadataEditor';
 import { wellFormedUTF16 } from './qualityEditor';
 import identifierFold from './twoPageVegetationIdentifierFold.json';
+import type { VegetationReferences } from './twoPageVegetationReferences';
 
 export type TwoPageVegetationForm = 'SubVegAXL_BC' | 'SubVegAXL' | 'SubVegCXL' | 'SubVegDXL';
 export interface TwoPageVegetationOwner { contextId: string; project: string; plot: string; form: TwoPageVegetationForm }
@@ -15,9 +16,10 @@ export interface TwoPageVegetationOriginal extends TwoPageVegetationOwner {
 }
 type WireRequest = TwoPageVegetationWriteResult['history']['Request'];
 export type TwoPageVegetationEdit = NonNullable<WireRequest['edits']>[number];
-export type TwoPageVegetationRequest = Omit<WireRequest, 'original' | 'edits'> & {
+export type TwoPageVegetationRequest = Omit<WireRequest, 'original' | 'edits' | 'speciesList'> & {
   original: TwoPageVegetationOriginal;
   edits: TwoPageVegetationEdit[];
+  speciesList?: VegetationReferences;
 };
 const record = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value);

@@ -27,6 +27,8 @@ function registry(environment = {}, overrides = {}) {
         return Promise.resolve(client.proxy(wire));
       },
       ...overrides,
+    }, TwoPageVegetationSpeciesListService: {
+      Save: (...args) => { calls.push(['species-list-save', ...args]); return Promise.reject(new Error('Held independent Species transport failure')); },
     } },
     './twoPageVegetationSession': { TwoPageVegetationSession },
     './qualityEditor': loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') }),
@@ -84,6 +86,45 @@ test('literal tuple ownership preserves case whitespace delimiters contexts and 
     { ...owner, plot: 'P\0' }, { ...owner, form: 'USysVegA' },
   ]) assert.throws(() => api.twoPageVegetationSession(invalid), /literal/);
   assert.equal(api.calls.length, 0);
+});
+
+test('all27 Species review/writing/selection combinations keep the new dispatch independently unavailable by default', async () => {
+  for (const review of ['true', 'false', undefined]) {
+    for (const writing of ['true', 'false', undefined]) {
+      for (const selection of ['true', 'false', undefined]) {
+        const api = registry({ VITE_TWO_PAGE_VEGETATION_REVIEW: review, VITE_TWO_PAGE_VEGETATION_WRITING: writing,
+          VITE_TWO_PAGE_VEGETATION_SPECIES_LIST: selection }, {
+          GetSpeciesReferences: () => {
+            const refs = structuredClone(require('./twoPageVegetationSpeciesListReceipts.json')[7].history.Request.speciesList);
+            Object.assign(refs, owner);
+            return Promise.resolve(client.proxy(refs));
+          },
+        });
+        const enabled = review === 'true' && writing === 'true' && selection === 'true';
+        assert.equal(api.twoPageVegetationSpeciesListEnabled, enabled);
+        if (review !== 'true') {
+          assert.throws(() => api.twoPageVegetationSession(owner), /disabled/);
+          assert.equal(api.calls.length, 0);
+          continue;
+        }
+        const session = api.twoPageVegetationSession(owner);
+        await session.load(); await session.loadReferences();
+        if (!enabled) {
+          assert.throws(() => session.stage('-7', 'Species', 'A', false), /disabled|independent gate/);
+          assert.equal(api.calls.filter(call => call[0].includes('save')).length, 0);
+          continue;
+        }
+        session.stage('-7', 'Species', 'A', false);
+        assert.equal(await session.save(request.requestId), false);
+        assert.equal(api.calls.filter(call => call[0] === 'save').length, 0);
+        const dispatched = api.calls.filter(call => call[0] === 'species-list-save');
+        assert.equal(dispatched.length, 1);
+        assert.equal(dispatched[0][1], contextId);
+        assert.ok(JSON.parse(dispatched[0][2]).speciesList);
+        assert.equal(session.closeState().blocked, true);
+      }
+    }
+  }
 });
 
 test('readonly Species facade uses exact retained owner and aggregate operation/remount barriers independently of writing', async () => {

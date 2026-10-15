@@ -70,12 +70,20 @@ func (s *TwoPageVegetationService) Save(ctx context.Context, contextID, requestJ
 
 func (s *TwoPageVegetationService) saveTwoPageVegetationObserved(ctx context.Context, contextID, requestJSON string,
 	beforeCommit func(*sql.Tx) error, afterCommit func(*twoPageVegetationWriteResult) error) (*TwoPageVegetationWriteResult, error) {
+	return s.saveTwoPageVegetationQualifiedObserved(ctx, contextID, requestJSON, false, beforeCommit, afterCommit)
+}
+
+func (s *TwoPageVegetationService) saveTwoPageVegetationQualifiedObserved(ctx context.Context, contextID, requestJSON string,
+	speciesList bool, beforeCommit func(*sql.Tx) error, afterCommit func(*twoPageVegetationWriteResult) error) (*twoPageVegetationWriteResult, error) {
 	if err := s.require(ctx, true); err != nil {
 		return nil, err
 	}
 	var request twoPageVegetationRequest
 	if err := json.Unmarshal([]byte(requestJSON), &request); err != nil {
 		return nil, err
+	}
+	if (request.SpeciesList != nil) != speciesList {
+		return nil, errors.New("two-page Species list requests require their independently enabled selection service; legacy Save does not grant Species")
 	}
 	started, err := s.contexts.beginTwoPageVegetationAttempt(ctx, request)
 	if err != nil {

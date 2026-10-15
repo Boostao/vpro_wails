@@ -1,0 +1,968 @@
+{
+  "schemaVersion": 1,
+  "nativeDirectObservations": 106,
+  "nativeNegativeExponentBoundary": {
+    "lastAccepted": 1073741819,
+    "firstRefused": 1073741820
+  },
+  "unavailableDomainPolicy": [
+    "Explicitly refuse mathematical zero with positive exponent greater than28 as an unqualified source DOUBLE-zero conversion domain; do not imitate anomalous nonzero source values",
+    "The latter is a documented conservative unavailable-domain adaptation, including source-valid0e29/0e100; not claimed as source refusal or complete grammar parity"
+  ],
+  "cases": [
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "1e-323",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "1e-323",
+      "binary64LE": "0200000000000000"
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "1e-324",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "1e-325",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "1e-9999999",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "0e9999999",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "0e-9999999",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "-0e9999999",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "1e309",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "1.7976931348623157e308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "1.7976931348623157e+308",
+      "binary64LE": "ffffffffffffef7f"
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "1.79769313486232e308",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "1.",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "1",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": ".1",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 20,
+      "displayed": "0.1",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "+.1",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 20,
+      "displayed": "0.1",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "001.000",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "1",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "1e-252",
+      "binary64LE": "d17de44e84539d0b"
+    },
+    {
+      "source": "profile-literal-lexical-bounds-source",
+      "literal": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "0e308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "1.2882297539194267e-231",
+      "binary64LE": "0000000000000010"
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "0e309",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "0e310",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "0e999",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "0e+309",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "-0e309",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "0e00000309",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "0.1e309",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "1e+308",
+      "binary64LE": "a0c8eb85f3cce17f"
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "0.01e310",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "1e+308",
+      "binary64LE": "a0c8eb85f3cce17f"
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "1e308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "1e+308",
+      "binary64LE": "a0c8eb85f3cce17f"
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "1e00000308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "1e+308",
+      "binary64LE": "a0c8eb85f3cce17f"
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "0e-999999999999999999999",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "1e-999999999999999999999",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": ".1e309",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "1e+308",
+      "binary64LE": "a0c8eb85f3cce17f"
+    },
+    {
+      "source": "profile-literal-exponent-bounds-source",
+      "literal": "000.000e309",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "1.2882297539194267e-231",
+      "binary64LE": "0000000000000010"
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e0",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e1",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e2",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e6",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e7",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e14",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e15",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e16",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e28",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e29",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e100",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e307",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "1.2882297539194267e-231",
+      "binary64LE": "0000000000000010"
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "1.2882297539194267e-231",
+      "binary64LE": "0000000000000010"
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0.0e308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "1.2882297539194267e-231",
+      "binary64LE": "0000000000000010"
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "-0e308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "-1.2882297539194267e-231",
+      "binary64LE": "0000000000000090"
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e-308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e-309",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e-2147483647",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e-2147483648",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e-2147483649",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "1e-2147483647",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "1e-2147483648",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "1e-2147483649",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e0000000000000000000000000000000000000001",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "1.2882297539194267e-231",
+      "binary64LE": "0000000000000010"
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e1",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e308",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": true,
+      "daoType": 7,
+      "displayed": "1.2882297539194267e-231",
+      "binary64LE": "0000000000000010"
+    },
+    {
+      "source": "profile-literal-zero-exponents-source",
+      "literal": "0e1",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "0e-9999999",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "0e-99999999",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "0e-100000000",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "0e-999999999",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "0e-1000000000",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "0e-1073741823",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "0e-1073741824",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "0e-2147483646",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-9999999",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-99999999",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-100000000",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-999999999",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-1000000000",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-1073741823",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-1073741824",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-2147483646",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-000000000000000000000000000999999999",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "1e-000000000000000000000000001000000000",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponents-source",
+      "literal": "0e-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "0e-1000000008",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "0e-1000000009",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "0e-1000000010",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "0e-1000000011",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "1e-1000000008",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "1e-1000000009",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "1e-1000000010",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "1e-1000000011",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "1e-0000000000000001000000009",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "1e-0000000000000001000000010",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "1e-+1",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "1e+-1",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "1e--1",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-negative-exponent-adjacency-source",
+      "literal": "0e+0000000000000000000000001",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "0e-1073741817",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "0e-1073741818",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "0e-1073741819",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 4,
+      "displayed": "0",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "0e-1073741820",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "0e-1073741821",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "0e-1073741822",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "1e-1073741817",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "1e-1073741818",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "1e-1073741819",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "1e-1073741820",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "1e-1073741821",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "1e-1073741822",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "1e-0000000000000000000000000000001073741819",
+      "nativeSyntaxError": false,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 7,
+      "displayed": "0.0",
+      "binary64LE": "0000000000000000"
+    },
+    {
+      "source": "profile-literal-exponent-search-source",
+      "literal": "1e-0000000000000000000000000000001073741820",
+      "nativeSyntaxError": true,
+      "desktopUnavailableZeroExponent": false,
+      "daoType": 0,
+      "displayed": "",
+      "binary64LE": ""
+    }
+  ]
+}

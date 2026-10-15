@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 )
 
@@ -15,7 +16,10 @@ type LongVegetationSettings struct {
 	Order                string                         `json:"order"`
 	ShowEnglishName      bool                           `json:"showEnglishName"`
 	ShowSpeciesCode      bool                           `json:"showSpeciesCode"`
+	SelectedField        string                         `json:"selectedField,omitempty"`
 	Quality              *LongVegetationQualitySettings `json:"quality"`
+	UnitGrouping         string                         `json:"unitGrouping,omitempty"`
+	UnitFields           []string                       `json:"unitFields,omitempty"`
 }
 
 type LongVegetationQualityCriterion struct {
@@ -78,13 +82,14 @@ type LongVegetationRow struct {
 }
 
 type LongVegetationUnit struct {
-	Code           ProjectMetadataCell     `json:"code"`
-	LongName       *string                 `json:"longName"`
-	NameStatus     string                  `json:"nameStatus"`
-	NameCandidates []EnvironmentReportName `json:"nameCandidates"`
-	NumPlots       int                     `json:"numPlots"`
-	MembershipIDs  []string                `json:"membershipIds"`
-	Rows           []LongVegetationRow     `json:"rows"`
+	Code               ProjectMetadataCell     `json:"code"`
+	LongName           *string                 `json:"longName"`
+	NameStatus         string                  `json:"nameStatus"`
+	NameCandidates     []EnvironmentReportName `json:"nameCandidates"`
+	NumPlots           int                     `json:"numPlots"`
+	MembershipIDs      []string                `json:"membershipIds"`
+	ProjectUnitIndexes []int                   `json:"projectUnitIndexes,omitempty"`
+	Rows               []LongVegetationRow     `json:"rows"`
 }
 
 type LongVegetationDiagnostic struct {
@@ -94,12 +99,34 @@ type LongVegetationDiagnostic struct {
 }
 
 type LongVegetationReport struct {
-	Project     string                          `json:"project"`
-	SU          string                          `json:"su"`
-	Title       string                          `json:"title"`
-	Units       []LongVegetationUnit            `json:"units"`
-	Diagnostics []LongVegetationDiagnostic      `json:"diagnostics"`
-	Quality     *LongVegetationQualitySelection `json:"quality"`
+	Project                    string                                 `json:"project"`
+	SU                         string                                 `json:"su"`
+	Title                      string                                 `json:"title"`
+	Units                      []LongVegetationUnit                   `json:"units"`
+	Diagnostics                []LongVegetationDiagnostic             `json:"diagnostics"`
+	Quality                    *LongVegetationQualitySelection        `json:"quality"`
+	SelectedFieldType          string                                 `json:"selectedFieldType,omitempty"`
+	NoneUnits                  []LongVegetationNoneUnitOccurrence     `json:"noneUnits,omitempty"`
+	SelectedUnits              []LongVegetationSelectedUnitOccurrence `json:"selectedUnits,omitempty"`
+	SourceKind                 string                                 `json:"sourceKind,omitempty"`
+	ProjectUnits               []LongVegetationProjectUnit            `json:"projectUnits,omitempty"`
+	ExcludedProjectUnitIndexes []int                                  `json:"excludedProjectUnitIndexes,omitempty"`
+}
+
+type LongVegetationSelectedUnitOccurrence struct {
+	MembershipID string              `json:"membershipId"`
+	EnvRowID     *string             `json:"envRowId"`
+	AdminRowID   *string             `json:"adminRowId"`
+	PlotNumber   ProjectMetadataCell `json:"plotNumber"`
+	SiteUnit     ProjectMetadataCell `json:"siteUnit"`
+}
+
+type LongVegetationNoneUnitOccurrence struct {
+	EnvRowID          string              `json:"envRowId"`
+	MembershipID      string              `json:"membershipId"`
+	QualityOccurrence *int                `json:"qualityOccurrence"`
+	PlotNumber        ProjectMetadataCell `json:"plotNumber"`
+	SiteUnit          ProjectMetadataCell `json:"siteUnit"`
 }
 
 type LongVegetationPreview struct {
@@ -123,8 +150,16 @@ func vegetationSettings(options longVegetationOptions) LongVegetationSettings {
 		Title: options.Title, Average: options.Average, ConstantSpeciesList: options.ConstantSpeciesList,
 		PresenceGreaterThan: options.PresenceGreaterThan, MeanCoverGreaterThan: options.MeanCoverGreaterThan,
 		Order: options.Order, ShowEnglishName: options.ShowEnglishName, ShowSpeciesCode: options.ShowSpeciesCode,
+		SelectedField: options.SelectedField,
 	}
 	settings.Grouping = "layer"
+	if options.NoneUnits {
+		settings.UnitGrouping = "all-plots"
+	}
+	if options.SelectedUnitFields != nil {
+		settings.UnitGrouping = "selected-fields"
+		settings.UnitFields = append([]string{}, options.SelectedUnitFields...)
+	}
 	if options.NoneGrouping {
 		settings.Grouping = "none"
 	} else if options.LifeformGrouping {
@@ -149,60 +184,109 @@ func (s *ContextService) GetLongVegetationOptions(ctx context.Context, contextID
 		if owner.selection.SU == "None" {
 			return LongVegetationOptions{}, errors.New("Long Vegetation requires an explicitly selected SU, not an all-project fallback")
 		}
-		options, err := loadLongVegetationOptions(plots)
-		if err != nil {
-			return LongVegetationOptions{}, err
-		}
-		if err := s.checkLongVegetationGrouping(options); err != nil {
-			return LongVegetationOptions{}, err
-		}
-		if err := acquireMutexLease(ctx, &owner.mu); err != nil {
-			return LongVegetationOptions{}, err
-		}
-		defer owner.mu.Unlock()
-		if err := profileOwnedFiles(owner); err != nil {
-			return LongVegetationOptions{}, err
-		}
-		if err := ctx.Err(); err != nil {
-			return LongVegetationOptions{}, err
-		}
-		return LongVegetationOptions{
-			ContextID: contextID, Project: owner.selection.Project, ProjectPath: owner.selection.ProjectPath,
-			SU: owner.selection.SU, SUPath: owner.selection.SUPath, Settings: vegetationSettings(options),
-		}, nil
+		return withOwnedPreferenceSnapshot(ctx, plots, publicationReadSnapshotHooks{}, func(_ *sqliteContext, tx *sql.Tx) (LongVegetationOptions, error) {
+			values, err := plots.projects.preferences.snapshot()
+			if err != nil {
+				return LongVegetationOptions{}, err
+			}
+			options, err := s.decodeOwnedLongVegetationOptions(ctx, plots, tx, values)
+			if err != nil {
+				return LongVegetationOptions{}, err
+			}
+			if err := s.checkLongVegetationGrouping(options); err != nil {
+				return LongVegetationOptions{}, err
+			}
+			if options.SelectedField != "" {
+				columns, err := readLongVegetationSelectedFieldDefinitions(ctx, tx)
+				if err != nil {
+					return LongVegetationOptions{}, err
+				}
+				if _, _, err := longVegetationSelectedFieldColumn(columns, options.SelectedField); err != nil {
+					return LongVegetationOptions{}, err
+				}
+			}
+			return LongVegetationOptions{
+				ContextID: contextID, Project: owner.selection.Project, ProjectPath: owner.selection.ProjectPath,
+				SU: owner.selection.SU, SUPath: owner.selection.SUPath, Settings: vegetationSettings(options),
+			}, nil
+		})
 	})
 }
 
 func (s *ContextService) PreviewLongVegetation(ctx context.Context, contextID string) (LongVegetationPreview, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (LongVegetationPreview, error) {
-		options, err := loadLongVegetationOptions(plots)
-		if err != nil {
-			return LongVegetationPreview{}, err
-		}
-		if err := s.checkLongVegetationGrouping(options); err != nil {
-			return LongVegetationPreview{}, err
-		}
-		report, err := readLongVegetationLayers(ctx, plots, options)
-		if err != nil {
-			return LongVegetationPreview{}, err
-		}
-		transport, err := longVegetationTransport(ctx, report)
-		if err != nil {
-			return LongVegetationPreview{}, err
-		}
-		owner := plots.projects.sqlite
-		return LongVegetationPreview{
-			ContextID: contextID, ProjectPath: owner.selection.ProjectPath, SUPath: owner.selection.SUPath,
-			Settings: vegetationSettings(options), Report: transport,
-		}, nil
+		return withOwnedPreferenceSnapshot(ctx, plots, publicationReadSnapshotHooks{}, func(owner *sqliteContext, tx *sql.Tx) (LongVegetationPreview, error) {
+			values, err := plots.projects.preferences.snapshot()
+			if err != nil {
+				return LongVegetationPreview{}, err
+			}
+			options, err := s.decodeOwnedLongVegetationOptions(ctx, plots, tx, values)
+			if err != nil {
+				return LongVegetationPreview{}, err
+			}
+			if err := s.checkLongVegetationGrouping(options); err != nil {
+				return LongVegetationPreview{}, err
+			}
+			source, err := readLongVegetationReportSource(ctx, owner, tx, options)
+			if err != nil {
+				return LongVegetationPreview{}, err
+			}
+			transport, err := longVegetationTransport(ctx, source.Report)
+			if err != nil {
+				return LongVegetationPreview{}, err
+			}
+			return LongVegetationPreview{
+				ContextID: contextID, ProjectPath: owner.selection.ProjectPath, SUPath: owner.selection.SUPath,
+				Settings: vegetationSettings(options), Report: transport,
+			}, nil
+		})
 	})
 }
 
 func longVegetationTransport(ctx context.Context, source vegetationLayerReport) (LongVegetationReport, error) {
+	if source.ProjectUnits != nil {
+		return LongVegetationReport{}, errors.New("whole-project report transport is unavailable; original Env provenance cannot become selected-SU membership IDs")
+	}
+	for _, unit := range source.Units {
+		if unit.ProjectUnitIndexes != nil {
+			return LongVegetationReport{}, errors.New("selected-list transport cannot carry project unit ownership indexes")
+		}
+	}
+	return cloneLongVegetationTransport(ctx, source)
+}
+
+func cloneLongVegetationTransport(ctx context.Context, source vegetationLayerReport) (LongVegetationReport, error) {
+	if ctx == nil {
+		return LongVegetationReport{}, errors.New("Long Vegetation transport requires a context")
+	}
+	if err := ctx.Err(); err != nil {
+		return LongVegetationReport{}, err
+	}
 	result := LongVegetationReport{
 		Project: source.Project, SU: source.SU, Title: source.Title,
-		Units:       make([]LongVegetationUnit, 0, len(source.Units)),
-		Diagnostics: make([]LongVegetationDiagnostic, 0, len(source.Diagnostics)),
+		SelectedFieldType: source.SelectedFieldType,
+		Units:             make([]LongVegetationUnit, 0, len(source.Units)),
+		Diagnostics:       make([]LongVegetationDiagnostic, 0, len(source.Diagnostics)),
+	}
+	for _, occurrence := range source.NoneUnits {
+		if err := ctx.Err(); err != nil {
+			return LongVegetationReport{}, err
+		}
+		result.NoneUnits = append(result.NoneUnits, LongVegetationNoneUnitOccurrence{
+			EnvRowID: occurrence.EnvRowID, MembershipID: occurrence.MembershipRowID,
+			QualityOccurrence: cloneCatalogueValue(occurrence.QualityOccurrence),
+			PlotNumber:        cloneSiteUnitCell(occurrence.PlotNumber), SiteUnit: cloneSiteUnitCell(occurrence.SiteUnit),
+		})
+	}
+	for _, occurrence := range source.SelectedUnits {
+		if err := ctx.Err(); err != nil {
+			return LongVegetationReport{}, err
+		}
+		result.SelectedUnits = append(result.SelectedUnits, LongVegetationSelectedUnitOccurrence{
+			MembershipID: occurrence.MembershipRowID,
+			EnvRowID:     cloneCatalogueValue(occurrence.EnvRowID), AdminRowID: cloneCatalogueValue(occurrence.AdminRowID),
+			PlotNumber: cloneSiteUnitCell(occurrence.PlotNumber), SiteUnit: cloneSiteUnitCell(occurrence.SiteUnit),
+		})
 	}
 	for _, unit := range source.Units {
 		if err := ctx.Err(); err != nil {
@@ -211,9 +295,10 @@ func longVegetationTransport(ctx context.Context, source vegetationLayerReport) 
 		next := LongVegetationUnit{
 			Code: cloneSiteUnitCell(unit.Code), NumPlots: unit.NumPlots,
 			LongName: cloneCatalogueValue(unit.LongName), NameStatus: unit.NameStatus,
-			NameCandidates: make([]EnvironmentReportName, 0, len(unit.NameCandidates)),
-			MembershipIDs:  append([]string{}, unit.MembershipIDs...),
-			Rows:           make([]LongVegetationRow, 0, len(unit.Rows)),
+			NameCandidates:     make([]EnvironmentReportName, 0, len(unit.NameCandidates)),
+			MembershipIDs:      append([]string{}, unit.MembershipIDs...),
+			ProjectUnitIndexes: append([]int(nil), unit.ProjectUnitIndexes...),
+			Rows:               make([]LongVegetationRow, 0, len(unit.Rows)),
 		}
 		for _, candidate := range unit.NameCandidates {
 			if err := ctx.Err(); err != nil {

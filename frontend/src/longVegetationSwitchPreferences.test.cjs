@@ -163,6 +163,12 @@ test('actual report composition preserves default-off switches and propagates re
         './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': prefs,
         './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
         './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
         './LongVegetationSwitchPreferences.svelte': { default: child() }, './longEnvironmentReport': {}, './longVegetationReport': {},
         './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
           view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }
@@ -175,6 +181,7 @@ test('actual report composition preserves default-off switches and propagates re
   const panel = source('LongVegetationSwitchPreferences.svelte');
   assert.match(panel, /const value = event.currentTarget.checked; edit\(field.key, value\)/);
   assert.doesNotMatch(panel, /reads\.track\(LongVegetationSwitchPreferencesService\.Save/);
-  assert.match(reportSource, /switchView = switches.view\(\); preview = null; workbookReview = null/);
+  assert.match(reportSource, /switchView = switches.view\(\); invalidateReports\(\)/);
+  assert.match(reportSource, /function invalidateReports\(\) \{\s*preview = null; workbookReview = null;\s*projectWorkspace\?\.invalidate\(\)/);
   assert.ok(reportSource.indexOf('data-vegetation-workbook-unknown') < reportSource.indexOf('<LongVegetationSwitchPreferences'));
 });

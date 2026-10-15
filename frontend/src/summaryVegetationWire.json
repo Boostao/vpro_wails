@@ -1,0 +1,3002 @@
+[
+  {
+    "contextId": "owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\project # 'é'.db",
+    "su": "Report",
+    "suPath": "C:\\fixture\\project # 'é'.db",
+    "average": 1,
+    "display": 1,
+    "source": "literal-normal-su-layer",
+    "ordering": "literal-null-first-layer-species",
+    "memberships": [
+      {
+        "rowId": "1",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "2",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "3",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "4",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P5",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "5",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "B",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "6",
+        "plotNumber": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "7",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P9",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "8",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P6",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "Orphan",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      }
+    ],
+    "units": [
+      {
+        "code": "A",
+        "numPlots": 4,
+        "membershipIds": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "6"
+        ],
+        "rawVegRowIds": [
+          "1",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "code": "B",
+        "numPlots": 1,
+        "membershipIds": [
+          "5"
+        ],
+        "rawVegRowIds": [
+          "3"
+        ]
+      }
+    ],
+    "columns": [
+      "A",
+      "B"
+    ],
+    "rows": [
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "Alpha",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "1.00",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "0.75 - 10.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "1.00 - 5.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "1",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "2",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "3",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "2"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 20,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "4",
+            "conversionLayerId": "1",
+            "membershipId": "5",
+            "unit": "B",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "3"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "S",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "0.25",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "0.25 - 0.50",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "2",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [],
+            "rawVegRowIds": [
+              "4"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "contextId": "owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\project # 'é'.db",
+    "su": "Report",
+    "suPath": "C:\\fixture\\project # 'é'.db",
+    "average": 2,
+    "display": 1,
+    "source": "literal-normal-su-layer",
+    "ordering": "literal-null-first-layer-species",
+    "memberships": [
+      {
+        "rowId": "1",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "2",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "3",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "4",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P5",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "5",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "B",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "6",
+        "plotNumber": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "7",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P9",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "8",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P6",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "Orphan",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      }
+    ],
+    "units": [
+      {
+        "code": "A",
+        "numPlots": 4,
+        "membershipIds": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "6"
+        ],
+        "rawVegRowIds": [
+          "1",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "code": "B",
+        "numPlots": 1,
+        "membershipIds": [
+          "5"
+        ],
+        "rawVegRowIds": [
+          "3"
+        ]
+      }
+    ],
+    "columns": [
+      "A",
+      "B"
+    ],
+    "rows": [
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "Alpha",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "1.00",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "0.75 - 13.33",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "1.00 - 5.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "1",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "2",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "3",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "2"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 20,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "4",
+            "conversionLayerId": "1",
+            "membershipId": "5",
+            "unit": "B",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "3"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "S",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "0.25",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "0.25 - 2.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "2",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [],
+            "rawVegRowIds": [
+              "4"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "contextId": "owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\project # 'é'.db",
+    "su": "Report",
+    "suPath": "C:\\fixture\\project # 'é'.db",
+    "average": 1,
+    "display": 2,
+    "source": "literal-normal-su-layer",
+    "ordering": "literal-null-first-layer-species",
+    "memberships": [
+      {
+        "rowId": "1",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "2",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "3",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "4",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P5",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "5",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "B",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "6",
+        "plotNumber": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "7",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P9",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "8",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P6",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "Orphan",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      }
+    ],
+    "units": [
+      {
+        "code": "A",
+        "numPlots": 4,
+        "membershipIds": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "6"
+        ],
+        "rawVegRowIds": [
+          "1",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "code": "B",
+        "numPlots": 1,
+        "membershipIds": [
+          "5"
+        ],
+        "rawVegRowIds": [
+          "3"
+        ]
+      }
+    ],
+    "columns": [
+      "A",
+      "B"
+    ],
+    "rows": [
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "Alpha",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "V - 3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "IV - 4",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "V - 3",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "1",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "2",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "3",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "2"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 20,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "4",
+            "conversionLayerId": "1",
+            "membershipId": "5",
+            "unit": "B",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "3"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "S",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "II - 1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "II - 1",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "2",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [],
+            "rawVegRowIds": [
+              "4"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "contextId": "owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\project # 'é'.db",
+    "su": "Report",
+    "suPath": "C:\\fixture\\project # 'é'.db",
+    "average": 2,
+    "display": 2,
+    "source": "literal-normal-su-layer",
+    "ordering": "literal-null-first-layer-species",
+    "memberships": [
+      {
+        "rowId": "1",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "2",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "3",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "4",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P5",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "5",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "B",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "6",
+        "plotNumber": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "7",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P9",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "8",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P6",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "Orphan",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      }
+    ],
+    "units": [
+      {
+        "code": "A",
+        "numPlots": 4,
+        "membershipIds": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "6"
+        ],
+        "rawVegRowIds": [
+          "1",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "code": "B",
+        "numPlots": 1,
+        "membershipIds": [
+          "5"
+        ],
+        "rawVegRowIds": [
+          "3"
+        ]
+      }
+    ],
+    "columns": [
+      "A",
+      "B"
+    ],
+    "rows": [
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "Alpha",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "V - 3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "IV - 5",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "V - 3",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "1",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "2",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "3",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "2"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 20,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "4",
+            "conversionLayerId": "1",
+            "membershipId": "5",
+            "unit": "B",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "3"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "S",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "II - 2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "II - 2",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "2",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [],
+            "rawVegRowIds": [
+              "4"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "contextId": "owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\project # 'é'.db",
+    "su": "Report",
+    "suPath": "C:\\fixture\\project # 'é'.db",
+    "average": 1,
+    "display": 3,
+    "source": "literal-normal-su-layer",
+    "ordering": "literal-null-first-layer-species",
+    "memberships": [
+      {
+        "rowId": "1",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "2",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "3",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "4",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P5",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "5",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "B",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "6",
+        "plotNumber": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "7",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P9",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "8",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P6",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "Orphan",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      }
+    ],
+    "units": [
+      {
+        "code": "A",
+        "numPlots": 4,
+        "membershipIds": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "6"
+        ],
+        "rawVegRowIds": [
+          "1",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "code": "B",
+        "numPlots": 1,
+        "membershipIds": [
+          "5"
+        ],
+        "rawVegRowIds": [
+          "3"
+        ]
+      }
+    ],
+    "columns": [
+      "A",
+      "B"
+    ],
+    "rows": [
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "Alpha",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "V",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "IV - 10.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "V - 5.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "1",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "2",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "3",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "2"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 20,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "4",
+            "conversionLayerId": "1",
+            "membershipId": "5",
+            "unit": "B",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "3"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "S",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "II",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "II - 0.50",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "2",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [],
+            "rawVegRowIds": [
+              "4"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "contextId": "owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\project # 'é'.db",
+    "su": "Report",
+    "suPath": "C:\\fixture\\project # 'é'.db",
+    "average": 2,
+    "display": 3,
+    "source": "literal-normal-su-layer",
+    "ordering": "literal-null-first-layer-species",
+    "memberships": [
+      {
+        "rowId": "1",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "2",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "3",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "4",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P5",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "5",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "B",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "6",
+        "plotNumber": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "7",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P9",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "8",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P6",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "Orphan",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      }
+    ],
+    "units": [
+      {
+        "code": "A",
+        "numPlots": 4,
+        "membershipIds": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "6"
+        ],
+        "rawVegRowIds": [
+          "1",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "code": "B",
+        "numPlots": 1,
+        "membershipIds": [
+          "5"
+        ],
+        "rawVegRowIds": [
+          "3"
+        ]
+      }
+    ],
+    "columns": [
+      "A",
+      "B"
+    ],
+    "rows": [
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "Alpha",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "V",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "IV - 13.33",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "V - 5.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "1",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "2",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "3",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "2"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 20,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "4",
+            "conversionLayerId": "1",
+            "membershipId": "5",
+            "unit": "B",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "3"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "S",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "II",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "II - 2.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "2",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [],
+            "rawVegRowIds": [
+              "4"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "contextId": "owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\project # 'é'.db",
+    "su": "Report",
+    "suPath": "C:\\fixture\\project # 'é'.db",
+    "average": 1,
+    "display": 6,
+    "source": "literal-normal-su-layer",
+    "ordering": "literal-null-first-layer-species",
+    "memberships": [
+      {
+        "rowId": "1",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "2",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "3",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "4",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P5",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "5",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "B",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "6",
+        "plotNumber": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "7",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P9",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "8",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P6",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "Orphan",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      }
+    ],
+    "units": [
+      {
+        "code": "A",
+        "numPlots": 4,
+        "membershipIds": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "6"
+        ],
+        "rawVegRowIds": [
+          "1",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "code": "B",
+        "numPlots": 1,
+        "membershipIds": [
+          "5"
+        ],
+        "rawVegRowIds": [
+          "3"
+        ]
+      }
+    ],
+    "columns": [
+      "A",
+      "B"
+    ],
+    "rows": [
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "Alpha",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "5.00",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "10.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "5.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "1",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "2",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "3",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "2"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 20,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "4",
+            "conversionLayerId": "1",
+            "membershipId": "5",
+            "unit": "B",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "3"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "S",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "0.50",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "0.50",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "2",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [],
+            "rawVegRowIds": [
+              "4"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "contextId": "owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\project # 'é'.db",
+    "su": "Report",
+    "suPath": "C:\\fixture\\project # 'é'.db",
+    "average": 2,
+    "display": 6,
+    "source": "literal-normal-su-layer",
+    "ordering": "literal-null-first-layer-species",
+    "memberships": [
+      {
+        "rowId": "1",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "2",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "3",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P2",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "4",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P5",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "5",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P3",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "B",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "6",
+        "plotNumber": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "A",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "7",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P9",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      },
+      {
+        "rowId": "8",
+        "plotNumber": {
+          "storage": "text",
+          "text": "P6",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "siteUnit": {
+          "storage": "text",
+          "text": "Orphan",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        }
+      }
+    ],
+    "units": [
+      {
+        "code": "A",
+        "numPlots": 4,
+        "membershipIds": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "6"
+        ],
+        "rawVegRowIds": [
+          "1",
+          "2",
+          "4"
+        ]
+      },
+      {
+        "code": "B",
+        "numPlots": 1,
+        "membershipIds": [
+          "5"
+        ],
+        "rawVegRowIds": [
+          "3"
+        ]
+      }
+    ],
+    "columns": [
+      "A",
+      "B"
+    ],
+    "rows": [
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "Alpha",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "5.00",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "13.33",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "text",
+            "text": "5.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "1",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "1",
+            "conversionLayerId": "1",
+            "membershipId": "2",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "1"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 10,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "3",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "2"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 20,
+              "blobHex": null
+            }
+          },
+          {
+            "stageRowId": "4",
+            "conversionLayerId": "1",
+            "membershipId": "5",
+            "unit": "B",
+            "layerMapId": "1",
+            "referenceOrigins": [
+              {
+                "table": "USysAllSpecs",
+                "rowId": "1"
+              }
+            ],
+            "rawVegRowIds": [
+              "3"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 5,
+              "blobHex": null
+            }
+          }
+        ]
+      },
+      {
+        "layer": {
+          "storage": "text",
+          "text": "A1",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "species": {
+          "storage": "text",
+          "text": "S",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "order": {
+          "storage": "text",
+          "text": "2.00",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "covers": [
+          {
+            "storage": "text",
+            "text": "2.00",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          {
+            "storage": "null",
+            "text": null,
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          }
+        ],
+        "witnesses": [
+          {
+            "stageRowId": "2",
+            "conversionLayerId": "1",
+            "membershipId": "3",
+            "unit": "A",
+            "layerMapId": "1",
+            "referenceOrigins": [],
+            "rawVegRowIds": [
+              "4"
+            ],
+            "cover": {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 2,
+              "blobHex": null
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

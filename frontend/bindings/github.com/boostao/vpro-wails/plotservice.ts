@@ -83,6 +83,10 @@ export function ListAuditEntries(plotNumber: string): $CancellablePromise<$model
     return $Call.ByID(2252058387, plotNumber);
 }
 
+export function ListAuditReadEntries(plot: string): $CancellablePromise<$models.OrdinaryAuditReadEntry[] | null> {
+    return $Call.ByID(822689139, plot);
+}
+
 /**
  * ListHumusRecords returns all humus rows for a plot.
  */

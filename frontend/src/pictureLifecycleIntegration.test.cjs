@@ -355,7 +355,7 @@ test('persistent lifecycle ownership blocks root close, transitions and backgrou
   const closed = [];
   const context = componentFunctions('App.svelte', ['handleCloseRequest', 'respondToClose', 'requestTransition',
     'respondToTransition', 'navigate', 'loadPlots', 'refresh', 'loadHierarchy'], {
-    view: 'picture-manager', localEditorBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false,
+    view: 'picture-manager', localEditorBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false, summaryEnvironmentalBusy: false, projectReportBusy: false,
     busy: false, editor: null, transitionWorking: false, archivePublicationBusy: false,
     vegetationPublicationBusy: false, lifeformPublicationBusy: false, summaryPublicationBusy: false,
     pendingTransition: null, closeWorking: false, closeRequest: '', closeError: '', error: '', transitionError: '',
@@ -369,9 +369,9 @@ test('persistent lifecycle ownership blocks root close, transitions and backgrou
     },
   });
   const expression = source('App.svelte').match(/const editorBusy = \$derived\(([^;]+)\);/)[1];
-  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', `return ${expression}`);
+  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', 'summaryPreferenceBusy', 'summaryFieldListBusy', 'summaryEnvironmentalBusy', 'projectReportBusy', 'externalSUEnvironmentBusy', `return ${expression}`);
   Object.defineProperty(context, 'editorBusy', {
-    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy),
+    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy, context.summaryPreferenceBusy, context.summaryFieldListBusy, context.summaryEnvironmentalBusy, context.projectReportBusy, context.externalSUEnvironmentBusy),
   });
   const stop = value.subscribe(() => {
     const close = value.closeState();

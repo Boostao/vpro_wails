@@ -455,6 +455,16 @@ test('complete entry projection accounts for every source binding and exact scop
     assert.deepEqual(['xl', 'common', 'extra'].map(scope => view.fields.filter(field => field.scope === scope).length),
       form.endsWith('-CHARS') ? [98, 14, 8] : [96, 13, 9]);
     assert.deepEqual(Array.from(view.header, field => field.column), ['PlotNumber']);
+    assert.equal(view.googleEarthAction.controlId, `form:${form}/btnGoogleEarth`);
+    assert.equal(view.googleEarthAction.caption, 'Plot on Google Earth');
+    assert.equal(view.vegetationTableAction.controlId, `form:${form}/btnViewVegTable`);
+    assert.equal(view.vegetationTableAction.caption, 'View Veg Table');
+    assert.equal(view.environmentTableAction.controlId, `form:${form}/btnViewEnvTable`);
+    assert.equal(view.environmentTableAction.caption, 'View Env Table');
+    assert.equal(view.metadataAction.controlId, `form:${form}/btnLoadMetadata`);
+    assert.equal(view.metadataAction.caption, form.endsWith('-CHARS') ? 'Edit Metadata' : 'Edit Project Metadata');
+    assert.equal(view.profilingAction.controlId, `form:${form}/btnVegProfile`);
+    assert.equal(view.profilingAction.caption, 'Plot Profiling');
     assert.equal(view.header[0].sourceInstances.length, 3);
     assert.deepEqual(Array.from(view.pages, page => page.name), ['Site/Veg', 'Soil/Terrain']);
     assert.equal(view.children.length, 6);
@@ -471,6 +481,25 @@ test('complete entry projection accounts for every source binding and exact scop
       api.twoPageParentCommonFields(form).find(field => field.column === 'PlotType').label);
     assert.equal(view.fields.some(field => field.column === 'EnteredBy'), form.endsWith('-CHARS'));
     assert.equal(view.fields.some(field => field.column === 'UpdatedFromCards'), form.endsWith('-CHARS'));
+  }
+});
+test('entry projection requires exact resolved Google Earth source control and tooltip in both variants', () => {
+  for (const form of ['FS882-8x6XL', 'FS882-8x6XL-CHARS']) {
+    for (const change of [
+      source => source.controls = source.controls.filter(control => control.controlName !== 'btnGoogleEarth'),
+      source => source.controls.push(structuredClone(source.controls.find(control => control.controlName === 'btnGoogleEarth'))),
+      source => source.controls.find(control => control.controlName === 'btnGoogleEarth').type = 'Label',
+      source => source.controls.find(control => control.controlName === 'btnGoogleEarth').properties.ControlTipText.value = 'default',
+      source => source.controls.find(control => control.controlName === 'btnGoogleEarth').events[0].procedure = 'PlotPlotsInGE',
+      source => source.controls.find(control => control.controlName === 'btnGoogleEarth').events[0].resolved = false,
+    ]) {
+      const source = structuredClone(extra.twoPageParentSource(form));
+      change(source);
+      const altered = loadTypeScript('twoPageEntryProjection.ts', {
+        ...projectionDependencies, './twoPageParentSession': { ...extra, twoPageParentSource: () => source },
+      });
+      assert.throws(() => altered.twoPageEntryProjection(form), /Google Earth/);
+    }
   }
 });
 test('entry projection rejects altered binding, header, child and page closures rather than inferring owners', () => {
@@ -533,7 +562,7 @@ test('complete source pages group every visible control once and bound options e
     }
   }
 });
-test('complete entry layout composes exact source pages, disjoint scoped editors and linked children with no picture dispatch', () => {
+test('complete entry layout composes exact source pages and dispatches pictures only with explicit reader availability', () => {
   const SourcePage = serverComponent(readFileSync(`${__dirname}\\SourcePage.svelte`, 'utf8'), 'SourcePage.svelte', {
     './paperLayout': { ...paper, paperPage: () => { throw new Error('Complete entry must not select XL pages'); } },
     './formPresentation': presentation,
@@ -546,6 +575,7 @@ test('complete entry layout composes exact source pages, disjoint scoped editors
     import Layout from './Layout.svelte';
     export let form; export let columns; export let duplicate = false; export let wrongScope = false;
     export let controls = []; export let controlScope = 'xl'; export let duplicateControls = false;
+    export let pictureReaderAvailable;
   </script>
   {#snippet input(control, position)}<input data-live-column={control.column} data-live-control={control.controlId} style={position}/>{/snippet}
   {#snippet identity(field)}<input data-header-column={field.column} readonly value="P"/>{/snippet}
@@ -553,7 +583,7 @@ test('complete entry layout composes exact source pages, disjoint scoped editors
     <span data-linked-child={child.form} data-master={child.masterFields[0]} data-child={child.childFields[0]}
       data-child-control={control.controlName}></span>
   {/snippet}
-  <Layout {form} {identity} {embedded} editors={[
+  <Layout {form} {identity} {embedded} {pictureReaderAvailable} editors={[
     {scope:wrongScope ? 'xl' : 'common',columns:columns.common,input},
     {scope:'extra',columns:columns.extra,input},
     ...(duplicate ? [{scope:'common',columns:columns.common,input}] : []),
@@ -579,6 +609,13 @@ test('complete entry layout composes exact source pages, disjoint scoped editors
     assert.match(html, /aria-label="Pictures unavailable"/);
     assert.match(html, /data-source-page="Site\/Veg"/);
     assert.match(html, /data-source-page="Soil\/Terrain"/);
+    const available = render(Component, { props: { form, columns, pictureReaderAvailable: true } }).body;
+    assert.equal((available.match(/data-linked-child=/g) || []).length, 6);
+    assert.match(available, /data-linked-child="frmVPicsXL" data-master="PlotNumber" data-child="PlotNumber" data-child-control="frmVPics"/);
+    assert.doesNotMatch(available, /Pictures unavailable/);
+    const unavailable = render(Component, { props: { form, columns, pictureReaderAvailable: false } }).body;
+    assert.doesNotMatch(unavailable, /data-linked-child="frmVPicsXL"/);
+    assert.match(unavailable, /Pictures unavailable/);
     assert.throws(() => render(Component, { props: { form, columns, duplicate: true } }).body, /Multiple two-page editors/);
     assert.throws(() => render(Component, { props: { form, columns, wrongScope: true } }).body, /no matching xl page editor owner/);
     const page = projection.twoPageEntryProjection(form).pages[0];

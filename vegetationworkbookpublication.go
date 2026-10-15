@@ -155,7 +155,7 @@ func (s *vegetationWorkbookService) readSource(ctx context.Context, plots *PlotS
 	if err != nil {
 		return fail(err)
 	}
-	options, err := decodeLongVegetationOptions(values)
+	options, err := s.contexts.decodeOwnedLongVegetationOptions(ctx, plots, tx, values)
 	if err != nil {
 		return fail(err)
 	}
@@ -196,7 +196,18 @@ func (s *vegetationWorkbookService) readSource(ctx context.Context, plots *PlotS
 		if err != nil {
 			return fail(err)
 		}
-		if report.Quality != nil {
+		if options.SelectedUnitFields != nil {
+			summary, err = vegetationWorkbookSelectedUnitSummary(ctx, summary, source.Tables[5], source.Tables[6],
+				source.Tables[1], options.SelectedUnitFields, report)
+			if err != nil {
+				return fail(err)
+			}
+		} else if options.NoneUnits {
+			summary, err = vegetationWorkbookNoneUnitSummary(ctx, summary, env, report)
+			if err != nil {
+				return fail(err)
+			}
+		} else if report.Quality != nil {
 			summary, err = vegetationWorkbookQualitySummary(ctx, summary, *report.Quality)
 			if err != nil {
 				return fail(err)

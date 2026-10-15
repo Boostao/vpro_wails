@@ -36,8 +36,77 @@ NULL/empty metadata remains distinguishable.
 The form displays Trim(PlotNumber1), Trim(Representing1), raw Zone1/ProjectID1,
 `Label Date: ` plus the current Long Date and `(VPro)`. Display Trim removes ASCII
 spaces at absolute string ends only, not tabs or spaces before a final newline.
-Raw assignments remain available separately. Desktop date presentation uses the
-local clock/locale; exact Access regional formatting has not been calibrated.
+Raw assignments remain available separately. The original desktop path uses the
+browser's local clock/locale without exact Access regional-format calibration.
+The opt-in native successor below has a separately bounded source calibration.
+
+### Native regional date successor
+
+An independent `VITE_PLOT_LABEL_REGIONAL_DATE=true` build-time gate and
+`VPRO_PLOT_LABEL_REGIONAL_DATE=true` backend gate add a Windows Long Date path
+without changing the original browser-locale preview when off. Both remain
+default-off. When enabled, failure or an unsupported calendar refuses the whole
+card; it never falls back to browser formatting.
+
+The original form expression, `"Label Date: " & Format(Now(),"Long Date")`,
+is now independently observed on twelve fixed-clock inputs, including leap
+days, daylight-saving dates, year boundaries and year9999. Each String result
+agrees after readonly reopen. The source owner normally closed, is independently
+absent, has no DAO lock, and canonical source hashes are unchanged. This proves
+the recorded en-US/Gregorian `dddd, MMMM d, yyyy` cases, not all regional settings
+or physical printing. The portable [source fixture](../testdata/plot-label-regional-date.json)
+retains independent expected strings.
+
+The new owned RPC holds the existing context operation lease through reading
+and formatting. One physical Env/Admin query requires byte-exact original text
+parents; duplicates, numeric identities, substituted views, BLOB/nontext label
+fields and malformed UTF-8 refuse before JSON can repair them. NULL and empty
+label fields remain distinct. This stricter projection is an explicit opt-in
+adaptation; the legacy `GetPlot` reader is unchanged.
+
+Windows locale, Long Date pattern and Gregorian calendar are captured explicitly.
+The fixed captured pattern is passed to `GetDateFormatEx`; every native result
+checks full capacity/NUL termination and UTF-16 pairs before conversion.
+Alternative calendars and API failures are explicit errors. The client validates
+the exact strict-Go wire, source/owner, calendar date and text bounds, creates
+detached immutable values from actual Svelte proxies, and rechecks generation
+after validation before assigning a card. Existing Cancel/navigation/native-close
+barriers and default-off report entries remain unchanged.
+
+Focused Go race/native source vectors, sixteen coupled client cases,
+warning-free interface bindings, Svelte check0/0, frontend build and production
+compile pass. A mixed browser-condition SSR invocation is retained as a failed
+runner; repository-standard execution passes without an application workaround.
+Independent application review found no significant issues. Its native failure
+coverage gap is resolved with typed API seams, all seven API failure phases,
+unsupported calendars, zero/oversized capacities, the 4095/4096 UTF-16-unit
+boundary and actual Windows export/API refusals. Focused race passes in2.909s;
+distinct follow-up review closes the gap with no significant issues.
+Isolated enabled and legacy Wails candidates compile with exact embedded-byte
+verification, without replacing default frontend assets. Three normally closed
+Wails owners now verify current native date/metadata, source NULL/empty assignments,
+literal/source refusal and correction, three-width actual visibility/viewport
+containment, held successful response cancellation/remount/root/native-close
+barriers, backend-off refusal and legacy compatibility. Each preserves all16
+fixture files. The first report-only seed lacked physical Admin parents: its
+explicit refusal and zero-write normal close remain failed harness evidence;
+corrected fixtures create those parents before launch, not through the app.
+
+A separate current-candidate parent smoke verifies text Save, unchanged numeric
+omission, a later real numeric Save, exact audits/all physical tables, tab draft
+retention/Undo and P1/P2/P1 reopen. Its report-only NULL child identities are
+assigned disposable fixture IDs before launch; no child repair/creation parity
+is inferred. The first Save completed despite an incorrect two-audit runner
+expectation; independent inspection seals its one real audit and continuation
+never replays it. Full frontend1506 cases pass after five stale root lifecycle
+test fixtures add the existing environmental activity dependency, without changing
+application guards. Corrected complete1538-input race integration passes exit0
+with unchanged inputs/discovery. Final association rehashes all1538inputs,
+1002focused/native files,204supplement/source files and17reviewed application
+paths; the application freeze is released. A separate zero-write native supplement
+measures all eight disclosed assignment labels/values and live pending Cancel,
+disabled input/Preview at all three widths, not screenshots alone. No printer job
+or file publication is introduced.
 
 ## Desktop adaptation
 
@@ -65,7 +134,8 @@ Physical label output is not inferred from the form's preview or report metadata
 Print All clones `Forms("FS882-6x4").RecordsetClone`, fills twelve-slot batches and
 uses ProjectName where single preview uses ProjectID. Its named form differs
 from the XL Form_Open requirement. Exact batch scope/name behavior, report
-pagination of `USysBecLabelsAll`, printer ownership and output remain unavailable. No automatic
+general pagination of `USysBecLabelsAll`, printer ownership and output remain unavailable. The
+selected-device report projection below is not this callback's acceptance. No automatic
 print, destructive staging-table behavior or speculative ProjectName lookup is
 inherited.
 
@@ -138,11 +208,193 @@ The2520-twip gap between slots6/7 is not the1140-twip spacing of neighboring slo
 do not substitute a uniform twelve-row grid or assume a page break from this
 metadata alone. All72 batch controls are retained.
 
+## Native report PDF projection (not source print callbacks)
+
+Two fresh disposable Access databases now import the original single and
+twelve-slot report exports, without importing/opening FS882 or invoking label
+form callbacks. Synthetic BecLabels staging assigns all49 fields explicitly.
+The source DDL's exported empty DEFAULT clauses are omitted only in these
+fixtures; this does not qualify default/index reconstruction.
+
+Each disposable report selects Microsoft Print to PDF locally. No default
+printer is changed, `acViewNormal` is never invoked, and no job is spooled.
+Original control bindings, twip positions, fonts and sizes remain identical
+before/after that selection. Native preview/OutputTo produces four PDFs: single
+and twelve-slot reports with complete values, then NULL/empty/nonempty metadata.
+Independent PDF reopen verifies26 label slots,129 exact printed lines, source
+ASCII-space Trim, unchanged raw zone/project display, original current Long Date,
+and no text span outside the page. NULL and empty presentation both remain blank
+while the49-field source staging retains their typed distinction and is unchanged.
+
+All four outputs are one approximately612.16-by792.06-point page on this selected
+virtual device. The recovered nonuniform twelve-slot spacing is visible in the
+native renders; it is not replaced by a guessed grid. PDF span geometry/fonts are
+retained separately from design properties: neither report metadata nor this
+renderer observation proves other-device scale, stock alignment or pagination.
+Both source owners quit normally, are independently absent, and leave no DAO
+locks or canonical source changes. The27-file private source/projection seal has
+SHA256 `55cf99df652cbc40121f46b8854dfc9c1ad2c9555b978fbf272d3cecc24440d7`.
+
+This is a report-rendering contract, not a new application PDF export, source
+Print1/position-button/PrintAll callback grant or physical printing capability.
+In particular, Print All's ordinary FS882 recordset and ProjectName discrepancy,
+live-form staging/editing and six-position click behavior remain unresolved.
+
+### Portable single-label PDF preparation draft
+
+A private Go preparation kernel now uses `go-pdf/fpdf` with independently parsed
+runtime Arial/Arial Bold TrueType bytes, never the library's Helvetica alias.
+No Windows font files are bundled. Font identity, embedding/subsetting permission
+and required glyph coverage are checked before registration. Only installable
+or editable embedding permissions are supported; preview/print-only rights are
+not treated as permission for an unrestricted editable PDF. A separate private
+font-only experiment independently reopens four candidates containing all129
+original printed spans. Actual embedded font identities and exact text agree,
+but native glyph advances differ by up to0.834595 points. This is explicitly
+**not** accepted Access printer geometry; replaying observed text origins is not
+a layout implementation.
+
+The draft kernel instead prepares one portable Letter page with36-point margins,
+the six original relative control rectangles and measured font sizes/weights.
+It retains source ASCII-space Trim only for plot/representing, raw project/zone
+display, NULL/empty source distinction, the marker and calibrated en-US Long
+Date. Fixed spacing is an explicit adaptation, not CanGrow/CanShrink, driver or
+stock parity. The supported preparation boundary is printable ASCII with no
+field overflow; Unicode, multiline/clipped content, unsupported regional/date
+provenance, mismatched saved-plot ownership and missing/substituted/restricted
+fonts refuse with zero output. These are output availability decisions, not new
+constraints or repairs on historical database values or the existing preview.
+
+This preparation kernel alone grants no destination publication,
+Print All/position callback or printer output. Focused PDF/regional race passes
+in3.224s; ordinary and SQLite-only production builds pass. Independently reopened
+actual-kernel full/NULL examples verify10 exact printed spans, embedded Arial,
+a612-by792-point page, and every field's original relative rectangle/alignment.
+Input/font immutability, all twelve original date vectors, identity/text/glyph/
+embedding/overflow refusals and cancellation after registration/encoding pass.
+Distinct read-only review finds no significant issues. This accepts only the
+preparation boundary: owned-source publication, client lifecycle
+and integrated desktop acceptance remain unfinished; defaults are unchanged.
+
+A private runtime font loader now resolves the actual Windows directory rather
+than trusting environment paths. Bounded regular-file reads own their handles,
+surface open/stat/read/close failures and cancellation (including close-time
+cancellation), validate the captured font bytes and return no partial font pair.
+The existing cancellable chunk reader is reused. Missing or unsupported fonts
+never trigger substitution. Focused combined race3.206s and SQLite-only production
+compile pass; distinct loader review finds no significant issues. The preparation
+permission tightening also passes focused follow-up review/race3.119s and an
+ordinary production rebuild. No public output is enabled.
+
+### Owned PDF publication draft
+
+The private publication boundary reads complete physical Env/Admin rows and
+column metadata through caller-owned pinned snapshots, with literal TEXT/byte
+membership and exact selection/path/owner provenance. It retains raw NULL/empty
+cells and physical identities, native date and runtime-font hashes alongside
+internally generated deterministic PDF bytes. Existing legacy readers are
+unchanged. Client-supplied PDF bytes never establish authority: full approved
+bytes must agree with a fresh internal preparation.
+
+The shared artifact publisher owns staging/parent identities and never overwrites
+a destination. Source/date/font observations are repeated before the link and
+after publication. Completed observations establish equality only at their
+observation times: the owner mutex does not prevent writes through already
+borrowed pools, and no through-link source lock is claimed. Postcommit drift or
+cleanup errors retain the published path/hash with an explicit do-not-replay
+error, rather than returning an empty failure result.
+
+Focused coupled race8.480s and ordinary production compile pass. Actual published
+output independently reopens with six exact source strings (including literal
+project spaces), real embedded Arial and one612-by792-point page. Local/external
+paths, complete-peer automatic rowid reuse, stale source/date/fonts, forged
+headers/bytes/ownership, malformed storage, duplicate parents, cancellation and
+pinned-coordinator retry, no-overwrite collision, corruption/short-write and
+postcommit snapshot/stage-cleanup failures are tested. Distinct publication review
+finds no significant issues. Direct Windows destination-parent replacement now
+also refuses publication and retains the stage under its original moved parent;
+affected coupled race8.627s and focused review pass. The publisher alone does not
+establish retained desktop, printer or whole-migration acceptance.
+
+### Strict service and attempt recovery draft
+
+The new service has independently gated review/export methods and strict
+required-key JSON requests, including raw-Unicode and decoded duplicate-key
+checks. A review binds complete physical source, captured date/font provenance,
+internally generated bytes and ownership to source/PDF hashes. Its service-owner
+token is independent of the per-request lowercase UUIDv4.
+
+Per-service attempt records bind that token, the original context and exact
+canonical payload. A running request cannot replay. Completed calls return
+detached immutable outcomes, including committed cleanup errors. Readonly
+recovery remains available when exporting is disabled; it reports running work
+or seals a not-yet-arrived exact request before certifying no publication can
+begin. Recovery never republishes and may read a prior context's known ledger
+receipt without granting old-context writes.
+
+These receipts are process/service-owner scoped, not durable database history.
+A fresh service rejects retired-owner requests with explicit unknown outcome;
+an empty new ledger never certifies that a previous service did not publish.
+Source-preparation failures and pre/post-publication cancellation retain typed
+recoverable outcomes without claiming rollback of a committed file.
+
+Focused coupled race11.932s and ordinary production compile pass. Strict-wire,
+disabled/nil/canceled service, stale source approval, UUID payload/context
+ownership, held concurrent export/running recovery, delayed-arrival sealing,
+immutable receipts, service-owner replacement and committed-error/cancellation
+cases are covered. Distinct service review finds no significant issues.
+
+### Registered portable PDF desktop
+
+The service is now registered behind independent default-off
+`VPRO_PLOT_LABEL_PDF_EXPORT`; interface-mode Wails bindings preserve nullable
+contracts. Independent `VITE_PLOT_LABEL_PDF_EXPORT` enables the saved-label route
+and portable PDF controls, not original physical Print. With PDF off, existing
+browser/regional previews retain their prior behavior. Full project/SU paths and
+context identity accompany immutable raw reviewed DTOs; no Svelte deep proxy is
+cloned at the export boundary.
+
+The retained per-context publication session owns the exact lowercase UUIDv4,
+approved hashes, destination and service token. Export is neither cancelled nor
+replayed. Busy/unknown/unacknowledged outcomes hold root lifecycle barriers;
+readonly recovery checks exact context/UUID/destination/bytes. Unknown outcomes
+cannot be acknowledged as success. Known immutable receipts survive acknowledgement
+and remount independently of source preview/card visibility. A retired service
+owner stays explicitly unknown, never inferred as no publication.
+
+Coupled race12.108s includes strict Go/client wire and independent default-off
+registration. Thirty focused and1545 complete frontend case executions, check0/0,
+default frontend and two exact-embed isolated Wails builds pass. Distinct15-file
+desktop review finds no significant issues. Four normally closed disposable
+owners retain all16 database/config files and verify one once-only PDF, six
+independently reopened exact strings/embedded Arial/Letter page, actual successful
+chunk-aware response hold/loss, readonly recovery without replay, card-independent
+receipt remount, actual read Cancel/late-result rejection, NULL/empty/refusal
+correction, backend/client gates and51 control/receipt measurements at1400/600/320.
+The rejected read-only predecessor used an assignment selector that also included
+new PDF hash fields; corrected scoping preserves its failure/cleanup evidence and
+all application guards. Complete1578-input race integration passes exit0 in
+5401.705149s with unchanged inputs/discovery. Final association rehashes1031
+native/build/review artifacts, preparation/service predecessors and27 source
+projection files, verifies five canonical label sources and seven original
+native/source owners absent, and releases the freeze. A failed missing-process
+exit-status assumption is corrected to accept only the explicit no-process error.
+This accepts the bounded portable workflow, not whole-migration completion.
+No defaults, canonical data, physical printing or unresolved callbacks change.
+
 Single print positions2-6 **add**, not subtract,
 0.6666/1.3333/2/2.6666/3.3333 *1440 to all six original control Tops.
 The form explicitly names Avery #02181. These decimal offsets differ from the
 batch spacing and are not a license to guess driver rounding, pagination or
-paper calibration. Built-in properties omitted by SaveAsText (including some
+paper calibration. A bounded original-VBA-leaf probe currently exhausted two
+attempts without runtime qualification of positions2-6: unsupported Section COM
+access, then Access.Run argument dispatch. Position1 produced an original PDF
+with unchanged staging and restored controls, but is not additional-position
+acceptance. Both failed owners normally quit, are independently absent and
+DAO-unlocked; five canonical label sources remain unchanged and no job was
+spooled. Additional positions remain unavailable rather than inheriting
+arithmetic-only evidence.
+Built-in properties omitted by SaveAsText (including some
 textbox Heights and ProjectID FontSize) remain absent in the export; the separate
 measured-default boundary below now resolves these properties. Exported FontName=Arial
 defaults retain their inherited provenance. Opaque printer blobs are not copied

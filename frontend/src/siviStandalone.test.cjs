@@ -3,7 +3,8 @@ const { test } = require('node:test');
 const { readFileSync } = require('node:fs');
 const path = require('node:path');
 const { compile } = require('svelte/compiler');
-const { componentFunctions } = require('./svelteTestHelpers.cjs');
+const { componentFunctions, serverComponent } = require('./svelteTestHelpers.cjs');
+const { render } = require('svelte/server');
 const source = name => readFileSync(path.join(__dirname, name), 'utf8');
 
 test('standalone source remains reduced normal SIVI, with 77 unique bound controls and three exact plot-linked children', () => {
@@ -51,6 +52,69 @@ test('actual entry does not bypass unsaved/close transition decisions or replace
   context.selected = { plotNumber: 'second' };
   await assert.rejects(pending('owned'), /Selected plot changed/);
   assert.equal(context.editorPlotNumber, 'original'); assert.equal(context.view, 'plots');
+});
+
+test('compiled Forms menu requires an available owned entry and callback without enabling other unavailable actions', () => {
+  const icons = new Proxy({}, { get: () => () => {} });
+  const component = serverComponent(source('Navigation.svelte'), 'Navigation.svelte', { '@lucide/svelte': icons });
+  for (const available of [false, true]) {
+    for (const callback of [undefined, () => {}]) {
+      const html = render(component, { props: {
+        view: 'plots', onnavigate: () => {}, siviAvailable: available, onopensivi: callback,
+      } }).body;
+      const button = html.match(/<button\b([^>]*)>[\s\S]*?<span>Enter\/Edit SIVI Data<\/span>\s*<\/button>/)?.[0];
+      assert.ok(button, 'the actual compiled menu must render its SIVI action');
+      const ownButton = button.slice(button.lastIndexOf('<button'));
+      assert.equal(/\bdisabled(?:\s|=|>)/.test(ownButton), !(available && callback));
+      assert.match(ownButton, available && callback ? /Existing draft and close guards apply/ : /Select a plot and enable/);
+      for (const label of ['Metadata', 'Herbarium', 'Colour-theme', 'User setup']) {
+        const menuButton = html.match(new RegExp(`<button\\b[^>]*>[\\s\\S]*?<span>${label}<\\/span>\\s*<\\/button>`))?.[0];
+        assert.ok(menuButton);
+        assert.match(menuButton.slice(menuButton.lastIndexOf('<button')), /\bdisabled(?:\s|=|>)/);
+      }
+    }
+  }
+});
+
+test('actual menu action closes its disclosure before delegating once to the existing guarded entry', () => {
+  const calls = [];
+  const context = componentFunctions('Navigation.svelte', ['itemEnabled', 'activate', 'closeMenu', 'navigate'], {
+    siviAvailable: false, onopensivi: undefined, openMenu: 'Forms',
+    navigation: { querySelector: () => ({ querySelector: () => ({ focus: () => calls.push('focus') }) }) },
+    onnavigate: view => calls.push(view),
+  });
+  context.actions.activate({ action: 'sivi' });
+  assert.deepEqual(calls, []);
+  context.siviAvailable = true;
+  context.actions.activate({ action: 'sivi' });
+  assert.deepEqual(calls, []);
+  context.onopensivi = () => { assert.equal(context.openMenu, null); calls.push('sivi'); };
+  context.actions.activate({ action: 'sivi' });
+  assert.deepEqual(calls, ['focus', 'sivi']);
+  context.siviAvailable = false;
+  context.actions.activate({ action: 'sivi' });
+  assert.deepEqual(calls, ['focus', 'sivi']);
+  context.actions.activate({ view: 'plots' });
+  assert.deepEqual(calls, ['focus', 'sivi', 'plots']);
+});
+
+test('root menu availability shares the existing standalone gate, selected plot and known context', () => {
+  const app = source('App.svelte');
+  assert.match(app, /siviAvailable=\{siviStandaloneEnabled && !!selected && !!\$projectState\?\.contextId\}/);
+  assert.match(app, /onopensivi=\{\(\) => void openSIVI\(\)\}/);
+  assert.doesNotMatch(source('Navigation.svelte'), /VITE_SIVI/);
+});
+
+test('actual root gate requires both literal feature flags in every prerequisite combination', () => {
+  const initializer = source('App.svelte').match(/const siviStandaloneEnabled = ([^;]+);/)?.[1];
+  assert.ok(initializer);
+  const enabled = new Function('environment', `return ${initializer.replaceAll('import.meta.env', 'environment')}`);
+  for (const standalone of [undefined, 'false', 'TRUE', 'true']) {
+    for (const parent of [undefined, 'false', 'TRUE', 'true']) {
+      assert.equal(enabled({ VITE_SIVI_STANDALONE: standalone, VITE_SIVI_PARENT_REVIEW: parent }),
+        standalone === 'true' && parent === 'true');
+    }
+  }
 });
 
 test('shared parent opener preserves busy/draft barriers and loads originals and preference choices through one path', async () => {

@@ -152,8 +152,12 @@ func TestLongVegetationLifeformFormatterAndMissingDefinitions(t *testing.T) {
 		}
 	}
 	layer, err := vegetationLifeformInsertionLayer(null)
-	if err != nil || layer.Storage != "null" {
-		t.Fatal("NULL formatter invented '?' key", layer, err)
+	if err != nil || layer.Storage != "text" || layer.Text == nil || *layer.Text != "?" {
+		t.Fatal("SQL Format(NULL,'00') lost empty-to-question conversion", layer, err)
+	}
+	layer, err = vegetationLifeformNull2Question(null)
+	if err != nil || !reflect.DeepEqual(layer, null) {
+		t.Fatal("direct Null2Question(NULL) must preserve NULL", layer, err)
 	}
 	layer, err = vegetationLifeformNull2Question(metadataText(""))
 	if err != nil || *layer.Text != "?" {
@@ -162,8 +166,104 @@ func TestLongVegetationLifeformFormatterAndMissingDefinitions(t *testing.T) {
 	prepared := lifeformPreparedFixture()
 	lifeformSetCover(&prepared, 0, "Cover1", strataReal(1))
 	result, err := prepareLongVegetationLifeforms(context.Background(), prepared, lifeformReferenceFixture())
-	if err != nil || result.Observations[0].Layer.Storage != "null" || *result.Observations[0].Cover.Real != 1 {
+	if err != nil || len(result.Observations) != 1 || result.Observations[0].Layer.Text == nil ||
+		*result.Observations[0].Layer.Text != "?" || *result.Observations[0].Cover.Real != 1 {
 		t.Fatal("LEFT JOIN missing definition dropped observation", result, err)
+	}
+}
+
+func TestLongVegetationLifeformNullableInsertionSourceRows(t *testing.T) {
+	null := ProjectMetadataCell{Storage: "null"}
+	for _, reference := range []struct {
+		name  string
+		table ProjectMetadataTable
+	}{
+		{"missing", lifeformReferenceFixture()},
+		{"nullable", lifeformReferenceFixture(lifeformReferenceRow("A", "A", null, null, metadataText("U")))},
+		{"nullable-fanout", lifeformReferenceFixture(
+			lifeformReferenceRow("A", "A", null, null, metadataText("U")),
+			lifeformReferenceRow("A", "Other", null, null, metadataText("U")))},
+	} {
+		for _, cover := range []struct {
+			name string
+			in   float64
+			want float64
+		}{
+			{"all-null", 0, 0}, {"zero", 0, 0}, {"negative", -3, -3},
+			{"single-three-tenths", 0.3, 0.30000001192092896},
+			{"positive", 30, 30}, {"cap", 120, float64(float32(99.9))},
+		} {
+			t.Run(reference.name+"/"+cover.name, func(t *testing.T) {
+				prepared := lifeformPreparedFixture()
+				if cover.name != "all-null" {
+					lifeformSetCover(&prepared, 0, "Cover1", strataReal(cover.in))
+				}
+				result, err := prepareLongVegetationLifeforms(context.Background(), prepared, reference.table)
+				if err != nil || len(result.Observations) != 1 {
+					t.Fatal(result, err)
+				}
+				row := result.Observations[0]
+				want := cover.want
+				if reference.name == "nullable-fanout" {
+					want *= 2
+				}
+				if row.PlotNumber != "P" || !reflect.DeepEqual(row.Species, metadataText("A")) ||
+					!reflect.DeepEqual(row.Layer, metadataText("?")) ||
+					row.Cover.Real == nil || *row.Cover.Real != want {
+					t.Fatal("source question stage, retained cover or reference fanout differs", row, want)
+				}
+			})
+		}
+	}
+}
+
+func TestLongVegetationLifeformQuestionLayerJoinPreservesNullMasterGroup(t *testing.T) {
+	prepared := lifeformPreparedFixture()
+	lifeformSetCover(&prepared, 0, "Cover1", strataReal(4))
+	missing := lifeformReferenceFixture()
+	options := layerTestOptions()
+	options.ConstantSpeciesList = false
+	options.PresenceGreaterThan, options.MeanCoverGreaterThan = -1, -100
+	for _, test := range []struct {
+		name   string
+		layers ProjectMetadataTable
+		factor float64
+	}{
+		{"unmatched-question", lifeformLayerFixture(), 1},
+		{"matched-question-fanout", lifeformLayerFixture("?", "?"), 2},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			report, err := planLongVegetationLifeforms(context.Background(), prepared, missing, missing, test.layers, options)
+			if err != nil || len(report.Units) != 2 {
+				t.Fatal(report, err)
+			}
+			for _, unit := range report.Units {
+				if len(unit.Rows) != 1 {
+					t.Fatal(unit)
+				}
+				row := unit.Rows[0]
+				wantMean := 2 * test.factor
+				if unit.Code.Text != nil {
+					wantMean = 4 * test.factor
+				}
+				if row.Layer.Storage != "null" || !reflect.DeepEqual(row.Species, metadataText("A")) ||
+					row.MeanCover == nil || *row.MeanCover != wantMean {
+					t.Fatal("insertion key confused with nullable master report group", row, wantMean)
+				}
+			}
+			found := false
+			for _, diagnostic := range report.Diagnostics {
+				if diagnostic.Code == "missing_layer_label" {
+					if test.factor != 1 || diagnostic.Identity != vegetationTextKey(metadataText("?")) {
+						t.Fatal("missing-layer diagnostic lost physical question identity", diagnostic)
+					}
+					found = true
+				}
+			}
+			if found != (test.factor == 1) {
+				t.Fatal("question LayerCode join evidence differs", report.Diagnostics)
+			}
+		})
 	}
 }
 

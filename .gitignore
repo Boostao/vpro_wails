@@ -23,6 +23,14 @@ build/android/gen/
 /.cache/
 /coverage/
 /.child-test-*/
+/_friday_demo_assets/
+/_friday_demo_menu_assets/
+/_presence_species_desktop_build/
+/_presence_species_desktop_build_final/
+/_presence_species_desktop_build_v2/
+/_presence_species_desktop_build_v3/
+/_ribbon_metadata_menu_assets/
+/_ribbon_sivi_menu_assets/
 *.log
 *.tmp
 *.temp
@@ -34,7 +42,11 @@ __pycache__/
 *.py[cod]
 # Native Access copies are private oracle data, not application resources.
 *.accdb
+*.accda
+*.accde
+*.accdr
 *.mdb
+*.mde
 *.laccdb
 *.ldb
 # Keep resources/*.db, sealed fixture inputs and generated Wails bindings tracked:

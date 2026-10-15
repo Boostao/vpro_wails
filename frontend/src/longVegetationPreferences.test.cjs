@@ -115,8 +115,8 @@ test('actual title handlers cancel reads and refuse stale publication without ca
   let release, cancellations = 0, saves = 0;
   const context = componentFunctions('LongVegetationReport.svelte',
     ['cancel', 'loadSavedTitle', 'saveTitle', 'editTitle'], {
-      preferences: session, preferenceView: session.view(), busy: false, operationHeld: false,
-      workbookBarrier: false, preferenceBarrier: false, statistics: null, statisticsBarrier: false, switchBarrier: false, thresholdBarrier: false, groupBarrier: false, qualityNullBarrier: false, generation: 0, error: '',
+      preferences: session, preferenceView: session.view(), busy: false, operationHeld: false, projectWorkspace: null,
+      workbookBarrier: false, preferenceBarrier: false, statistics: null, statisticsBarrier: false, switchBarrier: false, thresholdBarrier: false, groupBarrier: false, qualityNullBarrier: false, qualityMinimumBarrier: false, namingBarrier: false, selectedFieldBarrier: false, enforcementBarrier: false, unitBarrier: false, unitMutationHeld: false, generation: 0, error: '',
       reads: new ReadRequests(), contextId: scope.contextId, reportBusy() {},
       LongVegetationPreferencesService: {
         GetLongVegetationPreferences() {
@@ -150,6 +150,12 @@ test('enabled title presentation has one visible labelled control and retained s
         './longVegetationSwitchPreferences': {},
         './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
         './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
         './LongVegetationSwitchPreferences.svelte': { default() {} },
         './longEnvironmentReport': {},
         './longVegetationReport': {},

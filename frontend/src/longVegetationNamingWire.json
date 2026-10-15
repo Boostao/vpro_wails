@@ -1,0 +1,16 @@
+{
+  "review": {
+    "contextId": "naming-wire",
+    "project": "Sample",
+    "projectPath": "C:\\fixtures\\Sample.sqlite",
+    "su": "None",
+    "suPath": "",
+    "values": { "mode": 1, "selectedField": " historical\u0000field " },
+    "availability": { "none": true, "english": true, "code": true, "selectedField": false }
+  },
+  "request": {
+    "expected": { "mode": 1, "selectedField": " historical\u0000field " },
+    "proposed": { "mode": 2, "selectedField": "" }
+  },
+  "outcome": { "contextId": "naming-wire", "changed": true, "committed": true, "errorMessage": "" }
+}

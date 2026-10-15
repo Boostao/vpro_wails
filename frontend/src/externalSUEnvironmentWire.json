@@ -1,0 +1,55 @@
+{
+  "review": {
+    "review": {
+      "contextId": "EXTERNAL-SU-WIRE",
+      "project": "Project",
+      "su": "Selected",
+      "path": "C:\\wire\\project.db",
+      "env": {
+        "columns": [{"name":"PlotNumber","declaredType":"TEXT"},{"name":"Flag","declaredType":"INTEGER"}],
+        "rows": [{"rowId":"1","cells":[{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},{"storage":"integer","text":null,"integer":"0","real":null,"blobHex":null}]}]
+      },
+      "admin": {
+        "columns": [{"name":"Plot","declaredType":"TEXT"},{"name":"UserSiteUnit","declaredType":"TEXT"},{"name":"SiteUnitShortName","declaredType":"TEXT"},{"name":"SiteUnitLongName","declaredType":"TEXT"}],
+        "rows": [{"rowId":"2","cells":[{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Old","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"","integer":null,"real":null,"blobHex":null},{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null}]}]
+      },
+      "source": {
+        "columns": [{"name":"PlotNumber","declaredType":"TEXT"},{"name":"SiteUnit","declaredType":"TEXT"}],
+        "rows": [{"rowId":"3","cells":[{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"S","integer":null,"real":null,"blobHex":null}]}]
+      },
+      "master": {
+        "columns": [{"name":"SiteSeries","declaredType":"TEXT"},{"name":"SiteSeriesLongName","declaredType":"TEXT"}],
+        "rows": [{"rowId":"4","cells":[{"storage":"text","text":"S","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Master long","integer":null,"real":null,"blobHex":null}]}]
+      },
+      "personal": {
+        "columns": [{"name":"SiteSeries","declaredType":"TEXT"},{"name":"SiteSeriesLongName","declaredType":"TEXT"}],
+        "rows": []
+      },
+      "changes": [
+        {"plotNumber":"P1","envRowId":"1","adminRowId":"2","suRowId":"3","field":"UserSiteUnit","origin":"selected SU","before":{"storage":"text","text":"Old","integer":null,"real":null,"blobHex":null},"after":{"storage":"text","text":"S","integer":null,"real":null,"blobHex":null}},
+        {"plotNumber":"P1","envRowId":"1","adminRowId":"2","suRowId":"3","field":"SiteUnitShortName","origin":"master","before":{"storage":"text","text":"","integer":null,"real":null,"blobHex":null},"after":{"storage":"text","text":"S","integer":null,"real":null,"blobHex":null}},
+        {"plotNumber":"P1","envRowId":"1","adminRowId":"2","suRowId":"3","field":"SiteUnitLongName","origin":"master","before":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},"after":{"storage":"text","text":"Master long","integer":null,"real":null,"blobHex":null}}
+      ],
+      "historyHash": ""
+    },
+    "projectPath": "C:\\wire\\project.db",
+    "suPath": "C:\\wire\\selected.db",
+    "sourceHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "approvalHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "sessionId": "WIRE_SERVICE_OWNER"
+  },
+  "request": {
+    "approvalHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "requestId": "96e9f951-e521-4efb-a42e-437da0f9e81c",
+    "sessionId": "WIRE_SERVICE_OWNER",
+    "confirmed": true
+  },
+  "outcome": {"status":"committed","receipt":{"changedRows":1,"changedCells":3,"historyId":"1"},"errorMessage":""},
+  "recovery": {
+    "contextId": "EXTERNAL-SU-WIRE",
+    "requestId": "96e9f951-e521-4efb-a42e-437da0f9e81c",
+    "status": "completed",
+    "reason": "The exact request is sealed; this readonly recovery never transfers source values.",
+    "outcome": {"status":"committed","receipt":{"changedRows":1,"changedCells":3,"historyId":"1"},"errorMessage":""}
+  }
+}

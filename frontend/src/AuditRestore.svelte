@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import type { AuditEntry } from '../bindings/github.com/boostao/vpro-wails';
+  import type { OrdinaryAuditReadEntry } from '../bindings/github.com/boostao/vpro-wails';
 
   const adminColumns = new Set(['officenotes', 'startdate', 'becsiteunit', 'enteredby', 'siteplotquality', 'soilplotquality', 'usersiteunit', 'vegplotquality', 'humusthickness', 'updatedfromcards']);
   const headerAliases: Record<string, string> = {
@@ -19,9 +19,11 @@
     return id.toString() === value && id >= -(1n << 63n) && id < (1n << 63n);
   }
 
-  export function auditRestoreReason(entry: AuditEntry, project: string, plot: string, capabilities: AuditCapabilities): string | null {
+  export function auditRestoreReason(entry: OrdinaryAuditReadEntry, project: string, plot: string, capabilities: AuditCapabilities): string | null {
     if (!exactAuditRowId(entry.rowId)) return 'Invalid exact audit row identity.';
     if (entry.project !== project || entry.plotNumber !== plot) return 'Audit row belongs to another project or plot.';
+    if (entry.user === null) return 'NULL audit actor is readable but unavailable to ordinary restoration.';
+    if (entry.editWhen === null) return 'NULL audit date is readable but unavailable to ordinary restoration.';
     const table = ['Env', 'Admin', 'Veg', 'Humus', 'Mineral', 'Other'].find(name =>
       entry.table.toLowerCase() === `_${name}`.toLowerCase() ||
       entry.table.toLowerCase() === `${project}_${name}`.toLowerCase());
@@ -51,7 +53,7 @@
 <script lang="ts">
   import { AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
   let { entries, project, plot, capabilities, enabled, disabled, gateReason, revision, onrestore }: {
-    entries: AuditEntry[]; project: string; plot: string; capabilities: AuditCapabilities;
+    entries: OrdinaryAuditReadEntry[]; project: string; plot: string; capabilities: AuditCapabilities;
     enabled: boolean; disabled: boolean; gateReason: string; revision: number;
     onrestore: (rowIds: string[], action: AuditRestoreAction) => Promise<void>;
   } = $props();
@@ -116,7 +118,7 @@
               checked={selected.includes(entry.rowId)} disabled={blocked || reason !== null}
               title={reason ?? 'Select this field restoration'} onchange={(event) => toggle(entry.rowId, event.currentTarget.checked)} /></td>
             <td><code>{entry.rowId}</code></td>
-            <td>{entry.editWhen}<br />{entry.user}</td>
+            <td>{entry.editWhen === null ? '(NULL)' : entry.editWhen === '' ? '(empty text)' : entry.editWhen}<br />{entry.user === null ? '(NULL)' : entry.user === '' ? '(empty text)' : entry.user}</td>
             <td>{entry.table}<br />{entry.id === null ? 'Parent' : `Child ID ${entry.id}`}</td>
             <td>{entry.editField}</td>
             <td>{entry.beforeEdit === null ? 'NULL' : entry.beforeEdit === '' ? '(empty string)' : entry.beforeEdit}</td>

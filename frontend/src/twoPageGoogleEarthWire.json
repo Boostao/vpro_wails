@@ -1,0 +1,499 @@
+{
+  "options": {
+    "contextId": "wire-owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "plot": "108050",
+    "form": "FS882-8x6XL",
+    "values": {
+      "title": "VPro Plot Locations",
+      "descriptionField": "PlotRepresenting"
+    },
+    "fields": [
+      {
+        "name": "PlotNumber",
+        "declaredType": "TEXT"
+      },
+      {
+        "name": "Longitude",
+        "declaredType": "REAL"
+      },
+      {
+        "name": "Latitude",
+        "declaredType": "REAL"
+      },
+      {
+        "name": "PlotRepresenting",
+        "declaredType": "TEXT"
+      },
+      {
+        "name": "Unmapped",
+        "declaredType": "BLOB"
+      }
+    ]
+  },
+  "review": {
+    "contextId": "wire-owned",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Sample.db",
+    "plot": "108050",
+    "form": "FS882-8x6XL",
+    "descriptionField": "PlotRepresenting",
+    "title": "Fixture \u0026 café",
+    "original": {
+      "columns": [
+        {
+          "name": "PlotNumber",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "Longitude",
+          "declaredType": "REAL"
+        },
+        {
+          "name": "Latitude",
+          "declaredType": "REAL"
+        },
+        {
+          "name": "PlotRepresenting",
+          "declaredType": "TEXT"
+        },
+        {
+          "name": "Unmapped",
+          "declaredType": "BLOB"
+        }
+      ],
+      "rows": [
+        {
+          "rowId": "1",
+          "cells": [
+            {
+              "storage": "text",
+              "text": "108050",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 123.25,
+              "blobHex": null
+            },
+            {
+              "storage": "real",
+              "text": null,
+              "integer": null,
+              "real": 53.5,
+              "blobHex": null
+            },
+            {
+              "storage": "text",
+              "text": "Saved café \u0026 \u003cb\u003eraw\u003c/b\u003e",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            {
+              "storage": "blob",
+              "text": null,
+              "integer": null,
+              "real": null,
+              "blobHex": "00ff"
+            }
+          ]
+        }
+      ]
+    },
+    "byteCount": 329,
+    "kml": "\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\n\u003ckml xmlns=\"http://earth.google.com/kml/2.1\"\u003e\u003cDocument\u003e\u003cname\u003eFixture \u0026amp; café\u003c/name\u003e\u003cPlacemark\u003e\u003cname\u003e108050\u003c/name\u003e\u003cdescription\u003eSaved café \u0026amp;amp; \u0026amp;lt;b\u0026amp;gt;raw\u0026amp;lt;/b\u0026amp;gt;.\u003c/description\u003e\u003cPoint\u003e\u003ccoordinates\u003e-123.25,53.5,0\u003c/coordinates\u003e\u003c/Point\u003e\u003c/Placemark\u003e\u003c/Document\u003e\u003c/kml\u003e"
+  },
+  "descriptionCases": [
+    {
+      "contextId": "wire-owned",
+      "project": "Sample",
+      "projectPath": "C:\\fixture\\Sample.db",
+      "plot": "108050",
+      "form": "FS882-8x6XL",
+      "descriptionField": "PlotRepresenting",
+      "title": "Fixture \u0026 café",
+      "original": {
+        "columns": [
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Longitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "Latitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "PlotRepresenting",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": "BLOB"
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 123.25,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 53.5,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "\nSaved text",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          }
+        ]
+      },
+      "byteCount": 284,
+      "kml": "\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\n\u003ckml xmlns=\"http://earth.google.com/kml/2.1\"\u003e\u003cDocument\u003e\u003cname\u003eFixture \u0026amp; café\u003c/name\u003e\u003cPlacemark\u003e\u003cname\u003e108050\u003c/name\u003e\u003cdescription\u003e\u0026#xA;Saved text.\u003c/description\u003e\u003cPoint\u003e\u003ccoordinates\u003e-123.25,53.5,0\u003c/coordinates\u003e\u003c/Point\u003e\u003c/Placemark\u003e\u003c/Document\u003e\u003c/kml\u003e"
+    },
+    {
+      "contextId": "wire-owned",
+      "project": "Sample",
+      "projectPath": "C:\\fixture\\Sample.db",
+      "plot": "108050",
+      "form": "FS882-8x6XL",
+      "descriptionField": "PlotRepresenting",
+      "title": "Fixture \u0026 café",
+      "original": {
+        "columns": [
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Longitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "Latitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "PlotRepresenting",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": "BLOB"
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 123.25,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 53.5,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Saved\r\ntext",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          }
+        ]
+      },
+      "byteCount": 288,
+      "kml": "\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\n\u003ckml xmlns=\"http://earth.google.com/kml/2.1\"\u003e\u003cDocument\u003e\u003cname\u003eFixture \u0026amp; café\u003c/name\u003e\u003cPlacemark\u003e\u003cname\u003e108050\u003c/name\u003e\u003cdescription\u003eSaved\u0026#xD;\u0026#xA;text.\u003c/description\u003e\u003cPoint\u003e\u003ccoordinates\u003e-123.25,53.5,0\u003c/coordinates\u003e\u003c/Point\u003e\u003c/Placemark\u003e\u003c/Document\u003e\u003c/kml\u003e"
+    },
+    {
+      "contextId": "wire-owned",
+      "project": "Sample",
+      "projectPath": "C:\\fixture\\Sample.db",
+      "plot": "108050",
+      "form": "FS882-8x6XL",
+      "descriptionField": "PlotRepresenting",
+      "title": "Fixture \u0026 café",
+      "original": {
+        "columns": [
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Longitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "Latitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "PlotRepresenting",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": "BLOB"
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 123.25,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 53.5,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Saved\rtext",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          }
+        ]
+      },
+      "byteCount": 283,
+      "kml": "\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\n\u003ckml xmlns=\"http://earth.google.com/kml/2.1\"\u003e\u003cDocument\u003e\u003cname\u003eFixture \u0026amp; café\u003c/name\u003e\u003cPlacemark\u003e\u003cname\u003e108050\u003c/name\u003e\u003cdescription\u003eSaved\u0026#xD;text.\u003c/description\u003e\u003cPoint\u003e\u003ccoordinates\u003e-123.25,53.5,0\u003c/coordinates\u003e\u003c/Point\u003e\u003c/Placemark\u003e\u003c/Document\u003e\u003c/kml\u003e"
+    },
+    {
+      "contextId": "wire-owned",
+      "project": "Sample",
+      "projectPath": "C:\\fixture\\Sample.db",
+      "plot": "108050",
+      "form": "FS882-8x6XL",
+      "descriptionField": "PlotRepresenting",
+      "title": "Fixture \u0026 café",
+      "original": {
+        "columns": [
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Longitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "Latitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "PlotRepresenting",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": "BLOB"
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 123.25,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 53.5,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "\r\nSaved\r\ntext",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          }
+        ]
+      },
+      "byteCount": 298,
+      "kml": "\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\n\u003ckml xmlns=\"http://earth.google.com/kml/2.1\"\u003e\u003cDocument\u003e\u003cname\u003eFixture \u0026amp; café\u003c/name\u003e\u003cPlacemark\u003e\u003cname\u003e108050\u003c/name\u003e\u003cdescription\u003e\u0026#xD;\u0026#xA;Saved\u0026#xD;\u0026#xA;text.\u003c/description\u003e\u003cPoint\u003e\u003ccoordinates\u003e-123.25,53.5,0\u003c/coordinates\u003e\u003c/Point\u003e\u003c/Placemark\u003e\u003c/Document\u003e\u003c/kml\u003e"
+    },
+    {
+      "contextId": "wire-owned",
+      "project": "Sample",
+      "projectPath": "C:\\fixture\\Sample.db",
+      "plot": "108050",
+      "form": "FS882-8x6XL",
+      "descriptionField": "PlotRepresenting",
+      "title": "Fixture \u0026 café",
+      "original": {
+        "columns": [
+          {
+            "name": "PlotNumber",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Longitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "Latitude",
+            "declaredType": "REAL"
+          },
+          {
+            "name": "PlotRepresenting",
+            "declaredType": "TEXT"
+          },
+          {
+            "name": "Unmapped",
+            "declaredType": "BLOB"
+          }
+        ],
+        "rows": [
+          {
+            "rowId": "1",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "108050",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 123.25,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 53.5,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "\"quoted\" \u0026 'literal' \u003cb\u003ecafé\u003c/b\u003e",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "blob",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": "00ff"
+              }
+            ]
+          }
+        ]
+      },
+      "byteCount": 370,
+      "kml": "\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e\n\u003ckml xmlns=\"http://earth.google.com/kml/2.1\"\u003e\u003cDocument\u003e\u003cname\u003eFixture \u0026amp; café\u003c/name\u003e\u003cPlacemark\u003e\u003cname\u003e108050\u003c/name\u003e\u003cdescription\u003e\u0026amp;#34;quoted\u0026amp;#34; \u0026amp;amp; \u0026amp;#39;literal\u0026amp;#39; \u0026amp;lt;b\u0026amp;gt;café\u0026amp;lt;/b\u0026amp;gt;.\u003c/description\u003e\u003cPoint\u003e\u003ccoordinates\u003e-123.25,53.5,0\u003c/coordinates\u003e\u003c/Point\u003e\u003c/Placemark\u003e\u003c/Document\u003e\u003c/kml\u003e"
+    }
+  ]
+}

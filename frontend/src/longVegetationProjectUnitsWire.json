@@ -1,0 +1,69 @@
+[
+  {
+    "contextId":"owned","projectPath":"C:\\project.db","suPath":"",
+    "settings":{"title":"Project units","average":"all-plots","constantSpeciesList":false,"presenceGreaterThan":-100,"meanCoverGreaterThan":-100,"order":"species","showEnglishName":false,"showSpeciesCode":false,"grouping":"layer","quality":null,"unitGrouping":"selected-fields","unitFields":["Zone"]},
+    "report":{
+      "project":"Sample","su":"None","title":"Project units","quality":null,"sourceKind":"project-selected-fields",
+      "units":[
+        {"code":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null},"longName":null,"nameStatus":"missing","nameCandidates":[],"numPlots":2,"membershipIds":[],"projectUnitIndexes":[0,1],
+         "rows":[{"layer":{"storage":"text","text":"Tree","integer":null,"real":null,"blobHex":null},"species":{"storage":"text","text":"SP","integer":null,"real":null,"blobHex":null},"englishName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},"matchedName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},"presence":0.5,"meanCover":2,"plots":[{"plotNumber":"P1","cover":4}]}]},
+        {"code":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null},"longName":null,"nameStatus":"missing","nameCandidates":[],"numPlots":2,"membershipIds":[],"projectUnitIndexes":[2,3],
+         "rows":[{"layer":{"storage":"text","text":"Tree","integer":null,"real":null,"blobHex":null},"species":{"storage":"text","text":"SP","integer":null,"real":null,"blobHex":null},"englishName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},"matchedName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},"presence":0.5,"meanCover":2,"plots":[{"plotNumber":"P1","cover":4}]}]}
+      ],
+      "diagnostics":[{"code":"project_unit_join_multiplicity","identity":"P1","count":4},{"code":"unit_name_missing","identity":"text:Alpha","count":0},{"code":"unit_name_missing","identity":"text:Beta","count":0}],
+      "projectUnits":[
+        {"envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"11","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"12","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"12","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}}
+      ]
+    }
+  },
+  {
+    "contextId":"owned","projectPath":"C:\\project.db","suPath":"",
+    "settings":{"title":"Project units","average":"all-plots","constantSpeciesList":false,"presenceGreaterThan":-100,"meanCoverGreaterThan":-100,"order":"species","showEnglishName":false,"showSpeciesCode":false,"grouping":"layer","quality":null,"unitGrouping":"all-plots"},
+    "report":{
+      "project":"Sample","su":"None","title":"Project units","quality":null,"sourceKind":"project-all-plots",
+      "units":[
+        {"code":{"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null},"longName":null,"nameStatus":"missing","nameCandidates":[],"numPlots":2,"membershipIds":[],"projectUnitIndexes":[0,1],
+         "rows":[{"layer":{"storage":"text","text":"Tree","integer":null,"real":null,"blobHex":null},"species":{"storage":"text","text":"SP","integer":null,"real":null,"blobHex":null},"englishName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},"matchedName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},"presence":0.5,"meanCover":2,"plots":[{"plotNumber":"P1","cover":4}]}]}
+      ],
+      "diagnostics":[{"code":"project_unit_join_multiplicity","identity":"P1","count":2},{"code":"unit_name_missing","identity":"text:All plots","count":0}],
+      "projectUnits":[
+        {"envRowId":"11","adminRowId":null,"plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null}},
+        {"envRowId":"12","adminRowId":null,"plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null}}
+      ]
+    }
+  },
+  {
+    "contextId":"owned","projectPath":"C:\\project.db","suPath":"C:\\external.db",
+    "settings":{"title":"Project units","average":"all-plots","constantSpeciesList":false,"presenceGreaterThan":-100,"meanCoverGreaterThan":-100,"order":"species","showEnglishName":false,"showSpeciesCode":false,"grouping":"layer","quality":{"site":{"minimum":"Poor","includeNull":false},"veg":{"minimum":"Poor","includeNull":false},"soil":{"minimum":"Poor","includeNull":false}},"unitGrouping":"selected-fields","unitFields":["Zone"]},
+    "report":{
+      "project":"Sample","su":"Selected","title":"Project units","sourceKind":"project-selected-fields",
+      "units":[
+        {"code":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null},"longName":null,"nameStatus":"missing","nameCandidates":[],"numPlots":1,"membershipIds":[],"projectUnitIndexes":[0],
+         "rows":[{"layer":{"storage":"text","text":"Tree","integer":null,"real":null,"blobHex":null},"species":{"storage":"text","text":"SP","integer":null,"real":null,"blobHex":null},"englishName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},"matchedName":{"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},"presence":1,"meanCover":2,"plots":[{"plotNumber":"P1","cover":2}]}]}
+      ],
+      "diagnostics":[{"code":"quality_reference_multiplicity","identity":"1","count":8},{"code":"unit_name_missing","identity":"text:Alpha","count":0}],
+      "projectUnits":[{"envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}}],
+      "quality":{
+        "thresholdRowIds":[["90"],["90"],["90"]],"excludedMembershipIds":[],
+        "references":[
+          {"rowId":"100","item":{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},"listName":{"storage":"text","text":"DataQuality","integer":null,"real":null,"blobHex":null},"itemOrder":{"storage":"integer","text":null,"integer":"3","real":null,"blobHex":null}},
+          {"rowId":"101","item":{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},"listName":{"storage":"text","text":"DataQuality","integer":null,"real":null,"blobHex":null},"itemOrder":{"storage":"integer","text":null,"integer":"3","real":null,"blobHex":null}},
+          {"rowId":"90","item":{"storage":"text","text":"Poor","integer":null,"real":null,"blobHex":null},"listName":{"storage":"text","text":"DataQuality","integer":null,"real":null,"blobHex":null},"itemOrder":{"storage":"integer","text":null,"integer":"1","real":null,"blobHex":null}}
+        ],
+        "occurrences":[
+          {"membershipId":"1","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Original","integer":null,"real":null,"blobHex":null},"envRowId":"11","adminRowId":"21","listRowIds":["100","100","100"],"values":[{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null}]},
+          {"membershipId":"1","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Original","integer":null,"real":null,"blobHex":null},"envRowId":"11","adminRowId":"21","listRowIds":["100","100","101"],"values":[{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null}]},
+          {"membershipId":"1","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Original","integer":null,"real":null,"blobHex":null},"envRowId":"11","adminRowId":"21","listRowIds":["100","101","100"],"values":[{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null}]},
+          {"membershipId":"1","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Original","integer":null,"real":null,"blobHex":null},"envRowId":"11","adminRowId":"21","listRowIds":["100","101","101"],"values":[{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null}]},
+          {"membershipId":"1","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Original","integer":null,"real":null,"blobHex":null},"envRowId":"11","adminRowId":"21","listRowIds":["101","100","100"],"values":[{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null}]},
+          {"membershipId":"1","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Original","integer":null,"real":null,"blobHex":null},"envRowId":"11","adminRowId":"21","listRowIds":["101","100","101"],"values":[{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null}]},
+          {"membershipId":"1","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Original","integer":null,"real":null,"blobHex":null},"envRowId":"11","adminRowId":"21","listRowIds":["101","101","100"],"values":[{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null}]},
+          {"membershipId":"1","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Original","integer":null,"real":null,"blobHex":null},"envRowId":"11","adminRowId":"21","listRowIds":["101","101","101"],"values":[{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null},{"storage":"text","text":"Good","integer":null,"real":null,"blobHex":null}]}
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,1598 @@
+[
+  {
+    "review": {
+      "scope": {
+        "contextId": "owned",
+        "project": "Sample",
+        "projectPath": "C:\\project.db",
+        "su": "None",
+        "suPath": "",
+        "sourceKind": "project-selected-fields",
+        "revision": "3",
+        "fields": [
+          "Zone"
+        ],
+        "build": {
+          "approvalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "projectTuples": [
+            {
+              "envRowId": "11",
+              "adminRowId": "21",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Alpha",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "envRowId": "11",
+              "adminRowId": "22",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Alpha",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "envRowId": "12",
+              "adminRowId": "21",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Beta",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "envRowId": "12",
+              "adminRowId": "22",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Beta",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        },
+        "buildCurrent": true
+      },
+      "preview": {
+        "contextId": "owned",
+        "projectPath": "C:\\project.db",
+        "suPath": "",
+        "settings": {
+          "title": "Project units",
+          "grouping": "layer",
+          "average": "all-plots",
+          "constantSpeciesList": false,
+          "presenceGreaterThan": -100,
+          "meanCoverGreaterThan": -100,
+          "order": "species",
+          "showEnglishName": false,
+          "showSpeciesCode": false,
+          "quality": null,
+          "unitGrouping": "selected-fields",
+          "unitFields": [
+            "Zone"
+          ]
+        },
+        "report": {
+          "project": "Sample",
+          "su": "None",
+          "title": "Project units",
+          "units": [
+            {
+              "code": {
+                "storage": "text",
+                "text": "Alpha",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "longName": null,
+              "nameStatus": "missing",
+              "nameCandidates": [],
+              "numPlots": 2,
+              "membershipIds": [],
+              "projectUnitIndexes": [
+                0,
+                1
+              ],
+              "rows": [
+                {
+                  "layer": {
+                    "storage": "text",
+                    "text": "Tree",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "species": {
+                    "storage": "text",
+                    "text": "SP",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "englishName": {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "matchedName": {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "presence": 0.5,
+                  "meanCover": 2,
+                  "plots": [
+                    {
+                      "plotNumber": "P1",
+                      "cover": 4
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "code": {
+                "storage": "text",
+                "text": "Beta",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "longName": null,
+              "nameStatus": "missing",
+              "nameCandidates": [],
+              "numPlots": 2,
+              "membershipIds": [],
+              "projectUnitIndexes": [
+                2,
+                3
+              ],
+              "rows": [
+                {
+                  "layer": {
+                    "storage": "text",
+                    "text": "Tree",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "species": {
+                    "storage": "text",
+                    "text": "SP",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "englishName": {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "matchedName": {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "presence": 0.5,
+                  "meanCover": 2,
+                  "plots": [
+                    {
+                      "plotNumber": "P1",
+                      "cover": 4
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "project_unit_join_multiplicity",
+              "identity": "P1",
+              "count": 4
+            },
+            {
+              "code": "unit_name_missing",
+              "identity": "text:Alpha",
+              "count": 0
+            },
+            {
+              "code": "unit_name_missing",
+              "identity": "text:Beta",
+              "count": 0
+            }
+          ],
+          "quality": null,
+          "sourceKind": "project-selected-fields",
+          "projectUnits": [
+            {
+              "envRowId": "11",
+              "adminRowId": "21",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Alpha",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "envRowId": "11",
+              "adminRowId": "22",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Alpha",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "envRowId": "12",
+              "adminRowId": "21",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Beta",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "envRowId": "12",
+              "adminRowId": "22",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Beta",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        }
+      },
+      "options": {
+        "quickReport": false,
+        "spaceBetweenGroups": true,
+        "reportSummary": true
+      },
+      "summary": {
+        "createdDate": "2026-10-10",
+        "environmentRows": 2,
+        "sourcePlotRows": 4,
+        "sourceKind": "project-selected-fields",
+        "projectTuples": [
+          {
+            "envRowId": "11",
+            "adminRowId": "21",
+            "plotNumber": {
+              "storage": "text",
+              "text": "P1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "siteUnit": {
+              "storage": "text",
+              "text": "Alpha",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          },
+          {
+            "envRowId": "11",
+            "adminRowId": "22",
+            "plotNumber": {
+              "storage": "text",
+              "text": "P1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "siteUnit": {
+              "storage": "text",
+              "text": "Alpha",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          },
+          {
+            "envRowId": "12",
+            "adminRowId": "21",
+            "plotNumber": {
+              "storage": "text",
+              "text": "P1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "siteUnit": {
+              "storage": "text",
+              "text": "Beta",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          },
+          {
+            "envRowId": "12",
+            "adminRowId": "22",
+            "plotNumber": {
+              "storage": "text",
+              "text": "P1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "siteUnit": {
+              "storage": "text",
+              "text": "Beta",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          }
+        ],
+        "speciesVersion": {
+          "storage": "text",
+          "text": "literal version",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "versionStatus": "literal",
+        "versionDefinitions": {
+          "columns": [
+            {
+              "name": "table_name",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "description",
+              "declaredType": "TEXT"
+            }
+          ],
+          "rows": [
+            {
+              "rowId": "1",
+              "cells": [
+                {
+                  "storage": "text",
+                  "text": "USysAllSpecs",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "literal version",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reportScope": "unlumped",
+      "createdDate": "2026-10-10",
+      "sheets": [
+        {
+          "unit": {
+            "storage": "text",
+            "text": "Alpha",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          "name": "Alpha"
+        },
+        {
+          "unit": {
+            "storage": "text",
+            "text": "Beta",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          "name": "Beta"
+        }
+      ],
+      "skippedUnits": [],
+      "approvalHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "workbookSHA256": "bacdd0633560fc4d08738faf6196e4d865ccd6a77a9adf6b2249f9f0097a8db2",
+      "bytes": 9738
+    },
+    "readRequest": {
+      "revision": "3",
+      "buildApprovalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "scope": "unlumped"
+    },
+    "exportRequest": {
+      "revision": "3",
+      "buildApprovalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "scope": "unlumped",
+      "createdDate": "2026-10-10",
+      "approvalHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "destination": "C:\\output\\literal # 'é'.xlsx"
+    },
+    "outcome": {
+      "status": "published",
+      "requestedDestination": "C:\\output\\literal # 'é'.xlsx",
+      "path": "C:\\output\\literal # 'é'.xlsx",
+      "sha256": "bacdd0633560fc4d08738faf6196e4d865ccd6a77a9adf6b2249f9f0097a8db2",
+      "errorMessage": ""
+    }
+  },
+  {
+    "review": {
+      "scope": {
+        "contextId": "owned",
+        "project": "Sample",
+        "projectPath": "C:\\project.db",
+        "su": "None",
+        "suPath": "",
+        "sourceKind": "project-all-plots",
+        "revision": "3",
+        "fields": [
+          "RetainedInactive"
+        ],
+        "build": {
+          "approvalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "projectTuples": [
+            {
+              "envRowId": "11",
+              "adminRowId": null,
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "All plots",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "envRowId": "12",
+              "adminRowId": null,
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "All plots",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        },
+        "buildCurrent": true
+      },
+      "preview": {
+        "contextId": "owned",
+        "projectPath": "C:\\project.db",
+        "suPath": "",
+        "settings": {
+          "title": "Project units",
+          "grouping": "layer",
+          "average": "all-plots",
+          "constantSpeciesList": false,
+          "presenceGreaterThan": -100,
+          "meanCoverGreaterThan": -100,
+          "order": "species",
+          "showEnglishName": false,
+          "showSpeciesCode": false,
+          "quality": null,
+          "unitGrouping": "all-plots"
+        },
+        "report": {
+          "project": "Sample",
+          "su": "None",
+          "title": "Project units",
+          "units": [
+            {
+              "code": {
+                "storage": "text",
+                "text": "All plots",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "longName": null,
+              "nameStatus": "missing",
+              "nameCandidates": [],
+              "numPlots": 2,
+              "membershipIds": [],
+              "projectUnitIndexes": [
+                0,
+                1
+              ],
+              "rows": [
+                {
+                  "layer": {
+                    "storage": "text",
+                    "text": "Tree",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "species": {
+                    "storage": "text",
+                    "text": "SP",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "englishName": {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "matchedName": {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "presence": 0.5,
+                  "meanCover": 2,
+                  "plots": [
+                    {
+                      "plotNumber": "P1",
+                      "cover": 4
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "project_unit_join_multiplicity",
+              "identity": "P1",
+              "count": 2
+            },
+            {
+              "code": "unit_name_missing",
+              "identity": "text:All plots",
+              "count": 0
+            }
+          ],
+          "quality": null,
+          "sourceKind": "project-all-plots",
+          "projectUnits": [
+            {
+              "envRowId": "11",
+              "adminRowId": null,
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "All plots",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "envRowId": "12",
+              "adminRowId": null,
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "All plots",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        }
+      },
+      "options": {
+        "quickReport": false,
+        "spaceBetweenGroups": true,
+        "reportSummary": true
+      },
+      "summary": {
+        "createdDate": "2026-10-10",
+        "environmentRows": 2,
+        "sourcePlotRows": 2,
+        "sourceKind": "project-all-plots",
+        "projectTuples": [
+          {
+            "envRowId": "11",
+            "adminRowId": null,
+            "plotNumber": {
+              "storage": "text",
+              "text": "P1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "siteUnit": {
+              "storage": "text",
+              "text": "All plots",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          },
+          {
+            "envRowId": "12",
+            "adminRowId": null,
+            "plotNumber": {
+              "storage": "text",
+              "text": "P1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "siteUnit": {
+              "storage": "text",
+              "text": "All plots",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          }
+        ],
+        "speciesVersion": {
+          "storage": "text",
+          "text": "literal version",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "versionStatus": "literal",
+        "versionDefinitions": {
+          "columns": [
+            {
+              "name": "table_name",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "description",
+              "declaredType": "TEXT"
+            }
+          ],
+          "rows": [
+            {
+              "rowId": "1",
+              "cells": [
+                {
+                  "storage": "text",
+                  "text": "USysAllSpecs",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "literal version",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reportScope": "unlumped",
+      "createdDate": "2026-10-10",
+      "sheets": [
+        {
+          "unit": {
+            "storage": "text",
+            "text": "All plots",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          "name": "All plots"
+        }
+      ],
+      "skippedUnits": [],
+      "approvalHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "workbookSHA256": "601478cfe6fc6b52137a284ae57c7850fb6e99cd69e63d923afba1285ffbaed4",
+      "bytes": 8900
+    },
+    "readRequest": {
+      "revision": "3",
+      "buildApprovalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "scope": "unlumped"
+    },
+    "exportRequest": {
+      "revision": "3",
+      "buildApprovalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "scope": "unlumped",
+      "createdDate": "2026-10-10",
+      "approvalHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "destination": "C:\\output\\literal # 'é'.xlsx"
+    },
+    "outcome": {
+      "status": "published",
+      "requestedDestination": "C:\\output\\literal # 'é'.xlsx",
+      "path": "C:\\output\\literal # 'é'.xlsx",
+      "sha256": "601478cfe6fc6b52137a284ae57c7850fb6e99cd69e63d923afba1285ffbaed4",
+      "errorMessage": ""
+    }
+  },
+  {
+    "review": {
+      "scope": {
+        "contextId": "owned",
+        "project": "Sample",
+        "projectPath": "C:\\project.db",
+        "su": "Selected",
+        "suPath": "C:\\external.db",
+        "sourceKind": "project-selected-fields",
+        "revision": "3",
+        "fields": [
+          "Zone"
+        ],
+        "build": {
+          "approvalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "projectTuples": [
+            {
+              "envRowId": "11",
+              "adminRowId": "21",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Alpha",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            },
+            {
+              "envRowId": "13",
+              "adminRowId": "23",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P2",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Gamma",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        },
+        "buildCurrent": true
+      },
+      "preview": {
+        "contextId": "owned",
+        "projectPath": "C:\\project.db",
+        "suPath": "C:\\external.db",
+        "settings": {
+          "title": "Project units",
+          "grouping": "layer",
+          "average": "all-plots",
+          "constantSpeciesList": false,
+          "presenceGreaterThan": -100,
+          "meanCoverGreaterThan": -100,
+          "order": "species",
+          "showEnglishName": false,
+          "showSpeciesCode": false,
+          "quality": {
+            "site": {
+              "minimum": "Good",
+              "includeNull": false
+            },
+            "veg": {
+              "minimum": "Good",
+              "includeNull": false
+            },
+            "soil": {
+              "minimum": "Good",
+              "includeNull": false
+            }
+          },
+          "unitGrouping": "selected-fields",
+          "unitFields": [
+            "Zone"
+          ]
+        },
+        "report": {
+          "project": "Sample",
+          "su": "Selected",
+          "title": "Project units",
+          "units": [
+            {
+              "code": {
+                "storage": "text",
+                "text": "Alpha",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "longName": null,
+              "nameStatus": "missing",
+              "nameCandidates": [],
+              "numPlots": 1,
+              "membershipIds": [],
+              "projectUnitIndexes": [
+                0
+              ],
+              "rows": [
+                {
+                  "layer": {
+                    "storage": "text",
+                    "text": "Tree",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "species": {
+                    "storage": "text",
+                    "text": "SP",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "englishName": {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "matchedName": {
+                    "storage": "null",
+                    "text": null,
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  "presence": 1,
+                  "meanCover": 2,
+                  "plots": [
+                    {
+                      "plotNumber": "P1",
+                      "cover": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "diagnostics": [
+            {
+              "code": "quality_reference_multiplicity",
+              "identity": "1",
+              "count": 8
+            },
+            {
+              "code": "unit_name_missing",
+              "identity": "text:Alpha",
+              "count": 0
+            }
+          ],
+          "quality": {
+            "thresholdRowIds": [
+              [
+                "100",
+                "101"
+              ],
+              [
+                "100",
+                "101"
+              ],
+              [
+                "100",
+                "101"
+              ]
+            ],
+            "occurrences": [
+              {
+                "membershipId": "1",
+                "plotNumber": {
+                  "storage": "text",
+                  "text": "P1",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "siteUnit": {
+                  "storage": "text",
+                  "text": "Original",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "envRowId": "11",
+                "adminRowId": "21",
+                "listRowIds": [
+                  "100",
+                  "100",
+                  "100"
+                ],
+                "values": [
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              },
+              {
+                "membershipId": "1",
+                "plotNumber": {
+                  "storage": "text",
+                  "text": "P1",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "siteUnit": {
+                  "storage": "text",
+                  "text": "Original",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "envRowId": "11",
+                "adminRowId": "21",
+                "listRowIds": [
+                  "100",
+                  "100",
+                  "101"
+                ],
+                "values": [
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              },
+              {
+                "membershipId": "1",
+                "plotNumber": {
+                  "storage": "text",
+                  "text": "P1",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "siteUnit": {
+                  "storage": "text",
+                  "text": "Original",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "envRowId": "11",
+                "adminRowId": "21",
+                "listRowIds": [
+                  "100",
+                  "101",
+                  "100"
+                ],
+                "values": [
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              },
+              {
+                "membershipId": "1",
+                "plotNumber": {
+                  "storage": "text",
+                  "text": "P1",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "siteUnit": {
+                  "storage": "text",
+                  "text": "Original",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "envRowId": "11",
+                "adminRowId": "21",
+                "listRowIds": [
+                  "100",
+                  "101",
+                  "101"
+                ],
+                "values": [
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              },
+              {
+                "membershipId": "1",
+                "plotNumber": {
+                  "storage": "text",
+                  "text": "P1",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "siteUnit": {
+                  "storage": "text",
+                  "text": "Original",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "envRowId": "11",
+                "adminRowId": "21",
+                "listRowIds": [
+                  "101",
+                  "100",
+                  "100"
+                ],
+                "values": [
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              },
+              {
+                "membershipId": "1",
+                "plotNumber": {
+                  "storage": "text",
+                  "text": "P1",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "siteUnit": {
+                  "storage": "text",
+                  "text": "Original",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "envRowId": "11",
+                "adminRowId": "21",
+                "listRowIds": [
+                  "101",
+                  "100",
+                  "101"
+                ],
+                "values": [
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              },
+              {
+                "membershipId": "1",
+                "plotNumber": {
+                  "storage": "text",
+                  "text": "P1",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "siteUnit": {
+                  "storage": "text",
+                  "text": "Original",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "envRowId": "11",
+                "adminRowId": "21",
+                "listRowIds": [
+                  "101",
+                  "101",
+                  "100"
+                ],
+                "values": [
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              },
+              {
+                "membershipId": "1",
+                "plotNumber": {
+                  "storage": "text",
+                  "text": "P1",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "siteUnit": {
+                  "storage": "text",
+                  "text": "Original",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "envRowId": "11",
+                "adminRowId": "21",
+                "listRowIds": [
+                  "101",
+                  "101",
+                  "101"
+                ],
+                "values": [
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  },
+                  {
+                    "storage": "text",
+                    "text": "Good",
+                    "integer": null,
+                    "real": null,
+                    "blobHex": null
+                  }
+                ]
+              }
+            ],
+            "excludedMembershipIds": [
+              "2"
+            ],
+            "references": [
+              {
+                "rowId": "100",
+                "item": {
+                  "storage": "text",
+                  "text": "Good",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "listName": {
+                  "storage": "text",
+                  "text": "DataQuality",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "itemOrder": {
+                  "storage": "integer",
+                  "text": null,
+                  "integer": "3",
+                  "real": null,
+                  "blobHex": null
+                }
+              },
+              {
+                "rowId": "101",
+                "item": {
+                  "storage": "text",
+                  "text": "Good",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "listName": {
+                  "storage": "text",
+                  "text": "DataQuality",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "itemOrder": {
+                  "storage": "integer",
+                  "text": null,
+                  "integer": "3",
+                  "real": null,
+                  "blobHex": null
+                }
+              },
+              {
+                "rowId": "90",
+                "item": {
+                  "storage": "text",
+                  "text": "Poor",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "listName": {
+                  "storage": "text",
+                  "text": "DataQuality",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                "itemOrder": {
+                  "storage": "integer",
+                  "text": null,
+                  "integer": "1",
+                  "real": null,
+                  "blobHex": null
+                }
+              }
+            ]
+          },
+          "sourceKind": "project-selected-fields",
+          "projectUnits": [
+            {
+              "envRowId": "11",
+              "adminRowId": "21",
+              "plotNumber": {
+                "storage": "text",
+                "text": "P1",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              "siteUnit": {
+                "storage": "text",
+                "text": "Alpha",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              }
+            }
+          ]
+        }
+      },
+      "options": {
+        "quickReport": false,
+        "spaceBetweenGroups": true,
+        "reportSummary": true
+      },
+      "summary": {
+        "createdDate": "2026-10-10",
+        "environmentRows": 2,
+        "sourcePlotRows": 1,
+        "sourceKind": "project-selected-fields",
+        "projectTuples": [
+          {
+            "envRowId": "11",
+            "adminRowId": "21",
+            "plotNumber": {
+              "storage": "text",
+              "text": "P1",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            },
+            "siteUnit": {
+              "storage": "text",
+              "text": "Alpha",
+              "integer": null,
+              "real": null,
+              "blobHex": null
+            }
+          }
+        ],
+        "speciesVersion": {
+          "storage": "text",
+          "text": "literal version",
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "versionStatus": "literal",
+        "versionDefinitions": {
+          "columns": [
+            {
+              "name": "table_name",
+              "declaredType": "TEXT"
+            },
+            {
+              "name": "description",
+              "declaredType": "TEXT"
+            }
+          ],
+          "rows": [
+            {
+              "rowId": "1",
+              "cells": [
+                {
+                  "storage": "text",
+                  "text": "USysAllSpecs",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                },
+                {
+                  "storage": "text",
+                  "text": "literal version",
+                  "integer": null,
+                  "real": null,
+                  "blobHex": null
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "reportScope": "unlumped",
+      "createdDate": "2026-10-10",
+      "sheets": [
+        {
+          "unit": {
+            "storage": "text",
+            "text": "Alpha",
+            "integer": null,
+            "real": null,
+            "blobHex": null
+          },
+          "name": "Alpha"
+        }
+      ],
+      "skippedUnits": [],
+      "approvalHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "workbookSHA256": "75a06c8bb13bf93d4ef537cfe344ab248af3ec3c78bcc5594b88d0f62bc6f714",
+      "bytes": 9284
+    },
+    "readRequest": {
+      "revision": "3",
+      "buildApprovalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "scope": "unlumped"
+    },
+    "exportRequest": {
+      "revision": "3",
+      "buildApprovalHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "scope": "unlumped",
+      "createdDate": "2026-10-10",
+      "approvalHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "destination": "C:\\output\\literal # 'é'.xlsx"
+    },
+    "outcome": {
+      "status": "published",
+      "requestedDestination": "C:\\output\\literal # 'é'.xlsx",
+      "path": "C:\\output\\literal # 'é'.xlsx",
+      "sha256": "75a06c8bb13bf93d4ef537cfe344ab248af3ec3c78bcc5594b88d0f62bc6f714",
+      "errorMessage": ""
+    }
+  }
+]

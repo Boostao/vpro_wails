@@ -7,10 +7,10 @@ const { compile } = require('svelte/compiler');
 const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
 const navigation = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
 
-test('standalone lifeform preview is independently gated without enabling incomplete summary vegetation', () => {
+test('standalone lifeform and summary vegetation previews have independent default-off gates', () => {
   assert.equal(compile(navigation, { filename: 'Navigation.svelte', generate: 'client' }).warnings.length, 0);
   assert.match(navigation, /name: 'Lifeform Summary'.*VITE_LIFEFORM_SUMMARY === 'true' \? 'lifeform-summary' : undefined/);
-  assert.match(navigation, /name: 'Summary Vegetation', icon: ChartColumn \}/);
+  assert.match(navigation, /name: 'Summary Vegetation', icon: ChartColumn, view: import\.meta\.env\.VITE_SUMMARY_VEGETATION === 'true' \? 'summary-vegetation' : undefined/);
   assert.match(app, /view === 'lifeform-summary' && import\.meta\.env\.VITE_LIFEFORM_SUMMARY === 'true' && \$projectState/);
 });
 

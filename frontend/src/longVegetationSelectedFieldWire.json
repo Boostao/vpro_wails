@@ -1,0 +1,27 @@
+{
+  "review": {
+    "contextId": "selected-field-wire",
+    "project": "Sample",
+    "projectPath": "C:\\selected-field\\Sample.db",
+    "su": "Selected",
+    "suPath": "C:\\selected-field\\Selected.db",
+    "values": { "mode": 1, "selectedField": " historical\u0000field " },
+    "source": "configured-owned-imported-SQLite VLists.USysAllSpecs physical columns; source Value List suggestions are not mandatory membership",
+    "definitions": [
+      { "name": "Code", "declaredType": "TEXT" },
+      { "name": "Native", "declaredType": "TEXT" },
+      { "name": "ID", "declaredType": "INTEGER" },
+      { "name": "IsAttribute", "declaredType": "BOOLEAN" }
+    ]
+  },
+  "request": {
+    "expected": { "mode": 1, "selectedField": " historical\u0000field " },
+    "proposed": { "mode": 4, "selectedField": "Native" }
+  },
+  "outcome": {
+    "contextId": "selected-field-wire",
+    "changed": true,
+    "committed": true,
+    "errorMessage": ""
+  }
+}

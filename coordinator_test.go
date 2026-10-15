@@ -19,6 +19,16 @@ func TestOfflineDuckDBSQLiteCoordinator(t *testing.T) {
 		t.Fatal(err)
 	}
 	coordinator, err := NewCoordinator(context.Background(), projectPath, "Sample")
+	if !duckDBDriverAvailable {
+		if coordinator != nil || err == nil || !strings.Contains(err.Error(), "unavailable "+duckDBDriverUnavailableReason) {
+			t.Fatal("unsupported optional driver was not explicitly refused", coordinator, err)
+		}
+		after, readErr := os.ReadFile(projectPath)
+		if readErr != nil || string(before) != string(after) {
+			t.Fatal("unsupported optional coordinator changed SQLite data", readErr)
+		}
+		return
+	}
 	if err != nil {
 		if strings.Contains(err.Error(), "not installed") {
 			t.Skip(err)
@@ -43,5 +53,11 @@ func TestOfflineDuckDBSQLiteCoordinator(t *testing.T) {
 	after, err := os.ReadFile(projectPath)
 	if err != nil || string(before) != string(after) {
 		t.Fatalf("read-only attachment changed the project file: %v", err)
+	}
+}
+
+func TestDuckDBDriverPlatformAvailability(t *testing.T) {
+	if duckDBDriverAvailable == (duckDBDriverUnavailableReason != "") {
+		t.Fatal("DuckDB driver availability differs from supported release platforms", duckDBDriverAvailable, duckDBDriverUnavailableReason)
 	}
 }

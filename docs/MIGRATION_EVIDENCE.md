@@ -6,7 +6,563 @@ private Access copies, native binaries, closed project data, screenshots and
 WebView profiles are deliberately retained outside Git. A hash identifies a
 receipt but does not independently reproduce its native run.
 
-## Latest accepted application boundary
+## Current uncommitted forms/report boundary
+
+The private species-only profiling kernel adds three new app/test/portable
+corpus paths without changing the ordered runner. Three source query exports,
+25 physical vegetation rows and six complete independent schema/data reopens
+establish20 initial matching cases/23 scope plots. A separate normally closed
+readonly owner adds14 text cases/28 directional Integer(-1/0) comparisons,
+giving32 unique portable match cases. Both original owners are freshly absent;
+fixtures are byte-unchanged/lock-free after reads, seven canonical inputs and
+all1675 accepted predecessor inputs remain unchanged. Initial portable hash
+`c7632fb99ba6131b281010512af8637549fec436c9769857147913d5c9a56a7e`
+is preserved privately; expanded corpus hash is
+`c1a2cfdc147aa755cceaa2240168bf98040faa5e79237fa6cde232d91fe90b5e`.
+Terminal-space false negatives reproduce before correction. Comparison-only
+handling preserves complete original text while literal identity mismatches
+remain unavailable. Coupled race69.765s, vet and production compilation pass;
+exact independent review accepts all three private kernel paths with no
+significant findings, checking source/live/candidate and all18 artifact
+hashes/sizes. The corrected numeric-child test proves actual
+INTEGER storage rather than TEXT-affinity coercion; the failed predecessor is
+retained. No service/client/native application/default or original callback
+availability is claimed. The separate two-path unexported owned-context
+successor passes coupled race74.139s/vet/production, actual in-flight matching
+query cancellation followed by an owned retry, complete typed/file constancy
+and stale rules/count/schema/Lump/retired-context refusals. Context-level review
+accepts the two-path private boundary with no significant issues, verifies
+all27 artifact hashes/sizes and unchanged three-path kernel basis. Full
+integration passes exit0, UTC2026-10-13T19:06:11.634083 to20:39:46.339321,
+over1680 protected inputs/all51 resources/38 sealed artifacts. No source,
+input or package/embed drift; original source owners freshly absent. Final
+association releases the freeze. Its SHA256 is
+`3e189bdac96f4ed1207dae02db863702654acfcf48d931e0f27d3e61197646fb`;
+receipt SHA256 is
+`f4a75874fe497e39231d89045b1b44f7a4dd66fa08707ffc1754adf0fa56c5c0`.
+The original receipt's resource counter uses a wrong frontend prefix; a
+separate clarification independently rehashes51 actual root resource inputs
+with zero drift and preserves the immutable receipt bytes.
+An initial readonly-coordinator fixture write fails and is retained;
+reusing the standard writable fixture borrow corrects only the test harness.
+
+The single-plot normal/CHARS Google Earth successor has an exact two-file
+backend candidate and five canonical source hashes. All1605
+accepted nullable Audit predecessor inputs are reverified unchanged. Focused
+race10.444s and production compilation pass; independent backend follow-up
+race10.098s passes with no significant issues. Membership/None/actual retired-
+context and numeric-boundary/integer-storage acceptance gaps are closed.
+Tests independently parse exact one-placemark KML, check complete source data,
+NULL/empty descriptions, literal Env/Admin affinities, duplicate selected-SU
+isolation, unrelated malformed-row isolation, strict JSON, schema/coordinate
+errors and actual SQLite in-flight cancellation followed by owned retry.
+The initial missing-column fixture failed during its own rename because a stock
+report view referenced Longitude; removing that disposable view before rename
+fixes the harness, not the application. Its separately registered desktop
+successor has an exact20-file/14-base candidate: owned saved options and shared
+actual-Go wire initially passed race11.342s/production compile;117 focused/1627 registered
+frontend executions, check0/0 and default build pass. -ts -i generates74
+services/353 methods/379 models without warnings. Independent desktop review found
+MEDIUM multiline-description loss from HTML textarea parsing. Lossless escaped-
+original comparison and five actual-Go LF/CRLF/CR/entities fixtures now pass
+race11.197s, production compilation,118 focused/1628 registered frontend executions,
+check0/0 and default build. Initial candidate/finding and original14-base lineage
+are retained. Exact20-file v2 independent closure verifies original14 bases,
+five positive/nine altered-association cases and118 focused tests. Twelve normally
+closed disposable Wails owners preserve all16 files each: normal/CHARS original
+LF/CRLF/CR/NULL/empty/entities, complete independent physical Env rows, actual
+parent/humus/vegetation draft barriers, held successful response and actual
+validation yield Cancel/remount/late rejection, native-close/Return holds,
+labelled controls/data at1400/600/320 and both independent off-gates. Explicit
+Prepare-control follow-ups supplement the initial layout receipts. The2418-
+artifact seal is verified. Complete1613-input race passes exit0, UTC2026-10-12
+22:34:07.449853 to2026-10-13 00:09:52.762709, without input/discovery drift.
+Final association rehashes2418 sealed artifacts,20 candidates/14 original bases,
+canonical/source/predecessor lineage and twelve absent original owners. The
+freeze is released; no publication/external launch/default promotion is claimed.
+Initial self-closing
+textarea warnings, missing extracted-caller ownership variables, mixed browser/
+SSR runner failures and UTF16-log counting failure remain retained; corrections
+do not weaken source/lifecycle checks. No preference/publication writes or
+external launch acceptance is claimed.
+
+Next View Veg Table source evidence distinguishes normal17/CHARS14 columns and
+13/10 sort keys. Exact active controls and both all-project/selected-SU SQL
+branches are retained. Four extracted queries execute on a disposable ACE1033
+fixture with15/28 rows respectively, retaining all-NULL covers and exposing
+case-insensitive duplicate membership and unspecified ties. Two DAO hosts
+(one failed field-factory attempt, one accepted retry) close normally with locks
+absent; the18-artifact seal preserves canonical/catalogue hashes and verifies
+all1613 active integration inputs unchanged. This is controlled SQL evidence,
+not original callback, arbitrary locale or desktop acceptance. The unregistered,
+independently default-off backend draft now uses explicit controlled-English
+membership/order (966 calibrated native relations; general locale unverified),
+same-snapshot100000-row physical Veg/SU bounds and1..200-row joined pages with
+complete unique physical originals. Duplicate expansion is virtual, not allocated.
+Exact input/page thresholds and max+1 refusals, a fifty-million virtual join,
+17/14 variants, embedded/external/None/retired scope, NULL/duplicate IDs and raw
+storage/Unicode/cancellation/retry pass predecessor-inclusive race22.353s and
+production compile. Initial fixture failures remain retained. Exact3-file
+candidate and accepted manifest baseline are archived; independent backend
+review found no significant issues and accepts only this default-off saved-data
+draft. Candidate/base/source/validation hashes match; tests were not independently
+rerun. The registered mapped immutable/paginated desktop successor passes actual
+Go wires including50/20 pages, focused race58.226s,153 focused/1671 registered
+frontend executions, check0/0/default build/production compile and exact15-file/
+9-base independent review. Nine normally closed Wails owners retain16 files each,
+qualifying normal/CHARS selected/None, complete independent physical originals,
+actual paging, real parent/child draft barriers, held-response Cancel/variant/
+remount rejection, native-close/Return holds, labelled three-width columns/
+controls/disclosed originals and both independent off-gates. The1760-artifact
+seal is verified. Initial pre-owner NULL PlotNumber fixture refusal is retained;
+retry preserves family NOT NULL rather than weakening schema. Legacy nullable
+PlotNumber remains backend-only evidence. Complete1621-input integration passes
+`go test -race -timeout 120m ./...`, UTC2026-10-13T01:08:56.297106 to
+2026-10-13T02:39:54.546042, exit0 without input/discovery drift. Final association
+rechecks1760 artifacts, reviewed candidate/base/backend/source lineage and nine
+absent original owners; the freeze is released.
+No default promotion, general ACE locale, query DDL/edit/save/export or
+source/configuration/output writes are claimed.
+
+During that1621-input freeze, both active View Env Table callbacks and
+four known target lifecycles are source-traced. FormSet dispatches registry
+DataFormName to a form datasheet; USysEnv is a whole-project DISTINCTROW Env/
+Admin inner join, not SU/current-parent membership or raw Env-only export.
+One exact extracted query on a disposable ACE1033 fixture retains12 physical
+pairs, including four identical complete pair values; orphan rows are excluded
+and007/7 stay distinct. The15-artifact seal verifies13 source/catalogue hashes,
+normal DAO host/fixture cleanup and all1621 frozen inputs unchanged. Datasheet
+presentation, unsupported dynamic targets and original callbacks/lifecycle
+remain unqualified. No environment-table registration, desktop acceptance or
+writes are claimed.
+Supplemental static properties distinguish query order from target form order:
+default FS882-6x4 declares RootingDepth/SeepageDepth descending then PlotNumber;
+the other three declare PlotNumber. All export OrderByOn=NotDefault and
+FilterOnLoad=0. Stored filters are not automatically active; already-loaded
+instance ordering/filtering remains unknown.
+The default-off, unregistered readonly backend draft passes combined focused
+race76.036s and production compile. Owned dynamic target/refusal/missing-default
+behavior, target-specific declared order, whole-project physical Env/Admin
+pairs, complete typed witnesses, exact100000/max+1 input and200/max+1 page
+bounds,9,999,800,002 virtual pairs, selected/None/external/retired ownership,
+readonly preferences/data and actual in-flight cancellation/coordinator retry
+are covered. Exact two-file independent review finds no significant issues
+and verifies38 evidence hashes, without independently rerunning tests. Initial
+incomplete disposable schema failure is retained; the fixture preserves original
+columns on retry. This backend acceptance did not register or native-qualify
+the mapped desktop.
+The registered readonly successor retains446 bound instances from all four
+source targets, attached form labels and page groups, plus separate complete
+physical originals. Native datasheet headers/visibility/order are not inferred.
+Actual Go wires pass race2.764s; combined predecessor race122.934s,194 focused/
+1712 registered frontend executions, check0/0/default build/production compile
+and exact16-file/nine-base independent review pass. The reviewer verifies73
+hashes plus15 sealed source artifacts/four catalogues and all446 associations;
+Node PATH was unavailable, so there is no independent test rerun. Ten normally
+closed disposable Wails owners qualify four saved targets, normal/CHARS selected/
+None, complete independently observed pairs/originals/source-labelled values,
+60 unselected historical-date/nutrient rows despite stored filters, real draft
+barriers, paging, held-response/remount/close/Return, every planned selector at
+1400/600/320 and both off-gates. The2387-artifact seal rechecks all twelve original
+owners absent and all16 fixture files unchanged each. Two runner failures before
+source actions are retained with normal unchanged cleanup: missing owner capture
+and P1 on later ordinary None pages. Complete1630-input integration first failed
+after3555.054s with ThreadSanitizer allocation error1455 (Windows commit
+exhaustion), not an accepted pass. Inputs/discovery were unchanged. Its immutable
+log/receipt remain retained; exact-candidate retry passed root5607.056s with
+CGO1/GOMEMLIMIT1GiB/GOGC50/GOMAXPROCS2 and unchanged race instrumentation.
+All1630 inputs/discovery remained unchanged. Final association rehashed2387
+artifacts, sixteen candidates/nine bases, original source/catalogue/backend/
+vegetation lineage and twelve absent owners, with all sixteen fixture files
+unchanged per owner. Integration accepted; freeze released; gates default-off.
+
+Metadata opener follow-on: static74/75 binding/column and eleven-event source
+contract, then one controlled General1033 DAO fixture with nine lookup/three
+branch cases. Case/terminal ASCII-space aliases match;007/7 remain different.
+Unescaped apostrophe errors3077; DAO Null concatenation yields empty criterion
+without original Me.Value proof. Normal unmatched MyRS remains NoMatchTrue
+despite master match; empty MoveFirst3021 leaves it False and chooses SELECT
+even if master misses. No original form/Add/copy/allocation was executed.
+Seven artifacts rehash; normal fixture close/unlock and fresh original host
+absence pass with unchanged canonical sources. The independently default-off
+two-file backend passes combined race95.434s and production compile. Exact
+independent review verifies candidate/live, source/oracle/predecessor/validation
+lineage and finds no significant issues, without rerunning tests. Full-column
+fixture/API/readonly-master setup failures are retained; production guards
+were not weakened. Complete owned parent/page originals preserve historical
+storage, reject unknown membership/NULL parent and do not depend on global
+templates or write config/data/audits. Its registered mapped desktop passes202
+focused/1763 registered frontend executions, check0/0/default build, focused
+race91.337s, strict actual-Go wire and production compile. Warning-free -ts -i
+generation yields77 services/356 methods/385 models. Exact15-file/nine-base
+independent review verifies associations and physical fixtures with no
+significant issues, without primary-suite rerun. All74 source-labelled fields,
+immutable50-row paging and coupled draft/lifecycle guards are implemented.
+Initial unbound-node count and ID-storage expectation failures remain retained.
+Eight normally closed disposable Wails owners qualify normal/CHARS selected/
+None, both off-gates, all74 source fields/52 complete parent-page originals,
+50/20 paging, actual parent/humus/vegetation drafts, held-response Cancel/remount/
+late rejection, Return/native-close and all selectors at1400/600/320.
+The2056-artifact seal passes; ten original owners including two retained native
+independent-display expectation failures are absent, sixteen files unchanged
+each. Complete1638-input bounded-memory race integration passes exit0 in85m08s,
+with unchanged inputs and package/embed discovery. Final association reverified
+2056 artifacts, exact15 candidates/nine bases, native/source/backend/review/DAO/
+predecessor lineage and all ten absent original owners. The freeze is released;
+both gates remain default-off and original editable lifecycle is unaccepted.
+
+The mapped profiling readonly backend has two exclusive
+files and an independently default-off gate. Combined focused race93.489s and
+production compile pass. Explicit profile/attachment ownership, all nine fields,
+historical duplicate Order, Description distinctions,100000/max+1 physical
+sources,200/max+1 paging, actual concurrent WAL witness consistency and pinned
+in-flight cancellation/retry are covered. Exact candidate/source/predecessor
+association is sealed; independent review finds no significant issues and
+verifies hashes/helpers without rerunning primary checks. The initial fixture's
+missing VP08 Env Description is retained as a failure, then corrected without
+changing the application. Its registered desktop candidate passes213 focused/
+1815 registered frontend executions, check0/0/default build, production compile
+and focused Go race124.657s. Interface bindings are warning-free78/357/386.
+Nine public labels/bindings/header order are checked against the sealed source
+catalogue. Actual runtime response/validation retirement and local lazy50-row
+Description disclosure tests pass. Exact16-file/nine-base desktop review finds
+no significant issues; reviewer independently reruns213 focused tests and
+check0/0. Ready isolated candidates preserve reviewed inputs and default assets.
+Eight disposable-native cases pass normal/CHARS selected/None, independent
+off-gates, complete physical witnesses/nine displayed bindings,50/20 paging,
+draft barriers, actual response and candidate validation-yield retirement,
+close/Return and57 selector/width combinations per enabled owner.
+The2095-artifact seal verifies ten normally closed absent original owners and
+sixteen unchanged fixture files each. Full integration passes exit0,
+UTC2026-10-13T10:17:54.035226 to2026-10-13T11:43:35.674882, with no runner
+input or package/embed discovery drift. Final association reverified all2095
+native artifacts, exact reviews/source/predecessor lineage and absent owners.
+One retained harness timer-receiver failure was corrected without app edits.
+Initial UI block-scope and test-only warning
+receipts are retained and corrected. During the1646-input freeze, a separate
+source-only contract seals five active edit/suggestion callbacks and six raw
+combo declarations, including retained list state, bound Species NULL assignment,
+literal Sample_Env, explicit Layer/Operator LimitToList and exact spaced Lump SQL.
+Frozen inputs remain unchanged; native callbacks and mapped writes are unqualified.
+The Go/embed runner inventory omits one frontend-imported source read-model JSON;
+native review checked it before command start and the coverage reconciliation
+pins it separately:1646 runner inputs,1647 protected inputs. Final resource-complete
+association reverified both boundaries without altering the sealed runner and
+released the freeze. Both gates remain default-off.
+Eight artifacts seal independent General1033 DAO criterion calibration:
+twenty conversion cases/eight exact binary64 witnesses, including an adjacent
+DOUBLE whose concatenated literal becomes1 and changes the `>` result relative
+to binding the original DOUBLE. Original VBA callback/locale/mapped execution
+is not qualified. The DAO host exited normally, its lock is absent and source/
+frozen inputs remain unchanged.
+The private ChangeType conversion helper additionally passes twenty actual VBA
+cases through explicit fixture-only callers. Exact before/after reexports,
+value types/bits/literals, adjacent-threshold numeric predicates and all eight
+physical witnesses match. The19-artifact seal verifies two absent normally
+closed Access owners and no locks/source drift. First-attempt pre-execution
+regex failure is retained and corrected; the first export also matches.
+Original ProfileEnv/form callbacks and general locale/mapped execution remain
+unqualified.
+
+The numeric successor additionally seals36 artifacts:55 controlled ACE literal
+observations,480 independently captured DOUBLE comparisons, five accepted
+readonly fixtures and one retained unsupported-CDec-query attempt. All six
+original DAO hosts are absent, all locks absent and all eight physical witnesses
+unchanged per accepted fixture. LONG32, DECIMAL96/scale28 and DOUBLE comparisons
+are distinct, and scale28 half-even midpoint adjacency disproves formatting the
+row to fifteen digits before DECIMAL conversion. The five-file Env-only
+application candidate reproduces prior threshold failures, then passes all480
+source expectations through compiled SQLite queries, full service readonly/
+cancellation, storage/BOOLEAN/NULL/overflow and existing profile/formatter
+predecessors with race78.536s and production compilation. Exact five-path/
+three-base independent review finds no significant issues and independently
+verifies source pins/encoded expectations; tests/native were not rerun by the
+reviewer. Actual disposable Wails wire acceptance passes69 expected predicates
+across138 physical rules. All16 files and complete typed data/counts/history are
+unchanged and the original owner normally closed. The2367-artifact seal pins
+source/review/native/readonly predecessor lineage. Full1671-input integration
+with all51 resources passes exit0 without input/package/embed discovery drift,
+UTC2026-10-13T12:31:02.418218 to2026-10-13T13:55:30.502795. Final association
+reverified2367 artifacts, exact review and absent native owner, releasing the
+freeze. No original callback, mapped Run or default promotion is claimed.
+
+The cover-literal successor is integrated bounded acceptance.
+Source raw SINGLE, exact original MadMax/Nz expressions and DOUBLE aggregates
+expose differences from the previous bound-number queries;405 independent
+predicates,144 SINGLE midpoint comparisons and20 sum values are portable.
+Raw criteria are not Env-formatted. Veg arithmetic rounds each addition to
+SINGLE, promotes on overflow and retains DOUBLE after cancellation. Runtime
+precision is distinct from the DAO result descriptor. One aggregate-alias
+preparation failure is retained with normal cleanup; the qualified retry uses
+explicit physical-table columns. Before-fix failures are retained. Six-path
+candidate profile/formatter race70.047s and production compilation pass, including
+actual compiled queries, full readonly service/retry, NULL/malformed storage and
+TEXT255 criterion bounds. Exact six-path/four-base independent review accepts
+the bounded candidate without significant findings; all60 source artifacts and
+encoded expectations/hashes verified, no tests/native independently rerun.
+Disposable actual Wails wire passes431 predicates across1293 rules/59 parents,
+retaining complete typed review/schema/counts/data/history and16 files unchanged.
+Original owner normally closes and is absent. The2652-artifact seal retains
+accepted Env/source/review/native lineage; complete-source/resource full
+race passes exit0, UTC2026-10-13T14:49:16.625227 to2026-10-13T16:06:43.669853,
+with1673 protected inputs/all51 resources and no input/package/embed discovery
+drift. Final association reverified2652 artifacts and exact candidate/preimage/
+source/absent-owner evidence, releasing the freeze. Defaults/callbacks unchanged.
+The separate blank Access form host lifecycle passes with eleven sealed artifacts,
+normal owner closure/no lock and unchanged1671 application/five canonical inputs;
+zero source modules or original procedures were invoked.
+
+Two separate copied suggestion-callback host/dispatch attempts are retained as
+failures, not parity evidence. The corrected actual bound Form view preserves
+five exact private bodies and disables automatic import-created event bindings,
+but the first explicit dispatch fails with DISP_E_BADPARAMCOUNT. Zero calls
+completed and partial execution remains unknown. Both owners normally quit,
+both locks are absent and canonical/static/all1673 frozen inputs are unchanged;
+no third attempt or mapped editing acceptance is claimed.
+
+The raw-literal domain successor checks the measured exponent bound before zero
+acceptance and preserves supported underflow/leading zeros. Its conservative
+positive-exponent-zero-above28 refusal also excludes source-valid0e29/0e100;
+it is not source syntax rejection, general literal parity or inheritance of
+anomalous source values. Three paths/one accepted preimage pass106 native fixture
+cases, both compiler callers, readonly service refusal/correction/retry,
+coupled race68.876s and production compilation. Independent exact review finds
+no significant issues; source/candidate/preimage/diff hashes, all47 source
+artifacts and106 direct/30 search observations verified, no reviewer test/native
+rerun. Six normally closed/absent Wails owners verify actual Veg/Lump zero-domain/
+exponent-bound refusals and supported underflow. Complete typed rules/counts/
+data/history and16 files per owner are unchanged. The3686-artifact integration
+seal retains accepted cover lineage. Complete1675-input/all51-resource race
+passes exit0, UTC2026-10-13T16:32:16.515840 to2026-10-13T18:00:13.236306,
+without input/package/embed discovery drift. Final association reverified3686
+artifacts, the exact reviewed/preimage/source lineage and all six absent original
+native owners, releasing the freeze.
+
+The nullable ordinary Audit successor has distinct nullable presentation
+endpoints and a shared actual-Go wire fixture. Legacy strict AuditEntry/
+ListAuditEntries restoration/provenance remains unchanged. Shared query/order/
+schema policy, NULL/empty actor/date distinctions, explicit nonselectable NULL
+restoration, malformed UTF-8 refusal and same-context correction pass focused
+race7.062s, production compile,73 focused/1597 registered frontend executions,
+check0/0 and default build. Initial independent review found a HIGH actual
+merged-service captured-context adapter omission. The forwarding fix,65-method
+adapter requirement and actual delayed-read/backend stale-context checks close
+it in an independent focused follow-up; exact18-file/15-base successor review
+finds no significant issues. Six accepted/two rejected normally closed native
+owners preserve all16 files each. Initial-NULL ordinary labels/restoration
+refusal and normal/CHARS source launch, actual parent/humus/vegetation drafts,
+held-response cancellation/remount, native-close/Return, three-width visibility
+and independent source gates pass. The1710-artifact native seal is verified.
+Complete1605-input race passes exit0, UTC19:52:59.449269 to21:28:05.794068,
+without input/discovery drift. Exact association rehashes1710 artifacts,
+18 candidates/15 bases, canonical sources and accepted source Audit lineage,
+confirms all eight original owners absent and releases the freeze.
+
+The independently default-off source Audit candidate follows active normal/CHARS
+btnAudit -> USysAuditXL / UsysAuditTrail callbacks. Initial exact backend review
+found no significant issues; source Audit focused race5.421s and production
+compile pass. Its actual-Go round-trip fixture is shared with the strict client
+validator. Actual Svelte Load/error/retry/Cancel/destroy/remount/late-result and
+parent/peer guard tests pass54 focused and1595 registered frontend executions,
+check0/0 and default build. Exact22-file desktop review found no significant issues.
+Six accepted/eight normally closed native owners each preserve16 fixture files;
+normal/CHARS source rows, actual parent/humus/vegetation drafts, held-response
+Cancel/Return/remount/late rejection, native-close/Return barriers, three-width
+labelled cards and independent backend/client-off refusal pass. The1802-artifact
+native seal verifies all owners absent. Complete1602-input race passes exit0,
+UTC17:26:26.719054 to19:04:18.773109, without input/discovery drift. Final
+association rehashes1802 artifacts, exact review/base/source lineage and all
+eight closed owners; freeze released. Qualified native fixtures
+keep User/EditWhen valid after legacy ordinary Audit NULL User string scanning
+prevented mounting in the first rejected fixture. Nullable actor/date desktop
+launch is now proven by the separate nullable successor above; its complete
+integration is independently accepted, not inherited from predecessor acceptance.
+The readonly SQLite storage-order
+adaptation is not source restoration/registry-write or whole-form/report parity.
+
+The separately stored selected-SU reverse-transfer private kernel and strict
+facade each pass distinct review with no significant issues and production
+compilation. Frozen four-/ten-file predecessor inputs and receipts are retained
+privately under `external-su-reverse-kernel` / `external-su-reverse-facade`.
+Coverage includes actual independent SQLite writer exclusion in WAL/rollback
+modes, complete peer/schema/description drift, opened-handle replacement,
+trigger rollback/retry, cancellation, replay, committed cleanup receipts and
+unique exact positive-history recovery of uncertain commits; absent/duplicate
+history remains unknown. Registered/interface/retained desktop candidate checks
+pass coupled race70.038s,20 focused/1565 registered frontend case executions,
+check0/0 and default build. Missing extracted-test variables/exact guard
+expectations were corrected; failed logs are retained, not acceptance.
+Exact23-file desktop review finds no significant issues; the FS882 baseline
+matches the accepted1578-input predecessor exactly. Four normally closed actual
+Wails owners accept ordinary outer FS882 mutation/recovery and independent off
+gates. Enabled owners prove four cells/two rows/one history/zero source audits,
+unchanged16 support/config/source files in17-file fixtures, actual successful
+chunk-aware final-response loss/Cancel and readonly recovery without replay,
+immutable receipt/UUID after acknowledgement/remount, actual Save/Lock/close/six
+navigation plus native-close/Home barriers and required visible path/hash/control
+measurements at1400/600/320 widths. The private native seal rehashes1424 artifacts
+and confirms seven accepted/rejected owners closed. Three failed harness receipts
+remain failed, including fixture/catalogue/default-pane and guessed-selector
+assumptions; accepted fixtures leave immutable catalogues unchanged.
+Complete1594-input race integration passes exit0 in4968.961s, with zero source/
+discovery drift. Final association rehashes1424 artifacts/accepted backend lineage
+and canonical module, verifies all seven owners absent and releases the freeze.
+The action is ordinary outer FS882 only; nested normal/CHARS complete-entry panes
+hold it, and genuine CHARS outer-parent action parity remains unavailable. Existing
+public same-file transfer authority and all defaults are unchanged.
+
+The actual normal/CHARS mapped-control successor is a reviewed7-file candidate
+with disposable native acceptance. Canonical control/event/body/hash checks verify the real
+top-level `btnSuIntoEnv` identities omitted by the previous page projection.
+The candidate invokes the existing transfer inline, owns peer/child/reference
+guards, retains source variant with exact attempts through remount, and refreshes
+all loaded parent variants explicitly with receipt-preserving failure/retry.
+43 targeted/1567 registered frontend executions, check0/0, default build and
+39535104/39533568-byte exact-embed enabled/client-off Wails builds pass.
+Independent exact source review finds no significant issues. Six normally closed
+disposable owners accept actual mapped normal/CHARS invocation, once-only exact
+four-cell/two-row/one-history changes with zero source audits, successful-response
+loss/Cancel and readonly recovery, immutable receipt remount, independent gate
+refusals and three-width layout. Real source overlength/reference errors and
+valid unsaved drafts hold transfer; fresh literal acknowledgement and owner-local
+Undo make zero writes. Current and previously loaded peer source variants show
+the exact committed value after Return. The1869-artifact seal verifies all nine
+accepted/rejected owners closed and16 unchanged support/config/source files per
+enabled17-file fixture. Original async-cleanup failure was resolved on the same
+committed CHARS owner without replay; three subsequent zero-write harness
+failures retain selector/readiness/literal-acknowledgement assumptions, including
+explicit draft Undo before normal close. Automatic blocked-root remount remains
+retained-session/production-root test coverage rather than forced native teardown.
+Complete1594-input successor race passes exit0 in5354.906536s, UTC12:27:40.180049
+to13:56:55.086585, with unchanged inputs/discovery. Final association rehashes1869
+artifacts, accepted private backend lineage, canonical mapped forms/module and
+all nine closed owners; the freeze is released.
+
+The integrated exact nine-file picture-child candidate reuses the owned child
+PicturePanel for normal/CHARS mapped frmVPicsXL, behind its existing read gate.
+It retains source links/image identity, one active picture control surface and
+source/peer lifecycle barriers without metadataSession/manager mutation authority.
+75 targeted/1571 counted registered frontend executions, check0/0, default build,
+owned-picture race16.022s, production compile and exact-embed enabled/client-off
+SQLite-only Wails builds pass. Focused independent follow-up closes receipt
+auto-read and actual production-layout dispatch findings. Default-false layout
+capability and source-only receipt suppression preserve other callers.
+Six closed disposable Wails owners accept actual mapped normal/CHARS image bytes/
+dimensions/viewer, typed physical metadata, unapproved-path refusal, held-response
+Cancel/remount/late-result rejection, parent/source/native-close barriers and
+three-width containment. Two joint owners prove actual humus/vegetation drafts
+hold picture reads and picture pending holds peer fields/loads. All19 files remain
+unchanged per owner. Four rejected zero-write owners are closed and retained.
+Complete1594-input race passes UTC15:01:19.960328 to16:32:05.401129, exit0,
+with no source/discovery drift. Final association rehashes2113 artifacts, source
+lineage/canonical forms and all10 closed owners and releases the freeze.
+No source picture creation/deletion or default promotion follows. Exported
+normal/CHARS btnManagePictures controls have no OnClick binding; their private
+handlers remain dormant rather than being invented as an active source route.
+
+Existing A/BC and CHARS A literal Species list selection is independently reviewed,
+registered behind default-off capabilities, and disposable-native accepted.
+Normal/CHARS each prove one exact Species+cover Save, two audits/one history,
+complete physical peer preservation, actual chunk-aware successful-response
+Cancel/readonly recovery without replay and immutable receipt remount.
+Four accepted zero-write owners prove reference tuples, guards, layout and
+client/backend/C/D restrictions.1515 frontend cases and check0/0 pass.
+The351-file private native seal SHA256 is
+`dc38aeaf666a929b7389e11e8345a9bd494b75f3b00f7f40de85bf4abb566c15`.
+Failed runners remain retained; a completed Save is recovered on its same owner.
+
+Separate joint soil/Species acceptance changes no application source. Two
+normal/CHARS zero-write owners preserve all16 files, prove owner-local correction/
+Undo and cross-child/root barriers, and supply180 labelled soil measurements.
+The163-file private seal SHA256 is
+`2b4aeea042ea026bd1b420d0b93998c55618acd837ee9c1f0b0c3e0fc5ae9b9c`.
+Complete1551-input race integration passes exit0 in5120.640562s with unchanged
+inputs/ordinary-production discovery, UTC2026-10-12T04:25:38.346283
+to05:50:58.986845. Race receipt SHA256 is
+`d3fb0e191c8b310327b21a8a34b62418fa654b29e15710b248a4c11cd44683f8`.
+Final association rehashes541 artifacts,20 canonical sources and34 reviewed
+inputs and confirms all13 source/native owners normally closed; freeze released.
+This accepts the bounded successor, not whole-form replacement or defaults.
+
+Original label reports have a separate selected-device native PDF projection
+contract: four reopened PDFs,26 label slots/129 exact lines, raw NULL/empty
+staging retained and unclipped page spans. Both Access owners normally close;
+no source callback, print job or canonical mutation occurs.
+The27-file private source seal SHA256 is
+`55cf99df652cbc40121f46b8854dfc9c1ad2c9555b978fbf272d3cecc24440d7`.
+This does not implement application export or physical printing.
+
+Private portable single-label preparation/runtime Arial loading are now
+independently reviewed with no significant issues, including a stricter
+installable/editable-only embedding-permission follow-up. Focused combined
+race3.206s, permission-follow-up race3.119s and ordinary/SQLite-only production
+compiles pass. Two actual-kernel PDFs independently reopen as10 exact spans with
+real embedded Arial, one612-by792-point page and all original relative field
+rectangles/alignment. A separate four-PDF/129-span font experiment preserves
+source text but measures native glyph-advance differences up to0.834595pt:
+printer geometry is NOT accepted. Fixed spacing, printable-ASCII/no-overflow and
+calibrated en-US date are explicit preparation bounds; other input refuses
+without repairing historical data. Handle/error/cancellation faults retain no
+partial fonts or PDF bytes. The41-file private preparation/closed-build seal is
+`652a1ebd7c670f69474f3335018b00d029511daf27d0169d4da78baf0aeb7bd1`.
+The1551-input full integration above predates these PDF helpers.
+
+Owned publication/strict owner-scoped service have a separate34-file seal,
+verifying all41 predecessor artifacts, SHA256
+`caa8b6dee50c47b0b52c0d67b2fcaa6ee09d1486c86cc7f292840a569d0e9b9c`.
+Complete physical source/date/fonts and internal bytes are reobserved around a
+no-overwrite publication; postcommit drift/errors retain path/hash. Focused races
+and distinct backend reviews pass. Observations are not through-link write locks,
+and the attempt ledger is service-owner scoped memory rather than durable history.
+
+The registered default-off portable single-label PDF desktop now passes coupled
+race12.108s,30 focused/1545 full frontend case executions, check0/0, default frontend
+and two exact-embed isolated Wails builds. Distinct15-file review finds no
+significant issues. Four normally closed disposable owners preserve all16
+database/config files while proving one independently reopened exact-font/text/
+Letter PDF, actual successful chunk-aware response hold/loss, readonly recovery
+without replay, immutable card-independent receipt remount, held-read Cancel/
+late-result rejection, NULL/empty/refusal correction and independent gates.
+All51 planned control/receipt measurements pass at1400/600/320. The1031-file
+native/build/review seal SHA256 is
+`966f84f0e336a744964feb3ea0fd7299b8250de8934718f469ed5e1656dc270a`.
+The rejected selector runner and zero-write cleanup remain failed evidence;
+sealer Mode assumptions are corrected against explicit owner plans.
+Complete1578-input race integration passes exit0 with unchanged inputs/discovery,
+UTC2026-10-12T07:21:39.259730 to08:51:40.964879 (5401.705149s). Final association
+reverifies1031 native/build/review artifacts, preparation/service predecessors
+and27 source-projection files, five canonical label sources and seven original
+native/source owners absent. Association SHA256 is
+`ad75a976d65f746c99649049fe9e7833495b7e564ff2e14a92bc16c936895d9e`.
+The freeze is released; the failed missing-process runner assumption is retained
+as a correction, not accepted evidence. Physical printing, stock alignment,
+unresolved source callbacks, defaults and overall replacement remain unaccepted.
+
+## Accepted whole-project report predecessor
+
+Original whole-project Long Vegetation scope, retained workspace/panels and
+coherent root routing are independently reviewed and bounded native-accepted,
+remaining independently default-off. Full1321 frontend cases and Svelte check
+zero errors/warnings pass; actual-main private builds preserve accepted assets.
+Eight normally closed owners prove23 cases, four once-only Unit commits and
+four independently reopened exact-SHA project workbooks. All16 originals/
+22 protected identities restore and no extra physical database/owner remains.
+The289-file private native seal SHA256 is
+`1b3560502a47616f645f7fe8f0468a0e50cb0b237d8bb83362c72d1f71702d2d`.
+Failure evidence and closed-build archives remain retained; the terminated
+zero-write close predecessor is explicitly excluded from accepted owners.
+The [project report contract](LONG_VEGETATION_WORKBOOK_CONTRACT.md#whole-project-projection-boundary)
+records adaptations and remaining exclusions.
+
+Fresh corrected1333-input complete-source Windows race passes exit0 in
+4069.67047 seconds, finishing2026-10-10T22:11:38.375650Z. Frozen inputs and
+ordinary/production package/embed discoveries remain unchanged. All289 sealed
+native files and22 reviewed inputs reverify, with final acceptance separately
+associated rather than rewriting the immutable seal. The initially interrupted
+runner remains failed evidence.
+No commit, default promotion, printing or whole-replacement grant is implied.
+
+## Published feature-series baseline
 
 - Historical SIVI creation Undo, independently default-off.
 - 987 application source identities; 597 Go source hashes remained unchanged

@@ -190,7 +190,7 @@ test('creation panel retains receipts and safety feedback while unknown writes e
 
 test('root aggregates persistent creation ownership rather than letting a disposed read clear native-close and transition guards', () => {
   const app = source('App.svelte');
-  assert.match(app, /editorBusy = \$derived\(localEditorBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy\)/);
+  assert.match(app, /editorBusy = \$derived\(localEditorBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy \|\| externalSUEnvironmentBusy \|\| summaryPreferenceBusy \|\| summaryFieldListBusy \|\| summaryEnvironmentalBusy \|\| projectReportBusy\)/);
   assert.match(app, /pictureCreationBusy = activity\.busy \|\| activity\.blocked/);
   assert.match(app, /subscribePictureCreationActivity/);
   assert.match(app, /pictureManagerPlot = activity\.owner\.plotNumber/);
@@ -246,7 +246,7 @@ test('retained chooser and unknown writes block actual root close/context/naviga
   const closed = [];
   const context = componentFunctions('App.svelte', ['handleCloseRequest', 'respondToClose', 'requestTransition',
     'respondToTransition', 'navigate'], {
-    view: 'picture-manager', localEditorBusy: true, pictureCreationBusy: false, pictureLifecycleBusy: false, busy: false, editor: null,
+    view: 'picture-manager', localEditorBusy: true, pictureCreationBusy: false, pictureLifecycleBusy: false, summaryEnvironmentalBusy: false, projectReportBusy: false, busy: false, editor: null,
     transitionWorking: false, archivePublicationBusy: false, vegetationPublicationBusy: false,
     lifeformPublicationBusy: false, summaryPublicationBusy: false, pendingTransition: null,
     closeWorking: false, closeRequest: '', closeError: '', error: '', transitionError: '',
@@ -259,9 +259,9 @@ test('retained chooser and unknown writes block actual root close/context/naviga
     },
   });
   const expression = source('App.svelte').match(/const editorBusy = \$derived\(([^;]+)\);/)[1];
-  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', `return ${expression}`);
+  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', 'summaryPreferenceBusy', 'summaryFieldListBusy', 'summaryEnvironmentalBusy', 'projectReportBusy', 'externalSUEnvironmentBusy', `return ${expression}`);
   Object.defineProperty(context, 'editorBusy', {
-    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy),
+    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy, context.summaryPreferenceBusy, context.summaryFieldListBusy, context.summaryEnvironmentalBusy, context.projectReportBusy, context.externalSUEnvironmentBusy),
   });
   let observe = registry.subscribePictureCreationActivity(activity => {
     context.pictureCreationBusy = activity.busy || activity.blocked;
@@ -369,7 +369,7 @@ test('actual peer receipt effects refresh loaded owners once and discard late de
   const { compile } = require('svelte/compiler');
   const ts = require('typescript');
   const script = source('PicturePanel.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1]
-    .replace('onBusyChange, metadataSession }', 'onBusyChange, metadataSession, inspect }')
+    .replace('onBusyChange, metadataSession,', 'onBusyChange, metadataSession, inspect,')
     .replace('metadataSession?: PictureMetadataSession;', 'metadataSession?: PictureMetadataSession; inspect: (value: unknown) => void;');
   const compiled = compile(`<script lang="ts">${script}
     $effect(() => inspect({ review, selected, error, busy, cancel }));

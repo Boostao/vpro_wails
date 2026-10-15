@@ -2,8 +2,126 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { readFileSync } = require('node:fs');
 const { render } = require('svelte/server');
-const { componentFunctions, serverComponent } = require('./svelteTestHelpers.cjs');
+const { componentFunctions: extractFunctions, serverComponent } = require('./svelteTestHelpers.cjs');
+const componentFunctions = (name, functions, values) => extractFunctions(name, functions, {
+  auditOpen: false, auditBusy: false, googleEarthOpen: false, googleEarthBusy: false, ...values,
+});
 const owner = { contextId: 'context:owned', project: 'OwnedProject', plot: 'P' };
+
+test('actual mapped reverse action holds all variants, child ownership, validation and foreign scope before opening', () => {
+  const clean = { unsaved: false, busy: false, blocked: false, error: null };
+  const active = { ...clean }, peer = { ...clean }, calls = [];
+  const host = componentFunctions('TwoPageEntryEditor.svelte', ['getDraftState', 'openExternalTransfer'], {
+    owner, form: 'FS882-8x6XL-CHARS', close: active, error: null,
+    externalOpen: false, sourceRefreshing: false, sourceBlocked: false, childBlocked: false,
+    sourceScope: { ...owner, projectPath: 'P.db', su: 'Separate', suPath: 'S.db' },
+    externalSession: { reviewSourceForm: form => calls.push(form) },
+    view: { original: {}, referenceError: null },
+    sessions: new Map([['normal', { closeState: () => peer, view: () => ({ error: peer.error, referenceError: peer.referenceError }) }],
+      ['chars', { closeState: () => active, view: () => ({ error: active.error, referenceError: null }) }]]),
+    onchange() {},
+  });
+  for (const blocked of ['unsaved', 'busy', 'blocked']) {
+    peer[blocked] = true; host.actions.openExternalTransfer();
+    assert.equal(host.externalOpen, false); assert.deepEqual(calls, []);
+    peer[blocked] = false; host.error = null;
+  }
+  for (const blocked of ['sourceBlocked', 'childBlocked']) {
+    host[blocked] = true; host.actions.openExternalTransfer(); assert.equal(host.externalOpen, false);
+    host[blocked] = false; host.error = null;
+  }
+  peer.referenceError = 'Inactive peer references failed'; host.actions.openExternalTransfer();
+  assert.equal(host.externalOpen, false); peer.referenceError = null; host.error = null;
+  host.error = 'Retained source validation'; host.actions.openExternalTransfer();
+  assert.equal(host.externalOpen, false);
+  host.error = null; host.sourceScope.contextId = 'foreign'; host.actions.openExternalTransfer();
+  assert.equal(host.externalOpen, false);
+  host.error = null; host.sourceScope.contextId = owner.contextId; host.actions.openExternalTransfer();
+  assert.equal(host.externalOpen, true); assert.deepEqual(calls, ['FS882-8x6XL-CHARS']);
+  assert.equal(host.actions.getDraftState().unsaved, true);
+  assert.equal(host.actions.getDraftState().blocked, true);
+});
+
+test('source Return refreshes original and loaded peer variants; failure retains pane and receipt without replay', async () => {
+  const calls = [];
+  const peer = name => ({ closeState: () => ({ unsaved: false, busy: false, blocked: false }),
+    view: () => ({ original: {}, error: null, referenceError: null }),
+    load: async () => { calls.push(name); return true; } });
+  const current = peer('chars'), normal = peer('normal');
+  const host = componentFunctions('TwoPageEntryEditor.svelte', ['returnFromExternalTransfer'], {
+    externalOpen: true, sourceRefreshing: false, error: null, session: current,
+    externalEditor: { getCloseState: () => ({ unsaved: false, busy: false }) },
+    sessions: new Map([['chars', current], ['normal', normal]]), onchange() {},
+    oncommitted: async () => calls.push('parent'),
+  });
+  normal.load = async () => { calls.push('failed normal'); return false; };
+  await host.actions.returnFromExternalTransfer();
+  assert.equal(host.externalOpen, true); assert.equal(host.sourceRefreshing, false);
+  assert.match(host.error, /refresh failed.*never replay/i);
+  assert.deepEqual(calls, ['parent', 'chars', 'failed normal']);
+  normal.load = async () => { calls.push('normal'); return true; };
+  await host.actions.returnFromExternalTransfer();
+  assert.equal(host.externalOpen, false); assert.equal(host.error, null);
+  assert.deepEqual(calls.slice(3), ['parent', 'chars', 'normal']);
+  host.externalEditor.getCloseState = () => ({ unsaved: true, busy: false });
+  host.externalOpen = true; calls.length = 0;
+  await host.actions.returnFromExternalTransfer();
+  assert.deepEqual(calls, []); assert.equal(host.externalOpen, true);
+});
+
+test('source-held callbacks cannot stage, save, switch or close a retained source transfer', async () => {
+  const host = componentFunctions('TwoPageEntryEditor.svelte',
+    ['stage', 'selectProject', 'acknowledge', 'chooseForm', 'closeReview', 'operation'], {
+      externalOpen: true, error: null, childBlocked: false, close: { unsaved: false, busy: false, blocked: false },
+      onclosed: () => { throw new Error('No close permitted'); },
+    });
+  host.actions.stage('SiteUnitLongName', { kind: 'text', raw: 'new' });
+  assert.match(host.error, /no field was staged/);
+  host.actions.selectProject('1'); assert.match(host.error, /no ProjectID was staged/);
+  host.actions.acknowledge('SiteUnitLongName'); assert.match(host.error, /no literal draft was acknowledged/);
+  await host.actions.operation('save'); assert.match(host.error, /source transfer/);
+  await host.actions.chooseForm('FS882-8x6XL'); assert.match(host.error, /before changing source variant/);
+  host.actions.closeReview(); assert.match(host.error, /before closing/);
+});
+
+test('actual mapped picture activity holds parent callbacks and source action until owner-local Cancel completes', async () => {
+  const source = readFileSync(`${__dirname}\\FS882Form.svelte`, 'utf8');
+  const expression = source.match(/childBlocked=\{([^}]+)\}/)?.[1];
+  assert.ok(expression);
+  const keys = ['twoPageSoilBusy', 'twoPageSoilBlocked', 'twoPageVegetationBusy', 'twoPageVegetationBlocked', 'pictureBusy', 'pictureMetadataPending'];
+  const blocked = new Function(...keys, `return ${expression};`);
+  const clean = { unsaved: false, busy: false, blocked: false, error: null };
+  const calls = [];
+  const host = componentFunctions('TwoPageEntryEditor.svelte',
+    ['getDraftState', 'openExternalTransfer', 'stage', 'selectProject', 'operation', 'chooseForm', 'closeReview'], {
+      owner, form: 'FS882-8x6XL', close: clean, error: null, editingEnabled: true, reviewEnabled: true,
+      externalOpen: false, sourceRefreshing: false, sourceBlocked: false, childBlocked: false,
+      view: { original: {}, drafts: {}, referenceError: null },
+      sourceScope: { ...owner, projectPath: 'P.db', su: 'Separate', suPath: 'S.db' },
+      externalSession: { reviewSourceForm: form => calls.push(['transfer', form]) },
+      sessions: new Map(), session: {
+        stage: () => calls.push('stage'), selectProject: () => calls.push('project'),
+        load: () => calls.push('load'), save: () => calls.push('save'),
+      }, onclosed: () => calls.push('close'), onchange() {},
+    });
+  for (const activity of keys) {
+    host.childBlocked = blocked(...keys.map(key => key === activity));
+    assert.equal(host.childBlocked, true, activity);
+    host.actions.stage('SiteUnitLongName', { kind: 'text', raw: 'new' });
+    assert.match(host.error, /linked-child ownership/);
+    host.actions.selectProject('1'); assert.match(host.error, /linked-child ownership/);
+    await host.actions.operation('save'); assert.match(host.error, /linked-child drafts, reads and receipts/);
+    await host.actions.chooseForm('FS882-8x6XL-CHARS');
+    host.actions.closeReview();
+    host.actions.openExternalTransfer();
+    assert.deepEqual(calls, [], activity);
+    assert.equal(host.externalOpen, false);
+    host.error = null;
+  }
+  host.childBlocked = blocked(...keys.map(() => false));
+  host.actions.openExternalTransfer();
+  assert.deepEqual(calls, [['transfer', 'FS882-8x6XL']]);
+});
 
 test('actual reference option keys preserve Zone DISTINCT tuples and duplicate physical code identities', () => {
   const source = readFileSync(`${__dirname}\\TwoPageEntryEditor.svelte`, 'utf8');
@@ -128,7 +246,7 @@ test('actual complete-entry panel caches read ports per session and refuses repl
 test('actual panel close-state barrier covers the open review even after clean atomic save', () => {
   const close = { unsaved: false, busy: false, blocked: false, canSave: true, saveReason: '', error: null };
   const panel = componentFunctions('TwoPageEntryEditor.svelte', ['getCloseState', 'closeReview'], {
-    close, error: null, onclosed() {}, view: { error: null },
+    close, error: null, externalOpen: false, childBlocked: false, onclosed() {}, view: { error: null },
   });
   const barrier = panel.actions.getCloseState();
   assert.equal(barrier.unsaved, true);

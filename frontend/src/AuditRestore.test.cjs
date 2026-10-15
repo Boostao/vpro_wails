@@ -5,6 +5,8 @@ const { test } = require('node:test');
 const vm = require('node:vm');
 const ts = require('typescript');
 const { parse, compile } = require('svelte/compiler');
+const { render } = require('svelte/server');
+const { serverComponent } = require('./svelteTestHelpers.cjs');
 
 const source = readFileSync(path.join(__dirname, 'AuditRestore.svelte'), 'utf8');
 const code = source.match(/<script lang="ts" module>([\s\S]*?)<\/script>/)[1];
@@ -15,7 +17,7 @@ vm.runInNewContext(ts.transpileModule(code, {
 const { exactAuditRowId, auditRestoreReason } = exportsObject;
 const row = (overrides = {}) => ({
   rowId: '9007199254740993', project: 'Sample', plotNumber: 'RESTUI1', table: '_Env',
-  editField: 'Elevation', id: null, ...overrides
+  editField: 'Elevation', id: null, user: 'actor', editWhen: '2020-01-01 00:00:00', ...overrides
 });
 const caps = {
   header: { plotNumber: true, elevation: true, officeNotes: true, slope: true, microtopType: true, speciesListComplete: true },
@@ -60,6 +62,28 @@ test('component compiles with accessible native dialog and explicit actions', ()
   assert.match(source, /aria-labelledby="audit-confirm-title"/);
   assert.match(source, /selected = \[\]/);
   assert.doesNotMatch(source, /Number\(.*rowId|parseInt\(.*rowId/);
+});
+
+test('real Go nullable ordinary wire stays readable but explicitly unavailable to strict restoration', () => {
+  const entries = JSON.parse(readFileSync(path.join(__dirname, 'ordinaryAuditWire.json'), 'utf8'));
+  assert.match(auditRestoreReason(entries[0], 'Sample', '108050', caps), /NULL audit actor.*unavailable/);
+  assert.match(reason(row({ editWhen: null })), /NULL audit date.*unavailable/);
+  assert.equal(reason(row({ user: '', editWhen: '' })), null);
+  const component = serverComponent(source, 'AuditRestore.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': { AuditRestoreAction: { AuditRestoreCancel: 0, AuditRestoreRetain: 1, AuditRestorePrune: 2 } },
+  });
+  const html = render(component, { props: {
+    entries, project: 'Sample', plot: '108050', capabilities: caps, enabled: true,
+    disabled: false, gateReason: '', revision: 0, onrestore: async () => { throw new Error('readonly render cannot restore'); },
+  } }).body;
+  assert.match(html, /\(NULL\).*<br\s*\/?>\(NULL\)/);
+  assert.match(html, /type="checkbox"[^>]*disabled/);
+  assert.match(html, /NULL audit actor is readable but unavailable/);
+  const empty = render(component, { props: {
+    entries: [{ ...entries[0], user: '', editWhen: '' }], project: 'Sample', plot: '108050',
+    capabilities: caps, enabled: false, disabled: false, gateReason: '', revision: 0, onrestore: async () => {},
+  } }).body;
+  assert.match(empty, /\(empty text\).*<br\s*\/?>\(empty text\)/);
 });
 test('form gates restoration and refreshes both header and child revision after all outcomes', () => {
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');

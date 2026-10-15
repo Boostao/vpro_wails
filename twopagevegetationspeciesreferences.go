@@ -9,6 +9,8 @@ import (
 	"unicode/utf8"
 )
 
+const twoPageVegetationSpeciesReferenceSource = "configured-owned-imported-SQLite VLists.USysAllSpecs/VUser.USysUserSpp; physical definitions, not source union membership"
+
 type twoPageVegetationSpeciesReferences struct {
 	ContextID string               `json:"contextId"`
 	Project   string               `json:"project"`
@@ -55,7 +57,7 @@ func (s *ContextService) readTwoPageVegetationSpeciesReferences(ctx context.Cont
 			}
 			return &twoPageVegetationSpeciesReferences{
 				ContextID: contextID, Project: project, Plot: plot, Form: form,
-				Source: "configured-owned-imported-SQLite VLists.USysAllSpecs/VUser.USysUserSpp; physical definitions, not source union membership",
+				Source: twoPageVegetationSpeciesReferenceSource,
 				Master: references.Master, Personal: references.Personal,
 			}, nil
 		})

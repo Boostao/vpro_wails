@@ -60,6 +60,11 @@ func planTwoPageVegetationHistoricalEdits(ctx context.Context, original *twoPage
 }
 
 func planTwoPageVegetationTypedEdits(ctx context.Context, original *twoPageVegetationOriginal, edits []twoPageVegetationEdit, canonicalSingle bool) ([]twoPageVegetationAssignment, error) {
+	return planTwoPageVegetationQualifiedEdits(ctx, original, edits, canonicalSingle, nil)
+}
+
+func planTwoPageVegetationQualifiedEdits(ctx context.Context, original *twoPageVegetationOriginal, edits []twoPageVegetationEdit,
+	canonicalSingle bool, speciesReferences *twoPageVegetationSpeciesReferences) ([]twoPageVegetationAssignment, error) {
 	if ctx == nil || original == nil || original.ContextID == "" || original.Project == "" ||
 		original.Plot == "" || !utf8.ValidString(original.ContextID) || !utf8.ValidString(original.Project) ||
 		!utf8.ValidString(original.Plot) || len(edits) == 0 {
@@ -74,6 +79,11 @@ func planTwoPageVegetationTypedEdits(ctx context.Context, original *twoPageVeget
 	}
 	if original.Table != original.Project+"_Veg" || original.RecordSource != source {
 		return nil, errors.New("two-page vegetation original belongs to another physical source")
+	}
+	if speciesReferences != nil && (speciesReferences.ContextID != original.ContextID ||
+		speciesReferences.Project != original.Project || speciesReferences.Plot != original.Plot ||
+		speciesReferences.Form != original.Form || original.Form != "SubVegAXL_BC" && original.Form != "SubVegAXL") {
+		return nil, errors.New("two-page Species list references belong to another exact original A/CHARS owner")
 	}
 	columns, err := siteUnitTransferColumns(original.Records, "ID", "PlotNumber")
 	if err != nil {
@@ -120,6 +130,9 @@ func planTwoPageVegetationTypedEdits(ctx context.Context, original *twoPageVeget
 		covers = covers[:7]
 	}
 	allowed := map[string]bool{"Collected": true}
+	if speciesReferences != nil {
+		allowed["Species"] = true
+	}
 	for _, cover := range covers {
 		allowed[cover] = true
 	}
@@ -170,7 +183,13 @@ func planTwoPageVegetationTypedEdits(ctx context.Context, original *twoPageVeget
 		if edit.Value.Real != nil && *edit.Value.Real == 0 && math.Signbit(*edit.Value.Real) {
 			return nil, errors.New("two-page vegetation new negative-zero values require lossless source/storage calibration")
 		}
-		if edit.Column == "Collected" {
+		if edit.Column == "Species" {
+			if edit.Value.Storage != "text" || edit.Value.Text == nil {
+				err = errors.New("two-page Species list assignment requires non-NULL literal text")
+			} else {
+				_, err = qualifyTwoPageVegetationSpeciesListSelection(ctx, speciesReferences, *edit.Value.Text)
+			}
+		} else if edit.Column == "Collected" {
 			err = validateChildPhysicalText("Veg.Collected", value, 1)
 		} else {
 			err = validateSIVIChildSingle(edit.Column, edit.Value)
@@ -193,6 +212,11 @@ func planTwoPageVegetationTypedEdits(ctx context.Context, original *twoPageVeget
 		}
 		assignments = append(assignments, twoPageVegetationAssignment{edit.RowID, edit.Column, id,
 			cloneSiteUnitCell(before), cloneSiteUnitCell(edit.Value), value})
+	}
+	if speciesReferences != nil {
+		if err := requireTwoPageVegetationSpeciesListCovers(original, assignments); err != nil {
+			return nil, err
+		}
 	}
 	if err := ctx.Err(); err != nil {
 		return nil, err

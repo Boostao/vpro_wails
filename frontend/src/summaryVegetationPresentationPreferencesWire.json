@@ -1,0 +1,58 @@
+{
+  "review": {
+    "contextId": "e4403ac2d8150740f438415559ff653c",
+    "project": "Sample",
+    "projectPath": "C:\\Users\\BrunoTremblay\\AppData\\Local\\Temp\\TestSummaryPresentationFacadeEmitActualGoWire4181081\\001\\data\\projects\\Sample.db",
+    "su": "None",
+    "suPath": "",
+    "values": {
+      "title": "Short veg report title",
+      "showCommon": false,
+      "showGuide": false,
+      "hierarchyHeader": false,
+      "includeEnv": false,
+      "createSummary": true,
+      "combineVariants": false,
+      "constancy": false,
+      "groupBy": 1,
+      "display": 1,
+      "valueLimit": 0
+    },
+    "source": "owned native YAML saved Summary presentation; explicit Save adaptation; constancy-on forces Group by3/Display1/common names off without clearing limit; no guide renames, field-list writes or report-consumer parity"
+  },
+  "request": {
+    "expected": {
+      "title": "Short veg report title",
+      "showCommon": false,
+      "showGuide": false,
+      "hierarchyHeader": false,
+      "includeEnv": false,
+      "createSummary": true,
+      "combineVariants": false,
+      "constancy": false,
+      "groupBy": 1,
+      "display": 1,
+      "valueLimit": 0
+    },
+    "proposed": {
+      "title": "literal title",
+      "showCommon": false,
+      "showGuide": false,
+      "hierarchyHeader": false,
+      "includeEnv": false,
+      "createSummary": true,
+      "combineVariants": false,
+      "constancy": true,
+      "groupBy": 3,
+      "display": 1,
+      "valueLimit": 0
+    },
+    "constancyApplied": true
+  },
+  "outcome": {
+    "contextId": "e4403ac2d8150740f438415559ff653c",
+    "changed": true,
+    "committed": true,
+    "errorMessage": ""
+  }
+}

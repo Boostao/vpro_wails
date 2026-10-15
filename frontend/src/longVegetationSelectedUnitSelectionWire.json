@@ -1,0 +1,23 @@
+{
+  "contextId":"owned","project":"Sample","projectPath":"C:\\project.db","su":"Selected","suPath":"C:\\external.db",
+  "revision":"2","fields":["Zone"],
+  "definitions":[
+    {"table":"Env","name":"PlotNumber","declaredType":"TEXT","available":true,"reason":""},
+    {"table":"Env","name":"Zone","declaredType":"TEXT","available":true,"reason":""},
+    {"table":"Admin","name":"Plot","declaredType":"TEXT","available":true,"reason":""}
+  ],
+  "build":{
+    "approvalHash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "occurrences":[
+      {"membershipId":"1","envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"1","envRowId":"11","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"1","envRowId":"12","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"1","envRowId":"12","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"2","envRowId":"11","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"2","envRowId":"11","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Alpha","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"2","envRowId":"12","adminRowId":"21","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}},
+      {"membershipId":"2","envRowId":"12","adminRowId":"22","plotNumber":{"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},"siteUnit":{"storage":"text","text":"Beta","integer":null,"real":null,"blobHex":null}}
+    ]
+  },
+  "buildCurrent":true
+}

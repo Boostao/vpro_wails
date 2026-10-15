@@ -4,12 +4,15 @@ import { equalVegetationCell, serializeTwoPageVegetationRequest, twoPageVegetati
   type TwoPageVegetationOwner, type TwoPageVegetationOriginal, type TwoPageVegetationRequest } from './twoPageVegetationWire';
 import { stageTwoPageVegetation, twoPageVegetationRequest, type TwoPageVegetationDrafts } from './twoPageVegetationEditor';
 import { twoPageVegetationReceiptFromWire, twoPageVegetationOutcomeFromWire, twoPageVegetationCommittedOriginal,
+  twoPageVegetationSpeciesListReceiptFromWire, twoPageVegetationSpeciesListOutcomeFromWire,
   type TwoPageVegetationReceipt } from './twoPageVegetationReceipt';
 import { vegetationReferencesFromWire, type VegetationReferences } from './twoPageVegetationReferences';
+import { requireVegetationSpeciesListCovers } from './twoPageVegetationSpeciesList';
 
 export interface TwoPageVegetationPort {
   read(): CancellableRead<unknown>;
   save(requestJSON: string): CancellableRead<unknown>;
+  saveSpeciesList?(requestJSON: string): CancellableRead<unknown>;
   outcome(requestJSON: string): CancellableRead<unknown>;
   references(): CancellableRead<unknown>;
   validationYield?(): PromiseLike<void>;
@@ -44,7 +47,8 @@ export class TwoPageVegetationSession {
   private readonly retiredRequests = new Set<string>();
   private readingReferences = false;
 
-  constructor(owner: TwoPageVegetationOwner, private readonly port: TwoPageVegetationPort, private readonly writingEnabled = false) {
+  constructor(owner: TwoPageVegetationOwner, private readonly port: TwoPageVegetationPort, private readonly writingEnabled = false,
+    private readonly speciesListEnabled = false) {
     this.owner = { ...owner };
   }
   subscribe(notify: () => void) {
@@ -106,6 +110,9 @@ export class TwoPageVegetationSession {
   }
   async loadReferences(): Promise<boolean> {
     this.known();
+    if (Object.values(this.state.drafts).some(draft => draft.column === 'Species')) {
+      throw new Error('Correct or Undo retained Species drafts before replacing their reviewed reference snapshot.');
+    }
     const generation = ++this.generation;
     this.readingReferences = true;
     this.state.busy = true; this.state.references = null; this.state.referenceError = null; this.changed();
@@ -132,12 +139,34 @@ export class TwoPageVegetationSession {
     this.known();
     if (!this.writingEnabled) throw new Error('Vegetation writing is disabled.');
     if (!this.state.original) throw new Error('Load the exact vegetation original before staging.');
-    const draft = stageTwoPageVegetation(this.state.original, rowId, column, raw, nullValue);
+    if (column === 'Species' && (!this.speciesListEnabled || !this.state.references)) {
+      throw new Error('Species list selection requires its independent gate and reviewed physical references.');
+    }
+    const draft = stageTwoPageVegetation(this.state.original, rowId, column, raw, nullValue,
+      this.speciesListEnabled ? this.state.references ?? undefined : undefined);
     const key = JSON.stringify([rowId, column]);
     if (!draft.error && equalVegetationCell(draft.expected, draft.value)) delete this.state.drafts[key];
     else this.state.drafts[key] = draft;
-    this.state.error = Object.values(this.state.drafts).find(draft => draft.error)?.error ?? null;
+    this.revalidateSpeciesDrafts();
     this.changed();
+  }
+  private revalidateSpeciesDrafts() {
+    if (this.state.original && this.state.references) {
+      for (const [key, draft] of Object.entries(this.state.drafts)) {
+        if (draft.column === 'Species') {
+          this.state.drafts[key] = stageTwoPageVegetation(this.state.original, draft.rowId, draft.column,
+            draft.raw, draft.nullValue, this.state.references);
+        }
+      }
+      const validSpecies = Object.values(this.state.drafts).filter(draft => draft.column === 'Species' && !draft.error);
+      if (validSpecies.length) {
+        try { requireVegetationSpeciesListCovers(this.state.original, Object.values(this.state.drafts)); }
+        catch (cause) {
+          for (const draft of validSpecies) draft.error = String(cause);
+        }
+      }
+    }
+    this.state.error = Object.values(this.state.drafts).find(draft => draft.error)?.error ?? null;
   }
   select(rowId: string) {
     this.idle();
@@ -174,7 +203,9 @@ export class TwoPageVegetationSession {
     }
     const close = this.closeState();
     if (!close.canSave || !this.state.original) throw new Error(close.saveReason);
-    const request = twoPageVegetationRequest(this.state.original, this.owner, this.state.drafts, requestId);
+    const request = twoPageVegetationRequest(this.state.original, this.owner, this.state.drafts, requestId,
+      this.speciesListEnabled ? this.state.references ?? undefined : undefined);
+    if (request.speciesList && !this.port.saveSpeciesList) throw new Error('Species list Save transport is unavailable; no request was dispatched.');
     this.pending = { request, json: serializeTwoPageVegetationRequest(request) };
     this.state.noCommitCertificate = null;
     this.attempted = false;
@@ -195,18 +226,28 @@ export class TwoPageVegetationSession {
       if (!recovery) { this.attempted = true; this.dispatchSettled = false; }
       let wire: unknown;
       try {
-        wire = await this.reads.track(recovery ? this.port.outcome(pending.json) : this.port.save(pending.json));
+        let operation: CancellableRead<unknown>;
+        if (recovery) operation = this.port.outcome(pending.json);
+        else if (pending.request.speciesList) {
+          if (!this.port.saveSpeciesList) throw new Error('Species list Save transport is unavailable; recover the retained request without replay.');
+          operation = this.port.saveSpeciesList(pending.json);
+        } else operation = this.port.save(pending.json);
+        wire = await this.reads.track(operation);
       } finally { if (!recovery) this.dispatchSettled = true; }
       if (generation !== this.generation) return false;
       if (wire === null) throw new Error('Missing history is unresolved; neither cancellation nor matching values authorizes replay.');
       let receipt: TwoPageVegetationReceipt | null = null;
       let noCommit: { requestId: string; reason: string } | null = null;
       if (recovery) {
-        const outcome = twoPageVegetationOutcomeFromWire(wire, pending.request, pending.json, this.owner);
+        const outcome = pending.request.speciesList
+          ? await twoPageVegetationSpeciesListOutcomeFromWire(wire, pending.request, pending.json, this.owner, this.port.validationYield)
+          : twoPageVegetationOutcomeFromWire(wire, pending.request, pending.json, this.owner);
         if (outcome.status === 'notCommitted') noCommit = { requestId: outcome.requestId, reason: outcome.reason };
         else if (outcome.status === 'committed') receipt = outcome.receipt;
         else throw new Error(outcome.reason);
-      } else receipt = twoPageVegetationReceiptFromWire(wire, pending.request, this.owner);
+      } else receipt = pending.request.speciesList
+        ? await twoPageVegetationSpeciesListReceiptFromWire(wire, pending.request, this.owner, false, this.port.validationYield)
+        : twoPageVegetationReceiptFromWire(wire, pending.request, this.owner);
       await this.port.validationYield?.();
       if (generation !== this.generation) return false;
       if (noCommit) {

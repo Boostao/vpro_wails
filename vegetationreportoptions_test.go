@@ -89,7 +89,7 @@ func TestDecodeLongVegetationOptionsDefaults(t *testing.T) {
 	got, err := decodeLongVegetationOptions(values)
 	want := longVegetationOptions{Title: "Long Vegetation Report", Average: "all-plots",
 		ConstantSpeciesList: true, Order: "presence", ShowEnglishName: true}
-	if err != nil || got != want {
+	if err != nil || !reflect.DeepEqual(got, want) {
 		t.Fatalf("defaults: %#v, %v; want %#v", got, err, want)
 	}
 	if values["ReportOptions"].(map[string]any)["LVReportSummary"] != -1 {
@@ -131,7 +131,7 @@ func TestDecodeLongVegetationOptionsSourceEnums(t *testing.T) {
 
 func TestDecodeLongVegetationOptionsUnavailableModes(t *testing.T) {
 	for key, modes := range map[string][]any{
-		"LVUnitGroups":      {2, 3},
+		"LVUnitGroups":      {2},
 		"LVShowEnglishName": {4},
 	} {
 		for _, mode := range modes {
@@ -139,7 +139,7 @@ func TestDecodeLongVegetationOptionsUnavailableModes(t *testing.T) {
 				values := longVegetationOptionsFixture(t)
 				values["ReportOptions"].(map[string]any)[key] = mode
 				got, err := decodeLongVegetationOptions(values)
-				if err == nil || !strings.Contains(err.Error(), key) || got != (longVegetationOptions{}) {
+				if err == nil || !strings.Contains(err.Error(), key) || !reflect.DeepEqual(got, longVegetationOptions{}) {
 					t.Fatalf("unavailable mode silently accepted: %#v, %v", got, err)
 				}
 			})
@@ -167,7 +167,7 @@ func TestDecodeLongVegetationOptionsStrictTypesAndMissing(t *testing.T) {
 				values := longVegetationOptionsFixture(t)
 				values["ReportOptions"].(map[string]any)[key] = value
 				got, err := decodeLongVegetationOptions(values)
-				if err == nil || !strings.Contains(err.Error(), key) || got != (longVegetationOptions{}) {
+				if err == nil || !strings.Contains(err.Error(), key) || !reflect.DeepEqual(got, longVegetationOptions{}) {
 					t.Fatalf("invalid value accepted: %#v, %v", got, err)
 				}
 			})

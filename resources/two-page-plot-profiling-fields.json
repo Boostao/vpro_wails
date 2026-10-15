@@ -1,0 +1,17 @@
+{
+  "targetForm": "USysPlotProfiling",
+  "sourceSHA256": "e5b726ec24b192fb712605f3d02111baef8c1d9de94fa559703ba1f685d1fbe3",
+  "catalogueSHA256": "a85d42cc7c0e2364db224fe965170ea035af725088e42cc4164538f8251bc652",
+  "ordering": "source header left-to-right; geometry retained in sealed catalogue, not fixed desktop pixels",
+  "fields": [
+    {"column": "Order", "controlId": "form:USysPlotProfiling/MyOrder", "label": "Order", "labelControl": "Label21"},
+    {"column": "Table", "controlId": "form:USysPlotProfiling/cmbTable", "label": "Table", "labelControl": "Label32"},
+    {"column": "Field", "controlId": "form:USysPlotProfiling/cmbField", "label": "Field", "labelControl": "Label34"},
+    {"column": "Species", "controlId": "form:USysPlotProfiling/cmbSpecies", "label": "Species", "labelControl": "Label4"},
+    {"column": "Layer", "controlId": "form:USysPlotProfiling/cmbLayer", "label": "Layer", "labelControl": "Label5"},
+    {"column": "Operator", "controlId": "form:USysPlotProfiling/cmbOperator", "label": "Operator", "labelControl": "Label36"},
+    {"column": "Criteria", "controlId": "form:USysPlotProfiling/Criteria", "label": "Criteria", "labelControl": "Label6"},
+    {"column": "Operation", "controlId": "form:USysPlotProfiling/cmbOperation", "label": "Operation", "labelControl": "Label38"},
+    {"column": "PlotCount", "controlId": "form:USysPlotProfiling/PlotCount", "label": "Plot Count", "labelControl": "Label40"}
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "contextId": "wire-owned",
+  "project": "Sample",
+  "plot": "108050",
+  "form": "FS882-8x6XL",
+  "recordSource": "UsysAuditTrail",
+  "table": "Sample_Audit",
+  "records": {
+    "columns": [
+      {"name":"Project","declaredType":"TEXT"},
+      {"name":"User","declaredType":""},
+      {"name":"PlotNumber","declaredType":"TEXT"},
+      {"name":"Table","declaredType":""},
+      {"name":"EditField","declaredType":""},
+      {"name":"EditWhen","declaredType":""},
+      {"name":"BeforeEdit","declaredType":""},
+      {"name":"AfterEdit","declaredType":""},
+      {"name":"Restore","declaredType":""},
+      {"name":"Flag","declaredType":""},
+      {"name":"ID","declaredType":""}
+    ],
+    "rows": [
+      {
+        "rowId":"1",
+        "cells":[
+          {"storage":"text","text":"Sample","integer":null,"real":null,"blobHex":null},
+          {"storage":"text","text":"source user","integer":null,"real":null,"blobHex":null},
+          {"storage":"text","text":"108050","integer":null,"real":null,"blobHex":null},
+          {"storage":"text","text":"_Veg","integer":null,"real":null,"blobHex":null},
+          {"storage":"text","text":"Species","integer":null,"real":null,"blobHex":null},
+          {"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},
+          {"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},
+          {"storage":"text","text":"","integer":null,"real":null,"blobHex":null},
+          {"storage":"integer","text":null,"integer":"-1","real":null,"blobHex":null},
+          {"storage":"integer","text":null,"integer":"0","real":null,"blobHex":null},
+          {"storage":"null","text":null,"integer":null,"real":null,"blobHex":null}
+        ]
+      }
+    ]
+  }
+}

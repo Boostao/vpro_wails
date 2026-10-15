@@ -1,0 +1,487 @@
+{
+  "failure": null,
+  "observations": [
+    {
+      "function": "SVStructureStage",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVStructureStage",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVStructureStage",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVStructureStage",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVStructureStage",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "Z(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "Z(1)  "
+    },
+    {
+      "function": "SVStructureStage",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVStructureStage",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "C(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "C(1)  "
+    },
+    {
+      "function": "SVStructureStage",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVSuccessional",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVSuccessional",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVSuccessional",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVSuccessional",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSuccessional",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "Z(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "Z(1)  "
+    },
+    {
+      "function": "SVSuccessional",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSuccessional",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "C(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "C(1)  "
+    },
+    {
+      "function": "SVSuccessional",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVSurfaceTopographyType",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVSurfaceTopographyType",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVSurfaceTopographyType",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVSurfaceTopographyType",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSurfaceTopographyType",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "Z(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "Z(1)  "
+    },
+    {
+      "function": "SVSurfaceTopographyType",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSurfaceTopographyType",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "C(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "C(1)  "
+    },
+    {
+      "function": "SVSurfaceTopographyType",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVSnr",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVSnr",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVSnr",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVSnr",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSnr",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "Z(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "Z(1)  "
+    },
+    {
+      "function": "SVSnr",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSnr",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "C(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "C(1)  "
+    },
+    {
+      "function": "SVSnr",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVMesoSlopePosition",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVMesoSlopePosition",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVMesoSlopePosition",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVMesoSlopePosition",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVMesoSlopePosition",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "Z(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "Z(1)  "
+    },
+    {
+      "function": "SVMesoSlopePosition",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVMesoSlopePosition",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "C(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "C(1)  "
+    },
+    {
+      "function": "SVMesoSlopePosition",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    }
+  ],
+  "sourceAcceptanceSHA256": "a58db2ac82872f814f06b4d34c11edf6224e9a4552a3ffce47c30c9c9efa940a",
+  "scope": "Synthetic disposable original-body observations only; no canonical data/registry/default/output parity"
+}

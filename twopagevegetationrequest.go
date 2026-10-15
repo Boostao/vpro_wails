@@ -8,18 +8,24 @@ import (
 )
 
 type twoPageVegetationRequest struct {
-	RequestID string                     `json:"requestId"`
-	Original  *twoPageVegetationOriginal `json:"original"`
-	Edits     []twoPageVegetationEdit    `json:"edits"`
+	RequestID   string                              `json:"requestId"`
+	Original    *twoPageVegetationOriginal          `json:"original"`
+	Edits       []twoPageVegetationEdit             `json:"edits"`
+	SpeciesList *twoPageVegetationSpeciesReferences `json:"speciesList,omitempty"`
 }
 
 func (request *twoPageVegetationRequest) UnmarshalJSON(data []byte) error {
-	properties, err := sourceChildJSONObject(data, "two-page vegetation request", []string{"requestId", "original", "edits"}, nil)
+	properties, err := sourceChildJSONObject(data, "two-page vegetation request", []string{"requestId", "original", "edits"}, []string{"speciesList"})
 	if err != nil {
 		return err
 	}
 	if err := sourceChildJSONNonNull(properties, "two-page vegetation request", "requestId", "original", "edits"); err != nil {
 		return err
+	}
+	if _, present := properties["speciesList"]; present {
+		if err := sourceChildJSONNonNull(properties, "two-page vegetation request", "speciesList"); err != nil {
+			return err
+		}
 	}
 	required := []string{"contextId", "project", "plot", "form", "recordSource", "table", "records", "sourceRowIds"}
 	original, err := sourceChildJSONObject(properties["original"], "two-page vegetation original", required, nil)
@@ -67,7 +73,7 @@ func (request *twoPageVegetationRequest) UnmarshalJSON(data []byte) error {
 		return errors.New("two-page vegetation request requires a stable lowercase UUIDv4")
 	}
 	// The wire also carries durable precalibration requests; only a new write requires canonical SINGLE assignments.
-	if _, err := planTwoPageVegetationHistoricalEdits(context.Background(), decoded.Original, decoded.Edits); err != nil {
+	if _, err := planTwoPageVegetationRequest(context.Background(), twoPageVegetationRequest(decoded), false); err != nil {
 		return err
 	}
 	*request = twoPageVegetationRequest(decoded)
@@ -84,7 +90,7 @@ func detachTwoPageVegetationRequest(ctx context.Context, service *ContextService
 	if !siviDeletionUUID.MatchString(request.RequestID) {
 		return twoPageVegetationRequest{}, errors.New("two-page vegetation request requires a stable lowercase UUIDv4")
 	}
-	if _, err := planTwoPageVegetationHistoricalEdits(ctx, request.Original, request.Edits); err != nil {
+	if _, err := planTwoPageVegetationRequest(ctx, request, false); err != nil {
 		return twoPageVegetationRequest{}, err
 	}
 	raw, err := json.Marshal(request)

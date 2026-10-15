@@ -25,6 +25,76 @@ export function twoPageEntryValues(original: SIVIParentOriginal, form: TwoPagePa
 
 export function twoPageEntryProjection(form: TwoPageParentForm, coordinateMode: CoordinateDisplayMode = 'dd') {
   const source = twoPageParentSource(form);
+  const reverseControls = source.controls.filter(control => control.controlName === 'btnSuIntoEnv');
+  const reverse = reverseControls[0];
+  if (reverseControls.length !== 1 || reverse.type !== 'CommandButton' ||
+      !('Caption' in reverse.properties) || reverse.properties.Caption?.value !== 'SU Into Env' ||
+      !reverse.events || reverse.events.length !== 1 ||
+      reverse.events[0].property !== 'OnClick' || reverse.events[0].binding !== '[Event Procedure]' ||
+      reverse.events[0].procedure !== 'btnSuIntoEnv_Click' || !reverse.events[0].resolved) {
+    throw new Error('Two-page reverse transfer lost its exact source control/callback.');
+  }
+  const reverseAction = { controlId: reverse.controlId, caption: reverse.properties.Caption.value };
+  const auditControls = source.controls.filter(control => control.controlName === 'btnAudit');
+  const audit = auditControls[0];
+  if (auditControls.length !== 1 || audit.type !== 'CommandButton' ||
+      !('Caption' in audit.properties) || audit.properties.Caption?.value !== 'Audit' || audit.events?.length !== 1 ||
+      audit.events[0].property !== 'OnClick' || audit.events[0].binding !== '[Event Procedure]' ||
+      audit.events[0].procedure !== 'btnAudit_Click' || !audit.events[0].resolved) {
+    throw new Error('Two-page Audit lost its exact source control/callback.');
+  }
+  const auditAction = { controlId: audit.controlId, caption: audit.properties.Caption.value };
+  const googleEarthControls = source.controls.filter(control => control.controlName === 'btnGoogleEarth');
+  const googleEarth = googleEarthControls[0];
+  if (googleEarthControls.length !== 1 || googleEarth.type !== 'CommandButton' ||
+      !('ControlTipText' in googleEarth.properties) || googleEarth.properties.ControlTipText?.value !== 'Plot on Google Earth' ||
+      googleEarth.events?.length !== 1 || googleEarth.events[0].property !== 'OnClick' ||
+      googleEarth.events[0].binding !== '[Event Procedure]' || googleEarth.events[0].procedure !== 'btnGoogleEarth_Click' ||
+      !googleEarth.events[0].resolved) {
+    throw new Error('Two-page Google Earth lost its exact source control/tooltip/callback.');
+  }
+  const googleEarthAction = { controlId: googleEarth.controlId, caption: googleEarth.properties.ControlTipText.value };
+  const vegetationTableControls = source.controls.filter(control => control.controlName === 'btnViewVegTable');
+  const vegetationTable = vegetationTableControls[0];
+  if (vegetationTableControls.length !== 1 || vegetationTable.type !== 'CommandButton' ||
+      !('Caption' in vegetationTable.properties) || vegetationTable.properties.Caption?.value !== 'View Veg Table' ||
+      vegetationTable.events?.length !== 1 || vegetationTable.events[0].property !== 'OnClick' ||
+      vegetationTable.events[0].binding !== '[Event Procedure]' || vegetationTable.events[0].procedure !== 'btnViewVegTable_Click' ||
+      !vegetationTable.events[0].resolved) {
+    throw new Error('Two-page vegetation table lost its exact source control/callback.');
+  }
+  const vegetationTableAction = { controlId: vegetationTable.controlId, caption: vegetationTable.properties.Caption.value };
+  const environmentTableControls = source.controls.filter(control => control.controlName === 'btnViewEnvTable');
+  const environmentTable = environmentTableControls[0];
+  if (environmentTableControls.length !== 1 || environmentTable.type !== 'CommandButton' ||
+      !('Caption' in environmentTable.properties) || environmentTable.properties.Caption?.value !== 'View Env Table' ||
+      environmentTable.events?.length !== 1 || environmentTable.events[0].property !== 'OnClick' ||
+      environmentTable.events[0].binding !== '[Event Procedure]' || environmentTable.events[0].procedure !== 'btnViewEnvTable_Click' ||
+      !environmentTable.events[0].resolved) {
+    throw new Error('Two-page environment table lost its exact source control/callback.');
+  }
+  const environmentTableAction = { controlId: environmentTable.controlId, caption: environmentTable.properties.Caption.value };
+  const metadataControls = source.controls.filter(control => control.controlName === 'btnLoadMetadata');
+  const metadata = metadataControls[0];
+  const metadataCaption = form === 'FS882-8x6XL-CHARS' ? 'Edit Metadata' : 'Edit Project Metadata';
+  if (metadataControls.length !== 1 || metadata.type !== 'CommandButton' ||
+      !('Caption' in metadata.properties) || metadata.properties.Caption?.value !== metadataCaption ||
+      metadata.events?.length !== 1 || metadata.events[0].property !== 'OnClick' ||
+      metadata.events[0].binding !== '[Event Procedure]' || metadata.events[0].procedure !== 'btnLoadMetadata_Click' ||
+      !metadata.events[0].resolved) {
+    throw new Error('Two-page project metadata lost its exact source control/caption/callback.');
+  }
+  const metadataAction = { controlId: metadata.controlId, caption: metadataCaption };
+  const profilingControls = source.controls.filter(control => control.controlName === 'btnVegProfile');
+  const profiling = profilingControls[0];
+  if (profilingControls.length !== 1 || profiling.type !== 'CommandButton' ||
+      !('Caption' in profiling.properties) || profiling.properties.Caption?.value !== 'Plot Profiling' ||
+      profiling.events?.length !== 1 || profiling.events[0].property !== 'OnClick' ||
+      profiling.events[0].binding !== '[Event Procedure]' || profiling.events[0].procedure !== 'btnVegProfile_Click' ||
+      !profiling.events[0].resolved) {
+    throw new Error('Two-page Plot Profiling lost its exact source control/caption/callback.');
+  }
+  const profilingAction = { controlId: profiling.controlId, caption: profiling.properties.Caption.value };
   const root = xl.forms.find(source => source.name === xl.root);
   if (!root) throw new Error('Accepted XL source closure is unavailable.');
   const xlColumns = new Set(root.fields.flatMap(field => field.binding ? [field.binding] : []));
@@ -117,6 +187,6 @@ export function twoPageEntryProjection(form: TwoPageParentForm, coordinateMode: 
     return structuredClone({ ...child, page,
       availability: child.form === 'frmVPicsXL' ? 'unavailable' as const : 'accepted-xl-child' as const });
   });
-  return { form, source: source.source, sha256: source.sha256, header, pages,
+  return { form, source: source.source, sha256: source.sha256, reverseAction, auditAction, googleEarthAction, vegetationTableAction, environmentTableAction, metadataAction, profilingAction, header, pages,
     fields: [...fields.values()], children };
 }

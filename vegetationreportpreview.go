@@ -8,14 +8,21 @@ import (
 
 func (s *ContextService) previewLongVegetationLayers(ctx context.Context, contextID string) (vegetationLayerReport, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (vegetationLayerReport, error) {
-		options, err := loadLongVegetationOptions(plots)
-		if err != nil {
-			return vegetationLayerReport{}, err
-		}
-		if err := s.checkLongVegetationGrouping(options); err != nil {
-			return vegetationLayerReport{}, err
-		}
-		return readLongVegetationLayers(ctx, plots, options)
+		return withOwnedPreferenceSnapshot(ctx, plots, publicationReadSnapshotHooks{}, func(owner *sqliteContext, tx *sql.Tx) (vegetationLayerReport, error) {
+			values, err := plots.projects.preferences.snapshot()
+			if err != nil {
+				return vegetationLayerReport{}, err
+			}
+			options, err := s.decodeOwnedLongVegetationOptions(ctx, plots, tx, values)
+			if err != nil {
+				return vegetationLayerReport{}, err
+			}
+			if err := s.checkLongVegetationGrouping(options); err != nil {
+				return vegetationLayerReport{}, err
+			}
+			source, err := readLongVegetationReportSource(ctx, owner, tx, options)
+			return source.Report, err
+		})
 	})
 }
 

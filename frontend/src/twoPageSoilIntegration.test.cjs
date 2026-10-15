@@ -349,6 +349,8 @@ test('parent actual activity is not the always-unsaved review wrapper and includ
   const peer = { ...clean };
   const context = componentFunctions('TwoPageEntryEditor.svelte', ['getCloseState', 'getDraftState'], {
     close: clean, error: null, view: { original: {}, referenceError: null },
+    externalOpen: false, sourceRefreshing: false, auditOpen: false, auditBusy: false,
+    googleEarthOpen: false, googleEarthBusy: false,
     sessions: new Map([['normal', { closeState: () => clean }], ['chars', { closeState: () => peer }]]),
   });
   assert.equal(context.actions.getCloseState().unsaved, true);
@@ -368,7 +370,8 @@ test('parent child guards refuse new drafts/write/variant/close while retaining 
   const close = { unsaved: false, busy: false, blocked: false };
   const context = componentFunctions('TwoPageEntryEditor.svelte',
     ['stage', 'selectProject', 'chooseForm', 'closeReview', 'operation'], {
-      close, childBlocked: true, reviewEnabled: true, editingEnabled: true, error: null,
+      close, childBlocked: true, reviewEnabled: true, editingEnabled: true, error: null, externalOpen: false, auditOpen: false,
+      googleEarthOpen: false, googleEarthBusy: false,
       view: { drafts: {} }, form: 'normal', onclosed: () => calls.push('close'), onchange: () => calls.push('change'),
       session: { stage: column => calls.push(column), selectProject: () => calls.push('project'),
         view: () => ({ error: null }), save: () => calls.push('save'), undo: () => { calls.push('undo'); return true; } },
@@ -387,10 +390,10 @@ test('parent child guards refuse new drafts/write/variant/close while retaining 
 
 test('root and form lifecycle barriers retain soil ownership and default-off numeric child fallback', () => {
   const root = read('App.svelte'), form = read('FS882Form.svelte');
-  assert.match(root, /editorBusy = \$derived\(localEditorBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy\)/);
+  assert.match(root, /editorBusy = \$derived\(localEditorBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy \|\| externalSUEnvironmentBusy \|\| summaryPreferenceBusy \|\| summaryFieldListBusy \|\| summaryEnvironmentalBusy \|\| projectReportBusy\)/);
   assert.match(root, /subscribeTwoPageSoilActivity\(activity => \{ twoPageSoilBusy = activity\.busy \|\| activity\.blocked;/);
   assert.match(form, /twoPageSoilReviewEnabled && twoPageScope === 'entry'/);
-  assert.match(form, /childBlocked=\{twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\}/);
+  assert.match(form, /childBlocked=\{twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked \|\| pictureBusy \|\| pictureMetadataPending\}/);
   assert.match(form, /SourceChild name=\{child\.form\}[^>]*disabled=\{true\}/);
   assert.match(form, /otherHeaderWorkflowBusy = \$derived\(independentHeaderWorkflowBusy \|\| twoPageOpen \|\| twoPageBusy\)/);
   const context = componentFunctions('FS882Form.svelte', ['getCloseState'], {
@@ -407,7 +410,7 @@ test('root and form lifecycle barriers retain soil ownership and default-off num
 test('actual root close, context transition and background reads remain blocked after soil reader disposal and certification', async () => {
   const cancelled = [], transitions = [];
   const context = componentFunctions('App.svelte', ['handleCloseRequest', 'requestTransition', 'loadPlots', 'refresh', 'loadHierarchy'], {
-    view: 'fs882', localEditorBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false,
+    view: 'fs882', localEditorBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false, summaryEnvironmentalBusy: false, projectReportBusy: false,
     busy: false, editor: { getCloseState: () => ({ busy: false, blocked: false, unsaved: false, canSave: false, error: null }) },
     transitionWorking: false, archivePublicationBusy: false,
     vegetationPublicationBusy: false, lifeformPublicationBusy: false, summaryPublicationBusy: false,
@@ -418,9 +421,9 @@ test('actual root close, context transition and background reads remain blocked 
     CloseService: { CancelClose: id => { cancelled.push(id); }, GetPendingCloseRequest: () => operation('soil-close') },
   });
   const expression = read('App.svelte').match(/const editorBusy = \$derived\(([^;]+)\);/)[1];
-  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', `return ${expression}`);
+  const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', 'summaryPreferenceBusy', 'summaryFieldListBusy', 'summaryEnvironmentalBusy', 'projectReportBusy', 'externalSUEnvironmentBusy', `return ${expression}`);
   Object.defineProperty(context, 'editorBusy', {
-    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy),
+    get: () => aggregate(context.localEditorBusy, context.pictureCreationBusy, context.pictureLifecycleBusy, context.twoPageSoilBusy, context.twoPageVegetationBusy, context.summaryPreferenceBusy, context.summaryFieldListBusy, context.summaryEnvironmentalBusy, context.projectReportBusy, context.externalSUEnvironmentBusy),
   });
   const session = owned(complete(), {
     save: () => operation(Promise.reject(new Error('Lost dispatch'))),
@@ -609,7 +612,7 @@ test('compiled flag matrix preserves legacy parent reads unless the complete phy
         ListHumusRecords: () => { calls.push('humus'); if (rawProfile) throw new Error('Historical NULL ID'); return operation([]); },
         ListMineralRecords: () => { calls.push('mineral'); if (rawProfile) throw new Error('Historical BLOB/text depth'); return operation([]); },
         ListOtherRecords: () => { calls.push('other'); return operation([]); },
-        ListAuditEntries: () => { calls.push('audit'); return operation([]); },
+        ListAuditReadEntries: () => { calls.push('audit'); return operation([]); },
         GetChildCapabilities: kind => { calls.push(`cap:${kind}`); return operation({ horizon: true }); },
       },
     });
@@ -629,7 +632,7 @@ test('physical-soil profile propagates unrelated read failures without becoming 
     const context = componentFunctions('FS882Form.svelte', ['loadChildData'], {
       loadRequest: 1, childRevision: 0, siviIdentityEnabled: false, ordinarySoilUnavailable: 'Unavailable ordinary soil profile.',
       reads: { track: value => value }, PlotService: {
-        ListVegRecords: () => read('veg'), ListOtherRecords: () => read('other'), ListAuditEntries: () => read('audit'),
+        ListVegRecords: () => read('veg'), ListOtherRecords: () => read('other'), ListAuditReadEntries: () => read('audit'),
         GetChildCapabilities: kind => kind === 'Humus' ? read('cap:Humus') : operation({ horizon: true }),
       },
     });

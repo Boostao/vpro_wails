@@ -4,6 +4,7 @@ const {readFileSync} = require('node:fs');
 const path = require('node:path');
 const {compile} = require('svelte/compiler');
 const {render} = require('svelte/server');
+const {proxy} = require('svelte/internal/client');
 const {loadTypeScript,serverComponent} = require('./svelteTestHelpers.cjs');
 const quality = loadTypeScript('qualityEditor.ts', {'./becEditor':loadTypeScript('becEditor.ts')});
 const editor = loadTypeScript('projectMetadataEditor.ts', {
@@ -63,10 +64,271 @@ function qualifiedFixture() {
 }
 const validate = value => report.validateLongVegetationPreview(value,'owned','Sample','C:\\project.db','Selected','C:\\external.db');
 const validateOptions = value => report.validateLongVegetationOptions(value,'owned','Sample','C:\\project.db','Selected','C:\\external.db');
-const buildSource = (source, enabled = false, strataEnabled = false, codeEnabled = false) => source.replace(
+const scalarWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationSelectedScalarWire.json'),'utf8'));
+const selectedUnitWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationSelectedUnitsWire.json'),'utf8'));
+const validateSelectedUnits = value => report.validateLongVegetationPreview(value,'owned','Sample','C:\\project.db','Selected','C:\\external.db',true);
+test('ordinary selected-list validator refuses all distinct project wire on actual reactive proxies',()=>{
+  const projectWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationProjectUnitsWire.json'),'utf8'));
+  assert.equal(projectWire.length,3);
+  for(const value of projectWire) {
+    assert.throws(()=>report.validateLongVegetationPreview(value,'owned','Sample','C:\\project.db','None','',true),/Whole-project/);
+    const reactive=proxy(structuredClone(value));
+    assert.throws(()=>structuredClone(reactive));
+    assert.throws(()=>report.validateLongVegetationPreview(reactive,'owned','Sample','C:\\project.db','None','',true),/Whole-project/);
+  }
+  for(const mutate of [
+    value=>value.report.sourceKind='project-selected-fields',
+    value=>value.report.projectUnits=[],
+    value=>value.report.excludedProjectUnitIndexes=[],
+    value=>value.report.units[0].projectUnitIndexes=[]
+  ]) {
+    const value=fixture();
+    mutate(value);
+    assert.throws(()=>validate(value),/Whole-project/);
+  }
+});
+test('strict-Go selected units retain complete joins and unique original IDs across derived labels on actual proxies',()=>{
+  const value=structuredClone(selectedUnitWire);
+  assert.throws(()=>validate(value),/unavailable/);
+  assert.equal(validateSelectedUnits(value),value);
+  const reactive=proxy(structuredClone(value));
+  assert.throws(()=>structuredClone(reactive));
+  assert.equal(validateSelectedUnits(reactive),reactive);
+  assert.deepEqual(value.report.units.map(unit=>unit.numPlots),[4,4]);
+  assert.deepEqual(value.report.units.map(unit=>unit.membershipIds),[['1','2'],['1','2']]);
+  assert.throws(()=>report.requireLongVegetationGrouping(value.settings,true,true,true,true,true),/unavailable/);
+  assert.doesNotThrow(()=>report.requireLongVegetationGrouping(value.settings,false,false,false,false,false,true));
+  const options={contextId:'owned',project:'Sample',projectPath:'C:\\project.db',su:'Selected',suPath:'C:\\external.db',settings:value.settings};
+  assert.equal(report.validateLongVegetationOptions(options,'owned','Sample','C:\\project.db','Selected','C:\\external.db',true),options);
+  for(const mutate of [
+    x=>delete x.settings.unitFields, x=>x.settings.unitFields=null, x=>x.settings.unitFields=[],
+    x=>x.settings.unitFields=['Zone','zone'], x=>x.settings.unitFields=['Zone','bad-field'],
+    x=>x.settings.unitFields=['\ud800'], x=>x.settings.unitGrouping='all-plots',
+    x=>delete x.settings.unitGrouping, x=>delete x.report.selectedUnits, x=>x.report.selectedUnits=null,
+    x=>x.report.selectedUnits=[], x=>x.report.noneUnits=[],
+    x=>x.report.selectedUnits.pop(), x=>x.report.selectedUnits.push(structuredClone(x.report.selectedUnits[0])),
+    x=>x.report.selectedUnits[0].envRowId=null, x=>x.report.selectedUnits[0].adminRowId=null,
+    x=>x.report.selectedUnits[0].membershipId='01', x=>x.report.selectedUnits[0].envRowId='011',
+    x=>delete x.report.selectedUnits[0].adminRowId, x=>x.report.selectedUnits[0].extra=true,
+    x=>x.report.selectedUnits[0].plotNumber=cell('P2'), x=>x.report.selectedUnits[0].plotNumber=cell('p1'),
+    x=>x.report.selectedUnits[0].siteUnit=cell('changed'),
+    x=>x.report.selectedUnits[0].plotNumber=cell(''), x=>x.report.selectedUnits[0].siteUnit=cell(''),
+    x=>x.report.selectedUnits[0].plotNumber=cell('12345678'), x=>x.report.selectedUnits[0].siteUnit=cell('a'.repeat(256)),
+    x=>x.report.selectedUnits[0].siteUnit=cell('\ud800'), x=>x.report.selectedUnits[0].siteUnit=cell('a\0b'),
+    x=>x.report.selectedUnits[0].plotNumber=cell('\u00e9'), x=>x.report.selectedUnits[0].plotNumber=cell(null),
+    x=>x.report.units[0].membershipIds.push('1'), x=>x.report.units[0].membershipIds=['1'],
+    x=>x.report.units[0].membershipIds=['1','9'], x=>x.report.units[0].numPlots=2,
+    x=>x.report.units.pop(), x=>x.report.diagnostics=x.report.diagnostics.filter(d=>d.identity!=='1'),
+    x=>x.report.diagnostics.find(d=>d.code==='selected_unit_join_multiplicity').count=3,
+    x=>x.report.diagnostics.push(structuredClone(x.report.diagnostics.find(d=>d.code==='selected_unit_join_multiplicity'))),
+    x=>{x.report.selectedUnits[0].envRowId=null;x.report.selectedUnits[0].adminRowId=null;x.report.selectedUnits[0].siteUnit=cell(null);}
+  ]) {
+    const invalid=structuredClone(value);mutate(invalid);
+    assert.throws(()=>validateSelectedUnits(invalid),undefined,String(mutate));
+    assert.throws(()=>validateSelectedUnits(proxy(structuredClone(invalid))),undefined,String(mutate));
+  }
+});
+test('selected-unit nullable orphan witnesses preserve original physical identity and destination bounds',()=>{
+  for(const plot of [null,'P2']) {
+    const value=structuredClone(selectedUnitWire);
+    value.report.selectedUnits.push({membershipId:'3',envRowId:null,adminRowId:null,plotNumber:cell(plot),siteUnit:cell(null)});
+    if(plot===null) value.report.diagnostics.push({code:'excluded_unit_without_vegetation',identity:'null:',count:1});
+    else value.report.units.push({code:cell(null),longName:'',nameStatus:'unassigned',nameCandidates:[],
+      numPlots:1,membershipIds:['3'],rows:[]});
+    assert.equal(validateSelectedUnits(value),value);
+    for(const mutate of [
+      x=>x.report.selectedUnits.at(-1).siteUnit=cell('invented'),
+      x=>x.report.selectedUnits.at(-1).envRowId='11',
+      x=>x.report.selectedUnits.push({...x.report.selectedUnits.at(-1)}),
+    ]) { const invalid=structuredClone(value);mutate(invalid);assert.throws(()=>validateSelectedUnits(invalid)); }
+  }
+  const bounded=structuredClone(selectedUnitWire);
+  for(const row of bounded.report.selectedUnits) if(row.siteUnit.text==='Alpha') row.siteUnit=cell('\ud83d\ude00'.repeat(127)+'a');
+  bounded.report.units[0].code=cell('\ud83d\ude00'.repeat(127)+'a');
+  assert.equal(validateSelectedUnits(bounded),bounded);
+});
+test('selected units use qualified plot existence without weighting original reference fanout',()=>{
+  const value=structuredClone(selectedUnitWire), source=qualifiedFixture();
+  value.settings.quality=source.settings.quality;
+  value.report.quality=source.report.quality;
+  value.report.quality.occurrences=value.report.quality.occurrences.slice(0,2).flatMap(row=>['1','2'].map(id=>({
+    ...structuredClone(row),membershipId:id,plotNumber:cell('P1'),siteUnit:cell('Original')
+  })));
+  value.report.diagnostics.push(...['1','2'].map(id=>({code:'quality_reference_multiplicity',identity:id,count:2})));
+  assert.equal(validateSelectedUnits(value),value);
+  assert.deepEqual(value.report.units.map(unit=>unit.numPlots),[4,4]);
+  for(const mutate of [
+    x=>x.report.quality.occurrences[0].envRowId='99',
+    x=>x.report.quality.occurrences[0].membershipId='9',
+    x=>x.report.quality.occurrences=[],
+    x=>x.report.diagnostics=x.report.diagnostics.filter(d=>d.code!=='quality_reference_multiplicity'),
+    x=>x.report.units[0].numPlots=8,
+  ]) {const invalid=structuredClone(value);mutate(invalid);assert.throws(()=>validateSelectedUnits(invalid));}
+});
+test('draft source2 DTOs remain unavailable and cannot masquerade as ordinary reports',()=>{
+  for(const mutate of [
+    value=>value.settings.unitFields=['PlotNumber'],
+    value=>value.settings.unitFields=[],
+    value=>value.settings.unitFields=null,
+    value=>value.settings.unitGrouping='selected-fields',
+    value=>value.report.selectedUnits=[],
+    value=>value.report.selectedUnits=null,
+    value=>value.report.selectedUnits=[{membershipId:'1',envRowId:null,adminRowId:null,plotNumber:cell('P'),siteUnit:cell(null)}]
+  ]) {
+    const value=fixture();mutate(value);
+    assert.throws(()=>validate(value),/unavailable|unsupported/);
+    assert.throws(()=>validate(proxy(structuredClone(value))),/unavailable|unsupported/);
+  }
+  const value=fixture();value.settings.unitFields=['PlotNumber'];
+  assert.throws(()=>validateOptions({contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
+    su:'Selected',suPath:'C:\\external.db',settings:value.settings}),/unavailable/);
+});
+test('strict-Go selected scalar preview retains all four typed kinds on actual client proxies with independent gates',()=>{
+  for(const [kind, scalar] of Object.entries(scalarWire.cells)) {
+    const value=structuredClone(scalarWire.preview);
+    value.report.selectedFieldType=kind;
+    value.report.units[0].rows[0].englishName=structuredClone(scalar);
+    value.report.units[0].rows[0].matchedName=structuredClone(scalar);
+    assert.equal(validate(value),value);
+    const reactive=proxy(structuredClone(value));
+    assert.throws(()=>structuredClone(reactive));
+    assert.equal(validate(reactive),reactive);
+    assert.equal(reactive.report.units[0].rows[0].englishName.storage,scalar.storage);
+    assert.throws(()=>report.requireLongVegetationGrouping(value.settings,true,true,true),/selected field display is disabled/);
+    assert.doesNotThrow(()=>report.requireLongVegetationGrouping(value.settings,false,false,false,true));
+    const nulls=structuredClone(value);
+    nulls.report.units[0].rows[0].englishName=cell(null);
+    nulls.report.units[0].rows[0].matchedName=cell(null);
+    assert.equal(validate(nulls),nulls);
+    for(const mutate of [
+      x=>delete x.report.selectedFieldType,
+      x=>x.report.selectedFieldType='unknown',
+      x=>x.settings.selectedField='',
+      x=>x.settings.selectedField='\ud800',
+      x=>x.settings.selectedField='bad\0field',
+      x=>x.settings.showEnglishName=true,
+      x=>x.settings.showSpeciesCode=true,
+      x=>x.report.units[0].rows[0].englishName={...scalar,storage:'blob',blobHex:'00'},
+      x=>delete x.settings.selectedField,
+    ]) { const invalid=structuredClone(value); mutate(invalid); assert.throws(()=>validate(invalid)); }
+  }
+  for(const [kind, scalar] of [
+    ['text',cell('bad\0text')],['text',cell('\ud800')],['integer',{...scalarWire.cells.integer,integer:'2147483648'}],
+    ['integer',{...scalarWire.cells.integer,integer:'01'}],['boolean',{...scalarWire.cells.boolean,integer:'1'}],
+    ['boolean',{...scalarWire.cells.real,real:-1}],['real',{...scalarWire.cells.real,real:Infinity}],
+    ['real',scalarWire.cells.integer],
+  ]) {
+    const value=structuredClone(scalarWire.preview);
+    value.report.selectedFieldType=kind; value.report.units[0].rows[0].englishName=scalar;
+    assert.throws(()=>validate(value));
+  }
+});
+const noneWire = JSON.parse(readFileSync(path.join(__dirname,'longVegetationNoneUnitsWire.json'),'utf8'));
+test('strict-Go None unit wire distinguishes derived joins from physical membership IDs on actual client proxies',()=>{
+  assert.equal(validate(noneWire),noneWire);
+  const reactive=proxy(structuredClone(noneWire));
+  assert.throws(()=>structuredClone(reactive));
+  assert.equal(validate(reactive),reactive);
+  assert.throws(()=>report.requireLongVegetationGrouping(noneWire.settings,true,true,true,true),/None report units are disabled/);
+  assert.doesNotThrow(()=>report.requireLongVegetationGrouping(noneWire.settings,false,false,false,false,true));
+  for(const mutate of [
+    x=>delete x.report.noneUnits,
+    x=>x.report.noneUnits=[],
+    x=>delete x.settings.unitGrouping,
+    x=>x.settings.unitGrouping='site-unit-table',
+    x=>x.report.noneUnits.push(structuredClone(x.report.noneUnits[0])),
+    x=>x.report.noneUnits[0].envRowId='01',
+    x=>x.report.noneUnits[0].membershipId='9223372036854775808',
+    x=>x.report.noneUnits[0].siteUnit=cell('all plots'),
+    x=>x.report.noneUnits[0].plotNumber=cell(null),
+    x=>x.report.noneUnits[0].plotNumber=cell('non-ASCII é'),
+    x=>x.report.noneUnits[0].plotNumber=cell('bad\0plot'),
+    x=>x.report.noneUnits[0].qualityOccurrence=0,
+    x=>delete x.report.noneUnits[0].qualityOccurrence,
+    x=>x.report.units[0].code=cell('Original unit'),
+    x=>x.report.units[0].numPlots=1,
+    x=>x.report.units[0].membershipIds=['1','1'],
+    x=>x.report.units[0].membershipIds=['11'],
+    x=>x.report.diagnostics[0].count=3,
+    x=>x.report.diagnostics.shift(),
+  ]) {const invalid=structuredClone(noneWire);mutate(invalid);assert.throws(()=>validate(invalid),String(mutate));}
+  const missing=structuredClone(noneWire);
+  missing.report.noneUnits.push({...structuredClone(missing.report.noneUnits[0]),membershipId:'2'});
+  missing.report.units[0].membershipIds.push('2');missing.report.units[0].numPlots=3;
+  assert.throws(()=>validate(missing),/complete Env\/current-list/);
+});
+test('None unit client retains original quality identities and exact outer Env/indexed-reference completeness',()=>{
+  const value=qualifiedFixture();
+  value.settings.unitGrouping='all-plots';
+  value.report.noneUnits=value.report.quality.occurrences.map((original,index)=>({
+    envRowId:original.envRowId,membershipId:original.membershipId,qualityOccurrence:index,
+    plotNumber:structuredClone(original.plotNumber),siteUnit:cell('All plots')
+  }));
+  value.report.noneUnits.push(...value.report.noneUnits.slice(0,2).map(row=>({...structuredClone(row),envRowId:'13'})));
+  value.report.units[0].code=cell('All plots');
+  value.report.units[0].numPlots=5;
+  value.report.diagnostics.push({code:'none_unit_join_multiplicity',identity:'1',count:4});
+  assert.equal(validate(value),value);
+  const original=structuredClone(value.report.quality);
+  assert.equal(validate(proxy(structuredClone(value))).report.quality.occurrences[0].siteUnit.text,'');
+  assert.deepEqual(value.report.quality,original);
+  for(const mutate of [
+    x=>x.report.noneUnits[0].qualityOccurrence=null,
+    x=>x.report.noneUnits[0].qualityOccurrence=-1,
+    x=>x.report.noneUnits[0].qualityOccurrence=.5,
+    x=>x.report.noneUnits[0].qualityOccurrence=5,
+    x=>x.report.noneUnits[0].membershipId='2',
+    x=>x.report.noneUnits[0].plotNumber=cell('P1'),
+    x=>x.report.noneUnits[0].envRowId='99',
+    x=>x.report.quality.occurrences[0].siteUnit=cell('All plots'),
+    x=>x.report.noneUnits.pop(),
+    x=>x.report.units[0].numPlots=3,
+    x=>x.report.diagnostics.find(d=>d.code==='none_unit_join_multiplicity').count=2,
+  ]) {const invalid=structuredClone(value);mutate(invalid);assert.throws(()=>validate(invalid));}
+});
+for(const [label,presentationWire,expected] of [
+  ['None',noneWire,[
+    'None — All plots from Env/current selected list joins','joined sum / derived Env/current-list denominator',
+    'Derived Env/current-list denominator: 2','retained physical membership rows: 1',
+    'None unit join provenance (2 occurrences)','Outer ENV row 11; original SU row 1',
+    'Outer ENV row 12; original SU row 1','unfiltered current list','expand to all-project scope',
+  ]],
+  ['selected-field',selectedUnitWire,['Selected field unit join provenance (8 occurrences)','Original SU row 1;',
+    'ENV row 11; Admin row 21;','derived unit Alpha','filters by qualified plot existence',
+    'Derived selected-field denominator: 4','retained physical membership rows: 2']],
+]) test(`${label} report presentation labels derived denominator and original witnesses without claiming all-project scope`,()=>{
+  const original=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
+  const source=original.replace('let settings = $state.raw<LongVegetationSettings | null>(null);',
+    `let settings = $state.raw<LongVegetationSettings | null>(${JSON.stringify(presentationWire.settings)});`)
+    .replace('let preview = $state.raw<ValidatedLongVegetationPreview | null>(null);',
+      `let preview = $state.raw<ValidatedLongVegetationPreview | null>(${JSON.stringify(presentationWire)});`);
+  assert.notEqual(source,original);
+  const component=serverComponent(buildSource(source),'LongVegetationReport.svelte',{
+    '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
+    './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook,
+    './longVegetationPreferences':{},'./longVegetationStatisticsPreferences':{},
+    './longVegetationSwitchPreferences':{},'./LongVegetationSwitchPreferences.svelte':{default(){}},
+    './longVegetationThresholdPreferences':{},'./LongVegetationThresholdPreferences.svelte':{default(){}},
+    './longVegetationQualityNullPreferences':{},'./LongVegetationQualityNullPreferences.svelte':{default(){}},
+    './longVegetationGroupPreferences':{},'./LongVegetationGroupPreferences.svelte':{default(){}},
+    './longVegetationQualityMinimumPreferences':{},'./LongVegetationQualityMinimumPreferences.svelte':{default(){}},
+    './longVegetationNamingPreferences':{},'./LongVegetationNamingPreferences.svelte':{default(){}},
+    './longVegetationSelectedFieldPreferences':{},'./LongVegetationSelectedFieldPreferences.svelte':{default(){}},
+    './longVegetationEnforcementPreferences':{},'./LongVegetationEnforcementPreferences.svelte':{default(){}},
+    './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+    './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+  });
+  const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
+    su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});
+  for(const text of expected) assert.ok(result.body.replace(/\s+/g,' ').includes(text),`missing ${label} presentation: ${text}`);
+  assert.ok(!result.body.includes('joined sum / physical SU denominator'));
+});
+const buildSource = (source, enabled = false, strataEnabled = false, codeEnabled = false, selectedFieldEnabled = false) => source.replace(
   "import.meta.env.VITE_LONG_VEGETATION_LIFEFORM === 'true'", String(enabled)).replace(
   "import.meta.env.VITE_LONG_VEGETATION_STRATA === 'true'", String(strataEnabled)).replace(
   "import.meta.env.VITE_LONG_VEGETATION_CODE === 'true'", String(codeEnabled)).replace(
+  "import.meta.env.VITE_LONG_VEGETATION_SELECTED_FIELD === 'true'", String(selectedFieldEnabled)).replace(
+  "import.meta.env.VITE_LONG_VEGETATION_NONE_UNITS === 'true'", 'false').replace(
   "import.meta.env.VITE_LONG_VEGETATION_WORKBOOK === 'true'", 'false').replace(
   "import.meta.env.VITE_LONG_VEGETATION_PREFERENCES === 'true'", 'false');
 function options() {
@@ -106,7 +368,7 @@ test('lifeform transport preserves nullable exact INTEGER groups without widenin
   assert.doesNotThrow(()=>report.requireLongVegetationGrouping(settings(),false));
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
   assert.match(source,/VITE_LONG_VEGETATION_LIFEFORM === 'true'/);
-  assert.equal((source.match(/requireLongVegetationGrouping\(candidate\.?(?:settings)?, lifeformEnabled, strataEnabled, codeEnabled\)/g)||[]).length,2);
+  assert.equal((source.match(/requireLongVegetationGrouping\(candidate\.?(?:settings)?, lifeformEnabled, strataEnabled, codeEnabled, selectedFieldEnabled, noneUnitsEnabled, selectedUnitsEnabled\)/g)||[]).length,2);
   assert.match(source,/<th scope="col">\{groupLabel\}<\/th>/);
 });
 test('vegetation transport preserves constant-list threshold bypass, fanout, NULL/empty and zero/negative covers',()=>{
@@ -132,7 +394,7 @@ test('Strata grouping preserves text NULL cells and independently refuses disabl
   assert.throws(()=>validate(malformed));
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
   assert.match(source,/VITE_LONG_VEGETATION_STRATA === 'true'/);
-  assert.equal((source.match(/requireLongVegetationGrouping\(candidate\.?(?:settings)?, lifeformEnabled, strataEnabled, codeEnabled\)/g)||[]).length,2);
+  assert.equal((source.match(/requireLongVegetationGrouping\(candidate\.?(?:settings)?, lifeformEnabled, strataEnabled, codeEnabled, selectedFieldEnabled, noneUnitsEnabled, selectedUnitsEnabled\)/g)||[]).length,2);
 });
 test('quality transport preserves physical IDs and recomputes denominators from complete distinct reference occurrences',()=>{
   const value=qualifiedFixture();
@@ -271,11 +533,16 @@ test('vegetation bindings are cancellable and report UI is independently default
   assert.match(source('App.svelte'),/\{#key \$projectState\.contextId\}[\s\S]*<LongVegetationReport/);
   assert.match(source('App.svelte'),/closeDisposition\(state, busy \|\| editorBusy/);
   const panel=source('LongVegetationReport.svelte');
-  assert.match(panel,/onDestroy\(\(\) => \{ unsubscribeWorkbook\(\); unsubscribePreferences\?\.\(\); unsubscribeStatistics\?\.\(\); unsubscribeSwitches\?\.\(\); unsubscribeThresholds\?\.\(\); unsubscribeGroups\?\.\(\); unsubscribeQualityNulls\?\.\(\); cancel\(\); \}\)/);
+  const teardown=panel.slice(panel.indexOf('  onDestroy(() => {'),panel.indexOf('</script>',panel.indexOf('  onDestroy(() => {')));
+  for(const subscription of ['Workbook','Preferences','Statistics','Switches','Thresholds','Groups','QualityNulls',
+    'QualityMinima','Naming','SelectedField','Enforcement','Units','Project']) {
+    assert.match(teardown,new RegExp(`unsubscribe${subscription}\\??\\.?(?:\\(\\))`));
+  }
+  assert.match(teardown,/cancel\(\)/);
   assert.match(panel,/request !== generation/);
   assert.match(panel,/reads\.track\(ContextService\.PreviewLongVegetation\(contextId\)\)/);
   assert.match(panel,/const candidate = validateLongVegetationPreview/);
-  assert.match(panel,/requireLongVegetationGrouping\(candidate\.settings, lifeformEnabled, strataEnabled, codeEnabled\)/);
+  assert.match(panel,/requireLongVegetationGrouping\(candidate\.settings, lifeformEnabled, strataEnabled, codeEnabled, selectedFieldEnabled, noneUnitsEnabled, selectedUnitsEnabled\)/);
   assert.match(panel,/preview = candidate/);
   assert.match(panel,/settings = candidate\.settings/);
   assert.match(panel,/data-source-control="btnViewReport"/);
@@ -291,7 +558,13 @@ test('vegetation report uses responsive labelled read-only settings, separate na
     './longVegetationStatisticsPreferences':{},
     './longVegetationSwitchPreferences':{}, './LongVegetationSwitchPreferences.svelte':{default(){}},
     './longVegetationThresholdPreferences':{}, './LongVegetationThresholdPreferences.svelte':{default(){}},
-    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}}
+    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}},
+    './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
   });
   const result=render(component,{props:{
     contextId:'owned',project:'Sample',projectPath:'C:\\quoted <project>.db',
@@ -313,17 +586,23 @@ test('quality presentation retains literal criteria, NULL ranks versus missing j
   const value=qualifiedFixture();
   validate(value);
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8')
-    .replace('let settings = $state<LongVegetationSettings | null>(null);',
-      `let settings = $state<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
-    .replace('let preview = $state<ValidatedLongVegetationPreview | null>(null);',
-      `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
+    .replace('let settings = $state.raw<LongVegetationSettings | null>(null);',
+      `let settings = $state.raw<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
+    .replace('let preview = $state.raw<ValidatedLongVegetationPreview | null>(null);',
+      `let preview = $state.raw<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
   const component=serverComponent(buildSource(source),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
     './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook,'./longVegetationPreferences':{},
     './longVegetationStatisticsPreferences':{},
     './longVegetationSwitchPreferences':{}, './LongVegetationSwitchPreferences.svelte':{default(){}},
     './longVegetationThresholdPreferences':{}, './LongVegetationThresholdPreferences.svelte':{default(){}},
-    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}}
+    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}},
+    './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
   });
   const result=render(component,{props:{
     contextId:'owned',project:'Sample',projectPath:'C:\\project.db',su:'Selected',
@@ -337,6 +616,50 @@ test('quality presentation retains literal criteria, NULL ranks versus missing j
   }
   assert.ok(!result.body.includes('joined sum / physical SU denominator'));
 });
+test('selected scalar presentation shows literal list/matched headings and native Boolean/Long/DOUBLE values',()=>{
+  const original=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
+  for(const [kind, scalar, expected] of [
+    ['text',scalarWire.cells.text,'=literal &amp; native'],
+    ['integer',scalarWire.cells.integer,'2147483647'],
+    ['boolean',scalarWire.cells.boolean,'TRUE'],
+    ['boolean',{...scalarWire.cells.boolean,integer:'0'},'FALSE'],
+    ['real',scalarWire.cells.real,'1.005'],
+    ['text',cell(null),'NULL'],
+  ]) {
+    const value=structuredClone(scalarWire.preview);
+    value.report.selectedFieldType=kind;
+    value.report.units[0].rows[0].englishName=structuredClone(scalar);
+    value.report.units[0].rows[0].matchedName=structuredClone(scalar);
+    validate(value);
+    const source=original.replace('let settings = $state.raw<LongVegetationSettings | null>(null);',
+      `let settings = $state.raw<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
+      .replace('let preview = $state.raw<ValidatedLongVegetationPreview | null>(null);',
+        `let preview = $state.raw<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
+    assert.notEqual(source,original);
+    const component=serverComponent(buildSource(source,false,false,false,true),'LongVegetationReport.svelte',{
+      '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
+      './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook,
+      './longVegetationPreferences':{},'./longVegetationStatisticsPreferences':{},
+      './longVegetationSwitchPreferences':{}, './LongVegetationSwitchPreferences.svelte':{default(){}},
+      './longVegetationThresholdPreferences':{}, './LongVegetationThresholdPreferences.svelte':{default(){}},
+      './longVegetationQualityNullPreferences':{}, './LongVegetationQualityNullPreferences.svelte':{default(){}},
+      './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}},
+      './longVegetationQualityMinimumPreferences':{}, './LongVegetationQualityMinimumPreferences.svelte':{default(){}},
+      './longVegetationNamingPreferences':{}, './LongVegetationNamingPreferences.svelte':{default(){}},
+      './longVegetationSelectedFieldPreferences':{}, './LongVegetationSelectedFieldPreferences.svelte':{default(){}},
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+    });
+    const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
+      su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});
+    for(const heading of ['List  Literal &amp; "field" ','Matched report  Literal &amp; "field" ']) {
+      assert.ok(result.body.includes(heading),`missing literal scalar heading: ${heading}`);
+    }
+    assert.ok(result.body.includes(expected),`missing ${kind} output: ${expected}`);
+    assert.ok(!result.body.includes('List English name'));
+  }
+});
 test('lifeform presentation labels typed group and source-specific conversion instead of claiming standalone summary',()=>{
   const value=fixture();value.settings.grouping='lifeform';
   for(const row of value.report.units[0].rows) {
@@ -344,17 +667,23 @@ test('lifeform presentation labels typed group and source-specific conversion in
   }
   validate(value);
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8')
-    .replace('let settings = $state<LongVegetationSettings | null>(null);',
-      `let settings = $state<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
-    .replace('let preview = $state<ValidatedLongVegetationPreview | null>(null);',
-      `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
+    .replace('let settings = $state.raw<LongVegetationSettings | null>(null);',
+      `let settings = $state.raw<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
+    .replace('let preview = $state.raw<ValidatedLongVegetationPreview | null>(null);',
+      `let preview = $state.raw<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
   const component=serverComponent(buildSource(source,true),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
     './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook,'./longVegetationPreferences':{},
     './longVegetationStatisticsPreferences':{},
     './longVegetationSwitchPreferences':{}, './LongVegetationSwitchPreferences.svelte':{default(){}},
     './longVegetationThresholdPreferences':{}, './LongVegetationThresholdPreferences.svelte':{default(){}},
-    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}}
+    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}},
+    './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
   });
   const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
     su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});
@@ -368,17 +697,23 @@ test('Strata presentation labels original totals fallback cap and independent ch
   const value=fixture();value.settings.grouping='strata';
   validate(value);
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8')
-    .replace('let settings = $state<LongVegetationSettings | null>(null);',
-      `let settings = $state<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
-    .replace('let preview = $state<ValidatedLongVegetationPreview | null>(null);',
-      `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
+    .replace('let settings = $state.raw<LongVegetationSettings | null>(null);',
+      `let settings = $state.raw<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
+    .replace('let preview = $state.raw<ValidatedLongVegetationPreview | null>(null);',
+      `let preview = $state.raw<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
   const component=serverComponent(buildSource(source,false,true),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
     './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook,'./longVegetationPreferences':{},
     './longVegetationStatisticsPreferences':{},
     './longVegetationSwitchPreferences':{}, './LongVegetationSwitchPreferences.svelte':{default(){}},
     './longVegetationThresholdPreferences':{}, './LongVegetationThresholdPreferences.svelte':{default(){}},
-    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}}
+    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}},
+    './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
   });
   const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
     su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});
@@ -410,17 +745,23 @@ test('Code presentation preserves source caption but labels literal list/matched
   const value=fixture();value.settings.showEnglishName=false;value.settings.showSpeciesCode=true;
   validate(value);
   const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8')
-    .replace('let settings = $state<LongVegetationSettings | null>(null);',
-      `let settings = $state<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
-    .replace('let preview = $state<ValidatedLongVegetationPreview | null>(null);',
-      `let preview = $state<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
+    .replace('let settings = $state.raw<LongVegetationSettings | null>(null);',
+      `let settings = $state.raw<LongVegetationSettings | null>(${JSON.stringify(value.settings)});`)
+    .replace('let preview = $state.raw<ValidatedLongVegetationPreview | null>(null);',
+      `let preview = $state.raw<ValidatedLongVegetationPreview | null>(${JSON.stringify(value)});`);
   const component=serverComponent(buildSource(source,false,false,true),'LongVegetationReport.svelte',{
     '../bindings/github.com/boostao/vpro-wails':{ContextService:{}},
     './longEnvironmentReport':environment,'./longVegetationReport':report,'./vegetationWorkbook':workbook,'./longVegetationPreferences':{},
     './longVegetationStatisticsPreferences':{},
     './longVegetationSwitchPreferences':{}, './LongVegetationSwitchPreferences.svelte':{default(){}},
     './longVegetationThresholdPreferences':{}, './LongVegetationThresholdPreferences.svelte':{default(){}},
-    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}}
+    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences':{}, './LongVegetationGroupPreferences.svelte':{default(){}},
+    './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
   });
   const result=render(component,{props:{contextId:'owned',project:'Sample',projectPath:'C:\\project.db',
     su:'Selected',suPath:'C:\\external.db',onBusyChange:()=>{}}});

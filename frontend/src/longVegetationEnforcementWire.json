@@ -1,0 +1,30 @@
+{
+  "review": {
+    "contextId": "enforcement-wire",
+    "project": "Project",
+    "projectPath": "C:\\fixture\\Project.sqlite",
+    "su": "Units",
+    "suPath": "C:\\fixture\\Units.sqlite",
+    "values": { "enforce": false, "unitGroups": 2 },
+    "printers": {
+      "names": [" literal printer ", "Printer", "Printer"],
+      "default": "Other printer",
+      "source": "installed printers and current default observed read-only; separate host reads, not an atomic snapshot or permission to change the default"
+    }
+  },
+  "request": {
+    "expected": { "enforce": false, "unitGroups": 2 },
+    "proposed": { "enforce": true, "unitGroups": 1 }
+  },
+  "outcome": {
+    "contextId": "enforcement-wire",
+    "changed": true,
+    "committed": true,
+    "errorMessage": "",
+    "printers": {
+      "names": [],
+      "default": null,
+      "source": "installed printers and current default observed read-only; separate host reads, not an atomic snapshot or permission to change the default"
+    }
+  }
+}

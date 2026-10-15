@@ -124,7 +124,7 @@ func siteUnitFixedNumber(value float64, decimals, width int) string {
 	}
 	// DAO first converts DOUBLE to fifteen significant decimal digits.
 	// Round that decimal half-away, without binary multiplication error.
-	decimal, _ := new(big.Rat).SetString(strconv.FormatFloat(value, 'g', 15, 64))
+	decimal, _ := new(big.Rat).SetString(sourceDoubleDecimalString(value))
 	negative := decimal.Sign() < 0
 	decimal.Abs(decimal)
 	scale := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(decimals)), nil)

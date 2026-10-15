@@ -1,0 +1,51 @@
+{
+  "preview": {
+    "contextId": "owned",
+    "projectPath": "C:\\project.db",
+    "suPath": "C:\\external.db",
+    "settings": {
+      "title": "Selected scalar",
+      "grouping": "layer",
+      "average": "all-plots",
+      "constantSpeciesList": false,
+      "presenceGreaterThan": 0,
+      "meanCoverGreaterThan": 0,
+      "order": "species",
+      "showEnglishName": false,
+      "showSpeciesCode": false,
+      "selectedField": " Literal & \"field\" ",
+      "quality": null
+    },
+    "report": {
+      "project": "Sample",
+      "su": "Selected",
+      "title": "Selected scalar",
+      "selectedFieldType": "real",
+      "quality": null,
+      "diagnostics": [],
+      "units": [{
+        "code": {"storage": "text", "text": "U", "integer": null, "real": null, "blobHex": null},
+        "longName": null,
+        "nameStatus": "missing",
+        "nameCandidates": [],
+        "numPlots": 1,
+        "membershipIds": ["1"],
+        "rows": [{
+          "layer": {"storage": "text", "text": "Tree", "integer": null, "real": null, "blobHex": null},
+          "species": {"storage": "text", "text": "SP", "integer": null, "real": null, "blobHex": null},
+          "englishName": {"storage": "real", "text": null, "integer": null, "real": 1.005, "blobHex": null},
+          "matchedName": {"storage": "real", "text": null, "integer": null, "real": 1.005, "blobHex": null},
+          "presence": 1,
+          "meanCover": 2,
+          "plots": [{"plotNumber": "P1", "cover": 2}]
+        }]
+      }]
+    }
+  },
+  "cells": {
+    "text": {"storage": "text", "text": "=literal & native", "integer": null, "real": null, "blobHex": null},
+    "integer": {"storage": "integer", "text": null, "integer": "2147483647", "real": null, "blobHex": null},
+    "boolean": {"storage": "integer", "text": null, "integer": "-1", "real": null, "blobHex": null},
+    "real": {"storage": "real", "text": null, "integer": null, "real": 1.005, "blobHex": null}
+  }
+}

@@ -1,0 +1,1057 @@
+{
+  "schema": 1,
+  "groups": [
+    {
+      "name": "profile-cover-expression-source",
+      "table": "Veg",
+      "rows": [
+        [
+          null,
+          null,
+          "00000000"
+        ],
+        [
+          null,
+          null,
+          "cccccc3d"
+        ],
+        [
+          null,
+          null,
+          "cdcccc3d"
+        ],
+        [
+          null,
+          null,
+          "cecccc3d"
+        ],
+        [
+          null,
+          null,
+          "9999993e"
+        ],
+        [
+          null,
+          null,
+          "abaaaa3e"
+        ],
+        [
+          null,
+          null,
+          "4b069e3f"
+        ],
+        [
+          null,
+          null,
+          "ffff7f3f"
+        ],
+        [
+          null,
+          null,
+          "0000803f"
+        ],
+        [
+          null,
+          null,
+          "0100803f"
+        ],
+        [
+          null,
+          null,
+          "cdccccbd"
+        ],
+        [
+          null,
+          null,
+          "ffff7f7f"
+        ],
+        [
+          null,
+          null,
+          "01000000"
+        ]
+      ],
+      "expressions": [
+        {
+          "layer": "7",
+          "values": [
+            "0000000000000000",
+            "000000809999b93f",
+            "000000a09999b93f",
+            "000000c09999b93f",
+            "000000203333d33f",
+            "000000605555d53f",
+            "00000060c9c0f33f",
+            "000000e0ffffef3f",
+            "000000000000f03f",
+            "000000200000f03f",
+            "000000a09999b9bf",
+            "000000e0ffffef47",
+            "000000000000a036"
+          ],
+          "criteria": [
+            {
+              "literal": "0.1",
+              "comparison": "LLEEGGGGGGLGL"
+            },
+            {
+              "literal": "0.100000001490116",
+              "comparison": "LLLLGGGGGGLGL"
+            },
+            {
+              "literal": "0.10000000149011612",
+              "comparison": "LLLLGGGGGGLGL"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "LLLLEGGGGGLGL"
+            },
+            {
+              "literal": "0.3333333432674408",
+              "comparison": "LLLLLLGGGGLGL"
+            },
+            {
+              "literal": "1",
+              "comparison": "LLLLLLGLEGLGL"
+            },
+            {
+              "literal": "1.0000001192092896",
+              "comparison": "LLLLLLGLLLLGL"
+            },
+            {
+              "literal": "1.2345670461654663",
+              "comparison": "LLLLLLLLLLLGL"
+            },
+            {
+              "literal": "-0.1",
+              "comparison": "GGGGGGGGGGEGG"
+            },
+            {
+              "literal": "1e-28",
+              "comparison": "LGGGGGGGGGLGL"
+            },
+            {
+              "literal": "1e-29",
+              "comparison": "LGGGGGGGGGLGL"
+            }
+          ]
+        },
+        {
+          "layer": "Any",
+          "values": [
+            "0000000000000000",
+            "000000809999b93f",
+            "000000a09999b93f",
+            "000000c09999b93f",
+            "000000203333d33f",
+            "000000605555d53f",
+            "00000060c9c0f33f",
+            "000000e0ffffef3f",
+            "000000000000f03f",
+            "000000200000f03f",
+            "0000000000000000",
+            "000000e0ffffef47",
+            "000000000000a036"
+          ],
+          "criteria": [
+            {
+              "literal": "0.1",
+              "comparison": "LLEEGGGGGGLGL"
+            },
+            {
+              "literal": "0.100000001490116",
+              "comparison": "LLLLGGGGGGLGL"
+            },
+            {
+              "literal": "0.10000000149011612",
+              "comparison": "LLLLGGGGGGLGL"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "LLLLEGGGGGLGL"
+            },
+            {
+              "literal": "0.3333333432674408",
+              "comparison": "LLLLLLGGGGLGL"
+            },
+            {
+              "literal": "1",
+              "comparison": "LLLLLLGLEGLGL"
+            },
+            {
+              "literal": "1.0000001192092896",
+              "comparison": "LLLLLLGLLLLGL"
+            },
+            {
+              "literal": "1.2345670461654663",
+              "comparison": "LLLLLLLLLLLGL"
+            },
+            {
+              "literal": "-0.1",
+              "comparison": "GGGGGGGGGGGGG"
+            },
+            {
+              "literal": "1e-28",
+              "comparison": "LGGGGGGGGGLGL"
+            },
+            {
+              "literal": "1e-29",
+              "comparison": "LGGGGGGGGGLGL"
+            }
+          ]
+        },
+        {
+          "layer": "SumAll",
+          "values": [
+            "0000000000000000",
+            "000000809999b93f",
+            "000000a09999b93f",
+            "000000c09999b93f",
+            "000000203333d33f",
+            "000000605555d53f",
+            "00000060c9c0f33f",
+            "000000e0ffffef3f",
+            "000000000000f03f",
+            "000000200000f03f",
+            "000000a09999b9bf",
+            "000000e0ffffef47",
+            "000000000000a036"
+          ],
+          "criteria": [
+            {
+              "literal": "0.1",
+              "comparison": "LLEEGGGGGGLGL"
+            },
+            {
+              "literal": "0.100000001490116",
+              "comparison": "LLLLGGGGGGLGL"
+            },
+            {
+              "literal": "0.10000000149011612",
+              "comparison": "LLLLGGGGGGLGL"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "LLLLEGGGGGLGL"
+            },
+            {
+              "literal": "0.3333333432674408",
+              "comparison": "LLLLLLGGGGLGL"
+            },
+            {
+              "literal": "1",
+              "comparison": "LLLLLLGLEGLGL"
+            },
+            {
+              "literal": "1.0000001192092896",
+              "comparison": "LLLLLLGLLLLGL"
+            },
+            {
+              "literal": "1.2345670461654663",
+              "comparison": "LLLLLLLLLLLGL"
+            },
+            {
+              "literal": "-0.1",
+              "comparison": "GGGGGGGGGGEGG"
+            },
+            {
+              "literal": "1e-28",
+              "comparison": "LGGGGGGGGGLGL"
+            },
+            {
+              "literal": "1e-29",
+              "comparison": "LGGGGGGGGGLGL"
+            }
+          ]
+        },
+        {
+          "layer": "SumA",
+          "values": [
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000",
+            "0000000000000000"
+          ],
+          "criteria": [
+            {
+              "literal": "0.1",
+              "comparison": "LLLLLLLLLLLLL"
+            },
+            {
+              "literal": "0.100000001490116",
+              "comparison": "LLLLLLLLLLLLL"
+            },
+            {
+              "literal": "0.10000000149011612",
+              "comparison": "LLLLLLLLLLLLL"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "LLLLLLLLLLLLL"
+            },
+            {
+              "literal": "0.3333333432674408",
+              "comparison": "LLLLLLLLLLLLL"
+            },
+            {
+              "literal": "1",
+              "comparison": "LLLLLLLLLLLLL"
+            },
+            {
+              "literal": "1.0000001192092896",
+              "comparison": "LLLLLLLLLLLLL"
+            },
+            {
+              "literal": "1.2345670461654663",
+              "comparison": "LLLLLLLLLLLLL"
+            },
+            {
+              "literal": "-0.1",
+              "comparison": "GGGGGGGGGGGGG"
+            },
+            {
+              "literal": "1e-28",
+              "comparison": "LLLLLLLLLLLLL"
+            },
+            {
+              "literal": "1e-29",
+              "comparison": "LLLLLLLLLLLLL"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "profile-cover-arithmetic-source",
+      "table": "Veg",
+      "rows": [
+        [
+          "cdcccc3d",
+          "cdcc4c3e",
+          null
+        ],
+        [
+          "0000804b",
+          "0000803f",
+          "cdcccc3d"
+        ],
+        [
+          "cdcccc3d",
+          "cdcccc3d",
+          "cdcccc3d"
+        ],
+        [
+          "9a9999be",
+          "cdcccc3d",
+          "9a99993e"
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          "d2749e11",
+          null,
+          null
+        ],
+        [
+          "9a99193e",
+          "9a99193e",
+          "9a99193e"
+        ]
+      ],
+      "expressions": [
+        {
+          "layer": "7",
+          "values": [
+            null,
+            "000000a09999b93f",
+            "000000a09999b93f",
+            "000000403333d33f",
+            null,
+            null,
+            "000000403333c33f"
+          ],
+          "criteria": [
+            {
+              "literal": "0",
+              "comparison": "NGGGNNG"
+            },
+            {
+              "literal": "0.1",
+              "comparison": "NEEGNNG"
+            },
+            {
+              "literal": "0.099999994",
+              "comparison": "NGGGNNG"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "NLLENNL"
+            },
+            {
+              "literal": "0.300000011920929",
+              "comparison": "NLLLNNL"
+            },
+            {
+              "literal": "0.45",
+              "comparison": "NLLLNNL"
+            },
+            {
+              "literal": "16777216",
+              "comparison": "NLLLNNL"
+            },
+            {
+              "literal": "16777217",
+              "comparison": "NLLLNNL"
+            },
+            {
+              "literal": "2e-28",
+              "comparison": "NGGGNNG"
+            },
+            {
+              "literal": "3e-28",
+              "comparison": "NGGGNNG"
+            }
+          ]
+        },
+        {
+          "layer": "Any",
+          "values": [
+            "000000a09999c93f",
+            "0000000000007041",
+            "000000a09999b93f",
+            "000000403333d33f",
+            "0000000000000000",
+            "000000409ace333a",
+            "000000403333c33f"
+          ],
+          "criteria": [
+            {
+              "literal": "0",
+              "comparison": "GGGGEGG"
+            },
+            {
+              "literal": "0.1",
+              "comparison": "GGEGLLG"
+            },
+            {
+              "literal": "0.099999994",
+              "comparison": "GGGGLLG"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "LGLELLL"
+            },
+            {
+              "literal": "0.300000011920929",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "0.45",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "16777216",
+              "comparison": "LELLLLL"
+            },
+            {
+              "literal": "16777217",
+              "comparison": "LLLLLLL"
+            },
+            {
+              "literal": "2e-28",
+              "comparison": "GGGGLGG"
+            },
+            {
+              "literal": "3e-28",
+              "comparison": "GGGGLEG"
+            }
+          ]
+        },
+        {
+          "layer": "SumAll",
+          "values": [
+            "000000403333d33f",
+            "0000000000007041",
+            "000000403333d33f",
+            "000000809999b93f",
+            "0000000000000000",
+            "000000409ace333a",
+            "000000e0ccccdc3f"
+          ],
+          "criteria": [
+            {
+              "literal": "0",
+              "comparison": "GGGGEGG"
+            },
+            {
+              "literal": "0.1",
+              "comparison": "GGGLLLG"
+            },
+            {
+              "literal": "0.099999994",
+              "comparison": "GGGLLLG"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "EGELLLG"
+            },
+            {
+              "literal": "0.300000011920929",
+              "comparison": "LGLLLLG"
+            },
+            {
+              "literal": "0.45",
+              "comparison": "LGLLLLE"
+            },
+            {
+              "literal": "16777216",
+              "comparison": "LELLLLL"
+            },
+            {
+              "literal": "16777217",
+              "comparison": "LLLLLLL"
+            },
+            {
+              "literal": "2e-28",
+              "comparison": "GGGGLGG"
+            },
+            {
+              "literal": "3e-28",
+              "comparison": "GGGGLEG"
+            }
+          ]
+        },
+        {
+          "layer": "SumA",
+          "values": [
+            "000000403333d33f",
+            "0000000000007041",
+            "000000a09999c93f",
+            "000000c09999c9bf",
+            "0000000000000000",
+            "000000409ace333a",
+            "000000403333d33f"
+          ],
+          "criteria": [
+            {
+              "literal": "0",
+              "comparison": "GGGLEGG"
+            },
+            {
+              "literal": "0.1",
+              "comparison": "GGGLLLG"
+            },
+            {
+              "literal": "0.099999994",
+              "comparison": "GGGLLLG"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "EGLLLLE"
+            },
+            {
+              "literal": "0.300000011920929",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "0.45",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "16777216",
+              "comparison": "LELLLLL"
+            },
+            {
+              "literal": "16777217",
+              "comparison": "LLLLLLL"
+            },
+            {
+              "literal": "2e-28",
+              "comparison": "GGGLLGG"
+            },
+            {
+              "literal": "3e-28",
+              "comparison": "GGGLLEG"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "profile-lump-expression-source-v2",
+      "table": "Lump",
+      "rows": [
+        [
+          "cdcccc3d",
+          "cdcc4c3e",
+          null
+        ],
+        [
+          "0000804b",
+          "0000803f",
+          "cdcccc3d"
+        ],
+        [
+          "cdcccc3d",
+          "cdcccc3d",
+          "cdcccc3d"
+        ],
+        [
+          "9a9999be",
+          "cdcccc3d",
+          "9a99993e"
+        ],
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          "d2749e11",
+          null,
+          null
+        ],
+        [
+          "9a99193e",
+          "9a99193e",
+          "9a99193e"
+        ]
+      ],
+      "expressions": [
+        {
+          "layer": "7",
+          "values": [
+            null,
+            "000000a09999b93f",
+            "000000a09999b93f",
+            "000000403333d33f",
+            null,
+            null,
+            "000000403333c33f"
+          ],
+          "criteria": [
+            {
+              "literal": "0",
+              "comparison": "NGGGNNG"
+            },
+            {
+              "literal": "0.1",
+              "comparison": "NGGGNNG"
+            },
+            {
+              "literal": "0.099999994",
+              "comparison": "NGGGNNG"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "NLLGNNL"
+            },
+            {
+              "literal": "0.300000011920929",
+              "comparison": "NLLENNL"
+            },
+            {
+              "literal": "0.45",
+              "comparison": "NLLLNNL"
+            },
+            {
+              "literal": "16777216",
+              "comparison": "NLLLNNL"
+            },
+            {
+              "literal": "16777217",
+              "comparison": "NLLLNNL"
+            },
+            {
+              "literal": "2e-28",
+              "comparison": "NGGGNNG"
+            },
+            {
+              "literal": "3e-28",
+              "comparison": "NGGGNNG"
+            }
+          ]
+        },
+        {
+          "layer": "Any",
+          "values": [
+            "000000a09999c93f",
+            "0000000000007041",
+            "000000a09999b93f",
+            "000000403333d33f",
+            "0000000000000000",
+            "000000409ace333a",
+            "000000403333c33f"
+          ],
+          "criteria": [
+            {
+              "literal": "0",
+              "comparison": "GGGGEGG"
+            },
+            {
+              "literal": "0.1",
+              "comparison": "GGEGLLG"
+            },
+            {
+              "literal": "0.099999994",
+              "comparison": "GGGGLLG"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "LGLELLL"
+            },
+            {
+              "literal": "0.300000011920929",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "0.45",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "16777216",
+              "comparison": "LELLLLL"
+            },
+            {
+              "literal": "16777217",
+              "comparison": "LLLLLLL"
+            },
+            {
+              "literal": "2e-28",
+              "comparison": "GGGGLGG"
+            },
+            {
+              "literal": "3e-28",
+              "comparison": "GGGGLEG"
+            }
+          ]
+        },
+        {
+          "layer": "SumAll",
+          "values": [
+            "000000383333d33f",
+            "9a99991100007041",
+            "000000383333d33f",
+            "000000a09999b93f",
+            "0000000000000000",
+            "000000409ace333a",
+            "000000e0ccccdc3f"
+          ],
+          "criteria": [
+            {
+              "literal": "0",
+              "comparison": "GGGGEGG"
+            },
+            {
+              "literal": "0.1",
+              "comparison": "GGGGLLG"
+            },
+            {
+              "literal": "0.099999994",
+              "comparison": "GGGGLLG"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "GGGLLLG"
+            },
+            {
+              "literal": "0.300000011920929",
+              "comparison": "LGLLLLG"
+            },
+            {
+              "literal": "0.45",
+              "comparison": "LGLLLLG"
+            },
+            {
+              "literal": "16777216",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "16777217",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "2e-28",
+              "comparison": "GGGGLGG"
+            },
+            {
+              "literal": "3e-28",
+              "comparison": "GGGGLEG"
+            }
+          ]
+        },
+        {
+          "layer": "SumA",
+          "values": [
+            "000000383333d33f",
+            "0000001000007041",
+            "000000a09999c93f",
+            "000000b09999c9bf",
+            "0000000000000000",
+            "000000409ace333a",
+            "000000403333d33f"
+          ],
+          "criteria": [
+            {
+              "literal": "0",
+              "comparison": "GGGLEGG"
+            },
+            {
+              "literal": "0.1",
+              "comparison": "GGGLLLG"
+            },
+            {
+              "literal": "0.099999994",
+              "comparison": "GGGLLLG"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "GGLLLLG"
+            },
+            {
+              "literal": "0.300000011920929",
+              "comparison": "LGLLLLE"
+            },
+            {
+              "literal": "0.45",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "16777216",
+              "comparison": "LGLLLLL"
+            },
+            {
+              "literal": "16777217",
+              "comparison": "LELLLLL"
+            },
+            {
+              "literal": "2e-28",
+              "comparison": "GGGLLGG"
+            },
+            {
+              "literal": "3e-28",
+              "comparison": "GGGLLEG"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "single-cover-double-aggregate",
+      "table": "Lump",
+      "rows": [
+        [
+          null,
+          null,
+          "00000000"
+        ],
+        [
+          null,
+          null,
+          "cccccc3d"
+        ],
+        [
+          null,
+          null,
+          "cdcccc3d"
+        ],
+        [
+          null,
+          null,
+          "cecccc3d"
+        ],
+        [
+          null,
+          null,
+          "9999993e"
+        ],
+        [
+          null,
+          null,
+          "abaaaa3e"
+        ],
+        [
+          null,
+          null,
+          "4b069e3f"
+        ],
+        [
+          null,
+          null,
+          "ffff7f3f"
+        ],
+        [
+          null,
+          null,
+          "0000803f"
+        ],
+        [
+          null,
+          null,
+          "0100803f"
+        ],
+        [
+          null,
+          null,
+          "cdccccbd"
+        ],
+        [
+          null,
+          null,
+          "ffff7f7f"
+        ],
+        [
+          null,
+          null,
+          "01000000"
+        ]
+      ],
+      "expressions": [
+        {
+          "layer": "7",
+          "values": [
+            "0000000000000000",
+            "000000809999b93f",
+            "000000a09999b93f",
+            "000000c09999b93f",
+            "000000203333d33f",
+            "000000605555d53f",
+            "00000060c9c0f33f",
+            "000000e0ffffef3f",
+            "000000000000f03f",
+            "000000200000f03f",
+            "000000a09999b9bf",
+            "000000e0ffffef47",
+            "000000000000a036"
+          ],
+          "criteria": [
+            {
+              "literal": "0.1",
+              "comparison": "LLGGGGGGGGLGL"
+            },
+            {
+              "literal": "0.100000001490116",
+              "comparison": "LLEGGGGGGGLGL"
+            },
+            {
+              "literal": "0.10000000149011612",
+              "comparison": "LLLGGGGGGGLGL"
+            },
+            {
+              "literal": "0.3",
+              "comparison": "LLLLLGGGGGLGL"
+            },
+            {
+              "literal": "0.3333333432674408",
+              "comparison": "LLLLLGGGGGLGL"
+            },
+            {
+              "literal": "1",
+              "comparison": "LLLLLLGLEGLGL"
+            },
+            {
+              "literal": "1.0000001192092896",
+              "comparison": "LLLLLLGLLGLGL"
+            },
+            {
+              "literal": "1.2345670461654663",
+              "comparison": "LLLLLLGLLLLGL"
+            },
+            {
+              "literal": "-0.1",
+              "comparison": "GGGGGGGGGGLGG"
+            },
+            {
+              "literal": "1e-28",
+              "comparison": "LGGGGGGGGGLGL"
+            },
+            {
+              "literal": "1e-29",
+              "comparison": "LGGGGGGGGGLGL"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "singleMidpoints": {
+    "bits": [
+      "07247449",
+      "08247449",
+      "09247449",
+      "17247449",
+      "18247449",
+      "19247449",
+      "072474c9",
+      "082474c9",
+      "092474c9",
+      "172474c9",
+      "182474c9",
+      "192474c9",
+      "d1749e11",
+      "d2749e11",
+      "d3749e11",
+      "d1749e91",
+      "d2749e91",
+      "d3749e91"
+    ],
+    "criteria": [
+      {
+        "literal": "1000000.5",
+        "comparison": "LLGGGGLLLLLLLLLLLL"
+      },
+      {
+        "literal": "1000001.5",
+        "comparison": "LLLLGGLLLLLLLLLLLL"
+      },
+      {
+        "literal": "-1000000.5",
+        "comparison": "GGGGGGGGLLLLGGGGGG"
+      },
+      {
+        "literal": "-1000001.5",
+        "comparison": "GGGGGGGGGGLLGGGGGG"
+      },
+      {
+        "literal": "2e-28",
+        "comparison": "GGGGGGLLLLLLEGGLLL"
+      },
+      {
+        "literal": "3e-28",
+        "comparison": "GGGGGGLLLLLLLEELLL"
+      },
+      {
+        "literal": "-2e-28",
+        "comparison": "GGGGGGLLLLLLGGGELL"
+      },
+      {
+        "literal": "-3e-28",
+        "comparison": "GGGGGGLLLLLLGGGGEE"
+      }
+    ]
+  },
+  "sumPromotion": {
+    "bits": [
+      "ffff7f7f",
+      "ffff7f7f",
+      "ffff7fff",
+      "ffff7fff",
+      "cdcccc3d"
+    ],
+    "value": "000000a09999b93f",
+    "matchedLiteral": "0.100000001490116",
+    "unmatchedLiteral": "0.1"
+  }
+}

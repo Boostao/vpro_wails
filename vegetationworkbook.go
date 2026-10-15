@@ -39,24 +39,47 @@ type vegetationWorkbook struct {
 }
 
 func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPreview, layout vegetationWorkbookLayout) (result vegetationWorkbook, resultErr error) {
+	if preview.SUPath == "" || preview.Report.SourceKind != "" || preview.Report.ProjectUnits != nil ||
+		preview.Report.ExcludedProjectUnitIndexes != nil {
+		return result, errors.New("Long Vegetation selected-list workbook requires its original SU path and cannot consume project provenance")
+	}
+	return renderLongVegetationWorkbook(ctx, preview, layout, nil)
+}
+
+func renderLongVegetationWorkbook(ctx context.Context, preview LongVegetationPreview, layout vegetationWorkbookLayout,
+	project *vegetationProjectWorkbookEvidence) (result vegetationWorkbook, resultErr error) {
 	if ctx == nil {
 		return result, errors.New("Long Vegetation workbook requires a context")
 	}
 	if err := ctx.Err(); err != nil {
 		return result, err
 	}
-	if layout.ReportSummary != (layout.Summary != nil) {
+	var projectSummary *vegetationProjectWorkbookSummary
+	if project != nil {
+		projectSummary = project.Summary
+	}
+	if layout.ReportSummary != (layout.Summary != nil || projectSummary != nil) || layout.Summary != nil && projectSummary != nil {
 		return result, errors.New("Long Vegetation ReportSummary requires captured summary evidence; no omitted requested summary")
 	}
 	settings, report := preview.Settings, preview.Report
-	if preview.ContextID == "" || preview.ProjectPath == "" || preview.SUPath == "" ||
+	if preview.ContextID == "" || preview.ProjectPath == "" ||
 		report.Project == "" || report.SU == "" || settings.Title != report.Title || len(report.Units) == 0 ||
 		settings.ShowEnglishName && settings.ShowSpeciesCode ||
+		settings.SelectedField != "" && (settings.ShowEnglishName || settings.ShowSpeciesCode) ||
+		settings.SelectedField == "" && report.SelectedFieldType != "" ||
 		settings.Average != "all-plots" && settings.Average != "observations" ||
 		settings.Order != "species" && settings.Order != "presence" ||
 		math.IsNaN(settings.PresenceGreaterThan) || math.IsInf(settings.PresenceGreaterThan, 0) ||
 		math.IsNaN(settings.MeanCoverGreaterThan) || math.IsInf(settings.MeanCoverGreaterThan, 0) {
 		return result, errors.New("Long Vegetation workbook requires complete owned report/settings identity")
+	}
+	if settings.SelectedField != "" {
+		if err := environmentWorkbookText(settings.SelectedField); err != nil {
+			return result, err
+		}
+		if _, err := longVegetationSelectedScalarValue(report.SelectedFieldType, ProjectMetadataCell{Storage: "null"}); err != nil {
+			return result, err
+		}
 	}
 	groupLabel := "Layer"
 	switch settings.Grouping {
@@ -125,6 +148,30 @@ func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPr
 		}
 		return setText(sheet, address, text)
 	}
+	setSelectedCell := func(sheet, address string, cell ProjectMetadataCell) error {
+		value, err := longVegetationSelectedScalarValue(report.SelectedFieldType, cell)
+		if err != nil || value == nil {
+			return err
+		}
+		switch value := value.(type) {
+		case string:
+			err = setText(sheet, address, value)
+		case int64:
+			if report.SelectedFieldType == "boolean" {
+				err = book.SetCellBool(sheet, address, value == -1)
+			} else {
+				err = book.SetCellInt(sheet, address, value)
+			}
+		case float64:
+			err = book.SetCellFloat(sheet, address, value, -1, 64)
+		default:
+			return errors.New("Long Vegetation selected worksheet scalar lost its typed value")
+		}
+		if err != nil {
+			return err
+		}
+		return book.SetCellStyle(sheet, address, address, cover)
+	}
 	setNumber := func(sheet, address string, value *float64, style int) error {
 		if value == nil {
 			return nil
@@ -191,6 +238,10 @@ func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPr
 			if err := writeVegetationWorkbookSummary(ctx, book, preview, *layout.Summary); err != nil {
 				return result, err
 			}
+		} else if projectSummary != nil {
+			if err := writeVegetationProjectWorkbookSummary(ctx, book, preview, *projectSummary); err != nil {
+				return result, err
+			}
 		}
 		if err != nil {
 			return result, err
@@ -228,6 +279,8 @@ func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPr
 			labels = append(labels, "English Name")
 		} else if settings.ShowSpeciesCode {
 			labels = append(labels, "Code")
+		} else if settings.SelectedField != "" {
+			labels = append(labels, settings.SelectedField)
 		}
 		presenceColumn, meanColumn := len(labels)+1, len(labels)+2
 		labels = append(labels, "P", "MC")
@@ -304,7 +357,11 @@ func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPr
 			if err := setCell(name, "B"+strconv.Itoa(outputRow), row.Species); err != nil {
 				return result, err
 			}
-			if settings.ShowEnglishName || settings.ShowSpeciesCode {
+			if settings.SelectedField != "" {
+				if err := setSelectedCell(name, "C"+strconv.Itoa(outputRow), row.EnglishName); err != nil {
+					return result, err
+				}
+			} else if settings.ShowEnglishName || settings.ShowSpeciesCode {
 				if err := setCell(name, "C"+strconv.Itoa(outputRow), row.EnglishName); err != nil {
 					return result, err
 				}
@@ -374,7 +431,7 @@ func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPr
 			return result, err
 		}
 	}
-	if layout.Summary != nil {
+	if layout.ReportSummary {
 		if err := book.MoveSheet("ReportSummary", "_VPRO_Source"); err != nil {
 			return result, err
 		}
@@ -383,7 +440,8 @@ func prepareLongVegetationWorkbook(ctx context.Context, preview LongVegetationPr
 	source, err := json.Marshal(struct {
 		Preview LongVegetationPreview
 		Layout  vegetationWorkbookLayout
-	}{preview, layout})
+		Project *vegetationProjectWorkbookEvidence `json:"Project,omitempty"`
+	}{preview, layout, project})
 	if err != nil {
 		return result, err
 	}

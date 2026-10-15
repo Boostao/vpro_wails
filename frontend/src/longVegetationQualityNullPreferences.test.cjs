@@ -155,6 +155,12 @@ test('actual report retains errors across remount and propagates independent def
         './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
         './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
         './longVegetationQualityNullPreferences': prefs, './LongVegetationQualityNullPreferences.svelte': { default: child() },
+        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
         './LongVegetationSwitchPreferences.svelte': { default() {} }, './longEnvironmentReport': {}, './longVegetationReport': {},
         './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
           view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }
@@ -167,7 +173,8 @@ test('actual report retains errors across remount and propagates independent def
       else assert.doesNotMatch(body, /data-long-vegetation-quality-nulls/);
     }
   }
-  assert.match(reportSource, /qualityNullView = qualityNulls.view\(\); preview = null; workbookReview = null/);
+  assert.match(reportSource, /qualityNullView = qualityNulls.view\(\); invalidateReports\(\)/);
+  assert.match(reportSource, /function invalidateReports\(\) \{\s*preview = null; workbookReview = null;\s*projectWorkspace\?\.invalidate\(\)/);
   assert.match(reportSource, /groupBarrier \|\| qualityNullBarrier/);
   assert.match(reportSource, /unsubscribeQualityNulls\?\.\(\)/);
   assert.match(source('LongVegetationQualityNullPreferences.svelte'), /const checked = event.currentTarget.checked; edit\(field.key, checked\)/);

@@ -1,0 +1,103 @@
+{
+  "failure": null,
+  "observations": [
+    {
+      "unit": "A",
+      "expression": "ProbeSVnPlots(\"A\")",
+      "actual": [
+        "ok",
+        "Integer",
+        "4"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "Integer",
+      "expectedCount": 4
+    },
+    {
+      "unit": "a",
+      "expression": "ProbeSVnPlots(\"a\")",
+      "actual": [
+        "ok",
+        "Integer",
+        "4"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "Integer",
+      "expectedCount": 4
+    },
+    {
+      "unit": "B",
+      "expression": "ProbeSVnPlots(\"B\")",
+      "actual": [
+        "ok",
+        "Integer",
+        "0"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "Integer",
+      "expectedCount": 0
+    },
+    {
+      "unit": "",
+      "expression": "ProbeSVnPlots(\"\")",
+      "actual": [
+        "ok",
+        "Integer",
+        "1"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "Integer",
+      "expectedCount": 1
+    },
+    {
+      "unit": "missing",
+      "expression": "ProbeSVnPlots(\"missing\")",
+      "actual": [
+        "error",
+        "3021",
+        "No current record."
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "3021",
+      "expectedCount": null
+    },
+    {
+      "unit": null,
+      "expression": "ProbeSVnPlots(Null)",
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedCount": null
+    },
+    {
+      "unit": "MAX",
+      "expression": "ProbeSVnPlots(\"MAX\")",
+      "actual": [
+        "ok",
+        "Integer",
+        "32767"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "Integer",
+      "expectedCount": 32767
+    },
+    {
+      "unit": "OVER",
+      "expression": "ProbeSVnPlots(\"OVER\")",
+      "actual": [
+        "error",
+        "6",
+        "Overflow"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "6",
+      "expectedCount": null
+    }
+  ],
+  "sourceAcceptanceSHA256": "ec59c9063d448a81580a82f2ed1767bb98beff9097c2adf5d0159d030253dbdb",
+  "scope": "Synthetic disposable original-body observations only; no canonical data/registry/default/output parity"
+}

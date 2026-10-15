@@ -15,24 +15,29 @@ type ContextSelection struct {
 }
 
 type ContextService struct {
-	projects                        *ProjectService
-	plots                           *PlotService
-	siviHeightEnabled               bool
-	siviParentReviewEnabled         bool
-	siviParentEditingEnabled        bool
-	siviParentActionEditingEnabled  bool
-	siviProjectAssignmentEnabled    bool
-	tableCSVReviewEnabled           bool
-	plotLocationReviewEnabled       bool
-	siteUnitSummaryEnabled          bool
-	siteUnitSummaryLifeformsEnabled bool
-	siteUnitSummarySpeciesEnabled   bool
-	longVegetationNoneEnabled       bool
-	longVegetationLifeformEnabled   bool
-	longVegetationStrataEnabled     bool
-	longVegetationCodeEnabled       bool
-	twoPageSoilAttempts             twoPageSoilAttemptLedger
-	twoPageVegetationAttempts       twoPageVegetationAttemptLedger
+	projects                           *ProjectService
+	plots                              *PlotService
+	siviHeightEnabled                  bool
+	siviParentReviewEnabled            bool
+	siviParentEditingEnabled           bool
+	siviParentActionEditingEnabled     bool
+	siviProjectAssignmentEnabled       bool
+	tableCSVReviewEnabled              bool
+	plotLocationReviewEnabled          bool
+	siteUnitSummaryEnabled             bool
+	siteUnitSummaryLifeformsEnabled    bool
+	siteUnitSummarySpeciesEnabled      bool
+	longVegetationNoneEnabled          bool
+	longVegetationNoneUnitsEnabled     bool
+	longVegetationLifeformEnabled      bool
+	longVegetationStrataEnabled        bool
+	longVegetationCodeEnabled          bool
+	longVegetationSelectedFieldEnabled bool
+	longVegetationSelectedUnitsEnabled bool
+	selectedUnitSelections             selectedUnitSelectionLedger
+	projectReportScopes                vegetationProjectScopeLedger
+	twoPageSoilAttempts                twoPageSoilAttemptLedger
+	twoPageVegetationAttempts          twoPageVegetationAttemptLedger
 }
 
 func NewContextService(projects *ProjectService, plots *PlotService) (*ContextService, error) {
@@ -50,10 +55,19 @@ func (s *ContextService) SwitchContext(expectedID string, requested ContextSelec
 	if expectedID == "" || expectedID != s.projects.contextID {
 		return ProjectState{}, errors.New("project context changed; reload before switching")
 	}
-	return s.projects.switchSQLiteLocked(desktopSelection{
+	state, err := s.projects.switchSQLiteLocked(desktopSelection{
 		Project: requested.Project, ProjectPath: requested.ProjectPath, SU: requested.SU, SUPath: requested.SUPath,
 		Hierarchy: requested.Hierarchy, HierarchyPath: requested.HierarchyPath,
 	})
+	if err == nil {
+		s.selectedUnitSelections.mu.Lock()
+		s.selectedUnitSelections.entries = nil
+		s.selectedUnitSelections.mu.Unlock()
+		s.projectReportScopes.mu.Lock()
+		s.projectReportScopes.entries = nil
+		s.projectReportScopes.mu.Unlock()
+	}
+	return state, err
 }
 
 func withContextPlot[T any](s *ContextService, expectedID string, operation func(*PlotService) (T, error)) (T, error) {

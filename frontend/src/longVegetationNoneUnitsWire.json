@@ -1,0 +1,40 @@
+{
+  "contextId": "owned",
+  "projectPath": "C:\\project.db",
+  "suPath": "C:\\external.db",
+  "settings": {
+    "title": "None units", "average": "all-plots", "constantSpeciesList": false,
+    "presenceGreaterThan": -100, "meanCoverGreaterThan": -100,
+    "order": "species", "showEnglishName": false, "showSpeciesCode": false,
+    "grouping": "layer", "quality": null, "unitGrouping": "all-plots"
+  },
+  "report": {
+    "project": "Sample", "su": "Selected", "title": "None units",
+    "units": [{
+      "code": {"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null},
+      "longName": null, "nameStatus": "missing", "nameCandidates": [],
+      "numPlots": 2, "membershipIds": ["1"],
+      "rows": [{
+        "layer": {"storage":"text","text":"Tree","integer":null,"real":null,"blobHex":null},
+        "species": {"storage":"text","text":"SP","integer":null,"real":null,"blobHex":null},
+        "englishName": {"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},
+        "matchedName": {"storage":"null","text":null,"integer":null,"real":null,"blobHex":null},
+        "presence": 0.5, "meanCover": 2, "plots": [{"plotNumber":"P1","cover":4}]
+      }]
+    }],
+    "diagnostics": [
+      {"code":"none_unit_join_multiplicity","identity":"1","count":2},
+      {"code":"unit_name_missing","identity":"text:All plots","count":0}
+    ],
+    "quality": null,
+    "noneUnits": [{
+      "envRowId": "11", "membershipId": "1", "qualityOccurrence": null,
+      "plotNumber": {"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},
+      "siteUnit": {"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null}
+    }, {
+      "envRowId": "12", "membershipId": "1", "qualityOccurrence": null,
+      "plotNumber": {"storage":"text","text":"P1","integer":null,"real":null,"blobHex":null},
+      "siteUnit": {"storage":"text","text":"All plots","integer":null,"real":null,"blobHex":null}
+    }]
+  }
+}

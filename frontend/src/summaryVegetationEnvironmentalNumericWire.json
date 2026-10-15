@@ -1,0 +1,2792 @@
+[
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 2.3 - 5  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2 - -2.0 - -2",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.5 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2 - -2.0 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSeepage",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.0 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 2.3 - 5  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2 - -2.0 - -2",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.5 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2 - -2.0 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVRootingDepth",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.0 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "DecWood",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "BedRock",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Rocks",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "MineralSoil",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "OrganicMatter",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSubstrate",
+    "argument": {
+      "storage": "text",
+      "text": "Water",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Tree",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Shrub",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Herb",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 2.7 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0.0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 1000.9 - 1",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32 - -0.5 - 32",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -2.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStrataCover",
+    "argument": {
+      "storage": "text",
+      "text": "Moss",
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "negativeThousandNull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-1 - -1001.5 - 0  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSlope",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1.25 - 3 - 5.75  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSlope",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSlope",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSlope",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 0 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSlope",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "empty",
+      "cell": null
+    }
+  },
+  {
+    "function": "SVSlope",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2.5 - -3 - -2.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSlope",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1000.25 - 1001 - 1001.5",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVSlope",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32768 - -1 - 32767",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStandAge",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 02 - 5  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStandAge",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "(Null 2)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStandAge",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStandAge",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 00 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStandAge",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStandAge",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2 - -02 - -2",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStandAge",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1000 - 1001 - 1001",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVStandAge",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32768 - -01 - 32767",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVElevation",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "mixed",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1 - 02 - 5  (Null 1)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVElevation",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "allnull",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "  (Null 2)",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVElevation",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "missing",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVElevation",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "0 - 00 - 0",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVElevation",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "noenv",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVElevation",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "plain",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-2 - -02 - -2",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVElevation",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "thousand",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "1000 - 1001 - 1001",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  },
+  {
+    "function": "SVElevation",
+    "argument": {
+      "storage": "null",
+      "text": null,
+      "integer": null,
+      "real": null,
+      "blobHex": null
+    },
+    "unit": "limits",
+    "value": {
+      "kind": "cell",
+      "cell": {
+        "storage": "text",
+        "text": "-32768 - -01 - 32767",
+        "integer": null,
+        "real": null,
+        "blobHex": null
+      }
+    }
+  }
+]

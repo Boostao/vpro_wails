@@ -2,8 +2,11 @@ const assert = require('node:assert/strict');
 const {test} = require('node:test');
 const {readFileSync} = require('node:fs');
 const path = require('node:path');
-const {compile} = require('svelte/compiler');
-const {loadTypeScript} = require('./svelteTestHelpers.cjs');
+const {compile, compileModule} = require('svelte/compiler');
+const {loadTypeScript, componentFunctions, serverComponent} = require('./svelteTestHelpers.cjs');
+const {render} = require('svelte/server');
+const ts = require('typescript');
+const runtime = require('svelte/internal/client');
 const quality = loadTypeScript('qualityEditor.ts', {'./becEditor': loadTypeScript('becEditor.ts')});
 const defaults = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-standard.json'),'utf8'));
 const mapping = JSON.parse(readFileSync(path.join(__dirname,'..','..','resources','project-metadata-template.json'),'utf8'));
@@ -26,6 +29,174 @@ function restorationReview() {
   return {contextId:'original-context',historyId:'9007199254740994',project:'Sample',plotNumber:'P1',projectId:'Project',id:-200,
     columns,current,restored,audits:[audit]};
 }
+test('actual metadata opener and both existing buttons share the exact flag/parent/child/header guard',()=>{
+  const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  assert.equal((form.match(/metadataDisabled=\{!canOpenProjectMetadata\(\)\}/g) ?? []).length, 2);
+  for (const enabled of [false, true]) for (const parent of [false, true])
+    for (const child of [false, true]) for (const invalid of [false, true]) {
+      const context = componentFunctions('FS882Form.svelte', ['canOpenProjectMetadata', 'openProjectMetadata'], {
+        metadataEnabled: enabled, childParentDisabled: parent, childUnsaved: child,
+        headerValidation: invalid ? { FieldNumber: 'invalid raw draft' } : {},
+        metadataOpen: false, error: 'old error', successMsg: 'old notice',
+      });
+      const available = enabled && !parent && !child && !invalid;
+      assert.equal(context.actions.canOpenProjectMetadata(), available);
+      context.actions.openProjectMetadata();
+      assert.equal(context.metadataOpen, available);
+      assert.equal(context.successMsg, available ? null : 'old notice');
+      if (available) assert.equal(context.error, null);
+      else assert.match(context.error, /Finish or Undo existing drafts/);
+    }
+});
+
+test('compiled Metadata menu requires current availability and callback, without enabling other unavailable actions',()=>{
+  const source = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
+  const icons = new Proxy({}, { get: () => () => {} });
+  const component = serverComponent(source, 'Navigation.svelte', { '@lucide/svelte': icons });
+  for (const available of [false, true]) for (const callback of [undefined, () => {}]) {
+    const html = render(component, { props: {
+      view: 'fs882', onnavigate() {}, metadataAvailable: available, onopenmetadata: callback,
+    } }).body;
+    for (const label of ['Metadata', 'Herbarium', 'Colour-theme', 'User setup', 'Enter/Edit SIVI Data']) {
+      const match = html.match(new RegExp(`<button\\b[^>]*>[\\s\\S]*?<span>${label}<\\/span>\\s*<\\/button>`));
+      assert.ok(match, `actual compiled ${label} button must exist`);
+      const button = match[0].slice(match[0].lastIndexOf('<button'));
+      assert.equal(/\bdisabled(?:\s|=|>)/.test(button), label !== 'Metadata' || !(available && callback));
+      if (label === 'Metadata') assert.match(button, /clean, unlocked editor/);
+    }
+  }
+});
+
+test('actual metadata menu dispatch closes disclosure once and never dispatches unavailable or absent callbacks',()=>{
+  const calls = [];
+  const context = componentFunctions('Navigation.svelte', ['itemEnabled', 'activate', 'closeMenu', 'navigate'], {
+    metadataAvailable: false, onopenmetadata: undefined, openMenu: 'Forms',
+    navigation: { querySelector: () => ({ querySelector: () => ({ focus: () => calls.push('focus') }) }) },
+    onnavigate: view => calls.push(view),
+  });
+  context.actions.activate({ action: 'metadata' });
+  context.metadataAvailable = true;
+  context.actions.activate({ action: 'metadata' });
+  assert.deepEqual(calls, []);
+  context.onopenmetadata = () => { assert.equal(context.openMenu, null); calls.push('metadata'); };
+  context.actions.activate({ action: 'metadata' });
+  assert.deepEqual(calls, ['focus', 'metadata']);
+  context.metadataAvailable = false;
+  context.actions.activate({ action: 'metadata' });
+  assert.deepEqual(calls, ['focus', 'metadata']);
+  context.actions.activate({ view: 'plots' });
+  assert.deepEqual(calls, ['focus', 'metadata', 'plots']);
+});
+
+test('actual root metadata entry rejects unavailable and stale owners without opening or replacing anything',async()=>{
+  for (const unavailable of ['route', 'editor', 'context', 'guard']) {
+    let opened = 0, transitions = 0;
+    const owner = { canOpenProjectMetadata: () => unavailable !== 'guard', openProjectMetadata: () => opened++ };
+    const context = componentFunctions('App.svelte', ['openProjectMetadata'], {
+      view: unavailable === 'route' ? 'home' : 'fs882', editor: unavailable === 'editor' ? undefined : owner,
+      $projectState: unavailable === 'context' ? null : { contextId: 'owned' }, error: '',
+      requestTransition: async run => { transitions++; await run('owned'); },
+    });
+    await context.actions.openProjectMetadata();
+    assert.equal(opened, 0); assert.equal(transitions, 0);
+    assert.match(context.error, /clean, unlocked open plot/);
+  }
+  for (const stale of ['route', 'editor', 'context', 'callbackContext', 'guard', 'none']) {
+    let pending, opened = 0, allowed = true;
+    const owner = { canOpenProjectMetadata: () => allowed, openProjectMetadata: () => opened++ };
+    const context = componentFunctions('App.svelte', ['openProjectMetadata'], {
+      view: 'fs882', editor: owner, $projectState: { contextId: 'owned' }, error: '',
+      requestTransition: async run => { pending = run; },
+    });
+    await context.actions.openProjectMetadata();
+    assert.equal(opened, 0);
+    if (stale === 'route') context.view = 'home';
+    if (stale === 'editor') context.editor = { ...owner };
+    if (stale === 'context') context.$projectState = { contextId: 'new-context' };
+    if (stale === 'guard') allowed = false;
+    if (stale === 'none') { await pending('owned'); assert.equal(opened, 1); }
+    else { await assert.rejects(pending(stale === 'callbackContext' ? 'new-context' : 'owned'), /owner or availability changed/); assert.equal(opened, 0); }
+    assert.equal(context.editor === owner, stale !== 'editor');
+  }
+});
+
+test('actual root metadata entry retains busy/native-close/transition barriers and unsaved decisions',async()=>{
+  const { closeDisposition } = loadTypeScript('closeLifecycle.ts');
+  for (const hold of ['busy', 'editorBusy', 'transitionWorking', 'archivePublicationBusy', 'vegetationPublicationBusy',
+    'lifeformPublicationBusy', 'summaryPublicationBusy', 'pendingTransition', 'closeRequest', 'editorBlocked', 'dirty', 'none']) {
+    let opened = 0;
+    const state = { unsaved: hold === 'dirty', busy: false, blocked: hold === 'editorBlocked' };
+    const owner = { canOpenProjectMetadata: () => true, getCloseState: () => state, openProjectMetadata: () => opened++ };
+    const values = {
+      view: 'fs882', editor: owner, $projectState: { contextId: 'owned' }, error: '', transitionError: '',
+      busy: false, editorBusy: false, transitionWorking: false, archivePublicationBusy: false,
+      vegetationPublicationBusy: false, lifeformPublicationBusy: false, summaryPublicationBusy: false,
+      pendingTransition: null, closeRequest: '', closeDisposition, document: { activeElement: null },
+      HTMLElement: class {}, tick: async () => {},
+    };
+    if (hold === 'pendingTransition') values.pendingTransition = { contextId: 'owned', run() {} };
+    else if (hold === 'closeRequest') values.closeRequest = 'specific-owned-close-request';
+    else if (hold in values) values[hold] = true;
+    const context = componentFunctions('App.svelte', ['openProjectMetadata', 'requestTransition'], values);
+    await context.actions.openProjectMetadata();
+    assert.equal(opened, hold === 'none' ? 1 : 0);
+    if (hold === 'dirty') assert.equal(typeof context.pendingTransition.run, 'function');
+    else if (hold !== 'none') assert.match(context.error, /current operation or decision/);
+  }
+});
+
+test('actual client-runtime metadata availability reacts across the exported editor method and root derived state',()=>{
+  function execute(script, dependencies = {}) {
+    const compiled = compileModule(script, { filename: 'metadata-menu.svelte.js', generate: 'client' });
+    assert.equal(compiled.warnings.length, 0);
+    const module = { exports: {} };
+    new Function('module', 'exports', 'require', ts.transpileModule(compiled.js.code, { compilerOptions: {
+      module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022,
+    } }).outputText)(module, module.exports, id => {
+      if (id === 'svelte/internal/client') return runtime;
+      assert.ok(id in dependencies, `Unexpected client dependency ${id}`); return dependencies[id];
+    });
+    return module.exports;
+  }
+  const source = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  const ast = ts.createSourceFile('metadata.ts', source.match(/<script lang="ts">([\s\S]*?)<\/script>/)[1],
+    ts.ScriptTarget.Latest, true);
+  const predicate = ast.statements.find(node => ts.isFunctionDeclaration(node) && node.name.text === 'canOpenProjectMetadata');
+  assert.ok(predicate);
+  const child = execute(`
+    let metadataEnabled = $state(false), childParentDisabled = $state(false), childUnsaved = $state(false),
+      headerValidation = $state({});
+    ${predicate.getText(ast)}
+    export function update(flag, parent, peer, invalid) {
+      metadataEnabled = flag; childParentDisabled = parent; childUnsaved = peer;
+      if (invalid) headerValidation.raw = 'retained error'; else delete headerValidation.raw;
+    }
+  `);
+  const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
+  const expression = app.match(/metadataAvailable=\{([^}]+)\}/)?.[1];
+  assert.ok(expression); assert.doesNotMatch(expression, /import\.meta/);
+  const parent = execute(`
+    import * as child from 'owned-editor';
+    let editor = $state.raw(child), view = $state('fs882'), projectState = $state({ contextId: 'owned' });
+    const available = $derived(${expression.replaceAll('$projectState', 'projectState')});
+    export function enabled() { return available; }
+    export function route(next) { view = next; }
+    export function context(next) { projectState.contextId = next; }
+    export function unmount() { editor = undefined; }
+  `, { 'owned-editor': child });
+  assert.equal(parent.enabled(), false);
+  child.update(true, false, false, false); assert.equal(parent.enabled(), true);
+  for (const changes of [[true, true, false, false], [true, false, true, false], [true, false, false, true], [false, false, false, false]]) {
+    child.update(...changes); assert.equal(parent.enabled(), false);
+    child.update(true, false, false, false); assert.equal(parent.enabled(), true);
+  }
+  parent.route('home'); assert.equal(parent.enabled(), false);
+  parent.route('fs882'); assert.equal(parent.enabled(), true);
+  parent.context(''); assert.equal(parent.enabled(), false);
+  parent.context('owned'); assert.equal(parent.enabled(), true);
+  parent.unmount(); assert.equal(parent.enabled(), false);
+});
+
 test('Typed restoration preserves NULL, empty and historical unchanged cells; payloads are independent exact snapshots',()=>{
   const source=restorationReview();
   const request=restoration.metadataRestorationRequest(source,'retain','original-context','P1');

@@ -137,6 +137,10 @@ export function ListAuditEntries(contextID: string, plot: string): $CancellableP
     return $Call.ByID(2687960619, contextID, plot);
 }
 
+export function ListAuditReadEntries(contextID: string, plot: string): $CancellablePromise<$models.OrdinaryAuditReadEntry[] | null> {
+    return $Call.ByID(218608203, contextID, plot);
+}
+
 export function ListHumusRecords(contextID: string, plot: string): $CancellablePromise<$models.HumusRecord[] | null> {
     return $Call.ByID(295703714, contextID, plot);
 }

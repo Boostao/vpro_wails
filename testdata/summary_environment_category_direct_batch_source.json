@@ -1,0 +1,1063 @@
+{
+  "failure": null,
+  "observations": [
+    {
+      "function": "SVHydroGeoSubSystem",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVHydroGeoSubSystem",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  A(1)  B(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  A(1)  B(3)  (Null 1)"
+    },
+    {
+      "function": "SVHydroGeoSubSystem",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVHydroGeoSubSystem",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVHydroGeoSubSystem",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "Z(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "Z(1)  "
+    },
+    {
+      "function": "SVHydroGeoSubSystem",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVHydroGeoSubSystem",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "C(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "C(1)  "
+    },
+    {
+      "function": "SVHydroGeoSubSystem",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVHydroGeoSystem",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  B(1)  C(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  B(1)  C(3)  (Null 1)"
+    },
+    {
+      "function": "SVHydroGeoSystem",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  B(1)  C(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  B(1)  C(3)  (Null 1)"
+    },
+    {
+      "function": "SVHydroGeoSystem",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVHydroGeoSystem",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVHydroGeoSystem",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "A(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "A(1)  "
+    },
+    {
+      "function": "SVHydroGeoSystem",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVHydroGeoSystem",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "D(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "D(1)  "
+    },
+    {
+      "function": "SVHydroGeoSystem",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVSoilDrainage",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  C(1)  D(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  C(1)  D(3)  (Null 1)"
+    },
+    {
+      "function": "SVSoilDrainage",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  C(1)  D(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  C(1)  D(3)  (Null 1)"
+    },
+    {
+      "function": "SVSoilDrainage",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVSoilDrainage",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSoilDrainage",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "B(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "B(1)  "
+    },
+    {
+      "function": "SVSoilDrainage",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSoilDrainage",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "E(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "E(1)  "
+    },
+    {
+      "function": "SVSoilDrainage",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVHumusForm",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  D(1)  E(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  D(1)  E(3)  (Null 1)"
+    },
+    {
+      "function": "SVHumusForm",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  D(1)  E(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  D(1)  E(3)  (Null 1)"
+    },
+    {
+      "function": "SVHumusForm",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVHumusForm",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVHumusForm",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "C(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "C(1)  "
+    },
+    {
+      "function": "SVHumusForm",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVHumusForm",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "F(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "F(1)  "
+    },
+    {
+      "function": "SVHumusForm",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVRootRestrictingType",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  E(1)  F(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  E(1)  F(3)  (Null 1)"
+    },
+    {
+      "function": "SVRootRestrictingType",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  E(1)  F(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  E(1)  F(3)  (Null 1)"
+    },
+    {
+      "function": "SVRootRestrictingType",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVRootRestrictingType",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVRootRestrictingType",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "D(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "D(1)  "
+    },
+    {
+      "function": "SVRootRestrictingType",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVRootRestrictingType",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "G(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "G(1)  "
+    },
+    {
+      "function": "SVRootRestrictingType",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVSoilClassSubGroup",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  F(1)  G(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  F(1)  G(3)  (Null 1)"
+    },
+    {
+      "function": "SVSoilClassSubGroup",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  F(1)  G(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  F(1)  G(3)  (Null 1)"
+    },
+    {
+      "function": "SVSoilClassSubGroup",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVSoilClassSubGroup",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSoilClassSubGroup",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "E(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "E(1)  "
+    },
+    {
+      "function": "SVSoilClassSubGroup",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSoilClassSubGroup",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "H(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "H(1)  "
+    },
+    {
+      "function": "SVSoilClassSubGroup",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVSoilClassGroup",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  G(1)  H(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  G(1)  H(3)  (Null 1)"
+    },
+    {
+      "function": "SVSoilClassGroup",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  G(1)  H(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  G(1)  H(3)  (Null 1)"
+    },
+    {
+      "function": "SVSoilClassGroup",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVSoilClassGroup",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSoilClassGroup",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "F(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "F(1)  "
+    },
+    {
+      "function": "SVSoilClassGroup",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSoilClassGroup",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "I(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "I(1)  "
+    },
+    {
+      "function": "SVSoilClassGroup",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVRootZonePartSize",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  H(1)  I(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  H(1)  I(3)  (Null 1)"
+    },
+    {
+      "function": "SVRootZonePartSize",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  H(1)  I(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  H(1)  I(3)  (Null 1)"
+    },
+    {
+      "function": "SVRootZonePartSize",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVRootZonePartSize",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVRootZonePartSize",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "G(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "G(1)  "
+    },
+    {
+      "function": "SVRootZonePartSize",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVRootZonePartSize",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "J(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "J(1)  "
+    },
+    {
+      "function": "SVRootZonePartSize",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVSurficialMaterialSurf",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  I(1)  J(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  I(1)  J(3)  (Null 1)"
+    },
+    {
+      "function": "SVSurficialMaterialSurf",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  I(1)  J(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  I(1)  J(3)  (Null 1)"
+    },
+    {
+      "function": "SVSurficialMaterialSurf",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVSurficialMaterialSurf",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSurficialMaterialSurf",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "H(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "H(1)  "
+    },
+    {
+      "function": "SVSurficialMaterialSurf",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVSurficialMaterialSurf",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "K(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "K(1)  "
+    },
+    {
+      "function": "SVSurficialMaterialSurf",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVExposure",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  J(1)  K(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  J(1)  K(3)  (Null 1)"
+    },
+    {
+      "function": "SVExposure",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  J(1)  K(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  J(1)  K(3)  (Null 1)"
+    },
+    {
+      "function": "SVExposure",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVExposure",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVExposure",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "I(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "I(1)  "
+    },
+    {
+      "function": "SVExposure",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVExposure",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "L(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "L(1)  "
+    },
+    {
+      "function": "SVExposure",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    },
+    {
+      "function": "SVBioGeoClimaticZone",
+      "unit": "mixed",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  K(1)  L(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  K(1)  L(3)  (Null 1)"
+    },
+    {
+      "function": "SVBioGeoClimaticZone",
+      "unit": "MIXED",
+      "actual": [
+        "ok",
+        "String",
+        "(1)  K(1)  L(3)  (Null 1)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(1)  K(1)  L(3)  (Null 1)"
+    },
+    {
+      "function": "SVBioGeoClimaticZone",
+      "unit": "allnull",
+      "actual": [
+        "ok",
+        "String",
+        "(Null 2)"
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "(Null 2)"
+    },
+    {
+      "function": "SVBioGeoClimaticZone",
+      "unit": "missing",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVBioGeoClimaticZone",
+      "unit": "",
+      "actual": [
+        "ok",
+        "String",
+        "J(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "J(1)  "
+    },
+    {
+      "function": "SVBioGeoClimaticZone",
+      "unit": "noenv",
+      "actual": [
+        "ok",
+        "String",
+        ""
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": ""
+    },
+    {
+      "function": "SVBioGeoClimaticZone",
+      "unit": "plain",
+      "actual": [
+        "ok",
+        "String",
+        "M(1)  "
+      ],
+      "expectedStatus": "ok",
+      "expectedTypeOrError": "String",
+      "expectedText": "M(1)  "
+    },
+    {
+      "function": "SVBioGeoClimaticZone",
+      "unit": null,
+      "actual": [
+        "error",
+        "94",
+        "Invalid use of Null"
+      ],
+      "expectedStatus": "error",
+      "expectedTypeOrError": "94",
+      "expectedText": null
+    }
+  ],
+  "sourceAcceptanceSHA256": "bac6a4b0d6f161e567c30fdada3fa10b6882cd72b3969c52ee39988ef911783d",
+  "scope": "Synthetic88 original directly labeled TEXT observations, distinct per-column values; no canonical data or source collation adoption"
+}

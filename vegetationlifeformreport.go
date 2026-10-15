@@ -25,13 +25,13 @@ func vegetationLifeformInsertionLayer(cell ProjectMetadataCell) (ProjectMetadata
 	if err != nil {
 		return ProjectMetadataCell{}, err
 	}
-	if value == nil {
-		// Null2Question compares with "", not IsNull: NULL stays NULL.
-		return ProjectMetadataCell{Storage: "null"}, nil
-	}
-	formatted := fmt.Sprintf("%02d", *value)
-	if *value < 0 {
-		formatted = "-" + fmt.Sprintf("%02d", -*value)
+	// SQL Format(NULL, '00') yields empty text before Null2Question.
+	formatted := ""
+	if value != nil {
+		formatted = fmt.Sprintf("%02d", *value)
+		if *value < 0 {
+			formatted = "-" + fmt.Sprintf("%02d", -*value)
+		}
 	}
 	return vegetationLifeformNull2Question(ProjectMetadataCell{Storage: "text", Text: &formatted})
 }

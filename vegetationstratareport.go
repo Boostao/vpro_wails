@@ -25,7 +25,7 @@ func prepareLongVegetationStrata(ctx context.Context, prepared VegetationReportP
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if prepared.Project == "" || prepared.SU == "" || prepared.SU == "None" ||
+	if prepared.Project == "" || prepared.SU == "" || prepared.SU == "None" && prepared.projectUnitInputs == nil ||
 		!utf8.ValidString(prepared.Project+prepared.SU) || strings.ContainsRune(prepared.Project+prepared.SU, 0) {
 		return nil, errors.New("strata preparation requires explicit valid project/SU identities")
 	}

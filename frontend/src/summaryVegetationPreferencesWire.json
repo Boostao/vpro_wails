@@ -1,0 +1,40 @@
+{
+  "review": {
+    "contextId": "wire-context",
+    "project": "Sample",
+    "projectPath": "C:\\fixture\\Project.sqlite",
+    "su": "None",
+    "suPath": "C:\\fixture\\SU.sqlite",
+    "values": {
+      "groupBy": 1,
+      "average": 1,
+      "display": 1,
+      "showClass": 1,
+      "valueLimit": 0
+    },
+    "previewEnabled": true,
+    "selectionAvailable": true
+  },
+  "request": {
+    "expected": {
+      "groupBy": 1,
+      "average": 1,
+      "display": 1,
+      "showClass": 1,
+      "valueLimit": 0
+    },
+    "proposed": {
+      "groupBy": 4,
+      "average": 1,
+      "display": 6,
+      "showClass": 20,
+      "valueLimit": 0
+    }
+  },
+  "outcome": {
+    "contextId": "wire-context",
+    "changed": true,
+    "committed": true,
+    "errorMessage": ""
+  }
+}

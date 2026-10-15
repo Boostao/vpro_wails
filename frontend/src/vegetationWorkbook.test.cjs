@@ -71,6 +71,39 @@ test('strict unlumped review retains detached owned preview and nullable absent 
   assert.throws(() => workbook.validateVegetationWorkbookReview(fixture(), { ...owner, su: 'USysSuTableDynamic' }));
 });
 
+test('None workbook summary requires derived join count and does not infer original quality or physical SU count',()=>{
+  const input=fixture();
+  input.preview=JSON.parse(readFileSync(path.join(__dirname,'longVegetationNoneUnitsWire.json'),'utf8'));
+  input.preview.contextId=owner.contextId;
+  input.sheets=[{unit:cell('All plots'),name:'All plots'}];
+  input.summary.selectedPlotRows=2;
+  const value=workbook.validateVegetationWorkbookReview(input,owner);
+  assert.equal(value.summary.selectedPlotRows,2);
+  assert.equal(value.preview.report.units[0].membershipIds.length,1);
+  for(const count of [0,1,3]) {
+    const invalid=structuredClone(input);invalid.summary.selectedPlotRows=count;
+    assert.throws(()=>workbook.validateVegetationWorkbookReview(invalid,owner),/summary contradicts/);
+  }
+});
+test('selected-unit workbook retains independent consumer gate and derived summary count',()=>{
+  const input=fixture();
+  input.preview=JSON.parse(readFileSync(path.join(__dirname,'longVegetationSelectedUnitsWire.json'),'utf8'));
+  input.preview.contextId=owner.contextId;
+  input.sheets=['Alpha','Beta'].map(name=>({unit:cell(name),name}));
+  input.summary.selectedPlotRows=8;
+  assert.throws(()=>workbook.validateVegetationWorkbookReview(input,owner),/unavailable/);
+  const value=workbook.validateVegetationWorkbookReview(input,owner,true);
+  assert.equal(value.summary.selectedPlotRows,8);
+  assert.equal(value.preview.report.units[0].membershipIds.length,2);
+  input.preview.settings.unitFields[0]='changed';
+  input.preview.report.selectedUnits[0].siteUnit.text='changed';
+  assert.equal(value.preview.settings.unitFields[0],'Zone');
+  assert.equal(value.preview.report.selectedUnits[0].siteUnit.text,'Alpha');
+  for(const count of [0,2,4,7,9]) {
+    const invalid=structuredClone(value);invalid.summary.selectedPlotRows=count;
+    assert.throws(()=>workbook.validateVegetationWorkbookReview(invalid,owner,true),/summary contradicts/);
+  }
+});
 test('AllSpecs version states preserve NULL/empty/raw physical definitions and reject duplicate/foreign/invented values', () => {
   for (const literal of [null, '', ' Version ']) {
     const input = fixture(), summary = input.summary;
@@ -160,8 +193,9 @@ function routeHarness() {
   const reads = new (loadTypeScript('readRequests.ts', { '@wailsio/runtime': { Call: {}, CancelledRejectionError: class extends Error {} } }).ReadRequests)();
   let resolve, resolveExport, cancelled = 0, exportCancelled = 0, exports = 0;
   const context = vm.createContext({
-    ...owner, workbookEnabled: true, lifeformEnabled: false, strataEnabled: false, codeEnabled: false,
+    ...owner, workbookEnabled: true, lifeformEnabled: false, strataEnabled: false, codeEnabled: false, selectedFieldEnabled: false, noneUnitsEnabled: false, selectedUnitsEnabled: false,
     generation: 0, busy: false, operationHeld: false, error: '', preview: null, workbookReview: null, settings: fixture().preview.settings,
+    projectActive: false, projectWorkspace: null, projectView: null, sharedPreferenceBarrier: false,
     reads, preferences: null, statistics: null, preferenceBarrier: false, workbookSession: session, destination, reportBusy() {},
     requireLongVegetationGrouping: report.requireLongVegetationGrouping,
     VegetationWorkbookService: { GetReview(_context, request) {
@@ -182,7 +216,9 @@ function routeHarness() {
   Object.defineProperty(context, 'workbookBarrier', { get: () => session.view().busy || session.view().blocked });
   const cancel = code.slice(code.indexOf('  function cancel()'), code.indexOf('  async function options()'));
   const actions = code.slice(code.indexOf('  async function reviewWorkbook()'), code.indexOf('  async function loadSavedTitle()'));
-  vm.runInContext(cancel + actions + '\nthis.actions = { cancel, reviewWorkbook, publishWorkbook, acknowledgeWorkbook };', context);
+  const ts = require('typescript');
+  vm.runInContext(ts.transpileModule(cancel + actions + '\nthis.actions = { cancel, reviewWorkbook, publishWorkbook, acknowledgeWorkbook };',
+    { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText, context);
   return { context, session, actions: context.actions, complete: value => resolve(value), cancelled: () => cancelled,
     completeExport: value => resolveExport(value), exportCancelled: () => exportCancelled, exports: () => exports };
 }
@@ -199,6 +235,30 @@ test('actual review handler cancels borrowed reads, suppresses stale results and
   const fresh = actions.reviewWorkbook(); harness.complete(fixture()); await fresh;
   assert.equal(context.workbookReview.createdDate, '2026-10-06');
   context.operationHeld = true; await actions.publishWorkbook(); assert.equal(harness.session.view().blocked, false);
+});
+
+test('actual workbook review handler independently refuses mode4 without client capability and retains typed approved scalars when enabled', async () => {
+  const wire=JSON.parse(readFileSync(path.join(__dirname,'longVegetationSelectedScalarWire.json'),'utf8'));
+  for(const [kind, scalar] of Object.entries(wire.cells)) {
+    const harness=routeHarness(), input=fixture();
+    input.preview=structuredClone(wire.preview);
+    input.preview.contextId=owner.contextId;
+    input.preview.report.selectedFieldType=kind;
+    const row=input.preview.report.units[0].rows[0];
+    row.englishName=structuredClone(scalar); row.matchedName=structuredClone(scalar);
+    input.sheets=[{unit:cell('U'),name:'U'}];
+    harness.context.settings=input.preview.settings;
+    const refused=harness.actions.reviewWorkbook(); harness.complete(input); await refused;
+    assert.equal(harness.context.workbookReview,null);
+    assert.match(harness.context.error,/selected field display is disabled/);
+    assert.equal(harness.exports(),0);
+    harness.context.selectedFieldEnabled=true;
+    const accepted=harness.actions.reviewWorkbook(); harness.complete(input); await accepted;
+    assert.equal(harness.context.error,'');
+    assert.equal(harness.context.workbookReview.preview.report.selectedFieldType,kind);
+    assert.deepEqual(harness.context.workbookReview.preview.report.units[0].rows[0].englishName,scalar);
+    assert.equal(harness.exports(),0);
+  }
 });
 
 test('actual export handler holds reads and duplicate publication without cancellation and clears prepared review on receipt', async () => {
@@ -245,6 +305,31 @@ test('actual root transition and both native-close paths reject unresolved publi
   assert.equal(navigated, 1);
 });
 
+test('actual root workbook watcher and report share the immutable selected-unit consumer in both builds',()=>{
+  const ts=require('typescript');
+  const app=readFileSync(path.join(__dirname,'App.svelte'),'utf8');
+  const call=app.indexOf('    const session = vegetationWorkbookPublicationSession(');
+  const effect=app.slice(app.lastIndexOf('  $effect(',call),app.indexOf('  $effect(',call));
+  for(const enabled of [false,true]) {
+    const scope={...owner,contextId:'root-consumer-'+enabled};
+    const callbacks=[];
+    const context=vm.createContext({
+      $projectState:{contextId:scope.contextId,activeProject:scope.project,projectPath:scope.projectPath,activeSU:scope.su,suPath:scope.suPath},
+      vegetationPublicationBusy:false,view:'home',$effect:fn=>callbacks.push(fn),
+      vegetationWorkbookPublicationSession:workbook.vegetationWorkbookPublicationSession,
+    });
+    vm.runInContext(ts.transpileModule(effect
+      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_SELECTED_UNITS === 'true'/g,String(enabled))
+      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'true'/g,'false'),
+      {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,context);
+    assert.equal(callbacks.length,1);
+    const unsubscribe=callbacks[0]();
+    assert.equal(typeof unsubscribe,'function');
+    assert.equal(workbook.vegetationWorkbookPublicationSession(scope,enabled).view().busy,false);
+    assert.throws(()=>workbook.vegetationWorkbookPublicationSession(scope,!enabled));
+    unsubscribe();
+  }
+});
 test('route and root wiring keep held navigation/native close, no cancellable export, raw approval, labels and wrapped safety above guidance', () => {
   const panel = source(), app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   for (const [filename, value] of [['LongVegetationReport.svelte', panel], ['App.svelte', app]]) {
@@ -255,7 +340,7 @@ test('route and root wiring keep held navigation/native close, no cancellable ex
   assert.match(panel, /reads\.track\(VegetationWorkbookService\.GetReview/);
   assert.doesNotMatch(panel, /reads\.track\(VegetationWorkbookService\.ExportReviewed/);
   assert.match(panel, /if \(publication\.blocked\) workbookReview = null/);
-  assert.match(panel, /onBusyChange\(busy \|\| workbookBarrier \|\| preferenceBarrier\)/);
+  assert.match(panel, /onBusyChange\(busy \|\| workbookBarrier \|\| sharedPreferenceBarrier \|\| !!projectView\?\.closeBlocked\)/);
   assert.match(panel, /label for="vegetation-workbook-destination"/);
   assert.match(panel, /textarea id="vegetation-workbook-destination"/);
   assert.match(panel, /grid-template-columns: minmax\(0, 1fr\)/);
@@ -263,7 +348,7 @@ test('route and root wiring keep held navigation/native close, no cancellable ex
   assert.ok(panel.indexOf('data-vegetation-workbook-unknown') < panel.indexOf('class="guidance"'));
   assert.equal((app.match(/closeDisposition\(state, busy \|\| editorBusy[^\n]*vegetationPublicationBusy/g) || []).length, 4);
   for (const name of ['loadPlots', 'refresh', 'loadHierarchy']) {
-    assert.match(app, new RegExp(`async function ${name}\\([^)]*\\) \\{\\s*if \\(twoPageVegetationBusy \\|\\| twoPageSoilBusy \\|\\| pictureCreationBusy \\|\\| pictureLifecycleBusy \\|\\| vegetationPublicationBusy`));
+    assert.match(app, new RegExp(`async function ${name}\\([^)]*\\) \\{\\s*if \\(projectReportBusy \\|\\| twoPageVegetationBusy \\|\\| twoPageSoilBusy \\|\\| pictureCreationBusy \\|\\| pictureLifecycleBusy \\|\\| vegetationPublicationBusy`));
   }
   assert.match(app, /operationHeld=\{busy \|\| transitionWorking \|\| pendingTransition !== null \|\| !!closeRequest\}/);
   assert.match(app, /vegetationPublicationBusy = publication.busy \|\| publication.blocked/);
@@ -278,6 +363,12 @@ test('SSR remount shows persistent unknown alert and explicit acknowledgement wi
     .replace("import.meta.env.VITE_LONG_VEGETATION_THRESHOLD_PREFERENCES === 'true'", 'false')
     .replace("import.meta.env.VITE_LONG_VEGETATION_GROUP_PREFERENCES === 'true'", 'false')
     .replace("import.meta.env.VITE_LONG_VEGETATION_QUALITY_NULL_PREFERENCES === 'true'", 'false')
+    .replace("import.meta.env.VITE_LONG_VEGETATION_QUALITY_MINIMUM_PREFERENCES === 'true'", 'false')
+    .replace("import.meta.env.VITE_LONG_VEGETATION_NAMING_PREFERENCES === 'true'", 'false')
+    .replace("import.meta.env.VITE_LONG_VEGETATION_SELECTED_FIELD_PREFERENCES === 'true'", 'false')
+    .replace("import.meta.env.VITE_LONG_VEGETATION_ENFORCEMENT_PREFERENCES === 'true'", 'false')
+    .replace("import.meta.env.VITE_LONG_VEGETATION_UNIT_PREFERENCES === 'true'", 'false')
+    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_SELECTED_UNIT(?:S|_SELECTION) === 'true'/g, 'false')
     .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g, 'true'),
     'LongVegetationReport.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { ContextService: {}, VegetationWorkbookService: {} },
@@ -286,6 +377,12 @@ test('SSR remount shows persistent unknown alert and explicit acknowledgement wi
       './longVegetationSwitchPreferences': {},
       './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
       './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+      './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+      './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+      './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
       './LongVegetationSwitchPreferences.svelte': { default() {} },
     });
   const result = render(component, { props: { ...owned, onBusyChange() {} } });

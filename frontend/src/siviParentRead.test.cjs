@@ -242,6 +242,7 @@ test('already mounted profile handlers refuse every mutation under source author
       authorityBlocked: true, error: null, busy: false, committedFailure: false,
       draft: { review: { identity: 'original' }, cells: { retained: 'draft' } },
       creation: null, deletion: null, success: null,
+      presenceResult: { plotNumbers: ['P1'] },
       client: { SaveProjectPlotProfile() { writes++; }, CreateProjectPlotProfileRule() { writes++; },
         DeleteProjectPlotProfileRule() { writes++; } },
     });
@@ -253,6 +254,7 @@ test('already mounted profile handlers refuse every mutation under source author
     assert.equal(writes, 0);
   }
   context.actions.undo();
+  assert.equal(context.presenceResult, null);
   assert.equal(JSON.stringify(context.draft.cells), '{}');
   assert.equal(context.draft.review.identity, 'original');
   context.authorityBlocked = false;

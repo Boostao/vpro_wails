@@ -9,9 +9,10 @@
   type Projection = ReturnType<typeof twoPageEntryProjection>;
   type Child = Projection['children'][number];
   type Editor = { scope: TwoPageEntryScope; columns: readonly string[]; controls?: readonly string[]; input: Snippet<[PaperControl, string]>; labelled?: boolean };
-  let { form, coordinateMode = 'dd', values = new Map<string, unknown>(), editors = [], identity, embedded: childContent }: {
+  let { form, coordinateMode = 'dd', values = new Map<string, unknown>(), editors = [], identity, embedded: childContent, pictureReaderAvailable = false }: {
     form: TwoPageParentForm; coordinateMode?: CoordinateDisplayMode; values?: Map<string, unknown>;
     editors?: readonly Editor[]; identity: Snippet<[TwoPageEntryField]>; embedded: Snippet<[Child, PaperControl]>;
+    pictureReaderAvailable?: boolean;
   } = $props();
   const projection = $derived(twoPageEntryProjection(form, coordinateMode));
   const slots = $derived.by(() => {
@@ -55,7 +56,7 @@
       <SourcePage name={page.name} sourcePage={page} {values} editors={slots}>
         {#snippet embedded(control)}
           {@const child = childLink(control)}
-          {#if child.availability === 'unavailable'}
+          {#if child.availability === 'unavailable' && !(pictureReaderAvailable && child.form === 'frmVPicsXL')}
             <div class="rounded border p-3 text-sm text-stone-600" data-source-form={child.form}
               aria-label="Pictures unavailable">
               Pictures: source storage is mapped; the picture workflow remains unavailable.
