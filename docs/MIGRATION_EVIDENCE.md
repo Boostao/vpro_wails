@@ -8,6 +8,47 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+The broader qualified Boolean correction is independently reviewed and
+native-accepted and full-race integrated. Tests exercise each
+normal/two-page/ordinary update caller, mixed atomic refusal before approval,
+historical NULL omission, explicit Yes/No and old NULL-after restoration.
+All2318 standard frontend executions,167 affected cases and264 coupled Go
+races (404.600s) pass, including forged complete-entry requests; check0/0, vet
+and three actual-main builds pass. Independent review verifies1866 frozen inputs
+without significant findings. The initial embed-only runner assertion remains
+rejected; exact-input recovery preserves all26 production embed patterns and
+successful test receipts without changing accepted assets.
+Fresh Wails default/backend-off checks and eighteen typed Yes/No Save/prune pairs
+plus one ordinary No Save/exact-audit/scoped restoration pass on the single
+prepared fixture. Original source/audits/history and fifteen nonproject files
+remain exact; eighteen consumed typed receipts are the only additions. Specific
+CancelClose acknowledgements precede correction/Undo. The ordinary final no-op
+Clear assertion was completed from sealed physical history through a fresh
+staged-NULL read and known Cancel/Undo close cleanup, never mutation replay.
+All15 attempted owners are freshly absent. Old NULL-after receipt coverage is
+Go; ordinary restoration is a scoped binding, not an audit-dialog UI claim.
+Native association SHA256:
+`5ab4210161bf8d04e8190b1e31f186b832e3263a071b134f26495c8b946f2cbf`.
+The first full race remains rejected (root4593.395s): six old ordinary-header
+tests still expected a new Species NULL. All1866 inputs/285 artifacts and
+canonical/protected/closed-family hashes match the failed-run freeze. The
+three-file test-only correction preserves all mapped-field restoration by
+independently seeding legacy NULL-after receipts; explicit refusal/No and
+UpdatedFromCards nullable behavior remain covered. Production source/native
+acceptance is unchanged. Focused race passes21 top-level cases (40.130s);
+independent follow-up accepts the exact three test files with no significant
+findings and verifies their diff/race hashes. Fresh full race passes exit0,
+UTC2026-10-15T21:03:34.191436 to22:24:26.927490, root4499.991s. All1866
+inputs/296 artifacts/discovery, canonical/protected assets and the closed native
+family remain unchanged; all15 original owners are freshly absent. The source
+freeze is released; the first full run is not accepted retroactively.
+Full-race log SHA256:
+`73f7938cbe4ad4f87fe8f097dbca38a78270cd5ca824e87ef4d364b9206afcfb`.
+Integration receipt SHA256:
+`6aebdbf5ae5718562c2246bd79044ccee1c47d22301dcaea1882eadfd2a01d1a`.
+This follow-up does not inherit the preceding CHARS acceptance, enable new gates,
+change UpdatedFromCards/creation defaults or promote accepted demo assets.
+
 The CHARS parent-only desktop is independently reviewed, native-accepted and
 full-race integrated behind separate default-off server/client gates. All71
 source bindings,67 writable domains, complete31-reference Go/client wire,

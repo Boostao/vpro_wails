@@ -66,6 +66,9 @@ func (s *ContextService) writeTwoPageEntryWithLifecycle(ctx context.Context, con
 			if err != nil {
 				return nil, err
 			}
+			if err := validateSourceParentBooleanAssignments(assignments); err != nil {
+				return nil, fmt.Errorf("two-page complete entry: %w", err)
+			}
 			if err := approve(tx, observed, assignments); err != nil {
 				return nil, fmt.Errorf("two-page complete entry approval: %w", err)
 			}

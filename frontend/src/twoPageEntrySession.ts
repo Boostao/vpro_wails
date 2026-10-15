@@ -143,6 +143,19 @@ function needsAcknowledgement(snapshot: TwoPageEntrySnapshot, draft: TwoPageEntr
 }
 function issue(snapshot: TwoPageEntrySnapshot | null, draft: TwoPageEntryDraft, revision: number): { error: string | null; advisory: string | null } {
   if (draft.error) return { error: draft.error, advisory: null };
+  if (draft.column === 'SV_FloodPlain' || draft.column === 'SpeciesListComplete') {
+    const policy = snapshot?.Policies.find(policy => policy.column === draft.column);
+    if (!snapshot || policy?.kind !== 'boolean') {
+      return { error: 'Reload complete-entry Boolean source/policy proofs.', advisory: null };
+    }
+    const { binding, row, expected } = target(snapshot.Original, draft.column);
+    const parsed = parseTwoPageEntryValue(policy, expected, draft.input);
+    if (parsed.error) return { error: parsed.error, advisory: null };
+    if (draft.contextId !== snapshot.Original.ContextID || draft.table !== binding.Table || draft.rowId !== row.rowId ||
+        !equalCell(draft.expected, expected) || !equalCell(draft.value, parsed.value)) {
+      return { error: 'Complete-entry Boolean draft differs from its owned original or parsed input.', advisory: null };
+    }
+  }
   if (equalCell(draft.expected, draft.value)) return { error: null, advisory: null };
   if (!snapshot) return { error: 'Reload complete-entry source/reference proofs.', advisory: null };
   if (draft.column === 'BECSiteUnit' && !snapshot.MasterEditingAvailable) {

@@ -1,7 +1,7 @@
 import type { ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
 import { metadataCellText, equalCell } from './projectMetadataEditor';
 import { wellFormedUTF16 } from './qualityEditor';
-import { ordinaryTextError } from './ordinaryEditor';
+import { ordinaryTextError, sourceParentBooleanNullError } from './ordinaryEditor';
 import { siviDateTimestampError } from './siviDateTimestamp';
 
 export type SourceParentEntryInput = { kind: 'original' | 'clear' } | { kind: 'text'; raw: string }
@@ -49,5 +49,6 @@ export function parseSourceParentEntryValue<Policy extends SourceParentEntryPoli
   if (!error && expected.storage === 'blob' && !equalCell(expected, value)) {
     error = `${policy.column} historical BLOB replacement has no lossless source audit representation; retain original storage.`;
   }
+  if (!error) error = sourceParentBooleanNullError(policy.column, expected.storage === 'null', value.storage === 'null');
   return { value, error };
 }

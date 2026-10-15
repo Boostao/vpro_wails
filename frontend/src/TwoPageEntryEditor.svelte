@@ -457,7 +457,9 @@
     {@const column = control.column}
     {@const policy = view.snapshot.Policies.find(field => field.column === column)}
     {@const draft = view.drafts[column]}
-    {@const value = draft?.value ?? twoPageEntryCell(view.original, column)}
+    {@const originalCell = twoPageEntryCell(view.original, column)}
+    {@const nullBlocked = (column === 'SV_FloodPlain' || column === 'SpeciesListComplete') && originalCell.storage !== 'null'}
+    {@const value = draft?.value ?? originalCell}
     {@const raw = draft?.input.kind === 'text' ? draft.input.raw : value.storage === 'null' ? '' : metadataCellText(value)}
     {@const reference = view.snapshot.Fields.find(field => field.column === column)}
     {@const id = `complete-entry-${column}`}
@@ -483,7 +485,7 @@
         <select {id} class="w-full rounded border p-2" value={selected} disabled={unavailable}
           onchange={event => stage(column, event.currentTarget.value === '' ? { kind: 'clear' }
             : { kind: 'boolean', value: event.currentTarget.value === 'true' })}>
-          <option value="">NULL</option><option value="true">Yes</option><option value="false">No</option>
+          <option value="" disabled={nullBlocked}>{column === 'SV_FloodPlain' || column === 'SpeciesListComplete' ? 'Retain historical NULL' : 'NULL'}</option><option value="true">Yes</option><option value="false">No</option>
           {#if selected === 'historical'}<option value="historical" disabled>Historical {raw}</option>{/if}
         </select>
       {:else if policy?.kind === 'option'}
@@ -514,10 +516,11 @@
       {/if}
       {#if column !== 'ProjectID'}
         <div class="flex flex-wrap gap-2 text-xs">
-          <button type="button" disabled={unavailable} onclick={() => stage(column, { kind: 'clear' })}>Clear to NULL</button>
+          <button type="button" disabled={unavailable || nullBlocked} onclick={() => stage(column, { kind: 'clear' })}>Clear to NULL</button>
           <button type="button" disabled={unavailable} onclick={() => stage(column, { kind: 'original' })}>Keep original</button>
         </div>
       {/if}
+      {#if column === 'SV_FloodPlain' || column === 'SpeciesListComplete'}<p class="text-xs">Source Yes/No converts NULL to No; choose No explicitly. Unchanged historical NULL is retained.</p>{/if}
       {#if draft?.error}<p id={`${id}-error`} role="alert" class="text-xs text-red-700">{draft.error}</p>{/if}
       {#if reference && !reference.available}<p role="status" class="text-xs">{reference.diagnostic}</p>{/if}
       {#if column === 'BECSiteUnit' && !view.snapshot.MasterEditingAvailable}

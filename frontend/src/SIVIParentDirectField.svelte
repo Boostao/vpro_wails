@@ -35,7 +35,8 @@
       aria-describedby={`${id}-original`} aria-invalid={Boolean(draft?.error)}
       onchange={event => select(event.currentTarget.value)}>
       <option value="original">Retain original storage</option>
-      <option value="null">NULL</option>
+      <option value="null" disabled={boolean && original.storage !== 'null'}>
+        {boolean ? 'Retain historical NULL' : 'NULL'}</option>
       {#if boolean}<option value="true">Yes (-1)</option><option value="false">No (0)</option>
       {:else}<option value="1">Est.</option><option value="2">Meas.</option>{/if}
     </select>
@@ -45,7 +46,8 @@
       oninput={event => onstage({ kind: 'text', raw: event.currentTarget.value })} />
   {/if}
   <div class="flex flex-wrap gap-2 text-xs">
-    <button type="button" {disabled} class="rounded border px-2 py-1" aria-label={`Set NULL ${caption}`}
+    <button type="button" disabled={disabled || boolean && original.storage !== 'null'}
+      class="rounded border px-2 py-1" aria-label={`Set NULL ${caption}`}
       onclick={() => onstage({ kind: 'clear' })}>Set NULL</button>
     {#if categorical}
       <button type="button" {disabled} class="rounded border px-2 py-1" aria-label={`Set empty TEXT ${caption}`}
@@ -54,6 +56,7 @@
     <button type="button" {disabled} class="rounded border px-2 py-1" aria-label={`Retain original ${caption}`}
       onclick={() => onstage({ kind: 'original' })}>Retain original</button>
   </div>
+  {#if boolean}<p class="text-xs">Source Yes/No converts NULL to No; choose No explicitly. Unchanged historical NULL is retained.</p>{/if}
   <p id={`${id}-original`} class="text-xs text-stone-600 whitespace-pre-wrap break-words">Original:
     {original.storage === 'null' ? 'NULL' : original.storage === 'text' && original.text === '' ? '(empty text)' : metadataCellText(original)}
     ({original.storage})</p>

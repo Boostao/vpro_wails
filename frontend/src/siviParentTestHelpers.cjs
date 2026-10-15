@@ -10,9 +10,13 @@ const metadata = loadTypeScript('projectMetadataEditor.ts', {
 const restoration = loadTypeScript('projectMetadataRestore.ts', {
   './qualityEditor': quality, './projectMetadataEditor': metadata,
 });
+const ordinary = loadTypeScript('ordinaryEditor.ts', {
+  './qualityEditor': quality, './numericEditor': loadTypeScript('numericEditor.ts'),
+});
 const editor = loadTypeScript('siviParentEditor.ts', {
   '../../resources/fs1333-sivi-layout.json': source, './projectMetadataRestore': restoration,
   './projectMetadataEditor': metadata, './qualityEditor': quality, './numericEditor': loadTypeScript('numericEditor.ts'),
+  './ordinaryEditor': ordinary,
 });
 const { SIVIParentSession } = loadTypeScript('siviParentSession.ts', {
   './siviParentEditor': editor, './qualityEditor': quality,

@@ -28,6 +28,10 @@ export const nullableParentFlags = [
   { key: 'speciesListComplete', column: 'SpeciesListComplete', label: 'Species list complete', scope: 'veg', kind: 'flag' },
   { key: 'updatedFromCards', column: 'UpdatedFromCards', label: 'Updated from cards', scope: 'site', kind: 'flag' }
 ] as const;
+export function sourceParentBooleanNullError(column: string, originalNull: boolean, nextNull: boolean): string | null {
+  return !originalNull && nextNull && (column === 'SV_FloodPlain' || column === 'SpeciesListComplete')
+    ? `${column} source Yes/No converts NULL to No; select No explicitly instead of writing SQLite NULL.` : null;
+}
 export function nullableParentField(column: string | undefined) {
   return ordinaryField(column) ?? nullableParentFlags.find(field => field.column === column);
 }
@@ -38,7 +42,8 @@ export type OrdinaryTextField = Extract<OrdinaryField, { kind: 'text' | 'memo' }
 export type OrdinaryTextPolicy = { label: string; kind: 'text'; maximum: number } | { label: string; kind: 'memo' };
 export type OrdinaryNumberField = Extract<OrdinaryField, { kind: 'integer' | 'single' }>;
 export type OrdinaryNumberPolicy = { label: string; kind: 'integer' | 'single' };
-export type OrdinaryValues = Pick<FS882Header, OrdinaryKey>;
+export type OrdinaryValues = Pick<FS882Header, OrdinaryKey> &
+  Partial<Pick<FS882Header, typeof nullableParentFlags[number]['key']>>;
 export interface OrdinaryCell { raw: string; value: number | null; error: string | null }
 export type OrdinaryDrafts = Partial<Record<OrdinaryNumberField['key'], OrdinaryCell>>;
 
@@ -63,9 +68,13 @@ export function ordinaryNumberValue(field: OrdinaryNumberPolicy, raw: string, or
   return { raw, ...parsed };
 }
 export function ordinaryValidation(scope: OrdinaryScope, values: OrdinaryValues,
-  original: OrdinaryValues | null, drafts: OrdinaryDrafts, fields: readonly OrdinaryField[] = allOrdinaryFields): string | null {
+  original: OrdinaryValues | null, drafts: OrdinaryDrafts,
+  fields: readonly (OrdinaryField | typeof nullableParentFlags[number])[] = [...allOrdinaryFields, ...nullableParentFlags]): string | null {
   for (const field of fields.filter(field => field.scope === scope)) {
-    if (field.kind === 'text' || field.kind === 'memo') {
+    if (field.kind === 'flag') {
+      const error = sourceParentBooleanNullError(field.column, original?.[field.key] == null, values[field.key] === null);
+      if (error) return error;
+    } else if (field.kind === 'text' || field.kind === 'memo') {
       const error = ordinaryTextError(field, values[field.key], original?.[field.key] ?? null);
       if (error) return error;
     } else {

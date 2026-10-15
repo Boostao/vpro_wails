@@ -14,6 +14,35 @@ The separately gated SIVI height/cover panels reuse the same owned controller
 under FS882 or the standalone SIVI presentation. Exported coordinates are evidence,
 not a requirement to reproduce fixed Access pixels.
 
+### Shared qualified Yes/No update correction
+
+Source SV_FloodPlain and SpeciesListComplete convert assigned NULL to No at the
+engine boundary. New desktop updates therefore refuse non-NULL-to-NULL with an
+explicit No alternative instead of creating SQLite NULL or silently normalizing
+intent. The invariant now covers normal direct/source-action, two-page
+common/complete and ordinary Species updates as well as the accepted CHARS parent.
+It runs only after pure planning/unchanged omission and before mutation/approval;
+historical NULL, old NULL-after receipts and restoration remain independent.
+Client parsers and original-aware NULL controls agree. Complete-entry requests
+re-prepare these two Boolean drafts against owned original, policy and input
+before deciding omission. UpdatedFromCards, generic metadata/import and creation
+defaults remain outside this correction. All2318 standard frontend executions,
+167 affected cases,264 coupled races, check0/0, vet and three actual-main builds
+pass; independent review finds no significant issues. Fresh disposable Wails
+checks cover default/backend denial, original-aware NULL commands, invalid draft
+Save/close refusal, explicit Yes/No and restoration to historical NULL across
+normal/common/complete/CHARS and ordinary updates. Eighteen typed Save/prune
+pairs plus one ordinary Save/scoped-audit restore retain exact original source/
+audits/history and fifteen nonproject files. Specific CancelClose acknowledgements
+precede correction/Undo; retained harness mismatches do not replay completed
+mutations. Ordinary restoration uses the actual scoped binding, not an audit-dialog
+UI claim. Old NULL-after receipts have Go coverage, not new native calibration.
+The ordinary-header test-only follow-up passes21 focused races and independent
+review without reducing mapped-field/legacy restoration coverage. Fresh full
+race passes (root4499.991s), with1866 inputs/296 artifacts/discovery, canonical/
+protected assets and the closed family unchanged; all15 original owners are
+freshly absent. Earlier failed runs remain rejected. Defaults/demo assets are unchanged.
+
 ### CHARS SIVI source owner
 
 The separately named internal CHARS reader/projection uses the original
@@ -1045,7 +1074,7 @@ There are nine bound event routes, independent of the child BeforeUpdate paths:
 | Form | OnCurrent -> Form_Current | Initializes species-list and plot-type option displays from stored values; no option audit should be manufactured on display |
 | Form | OnLoad -> Form_Load | Reads the ProjectID-source preference |
 | optPlotType | AfterUpdate | Writes PlotType; normal parent also restores the selected option and refreshes |
-| optSpeciesListComplete | AfterUpdate | Writes true, false or NULL to SpeciesListComplete |
+| optSpeciesListComplete | AfterUpdate | Assigns true, false or NULL expression; the qualified Yes/No engine converts NULL to No |
 | optProjectID | AfterUpdate | Changes the registry-backed source preference, not the bound ProjectID itself |
 | ProjectID | GotFocus | Rebuilds choices from master or current-project metadata |
 | ProjectID | NotInList | Enters metadata creation/editing and record-save logic; not a simple free-text completion |
@@ -1123,8 +1152,10 @@ Refresh. The callback first assigns the option to an Integer and declares its
 mapped value as String; its Else assigns NULL to that String. Do not convert
 this source defect into a verified NULL-clear action or copy the CHARS Variant
 callback. Species-list-complete uses Variant:1 maps to True,2 to False, Else
-to NULL. A future explicit storage proposal must preserve Access BOOLEAN=-1/0
-and the implicit target identity without widening ordinary scalar allowlists.
+assigns NULL, which the qualified Yes/No engine converts to No. Selected desktop
+options1/2 preserve Access BOOLEAN=-1/0 and the implicit target identity without
+widening ordinary scalar allowlists. Changed SQLite NULL now refuses with an
+explicit No alternative; unchanged historical NULL is retained by omission.
 Form_Current calls the separate display initializers: known stored values map
 back to option values, otherwise the group is NULL. Display initialization is
 not an edit, an assignment or an audit. These are static event paths, not new

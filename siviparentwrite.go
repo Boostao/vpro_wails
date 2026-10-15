@@ -218,7 +218,14 @@ func withSIVIParentWriteTransaction(ctx context.Context, owner *sqliteContext, p
 
 func (s *ContextService) writeSIVIParentDirect(ctx context.Context, contextID, plot string, original *siviParentProjection, edits siviParentDirectEdits) (*siviParentWriteResult, error) {
 	return s.writeSIVIParentPlanned(ctx, contextID, plot, original, siviParentDirectHistory, func(observed *siviParentProjection) ([]siviParentScalarAssignment, error) {
-		return planSIVIParentDirectEdits(ctx, observed, edits)
+		assignments, err := planSIVIParentDirectEdits(ctx, observed, edits)
+		if err != nil {
+			return nil, err
+		}
+		if err := validateSourceParentBooleanAssignments(assignments); err != nil {
+			return nil, fmt.Errorf("SIVI direct entry: %w", err)
+		}
+		return assignments, nil
 	})
 }
 

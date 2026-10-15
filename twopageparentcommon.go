@@ -87,7 +87,14 @@ func (s *ContextService) writeTwoPageParentCommon(ctx context.Context, contextID
 	}
 	result, err := s.writeSIVIParentPlannedWithHooks(ctx, contextID, plot, original, history,
 		func(observed *siviParentProjection) ([]siviParentScalarAssignment, error) {
-			return planTwoPageParentCommonProjection(ctx, observed, edits)
+			assignments, err := planTwoPageParentCommonProjection(ctx, observed, edits)
+			if err != nil {
+				return nil, err
+			}
+			if err := validateSourceParentBooleanAssignments(assignments); err != nil {
+				return nil, err
+			}
+			return assignments, nil
 		}, siviParentWriteHooks{read: read})
 	if err != nil {
 		return nil, fmt.Errorf("two-page common-field writing: %w", err)

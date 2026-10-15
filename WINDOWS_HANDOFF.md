@@ -396,9 +396,49 @@ artifacts/discovery,12 canonical/19 protected assets and the closed native
 family remain unchanged; all18 predecessor/current owners are freshly absent.
 Private `chars-sivi-desktop-boolean-integration/receipt.json` is accepted;
 the prior stopped integration remains unaccepted. The source freeze is released.
-Proceed with the authorized local commit, then source-qualified CHARS
-SpeciesListComplete options1/2 and the recorded existing Boolean NULL follow-up;
-never invent a PlotType writer from its unwired procedure. No push. No
+The accepted CHARS source is committed locally on main as `c3a653e`; no push.
+The accepted shared Boolean correction extends only the qualified changed-NULL
+guard to normal direct/action, two-page common/complete and ordinary Species
+updates. Client parsers, original-aware NULL commands and diagnostics agree;
+complete-entry requests now re-prepare these two fields against owned originals
+before unchanged omission. All2318 standard frontend executions,167 affected
+cases,264 coupled races (404.600s), check0/0 and vet pass. Independent review
+accepts all1866 frozen inputs without significant findings. The initial runner
+incorrectly expected only one package embed; its rejected receipt is retained.
+An exact-input recovery preserves all26 production patterns with frontend-only
+substitution and builds default/common/entry binaries (42391552/42413568/
+42413056 bytes). No accepted assets are overwritten.
+Fresh disposable default/backend-off, normal, both common/complete variants
+and CHARS pass: eighteen typed Save/prune pairs plus one ordinary No Save,
+exact audit and scoped audit-prune restoration. Specific CancelClose receipts
+precede correction/Undo. The ordinary postcommit Clear no-op expectation was
+completed through a fresh staged-NULL read; a known retained close Cancel was
+acknowledged before Undo/close. No completed mutation was replayed. Original
+source/audits/history and fifteen nonproject files remain exact; eighteen
+consumed typed receipts are the only additions. All15 attempted native owners
+are freshly absent. Legacy NULL-after receipts have Go coverage, not a new
+native claim. Private `source-parent-boolean-final/native-association.json`
+accepts this bounded native boundary. The first full race failed (root4593.395s)
+on six ordinary-header tests still expecting a new Species NULL write. Its
+rejected receipt/log and exact1866-input/285-artifact/canonical/protected/closed
+family constancy are preserved. Three test files now exercise refusal/explicit
+No and seed old NULL-after restoration receipts independently of the protected
+writer; all mapped-field and UpdatedFromCards coverage is retained. Application,
+frontend, bindings, resources and accepted native evidence are unchanged.
+Focused race passes21 top-level cases (40.130s); the retained independent
+reviewer accepts the exact three-file correction without significant findings.
+Private `source-boolean-header-tests/validation.json` and
+`review-disposition.json` seal that test-only follow-up. Fresh full race passes
+exit0, UTC2026-10-15T21:03:34.191436 to22:24:26.927490, root4499.991s.
+All1866 inputs/296 artifacts/discovery, canonical/protected assets and the
+closed16-file family remain unchanged; all15 owners are freshly absent.
+Private `source-parent-boolean-header-integration/receipt.json` is accepted.
+The source freeze is released. Preserve earlier failed runs as rejected;
+do not replay native mutations.
+The Friday demo and accepted assets are unchanged. UpdatedFromCards, generic
+metadata/import and creation defaults remain excluded. Continue with
+source-qualified CHARS SpeciesListComplete options1/2; never
+invent a PlotType writer from its unwired procedure. No push. No
 default/demo availability has changed;
 SubZone/new blank Ahorizon and whole-form/native parity remain unavailable.
 Continue the ordered forms/report backlog, not a whole-migration completion.

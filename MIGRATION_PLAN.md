@@ -45,6 +45,15 @@ feature-sized revision's entry points, guards and exclusions.
 ## Next forms/report work
 
 Forms, the complete report pipeline and the Access ribbon remain unfinished.
+The accepted correction applies the source-qualified changed-NULL refusal
+for SV_FloodPlain/SpeciesListComplete to existing normal, two-page and ordinary
+update paths. Shared guards and client request re-preparation preserve historical
+omission and old receipt restoration; unrelated flags and creation defaults are
+excluded. Focused tests, independent review, disposable native acceptance and
+fresh full race integration pass; earlier failed runs remain rejected.
+Continue the source-qualified CHARS Comp./Part. action; its dormant PlotType
+procedure grants no writer.
+
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner
 instead of remaining permanently disabled. Both frontend prerequisites, a
 selected plot and known context are required; independent backend denial and
@@ -284,6 +293,23 @@ pre-correction run remains unaccepted. No default/demo promotion or whole-form
 completion follows this acceptance.
 Preserve SubZone/blank-Ahorizon,
 child and implicit-action exclusions while continuing the ordered backlog.
+
+The shared qualified SV_FloodPlain/SpeciesListComplete update correction now
+passes2318 standard frontend executions,167 affected cases,264 coupled races,
+check0/0, vet, three private actual-main builds and independent review.
+Disposable default/backend-off and normal/common/complete/CHARS modes pass;
+eighteen typed Save/prune pairs and one ordinary Save/scoped-audit restoration
+preserve complete source/original audit/history rows and fifteen other files.
+Specific native-close acknowledgements precede correction or Undo. The ordinary
+postcommit assertion was completed from sealed physical history and a fresh
+client without mutation replay. Legacy NULL-after receipts retain Go coverage;
+this is not an additional native legacy-receipt claim. The ordinary-header
+test-only follow-up passes21 focused races and independent review while retaining
+all mapped-field legacy restoration. Fresh full race passes (root4499.991s),
+with1866 inputs/296 artifacts/discovery, canonical/protected assets and closed
+native family unchanged; all15 original owners are freshly absent. Earlier
+failed runs remain rejected. Keep UpdatedFromCards, generic metadata/import and
+creation defaults outside this accepted correction; continue the next CHARS action.
 
 The mapped normal/CHARS single-plot Google Earth successor is integrated. Its
 registered independently gated candidate previews one saved literal Env plot, not the existing
@@ -2019,7 +2045,7 @@ directory.
 - Define each implementation contract, owned files, exclusions and measurable
   checks before editing. Keep application complexity separate from test volume;
   helper extraction requires a demonstrated invariant, not a helper quota.
-- Focused Go tests first; full `go test -race -timeout 75m ./...` at integration.
+- Focused Go tests first; full `go test -race -timeout 120m ./...` at integration.
   Frontend changes require tests, check and build. Bindings/lifecycle require
   actual Wails with disposable data, not browser preview.
 - Nontrivial changes require independent read-only review, resolved findings

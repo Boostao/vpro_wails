@@ -179,6 +179,14 @@ func TestPlotHeader_NullableBooleans(t *testing.T) {
 			}
 			for i, value := range []*bool{boolPointer(false), boolPointer(true), boolPointer(true), boolPointer(false), nil} {
 				reflect.ValueOf(&h).Elem().FieldByName(field.member).Set(reflect.ValueOf(value))
+				if field.member == "SpeciesListComplete" && value == nil {
+					before := substrateSnapshot(t, db)
+					if err := s.UpdatePlot(h); err == nil || !strings.Contains(err.Error(), "select No explicitly") {
+						t.Fatalf("step %d accepted new Species NULL: %v", i, err)
+					}
+					assertSubstrateSnapshot(t, db, before)
+					continue
+				}
 				if err := s.UpdatePlot(h); err != nil {
 					t.Fatal(err)
 				}
@@ -206,8 +214,12 @@ func TestPlotHeader_NullableBooleans(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if len(entries) != 4 {
-				t.Fatalf("boolean audit count %d, want 4", len(entries))
+			wantChanges := [][2]any{{nil, "0"}, {"0", "-1"}, {"-1", "0"}}
+			if field.member == "UpdatedFromCards" {
+				wantChanges = append(wantChanges, [2]any{"0", nil})
+			}
+			if len(entries) != len(wantChanges) {
+				t.Fatalf("boolean audit count %d, want %d", len(entries), len(wantChanges))
 			}
 			var changes [][2]any
 			for _, entry := range entries {
@@ -220,7 +232,7 @@ func TestPlotHeader_NullableBooleans(t *testing.T) {
 				}
 				changes = append(changes, [2]any{before, after})
 			}
-			for _, want := range [][2]any{{nil, "0"}, {"0", "-1"}, {"-1", "0"}, {"0", nil}} {
+			for _, want := range wantChanges {
 				found := false
 				for _, change := range changes {
 					found = found || reflect.DeepEqual(change, want)
@@ -269,11 +281,25 @@ func TestPlotHeader_BooleanAuditStrengths(t *testing.T) {
 		want := 0
 		for i, value := range []*bool{nil, boolPointer(false), boolPointer(true), nil} {
 			h.SpeciesListComplete, h.UpdatedFromCards = value, value
+			if i == 3 {
+				before := substrateSnapshot(t, db)
+				if err := s.SavePlot(h); err == nil || !strings.Contains(err.Error(), "select No explicitly") {
+					t.Fatalf("strength %d accepted mixed new Species NULL: %v", strength, err)
+				}
+				assertSubstrateSnapshot(t, db, before)
+				h.SpeciesListComplete = boolPointer(false)
+			}
 			if err := s.SavePlot(h); err != nil {
 				t.Fatal(err)
 			}
-			if (i == 1 && strength >= 2) || (i == 2 && strength >= 1) || (i == 3 && strength == 3) {
+			if (i == 1 && strength >= 2) || (i == 2 && strength >= 1) {
 				want += 2
+			}
+			if i == 3 && strength >= 1 {
+				want++
+				if strength == 3 {
+					want++
+				}
 			}
 			if got := auditCount(t, db, h.PlotNumber); got != want {
 				t.Fatalf("strength %d step %d: audit count %d, want %d", strength, i, got, want)

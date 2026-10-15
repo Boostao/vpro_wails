@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -41,7 +42,15 @@ func TestSIVIParentActionWriterSourceChoicesTypedRestorationAndIsolation(t *test
 						if err != nil {
 							t.Fatal(err)
 						}
+						filesBefore := databaseBytes(t, service.projects.sqlite.attachments)
 						result, err := service.writeSIVIParentActions(context.Background(), state.ContextID, original.Plot, original, edits)
+						if speciesOption == 0 {
+							if err == nil || result != nil || !strings.Contains(err.Error(), "select No explicitly") {
+								t.Fatal("new source species NULL action was accepted", result, err)
+							}
+							assertProfileSUFiles(t, service, filesBefore)
+							return
+						}
 						if err != nil || result == nil || result.ChangedCells != 2 || result.HistoryID == "" || !result.SourceRefreshRequired {
 							t.Fatal("source action pair failed", result, err)
 						}
@@ -312,12 +321,16 @@ func TestSIVIParentActionWriterRollbackAndRetry(t *testing.T) {
 	}
 }
 
-func TestSIVIParentActionRestorationPreservesUnauditedAssignments(t *testing.T) {
+func TestSIVIParentActionLegacyRestorationPreservesUnauditedAssignments(t *testing.T) {
 	for _, strength := range []int{1, 2} {
 		t.Run(strconv.Itoa(strength), func(t *testing.T) {
 			service, state, original, actions := siviParentActionWriteFixture(t, false, strength)
 			actions[1].Option = nil
-			result, err := service.writeSIVIParentActions(context.Background(), state.ContextID, original.Plot, original, actions)
+			// Old NULL-after receipts retain their original audited subset, not new-write authority.
+			result, err := service.writeSIVIParentPlanned(context.Background(), state.ContextID, original.Plot, original,
+				siviParentActionHistory, func(observed *siviParentProjection) ([]siviParentScalarAssignment, error) {
+					return planSIVIParentActionEdits(context.Background(), observed, actions)
+				})
 			if err != nil || result.ChangedCells != 2 || result.HistoryID == "" {
 				t.Fatal("mixed audited/unaudited action pair failed", result, err)
 			}

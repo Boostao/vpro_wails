@@ -317,18 +317,24 @@ func TestPlotHeader_AllFieldsRoundTripAndAudit(t *testing.T) {
 	if count := auditCount(t, db, h.PlotNumber); count != 2*fieldCount {
 		t.Fatalf("update audit count: %d", count)
 	}
-	if err := s.SavePlot(FS882Header{PlotNumber: h.PlotNumber}); err != nil {
+	beforeClear := substrateSnapshot(t, db)
+	if err := s.SavePlot(FS882Header{PlotNumber: h.PlotNumber}); err == nil || !strings.Contains(err.Error(), "select No explicitly") {
+		t.Fatalf("mixed clear accepted new Species NULL: %v", err)
+	}
+	assertSubstrateSnapshot(t, db, beforeClear)
+	clearedHeader := FS882Header{PlotNumber: h.PlotNumber, SpeciesListComplete: boolPointer(false)}
+	if err := s.SavePlot(clearedHeader); err != nil {
 		t.Fatal(err)
 	}
 	got, err = s.GetPlot(h.PlotNumber)
-	if err != nil || !reflect.DeepEqual(*got, FS882Header{PlotNumber: h.PlotNumber}) {
+	if err != nil || !reflect.DeepEqual(*got, clearedHeader) {
 		t.Fatalf("clear roundtrip: %#v, %v", got, err)
 	}
 	var cleared int
 	if err := db.QueryRow(`SELECT COUNT(*) FROM Sample_Audit WHERE PlotNumber = ? AND BeforeEdit IS NOT NULL AND AfterEdit IS NULL`, h.PlotNumber).Scan(&cleared); err != nil {
 		t.Fatal(err)
 	}
-	if cleared != fieldCount || auditCount(t, db, h.PlotNumber) != 3*fieldCount {
+	if cleared != fieldCount-1 || auditCount(t, db, h.PlotNumber) != 3*fieldCount-1 {
 		t.Fatalf("clear-to-null audit count: %d", cleared)
 	}
 }

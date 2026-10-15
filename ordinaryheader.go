@@ -99,7 +99,7 @@ func validateOrdinaryHeaderValues(h FS882Header, old *FS882Header) error {
 			return err
 		}
 	}
-	return nil
+	return validateSourceParentBooleanNull("SpeciesListComplete", previous.SpeciesListComplete == nil, h.SpeciesListComplete == nil)
 }
 
 func validateOrdinaryHeaderBeforeTransaction(db *sql.DB, project string, h FS882Header, mode headerSaveMode) error {

@@ -81,7 +81,8 @@
 {#snippet fieldInput(field: Field)}
   {#if view.original}
             {@const draft = view.drafts[field.column]}
-            {@const value = draft?.value ?? twoPageParentCommonCell(view.original, field.column)}
+            {@const originalCell = twoPageParentCommonCell(view.original, field.column)}
+            {@const value = draft?.value ?? originalCell}
             {@const raw = draft?.input.kind === 'text' ? draft.input.raw : value.storage === 'null' ? '' : metadataCellText(value)}
             {@const id = `two-page-common-${field.column}`}
             {@const unavailable = disabled || view.busy || view.blocked}
@@ -106,7 +107,7 @@
                   onchange={event => onstage(field.column, event.currentTarget.value === '' ? { kind: 'clear' }
                     : event.currentTarget.value === 'true' || event.currentTarget.value === 'false'
                     ? { kind: 'boolean', value: event.currentTarget.value === 'true' } : { kind: 'text', raw: event.currentTarget.value })}>
-                  <option value="">NULL</option><option value="true">Yes</option><option value="false">No</option>
+                  <option value="" disabled={originalCell.storage !== 'null'}>Retain historical NULL</option><option value="true">Yes</option><option value="false">No</option>
                   {#if selected === 'historical'}<option value="historical" disabled>Historical {raw}</option>{/if}
                 </select>
               {:else}
@@ -124,13 +125,15 @@
                 {/if}
               {/if}
               <div class="flex flex-wrap gap-2 text-xs">
-                <button type="button" disabled={unavailable} onclick={() => onstage(field.column, { kind: 'clear' })}>Clear to NULL</button>
+                <button type="button" disabled={unavailable || field.policy.kind === 'boolean' && originalCell.storage !== 'null'}
+                  onclick={() => onstage(field.column, { kind: 'clear' })}>Clear to NULL</button>
                 {#if field.policy.kind === 'categorical'}
                   <button type="button" disabled={unavailable} onclick={() => onstage(field.column, { kind: 'empty' })}>Set empty TEXT</button>
                 {/if}
                 <button type="button" disabled={unavailable} onclick={() => onstage(field.column, { kind: 'original' })}>Retain original</button>
                 <span data-storage={value.storage}>{value.storage === 'text' && value.text === '' ? 'empty text' : value.storage}</span>
               </div>
+              {#if field.policy.kind === 'boolean'}<p class="text-xs">Source Yes/No converts NULL to No; choose No explicitly. Unchanged historical NULL is retained.</p>{/if}
               {#if draft?.error}<p id={`${id}-error`} role="alert" class="text-sm text-red-700">{draft.error}</p>{/if}
               {#if field.sourceInstances.length > 1}
                 <p class="text-xs text-stone-600">Both source Est/Meas controls bind Stand Age. One shared editor preserves that binding; it does not edit Stand Height.</p>

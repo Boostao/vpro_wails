@@ -6,6 +6,19 @@ import (
 	"testing"
 )
 
+func seedLegacyHeaderClear(t *testing.T, service *PlotService, db *sql.DB, header FS882Header) {
+	t.Helper()
+	cleared := FS882Header{PlotNumber: header.PlotNumber, SpeciesListComplete: header.SpeciesListComplete}
+	if err := service.SavePlot(cleared); err != nil {
+		t.Fatal(err)
+	}
+	// Old NULL-after receipts remain restorable, but the current writer must not create them.
+	if _, err := db.Exec(`UPDATE Sample_Env SET SpeciesListComplete=NULL WHERE PlotNumber=?`, header.PlotNumber); err != nil {
+		t.Fatal(err)
+	}
+	restoreAuditFixture(t, db, header.PlotNumber, "_Env", "SpeciesListComplete", nil, *header.SpeciesListComplete, nil)
+}
+
 func TestPlotHeader_RestoreAllMappedFields(t *testing.T) {
 	for _, qualified := range []bool{false, true} {
 		t.Run(map[bool]string{false: "suffix-table", true: "project-table"}[qualified], func(t *testing.T) {
@@ -14,9 +27,7 @@ func TestPlotHeader_RestoreAllMappedFields(t *testing.T) {
 			if err := s.SavePlot(h); err != nil {
 				t.Fatal(err)
 			}
-			if err := s.SavePlot(FS882Header{PlotNumber: h.PlotNumber}); err != nil {
-				t.Fatal(err)
-			}
+			seedLegacyHeaderClear(t, s, db, h)
 			if _, err := db.Exec(`UPDATE Sample_Audit SET Restore = 1 WHERE PlotNumber = ? AND BeforeEdit IS NOT NULL AND AfterEdit IS NULL`, h.PlotNumber); err != nil {
 				t.Fatal(err)
 			}
@@ -69,9 +80,7 @@ func TestPlotHeader_RestoreRollbackAndAllowlist(t *testing.T) {
 			if err := s.SavePlot(h); err != nil {
 				t.Fatal(err)
 			}
-			if err := s.SavePlot(FS882Header{PlotNumber: h.PlotNumber}); err != nil {
-				t.Fatal(err)
-			}
+			seedLegacyHeaderClear(t, s, db, h)
 			if _, err := db.Exec(`UPDATE Sample_Audit SET Restore = 1 WHERE PlotNumber = ? AND BeforeEdit IS NOT NULL AND AfterEdit IS NULL`, h.PlotNumber); err != nil {
 				t.Fatal(err)
 			}

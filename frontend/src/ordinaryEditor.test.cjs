@@ -13,6 +13,21 @@ const { ordinaryFields, ordinaryField, ordinaryTextError, ordinaryNumberValue,
   ordinaryValidation, ordinarySession, rememberOrdinarySession } = editor;
 const values = () => Object.fromEntries([...ordinaryFields, ...editor.additionalParentFields].map(field => [field.key, null]));
 
+test('ordinary validation rejects only changed source Species NULL and preserves historical NULL and unrelated flags', () => {
+  for (const originalValue of [true, false]) {
+    const original = { ...values(), speciesListComplete: originalValue, updatedFromCards: false };
+    assert.match(ordinaryValidation('veg', { ...original, speciesListComplete: null }, original, {}), /NULL to No/);
+    for (const next of [true, false]) {
+      assert.equal(ordinaryValidation('veg', { ...original, speciesListComplete: next }, original, {}), null);
+    }
+    assert.equal(ordinaryValidation('site', { ...original, updatedFromCards: null }, original, {}), null);
+  }
+  const historical = { ...values(), speciesListComplete: null };
+  for (const next of [null, true, false]) {
+    assert.equal(ordinaryValidation('veg', { ...historical, speciesListComplete: next }, historical, {}), null);
+  }
+});
+
 test('Fourteen original fields retain scopes independently from later scalar and constrained workflows', () => {
   assert.equal(ordinaryFields.length, 14);
   assert.equal(ordinaryFields.filter(field => field.scope === 'site').length, 2);
@@ -213,8 +228,8 @@ test('Two separately gated source flags retain nullable identity and labelled Ch
   const Flags = serverComponent(source.replace('import.meta.env.VITE_ORDINARY_PARENT_EDITING', "'false'")
     .replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'true'")
     .replace('import.meta.env.VITE_ADDITIONAL_PARENT_EDITING', "'false'"), 'OrdinaryFields.svelte', { './ordinaryEditor': editor });
-  const fixture = `<script>import Flags from './OrdinaryFields.svelte';let {draft, field}=$props();</script>
-    <Flags bind:draft original={null} scope={field.scope} capabilities={{[field.key]:true}} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
+  const fixture = `<script>import Flags from './OrdinaryFields.svelte';let {draft, field, original=null}=$props();</script>
+    <Flags bind:draft {original} scope={field.scope} capabilities={{[field.key]:true}} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
       {#snippet children(slot)}
         {#if slot}{@render slot.input({column:field.column,type:'CheckBox',enabled:true,locked:false,controlName:field.column},'width:100%')}{/if}
       {/snippet}
@@ -228,6 +243,14 @@ test('Two separately gated source flags retain nullable identity and labelled Ch
       assert.match(html, new RegExp(`aria-label="${field.label}"`));
       assert.match(html, new RegExp(value === null ? 'Not recorded \\(NULL\\)' : value ? 'Yes' : 'No'));
       assert.match(html, new RegExp(`aria-label="Clear ${field.label} to NULL"`));
+    }
+    for (const originalValue of [null, false, true]) {
+      const original = { ...values(), [field.key]: originalValue };
+      const html = render(Component, { props: { draft: { ...original, [field.key]: true }, original, field } }).body;
+      const clear = html.match(/<button[^>]*>/)[0];
+      assert.equal(clear.includes('disabled'), field.key === 'speciesListComplete' && originalValue !== null);
+      if (field.key === 'speciesListComplete') assert.match(html, /NULL to No/);
+      else assert.doesNotMatch(html, /NULL to No/);
     }
   }
 });

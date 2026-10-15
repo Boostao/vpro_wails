@@ -150,7 +150,7 @@ func TestSIVIParentDirectWriterExactUTF16BooleanOptionAndNullWrites(t *testing.T
 	root, horizon := strings.Repeat("\U0001f600", 50), strings.Repeat("\U0001f600", 2)+"a"
 	drafts := siviParentDirectEdits{
 		Scalars: []siviParentScalarEdit{
-			siviParentEdit(t, parent, "SV_FloodPlain", ProjectMetadataCell{Storage: "null"}),
+			siviParentEdit(t, parent, "SV_FloodPlain", metadataInteger("-1")),
 			siviParentEdit(t, parent, "SV_StandHeight", ProjectMetadataCell{Storage: "null"}),
 		},
 		Options: []siviParentScalarEdit{

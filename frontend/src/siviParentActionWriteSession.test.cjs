@@ -42,11 +42,18 @@ function fixture(overrides = {}) {
   };
   return { session: new SIVIParentActionWriteSession(owner, port, () => {}), calls, port };
 }
-test('all15 action requests preserve explicit source options, implicit row identity and exact wire shape', () => {
+test('ten writable action combinations preserve wire identity and five changed-NULL combinations refuse', () => {
   for (let plot = 1; plot <= 5; plot++) for (const species of [null, 1, 2]) {
     const value = base();
     let drafts = editor.stageSIVIParent(value, {}, 'PlotType', { kind: 'option', option: plot });
     drafts = editor.stageSIVIParent(value, drafts, 'SpeciesListComplete', { kind: 'option', option: species });
+    if (species === null) {
+      assert.match(drafts.SpeciesListComplete.error, /NULL to No/);
+      assert.throws(() => siviParentActionRequest(value, drafts), /NULL to No/);
+      drafts.SpeciesListComplete.error = null;
+      assert.throws(() => siviParentActionRequest(value, drafts));
+      continue;
+    }
     const request = siviParentActionRequest(value, drafts);
     assert.deepEqual(Object.keys(request).sort(), ['actions', 'original']);
     assert.equal(request.actions.length, 2);
@@ -119,13 +126,13 @@ test('source Refresh acknowledgement is checked against actual action scope afte
     assert.equal(await session.undo(), true);
   }
 });
-test('species-only action acknowledgement permits explicit NULL without claiming source Refresh', async () => {
+test('species-only action acknowledgement permits explicit No without claiming source Refresh', async () => {
   const { session, calls } = fixture();
   await session.load();
-  session.stage('SpeciesListComplete', { kind: 'option', option: null });
+  session.stage('SpeciesListComplete', { kind: 'option', option: 2 });
   assert.equal(await session.save(), true);
   const binding = session.view().original.Bindings.find(binding => binding.Binding === 'SpeciesListComplete');
-  assert.equal(session.view().original.Rows[0].Env.cells[binding.Column].storage, 'null');
+  assert.equal(session.view().original.Rows[0].Env.cells[binding.Column].integer, '0');
   assert.equal(calls.refresh, 1);
   assert.equal(await session.restore('prune'), true);
   assert.equal(calls.restore, 1);
@@ -161,6 +168,27 @@ const Panel = serverComponent(readFileSync(path.join(__dirname, 'SIVIParentReadP
   './SIVIParentDirectField.svelte': { default: DirectField }, './SIVIParentActionField.svelte': { default: ActionField },
   './siviProjectAssignmentSession': assignmentSession, './SIVIProjectAssignmentField.svelte': { default: assignmentField },
 });
+test('compiled normal Boolean controls base NULL availability on original storage, not the current draft', () => {
+  for (const [stored, blocked] of [[cell(), false], [cell('integer', '-1'), true], [cell('integer', '0'), true]]) {
+    for (const [Component, column, input] of [
+      [DirectField, 'SV_FloodPlain', { kind: 'boolean', value: false }],
+      [ActionField, 'SpeciesListComplete', { kind: 'option', option: 2 }],
+    ]) {
+      const value = base(); setCell(value, column, stored);
+      const drafts = editor.stageSIVIParent(value, {}, column, input);
+      const html = render(Component, { props: { column, original: stored, draft: drafts[column],
+        caption: 'Floodplain', disabled: false, onstage() {} } }).body;
+      const option = html.match(/<option value="null"[^>]*>/)[0];
+      assert.equal(option.includes('disabled'), blocked);
+      assert.match(html, /NULL to No/);
+      if (column === 'SV_FloodPlain') {
+        assert.equal(html.match(/<button[^>]*aria-label="Set NULL Floodplain"[^>]*>/)[0].includes('disabled'), blocked);
+        assert.match(html, /No \(0\)/);
+      } else assert.match(html, /Part\./);
+    }
+  }
+});
+
 test('normal source action controls have literal labels/options without initialization or NULL PlotType', async () => {
   const { session, calls } = fixture(); await session.load();
   const props = { view: { original: base(), busy: false, error: null }, actionView: session.view(),
@@ -180,10 +208,32 @@ test('normal source action controls have literal labels/options without initiali
   assert.equal(calls.save, 0);
   session.stage('SpeciesListComplete', { kind: 'option', option: null });
   const remount = render(Panel, { props: { ...props, actionView: session.view() } }).body;
-  assert.match(remount, /value="null" selected/);
+  assert.match(remount, /value="null" disabled="" selected=""/);
+  assert.match(remount, /NULL to No/);
+  assert.equal(session.closeState().blocked, true);
   assert.equal(calls.save, 0);
   const disabled = render(Panel, { props: { ...props, actionView: null } }).body;
   assert.doesNotMatch(disabled, /data-sivi-action-(?:field|toolbar)/);
+});
+test('species NULL errors survive session views and block Save until explicit correction or Undo', async () => {
+  const { session, calls } = fixture();
+  await session.load();
+  session.stage('SpeciesListComplete', { kind: 'option', option: null });
+  const remounted = session.view();
+  assert.match(remounted.drafts.SpeciesListComplete.error, /NULL to No/);
+  remounted.drafts.SpeciesListComplete.error = null;
+  assert.match(session.view().drafts.SpeciesListComplete.error, /NULL to No/);
+  assert.equal(session.closeState().blocked, true);
+  await assert.rejects(session.save(), /NULL to No/);
+  assert.equal(calls.save, 0);
+  session.stage('SpeciesListComplete', { kind: 'option', option: 2 });
+  assert.equal(session.closeState().blocked, false);
+  assert.equal(await session.save(), true);
+  assert.equal(calls.save, 1);
+  session.stage('SpeciesListComplete', { kind: 'option', option: null });
+  await session.undo();
+  assert.equal(session.closeState().blocked, false);
+  assert.equal(calls.save, 1);
 });
 test('action errors precede fields and both scoped editors preserve distinct history during clean reloads', async () => {
   const { session } = fixture(); await session.load();

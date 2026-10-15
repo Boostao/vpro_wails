@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"reflect"
 )
 
@@ -33,6 +34,9 @@ func (s *ContextService) writeSIVIParentActions(ctx context.Context, contextID, 
 		assignments, err := planSIVIParentActionEdits(ctx, observed, edits)
 		if err != nil {
 			return nil, err
+		}
+		if err := validateSourceParentBooleanAssignments(assignments); err != nil {
+			return nil, fmt.Errorf("SIVI source action: %w", err)
 		}
 		sources, err := siviParentActionSources()
 		if err != nil {

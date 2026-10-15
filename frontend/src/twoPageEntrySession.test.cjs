@@ -111,6 +111,46 @@ const tick = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
   return { promise, resolve, reject }; };
 
+test('both complete owners reject new Boolean NULL even after erased errors and preserve historical retention', async () => {
+  for (const form of forms) for (const column of ['SV_FloodPlain', 'SpeciesListComplete']) {
+    for (const stored of [cell('integer', '-1'), cell('integer', '0')]) {
+      const snapshot = fixtureSnapshot(form); set(snapshot, column, stored);
+      const f = fixture({ form, snapshot }); await f.session.load();
+      f.session.stage(column, { kind: 'clear' });
+      assert.equal(f.session.closeState().blocked, true);
+      const remount = f.session.view();
+      assert.match(remount.drafts[column].error, /NULL to No/);
+      remount.drafts[column].error = null;
+      assert.throws(() => f.session.scope.request(remount.original, remount.drafts), /NULL to No/);
+      await assert.rejects(f.session.save(), /NULL to No/);
+      assert.equal(f.calls.save, 0);
+      f.session.stage(column, { kind: 'boolean', value: false });
+      assert.equal(f.session.closeState().blocked, false);
+      for (const mutate of [
+        draft => { draft.value = cell(); },
+        draft => { draft.value = cell(); draft.expected = cell(); },
+        draft => { draft.rowId = '999'; },
+      ]) {
+        const forged = f.session.view(); mutate(forged.drafts[column]);
+        assert.throws(() => f.session.scope.request(forged.original, forged.drafts), /owned original or parsed input/);
+      }
+      await f.session.undo();
+      assert.equal(f.session.closeState().blocked, false);
+    }
+    const f = fixture({ form }); await f.session.load();
+    f.session.stage(column, { kind: 'boolean', value: true });
+    f.session.stage(column, { kind: 'clear' });
+    assert.equal(f.session.closeState().unsaved, false);
+    assert.equal(await f.session.save(), true);
+    assert.equal(f.calls.save, 0);
+    f.session.stage(column, { kind: 'boolean', value: false });
+    assert.equal(await f.session.save(), true);
+    assert.equal(f.last().edits[0].value.integer, '0');
+    assert.equal(await f.session.restore('prune'), true);
+    assert.equal(api.twoPageEntryCell(f.session.view().original, column).storage, 'null');
+  }
+});
+
 test('both complete form cohorts load one owned pair, 117/119 policies and 56/55 typed references', async () => {
   for (const form of forms) {
     const f = fixture({ form }); assert.equal(await f.session.load(), true);

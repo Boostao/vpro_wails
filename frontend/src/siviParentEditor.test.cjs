@@ -153,6 +153,13 @@ test('numeric BOOLEAN and action domains preserve exact accepted storage and rej
     ['SV_PolygonNumber', 'text'], ['SpeciesListComplete', 'actions']]) {
     const nonnull = original(); setCell(nonnull, column, cell('integer', '-1'));
     const d = editor.stageSIVIParent(nonnull, {}, column, { kind: 'clear' });
+    if (column === 'SV_FloodPlain' || column === 'SpeciesListComplete') {
+      assert.match(d[column].error, /NULL to No/);
+      assert.throws(() => editor.siviParentProposal(nonnull, d), /NULL to No/);
+      d[column].error = null;
+      assert.throws(() => editor.siviParentProposal(nonnull, d));
+      continue;
+    }
     const proposal = editor.siviParentProposal(nonnull, d);
     assert.equal(proposal[domain].length, 1);
     if (domain === 'actions') assert.equal(proposal.actions[0].option, null);
@@ -166,6 +173,22 @@ test('numeric BOOLEAN and action domains preserve exact accepted storage and rej
     ['SV_PolygonNumber', { kind: 'empty' }], ['SV_StandHeight', { kind: 'option', option: 1 }],
     ...['NaN', '1bad', '1e999', '3.5e38', '\ud800'].map(raw => ['SV_StandHeight', { kind: 'text', raw }]),
   ]) assert.throws(() => editor.siviParentProposal(r, editor.stageSIVIParent(r, {}, column, input)));
+});
+test('qualified Boolean historical NULL remains omitted after staging Yes and retaining NULL', () => {
+  for (const [column, yes, no] of [
+    ['SV_FloodPlain', { kind: 'boolean', value: true }, { kind: 'boolean', value: false }],
+    ['SpeciesListComplete', { kind: 'option', option: 1 }, { kind: 'option', option: 2 }],
+  ]) {
+    const value = original();
+    let drafts = editor.stageSIVIParent(value, {}, column, yes);
+    assert.equal(drafts[column].value.integer, '-1');
+    drafts = editor.stageSIVIParent(value, drafts, column, { kind: 'clear' });
+    assert.equal(drafts[column].error, null);
+    assert.equal(Object.values(editor.siviParentProposal(value, drafts)).filter(Array.isArray).flat().length, 0);
+    drafts = editor.stageSIVIParent(value, drafts, column, no);
+    assert.equal(drafts[column].value.integer, '0');
+    assert.equal(drafts[column].error, null);
+  }
 });
 test('unchanged invalid history is omitted without imposing height-specific BLOB restrictions', () => {
   for (const column of Object.keys(inputs)) {

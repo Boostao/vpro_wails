@@ -195,6 +195,27 @@ The earlier stopped integration remains unaccepted. No default/demo availability
 or whole-form/ribbon parity follows this bounded parent acceptance.
 No default or qualified demo availability has changed.
 
+The same qualified Yes/No correction is now implemented across normal SIVI
+FloodPlain/source Species actions, two-page common/complete entry and the ordinary
+Species flag. Changed NULL refuses explicitly; Yes=-1/No=0, unchanged historical
+NULL and old NULL-after restoration remain supported. Complete-entry requests
+independently re-prepare these two Boolean drafts against their owned originals.
+UpdatedFromCards, generic metadata/import and creation defaults are not changed.
+All2318 standard frontend executions,167 affected cases,264 coupled Go races,
+check0/0, vet and three private actual-main builds pass. Independent review
+finds no significant issues. Fresh disposable Wails default/backend-off modes,
+eighteen typed Yes/No Save/prune pairs and one ordinary Save/audit-restore pair
+pass. Specific native-close acknowledgements precede correction/Undo; source,
+original audits/history and fifteen nonproject files remain exact. An ordinary
+postcommit harness expectation was completed from its sealed checkpoint without
+replaying a mutation. Old NULL-after receipt coverage is Go, not a new native
+legacy-receipt claim. The test-only ordinary-header follow-up passes21 focused
+races and independent review, retaining all mapped-field legacy restoration.
+Fresh full repository race passes (root4499.991s); all1866 inputs/296 artifacts,
+package/embed discovery, canonical/protected assets and closed native family
+remain unchanged, and all15 original owners are freshly absent. Earlier failed
+runs remain rejected. No accepted demo/assets or availability defaults are promoted.
+
 The qualified private Windows demo is
 `build\bin\VPRO-Friday-Demo-2026-10-16-menu.zip` (17,273,336 bytes;
 SHA256 `450313ae2b111312190f939f75d4b69e3d2cc57695b0b92615e907eb0a7ac013`).

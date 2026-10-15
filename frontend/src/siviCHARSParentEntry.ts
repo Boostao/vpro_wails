@@ -103,8 +103,7 @@ export function parseSIVICHARSParentValue(policy: SIVICHARSParentEntryPolicy,
   const parsed = parseSourceParentEntryValue(policy, expected, input, {
     label: 'CHARS SIVI', kinds, allowsEmpty: field => field.allowEmpty, number: parseNumber,
   });
-  if (!equalSIVICHARSParentCell(expected, parsed.value) &&
-      (!policy.writable || policy.kind === 'boolean' && parsed.value.storage === 'null')) {
+  if (!equalSIVICHARSParentCell(expected, parsed.value) && !policy.writable) {
     return { value: parsed.value, error: policy.diagnostic };
   }
   return parsed;

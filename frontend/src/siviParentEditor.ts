@@ -4,6 +4,7 @@ import { completeCell, exactSigned64 } from './projectMetadataRestore';
 import { equalCell, metadataCellText } from './projectMetadataEditor';
 import { wellFormedUTF16 } from './qualityEditor';
 import { finiteSingleValue } from './numericEditor';
+import { sourceParentBooleanNullError } from './ordinaryEditor';
 
 const policies = {
   SV_StandHeight: { owner: 'Env', domain: 'scalars', kind: 'number', maximum: 0 },
@@ -225,6 +226,7 @@ export function parseSIVIParentInput(column: SIVIParentColumn, expected: Project
       if (input.raw.length > policy.maximum) error = `${column} exceeds${policy.maximum} UTF-16 units; literal input was not truncated.`;
     }
   } else error = 'SIVI parent input intent is unavailable.';
+  if (!error) error = sourceParentBooleanNullError(column, expected.storage === 'null', value.storage === 'null');
   return { value, error };
 }
 

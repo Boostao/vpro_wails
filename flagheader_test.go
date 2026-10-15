@@ -30,7 +30,16 @@ func TestNullableParentFlagsPreserveNullFalseAndAccessTrue(t *testing.T) {
 					flag := value.(bool)
 					setOrdinaryTestValue(&h, field.member, &flag)
 				}
-				if err := s.UpdatePlot(h); err != nil {
+				before := substrateSnapshot(t, db)
+				err := s.UpdatePlot(h)
+				if value == nil && field.member == "SpeciesListComplete" {
+					if err == nil || !strings.Contains(err.Error(), "select No explicitly") {
+						t.Fatal("new source Boolean NULL was silently accepted", err)
+					}
+					assertSubstrateSnapshot(t, db, before)
+					continue
+				}
+				if err != nil {
 					t.Fatal(err)
 				}
 				var stored *int
@@ -41,7 +50,11 @@ func TestNullableParentFlagsPreserveNullFalseAndAccessTrue(t *testing.T) {
 					t.Fatal("nullable Boolean physical representation changed", value, stored)
 				}
 			}
-			if auditCount(t, db, "FLAG") != 3 {
+			expectedAudits := 3
+			if field.member == "SpeciesListComplete" {
+				expectedAudits = 2
+			}
+			if auditCount(t, db, "FLAG") != expectedAudits {
 				t.Fatal("nullable flag changes produced phantom or omitted audits")
 			}
 			for _, raw := range []string{"-1", "0", "1", `"true"`, `"false"`} {

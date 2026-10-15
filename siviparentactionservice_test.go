@@ -85,8 +85,16 @@ func TestSIVIParentPublicActionStrictWireSaveRestore(t *testing.T) {
 	if request.Actions[1].Option != nil || request.Actions[0].ControlID != "form:frmSIVIsite/optPlotType" {
 		t.Fatal("nullable option/source identity changed in transport", request)
 	}
+	before := databaseBytes(t, service.projects.sqlite.attachments)
 	result, err := service.SaveSIVIParentActions(context.Background(), state.ContextID, original.Plot, request)
-	if err != nil || result.ChangedCells != 2 || result.HistoryID == "" || !result.SourceRefreshRequired {
+	if err == nil || result != nil || !strings.Contains(err.Error(), "select No explicitly") {
+		t.Fatal("strict wire silently accepted a new source Species NULL", result, err)
+	}
+	assertProfileSUFiles(t, service, before)
+	no := 2
+	request.Actions[1].Option = &no
+	result, err = service.SaveSIVIParentActions(context.Background(), state.ContextID, original.Plot, request)
+	if err != nil || result == nil || result.ChangedCells != 2 || result.HistoryID == "" || !result.SourceRefreshRequired {
 		t.Fatal("raw explicit action request failed", result, err)
 	}
 	restored, err := service.RestoreSIVIParentActions(context.Background(), state.ContextID, original.Plot, result.HistoryID, AuditRestorePrune)

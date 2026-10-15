@@ -2,7 +2,7 @@
   import { untrack, type Snippet } from 'svelte';
   import type { FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
-  import { ordinaryFields, additionalParentFields, nullableParentFlags, nullableParentField, ordinaryTextError, ordinaryNumberValue, ordinaryValidation,
+  import { ordinaryFields, additionalParentFields, nullableParentFlags, nullableParentField, ordinaryTextError, ordinaryNumberValue, ordinaryValidation, sourceParentBooleanNullError,
     ordinarySession, rememberOrdinarySession, type OrdinaryScope, type OrdinaryNumberField,
     type OrdinaryTextField, type OrdinaryDrafts } from './ordinaryEditor';
   let { draft = $bindable(), original, scope, capabilities, disabled, onchange, onvalidation, onVegNotesTab, children }: {
@@ -20,7 +20,7 @@
     ...(additionalEnabled ? additionalParentFields : []),
     ...(flagsEnabled ? nullableParentFlags : [])
   ].filter(field => field.scope === scope));
-  const validation = $derived(ordinaryValidation(scope, draft, original, staged, fields.filter(field => field.kind !== 'flag')));
+  const validation = $derived(ordinaryValidation(scope, draft, original, staged, fields));
   $effect(() => {
     const identity = draft, baseline = original;
     untrack(() => { staged = ordinarySession(identity, baseline); });
@@ -51,6 +51,8 @@
 {#snippet input(control: PaperControl, position: string)}
   {@const field = nullableParentField(control.column)}
   {#if field?.kind === 'flag' && control.type === 'CheckBox'}
+    {@const nullDiagnostic = sourceParentBooleanNullError(field.column, false, true)}
+    {@const nullBlocked = nullDiagnostic !== null && original?.[field.key] != null}
     <div class="nullable-flag" style={position}>
       <input id={`header-${field.key}`} data-column={field.column} data-source-control={control.controlName}
         type="checkbox" aria-label={field.label} checked={draft[field.key] === true}
@@ -59,8 +61,9 @@
         onchange={event => { draft[field.key] = event.currentTarget.checked; onchange(); }} />
       <span>{draft[field.key] === null ? 'Not recorded (NULL)' : draft[field.key] ? 'Yes' : 'No'}</span>
       <button type="button" aria-label={`Clear ${field.label} to NULL`}
-        disabled={disabled || capabilities[field.key] !== true || !control.enabled || control.locked || draft[field.key] === null}
+        disabled={disabled || capabilities[field.key] !== true || !control.enabled || control.locked || draft[field.key] === null || nullBlocked}
         onclick={() => { draft[field.key] = null; onchange(); }}>Clear</button>
+      {#if nullDiagnostic}<p class="text-xs">{nullDiagnostic} Unchanged historical NULL is retained.</p>{/if}
     </div>
   {:else if field && field.kind !== 'flag' && control.type === 'TextBox'}
     {#if field.kind === 'memo'}

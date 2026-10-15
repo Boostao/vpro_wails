@@ -89,6 +89,38 @@ function fixture(form = 'FS882-8x6XL', overrides = {}, initial = original(form))
   };
   return { session: new api.TwoPageParentCommonSession(owner, form, port, () => {}), calls, last: () => last };
 }
+test('both common owners refuse changed Boolean NULL, reprepare forged requests and retain historical NULL', async () => {
+  for (const form of ['FS882-8x6XL', 'FS882-8x6XL-CHARS']) {
+    for (const stored of [cell('integer', '-1'), cell('integer', '0')]) {
+      const initial = original(form); set(initial, 'SV_FloodPlain', stored);
+      const f = fixture(form, {}, initial); await f.session.load();
+      f.session.stage('SV_FloodPlain', { kind: 'clear' });
+      assert.equal(f.session.closeState().blocked, true);
+      const remount = f.session.view();
+      assert.match(remount.drafts.SV_FloodPlain.error, /NULL to No/);
+      remount.drafts.SV_FloodPlain.error = null;
+      assert.throws(() => api.twoPageParentCommonRequest(initial, remount.drafts, form), /NULL to No/);
+      await assert.rejects(f.session.save(), /NULL to No/);
+      assert.equal(f.calls.save, 0);
+      f.session.stage('SV_FloodPlain', { kind: 'boolean', value: false });
+      assert.equal(f.session.closeState().blocked, false);
+      await f.session.undo();
+      assert.equal(f.session.closeState().blocked, false);
+    }
+    const f = fixture(form); await f.session.load();
+    f.session.stage('SV_FloodPlain', { kind: 'boolean', value: true });
+    f.session.stage('SV_FloodPlain', { kind: 'clear' });
+    assert.equal(f.session.closeState().unsaved, false);
+    assert.equal(await f.session.save(), true);
+    assert.equal(f.calls.save, 0);
+    f.session.stage('SV_FloodPlain', { kind: 'boolean', value: false });
+    assert.equal(await f.session.save(), true);
+    assert.equal(f.last().edits[0].value.integer, '0');
+    assert.equal(await f.session.restore('prune'), true);
+    assert.equal(api.twoPageParentCommonCell(f.session.view().original, 'SV_FloodPlain').storage, 'null');
+  }
+});
+
 test('common source scope preserves every instance with one live owner per logical field', async () => {
   for (const form of ['FS882-8x6XL', 'FS882-8x6XL-CHARS']) {
     const fields = api.twoPageParentCommonFields(form), f = fixture(form);

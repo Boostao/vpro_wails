@@ -22,6 +22,22 @@ const cell = (storage = 'null', value = null) => ({ storage, text: storage === '
   integer: storage === 'integer' ? value : null, real: storage === 'real' ? value : null,
   blobHex: storage === 'blob' ? value : null });
 
+test('entry Boolean NULL policy is qualified, historical-safe and leaves BLOB error priority intact', () => {
+  for (const column of ['SV_FloodPlain', 'SpeciesListComplete']) {
+    const p = { ...policy('boolean'), column };
+    for (const original of [cell('integer', '-1'), cell('integer', '0')]) {
+      assert.match(api.parseTwoPageEntryValue(p, original, { kind: 'clear' }).error, /NULL to No/);
+      assert.equal(api.parseTwoPageEntryValue(p, original, { kind: 'boolean', value: true }).value.integer, '-1');
+      assert.equal(api.parseTwoPageEntryValue(p, original, { kind: 'boolean', value: false }).value.integer, '0');
+      assert.equal(api.parseTwoPageEntryValue(p, original, { kind: 'original' }).error, null);
+    }
+    assert.deepEqual(api.parseTwoPageEntryValue(p, cell(), { kind: 'clear' }), { value: cell(), error: null });
+    assert.match(api.parseTwoPageEntryValue(p, cell('blob', 'FF'), { kind: 'clear' }).error, /BLOB replacement/);
+  }
+  assert.deepEqual(api.parseTwoPageEntryValue({ ...policy('boolean'), column: 'UpdatedFromCards' },
+    cell('integer', '-1'), { kind: 'clear' }), { value: cell(), error: null });
+});
+
 test('entry parser retains literal text and exact UTF-16 thresholds without repair', () => {
   for (const kind of ['text', 'categorical', 'plot-type']) {
     const p = policy(kind, 4);

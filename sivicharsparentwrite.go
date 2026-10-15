@@ -61,10 +61,8 @@ func (s *ContextService) writeSIVICHARSParentEntryWithLifecycle(ctx context.Cont
 			if err != nil {
 				return nil, err
 			}
-			for _, assignment := range assignments {
-				if assignment.Column == "SV_FloodPlain" && assignment.After.Storage == "null" {
-					return nil, errors.New("CHARS source Yes/No converts NULL to No; select No explicitly instead of writing SQLite NULL")
-				}
+			if err := validateSourceParentBooleanAssignments(assignments); err != nil {
+				return nil, fmt.Errorf("CHARS entry: %w", err)
 			}
 			if err := approve(tx, observed, assignments); err != nil {
 				return nil, fmt.Errorf("CHARS entry approval: %w", err)
