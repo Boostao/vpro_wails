@@ -1,0 +1,327 @@
+{
+  "RecordSource": "SELECT DISTINCT USysBreakTable.Reference, USysBreakTable.BreakCode FROM USysBreakTable; ",
+  "Cases": [
+    {
+      "Name": "ordinary",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "R1",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": "R2",
+          "BreakCode": "B",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          "R1",
+          "A"
+        ],
+        [
+          "R2",
+          "B"
+        ]
+      ],
+      "Refuse": false
+    },
+    {
+      "Name": "empty-table",
+      "SourceRows": [],
+      "ActualPairs": [],
+      "Refuse": false
+    },
+    {
+      "Name": "all-null",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": null,
+          "BreakCode": null,
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          null,
+          null
+        ]
+      ],
+      "Refuse": false
+    },
+    {
+      "Name": "null-empty",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": null,
+          "BreakCode": null,
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": "",
+          "BreakCode": null,
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": null,
+          "BreakCode": "",
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": "",
+          "BreakCode": "",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          null,
+          null
+        ],
+        [
+          null,
+          ""
+        ],
+        [
+          "",
+          null
+        ],
+        [
+          "",
+          ""
+        ]
+      ],
+      "Refuse": false
+    },
+    {
+      "Name": "duplicate-pair",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "R1",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 2,
+          "Reference": "R1",
+          "BreakCode": "A",
+          "PlotNumber": "P2"
+        }
+      ],
+      "ActualPairs": [
+        [
+          "R1",
+          "A"
+        ]
+      ],
+      "Refuse": false
+    },
+    {
+      "Name": "reference-only-differs",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "R1",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": "R2",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          "R1",
+          "A"
+        ],
+        [
+          "R2",
+          "A"
+        ]
+      ],
+      "Refuse": false
+    },
+    {
+      "Name": "code-only-differs",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "R1",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": "R1",
+          "BreakCode": "B",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          "R1",
+          "A"
+        ],
+        [
+          "R1",
+          "B"
+        ]
+      ],
+      "Refuse": false
+    },
+    {
+      "Name": "ascii-case",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "R1",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": "r1",
+          "BreakCode": "a",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          "R1",
+          "A"
+        ]
+      ],
+      "Refuse": true
+    },
+    {
+      "Name": "trailing-space",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "R1",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": "R1 ",
+          "BreakCode": "A ",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          "R1",
+          "A"
+        ]
+      ],
+      "Refuse": true
+    },
+    {
+      "Name": "leading-space",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "R1",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": " R1",
+          "BreakCode": " A",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          " R1",
+          " A"
+        ],
+        [
+          "R1",
+          "A"
+        ]
+      ],
+      "Refuse": false
+    },
+    {
+      "Name": "accent",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "E",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        },
+        {
+          "Order": 1,
+          "Reference": "\u00c9",
+          "BreakCode": "A",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          "E",
+          "A"
+        ],
+        [
+          "\u00c9",
+          "A"
+        ]
+      ],
+      "Refuse": true
+    },
+    {
+      "Name": "formula-looking",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "=1+1",
+          "BreakCode": "001",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          "=1+1",
+          "001"
+        ]
+      ],
+      "Refuse": false
+    },
+    {
+      "Name": "text-width255",
+      "SourceRows": [
+        {
+          "Order": 1,
+          "Reference": "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+          "BreakCode": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+          "PlotNumber": "P1"
+        }
+      ],
+      "ActualPairs": [
+        [
+          "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+          "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+        ]
+      ],
+      "Refuse": false
+    }
+  ],
+  "NativeQueryReceiptSHA256": "40c7f37fda151740e67c1f974f6e65f089d7c8173bb8cadc72885252a70459fa",
+  "Scope": "Independent ACE1033 query pairs; raw-representative/Unicode refusals are explicit successor restrictions, not source outputs"
+}

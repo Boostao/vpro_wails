@@ -1,0 +1,72 @@
+{
+  "empty": {
+    "contextId": "break-context",
+    "sourcePath": "C:\\fixtures\\saved '# codes\\VPro64.db",
+    "sourceSHA256": "6c028441f45ce6353287451d6a90e04d2127cf8a944e5c70a76995e5f3ea85ab",
+    "offset": 0,
+    "limit": 50,
+    "total": 0,
+    "rows": []
+  },
+  "end": {
+    "contextId": "break-context",
+    "sourcePath": "C:\\fixtures\\saved '# codes\\VPro64.db",
+    "sourceSHA256": "08e6462bf0952b5d5511a6cc1daa81b2a1c106d42d8de057a7a355b5587095ac",
+    "offset": 100,
+    "limit": 50,
+    "total": 7,
+    "rows": []
+  },
+  "first": {
+    "contextId": "break-context",
+    "sourcePath": "C:\\fixtures\\saved '# codes\\VPro64.db",
+    "sourceSHA256": "08e6462bf0952b5d5511a6cc1daa81b2a1c106d42d8de057a7a355b5587095ac",
+    "offset": 0,
+    "limit": 50,
+    "total": 7,
+    "rows": [
+      {
+        "reference": null,
+        "breakCode": null
+      },
+      {
+        "reference": "",
+        "breakCode": null
+      },
+      {
+        "reference": null,
+        "breakCode": ""
+      },
+      {
+        "reference": "",
+        "breakCode": ""
+      },
+      {
+        "reference": "=1+1",
+        "breakCode": "001"
+      },
+      {
+        "reference": "R1",
+        "breakCode": "A"
+      },
+      {
+        "reference": "R2",
+        "breakCode": "B"
+      }
+    ]
+  },
+  "page": {
+    "contextId": "break-context",
+    "sourcePath": "C:\\fixtures\\saved '# codes\\VPro64.db",
+    "sourceSHA256": "08e6462bf0952b5d5511a6cc1daa81b2a1c106d42d8de057a7a355b5587095ac",
+    "offset": 5,
+    "limit": 1,
+    "total": 7,
+    "rows": [
+      {
+        "reference": "R1",
+        "breakCode": "A"
+      }
+    ]
+  }
+}

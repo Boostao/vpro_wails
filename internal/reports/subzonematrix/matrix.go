@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strings"
 	"unicode/utf8"
+
+	"github.com/boostao/vpro-wails/internal/accesscompare"
 )
 
 const (
@@ -44,12 +45,11 @@ type member struct {
 
 // This is the bounded ACE1033 ASCII calibration, not a Unicode collation.
 func key(text string) (string, error) {
-	for _, char := range text {
-		if char < 32 || char > 126 {
-			return "", errors.New("matrix comparison requires calibrated printable ASCII; no text was repaired")
-		}
+	result, ok := accesscompare.PrintableASCIIKey(text)
+	if !ok {
+		return "", errors.New("matrix comparison requires calibrated printable ASCII; no text was repaired")
 	}
-	return strings.ToLower(strings.TrimRight(text, " ")), nil
+	return result, nil
 }
 
 func first(text string, count int) string {

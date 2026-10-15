@@ -6,7 +6,45 @@ private Access copies, native binaries, closed project data, screenshots and
 WebView profiles are deliberately retained outside Git. A hash identifies a
 receipt but does not independently reproduce its native run.
 
-## Current uncommitted forms/report boundary
+## Current forms/report boundary
+
+PC-ORD Break Report has thirteen exact extracted-query DAO cases and an
+independently reviewed bounded planner/owned reader/service/actual-Go wire.
+Backend review found a mutable-owner pre-lease race: the old-reader overlay
+reproduces it and the corrected regression overlaps400 reviews/20 real switches,
+with exact stale refusal, final retry and unchanged physical family bytes.
+Fourteen backend/wire inputs,19 assets and five canonical sources match
+before/after follow-up. Coupled race, planner races, vet and production
+SQLite-only compilation pass.
+
+Distinct desktop review accepts twelve implementation/generated paths, with
+all1833 inputs,19 protected assets, five canonical sources, eight validation
+logs and two isolated binaries verified before/after. All147 focused frontend
+cases, check0/0 and default/enabled frontend/Wails builds pass. Four normally
+closed actual Wails owners verify gate isolation,65 distinct pairs/66 rows,
+literal NULL/empty/001/formula/space/TEXT255 pages, three-width actual visible
+text/control containment and held response/exact native-close acknowledgement
+before Cancel/remount/release/retry. A malformed off-page TEXT value refuses
+before JSON; correction/retry on the same coordinator recovers the exact tagged
+source hash. All16 original family/configuration bytes are restored and four
+original owners freshly absent. The private native seal covers1833 source
+inputs and2222 artifacts. All2110 registered frontend executions pass.
+Full default-profile Go race passes exit0, UTC2026-10-15T08:52:27.940637 to
+10:06:16.126601; root4133.272s. All1833 inputs,2226 artifacts and package/embed
+discovery match with zero drift; four original owners are freshly absent and
+the source freeze is released. Full-race log SHA256:
+`c8d735fde68a0c10d0aa7ffae7bbd58b734305c1ddda1c7a9708d31ae25ceb93`.
+Only test registration/six status documents changed after reviewed native
+acceptance; application/bindings/native assets remained unchanged. Original report UI,
+footers, printing/export generation and default/demo promotion remain excluded.
+
+Hierarchy Diagram remains blocked after two disposable host dispatch attempts
+failed before any completed source case. Both Access owners close normally;
+no Excel owner/lock or canonical/asset drift remains. This is host-dispatch
+failure, not original VBA failure or permission for a third attempt. Preserve
+the closed failed disposition and continue independent ordered work.
+
+## Earlier retained boundary evidence
 
 The private species-only profiling kernel adds three new app/test/portable
 corpus paths without changing the ordered runner. Three source query exports,

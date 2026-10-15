@@ -52,6 +52,9 @@ func main() {
 	if _, err := siviFeature(subzoneMatrixFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
+	if _, err := siviFeature(breakReportReviewEnvironment, os.LookupEnv); err != nil {
+		log.Fatal(err)
+	}
 	if _, err := siviFeature(siteUnitSummaryWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
@@ -485,6 +488,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	breakReport, err := NewBreakReportService(contextService, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	twoPageProfiling, err := NewTwoPageProfilingService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -545,6 +552,7 @@ func main() {
 		application.NewService(twoPageEnvironmentTable),
 		application.NewService(twoPageProjectMetadata),
 		application.NewService(userLog),
+		application.NewService(breakReport),
 		application.NewService(twoPageProfiling),
 		application.NewService(profileSpeciesPresence),
 		application.NewService(twoPageVegetation),

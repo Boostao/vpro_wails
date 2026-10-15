@@ -143,7 +143,7 @@ replaced. No original Excel callback/formatting or whole-report parity is
 granted; differing ambiguous cells are not guessed. The current contract is
 [Subzone Matrix](docs/SUBZONE_MATRIX_CONTRACT.md).
 
-Next independent report work is Hierarchy Diagram. Read-only static tracing
+Hierarchy Diagram remains unavailable. Read-only static tracing
 seals eight unchanged canonical inputs and both original ribbon actions.
 The active child-name `?` path exits the whole current sibling loop; every root
 assigns A1, even when its shape advances. Full-row master/personal UNION and
@@ -151,6 +151,33 @@ FindFirst ordering, cutoff conversion and actual Excel output still require
 bounded disposable native calibration. Dormant orphan/highlight code is not
 a write or display requirement. Static evidence does not enable the workflow
 or establish runtime parity.
+Two disposable host attempts fail at `Access.Run` argument dispatch before any
+completed source case. Both owners close normally and are freshly absent, with
+no Excel owner/locks or canonical/application/asset drift. The broken-oracle
+budget is exhausted; this is not a source VBA failure and no third attempt is
+authorized. Keep Hierarchy Diagram unavailable.
+
+The independent PC-ORD Break Report query/preview successor is now reviewed and
+disposable-native accepted and complete-source race integrated.
+Thirteen exact DAO query cases qualify the saved global VPro64 DISTINCT pairs.
+The bounded pure planner, owned physical reader and literal-gated facade retain
+NULL/empty, raw literals and complete original-source witnesses. An independently
+found pre-lease owner race is reproduced and corrected with actual concurrent
+review/switch coverage. Distinct desktop review accepts strict actual-Go wire,
+normal menu, keyed context ownership and existing read/close barriers.
+147 focused frontend cases, check0/0 and isolated default/enabled Wails builds
+pass. Four native gate modes verify65 pairs/66 physical rows, paging,
+three-width visible text/control containment, exact native-close acknowledgement
+before cancelling/releasing held reads, remount rejection/retry and malformed
+off-page UTF-8 refusal/correction on the same coordinator. All16 original files
+are restored after normal close and all four original owners are freshly absent.
+All2,110 registered frontend executions pass. Full default-profile Go race
+passes exit0, UTC2026-10-15T08:52:27.940637 to10:06:16.126601; root4133.272s.
+All1833 inputs,2226 artifacts and package/embed discovery are unchanged; four
+original native owners are freshly absent and the source freeze is released.
+Both flags remain default-off; no demo/assets promotion or original report
+printing/footer/export-generation parity is claimed. The current boundary is
+[PC-ORD Break Report](docs/BREAK_REPORT_CONTRACT.md).
 
 The mapped normal/CHARS single-plot Google Earth successor is integrated. Its
 registered independently gated candidate previews one saved literal Env plot, not the existing

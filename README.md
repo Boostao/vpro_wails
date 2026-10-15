@@ -85,6 +85,24 @@ Full default-profile Go race integration passes with all1,814 inputs,
 2,439 artifacts and package/embed discovery unchanged. All five original native
 owners are freshly absent; the source freeze is released.
 
+**Reports > PC-ORD Break Report** now has an independently reviewed and
+disposable-native-accepted read-only successor. It requires the independent
+literal `VITE_BREAK_REPORT_REVIEW=true` frontend build and
+`VPRO_BREAK_REPORT_REVIEW=true` runtime flags, both default-off. It reviews
+saved global VPro64 `USysBreakTable` DISTINCT pairs, not a new PC-ORD export.
+Original caption, code/reference column order, NULL/empty and literal values
+remain visible. Whole-source bounds/hash, strict transport and source-stable
+paging refuse unsupported/ambiguous values rather than repair them.
+Actual Wails gate isolation, first/tail pages, three-width layout, held
+read/native-close cancellation/remount and off-page malformed-text
+refusal/correction/retry pass, with all sixteen fixture files restored.
+All 2,110 registered frontend executions and complete-source Go race integration
+pass: 1,833 inputs, 2,226 artifacts and package/embed discovery unchanged, with
+all four original native owners freshly absent. Original timestamp/page footers,
+physical printing and export generation remain unavailable.
+See [the Break Report contract](docs/BREAK_REPORT_CONTRACT.md).
+The qualified demo and accepted frontend assets are unchanged.
+
 The qualified private Windows demo is
 `build\bin\VPRO-Friday-Demo-2026-10-16-menu.zip` (17,273,336 bytes;
 SHA256 `450313ae2b111312190f939f75d4b69e3d2cc57695b0b92615e907eb0a7ac013`).

@@ -171,17 +171,55 @@ Full default-profile Go race passes exit0, UTC2026-10-15T06:35:37.130447 to
 07:50:05.527306; root4172.205s. All1814 inputs,2439 artifacts and package/embed
 discovery are unchanged. All five original native owners are freshly absent;
 the source freeze is released. Do not duplicate the completed suite.
+The coherent35-path successor is committed locally on main as `a64af21`,
+with the required co-author and clean immediate postcommit status; no push.
 No accepted assets, demo ZIP or
 default feature flag is promoted.
 No original callback/workbook/report availability is granted.
-Next: Hierarchy Diagram source calibration. Eight unchanged canonical inputs
+Hierarchy Diagram source calibration is blocked. Eight unchanged canonical inputs
 and both ribbon callbacks are sealed privately in `hierarchy-diagram-source`.
 The active `?` child branch exits its whole sibling loop; all roots assign A1.
 Reference UNION/FindFirst order, cutoff conversion and actual Excel shapes/output
-remain unqualified. No native operation or application change occurred in this
-static phase. Use one disposable Access/Excel owner, at most two broken-oracle
-attempts or20 minutes; do not invent parity or activate dormant orphan/highlight
-code. The next native calibration is pending.
+remain unqualified. Two disposable fixture attempts return host
+`Access.Run`/`DISP_E_BADPARAMCOUNT` before any completed source case; this is
+not original VBA/Excel behavior evidence. Both Access owners normally close
+and are freshly absent; no Excel owner or fixture lock remains. Canonical,
+application and accepted assets are unchanged. The private failed disposition
+seals both attempts. Budget exhausted: no third attempt, no availability or
+dormant orphan/highlight activation.
+The independent PC-ORD Break Report successor is reviewed and disposable-native
+accepted and full-race integrated. Its thirteen exact-query DAO
+cases preserve the global VPro64 DISTINCT pair, left BreakCode/right Reference
+order, heading and separate source caption. A pre-lease mutable-owner race found
+in backend review is reproduced with the old overlay and fixed;400 reviews/
+20 real switches pass with exact stale refusals and unchanged database bytes.
+Backend/wire and twelve-path desktop reviews find no remaining significant issue.
+147 focused frontend cases, check0/0 and isolated default/enabled frontend/Wails
+builds pass. Four actual Wails modes verify independent literal gates,
+66 physical/65 distinct pairs, first/tail pages and visible text/controls at
+1400/760/420. Held actual response, exact close cancellation before Cancel/
+remount/release, stale-reply refusal and fresh retry pass. Off-page malformed
+TEXT refuses before JSON; correction/retry on the same coordinator recovers the
+exact source witness. Sixteen original family/config bytes are restored after
+normal close; all four owners are freshly absent. Native seal covers1833 inputs/
+2222 artifacts. Both flags remain default-off; accepted assets/demo ZIPs unchanged.
+Original report UI, timestamp/page footers, printing/export generation remain
+unavailable. All2110 registered frontend executions pass. Full default-profile
+Go race passes exit0, UTC2026-10-15T08:52:27.940637 to10:06:16.126601;
+root4133.272s. All1833 inputs,2226 artifacts and package/embed discovery are
+unchanged, four original owners freshly absent and source freeze released.
+Do not repeat this completed integration or Hierarchy's oracle.
+
+Next safe forms work is explicit CHARS SIVI source ownership. Private
+`chars-sivi-source\static-disposition.json` seals eleven canonical inputs,
+71 CHARS versus77 normal parent bindings and three PlotNumber child links.
+RootZoneParticleSize (Env TEXT6) and SV_WaterTableCM (Env SINGLE) are distinct
+physical fields, not normal-root-texture/seepage aliases. Exactly two shared
+coordinate presentation differences remain after omitting only event line
+offsets. Complete child-A VBA is identical despite extended Cover5 controls;
+parent PlotType Variant/no Refresh differs from normal String/restore/Refresh.
+Reuse existing projection/reference/scalar policies without widening normal77
+contracts. No CHARS native acceptance or write/menu enablement is granted.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated
