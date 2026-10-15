@@ -14,6 +14,58 @@ The separately gated SIVI height/cover panels reuse the same owned controller
 under FS882 or the standalone SIVI presentation. Exported coordinates are evidence,
 not a requirement to reproduce fixed Access pixels.
 
+### CHARS SIVI source owner (not desktop availability)
+
+The separately named internal CHARS reader/projection uses the original
+`frmSIVIsite-CHARS` catalogue: 71 direct bindings and the distinct implicit
+SpeciesListComplete target. It reuses the normal parent's binding invariant,
+physical Env/Admin projection, current-context operation lease and caller-owned
+read snapshot, not a second database family or a frozen replacement for data.
+Normal SIVI retains its original 77 direct bindings, writer and service identity.
+No public method, menu route, frontend gate or write authority is added.
+
+CHARS adds Env.RootZoneParticleSize (source TEXT6, caption R. Z. Particle Size)
+and Env.SV_WaterTableCM (source SINGLE, caption Water Table Depth). Neither is an
+alias for normal SV_RootZoneTexture (TEXT100) or SeepageDepth (INTEGER).
+Historical raw cells are read without new-write validation, trimming, narrowing
+or normalization; NULL/empty/blob and duplicate physical pair identities remain
+distinct. Source coordinates remain evidence. Unlike normal Fixed6 controls,
+CHARS Latitude/Longitude do not export that formatting.
+
+Its three original PlotNumber child links resolve to SubVegA-SIVI,
+SubVegC-SIVI and SubVegD-SIVI. Complete child-A VBA is identical to the normal
+SubVegA-SIVI_BC class, although the extended presentation adds Cover5a/b/c.
+This does not widen normal child membership or editing. CHARS PlotType uses a
+Variant result without normal's option restoration/Refresh; native NULL,
+conversion and callback timing remain unqualified. Whole CHARS presentation,
+draft ownership, references, editing and native acceptance remain unavailable.
+
+All136 coupled CHARS/normal/two-page parent race cases pass (root215.282s),
+as do source-tool races and actual production SQLite-only compilation with
+the exact catalogue embed. All1836 inputs,11 canonical sources and19 protected
+assets are unchanged before/after validation and independent review.
+Distinct read-only review accepts the eight-path unexposed source-owner scope
+without significant findings. Full default-profile Go race passes exit0,
+UTC2026-10-15T10:25:41.019676 to11:38:36.421901; root4126.154s. All1836 inputs,
+57 artifacts and package/embed discovery are unchanged; four predecessor native
+owners are freshly absent and the source freeze is released. Previously accepted
+frontend inputs remain exact; only five status documents changed after review.
+This is internal source ownership, not CHARS native acceptance or whole-form parity.
+
+Seventeen separate DAO16/ACE1033 engine cases qualify the two new physical
+fields on an exclusive disposable database, with a second readonly process
+verifying exact values/bits after complete closure. RootZoneParticleSize is
+nullable TEXT6 with AllowZeroLength=false: new empty text refuses at Update,
+literal spaces and six UTF-16 units persist, and seven/eight units refuse at
+assignment. SV_WaterTableCM narrows before storage: 0.1 becomes
+0.10000000149011612, 99.999999 becomes100, and the adjacent DOUBLE above maximum
+SINGLE rounds to that maximum. A raw pre-narrow range guard is not equivalent.
+Negative underflow persists as negative zero; SQLite REAL sign preservation is
+not implied. Canonical Access/exports and the observer's fixture bytes are
+unchanged, with no lock remaining. These are table-engine witnesses, not
+bound-control, callback, reference-membership, default or original-form proof.
+Do not widen old accepted consumers or inherit vegetation's `<100` rule for Water.
+
 ### Accepted bounded combined child editing
 
 The independently default-off `VPRO_SIVI_COMBINED_EDITING` and

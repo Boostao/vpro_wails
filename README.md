@@ -103,6 +103,17 @@ physical printing and export generation remain unavailable.
 See [the Break Report contract](docs/BREAK_REPORT_CONTRACT.md).
 The qualified demo and accepted frontend assets are unchanged.
 
+CHARS SIVI now has an explicit internal 71-binding source projection and owned
+physical reader, separate from the unchanged normal 77-binding owner.
+The source-specific particle-size TEXT6 and water-depth SINGLE fields are not
+aliases. This is read-model groundwork, not a newly available form or writer.
+All136 coupled parent race cases, source-tool races and production SQLite-only
+compilation pass; distinct read-only review accepts the source-owner scope.
+Complete-source Go race integration passes with all1,836 inputs,57 artifacts
+and package/embed discovery unchanged. Four predecessor native owners are
+freshly absent; this is not CHARS native-form acceptance.
+See [the SIVI source boundary](docs/FS1333-parent-access-contract.md).
+
 The qualified private Windows demo is
 `build\bin\VPRO-Friday-Demo-2026-10-16-menu.zip` (17,273,336 bytes;
 SHA256 `450313ae2b111312190f939f75d4b69e3d2cc57695b0b92615e907eb0a7ac013`).

@@ -8,6 +8,32 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+CHARS SIVI internal source ownership is independently reviewed:71 direct
+bindings plus distinct implicit SpeciesListComplete, original four-form
+catalogue and current-owner physical Env/Admin read reuse. Normal77 contracts
+remain unchanged; source TEXT6 particle size/SINGLE water depth are not aliases.
+All136 coupled parent race cases pass (root215.282s), as do source-tool races
+and actual production SQLite-only compilation. All1836 inputs,11 canonical
+sources and19 protected assets match before/after focused validation and
+independent eight-path review. The private validation receipt SHA256 is
+`cd2c9c513a468d0cc5dd8150edbb7b8c2681077d24b95f6782fd4b39a92a48fe`;
+review disposition SHA256 is
+`0a8d86b32c9741026f771f84acce9434ebf596e707c568e519518b46ad723f2f`.
+Full default-profile Go race passes exit0, UTC2026-10-15T10:25:41.019676 to
+11:38:36.421901; root4126.154s, all1836 inputs/57 artifacts/discovery unchanged,
+four predecessor owners freshly absent and source freeze released. Full-race
+log SHA256:
+`6e6c07a3cffe869609f7bbcb15c9b7d813ada5151b6bbafbe9fa297c846fa1b4`.
+Reviewed application/catalogue and accepted frontend inputs remain unchanged;
+five status-only documents changed after review. CHARS desktop/menu/write/native
+enablement and whole-form parity remain excluded from this source-owner acceptance.
+Seventeen separate DAO16/ACE1033 new-field storage cases plus a second closed
+readonly process qualify TEXT6 empty/UTF-16 refusal and SINGLE narrowing,
+adjacent-maximum acceptance and persisted negative-zero bits. Canonical source
+and observer fixture bytes remain exact; no lock, UI or callback run occurred.
+Bound-control timing, reference membership/defaults and SQLite sign preservation
+are not established by this engine calibration.
+
 PC-ORD Break Report has thirteen exact extracted-query DAO cases and an
 independently reviewed bounded planner/owned reader/service/actual-Go wire.
 Backend review found a mutable-owner pre-lease race: the old-reader overlay

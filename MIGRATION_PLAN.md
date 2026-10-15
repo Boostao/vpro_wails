@@ -179,6 +179,25 @@ Both flags remain default-off; no demo/assets promotion or original report
 printing/footer/export-generation parity is claimed. The current boundary is
 [PC-ORD Break Report](docs/BREAK_REPORT_CONTRACT.md).
 
+CHARS SIVI has an explicit internal71+implicit source owner, reusing existing
+literal physical projection/current-context snapshot helpers without widening
+normal77 readers/writers. The generated source catalogue retains three
+PlotNumber child links and distinct TEXT6 particle-size/SINGLE water-depth
+storage. All136 coupled parent race cases, source-tool races and production
+SQLite-only compilation pass. Distinct independent review accepts the
+eight-path unexposed source-owner scope with all1836 inputs,11 canonical sources
+and19 protected assets unchanged. Full default-profile Go race passes exit0,
+UTC2026-10-15T10:25:41.019676 to11:38:36.421901; root4126.154s, all1836 inputs/
+57 artifacts/discovery unchanged and four predecessor owners freshly absent.
+This grants no menu, frontend or write availability.
+Complete source callbacks, per-variant drafts/references and actual desktop
+acceptance remain ordered deliverables, not exclusions.
+Seventeen independently closed/reopened DAO storage cases qualify TEXT6
+empty/UTF-16 refusal and SINGLE narrowing/adjacent maximum/negative-zero behavior.
+These do not qualify bound-control timing. Next implement explicit CHARS entry
+policies/planning with historical omission and SQLite representability guards,
+not an alias of normal writers or an unmodified raw-range helper.
+
 The mapped normal/CHARS single-plot Google Earth successor is integrated. Its
 registered independently gated candidate previews one saved literal Env plot, not the existing
 all-project/selected-SU report expansion. Paired-parent/current-context ownership,

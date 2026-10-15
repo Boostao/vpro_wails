@@ -54,9 +54,13 @@ var siviParentSourceBindings = sync.OnceValues(func() ([]siviParentBinding, erro
 	if err != nil {
 		return nil, err
 	}
+	return sourceSIVIParentBindings(layout.Forms[0].Fields, 77)
+})
+
+func sourceSIVIParentBindings(fields []fs882layout.Field, directCount int) ([]siviParentBinding, error) {
 	bindings := []siviParentBinding{}
 	seen := map[string]bool{}
-	for _, field := range layout.Forms[0].Fields {
+	for _, field := range fields {
 		if field.Binding == "" {
 			continue
 		}
@@ -67,11 +71,11 @@ var siviParentSourceBindings = sync.OnceValues(func() ([]siviParentBinding, erro
 		seen[key] = true
 		bindings = append(bindings, siviParentBinding{ControlID: field.ControlID, Binding: field.Binding})
 	}
-	if len(bindings) != 77 || seen["specieslistcomplete"] {
-		return nil, errors.New("SIVI requires77 direct bindings and a distinct implicit species-list target")
+	if len(bindings) != directCount || seen["specieslistcomplete"] {
+		return nil, fmt.Errorf("SIVI requires%d direct bindings and a distinct implicit species-list target", directCount)
 	}
 	return append(bindings, siviParentBinding{Binding: "SpeciesListComplete", Implicit: true}), nil
-})
+}
 
 // Literal BINARY membership is a SQLite adaptation, not proof of Access
 // Unicode collation/DISTINCTROW behavior. Every matching physical pair survives.

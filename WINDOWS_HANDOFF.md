@@ -209,8 +209,11 @@ Go race passes exit0, UTC2026-10-15T08:52:27.940637 to10:06:16.126601;
 root4133.272s. All1833 inputs,2226 artifacts and package/embed discovery are
 unchanged, four original owners freshly absent and source freeze released.
 Do not repeat this completed integration or Hierarchy's oracle.
+The coherent31-path Break Report successor is committed locally on main as
+`b154a43`, with the required co-author and clean immediate postcommit status.
+No push, demo promotion or default enablement occurred.
 
-Next safe forms work is explicit CHARS SIVI source ownership. Private
+Current forms work is explicit CHARS SIVI source ownership. Private
 `chars-sivi-source\static-disposition.json` seals eleven canonical inputs,
 71 CHARS versus77 normal parent bindings and three PlotNumber child links.
 RootZoneParticleSize (Env TEXT6) and SV_WaterTableCM (Env SINGLE) are distinct
@@ -218,8 +221,27 @@ physical fields, not normal-root-texture/seepage aliases. Exactly two shared
 coordinate presentation differences remain after omitting only event line
 offsets. Complete child-A VBA is identical despite extended Cover5 controls;
 parent PlotType Variant/no Refresh differs from normal String/restore/Refresh.
-Reuse existing projection/reference/scalar policies without widening normal77
-contracts. No CHARS native acceptance or write/menu enablement is granted.
+The internal71+implicit projection/owned reader and generated four-form
+catalogue reuse existing context/snapshot/physical projection helpers; the
+normal77 binding invariant remains unchanged. All136 coupled parent race cases
+pass (root215.282s), as do source-tool races and actual SQLite-only production
+compilation with exact embed discovery. Distinct independent read-only review
+accepts all eight scoped paths with no significant findings; all1836 inputs,
+11 canonical sources and19 protected assets match before/after. Full Go race
+passes exit0, UTC2026-10-15T10:25:41.019676 to11:38:36.421901; root4126.154s.
+All1836 inputs,57 artifacts and package/embed discovery match, with four
+predecessor owners freshly absent; source freeze released. Do not repeat this
+completed integration. Next safe implementation is
+explicit CHARS entry-domain policy/planning, not an alias of normal writers.
+No CHARS native acceptance or write/menu enablement is granted.
+Private `chars-sivi-entry-storage` retains seventeen DAO16/ACE1033 field cases
+and a separate closed readonly observer with unchanged canonical/fixture bytes
+and no lock. TEXT6 is nullable but rejects new empty (AllowZeroLength=false);
+six UTF-16 units/spaces preserve, seven/eight refuse. Water SINGLE narrows
+99.999999 to100 and accepts the adjacent DOUBLE above maximum by rounding down.
+Negative underflow persists as negative zero. Do not inherit vegetation's
+`<100` rule, widen old consumers or silently normalize unsupported SQLite zero
+signs. No bound-control/callback/default/reference-membership proof is granted.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated
