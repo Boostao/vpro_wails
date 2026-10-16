@@ -14,6 +14,13 @@ qualified XLSX/KML output, additional forms and retained preference editors have
 individual opt-in flags; the normal build intentionally leaves them default-off.
 A disabled menu item means unavailable in that build, not permission to bypass
 its guard. Use a disposable project/configuration for a demo with writes.
+There are three distinct reasons: a build-profile opt-in is absent, current
+plot/editor prerequisites are unmet, or the workflow itself remains unavailable.
+Select a plot before SIVI; Metadata additionally requires a clean unlocked owner.
+The refreshed private Windows preview includes CHARS entry/linked workflows,
+shared metadata, saved User log and Subzone Matrix alongside the prior Summary
+preview. Actual package qualification and remaining machine-local release checks
+are recorded in [Windows handoff](WINDOWS_HANDOFF.md); product defaults are unchanged.
 
 | Area | Ready within documented boundaries | Still missing for replacement parity |
 | --- | --- | --- |
@@ -126,12 +133,29 @@ inputs/383 artifacts unchanged. Failed candidates/harness routes stay rejected;
 no default/demo promotion or whole-form parity follows.
 
 **Forms > Metadata** now delegates to the existing project-metadata editor for
-the currently open FS882/SIVI plot. It is unavailable until the current editor
+the currently open FS882/SIVI or separately gated CHARS plot. It is unavailable until the current editor
 is clean, unlocked and available under `VITE_PROJECT_METADATA_EDITING=true`.
 It shares the existing metadata guards rather than adding a separate controller
 or silently choosing a physical record. Global metadata administration and
 implicit Access Save behavior are not granted; other metadata operation flags
 and backend ownership checks remain unchanged.
+
+The CHARS original **Edit Metadata** button shares that menu predicate under
+the existing parent and metadata flags, with optional existing restoration.
+The parent component and eight mutation-session owners retain their authority;
+presentation panels may remount at existing original/fallback sites after a
+parent-read failure. Independent retained-authority regressions cover parent
+and restoration-history read failures and subsequent use of preserved history.
+All2593 frontend executions, five isolated frontend/Wails profiles, check,
+focused race/vet and distinct review pass. Disposable native acceptance proves
+one actual Save/four exact audits, one typed prune, read-only recovery, precise
+native-close acknowledgement and147 controls at actual1400/760/420 widths.
+Two rejected harness routes continue from sealed mutations without replay.
+Original business/audits/old histories and fifteen other files are exact;
+one consumed technical metadata history remains. P2 has empty-text ProjectID,
+not NULL. Full race passes root4319.235s with1871 inputs/145 artifacts and
+source/discovery/protected data unchanged. No new writer/backend/binding/flag,
+Add/copy/template, ProjectID/PlotType or whole-form parity is granted.
 
 **Forms > User log - Read-only** has a reviewed, disposable-native-verified
 integrated successor. It requires `VITE_USER_LOG_REVIEW=true` when

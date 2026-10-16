@@ -8,6 +8,37 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+The CHARS Edit Metadata composition is independently reviewed, native-accepted
+and full-race integrated. Original button/menu share existing prerequisites,
+explicit physical selection and current context ownership; no new writer or
+backend/binding/schema/session/flag is introduced. The parent component and
+eight mutation sessions retain authority, not guaranteed presentation-node
+identity through existing parent-original/fallback remounts. Independent
+regression covers parent/history read failure, retained receipts and later use.
+All2593 frontend executions, five isolated frontend/Wails profiles, check,
+focused race/vet and review/follow-up pass.
+Five native profiles prove one actual Save/four exact audits and one typed
+prune; business/audits/old history and fifteen other files remain exact, with
+one consumed technical metadata history. Three actual widths1400/760/420
+measure147 controls each. Two original harness routes stay rejected: a DOM
+identity assumption and a late P2 NULL assumption. Live continuations never
+replay Save/prune; P2 actually contains empty TEXT. Specific CancelClose
+acknowledgements precede corrections/barrier release, and the owner closes
+normally. No Add/copy/template, identity/callback or whole-form promotion.
+Full race passes exit0, UTC2026-10-16T14:23:43.999944 to15:46:37.847225,
+root4319.235s;1871 inputs/145 artifacts, source/discovery/protected data and
+closed family match, with source owners freshly absent.
+Integration receipt SHA256:
+`2ac18d2341a7b0bbc92a2bb5afb9a9e361ee0e650b2641ced9426fadc64f62a0`.
+Full-race log SHA256:
+`75a321d7327b47d886d3ed4cc38941c77e9a3e83276952239a4771faf0c60d1d`.
+Private locators: `chars-parent-metadata-candidate-v2/{review-disposition,native-association}.json`,
+`chars-parent-metadata-lifetime-qualification.json`,
+`chars-parent-metadata-native/{all-initial,all-postcommit-resume,all-readonly-final}/`,
+and `chars-parent-metadata-integration/{freeze,receipt}.json`.
+
+### Integrated lifecycle predecessor
+
 The CHARS lifecycle composition is independently reviewed, disposable-native
 accepted and full-race integrated. Existing persistent deletion/restoration/
 historical creation Undo sessions and panels preserve the actual three links,

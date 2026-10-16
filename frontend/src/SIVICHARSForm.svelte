@@ -23,12 +23,21 @@
   import { siviDeletionSession as ownedDeletionSession,
     siviDeletionRestorationSession as ownedRestorationSession } from './siviDeletionSessions';
   import { siviCreationUndoSession as ownedCreationUndoSession } from './siviCreationUndoSessions';
+  import ProjectMetadataEditor from './ProjectMetadataEditor.svelte';
+  import { bindContextPlots } from './contextPlots';
 
   let { contextId, project, plotNumber, onSaved, onBusyChange }: {
     contextId: string; project: string; plotNumber: string;
     onSaved?: (plot: string) => void | Promise<void>; onBusyChange?: (busy: boolean) => void;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot: plotNumber }));
+  const metadataEnabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true' &&
+    import.meta.env.VITE_PROJECT_METADATA_EDITING === 'true';
+  const metadataRestorationEnabled = import.meta.env.VITE_PROJECT_METADATA_RESTORE === 'true';
+  const metadataClient = metadataEnabled ? bindContextPlots(owner.contextId) : null;
+  let metadataOpen = $state(false);
+  let metadataBusy = $state(false);
+  let metadataEditor = $state.raw<ProjectMetadataEditor>();
   const linkedEnabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true' &&
     import.meta.env.VITE_SIVI_COMBINED_EDITING === 'true';
   const collectedEnabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true' &&
@@ -149,14 +158,16 @@
   const identityPending = $derived(identityEnabled && Boolean(identityClose.unsaved || identityClose.busy || identityClose.blocked));
   const creationRecoveryDisabled = $derived(creationRecoveryBlocked());
   const creationEditingDisabled = $derived(creationRecoveryDisabled || !parentReady || creationRefreshNeeded);
-  const linkedParentReady = $derived(parentReady && !creationPending && !lifecyclePending);
-  const peerBlockedReason = $derived(lifecyclePending
+  const linkedParentReady = $derived(parentReady && !metadataOpen && !creationPending && !lifecyclePending);
+  const peerBlockedReason = $derived(metadataOpen
+    ? 'Finish the owned project metadata review before changing the CHARS parent or linked children.'
+    : lifecyclePending
     ? 'Finish the explicit deletion, restoration or historical creation Undo review/recovery before changing the CHARS parent.'
     : creationPending
     ? 'Finish, correct, Undo or resolve the retained creation request and refresh before changing the CHARS parent.'
     : combinedPending || collectedPending || speciesPending || identityPending
     ? 'Finish, correct or Undo linked vegetation drafts/recovery before changing the CHARS parent.' : '');
-  $effect(() => { onBusyChange?.(parentBusy || linkedEnabled && childView.busy ||
+  $effect(() => { onBusyChange?.(metadataBusy || metadataOpen && !metadataEditor || parentBusy || linkedEnabled && childView.busy ||
     collectedEnabled && collectedView.busy || speciesEnabled && speciesView.busy || identityEnabled && identityView.busy ||
     Boolean(creationClose?.busy) || lifecycleKinds.some(kind => lifecycleStates[kind]?.busy)); });
   onDestroy(() => {
@@ -187,7 +198,10 @@
       throw new Error(`Linked ${target} drafts/recovery must finish before a peer operation.`);
     }
   }
-  function requireCleanPeers(except?: Child | 'creation' | Lifecycle, verifiedRefresh = false) {
+  function requireCleanPeers(except?: Child | 'creation' | Lifecycle | 'metadata', verifiedRefresh = false) {
+    if (metadataOpen && except !== 'metadata') {
+      throw new Error('Finish the owned project metadata review before a peer operation.');
+    }
     for (const target of targets) if (target !== except) requireCleanPeer(target);
     if (except !== 'creation' && creationPending && !(verifiedRefresh && verifiedReceiptOnly('creation'))) {
       throw new Error('Finish creation drafts, unknown acknowledgement or verified host refresh before a peer operation.');
@@ -376,7 +390,7 @@
     return !close.unsaved && !close.busy && !close.blocked;
   }
   function creationRecoveryBlocked(verifiedRefresh = false) {
-    return !creationEnabled || parentBusy || Boolean(childOperation) || creationHostBusy || lifecycleHostBusy !== null ||
+    return metadataOpen || !creationEnabled || parentBusy || Boolean(childOperation) || creationHostBusy || lifecycleHostBusy !== null ||
       combinedPending || collectedPending || speciesPending || identityPending ||
       lifecycleKinds.some(kind => pendingLifecycle(kind) && !(verifiedRefresh && verifiedReceiptOnly(kind))) ||
       !parent?.canReloadLinkedParent();
@@ -406,7 +420,7 @@
     return Boolean(close && (close.unsaved || close.busy || close.blocked));
   }
   function lifecycleRecoveryDisabled(kind: Lifecycle, verifiedRefresh = false) {
-    return !lifecycleEntry(kind) || parentBusy || Boolean(childOperation) || creationHostBusy ||
+    return metadataOpen || !lifecycleEntry(kind) || parentBusy || Boolean(childOperation) || creationHostBusy ||
       lifecycleHostBusy !== null || combinedPending || collectedPending || speciesPending || identityPending ||
       creationPending && !(verifiedRefresh && verifiedReceiptOnly('creation')) ||
       lifecycleKinds.some(peer => peer !== kind && pendingLifecycle(peer) &&
@@ -545,6 +559,13 @@
     collectedView;
     speciesView;
     identityView;
+    if (metadataOpen) {
+      const close = metadataEditor?.getCloseState();
+      return { unsaved: true, busy: metadataBusy || !close || close.busy,
+        blocked: !close || Boolean(close.blocked), canSave: false,
+        saveReason: 'Finish Save, Undo or recovery in the owned metadata editor, then close its review explicitly.',
+        error: close?.error || operationError || null };
+    }
     const own = parent?.getCloseState();
     const states = [own, creationClose, ...lifecycleKinds.map(kind => lifecycleStates[kind]),
       ...targets.map(target => entry(target).enabled ? entry(target).session.closeState() : null)]
@@ -576,8 +597,42 @@
     }
     return parent.saveForClose();
   }
-  export function canOpenProjectMetadata() { return false; }
-  export function openProjectMetadata() { operationError = 'CHARS project-metadata action remains unavailable.'; }
+  export function canOpenProjectMetadata() {
+    if (!metadataEnabled || !metadataClient || disposed || metadataOpen || !parentReady ||
+      parentBusy || childOperation) return false;
+    const close = getCloseState();
+    return !close.unsaved && !close.busy && !close.blocked;
+  }
+  export function openProjectMetadata() {
+    if (!canOpenProjectMetadata()) {
+      operationError = 'Project metadata requires its editing gate and a clean, unlocked available CHARS parent and peers.';
+      return;
+    }
+    operationError = '';
+    metadataOpen = true;
+  }
+  async function refreshAfterMetadataSave() {
+    requireLive();
+    if (!metadataOpen || !parent?.canReloadLinkedParent()) {
+      throw new Error('Retain the owned metadata result until its clean unlocked CHARS parent can refresh; never replay Save.');
+    }
+    requireCleanPeers('metadata');
+    await parent.refreshAfterLinkedSave();
+    for (const target of targets) await refreshCleanPeer(target);
+    await refreshLifecycleLists();
+    requireLive();
+    requireCleanPeers('metadata');
+    await onSaved?.(owner.plot);
+    requireLive();
+  }
+  function closeProjectMetadata() {
+    if (!metadataOpen || metadataBusy || metadataEditor?.getCloseState().busy) {
+      operationError = 'Wait for the owned metadata operation before closing its review.';
+      return;
+    }
+    metadataOpen = false;
+    operationError = '';
+  }
 </script>
 
 {#snippet linkedVegetation()}
@@ -713,12 +768,20 @@
   {/if}
 {/snippet}
 
+<div hidden={metadataOpen}>
 <SIVICHARSParentForm bind:this={parent} contextId={owner.contextId} project={owner.project} plotNumber={owner.plot}
   onSaved={refreshAfterParentSave} onBusyChange={value => { parentBusy = value; }}
   {peerBlockedReason} collectedAvailable={collectedEnabled} speciesAvailable={speciesEnabled} identityAvailable={identityEnabled}
   creationAvailable={creationEnabled} deletionAvailable={deletionEnabled} restorationAvailable={restorationEnabled}
   creationUndoAvailable={creationUndoEnabled}
+  metadataAvailable={canOpenProjectMetadata()} onMetadata={metadataEnabled ? openProjectMetadata : undefined}
   peerUnlockAvailable={(creationPending || lifecyclePending) && !creationClose?.busy &&
     !lifecycleKinds.some(kind => lifecycleStates[kind]?.busy)}
   linkedVegetation={vegetationEnabled ? linkedVegetation : undefined} />
-{#if operationError && !vegetationEnabled}<p role="alert" class="text-red-800">{operationError}</p>{/if}
+</div>
+{#if metadataOpen && metadataClient}
+  <ProjectMetadataEditor bind:this={metadataEditor} client={metadataClient} contextId={owner.contextId} plot={owner.plot}
+    allowRestoration={metadataRestorationEnabled} onclosed={closeProjectMetadata}
+    onbusy={value => { metadataBusy = value; }} oncommitted={refreshAfterMetadataSave} />
+{/if}
+{#if operationError && (metadataOpen || !vegetationEnabled)}<p role="alert" class="text-red-800">{operationError}</p>{/if}

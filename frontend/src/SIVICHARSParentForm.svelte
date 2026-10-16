@@ -10,12 +10,13 @@
   import type { EditorCloseState } from './closeLifecycle';
   import source from '../../resources/fs1333-chars-sivi-layout.json';
 
-  let { contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation, peerBlockedReason = '', collectedAvailable = false, speciesAvailable = false, identityAvailable = false, creationAvailable = false, deletionAvailable = false, restorationAvailable = false, creationUndoAvailable = false, peerUnlockAvailable = false }: {
+  let { contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation, peerBlockedReason = '', collectedAvailable = false, speciesAvailable = false, identityAvailable = false, creationAvailable = false, deletionAvailable = false, restorationAvailable = false, creationUndoAvailable = false, peerUnlockAvailable = false, metadataAvailable = false, onMetadata }: {
     contextId: string; project: string; plotNumber: string;
     onSaved?: (plot: string) => void | Promise<void>; onBusyChange?: (busy: boolean) => void;
     linkedVegetation?: Snippet; peerBlockedReason?: string; collectedAvailable?: boolean; speciesAvailable?: boolean; identityAvailable?: boolean;
     creationAvailable?: boolean; deletionAvailable?: boolean; restorationAvailable?: boolean;
     creationUndoAvailable?: boolean; peerUnlockAvailable?: boolean;
+    metadataAvailable?: boolean; onMetadata?: () => void;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot: plotNumber }));
   const enabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true';
@@ -123,8 +124,15 @@
     if (!await session.load()) throw new Error(session.view().error || 'CHARS linked parent refresh failed.');
     operationError = '';
   }
-  export function canOpenProjectMetadata() { return false; }
-  export function openProjectMetadata() { operationError = 'CHARS project-metadata action remains unavailable.'; }
+  export function canOpenProjectMetadata() { return metadataAvailable && typeof onMetadata === 'function'; }
+  export function openProjectMetadata() {
+    if (!canOpenProjectMetadata()) {
+      operationError = 'Project metadata requires the clean unlocked CHARS owner and its independent editing gate.';
+      return;
+    }
+    operationError = '';
+    onMetadata?.();
+  }
   $effect(() => { onBusyChange?.(Boolean(view?.busy)); });
   onMount(() => { if (enabled) void operation('load'); });
   onDestroy(() => { session.dispose(); onBusyChange?.(false); });
@@ -137,6 +145,11 @@
   {#if view?.busy}<p role="status">CHARS parent entry: {view.operation}...</p>{/if}
   {#if !enabled}<p role="status">CHARS parent entry is disabled in this build.</p>{/if}
   <div class="flex flex-wrap gap-2">
+    {#if onMetadata}
+      <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-metadata-open
+        data-source-control="form:frmSIVIsite-CHARS/btnEditMetadata"
+        disabled={!canOpenProjectMetadata()} onclick={openProjectMetadata}>Edit Metadata</button>
+    {/if}
     <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-lock
       disabled={lockToggleDisabled}
       onclick={() => { toggleParentLock(); }}>{locked ? 'Unlock CHARS entry' : 'Lock CHARS entry'}</button>
@@ -263,7 +276,7 @@
     Only Exposure 1/2, Soil Drainage and Successional Status require listed non-NULL codes. Other codes remain literal.
     Coordinates retain finite source DOUBLE values without new geographic bounds. Numeric blanks mean NULL; spaces are not silently trimmed.
     Dates use exact YYYY-MM-DD HH:MM:SS with an optional fractional second.</p>
-  <p role="status" class="text-sm text-amber-800">CHARS ProjectID/PlotType and other source actions,
+  <p role="status" class="text-sm text-amber-800">CHARS ProjectID/PlotType and unqualified source actions,
     {linkedVegetation ? `${unavailableChildren ? `child ${unavailableChildren} and ` : ''}unqualified callbacks,`
       : 'child vegetation workflows,'}
     changed SubZone and blank A-horizon assignment remain unavailable in this {linkedVegetation ? 'CHARS editor' : 'parent-only editor'}.

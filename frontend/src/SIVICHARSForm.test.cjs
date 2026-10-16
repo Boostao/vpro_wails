@@ -14,6 +14,8 @@ const creationReceiptTemplate = require('./siviCreationUndoTestHelpers.cjs').rev
 const deletionProof = require('./siviDeletionTestHelpers.cjs');
 const creationUndoProof = require('./siviCreationUndoTestHelpers.cjs');
 const lifecycleOff = {
+  './ProjectMetadataEditor.svelte': { default() {} },
+  './contextPlots': { bindContextPlots() { throw new Error('Metadata must remain independently gated.'); } },
   './SIVIDeletionPanel.svelte': { default() {} },
   './SIVIDeletionRestorationPanel.svelte': { default() {} },
   './SIVICreationUndoPanel.svelte': { default() {} },
@@ -38,9 +40,22 @@ function fixture(options = {}) {
     creationReferences: 0, create: 0, creationLookup: 0,
     lifecycle: Object.fromEntries(['deletion', 'restoration', 'creationUndo'].map(kind =>
       [kind, { read: 0, review: 0, save: 0, lookup: 0 }])),
+    metadataRead: 0, metadataSave: 0, metadataCommitted: 0,
     restore: 0, collectedRestore: 0, speciesRestore: 0, refresh: 0, cancelled: 0 };
   const originalParent = clone(wire);
-  let currentParent = clone(wire);
+  if (options.metadata) {
+    const binding = originalParent.Original.Bindings.find(row => row.Binding === 'ProjectID');
+    originalParent.Original.Rows[0].Env.cells[binding.Column] = cell('text', 'Existing Project');
+  }
+  let currentParent = clone(originalParent);
+  const metadataReview = { project: wire.Original.Project, plotNumber: wire.Original.Plot, projectId: 'Existing Project',
+    projectRecords: {
+      columns: ['ID', 'ProjectID', 'ProjectTitle'].map(name => ({ name, declaredType: name === 'ID' ? 'INTEGER' : 'VARCHAR' })),
+      rows: ['-200', '-201'].map((id, index) => ({ rowId: id,
+        cells: [cell('integer', id), cell('text', 'Existing Project'), cell('text', `Original title ${index}`)] })),
+    }, masterTemplates: { columns: [], rows: [] } };
+  const metadataFields = [{ name: 'ProjectTitle', kind: 'text', maximum: 255, collection: false,
+    referenceList: '', referenceColumn: '', limitToList: false, options: [] }];
   const originalChild = review({ extended: true });
   for (const group of originalChild) for (const row of group.Rows) {
     row.cells[group.Columns.indexOf('PlotNumber')] = cell('text', wire.Original.Plot);
@@ -173,8 +188,37 @@ function fixture(options = {}) {
   }
   const cleanups = [];
   const parentProps = { contextId: wire.Original.ContextID, project: wire.Original.Project, plotNumber: wire.Original.Plot };
-  const environment = { VITE_SIVI_CHARS_PARENT_ENTRY: 'true', VITE_SIVI_COMBINED_EDITING: 'true', ...options.environment };
+  const environment = { VITE_SIVI_CHARS_PARENT_ENTRY: 'true', VITE_SIVI_COMBINED_EDITING: 'true',
+    VITE_PROJECT_METADATA_EDITING: options.metadata ? 'true' : 'false', ...options.environment };
   const api = {
+    ContextService: {
+      ReviewProjectMetadata: async (context, plot) => {
+        assert.equal(context, parentOwner().contextId);
+        assert.equal(plot, parentOwner().plot);
+        calls.metadataRead++;
+        return options.metadataRead ? options.metadataRead(calls.metadataRead, clone(metadataReview)) : clone(metadataReview);
+      },
+      ListProjectMetadataFields: async context => {
+        assert.equal(context, parentOwner().contextId);
+        return clone(metadataFields);
+      },
+      SaveProjectMetadata: async (context, request) => {
+        assert.equal(context, parentOwner().contextId);
+        assert.equal(request.plotNumber, parentOwner().plot);
+        calls.metadataSave++;
+        calls.metadataRequest = JSON.parse(JSON.stringify(request));
+        if (options.metadataReject) throw new Error('Metadata backend independently disabled.');
+        const row = metadataReview.projectRecords.rows.find(value => value.rowId === request.original.rowId);
+        assert.ok(row);
+        assert.deepEqual(JSON.parse(JSON.stringify(request.original)), row);
+        for (const change of request.changes) {
+          row.cells[metadataReview.projectRecords.columns.findIndex(column => column.name === change.column)] =
+            JSON.parse(JSON.stringify(change.value));
+        }
+        calls.metadataCommitted++;
+        await options.metadataSave?.(calls.metadataRequest);
+      },
+    },
     SIVIDeletionService: {
       GetTargets: async () => lifecycleRead('deletion', { ...parentOwner(), columns: deletionOriginal.columns,
         rows: [...(deletionRecord && !deletionConsumed ? [] : [deletionOriginal.original]), ...additionalDeletionRows] }),
@@ -424,14 +468,18 @@ function fixture(options = {}) {
     const ast = ts.createSourceFile(name + '.ts', script, ts.ScriptTarget.Latest, true);
     const declaration = ast.statements.find(node => ts.isVariableStatement(node) && node.getText(ast).includes('$props()'));
     assert.ok(declaration);
-    const properties = name === 'SIVICHARSForm.svelte' ? 'contextId, project, plotNumber, onSaved, onBusyChange'
+    const properties = name === 'ProjectMetadataEditor.svelte'
+      ? 'client, contextId, plot, onclosed, onbusy, oncommitted, allowCreation = false, allowTemplateCreation = false, allowRestoration = false'
+      : name === 'SIVICHARSForm.svelte' ? 'contextId, project, plotNumber, onSaved, onBusyChange'
       : `contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation,
         collectedAvailable = false, speciesAvailable = false, identityAvailable = false, creationAvailable = false,
         deletionAvailable = false, restorationAvailable = false, creationUndoAvailable = false`;
     script = script.slice(0, declaration.getStart(ast)) + `const { ${properties} } = __props;` +
       script.slice(declaration.end);
     if (name === 'SIVICHARSParentForm.svelte') {
-      for (const prop of ['peerBlockedReason', 'peerUnlockAvailable']) script = script.replaceAll(prop, '__props.' + prop);
+      for (const prop of ['peerBlockedReason', 'peerUnlockAvailable', 'metadataAvailable', 'onMetadata']) {
+        script = script.replaceAll(prop, '__props.' + prop);
+      }
     }
     const javascript = ts.transpileModule(script.replaceAll('import.meta.env', '__environment'), {
       compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
@@ -450,6 +498,8 @@ function fixture(options = {}) {
   let parent, form, disposeEffects;
   Object.defineProperty(parentProps, 'peerBlockedReason', { get: () => form.peerReason() });
   Object.defineProperty(parentProps, 'peerUnlockAvailable', { get: () => form.creationCanUnlock() });
+  Object.defineProperty(parentProps, 'metadataAvailable', { get: () => form.canOpenProjectMetadata() });
+  Object.defineProperty(parentProps, 'onMetadata', { get: () => options.metadata ? form.openProjectMetadata : undefined });
   function mount() { disposeEffects = runtime.effect_root(() => {
     form = component('SIVICHARSForm.svelte', {
       ...parentProps, onSaved: async () => { calls.refresh++; await options.refresh?.(); },
@@ -486,7 +536,12 @@ function fixture(options = {}) {
       export function lifecycleSnapshot(kind) { return lifecycleEntry(kind)?.view(); }
       export function retainedLifecycle(kind) { return lifecycleEntry(kind); }
       export function lifecycleTargets() { return deletionTargets; }
-      export function lifecycleNeedsRefresh(kind) { return lifecycleRefreshNeeded(kind); }`);
+      export function lifecycleNeedsRefresh(kind) { return lifecycleRefreshNeeded(kind); }
+      export function bindMetadata(value) { metadataEditor = value; }
+      export function metadataIsOpen() { return metadataOpen; }
+      export function metadataCommitted() { return refreshAfterMetadataSave(); }
+      export function metadataClosed() { closeProjectMetadata(); }
+      export function metadataBusyChanged(value) { metadataBusy = value; }`);
     parentProps.onSaved = form.parentSaved;
     parent = component('SIVICHARSParentForm.svelte', parentProps, `
       export function loadSource() { return operation('load'); }
@@ -504,6 +559,29 @@ function fixture(options = {}) {
   mount();
   return { calls, get parent() { return parent; }, get form() { return form; }, rowId: originalChild[0].Rows[0].rowId,
     lifecycleOriginal: clone(deletionOriginal), lifecycleCreation: clone(historicalCreation),
+    metadata() {
+      assert.ok(form.metadataIsOpen());
+      let editor;
+      const release = runtime.effect_root(() => {
+        editor = component('ProjectMetadataEditor.svelte', {
+          client: load(path.join(__dirname, 'contextPlots.ts')).bindContextPlots(parentOwner().contextId),
+          contextId: parentOwner().contextId, plot: parentOwner().plot,
+          onclosed: form.metadataClosed, onbusy: form.metadataBusyChanged, oncommitted: form.metadataCommitted,
+        }, `export function readMetadata() { return reload(); }
+          export function selectMetadata(row) { select(row); }
+          export function stageMetadataField(name, raw, nil = false) {
+            const field = fields.find(value => value.name === name);
+            if (!field) throw new Error('Missing actual metadata field definition.');
+            stage(field, raw, nil);
+          }
+          export function saveMetadata() { return save(); }
+          export function closeMetadata() { close(); }
+          export function metadataState() { return { review, draft, errors, busy, ready, error, committedFailure }; }`);
+        form.bindMetadata(editor);
+      });
+      cleanups.push(release);
+      return editor;
+    },
     creationEditor: () => load(path.join(__dirname, 'siviCreationEditor.ts')),
     creationFields(form) {
       const fields = serverComponent(source('SIVICreationFields.svelte'), 'SIVICreationFields.svelte',
@@ -515,6 +593,286 @@ function fixture(options = {}) {
     remount() { for (const cleanup of cleanups.splice(0).reverse()) cleanup(); disposeEffects(); mount(); },
     dispose() { for (const cleanup of cleanups.reverse()) cleanup(); disposeEffects(); } };
 }
+
+test('compiled CHARS metadata dispatch requires literal parent/editing flags and the shared clean unlocked owner', async () => {
+  for (const parent of [undefined, 'false', 'TRUE', 'true']) for (const editing of [undefined, 'false', 'TRUE', 'true']) {
+    const f = fixture({ metadata: true, environment: {
+      VITE_SIVI_CHARS_PARENT_ENTRY: parent, VITE_PROJECT_METADATA_EDITING: editing,
+    } });
+    try {
+      assert.equal(f.form.canOpenProjectMetadata(), false);
+      await f.parent.loadSource();
+      if (parent === 'true') f.parent.unlock();
+      const available = parent === 'true' && editing === 'true';
+      assert.equal(f.form.canOpenProjectMetadata(), available);
+      assert.equal(f.parent.canOpenProjectMetadata(), available);
+      f.parent.openProjectMetadata();
+      assert.equal(f.form.metadataIsOpen(), available);
+      assert.equal(f.calls.metadataRead, 0);
+    } finally { f.dispose(); }
+  }
+  const f = fixture({ metadata: true });
+  try {
+    await f.parent.loadSource();
+    assert.equal(f.form.canOpenProjectMetadata(), false);
+    f.parent.unlock();
+    f.parent.draft('SiteNotes', { kind: 'text', raw: 'Retained parent draft' });
+    f.form.openProjectMetadata();
+    assert.equal(f.form.metadataIsOpen(), false);
+    assert.equal(f.parent.snapshot().drafts.SiteNotes.input.raw, 'Retained parent draft');
+    assert.equal(f.calls.metadataRead, 0);
+  } finally { f.dispose(); }
+});
+
+test('all eight retained CHARS peer owners prevent metadata dispatch without resetting their authority', async () => {
+  for (const peer of ['combined', 'collected', 'species', 'identity', 'creation', 'deletion', 'restoration', 'creationUndo']) {
+    const f = await lifecycleFixture({ metadata: true, seedDeletion: peer === 'restoration', environment: {
+      VITE_SIVI_COLLECTED_EDITING: 'true', VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_IDENTITY_EDITING: 'true',
+    } });
+    try {
+      assert.equal(f.form.canOpenProjectMetadata(), true, peer);
+      if (peer === 'combined') {
+        await f.form.perform('load'); f.form.draft(f.rowId, 'Cover1', '9');
+      } else if (peer === 'collected') {
+        await f.form.collect('load'); f.form.cycle(f.rowId);
+      } else if (peer === 'species') {
+        await f.form.select('load'); f.form.speciesDraft(f.rowId, 'ABSENT');
+      } else if (peer === 'identity') {
+        await f.form.identify('load'); f.form.identityDraft(f.rowId, '17');
+      } else if (peer === 'creation') {
+        assert.equal(await f.form.createRow('load'), true, f.form.getCloseState().error);
+        assert.equal(await f.form.createRow('start', 'SubVegC-SIVI'), true, f.form.getCloseState().error);
+      } else await lifecycleReview(f, peer);
+      const before = f.form.getCloseState();
+      assert.equal(before.unsaved, true, peer);
+      f.form.openProjectMetadata();
+      assert.equal(f.form.metadataIsOpen(), false, peer);
+      assert.equal(f.form.getCloseState().unsaved, true, peer);
+      assert.equal(f.calls.metadataRead, 0, peer);
+    } finally { f.dispose(); }
+  }
+});
+
+test('actual compiled metadata editor retains explicit physical selection, invalid drafts and CHARS close/peer barriers', async () => {
+  const f = await lifecycleFixture({ metadata: true });
+  try {
+    const parent = f.parent;
+    const beforeReads = f.calls.parentRead;
+    f.parent.openProjectMetadata();
+    assert.equal(f.form.metadataIsOpen(), true);
+    assert.equal(f.form.getCloseState().busy, true);
+    const metadata = f.metadata();
+    await metadata.readMetadata();
+    assert.equal(metadata.metadataState().draft, null);
+    assert.equal(f.form.getCloseState().unsaved, true);
+    assert.equal(f.form.getCloseState().canSave, false);
+    assert.match(f.form.peerReason(), /metadata review/);
+    assert.equal(f.parent.lockEligibility().disabled, true);
+    assert.equal(await f.form.perform('load'), false);
+    assert.equal(await f.form.createRow('start', 'SubVegC-SIVI'), false);
+    assert.equal(await f.form.lifecycle('deletion', 'load'), false);
+    assert.equal(await f.form.saveForClose(), false);
+    await metadata.saveMetadata();
+    assert.equal(f.calls.metadataSave, 0);
+    metadata.selectMetadata('-201');
+    metadata.stageMetadataField('ProjectTitle', 'x'.repeat(256));
+    assert.equal(metadata.metadataState().errors.length, 1);
+    assert.equal(f.form.getCloseState().blocked, true);
+    await metadata.saveMetadata();
+    metadata.closeMetadata();
+    assert.equal(f.form.metadataIsOpen(), true);
+    assert.equal(f.calls.metadataSave, 0);
+    assert.equal(metadata.metadataState().draft.cells.ProjectTitle.raw.length, 256);
+    metadata.stageMetadataField('ProjectTitle', 'Original title 1');
+    assert.equal(metadata.metadataState().errors.length, 0);
+    metadata.closeMetadata();
+    assert.equal(f.form.metadataIsOpen(), false);
+    assert.equal(f.parent, parent);
+    assert.equal(f.parent.lockEligibility().locked, false);
+    assert.equal(f.calls.parentRead, beforeReads);
+    assert.equal(f.form.canOpenProjectMetadata(), true);
+  } finally { f.dispose(); }
+});
+
+test('metadata known commit/failed parent refresh recovers read-only without another Save or changing the unselected peer row', async () => {
+  let failParent = false;
+  const f = fixture({ metadata: true, parentRead: (_count, value) => {
+    if (failParent) throw new Error('Injected metadata-owned parent read failure');
+    return value;
+  } });
+  try {
+    await f.parent.loadSource(); f.parent.unlock();
+    await f.form.perform('load');
+    f.form.openProjectMetadata();
+    const metadata = f.metadata();
+    await metadata.readMetadata();
+    metadata.selectMetadata('-201');
+    metadata.stageMetadataField('ProjectTitle', 'Reviewed title');
+    failParent = true;
+    await metadata.saveMetadata();
+    assert.equal(f.calls.metadataSave, 1);
+    assert.equal(f.calls.metadataCommitted, 1);
+    assert.equal(f.calls.metadataRequest.original.rowId, '-201');
+    assert.deepEqual(f.calls.metadataRequest.changes, [{ column: 'ProjectTitle', value: cell('text', 'Reviewed title') }]);
+    assert.equal(metadata.metadataState().committedFailure, true);
+    assert.equal(f.form.getCloseState().blocked, true);
+    assert.match(f.form.getCloseState().error, /Metadata committed/);
+    await metadata.saveMetadata();
+    metadata.closeMetadata();
+    assert.equal(f.form.metadataIsOpen(), true);
+    assert.equal(f.calls.metadataSave, 1);
+    failParent = false;
+    await metadata.readMetadata();
+    assert.equal(metadata.metadataState().committedFailure, false);
+    const rows = metadata.metadataState().review.projectRecords.rows;
+    assert.equal(rows[0].cells[2].text, 'Original title 0');
+    assert.equal(rows[1].cells[2].text, 'Reviewed title');
+    assert.equal(f.calls.metadataSave, 1);
+    assert.equal(f.calls.childRead, 2);
+    assert.equal(f.calls.refresh, 1);
+    metadata.closeMetadata();
+    assert.equal(f.form.metadataIsOpen(), false);
+  } finally { f.dispose(); }
+});
+
+test('metadata recovery retains verified parent, peer and lifecycle authority while refreshing loaded lists', async () => {
+  for (const failure of ['parent', 'restoration history']) {
+    let fail = false;
+    const f = await lifecycleFixture({ metadata: true, environment: {
+      VITE_SIVI_COLLECTED_EDITING: 'true', VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_IDENTITY_EDITING: 'true',
+    }, parentRead: (_count, value) => {
+      if (fail && failure === 'parent') throw new Error('Metadata-owned parent refresh failed');
+      return value;
+    }, lifecycleRead: (kind, _count, value) => {
+      if (fail && failure === 'restoration history' && kind === 'restoration') {
+        throw new Error('Metadata-owned restoration history refresh failed');
+      }
+      return value;
+    } });
+    try {
+      assert.equal(await f.form.createRow('load'), true);
+      assert.equal(await f.form.createRow('start', 'SubVegA-SIVI'), true);
+      validCreation(f);
+      assert.equal(await f.form.createRow('save'), true);
+      for (const kind of ['deletion', 'restoration', 'creationUndo']) {
+        await lifecycleReview(f, kind);
+        lifecycleConfirm(f, kind);
+        assert.equal(await f.form.lifecycle(kind, kind === 'creationUndo' ? 'undo' : 'save'), true,
+          f.form.getCloseState().error);
+      }
+      for (const load of [() => f.form.perform('load'), () => f.form.collect('load'),
+        () => f.form.select('load'), () => f.form.identify('load')]) assert.equal(await load(), true);
+      f.form.draft(f.rowId, 'Cover5a', '3.5');
+      assert.equal(await f.form.perform('save'), true);
+      f.parent.draft('RootZoneParticleSize', { kind: 'text', raw: 'FINE' });
+      assert.equal(await f.form.saveForClose(), true);
+      assert.equal(f.parent.snapshot().historyId, '101');
+      assert.equal(f.form.snapshot().historyId, '201');
+      const created = clone(f.form.creationSnapshot().receipt);
+      const lifecycle = Object.fromEntries(['deletion', 'restoration', 'creationUndo'].map(kind =>
+        [kind, { receipt: clone(f.form.lifecycleSnapshot(kind).receipt),
+          history: clone(f.form.lifecycleSnapshot(kind).history), reads: f.calls.lifecycle[kind].read }]));
+      const reads = Object.fromEntries(['parentRead', 'childRead', 'collectedRead', 'speciesRead', 'identityRead']
+        .map(key => [key, f.calls[key]]));
+      assert.equal(f.form.canOpenProjectMetadata(), true);
+      f.form.openProjectMetadata();
+      const metadata = f.metadata();
+      await metadata.readMetadata();
+      metadata.selectMetadata('-201');
+      metadata.stageMetadataField('ProjectTitle', 'Metadata beside retained authority');
+      fail = true;
+      await metadata.saveMetadata();
+      assert.equal(f.calls.metadataSave, 1);
+      assert.equal(metadata.metadataState().committedFailure, true);
+      assert.equal(f.form.getCloseState().blocked, true);
+      assert.equal(f.parent.snapshot().historyId, '101');
+      assert.equal(f.form.snapshot().historyId, '201');
+      assert.deepEqual(f.form.creationSnapshot().receipt, created);
+      for (const [kind, saved] of Object.entries(lifecycle)) {
+        assert.deepEqual(f.form.lifecycleSnapshot(kind).receipt, saved.receipt);
+      }
+      fail = false;
+      await metadata.readMetadata();
+      assert.equal(metadata.metadataState().committedFailure, false, f.form.getCloseState().error);
+      assert.equal(f.parent.snapshot().historyId, '101');
+      assert.equal(f.form.snapshot().historyId, '201');
+      assert.deepEqual(f.form.creationSnapshot().receipt, created);
+      for (const [kind, saved] of Object.entries(lifecycle)) {
+        assert.deepEqual(f.form.lifecycleSnapshot(kind).receipt, saved.receipt);
+        assert.deepEqual(f.form.lifecycleSnapshot(kind).history, saved.history);
+        assert.ok(f.calls.lifecycle[kind].read > saved.reads, kind);
+        assert.equal(f.calls.lifecycle[kind].save, 1, kind);
+      }
+      for (const [key, before] of Object.entries(reads)) assert.ok(f.calls[key] > before, key);
+      assert.deepEqual([f.calls.metadataSave, f.calls.metadataCommitted, f.calls.parentSave, f.calls.childSave,
+        f.calls.create, f.calls.collectedSave, f.calls.speciesSave, f.calls.identitySave], [1, 1, 1, 1, 1, 0, 0, 0]);
+      const rows = metadata.metadataState().review.projectRecords.rows;
+      assert.equal(rows[0].cells[2].text, 'Original title 0');
+      assert.equal(rows[1].cells[2].text, 'Metadata beside retained authority');
+      metadata.closeMetadata();
+      assert.equal(f.form.metadataIsOpen(), false);
+      assert.equal(f.form.getCloseState().unsaved, false);
+      assert.equal(await f.form.perform('prune'), true);
+      assert.equal(f.calls.restore, 1);
+      assert.equal(f.parent.snapshot().historyId, '101');
+      assert.equal(await f.parent.restoreSource(), true);
+      assert.equal(f.parent.snapshot().historyId, null);
+      assert.deepEqual([f.calls.metadataSave, f.calls.parentSave, f.calls.childSave], [1, 1, 1]);
+    } finally { f.dispose(); }
+  }
+});
+
+test('held actual metadata Save owns native-close state until its existing writer and parent refresh settle', async () => {
+  const held = deferred();
+  const f = fixture({ metadata: true, metadataSave: () => held.promise });
+  try {
+    await f.parent.loadSource(); f.parent.unlock(); f.form.openProjectMetadata();
+    const metadata = f.metadata();
+    await metadata.readMetadata();
+    metadata.selectMetadata('-200');
+    metadata.stageMetadataField('ProjectTitle', 'One held commit');
+    const save = metadata.saveMetadata();
+    assert.equal(f.calls.metadataCommitted, 1);
+    assert.equal(f.form.getCloseState().busy, true);
+    assert.equal(f.form.getCloseState().canSave, false);
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(f.parent.clickLock(), false);
+    metadata.closeMetadata();
+    assert.equal(f.form.metadataIsOpen(), true);
+    held.resolve();
+    await save;
+    assert.equal(f.calls.metadataSave, 1);
+    assert.equal(f.form.getCloseState().busy, false);
+    metadata.closeMetadata();
+    assert.equal(f.form.metadataIsOpen(), false);
+  } finally { held.resolve(); f.dispose(); }
+});
+
+test('disposed metadata response cannot populate a remounted CHARS owner or trigger source refresh', async () => {
+  const held = deferred();
+  const f = fixture({ metadata: true, metadataRead: (count, value) => {
+    if (count === 1) { held.result = value; return held.promise; }
+    return value;
+  } });
+  try {
+    await f.parent.loadSource(); f.parent.unlock(); f.form.openProjectMetadata();
+    const old = f.metadata();
+    const pending = old.readMetadata();
+    assert.equal(f.form.getCloseState().busy, true);
+    f.remount();
+    held.resolve(held.result);
+    await pending;
+    assert.equal(old.metadataState().review, null);
+    assert.equal(f.form.metadataIsOpen(), false);
+    assert.equal(f.calls.refresh, 0);
+    await f.parent.loadSource(); f.parent.unlock(); f.form.openProjectMetadata();
+    const fresh = f.metadata();
+    await fresh.readMetadata();
+    assert.equal(fresh.metadataState().review.projectRecords.rows.length, 2);
+    assert.equal(f.calls.metadataRead, 2);
+    assert.equal(f.calls.metadataSave, 0);
+  } finally { f.dispose(); }
+});
 
 test('compiled linked snippet requires exact parent and independent combined/Collected/Species/identity literal flags', () => {
   for (const parent of [undefined, 'false', 'TRUE', 'true']) for (const combined of [undefined, 'false', 'TRUE', 'true'])

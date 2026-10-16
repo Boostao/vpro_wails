@@ -42,6 +42,16 @@ test('compiled CHARS presentation consumes the exact source and renders every bi
       assert.match(html, /disabled in this build/);
       continue;
     }
+    for (const metadataAvailable of [false, true]) for (const onMetadata of [undefined, () => {}]) {
+      const metadata = render(component, { props: { ...props, metadataAvailable, onMetadata } }).body;
+      const button = metadata.match(/<button\b[^>]*data-chars-metadata-open[^>]*>[^<]*<\/button>/)?.[0];
+      assert.equal(Boolean(button), Boolean(onMetadata));
+      if (button) {
+        assert.match(button, /data-source-control="form:frmSIVIsite-CHARS\/btnEditMetadata"/);
+        assert.match(button, />Edit Metadata<\/button>/);
+        assert.equal(/\sdisabled(?:=|\s|>)/.test(button), !metadataAvailable);
+      }
+    }
     for (const available of [false, true]) {
       const recovery = render(component, { props: { ...props, peerBlockedReason: 'Retained creator recovery',
         peerUnlockAvailable: available, creationAvailable: true } }).body;

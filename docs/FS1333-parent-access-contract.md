@@ -14,6 +14,34 @@ The separately gated SIVI height/cover panels reuse the same owned controller
 under FS882 or the standalone SIVI presentation. Exported coordinates are evidence,
 not a requirement to reproduce fixed Access pixels.
 
+### Accepted CHARS metadata composition
+
+Original `btnEditMetadata_Click` matches normal SIVI exactly. The original
+Edit Metadata action and Forms menu now delegate to the same existing
+context-bound editor under the literal parent/metadata flags; restoration
+retains its independent existing flag. Clean/unlocked owner, current context
+and explicit physical selection remain mandatory. No guessed backend flag,
+new writer, implicit creation/template, ProjectID/PlotType or attachment grant.
+
+The retained parent component and eight root-owned mutation sessions preserve
+drafts, errors, receipts and history authority. Existing original/fallback
+snippet sites can remount presentation panels after a parent read failure;
+transient focus/creation-event diagnostics are not promised stable DOM state.
+Independent regression covers parent/history refresh failures and later use
+of retained parent/peer restoration authority. All2593 frontend executions,
+five isolated frontend/Wails profiles, focused race/vet/check/build and
+distinct review/follow-up pass.
+
+Native five-profile acceptance proves one actual Save/four exact audits,
+one typed prune, read-only parent/loaded-peer/lifecycle recovery and precise
+native-close acknowledgement. Three actual widths1400/760/420 measure147
+controls. Failed DOM-identity and P2-NULL harness assumptions remain rejected;
+same-owner continuations never repeat committed mutations. P2 ProjectID is
+empty TEXT. Final business/audits/old history and fifteen other files are exact,
+with one new consumed metadata history only. Full race passes root4319.235s
+with1871 inputs/145 artifacts/discovery and protected data unchanged.
+This accepts the bounded composition, not original callbacks or whole parity.
+
 ### Accepted CHARS lifecycle composition
 
 The CHARS owner composes the existing persistent deletion, typed restoration

@@ -204,8 +204,32 @@ Four failed harness routes remain unaccepted, including one qualified owned
 termination after zero-write checks. A completed Delete was restored without
 replay. Fresh full race passes (root4250.103s), preserving1871 inputs/383 artifacts,
 discovery and protected data; all eighteen owners are freshly absent.
-No default/demo promotion or whole-form parity follows. Continue the shared
-CHARS Edit Metadata action; its original callback exactly matches normal SIVI.
+No default/demo promotion or whole-form parity follows from that lifecycle acceptance.
+
+The shared CHARS Edit Metadata composition is now independently reviewed,
+disposable-native accepted and full-race integrated. Original button and Forms
+menu share existing parent/metadata prerequisites; optional existing restoration,
+literal physical selection and immutable context ownership are reused without
+new writer/backend/binding/schema/session/flag infrastructure. Parent component
+and eight session owners survive review/recovery; existing presentation panels
+may remount after parent-original read loss. Parent/history failure regression
+retains prior receipts and proves later restoration authority.
+All2593 frontend executions, five isolated frontend/Wails profiles, focused
+race/vet/check/build and reviewer follow-up pass. One UI Save/four exact audits
+and one UI typed prune leave exact original business/audits/old histories plus
+one consumed metadata history; fifteen nonproject files remain exact. Two
+rejected harness routes continue sealed mutations without replay. P2 ProjectID
+is historical empty TEXT, not NULL. Actual1400/760/420 layouts measure147 controls;
+specific native-close acknowledgements precede barrier changes.
+Full race passes root4319.235s, preserving1871 inputs/145 artifacts, canonical/
+protected sources, closed family and discovery. No Add/copy/template,
+ProjectID/PlotType/callback timing, default or whole-parity promotion follows.
+Next safely compose writable metadata under the two original complete-entry
+two-page actions while preserving their separate saved-data reader. Static
+qualification confirms both callbacks share ProjectID-only active criteria;
+StartDate criteria are comments. The private bounded reuse contract is sealed;
+implementation/review/native/integration remain separate pending deliverables.
+Continue the ordered forms/report/ribbon backlog, not a checkpoint stop.
 
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner
 instead of remaining permanently disabled. Both frontend prerequisites, a
