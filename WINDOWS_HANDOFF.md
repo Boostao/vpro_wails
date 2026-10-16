@@ -25,8 +25,11 @@ Current machine state only. Portable scope and ordered work are in
 
 ## Published main and accepted metadata
 
-Reconciliation commit `161c94e6161780a4e997e9aed3bf139cde180855` is published
-to `origin/main`; actual local `main` fast-forwards to it. Both histories are
+Reconciliation commit `161c94e6161780a4e997e9aed3bf139cde180855` preserves
+both histories. Accepted metadata commit
+`842ca946ac810393f9d548349f693ac0f51e1f13` is published to `origin/main`;
+the accepted two-page successor below follows it directly on `main`. Obtain the
+current publication identity with `git rev-parse HEAD`. Both histories are
 retained (17 local/52 remote predecessors), without a force-push. The explicit
 121-conflict resolution preserves the accepted application tree byte-for-byte;
 the only final tree changes are three prose lines in two portable-source docs.
@@ -59,6 +62,10 @@ No Add/copy/template, identity/callback or whole-form parity is granted.
 
 `build\bin\VPRO-Demo-2026-10-16-refresh.zip`:17,533,868 bytes.
 SHA256: `c064b158719f5936fa8c7618777d58936ef10cc7c1df8affa42ce16cad3b19db`.
+The ZIP was unexpectedly absent during successor preflight; its cause is unknown.
+It was recovered byte-exactly from the twenty qualified members, with all member
+and container hashes verified; an exact private backup is retained. No completed
+demo mutation or build qualification was replayed.
 The adjacent `.zip.sha256` is supplied. Extract all files and run
 `Launch-Demo.exe`, not the application executable directly. Every launch makes
 a fresh retained disposable run; old run changes do not enter the next seed.
@@ -87,18 +94,46 @@ This is not a production installer, default promotion or complete migration.
 
 Actual old-remote run `38924414719` failed both Windows builds on DuckDB/cgo;
 Linux amd64/arm64 and macOS jobs succeeded, release was skipped. It ran the
-older `cb5c523` workflow, not the current hardened pipeline. All24 local
-release-tool tests pass. Publish the coherent accepted metadata source/docs
-on main, then run the current workflow with draft/prerelease inputs and verify
-all target jobs, architecture witnesses, exact assets and downloaded checksums.
-Do not report local tests or old-remote success as current hosted acceptance.
+older `cb5c523` workflow, not the current hardened pipeline.
+Current-source `842ca946` run `38929085479` passes all seven jobs. Draft/
+prerelease `v0.1.0-demo.20261016.2`, release415147921, has14 payloads plus
+the manifest. CPU/source witnesses and remote re-download byte checks pass;
+independent authenticated draft API digests match all15 attachments.
+Manifest SHA256:
+`75489b24dade03ce076f164e37119233b33783dcf98682a442bd2c011644f692`.
+Private `refreshed-demo-20261016/hosted-current/verified-release.json` and
+`release-job.txt` seal acceptance. Draft by-tag404 and wrong log Accept415 were
+read-only instrumentation errors; no dispatch or mutation was replayed.
+The default release is separate from the immutable opt-in demo; no public
+production promotion or all-platform runtime acceptance is claimed.
 
-After that, resume `two-page-metadata-editing-contract.json`: both original
+Resumed `two-page-metadata-editing-contract.json`: both original
 normal/CHARS metadata actions have statically qualified ProjectID-only active
 criteria (StartDate clauses are comments). Reuse the existing writer while
 preserving separate alias-aware saved-data review, literal writer ownership,
 all parent/soil/vegetation/picture barriers and existing default gates.
-Implementation, validation, distinct review, native and integration are pending.
+The successor is now independently reviewed, native-accepted and full-race
+integrated. It retains the complete-entry owner, separate reader and fresh
+in-place menu capability without weakening ordinary/global close barriers.
+V4 review rejected a skipped errored outer cohort; V5 retries original-or-error
+peers and proves persistent failure, read-only recovery and retained histories.
+All2593 lifecycle/70 entry/176 affected frontend cases, check/focused race/vet
+and five isolated Wails builds pass. Six native owners close normally.
+Parent and metadata Save/prune, repeated outer-cohort recovery, soil/vegetation
+and precise close acknowledgements,147 controls at1400/760/420 pass.
+Business/audits/old histories and fifteen other files are exact; two consumed
+histories remain. Two picture startup refusals are preserved with zero writes:
+the fixture lacks a tblVPics SQLite library, so the backend stays disabled.
+A wrong unsaved-dialog expectation continued the same metadata owner at its
+actual context-busy barrier, without replay. Both executed harness versions
+are archived with exact hashes, including Windows CRLF.
+Fresh full race accepts exit0, UTC2026-10-16T17:35:46.351489 to18:44:56.371239;
+root4137.598s,1872 inputs/147 artifacts, all protected/source/discovery/closed
+families unchanged and six owners freshly absent.
+Private `two-page-metadata-integration/receipt.json` SHA256:
+`3f7027ffdcf700fe4bef73d74c7207129e3ccf1dcf8295a065a51f90ada71286`.
+The freeze is released; portable docs are reconciled for this coherent main
+publication. No default/demo or whole-form promotion is granted.
 Continue all ordered forms/report/ribbon deliverables, not a checkpoint stop.
 
 Full integration on this VM: `go test -race -timeout 120m ./...`.

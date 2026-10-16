@@ -407,7 +407,7 @@ test('SIVI metadata reuses the existing guarded editor and commit recovery inste
   assert.match(parent, /siviParentView && !metadataOpen/);
   assert.match(parent, /onMetadata=\{metadataEnabled \? openProjectMetadata : undefined\}/);
   assert.match(parent, /metadataDisabled=\{!canOpenProjectMetadata\(\)\}/);
-  const clean = { metadataEnabled: true, childParentDisabled: false, childUnsaved: false, headerValidation: {} };
+  const clean = { metadataEnabled: true, twoPageOpen: false, childParentDisabled: false, childUnsaved: false, headerValidation: {} };
   for (const [change, expected] of [[{}, true], [{ metadataEnabled: false }, false],
     [{ childParentDisabled: true }, false], [{ childUnsaved: true }, false], [{ headerValidation: { fieldNo: 'invalid' } }, false]]) {
     const context = componentFunctions('FS882Form.svelte', ['canOpenProjectMetadata'], { ...clean, ...change });

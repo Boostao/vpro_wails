@@ -346,7 +346,8 @@ test('route and root wiring keep held navigation/native close, no cancellable ex
   assert.match(panel, /grid-template-columns: minmax\(0, 1fr\)/);
   assert.match(panel, /overflow-wrap: anywhere/);
   assert.ok(panel.indexOf('data-vegetation-workbook-unknown') < panel.indexOf('class="guidance"'));
-  assert.equal((app.match(/closeDisposition\(state, busy \|\| editorBusy[^\n]*vegetationPublicationBusy/g) || []).length, 4);
+  assert.equal((app.match(/closeDisposition\(state, busy \|\| editorBusy[^\n]*vegetationPublicationBusy/g) || []).length, 3);
+  assert.equal((app.match(/closeDisposition\(ownedAction \? null : state, busy \|\| !ownedAction && editorBusy[^\n]*vegetationPublicationBusy/g) || []).length, 1);
   for (const name of ['loadPlots', 'refresh', 'loadHierarchy']) {
     assert.match(app, new RegExp(`async function ${name}\\([^)]*\\) \\{\\s*if \\(projectReportBusy \\|\\| twoPageVegetationBusy \\|\\| twoPageSoilBusy \\|\\| pictureCreationBusy \\|\\| pictureLifecycleBusy \\|\\| vegetationPublicationBusy`));
   }

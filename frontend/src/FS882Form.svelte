@@ -355,7 +355,10 @@
   const twoPageCommonSessions: TwoPageParentCommonSessionCache = new Map();
   const twoPageEntrySessions: TwoPageEntrySessionCache = new Map();
   let twoPageRevision = $state(0);
-  let twoPageEditor = $state<{ getCloseState(): EditorCloseState; getDraftState?(): EditorCloseState; undo(): void }>();
+  let twoPageEditor = $state<{
+    getCloseState(): EditorCloseState; getDraftState?(): EditorCloseState; undo(): void;
+    canOpenMetadataEditor?(): boolean; openMetadataEditor?(): void;
+  }>();
   let twoPageSoilBusy = $state(false);
   let twoPageSoilBlocked = $state(false);
   $effect(() => subscribeTwoPageSoilActivity(activity => {
@@ -1564,6 +1567,10 @@
   }
 
   export function canOpenProjectMetadata() {
+    if (twoPageOpen) {
+      return metadataEnabled && twoPageScope === 'entry' && Object.keys(headerValidation).length === 0 &&
+        typeof twoPageEditor?.openMetadataEditor === 'function' && Boolean(twoPageEditor.canOpenMetadataEditor?.());
+    }
     return metadataEnabled && !childParentDisabled && !childUnsaved && Object.keys(headerValidation).length === 0;
   }
 
@@ -1572,7 +1579,13 @@
       error = 'Finish or Undo existing drafts and unlock the available plot before reviewing project metadata.';
       return;
     }
-    metadataOpen = true; error = null; successMsg = null;
+    if (twoPageOpen) twoPageEditor?.openMetadataEditor?.();
+    else metadataOpen = true;
+    error = null; successMsg = null;
+  }
+
+  export function canOpenMetadataInPlace() {
+    return twoPageOpen && canOpenProjectMetadata();
   }
 
   function openTwoPageReview() {
@@ -1615,7 +1628,7 @@
       const variants = cohort.cache.get(JSON.stringify({ contextId, project: twoPageProject, plot: draft.plotNumber }));
       if (!variants) continue;
       for (const peer of variants.values()) {
-        if (!peer.view().original) continue;
+        if (!peer.view().original && !peer.view().error) continue;
         if (peer.closeState().unsaved || peer.closeState().busy || !await peer.load()) {
           throw new Error(peer.view().error ?? 'Another two-page field scope could not be refreshed; no write was replayed.');
         }
@@ -3661,6 +3674,7 @@
           vegetationTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_VEGETATION_TABLE_REVIEW === 'true'}
           environmentTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_ENVIRONMENT_TABLE_REVIEW === 'true'}
           projectMetadataReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROJECT_METADATA_REVIEW === 'true'}
+          projectMetadataClient={PlotService} metadataRestorationAvailable={metadataRestorationEnabled}
           profilingReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROFILING_REVIEW === 'true'}
           profilingSource={$projectState?.plotProfile?.source ?? null}
           vegetationTableSU={$projectState?.activeSU ?? ''}
@@ -3668,7 +3682,7 @@
           sourceProjectPath={$projectState?.projectPath ?? ''}
           externalScope={externalSUEnvironmentEnabled && separateSUSelected && !siviStandalone && $projectState?.projectPath && $projectState.suPath
             ? { contextId, project: $projectState.activeProject, projectPath: $projectState.projectPath, su: $projectState.activeSU, suPath: $projectState.suPath } : null}
-          sourceBlocked={twoPageLinkedParentBlocked || twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked}
+          sourceBlocked={twoPageLinkedParentBlocked || Object.keys(headerValidation).length > 0 || twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked}
           cache={twoPageEntrySessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
           childBlocked={twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked || pictureBusy || pictureMetadataPending}
           onbusy={value => twoPageBusy = value}

@@ -36,6 +36,7 @@ test('actual metadata opener and both existing buttons share the exact flag/pare
     for (const child of [false, true]) for (const invalid of [false, true]) {
       const context = componentFunctions('FS882Form.svelte', ['canOpenProjectMetadata', 'openProjectMetadata'], {
         metadataEnabled: enabled, childParentDisabled: parent, childUnsaved: child,
+        twoPageOpen: false,
         headerValidation: invalid ? { FieldNumber: 'invalid raw draft' } : {},
         metadataOpen: false, error: 'old error', successMsg: 'old notice',
       });
@@ -165,11 +166,15 @@ test('actual client-runtime metadata availability reacts across the exported edi
   assert.ok(predicate);
   const child = execute(`
     let metadataEnabled = $state(false), childParentDisabled = $state(false), childUnsaved = $state(false),
-      headerValidation = $state({});
+      headerValidation = $state({}), twoPageOpen = $state(false),
+      twoPageScope = $state('entry'), twoPageEditor = $state.raw(undefined);
     ${predicate.getText(ast)}
     export function update(flag, parent, peer, invalid) {
       metadataEnabled = flag; childParentDisabled = parent; childUnsaved = peer;
       if (invalid) headerValidation.raw = 'retained error'; else delete headerValidation.raw;
+    }
+    export function entry(open, scope, owner) {
+      twoPageOpen = open; twoPageScope = scope; twoPageEditor = owner;
     }
   `);
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
@@ -194,6 +199,14 @@ test('actual client-runtime metadata availability reacts across the exported edi
   parent.route('fs882'); assert.equal(parent.enabled(), true);
   parent.context(''); assert.equal(parent.enabled(), false);
   parent.context('owned'); assert.equal(parent.enabled(), true);
+  const allowed = runtime.state(true);
+  child.entry(true, 'entry', { canOpenMetadataEditor: () => runtime.get(allowed), openMetadataEditor() {} });
+  assert.equal(parent.enabled(), true);
+  runtime.set(allowed, false); assert.equal(parent.enabled(), false);
+  runtime.set(allowed, true); assert.equal(parent.enabled(), true);
+  child.entry(true, 'common', { canOpenMetadataEditor: () => true, openMetadataEditor() {} });
+  assert.equal(parent.enabled(), false);
+  child.entry(false, 'entry', undefined); assert.equal(parent.enabled(), true);
   parent.unmount(); assert.equal(parent.enabled(), false);
 });
 

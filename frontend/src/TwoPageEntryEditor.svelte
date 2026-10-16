@@ -20,9 +20,12 @@
   import TwoPageVegetationTablePanel from './TwoPageVegetationTablePanel.svelte';
   import TwoPageEnvironmentTablePanel from './TwoPageEnvironmentTablePanel.svelte';
   import TwoPageProjectMetadataPanel from './TwoPageProjectMetadataPanel.svelte';
+  import ProjectMetadataEditor from './ProjectMetadataEditor.svelte';
+  import type { bindContextPlots } from './contextPlots';
   import TwoPageProfilingPanel from './TwoPageProfilingPanel.svelte';
 
   let { contextId, project, plot, cache, revision, onchange, onbusy, onclosed, oncommitted, embedded: childContent, childBlocked = false, pictureReaderAvailable = false, auditReaderAvailable = false, googleEarthReaderAvailable = false, vegetationTableReaderAvailable = false, environmentTableReaderAvailable = false, projectMetadataReaderAvailable = false, vegetationTableSU = '', vegetationTableSUPath = '', sourceProjectPath = '',
+    projectMetadataClient, metadataRestorationAvailable = false,
     profilingReaderAvailable = false, profilingSource = null, externalScope = null, sourceBlocked = true, initialForm = 'FS882-8x6XL' }: {
     contextId: string; project: string; plot: string; cache: TwoPageEntrySessionCache; revision: number;
     onchange: () => void; onbusy: (busy: boolean) => void; onclosed: () => void; oncommitted: () => Promise<void>;
@@ -30,6 +33,7 @@
     childBlocked?: boolean; pictureReaderAvailable?: boolean; auditReaderAvailable?: boolean;
     googleEarthReaderAvailable?: boolean; sourceProjectPath?: string;
     vegetationTableReaderAvailable?: boolean; environmentTableReaderAvailable?: boolean; projectMetadataReaderAvailable?: boolean; vegetationTableSU?: string; vegetationTableSUPath?: string;
+    projectMetadataClient?: ReturnType<typeof bindContextPlots>; metadataRestorationAvailable?: boolean;
     profilingReaderAvailable?: boolean; profilingSource?: { name: string; path: string } | null;
     externalScope?: GoogleEarthScope | null; sourceBlocked?: boolean; initialForm?: TwoPageParentForm;
   } = $props();
@@ -37,6 +41,9 @@
   const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW === 'true'
     && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW === 'true';
   const editingEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_EDITING === 'true';
+  const metadataEditingEnabled = reviewEnabled && import.meta.env.VITE_PROJECT_METADATA_EDITING === 'true';
+  const metadataClient = untrack(() => projectMetadataClient);
+  const metadataRestore = untrack(() => metadataRestorationAvailable);
   const sessions = untrack(() => {
     const key = JSON.stringify(owner);
     const existing = cache.get(key) ?? new Map<TwoPageParentForm, TwoPageEntrySession>();
@@ -54,8 +61,9 @@
   let vegetationTableBusy = $state(false);
   let environmentTableOpen = $state(false);
   let environmentTableBusy = $state(false);
-  let projectMetadataOpen = $state(false);
+  let projectMetadataOpen = $state<'read' | 'edit' | null>(null);
   let projectMetadataBusy = $state(false);
+  let metadataEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
   let profilingOpen = $state(false);
   let profilingBusy = $state(false);
   const profileSource = untrack(() => profilingSource ? { ...profilingSource } : null);
@@ -91,19 +99,50 @@
     }, onchange);
     sessions.set(sourceForm, created); return created;
   }
-  $effect(() => { onbusy(view.busy || view.referencesBusy || externalOpen || sourceRefreshing || auditOpen || auditBusy || googleEarthOpen || googleEarthBusy || vegetationTableOpen || vegetationTableBusy || environmentTableOpen || environmentTableBusy || projectMetadataOpen || projectMetadataBusy || profilingOpen || profilingBusy); });
+  $effect(() => { onbusy(view.busy || view.referencesBusy || externalOpen || sourceRefreshing || auditOpen || auditBusy || googleEarthOpen || googleEarthBusy || vegetationTableOpen || vegetationTableBusy || environmentTableOpen || environmentTableBusy || Boolean(projectMetadataOpen) || projectMetadataBusy || profilingOpen || profilingBusy); });
   onDestroy(() => {
     const active = session.view();
     if (active.operation === 'read' || active.referencesBusy) session.cancel();
   });
   export function getCloseState(): EditorCloseState {
+    if (projectMetadataOpen === 'edit') return metadataEditor?.getCloseState() ?? {
+      unsaved: true, busy: projectMetadataBusy, canSave: false, blocked: true, error,
+      saveReason: 'Finish the owned metadata editor before closing the complete-entry source.',
+    };
     return { ...close, unsaved: true, busy: close.busy || projectMetadataBusy || profilingBusy, canSave: false, error: error ?? close.error,
       saveReason: 'Save or Undo complete-entry drafts explicitly, then close their review before saving or closing the plot.' };
   }
   export function getDraftState(): EditorCloseState {
     const states = [...sessions.values()].map(owned => owned.closeState());
-    return { ...close, unsaved: externalOpen || auditOpen || googleEarthOpen || vegetationTableOpen || environmentTableOpen || projectMetadataOpen || profilingOpen || states.some(state => state.unsaved), busy: sourceRefreshing || auditBusy || googleEarthBusy || vegetationTableBusy || environmentTableBusy || projectMetadataBusy || profilingBusy || states.some(state => state.busy),
-      error: error ?? close.error, blocked: externalOpen || auditOpen || googleEarthOpen || vegetationTableOpen || environmentTableOpen || projectMetadataOpen || profilingOpen || !view.original || !!view.referenceError || states.some(state => state.blocked) };
+    const metadataClose = projectMetadataOpen === 'edit' ? getCloseState() : null;
+    return { ...close, unsaved: externalOpen || auditOpen || googleEarthOpen || vegetationTableOpen || environmentTableOpen || Boolean(projectMetadataOpen) || profilingOpen || states.some(state => state.unsaved), busy: sourceRefreshing || auditBusy || googleEarthBusy || vegetationTableBusy || environmentTableBusy || projectMetadataBusy || profilingBusy || Boolean(metadataClose?.busy) || states.some(state => state.busy),
+      error: error ?? metadataClose?.error ?? close.error, blocked: externalOpen || auditOpen || googleEarthOpen || vegetationTableOpen || environmentTableOpen || Boolean(projectMetadataOpen) || profilingOpen || !view.original || !!view.referenceError || states.some(state => state.blocked) };
+  }
+  export function canOpenMetadataEditor() {
+    const state = getDraftState();
+    if (!metadataEditingEnabled || !metadataClient || sourceBlocked || childBlocked || !view.original ||
+        state.unsaved || state.busy || state.blocked || state.error ||
+        [...sessions.values()].some(peer => Boolean(peer.view().error || peer.view().referenceError))) return false;
+    const projectId = twoPageEntryCell(view.original, 'ProjectID');
+    return projectId.storage === 'text' && projectId.text !== null && projectId.text.length > 0;
+  }
+  export function openMetadataEditor() {
+    if (!canOpenMetadataEditor()) {
+      error = 'Resolve source-variant and linked-child drafts, references and retained outcomes before editing owned project metadata.';
+      return;
+    }
+    error = null; projectMetadataOpen = 'edit'; onchange();
+  }
+  async function refreshMetadataPeers() {
+    await oncommitted();
+    for (const peer of sessions.values()) {
+      if (!peer.view().original && !peer.view().error && !peer.view().referenceError) continue;
+      const state = peer.closeState();
+      if (state.unsaved || state.busy || state.blocked || !await peer.load()) {
+        throw new Error(peer.view().error ?? peer.view().referenceError ??
+          'A complete-entry metadata peer could not refresh; no write was replayed.');
+      }
+    }
   }
   function openProfiling() {
     const draftState = getDraftState();
@@ -129,11 +168,15 @@
       error = 'Resolve all source-variant and linked-child drafts, references and retained outcomes before project metadata review.';
       return;
     }
-    error = null; projectMetadataOpen = true; onchange();
+    error = null; projectMetadataOpen = 'read'; onchange();
   }
   function returnFromProjectMetadata() {
+    if (projectMetadataOpen !== 'read') {
+      error = 'Return is limited to saved-data metadata review; finish editing in its owned editor.';
+      return;
+    }
     if (projectMetadataBusy) { error = 'Wait for or cancel the owned project metadata read before returning to the source form.'; return; }
-    projectMetadataOpen = false; error = null; onchange();
+    projectMetadataOpen = null; error = null; onchange();
   }
   function openEnvironmentTable() {
     const draftState = getDraftState();
@@ -227,7 +270,10 @@
       error = `Source refresh failed; retain the immutable transfer receipt and retry Return, never replay: ${String(cause)}`;
     } finally { sourceRefreshing = false; onchange(); }
   }
-  export function undo() { void operation('undo'); }
+  export function undo() {
+    if (projectMetadataOpen === 'edit') { metadataEditor?.undo(); return; }
+    void operation('undo');
+  }
   async function chooseForm(next: TwoPageParentForm) {
     if (externalOpen || auditOpen || googleEarthOpen || vegetationTableOpen || environmentTableOpen || projectMetadataOpen || profilingOpen || childBlocked || close.unsaved || close.busy || close.blocked) {
       error = 'Save or Undo the owned complete-entry draft before changing source variant.'; return;
@@ -299,7 +345,10 @@
     } catch (cause) { error = `Literal acknowledgement refused: ${String(cause)}`; }
   }
   function cancel() {
-    try { session.cancel(); error = session.view().error; }
+    try {
+      if (projectMetadataOpen) throw new Error('Project metadata owns the source; cancel its own read explicitly.');
+      session.cancel(); error = session.view().error;
+    }
     catch (cause) { error = `Complete-entry cancellation refused: ${String(cause)}`; }
   }
   function closeReview() {
@@ -327,7 +376,17 @@
       projectPath={vegetationScope.projectPath} su={vegetationScope.su} suPath={vegetationScope.suPath}
       profileSource={profileSource} onBusyChange={value => profilingBusy = value} />
     <button type="button" disabled={profilingBusy} onclick={returnFromProfiling}>Return to complete-entry source</button>
-  {:else if projectMetadataOpen}
+  {:else if projectMetadataOpen === 'edit'}
+    <p role="status">Source action {form} / {projection.metadataAction.controlId}; pinned opening plot {JSON.stringify(owner.plot)}.</p>
+    {#if metadataClient}
+      <ProjectMetadataEditor bind:this={metadataEditor} client={metadataClient} contextId={owner.contextId} plot={owner.plot}
+        allowRestoration={metadataRestore} onbusy={value => projectMetadataBusy = value}
+        onclosed={() => { projectMetadataOpen = null; error = null; onchange(); }}
+        oncommitted={refreshMetadataPeers} />
+    {:else}
+      <p role="alert">The owned context-bound metadata client is unavailable. No metadata operation can run.</p>
+    {/if}
+  {:else if projectMetadataOpen === 'read'}
     <p role="status">Source action {form} / {projection.metadataAction.controlId}; pinned opening plot {JSON.stringify(owner.plot)}.</p>
     <TwoPageProjectMetadataPanel contextId={owner.contextId} project={owner.project} plot={owner.plot} {form}
       projectPath={vegetationScope.projectPath} su={vegetationScope.su} suPath={vegetationScope.suPath}
@@ -363,6 +422,10 @@
     {#if sourceRefreshing}<p role="status">Refreshing source variants; the committed transfer will not be replayed.</p>{/if}
   {:else}
   <div class="flex flex-wrap gap-2">
+    {#if metadataEditingEnabled}
+      <button type="button" data-two-page-project-metadata-edit-open data-source-control={projection.metadataAction.controlId}
+        disabled={!canOpenMetadataEditor()} onclick={openMetadataEditor}>{projection.metadataAction.caption}</button>
+    {/if}
     {#if profilingReaderAvailable}
       <button type="button" data-two-page-profiling-open data-source-control={projection.profilingAction.controlId}
         disabled={!profileSource?.name || profileSource.name === 'None' || !profileSource.path ||
@@ -372,7 +435,7 @@
         onclick={openProfiling}>{projection.profilingAction.caption}: read-only saved data</button>
     {/if}
     {#if projectMetadataReaderAvailable}
-      <button type="button" data-two-page-project-metadata-open data-source-control={projection.metadataAction.controlId}
+      <button type="button" data-two-page-project-metadata-open data-source-control={metadataEditingEnabled ? undefined : projection.metadataAction.controlId}
         disabled={!vegetationScope.projectPath || !vegetationScope.su || vegetationScope.su !== 'None' && !vegetationScope.suPath ||
           sourceBlocked || childBlocked || getDraftState().unsaved || getDraftState().busy || getDraftState().blocked ||
           Boolean(getDraftState().error) || [...sessions.values()].some(peer => Boolean(peer.view().error || peer.view().referenceError))}
@@ -442,7 +505,8 @@
   <p class="text-xs text-stone-600">One atomic parent Save covers all three accepted field scopes.
     Identity changes, coordinate-conversion callbacks, metadata creation, picture creation and unverified source actions remain unavailable.
     Linked children use their independently gated readers/editors outside this parent transaction.
-    The picture child is read-only; metadata changes and record deletion remain outside this review.</p>
+    The picture child is read-only. Metadata editing uses its separate owned editor and transaction;
+    record deletion remains outside this review.</p>
   {/if}
 </section>
 

@@ -48,6 +48,9 @@ function serverComponent(source, filename, dependencies, environment = {}) {
         });
       }
       if (name === 'svelte' || name.startsWith('svelte/')) return require(name);
+      if (name === './ProjectMetadataEditor.svelte' && environment.VITE_PROJECT_METADATA_EDITING !== 'true') {
+        return { default: () => { throw new Error('Metadata editor rendered while its explicit test profile is disabled.'); } };
+      }
       if (name === './summaryVegetationPreferenceSessions' && environment.VITE_SUMMARY_VEGETATION_PREFERENCES !== 'true') {
         return { summaryVegetationPreferenceSession: null };
       }

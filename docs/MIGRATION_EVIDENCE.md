@@ -6,7 +6,63 @@ private Access copies, native binaries, closed project data, screenshots and
 WebView profiles are deliberately retained outside Git. A hash identifies a
 receipt but does not independently reproduce its native run.
 
+## Hosted release acceptance
+
+[Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)
+builds published source `842ca946ac810393f9d548349f693ac0f51e1f13`.
+All seven jobs pass: validation, Windows amd64/arm64, native Linux amd64/arm64,
+macOS universal and release creation. Draft/prerelease
+`v0.1.0-demo.20261016.2` has exactly fourteen payloads plus one manifest;
+the five CPU/source witnesses are validated build inputs, not extra attached
+release assets. Hosted remote re-download verifies every payload byte against
+the validated manifest; an independent authenticated draft API read confirms
+all fifteen attached digests. Manifest SHA256:
+`75489b24dade03ce076f164e37119233b33783dcf98682a442bd2c011644f692`.
+Private release-job log SHA256:
+`c00c19bc65498a5cc88305a9397d596aabe4f542df5217788fca2241188c01ee`.
+The earlier old-source Windows failures remain rejected. Read-only verifier
+endpoint/media-type errors were corrected without redispatch or publication.
+This is the default release profile, not the private opt-in demo or production/
+all-platform runtime acceptance. macOS is ad-hoc signed, not notarized.
+
 ## Current forms/report boundary
+
+Two-page existing-row metadata editing is independently reviewed, native
+accepted and full-race integrated. Both source captions and the Forms menu use
+the retained complete-entry owner and existing immutable context-bound editor.
+Literal saved text identity and physical selection stay distinct from the
+separate alias-aware read-only reader. No new backend/binding/schema/flag or
+Add/template authority is introduced.
+Review found a skipped failed outer cohort; the corrected V5 condition retries
+peers with originals or retained errors. Independent production reload probes
+and the composed regression cover both extra/common cohorts, repeated failure,
+history/session retention and no additional writes. Node22 qualification passes
+2593 lifecycle/70 entry/176 affected frontend executions, check, focused races/
+vet and five actual isolated frontend/Wails builds.
+Six normally closed native profiles verify both variants, independent grants/
+backend denial, one parent Save/prune and one metadata Save/four exact audits/
+prune, repeated outer-cohort failure/recovery, soil/vegetation/precise native
+close barriers and147 visible labelled controls at1400/760/420. Business/audits/
+old histories and fifteen other files return exactly; two consumed histories
+remain. Two pre-window picture startup failures preserve all sixteen files;
+the absent SQLite picture library is not replaced with a guessed directory or
+seed. That backend stays disabled; no native picture claim follows.
+The metadata owner continued from a rejected dialog expectation at its actual
+context-busy barrier without mutation replay. Both executed harness versions
+are archived byte-exactly, including CRLF.
+Fresh full race passes exit0, UTC2026-10-16T17:35:46.351489 to18:44:56.371239,
+root4137.598s;1872 inputs/147 artifacts, discovery, source/canonical/protected
+data and closed families match; six owners are freshly absent.
+Integration receipt SHA256:
+`3f7027ffdcf700fe4bef73d74c7207129e3ccf1dcf8295a065a51f90ada71286`.
+Full-race log SHA256:
+`338cf77101500792a6d6270972cb8586a699bd1f9e12b187a31dd0461b76b3e0`.
+Private locators: `two-page-metadata-candidate-v5/{freeze,review-disposition}.json`,
+`two-page-metadata-native/acceptance.json` and
+`two-page-metadata-integration/{freeze,receipt}.json`.
+No original callback timing, default/demo or whole-form acceptance follows.
+
+### Integrated CHARS metadata predecessor
 
 The CHARS Edit Metadata composition is independently reviewed, native-accepted
 and full-race integrated. Original button/menu share existing prerequisites,

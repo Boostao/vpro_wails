@@ -133,7 +133,8 @@ inputs/383 artifacts unchanged. Failed candidates/harness routes stay rejected;
 no default/demo promotion or whole-form parity follows.
 
 **Forms > Metadata** now delegates to the existing project-metadata editor for
-the currently open FS882/SIVI or separately gated CHARS plot. It is unavailable until the current editor
+the currently open FS882/SIVI, separately gated CHARS plot, or retained
+complete-entry two-page owner. It is unavailable until the current editor
 is clean, unlocked and available under `VITE_PROJECT_METADATA_EDITING=true`.
 It shares the existing metadata guards rather than adding a separate controller
 or silently choosing a physical record. Global metadata administration and
@@ -156,6 +157,29 @@ one consumed technical metadata history remains. P2 has empty-text ProjectID,
 not NULL. Full race passes root4319.235s with1871 inputs/145 artifacts and
 source/discovery/protected data unchanged. No new writer/backend/binding/flag,
 Add/copy/template, ProjectID/PlotType or whole-form parity is granted.
+
+The normal and CHARS complete-entry **Edit Project Metadata / Edit Metadata**
+actions now share that Forms-menu opener and the existing context-bound editor.
+They require literal `VITE_TWO_PAGE_PARENT_REVIEW`,
+`VITE_TWO_PAGE_PARENT_ENTRY_REVIEW` and `VITE_PROJECT_METADATA_EDITING`; direct
+parent editing is not a prerequisite. Optional restoration retains its existing
+gate. The alias-aware saved-data reader remains a separate read-only action;
+editing requires a nonempty saved text ProjectID and explicit physical selection.
+Parent variants and outer field-scope caches retain histories through metadata
+Save/prune. Failed outer-cohort reads remain eligible after original loss:
+repeated failure cannot silently clear recovery, and retry performs reads only.
+Independent review/follow-up,2593 lifecycle/70 entry/176 affected frontend
+executions, check, focused races/vet and five Wails builds pass.
+Six closed native profiles verify both captions/menu paths, parent and metadata
+Save/prune, repeated outer-cohort failure/recovery, linked soil/vegetation and
+precise native-close barriers, and147 controls at1400/760/420.
+Business/audits/old histories and fifteen other files are exact; two consumed
+technical histories remain. Fresh full race passes root4137.598s with1872
+inputs/147 artifacts/discovery and protected data unchanged.
+This fixture has no picture SQLite library, so its picture backend stays
+disabled; this batch grants no native picture proof, Add/template, new backend/
+flag, original callback timing, default/demo or whole-form promotion.
+See the [two-page contract](docs/FS882-two-page-access-contract.md#owned-existing-row-metadata-editing).
 
 **Forms > User log - Read-only** has a reviewed, disposable-native-verified
 integrated successor. It requires `VITE_USER_LOG_REVIEW=true` when
@@ -2493,6 +2517,15 @@ the remotely attached names and downloaded bytes. Existing remote lightweight
 or annotated tags must resolve to the built checkout before release creation;
 a tag belonging to different source refuses publication. Version metadata preparation
 is restricted to a fresh CI checkout, not local migration data/settings.
+
+The current pipeline passed all seven jobs in
+[hosted run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)
+on source `842ca946ac810393f9d548349f693ac0f51e1f13`.
+Draft/prerelease `v0.1.0-demo.20261016.2` contains exactly fourteen payloads and
+the checksum manifest. Packaged CPU/source witnesses, remotely downloaded bytes
+and independent API digests pass. This validates the default release profile,
+not promotion of the separately qualified opt-in demo or complete platform
+runtime/form parity. macOS remains ad-hoc signed, not notarized.
 
 SQLite remains canonical on every target. The optional
 [DuckDB driver boundary](duckdbdriver.go) preserves existing supported-platform

@@ -2143,6 +2143,45 @@ with unchanged inputs and package/embed discovery. Final association reverified
 predecessor lineage; the freeze is released. Gates remain default-off;
 registered readonly adaptation is not original editable callback parity.
 
+### Owned existing-row metadata editing
+
+The normal `Edit Project Metadata` and CHARS `Edit Metadata` actions now reuse
+the existing context-bound metadata editor inside retained complete-entry
+ownership. The Forms menu delegates to that same admission/opener, with a fresh
+explicit in-place capability after blur/tick; ordinary navigation and global
+operation/publication/native-close barriers remain unchanged.
+Literal `VITE_TWO_PAGE_PARENT_REVIEW`, `VITE_TWO_PAGE_PARENT_ENTRY_REVIEW` and
+`VITE_PROJECT_METADATA_EDITING` are required. Parent direct editing is separate;
+optional restoration keeps `VITE_PROJECT_METADATA_RESTORE`. There is no new
+backend metadata flag. A nonempty saved TEXT ProjectID, literal physical-source
+authorization and explicit physical row selection are required. The alias-aware
+saved-data reader remains separate; it does not authorize this writer.
+
+Existing parent variants, extra/common cohorts and linked owners retain their
+sessions/history. Postcommit refresh reads only; failed peers with cleared
+originals remain eligible through their retained errors. Persistent failure
+continues blocking recovery, while correction/retry cannot repeat Save.
+Independent review found that eligibility omission and accepted the reproduced
+production reload regression/fix for both cohorts. All2593 lifecycle/70 entry/
+176 affected frontend cases, check, focused races/vet and five isolated actual
+Wails builds pass.
+
+Six closed disposable native profiles prove both source captions/menu paths,
+separate reader and independent grants/backend denial. One parent Save/prune
+and one selected metadata Save/four exact audits/prune preserve histories across
+repeated outer-cohort failure and read-only recovery. Soil/vegetation and fresh
+specific CancelClose acknowledgements hold competing actions;147 labelled
+controls pass at actual1400/760/420 widths. Business/audits/old histories and
+fifteen other files are exact; two consumed technical histories remain.
+Rejected startup/navigation expectations are preserved, with the same retained
+metadata owner continued without mutation replay. This fixture has no tblVPics
+SQLite library: its picture backend remains disabled, not newly seeded or
+native-qualified. Fresh full race passes root4137.598s, preserving1872 inputs/
+147 artifacts, discovery and canonical/protected/closed data.
+No Add/copy/template, ProjectID assignment, attachments, original focus/Current/
+NotInList timing, new backend/binding/schema/flags or default/demo/whole-form
+promotion is granted.
+
 The subsequent [mapped profiling backend draft](../twopageprofilingservice.go)
 is independently default-off. It explicitly refuses legacy
 implicit project fallback and None profile selection. Literal selected paired

@@ -224,11 +224,23 @@ specific native-close acknowledgements precede barrier changes.
 Full race passes root4319.235s, preserving1871 inputs/145 artifacts, canonical/
 protected sources, closed family and discovery. No Add/copy/template,
 ProjectID/PlotType/callback timing, default or whole-parity promotion follows.
-Next safely compose writable metadata under the two original complete-entry
-two-page actions while preserving their separate saved-data reader. Static
-qualification confirms both callbacks share ProjectID-only active criteria;
-StartDate criteria are comments. The private bounded reuse contract is sealed;
-implementation/review/native/integration remain separate pending deliverables.
+Writable metadata is now composed under both original complete-entry two-page
+actions and the same retained-owner Forms menu. ProjectID-only criteria and the
+separate alias-aware saved-data reader remain explicit. Existing editor/client/
+restoration infrastructure is reused without new backend/binding/schema/flags.
+Independent review resolved a cross-scope retry omission; both outer-cohort
+production reload regressions retain histories and reject repeated failure.
+All2593 lifecycle/70 entry/176 affected frontend executions, five Wails profiles,
+check/focused race/vet and focused review pass. Six normally closed native
+profiles prove parent and metadata Save/prune, four exact metadata audits,
+outer-cohort read-only recovery, linked soil/vegetation/close barriers and147
+controls at1400/760/420. Business/audits/old history and fifteen files are exact;
+two consumed histories remain. Rejected startup/navigation expectations are
+preserved and the retained owner continued without mutation replay. No picture
+library exists in this fixture; that backend remains disabled, not qualified.
+Fresh full race passes root4137.598s with1872 inputs/147 artifacts/discovery and
+canonical/protected/closed data unchanged. No Add/template, original callback
+timing or default/demo/whole-form promotion follows.
 Continue the ordered forms/report/ribbon backlog, not a checkpoint stop.
 
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner

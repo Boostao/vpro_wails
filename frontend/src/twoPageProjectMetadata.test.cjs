@@ -192,10 +192,10 @@ test('mapped metadata opener refuses every scope/draft/peer/child error and pend
     assert.equal(panel.projectMetadataOpen, false); assert.match(panel.error, /Resolve/);
   }
   const panel = create({ projectMetadataBusy: true }); panel.actions.openProjectMetadata();
-  assert.equal(panel.projectMetadataOpen, true);
-  panel.actions.returnFromProjectMetadata(); assert.equal(panel.projectMetadataOpen, true); assert.match(panel.error, /cancel/);
+  assert.equal(panel.projectMetadataOpen, 'read');
+  panel.actions.returnFromProjectMetadata(); assert.equal(panel.projectMetadataOpen, 'read'); assert.match(panel.error, /cancel/);
   panel.projectMetadataBusy = false; panel.actions.returnFromProjectMetadata();
-  assert.equal(panel.projectMetadataOpen, false); assert.equal(panel.error, null);
+  assert.equal(panel.projectMetadataOpen, null); assert.equal(panel.error, null);
 });
 test('open metadata suspends actual parent/variant/close and every peer source callback', async () => {
   const clean = { unsaved: false, busy: false, blocked: false, error: null };

@@ -254,6 +254,7 @@
   let editor: {
     getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean>;
     canOpenProjectMetadata: () => boolean; openProjectMetadata: () => void;
+    canOpenMetadataInPlace?: () => boolean;
   } | undefined = $state();
   let closeRequest = $state('');
   let closeWorking = $state(false);
@@ -368,18 +369,22 @@
     (su) => su.name === $projectState?.activeSU && su.path === $projectState?.suPath
   ) ?? -1);
 
-  async function requestTransition(run: (contextId: string) => Promise<void>) {
+  async function requestTransition(run: (contextId: string) => Promise<void>, ownedAction?: () => boolean) {
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     await tick();
+    if (ownedAction && !ownedAction()) {
+      error = 'Owned action or editor availability changed; no editor replaced.';
+      return;
+    }
     const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-    if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
+    if (closeDisposition(ownedAction ? null : state, busy || !ownedAction && editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
       error = 'Wait for the current operation or decision before changing context.';
       return;
     }
     const contextId = $projectState?.contextId;
     if (!contextId) { error = 'A project context must finish loading before navigation.'; return; }
     transitionError = '';
-    if (state?.unsaved) {
+    if (state?.unsaved && !ownedAction) {
       pendingTransition = { contextId, run };
       return;
     }
@@ -460,13 +465,17 @@
     }
     const owner = editor;
     const contextId = $projectState.contextId;
+    const ownedAction = owner.canOpenMetadataInPlace?.()
+      ? () => view === 'fs882' && editor === owner && $projectState?.contextId === contextId &&
+        owner.canOpenMetadataInPlace?.() === true
+      : undefined;
     await requestTransition(async currentContext => {
       if (view !== 'fs882' || editor !== owner || currentContext !== contextId ||
           $projectState?.contextId !== contextId || !owner.canOpenProjectMetadata()) {
         throw new Error('Project metadata owner or availability changed; no editor replaced.');
       }
       owner.openProjectMetadata();
-    });
+    }, ownedAction);
   }
 
   async function resolveNavigation(proposal: ProjectPlotProfileFilterRequest, contextId: string): Promise<ProfileNavigation> {
