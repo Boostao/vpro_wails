@@ -139,6 +139,19 @@ func TestSummaryEnvironmentalCanonicalAllDefinitionsOwnedSnapshot(t *testing.T) 
 					t.Fatal("canonical first-unit workbook value differs from independent expectation", definition, value, err)
 				}
 			}
+			combined, err := prepareSummaryVegetationWorkbook(t.Context(), summaryVegetationWorkbookInput{
+				Title: "Summary", Vegetation: got.Vegetation,
+				Environment: &summaryEnvironmentalWorkbookInput{FirstRow: 5, FieldList: got.FieldList,
+					Units: summaryEnvironmentalPreviewUnits(got.Vegetation), Rows: got.Rows},
+			})
+			if err != nil || combined.FirstVegetationRow != 59 {
+				t.Fatal("canonical header and existing named body cannot compose", err)
+			}
+			combinedBook := openSummaryEnvironmentalWorkbook(t, summaryEnvironmentalWorkbook{Bytes: combined.Bytes})
+			marker, err := combinedBook.GetCellValue(combined.Sheet, "A58")
+			if err != nil || marker != "StartVeg" {
+				t.Fatal("canonical source post-deletion boundary changed", marker, err)
+			}
 			if !reflect.DeepEqual(databaseBytes(t, owner.attachments), before) {
 				t.Fatal("complete canonical read mutated physical source")
 			}

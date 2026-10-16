@@ -26,33 +26,88 @@ type summaryEnvironmentalWorkbook struct {
 	Header summaryEnvironmentalHeaderPlan
 }
 
+type summaryWorkbookLayout struct {
+	Sheet, Title                string
+	LastRow, LastColumn         int
+	SeparatorRow, ItalicFromRow int
+	HeaderRows                  []int
+	Cells                       []summaryEnvironmentalHeaderCell
+}
+
 // This private inspection preserves typed values, not Excel automation coercion.
-func prepareSummaryEnvironmentalWorkbook(ctx context.Context, input summaryEnvironmentalWorkbookInput) (result summaryEnvironmentalWorkbook, resultErr error) {
+func prepareSummaryEnvironmentalWorkbook(ctx context.Context, input summaryEnvironmentalWorkbookInput) (summaryEnvironmentalWorkbook, error) {
 	if ctx == nil {
-		return result, errors.New("Summary environmental workbook requires a context")
+		return summaryEnvironmentalWorkbook{}, errors.New("Summary environmental workbook requires a context")
 	}
 	plan, err := prepareSummaryEnvironmentalHeader(ctx, input.FirstRow, input.English, input.FieldList, input.Units, input.Rows)
 	if err != nil {
-		return result, err
+		return summaryEnvironmentalWorkbook{}, err
+	}
+	data, err := renderSummaryWorkbook(ctx, input, summaryWorkbookLayout{
+		Sheet: "Summary Environment", Title: "Summary environmental inspection",
+		LastRow: max(input.FirstRow-1, plan.LastDataRow), LastColumn: plan.LastValueColumn,
+		HeaderRows: []int{input.FirstRow - 1}, Cells: plan.Cells,
+	})
+	if err != nil {
+		return summaryEnvironmentalWorkbook{}, err
+	}
+	return summaryEnvironmentalWorkbook{Bytes: data, Header: plan}, nil
+}
+
+func renderSummaryWorkbook[T any](ctx context.Context, input T, layout summaryWorkbookLayout) (result []byte, resultErr error) {
+	if ctx == nil {
+		return nil, errors.New("Summary workbook rendering requires a context")
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if layout.LastRow < 1 || layout.LastRow > 32767 || layout.LastColumn < 1 || layout.LastColumn > 254 {
+		return nil, errors.New("Summary workbook layout exceeds the qualified source frame")
 	}
 	if err := reportWorkbookSourceValue(reflect.ValueOf(input), func(cell ProjectMetadataCell) error {
 		_, err := metadataCellValue(cell)
 		return err
 	}, "Summary environmental"); err != nil {
-		return result, fmt.Errorf("Summary environmental workbook provenance: %w", err)
+		return nil, fmt.Errorf("Summary workbook provenance: %w", err)
+	}
+	seen := map[[2]int]bool{}
+	for _, placed := range layout.Cells {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		key := [2]int{placed.Row, placed.Column}
+		if placed.Row < 1 || placed.Row > layout.LastRow || placed.Column < 1 || placed.Column > layout.LastColumn || seen[key] {
+			return nil, errors.New("Summary workbook contains overlapping or out-of-frame cells")
+		}
+		seen[key] = true
+		switch placed.Value.Kind {
+		case "empty":
+			if placed.Value.Cell != nil {
+				return nil, errors.New("Summary workbook Empty must not contain a typed cell")
+			}
+		case "cell":
+			if placed.Value.Cell == nil {
+				return nil, errors.New("Summary workbook ordinary value requires a typed cell")
+			}
+			if _, err := metadataCellValue(*placed.Value.Cell); err != nil {
+				return nil, err
+			}
+		default:
+			return nil, errors.New("Summary workbook requires an exact Empty or ordinary value tag")
+		}
 	}
 	book := excelize.NewFile()
 	defer func() {
 		resultErr = errors.Join(resultErr, book.Close(), ctx.Err())
 		if resultErr != nil {
-			result = summaryEnvironmentalWorkbook{}
+			result = nil
 		}
 	}()
-	const sheet = "Summary Environment"
+	sheet := layout.Sheet
 	if err := book.SetSheetName("Sheet1", sheet); err != nil {
 		return result, err
 	}
-	if err := book.SetDocProps(&excelize.DocProperties{Title: "Summary environmental inspection", Creator: "VPRO",
+	if err := book.SetDocProps(&excelize.DocProperties{Title: layout.Title, Creator: "VPRO",
 		Created: "2000-01-01T00:00:00Z", Modified: "2000-01-01T00:00:00Z"}); err != nil {
 		return result, err
 	}
@@ -67,14 +122,19 @@ func prepareSummaryEnvironmentalWorkbook(ctx context.Context, input summaryEnvir
 	if err != nil {
 		return result, err
 	}
-	last, err := excelize.CoordinatesToCellName(plan.LastValueColumn, max(input.FirstRow-1, plan.LastDataRow))
+	italic, err := book.NewStyle(&excelize.Style{Font: &excelize.Font{Family: "Arial", Size: 8, Italic: true},
+		Alignment: &excelize.Alignment{WrapText: true, Vertical: "top"}})
 	if err != nil {
 		return result, err
 	}
-	if err := book.SetCellStyle(sheet, fmt.Sprintf("A%d", input.FirstRow-1), last, style); err != nil {
+	last, err := excelize.CoordinatesToCellName(layout.LastColumn, layout.LastRow)
+	if err != nil {
 		return result, err
 	}
-	lastColumn, err := excelize.ColumnNumberToName(plan.LastValueColumn)
+	if err := book.SetCellStyle(sheet, "A1", last, style); err != nil {
+		return result, err
+	}
+	lastColumn, err := excelize.ColumnNumberToName(layout.LastColumn)
 	if err != nil {
 		return result, err
 	}
@@ -86,7 +146,15 @@ func prepareSummaryEnvironmentalWorkbook(ctx context.Context, input summaryEnvir
 			return result, err
 		}
 	}
-	for _, placed := range plan.Cells {
+	if layout.SeparatorRow != 0 {
+		if layout.SeparatorRow < 1 || layout.SeparatorRow > layout.LastRow {
+			return result, errors.New("Summary workbook separator is outside the frame")
+		}
+		if err := book.SetCellStyle(sheet, fmt.Sprintf("A%d", layout.SeparatorRow), fmt.Sprintf("%s%d", lastColumn, layout.SeparatorRow), heading); err != nil {
+			return result, err
+		}
+	}
+	for _, placed := range layout.Cells {
 		if err := ctx.Err(); err != nil {
 			return result, err
 		}
@@ -97,6 +165,7 @@ func prepareSummaryEnvironmentalWorkbook(ctx context.Context, input summaryEnvir
 		if placed.Value.Kind == "cell" {
 			cell := placed.Value.Cell
 			switch cell.Storage {
+			case "null":
 			case "text":
 				if err := setReportWorkbookText(book, sheet, address, *cell.Text); err != nil {
 					return result, fmt.Errorf("Summary environmental workbook %s: %w", address, err)
@@ -112,11 +181,20 @@ func prepareSummaryEnvironmentalWorkbook(ctx context.Context, input summaryEnvir
 				if err := book.SetCellInt(sheet, address, value); err != nil {
 					return result, err
 				}
+			default:
+				return result, fmt.Errorf("Summary workbook %s has unsupported visible storage %q", address, cell.Storage)
 			}
 		}
-		if placed.Row == input.FirstRow-1 {
-			if err := book.SetCellStyle(sheet, address, address, heading); err != nil {
+		if layout.ItalicFromRow > 0 && placed.Row >= layout.ItalicFromRow && placed.Column == 2 {
+			if err := book.SetCellStyle(sheet, address, address, italic); err != nil {
 				return result, err
+			}
+		}
+		for _, row := range layout.HeaderRows {
+			if placed.Row == row {
+				if err := book.SetCellStyle(sheet, address, address, heading); err != nil {
+					return result, err
+				}
 			}
 		}
 	}
@@ -150,5 +228,5 @@ func prepareSummaryEnvironmentalWorkbook(ctx context.Context, input summaryEnvir
 	if err := ctx.Err(); err != nil {
 		return result, err
 	}
-	return summaryEnvironmentalWorkbook{Bytes: bytes.Clone(buffer.Bytes()), Header: plan}, nil
+	return bytes.Clone(buffer.Bytes()), nil
 }

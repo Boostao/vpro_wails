@@ -451,19 +451,22 @@ Original Excel output coercion is not a safe proxy for typed inspection: for
 example, a source string `1 - 2 - 3` becomes a date serial. The inspection keeps
 the original tagged value instead of claiming workbook-formatting parity.
 
-Private XLSX preparation now carries the environmental header's complete selected
-rows and unit order into a readable worksheet, with exact typed input in
-very-hidden provenance. Date-like, formula-like and leading-zero strings stay
+Private XLSX composition now combines the existing named layer vegetation
+preview with the optional complete environmental header. Source-related counts,
+labels, unit order and the post-deletion vegetation start are retained without
+duplicating reference resolution or arithmetic. The complete typed input remains
+in very-hidden provenance. Date-like, formula-like and leading-zero strings stay
 literal; numeric Empty, NULL and empty text remain distinguishable in provenance.
-Unrepresentable text or integers beyond Excel's fifteen-digit precision refuse
-all output. This is not a registered service or export action, does not compose
-the vegetation body, and does not enable whole formatted Summary or printing.
+Unrepresentable text, overprecision integers, mismatched pivot units and
+out-of-order/incomplete rows refuse all output. This is not a registered service
+or export action and does not enable public formatted Summary or printing.
 The [shared workbook value boundary](reportworkbookvalues.go) retains the existing
 Lifeform text/NULL identity policy separately from canonical Summary typed cells.
-Focused coupled race, vet, production compilation and distinct read-only review
-pass; fresh full-repository race passes (root4124.177s), preserving1876 managed
-inputs,11 artifacts, package/embed discovery, protected assets and both closed
-native families. This accepts the private boundary, not new native/public output.
+The header-only and composed paths are independently reviewed and full-race
+integrated. The composed path's fresh race run passes (root4172.686s), with
+all1879 managed inputs/16 artifacts, package/embed discovery, canonical/protected
+assets and both closed native families unchanged. Neither supplies common/guide
+names, hierarchy/lumping/quality side effects, Excel macros or printing parity.
 
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus

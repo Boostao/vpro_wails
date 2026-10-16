@@ -2132,6 +2132,48 @@ managed inputs/11 artifacts, package/embed discovery, canonical/protected assets
 and both closed native families unchanged. These are private preparation and
 legacy-caller preservation checks, not new native/public report acceptance.
 
+### Private named layer workbook composition
+
+The [private composer](../summaryvegetationworkbook.go) consumes the existing
+`SummaryVegetationPreview`; it does not look up names after aggregation.
+`MakeSvQueries` groups by the ScientificName-or-Species expression before its
+crosstab. The existing layer planner already performs that step with complete
+reference-origin witnesses and literal NULL-first ordering. Its already accepted
+display/average/class option shapes share the same literal transport; no formula
+is recalculated by the composer.
+
+Without environmental fields, original `BuildReport`/`AddNPlots` placement leaves
+plot counts at row4, column headings at row5 and vegetation at row6. With `k`
+selected environmental fields, unit headings remain at row4, fields occupy
+rows5 through `k+4`, the `StartVeg` separator is at `k+5`, and vegetation starts
+at `k+6` after the original row deletions. Layer, Spp and Order occupy A/B/C;
+unit columns start at D. Common/guide names and alternate grouping remain
+outside this boundary. Exact SV1 unit/pivot-column agreement is required:
+subsets or reordering refuse all output, never silently shift counts or values.
+
+The environmental and composed paths share one renderer and lifetime/provenance
+boundary rather than serializing/reopening an intermediate workbook. It rejects
+duplicate/out-of-frame placements, malformed value tags and unsupported visible
+storage. Input witnesses remain unchanged and complete; text stays literal,
+integers retain the checked precision bound and failed/cancelled cleanup clears
+all returned bytes. Project worksheet identity must survive unchanged, including
+the shared reserved-name/Unicode checks; sanitization/truncation is refused.
+
+This is private in-memory preparation, not a new owned read or writer authority.
+A future public coordinator must obtain the coupled preview in one owned
+snapshot and separately qualify preferences, source/destination guards, binding,
+client receipt/lifecycle and actual Wails acceptance. No service, binding, UI,
+flag, publication, default promotion, Excel macro or printing is introduced.
+
+Distinct read-only review finds no significant issues in the frozen private
+composition and shared renderer. A focused evidence follow-up verifies exact
+race/vet/build argv and exit0 markers, repeated coupled race155.760s and
+byte-exact stripped SQLite-only production executables. Fresh full repository
+race passes (root4172.686s), with1879 managed inputs/16 artifacts, discovery,
+canonical/protected assets and both closed native families unchanged. This is
+private preparation/caller-preservation acceptance, not a new public/native
+report or source scalar-coercion/formatting claim.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

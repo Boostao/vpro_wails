@@ -1004,8 +1004,17 @@ checked text/source-value boundaries retain explicit legacy Lifeform versus
 canonical Summary cell policies. Focused coupled race150.725s/vet/production
 and distinct clean review/follow-up pass. Fresh complete-repository race passes
 (root4124.177s), with1876 managed inputs/11 artifacts, discovery, protected assets
-and both closed native families unchanged. No service, binding, UI, flag,
-vegetation-body composition, printing or public availability follows.
+and both closed native families unchanged. A separate private compositor now
+reuses that renderer and existing named layer rows for combined/noncombined
+source-related placement. Initial body/header and broader coupled caller races,
+vet and production pass. Distinct read-only review finds no significant issues;
+its exact-command evidence follow-up verifies repeated race155.760s, vet and a
+byte-exact production executable. Fresh full integration passes in4187.906s
+(root4172.686s), retaining1879 managed inputs/16 artifacts, discovery,
+canonical/protected assets and both closed native families. Exact SV1/pivot
+alignment and unchanged worksheet
+identity are required. No service, binding, UI, flag, printing or public
+availability follows from either private boundary.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

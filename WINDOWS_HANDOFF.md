@@ -138,7 +138,7 @@ Private `two-page-metadata-publication.json` associates its exact staged diff
 with the accepted integration. No default/demo or whole-form promotion is granted.
 Continue all ordered forms/report/ribbon deliverables, not a checkpoint stop.
 
-## Current private Summary prerequisite
+## Accepted private Summary header prerequisite
 
 Accepted private environmental-header XLSX preparation reuses the existing placement
 plan and explicit literal scalar adaptation; it adds no service, binding, UI,
@@ -163,13 +163,35 @@ all1876 managed inputs/11 artifacts, discovery, canonical/protected assets and
 both closed native families. Receipt:
 `summary-environment-workbook-integration/receipt.json`, SHA256
 `b6a2670191911b88b278dfd56035a4e3f9173be20d3390ba842ff2e041ff45ff`.
-The freeze is released for coherent private-prerequisite publication; this is
-not new native/public or whole-report acceptance.
-Next source-ready seam is private vegetation-body composition using existing
-named layer aggregation, not a posthoc scientific-name mapper or new arithmetic.
-Its static contract is `summary-workbook-body-source-contract.json`. Preserve
-the original placement and require SV1/pivot alignment; common/guide names,
-hierarchy/lumping/quality side effects, macros and printing remain excluded.
+The header predecessor is committed/published as `e6d2f04`. Its proof does not
+automatically qualify the separate body successor below; neither is new
+native/public or whole-report acceptance.
+
+## Current qualified private Summary workbook preparation
+
+Named-layer composition now shares the header renderer and preserves the
+original combined/noncombined row placements, literal values and full typed
+provenance. It reuses existing scientific-name grouping and calculations; exact
+unit/pivot agreement and unchanged worksheet identity are required. Common/guide
+names, other grouping, public services/UI/publication and printing remain off.
+Initial body/header races pass2.868s and broader coupled races158.393s.
+Distinct read-only review finds no significant issues in all nine frozen paths.
+Its evidence follow-up verifies complete argv/environment/exit associations for
+the repeated race155.760s, vet and byte-exact production executable, SHA256
+`f1b78647412b7f2d5bdb99b6896ea9c9c2b527060d607ffd40e92a515b0ae199`.
+The original exact-command receipt limitation is resolved, not silently omitted.
+Fresh full race integration passes in4187.906s (root4172.686s), retaining all1879
+managed inputs/16 artifacts, package/embed discovery, canonical/protected assets
+and both closed native families. Private receipt:
+`summary-workbook-body-integration/receipt.json`, SHA256
+`fd834aa15e66d1e22a5912dbe17171a1215b588b8b7429d0aa909fa8911b7a13`.
+The freeze is released for coherent publication of this private boundary only.
+Next is an owned public Summary workbook review/publication workflow: retain the
+already-read personal/LayerCode tables, take all coupled physical inputs in one
+owned snapshot, qualify saved effects and independent flags, then verify actual
+bindings, client receipts/lifecycle and disposable Wails acceptance. The private
+contract is `summary-workbook-owned-publication-contract.json`; no public
+availability or default promotion has been granted.
 
 Full integration on this VM: `go test -race -timeout 120m ./...`.
 For isolated Go overlays use `GODEBUG=goindex=0` and verify exact embed discovery.
