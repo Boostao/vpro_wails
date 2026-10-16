@@ -4,7 +4,7 @@
   type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'break-report' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
   type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'sivi-chars' | 'metadata' };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
-  let { view, onnavigate, siviAvailable = false, onopensivi, charsAvailable = false, onopenchars, charsLinkedVegetation = false, charsCollected = false, charsSpecies = false, charsIdentity = false,
+  let { view, onnavigate, siviAvailable = false, onopensivi, charsAvailable = false, onopenchars, charsLinkedVegetation = false, charsCollected = false, charsSpecies = false, charsIdentity = false, charsCreation = false,
     metadataAvailable = false, onopenmetadata }: {
     view: View; onnavigate: (view: View) => void;
     siviAvailable?: boolean; onopensivi?: () => void;
@@ -13,10 +13,12 @@
     charsCollected?: boolean;
     charsSpecies?: boolean;
     charsIdentity?: boolean;
+    charsCreation?: boolean;
     metadataAvailable?: boolean; onopenmetadata?: () => void;
   } = $props();
   const charsScope = $derived([charsLinkedVegetation ? 'covers/heights' : '', charsCollected ? 'Collected cycles' : '',
-    charsSpecies ? 'Species selections' : '', charsIdentity ? 'vegetation IDs' : ''].filter(Boolean).join(' and '));
+    charsSpecies ? 'Species selections' : '', charsIdentity ? 'vegetation IDs' : '',
+    charsCreation ? 'source-bound row creation' : ''].filter(Boolean).join(' and '));
   let navigation: HTMLElement;
   let openMenu = $state<string | null>(null);
 
@@ -159,7 +161,7 @@
                     : 'Select a plot and enable the independent SIVI standalone and parent-review gates.'
                   : item.action === 'sivi-chars'
                     ? itemEnabled(item) ? charsScope
-                      ? `Experimental CHARS parent with separately gated linked ${charsScope}. ${charsSpecies ? '' : 'Species, '}${charsCollected ? '' : 'Collected, '}${charsIdentity ? '' : 'identity/'}lifecycle and unqualified callbacks remain unavailable. Existing draft and close guards apply.`
+                      ? `Experimental CHARS parent with separately gated linked ${charsScope}. ${charsSpecies ? '' : 'Species, '}${charsCollected ? '' : 'Collected, '}${charsIdentity ? '' : 'identity/'}${charsCreation ? 'deletion' : 'lifecycle'} and unqualified callbacks remain unavailable. Existing draft and close guards apply.`
                       : 'Experimental CHARS parent-only entry with Comp./Part. Save. Child workflows and ProjectID/PlotType remain unavailable. Existing draft and close guards apply.'
                       : 'Select a plot and enable the independent CHARS parent-entry gate.'
                   : item.action === 'metadata'

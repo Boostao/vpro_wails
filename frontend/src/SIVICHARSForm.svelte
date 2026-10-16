@@ -14,6 +14,9 @@
   import SIVICollectedPanel from './SIVICollectedPanel.svelte';
   import SIVISpeciesPanel from './SIVISpeciesPanel.svelte';
   import SIVIIdentityPanel from './SIVIIdentityPanel.svelte';
+  import SIVICreationPanel from './SIVICreationPanel.svelte';
+  import { siviCreationSession as ownedCreationSession } from './siviCreationSessions';
+  import type { SIVICreationDraft, SIVICreationForm } from './siviCreationEditor';
 
   let { contextId, project, plotNumber, onSaved, onBusyChange }: {
     contextId: string; project: string; plotNumber: string;
@@ -28,7 +31,10 @@
     import.meta.env.VITE_SIVI_SPECIES_EDITING === 'true';
   const identityEnabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true' &&
     import.meta.env.VITE_SIVI_IDENTITY_EDITING === 'true';
-  const vegetationEnabled = linkedEnabled || collectedEnabled || speciesEnabled || identityEnabled;
+  const creationEnabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true' &&
+    import.meta.env.VITE_SIVI_CREATION_WRITING === 'true';
+  const creationForms: SIVICreationForm[] = ['SubVegA-SIVI', 'SubVegC-SIVI', 'SubVegD-SIVI'];
+  const vegetationEnabled = linkedEnabled || collectedEnabled || speciesEnabled || identityEnabled || creationEnabled;
   type Child = 'combined' | 'collected' | 'species' | 'identity';
   const targets: Child[] = ['combined', 'collected', 'species', 'identity'];
   type Operation = 'load' | 'save' | 'undo' | 'retain' | 'prune';
@@ -70,6 +76,29 @@
   const identity = new SIVIIdentitySession(owner.plot, port('identity', SIVIIdentityService),
     () => { identityView = identity.view(); }, true);
   let identityView = $state.raw(identity.view());
+  const creation = creationEnabled ? ownedCreationSession(owner) : null;
+  let creationRevision = $state(0);
+  let creationHostBusy = $state(false);
+  let creationRefreshedRevision = $state(-1);
+  $effect(() => creation?.subscribe(() => untrack(() => creationRevision++)));
+  const creationView = $derived.by(() => { creationRevision; return creation?.view(); });
+  const creationRefreshNeeded = $derived(Boolean(creationView?.receipt &&
+    creationView.revision !== creationRefreshedRevision));
+  const foreignCreationDraft = $derived(Boolean(creationView?.draft && !creationForms.includes(creationView.draft.form)));
+  const creationClose = $derived.by((): EditorCloseState | null => {
+    creationRevision;
+    if (!creation) return null;
+    const close = creation.closeState();
+    const reason = creationHostBusy ? 'Wait for the verified creation parent and peer refresh.'
+      : foreignCreationDraft ? 'Return to the retained source-form editor or explicitly Undo its creation draft.'
+      : creationRefreshNeeded ? 'Creation is verified. Refresh parent and peers without repeating Create.'
+      : close.saveReason;
+    return { ...close, unsaved: close.unsaved || creationRefreshNeeded,
+      busy: close.busy || creationHostBusy, blocked: close.blocked || foreignCreationDraft || creationRefreshNeeded,
+      canSave: close.canSave && !creationHostBusy && !foreignCreationDraft && !creationRefreshNeeded, saveReason: reason };
+  });
+  const creationPending = $derived(Boolean(creationClose &&
+    (creationClose.unsaved || creationClose.busy || creationClose.blocked)));
   const childClose = $derived.by(() => { childView; return child.closeState(); });
   const collectedClose = $derived.by(() => { collectedView; return collected.closeState(); });
   const speciesClose = $derived.by(() => { speciesView; return species.closeState(); });
@@ -79,10 +108,17 @@
   const collectedPending = $derived(collectedEnabled && Boolean(collectedClose.unsaved || collectedClose.busy || collectedClose.blocked));
   const speciesPending = $derived(speciesEnabled && Boolean(speciesClose.unsaved || speciesClose.busy || speciesClose.blocked));
   const identityPending = $derived(identityEnabled && Boolean(identityClose.unsaved || identityClose.busy || identityClose.blocked));
-  const peerBlockedReason = $derived(combinedPending || collectedPending || speciesPending || identityPending
+  const creationRecoveryDisabled = $derived(!creationEnabled || parentBusy || Boolean(childOperation) || creationHostBusy ||
+    combinedPending || collectedPending || speciesPending || identityPending || !parent?.canReloadLinkedParent());
+  const creationEditingDisabled = $derived(creationRecoveryDisabled || !parentReady || creationRefreshNeeded);
+  const linkedParentReady = $derived(parentReady && !creationPending);
+  const peerBlockedReason = $derived(creationPending
+    ? 'Finish, correct, Undo or resolve the retained creation request and refresh before changing the CHARS parent.'
+    : combinedPending || collectedPending || speciesPending || identityPending
     ? 'Finish, correct or Undo linked vegetation drafts/recovery before changing the CHARS parent.' : '');
   $effect(() => { onBusyChange?.(parentBusy || linkedEnabled && childView.busy ||
-    collectedEnabled && collectedView.busy || speciesEnabled && speciesView.busy || identityEnabled && identityView.busy); });
+    collectedEnabled && collectedView.busy || speciesEnabled && speciesView.busy || identityEnabled && identityView.busy ||
+    Boolean(creationClose?.busy)); });
   onDestroy(() => {
     disposed = true;
     for (const target of targets) { reads[target].cancelAll(); entry(target).session.dispose(); }
@@ -111,8 +147,11 @@
       throw new Error(`Linked ${target} drafts/recovery must finish before a peer operation.`);
     }
   }
-  function requireCleanPeers(except?: Child) {
+  function requireCleanPeers(except?: Child | 'creation') {
     for (const target of targets) if (target !== except) requireCleanPeer(target);
+    if (except !== 'creation' && creationPending) {
+      throw new Error('Finish creation drafts, unknown acknowledgement or verified host refresh before a peer operation.');
+    }
   }
   async function refreshCleanPeer(target: Child) {
     requireCleanPeer(target);
@@ -230,13 +269,72 @@
     }
     reads[target].cancelAll();
   }
+  async function refreshAfterCreation() {
+    requireLive();
+    requireCleanPeers('creation');
+    if (!creation?.view().receipt || !parent?.canReloadLinkedParent()) {
+      throw new Error('Keep the verified creation receipt and unlock the clean parent before read-only refresh.');
+    }
+    creationHostBusy = true;
+    try {
+      await parent.refreshAfterLinkedSave();
+      for (const target of targets) await refreshCleanPeer(target);
+      await onSaved?.(owner.plot);
+      requireLive();
+      creationRefreshedRevision = creation.view().revision;
+    } finally { if (!disposed) creationHostBusy = false; }
+  }
+  async function creationOperation(kind: 'load' | 'start' | 'save' | 'undo' | 'resolve' | 'cancel' | 'refresh',
+    form?: SIVICreationForm): Promise<boolean> {
+    operationError = '';
+    try {
+      requireLive();
+      if (!creation) throw new Error('CHARS creation requires its independent entry gates.');
+      if (kind === 'cancel') { creation.cancel(); return true; }
+      requireCleanPeers('creation');
+      if (creationRecoveryDisabled || (kind === 'load' || kind === 'start' || kind === 'save') && creationEditingDisabled) {
+        throw new Error('Unlock the clean owned parent and finish conflicting operations before CHARS creation.');
+      }
+      if (kind === 'refresh') await refreshAfterCreation();
+      else if (kind === 'undo') creation.discard();
+      else if (kind === 'start') {
+        if (!form || !creationForms.includes(form)) throw new Error('Choose an actual CHARS extended A, C or D source form.');
+        creation.start(form);
+      } else if (kind === 'load') return await creation.loadReferences();
+      else {
+        if (kind === 'save' && (foreignCreationDraft || !creationClose?.canSave)) {
+          throw new Error(creationClose?.saveReason || 'Correct the retained CHARS creation draft.');
+        }
+        const ok = kind === 'save' ? await creation.save(crypto.randomUUID()) : await creation.resolve();
+        if (!ok) return false;
+        await refreshAfterCreation();
+      }
+      return true;
+    } catch (cause) {
+      if (!disposed) operationError = creationRefreshNeeded
+        ? `CHARS creation is already verified; read-only host refresh remains pending. Never repeat Create: ${String(cause)}`
+        : `CHARS creation operation failed; retained owner unchanged: ${String(cause)}`;
+      return false;
+    }
+  }
+  function stageCreation(draft: SIVICreationDraft) {
+    operationError = '';
+    try {
+      requireLive();
+      requireCleanPeers('creation');
+      if (!creation || creationEditingDisabled || foreignCreationDraft || !creationForms.includes(draft.form)) {
+        throw new Error('Correct creation only in its available, unlocked source-form owner.');
+      }
+      creation.updateDraft(draft);
+    } catch (cause) { operationError = `CHARS creation draft retained: ${String(cause)}`; }
+  }
   export function getCloseState(): EditorCloseState {
     childView;
     collectedView;
     speciesView;
     identityView;
     const own = parent?.getCloseState();
-    const states = [own, ...targets.map(target => entry(target).enabled ? entry(target).session.closeState() : null)]
+    const states = [own, creationClose, ...targets.map(target => entry(target).enabled ? entry(target).session.closeState() : null)]
       .filter((state): state is EditorCloseState => Boolean(state));
     const dirty = states.filter(state => state.unsaved);
     const conflict = dirty.length > 1;
@@ -256,6 +354,7 @@
       operationError = close.saveReason || 'CHARS parent ownership is unavailable.';
       return false;
     }
+    if (creationClose?.unsaved) return creationOperation('save');
     for (const target of targets) {
       const active = entry(target);
       if (active.enabled && active.session.closeState().unsaved) return operate('save', target);
@@ -274,14 +373,14 @@
       {#if linkedEnabled}
       {#if !opened}
         <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-linked-open
-          disabled={!parentReady || Boolean(childOperation) || collectedPending || speciesPending || identityPending}
+          disabled={!linkedParentReady || Boolean(childOperation) || collectedPending || speciesPending || identityPending}
           onclick={() => void operate('load')}>Open linked covers &amp; heights</button>
       {:else}
         {#if childOperation?.target === 'combined' && childOperation.kind === 'load' && childView.busy}
           <button type="button" class="rounded border px-3 py-2" data-chars-linked-cancel onclick={() => cancelRead()}>Cancel linked source read</button>
         {/if}
         <SIVICombinedPanel view={childView}
-          disabled={!parentReady || collectedPending || speciesPending || identityPending} canSave={childClose.canSave}
+          disabled={!linkedParentReady || collectedPending || speciesPending || identityPending} canSave={childClose.canSave}
           onstage={stage} onsave={() => void operate('save')} onundo={() => void operate('undo')}
           onreload={() => void operate('load')}
           onrestore={action => void operate(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
@@ -290,7 +389,7 @@
       {#if collectedEnabled}
         {#if !collectedOpened}
           <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-collected-open
-            disabled={!parentReady || Boolean(childOperation) || combinedPending || speciesPending || identityPending}
+            disabled={!linkedParentReady || Boolean(childOperation) || combinedPending || speciesPending || identityPending}
             onclick={() => void operate('load', 'collected')}>Open linked Collected cycles</button>
         {:else}
           {#if childOperation?.target === 'collected' && childOperation.kind === 'load' && collectedView.busy}
@@ -298,7 +397,7 @@
               onclick={() => cancelRead('collected')}>Cancel linked Collected source read</button>
           {/if}
           <SIVICollectedPanel view={collectedView}
-            disabled={!parentReady || combinedPending || speciesPending || identityPending}
+            disabled={!linkedParentReady || combinedPending || speciesPending || identityPending}
             canSave={collectedClose.canSave} oncycle={cycleCollected}
             onsave={() => void operate('save', 'collected')} onundo={() => void operate('undo', 'collected')}
             onreload={() => void operate('load', 'collected')}
@@ -308,14 +407,14 @@
       {#if speciesEnabled}
         {#if !speciesOpened}
           <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-species-open
-            disabled={!parentReady || Boolean(childOperation) || combinedPending || collectedPending || identityPending}
+            disabled={!linkedParentReady || Boolean(childOperation) || combinedPending || collectedPending || identityPending}
             onclick={() => void operate('load', 'species')}>Open linked Species selections</button>
         {:else}
           {#if childOperation?.target === 'species' && childOperation.kind === 'load' && speciesView.busy}
             <button type="button" class="rounded border px-3 py-2" data-chars-species-cancel
               onclick={() => cancelRead('species')}>Cancel linked Species source/reference read</button>
           {/if}
-          <SIVISpeciesPanel view={speciesView} disabled={!parentReady || combinedPending || collectedPending || identityPending}
+          <SIVISpeciesPanel view={speciesView} disabled={!linkedParentReady || combinedPending || collectedPending || identityPending}
             canSave={speciesClose.canSave} onstage={stageSpecies} oncontext={contextSpecies} onchoose={chooseSpecies}
             onsave={() => void operate('save', 'species')} onundo={() => void operate('undo', 'species')}
             onreload={() => void operate('load', 'species')}
@@ -325,25 +424,36 @@
       {#if identityEnabled}
         {#if !identityOpened}
           <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-identity-open
-            disabled={!parentReady || Boolean(childOperation) || combinedPending || collectedPending || speciesPending}
+            disabled={!linkedParentReady || Boolean(childOperation) || combinedPending || collectedPending || speciesPending}
             onclick={() => void operate('load', 'identity')}>Open linked vegetation IDs</button>
         {:else}
           {#if childOperation?.target === 'identity' && childOperation.kind === 'load' && identityView.busy}
             <button type="button" class="rounded border px-3 py-2" data-chars-identity-cancel
               onclick={() => cancelRead('identity')}>Cancel linked ID source read</button>
           {/if}
-          <SIVIIdentityPanel view={identityView} disabled={!parentReady || combinedPending || collectedPending || speciesPending}
+          <SIVIIdentityPanel view={identityView} disabled={!linkedParentReady || combinedPending || collectedPending || speciesPending}
             canSave={identityClose.canSave} onstage={stageIdentity}
             onsave={() => void operate('save', 'identity')} onundo={() => void operate('undo', 'identity')}
             onreload={() => void operate('load', 'identity')}
             onrestore={action => void operate(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune', 'identity')} />
         {/if}
       {/if}
+      {#if creationEnabled && creationView && creationClose}
+        {#if creationRefreshNeeded}
+          <p role="alert" class="break-words text-sm">Creation is verified. Refresh the owned parent and peers without repeating Create.</p>
+          <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-creation-refresh
+            disabled={creationRecoveryDisabled || creationView.busy}
+            onclick={() => void creationOperation('refresh')}>Refresh verified creation (read-only)</button>
+        {/if}
+        <SIVICreationPanel view={creationView} close={creationClose} {owner} allowedForms={creationForms}
+          disabled={creationEditingDisabled} recoveryDisabled={creationRecoveryDisabled}
+          onoperation={(kind, form) => void creationOperation(kind, form)} onchange={stageCreation} />
+      {/if}
       <p class="text-sm text-stone-600">Saved rows use the original PlotNumber links and extended B3/B4/B5 controls.
         Parent and independently gated covers/heights, Collected, Species and IDs keep separate drafts and typed histories.
         Same-row histories restore in reverse edit order; changed physical rows refuse restoration.
         ID edits have technical history without source field audits. Species selections require an eligible source group;
-        personal-species creation, vegetation creation/deletion,
+        personal-species creation, {creationEnabled ? 'vegetation deletion' : 'vegetation creation/deletion'},
         automatic totals and unqualified source callbacks remain unavailable.
         Reviewed Save is a desktop adaptation, not original Click/NotInList/focus timing parity.</p>
     </section>
@@ -353,5 +463,6 @@
 <SIVICHARSParentForm bind:this={parent} contextId={owner.contextId} project={owner.project} plotNumber={owner.plot}
   onSaved={refreshAfterParentSave} onBusyChange={value => { parentBusy = value; }}
   {peerBlockedReason} collectedAvailable={collectedEnabled} speciesAvailable={speciesEnabled} identityAvailable={identityEnabled}
+  creationAvailable={creationEnabled} peerUnlockAvailable={creationPending && !creationClose?.busy}
   linkedVegetation={vegetationEnabled ? linkedVegetation : undefined} />
 {#if operationError && !vegetationEnabled}<p role="alert" class="text-red-800">{operationError}</p>{/if}

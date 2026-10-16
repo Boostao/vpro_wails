@@ -107,6 +107,41 @@ Explicit Save/reload is the desktop adaptation; original callback timing,
 ProjectID/PlotType, unavailable references, child/whole-form/ribbon parity and
 default/demo promotion are not granted.
 
+### Accepted CHARS source-bound creation composition
+
+The [CHARS owner](../frontend/src/SIVICHARSForm.svelte) composes the existing
+persistent context/project/plot-keyed creator and shared panel. The actual
+extended A/C/D links offer fourteen cover/total fields; the legacy normal
+four-form/twenty-one-field surface remains unchanged. Existing independent
+creation gates and parent prerequisites apply. Foreign retained normal-A
+drafts cannot be rebound or submitted, while explicit owning Undo/recovery
+remains reachable. No new backend, binding, session, flag or allocator is added.
+
+Explicit Species decisions, source membership including zero, all44 stored
+cells, NULL/default distinctions and permanent reservations reuse the accepted
+creator. Unknown cancelled acknowledgements retain the exact request and
+resolve read-only. A verified receipt and per-host refresh marker survive
+remount; failed parent/loaded-peer refresh has a reachable read-only retry
+without another Create. Narrow clean missing-parent read/local unlock permits
+correction/recovery, not parent fields/Save/Lock.
+
+All2469 frontend executions/353 affected cases,1024 existing child plus32
+creator gate combinations, check0/0, coupled races/vet, eight production
+profiles and distinct static review pass. Native independent gates, actual
+three-form creation/all-peer visibility, six-owner barriers, precise close
+acknowledgements, held responses/unknown lookup/stale delivery, failed-parent
+recovery, Cancel/remount/P1/P2/P1 and three-width fields/decisions/receipts pass.
+A wrong selector stops before writes. A later JSON REAL0 Python-tag assertion
+stops after one completed Create; once-only existing scoped Undo recovers that
+row without replay. Four subsequent distinct accepted UI Creates plus that
+initial Create emit ten audits total; five scoped Undos restore exact business/
+audits/old history. Five creation/Undo pairs and five new permanent reservations
+remain, thirteen total; fifteen other files are exact and thirteen owners absent.
+This cleanup is not new CHARS historical Undo UI parity. Full race passes
+root4276.107s with1871 inputs/233 artifacts/discovery and protected data unchanged.
+Original callback/allocator equivalence, deletion/restoration, default/demo
+promotion and whole-form/ribbon completion remain excluded.
+
 ### Accepted CHARS child ID composition
 
 The [CHARS owner](../frontend/src/SIVICHARSForm.svelte) reuses the existing

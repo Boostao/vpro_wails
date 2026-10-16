@@ -63,6 +63,7 @@
   const siviCHARSCollectedEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_COLLECTED_EDITING === 'true';
   const siviCHARSSpeciesEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_SPECIES_EDITING === 'true';
   const siviCHARSIdentityEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_IDENTITY_EDITING === 'true';
+  const siviCHARSCreationEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_CREATION_WRITING === 'true';
   let offset = $state(0);
   let busy = $state(false);
   let error = $state('');
@@ -1010,6 +1011,7 @@
       charsCollected={siviCHARSCollectedEnabled}
       charsSpecies={siviCHARSSpeciesEnabled}
       charsIdentity={siviCHARSIdentityEnabled}
+      charsCreation={siviCHARSCreationEnabled}
       onopenchars={() => void openSIVI('sivi-chars')}
       metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
       onopenmetadata={() => void openProjectMetadata()} />{/if}

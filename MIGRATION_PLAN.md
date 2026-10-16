@@ -147,15 +147,37 @@ preserving1871 inputs/180 artifacts/discovery and canonical/protected/closed
 data. No allocator, callback timing, creation/deletion, whole-form/ribbon or
 default/demo promotion follows.
 
-Next, compose existing persistent source-bound creation for CHARS extended A/C/D.
-Static qualification seals eleven canonical files/two packaged resources.
-Reuse the existing creator/receipt lookup and owner, with three forms/fourteen
-cover/total fields rather than the normal four-form/twenty-one-field surface.
-Retained foreign-form drafts must not be silently reinterpreted; unknown
-acknowledgements and postcommit host-refresh recovery remain distinct lifecycle
-states. Creation implementation/validation/review/native/integration follow
-the accepted identity local commit; deletion/restoration and the remaining
-forms/report/ribbon backlog are still ordered work.
+CHARS source-bound creation is independently reviewed, disposable-native
+accepted and full-race integrated. Eleven canonical files/two packaged resources
+qualify the actual extended A/C/D links and fourteen cover/total controls.
+The existing persistent creator/shared panel, strict receipt lookup and
+independent gates are reused without backend/binding/session/flag changes;
+legacy four-form behavior remains unchanged. Foreign drafts are not rebound.
+Unknown acknowledgement and verified receipt/host-refresh recovery remain
+separate; remounted missing-parent read/local unlock permits recovery without
+enabling parent fields, Save or Lock.
+All2469 frontend executions/353 affected cases,1024 existing child plus32
+creator flag combinations, check0/0, coupled race410.652s/vet and eight
+production profiles pass. Distinct static review finds no significant issues.
+Eight isolated native profiles plus distinct three-form and presentation cycles
+prove source defaults/zero membership, all44 cells, six-owner barriers, complete
+loaded-peer visibility, precise native-close acknowledgements, unknown lookup/
+stale-response rejection, failed-parent recovery, Cancel/remount/P1/P2/P1 and
+actual three-width fields/decisions/buttons/receipts.
+A wrong-selector run stopped with zero writes. A later harness tagged JSON
+REAL0 as integer0 after one completed Create/two audits; its exact scoped Undo
+recovery is preserved without replay. Four subsequent distinct accepted UI
+Creates/eight audits and their scoped Undos restore original business/audits/
+old history and fifteen other files exactly. Five creation/Undo history pairs
+and five new reservations remain, thirteen total; all thirteen owners are absent.
+These cleanup calls are not new CHARS historical Undo UI parity.
+Fresh full race passes root4276.107s with1871 inputs/233 artifacts/discovery,
+canonical/protected assets and the closed family unchanged. Default/demo
+promotion, original callback/allocator equivalence and whole-form parity remain
+excluded. Next compose separately gated CHARS deletion, typed restoration and
+historical creation Undo using the existing persistent boundaries; the private
+source/reuse contract is sealed without further oracle actions. Continue the
+ordered forms/report/ribbon backlog, not a whole-migration completion.
 
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner
 instead of remaining permanently disabled. Both frontend prerequisites, a

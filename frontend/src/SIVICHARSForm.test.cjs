@@ -10,6 +10,7 @@ const { serverComponent } = require('./svelteTestHelpers.cjs');
 const { review, cell } = require('./siviSourceFixture.cjs');
 const wire = require('../../testdata/chars-sivi-entry-client-wire.json');
 const speciesWire = require('./siviSpeciesReferenceFixture.json');
+const creationReceiptTemplate = require('./siviCreationUndoTestHelpers.cjs').review;
 const source = name => readFileSync(path.join(__dirname, name), 'utf8');
 const clone = value => structuredClone(value);
 const deferred = () => {
@@ -22,6 +23,7 @@ function fixture(options = {}) {
   const calls = { parentRead: 0, childRead: 0, collectedRead: 0, parentSave: 0, childSave: 0,
     collectedSave: 0, speciesRead: 0, speciesReferences: 0, speciesSave: 0,
     identityRead: 0, identitySave: 0, identityRestore: 0,
+    creationReferences: 0, create: 0, creationLookup: 0,
     restore: 0, collectedRestore: 0, speciesRestore: 0, refresh: 0, cancelled: 0 };
   const originalParent = clone(wire);
   let currentParent = clone(wire);
@@ -34,6 +36,22 @@ function fixture(options = {}) {
   }
   let currentChild = clone(originalChild);
   const references = { ...clone(speciesWire), contextId: wire.Original.ContextID, project: wire.Original.Project, plot: wire.Original.Plot };
+  function creationReceipt(request, lookup = false) {
+    const template = clone(creationReceiptTemplate().creation);
+    const receipt = { ...template, ...parentOwner(), form: request.form, request: clone(request), covers: clone(request.covers),
+      id: 2147483000 + calls.create, rowId: String(9000 + calls.create),
+      requestId: request.requestId, historyId: request.requestId, didCommit: !lookup, replayed: lookup };
+    receipt.committed.rowId = receipt.rowId;
+    for (const [index, column] of receipt.columns.entries()) {
+      receipt.committed.cells[index] = column.name === 'ID' ? cell('integer', String(receipt.id))
+        : column.name === 'Flag' ? cell('integer', '0')
+        : column.name === 'PlotNumber' ? cell('text', request.plot)
+        : column.name === 'Species' ? cell('text', request.species)
+        : clone(request.covers.find(cover => cover.column === column.name)?.value ?? cell('null'));
+    }
+    return receipt;
+  }
+  function parentOwner() { return { contextId: wire.Original.ContextID, project: wire.Original.Project, plot: wire.Original.Plot }; }
   function requireCommittedRows(edits, committed) {
     const ids = new Set(edits.map(edit => edit.rowId));
     for (let index = 0; index < currentChild.length; index++) {
@@ -48,6 +66,31 @@ function fixture(options = {}) {
   const parentProps = { contextId: wire.Original.ContextID, project: wire.Original.Project, plotNumber: wire.Original.Plot };
   const environment = { VITE_SIVI_CHARS_PARENT_ENTRY: 'true', VITE_SIVI_COMBINED_EDITING: 'true', ...options.environment };
   const api = {
+    SIVICreationService: {
+      GetReferences: async (context, plot) => {
+        calls.creationReferences++;
+        assert.equal(context, wire.Original.ContextID);
+        assert.equal(plot, wire.Original.Plot);
+        return options.creationReferences ? options.creationReferences(calls.creationReferences, clone(references)) : clone(references);
+      },
+      Create: async (context, raw) => {
+        calls.create++;
+        assert.equal(context, wire.Original.ContextID);
+        calls.creationRequest = JSON.parse(raw);
+        const result = creationReceipt(calls.creationRequest);
+        for (const group of currentChild) if (group.Form === result.form) {
+          group.Rows.push({ rowId: result.rowId, cells: group.Columns.map(name =>
+            clone(result.committed.cells[result.columns.findIndex(column => column.name === name)])) });
+        }
+        return options.create ? options.create(calls.creationRequest, result) : result;
+      },
+      LookupReceipt: async (context, raw) => {
+        calls.creationLookup++;
+        assert.equal(context, wire.Original.ContextID);
+        assert.deepEqual(JSON.parse(raw), calls.creationRequest);
+        return options.creationLookup ? options.creationLookup(calls.creationRequest) : creationReceipt(calls.creationRequest, true);
+      },
+    },
     AuditRestoreAction: { AuditRestoreRetain: 'retain', AuditRestorePrune: 'prune' },
     SIVICHARSParentEntryService: {
       Review: async () => {
@@ -227,6 +270,7 @@ function fixture(options = {}) {
     } };
     if (request === 'svelte') return { untrack: runtime.untrack, onMount() {}, onDestroy: callback => cleanups.push(callback) };
     if (request === 'svelte/internal/client') return runtime;
+    if (request === '@wailsio/runtime') return {};
     if (request.endsWith('.svelte')) return { default() {} };
     const target = path.resolve(path.dirname(filename), request);
     if (target.endsWith('.json')) return JSON.parse(readFileSync(target, 'utf8'));
@@ -243,7 +287,9 @@ function fixture(options = {}) {
       : 'contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation';
     script = script.slice(0, declaration.getStart(ast)) + `const { ${properties} } = __props;` +
       script.slice(declaration.end);
-    if (name === 'SIVICHARSParentForm.svelte') script = script.replaceAll('peerBlockedReason', '__props.peerBlockedReason');
+    if (name === 'SIVICHARSParentForm.svelte') {
+      for (const prop of ['peerBlockedReason', 'peerUnlockAvailable']) script = script.replaceAll(prop, '__props.' + prop);
+    }
     const javascript = ts.transpileModule(script.replaceAll('import.meta.env', '__environment'), {
       compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
     }).outputText;
@@ -258,8 +304,10 @@ function fixture(options = {}) {
       request === 'test-owner' ? { props, environment } : dependency(request, filename));
     return module.exports;
   }
-  let parent, form;
-  const disposeEffects = runtime.effect_root(() => {
+  let parent, form, disposeEffects;
+  Object.defineProperty(parentProps, 'peerBlockedReason', { get: () => form.peerReason() });
+  Object.defineProperty(parentProps, 'peerUnlockAvailable', { get: () => form.creationCanUnlock() });
+  function mount() { disposeEffects = runtime.effect_root(() => {
     form = component('SIVICHARSForm.svelte', {
       ...parentProps, onSaved: async () => { calls.refresh++; await options.refresh?.(); },
     }, `export function bindParent(value) { parent = value; }
@@ -282,9 +330,14 @@ function fixture(options = {}) {
       export function identify(kind) { return operate(kind, 'identity'); }
       export function identityDraft(row, raw, nil = false) { stageIdentity(row, raw, nil); }
       export function identitySnapshot() { return identityView; }
-      export function cancelIdentity() { cancelRead('identity'); }`);
+      export function cancelIdentity() { cancelRead('identity'); }
+      export function createRow(kind, source) { return creationOperation(kind, source); }
+      export function creationDraft(value) { stageCreation(value); }
+      export function creationSnapshot() { return creationView; }
+      export function creationCanUnlock() { return creationPending && !creationClose?.busy; }
+      export function retainedCreation() { return creation; }
+      export function creationNeedsRefresh() { return creationRefreshNeeded; }`);
     parentProps.onSaved = form.parentSaved;
-    Object.defineProperty(parentProps, 'peerBlockedReason', { get: form.peerReason });
     parent = component('SIVICHARSParentForm.svelte', parentProps, `
       export function loadSource() { return operation('load'); }
       export function unlock() { locked = false; }
@@ -293,8 +346,18 @@ function fixture(options = {}) {
       export function undoSource() { return operation('undo'); }
       export function restoreSource() { return operation('prune'); }`);
     form.bindParent(parent);
-  });
-  return { calls, parent, form, rowId: originalChild[0].Rows[0].rowId,
+  }); }
+  mount();
+  return { calls, get parent() { return parent; }, get form() { return form; }, rowId: originalChild[0].Rows[0].rowId,
+    creationEditor: () => load(path.join(__dirname, 'siviCreationEditor.ts')),
+    creationFields(form) {
+      const fields = serverComponent(source('SIVICreationFields.svelte'), 'SIVICreationFields.svelte',
+        Object.fromEntries(['siviCoverEditor', 'siviSpeciesEditor', 'vegetationSpeciesEditor', 'siviCreationEditor']
+          .map(name => ['./' + name, load(path.join(__dirname, name + '.ts'))])));
+      const draft = load(path.join(__dirname, 'siviCreationEditor.ts')).beginSIVICreation(form, parentOwner());
+      return render(fields, { props: { draft, owner: parentOwner(), references: clone(references), onchange() {} } }).body;
+    },
+    remount() { for (const cleanup of cleanups.splice(0).reverse()) cleanup(); disposeEffects(); mount(); },
     dispose() { for (const cleanup of cleanups.reverse()) cleanup(); disposeEffects(); } };
 }
 
@@ -312,6 +375,8 @@ test('compiled linked snippet requires exact parent and independent combined/Col
       './SIVICollectedPanel.svelte': { default() {} },
       './SIVIIdentityPanel.svelte': { default() {} },
       './SIVISpeciesPanel.svelte': { default() {} },
+      './SIVICreationPanel.svelte': { default() {} },
+      './siviCreationSessions': { siviCreationSession() { throw new Error('Creation must remain independently gated.'); } },
       '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {}, SIVISpeciesService: {}, SIVIIdentityService: {}, AuditRestoreAction: {} },
       './siviCombinedSession': { SIVICombinedSession: class {
         view() { return { busy: false }; }
@@ -362,6 +427,300 @@ test('compiled linked snippet requires exact parent and independent combined/Col
   assert.match(app, /charsSpecies=\{siviCHARSSpeciesEnabled\}/);
   assert.match(app, /const siviCHARSIdentityEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_IDENTITY_EDITING === 'true'/);
   assert.match(app, /charsIdentity=\{siviCHARSIdentityEnabled\}/);
+});
+
+test('compiled creator gate is independent of all four child gates and exposes only actual CHARS source forms', () => {
+  for (const parent of [undefined, 'false', 'TRUE', 'true']) for (const creation of [undefined, 'false', 'TRUE', 'true'])
+  for (const peers of ['false', 'true']) {
+    let panels = 0;
+    const parentStub = serverComponent('<script>let { linkedVegetation } = $props();</script>{@render linkedVegetation?.()}',
+      'parent.svelte', {});
+    const panelStub = serverComponent(`<script>import { record } from 'proof';
+      let { allowedForms } = $props();</script>{record(allowedForms)}<div data-creator-proof></div>`, 'creator.svelte',
+      { proof: { record: forms => {
+        panels++;
+        assert.deepEqual(Array.from(forms), ['SubVegA-SIVI', 'SubVegC-SIVI', 'SubVegD-SIVI']);
+        return '';
+      } } });
+    class Child {
+      view() { return { busy: false }; }
+      closeState() { return { busy: false, unsaved: false, blocked: false }; }
+      dispose() {}
+    }
+    const component = serverComponent(source('SIVICHARSForm.svelte'), 'SIVICHARSForm.svelte', {
+      '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {},
+        SIVISpeciesService: {}, SIVIIdentityService: {}, AuditRestoreAction: {} },
+      './SIVICHARSParentForm.svelte': { default: parentStub },
+      ...Object.fromEntries(['Combined', 'Collected', 'Species', 'Identity'].map(name => ['./SIVI' + name + 'Panel.svelte', { default() {} }])),
+      ...Object.fromEntries(['Combined', 'Collected', 'Species', 'Identity']
+        .map(name => ['./sivi' + name + 'Session', { ['SIVI' + name + 'Session']: Child }])),
+      './SIVICreationPanel.svelte': { default: panelStub },
+      './siviCreationSessions': { siviCreationSession: () => ({
+        view: () => ({ receipt: null, draft: null, revision: 0 }),
+        closeState: () => ({ unsaved: false, busy: false, blocked: false, canSave: false }),
+      }) },
+    }, { VITE_SIVI_CHARS_PARENT_ENTRY: parent, VITE_SIVI_CREATION_WRITING: creation,
+      VITE_SIVI_COMBINED_EDITING: peers, VITE_SIVI_COLLECTED_EDITING: peers,
+      VITE_SIVI_SPECIES_EDITING: peers, VITE_SIVI_IDENTITY_EDITING: peers });
+    const html = render(component, { props: { contextId: 'owned', project: 'Sample', plotNumber: 'P' } }).body;
+    const enabled = parent === 'true' && creation === 'true';
+    assert.equal(panels, enabled ? 1 : 0);
+    assert.equal(html.includes('data-creator-proof'), enabled);
+  }
+  assert.match(source('App.svelte'), /const siviCHARSCreationEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_CREATION_WRITING === 'true'/);
+  assert.match(source('App.svelte'), /charsCreation=\{siviCHARSCreationEnabled\}/);
+});
+
+test('actual CHARS creation fields expose fourteen labelled covers/totals and no height or identity assignment', () => {
+  const f = fixture();
+  try {
+    const expected = {
+      'SubVegA-SIVI': ['Cover1', 'Cover2', 'Cover3', 'TotalA', 'Cover4', 'Cover5', 'Cover5a', 'Cover5b', 'Cover5c', 'TotalB'],
+      'SubVegC-SIVI': ['Cover6'], 'SubVegD-SIVI': ['Cover7', 'Cover8', 'Cover9'],
+    };
+    let controls = 0;
+    for (const [form, columns] of Object.entries(expected)) {
+      const html = f.creationFields(form);
+      for (const column of columns) {
+        const id = `sivi-creation-${form}-${column}`;
+        assert.equal(html.split(`id="${id}"`).length - 1, 1);
+        assert.match(html, new RegExp(`for="${id}"`));
+        controls++;
+      }
+      assert.equal([...html.matchAll(/<input[^>]*id="sivi-creation-/g)].length, columns.length + 1);
+      assert.doesNotMatch(html, /id="[^"]*(?:Height|Layer|Collected|PlotNumber|\bID)"/);
+    }
+    assert.equal(controls, 14);
+  } finally { f.dispose(); }
+});
+
+async function creationFixture(options = {}) {
+  const f = fixture({ ...options, environment: { VITE_SIVI_CREATION_WRITING: 'true', ...options.environment } });
+  assert.equal(await f.parent.loadSource(), true);
+  f.parent.unlock();
+  return f;
+}
+function validCreation(f, form = 'SubVegA-SIVI', raw = '0') {
+  const editor = f.creationEditor();
+  const original = f.form.creationSnapshot().draft;
+  assert.equal(original.form, form);
+  const species = form === 'SubVegD-SIVI' ? 'MOSS' : form === 'SubVegC-SIVI' ? 'MINE' : 'TREE';
+  const column = form === 'SubVegC-SIVI' ? 'Cover6' : form === 'SubVegD-SIVI' ? 'Cover7' : 'Cover5a';
+  let draft = editor.stageSIVICreationSpecies(original, species);
+  if (form === 'SubVegC-SIVI') draft = editor.chooseSIVICreationSpecies(draft, f.form.creationSnapshot().references,
+    { contextId: draft.contextId, project: draft.project, plot: draft.plot }, 'user', 'MINE');
+  f.form.creationDraft(editor.stageSIVICreationCover(draft, column, raw, false));
+}
+
+test('actual CHARS creator requires its own gate, source parent and exact three forms without a second owner', async () => {
+  const off = fixture();
+  try {
+    assert.equal(await off.form.createRow('load'), false);
+    assert.equal(off.calls.creationReferences, 0);
+  } finally { off.dispose(); }
+  const f = fixture({ environment: { VITE_SIVI_CREATION_WRITING: 'true', VITE_SIVI_COMBINED_EDITING: 'false' } });
+  try {
+    assert.equal(await f.form.createRow('load'), false);
+    assert.equal(f.calls.creationReferences, 0);
+    assert.equal(await f.parent.loadSource(), true);
+    f.parent.unlock();
+    assert.equal(await f.form.createRow('load'), true);
+    assert.equal(await f.form.createRow('start', 'SubVegA-SIVI_BC'), false);
+    for (const form of ['SubVegA-SIVI', 'SubVegC-SIVI', 'SubVegD-SIVI']) {
+      assert.equal(await f.form.createRow('start', form), true);
+      validCreation(f, form);
+      assert.equal(f.form.getCloseState().canSave, true, f.form.getCloseState().saveReason);
+      assert.equal(await f.form.saveForClose(), true);
+      const receipt = f.form.creationSnapshot().receipt;
+      assert.equal(receipt.form, form);
+      assert.equal(receipt.original.cells.length, 44);
+      assert.equal(receipt.original.cells.filter(value => value.storage === 'null').length, 43);
+      assert.equal(receipt.committed.cells.filter(value => value.storage === 'null').length, 39);
+      assert.deepEqual(receipt.covers.map(cover => [cover.column, cover.value.real]),
+        [[form === 'SubVegC-SIVI' ? 'Cover6' : form === 'SubVegD-SIVI' ? 'Cover7' : 'Cover5a', 0]]);
+      assert.equal(Object.hasOwn(f.calls.creationRequest, 'id'), false);
+      assert.equal(f.form.creationNeedsRefresh(), false);
+    }
+    assert.equal(f.calls.create, 3);
+    assert.equal(f.calls.parentSave, 0);
+    assert.equal(f.calls.creationLookup, 0);
+  } finally { f.dispose(); }
+});
+
+test('creator raw validation and owning correction survive remount and block every child/parent and close Save', async () => {
+  const f = await creationFixture({ environment: {
+    VITE_SIVI_COLLECTED_EDITING: 'true', VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_IDENTITY_EDITING: 'true' } });
+  try {
+    assert.equal(await f.form.createRow('load'), true);
+    assert.equal(await f.form.createRow('start', 'SubVegA-SIVI'), true);
+    validCreation(f, 'SubVegA-SIVI', '100');
+    const retained = f.form.retainedCreation();
+    assert.equal(f.form.getCloseState().blocked, true);
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(await f.form.perform('load'), false);
+    assert.equal(await f.form.collect('load'), false);
+    assert.equal(await f.form.select('load'), false);
+    assert.equal(await f.form.identify('load'), false);
+    f.parent.draft('RootZoneParticleSize', { kind: 'text', raw: 'FINE' });
+    assert.equal(f.parent.getCloseState().unsaved, false);
+    f.remount();
+    assert.equal(f.form.retainedCreation(), retained);
+    assert.equal(f.form.creationSnapshot().draft.cells.Cover5a.raw, '100');
+    assert.equal(f.form.getCloseState().canSave, false);
+    assert.equal(await f.parent.loadSource(), true, 'fresh parent read remains available for retained peer recovery');
+    f.parent.unlock();
+    validCreation(f);
+    assert.equal(f.form.creationSnapshot().error, null);
+    assert.equal(f.form.getCloseState().canSave, true);
+    assert.equal(await f.form.createRow('undo'), true);
+    assert.equal(f.calls.create, 0);
+    assert.equal(f.form.getCloseState().unsaved, false);
+  } finally { f.dispose(); }
+});
+
+test('a retained normal standard-A draft is not silently rebound, submitted or erased by CHARS remount', async () => {
+  const f = await creationFixture();
+  try {
+    assert.equal(await f.form.createRow('load'), true);
+    f.form.retainedCreation().start('SubVegA-SIVI_BC');
+    f.remount();
+    assert.equal(await f.parent.loadSource(), true);
+    f.parent.unlock();
+    assert.equal(f.form.creationSnapshot().draft.form, 'SubVegA-SIVI_BC');
+    assert.equal(f.form.getCloseState().blocked, true);
+    assert.equal(await f.form.createRow('save'), false);
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(f.calls.create, 0);
+    assert.equal(await f.form.createRow('undo'), true);
+    assert.equal(await f.form.createRow('start', 'SubVegA-SIVI'), true);
+  } finally { f.dispose(); }
+});
+
+test('verified creation refresh failure preserves receipt and reachable read-only recovery without originals or Create replay', async () => {
+  let fail = true;
+  const f = await creationFixture({ parentRead: (count, value) => {
+    if (count > 1 && fail) throw new Error('parent projection unavailable');
+    return value;
+  } });
+  try {
+    assert.equal(await f.form.perform('load'), true);
+    assert.equal(await f.form.createRow('load'), true);
+    assert.equal(await f.form.createRow('start', 'SubVegA-SIVI'), true);
+    validCreation(f);
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(f.calls.create, 1);
+    assert.equal(f.form.creationSnapshot().draft, null);
+    assert.ok(f.form.creationSnapshot().receipt);
+    assert.equal(f.form.creationNeedsRefresh(), true);
+    assert.equal(f.parent.snapshot().original, null);
+    assert.equal(await f.form.createRow('save'), false);
+    assert.equal(f.calls.create, 1);
+    fail = false;
+    assert.equal(await f.form.createRow('refresh'), true);
+    assert.equal(f.form.creationNeedsRefresh(), false);
+    assert.equal(f.calls.childRead, 2);
+    const receipt = f.form.creationSnapshot().receipt;
+    f.remount();
+    assert.deepEqual(f.form.creationSnapshot().receipt, receipt);
+    assert.equal(f.form.creationNeedsRefresh(), true, 'new host independently refreshes the retained irreversible receipt');
+    assert.equal(await f.parent.loadSource(), true);
+    f.parent.unlock();
+    assert.equal(await f.form.createRow('refresh'), true);
+    assert.equal(f.calls.create, 1);
+  } finally { f.dispose(); }
+});
+
+test('cancelled actual Create acknowledgement retains exact request; remount resolves read-only and rejects old completion', async () => {
+  const held = deferred();
+  const f = await creationFixture({ create: (_request, result) => { held.result = result; return held.promise; } });
+  try {
+    assert.equal(await f.form.createRow('load'), true);
+    assert.equal(await f.form.createRow('start', 'SubVegA-SIVI'), true);
+    validCreation(f);
+    const saving = f.form.saveForClose();
+    assert.equal(f.form.getCloseState().busy, true);
+    assert.equal(await f.form.createRow('cancel'), true);
+    const requestId = f.form.creationSnapshot().requestId;
+    assert.equal(f.form.creationSnapshot().blocked, true);
+    f.remount();
+    assert.equal(f.form.creationSnapshot().requestId, requestId);
+    assert.equal(await f.parent.loadSource(), true);
+    f.parent.unlock();
+    assert.equal(await f.form.createRow('resolve'), true);
+    assert.equal(f.calls.create, 1);
+    assert.equal(f.calls.creationLookup, 1);
+    assert.equal(f.form.creationSnapshot().receipt.replayed, true);
+    held.resolve(held.result);
+    assert.equal(await saving, false);
+    assert.equal(f.form.creationSnapshot().receipt.replayed, true);
+    assert.equal(f.form.getCloseState().unsaved, false);
+  } finally { f.dispose(); }
+});
+
+test('creator definition Cancel and stale completion retain the current owner and explicit read retry', async () => {
+  const held = deferred();
+  const f = await creationFixture({ creationReferences: (count, value) => {
+    if (count === 1) { held.result = value; return held.promise; }
+    return value;
+  } });
+  try {
+    const loading = f.form.createRow('load');
+    assert.equal(f.form.creationSnapshot().busy, true);
+    assert.equal(await f.form.createRow('cancel'), true);
+    assert.match(f.form.creationSnapshot().error, /cancelled/);
+    assert.equal(await f.form.createRow('start', 'SubVegC-SIVI'), false);
+    f.remount();
+    assert.equal(await f.parent.loadSource(), true);
+    f.parent.unlock();
+    assert.equal(await f.form.createRow('load'), true);
+    held.resolve({ ...held.result, plot: 'FOREIGN' });
+    assert.equal(await loading, false);
+    assert.equal(f.form.creationSnapshot().error, null);
+    assert.equal(await f.form.createRow('start', 'SubVegC-SIVI'), true);
+  } finally { f.dispose(); }
+});
+
+test('every loaded peer refreshes after Create, and failed sibling refresh keeps the same irreversible receipt', async () => {
+  let fail = false;
+  const f = await creationFixture({ environment: {
+    VITE_SIVI_COLLECTED_EDITING: 'true', VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_IDENTITY_EDITING: 'true' },
+    collectedRead: (_count, value) => { if (fail) throw new Error('Collected source unavailable'); return value; } });
+  try {
+    for (const load of [() => f.form.perform('load'), () => f.form.collect('load'),
+      () => f.form.select('load'), () => f.form.identify('load')]) assert.equal(await load(), true);
+    assert.equal(await f.form.createRow('load'), true);
+    assert.equal(await f.form.createRow('start', 'SubVegA-SIVI'), true);
+    validCreation(f);
+    fail = true;
+    assert.equal(await f.form.saveForClose(), false);
+    const receipt = f.form.creationSnapshot().receipt;
+    assert.equal(f.form.creationNeedsRefresh(), true);
+    fail = false;
+    assert.equal(await f.form.createRow('refresh'), true);
+    assert.deepEqual(f.form.creationSnapshot().receipt, receipt);
+    assert.equal(f.calls.create, 1);
+    assert.equal(f.calls.childRead, 3);
+    assert.equal(f.calls.collectedRead, 3);
+    assert.equal(f.calls.speciesRead, 2);
+    assert.equal(f.calls.identityRead, 2);
+    for (const view of [f.form.snapshot(), f.form.collectedSnapshot(), f.form.speciesSnapshot(), f.form.identitySnapshot()]) {
+      const added = view.review[0].Rows.find(row => row.rowId === receipt.rowId);
+      assert.ok(added, 'every loaded peer sees the newly created physical row after explicit recovery');
+    }
+  } finally { f.dispose(); }
+});
+
+test('dirty child peers prevent creator reference reads, start, corrections and mutations before transport', async () => {
+  const f = await creationFixture();
+  try {
+    assert.equal(await f.form.perform('load'), true);
+    f.form.draft(f.rowId, 'Cover5a', '5');
+    assert.equal(await f.form.createRow('load'), false);
+    assert.equal(await f.form.createRow('start', 'SubVegA-SIVI'), false);
+    assert.equal(f.calls.creationReferences, 0);
+    assert.equal(f.calls.create, 0);
+    assert.equal(f.form.getCloseState().unsaved, true);
+  } finally { f.dispose(); }
 });
 
 test('actual client owners react across peer drafts, lock, invalid correction, close Save and independent restoration', async () => {

@@ -5,9 +5,9 @@
   import type { SIVISpeciesOwner } from './siviSpeciesEditor';
   import type { EditorCloseState } from './closeLifecycle';
 
-  let { view, close, owner, disabled = false, recoveryDisabled = false, onoperation, onchange }: {
+  let { view, close, owner, disabled = false, recoveryDisabled = false, allowedForms, onoperation, onchange }: {
     view: SIVICreationView; close: EditorCloseState; owner: SIVISpeciesOwner;
-    disabled?: boolean; recoveryDisabled?: boolean;
+    disabled?: boolean; recoveryDisabled?: boolean; allowedForms?: readonly SIVICreationForm[];
     onoperation: (operation: 'load' | 'start' | 'save' | 'undo' | 'resolve' | 'cancel', form?: SIVICreationForm) => void;
     onchange: (draft: SIVICreationDraft) => void;
   } = $props();
@@ -17,11 +17,17 @@
     { form: 'SubVegC-SIVI', label: 'C herbs' },
     { form: 'SubVegD-SIVI', label: 'D mosses' },
   ];
+  const availableForms = $derived(forms.filter(source => !allowedForms || allowedForms.includes(source.form)));
+  const draftAllowed = $derived(!view.draft || !allowedForms || allowedForms.includes(view.draft.form));
 </script>
 
 <section class="my-3 space-y-3 rounded border border-stone-300 p-3" data-sivi-creation-panel aria-label="SIVI source row creation">
   <h2 class="font-semibold">Create a source-bound SIVI row</h2>
   {#if view.error}<p role="alert" class="break-words text-sm text-red-700">{view.error}</p>{/if}
+  {#if !draftAllowed}
+    <p role="alert" class="break-words text-sm">The retained creation draft belongs to another source form.
+      Return to its owning editor or explicitly Undo it; this editor will not reinterpret or submit it.</p>
+  {/if}
   {#if view.blocked}
     <p role="alert" class="break-words text-sm">Request {view.requestId}: outcome unknown. Do not repeat Create or infer success from matching rows.</p>
     <button type="button" data-sivi-creation-resolve class="rounded border px-3 py-2 disabled:opacity-50"
@@ -34,18 +40,20 @@
   <div class="flex flex-wrap gap-2">
     <button type="button" data-sivi-creation-references class="rounded border px-3 py-2 disabled:opacity-50"
       disabled={disabled || view.busy || view.blocked} onclick={() => onoperation('load')}>Load creation Species definitions</button>
-    {#each forms as source}
+    {#each availableForms as source}
       <button type="button" data-sivi-creation-start={source.form} class="rounded border px-3 py-2 disabled:opacity-50"
         disabled={disabled || view.busy || view.blocked || !view.references || view.draft !== null}
         onclick={() => onoperation('start', source.form)}>New {source.label} row</button>
     {/each}
   </div>
   {#if view.draft && view.references}
-    <SIVICreationFields draft={view.draft} {owner} references={view.references}
-      disabled={disabled || view.busy || view.blocked} {onchange} />
+    {#if draftAllowed}
+      <SIVICreationFields draft={view.draft} {owner} references={view.references}
+        disabled={disabled || view.busy || view.blocked} {onchange} />
+    {/if}
     <div class="flex flex-wrap gap-2">
       <button type="button" data-sivi-creation-save class="rounded border px-3 py-2 disabled:opacity-50"
-        disabled={disabled || !close.canSave} onclick={() => onoperation('save')}>Create reviewed row</button>
+        disabled={disabled || !draftAllowed || !close.canSave} onclick={() => onoperation('save')}>Create reviewed row</button>
       <button type="button" data-sivi-creation-undo class="rounded border px-3 py-2 disabled:opacity-50"
         disabled={view.busy || view.blocked || recoveryDisabled} onclick={() => onoperation('undo')}>Undo unsubmitted creation draft</button>
     </div>

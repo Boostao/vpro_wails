@@ -8,6 +8,43 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+The CHARS creation composition is independently reviewed, disposable-native
+accepted and full-race integrated. Eleven canonical files/two packaged resources
+qualify actual extended A/C/D links/fourteen fields. Existing persistent owner,
+shared panel, strict receipt lookup and independent gates are reused without
+backend/binding/session/flag changes. Foreign drafts, unknown acknowledgements
+and verified receipt/host-refresh recovery remain distinct.
+All22 checks/eight production profiles pass:2469 frontend executions,
+353 affected cases,1024 existing child plus32 creator flag combinations,
+check0/0 and coupled race410.652s/vet. Static reviewer
+b7e43859-52c2-46ec-8371-226905294337 finds no significant issues against the
+exact frozen11-path diff/base and canonical inputs; no reviewer-run tests/native.
+Eight isolated Wails profiles plus distinct three-form/presentation cycles pass.
+Preserved first wrong-selector stop has zero writes/all16 bytes exact.
+Preserved second harness stop tags JSON REAL0 as integer0 after one completed
+Cover5a-zero Create/two audits; correct full44 physical storage and exact durable
+proposal precede once-only scoped Undo recovery. No completed Create is replayed.
+Subsequent distinct Cover5b-zero/C Cover6-zero/D Cover7-zero and D Cover8-zero
+plans prove four accepted UI Creates/eight audits, complete loaded-peer
+visibility, six-owner barriers, specific native-close acknowledgements, held
+chunk-aware response/unknown lookup/stale rejection, failed-parent recovery,
+Cancel/remount/P1/P2/P1 and actual three-width fields/decision/start/reference/
+receipt controls. Five existing scoped Undos across all cycles restore exact
+business/audits/old history; this is not new CHARS Undo UI parity. Five creation/
+Undo pairs and five new reservations remain, thirteen total. Fifteen other files
+are exact and all thirteen native owners are freshly absent.
+Native association SHA256:
+`ef1df40830162d99694386254eeb61f31fc43dc8dcbbc51b240dae143357e2b2`.
+Full race passes exit0, UTC2026-10-16T09:00:28.130351 to10:22:52.850707,
+root4276.107s. All1871 inputs/233 artifacts, discovery, canonical/protected
+assets and closed family match.
+Full-race log SHA256:
+`f91a0009e56d8abb07707dd1f5c9f7c59b38388a130e34da1e343c051b52321b`.
+Integration receipt SHA256:
+`f665bf59bd96cb8debf0eee3253a9bcb2481a6a69f402a3eccf8e503842dbc08`.
+No original callback/allocator equivalence, deletion/restoration,
+default/demo promotion or overall migration completion is claimed.
+
 The CHARS child ID composition is independently reviewed, disposable-native
 accepted and full-race integrated. Eleven canonical files qualify four ID
 bindings, nullable signed32/nonunique index, source audit exclusion and metadata

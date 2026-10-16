@@ -10,7 +10,7 @@ are in [README](README.md), [MIGRATION_PLAN](MIGRATION_PLAN.md),
 - This is the Windows VM, not a remote Linux session.
 - Active repository: `C:\Users\BrunoTremblay\Work\vpro_wails`, branch `main`.
   Shared Boolean predecessor: `6d938d1d27c43d2bd96adcf6ad3c435f4db7f941`.
-  Current accepted CHARS child ID composition is described below. No push.
+  Current accepted CHARS creation composition is described below. No push.
   The old `access-parity-windows-handoff` worktree is not the integration root.
 - Canonical Access exports: `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
   Never modify canonical Access/data; use disposable fixtures for native work.
@@ -598,15 +598,45 @@ accepts; source freeze is released for six related documentation reconciliations
 and coherent local commit. No new backend/binding/flag, allocator, callback
 timing, creation/deletion, default/demo promotion or push.
 
-Next private `chars-child-creation-contract.json` and
-`chars-child-creation-source-seal.json` seal eleven canonical files/two packaged
-resources for static reuse qualification only. After the identity local commit,
-compose existing persistent creation/receipt lookup for extended A/C/D only
-(three forms/fourteen cover-total controls, preserving legacy four/twenty-one).
-Keep foreign retained drafts explicit, creator-specific unknown acknowledgement
-and host-refresh recovery separate, and no second writer/session ownership.
-No creation implementation/native launch is authorized by this source seal alone.
-Continue the ordered forms/report backlog, not a whole-migration completion.
+Identity is committed locally on main as
+`4907f9d2de078dc15431b554dbf250a0838e501b`, required co-author/clean immediate
+status and CRLF-only validated-source association sealed; no push.
+CHARS creation is now independently reviewed, native-accepted and full-race
+integrated. Frozen11-path candidate is based on that identity commit.
+All22 checks/eight production profiles pass:2469 frontend executions,
+353 affected cases, check0/0, coupled race410.652s/vet. Distinct static reviewer
+`b7e43859-52c2-46ec-8371-226905294337` finds no significant issues; it ran no
+tests/native actions. Eleven canonical files/two packaged resources are sealed.
+Persistent creator/shared panel, extended A/C/D/fourteen controls, retained
+foreign drafts, unknown lookup and per-host verified receipt refresh preserve
+legacy defaults. Remount missing-parent read/local unlock remains recovery-only.
+Eight isolated native gate routes pass. Preserve rejected `all-initial`:
+incorrect Species selector, zero Saves/all16 bytes exact. Preserve rejected
+`all-selectors-corrected`: one completed Cover5a-zero Create/two audits before
+Python tagged JSON REAL0 as integer0. Physical REAL/full44 row are correct;
+the correction converts tagged REAL to float in the harness only.
+`all-binding-recovery` removes that row once through existing scoped Undo.
+`all-distinct-cycle` uses different Cover5b-zero/C Cover6-zero/D Cover7-zero
+plans, three actual Creates/six audits, all-peer visibility, six-owner barriers,
+held chunk-aware responses, exact native-close acknowledgements, cancelled
+acknowledgement/read-only resolution, failed-parent recovery and P1/P2/P1.
+`all-presentation` adds one distinct D Cover8-zero Create/two audits and actual
+three-width start/reference/personal-decision/receipt geometry. Five scoped
+Undos across all runs restore business/audits/old history exactly, retaining
+five creation/Undo pairs and five new permanent reservations, thirteen total.
+Fifteen other files are exact; all thirteen native owners are freshly absent.
+No completed Create is replayed; scoped cleanup is not new CHARS Undo UI parity.
+Fresh full race passes exit0, UTC2026-10-16T09:00:28.130351 to10:22:52.850707,
+root4276.107s. All1871 inputs/233 artifacts, discovery, canonical/protected
+assets and closed family are unchanged. `chars-child-creation-integration`
+receipt accepts; release the freeze only for six related documentation
+reconciliations and coherent local commit. No default/demo promotion or push.
+Next `chars-child-lifecycle-contract.json`/source seal qualifies eleven
+canonical files/two packaged resources/twelve reuse inputs, with no new oracle
+actions. After creation commit, compose independent persistent deletion,
+typed restoration and historical creation Undo; do not add another writer or
+inherit destructive Access cleanup. Continue all ordered forms/report/ribbon
+work rather than declaring completion at this accepted composition.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated
 Go overlays and verify exact embed discovery. Generate Wails bindings with

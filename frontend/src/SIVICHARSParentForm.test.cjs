@@ -33,13 +33,23 @@ test('compiled CHARS presentation consumes the exact source and renders every bi
         dispose() {}
       } },
     }, { VITE_SIVI_CHARS_PARENT_ENTRY: flag });
-    const html = render(component, { props: { contextId: 'owned', project: 'Sample', plotNumber: '108050' } }).body;
+    const props = { contextId: 'owned', project: 'Sample', plotNumber: '108050' };
+    const html = render(component, { props }).body;
     assert.ok(snapshots > 0, 'consume the lazy render before claiming profile coverage');
     const fields = [...html.matchAll(/data-chars-field="([^"]+)"/g)].map(match => match[1]);
     assert.equal(fields.length, flag === 'true' ? 71 : 0);
     if (flag !== 'true') {
       assert.match(html, /disabled in this build/);
       continue;
+    }
+    for (const available of [false, true]) {
+      const recovery = render(component, { props: { ...props, peerBlockedReason: 'Retained creator recovery',
+        peerUnlockAvailable: available, creationAvailable: true } }).body;
+      const lock = recovery.match(/<button\b[^>]*data-chars-lock[^>]*>/)?.[0];
+      assert.ok(lock);
+      assert.equal(/\sdisabled(?:=|\s|>)/.test(lock), !available, 'only recovery permits unlocking a clean remounted parent');
+      assert.match(recovery, /data-chars-save[^>]*\sdisabled(?:=|\s|>)/);
+      assert.match(recovery, /id="chars-RootZoneParticleSize"[^>]*\sdisabled(?:=|\s|>)/);
     }
     assert.equal(new Set(fields).size, 71);
     for (const field of source.forms[0].fields.filter(field => field.binding)) {

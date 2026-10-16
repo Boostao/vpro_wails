@@ -225,3 +225,25 @@ test('panel remount keeps safety ahead of guidance and unknown recovery reachabl
   assert.match(root, /siviCreationSession\?\.subscribe/);
   assert.match(root, /<SIVICreationPanel view=\{siviCreationView\}/);
 });
+
+test('shared creation panel restricts CHARS to three source forms without altering legacy four-form callers', () => {
+  const fields = serverComponent('<script lang="ts">let {draft} = $props();</script><div data-retained-form={draft.form}></div>',
+    'CreationFieldsMock.svelte', {});
+  const component = serverComponent(readFileSync(path.join(__dirname, 'SIVICreationPanel.svelte'), 'utf8'),
+    'SIVICreationPanel.svelte', { './SIVICreationFields.svelte': { default: fields } });
+  const forms = ['SubVegA-SIVI', 'SubVegC-SIVI', 'SubVegD-SIVI'];
+  const view = { draft: null, references: { ...owner }, busy: false, blocked: false, error: null, receipt: null };
+  const props = { view, close: { canSave: true }, owner, onoperation() {}, onchange() {} };
+  const legacy = render(component, { props }).body;
+  const chars = render(component, { props: { ...props, allowedForms: forms } }).body;
+  assert.equal([...legacy.matchAll(/data-sivi-creation-start=/g)].length, 4);
+  assert.equal([...chars.matchAll(/data-sivi-creation-start=/g)].length, 3);
+  assert.match(legacy, /data-sivi-creation-start="SubVegA-SIVI_BC"/);
+  assert.doesNotMatch(chars, /data-sivi-creation-start="SubVegA-SIVI_BC"/);
+  const foreign = render(component, { props: { ...props, allowedForms: forms,
+    view: { ...view, draft: { ...owner, form: 'SubVegA-SIVI_BC', species: 'TREE' } } } }).body;
+  assert.match(foreign, /will not reinterpret or submit/);
+  assert.doesNotMatch(foreign, /data-retained-form/);
+  assert.match(foreign, /data-sivi-creation-save[^>]*\sdisabled(?:=|\s|>)/);
+  assert.doesNotMatch(foreign, /data-sivi-creation-undo[^>]*\sdisabled(?:=|\s|>)/);
+});

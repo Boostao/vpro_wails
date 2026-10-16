@@ -85,6 +85,28 @@ Ten native owners are freshly absent. Fresh full race passes root4335.061s,
 preserving1871 inputs/180 artifacts/discovery. No new backend/binding/flag,
 allocator, source callback timing, creation/deletion or default/demo promotion.
 
+CHARS child **creation** now composes the existing persistent creator and shared
+panel under `VITE_SIVI_CREATION_WRITING=true`, independent
+`VPRO_SIVI_CREATION_WRITING=true` and CHARS parent prerequisites. Only the actual
+extended A/C/D links and their fourteen cover/total controls are offered; normal
+four-form behavior remains unchanged. Explicit Species decisions, zero versus
+NULL, all44 stored cells and permanent allocation reservations are preserved.
+Foreign retained drafts are not rebound. Unknown acknowledgements resolve
+read-only; verified receipts survive remount and failed parent/peer refresh
+without another Create. All2469 frontend executions/353 affected cases, check0/0,
+coupled races/vet, eight production profiles and independent static review pass.
+Disposable Wails verifies independent gates, actual three-form creation,
+six-owner barriers, cancellation/remount/recovery and three-width fields,
+decision buttons and receipts. Five completed Creates/ten source audits across
+the preserved failed/recovery and distinct cycles are cleaned by five existing
+scoped Undos, not a new CHARS Undo UI claim; no Create is replayed. Business/
+audits/old history and fifteen other files are exact; five creation/Undo history
+pairs and five new permanent reservations remain, thirteen reservations total.
+All thirteen native owners are absent. Fresh full race passes root4276.107s,
+preserving1871 inputs/233 artifacts/discovery and protected data. No new
+backend/binding/session/flag, original callback/allocator equivalence,
+deletion/restoration, whole-form or default/demo promotion follows.
+
 **Forms > Metadata** now delegates to the existing project-metadata editor for
 the currently open FS882/SIVI plot. It is unavailable until the current editor
 is clean, unlocked and available under `VITE_PROJECT_METADATA_EDITING=true`.
