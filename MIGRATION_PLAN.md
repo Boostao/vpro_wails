@@ -82,12 +82,34 @@ consumed receipts, with fifteen other files unchanged and five owners absent.
 Fresh full race passes (root4345.973s), preserving1871 inputs/89 artifacts and
 discovery. No default/demo or whole-form promotion follows.
 
-Next connect the existing independently gated Collected session/panel to this
-CHARS owner. Nine canonical hashes seal equivalent four-form Collected bindings/
-active Click bodies and TEXT1 storage. Reuse the accepted desktop cycle intent,
-physical ownership and typed history; do not reopen the exhausted original
-mouse-Click oracle or claim its timing/focus parity. Keep parent/combined/
-Collected peers' drafts, recovery and receipts independent; no new writer or flag.
+The CHARS Collected composition is independently reviewed, disposable-native
+accepted and full-race integrated. Nine canonical hashes seal equivalent
+four-form bindings/Click bodies and TEXT1 storage. Existing independent gates,
+session/panel and typed writer are reused; Collected does not require combined.
+Parent/combined/Collected retain separate drafts, errors and receipts. Read-only
+recovery remains reachable after parent or clean-sibling originals disappear.
+Same-row histories restore in reverse edit order under the unchanged complete
+physical-row witness; the corrected mock/regression and UI guidance preserve it.
+All2365 frontend executions, check0/0, focused races/vet and five production
+profiles pass. Actual Wails proves six profiles,12 unique live fields across
+A/C/D, NULL/C/V cycles/unknown-empty noops, three Saves/seven exact audits,
+three retained histories and reverse-order UI pruning, failed source retries
+without replay, navigation Cancel, exact native-close acknowledgement, held
+read/Cancel/remount/P1/P2/P1 and three-width labelled viewport witnesses.
+All business/audit/old history restores; only three new consumed histories remain.
+Fifteen other files are unchanged and eight owners are freshly absent, including
+two preserved zero-write harness failures. Fresh full race passes root4372.733s,
+preserving1871 inputs/143 artifacts/discovery and canonical/protected/closed data.
+The original mouse-Click attempts remain exhausted; no timing/focus parity,
+new writer/flag or default/demo promotion follows.
+
+Next source-qualified work composes the existing independently gated Species
+session/panel with explicit eligible A/C/D contexts. Eleven canonical hashes
+seal four bindings/decision paths, their distinct literal focus destinations,
+required TEXT8, UNION/list policies, original links and metadata early-exit.
+Do not reopen exhausted creation attempts, add metadata writes or relax full-row
+history guards. Implementation and its dependent review/native/integration
+acceptance remain outstanding, not whole-form completion.
 
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner
 instead of remaining permanently disabled. Both frontend prerequisites, a

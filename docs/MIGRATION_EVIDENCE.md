@@ -8,6 +8,33 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+The CHARS Collected composition is independently reviewed, disposable-native
+accepted and full-race integrated. Existing independent parent/Collected gates,
+extended session/panel/writer and original A/C/D links are reused; combined
+remains optional. All2365 frontend executions, check0/0, focused races/vet and
+five production profiles pass. The first validation freeze remains rejected
+for a test-only full-row restoration mock gap; focused successor review accepts
+the corrected reverse-order witness and explicit refusal regression.
+Six actual Wails profiles prove12 unique live physical fields, NULL/C/V cycles,
+unknown/empty noops, three Saves/seven exact audits, three retained/pruned
+histories, sibling/absent-parent read recovery, navigation Cancel, exact native-
+close acknowledgement, actual chunk-aware read/Cancel/remount/P1/P2/P1 and
+three-width labelled viewport witnesses. Two zero-write harness failures remain
+preserved; all eight owners normally close and are freshly absent. Business/
+audits/old history and fifteen other files are exact; only three new consumed
+histories remain. Four explicit seed cells affect only the inherited fixture.
+Same-row histories restore in reverse edit order under unchanged physical-row
+guards. No original Click/focus timing or default/demo promotion is claimed.
+Native association SHA256:
+`186754cd305541e87ca9f34a8508370e9b5b301f9640351cee62df45831b748c`.
+Full race passes exit0, UTC2026-10-16T03:20:01.137547 to04:43:59.485393,
+root4372.733s. All1871 inputs/143 artifacts, package/embed discovery, canonical/
+protected assets and closed family match.
+Full-race log SHA256:
+`66a67ac1784add8fd36e6f488a3aefe464ac94f1bf7bc47cdca5390c531e8f35`.
+Integration receipt SHA256:
+`bc5608be67e79ddf821651337aee668d74d3040872d40fc3bb12a7c1bcb31b9e`.
+
 The CHARS linked cover/height successor is independently reviewed, disposable-
 native accepted and full-race integrated. Its thin composite reuses existing
 extended17-column services/session/panel and original A/C/D PlotNumber links;

@@ -38,8 +38,15 @@ It preserves draft/close decisions and independent backend review denial;
 The separate experimental CHARS parent entry requires its own literal
 `VITE_SIVI_CHARS_PARENT_ENTRY=true` and independent backend opt-in; unsupported
 actions remain disabled. Its linked covers/heights additionally require the
-existing combined-editor frontend/backend gates. This does not complete SIVI callbacks or the original
-ribbon's other functionality.
+existing combined-editor frontend/backend gates. Independently gated Collected
+cycles now reuse the existing editor under `VITE_SIVI_COLLECTED_EDITING=true`
+and `VPRO_SIVI_COLLECTED_EDITING=true`, without requiring the combined gate.
+Parent, covers/heights and Collected retain separate drafts, recovery and typed
+histories. Same-row histories restore in reverse edit order under the unchanged
+full physical-row guard. Actual Wails acceptance and full race integration pass;
+explicit Save is not original Click/focus timing parity. No default or qualified
+demo assets change. Species/identity/lifecycle and remaining SIVI callbacks or
+the original ribbon's other functionality are not completed by this composition.
 
 **Forms > Metadata** now delegates to the existing project-metadata editor for
 the currently open FS882/SIVI plot. It is unavailable until the current editor

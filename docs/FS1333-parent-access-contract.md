@@ -107,6 +107,47 @@ Explicit Save/reload is the desktop adaptation; original callback timing,
 ProjectID/PlotType, unavailable references, child/whole-form/ribbon parity and
 default/demo promotion are not granted.
 
+### Accepted CHARS linked Collected composition
+
+The [CHARS owner](../frontend/src/SIVICHARSForm.svelte) now also composes the
+existing extended Collected session/panel. Exact parent and Collected frontend
+gates are required, with independent backend denial; the combined gate is
+optional. Original A/C/D PlotNumber links, cover-driven membership and one live
+Collected field per physical row remain unchanged. NULL/C/V cycles are reviewed
+click intent, while historical unknown/empty text remains unchanged. Four equal
+active Click procedures and TEXT1 storage are sealed from nine canonical files;
+this does not reopen the two exhausted original mouse-Click attempts or grant
+source Click/modal/focus timing.
+
+Parent, combined and Collected retain separate drafts, validation/errors and
+typed receipts. The shared typed preflight blocks conflicting peers while
+keeping owning correction/Undo live. Root close can Save only one valid dirty
+owner. After commit, read-only recovery can reload an unavailable clean parent
+and explicitly retry a clean sibling whose failed refresh removed originals.
+Neither operation replays mutation. Separate histories are not independent
+out-of-order restoration authority: the existing full physical-row witness
+requires reverse edit order for histories sharing a row. The mock now enforces
+that boundary; explicit out-of-order refusal remains visible and blocks close.
+
+All2365 frontend executions, actual-client three-owner/failed-refresh/retained
+receipt regressions, compiled independent gates, check0/0, focused reused Go
+races/vet and five isolated frontend/Wails profiles pass. Distinct review and
+focused correction are accepted. Actual Wails default/parent/linked/Collected/
+backend-off/all profiles verify12 unique live fields, all source groups, cycles
+and noops, three Saves/seven exact audits, separate retained histories and
+reverse-order UI prune. Held actual chunk-aware responses, failed sibling and
+absent-parent recovery, navigation Cancel, exact native-close acknowledgement,
+read Cancel/remount/P1/P2/P1 and three-width visible label/viewport witnesses pass.
+All business/audits/old history restores exactly; three new consumed histories
+remain, fifteen other files unchanged and eight owners freshly absent.
+Full race passes root4372.733s with1871 inputs/143 artifacts/discovery unchanged.
+
+Four explicit Collected seeds exist only in the new inherited disposable
+fixture. Injected503 responses prove WebView2 recovery, not SQLite failure
+timing. Two zero-write harness assumptions and their exact normal cleanup remain
+rejected evidence. No new writer/binding/flag, metadata/personal-definition
+write, Species/identity/lifecycle or default/demo promotion follows.
+
 ### Accepted CHARS linked covers and heights
 
 The thin [CHARS owner](../frontend/src/SIVICHARSForm.svelte) composes the

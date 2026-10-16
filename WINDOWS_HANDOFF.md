@@ -494,13 +494,49 @@ PowerShell owner, not a retained native app. Private
 `chars-sivi-linked-integration\receipt.json` accepts; source freeze released.
 No new writer, binding, flag, source callback or default/demo promotion.
 
-Next private `chars-sivi-collected-contract.json` and
-`chars-sivi-collected-source-seal.json` seal nine canonical hashes, four equal
-active Click procedures, live bindings and TEXT1 storage. Reuse the existing
-independently gated Collected session/panel inside CHARS, retaining parent/
-combined/Collected drafts, recovery and receipts. The two original mouse-Click
-attempts remain exhausted; no new Access action is authorized. Complete the
-local linked successor commit before starting that implementation.
+The linked successor is committed locally as `c6e4a88` on main; no push.
+The CHARS Collected successor is independently reviewed, native-accepted and
+full-race integrated. Private `chars-sivi-collected-candidate-v2` is the exact
+1871-input accepted freeze. All2365 frontend executions, check0/0, focused
+races/vet and five isolated frontend/Wails profiles pass. The initial check's
+optional blocked-state booleans are corrected. The first passing freeze remains
+rejected because its test-only mock missed the existing full-row restoration
+guard; v2 enforces that guard, tests reverse order and explicit out-of-order
+refusal, and discloses it in UI guidance. Distinct focused follow-up accepts.
+
+One inherited16-file family adds four explicitly recorded disposable Collected
+seed cells only. Actual Wails default/parent/linked/Collected/backend-off/all
+profiles,12 unique live A/C/D fields, NULL/C/V and unknown/empty noops pass.
+Three actual Saves/seven exact audits retain independent receipts through
+failed parent/sibling refresh and read-only recovery. Reverse-order UI pruning
+restores business/audits/old history exactly, with three new consumed histories
+only. Navigation Cancel preserves the owning draft; exact CancelClose200
+precedes correction/release. Held actual chunk-aware response/read Cancel,
+remount/P1/P2/P1 and three-width visible labels/viewport witnesses pass.
+Eight native owners normally close and are freshly absent. Two zero-write
+harness stops remain preserved: wrapper div disabled-property assumption and
+valid-draft navigation-dialog versus invalid-draft alert assumption. Known
+Cancel/owning Undo cleanup preserved exact16-file hashes before the final run.
+No completed mutation was replayed; the other15 files and canonical/predecessor
+bytes remain unchanged. Native association is sealed privately.
+
+Fresh `go test -race -timeout 120m ./...` passes exit0,
+UTC2026-10-16T03:20:01.137547 to04:43:59.485393; root4372.733s.
+All1871 inputs/143 artifacts, package/embed discovery, canonical/protected assets
+and closed family remain unchanged. Private
+`chars-sivi-collected-integration\receipt.json` accepts; source freeze released
+for six documentation reconciliations and coherent authorized local commit.
+The original Collected mouse-Click attempts remain exhausted; no new Access
+action, source timing/focus claim or default/demo promotion is authorized.
+
+Next private `chars-sivi-species-contract.json` and
+`chars-sivi-species-source-seal.json` seal11 canonical hashes for extended child
+Species reuse, explicit A/C/D contexts and metadata no-op. This is distinct from
+the already accepted `chars-sivi-species-action-contract.json`/old
+`chars-sivi-species-candidate` SpeciesListComplete action. Use a new
+`chars-child-species-*` candidate/native/integration namespace, never overwrite
+those accepted action artifacts. Begin application edits only after the
+Collected local commit. No new backend writer, flag or Access oracle is planned.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated
