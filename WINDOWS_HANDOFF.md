@@ -10,7 +10,7 @@ are in [README](README.md), [MIGRATION_PLAN](MIGRATION_PLAN.md),
 - This is the Windows VM, not a remote Linux session.
 - Active repository: `C:\Users\BrunoTremblay\Work\vpro_wails`, branch `main`.
   Shared Boolean predecessor: `6d938d1d27c43d2bd96adcf6ad3c435f4db7f941`.
-  Current accepted CHARS child Species composition is described below. No push.
+  Current accepted CHARS child ID composition is described below. No push.
   The old `access-parity-windows-handoff` worktree is not the integration root.
 - Canonical Access exports: `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
   Never modify canonical Access/data; use disposable fixtures for native work.
@@ -568,14 +568,44 @@ accepts; source freeze released for six related docs and coherent local commit.
 No backend/binding/new flag, exhausted original callback attempt, canonical/native
 Access action, whole-form claim or default/demo promotion follows.
 
-Next private `chars-child-identity-contract.json` and
-`chars-child-identity-source-seal.json` qualify11 canonical files/four ID controls,
-nullable LONG/nonunique index, active audit ID skip and metadata no-op.
-The source seal is static only; no implementation or native acceptance claim.
-Do not revive dormant A/D Recordset rewrites or turn C's warning into cancellation.
-Reuse existing independently gated identity session/panel/writer, signed32/NULL
-rules, full collision/restoration witnesses and zero-source-audit technical
-history. Start application changes only after the accepted Species local commit.
+Species is committed locally on main as
+`09435d056d53fb1465362fe910c5d9e7098872c6`, with required co-author and clean
+immediate status; exact CRLF-only commit association is sealed, no push.
+Identity composes the existing independently gated session/panel/writer through
+four typed children/five owners. Eleven canonical files qualify signed32/NULL,
+nonunique ID index, audit ID skip and metadata no-op; dormant A/D rewrite paths
+grant nothing. All2425 frontend executions/66 focused cases,1024 compiled flag
+combinations, check0/0, coupled races/vet and seven isolated production profiles
+pass. Distinct reviewer1276d8d1-dfb2-4581-b0c4-8e0f7f3d7312 finds no significant
+issues; disposition is sealed. Use installed npm.cmd, not policy-blocked npm.ps1.
+Eight actual Wails gate profiles pass on one derived sixteen-file family,
+without a new database seed. The first endpoint Save commits three ID cells/
+zero audits before a harness omitted the intended permanent reservation table.
+Preserve rejected `all-initial` and accepted `all-binding-recovery`: one scoped
+restoration, not an ID restoration-button UI claim, no completed Save replay.
+`baseline-post-recovery.json` qualifies `all-distinct-cycle`, with different IDs/
+NULL row, five actual UI Saves/ten audits, five-owner reverse UI pruning,
+failed-parent read recovery, held actual responses, precise CancelClose receipts,
+Cancel/remount/P1/P2/P1 and three-width labels/buttons. Business/audits/old history
+and fifteen other files are exact. Across both cycles six consumed histories/
+eight permanent reservation rows remain; three reservations were added relative
+to the post-recovery baseline. All ten native owners are freshly absent.
+Fresh `go test -race -timeout 120m ./...` passes exit0,
+UTC2026-10-16T06:59:04.460400 to08:22:58.263498; root4335.061s.
+All1871 inputs/180 artifacts, discovery, canonical/protected assets and the
+closed family are unchanged. `chars-child-identity-integration\receipt.json`
+accepts; source freeze is released for six related documentation reconciliations
+and coherent local commit. No new backend/binding/flag, allocator, callback
+timing, creation/deletion, default/demo promotion or push.
+
+Next private `chars-child-creation-contract.json` and
+`chars-child-creation-source-seal.json` seal eleven canonical files/two packaged
+resources for static reuse qualification only. After the identity local commit,
+compose existing persistent creation/receipt lookup for extended A/C/D only
+(three forms/fourteen cover-total controls, preserving legacy four/twenty-one).
+Keep foreign retained drafts explicit, creator-specific unknown acknowledgement
+and host-refresh recovery separate, and no second writer/session ownership.
+No creation implementation/native launch is authorized by this source seal alone.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated

@@ -124,12 +124,38 @@ discovery, canonical/protected assets and closed family. No new backend/binding/
 flag, original callback/focus timing, personal creation or default/demo promotion
 follows. Exhausted source attempts remain exhausted.
 
-Next, compose the existing independently gated physical-row ID editor. Static
-qualification seals four bound ID controls, nullable LONG/nonunique index,
-ID audit exclusion and metadata no-op; dormant A/D rewrite paths grant nothing.
-Reuse existing signed32/NULL/collision/history policies, complete peer witnesses
-and typed child ownership. Implementation, review, native and full integration
-remain outstanding; identity/lifecycle and whole-form/ribbon parity are not granted.
+The CHARS child ID composition is independently reviewed, disposable-native
+accepted and full-race integrated. Eleven canonical files qualify four bound ID
+controls, nullable LONG/nonunique index, ID audit exclusion and metadata no-op;
+dormant A/D rewrite paths grant nothing. The existing independently gated
+identity session/panel/writer shares the typed four-child/five-owner boundary
+without backend/binding/flag changes. Separate drafts/errors/receipts, complete
+peer witnesses and zero-source-audit restoration remain intact.
+All2425 frontend executions,66 focused cases,1024 compiled flag combinations,
+check0/0, coupled races/vet and seven isolated frontend/Wails profiles pass;
+distinct review finds no significant issues. Eight native gate profiles pass.
+The first endpoint Save committed three ID cells/zero audits before a harness
+omitted the intended permanent reservation table. One scoped-binding restoration
+recovers it without replay, not an ID restoration-button UI claim. A subsequent
+different-ID/different-NULL-row plan passes five actual UI Saves/ten audits,
+five-owner reverse restoration, held responses, failed-parent recovery, precise
+native-close acknowledgements, Cancel/remount/P1/P2/P1 and three-width controls.
+Original business/audits/old history and fifteen other files are exact; six
+consumed histories/eight permanent reservations remain across both cycles.
+Ten native owners are freshly absent. Fresh full race passes root4335.061s,
+preserving1871 inputs/180 artifacts/discovery and canonical/protected/closed
+data. No allocator, callback timing, creation/deletion, whole-form/ribbon or
+default/demo promotion follows.
+
+Next, compose existing persistent source-bound creation for CHARS extended A/C/D.
+Static qualification seals eleven canonical files/two packaged resources.
+Reuse the existing creator/receipt lookup and owner, with three forms/fourteen
+cover/total fields rather than the normal four-form/twenty-one-field surface.
+Retained foreign-form drafts must not be silently reinterpreted; unknown
+acknowledgements and postcommit host-refresh recovery remain distinct lifecycle
+states. Creation implementation/validation/review/native/integration follow
+the accepted identity local commit; deletion/restoration and the remaining
+forms/report/ribbon backlog are still ordered work.
 
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner
 instead of remaining permanently disabled. Both frontend prerequisites, a

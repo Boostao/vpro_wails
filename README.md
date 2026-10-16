@@ -45,7 +45,7 @@ Parent, covers/heights and Collected retain separate drafts, recovery and typed
 histories. Same-row histories restore in reverse edit order under the unchanged
 full physical-row guard. Actual Wails acceptance and full race integration pass;
 explicit Save is not original Click/focus timing parity. No default or qualified
-demo assets change. Identity/lifecycle and remaining SIVI callbacks or
+demo assets change. Creation/deletion and remaining SIVI callbacks or
 the original ribbon's other functionality are not completed by this composition.
 
 CHARS child **Species** now reuses its existing session/panel/writer under
@@ -64,6 +64,26 @@ only four consumed histories remain, seven owners freshly absent. Fresh full
 race passes root4394.488s with1871 inputs/140 artifacts/discovery unchanged.
 No new backend/binding/flag, metadata write, callback/focus timing claim or
 default/demo promotion follows. See the [CHARS contract](docs/FS1333-parent-access-contract.md).
+
+CHARS child **ID** editing now reuses the independently gated existing identity
+session/panel/writer (`VITE_SIVI_IDENTITY_EDITING=true` and
+`VPRO_SIVI_IDENTITY_EDITING=true`, plus CHARS parent prerequisites). Four typed
+child peers/five owners preserve separate drafts, raw errors and histories.
+Nullable signed32 application IDs remain distinct from physical row identity;
+restoration requires complete peer witnesses and prunes zero source audits.
+All2425 frontend executions,1024 compiled flag combinations, check0/0, focused
+races/vet, seven production profiles and distinct review pass. Disposable Wails
+acceptance verifies ID/NULL editing, five-owner restoration, failed-parent
+recovery without replay, held actual responses and three-width labels/buttons.
+An initial completed endpoint Save was restored once through the scoped binding
+after a harness omitted the intended permanent reservation table; this is not
+an ID restoration-button claim. A subsequent different-ID/different-NULL-row
+cycle verifies five actual UI Saves/ten audits and reverse UI restoration.
+Across both cycles, original business/audits/old history and fifteen other
+files are exact; six consumed histories/eight permanent reservations remain.
+Ten native owners are freshly absent. Fresh full race passes root4335.061s,
+preserving1871 inputs/180 artifacts/discovery. No new backend/binding/flag,
+allocator, source callback timing, creation/deletion or default/demo promotion.
 
 **Forms > Metadata** now delegates to the existing project-metadata editor for
 the currently open FS882/SIVI plot. It is unavailable until the current editor

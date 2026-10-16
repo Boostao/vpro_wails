@@ -10,10 +10,10 @@
   import type { EditorCloseState } from './closeLifecycle';
   import source from '../../resources/fs1333-chars-sivi-layout.json';
 
-  let { contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation, peerBlockedReason = '', collectedAvailable = false, speciesAvailable = false }: {
+  let { contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation, peerBlockedReason = '', collectedAvailable = false, speciesAvailable = false, identityAvailable = false }: {
     contextId: string; project: string; plotNumber: string;
     onSaved?: (plot: string) => void | Promise<void>; onBusyChange?: (busy: boolean) => void;
-    linkedVegetation?: Snippet; peerBlockedReason?: string; collectedAvailable?: boolean; speciesAvailable?: boolean;
+    linkedVegetation?: Snippet; peerBlockedReason?: string; collectedAvailable?: boolean; speciesAvailable?: boolean; identityAvailable?: boolean;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot: plotNumber }));
   const enabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true';
@@ -237,7 +237,7 @@
     Coordinates retain finite source DOUBLE values without new geographic bounds. Numeric blanks mean NULL; spaces are not silently trimmed.
     Dates use exact YYYY-MM-DD HH:MM:SS with an optional fractional second.</p>
   <p role="status" class="text-sm text-amber-800">CHARS ProjectID/PlotType and other source actions,
-    {linkedVegetation ? `child ${speciesAvailable ? '' : 'Species/'}${collectedAvailable ? '' : 'Collected/'}identity/lifecycle and unqualified callbacks,`
+    {linkedVegetation ? `child ${speciesAvailable ? '' : 'Species/'}${collectedAvailable ? '' : 'Collected/'}${identityAvailable ? '' : 'identity/'}lifecycle and unqualified callbacks,`
       : 'child vegetation workflows,'}
     changed SubZone and blank A-horizon assignment remain unavailable in this {linkedVegetation ? 'CHARS editor' : 'parent-only editor'}.
     Use the separately accepted normal SIVI/FS882 workflows where applicable.</p>

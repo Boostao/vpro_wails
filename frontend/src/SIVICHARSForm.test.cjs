@@ -21,6 +21,7 @@ const deferred = () => {
 function fixture(options = {}) {
   const calls = { parentRead: 0, childRead: 0, collectedRead: 0, parentSave: 0, childSave: 0,
     collectedSave: 0, speciesRead: 0, speciesReferences: 0, speciesSave: 0,
+    identityRead: 0, identitySave: 0, identityRestore: 0,
     restore: 0, collectedRestore: 0, speciesRestore: 0, refresh: 0, cancelled: 0 };
   const originalParent = clone(wire);
   let currentParent = clone(wire);
@@ -29,6 +30,7 @@ function fixture(options = {}) {
     row.cells[group.Columns.indexOf('PlotNumber')] = cell('text', wire.Original.Plot);
     if (options.collectedValue) row.cells[group.Columns.indexOf('Collected')] = clone(options.collectedValue);
     if (options.speciesValue) row.cells[group.Columns.indexOf('Species')] = clone(options.speciesValue);
+    if (options.identityValue) row.cells[group.Columns.indexOf('ID')] = clone(options.identityValue);
   }
   let currentChild = clone(originalChild);
   const references = { ...clone(speciesWire), contextId: wire.Original.ContextID, project: wire.Original.Project, plot: wire.Original.Plot };
@@ -173,6 +175,38 @@ function fixture(options = {}) {
         prunedAuditRows: action === 'prune' ? calls.speciesRequest.edits.length : 0, cleanedVegRows: 0, cancelled: false };
     },
   };
+  api.SIVIIdentityService = {
+    GetOriginal: async (context, plot, extended) => {
+      calls.identityRead++;
+      assert.equal(context, wire.Original.ContextID);
+      assert.equal(plot, wire.Original.Plot);
+      assert.equal(extended, true);
+      return options.identityRead ? options.identityRead(calls.identityRead, clone(currentChild)) : clone(currentChild);
+    },
+    SaveReviewed: async (_context, _plot, extended, raw) => {
+      calls.identitySave++;
+      assert.equal(extended, true);
+      calls.identityRequest = JSON.parse(raw);
+      for (const edit of calls.identityRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
+        assert.equal(edit.column, 'ID');
+        if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('ID')] = clone(edit.value);
+      }
+      calls.committedIdentity = clone(currentChild);
+      return options.identitySave ? options.identitySave(calls.identityRequest)
+        : { ChangedCells: calls.identityRequest.edits.length, HistoryID: '501' };
+    },
+    RestoreReviewed: async (_context, _plot, history, action) => {
+      calls.identityRestore++;
+      assert.equal(history, '501');
+      assert.ok(['retain', 'prune'].includes(action));
+      requireCommittedRows(calls.identityRequest.edits, calls.committedIdentity);
+      for (const edit of calls.identityRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
+        if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('ID')] = clone(edit.expected);
+      }
+      return options.identityRestore ? options.identityRestore()
+        : { restoredRows: calls.identityRequest.edits.length, prunedAuditRows: 0, cleanedVegRows: 0, cancelled: false };
+    },
+  };
   const cache = new Map();
   function load(filename) {
     if (cache.has(filename)) return cache.get(filename);
@@ -244,7 +278,11 @@ function fixture(options = {}) {
       export function speciesContext(row, group) { contextSpecies(row, group); }
       export function speciesChoose(row, kind, selected) { chooseSpecies(row, kind, selected); }
       export function speciesSnapshot() { return speciesView; }
-      export function cancelSpecies() { cancelRead('species'); }`);
+      export function cancelSpecies() { cancelRead('species'); }
+      export function identify(kind) { return operate(kind, 'identity'); }
+      export function identityDraft(row, raw, nil = false) { stageIdentity(row, raw, nil); }
+      export function identitySnapshot() { return identityView; }
+      export function cancelIdentity() { cancelRead('identity'); }`);
     parentProps.onSaved = form.parentSaved;
     Object.defineProperty(parentProps, 'peerBlockedReason', { get: form.peerReason });
     parent = component('SIVICHARSParentForm.svelte', parentProps, `
@@ -260,9 +298,10 @@ function fixture(options = {}) {
     dispose() { for (const cleanup of cleanups.reverse()) cleanup(); disposeEffects(); } };
 }
 
-test('compiled linked snippet requires exact parent and independent combined/Collected/Species literal flags', () => {
+test('compiled linked snippet requires exact parent and independent combined/Collected/Species/identity literal flags', () => {
   for (const parent of [undefined, 'false', 'TRUE', 'true']) for (const combined of [undefined, 'false', 'TRUE', 'true'])
-  for (const collected of [undefined, 'false', 'TRUE', 'true']) for (const species of [undefined, 'false', 'TRUE', 'true']) {
+  for (const collected of [undefined, 'false', 'TRUE', 'true']) for (const species of [undefined, 'false', 'TRUE', 'true'])
+  for (const identity of [undefined, 'false', 'TRUE', 'true']) {
     let rendered = 0;
     const parentStub = serverComponent(`<script lang="ts">
       import { record } from 'proof'; let { linkedVegetation } = $props();
@@ -271,8 +310,9 @@ test('compiled linked snippet requires exact parent and independent combined/Col
     const component = serverComponent(source('SIVICHARSForm.svelte'), 'SIVICHARSForm.svelte', {
       './SIVICHARSParentForm.svelte': { default: parentStub }, './SIVICombinedPanel.svelte': { default() {} },
       './SIVICollectedPanel.svelte': { default() {} },
+      './SIVIIdentityPanel.svelte': { default() {} },
       './SIVISpeciesPanel.svelte': { default() {} },
-      '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {}, SIVISpeciesService: {}, AuditRestoreAction: {} },
+      '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {}, SIVISpeciesService: {}, SIVIIdentityService: {}, AuditRestoreAction: {} },
       './siviCombinedSession': { SIVICombinedSession: class {
         view() { return { busy: false }; }
         closeState() { return { busy: false, unsaved: false, blocked: false }; }
@@ -288,18 +328,25 @@ test('compiled linked snippet requires exact parent and independent combined/Col
         closeState() { return { busy: false, unsaved: false, blocked: false }; }
         dispose() {}
       } },
+      './siviIdentitySession': { SIVIIdentitySession: class {
+        view() { return { busy: false }; }
+        closeState() { return { busy: false, unsaved: false, blocked: false }; }
+        dispose() {}
+      } },
     }, { VITE_SIVI_CHARS_PARENT_ENTRY: parent, VITE_SIVI_COMBINED_EDITING: combined,
-      VITE_SIVI_COLLECTED_EDITING: collected, VITE_SIVI_SPECIES_EDITING: species });
+      VITE_SIVI_COLLECTED_EDITING: collected, VITE_SIVI_SPECIES_EDITING: species, VITE_SIVI_IDENTITY_EDITING: identity });
     const html = render(component, { props: { contextId: 'owned', project: 'Sample', plotNumber: 'P' } }).body;
     const combinedEnabled = parent === 'true' && combined === 'true';
     const collectedEnabled = parent === 'true' && collected === 'true';
     const speciesEnabled = parent === 'true' && species === 'true';
-    const enabled = combinedEnabled || collectedEnabled || speciesEnabled;
+    const identityEnabled = parent === 'true' && identity === 'true';
+    const enabled = combinedEnabled || collectedEnabled || speciesEnabled || identityEnabled;
     assert.equal(rendered, enabled ? 1 : 0);
     assert.equal(html.includes('data-chars-linked-vegetation'), enabled);
     assert.equal((html.match(/data-chars-linked-open/g) ?? []).length, combinedEnabled ? 1 : 0);
     assert.equal((html.match(/data-chars-collected-open/g) ?? []).length, collectedEnabled ? 1 : 0);
     assert.equal((html.match(/data-chars-species-open/g) ?? []).length, speciesEnabled ? 1 : 0);
+    assert.equal((html.match(/data-chars-identity-open/g) ?? []).length, identityEnabled ? 1 : 0);
     assert.doesNotMatch(html, /data-sivi-combined-column/);
   }
   assert.equal(compile(source('SIVICHARSForm.svelte'), { filename: 'SIVICHARSForm.svelte', generate: 'client' }).warnings.length, 0);
@@ -313,6 +360,8 @@ test('compiled linked snippet requires exact parent and independent combined/Col
   assert.match(app, /charsCollected=\{siviCHARSCollectedEnabled\}/);
   assert.match(app, /const siviCHARSSpeciesEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_SPECIES_EDITING === 'true'/);
   assert.match(app, /charsSpecies=\{siviCHARSSpeciesEnabled\}/);
+  assert.match(app, /const siviCHARSIdentityEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_IDENTITY_EDITING === 'true'/);
+  assert.match(app, /charsIdentity=\{siviCHARSIdentityEnabled\}/);
 });
 
 test('actual client owners react across peer drafts, lock, invalid correction, close Save and independent restoration', async () => {
@@ -727,6 +776,247 @@ test('same-row sibling history preserves the backend full-row restoration guard 
     assert.equal(f.calls.childSave, 1);
     assert.equal(f.calls.collectedSave, 1);
   } finally { f.dispose(); }
+});
+
+const identityEnvironment = { VITE_SIVI_IDENTITY_EDITING: 'true', VITE_SIVI_COLLECTED_EDITING: 'true',
+  VITE_SIVI_SPECIES_EDITING: 'true' };
+
+for (const [raw, nil, expected] of [
+  ['-2147483648', false, cell('integer', '-2147483648')],
+  ['2147483647', false, cell('integer', '2147483647')],
+  ['', true, cell('null')],
+]) {
+  test(`identity-only client saves exact ${nil ? 'NULL' : raw} and restores with zero source audits`, async () => {
+    const f = fixture({ environment: { VITE_SIVI_IDENTITY_EDITING: 'true', VITE_SIVI_COMBINED_EDITING: 'false' } });
+    try {
+      assert.equal(await f.parent.loadSource(), true);
+      assert.equal(await f.form.identify('load'), false);
+      f.parent.unlock();
+      assert.equal(await f.form.identify('load'), true);
+      f.form.identityDraft(f.rowId, raw, nil);
+      assert.equal(f.form.getCloseState().canSave, true);
+      assert.equal(await f.form.saveForClose(), true);
+      assert.deepEqual(f.calls.identityRequest.edits, [{ rowId: f.rowId, form: 'SubVegA-SIVI',
+        column: 'ID', expected: cell('integer', '1'), value: expected }]);
+      assert.equal(f.form.identitySnapshot().historyId, '501');
+      assert.equal(await f.form.identify('prune'), true);
+      assert.deepEqual(f.form.identitySnapshot().review[0].Rows[0].cells[0], cell('integer', '1'));
+      assert.deepEqual([f.calls.identitySave, f.calls.identityRestore, f.calls.childRead,
+        f.calls.collectedRead, f.calls.speciesRead, f.calls.parentSave], [1, 1, 0, 0, 0, 0]);
+    } finally { f.dispose(); }
+  });
+}
+
+test('identity invalid raw input blocks every actual peer while valid correction and owning Undo remain live', async () => {
+  const f = fixture({ environment: identityEnvironment });
+  try {
+    assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+    assert.equal(await f.form.perform('load'), true);
+    assert.equal(await f.form.collect('load'), true);
+    assert.equal(await f.form.select('load'), true);
+    assert.equal(await f.form.identify('load'), true);
+    for (const raw of ['-2147483649', '2147483648', ' 2', '1.0', '02', '-0', '\ud800']) {
+      f.form.identityDraft(f.rowId, raw);
+      assert.equal(f.form.identitySnapshot().drafts[f.rowId].raw, raw);
+      assert.ok(f.form.identitySnapshot().drafts[f.rowId].error);
+      assert.equal(f.form.getCloseState().unsaved, true);
+      assert.equal(f.form.getCloseState().canSave, false);
+      assert.equal(await f.form.saveForClose(), false);
+      f.form.draft(f.rowId, 'Cover5a', '2'); f.form.cycle(f.rowId); f.form.speciesDraft(f.rowId, 'TREE');
+      f.parent.draft('RootZoneParticleSize', { kind: 'text', raw: 'FINE' });
+      assert.deepEqual(f.form.snapshot().drafts.covers, {});
+      assert.deepEqual(f.form.collectedSnapshot().drafts, {});
+      assert.deepEqual(f.form.speciesSnapshot().drafts, {});
+      assert.equal(f.parent.getCloseState().unsaved, false);
+      assert.equal(await f.parent.undoSource(), false);
+      f.form.identityDraft(f.rowId, '2');
+      assert.equal(f.form.identitySnapshot().drafts[f.rowId].error, null);
+      assert.equal(f.form.getCloseState().canSave, true);
+      assert.equal(await f.form.identify('undo'), true);
+      assert.equal(f.form.getCloseState().unsaved, false);
+    }
+    assert.equal(f.calls.identitySave + f.calls.speciesSave + f.calls.collectedSave + f.calls.childSave + f.calls.parentSave, 0);
+  } finally { f.dispose(); }
+});
+
+test('five owners retain independent histories and restore complete same-row witnesses in reverse edit order', async () => {
+  const f = fixture({ environment: identityEnvironment });
+  try {
+    assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+    for (const load of [f.form.perform, f.form.collect, f.form.select, f.form.identify]) assert.equal(await load('load'), true);
+    f.form.identityDraft(f.rowId, '2'); assert.equal(await f.form.saveForClose(), true);
+    f.form.speciesDraft(f.rowId, 'TREE'); assert.equal(await f.form.saveForClose(), true);
+    f.form.cycle(f.rowId); assert.equal(await f.form.saveForClose(), true);
+    f.form.draft(f.rowId, 'Cover5a', '3'); assert.equal(await f.form.saveForClose(), true);
+    f.parent.draft('RootZoneParticleSize', { kind: 'text', raw: 'FINE' }); assert.equal(await f.form.saveForClose(), true);
+    assert.deepEqual([f.parent.snapshot().historyId, f.form.snapshot().historyId, f.form.collectedSnapshot().historyId,
+      f.form.speciesSnapshot().historyId, f.form.identitySnapshot().historyId], ['101', '201', '301', '401', '501']);
+    assert.equal(await f.form.perform('prune'), true);
+    assert.equal(await f.form.collect('prune'), true);
+    assert.equal(await f.form.select('prune'), true);
+    assert.equal(await f.form.identify('prune'), true);
+    assert.equal(await f.parent.restoreSource(), true);
+    assert.deepEqual(f.form.identitySnapshot().review[0].Rows[0].cells[0], cell('integer', '1'));
+    assert.equal(f.form.speciesSnapshot().review[0].Rows[0].cells[2].text, 'RAW');
+    assert.deepEqual([f.calls.parentSave, f.calls.childSave, f.calls.collectedSave, f.calls.speciesSave, f.calls.identitySave],
+      [1, 1, 1, 1, 1]);
+    assert.deepEqual([f.calls.restore, f.calls.collectedRestore, f.calls.speciesRestore, f.calls.identityRestore], [1, 1, 1, 1]);
+  } finally { f.dispose(); }
+});
+
+for (const owner of ['combined', 'collected', 'species', 'identity']) {
+  test(`${owner} retains exactly-once recovery after a different identity/reference owner loses originals`, async () => {
+    let fail = false;
+    const f = fixture({ environment: identityEnvironment,
+      identityRead: (_count, value) => { if (fail && owner !== 'identity') throw new Error('ID source disappeared'); return value; },
+      speciesReferences: (_count, value) => { if (fail && owner === 'identity') throw new Error('Species references disappeared'); return value; } });
+    const operate = { combined: f.form.perform, collected: f.form.collect, species: f.form.select, identity: f.form.identify }[owner];
+    const view = { combined: f.form.snapshot, collected: f.form.collectedSnapshot,
+      species: f.form.speciesSnapshot, identity: f.form.identitySnapshot }[owner];
+    try {
+      assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+      for (const load of [f.form.perform, f.form.collect, f.form.select, f.form.identify]) assert.equal(await load('load'), true);
+      if (owner === 'combined') f.form.draft(f.rowId, 'Cover5a', '3');
+      else if (owner === 'collected') f.form.cycle(f.rowId);
+      else if (owner === 'species') f.form.speciesDraft(f.rowId, 'TREE');
+      else f.form.identityDraft(f.rowId, '2');
+      fail = true;
+      assert.equal(await f.form.saveForClose(), false);
+      assert.equal(view().historyId, { combined: '201', collected: '301', species: '401', identity: '501' }[owner]);
+      assert.equal(f.form.getCloseState().blocked, true);
+      assert.equal(await f.form.saveForClose(), false);
+      assert.equal(await operate('undo'), false);
+      if (owner !== 'identity') assert.equal(f.form.identitySnapshot().review, null);
+      fail = false;
+      assert.equal(await operate('undo'), true);
+      assert.ok(f.form.identitySnapshot().review);
+      assert.ok(f.form.speciesSnapshot().references);
+      assert.equal(f.form.getCloseState().blocked, false);
+      assert.equal(f.calls.identitySave + f.calls.speciesSave + f.calls.collectedSave + f.calls.childSave, 1);
+      assert.equal(await operate('prune'), true);
+    } finally { f.dispose(); }
+  });
+}
+
+test('identity postcommit absent-parent recovery and parent failed-ID refresh remain reachable without replay', async () => {
+  for (const owner of ['identity', 'parent']) {
+    let fail = false;
+    const f = fixture({ environment: identityEnvironment,
+      parentRead: (_count, value) => { if (fail && owner === 'identity') throw new Error('CHARS parent disappeared'); return value; },
+      identityRead: (_count, value) => { if (fail && owner === 'parent') throw new Error('ID refresh disappeared'); return value; } });
+    try {
+      assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+      assert.equal(await f.form.identify('load'), true);
+      if (owner === 'identity') f.form.identityDraft(f.rowId, '2');
+      else f.parent.draft('RootZoneParticleSize', { kind: 'text', raw: 'FINE' });
+      fail = true;
+      assert.equal(await f.form.saveForClose(), false);
+      const undo = owner === 'identity' ? () => f.form.identify('undo') : f.parent.undoSource;
+      assert.equal(await undo(), false);
+      fail = false;
+      assert.equal(await undo(), true);
+      assert.equal(f.form.getCloseState().blocked, false);
+      assert.equal(f.calls.identitySave + f.calls.parentSave, 1);
+      assert.equal(owner === 'identity' ? await f.form.identify('prune') : await f.parent.restoreSource(), true);
+    } finally { f.dispose(); }
+  }
+});
+
+test('identity source read cancellation is owned and a held Save cannot cancel or replay', async () => {
+  const read = deferred(), save = deferred();
+  const f = fixture({ environment: identityEnvironment,
+    identityRead: (count, value) => count === 1 ? read.promise : value,
+    cancel: () => read.reject(new Error('owned ID read cancelled')), identitySave: () => save.promise });
+  try {
+    assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+    const loading = f.form.identify('load');
+    assert.equal(f.form.getCloseState().busy, true);
+    f.form.cancelSource(); f.form.cancelCollected(); f.form.cancelSpecies();
+    assert.equal(f.calls.cancelled, 0);
+    f.form.cancelIdentity();
+    assert.equal(await loading, false);
+    assert.match(f.form.identitySnapshot().error, /owned ID read cancelled/);
+    assert.equal(await f.form.identify('load'), true);
+    f.form.identityDraft(f.rowId, '2');
+    const saving = f.form.saveForClose();
+    const cancelled = f.calls.cancelled;
+    f.form.cancelIdentity();
+    assert.equal(f.calls.cancelled, cancelled);
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(f.calls.identitySave, 1);
+    save.resolve({ ChangedCells: 1, HistoryID: '501' });
+    assert.equal(await saving, true);
+    assert.equal(await f.form.identify('prune'), true);
+  } finally { f.dispose(); }
+});
+
+test('late identity source cannot populate a remounted client and a clean retry uses current ownership', async () => {
+  const read = deferred();
+  const old = fixture({ environment: identityEnvironment, identityRead: () => read.promise });
+  assert.equal(await old.parent.loadSource(), true); old.parent.unlock();
+  const loading = old.form.identify('load');
+  old.dispose();
+  const next = fixture({ environment: identityEnvironment });
+  try {
+    assert.equal(await next.parent.loadSource(), true); next.parent.unlock();
+    read.resolve(review({ extended: true }));
+    assert.equal(await loading, false);
+    assert.equal(next.form.identitySnapshot().review, null);
+    assert.equal(next.calls.identityRead, 0);
+    assert.equal(await next.form.identify('load'), true);
+  } finally { next.dispose(); }
+});
+
+test('identity backend denial, unsupported source and unchanged NULL never coerce or invent IDs', async () => {
+  for (const options of [
+    { identityRead: () => { throw new Error('SIVI identity editing is disabled in this session'); } },
+    { identityValue: cell('integer', '2147483648') }, { identityValue: cell('text', '1') },
+    { identityValue: cell('real', 1) }, { identityValue: cell('blob', 'ff') }, { identityValue: cell('null') },
+  ]) {
+    const f = fixture({ ...options, environment: identityEnvironment });
+    try {
+      assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+      const loaded = await f.form.identify('load');
+      if (options.identityRead) {
+        assert.equal(loaded, false);
+        assert.match(f.form.identitySnapshot().error, /disabled/);
+      } else if (options.identityValue.storage === 'null') {
+        f.form.identityDraft(f.rowId, '', true);
+        assert.equal(f.form.getCloseState().unsaved, false);
+      } else {
+        assert.equal(loaded, true);
+        f.form.identityDraft(f.rowId, '2');
+        assert.equal(f.form.identitySnapshot().drafts[f.rowId].raw, '2');
+        assert.deepEqual(f.form.identitySnapshot().drafts[f.rowId].expected, options.identityValue);
+        assert.match(f.form.getCloseState().error, /Historical unsupported/);
+        assert.equal(await f.form.identify('undo'), true);
+      }
+      assert.equal(f.calls.identitySave, 0);
+    } finally { f.dispose(); }
+  }
+});
+
+test('identity restoration refuses changed complete rows and rejects invented source audit pruning', async () => {
+  for (const failure of ['changed-peer', 'audit-ack']) {
+    const f = fixture({ environment: identityEnvironment,
+      identityRestore: failure === 'audit-ack' ? () => ({ restoredRows: 1, prunedAuditRows: 1,
+        cleanedVegRows: 0, cancelled: false }) : undefined });
+    try {
+      assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+      assert.equal(await f.form.identify('load'), true);
+      assert.equal(await f.form.perform('load'), true);
+      f.form.identityDraft(f.rowId, '2'); assert.equal(await f.form.saveForClose(), true);
+      if (failure === 'changed-peer') {
+        f.form.draft(f.rowId, 'Cover5a', '3'); assert.equal(await f.form.saveForClose(), true);
+      }
+      assert.equal(await f.form.identify('prune'), false);
+      assert.equal(f.form.getCloseState().blocked, true);
+      assert.equal(f.form.identitySnapshot().historyId, null);
+      assert.equal(await f.form.identify('prune'), false);
+      assert.equal(f.calls.identityRestore, 1);
+      assert.equal(f.calls.identitySave, 1);
+    } finally { f.dispose(); }
+  }
 });
 
 test('Species-only actual client preserves strict Go reference wire and explicit eligible extended source context', async () => {

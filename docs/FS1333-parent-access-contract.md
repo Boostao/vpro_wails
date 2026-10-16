@@ -107,6 +107,39 @@ Explicit Save/reload is the desktop adaptation; original callback timing,
 ProjectID/PlotType, unavailable references, child/whole-form/ribbon parity and
 default/demo promotion are not granted.
 
+### Accepted CHARS child ID composition
+
+The [CHARS owner](../frontend/src/SIVICHARSForm.svelte) reuses the existing
+independently gated identity session/panel/writer. Four bound ID controls qualify
+mutable nullable LONG application IDs, not rowid or PlotNumber. The ID index is
+nonunique; the DAO GenUniqueID default does not prove allocator equivalence.
+AuditTrail excludes ID/PlotNumber and metadata updates exit before mutation.
+Dormant A/D manual rewrites grant nothing; C's cover warning is not cancellation.
+
+Four typed child peers/five owners share clean-peer preflight, refresh and close
+guards while retaining separate raw drafts/errors/receipts. Signed32/NULL rules,
+complete physical peer witnesses, cancelled/stale read rejection and audit-free
+technical history remain unchanged. Retained reservations include old/new IDs
+and survive restoration. Identity restoration requires a real history ID and
+zero source audit pruning; no collision/restoration witness is weakened.
+
+All2425 frontend executions/66 focused cases,1024 compiled flag combinations,
+check0/0, coupled races/vet and seven isolated frontend/Wails profiles pass.
+Distinct review finds no significant issues. Eight actual native gate profiles
+pass. The first three-cell endpoint Save committed before a harness omitted the
+intended reservation table; one scoped-binding restoration recovers it without
+replay, not an ID restoration-button claim. A subsequent plan uses different
+IDs/a different NULL row and proves five UI Saves/ten exact audits, five retained
+histories/reverse UI pruning and three more permanent reservations. Across both
+cycles all original business/audits/old history and fifteen other files are
+exact; six consumed histories/eight reservations remain. Held actual chunk-aware
+responses, failed-parent recovery, precise CancelClose acknowledgements before
+correction/release, Cancel/remount/P1/P2/P1 and three-width controls pass.
+Ten native owners are freshly absent. Full race passes root4335.061s with1871
+inputs/180 artifacts/discovery and canonical/protected/closed data unchanged.
+No backend/binding/flag/allocator, source callback timing, creation/deletion,
+whole-form/ribbon or default/demo promotion follows.
+
 ### Accepted CHARS child Species composition
 
 The [CHARS owner](../frontend/src/SIVICHARSForm.svelte) composes the existing

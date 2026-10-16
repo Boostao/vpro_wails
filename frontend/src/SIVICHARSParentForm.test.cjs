@@ -138,10 +138,10 @@ test('compiled CHARS menu is independently gated and discloses its exact parent/
   });
   for (const available of [false, true]) {
     for (const callback of [undefined, () => {}]) {
-      for (const collected of [false, true]) for (const species of [false, true]) {
+      for (const collected of [false, true]) for (const species of [false, true]) for (const identity of [false, true]) {
       const html = render(component, { props: { view: 'plots', onnavigate: () => {},
         charsAvailable: available, onopenchars: callback, charsLinkedVegetation: combined === 'true',
-        charsCollected: collected, charsSpecies: species } }).body;
+        charsCollected: collected, charsSpecies: species, charsIdentity: identity } }).body;
       const match = html.match(/<button\b[^>]*>[\s\S]*?<span>CHARS SIVI parent — Experimental<\/span>\s*<\/button>/)?.[0];
       assert.ok(match);
       const button = match.slice(match.lastIndexOf('<button'));
@@ -149,10 +149,12 @@ test('compiled CHARS menu is independently gated and discloses its exact parent/
       assert.match(button, available && callback
         ? combined === 'true' ? /separately gated linked covers\/heights/
           : collected ? /separately gated linked Collected cycles/
-            : species ? /separately gated linked Species selections/ : /parent-only entry/
+            : species ? /separately gated linked Species selections/
+              : identity ? /separately gated linked vegetation IDs/ : /parent-only entry/
         : /independent CHARS parent-entry gate/);
       assert.equal(button.includes('Collected cycles'), Boolean(available && callback && collected));
       assert.equal(button.includes('Species selections'), Boolean(available && callback && species));
+      assert.equal(button.includes('vegetation IDs'), Boolean(available && callback && identity));
       }
     }
   }

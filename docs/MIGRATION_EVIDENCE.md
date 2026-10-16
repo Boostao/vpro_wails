@@ -8,6 +8,36 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+The CHARS child ID composition is independently reviewed, disposable-native
+accepted and full-race integrated. Eleven canonical files qualify four ID
+bindings, nullable signed32/nonunique index, source audit exclusion and metadata
+no-op. Existing independent identity gates/session/panel/writer compose through
+four typed peers/five owners, without backend/binding/flag changes.
+All2425 frontend executions/66 focused cases,1024 compiled flag combinations,
+check0/0, coupled races/vet and seven isolated frontend/Wails profiles pass.
+Distinct reviewer1276d8d1-dfb2-4581-b0c4-8e0f7f3d7312 finds no significant issues.
+Eight actual Wails gate profiles pass. Initial endpoint Save commits three ID
+cells/zero audits before a harness omitted the intended reservation table.
+Its once-only scoped-binding restoration is not an ID restoration-button UI
+claim. The distinct subsequent plan uses different IDs/a different NULL row,
+not a replay; five UI Saves/ten exact audits, five retained histories/reverse UI
+pruning, complete-row witnesses, failed-parent recovery, held actual responses,
+precise native-close acknowledgements, Cancel/remount/P1/P2/P1 and three-width
+labelled fields/buttons pass. Across both cycles original business/audits/old
+history and fifteen other files are exact; six consumed histories/eight permanent
+reservations remain. Three reservations are new relative to the post-recovery
+baseline. Ten native owners are freshly absent. No allocator/default/callback
+timing, creation/deletion, whole-form/ribbon or demo promotion is claimed.
+Native association SHA256:
+`9d70d50cf162099fcbd13604069ca03d75f97f07ce871a0a16fed173aba77500`.
+Full race passes exit0, UTC2026-10-16T06:59:04.460400 to08:22:58.263498,
+root4335.061s. All1871 inputs/180 artifacts, package/embed discovery,
+canonical/protected assets and closed family match.
+Full-race log SHA256:
+`145213ae37f830d3978b57dd73032c085368b9e555f1d2dbb727a3b92db62c86`.
+Integration receipt SHA256:
+`33d2bc358ea2d86fe9ec56ef3d15c313773bd2e1ae5d9562ba7056b643d92077`.
+
 The CHARS child Species composition is independently reviewed, disposable-native
 accepted and full-race integrated. Eleven canonical hashes seal four live
 bindings, explicit eligible A/C/D contexts, required TEXT8, decision/list/UNION
