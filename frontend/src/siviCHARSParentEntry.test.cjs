@@ -46,8 +46,52 @@ test('client source-owned request matches the actual strict Go round-trip and pr
     ['SV_WaterTableCM', { kind: 'text', raw: '.1' }],
     ['StartDate', { kind: 'text', raw: '1900' }],
     ['SV_FloodPlain', { kind: 'boolean', value: true }],
+    ['SpeciesListComplete', { kind: 'option', option: 1 }],
   ]) drafts = loaded.stageSIVICHARSParentEntry(value, fields, drafts, column, input);
   assert.deepEqual(JSON.parse(JSON.stringify(loaded.siviCHARSParentEntryRequest(value, fields, drafts))), wire.Request);
+});
+
+test('CHARS Comp./Part. preserves source identity, historical omission and independent request preparation', () => {
+  const fields = policies();
+  for (const stored of [cell(), cell('integer', '-1'), cell('integer', '0'), cell('integer', '7')]) {
+    const value = original(); setCell(value, 'SpeciesListComplete', stored);
+    const retained = loaded.stageSIVICHARSParentEntry(value, fields, {}, 'SpeciesListComplete', { kind: 'original' });
+    const omitted = loaded.siviCHARSParentEntryRequest(value, fields, retained);
+    assert.deepEqual(Array.from(omitted.edits), []);
+    assert.equal(omitted.actions, undefined);
+    for (const option of [1, 2]) {
+      const drafts = loaded.stageSIVICHARSParentEntry(value, fields, {}, 'SpeciesListComplete', { kind: 'option', option });
+      const request = loaded.siviCHARSParentEntryRequest(value, fields, drafts);
+      const next = option === 1 ? '-1' : '0';
+      assert.equal(request.actions?.length ?? 0, stored.storage === 'integer' && stored.integer === next ? 0 : 1);
+      if (request.actions) {
+        assert.equal(request.actions[0].controlId, 'form:frmSIVIsite-CHARS/optSpeciesListComplete');
+        assert.equal(request.actions[0].table, 'Sample_Env');
+        assert.equal(request.actions[0].option, option);
+      }
+    }
+    for (const input of [{ kind: 'clear' }, { kind: 'option', option: null }, { kind: 'option', option: 0 },
+      { kind: 'option', option: 3 }, { kind: 'boolean', value: true }, { kind: 'text', raw: '\ud800' }]) {
+      const drafts = loaded.stageSIVICHARSParentEntry(value, fields, {}, 'SpeciesListComplete', input);
+      assert.match(drafts.SpeciesListComplete.error, /Comp.\/Part./);
+      drafts.SpeciesListComplete.error = null;
+      assert.throws(() => loaded.siviCHARSParentEntryRequest(value, fields, drafts), /Comp.\/Part./);
+    }
+  }
+  for (const mutate of [
+    row => { row.controlId = 'form:frmSIVIsite/optSpeciesListComplete'; },
+    row => { row.table = 'Sample_Admin'; },
+    row => { row.rowId = 'foreign'; },
+    row => { row.contextId = 'foreign'; },
+    row => { row.column = 'PlotType'; },
+    row => { row.expected = row.value; },
+    row => { row.value = cell(); },
+    row => { row.input = { kind: 'original' }; },
+  ]) {
+    const drafts = loaded.stageSIVICHARSParentEntry(original(), fields, {}, 'SpeciesListComplete', { kind: 'option', option: 1 });
+    mutate(drafts.SpeciesListComplete);
+    assert.throws(() => loaded.siviCHARSParentEntryRequest(original(), fields, drafts));
+  }
 });
 
 test('client refuses wrong forms, aliases, physical rows and incomplete or substituted policy cohorts', () => {
@@ -177,7 +221,7 @@ test('draft errors stay explicit until valid correction/retain, while exact sour
   assert.equal(drafts.RootZoneParticleSize.value.text, 'new');
   drafts = loaded.stageSIVICHARSParentEntry(value, fields, drafts, 'RootZoneParticleSize', { kind: 'original' });
   assert.equal(loaded.siviCHARSParentEntryRequest(value, fields, drafts).edits.length, 1);
-  for (const column of ['ProjectID', 'PlotNumber', 'PlotType', 'SpeciesListComplete', 'SV_RootZoneTexture']) {
+  for (const column of ['ProjectID', 'PlotNumber', 'PlotType', 'SV_RootZoneTexture']) {
     assert.throws(() => loaded.stageSIVICHARSParentEntry(value, fields, drafts, column, { kind: 'clear' }), /readonly/);
   }
   for (const mutate of [

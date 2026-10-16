@@ -51,8 +51,21 @@ update paths. Shared guards and client request re-preparation preserve historica
 omission and old receipt restoration; unrelated flags and creation defaults are
 excluded. Focused tests, independent review, disposable native acceptance and
 fresh full race integration pass; earlier failed runs remain rejected.
-Continue the source-qualified CHARS Comp./Part. action; its dormant PlotType
-procedure grants no writer.
+The source-qualified CHARS Comp./Part. action now shares the existing owned
+parent session and atomic direct/action Save, with strict optional action
+transport and full-plan/audited-subset history. All2320 frontend executions,
+205 affected cases,841 coupled Go test/subtest events, check0/0, production
+vet/builds and distinct20-path review pass. Native default/backend denial,
+five Save/prune pairs, six exact cell/audit changes, historical NULL retention,
+same-option zero backend Saves and specific native-close acknowledgement pass.
+One sealed UI Save was recovered after restart by scoped-binding restoration,
+not a restoration-button UI claim; four later pairs use actual UI restoration.
+No completed mutation was replayed. Fresh full race passes (root4453.093s),
+with1869 inputs/98 artifacts/discovery and the closed family unchanged; all six
+owners are freshly absent. Its dormant PlotType procedure grants no writer;
+defaults and the qualified demo remain unchanged. Next connect the existing
+extended17-column combined cover/height editor through CHARS's three original
+PlotNumber links, retaining separate peer drafts/history and close guards.
 
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner
 instead of remaining permanently disabled. Both frontend prerequisites, a

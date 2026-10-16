@@ -124,9 +124,10 @@ func TestSIVICHARSApprovalHoldsActualFamilyReadLockUntilTransactionEnds(t *testi
 
 func TestSIVICHARSOwnedEntryConcurrentReviewedSavesCommitExactlyOnce(t *testing.T) {
 	service, state, review := charsEntryServiceFixture(t)
-	request := SIVICHARSParentEntryWrite{review.Original, []SIVIParentCellEdit{
+	request := SIVICHARSParentEntryWrite{Original: review.Original, Edits: []SIVIParentCellEdit{
 		charsMandatoryEdit(t, review, "SuccessionalStatus"),
 	}}
+
 	start := make(chan struct{})
 	results := make(chan *SIVIParentWriteResult, 2)
 	failures := make(chan error, 2)

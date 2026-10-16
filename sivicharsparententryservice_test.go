@@ -45,7 +45,7 @@ func TestSIVICHARSEntryServiceActualWireMandatoryReferencesAndRestoration(t *tes
 	for _, column := range []string{"Exposure1", "Exposure2", "SuccessionalStatus", "SoilDrainage"} {
 		edits = append(edits, charsMandatoryEdit(t, review, column))
 	}
-	raw, err := json.Marshal(SIVICHARSParentEntryWrite{review.Original, edits})
+	raw, err := json.Marshal(SIVICHARSParentEntryWrite{Original: review.Original, Edits: edits})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,9 +86,10 @@ func TestSIVICHARSEntryServiceIndependentGateStaleAndCancellation(t *testing.T) 
 		t.Fatal(err)
 	}
 	before := databaseBytes(t, service.contexts.projects.sqlite.attachments)
-	request := SIVICHARSParentEntryWrite{review.Original, []SIVIParentCellEdit{
+	request := SIVICHARSParentEntryWrite{Original: review.Original, Edits: []SIVIParentCellEdit{
 		charsEntryEdit(t, review.Original, "SV_WaterTableCM", siviReal(.1)),
 	}}
+
 	if got, err := disabled.Review(context.Background(), state.ContextID, "108050"); err == nil || got != nil {
 		t.Fatal("disabled review leaked source", got, err)
 	}
@@ -114,9 +115,10 @@ func TestSIVICHARSEntryServiceIndependentGateStaleAndCancellation(t *testing.T) 
 
 func TestSIVICHARSEntryTransportRejectsDuplicatesUnknownKeysAndRawUnicode(t *testing.T) {
 	original := charsEntryOriginal(t)
-	request := SIVICHARSParentEntryWrite{original, []SIVIParentCellEdit{
+	request := SIVICHARSParentEntryWrite{Original: original, Edits: []SIVIParentCellEdit{
 		charsEntryEdit(t, original, "RootZoneParticleSize", metadataText("abc")),
 	}}
+
 	data, err := json.Marshal(request)
 	if err != nil {
 		t.Fatal(err)
@@ -150,10 +152,11 @@ func TestSIVICHARSEntryMandatoryFailuresRollbackThenCorrect(t *testing.T) {
 	for _, column := range []string{"Exposure1", "Exposure2", "SuccessionalStatus", "SoilDrainage"} {
 		t.Run(column, func(t *testing.T) {
 			service, state, review := charsEntryServiceFixture(t)
-			request := SIVICHARSParentEntryWrite{review.Original, []SIVIParentCellEdit{
+			request := SIVICHARSParentEntryWrite{Original: review.Original, Edits: []SIVIParentCellEdit{
 				charsEntryEdit(t, review.Original, "SV_WaterTableCM", siviReal(.1)),
 				charsEntryEdit(t, review.Original, column, metadataText("?")),
 			}}
+
 			before := databaseBytes(t, service.contexts.projects.sqlite.attachments)
 			if got, err := service.Save(context.Background(), state.ContextID, "108050", request); err == nil || got != nil {
 				t.Fatal("absent mandatory source code committed", got, err)
@@ -174,7 +177,7 @@ func TestSIVICHARSEntryHistoricalOmissionNullAndOptionalValuesDoNotInventCallbac
 	if err != nil {
 		t.Fatal(err)
 	}
-	request := SIVICHARSParentEntryWrite{review.Original, []SIVIParentCellEdit{
+	request := SIVICHARSParentEntryWrite{Original: review.Original, Edits: []SIVIParentCellEdit{
 		charsEntryEdit(t, review.Original, "Exposure1", metadataText("?")),
 		charsEntryEdit(t, review.Original, "Exposure2", ProjectMetadataCell{Storage: "null"}),
 		charsEntryEdit(t, review.Original, "SuccessionalStatus", ProjectMetadataCell{Storage: "null"}),
@@ -182,6 +185,7 @@ func TestSIVICHARSEntryHistoricalOmissionNullAndOptionalValuesDoNotInventCallbac
 		charsEntryEdit(t, review.Original, "RootZoneParticleSize", metadataText("  Z  ")),
 		charsEntryEdit(t, review.Original, "SV_AhorizonType", metadataText("Other")),
 	}}
+
 	service.readers = siviParentSharedReferenceReaders{}
 	written, err := service.Save(context.Background(), state.ContextID, "108050", request)
 	if err != nil || written == nil || written.ChangedCells != 5 {
@@ -220,7 +224,7 @@ func TestSIVICHARSEntryBorrowedFailureAndInFlightCancellationRetry(t *testing.T)
 				rows[0].Description = &bad
 				return rows, nil
 			}}
-			request := SIVICHARSParentEntryWrite{review.Original, []SIVIParentCellEdit{charsMandatoryEdit(t, review, "SoilDrainage")}}
+			request := SIVICHARSParentEntryWrite{Original: review.Original, Edits: []SIVIParentCellEdit{charsMandatoryEdit(t, review, "SoilDrainage")}}
 			before := databaseBytes(t, service.contexts.projects.sqlite.attachments)
 			got, err := service.Save(ctx, state.ContextID, "108050", request)
 			if err == nil || got != nil || kind == "failure" && !errors.Is(err, failure) ||
@@ -232,7 +236,7 @@ func TestSIVICHARSEntryBorrowedFailureAndInFlightCancellationRetry(t *testing.T)
 	}
 	service.readers = originalReaders
 	if got, err := service.Save(context.Background(), state.ContextID, "108050",
-		SIVICHARSParentEntryWrite{review.Original, []SIVIParentCellEdit{charsMandatoryEdit(t, review, "SoilDrainage")}}); err != nil || got == nil {
+		SIVICHARSParentEntryWrite{Original: review.Original, Edits: []SIVIParentCellEdit{charsMandatoryEdit(t, review, "SoilDrainage")}}); err != nil || got == nil {
 		t.Fatal("failed/cancelled borrowed reference leaked writer lifecycle", got, err)
 	}
 }
@@ -240,7 +244,7 @@ func TestSIVICHARSEntryBorrowedFailureAndInFlightCancellationRetry(t *testing.T)
 func TestSIVICHARSEntryFamilySchemaAndJournalFailuresRecover(t *testing.T) {
 	service, state, review := charsEntryServiceFixture(t)
 	path := service.contexts.projects.sqlite.attachments["VLists"]
-	request := SIVICHARSParentEntryWrite{review.Original, []SIVIParentCellEdit{charsMandatoryEdit(t, review, "SuccessionalStatus")}}
+	request := SIVICHARSParentEntryWrite{Original: review.Original, Edits: []SIVIParentCellEdit{charsMandatoryEdit(t, review, "SuccessionalStatus")}}
 	for _, kind := range []string{"missing", "malformed", "view", "wal"} {
 		t.Run(kind, func(t *testing.T) {
 			switch kind {

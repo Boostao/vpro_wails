@@ -3,7 +3,7 @@
   import { SIVICHARSParentEntryService, AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { SIVICHARSParentEntrySession } from './siviCHARSParentEntrySession';
-  import { siviCHARSParentFields } from './siviCHARSParentEntry';
+  import { siviCHARSParentFields, siviCHARSParentSpeciesAction } from './siviCHARSParentEntry';
   import { siviReferencePolicies } from './referenceEditor';
   import { metadataCellText } from './projectMetadataEditor';
   import type { SourceParentEntryInput } from './sourceParentEntryDraft';
@@ -187,6 +187,31 @@
               {/if}
             </div>
           {/each}
+          {#if group.name === 'Vegetation'}
+            {@const binding = view.original.Bindings.find(row => row.Binding === 'SpeciesListComplete' && row.Implicit)!}
+            {@const original = view.original.Rows[0].Env.cells[binding.Column]}
+            {@const draft = view.drafts.SpeciesListComplete}
+            {@const value = draft?.value ?? original}
+            <div class="min-w-0 space-y-1" data-chars-action="SpeciesListComplete" data-source-control={siviCHARSParentSpeciesAction}>
+              <label class="block text-sm font-medium" for="chars-SpeciesListComplete">Spp List</label>
+              <select id="chars-SpeciesListComplete" class="w-full min-w-0 rounded border p-2" {disabled}
+                aria-invalid={Boolean(draft?.error)} aria-describedby={draft?.error ? 'chars-SpeciesListComplete-error' : undefined}
+                value={value.storage === 'integer' && value.integer === '-1' ? '1'
+                  : value.storage === 'integer' && value.integer === '0' ? '2' : 'original'}
+                onchange={event => {
+                  const option = event.currentTarget.value;
+                  stage('SpeciesListComplete', option === 'original' ? { kind: 'original' } : { kind: 'option', option: Number(option) });
+                }}>
+                <option value="original">Retain original storage ({metadataCellText(original) || (original.storage === 'null' ? 'NULL' : original.storage)})</option>
+                <option value="1">Comp.</option>
+                <option value="2">Part.</option>
+              </select>
+              <button type="button" class="rounded border px-2 py-2 text-xs" {disabled}
+                onclick={() => stage('SpeciesListComplete', { kind: 'original' })}>Retain original Species list complete</button>
+              {#if draft?.error}<p id="chars-SpeciesListComplete-error" role="alert" class="text-sm text-red-800">{draft.error}</p>{/if}
+              <p class="text-xs text-stone-600">Species list complete: Comp. stores Yes (-1); Part. stores No (0). Historical NULL remains by retention, not a new NULL assignment.</p>
+            </div>
+          {/if}
         </div>
       </section>
     {/each}
@@ -195,6 +220,6 @@
     Only Exposure 1/2, Soil Drainage and Successional Status require listed non-NULL codes. Other codes remain literal.
     Coordinates retain finite source DOUBLE values without new geographic bounds. Numeric blanks mean NULL; spaces are not silently trimmed.
     Dates use exact YYYY-MM-DD HH:MM:SS with an optional fractional second.</p>
-  <p role="status" class="text-sm text-amber-800">CHARS ProjectID/PlotType and other implicit source actions, child vegetation workflows,
+  <p role="status" class="text-sm text-amber-800">CHARS ProjectID/PlotType and other source actions, child vegetation workflows,
     changed SubZone and blank A-horizon assignment remain unavailable in this parent-only editor. Use the separately accepted normal SIVI/FS882 workflows where applicable.</p>
 </section>

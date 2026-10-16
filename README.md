@@ -35,8 +35,10 @@ Normal **Forms > Enter/Edit SIVI Data** now delegates to the existing guarded
 standalone opener when `VITE_SIVI_STANDALONE=true` and
 `VITE_SIVI_PARENT_REVIEW=true`, with a selected owned plot and known context.
 It preserves draft/close decisions and independent backend review denial;
-CHARS and other unavailable actions remain disabled. This does not complete
-SIVI callbacks or the original ribbon's other functionality.
+The separate experimental CHARS parent entry requires its own literal
+`VITE_SIVI_CHARS_PARENT_ENTRY=true` and independent backend opt-in; unsupported
+actions remain disabled. This does not complete SIVI callbacks or the original
+ribbon's other functionality.
 
 **Forms > Metadata** now delegates to the existing project-metadata editor for
 the currently open FS882/SIVI plot. It is unavailable until the current editor
@@ -155,8 +157,9 @@ The independently reviewed desktop candidate wires the existing close/navigation
 source-grouped71-binding presentation, reference-safe drafts and explicit
 Save/Undo/history behind independent `VPRO_SIVI_CHARS_PARENT_ENTRY` and
 `VITE_SIVI_CHARS_PARENT_ENTRY` literal flags (both default off). The Forms item
-is explicitly parent-only: child workflows, ProjectID/PlotType and other
-implicit actions remain unavailable, as do changed SubZone and blank Ahorizon.
+is explicitly parent-only: child workflows and ProjectID/PlotType remain
+unavailable, as do changed SubZone and blank Ahorizon. The separately qualified
+Spp List action below adds only Comp./Part. to this same parent owner.
 All200 affected frontend cases,2310 standard frontend lifecycle executions,
 zero-diagnostic check, production vet and isolated default/enabled Wails builds
 pass. Actual Go/client fixtures cover all31 references, including Ahorizon
@@ -194,6 +197,27 @@ all18 original native owners are freshly absent. The source freeze is released.
 The earlier stopped integration remains unaccepted. No default/demo availability
 or whole-form/ribbon parity follows this bounded parent acceptance.
 No default or qualified demo availability has changed.
+
+CHARS **Spp List** now retains the source **Comp.**/**Part.** options through the
+same owned parent draft and atomic Save as direct fields. Comp. stores true=-1;
+Part. stores0. There is no new NULL command: unchanged historical NULL omits,
+and typed restoration preserves it. Source callback timing is an explicit
+Save/reload adaptation, not an automatic Access-event claim. PlotType's unwired
+private procedure grants no writer. Strict optional action transport and complete
+plan/audited-subset history preserve legacy direct-only requests and receipts.
+All2320 frontend executions,205 affected cases,841 coupled Go test/subtest
+events, check0/0, vet, isolated default/enabled production builds and distinct
+20-path review pass. Actual Wails verifies independent gates, five Save/prune
+pairs with six exact changed/audited cells, historical NULL, same-option zero
+backend Saves, retained invalid mixed drafts and the exact native-close
+cancellation acknowledgement before correction. One interrupted UI Save was
+sealed and restored once through the scoped binding after restart; four later
+restorations use the actual UI. No mutation was replayed. Original source,
+audits and old histories remain exact with only five consumed new receipts;
+fifteen other files are unchanged and all six owners are freshly absent.
+Fresh full race passes (root4453.093s), preserving1869 inputs/98 artifacts and
+package/embed discovery. This does not enable children, complete CHARS/ribbon
+parity or promote defaults/demo assets.
 
 The same qualified Yes/No correction is now implemented across normal SIVI
 FloodPlain/source Species actions, two-page common/complete entry and the ordinary

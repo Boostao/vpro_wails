@@ -71,8 +71,41 @@ PlotType procedure using a Variant result without normal's option restoration/
 Refresh, but its optPlotType control has no exported AfterUpdate binding.
 Do not invent a writer from this unwired procedure. SpeciesListComplete does
 have a resolved AfterUpdate binding; original-form callback timing remains
-unqualified. Parent-only desktop observations below do not qualify these actions
-or whole-form/child execution.
+unqualified. The explicit Species Save adaptation below qualifies only Comp./Part.,
+not the unwired PlotType procedure or whole-form/child execution.
+
+### Accepted CHARS Spp List action
+
+The exact source option group `optSpeciesListComplete` owns Comp./Part. values1/2,
+with implicit Env.SpeciesListComplete storage true=-1/false=0. The qualified
+planner rechecks the exported option controls, captions, containment and event
+path; no normal-form identity or direct implicit-column writer is substituted.
+The single CHARS parent session holds source-action and direct drafts together.
+Its optional strict `actions` transport rejects NULL arrays/options, duplicates,
+unknown/recased keys and malformed Unicode, while legacy original/edits requests
+remain valid. Combined planning uses the existing transaction/audits/history;
+complete EntryPlan provenance and audited-subset restoration remain distinct.
+There is no new NULL action. Historical NULL/invalid originals omit unchanged;
+old direct receipts remain readable and historical NULL restoration stays live.
+
+All2320 standard frontend executions,205 affected cases,841 coupled Go
+test/subtest events, check0/0, production vet and default/enabled Wails builds
+pass. Distinct20-path review accepts without significant findings. Disposable
+Wails default/backend-off denial and five Save/prune pairs verify six exact
+changed/audited cells, mixed invalid drafts and specific CancelClose completion
+before correction, same-option zero backend Saves, NULL retention/restoration
+and three-width visible labels/controls. After a rejected clean-Save-disabled
+harness expectation, sealed history9 is restored once through the scoped binding
+in a fresh owned process, not a restoration-button UI claim. Four later pairs
+use actual UI restoration. No completed mutation is replayed. Source/audits/old
+histories remain exact with only five consumed new receipts, fifteen other files
+unchanged and six original owners freshly absent. Fresh full race passes
+(root4453.093s), preserving1869 inputs/98 artifacts, package/embed discovery,
+canonical/protected assets and the closed family.
+
+Explicit Save/reload is the desktop adaptation; original callback timing,
+ProjectID/PlotType, unavailable references, child/whole-form/ribbon parity and
+default/demo promotion are not granted.
 
 All136 coupled CHARS/normal/two-page parent race cases pass (root215.282s),
 as do source-tool races and actual production SQLite-only compilation with
@@ -272,9 +305,9 @@ literal `VPRO_SIVI_CHARS_PARENT_ENTRY` flag and requires the separate
 `VITE_SIVI_CHARS_PARENT_ENTRY` client flag. Both default off. Qualified interface
 bindings and a source-grouped parent-only editor reuse existing owned drafts,
 close/navigation, reference DTO validation and conservative mutation receipts.
-All71 bindings render once;67 domains can be edited. The source's ProjectID/
-PlotType and implicit actions, child workflows and whole-form parity are not
-enabled by this candidate. The new menu caption explicitly identifies the
+All71 bindings render once;67 direct domains can be edited. The source's ProjectID/
+PlotType, child workflows and whole-form parity are not enabled. The separately
+qualified Spp List action above adds only Comp./Part. to this owner. The menu caption explicitly identifies the
 parent-only experimental adaptation rather than claiming full CHARS ribbon
 parity.
 

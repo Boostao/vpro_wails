@@ -1,14 +1,17 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 )
 
 type SIVICHARSParentEntryWrite struct {
-	Original *SIVIParentProjection `json:"original"`
-	Edits    []SIVIParentCellEdit  `json:"edits"`
+	Original *SIVIParentProjection   `json:"original"`
+	Edits    []SIVIParentCellEdit    `json:"edits"`
+	Actions  []SIVIParentActionInput `json:"actions,omitempty"`
 }
 
 func (request *SIVICHARSParentEntryWrite) UnmarshalJSON(data []byte) error {
@@ -17,8 +20,34 @@ func (request *SIVICHARSParentEntryWrite) UnmarshalJSON(data []byte) error {
 	if err := validateSourceParentEntryJSONProperties(data, "CHARS parent entry"); err != nil {
 		return fmt.Errorf("CHARS parent entry transport: %w", err)
 	}
-	if err := decodeStrictRequiredJSON(data, &decoded, "CHARS parent entry", "original", "edits"); err != nil {
+	if err := decodeProfileLifecycleJSON(data, &decoded, "original", "edits"); err != nil {
 		return fmt.Errorf("CHARS parent entry transport: %w", err)
+	}
+	var properties map[string]json.RawMessage
+	if err := json.Unmarshal(data, &properties); err != nil {
+		return fmt.Errorf("CHARS parent entry properties: %w", err)
+	}
+	for key, value := range properties {
+		switch key {
+		case "original", "edits":
+		case "actions":
+			if bytes.Equal(bytes.TrimSpace(value), []byte("null")) {
+				return errors.New("CHARS parent entry actions must be omitted or an explicit array")
+			}
+			var actions []json.RawMessage
+			if err := json.Unmarshal(value, &actions); err != nil {
+				return fmt.Errorf("CHARS parent entry action array: %w", err)
+			}
+			for _, raw := range actions {
+				var action SIVIParentActionInput
+				if err := decodeStrictRequiredJSON(raw, &action, "CHARS source action",
+					"contextId", "controlId", "table", "rowId", "expected", "option"); err != nil {
+					return err
+				}
+			}
+		default:
+			return fmt.Errorf("CHARS parent entry has an unknown property %q", key)
+		}
 	}
 	*request = SIVICHARSParentEntryWrite(decoded)
 	return nil
@@ -59,7 +88,11 @@ func (s *SIVICHARSParentEntryService) Save(ctx context.Context, contextID, plot 
 	if err := s.require(ctx); err != nil {
 		return nil, err
 	}
-	return s.contexts.writeSIVICHARSParentOwnedEntry(ctx, contextID, plot, request.Original, request.Edits, s.readers)
+	actions := make([]siviParentActionEdit, len(request.Actions))
+	for index, input := range request.Actions {
+		actions[index] = siviParentActionEdit{input.ContextID, input.ControlID, input.Table, input.RowID, input.Expected, input.Option}
+	}
+	return s.contexts.writeSIVICHARSParentOwnedProposal(ctx, contextID, plot, request.Original, request.Edits, actions, s.readers)
 }
 
 func (s *SIVICHARSParentEntryService) Restore(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction) (*AuditRestoreResult, error) {

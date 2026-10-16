@@ -8,6 +8,34 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+The qualified CHARS Spp List Comp./Part. successor is independently reviewed,
+native-accepted and full-race integrated. One existing parent session combines
+direct fields and the optional strict source-action transport, with complete
+EntryPlan/audited-subset history and no new NULL writer. All2320 frontend
+executions,205 affected cases,841 coupled Go test/subtest events, check0/0, vet
+and default/enabled production builds pass; distinct20-path review finds no
+significant issues. Actual Wails checks default/backend denial, five Save/prune
+pairs/six cells, historical NULL, same-option zero backend Saves, mixed invalid
+drafts/exact native-close acknowledgement and three-width visible controls.
+The rejected clean-Save-disabled harness assumption follows one sealed UI Save;
+fresh continuation independently verifies that checkpoint and restores history9
+once through the scoped binding, not a restoration-button UI claim. Four later
+pairs use UI restoration. No completed mutation is replayed. Original source/
+audits/old histories and fifteen other files are exact; only consumed histories
+9-13 remain and all six original owners are freshly absent.
+Native association SHA256:
+`0c1cdd59169e0d66973fb1a96c0b9770ce92dd648a27d6e81ba5c662ec50344a`.
+Fresh full race passes exit0, UTC2026-10-15T23:26:20.446546 to
+2026-10-16T00:45:29.320388, root4453.093s. All1869 inputs/98 artifacts,
+package/embed discovery, canonical/protected assets and closed family match.
+Full-race log SHA256:
+`a4516ab715bae06dee9dfb773110daa3f46293d5ccb6ec5144171e14a009a3da`.
+Integration receipt SHA256:
+`fb808ca35384499e123df3e3c9130395e912be87233b5140353499b5b345f53a`.
+Source freeze released. Earlier failed checks remain rejected; callback timing,
+PlotType/ProjectID, child/whole-form/ribbon parity and default/demo promotion
+remain excluded.
+
 The broader qualified Boolean correction is independently reviewed and
 native-accepted and full-race integrated. Tests exercise each
 normal/two-page/ordinary update caller, mixed atomic refusal before approval,
@@ -74,7 +102,7 @@ Full-race log SHA256:
 Integration receipt SHA256:
 `dbb9460abc70a25326656596d1ed2dfed492bbf75b5bfd7e34690708fad0be27`.
 The earlier stopped race remains unaccepted. SubZone, new blank Ahorizon,
-ProjectID/implicit actions, child/whole-form execution and broader ribbon parity
+ProjectID/PlotType, child/whole-form execution and broader ribbon parity
 remain unavailable; no default or qualified-demo promotion occurred.
 
 Predecessor CHARS SIVI internal source ownership is independently reviewed:71 direct

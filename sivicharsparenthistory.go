@@ -26,11 +26,11 @@ func siviCHARSParentEntryHistoryAssignments(ctx context.Context, event siviParen
 		auditedEdits = append(auditedEdits, siviParentScalarEdit{original.ContextID, change.Table, change.RowID,
 			change.Column, change.Before, change.After})
 	}
-	audited, err := planSIVICHARSParentWritableEntry(ctx, original, auditedEdits)
+	audited, err := planSIVICHARSParentHistoryPlan(ctx, original, auditedEdits)
 	if err != nil || len(audited) != len(event.Changes) {
 		return nil, errors.Join(err, errors.New("CHARS typed history contains repeated or unchanged audited assignments"))
 	}
-	planned, err := planSIVICHARSParentWritableEntry(ctx, original, event.EntryPlan)
+	planned, err := planSIVICHARSParentHistoryPlan(ctx, original, event.EntryPlan)
 	if err != nil || len(planned) != len(event.EntryPlan) {
 		return nil, errors.Join(err, errors.New("CHARS typed history contains repeated, unchanged or malformed full source assignments"))
 	}

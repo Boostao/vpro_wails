@@ -100,7 +100,8 @@ export class SIVICHARSParentEntrySession extends SIVIParentScopedWriteSession<st
       return review.value.policies;
     };
     super(owner, conservativePort(port, 'CHARS parent entry'), notify, {
-      label: 'CHARS parent entry', accepts: (column): column is string => policies().some(field => field.column === column),
+      label: 'CHARS parent entry', accepts: (column): column is string =>
+        column === 'SpeciesListComplete' || policies().some(field => field.column === column),
       unavailable: 'CHARS source field is readonly or unavailable.',
       drafts: {
         empty: () => ({}), dirty, errors,
@@ -115,7 +116,7 @@ export class SIVICHARSParentEntrySession extends SIVIParentScopedWriteSession<st
         const error = errors(drafts)[0]; if (error) throw new Error(error);
         return siviCHARSParentEntryRequest(original, policies(), drafts);
       },
-      count: request => request.edits.length,
+      count: request => request.edits.length + (request.actions?.length ?? 0),
     });
     this.review = review;
   }

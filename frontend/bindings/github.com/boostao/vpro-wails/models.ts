@@ -1699,6 +1699,7 @@ export interface SIVICHARSParentEntryReview {
 export interface SIVICHARSParentEntryWrite {
     "original": SIVIParentProjection | null;
     "edits": SIVIParentCellEdit[] | null;
+    "actions"?: SIVIParentActionInput[] | null;
 }
 
 export interface SIVICoverWriteResult {

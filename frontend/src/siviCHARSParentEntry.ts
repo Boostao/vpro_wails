@@ -1,5 +1,5 @@
 import source from '../../resources/fs1333-chars-sivi-layout.json';
-import type { ProjectMetadataCell, SIVIParentCellEdit,
+import type { ProjectMetadataCell, SIVIParentCellEdit, SIVIParentActionInput,
   SIVICHARSParentEntryPolicy as PolicyWire } from '../bindings/github.com/boostao/vpro-wails';
 import { validateSourceParentPhysical, type SIVIParentOriginal } from './siviParentEditor';
 import { equalCell } from './projectMetadataEditor';
@@ -12,10 +12,28 @@ export interface SIVICHARSParentEntryPolicy extends Omit<PolicyWire, 'owner' | '
   kind: 'text' | 'date' | 'integer' | 'single' | 'double' | 'boolean' | 'option';
 }
 export interface SIVICHARSParentEntryDraft extends SIVIParentCellEdit {
-  input: SourceParentEntryInput; error: string | null;
+  input: SourceParentEntryInput; error: string | null; controlId?: string;
 }
 export type SIVICHARSParentEntryDrafts = Record<string, SIVICHARSParentEntryDraft>;
 export const siviCHARSParentFields = source.forms[0].fields.filter(field => field.binding);
+export const siviCHARSParentSpeciesAction = (() => {
+  const fields = source.forms[0].fields.filter(field => field.controlName === 'optSpeciesListComplete');
+  const field = fields[0];
+  if (fields.length !== 1 || field.controlId !== 'form:frmSIVIsite-CHARS/optSpeciesListComplete' ||
+      field.type !== 'OptionGroup' || field.binding || !field.readOnly || field.implementation !== 'unmapped' ||
+      !field.events || field.events.filter(event => event.property === 'AfterUpdate' && event.binding === '[Event Procedure]' &&
+        event.procedure === 'optSpeciesListComplete_AfterUpdate' && event.resolved).length !== 1) {
+    throw new Error('CHARS Species action requires its exact resolved unbound source control.');
+  }
+  const options = source.forms[0].fields.filter(option =>
+    option.type === 'OptionButton' && option.line > field.line && option.endLine < field.endLine);
+  if (options.length !== 2 || options.some((option, index) =>
+    option.controlName !== ['Option618', 'Option620'][index] || option.caption !== ['Comp.', 'Part.'][index] ||
+    !('OptionValue' in option.properties) || option.properties.OptionValue?.value !== String(index + 1))) {
+    throw new Error('CHARS Species action requires the original Comp./Part. option values.');
+  }
+  return field.controlId;
+})();
 const editable = siviCHARSParentFields.filter(field =>
   !['PlotNumber', 'ProjectID', 'PlotType'].includes(field.binding!));
 const kinds = ['text', 'date', 'integer', 'single', 'double', 'boolean', 'option'];
@@ -111,6 +129,21 @@ export function parseSIVICHARSParentValue(policy: SIVICHARSParentEntryPolicy,
 
 export function stageSIVICHARSParentEntry(original: SIVIParentOriginal, policies: readonly SIVICHARSParentEntryPolicy[],
   drafts: SIVICHARSParentEntryDrafts, column: string, input: SourceParentEntryInput): SIVICHARSParentEntryDrafts {
+  if (column === 'SpeciesListComplete') {
+    const binding = original.Bindings.find(row => row.Binding === column && row.Implicit);
+    if (!binding || binding.ControlID !== '' || binding.Table !== original.EnvTable || original.Rows.length !== 1) {
+      throw new Error('CHARS Species action requires its original implicit Env target.');
+    }
+    const row = original.Rows[0].Env, expected = row.cells[binding.Column];
+    const selected = input.kind === 'option' && (input.option === 1 || input.option === 2);
+    const value = selected
+      ? { ...sourceParentEntryNull(), storage: 'integer', integer: input.option === 1 ? '-1' : '0' }
+      : structuredClone(expected);
+    return { ...drafts, [column]: { contextId: original.ContextID, table: binding.Table, rowId: row.rowId, column,
+      controlId: siviCHARSParentSpeciesAction, expected: structuredClone(expected), value,
+      input: structuredClone(input), error: selected || input.kind === 'original' ? null
+        : 'CHARS Species action requires selected Comp./Part. option1/2; retain original storage instead of assigning NULL.' } };
+  }
   const policy = policies.find(field => field.column === column);
   const binding = original.Bindings.find(row => row.Binding === policy?.binding);
   if (!policy || !binding || binding.Implicit || binding.Table !== `${original.Project}_${policy.owner}`) {
@@ -126,19 +159,29 @@ export function siviCHARSParentEntryRequest(original: SIVIParentOriginal, polici
   drafts: SIVICHARSParentEntryDrafts) {
   const reviewed = siviCHARSParentPoliciesFromWire(policies, original);
   const edits: SIVIParentCellEdit[] = [];
+  const actions: SIVIParentActionInput[] = [];
   for (const [column, draft] of Object.entries(drafts)) {
     if (draft.error) throw new Error(draft.error);
     const prepared = stageSIVICHARSParentEntry(original, reviewed, {}, column, draft.input)[column];
     if (prepared.error) throw new Error(prepared.error);
-    if (draft.column !== column || draft.contextId !== prepared.contextId || draft.table !== prepared.table ||
+    if (draft.column !== column || draft.controlId !== prepared.controlId ||
+        draft.contextId !== prepared.contextId || draft.table !== prepared.table ||
         draft.rowId !== prepared.rowId || !equalSIVICHARSParentCell(draft.expected, prepared.expected) ||
         !equalSIVICHARSParentCell(draft.value, prepared.value)) {
       throw new Error('CHARS entry draft identity or prepared source value changed.');
     }
     if (!equalSIVICHARSParentCell(prepared.expected, prepared.value)) {
-      const { input: _input, error: _error, ...edit } = prepared;
-      edits.push(structuredClone(edit));
+      if (column === 'SpeciesListComplete') {
+        if (prepared.input.kind !== 'option' || prepared.controlId !== siviCHARSParentSpeciesAction) {
+          throw new Error('CHARS Species request lost its selected source option.');
+        }
+        actions.push({ contextId: prepared.contextId, controlId: prepared.controlId, table: prepared.table,
+          rowId: prepared.rowId, expected: structuredClone(prepared.expected), option: prepared.input.option });
+      } else {
+        const { input: _input, error: _error, controlId: _controlId, ...edit } = prepared;
+        edits.push(structuredClone(edit));
+      }
     }
   }
-  return { original: structuredClone(original), edits };
+  return { original: structuredClone(original), edits, ...(actions.length ? { actions } : {}) };
 }

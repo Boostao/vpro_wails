@@ -69,12 +69,17 @@ function fixture(overrides = {}) {
         const row = state.review.Original.Rows[0][binding.Table.endsWith('_Admin') ? 'Admin' : 'Env'];
         row.cells[binding.Column] = structuredClone(edit.value);
       }
-      return { ChangedCells: request.edits.length, HistoryID: '1' };
+      for (const action of request.actions ?? []) {
+        const binding = state.review.Original.Bindings.find(row => row.Binding === 'SpeciesListComplete' && row.Implicit);
+        state.review.Original.Rows[0].Env.cells[binding.Column] = cell('integer', action.option === 1 ? '-1' : '0');
+      }
+      return { ChangedCells: request.edits.length + (request.actions?.length ?? 0), HistoryID: '1' };
     },
     restore: async (id, action) => {
       state.restores.push({ id, action }); state.review = review();
-      return { restoredRows: state.writes[0].edits.length, cleanedVegRows: 0, cancelled: false,
-        prunedAuditRows: action === 'prune' ? state.writes[0].edits.length : 0 };
+      const count = state.writes[0].edits.length + (state.writes[0].actions?.length ?? 0);
+      return { restoredRows: count, cleanedVegRows: 0, cancelled: false,
+        prunedAuditRows: action === 'prune' ? count : 0 };
     },
     refreshParent: async () => { state.refreshed++; },
     ...overrides,
@@ -95,6 +100,38 @@ test('owned CHARS session reads complete source/reference cohorts without stagin
   assert.deepEqual(Array.from(snow.definitions.rows, row => row.cells[1].storage), ['null', 'text', 'null', 'text']);
   fields[0].choices[0].code = 'caller mutation';
   assert.equal(session.view().snapshot.fields[0].choices[0].code, 'X');
+});
+
+test('one CHARS owner retains invalid source choices across detached views and commits mixed drafts atomically', async () => {
+  for (const option of [1, 2]) {
+    const { session, state } = fixture();
+    assert.equal(await session.load(), true);
+    session.stage('SV_WaterTableCM', { kind: 'text', raw: '.1' });
+    session.stage('SpeciesListComplete', { kind: 'clear' });
+    assert.equal(session.closeState().blocked, true);
+    const detached = session.view();
+    assert.match(detached.drafts.SpeciesListComplete.error, /Comp.\/Part./);
+    detached.drafts.SpeciesListComplete.error = null;
+    assert.match(session.view().drafts.SpeciesListComplete.error, /Comp.\/Part./);
+    assert.equal(session.closeState().canSave, false);
+    await assert.rejects(session.save(), /Comp.\/Part./);
+    assert.equal(state.writes.length, 0);
+    session.stage('SpeciesListComplete', { kind: 'option', option });
+    assert.equal(session.closeState().blocked, false);
+    assert.equal(await session.save(), true);
+    assert.equal(state.writes.length, 1);
+    assert.equal(state.writes[0].edits.length, 1);
+    assert.equal(state.writes[0].actions.length, 1);
+    assert.equal(state.writes[0].actions[0].option, option);
+    assert.equal(session.closeState().unsaved, false);
+    assert.equal(await session.restore('prune'), true);
+    assert.equal(state.restores.length, 1);
+    session.stage('SpeciesListComplete', { kind: 'option', option });
+    session.stage('SpeciesListComplete', { kind: 'original' });
+    assert.equal(session.closeState().unsaved, false);
+    assert.equal(await session.save(), true);
+    assert.equal(state.writes.length, 1);
+  }
 });
 
 test('actual Go Ahorizon wire retains literal ordinals and blank TEXT without relaxing physical row identity', async () => {

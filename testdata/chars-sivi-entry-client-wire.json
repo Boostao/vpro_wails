@@ -4939,6 +4939,22 @@
           "blobHex": null
         }
       }
+    ],
+    "actions": [
+      {
+        "contextId": "owned",
+        "controlId": "form:frmSIVIsite-CHARS/optSpeciesListComplete",
+        "table": "Sample_Env",
+        "rowId": "2",
+        "expected": {
+          "storage": "null",
+          "text": null,
+          "integer": null,
+          "real": null,
+          "blobHex": null
+        },
+        "option": 1
+      }
     ]
   },
   "Fields": [

@@ -9,6 +9,8 @@ are in [README](README.md), [MIGRATION_PLAN](MIGRATION_PLAN.md),
 
 - This is the Windows VM, not a remote Linux session.
 - Active repository: `C:\Users\BrunoTremblay\Work\vpro_wails`, branch `main`.
+  Shared Boolean predecessor: `6d938d1d27c43d2bd96adcf6ad3c435f4db7f941`.
+  Current accepted CHARS Species action is described below. No push.
   The old `access-parity-windows-handoff` worktree is not the integration root.
 - Canonical Access exports: `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
   Never modify canonical Access/data; use disposable fixtures for native work.
@@ -436,11 +438,39 @@ Private `source-parent-boolean-header-integration/receipt.json` is accepted.
 The source freeze is released. Preserve earlier failed runs as rejected;
 do not replay native mutations.
 The Friday demo and accepted assets are unchanged. UpdatedFromCards, generic
-metadata/import and creation defaults remain excluded. Continue with
-source-qualified CHARS SpeciesListComplete options1/2; never
-invent a PlotType writer from its unwired procedure. No push. No
-default/demo availability has changed;
+metadata/import and creation defaults remain excluded. The Boolean correction
+is committed locally as `6d938d1`, with a sealed private commit association.
+The source-qualified CHARS SpeciesListComplete1/2 action is independently
+reviewed, native-accepted and full-race integrated: one parent session, atomic
+direct/action Save, strict optional actions and complete-plan/subset history.
+All2320 frontend executions,205 affected cases,841 coupled Go test/subtest
+events, check0/0, vet and default/enabled actual-main builds pass. The20-path
+review is accepted without significant findings. Private
+`chars-sivi-species-candidate\review-disposition.json` retains that disposition.
+Single inherited16-file fixture, no new SQLite seeding: default/backend-off
+denial, five Save/prune pairs/six cells, historical NULL, zero backend Saves for
+same-option clean Save and exact CancelClose200 before mixed-draft correction
+pass. Rejected menu-selector and clean-Save-disabled assumptions remain preserved.
+The first P1 Comp. Save/history9 was independently observed, never replayed;
+fresh continuation restores it once through the actual scoped binding, not a
+restoration-button UI claim. Four later pairs use actual UI restoration.
+All original source/audits/old histories are exact; new consumed histories9-13
+only, fifteen other files unchanged and six original owners freshly absent.
+Private `chars-sivi-species-candidate\native-association.json` seals the scope.
+Fresh `go test -race -timeout 120m ./...` passes exit0,
+UTC2026-10-15T23:26:20.446546 to2026-10-16T00:45:29.320388; root4453.093s.
+All1869 inputs/98 artifacts/discovery, canonical/protected assets and closed
+native family remain unchanged. Private
+`chars-sivi-species-integration\receipt.json` is accepted; source freeze released.
+Earlier type/wire/test-placement failures remain rejected. Never invent a
+PlotType writer from its unwired procedure. No default/demo availability changed;
 SubZone/new blank Ahorizon and whole-form/native parity remain unavailable.
+Next source-backed contract is private `chars-sivi-linked-vegetation-contract.json`,
+with eight canonical hashes: reuse existing extended17-column combined
+service/session/panel through the three original PlotNumber links, not a new
+writer or duplicate parent. Preserve peer drafts/errors/history, clean-peer
+refresh, lock/navigation/close guards and read-only cancellation. Implementation
+has not started. No new Access oracle is needed or authorized by that contract.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated

@@ -83,6 +83,12 @@ func approveSIVICHARSRequiredReferences(ctx context.Context, tx *sql.Tx, owner *
 
 func (s *ContextService) writeSIVICHARSParentOwnedEntry(ctx context.Context, contextID, plot string,
 	original *siviParentProjection, edits []siviParentScalarEdit, readers siviParentSharedReferenceReaders) (*siviParentWriteResult, error) {
+	return s.writeSIVICHARSParentOwnedProposal(ctx, contextID, plot, original, edits, nil, readers)
+}
+
+func (s *ContextService) writeSIVICHARSParentOwnedProposal(ctx context.Context, contextID, plot string,
+	original *siviParentProjection, edits []siviParentScalarEdit, actions []siviParentActionEdit,
+	readers siviParentSharedReferenceReaders) (*siviParentWriteResult, error) {
 	var owner *sqliteContext
 	lifecycle := sourceParentEntryLifecycle{
 		prepare: func(plots *PlotService, conn *sql.Conn) (func(), error) {
@@ -106,7 +112,7 @@ func (s *ContextService) writeSIVICHARSParentOwnedEntry(ctx context.Context, con
 			return profileOwnedFiles(owner)
 		},
 	}
-	return s.writeSIVICHARSParentEntryWithLifecycle(ctx, contextID, plot, original, edits,
+	return s.writeSIVICHARSParentProposal(ctx, contextID, plot, original, edits, actions,
 		func(tx *sql.Tx, _ *siviParentProjection, assignments []siviParentScalarAssignment) error {
 			return approveSIVICHARSRequiredReferences(ctx, tx, owner, readers, assignments)
 		}, lifecycle)

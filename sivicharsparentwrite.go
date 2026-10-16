@@ -39,6 +39,12 @@ func (s *ContextService) writeSIVICHARSParentEntry(ctx context.Context, contextI
 func (s *ContextService) writeSIVICHARSParentEntryWithLifecycle(ctx context.Context, contextID, plot string,
 	original *siviParentProjection, edits []siviParentScalarEdit, approve siviCHARSParentEntryApproval,
 	lifecycle sourceParentEntryLifecycle) (*siviParentWriteResult, error) {
+	return s.writeSIVICHARSParentProposal(ctx, contextID, plot, original, edits, nil, approve, lifecycle)
+}
+
+func (s *ContextService) writeSIVICHARSParentProposal(ctx context.Context, contextID, plot string,
+	original *siviParentProjection, edits []siviParentScalarEdit, actions []siviParentActionEdit,
+	approve siviCHARSParentEntryApproval, lifecycle sourceParentEntryLifecycle) (*siviParentWriteResult, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
@@ -57,7 +63,7 @@ func (s *ContextService) writeSIVICHARSParentEntryWithLifecycle(ctx context.Cont
 			if !sourceParentProjectionStorageEqual(original, observed) {
 				return nil, errors.New("CHARS reviewed physical parent storage changed; undo and reload")
 			}
-			assignments, err := planSIVICHARSParentWritableEntry(ctx, observed, edits)
+			assignments, err := planSIVICHARSParentProposal(ctx, observed, edits, actions)
 			if err != nil {
 				return nil, err
 			}

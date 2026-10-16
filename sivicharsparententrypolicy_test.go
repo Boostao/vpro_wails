@@ -81,6 +81,11 @@ func TestSIVICHARSEntryClientGoWire(t *testing.T) {
 		charsEntryEdit(t, wire.Original, "StartDate", metadataInteger("1900")),
 		charsEntryEdit(t, wire.Original, "SV_FloodPlain", metadataInteger("-1")),
 	}}
+	option := 1
+	action := charsSpeciesAction(t, wire.Original, &option)
+	wire.Request.Actions = []SIVIParentActionInput{
+		{action.ContextID, action.ControlID, action.Table, action.RowID, action.Expected, action.Option},
+	}
 	requestData, err := json.Marshal(wire.Request)
 	if err != nil {
 		t.Fatal(err)
@@ -91,6 +96,10 @@ func TestSIVICHARSEntryClientGoWire(t *testing.T) {
 	}
 	if plan, err := planSIVICHARSParentEntry(context.Background(), decoded.Original, decoded.Edits); err != nil || len(plan) != 4 {
 		t.Fatal("actual client request did not prepare its complete source plan", plan, err)
+	}
+	if plan, err := planSIVICHARSParentProposal(context.Background(), decoded.Original, decoded.Edits,
+		[]siviParentActionEdit{action}); err != nil || len(plan) != 5 {
+		t.Fatal("actual client request did not prepare atomic direct/action source plan", plan, err)
 	}
 	data, err := json.MarshalIndent(wire, "", "  ")
 	if err != nil {

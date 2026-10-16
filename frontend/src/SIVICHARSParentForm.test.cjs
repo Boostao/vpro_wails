@@ -18,7 +18,8 @@ test('compiled CHARS presentation consumes the exact source and renders every bi
     const component = serverComponent(code('SIVICHARSParentForm.svelte'), 'SIVICHARSParentForm.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { SIVICHARSParentEntryService: {},
         AuditRestoreAction: { AuditRestoreRetain: 'retain', AuditRestorePrune: 'prune' } },
-      './siviCHARSParentEntry': { siviCHARSParentFields: source.forms[0].fields.filter(field => field.binding) },
+      './siviCHARSParentEntry': { siviCHARSParentFields: source.forms[0].fields.filter(field => field.binding),
+        siviCHARSParentSpeciesAction: 'form:frmSIVIsite-CHARS/optSpeciesListComplete' },
       './referenceEditor': { siviReferencePolicies: [] },
       './projectMetadataEditor': metadata,
       '../../resources/fs1333-chars-sivi-layout.json': { default: source },
@@ -63,6 +64,13 @@ test('compiled CHARS presentation consumes the exact source and renders every bi
     assert.match(boolean, /Retain historical NULL/);
     assert.match(boolean, /Yes \(-1\)/);
     assert.match(boolean, /No \(0\)/);
+    const action = [...html.matchAll(/<select\b[^>]*>[\s\S]*?<\/select>/g)]
+      .map(match => match[0]).find(select => select.includes('id="chars-SpeciesListComplete"'));
+    assert.ok(action, 'resolve the actual implicit source choice before checking options');
+    assert.match(action, /value="1">Comp\./);
+    assert.match(action, /value="2">Part\./);
+    assert.doesNotMatch(action, /value="null"/);
+    assert.equal((html.match(/data-chars-action="SpeciesListComplete"/g) ?? []).length, 1);
   }
   }
 });
