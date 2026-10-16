@@ -1,0 +1,96 @@
+package main
+
+import (
+	"context"
+	"database/sql"
+	"errors"
+)
+
+type summaryVegetationWorkbookOptions struct {
+	Title      string
+	Average    int
+	Display    int
+	ShowClass  int
+	IncludeEnv bool
+}
+
+type summaryVegetationWorkbookSourcePath struct {
+	Role string
+	Path string
+}
+
+type summaryVegetationWorkbookSource struct {
+	Input       summaryVegetationWorkbookInput
+	Raw         summaryVegetationSnapshotPreview
+	Environment summaryEnvironmentalPhysicalInput
+	Paths       []summaryVegetationWorkbookSourcePath
+}
+
+func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVegetationEnvironmentalLifeformService,
+	plots *PlotService, owner *sqliteContext, tx *sql.Tx, contextID string,
+	options summaryVegetationWorkbookOptions) (summaryVegetationWorkbookSource, error) {
+	fail := func(err error) (summaryVegetationWorkbookSource, error) {
+		return summaryVegetationWorkbookSource{}, err
+	}
+	if ctx == nil {
+		return fail(errors.New("Summary workbook source requires a context"))
+	}
+	if err := ctx.Err(); err != nil {
+		return fail(err)
+	}
+	if service == nil || service.environment == nil || service.environment.report == nil ||
+		!service.environment.report.enabled {
+		return fail(errors.New("Summary workbook source requires enabled Summary Vegetation"))
+	}
+	environment := service.environment
+	if options.IncludeEnv && (!service.enabled || !environment.enabled || !environment.numericEnabled) {
+		return fail(errors.New("Summary workbook environmental header requires enabled environmental, numeric and lifeform inspection"))
+	}
+	if plots == nil || plots.projects == nil || owner == nil || plots.projects.sqlite != owner || tx == nil {
+		return fail(errors.New("Summary workbook source requires the owned plot context and read transaction"))
+	}
+	contexts := environment.report.contexts
+	if contexts == nil || contexts.projects == nil || contexts.projects.sqlite != owner ||
+		!plots.contextScoped || contextID == "" || plots.projects.contextID != contextID {
+		return fail(errors.New("Summary workbook source requires its current scoped report context"))
+	}
+	if err := validateGoogleEarthReviewStrings(contextID, options.Title); err != nil {
+		return fail(err)
+	}
+	if err := validateSummaryVegetationDisplayOptions(ctx, options.Average, options.Display, options.ShowClass); err != nil {
+		return fail(err)
+	}
+	raw, err := environment.report.readSnapshot(ctx, contextID, plots, owner, tx,
+		options.Average, options.Display, options.ShowClass, 11)
+	if err != nil {
+		return fail(err)
+	}
+	result := summaryVegetationWorkbookSource{Raw: raw,
+		Input: summaryVegetationWorkbookInput{Title: options.Title, Vegetation: raw.Preview},
+		Paths: []summaryVegetationWorkbookSourcePath{}}
+	for _, role := range []string{"project", "su", "VLists", "VUser", "VPro64"} {
+		path, ok := owner.attachments[role]
+		if !ok || path == "" {
+			return fail(errors.New("Summary workbook source is missing a required owned attachment path"))
+		}
+		result.Paths = append(result.Paths, summaryVegetationWorkbookSourcePath{role, path})
+	}
+	if options.IncludeEnv {
+		result.Environment, err = readSummaryEnvironmentalTables(ctx, owner, tx, validateSummaryEnvironmentalLifeformSelectedFunction)
+		if err != nil {
+			return fail(err)
+		}
+		rows, err := planSummaryEnvironmentalSnapshotRows(ctx, raw, result.Environment.FieldList, result.Environment.Env)
+		if err != nil {
+			return fail(err)
+		}
+		result.Input.Environment = &summaryEnvironmentalWorkbookInput{
+			FirstRow: 5, FieldList: result.Environment.FieldList,
+			Units: summaryEnvironmentalPreviewUnits(raw.Preview), Rows: rows,
+		}
+	}
+	if err := ctx.Err(); err != nil {
+		return fail(err)
+	}
+	return result, nil
+}

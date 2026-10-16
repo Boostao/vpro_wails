@@ -144,10 +144,12 @@ func (s *SummaryVegetationService) preview(ctx context.Context, contextID string
 }
 
 type summaryVegetationSnapshotPreview struct {
-	Preview SummaryVegetationPreview
-	SU      ProjectMetadataTable
-	Veg     ProjectMetadataTable
-	Master  ProjectMetadataTable
+	Preview  SummaryVegetationPreview
+	SU       ProjectMetadataTable
+	Veg      ProjectMetadataTable
+	Master   ProjectMetadataTable
+	Personal ProjectMetadataTable
+	Layers   ProjectMetadataTable
 }
 
 func (s *SummaryVegetationService) readSnapshot(ctx context.Context, contextID string, plots *PlotService,
@@ -270,6 +272,7 @@ func (s *SummaryVegetationService) readSnapshot(ctx context.Context, contextID s
 	if err := ctx.Err(); err != nil {
 		return fail(err)
 	}
-	return summaryVegetationSnapshotPreview{Preview: result, SU: tables[1], Veg: tables[0], Master: tables[2]}, nil
+	return summaryVegetationSnapshotPreview{Preview: result, SU: tables[1], Veg: tables[0], Master: tables[2],
+		Personal: tables[3], Layers: tables[4]}, nil
 
 }

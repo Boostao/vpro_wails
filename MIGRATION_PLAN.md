@@ -1015,6 +1015,18 @@ canonical/protected assets and both closed native families. Exact SV1/pivot
 alignment and unchanged worksheet
 identity are required. No service, binding, UI, flag, printing or public
 availability follows from either private boundary.
+The composed prerequisite is published as `e5300ab`. The private owned-input
+reader retains already-read personal/layer tables and reuses equivalent
+field/Env reads and QuickVeg/lifeform composition. It produces the existing
+workbook input plus complete required physical tables/attachment identities in
+one owned SQLite snapshot. Managed/external mixed and canonical selections,
+invisible peer drift, independent gates, malformed unused text, cleanup,
+in-flight cancellation and retry pass focused races7.861s. Coupled caller
+races59.019s/vet/production and distinct review/focused identity follow-up pass.
+Fresh full integration passes in4248.937s (root4202.938s), retaining1882 managed
+inputs/13 artifacts, discovery, canonical/protected assets and both closed
+native families. There is no registered service, UI, preference-policy or
+public/native output promotion.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

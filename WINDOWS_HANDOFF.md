@@ -185,13 +185,43 @@ managed inputs/16 artifacts, package/embed discovery, canonical/protected assets
 and both closed native families. Private receipt:
 `summary-workbook-body-integration/receipt.json`, SHA256
 `fd834aa15e66d1e22a5912dbe17171a1215b588b8b7429d0aa909fa8911b7a13`.
-The freeze is released for coherent publication of this private boundary only.
+This private boundary is committed/published as `e5300ab` on `main`.
 Next is an owned public Summary workbook review/publication workflow: retain the
 already-read personal/LayerCode tables, take all coupled physical inputs in one
 owned snapshot, qualify saved effects and independent flags, then verify actual
 bindings, client receipts/lifecycle and disposable Wails acceptance. The private
 contract is `summary-workbook-owned-publication-contract.json`; no public
 availability or default promotion has been granted.
+
+## Current qualified private owned Summary source
+
+The new reader retains the existing raw personal/layer tables rather than
+rereading them. Shared physical field/Env reading and original QuickVeg/lifeform
+composition preserve existing preview wire/value/error policies. A future
+approval source now includes all five complete physical body inputs, complete
+selected/unselected definitions, needed Env and five literal attachment paths
+from one owned SQLite snapshot. No request/service/flag/UI is added; saved
+effect admission and publication authority remain separate unfinished work.
+Focused races pass7.861s, including managed/external mixed/canonical composition,
+unchanged physical inputs/config, invisible personal/layer peers, independent
+gates, malformed unused text, missing physical table restoration, source cleanup,
+in-flight cancellation and successful retry. An initial overlength synthetic
+Layer value violated source TEXT(3); the fixture was corrected, not the reader.
+Coupled caller races59.019s, vet and stripped SQLite-only production pass.
+Distinct read-only review finds no significant issues; its focused follow-up
+independently verifies the complete seven-tracked/three-untracked diff, all ten
+source identities and exact formal log/runner/executable associations. Earlier
+focused logs are not formal freeze-associated acceptance; the coupled selector
+includes the new tests. Validation freeze SHA256:
+`085abb678f0319818d629ace1027c64583d5bdea59c0a155642bbb2644d51c46`.
+Fresh full race passes in4248.937s (root4202.938s), retaining all1882 inputs/13
+artifacts, discovery, canonical/protected assets and both closed native families.
+Private receipt `summary-workbook-owned-source-integration/receipt.json`, SHA256
+`3da48d96cc346b74557d66cab925a3b28fee8710ae36bdb9ee5af3cf6118f1d6`.
+This accepts the private reader/caller preservation for coherent publication,
+not saved effects, output authority, a new native/public workflow or whole
+formatted Summary. Next safe seam remains owned review/publication with explicit
+source-option admission and client lifecycle/receipt acceptance.
 
 Full integration on this VM: `go test -race -timeout 120m ./...`.
 For isolated Go overlays use `GODEBUG=goindex=0` and verify exact embed discovery.

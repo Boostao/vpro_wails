@@ -2174,6 +2174,35 @@ canonical/protected assets and both closed native families unchanged. This is
 private preparation/caller-preservation acceptance, not a new public/native
 report or source scalar-coercion/formatting claim.
 
+### Private owned Summary workbook input
+
+The private [owned reader](../summaryvegetationworkbooksource.go) builds the
+existing compositor input inside an already owned context/read transaction.
+It retains all five physical SU/vegetation/master/personal/layer tables, complete
+selected/unselected field-list definitions and needed Env, plus literal source
+attachment roles/paths. Unused personal and layer rows remain part of the source
+even when their changes leave the visible workbook input unchanged. These are
+observation-time inputs for future approval, not a file-publication guarantee.
+
+The environmental reader and QuickVeg/lifeform composition are extracted from
+the existing preview paths rather than duplicated. Existing public previews
+retain their wire, values, independent gates and operation-specific errors.
+Vegetation-only input does not require environmental tables or their gates;
+combined input requires the existing environmental/numeric/lifeform gates.
+Mismatched or unscoped ownership, stale context, malformed physical text and
+failed/cancelled read cleanup return no partial source; retry preserves owned
+attachments. Focused managed/external mixed and canonical source tests pass,
+including reopened compositor bytes and invisible peer changes. Coupled caller
+races59.019s, vet and stripped SQLite-only production compilation pass. Distinct
+read-only review and focused identity/diff follow-up find no significant issues.
+Fresh full-repository race passes (root4202.938s), retaining1882 managed inputs/13
+artifacts, package/embed discovery, canonical/protected assets and both closed
+native families.
+
+This boundary does not interpret saved report preferences, authorize an output
+file, add a service/binding/UI/flag, or enable common/guide names, hierarchy,
+lumping, quality, constancy, source Excel coercion, macros or printing.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

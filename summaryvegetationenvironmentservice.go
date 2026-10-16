@@ -111,58 +111,75 @@ func previewSummaryEnvironmentalRawSnapshot[R any](ctx context.Context, s *Summa
 			if err != nil {
 				return zero, err
 			}
-			fields, err := readSummaryVegetationFieldList(ctx, tx)
+			physical, err := readSummaryEnvironmentalTables(ctx, owner, tx, validate)
 			if err != nil {
 				return zero, err
 			}
-			if err := validateSummaryVegetationFieldListWitness(ctx, fields); err != nil {
-				return zero, err
-			}
-			index, err := indexSummaryVegetationFieldList(ctx, fields)
-			if err != nil {
-				return zero, err
-			}
-			selected := make(map[string]bool, len(index.Selected))
-			for _, id := range index.Selected {
-				selected[id] = true
-			}
-			needsEnv := false
-			for _, row := range fields.Rows {
-				if !selected[row.RowID] {
-					continue
-				}
-				function, err := vegetationReportIdentity(row.Cells[5])
-				if err != nil {
-					return zero, fmt.Errorf("Summary environmental selected row %s FunctionName: %w", row.RowID, err)
-				}
-				if function != nil {
-					if err := validate(*function, row.Cells[6]); err != nil {
-						return zero, fmt.Errorf("Summary environmental selected row %s: %w", row.RowID, err)
-					}
-					if *function != "SVnPlots" && *function != "SVLifeformCover" {
-						needsEnv = true
-					}
-				}
-			}
-			var env ProjectMetadataTable
-			if needsEnv {
-				name := owner.selection.Project + "_Env"
-				var count int
-				if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM project.sqlite_master WHERE type='table' AND name COLLATE BINARY=?`, name).Scan(&count); err != nil {
-					return zero, err
-				}
-				if count != 1 {
-					return zero, fmt.Errorf("Summary environmental preview requires original physical project.%s table", name)
-				}
-				if err := validateSIVIPhysicalSchema(ctx, tx, "project", name, "Summary environmental preview"); err != nil {
-					return zero, err
-				}
-				env, err = readSQLiteStorageRows(ctx, tx, "project", name, "", nil, "")
-				if err != nil {
-					return zero, fmt.Errorf("Summary environmental physical Env read: %w", err)
-				}
-			}
-			return build(source, fields, env, owner.attachments["VPro64"], owner.attachments["project"], owner.attachments["VLists"])
+			return build(source, physical.FieldList, physical.Env, owner.attachments["VPro64"], owner.attachments["project"], owner.attachments["VLists"])
 		})
 	})
+}
+
+type summaryEnvironmentalPhysicalInput struct {
+	FieldList ProjectMetadataTable
+	Env       ProjectMetadataTable
+}
+
+func readSummaryEnvironmentalTables(ctx context.Context, owner *sqliteContext, tx *sql.Tx,
+	validate func(string, ProjectMetadataCell) error) (summaryEnvironmentalPhysicalInput, error) {
+	fail := func(err error) (summaryEnvironmentalPhysicalInput, error) {
+		return summaryEnvironmentalPhysicalInput{}, err
+	}
+	fields, err := readSummaryVegetationFieldList(ctx, tx)
+	if err != nil {
+		return fail(err)
+	}
+	if err := validateSummaryVegetationFieldListWitness(ctx, fields); err != nil {
+		return fail(err)
+	}
+	index, err := indexSummaryVegetationFieldList(ctx, fields)
+	if err != nil {
+		return fail(err)
+	}
+	selected := make(map[string]bool, len(index.Selected))
+	for _, id := range index.Selected {
+		selected[id] = true
+	}
+	needsEnv := false
+	for _, row := range fields.Rows {
+		if !selected[row.RowID] {
+			continue
+		}
+		function, err := vegetationReportIdentity(row.Cells[5])
+		if err != nil {
+			return fail(fmt.Errorf("Summary environmental selected row %s FunctionName: %w", row.RowID, err))
+		}
+		if function != nil {
+			if err := validate(*function, row.Cells[6]); err != nil {
+				return fail(fmt.Errorf("Summary environmental selected row %s: %w", row.RowID, err))
+			}
+			if *function != "SVnPlots" && *function != "SVLifeformCover" {
+				needsEnv = true
+			}
+		}
+	}
+	var env ProjectMetadataTable
+	if needsEnv {
+		name := owner.selection.Project + "_Env"
+		var count int
+		if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM project.sqlite_master WHERE type='table' AND name COLLATE BINARY=?`, name).Scan(&count); err != nil {
+			return fail(err)
+		}
+		if count != 1 {
+			return fail(fmt.Errorf("Summary environmental preview requires original physical project.%s table", name))
+		}
+		if err := validateSIVIPhysicalSchema(ctx, tx, "project", name, "Summary environmental preview"); err != nil {
+			return fail(err)
+		}
+		env, err = readSQLiteStorageRows(ctx, tx, "project", name, "", nil, "")
+		if err != nil {
+			return fail(fmt.Errorf("Summary environmental physical Env read: %w", err))
+		}
+	}
+	return summaryEnvironmentalPhysicalInput{FieldList: fields, Env: env}, nil
 }

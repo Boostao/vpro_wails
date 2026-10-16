@@ -52,41 +52,10 @@ func (s *SummaryVegetationEnvironmentalLifeformService) PreviewEnvironmentalLife
 		return nil, errors.New("Summary lifeform environmental preview requires enabled numeric environmental inspection")
 	}
 	return previewSummaryEnvironmentalRawSnapshot(ctx, s.environment, contextID, average, display, showClass,
-		func(function string, argument ProjectMetadataCell) error {
-			if function == "SVLifeformCover" {
-				_, err := summaryEnvironmentalLifeformArgument(argument)
-				return err
-			}
-			return validateSummaryEnvironmentalNumericSelectedFunction(function, argument)
-		},
+		validateSummaryEnvironmentalLifeformSelectedFunction,
 		func(source summaryVegetationSnapshotPreview, fields, env ProjectMetadataTable,
 			sourcePath, envPath, masterPath string) (*SummaryVegetationEnvironmentalLifeformPreview, error) {
-			needsQuick := false
-			index, err := indexSummaryVegetationFieldList(ctx, fields)
-			if err != nil {
-				return nil, err
-			}
-			selected := make(map[string]bool, len(index.Selected))
-			for _, id := range index.Selected {
-				selected[id] = true
-			}
-			for _, row := range fields.Rows {
-				if err := ctx.Err(); err != nil {
-					return nil, err
-				}
-				if selected[row.RowID] && row.Cells[5].Text != nil && *row.Cells[5].Text == "SVLifeformCover" {
-					needsQuick = true
-				}
-			}
-			var quick ProjectMetadataTable
-			if needsQuick {
-				quick, err = prepareSummaryEnvironmentalQuickVeg(ctx, source.Preview.Project, source.Preview.SU, source.Veg, source.SU)
-				if err != nil {
-					return nil, err
-				}
-			}
-			rows, err := planSummaryVegetationEnvironmentalLifeformRows(ctx, fields,
-				summaryEnvironmentalPreviewUnits(source.Preview), env, source.SU, quick, source.Master)
+			rows, err := planSummaryEnvironmentalSnapshotRows(ctx, source, fields, env)
 			if err != nil {
 				return nil, err
 			}
@@ -96,4 +65,42 @@ func (s *SummaryVegetationEnvironmentalLifeformService) PreviewEnvironmentalLife
 				Source: summaryEnvironmentalLifeformSource,
 			}, nil
 		})
+}
+
+func validateSummaryEnvironmentalLifeformSelectedFunction(function string, argument ProjectMetadataCell) error {
+	if function == "SVLifeformCover" {
+		_, err := summaryEnvironmentalLifeformArgument(argument)
+		return err
+	}
+	return validateSummaryEnvironmentalNumericSelectedFunction(function, argument)
+}
+
+func planSummaryEnvironmentalSnapshotRows(ctx context.Context, source summaryVegetationSnapshotPreview,
+	fields, env ProjectMetadataTable) ([]SummaryVegetationEnvironmentalNumericRow, error) {
+	index, err := indexSummaryVegetationFieldList(ctx, fields)
+	if err != nil {
+		return nil, err
+	}
+	selected := make(map[string]bool, len(index.Selected))
+	for _, id := range index.Selected {
+		selected[id] = true
+	}
+	needsQuick := false
+	for _, row := range fields.Rows {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		if selected[row.RowID] && row.Cells[5].Text != nil && *row.Cells[5].Text == "SVLifeformCover" {
+			needsQuick = true
+		}
+	}
+	var quick ProjectMetadataTable
+	if needsQuick {
+		quick, err = prepareSummaryEnvironmentalQuickVeg(ctx, source.Preview.Project, source.Preview.SU, source.Veg, source.SU)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return planSummaryVegetationEnvironmentalLifeformRows(ctx, fields,
+		summaryEnvironmentalPreviewUnits(source.Preview), env, source.SU, quick, source.Master)
 }

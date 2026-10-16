@@ -468,6 +468,17 @@ all1879 managed inputs/16 artifacts, package/embed discovery, canonical/protecte
 assets and both closed native families unchanged. Neither supplies common/guide
 names, hierarchy/lumping/quality side effects, Excel macros or printing parity.
 
+A qualified private owned-input reader now reuses the same layer and environmental
+read/planning boundaries within one SQLite snapshot. Its future approval source
+retains complete physical SU, vegetation, master, personal and layer tables,
+selected/unselected field-list definitions, needed Env and literal attachment
+paths, not only visible preview witnesses. Existing preview wire shapes and
+independent gates stay unchanged. Coupled caller races59.019s, vet, production
+compilation and distinct independent review pass. Fresh full-repository race
+passes (root4202.938s), retaining1882 managed inputs/13 artifacts, discovery,
+canonical/protected assets and both closed native families. This adds no export
+service, UI, saved-option authority or public availability.
+
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus
 87.8 MB for the same stripped frontend build. Sample native startup and first
