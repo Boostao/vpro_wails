@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -26,37 +25,10 @@ type lifeformWorkbook struct {
 
 // Validate provenance before JSON can replace malformed Unicode or typed cells.
 func lifeformWorkbookSourceValue(value reflect.Value) error {
-	if value.Type() == reflect.TypeOf(ProjectMetadataCell{}) {
-		cell := value.Interface().(ProjectMetadataCell)
-		if _, err := vegetationReportIdentity(cell); err != nil {
-			return err
-		}
-	}
-	switch value.Kind() {
-	case reflect.Struct:
-		for i := 0; i < value.NumField(); i++ {
-			if err := lifeformWorkbookSourceValue(value.Field(i)); err != nil {
-				return err
-			}
-		}
-	case reflect.Array, reflect.Slice:
-		for i := 0; i < value.Len(); i++ {
-			if err := lifeformWorkbookSourceValue(value.Index(i)); err != nil {
-				return err
-			}
-		}
-	case reflect.Pointer:
-		if !value.IsNil() {
-			return lifeformWorkbookSourceValue(value.Elem())
-		}
-	case reflect.String:
-		return environmentWorkbookText(value.String())
-	case reflect.Float64:
-		if math.IsNaN(value.Float()) || math.IsInf(value.Float(), 0) {
-			return errors.New("Lifeform workbook requires finite source numbers")
-		}
-	}
-	return nil
+	return reportWorkbookSourceValue(value, func(cell ProjectMetadataCell) error {
+		_, err := vegetationReportIdentity(cell)
+		return err
+	}, "Lifeform")
 }
 
 func validateLifeformWorkbook(ctx context.Context, lifeform LifeformSummaryPreview, attributes SpeciesAttributeSummaryPreview) error {

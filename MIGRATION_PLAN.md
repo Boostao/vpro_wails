@@ -997,9 +997,15 @@ explicit fixture getter/value/QuickVeg boundaries and sealed cleanup. This is a
 new header contract, not a retry of exhausted AddNPlots/whole BuildReport probes.
 Source case-insensitive n Plots placement and Excel's loss of empty/numeric-text
 distinctions remain separate from typed read-model values. A private typed header
-placement prerequisite passes focused race/production and distinct clean review;
-exact source/validation association is sealed,
-no scalar conversion/workbook/public availability follows.
+placement prerequisite is now reused by private literal XLSX preparation.
+Complete selected rows/unit order and typed Empty/NULL/empty/integer provenance
+survive reopened workbooks; source scalar coercion is not performed. Shared
+checked text/source-value boundaries retain explicit legacy Lifeform versus
+canonical Summary cell policies. Focused coupled race150.725s/vet/production
+and distinct clean review/follow-up pass. Fresh complete-repository race passes
+(root4124.177s), with1876 managed inputs/11 artifacts, discovery, protected assets
+and both closed native families unchanged. No service, binding, UI, flag,
+vegetation-body composition, printing or public availability follows.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

@@ -27,9 +27,10 @@ Current machine state only. Portable scope and ordered work are in
 
 Reconciliation commit `161c94e6161780a4e997e9aed3bf139cde180855` preserves
 both histories. Accepted metadata commit
-`842ca946ac810393f9d548349f693ac0f51e1f13` is published to `origin/main`;
-the accepted two-page successor below follows it directly on `main`. Obtain the
-current publication identity with `git rev-parse HEAD`. Both histories are
+`842ca946ac810393f9d548349f693ac0f51e1f13` and its accepted two-page successor
+`ebeca28fc14d2fefd65036394b518fbdd6c44b46` are published to `origin/main`.
+Remote identity and clean worktree were verified before starting the next
+private prerequisite. Both histories are
 retained (17 local/52 remote predecessors), without a force-push. The explicit
 121-conflict resolution preserves the accepted application tree byte-for-byte;
 the only final tree changes are three prose lines in two portable-source docs.
@@ -132,9 +133,43 @@ root4137.598s,1872 inputs/147 artifacts, all protected/source/discovery/closed
 families unchanged and six owners freshly absent.
 Private `two-page-metadata-integration/receipt.json` SHA256:
 `3f7027ffdcf700fe4bef73d74c7207129e3ccf1dcf8295a065a51f90ada71286`.
-The freeze is released; portable docs are reconciled for this coherent main
-publication. No default/demo or whole-form promotion is granted.
+The freeze is released; the coherent16-path commit is published as `ebeca28`.
+Private `two-page-metadata-publication.json` associates its exact staged diff
+with the accepted integration. No default/demo or whole-form promotion is granted.
 Continue all ordered forms/report/ribbon deliverables, not a checkpoint stop.
+
+## Current private Summary prerequisite
+
+Accepted private environmental-header XLSX preparation reuses the existing placement
+plan and explicit literal scalar adaptation; it adds no service, binding, UI,
+flag, publication, vegetation-body composition or whole-report availability.
+Shared source traversal keeps the existing Lifeform text/NULL policy separate
+from canonical Summary typed cells. The checked literal writer is shared with
+the existing Summary Environment workbook.
+
+Focused coupled Go race passes150.725s, vet and stripped SQLite-only production
+compilation pass. Both managed/external53-row canonical previews roundtrip into
+reopened XLSX, without data changes. Earlier inappropriate-policy, cancellation
+fixture and formatting attempts are rejected, not acceptance.
+Nine-path source freeze is
+`summary-environment-workbook-validation/freeze.json`, SHA256
+`45afdc4e40c00ff4a8e423e9438386e308e3d5c63ec6898f45ebc498c0649597`.
+Distinct read-only review and focused evidence follow-up accept all nine frozen
+paths. Original quiet vet/build successes created no Tee files; explicit reruns
+now have exit0 receipts and a byte-exact second production executable, SHA256
+`1341e29f7157e834f9f5015a97a6ef5eb1103be4cdb0b2c508742fc0d2479777`.
+Fresh full integration now accepts exit0 in4140.453s (root4124.177s), retaining
+all1876 managed inputs/11 artifacts, discovery, canonical/protected assets and
+both closed native families. Receipt:
+`summary-environment-workbook-integration/receipt.json`, SHA256
+`b6a2670191911b88b278dfd56035a4e3f9173be20d3390ba842ff2e041ff45ff`.
+The freeze is released for coherent private-prerequisite publication; this is
+not new native/public or whole-report acceptance.
+Next source-ready seam is private vegetation-body composition using existing
+named layer aggregation, not a posthoc scientific-name mapper or new arithmetic.
+Its static contract is `summary-workbook-body-source-contract.json`. Preserve
+the original placement and require SV1/pivot alignment; common/guide names,
+hierarchy/lumping/quality side effects, macros and printing remain excluded.
 
 Full integration on this VM: `go test -race -timeout 120m ./...`.
 For isolated Go overlays use `GODEBUG=goindex=0` and verify exact embed discovery.

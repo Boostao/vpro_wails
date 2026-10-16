@@ -2083,6 +2083,55 @@ drift. Original bodies are byte-exact; the project getter remains fixture-only.
 No general SINGLE-to-text/noninteger decimal calibration, physical source
 ownership, formatted dispatcher or report availability follows.
 
+### Private typed environmental workbook preparation
+
+The unexported [environmental workbook preparer](../summaryvegetationenvironmentworkbook.go)
+reuses `prepareSummaryEnvironmentalHeader`, not another field dispatcher or
+calculation implementation. Its complete selected-row witness, original unit
+order, Source/Label grouping, special `n Plots` caption column and optional
+English-name offset remain the accepted placement boundary.
+
+Static `V7mdlReportsShortVeg` evidence separates this boundary from full output:
+`AddEnvFields` selects Report=Yes in Order order and writes helper results into
+the header; `NewShortVeg` starts that header at row5 when included; `BuildReport`
+then inserts vegetation, deletes/rearranges rows and applies `FormatCells`.
+The latter's Excel value assignment and multiply operation are not implemented
+as implicit scalar conversion. The field-list form's positive-Order display is
+not substituted for the full selected header. Its seven storage columns remain
+those in `USysShortVegSummaryFieldList_CreateSQL`; source report queries are
+inline VBA SQL, not a newly invented named query.
+
+This private inspection writes text literally, including date-like,
+formula-like and leading-zero values. Canonical integers within fifteen decimal
+digits are numeric cells; larger integers refuse the entire output rather than
+round. Numeric Empty and NULL are both visually blank, but remain distinct from
+each other and empty text in complete hex-encoded input provenance on the
+very-hidden `_VPRO_Source` worksheet. Unsupported XML/Unicode, overlength text
+and non-roundtrippable OOXML escape literals refuse all bytes. Cancellation
+during placement, after serialization or cleanup also returns no partial result.
+No external file is opened or published.
+
+The [shared value boundary](../reportworkbookvalues.go) reuses Summary
+Environment's checked literal OOXML writer and the existing recursive
+string/finite-number validation. Typed-cell policies stay explicit: existing
+Lifeform callers still accept text/NULL identities only; Summary provenance
+also accepts canonical integer/real/blob cells where the existing field-list
+witness permits them. This does not broaden any existing reader.
+
+There is no service registration, binding, UI action, runtime flag or default
+change. This preparer does not compose the vegetation body, supply source
+scientific/common-name projection, replace Excel macros, establish printing or
+enable whole formatted Summary output. `SVHumusDepth` and the other currently
+unsupported source branches remain unavailable at the existing preview boundary.
+Reopened-workbook tests cover the complete53-row supported canonical selection
+through both managed and external owned snapshots, without changing their data.
+Focused coupled race150.725s, vet and production compilation pass. Distinct
+review verifies the nine-path freeze and the byte-exact confirmation build;
+no significant issue remains. Fresh full race passes root4124.177s with1876
+managed inputs/11 artifacts, package/embed discovery, canonical/protected assets
+and both closed native families unchanged. These are private preparation and
+legacy-caller preservation checks, not new native/public report acceptance.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

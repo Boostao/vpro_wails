@@ -119,6 +119,26 @@ func TestSummaryEnvironmentalCanonicalAllDefinitionsOwnedSnapshot(t *testing.T) 
 			if err := decoder.Decode(&roundtrip); err != nil || !reflect.DeepEqual(got, &roundtrip) {
 				t.Fatal("complete canonical matrix strict wire changed", err)
 			}
+			workbook, err := prepareSummaryEnvironmentalWorkbook(t.Context(), summaryEnvironmentalWorkbookInput{
+				FirstRow: 5, FieldList: got.FieldList, Units: summaryEnvironmentalPreviewUnits(got.Vegetation), Rows: got.Rows,
+			})
+			if err != nil || len(workbook.Bytes) == 0 || len(workbook.Header.Fields) != 53 ||
+				workbook.Header.LastDataRow != 57 || workbook.Header.NextRow != 60 {
+				t.Fatal("complete canonical typed workbook preparation differs", err)
+			}
+			book := openSummaryEnvironmentalWorkbook(t, workbook)
+			for i, definition := range selected {
+				want := ""
+				if definition[5] == "SVnPlots" {
+					want = "4"
+				} else if definition[5] == "SVLifeformCover" {
+					want = "3.8 - 4.4 - 5.0"
+				}
+				value, err := book.GetCellValue("Summary Environment", "D"+strconv.Itoa(i+5))
+				if err != nil || value != want {
+					t.Fatal("canonical first-unit workbook value differs from independent expectation", definition, value, err)
+				}
+			}
 			if !reflect.DeepEqual(databaseBytes(t, owner.attachments), before) {
 				t.Fatal("complete canonical read mutated physical source")
 			}

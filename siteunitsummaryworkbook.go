@@ -204,22 +204,10 @@ func prepareSiteUnitSummaryWorkbookProjection(ctx context.Context, preview SiteU
 		return result, err
 	}
 	text := func(sheet, cell, value string) error {
-		// Excelize's plain shared-string writer does not preserve literal OOXML escapes.
-		// A single unformatted rich-text run uses its checked escape-aware writer.
-		if strings.Contains(value, "_x") {
-			if err := book.SetCellRichText(sheet, cell, []excelize.RichTextRun{{Text: value}}); err != nil {
-				return err
-			}
-			actual, err := book.GetCellValue(sheet, cell, excelize.Options{RawCellValue: true})
-			if err != nil {
-				return err
-			}
-			if actual != value {
-				return errors.New("Summary Environment literal text cannot roundtrip through Excel's escape representation; no replacement or partial workbook")
-			}
-			return nil
+		if err := setReportWorkbookText(book, sheet, cell, value); err != nil {
+			return fmt.Errorf("Summary Environment %w", err)
 		}
-		return book.SetCellStr(sheet, cell, value)
+		return nil
 	}
 	method := "Quantitative values summarized as: Min---Mean---Max"
 	if preview.Report.Method == 2 {
