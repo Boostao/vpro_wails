@@ -8,6 +8,33 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+The CHARS lifecycle composition is independently reviewed, disposable-native
+accepted and full-race integrated. Existing persistent deletion/restoration/
+historical creation Undo sessions and panels preserve the actual three links,
+full44-cell witnesses, immutable history provenance and explicit-only mutation
+guards without backend/binding/schema/session/flag changes.
+Corrected28-check/eleven-profile validation passes2586 frontend executions/
+470 affected cases, focused races/vet/check/build and distinct review/follow-up.
+The first candidate remains rejected for its missing-original recovery Unlock;
+production and fixture now share the guarded action without granting writes.
+
+Thirteen nonmutating profiles plus once-only full continuation prove three
+Delete/typed Restore pairs, four historical UI Undos, five representative
+refusal categories, all-owner parent-failure/unknown recovery, specific close
+acknowledgements, four-receipt remount and actual1400/760/420 client layouts.
+Original business/old-history rows and fifteen other files remain exact; seven
+retained source audits,3/3/4/4 histories and four reservations are accounted.
+Failed harness routes remain rejected, including one qualified owned termination
+after duplicate runtime initialization broke close routing. The accepted route
+uses the existing runtime HTTP protocol and closes normally after restoring
+its window minimum. The already completed A Delete is restored without replay.
+Fresh full race passes root4250.103s, UTC2026-10-16T12:01:23.545602 to
+13:23:43.442781, with1871 inputs/383 artifacts/discovery and protected data exact;
+all eighteen owners are freshly absent. No whole-form/default/demo promotion.
+Private receipts: `chars-child-lifecycle-candidate-v2/{review-disposition,native-association}.json`,
+`chars-child-lifecycle-native/{postcommit-resume.json,all-postcommit-resume/}`,
+and `chars-child-lifecycle-integration/{freeze,receipt}.json`.
+
 The CHARS creation composition is independently reviewed, disposable-native
 accepted and full-race integrated. Eleven canonical files/two packaged resources
 qualify actual extended A/C/D links/fourteen fields. Existing persistent owner,

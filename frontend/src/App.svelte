@@ -64,6 +64,9 @@
   const siviCHARSSpeciesEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_SPECIES_EDITING === 'true';
   const siviCHARSIdentityEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_IDENTITY_EDITING === 'true';
   const siviCHARSCreationEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_CREATION_WRITING === 'true';
+  const siviCHARSDeletionEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_DELETION_WRITING === 'true';
+  const siviCHARSRestorationEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_DELETION_RESTORING === 'true';
+  const siviCHARSCreationUndoEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_CREATION_UNDO === 'true';
   let offset = $state(0);
   let busy = $state(false);
   let error = $state('');
@@ -1012,6 +1015,9 @@
       charsSpecies={siviCHARSSpeciesEnabled}
       charsIdentity={siviCHARSIdentityEnabled}
       charsCreation={siviCHARSCreationEnabled}
+      charsDeletion={siviCHARSDeletionEnabled}
+      charsRestoration={siviCHARSRestorationEnabled}
+      charsCreationUndo={siviCHARSCreationUndoEnabled}
       onopenchars={() => void openSIVI('sivi-chars')}
       metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
       onopenmetadata={() => void openProjectMetadata()} />{/if}

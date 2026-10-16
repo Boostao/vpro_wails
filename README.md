@@ -107,6 +107,24 @@ preserving1871 inputs/233 artifacts/discovery and protected data. No new
 backend/binding/session/flag, original callback/allocator equivalence,
 deletion/restoration, whole-form or default/demo promotion follows.
 
+CHARS linked **deletion, typed restoration and historical creation Undo** now
+reuse the existing persistent sessions/panels under their independent frontend
+and backend flags plus CHARS parent prerequisites. Delete offers only the
+actual extended A/C/D links; historical normal-A provenance is retained without
+granting new normal-A creation/deletion. Full44-cell witnesses, permanent ID
+reservations, explicit confirmation/audit policy and all-owner close guards
+remain authoritative. Ordinary Save/Save-and-close never performs these actions.
+Unknown results resolve read-only; verified receipts and clean-peer refresh
+survive remount without replay. The production recovery unlock permits only
+clean owned peer recovery without a parent original, never parent/child writes.
+Independent review,2586 frontend executions/check/build, thirteen nonmutating
+native profiles and once-only full continuation pass. Three Delete/Restore
+pairs, four historical Undos, four-receipt remount and actual three-width
+controls preserve business/old-history rows, with retained audits and technical
+history/reservations accounted separately. Full race passes with1871 frozen
+inputs/383 artifacts unchanged. Failed candidates/harness routes stay rejected;
+no default/demo promotion or whole-form parity follows.
+
 **Forms > Metadata** now delegates to the existing project-metadata editor for
 the currently open FS882/SIVI plot. It is unavailable until the current editor
 is clean, unlocked and available under `VITE_PROJECT_METADATA_EDITING=true`.

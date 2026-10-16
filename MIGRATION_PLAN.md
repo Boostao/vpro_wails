@@ -179,6 +179,34 @@ historical creation Undo using the existing persistent boundaries; the private
 source/reuse contract is sealed without further oracle actions. Continue the
 ordered forms/report/ribbon backlog, not a whole-migration completion.
 
+The accepted CHARS lifecycle composition connects the existing persistent
+deletion, typed restoration and historical creation Undo owners/panels without
+new backend/binding/schema/session/flag changes. New Delete choices are the
+three actual extended A/C/D links and complete44-cell physical rows; foreign
+normal-A deletion reviews are not rebound. Immutable historical provenance,
+including normal-A history, remains explicit in the separate safety adaptations.
+Ordinary Save/Save-and-close cannot perform these actions. All owners share
+peer/close barriers while retaining explicit discard, unknown read-only lookup
+and per-host verified receipt refresh. Loaded empty lifecycle lists refresh
+after mutations without initializing optional disabled peers.
+Corrected validation passes28 checks/eleven production profiles,2586 frontend
+executions/470 affected cases, focused Go races/vet and check0/0. Distinct
+independent review accepts the guarded missing-original recovery unlock and
+revision-pinned shared refresh; parent/child writes still require originals.
+The first candidate and failed expectations remain rejected and preserved.
+Thirteen nonmutating native profiles plus once-only continuation prove three
+Delete/typed Restore pairs, four historical creation Undos, five representative
+refusal categories, all-owner recovery/close barriers and four-receipt remount.
+Actual client1400/760/420 controls and all44 historical cells pass. Original
+business rows/old histories and fifteen other files remain exact; seven retained
+source audits and3/3/4/4 technical histories/four reservations are accounted.
+Four failed harness routes remain unaccepted, including one qualified owned
+termination after zero-write checks. A completed Delete was restored without
+replay. Fresh full race passes (root4250.103s), preserving1871 inputs/383 artifacts,
+discovery and protected data; all eighteen owners are freshly absent.
+No default/demo promotion or whole-form parity follows. Continue the shared
+CHARS Edit Metadata action; its original callback exactly matches normal SIVI.
+
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner
 instead of remaining permanently disabled. Both frontend prerequisites, a
 selected plot and known context are required; independent backend denial and

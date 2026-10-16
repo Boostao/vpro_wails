@@ -10,7 +10,7 @@ are in [README](README.md), [MIGRATION_PLAN](MIGRATION_PLAN.md),
 - This is the Windows VM, not a remote Linux session.
 - Active repository: `C:\Users\BrunoTremblay\Work\vpro_wails`, branch `main`.
   Shared Boolean predecessor: `6d938d1d27c43d2bd96adcf6ad3c435f4db7f941`.
-  Current accepted CHARS creation composition is described below. No push.
+  Current accepted CHARS lifecycle composition is described below. No push.
   The old `access-parity-windows-handoff` worktree is not the integration root.
 - Canonical Access exports: `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
   Never modify canonical Access/data; use disposable fixtures for native work.
@@ -631,12 +631,38 @@ root4276.107s. All1871 inputs/233 artifacts, discovery, canonical/protected
 assets and closed family are unchanged. `chars-child-creation-integration`
 receipt accepts; release the freeze only for six related documentation
 reconciliations and coherent local commit. No default/demo promotion or push.
-Next `chars-child-lifecycle-contract.json`/source seal qualifies eleven
-canonical files/two packaged resources/twelve reuse inputs, with no new oracle
-actions. After creation commit, compose independent persistent deletion,
-typed restoration and historical creation Undo; do not add another writer or
-inherit destructive Access cleanup. Continue all ordered forms/report/ribbon
-work rather than declaring completion at this accepted composition.
+CHARS lifecycle is independently reviewed, native-accepted and full-race
+integrated over creation commit `ed81b1a`. Existing persistent owners/panels,
+three extended Delete links, immutable historical provenance, full44-cell
+witnesses and explicit-only mutation/close guards are reused without new
+backend/binding/schema/session/flag changes.
+`chars-child-lifecycle-candidate-v2` passes28 checks/eleven profiles,2586 frontend
+executions/470 affected cases, focused races/vet/check0/0 and accepted distinct
+review/focused follow-up. The first candidate remains rejected for its real
+missing-original Unlock deadlock. Production and fixture now share the guarded
+recovery-only unlock; writes still require originals.
+Native13 nonmutating profiles and `all-postcommit-resume` pass three Delete/
+typed Restore pairs, four historical Undos, five representative refusal
+categories, parent-failure/unknown recovery, specific native-close acknowledgements,
+four-receipt remount and actual1400/760/420 client layouts/all44 cells.
+Original business/old-history rows and fifteen other files are exact; seven
+retained source audits,3/3/4/4 histories and four permanent reservations are
+accounted. Five representative categories are not total global API attempts.
+Four failed routes remain rejected. The duplicate-runtime failure owner was
+terminated only after fresh identity/zero-write checks; never call that a normal
+close. The accepted route uses the existing runtime HTTP protocol for its
+temporary minimum override, restores560/520 and closes normally.
+`postcommit-resume.json` seals the one completed A Delete from the failed parent
+retry harness; continuation restores it once, never replays Delete.
+Full integration passes exit0, UTC2026-10-16T12:01:23.545602 to
+13:23:43.442781, root4250.103s. All1871 inputs/383 artifacts, discovery,
+canonical/protected/source-family and closed fixture identities are unchanged;
+all eighteen owners are freshly absent. The source freeze is released.
+Next `chars-parent-metadata-contract.json` seals seven canonical inputs and
+exact normal/CHARS Edit Metadata callback equality. Compose the existing owned
+metadata editor, original button and shared Forms-menu predicate; do not add
+another writer or grant ProjectID/PlotType/NotInList/implicit creation.
+Continue all ordered forms/report/ribbon work. No push/default/demo promotion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated
 Go overlays and verify exact embed discovery. Generate Wails bindings with

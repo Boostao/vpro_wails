@@ -11,6 +11,18 @@ const { review, cell } = require('./siviSourceFixture.cjs');
 const wire = require('../../testdata/chars-sivi-entry-client-wire.json');
 const speciesWire = require('./siviSpeciesReferenceFixture.json');
 const creationReceiptTemplate = require('./siviCreationUndoTestHelpers.cjs').review;
+const deletionProof = require('./siviDeletionTestHelpers.cjs');
+const creationUndoProof = require('./siviCreationUndoTestHelpers.cjs');
+const lifecycleOff = {
+  './SIVIDeletionPanel.svelte': { default() {} },
+  './SIVIDeletionRestorationPanel.svelte': { default() {} },
+  './SIVICreationUndoPanel.svelte': { default() {} },
+  './siviDeletionSessions': {
+    siviDeletionSession() { throw new Error('Deletion must remain independently gated.'); },
+    siviDeletionRestorationSession() { throw new Error('Restoration must remain independently gated.'); },
+  },
+  './siviCreationUndoSessions': { siviCreationUndoSession() { throw new Error('Creation Undo must remain independently gated.'); } },
+};
 const source = name => readFileSync(path.join(__dirname, name), 'utf8');
 const clone = value => structuredClone(value);
 const deferred = () => {
@@ -24,6 +36,8 @@ function fixture(options = {}) {
     collectedSave: 0, speciesRead: 0, speciesReferences: 0, speciesSave: 0,
     identityRead: 0, identitySave: 0, identityRestore: 0,
     creationReferences: 0, create: 0, creationLookup: 0,
+    lifecycle: Object.fromEntries(['deletion', 'restoration', 'creationUndo'].map(kind =>
+      [kind, { read: 0, review: 0, save: 0, lookup: 0 }])),
     restore: 0, collectedRestore: 0, speciesRestore: 0, refresh: 0, cancelled: 0 };
   const originalParent = clone(wire);
   let currentParent = clone(wire);
@@ -52,6 +66,101 @@ function fixture(options = {}) {
     return receipt;
   }
   function parentOwner() { return { contextId: wire.Original.ContextID, project: wire.Original.Project, plot: wire.Original.Plot }; }
+  const lifecycleRequests = {}, lifecycleReceipts = {};
+  const deletionOriginal = { ...deletionProof.original(), ...parentOwner(), form: 'SubVegA-SIVI' };
+  for (const [index, column] of deletionOriginal.columns.entries()) {
+    if (column.name === 'PlotNumber') deletionOriginal.original.cells[index] = cell('text', parentOwner().plot);
+    if (['Cover6', 'Cover7'].includes(column.name)) deletionOriginal.original.cells[index] = cell('real', 0);
+  }
+  if (options.deletionCell) {
+    deletionOriginal.original.cells[deletionOriginal.columns.findIndex(column => column.name === options.deletionCell.column)] =
+      clone(options.deletionCell.value);
+  }
+  const additionalDeletionRows = [];
+  const historicalCreation = creationUndoProof.review();
+  Object.assign(historicalCreation, parentOwner());
+  Object.assign(historicalCreation.creation, parentOwner());
+  Object.assign(historicalCreation.creation.request, parentOwner());
+  if (options.historicalCreationForm) {
+    historicalCreation.form = historicalCreation.creation.form = historicalCreation.creation.request.form = options.historicalCreationForm;
+  }
+  historicalCreation.committed.cells[historicalCreation.columns.findIndex(column => column.name === 'PlotNumber')] = cell('text', parentOwner().plot);
+  historicalCreation.creation.committed = clone(historicalCreation.committed);
+  for (const row of historicalCreation.auditsBefore) {
+    row.cells[historicalCreation.auditColumns.findIndex(column => column.name === 'PlotNumber')] = cell('text', parentOwner().plot);
+    row.cells[historicalCreation.auditColumns.findIndex(column => column.name === 'Project')] = cell('text', parentOwner().project);
+  }
+  let deletionRecord = options.seedDeletion ? { ...deletionProof.receipt({ ...clone(deletionOriginal),
+    requestId: deletionProof.token }, true), ...parentOwner() } : null;
+  let deletionConsumed = false, creationConsumed = false;
+  function projectPhysical(columns, row, remove) {
+    for (const group of currentChild) {
+      group.Rows = group.Rows.filter(value => value.rowId !== row.rowId);
+      const membership = group.Form.startsWith('SubVegA-')
+        ? ['Cover1', 'Cover2', 'Cover3', 'TotalA', 'Cover4', 'Cover5', 'Cover5a', 'Cover5b', 'Cover5c', 'TotalB']
+        : group.Form === 'SubVegC-SIVI' ? ['Cover6'] : ['Cover7', 'Cover8', 'Cover9'];
+      if (!remove && membership.some(name => row.cells[columns.findIndex(column => column.name === name)].storage !== 'null')) {
+        group.Rows.push({ rowId: row.rowId, cells: group.Columns.map(name => clone(row.cells[columns.findIndex(column => column.name === name)])) });
+      }
+    }
+  }
+  if (options.lifecycle) {
+    if (!options.seedDeletion) projectPhysical(deletionOriginal.columns, deletionOriginal.original, false);
+    projectPhysical(historicalCreation.columns, historicalCreation.committed, false);
+  }
+  function restorationReview() {
+    assert.ok(deletionRecord);
+    const auditColumns = historicalCreation.auditColumns;
+    return { ...parentOwner(), historyId: deletionRecord.historyId, expected: 'a'.repeat(64),
+      form: deletionRecord.form, rowId: deletionRecord.rowId, id: deletionRecord.id,
+      columns: clone(deletionRecord.columns), original: clone(deletionRecord.original),
+      deletion: { ...clone(deletionRecord), didCommit: false, replayed: true },
+      auditColumns: clone(auditColumns), auditsBefore: deletionRecord.audits.map(audit => ({
+        rowId: audit.rowId, cells: auditColumns.map(column => column.name === 'ID' ? cell('integer', String(audit.id))
+          : ['Restore', 'Flag'].includes(column.name) ? cell('integer', '0')
+          : column.name === 'AfterEdit' ? cell('null')
+          : cell('text', { Project: audit.project, User: audit.user, PlotNumber: audit.plotNumber, Table: 'sAmPlE_vEg',
+            EditField: audit.editField, EditWhen: audit.editWhen, BeforeEdit: audit.beforeEdit }[column.name])),
+      })) };
+  }
+  function restorationResult(request) {
+    const reviewed = restorationReview(), after = request.action === 'prune' ? [] : clone(reviewed.auditsBefore);
+    for (const row of after) row.cells[reviewed.auditColumns.findIndex(column => column.name === 'Restore')] = cell('integer', '-1');
+    return { ...reviewed, requestId: request.requestId, restorationId: request.requestId, action: request.action,
+      actor: ' restoring user ', auditStrength: 2, editWhen: '2026-10-07 19:31:54', restored: clone(reviewed.original),
+      request: clone(request), auditsAfter: after, cancelled: false, restoredRows: 1,
+      prunedAuditRows: request.action === 'prune' ? reviewed.auditsBefore.length : 0, didCommit: true, replayed: false };
+  }
+  async function lifecycleRead(kind, value) {
+    const count = ++calls.lifecycle[kind].read;
+    return options.lifecycleRead ? options.lifecycleRead(kind, count, clone(value)) : clone(value);
+  }
+  async function lifecycleMutation(kind, raw) {
+    calls.lifecycle[kind].save++;
+    const request = JSON.parse(raw);
+    lifecycleRequests[kind] = clone(request);
+    let result;
+    if (kind === 'deletion') {
+      result = { ...deletionProof.receipt(request), ...parentOwner() };
+      deletionRecord = clone(result);
+      projectPhysical(request.columns, request.original, true);
+    } else if (kind === 'restoration') {
+      result = restorationResult(request);
+      deletionConsumed = true;
+      projectPhysical(result.columns, result.original, false);
+    } else {
+      result = creationUndoProof.result(historicalCreation, request);
+      creationConsumed = true;
+      projectPhysical(historicalCreation.columns, historicalCreation.committed, true);
+    }
+    lifecycleReceipts[kind] = clone(result);
+    return options.lifecycleMutation ? options.lifecycleMutation(kind, request, result) : result;
+  }
+  async function lifecycleLookup(kind, raw) {
+    calls.lifecycle[kind].lookup++;
+    assert.deepEqual(JSON.parse(raw), lifecycleRequests[kind]);
+    return { ...clone(lifecycleReceipts[kind]), didCommit: false, replayed: true };
+  }
   function requireCommittedRows(edits, committed) {
     const ids = new Set(edits.map(edit => edit.rowId));
     for (let index = 0; index < currentChild.length; index++) {
@@ -66,6 +175,36 @@ function fixture(options = {}) {
   const parentProps = { contextId: wire.Original.ContextID, project: wire.Original.Project, plotNumber: wire.Original.Plot };
   const environment = { VITE_SIVI_CHARS_PARENT_ENTRY: 'true', VITE_SIVI_COMBINED_EDITING: 'true', ...options.environment };
   const api = {
+    SIVIDeletionService: {
+      GetTargets: async () => lifecycleRead('deletion', { ...parentOwner(), columns: deletionOriginal.columns,
+        rows: [...(deletionRecord && !deletionConsumed ? [] : [deletionOriginal.original]), ...additionalDeletionRows] }),
+      GetOriginal: async (_context, _plot, form, rowId) => {
+        calls.lifecycle.deletion.review++;
+        const row = rowId === deletionOriginal.original.rowId ? deletionOriginal.original
+          : additionalDeletionRows.find(row => row.rowId === rowId);
+        assert.ok(row);
+        return { ...clone(deletionOriginal), form, original: clone(row) };
+      },
+      Delete: async (_context, raw) => lifecycleMutation('deletion', raw),
+      LookupReceipt: async (_context, raw) => lifecycleLookup('deletion', raw),
+      GetHistory: async () => lifecycleRead('restoration', { ...parentOwner(), historyPresent: deletionRecord !== null,
+        events: deletionRecord ? [{ historyId: deletionRecord.historyId, form: deletionRecord.form, rowId: deletionRecord.rowId,
+          id: deletionRecord.id, species: deletionOriginal.original.cells[deletionOriginal.columns.findIndex(column => column.name === 'Species')].text,
+          actor: deletionRecord.actor, editWhen: deletionRecord.editWhen, restored: deletionConsumed, consumed: deletionConsumed }] : [] }),
+      ReviewRestoration: async () => { calls.lifecycle.restoration.review++; return restorationReview(); },
+      Restore: async (_context, raw) => lifecycleMutation('restoration', raw),
+      LookupRestorationReceipt: async (_context, raw) => lifecycleLookup('restoration', raw),
+    },
+    SIVICreationUndoService: {
+      GetHistory: async () => lifecycleRead('creationUndo', { ...parentOwner(), historyPresent: true, events: [{
+        historyId: historicalCreation.historyId, form: historicalCreation.form, rowId: historicalCreation.rowId, id: historicalCreation.id,
+        species: 'TREE', actor: historicalCreation.creation.actor, editWhen: historicalCreation.creation.editWhen,
+        undone: creationConsumed, consumed: creationConsumed, reviewAvailable: !creationConsumed,
+        unavailableReason: creationConsumed ? 'This creation history has already been consumed.' : null }] }),
+      Review: async () => { calls.lifecycle.creationUndo.review++; return clone(historicalCreation); },
+      Undo: async (_context, raw) => lifecycleMutation('creationUndo', raw),
+      LookupReceipt: async (_context, raw) => lifecycleLookup('creationUndo', raw),
+    },
     SIVICreationService: {
       GetReferences: async (context, plot) => {
         calls.creationReferences++;
@@ -78,6 +217,8 @@ function fixture(options = {}) {
         assert.equal(context, wire.Original.ContextID);
         calls.creationRequest = JSON.parse(raw);
         const result = creationReceipt(calls.creationRequest);
+        additionalDeletionRows.push({ rowId: result.rowId, cells: deletionOriginal.columns.map(column =>
+          clone(result.committed.cells[result.columns.findIndex(value => value.name === column.name)])) });
         for (const group of currentChild) if (group.Form === result.form) {
           group.Rows.push({ rowId: result.rowId, cells: group.Columns.map(name =>
             clone(result.committed.cells[result.columns.findIndex(column => column.name === name)])) });
@@ -284,7 +425,9 @@ function fixture(options = {}) {
     const declaration = ast.statements.find(node => ts.isVariableStatement(node) && node.getText(ast).includes('$props()'));
     assert.ok(declaration);
     const properties = name === 'SIVICHARSForm.svelte' ? 'contextId, project, plotNumber, onSaved, onBusyChange'
-      : 'contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation';
+      : `contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation,
+        collectedAvailable = false, speciesAvailable = false, identityAvailable = false, creationAvailable = false,
+        deletionAvailable = false, restorationAvailable = false, creationUndoAvailable = false`;
     script = script.slice(0, declaration.getStart(ast)) + `const { ${properties} } = __props;` +
       script.slice(declaration.end);
     if (name === 'SIVICHARSParentForm.svelte') {
@@ -334,13 +477,24 @@ function fixture(options = {}) {
       export function createRow(kind, source) { return creationOperation(kind, source); }
       export function creationDraft(value) { stageCreation(value); }
       export function creationSnapshot() { return creationView; }
-      export function creationCanUnlock() { return creationPending && !creationClose?.busy; }
+      export function creationCanUnlock() { return (creationPending || lifecyclePending) && !creationClose?.busy &&
+        !lifecycleKinds.some(kind => lifecycleStates[kind]?.busy); }
       export function retainedCreation() { return creation; }
-      export function creationNeedsRefresh() { return creationRefreshNeeded; }`);
+      export function creationNeedsRefresh() { return creationRefreshNeeded; }
+      export function lifecycle(kind, operation, identity, source) { return lifecycleOperation(kind, operation, identity, source); }
+      export function lifecycleConfirm(kind, confirmed, action) { stageLifecycle(kind, confirmed, action); }
+      export function lifecycleSnapshot(kind) { return lifecycleEntry(kind)?.view(); }
+      export function retainedLifecycle(kind) { return lifecycleEntry(kind); }
+      export function lifecycleTargets() { return deletionTargets; }
+      export function lifecycleNeedsRefresh(kind) { return lifecycleRefreshNeeded(kind); }`);
     parentProps.onSaved = form.parentSaved;
     parent = component('SIVICHARSParentForm.svelte', parentProps, `
       export function loadSource() { return operation('load'); }
-      export function unlock() { locked = false; }
+      export function unlock() { return locked ? toggleParentLock() : true; }
+      export function clickLock() { return toggleParentLock(); }
+      export function lockEligibility() {
+        return { locked, disabled: lockToggleDisabled, hasOriginal: !!view?.original, fieldsDisabled: disabled };
+      }
       export function draft(column, input) { stage(column, input); }
       export function snapshot() { return view; }
       export function undoSource() { return operation('undo'); }
@@ -349,6 +503,7 @@ function fixture(options = {}) {
   }); }
   mount();
   return { calls, get parent() { return parent; }, get form() { return form; }, rowId: originalChild[0].Rows[0].rowId,
+    lifecycleOriginal: clone(deletionOriginal), lifecycleCreation: clone(historicalCreation),
     creationEditor: () => load(path.join(__dirname, 'siviCreationEditor.ts')),
     creationFields(form) {
       const fields = serverComponent(source('SIVICreationFields.svelte'), 'SIVICreationFields.svelte',
@@ -371,6 +526,7 @@ test('compiled linked snippet requires exact parent and independent combined/Col
       </script><section>{record(Boolean(linkedVegetation))}{#if linkedVegetation}{@render linkedVegetation()}{/if}</section>`, 'linked-parent.svelte',
       { proof: { record: value => { if (value) rendered++; return ''; } } });
     const component = serverComponent(source('SIVICHARSForm.svelte'), 'SIVICHARSForm.svelte', {
+      ...lifecycleOff,
       './SIVICHARSParentForm.svelte': { default: parentStub }, './SIVICombinedPanel.svelte': { default() {} },
       './SIVICollectedPanel.svelte': { default() {} },
       './SIVIIdentityPanel.svelte': { default() {} },
@@ -448,6 +604,7 @@ test('compiled creator gate is independent of all four child gates and exposes o
       dispose() {}
     }
     const component = serverComponent(source('SIVICHARSForm.svelte'), 'SIVICHARSForm.svelte', {
+      ...lifecycleOff,
       '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {},
         SIVISpeciesService: {}, SIVIIdentityService: {}, AuditRestoreAction: {} },
       './SIVICHARSParentForm.svelte': { default: parentStub },
@@ -470,6 +627,562 @@ test('compiled creator gate is independent of all four child gates and exposes o
   assert.match(source('App.svelte'), /const siviCHARSCreationEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_CREATION_WRITING === 'true'/);
   assert.match(source('App.svelte'), /charsCreation=\{siviCHARSCreationEnabled\}/);
 });
+
+test('compiled lifecycle gates remain literal and independent of creator and typed child flags', () => {
+  const flags = [undefined, 'false', 'TRUE', 'true'];
+  for (const parent of flags) for (const deletion of flags) for (const restoration of flags) for (const undo of flags) {
+    const counts = { deletion: 0, restoration: 0, creationUndo: 0 };
+    class Child {
+      view() { return { busy: false }; }
+      closeState() { return { busy: false, unsaved: false, blocked: false }; }
+      dispose() {}
+    }
+    const parentStub = serverComponent('<script>let { linkedVegetation } = $props();</script>{@render linkedVegetation?.()}',
+      'parent.svelte', {});
+    function panel(kind) {
+      return { default: serverComponent(`<script>import { record } from 'proof';</script>{record()}`,
+        kind + '.svelte', { proof: { record() { counts[kind]++; return ''; } } }) };
+    }
+    const session = () => ({
+      view: () => ({ receipt: null, targets: null, original: null, history: null, review: null, revision: 0 }),
+      closeState: () => ({ unsaved: false, busy: false, blocked: false, canSave: false }),
+    });
+    const component = serverComponent(source('SIVICHARSForm.svelte'), 'SIVICHARSForm.svelte', {
+      ...lifecycleOff,
+      './SIVICHARSParentForm.svelte': { default: parentStub },
+      '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {},
+        SIVISpeciesService: {}, SIVIIdentityService: {}, AuditRestoreAction: {} },
+      ...Object.fromEntries(['Combined', 'Collected', 'Species', 'Identity'].map(name => ['./SIVI' + name + 'Panel.svelte', { default() {} }])),
+      ...Object.fromEntries(['Combined', 'Collected', 'Species', 'Identity'].map(name =>
+        ['./sivi' + name + 'Session', { ['SIVI' + name + 'Session']: Child }])),
+      './SIVICreationPanel.svelte': { default() {} },
+      './siviCreationSessions': { siviCreationSession() { throw new Error('Creator is not a lifecycle prerequisite.'); } },
+      './SIVIDeletionPanel.svelte': panel('deletion'), './SIVIDeletionRestorationPanel.svelte': panel('restoration'),
+      './SIVICreationUndoPanel.svelte': panel('creationUndo'),
+      './siviDeletionSessions': { siviDeletionSession: session, siviDeletionRestorationSession: session },
+      './siviCreationUndoSessions': { siviCreationUndoSession: session },
+    }, { VITE_SIVI_CHARS_PARENT_ENTRY: parent, VITE_SIVI_DELETION_WRITING: deletion,
+      VITE_SIVI_DELETION_RESTORING: restoration, VITE_SIVI_CREATION_UNDO: undo });
+    render(component, { props: { contextId: 'owned', project: 'Sample', plotNumber: 'P' } }).body;
+    for (const [index, kind] of ['deletion', 'restoration', 'creationUndo'].entries()) {
+      assert.equal(counts[kind], parent === 'true' && [deletion, restoration, undo][index] === 'true' ? 1 : 0);
+    }
+  }
+  for (const name of ['Deletion', 'Restoration', 'CreationUndo']) {
+    assert.match(source('App.svelte'), new RegExp(`chars${name}=\\{siviCHARS${name}Enabled\\}`));
+  }
+});
+
+async function lifecycleFixture(options = {}) {
+  const f = fixture({ ...options, lifecycle: true, environment: {
+    VITE_SIVI_CREATION_WRITING: 'true', VITE_SIVI_DELETION_WRITING: 'true',
+    VITE_SIVI_DELETION_RESTORING: 'true', VITE_SIVI_CREATION_UNDO: 'true', ...options.environment,
+  } });
+  assert.equal(await f.parent.loadSource(), true);
+  f.parent.unlock();
+  return f;
+}
+async function lifecycleReview(f, kind, source = 'SubVegA-SIVI') {
+  const load = kind === 'deletion' ? 'load' : 'history';
+  assert.equal(await f.form.lifecycle(kind, load), true, f.form.getCloseState().error);
+  const id = kind === 'deletion' ? f.lifecycleOriginal.original.rowId
+    : f.form.lifecycleSnapshot(kind).history.events[0].historyId;
+  assert.equal(await f.form.lifecycle(kind, 'review', id, source), true, f.form.getCloseState().error);
+  return id;
+}
+function lifecycleConfirm(f, kind, action = 'prune') {
+  if (kind !== 'deletion') f.form.lifecycleConfirm(kind, false, action);
+  f.form.lifecycleConfirm(kind, true);
+}
+
+test('three CHARS deletion links share one complete physical original and ordinary Save never deletes it', async () => {
+  const f = await lifecycleFixture();
+  try {
+    assert.equal(await f.form.lifecycle('deletion', 'load'), true);
+    assert.deepEqual(f.form.lifecycleTargets().map(value => [value.form, value.rowId]),
+      ['SubVegA-SIVI', 'SubVegC-SIVI', 'SubVegD-SIVI'].map(form => [form, f.lifecycleOriginal.original.rowId]));
+    assert.equal(await f.form.lifecycle('deletion', 'review', f.lifecycleOriginal.original.rowId, 'SubVegA-SIVI_BC'), false);
+    assert.equal(f.calls.lifecycle.deletion.review, 0);
+    await lifecycleReview(f, 'deletion');
+    assert.deepEqual(f.form.lifecycleSnapshot('deletion').original.original, f.lifecycleOriginal.original);
+    assert.equal(f.form.lifecycleSnapshot('deletion').original.columns.length, 44);
+    lifecycleConfirm(f, 'deletion');
+    assert.equal(f.form.getCloseState().canSave, false);
+    assert.match(f.form.getCloseState().saveReason, /explicitly|Save-and-close/);
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(await f.parent.saveForClose(), false);
+    assert.equal(f.calls.lifecycle.deletion.save, 0);
+    assert.equal(await f.form.createRow('load'), false);
+    assert.equal(await f.form.lifecycle('restoration', 'history'), false);
+    for (const read of [() => f.form.perform('load'), () => f.form.collect('load'),
+      () => f.form.select('load'), () => f.form.identify('load')]) assert.equal(await read(), false);
+    f.remount();
+    assert.equal(f.form.lifecycleSnapshot('deletion').confirmed, true);
+    assert.equal(await f.parent.loadSource(), true);
+    f.parent.unlock();
+    assert.equal(await f.form.lifecycle('deletion', 'undo'), true);
+    assert.equal(f.form.getCloseState().unsaved, false);
+  } finally { f.dispose(); }
+});
+
+test('a retained normal-A deletion review is neither rebound nor submitted, but owning discard survives remount', async () => {
+  const f = await lifecycleFixture();
+  try {
+    assert.equal(await f.form.lifecycle('deletion', 'load'), true);
+    const retained = f.form.retainedLifecycle('deletion');
+    assert.equal(await retained.review('SubVegA-SIVI_BC', f.lifecycleOriginal.original.rowId), true);
+    retained.confirm(true);
+    f.remount();
+    assert.equal(f.form.retainedLifecycle('deletion'), retained);
+    assert.equal(await f.parent.loadSource(), true);
+    f.parent.unlock();
+    assert.equal(f.form.lifecycleSnapshot('deletion').original.form, 'SubVegA-SIVI_BC');
+    assert.equal(await f.form.lifecycle('deletion', 'save'), false);
+    assert.equal(f.calls.lifecycle.deletion.save, 0);
+    assert.equal(await f.form.lifecycle('deletion', 'undo'), true);
+  } finally { f.dispose(); }
+});
+
+test('Delete refreshes every loaded physical-row peer and history, then typed restoration preserves all44 cells', async () => {
+  const f = await lifecycleFixture({ environment: {
+    VITE_SIVI_COLLECTED_EDITING: 'true', VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_IDENTITY_EDITING: 'true' } });
+  try {
+    for (const load of [() => f.form.perform('load'), () => f.form.collect('load'),
+      () => f.form.select('load'), () => f.form.identify('load')]) assert.equal(await load(), true);
+    assert.equal(await f.form.lifecycle('restoration', 'history'), true);
+    assert.equal(f.form.lifecycleSnapshot('restoration').history.historyPresent, false);
+    assert.equal(await f.form.lifecycle('creationUndo', 'history'), true);
+    await lifecycleReview(f, 'deletion', 'SubVegC-SIVI');
+    lifecycleConfirm(f, 'deletion');
+    assert.equal(await f.form.lifecycle('deletion', 'save'), true, f.form.getCloseState().error);
+    assert.equal(f.calls.lifecycle.deletion.save, 1);
+    assert.equal(f.form.lifecycleNeedsRefresh('deletion'), false);
+    for (const view of [f.form.snapshot(), f.form.collectedSnapshot(), f.form.speciesSnapshot(), f.form.identitySnapshot()]) {
+      assert.equal(view.review.some(group => group.Rows.some(row => row.rowId === f.lifecycleOriginal.original.rowId)), false);
+    }
+    assert.equal(f.form.lifecycleSnapshot('deletion').targets.length, 0);
+    assert.equal(f.form.lifecycleSnapshot('restoration').history.events.length, 1);
+    assert.equal(f.calls.lifecycle.creationUndo.read, 2);
+    await lifecycleReview(f, 'restoration');
+    lifecycleConfirm(f, 'restoration', 'retain');
+    f.form.lifecycleConfirm('restoration', false, 'prune');
+    assert.equal(f.form.lifecycleSnapshot('restoration').confirmed, false);
+    assert.equal(await f.form.lifecycle('restoration', 'save'), false);
+    lifecycleConfirm(f, 'restoration');
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(await f.form.lifecycle('restoration', 'save'), true, f.form.getCloseState().error);
+    assert.deepEqual(f.form.lifecycleSnapshot('restoration').receipt.restored, f.lifecycleOriginal.original);
+    assert.equal(f.calls.lifecycle.restoration.save, 1);
+    assert.equal(f.form.lifecycleSnapshot('restoration').history.events[0].consumed, true);
+    assert.equal(f.form.lifecycleSnapshot('deletion').targets.length, 4);
+    assert.equal(f.form.lifecycleTargets().length, 3);
+    for (const view of [f.form.snapshot(), f.form.collectedSnapshot(), f.form.speciesSnapshot(), f.form.identitySnapshot()]) {
+      for (const group of view.review) assert.ok(group.Rows.some(row => row.rowId === f.lifecycleOriginal.original.rowId));
+    }
+  } finally { f.dispose(); }
+});
+
+test('historical creation Undo retains explicit normal-A provenance instead of inferring a new CHARS creation form', async () => {
+  const f = await lifecycleFixture({ historicalCreationForm: 'SubVegA-SIVI_BC' });
+  try {
+    await lifecycleReview(f, 'creationUndo');
+    assert.equal(f.form.lifecycleSnapshot('creationUndo').review.form, 'SubVegA-SIVI_BC');
+    lifecycleConfirm(f, 'creationUndo', 'retain');
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(f.calls.lifecycle.creationUndo.save, 0);
+    assert.equal(await f.form.lifecycle('creationUndo', 'undo'), true, f.form.getCloseState().error);
+    const receipt = f.form.lifecycleSnapshot('creationUndo').receipt;
+    assert.equal(receipt.form, 'SubVegA-SIVI_BC');
+    assert.equal(receipt.committed.cells.length, 44);
+    assert.equal(receipt.auditsAfter.length, 2);
+    assert.equal(f.form.lifecycleSnapshot('creationUndo').history.events[0].consumed, true);
+    assert.equal(f.calls.lifecycle.creationUndo.save, 1);
+  } finally { f.dispose(); }
+});
+
+test('cancelled lifecycle acknowledgements resolve the same retained requests after remount without repeating mutations', async () => {
+  for (const kind of ['deletion', 'restoration', 'creationUndo']) {
+    const held = deferred();
+    const f = await lifecycleFixture({ seedDeletion: kind === 'restoration',
+      lifecycleMutation: (_kind, _request, value) => { held.result = value; return held.promise; } });
+    try {
+      await lifecycleReview(f, kind);
+      lifecycleConfirm(f, kind);
+      const pending = f.form.lifecycle(kind, kind === 'creationUndo' ? 'undo' : 'save');
+      assert.equal(f.form.getCloseState().busy, true);
+      assert.equal(await f.form.lifecycle(kind, 'cancel'), true);
+      const retained = f.form.lifecycleSnapshot(kind).requestId;
+      assert.equal(f.form.lifecycleSnapshot(kind).blocked, true);
+      f.remount();
+      assert.equal(await f.parent.loadSource(), true);
+      f.parent.unlock();
+      assert.equal(f.form.lifecycleSnapshot(kind).requestId, retained);
+      assert.equal(await f.form.lifecycle(kind, kind === 'creationUndo' ? 'discard' : 'undo'), false);
+      assert.equal(await f.form.lifecycle(kind, 'resolve'), true, f.form.getCloseState().error);
+      assert.equal(f.calls.lifecycle[kind].save, 1);
+      assert.equal(f.calls.lifecycle[kind].lookup, 1);
+      assert.equal(f.form.lifecycleSnapshot(kind).receipt.replayed, true);
+      held.resolve(held.result);
+      assert.equal(await pending, false);
+      assert.equal(f.form.lifecycleSnapshot(kind).receipt.replayed, true);
+    } finally { f.dispose(); }
+  }
+});
+
+test('verified lifecycle receipt and missing-parent recovery survive remount without mutation replay', async () => {
+  for (const kind of ['deletion', 'restoration', 'creationUndo']) {
+    let fail = true;
+    const f = await lifecycleFixture({ seedDeletion: kind === 'restoration',
+      parentRead: (count, value) => { if (count > 1 && fail) throw new Error('missing parent projection'); return value; } });
+    try {
+      await lifecycleReview(f, kind);
+      lifecycleConfirm(f, kind);
+      assert.equal(await f.form.lifecycle(kind, kind === 'creationUndo' ? 'undo' : 'save'), false);
+      const receipt = f.form.lifecycleSnapshot(kind).receipt;
+      assert.ok(receipt);
+      assert.equal(f.form.lifecycleNeedsRefresh(kind), true);
+      assert.equal(f.parent.snapshot().original, null);
+      assert.equal(await f.form.lifecycle(kind, kind === 'creationUndo' ? 'undo' : 'save'), false);
+      fail = false;
+      f.remount();
+      assert.equal(f.form.lifecycleNeedsRefresh(kind), true);
+      assert.equal(await f.parent.loadSource(), true);
+      f.parent.unlock();
+      assert.equal(await f.form.lifecycle(kind, 'refresh'), true, f.form.getCloseState().error);
+      assert.deepEqual(f.form.lifecycleSnapshot(kind).receipt, receipt);
+      assert.equal(f.calls.lifecycle[kind].save, 1);
+      assert.equal(f.form.getCloseState().unsaved, false);
+    } finally { f.dispose(); }
+  }
+});
+
+test('loaded empty lifecycle lists retry postcommit failure without initializing optional peers', async () => {
+  let fail = false;
+  const f = await lifecycleFixture({ environment: { VITE_SIVI_COMBINED_EDITING: 'false',
+    VITE_SIVI_COLLECTED_EDITING: 'false', VITE_SIVI_SPECIES_EDITING: 'false', VITE_SIVI_IDENTITY_EDITING: 'false' },
+    lifecycleRead: (kind, count, value) => { if (kind === 'restoration' && count > 1 && fail) throw new Error('history refresh failed'); return value; } });
+  try {
+    assert.equal(await f.form.lifecycle('restoration', 'history'), true);
+    assert.equal(f.form.lifecycleSnapshot('restoration').history.events.length, 0);
+    await lifecycleReview(f, 'deletion');
+    lifecycleConfirm(f, 'deletion');
+    fail = true;
+    assert.equal(await f.form.lifecycle('deletion', 'save'), false);
+    const receipt = f.form.lifecycleSnapshot('deletion').receipt;
+    assert.equal(f.form.lifecycleNeedsRefresh('deletion'), true);
+    fail = false;
+    assert.equal(await f.form.lifecycle('deletion', 'refresh'), true);
+    assert.deepEqual(f.form.lifecycleSnapshot('deletion').receipt, receipt);
+    assert.equal(f.form.lifecycleSnapshot('restoration').history.events.length, 1);
+    assert.equal(f.calls.lifecycle.deletion.save, 1);
+    assert.equal(f.calls.childRead + f.calls.collectedRead + f.calls.speciesRead + f.calls.identityRead, 0);
+  } finally { f.dispose(); }
+});
+
+test('each lifecycle review blocks every other owner while explicit known discard stays reachable', async () => {
+  for (const kind of ['deletion', 'restoration', 'creationUndo']) {
+    const f = await lifecycleFixture({ seedDeletion: kind === 'restoration', environment: {
+      VITE_SIVI_COLLECTED_EDITING: 'true', VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_IDENTITY_EDITING: 'true' } });
+    try {
+      await lifecycleReview(f, kind);
+      lifecycleConfirm(f, kind);
+      for (const read of [() => f.form.perform('load'), () => f.form.collect('load'),
+        () => f.form.select('load'), () => f.form.identify('load'), () => f.form.createRow('load')]) assert.equal(await read(), false);
+      for (const peer of ['deletion', 'restoration', 'creationUndo']) if (peer !== kind) {
+        assert.equal(await f.form.lifecycle(peer, peer === 'deletion' ? 'load' : 'history'), false);
+        assert.equal(f.calls.lifecycle[peer].read, 0);
+      }
+      f.parent.draft('RootZoneParticleSize', { kind: 'text', raw: 'FINE' });
+      assert.equal(f.parent.getCloseState().unsaved, false);
+      assert.equal(await f.form.saveForClose(), false);
+      assert.equal(await f.form.lifecycle(kind, kind === 'creationUndo' ? 'discard' : 'undo'), true);
+      assert.equal(f.calls.lifecycle[kind].save, 0);
+    } finally { f.dispose(); }
+  }
+});
+
+test('cancelled lifecycle reads reject stale foreign results after remount and a fresh owning read', async () => {
+  for (const kind of ['deletion', 'restoration', 'creationUndo']) {
+    const held = deferred();
+    const f = await lifecycleFixture({ seedDeletion: kind === 'restoration', lifecycleRead: (current, count, value) => {
+      if (current === kind && count === 1) { held.result = value; return held.promise; }
+      return value;
+    } });
+    try {
+      const operation = kind === 'deletion' ? 'load' : 'history';
+      const reading = f.form.lifecycle(kind, operation);
+      assert.equal(f.form.lifecycleSnapshot(kind).busy, true);
+      assert.equal(await f.form.lifecycle(kind, 'cancel'), true);
+      assert.equal(f.form.lifecycleSnapshot(kind).blocked, false);
+      assert.match(f.form.lifecycleSnapshot(kind).error, /cancelled/);
+      f.remount();
+      assert.equal(await f.parent.loadSource(), true);
+      f.parent.unlock();
+      assert.equal(await f.form.lifecycle(kind, operation), true);
+      held.resolve({ ...held.result, plot: 'FOREIGN' });
+      assert.equal(await reading, false);
+      assert.equal(f.form.lifecycleSnapshot(kind).error, null);
+      assert.equal(f.calls.lifecycle[kind].read, 2);
+      assert.equal(f.calls.lifecycle[kind].save, 0);
+    } finally { f.dispose(); }
+  }
+});
+
+test('new creator commits refresh already loaded deletion and historical lists with the new physical target', async () => {
+  const f = await lifecycleFixture();
+  try {
+    for (const kind of ['deletion', 'restoration', 'creationUndo']) {
+      assert.equal(await f.form.lifecycle(kind, kind === 'deletion' ? 'load' : 'history'), true);
+    }
+    assert.equal(await f.form.createRow('load'), true);
+    assert.equal(await f.form.createRow('start', 'SubVegA-SIVI'), true);
+    validCreation(f);
+    assert.equal(await f.form.createRow('save'), true);
+    const receipt = f.form.creationSnapshot().receipt;
+    assert.equal(f.form.lifecycleTargets().some(target => target.rowId === receipt.rowId && target.form === receipt.form), true);
+    for (const kind of ['deletion', 'restoration', 'creationUndo']) assert.equal(f.calls.lifecycle[kind].read, 2);
+    assert.equal(await f.form.lifecycle('deletion', 'review', receipt.rowId, receipt.form), true);
+    const original = f.form.lifecycleSnapshot('deletion').original;
+    for (const [index, column] of original.columns.entries()) {
+      assert.deepEqual(original.original.cells[index], receipt.committed.cells[receipt.columns.findIndex(value => value.name === column.name)]);
+    }
+    assert.equal(await f.form.lifecycle('deletion', 'undo'), true);
+    assert.equal(f.calls.create, 1);
+    assert.equal(f.calls.lifecycle.deletion.save, 0);
+  } finally { f.dispose(); }
+});
+
+test('historical unavailable targets and freshly reviewed invalid originals stay explicit without deletion or repair', async () => {
+  for (const [column, value, reason] of [
+    ['ID', cell('null'), /NULL or non-signed32/],
+    ['ID', cell('integer', '2147483648'), /NULL or non-signed32/],
+    ['Species', cell('blob', 'ff'), /BLOB/],
+    ['Flag', cell('real', 1), /BOOLEAN/],
+  ]) {
+    const f = await lifecycleFixture({ deletionCell: { column, value } });
+    try {
+      assert.equal(await f.form.lifecycle('deletion', 'load'), true, f.form.getCloseState().error);
+      assert.equal(f.form.lifecycleTargets().length, 3);
+      for (const target of f.form.lifecycleTargets()) assert.match(target.unavailable, reason);
+      assert.equal(await f.form.lifecycle('deletion', 'review', f.lifecycleOriginal.original.rowId, 'SubVegA-SIVI'), true);
+      assert.match(f.form.lifecycleSnapshot('deletion').error, reason);
+      f.form.lifecycleConfirm('deletion', true);
+      assert.equal(f.form.getCloseState().blocked, true);
+      assert.equal(await f.form.lifecycle('deletion', 'save'), false);
+      assert.equal(f.calls.lifecycle.deletion.save, 0);
+      assert.equal(await f.form.lifecycle('deletion', 'undo'), true);
+    } finally { f.dispose(); }
+  }
+});
+
+test('one read-only refresh reconciles several retained verified receipts after remount without a peer deadlock', async () => {
+  const f = await lifecycleFixture();
+  try {
+    assert.equal(await f.form.createRow('load'), true);
+    assert.equal(await f.form.createRow('start', 'SubVegA-SIVI'), true);
+    validCreation(f);
+    assert.equal(await f.form.createRow('save'), true);
+    for (const kind of ['deletion', 'restoration', 'creationUndo']) {
+      await lifecycleReview(f, kind);
+      lifecycleConfirm(f, kind);
+      assert.equal(await f.form.lifecycle(kind, kind === 'creationUndo' ? 'undo' : 'save'), true, f.form.getCloseState().error);
+    }
+    const receipts = Object.fromEntries(['deletion', 'restoration', 'creationUndo'].map(kind =>
+      [kind, f.form.lifecycleSnapshot(kind).receipt]));
+    const created = f.form.creationSnapshot().receipt;
+    assert.equal(f.form.getCloseState().unsaved, false);
+    f.remount();
+    assert.equal(f.form.creationNeedsRefresh(), true);
+    for (const kind of Object.keys(receipts)) assert.equal(f.form.lifecycleNeedsRefresh(kind), true);
+    assert.equal(await f.parent.loadSource(), true);
+    f.parent.unlock();
+    assert.equal(await f.form.lifecycle('restoration', 'refresh'), true, f.form.getCloseState().error);
+    for (const kind of Object.keys(receipts)) {
+      assert.equal(f.form.lifecycleNeedsRefresh(kind), false);
+      assert.deepEqual(f.form.lifecycleSnapshot(kind).receipt, receipts[kind]);
+      assert.equal(f.calls.lifecycle[kind].save, 1);
+    }
+    assert.deepEqual(f.form.creationSnapshot().receipt, created);
+    assert.equal(f.form.creationNeedsRefresh(), false);
+    assert.equal(f.calls.create, 1);
+    assert.equal(f.form.getCloseState().unsaved, false);
+    assert.equal(await f.form.createRow('start', 'SubVegC-SIVI'), true);
+    f.remount();
+    assert.equal(await f.parent.loadSource(), true);
+    f.parent.unlock();
+    assert.equal(await f.form.lifecycle('restoration', 'refresh'), false, 'a retained unsent draft is not a receipt-only peer');
+    assert.equal(await f.form.createRow('undo'), true, 'explicit owning discard remains reachable beside verified receipts');
+    assert.equal(await f.form.lifecycle('restoration', 'refresh'), true);
+    assert.equal(f.calls.create, 1);
+    assert.equal(f.form.getCloseState().unsaved, false);
+  } finally { f.dispose(); }
+});
+
+for (const kind of ['deletion', 'restoration', 'creationUndo']) {
+test(`retained unknown ${kind} remount uses production recovery unlock without a parent original or write grant`, async () => {
+  const held = deferred();
+  const parentEntered = deferred(), parentReleased = deferred();
+  let failParent = false, holdParent = false;
+  const f = await lifecycleFixture({
+    parentRead: async (n, value) => {
+      if (failParent) {
+        if (holdParent) { parentEntered.resolve(); await parentReleased.promise; }
+        throw new Error('parent projection unavailable');
+      }
+      return value;
+    },
+    lifecycleMutation: (target, request, result) => {
+      if (target !== kind) return result;
+      held.result = result;
+      return held.promise;
+    },
+  });
+  try {
+    assert.match(source('SIVICHARSParentForm.svelte'),
+      /data-chars-lock\s+disabled=\{lockToggleDisabled\}\s+onclick=\{\(\) => \{ toggleParentLock\(\); \}\}/);
+    if (kind === 'restoration') {
+      await lifecycleReview(f, 'deletion');
+      lifecycleConfirm(f, 'deletion');
+      assert.equal(await f.form.lifecycle('deletion', 'save'), true);
+    }
+    await lifecycleReview(f, kind);
+    lifecycleConfirm(f, kind);
+    const pending = f.form.lifecycle(kind, kind === 'creationUndo' ? 'undo' : 'save');
+    assert.equal(f.form.lifecycleSnapshot(kind).busy, true);
+    assert.equal(await f.form.lifecycle(kind, 'cancel'), true);
+    const requestId = f.form.lifecycleSnapshot(kind).requestId;
+    failParent = true;
+    holdParent = true;
+    f.remount();
+    const loading = f.parent.loadSource();
+    await parentEntered.promise;
+    assert.equal(f.parent.lockEligibility().disabled, true);
+    assert.equal(f.parent.clickLock(), false, 'busy parent cannot acquire recovery unlock');
+    assert.equal(f.parent.canReloadLinkedParent(), false);
+    holdParent = false;
+    parentReleased.resolve();
+    assert.equal(await loading, false);
+    assert.deepEqual(f.parent.lockEligibility(), { locked: true, disabled: false, hasOriginal: false, fieldsDisabled: true });
+    assert.equal(f.parent.clickLock(), true);
+    assert.equal(f.parent.canReloadLinkedParent(), true);
+    assert.equal(f.parent.canOpenLinkedVegetation(), false);
+    assert.equal(await f.parent.saveForClose(), false);
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(await f.form.perform('load'), false);
+    assert.equal(await f.form.lifecycle(kind, 'resolve'), false, 'lookup can succeed while subsequent host refresh fails');
+    const resolved = f.form.lifecycleSnapshot(kind);
+    assert.equal(f.calls.lifecycle[kind].lookup, 1);
+    assert.equal(f.calls.lifecycle[kind].save, 1);
+    assert.equal(resolved.blocked, false);
+    assert.equal(resolved.requestId, null);
+    assert.equal(resolved.receipt.requestId, requestId);
+    assert.equal(resolved.receipt.replayed, true);
+    assert.equal(f.form.lifecycleNeedsRefresh(kind), true);
+    assert.equal(f.form.getCloseState().canSave, false);
+    held.resolve(held.result);
+    assert.equal(await pending, false);
+    failParent = false;
+    assert.equal(await f.form.lifecycle(kind, 'refresh'), true);
+    assert.equal(f.form.lifecycleNeedsRefresh(kind), false);
+    assert.equal(f.calls.lifecycle[kind].save, 1);
+  } finally { held.resolve(held.result); parentReleased.resolve(); f.dispose(); }
+});
+}
+
+test('missing parent without a retained peer cannot use the production recovery-only unlock', async () => {
+  let failParent = false;
+  const f = await fixture({ parentRead: (n, value) => {
+    if (failParent) throw new Error('parent projection unavailable');
+    return value;
+  } });
+  try {
+    failParent = true;
+    f.remount();
+    assert.equal(await f.parent.loadSource(), false);
+    assert.equal(f.parent.lockEligibility().disabled, true);
+    assert.equal(f.parent.clickLock(), false);
+    assert.equal(f.parent.canReloadLinkedParent(), false);
+    assert.equal(f.parent.canOpenLinkedVegetation(), false);
+  } finally { f.dispose(); }
+});
+
+for (const disturbance of ['revision', 'review', 'unknown', 'discarded-review']) {
+  test(`awaited common refresh preserves newer ${disturbance} authority and requires explicit recovery`, async () => {
+    const entered = deferred(), release = deferred(), acknowledgement = deferred();
+    let holdRefresh = false, holdMutation = false;
+    const f = await lifecycleFixture({
+      refresh: async () => { if (holdRefresh) { entered.resolve(); await release.promise; } },
+      lifecycleMutation: (kind, request, result) => {
+        if (!holdMutation) return result;
+        acknowledgement.result = result;
+        return acknowledgement.promise;
+      },
+    });
+    try {
+      for (const kind of ['deletion', 'restoration', 'creationUndo']) {
+        await lifecycleReview(f, kind);
+        lifecycleConfirm(f, kind);
+        assert.equal(await f.form.lifecycle(kind, kind === 'creationUndo' ? 'undo' : 'save'), true);
+      }
+      const original = f.form.lifecycleSnapshot('deletion').receipt;
+      f.remount();
+      assert.equal(await f.parent.loadSource(), true);
+      assert.equal(f.parent.unlock(), true);
+      holdRefresh = true;
+      const refreshing = f.form.lifecycle('restoration', 'refresh');
+      await entered.promise;
+      const session = f.form.retainedLifecycle('deletion');
+      assert.equal(await session.loadTargets(), true);
+      assert.equal(await session.review(original.form, original.rowId), true);
+      let saving;
+      if (disturbance === 'discarded-review') session.discard();
+      else if (disturbance !== 'review') {
+        session.confirm(true);
+        holdMutation = disturbance === 'unknown';
+        saving = session.save(require('node:crypto').randomUUID());
+        if (disturbance === 'unknown') {
+          session.cancel();
+          assert.equal(session.view().blocked, true);
+        } else {
+          assert.equal(await saving, true);
+          assert.equal(session.view().revision, 2);
+        }
+      }
+      const pendingRequest = session.view().requestId;
+      release.resolve();
+      assert.equal(await refreshing, true);
+      holdRefresh = false;
+      if (disturbance !== 'discarded-review') {
+        assert.equal(f.form.getCloseState().canSave, false);
+        assert.equal(await f.form.perform('load'), false);
+      }
+      if (disturbance === 'revision') {
+        assert.equal(f.form.lifecycleNeedsRefresh('deletion'), true);
+        assert.equal(await f.form.lifecycle('deletion', 'refresh'), true);
+      } else if (disturbance === 'review') {
+        assert.equal(session.view().original.original.rowId, original.rowId);
+        assert.equal(session.closeState().unsaved, true);
+        assert.equal(await f.form.lifecycle('deletion', 'undo'), true);
+      } else if (disturbance === 'unknown') {
+        assert.equal(session.view().requestId, pendingRequest);
+        assert.equal(session.view().blocked, true);
+        assert.equal(await f.form.lifecycle('deletion', 'undo'), false);
+        assert.equal(await f.form.lifecycle('deletion', 'resolve'), true);
+        acknowledgement.resolve(acknowledgement.result);
+        assert.equal(await saving, false);
+        assert.equal(session.view().receipt.requestId, pendingRequest);
+        assert.equal(session.view().receipt.replayed, true);
+      } else {
+        assert.equal(session.view().original, null);
+        assert.equal(session.view().receipt, null, 'a discarded review cannot resurrect its earlier receipt');
+        assert.equal(f.form.lifecycleNeedsRefresh('restoration'), false);
+        assert.equal(f.form.lifecycleNeedsRefresh('creationUndo'), false);
+      }
+      assert.equal(f.calls.lifecycle.deletion.save, disturbance === 'review' || disturbance === 'discarded-review' ? 1 : 2);
+      assert.equal(f.form.getCloseState().unsaved, false);
+    } finally { release.resolve(); acknowledgement.resolve(acknowledgement.result); f.dispose(); }
+  });
+}
 
 test('actual CHARS creation fields expose fourteen labelled covers/totals and no height or identity assignment', () => {
   const f = fixture();

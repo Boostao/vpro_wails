@@ -14,6 +14,46 @@ The separately gated SIVI height/cover panels reuse the same owned controller
 under FS882 or the standalone SIVI presentation. Exported coordinates are evidence,
 not a requirement to reproduce fixed Access pixels.
 
+### Accepted CHARS lifecycle composition
+
+The CHARS owner composes the existing persistent deletion, typed restoration
+and historical creation Undo sessions/panels. New Delete choices are only the
+actual extended A/C/D PlotNumber links. Complete44-cell originals and permanent
+ID reservations remain authoritative; foreign normal-A deletion reviews are not
+rebound. Historical restoration/Undo retain immutable original form provenance,
+including normal-A, without granting new normal-A creation or deletion.
+Independent existing parent/operation flags remain default-off.
+
+Each mutation requires its own reviewed confirmation and explicit audit policy.
+Ordinary Save/Save-and-close cannot dispatch it. Parent/typed-peer/creator/
+lifecycle drafts, reads and unknown outcomes block conflicting operations.
+Read-only lookup and owning discard remain reachable. Shared verified refresh
+pins receipt revisions and acknowledges only unchanged clean receipts, never
+pending reviews/unknown requests. Missing-original recovery can unlock only a
+clean owned peer path; all parent/child writes still require originals.
+
+Corrected validation passes2586 frontend executions/470 affected cases,
+eleven production profiles, focused races/vet/check/build and distinct review.
+The first candidate's actual Unlock deadlock and failed fixture expectations
+remain rejected; eight focused correction cases and reviewer follow-up pass.
+Disposable native acceptance proves13 nonmutating profiles, three Delete/
+typed Restore pairs, four UI historical Undos, five representative refusal
+categories, all-owner recovery/close barriers and four-receipt P1/P2/P1 remount.
+Actual1400/760/420 client layouts measure all44 historical cells and controls.
+One normal-A history uses explicit existing-service setup, not normal-A CHARS
+creation UI. Four failed routes remain unaccepted; one zero-write owner required
+qualified owned termination after a duplicate runtime import broke close routing.
+The accepted route avoids that import and normally closes with minimum restored.
+One completed A Delete is continued through its exact restoration, never replayed.
+
+Original business/old-history rows and fifteen nonproject files are exact.
+Seven retained Restore=-1 audit rows and3/3/4/4 new technical histories/four
+reservations are accounted separately. Full race passes root4250.103s with
+1871 inputs/383 artifacts/discovery and protected data unchanged; eighteen
+owners are freshly absent. This accepts the bounded desktop composition, not
+original callback timing, destructive Access cleanup, whole-form parity or
+default/demo promotion.
+
 ### Shared qualified Yes/No update correction
 
 Source SV_FloodPlain and SpeciesListComplete convert assigned NULL to No at the

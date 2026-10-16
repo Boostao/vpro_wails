@@ -10,11 +10,12 @@
   import type { EditorCloseState } from './closeLifecycle';
   import source from '../../resources/fs1333-chars-sivi-layout.json';
 
-  let { contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation, peerBlockedReason = '', collectedAvailable = false, speciesAvailable = false, identityAvailable = false, creationAvailable = false, peerUnlockAvailable = false }: {
+  let { contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation, peerBlockedReason = '', collectedAvailable = false, speciesAvailable = false, identityAvailable = false, creationAvailable = false, deletionAvailable = false, restorationAvailable = false, creationUndoAvailable = false, peerUnlockAvailable = false }: {
     contextId: string; project: string; plotNumber: string;
     onSaved?: (plot: string) => void | Promise<void>; onBusyChange?: (busy: boolean) => void;
     linkedVegetation?: Snippet; peerBlockedReason?: string; collectedAvailable?: boolean; speciesAvailable?: boolean; identityAvailable?: boolean;
-    creationAvailable?: boolean; peerUnlockAvailable?: boolean;
+    creationAvailable?: boolean; deletionAvailable?: boolean; restorationAvailable?: boolean;
+    creationUndoAvailable?: boolean; peerUnlockAvailable?: boolean;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot: plotNumber }));
   const enabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true';
@@ -34,6 +35,22 @@
   const disabled = $derived(!enabled || locked || !view?.original || Boolean(view?.busy || view?.blocked || peerBlockedReason));
   const peerParentReadAvailable = $derived(peerUnlockAvailable && !view?.original &&
     !close.unsaved && !close.busy && !close.blocked);
+  const lockToggleDisabled = $derived(!enabled || close.busy || close.unsaved || close.blocked ||
+    (!view?.original && !(locked && peerParentReadAvailable)) ||
+    Boolean(peerBlockedReason && !(locked && peerUnlockAvailable)));
+
+  function toggleParentLock(): boolean {
+    if (lockToggleDisabled) {
+      operationError = 'Keep the parent clean and idle; an unavailable original permits only owned peer recovery unlock.';
+      return false;
+    }
+    locked = !locked;
+    operationError = '';
+    return true;
+  }
+  const unavailableChildren = $derived([speciesAvailable ? '' : 'Species', collectedAvailable ? '' : 'Collected',
+    identityAvailable ? '' : 'identity', creationAvailable ? '' : 'creation', deletionAvailable ? '' : 'deletion',
+    restorationAvailable ? '' : 'typed restoration', creationUndoAvailable ? '' : 'historical creation Undo'].filter(Boolean).join(', '));
   const site = siviCHARSParentFields.filter(field => 'pageId' in field && field.pageId === 'form:frmSIVIsite-CHARS/Site');
   const interval = (first: string, last: string) =>
     site.slice(site.findIndex(field => field.binding === first), site.findIndex(field => field.binding === last) + 1);
@@ -67,6 +84,9 @@
       if (!enabled) throw new Error('CHARS parent entry is disabled in this build.');
       if (peerBlockedReason && !(kind === 'load' && peerParentReadAvailable)) throw new Error(peerBlockedReason);
       if (kind === 'load') return await session.load();
+      if ((kind === 'save' || kind === 'retain' || kind === 'prune') && !view?.original) {
+        throw new Error('Load the owned CHARS parent original before writing.');
+      }
       if (kind === 'save') {
         if (locked) throw new Error('Unlock CHARS entry before saving.');
         return await session.save();
@@ -118,9 +138,8 @@
   {#if !enabled}<p role="status">CHARS parent entry is disabled in this build.</p>{/if}
   <div class="flex flex-wrap gap-2">
     <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-lock
-      disabled={!enabled || !view?.original || close.busy || close.unsaved ||
-        Boolean(close.blocked || peerBlockedReason && !(locked && peerUnlockAvailable))}
-      onclick={() => { locked = !locked; }}>{locked ? 'Unlock CHARS entry' : 'Lock CHARS entry'}</button>
+      disabled={lockToggleDisabled}
+      onclick={() => { toggleParentLock(); }}>{locked ? 'Unlock CHARS entry' : 'Lock CHARS entry'}</button>
     <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-save
       disabled={disabled || !close.canSave} onclick={() => void operation('save')}>Save CHARS entry</button>
     <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-undo
@@ -245,7 +264,7 @@
     Coordinates retain finite source DOUBLE values without new geographic bounds. Numeric blanks mean NULL; spaces are not silently trimmed.
     Dates use exact YYYY-MM-DD HH:MM:SS with an optional fractional second.</p>
   <p role="status" class="text-sm text-amber-800">CHARS ProjectID/PlotType and other source actions,
-    {linkedVegetation ? `child ${speciesAvailable ? '' : 'Species/'}${collectedAvailable ? '' : 'Collected/'}${identityAvailable ? '' : 'identity/'}${creationAvailable ? 'deletion' : 'lifecycle'} and unqualified callbacks,`
+    {linkedVegetation ? `${unavailableChildren ? `child ${unavailableChildren} and ` : ''}unqualified callbacks,`
       : 'child vegetation workflows,'}
     changed SubZone and blank A-horizon assignment remain unavailable in this {linkedVegetation ? 'CHARS editor' : 'parent-only editor'}.
     Use the separately accepted normal SIVI/FS882 workflows where applicable.</p>
