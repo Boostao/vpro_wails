@@ -10,7 +10,7 @@ are in [README](README.md), [MIGRATION_PLAN](MIGRATION_PLAN.md),
 - This is the Windows VM, not a remote Linux session.
 - Active repository: `C:\Users\BrunoTremblay\Work\vpro_wails`, branch `main`.
   Shared Boolean predecessor: `6d938d1d27c43d2bd96adcf6ad3c435f4db7f941`.
-  Current accepted CHARS linked cover/height editor is described below. No push.
+  Current accepted CHARS child Species composition is described below. No push.
   The old `access-parity-windows-handoff` worktree is not the integration root.
 - Canonical Access exports: `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
   Never modify canonical Access/data; use disposable fixtures for native work.
@@ -529,14 +529,53 @@ for six documentation reconciliations and coherent authorized local commit.
 The original Collected mouse-Click attempts remain exhausted; no new Access
 action, source timing/focus claim or default/demo promotion is authorized.
 
-Next private `chars-sivi-species-contract.json` and
+Private `chars-sivi-species-contract.json` and
 `chars-sivi-species-source-seal.json` seal11 canonical hashes for extended child
 Species reuse, explicit A/C/D contexts and metadata no-op. This is distinct from
 the already accepted `chars-sivi-species-action-contract.json`/old
 `chars-sivi-species-candidate` SpeciesListComplete action. Use a new
 `chars-child-species-*` candidate/native/integration namespace, never overwrite
-those accepted action artifacts. Begin application edits only after the
-Collected local commit. No new backend writer, flag or Access oracle is planned.
+those accepted action artifacts. Collected is committed locally on main as
+`814a02765c5b469c1ea333fd987ee2bab5827ad4`, with required co-author, clean immediate
+status and sealed private commit association; no push. Repository core.autocrlf
+normalizes validated working CRLF to committed LF only; the initial raw-blob
+association assumption is recorded, without changing source or the commit.
+The Species composition is independently reviewed, native-accepted and full-race
+integrated. It reuses existing source/reference sessions and typed peer guards
+across three children/four owners. All2396 frontend executions/281 affected cases,
+check0/0, focused races/vet and six isolated frontend/Wails profiles pass.
+Distinct reviewer `20f8aa67-e3dc-48d3-8116-35dfe4e18ca2` finds no significant issues.
+Seven first-run actual native profiles pass: default/parent/linked/Collected/
+Species/backend-off/all. Twelve unique physical fields, explicit A/C/D contexts,
+old-code keep/replace/known-personal decisions, four Saves/ten audits and four
+retained histories are verified. Reverse UI pruning restores exact business/
+audits/old history, leaving only four consumed receipts;15 other files are exact.
+Held actual responses, absent-parent recovery without replay, precise CancelClose
+acknowledgements, reference Cancel/remount/P1/P2/P1 and three-width labelled
+fields/decision buttons pass. Seven native owners are freshly absent.
+The derived fixture adds only one master OldCode cell and one personal row;
+Report is REAL1, ScientificName/SppNumber NULL and EnglishName empty. The accepted
+Collected workflow prefix runs on this new fixture; old evidence is unchanged.
+No source metadata/personal-definition writes occur during application acceptance.
+The initial nested-helper check and nontext test-only expectation corrections
+precede the freeze; retained raw/error/original identity is now tested explicitly.
+
+Fresh `go test -race -timeout 120m ./...` passes exit0,
+UTC2026-10-16T05:08:01.919991 to06:32:25.723676; root4394.488s.
+All1871 inputs/140 artifacts, package/embed discovery, canonical/protected assets
+and closed family remain exact. `chars-child-species-integration\receipt.json`
+accepts; source freeze released for six related docs and coherent local commit.
+No backend/binding/new flag, exhausted original callback attempt, canonical/native
+Access action, whole-form claim or default/demo promotion follows.
+
+Next private `chars-child-identity-contract.json` and
+`chars-child-identity-source-seal.json` qualify11 canonical files/four ID controls,
+nullable LONG/nonunique index, active audit ID skip and metadata no-op.
+The source seal is static only; no implementation or native acceptance claim.
+Do not revive dormant A/D Recordset rewrites or turn C's warning into cancellation.
+Reuse existing independently gated identity session/panel/writer, signed32/NULL
+rules, full collision/restoration witnesses and zero-source-audit technical
+history. Start application changes only after the accepted Species local commit.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated

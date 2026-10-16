@@ -45,8 +45,25 @@ Parent, covers/heights and Collected retain separate drafts, recovery and typed
 histories. Same-row histories restore in reverse edit order under the unchanged
 full physical-row guard. Actual Wails acceptance and full race integration pass;
 explicit Save is not original Click/focus timing parity. No default or qualified
-demo assets change. Species/identity/lifecycle and remaining SIVI callbacks or
+demo assets change. Identity/lifecycle and remaining SIVI callbacks or
 the original ribbon's other functionality are not completed by this composition.
+
+CHARS child **Species** now reuses its existing session/panel/writer under
+`VITE_SIVI_SPECIES_EDITING=true` and independent `VPRO_SIVI_SPECIES_EDITING=true`,
+in addition to CHARS parent prerequisites. Combined and Collected remain optional.
+One field per physical row has explicit eligible A/C/D source-group selection,
+listed/old-code keep/replace and known-personal decisions; personal creation is
+unavailable. Four owners retain separate drafts/errors/receipts and shared
+preflight/refresh/close guards. All2396 frontend executions/281 affected cases,
+check0/0, focused races/vet, six production profiles and distinct review pass.
+Seven actual Wails profiles verify four Saves/ten audits, retained histories/
+reverse UI pruning, failed-parent read recovery without replay, exact native-close
+acknowledgements, held reference Cancel/remount/P1/P2/P1 and three-width labels/
+decision buttons. Business/audits/old history and fifteen other files are exact;
+only four consumed histories remain, seven owners freshly absent. Fresh full
+race passes root4394.488s with1871 inputs/140 artifacts/discovery unchanged.
+No new backend/binding/flag, metadata write, callback/focus timing claim or
+default/demo promotion follows. See the [CHARS contract](docs/FS1333-parent-access-contract.md).
 
 **Forms > Metadata** now delegates to the existing project-metadata editor for
 the currently open FS882/SIVI plot. It is unavailable until the current editor
@@ -166,8 +183,8 @@ source-grouped71-binding presentation, reference-safe drafts and explicit
 Save/Undo/history behind independent `VPRO_SIVI_CHARS_PARENT_ENTRY` and
 `VITE_SIVI_CHARS_PARENT_ENTRY` literal flags (both default off). The Forms item
 retains a parent-only profile when the combined-editor gate is off. The linked
-cover/height scope below adds only the existing extended editor; child Species,
-Collected, identity/lifecycle and ProjectID/PlotType remain unavailable, as do
+cover/height, Collected and child Species scopes reuse independently gated
+extended editors; identity/lifecycle and ProjectID/PlotType remain unavailable, as do
 changed SubZone and blank Ahorizon. The separately qualified
 Spp List action below adds only Comp./Part. to this same parent owner.
 All200 affected frontend cases,2310 standard frontend lifecycle executions,

@@ -9,6 +9,7 @@ const { render } = require('svelte/server');
 const { serverComponent } = require('./svelteTestHelpers.cjs');
 const { review, cell } = require('./siviSourceFixture.cjs');
 const wire = require('../../testdata/chars-sivi-entry-client-wire.json');
+const speciesWire = require('./siviSpeciesReferenceFixture.json');
 const source = name => readFileSync(path.join(__dirname, name), 'utf8');
 const clone = value => structuredClone(value);
 const deferred = () => {
@@ -19,15 +20,18 @@ const deferred = () => {
 
 function fixture(options = {}) {
   const calls = { parentRead: 0, childRead: 0, collectedRead: 0, parentSave: 0, childSave: 0,
-    collectedSave: 0, restore: 0, collectedRestore: 0, refresh: 0, cancelled: 0 };
+    collectedSave: 0, speciesRead: 0, speciesReferences: 0, speciesSave: 0,
+    restore: 0, collectedRestore: 0, speciesRestore: 0, refresh: 0, cancelled: 0 };
   const originalParent = clone(wire);
   let currentParent = clone(wire);
   const originalChild = review({ extended: true });
   for (const group of originalChild) for (const row of group.Rows) {
     row.cells[group.Columns.indexOf('PlotNumber')] = cell('text', wire.Original.Plot);
     if (options.collectedValue) row.cells[group.Columns.indexOf('Collected')] = clone(options.collectedValue);
+    if (options.speciesValue) row.cells[group.Columns.indexOf('Species')] = clone(options.speciesValue);
   }
   let currentChild = clone(originalChild);
+  const references = { ...clone(speciesWire), contextId: wire.Original.ContextID, project: wire.Original.Project, plot: wire.Original.Plot };
   function requireCommittedRows(edits, committed) {
     const ids = new Set(edits.map(edit => edit.rowId));
     for (let index = 0; index < currentChild.length; index++) {
@@ -132,6 +136,43 @@ function fixture(options = {}) {
       },
     },
   };
+  api.SIVISpeciesService = {
+    GetOriginal: async (context, plot, extended) => {
+      calls.speciesRead++;
+      assert.equal(context, wire.Original.ContextID);
+      assert.equal(plot, wire.Original.Plot);
+      assert.equal(extended, true);
+      return options.speciesRead ? options.speciesRead(calls.speciesRead, clone(currentChild)) : clone(currentChild);
+    },
+    GetReferences: async (context, plot) => {
+      calls.speciesReferences++;
+      assert.equal(context, wire.Original.ContextID);
+      assert.equal(plot, wire.Original.Plot);
+      return options.speciesReferences ? options.speciesReferences(calls.speciesReferences, clone(references)) : clone(references);
+    },
+    SaveReviewed: async (_context, _plot, extended, raw) => {
+      calls.speciesSave++;
+      assert.equal(extended, true);
+      calls.speciesRequest = JSON.parse(raw);
+      assert.deepEqual(calls.speciesRequest.references, references);
+      for (const edit of calls.speciesRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
+        if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('Species')] = cell('text', edit.value);
+      }
+      calls.committedSpecies = clone(currentChild);
+      return options.speciesSave ? options.speciesSave(calls.speciesRequest)
+        : { ChangedCells: calls.speciesRequest.edits.length, HistoryID: '401' };
+    },
+    RestoreReviewed: async (_context, _plot, history, action) => {
+      calls.speciesRestore++;
+      assert.equal(history, '401');
+      requireCommittedRows(calls.speciesRequest.edits, calls.committedSpecies);
+      for (const edit of calls.speciesRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
+        if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('Species')] = clone(edit.expected);
+      }
+      return { restoredRows: calls.speciesRequest.edits.length,
+        prunedAuditRows: action === 'prune' ? calls.speciesRequest.edits.length : 0, cleanedVegRows: 0, cancelled: false };
+    },
+  };
   const cache = new Map();
   function load(filename) {
     if (cache.has(filename)) return cache.get(filename);
@@ -197,7 +238,13 @@ function fixture(options = {}) {
       export function collect(kind) { return operate(kind, 'collected'); }
       export function cycle(row) { cycleCollected(row); }
       export function collectedSnapshot() { return collectedView; }
-      export function cancelCollected() { cancelRead('collected'); }`);
+      export function cancelCollected() { cancelRead('collected'); }
+      export function select(kind) { return operate(kind, 'species'); }
+      export function speciesDraft(row, raw) { stageSpecies(row, raw); }
+      export function speciesContext(row, group) { contextSpecies(row, group); }
+      export function speciesChoose(row, kind, selected) { chooseSpecies(row, kind, selected); }
+      export function speciesSnapshot() { return speciesView; }
+      export function cancelSpecies() { cancelRead('species'); }`);
     parentProps.onSaved = form.parentSaved;
     Object.defineProperty(parentProps, 'peerBlockedReason', { get: form.peerReason });
     parent = component('SIVICHARSParentForm.svelte', parentProps, `
@@ -213,9 +260,9 @@ function fixture(options = {}) {
     dispose() { for (const cleanup of cleanups.reverse()) cleanup(); disposeEffects(); } };
 }
 
-test('compiled linked snippet requires exact parent and independent combined/Collected literal flags', () => {
+test('compiled linked snippet requires exact parent and independent combined/Collected/Species literal flags', () => {
   for (const parent of [undefined, 'false', 'TRUE', 'true']) for (const combined of [undefined, 'false', 'TRUE', 'true'])
-  for (const collected of [undefined, 'false', 'TRUE', 'true']) {
+  for (const collected of [undefined, 'false', 'TRUE', 'true']) for (const species of [undefined, 'false', 'TRUE', 'true']) {
     let rendered = 0;
     const parentStub = serverComponent(`<script lang="ts">
       import { record } from 'proof'; let { linkedVegetation } = $props();
@@ -224,7 +271,8 @@ test('compiled linked snippet requires exact parent and independent combined/Col
     const component = serverComponent(source('SIVICHARSForm.svelte'), 'SIVICHARSForm.svelte', {
       './SIVICHARSParentForm.svelte': { default: parentStub }, './SIVICombinedPanel.svelte': { default() {} },
       './SIVICollectedPanel.svelte': { default() {} },
-      '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {}, AuditRestoreAction: {} },
+      './SIVISpeciesPanel.svelte': { default() {} },
+      '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {}, SIVISpeciesService: {}, AuditRestoreAction: {} },
       './siviCombinedSession': { SIVICombinedSession: class {
         view() { return { busy: false }; }
         closeState() { return { busy: false, unsaved: false, blocked: false }; }
@@ -235,15 +283,23 @@ test('compiled linked snippet requires exact parent and independent combined/Col
         closeState() { return { busy: false, unsaved: false, blocked: false }; }
         dispose() {}
       } },
-    }, { VITE_SIVI_CHARS_PARENT_ENTRY: parent, VITE_SIVI_COMBINED_EDITING: combined, VITE_SIVI_COLLECTED_EDITING: collected });
+      './siviSpeciesSession': { SIVISpeciesSession: class {
+        view() { return { busy: false }; }
+        closeState() { return { busy: false, unsaved: false, blocked: false }; }
+        dispose() {}
+      } },
+    }, { VITE_SIVI_CHARS_PARENT_ENTRY: parent, VITE_SIVI_COMBINED_EDITING: combined,
+      VITE_SIVI_COLLECTED_EDITING: collected, VITE_SIVI_SPECIES_EDITING: species });
     const html = render(component, { props: { contextId: 'owned', project: 'Sample', plotNumber: 'P' } }).body;
     const combinedEnabled = parent === 'true' && combined === 'true';
     const collectedEnabled = parent === 'true' && collected === 'true';
-    const enabled = combinedEnabled || collectedEnabled;
+    const speciesEnabled = parent === 'true' && species === 'true';
+    const enabled = combinedEnabled || collectedEnabled || speciesEnabled;
     assert.equal(rendered, enabled ? 1 : 0);
     assert.equal(html.includes('data-chars-linked-vegetation'), enabled);
     assert.equal((html.match(/data-chars-linked-open/g) ?? []).length, combinedEnabled ? 1 : 0);
     assert.equal((html.match(/data-chars-collected-open/g) ?? []).length, collectedEnabled ? 1 : 0);
+    assert.equal((html.match(/data-chars-species-open/g) ?? []).length, speciesEnabled ? 1 : 0);
     assert.doesNotMatch(html, /data-sivi-combined-column/);
   }
   assert.equal(compile(source('SIVICHARSForm.svelte'), { filename: 'SIVICHARSForm.svelte', generate: 'client' }).warnings.length, 0);
@@ -255,6 +311,8 @@ test('compiled linked snippet requires exact parent and independent combined/Col
   assert.match(app, /charsLinkedVegetation=\{siviCHARSLinkedVegetationEnabled\}/);
   assert.match(app, /const siviCHARSCollectedEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_COLLECTED_EDITING === 'true'/);
   assert.match(app, /charsCollected=\{siviCHARSCollectedEnabled\}/);
+  assert.match(app, /const siviCHARSSpeciesEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_SPECIES_EDITING === 'true'/);
+  assert.match(app, /charsSpecies=\{siviCHARSSpeciesEnabled\}/);
 });
 
 test('actual client owners react across peer drafts, lock, invalid correction, close Save and independent restoration', async () => {
@@ -668,5 +726,299 @@ test('same-row sibling history preserves the backend full-row restoration guard 
     assert.equal(f.form.snapshot().review[0].Rows[0].cells.at(-1).text, 'C');
     assert.equal(f.calls.childSave, 1);
     assert.equal(f.calls.collectedSave, 1);
+  } finally { f.dispose(); }
+});
+
+test('Species-only actual client preserves strict Go reference wire and explicit eligible extended source context', async () => {
+  const f = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_COMBINED_EDITING: 'false' } });
+  try {
+    assert.equal(await f.parent.loadSource(), true);
+    assert.equal(await f.form.select('load'), false);
+    f.parent.unlock();
+    assert.equal(await f.form.select('load'), true);
+    assert.equal(f.form.speciesSnapshot().extended, true);
+    assert.equal(f.form.speciesSnapshot().references.master.columns[0].declaredType, 'TEXT');
+    assert.equal(f.form.speciesSnapshot().references.master.rows[0].rowId, '9223372036854775807');
+    f.form.speciesDraft(f.rowId, 'MOSS');
+    assert.equal(f.form.getCloseState().canSave, false);
+    f.form.speciesContext(f.rowId, 2);
+    assert.equal(f.form.getCloseState().canSave, true);
+    assert.equal(await f.form.saveForClose(), true);
+    assert.equal(f.calls.speciesRequest.edits[0].form, 'SubVegD-SIVI');
+    assert.equal(f.calls.speciesRequest.edits[0].value, 'MOSS');
+    assert.equal(f.calls.speciesRequest.edits[0].expected.text, 'RAW');
+    assert.equal(f.form.speciesSnapshot().historyId, '401');
+    assert.equal(await f.form.select('prune'), true);
+    assert.equal(f.calls.speciesSave, 1);
+    assert.equal(f.calls.childRead, 0);
+    assert.equal(f.calls.collectedRead, 0);
+  } finally { f.dispose(); }
+});
+
+for (const [raw, decision, selected, expected] of [
+  ['old', 'keep', undefined, 'OLD'], ['old', 'replace', 'TREE', 'TREE'], ['MINE', 'user', 'MINE', 'MINE'],
+]) {
+  test(`extended Species ${decision} keeps existing reviewed source decisions, not new definition authority`, async () => {
+    const f = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true' } });
+    try {
+      assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+      assert.equal(await f.form.select('load'), true);
+      f.form.speciesDraft(f.rowId, raw);
+      assert.equal(f.form.getCloseState().canSave, false);
+      f.form.speciesChoose(f.rowId, decision, selected);
+      assert.equal(await f.form.saveForClose(), true);
+      assert.equal(f.calls.speciesRequest.edits[0].decision, decision);
+      assert.equal(f.calls.speciesRequest.edits[0].value, expected);
+      assert.equal(f.calls.speciesRequest.edits[0].entered, raw);
+      assert.equal(await f.form.select('prune'), true);
+      assert.equal(f.calls.speciesSave, 1);
+    } finally { f.dispose(); }
+  });
+}
+
+test('Species invalid drafts block all peers while valid correction and owning Undo remain live', async () => {
+  const f = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_COLLECTED_EDITING: 'true' } });
+  try {
+    assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+    assert.equal(await f.form.perform('load'), true);
+    assert.equal(await f.form.collect('load'), true);
+    assert.equal(await f.form.select('load'), true);
+    for (const raw of ['TOO-LONG-CODE', '\ud800', 'NEW']) {
+      f.form.speciesDraft(f.rowId, raw);
+      assert.equal(f.form.speciesSnapshot().drafts[f.rowId].raw, raw);
+      assert.ok(f.form.speciesSnapshot().drafts[f.rowId].error);
+      assert.equal(f.form.getCloseState().unsaved, true);
+      assert.equal(f.form.getCloseState().canSave, false);
+      assert.equal(await f.form.saveForClose(), false);
+      f.form.draft(f.rowId, 'Cover5a', '2');
+      f.form.cycle(f.rowId);
+      f.parent.draft('RootZoneParticleSize', { kind: 'text', raw: 'FINE' });
+      assert.deepEqual(f.form.snapshot().drafts.covers, {});
+      assert.deepEqual(f.form.collectedSnapshot().drafts, {});
+      assert.equal(f.parent.getCloseState().unsaved, false);
+      assert.equal(await f.parent.undoSource(), false);
+      assert.equal(await f.form.collect('load'), false);
+      f.form.speciesDraft(f.rowId, 'TREE');
+      assert.equal(f.form.speciesSnapshot().drafts[f.rowId].error, null);
+      assert.equal(f.form.getCloseState().canSave, true);
+      assert.equal(await f.form.select('undo'), true);
+      assert.equal(f.form.getCloseState().unsaved, false);
+    }
+    assert.equal(f.calls.speciesSave + f.calls.childSave + f.calls.collectedSave + f.calls.parentSave, 0);
+  } finally { f.dispose(); }
+});
+
+test('four client owners retain receipts and restore same-row history in legitimate reverse mutation order', async () => {
+  const f = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_COLLECTED_EDITING: 'true' } });
+  try {
+    assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+    assert.equal(await f.form.perform('load'), true);
+    assert.equal(await f.form.collect('load'), true);
+    assert.equal(await f.form.select('load'), true);
+    f.form.speciesDraft(f.rowId, 'TREE');
+    assert.equal(await f.form.saveForClose(), true);
+    assert.equal(f.form.snapshot().review[0].Rows[0].cells[2].text, 'TREE');
+    assert.equal(f.form.collectedSnapshot().review[0].Rows[0].cells[2].text, 'TREE');
+    f.form.cycle(f.rowId); assert.equal(await f.form.saveForClose(), true);
+    assert.equal(f.form.speciesSnapshot().historyId, '401');
+    f.form.draft(f.rowId, 'Cover5a', '3'); assert.equal(await f.form.saveForClose(), true);
+    assert.equal(f.form.collectedSnapshot().historyId, '301');
+    f.parent.draft('RootZoneParticleSize', { kind: 'text', raw: 'FINE' });
+    assert.equal(await f.form.saveForClose(), true);
+    assert.equal(f.parent.snapshot().historyId, '101');
+    assert.equal(f.form.snapshot().historyId, '201');
+    assert.equal(f.form.collectedSnapshot().historyId, '301');
+    assert.equal(f.form.speciesSnapshot().historyId, '401');
+    assert.equal(await f.form.perform('prune'), true);
+    assert.equal(await f.form.collect('prune'), true);
+    assert.equal(await f.form.select('prune'), true);
+    assert.equal(f.form.snapshot().review[0].Rows[0].cells[2].text, 'RAW');
+    assert.equal(await f.parent.restoreSource(), true);
+    assert.deepEqual([f.calls.speciesSave, f.calls.collectedSave, f.calls.childSave, f.calls.parentSave], [1, 1, 1, 1]);
+    assert.deepEqual([f.calls.speciesRestore, f.calls.collectedRestore, f.calls.restore], [1, 1, 1]);
+  } finally { f.dispose(); }
+});
+
+for (const owner of ['combined', 'collected', 'species']) {
+  test(`${owner} acknowledged mutation retains recovery when a different child's source/reference refresh fails`, async () => {
+    let fail = false;
+    const f = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_COLLECTED_EDITING: 'true' },
+      read: (_count, value) => { if (fail && owner === 'species') throw new Error('combined source disappeared'); return value; },
+      speciesReferences: (_count, value) => { if (fail && owner !== 'species') throw new Error('Species definitions disappeared'); return value; },
+    });
+    const operate = owner === 'combined' ? kind => f.form.perform(kind)
+      : owner === 'collected' ? kind => f.form.collect(kind) : kind => f.form.select(kind);
+    const view = () => owner === 'combined' ? f.form.snapshot()
+      : owner === 'collected' ? f.form.collectedSnapshot() : f.form.speciesSnapshot();
+    const receipt = { combined: '201', collected: '301', species: '401' }[owner];
+    try {
+      assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+      assert.equal(await f.form.perform('load'), true);
+      assert.equal(await f.form.collect('load'), true);
+      assert.equal(await f.form.select('load'), true);
+      if (owner === 'combined') f.form.draft(f.rowId, 'Cover5a', '3');
+      else if (owner === 'collected') f.form.cycle(f.rowId);
+      else f.form.speciesDraft(f.rowId, 'TREE');
+      fail = true;
+      assert.equal(await f.form.saveForClose(), false);
+      assert.equal(view().historyId, receipt);
+      assert.equal(f.form.getCloseState().blocked, true);
+      assert.equal(await f.form.saveForClose(), false);
+      assert.equal(await operate('undo'), false);
+      if (owner !== 'species') assert.equal(f.form.speciesSnapshot().references, null);
+      fail = false;
+      assert.equal(await operate('undo'), true);
+      assert.equal(view().historyId, receipt);
+      assert.ok(f.form.speciesSnapshot().references);
+      assert.ok(f.form.snapshot().review);
+      assert.equal(f.form.getCloseState().blocked, false);
+      assert.equal(f.calls.speciesSave + f.calls.collectedSave + f.calls.childSave, 1);
+      assert.equal(await operate('prune'), true);
+    } finally { f.dispose(); }
+  });
+}
+
+test('parent postcommit missing Species definitions retry preserves all previously loaded history owners', async () => {
+  let fail = false;
+  const f = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true', VITE_SIVI_COLLECTED_EDITING: 'true' },
+    speciesReferences: (_count, value) => { if (fail) throw new Error('Species definitions reload failed'); return value; } });
+  try {
+    assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+    assert.equal(await f.form.perform('load'), true);
+    assert.equal(await f.form.collect('load'), true);
+    assert.equal(await f.form.select('load'), true);
+    f.form.speciesDraft(f.rowId, 'TREE'); assert.equal(await f.form.saveForClose(), true);
+    f.parent.draft('RootZoneParticleSize', { kind: 'text', raw: 'FINE' });
+    fail = true;
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(f.parent.snapshot().historyId, '101');
+    assert.equal(f.form.speciesSnapshot().references, null);
+    assert.equal(await f.parent.undoSource(), false);
+    fail = false;
+    assert.equal(await f.parent.undoSource(), true);
+    assert.equal(f.form.speciesSnapshot().historyId, '401');
+    assert.equal(f.parent.snapshot().historyId, '101');
+    assert.equal(await f.form.select('prune'), true);
+    assert.equal(await f.parent.restoreSource(), true);
+    assert.equal(f.calls.speciesSave, 1);
+    assert.equal(f.calls.parentSave, 1);
+  } finally { f.dispose(); }
+});
+
+test('Species partial or foreign reference bundles never enable drafts and explicit retry corrects the error', async () => {
+  for (const failure of ['original', 'references', 'foreign']) {
+    const f = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true' },
+      speciesRead: (count, value) => failure === 'original' && count === 1 ? null : value,
+      speciesReferences: (count, value) => count !== 1 ? value
+        : failure === 'references' ? null : failure === 'foreign' ? { ...value, contextId: 'foreign owner' } : value });
+    try {
+      assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+      assert.equal(await f.form.select('load'), false);
+      assert.equal(f.form.speciesSnapshot().review, null);
+      assert.equal(f.form.speciesSnapshot().references, null);
+      assert.ok(f.form.speciesSnapshot().error);
+      f.form.speciesDraft(f.rowId, 'TREE');
+      assert.equal(f.calls.speciesSave, 0);
+      assert.equal(await f.form.select('load'), true);
+      assert.ok(f.form.speciesSnapshot().references);
+    } finally { f.dispose(); }
+  }
+});
+
+test('Species source/reference read cancellation is owner-specific while mutations cannot cancel or replay', async () => {
+  const references = deferred(), save = deferred();
+  const f = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true' },
+    speciesReferences: (count, value) => count === 1 ? references.promise : value,
+    cancel: () => references.reject(new Error('owned Species reference read cancelled')),
+    speciesSave: () => save.promise });
+  try {
+    assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+    const loading = f.form.select('load');
+    assert.equal(f.form.getCloseState().busy, true);
+    f.form.cancelSource(); f.form.cancelCollected();
+    assert.equal(f.calls.cancelled, 0);
+    f.form.cancelSpecies();
+    assert.equal(await loading, false);
+    assert.match(f.form.speciesSnapshot().error, /owned Species reference read cancelled/);
+    assert.equal(await f.form.select('load'), true);
+    f.form.speciesDraft(f.rowId, 'TREE');
+    const saving = f.form.saveForClose();
+    const count = f.calls.cancelled;
+    f.form.cancelSpecies();
+    assert.equal(f.calls.cancelled, count);
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(f.calls.speciesSave, 1);
+    save.resolve({ ChangedCells: 1, HistoryID: '401' });
+    assert.equal(await saving, true);
+    assert.equal(await f.form.select('prune'), true);
+  } finally { f.dispose(); }
+});
+
+test('late Species source/reference delivery cannot populate a replacement actual client owner', async () => {
+  const references = deferred();
+  const old = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true' }, speciesReferences: () => references.promise });
+  assert.equal(await old.parent.loadSource(), true); old.parent.unlock();
+  const loading = old.form.select('load');
+  old.dispose();
+  const next = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true' } });
+  try {
+    assert.equal(await next.parent.loadSource(), true); next.parent.unlock();
+    references.resolve({ ...clone(speciesWire), contextId: wire.Original.ContextID, project: wire.Original.Project, plot: wire.Original.Plot });
+    assert.equal(await loading, false);
+    assert.equal(next.form.speciesSnapshot().references, null);
+    assert.equal(next.calls.speciesRead, 0);
+    assert.equal(await next.form.select('load'), true);
+  } finally { next.dispose(); }
+});
+
+test('Species independent backend denial and historical nontext source refuse without coercion or writes', async () => {
+  for (const options of [
+    { speciesRead: () => { throw new Error('SIVI Species editing is disabled in this session'); } },
+    { speciesValue: cell('integer', '123') },
+  ]) {
+    const f = fixture({ ...options, environment: { VITE_SIVI_SPECIES_EDITING: 'true' } });
+    try {
+      assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+      const loaded = await f.form.select('load');
+      if (options.speciesRead) {
+        assert.equal(loaded, false);
+        assert.match(f.form.speciesSnapshot().error, /disabled/);
+      } else {
+        assert.equal(loaded, true);
+        f.form.speciesDraft(f.rowId, 'TREE');
+        assert.match(f.form.getCloseState().error, /Historical non-text/);
+        assert.equal(f.form.speciesSnapshot().drafts[f.rowId].raw, 'TREE');
+        assert.deepEqual(f.form.speciesSnapshot().drafts[f.rowId].expected, cell('integer', '123'));
+        assert.equal(f.form.getCloseState().canSave, false);
+        assert.equal(await f.form.select('undo'), true);
+        assert.deepEqual(f.form.speciesSnapshot().drafts, {});
+      }
+      assert.equal(f.calls.speciesSave, 0);
+    } finally { f.dispose(); }
+  }
+});
+
+test('Species postcommit parent-read failure retains its reference owner and reachable recovery without originals', async () => {
+  let fail = false;
+  const f = fixture({ environment: { VITE_SIVI_SPECIES_EDITING: 'true' },
+    parentRead: (_count, value) => { if (fail) throw new Error('owned CHARS parent read failed'); return value; } });
+  try {
+    assert.equal(await f.parent.loadSource(), true); f.parent.unlock();
+    assert.equal(await f.form.select('load'), true);
+    f.form.speciesDraft(f.rowId, 'TREE');
+    fail = true;
+    assert.equal(await f.form.saveForClose(), false);
+    assert.equal(f.parent.snapshot().original, null);
+    assert.equal(f.form.speciesSnapshot().historyId, '401');
+    assert.equal(f.form.getCloseState().blocked, true);
+    assert.equal(await f.parent.undoSource(), false);
+    assert.equal(await f.form.select('undo'), false);
+    fail = false;
+    assert.equal(await f.form.select('undo'), true);
+    assert.equal(f.form.speciesSnapshot().historyId, '401');
+    assert.ok(f.form.speciesSnapshot().references);
+    assert.equal(f.form.getCloseState().blocked, false);
+    assert.equal(f.calls.speciesSave, 1);
+    assert.equal(await f.form.select('prune'), true);
   } finally { f.dispose(); }
 });

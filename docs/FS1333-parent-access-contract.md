@@ -107,6 +107,52 @@ Explicit Save/reload is the desktop adaptation; original callback timing,
 ProjectID/PlotType, unavailable references, child/whole-form/ribbon parity and
 default/demo promotion are not granted.
 
+### Accepted CHARS child Species composition
+
+The [CHARS owner](../frontend/src/SIVICHARSForm.svelte) composes the existing
+extended Species session/panel/writer, with independent parent/Species frontend
+and backend gates. Combined and Collected are optional. Eleven canonical hashes
+qualify four live Species bindings, required TEXT8 and A/C/D list/UNION/decision
+paths. Literal Cover1/Cover6/Cover7 focus destinations are recorded, not erased
+as identifier recasing or claimed as implicit focus timing. The active metadata
+callback exits before writes; no metadata row/column/audit is invented.
+
+One live Species field per physical row retains explicit eligible source-group
+selection. Listed codes, old-code keep/replace and existing personal definitions
+reuse the bounded source comparison/reference policies. Master signed32 and
+personal signed16 metadata, physical duplicate definitions and NULL/empty values
+remain distinct. Personal creation stays unavailable; exhausted original source
+attempts are not reopened. Historical nontext edits retain raw/error/expected
+identity until explicit correction/Undo, never a repaired empty value.
+
+The typed three-child preflight/refresh boundary and four-owner close aggregation
+keep separate drafts/errors/history. Tracked original/reference bundles prevent
+partial, cancelled or stale reads from enabling replacement owners. Postcommit
+parent/sibling failure retains receipts and explicit read-only recovery even
+without originals. Same-row restoration still requires reverse committed-row
+order; no backend witness is relaxed.
+
+All2396 frontend executions/281 affected cases, check0/0, focused reused races/
+vet, six isolated frontend/Wails profiles and distinct review pass. Seven actual
+native profiles verify12 unique physical fields, explicit A/C/D contexts,
+keep/replace/personal decisions, four Saves/ten exact audits and four independent
+histories restored through reverse UI pruning. Actual chunk-aware held mutation/
+reference responses, precise native-close acknowledgements before correction/
+release, failed-parent recovery, Cancel/remount/P1/P2/P1 and three-width visible
+labels/decision buttons pass. Business/audits/old history restores exactly;
+four consumed new histories remain, fifteen other files exact and seven owners
+freshly absent. Fresh full race passes root4394.488s, preserving1871 inputs/
+140 artifacts/discovery and canonical/protected/closed data.
+
+Only the derived fixture adds a master OldCode cell and one personal definition.
+Its Report REAL1, ScientificName/SppNumber NULL and EnglishName empty remain
+distinct. Application acceptance writes neither reference family. A sealed
+accepted Collected-workflow prefix executes on this new fixture; predecessor
+evidence remains unchanged. Injected503 responses establish WebView2 recovery,
+not SQLite source-failure timing. No new backend/binding/flag, original callback/
+warning/focus timing, identity/lifecycle, whole-form/ribbon or default/demo
+promotion follows.
+
 ### Accepted CHARS linked Collected composition
 
 The [CHARS owner](../frontend/src/SIVICHARSForm.svelte) now also composes the

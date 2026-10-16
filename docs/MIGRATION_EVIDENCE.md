@@ -8,6 +8,33 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+The CHARS child Species composition is independently reviewed, disposable-native
+accepted and full-race integrated. Eleven canonical hashes seal four live
+bindings, explicit eligible A/C/D contexts, required TEXT8, decision/list/UNION
+policies and metadata no-op. Existing independent parent/Species gates and
+extended session/panel/writer are reused; combined/Collected remain optional.
+All2396 frontend executions/281 affected cases, check0/0, focused races/vet,
+six isolated frontend/Wails profiles and distinct review pass.
+Seven actual native profiles verify12 unique physical fields, old-code keep/
+replace/known-personal decisions, four Saves/ten exact audits, four retained
+histories/reverse UI pruning, absent-parent read recovery without replay and
+specific native-close acknowledgements. Held actual mutation/reference responses,
+Cancel/remount/P1/P2/P1 and three-width labelled fields/decision buttons pass.
+All business/audits/old history and fifteen other files are exact; only four
+consumed histories remain and seven native owners are freshly absent.
+One alias cell/one personal fixture row are explicit preparation only; no
+application reference/metadata writes occur. No original callback/focus timing,
+personal creation, new backend/binding/flag or default/demo promotion is claimed.
+Native association SHA256:
+`2270399005e50b150a8683bab3f7d71977ae676d8ffc00c3dfd470280319fead`.
+Full race passes exit0, UTC2026-10-16T05:08:01.919991 to06:32:25.723676,
+root4394.488s. All1871 inputs/140 artifacts, package/embed discovery, canonical/
+protected assets and closed family match.
+Full-race log SHA256:
+`20ce795808030130da3e8ab1121a6185767c1dbaad979a30b35b6e3a688049eb`.
+Integration receipt SHA256:
+`d5fb42f170666b761dbfb3a5ce1bd79573b306ce1c638c4138b7853b656098d7`.
+
 The CHARS Collected composition is independently reviewed, disposable-native
 accepted and full-race integrated. Existing independent parent/Collected gates,
 extended session/panel/writer and original A/C/D links are reused; combined

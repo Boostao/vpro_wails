@@ -103,13 +103,33 @@ preserving1871 inputs/143 artifacts/discovery and canonical/protected/closed dat
 The original mouse-Click attempts remain exhausted; no timing/focus parity,
 new writer/flag or default/demo promotion follows.
 
-Next source-qualified work composes the existing independently gated Species
-session/panel with explicit eligible A/C/D contexts. Eleven canonical hashes
-seal four bindings/decision paths, their distinct literal focus destinations,
-required TEXT8, UNION/list policies, original links and metadata early-exit.
-Do not reopen exhausted creation attempts, add metadata writes or relax full-row
-history guards. Implementation and its dependent review/native/integration
-acceptance remain outstanding, not whole-form completion.
+The CHARS child Species composition is independently reviewed, disposable-native
+accepted and full-race integrated. Eleven canonical hashes seal four live
+bindings/decision paths, distinct literal focus destinations, required TEXT8,
+UNION/list policies, original links and metadata early-exit. Existing independent
+gates/session/panel/writer are reused, with explicit eligible A/C/D contexts.
+Three typed child peers and four owners retain separate drafts/errors/receipts;
+tracked projection/reference bundles reject partial, cancelled and stale reads.
+All2396 frontend executions,281 affected cases, check0/0, focused races/vet and
+six isolated frontend/Wails profiles pass. Distinct review finds no significant
+issues. Seven actual native profiles prove12 unique physical fields, listed/
+old-code keep/replace/known-personal decisions, four Saves/ten exact audits,
+absent-parent recovery without replay and reverse-order four-history UI pruning.
+Held actual mutation/reference responses, precise native-close acknowledgements,
+Cancel/remount/P1/P2/P1 and three-width labelled fields/decision buttons pass.
+Business/audits/old history restore exactly; only four consumed histories remain.
+Fifteen other files are unchanged and seven native owners are freshly absent.
+Fresh full race passes root4394.488s, preserving1871 inputs/140 artifacts,
+discovery, canonical/protected assets and closed family. No new backend/binding/
+flag, original callback/focus timing, personal creation or default/demo promotion
+follows. Exhausted source attempts remain exhausted.
+
+Next, compose the existing independently gated physical-row ID editor. Static
+qualification seals four bound ID controls, nullable LONG/nonunique index,
+ID audit exclusion and metadata no-op; dormant A/D rewrite paths grant nothing.
+Reuse existing signed32/NULL/collision/history policies, complete peer witnesses
+and typed child ownership. Implementation, review, native and full integration
+remain outstanding; identity/lifecycle and whole-form/ribbon parity are not granted.
 
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner
 instead of remaining permanently disabled. Both frontend prerequisites, a
