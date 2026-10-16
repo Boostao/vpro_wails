@@ -27,7 +27,7 @@ entrypoints rather than removal of its underlying data/function.
 
 ## Sources
 
-External local corpus under `C:\Users\BrunoTremblay\Work\VPRO_ACCESS`:
+External local corpus under `<private-Access-root>`:
 
 - `_BEC_data_system_fs1a_schedule_of_services_v2 (13).md`: Services1-6 and outcomes.
 - `Links for BEC data systems.md`: pointers to predecessor projects, not parity proof.
