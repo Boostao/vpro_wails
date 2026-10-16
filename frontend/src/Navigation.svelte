@@ -4,11 +4,12 @@
   type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'break-report' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
   type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'sivi-chars' | 'metadata' };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
-  let { view, onnavigate, siviAvailable = false, onopensivi, charsAvailable = false, onopenchars,
+  let { view, onnavigate, siviAvailable = false, onopensivi, charsAvailable = false, onopenchars, charsLinkedVegetation = false,
     metadataAvailable = false, onopenmetadata }: {
     view: View; onnavigate: (view: View) => void;
     siviAvailable?: boolean; onopensivi?: () => void;
     charsAvailable?: boolean; onopenchars?: () => void;
+    charsLinkedVegetation?: boolean;
     metadataAvailable?: boolean; onopenmetadata?: () => void;
   } = $props();
   let navigation: HTMLElement;
@@ -152,7 +153,9 @@
                   ? itemEnabled(item) ? 'Experimental normal SIVI / FS1333 for the selected plot. Existing draft and close guards apply. Use disposable projects only.'
                     : 'Select a plot and enable the independent SIVI standalone and parent-review gates.'
                   : item.action === 'sivi-chars'
-                    ? itemEnabled(item) ? 'Experimental CHARS parent-only entry. Child workflows and implicit actions remain unavailable. Existing draft and close guards apply.'
+                    ? itemEnabled(item) ? charsLinkedVegetation
+                      ? 'Experimental CHARS parent with separately gated linked covers/heights. Species, Collected, identity/lifecycle and unqualified callbacks remain unavailable. Existing draft and close guards apply.'
+                      : 'Experimental CHARS parent-only entry with Comp./Part. Save. Child workflows and ProjectID/PlotType remain unavailable. Existing draft and close guards apply.'
                       : 'Select a plot and enable the independent CHARS parent-entry gate.'
                   : item.action === 'metadata'
                     ? 'Project metadata for the open plot. Requires the existing metadata gate and a clean, unlocked editor; finish or Undo drafts first.'

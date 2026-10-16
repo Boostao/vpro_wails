@@ -107,6 +107,47 @@ Explicit Save/reload is the desktop adaptation; original callback timing,
 ProjectID/PlotType, unavailable references, child/whole-form/ribbon parity and
 default/demo promotion are not granted.
 
+### Accepted CHARS linked covers and heights
+
+The thin [CHARS owner](../frontend/src/SIVICHARSForm.svelte) composes the
+existing parent and extended combined session/panel. Original SubVegA-SIVI,
+SubVegC-SIVI and SubVegD-SIVI link through literal PlotNumber. No new backend
+writer, binding or flag is added. Both existing parent/combined literal frontend
+gates and independent backend gates remain required; the parent-only profile
+stays intact. All71 parent bindings and the Spp List action remain once.
+The linked snippet follows Vegetation before Notes; unavailable parent originals
+retain the same recovery controls outside the loaded-field branch.
+
+Only a clean, unlocked available parent permits entry, staging, Save or
+restoration. Each peer's drafts/errors/busy/unknown outcome blocks conflicting
+operations; the owning peer retains correction/Undo. A failed postcommit
+parent-source read must not deadlock both owners: explicit blocked-child Undo
+may reload a clean/unlocked/idle parent without originals, then observe the
+child again. It cannot bypass the parent's own drafts, busy or blocked state.
+Independent history receipts survive clean-peer refresh and failed retries.
+Mutations are never cancelled or replayed; only source reads can cancel.
+
+All2350 frontend executions, actual-client failure/retry/receipt regressions,
+compiled literal flags, check0/0, focused reused races/vet and three isolated
+frontend/Wails profiles pass. Distinct review rejected the earlier recovery
+deadlock and accepts its focused correction. Disposable actual Wails verifies
+all17 columns, independent A/C/D cover-driven membership and height-only
+nonmembership, two Saves/four exact audits, separate UI prune restoration,
+missing-parent recovery, exact native-close acknowledgement before correction/
+release, held source Cancel/remount and P1/P2/P1. All149 displayed child controls
+have visible labels and horizontal containment at three requested widths;
+scrolled field/button witnesses establish actual viewport intersection.
+Original business/audit/old-history rows restore exactly, leaving only two
+consumed new receipts. Fifteen other files are unchanged and five owners absent.
+Full race passes (root4345.973s), preserving1871 inputs/89 artifacts/discovery.
+
+The native parent-read fault replaces an observed real response with an explicit
+503 host failure; it proves WebView2 recovery, not SQLite failure timing.
+Seven recorded seed cells exist only in the new disposable fixture to exercise
+all groups/height-only omission. Canonical and predecessor bytes are unchanged.
+Species/Collected/identity/lifecycle, original warnings/focus/callback timing,
+whole-form/ribbon completion and default/demo promotion remain excluded.
+
 All136 coupled CHARS/normal/two-page parent race cases pass (root215.282s),
 as do source-tool races and actual production SQLite-only compilation with
 the exact catalogue embed. All1836 inputs,11 canonical sources and19 protected

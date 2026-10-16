@@ -63,9 +63,31 @@ not a restoration-button UI claim; four later pairs use actual UI restoration.
 No completed mutation was replayed. Fresh full race passes (root4453.093s),
 with1869 inputs/98 artifacts/discovery and the closed family unchanged; all six
 owners are freshly absent. Its dormant PlotType procedure grants no writer;
-defaults and the qualified demo remain unchanged. Next connect the existing
-extended17-column combined cover/height editor through CHARS's three original
-PlotNumber links, retaining separate peer drafts/history and close guards.
+defaults and the qualified demo remain unchanged.
+
+The thin CHARS composite now connects the existing extended17-column combined
+cover/height editor through all three original PlotNumber links, without new
+backend writers, bindings or flags. All2350 frontend executions, check0/0,
+focused Go races/vet and three isolated frontend/Wails profiles pass. Distinct
+review found a postcommit parent-read recovery deadlock; the reproduced failure,
+read-only recovery correction and accepted focused follow-up are retained.
+The original71 parent bindings remain once; linked controls follow Vegetation
+before Notes, with recovery still visible when parent originals are unavailable.
+Disposable actual Wails verifies default/parent-only/backend-off gates, all17
+columns, A/C/D cover-driven membership/height-only omission, two Saves/four exact
+audits and independent UI pruning, peer drafts/lock/close, failed parent-read
+retry without replay, held read/Cancel/remount and P1/P2/P1. Three-width labelled
+controls pass; exact business/audit/old-history restoration leaves only two
+consumed receipts, with fifteen other files unchanged and five owners absent.
+Fresh full race passes (root4345.973s), preserving1871 inputs/89 artifacts and
+discovery. No default/demo or whole-form promotion follows.
+
+Next connect the existing independently gated Collected session/panel to this
+CHARS owner. Nine canonical hashes seal equivalent four-form Collected bindings/
+active Click bodies and TEXT1 storage. Reuse the accepted desktop cycle intent,
+physical ownership and typed history; do not reopen the exhausted original
+mouse-Click oracle or claim its timing/focus parity. Keep parent/combined/
+Collected peers' drafts, recovery and receipts independent; no new writer or flag.
 
 The normal SIVI Forms-menu entry now delegates to the existing standalone owner
 instead of remaining permanently disabled. Both frontend prerequisites, a

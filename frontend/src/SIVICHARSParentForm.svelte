@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy, untrack } from 'svelte';
+  import { onMount, onDestroy, untrack, type Snippet } from 'svelte';
   import { SIVICHARSParentEntryService, AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { SIVICHARSParentEntrySession } from './siviCHARSParentEntrySession';
@@ -10,9 +10,10 @@
   import type { EditorCloseState } from './closeLifecycle';
   import source from '../../resources/fs1333-chars-sivi-layout.json';
 
-  let { contextId, project, plotNumber, onSaved, onBusyChange }: {
+  let { contextId, project, plotNumber, onSaved, onBusyChange, linkedVegetation, peerBlockedReason = '' }: {
     contextId: string; project: string; plotNumber: string;
     onSaved?: (plot: string) => void | Promise<void>; onBusyChange?: (busy: boolean) => void;
+    linkedVegetation?: Snippet; peerBlockedReason?: string;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot: plotNumber }));
   const enabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true';
@@ -29,7 +30,7 @@
   }, () => { view = session.view(); });
   view = session.view();
   const close = $derived.by(() => { view; return session.closeState(); });
-  const disabled = $derived(!enabled || locked || !view?.original || Boolean(view?.busy || view?.blocked));
+  const disabled = $derived(!enabled || locked || !view?.original || Boolean(view?.busy || view?.blocked || peerBlockedReason));
   const site = siviCHARSParentFields.filter(field => 'pageId' in field && field.pageId === 'form:frmSIVIsite-CHARS/Site');
   const interval = (first: string, last: string) =>
     site.slice(site.findIndex(field => field.binding === first), site.findIndex(field => field.binding === last) + 1);
@@ -61,6 +62,7 @@
     operationError = '';
     try {
       if (!enabled) throw new Error('CHARS parent entry is disabled in this build.');
+      if (peerBlockedReason) throw new Error(peerBlockedReason);
       if (kind === 'load') return await session.load();
       if (kind === 'save') {
         if (locked) throw new Error('Unlock CHARS entry before saving.');
@@ -77,7 +79,7 @@
   function stage(column: string, input: SourceParentEntryInput) {
     operationError = '';
     try {
-      if (disabled) throw new Error('CHARS entry is locked, busy or unavailable.');
+      if (disabled) throw new Error(peerBlockedReason || 'CHARS entry is locked, busy or unavailable.');
       session.stage(column, input);
     } catch (cause) { operationError = String(cause); }
   }
@@ -86,6 +88,18 @@
     return { ...session.closeState(), error: operationError || session.closeState().error };
   }
   export async function saveForClose() { return operation('save'); }
+  export function canReloadLinkedParent() {
+    view;
+    return enabled && !locked && !close.unsaved && !close.busy && !close.blocked;
+  }
+  export function canOpenLinkedVegetation() {
+    return canReloadLinkedParent() && !!view?.original;
+  }
+  export async function refreshAfterLinkedSave() {
+    if (!canReloadLinkedParent()) throw new Error('CHARS parent must remain clean, unlocked and idle during linked refresh.');
+    if (!await session.load()) throw new Error(session.view().error || 'CHARS linked parent refresh failed.');
+    operationError = '';
+  }
   export function canOpenProjectMetadata() { return false; }
   export function openProjectMetadata() { operationError = 'CHARS project-metadata action remains unavailable.'; }
   $effect(() => { onBusyChange?.(Boolean(view?.busy)); });
@@ -101,12 +115,12 @@
   {#if !enabled}<p role="status">CHARS parent entry is disabled in this build.</p>{/if}
   <div class="flex flex-wrap gap-2">
     <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-lock
-      disabled={!enabled || !view?.original || close.busy || close.unsaved || Boolean(close.blocked)}
+      disabled={!enabled || !view?.original || close.busy || close.unsaved || Boolean(close.blocked || peerBlockedReason)}
       onclick={() => { locked = !locked; }}>{locked ? 'Unlock CHARS entry' : 'Lock CHARS entry'}</button>
     <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-save
       disabled={disabled || !close.canSave} onclick={() => void operation('save')}>Save CHARS entry</button>
     <button type="button" class="rounded border px-3 py-2 disabled:opacity-50" data-chars-undo
-      disabled={!enabled || close.busy} onclick={() => void operation('undo')}>Undo / reload</button>
+      disabled={!enabled || close.busy || Boolean(peerBlockedReason)} onclick={() => void operation('undo')}>Undo / reload</button>
     {#if view?.historyId}
       <button type="button" class="rounded border px-3 py-2 disabled:opacity-50"
         disabled={disabled || close.unsaved || Boolean(close.blocked)}
@@ -213,13 +227,17 @@
             </div>
           {/if}
         </div>
+        {#if group.name === 'Vegetation'}{@render linkedVegetation?.()}{/if}
       </section>
     {/each}
   {/if}
+  {#if !view?.original}{@render linkedVegetation?.()}{/if}
   <p class="text-sm text-stone-600">Explicit Save, Undo and history restoration are desktop safety adaptations, not original callback parity.
     Only Exposure 1/2, Soil Drainage and Successional Status require listed non-NULL codes. Other codes remain literal.
     Coordinates retain finite source DOUBLE values without new geographic bounds. Numeric blanks mean NULL; spaces are not silently trimmed.
     Dates use exact YYYY-MM-DD HH:MM:SS with an optional fractional second.</p>
-  <p role="status" class="text-sm text-amber-800">CHARS ProjectID/PlotType and other source actions, child vegetation workflows,
-    changed SubZone and blank A-horizon assignment remain unavailable in this parent-only editor. Use the separately accepted normal SIVI/FS882 workflows where applicable.</p>
+  <p role="status" class="text-sm text-amber-800">CHARS ProjectID/PlotType and other source actions,
+    {linkedVegetation ? 'child Species/Collected/identity/lifecycle and unqualified callbacks,' : 'child vegetation workflows,'}
+    changed SubZone and blank A-horizon assignment remain unavailable in this {linkedVegetation ? 'CHARS editor' : 'parent-only editor'}.
+    Use the separately accepted normal SIVI/FS882 workflows where applicable.</p>
 </section>

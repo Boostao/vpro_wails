@@ -8,6 +8,34 @@ receipt but does not independently reproduce its native run.
 
 ## Current forms/report boundary
 
+The CHARS linked cover/height successor is independently reviewed, disposable-
+native accepted and full-race integrated. Its thin composite reuses existing
+extended17-column services/session/panel and original A/C/D PlotNumber links;
+there is no new writer, binding or flag. All2350 frontend executions, check0/0,
+focused reused Go races/vet and three isolated production profiles pass.
+Distinct review rejected an earlier postcommit parent-read recovery deadlock;
+the reproduced failure, reachable readonly recovery and accepted focused
+follow-up remain sealed. Actual Wails proves all17 columns, height-only
+nonmembership, P1/P2/P1, independent drafts/receipts, two Saves/four exact audits,
+separate UI pruning, failed-read retry without replay, exact native-close
+acknowledgements and actual read Cancel/remount. Three-width visible labels/
+containment and scrolled viewport witnesses pass. Original business/audit/old
+history and fifteen other files restore exactly; only two consumed receipts
+remain and all five owners are freshly absent. Seven explicitly recorded seed
+cells affect only the new disposable fixture, never canonical/predecessor data.
+Native association SHA256:
+`a3b569eda0c1c33b916095bfda4f32ecc113e2dfd2f5ec23ce8421b78023e1e2`.
+Full race passes exit0, UTC2026-10-16T01:24:56.212575 to02:48:38.210977,
+root4345.973s. All1871 inputs/89 artifacts, package/embed discovery, canonical/
+protected assets and closed family match. The reused PID belongs to a different
+PowerShell process; none of the five original native owners remains.
+Full-race log SHA256:
+`2c9566adcde6cfa541ff034674b62717f5908997887eb91b259cd8bf1da751e9`.
+Integration receipt SHA256:
+`08303a6892f3793839f1e62fe4ef251f61732d17a5e42ed925581eca57f6d695`.
+Source freeze released. Source callbacks, child Species/Collected/identity/
+lifecycle, whole-form/ribbon parity and default/demo promotion remain excluded.
+
 The qualified CHARS Spp List Comp./Part. successor is independently reviewed,
 native-accepted and full-race integrated. One existing parent session combines
 direct fields and the optional strict source-action transport, with complete
@@ -33,7 +61,7 @@ Full-race log SHA256:
 Integration receipt SHA256:
 `fb808ca35384499e123df3e3c9130395e912be87233b5140353499b5b345f53a`.
 Source freeze released. Earlier failed checks remain rejected; callback timing,
-PlotType/ProjectID, child/whole-form/ribbon parity and default/demo promotion
+PlotType/ProjectID, child Species/Collected/identity/lifecycle, whole-form/ribbon parity and default/demo promotion
 remain excluded.
 
 The broader qualified Boolean correction is independently reviewed and

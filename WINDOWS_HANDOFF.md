@@ -10,7 +10,7 @@ are in [README](README.md), [MIGRATION_PLAN](MIGRATION_PLAN.md),
 - This is the Windows VM, not a remote Linux session.
 - Active repository: `C:\Users\BrunoTremblay\Work\vpro_wails`, branch `main`.
   Shared Boolean predecessor: `6d938d1d27c43d2bd96adcf6ad3c435f4db7f941`.
-  Current accepted CHARS Species action is described below. No push.
+  Current accepted CHARS linked cover/height editor is described below. No push.
   The old `access-parity-windows-handoff` worktree is not the integration root.
 - Canonical Access exports: `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI`.
   Never modify canonical Access/data; use disposable fixtures for native work.
@@ -465,12 +465,42 @@ native family remain unchanged. Private
 Earlier type/wire/test-placement failures remain rejected. Never invent a
 PlotType writer from its unwired procedure. No default/demo availability changed;
 SubZone/new blank Ahorizon and whole-form/native parity remain unavailable.
-Next source-backed contract is private `chars-sivi-linked-vegetation-contract.json`,
-with eight canonical hashes: reuse existing extended17-column combined
-service/session/panel through the three original PlotNumber links, not a new
-writer or duplicate parent. Preserve peer drafts/errors/history, clean-peer
-refresh, lock/navigation/close guards and read-only cancellation. Implementation
-has not started. No new Access oracle is needed or authorized by that contract.
+The CHARS linked cover/height successor is now reviewed, native-accepted and
+full-race integrated. Private `chars-sivi-linked-candidate-v3` is the accepted
+1871-input freeze. All2350 frontend executions, check0/0, focused races/vet and
+default/parent/linked frontend/Wails builds pass. The initial Navigation flag
+lookup violation remains rejected. Distinct review rejected v2 for a postcommit
+parent-read recovery deadlock; v3 preserves explicit read-only recovery and
+reachable child Undo when parent originals disappear. Regression/focused
+follow-up review and actual Wails prove failure, failed retry, successful
+same-owner recovery and exactly-once mutations.
+
+One inherited16-file disposable fixture has seven explicitly recorded seed
+cells to exercise A/C/D and height-only nonmembership; canonical/predecessor
+bytes are unchanged. Default/parent-only/backend-off profiles, all17 columns,
+two Saves/four exact audits, independent UI pruning, P1/P2/P1, peer drafts/lock/
+native-close and actual held-read Cancel/remount pass. Specific CancelClose200
+precedes correction/release. All149 child controls have visible labels and
+containment at three requested widths, with separately scrolled viewport
+witnesses. Original business/audits/old history restore exactly; only two new
+consumed receipts remain. Fifteen other files and five absent owners are sealed
+by `chars-sivi-linked-candidate-v3\native-association.json`.
+
+Fresh `go test -race -timeout 120m ./...` passes exit0,
+UTC2026-10-16T01:24:56.212575 to02:48:38.210977; root4345.973s.
+All1871 inputs/89 artifacts/discovery, protected/canonical assets and closed
+family remain unchanged; the reused PID is independently a different
+PowerShell owner, not a retained native app. Private
+`chars-sivi-linked-integration\receipt.json` accepts; source freeze released.
+No new writer, binding, flag, source callback or default/demo promotion.
+
+Next private `chars-sivi-collected-contract.json` and
+`chars-sivi-collected-source-seal.json` seal nine canonical hashes, four equal
+active Click procedures, live bindings and TEXT1 storage. Reuse the existing
+independently gated Collected session/panel inside CHARS, retaining parent/
+combined/Collected drafts, recovery and receipts. The two original mouse-Click
+attempts remain exhausted; no new Access action is authorized. Complete the
+local linked successor commit before starting that implementation.
 Continue the ordered forms/report backlog, not a whole-migration completion.
 Use `go test -race -timeout 120m ./...` for full integration on this VM; the
 default ten-minute budget is insufficient. Keep `GODEBUG=goindex=0` for isolated

@@ -37,7 +37,8 @@ standalone opener when `VITE_SIVI_STANDALONE=true` and
 It preserves draft/close decisions and independent backend review denial;
 The separate experimental CHARS parent entry requires its own literal
 `VITE_SIVI_CHARS_PARENT_ENTRY=true` and independent backend opt-in; unsupported
-actions remain disabled. This does not complete SIVI callbacks or the original
+actions remain disabled. Its linked covers/heights additionally require the
+existing combined-editor frontend/backend gates. This does not complete SIVI callbacks or the original
 ribbon's other functionality.
 
 **Forms > Metadata** now delegates to the existing project-metadata editor for
@@ -157,8 +158,10 @@ The independently reviewed desktop candidate wires the existing close/navigation
 source-grouped71-binding presentation, reference-safe drafts and explicit
 Save/Undo/history behind independent `VPRO_SIVI_CHARS_PARENT_ENTRY` and
 `VITE_SIVI_CHARS_PARENT_ENTRY` literal flags (both default off). The Forms item
-is explicitly parent-only: child workflows and ProjectID/PlotType remain
-unavailable, as do changed SubZone and blank Ahorizon. The separately qualified
+retains a parent-only profile when the combined-editor gate is off. The linked
+cover/height scope below adds only the existing extended editor; child Species,
+Collected, identity/lifecycle and ProjectID/PlotType remain unavailable, as do
+changed SubZone and blank Ahorizon. The separately qualified
 Spp List action below adds only Comp./Part. to this same parent owner.
 All200 affected frontend cases,2310 standard frontend lifecycle executions,
 zero-diagnostic check, production vet and isolated default/enabled Wails builds
@@ -216,8 +219,28 @@ restorations use the actual UI. No mutation was replayed. Original source,
 audits and old histories remain exact with only five consumed new receipts;
 fifteen other files are unchanged and all six owners are freshly absent.
 Fresh full race passes (root4453.093s), preserving1869 inputs/98 artifacts and
-package/embed discovery. This does not enable children, complete CHARS/ribbon
-parity or promote defaults/demo assets.
+package/embed discovery. This action alone does not enable children or complete
+CHARS/ribbon parity; defaults/demo assets remain unchanged.
+
+CHARS now composes the existing extended **17-column cover/height editor**
+through its original Tree/Shrubs, Herb and Moss/Lichen PlotNumber links.
+Both literal frontend gates (`VITE_SIVI_CHARS_PARENT_ENTRY`,
+`VITE_SIVI_COMBINED_EDITING`) and their independent backend gates are required.
+No backend writer, binding or flag was added. Parent and child retain separate
+drafts, errors and typed history receipts; lock, navigation and native-close
+guards cover both. Explicit read-only recovery remains reachable when a
+postcommit parent read fails, without replaying the completed Save.
+All2350 frontend executions, check0/0, focused Go races/vet and three isolated
+frontend/Wails profiles pass. Independent review found and then verified the
+parent-read recovery correction. Actual Wails proves all17 columns, cover-driven
+A/C/D membership with height-only omission, P1/P2/P1, two Saves/four exact audits,
+separate UI pruning, held read/Cancel/stale-remount refusal and three-width
+visible labelled controls. Business/audit/old-history rows and fifteen other
+files restore exactly; only two consumed receipts remain. All five owners are
+freshly absent. Full race passes (root4345.973s), preserving1871 inputs,
+89 artifacts and package/embed discovery. Original callback timing, child
+Species/Collected/identity/lifecycle, whole-form/ribbon completion and
+default/demo promotion remain excluded.
 
 The same qualified Yes/No correction is now implemented across normal SIVI
 FloodPlain/source Species actions, two-page common/complete entry and the ordinary

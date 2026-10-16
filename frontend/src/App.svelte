@@ -5,7 +5,7 @@
   import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary, type ProjectPlotProfileFilterRequest, type PlotProfileSource, type PlotProfileSourceInfo } from '../bindings/github.com/boostao/vpro-wails';
   import { projectState } from './state';
   import FS882Form from './FS882Form.svelte';
-  import SIVICHARSParentForm from './SIVICHARSParentForm.svelte';
+  import SIVICHARSForm from './SIVICHARSForm.svelte';
   import Navigation from './Navigation.svelte';
   import DemoReadiness from './DemoReadiness.svelte';
   import LongEnvironmentReport from './LongEnvironmentReport.svelte';
@@ -59,6 +59,7 @@
   const editorLabel = $derived(editorEntryForm === 'sivi-chars' ? 'CHARS SIVI parent' : editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882');
   const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE === 'true' && import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
   const siviCHARSParentEntryEnabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true';
+  const siviCHARSLinkedVegetationEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_COMBINED_EDITING === 'true';
   let offset = $state(0);
   let busy = $state(false);
   let error = $state('');
@@ -1002,6 +1003,7 @@
       siviAvailable={siviStandaloneEnabled && !!selected && !!$projectState?.contextId}
       onopensivi={() => void openSIVI()}
       charsAvailable={siviCHARSParentEntryEnabled && !!selected && !!$projectState?.contextId}
+      charsLinkedVegetation={siviCHARSLinkedVegetationEnabled}
       onopenchars={() => void openSIVI('sivi-chars')}
       metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
       onopenmetadata={() => void openProjectMetadata()} />{/if}
@@ -1286,7 +1288,7 @@
           {#key editorEntryForm}
           {#key editorPlotNumber}
           {#if editorEntryForm === 'sivi-chars'}
-          <SIVICHARSParentForm bind:this={editor}
+          <SIVICHARSForm bind:this={editor}
             contextId={$projectState?.contextId ?? ''} project={$projectState?.activeProject ?? ''} plotNumber={editorPlotNumber ?? ''}
             onSaved={async (p) => { editorPlotNumber = p; await loadPlots(offset); }}
             onBusyChange={(busy) => { localEditorBusy = busy; }} />

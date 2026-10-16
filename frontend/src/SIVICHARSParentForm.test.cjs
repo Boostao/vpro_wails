@@ -75,6 +75,38 @@ test('compiled CHARS presentation consumes the exact source and renders every bi
   }
 });
 
+test('compiled linked recovery remains rendered exactly once when parent originals are unavailable', () => {
+  for (const available of [false, true]) {
+    let rendered = 0;
+    const parent = serverComponent(code('SIVICHARSParentForm.svelte'), 'SIVICHARSParentForm.svelte', {
+      '../bindings/github.com/boostao/vpro-wails': { SIVICHARSParentEntryService: {}, AuditRestoreAction: {} },
+      './siviCHARSParentEntry': { siviCHARSParentFields: source.forms[0].fields.filter(field => field.binding),
+        siviCHARSParentSpeciesAction: 'form:frmSIVIsite-CHARS/optSpeciesListComplete' },
+      './referenceEditor': { siviReferencePolicies: [] }, './projectMetadataEditor': metadata,
+      '../../resources/fs1333-chars-sivi-layout.json': { default: source },
+      './siviCHARSParentEntrySession': { SIVICHARSParentEntrySession: class {
+        view() { return { original: available ? wire.Original : null,
+          snapshot: available ? { policies: wire.Policies, fields: [] } : null,
+          drafts: {}, advisories: {}, busy: false, blocked: false, historyId: null, error: null }; }
+        closeState() { return { unsaved: false, busy: false, blocked: false, canSave: available, saveReason: '', error: null }; }
+        dispose() {}
+      } },
+    }, { VITE_SIVI_CHARS_PARENT_ENTRY: 'true' });
+    const host = serverComponent(`<script>import Parent from 'parent'; import { record } from 'proof';</script>
+      {#snippet linked()}{record()}<span data-linked-recovery>Retained linked recovery</span>{/snippet}
+      <Parent contextId="owned" project="Sample" plotNumber="108050" linkedVegetation={linked} />`,
+    'linked-recovery-host.svelte', { parent: { default: parent }, proof: { record: () => { rendered++; return ''; } } });
+    const html = render(host).body;
+    assert.equal(rendered, 1);
+    assert.equal((html.match(/data-linked-recovery/g) ?? []).length, 1);
+    assert.equal((html.match(/data-chars-field=/g) ?? []).length, available ? 71 : 0);
+    if (available) {
+      assert.ok(html.indexOf('aria-label="Vegetation"') < html.indexOf('data-linked-recovery'));
+      assert.ok(html.indexOf('data-linked-recovery') < html.indexOf('aria-label="Notes"'));
+    }
+  }
+});
+
 test('actual CHARS route needs its exact independent gate and defers ownership replacement until transition completion', async () => {
   let pending;
   const state = componentFunctions('App.svelte', ['openSIVI'], {
@@ -99,20 +131,24 @@ test('actual CHARS route needs its exact independent gate and defers ownership r
   assert.equal(state.editorPlotNumber, ' P ');
 });
 
-test('compiled CHARS menu is independently gated and discloses its parent-only scope', () => {
+test('compiled CHARS menu is independently gated and discloses its exact parent/linked scope', () => {
+  for (const combined of [undefined, 'false', 'TRUE', 'true']) {
   const component = serverComponent(code('Navigation.svelte'), 'Navigation.svelte', {
     '@lucide/svelte': new Proxy({}, { get: () => () => {} }),
   });
   for (const available of [false, true]) {
     for (const callback of [undefined, () => {}]) {
       const html = render(component, { props: { view: 'plots', onnavigate: () => {},
-        charsAvailable: available, onopenchars: callback } }).body;
+        charsAvailable: available, onopenchars: callback, charsLinkedVegetation: combined === 'true' } }).body;
       const match = html.match(/<button\b[^>]*>[\s\S]*?<span>CHARS SIVI parent — Experimental<\/span>\s*<\/button>/)?.[0];
       assert.ok(match);
       const button = match.slice(match.lastIndexOf('<button'));
       assert.equal(/\bdisabled(?:\s|=|>)/.test(button), !(available && callback));
-      assert.match(button, available && callback ? /parent-only entry/ : /independent CHARS parent-entry gate/);
+      assert.match(button, available && callback
+        ? combined === 'true' ? /separately gated linked covers\/heights/ : /parent-only entry/
+        : /independent CHARS parent-entry gate/);
     }
+  }
   }
 });
 
@@ -135,7 +171,7 @@ test('actual CHARS menu delegates once only after restoring owned navigation foc
 test('CHARS shares the root native-close and navigation interface without replacing the normal FS882 host', () => {
   const app = code('App.svelte'), form = code('SIVICHARSParentForm.svelte');
   assert.match(app, /siviCHARSParentEntryEnabled = import\.meta\.env\.VITE_SIVI_CHARS_PARENT_ENTRY === 'true'/);
-  assert.match(app, /\{#if editorEntryForm === 'sivi-chars'\}[\s\S]*?<SIVICHARSParentForm bind:this=\{editor\}[\s\S]*?\{:else\}[\s\S]*?<FS882Form/);
+  assert.match(app, /\{#if editorEntryForm === 'sivi-chars'\}[\s\S]*?<SIVICHARSForm bind:this=\{editor\}[\s\S]*?\{:else\}[\s\S]*?<FS882Form/);
   assert.match(form, /\$state\.raw<ReturnType<SIVICHARSParentEntrySession\['view'\]>/);
   for (const method of ['getCloseState', 'saveForClose', 'canOpenProjectMetadata', 'openProjectMetadata']) {
     assert.match(form, new RegExp(`export (?:async )?function ${method}\\(`));
