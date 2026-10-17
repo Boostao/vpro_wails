@@ -357,6 +357,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	summaryVegetationWorkbook.groupedEnabled, err = siviFeature(summaryVegetationGroupedWorkbookFeatureEnvironment, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	summaryVegetationPreferencesEnabled, err := summaryVegetationPreferencesFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)

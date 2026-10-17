@@ -188,6 +188,55 @@ Private `summary-grouped-workbook-integration/receipt.json` SHA256:
 Only directly related documentation changes after integration. No new native
 availability or original Report acceptance is claimed.
 
+## Accepted grouped inspection publication
+
+The [desktop extension](LONG_VEGETATION_WORKBOOK_CONTRACT.md#accepted-grouped-inspection-publication)
+extends the existing publisher with independently gated explicit Group12/13/14
+authority. Focused backend race passes in75.137s; Svelte check reports0 errors/
+warnings. Eight portable production-Go vectors cover typed Order, environment,
+class and None-presence paths. Related client tests cover immutable actual
+proxies, strict metadata/authority, flag gates, incompatible retained selections,
+review identity, remount/receipt barriers and cancelled validation.
+
+Initial Group12 tests used a zero-only B contribution: accepted source staging
+correctly omitted its pivot column, so the existing complete-alignment guard
+refused. Only the disposable fixture was qualified with a nonzero contribution;
+a separate test now proves the zero-only refusal and correction/retry. Client
+development also corrected test assumptions about NULL-first ordering/scientific
+labels and supplied the server lifecycle runtime for browser-conditioned SSR.
+These are not product changes to source calculation or alignment policy.
+Frozen validation accepts215 related client cases/31 browser cases, check0/0,
+private assets, coupled race787.157s, vet5.782s and production12.984s.86 exact
+baseline vectors preserve legacy outputs/approvals/options and discovery.
+Distinct exact20-path review finds no significant issues.
+
+Actual Wails accepts five reopened outputs: Strata, Lifeform/environment, None,
+Strata/class/environment and None/presence/environment. Independent ZIP/XML
+inspection checks all body values, numeric Order and decoded complete hidden
+source/options/scope. Four actual remounts/four exact close acknowledgements,
+36 responsive observations, held validation/stale-result refusal and persistent
+unknown committed publication pass. Four backend-off modes refuse while Layer
+remains available. All16 fixture/config/audit files remain exact; all three
+native owners normally close and fresh owned-process checks pass.
+
+Retained harness failures concern Path typing before any publication, decoding
+hexadecimal provenance after the first output, disabled Show after four outputs
+and minifier template-literal AST selection before a lifecycle owner launch.
+Each completed publication was independently recovered without replay. Rejected
+private lifecycle assets/log are archived. No product correction followed review.
+Integration preflight initially assumed whole-directory inherited manifests;
+the first four families intentionally seal selected fixture/evidence files.
+Every inherited accepted hash matches. The corrected runner preserves that
+manifest policy and requires complete equality for the new family.
+
+Full race accepts exit0, UTC2026-10-17T12:47:13.621866 to14:03:41.684488,
+4588.062s total. All1910 managed inputs/190 artifacts, discovery,26 canonical
+inputs/21 protected assets and seven closed native families match. Private
+`summary-grouped-desktop-integration/receipt.json` SHA256:
+`100e02b1ae540b8affaa3ebe666434e1bbb181737a73e46fe052b1c592c7a145`.
+Only directly related documentation changes afterward. This is typed inspection,
+not original Report/callback/formatting/printing or delivered-demo acceptance.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

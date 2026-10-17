@@ -553,6 +553,22 @@ legacy comparisons, coupled race/vet/production and distinct review pass. Full
 race passes in4712.235s with1907 inputs/142 artifacts and six closed native
 families unchanged. No transport, UI, flag or delivered-demo availability changes.
 
+The **accepted, default-off desktop extension** connects that grouped
+renderer to the existing inspection publisher and Summary Group by control.
+Explicit `groupAndOrder`12/13/14 requires independent
+`VPRO_SUMMARY_VEGETATION_GROUPED_WORKBOOK` /
+`VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK` flags. Omission retains the accepted
+Layer request/approval/output path. Grouped references and ancillary sheets
+refuse without changing selections; incomplete unit/pivot alignment also refuses.
+Frozen validation passes215 related client cases/31 browser cases, check/build,
+coupled race/vet/production and86 exact legacy vectors. Independent review finds
+no significant issues. Actual Wails accepts five reopened outputs, four remounts/
+exact close acknowledgements,36 responsive observations, unknown committed
+publication retention and four independent backend-off refusals; all16 fixture
+files stay unchanged. Full race passes in4588.062s, preserving1910 inputs/190
+artifacts and seven closed native families. This does not change the delivered
+demo or original Report availability.
+
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus
 87.8 MB for the same stripped frontend build. Sample native startup and first

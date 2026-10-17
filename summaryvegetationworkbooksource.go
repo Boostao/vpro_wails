@@ -68,8 +68,18 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 	if err := validateSummaryVegetationDisplayOptions(ctx, options.Average, options.Display, calculationClass); err != nil {
 		return fail(err)
 	}
+	grouping := 11
+	if options.GroupAndOrder != nil {
+		if options.References != nil || options.Ancillary != nil {
+			return fail(errors.New("Summary grouped workbook effective references and ancillary worksheets are not qualified; choose Layer or clear those modes"))
+		}
+		grouping = *options.GroupAndOrder
+		if err := validateSummaryVegetationGroupedOptions(ctx, options.Average, grouping, options.Display, calculationClass); err != nil {
+			return fail(err)
+		}
+	}
 	raw, err := environment.report.readSnapshotWithReferences(ctx, contextID, plots, owner, tx,
-		options.Average, options.Display, calculationClass, 11, options.References)
+		options.Average, options.Display, calculationClass, grouping, options.References)
 	if err != nil {
 		return fail(err)
 	}

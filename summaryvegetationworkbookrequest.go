@@ -39,31 +39,33 @@ func (options *SummaryVegetationWorkbookAncillaryOptions) UnmarshalJSON(data []b
 }
 
 type SummaryVegetationWorkbookOptions struct {
-	Title      string                                     `json:"title"`
-	Average    int                                        `json:"average"`
-	Display    int                                        `json:"display"`
-	ShowClass  int                                        `json:"showClass"`
-	IncludeEnv bool                                       `json:"includeEnv"`
-	Ancillary  *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary,omitempty"`
-	References *SummaryVegetationReferenceOptions         `json:"references,omitempty"`
+	Title         string                                     `json:"title"`
+	Average       int                                        `json:"average"`
+	Display       int                                        `json:"display"`
+	ShowClass     int                                        `json:"showClass"`
+	IncludeEnv    bool                                       `json:"includeEnv"`
+	Ancillary     *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary,omitempty"`
+	References    *SummaryVegetationReferenceOptions         `json:"references,omitempty"`
+	GroupAndOrder *int                                       `json:"groupAndOrder,omitempty"`
 }
 
 func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) error {
 	var raw struct {
-		Title      *string                                    `json:"title"`
-		Average    *int                                       `json:"average"`
-		Display    *int                                       `json:"display"`
-		ShowClass  *int                                       `json:"showClass"`
-		IncludeEnv *bool                                      `json:"includeEnv"`
-		Ancillary  *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary"`
-		References *SummaryVegetationReferenceOptions         `json:"references"`
+		Title         *string                                    `json:"title"`
+		Average       *int                                       `json:"average"`
+		Display       *int                                       `json:"display"`
+		ShowClass     *int                                       `json:"showClass"`
+		IncludeEnv    *bool                                      `json:"includeEnv"`
+		Ancillary     *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary"`
+		References    *SummaryVegetationReferenceOptions         `json:"references"`
+		GroupAndOrder *int                                       `json:"groupAndOrder"`
 	}
 	properties, err := sourceChildJSONObject(data, "Summary draft workbook options",
-		[]string{"title", "average", "display", "showClass", "includeEnv"}, []string{"ancillary", "references"})
+		[]string{"title", "average", "display", "showClass", "includeEnv"}, []string{"ancillary", "references", "groupAndOrder"})
 	if err != nil {
 		return err
 	}
-	if err := sourceChildJSONNonNull(properties, "Summary draft workbook options", "ancillary", "references"); err != nil {
+	if err := sourceChildJSONNonNull(properties, "Summary draft workbook options", "ancillary", "references", "groupAndOrder"); err != nil {
 		return err
 	}
 	if err := json.Unmarshal(data, &raw); err != nil {
@@ -73,7 +75,8 @@ func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) erro
 		return errors.New("Summary draft workbook requires explicit title, calculation and environmental options; NULL is not a value")
 	}
 	*options = SummaryVegetationWorkbookOptions{Title: *raw.Title, Average: *raw.Average, Display: *raw.Display,
-		ShowClass: *raw.ShowClass, IncludeEnv: *raw.IncludeEnv, Ancillary: raw.Ancillary, References: raw.References}
+		ShowClass: *raw.ShowClass, IncludeEnv: *raw.IncludeEnv, Ancillary: raw.Ancillary, References: raw.References,
+		GroupAndOrder: raw.GroupAndOrder}
 	return nil
 }
 

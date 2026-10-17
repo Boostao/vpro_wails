@@ -32,6 +32,7 @@ const client = loadTypeScript('summaryVegetationWorkbook.ts', {
 const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookWire.json'), 'utf8'));
 const ancillaryWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookAncillaryWire.json'), 'utf8'));
 const referenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookReferencesWire.json'), 'utf8'));
+const groupedWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath']
   .map(key => [key, wire.vegetation.preview[key]]));
 const yieldNow = () => Promise.resolve();
@@ -240,7 +241,7 @@ test('changing Calculate/Display invalidates review at publication and no destin
 });
 
 function mountPanel(session, services, held = false, calculation = wire.environment.options, ancillaryEnabled = false,
-  referencesEnabled = false) {
+  referencesEnabled = false, groupedEnabled = false) {
   const filename = 'SummaryVegetationWorkbookPanel.svelte';
   const source = readFileSync(path.join(__dirname, filename), 'utf8');
   assert.deepEqual(compiler.compile(source, { filename, generate: 'client' }).warnings, []);
@@ -267,7 +268,8 @@ function mountPanel(session, services, held = false, calculation = wire.environm
     __props: { owner, calculation, disabled: held, onBusyChange: value => notifications.push(value) },
     __environment: { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
       VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: ancillaryEnabled ? 'true' : 'false',
-      VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: referencesEnabled ? 'true' : 'false' },
+      VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: referencesEnabled ? 'true' : 'false',
+      VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: groupedEnabled ? 'true' : 'false' },
     require(name) { assert.ok(name in dependencies, name); return dependencies[name]; },
   });
   return { ...module.exports.handlers, notifications, destroy: () => destroy() };
@@ -765,4 +767,209 @@ test('consumed reference rendering bounds name groups to fifty with labelled con
   assert.match(html, /Project effective source references and attribute descriptions/);
   assert.match(html, /Include common names in grouping and the workbook/);
   assert.match(html, /Use master CombinedEnglishName/);
+});
+
+test('eight strict Go grouped wires detach actual proxies and preserve typed metadata without widening ordinary consumers', async () => {
+  assert.equal(Object.keys(groupedWire).length, 8);
+  for (const value of Object.values(groupedWire)) {
+    const source = proxy(structuredClone(value));
+    assert.throws(() => structuredClone(source));
+    const result = await client.validateSummaryVegetationWorkbookReview(source, owner, value.options, yieldNow);
+    assert.deepEqual(plain(result), value);
+    assert.equal(Object.isFrozen(result.preview.groupField), true);
+    assert.equal(Object.isFrozen(result.preview.rows[0].order), true);
+    source.preview.groupField.name = 'caller';
+    assert.deepEqual(plain(result), value);
+    assert.throws(() => vegetation.validateSummaryVegetation(value.preview, owner,
+      value.options.average, value.options.display, value.options.showClass));
+    if (value.environment) {
+      const { groupAndOrder, ...ordinary } = value.options;
+      await assert.rejects(environmental.validateSummaryEnvironmentalLifeformOptions(
+        value.environment, owner, ordinary, yieldNow));
+    }
+  }
+  assert.deepEqual(groupedWire.lifeform.preview.groupField, { name: 'LifeForm', daoType: 10, size: 3 });
+  assert.equal(groupedWire.lifeform.preview.rows[0].layer.storage, 'null');
+  assert.equal(groupedWire.lifeform.preview.rows.find(row => row.species.text === 'Lifeform 1').layer.text, '01');
+  assert.equal(groupedWire.none.preview.rows[0].layer.storage, 'null');
+  assert.deepEqual(groupedWire.strata.preview.orderField, { name: 'Order', daoType: 7, size: 8 });
+  assert.equal(groupedWire.strata.preview.rows.find(row => row.species.text === 'Lifeform 1').order.real, 1.56);
+  assert.deepEqual(groupedWire.strataClass.preview.orderField, { name: 'Order', daoType: 10, size: 0 });
+});
+
+test('grouped authority rejects omitted, null, legacy, mistyped and cross-mode metadata without repairing it', async () => {
+  const changes = [
+    value => { delete value.options.groupAndOrder; },
+    value => { value.options.groupAndOrder = null; },
+    value => { value.options.groupAndOrder = 11; },
+    value => { value.options.groupAndOrder = '12'; },
+    value => { value.options.groupAndOrder = 13; },
+    value => { value.options.GroupAndOrder = 12; },
+    value => { value.options.references = { showCommon: false, useGuideNames: false }; },
+    value => { value.options.ancillary = { createSummary: false }; },
+    value => { value.scope = client.summaryVegetationWorkbookScope; },
+    value => { delete value.preview.groupAndOrder; },
+    value => { value.preview.groupField.name = 'Strata'; },
+    value => { value.preview.groupField.size = 3; },
+    value => { value.preview.orderField.daoType = 10; },
+    value => { value.preview.rows[0].order.real = '1.56'; },
+    value => { value.preview.rows[0].order.real = Infinity; },
+    value => { value.preview.ordering = 'literal-null-first-layer-species'; },
+    value => { value.environment.vegetation.groupAndOrder = 14; },
+    value => { value.preview.columns.pop(); },
+  ];
+  for (const [index, change] of changes.entries()) {
+    const value = structuredClone(groupedWire.strataEnvironment);
+    change(value);
+    await assert.rejects(client.validateSummaryVegetationWorkbookReview(
+      value, owner, value.options, yieldNow), `grouped case ${index}`);
+  }
+  const value = structuredClone(groupedWire.none);
+  value.preview.rows[0].layer = { storage: 'text', text: '' };
+  await assert.rejects(client.validateSummaryVegetationWorkbookReview(value, owner, value.options, yieldNow));
+  await assert.rejects(client.validateSummaryVegetationWorkbookReview(groupedWire.lifeform,
+    owner, groupedWire.strata.options, yieldNow));
+});
+
+test('group changes invalidate reviewed publication while receipts and invalid drafts keep their independent barriers', async () => {
+  const value = groupedWire.strata, session = sessionFor(value);
+  assert.equal(client.sameSummaryWorkbookOptions(value.options, { ...value.options, groupAndOrder: 13 }), false);
+  assert.equal(client.sameSummaryWorkbookOptions(value.options, wire.vegetation.options), false);
+  await session.review(value.options, { review: () => Promise.resolve(value), validationYield: yieldNow });
+  session.edit('destination', destination);
+  let writes = 0;
+  await assert.rejects(session.publish({ ...value.options, groupAndOrder: 14 }, () => { writes++; }), /current explicit/);
+  assert.equal(writes, 0);
+  await session.publish(value.options, request => {
+    writes++;
+    assert.deepEqual(plain(request), { options: value.options, approvalHash: value.approvalHash, destination });
+    return Promise.resolve(outcome(value));
+  });
+  assert.equal(writes, 1);
+  session.acknowledge();
+  session.edit('title', '\ud800');
+  assert.equal(session.held(), true);
+  assert.match(session.view().draftError, /Title/);
+  session.undoDraft();
+  assert.equal(session.held(), false);
+  assert.equal(session.view().publication.outcome.sha256, value.workbookSHA256);
+});
+
+test('compiled grouped panel gate refuses dispatch, preserves incompatible selections and publishes only explicit authority', async () => {
+  const value = groupedWire.strata;
+  for (const enabled of [false, true]) {
+    const session = sessionFor(value);
+    let reads = 0, writes = 0;
+    const services = {
+      GetReview(contextId, json) {
+        reads++;
+        assert.equal(contextId, owner.contextId);
+        assert.deepEqual(JSON.parse(json), value.options);
+        return Promise.resolve(proxy(structuredClone(value)));
+      },
+      ExportReviewed(contextId, json) {
+        writes++;
+        assert.equal(contextId, owner.contextId);
+        assert.deepEqual(JSON.parse(json), { options: value.options, approvalHash: value.approvalHash, destination });
+        return Promise.resolve(outcome(value));
+      },
+    };
+    const pane = mountPanel(session, services, false, value.options, true, true, enabled);
+    await pane.review();
+    assert.equal(reads, enabled ? 1 : 0);
+    if (enabled) {
+      pane.selectAncillary('sheets', { currentTarget: { checked: true } });
+      await pane.review();
+      assert.equal(reads, 1);
+      assert.equal(pane.view().includeAncillary, true);
+      pane.selectAncillary('sheets', { currentTarget: { checked: false } });
+      pane.selectReferences('include', { currentTarget: { checked: true } });
+      await pane.review();
+      assert.equal(reads, 1);
+      assert.equal(pane.view().includeReferences, true);
+      pane.selectReferences('include', { currentTarget: { checked: false } });
+      await pane.review();
+      pane.edit('destination', destination);
+      await pane.publish();
+      assert.equal(writes, 1);
+    }
+    pane.destroy();
+    const remount = mountPanel(session, services, false, value.options, true, true, enabled);
+    await remount.publish();
+    assert.equal(writes, enabled ? 1 : 0);
+    if (enabled) assert.equal(remount.view().publication.outcome.sha256, value.workbookSHA256);
+    remount.destroy();
+  }
+});
+
+test('grouped validation cancellation waits for yield and cannot populate a remounted panel', { timeout: 10000 }, async () => {
+  const value = groupedWire.lifeformEnvironment, session = sessionFor(value);
+  const entered = deferred(), release = deferred();
+  const pending = session.review(value.options, {
+    review: () => Promise.resolve(proxy(structuredClone(value))),
+    validationYield: async () => { entered.resolve(); await release.promise; },
+  });
+  await entered.promise;
+  session.cancel();
+  const remount = mountPanel(session, {}, false, value.options, false, false, true);
+  assert.equal(session.held(), true);
+  assert.equal(remount.view().review, null);
+  release.resolve();
+  assert.equal(await pending, false);
+  assert.equal(session.held(), false);
+  assert.equal(remount.view().review, null);
+  remount.destroy();
+});
+
+test('consumed outer Summary rendering forwards only flag-authorized Group By selections to the existing workbook panel', () => {
+  const reportSession = vegetation.summaryVegetationSession(owner);
+  for (const enabled of [false, true]) for (const group of [11, 12, 13, 14]) {
+    reportSession.edit(1, 6, 1, group);
+    const calls = [];
+    const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationReport.svelte'), 'utf8'),
+      'SummaryVegetationReport.svelte', {
+        svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
+        './summaryVegetation': vegetation,
+        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationService: {} },
+        './SummaryVegetationWorkbookPanel.svelte': { default: (_payload, props) => { calls.push(props); } },
+      }, { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
+        VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: enabled ? 'true' : 'false' });
+    const html = require('svelte/server').render(component, { props: { ...owner, onBusyChange() {} } }).body;
+    assert.match(html, /Group by/);
+    assert.equal(calls.length, 1);
+    assert.deepEqual(plain(calls[0].calculation), { average: 1, display: 6, showClass: 1,
+      ...(enabled && group !== 11 ? { groupAndOrder: group } : {}) });
+    assert.equal(calls[0].disabled, !enabled && group !== 11);
+  }
+});
+
+test('consumed grouped panel renders accurate grouping and explicit unavailable feedback without clearing retained modes', () => {
+  for (const [enabled, mode] of [[false, null], [true, null], [true, 'references'], [true, 'ancillary']]) {
+    const value = groupedWire.lifeform, session = sessionFor(value);
+    if (mode === 'references') session.selectReferences('include', true);
+    if (mode === 'ancillary') session.includeAncillary(true);
+    let subscriptions = 0;
+    const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
+      'SummaryVegetationWorkbookPanel.svelte', {
+        svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
+        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+        './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
+        './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
+          subscriptions++; return session;
+        } },
+      }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
+        VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: enabled ? 'true' : 'false',
+        VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: 'true', VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: 'true' });
+    const html = require('svelte/server').render(component, { props: {
+      owner, calculation: value.options, disabled: false, onBusyChange() {},
+    } }).body;
+    assert.equal(subscriptions, 1);
+    assert.match(html, /Workbook grouping: Lifeform/);
+    assert.equal(html.includes('No options were changed automatically.'), !enabled || mode !== null);
+    const button = html.match(/<button[^>]*data-summary-workbook-review[^>]*>/);
+    assert.ok(button);
+    assert.equal(/\bdisabled\b/.test(button[0]), !enabled || mode !== null);
+    assert.equal(session.view().includeReferences, mode === 'references');
+    assert.equal(session.view().includeAncillary, mode === 'ancillary');
+  }
 });

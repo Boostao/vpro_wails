@@ -2500,6 +2500,42 @@ Report/callback/quality/lump/constancy/printing or default/demo change is includ
 Group12/13 Display2 retains its source criteria-type failure. Group13/14 common
 First selection remains unknown rather than synthesized.
 
+### Accepted grouped inspection publication
+
+This accepted default-off desktop extension reuses the existing workbook service, snapshot,
+reviewed publisher, session and panel. Strict optional `groupAndOrder` accepts only
+12/13/14; omission keeps the accepted Layer11 wire, approval and output. Explicit
+11, NULL, wrong scalar/key case and duplicate decoded keys refuse. Independent
+default-off backend/frontend `VPRO_`/`VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK`
+flags govern availability. The existing Summary Group by control supplies the
+selection, and the panel independently checks its flag.
+
+Grouping uses a separate approval domain and exact typed inspection scope, with
+full options/source provenance. Selected environmental rows remain supported.
+Effective references/common/guide and ancillary sheets are explicitly unavailable
+with grouping; selections stay retained rather than automatically cleared.
+Complete unit/pivot alignment remains required: zero-only source contributions
+can omit a pivot column and must refuse, not gain an invented column. Group12/13
+Display2 still refuses the calibrated source criteria failure.
+
+Development backend race and eight production-Go wire vectors pass, including
+strict authority, matrix/output/no-write, collision, drift, cancellation and
+missing-pivot correction/retry coverage. Client tests exercise actual reactive
+proxies, independent compiled panel flags, publication option identity, receipt/
+draft retention, held-validation cancellation and consumed outer-panel routing.
+Frozen validation accepts215 related client cases/31 browser cases, check0/0,
+private build, coupled race787.157s, vet5.782s and production12.984s.86 exact
+legacy vectors and package/embed discovery match; distinct review finds no
+significant issues. Actual Wails accepts five reopened typed outputs, four real
+remounts/four exact close acknowledgements,36 responsive observations, held
+validation/stale-result refusal, retained unknown committed publication without
+replay and four independent backend-off refusals. All16 fixture/config/audit
+files remain unchanged, and all three owners close normally. Only a private
+main-entry seam enables test remounts; product components/session stay unchanged.
+Full race accepts exit0 in4588.062s, preserving1910 managed inputs/190 artifacts,
+discovery, canonical/protected assets and seven closed native families.
+No original Report or default/demo promotion.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

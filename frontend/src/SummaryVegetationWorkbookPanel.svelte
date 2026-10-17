@@ -15,6 +15,7 @@
   const enabled = import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK === 'true';
   const ancillaryEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK === 'true';
   const referencesEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES === 'true';
+  const groupedEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK === 'true';
   const environmentEnabled = summaryEnvironmentalLifeformEnabled;
   let viewState = $state.raw(session.view());
   let error = $state('');
@@ -23,9 +24,14 @@
   const unitPageSize = 50;
   const barrier = $derived(viewState.publication.busy || viewState.publication.blocked);
   const held = $derived(disabled || viewState.reviewing || barrier);
+  const grouped = $derived(calculation.groupAndOrder !== undefined);
+  const groupingUnavailable = $derived(grouped && (!groupedEnabled || viewState.includeReferences || viewState.includeAncillary));
+  const groupLabel = $derived(!grouped ? 'Layer' : calculation.groupAndOrder === 12 ? 'Strata' :
+    calculation.groupAndOrder === 13 ? 'Lifeform' : calculation.groupAndOrder === 14 ? 'None' : 'Unsupported');
   const currentReview = $derived(!!viewState.review && sameSummaryWorkbookOptions(viewState.review.options, {
     average: calculation.average, display: calculation.display, showClass: calculation.showClass,
     title: viewState.title, includeEnv: viewState.includeEnv,
+    ...(grouped ? { groupAndOrder: calculation.groupAndOrder } : {}),
     ...(viewState.includeAncillary ? { ancillary: { createSummary: viewState.createSummary } } : {}),
     ...(viewState.includeReferences ? { references: {
       showCommon: viewState.showCommon, useGuideNames: viewState.useGuideNames } } : {}),
@@ -63,7 +69,7 @@
     try { session.selectReferences(field, checked); } catch (cause) { error = String(cause); }
   }
   async function review() {
-    if (!enabled || held || viewState.draftError || viewState.includeEnv && !environmentEnabled ||
+    if (!enabled || held || groupingUnavailable || viewState.draftError || viewState.includeEnv && !environmentEnabled ||
         viewState.includeAncillary && !ancillaryEnabled || viewState.includeReferences && !referencesEnabled) return;
     error = '';
     unitPage = 0;
@@ -76,7 +82,7 @@
     } catch (cause) { error = String(cause); }
   }
   async function publish() {
-    if (!enabled || held || viewState.draftError || !currentReview ||
+    if (!enabled || held || groupingUnavailable || viewState.draftError || !currentReview ||
         viewState.includeReferences && !referencesEnabled) return;
     error = '';
     try {
@@ -113,6 +119,14 @@
     <button data-summary-workbook-acknowledge onclick={acknowledge}>Acknowledge workbook outcome</button>
   {/if}
   {#if !enabled}<p>Inspection workbook publication is disabled in this build.</p>{/if}
+  <p data-summary-workbook-group>Workbook grouping: {groupLabel}.
+    {#if groupedEnabled}Uses the Summary Group by selection.
+    {:else}Layer only; grouped workbook publication is disabled in this build.{/if}</p>
+  {#if groupingUnavailable}
+    <p role="alert">Grouped workbook publication is unavailable with effective references or source worksheets,
+      or when its independent build flag is disabled. Clear those workbook modes or choose Layer.
+      No options were changed automatically.</p>
+  {/if}
   <div class="fields">
     <label>Workbook title
       <input data-summary-workbook-title value={viewState.title} disabled={!enabled || held}
@@ -157,17 +171,18 @@
     </label>
   </div>
   <div class="actions">
-    <button data-summary-workbook-review disabled={!enabled || held || !!viewState.draftError} onclick={review}>Review inspection workbook</button>
+    <button data-summary-workbook-review disabled={!enabled || held || groupingUnavailable || !!viewState.draftError} onclick={review}>Review inspection workbook</button>
     <button data-summary-workbook-cancel disabled={!viewState.reviewing || barrier} onclick={() => session.cancel()}>Cancel review</button>
     <button data-summary-workbook-undo disabled={!enabled || held} onclick={undo}>Undo export options</button>
-    <button data-summary-workbook-publish disabled={!enabled || held || !!viewState.draftError || !currentReview || !viewState.destination}
+    <button data-summary-workbook-publish disabled={!enabled || held || groupingUnavailable || !!viewState.draftError || !currentReview || !viewState.destination}
       onclick={publish}>Publish reviewed workbook</button>
   </div>
   {#if viewState.reviewing}<p role="status">Reading and validating the complete owned workbook plan...</p>{/if}
   {#if viewState.review}
     <div data-summary-workbook-plan class="plan">
       {#if !currentReview}<p role="alert">Calculation options changed; review the current options before publication.</p>{/if}
-      <p>Sheet: {viewState.review.sheet}. {viewState.review.preview.rows.length} vegetation rows;
+      <p>Sheet: {viewState.review.sheet}. Group field: {viewState.review.preview.groupField?.name ?? 'Layer'}.
+        {viewState.review.preview.rows.length} vegetation rows;
         {viewState.review.environment?.rows.length ?? 0} environmental rows; first vegetation row {viewState.review.firstVegetationRow}.
         {viewState.review.bytes} bytes.</p>
       <p>Approval: {viewState.review.approvalHash}<br />Workbook SHA256: {viewState.review.workbookSHA256}</p>

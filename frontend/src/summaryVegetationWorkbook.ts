@@ -13,10 +13,11 @@ export const summaryVegetationWorkbookScope = 'Explicit read-only normal-SU laye
 export const summaryVegetationAncillaryWorkbookScope = 'Explicit read-only normal-SU layer inspection with SU Table and optional ReportSummary; literal XLSX, not original NewShortVeg preflight/callbacks or formatting/printing parity';
 export const summaryVegetationEffectiveReferencesScope = 'Explicit read-only normal-SU layer inspection with projected attribute/common/guide references; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity';
 export const summaryVegetationEffectiveAncillaryScope = 'Explicit read-only normal-SU layer inspection with projected attribute/common/guide references, SU Table and optional ReportSummary; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity';
-type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references'> & {
-  references?: SummaryVegetationReferenceMode;
+export const summaryVegetationGroupedWorkbookScope = 'Explicit read-only normal-SU Strata/Lifeform/None inspection; typed XLSX, not grouped common/guide references, ancillary worksheets, original Report callbacks or formatting/printing parity';
+type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references' | 'groupAndOrder'> & {
+  references?: SummaryVegetationReferenceMode; groupAndOrder?: number;
 };
-export type SummaryWorkbookCalculation = Pick<SummaryVegetationWorkbookOptions, 'average' | 'display' | 'showClass'>;
+export type SummaryWorkbookCalculation = Pick<SummaryVegetationWorkbookOptions, 'average' | 'display' | 'showClass' | 'groupAndOrder'>;
 type SummaryWorkbookReportSummary = Omit<SummaryVegetationWorkbookReportSummary, 'units'> & {
   units: NonNullable<SummaryVegetationWorkbookReportSummary['units']>;
 };
@@ -46,13 +47,19 @@ function reject(): never {
 }
 function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
   const keys = ['title', 'average', 'display', 'showClass', 'includeEnv'];
-  if ((!shape(value, keys) && !shape(value, [...keys, 'ancillary']) &&
-      !shape(value, [...keys, 'references']) && !shape(value, [...keys, 'ancillary', 'references'])) ||
+  const optional = ['ancillary', 'references', 'groupAndOrder'].filter(key =>
+    value !== null && typeof value === 'object' && Object.hasOwn(value, key));
+  if (!shape(value, [...keys, ...optional]) ||
       !workbookText(value.title) || typeof value.includeEnv !== 'boolean' ||
-      typeof value.average !== 'number' || typeof value.display !== 'number' || typeof value.showClass !== 'number' ||
-      summaryVegetationOptionError(value.average, value.display, value.showClass, 11)) reject();
+      typeof value.average !== 'number' || typeof value.display !== 'number' || typeof value.showClass !== 'number') reject();
   const result: SummaryVegetationWorkbookOptions = { title: value.title, average: value.average, display: value.display,
     showClass: value.showClass, includeEnv: value.includeEnv };
+  if (Object.hasOwn(value, 'groupAndOrder')) {
+    if (value.groupAndOrder !== 12 && value.groupAndOrder !== 13 && value.groupAndOrder !== 14 ||
+        Object.hasOwn(value, 'references') || Object.hasOwn(value, 'ancillary')) reject();
+    result.groupAndOrder = value.groupAndOrder;
+  }
+  if (summaryVegetationOptionError(value.average, value.display, value.showClass, result.groupAndOrder ?? 11)) reject();
   if (Object.hasOwn(value, 'ancillary')) {
     if (!shape(value.ancillary, ['createSummary']) || typeof value.ancillary.createSummary !== 'boolean') reject();
     result.ancillary = { createSummary: value.ancillary.createSummary };
@@ -67,7 +74,7 @@ function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
 export function sameSummaryWorkbookOptions(left: SummaryVegetationWorkbookOptions,
   right: SummaryVegetationWorkbookOptions): boolean {
   return left.title === right.title && left.average === right.average && left.display === right.display &&
-    left.showClass === right.showClass && left.includeEnv === right.includeEnv &&
+    left.showClass === right.showClass && left.includeEnv === right.includeEnv && left.groupAndOrder === right.groupAndOrder &&
     (left.ancillary === undefined ? right.ancillary === undefined :
       !!left.ancillary && !!right.ancillary && left.ancillary.createSummary === right.ancillary.createSummary) &&
     (left.references === undefined ? right.references === undefined : !!left.references && !!right.references &&
@@ -126,7 +133,7 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
   current: () => boolean = () => true): Promise<ValidatedSummaryVegetationWorkbookReview | null> {
   if (!current()) return null;
   const options = optionsValue(requested);
-  const scope = options.references
+  const scope = options.groupAndOrder !== undefined ? summaryVegetationGroupedWorkbookScope : options.references
     ? options.ancillary ? summaryVegetationEffectiveAncillaryScope : summaryVegetationEffectiveReferencesScope
     : options.ancillary ? summaryVegetationAncillaryWorkbookScope : summaryVegetationWorkbookScope;
   if (!shape(value, ['preview', 'environment', 'options', 'scope', 'sheet', 'firstVegetationRow',
@@ -140,7 +147,7 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
       typeof value.firstVegetationRow !== 'number' || !Number.isSafeInteger(value.firstVegetationRow)) reject();
   const { approvalHash, workbookSHA256, bytes, sheet, firstVegetationRow } = value;
   const preview = await validateSummaryVegetationAsync(value.preview, owner,
-    options.average, options.display, options.showClass, 11, {
+    options.average, options.display, options.showClass, options.groupAndOrder ?? 11, {
       preview: () => Promise.reject(new Error('Workbook validation cannot dispatch a read')),
       cancel() {}, validationYield,
     }, current, options.references);
@@ -223,6 +230,7 @@ export class SummaryVegetationWorkbookSession {
   }
   options(calculation: SummaryWorkbookCalculation): SummaryVegetationWorkbookOptions {
     return optionsValue({ average: calculation.average, display: calculation.display, showClass: calculation.showClass,
+      ...(calculation.groupAndOrder !== undefined ? { groupAndOrder: calculation.groupAndOrder } : {}),
       title: this.state.title, includeEnv: this.state.includeEnv,
       ...(this.state.includeAncillary ? { ancillary: { createSummary: this.state.createSummary } } : {}),
       ...(this.state.includeReferences ? { references: {

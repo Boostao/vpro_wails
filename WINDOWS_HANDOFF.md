@@ -407,9 +407,39 @@ All1907 managed inputs/142 artifacts, discovery,26 canonical/21 protected
 inputs and six closed native families match. Private
 `summary-grouped-workbook-integration/receipt.json` SHA256:
 `682f99b96c17c58a6c1f8bd166af3f7b7c89ff120b17e3ca09deb1d3bee03494`.
-The freeze is released for directly related documentation and normal publication.
-No new native owner or Access/Excel/clipboard operation is planned for this
-private renderer boundary. Existing six closed native families stay sealed.
+The private renderer is published as
+`7b374e6da2769fa5cb103bdc84604180108b75f9` on remote `main`, with clean0/0
+verified before starting its successor. Existing six closed native families
+stay sealed.
+
+Current accepted slice: grouped desktop inspection in the existing publisher/session/
+panel. Strict optional `groupAndOrder`12/13/14 and independent default-off
+`VPRO_`/`VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK` flags reuse the Summary
+Group by control; no service/method is added. Generated interface bindings retain
+84 services/368 methods/405 models. Omitted grouping preserves Layer behavior;
+grouped references/ancillary, original Report and default/demo promotion remain
+excluded. Backend focused race75.137s and client checks pass. The disposable
+fixture now qualifies B with Cover1=0.5; a separate zero-only pivot refusal and
+correction/retry test preserves the accepted alignment guard.
+Frozen validation accepts215 related client cases/31 browser cases, check0/0,
+private build, coupled race787.157s, vet5.782s and production12.984s.86 exact
+legacy vectors and discovery match; distinct review finds no significant issues.
+Actual Wails accepts five reopened outputs, four remounts/exact close
+acknowledgements,36 responsive observations, held validation/stale-result refusal,
+unknown committed publication retention and four backend-off refusals. All16
+fixture/config/audit files stay unchanged. Three owners normally close; the new
+`evidence/private/native-summary-grouped-workbook` family is sealed. Harness
+typing/hex-provenance/disabled-Show/AST setup corrections and rejected private
+assets are retained; no completed publication was replayed or product changed.
+Integration preflight was corrected to honor inherited selected-file manifests;
+every accepted old hash matches, and the new family requires whole-set equality.
+Full race accepts exit0 in4588.062s, UTC2026-10-17T12:47:13.621866 to
+14:03:41.684488, preserving1910 inputs/190 artifacts, discovery,26 canonical/
+21 protected assets and seven closed native families.
+Private `summary-grouped-desktop-integration/receipt.json` SHA256:
+`100e02b1ae540b8affaa3ebe666434e1bbb181737a73e46fe052b1c592c7a145`.
+Freeze released only for directly related docs and normal publication. Future
+native work needs a new family. Original Access/Excel/clipboard work stays stopped.
 
 The bounded Excel/ADO control is stopped after two attempts; do not replay it.
 The first failed before CopyFromRecordset/clipboard Copy. The second completed

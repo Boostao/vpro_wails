@@ -1116,6 +1116,19 @@ no significant issues. Full race accepts exit0 in4712.235s (root4694.637s),
 preserving1907 inputs/142 artifacts, discovery, canonical/protected assets and
 six closed native families. No grouped references, ancillary routing, public transport/UI/
 flags or original Report/default/demo promotion is included.
+The accepted successor is an independently default-off grouped desktop
+extension of the existing inspection publisher, not another service or publisher.
+Optional strict `groupAndOrder`12/13/14 carries explicit authority and a separate
+approval domain; omission preserves Layer behavior. Reuse the Summary Group by
+control. Reject grouped references/ancillary and incomplete pivot columns without
+repair. Frozen validation accepts215 related client cases/31 browser cases,
+check/build, coupled race/vet/production and86 exact legacy vectors; distinct
+review finds no significant issues. Disposable Wails accepts five reopened
+outputs, four remounts/exact close acknowledgements,36 responsive observations,
+unknown committed publication retention and four backend-off refusals. All16
+fixture files remain exact. Full race accepts exit0 in4588.062s, preserving1910
+inputs/190 artifacts, discovery and seven closed native families. Do not promote
+to default/demo or original Report parity.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

@@ -23,6 +23,8 @@ const summaryVegetationAncillaryWorkbookScope = "Explicit read-only normal-SU la
 const summaryVegetationEffectiveReferencesFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES"
 const summaryVegetationEffectiveReferencesScope = "Explicit read-only normal-SU layer inspection with projected attribute/common/guide references; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity"
 const summaryVegetationEffectiveAncillaryScope = "Explicit read-only normal-SU layer inspection with projected attribute/common/guide references, SU Table and optional ReportSummary; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity"
+const summaryVegetationGroupedWorkbookFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_GROUPED_WORKBOOK"
+const summaryVegetationGroupedWorkbookScope = "Explicit read-only normal-SU Strata/Lifeform/None inspection; typed XLSX, not grouped common/guide references, ancillary worksheets, original Report callbacks or formatting/printing parity"
 
 type SummaryVegetationWorkbookAncillaryUnit struct {
 	Code     string  `json:"code"`
@@ -64,6 +66,7 @@ type SummaryVegetationWorkbookService struct {
 	enabled           bool
 	ancillaryEnabled  bool
 	referencesEnabled bool
+	groupedEnabled    bool
 	now               func() time.Time
 }
 
@@ -132,6 +135,9 @@ func (s *SummaryVegetationWorkbookService) readSource(ctx context.Context, plots
 
 func (s *SummaryVegetationWorkbookService) readSourceAt(ctx context.Context, plots *PlotService, owner *sqliteContext,
 	tx *sql.Tx, contextID string, options SummaryVegetationWorkbookOptions, createdAt string) (summaryVegetationWorkbookSource, error) {
+	if options.GroupAndOrder != nil && !s.groupedEnabled {
+		return summaryVegetationWorkbookSource{}, errors.New("Summary grouped workbook is disabled in this session")
+	}
 	if options.References != nil && !s.referencesEnabled {
 		return summaryVegetationWorkbookSource{}, errors.New("Summary effective references are disabled in this session")
 	}
@@ -191,6 +197,9 @@ func summaryVegetationWorkbookApproval(source summaryVegetationWorkbookSource, w
 	}
 	if options.References != nil {
 		domain = "VPRO Summary effective references workbook approval v1\x00"
+	}
+	if options.GroupAndOrder != nil {
+		domain = "VPRO Summary grouped workbook approval v1\x00"
 	}
 	digest := sha256.Sum256(append([]byte(domain), data...))
 	return hex.EncodeToString(digest[:]), nil

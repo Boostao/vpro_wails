@@ -2575,6 +2575,7 @@ export interface SummaryVegetationWorkbookOptions {
     "includeEnv": boolean;
     "ancillary"?: SummaryVegetationWorkbookAncillaryOptions | null;
     "references"?: SummaryVegetationReferenceOptions | null;
+    "groupAndOrder"?: number | null;
 }
 
 export interface SummaryVegetationWorkbookReportSummary {
