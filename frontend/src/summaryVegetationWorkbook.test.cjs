@@ -33,6 +33,7 @@ const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWork
 const ancillaryWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookAncillaryWire.json'), 'utf8'));
 const referenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookReferencesWire.json'), 'utf8'));
 const groupedWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedWire.json'), 'utf8'));
+const strataReferenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookStrataReferencesWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath']
   .map(key => [key, wire.vegetation.preview[key]]));
 const yieldNow = () => Promise.resolve();
@@ -856,7 +857,7 @@ test('group changes invalidate reviewed publication while receipts and invalid d
 });
 
 test('compiled grouped panel gate refuses dispatch, preserves incompatible selections and publishes only explicit authority', async () => {
-  const value = groupedWire.strata;
+  const value = groupedWire.lifeform;
   for (const enabled of [false, true]) {
     const session = sessionFor(value);
     let reads = 0, writes = 0;
@@ -971,5 +972,180 @@ test('consumed grouped panel renders accurate grouping and explicit unavailable 
     assert.equal(/\bdisabled\b/.test(button[0]), !enabled || mode !== null);
     assert.equal(session.view().includeReferences, mode === 'references');
     assert.equal(session.view().includeAncillary, mode === 'ancillary');
+  }
+});
+
+test('eight strict Go Strata reference vectors detach actual proxies and require both explicit authorities', async () => {
+  assert.equal(Object.keys(strataReferenceWire).length, 8);
+  for (const value of Object.values(strataReferenceWire)) {
+    const source = proxy(structuredClone(value));
+    assert.throws(() => structuredClone(source));
+    const result = await client.validateSummaryVegetationWorkbookReview(source, owner, value.options, yieldNow);
+    assert.deepEqual(plain(result), value);
+    assert.equal(Object.isFrozen(result.preview.references), true);
+    assert.equal(Object.isFrozen(result.preview.groupField), true);
+    assert.equal(Object.isFrozen(result.options.references), true);
+    assert.equal(Object.isFrozen(result.preview.rows[0].witnesses[0].referenceOrigins), true);
+    source.preview.references.masterRows++;
+    source.preview.groupField.name = 'caller';
+    assert.deepEqual(plain(result), value);
+    assert.throws(() => vegetation.validateSummaryVegetation(value.preview, owner,
+      value.options.average, value.options.display, value.options.showClass));
+    for (const field of ['references', 'groupAndOrder']) {
+      const options = { ...value.options };
+      delete options[field];
+      await assert.rejects(client.validateSummaryVegetationWorkbookReview(value, owner, options, yieldNow));
+    }
+    if (value.environment) {
+      const { groupAndOrder, ...ordinary } = value.options;
+      await assert.rejects(environmental.validateSummaryEnvironmentalLifeformOptions(
+        value.environment, owner, ordinary, yieldNow));
+    }
+  }
+  const common = strataReferenceWire.common.preview.rows.filter(row => row.species.text === 'Lifeform 1');
+  assert.equal(common.length, 2);
+  assert.ok(common.every(row => row.layer.text === 'A' && row.order.real === 1.56 && row.covers[0].text === '1.56'));
+  assert.equal(strataReferenceWire.attributes.preview.rows.find(row => row.species.text === 'Lifeform 1').order.real, 3.13);
+  const guideAttribute = strataReferenceWire.guide.preview.rows.find(row => row.species.text === 'LF1');
+  assert.equal(guideAttribute.commonName.storage, 'null');
+  assert.deepEqual(guideAttribute.witnesses[0].referenceOrigins,
+    [{ table: 'USysSppAttributeDescription', rowId: '1' }, { table: 'USysSppAttributeDescription', rowId: '2' }]);
+});
+
+test('Strata reference validator rejects cross-mode authority, numeric/text confusion and conflicting owned frames', async () => {
+  const changes = [
+    value => { value.options.groupAndOrder = 13; },
+    value => { value.options.groupAndOrder = 14; },
+    value => { value.options.references = null; },
+    value => { value.options.references.showCommon = false; },
+    value => { value.options.ancillary = { createSummary: false }; },
+    value => { value.options.display = 2; },
+    value => { value.scope = client.summaryVegetationGroupedWorkbookScope; },
+    value => { value.scope = client.summaryVegetationEffectiveReferencesScope; },
+    value => { value.preview.source = 'literal-normal-su-grouped'; },
+    value => { value.preview.ordering = 'literal-null-first-group-species'; },
+    value => { delete value.preview.groupField; },
+    value => { value.preview.groupField.name = 'Strata'; },
+    value => { value.preview.groupField.size = 3; },
+    value => { value.preview.orderField.daoType = 10; },
+    value => { value.preview.references.useGuideNames = true; },
+    value => { value.preview.references.removedMasterRows = -1; },
+    value => { delete value.preview.rows[0].commonName; },
+    value => { value.preview.rows[0].commonName.text = '\ud800'; },
+    value => { value.preview.rows[0].order = { storage: 'text', text: '1.56' }; },
+    value => { value.preview.rows[0].witnesses[0].referenceOrigins[0].table = 'Unowned'; },
+    value => { value.environment.vegetation.references.unionRows--; },
+    value => { value.environment.vegetation.groupAndOrder = 13; },
+  ];
+  for (const [index, change] of changes.entries()) {
+    const value = structuredClone(strataReferenceWire.environment);
+    change(value);
+    await assert.rejects(client.validateSummaryVegetationWorkbookReview(
+      value, owner, value.options, yieldNow), `Strata reference case ${index}`);
+  }
+});
+
+test('compiled Strata reference panel requires both existing flags and retains incompatible grouping without dispatch', async () => {
+  const value = strataReferenceWire.common;
+  for (const grouped of [false, true]) for (const references of [false, true]) {
+    const session = sessionFor(value);
+    let reads = 0, writes = 0;
+    const services = {
+      GetReview(contextId, json) {
+        reads++;
+        assert.equal(contextId, owner.contextId);
+        assert.deepEqual(JSON.parse(json), value.options);
+        return Promise.resolve(proxy(structuredClone(value)));
+      },
+      ExportReviewed(contextId, json) {
+        writes++;
+        assert.equal(contextId, owner.contextId);
+        assert.deepEqual(JSON.parse(json), { options: value.options, approvalHash: value.approvalHash, destination });
+        return Promise.resolve(outcome(value));
+      },
+    };
+    const pane = mountPanel(session, services, false, value.options, true, references, grouped);
+    await pane.review();
+    assert.equal(reads, grouped && references ? 1 : 0);
+    assert.equal(pane.view().includeReferences, true);
+    if (grouped && references) {
+      pane.selectAncillary('sheets', { currentTarget: { checked: true } });
+      await pane.review();
+      assert.equal(reads, 1);
+      assert.equal(pane.view().includeAncillary, true);
+      pane.selectAncillary('sheets', { currentTarget: { checked: false } });
+    }
+    pane.destroy();
+    const incompatible = mountPanel(session, services, false, { ...value.options, groupAndOrder: 13 }, true, references, grouped);
+    await incompatible.review();
+    await incompatible.publish();
+    assert.equal(reads, grouped && references ? 1 : 0);
+    assert.equal(writes, 0);
+    assert.equal(incompatible.view().includeReferences, true);
+    incompatible.destroy();
+    const returned = mountPanel(session, services, false, value.options, true, references, grouped);
+    if (grouped && references) {
+      await returned.review();
+      returned.edit('destination', destination);
+      await returned.publish();
+      assert.equal(writes, 1);
+      returned.acknowledge();
+      assert.equal(returned.view().publication.outcome.sha256, value.workbookSHA256);
+    } else {
+      await returned.publish();
+      assert.equal(writes, 0);
+    }
+    returned.destroy();
+  }
+});
+
+test('Strata reference held validation remains owned through Cancel and cannot populate a remounted panel', { timeout: 10000 }, async () => {
+  const value = strataReferenceWire.environment, session = sessionFor(value);
+  const entered = deferred(), release = deferred();
+  const pending = session.review(value.options, {
+    review: () => Promise.resolve(proxy(structuredClone(value))),
+    validationYield: async () => { entered.resolve(); await release.promise; },
+  });
+  await entered.promise;
+  session.cancel();
+  const remount = mountPanel(session, {}, false, value.options, false, true, true);
+  assert.equal(session.held(), true);
+  assert.equal(remount.view().review, null);
+  release.resolve();
+  assert.equal(await pending, false);
+  assert.equal(session.held(), false);
+  assert.equal(remount.view().review, null);
+  assert.equal(remount.view().includeReferences, true);
+  remount.destroy();
+});
+
+test('consumed Strata reference panel rendering preserves independent gates and retained scope intent', () => {
+  for (const value of [referenceWire.common, strataReferenceWire.common]) {
+  for (const grouped of [false, true]) for (const references of [false, true]) {
+    const session = sessionFor(value);
+    let subscriptions = 0;
+    const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
+      'SummaryVegetationWorkbookPanel.svelte', {
+        svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
+        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+        './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
+        './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
+          subscriptions++; return session;
+        } },
+      }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
+        VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: grouped ? 'true' : 'false',
+        VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: references ? 'true' : 'false' });
+    const html = require('svelte/server').render(component, { props: {
+      owner, calculation: value.options, disabled: false, onBusyChange() {},
+    } }).body;
+    assert.equal(subscriptions, 1);
+    const strata = value.options.groupAndOrder === 12;
+    assert.match(html, strata ? /Workbook grouping: Strata/ : /Workbook grouping: Layer/);
+    const button = html.match(/<button[^>]*data-summary-workbook-review[^>]*>/);
+    assert.ok(button);
+    assert.equal(/\bdisabled\b/.test(button[0]), strata && !grouped || !references);
+    assert.equal(html.includes('Effective reference projection is disabled'), !references);
+    assert.equal(session.view().includeReferences, true);
+  }
   }
 });

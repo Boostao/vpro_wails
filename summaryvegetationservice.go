@@ -166,8 +166,8 @@ func (s *SummaryVegetationService) readSnapshotWithReferences(ctx context.Contex
 	fail := func(err error) (summaryVegetationSnapshotPreview, error) {
 		return summaryVegetationSnapshotPreview{}, err
 	}
-	if options != nil && groupAndOrder != 11 {
-		return fail(errors.New("Summary effective references require explicit Layer11 inspection; grouped First/common-name behavior remains unavailable"))
+	if options != nil && groupAndOrder != 11 && groupAndOrder != 12 {
+		return fail(errors.New("Summary effective references require Layer11 or Strata12 inspection; First/common-name behavior for13/14 remains unavailable"))
 	}
 
 	if s.qualityPreferences {
@@ -232,8 +232,8 @@ func (s *SummaryVegetationService) readSnapshotWithReferences(ctx context.Contex
 		report, err = prepareSummaryVegetationLayerReferences(ctx, owner.selection.Project, owner.selection.SU,
 			tables[0], tables[1], tables[2], tables[3], tables[4], average, display, showClass, references)
 	} else {
-		grouped, err = prepareSummaryVegetationGroupedOptions(ctx, owner.selection.Project, owner.selection.SU,
-			tables[0], tables[1], tables[2], tables[3], tables[4], average, groupAndOrder, display, showClass)
+		grouped, err = prepareSummaryVegetationGroupedReferences(ctx, owner.selection.Project, owner.selection.SU,
+			tables[0], tables[1], tables[2], tables[3], tables[4], average, groupAndOrder, display, showClass, references)
 		report = grouped.Report
 	}
 	if err != nil {
@@ -259,6 +259,12 @@ func (s *SummaryVegetationService) readSnapshotWithReferences(ctx context.Contex
 		result.OrderField = &SummaryVegetationField{grouped.OrderField.Name, grouped.OrderField.DAOType, grouped.OrderField.Size}
 		result.Source = "literal-normal-su-grouped"
 		result.Ordering = "literal-null-first-group-species"
+		if references != nil {
+			result.Source = "literal-normal-su-effective-references"
+			if references.Review.ShowCommon {
+				result.Ordering = "literal-null-first-layer-species-common"
+			}
+		}
 	}
 	uc, err := siteUnitTransferColumns(tables[1], "PlotNumber", "SiteUnit")
 	if err != nil {

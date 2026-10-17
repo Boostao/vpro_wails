@@ -70,8 +70,8 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 	}
 	grouping := 11
 	if options.GroupAndOrder != nil {
-		if options.References != nil || options.Ancillary != nil {
-			return fail(errors.New("Summary grouped workbook effective references and ancillary worksheets are not qualified; choose Layer or clear those modes"))
+		if options.Ancillary != nil || options.References != nil && *options.GroupAndOrder != 12 {
+			return fail(errors.New("Summary grouped ancillary worksheets and Lifeform/None effective references are not qualified; retain Layer or Strata reference inspection"))
 		}
 		grouping = *options.GroupAndOrder
 		if err := validateSummaryVegetationGroupedOptions(ctx, options.Average, grouping, options.Display, calculationClass); err != nil {

@@ -547,8 +547,8 @@ flags remain default-off; this is not additional demo or original Report accepta
 The accepted private prerequisite renders already-calibrated normal-SU Strata,
 Lifeform and None previews through that same workbook renderer. It retains exact
 group metadata and DOUBLE Order only for Display6; other body values stay
-TEXT/NULL. Group12/13 Display2 and all grouped common/guide references still
-refuse.112 independent source-layout renders/224 owned-mode renders,86 exact
+TEXT/NULL. At that prerequisite boundary, Group12/13 Display2 and grouped
+common/guide references refuse.112 independent source-layout renders/224 owned-mode renders,86 exact
 legacy comparisons, coupled race/vet/production and distinct review pass. Full
 race passes in4712.235s with1907 inputs/142 artifacts and six closed native
 families unchanged. No transport, UI, flag or delivered-demo availability changes.
@@ -558,8 +558,9 @@ renderer to the existing inspection publisher and Summary Group by control.
 Explicit `groupAndOrder`12/13/14 requires independent
 `VPRO_SUMMARY_VEGETATION_GROUPED_WORKBOOK` /
 `VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK` flags. Omission retains the accepted
-Layer request/approval/output path. Grouped references and ancillary sheets
-refuse without changing selections; incomplete unit/pivot alignment also refuses.
+Layer request/approval/output path. Group13/14 references and grouped ancillary
+sheets still refuse without changing selections; the Strata reference successor
+below has its own joint authority. Incomplete unit/pivot alignment also refuses.
 Frozen validation passes215 related client cases/31 browser cases, check/build,
 coupled race/vet/production and86 exact legacy vectors. Independent review finds
 no significant issues. Actual Wails accepts five reopened outputs, four remounts/
@@ -568,6 +569,22 @@ publication retention and four independent backend-off refusals; all16 fixture
 files stay unchanged. Full race passes in4588.062s, preserving1910 inputs/190
 artifacts and seven closed native families. This does not change the delivered
 demo or original Report availability.
+
+The accepted [Strata effective-reference inspection](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#accepted-strata-effective-reference-inspection)
+composes Group12 and attribute/common/guide references through that same service,
+publisher and retained panel. Both existing grouped-workbook and effective-reference
+backend/frontend gates are required; no new API, binding, dependency or flag is
+added. Common Name shifts the explicitly permitted typed Order column without
+widening ordinary REAL rendering. Complete physical provenance, NULL/empty names,
+independent draft errors and irreversible receipts remain intact.
+Frozen validation accepts220 related client/36 browser cases, check0/0/build,
+coupled race/vet/production and86 exact legacy vectors; distinct review finds no
+significant issues. Wails accepts five reopened outputs, four remounts/exact close
+acknowledgements,42 responsive observations and both independent backend denials
+with unrelated routes preserved and16 unchanged fixture files. Full race passes
+in5153.016s, preserving1913 inputs/236 artifacts and eight closed native families.
+Group13/14 references, grouped ancillary, Strata Display2 and original
+Report/formatting/printing remain unavailable; the demo and defaults are unchanged.
 
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus

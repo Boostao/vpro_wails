@@ -355,14 +355,17 @@ func TestSummaryGroupedWorkbookRefusalsAndCancellation(t *testing.T) {
 
 func TestSummaryGroupedWorkbookRealOrderRangeDoesNotWidenLegacyRendering(t *testing.T) {
 	for _, test := range []struct {
-		first, row, column int
-		accepted           bool
+		first, orderColumn, row, column int
+		accepted                        bool
 	}{
-		{0, 6, 3, false}, {-1, 6, 3, false}, {7, 6, 3, false},
-		{6, 5, 3, false}, {6, 6, 2, false}, {6, 6, 4, false}, {6, 6, 3, true},
+		{0, 0, 6, 3, false}, {-1, 3, 6, 3, false}, {7, 3, 6, 3, false},
+		{6, 3, 5, 3, false}, {6, 3, 6, 2, false}, {6, 3, 6, 4, false}, {6, 3, 6, 3, true},
+		{6, 4, 6, 4, true}, {6, 4, 6, 3, false}, {6, 5, 6, 4, false},
+		{6, 0, 6, 3, false}, {0, 3, 6, 3, false}, {6, 2, 6, 2, false},
 	} {
 		cell := strataReal(math.Nextafter(0.15, 0))
-		layout := summaryWorkbookLayout{Sheet: "Typed", LastRow: 6, LastColumn: 4, RealOrderFromRow: test.first,
+		layout := summaryWorkbookLayout{Sheet: "Typed", LastRow: 6, LastColumn: 4,
+			RealOrderFromRow: test.first, RealOrderColumn: test.orderColumn,
 			Cells: []summaryEnvironmentalHeaderCell{{Row: test.row, Column: test.column,
 				Value: SummaryVegetationEnvironmentalValue{Kind: "cell", Cell: &cell}}}}
 		result, err := renderSummaryWorkbook(t.Context(), cell, layout)

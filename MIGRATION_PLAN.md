@@ -45,6 +45,21 @@ feature-sized revision's entry points, guards and exclusions.
 ## Next forms/report work
 
 Forms, the complete report pipeline and the Access ribbon remain unfinished.
+The Strata12 effective-reference successor is independently reviewed,
+disposable-native accepted and full-race integrated using the existing inspection
+infrastructure and both existing independent gates. Frozen validation accepts220
+related client/36 browser cases, check0/0/build, coupled race/vet/production and86
+exact legacy comparisons. Five reopened Wails outputs, four real remounts/exact
+close acknowledgements,42 responsive observations and two independent backend
+denials pass with16 unchanged fixture files. Full race passes in5153.016s,
+preserving1913 inputs/236 artifacts and eight closed native families.
+Group13/14 First(common name), grouped ancillary, Strata Display2 and original
+Report callbacks remain unavailable. The next source-qualified candidate is
+Group13/14 effective attribute references with common/guide both off: the source
+does not select First(common name) in that case. It is not implemented or enabled.
+The qualified demo and defaults are unchanged. Unbound two-page Picture Manager
+procedures remain dormant, not a missing live event to implement.
+
 The accepted correction applies the source-qualified changed-NULL refusal
 for SV_FloodPlain/SpeciesListComplete to existing normal, two-page and ordinary
 update paths. Shared guards and client request re-preparation preserve historical

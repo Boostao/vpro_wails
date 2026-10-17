@@ -39,23 +39,40 @@ func validateSummaryVegetationGroupedOptions(ctx context.Context, average, group
 
 func prepareSummaryVegetationGroupedOptions(ctx context.Context, project, suName string,
 	veg, su, master, personal, layers ProjectMetadataTable, average, grouping, display, showClass int) (summaryVegetationGroupedReport, error) {
+	return prepareSummaryVegetationGroupedReferences(ctx, project, suName, veg, su, master, personal, layers,
+		average, grouping, display, showClass, nil)
+}
+
+func prepareSummaryVegetationGroupedReferences(ctx context.Context, project, suName string,
+	veg, su, master, personal, layers ProjectMetadataTable, average, grouping, display, showClass int,
+	references *summaryVegetationReferencePlan) (summaryVegetationGroupedReport, error) {
 	fail := func(err error) (summaryVegetationGroupedReport, error) { return summaryVegetationGroupedReport{}, err }
 	if err := validateSummaryVegetationGroupedOptions(ctx, average, grouping, display, showClass); err != nil {
 		return fail(err)
+	}
+	if references != nil && grouping != 12 {
+		return fail(errors.New("summary vegetation effective grouped references require GroupAndOrder12; First(common name) for13/14 is unqualified"))
 	}
 	prepared, err := prepareLongVegetation(ctx, project, suName, veg, su, layers)
 	if err != nil {
 		return fail(fmt.Errorf("summary vegetation grouped source preparation: %w", err))
 	}
-	references, err := prepareVegetationLifeformReferences(ctx, master, personal)
-	if err != nil {
-		return fail(fmt.Errorf("summary vegetation grouped source references: %w", err))
+	var union ProjectMetadataTable
+	if references != nil {
+		union = references.References.Table
+	} else {
+		legacy, err := prepareVegetationLifeformReferences(ctx, master, personal)
+		if err != nil {
+			return fail(fmt.Errorf("summary vegetation grouped source references: %w", err))
+		}
+		union = legacy.Table
 	}
-	stage, err := prepareSummaryVegetationGroupedEntries(ctx, prepared, references.Table, grouping)
+	stage, err := prepareSummaryVegetationGroupedEntries(ctx, prepared, union, grouping)
 	if err != nil {
 		return fail(err)
 	}
-	report, err := planSummaryVegetationGroupedStageOptions(ctx, veg, su, stage, master, personal, layers, average, grouping, display, showClass)
+	report, err := planSummaryVegetationGroupedStageReferences(ctx, veg, su, stage, master, personal, layers,
+		average, grouping, display, showClass, references)
 	if err != nil {
 		return fail(err)
 	}
@@ -99,12 +116,23 @@ func planSummaryVegetationGroupedStage(ctx context.Context,
 
 func planSummaryVegetationGroupedStageOptions(ctx context.Context,
 	raw, su, stage, master, personal, layers ProjectMetadataTable, average, grouping, display, showClass int) (summaryVegetationGroupedReport, error) {
+	return planSummaryVegetationGroupedStageReferences(ctx, raw, su, stage, master, personal, layers,
+		average, grouping, display, showClass, nil)
+}
+
+func planSummaryVegetationGroupedStageReferences(ctx context.Context,
+	raw, su, stage, master, personal, layers ProjectMetadataTable, average, grouping, display, showClass int,
+	references *summaryVegetationReferencePlan) (summaryVegetationGroupedReport, error) {
 	fail := func(err error) (summaryVegetationGroupedReport, error) { return summaryVegetationGroupedReport{}, err }
 	if err := validateSummaryVegetationGroupedOptions(ctx, average, grouping, display, showClass); err != nil {
 		return fail(err)
 	}
+	if references != nil && grouping != 12 {
+		return fail(errors.New("summary vegetation effective grouped references require GroupAndOrder12; First(common name) for13/14 is unqualified"))
+	}
 	// Class4/5 override the earlier numeric grouped Order in the source.
-	projection := summaryVegetationStageProjection{joinField: "Layer1234567", joinLimit: 2, labelField: "Strata", labelLimit: 1, numericOrder: display == 6}
+	projection := summaryVegetationStageProjection{joinField: "Layer1234567", joinLimit: 2, labelField: "Strata", labelLimit: 1,
+		numericOrder: display == 6, references: references}
 	orderField := summaryVegetationGroupField{Name: "Order", DAOType: 10}
 	if display == 6 {
 		orderField.DAOType, orderField.Size = 7, 8

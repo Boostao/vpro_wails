@@ -27,12 +27,12 @@ type summaryEnvironmentalWorkbook struct {
 }
 
 type summaryWorkbookLayout struct {
-	Sheet, Title                string
-	LastRow, LastColumn         int
-	SeparatorRow, ItalicFromRow int
-	RealOrderFromRow            int
-	HeaderRows                  []int
-	Cells                       []summaryEnvironmentalHeaderCell
+	Sheet, Title                      string
+	LastRow, LastColumn               int
+	SeparatorRow, ItalicFromRow       int
+	RealOrderFromRow, RealOrderColumn int
+	HeaderRows                        []int
+	Cells                             []summaryEnvironmentalHeaderCell
 }
 
 // This private inspection preserves typed values, not Excel automation coercion.
@@ -71,7 +71,9 @@ func renderSummaryWorkbookWithSheets(ctx context.Context, input any, layout summ
 		return nil, errors.New("Summary workbook layout exceeds the qualified source frame")
 	}
 	if layout.RealOrderFromRow < 0 || layout.RealOrderFromRow > layout.LastRow ||
-		layout.RealOrderFromRow > 0 && layout.LastColumn < 3 {
+		(layout.RealOrderFromRow == 0) != (layout.RealOrderColumn == 0) ||
+		layout.RealOrderFromRow > 0 && (layout.RealOrderColumn < 3 || layout.RealOrderColumn > 4 ||
+			layout.RealOrderColumn > layout.LastColumn) {
 		return nil, errors.New("Summary workbook real Order range is outside the qualified frame")
 	}
 	if err := reportWorkbookSourceValue(reflect.ValueOf(input), func(cell ProjectMetadataCell) error {
@@ -192,7 +194,7 @@ func renderSummaryWorkbookWithSheets(ctx context.Context, input any, layout summ
 					return result, err
 				}
 			case "real":
-				if layout.RealOrderFromRow == 0 || placed.Row < layout.RealOrderFromRow || placed.Column != 3 {
+				if layout.RealOrderFromRow == 0 || placed.Row < layout.RealOrderFromRow || placed.Column != layout.RealOrderColumn {
 					return result, fmt.Errorf("Summary workbook %s real values require the explicit grouped Order range", address)
 				}
 				if err := book.SetCellFloat(sheet, address, *cell.Real, -1, 64); err != nil {

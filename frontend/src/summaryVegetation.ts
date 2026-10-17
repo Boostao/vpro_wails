@@ -77,7 +77,7 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
     grouped ? 'literal-normal-su-grouped' : 'literal-normal-su-layer';
   const ordering = common ? 'literal-null-first-layer-species-common' :
     grouped ? 'literal-null-first-group-species' : 'literal-null-first-layer-species';
-  if (references && (grouped || !lifeformShape(references, ['showCommon', 'useGuideNames']) ||
+  if (references && (grouped && groupAndOrder !== 12 || !lifeformShape(references, ['showCommon', 'useGuideNames']) ||
       typeof references.showCommon !== 'boolean' || typeof references.useGuideNames !== 'boolean')) reject();
   if (summaryVegetationOptionError(average, display, showClass, groupAndOrder) || !Object.values(owner).every(lifeformText) ||
       owner.contextId === '' || owner.project === '' || owner.projectPath === '' || owner.suPath === '' ||

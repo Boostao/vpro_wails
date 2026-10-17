@@ -14,6 +14,7 @@ export const summaryVegetationAncillaryWorkbookScope = 'Explicit read-only norma
 export const summaryVegetationEffectiveReferencesScope = 'Explicit read-only normal-SU layer inspection with projected attribute/common/guide references; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity';
 export const summaryVegetationEffectiveAncillaryScope = 'Explicit read-only normal-SU layer inspection with projected attribute/common/guide references, SU Table and optional ReportSummary; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity';
 export const summaryVegetationGroupedWorkbookScope = 'Explicit read-only normal-SU Strata/Lifeform/None inspection; typed XLSX, not grouped common/guide references, ancillary worksheets, original Report callbacks or formatting/printing parity';
+export const summaryVegetationStrataReferencesScope = 'Explicit read-only normal-SU Strata effective-reference inspection; typed XLSX, not Lifeform/None common names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity';
 type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references' | 'groupAndOrder'> & {
   references?: SummaryVegetationReferenceMode; groupAndOrder?: number;
 };
@@ -56,7 +57,7 @@ function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
     showClass: value.showClass, includeEnv: value.includeEnv };
   if (Object.hasOwn(value, 'groupAndOrder')) {
     if (value.groupAndOrder !== 12 && value.groupAndOrder !== 13 && value.groupAndOrder !== 14 ||
-        Object.hasOwn(value, 'references') || Object.hasOwn(value, 'ancillary')) reject();
+        Object.hasOwn(value, 'references') && value.groupAndOrder !== 12 || Object.hasOwn(value, 'ancillary')) reject();
     result.groupAndOrder = value.groupAndOrder;
   }
   if (summaryVegetationOptionError(value.average, value.display, value.showClass, result.groupAndOrder ?? 11)) reject();
@@ -133,7 +134,8 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
   current: () => boolean = () => true): Promise<ValidatedSummaryVegetationWorkbookReview | null> {
   if (!current()) return null;
   const options = optionsValue(requested);
-  const scope = options.groupAndOrder !== undefined ? summaryVegetationGroupedWorkbookScope : options.references
+  const scope = options.groupAndOrder !== undefined
+    ? options.references ? summaryVegetationStrataReferencesScope : summaryVegetationGroupedWorkbookScope : options.references
     ? options.ancillary ? summaryVegetationEffectiveAncillaryScope : summaryVegetationEffectiveReferencesScope
     : options.ancillary ? summaryVegetationAncillaryWorkbookScope : summaryVegetationWorkbookScope;
   if (!shape(value, ['preview', 'environment', 'options', 'scope', 'sheet', 'firstVegetationRow',

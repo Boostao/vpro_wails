@@ -19,12 +19,17 @@ func summaryGroupedDesktopFixture(t *testing.T, external bool) (*SummaryVegetati
 	t.Helper()
 	service, state := summaryDraftWorkbookFixture(t, external)
 	service.groupedEnabled = true
+	qualifySummaryGroupedDesktopFixture(t, service, state)
+	return service, state
+}
+
+func qualifySummaryGroupedDesktopFixture(t *testing.T, service *SummaryVegetationWorkbookService, state ProjectState) {
+	t.Helper()
 	owner := service.source.environment.report.contexts.projects.sqlite
 	mutateContextFixture(t, owner.attachments["VPro64"],
 		`UPDATE LayerCode SET Strata='A',LayerCode='01' WHERE Layer1234567='1'`)
 	mutateContextFixture(t, owner.attachments["project"],
 		`UPDATE `+quoteHeaderIdentifier(state.ActiveProject+"_Veg")+` SET Cover1=0.5 WHERE PlotNumber='P3' AND Species='LF1'`)
-	return service, state
 }
 
 func TestSummaryGroupedDesktopStrictAuthorityAndIndependentGate(t *testing.T) {
@@ -71,6 +76,8 @@ func TestSummaryGroupedDesktopStrictAuthorityAndIndependentGate(t *testing.T) {
 		changed := options
 		switch mode {
 		case "references":
+			group := 13
+			changed.GroupAndOrder = &group
 			changed.References = &SummaryVegetationReferenceOptions{}
 		case "memberships":
 			changed.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{}

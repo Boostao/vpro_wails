@@ -237,6 +237,48 @@ inputs/21 protected assets and seven closed native families match. Private
 Only directly related documentation changes afterward. This is typed inspection,
 not original Report/callback/formatting/printing or delivered-demo acceptance.
 
+## Accepted Strata effective-reference inspection
+
+The [composition contract](LONG_VEGETATION_WORKBOOK_CONTRACT.md#accepted-strata-effective-reference-inspection)
+reuses the existing Group12 staging, effective-reference preparation, aggregation,
+publisher and retained panel. Original MakeSvQueries includes EnglishName in
+Group12 grouping; Group13/14 First(common name) is deliberately not inferred.
+Both independent existing grouped/reference gates are required. No service,
+method, model, binding, dependency or flag is added. Common Name shifts numeric
+Order from column3 to4; explicit paired row/column permission keeps REAL values
+out of ordinary rendering and the other column.
+
+Private-kernel race848.531s/vet/build and distinct review pass. Frozen composition
+validation accepts220 related client/36 browser cases, check0/0/isolated build,
+coupled race1012.406s, vet5.984s and production12.531s. Independent expected
+managed/external cases reopen every body cell and complete hidden provenance;
+authority/unrendered-peer drift, collision/retry, cancellation and detached
+results are covered. Both old eight-vector wire files stay byte-exact, and86
+complete base/candidate output/source/approval vectors match. Distinct exact
+21-path review finds no significant issues.
+
+Actual Wails accepts five publications: attributes, common, guide, common with
+environment and guide/class/environment. Independent ZIP/XML checks all body
+cells, shifted typed Order and decoded complete hidden source/options/scope;
+name pages are50/19 with explicit NULL/empty labels. Four real host remounts/four
+exact native-close acknowledgements,42 visible/intersecting responsive
+observations and held-validation stale-result refusal pass. A physically
+committed publication with lost acknowledgement remains unknown without replay.
+Separate grouped-off/reference-off owners refuse the combined request with zero
+publication while retaining Layer-reference/plain-Strata review respectively.
+All16 fixture/config/audit files remain exact and all four owners normally close
+and are freshly absent. Only the private main entry has a remount seam.
+
+Full race accepts exit0, UTC2026-10-17T15:27:57.437937 to16:53:50.453037,
+5153.016s total. All1913 managed inputs/236 artifacts, package/embed discovery,
+26 canonical inputs/21 protected assets and eight closed native families match.
+Private `summary-strata-reference-desktop-integration/receipt.json` SHA256:
+`c19db82f56932dfb8d49950aed83e5f57b005b2c4e123f70004806d4485852e7`.
+Only six directly related documentation files change afterward.
+No Access/Excel/clipboard action occurred. Group13/14 references, grouped
+ancillary, Strata Display2, original Report/callback/formatting/printing and
+default/delivered-demo promotion remain unavailable.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

@@ -2452,7 +2452,8 @@ environmental lifeform calculation uses retained physical master rows, never
 personal UNION rows or derived NULL-Lifeform attributes, with signed32 only in
 this new mode. Ordinary accepted consumers remain signed16. Literal equality/
 ordering is an adaptation, not general Access collation or UNION representative
-parity. Group12 remains separate; Group13/14 First(common name) is not inferred.
+parity. Group12 has the separately qualified composition below; Group13/14
+First(common name) is not inferred.
 
 Mode/common/guide drafts preserve independent title/destination errors and
 irreversible receipts. Guide/common coupling is visible; name-group review uses
@@ -2512,8 +2513,9 @@ selection, and the panel independently checks its flag.
 
 Grouping uses a separate approval domain and exact typed inspection scope, with
 full options/source provenance. Selected environmental rows remain supported.
-Effective references/common/guide and ancillary sheets are explicitly unavailable
-with grouping; selections stay retained rather than automatically cleared.
+Group13/14 effective references/common/guide and grouped ancillary sheets remain
+unavailable; Group12 references have the separately qualified composition below.
+Unavailable selections stay retained rather than automatically cleared.
 Complete unit/pivot alignment remains required: zero-only source contributions
 can omit a pivot column and must refuse, not gain an invented column. Group12/13
 Display2 still refuses the calibrated source criteria failure.
@@ -2535,6 +2537,58 @@ main-entry seam enables test remounts; product components/session stay unchanged
 Full race accepts exit0 in4588.062s, preserving1910 managed inputs/190 artifacts,
 discovery, canonical/protected assets and seven closed native families.
 No original Report or default/demo promotion.
+
+### Accepted Strata effective-reference inspection
+
+The existing inspection source/publisher/session/panel compose explicit
+GroupAndOrder12 and effective references. Both existing independent
+grouped-workbook and effective-reference backend/frontend gates are required;
+no service, method, model, binding, dependency or flag is added. A distinct
+combined scope and approval domain bind complete physical peers, requested
+reference options and typed output. Original Report callbacks remain unavailable.
+
+Original MakeSvQueries lines1241-1268 include EnglishName in Group12 grouping;
+unlike13/14, this does not require choosing an arbitrary First(common name).
+The private prerequisite reuses the effective-reference plan and existing
+staging/aggregation kernel. Independent expected values cover common/guide
+grouping, reference fanout, fixed denominators, NULL/empty names, whole-row UNION
+origins, raw MAX provenance, cancellation, detached results and malformed-name
+refusal/correction. Its affected race848.531s/vet/build and distinct review pass.
+
+Common-name grouping shifts DOUBLE Order from column3 to4. The shared writer
+requires the explicit paired row/column range; ordinary rendering still refuses
+REAL cells, and either permitted Order column refuses the other. Existing
+reference preparation, literal/NULL/empty distinctions, raw MAX origins and
+retained drafts/receipts/stale-validation barriers are reused. Review and Publish
+buttons share the selected-mode guard with their handlers, including retained
+references when their independent build gate is off.
+
+Eight new strict-Go vectors cover attributes/common/guide, both Average modes,
+environment, class and distribution. Shared portable normalization removes
+duplication while preserving both existing eight-vector files byte-exactly.
+Managed/external tests reopen every body cell and hidden complete provenance,
+checking independent gates, changed authority, an unrendered peer, cancellation,
+collision and recovery. Frozen validation accepts220 related client/36 browser
+cases, actual proxies/compiled handlers/consumed rendering, check0/0/isolated
+build, coupled race1012.406s, vet5.984s and production12.531s.86 complete legacy
+output/source/approval vectors match; distinct21-path review finds no significant
+issues.
+
+Actual Wails accepts five independently reopened outputs,50/19-row common-name
+pages, four real remounts/four exact native-close acknowledgements,42 responsive
+observations and stale held-validation rejection. Lost committed-publication
+acknowledgement stays unknown without replay. Separate grouped-off/reference-off
+profiles refuse combined inspection with zero publication while keeping the
+unrelated Layer-reference/plain-Strata routes available. All16 fixture/config/
+audit files remain unchanged and all four owners normally close/freshly disappear.
+Private instrumentation changes only the isolated main entry.
+
+Full race accepts exit0 in5153.016s, preserving1913 inputs/236 artifacts,
+package/embed discovery, canonical/protected assets and eight closed families.
+See the [evidence summary](MIGRATION_EVIDENCE.md#accepted-strata-effective-reference-inspection).
+Lifeform/None references, grouped ancillary sheets and Strata Display2 remain
+unavailable. No original quality/lumping/Report callbacks, Excel/formatting/
+printing, default or delivered-demo promotion follows.
 
 ### Class threshold neighbors
 

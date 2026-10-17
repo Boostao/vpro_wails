@@ -23,6 +23,46 @@ Current machine state only. Portable scope and ordered work are in
 - Private receipts, Access copies, fixtures, profiles and binaries remain in
   the active session's files/private evidence. Do not publish or delete them.
 
+## Latest accepted gate
+
+The Strata12 effective-reference successor to source parent
+`8c07a50d48f9cf253fc8e8dbcd565766e8c651cd` is independently reviewed,
+disposable-native accepted and full-race integrated. It reuses existing Summary
+workbook inspection and both independent grouped/effective-reference flags;
+there are no new API/models/bindings/flags or default/demo/original Report changes.
+Frozen validation accepts220 related client/36 browser cases, check0/0/build,
+coupled race1012.406s/vet/production and86 exact legacy comparisons.
+
+One fresh `native-summary-strata-references` family accepts five reopened
+publications, four real host remounts/four exact native-close acknowledgements,
+42 responsive observations and independent grouped-off/reference-off backend
+denials while retaining the unrelated existing routes. All16 fixture/config/audit
+files remain unchanged; all four owners normally close and are freshly absent.
+The lifecycle unknown publication is retained without replay. No Access/Excel/
+clipboard action occurred. Private instrumentation changes only the isolated
+main entry, not production components.
+
+`summary-strata-reference-desktop-integration/receipt.json` accepts exit0:
+UTC2026-10-17T15:27:57.437937 to16:53:50.453037;5153.016s total.
+All1913 inputs/236 artifacts, discovery,26 canonical inputs/21 protected assets
+and eight closed native families match. Receipt SHA256:
+`c19db82f56932dfb8d49950aed83e5f57b005b2c4e123f70004806d4485852e7`.
+The freeze is released; only directly related documentation changes follow.
+Git records the publication revision and the private publication association
+binds it to this exact acceptance.
+
+Next safe source contract: Group13/14 effective attribute references only with
+common/guide both off, avoiding unqualified First(common name) selection.
+This successor is not yet implemented or enabled. Grouped ancillary, source
+Display2 failures, original Report callbacks and whole-form/ribbon gaps remain.
+
+The attempted two-page Picture Manager route was rejected before any native
+action: both canonical buttons lack OnClick bindings, as already documented in
+the two-page contract. All four attempted tracked-file changes were restored
+byte-exactly; the failed draft/log are retained privately. Do not re-invent that
+dormant callback or repeat its native preparation. Existing picture readers and
+the standalone manager are unchanged.
+
 ## Published main and accepted metadata
 
 Reconciliation commit `161c94e6161780a4e997e9aed3bf139cde180855` preserves

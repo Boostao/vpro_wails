@@ -37,7 +37,7 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 	if err := validateSummaryVegetationDisplayOptions(ctx, preview.Average, preview.Display, preview.ShowClass); err != nil {
 		return fail(err)
 	}
-	grouped := preview.Source == "literal-normal-su-grouped"
+	grouped := preview.Source == "literal-normal-su-grouped" || preview.GroupAndOrder != 0 && preview.GroupAndOrder != 11
 	groupLabel := "Layer"
 	if grouped {
 		var err error
@@ -162,7 +162,7 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		}
 		values = append(values, row.Order)
 		for column, cell := range append(values, row.Covers...) {
-			if grouped && preview.Display == 6 && column == 2 {
+			if grouped && preview.Display == 6 && column == leading-1 {
 				if cell.Storage != "real" {
 					return fail(fmt.Errorf("Summary workbook grouped row%d requires original DOUBLE Order", i+1))
 				}
@@ -184,13 +184,13 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 			}
 		}
 	}
-	realOrderFromRow := 0
+	realOrderFromRow, realOrderColumn := 0, 0
 	if grouped && preview.Display == 6 {
-		realOrderFromRow = first
+		realOrderFromRow, realOrderColumn = first, leading
 	}
 	data, err := renderSummaryWorkbookWithSheets(ctx, provenance, summaryWorkbookLayout{
 		Sheet: sheet, Title: input.Title, LastRow: first + len(preview.Rows) - 1, LastColumn: leading + len(preview.Columns),
-		SeparatorRow: separator, ItalicFromRow: first, RealOrderFromRow: realOrderFromRow,
+		SeparatorRow: separator, ItalicFromRow: first, RealOrderFromRow: realOrderFromRow, RealOrderColumn: realOrderColumn,
 		HeaderRows: []int{1, headerRow}, Cells: cells,
 	}, writeSheets)
 	if err != nil {
@@ -203,8 +203,8 @@ func summaryVegetationWorkbookGroup(ctx context.Context, preview SummaryVegetati
 	if err := validateSummaryVegetationGroupedOptions(ctx, preview.Average, preview.GroupAndOrder, preview.Display, preview.ShowClass); err != nil {
 		return "", err
 	}
-	if preview.References != nil {
-		return "", errors.New("Summary grouped workbook effective references/common names are not qualified")
+	if preview.References != nil && preview.GroupAndOrder != 12 {
+		return "", errors.New("Summary grouped effective references require Strata12; First/common names for13/14 are not qualified")
 	}
 	group := SummaryVegetationField{Name: "Layer", DAOType: 10, Size: 1}
 	switch preview.GroupAndOrder {
