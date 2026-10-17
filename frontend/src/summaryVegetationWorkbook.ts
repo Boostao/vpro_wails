@@ -1,4 +1,5 @@
-import type { SummaryVegetationWorkbookOptions, VegetationWorkbookOutcome } from '../bindings/github.com/boostao/vpro-wails';
+import type { SummaryVegetationWorkbookOptions, SummaryVegetationWorkbookAncillaryReview,
+  SummaryVegetationWorkbookReportSummary, VegetationWorkbookOutcome } from '../bindings/github.com/boostao/vpro-wails';
 import { lifeformShape as shape } from './lifeformSummary';
 import { workbookText, workbookWorksheetName, workbookFoldedName } from './lifeformWorkbook';
 import { summaryVegetationOptionError, validateSummaryVegetationAsync,
@@ -9,14 +10,23 @@ import { PublicationSession } from './publicationSession';
 import { validateEnvironmentWorkbookOutcome } from './environmentWorkbook';
 
 export const summaryVegetationWorkbookScope = 'Explicit read-only normal-SU layer inspection; literal XLSX, not original NewShortVeg orchestration, saved callbacks, ancillary sheets or formatting/printing parity';
+export const summaryVegetationAncillaryWorkbookScope = 'Explicit read-only normal-SU layer inspection with SU Table and optional ReportSummary; literal XLSX, not original NewShortVeg preflight/callbacks or formatting/printing parity';
 export type SummaryWorkbookCalculation = Pick<SummaryVegetationWorkbookOptions, 'average' | 'display' | 'showClass'>;
+type SummaryWorkbookReportSummary = Omit<SummaryVegetationWorkbookReportSummary, 'units'> & {
+  units: NonNullable<SummaryVegetationWorkbookReportSummary['units']>;
+};
+type SummaryWorkbookAncillaryReview = Omit<SummaryVegetationWorkbookAncillaryReview, 'sheets' | 'summary'> & {
+  sheets: string[]; summary: SummaryWorkbookReportSummary | null;
+};
 export interface ValidatedSummaryVegetationWorkbookReview {
   preview: SummaryVegetationPreview; environment: SummaryEnvironmentalLifeformPreview | null;
   options: SummaryVegetationWorkbookOptions; scope: string; sheet: string; firstVegetationRow: number;
   approvalHash: string; workbookSHA256: string; bytes: number;
+  ancillary?: SummaryWorkbookAncillaryReview;
 }
 export type SummaryVegetationWorkbookExportRequest = {
   options: SummaryVegetationWorkbookOptions; approvalHash: string; destination: string;
+  createdAt?: string;
 };
 export interface SummaryWorkbookRead extends PromiseLike<unknown> { cancel?(): void }
 export interface SummaryWorkbookPort {
@@ -30,17 +40,72 @@ function reject(): never {
   throw new Error('Summary inspection workbook review has inconsistent options, owned source, scope or frame; no repairs applied.');
 }
 function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
-  if (!shape(value, ['title', 'average', 'display', 'showClass', 'includeEnv']) ||
+  const keys = ['title', 'average', 'display', 'showClass', 'includeEnv'];
+  if ((!shape(value, keys) && !shape(value, [...keys, 'ancillary'])) ||
       !workbookText(value.title) || typeof value.includeEnv !== 'boolean' ||
       typeof value.average !== 'number' || typeof value.display !== 'number' || typeof value.showClass !== 'number' ||
       summaryVegetationOptionError(value.average, value.display, value.showClass, 11)) reject();
-  return { title: value.title, average: value.average, display: value.display,
+  const result: SummaryVegetationWorkbookOptions = { title: value.title, average: value.average, display: value.display,
     showClass: value.showClass, includeEnv: value.includeEnv };
+  if (Object.hasOwn(value, 'ancillary')) {
+    if (!shape(value.ancillary, ['createSummary']) || typeof value.ancillary.createSummary !== 'boolean') reject();
+    result.ancillary = { createSummary: value.ancillary.createSummary };
+  }
+  return result;
 }
 export function sameSummaryWorkbookOptions(left: SummaryVegetationWorkbookOptions,
   right: SummaryVegetationWorkbookOptions): boolean {
   return left.title === right.title && left.average === right.average && left.display === right.display &&
-    left.showClass === right.showClass && left.includeEnv === right.includeEnv;
+    left.showClass === right.showClass && left.includeEnv === right.includeEnv &&
+    (left.ancillary === undefined ? right.ancillary === undefined :
+      !!left.ancillary && !!right.ancillary && left.ancillary.createSummary === right.ancillary.createSummary);
+}
+
+async function ancillaryValue(value: unknown, options: SummaryVegetationWorkbookOptions,
+  preview: SummaryVegetationPreview, validationYield: () => PromiseLike<void>,
+  current: () => boolean): Promise<SummaryWorkbookAncillaryReview | null> {
+  const selected = options.ancillary;
+  if (!selected || !shape(value, ['createdAt', 'membershipRows', 'sheets', 'summary']) ||
+      typeof value.createdAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(value.createdAt) ||
+      value.membershipRows !== preview.memberships.length ||
+      preview.memberships.length > (selected.createSummary ? 1048572 : 1048575) ||
+      !Array.isArray(value.sheets)) reject();
+  const created = new Date(value.createdAt);
+  if (!Number.isFinite(created.getTime()) || created.getUTCFullYear() < 100 ||
+      created.toISOString().replace('.000Z', 'Z') !== value.createdAt) reject();
+  const sheets = [preview.project, 'SU Table', ...(selected.createSummary ? ['ReportSummary'] : [])];
+  if (value.sheets.length !== sheets.length || value.sheets.some((sheet, i) => sheet !== sheets[i]) ||
+      new Set([...sheets, '_VPRO_Source'].map(workbookFoldedName)).size !== sheets.length + 1) reject();
+  let summary: SummaryWorkbookReportSummary | null = null;
+  if (selected.createSummary) {
+    const raw = value.summary;
+    if (!shape(raw, ['environmentRows', 'environmentCountAvailable', 'selectedPlotRows', 'version', 'versionStatus', 'units']) ||
+        typeof raw.environmentRows !== 'number' || !Number.isSafeInteger(raw.environmentRows) || raw.environmentRows < 0 ||
+        raw.environmentCountAvailable !== (raw.environmentRows !== 0) || !workbookText(raw.version) ||
+        typeof raw.versionStatus !== 'string' ||
+        !['metadata-unavailable', 'missing-definition', 'null', 'literal'].includes(raw.versionStatus) ||
+        raw.versionStatus !== 'literal' && raw.version !== 'Unknown' ||
+        !Array.isArray(raw.units) || raw.units.length > 32762) reject();
+    let selectedRows = 0;
+    for (let i = 0; i < preview.memberships.length; i++) {
+      if (i % 256 === 0) { await validationYield(); if (!current()) return null; }
+      if (preview.memberships[i].plotNumber.storage !== 'null') selectedRows++;
+    }
+    if (raw.selectedPlotRows !== selectedRows) reject();
+    const units: SummaryWorkbookReportSummary['units'] = [], codes = new Set<string>();
+    for (let i = 0; i < raw.units.length; i++) {
+      if (i % 256 === 0) { await validationYield(); if (!current()) return null; }
+      const unit = raw.units[i];
+      if (!shape(unit, ['code', 'numPlots', 'longName']) || !workbookText(unit.code) || codes.has(unit.code) ||
+          typeof unit.numPlots !== 'number' || !Number.isSafeInteger(unit.numPlots) || unit.numPlots <= 0 ||
+          unit.longName !== null && !workbookText(unit.longName)) reject();
+      codes.add(unit.code);
+      units.push({ code: unit.code, numPlots: unit.numPlots, longName: unit.longName });
+    }
+    summary = { environmentRows: raw.environmentRows, environmentCountAvailable: raw.environmentCountAvailable,
+      selectedPlotRows: selectedRows, version: raw.version, versionStatus: raw.versionStatus, units };
+  } else if (value.summary !== null) reject();
+  return { createdAt: value.createdAt, membershipRows: preview.memberships.length, sheets, summary };
 }
 
 export async function validateSummaryVegetationWorkbookReview(value: unknown, owner: SummaryVegetationOwner,
@@ -48,9 +113,11 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
   current: () => boolean = () => true): Promise<ValidatedSummaryVegetationWorkbookReview | null> {
   if (!current()) return null;
   const options = optionsValue(requested);
+  const scope = options.ancillary ? summaryVegetationAncillaryWorkbookScope : summaryVegetationWorkbookScope;
   if (!shape(value, ['preview', 'environment', 'options', 'scope', 'sheet', 'firstVegetationRow',
-    'approvalHash', 'workbookSHA256', 'bytes']) || !sameSummaryWorkbookOptions(optionsValue(value.options), options) ||
-      value.scope !== summaryVegetationWorkbookScope || value.sheet !== owner.project ||
+    'approvalHash', 'workbookSHA256', 'bytes', ...(options.ancillary ? ['ancillary'] : [])]) ||
+      !sameSummaryWorkbookOptions(optionsValue(value.options), options) ||
+      value.scope !== scope || value.sheet !== owner.project ||
       workbookWorksheetName(owner.project, 0) !== owner.project ||
       workbookFoldedName(owner.project) === workbookFoldedName('_vpro_source') ||
       !hash(value.approvalHash) || !hash(value.workbookSHA256) ||
@@ -90,8 +157,13 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
   }
   const result: ValidatedSummaryVegetationWorkbookReview = {
     preview, environment, options, approvalHash, workbookSHA256, bytes, sheet, firstVegetationRow,
-    scope: summaryVegetationWorkbookScope,
+    scope,
   };
+  if (options.ancillary) {
+    const ancillary = await ancillaryValue(value.ancillary, options, preview, validationYield, current);
+    if (!current() || ancillary === null) return null;
+    result.ancillary = ancillary;
+  }
   const pending: unknown[] = [result];
   for (let i = 0; pending.length; i++) {
     if (i % 256 === 0) { await validationYield(); if (!current()) return null; }
@@ -110,7 +182,8 @@ export class SummaryVegetationWorkbookSession {
   private listeners = new Set<() => void>();
   private generation = 0;
   private read: SummaryWorkbookRead | null = null;
-  private state = { title: '', includeEnv: false, destination: '', draftError: '', error: '',
+  private state = { title: '', includeEnv: false, includeAncillary: false, createSummary: false,
+    destination: '', draftError: '', error: '',
     reviewing: false, review: null as ValidatedSummaryVegetationWorkbookReview | null };
   constructor(private readonly owner: SummaryVegetationOwner) {
     this.owner = Object.freeze(structuredClone(owner));
@@ -133,7 +206,9 @@ export class SummaryVegetationWorkbookSession {
     return !this.state.reviewing && !publication.busy && !publication.blocked;
   }
   options(calculation: SummaryWorkbookCalculation): SummaryVegetationWorkbookOptions {
-    return optionsValue({ ...calculation, title: this.state.title, includeEnv: this.state.includeEnv });
+    return optionsValue({ average: calculation.average, display: calculation.display, showClass: calculation.showClass,
+      title: this.state.title, includeEnv: this.state.includeEnv,
+      ...(this.state.includeAncillary ? { ancillary: { createSummary: this.state.createSummary } } : {}) });
   }
   edit(field: 'title' | 'destination', raw: string): void {
     if (!this.editable()) throw new Error('Wait for review or acknowledge the workbook publication before editing.');
@@ -146,6 +221,17 @@ export class SummaryVegetationWorkbookSession {
     this.state.includeEnv = include; this.state.review = null; this.state.error = '';
     this.notify();
   }
+  includeAncillary(include: boolean): void {
+    if (!this.editable()) throw new Error('Wait for review or acknowledge the workbook publication before editing.');
+    this.state.includeAncillary = include; this.state.review = null; this.state.error = '';
+    this.notify();
+  }
+  includeSummary(include: boolean): void {
+    if (!this.editable()) throw new Error('Wait for review or acknowledge the workbook publication before editing.');
+    if (!this.state.includeAncillary) throw new Error('Select source worksheets before selecting ReportSummary.');
+    this.state.createSummary = include; this.state.review = null; this.state.error = '';
+    this.notify();
+  }
   private validateDraft() {
     this.state.draftError = !workbookText(this.state.title)
       ? 'Title requires valid literal workbook text of at most 32767 UTF-16 units.'
@@ -154,7 +240,8 @@ export class SummaryVegetationWorkbookSession {
   }
   undoDraft(): void {
     if (!this.editable()) throw new Error('Wait for review or acknowledge the workbook publication before Undo.');
-    Object.assign(this.state, { title: '', includeEnv: false, destination: '', draftError: '', error: '', review: null });
+    Object.assign(this.state, { title: '', includeEnv: false, includeAncillary: false, createSummary: false,
+      destination: '', draftError: '', error: '', review: null });
     this.notify();
   }
   cancel(): void {
@@ -190,7 +277,8 @@ export class SummaryVegetationWorkbookSession {
     if (!review || !sameSummaryWorkbookOptions(review.options, options))
       throw new Error('Review the current explicit workbook options before publication.');
     if (!this.state.destination) throw new Error('Choose an explicit literal .xlsx destination before publication.');
-    await this.publication.publish({ options, approvalHash: review.approvalHash, destination: this.state.destination },
+    await this.publication.publish({ options, approvalHash: review.approvalHash, destination: this.state.destination,
+      ...(review.ancillary ? { createdAt: review.ancillary.createdAt } : {}) },
       this.state.destination, port,
       value => validateEnvironmentWorkbookOutcome(value, this.state.destination, review.workbookSHA256));
   }

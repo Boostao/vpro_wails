@@ -34,6 +34,9 @@ func prepareSummaryVegetationAncillaryWorkbook(ctx context.Context,
 	}
 	preview := input.Source.Input.Vegetation
 	options := input.Options
+	if options.Ancillary != nil && options.Ancillary.CreateSummary != input.CreateSummary {
+		return fail(errors.New("Summary ancillary workbook summary selection differs from its retained options"))
+	}
 	if options.Title != input.Source.Input.Title || options.Average != preview.Average ||
 		options.Display != preview.Display || options.IncludeEnv != (input.Source.Input.Environment != nil) ||
 		options.ShowClass != 0 && options.ShowClass != 1 && options.ShowClass != 10 && options.ShowClass != 20 {
@@ -100,7 +103,7 @@ func prepareSummaryVegetationAncillaryWorkbook(ctx context.Context,
 		"Read-only literal normal-SU Layer inspection with ancillary sheets; zero value limit, no quality/lump/common-name/guide/constancy callbacks, Excel coercion or original Report/printing parity",
 		input,
 	}
-	return prepareSummaryVegetationWorkbookWithSheets(ctx, input.Source.Input, provenance, func(book *excelize.File) error {
+	result, err := prepareSummaryVegetationWorkbookWithSheets(ctx, input.Source.Input, provenance, func(book *excelize.File) error {
 		if _, err := book.NewSheet("SU Table"); err != nil {
 			return err
 		}
@@ -198,6 +201,13 @@ func prepareSummaryVegetationAncillaryWorkbook(ctx context.Context,
 		}
 		return book.SetColWidth("ReportSummary", "B", "K", 24)
 	})
+	if err != nil {
+		return fail(err)
+	}
+	if input.CreateSummary {
+		result.Ancillary = &plan
+	}
+	return result, nil
 }
 
 func validateSummaryAncillaryWorksheetRows(memberships, units int, summary bool) error {

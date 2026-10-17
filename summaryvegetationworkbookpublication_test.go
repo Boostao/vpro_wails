@@ -71,70 +71,75 @@ func TestSummaryDraftWorkbookPublicationInvisibleDrift(t *testing.T) {
 }
 
 func TestSummaryDraftWorkbookPublicationCancellationCleanupAndRetry(t *testing.T) {
-	for _, phase := range []string{"first-commit", "first-cleanup", "prelink-cleanup", "published-cleanup", "prelink-cancel", "published-cancel"} {
-		t.Run(phase, func(t *testing.T) {
-			service, state := summaryDraftWorkbookFixture(t, false)
-			options := SummaryVegetationWorkbookOptions{Average: 1, Display: 6}
-			review, err := service.GetReview(t.Context(), state.ContextID, workbookRequest(t, options))
-			if err != nil {
-				t.Fatal(err)
-			}
-			destination := filepath.Join(t.TempDir(), "draft.xlsx")
-			request := summaryDraftWorkbookExport(t, review, destination)
-			ctx, cancel := context.WithCancel(t.Context())
-			defer cancel()
-			reads := 0
-			failure := errors.New("draft source cleanup failure")
-			hooks := summaryVegetationWorkbookHooks{snapshot: publicationReadSnapshotHooks{
-				commitRead: func(*sql.Tx) error {
-					reads++
-					if phase == "first-commit" && reads == 1 {
-						return failure
-					}
-					if phase == "prelink-cancel" && reads == 2 || phase == "published-cancel" && reads == 3 {
-						cancel()
-					}
-					return nil
-				},
-				rollbackRead: func(*sql.Tx) error {
-					if phase == "first-cleanup" && reads == 1 || phase == "prelink-cleanup" && reads == 2 ||
-						phase == "published-cleanup" && reads == 3 {
-						return failure
-					}
-					return nil
-				},
-			}}
-			outcome, err := service.exportReviewed(ctx, state.ContextID, request, hooks)
-			if strings.HasPrefix(phase, "first-") {
-				if !errors.Is(err, failure) || outcome != nil {
-					t.Fatal("initial failed read invented an outcome", outcome, err)
+	for _, mode := range []string{"legacy", "memberships", "summary"} {
+		for _, phase := range []string{"first-commit", "first-cleanup", "prelink-cleanup", "published-cleanup", "prelink-cancel", "published-cancel"} {
+			t.Run(mode+"/"+phase, func(t *testing.T) {
+				service, state := summaryAncillaryDesktopFixture(t, false)
+				options := SummaryVegetationWorkbookOptions{Average: 1, Display: 6}
+				if mode != "legacy" {
+					options.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{CreateSummary: mode == "summary"}
 				}
-			} else {
-				expected := "not-published"
+				review, err := service.GetReview(t.Context(), state.ContextID, workbookRequest(t, options))
+				if err != nil {
+					t.Fatal(err)
+				}
+				destination := filepath.Join(t.TempDir(), "draft.xlsx")
+				request := summaryDraftWorkbookExport(t, review, destination)
+				ctx, cancel := context.WithCancel(t.Context())
+				defer cancel()
+				reads := 0
+				failure := errors.New("draft source cleanup failure")
+				hooks := summaryVegetationWorkbookHooks{snapshot: publicationReadSnapshotHooks{
+					commitRead: func(*sql.Tx) error {
+						reads++
+						if phase == "first-commit" && reads == 1 {
+							return failure
+						}
+						if phase == "prelink-cancel" && reads == 2 || phase == "published-cancel" && reads == 3 {
+							cancel()
+						}
+						return nil
+					},
+					rollbackRead: func(*sql.Tx) error {
+						if phase == "first-cleanup" && reads == 1 || phase == "prelink-cleanup" && reads == 2 ||
+							phase == "published-cleanup" && reads == 3 {
+							return failure
+						}
+						return nil
+					},
+				}}
+				outcome, err := service.exportReviewed(ctx, state.ContextID, request, hooks)
+				if strings.HasPrefix(phase, "first-") {
+					if !errors.Is(err, failure) || outcome != nil {
+						t.Fatal("initial failed read invented an outcome", outcome, err)
+					}
+				} else {
+					expected := "not-published"
+					if strings.HasPrefix(phase, "published-") {
+						expected = "published-with-errors"
+					}
+					if err != nil || outcome == nil || outcome.Status != expected || outcome.ErrorMessage == "" {
+						t.Fatal("read cleanup/cancellation hid publication state", outcome, err)
+					}
+				}
 				if strings.HasPrefix(phase, "published-") {
-					expected = "published-with-errors"
+					if outcome.SHA256 != review.WorkbookSHA256 || !strings.Contains(outcome.ErrorMessage, "do not replay") {
+						t.Fatal("postcommit failure lost the irreversible receipt", outcome)
+					}
+					if data, err := os.ReadFile(destination); err != nil || len(data) != review.Bytes {
+						t.Fatal("committed workbook missing", err)
+					}
+				} else {
+					if _, err := os.Stat(destination); !errors.Is(err, os.ErrNotExist) {
+						t.Fatal("known failed operation created a destination", err)
+					}
+					retry, err := service.ExportReviewed(t.Context(), state.ContextID, request)
+					if err != nil || retry == nil || retry.Status != "published" {
+						t.Fatal("known precommit failure prevented safe retry", retry, err)
+					}
 				}
-				if err != nil || outcome == nil || outcome.Status != expected || outcome.ErrorMessage == "" {
-					t.Fatal("read cleanup/cancellation hid publication state", outcome, err)
-				}
-			}
-			if strings.HasPrefix(phase, "published-") {
-				if outcome.SHA256 != review.WorkbookSHA256 || !strings.Contains(outcome.ErrorMessage, "do not replay") {
-					t.Fatal("postcommit failure lost the irreversible receipt", outcome)
-				}
-				if data, err := os.ReadFile(destination); err != nil || len(data) != review.Bytes {
-					t.Fatal("committed workbook missing", err)
-				}
-			} else {
-				if _, err := os.Stat(destination); !errors.Is(err, os.ErrNotExist) {
-					t.Fatal("known failed operation created a destination", err)
-				}
-				retry, err := service.ExportReviewed(t.Context(), state.ContextID, request)
-				if err != nil || retry == nil || retry.Status != "published" {
-					t.Fatal("known precommit failure prevented safe retry", retry, err)
-				}
-			}
-		})
+			})
+		}
 	}
 }
 

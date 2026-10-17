@@ -29,7 +29,12 @@ func summaryDraftWorkbookFixture(t *testing.T, external bool) (*SummaryVegetatio
 
 func summaryDraftWorkbookExport(t *testing.T, review *SummaryVegetationWorkbookReview, destination string) string {
 	t.Helper()
-	return workbookRequest(t, summaryVegetationWorkbookExportRequest{review.Options, review.ApprovalHash, destination})
+	request := summaryVegetationWorkbookExportRequest{Options: review.Options,
+		ApprovalHash: review.ApprovalHash, Destination: destination}
+	if review.Ancillary != nil {
+		request.CreatedAt = review.Ancillary.CreatedAt
+	}
+	return workbookRequest(t, request)
 }
 
 func TestSummaryDraftWorkbookServiceReviewPublishCollisionAndZeroWrites(t *testing.T) {

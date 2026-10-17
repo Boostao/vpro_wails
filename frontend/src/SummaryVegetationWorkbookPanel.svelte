@@ -13,13 +13,18 @@
   const owned = untrack(() => structuredClone(owner));
   const session = summaryVegetationWorkbookSession(owned);
   const enabled = import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK === 'true';
+  const ancillaryEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK === 'true';
   const environmentEnabled = summaryEnvironmentalLifeformEnabled;
   let viewState = $state.raw(session.view());
   let error = $state('');
+  let unitPage = $state(0);
+  const unitPageSize = 50;
   const barrier = $derived(viewState.publication.busy || viewState.publication.blocked);
   const held = $derived(disabled || viewState.reviewing || barrier);
   const currentReview = $derived(!!viewState.review && sameSummaryWorkbookOptions(viewState.review.options, {
-    ...calculation, title: viewState.title, includeEnv: viewState.includeEnv,
+    average: calculation.average, display: calculation.display, showClass: calculation.showClass,
+    title: viewState.title, includeEnv: viewState.includeEnv,
+    ...(viewState.includeAncillary ? { ancillary: { createSummary: viewState.createSummary } } : {}),
   }));
   const unsubscribe = session.subscribe(() => { viewState = session.view(); onBusyChange(session.held()); });
   function edit(field: 'title' | 'destination', raw: string) {
@@ -33,14 +38,25 @@
     try { session.includeEnvironment((event.currentTarget as HTMLInputElement).checked); }
     catch (cause) { error = String(cause); }
   }
+  function selectAncillary(field: 'sheets' | 'summary', event: Event) {
+    if (held || !ancillaryEnabled) return;
+    const checked = (event.currentTarget as HTMLInputElement).checked;
+    error = '';
+    try {
+      if (field === 'sheets') session.includeAncillary(checked);
+      else session.includeSummary(checked);
+    } catch (cause) { error = String(cause); }
+  }
   function undo() {
     if (held) return;
     error = '';
     try { session.undoDraft(); } catch (cause) { error = String(cause); }
   }
   async function review() {
-    if (!enabled || held || viewState.draftError || viewState.includeEnv && !environmentEnabled) return;
+    if (!enabled || held || viewState.draftError || viewState.includeEnv && !environmentEnabled ||
+        viewState.includeAncillary && !ancillaryEnabled) return;
     error = '';
+    unitPage = 0;
     try {
       await session.review(calculation, {
         review: (contextId, options) => SummaryVegetationWorkbookService.GetReview(contextId, JSON.stringify(options)),
@@ -95,6 +111,17 @@
         disabled={!enabled || held || !environmentEnabled} onchange={includeEnvironment} />
       Include selected environmental rows
     </label>
+    <label class="checkbox">
+      <input type="checkbox" data-summary-workbook-ancillary checked={viewState.includeAncillary}
+        disabled={!enabled || held || !ancillaryEnabled} onchange={event => selectAncillary('sheets', event)} />
+      Include source worksheets (SU Table)
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" data-summary-workbook-summary checked={viewState.createSummary}
+        disabled={!enabled || held || !ancillaryEnabled || !viewState.includeAncillary}
+        onchange={event => selectAncillary('summary', event)} />
+      Include ReportSummary counts, unit names and version
+    </label>
     <label>New workbook destination (.xlsx)
       <input data-summary-workbook-destination value={viewState.destination} disabled={!enabled || held}
         oninput={event => edit('destination', event.currentTarget.value)} />
@@ -115,13 +142,44 @@
         {viewState.review.environment?.rows.length ?? 0} environmental rows; first vegetation row {viewState.review.firstVegetationRow}.
         {viewState.review.bytes} bytes.</p>
       <p>Approval: {viewState.review.approvalHash}<br />Workbook SHA256: {viewState.review.workbookSHA256}</p>
+      {#if viewState.review.ancillary}
+        <div data-summary-workbook-ancillary-plan class="plan">
+          <p>Source sheets: {viewState.review.ancillary.sheets.join(', ')}.
+            Reviewed creation time: {viewState.review.ancillary.createdAt}.
+            {viewState.review.ancillary.membershipRows} physical SU membership rows.</p>
+          {#if viewState.review.ancillary.summary}
+            {@const summary = viewState.review.ancillary.summary}
+            <p>Plots in database: {summary.environmentCountAvailable ? summary.environmentRows : 'N/A'}.
+              Non-NULL selected plot rows: {summary.selectedPlotRows}.
+              AllSpecs version: {summary.version === '' ? '(empty)' : summary.version} ({summary.versionStatus}).</p>
+            <div class="unit-table">
+              <table aria-label="Reviewed ReportSummary units">
+                <thead><tr><th scope="col">Short name</th><th scope="col">Units</th><th scope="col">Long name</th></tr></thead>
+                <tbody>{#each summary.units.slice(unitPage * unitPageSize, (unitPage + 1) * unitPageSize) as unit (unit.code)}
+                  <tr><th scope="row">{unit.code === '' ? '(empty)' : unit.code}</th><td>{unit.numPlots}</td>
+                    <td>{unit.longName === null ? '(NULL)' : unit.longName === '' ? '(empty)' : unit.longName}</td></tr>
+                {/each}</tbody>
+              </table>
+            </div>
+            <div class="actions">
+              <button data-summary-units-previous disabled={held || unitPage === 0}
+                onclick={() => unitPage--}>Previous units</button>
+              <span>{summary.units.length} units; page {unitPage + 1} of {Math.max(1, Math.ceil(summary.units.length / unitPageSize))}.</span>
+              <button data-summary-units-next disabled={held || (unitPage + 1) * unitPageSize >= summary.units.length}
+                onclick={() => unitPage++}>Next units</button>
+            </div>
+          {/if}
+        </div>
+      {/if}
       <p>{viewState.review.scope}</p>
     </div>
   {/if}
   <p>Explicit Layer inspection export using Calculate, Display Values and Show above, plus these title/environment options.
     Saved presentation callbacks are not applied. Source data, preferences and audit history are not changed.
-    This is not the original Access Report action: attribute-description preflight, ancillary quality/SU sheets,
-    original formatting, printing and macros remain unavailable. Existing destinations are never replaced.</p>
+    This is not the original Access Report action: attribute-description preflight, quality/lumping/naming callbacks,
+    original formatting, Excel coercion, printing and macros remain unavailable. Source worksheets are an explicit,
+    separately enabled inspection option. Existing destinations are never replaced.</p>
+  {#if !ancillaryEnabled}<p>Source worksheet publication is disabled in this build.</p>{/if}
 </section>
 
 <style>
@@ -133,5 +191,8 @@
   .checkbox { flex-direction: row; align-items: center; }
   .actions { display: flex; flex-wrap: wrap; gap: .75rem; }
   button { min-height: 2.5rem; padding: .5rem .75rem; }
+  .unit-table { min-width: 0; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: .5rem; border: 1px solid #d1d5db; text-align: left; overflow-wrap: anywhere; }
   [role="alert"] { color: var(--color-red-700, #b91c1c); }
 </style>

@@ -2358,6 +2358,73 @@ status documentation is reconciled afterward; application/test inputs are
 unchanged. No native/default/demo availability or original Report acceptance
 is claimed.
 
+### Default-off accepted ancillary inspection
+
+This is an independently reviewed, native-accepted and full-race integrated
+extension of the existing inspection
+publisher, not another service/panel and not original `NewShortVeg` enablement.
+It requires both existing workbook gates and independent
+`VPRO_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK` /
+`VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK` gates, default-off separately.
+The existing constructor still looks up only its original feature flag.
+
+Legacy requests retain exactly five options and three export properties.
+Absent `ancillary` retains the old review/source JSON, approval domainv2 and
+workbook output; explicit NULL is rejected rather than treated as absence.
+The optional mode is `ancillary: { createSummary: boolean }`, with the nested
+boolean explicit and non-NULL. Exact keys, decoded-key duplicates, raw Unicode
+and trailing JSON are checked. Legacy publication rejects `createdAt`, including
+an explicitly supplied empty or NULL value.
+
+In ancillary mode the server captures one canonical UTC RFC3339 time at review.
+The review echoes it, and publication requires exactly that time under a
+distinct ancillary approval domain. Export never regenerates it from the clock.
+The same owned read snapshot captures the complete body, references and paths;
+summary selection adds physical Env, master-unit names and AllSpecs Description
+definitions. An already-read complete Env is reused for the environmental
+header. SU-only selection does not read summary-only tables. Complete added
+inputs, including unrendered peers, participate in approval, very-hidden
+provenance and pre/postpublication source checks. The composer retains the added
+tables/time once, not twice in nested source provenance.
+
+The review exposes visible sheet order, physical membership count, optional
+environment/non-NULL-selected counts, version status/display and literal
+unit/count/nullable-long-name rows. Empty Env is unavailable count `N/A`, not
+numeric0; NULL and empty long names remain distinguishable. Metadata validation
+yields and checks request generation before installing results; the immutable
+transport boundary remains `$state.raw`. Unit review uses50-row pages rather
+than rendering the entire source catalogue. Draft selection, validation and
+irreversible publication receipts remain separate in the existing retained
+session and root navigation/native-close barrier. Checkbox edits do not erase
+title/destination draft errors; Undo does not erase publication receipts.
+
+No new/replayed Access, Excel or clipboard control is required or authorized by
+this extension. Source adaptations and original preflight/quality/lumping/
+guide/common/constancy/formatting/coercion/printing exclusions above remain.
+Frozen validation passes202 related client cases,18 browser cases, check0/0,
+private frontend build, coupled Go races159.422s, vet and production compilation.
+Independent review finds no significant issues.26 isolated base/candidate vectors
+retain legacy output, wire and approval identities.
+
+Actual Wails accepts all four summary/environment output combinations with
+independently reopened hashes/cells, numeric counts, formula-safe literal text,
+hidden provenance and50/4-row metadata pages. Four actual remounts/four specific
+native-close cancellation acknowledgements cover invalid drafts, actual held
+metadata validation and a committed response withheld from the client.
+Stale validation cannot install a result after remount. Unknown publication
+receipts survive acknowledgement/Undo/remount without replay.36 observations
+check visibility, viewport intersection, containment and labels at1400/760/420.
+The frontend-enabled/backend-disabled profile refuses both ancillary modes while
+legacy review still works. All16 fixture/config/audit files remain exact and
+all owned processes close normally. A private main-entry-only seam enables
+remounts; production components/session/validator remain unchanged.
+
+Fresh full race passes exit0 in4545.281s, preserving1901 managed inputs/58
+artifacts, discovery, protected data and five closed native families. See the
+[evidence summary](MIGRATION_EVIDENCE.md#accepted-ancillary-desktop-inspection).
+This acceptance does not enable defaults, replace the delivered demo or establish
+original Report/Excel behavior. Original clipboard restoration remains unknown.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

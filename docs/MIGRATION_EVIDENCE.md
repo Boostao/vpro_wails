@@ -30,8 +30,9 @@ Private `summary-draft-workbook-integration/receipt.json` SHA256:
 Post-integration edits reconcile documentation only.
 
 This is literal read-only inspection output, not the original Report action.
-Active form callbacks, attribute-description preflight, ancillary sheets and
-original formatting/printing remain unfinished. Default availability and the
+Active form callbacks, attribute-description preflight and original
+formatting/printing remain unfinished. Ancillary sheets are accepted only in the
+separate default-off extension below. Default availability and the
 immutable delivered demo/release are not changed by this acceptance.
 
 ## Private Summary ancillary source
@@ -79,6 +80,47 @@ Only directly related documentation is reconciled afterward. No service/flag/UI,
 original preflight/callback/Excel-coercion/printing or native/default/demo
 availability follows. The separate rejected Excel control and clipboard
 restoration unknown are unchanged.
+
+## Accepted ancillary desktop inspection
+
+The accepted extension reuses the existing workbook service/session/panel.
+Strict optional request fields retain legacy omission semantics; reviewed UTC
+time and complete additional inputs bind the new approval domain and checked
+publication. Counts, version states and literal NULL/empty names are visible;
+unit review is bounded to50 DOM rows per page. Backend/frontend ancillary flags
+are independently default-off.
+
+Frozen validation passes202 related client cases,18 browser cases, check0/0,
+private frontend build, coupled races159.422s, vet6.188s and production12.781s.
+Independent review against the exact25-path candidate/base finds no significant
+issues;26 exact legacy output/wire/approval comparisons and discovery match.
+
+Actual Wails publishes/reopens four summary/environment combinations with exact
+bytes, cells, numeric counts, literal OOXML escapes and source provenance.
+Metadata DOM pages are50/4 rows. Lifecycle acceptance proves four actual
+remounts/four exact native-close cancellation acknowledgements, invalid draft
+retention, held metadata validation/stale-result rejection, persistent unknown
+committed publication without replay and36 responsive observations at1400/760/420.
+The frontend-enabled/backend-disabled profile rejects both new modes while
+legacy review remains available. All16 fixture/config/audit files remain exact;
+all owned processes close normally. Remount testing uses a private entry-only
+seam, not modified production components/session/validator.
+
+Setup/schema, XML-decoder and build-analysis harness refusals remain archived;
+completed publications were inspected and resumed, never replayed. The independent
+OOXML decoder handles `_x005F_x0041_` once as literal `_x0041_`, not recursively.
+The first integration preflight expected an absent build-receipt property and
+stopped before starting tests; it was corrected to verify actual seam/source/
+bundle/log identities. No application change or native mutation was replayed.
+
+Fresh `go test -race -count=1 -timeout 120m ./...` passes exit0:
+UTC2026-10-17T06:41:46.672023 to07:57:31.955683,4545.281s total.
+All1901 inputs/58 artifacts, package/embed discovery, canonical/protected data
+and five closed native families match. Private
+`summary-ancillary-desktop-integration/receipt.json` SHA256:
+`02316121aeaecb4942b1a363517678888ce0034d9db817e88b2c35f678ef555e`.
+Only directly related documentation is reconciled after integration. The immutable
+demo, original Report exclusions and rejected Excel/clipboard unknown are unchanged.
 
 ## Hosted release acceptance
 

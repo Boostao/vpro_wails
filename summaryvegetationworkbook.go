@@ -20,6 +20,7 @@ type summaryVegetationWorkbook struct {
 	Bytes              []byte
 	Sheet              string
 	FirstVegetationRow int
+	Ancillary          *summaryVegetationAncillaryPlan
 }
 
 func prepareSummaryVegetationWorkbook(ctx context.Context, input summaryVegetationWorkbookInput) (summaryVegetationWorkbook, error) {

@@ -18,6 +18,12 @@ type summaryVegetationWorkbookSource struct {
 	Raw         summaryVegetationSnapshotPreview
 	Environment summaryEnvironmentalPhysicalInput
 	Paths       []summaryVegetationWorkbookSourcePath
+	Ancillary   *summaryVegetationWorkbookAncillarySource `json:"Ancillary,omitempty"`
+}
+
+type summaryVegetationWorkbookAncillarySource struct {
+	CreatedAt string
+	Tables    summaryVegetationAncillaryTables
 }
 
 func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVegetationEnvironmentalLifeformService,

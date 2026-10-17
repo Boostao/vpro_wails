@@ -2532,12 +2532,39 @@ export interface SummaryVegetationWitness {
     "cover": ProjectMetadataCell;
 }
 
+export interface SummaryVegetationWorkbookAncillaryOptions {
+    "createSummary": boolean;
+}
+
+export interface SummaryVegetationWorkbookAncillaryReview {
+    "createdAt": string;
+    "membershipRows": number;
+    "sheets": string[] | null;
+    "summary": SummaryVegetationWorkbookReportSummary | null;
+}
+
+export interface SummaryVegetationWorkbookAncillaryUnit {
+    "code": string;
+    "numPlots": number;
+    "longName": string | null;
+}
+
 export interface SummaryVegetationWorkbookOptions {
     "title": string;
     "average": number;
     "display": number;
     "showClass": number;
     "includeEnv": boolean;
+    "ancillary"?: SummaryVegetationWorkbookAncillaryOptions | null;
+}
+
+export interface SummaryVegetationWorkbookReportSummary {
+    "environmentRows": number;
+    "environmentCountAvailable": boolean;
+    "selectedPlotRows": number;
+    "version": string;
+    "versionStatus": string;
+    "units": SummaryVegetationWorkbookAncillaryUnit[] | null;
 }
 
 export interface SummaryVegetationWorkbookReview {
@@ -2550,6 +2577,7 @@ export interface SummaryVegetationWorkbookReview {
     "approvalHash": string;
     "workbookSHA256": string;
     "bytes": number;
+    "ancillary"?: SummaryVegetationWorkbookAncillaryReview | null;
 }
 
 export interface TableCSVArchiveOutcome {

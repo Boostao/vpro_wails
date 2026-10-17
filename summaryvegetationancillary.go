@@ -45,6 +45,11 @@ type summaryVegetationAncillaryPlan struct {
 
 func readSummaryVegetationAncillaryTables(ctx context.Context, owner *sqliteContext,
 	tx *sql.Tx) (summaryVegetationAncillaryTables, error) {
+	return readSummaryVegetationAncillaryTablesWithEnv(ctx, owner, tx, nil)
+}
+
+func readSummaryVegetationAncillaryTablesWithEnv(ctx context.Context, owner *sqliteContext,
+	tx *sql.Tx, retainedEnv *ProjectMetadataTable) (summaryVegetationAncillaryTables, error) {
 	fail := func(err error) (summaryVegetationAncillaryTables, error) {
 		return summaryVegetationAncillaryTables{}, err
 	}
@@ -55,6 +60,12 @@ func readSummaryVegetationAncillaryTables(ctx context.Context, owner *sqliteCont
 		return fail(err)
 	}
 	var result summaryVegetationAncillaryTables
+	if retainedEnv != nil {
+		if len(retainedEnv.Columns) == 0 {
+			return fail(errors.New("Summary ancillary input requires a complete retained physical Env schema"))
+		}
+		result.Env = *retainedEnv
+	}
 	for _, source := range []struct {
 		role, name string
 		target     *ProjectMetadataTable
@@ -62,6 +73,9 @@ func readSummaryVegetationAncillaryTables(ctx context.Context, owner *sqliteCont
 		{"project", owner.selection.Project + "_Env", &result.Env},
 		{"VLists", "MasterSiteUnitList", &result.UnitNames},
 	} {
+		if source.role == "project" && retainedEnv != nil {
+			continue
+		}
 		if err := validateSIVIPhysicalSchema(ctx, tx, source.role, source.name, "Summary ancillary input"); err != nil {
 			return fail(err)
 		}

@@ -1074,11 +1074,25 @@ workbook lifetime. Focused races/vet/production, distinct review/follow-up and
 six byte-exact base compatibility probes pass. Fresh full race passes exit0
 in4484.313s (root4467.898s), preserving1897 inputs/36 artifacts, discovery,
 canonical/protected assets and closed native families.
-Next reconcile the active attribute-description reference projection and
+The accepted desktop extension integrates those sheets into the existing inspection
+publisher/session under independently default-off ancillary flags. Optional
+strict request fields preserve the legacy wire/approval domain; reviewed UTC time
+is echoed at publication and complete additional inputs participate in the same
+snapshot/revalidation/receipt path. Visible metadata retains counts, version and
+NULL/empty names; the unit review renders at most50 rows per page.
+Independent review finds no significant issues;202 related client cases,18 browser
+cases, check/build, coupled races/vet/production and26 exact legacy vectors pass.
+Actual Wails accepts four reopened outputs,50/4-row unit pages, four actual
+remounts/four exact close acknowledgements, held metadata validation and stale-result
+rejection, persistent unknown publication without replay, independent backend-off
+refusal and36 responsive observations. All16 fixture files remain exact.
+Fresh full race passes exit0 in4545.281s with1901 inputs/58 artifacts, unchanged
+discovery/protected data and five closed native families.
+Then reconcile the active attribute-description reference projection and
 guide/common-name effects before UNION/grouping, with explicit master32 versus
 personal16 policy and derived provenance; retain original callback/quality/lump/
 constancy/formatting/printing gaps. No new UI/default or original Report
-acceptance is granted by private sheet rendering.
+acceptance is granted beyond this explicit default-off inspection extension.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

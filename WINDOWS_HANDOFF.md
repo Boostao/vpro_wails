@@ -328,12 +328,41 @@ native families match. Private `summary-ancillary-render-integration/receipt.jso
 SHA256: `ad52501112245d0603c6f0e88ac0d7f723077e139d97d571c1143073e43f6df6`.
 The freeze is released; only directly related documentation is reconciled.
 No native/public/original Report or default/demo acceptance is granted.
-Next source-ready work is effective attribute-description reference projection,
-master32/personal16 policy and guide/common effects before UNION/grouping;
-`summary-effective-reference-source-trace` records the static control-flow
+Current accepted successor: optional ancillary inspection in the EXISTING workbook
+service/session/panel, with
+strict optional mode/time fields, independent default-off
+`VPRO_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK` /
+`VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK`, full additional source binding,
+visible summary metadata and50-row unit pagination. The old constructor lookup,
+legacy wire/v2 approval and output paths remain separate. Frozen validation accepts
+202 related client cases/18 browser cases, check0/0, private build, coupled races
+159.422s, vet6.188s and production12.781s. Distinct review finds no significant
+issues;26 exact legacy vectors and package/embed discovery match.
+Actual Wails accepts four reopened output modes,50/4-row unit pages, four real
+remounts/four exact close acknowledgements, held metadata validation/stale-result
+rejection, persistent unknown committed publication without replay, independent
+backend-off refusal and36 responsive observations. All16 fixture/config/audit
+files remain exact. Production-smoke, lifecycle and backend-off owners normally
+closed; fresh process checks find no native owner in any closed family.
+Private main-entry-only remount seam leaves product components/session unchanged.
+Rejected setup/schema/XML/AST evidence remains retained; completed publications
+were never replayed. Fresh full race accepts exit0 in4545.281s,
+UTC2026-10-17T06:41:46.672023 to07:57:31.955683. All1901 managed inputs/58 artifacts,
+discovery, canonical/protected assets and five closed native families match.
+Private `summary-ancillary-desktop-integration/receipt.json` SHA256:
+`02316121aeaecb4942b1a363517678888ce0034d9db817e88b2c35f678ef555e`.
+The freeze is released for directly related documentation and the authorized
+coherent feature commit/push. No default/demo or original Report promotion.
+Next source-ready work is effective attribute-description
+reference projection, master32/personal16 policy and guide/common effects before UNION/grouping;
+`summary-effective-reference-source-trace.json` in session files records the static control-flow
 findings. Guide uses CombinedEnglishName, not ShortenedGuideName; cleanup
 restores field names. Never mutate the physical reference family or invent
-physical provenance to simulate those callbacks.
+physical provenance to simulate those callbacks. Guide-mode derived attribute
+common names use default NULL CombinedEnglishName, not Definition. Group11/12
+split common names, but13/14 select First without that grouping; conflicting
+representatives remain unknown. Master Code/Codetype255 and staged Species8 are
+separate boundaries; preserve legacy16-bit readers while introducing master32.
 
 The bounded Excel/ADO control is stopped after two attempts; do not replay it.
 The first failed before CopyFromRecordset/clipboard Copy. The second completed

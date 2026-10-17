@@ -504,7 +504,8 @@ close-cancellation acknowledgements, correction/Undo, lost publication
 acknowledgement, independent backend refusal and responsive controls/paths at
 three widths. All16 fixture data/config/audit files remained byte-identical.
 Its scope is literal export of explicit read-only inspection, not original
-`NewShortVeg` orchestration or saved callbacks/ancillary sheets/printing.
+`NewShortVeg` orchestration, saved callbacks or printing. Ancillary sheets are
+available only through the separately accepted default-off extension below.
 The original Report-click assigns `sysCreateReportSummary` before invoking
 `NewShortVeg`; `BuildReport` consumes it. Its summary worksheet remains an
 original-workflow requirement despite the unused module-local `CreateSummary`.
@@ -516,8 +517,19 @@ are independently reviewed and full-race integrated. The composition adds
 retaining complete memberships, literal duplicate join counts, NULL/empty states
 and raw source/options/time provenance. Six exact base comparisons preserve the
 existing workbook/source outputs; the latest full race passes (root4467.898s;
-1897 managed inputs). This remains unregistered private preparation, not a new
-desktop action, original Report/formatting/printing parity or demo promotion.
+1897 managed inputs). That accepted slice is private preparation, not original
+Report/formatting/printing parity or demo promotion.
+The accepted [ancillary inspection extension](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#default-off-accepted-ancillary-inspection)
+extends the existing publisher and persistent session rather than adding another
+service/panel. Independent review,202 related client cases,18 browser cases,
+check/build, coupled races/vet/production and26 exact legacy comparisons pass.
+Actual Wails verifies all four summary/environment combinations,50/4-row unit
+pages, four remounts and exact close acknowledgements, stale validation rejection,
+lost publication acknowledgement without replay, backend-off refusal and36
+responsive observations. All16 fixture files remain unchanged. Fresh full race
+passes in4545.281s, preserving1901 managed inputs and five closed native families.
+The backend/frontend flags remain independently default-off; the original Report
+action, unresolved clipboard boundary and delivered demo are unchanged.
 
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus

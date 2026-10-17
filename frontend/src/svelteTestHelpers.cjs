@@ -17,7 +17,7 @@ function serverComponent(source, filename, dependencies, environment = {}) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
   }).outputText;
   vm.runInNewContext(code, {
-    module, exports: module.exports, __testEnvironment: environment,
+    module, exports: module.exports, structuredClone, __testEnvironment: environment,
     require(name) {
       if (name in dependencies) return dependencies[name];
       if (name === './readRequests') return serverReads;
