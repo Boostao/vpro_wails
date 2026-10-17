@@ -55,6 +55,11 @@ func prepareSummaryEnvironmentalWorkbook(ctx context.Context, input summaryEnvir
 }
 
 func renderSummaryWorkbook[T any](ctx context.Context, input T, layout summaryWorkbookLayout) (result []byte, resultErr error) {
+	return renderSummaryWorkbookWithSheets(ctx, input, layout, nil)
+}
+
+func renderSummaryWorkbookWithSheets(ctx context.Context, input any, layout summaryWorkbookLayout,
+	writeSheets func(*excelize.File) error) (result []byte, resultErr error) {
 	if ctx == nil {
 		return nil, errors.New("Summary workbook rendering requires a context")
 	}
@@ -196,6 +201,14 @@ func renderSummaryWorkbook[T any](ctx context.Context, input T, layout summaryWo
 					return result, err
 				}
 			}
+		}
+	}
+	if writeSheets != nil {
+		if err := writeSheets(book); err != nil {
+			return result, err
+		}
+		if err := ctx.Err(); err != nil {
+			return result, err
 		}
 	}
 	if _, err := book.NewSheet("_VPRO_Source"); err != nil {

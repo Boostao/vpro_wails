@@ -1058,7 +1058,7 @@ in4632.360s (root4580.720s), retaining1893 managed inputs/23 artifacts, discover
 canonical/protected assets and four closed native families.
 This is an explicit read-only inspection export, not original `NewShortVeg`:
 its active attribute-description preflight and ancillary quality/SU sheets are
-not implemented. Although `CreateSummary` is unused locally, the original
+not part of that publisher. Although `CreateSummary` is unused locally, the original
 Report-click sets `sysCreateReportSummary` and `BuildReport` consumes that global.
 The original summary worksheet and combine-variants/lump callback effects remain
 requirements for the full Report action, not effects of this inspection export.
@@ -1068,9 +1068,17 @@ Private ancillary source preparation now has focused races/vet/production,
 independent review/follow-up and fresh full-race integration (root4509.951s;
 1895 managed inputs/23 artifacts). It models complete memberships, DISTINCT
 Veg-backed unit admission, physical master-name join counts and actual
-Description/count states without changing existing consumers. Next compose
-source-ready sheet rendering and the remaining original preflight/callback
-policies; no new UI/default or original Report/printing acceptance is granted.
+Description/count states without changing existing consumers. Its private
+worksheet composition now writes `SU Table` and optional `ReportSummary` in one
+workbook lifetime. Focused races/vet/production, distinct review/follow-up and
+six byte-exact base compatibility probes pass. Fresh full race passes exit0
+in4484.313s (root4467.898s), preserving1897 inputs/36 artifacts, discovery,
+canonical/protected assets and closed native families.
+Next reconcile the active attribute-description reference projection and
+guide/common-name effects before UNION/grouping, with explicit master32 versus
+personal16 policy and derived provenance; retain original callback/quality/lump/
+constancy/formatting/printing gaps. No new UI/default or original Report
+acceptance is granted by private sheet rendering.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

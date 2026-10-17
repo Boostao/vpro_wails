@@ -2314,7 +2314,49 @@ in4524.000s (root4509.951s), preserving1895 managed inputs/23 artifacts,
 package/embed discovery, canonical/protected assets and the closed native
 families. The rejected Excel/ADO control remains separately unaccepted with
 clipboard restoration unknown; integration does not change that disposition.
-Rendering and native/end-to-end original Report acceptance remain unverified.
+Source preparation alone does not establish rendering or native/end-to-end
+original Report acceptance; private literal composition is qualified below.
+
+### Private ancillary worksheet composition
+
+The private composition writes `SU Table` and optional `ReportSummary` in
+the existing vegetation/environment workbook lifetime, without serializing and
+reopening an intermediate XLSX. The legacy entry points and their typed source
+wire remain unchanged. Shared physical-membership projection serves both the
+source planner and the two membership blocks, retaining all rows and literal
+NULL/empty identities rather than reducing them to vegetation-backed units.
+The optional summary retains the source captions, D:F unit block, H:I membership
+block and duplicate master-name count multiplicity. `SU Table` keeps D:G hidden.
+
+This is explicitly normal-SU Layer inspection with zero value limit and no
+lumping, quality, common-name, guide or constancy callbacks. B5 identifies the
+actual selected normal-SU physical table, not an uncreated dynamic temporary
+table. The reviewed RFC3339 timestamp is used literally instead of claiming
+Access/Excel locale formatting. Missing/NULL AllSpecs Description displays
+`Unknown`, literal empty stays empty, and empty Env displays `N/A`; their full
+raw states remain distinct in very-hidden provenance alongside complete raw
+body/reference inputs, source paths and options. Summary-only unavailable
+tables or ambiguous `First` values do not block SU-only composition.
+
+Every allocated/reserved worksheet name is compared with the XLSX library's
+`strings.EqualFold` equivalence, including long-s aliases. Failure or cancellation
+must return no partial workbook. Project-first sheet order and fixed readable
+column widths are explicit presentation adaptations, not original Excel AutoFit,
+scalar coercion, formatting/macros/printing or full Report parity. This boundary
+adds no registration, flags, bindings or UI. Focused races66.640s, vet4.625s and
+stripped SQLite-only production10.594s pass. Exact worksheet row boundaries,
+including the post-write VBA Integer increment, are tested without constructing
+an oversized workbook; actual oversized SU refuses before membership projection.
+Independent review and substantive focused follow-up find no significant issues
+and verify source/runner/log/exit/binary associations. Six isolated candidate/base
+probes preserve byte-exact legacy vegetation/environment workbooks and the source
+plan, with unchanged package/embed discovery; this is not universal input proof.
+Fresh full race integration passes exit0 in4484.313s (root4467.898s),
+preserving1897 managed inputs/36 artifacts, package/embed discovery,
+canonical/protected assets and closed native families. Only directly related
+status documentation is reconciled afterward; application/test inputs are
+unchanged. No native/default/demo availability or original Report acceptance
+is claimed.
 
 ### Class threshold neighbors
 

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+
+	"github.com/xuri/excelize/v2"
 )
 
 type summaryVegetationWorkbookInput struct {
@@ -21,6 +23,11 @@ type summaryVegetationWorkbook struct {
 }
 
 func prepareSummaryVegetationWorkbook(ctx context.Context, input summaryVegetationWorkbookInput) (summaryVegetationWorkbook, error) {
+	return prepareSummaryVegetationWorkbookWithSheets(ctx, input, input, nil)
+}
+
+func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summaryVegetationWorkbookInput,
+	provenance any, writeSheets func(*excelize.File) error) (summaryVegetationWorkbook, error) {
 	fail := func(err error) (summaryVegetationWorkbook, error) { return summaryVegetationWorkbook{}, err }
 	if ctx == nil {
 		return fail(errors.New("Summary workbook requires a context"))
@@ -121,10 +128,10 @@ func prepareSummaryVegetationWorkbook(ctx context.Context, input summaryVegetati
 			}
 		}
 	}
-	data, err := renderSummaryWorkbook(ctx, input, summaryWorkbookLayout{
+	data, err := renderSummaryWorkbookWithSheets(ctx, provenance, summaryWorkbookLayout{
 		Sheet: sheet, Title: input.Title, LastRow: first + len(preview.Rows) - 1, LastColumn: 3 + len(preview.Columns),
 		SeparatorRow: separator, ItalicFromRow: first, HeaderRows: []int{1, headerRow}, Cells: cells,
-	})
+	}, writeSheets)
 	if err != nil {
 		return fail(err)
 	}

@@ -186,12 +186,9 @@ and both closed native families. Private receipt:
 `summary-workbook-body-integration/receipt.json`, SHA256
 `fd834aa15e66d1e22a5912dbe17171a1215b588b8b7429d0aa909fa8911b7a13`.
 This private boundary is committed/published as `e5300ab` on `main`.
-Next is an owned public Summary workbook review/publication workflow: retain the
-already-read personal/LayerCode tables, take all coupled physical inputs in one
-owned snapshot, qualify saved effects and independent flags, then verify actual
-bindings, client receipts/lifecycle and disposable Wails acceptance. The private
-contract is `summary-workbook-owned-publication-contract.json`; no public
-availability or default promotion has been granted.
+The owned source and default-off inspection publisher below now supersede that
+private-only milestone. The predecessor does not independently grant original
+Report availability or default promotion.
 
 ## Current qualified private owned Summary source
 
@@ -220,8 +217,8 @@ Private receipt `summary-workbook-owned-source-integration/receipt.json`, SHA256
 `3da48d96cc346b74557d66cab925a3b28fee8710ae36bdb9ee5af3cf6118f1d6`.
 Published as `32ed733` on clean `main`; this accepts private reader/caller preservation,
 not saved effects, output authority, a new native/public workflow or whole
-formatted Summary. Next safe seam remains owned review/publication with explicit
-source-option admission and client lifecycle/receipt acceptance.
+formatted Summary. Its owned review/publication successor is accepted below;
+original report callbacks and whole-workflow parity remain separate.
 
 ## Accepted default-off Summary inspection publisher
 
@@ -300,8 +297,43 @@ All1895 managed inputs/23 artifacts, discovery, canonical/protected assets,
 accepted closed native families and rejected control evidence match.
 Private `summary-ancillary-integration/receipt.json` SHA256:
 `4085f045c74b22d3dff1a07efc691cf6a092c349a82c9b379fdb2062bea1b12b`.
-The freeze is released. It adds no flag, registration, UI, rendered workbook or
-original Report/native acceptance.
+The freeze is released. The eight-path prerequisite is normally committed and
+pushed as `14812fedaf09b37c918aed28c033f8985f127ccd`; exact remote `main`,
+clean worktree and0/0 were verified before the next candidate.
+Private `summary-ancillary-publication.json` associates that commit/tree and
+integration. It adds no flag, registration, UI or original Report/native acceptance.
+
+Accepted private composition writes `SU Table` and optional `ReportSummary` with the
+accepted body/header in one workbook lifetime. It retains all memberships,
+source duplicate counts, complete raw provenance and reviewed options/time;
+EqualFold guards include Unicode aliases. Summary-only constraints do not
+block SU-only output. Normal-SU identity, RFC3339 time, project-first sheets,
+fixed widths and zero value limit are explicit inspection adaptations, not
+original callback/Excel-formatting parity. No service/flag/bindings/UI changes.
+`summary-ancillary-render-validation-v2/receipt.json` seals focused race66.640s,
+vet4.625s and production10.594s, all exit0. One initial numeric-type test
+expectation was corrected for Excelize implicit numeric cells; actual worksheet
+XML now independently verifies the required numeric values and absent formulas.
+The exact worksheet row limits and actual early oversized-SU refusal are tested.
+A misplaced test declaration was rejected by gofmt and corrected before the
+complete replacement validation. Both development failures remain explicit.
+Distinct bounded review and substantive follow-up find no significant issues;
+all source/runner/log/exit/binary identities match. Six isolated candidate/base
+probes preserve byte-exact legacy outputs and exact package/embed discovery.
+Private v2 compatibility/review receipts retain those associations.
+Fresh full race integration accepts exit0, UTC2026-10-17T04:17:02.019665 to
+05:31:46.325171,4484.313s total/root4467.898s. All1897 managed inputs/36
+artifacts, exact package/embed discovery, canonical/protected assets and closed
+native families match. Private `summary-ancillary-render-integration/receipt.json`
+SHA256: `ad52501112245d0603c6f0e88ac0d7f723077e139d97d571c1143073e43f6df6`.
+The freeze is released; only directly related documentation is reconciled.
+No native/public/original Report or default/demo acceptance is granted.
+Next source-ready work is effective attribute-description reference projection,
+master32/personal16 policy and guide/common effects before UNION/grouping;
+`summary-effective-reference-source-trace` records the static control-flow
+findings. Guide uses CombinedEnglishName, not ShortenedGuideName; cleanup
+restores field names. Never mutate the physical reference family or invent
+physical provenance to simulate those callbacks.
 
 The bounded Excel/ADO control is stopped after two attempts; do not replay it.
 The first failed before CopyFromRecordset/clipboard Copy. The second completed

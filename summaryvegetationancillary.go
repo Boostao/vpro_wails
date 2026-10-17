@@ -104,9 +104,9 @@ func prepareSummaryVegetationAncillary(ctx context.Context,
 	}, "Summary ancillary"); err != nil {
 		return fail(err)
 	}
-	su, err := siteUnitTransferColumns(input.SU, "PlotNumber", "SiteUnit")
+	memberships, selectedPlotRows, err := prepareSummaryAncillaryMemberships(ctx, input.SU)
 	if err != nil {
-		return fail(fmt.Errorf("Summary ancillary SU: %w", err))
+		return fail(err)
 	}
 	veg, err := siteUnitTransferColumns(input.Veg, "PlotNumber")
 	if err != nil {
@@ -128,7 +128,7 @@ func prepareSummaryVegetationAncillary(ctx context.Context,
 		CreatedAt: input.CreatedAt, EnvironmentRows: header.EnvironmentRows,
 		EnvironmentCountAvailable: header.EnvironmentRows != 0,
 		SpeciesVersion:            cloneSiteUnitCell(header.SpeciesVersion), VersionStatus: header.VersionStatus,
-		Memberships: []summaryVegetationAncillaryMembership{}, Units: []summaryVegetationAncillaryUnit{},
+		Memberships: memberships, SelectedPlotRows: selectedPlotRows, Units: []summaryVegetationAncillaryUnit{},
 	}
 	plots := map[string]bool{}
 	for _, row := range input.Veg.Rows {
@@ -145,24 +145,12 @@ func prepareSummaryVegetationAncillary(ctx context.Context,
 	}
 	selected := map[string]bool{}
 	counts := map[string]int64{}
-	for _, row := range input.SU.Rows {
+	for _, member := range memberships {
 		if err := ctx.Err(); err != nil {
 			return fail(err)
 		}
-		plot, unit := row.Cells[su["PlotNumber"]], row.Cells[su["SiteUnit"]]
-		p, err := vegetationReportIdentity(plot)
-		if err != nil {
-			return fail(fmt.Errorf("Summary ancillary SU row%s PlotNumber: %w", row.RowID, err))
-		}
-		u, err := vegetationReportIdentity(unit)
-		if err != nil {
-			return fail(fmt.Errorf("Summary ancillary SU row%s SiteUnit: %w", row.RowID, err))
-		}
-		result.Memberships = append(result.Memberships, summaryVegetationAncillaryMembership{
-			SourceRowID: row.RowID, PlotNumber: cloneSiteUnitCell(plot), SiteUnit: cloneSiteUnitCell(unit),
-		})
+		p, u := member.PlotNumber.Text, member.SiteUnit.Text
 		if p != nil {
-			result.SelectedPlotRows++
 			if u != nil {
 				counts[*u]++
 				if plots[*p] {
@@ -211,4 +199,45 @@ func prepareSummaryVegetationAncillary(ctx context.Context,
 		return fail(err)
 	}
 	return result, nil
+}
+
+func prepareSummaryAncillaryMemberships(ctx context.Context, table ProjectMetadataTable) ([]summaryVegetationAncillaryMembership, int, error) {
+	if ctx == nil {
+		return nil, 0, errors.New("Summary ancillary membership preparation requires a context")
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, 0, err
+	}
+	columns, err := siteUnitTransferColumns(table, "PlotNumber", "SiteUnit")
+	if err != nil {
+		return nil, 0, fmt.Errorf("Summary ancillary SU: %w", err)
+	}
+	result, count := []summaryVegetationAncillaryMembership{}, 0
+	for _, row := range table.Rows {
+		if err := ctx.Err(); err != nil {
+			return nil, 0, err
+		}
+		plot, unit := row.Cells[columns["PlotNumber"]], row.Cells[columns["SiteUnit"]]
+		for _, field := range []struct {
+			name string
+			cell ProjectMetadataCell
+		}{{"PlotNumber", plot}, {"SiteUnit", unit}} {
+			if _, err := metadataCellValue(field.cell); err != nil {
+				return nil, 0, fmt.Errorf("Summary ancillary SU row%s %s: %w", row.RowID, field.name, err)
+			}
+			if _, err := vegetationReportIdentity(field.cell); err != nil {
+				return nil, 0, fmt.Errorf("Summary ancillary SU row%s %s: %w", row.RowID, field.name, err)
+			}
+		}
+		result = append(result, summaryVegetationAncillaryMembership{
+			SourceRowID: row.RowID, PlotNumber: cloneSiteUnitCell(plot), SiteUnit: cloneSiteUnitCell(unit),
+		})
+		if plot.Text != nil {
+			count++
+		}
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, 0, err
+	}
+	return result, count, nil
 }

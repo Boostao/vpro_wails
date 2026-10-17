@@ -57,6 +57,29 @@ canonical template/data was used. Preserve the rejected/control receipts,
 do not replay completed actions or treat this integration as sealed clipboard
 cleanup or original report-formatting proof.
 
+## Private Summary ancillary worksheet composition
+
+The [private composition](LONG_VEGETATION_WORKBOOK_CONTRACT.md#private-ancillary-worksheet-composition)
+adds `SU Table` and optional `ReportSummary` within the existing body/header
+workbook lifetime. Focused races66.640s, vet4.625s and stripped SQLite-only
+production10.594s pass. Independent review and substantive focused follow-up
+find no significant issues and verify exact source/runner/log/exit/binary
+associations. Eight layout/summary/average combinations, literal text/formulas,
+NULL/empty, complete source provenance, EqualFold collisions, exact row limits,
+early oversized-input refusal and cancellation/no-partial-output are covered.
+Six isolated candidate/base cases preserve byte-exact legacy workbook/source
+outputs and accepted package/embed discovery; this is not universal input proof.
+
+Fresh full race passes exit0, UTC2026-10-17T04:17:02.019665 to05:31:46.325171,
+4484.313s total/root4467.898s. All1897 managed inputs/36 artifacts, discovery,
+canonical/protected assets and closed native families remain exact.
+Private `summary-ancillary-render-integration/receipt.json` SHA256:
+`ad52501112245d0603c6f0e88ac0d7f723077e139d97d571c1143073e43f6df6`.
+Only directly related documentation is reconciled afterward. No service/flag/UI,
+original preflight/callback/Excel-coercion/printing or native/default/demo
+availability follows. The separate rejected Excel control and clipboard
+restoration unknown are unchanged.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)
