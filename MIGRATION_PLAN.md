@@ -1064,6 +1064,13 @@ The original summary worksheet and combine-variants/lump callback effects remain
 requirements for the full Report action, not effects of this inspection export.
 Normal layer
 group11 does not use the historical value limit.
+Private ancillary source preparation now has focused races/vet/production,
+independent review/follow-up and fresh full-race integration (root4509.951s;
+1895 managed inputs/23 artifacts). It models complete memberships, DISTINCT
+Veg-backed unit admission, physical master-name join counts and actual
+Description/count states without changing existing consumers. Next compose
+source-ready sheet rendering and the remaining original preflight/callback
+policies; no new UI/default or original Report/printing acceptance is granted.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

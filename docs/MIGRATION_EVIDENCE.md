@@ -34,6 +34,29 @@ Active form callbacks, attribute-description preflight, ancillary sheets and
 original formatting/printing remain unfinished. Default availability and the
 immutable delivered demo/release are not changed by this acceptance.
 
+## Private Summary ancillary source
+
+The [ancillary boundary](LONG_VEGETATION_WORKBOOK_CONTRACT.md#private-summary-ancillary-source-preparation)
+has independent review and focused follow-up without significant findings.
+Replacement focused races58.625s, vet4.625s and production10.625s pass.
+The reproduced unavailable-Env failure is retained as rejected evidence;
+missing schema now refuses while an actual empty Env stays distinguishable.
+
+Fresh full race passes exit0, UTC2026-10-17T02:33:19.372689 to03:48:43.373890,
+4524.000s total/root4509.951s.1895 inputs/23 artifacts, discovery,
+canonical/protected assets and closed native families remain exact.
+Private `summary-ancillary-integration/receipt.json` SHA256:
+`4085f045c74b22d3dff1a07efc691cf6a092c349a82c9b379fdb2062bea1b12b`.
+Only documentation is reconciled afterward. This accepts private preparation,
+not rendering, callbacks, an exposed native action or default promotion.
+
+The separate two-attempt Excel/ADO control is **not accepted**. Its final
+workbook/typed observations completed and both owned Excel processes closed,
+but parent clipboard restoration failed and remains unknown. No Access/DAO or
+canonical template/data was used. Preserve the rejected/control receipts,
+do not replay completed actions or treat this integration as sealed clipboard
+cleanup or original report-formatting proof.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

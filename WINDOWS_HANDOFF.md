@@ -225,6 +225,10 @@ source-option admission and client lifecycle/receipt acceptance.
 
 ## Accepted default-off Summary inspection publisher
 
+Published as `018365f456d64d38a96fbccac5adab8fb8ac92e4` on `origin/main`;
+normal push, exact remote identity, clean worktree and0/0 ahead/behind verified
+before starting the next private source-preparation work.
+
 Strict explicit title/average/display/class/includeEnv options now wrap the
 accepted source, complete physical-input approval and checked no-replace XLSX
 publication. Postcommit drift/cancellation/cleanup preserve the output receipt
@@ -287,6 +291,28 @@ Next source work must follow the original Report-click: it sets the global
 variant/lump table. An unused local does not make those form paths dormant.
 Private `summary-original-report-source-reconnaissance.json` records the static
 trace, physical schema and reusable helpers without running Access.
+The new private ancillary source/planner is implemented, focused-tested and
+independently reviewed, including the unavailable-versus-empty Env correction.
+`summary-ancillary-validation-v2/receipt.json` records exact source/runner/log/
+exit/binary identities. Fresh full race integration accepts exit0
+in4524.000s (root4509.951s), UTC2026-10-17T02:33:19.372689 to03:48:43.373890.
+All1895 managed inputs/23 artifacts, discovery, canonical/protected assets,
+accepted closed native families and rejected control evidence match.
+Private `summary-ancillary-integration/receipt.json` SHA256:
+`4085f045c74b22d3dff1a07efc691cf6a092c349a82c9b379fdb2062bea1b12b`.
+The freeze is released. It adds no flag, registration, UI, rendered workbook or
+original Report/native acceptance.
+
+The bounded Excel/ADO control is stopped after two attempts; do not replay it.
+The first failed before CopyFromRecordset/clipboard Copy. The second completed
+the nine TEXT/NULL cases and both formatting passes, saved its private workbook
+and normally closed; both owned PIDs are freshly absent. It is a control, not
+DAO/Access or whole-report proof. Parent clipboard restoration failed
+(`CloseClipboard Failed`), so original clipboard restoration is **unknown**;
+do not claim sealed cleanup or overwrite current clipboard to conceal this.
+Private `summary-excel-recordset-control` and its rejected-initial sibling retain
+the exact drivers/typed observations. No canonical Access/template/data was
+modified. Keep original formatting unavailable; continue independent Go work.
 
 Full integration on this VM: `go test -race -timeout 120m ./...`.
 For isolated Go overlays use `GODEBUG=goindex=0` and verify exact embed discovery.

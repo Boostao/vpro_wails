@@ -509,6 +509,13 @@ The original Report-click assigns `sysCreateReportSummary` before invoking
 `NewShortVeg`; `BuildReport` consumes it. Its summary worksheet remains an
 original-workflow requirement despite the unused module-local `CreateSummary`.
 
+The next private ancillary source boundary is independently reviewed and
+full-race integrated (root4509.951s;1895 managed inputs). It reuses the owned
+SU/Veg snapshot with physical Env, master unit names and AllSpecs Description,
+retaining complete memberships, duplicate join counts and NULL/empty states.
+It does not yet render those sheets, add a desktop action or complete the
+original Report pipeline.
+
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus
 87.8 MB for the same stripped frontend build. Sample native startup and first

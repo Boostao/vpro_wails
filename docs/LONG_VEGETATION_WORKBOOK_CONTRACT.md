@@ -2273,6 +2273,49 @@ canonical/protected assets and four closed native families. The portable
 [evidence summary](MIGRATION_EVIDENCE.md#summary-inspection-workbook) identifies
 the immutable private receipt; the delivered demo and default flags are unchanged.
 
+### Private Summary ancillary source preparation
+
+The original `USysShortVegOptions.btnViewReport_Click` sets
+`sysCreateReportSummary` before `NewShortVeg`; its `BuildReport` consumes that
+global. The original workflow therefore still requires `ReportSummary` when
+selected and always adds `SU Table`. The unused local `CreateSummary` is not
+proof that the form callback is dormant.
+
+The new private ancillary boundary prepares those source inputs without
+registering a service, adding flags/UI or changing the accepted inspection
+workbook. Its additional Env, master site-unit names and actual AllSpecs
+Description are read on the caller's existing owned transaction; the caller
+reuses its complete already-read SU/Veg. All raw additional tables remain
+available for later approval, including unused physical peers.
+
+The literal normal-SU projection retains every physical membership, including
+NULL/empty and plots without vegetation. `SnTable` unit admission instead
+requires a real Veg join; duplicate Veg matches do not multiply its DISTINCT
+units. Ancillary counts include every non-NULL SU plot in admitted units and
+the full duplicate master-name join multiplicity. Missing master names omit
+only that ancillary unit row. Conflicting `First` long-name candidates refuse
+preparation rather than inventing a stable Access representative.
+
+An explicit canonical reviewed RFC3339 time is retained for later deterministic
+publication, not regenerated at export. Empty Env has a distinct unavailable
+record-count state corresponding to the source's `MoveLast` error path.
+AllSpecs version uses the existing physical Description boundary, retaining
+missing/NULL/empty status separately; a future presentation adapter must account
+for the original String function's display behavior without changing storage.
+The model is not a rendered or publicly accepted original report. Attribute
+preflight, temporary-table mutations, quality/lump/common-name callbacks,
+Excel scalar coercion, formatting/printing and whole-workflow acceptance remain
+separate. Focused races58.625s, vet4.625s and stripped SQLite-only production
+10.625s pass. Independent review and focused follow-up find no significant
+issues and verify source/runner/log/exit/binary associations. A reproduced
+unavailable-Env regression now refuses a missing schema instead of confusing
+it with an empty physical table. Fresh full race integration passes exit0
+in4524.000s (root4509.951s), preserving1895 managed inputs/23 artifacts,
+package/embed discovery, canonical/protected assets and the closed native
+families. The rejected Excel/ADO control remains separately unaccepted with
+clipboard restoration unknown; integration does not change that disposition.
+Rendering and native/end-to-end original Report acceptance remain unverified.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes
