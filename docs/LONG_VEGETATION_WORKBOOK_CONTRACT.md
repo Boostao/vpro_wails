@@ -2203,6 +2203,76 @@ This boundary does not interpret saved report preferences, authorize an output
 file, add a service/binding/UI/flag, or enable common/guide names, hierarchy,
 lumping, quality, constancy, source Excel coercion, macros or printing.
 
+### Default-off accepted inspection workbook
+
+The [inspection publisher](../summaryvegetationworkbookservice.go) uses
+explicit title, average, display, class and environmental options, not saved
+report callbacks. Review binds the entire physical input, exact scope/options,
+worksheet/frame and deterministic workbook bytes. Duplicate/escaped request
+keys, NULL options, raw malformed Unicode and unknown fields are refused before
+typed decoding. Saved quality enforcement remains unavailable and cannot be
+bypassed by disabling an older preview flag.
+
+Publication reobserves complete owned inputs and uses the shared checked
+no-replace artifact boundary. Invisible personal-source changes invalidate the
+approval even if rendered bytes are identical. Precommit failure leaves no
+destination and supports an explicit safe retry; committed drift/cancellation/
+cleanup errors retain path/hash/outcome and warn against replay. Completed
+snapshots prove observation-time equality, not absence of later external writes.
+
+Coupled backend races, vet and production compile pass; exact-scope independent
+backend review found no significant issues. Registration, interface bindings
+and a separately gated client panel are implemented. The strict-Go wire fixture
+normalizes machine paths and carries a zero approval placeholder: it proves
+transport/validation, not authority to publish a real project. Client tests
+exercise actual Svelte proxies, immutable review state, held asynchronous
+validation, cancellation/remount, strict options, unknown/committed receipts and
+the combined root lifecycle barrier. Existing environmental entrypoints retain
+their fixed1/6/0 policy; only the explicit workbook validator accepts its selected
+calculation options. Client review, private production build and actual Wails
+acceptance and full integration pass. No public/default promotion is
+accepted. It must be labelled as literal export of
+read-only inspection, not the original `NewShortVeg` action. That entry actively
+rebuilds master attribute descriptions and adds ancillary quality/SU output;
+neither is silently reproduced here. Its `CreateSummary` local is unused, but
+the original `USysShortVegOptions.btnViewReport_Click` sets
+`sysCreateReportSummary` before calling `NewShortVeg`, and `BuildReport` consumes
+that global. The same click selects the effective variant/lump table. These
+active original-workflow effects remain required for full Report parity; the
+inspection export deliberately does not dispatch them.
+Group11 does not consume `ValueLimit`; irrelevant historical options
+must not become new output-admission constraints.
+
+Retained Show1/10/20 is not a class-calculation instruction for displays1/2/3/6.
+The inspection adapter validates that retained selection and calls the existing
+calculator with no class selection for those modes, without changing the
+legacy class-only API. Review still returns and approval domainv2 binds the
+original explicit Show value: different retained selections must not share
+approval merely because their workbook bytes are equal.96 combinations cover
+both environmental modes, both averages, every display and all retained Show
+selections, including required rejection of missing class selection for4/5.
+The first Wails candidate exposed this boundary and was rejected with zero
+publications/all16 fixture files unchanged. Replacement formal checks,
+independent reviewer follow-up and native acceptance pass. Actual production
+Wails exports both environmental modes and independently reopens their bytes/
+hashes/literal title. A private entry-only mount seam exercises real app remount
+during held validation and committed publication without changing production
+components/sessions; old completion cannot populate the new panel. Invalid
+drafts and read errors persist across remount with correction/Undo available.
+Each of four close refusals has a fresh actual CancelClose response and exact
+closing-message witness before changing its barrier. A deliberately lost client
+acknowledgement retains an independently inspected physical commit, blocks
+replay/navigation/close and survives remount; acknowledgement preserves evidence.
+Native backend-off refuses the enabled client.30 responsive observations measure
+controls/labels, reviewed hashes and unknown destination receipt at three
+widths with actual visibility, viewport intersection and containment. All16
+physical data/config/audit files remain byte-identical across normally closed
+phases. Fresh full race integration passes exit0 in4632.360s (root4580.720s),
+preserving1893 managed inputs/23 artifacts, exact package/embed discovery,
+canonical/protected assets and four closed native families. The portable
+[evidence summary](MIGRATION_EVIDENCE.md#summary-inspection-workbook) identifies
+the immutable private receipt; the delivered demo and default flags are unchanged.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

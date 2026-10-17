@@ -43,17 +43,25 @@ export function validateSummaryEnvironmentalNumeric(value: unknown, owner: Summa
 
 export async function validateSummaryEnvironmentalLifeform(value: unknown, owner: SummaryVegetationOwner,
   validationYield: () => PromiseLike<void>, current: () => boolean = () => true): Promise<SummaryEnvironmentalLifeformPreview | null> {
+  return validateSummaryEnvironmentalLifeformOptions(value, owner, { average: 1, display: 6, showClass: 0 },
+    validationYield, current);
+}
+
+export async function validateSummaryEnvironmentalLifeformOptions(value: unknown, owner: SummaryVegetationOwner,
+  options: { average: number; display: number; showClass: number },
+  validationYield: () => PromiseLike<void>, current: () => boolean = () => true): Promise<SummaryEnvironmentalLifeformPreview | null> {
   if (!current()) return null;
   if (!lifeformShape(value, ['vegetation', 'fieldList', 'rows', 'sourcePath', 'envSourcePath', 'masterSourcePath', 'source']) ||
       !lifeformText(value.masterSourcePath) || !value.masterSourcePath) reject();
   const masterSourcePath = value.masterSourcePath;
-  const result = await validateSummaryEnvironmentalTaggedRows(value, owner, validationYield, current, 'lifeform');
+  const result = await validateSummaryEnvironmentalTaggedRows(value, owner, validationYield, current, 'lifeform', options);
   if (!current() || result === null) return null;
   return Object.freeze({ ...result, masterSourcePath });
 }
 
 function validateSummaryEnvironmentalTaggedRows(value: unknown, owner: SummaryVegetationOwner,
-  validationYield: () => PromiseLike<void>, current: () => boolean, mode: true | 'lifeform'): Promise<SummaryEnvironmentalPreview<SummaryEnvironmentalValue> | null> {
+  validationYield: () => PromiseLike<void>, current: () => boolean, mode: true | 'lifeform',
+  options = { average: 1, display: 6, showClass: 0 }): Promise<SummaryEnvironmentalPreview<SummaryEnvironmentalValue> | null> {
   return validateSummaryEnvironmentalRows<SummaryEnvironmentalValue>(value, owner, validationYield, current, mode,
     (value, functionName, argument) => {
       if (numericFunctions.has(functionName)) return numericEnvironmentalValue(functionName, argument, value);
@@ -64,20 +72,21 @@ function validateSummaryEnvironmentalTaggedRows(value: unknown, owner: SummaryVe
       if (numericFunctions.has(functionName)) return;
       if (value.kind !== 'cell' || (functionName === 'SVnPlots' ?
           value.cell.storage !== 'integer' || value.cell.integer !== String(count) || count > 32767 : value.cell.storage !== 'text')) reject();
-    });
+    }, options);
 }
 
 async function validateSummaryEnvironmentalRows<V>(value: unknown, owner: SummaryVegetationOwner,
   validationYield: () => PromiseLike<void>, current: () => boolean, mode: boolean | 'lifeform',
   readValue: (value: unknown, functionName: string, argument: FieldListCell) => V,
-  checkValue: (value: V, functionName: string, count: number) => void): Promise<SummaryEnvironmentalPreview<V> | null> {
+  checkValue: (value: V, functionName: string, count: number) => void,
+  options = { average: 1, display: 6, showClass: 0 }): Promise<SummaryEnvironmentalPreview<V> | null> {
   if (!current()) return null;
   const lifeform = mode === 'lifeform', numeric = mode !== false;
   const source = lifeform ? summaryEnvironmentalLifeformSource : numeric ? summaryEnvironmentalNumericSource : summaryEnvironmentalSource;
   if (!lifeformShape(value, ['vegetation', 'fieldList', 'rows', 'sourcePath', 'envSourcePath', ...(lifeform ? ['masterSourcePath'] : []), 'source']) ||
       !lifeformText(value.sourcePath) || !value.sourcePath || value.envSourcePath !== owner.projectPath ||
       value.source !== source || !Array.isArray(value.rows)) reject();
-  const vegetation = await validateSummaryVegetationAsync(value.vegetation, owner, 1, 6, 0, 11,
+  const vegetation = await validateSummaryVegetationAsync(value.vegetation, owner, options.average, options.display, options.showClass, 11,
     { preview: () => Promise.reject(new Error('Validation cannot dispatch a read')), cancel: () => {}, validationYield }, current);
   if (!current() || vegetation === null) return null;
   const table = fieldListTable(value.fieldList), index = fieldListIndex(table);

@@ -345,6 +345,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	summaryVegetationWorkbook, err := NewSummaryVegetationWorkbookService(summaryEnvironmentLifeform, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	summaryVegetationPreferencesEnabled, err := summaryVegetationPreferencesFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -581,6 +585,7 @@ func main() {
 		application.NewService(summaryVegetation),
 		application.NewService(summaryEnvironment),
 		application.NewService(summaryEnvironmentLifeform),
+		application.NewService(summaryVegetationWorkbook),
 		application.NewService(NewSummaryVegetationPreferencesService(contextService, summaryVegetationPreferencesEnabled, summaryVegetation.enabled)),
 		application.NewService(NewSummaryVegetationQualityPreferencesService(contextService, summaryVegetationQualityEnabled)),
 		application.NewService(NewSummaryVegetationPresentationPreferencesService(contextService, summaryVegetationPresentationEnabled)),

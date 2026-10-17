@@ -6,13 +6,7 @@ import (
 	"errors"
 )
 
-type summaryVegetationWorkbookOptions struct {
-	Title      string
-	Average    int
-	Display    int
-	ShowClass  int
-	IncludeEnv bool
-}
+type summaryVegetationWorkbookOptions = SummaryVegetationWorkbookOptions
 
 type summaryVegetationWorkbookSourcePath struct {
 	Role string
@@ -57,11 +51,19 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 	if err := validateGoogleEarthReviewStrings(contextID, options.Title); err != nil {
 		return fail(err)
 	}
-	if err := validateSummaryVegetationDisplayOptions(ctx, options.Average, options.Display, options.ShowClass); err != nil {
+	if options.ShowClass != 0 && options.ShowClass != 1 && options.ShowClass != 10 && options.ShowClass != 20 {
+		return fail(errors.New("Summary workbook requires supported retained ShowClass0,1,10 or20"))
+	}
+	calculationClass := options.ShowClass
+	if options.Display != 4 && options.Display != 5 {
+		// These source displays retain Show but do not consume it; keep the legacy calculator policy unchanged.
+		calculationClass = 0
+	}
+	if err := validateSummaryVegetationDisplayOptions(ctx, options.Average, options.Display, calculationClass); err != nil {
 		return fail(err)
 	}
 	raw, err := environment.report.readSnapshot(ctx, contextID, plots, owner, tx,
-		options.Average, options.Display, options.ShowClass, 11)
+		options.Average, options.Display, calculationClass, 11)
 	if err != nil {
 		return fail(err)
 	}

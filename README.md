@@ -479,6 +479,36 @@ passes (root4202.938s), retaining1882 managed inputs/13 artifacts, discovery,
 canonical/protected assets and both closed native families. This adds no export
 service, UI, saved-option authority or public availability.
 
+An independently default-off inspection workbook now adds strict explicit-option
+review and checked no-replace publication around that input. Approval includes
+complete physical inputs, not just visible cells. It preserves committed output
+receipts after post-publication drift/cleanup failures and refuses saved quality
+enforcement even when the legacy preview quality flag is off. Coupled backend
+races, vet and production compile pass; independent backend review found no
+significant issues. Service registration, interface bindings and a gated client
+panel are now implemented; 196 related client tests and Svelte types pass.
+Client review, private production-profile build and disposable Wails acceptance
+now pass; full race integration passes (root4580.720s), preserving1893 managed
+inputs/23 artifacts, discovery, protected assets and four closed native families.
+This does not promote default
+availability or the original Report action.
+The first actual Wails candidate exposed retained Show=1 being passed to the
+legacy class-only calculator for Cover display6. It was normally closed with
+zero publications and all16 fixture files unchanged. The inspection adapter now
+retains that explicit option in approval but omits it from calculations where
+Access ignores it; the old class-only API remains strict. The96-case option
+matrix and publisher regressions pass. The replacement was independently
+reviewed and actually published/reopened both workbook modes with exact hashes
+and a formula-safe title. Native checks cover five real app remounts, four exact
+close-cancellation acknowledgements, correction/Undo, lost publication
+acknowledgement, independent backend refusal and responsive controls/paths at
+three widths. All16 fixture data/config/audit files remained byte-identical.
+Its scope is literal export of explicit read-only inspection, not original
+`NewShortVeg` orchestration or saved callbacks/ancillary sheets/printing.
+The original Report-click assigns `sysCreateReportSummary` before invoking
+`NewShortVeg`; `BuildReport` consumes it. Its summary worksheet remains an
+original-workflow requirement despite the unused module-local `CreateSummary`.
+
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus
 87.8 MB for the same stripped frontend build. Sample native startup and first

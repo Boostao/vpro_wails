@@ -218,10 +218,75 @@ Fresh full race passes in4248.937s (root4202.938s), retaining all1882 inputs/13
 artifacts, discovery, canonical/protected assets and both closed native families.
 Private receipt `summary-workbook-owned-source-integration/receipt.json`, SHA256
 `3da48d96cc346b74557d66cab925a3b28fee8710ae36bdb9ee5af3cf6118f1d6`.
-This accepts the private reader/caller preservation for coherent publication,
+Published as `32ed733` on clean `main`; this accepts private reader/caller preservation,
 not saved effects, output authority, a new native/public workflow or whole
 formatted Summary. Next safe seam remains owned review/publication with explicit
 source-option admission and client lifecycle/receipt acceptance.
+
+## Accepted default-off Summary inspection publisher
+
+Strict explicit title/average/display/class/includeEnv options now wrap the
+accepted source, complete physical-input approval and checked no-replace XLSX
+publication. Postcommit drift/cancellation/cleanup preserve the output receipt
+and warn against replay. Saved quality enforcement is independently refused.
+Coupled backend races76.922s, vet5.516s and production13.031s pass.
+Reviewer c1b9d3de independently verified the exact nine-path scope, all hashes
+and exact command/exit associations; no significant findings. The first compile caught an unused import;
+the first publication assertion incorrectly expected a short Windows path alias
+instead of the publisher's canonical path. Tests now separately require the
+literal requested path and actual same-file ownership; application semantics
+were not weakened. Registration, interface bindings and a gated frontend panel
+are implemented. Explicit-option environmental validation shares the existing
+validator without widening the legacy1/6/0 entrypoint. 196 related client tests
+and Svelte types pass. An initial mixed SSR/client runner used browser module
+conditions and failed11 SSR lifecycle cases; the correct default-condition
+runner passes all196. The dedicated browser-runtime selector also passes.
+Frontend drafts/errors and irreversible receipts persist independently; the
+combined root Summary barrier covers both workbook families, including an
+unmounted validation/publication hold. Client review, private production-profile
+build, actual Wails lifecycle/output acceptance and full integration pass.
+No default/public promotion is accepted.
+First actual Wails candidate was normally closed/rejected: the fixture's saved
+group14 correctly disabled Layer output, so the harness first needed Layer11.
+Its subsequent Cover6/retained Show1 request then exposed a real adapter bug:
+legacy class-only calculation was selected. No export was dispatched; all16
+fixture files/config/audits remained byte-identical. Native request/error and
+cleanup receipts are retained under the rejected candidate directory.
+The inspection adapter now validates retained Show separately, uses class
+selection only for displays4/5 and binds every raw explicit option in approval
+domainv2. Legacy PreviewClass still rejects nonclass displays.96 option cases
+and publisher regressions pass20.469s; an earlier matrix run caught the raw
+pre-validation guard still preceding adaptation and is failed evidence.
+Replacement25-path formal checks pass:196 related tests12.781s,12 browser cases
+1.781s, check28.078s, opted-in build7.297s, coupled races84.687s, vet5.016s and
+production10.422s. Reviewer c1b9d3de focused follow-up independently matched all
+source/log/runner/binary/assets and found no significant issues.
+Actual replacement Wails publishes/reopens both workbook modes with exact
+hashes/literal formula-safe title. Private entry-only remount instrumentation
+leaves production components unchanged and proves five actual remounts across
+held validation/publication, invalid drafts, unknown outcomes and read errors.
+Four native-close requests each wait for a fresh actual CancelClose response
+and exact closing message before barrier correction/release.30 control/plan/
+unknown-receipt measurements pass actual visibility, viewport intersection,
+containment and labels at1400/760/420. Backend-off native refusal dispatches
+zero publications. Three explicit workbook files are retained; no publication
+was replayed. Every phase normally closes and all16 fixture data/config/audit
+files remain byte-identical. The original rejected and replacement families
+are sealed164 files with four closed owners. Fresh full race integration accepts
+exit0 in4632.360s (root4580.720s), UTC2026-10-17T00:39:30.936382 to
+01:56:43.304389. All1893 managed inputs/23 artifacts, discovery,
+canonical/protected assets and four closed native families match.
+Private `summary-draft-workbook-integration/receipt.json` SHA256:
+`fb7771f373cfaaf54a14d12c83ea1a057295cd93df480bee769d451fe3e3449c`.
+The integration freeze is released; no original NewShortVeg/printing parity follows.
+This is explicitly a read-only inspection workbook, not `NewShortVeg` itself:
+active attribute-description preflight and ancillary quality/SU sheets remain
+out of scope along with saved report callbacks, original formatting and printing.
+Next source work must follow the original Report-click: it sets the global
+`sysCreateReportSummary` consumed by BuildReport and selects the effective
+variant/lump table. An unused local does not make those form paths dormant.
+Private `summary-original-report-source-reconnaissance.json` records the static
+trace, physical schema and reusable helpers without running Access.
 
 Full integration on this VM: `go test -race -timeout 120m ./...`.
 For isolated Go overlays use `GODEBUG=goindex=0` and verify exact embed discovery.

@@ -11,6 +11,7 @@
   import SummaryVegetationFieldList from './SummaryVegetationFieldList.svelte';
   import { summaryVegetationFieldListDesktop } from './summaryVegetationFieldListDesktop';
   import SummaryVegetationEnvironmental from './SummaryVegetationEnvironmental.svelte';
+  import SummaryVegetationWorkbookPanel from './SummaryVegetationWorkbookPanel.svelte';
   import { summaryEnvironmentalDesktop, summaryEnvironmentalEnabled, summaryEnvironmentalNumericEnabled, summaryEnvironmentalLifeformEnabled, summaryEnvironmentalPort } from './summaryVegetationEnvironmentalDesktop';
   import type { SummaryEnvironmentalSession, SummaryEnvironmentalNumericSession, SummaryEnvironmentalLifeformSession } from './summaryVegetationEnvironmental';
 
@@ -23,7 +24,8 @@
   function ownedContext() { return { contextId, project, projectPath, su, suPath }; }
   const session = summaryVegetationSession(ownedContext());
   let environmentalHeld = $state(false);
-  const operationHeld = $derived(operationHeldProp || environmentalHeld);
+  let workbookHeld = $state(false);
+  const operationHeld = $derived(operationHeldProp || environmentalHeld || workbookHeld);
   let environmentalSession = $state.raw<SummaryEnvironmentalSession | SummaryEnvironmentalNumericSession | SummaryEnvironmentalLifeformSession | null>(null);
   let environmentalError = $state('');
   if (summaryEnvironmentalEnabled) {
@@ -61,7 +63,7 @@
     onBusyChange(viewState.busy || (!preferences && !!viewState.draftError) || preferenceReadBusy ||
       !!preferenceView && (preferenceView.busy || preferenceView.blocked || !!preferenceView.draftError) ||
       qualityReadBusy || !!qualityView && (qualityView.busy || qualityView.blocked || !!qualityView.draftError) ||
-      presentationReadBusy || !!presentationView && (presentationView.busy || presentationView.blocked || !!presentationView.draftError) || fieldListHeld || environmentalHeld);
+      presentationReadBusy || !!presentationView && (presentationView.busy || presentationView.blocked || !!presentationView.draftError) || fieldListHeld || environmentalHeld || workbookHeld);
   }
   const unsubscribe = session.subscribe(() => { viewState = session.view(); reportBusy(); });
   const unsubscribeEnvironment = summaryEnvironmentalEnabled ? summaryEnvironmentalDesktop.subscribe(() => {
@@ -306,10 +308,18 @@
   {#if environmentalError}<p role="alert">{environmentalError}</p>{/if}
   {#if environmentalSession}
     <SummaryVegetationEnvironmental session={environmentalSession} port={summaryEnvironmentalPort} numeric={summaryEnvironmentalNumericEnabled} lifeform={summaryEnvironmentalLifeformEnabled}
-      operationHeld={operationHeldProp || unavailableScope || viewState.busy || fieldListHeld ||
+      operationHeld={operationHeldProp || workbookHeld || unavailableScope || viewState.busy || fieldListHeld ||
         preferenceHeld || preferenceInvalid || !!viewState.draftError || qualityMutationHeld || qualityUnavailable ||
         presentationMutationHeld || presentationInvalid}
       onBusyChange={() => { environmentalHeld = summaryEnvironmentalDesktop.activity().busy; reportBusy(); }} />
+  {/if}
+  {#if import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK === 'true'}
+    <SummaryVegetationWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }}
+      calculation={{ average: viewState.average, display: viewState.display, showClass: viewState.showClass }}
+      disabled={operationHeldProp || environmentalHeld || unavailableScope || viewState.groupAndOrder !== 11 ||
+        viewState.busy || fieldListHeld || preferenceHeld || preferenceInvalid || !!viewState.draftError ||
+        qualityMutationHeld || qualityUnavailable || presentationMutationHeld || presentationInvalid}
+      onBusyChange={(held) => { workbookHeld = held; reportBusy(); }} />
   {/if}
   <div class="actions">
     <button onclick={() => session.show(port)} disabled={!enabled || unavailableScope || viewState.busy || operationHeld || fieldListHeld || preferenceHeld || preferenceInvalid ||
@@ -322,7 +332,8 @@
     Stored presentation drafts are separate and are not consumed by this raw crosstab preview.
     Unlumped, no quality filtering, English/guide names, environment headers or constancy.
     Strata and Lifeform Presence Class and Significance Class remain unavailable because the original grouped query has a criteria type mismatch.
-    Other groupings, report units, workbook output and printing are unavailable.</p>
+    Other groupings, report units, original formatted workbook output and printing are unavailable.
+    A separately gated draft Layer inspection workbook is distinct from that Report action.</p>
   <p>The source “% Presence” display uses Count/nPlots ratios (0.75), not ratio × 100. Cover cells preserve source formatted text and NULL blanks.
     Profile navigation does not filter the current physical Site Unit Table.</p>
   {#if viewState.preview && !qualityUnavailable}

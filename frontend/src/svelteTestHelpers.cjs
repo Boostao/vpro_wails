@@ -66,6 +66,9 @@ function serverComponent(source, filename, dependencies, environment = {}) {
       if (name === './summaryVegetationEnvironmentalDesktop' && environment.VITE_SUMMARY_VEGETATION_ENVIRONMENT !== 'true') {
         return { summaryEnvironmentalEnabled: false, summaryEnvironmentalDesktop: {}, summaryEnvironmentalPort: {} };
       }
+      if (name === './SummaryVegetationWorkbookPanel.svelte' && environment.VITE_SUMMARY_VEGETATION_WORKBOOK !== 'true') {
+        return { default: () => { throw new Error('Inspection workbook rendered while its explicit test profile is disabled.'); } };
+      }
       if (name === './SummaryVegetationEnvironmental.svelte') return { default: serverComponent(
         readFileSync(path.join(__dirname, 'SummaryVegetationEnvironmental.svelte'), 'utf8'),
         'SummaryVegetationEnvironmental.svelte', dependencies, environment) };

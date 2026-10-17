@@ -42,6 +42,7 @@
   import { lifeformWorkbookPublicationSession } from './lifeformWorkbook';
   import { siteUnitSummaryWorkbookPublicationSession } from './siteUnitSummaryWorkbook';
   import { extendedSummaryWorkbookPublicationSession } from './siteUnitSummaryExtendedWorkbook';
+  import { summaryVegetationWorkbookSession } from './summaryVegetationWorkbook';
   import { subscribePictureCreationActivity } from './pictureCreationSessions';
   import { subscribePictureLifecycleActivity } from './pictureLifecycleSessions';
   import { subscribeTwoPageSoilActivity } from './twoPageSoilSessions';
@@ -192,7 +193,9 @@
   let archivePublicationBusy = $state(false);
   let vegetationPublicationBusy = $state(false);
   let lifeformPublicationBusy = $state(false);
-  let summaryPublicationBusy = $state(false);
+  let summaryEnvironmentPublicationBusy = $state(false);
+  let summaryVegetationPublicationBusy = $state(false);
+  const summaryPublicationBusy = $derived(summaryEnvironmentPublicationBusy || summaryVegetationPublicationBusy);
   $effect(() => {
     const state = $projectState;
     if (import.meta.env.VITE_LONG_VEGETATION_WORKBOOK !== 'true' || import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'true' ||
@@ -235,7 +238,7 @@
     const state = $projectState;
     if ((import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'true' && import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'true') ||
         import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'true' ||
-        !state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryPublicationBusy = false; return; }
+        !state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryEnvironmentPublicationBusy = false; return; }
     const owner = { contextId: state.contextId, project: state.activeProject,
       projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath };
     const sessions: Array<ReturnType<typeof siteUnitSummaryWorkbookPublicationSession> |
@@ -245,11 +248,22 @@
     const update = () => {
       const states = sessions.map(session => session.view());
       const publication = { busy: states.some(state => state.busy), blocked: states.some(state => state.blocked) };
-      summaryPublicationBusy = publication.busy || publication.blocked;
+      summaryEnvironmentPublicationBusy = publication.busy || publication.blocked;
       if (publication.blocked && view === 'home') view = 'summary-environment';
     };
     const unsubscribe = sessions.map(session => session.subscribe(update));
     return () => { for (const stop of unsubscribe) stop(); };
+  });
+  $effect(() => {
+    const state = $projectState;
+    if (import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK !== 'true' || import.meta.env.VITE_SUMMARY_VEGETATION !== 'true' ||
+        !state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryVegetationPublicationBusy = false; return; }
+    const session = summaryVegetationWorkbookSession({ contextId: state.contextId, project: state.activeProject,
+      projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath });
+    return session.subscribe(() => {
+      summaryVegetationPublicationBusy = session.held();
+      if (session.held() && view === 'home') view = 'summary-vegetation';
+    });
   });
   let editor: {
     getCloseState: () => EditorCloseState; saveForClose: () => Promise<boolean>;

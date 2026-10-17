@@ -1027,6 +1027,43 @@ Fresh full integration passes in4248.937s (root4202.938s), retaining1882 managed
 inputs/13 artifacts, discovery, canonical/protected assets and both closed
 native families. There is no registered service, UI, preference-policy or
 public/native output promotion.
+The private reader is published as `32ed733`. The accepted default-off backend/client
+workflow wraps it with strict explicit options, complete physical-input
+approval and checked no-replace XLSX publication. Source drift invalidates
+approval even when visible workbook bytes stay identical; postcommit failures
+retain the irreversible receipt. Saved quality enforcement is refused regardless
+of the legacy preview gate. Coupled backend races76.922s, vet and production
+compile pass; exact-scope independent backend review found no significant issues.
+Service registration/interface bindings and client draft/review/publication
+barriers are implemented. 196 related client tests and Svelte types pass;
+client review, private production build and actual Wails acceptance now pass;
+full integration passes. No default/public promotion is accepted.
+First Wails candidate rejected before publication: retained Show1/display6
+reached the strict class-only calculator. All16 fixture files remained unchanged
+after normal shutdown. New inspection-only adaptation preserves raw Show in
+the approval while using no class calculation for displays1,2,3,6; original
+class-only consumers are not widened.96 option combinations plus publisher
+regressions pass20.469s. Replacement25-path formal checks and focused independent
+review follow-up pass, including196 related client tests,12 browser-runtime
+tests, check/build, coupled Go races84.687s and vet/production. Real Wails
+publishes/reopens both modes with exact hashes and literal title, preserves
+errors/receipts through five actual remounts, rejects close with four exact
+CancelClose witnesses and refuses the independent disabled backend.30 responsive
+measurements cover actual visibility/viewport/containment at1400/760/420.
+No publication was replayed; all16 physical fixture/config/audit files remain
+unchanged. A private entry-only seam permits the held-validation/publication
+remount checks without changing production components. Closed failed and
+replacement candidates are preserved. Fresh full race integration passes exit0
+in4632.360s (root4580.720s), retaining1893 managed inputs/23 artifacts, discovery,
+canonical/protected assets and four closed native families.
+This is an explicit read-only inspection export, not original `NewShortVeg`:
+its active attribute-description preflight and ancillary quality/SU sheets are
+not implemented. Although `CreateSummary` is unused locally, the original
+Report-click sets `sysCreateReportSummary` and `BuildReport` consumes that global.
+The original summary worksheet and combine-variants/lump callback effects remain
+requirements for the full Report action, not effects of this inspection export.
+Normal layer
+group11 does not use the historical value limit.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test:summary-workbook": "node --conditions=browser --test src/summaryVegetationWorkbook.test.cjs src/summaryVegetationEnvironmentalLifeformPreview.test.cjs src/summaryVegetationEnvironmentalPanel.test.cjs src/siteUnitSummaryWorkbookIntegration.test.cjs",
     "test:summary-environment": "node --conditions=browser --test src/summaryVegetationEnvironmental.test.cjs src/summaryVegetationEnvironmentalPanel.test.cjs src/summaryVegetationEnvironmentalNumeric.test.cjs src/summaryVegetationEnvironmentalNumericPreview.test.cjs src/summaryVegetationEnvironmentalLifeformPreview.test.cjs src/summaryVegetationEnvironmentalCanonical.test.cjs src/DemoReadiness.test.cjs",
     "test:summary-field-list": "node --conditions=browser --test src/summaryVegetationFieldList.test.cjs src/summaryVegetationFieldListPane.test.cjs src/summaryVegetationFieldListDesktop.test.cjs",
     "dev": "vite",

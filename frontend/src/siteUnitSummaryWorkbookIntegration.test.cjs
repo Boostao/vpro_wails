@@ -17,7 +17,7 @@ test('actual top-level Summary authority effect subscribes and reopens a retaine
   for (const enabled of [true, false]) for (const blocked of [true, false]) {
     let subscribed = 0, unsubscribed = 0, owner;
     const context = vm.createContext({
-      summaryPublicationBusy: false, view: 'home',
+      summaryEnvironmentPublicationBusy: false, view: 'home',
       $projectState: { contextId: 'owned', activeProject: 'Sample', projectPath: 'C:\\Sample.db',
         activeSU: 'Summary', suPath: 'C:\\external.db' },
       $effect(run) { this.cleanup = run(); },
@@ -35,7 +35,7 @@ test('actual top-level Summary authority effect subscribes and reopens a retaine
       .replaceAll("import.meta.env.VITE_SITE_UNIT_SUMMARY", "'true'");
     vm.runInContext(ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText, context);
     assert.equal(subscribed, enabled ? 1 : 0);
-    assert.equal(context.summaryPublicationBusy, enabled);
+    assert.equal(context.summaryEnvironmentPublicationBusy, enabled);
     assert.equal(context.view, enabled && blocked ? 'summary-environment' : 'home');
     if (enabled) {
       assert.equal(owner.contextId, 'owned'); assert.equal(owner.suPath, 'C:\\external.db');
@@ -112,7 +112,8 @@ test('Summary root and parent wire independent default-off gates and persistent 
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const parent = readFileSync(path.join(__dirname, 'SiteUnitSummary.svelte'), 'utf8');
   assert.match(app, /VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'true' && import\.meta\.env\.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'true'/);
-  assert.match(app, /summaryPublicationBusy = publication.busy \|\| publication.blocked/);
+  assert.match(app, /summaryEnvironmentPublicationBusy = publication.busy \|\| publication.blocked/);
+  assert.match(app, /summaryPublicationBusy = \$derived\(summaryEnvironmentPublicationBusy \|\| summaryVegetationPublicationBusy\)/);
   assert.match(app, /publication.blocked && view === 'home'\) view = 'summary-environment'/);
   assert.match(parent, /VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'true'/);
   assert.match(parent, /<SiteUnitSummaryWorkbookPanel owner=\{\{ contextId, project, projectPath, su, suPath \}\} \{method\}/);

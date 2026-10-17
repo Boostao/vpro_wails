@@ -6,6 +6,34 @@ private Access copies, native binaries, closed project data, screenshots and
 WebView profiles are deliberately retained outside Git. A hash identifies a
 receipt but does not independently reproduce its native run.
 
+## Summary inspection workbook
+
+The independently default-off [inspection workflow](LONG_VEGETATION_WORKBOOK_CONTRACT.md#default-off-accepted-inspection-workbook)
+has backend/client review and substantive focused follow-up with no significant
+findings. Replacement validation passes196 related tests,12 browser-runtime
+tests, Svelte check, opted-in Vite build, coupled Go races, vet and production
+Wails compilation. The rejected initial native candidate remains rejected.
+
+Actual Wails qualifies both workbook modes with independently reopened exact
+bytes, five real remounts, four fresh close-cancellation acknowledgements,
+retained validation/unknown publication evidence, independent backend refusal
+and30 labelled visibility/viewport/containment observations at1400/760/420.
+Three explicit workbooks were published without replay; all16 fixture/config/
+audit files remain exact per phase. Four owned native processes normally closed.
+
+Fresh `go test -race -count=1 -timeout 120m ./...` passes exit0:
+UTC2026-10-17T00:39:30.936382 to01:56:43.304389,4632.360s total,
+root4580.720s. It preserves1893 managed inputs/23 artifacts, package/embed
+discovery, canonical/protected assets and four closed native families.
+Private `summary-draft-workbook-integration/receipt.json` SHA256:
+`fb7771f373cfaaf54a14d12c83ea1a057295cd93df480bee769d451fe3e3449c`.
+Post-integration edits reconcile documentation only.
+
+This is literal read-only inspection output, not the original Report action.
+Active form callbacks, attribute-description preflight, ancillary sheets and
+original formatting/printing remain unfinished. Default availability and the
+immutable delivered demo/release are not changed by this acceptance.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

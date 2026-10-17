@@ -2532,6 +2532,26 @@ export interface SummaryVegetationWitness {
     "cover": ProjectMetadataCell;
 }
 
+export interface SummaryVegetationWorkbookOptions {
+    "title": string;
+    "average": number;
+    "display": number;
+    "showClass": number;
+    "includeEnv": boolean;
+}
+
+export interface SummaryVegetationWorkbookReview {
+    "preview": SummaryVegetationPreview;
+    "environment": SummaryVegetationEnvironmentalLifeformPreview | null;
+    "options": SummaryVegetationWorkbookOptions;
+    "scope": string;
+    "sheet": string;
+    "firstVegetationRow": number;
+    "approvalHash": string;
+    "workbookSHA256": string;
+    "bytes": number;
+}
+
 export interface TableCSVArchiveOutcome {
     "status": string;
     "requestedDestination": string;

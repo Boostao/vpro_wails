@@ -68,6 +68,7 @@ import * as SummaryVegetationPreferencesService from "./summaryvegetationprefere
 import * as SummaryVegetationPresentationPreferencesService from "./summaryvegetationpresentationpreferencesservice.js";
 import * as SummaryVegetationQualityPreferencesService from "./summaryvegetationqualitypreferencesservice.js";
 import * as SummaryVegetationService from "./summaryvegetationservice.js";
+import * as SummaryVegetationWorkbookService from "./summaryvegetationworkbookservice.js";
 import * as TableCSVArchiveService from "./tablecsvarchiveservice.js";
 import * as TwoPageEnvironmentTableService from "./twopageenvironmenttableservice.js";
 import * as TwoPageGoogleEarthService from "./twopagegoogleearthservice.js";
@@ -152,6 +153,7 @@ export {
     SummaryVegetationPresentationPreferencesService,
     SummaryVegetationQualityPreferencesService,
     SummaryVegetationService,
+    SummaryVegetationWorkbookService,
     TableCSVArchiveService,
     TwoPageEnvironmentTableService,
     TwoPageGoogleEarthService,
@@ -481,6 +483,8 @@ export type {
     SummaryVegetationRow,
     SummaryVegetationUnit,
     SummaryVegetationWitness,
+    SummaryVegetationWorkbookOptions,
+    SummaryVegetationWorkbookReview,
     TableCSVArchiveOutcome,
     TableCSVArchiveReview,
     TableCSVDescription,
