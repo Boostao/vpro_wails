@@ -1105,6 +1105,17 @@ All16 fixture files remain exact. Full race passes exit0 in4438.094s
 canonical/protected data and six closed native families. Both flags stay default-off.
 Grouped12/13/14 and original callback/quality/lump/constancy/formatting/printing
 gaps remain separate; this inspection does not expand accepted demo availability.
+The accepted private grouped-body prerequisite reuses the renderer for accepted
+normal-SU Group12/13/14 previews, with exact group/Order metadata and source row
+ordering. Display6 alone retains real Order in its explicit body column; legacy
+rendering keeps real-value refusal. Independent source rows, owned preview modes,
+environmental placement, provenance, cancellation and byte-exact legacy output
+pass112 independent source-layout/224 owned renders and86 exact legacy vectors.
+Coupled race152.562s, vet9.625s and production12.906s pass; distinct review finds
+no significant issues. Full race accepts exit0 in4712.235s (root4694.637s),
+preserving1907 inputs/142 artifacts, discovery, canonical/protected assets and
+six closed native families. No grouped references, ancillary routing, public transport/UI/
+flags or original Report/default/demo promotion is included.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

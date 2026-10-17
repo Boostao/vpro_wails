@@ -37,7 +37,19 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 	if err := validateSummaryVegetationDisplayOptions(ctx, preview.Average, preview.Display, preview.ShowClass); err != nil {
 		return fail(err)
 	}
+	grouped := preview.Source == "literal-normal-su-grouped"
+	groupLabel := "Layer"
+	if grouped {
+		var err error
+		groupLabel, err = summaryVegetationWorkbookGroup(ctx, preview)
+		if err != nil {
+			return fail(err)
+		}
+	}
 	source, ordering, common := "literal-normal-su-layer", "literal-null-first-layer-species", false
+	if grouped {
+		source, ordering = "literal-normal-su-grouped", "literal-null-first-group-species"
+	}
 	if reference := preview.References; reference != nil {
 		source = "literal-normal-su-effective-references"
 		common = reference.ShowCommon
@@ -56,10 +68,10 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 	if preview.ContextID == "" || preview.ProjectPath == "" || preview.SUPath == "" || preview.Project == "" ||
 		preview.SU == "" || preview.SU == "None" || preview.SU == "USysSuTableDynamic" ||
 		preview.Source != source || preview.Ordering != ordering ||
-		(preview.GroupAndOrder != 0 && preview.GroupAndOrder != 11) || preview.GroupField != nil || preview.OrderField != nil ||
+		!grouped && ((preview.GroupAndOrder != 0 && preview.GroupAndOrder != 11) || preview.GroupField != nil || preview.OrderField != nil) ||
 		len(preview.Units) == 0 || len(preview.Units) > 250 || len(preview.Rows) == 0 || len(preview.Memberships) == 0 ||
 		len(preview.Columns) != len(preview.Units) {
-		return fail(errors.New("Summary workbook requires a complete normal-SU layer preview with aligned units and nonempty vegetation"))
+		return fail(errors.New("Summary workbook requires a complete supported normal-SU preview with aligned units and nonempty vegetation"))
 	}
 	sheet, err := environmentWorkbookSheetName(preview.Project, 0)
 	if err != nil {
@@ -88,7 +100,7 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 	}
 	first, separator, headerRow := 6, 0, 5
 	leading := 3
-	labels := []string{"Layer", "Spp", "Order"}
+	labels := []string{groupLabel, "Spp", "Order"}
 	if common {
 		leading = 4
 		labels = []string{"Layer", "Spp", "Common Name", "Order"}
@@ -136,13 +148,25 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 			(row.CommonName != nil) != common {
 			return fail(errors.New("Summary workbook body requires distinct source-ordered groups and complete pivot values"))
 		}
+		if grouped {
+			if err := lifeformSummaryText(row.Layer, preview.GroupField.Size); err != nil {
+				return fail(fmt.Errorf("Summary workbook grouped row%d: %w", i+1, err))
+			}
+			if preview.GroupAndOrder == 14 && row.Layer.Storage != "null" {
+				return fail(errors.New("Summary workbook None grouping requires the original NULL group"))
+			}
+		}
 		values := []ProjectMetadataCell{row.Layer, row.Species}
 		if common {
 			values = append(values, *row.CommonName)
 		}
 		values = append(values, row.Order)
 		for column, cell := range append(values, row.Covers...) {
-			if cell.Storage != "text" && cell.Storage != "null" {
+			if grouped && preview.Display == 6 && column == 2 {
+				if cell.Storage != "real" {
+					return fail(fmt.Errorf("Summary workbook grouped row%d requires original DOUBLE Order", i+1))
+				}
+			} else if cell.Storage != "text" && cell.Storage != "null" {
 				return fail(fmt.Errorf("Summary workbook body row%d requires original text/NULL output, not scalar conversion", i+1))
 			}
 			if _, err := metadataCellValue(cell); err != nil {
@@ -160,12 +184,41 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 			}
 		}
 	}
+	realOrderFromRow := 0
+	if grouped && preview.Display == 6 {
+		realOrderFromRow = first
+	}
 	data, err := renderSummaryWorkbookWithSheets(ctx, provenance, summaryWorkbookLayout{
 		Sheet: sheet, Title: input.Title, LastRow: first + len(preview.Rows) - 1, LastColumn: leading + len(preview.Columns),
-		SeparatorRow: separator, ItalicFromRow: first, HeaderRows: []int{1, headerRow}, Cells: cells,
+		SeparatorRow: separator, ItalicFromRow: first, RealOrderFromRow: realOrderFromRow,
+		HeaderRows: []int{1, headerRow}, Cells: cells,
 	}, writeSheets)
 	if err != nil {
 		return fail(err)
 	}
 	return summaryVegetationWorkbook{Bytes: data, Sheet: sheet, FirstVegetationRow: first}, nil
+}
+
+func summaryVegetationWorkbookGroup(ctx context.Context, preview SummaryVegetationPreview) (string, error) {
+	if err := validateSummaryVegetationGroupedOptions(ctx, preview.Average, preview.GroupAndOrder, preview.Display, preview.ShowClass); err != nil {
+		return "", err
+	}
+	if preview.References != nil {
+		return "", errors.New("Summary grouped workbook effective references/common names are not qualified")
+	}
+	group := SummaryVegetationField{Name: "Layer", DAOType: 10, Size: 1}
+	switch preview.GroupAndOrder {
+	case 13:
+		group = SummaryVegetationField{Name: "LifeForm", DAOType: 10, Size: 3}
+	case 14:
+		group = SummaryVegetationField{Name: "Group", DAOType: 9}
+	}
+	order := SummaryVegetationField{Name: "Order", DAOType: 10}
+	if preview.Display == 6 {
+		order.DAOType, order.Size = 7, 8
+	}
+	if preview.GroupField == nil || *preview.GroupField != group || preview.OrderField == nil || *preview.OrderField != order {
+		return "", errors.New("Summary grouped workbook requires exact original group and Order metadata")
+	}
+	return group.Name, nil
 }

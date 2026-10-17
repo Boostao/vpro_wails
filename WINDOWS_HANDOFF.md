@@ -372,7 +372,10 @@ Fresh full race accepts exit0, UTC2026-10-17T09:09:51.353051 to10:23:49.445398,
 canonical/protected assets and six closed native families match. Private
 `summary-effective-reference-integration/receipt.json` SHA256:
 `37f53d95a90b77d16db216edb5545f6d6c113a9939990704af764ece1d49347c`.
-The freeze is released for directly related documentation and normal publication.
+The accepted slice is published as
+`635b60a1a82659154e4e92d30ccc97d18a92ff1c`, with clean exact remote main/0-0
+verified before continuation. Private `summary-effective-reference-publication.json`
+associates the exact commit/tree/staged diff with accepted integration.
 Do not modify sealed native families. Rejected setup/header/AST harness evidence
 is retained; completed publications were never replayed.
 The separate `VPRO_`/`VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES` flags remain
@@ -384,6 +387,29 @@ common names use default NULL CombinedEnglishName, not Definition. Group11/12
 split common names, but13/14 select First without that grouping; conflicting
 representatives remain unknown. Master Code/Codetype255 and staged Species8 are
 separate boundaries; preserve legacy16-bit readers while introducing master32.
+
+Current accepted prerequisite: private Group12/13/14 workbook body rendering,
+reusing accepted previews and the existing renderer. Exact source group/Order
+metadata, real Display6 Order only in its explicit body range, literal TEXT/NULL
+and complete provenance are required. Group12/13 Display2, grouped references/
+common/guide, ancillary routing, public transport/UI/flags and original Report
+promotion remain excluded. A development run rejected only an incorrect matrix
+count (112 source-layout renders, not124); no product correction was needed.
+Frozen validation accepts112 source-layout/224 owned renders, four source
+criteria refusals, typed/XML/binary64 transport, cancellation and determinism.
+Coupled race152.562s, vet9.625s and production12.906s pass.86 exact baseline
+vectors and package/embed discovery match. An initial private legacy harness
+incorrectly requested ancillary metadata for non-ancillary modes; rejected
+driver/output are retained and only the harness was corrected. Distinct review
+finds no significant issues. Fresh full race accepts exit0,
+UTC2026-10-17T10:42:56.940584 to12:01:29.173584,4712.235s/root4694.637s.
+All1907 managed inputs/142 artifacts, discovery,26 canonical/21 protected
+inputs and six closed native families match. Private
+`summary-grouped-workbook-integration/receipt.json` SHA256:
+`682f99b96c17c58a6c1f8bd166af3f7b7c89ff120b17e3ca09deb1d3bee03494`.
+The freeze is released for directly related documentation and normal publication.
+No new native owner or Access/Excel/clipboard operation is planned for this
+private renderer boundary. Existing six closed native families stay sealed.
 
 The bounded Excel/ADO control is stopped after two attempts; do not replay it.
 The first failed before CopyFromRecordset/clipboard Copy. The second completed

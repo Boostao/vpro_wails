@@ -544,6 +544,15 @@ files remain exact. Full race passes in4438.094s with1906 inputs/108 artifacts,
 discovery and six closed native families unchanged. Separate backend/frontend
 flags remain default-off; this is not additional demo or original Report acceptance.
 
+The accepted private prerequisite renders already-calibrated normal-SU Strata,
+Lifeform and None previews through that same workbook renderer. It retains exact
+group metadata and DOUBLE Order only for Display6; other body values stay
+TEXT/NULL. Group12/13 Display2 and all grouped common/guide references still
+refuse.112 independent source-layout renders/224 owned-mode renders,86 exact
+legacy comparisons, coupled race/vet/production and distinct review pass. Full
+race passes in4712.235s with1907 inputs/142 artifacts and six closed native
+families unchanged. No transport, UI, flag or delivered-demo availability changes.
+
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus
 87.8 MB for the same stripped frontend build. Sample native startup and first

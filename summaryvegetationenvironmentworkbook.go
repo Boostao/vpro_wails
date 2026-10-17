@@ -30,6 +30,7 @@ type summaryWorkbookLayout struct {
 	Sheet, Title                string
 	LastRow, LastColumn         int
 	SeparatorRow, ItalicFromRow int
+	RealOrderFromRow            int
 	HeaderRows                  []int
 	Cells                       []summaryEnvironmentalHeaderCell
 }
@@ -68,6 +69,10 @@ func renderSummaryWorkbookWithSheets(ctx context.Context, input any, layout summ
 	}
 	if layout.LastRow < 1 || layout.LastRow > 32767 || layout.LastColumn < 1 || layout.LastColumn > 254 {
 		return nil, errors.New("Summary workbook layout exceeds the qualified source frame")
+	}
+	if layout.RealOrderFromRow < 0 || layout.RealOrderFromRow > layout.LastRow ||
+		layout.RealOrderFromRow > 0 && layout.LastColumn < 3 {
+		return nil, errors.New("Summary workbook real Order range is outside the qualified frame")
 	}
 	if err := reportWorkbookSourceValue(reflect.ValueOf(input), func(cell ProjectMetadataCell) error {
 		_, err := metadataCellValue(cell)
@@ -184,6 +189,13 @@ func renderSummaryWorkbookWithSheets(ctx context.Context, input any, layout summ
 					return result, fmt.Errorf("Summary environmental workbook %s integer exceeds Excel's fifteen-digit precision; no rounding", address)
 				}
 				if err := book.SetCellInt(sheet, address, value); err != nil {
+					return result, err
+				}
+			case "real":
+				if layout.RealOrderFromRow == 0 || placed.Row < layout.RealOrderFromRow || placed.Column != 3 {
+					return result, fmt.Errorf("Summary workbook %s real values require the explicit grouped Order range", address)
+				}
+				if err := book.SetCellFloat(sheet, address, *cell.Real, -1, 64); err != nil {
 					return result, err
 				}
 			default:

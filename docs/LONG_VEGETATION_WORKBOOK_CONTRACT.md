@@ -2473,6 +2473,33 @@ canonical/protected data and six closed native families unchanged. See the
 No physical reference mutation, original quality/lumping/callback/constancy/
 Excel/printing, default or delivered-demo promotion is granted.
 
+### Private accepted grouped workbook body
+
+This private prerequisite reuses the same renderer for already-calibrated
+normal-SU Group12/13/14 previews. Original query group names/types remain Layer/
+TEXT1, LifeForm/TEXT3 and Group/NULL BINARY9. Display6 Order remains DOUBLE7/8;
+the other supported displays retain their original TEXT10/0 Order, including
+the late class override. The body preserves nullable groups, literal ordering,
+leading-zero labels, TEXT covers, complete input/provenance and environmental
+placement. Only an explicit grouped body Order range permits visible REAL cells;
+all previous callers retain their real-value refusal. This is typed inspection,
+not original Excel CopyFromRecordset coercion or formatting.
+
+The existing original source fixtures supply independent expected fields/rows.
+Owned managed/external previews, reopened cell/XML types, finite binary64
+transport, cancellation/no partial output, input immutability, deterministic
+bytes and exact legacy output pass112 source-layout/224 owned renders, four
+source refusals and86 byte-exact baseline vectors. Coupled race152.562s,
+vet9.625s and production12.906s pass. Distinct review finds no significant issues.
+Full race accepts exit0 in4712.235s with1907 inputs/142 artifacts, discovery,
+canonical/protected data and six closed native families unchanged. See the
+[evidence summary](MIGRATION_EVIDENCE.md#accepted-private-grouped-workbook-body).
+No new service/options/bindings/
+flags/UI, grouped effective references/common/guide, ancillary routing, original
+Report/callback/quality/lump/constancy/printing or default/demo change is included.
+Group12/13 Display2 retains its source criteria-type failure. Group13/14 common
+First selection remains unknown rather than synthesized.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

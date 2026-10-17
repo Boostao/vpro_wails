@@ -160,6 +160,34 @@ Private `summary-effective-reference-integration/receipt.json` SHA256:
 Only directly related documentation is reconciled after integration. Separate
 flags remain default-off; the immutable demo and clipboard unknown are unchanged.
 
+## Accepted private grouped workbook body
+
+The [private renderer contract](LONG_VEGETATION_WORKBOOK_CONTRACT.md#private-accepted-grouped-workbook-body)
+consumes accepted Group12/13/14 previews without exposing new options. Expected
+rows/DAO fields come directly from the existing independently sealed original
+source fixtures, not from recomputing test expectations with the renderer.
+Managed/external preview combinations and standalone/environmental layouts are
+covered separately. A development run rejected an assumed124 source-layout
+count; all individual cases passed and the actual112 count was corrected.
+Frozen validation accepts112 independent source-layout renders,224 owned-mode
+renders and four original criteria refusals. Reopened XML verifies DOUBLE Order
+bits, including adjacent binary64/negative zero; text, NULL, formulas/provenance,
+width/ref permission, immutability/determinism and late cancellation are checked.
+Coupled race152.562s, vet9.625s and production12.906s pass.86 exact baseline
+vectors preserve ordinary, ancillary and eight effective-reference modes with
+identical package/embed discovery. The rejected initial private legacy probe
+called ancillary metadata review without selecting ancillary mode; its driver/
+output remain retained and only the harness was corrected. Distinct exact
+nine-path review reports no significant issues; no product change follows.
+
+Full race accepts exit0, UTC2026-10-17T10:42:56.940584 to12:01:29.173584,
+4712.235s total/root4694.637s. All1907 managed inputs/142 artifacts, discovery,
+26 canonical inputs/21 protected assets and six closed native families match.
+Private `summary-grouped-workbook-integration/receipt.json` SHA256:
+`682f99b96c17c58a6c1f8bd166af3f7b7c89ff120b17e3ca09deb1d3bee03494`.
+Only directly related documentation changes after integration. No new native
+availability or original Report acceptance is claimed.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)
