@@ -16,6 +16,7 @@ export const summaryVegetationEffectiveAncillaryScope = 'Explicit read-only norm
 export const summaryVegetationGroupedWorkbookScope = 'Explicit read-only normal-SU Strata/Lifeform/None inspection; typed XLSX, not grouped common/guide references, ancillary worksheets, original Report callbacks or formatting/printing parity';
 export const summaryVegetationStrataReferencesScope = 'Explicit read-only normal-SU Strata effective-reference inspection; typed XLSX, not Lifeform/None common names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity';
 export const summaryVegetationGroupedAttributesScope = 'Explicit read-only normal-SU Lifeform/None effective-attribute inspection; typed XLSX, no common/guide names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity';
+export const summaryVegetationGroupedAncillaryScope = 'Explicit read-only normal-SU Strata/Lifeform/None inspection with optional effective references, SU Table and optional ReportSummary; typed XLSX, no Lifeform/None common names, original Report callbacks or formatting/printing parity';
 type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references' | 'groupAndOrder'> & {
   references?: SummaryVegetationReferenceMode; groupAndOrder?: number;
 };
@@ -57,8 +58,7 @@ function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
   const result: SummaryVegetationWorkbookOptions = { title: value.title, average: value.average, display: value.display,
     showClass: value.showClass, includeEnv: value.includeEnv };
   if (Object.hasOwn(value, 'groupAndOrder')) {
-    if (value.groupAndOrder !== 12 && value.groupAndOrder !== 13 && value.groupAndOrder !== 14 ||
-        Object.hasOwn(value, 'ancillary')) reject();
+    if (value.groupAndOrder !== 12 && value.groupAndOrder !== 13 && value.groupAndOrder !== 14) reject();
     result.groupAndOrder = value.groupAndOrder;
   }
   if (summaryVegetationOptionError(value.average, value.display, value.showClass, result.groupAndOrder ?? 11)) reject();
@@ -138,7 +138,8 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
   if (!current()) return null;
   const options = optionsValue(requested);
   const scope = options.groupAndOrder !== undefined
-    ? options.references ? options.groupAndOrder === 12 ? summaryVegetationStrataReferencesScope :
+    ? options.ancillary ? summaryVegetationGroupedAncillaryScope :
+      options.references ? options.groupAndOrder === 12 ? summaryVegetationStrataReferencesScope :
       summaryVegetationGroupedAttributesScope : summaryVegetationGroupedWorkbookScope : options.references
     ? options.ancillary ? summaryVegetationEffectiveAncillaryScope : summaryVegetationEffectiveReferencesScope
     : options.ancillary ? summaryVegetationAncillaryWorkbookScope : summaryVegetationWorkbookScope;

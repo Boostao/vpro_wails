@@ -130,13 +130,16 @@ func TestSummaryGroupedAttributeWorkbookIndependentGatesAndUnavailableNames(t *t
 				}
 			}
 		}
+		service.ancillaryEnabled = false
 		for _, summary := range []bool{false, true} {
 			changed := options
 			changed.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{CreateSummary: summary}
-			if review, err := service.GetReview(t.Context(), state.ContextID, workbookRequest(t, changed)); err == nil || review != nil {
-				t.Fatal("grouped ancillary authority inferred", grouping, summary, review, err)
+			if review, err := service.GetReview(t.Context(), state.ContextID, workbookRequest(t, changed)); err == nil ||
+				review != nil || !strings.Contains(err.Error(), "ancillary workbook is disabled") {
+				t.Fatal("disabled grouped ancillary authority inferred", grouping, summary, err)
 			}
 		}
+		service.ancillaryEnabled = true
 	}
 }
 

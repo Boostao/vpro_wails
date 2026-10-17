@@ -45,25 +45,32 @@ feature-sized revision's entry points, guards and exclusions.
 ## Next forms/report work
 
 Forms, the complete report pipeline and the Access ribbon remain unfinished.
-The Lifeform/None13/14 effective-attribute successor is independently reviewed,
-disposable-native accepted and full-race integrated using the existing inspection
-infrastructure and both existing independent gates. It permits attributes only
-with common/guide both off, avoiding unqualified First(common name), and retains
-derived NULL-Lifeform groups. Layer/Strata behavior remains unchanged.
-Frozen validation accepts225 related client/41 browser cases, check0/0/build,
-coupled race1182.656s/vet/production and166 exact legacy comparisons. Five
-reopened Wails outputs, four real remounts/exact close acknowledgements,
-42 responsive observations and two independent backend denials pass with16
-unchanged fixture files. Actual table captions/typed Order and independent
-physical arithmetic are verified. Full race passes in5781.860s, preserving1916
-inputs/285 artifacts and nine closed native families. The shared reference-table
-correction renders numeric Order instead of NULL and retains original group
-captions; consumed rendering covers Layer/Strata/13/14.
-Group13/14 common/guide First, grouped ancillary, Strata/Lifeform Display2 and
-original Report callbacks remain unavailable; None Display2 is supported.
-Next qualify original grouped ancillary assembly, including SnTable admission/
-staging timing and summary metadata, rather than merely lifting guards. The
-qualified demo and defaults are unchanged. Unbound two-page Picture Manager
+The grouped ancillary successor is independently reviewed, disposable-native
+accepted and full-race integrated. It composes SU Table/optional ReportSummary
+with supported Strata12/Lifeform13/None14 and existing supported effective
+references through the same snapshot, renderer, publisher and retained panel.
+SnTable admission remains original raw-SU/Veg, not the grouped pivot. Original
+Strata/Lifeform/None summary captions and every independent gate remain intact.
+No new production file, service, binding, dependency, flag or default promotion.
+Frozen validation accepts229 related client/45 browser cases, check0/0/build,
+coupled race768.297s/vet/production and206 exact legacy comparisons. Distinct
+review finds no significant issues. Six reopened Wails outputs, independent
+physical memberships/counts, four real remounts/exact close acknowledgements,
+54 responsive observations and three independent backend denials pass with16
+unchanged fixture files and six normally closed owners. A retained larger-
+fixture witness was corrected after independently checking the first completed
+publication; no write was replayed. Full race passes in4861.766s, preserving1918
+inputs/332 artifacts and ten closed native families.
+Group13/14 common/guide First, Strata/Lifeform Display2 and original Report
+callbacks remain unavailable; None Display2 is supported. The qualified demo
+and defaults are unchanged.
+
+Next source contract is Constancy: reuse the existing coupled preference CAS,
+but qualify numeric USysAllSpecies.Lifeform, raw-code/display-name grouping,
+DAO metadata and NULL/duplicate output before implementation. Ordinary Group13
+textual LayerCode grouping is not equivalent. Static investigation is not native
+acceptance or report-consumer enablement.
+Unbound two-page Picture Manager
 procedures remain dormant, not a missing live event to implement.
 
 The accepted correction applies the source-qualified changed-NULL refusal

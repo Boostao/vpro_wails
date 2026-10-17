@@ -70,9 +70,9 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 	}
 	grouping := 11
 	if options.GroupAndOrder != nil {
-		if options.Ancillary != nil || options.References != nil && !summaryVegetationReferenceGroupingAvailable(
+		if options.References != nil && !summaryVegetationReferenceGroupingAvailable(
 			*options.GroupAndOrder, options.References.ShowCommon || options.References.UseGuideNames) {
-			return fail(errors.New("Summary grouped ancillary worksheets and Lifeform/None common/guide names are not qualified; attribute references without names remain supported"))
+			return fail(errors.New("Summary Lifeform/None common/guide names are not qualified; attribute references without names remain supported"))
 		}
 		grouping = *options.GroupAndOrder
 		if err := validateSummaryVegetationGroupedOptions(ctx, options.Average, grouping, options.Display, calculationClass); err != nil {

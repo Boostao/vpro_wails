@@ -126,7 +126,15 @@ func assertSummaryGroupedWorkbookBody(t *testing.T, input summaryVegetationWorkb
 		}
 	}
 	for i, row := range preview.Rows {
-		for j, cell := range append([]ProjectMetadataCell{row.Layer, row.Species, row.Order}, row.Covers...) {
+		cells := []ProjectMetadataCell{row.Layer, row.Species}
+		if (row.CommonName != nil) != (preview.References != nil && preview.References.ShowCommon) {
+			t.Fatal("reviewed common-name column presence differs")
+		}
+		if row.CommonName != nil {
+			cells = append(cells, *row.CommonName)
+		}
+		cells = append(cells, row.Order)
+		for j, cell := range append(cells, row.Covers...) {
 			address, err := excelize.CoordinatesToCellName(j+1, result.FirstVegetationRow+i)
 			if err != nil {
 				t.Fatal(err)

@@ -176,6 +176,7 @@ func TestSummaryStrataReferenceWorkbookIndependentGatesAndUnsupportedModes(t *te
 	}
 	service.ancillaryEnabled = true
 	for _, mode := range []string{"lifeform", "none", "memberships", "summary", "display2"} {
+		service.ancillaryEnabled = mode != "memberships" && mode != "summary"
 		changed := options
 		switch mode {
 		case "lifeform", "none":

@@ -2652,6 +2652,62 @@ native families. See the [portable evidence](MIGRATION_EVIDENCE.md#accepted-life
 Common/guide names, grouped ancillary, Strata/Lifeform Display2, original Report/
 callback/formatting/printing and default/delivered-demo promotion are not granted.
 
+### Accepted grouped ancillary inspection
+
+This accepted successor composes the existing read-only SU Table and optional
+ReportSummary with supported Strata12, Lifeform13 and None14 workbooks. Existing
+effective-reference rules still apply: common/guide names are allowed for
+Strata only;13/14 require both off. No original Report action is enabled.
+
+The canonical active `MakeSvQueries` constructs SnTable from original project
+Veg joined to selected SU before `CreateTempVeg`/`BuildDataTable` grouped staging.
+`BuildReport` selects ReportSummary independently of grouping; `AddSuTab` copies
+the selected SU with no grouping branch when quality enforcement is off.
+Consequently the existing raw-SU/Veg admission, physical duplicate memberships,
+master-name join multiplicity and ambiguous First-name refusal remain the
+ancillary contract. Grouped pivot rows must not replace that raw admission.
+
+Original `ShortVegOptionText` captions determine ReportSummary B7: Strata,
+Lifeform or None. These differ from body DAO field captions Layer, LifeForm
+or Group. B8 remains Species. B5 continues the explicit adaptation of displaying
+the selected physical SU table, not inventing an Access scratch table.
+Complete original source/options/time and the new combined scope are retained
+in hidden provenance. The grouped ancillary approval domain is separate;
+requests without this composition keep their existing scopes and domains.
+
+The shared source/snapshot, body/ancillary writer and no-replace publication/
+session/lifecycle are reused. Existing grouped, ancillary and optional reference
+gates are independent; there is no new production file/API/binding/flag.
+Tests include typed main bodies with optional common-name columns,
+source worksheet identities/metadata,16 managed/external compositions, strict
+Go transport, all eight independent gate combinations and explicit mismatched
+authority/cancellation refusal. Guide-only API authority remains exact; the UI
+also selects Common when Guide is selected.
+Frozen validation accepts229 related client/45 browser cases, check0/0/isolated
+build, coupled race768.297s/vet/production and206 exact legacy comparisons.
+Distinct read-only review finds no significant issues.
+
+Actual Wails accepts six independently reopened publications across all three
+groups, common/guide/attribute references, summary, SU-only and environment.
+Every main body cell, typed shifted Order, original caption and full hidden
+provenance is inspected. Independent physical reads establish eight memberships,
+two admitted units/seven selected plots, duplicate master-name count effects and
+NULL metadata. Four remounts/four exact native-close acknowledgements,54 responsive
+observations, held-validation stale refusal and unknown committed-publication
+retention pass. Each of three independent backend-off profiles preserves an
+unrelated authorized route. Four retained unsupported-name drafts dispatch
+nothing; corrected reviews succeed. All16 source/config/audit files remain
+unchanged and all six owners normally close. The retained first witness used
+larger-fixture constants; the completed workbook and actual fixture were checked
+before continuing, without replay.
+
+Full root race passes in4861.766s, preserving1918 inputs/332 artifacts,
+discovery,26 canonical inputs/21 protected assets and ten closed native families.
+See [portable evidence](MIGRATION_EVIDENCE.md#accepted-grouped-ancillary-inspection).
+No default/delivered-demo promotion or acceptance of13/14 common/guide,
+Strata/Lifeform Display2, quality/lumping, original formatting/callbacks,
+Excel coercion or printing. No Access/Excel/clipboard action occurred.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

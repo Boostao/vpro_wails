@@ -326,6 +326,53 @@ No Access/Excel/clipboard actions. Common/guide names for13/14, grouped ancillar
 Strata/Lifeform Display2, original Report/callback/formatting/printing and default/
 delivered-demo promotion remain unavailable. None Display2 is supported.
 
+## Accepted grouped ancillary inspection
+
+The [source contract](LONG_VEGETATION_WORKBOOK_CONTRACT.md#accepted-grouped-ancillary-inspection)
+composes existing SU Table/optional ReportSummary with supported12/13/14 and
+supported effective references. Canonical SnTable admission precedes grouped
+staging, so the original raw-SU/Veg ancillary preparation remains the authority,
+not the grouped pivot. Original B7 Strata/Lifeform/None captions differ from
+body field names. Existing snapshot, renderer, publisher, retained panel and
+independent gates are reused. No new production file/API/binding/dependency/flag.
+
+Sixteen managed/external vectors verify entire typed main bodies, optional
+common-name columns, original worksheet metadata and complete physical
+provenance. Eight strict production-Go vectors cover actual-proxy/compiled
+client behavior, all independent gate combinations, retained authority drift,
+cancellation and stale validation. Frozen validation accepts229 related client/
+45 browser cases, check0/0/isolated build, coupled race768.297s, production vet/
+build and206 exact legacy comparisons. Distinct read-only review finds no
+significant issues.
+
+Actual Wails accepts six independently reopened publications spanning Strata/
+Lifeform/None, common/guide/attribute references, SU-only/summary and environment.
+ZIP/XML checks every main body cell, typed shifted Order, original captions and
+decoded complete hidden provenance. Independent physical reads check all eight
+memberships, two admitted units, seven selected plots, duplicate master-name
+counts and NULL metadata. Four host remounts/four exact native-close
+acknowledgements,54 responsive observations and held-validation stale refusal
+pass. The lost completed-publication acknowledgement remains unknown without
+replay. Three independent backend-off profiles preserve unrelated authorized
+routes with zero publications; four unsupported-name drafts dispatch nothing.
+All16 fixture/config/audit files remain unchanged; all six owners normally
+close and are freshly absent.
+
+The first retained native witness assumed a larger predecessor fixture.
+Its successful publication, exact SHA and actual physical memberships/counts
+were independently verified before continuing only the remaining actions.
+No completed publication was replayed. No Access/Excel/clipboard action occurred.
+
+Full root race accepts exit0, UTC2026-10-17T20:42:09.349504 to22:03:11.123593,
+4861.766s total. All1918 managed inputs/332 artifacts, package/embed discovery,
+26 canonical inputs/21 protected assets and ten closed native families match.
+Private `summary-grouped-ancillary-integration/receipt.json` SHA256:
+`c5d01fd3e7f94236ad72bd25ea04560af8b735f353170a11224cad524b2550a0`.
+Only six directly related documentation files change afterward.
+Common/guide names for13/14, Strata/Lifeform Display2, original Report/callback/
+formatting/printing, quality/lumping and default/delivered-demo promotion remain
+unavailable. Constancy is a separate static source contract, not acceptance.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

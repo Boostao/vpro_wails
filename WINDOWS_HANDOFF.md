@@ -23,58 +23,54 @@ Current machine state only. Portable scope and ordered work are in
 - Private receipts, Access copies, fixtures, profiles and binaries remain in
   the active session's files/private evidence. Do not publish or delete them.
 
-## Current integration
+## Current accepted integration
 
-Published source parent is `2e9d2b098cb74cb7083fe0a76449b577887d5095`.
-The accepted successor composes Group13/14 effective attribute references only
-when common/guide are both off, reusing both independent existing gates.
-One shared Go/TS availability invariant preserves Layer/Strata behavior and
-explicitly refuses unqualified First(common name). A separate scope/approval
-domain leaves Strata12 and old paths unchanged. No new service/API/models/
-bindings/dependencies/flags or default/demo changes.
+Source parent is published `d1d18e3ee6f7b4a9e99b167bb5e23e12dc928984`.
+The accepted grouped ancillary successor composes SU Table and optional
+ReportSummary with supported12/13/14 and supported effective references.
+Canonical MakeSvQueries creates SnTable from original Veg before grouped staging;
+the existing raw-SU/Veg ancillary preparation is reused, not the grouped pivot.
+B7 retains original Strata/Lifeform/None captions; B8 remains Species. Separate
+combined scope/approval authority leaves existing paths unchanged. No new
+production file/service/binding/dependency/flag or default/demo promotion.
 
-Frozen19-path/1916-input validation accepts225 related client/41 browser cases,
-check0/0/isolated build, coupled race1182.656s/vet/production and166 exact legacy
-comparisons. Distinct read-only review finds no significant issues. Two private
-kernel/four workbook test functions retain independent values, derived NULL
-groups, duplicate/reference origins and complete managed/external body/provenance.
-The original body assertion/private-provenance wrapper remains intact.
+Frozen16-path/1918-input validation accepts229 related client/45 browser cases,
+check0/0/isolated build, coupled race768.297s/vet/production and206 exact legacy
+comparisons. Distinct read-only review finds no significant issues. Sixteen
+managed/external compositions verify typed main bodies, optional common-name
+columns, source worksheets and complete provenance; all eight independent
+group/ancillary/reference gate combinations and stale authority are covered.
 
-One fresh `native-summary-grouped-attributes` family accepts five reopened
-publications, actual table captions/every visible typed Order/row identity,
-two independent physical arithmetic witnesses, four host remounts/four exact
-native-close acknowledgements,42 responsive observations and independent
-grouped-off/reference-off denials preserving unrelated routes. All16 fixture/
-config/audit files remain unchanged; all four owners normally close and are
-freshly absent. The lifecycle unknown publication stays retained without replay.
-No Access/Excel/clipboard action occurred. Only the private main entry is
-instrumented.
+One closed `native-summary-grouped-ancillary` family accepts six independently
+reopened publications, every main body cell/typed Order/source caption/provenance,
+and physical membership/count witnesses. Four host remounts/four exact native-
+close acknowledgements,54 responsive observations, held-validation stale refusal,
+unknown committed-publication retention, three independent backend denials and
+four retained unsupported-name drafts pass. All16 fixture/config/audit files
+remain unchanged; all six owners normally close and are freshly absent.
+The retained first native witness incorrectly assumed the larger predecessor
+fixture; the actual eight memberships/two units/seven selected plots and already-
+published workbook were independently verified before continuing without replay.
+No Access/Excel/clipboard action occurred.
 
-The first frozen attempt remains stopped/unaccepted and hash-archived before
-native launch. Consumed rendering reproduces REAL Order displayed as NULL;
-the correction uses typed scalars/original group captions without changing
-workbook calculations. Retained native harness corrections account for the
-accessible scientific-name th row header, original LifeForm XML heading and
-review-plan clearing after acknowledgement. The already-published first
-workbook was independently verified before continuing, never replayed.
-Independent arithmetic uses original IsAttribute=Yes removal, not an assumed
-Codetype filter; that initial failed witness is retained privately.
+`summary-grouped-ancillary-integration/receipt.json` accepts exit0:
+UTC2026-10-17T20:42:09.349504 to22:03:11.123593;4861.766s total.
+All1918 inputs/332 artifacts, discovery,26 canonical inputs/21 protected assets
+and ten closed native families match. Receipt SHA256:
+`c5d01fd3e7f94236ad72bd25ea04560af8b735f353170a11224cad524b2550a0`.
+The freeze is released; only six directly related documentation files change
+afterward. Git and the private publication association identify publication.
 
-`summary-grouped-attributes-integration/receipt.json` accepts exit0:
-UTC2026-10-17T18:03:34.596358 to19:39:56.469873;5781.860s total.
-All1916 inputs/285 artifacts, discovery,26 canonical inputs/21 protected assets
-and nine closed native families match. Receipt SHA256:
-`71b7f7a1db7a2c9fa3e86d4f99b7d96ed4e5547269fd9df4963389ff2de416e9`.
-The freeze is released; only directly related documentation changes follow.
-Git records the publication revision and the private publication association
-binds it to this exact acceptance.
-
-Next source contract: original grouped ancillary assembly, especially SnTable
-admission versus group staging and ReportSummary grouping/order metadata.
-Prove equivalence before sharing the current raw-SU/Veg ancillary plan; do not
-merely lift guards. Group13/14 common/guide First, grouped ancillary, Strata/
-Lifeform Display2, original Report callbacks and whole-form/ribbon gaps remain.
-None Display2 is supported. Continue the ordered work after publication.
+Next source contract: Constancy. Static source proves its callback forces
+Group3/Display1/common0 without clearing the historical limit, and its query
+overrides ordinary textual Group13 with numeric USysAllSpecies.Lifeform plus
+raw species code/display name grouping. Do not merely relabel the existing
+Group13 report. Actual DAO metadata, NULL/duplicate identity and active reference
+preparation still require qualification. Existing coupled presentation preference
+CAS is reusable; no Constancy implementation or native oracle has launched.
+Group13/14 common/guide First, Strata/Lifeform Display2, original Report callbacks
+and whole-form/ribbon gaps remain. None Display2 is supported. Continue the
+ordered work after publication; the delivered demo/release is unchanged.
 
 The attempted two-page Picture Manager route was rejected before any native
 action: both canonical buttons lack OnClick bindings, as already documented in

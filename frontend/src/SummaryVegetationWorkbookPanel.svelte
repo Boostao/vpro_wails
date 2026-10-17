@@ -25,7 +25,7 @@
   const barrier = $derived(viewState.publication.busy || viewState.publication.blocked);
   const held = $derived(disabled || viewState.reviewing || barrier);
   const grouped = $derived(calculation.groupAndOrder !== undefined);
-  const groupingUnavailable = $derived(grouped && (!groupedEnabled || viewState.includeAncillary ||
+  const groupingUnavailable = $derived(grouped && (!groupedEnabled ||
     viewState.includeReferences && !summaryVegetationReferenceGroupingAvailable(calculation.groupAndOrder ?? 11,
       viewState.showCommon || viewState.useGuideNames)));
   const modeUnavailable = $derived(groupingUnavailable || viewState.includeEnv && !environmentEnabled ||
@@ -125,7 +125,7 @@
     {#if groupedEnabled}Uses the Summary Group by selection.
     {:else}Layer only; grouped workbook publication is disabled in this build.{/if}</p>
   {#if groupingUnavailable}
-    <p role="alert">Grouped publication requires its independent build flag and no source worksheets.
+    <p role="alert">Grouped publication requires its independent build flag and compatible reference options.
       Common/guide names support Layer or Strata only. Lifeform/None support attribute references with both names off.
       Clear incompatible modes or choose a supported grouping.
       No options were changed automatically.</p>
@@ -261,7 +261,7 @@
       <p>{viewState.review.scope}</p>
     </div>
   {/if}
-  <p>Explicit Layer inspection export using Calculate, Display Values and Show above, plus these title/environment options.
+  <p>Explicit inspection export using the grouping, Calculate, Display Values and Show above, plus these title/environment options.
     Saved presentation callbacks are not applied. Source data, preferences and audit history are not changed.
     This is not the original Access Report action: quality/lumping callbacks, original formatting, Excel coercion,
     printing and macros remain unavailable. Optional attribute/common/guide projection is read-only and uses literal

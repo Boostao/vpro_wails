@@ -16,6 +16,9 @@ func validateSummaryWorkbookCreatedAt(value string) error {
 
 func summaryWorkbookScope(options SummaryVegetationWorkbookOptions) string {
 	if options.GroupAndOrder != nil {
+		if options.Ancillary != nil {
+			return summaryVegetationGroupedAncillaryScope
+		}
 		if options.References != nil {
 			if *options.GroupAndOrder != 12 {
 				return summaryVegetationGroupedAttributesScope
@@ -38,13 +41,12 @@ func summaryWorkbookScope(options SummaryVegetationWorkbookOptions) string {
 
 func prepareSummaryWorkbookSource(ctx context.Context, source summaryVegetationWorkbookSource,
 	options SummaryVegetationWorkbookOptions) (summaryVegetationWorkbook, error) {
-	if options.GroupAndOrder != nil && (options.Ancillary != nil ||
-		options.References != nil && !summaryVegetationReferenceGroupingAvailable(*options.GroupAndOrder,
-			options.References.ShowCommon || options.References.UseGuideNames) ||
+	if options.GroupAndOrder != nil && (options.References != nil && !summaryVegetationReferenceGroupingAvailable(*options.GroupAndOrder,
+		options.References.ShowCommon || options.References.UseGuideNames) ||
 		(options.References != nil) != (source.Input.Vegetation.References != nil) ||
 		(options.References != nil) != (source.Raw.Preview.References != nil) ||
 		source.Input.Vegetation.GroupAndOrder != *options.GroupAndOrder || source.Raw.Preview.GroupAndOrder != *options.GroupAndOrder) {
-		return summaryVegetationWorkbook{}, errors.New("Summary grouped workbook requires exact supported source/options; Lifeform/None require attribute references without common/guide names, and grouped ancillary worksheets remain unavailable")
+		return summaryVegetationWorkbook{}, errors.New("Summary grouped workbook requires exact supported source/options; Lifeform/None require attribute references without common/guide names")
 	}
 	if options.Ancillary == nil {
 		if source.Ancillary != nil {

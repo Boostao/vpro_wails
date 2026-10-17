@@ -34,6 +34,32 @@ func prepareSummaryVegetationAncillaryWorkbook(ctx context.Context,
 	}
 	preview := input.Source.Input.Vegetation
 	options := input.Options
+	groupLabel := "Layer"
+	scope := "Read-only literal normal-SU Layer inspection with ancillary sheets; zero value limit, no quality/lump/common-name/guide/constancy callbacks, Excel coercion or original Report/printing parity"
+	if options.GroupAndOrder != nil {
+		if preview.GroupAndOrder != *options.GroupAndOrder ||
+			(options.References != nil) != (preview.References != nil) {
+			return fail(errors.New("Summary grouped ancillary workbook requires matching grouping and reference authority"))
+		}
+		if options.References != nil && (preview.References.ShowCommon != (options.References.ShowCommon || options.References.UseGuideNames) ||
+			preview.References.UseGuideNames != options.References.UseGuideNames) {
+			return fail(errors.New("Summary grouped ancillary workbook reference selection differs from its retained preview"))
+		}
+		if _, err := summaryVegetationWorkbookGroup(ctx, preview); err != nil {
+			return fail(err)
+		}
+		switch *options.GroupAndOrder {
+		case 12:
+			groupLabel = "Strata"
+		case 13:
+			groupLabel = "Lifeform"
+		case 14:
+			groupLabel = "None"
+		}
+		scope = summaryVegetationGroupedAncillaryScope
+	} else if preview.GroupAndOrder != 0 {
+		return fail(errors.New("Summary grouped ancillary workbook requires explicit matching grouping options"))
+	}
 	if options.Ancillary != nil && options.Ancillary.CreateSummary != input.CreateSummary {
 		return fail(errors.New("Summary ancillary workbook summary selection differs from its retained options"))
 	}
@@ -100,7 +126,7 @@ func prepareSummaryVegetationAncillaryWorkbook(ctx context.Context,
 		Scope string
 		Input summaryVegetationAncillaryWorkbookInput
 	}{
-		"Read-only literal normal-SU Layer inspection with ancillary sheets; zero value limit, no quality/lump/common-name/guide/constancy callbacks, Excel coercion or original Report/printing parity",
+		scope,
 		input,
 	}
 	result, err := prepareSummaryVegetationWorkbookWithSheets(ctx, input.Source.Input, provenance, func(book *excelize.File) error {
@@ -140,7 +166,7 @@ func prepareSummaryVegetationAncillaryWorkbook(ctx context.Context,
 		}
 		texts := []struct{ address, value string }{
 			{"A1", input.Source.Input.Title}, {"A2", "Date created: " + plan.CreatedAt},
-			{"B4", preview.Project}, {"B5", preview.SU + "_SU"}, {"B6", "None_Lump"}, {"B7", "Layer"},
+			{"B4", preview.Project}, {"B5", preview.SU + "_SU"}, {"B6", "None_Lump"}, {"B7", groupLabel},
 			{"B8", "Species"}, {"B12", average}, {"D4", "Short name"}, {"E4", "Units"}, {"F4", "Long name"},
 			{"H4", "Plotnumber"}, {"I4", "Site Unit"},
 		}

@@ -35,6 +35,7 @@ const referenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVeget
 const groupedWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedWire.json'), 'utf8'));
 const strataReferenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookStrataReferencesWire.json'), 'utf8'));
 const groupedAttributeWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedAttributesWire.json'), 'utf8'));
+const groupedAncillaryWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedAncillaryWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath']
   .map(key => [key, wire.vegetation.preview[key]]));
 const yieldNow = () => Promise.resolve();
@@ -64,6 +65,117 @@ function outcome(value, status = 'published') {
   return { status, requestedDestination: destination, path: 'C:\\output\\resolved.xlsx',
     sha256: value.workbookSHA256, errorMessage: status === 'published' ? '' : 'Committed, source changed; do not replay.' };
 }
+
+test('strict grouped ancillary Go vectors retain typed bodies, complete memberships and original source worksheet scope', async () => {
+  assert.equal(Object.keys(groupedAncillaryWire).length, 8);
+  for (const value of Object.values(groupedAncillaryWire)) {
+    const raw = proxy(structuredClone(value));
+    const result = await client.validateSummaryVegetationWorkbookReview(raw, owner, value.options, yieldNow);
+    assert.deepEqual(plain(result), value);
+    assert.equal(result.scope, 'Explicit read-only normal-SU Strata/Lifeform/None inspection with optional effective references, SU Table and optional ReportSummary; typed XLSX, no Lifeform/None common names, original Report callbacks or formatting/printing parity');
+    assert.equal(result.ancillary.membershipRows, result.preview.memberships.length);
+    assert.equal(result.ancillary.summary !== null, value.options.ancillary.createSummary);
+    assert.equal(Object.isFrozen(result.ancillary.sheets), true);
+    assert.equal(Object.isFrozen(result.preview.rows[0].witnesses), true);
+    raw.ancillary.sheets[1] = 'Foreign';
+    assert.deepEqual(plain(result), value);
+  }
+});
+
+test('grouped ancillary reviews reject omitted, mismatched and old-scope authority without repairing the request', async () => {
+  for (const base of Object.values(groupedAncillaryWire)) {
+    for (const mutate of [
+      value => { delete value.options.ancillary; },
+      value => { delete value.ancillary; },
+      value => { value.options.ancillary.createSummary = !value.options.ancillary.createSummary; },
+      value => { value.ancillary.membershipRows++; },
+      value => { value.ancillary.sheets[1] = 'Foreign'; },
+      value => { value.ancillary.createdAt = '2026-02-30T02:00:00Z'; },
+      value => { value.scope = client.summaryVegetationGroupedWorkbookScope; },
+      value => { value.scope = client.summaryVegetationGroupedAttributesScope; },
+      value => { value.scope = client.summaryVegetationAncillaryWorkbookScope; },
+      value => { value.preview.groupField.name = 'Wrong'; },
+    ]) {
+      const value = structuredClone(base);
+      mutate(value);
+      await assert.rejects(client.validateSummaryVegetationWorkbookReview(value, owner, value.options, yieldNow));
+    }
+  }
+  for (const base of [groupedAncillaryWire.lifeformAttributeEnvironment, groupedAncillaryWire.noneAttributeMemberships]) {
+    for (const name of ['showCommon', 'useGuideNames']) {
+      const value = structuredClone(base);
+      value.options.references[name] = true;
+      await assert.rejects(client.validateSummaryVegetationWorkbookReview(value, owner, value.options, yieldNow));
+    }
+  }
+});
+
+test('compiled grouped ancillary panels compose all three independent gates and retain publication receipts across remounts', async () => {
+  for (const value of Object.values(groupedAncillaryWire)) {
+    for (const grouped of [false, true]) for (const ancillary of [false, true]) for (const references of [false, true]) {
+      const allowed = grouped && ancillary && (!value.options.references || references);
+      const session = sessionFor(value);
+      let reads = 0, writes = 0;
+      const services = {
+        GetReview(contextId, json) {
+          reads++;
+          assert.equal(contextId, owner.contextId);
+          assert.deepEqual(JSON.parse(json), value.options);
+          return Promise.resolve(proxy(structuredClone(value)));
+        },
+        ExportReviewed(contextId, json) {
+          writes++;
+          assert.equal(contextId, owner.contextId);
+          assert.deepEqual(JSON.parse(json), { options: value.options, approvalHash: value.approvalHash,
+            destination, createdAt: value.ancillary.createdAt });
+          return Promise.resolve(outcome(value));
+        },
+      };
+      const pane = mountPanel(session, services, false, value.options, ancillary, references, grouped);
+      await pane.review();
+      assert.equal(reads, allowed ? 1 : 0);
+      assert.equal(pane.view().includeAncillary, true);
+      if (allowed) {
+        assert.deepEqual(plain(pane.view().review), value);
+        pane.edit('destination', destination);
+        await pane.publish();
+        assert.equal(writes, 1);
+      }
+      pane.destroy();
+      const remount = mountPanel(session, services, false, value.options, ancillary, references, grouped);
+      await remount.publish();
+      assert.equal(writes, allowed ? 1 : 0);
+      if (allowed) {
+        assert.equal(remount.view().publication.outcome.sha256, value.workbookSHA256);
+        remount.acknowledge();
+        remount.edit('title', '\ud800');
+        assert.equal(session.held(), true);
+        remount.undo();
+        assert.equal(session.held(), false);
+        assert.equal(session.view().publication.outcome.sha256, value.workbookSHA256);
+      }
+      remount.destroy();
+    }
+  }
+});
+
+test('grouped ancillary cancellation waits for the held actual validation and cannot populate a remount', async () => {
+  const value = groupedAncillaryWire.strataCommonEnvironment, session = sessionFor(value);
+  const entered = deferred(), release = deferred();
+  const pending = session.review(value.options, {
+    review: () => Promise.resolve(proxy(structuredClone(value))),
+    validationYield: async () => { entered.resolve(); await release.promise; },
+  });
+  await entered.promise;
+  session.cancel();
+  const remount = mountPanel(session, {}, false, value.options, true, true, true);
+  assert.equal(session.held(), true);
+  release.resolve();
+  assert.equal(await pending, false);
+  assert.equal(session.held(), false);
+  assert.equal(remount.view().review, null);
+  remount.destroy();
+});
 
 test('strict production Go wire validates both frames and explicit nonlegacy environmental calculation without widening old entrypoint', async () => {
   for (const value of Object.values(wire)) {
@@ -879,15 +991,17 @@ test('compiled grouped panel gate refuses dispatch, preserves incompatible selec
         return Promise.resolve(outcome(value));
       },
     };
-    const pane = mountPanel(session, services, false, value.options, true, true, enabled);
+    const pane = mountPanel(session, services, false, value.options, false, true, enabled);
     await pane.review();
     assert.equal(reads, enabled ? 1 : 0);
     if (enabled) {
       pane.selectAncillary('sheets', { currentTarget: { checked: true } });
+      assert.equal(pane.view().includeAncillary, false);
+      session.includeAncillary(true);
       await pane.review();
       assert.equal(reads, 1);
       assert.equal(pane.view().includeAncillary, true);
-      pane.selectAncillary('sheets', { currentTarget: { checked: false } });
+      session.includeAncillary(false);
       pane.selectReferences('include', { currentTarget: { checked: true } });
       pane.selectReferences('common', { currentTarget: { checked: true } });
       await pane.review();
@@ -900,7 +1014,7 @@ test('compiled grouped panel gate refuses dispatch, preserves incompatible selec
       assert.equal(writes, 1);
     }
     pane.destroy();
-    const remount = mountPanel(session, services, false, value.options, true, true, enabled);
+    const remount = mountPanel(session, services, false, value.options, false, true, enabled);
     await remount.publish();
     assert.equal(writes, enabled ? 1 : 0);
     if (enabled) assert.equal(remount.view().publication.outcome.sha256, value.workbookSHA256);
@@ -975,10 +1089,10 @@ test('consumed grouped panel renders accurate grouping and explicit unavailable 
     } }).body;
     assert.equal(subscriptions, 1);
     assert.match(html, /Workbook grouping: Lifeform/);
-    assert.equal(html.includes('No options were changed automatically.'), !enabled || mode !== null);
+    assert.equal(html.includes('No options were changed automatically.'), !enabled || mode === 'references');
     const button = html.match(/<button[^>]*data-summary-workbook-review[^>]*>/);
     assert.ok(button);
-    assert.equal(/\bdisabled\b/.test(button[0]), !enabled || mode !== null);
+    assert.equal(/\bdisabled\b/.test(button[0]), !enabled || mode === 'references');
     assert.equal(session.view().includeReferences, mode === 'references');
     assert.equal(session.view().includeAncillary, mode === 'ancillary');
   }
@@ -1073,16 +1187,18 @@ test('compiled Strata reference panel requires both existing flags and retains i
         return Promise.resolve(outcome(value));
       },
     };
-    const pane = mountPanel(session, services, false, value.options, true, references, grouped);
+    const pane = mountPanel(session, services, false, value.options, false, references, grouped);
     await pane.review();
     assert.equal(reads, grouped && references ? 1 : 0);
     assert.equal(pane.view().includeReferences, true);
     if (grouped && references) {
       pane.selectAncillary('sheets', { currentTarget: { checked: true } });
+      assert.equal(pane.view().includeAncillary, false);
+      session.includeAncillary(true);
       await pane.review();
       assert.equal(reads, 1);
       assert.equal(pane.view().includeAncillary, true);
-      pane.selectAncillary('sheets', { currentTarget: { checked: false } });
+      session.includeAncillary(false);
     }
     pane.destroy();
     const incompatible = mountPanel(session, services, false, { ...value.options, groupAndOrder: 13 }, true, references, grouped);

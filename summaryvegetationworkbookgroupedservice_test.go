@@ -73,6 +73,7 @@ func TestSummaryGroupedDesktopStrictAuthorityAndIndependentGate(t *testing.T) {
 	}
 	service.groupedEnabled, service.referencesEnabled, service.ancillaryEnabled = true, true, true
 	for _, mode := range []string{"references", "memberships", "summary", "display2"} {
+		service.ancillaryEnabled = mode != "memberships" && mode != "summary"
 		changed := options
 		switch mode {
 		case "references":

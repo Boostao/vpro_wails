@@ -584,8 +584,9 @@ significant issues. Wails accepts five reopened outputs, four remounts/exact clo
 acknowledgements,42 responsive observations and both independent backend denials
 with unrelated routes preserved and16 unchanged fixture files. Full race passes
 in5153.016s, preserving1913 inputs/236 artifacts and eight closed native families.
-Group13/14 common/guide references, grouped ancillary, Strata Display2 and original
-Report/formatting/printing remain unavailable; the demo and defaults are unchanged.
+Group13/14 common/guide references, Strata Display2 and original Report/formatting/
+printing remain unavailable; later attribute/ancillary compositions are qualified
+below. The demo and defaults are unchanged.
 
 The accepted [Lifeform/None effective-attribute inspection](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#accepted-lifeformnone-effective-attribute-inspection)
 extends13/14 only when common/guide are both off. It reuses the same staging,
@@ -600,8 +601,25 @@ independent ZIP/XML/provenance and table-cell checks; physical arithmetic,
 four remounts/exact close acknowledgements,42 responsive observations and both
 backend denials pass with16 unchanged fixture files. Full race passes in5781.860s,
 preserving1916 inputs/285 artifacts and nine closed native families. Common/
-guide First for13/14, grouped ancillary, Strata/Lifeform Display2 and original
+guide First for13/14, Strata/Lifeform Display2 and original
 Report/callback/formatting/printing remain unavailable. No default/demo promotion.
+
+The accepted [grouped ancillary inspection](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#accepted-grouped-ancillary-inspection)
+composes SU Table and optional ReportSummary with supported Strata/Lifeform/None
+and supported effective references. It reuses the existing snapshot, renderer,
+publisher, panel and independent gates; no new production file, API, binding,
+dependency or flag. Original raw-SU/Veg admission and summary captions remain
+explicit.229 related client/45 browser cases,206 exact legacy comparisons,
+check0/0/build, coupled race768.297s/vet/production and distinct review pass.
+Six actual Wails outputs pass complete body/provenance and independent physical
+membership/count checks. Four remounts/exact close acknowledgements,54 responsive
+observations and three independent backend denials preserve16 fixture files;
+all six owners close normally. Full race passes in4861.766s with1918 unchanged
+inputs/332 artifacts and ten closed native families. Retained native witness
+correction never replays a completed publication.13/14 common/guide, Strata/
+Lifeform Display2, original Report/callback/formatting/printing and default/demo
+promotion remain unavailable. Constancy numeric grouping is the next source
+contract, not an enabled report.
 
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus
