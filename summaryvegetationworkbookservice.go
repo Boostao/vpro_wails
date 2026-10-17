@@ -20,6 +20,9 @@ const summaryVegetationWorkbookFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_WOR
 const summaryVegetationWorkbookDraftScope = "Explicit read-only normal-SU layer inspection; literal XLSX, not original NewShortVeg orchestration, saved callbacks, ancillary sheets or formatting/printing parity"
 const summaryVegetationAncillaryWorkbookFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK"
 const summaryVegetationAncillaryWorkbookScope = "Explicit read-only normal-SU layer inspection with SU Table and optional ReportSummary; literal XLSX, not original NewShortVeg preflight/callbacks or formatting/printing parity"
+const summaryVegetationEffectiveReferencesFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES"
+const summaryVegetationEffectiveReferencesScope = "Explicit read-only normal-SU layer inspection with projected attribute/common/guide references; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity"
+const summaryVegetationEffectiveAncillaryScope = "Explicit read-only normal-SU layer inspection with projected attribute/common/guide references, SU Table and optional ReportSummary; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity"
 
 type SummaryVegetationWorkbookAncillaryUnit struct {
 	Code     string  `json:"code"`
@@ -57,10 +60,11 @@ type SummaryVegetationWorkbookReview struct {
 }
 
 type SummaryVegetationWorkbookService struct {
-	source           *SummaryVegetationEnvironmentalLifeformService
-	enabled          bool
-	ancillaryEnabled bool
-	now              func() time.Time
+	source            *SummaryVegetationEnvironmentalLifeformService
+	enabled           bool
+	ancillaryEnabled  bool
+	referencesEnabled bool
+	now               func() time.Time
 }
 
 type summaryVegetationWorkbookHooks struct {
@@ -128,6 +132,9 @@ func (s *SummaryVegetationWorkbookService) readSource(ctx context.Context, plots
 
 func (s *SummaryVegetationWorkbookService) readSourceAt(ctx context.Context, plots *PlotService, owner *sqliteContext,
 	tx *sql.Tx, contextID string, options SummaryVegetationWorkbookOptions, createdAt string) (summaryVegetationWorkbookSource, error) {
+	if options.References != nil && !s.referencesEnabled {
+		return summaryVegetationWorkbookSource{}, errors.New("Summary effective references are disabled in this session")
+	}
 	if options.Ancillary != nil {
 		if !s.ancillaryEnabled {
 			return summaryVegetationWorkbookSource{}, errors.New("Summary ancillary workbook is disabled in this session")
@@ -181,6 +188,9 @@ func summaryVegetationWorkbookApproval(source summaryVegetationWorkbookSource, w
 	domain := "VPRO Summary draft workbook approval v2\x00"
 	if options.Ancillary != nil {
 		domain = "VPRO Summary ancillary workbook approval v1\x00"
+	}
+	if options.References != nil {
+		domain = "VPRO Summary effective references workbook approval v1\x00"
 	}
 	digest := sha256.Sum256(append([]byte(domain), data...))
 	return hex.EncodeToString(digest[:]), nil

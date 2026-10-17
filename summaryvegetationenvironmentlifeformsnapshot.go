@@ -101,6 +101,15 @@ func planSummaryEnvironmentalSnapshotRows(ctx context.Context, source summaryVeg
 			return nil, err
 		}
 	}
+	if source.Preview.References != nil {
+		// Derived attributes have NULL Lifeform; only retained physical master rows can contribute.
+		master, err := summaryEffectiveReferenceEnvironmentMaster(ctx, source.Master)
+		if err != nil {
+			return nil, err
+		}
+		return planSummaryEnvironmentalLifeformRowsWithMasterInteger(ctx, fields,
+			summaryEnvironmentalPreviewUnits(source.Preview), env, source.SU, quick, master, summaryVegetationMasterLongInteger)
+	}
 	return planSummaryVegetationEnvironmentalLifeformRows(ctx, fields,
 		summaryEnvironmentalPreviewUnits(source.Preview), env, source.SU, quick, source.Master)
 }

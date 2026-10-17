@@ -351,12 +351,33 @@ UTC2026-10-17T06:41:46.672023 to07:57:31.955683. All1901 managed inputs/58 artif
 discovery, canonical/protected assets and five closed native families match.
 Private `summary-ancillary-desktop-integration/receipt.json` SHA256:
 `02316121aeaecb4942b1a363517678888ce0034d9db817e88b2c35f678ef555e`.
-The freeze is released for directly related documentation and the authorized
-coherent feature commit/push. No default/demo or original Report promotion.
-Next source-ready work is effective attribute-description
-reference projection, master32/personal16 policy and guide/common effects before UNION/grouping;
-`summary-effective-reference-source-trace.json` in session files records the static control-flow
-findings. Guide uses CombinedEnglishName, not ShortenedGuideName; cleanup
+The ancillary extension is published as
+`92af59b8b1b15f2c19a6d2fbdfbd8e4e132dd2d8`, verified on remote `main`.
+No default/demo or original Report promotion.
+Current accepted slice is the effective attribute-description reference
+extension in the existing workbook publisher/session/panel. Master32/personal16
+policies, guide/common effects before UNION/Layer11 grouping, literal common
+column placement, derived origins and retained mode drafts are implemented.
+The environmental header explicitly uses retained master rows and signed32 only
+in this new mode, not personal/derived references or an implicit legacy widening.
+Frozen validation passes208 related client/24 browser cases, check0/0/build,
+coupled race610.000s, vet7.250s, production12.735s and46 exact legacy vectors.
+Distinct review finds no significant issues. Actual Wails accepts five reopened
+outputs,50/19-row name pages, four remounts/four exact close acknowledgements,
+54 responsive observations, persistent unknown publication without replay and
+four independent backend refusals. All16 fixture/config/audit files remain exact;
+production-smoke, lifecycle and backend-off owners normally closed.
+Fresh full race accepts exit0, UTC2026-10-17T09:09:51.353051 to10:23:49.445398,
+4438.094s total/root4417.042s. All1906 managed inputs/108 artifacts, discovery,
+canonical/protected assets and six closed native families match. Private
+`summary-effective-reference-integration/receipt.json` SHA256:
+`37f53d95a90b77d16db216edb5545f6d6c113a9939990704af764ece1d49347c`.
+The freeze is released for directly related documentation and normal publication.
+Do not modify sealed native families. Rejected setup/header/AST harness evidence
+is retained; completed publications were never replayed.
+The separate `VPRO_`/`VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES` flags remain
+default-off. `summary-effective-reference-source-trace.json` in session files
+records the static control-flow findings. Guide uses CombinedEnglishName, not ShortenedGuideName; cleanup
 restores field names. Never mutate the physical reference family or invent
 physical provenance to simulate those callbacks. Guide-mode derived attribute
 common names use default NULL CombinedEnglishName, not Definition. Group11/12

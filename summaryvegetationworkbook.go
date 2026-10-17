@@ -37,9 +37,25 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 	if err := validateSummaryVegetationDisplayOptions(ctx, preview.Average, preview.Display, preview.ShowClass); err != nil {
 		return fail(err)
 	}
+	source, ordering, common := "literal-normal-su-layer", "literal-null-first-layer-species", false
+	if reference := preview.References; reference != nil {
+		source = "literal-normal-su-effective-references"
+		common = reference.ShowCommon
+		if reference.UseGuideNames && !common || reference.MasterRows < 0 || reference.PersonalRows < 0 ||
+			reference.DescriptionRows < 0 || reference.RemovedMasterRows < 0 ||
+			reference.RemovedMasterRows > reference.MasterRows || reference.DerivedRows < 0 ||
+			reference.DerivedRows > reference.DescriptionRows || reference.UnionRows < 0 ||
+			int64(reference.UnionRows) > int64(reference.MasterRows-reference.RemovedMasterRows)+
+				int64(reference.PersonalRows)+int64(reference.DerivedRows) {
+			return fail(errors.New("Summary workbook effective reference metadata is inconsistent; no repairs applied"))
+		}
+		if common {
+			ordering = "literal-null-first-layer-species-common"
+		}
+	}
 	if preview.ContextID == "" || preview.ProjectPath == "" || preview.SUPath == "" || preview.Project == "" ||
 		preview.SU == "" || preview.SU == "None" || preview.SU == "USysSuTableDynamic" ||
-		preview.Source != "literal-normal-su-layer" || preview.Ordering != "literal-null-first-layer-species" ||
+		preview.Source != source || preview.Ordering != ordering ||
 		(preview.GroupAndOrder != 0 && preview.GroupAndOrder != 11) || preview.GroupField != nil || preview.OrderField != nil ||
 		len(preview.Units) == 0 || len(preview.Units) > 250 || len(preview.Rows) == 0 || len(preview.Memberships) == 0 ||
 		len(preview.Columns) != len(preview.Units) {
@@ -71,12 +87,18 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		add(row, column, ProjectMetadataCell{Storage: "text", Text: &value})
 	}
 	first, separator, headerRow := 6, 0, 5
+	leading := 3
+	labels := []string{"Layer", "Spp", "Order"}
+	if common {
+		leading = 4
+		labels = []string{"Layer", "Spp", "Common Name", "Order"}
+	}
 	caption := "Vegetation Table"
 	if environment := input.Environment; environment != nil {
-		if environment.FirstRow != 5 || environment.English || !reflect.DeepEqual(environment.Units, summaryEnvironmentalPreviewUnits(preview)) {
-			return fail(errors.New("Summary workbook environmental header requires row5, no common names and the same complete SV1 frame"))
+		if environment.FirstRow != 5 || environment.English != common || !reflect.DeepEqual(environment.Units, summaryEnvironmentalPreviewUnits(preview)) {
+			return fail(errors.New("Summary workbook environmental header requires row5, the same common-name layout and complete SV1 frame"))
 		}
-		header, err := prepareSummaryEnvironmentalHeader(ctx, 5, false, environment.FieldList, environment.Units, environment.Rows)
+		header, err := prepareSummaryEnvironmentalHeader(ctx, 5, common, environment.FieldList, environment.Units, environment.Rows)
 		if err != nil {
 			return fail(err)
 		}
@@ -87,11 +109,11 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 	} else {
 		for i, unit := range preview.Units {
 			count := strconv.Itoa(unit.NumPlots)
-			add(4, i+4, ProjectMetadataCell{Storage: "integer", Integer: &count})
-			text(5, i+4, unit.Code)
+			add(4, i+leading+1, ProjectMetadataCell{Storage: "integer", Integer: &count})
+			text(5, i+leading+1, unit.Code)
 		}
-		text(4, 3, "n Plots")
-		for i, label := range []string{"Layer", "Spp", "Order"} {
+		text(4, leading, "n Plots")
+		for i, label := range labels {
 			text(5, i+1, label)
 		}
 	}
@@ -110,10 +132,16 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		if err := ctx.Err(); err != nil {
 			return fail(err)
 		}
-		if len(row.Covers) != len(preview.Columns) || len(row.Witnesses) == 0 {
+		if len(row.Covers) != len(preview.Columns) || len(row.Witnesses) == 0 ||
+			(row.CommonName != nil) != common {
 			return fail(errors.New("Summary workbook body requires distinct source-ordered groups and complete pivot values"))
 		}
-		for column, cell := range append([]ProjectMetadataCell{row.Layer, row.Species, row.Order}, row.Covers...) {
+		values := []ProjectMetadataCell{row.Layer, row.Species}
+		if common {
+			values = append(values, *row.CommonName)
+		}
+		values = append(values, row.Order)
+		for column, cell := range append(values, row.Covers...) {
 			if cell.Storage != "text" && cell.Storage != "null" {
 				return fail(fmt.Errorf("Summary workbook body row%d requires original text/NULL output, not scalar conversion", i+1))
 			}
@@ -124,13 +152,16 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		}
 		if i > 0 {
 			prior := preview.Rows[i-1]
-			if !less(prior.Layer, row.Layer) && (!reflect.DeepEqual(prior.Layer, row.Layer) || !less(prior.Species, row.Species)) {
+			ordered := less(prior.Layer, row.Layer) || reflect.DeepEqual(prior.Layer, row.Layer) &&
+				(less(prior.Species, row.Species) || reflect.DeepEqual(prior.Species, row.Species) &&
+					common && less(*prior.CommonName, *row.CommonName))
+			if !ordered {
 				return fail(errors.New("Summary workbook body groups are duplicated or outside the source literal ordering"))
 			}
 		}
 	}
 	data, err := renderSummaryWorkbookWithSheets(ctx, provenance, summaryWorkbookLayout{
-		Sheet: sheet, Title: input.Title, LastRow: first + len(preview.Rows) - 1, LastColumn: 3 + len(preview.Columns),
+		Sheet: sheet, Title: input.Title, LastRow: first + len(preview.Rows) - 1, LastColumn: leading + len(preview.Columns),
 		SeparatorRow: separator, ItalicFromRow: first, HeaderRows: []int{1, headerRow}, Cells: cells,
 	}, writeSheets)
 	if err != nil {

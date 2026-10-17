@@ -1,9 +1,9 @@
-import type { SummaryVegetationWorkbookOptions, SummaryVegetationWorkbookAncillaryReview,
+import type { SummaryVegetationWorkbookOptions as GeneratedSummaryWorkbookOptions, SummaryVegetationWorkbookAncillaryReview,
   SummaryVegetationWorkbookReportSummary, VegetationWorkbookOutcome } from '../bindings/github.com/boostao/vpro-wails';
 import { lifeformShape as shape } from './lifeformSummary';
 import { workbookText, workbookWorksheetName, workbookFoldedName } from './lifeformWorkbook';
 import { summaryVegetationOptionError, validateSummaryVegetationAsync,
-  type SummaryVegetationOwner, type SummaryVegetationPreview } from './summaryVegetation';
+  type SummaryVegetationOwner, type SummaryVegetationPreview, type SummaryVegetationReferenceMode } from './summaryVegetation';
 import { validateSummaryEnvironmentalLifeformOptions,
   type SummaryEnvironmentalLifeformPreview } from './summaryVegetationEnvironmental';
 import { PublicationSession } from './publicationSession';
@@ -11,6 +11,11 @@ import { validateEnvironmentWorkbookOutcome } from './environmentWorkbook';
 
 export const summaryVegetationWorkbookScope = 'Explicit read-only normal-SU layer inspection; literal XLSX, not original NewShortVeg orchestration, saved callbacks, ancillary sheets or formatting/printing parity';
 export const summaryVegetationAncillaryWorkbookScope = 'Explicit read-only normal-SU layer inspection with SU Table and optional ReportSummary; literal XLSX, not original NewShortVeg preflight/callbacks or formatting/printing parity';
+export const summaryVegetationEffectiveReferencesScope = 'Explicit read-only normal-SU layer inspection with projected attribute/common/guide references; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity';
+export const summaryVegetationEffectiveAncillaryScope = 'Explicit read-only normal-SU layer inspection with projected attribute/common/guide references, SU Table and optional ReportSummary; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity';
+type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references'> & {
+  references?: SummaryVegetationReferenceMode;
+};
 export type SummaryWorkbookCalculation = Pick<SummaryVegetationWorkbookOptions, 'average' | 'display' | 'showClass'>;
 type SummaryWorkbookReportSummary = Omit<SummaryVegetationWorkbookReportSummary, 'units'> & {
   units: NonNullable<SummaryVegetationWorkbookReportSummary['units']>;
@@ -41,7 +46,8 @@ function reject(): never {
 }
 function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
   const keys = ['title', 'average', 'display', 'showClass', 'includeEnv'];
-  if ((!shape(value, keys) && !shape(value, [...keys, 'ancillary'])) ||
+  if ((!shape(value, keys) && !shape(value, [...keys, 'ancillary']) &&
+      !shape(value, [...keys, 'references']) && !shape(value, [...keys, 'ancillary', 'references'])) ||
       !workbookText(value.title) || typeof value.includeEnv !== 'boolean' ||
       typeof value.average !== 'number' || typeof value.display !== 'number' || typeof value.showClass !== 'number' ||
       summaryVegetationOptionError(value.average, value.display, value.showClass, 11)) reject();
@@ -51,6 +57,11 @@ function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
     if (!shape(value.ancillary, ['createSummary']) || typeof value.ancillary.createSummary !== 'boolean') reject();
     result.ancillary = { createSummary: value.ancillary.createSummary };
   }
+  if (Object.hasOwn(value, 'references')) {
+    if (!shape(value.references, ['showCommon', 'useGuideNames']) ||
+        typeof value.references.showCommon !== 'boolean' || typeof value.references.useGuideNames !== 'boolean') reject();
+    result.references = { showCommon: value.references.showCommon, useGuideNames: value.references.useGuideNames };
+  }
   return result;
 }
 export function sameSummaryWorkbookOptions(left: SummaryVegetationWorkbookOptions,
@@ -58,7 +69,9 @@ export function sameSummaryWorkbookOptions(left: SummaryVegetationWorkbookOption
   return left.title === right.title && left.average === right.average && left.display === right.display &&
     left.showClass === right.showClass && left.includeEnv === right.includeEnv &&
     (left.ancillary === undefined ? right.ancillary === undefined :
-      !!left.ancillary && !!right.ancillary && left.ancillary.createSummary === right.ancillary.createSummary);
+      !!left.ancillary && !!right.ancillary && left.ancillary.createSummary === right.ancillary.createSummary) &&
+    (left.references === undefined ? right.references === undefined : !!left.references && !!right.references &&
+      left.references.showCommon === right.references.showCommon && left.references.useGuideNames === right.references.useGuideNames);
 }
 
 async function ancillaryValue(value: unknown, options: SummaryVegetationWorkbookOptions,
@@ -113,7 +126,9 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
   current: () => boolean = () => true): Promise<ValidatedSummaryVegetationWorkbookReview | null> {
   if (!current()) return null;
   const options = optionsValue(requested);
-  const scope = options.ancillary ? summaryVegetationAncillaryWorkbookScope : summaryVegetationWorkbookScope;
+  const scope = options.references
+    ? options.ancillary ? summaryVegetationEffectiveAncillaryScope : summaryVegetationEffectiveReferencesScope
+    : options.ancillary ? summaryVegetationAncillaryWorkbookScope : summaryVegetationWorkbookScope;
   if (!shape(value, ['preview', 'environment', 'options', 'scope', 'sheet', 'firstVegetationRow',
     'approvalHash', 'workbookSHA256', 'bytes', ...(options.ancillary ? ['ancillary'] : [])]) ||
       !sameSummaryWorkbookOptions(optionsValue(value.options), options) ||
@@ -128,7 +143,7 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
     options.average, options.display, options.showClass, 11, {
       preview: () => Promise.reject(new Error('Workbook validation cannot dispatch a read')),
       cancel() {}, validationYield,
-    }, current);
+    }, current, options.references);
   if (!current() || preview === null) return null;
   const environment = options.includeEnv
     ? await validateSummaryEnvironmentalLifeformOptions(value.environment, owner, options, validationYield, current)
@@ -183,6 +198,7 @@ export class SummaryVegetationWorkbookSession {
   private generation = 0;
   private read: SummaryWorkbookRead | null = null;
   private state = { title: '', includeEnv: false, includeAncillary: false, createSummary: false,
+    includeReferences: false, showCommon: false, useGuideNames: false,
     destination: '', draftError: '', error: '',
     reviewing: false, review: null as ValidatedSummaryVegetationWorkbookReview | null };
   constructor(private readonly owner: SummaryVegetationOwner) {
@@ -208,7 +224,9 @@ export class SummaryVegetationWorkbookSession {
   options(calculation: SummaryWorkbookCalculation): SummaryVegetationWorkbookOptions {
     return optionsValue({ average: calculation.average, display: calculation.display, showClass: calculation.showClass,
       title: this.state.title, includeEnv: this.state.includeEnv,
-      ...(this.state.includeAncillary ? { ancillary: { createSummary: this.state.createSummary } } : {}) });
+      ...(this.state.includeAncillary ? { ancillary: { createSummary: this.state.createSummary } } : {}),
+      ...(this.state.includeReferences ? { references: {
+        showCommon: this.state.showCommon, useGuideNames: this.state.useGuideNames } } : {}) });
   }
   edit(field: 'title' | 'destination', raw: string): void {
     if (!this.editable()) throw new Error('Wait for review or acknowledge the workbook publication before editing.');
@@ -232,6 +250,20 @@ export class SummaryVegetationWorkbookSession {
     this.state.createSummary = include; this.state.review = null; this.state.error = '';
     this.notify();
   }
+  selectReferences(field: 'include' | 'common' | 'guide', selected: boolean): void {
+    if (!this.editable()) throw new Error('Wait for review or acknowledge the workbook publication before editing.');
+    if (field !== 'include' && !this.state.includeReferences)
+      throw new Error('Select effective source references before selecting common or guide names.');
+    if (field === 'include') this.state.includeReferences = selected;
+    else if (field === 'guide') {
+      this.state.useGuideNames = selected;
+      if (selected) this.state.showCommon = true;
+    } else {
+      if (!selected && this.state.useGuideNames) throw new Error('Guide names require common-name output; clear guide names first.');
+      this.state.showCommon = selected;
+    }
+    this.state.review = null; this.state.error = ''; this.notify();
+  }
   private validateDraft() {
     this.state.draftError = !workbookText(this.state.title)
       ? 'Title requires valid literal workbook text of at most 32767 UTF-16 units.'
@@ -241,6 +273,7 @@ export class SummaryVegetationWorkbookSession {
   undoDraft(): void {
     if (!this.editable()) throw new Error('Wait for review or acknowledge the workbook publication before Undo.');
     Object.assign(this.state, { title: '', includeEnv: false, includeAncillary: false, createSummary: false,
+      includeReferences: false, showCommon: false, useGuideNames: false,
       destination: '', draftError: '', error: '', review: null });
     this.notify();
   }

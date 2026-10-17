@@ -15,6 +15,12 @@ func validateSummaryWorkbookCreatedAt(value string) error {
 }
 
 func summaryWorkbookScope(options SummaryVegetationWorkbookOptions) string {
+	if options.References != nil {
+		if options.Ancillary != nil {
+			return summaryVegetationEffectiveAncillaryScope
+		}
+		return summaryVegetationEffectiveReferencesScope
+	}
 	if options.Ancillary != nil {
 		return summaryVegetationAncillaryWorkbookScope
 	}
@@ -26,6 +32,13 @@ func prepareSummaryWorkbookSource(ctx context.Context, source summaryVegetationW
 	if options.Ancillary == nil {
 		if source.Ancillary != nil {
 			return summaryVegetationWorkbook{}, errors.New("Summary draft workbook has unexpected ancillary source authority")
+		}
+		if options.References != nil {
+			return prepareSummaryVegetationWorkbookWithSheets(ctx, source.Input, struct {
+				Source  summaryVegetationWorkbookSource
+				Options SummaryVegetationWorkbookOptions
+				Scope   string
+			}{source, options, summaryWorkbookScope(options)}, nil)
 		}
 		return prepareSummaryVegetationWorkbook(ctx, source.Input)
 	}

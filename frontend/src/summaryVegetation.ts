@@ -1,6 +1,11 @@
 import { lifeformText, lifeformShape, lifeformCell, lifeformRowID, type LifeformTextCell } from './lifeformSummary';
 
 export type SummaryVegetationOwner = { contextId: string; project: string; projectPath: string; su: string; suPath: string };
+export type SummaryVegetationReferenceMode = { showCommon: boolean; useGuideNames: boolean };
+export type SummaryVegetationReferenceMetadata = {
+  masterRows: number; personalRows: number; descriptionRows: number; removedMasterRows: number;
+  derivedRows: number; unionRows: number; showCommon: boolean; useGuideNames: boolean;
+};
 export type SummaryVegetationWitness = {
   stageRowId: string; conversionLayerId: string; membershipId: string; unit: string; layerMapId: string;
   referenceOrigins: { table: string; rowId: string }[]; rawVegRowIds: string[];
@@ -11,13 +16,15 @@ export type SummaryVegetationField = { name: string; daoType: number; size: numb
 export type SummaryVegetationOrder = LifeformTextCell | { storage: 'real'; text: null; integer: null; real: number; blobHex: null };
 export type SummaryVegetationRow = {
   layer: LifeformTextCell; species: LifeformTextCell; order: SummaryVegetationOrder;
+  commonName?: LifeformTextCell;
   covers: LifeformTextCell[]; witnesses: SummaryVegetationWitness[];
 };
 export type SummaryVegetationPreview = SummaryVegetationOwner & {
   average: number; display: number; showClass?: number; groupAndOrder?: number;
   groupField?: SummaryVegetationField; orderField?: SummaryVegetationField;
-  source: 'literal-normal-su-layer' | 'literal-normal-su-grouped';
-  ordering: 'literal-null-first-layer-species' | 'literal-null-first-group-species';
+  source: 'literal-normal-su-layer' | 'literal-normal-su-grouped' | 'literal-normal-su-effective-references';
+  ordering: 'literal-null-first-layer-species' | 'literal-null-first-group-species' | 'literal-null-first-layer-species-common';
+  references?: SummaryVegetationReferenceMetadata;
   memberships: { rowId: string; plotNumber: LifeformTextCell; siteUnit: LifeformTextCell }[];
   units: SummaryVegetationUnit[]; columns: string[]; rows: SummaryVegetationRow[];
 };
@@ -61,20 +68,41 @@ function summaryOrderCell(value: unknown, grouped: boolean): value is SummaryVeg
 }
 
 function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOwner,
-  average: number, display: number, showClass = 0, groupAndOrder = 11): Generator<void, SummaryVegetationPreview> {
+  average: number, display: number, showClass = 0, groupAndOrder = 11,
+  references?: SummaryVegetationReferenceMode): Generator<void, SummaryVegetationPreview> {
   const classMode = display === 4 || display === 5;
   const grouped = groupAndOrder !== 11;
+  const common = !!references && (references.showCommon || references.useGuideNames);
+  const source = references ? 'literal-normal-su-effective-references' :
+    grouped ? 'literal-normal-su-grouped' : 'literal-normal-su-layer';
+  const ordering = common ? 'literal-null-first-layer-species-common' :
+    grouped ? 'literal-null-first-group-species' : 'literal-null-first-layer-species';
+  if (references && (grouped || !lifeformShape(references, ['showCommon', 'useGuideNames']) ||
+      typeof references.showCommon !== 'boolean' || typeof references.useGuideNames !== 'boolean')) reject();
   if (summaryVegetationOptionError(average, display, showClass, groupAndOrder) || !Object.values(owner).every(lifeformText) ||
       owner.contextId === '' || owner.project === '' || owner.projectPath === '' || owner.suPath === '' ||
       owner.su === '' || owner.su === 'None' || owner.su === 'USysSuTableDynamic' ||
       !lifeformShape(value, ['contextId', 'project', 'projectPath', 'su', 'suPath', 'average', 'display',
         'source', 'ordering', 'memberships', 'units', 'columns', 'rows', ...(classMode ? ['showClass'] : []),
-        ...(grouped ? ['groupAndOrder', 'groupField', 'orderField'] : [])]) ||
+        ...(grouped ? ['groupAndOrder', 'groupField', 'orderField'] : []), ...(references ? ['references'] : [])]) ||
       Object.entries(owner).some(([key, item]) => value[key] !== item) ||
       value.average !== average || value.display !== display || classMode && value.showClass !== showClass ||
-      value.source !== (grouped ? 'literal-normal-su-grouped' : 'literal-normal-su-layer') ||
-      value.ordering !== (grouped ? 'literal-null-first-group-species' : 'literal-null-first-layer-species') || !Array.isArray(value.memberships) ||
+      value.source !== source || value.ordering !== ordering || !Array.isArray(value.memberships) ||
       !Array.isArray(value.units) || !Array.isArray(value.columns) || !Array.isArray(value.rows)) reject();
+  let referenceMetadata: SummaryVegetationReferenceMetadata | undefined;
+  if (references) {
+    const raw = value.references;
+    if (!lifeformShape(raw, ['masterRows', 'personalRows', 'descriptionRows', 'removedMasterRows', 'derivedRows',
+      'unionRows', 'showCommon', 'useGuideNames'])) reject();
+    const { masterRows, personalRows, descriptionRows, removedMasterRows, derivedRows, unionRows } = raw;
+    const count = (item: unknown): item is number => typeof item === 'number' && Number.isSafeInteger(item) && item >= 0;
+    if (!count(masterRows) || !count(personalRows) || !count(descriptionRows) || !count(removedMasterRows) ||
+        !count(derivedRows) || !count(unionRows) || removedMasterRows > masterRows || derivedRows > descriptionRows ||
+        unionRows > masterRows - removedMasterRows + personalRows + derivedRows ||
+        raw.showCommon !== common || raw.useGuideNames !== references.useGuideNames) reject();
+    referenceMetadata = { masterRows, personalRows, descriptionRows, removedMasterRows, derivedRows, unionRows,
+      showCommon: common, useGuideNames: references.useGuideNames };
+  }
   const groupField = grouped ? { name: groupAndOrder === 12 ? 'Layer' : groupAndOrder === 13 ? 'LifeForm' : 'Group',
     daoType: groupAndOrder === 14 ? 9 : 10, size: groupAndOrder === 12 ? 1 : groupAndOrder === 13 ? 3 : 0 } : undefined;
   const orderField = grouped ? { name: 'Order', daoType: display === 6 ? 7 : 10, size: display === 6 ? 8 : 0 } : undefined;
@@ -117,14 +145,21 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
   const rows: SummaryVegetationRow[] = [], stages = new Map<string, string>(), groups = new Set<string>();
   for (const item of value.rows) {
     yield;
-    if (!lifeformShape(item, ['layer', 'species', 'order', 'covers', 'witnesses']) ||
+    if (!lifeformShape(item, ['layer', 'species', 'order', 'covers', 'witnesses', ...(common ? ['commonName'] : [])]) ||
         !lifeformCell(item.layer, groupAndOrder === 12 ? 1 : 3) ||
         groupAndOrder === 14 && item.layer.storage !== 'null' ||
-        !lifeformCell(item.species, 255) || !summaryOrderCell(item.order, grouped && display === 6) ||
+        !lifeformCell(item.species, 255) ||
+        !summaryOrderCell(item.order, grouped && display === 6) ||
         !Array.isArray(item.covers) || item.covers.length !== columns.length ||
         !Array.isArray(item.witnesses) || item.witnesses.length === 0 ||
         (display === 2 || display === 6 || classMode) && item.order.storage === 'null') reject();
-    const key = JSON.stringify([item.layer.storage, item.layer.text, item.species.storage, item.species.text]);
+    let commonName: LifeformTextCell | undefined;
+    if (common) {
+      if (!lifeformCell(item.commonName, 255)) reject();
+      commonName = { ...item.commonName };
+    }
+    const key = JSON.stringify([item.layer.storage, item.layer.text, item.species.storage, item.species.text,
+      ...(commonName ? [commonName.storage, commonName.text] : [])]);
     if (groups.has(key)) reject();
     groups.add(key);
     const covers: LifeformTextCell[] = [];
@@ -159,7 +194,8 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
       for (const origin of witness.referenceOrigins) {
         yield;
         if (!lifeformShape(origin, ['table', 'rowId']) || !lifeformRowID(origin.rowId) ||
-            origin.table !== 'USysAllSpecs' && origin.table !== 'USysUserSpp') reject();
+            origin.table !== 'USysAllSpecs' && origin.table !== 'USysUserSpp' &&
+              (!references || origin.table !== 'USysSppAttributeDescription')) reject();
         const key = JSON.stringify([origin.table, origin.rowId]);
         if (originKeys.has(key)) reject();
         originKeys.add(key); origins.push({ table: origin.table, rowId: origin.rowId });
@@ -189,16 +225,17 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
       orders.sort(literalCompare);
       if (item.order.text !== (orders.length ? orders[orders.length - 1] : null)) reject();
     }
-    const row = { layer: { ...item.layer }, species: { ...item.species }, order: { ...item.order }, covers, witnesses };
+    const row: SummaryVegetationRow = { layer: { ...item.layer }, species: { ...item.species },
+      ...(commonName ? { commonName } : {}), order: { ...item.order }, covers, witnesses };
     if (rows.length) {
       const prior = rows[rows.length - 1];
-      if ((compareCell(prior.layer, row.layer) || compareCell(prior.species, row.species)) >= 0) reject();
+      if ((compareCell(prior.layer, row.layer) || compareCell(prior.species, row.species) ||
+          (common ? compareCell(prior.commonName!, row.commonName!) : 0)) >= 0) reject();
     }
     rows.push(row);
   }
   const result: SummaryVegetationPreview = { ...owner, average, display,
-    source: grouped ? 'literal-normal-su-grouped' : 'literal-normal-su-layer',
-    ordering: grouped ? 'literal-null-first-group-species' : 'literal-null-first-layer-species',
+    source, ordering, ...(referenceMetadata ? { references: referenceMetadata } : {}),
     ...(grouped ? { groupAndOrder, groupField, orderField } : {}),
     ...(classMode ? { showClass } : {}), memberships, units, columns, rows };
   const pending: object[] = [result];
@@ -222,8 +259,9 @@ export function validateSummaryVegetation(value: unknown, owner: SummaryVegetati
 }
 
 export async function validateSummaryVegetationAsync(value: unknown, owner: SummaryVegetationOwner,
-  average: number, display: number, showClass: number, groupAndOrder: number, port: SummaryVegetationPort, current: () => boolean): Promise<SummaryVegetationPreview | null> {
-  const validation = summaryVegetationValidation(value, owner, average, display, showClass, groupAndOrder);
+  average: number, display: number, showClass: number, groupAndOrder: number, port: SummaryVegetationPort,
+  current: () => boolean, references?: SummaryVegetationReferenceMode): Promise<SummaryVegetationPreview | null> {
+  const validation = summaryVegetationValidation(value, owner, average, display, showClass, groupAndOrder, references);
   let count = 0;
   for (;;) {
     if (!current()) return null;

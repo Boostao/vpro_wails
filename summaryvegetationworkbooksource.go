@@ -68,8 +68,8 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 	if err := validateSummaryVegetationDisplayOptions(ctx, options.Average, options.Display, calculationClass); err != nil {
 		return fail(err)
 	}
-	raw, err := environment.report.readSnapshot(ctx, contextID, plots, owner, tx,
-		options.Average, options.Display, calculationClass, 11)
+	raw, err := environment.report.readSnapshotWithReferences(ctx, contextID, plots, owner, tx,
+		options.Average, options.Display, calculationClass, 11, options.References)
 	if err != nil {
 		return fail(err)
 	}
@@ -95,6 +95,7 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 		result.Input.Environment = &summaryEnvironmentalWorkbookInput{
 			FirstRow: 5, FieldList: result.Environment.FieldList,
 			Units: summaryEnvironmentalPreviewUnits(raw.Preview), Rows: rows,
+			English: raw.Preview.References != nil && raw.Preview.References.ShowCommon,
 		}
 	}
 	if err := ctx.Err(); err != nil {

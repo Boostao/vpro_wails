@@ -122,6 +122,44 @@ and five closed native families match. Private
 Only directly related documentation is reconciled after integration. The immutable
 demo, original Report exclusions and rejected Excel/clipboard unknown are unchanged.
 
+## Accepted effective-reference inspection
+
+The [accepted contract](LONG_VEGETATION_WORKBOOK_CONTRACT.md#default-off-accepted-effective-reference-inspection)
+adds no service or original Report action. Read-only attribute replacement,
+guide-before-UNION/common grouping, master32 versus personal16 and the
+master-only environmental policy have independent expected tests. Owned source
+modes, physical unrendered peer drift, authority refusal/retry, no-replace
+publication and an independently reopened literal common-name cell pass.
+Eight strict production-Go vectors exercise actual Svelte proxies, conditional
+authority, mode/draft/receipt, cancellation/generation and consumed50-row
+name-group rendering. Frozen validation passes208 related client/24 browser
+cases, check0/0/build, coupled race610.000s, vet7.250s and production12.735s.
+Validation receipt SHA256:
+`9383d8fff1ddcf36b70c3724fd4f2776916d229ab894c2c1d13b3304c3482d79`.
+An isolated baseline comparison preserves46 exact legacy vectors and discovery.
+Distinct exact-candidate review finds no significant issues.
+
+Actual Wails independently reopens five outputs, including common/guide,
+environmental and ancillary combinations. Literal names/cells, NULL/empty,
+guide-derived NULL, unchanged personal names and master-only lifeform values pass.
+Name pages are50/19; four actual remounts/four exact close acknowledgements,
+54 responsive observations and a held metadata validation prove cancellation/
+stale-result rejection. A held committed publication becomes persistent unknown
+without replay or receipt erasure. An independent backend-off profile preserves
+ordinary review and refuses all four effective-reference modes with zero outputs.
+All16 fixture/config/audit files remain exact; all three owners normally close
+and fresh PID checks prove absence. A private main-entry-only remount seam does
+not change production components/session/validators. Rejected fixture/header/AST
+harness evidence remains retained; completed publications were never replayed.
+
+Fresh full race accepts exit0, UTC2026-10-17T09:09:51.353051 to10:23:49.445398,
+4438.094s total/root4417.042s. All1906 managed inputs/108 artifacts, exact discovery,
+26 canonical inputs/21 protected assets and six closed native families match.
+Private `summary-effective-reference-integration/receipt.json` SHA256:
+`37f53d95a90b77d16db216edb5545f6d6c113a9939990704af764ece1d49347c`.
+Only directly related documentation is reconciled after integration. Separate
+flags remain default-off; the immutable demo and clipboard unknown are unchanged.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

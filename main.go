@@ -353,6 +353,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	summaryVegetationWorkbook.referencesEnabled, err = siviFeature(summaryVegetationEffectiveReferencesFeatureEnvironment, os.LookupEnv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	summaryVegetationPreferencesEnabled, err := summaryVegetationPreferencesFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)

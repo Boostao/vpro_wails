@@ -20,11 +20,12 @@ type summaryVegetationLayerWitness struct {
 }
 
 type summaryVegetationLayerRow struct {
-	Layer     ProjectMetadataCell
-	Species   ProjectMetadataCell
-	Order     ProjectMetadataCell
-	Covers    []ProjectMetadataCell
-	Witnesses []summaryVegetationLayerWitness
+	Layer      ProjectMetadataCell
+	Species    ProjectMetadataCell
+	CommonName *ProjectMetadataCell `json:"CommonName,omitempty"`
+	Order      ProjectMetadataCell
+	Covers     []ProjectMetadataCell
+	Witnesses  []summaryVegetationLayerWitness
 }
 
 type summaryVegetationLayerReport struct {
@@ -47,6 +48,13 @@ func prepareSummaryVegetationLayerDisplay(ctx context.Context, project, suName s
 
 func prepareSummaryVegetationLayerOptions(ctx context.Context, project, suName string,
 	veg, su, master, personal, layers ProjectMetadataTable, average, display, showClass int) (summaryVegetationLayerReport, error) {
+	return prepareSummaryVegetationLayerReferences(ctx, project, suName, veg, su, master, personal, layers,
+		average, display, showClass, nil)
+}
+
+func prepareSummaryVegetationLayerReferences(ctx context.Context, project, suName string,
+	veg, su, master, personal, layers ProjectMetadataTable, average, display, showClass int,
+	references *summaryVegetationReferencePlan) (summaryVegetationLayerReport, error) {
 	fail := func(err error) (summaryVegetationLayerReport, error) { return summaryVegetationLayerReport{}, err }
 	if err := validateSummaryVegetationDisplayOptions(ctx, average, display, showClass); err != nil {
 		return fail(err)
@@ -120,7 +128,9 @@ func prepareSummaryVegetationLayerOptions(ctx context.Context, project, suName s
 		origins[id] = sourceIDs[sourceKey{observation.PlotNumber, vegetationTextKey(observation.Species)}]
 		conversionLayers[id] = observation.LayerRowID
 	}
-	result, err := planSummaryVegetationLayerOptions(ctx, veg, su, stage, master, personal, layers, average, display, showClass)
+	result, err := planSummaryVegetationStage(ctx, veg, su, stage, master, personal, layers, average, display, showClass,
+		summaryVegetationStageProjection{joinField: "Layer1234567", joinLimit: 2, labelField: "Layer", labelLimit: 3,
+			references: references})
 	if err != nil {
 		return fail(err)
 	}
@@ -162,6 +172,7 @@ type summaryVegetationStageProjection struct {
 	labelLimit   int
 	nullGroup    bool
 	numericOrder bool
+	references   *summaryVegetationReferencePlan
 }
 
 func planSummaryVegetationStage(ctx context.Context,
@@ -175,9 +186,16 @@ func planSummaryVegetationStage(ctx context.Context,
 	if err != nil {
 		return fail(err)
 	}
-	references, err := prepareVegetationLifeformReferences(ctx, master, personal)
-	if err != nil {
-		return fail(fmt.Errorf("summary vegetation layer references: %w", err))
+	var references vegetationLifeformReferences
+	showCommon := false
+	if projection.references != nil {
+		references = projection.references.References
+		showCommon = projection.references.Review.ShowCommon
+	} else {
+		references, err = prepareVegetationLifeformReferences(ctx, master, personal)
+		if err != nil {
+			return fail(fmt.Errorf("summary vegetation layer references: %w", err))
+		}
 	}
 	sc, err := siteUnitTransferColumns(stage, "Plotnumber", "Layer", "Species", "Cover")
 	if err != nil {
@@ -225,7 +243,11 @@ func planSummaryVegetationStage(ctx context.Context,
 		if err := ctx.Err(); err != nil {
 			return fail(err)
 		}
-		for name, limit := range map[string]int{"Code": 8, "ScientificName": 255, "EnglishName": 255, "Codetype": 1} {
+		codeLimit, typeLimit := 8, 1
+		if projection.references != nil {
+			codeLimit, typeLimit = 255, 255
+		}
+		for name, limit := range map[string]int{"Code": codeLimit, "ScientificName": 255, "EnglishName": 255, "Codetype": typeLimit} {
 			if err := lifeformSummaryText(row.Cells[rc[name]], limit); err != nil {
 				return fail(fmt.Errorf("summary vegetation layer reference row %s %s: %w", row.RowID, name, err))
 			}
@@ -252,7 +274,7 @@ func planSummaryVegetationStage(ctx context.Context,
 			members[*plot] = append(members[*plot], row)
 		}
 	}
-	type groupKey struct{ layer, species string }
+	type groupKey struct{ layer, species, common string }
 	type group struct {
 		row    summaryVegetationLayerRow
 		covers map[string][]ProjectMetadataCell
@@ -300,20 +322,29 @@ func planSummaryVegetationStage(ctx context.Context,
 					return fail(err)
 				}
 				name := species
+				common := ProjectMetadataCell{Storage: "null"}
 				origins := []vegetationLifeformReferenceOrigin{}
 				if ref.RowID != "" {
 					if scientific := ref.Cells[rc["ScientificName"]]; scientific.Storage != "null" {
 						name = scientific
 					}
 					origins = append(origins, references.Origins[ref.RowID]...)
+					common = ref.Cells[rc["EnglishName"]]
 				}
-				key := groupKey{vegetationTextKey(mapping.label), vegetationTextKey(name)}
+				key := groupKey{layer: vegetationTextKey(mapping.label), species: vegetationTextKey(name)}
+				if showCommon {
+					key.common = vegetationTextKey(common)
+				}
 				g := groups[key]
 				if g == nil {
 					g = &group{row: summaryVegetationLayerRow{Layer: cloneSiteUnitCell(mapping.label),
 						Species: cloneSiteUnitCell(name), Witnesses: []summaryVegetationLayerWitness{}},
 						covers: map[string][]ProjectMetadataCell{}}
 					groups[key] = g
+					if showCommon {
+						value := cloneSiteUnitCell(common)
+						g.row.CommonName = &value
+					}
 				}
 				pivot[unit] = true
 				g.covers[unit] = append(g.covers[unit], cloneSiteUnitCell(cover))
@@ -381,10 +412,19 @@ func planSummaryVegetationStage(ctx context.Context,
 			}
 			return *a.Layer.Text < *b.Layer.Text
 		}
-		if a.Species.Text == nil || b.Species.Text == nil {
-			return a.Species.Text == nil && b.Species.Text != nil
+		if vegetationTextKey(a.Species) != vegetationTextKey(b.Species) {
+			if a.Species.Text == nil || b.Species.Text == nil {
+				return a.Species.Text == nil
+			}
+			return *a.Species.Text < *b.Species.Text
 		}
-		return *a.Species.Text < *b.Species.Text
+		if showCommon {
+			if a.CommonName.Text == nil || b.CommonName.Text == nil {
+				return a.CommonName.Text == nil && b.CommonName.Text != nil
+			}
+			return *a.CommonName.Text < *b.CommonName.Text
+		}
+		return false
 	})
 	if err := ctx.Err(); err != nil {
 		return fail(err)

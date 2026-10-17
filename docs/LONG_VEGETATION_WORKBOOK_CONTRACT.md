@@ -2425,6 +2425,54 @@ artifacts, discovery, protected data and five closed native families. See the
 This acceptance does not enable defaults, replace the delivered demo or establish
 original Report/Excel behavior. Original clipboard restoration remains unknown.
 
+### Default-off accepted effective-reference inspection
+
+This reviewed/native-accepted and full-race integrated extension reuses the inspection service, publisher,
+owned snapshot, retained session and panel. Independently default-off
+`VPRO_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES` and
+`VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES` require existing workbook gates.
+Strict optional `references={showCommon:boolean,useGuideNames:boolean}` selects
+read-only effective references; omission retains legacy wire/approval/output.
+An independent approval domain binds complete physical inputs and both options.
+Ancillary mode remains optional, with its own unchanged reviewed-time contract.
+
+The projection excludes master IsAttribute=True (-1) and derives every metadata
+row with non-NULL ShortName as Code/U/Definition, without filtering on metadata
+IsAttribute or inventing physical master row IDs. Source origins retain the
+physical description table/row. Master Code/Codetype255 and Lifeform LONG32 are
+distinct from personal Code8/Codetype1/LifeForm INTEGER16 and staged Species8.
+Guide selects master CombinedEnglishName before whole-row literal UNION;
+personal EnglishName stays unchanged and derived guide names are NULL.
+Guide forces effective common-name output, while requested options stay explicit.
+
+Layer11 groups/sorts by common name when selected; its workbook column between
+Spp and Order shifts environmental/header/body columns consistently. Complete
+master/description peers remain in provenance even when not rendered. The
+environmental lifeform calculation uses retained physical master rows, never
+personal UNION rows or derived NULL-Lifeform attributes, with signed32 only in
+this new mode. Ordinary accepted consumers remain signed16. Literal equality/
+ordering is an adaptation, not general Access collation or UNION representative
+parity. Group12 remains separate; Group13/14 First(common name) is not inferred.
+
+Mode/common/guide drafts preserve independent title/destination errors and
+irreversible receipts. Guide/common coupling is visible; name-group review uses
+50-row pages and explicit NULL/empty labels. Eight strict-Go transport vectors,
+actual client proxies, cancellation/generation, draft/receipt and consumed
+rendering cases pass. Frozen validation accepts208 related client/24 browser
+cases, check0/0/build, coupled race/vet/production and46 exact legacy comparisons.
+Distinct exact-candidate review finds no significant issues. Actual Wails accepts
+five independently reopened outputs,50/19-row name pages, four real remounts/
+four exact native-close acknowledgements,54 responsive observations and four
+independent backend refusals. Held metadata validation rejects stale results;
+lost committed-publication acknowledgement stays unknown without replay or
+receipt erasure. All16 fixture/config/audit files remain unchanged and owners
+normally close. Private host-remount instrumentation changes no product component.
+Fresh full race passes in4438.094s with1906 inputs/108 artifacts, discovery,
+canonical/protected data and six closed native families unchanged. See the
+[evidence summary](MIGRATION_EVIDENCE.md#accepted-effective-reference-inspection).
+No physical reference mutation, original quality/lumping/callback/constancy/
+Excel/printing, default or delivered-demo promotion is granted.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

@@ -14,10 +14,12 @@
   const session = summaryVegetationWorkbookSession(owned);
   const enabled = import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK === 'true';
   const ancillaryEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK === 'true';
+  const referencesEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES === 'true';
   const environmentEnabled = summaryEnvironmentalLifeformEnabled;
   let viewState = $state.raw(session.view());
   let error = $state('');
   let unitPage = $state(0);
+  let referencePage = $state(0);
   const unitPageSize = 50;
   const barrier = $derived(viewState.publication.busy || viewState.publication.blocked);
   const held = $derived(disabled || viewState.reviewing || barrier);
@@ -25,6 +27,8 @@
     average: calculation.average, display: calculation.display, showClass: calculation.showClass,
     title: viewState.title, includeEnv: viewState.includeEnv,
     ...(viewState.includeAncillary ? { ancillary: { createSummary: viewState.createSummary } } : {}),
+    ...(viewState.includeReferences ? { references: {
+      showCommon: viewState.showCommon, useGuideNames: viewState.useGuideNames } } : {}),
   }));
   const unsubscribe = session.subscribe(() => { viewState = session.view(); onBusyChange(session.held()); });
   function edit(field: 'title' | 'destination', raw: string) {
@@ -52,11 +56,18 @@
     error = '';
     try { session.undoDraft(); } catch (cause) { error = String(cause); }
   }
+  function selectReferences(field: 'include' | 'common' | 'guide', event: Event) {
+    if (held || !referencesEnabled) return;
+    const checked = (event.currentTarget as HTMLInputElement).checked;
+    error = '';
+    try { session.selectReferences(field, checked); } catch (cause) { error = String(cause); }
+  }
   async function review() {
     if (!enabled || held || viewState.draftError || viewState.includeEnv && !environmentEnabled ||
-        viewState.includeAncillary && !ancillaryEnabled) return;
+        viewState.includeAncillary && !ancillaryEnabled || viewState.includeReferences && !referencesEnabled) return;
     error = '';
     unitPage = 0;
+    referencePage = 0;
     try {
       await session.review(calculation, {
         review: (contextId, options) => SummaryVegetationWorkbookService.GetReview(contextId, JSON.stringify(options)),
@@ -65,7 +76,8 @@
     } catch (cause) { error = String(cause); }
   }
   async function publish() {
-    if (!enabled || held || viewState.draftError || !currentReview) return;
+    if (!enabled || held || viewState.draftError || !currentReview ||
+        viewState.includeReferences && !referencesEnabled) return;
     error = '';
     try {
       await session.publish(calculation, request =>
@@ -122,6 +134,23 @@
         onchange={event => selectAncillary('summary', event)} />
       Include ReportSummary counts, unit names and version
     </label>
+    <label class="checkbox">
+      <input type="checkbox" data-summary-workbook-references checked={viewState.includeReferences}
+        disabled={!enabled || held || !referencesEnabled} onchange={event => selectReferences('include', event)} />
+      Project effective source references and attribute descriptions
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" data-summary-workbook-common checked={viewState.showCommon}
+        disabled={!enabled || held || !referencesEnabled || !viewState.includeReferences || viewState.useGuideNames}
+        onchange={event => selectReferences('common', event)} />
+      Include common names in grouping and the workbook
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" data-summary-workbook-guide checked={viewState.useGuideNames}
+        disabled={!enabled || held || !referencesEnabled || !viewState.includeReferences}
+        onchange={event => selectReferences('guide', event)} />
+      Use master CombinedEnglishName (also includes common names)
+    </label>
     <label>New workbook destination (.xlsx)
       <input data-summary-workbook-destination value={viewState.destination} disabled={!enabled || held}
         oninput={event => edit('destination', event.currentTarget.value)} />
@@ -142,6 +171,45 @@
         {viewState.review.environment?.rows.length ?? 0} environmental rows; first vegetation row {viewState.review.firstVegetationRow}.
         {viewState.review.bytes} bytes.</p>
       <p>Approval: {viewState.review.approvalHash}<br />Workbook SHA256: {viewState.review.workbookSHA256}</p>
+      {#if viewState.review.preview.references}
+        {@const reference = viewState.review.preview.references}
+        <div data-summary-workbook-reference-plan class="plan">
+          <p>Effective references: {reference.masterRows} physical master rows;
+            {reference.removedMasterRows} old attribute rows excluded; {reference.personalRows} personal rows.
+            {reference.derivedRows} attribute rows projected from {reference.descriptionRows} description rows;
+            {reference.unionRows} distinct literal reference rows.
+            Common names: {reference.showCommon ? 'included' : 'not included'}.
+            Guide names: {reference.useGuideNames ? 'master CombinedEnglishName' : 'not selected'}.</p>
+          <p>Derived origins identify physical attribute-description rows, not invented master records.
+            Name groups are shown below; cover values are in the workbook. NULL and empty names remain distinct.</p>
+          <div class="unit-table">
+            <table aria-label="Reviewed effective reference groups">
+              <thead><tr><th scope="col">Layer</th><th scope="col">Scientific name/code</th>
+                {#if reference.showCommon}<th scope="col">Common name</th>{/if}<th scope="col">Order</th></tr></thead>
+              <tbody>{#each viewState.review.preview.rows.slice(referencePage * unitPageSize, (referencePage + 1) * unitPageSize) as row}
+                <tr><td>{row.layer.text === null ? '(NULL)' : row.layer.text === '' ? '(empty)' : row.layer.text}</td>
+                  <th scope="row">{row.species.text === null ? '(NULL)' : row.species.text === '' ? '(empty)' : row.species.text}</th>
+                  {#if reference.showCommon}
+                    {#if row.commonName}
+                      <td>{row.commonName.text === null ? '(NULL)' : row.commonName.text === '' ? '(empty)' : row.commonName.text}</td>
+                    {:else}
+                      <td><span role="alert">Reviewed common name is missing.</span></td>
+                    {/if}
+                  {/if}
+                  <td>{row.order.text === null ? '(NULL)' : row.order.text === '' ? '(empty)' : row.order.text}</td></tr>
+              {/each}</tbody>
+            </table>
+          </div>
+          <div class="actions">
+            <button data-summary-reference-previous disabled={held || referencePage === 0}
+              onclick={() => referencePage--}>Previous name groups</button>
+            <span>{viewState.review.preview.rows.length} name groups; page {referencePage + 1} of
+              {Math.max(1, Math.ceil(viewState.review.preview.rows.length / unitPageSize))}.</span>
+            <button data-summary-reference-next disabled={held || (referencePage + 1) * unitPageSize >= viewState.review.preview.rows.length}
+              onclick={() => referencePage++}>Next name groups</button>
+          </div>
+        </div>
+      {/if}
       {#if viewState.review.ancillary}
         <div data-summary-workbook-ancillary-plan class="plan">
           <p>Source sheets: {viewState.review.ancillary.sheets.join(', ')}.
@@ -176,10 +244,12 @@
   {/if}
   <p>Explicit Layer inspection export using Calculate, Display Values and Show above, plus these title/environment options.
     Saved presentation callbacks are not applied. Source data, preferences and audit history are not changed.
-    This is not the original Access Report action: attribute-description preflight, quality/lumping/naming callbacks,
-    original formatting, Excel coercion, printing and macros remain unavailable. Source worksheets are an explicit,
-    separately enabled inspection option. Existing destinations are never replaced.</p>
+    This is not the original Access Report action: quality/lumping callbacks, original formatting, Excel coercion,
+    printing and macros remain unavailable. Optional attribute/common/guide projection is read-only and uses literal
+    comparison, not Access collation or physical preflight mutations. Source worksheets are a separate inspection
+    option. Existing destinations are never replaced.</p>
   {#if !ancillaryEnabled}<p>Source worksheet publication is disabled in this build.</p>{/if}
+  {#if !referencesEnabled}<p>Effective reference projection is disabled in this build.</p>{/if}
 </section>
 
 <style>

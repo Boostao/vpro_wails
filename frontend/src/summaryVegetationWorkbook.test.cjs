@@ -31,6 +31,7 @@ const client = loadTypeScript('summaryVegetationWorkbook.ts', {
 });
 const wire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookWire.json'), 'utf8'));
 const ancillaryWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookAncillaryWire.json'), 'utf8'));
+const referenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookReferencesWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath']
   .map(key => [key, wire.vegetation.preview[key]]));
 const yieldNow = () => Promise.resolve();
@@ -48,6 +49,11 @@ function sessionFor(value) {
   if (value.options.ancillary) {
     session.includeAncillary(true);
     session.includeSummary(value.options.ancillary.createSummary);
+  }
+  if (value.options.references) {
+    session.selectReferences('include', true);
+    session.selectReferences('common', value.options.references.showCommon);
+    session.selectReferences('guide', value.options.references.useGuideNames);
   }
   return session;
 }
@@ -233,14 +239,15 @@ test('changing Calculate/Display invalidates review at publication and no destin
   assert.equal(dispatched, false);
 });
 
-function mountPanel(session, services, held = false, calculation = wire.environment.options, ancillaryEnabled = false) {
+function mountPanel(session, services, held = false, calculation = wire.environment.options, ancillaryEnabled = false,
+  referencesEnabled = false) {
   const filename = 'SummaryVegetationWorkbookPanel.svelte';
   const source = readFileSync(path.join(__dirname, filename), 'utf8');
   assert.deepEqual(compiler.compile(source, { filename, generate: 'client' }).warnings, []);
   let destroy;
   const notifications = [];
   let script = source.match(/<script lang="ts">([\s\S]*?)<\/script>/)[1].replace('$props()', '__props');
-  script += '\nexport const handlers = {review, publish, edit, undo, acknowledge, selectAncillary, view: () => viewState};';
+  script += '\nexport const handlers = {review, publish, edit, undo, acknowledge, selectAncillary, selectReferences, view: () => viewState};';
   const stripped = ts.transpileModule(script, {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
   }).outputText;
@@ -259,7 +266,8 @@ function mountPanel(session, services, held = false, calculation = wire.environm
   vm.runInNewContext(code, { module, exports: module.exports, structuredClone, setTimeout,
     __props: { owner, calculation, disabled: held, onBusyChange: value => notifications.push(value) },
     __environment: { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
-      VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: ancillaryEnabled ? 'true' : 'false' },
+      VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: ancillaryEnabled ? 'true' : 'false',
+      VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: referencesEnabled ? 'true' : 'false' },
     require(name) { assert.ok(name in dependencies, name); return dependencies[name]; },
   });
   return { ...module.exports.handlers, notifications, destroy: () => destroy() };
@@ -568,4 +576,193 @@ test('actual consumed server rendering bounds summary DOM to fifty units and dis
   assert.match(html, /\(NULL\)/);
   assert.match(html, /\(empty\)/);
   assert.match(html, /Date|Reviewed creation time/);
+});
+
+test('strict Go effective-reference wire accepts all modes and actual proxies without widening ordinary previews', async () => {
+  for (const value of Object.values(referenceWire)) {
+    const source = proxy(structuredClone(value));
+    assert.throws(() => structuredClone(source));
+    const result = await client.validateSummaryVegetationWorkbookReview(source, owner, value.options, yieldNow);
+    assert.deepEqual(plain(result), value);
+    assert.equal(Object.isFrozen(result.preview.references), true);
+    assert.equal(Object.isFrozen(result.options.references), true);
+    assert.equal(Object.isFrozen(result.preview.rows[0].witnesses[0].referenceOrigins), true);
+    source.preview.references.masterRows++;
+    assert.deepEqual(plain(result), value);
+    assert.throws(() => vegetation.validateSummaryVegetation(value.preview, owner, 1, 6));
+    if (value.environment) {
+      const { average, display, showClass } = value.options;
+      await assert.rejects(environmental.validateSummaryEnvironmentalLifeformOptions(
+        value.environment, owner, { average, display, showClass }, yieldNow));
+    }
+  }
+  const guideAttribute = referenceWire.guide.preview.rows.find(row => row.species.text === 'LF1');
+  assert.equal(guideAttribute.commonName.storage, 'null');
+  assert.deepEqual(guideAttribute.witnesses[0].referenceOrigins,
+    [{ table: 'USysSppAttributeDescription', rowId: '1' }, { table: 'USysSppAttributeDescription', rowId: '2' }]);
+  const personal = referenceWire.guide.preview.rows.find(row => row.commonName.text === 'Personal');
+  assert.equal(personal.witnesses[0].referenceOrigins[0].table, 'USysUserSpp');
+});
+
+test('reference validator rejects missing/extra authority, malformed counts, foreign mode, common cells and origins', async () => {
+  const changes = [
+    value => { delete value.options.references; },
+    value => { value.options.references = null; },
+    value => { value.options.references.extra = true; },
+    value => { value.options.references.showCommon = 1; },
+    value => { value.options.references.useGuideNames = null; },
+    value => { value.scope = client.summaryVegetationWorkbookScope; },
+    value => { delete value.preview.references; },
+    value => { value.preview.references = null; },
+    value => { value.preview.references.extra = 0; },
+    value => { value.preview.references.masterRows = -1; },
+    value => { value.preview.references.personalRows = Number.MAX_SAFE_INTEGER + 1; },
+    value => { value.preview.references.descriptionRows = '4'; },
+    value => { value.preview.references.removedMasterRows = 15; },
+    value => { value.preview.references.derivedRows = 5; },
+    value => { value.preview.references.unionRows = 18; },
+    value => { value.preview.references.showCommon = false; },
+    value => { value.preview.references.useGuideNames = false; },
+    value => { delete value.preview.rows[0].commonName; },
+    value => { value.preview.rows[0].commonName = null; },
+    value => { value.preview.rows[0].commonName.text = '\ud800'; },
+    value => { value.preview.rows[0].commonName.text = 'x'.repeat(256); },
+    value => { value.preview.ordering = 'literal-null-first-layer-species'; },
+    value => { value.preview.source = 'literal-normal-su-layer'; },
+    value => { value.preview.rows[0].witnesses[0].referenceOrigins[0].table = 'InventedMaster'; },
+    value => { value.environment.vegetation.references.unionRows--; },
+  ];
+  for (const [index, change] of changes.entries()) {
+    const value = structuredClone(referenceWire.guideSummary);
+    change(value);
+    await assert.rejects(client.validateSummaryVegetationWorkbookReview(
+      value, owner, referenceWire.guideSummary.options, yieldNow), `reference case ${index}`);
+  }
+  const attributes = structuredClone(referenceWire.attributes);
+  attributes.preview.rows[0].commonName = { storage: 'null', text: null };
+  await assert.rejects(client.validateSummaryVegetationWorkbookReview(attributes, owner, attributes.options, yieldNow));
+});
+
+test('reference drafts preserve independent validation and receipts, guide forces common, and omitted mode stays omitted', async () => {
+  const value = referenceWire.guideSummary, session = sessionFor(value);
+  session.edit('title', '\ud800');
+  session.selectReferences('include', false);
+  assert.match(session.view().draftError, /Title/);
+  assert.equal(session.held(), true);
+  assert.throws(() => session.options(value.options), /inconsistent options/);
+  session.edit('title', value.options.title);
+  assert.equal(Object.hasOwn(session.options({ ...value.options, title: 'ignored' }), 'references'), false);
+  assert.throws(() => session.selectReferences('guide', false), /Select effective/);
+  session.selectReferences('include', true);
+  assert.throws(() => session.selectReferences('common', false), /clear guide/);
+  session.selectReferences('guide', false);
+  session.selectReferences('common', false);
+  session.selectReferences('guide', true);
+  assert.equal(session.view().showCommon, true);
+  session.edit('title', value.options.title);
+  session.edit('destination', destination);
+  assert.equal(await session.review(value.options, { review: () => Promise.resolve(value), validationYield: yieldNow }), true);
+  let calls = 0;
+  await session.publish(value.options, request => {
+    calls++;
+    assert.deepEqual(plain(request), { options: value.options, approvalHash: value.approvalHash,
+      destination, createdAt: value.ancillary.createdAt });
+    return Promise.resolve(outcome(value));
+  });
+  assert.equal(calls, 1);
+  assert.throws(() => session.selectReferences('include', false), /acknowledge/);
+  session.acknowledge();
+  session.undoDraft();
+  assert.equal(session.view().includeReferences, false);
+  assert.equal(session.view().publication.outcome.sha256, value.workbookSHA256);
+});
+
+test('effective-reference validation yields, cancellation retains the barrier and cannot install a stale result', { timeout: 10000 }, async () => {
+  const value = referenceWire.guideSummary, session = sessionFor(value);
+  const entered = deferred(), release = deferred();
+  const reviewing = session.review(value.options, {
+    review: () => Promise.resolve(proxy(structuredClone(value))),
+    validationYield: async () => { entered.resolve(); await release.promise; },
+  });
+  await entered.promise;
+  session.cancel();
+  assert.equal(session.held(), true);
+  assert.equal(session.view().review, null);
+  release.resolve();
+  assert.equal(await reviewing, false);
+  assert.equal(session.held(), false);
+  assert.equal(session.view().review, null);
+  assert.match(session.view().error, /cancelled/);
+});
+
+test('compiled reference controls obey their independent gate and retain actual publication on remount', async () => {
+  const value = referenceWire.guideCommon;
+  for (const enabled of [false, true]) {
+    const session = sessionFor(wire.vegetation);
+    let reads = 0, writes = 0;
+    const pane = mountPanel(session, {
+      GetReview(contextId, json) {
+        reads++;
+        assert.equal(contextId, owner.contextId);
+        assert.deepEqual(JSON.parse(json), enabled ? value.options : wire.vegetation.options);
+        return Promise.resolve(proxy(structuredClone(enabled ? value : wire.vegetation)));
+      },
+      ExportReviewed(contextId, json) {
+        writes++;
+        assert.equal(contextId, owner.contextId);
+        assert.deepEqual(JSON.parse(json), { options: value.options, approvalHash: value.approvalHash, destination });
+        return Promise.resolve(outcome(value));
+      },
+    }, false, wire.vegetation.options, false, enabled);
+    pane.selectReferences('include', { currentTarget: { checked: true } });
+    pane.selectReferences('guide', { currentTarget: { checked: true } });
+    assert.equal(session.view().includeReferences, enabled);
+    assert.equal(session.view().showCommon, enabled);
+    assert.equal(session.view().useGuideNames, enabled);
+    await pane.review();
+    assert.equal(reads, 1);
+    if (enabled) {
+      pane.edit('destination', destination);
+      await pane.publish();
+      assert.equal(writes, 1);
+      pane.destroy();
+      const remount = mountPanel(session, {}, false, value.options, false, enabled);
+      assert.equal(remount.view().publication.blocked, true);
+      remount.acknowledge();
+      remount.undo();
+      assert.equal(remount.view().publication.outcome.sha256, value.workbookSHA256);
+      remount.destroy();
+    } else pane.destroy();
+  }
+});
+
+test('consumed reference rendering bounds name groups to fifty with labelled controls and visible NULL/empty distinction', async () => {
+  const value = structuredClone(referenceWire.common), seed = value.preview.rows[0];
+  value.preview.rows = Array.from({ length: 101 }, (_, i) => ({
+    ...structuredClone(seed), species: { ...seed.species, text: `Name${String(i).padStart(3, '0')}` },
+    commonName: { ...seed.commonName, storage: i % 2 ? 'text' : 'null', text: i % 2 ? '' : null },
+  }));
+  const session = sessionFor(value);
+  assert.equal(await session.review(value.options, { review: () => Promise.resolve(value), validationYield: yieldNow }), true);
+  let subscribed = 0;
+  const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
+    'SummaryVegetationWorkbookPanel.svelte', {
+      svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
+      '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+      './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
+      './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => { subscribed++; return session; } },
+    }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true', VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: 'true' });
+  const html = require('svelte/server').render(component, { props: {
+    owner, calculation: value.options, disabled: false, onBusyChange() {},
+  } }).body;
+  assert.equal(subscribed, 1);
+  assert.match(html, /101 name groups; page 1 of\s+3/);
+  assert.match(html, /Name049/);
+  assert.doesNotMatch(html, /Name050/);
+  assert.equal((html.match(/<th\b[^>]*\bscope="row"[^>]*>/g) || []).length, 50);
+  assert.match(html, /\(NULL\)/);
+  assert.match(html, /\(empty\)/);
+  assert.match(html, /Project effective source references and attribute descriptions/);
+  assert.match(html, /Include common names in grouping and the workbook/);
+  assert.match(html, /Use master CombinedEnglishName/);
 });

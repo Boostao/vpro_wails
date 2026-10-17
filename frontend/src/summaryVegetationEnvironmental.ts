@@ -1,6 +1,7 @@
 import { lifeformShape, lifeformText } from './lifeformSummary';
 import { fieldListCell, fieldListIndex, fieldListTable, type FieldListCell, type FieldListRow, type FieldListTable } from './summaryVegetationFieldList';
-import { validateSummaryVegetationAsync, type SummaryVegetationOwner, type SummaryVegetationPreview } from './summaryVegetation';
+import { validateSummaryVegetationAsync, type SummaryVegetationOwner, type SummaryVegetationPreview,
+  type SummaryVegetationReferenceMode } from './summaryVegetation';
 import { numericEnvironmentalArgument, numericEnvironmentalValue, type SummaryEnvironmentalValue } from './summaryVegetationEnvironmentalNumeric';
 
 export const summaryEnvironmentalSource = 'one owned SQLite snapshot: raw Summary units, physical SU counts, selected field-list and needed Env; literal scope adaptation; no formatted workbook';
@@ -35,6 +36,9 @@ export const summaryEnvironmentalLifeformSource = 'one owned SQLite snapshot: ra
 export interface SummaryEnvironmentalLifeformPreview extends SummaryEnvironmentalPreview<SummaryEnvironmentalValue> {
   masterSourcePath: string;
 }
+type SummaryEnvironmentalCalculation = {
+  average: number; display: number; showClass: number; references?: SummaryVegetationReferenceMode;
+};
 const numericFunctions = new Set(['SVSeepage', 'SVRootingDepth', 'SVStandAge', 'SVElevation', 'SVSlope', 'SVSubstrate', 'SVStrataCover']);
 export function validateSummaryEnvironmentalNumeric(value: unknown, owner: SummaryVegetationOwner,
   validationYield: () => PromiseLike<void>, current: () => boolean = () => true): Promise<SummaryEnvironmentalPreview<SummaryEnvironmentalValue> | null> {
@@ -48,7 +52,7 @@ export async function validateSummaryEnvironmentalLifeform(value: unknown, owner
 }
 
 export async function validateSummaryEnvironmentalLifeformOptions(value: unknown, owner: SummaryVegetationOwner,
-  options: { average: number; display: number; showClass: number },
+  options: SummaryEnvironmentalCalculation,
   validationYield: () => PromiseLike<void>, current: () => boolean = () => true): Promise<SummaryEnvironmentalLifeformPreview | null> {
   if (!current()) return null;
   if (!lifeformShape(value, ['vegetation', 'fieldList', 'rows', 'sourcePath', 'envSourcePath', 'masterSourcePath', 'source']) ||
@@ -61,7 +65,7 @@ export async function validateSummaryEnvironmentalLifeformOptions(value: unknown
 
 function validateSummaryEnvironmentalTaggedRows(value: unknown, owner: SummaryVegetationOwner,
   validationYield: () => PromiseLike<void>, current: () => boolean, mode: true | 'lifeform',
-  options = { average: 1, display: 6, showClass: 0 }): Promise<SummaryEnvironmentalPreview<SummaryEnvironmentalValue> | null> {
+  options: SummaryEnvironmentalCalculation = { average: 1, display: 6, showClass: 0 }): Promise<SummaryEnvironmentalPreview<SummaryEnvironmentalValue> | null> {
   return validateSummaryEnvironmentalRows<SummaryEnvironmentalValue>(value, owner, validationYield, current, mode,
     (value, functionName, argument) => {
       if (numericFunctions.has(functionName)) return numericEnvironmentalValue(functionName, argument, value);
@@ -79,7 +83,7 @@ async function validateSummaryEnvironmentalRows<V>(value: unknown, owner: Summar
   validationYield: () => PromiseLike<void>, current: () => boolean, mode: boolean | 'lifeform',
   readValue: (value: unknown, functionName: string, argument: FieldListCell) => V,
   checkValue: (value: V, functionName: string, count: number) => void,
-  options = { average: 1, display: 6, showClass: 0 }): Promise<SummaryEnvironmentalPreview<V> | null> {
+  options: SummaryEnvironmentalCalculation = { average: 1, display: 6, showClass: 0 }): Promise<SummaryEnvironmentalPreview<V> | null> {
   if (!current()) return null;
   const lifeform = mode === 'lifeform', numeric = mode !== false;
   const source = lifeform ? summaryEnvironmentalLifeformSource : numeric ? summaryEnvironmentalNumericSource : summaryEnvironmentalSource;
@@ -87,7 +91,7 @@ async function validateSummaryEnvironmentalRows<V>(value: unknown, owner: Summar
       !lifeformText(value.sourcePath) || !value.sourcePath || value.envSourcePath !== owner.projectPath ||
       value.source !== source || !Array.isArray(value.rows)) reject();
   const vegetation = await validateSummaryVegetationAsync(value.vegetation, owner, options.average, options.display, options.showClass, 11,
-    { preview: () => Promise.reject(new Error('Validation cannot dispatch a read')), cancel: () => {}, validationYield }, current);
+    { preview: () => Promise.reject(new Error('Validation cannot dispatch a read')), cancel: () => {}, validationYield }, current, options.references);
   if (!current() || vegetation === null) return null;
   const table = fieldListTable(value.fieldList), index = fieldListIndex(table);
   if (index.error || index.selected.length !== value.rows.length) reject();

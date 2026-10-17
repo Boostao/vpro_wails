@@ -20,6 +20,22 @@ type vegetationLifeformReferences struct {
 	Origins map[string][]vegetationLifeformReferenceOrigin
 }
 
+func appendVegetationLifeformUnionRow(result *vegetationLifeformReferences, seen map[string]string,
+	cells []ProjectMetadataCell, origin vegetationLifeformReferenceOrigin) error {
+	key, err := json.Marshal(cells)
+	if err != nil {
+		return err
+	}
+	id := seen[string(key)]
+	if id == "" {
+		id = strconv.Itoa(len(result.Table.Rows) + 1)
+		seen[string(key)] = id
+		result.Table.Rows = append(result.Table.Rows, ProjectMetadataRow{RowID: id, Cells: cells})
+	}
+	result.Origins[id] = append(result.Origins[id], origin)
+	return nil
+}
+
 func vegetationLifeformInteger(cell ProjectMetadataCell) (*int, error) {
 	if _, err := metadataCellValue(cell); err != nil {
 		return nil, err
@@ -123,17 +139,10 @@ func prepareVegetationLifeformReferences(ctx context.Context, master, personal P
 			for _, name := range vegetationLifeformReferenceColumns {
 				cells = append(cells, cloneSiteUnitCell(row.Cells[columns[name]]))
 			}
-			key, err := json.Marshal(cells)
-			if err != nil {
+			if err := appendVegetationLifeformUnionRow(&result, seen, cells,
+				vegetationLifeformReferenceOrigin{source.name, row.RowID}); err != nil {
 				return fail(err)
 			}
-			id := seen[string(key)]
-			if id == "" {
-				id = strconv.Itoa(len(result.Table.Rows) + 1)
-				seen[string(key)] = id
-				result.Table.Rows = append(result.Table.Rows, ProjectMetadataRow{RowID: id, Cells: cells})
-			}
-			result.Origins[id] = append(result.Origins[id], vegetationLifeformReferenceOrigin{source.name, row.RowID})
 		}
 	}
 	if err := ctx.Err(); err != nil {

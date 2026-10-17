@@ -1088,11 +1088,23 @@ rejection, persistent unknown publication without replay, independent backend-of
 refusal and36 responsive observations. All16 fixture files remain exact.
 Fresh full race passes exit0 in4545.281s with1901 inputs/58 artifacts, unchanged
 discovery/protected data and five closed native families.
-Then reconcile the active attribute-description reference projection and
-guide/common-name effects before UNION/grouping, with explicit master32 versus
-personal16 policy and derived provenance; retain original callback/quality/lump/
-constancy/formatting/printing gaps. No new UI/default or original Report
-acceptance is granted beyond this explicit default-off inspection extension.
+The accepted effective-reference inspection implements the read-only
+attribute-description projection and guide/common-name effects before UNION/
+Layer11 grouping, with explicit master32/personal16 source policies and derived
+origins. It reuses the existing publisher/session rather than adding a service.
+The environmental header reads retained physical master rows, not the reference
+UNION: deleted attributes, derived NULL-Lifeform rows and personal rows cannot
+contribute. Ordinary signed16 consumers remain unchanged. Frozen validation passes
+208 related client/24 browser cases, check0/0/build, coupled race610.000s,
+vet/production and46 exact legacy comparisons. Distinct review finds no
+significant issues. Actual Wails accepts five reopened outputs,50/19-row name
+pages, four remounts/four exact close acknowledgements,54 responsive observations,
+persistent unknown publication without replay and four backend refusals.
+All16 fixture files remain exact. Full race passes exit0 in4438.094s
+(root4417.042s), preserving1906 inputs/108 artifacts, package/embed discovery,
+canonical/protected data and six closed native families. Both flags stay default-off.
+Grouped12/13/14 and original callback/quality/lump/constancy/formatting/printing
+gaps remain separate; this inspection does not expand accepted demo availability.
 Separate original AddEnvFields scalar assignment calibrates34 exact strings with
 native typed/formula observations and readonly XML/DAO reopens. Excel changes
 numeric-looking strings, Booleans, dates, formulas and16-digit precision; typed

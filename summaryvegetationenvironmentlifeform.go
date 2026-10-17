@@ -10,6 +10,12 @@ import (
 
 func prepareSummaryVegetationEnvironmentalLifeform(ctx context.Context, argument string, siteUnit *string,
 	quick, master, su ProjectMetadataTable) (ProjectMetadataCell, error) {
+	return prepareSummaryEnvironmentalLifeformWithMasterInteger(ctx, argument, siteUnit, quick, master, su,
+		vegetationLifeformInteger)
+}
+
+func prepareSummaryEnvironmentalLifeformWithMasterInteger(ctx context.Context, argument string, siteUnit *string,
+	quick, master, su ProjectMetadataTable, readInteger func(ProjectMetadataCell) (*int, error)) (ProjectMetadataCell, error) {
 	fail := func(err error) (ProjectMetadataCell, error) {
 		return ProjectMetadataCell{}, fmt.Errorf("Summary environmental lifeform %q: %w", argument, err)
 	}
@@ -18,6 +24,9 @@ func prepareSummaryVegetationEnvironmentalLifeform(ctx context.Context, argument
 	}
 	if err := ctx.Err(); err != nil {
 		return fail(err)
+	}
+	if readInteger == nil {
+		return fail(errors.New("requires its explicit master Lifeform source policy"))
 	}
 	var form int
 	switch argument {
@@ -101,7 +110,7 @@ func prepareSummaryVegetationEnvironmentalLifeform(ctx context.Context, argument
 		if err != nil {
 			return fail(fmt.Errorf("master row %s Codetype: %w", row.RowID, err))
 		}
-		lifeform, err := vegetationLifeformInteger(row.Cells[mc["Lifeform"]])
+		lifeform, err := readInteger(row.Cells[mc["Lifeform"]])
 		if err != nil {
 			return fail(fmt.Errorf("master row %s Lifeform: %w", row.RowID, err))
 		}

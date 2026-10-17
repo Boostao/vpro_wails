@@ -27,11 +27,12 @@ type SummaryVegetationWitness struct {
 }
 
 type SummaryVegetationRow struct {
-	Layer     ProjectMetadataCell        `json:"layer"`
-	Species   ProjectMetadataCell        `json:"species"`
-	Order     ProjectMetadataCell        `json:"order"`
-	Covers    []ProjectMetadataCell      `json:"covers"`
-	Witnesses []SummaryVegetationWitness `json:"witnesses"`
+	Layer      ProjectMetadataCell        `json:"layer"`
+	Species    ProjectMetadataCell        `json:"species"`
+	CommonName *ProjectMetadataCell       `json:"commonName,omitempty"`
+	Order      ProjectMetadataCell        `json:"order"`
+	Covers     []ProjectMetadataCell      `json:"covers"`
+	Witnesses  []SummaryVegetationWitness `json:"witnesses"`
 }
 
 type SummaryVegetationUnit struct {
@@ -48,23 +49,24 @@ type SummaryVegetationField struct {
 }
 
 type SummaryVegetationPreview struct {
-	ContextID     string                       `json:"contextId"`
-	Project       string                       `json:"project"`
-	ProjectPath   string                       `json:"projectPath"`
-	SU            string                       `json:"su"`
-	SUPath        string                       `json:"suPath"`
-	Average       int                          `json:"average"`
-	Display       int                          `json:"display"`
-	ShowClass     int                          `json:"showClass,omitempty"`
-	GroupAndOrder int                          `json:"groupAndOrder,omitempty"`
-	GroupField    *SummaryVegetationField      `json:"groupField,omitempty"`
-	OrderField    *SummaryVegetationField      `json:"orderField,omitempty"`
-	Source        string                       `json:"source"`
-	Ordering      string                       `json:"ordering"`
-	Memberships   []VegetationReportMembership `json:"memberships"`
-	Units         []SummaryVegetationUnit      `json:"units"`
-	Columns       []string                     `json:"columns"`
-	Rows          []SummaryVegetationRow       `json:"rows"`
+	ContextID     string                            `json:"contextId"`
+	Project       string                            `json:"project"`
+	ProjectPath   string                            `json:"projectPath"`
+	SU            string                            `json:"su"`
+	SUPath        string                            `json:"suPath"`
+	Average       int                               `json:"average"`
+	Display       int                               `json:"display"`
+	ShowClass     int                               `json:"showClass,omitempty"`
+	GroupAndOrder int                               `json:"groupAndOrder,omitempty"`
+	GroupField    *SummaryVegetationField           `json:"groupField,omitempty"`
+	OrderField    *SummaryVegetationField           `json:"orderField,omitempty"`
+	Source        string                            `json:"source"`
+	Ordering      string                            `json:"ordering"`
+	Memberships   []VegetationReportMembership      `json:"memberships"`
+	Units         []SummaryVegetationUnit           `json:"units"`
+	Columns       []string                          `json:"columns"`
+	Rows          []SummaryVegetationRow            `json:"rows"`
+	References    *SummaryVegetationReferenceReview `json:"references,omitempty"`
 }
 
 type SummaryVegetationService struct {
@@ -144,18 +146,28 @@ func (s *SummaryVegetationService) preview(ctx context.Context, contextID string
 }
 
 type summaryVegetationSnapshotPreview struct {
-	Preview  SummaryVegetationPreview
-	SU       ProjectMetadataTable
-	Veg      ProjectMetadataTable
-	Master   ProjectMetadataTable
-	Personal ProjectMetadataTable
-	Layers   ProjectMetadataTable
+	Preview      SummaryVegetationPreview
+	SU           ProjectMetadataTable
+	Veg          ProjectMetadataTable
+	Master       ProjectMetadataTable
+	Personal     ProjectMetadataTable
+	Layers       ProjectMetadataTable
+	Descriptions *ProjectMetadataTable `json:"Descriptions,omitempty"`
 }
 
 func (s *SummaryVegetationService) readSnapshot(ctx context.Context, contextID string, plots *PlotService,
 	owner *sqliteContext, tx *sql.Tx, average, display, showClass, groupAndOrder int) (summaryVegetationSnapshotPreview, error) {
+	return s.readSnapshotWithReferences(ctx, contextID, plots, owner, tx, average, display, showClass, groupAndOrder, nil)
+}
+
+func (s *SummaryVegetationService) readSnapshotWithReferences(ctx context.Context, contextID string, plots *PlotService,
+	owner *sqliteContext, tx *sql.Tx, average, display, showClass, groupAndOrder int,
+	options *SummaryVegetationReferenceOptions) (summaryVegetationSnapshotPreview, error) {
 	fail := func(err error) (summaryVegetationSnapshotPreview, error) {
 		return summaryVegetationSnapshotPreview{}, err
+	}
+	if options != nil && groupAndOrder != 11 {
+		return fail(errors.New("Summary effective references require explicit Layer11 inspection; grouped First/common-name behavior remains unavailable"))
 	}
 
 	if s.qualityPreferences {
@@ -195,9 +207,30 @@ func (s *SummaryVegetationService) readSnapshot(ctx context.Context, contextID s
 	var report summaryVegetationLayerReport
 	var grouped summaryVegetationGroupedReport
 	var err error
+	var descriptions *ProjectMetadataTable
+	var references *summaryVegetationReferencePlan
+	if options != nil {
+		var count int
+		if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM "VLists".sqlite_master
+			WHERE type='table' AND name COLLATE BINARY='USysSppAttributeDescription'`).Scan(&count); err != nil {
+			return fail(err)
+		}
+		if count != 1 {
+			return fail(errors.New("Summary effective references require original physical VLists.USysSppAttributeDescription"))
+		}
+		table, err := readSQLiteStorageRows(ctx, tx, "VLists", "USysSppAttributeDescription", "", nil, "")
+		if err != nil {
+			return fail(err)
+		}
+		plan, err := prepareSummaryVegetationReferences(ctx, tables[2], tables[3], table, *options)
+		if err != nil {
+			return fail(err)
+		}
+		descriptions, references = &table, &plan
+	}
 	if groupAndOrder == 11 {
-		report, err = prepareSummaryVegetationLayerOptions(ctx, owner.selection.Project, owner.selection.SU,
-			tables[0], tables[1], tables[2], tables[3], tables[4], average, display, showClass)
+		report, err = prepareSummaryVegetationLayerReferences(ctx, owner.selection.Project, owner.selection.SU,
+			tables[0], tables[1], tables[2], tables[3], tables[4], average, display, showClass, references)
 	} else {
 		grouped, err = prepareSummaryVegetationGroupedOptions(ctx, owner.selection.Project, owner.selection.SU,
 			tables[0], tables[1], tables[2], tables[3], tables[4], average, groupAndOrder, display, showClass)
@@ -212,6 +245,13 @@ func (s *SummaryVegetationService) readSnapshot(ctx context.Context, contextID s
 		Source: "literal-normal-su-layer", Ordering: "literal-null-first-layer-species",
 		Memberships: []VegetationReportMembership{}, Units: []SummaryVegetationUnit{},
 		Columns: append([]string{}, report.Columns...), Rows: []SummaryVegetationRow{},
+	}
+	if references != nil {
+		result.Source = "literal-normal-su-effective-references"
+		result.References = &references.Review
+		if references.Review.ShowCommon {
+			result.Ordering = "literal-null-first-layer-species-common"
+		}
 	}
 	if groupAndOrder != 11 {
 		result.GroupAndOrder = groupAndOrder
@@ -246,6 +286,10 @@ func (s *SummaryVegetationService) readSnapshot(ctx context.Context, contextID s
 		}
 		transport := SummaryVegetationRow{Layer: cloneSiteUnitCell(row.Layer), Species: cloneSiteUnitCell(row.Species),
 			Order: cloneSiteUnitCell(row.Order), Covers: []ProjectMetadataCell{}, Witnesses: []SummaryVegetationWitness{}}
+		if row.CommonName != nil {
+			value := cloneSiteUnitCell(*row.CommonName)
+			transport.CommonName = &value
+		}
 		for _, cell := range row.Covers {
 			if err := ctx.Err(); err != nil {
 				return fail(err)
@@ -273,6 +317,6 @@ func (s *SummaryVegetationService) readSnapshot(ctx context.Context, contextID s
 		return fail(err)
 	}
 	return summaryVegetationSnapshotPreview{Preview: result, SU: tables[1], Veg: tables[0], Master: tables[2],
-		Personal: tables[3], Layers: tables[4]}, nil
+		Personal: tables[3], Layers: tables[4], Descriptions: descriptions}, nil
 
 }

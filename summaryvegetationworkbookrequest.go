@@ -9,6 +9,21 @@ type SummaryVegetationWorkbookAncillaryOptions struct {
 	CreateSummary bool `json:"createSummary"`
 }
 
+func (options *SummaryVegetationReferenceOptions) UnmarshalJSON(data []byte) error {
+	var raw struct {
+		ShowCommon    *bool `json:"showCommon"`
+		UseGuideNames *bool `json:"useGuideNames"`
+	}
+	if err := decodeStrictRequiredJSON(data, &raw, "Summary effective reference options", "showCommon", "useGuideNames"); err != nil {
+		return err
+	}
+	if raw.ShowCommon == nil || raw.UseGuideNames == nil {
+		return errors.New("Summary effective references require explicit non-NULL common/guide selections")
+	}
+	*options = SummaryVegetationReferenceOptions{ShowCommon: *raw.ShowCommon, UseGuideNames: *raw.UseGuideNames}
+	return nil
+}
+
 func (options *SummaryVegetationWorkbookAncillaryOptions) UnmarshalJSON(data []byte) error {
 	var raw struct {
 		CreateSummary *bool `json:"createSummary"`
@@ -30,6 +45,7 @@ type SummaryVegetationWorkbookOptions struct {
 	ShowClass  int                                        `json:"showClass"`
 	IncludeEnv bool                                       `json:"includeEnv"`
 	Ancillary  *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary,omitempty"`
+	References *SummaryVegetationReferenceOptions         `json:"references,omitempty"`
 }
 
 func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) error {
@@ -40,13 +56,14 @@ func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) erro
 		ShowClass  *int                                       `json:"showClass"`
 		IncludeEnv *bool                                      `json:"includeEnv"`
 		Ancillary  *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary"`
+		References *SummaryVegetationReferenceOptions         `json:"references"`
 	}
 	properties, err := sourceChildJSONObject(data, "Summary draft workbook options",
-		[]string{"title", "average", "display", "showClass", "includeEnv"}, []string{"ancillary"})
+		[]string{"title", "average", "display", "showClass", "includeEnv"}, []string{"ancillary", "references"})
 	if err != nil {
 		return err
 	}
-	if err := sourceChildJSONNonNull(properties, "Summary draft workbook options", "ancillary"); err != nil {
+	if err := sourceChildJSONNonNull(properties, "Summary draft workbook options", "ancillary", "references"); err != nil {
 		return err
 	}
 	if err := json.Unmarshal(data, &raw); err != nil {
@@ -56,7 +73,7 @@ func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) erro
 		return errors.New("Summary draft workbook requires explicit title, calculation and environmental options; NULL is not a value")
 	}
 	*options = SummaryVegetationWorkbookOptions{Title: *raw.Title, Average: *raw.Average, Display: *raw.Display,
-		ShowClass: *raw.ShowClass, IncludeEnv: *raw.IncludeEnv, Ancillary: raw.Ancillary}
+		ShowClass: *raw.ShowClass, IncludeEnv: *raw.IncludeEnv, Ancillary: raw.Ancillary, References: raw.References}
 	return nil
 }
 

@@ -2468,6 +2468,7 @@ export interface SummaryVegetationPreview {
     "units": SummaryVegetationUnit[] | null;
     "columns": string[] | null;
     "rows": SummaryVegetationRow[] | null;
+    "references"?: SummaryVegetationReferenceReview | null;
 }
 
 export interface SummaryVegetationQualityPreferenceValues {
@@ -2501,14 +2502,31 @@ export interface SummaryVegetationQualityPreferencesReview {
     "becDefinitions": ProjectMetadataTable;
 }
 
+export interface SummaryVegetationReferenceOptions {
+    "showCommon": boolean;
+    "useGuideNames": boolean;
+}
+
 export interface SummaryVegetationReferenceOrigin {
     "table": string;
     "rowId": string;
 }
 
+export interface SummaryVegetationReferenceReview {
+    "masterRows": number;
+    "personalRows": number;
+    "descriptionRows": number;
+    "removedMasterRows": number;
+    "derivedRows": number;
+    "unionRows": number;
+    "showCommon": boolean;
+    "useGuideNames": boolean;
+}
+
 export interface SummaryVegetationRow {
     "layer": ProjectMetadataCell;
     "species": ProjectMetadataCell;
+    "commonName"?: ProjectMetadataCell | null;
     "order": ProjectMetadataCell;
     "covers": ProjectMetadataCell[] | null;
     "witnesses": SummaryVegetationWitness[] | null;
@@ -2556,6 +2574,7 @@ export interface SummaryVegetationWorkbookOptions {
     "showClass": number;
     "includeEnv": boolean;
     "ancillary"?: SummaryVegetationWorkbookAncillaryOptions | null;
+    "references"?: SummaryVegetationReferenceOptions | null;
 }
 
 export interface SummaryVegetationWorkbookReportSummary {

@@ -531,6 +531,19 @@ passes in4545.281s, preserving1901 managed inputs and five closed native familie
 The backend/frontend flags remain independently default-off; the original Report
 action, unresolved clipboard boundary and delivered demo are unchanged.
 
+The accepted [effective-reference inspection](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#default-off-accepted-effective-reference-inspection)
+reuses that publisher for read-only attribute-description replacement and
+common/guide-name grouping. It explicitly separates master LONG32 from personal
+INTEGER16 and keeps ordinary consumers unchanged. Frozen validation passes208
+related client cases/24 browser cases, check0/0, build, coupled race/vet/production
+and46 exact legacy comparisons; independent review finds no significant issues.
+Actual Wails accepts five reopened outputs,50/19-row name pages, four remounts/
+exact close acknowledgements,54 responsive observations and four backend refusals.
+Lost publication acknowledgement remains unknown without replay; all16 fixture
+files remain exact. Full race passes in4438.094s with1906 inputs/108 artifacts,
+discovery and six closed native families unchanged. Separate backend/frontend
+flags remain default-off; this is not additional demo or original Report acceptance.
+
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus
 87.8 MB for the same stripped frontend build. Sample native startup and first

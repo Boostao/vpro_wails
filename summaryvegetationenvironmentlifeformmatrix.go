@@ -22,6 +22,13 @@ func summaryEnvironmentalLifeformArgument(argument ProjectMetadataCell) (string,
 
 func planSummaryVegetationEnvironmentalLifeformRows(ctx context.Context, fieldList ProjectMetadataTable,
 	units []summaryVegetationUnit, env, su, quick, master ProjectMetadataTable) ([]SummaryVegetationEnvironmentalNumericRow, error) {
+	return planSummaryEnvironmentalLifeformRowsWithMasterInteger(ctx, fieldList, units, env, su, quick, master,
+		vegetationLifeformInteger)
+}
+
+func planSummaryEnvironmentalLifeformRowsWithMasterInteger(ctx context.Context, fieldList ProjectMetadataTable,
+	units []summaryVegetationUnit, env, su, quick, master ProjectMetadataTable,
+	readInteger func(ProjectMetadataCell) (*int, error)) ([]SummaryVegetationEnvironmentalNumericRow, error) {
 	return planSummaryEnvironmentalSelectedRows(ctx, fieldList, units, env, su,
 		func(function string, argument ProjectMetadataCell) error {
 			if function == "SVLifeformCover" {
@@ -36,7 +43,7 @@ func planSummaryVegetationEnvironmentalLifeformRows(ctx context.Context, fieldLi
 				if err != nil {
 					return SummaryVegetationEnvironmentalValue{}, err
 				}
-				cell, err := prepareSummaryVegetationEnvironmentalLifeform(ctx, form, &unit, quick, master, su)
+				cell, err := prepareSummaryEnvironmentalLifeformWithMasterInteger(ctx, form, &unit, quick, master, su, readInteger)
 				if err != nil {
 					return SummaryVegetationEnvironmentalValue{}, err
 				}
