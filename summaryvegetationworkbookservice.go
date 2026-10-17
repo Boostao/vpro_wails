@@ -26,6 +26,7 @@ const summaryVegetationEffectiveAncillaryScope = "Explicit read-only normal-SU l
 const summaryVegetationGroupedWorkbookFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_GROUPED_WORKBOOK"
 const summaryVegetationGroupedWorkbookScope = "Explicit read-only normal-SU Strata/Lifeform/None inspection; typed XLSX, not grouped common/guide references, ancillary worksheets, original Report callbacks or formatting/printing parity"
 const summaryVegetationStrataReferencesScope = "Explicit read-only normal-SU Strata effective-reference inspection; typed XLSX, not Lifeform/None common names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity"
+const summaryVegetationGroupedAttributesScope = "Explicit read-only normal-SU Lifeform/None effective-attribute inspection; typed XLSX, no common/guide names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity"
 
 type SummaryVegetationWorkbookAncillaryUnit struct {
 	Code     string  `json:"code"`
@@ -203,6 +204,9 @@ func summaryVegetationWorkbookApproval(source summaryVegetationWorkbookSource, w
 		domain = "VPRO Summary grouped workbook approval v1\x00"
 		if options.References != nil {
 			domain = "VPRO Summary Strata effective references workbook approval v1\x00"
+			if *options.GroupAndOrder != 12 {
+				domain = "VPRO Summary grouped attributes workbook approval v1\x00"
+			}
 		}
 	}
 	digest := sha256.Sum256(append([]byte(domain), data...))

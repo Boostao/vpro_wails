@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
   import { SummaryVegetationWorkbookService } from '../bindings/github.com/boostao/vpro-wails';
-  import type { SummaryVegetationOwner } from './summaryVegetation';
+  import { summaryVegetationReferenceGroupingAvailable, type SummaryVegetationOwner } from './summaryVegetation';
   import { summaryEnvironmentalLifeformEnabled } from './summaryVegetationEnvironmentalDesktop';
   import { summaryVegetationWorkbookSession, sameSummaryWorkbookOptions,
     type SummaryWorkbookCalculation } from './summaryVegetationWorkbook';
@@ -26,7 +26,8 @@
   const held = $derived(disabled || viewState.reviewing || barrier);
   const grouped = $derived(calculation.groupAndOrder !== undefined);
   const groupingUnavailable = $derived(grouped && (!groupedEnabled || viewState.includeAncillary ||
-    viewState.includeReferences && calculation.groupAndOrder !== 12));
+    viewState.includeReferences && !summaryVegetationReferenceGroupingAvailable(calculation.groupAndOrder ?? 11,
+      viewState.showCommon || viewState.useGuideNames)));
   const modeUnavailable = $derived(groupingUnavailable || viewState.includeEnv && !environmentEnabled ||
     viewState.includeAncillary && !ancillaryEnabled || viewState.includeReferences && !referencesEnabled);
   const groupLabel = $derived(!grouped ? 'Layer' : calculation.groupAndOrder === 12 ? 'Strata' :
@@ -125,7 +126,8 @@
     {:else}Layer only; grouped workbook publication is disabled in this build.{/if}</p>
   {#if groupingUnavailable}
     <p role="alert">Grouped publication requires its independent build flag and no source worksheets.
-      Effective references support Layer or Strata only. Clear incompatible modes or choose a supported grouping.
+      Common/guide names support Layer or Strata only. Lifeform/None support attribute references with both names off.
+      Clear incompatible modes or choose a supported grouping.
       No options were changed automatically.</p>
   {/if}
   <div class="fields">
@@ -200,7 +202,7 @@
             Name groups are shown below; cover values are in the workbook. NULL and empty names remain distinct.</p>
           <div class="unit-table">
             <table aria-label="Reviewed effective reference groups">
-              <thead><tr><th scope="col">Layer</th><th scope="col">Scientific name/code</th>
+              <thead><tr><th scope="col">{viewState.review.preview.groupField?.name ?? 'Layer'}</th><th scope="col">Scientific name/code</th>
                 {#if reference.showCommon}<th scope="col">Common name</th>{/if}<th scope="col">Order</th></tr></thead>
               <tbody>{#each viewState.review.preview.rows.slice(referencePage * unitPageSize, (referencePage + 1) * unitPageSize) as row}
                 <tr><td>{row.layer.text === null ? '(NULL)' : row.layer.text === '' ? '(empty)' : row.layer.text}</td>
@@ -212,7 +214,8 @@
                       <td><span role="alert">Reviewed common name is missing.</span></td>
                     {/if}
                   {/if}
-                  <td>{row.order.text === null ? '(NULL)' : row.order.text === '' ? '(empty)' : row.order.text}</td></tr>
+                  <td>{row.order.storage === 'real' ? row.order.real :
+                    row.order.text === null ? '(NULL)' : row.order.text === '' ? '(empty)' : row.order.text}</td></tr>
               {/each}</tbody>
             </table>
           </div>

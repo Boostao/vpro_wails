@@ -34,6 +34,7 @@ const ancillaryWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVeget
 const referenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookReferencesWire.json'), 'utf8'));
 const groupedWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedWire.json'), 'utf8'));
 const strataReferenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookStrataReferencesWire.json'), 'utf8'));
+const groupedAttributeWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedAttributesWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath']
   .map(key => [key, wire.vegetation.preview[key]]));
 const yieldNow = () => Promise.resolve();
@@ -262,6 +263,7 @@ function mountPanel(session, services, held = false, calculation = wire.environm
     'svelte/internal/client': runtime,
     svelte: { onDestroy: callback => { destroy = callback; }, untrack: runtime.untrack },
     '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: services },
+    './summaryVegetation': vegetation,
     './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
     './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => session },
   };
@@ -567,6 +569,7 @@ test('actual consumed server rendering bounds summary DOM to fifty units and dis
       './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
         subscribed++; return session;
       } },
+      './summaryVegetation': vegetation,
     }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true', VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: 'true' });
   const html = require('svelte/server').render(component, { props: {
     owner, calculation: value.options, disabled: false, onBusyChange() {},
@@ -754,6 +757,7 @@ test('consumed reference rendering bounds name groups to fifty with labelled con
       '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
       './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
       './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => { subscribed++; return session; } },
+      './summaryVegetation': vegetation,
     }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true', VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: 'true' });
   const html = require('svelte/server').render(component, { props: {
     owner, calculation: value.options, disabled: false, onBusyChange() {},
@@ -885,6 +889,7 @@ test('compiled grouped panel gate refuses dispatch, preserves incompatible selec
       assert.equal(pane.view().includeAncillary, true);
       pane.selectAncillary('sheets', { currentTarget: { checked: false } });
       pane.selectReferences('include', { currentTarget: { checked: true } });
+      pane.selectReferences('common', { currentTarget: { checked: true } });
       await pane.review();
       assert.equal(reads, 1);
       assert.equal(pane.view().includeReferences, true);
@@ -947,7 +952,10 @@ test('consumed outer Summary rendering forwards only flag-authorized Group By se
 test('consumed grouped panel renders accurate grouping and explicit unavailable feedback without clearing retained modes', () => {
   for (const [enabled, mode] of [[false, null], [true, null], [true, 'references'], [true, 'ancillary']]) {
     const value = groupedWire.lifeform, session = sessionFor(value);
-    if (mode === 'references') session.selectReferences('include', true);
+    if (mode === 'references') {
+      session.selectReferences('include', true);
+      session.selectReferences('common', true);
+    }
     if (mode === 'ancillary') session.includeAncillary(true);
     let subscriptions = 0;
     const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
@@ -958,6 +966,7 @@ test('consumed grouped panel renders accurate grouping and explicit unavailable 
         './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
           subscriptions++; return session;
         } },
+        './summaryVegetation': vegetation,
       }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
         VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: enabled ? 'true' : 'false',
         VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: 'true', VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: 'true' });
@@ -1119,6 +1128,185 @@ test('Strata reference held validation remains owned through Cancel and cannot p
   remount.destroy();
 });
 
+test('consumed reference tables retain original group captions and display typed numeric Order rather than NULL', async () => {
+  for (const value of [referenceWire.common, strataReferenceWire.attributes, groupedAttributeWire.lifeform, groupedAttributeWire.none]) {
+    const session = sessionFor(value);
+    assert.equal(await session.review(value.options, { review: () => Promise.resolve(proxy(structuredClone(value))),
+      validationYield: yieldNow }), true);
+    let subscribed = 0;
+    const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
+      'SummaryVegetationWorkbookPanel.svelte', {
+        svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
+        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+        './summaryVegetation': vegetation,
+        './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
+        './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
+          subscribed++; return session;
+        } },
+      }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true', VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: 'true',
+        VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: 'true' });
+    const html = require('svelte/server').render(component, { props: {
+      owner, calculation: value.options, disabled: false, onBusyChange() {},
+    } }).body;
+    assert.equal(subscribed, 1);
+    const table = html.replace(/<!--[\s\S]*?-->/g, '').match(/<table\b[^>]*aria-label="Reviewed effective reference groups"[^>]*>([\s\S]*?)<\/table>/);
+    assert.ok(table);
+    assert.match(table[1], new RegExp(`<th\\b[^>]*scope="col"[^>]*>${value.preview.groupField?.name ?? 'Layer'}</th>`));
+    const body = table[1].match(/<tbody\b[^>]*>([\s\S]*?)<\/tbody>/);
+    assert.ok(body);
+    const rows = [...body[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/g)];
+    const expected = value.preview.rows.slice(0, 50);
+    assert.ok(expected.length > 0);
+    assert.equal(rows.length, expected.length);
+    for (const [index, row] of expected.entries()) {
+      const cells = [...rows[index][1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/g)];
+      assert.ok(cells.length >= 2);
+      assert.equal(cells.at(-1)[1].trim(), row.order.storage === 'real' ? String(row.order.real) :
+        row.order.text === null ? '(NULL)' : row.order.text === '' ? '(empty)' : row.order.text);
+    }
+  }
+});
+
+test('eight strict Go grouped attribute vectors detach proxies without synthesizing First common names', async () => {
+  assert.equal(Object.keys(groupedAttributeWire).length, 8);
+  for (const value of Object.values(groupedAttributeWire)) {
+    const raw = proxy(structuredClone(value));
+    const result = await client.validateSummaryVegetationWorkbookReview(raw, owner, raw.options, yieldNow);
+    assert.deepEqual(plain(result), value);
+    assert.equal(result.scope, client.summaryVegetationGroupedAttributesScope);
+    assert.equal(result.preview.references.showCommon, false);
+    assert.equal(result.preview.references.useGuideNames, false);
+    assert.ok(result.preview.rows.length > 0);
+    assert.ok(result.preview.rows.some(row => row.layer.storage === 'null'));
+    assert.ok(result.preview.rows.every(row => !Object.hasOwn(row, 'commonName')));
+    assert.equal(Object.isFrozen(result.options.references), true);
+    assert.equal(Object.isFrozen(result.preview.rows[0].witnesses), true);
+    raw.preview.rows[0].witnesses[0].rawVegRowIds[0] = 'foreign';
+    assert.deepEqual(plain(result), value);
+  }
+  for (let group = 0; group <= 15; group++) {
+    const allowed = { 11: [true, true], 12: [true, true], 13: [true, false], 14: [true, false] };
+    for (const [index, common] of [false, true].entries())
+      assert.equal(vegetation.summaryVegetationReferenceGroupingAvailable(group, common), allowed[group]?.[index] ?? false);
+  }
+});
+
+test('grouped attribute reviews reject name selection, scope confusion and malformed grouping authority', async () => {
+  for (const base of [groupedAttributeWire.lifeform, groupedAttributeWire.none]) {
+    for (const mutate of [
+      value => { value.options.references.showCommon = true; },
+      value => { value.options.references.useGuideNames = true; },
+      value => { value.preview.references.showCommon = true; },
+      value => { value.preview.references.useGuideNames = true; },
+      value => { value.options.ancillary = { createSummary: false }; },
+      value => { delete value.options.references; },
+      value => { delete value.preview.references; },
+      value => { value.options.groupAndOrder = 12; },
+      value => { value.scope = client.summaryVegetationStrataReferencesScope; },
+      value => { value.scope = client.summaryVegetationGroupedWorkbookScope; },
+      value => { value.preview.groupField.daoType = 7; },
+      value => { value.preview.rows[0].commonName = { storage: 'null', text: null, integer: null, real: null, blobHex: null }; },
+      value => { value.preview.rows[0].order = { storage: 'text', text: '1', integer: null, real: null, blobHex: null }; },
+    ]) {
+      const value = structuredClone(base);
+      mutate(value);
+      await assert.rejects(client.validateSummaryVegetationWorkbookReview(value, owner, value.options, yieldNow));
+    }
+  }
+});
+
+test('compiled grouped attribute panels require both gates and retain unsupported common and guide drafts across remounts', async () => {
+  for (const value of [groupedAttributeWire.lifeform, groupedAttributeWire.none]) {
+    for (const grouped of [false, true]) for (const references of [false, true]) {
+      const session = sessionFor(value);
+      let reads = 0, writes = 0;
+      const services = {
+        GetReview(contextId, json) {
+          reads++;
+          assert.equal(contextId, owner.contextId);
+          assert.deepEqual(JSON.parse(json), value.options);
+          return Promise.resolve(proxy(structuredClone(value)));
+        },
+        ExportReviewed(contextId, json) {
+          writes++;
+          assert.equal(contextId, owner.contextId);
+          assert.deepEqual(JSON.parse(json), { options: value.options, approvalHash: value.approvalHash, destination });
+          return Promise.resolve(outcome(value));
+        },
+      };
+      const pane = mountPanel(session, services, false, value.options, true, references, grouped);
+      await pane.review();
+      assert.equal(reads, grouped && references ? 1 : 0);
+      if (grouped && references) {
+        pane.selectReferences('common', { currentTarget: { checked: true } });
+        await pane.review();
+        assert.equal(reads, 1);
+      }
+      pane.destroy();
+      const remount = mountPanel(session, services, false, value.options, true, references, grouped);
+      await remount.review();
+      await remount.publish();
+      assert.equal(reads, grouped && references ? 1 : 0);
+      assert.equal(writes, 0);
+      if (grouped && references) {
+        assert.equal(remount.view().showCommon, true);
+        remount.selectReferences('common', { currentTarget: { checked: false } });
+        remount.selectReferences('guide', { currentTarget: { checked: true } });
+        await remount.review();
+        assert.equal(reads, 1);
+        assert.equal(remount.view().useGuideNames, true);
+        remount.selectReferences('guide', { currentTarget: { checked: false } });
+        remount.selectReferences('common', { currentTarget: { checked: false } });
+        await remount.review();
+        assert.equal(reads, 2);
+        remount.edit('destination', destination);
+        await remount.publish();
+        assert.equal(writes, 1);
+        remount.acknowledge();
+        remount.edit('title', '\ud800');
+        assert.equal(session.held(), true);
+        remount.undo();
+        assert.equal(session.held(), false);
+        assert.equal(session.view().publication.outcome.sha256, value.workbookSHA256);
+      }
+      remount.destroy();
+    }
+  }
+});
+
+test('consumed grouped attribute rendering distinguishes supported references from retained unavailable names', () => {
+  for (const grouped of [false, true]) for (const references of [false, true]) {
+    let selected, subscribed = 0;
+    const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
+      'SummaryVegetationWorkbookPanel.svelte', {
+        svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
+        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+        './summaryVegetation': vegetation,
+        './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
+        './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
+          subscribed++; return selected;
+        } },
+      }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
+        VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: grouped ? 'true' : 'false',
+        VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: references ? 'true' : 'false' });
+    for (const value of [groupedAttributeWire.lifeform, groupedAttributeWire.none]) {
+      for (const mode of ['attributes', 'common', 'guide']) {
+        selected = sessionFor(value);
+        if (mode !== 'attributes') selected.selectReferences(mode, true);
+        const html = require('svelte/server').render(component, { props: {
+          owner, calculation: value.options, disabled: false, onBusyChange() {},
+        } }).body;
+        const button = html.match(/<button[^>]*data-summary-workbook-review[^>]*>/);
+        assert.ok(button);
+        assert.equal(/\bdisabled\b/.test(button[0]), !grouped || !references || mode !== 'attributes');
+        assert.equal(selected.view().includeReferences, true);
+        if (mode !== 'attributes') assert.match(html, /Lifeform\/None support attribute references with both names off/);
+      }
+    }
+    assert.equal(subscribed, 6);
+  }
+});
+
 test('consumed Strata reference panel rendering preserves independent gates and retained scope intent', () => {
   for (const value of [referenceWire.common, strataReferenceWire.common]) {
   for (const grouped of [false, true]) for (const references of [false, true]) {
@@ -1132,6 +1320,7 @@ test('consumed Strata reference panel rendering preserves independent gates and 
         './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
           subscriptions++; return session;
         } },
+        './summaryVegetation': vegetation,
       }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
         VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: grouped ? 'true' : 'false',
         VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: references ? 'true' : 'false' });

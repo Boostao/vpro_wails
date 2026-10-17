@@ -558,9 +558,10 @@ renderer to the existing inspection publisher and Summary Group by control.
 Explicit `groupAndOrder`12/13/14 requires independent
 `VPRO_SUMMARY_VEGETATION_GROUPED_WORKBOOK` /
 `VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK` flags. Omission retains the accepted
-Layer request/approval/output path. Group13/14 references and grouped ancillary
-sheets still refuse without changing selections; the Strata reference successor
-below has its own joint authority. Incomplete unit/pivot alignment also refuses.
+Layer request/approval/output path. Group13/14 common/guide references and grouped
+ancillary sheets still refuse without changing selections; the reference
+successors below have their own joint authority. Incomplete unit/pivot alignment
+also refuses.
 Frozen validation passes215 related client cases/31 browser cases, check/build,
 coupled race/vet/production and86 exact legacy vectors. Independent review finds
 no significant issues. Actual Wails accepts five reopened outputs, four remounts/
@@ -583,8 +584,24 @@ significant issues. Wails accepts five reopened outputs, four remounts/exact clo
 acknowledgements,42 responsive observations and both independent backend denials
 with unrelated routes preserved and16 unchanged fixture files. Full race passes
 in5153.016s, preserving1913 inputs/236 artifacts and eight closed native families.
-Group13/14 references, grouped ancillary, Strata Display2 and original
+Group13/14 common/guide references, grouped ancillary, Strata Display2 and original
 Report/formatting/printing remain unavailable; the demo and defaults are unchanged.
+
+The accepted [Lifeform/None effective-attribute inspection](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#accepted-lifeformnone-effective-attribute-inspection)
+extends13/14 only when common/guide are both off. It reuses the same staging,
+renderer, publisher and panel with both existing independent gates; no new API,
+binding, dependency or flag. Derived NULL-Lifeform groups remain present and
+None Display2 is supported. The shared reference table now displays numeric
+Order instead of NULL and preserves original group captions, including LifeForm/
+Group. Frozen validation accepts225 related client/41 browser cases, check0/0/
+build, coupled race1182.656s/vet/production and166 exact legacy comparisons.
+Distinct review finds no significant issues. Five actual Wails outputs pass
+independent ZIP/XML/provenance and table-cell checks; physical arithmetic,
+four remounts/exact close acknowledgements,42 responsive observations and both
+backend denials pass with16 unchanged fixture files. Full race passes in5781.860s,
+preserving1916 inputs/285 artifacts and nine closed native families. Common/
+guide First for13/14, grouped ancillary, Strata/Lifeform Display2 and original
+Report/callback/formatting/printing remain unavailable. No default/demo promotion.
 
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus

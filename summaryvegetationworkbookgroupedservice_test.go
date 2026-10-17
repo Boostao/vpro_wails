@@ -78,7 +78,7 @@ func TestSummaryGroupedDesktopStrictAuthorityAndIndependentGate(t *testing.T) {
 		case "references":
 			group := 13
 			changed.GroupAndOrder = &group
-			changed.References = &SummaryVegetationReferenceOptions{}
+			changed.References = &SummaryVegetationReferenceOptions{ShowCommon: true}
 		case "memberships":
 			changed.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{}
 		case "summary":

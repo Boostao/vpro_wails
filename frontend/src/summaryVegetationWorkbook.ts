@@ -2,7 +2,7 @@ import type { SummaryVegetationWorkbookOptions as GeneratedSummaryWorkbookOption
   SummaryVegetationWorkbookReportSummary, VegetationWorkbookOutcome } from '../bindings/github.com/boostao/vpro-wails';
 import { lifeformShape as shape } from './lifeformSummary';
 import { workbookText, workbookWorksheetName, workbookFoldedName } from './lifeformWorkbook';
-import { summaryVegetationOptionError, validateSummaryVegetationAsync,
+import { summaryVegetationOptionError, summaryVegetationReferenceGroupingAvailable, validateSummaryVegetationAsync,
   type SummaryVegetationOwner, type SummaryVegetationPreview, type SummaryVegetationReferenceMode } from './summaryVegetation';
 import { validateSummaryEnvironmentalLifeformOptions,
   type SummaryEnvironmentalLifeformPreview } from './summaryVegetationEnvironmental';
@@ -15,6 +15,7 @@ export const summaryVegetationEffectiveReferencesScope = 'Explicit read-only nor
 export const summaryVegetationEffectiveAncillaryScope = 'Explicit read-only normal-SU layer inspection with projected attribute/common/guide references, SU Table and optional ReportSummary; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity';
 export const summaryVegetationGroupedWorkbookScope = 'Explicit read-only normal-SU Strata/Lifeform/None inspection; typed XLSX, not grouped common/guide references, ancillary worksheets, original Report callbacks or formatting/printing parity';
 export const summaryVegetationStrataReferencesScope = 'Explicit read-only normal-SU Strata effective-reference inspection; typed XLSX, not Lifeform/None common names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity';
+export const summaryVegetationGroupedAttributesScope = 'Explicit read-only normal-SU Lifeform/None effective-attribute inspection; typed XLSX, no common/guide names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity';
 type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references' | 'groupAndOrder'> & {
   references?: SummaryVegetationReferenceMode; groupAndOrder?: number;
 };
@@ -57,7 +58,7 @@ function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
     showClass: value.showClass, includeEnv: value.includeEnv };
   if (Object.hasOwn(value, 'groupAndOrder')) {
     if (value.groupAndOrder !== 12 && value.groupAndOrder !== 13 && value.groupAndOrder !== 14 ||
-        Object.hasOwn(value, 'references') && value.groupAndOrder !== 12 || Object.hasOwn(value, 'ancillary')) reject();
+        Object.hasOwn(value, 'ancillary')) reject();
     result.groupAndOrder = value.groupAndOrder;
   }
   if (summaryVegetationOptionError(value.average, value.display, value.showClass, result.groupAndOrder ?? 11)) reject();
@@ -69,6 +70,8 @@ function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
     if (!shape(value.references, ['showCommon', 'useGuideNames']) ||
         typeof value.references.showCommon !== 'boolean' || typeof value.references.useGuideNames !== 'boolean') reject();
     result.references = { showCommon: value.references.showCommon, useGuideNames: value.references.useGuideNames };
+    if (!summaryVegetationReferenceGroupingAvailable(result.groupAndOrder ?? 11,
+      result.references.showCommon || result.references.useGuideNames)) reject();
   }
   return result;
 }
@@ -135,7 +138,8 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
   if (!current()) return null;
   const options = optionsValue(requested);
   const scope = options.groupAndOrder !== undefined
-    ? options.references ? summaryVegetationStrataReferencesScope : summaryVegetationGroupedWorkbookScope : options.references
+    ? options.references ? options.groupAndOrder === 12 ? summaryVegetationStrataReferencesScope :
+      summaryVegetationGroupedAttributesScope : summaryVegetationGroupedWorkbookScope : options.references
     ? options.ancillary ? summaryVegetationEffectiveAncillaryScope : summaryVegetationEffectiveReferencesScope
     : options.ancillary ? summaryVegetationAncillaryWorkbookScope : summaryVegetationWorkbookScope;
   if (!shape(value, ['preview', 'environment', 'options', 'scope', 'sheet', 'firstVegetationRow',

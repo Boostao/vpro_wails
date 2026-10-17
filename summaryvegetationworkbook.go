@@ -203,8 +203,9 @@ func summaryVegetationWorkbookGroup(ctx context.Context, preview SummaryVegetati
 	if err := validateSummaryVegetationGroupedOptions(ctx, preview.Average, preview.GroupAndOrder, preview.Display, preview.ShowClass); err != nil {
 		return "", err
 	}
-	if preview.References != nil && preview.GroupAndOrder != 12 {
-		return "", errors.New("Summary grouped effective references require Strata12; First/common names for13/14 are not qualified")
+	if preview.References != nil && !summaryVegetationReferenceGroupingAvailable(preview.GroupAndOrder,
+		preview.References.ShowCommon || preview.References.UseGuideNames) {
+		return "", errors.New("Summary grouped common/guide references require Strata12; First(common name) for13/14 is not qualified")
 	}
 	group := SummaryVegetationField{Name: "Layer", DAOType: 10, Size: 1}
 	switch preview.GroupAndOrder {

@@ -45,6 +45,9 @@ function compareCell(a: LifeformTextCell, b: LifeformTextCell): number {
   if (a.text === null || b.text === null) return a.text === null ? b.text === null ? 0 : -1 : 1;
   return literalCompare(a.text, b.text);
 }
+export function summaryVegetationReferenceGroupingAvailable(groupAndOrder: number, common: boolean): boolean {
+  return groupAndOrder === 11 || groupAndOrder === 12 || !common && (groupAndOrder === 13 || groupAndOrder === 14);
+}
 export function summaryVegetationOptionError(average: unknown, display: unknown, showClass: unknown = 0, groupAndOrder: unknown = 11): string {
   if (groupAndOrder !== 11 && groupAndOrder !== 12 && groupAndOrder !== 13 && groupAndOrder !== 14)
     return 'Choose a supported Group by option; no settings were saved.';
@@ -77,7 +80,8 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
     grouped ? 'literal-normal-su-grouped' : 'literal-normal-su-layer';
   const ordering = common ? 'literal-null-first-layer-species-common' :
     grouped ? 'literal-null-first-group-species' : 'literal-null-first-layer-species';
-  if (references && (grouped && groupAndOrder !== 12 || !lifeformShape(references, ['showCommon', 'useGuideNames']) ||
+  if (references && (!summaryVegetationReferenceGroupingAvailable(groupAndOrder, common) ||
+      !lifeformShape(references, ['showCommon', 'useGuideNames']) ||
       typeof references.showCommon !== 'boolean' || typeof references.useGuideNames !== 'boolean')) reject();
   if (summaryVegetationOptionError(average, display, showClass, groupAndOrder) || !Object.values(owner).every(lifeformText) ||
       owner.contextId === '' || owner.project === '' || owner.projectPath === '' || owner.suPath === '' ||

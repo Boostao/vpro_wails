@@ -23,38 +23,58 @@ Current machine state only. Portable scope and ordered work are in
 - Private receipts, Access copies, fixtures, profiles and binaries remain in
   the active session's files/private evidence. Do not publish or delete them.
 
-## Latest accepted gate
+## Current integration
 
-The Strata12 effective-reference successor to source parent
-`8c07a50d48f9cf253fc8e8dbcd565766e8c651cd` is independently reviewed,
-disposable-native accepted and full-race integrated. It reuses existing Summary
-workbook inspection and both independent grouped/effective-reference flags;
-there are no new API/models/bindings/flags or default/demo/original Report changes.
-Frozen validation accepts220 related client/36 browser cases, check0/0/build,
-coupled race1012.406s/vet/production and86 exact legacy comparisons.
+Published source parent is `2e9d2b098cb74cb7083fe0a76449b577887d5095`.
+The accepted successor composes Group13/14 effective attribute references only
+when common/guide are both off, reusing both independent existing gates.
+One shared Go/TS availability invariant preserves Layer/Strata behavior and
+explicitly refuses unqualified First(common name). A separate scope/approval
+domain leaves Strata12 and old paths unchanged. No new service/API/models/
+bindings/dependencies/flags or default/demo changes.
 
-One fresh `native-summary-strata-references` family accepts five reopened
-publications, four real host remounts/four exact native-close acknowledgements,
-42 responsive observations and independent grouped-off/reference-off backend
-denials while retaining the unrelated existing routes. All16 fixture/config/audit
-files remain unchanged; all four owners normally close and are freshly absent.
-The lifecycle unknown publication is retained without replay. No Access/Excel/
-clipboard action occurred. Private instrumentation changes only the isolated
-main entry, not production components.
+Frozen19-path/1916-input validation accepts225 related client/41 browser cases,
+check0/0/isolated build, coupled race1182.656s/vet/production and166 exact legacy
+comparisons. Distinct read-only review finds no significant issues. Two private
+kernel/four workbook test functions retain independent values, derived NULL
+groups, duplicate/reference origins and complete managed/external body/provenance.
+The original body assertion/private-provenance wrapper remains intact.
 
-`summary-strata-reference-desktop-integration/receipt.json` accepts exit0:
-UTC2026-10-17T15:27:57.437937 to16:53:50.453037;5153.016s total.
-All1913 inputs/236 artifacts, discovery,26 canonical inputs/21 protected assets
-and eight closed native families match. Receipt SHA256:
-`c19db82f56932dfb8d49950aed83e5f57b005b2c4e123f70004806d4485852e7`.
+One fresh `native-summary-grouped-attributes` family accepts five reopened
+publications, actual table captions/every visible typed Order/row identity,
+two independent physical arithmetic witnesses, four host remounts/four exact
+native-close acknowledgements,42 responsive observations and independent
+grouped-off/reference-off denials preserving unrelated routes. All16 fixture/
+config/audit files remain unchanged; all four owners normally close and are
+freshly absent. The lifecycle unknown publication stays retained without replay.
+No Access/Excel/clipboard action occurred. Only the private main entry is
+instrumented.
+
+The first frozen attempt remains stopped/unaccepted and hash-archived before
+native launch. Consumed rendering reproduces REAL Order displayed as NULL;
+the correction uses typed scalars/original group captions without changing
+workbook calculations. Retained native harness corrections account for the
+accessible scientific-name th row header, original LifeForm XML heading and
+review-plan clearing after acknowledgement. The already-published first
+workbook was independently verified before continuing, never replayed.
+Independent arithmetic uses original IsAttribute=Yes removal, not an assumed
+Codetype filter; that initial failed witness is retained privately.
+
+`summary-grouped-attributes-integration/receipt.json` accepts exit0:
+UTC2026-10-17T18:03:34.596358 to19:39:56.469873;5781.860s total.
+All1916 inputs/285 artifacts, discovery,26 canonical inputs/21 protected assets
+and nine closed native families match. Receipt SHA256:
+`71b7f7a1db7a2c9fa3e86d4f99b7d96ed4e5547269fd9df4963389ff2de416e9`.
 The freeze is released; only directly related documentation changes follow.
 Git records the publication revision and the private publication association
 binds it to this exact acceptance.
 
-Next safe source contract: Group13/14 effective attribute references only with
-common/guide both off, avoiding unqualified First(common name) selection.
-This successor is not yet implemented or enabled. Grouped ancillary, source
-Display2 failures, original Report callbacks and whole-form/ribbon gaps remain.
+Next source contract: original grouped ancillary assembly, especially SnTable
+admission versus group staging and ReportSummary grouping/order metadata.
+Prove equivalence before sharing the current raw-SU/Veg ancillary plan; do not
+merely lift guards. Group13/14 common/guide First, grouped ancillary, Strata/
+Lifeform Display2, original Report callbacks and whole-form/ribbon gaps remain.
+None Display2 is supported. Continue the ordered work after publication.
 
 The attempted two-page Picture Manager route was rejected before any native
 action: both canonical buttons lack OnClick bindings, as already documented in

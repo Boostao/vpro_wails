@@ -50,8 +50,8 @@ func prepareSummaryVegetationGroupedReferences(ctx context.Context, project, suN
 	if err := validateSummaryVegetationGroupedOptions(ctx, average, grouping, display, showClass); err != nil {
 		return fail(err)
 	}
-	if references != nil && grouping != 12 {
-		return fail(errors.New("summary vegetation effective grouped references require GroupAndOrder12; First(common name) for13/14 is unqualified"))
+	if references != nil && !summaryVegetationReferenceGroupingAvailable(grouping, references.Review.ShowCommon || references.Review.UseGuideNames) {
+		return fail(errors.New("summary vegetation grouped common/guide references require GroupAndOrder12; First(common name) for13/14 is unqualified"))
 	}
 	prepared, err := prepareLongVegetation(ctx, project, suName, veg, su, layers)
 	if err != nil {
@@ -127,8 +127,8 @@ func planSummaryVegetationGroupedStageReferences(ctx context.Context,
 	if err := validateSummaryVegetationGroupedOptions(ctx, average, grouping, display, showClass); err != nil {
 		return fail(err)
 	}
-	if references != nil && grouping != 12 {
-		return fail(errors.New("summary vegetation effective grouped references require GroupAndOrder12; First(common name) for13/14 is unqualified"))
+	if references != nil && !summaryVegetationReferenceGroupingAvailable(grouping, references.Review.ShowCommon || references.Review.UseGuideNames) {
+		return fail(errors.New("summary vegetation grouped common/guide references require GroupAndOrder12; First(common name) for13/14 is unqualified"))
 	}
 	// Class4/5 override the earlier numeric grouped Order in the source.
 	projection := summaryVegetationStageProjection{joinField: "Layer1234567", joinLimit: 2, labelField: "Strata", labelLimit: 1,

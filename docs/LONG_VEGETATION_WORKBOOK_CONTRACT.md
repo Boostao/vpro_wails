@@ -2586,9 +2586,71 @@ Private instrumentation changes only the isolated main entry.
 Full race accepts exit0 in5153.016s, preserving1913 inputs/236 artifacts,
 package/embed discovery, canonical/protected assets and eight closed families.
 See the [evidence summary](MIGRATION_EVIDENCE.md#accepted-strata-effective-reference-inspection).
-Lifeform/None references, grouped ancillary sheets and Strata Display2 remain
-unavailable. No original quality/lumping/Report callbacks, Excel/formatting/
+Lifeform/None common/guide names, grouped ancillary sheets and Strata Display2
+remain unavailable; the attribute-only extension is qualified below.
+No original quality/lumping/Report callbacks, Excel/formatting/
 printing, default or delivered-demo promotion follows.
+
+### Accepted Lifeform/None effective attribute inspection
+
+Canonical NewShortVeg applies AddAttributeDescriptions before MakeSvQueries.
+Its Group13/14 branches select First(common name) only when ShowCommon is
+nonzero, so effective attribute references without common/guide names do not
+require choosing that unqualified representative. The extension reuses existing
+staging/aggregation, source snapshot, writer, publisher and retained panel for
+explicit13/14 with both names off. A shared Go/TS availability policy covers
+Layer/Strata and this exact new case. Both independent existing grouped/reference
+gates remain required; unsupported names/ancillary selections remain retained,
+not automatically cleared. No new service, model, binding, dependency or flag.
+
+The new scope and approval domain are distinct; accepted Strata12 and all old
+omission/request/output/approval paths match166 exact base/candidate vectors.
+Common Name is absent, not an empty synthesized field. Group13 retains source
+NULL groups from derived NULL-Lifeform staging and LEFT JOIN LayerCode
+(MakeSvQueries1403-1409); Group14 retains its NULL BINARY group. Source13 Display2
+still refuses while source14 Display2 remains supported. Reference fanout in
+staging/aggregation, fixed denominators, whole-row UNION/derived origins and raw
+MAX peers remain explicit. No new calculation or First-selection algorithm.
+
+Independent values cover both groups/Average modes, including NULL and mapped
+Lifeform groups. Existing calibrated display/class equivalence, common/guide
+refusal, cancellation/detachment and managed/external reopened body/provenance,
+authority drift, collision and exact recovery pass development race18.315s.
+The shared body assertion still checks literal text, exact DOUBLE bits and no
+formulas; its original wrapper retains complete private input/provenance checks.
+Eight strict-Go vectors and41 actual proxy/compiled-handler/consumed-rendering
+workbook cases pass both ordinary/browser runtimes; check reports0 errors/
+warnings. A coupled table correction renders REAL Order instead of NULL and
+uses original group captions rather than a fixed Layer header. Consumed rendering
+first reproduces `(NULL)` instead of1.56, then checks all visible Order values
+for ordinary Layer, Strata and both new groups. The first frozen attempt remains
+stopped/unaccepted and hash-archived before any native launch; source/workbook
+values were never changed to match the display. Corrected frozen validation
+accepts225 related client/41 browser cases, check0/0/isolated build, coupled
+race1182.656s, production vet/build and166 exact legacy comparisons.
+Distinct19-path read-only review finds no significant issues.
+
+Actual Wails accepts five independently reopened publications: Lifeform/None
+attributes, Lifeform/class/environment, None frequency and None Average2/
+environment. Every visible reference row checks original group caption,
+scientific-name row header, NULL/empty group and typed Order, including paging.
+Independent physical LF1 duplicate/membership arithmetic verifies None3.13/1.00
+and LifeForm01 6.25/2.00 without application calculation/formatting helpers.
+Four actual remounts/four exact native-close acknowledgements,42 responsive
+observations, held-validation stale rejection and persistent unknown committed
+publication without replay pass. Both independent backend denials preserve
+unrelated authorized routes with zero publication. All16 fixture/config/audit
+files remain unchanged and all four owners normally close/freshly disappear.
+Only the private main entry is instrumented. Inherited native witnesses were
+corrected for accessible th row headers, original LifeForm XML headings and
+cleared post-ack review plans; the completed first publication was verified
+physically before continuation, never replayed.
+
+Full race passes exit0 in5781.860s, preserving1916 inputs/285 artifacts,
+package/embed discovery,26 canonical inputs/21 protected assets and nine closed
+native families. See the [portable evidence](MIGRATION_EVIDENCE.md#accepted-lifeformnone-effective-attribute-inspection).
+Common/guide names, grouped ancillary, Strata/Lifeform Display2, original Report/
+callback/formatting/printing and default/delivered-demo promotion are not granted.
 
 ### Class threshold neighbors
 

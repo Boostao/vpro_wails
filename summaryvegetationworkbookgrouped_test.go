@@ -68,7 +68,7 @@ func summaryGroupedWorkbookSourceInput(t *testing.T, source summaryGroupedWorkbo
 	return input
 }
 
-func assertSummaryGroupedWorkbookCells(t *testing.T, input summaryVegetationWorkbookInput, result summaryVegetationWorkbook) {
+func assertSummaryGroupedWorkbookBody(t *testing.T, input summaryVegetationWorkbookInput, result summaryVegetationWorkbook) *excelize.File {
 	t.Helper()
 	book := openSummaryEnvironmentalWorkbook(t, summaryEnvironmentalWorkbook{Bytes: result.Bytes})
 	archive, err := zip.NewReader(bytes.NewReader(result.Bytes), int64(len(result.Bytes)))
@@ -155,6 +155,12 @@ func assertSummaryGroupedWorkbookCells(t *testing.T, input summaryVegetationWork
 			}
 		}
 	}
+	return book
+}
+
+func assertSummaryGroupedWorkbookCells(t *testing.T, input summaryVegetationWorkbookInput, result summaryVegetationWorkbook) {
+	t.Helper()
+	book := assertSummaryGroupedWorkbookBody(t, input, result)
 	encoded, err := json.Marshal(input)
 	if err != nil || !bytes.Equal(encoded, summaryEnvironmentalWorkbookSource(t, book)) {
 		t.Fatal("complete grouped input/provenance differs", err)

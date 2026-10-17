@@ -275,9 +275,56 @@ Full race accepts exit0, UTC2026-10-17T15:27:57.437937 to16:53:50.453037,
 Private `summary-strata-reference-desktop-integration/receipt.json` SHA256:
 `c19db82f56932dfb8d49950aed83e5f57b005b2c4e123f70004806d4485852e7`.
 Only six directly related documentation files change afterward.
-No Access/Excel/clipboard action occurred. Group13/14 references, grouped
+No Access/Excel/clipboard action occurred. Group13/14 common/guide references, grouped
 ancillary, Strata Display2, original Report/callback/formatting/printing and
 default/delivered-demo promotion remain unavailable.
+
+## Accepted Lifeform/None effective attribute inspection
+
+The [source contract](LONG_VEGETATION_WORKBOOK_CONTRACT.md#accepted-lifeformnone-effective-attribute-inspection)
+composes13/14 effective attributes only with common/guide both off, avoiding
+unqualified First(common name). Existing staging/aggregation, renderer, publisher,
+retained panel and both independent grouped/reference gates are reused. No new
+service, API, model, binding, dependency or flag. Derived NULL-Lifeform groups,
+fixed denominators, whole-row origins and raw MAX peers remain explicit.
+
+Independent kernel/body/provenance cases cover both groups/Average modes,
+managed/external sources, cancellation/detachment, authority drift, collision and
+exact recovery. Eight new strict-Go vectors support41 actual-proxy/compiled/
+consumed-rendering workbook cases in both runtimes. A reproduced numeric-Order
+NULL display is corrected with typed scalars and original group captions.
+Frozen validation accepts225 related client/41 browser cases, check0/0/isolated
+build, coupled race1182.656s, production vet/build and166 exact legacy output/
+source/scope/options/approval comparisons. Distinct19-path review finds no
+significant issues. The stopped earlier freeze remains unaccepted and archived.
+
+Actual Wails accepts five publications covering Lifeform/None attributes,
+Lifeform/class/environment, None frequency and None Average2/environment.
+Independent ZIP/XML checks every body cell and decoded complete hidden
+provenance. Actual reference tables check original captions/typed Order/row
+identity on first/next pages. Independent physical LF1 arithmetic witnesses
+None3.13/1.00 and LifeForm01 6.25/2.00 without application helpers. Four remounts/
+four exact native-close acknowledgements,42 visible/intersecting responsive
+observations and held-validation stale refusal pass. Lost committed-publication
+acknowledgement stays unknown without replay. Each independent backend denial
+preserves the unrelated route with zero publication. All16 fixture/config/audit
+files remain exact; all four owners normally close and are freshly absent.
+Private instrumentation changes only the isolated main entry. Native witnesses
+account for accessible scientific-name th row headers, original group metadata
+in XML and review clearing after acknowledgement; the completed first workbook
+was physically verified before continuing, never replayed. The independent
+arithmetic witness uses original IsAttribute=Yes deletion rather than its
+rejected initial Codetype assumption.
+
+Full race accepts exit0, UTC2026-10-17T18:03:34.596358 to19:39:56.469873,
+5781.860s total. All1916 managed inputs/285 artifacts, package/embed discovery,
+26 canonical inputs/21 protected assets and nine closed native families match.
+Private `summary-grouped-attributes-integration/receipt.json` SHA256:
+`71b7f7a1db7a2c9fa3e86d4f99b7d96ed4e5547269fd9df4963389ff2de416e9`.
+Only six directly related documentation files change afterward.
+No Access/Excel/clipboard actions. Common/guide names for13/14, grouped ancillary,
+Strata/Lifeform Display2, original Report/callback/formatting/printing and default/
+delivered-demo promotion remain unavailable. None Display2 is supported.
 
 ## Hosted release acceptance
 
