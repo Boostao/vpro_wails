@@ -37,7 +37,7 @@ These states describe availability, not confidence percentages:
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
 | Work with pictures | Development: owned reads/metadata and independently gated explicit lifecycle operations | Original Add/save/default/confirmation/Current timing and complete host integration |
 | Run profiles, Find and transfers | Development: bounded rule lifecycle/results, explicit navigation, owned-project Env/SU transfers | Unsupported criteria, external-file mutations and administration |
-| Produce priority reports | Preview subset: Summary inspection and Matrix XLSX. Development: supported Long Environment/Vegetation, summaries, reviewed XLSX/KML and saved options | Complete required combined/formatted variants and complete user report journeys; printing remains separate |
+| Produce priority reports | Preview: Long Environment/Vegetation selection, title Save/Undo, preview, reviewed XLSX publication and saved reopening; inherited Summary inspection/Matrix XLSX. Development: additional summaries, options, XLSX/KML | Complete required combined/formatted variants and remaining options/user journeys; printing remains separate |
 | Produce labels | Development: saved preview and portable single-label PDF | Physical printing, Print All, positions/stock and broader regional calibration |
 | Create/import/manage projects | Incomplete: private Access reader/staging/template/DDL groundwork only | Safe end-user creation/import/conversion, merge/splinter/compare and recovery |
 | Use the ribbon and auxiliary tools | Partial: some guarded routes and read-only hierarchy/log/location replacements exist | Remaining project/SU/hierarchy administration, standards, Help and auxiliary forms |
@@ -51,50 +51,55 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-current-main.zip`, 17,626,821 bytes, SHA256
-`fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
+`VPRO-Demo-2026-10-18-reports.zip`, 17,506,297 bytes, SHA256
+`f9d1d26c94b119165cd0bec0511a996933e1b33e7340fd917066cc5751cc9383`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
-23 frontend/22 runtime flags, packaged binary SHA256
-`d46f1485859b88a6e6e064b496d852688f91a3af0d2213628c2d7db2cad5ed4d`,
+31 frontend/28 runtime flags, packaged binary SHA256
+`cb7fee2f0ebc666281b3aaec42d61a8c13f0358fed37208cf48c6fcc7a91f0f2`,
 source-input SHA256
-`cb56ba7414afdc7b961412d1cd3d5d9467312806b02689ece900553c9857e792`.
+`0a70abd6fddbfce08ef382acbadffe138cf5c5cfcc82caba85e01c43ec9ed795`.
 Do not reconstruct the profile from remembered flag aliases or silently add
-new source features. Payload hashes come from `files[].sha256`;
-`acceptedCandidateSHA256` identifies predecessor lineage, not this packaged EXE.
-Source `58c4723` uses the previous profile, seed and launcher unchanged; the
-earlier archive/evidence is preserved. All non-documentation source inputs match
-the accepted full-race baseline. Focused client tests, check, isolated Vite/Go
-production builds and exact embed discovery pass.
+new source features. `files[].sha256` owns application/seed hashes; `launcher`
+and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
+named, not a substitute for the packaged EXE identity.
 
-Actual packaged entry verifies Undo, parent/metadata Save/six audits, P1/P2/P1
-and reopening the same saved run. Standalone SIVI77, CHARS71/eight panels and
-metadata147 controls at1400/760/420 widths pass. All thirty Summary rows match,
-including the saved slope; saved-log1070 rows/page50 and one actual reopened
-Matrix workbook with leading-zero codes/hidden provenance pass. A stale pre-edit
-Summary expectation is retained as a failed assertion, independently corrected
-from physical membership; no completed Save/publication was replayed.
-Three native owners close normally;1930 inputs,21 assets and49 canonical inputs
-match. These are bounded user journeys, not every enabled child mutation.
+Source `bc1490aa` uses existing services/components without new application code.
+The private launcher adds six fixed runtime literals and matching independent
+environment expectations; complete launcher race tests pass. Only a synthetic
+DemoReports_SU table is added: P1 twice, P2 and P3 in DemoA. All17 original tables
+and15 other seed files are exact. The original Report SU/default stays intact.
+Select **DemoReports** for the Long reports, **Report** for existing Summary.
 
-Additional acceptance uses that exact immutable ZIP/profile. One mixed
-Cover1/HeightA Save commits two cells/two audits, selected restoration/pruning
-recovers the original business tables, and Collected persists through navigation
-and a fresh application reopen. Invalid input blocks Save/Lock/Home/native close;
-fresh CancelClose acknowledgements precede correction or held-response release.
-Two retained harness failures are explicitly resolved without replay.
+New-profile native acceptance verifies216 Environment values/72 canonical labels,
+thirteen Vegetation rows with presence .5/mean1.5625 and pivots P1=2.5/P2=3.75,
+retaining NULL Strata, missing names and the physical four-member denominator.
+Report controls at1400/760/420 widths, title draft/Undo/two Saves, two once-only
+XLSX publications/independent reopen, same-family saved reopening, core parent
+Undo/P1-P2-P1, cancellation/remount, stale/no-replace and fresh native-close
+acknowledgements pass. All business tables/audits remain exact; only two declared
+titles change after explicit scope selection. Eight owners close normally.
+All1930 inputs,21 protected assets and54 canonical inputs match.
 
-A separate fresh family verifies one extended-shrub child creation, reviewed
-deletion, deleted-row restoration/pruning and historical creation Undo/pruning.
-All44 physical cells and peers, two creation audits, three deletion audits
-(including Flag0), permanent ID reservation and retained technical history match.
-Final business tables/audits equal the original fixture. All five additional
-native owners close normally. These are explicit desktop safety adaptations,
-not plot creation, original Access undelete or complete callback parity.
-Current source only clarifies independently gated lifecycle availability;
-33 focused client cases, check0/0 and an isolated same-profile build pass.
-That wording/test change is not in the ZIP; no flag or backend change is implied.
+Focused Go race,366 client cases, check0/0, isolated Vite/Go production builds and
+exact overlay discovery pass. Backend full-race lineage is unchanged; no new
+full-root race is claimed. Distinct read-only review finds no significant issues.
+The43,027,968-byte EXE is89,600 bytes larger, not a size optimization.
+
+Launcher/profile, empty-unit fixture and DTO/observer expectation failures are
+preserved and explicitly resolved. The original empty-unit refusal remains;
+only the new synthetic row was corrected. A missed chunked title-Save capture
+was recovered from its committed UI receipt and exact closed YAML, never replayed.
+The final manifest supersedes stale build-time pending/predecessor metadata.
+
+The immutable23/22 predecessor remains preserved at SHA256
+`fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
+Its parent/metadata, SIVI/CHARS, Summary/log/Matrix and child Save/restore,
+Collected/reopen, create/delete/restore/creation-Undo receipts retain their exact
+scope. Source and prior gates are retained, not every child mutation rerun on
+the new31/28 binary. These are explicit desktop safety adaptations, not original
+Access undelete, parent creation or whole-form callback parity.
 
 The current source, that pinned preview and default CI release are distinct.
 Seven-job release run38929085479 on `842ca946` validates default packaging;
@@ -108,11 +113,11 @@ before writing another service, state machine, flag or preparation layer.
 
 | Priority | User outcome and bounded work | Completion evidence |
 | --- | --- | --- |
-| 1 - supported journeys verified | Parent/metadata plus the child entry/recovery and explicit lifecycle journeys above are accepted in the pinned preview. Preserve them; consolidate orchestration only where behavior is demonstrably equivalent. Wider host/source combinations remain in priority4, not silently completed. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
-| 2 - next | Priority reports usable from that profile: select scope/options, preview, publish and reopen supported Long Environment/Vegetation/Summary outputs. | Independent expected values/membership, saved options, exact reopened files, cancellation/stale-approval refusal and visible unsupported variants |
-| 3 | Real-data onboarding and project administration. Integrate existing go-mdbtools boundaries instead of another Access parser; reuse the original SQLite family and metadata. | Disposable complete import/new-project/reopen/recovery journeys before production authorization; merge/splinter/compare remain separately accounted |
+| 1 - supported journeys verified | Preserve parent/metadata and child entry/recovery/lifecycle acceptance with its exact inherited23/22 scope. Source/gates are retained; parent Undo/navigation is rechecked on31/28. Consolidate only demonstrably equivalent behavior. Wider host/source combinations remain in priority4. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
+| 2 - supported subset verified | Long Environment/Vegetation title/preview/XLSX/reopen journeys now pass in the pinned profile; preserve inherited Summary/Matrix scope. Other options, combined/formatted variants and printing are not silently completed. | Independent values/membership, saved titles, exact reopened outputs and cancellation/stale/no-replace/close barriers are sealed |
+| 3 - next | Real-data onboarding and project administration. Integrate existing go-mdbtools boundaries instead of another Access parser; reuse the original SQLite family and metadata. | Disposable complete import/new-project/reopen/recovery journeys before production authorization; merge/splinter/compare remain separately accounted |
 | 4 | Finish remaining forms/pictures/profiles/ribbon workflows in client-priority order. Resolve genuine business choices without inventing callbacks or reproducing destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
-| 5 | Complete required labels/printing and final distribution/platform acceptance. | Qualified devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
+| 5 | Complete required report variants/options, labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
 
 Priorities organize, not delete, the former thirteen deliverables:
 stabilization; F1-F3 context/configuration; ownership/performance; FS882 parent;

@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-current-main.zip`, 17,626,821 bytes.
+`VPRO-Demo-2026-10-18-reports.zip`, 17,506,297 bytes.
 
 SHA256:
-`fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
+`f9d1d26c94b119165cd0bec0511a996933e1b33e7340fd917066cc5751cc9383`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,24 +46,36 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-23 frontend and 22 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+31 frontend and 28 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
 3. With a clean unlocked selected plot, review/edit an explicit metadata record.
 4. Inspect Summary, saved User log paging and the bounded Matrix XLSX workflow.
+5. Explicitly select the synthetic **DemoReports** SU for Long Environment and
+   Long Vegetation: load titles/options, preview, review and explicitly publish
+   each supported XLSX to a new destination. Title Save/Undo is separate from
+   workbook publication. Select the original **Report** SU for Summary.
 
-Source `58c4723` retains the prior 23/22 profile, seed and launcher unchanged.
-Actual packaged navigation, Undo, parent/metadata Saves and six audits, reopening
-the same saved run, standalone SIVI/CHARS panels, responsive controls, all thirty
-Summary rows, saved-log paging and one reopened Matrix workbook were verified.
-Additional checks of this same binary verify child Cover/Height Save and selected
-restoration, Collected persistence through navigation/reopen, and an explicit
-child create/delete/restore/historical creation Undo journey. Invalid drafts and
-held Save acknowledgement block native close; completed mutations are not replayed.
-Summary reflects the saved values. The earlier preview/evidence remains intact.
-Current source corrects misleading creation-panel availability guidance; that
-wording-only correction is not in the immutable ZIP.
+Source `bc1490aa` reuses existing application services/components; this delivery
+adds no application code. Its private launcher adds six existing runtime flags.
+Only the synthetic DemoReports SU is added to the seed; every original table and
+the other fifteen seed files remain unchanged. Missing names, NULL Strata and
+duplicate membership are preserved, not repaired.
+
+The new profile verifies all216 canonical Environment values, thirteen Vegetation
+rows/pivots, responsive report controls, title draft/Undo/Save, two actual XLSX
+publications and independent file reopening. The same saved family reopens with
+both titles and exact outputs. Cancellation/remount, stale approval, no-replace
+and native-close guards pass; no completed mutation is replayed. Parent
+Undo/P1-P2-P1 navigation is rechecked. Independent review finds no significant
+issues in this bounded private promotion.
+
+Earlier parent/metadata Saves, SIVI/CHARS panels, Summary/log/Matrix and child
+entry/lifecycle acceptance remain scoped to the preserved23/22 predecessor,
+SHA256 `fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
+Their source contracts/flags are retained; not every child mutation was rerun on
+the new binary. The creator-guidance correction is now included.
 **Later source additions are not automatically included or qualified in this ZIP.**
 The [delivery plan](MIGRATION_PLAN.md#supported-preview-profile) owns promotion.
 
@@ -88,8 +100,9 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is 42,938,368 bytes. An earlier controlled
-same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
+The qualified preview executable is 43,027,968 bytes, 89,600 bytes larger than
+its predecessor; this report delivery is not a binary-size reduction. An earlier
+controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 
 ### Validation
