@@ -50,26 +50,38 @@ that a narrower preparation or acceptance gate is complete.
 
 ## Supported preview profile
 
-The sole currently qualified private preview is
-`VPRO-Demo-2026-10-16-refresh.zip`, 17,533,868 bytes, SHA256
-`c064b158719f5936fa8c7618777d58936ef10cc7c1df8affa42ce16cad3b19db`.
+The current supported private preview is
+`VPRO-Demo-2026-10-18-current-main.zip`, 17,626,821 bytes, SHA256
+`fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
 23 frontend/22 runtime flags, packaged binary SHA256
-`78652d39020a4961cfbb9822b1de1dcbbf4b6c0f99880af4e7338cca820aec53`,
+`d46f1485859b88a6e6e064b496d852688f91a3af0d2213628c2d7db2cad5ed4d`,
 source-input SHA256
-`2f525ed9df139fe03d7f609dff5cb853fb48b313302cf419111e0aa6315395ea`.
+`cb56ba7414afdc7b961412d1cd3d5d9467312806b02689ece900553c9857e792`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. Payload hashes come from `files[].sha256`;
 `acceptedCandidateSHA256` identifies predecessor lineage, not this packaged EXE.
-Its walkthrough verifies navigation, parent/metadata
-Save/audits, CHARS/linked panels, Summary/log inspection and a Matrix workbook.
+Source `58c4723` uses the previous profile, seed and launcher unchanged; the
+earlier archive/evidence is preserved. All non-documentation source inputs match
+the accepted full-race baseline. Focused client tests, check, isolated Vite/Go
+production builds and exact embed discovery pass.
+
+Actual packaged entry verifies Undo, parent/metadata Save/six audits, P1/P2/P1
+and reopening the same saved run. Standalone SIVI77, CHARS71/eight panels and
+metadata147 controls at1400/760/420 widths pass. All thirty Summary rows match,
+including the saved slope; saved-log1070 rows/page50 and one actual reopened
+Matrix workbook with leading-zero codes/hidden provenance pass. A stale pre-edit
+Summary expectation is retained as a failed assertion, independently corrected
+from physical membership; no completed Save/publication was replayed.
+Three native owners close normally;1930 inputs,21 assets and49 canonical inputs
+match. These are bounded user journeys, not every enabled child mutation.
 
 The current source, that pinned preview and default CI release are distinct.
 Seven-job release run38929085479 on `842ca946` validates default packaging;
 it does not qualify an updated preview or every platform's runtime.
-No single current-main preview containing all accepted opt-ins has been accepted.
+This current-main preview deliberately does not enable every accepted opt-in.
 
 ## Ranked delivery backlog
 
@@ -78,12 +90,11 @@ before writing another service, state machine, flag or preparation layer.
 
 | Priority | User outcome and bounded work | Completion evidence |
 | --- | --- | --- |
-| 1 - next | One reproducible current-main preview. Reuse the pinned profile unchanged first; preserve its seed/old archive. Inventory the actual menu/field availability and missing actions in that exact candidate. | Candidate/source/profile hashes, fresh packaged navigation/edit/Save/reopen/report walkthrough, independent readback and normal closure. No silent feature promotion or mutation replay |
-| 2 | A coherent entry journey: select data/plot, edit parent and supported children, Save/Undo, navigate, reopen and recover safely. Consolidate FS882/SIVI/two-page orchestration only where behavior is demonstrably equivalent. | Whole-journey acceptance in the supported profile, including NULL/history, competing drafts, cancellation/unknown outcomes and close barriers; missing source behavior stays explicit |
-| 3 | Priority reports usable from that profile: select scope/options, preview, publish and reopen supported Long Environment/Vegetation/Summary outputs. | Independent expected values/membership, saved options, exact reopened files, cancellation/stale-approval refusal and visible unsupported variants |
-| 4 | Real-data onboarding and project administration. Integrate existing go-mdbtools boundaries instead of another Access parser; reuse the original SQLite family and metadata. | Disposable complete import/new-project/reopen/recovery journeys before production authorization; merge/splinter/compare remain separately accounted |
-| 5 | Finish remaining forms/pictures/profiles/ribbon workflows in client-priority order. Resolve genuine business choices without inventing callbacks or reproducing destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
-| 6 | Complete required labels/printing and final distribution/platform acceptance. | Qualified devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
+| 1 - next | Complete the coherent entry journey beyond the qualified parent/metadata path: supported child mutations, Save/Undo, navigation, reopen and recovery. Consolidate FS882/SIVI/two-page orchestration only where behavior is demonstrably equivalent. | Whole-journey acceptance in the supported profile, including NULL/history, competing drafts, cancellation/unknown outcomes and close barriers; missing source behavior stays explicit |
+| 2 | Priority reports usable from that profile: select scope/options, preview, publish and reopen supported Long Environment/Vegetation/Summary outputs. | Independent expected values/membership, saved options, exact reopened files, cancellation/stale-approval refusal and visible unsupported variants |
+| 3 | Real-data onboarding and project administration. Integrate existing go-mdbtools boundaries instead of another Access parser; reuse the original SQLite family and metadata. | Disposable complete import/new-project/reopen/recovery journeys before production authorization; merge/splinter/compare remain separately accounted |
+| 4 | Finish remaining forms/pictures/profiles/ribbon workflows in client-priority order. Resolve genuine business choices without inventing callbacks or reproducing destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
+| 5 | Complete required labels/printing and final distribution/platform acceptance. | Qualified devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
 
 Priorities organize, not delete, the former thirteen deliverables:
 stabilization; F1-F3 context/configuration; ownership/performance; FS882 parent;

@@ -34,11 +34,11 @@ inferring availability from menus, source files or a passed component test.
 
 ## Qualified Windows preview
 
-There is one currently qualified private preview:
-`VPRO-Demo-2026-10-16-refresh.zip`, 17,533,868 bytes.
+The current supported private preview is:
+`VPRO-Demo-2026-10-18-current-main.zip`, 17,626,821 bytes.
 
 SHA256:
-`c064b158719f5936fa8c7618777d58936ef10cc7c1df8affa42ce16cad3b19db`.
+`fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -53,8 +53,11 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
 3. With a clean unlocked selected plot, review/edit an explicit metadata record.
 4. Inspect Summary, saved User log paging and the bounded Matrix XLSX workflow.
 
-Actual packaged navigation, parent/metadata Saves and audits, linked panels,
-responsive controls and a reopened Matrix workbook were verified.
+Source `58c4723` retains the prior 23/22 profile, seed and launcher unchanged.
+Actual packaged navigation, Undo, parent/metadata Saves and six audits, reopening
+the same saved run, standalone SIVI/CHARS panels, responsive controls, all thirty
+Summary rows, saved-log paging and one reopened Matrix workbook were verified.
+Summary reflects the saved values. The earlier preview/evidence remains intact.
 **Later source additions are not automatically included or qualified in this ZIP.**
 The [delivery plan](MIGRATION_PLAN.md#supported-preview-profile) owns promotion.
 
@@ -79,7 +82,7 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is 42,670,592 bytes. An earlier controlled
+The qualified preview executable is 42,938,368 bytes. An earlier controlled
 same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 

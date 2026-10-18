@@ -27,17 +27,15 @@ Current machine state only. Portable scope and ordered work are in
 
 ## Current delivery objective
 
-- The delivery reset is documentation-only; no application flags, data or
-  accepted assets are changed. The current plan is the workflow-level authority,
-  not the historical root ledgers retained at Git commit `3bf43c4`.
-- Next objective: one current-main preview using the existing qualified23/22
-  profile unchanged, followed by complete packaged user journeys. Do not select
-  another isolated parity preparation merely because it is ready.
-- The old preview stays immutable. Its payload EXE hash is
-  `78652d39020a4961cfbb9822b1de1dcbbf4b6c0f99880af4e7338cca820aec53`
-  from manifest `files[].sha256`; `acceptedCandidateSHA256` is a different
-  predecessor identity, not the packaged EXE hash.
-- No new preview, native suite or release dispatch is implied by this reset.
+- Delivery reset `58c4723` is published. The current plan owns workflow status,
+  not the historical root ledgers retained at `3bf43c4`.
+- Its current-main preview is now qualified with the unchanged23/22 profile.
+  No feature opt-ins, seed, launcher or accepted frontend assets were promoted
+  or replaced. Next objective: coherent supported child-entry/navigation/recovery
+  journeys beyond the accepted parent/metadata path, not another private kernel.
+- The old preview remains immutable. Manifest `files[].sha256` owns payload
+  hashes; `acceptedCandidateSHA256` is predecessor lineage, not the packaged EXE.
+- No release dispatch or all-platform runtime acceptance occurred.
 
 ## Current accepted application integration
 
@@ -82,8 +80,8 @@ Restoration intent/result and failed receipts remain private.
 
 This is an explicit desktop operation, not source implicit-buffer/callback or
 random allocator parity, deletion/restoration, whole-form or default/demo
-promotion. Continue ordered migration work after the authorized publication
-association; a bounded feature gate is not the overall completion condition.
+promotion. The current preview below deliberately leaves these soil creation
+gates off; a bounded feature gate is not the overall completion condition.
 
 ## Source boundaries that must not be reopened casually
 
@@ -127,18 +125,27 @@ association; a bounded feature gate is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- `build\bin\VPRO-Demo-2026-10-16-refresh.zip`:17,533,868 bytes.
-  SHA256 `c064b158719f5936fa8c7618777d58936ef10cc7c1df8affa42ce16cad3b19db`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-current-main.zip`:17,626,821 bytes.
+  SHA256 `fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- The ZIP's unexpected absence was recovered byte-exactly from twenty qualified
-  members, with container/member hashes verified and a private backup retained.
-  Its cause remains unknown; no completed mutation was replayed.
-- SQLite-only executable:42,670,592 bytes;23 explicit frontend/22 runtime gates.
-  Accepted packaged navigation, parent/metadata Save/audits, CHARS panels,
-  responsive controls, Summary/matrix inspection and one XLSX publication remain
-  qualified. Ten synthetic10,052-plot reads took46-79ms; launch-to-Home1.812s,
-  including harness overhead, not a universal latency guarantee.
+- Source58c4723; SQLite-only EXE42,938,368 bytes, SHA256
+  `d46f1485859b88a6e6e064b496d852688f91a3af0d2213628c2d7db2cad5ed4d`.
+  Same23 frontend/22 runtime gates,16 seed files and launcher as the old preview.
+  Focused client/check/isolated production builds pass. Actual Undo, two Saves/
+  six audits, P1/P2/P1 and exact reopened state, standaloneSIVI77, CHARS71/eight
+  panels, metadata147 controls/three widths, exact Summary30 rows, log1070/page50
+  and one actual reopened Matrix XLSX pass. Three owners normally close and are
+  freshly absent. All1930 inputs/21 assets/49 canonical inputs match.
+- Private `current-main-preview-20261018/delivery.json` SHA256:
+  `0e9914e6c339cadc884165279c8fb6e6d5b27bfb78bf5b98a9ae642b579ce877`.
+  Retain the failed stale pre-edit Summary expectation and independent physical
+  membership correction; no completed Save/publication replay. Reopen-to-Home
+  took1.235s including harness; this is not a general startup/performance claim.
+- Previous `VPRO-Demo-2026-10-16-refresh.zip` stays unchanged, SHA256
+  `c064b158719f5936fa8c7618777d58936ef10cc7c1df8affa42ce16cad3b19db`.
+  Its earlier absence/recovery and private backup remain recorded; cause unknown.
+  Its synthetic10,052-plot reads46-79ms are historical, not new-preview evidence.
 - Hardened source `842ca946` release run `38929085479` passes all seven jobs.
   Draft/prerelease `v0.1.0-demo.20261016.2`, release415147921, retains fourteen
   payloads plus manifest with re-download/API digest checks. Manifest SHA256:
