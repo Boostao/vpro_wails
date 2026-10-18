@@ -55,7 +55,7 @@ Do not reopen this exhausted probe or widen existing physical-choice assignment;
 continue an independent ready deliverable. The [parent contract](docs/FS1333-parent-access-contract.md#private-projectid-choice-planning-candidate)
 records the exact remaining unknowns.
 
-Next independent forms boundary: linked Humus/Mineral creation. Static
+Accepted linked Humus/Mineral creation boundary: static
 form/query/module trace plus disposable engine calibration qualify complete
 18/28-column defaults, literal parent linkage, TEXT7/TEXT8 widths and actual
 AutoIncr/random-LONG/unique-index distinctions. Two independently reopened
@@ -71,6 +71,22 @@ cancellation before held-response release. Full-root race integration passes
 no default/demo or original callback/random-distribution parity grant follows.
 The [linked-soil contract](docs/FS882-two-page-access-contract.md#linked-soil-creation-qualified-engine-boundary)
 records the accepted engine boundary and retained pre-mutation correction.
+
+Linked-soil deletion source qualification is partial, not an implementation
+grant. Four original6x4 normal/CHARS linked Form-view contexts allow deletion and
+have no bound Delete/BeforeDelConfirm/AfterDelConfirm events. The second and
+last disposable attempt completed one normal Humus deletion without an observed
+confirmation despite Confirm Record Changes=True; the planned No was never
+dispatched. Independent closed-file comparison proves exactly the planned full
+row removed, complete peers/all84 other tables unchanged and no source audit
+change at the observed strength1. No command was replayed. Both owners normally
+closed, VPro registry/captured options were restored, and canonical inputs/seed
+remained unchanged. Preserve the failed expectations and sealed partial receipt;
+do not launch a third debugging attempt, infer a missing confirmation's cause
+or enable destructive desktop actions. Mineral/CHARS execution, cancellation
+and other-strength runtime behavior remain unknown;8x6 execution was not probed.
+Continue independent ready
+forms/report work; see the [source boundary](docs/FS882-two-page-access-contract.md#linked-soil-deletion-partial-source-boundary).
 
 The grouped ancillary successor is independently reviewed, disposable-native
 accepted and full-race integrated. It composes SU Table/optional ReportSummary

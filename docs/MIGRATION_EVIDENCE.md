@@ -40,6 +40,26 @@ verified byte-exact. Source callback timing, implicit new buffers, random
 allocator equivalence, deletion/restoration, whole-form parity and default/demo
 promotion are not granted.
 
+## Partial linked-soil deletion source observation
+
+The [source contract](FS882-two-page-access-contract.md#linked-soil-deletion-partial-source-boundary)
+retains a two-attempt boundary, not accepted deletion/restoration parity. Four
+original6x4 normal/CHARS linked Form-view contexts allow deletion without bound
+deletion events. One existing normal Humus command completed without an
+observed confirmation despite Confirm Record Changes=True; its planned No was
+never dispatched. Independent closed-file complete-row comparison verifies
+exactly one removal, unchanged peers/all84 other physical tables and no source
+audit change at strength1. No completed mutation was replayed.
+
+Both owners normally closed. Four floating-menu coordinate changes were
+guardedly restored; the entire VPro registry, attempt2 captured options,
+canonical inputs and accepted seed match. Attempt1 did not independently
+capture Auto Compact. Failed expectations and32 files remain private.
+`source-two-page-soil-deletion/source-qualification-partial.json` SHA256:
+`1fe9eaedb9a027da08771fc20d6e956c2e922abaa986d74c854e833e2936532c`.
+No third source debugging launch, inferred warning cause, cancellation,
+Mineral/CHARS/8x6/other-strength acceptance or destructive desktop enablement.
+
 ## Summary inspection workbook
 
 The independently default-off [inspection workflow](LONG_VEGETATION_WORKBOOK_CONTRACT.md#default-off-accepted-inspection-workbook)

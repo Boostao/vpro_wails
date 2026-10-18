@@ -89,6 +89,20 @@ association; a bounded feature gate is not the overall completion condition.
   No form/AuditTrail runtime acceptance follows from DAO. Source text/memo
   fields disallow zero-length; no additional field/table ValidationRule found.
   Do not replay either insertion or modify the sealed copy.
+- Soil deletion: the two-attempt source boundary is closed as partial in
+  `source-two-page-soil-deletion/source-qualification-partial.json`, SHA256
+  `1fe9eaedb9a027da08771fc20d6e956c2e922abaa986d74c854e833e2936532c`.
+  Four6x4 linked Form-view contexts allow deletion with no bound deletion events.
+  Attempt2 completed one normal Humus deletion without a confirmation despite
+  Confirm Record Changes=True; its planned No was never dispatched. Independent
+  closed-file comparison proves exactly that full row removed, complete peers/
+  all84 other tables unchanged and no audit change at strength1. No replay.
+  Both owners normally closed; original floating-menu close changed four saved
+  coordinates, which were guardedly restored exactly. All VPro registry and
+  attempt2 captured options, canonical inputs and seed match. Attempt1 did not
+  independently capture Auto Compact. Preserve32 files and both failed
+  expectations. No third debug launch, inferred warning cause, source cancellation/
+  Mineral/CHARS/8x6/other-strength acceptance or destructive desktop enablement.
 - Two-page Picture Manager buttons lack canonical OnClick bindings. The
   rejected attempted route stopped before native actions and was restored
   byte-exactly. Do not invent that dormant callback or restart its preparation.

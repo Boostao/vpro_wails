@@ -803,6 +803,42 @@ stable-request recovery and the existing retained owner/barriers. Do not widen
 existing-row Save, infer source deletion/restoration, enable creation, or claim
 whole-form parity from this qualification.
 
+### Linked-soil deletion: partial source boundary
+
+Canonical child forms bind only BeforeUpdate to AuditTrail; neither exports
+Delete/BeforeDelConfirm/AfterDelConfirm or an AllowDeletions override. A bounded
+disposable original-form inspection observed all four FS882-6x4XL/CHARS linked
+Humus/Mineral contexts in actual Form view with AllowDeletions/AllowEdits/
+AllowAdditions=True, clean buffers and literal PlotNumber master/child links.
+The initially selected parents had new child buffers, so these properties alone
+do not prove an existing-row command, audit or confirmation.
+
+The second and last native attempt selected an independently captured existing
+normal Humus row, with exact parent/ID/Horizon and owned native-thread focus
+guards, then issued acCmdDeleteRecord once. It completed without an observed
+confirmation despite Confirm Record Changes=True. The intended No decision
+was conditional on that dialog and was never dispatched. The harness stopped
+on its failed confirmation expectation; it did not replay the completed command.
+An independently reopened complete typed multiset proves exactly the planned
+Humus row removed, all its peers/all84 other physical tables unchanged and no
+source audit change at the observed strength1. A recorded planned decision is
+not an executed cancellation.
+
+Both owners normally closed. Original parent Close opens the floating menu;
+its normal close saved four changed window coordinates. Guarded restoration
+returned the entire VPro registry to the exact prior snapshot. Attempt2 also
+restored its three captured options (Move After Enter, Auto Compact and Confirm
+Record Changes); attempt1 captured only Move After Enter. Canonical inputs and
+the accepted seed are unchanged. Failed expectations, closed copies and cleanup
+are retained in32 private files. Partial source receipt SHA256:
+`1fe9eaedb9a027da08771fc20d6e956c2e922abaa986d74c854e833e2936532c`.
+
+This exhausts the two-attempt source debugging boundary. Do not infer why no
+confirmation appeared, launch a third attempt, or claim original cancellation,
+Mineral/CHARS or8x6 deletion execution, other-strength runtime auditing, restoration
+or whole-form parity. No destructive desktop workflow is enabled by this
+partial observation; continue an independent ready migration deliverable.
+
 ### Explicit linked-soil creation candidate
 
 The independently default-off creation candidate reuses the existing soil
