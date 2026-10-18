@@ -34,7 +34,7 @@ These states describe availability, not confidence percentages:
 | Select existing data and browse plots | Core/Preview: original SQLite family, configuration, owned project/SU/hierarchy selection, filtering and context switching | Production onboarding/administration is separate; attachment is not conversion |
 | Enter ordinary FS882 data | Core/Preview: 98 mapped writable parent fields; bounded soil/Other/vegetation editors, draft/Save/Undo/Lock/close behavior | Complete remaining source events, calculations and whole linked-form journeys |
 | Enter SIVI/CHARS data | Preview: parent panels, mixed child Save/restore, Collected navigation/reopen and explicit child create/delete/restore/creation Undo journeys. Development: wider separately gated species/ID and cross-host combinations | Whole-form callback/navigation equivalence; child creation/deletion is not plot/parent creation |
-| Use two-page entry | Preview: complete normal117/CHARS119 parents, explicit linked Humus/Mineral creation/editing and demonstrated Normal/CHARS vegetation cover/Collected edits, guards and saved reopen; C/D empty memberships remain read-only. Development: metadata/Species/heights and wider host combinations have separate boundaries | Whole-form/picture integration, populated C/D and remaining field/callback journeys; implicit creation and soil deletion/restoration remain unavailable |
+| Use two-page entry | Preview: complete normal117/CHARS119 parents, linked Humus/Mineral creation/editing, demonstrated vegetation cover/Collected and exact existing-list Species coedits, guards and saved reopen; C/D empty memberships remain read-only. Development: broader Species/metadata/heights and host combinations have separate boundaries | Whole-form/picture integration, populated C/D and remaining field/callback journeys; manual/NotInList, implicit creation and soil deletion/restoration remain unavailable |
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
 | Work with pictures | Development: owned reads/metadata and independently gated explicit lifecycle operations | Original Add/save/default/confirmation/Current timing and complete host integration |
 | Run profiles, Find and transfers | Development: bounded rule lifecycle/results, explicit navigation, owned-project Env/SU transfers | Unsupported criteria, external-file mutations and administration |
@@ -52,44 +52,55 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-linked-vegetation.zip`,17,560,007 bytes, SHA256
-`5c3e9ece6accd6fffdfed392e8aae99fa6819d2a54a57276d5cc724525f7f57f`.
+`VPRO-Demo-2026-10-18-species-list.zip`,17,560,824 bytes, SHA256
+`6fc79320bc1ae16bae2e2bb345042dcc15611b12d1ec662fc95f3e132ce705af`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
-43 frontend/39 runtime flags, packaged binary SHA256
-`722664395d1e08fc93be7eadab4d0d98d258f4cc9742892b219d21ea847028d9`,
+44 frontend/40 runtime flags, packaged binary SHA256
+`4d180f4265d990cfb5c5cf8fc74ebe83c9bfad7dab575a3b463177300b388b57`,
 source-input SHA256
-`93ffd3f9b34b61b1dd971930e883af276dcf155ac9fc8bf3dfa44da71fee7da2`.
+`e753ef4ed5ef3958e8596fd3ed9247eee590e6154ea3db094d6fc0281074195b`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. `files[].sha256` owns application/seed hashes; `launcher`
 and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
 named, not a substitute for the packaged EXE identity.
 
-Source is committed `8cbdd36`; production app/backend/seed/defaults unchanged.
-One test fixture explicitly initializes the already-bound editor state.
-Two existing vegetation review/writing gates extend the previous profile; no
-kernel/service/dependency added. Initial JS1,013,963, down80.51% from5,202,547;
-total5,346,499. EXE43,178,496 is39,936 bytes larger than its reference predecessor.
+Source is committed `91fcc46`; production app/backend/seed/defaults unchanged.
+One existing Species-list gate extends the previous profile, reusing reference/
+planner/writer/history/session infrastructure; no kernel/service/dependency added.
+Initial JS1,014,098, down80.51% from5,202,547; total5,346,677.
+EXE43,178,496 equals its vegetation predecessor.
 No new timing/binary-shrink claim.
 
-Current native acceptance edits Normal Cover1/Collected and CHARS Cover5a:
-two explicit Saves, three independently reopened physical/history audits and
-two histories on row1/negative signed32 ID-100001, complete peers/unmapped cells
-exact. Collected is TEXT1 NULL/C/V, not BOOLEAN. A membership is13; C/D membership
-is0 with13 read-only physical rows each, not populated C/D edit qualification.
-Invalid100/narrowed100/overlength text, five fresh CancelClose responses before
-correction/release, held-response read-only recovery, alias reload and retained
-receipt remounts pass. All planned labels/fields/actions are measured980/1400.
-Two saved gate-off reopens deny four calls, preserve16 files each, retain parent117
-and writing-off saved normal117/CHARS119/reference reads. All three owners close.
+Current native acceptance selects Normal LF1->LF2 with Cover1 and CHARS LF2->LF3
+with Cover5a: two selection-service Saves, four independently checked physical/
+history audits and two histories on row1/negative signed32 ID-100001.
+Complete peers/unmapped cells, metadata/reference files exact. Options are four
+master LF1..LF4 codes; personal empty. Original/planned common-seven cover must
+not all be NULL. Joint soil draft guards, five fresh CancelClose responses before
+correction/release/ack, held-response read-only recovery, alias reload, receipt
+remounts and labelled fields/selects/actions980/1400 pass.
+Three saved gate-off reopens deny six calls including legacy Save's lack of
+Species authority, preserve16 files each, retain parent117 and writing/selection-
+off saved normal117/CHARS119/reference reads. All four owners close.
 
-All121 related client cases, combined124-case startup selector, launcher races,
-focused vegetation race111.563s/check0/0/Vite/Go/exact26 embeds pass. Independent
-review finds no material issues. The preproduction missing-fixture failure is
-preserved with its source re-freeze; the native journey passes first attempt.
-No new full-root race/oracle, every-field/populated-C/D, Species/heights,
-identity/create/delete/restore, implicit events or whole-migration grant.
+All121 related client cases, launcher races, coupled vegetation/Species-list
+race136.687s/check0/0/Vite/Go/exact26 embeds pass; independent review finds no
+material issues. A reused invalid-draft guard expected valid Save disabled;
+its failure preceded any Save, then zero-write hashes/existing LF2 draft were
+verified and the same owner continued. The native journey was not first-pass;
+no completed mutation replay. No new full-root race/oracle, populated personal/
+duplicate-reference/whole-Unicode, populated-C/D/every-field, manual/alias/
+NotInList/personal creation, heights/identity/lifecycle/implicit-event grant.
+
+The preserved43/39 vegetation ZIP, SHA256
+`5c3e9ece6accd6fffdfed392e8aae99fa6819d2a54a57276d5cc724525f7f57f`,
+owns Normal Cover1/Collected and CHARS Cover5a, two Saves/three audits/two histories,
+TEXT1 NULL/C/V, invalid100/narrowed100/overlength, recovery/remount/alias and
+two saved gate-off reopens. C/D membership0 with13 read-only physical rows each.
+Its combined124 startup cases and corrected bound-editor test keep their identity;
+Collected was not replayed here. Three owners close;16 exact files per reopen.
 
 The preserved41/37 reference-report ZIP, SHA256
 `b31cc3038bf5742486a84dfc6bff3406da17a5769b7eff568f600555cbc94a5e`,
@@ -102,7 +113,7 @@ drops zero stage entries but retains denominator4. Cancellation/close/ack guards
 references-off denial/ordinary review, two closed owners and exact15 DBs with
 declared SU config change/16 files per reopen belong to that binary.
 Its inspector/source-mode and reviewed walkthrough corrections remain preserved
-without publication replay. These publications were not repeated on43/39.
+without publication replay. These publications were not repeated on44/40.
 Use a fresh launcher run for report examples after vegetation edits.
 
 The preserved soil ZIP, SHA256
@@ -110,7 +121,7 @@ The preserved soil ZIP, SHA256
 owns two explicit creations with18/28 defaults, two Saves/six audits/four histories/
 permanent IDs, exact peers, retained normal117/CHARS119 remounts/read-only recovery
 and three gate-off reopens. Four owners close;15 other files exact after writes/
-16 exact per reopen. These mutations were not replayed on43/39. Positive allocation
+16 exact per reopen. These mutations were not replayed on44/40. Positive allocation
 is an adaptation, not GenUniqueID compatibility; no implicit creation or soil
 deletion/restoration.
 
@@ -124,7 +135,7 @@ Duplicate P1 and physical zero-cover P3 remain. Absent master long names yield n
 invented ReportSummary unit row. Both owners close;15 databases stay exact
 with declared SU/config selection and16 files stay exact in the denial reopen.
 Its wire/scientific-name inspector corrections continued without replay.
-That no-reference publication was not repeated on43/39; the41/37 predecessor
+That no-reference publication was not repeated on44/40; the41/37 predecessor
 separately qualifies the three reference-based outputs. Original callbacks and
 full formatting/printing remain separate.
 
@@ -163,7 +174,7 @@ The immutable23/22 predecessor remains preserved at SHA256
 Its parent/metadata, SIVI/CHARS, Summary/log/Matrix and child Save/restore,
 Collected/reopen, create/delete/restore/creation-Undo receipts retain their exact
 scope. Source and prior gates are retained, not every child mutation rerun on
-the new43/39 binary. These are explicit desktop safety adaptations, not original
+the new44/40 binary. These are explicit desktop safety adaptations, not original
 Access undelete, parent creation or whole-form callback parity.
 
 The current source, that pinned preview and default CI release are distinct.
@@ -182,7 +193,7 @@ before writing another service, state machine, flag or preparation layer.
 | 1 - supported journeys verified | Preserve parent/metadata and child entry/recovery/lifecycle acceptance with its exact inherited23/22 scope. Source/gates are retained; parent Undo/navigation is rechecked on31/28. Consolidate only demonstrably equivalent behavior. Wider host/source combinations remain in priority4. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
 | 2 - supported subset verified | Preserve Long/Matrix lineage and Summary None/display6/environment/ancillary plus common/guide-NULL and numeric Constancy publications. Other options/combined/formatted variants and printing remain separate. | Independent vegetation/names/membership, reviewed environment, reopened outputs and cancellation/stale/close/acknowledgement barriers sealed; environmental calibration retains kernel lineage |
 | 3 - blocked prerequisites | Real-data onboarding/project administration needs production go-mdbtools reader integration, source schema/default/identity qualification and platform/licensing closure. New-project Description/default oracle retry is explicitly closed after two attempts; do not reopen it under another name. Reuse completed F1-F3 and continue independent deliverables. | Disposable complete import/new-project/reopen/recovery before authorization; private scalar staging is not production import and merge/splinter/compare remain separate |
-| 4 | Preserve delivered linked-soil and demonstrated Normal/CHARS vegetation edits; finish remaining Species/field/populated-C/D, pictures/profiles/ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
+| 4 | Preserve delivered linked-soil, demonstrated vegetation and exact existing-list Species coedits; finish broader Species/field/populated-C/D, pictures/profiles/ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
 | 5 | Complete required report variants/options, labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
 
 Priorities organize, not delete, the former thirteen deliverables:

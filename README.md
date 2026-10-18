@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-linked-vegetation.zip`, 17,560,007 bytes.
+`VPRO-Demo-2026-10-18-species-list.zip`, 17,560,824 bytes.
 
 SHA256:
-`5c3e9ece6accd6fffdfed392e8aae99fa6819d2a54a57276d5cc724525f7f57f`.
+`6fc79320bc1ae16bae2e2bb345042dcc15611b12d1ec662fc95f3e132ce705af`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-43 frontend and 39 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+44 frontend and 40 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -77,29 +77,45 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
    load vegetation and edit B3 (Cover5a); Save and acknowledge. Reload the Normal
    alias before another edit. Herb/Moss have zero C/D query memberships in this
    seed: their physical rows remain read-only, not creation opportunities.
+10. For existing-list Species selection, first **Review Species definitions
+    (read only)**. Choose an exact LF1..LF4 code in Normal or CHARS, optionally
+    coedit covers, Save explicitly and acknowledge. Reload the other alias before
+    further edits. Manual/alias/NotInList/personal creation remain unavailable.
 
-Source is committed `8cbdd36`; production app/backend/seed/defaults are unchanged.
-One coupled test fixture now explicitly represents an already-bound editor's
-startup state. Two existing vegetation review/writing gates extend the profile;
-no application kernel, service or dependency was added.
+Source is committed `91fcc46`; production app/backend/seed/defaults are unchanged.
+One existing Species-list gate extends the preceding profile, reusing the same
+reference reader, planner, atomic writer, history and retained session.
+No application kernel, service or dependency was added.
 
-Current native acceptance covers Normal Cover1/Collected and CHARS Cover5a:
-two explicit Saves, three independently checked source audits and two histories
-on physical row1/legacy ID-100001. Complete peers/unmapped cells remain exact.
-Collected is TEXT1 with NULL/C/V cycling, not BOOLEAN. Invalid100, SINGLE-narrowed
-100 and overlength text, five fresh native-close acknowledgements, held-response
-read-only recovery, alias reload and receipt remounts pass without Save replay.
-Fields, associated labels and actions are visible/contained at980/1400.
-Two saved gate-off reopens deny four backend calls, preserve all16 files each
-and retain ordinary parent117; writing-off reads show saved normal117/CHARS119.
-All three owners close. All121 related client cases, the combined124-case startup
-selector, launcher races, focused vegetation races111.563s, check0/0 and isolated
-Vite/Go/exact26 embeds pass. Independent review finds no material issues.
-The original missing-fixture build failure is preserved; native acceptance
-passed first attempt. No new full-root race or original Access oracle is claimed.
-Populated C/D writes, every field combination, Species selection, heights,
-identity/create/delete/restore and implicit event/focus behavior remain outside
-this qualification.
+Current native acceptance covers Normal Species LF1->LF2 with Cover1 and CHARS
+LF2->LF3 with Cover5a: two selection-service Saves, four independently checked
+physical/history audits and two histories on row1/legacy ID-100001.
+Complete peers/unmapped cells, project metadata and reference files remain exact.
+The seed offers four exact master codes LF1..LF4 and no personal definitions;
+original/planned common-seven covers must not all be NULL. Both soil panels
+load; soil drafts block Species/cover staging and Species drafts block new soil
+actions. Five fresh close acknowledgements, held-response read-only recovery,
+alias reload, receipt remount and labelled980/1400 fields/actions pass.
+Three saved gate-off reopens deny six calls, including legacy Save's lack of
+Species authority, preserving16 files each. Parent117 remains available;
+writing/selection-off reads show saved normal117/CHARS119. All four owners close.
+All121 related client cases, launcher races, coupled vegetation/Species-list
+races136.687s/check0/0 and isolated Vite/Go/exact26 embeds pass. Independent
+review finds no material issues. A harness expected a valid draft's own Save
+disabled; its pre-Save failure/zero-write family and corrected same-owner
+continuation remain preserved. No completed Save was replayed.
+No new full-root race/oracle, populated personal/duplicate-reference/whole-Unicode,
+populated C/D/every-field, manual/alias/NotInList/personal creation, heights,
+identity/lifecycle or implicit event/focus qualification is claimed.
+
+The immutable43/39 vegetation predecessor remains unchanged, SHA256
+`5c3e9ece6accd6fffdfed392e8aae99fa6819d2a54a57276d5cc724525f7f57f`.
+It owns Normal Cover1/Collected and CHARS Cover5a, two Saves/three audits/two
+histories, TEXT1 NULL/C/V, invalid100/narrowed100/overlength guards, read-only
+recovery, alias/remount/saved reopen and independent denials. C/D source membership
+is0 with13 read-only physical rows each. All three owners close. Its combined124
+startup cases and one corrected bound-editor test fixture retain their identity;
+the Collected journey was not replayed on this binary.
 
 The immutable reference-report predecessor remains unchanged, SHA256
 `b31cc3038bf5742486a84dfc6bff3406da17a5769b7eff568f600555cbc94a5e`.
@@ -142,9 +158,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is1,013,963 bytes versus5,202,547 before
-deferral (80.51% less); total JavaScript is5,346,499. The EXE is39,936 bytes larger
-than the reference-report predecessor; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is1,014,098 bytes versus5,202,547 before
+deferral (80.51% less); total JavaScript is5,346,677. The EXE equals the43/39
+vegetation predecessor; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
@@ -175,8 +191,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,178,496 bytes,39,936 larger than the
-reference-report predecessor; deferred loading is not a binary-size reduction. An earlier
+The qualified preview executable is43,178,496 bytes, equal to the vegetation
+predecessor; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 
