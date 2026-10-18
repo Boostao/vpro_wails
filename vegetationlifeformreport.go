@@ -21,7 +21,12 @@ type vegetationLifeformPreparation struct {
 }
 
 func vegetationLifeformInsertionLayer(cell ProjectMetadataCell) (ProjectMetadataCell, error) {
-	value, err := vegetationLifeformInteger(cell)
+	return vegetationLifeformInsertionLayerWithInteger(cell, vegetationLifeformInteger)
+}
+
+func vegetationLifeformInsertionLayerWithInteger(cell ProjectMetadataCell,
+	readInteger func(ProjectMetadataCell) (*int, error)) (ProjectMetadataCell, error) {
+	value, err := readInteger(cell)
 	if err != nil {
 		return ProjectMetadataCell{}, err
 	}
@@ -53,11 +58,16 @@ func vegetationLifeformNull2Question(cell ProjectMetadataCell) (ProjectMetadataC
 // at its parameter boundary, and EntryDat_Veg.Cover has the final assignment.
 func prepareLongVegetationLifeforms(ctx context.Context, prepared VegetationReportPreparation,
 	union ProjectMetadataTable) (vegetationLifeformPreparation, error) {
+	return prepareLongVegetationLifeformsWithInteger(ctx, prepared, union, vegetationLifeformInteger)
+}
+
+func prepareLongVegetationLifeformsWithInteger(ctx context.Context, prepared VegetationReportPreparation,
+	union ProjectMetadataTable, readInteger func(ProjectMetadataCell) (*int, error)) (vegetationLifeformPreparation, error) {
 	fail := func(err error) (vegetationLifeformPreparation, error) { return vegetationLifeformPreparation{}, err }
 	if err := ctx.Err(); err != nil {
 		return fail(err)
 	}
-	columns, err := vegetationLifeformReferenceSchema(ctx, union)
+	columns, err := vegetationLifeformReferenceSourceSchemaWithInteger(ctx, union, "Lifeform", readInteger)
 	if err != nil {
 		return fail(err)
 	}
@@ -139,7 +149,7 @@ func prepareLongVegetationLifeforms(ctx context.Context, prepared VegetationRepo
 				}
 				form = ref.Cells[columns["Lifeform"]]
 			}
-			layer, err := vegetationLifeformInsertionLayer(form)
+			layer, err := vegetationLifeformInsertionLayerWithInteger(form, readInteger)
 			if err != nil {
 				return fail(err)
 			}

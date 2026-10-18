@@ -12,6 +12,11 @@ import (
 // EntryDat_Veg is a new typed read model, not a rewrite of the source table.
 func prepareSummaryVegetationGroupedEntries(ctx context.Context, prepared VegetationReportPreparation,
 	union ProjectMetadataTable, grouping int) (ProjectMetadataTable, error) {
+	return prepareSummaryVegetationGroupedEntriesWithInteger(ctx, prepared, union, grouping, vegetationLifeformInteger)
+}
+
+func prepareSummaryVegetationGroupedEntriesWithInteger(ctx context.Context, prepared VegetationReportPreparation,
+	union ProjectMetadataTable, grouping int, readInteger func(ProjectMetadataCell) (*int, error)) (ProjectMetadataTable, error) {
 	fail := func(err error) (ProjectMetadataTable, error) { return ProjectMetadataTable{}, err }
 	if ctx == nil {
 		return fail(errors.New("summary vegetation grouped entries require a context"))
@@ -123,7 +128,7 @@ func prepareSummaryVegetationGroupedEntries(ctx context.Context, prepared Vegeta
 			appendRow(row.PlotNumber, ProjectMetadataCell{Storage: "text", Text: &row.Layer}, row.Species, row.Cover, null)
 		}
 	case 13:
-		lifeforms, err := prepareLongVegetationLifeforms(ctx, held, union)
+		lifeforms, err := prepareLongVegetationLifeformsWithInteger(ctx, held, union, readInteger)
 		if err != nil {
 			return fail(err)
 		}

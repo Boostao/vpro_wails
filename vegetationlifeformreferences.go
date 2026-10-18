@@ -59,6 +59,11 @@ func vegetationLifeformReferenceSchema(ctx context.Context, table ProjectMetadat
 }
 
 func vegetationLifeformReferenceSourceSchema(ctx context.Context, table ProjectMetadataTable, lifeformColumn string) (map[string]int, error) {
+	return vegetationLifeformReferenceSourceSchemaWithInteger(ctx, table, lifeformColumn, vegetationLifeformInteger)
+}
+
+func vegetationLifeformReferenceSourceSchemaWithInteger(ctx context.Context, table ProjectMetadataTable, lifeformColumn string,
+	readInteger func(ProjectMetadataCell) (*int, error)) (map[string]int, error) {
 	required := append([]string{}, vegetationLifeformReferenceColumns...)
 	required[2] = lifeformColumn
 	columns, err := siteUnitTransferColumns(table, required...)
@@ -74,7 +79,7 @@ func vegetationLifeformReferenceSourceSchema(ctx context.Context, table ProjectM
 			cell := row.Cells[columns[name]]
 			var err error
 			if name == "Lifeform" {
-				_, err = vegetationLifeformInteger(cell)
+				_, err = readInteger(cell)
 			} else {
 				_, err = vegetationReportIdentity(cell)
 			}

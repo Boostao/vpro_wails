@@ -618,8 +618,22 @@ all six owners close normally. Full race passes in4861.766s with1918 unchanged
 inputs/332 artifacts and ten closed native families. Retained native witness
 correction never replays a completed publication.13/14 common/guide, Strata/
 Lifeform Display2, original Report/callback/formatting/printing and default/demo
-promotion remain unavailable. Constancy numeric grouping is the next source
-contract, not an enabled report.
+promotion remain unavailable. Constancy remains a separate, unavailable consumer.
+
+The accepted [private Constancy preparation](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#private-accepted-constancy-preparation)
+reuses existing reference preparation, Group13 staging, aggregation and formatting,
+but groups by numeric nullable master/personal Lifeform and separate raw species
+identity. Ten disposable original source-query cases establish LONG4 group
+metadata, TEXT Order and duplicate visible rows; they are not full Report
+execution. New explicit integer-reader variants retain all legacy signed16
+wrappers and original selected TEXT3 limits. Derived attribute origins, MAX
+peers, detachment and cancellation/retry are tested. Distinct review, coupled
+race1507.859s, production vet/build and246 exact legacy comparisons pass.
+Full root race passes in6823.438s with1919 unchanged inputs,2904 protected artifact
+entries and eleven closed native families. Stable raw-code tie ordering is an
+explicit read-model adaptation. No public DTO/service/binding/frontend/flag/
+preferences/default/demo changes. Numeric rendering, strict transport, duplicate
+row validation and draft ownership are the next consumer work, not enabled parity.
 
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus

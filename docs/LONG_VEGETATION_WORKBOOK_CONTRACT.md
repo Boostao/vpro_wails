@@ -2708,6 +2708,50 @@ No default/delivered-demo promotion or acceptance of13/14 common/guide,
 Strata/Lifeform Display2, quality/lumping, original formatting/callbacks,
 Excel coercion or printing. No Access/Excel/clipboard action occurred.
 
+### Private accepted Constancy preparation
+
+Original `IsConstancy` forces Group3/Display1/common0 through the existing
+callbacks without clearing the historical limit. Existing coupled presentation
+preference CAS already models that persistence boundary; this preparation adds
+no competing preferences or automatic saves.
+
+The later `MakeSvQueries` Constancy override selects numeric
+`USysAllSpecies.Lifeform`, scientific name with NULL-only raw-code fallback and
+lexical prefix Max Order. GROUP BY separately retains numeric lifeform, raw
+Species and displayed name. Ordinary Group13's textual LayerCode label is not
+equivalent. Group13/Display1 keeps empty MyWhere and LifeForm/Spp ordering.
+Ten disposable staged-query cases across both Average branches establish
+Lifeform DAO LONG4/size4, Order TEXT10/size0, NULL-first numeric ordering and
+retained identical visible rows through SV3 DISTINCTROW. Distinct-valued rows
+with equal displayed keys also remain separate. Stable raw-code tie order is
+an explicit deterministic read-model adaptation, not source tie-order parity.
+
+The private kernel reuses effective-reference preparation, original Group13
+MAX/SINGLE staging, joins, denominators, aggregation, decimal formatting and
+whole-row physical witnesses. Only the new Constancy caller uses explicit
+LONG32 integer-reader variants on the already validated master32/personal16
+union. Every legacy wrapper remains signed16. An unused master2147483647 does
+not invalidate this new route; a selected formatted lifeform still must fit
+the original TEXT3 stage or the operation refuses without partial output.
+RawSpecies remains separate from display name and the numeric group. Derived
+attribute NULL groups combine original stage layers without losing origins.
+
+Independent tests retain the ten source-query vectors, cross-stage/attribute
+arithmetic, duplicate MAX peers, helper/caller policies, bounds, detachment and
+cancellation/retry. Frozen six-path/1919-input validation accepts focused
+race15.688s, coupled race1507.859s, production vet/build and246 exact legacy
+workbook/source/approval/scope/options comparisons. Distinct read-only review
+finds no significant issues. Full root race passes in6823.438s, preserving1919
+inputs/2904 protected artifact entries, discovery,38 canonical inputs/21 assets
+and eleven closed native families. See [portable evidence](MIGRATION_EVIDENCE.md#accepted-private-constancy-preparation).
+
+This is not a public Constancy route: no public DTO/service/transport/binding/
+frontend/flag/prefs/default/demo change. Query calibration uses explicitly
+projected staged inputs, not full Report/preflight/BuildLifeFormTable execution,
+Excel/clipboard/printing or callback parity. The next consumer must separately
+wire strict authority, numeric rendering, raw-code duplicate validation and
+parent presentation/calculation ownership before desktop acceptance.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

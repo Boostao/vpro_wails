@@ -373,6 +373,53 @@ Common/guide names for13/14, Strata/Lifeform Display2, original Report/callback/
 formatting/printing, quality/lumping and default/delivered-demo promotion remain
 unavailable. Constancy is a separate static source contract, not acceptance.
 
+## Accepted private Constancy preparation
+
+The [private contract](LONG_VEGETATION_WORKBOOK_CONTRACT.md#private-accepted-constancy-preparation)
+distinguishes numeric `USysAllSpecies.Lifeform` from ordinary Group13 textual
+LayerCode grouping. Original Constancy SELECT/GROUP clauses retain raw Species
+separately from scientific-name-or-code display. Display1 preserves lexical
+prefix Order and Group13 LifeForm/Spp sorting.
+
+One new disposable source-query family executes ten projected cases across
+both Average branches: ordinary, NULL lifeform, equal display with identical
+values, equal display with distinct values and numeric source policies.
+Independent expected values and DAO fields establish LONG4/size4 Lifeform,
+TEXT10/size0 Order, NULL-first numeric ordering and two visibly identical rows
+surviving SV3 DISTINCTROW. Every case is reopened readonly. Normal owned quit,
+fresh PID absence, absent DAO locks and source/fixture hashes are sealed.
+This is projected query/helper calibration, not full original Report/preflight/
+BuildLifeFormTable execution. No canonical write or Excel/clipboard action.
+
+The new private caller reuses existing reference preparation/staging/aggregation/
+formatters/witnesses. Explicit LONG32 reader variants apply only to the validated
+master32/personal16 union; legacy signed16 wrappers remain exact. Original
+selected TEXT3 bounds still refuse, while unused wide master references are
+allowed. Fast tests retain raw-code identity, original MAX peers, cross-stage/
+derived-attribute arithmetic and origins, deterministic raw-code tie adaptation,
+detachment, cancellation/retry and caller/helper compatibility. That tie
+adaptation is not Access tie-order parity.
+
+Frozen six-path validation accepts focused race15.688s, coupled race1507.859s,
+production vet21.656s/build15.766s and246 exact base/candidate comparisons,
+including40 just-published grouped ancillary output/source/approval/scope/options
+vectors. Distinct read-only review finds no significant issues and matches all
+six frozen hashes. Development failures remain recorded: numeric identity
+validation was initially inside the text-field loop; an unused-wide test
+mistakenly included the wide species among selected inputs. Both were corrected
+before the accepted freeze, without weakening selected-width refusal.
+
+Full root race accepts exit0, UTC2026-10-17T23:01:02.041833 to
+2026-10-18T00:54:47.548940,6823.438s total. All1919 managed inputs/2904 protected
+artifact entries, package/embed discovery,38 canonical inputs/21 protected assets
+and eleven closed native families match: ten previous Wails families plus the
+new Access source-query family. Private `summary-constancy-integration/receipt.json`
+SHA256: `8c1c9d6fb6a010c678405bfab57864d895ce4afa0f304a3e5f0007fde5f2f52b`.
+Only six directly related documentation files change afterward.
+No public DTO/service/binding/frontend/flag/prefs/default/demo change or new
+Wails UI acceptance. Inherited client inputs and strict-Go wire fixtures remain
+unchanged; they are not represented as new frontend executions.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

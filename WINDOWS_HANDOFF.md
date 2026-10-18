@@ -25,49 +25,52 @@ Current machine state only. Portable scope and ordered work are in
 
 ## Current accepted integration
 
-Source parent is published `d1d18e3ee6f7b4a9e99b167bb5e23e12dc928984`.
-The accepted grouped ancillary successor composes SU Table and optional
-ReportSummary with supported12/13/14 and supported effective references.
-Canonical MakeSvQueries creates SnTable from original Veg before grouped staging;
-the existing raw-SU/Veg ancillary preparation is reused, not the grouped pivot.
-B7 retains original Strata/Lifeform/None captions; B8 remains Species. Separate
-combined scope/approval authority leaves existing paths unchanged. No new
-production file/service/binding/dependency/flag or default/demo promotion.
+Source parent is published `48cc9d9f6e0982290bad0492f064c475ab05cf8d`.
+The accepted private Constancy preparation reuses existing effective references,
+Group13 MAX/SINGLE staging, aggregation, formatting and physical witnesses.
+Its numeric nullable Lifeform group is DAO LONG4/size4, not ordinary Group13's
+LifeForm TEXT3. Order remains TEXT10/size0. Raw Species is a separate grouping
+identity: two visibly identical rows survive the source DISTINCTROW query.
+Deterministic raw-code ordering among equal displayed keys is an explicit read-
+model adaptation, not Access tie-order parity.
 
-Frozen16-path/1918-input validation accepts229 related client/45 browser cases,
-check0/0/isolated build, coupled race768.297s/vet/production and206 exact legacy
-comparisons. Distinct read-only review finds no significant issues. Sixteen
-managed/external compositions verify typed main bodies, optional common-name
-columns, source worksheets and complete provenance; all eight independent
-group/ancillary/reference gate combinations and stale authority are covered.
+One disposable `summary-constancy-source` family calibrates ten projected query
+cases across both averages, NULL/missing groups, equal names with equal/distinct
+values and numeric source policies. Readonly reopen, independently expected
+values/metadata, fresh owner/lock absence and source/fixture hashes pass.
+This executes original extracted query/helper boundaries on explicitly staged
+inputs, not full original Report/preflight/BuildLifeFormTable execution.
+No Excel/clipboard action or canonical mutation occurred.
 
-One closed `native-summary-grouped-ancillary` family accepts six independently
-reopened publications, every main body cell/typed Order/source caption/provenance,
-and physical membership/count witnesses. Four host remounts/four exact native-
-close acknowledgements,54 responsive observations, held-validation stale refusal,
-unknown committed-publication retention, three independent backend denials and
-four retained unsupported-name drafts pass. All16 fixture/config/audit files
-remain unchanged; all six owners normally close and are freshly absent.
-The retained first native witness incorrectly assumed the larger predecessor
-fixture; the actual eight memberships/two units/seven selected plots and already-
-published workbook were independently verified before continuing without replay.
-No Access/Excel/clipboard action occurred.
+Explicit integer-reader variants let only the new Constancy caller stage an
+already validated master LONG32/personal INTEGER16 reference union. Legacy
+wrappers remain signed16. Unused wide master values are accepted, while selected
+formatted lifeforms still must fit original TEXT3 staging. Derived attribute
+origins, cross-stage aggregation, raw MAX peers, detachment, cancellation/retry
+and helper/caller compatibility have independent tests.
+Frozen six-path/1919-input validation passes focused race15.688s, coupled
+race1507.859s, production vet/build and246 exact legacy comparisons, including
+the just-published grouped ancillary outputs. Distinct read-only review finds
+no significant issues. No frontend/public DTO/service/binding/flag/prefs/default/
+demo change; inherited client inputs and strict-Go wire fixtures remain exact.
 
-`summary-grouped-ancillary-integration/receipt.json` accepts exit0:
-UTC2026-10-17T20:42:09.349504 to22:03:11.123593;4861.766s total.
-All1918 inputs/332 artifacts, discovery,26 canonical inputs/21 protected assets
-and ten closed native families match. Receipt SHA256:
-`c5d01fd3e7f94236ad72bd25ea04560af8b735f353170a11224cad524b2550a0`.
+`summary-constancy-integration/receipt.json` accepts exit0:
+UTC2026-10-17T23:01:02.041833 to2026-10-18T00:54:47.548940;6823.438s.
+All1919 inputs/2904 protected artifact entries, discovery,38 canonical inputs/
+21 protected assets and eleven closed native families match (ten prior Wails
+families plus the new Access source-query family). Receipt SHA256:
+`8c1c9d6fb6a010c678405bfab57864d895ce4afa0f304a3e5f0007fde5f2f52b`.
 The freeze is released; only six directly related documentation files change
 afterward. Git and the private publication association identify publication.
 
-Next source contract: Constancy. Static source proves its callback forces
-Group3/Display1/common0 without clearing the historical limit, and its query
-overrides ordinary textual Group13 with numeric USysAllSpecies.Lifeform plus
-raw species code/display name grouping. Do not merely relabel the existing
-Group13 report. Actual DAO metadata, NULL/duplicate identity and active reference
-preparation still require qualification. Existing coupled presentation preference
-CAS is reusable; no Constancy implementation or native oracle has launched.
+Next contract: the Constancy workbook/UI consumer. Strict requests, distinct
+source/scope/approval authority, public raw-code identity, numeric validation/
+rendering and retained duplicate rows are not wired yet. The current panel
+would render an integer group as NULL and the client rejects duplicate displayed
+keys; neither behavior is permission to enable this route. Preserve parent
+calculation/presentation ownership and the existing coupled preference CAS
+(Group3/Display1/common0, historical limit retained), with no implicit writes.
+Keep correction/Undo, remount/stale-result and exact native-close behavior.
 Group13/14 common/guide First, Strata/Lifeform Display2, original Report callbacks
 and whole-form/ribbon gaps remain. None Display2 is supported. Continue the
 ordered work after publication; the delivered demo/release is unchanged.

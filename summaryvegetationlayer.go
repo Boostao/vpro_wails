@@ -20,12 +20,14 @@ type summaryVegetationLayerWitness struct {
 }
 
 type summaryVegetationLayerRow struct {
-	Layer      ProjectMetadataCell
-	Species    ProjectMetadataCell
-	CommonName *ProjectMetadataCell `json:"CommonName,omitempty"`
-	Order      ProjectMetadataCell
-	Covers     []ProjectMetadataCell
-	Witnesses  []summaryVegetationLayerWitness
+	Layer        ProjectMetadataCell
+	Species      ProjectMetadataCell
+	CommonName   *ProjectMetadataCell `json:"CommonName,omitempty"`
+	RawSpecies   *ProjectMetadataCell `json:"RawSpecies,omitempty"`
+	Order        ProjectMetadataCell
+	Covers       []ProjectMetadataCell
+	Witnesses    []summaryVegetationLayerWitness
+	numericGroup *int
 }
 
 type summaryVegetationLayerReport struct {
@@ -173,6 +175,7 @@ type summaryVegetationStageProjection struct {
 	nullGroup    bool
 	numericOrder bool
 	references   *summaryVegetationReferencePlan
+	constancy    bool
 }
 
 func planSummaryVegetationStage(ctx context.Context,
@@ -239,6 +242,7 @@ func planSummaryVegetationStage(ctx context.Context,
 		return fail(err)
 	}
 	refRows := map[string][]ProjectMetadataRow{}
+	numericGroups := map[string]*int{}
 	for _, row := range references.Table.Rows {
 		if err := ctx.Err(); err != nil {
 			return fail(err)
@@ -251,6 +255,19 @@ func planSummaryVegetationStage(ctx context.Context,
 			if err := lifeformSummaryText(row.Cells[rc[name]], limit); err != nil {
 				return fail(fmt.Errorf("summary vegetation layer reference row %s %s: %w", row.RowID, name, err))
 			}
+		}
+		if projection.constancy {
+			if row.RowID == "" {
+				return fail(errors.New("summary vegetation Constancy reference requires a physical projection identity"))
+			}
+			if _, exists := numericGroups[row.RowID]; exists {
+				return fail(errors.New("summary vegetation Constancy has duplicate reference projection identities"))
+			}
+			number, err := summaryVegetationMasterLongInteger(row.Cells[rc["Lifeform"]])
+			if err != nil {
+				return fail(fmt.Errorf("summary vegetation Constancy reference row %s: %w", row.RowID, err))
+			}
+			numericGroups[row.RowID] = number
 		}
 		if code := row.Cells[rc["Code"]].Text; code != nil {
 			refRows[*code] = append(refRows[*code], row)
@@ -274,7 +291,7 @@ func planSummaryVegetationStage(ctx context.Context,
 			members[*plot] = append(members[*plot], row)
 		}
 	}
-	type groupKey struct{ layer, species, common string }
+	type groupKey struct{ layer, species, common, rawSpecies string }
 	type group struct {
 		row    summaryVegetationLayerRow
 		covers map[string][]ProjectMetadataCell
@@ -331,16 +348,32 @@ func planSummaryVegetationStage(ctx context.Context,
 					origins = append(origins, references.Origins[ref.RowID]...)
 					common = ref.Cells[rc["EnglishName"]]
 				}
-				key := groupKey{layer: vegetationTextKey(mapping.label), species: vegetationTextKey(name)}
+				label := mapping.label
+				key := groupKey{layer: vegetationTextKey(label), species: vegetationTextKey(name)}
+				var number *int
+				if projection.constancy {
+					label = ProjectMetadataCell{Storage: "null"}
+					number = numericGroups[ref.RowID]
+					key.layer, key.rawSpecies = "null", vegetationTextKey(species)
+					if number != nil {
+						value := strconv.Itoa(*number)
+						label = ProjectMetadataCell{Storage: "integer", Integer: &value}
+						key.layer = "integer:" + value
+					}
+				}
 				if showCommon {
 					key.common = vegetationTextKey(common)
 				}
 				g := groups[key]
 				if g == nil {
-					g = &group{row: summaryVegetationLayerRow{Layer: cloneSiteUnitCell(mapping.label),
-						Species: cloneSiteUnitCell(name), Witnesses: []summaryVegetationLayerWitness{}},
+					g = &group{row: summaryVegetationLayerRow{Layer: cloneSiteUnitCell(label),
+						Species: cloneSiteUnitCell(name), Witnesses: []summaryVegetationLayerWitness{}, numericGroup: number},
 						covers: map[string][]ProjectMetadataCell{}}
 					groups[key] = g
+					if projection.constancy {
+						raw := cloneSiteUnitCell(species)
+						g.row.RawSpecies = &raw
+					}
 					if showCommon {
 						value := cloneSiteUnitCell(common)
 						g.row.CommonName = &value
@@ -406,7 +439,15 @@ func planSummaryVegetationStage(ctx context.Context,
 	}
 	sort.Slice(result.Rows, func(i, j int) bool {
 		a, b := result.Rows[i], result.Rows[j]
-		if vegetationTextKey(a.Layer) != vegetationTextKey(b.Layer) {
+		if projection.constancy {
+			if a.numericGroup == nil || b.numericGroup == nil {
+				if a.numericGroup != nil || b.numericGroup != nil {
+					return a.numericGroup == nil
+				}
+			} else if *a.numericGroup != *b.numericGroup {
+				return *a.numericGroup < *b.numericGroup
+			}
+		} else if vegetationTextKey(a.Layer) != vegetationTextKey(b.Layer) {
 			if a.Layer.Text == nil || b.Layer.Text == nil {
 				return a.Layer.Text == nil
 			}
@@ -417,6 +458,12 @@ func planSummaryVegetationStage(ctx context.Context,
 				return a.Species.Text == nil
 			}
 			return *a.Species.Text < *b.Species.Text
+		}
+		if projection.constancy && vegetationTextKey(*a.RawSpecies) != vegetationTextKey(*b.RawSpecies) {
+			if a.RawSpecies.Text == nil || b.RawSpecies.Text == nil {
+				return a.RawSpecies.Text == nil
+			}
+			return *a.RawSpecies.Text < *b.RawSpecies.Text
 		}
 		if showCommon {
 			if a.CommonName.Text == nil || b.CommonName.Text == nil {
