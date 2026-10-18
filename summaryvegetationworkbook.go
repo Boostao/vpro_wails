@@ -34,6 +34,7 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		return fail(errors.New("Summary workbook requires a context"))
 	}
 	preview := input.Vegetation
+	constancy := preview.Source == summaryVegetationConstancySource
 	if err := validateSummaryVegetationDisplayOptions(ctx, preview.Average, preview.Display, preview.ShowClass); err != nil {
 		return fail(err)
 	}
@@ -64,6 +65,9 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		if common {
 			ordering = "literal-null-first-layer-species-common"
 		}
+	}
+	if constancy {
+		source, ordering = summaryVegetationConstancySource, summaryVegetationConstancyOrdering
 	}
 	if preview.ContextID == "" || preview.ProjectPath == "" || preview.SUPath == "" || preview.Project == "" ||
 		preview.SU == "" || preview.SU == "None" || preview.SU == "USysSuTableDynamic" ||
@@ -106,6 +110,9 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		labels = []string{"Layer", "Spp", "Common Name", "Order"}
 	}
 	caption := "Vegetation Table"
+	if constancy {
+		caption = "Vegetation Table - Constancy Format"
+	}
 	if environment := input.Environment; environment != nil {
 		if environment.FirstRow != 5 || environment.English != common || !reflect.DeepEqual(environment.Units, summaryEnvironmentalPreviewUnits(preview)) {
 			return fail(errors.New("Summary workbook environmental header requires row5, the same common-name layout and complete SV1 frame"))
@@ -140,6 +147,7 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		}
 		return *left.Text < *right.Text
 	}
+	var priorNumber *int
 	for i, row := range preview.Rows {
 		if err := ctx.Err(); err != nil {
 			return fail(err)
@@ -148,7 +156,23 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 			(row.CommonName != nil) != common {
 			return fail(errors.New("Summary workbook body requires distinct source-ordered groups and complete pivot values"))
 		}
-		if grouped {
+		var number *int
+		if constancy {
+			var err error
+			number, err = summaryVegetationMasterLongInteger(row.Layer)
+			if err != nil {
+				return fail(fmt.Errorf("Summary Constancy workbook row%d: %w", i+1, err))
+			}
+			if row.RawSpecies == nil {
+				return fail(errors.New("Summary Constancy workbook requires the raw species grouping identity for every row"))
+			}
+			if err := lifeformSummaryText(*row.RawSpecies, 8); err != nil {
+				return fail(fmt.Errorf("Summary Constancy workbook raw species row%d: %w", i+1, err))
+			}
+		} else if row.RawSpecies != nil {
+			return fail(errors.New("Summary ordinary workbook cannot consume Constancy raw-species identity"))
+		}
+		if grouped && !constancy {
 			if err := lifeformSummaryText(row.Layer, preview.GroupField.Size); err != nil {
 				return fail(fmt.Errorf("Summary workbook grouped row%d: %w", i+1, err))
 			}
@@ -162,7 +186,11 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		}
 		values = append(values, row.Order)
 		for column, cell := range append(values, row.Covers...) {
-			if grouped && preview.Display == 6 && column == leading-1 {
+			if constancy && column == 0 {
+				if cell.Storage != "integer" && cell.Storage != "null" {
+					return fail(fmt.Errorf("Summary Constancy workbook row%d requires original LONG/NULL lifeform", i+1))
+				}
+			} else if grouped && preview.Display == 6 && column == leading-1 {
 				if cell.Storage != "real" {
 					return fail(fmt.Errorf("Summary workbook grouped row%d requires original DOUBLE Order", i+1))
 				}
@@ -179,10 +207,19 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 			ordered := less(prior.Layer, row.Layer) || reflect.DeepEqual(prior.Layer, row.Layer) &&
 				(less(prior.Species, row.Species) || reflect.DeepEqual(prior.Species, row.Species) &&
 					common && less(*prior.CommonName, *row.CommonName))
+			if constancy {
+				sameGroup := priorNumber == nil && number == nil ||
+					priorNumber != nil && number != nil && *priorNumber == *number
+				ordered = priorNumber == nil && number != nil ||
+					priorNumber != nil && number != nil && *priorNumber < *number ||
+					sameGroup && (less(prior.Species, row.Species) ||
+						reflect.DeepEqual(prior.Species, row.Species) && less(*prior.RawSpecies, *row.RawSpecies))
+			}
 			if !ordered {
 				return fail(errors.New("Summary workbook body groups are duplicated or outside the source literal ordering"))
 			}
 		}
+		priorNumber = number
 	}
 	realOrderFromRow, realOrderColumn := 0, 0
 	if grouped && preview.Display == 6 {
@@ -213,6 +250,13 @@ func summaryVegetationWorkbookGroup(ctx context.Context, preview SummaryVegetati
 		group = SummaryVegetationField{Name: "LifeForm", DAOType: 10, Size: 3}
 	case 14:
 		group = SummaryVegetationField{Name: "Group", DAOType: 9}
+	}
+	if preview.Source == summaryVegetationConstancySource {
+		if preview.GroupAndOrder != 13 || preview.Display != 1 || preview.ShowClass != 0 ||
+			preview.References == nil || preview.References.ShowCommon || preview.References.UseGuideNames {
+			return "", errors.New("Summary Constancy workbook requires numeric Group13/Display1 and effective references without common/guide names")
+		}
+		group = SummaryVegetationField{Name: "Lifeform", DAOType: 4, Size: 4}
 	}
 	order := SummaryVegetationField{Name: "Order", DAOType: 10}
 	if preview.Display == 6 {

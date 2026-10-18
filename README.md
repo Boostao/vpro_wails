@@ -631,9 +631,21 @@ peers, detachment and cancellation/retry are tested. Distinct review, coupled
 race1507.859s, production vet/build and246 exact legacy comparisons pass.
 Full root race passes in6823.438s with1919 unchanged inputs,2904 protected artifact
 entries and eleven closed native families. Stable raw-code tie ordering is an
-explicit read-model adaptation. No public DTO/service/binding/frontend/flag/
-preferences/default/demo changes. Numeric rendering, strict transport, duplicate
-row validation and draft ownership are the next consumer work, not enabled parity.
+explicit read-model adaptation. That private revision changed no public DTO/
+service/binding/frontend/flag/preferences/default/demo surface.
+
+The [native-verified Constancy consumer](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#constancy-workbook-consumer)
+now wires numeric rendering, strict authority and duplicate raw identity into
+the existing workbook inspection panel. Its intent comes from the loaded
+presentation draft, without rewriting basic calculation/manual reference drafts
+or saving preferences. Existing grouped/reference/presentation prerequisites
+remain independently gated. Frozen validation,250 exact compatibility comparisons,
+independent review and disposable Wails acceptance pass. Five reopened outputs,
+numeric/NULL/negative groups and duplicate raw identities, retained drafts,
+four remounts/exact close acknowledgements,54 responsive observations and three
+independent backend denials preserve16 fixture files. Full race integration passes
+in5011.094s, preserving1923 inputs/2964 artifacts and twelve closed native families.
+This is not accepted original Report/formatting/printing parity or a demo update.
 
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus

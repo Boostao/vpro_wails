@@ -17,10 +17,11 @@ export const summaryVegetationGroupedWorkbookScope = 'Explicit read-only normal-
 export const summaryVegetationStrataReferencesScope = 'Explicit read-only normal-SU Strata effective-reference inspection; typed XLSX, not Lifeform/None common names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity';
 export const summaryVegetationGroupedAttributesScope = 'Explicit read-only normal-SU Lifeform/None effective-attribute inspection; typed XLSX, no common/guide names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity';
 export const summaryVegetationGroupedAncillaryScope = 'Explicit read-only normal-SU Strata/Lifeform/None inspection with optional effective references, SU Table and optional ReportSummary; typed XLSX, no Lifeform/None common names, original Report callbacks or formatting/printing parity';
-type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references' | 'groupAndOrder'> & {
-  references?: SummaryVegetationReferenceMode; groupAndOrder?: number;
+export const summaryVegetationConstancyScope = 'Explicit read-only normal-SU Constancy inspection with numeric lifeform and raw-species grouping; typed XLSX with optional environment/ancillary composition, adapted raw-code tie ordering, not original Report callbacks or formatting/printing parity';
+type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references' | 'groupAndOrder' | 'constancy'> & {
+  references?: SummaryVegetationReferenceMode; groupAndOrder?: number; constancy?: true;
 };
-export type SummaryWorkbookCalculation = Pick<SummaryVegetationWorkbookOptions, 'average' | 'display' | 'showClass' | 'groupAndOrder'>;
+export type SummaryWorkbookCalculation = Pick<SummaryVegetationWorkbookOptions, 'average' | 'display' | 'showClass' | 'groupAndOrder' | 'constancy'>;
 type SummaryWorkbookReportSummary = Omit<SummaryVegetationWorkbookReportSummary, 'units'> & {
   units: NonNullable<SummaryVegetationWorkbookReportSummary['units']>;
 };
@@ -50,7 +51,7 @@ function reject(): never {
 }
 function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
   const keys = ['title', 'average', 'display', 'showClass', 'includeEnv'];
-  const optional = ['ancillary', 'references', 'groupAndOrder'].filter(key =>
+  const optional = ['ancillary', 'references', 'groupAndOrder', 'constancy'].filter(key =>
     value !== null && typeof value === 'object' && Object.hasOwn(value, key));
   if (!shape(value, [...keys, ...optional]) ||
       !workbookText(value.title) || typeof value.includeEnv !== 'boolean' ||
@@ -73,12 +74,18 @@ function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
     if (!summaryVegetationReferenceGroupingAvailable(result.groupAndOrder ?? 11,
       result.references.showCommon || result.references.useGuideNames)) reject();
   }
+  if (Object.hasOwn(value, 'constancy')) {
+    if (value.constancy !== true || result.groupAndOrder !== 13 || result.display !== 1 ||
+        !result.references || result.references.showCommon || result.references.useGuideNames) reject();
+    result.constancy = true;
+  }
   return result;
 }
 export function sameSummaryWorkbookOptions(left: SummaryVegetationWorkbookOptions,
   right: SummaryVegetationWorkbookOptions): boolean {
   return left.title === right.title && left.average === right.average && left.display === right.display &&
     left.showClass === right.showClass && left.includeEnv === right.includeEnv && left.groupAndOrder === right.groupAndOrder &&
+    left.constancy === right.constancy &&
     (left.ancillary === undefined ? right.ancillary === undefined :
       !!left.ancillary && !!right.ancillary && left.ancillary.createSummary === right.ancillary.createSummary) &&
     (left.references === undefined ? right.references === undefined : !!left.references && !!right.references &&
@@ -137,7 +144,7 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
   current: () => boolean = () => true): Promise<ValidatedSummaryVegetationWorkbookReview | null> {
   if (!current()) return null;
   const options = optionsValue(requested);
-  const scope = options.groupAndOrder !== undefined
+  const scope = options.constancy ? summaryVegetationConstancyScope : options.groupAndOrder !== undefined
     ? options.ancillary ? summaryVegetationGroupedAncillaryScope :
       options.references ? options.groupAndOrder === 12 ? summaryVegetationStrataReferencesScope :
       summaryVegetationGroupedAttributesScope : summaryVegetationGroupedWorkbookScope : options.references
@@ -157,7 +164,7 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
     options.average, options.display, options.showClass, options.groupAndOrder ?? 11, {
       preview: () => Promise.reject(new Error('Workbook validation cannot dispatch a read')),
       cancel() {}, validationYield,
-    }, current, options.references);
+    }, current, options.references, options.constancy);
   if (!current() || preview === null) return null;
   const environment = options.includeEnv
     ? await validateSummaryEnvironmentalLifeformOptions(value.environment, owner, options, validationYield, current)
@@ -238,9 +245,11 @@ export class SummaryVegetationWorkbookSession {
   options(calculation: SummaryWorkbookCalculation): SummaryVegetationWorkbookOptions {
     return optionsValue({ average: calculation.average, display: calculation.display, showClass: calculation.showClass,
       ...(calculation.groupAndOrder !== undefined ? { groupAndOrder: calculation.groupAndOrder } : {}),
+      ...(calculation.constancy !== undefined ? { constancy: calculation.constancy } : {}),
       title: this.state.title, includeEnv: this.state.includeEnv,
       ...(this.state.includeAncillary ? { ancillary: { createSummary: this.state.createSummary } } : {}),
-      ...(this.state.includeReferences ? { references: {
+      ...(calculation.constancy ? { references: { showCommon: false, useGuideNames: false } } :
+        this.state.includeReferences ? { references: {
         showCommon: this.state.showCommon, useGuideNames: this.state.useGuideNames } } : {}) });
   }
   edit(field: 'title' | 'destination', raw: string): void {

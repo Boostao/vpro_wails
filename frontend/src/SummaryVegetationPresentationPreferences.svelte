@@ -134,12 +134,13 @@
     {#if busy}<button data-summary-presentation-cancel onclick={cancel}>Cancel presentation read</button>
       <p role="status">Reading owned saved Summary presentation...</p>{/if}
   </div>
-  <p class="guidance">Configuration-only drafts, not report-output formatting parity.
+  <p class="guidance">Stored presentation drafts, not original report-output formatting parity.
     Load before editing; unloaded controls do not represent saved values.
     Constancy-on stages Group by3, Display1 and english names off without clearing the stored limit;
     switching it off does not restore old choices. Reload shared Summary options after a committed callback plan.
     These drafts do not enable guide renames, environmental field-list editing, hierarchy reports,
-    constancy-format output, report summaries, printing or workbooks.</p>
+    original Report output or printing. The separately gated workbook inspection can consume the loaded
+    Constancy draft without Save; it does not apply the other presentation flags.</p>
 </section>
 
 <style>

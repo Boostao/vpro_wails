@@ -28,6 +28,7 @@ const summaryVegetationGroupedWorkbookScope = "Explicit read-only normal-SU Stra
 const summaryVegetationStrataReferencesScope = "Explicit read-only normal-SU Strata effective-reference inspection; typed XLSX, not Lifeform/None common names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity"
 const summaryVegetationGroupedAttributesScope = "Explicit read-only normal-SU Lifeform/None effective-attribute inspection; typed XLSX, no common/guide names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity"
 const summaryVegetationGroupedAncillaryScope = "Explicit read-only normal-SU Strata/Lifeform/None inspection with optional effective references, SU Table and optional ReportSummary; typed XLSX, no Lifeform/None common names, original Report callbacks or formatting/printing parity"
+const summaryVegetationConstancyScope = "Explicit read-only normal-SU Constancy inspection with numeric lifeform and raw-species grouping; typed XLSX with optional environment/ancillary composition, adapted raw-code tie ordering, not original Report callbacks or formatting/printing parity"
 
 type SummaryVegetationWorkbookAncillaryUnit struct {
 	Code     string  `json:"code"`
@@ -65,12 +66,13 @@ type SummaryVegetationWorkbookReview struct {
 }
 
 type SummaryVegetationWorkbookService struct {
-	source            *SummaryVegetationEnvironmentalLifeformService
-	enabled           bool
-	ancillaryEnabled  bool
-	referencesEnabled bool
-	groupedEnabled    bool
-	now               func() time.Time
+	source              *SummaryVegetationEnvironmentalLifeformService
+	enabled             bool
+	ancillaryEnabled    bool
+	referencesEnabled   bool
+	groupedEnabled      bool
+	presentationEnabled bool
+	now                 func() time.Time
 }
 
 type summaryVegetationWorkbookHooks struct {
@@ -138,6 +140,12 @@ func (s *SummaryVegetationWorkbookService) readSource(ctx context.Context, plots
 
 func (s *SummaryVegetationWorkbookService) readSourceAt(ctx context.Context, plots *PlotService, owner *sqliteContext,
 	tx *sql.Tx, contextID string, options SummaryVegetationWorkbookOptions, createdAt string) (summaryVegetationWorkbookSource, error) {
+	if err := validateSummaryConstancyWorkbookOptions(options); err != nil {
+		return summaryVegetationWorkbookSource{}, err
+	}
+	if options.Constancy && !s.presentationEnabled {
+		return summaryVegetationWorkbookSource{}, errors.New("Summary Constancy workbook requires enabled presentation preferences")
+	}
 	if options.GroupAndOrder != nil && !s.groupedEnabled {
 		return summaryVegetationWorkbookSource{}, errors.New("Summary grouped workbook is disabled in this session")
 	}
@@ -212,6 +220,9 @@ func summaryVegetationWorkbookApproval(source summaryVegetationWorkbookSource, w
 		if options.Ancillary != nil {
 			domain = "VPRO Summary grouped ancillary workbook approval v1\x00"
 		}
+	}
+	if options.Constancy {
+		domain = "VPRO Summary Constancy workbook approval v1\x00"
 	}
 	digest := sha256.Sum256(append([]byte(domain), data...))
 	return hex.EncodeToString(digest[:]), nil

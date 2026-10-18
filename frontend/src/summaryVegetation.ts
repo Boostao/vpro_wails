@@ -14,16 +14,19 @@ export type SummaryVegetationWitness = {
 export type SummaryVegetationUnit = { code: string; numPlots: number; membershipIds: string[]; rawVegRowIds: string[] };
 export type SummaryVegetationField = { name: string; daoType: number; size: number };
 export type SummaryVegetationOrder = LifeformTextCell | { storage: 'real'; text: null; integer: null; real: number; blobHex: null };
+export type SummaryVegetationGroup = LifeformTextCell | {
+  storage: 'integer'; text: null; integer: string; real: null; blobHex: null;
+};
 export type SummaryVegetationRow = {
-  layer: LifeformTextCell; species: LifeformTextCell; order: SummaryVegetationOrder;
-  commonName?: LifeformTextCell;
+  layer: SummaryVegetationGroup; species: LifeformTextCell; order: SummaryVegetationOrder;
+  commonName?: LifeformTextCell; rawSpecies?: LifeformTextCell;
   covers: LifeformTextCell[]; witnesses: SummaryVegetationWitness[];
 };
 export type SummaryVegetationPreview = SummaryVegetationOwner & {
   average: number; display: number; showClass?: number; groupAndOrder?: number;
   groupField?: SummaryVegetationField; orderField?: SummaryVegetationField;
-  source: 'literal-normal-su-layer' | 'literal-normal-su-grouped' | 'literal-normal-su-effective-references';
-  ordering: 'literal-null-first-layer-species' | 'literal-null-first-group-species' | 'literal-null-first-layer-species-common';
+  source: 'literal-normal-su-layer' | 'literal-normal-su-grouped' | 'literal-normal-su-effective-references' | 'literal-normal-su-constancy';
+  ordering: 'literal-null-first-layer-species' | 'literal-null-first-group-species' | 'literal-null-first-layer-species-common' | 'literal-null-first-numeric-lifeform-species-raw-code';
   references?: SummaryVegetationReferenceMetadata;
   memberships: { rowId: string; plotNumber: LifeformTextCell; siteUnit: LifeformTextCell }[];
   units: SummaryVegetationUnit[]; columns: string[]; rows: SummaryVegetationRow[];
@@ -41,9 +44,22 @@ function literalCompare(a: string, b: string): number {
   }
   return left.length - right.length;
 }
-function compareCell(a: LifeformTextCell, b: LifeformTextCell): number {
+function compareCell(a: { text: string | null }, b: { text: string | null }): number {
   if (a.text === null || b.text === null) return a.text === null ? b.text === null ? 0 : -1 : 1;
   return literalCompare(a.text, b.text);
+}
+function summaryGroupCell(value: unknown, constancy: boolean, limit: number): value is SummaryVegetationGroup {
+  if (!constancy) return lifeformCell(value, limit);
+  if (!lifeformShape(value, ['storage', 'text', 'integer', 'real', 'blobHex'])) return false;
+  if (value.storage === 'null') return lifeformCell(value);
+  return value.storage === 'integer' && value.text === null && value.real === null && value.blobHex === null &&
+    typeof value.integer === 'string' && /^(?:0|-?[1-9]\d*)$/.test(value.integer) &&
+    Number(value.integer) >= -2147483648 && Number(value.integer) <= 2147483647;
+}
+function compareGroup(a: SummaryVegetationGroup, b: SummaryVegetationGroup, constancy: boolean): number {
+  if (!constancy) return compareCell(a, b);
+  if (a.integer === null || b.integer === null) return a.integer === null ? b.integer === null ? 0 : -1 : 1;
+  return Number(a.integer) - Number(b.integer);
 }
 export function summaryVegetationReferenceGroupingAvailable(groupAndOrder: number, common: boolean): boolean {
   return groupAndOrder === 11 || groupAndOrder === 12 || !common && (groupAndOrder === 13 || groupAndOrder === 14);
@@ -72,17 +88,18 @@ function summaryOrderCell(value: unknown, grouped: boolean): value is SummaryVeg
 
 function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOwner,
   average: number, display: number, showClass = 0, groupAndOrder = 11,
-  references?: SummaryVegetationReferenceMode): Generator<void, SummaryVegetationPreview> {
+  references?: SummaryVegetationReferenceMode, constancy = false): Generator<void, SummaryVegetationPreview> {
   const classMode = display === 4 || display === 5;
   const grouped = groupAndOrder !== 11;
   const common = !!references && (references.showCommon || references.useGuideNames);
-  const source = references ? 'literal-normal-su-effective-references' :
+  const source = constancy ? 'literal-normal-su-constancy' : references ? 'literal-normal-su-effective-references' :
     grouped ? 'literal-normal-su-grouped' : 'literal-normal-su-layer';
-  const ordering = common ? 'literal-null-first-layer-species-common' :
+  const ordering = constancy ? 'literal-null-first-numeric-lifeform-species-raw-code' : common ? 'literal-null-first-layer-species-common' :
     grouped ? 'literal-null-first-group-species' : 'literal-null-first-layer-species';
   if (references && (!summaryVegetationReferenceGroupingAvailable(groupAndOrder, common) ||
       !lifeformShape(references, ['showCommon', 'useGuideNames']) ||
       typeof references.showCommon !== 'boolean' || typeof references.useGuideNames !== 'boolean')) reject();
+  if (constancy && (groupAndOrder !== 13 || display !== 1 || !references || common)) reject();
   if (summaryVegetationOptionError(average, display, showClass, groupAndOrder) || !Object.values(owner).every(lifeformText) ||
       owner.contextId === '' || owner.project === '' || owner.projectPath === '' || owner.suPath === '' ||
       owner.su === '' || owner.su === 'None' || owner.su === 'USysSuTableDynamic' ||
@@ -107,7 +124,7 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
     referenceMetadata = { masterRows, personalRows, descriptionRows, removedMasterRows, derivedRows, unionRows,
       showCommon: common, useGuideNames: references.useGuideNames };
   }
-  const groupField = grouped ? { name: groupAndOrder === 12 ? 'Layer' : groupAndOrder === 13 ? 'LifeForm' : 'Group',
+  const groupField = constancy ? { name: 'Lifeform', daoType: 4, size: 4 } : grouped ? { name: groupAndOrder === 12 ? 'Layer' : groupAndOrder === 13 ? 'LifeForm' : 'Group',
     daoType: groupAndOrder === 14 ? 9 : 10, size: groupAndOrder === 12 ? 1 : groupAndOrder === 13 ? 3 : 0 } : undefined;
   const orderField = grouped ? { name: 'Order', daoType: display === 6 ? 7 : 10, size: display === 6 ? 8 : 0 } : undefined;
   if (grouped) {
@@ -149,8 +166,9 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
   const rows: SummaryVegetationRow[] = [], stages = new Map<string, string>(), groups = new Set<string>();
   for (const item of value.rows) {
     yield;
-    if (!lifeformShape(item, ['layer', 'species', 'order', 'covers', 'witnesses', ...(common ? ['commonName'] : [])]) ||
-        !lifeformCell(item.layer, groupAndOrder === 12 ? 1 : 3) ||
+    if (!lifeformShape(item, ['layer', 'species', 'order', 'covers', 'witnesses',
+        ...(common ? ['commonName'] : []), ...(constancy ? ['rawSpecies'] : [])]) ||
+        !summaryGroupCell(item.layer, constancy, groupAndOrder === 12 ? 1 : 3) ||
         groupAndOrder === 14 && item.layer.storage !== 'null' ||
         !lifeformCell(item.species, 255) ||
         !summaryOrderCell(item.order, grouped && display === 6) ||
@@ -162,8 +180,14 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
       if (!lifeformCell(item.commonName, 255)) reject();
       commonName = { ...item.commonName };
     }
-    const key = JSON.stringify([item.layer.storage, item.layer.text, item.species.storage, item.species.text,
-      ...(commonName ? [commonName.storage, commonName.text] : [])]);
+    let rawSpecies: LifeformTextCell | undefined;
+    if (constancy) {
+      if (!lifeformCell(item.rawSpecies, 8)) reject();
+      rawSpecies = { ...item.rawSpecies };
+    }
+    const key = JSON.stringify([item.layer.storage, constancy ? item.layer.integer : item.layer.text,
+      item.species.storage, item.species.text, ...(commonName ? [commonName.storage, commonName.text] : []),
+      ...(rawSpecies ? [rawSpecies.storage, rawSpecies.text] : [])]);
     if (groups.has(key)) reject();
     groups.add(key);
     const covers: LifeformTextCell[] = [];
@@ -230,11 +254,13 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
       if (item.order.text !== (orders.length ? orders[orders.length - 1] : null)) reject();
     }
     const row: SummaryVegetationRow = { layer: { ...item.layer }, species: { ...item.species },
-      ...(commonName ? { commonName } : {}), order: { ...item.order }, covers, witnesses };
+      ...(commonName ? { commonName } : {}), ...(rawSpecies ? { rawSpecies } : {}),
+      order: { ...item.order }, covers, witnesses };
     if (rows.length) {
       const prior = rows[rows.length - 1];
-      if ((compareCell(prior.layer, row.layer) || compareCell(prior.species, row.species) ||
-          (common ? compareCell(prior.commonName!, row.commonName!) : 0)) >= 0) reject();
+      if ((compareGroup(prior.layer, row.layer, constancy) || compareCell(prior.species, row.species) ||
+          (common ? compareCell(prior.commonName!, row.commonName!) : 0) ||
+          (constancy ? compareCell(prior.rawSpecies!, row.rawSpecies!) : 0)) >= 0) reject();
     }
     rows.push(row);
   }
@@ -264,8 +290,8 @@ export function validateSummaryVegetation(value: unknown, owner: SummaryVegetati
 
 export async function validateSummaryVegetationAsync(value: unknown, owner: SummaryVegetationOwner,
   average: number, display: number, showClass: number, groupAndOrder: number, port: SummaryVegetationPort,
-  current: () => boolean, references?: SummaryVegetationReferenceMode): Promise<SummaryVegetationPreview | null> {
-  const validation = summaryVegetationValidation(value, owner, average, display, showClass, groupAndOrder, references);
+  current: () => boolean, references?: SummaryVegetationReferenceMode, constancy = false): Promise<SummaryVegetationPreview | null> {
+  const validation = summaryVegetationValidation(value, owner, average, display, showClass, groupAndOrder, references, constancy);
   let count = 0;
   for (;;) {
     if (!current()) return null;

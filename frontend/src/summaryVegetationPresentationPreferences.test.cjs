@@ -327,7 +327,10 @@ test('actual compiled pane preserves unique associated original labels and unava
   assert.match(html, /<input[^>]*id="summary-presentation-showCommon"[^>]*disabled/);
   assert.match(html, /<input[^>]*id="summary-presentation-hierarchyHeader"[^>]*disabled/);
   assert.match(html, /7\.25/);
-  assert.match(html, /Configuration-only drafts, not report-output formatting parity/);
+  assert.match(html, /Stored presentation drafts, not original report-output formatting parity/);
+  assert.match(html, /original Report output or printing/);
+  assert.match(html, /separately gated workbook inspection can consume the loaded\s+Constancy draft without Save/);
+  assert.match(html, /does not apply the other presentation flags/);
   assert.match(panelSource, /const raw = event\.currentTarget\.value; editTitle\(raw\)/);
   assert.match(panelSource, /const raw = event\.currentTarget\.checked; editFlag\(field\.key, raw\)/);
   assert.match(panelSource, /\$state\.raw/);

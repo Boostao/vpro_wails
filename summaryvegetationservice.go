@@ -30,6 +30,7 @@ type SummaryVegetationRow struct {
 	Layer      ProjectMetadataCell        `json:"layer"`
 	Species    ProjectMetadataCell        `json:"species"`
 	CommonName *ProjectMetadataCell       `json:"commonName,omitempty"`
+	RawSpecies *ProjectMetadataCell       `json:"rawSpecies,omitempty"`
 	Order      ProjectMetadataCell        `json:"order"`
 	Covers     []ProjectMetadataCell      `json:"covers"`
 	Witnesses  []SummaryVegetationWitness `json:"witnesses"`
@@ -163,8 +164,22 @@ func (s *SummaryVegetationService) readSnapshot(ctx context.Context, contextID s
 func (s *SummaryVegetationService) readSnapshotWithReferences(ctx context.Context, contextID string, plots *PlotService,
 	owner *sqliteContext, tx *sql.Tx, average, display, showClass, groupAndOrder int,
 	options *SummaryVegetationReferenceOptions) (summaryVegetationSnapshotPreview, error) {
+	return s.readSnapshotWithReferenceMode(ctx, contextID, plots, owner, tx,
+		average, display, showClass, groupAndOrder, options, false)
+}
+
+const summaryVegetationConstancySource = "literal-normal-su-constancy"
+const summaryVegetationConstancyOrdering = "literal-null-first-numeric-lifeform-species-raw-code"
+
+func (s *SummaryVegetationService) readSnapshotWithReferenceMode(ctx context.Context, contextID string, plots *PlotService,
+	owner *sqliteContext, tx *sql.Tx, average, display, showClass, groupAndOrder int,
+	options *SummaryVegetationReferenceOptions, constancy bool) (summaryVegetationSnapshotPreview, error) {
 	fail := func(err error) (summaryVegetationSnapshotPreview, error) {
 		return summaryVegetationSnapshotPreview{}, err
+	}
+	if constancy && (groupAndOrder != 13 || display != 1 || showClass != 0 || options == nil ||
+		options.ShowCommon || options.UseGuideNames) {
+		return fail(errors.New("Summary Constancy snapshot requires Group13/Display1 and effective references without common/guide names"))
 	}
 	if options != nil && !summaryVegetationReferenceGroupingAvailable(groupAndOrder, options.ShowCommon || options.UseGuideNames) {
 		return fail(errors.New("Summary effective common/guide references require Layer11 or Strata12 inspection; First(common name) for13/14 remains unavailable"))
@@ -231,6 +246,10 @@ func (s *SummaryVegetationService) readSnapshotWithReferences(ctx context.Contex
 	if groupAndOrder == 11 {
 		report, err = prepareSummaryVegetationLayerReferences(ctx, owner.selection.Project, owner.selection.SU,
 			tables[0], tables[1], tables[2], tables[3], tables[4], average, display, showClass, references)
+	} else if constancy {
+		grouped, err = prepareSummaryVegetationConstancyReferences(ctx, owner.selection.Project, owner.selection.SU,
+			tables[0], tables[1], tables[2], tables[3], tables[4], average, references)
+		report = grouped.Report
 	} else {
 		grouped, err = prepareSummaryVegetationGroupedReferences(ctx, owner.selection.Project, owner.selection.SU,
 			tables[0], tables[1], tables[2], tables[3], tables[4], average, groupAndOrder, display, showClass, references)
@@ -266,6 +285,9 @@ func (s *SummaryVegetationService) readSnapshotWithReferences(ctx context.Contex
 			}
 		}
 	}
+	if constancy {
+		result.Source, result.Ordering = summaryVegetationConstancySource, summaryVegetationConstancyOrdering
+	}
 	uc, err := siteUnitTransferColumns(tables[1], "PlotNumber", "SiteUnit")
 	if err != nil {
 		return fail(err)
@@ -295,6 +317,10 @@ func (s *SummaryVegetationService) readSnapshotWithReferences(ctx context.Contex
 		if row.CommonName != nil {
 			value := cloneSiteUnitCell(*row.CommonName)
 			transport.CommonName = &value
+		}
+		if row.RawSpecies != nil {
+			value := cloneSiteUnitCell(*row.RawSpecies)
+			transport.RawSpecies = &value
 		}
 		for _, cell := range row.Covers {
 			if err := ctx.Err(); err != nil {

@@ -75,13 +75,23 @@ references in the new caller; original selected TEXT3 bounds still apply.
 Focused/coupled race1507.859s, production vet/build and246 exact legacy vectors
 pass; full race6823.438s preserves1919 inputs/2904 protected artifact entries,
 38 canonical inputs/21 assets and eleven closed native families. There is no
-public Constancy DTO/service/transport/UI/default/demo change.
+public Constancy DTO/service/transport/UI/default/demo change in that private revision.
 
-Next qualify the Constancy workbook/UI consumer: strict scope/approval and raw
-identity, numeric validation/rendering, retained duplicates and calculation/
-presentation draft ownership. Reuse existing coupled preference CAS without
-implicit writes. The current text-group renderer/duplicate-key validator is not
-compatible; keep the consumer unavailable until wired and natively accepted.
+The independently reviewed/native-verified Constancy workbook/UI consumer wires strict true-only
+requests, distinct scope/approval/source, numeric validation/rendering and raw-code
+duplicate identity. It consumes only the existing loaded presentation draft in
+the separate inspection panel, retaining basic calculation and independent manual
+reference/name drafts without implicit preference writes. Existing grouped,
+reference and presentation flags remain independent; no new service/flag/default
+or demo promotion. Frozen28-path/1923-input validation passes focused race87.188s,
+coupled race749.172s,236 related client/52 browser cases, check0/0, build/vet/
+production and250 exact legacy comparisons. Review identified a first numeric-row
+ordering gap; five failing invalid cases reproduced it, a one-assignment correction
+and seven explicit cases resolve it, and focused follow-up finds no significant
+issues. Five reopened Wails outputs, four remounts/exact close acknowledgements,
+54 responsive observations and three backend denials preserve16 fixture files.
+Full root race integration passes in5011.094s, preserving1923 inputs/2964 artifacts,
+38 canonical inputs/21 assets and twelve closed native families.
 Deterministic raw-code tie ordering is a read-model adaptation, not source tie
 parity. Projected query calibration is not full original Report execution.
 Unbound two-page Picture Manager

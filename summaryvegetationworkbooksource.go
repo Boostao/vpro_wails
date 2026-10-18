@@ -38,6 +38,9 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 	if err := ctx.Err(); err != nil {
 		return fail(err)
 	}
+	if err := validateSummaryConstancyWorkbookOptions(options); err != nil {
+		return fail(err)
+	}
 	if service == nil || service.environment == nil || service.environment.report == nil ||
 		!service.environment.report.enabled {
 		return fail(errors.New("Summary workbook source requires enabled Summary Vegetation"))
@@ -79,8 +82,8 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 			return fail(err)
 		}
 	}
-	raw, err := environment.report.readSnapshotWithReferences(ctx, contextID, plots, owner, tx,
-		options.Average, options.Display, calculationClass, grouping, options.References)
+	raw, err := environment.report.readSnapshotWithReferenceMode(ctx, contextID, plots, owner, tx,
+		options.Average, options.Display, calculationClass, grouping, options.References, options.Constancy)
 	if err != nil {
 		return fail(err)
 	}

@@ -2527,6 +2527,7 @@ export interface SummaryVegetationRow {
     "layer": ProjectMetadataCell;
     "species": ProjectMetadataCell;
     "commonName"?: ProjectMetadataCell | null;
+    "rawSpecies"?: ProjectMetadataCell | null;
     "order": ProjectMetadataCell;
     "covers": ProjectMetadataCell[] | null;
     "witnesses": SummaryVegetationWitness[] | null;
@@ -2576,6 +2577,7 @@ export interface SummaryVegetationWorkbookOptions {
     "ancillary"?: SummaryVegetationWorkbookAncillaryOptions | null;
     "references"?: SummaryVegetationReferenceOptions | null;
     "groupAndOrder"?: number | null;
+    "constancy"?: boolean;
 }
 
 export interface SummaryVegetationWorkbookReportSummary {

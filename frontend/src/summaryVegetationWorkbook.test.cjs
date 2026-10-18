@@ -36,6 +36,7 @@ const groupedWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetat
 const strataReferenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookStrataReferencesWire.json'), 'utf8'));
 const groupedAttributeWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedAttributesWire.json'), 'utf8'));
 const groupedAncillaryWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedAncillaryWire.json'), 'utf8'));
+const constancyWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookConstancyWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath']
   .map(key => [key, wire.vegetation.preview[key]]));
 const yieldNow = () => Promise.resolve();
@@ -65,6 +66,222 @@ function outcome(value, status = 'published') {
   return { status, requestedDestination: destination, path: 'C:\\output\\resolved.xlsx',
     sha256: value.workbookSHA256, errorMessage: status === 'published' ? '' : 'Committed, source changed; do not replay.' };
 }
+
+test('eight strict Go Constancy vectors preserve numeric and raw identity through actual proxies and composition', async () => {
+  assert.equal(Object.keys(constancyWire).length, 8);
+  for (const value of Object.values(constancyWire)) {
+    const raw = proxy(structuredClone(value));
+    const result = await client.validateSummaryVegetationWorkbookReview(raw, owner, value.options, yieldNow);
+    assert.deepEqual(plain(result), value);
+    assert.equal(result.scope, client.summaryVegetationConstancyScope);
+    assert.deepEqual(plain(result.preview.groupField), { name: 'Lifeform', daoType: 4, size: 4 });
+    assert.ok(result.preview.rows.some(row => row.layer.storage === 'null'));
+    const twins = result.preview.rows.filter(row => row.species.text === 'Lifeform 2');
+    assert.equal(twins.length, 2);
+    assert.deepEqual(plain(twins.map(row => row.rawSpecies.text)), ['LF2', 'TWIN']);
+    assert.equal(twins[0].layer.integer, '2');
+    assert.deepEqual(plain(twins[0].covers), plain(twins[1].covers));
+    assert.equal(Object.isFrozen(twins[0].rawSpecies), true);
+    assert.equal(Object.isFrozen(twins[0].layer), true);
+    raw.preview.rows[0].rawSpecies.text = 'Changed';
+    assert.deepEqual(plain(result), value);
+  }
+});
+
+test('Constancy review rejects marker, source, numeric metadata and duplicate raw-identity drift without widening ordinary authority', async () => {
+  for (const base of Object.values(constancyWire)) {
+    for (const mutate of [
+      value => { delete value.options.constancy; },
+      value => { value.options.constancy = false; },
+      value => { value.options.constancy = null; },
+      value => { value.options.constancy = 'true'; },
+      value => { value.options.groupAndOrder = 12; },
+      value => { value.options.display = 6; },
+      value => { value.options.references.showCommon = true; },
+      value => { value.options.references.useGuideNames = true; },
+      value => { value.scope = client.summaryVegetationGroupedAttributesScope; },
+      value => { value.preview.source = 'literal-normal-su-effective-references'; },
+      value => { value.preview.ordering = 'literal-null-first-group-species'; },
+      value => { value.preview.groupField = { name: 'LifeForm', daoType: 10, size: 3 }; },
+      value => { delete value.preview.rows[0].rawSpecies; },
+      value => { value.preview.rows[0].rawSpecies = { ...value.preview.rows[0].rawSpecies, text: '123456789' }; },
+      ...['2147483648', '-2147483649', '01', '-0', '1.0'].map(integer =>
+        value => { value.preview.rows.find(row => row.layer.storage === 'integer').layer.integer = integer; }),
+      value => {
+        const twins = value.preview.rows.filter(row => row.species.text === 'Lifeform 2');
+        twins[1].rawSpecies = structuredClone(twins[0].rawSpecies);
+      },
+      value => {
+        const indexes = value.preview.rows.flatMap((row, i) => row.species.text === 'Lifeform 2' ? [i] : []);
+        assert.equal(indexes.length, 2);
+        [value.preview.rows[indexes[0]], value.preview.rows[indexes[1]]] =
+          [value.preview.rows[indexes[1]], value.preview.rows[indexes[0]]];
+      },
+    ]) {
+      const value = structuredClone(base);
+      mutate(value);
+      await assert.rejects(client.validateSummaryVegetationWorkbookReview(value, owner, value.options, yieldNow));
+    }
+  }
+  const ordinary = structuredClone(groupedAttributeWire.lifeform);
+  ordinary.preview.rows[0].layer = { storage: 'integer', integer: '1', text: null, real: null, blobHex: null };
+  await assert.rejects(client.validateSummaryVegetationWorkbookReview(ordinary, owner, ordinary.options, yieldNow));
+});
+
+test('Constancy compiled controls require all three existing gates without erasing independent reference/name drafts', async () => {
+  const value = constancyWire.vegetationAverage1;
+  for (let mask = 0; mask < 8; mask++) {
+    const session = sessionFor(value);
+    session.selectReferences('guide', true);
+    let reads = 0;
+    const services = { GetReview(contextId, json) {
+      assert.equal(contextId, owner.contextId);
+      assert.deepEqual(JSON.parse(json), value.options);
+      reads++;
+      return Promise.resolve(proxy(structuredClone(value)));
+    } };
+    const mounted = mountPanel(session, services, false, value.options, false,
+      !!(mask & 2), !!(mask & 1), !!(mask & 4));
+    mounted.selectReferences('guide', { currentTarget: { checked: false } });
+    assert.equal(session.view().useGuideNames, true);
+    await mounted.review();
+    assert.equal(reads, mask === 7 ? 1 : 0);
+    assert.equal(session.view().review !== null, mask === 7);
+    assert.deepEqual(plain(session.options({ average: 1, display: 6, showClass: 20, groupAndOrder: 12 }).references),
+      { showCommon: true, useGuideNames: true });
+    mounted.destroy();
+  }
+});
+
+test('consumed Constancy table renders numeric lifeforms and duplicate visible groups with retained source ownership', async () => {
+  const value = constancyWire.combinedSummaryAverage1;
+  const session = sessionFor(value);
+  session.selectReferences('guide', true);
+  assert.equal(await session.review(value.options, { review: () => Promise.resolve(proxy(structuredClone(value))),
+    validationYield: yieldNow }), true);
+  let subscribed = 0;
+  const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
+    'SummaryVegetationWorkbookPanel.svelte', {
+      svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
+      '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+      './summaryVegetation': vegetation,
+      './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
+      './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => { subscribed++; return session; } },
+    }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true', VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: 'true',
+      VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: 'true', VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: 'true',
+      VITE_SUMMARY_VEGETATION_PRESENTATION_PREFERENCES: 'true' });
+  const html = require('svelte/server').render(component, { props: {
+    owner, calculation: value.options, disabled: false, onBusyChange() {},
+  } }).body.replace(/<!--[\s\S]*?-->/g, '');
+  assert.equal(subscribed, 1);
+  assert.match(html, /loaded presentation Constancy draft/);
+  const table = html.match(/<table\b[^>]*aria-label="Reviewed effective reference groups"[^>]*>([\s\S]*?)<\/table>/);
+  assert.ok(table);
+  assert.match(table[1], /<th\b[^>]*scope="col"[^>]*>Lifeform<\/th>/);
+  const body = table[1].match(/<tbody\b[^>]*>([\s\S]*?)<\/tbody>/);
+  assert.ok(body);
+  const rows = [...body[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/g)];
+  assert.ok(value.preview.rows.length > 0);
+  assert.equal(rows.length, value.preview.rows.length);
+  for (const [index, expected] of value.preview.rows.entries()) {
+    const cells = [...rows[index][1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/g)];
+    assert.equal(cells[0][1].trim(), expected.layer.storage === 'integer' ? expected.layer.integer : '(NULL)');
+  }
+  for (const [field, selected] of [['references', true], ['common', false], ['guide', false]]) {
+    const input = html.match(new RegExp(`<input\\b[^>]*data-summary-workbook-${field}[^>]*>`));
+    assert.ok(input);
+    assert.equal(/\bchecked\b/.test(input[0]), selected);
+    assert.match(input[0], /\bdisabled\b/);
+  }
+  assert.match(body[1], /aria-label="Raw species LF2"/);
+  assert.match(body[1], /aria-label="Raw species TWIN"/);
+  assert.equal(session.view().useGuideNames, true);
+});
+
+test('consumed outer Summary takes only loaded presentation Constancy intent and never rewrites basic calculation drafts', () => {
+  const report = vegetation.summaryVegetationSession(owner);
+  for (const initialized of [false, true]) for (const selected of [false, true]) for (const invalid of [false, true]) {
+    report.edit(2, 6, 20, 12);
+    const before = plain(report.view());
+    const calls = [];
+    const presentation = { view: () => ({ initialized, draft: { constancy: selected },
+      draftError: invalid ? 'Invalid retained draft' : '', busy: false, blocked: false }),
+      subscribe(listener) { listener(); return () => {}; }, cancelLoad() {} };
+    const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationReport.svelte'), 'utf8'),
+      'SummaryVegetationReport.svelte', {
+        svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
+        './summaryVegetation': vegetation,
+        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationService: {} },
+        './summaryVegetationPresentationPreferenceSessions': { summaryVegetationPresentationPreferenceSession: () => presentation },
+        './SummaryVegetationWorkbookPanel.svelte': { default: (_payload, props) => { calls.push(props); } },
+      }, { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
+        VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: 'true' });
+    const html = require('svelte/server').render(component, { props: { ...owner, onBusyChange() {} } }).body;
+    assert.match(html, /Group by/);
+    assert.equal(calls.length, 1);
+    assert.deepEqual(plain(calls[0].calculation), { average: 2, display: initialized && selected ? 1 : 6,
+      showClass: 20, groupAndOrder: initialized && selected ? 13 : 12,
+      ...(initialized && selected ? { constancy: true } : {}) });
+    assert.equal(calls[0].disabled, invalid);
+    assert.deepEqual(plain(report.view()), before);
+  }
+});
+
+test('Constancy validation holds cancellation ownership through a remount without installing the old numeric result', { timeout: 10000 }, async () => {
+  const value = constancyWire.combinedSummaryAverage2;
+  const session = sessionFor(value), reached = deferred(), hold = deferred();
+  let yields = 0, reads = 0;
+  const loading = session.review(value.options, {
+    review: () => { reads++; return Promise.resolve(proxy(structuredClone(value))); },
+    validationYield() {
+      if (++yields === 2) { reached.resolve(); return hold.promise; }
+      return Promise.resolve();
+    },
+  });
+  await reached.promise;
+  session.cancel();
+  assert.equal(session.held(), true);
+  const mounted = mountPanel(session, { GetReview() { reads++; throw new Error('Must remain held'); } },
+    false, value.options, true, true, true, true);
+  await mounted.review();
+  assert.equal(reads, 1);
+  assert.equal(session.view().review, null);
+  hold.resolve();
+  assert.equal(await loading, false);
+  assert.equal(session.view().review, null);
+  assert.equal(session.held(), false);
+  mounted.destroy();
+});
+
+test('Constancy publication transports detached exact authority and retains receipt separately from manual names and mode changes', async () => {
+  const value = constancyWire.membershipsAverage2, session = sessionFor(value);
+  session.selectReferences('guide', true);
+  session.edit('destination', destination);
+  assert.throws(() => session.options({ ...value.options, constancy: false }), /inconsistent options/);
+  assert.equal(await session.review(value.options, { review: () => Promise.resolve(proxy(structuredClone(value))),
+    validationYield: yieldNow }), true);
+  let writes = 0;
+  await session.publish(value.options, request => {
+    writes++;
+    assert.deepEqual(plain(structuredClone(request)), {
+      options: value.options, approvalHash: value.approvalHash, destination, createdAt: value.ancillary.createdAt,
+    });
+    return Promise.resolve(outcome(value));
+  });
+  assert.equal(writes, 1);
+  assert.equal(session.held(), true);
+  assert.throws(() => session.selectReferences('guide', false), /acknowledge/);
+  const ordinary = { average: 1, display: 6, showClass: 20, groupAndOrder: 12 };
+  const mounted = mountPanel(session, {}, false, ordinary, true, true, true, true);
+  assert.equal(mounted.view().publication.outcome.status, 'published');
+  mounted.acknowledge();
+  assert.equal(session.held(), false);
+  assert.equal(session.view().publication.outcome.status, 'published');
+  assert.deepEqual(plain(session.options(ordinary).references), { showCommon: true, useGuideNames: true });
+  assert.equal(Object.hasOwn(session.options(ordinary), 'constancy'), false);
+  assert.equal(session.view().useGuideNames, true);
+  mounted.destroy();
+});
 
 test('strict grouped ancillary Go vectors retain typed bodies, complete memberships and original source worksheet scope', async () => {
   assert.equal(Object.keys(groupedAncillaryWire).length, 8);
@@ -355,7 +572,7 @@ test('changing Calculate/Display invalidates review at publication and no destin
 });
 
 function mountPanel(session, services, held = false, calculation = wire.environment.options, ancillaryEnabled = false,
-  referencesEnabled = false, groupedEnabled = false) {
+  referencesEnabled = false, groupedEnabled = false, presentationEnabled = false) {
   const filename = 'SummaryVegetationWorkbookPanel.svelte';
   const source = readFileSync(path.join(__dirname, filename), 'utf8');
   assert.deepEqual(compiler.compile(source, { filename, generate: 'client' }).warnings, []);
@@ -384,7 +601,8 @@ function mountPanel(session, services, held = false, calculation = wire.environm
     __environment: { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
       VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: ancillaryEnabled ? 'true' : 'false',
       VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: referencesEnabled ? 'true' : 'false',
-      VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: groupedEnabled ? 'true' : 'false' },
+      VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: groupedEnabled ? 'true' : 'false',
+      VITE_SUMMARY_VEGETATION_PRESENTATION_PREFERENCES: presentationEnabled ? 'true' : 'false' },
     require(name) { assert.ok(name in dependencies, name); return dependencies[name]; },
   });
   return { ...module.exports.handlers, notifications, destroy: () => destroy() };

@@ -103,6 +103,7 @@
   }
   const presentationMutationHeld = $derived(presentationReadBusy || !!presentationView && (presentationView.busy || presentationView.blocked));
   const presentationInvalid = $derived(!!presentationView?.draftError || !!presentationView?.authorityUnknown || !!presentationView?.readError);
+  const workbookConstancy = $derived(!!presentationView?.initialized && presentationView.draft?.constancy === true);
   const qualityMutationHeld = $derived(qualityReadBusy || !!qualityView && (qualityView.busy || qualityView.blocked));
   const qualityInvalid = $derived(!!qualityView?.draftError || !!qualityView?.authorityUnknown || !!qualityView?.readError);
   const qualityUnavailable = $derived(!!quality && (!qualityView?.saved || qualityView.saved.enforce || qualityInvalid));
@@ -316,8 +317,9 @@
   {/if}
   {#if import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK === 'true'}
     <SummaryVegetationWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }}
-      calculation={{ average: viewState.average, display: viewState.display, showClass: viewState.showClass,
-        ...(groupedWorkbookEnabled && viewState.groupAndOrder !== 11 ? { groupAndOrder: viewState.groupAndOrder } : {}) }}
+      calculation={{ average: viewState.average, display: workbookConstancy ? 1 : viewState.display, showClass: viewState.showClass,
+        ...(workbookConstancy ? { groupAndOrder: 13, constancy: true } :
+          groupedWorkbookEnabled && viewState.groupAndOrder !== 11 ? { groupAndOrder: viewState.groupAndOrder } : {}) }}
       disabled={operationHeldProp || environmentalHeld || unavailableScope || viewState.groupAndOrder !== 11 && !groupedWorkbookEnabled ||
         viewState.busy || fieldListHeld || preferenceHeld || preferenceInvalid || !!viewState.draftError ||
         qualityMutationHeld || qualityUnavailable || presentationMutationHeld || presentationInvalid}

@@ -16,6 +16,7 @@
   const ancillaryEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK === 'true';
   const referencesEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES === 'true';
   const groupedEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK === 'true';
+  const presentationEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_PRESENTATION_PREFERENCES === 'true';
   const environmentEnabled = summaryEnvironmentalLifeformEnabled;
   let viewState = $state.raw(session.view());
   let error = $state('');
@@ -25,20 +26,26 @@
   const barrier = $derived(viewState.publication.busy || viewState.publication.blocked);
   const held = $derived(disabled || viewState.reviewing || barrier);
   const grouped = $derived(calculation.groupAndOrder !== undefined);
+  const constancy = $derived(calculation.constancy === true);
+  const effectiveReferences = $derived(constancy || viewState.includeReferences);
+  const effectiveCommon = $derived(!constancy && viewState.showCommon);
+  const effectiveGuide = $derived(!constancy && viewState.useGuideNames);
   const groupingUnavailable = $derived(grouped && (!groupedEnabled ||
-    viewState.includeReferences && !summaryVegetationReferenceGroupingAvailable(calculation.groupAndOrder ?? 11,
-      viewState.showCommon || viewState.useGuideNames)));
+    effectiveReferences && !summaryVegetationReferenceGroupingAvailable(calculation.groupAndOrder ?? 11,
+      effectiveCommon || effectiveGuide)));
   const modeUnavailable = $derived(groupingUnavailable || viewState.includeEnv && !environmentEnabled ||
-    viewState.includeAncillary && !ancillaryEnabled || viewState.includeReferences && !referencesEnabled);
+    viewState.includeAncillary && !ancillaryEnabled || effectiveReferences && !referencesEnabled ||
+    constancy && !presentationEnabled);
   const groupLabel = $derived(!grouped ? 'Layer' : calculation.groupAndOrder === 12 ? 'Strata' :
     calculation.groupAndOrder === 13 ? 'Lifeform' : calculation.groupAndOrder === 14 ? 'None' : 'Unsupported');
   const currentReview = $derived(!!viewState.review && sameSummaryWorkbookOptions(viewState.review.options, {
     average: calculation.average, display: calculation.display, showClass: calculation.showClass,
     title: viewState.title, includeEnv: viewState.includeEnv,
     ...(grouped ? { groupAndOrder: calculation.groupAndOrder } : {}),
+    ...(constancy ? { constancy: true } : {}),
     ...(viewState.includeAncillary ? { ancillary: { createSummary: viewState.createSummary } } : {}),
-    ...(viewState.includeReferences ? { references: {
-      showCommon: viewState.showCommon, useGuideNames: viewState.useGuideNames } } : {}),
+    ...(effectiveReferences ? { references: {
+      showCommon: effectiveCommon, useGuideNames: effectiveGuide } } : {}),
   }));
   const unsubscribe = session.subscribe(() => { viewState = session.view(); onBusyChange(session.held()); });
   function edit(field: 'title' | 'destination', raw: string) {
@@ -67,7 +74,7 @@
     try { session.undoDraft(); } catch (cause) { error = String(cause); }
   }
   function selectReferences(field: 'include' | 'common' | 'guide', event: Event) {
-    if (held || !referencesEnabled) return;
+    if (held || !referencesEnabled || constancy) return;
     const checked = (event.currentTarget as HTMLInputElement).checked;
     error = '';
     try { session.selectReferences(field, checked); } catch (cause) { error = String(cause); }
@@ -122,8 +129,18 @@
   {/if}
   {#if !enabled}<p>Inspection workbook publication is disabled in this build.</p>{/if}
   <p data-summary-workbook-group>Workbook grouping: {groupLabel}.
-    {#if groupedEnabled}Uses the Summary Group by selection.
+    {#if constancy}Uses the loaded presentation Constancy draft: Lifeform grouping, Display Values1 and effective references without common/guide names.
+    {:else if groupedEnabled}Uses the Summary Group by selection.
     {:else}Layer only; grouped workbook publication is disabled in this build.{/if}</p>
+  {#if constancy}
+    <p data-summary-workbook-constancy>Constancy inspection retains numeric lifeform and separate raw-species groups,
+      including visibly identical rows. Equal visible keys use an adapted raw-code tie order.
+      Independent workbook name/reference drafts are retained for deselection; no preferences were saved.</p>
+    {#if !presentationEnabled || !referencesEnabled || !groupedEnabled}
+      <p role="alert">Constancy inspection requires the independent presentation, effective-reference and grouped-workbook flags.
+        The selected intent is retained; no ordinary workbook is substituted.</p>
+    {/if}
+  {/if}
   {#if groupingUnavailable}
     <p role="alert">Grouped publication requires its independent build flag and compatible reference options.
       Common/guide names support Layer or Strata only. Lifeform/None support attribute references with both names off.
@@ -152,19 +169,19 @@
       Include ReportSummary counts, unit names and version
     </label>
     <label class="checkbox">
-      <input type="checkbox" data-summary-workbook-references checked={viewState.includeReferences}
-        disabled={!enabled || held || !referencesEnabled} onchange={event => selectReferences('include', event)} />
+      <input type="checkbox" data-summary-workbook-references checked={effectiveReferences}
+        disabled={!enabled || held || !referencesEnabled || constancy} onchange={event => selectReferences('include', event)} />
       Project effective source references and attribute descriptions
     </label>
     <label class="checkbox">
-      <input type="checkbox" data-summary-workbook-common checked={viewState.showCommon}
-        disabled={!enabled || held || !referencesEnabled || !viewState.includeReferences || viewState.useGuideNames}
+      <input type="checkbox" data-summary-workbook-common checked={effectiveCommon}
+        disabled={!enabled || held || !referencesEnabled || !viewState.includeReferences || viewState.useGuideNames || constancy}
         onchange={event => selectReferences('common', event)} />
       Include common names in grouping and the workbook
     </label>
     <label class="checkbox">
-      <input type="checkbox" data-summary-workbook-guide checked={viewState.useGuideNames}
-        disabled={!enabled || held || !referencesEnabled || !viewState.includeReferences}
+      <input type="checkbox" data-summary-workbook-guide checked={effectiveGuide}
+        disabled={!enabled || held || !referencesEnabled || !viewState.includeReferences || constancy}
         onchange={event => selectReferences('guide', event)} />
       Use master CombinedEnglishName (also includes common names)
     </label>
@@ -205,7 +222,9 @@
               <thead><tr><th scope="col">{viewState.review.preview.groupField?.name ?? 'Layer'}</th><th scope="col">Scientific name/code</th>
                 {#if reference.showCommon}<th scope="col">Common name</th>{/if}<th scope="col">Order</th></tr></thead>
               <tbody>{#each viewState.review.preview.rows.slice(referencePage * unitPageSize, (referencePage + 1) * unitPageSize) as row}
-                <tr><td>{row.layer.text === null ? '(NULL)' : row.layer.text === '' ? '(empty)' : row.layer.text}</td>
+                <tr aria-label={row.rawSpecies ? `Raw species ${row.rawSpecies.text === null ? '(NULL)' : row.rawSpecies.text === '' ? '(empty)' : row.rawSpecies.text}` : undefined}>
+                  <td>{row.layer.storage === 'integer' ? row.layer.integer :
+                    row.layer.text === null ? '(NULL)' : row.layer.text === '' ? '(empty)' : row.layer.text}</td>
                   <th scope="row">{row.species.text === null ? '(NULL)' : row.species.text === '' ? '(empty)' : row.species.text}</th>
                   {#if reference.showCommon}
                     {#if row.commonName}

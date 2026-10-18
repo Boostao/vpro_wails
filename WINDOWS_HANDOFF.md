@@ -25,7 +25,8 @@ Current machine state only. Portable scope and ordered work are in
 
 ## Current accepted integration
 
-Source parent is published `48cc9d9f6e0982290bad0492f064c475ab05cf8d`.
+The accepted private-kernel baseline is published `f55957b647028a688455480e682e30206389087f`
+(parent `48cc9d9f6e0982290bad0492f064c475ab05cf8d`).
 The accepted private Constancy preparation reuses existing effective references,
 Group13 MAX/SINGLE staging, aggregation, formatting and physical witnesses.
 Its numeric nullable Lifeform group is DAO LONG4/size4, not ordinary Group13's
@@ -60,17 +61,40 @@ All1919 inputs/2904 protected artifact entries, discovery,38 canonical inputs/
 21 protected assets and eleven closed native families match (ten prior Wails
 families plus the new Access source-query family). Receipt SHA256:
 `8c1c9d6fb6a010c678405bfab57864d895ce4afa0f304a3e5f0007fde5f2f52b`.
-The freeze is released; only six directly related documentation files change
-afterward. Git and the private publication association identify publication.
+That revision is published; Git and the private publication association identify
+its exact accepted tree. The following consumer has separate native and full
+integration acceptance; Git and the private association identify its publication.
 
-Next contract: the Constancy workbook/UI consumer. Strict requests, distinct
-source/scope/approval authority, public raw-code identity, numeric validation/
-rendering and retained duplicate rows are not wired yet. The current panel
-would render an integer group as NULL and the client rejects duplicate displayed
-keys; neither behavior is permission to enable this route. Preserve parent
-calculation/presentation ownership and the existing coupled preference CAS
-(Group3/Display1/common0, historical limit retained), with no implicit writes.
-Keep correction/Undo, remount/stale-result and exact native-close behavior.
+Active consumer: the existing workbook panel consumes the loaded presentation
+Constancy draft without changing basic calculation or independent workbook-name
+drafts, adding another editor/flag/service, or persisting YAML. Strict true-only
+requests, distinct source/scope/approval, public raw identity, numeric validation/
+rendering and retained duplicate rows are wired behind existing independent
+grouped/reference/presentation flags. Wails interfaces use `-ts -i`.
+Frozen validation passes focused race87.188s/coupled race749.172s,236 related
+client/52 browser cases, eight strict-Go composition vectors, check0/0, build/
+vet/production and250 exact compatibility comparisons. Independent review and
+focused follow-up accept the corrected numeric-leading ordering guard with seven
+explicit cases. Native acceptance seals five reopened outputs, actual numeric/
+NULL/negative/raw-twin rows, retained presentation/manual/basic drafts, four real
+remounts/exact close acknowledgements,54 responsive observations and three
+independent backend denials. All16 source/config/audit fixture files are unchanged;
+five final owners and one rejected-fixture owner normally closed.
+The bounded contract and resolved development failures are in the current
+session's `summary-constancy-desktop-contract.json` and
+`summary-constancy-desktop-development.json`. Final receipt family is
+`summary-constancy-desktop-review-fix-validation`; native receipt is
+`native-summary-constancy-workbook/native-acceptance.json`. The initial LF2
+fixture is closed/preserved: its attribute-reference fanout is not an equal-value
+twin. Fresh TWIN/TWN2 qualify duplicate visible values; the sealed seed has8
+memberships/2 units, not its older expanded smoke frame. Completed publications
+were never replayed. No native owner remains. Full root integration accepts exit0,
+UTC2026-10-18T02:42:08.181410 to2026-10-18T04:05:39.278581;5011.094s.
+All1923 inputs/2964 artifact entries,38 canonical inputs/21 assets, discovery and
+twelve closed native families match. Receipt:
+`summary-constancy-desktop-integration/receipt.json`; SHA256:
+`ed92a5e8aada3d994cb77f97204949488d9148345840abfcbe07d1bf36109292`.
+Preserve exact native-close acknowledgements.
 Group13/14 common/guide First, Strata/Lifeform Display2, original Report callbacks
 and whole-form/ribbon gaps remain. None Display2 is supported. Continue the
 ordered work after publication; the delivered demo/release is unchanged.

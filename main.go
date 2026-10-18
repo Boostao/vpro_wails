@@ -374,6 +374,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	summaryVegetationWorkbook.presentationEnabled = summaryVegetationPresentationEnabled
 	summaryVegetationFieldListEnabled, err := summaryVegetationFieldListFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)

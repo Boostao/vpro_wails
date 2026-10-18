@@ -2752,6 +2752,52 @@ Excel/clipboard/printing or callback parity. The next consumer must separately
 wire strict authority, numeric rendering, raw-code duplicate validation and
 parent presentation/calculation ownership before desktop acceptance.
 
+### Constancy workbook consumer
+
+**Independently reviewed/native-verified and full-race integrated; default-off.**
+The existing inspection panel consumes the loaded presentation Constancy draft:
+effective Group13/Display1 with the retained Average and historical ShowClass
+transport (calculation0). It does not rewrite basic calculation drafts, add a
+checkbox/editor or persist preferences. Effective references are selected with
+common/guide names off; separate manual reference/name drafts remain available
+after deselection. Existing grouped, reference and presentation flags are
+independent prerequisites. Unavailable intent remains selected, never an ordinary
+workbook fallback.
+
+The optional request marker must be true when present. It requires explicit
+Group13/Display1 and effective names-off references. A distinct preview source,
+scope and approval domain cover numeric nullable `Lifeform` LONG4/size4,
+TEXT Order, raw-species grouping and supported environment/ancillary composition.
+Raw identity is retained in provenance, not an invented worksheet column.
+The first body column is numeric; the original Constancy caption yields to
+`Site Unit Summary Table` when environmental rows are included. The actual
+inspection table renders numeric groups and retains duplicate visible rows.
+Ordinary validators and signed16 readers stay narrow; unused valid master LONG
+values are not a reason to widen legacy consumers.
+
+Development tests include eight strict production-Go wire vectors, independent
+MAX/fixed-denominator arithmetic, actual Svelte proxies, all eight prerequisite
+combinations, consumed panel/parent rendering, cancellation/remount, collision,
+cleanup/retry and retained receipts. Frozen focused/coupled races,236 related
+client/52 browser cases, check/build/vet/production and250 exact compatibility
+comparisons pass. Numeric-leading ordering now initializes after the first row;
+seven explicit cases cover valid negative/raw-tie starts and error-with-zero-bytes
+duplicate/descending group/species/raw/NULL transitions. Independent review and
+focused follow-up find no significant issues.
+
+Five once-only Wails outputs independently reopen typed bodies, original captions
+and hidden provenance, including environment and raw-SU/ReportSummary composition.
+Actual paged tables show numeric/NULL/negative groups and equal-visible TWIN/TWN2
+rows with separate raw identities. The pre-existing LF2 attribute-stage fanout
+is retained, not flattened into the new pair. Presentation selection without Save
+preserves basic/manual drafts and16 source/config/audit files. Four actual
+remounts/exact close acknowledgements,54 three-width observations and independent
+grouped/reference/presentation backend denials pass; ordinary reads remain usable.
+Presentation-off source editing stays unavailable, not a fabricated loaded draft.
+Full root race integration passes in5011.094s, preserving1923 managed inputs/
+2964 artifacts,38 canonical inputs/21 assets and twelve closed native families.
+No new service/flag/default/demo promotion or original Report/printing claim.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

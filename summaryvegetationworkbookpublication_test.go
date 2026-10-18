@@ -71,13 +71,24 @@ func TestSummaryDraftWorkbookPublicationInvisibleDrift(t *testing.T) {
 }
 
 func TestSummaryDraftWorkbookPublicationCancellationCleanupAndRetry(t *testing.T) {
-	for _, mode := range []string{"legacy", "memberships", "summary"} {
+	for _, mode := range []string{"legacy", "memberships", "summary", "constancy"} {
 		for _, phase := range []string{"first-commit", "first-cleanup", "prelink-cleanup", "published-cleanup", "prelink-cancel", "published-cancel"} {
 			t.Run(mode+"/"+phase, func(t *testing.T) {
-				service, state := summaryAncillaryDesktopFixture(t, false)
+				var service *SummaryVegetationWorkbookService
+				var state ProjectState
+				if mode == "constancy" {
+					service, state = summaryConstancyDesktopFixture(t, false)
+				} else {
+					service, state = summaryAncillaryDesktopFixture(t, false)
+				}
 				options := SummaryVegetationWorkbookOptions{Average: 1, Display: 6}
 				if mode != "legacy" {
 					options.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{CreateSummary: mode == "summary"}
+				}
+				if mode == "constancy" {
+					options = summaryConstancyWorkbookOptions()
+					options.IncludeEnv = true
+					options.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{CreateSummary: true}
 				}
 				review, err := service.GetReview(t.Context(), state.ContextID, workbookRequest(t, options))
 				if err != nil {

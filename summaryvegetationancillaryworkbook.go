@@ -34,6 +34,9 @@ func prepareSummaryVegetationAncillaryWorkbook(ctx context.Context,
 	}
 	preview := input.Source.Input.Vegetation
 	options := input.Options
+	if err := validateSummaryConstancyWorkbookSource(input.Source, options); err != nil {
+		return fail(err)
+	}
 	groupLabel := "Layer"
 	scope := "Read-only literal normal-SU Layer inspection with ancillary sheets; zero value limit, no quality/lump/common-name/guide/constancy callbacks, Excel coercion or original Report/printing parity"
 	if options.GroupAndOrder != nil {
@@ -57,6 +60,9 @@ func prepareSummaryVegetationAncillaryWorkbook(ctx context.Context,
 			groupLabel = "None"
 		}
 		scope = summaryVegetationGroupedAncillaryScope
+		if options.Constancy {
+			scope = summaryVegetationConstancyScope
+		}
 	} else if preview.GroupAndOrder != 0 {
 		return fail(errors.New("Summary grouped ancillary workbook requires explicit matching grouping options"))
 	}

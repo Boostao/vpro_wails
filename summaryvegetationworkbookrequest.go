@@ -47,6 +47,7 @@ type SummaryVegetationWorkbookOptions struct {
 	Ancillary     *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary,omitempty"`
 	References    *SummaryVegetationReferenceOptions         `json:"references,omitempty"`
 	GroupAndOrder *int                                       `json:"groupAndOrder,omitempty"`
+	Constancy     bool                                       `json:"constancy,omitempty"`
 }
 
 func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) error {
@@ -59,13 +60,14 @@ func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) erro
 		Ancillary     *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary"`
 		References    *SummaryVegetationReferenceOptions         `json:"references"`
 		GroupAndOrder *int                                       `json:"groupAndOrder"`
+		Constancy     *bool                                      `json:"constancy"`
 	}
 	properties, err := sourceChildJSONObject(data, "Summary draft workbook options",
-		[]string{"title", "average", "display", "showClass", "includeEnv"}, []string{"ancillary", "references", "groupAndOrder"})
+		[]string{"title", "average", "display", "showClass", "includeEnv"}, []string{"ancillary", "references", "groupAndOrder", "constancy"})
 	if err != nil {
 		return err
 	}
-	if err := sourceChildJSONNonNull(properties, "Summary draft workbook options", "ancillary", "references", "groupAndOrder"); err != nil {
+	if err := sourceChildJSONNonNull(properties, "Summary draft workbook options", "ancillary", "references", "groupAndOrder", "constancy"); err != nil {
 		return err
 	}
 	if err := json.Unmarshal(data, &raw); err != nil {
@@ -74,9 +76,24 @@ func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) erro
 	if raw.Title == nil || raw.Average == nil || raw.Display == nil || raw.ShowClass == nil || raw.IncludeEnv == nil {
 		return errors.New("Summary draft workbook requires explicit title, calculation and environmental options; NULL is not a value")
 	}
-	*options = SummaryVegetationWorkbookOptions{Title: *raw.Title, Average: *raw.Average, Display: *raw.Display,
+	if raw.Constancy != nil && !*raw.Constancy {
+		return errors.New("Summary Constancy selection must be true when present; omit it for ordinary inspection")
+	}
+	parsed := SummaryVegetationWorkbookOptions{Title: *raw.Title, Average: *raw.Average, Display: *raw.Display,
 		ShowClass: *raw.ShowClass, IncludeEnv: *raw.IncludeEnv, Ancillary: raw.Ancillary, References: raw.References,
-		GroupAndOrder: raw.GroupAndOrder}
+		GroupAndOrder: raw.GroupAndOrder, Constancy: raw.Constancy != nil}
+	if err := validateSummaryConstancyWorkbookOptions(parsed); err != nil {
+		return err
+	}
+	*options = parsed
+	return nil
+}
+
+func validateSummaryConstancyWorkbookOptions(options SummaryVegetationWorkbookOptions) error {
+	if options.Constancy && (options.GroupAndOrder == nil || *options.GroupAndOrder != 13 ||
+		options.Display != 1 || options.References == nil || options.References.ShowCommon || options.References.UseGuideNames) {
+		return errors.New("Summary Constancy workbook requires explicit Group13/Display1 and effective references without common/guide names")
+	}
 	return nil
 }
 

@@ -420,6 +420,32 @@ No public DTO/service/binding/frontend/flag/prefs/default/demo change or new
 Wails UI acceptance. Inherited client inputs and strict-Go wire fixtures remain
 unchanged; they are not represented as new frontend executions.
 
+## Constancy consumer
+
+The [workbook/UI successor](LONG_VEGETATION_WORKBOOK_CONTRACT.md#constancy-workbook-consumer)
+is independently reviewed and native-verified on the published private kernel. Frozen
+checks cover strict mode/source/numeric/raw-identity authority, eight production-Go
+composition vectors, all eight independent prerequisite combinations, actual
+Svelte proxies and consumed rendering, retained source/manual drafts and
+publication/cancellation/cleanup/retry behavior. Focused race87.188s, coupled
+race749.172s,236 related client/52 browser cases, check0/0, isolated build,
+production vet/build and250 exact compatibility comparisons pass. Review found
+first numeric-row ordering was not initialized; five invalid witnesses failed
+before the one-assignment fix, seven cases now pass and focused follow-up resolves
+the finding. Five reopened Wails outputs verify typed bodies/captions/provenance,
+retained drafts and duplicate raw identities. Four actual remounts/exact close
+acknowledgements,54 responsive observations and three independent backend denials
+pass with16 unchanged fixture files and normally closed owners.
+An initial zero-publication fixture is preserved: LF2 has independent attribute-
+stage fanout; fresh TWIN/TWN2 supply the equal-value pair. A historical larger-SU
+witness was corrected to the sealed eight-membership/two-unit seed after checking
+four completed outputs; none was replayed. The presentation-off exact refusal
+was retained while source editing remains unavailable.
+Full root race integration passes in5011.094s with1923 managed inputs/2964 artifacts,
+38 canonical inputs/21 assets, unchanged discovery and twelve closed native
+families. Only six acceptance-status docs change after that freeze. The delivered demo,
+default availability and original Report/printing status are unchanged.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

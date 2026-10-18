@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"reflect"
 	"time"
 )
 
@@ -15,6 +16,9 @@ func validateSummaryWorkbookCreatedAt(value string) error {
 }
 
 func summaryWorkbookScope(options SummaryVegetationWorkbookOptions) string {
+	if options.Constancy {
+		return summaryVegetationConstancyScope
+	}
 	if options.GroupAndOrder != nil {
 		if options.Ancillary != nil {
 			return summaryVegetationGroupedAncillaryScope
@@ -41,6 +45,9 @@ func summaryWorkbookScope(options SummaryVegetationWorkbookOptions) string {
 
 func prepareSummaryWorkbookSource(ctx context.Context, source summaryVegetationWorkbookSource,
 	options SummaryVegetationWorkbookOptions) (summaryVegetationWorkbook, error) {
+	if err := validateSummaryConstancyWorkbookSource(source, options); err != nil {
+		return summaryVegetationWorkbook{}, err
+	}
 	if options.GroupAndOrder != nil && (options.References != nil && !summaryVegetationReferenceGroupingAvailable(*options.GroupAndOrder,
 		options.References.ShowCommon || options.References.UseGuideNames) ||
 		(options.References != nil) != (source.Input.Vegetation.References != nil) ||
@@ -82,6 +89,22 @@ func prepareSummaryWorkbookSource(ctx context.Context, source summaryVegetationW
 		}
 	}
 	return result, nil
+}
+
+func validateSummaryConstancyWorkbookSource(source summaryVegetationWorkbookSource, options SummaryVegetationWorkbookOptions) error {
+	if err := validateSummaryConstancyWorkbookOptions(options); err != nil {
+		return err
+	}
+	if options.Constancy != (source.Input.Vegetation.Source == summaryVegetationConstancySource) ||
+		options.Constancy != (source.Raw.Preview.Source == summaryVegetationConstancySource) {
+		return errors.New("Summary Constancy workbook options differ from source/body authority")
+	}
+	if options.Constancy && (!reflect.DeepEqual(source.Input.Vegetation, source.Raw.Preview) ||
+		source.Input.Vegetation.Average != options.Average ||
+		source.Input.Vegetation.Display != options.Display || source.Input.Vegetation.ShowClass != 0) {
+		return errors.New("Summary Constancy workbook requires matching complete source/body calculation and raw-species identities")
+	}
+	return nil
 }
 
 func summaryWorkbookAncillaryReview(source summaryVegetationWorkbookSource, workbook summaryVegetationWorkbook,
