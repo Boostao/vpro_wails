@@ -29,13 +29,15 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is reviewed41/37 reference reports on14f0dac.
-  One existing reference gate extends soil; app/backend/seed/defaults unchanged.
-  Three common/guide-NULL/Constancy publications,39 independent vegetation rows/
-  278 typed cells/full provenance/close/acknowledgement/independent denials pass.
-  All15 DBs exact with declared SU config change; denial reopen preserves16.
-  Soil mutations/parent typing/Save/Long retain predecessor binary lineage.
-  Initial JS falls81.00%; EXE same size as soil. No new timing/shrink claim.
+- Current preview is reviewed43/39 linked vegetation on8cbdd36.
+  Two existing review/writing gates extend reference reports; production app/
+  backend/seed/defaults unchanged, one coupled test fixture corrected.
+  Normal Cover1/Collected and CHARS Cover5a: two Saves/three audits/two histories,
+  complete peers, five fresh CancelClose acknowledgements, held-response recovery,
+  alias/remount/saved reopens pass. C/D memberships0 remain physical read-only.
+  Four backend denials/two reopens preserve16 files each; three owners close.
+  Reports/soil/parent/Long mutations retain predecessor binary lineage.
+  Initial JS falls80.51%; EXE grows39,936 bytes. No new timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -43,7 +45,7 @@ Current machine state only. Portable scope and ordered work are in
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
 - Current-source draft release run39149407850 passes seven jobs and all asset
-  checks. Default release is not the private41/37 profile or all-platform runtime
+  checks. Default release is not the private43/39 profile or all-platform runtime
   acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
@@ -159,50 +161,63 @@ qualification; that bounded journey is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-reference-reports.zip`:17,549,901 bytes.
-  SHA256 `b31cc3038bf5742486a84dfc6bff3406da17a5769b7eff568f600555cbc94a5e`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-linked-vegetation.zip`:17,560,007 bytes.
+  SHA256 `5c3e9ece6accd6fffdfed392e8aae99fa6819d2a54a57276d5cc724525f7f57f`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Source14f0dac; SQLite-only EXE43,138,560 bytes, SHA256
-  `27acac410d58f0ad1c65a388c1ca7882a9324c2a25351e42e2897578040a1407`.
-  Exact41 frontend/37 runtime gates; private launcher SHA256
-  `ea280ed8179f5e5cf79debfcacf986fd1e7c4b4bf12f4b50693f7ca2968d050e`.
-  Only effective-reference flag added; app/backend/seed/defaults unchanged.
-  Inherited lower-case false is stripped without changing caller.
-- Private `effective-reference-demo-20261018/validation-seal.json`, SHA256
-  `d8a3d314569f6860930d2d0f0ab26d5167e9d3f173640c6c6c5f207726653f21`,
-  pins1931 inputs/21 assets/58 canonical records and native proofs.
-  Initial JS988,615 versus5,202,547; total5,306,672. EXE same size as soil;
+- Source8cbdd36; SQLite-only EXE43,178,496 bytes, SHA256
+  `722664395d1e08fc93be7eadab4d0d98d258f4cc9742892b219d21ea847028d9`.
+  Exact43 frontend/39 runtime gates; private launcher SHA256
+  `f3201300c9779feb6caadadb51230cef45331d8b783d8c66bd0037eac98924e6`.
+  Only vegetation review/writing added; Species-list stays off. Production app/
+  backend/seed/defaults unchanged; inherited false aliases stripped without caller
+  mutation. One extracted-App test initializes already-bound editor state.
+- Private `linked-vegetation-demo-20261018/validation-seal.json`, SHA256
+  `de4c2b777478c552960317f6a57e3b49f5429ef1c9e1b147269b813026798a85`,
+  pins source/canonical/21 protected assets and native proofs; source input SHA256
+  `93ffd3f9b34b61b1dd971930e883af276dcf155ac9fc8bf3dfa44da71fee7da2`.
+  Initial JS1,013,963 versus5,202,547; total5,346,499. EXE grows39,936 bytes;
   no new timing/shrink claim.
-- Current native: three common-name/guide-NULL None6 and numeric Constancy13/1
-  publications,39 independent vegetation rows/names and278 typed cells including
-  60 environmental cells against reviewed plans. Full very-hidden provenance,
-  four memberships and Lifeforms1..13 retained. Environment keeps kernel lineage.
-  Guide names all NULL;168 physical descriptions project98 references but none
-  is selected vegetation here. No populated guide/attribute/original rename claim.
-- P3 has physical LF1 zero. Constancy BuildLifeFormTable retains it (frequency1.00,
-  other0.75/mean1.56); None ConvertProVeg2V2Null drops zero but retains denominator4.
-  Invalid destination/cancel/remount/stale absence, five fresh CancelClose-before-
-  release and acknowledgement/Home barriers pass. Both owners close/freshly absent.
-  First run15 DBs exact; config intentionally selects Report->DemoReports.
-  References-off reopening denies3 modes, retains ordinary13-row review/P1 parent117
-  and preserves16 files. Twelve controls measured980/1400.
-- All107 client cases, launcher races, focused race121.172s/check0/0/Vite/Go/exact26
-  embeds pass. Reviewer `0d30aca2-9d70-4f57-972c-278b1c0ed164` finds stale BUILD AND
-  EVIDENCE wording; v1 retained and only walkthrough/manifest hashes corrected.
-  Focused reviewer `d30dae60-2f7b-45b8-9aef-411234f688f1` confirms resolution, no
-  remaining material contradiction. All20 payload hashes/final prepare-only pass.
-  Original Decimal(float) inspector failure, missing continuation fill helper
-  before guide review and speculative positive-only Constancy frequency remain
-  preserved; same successful held results continued without any publication replay.
-  Source-mode correction supersedes the interim frequency correction explicitly.
-  No new full-root race, original callbacks/printing, whole-form or Source4 grant.
+- Current native: Normal Cover1/Collected then CHARS Cover5a, exactly two Saves/
+  three physical/history audits/two histories on row1/negative ID-100001.
+  Complete peers/unmapped cells exact; Collected is TEXT1 NULL/C/V, not BOOLEAN.
+  A query membership13; C/D0 with13 read-only physical rows each. No seed repair.
+  Invalid100/SINGLE-narrowed100/CC, five fresh CancelClose responses before
+  correction/release/acknowledgement, held-save read-only recovery, alias reload,
+  normal117/CHARS119 receipt remount and980/1400 fields/labels/actions pass.
+  Two saved gate-off reopens deny4 calls; parent117 remains available, writing-off
+  normal117/CHARS119 saved views and physical references read. All16 files exact
+  each reopen; all three owners close. Independent closed audit inspection checks
+  exact before/after/project/user/plot/table/flags/ID and preserves16 files.
+- All121 client cases, combined124 startup selector, launcher races, focused
+  vegetation race111.563s/check0/0/Vite/Go/exact26 embeds pass. Reviewer
+  `6b4c5a88-2050-4eab-9a27-cfae2864ed7b` finds no material issues, including
+  closed-audit follow-up. All20 payload hashes/final prepare-only pass.
+  Original build failed on missing extracted-VM editorInitializing before
+  production/native; failed freeze/log preserved, only one test line changed and
+  source re-frozen. Native journey passes first attempt, no Save replay.
+  Pre-review walkthrough labels corrected to B3/B4/B5 for Cover5a/b/c.
+  No new full-root race/oracle, every-field/populated-C/D, Species/heights/
+  identity/create/delete/restore, original implicit events or whole-form grant.
+- Preserved41/37 reference-report ZIP SHA256
+  `b31cc3038bf5742486a84dfc6bff3406da17a5769b7eff568f600555cbc94a5e`
+  owns three common/guide-NULL/Constancy outputs,39 independent vegetation rows/
+  names,278 typed cells including60 reviewed environmental cells, numeric Lifeform
+  order/full provenance and cancellation/close/ack guards. Constancy retains LF1
+  zero (frequency1.00/others0.75/mean1.56); None drops zero but retains denominator4.
+  Two owners close;15 DBs exact with declared DemoReports selection/config change,
+  denial reopen16 exact. Guide names all NULL,98 derived references not selected
+  vegetation. Inspector/source-mode and reviewed walkthrough corrections remain
+  preserved, without publication replay. Seal SHA256
+  `d8a3d314569f6860930d2d0f0ab26d5167e9d3f173640c6c6c5f207726653f21`.
+  These publications were not repeated on43/39. Use a fresh launcher run for report
+  examples after vegetation edits. No populated guide/original callback grant.
 - Preserved soil ZIP SHA256
   `4f3f6ed92a9d38cd02bc10e4eafd88dd1af867030a567cbef883f894d9f19fd5`
   owns normal117/CHARS119, two Creates/two Saves/six audits/four histories/
   18/28 defaults/permanent reservations/exact peers, read-only outcome recovery,
   retained remounts/three denials reopens. Four owners close;other15 files exact
-  after writes/16 per reopen. Those mutations were not repeated on41/37.
+  after writes/16 per reopen. Those mutations were not repeated on43/39.
   Explicit positive allocator is an adaptation; implicit creation/random allocator
   compatibility/soil deletion/restoration remain unavailable.
 - Preserved Summary ZIP SHA256
@@ -214,7 +229,7 @@ qualification; that bounded journey is not the overall completion condition.
   Two owners close/15 DBs exact with declared config selection/16 exact in denial
   reopening. Its wire-key/scientific-name and ZIP separator inspector corrections
   remain preserved without replay. This no-reference publication was not repeated
-  on41/37; three reference-based publications are independently checked above.
+  on43/39; three reference-based publications retain their41/37 lineage above.
 - Preserved entry-performance ZIP SHA256
   `0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`
   owns normal117/CHARS119 layouts, one3scope Save/three audits, saved reopening,
@@ -244,7 +259,7 @@ qualification; that bounded journey is not the overall completion condition.
 - The old `VPRO-Demo-2026-10-18-current-main.zip` remains unchanged, SHA256
   `fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
   Parent/metadata, SIVI/CHARS, Summary/log/Matrix and child lifecycle evidence is
-  inherited with its exact23/22 scope, not every mutation rerun on new41/37.
+  inherited with its exact23/22 scope, not every mutation rerun on new43/39.
   Its private delivery receipt remains SHA256
   `0e9914e6c339cadc884165279c8fb6e6d5b27bfb78bf5b98a9ae642b579ce877`.
 - Previous `VPRO-Demo-2026-10-16-refresh.zip` stays unchanged, SHA256
