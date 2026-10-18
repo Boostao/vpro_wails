@@ -803,6 +803,45 @@ stable-request recovery and the existing retained owner/barriers. Do not widen
 existing-row Save, infer source deletion/restoration, enable creation, or claim
 whole-form parity from this qualification.
 
+### Explicit linked-soil creation candidate
+
+The independently default-off creation candidate reuses the existing soil
+writer, attempt/outcome ledger, panel and retained session. Backend
+`VPRO_TWO_PAGE_SOIL_CREATION` requires soil review and writing; frontend
+`VITE_TWO_PAGE_SOIL_CREATION` requires the corresponding client review/writing
+flags. Ordinary Save rejects creation; only the distinct `CreateHorizon`
+method accepts a nonempty, literal Horizon within8 UTF-16 units. New Horizon
+drafts/errors and committed receipts retain their exact context/parent/form
+owner across remounts, using the existing navigation/Lock/native-close barriers.
+
+The transaction inserts all18/28 physical cells, with Flag integer0 and other
+ordinary/unbound defaults NULL. It reuses the existing positive child-ID
+allocator and permanent reservations, including off-parent historical IDs.
+This is an explicit desktop allocation adaptation, not Access's random
+distribution. Only the requested NULL-to-Horizon addition contributes a source
+audit at strength2/3; full creation provenance and its physical rowid remain in
+typed internal history at every strength. Data, audits, reservations and history
+commit together. Read-only exact-request recovery distinguishes committed
+history from a sealed absent attempt without replaying a creation.
+
+Coupled soil/SIVI identity/creation race tests pass376.776s. Eight synthetic
+actual-Go wire cases cover both forms and all audit strengths;65 related client
+cases, real Svelte proxy/consumed compiled-panel checks, type-check0/0 and
+production frontend build pass. Full-feature independent review finds no
+significant issues; production vet/build pass. Disposable Wails acceptance
+reopens five complete creations across normal/CHARS with five strength3 source
+audits, exact old rows, reservations/history, two held-response recoveries
+without replay and retained receipt remount. A fresh CancelClose response is
+observed before releasing a held operation, independently of stale warning
+text. Six panel/width observations at1400/600/320 and three independent native
+backend denials pass; all four profiles close normally. Full-root integration
+passes5003.344s with1930 managed inputs/3873 protected artifacts,49 canonical
+inputs/21 assets, sixteen closed native families and package/embed discovery
+unchanged. This accepts the explicitly gated desktop operation. Original callback timing,
+implicit new buffers, deletion/restoration and whole-form parity remain excluded.
+The earlier independent review of only the pure default planner does not accept
+this larger writer/client candidate.
+
 ### Existing soil assignment planning
 
 The next private prerequisite is [existing-row assignment planning](../twopagesoilplan.go),

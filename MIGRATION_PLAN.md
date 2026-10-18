@@ -61,9 +61,14 @@ form/query/module trace plus disposable engine calibration qualify complete
 AutoIncr/random-LONG/unique-index distinctions. Two independently reopened
 insertions preserve old rows and five parent/metadata/audit tables. Original
 form callbacks and allocator collision/retry equivalence are not accepted;
-desktop creation stays unavailable pending its typed writer/retained UI and
-independent/native acceptance. Reuse existing soil readers/planners, atomic
-receipt handling and permanent child-ID reservations, not a parallel editor.
+the independently gated explicit desktop candidate now reuses the soil
+writer/retained UI, atomic receipt handling and permanent child-ID reservations,
+not a parallel editor. Coupled races, client/production checks, distinct review
+and disposable Wails acceptance pass: five complete normal/CHARS creations,
+three independent backend denials, remounted receipts and fresh native-close
+cancellation before held-response release. Full-root race integration passes
+5003.344s with1930 managed inputs/3873 protected artifacts and unchanged discovery;
+no default/demo or original callback/random-distribution parity grant follows.
 The [linked-soil contract](docs/FS882-two-page-access-contract.md#linked-soil-creation-qualified-engine-boundary)
 records the accepted engine boundary and retained pre-mutation correction.
 

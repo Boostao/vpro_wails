@@ -18,15 +18,21 @@ type twoPageSoilRequest struct {
 	RequestID string               `json:"requestId"`
 	Original  *twoPageSoilOriginal `json:"original"`
 	Edits     []twoPageSoilEdit    `json:"edits"`
+	Horizon   *string              `json:"horizon,omitempty"`
 }
 
 func (request *twoPageSoilRequest) UnmarshalJSON(data []byte) error {
-	properties, err := sourceChildJSONObject(data, "two-page soil request", []string{"requestId", "original", "edits"}, nil)
+	properties, err := sourceChildJSONObject(data, "two-page soil request", []string{"requestId", "original", "edits"}, []string{"horizon"})
 	if err != nil {
 		return err
 	}
 	if err := sourceChildJSONNonNull(properties, "two-page soil request", "requestId", "original", "edits"); err != nil {
 		return err
+	}
+	if _, present := properties["horizon"]; present {
+		if err := sourceChildJSONNonNull(properties, "soil creation request", "horizon"); err != nil {
+			return err
+		}
 	}
 	original, err := sourceChildJSONObject(properties["original"], "two-page soil original",
 		[]string{"contextId", "project", "plot", "form", "recordSource", "table", "records"}, nil)
@@ -61,7 +67,7 @@ func (request *twoPageSoilRequest) UnmarshalJSON(data []byte) error {
 	if !siviDeletionUUID.MatchString(decoded.RequestID) {
 		return errors.New("two-page soil request requires a stable lowercase UUIDv4")
 	}
-	if _, err := planTwoPageSoilEdits(context.Background(), decoded.Original, decoded.Edits); err != nil {
+	if err := validateTwoPageSoilRequestPlan(context.Background(), twoPageSoilRequest(decoded)); err != nil {
 		return err
 	}
 	*request = twoPageSoilRequest(decoded)
@@ -75,6 +81,7 @@ type twoPageSoilHistory struct {
 	AuditStrength int
 	EditWhen      string
 	Audits        []AuditEntry
+	CreatedRowID  *string `json:"CreatedRowID,omitempty"`
 }
 
 type twoPageSoilWriteResult struct {
@@ -101,6 +108,16 @@ func twoPageSoilPlannedTable(original ProjectMetadataTable, assignments []twoPag
 }
 
 func validateTwoPageSoilHistory(ctx context.Context, history twoPageSoilHistory) error {
+	if history.Request.Horizon != nil {
+		ordinary, err := twoPageSoilCreationEditHistory(ctx, history)
+		if err != nil {
+			return err
+		}
+		return validateTwoPageSoilHistory(ctx, ordinary)
+	}
+	if history.CreatedRowID != nil {
+		return errors.New("existing-row soil history cannot contain creation authority")
+	}
 	plan, err := planTwoPageSoilEdits(ctx, history.Request.Original, history.Request.Edits)
 	if err != nil || len(plan) == 0 || !siviDeletionUUID.MatchString(history.Request.RequestID) {
 		return errors.Join(err, errors.New("two-page soil history requires a complete changed source plan"))
@@ -186,9 +203,15 @@ func readTwoPageSoilReceipt(ctx context.Context, request twoPageSoilRequest, tab
 		}
 		seen[*id.Text] = true
 		raw := []byte(*proposal.Text)
-		if _, err := sourceChildJSONObject(raw, "two-page soil history",
-			[]string{"Request", "Committed", "Actor", "AuditStrength", "EditWhen", "Audits"}, nil); err != nil {
+		properties, err := sourceChildJSONObject(raw, "two-page soil history",
+			[]string{"Request", "Committed", "Actor", "AuditStrength", "EditWhen", "Audits"}, []string{"CreatedRowID"})
+		if err != nil {
 			return nil, err
+		}
+		if _, present := properties["CreatedRowID"]; present {
+			if err := sourceChildJSONNonNull(properties, "soil creation history", "CreatedRowID"); err != nil {
+				return nil, err
+			}
 		}
 		var history twoPageSoilHistory
 		if err := json.Unmarshal(raw, &history); err != nil {
@@ -278,7 +301,7 @@ func detachTwoPageSoilRequest(ctx context.Context, service *ContextService, requ
 	if !siviDeletionUUID.MatchString(request.RequestID) {
 		return twoPageSoilRequest{}, errors.New("two-page soil request requires a stable lowercase UUIDv4")
 	}
-	if _, err := planTwoPageSoilEdits(ctx, request.Original, request.Edits); err != nil {
+	if err := validateTwoPageSoilRequestPlan(ctx, request); err != nil {
 		return twoPageSoilRequest{}, err
 	}
 	for _, column := range request.Original.Records.Columns {
@@ -401,7 +424,16 @@ func (s *ContextService) writeTwoPageSoilObserved(ctx context.Context, contextID
 			if err != nil || !reflect.DeepEqual(fresh, original.Records) {
 				return errors.Join(err, errors.New("two-page soil complete original/schema changed; cancel and reload"))
 			}
-			plan, err := planTwoPageSoilEdits(ctx, original, request.Edits)
+			edits := request.Edits
+			var creation *twoPageSoilCreationPreparation
+			if request.Horizon != nil {
+				creation, err = prepareTwoPageSoilCreation(ctx, tx, request, before)
+				if err != nil {
+					return err
+				}
+				before, original, soil, edits = creation.Baseline, creation.Original, creation.Soil, creation.Edits
+			}
+			plan, err := planTwoPageSoilEdits(ctx, original, edits)
 			if err != nil || len(plan) == 0 {
 				return errors.Join(err, errors.New("two-page soil mutation requires a nonempty changed source plan"))
 			}
@@ -412,6 +444,9 @@ func (s *ContextService) writeTwoPageSoilObserved(ctx context.Context, contextID
 			history := twoPageSoilHistory{Request: request, Committed: twoPageSoilPlannedTable(original.Records, plan),
 				Actor: plots.currentUser, AuditStrength: plots.auditStrength,
 				EditWhen: time.Now().Format("2006-01-02 15:04:05"), Audits: []AuditEntry{}}
+			if creation != nil {
+				history.CreatedRowID = &creation.RowID
+			}
 			kind := "Humus"
 			if original.Form == "SoilMineralXL" {
 				kind = "Mineral"
@@ -462,6 +497,9 @@ func (s *ContextService) writeTwoPageSoilObserved(ctx context.Context, contextID
 				return err
 			}
 			expected := map[string]ProjectMetadataTable{original.Table: twoPageSoilPlannedTable(soil, plan), original.Project + "_Audit": auditPlan}
+			if creation != nil {
+				expected[siviIdentityLedger] = creation.Ledger
+			}
 			after, err := environmentSiteUnitTables(ctx, tx)
 			if err != nil {
 				return err

@@ -38,6 +38,47 @@ const literal = (value: unknown): value is string =>
 export const twoPageSoilKind = (form: TwoPageSoilForm): SoilKind => form === 'SoilHumusXL' ? 'Humus' : 'Mineral';
 const nullCell = (): ProjectMetadataCell => ({ storage: 'null', text: null, integer: null, real: null, blobHex: null });
 
+function soilCreationColumns(original: TwoPageSoilOriginal, horizon: string): Map<string, number> {
+  if (!horizon || !wellFormedUTF16(horizon) || horizon.length > 8 ||
+      !original.plot || !wellFormedUTF16(original.plot) || original.plot.length > 7) {
+    throw new Error('Add Horizon requires nonempty literal Horizon text within8 UTF-16 units and a parent within7; no trim or case conversion is applied.');
+  }
+  const kind = twoPageSoilKind(original.form);
+  const unbound = kind === 'Humus' ? ['Consistence', 'Character', 'Fauna'] :
+    ['MottlesAbundance', 'MottlesSize', 'MottlesContrast', 'ClayFilmsFreq', 'ClayFilmThickness', 'Effervescence', 'Porosity'];
+  const allowed = new Set(['ID', 'Flag', 'PlotNumber', ...soilFields[kind].map(field => field.column), ...unbound]);
+  if (original.records.columns.length !== allowed.size ||
+      original.records.columns.some(column => !allowed.has(column.name))) {
+    throw new Error('Add Horizon requires the complete original18/28-column source schema; unknown defaults are unavailable.');
+  }
+  return new Map(original.records.columns.map((column, index) => [column.name, index]));
+}
+
+export function twoPageSoilCreationRequest(original: TwoPageSoilOriginal, owner: TwoPageSoilOwner,
+  horizon: string, requestId: string): TwoPageSoilRequest {
+  const detached = twoPageSoilOriginalFromWire(original, owner);
+  soilCreationColumns(detached, horizon);
+  if (!validSIVIRequestId(requestId)) throw new Error('Add Horizon requires a fresh stable lowercase UUIDv4.');
+  return { requestId, original: detached, edits: [], horizon };
+}
+
+export function validateTwoPageSoilHorizonDraft(original: TwoPageSoilOriginal, horizon: string): void {
+  soilCreationColumns(original, horizon);
+}
+
+export function twoPageSoilCreationDefaults(original: TwoPageSoilOriginal, horizon: string, id: string): ProjectMetadataCell[] {
+  const columns = soilCreationColumns(original, horizon);
+  if (!exactSigned64(id) || BigInt(id) < -2147483648n || BigInt(id) > 2147483647n ||
+      original.records.rows.some(row => identityMatches(row.cells[columns.get('ID')!], id))) {
+    throw new Error('Add Horizon receipt requires a distinct exact allocated signed32 identity.');
+  }
+  return original.records.columns.map(column => column.name === 'ID'
+    ? { ...nullCell(), storage: 'integer', integer: id }
+    : column.name === 'Flag' ? { ...nullCell(), storage: 'integer', integer: '0' }
+      : column.name === 'PlotNumber' ? { ...nullCell(), storage: 'text', text: original.plot }
+        : column.name === 'Horizon' ? { ...nullCell(), storage: 'text', text: horizon } : nullCell());
+}
+
 export function twoPageSoilOriginalFromWire(wire: unknown, owner: TwoPageSoilOwner): TwoPageSoilOriginal {
   if (!record(wire) || !keys(wire, ['contextId', 'project', 'plot', 'form', 'recordSource', 'table', 'records']) ||
       !literal(owner.contextId) || !literal(owner.project) || !literal(owner.plot) ||

@@ -5,6 +5,7 @@ import { wellFormedUTF16 } from './qualityEditor';
 
 export const twoPageSoilReviewEnabled = import.meta.env.VITE_TWO_PAGE_SOIL_REVIEW === 'true';
 export const twoPageSoilWritingEnabled = twoPageSoilReviewEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_WRITING === 'true';
+export const twoPageSoilCreationEnabled = twoPageSoilWritingEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_CREATION === 'true';
 const sessions = new Map<string, { owner: TwoPageSoilOwner; session: TwoPageSoilSession; unsubscribe: () => void }>();
 const observers = new Set<(activity: TwoPageSoilActivity) => void>();
 export interface TwoPageSoilActivity {
@@ -43,8 +44,9 @@ export function twoPageSoilSession(owner: TwoPageSoilOwner): TwoPageSoilSession 
   const session = new TwoPageSoilSession(retainedOwner, {
     read: () => TwoPageSoilService.GetOriginal(contextId, plot, form),
     save: request => TwoPageSoilService.Save(contextId, request),
+    create: request => TwoPageSoilService.CreateHorizon(contextId, request),
     outcome: request => TwoPageSoilService.RecoverOutcome(contextId, request),
-  }, twoPageSoilWritingEnabled);
+  }, twoPageSoilWritingEnabled, twoPageSoilCreationEnabled);
   let initialized = false;
   const unsubscribe = session.subscribe(() => { if (initialized) changed(); });
   sessions.set(key, { owner: retainedOwner, session, unsubscribe });

@@ -110,6 +110,36 @@ test('source-bound soil presentation contains each of the12/18 editable bindings
   }
 });
 
+test('enabled creation renders one labelled retained input and explicit action in both compiled source panels', async () => {
+  const cases = require('./twoPageSoilCreationWire.json');
+  for (const entry of [cases[0], cases[4]]) {
+    const { contextId, project, plot, form } = entry.request.original;
+    const owner = { contextId, project, plot, form };
+    const session = new TwoPageSoilSession(owner, {
+      read: () => operation(entry.request.original), save: () => { throw new Error('unexpected ordinary Save'); },
+      create: () => { throw new Error('render cannot dispatch creation'); },
+      outcome: () => { throw new Error('unexpected recovery'); },
+    }, true, true);
+    await session.load(); session.beginCreation(); session.stageCreation('123456789');
+    let called = false;
+    const deps = { ...dependencies(session), './twoPageSoilSessions': {
+      twoPageSoilWritingEnabled: true, twoPageSoilCreationEnabled: true,
+      twoPageSoilSession: observed => { assert.deepEqual(structuredClone(observed), owner); called = true; return session; },
+    } };
+    const component = serverComponent(read('TwoPageSoilPanel.svelte'), 'TwoPageSoilPanel.svelte', deps);
+    const html = render(component, { props: { ...owner, parentBlocked: false } }).body;
+    assert.equal(called, true);
+    assert.equal((html.match(/data-soil-new-horizon/g) ?? []).length, 1);
+    assert.match(html, new RegExp(`for="${form}-new-horizon"`));
+    assert.match(html, /value="123456789"/);
+    assert.match(html, /aria-invalid="true"/);
+    assert.match(html, /creation requires the separate explicit New horizon action/);
+    assert.match(html, /<button[^>]*disabled[^>]*>Create (Humus|Mineral) horizon/);
+    assert.doesNotMatch(html, /creation, deletion and restoration remain unavailable/);
+    assert.equal(session.view().creation.raw, '123456789');
+  }
+});
+
 test('NULL ID, absent Horizon and missing mapped fields stay explicit readonly physical rows', async () => {
   for (const change of [
     source => { source.records.rows[0].cells[0] = cell(); },

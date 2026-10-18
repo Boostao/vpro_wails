@@ -9,6 +9,7 @@ import (
 
 const twoPageSoilReviewEnvironment = "VPRO_TWO_PAGE_SOIL_REVIEW"
 const twoPageSoilWritingEnvironment = "VPRO_TWO_PAGE_SOIL_WRITING"
+const twoPageSoilCreationEnvironment = "VPRO_TWO_PAGE_SOIL_CREATION"
 
 type TwoPageSoilOriginal = twoPageSoilOriginal
 type TwoPageSoilWriteResult = twoPageSoilWriteResult
@@ -18,6 +19,7 @@ type TwoPageSoilReferences = twoPageSoilReferences
 type TwoPageSoilService struct {
 	contexts        *ContextService
 	review, writing bool
+	creation        bool
 }
 
 func NewTwoPageSoilService(contexts *ContextService, lookup func(string) (string, bool)) (*TwoPageSoilService, error) {
@@ -32,7 +34,11 @@ func NewTwoPageSoilService(contexts *ContextService, lookup func(string) (string
 	if err != nil {
 		return nil, err
 	}
-	return &TwoPageSoilService{contexts: contexts, review: review, writing: writing}, nil
+	creation, err := siviFeature(twoPageSoilCreationEnvironment, lookup)
+	if err != nil {
+		return nil, err
+	}
+	return &TwoPageSoilService{contexts: contexts, review: review, writing: writing, creation: creation}, nil
 }
 
 func (s *TwoPageSoilService) require(ctx context.Context, writing bool) error {
@@ -71,12 +77,27 @@ func (s *TwoPageSoilService) Save(ctx context.Context, contextID, requestJSON st
 
 func (s *TwoPageSoilService) saveTwoPageSoilObserved(ctx context.Context, contextID, requestJSON string,
 	beforeCommit func(*sql.Tx) error, afterCommit func(*twoPageSoilWriteResult) error) (*TwoPageSoilWriteResult, error) {
+	return s.dispatchTwoPageSoilObserved(ctx, contextID, requestJSON, false, beforeCommit, afterCommit)
+}
+
+func (s *TwoPageSoilService) CreateHorizon(ctx context.Context, contextID, requestJSON string) (*TwoPageSoilWriteResult, error) {
+	return s.dispatchTwoPageSoilObserved(ctx, contextID, requestJSON, true, nil, nil)
+}
+
+func (s *TwoPageSoilService) dispatchTwoPageSoilObserved(ctx context.Context, contextID, requestJSON string, creation bool,
+	beforeCommit func(*sql.Tx) error, afterCommit func(*twoPageSoilWriteResult) error) (*TwoPageSoilWriteResult, error) {
 	if err := s.require(ctx, true); err != nil {
 		return nil, err
+	}
+	if creation && !s.creation {
+		return nil, errors.New("soil horizon creation requires independently enabled creation review")
 	}
 	var request twoPageSoilRequest
 	if err := json.Unmarshal([]byte(requestJSON), &request); err != nil {
 		return nil, err
+	}
+	if creation != (request.Horizon != nil) {
+		return nil, errors.New("soil horizon creation requires its explicit action; ordinary Save cannot create records")
 	}
 	started, err := s.contexts.beginTwoPageSoilAttempt(ctx, request)
 	if err != nil {

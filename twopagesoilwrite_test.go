@@ -450,7 +450,7 @@ func TestTwoPageSoilWriteRefusesAffinityNormalization(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	request := twoPageSoilRequest{soilWriteUUID, original, []twoPageSoilEdit{soilPlanEdit(original, "UpperDepth", siviReal(5))}}
+	request := twoPageSoilRequest{RequestID: soilWriteUUID, Original: original, Edits: []twoPageSoilEdit{soilPlanEdit(original, "UpperDepth", siviReal(5))}}
 	before := databaseBytes(t, service.projects.sqlite.attachments)
 	if receipt, err := service.writeTwoPageSoil(context.Background(), state.ContextID, request); err == nil || receipt != nil ||
 		!strings.Contains(err.Error(), "transaction differs from its complete plan") {

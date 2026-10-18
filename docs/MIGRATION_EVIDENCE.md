@@ -6,6 +6,40 @@ private Access copies, native binaries, closed project data, screenshots and
 WebView profiles are deliberately retained outside Git. A hash identifies a
 receipt but does not independently reproduce its native run.
 
+## Explicit linked-soil horizon creation
+
+The [creation contract](FS882-two-page-access-contract.md#explicit-linked-soil-creation-candidate)
+extends the existing soil writer/session rather than adding an editor family.
+Coupled soil/SIVI identity/creation race tests pass376.776s;65 related client
+cases, actual-Go wire fixtures for both forms/all audit strengths, real client
+proxies, consumed compiled-panel checks, check0/0, vet and production builds pass.
+Distinct full-feature read-only review reports no significant issues.
+
+Disposable Wails acceptance reopens five complete18/28-cell creations across
+normal/CHARS, five exact source audits and unchanged old rows. It verifies
+reserved IDs, complete typed history, two held-response recoveries without
+replay, invalid-draft barriers, remounted acknowledged receipts, three independent
+backend denials and six panel/width observations at1400/600/320. A fresh
+CancelClose response precedes held-operation release; earlier warning text is
+not treated as a new acknowledgement. All four profiles close normally.
+Private native receipt SHA256:
+`911d7c02b1ac08354127278496b9f18ae8538d18315c06e0d3072ea124dcf878`.
+
+Full `go test -race -count=1 -timeout 150m ./...` passes exit0 in5003.344s,
+ending UTC2026-10-18T12:10:58.570689. It preserves1930 managed inputs,
+3873 protected artifacts,49 canonical inputs,21 protected assets, sixteen
+closed native families and exact package/embed discovery. Private
+`two-page-soil-creation-integration/receipt.json` SHA256:
+`5d7670609bb683ff6f2db175cd1aa083f7a28d6297dfd52d95d1a9d9e75984b7`.
+Only acceptance-status documentation changes after that freeze.
+
+Pre-mutation receipt/tab assumptions and the earlier text-only close witness
+remain preserved, not accepted as substitute execution. Candidate generated
+assets are retained separately; all protected baseline assets are restored and
+verified byte-exact. Source callback timing, implicit new buffers, random
+allocator equivalence, deletion/restoration, whole-form parity and default/demo
+promotion are not granted.
+
 ## Summary inspection workbook
 
 The independently default-off [inspection workflow](LONG_VEGETATION_WORKBOOK_CONTRACT.md#default-off-accepted-inspection-workbook)

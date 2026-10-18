@@ -9,6 +9,10 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function CreateHorizon(contextID: string, requestJSON: string): $CancellablePromise<$models.TwoPageSoilWriteResult | null> {
+    return $Call.ByID(3652079466, contextID, requestJSON);
+}
+
 export function GetOriginal(contextID: string, plot: string, form: string): $CancellablePromise<$models.TwoPageSoilOriginal | null> {
     return $Call.ByID(2402207750, contextID, plot, form);
 }

@@ -762,74 +762,37 @@ remain unfinished.
 The normal source's duplicate
 age binding is preserved rather than silently replaced with a height binding.
 
-Two-page linked soil editing is still unavailable. The
-[private Humus/Mineral prerequisites](docs/FS882-two-page-access-contract.md#linked-soil-physical-read-prerequisite)
-now include a reviewed complete tagged physical reader and existing-row planner
-for all30 visible soil data bindings. The separately contracted atomic
-stable-request writer passes coupled Go race/vet/production checks and independent
-review. Independently default-off review/writing services and actual-main
-interface bindings are also reviewed. Typed client drafts and the shared
-strict-Go wire pass1009 frontend tests, check/build and focused validation.
-Independent review's numeric-peer collision finding is closed with shared
-Go/client witnesses. These private boundaries do not enable the child host, replace
-ordinary editor guards or establish source ordering/focus and whole-form parity.
-Retained mutation sessions and complete typed receipt validation are reviewed;
-unknown requests cannot be discarded or replayed on missing history.
-The independently gated persistent registry and aggregate lifecycle activity are
-also reviewed;1029 frontend tests/check and isolated build pass. Experimental
-linked-soil panels and parent/root ownership barriers pass1041 frontend tests,
-check/private builds and independent review. Actual Wails lifecycle acceptance
-remains outstanding. Exact numeric/NULL depth direction and existing-record
-Enter are implemented as scoped explicit-Save adaptations;1047 frontend cases,
-check/private builds and independent corrected review pass. Native proof remains
-pending.
-The experimental complete-entry soil profile now separates physical review
-from legacy numeric-ID soil readers: ordinary soil rows/actions/counts explicitly
-remain unavailable rather than blocking historical NULL-ID rows or reporting
-zero layers. Both soil and complete-entry review flags are required; default
-legacy behavior and unrelated read errors are preserved. This frontend-only
-adaptation passes1051 frontend tests/check/private builds and independent review.
-Two normally closed disposable Wails read owners prove preserved default
-refusal and enabled all30-field/NULL-ID read-only reachability, with owned and
-protected identities unchanged. Responsive layout and mutation/lifecycle
-acceptance remain outstanding; no default editing or whole-form grant follows.
-Further native layout/nonchunked mutation/recovery cases pass, but a large
-Mineral request exposed a self-locking final SQLite scope read. Both failed
-requests were certified no-commit and all disposable owners closed/restored.
-A transaction-local scope correction passes focused race tests; external SU
-WAL membership stays unavailable without through-commit read reservations.
-Independent exact-five-file review reports no significant issues; shared
-journal-mode/scope race checks and production/vet pass. Fresh690-input full
-integration passes with unchanged inputs/discovery. A distinct corrected Wails
-candidate passes one actual chunked Mineral Memo commit with one source audit
-and complete typed history, held-response cancellation/native-close refusal,
-read-only recovery without replay and retained receipt acknowledgement. The
-fifth owner closes normally; the committed DB is retained and all16 identities/
-protected originals restored. This accepts the bounded existing-row soil host,
-not default editing, source combo lists, create/delete/restore or whole-form parity.
-The next source-choice candidate implements independently default-off readonly
-references, strict tagged Go/client transport and individually distinguishable
-choice/metadata disclosures. Choosing observes the current physical row/form/
-definition before existing draft validation, with no implicit Save or new
-membership/coercion rules. Independent review,1058 frontend tests/check/private
-builds and focused Go/production/vet pass. The695-input full race passes with
-unchanged inputs/discovery. A sixth actual-main Wails owner accepts six normal/
-CHARS layouts at1400/600/320, duplicate NULL/empty/BOOLEAN source metadata,
-typed staging, invalid Save/disposal/native-close guards and correction/Undo.
-Held-read cancellation/actual parent remount refuses stale definitions; malformed
-fixture UTF8 fails completely and correction/retry succeeds. One planned
-two-field choice Save commits exact TEXT/INTEGER cells, two strength3 source
-audits and complete durable history; read-only recovery and acknowledged
-receipt remount prove zero replay. Normal close restores all16 identities and
-protected sources; committed evidence is retained/sealed with a fresh profile,
-leaving preceding sealed files unchanged. Mixed-storage calibration,
-create/delete/restore and whole-form/default editing remain unavailable.
-Server-owned attempt sealing now provides reviewed no-commit certification
-without inferring it from cancelled promises or absent history; late matching
-UUIDs cannot mutate after certification. Coupled soil/SQLite races and1033
-frontend tests/check/isolated build pass; the frozen687-input full integration
-race passes with unchanged inputs and package/embed discovery. This freeze
-does not cover the newly built candidate UI's native acceptance.
+Two-page [linked Humus/Mineral review](docs/FS882-two-page-access-contract.md#linked-soil-physical-read-prerequisite)
+supports all30 visible data bindings in the independently enabled experimental
+complete-entry profile. Existing-row editing, source-choice disclosures,
+responsive layouts and retained mutation/recovery sessions have bounded
+independent review, native verification and full-race acceptance. Physical
+NULL-ID rows remain visible without invented numeric IDs or zero layer counts;
+legacy numeric-ID soil actions/counts are unavailable in this profile.
+
+Save is explicit. Source choices preserve duplicate definitions and NULL/empty
+metadata, stage through ordinary field validation and never imply membership
+or Save. Existing-record Enter and stable depth-order ties are desktop
+adaptations. Historical nonnumeric depth values retain physical order with an
+explicit diagnostic. Exact immutable requests, read-only recovery and sealed
+no-commit outcomes prevent lost or repeated mutations; drafts/errors and
+acknowledged receipts survive remounts. Parent, navigation, Lock and native-close
+barriers retain ownership. Ordinary default editor behavior is unchanged.
+
+The new [explicit horizon creation candidate](docs/FS882-two-page-access-contract.md#explicit-linked-soil-creation-candidate)
+adds separate New/Create Horizon actions, complete NULL/False defaults and
+permanent server-owned positive ID reservations. It is independently gated by
+`VPRO_TWO_PAGE_SOIL_CREATION` and `VITE_TWO_PAGE_SOIL_CREATION`, in addition to
+soil review/writing and the complete-entry host prerequisites. Coupled races,
+strict actual-Go/client wire tests, frontend check/build, production compilation
+and independent review pass. Disposable Wails verification accepts five exact
+creations across normal/CHARS, retained receipts, held-response read-only
+recovery, fresh native-close cancellation acknowledgement and three independent
+backend denials. Full-root race integration passes5003.344s with1930 managed
+inputs,3873 protected artifacts,49 canonical inputs,21 assets and16 closed
+native families unchanged. No default/demo grant,
+linked-soil deletion/restoration, original implicit-new-buffer/callback timing,
+Access random allocator equivalence or whole-form parity is claimed.
 
 The current default-off complete-source presentation in
 [twoPageEntryProjection.ts](frontend/src/twoPageEntryProjection.ts) accounts for

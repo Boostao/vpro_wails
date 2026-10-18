@@ -3424,6 +3424,7 @@ export interface twoPageSoilHistory {
     "AuditStrength": number;
     "EditWhen": string;
     "Audits": AuditEntry[] | null;
+    "CreatedRowID"?: string | null;
 }
 
 export interface twoPageSoilOriginal {
@@ -3455,6 +3456,7 @@ export interface twoPageSoilRequest {
     "requestId": string;
     "original": twoPageSoilOriginal | null;
     "edits": twoPageSoilEdit[] | null;
+    "horizon"?: string | null;
 }
 
 export interface twoPageSoilWriteResult {

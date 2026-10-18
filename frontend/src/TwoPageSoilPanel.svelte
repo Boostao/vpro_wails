@@ -3,7 +3,7 @@
   import { TwoPageSoilService, type ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
   import SoilReferenceChoices from './SoilReferenceChoices.svelte';
   import { SoilReferenceLookup, type SoilReferenceView } from './twoPageSoilReferences';
-  import { twoPageSoilSession, twoPageSoilWritingEnabled } from './twoPageSoilSessions';
+  import { twoPageSoilSession, twoPageSoilWritingEnabled, twoPageSoilCreationEnabled } from './twoPageSoilSessions';
   import { twoPageSoilKind, type TwoPageSoilForm } from './twoPageSoilEditor';
   import { equalCell, metadataCellText } from './projectMetadataEditor';
   import { soilFields } from './soilChildEditor';
@@ -38,7 +38,7 @@
   const row = $derived(depthOrder?.rows.find(row => row.rowId === selected) ?? depthOrder?.rows[0]);
   const diagnostic = $derived(view.original && row ? twoPageSoilRowDiagnostic(view.original, row.rowId) : null);
   const fieldsDisabled = $derived(parentBlocked || !twoPageSoilWritingEnabled || view.busy || referenceView.busy ||
-    view.blocked || view.acknowledgementRequired || !!diagnostic);
+    view.blocked || view.acknowledgementRequired || !!diagnostic || !!view.creation);
 
   async function focusHorizon(plannedRow = row?.rowId, owned = session): Promise<boolean> {
     await tick();
@@ -58,6 +58,40 @@
       selected = rowId;
       await focusHorizon(rowId);
     } catch (cause) { error = `Soil selection/focus refused without mutation: ${String(cause)}`; }
+  }
+  function beginCreation() {
+    try {
+      if (parentBlocked || referenceView.busy) throw new Error('Resolve parent/source-choice operations before Add Horizon.');
+      session.beginCreation(); error = null;
+    } catch (cause) { error = `Add Horizon refused without mutation: ${String(cause)}`; }
+  }
+  function stageCreation(raw: string) {
+    try {
+      if (parentBlocked || referenceView.busy) throw new Error('Resolve parent/source-choice operations before staging a new Horizon.');
+      session.stageCreation(raw); error = null;
+    } catch (cause) { error = `New Horizon draft refused: ${String(cause)}`; }
+  }
+  async function createHorizon() {
+    const owned = session;
+    try {
+      if (parentBlocked || referenceView.busy || !panel || panel.dataset.twoPageSoilPanel !== form) {
+        throw new Error('Observed creation owner is unavailable.');
+      }
+      const input = panel.querySelector<HTMLInputElement>('[data-soil-new-horizon]');
+      if (!input || input.disabled || !input.checkVisibility() || input.value !== view.creation?.raw) {
+        throw new Error('Observed new Horizon differs from its retained literal draft.');
+      }
+      error = null;
+      const ok = await owned.create(crypto.randomUUID());
+      if (owned !== session) return;
+      if (!ok) error = owned.view().error;
+      else {
+        const receipt = owned.view().receipts.at(-1);
+        if (receipt?.history.CreatedRowID) selected = receipt.history.CreatedRowID;
+      }
+    } catch (cause) {
+      if (owned === session) error = `Explicit Horizon creation refused; retained state preserved: ${String(cause)}`;
+    }
   }
   async function enterRecord(event: KeyboardEvent, column: string) {
     if (event.key !== 'Enter' || event.defaultPrevented || event.isComposing || event.repeat ||
@@ -157,11 +191,30 @@
     <button type="button" disabled={parentBlocked || view.busy || referenceView.busy || view.blocked || view.acknowledgementRequired}
       onclick={loadReferences}>{referenceView.error ? 'Retry' : 'Load'} source soil choices</button>
     {#if referenceView.busy}<button type="button" onclick={() => referenceLookup?.cancel()}>Cancel source soil choices</button>{/if}
-    <button type="button" disabled={view.busy || view.blocked || view.acknowledgementRequired || !Object.keys(view.drafts).length} onclick={() => operation('undo')}>Undo soil drafts</button>
+    {#if twoPageSoilCreationEnabled}
+      <button type="button" disabled={parentBlocked || referenceView.busy || view.busy || close.unsaved || close.blocked || !view.original}
+        onclick={beginCreation}>New {twoPageSoilKind(form)} horizon</button>
+    {/if}
+    <button type="button" disabled={view.busy || view.blocked || view.acknowledgementRequired || !Object.keys(view.drafts).length && !view.creation} onclick={() => operation('undo')}>Undo soil drafts</button>
     {#if view.busy}<button type="button" onclick={() => operation('cancel')}>Cancel soil operation</button>{/if}
     {#if view.blocked}<button type="button" disabled={view.busy} onclick={() => operation('recover')}>Recover soil outcome (read only)</button>{/if}
     {#if view.acknowledgementRequired}<button type="button" disabled={view.busy} onclick={() => operation('acknowledge')}>Acknowledge committed soil receipt</button>{/if}
   </div>
+  {#if view.creation}
+    <fieldset class="min-w-0 space-y-2 rounded border p-3">
+      <legend class="font-semibold">New {twoPageSoilKind(form)} horizon for {plot}</legend>
+      <label class="block text-sm font-medium" for={`${form}-new-horizon`}>New Horizon</label>
+      <input id={`${form}-new-horizon`} data-soil-new-horizon type="text" class="w-full min-w-0 rounded border p-2"
+        value={view.creation.raw} aria-invalid={!!view.creation.error}
+        disabled={parentBlocked || referenceView.busy || view.busy || view.blocked || view.acknowledgementRequired}
+        oninput={event => stageCreation(event.currentTarget.value)} />
+      {#if view.creation.error}<p role="alert" class="break-words text-red-700">{view.creation.error}</p>{/if}
+      <button type="button" disabled={parentBlocked || referenceView.busy || view.busy || view.blocked || view.acknowledgementRequired || !!view.creation.error}
+        onclick={createHorizon}>Create {twoPageSoilKind(form)} horizon</button>
+      <p class="break-words text-sm">Explicit creation only: the server allocates a reserved ID, Flag starts False, and other fields start NULL.
+        Ordinary Save and Enter do not create a record. After creation, acknowledge its retained receipt before editing the new row.</p>
+    </fieldset>
+  {/if}
   {#if view.original}
     {#if depthOrder?.diagnostic}<p role="alert">{depthOrder.diagnostic}</p>
     {:else}<p role="status">Depth Up {form === 'SoilHumusXL' ? 'descending (NULL last)' : 'ascending (NULL first)'}. Ties retain physical reader order.</p>{/if}
@@ -173,7 +226,7 @@
           Depth Up {view.original.records.columns.some(column => column.name === 'UpperDepth') ? twoPageSoilStoredText(view.original, physical.rowId, 'UpperDepth') : '(source column unavailable)'};
           ID {twoPageSoilStoredText(view.original, physical.rowId, 'ID')}; physical row {physical.rowId}
         </button>
-      {:else}<p role="status">No physical soil records for this exact parent. Creation is unavailable.</p>{/each}
+      {:else}<p role="status">No physical soil records for this exact parent.{twoPageSoilCreationEnabled ? ' Use the explicit New horizon action.' : ' Creation is unavailable.'}</p>{/each}
     </div>
     {#if row}
       <p class="break-words text-sm">Application ID {twoPageSoilStoredText(view.original, row.rowId, 'ID')}; physical row {row.rowId}; parent {plot}</p>
@@ -226,5 +279,5 @@
     <p role="alert">Physical row {draft.rowId}, {draft.column}: {draft.error}. Select that row to correct it or Undo.</p>
   {/each}
   {#if view.receipts.length}<p role="status">{view.receipts.length} immutable committed soil receipt(s) retained across remounts.</p>{/if}
-  <p class="text-xs text-gray-600">Existing-row experimental review only. Numeric/NULL depth direction follows the source form; stable ties and historical nonnumeric physical order are explicit desktop adaptations. Enter moves to the next existing record's Horizon without Save; modifiers keep normal field behavior. Source choices use current configured definitions and stage through ordinary soil validation; creation, deletion and restoration remain unavailable. NULL is explicit; typing replaces NULL without completing or trimming text. Save is explicit and never dispatched by changing rows or choosing a definition.</p>
+  <p class="text-xs text-gray-600">Experimental linked-soil review. Numeric/NULL depth direction follows the source form; stable ties and historical nonnumeric physical order are explicit desktop adaptations. Enter moves to the next existing record's Horizon without Save; modifiers keep normal field behavior. Source choices use current configured definitions and stage through ordinary soil validation; {twoPageSoilCreationEnabled ? 'creation requires the separate explicit New horizon action; deletion and restoration remain unavailable.' : 'creation, deletion and restoration remain unavailable.'} NULL is explicit; typing replaces NULL without completing or trimming text. Save is explicit and never dispatched by changing rows or choosing a definition.</p>
 </section>

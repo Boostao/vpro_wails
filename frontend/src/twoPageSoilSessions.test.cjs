@@ -54,6 +54,39 @@ test('default and writing-only cannot grant review; read-only cannot stage or di
   assert.equal(api.releaseTwoPageSoilSession(owner), true);
 });
 
+test('independent creation profile retains drafts and dispatches only its exact owner/action across remounts', async () => {
+  const entry = structuredClone(require('./twoPageSoilCreationWire.json')[0]);
+  const { contextId, project, plot, form } = entry.request.original;
+  const creationOwner = { contextId, project, plot, form };
+  for (const environment of [enabled, { VITE_TWO_PAGE_SOIL_CREATION: 'true' },
+    { VITE_TWO_PAGE_SOIL_REVIEW: 'true', VITE_TWO_PAGE_SOIL_CREATION: 'true' },
+    { VITE_TWO_PAGE_SOIL_WRITING: 'true', VITE_TWO_PAGE_SOIL_CREATION: 'true' }]) {
+    assert.equal(registry(environment).twoPageSoilCreationEnabled, false);
+  }
+  const creates = [];
+  const api = registry({ ...enabled, VITE_TWO_PAGE_SOIL_CREATION: 'true' }, {
+    GetOriginal: () => Promise.resolve(entry.request.original),
+    CreateHorizon: (...args) => { creates.push(args); return Promise.resolve(entry.receipt); },
+  });
+  assert.equal(api.twoPageSoilCreationEnabled, true);
+  const session = api.twoPageSoilSession(creationOwner);
+  await session.load(); session.beginCreation(); session.stageCreation('123456789');
+  assert.equal(api.twoPageSoilActivity().blocked, true);
+  assert.throws(() => api.releaseTwoPageSoilSession(creationOwner));
+  assert.equal(api.twoPageSoilSession({ ...creationOwner }), session);
+  assert.equal(api.twoPageSoilSession(creationOwner).view().creation.raw, '123456789');
+  session.stageCreation(' Oh ');
+  assert.equal(await session.create(entry.request.requestId), true);
+  assert.equal(creates.length, 1);
+  assert.equal(creates[0][0], contextId);
+  assert.deepEqual(JSON.parse(creates[0][1]), entry.request);
+  assert.equal(api.twoPageSoilActivity().blocked, true);
+  session.acknowledge();
+  assert.equal(api.twoPageSoilActivity().blocked, false);
+  assert.equal(api.releaseTwoPageSoilSession(creationOwner), false);
+  assert.equal(api.twoPageSoilSession(creationOwner).view().receipts.length, 1);
+});
+
 test('literal owner keys distinguish contexts/projects/parents/forms without trimming or delimiter collisions', () => {
   const api = registry(enabled);
   const first = api.twoPageSoilSession(owner);

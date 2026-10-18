@@ -213,6 +213,14 @@ func updateSIVIPhysicalIdentity(ctx context.Context, tx *sql.Tx, project, plot s
 }
 
 func reserveSIVIIdentityPlan(ctx context.Context, tx *sql.Tx, project string, before map[string]ProjectMetadataTable, assignments []siviHeightAssignment) (map[string]ProjectMetadataTable, ProjectMetadataTable, error) {
+	cells := make([]ProjectMetadataCell, 0, len(assignments)*2)
+	for _, assignment := range assignments {
+		cells = append(cells, assignment.Before, assignment.After)
+	}
+	return reserveSourceChildIdentityPlan(ctx, tx, project, "Veg", "SIVI identity", before, cells)
+}
+
+func reserveSourceChildIdentityPlan(ctx context.Context, tx *sql.Tx, project, kind, operation string, before map[string]ProjectMetadataTable, cells []ProjectMetadataCell) (map[string]ProjectMetadataTable, ProjectMetadataTable, error) {
 	baseline := before
 	ledger, present := before[siviIdentityLedger]
 	if !present {
@@ -229,20 +237,18 @@ func reserveSIVIIdentityPlan(ctx context.Context, tx *sql.Tx, project string, be
 		}
 		ledger, baseline = created[siviIdentityLedger], created
 		if len(ledger.Rows) != 0 {
-			return nil, ProjectMetadataTable{}, errors.New("new SIVI identity reservation ledger is not empty")
+			return nil, ProjectMetadataTable{}, fmt.Errorf("new %s reservation ledger is not empty", operation)
 		}
 	}
 	if !reflect.DeepEqual(ledger.Columns, []ProjectMetadataColumn{{Name: "ChildTable", DeclaredType: "TEXT"}, {Name: "ID", DeclaredType: "INTEGER"}}) {
-		return nil, ProjectMetadataTable{}, errors.New("SIVI identity reservation schema differs from the existing child ledger")
+		return nil, ProjectMetadataTable{}, fmt.Errorf("%s reservation schema differs from the existing child ledger", operation)
 	}
 	expected := ProjectMetadataTable{Columns: ledger.Columns, Rows: append([]ProjectMetadataRow{}, ledger.Rows...)}
-	table := quoteHeaderIdentifier(project + "_Veg")
+	table := quoteHeaderIdentifier(project + "_" + kind)
 	ids := map[string]bool{}
-	for _, assignment := range assignments {
-		for _, cell := range []ProjectMetadataCell{assignment.Before, assignment.After} {
-			if cell.Storage == "integer" && cell.Integer != nil {
-				ids[*cell.Integer] = true
-			}
+	for _, cell := range cells {
+		if cell.Storage == "integer" && cell.Integer != nil {
+			ids[*cell.Integer] = true
 		}
 	}
 	for _, row := range ledger.Rows {
@@ -261,7 +267,7 @@ func reserveSIVIIdentityPlan(ctx context.Context, tx *sql.Tx, project string, be
 			return nil, ProjectMetadataTable{}, err
 		}
 		if count, err := inserted.RowsAffected(); err != nil || count != 1 {
-			return nil, ProjectMetadataTable{}, errors.Join(err, errors.New("SIVI identity reservation did not insert exactly one entry"))
+			return nil, ProjectMetadataTable{}, errors.Join(err, fmt.Errorf("%s reservation did not insert exactly one entry", operation))
 		}
 		rowID, err := inserted.LastInsertId()
 		if err != nil {

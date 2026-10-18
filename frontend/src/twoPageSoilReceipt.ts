@@ -7,6 +7,7 @@ import { completeMetadataCellFromWire } from './siviParentTransport';
 import { validSIVIRequestId } from './siviRequestId';
 import { soilFields } from './soilChildEditor';
 import { twoPageSoilOriginalFromWire, twoPageSoilEditableID, twoPageSoilKind, twoPageSoilRequest,
+  twoPageSoilCreationRequest, twoPageSoilCreationDefaults,
   type TwoPageSoilOwner, type TwoPageSoilOriginal } from './twoPageSoilEditor';
 
 export type TwoPageSoilRequest = ReturnType<typeof twoPageSoilRequest>;
@@ -18,6 +19,7 @@ export interface TwoPageSoilReceipt {
     AuditStrength: number;
     EditWhen: string;
     Audits: AuditEntry[];
+    CreatedRowID?: string;
   };
   didCommit: boolean;
   replayed: boolean;
@@ -53,6 +55,7 @@ function auditText(column: string, cell: ProjectMetadataCell): string | null {
 }
 export function twoPageSoilReceiptFromWire(wire: unknown, request: TwoPageSoilRequest,
   owner: TwoPageSoilOwner, recovery = false): TwoPageSoilReceipt {
+  if (request.horizon !== undefined) return soilCreationReceipt(wire, request, owner, recovery);
   const diagnostic = 'Soil receipt differs from its retained complete request/source plan; recover durable history without replay.';
   const original = twoPageSoilOriginalFromWire(request.original, owner);
   if (!validSIVIRequestId(request.requestId) || !Array.isArray(request.edits) || !request.edits.length ||
@@ -95,6 +98,48 @@ export function twoPageSoilReceiptFromWire(wire: unknown, request: TwoPageSoilRe
     seenEdits.add(key);
     confirmed.edits.push({ contextId: retained.contextId, form: retained.form, rowId: retained.rowId,
       column: retained.column, expected: { ...retained.expected }, value: { ...retained.value } });
+  }
+
+  function soilCreationReceipt(wire: unknown, request: TwoPageSoilRequest,
+    owner: TwoPageSoilOwner, recovery: boolean): TwoPageSoilReceipt {
+    const diagnostic = 'Add Horizon receipt differs from its exact complete creation plan; retain the request and recover without replay.';
+    if (typeof request.horizon !== 'string' || request.edits.length !== 0 ||
+        !record(wire) || !exact(wire, ['history', 'didCommit', 'replayed']) || !record(wire.history) ||
+        !exact(wire.history, ['Request', 'Committed', 'Actor', 'AuditStrength', 'EditWhen', 'Audits', 'CreatedRowID'])) {
+      throw new Error(diagnostic);
+    }
+    const retained = twoPageSoilCreationRequest(request.original, owner, request.horizon, request.requestId);
+    const history = wire.history;
+    if (!record(history.Request) || !exact(history.Request, ['requestId', 'original', 'edits', 'horizon']) ||
+        history.Request.requestId !== retained.requestId || history.Request.horizon !== retained.horizon ||
+        !Array.isArray(history.Request.edits) || history.Request.edits.length !== 0 ||
+        typeof history.CreatedRowID !== 'string' || !exactSigned64(history.CreatedRowID) ||
+        JSON.stringify(twoPageSoilOriginalFromWire(history.Request.original, owner)) !== JSON.stringify(retained.original)) {
+      throw new Error(diagnostic);
+    }
+    const committed = twoPageSoilOriginalFromWire({ ...retained.original, records: history.Committed }, owner).records;
+    const created = committed.rows.find(row => row.rowId === history.CreatedRowID);
+    const idIndex = retained.original.records.columns.findIndex(column => column.name === 'ID');
+    const horizonIndex = retained.original.records.columns.findIndex(column => column.name === 'Horizon');
+    if (!created || created.cells[idIndex].storage !== 'integer' || created.cells[idIndex].integer === null) throw new Error(diagnostic);
+    const cells = twoPageSoilCreationDefaults(retained.original, request.horizon, created.cells[idIndex].integer);
+    if (created.cells.some((cell, index) => !equalCell(cell, cells[index])) ||
+        retained.original.records.rows.some(row => row.rowId === created.rowId)) throw new Error(diagnostic);
+    const value = cells[horizonIndex];
+    cells[horizonIndex] = { storage: 'null', text: null, integer: null, real: null, blobHex: null };
+    const rows = [...retained.original.records.rows, { rowId: created.rowId, cells }];
+    rows.sort((a, b) => BigInt(a.rowId) < BigInt(b.rowId) ? -1 : BigInt(a.rowId) > BigInt(b.rowId) ? 1 : 0);
+    const original = { ...retained.original, records: { columns: retained.original.records.columns, rows } };
+    const editRequest: TwoPageSoilRequest = { requestId: retained.requestId, original, edits: [{
+      contextId: owner.contextId, form: owner.form, rowId: created.rowId, column: 'Horizon',
+      expected: cells[horizonIndex], value,
+    }] };
+    const checked = twoPageSoilReceiptFromWire({
+      didCommit: wire.didCommit, replayed: wire.replayed,
+      history: { Request: editRequest, Committed: committed, Actor: history.Actor,
+        AuditStrength: history.AuditStrength, EditWhen: history.EditWhen, Audits: history.Audits },
+    }, editRequest, owner, recovery);
+    return { ...checked, history: { ...checked.history, Request: retained, CreatedRowID: created.rowId } };
   }
   if (history.Request.edits.length !== request.edits.length) throw new Error(diagnostic);
   const strength = history.AuditStrength;

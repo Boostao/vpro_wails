@@ -82,6 +82,10 @@ func siviIdentityCellMatches(cell ProjectMetadataCell, id string) bool {
 }
 
 func siviIdentityReservedIDs(project string, tables map[string]ProjectMetadataTable) (map[string]bool, error) {
+	return sourceChildIdentityReservedIDs(project, "Veg", "SIVI identity", tables)
+}
+
+func sourceChildIdentityReservedIDs(project, kind, operation string, tables map[string]ProjectMetadataTable) (map[string]bool, error) {
 	reserved := map[string]bool{}
 	for _, source := range []struct{ table, ownerColumn string }{
 		{"__VPRO_ChildIdentity", "ChildTable"}, {project + "_Audit", "Table"},
@@ -97,11 +101,11 @@ func siviIdentityReservedIDs(project string, tables map[string]ProjectMetadataTa
 		for _, row := range table.Rows {
 			owner := row.Cells[columns[source.ownerColumn]]
 			if owner.Storage != "text" || owner.Text == nil {
-				return nil, errors.New("SIVI identity reservations contain unsupported table-owner storage")
+				return nil, fmt.Errorf("%s reservations contain unsupported table-owner storage", operation)
 			}
-			matches := *owner.Text == quoteHeaderIdentifier(project+"_Veg")
+			matches := *owner.Text == quoteHeaderIdentifier(project+"_"+kind)
 			if source.ownerColumn == "Table" {
-				matches = strings.EqualFold(*owner.Text, "_Veg") || strings.EqualFold(*owner.Text, project+"_Veg")
+				matches = strings.EqualFold(*owner.Text, "_"+kind) || strings.EqualFold(*owner.Text, project+"_"+kind)
 			}
 			if !matches {
 				continue
@@ -111,7 +115,7 @@ func siviIdentityReservedIDs(project string, tables map[string]ProjectMetadataTa
 				continue
 			}
 			if err := validateSIVIIdentityCell("ID", id); err != nil || id.Integer == nil {
-				return nil, errors.Join(err, errors.New("SIVI identity reservation is not an exact signed32 ID"))
+				return nil, errors.Join(err, fmt.Errorf("%s reservation is not an exact signed32 ID", operation))
 			}
 			reserved[*id.Integer] = true
 		}
