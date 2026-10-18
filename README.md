@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-saved-label.zip`, 17,565,074 bytes.
+`VPRO-Demo-2026-10-18-coordinate-kml.zip`, 17,571,483 bytes.
 
 SHA256:
-`35714f1c79ba444912d218b39fe33e9276fa75d4b19c5d2319cac4e0800235d4`.
+`3e09db767075a2f194b542ca60ade4b22e075231140aa36174b4a248ba08f6de`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-45 frontend and 41 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+49 frontend and 45 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -86,35 +86,49 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
     Export once, recover readonly if needed, then acknowledge. P2 demonstrates
     empty assignments; P3's NULL Zone explicitly refuses. Correct and review again.
     Receipts survive remount. This is not physical Print/positions/Print All.
+12. On a fresh run, load P1 complete entry, enter Latitude50.25/Longitude123.25
+    and **Save complete entry** once. Close complete-entry review, then Home.
+    Reports > **Plot location review** shows one DISTINCT row. In **Google Earth
+    location preparation**, load fields, choose literal PlotRepresenting, set
+    Place Name and review raw locations, then review/export KML to an explicit
+    new destination. This seed has two P1 SU memberships: both raw rows and both
+    placemarks are intentionally retained. Acknowledge the retained outcome.
+    Viewer launch, remote icons, saved preferences and implicit Save remain off.
 
-Source is committed `12d71f6`; production app/backend/seed/defaults are unchanged.
-One existing PDF gate extends the preceding profile, reusing its saved physical
-reader, native date/font preparation, artifact publisher and retained session.
-No application kernel, service, dependency or font payload was added.
+Source is committed `4b328ad`; production app/backend/seed/defaults are unchanged.
+Four existing Location/Google Earth/KML gates extend the preceding profile.
+No application kernel, service, dependency or seed change was added.
 
-Current native acceptance publishes one P1 PDF: five independently reopened exact
-strings, embedded Arial Regular/Bold, one612x792 Letter page and contained spans.
-P1 NULL/P2 empty assignments remain distinct; P3 NULL Zone refuses without stale
-card or repair, then P2 succeeds. Actual held review Cancel discards its late
-result after remount. Actual successful export response is held/lost, recovered
-readonly without replay, acknowledged and retained without a card after remount.
-Four fresh native-close acknowledgements precede release/cleanup.
-Labelled controls/actions/opened assignments, long hashes/destination/receipts
-are actually visible/contained980/1400. One saved backend-off reopen denies
-review/export; retired service-owner recovery explicitly stays unknown, not
-no-publication. Ordinary parent117 remains available. Both owners close; all16
-database/config files and complete physical snapshots stay exact, with zero
-source audits/writes/printer actions. All30 focused clients, launcher races,
-label races16.781s/check0/0 and isolated Vite/Go/exact26 embeds pass. Independent
-review finds no significant issues. Main PDF passes first attempt; overall
-native was not first-pass: saved-reopen cleanup omitted closing complete-entry
-review/Home. Exact files/PDF and same owner were verified, then a fresh close
-cancellation preceded established cleanup. Initial sorted-root build preflight
-failure is also preserved. No Save/export replay or new full-root race/oracle.
-Supported output is unclipped single-line printable ASCII with calibrated en-US
-dates and suitable runtime fonts. Physical printing, positions/stock/Print All,
-live-form staging callbacks, Unicode/multiline/overflow output and whole parity
-remain unavailable.
+Current native acceptance saves exactly two P1 coordinates with two audits and
+one technical history;389 historical audits, all peers/unmapped cells and the
+other15 files remain unchanged. Location has one DISTINCT row; direct Env/SU
+preparation and one KML export retain both physical memberships. Independently
+reopened UTF-8/XML/hash proves the literal title and two P1 placemarks, each
+`-123.25,50.25,0`; raw NULL description remains NULL and renders as a period.
+Actual held-review Cancel/remount rejects its late result. Actual successful
+publication is held/released once; acknowledgement/remount retains the receipt
+without XML. Four fresh native-close acknowledgements precede release/ack.
+Controls/actions/all report cells/long receipts are visible/contained980/1400.
+Four saved reopens disable one runtime gate each: six backend denials,
+independent KML reads and ordinary117/saved coordinates remain available.
+All five owners close;16 saved files and complete physical peers stay exact.
+All62 focused clients, launcher races, coupled Go races137.302s/check0/0 and
+isolated Vite/Go/exact26 embeds pass; independent review finds no material issues.
+Native was not first-pass: missing harness `ast` before UI actions, then an
+incorrect one-row raw expectation. Both same-owner corrections are preserved;
+no Save/export replay or application repair. No new full-root race/oracle,
+formal KML schema/viewer, DMS/single-plot callbacks or complete-parity claim.
+This KML service does not have the PDF service's readonly recovery API.
+
+The immutable45/41 saved-label predecessor remains unchanged, SHA256
+`35714f1c79ba444912d218b39fe33e9276fa75d4b19c5d2319cac4e0800235d4`.
+It owns one P1 PDF/five exact strings/Arial/Letter page, NULL/empty assignments,
+P3 refusal/retry, held-review cancellation and lost-response readonly recovery,
+retained receipt and two closed owners with16 exact files/full snapshots.
+Its cleanup/preflight harness failures and corrections remain preserved.
+Those label publications were not replayed on this binary. Single-line printable
+ASCII/calibrated en-US/runtime fonts remain bounded; physical printing,
+positions/stock/Print All, live staging and Unicode/multiline/overflow remain off.
 
 The immutable44/40 Species predecessor remains unchanged, SHA256
 `6fc79320bc1ae16bae2e2bb345042dcc15611b12d1ec662fc95f3e132ce705af`.
@@ -177,9 +191,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is1,030,948 bytes versus5,202,547 before
-deferral (80.18% less); total JavaScript is5,363,574. The EXE grows18,432 bytes
-versus the Species predecessor; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is1,057,710 bytes versus5,202,547 before
+deferral (79.67% less); total JavaScript is5,390,313. The EXE grows29,184 bytes
+versus the saved-label predecessor; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
