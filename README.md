@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-entry-performance.zip`, 17,523,481 bytes.
+`VPRO-Demo-2026-10-18-summary-workbook.zip`, 17,534,060 bytes.
 
 SHA256:
-`0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`.
+`507acfd1dc5ee943c261019a504839cb8287fd0bcfde63c8b3a49d9b9904437c`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,70 +46,65 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-34 frontend and 30 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+37 frontend and 33 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
 3. With a clean unlocked selected plot, review/edit an explicit metadata record.
    Alternatively, use **Load complete entry** for the complete normal/CHARS
    two-page **parent** editor. Save/Undo there, then close its review explicitly.
-4. Inspect Summary, saved User log paging and the bounded Matrix XLSX workflow.
+4. Inspect saved User log paging and the bounded Matrix XLSX workflow.
 5. Explicitly select the synthetic **DemoReports** SU for Long Environment and
    Long Vegetation: load titles/options, preview, review and explicitly publish
    each supported XLSX to a new destination. Title Save/Undo is separate from
-   workbook publication. Select the original **Report** SU for Summary.
+   workbook publication.
+6. On **DemoReports**, open **Summary Vegetation**, load saved options/quality
+   and retain None grouping/display6/average1/show1. Select environmental rows,
+   SU Table and ReportSummary, review the complete plan, then explicitly publish
+   to a new `.xlsx` destination and acknowledge the outcome.
 
-Application source is base `67afa71` plus the manifest-pinned reviewed immutable
-reference-snapshot optimization. The34/30 profile, launcher, backend, seed and
-validation rules are unchanged.
-Normal117/CHARS119 unique parent controls have visible associated labels and
-native980/1400 layout checks. One held three-scope Save changes FieldNumber,
-SV_CanopyComposition and ProvinceStateTerritory with three exact source audits
-and one technical history; all physical peers remain exact. Invalid drafts block
-Save/Lock/Home/variant/native close. Fresh native CancelClose acknowledgements
-precede correction and held-response release. Saved reopening verifies both
-variants and ordinary P2/P1 navigation; independent backend review/write denials
-pass. All sixteen closed files stay exact after each read-only reopen.
+Application source is committed `5dee2ee`; app/backend/seed/defaults are unchanged.
+Only three existing Summary workbook/grouped/ancillary gates were added to the
+previous profile. No new reporting kernel, service or dependency was introduced.
+The new native journey checks one publication, 13 independently calculated
+vegetation rows, 30 environmental cells against the reviewed plan, four physical
+memberships, ancillary sheets and very-hidden complete provenance. Environmental
+calculation qualification also relies on existing kernel tests, not a new oracle.
+P1 appears twice; P3 has a physical LF1 zero-cover row, not missing vegetation.
+Absent master long names produce no invented ReportSummary unit-name row.
 
-Focused40 entry cases, three startup-budget cases, launcher race, check0/0,
-production Vite/Go builds and independent read-only review pass. The reviewer
-also reran all40 focused cases. This is complete **parent** entry, not complete
-two-page children, pictures, source callbacks, identity or implicit creation.
-No new full-root race is claimed. Current-binary report smoke loads options/
-titles only; actual publications retain their predecessor lineage.
+Invalid destination, cancellation/remount/stale response, native close and
+publication acknowledgement guards pass. A fresh CancelClose response precedes
+held-response release. The source's 15 databases remain byte-identical; selecting
+DemoReports intentionally changes configuration (initial config bytes were not
+retained). A separate backend-off reopening refuses workbook review, loads P1's
+117 complete-parent fields and leaves all 16 family files exact. Both owners
+close normally. Two inspector assumptions were corrected after publication
+without replay: wire-key casing and scientific-name projection.
 
-Deferred FS882/CHARS loading retains its owner keys and eager operation guards.
-Initial transitive JavaScript is929,255 bytes versus5,202,547 before deferral
-(82.14% less); total JavaScript is5,230,739. Neither measured startup latency nor
-binary shrink is inferred. The preserved31/28 startup ZIP, SHA256
-`bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`,
-owns cold-load Home/context/plot replacement, failed-import recovery, close while
-loading, parent Save and held child Save/restore/reopen acceptance.
+All 123 related client cases, launcher races, Summary-workbook Go races,
+check0/0, isolated Vite/Go builds, exact embed discovery and independent read-only
+review pass. Summary controls are measured at980/1400. No new full-root race,
+original Report callback, full formatting/printing or common/guide/Constancy
+qualification is claimed.
 
-Complete entry no longer copies its full reference snapshot on every reactive
-read. Validated detached snapshots are deeply immutable and shared until an
-actual receipt changes; originals and drafts retain defensive copies. On the
-same6,040,765-byte captured wire, median clean/dirty view reads fell from98.85/
-95.72ms to0.65/0.50ms; a sequential fresh-process comparison also passed the
-under10ms/80%-reduction threshold. Actual native input-to-reactive-flush medians
-are8.8ms normal/9.4ms CHARS over20 edits each. These are bounded session/typing
-measurements, not an initial-load, transport-size, SQL or whole-app speedup.
-The previous complete-parent ZIP remains unchanged at SHA256
-`d16b9c70c904bc0ad8ac1baf3fcc0384f3abff5f73c9ad9e011cb0ed67c8e214`.
+The immutable entry-performance predecessor remains unchanged, SHA256
+`0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`.
+It owns normal117/CHARS119 layouts, one three-scope Save/three audits, saved
+reopening, backend denials and native typing medians8.8/9.4ms. Its immutable
+reference-snapshot optimization remains: clean/dirty session view medians fell
+98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
+bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-The seed and earlier report opt-ins remain unchanged. The
-preserved report ZIP, SHA256
-`f9d1d26c94b119165cd0bec0511a996933e1b33e7340fd917066cc5751cc9383`,
-owns216 canonical Environment values, Vegetation pivots, two title Saves/two XLSX
-publications, independent file reopening and report cancellation/stale/no-replace
-guards. Those mutations were not replayed on this candidate. Missing names,
-NULL Strata and duplicate DemoReports membership remain preserved.
-
-Other parent/metadata Saves, Summary/log/Matrix and child lifecycle acceptance
-remain scoped to the preserved23/22 predecessor,
-SHA256 `fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
-Their source contracts/flags are retained; not every child mutation was rerun on
-the new binary. Close metadata review explicitly before changing context.
+Current initial transitive JavaScript is963,111 bytes versus5,202,547 before
+deferral (81.49% less); total JavaScript is5,264,587. The extra report surface
+slightly increases payload and EXE size; no new startup or binary-shrink claim.
+Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
+lineage. Long report publications retain the report predecessor's lineage; other
+metadata/child lifecycle mutations retain their23/22 predecessor scope. They
+were not replayed on this binary. The [delivery plan](MIGRATION_PLAN.md#supported-preview-profile)
+pins those preserved archives. Close metadata/complete-entry reviews explicitly
+before changing context.
 **Later source additions are not automatically included or qualified in this ZIP.**
 The [delivery plan](MIGRATION_PLAN.md#supported-preview-profile) owns promotion.
 
@@ -134,8 +129,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,061,760 bytes, unchanged from the
-complete-parent preview; deferred loading is not a binary-size reduction. An earlier
+The qualified preview executable is43,096,576 bytes, 34,816 bytes larger than the
+entry-performance preview; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 
