@@ -4,8 +4,6 @@
   import { ChevronLeft, ChevronRight, Database, FolderOpen, RefreshCw } from '@lucide/svelte';
   import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary, type ProjectPlotProfileFilterRequest, type PlotProfileSource, type PlotProfileSourceInfo } from '../bindings/github.com/boostao/vpro-wails';
   import { projectState } from './state';
-  import FS882Form from './FS882Form.svelte';
-  import SIVICHARSForm from './SIVICHARSForm.svelte';
   import Navigation from './Navigation.svelte';
   import DemoReadiness from './DemoReadiness.svelte';
   import LongEnvironmentReport from './LongEnvironmentReport.svelte';
@@ -270,6 +268,23 @@
     canOpenProjectMetadata: () => boolean; openProjectMetadata: () => void;
     canOpenMetadataInPlace?: () => boolean;
   } | undefined = $state();
+  let fs882ModuleLoaded = $state(false);
+  let siviCHARSModuleLoaded = $state(false);
+  const editorInitializing = $derived(view === 'fs882' && !editor &&
+    (editorEntryForm === 'sivi-chars' ? siviCHARSModuleLoaded : fs882ModuleLoaded));
+
+  async function loadFS882Editor() {
+    const module = await import('./FS882Form.svelte');
+    fs882ModuleLoaded = true;
+    return module;
+  }
+
+  async function loadSIVICHARSEditor() {
+    const module = await import('./SIVICHARSForm.svelte');
+    siviCHARSModuleLoaded = true;
+    return module;
+  }
+
   let closeRequest = $state('');
   let closeWorking = $state(false);
   let closeError = $state('');
@@ -332,7 +347,7 @@
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       await tick();
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor));
+      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || editorInitializing);
       if (disposition === 'busy') {
         await CloseService.CancelClose(requestId);
         error = 'Wait for the current operation to finish before closing VPRO.';
@@ -359,7 +374,7 @@
         return;
       }
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || (view === 'fs882' && !editor)) === 'busy') {
+      if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || editorInitializing) === 'busy') {
         closeError = 'Wait for the current operation to finish before closing VPRO.';
         return;
       }
@@ -391,7 +406,7 @@
       return;
     }
     const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-    if (closeDisposition(ownedAction ? null : state, busy || !ownedAction && editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || !!closeRequest || (view === 'fs882' && !editor)) === 'busy') {
+    if (closeDisposition(ownedAction ? null : state, busy || !ownedAction && editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || !!closeRequest || editorInitializing) === 'busy') {
       error = 'Wait for the current operation or decision before changing context.';
       return;
     }
@@ -1325,11 +1340,20 @@
           {#key editorEntryForm}
           {#key editorPlotNumber}
           {#if editorEntryForm === 'sivi-chars'}
+          {#await loadSIVICHARSEditor()}
+            <p role="status" data-entry-loading="sivi-chars">Loading CHARS SIVI parent editor...</p>
+          {:then { default: SIVICHARSForm }}
           <SIVICHARSForm bind:this={editor}
             contextId={$projectState?.contextId ?? ''} project={$projectState?.activeProject ?? ''} plotNumber={editorPlotNumber ?? ''}
             onSaved={async (p) => { editorPlotNumber = p; await loadPlots(offset); }}
             onBusyChange={(busy) => { localEditorBusy = busy; }} />
+          {:catch error}
+            <p class="error" role="alert" data-entry-load-error="sivi-chars">CHARS SIVI parent editor could not load: {String(error)}</p>
+          {/await}
           {:else}
+          {#await loadFS882Editor()}
+            <p role="status" data-entry-loading="fs882">Loading {editorLabel} editor...</p>
+          {:then { default: FS882Form }}
           <FS882Form
             bind:this={editor}
             plotNumber={editorPlotNumber}
@@ -1342,6 +1366,9 @@
             onProfileSUReview={reviewProfileSU}
             onFindPlot={plotFindEnabled ? () => { plotFindOpen = true; } : undefined}
           />
+          {:catch error}
+            <p class="error" role="alert" data-entry-load-error="fs882">{editorLabel} editor could not load: {String(error)}</p>
+          {/await}
           {/if}
           {/key}
           {/key}

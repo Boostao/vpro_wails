@@ -29,14 +29,17 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is the reviewed31/28 entry/reports profile from `bc1490aa`.
-  Existing Long Environment/Vegetation title/preview/XLSX/reopen workflows are
-  now qualified; no application code was added. The private launcher adds six
-  existing runtime flags and the seed only adds DemoReports_SU. Accepted frontend
-  assets and the old23/22 ZIP remain unchanged. Next objective: real-data
-  onboarding/project administration, not another private report kernel.
-- Both previews remain immutable. The new manifest explicitly separates payload,
-  launcher/walkthrough and predecessor identities.
+- Current preview is the reviewed31/28 deferred-entry/reports profile: base8184550
+  plus the manifest-pinned App/test/runner delta. Native cold-load cancellation,
+  owner replacement, entry Save/restore, saved reopen and report reads pass.
+  Initial transitive JS falls82.15%; no timing/binary-shrink claim. Launcher,
+  seed, backend, protected frontend assets and earlier ZIPs remain unchanged.
+- Real-data onboarding has explicit reader/schema/platform/licensing blockers.
+  New-project Description/default probe has `noFurtherOracleRetry:true`; no new
+  Access action is authorized by this checkpoint. Continue safe forms/report/
+  ribbon deliverables without restarting F1-F3 or creating another private kernel.
+- All previews remain immutable. The new manifest separates exact frozen source,
+  current entry proofs, inherited report publications and older child lifecycle.
 - No release dispatch or all-platform runtime acceptance occurred.
 
 ## Current accepted application integration
@@ -152,42 +155,46 @@ gates off; a bounded feature gate is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-reports.zip`:17,506,297 bytes.
-  SHA256 `f9d1d26c94b119165cd0bec0511a996933e1b33e7340fd917066cc5751cc9383`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-startup.zip`:17,522,075 bytes.
+  SHA256 `bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Sourcebc1490aa; SQLite-only EXE43,027,968 bytes, SHA256
-  `cb7fee2f0ebc666281b3aaec42d61a8c13f0358fed37208cf48c6fcc7a91f0f2`.
+- Source base8184550 plus frozen reviewed delta; SQLite-only EXE43,058,688 bytes,
+  SHA256 `82c8acca6697655926f855d064ca95060ff9f78de78dca44c8afb721542fc40f`.
   Exact31 frontend/28 runtime gates; private launcher SHA256
   `b53708a2fd6118aafe8cef4795d5391bf5be16163e5c426c7d23e49abe0f7ae0`.
-  Full launcher race tests pass. No application service/component changes;
-  added existing flags only, no arbitrary manifest-driven environment injection.
-- Private `priority-report-preview-20261018/validation-seal.json`, SHA256
-  `f904de065dedf124f74a43f4829ad58c10fd80ebc8686891446fe6ad6e799bdf`,
-  seals216 canonical Environment values,13 Vegetation rows/pivots, report controls
-  at1400/760/420, two title Saves/two actual XLSX publications and independent
-  reopen, saved-family reopen and core parent Undo/P1-P2-P1. Draft/cancel-remount,
-  stale/no-replace and fresh CancelClose guards pass. Eight owners freshly absent;
-  all1930 inputs/21 assets/54 canonical inputs match. Focused Go race,366 client
-  cases, check0/0, isolated production/overlay checks pass; no new full-race claim.
-- Original17 tables/15 other seed files are exact. New DemoReports_SU has P1/P1/
-  P2/P3 in DemoA, preserving NULL Strata/missing names. Physical denominator4,
-  distinct presence .5, mean1.5625, P1pivot2.5/P2pivot3.75 are independently
-  checked against source pivot/count semantics and actual1.25/3.75 covers.
+  Launcher/seed/Go/C/bindings/resources are unchanged from the report preview.
+- Private `startup-payload-fixed-20261018/validation-seal.json`, SHA256
+  `8a88c6c53d2e4500effe4f9b81c9b8a437210db41043dab645915d8f987e9376`,
+  pins1931 source inputs,21 protected assets/54 canonical inputs and six freshly
+  absent owners. Initial transitive JS928,901 vs5,202,547; total5,227,533.
+  The EXE grows30,720 bytes; no measured startup-time or binary-shrink claim.
+- Cold FS882/Home/SU-context/P2 and CHARS/Home/P2 prove current owner only.
+  Native import failure alert/Home and close while a module is held pass.
+  Parent Save changes only FieldNumber/SlopeGradient with two exact audits.
+  Invalid child100 blocks Save/Lock/Home/close; fresh CancelClose precedes valid
+  correction and held response release. One Cover1/HeightA Save/two audits and
+  restoration preserve all peers/parent audits and retain marked technical history.
+  No mutation replay. Same-family reopen checks SIVI77/CHARS71, metadata,
+  layouts980/1400, Env72/Veg13 report rows and all sixteen closed files exact.
+- Focused110 client cases, check0/0, Vite/Go production and exact26 embed patterns
+  pass. Distinct read-only review finds no significant issues; pre-bind interval
+  remains predicate/compiler, not held-native coverage. No new full-root race.
+  Private `review-disposition.json` and `delivery.json` pin review/package;
+  all20 ZIP payload hashes and final prepare-only pass.
+- Rejected initial candidate stays in `startup-payload-20261018`; corrected source,
+  failed harness assumptions and continuations stay in the fixed root. Root
+  `native-validation/entry-validation` owns the once-only mutation/close/restore
+  receipts; `report-completion` closes the saved read family; `module-failure-close`
+  closes the final owner. Metadata review must close explicitly before navigation.
+- Prior `VPRO-Demo-2026-10-18-reports.zip` remains exact, SHA256
+  `f9d1d26c94b119165cd0bec0511a996933e1b33e7340fd917066cc5751cc9383`.
+  Its `priority-report-preview-20261018/validation-seal.json`/delivery retain216
+  Environment values,13 Vegetation pivots, two title Saves/two XLSX publications
+  and independent reopen, report controls1400/760/420 and stale/no-replace guards.
+  These mutations were not repeated on the new binary. Launcher/seed are exact:
+  DemoReports_SU is P1/P1/P2/P3 in DemoA; presence .5/mean1.5625 and pivots2.5/3.75.
   Select DemoReports for Long reports and original Report for Summary.
-- Distinct read-only reviewer finds no significant issues. Private
-  `priority-report-preview-20261018/review-disposition.json` SHA256
-  `239e3114c6033a4b306ce6d4b27fef5f104eb54a9195934ffc63d731f6449979`.
-  `delivery.json` SHA256
-  `af498364bd6068b18fb0a95638a08736a9890a223cfd9ed35c032bea310e0303`
-  verifies all20 ZIP payloads and final launcher prepare-only without a native
-  launch. App EXE grew89,600 bytes; this is not binary/performance optimization.
-- Preserve all failed launcher/empty-unit/DTO/chunk-observer/outcome expectations.
-  First launcher was archived with extended Windows paths. V3 preparation,
-  validation and final manifest supersede immutable builder/v1/v2 stale metadata.
-  Environment Save's missed chunked capture is independently recovered from its
-  committed UI receipt/exact closed YAML; no completed mutation/publication was
-  replayed. Collision is an explicit not-published receipt, not an RPC exception.
 - The old `VPRO-Demo-2026-10-18-current-main.zip` remains unchanged, SHA256
   `fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
   Parent/metadata, SIVI/CHARS, Summary/log/Matrix and child lifecycle evidence is

@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-reports.zip`, 17,506,297 bytes.
+`VPRO-Demo-2026-10-18-startup.zip`, 17,522,075 bytes.
 
 SHA256:
-`f9d1d26c94b119165cd0bec0511a996933e1b33e7340fd917066cc5751cc9383`.
+`bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -57,25 +57,38 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
    each supported XLSX to a new destination. Title Save/Undo is separate from
    workbook publication. Select the original **Report** SU for Summary.
 
-Source `bc1490aa` reuses existing application services/components; this delivery
-adds no application code. Its private launcher adds six existing runtime flags.
-Only the synthetic DemoReports SU is added to the seed; every original table and
-the other fifteen seed files remain unchanged. Missing names, NULL Strata and
-duplicate membership are preserved, not repaired.
+The manifest pins source base `8184550` plus the exact reviewed deferred-entry
+delta; it does not identify the executable as unmodified base source. FS882 and
+CHARS entry panels now load on demand, keeping their existing context/form/plot
+keys and eager draft/operation guards. Actual initial transitive JavaScript falls
+from5,202,547 to928,901 bytes (82.15% less). Total JavaScript is5,227,533 bytes,
+24,986 bytes more; this is not a measured startup-time or binary-size reduction.
 
-The new profile verifies all216 canonical Environment values, thirteen Vegetation
-rows/pivots, responsive report controls, title draft/Undo/Save, two actual XLSX
-publications and independent file reopening. The same saved family reopens with
-both titles and exact outputs. Cancellation/remount, stale approval, no-replace
-and native-close guards pass; no completed mutation is replayed. Parent
-Undo/P1-P2-P1 navigation is rechecked. Independent review finds no significant
-issues in this bounded private promotion.
+Native Windows acceptance holds module requests across Home, plot and SU-context
+replacement, verifies only the current owner mounts, and checks visible import
+failure/Home recovery and clean close while a module is held. Parent Undo,
+P1-P2-P1, one actual parent Save/two audits, invalid child/close guards, one held
+child Save/two audits and explicit restoration pass without replay. Child history
+is retained and marked restored; only its selected audits are pruned. The same
+saved family reopens with exact parent/child values, normal SIVI77/CHARS71 fields,
+metadata and responsive980/1400 layouts. Long report reads retain72 Environment
+rows and13 Vegetation rows. All sixteen closed family files remain exact after
+those reads. Focused110 cases, check0/0, production builds and independent review
+pass. Backend sources are unchanged; no new full-root race is claimed.
 
-Earlier parent/metadata Saves, SIVI/CHARS panels, Summary/log/Matrix and child
-entry/lifecycle acceptance remain scoped to the preserved23/22 predecessor,
+The unchanged launcher and seed retain the prior31/28 report profile. The
+preserved report ZIP, SHA256
+`f9d1d26c94b119165cd0bec0511a996933e1b33e7340fd917066cc5751cc9383`,
+owns216 canonical Environment values, Vegetation pivots, two title Saves/two XLSX
+publications, independent file reopening and report cancellation/stale/no-replace
+guards. Those mutations were not replayed on the startup candidate. Missing names,
+NULL Strata and duplicate DemoReports membership remain preserved.
+
+Other parent/metadata Saves, Summary/log/Matrix and child lifecycle acceptance
+remain scoped to the preserved23/22 predecessor,
 SHA256 `fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
 Their source contracts/flags are retained; not every child mutation was rerun on
-the new binary. The creator-guidance correction is now included.
+the new binary. Close metadata review explicitly before changing context.
 **Later source additions are not automatically included or qualified in this ZIP.**
 The [delivery plan](MIGRATION_PLAN.md#supported-preview-profile) owns promotion.
 
@@ -100,8 +113,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is 43,027,968 bytes, 89,600 bytes larger than
-its predecessor; this report delivery is not a binary-size reduction. An earlier
+The qualified preview executable is43,058,688 bytes,30,720 bytes larger than
+the report preview; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 
