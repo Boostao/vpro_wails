@@ -67,5 +67,5 @@
   <p class="text-xs text-stone-600">Creation assigns only exact parent, Species and reviewed source covers/totals.
     Untouched fields stay NULL, Flag stays false, and no heights or automatic sums are inferred.
     Positive signed32 identity allocation is a desktop adaptation, not Access random-number equivalence.
-    Deletion and historical creation restoration remain unavailable.</p>
+    Deletion and historical creation Undo are separate, independently gated workflows.</p>
 </section>

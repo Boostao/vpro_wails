@@ -218,6 +218,8 @@ test('panel remount keeps safety ahead of guidance and unknown recovery reachabl
   const output = render(component, { props: { view, close: { canSave: false }, owner, disabled: true,
     recoveryDisabled: false, onoperation() {}, onchange() {} } }).body;
   assert.ok(output.indexOf('retained unknown') < output.indexOf('Creation assigns only'));
+  assert.match(output, /Deletion and historical creation Undo are separate, independently gated workflows/);
+  assert.doesNotMatch(output, /Deletion and historical creation restoration remain unavailable/);
   assert.match(output, /data-sivi-creation-fields/);
   assert.match(output, /data-sivi-creation-resolve(?:(?!<\/button>)[\s\S])*read-only/);
   assert.doesNotMatch(output, /data-sivi-creation-resolve[^>]*\sdisabled(?:=|\s|>)/);
@@ -236,6 +238,10 @@ test('shared creation panel restricts CHARS to three source forms without alteri
   const props = { view, close: { canSave: true }, owner, onoperation() {}, onchange() {} };
   const legacy = render(component, { props }).body;
   const chars = render(component, { props: { ...props, allowedForms: forms } }).body;
+  for (const output of [legacy, chars]) {
+    assert.match(output, /Deletion and historical creation Undo are separate, independently gated workflows/);
+    assert.doesNotMatch(output, /Deletion and historical creation restoration remain unavailable/);
+  }
   assert.equal([...legacy.matchAll(/data-sivi-creation-start=/g)].length, 4);
   assert.equal([...chars.matchAll(/data-sivi-creation-start=/g)].length, 3);
   assert.match(legacy, /data-sivi-creation-start="SubVegA-SIVI_BC"/);

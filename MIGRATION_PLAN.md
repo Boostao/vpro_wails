@@ -32,7 +32,7 @@ These states describe availability, not confidence percentages:
 | --- | --- | --- |
 | Select existing data and browse plots | Core/Preview: original SQLite family, configuration, owned project/SU/hierarchy selection, filtering and context switching | Production onboarding/administration is separate; attachment is not conversion |
 | Enter ordinary FS882 data | Core/Preview: 98 mapped writable parent fields; bounded soil/Other/vegetation editors, draft/Save/Undo/Lock/close behavior | Complete remaining source events, calculations and whole linked-form journeys |
-| Enter SIVI/CHARS data | Preview/Development: parent editing and separately gated vegetation children, species/Collected/ID/lifecycle composition | Whole-form callback/navigation equivalence; child creation/deletion is not plot/parent creation |
+| Enter SIVI/CHARS data | Preview: parent panels, mixed child Save/restore, Collected navigation/reopen and explicit child create/delete/restore/creation Undo journeys. Development: wider separately gated species/ID and cross-host combinations | Whole-form callback/navigation equivalence; child creation/deletion is not plot/parent creation |
 | Use two-page entry | Development: parent mixed Save, metadata editing, linked soil/vegetation editing and explicit soil creation accepted in qualified profiles | Whole-form/picture integration, remaining callbacks; not included automatically in the pinned preview |
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
 | Work with pictures | Development: owned reads/metadata and independently gated explicit lifecycle operations | Original Add/save/default/confirmation/Current timing and complete host integration |
@@ -78,6 +78,24 @@ from physical membership; no completed Save/publication was replayed.
 Three native owners close normally;1930 inputs,21 assets and49 canonical inputs
 match. These are bounded user journeys, not every enabled child mutation.
 
+Additional acceptance uses that exact immutable ZIP/profile. One mixed
+Cover1/HeightA Save commits two cells/two audits, selected restoration/pruning
+recovers the original business tables, and Collected persists through navigation
+and a fresh application reopen. Invalid input blocks Save/Lock/Home/native close;
+fresh CancelClose acknowledgements precede correction or held-response release.
+Two retained harness failures are explicitly resolved without replay.
+
+A separate fresh family verifies one extended-shrub child creation, reviewed
+deletion, deleted-row restoration/pruning and historical creation Undo/pruning.
+All44 physical cells and peers, two creation audits, three deletion audits
+(including Flag0), permanent ID reservation and retained technical history match.
+Final business tables/audits equal the original fixture. All five additional
+native owners close normally. These are explicit desktop safety adaptations,
+not plot creation, original Access undelete or complete callback parity.
+Current source only clarifies independently gated lifecycle availability;
+33 focused client cases, check0/0 and an isolated same-profile build pass.
+That wording/test change is not in the ZIP; no flag or backend change is implied.
+
 The current source, that pinned preview and default CI release are distinct.
 Seven-job release run38929085479 on `842ca946` validates default packaging;
 it does not qualify an updated preview or every platform's runtime.
@@ -90,8 +108,8 @@ before writing another service, state machine, flag or preparation layer.
 
 | Priority | User outcome and bounded work | Completion evidence |
 | --- | --- | --- |
-| 1 - next | Complete the coherent entry journey beyond the qualified parent/metadata path: supported child mutations, Save/Undo, navigation, reopen and recovery. Consolidate FS882/SIVI/two-page orchestration only where behavior is demonstrably equivalent. | Whole-journey acceptance in the supported profile, including NULL/history, competing drafts, cancellation/unknown outcomes and close barriers; missing source behavior stays explicit |
-| 2 | Priority reports usable from that profile: select scope/options, preview, publish and reopen supported Long Environment/Vegetation/Summary outputs. | Independent expected values/membership, saved options, exact reopened files, cancellation/stale-approval refusal and visible unsupported variants |
+| 1 - supported journeys verified | Parent/metadata plus the child entry/recovery and explicit lifecycle journeys above are accepted in the pinned preview. Preserve them; consolidate orchestration only where behavior is demonstrably equivalent. Wider host/source combinations remain in priority4, not silently completed. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
+| 2 - next | Priority reports usable from that profile: select scope/options, preview, publish and reopen supported Long Environment/Vegetation/Summary outputs. | Independent expected values/membership, saved options, exact reopened files, cancellation/stale-approval refusal and visible unsupported variants |
 | 3 | Real-data onboarding and project administration. Integrate existing go-mdbtools boundaries instead of another Access parser; reuse the original SQLite family and metadata. | Disposable complete import/new-project/reopen/recovery journeys before production authorization; merge/splinter/compare remain separately accounted |
 | 4 | Finish remaining forms/pictures/profiles/ribbon workflows in client-priority order. Resolve genuine business choices without inventing callbacks or reproducing destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
 | 5 | Complete required labels/printing and final distribution/platform acceptance. | Qualified devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |

@@ -57,7 +57,13 @@ Source `58c4723` retains the prior 23/22 profile, seed and launcher unchanged.
 Actual packaged navigation, Undo, parent/metadata Saves and six audits, reopening
 the same saved run, standalone SIVI/CHARS panels, responsive controls, all thirty
 Summary rows, saved-log paging and one reopened Matrix workbook were verified.
+Additional checks of this same binary verify child Cover/Height Save and selected
+restoration, Collected persistence through navigation/reopen, and an explicit
+child create/delete/restore/historical creation Undo journey. Invalid drafts and
+held Save acknowledgement block native close; completed mutations are not replayed.
 Summary reflects the saved values. The earlier preview/evidence remains intact.
+Current source corrects misleading creation-panel availability guidance; that
+wording-only correction is not in the immutable ZIP.
 **Later source additions are not automatically included or qualified in this ZIP.**
 The [delivery plan](MIGRATION_PLAN.md#supported-preview-profile) owns promotion.
 

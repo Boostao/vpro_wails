@@ -31,8 +31,9 @@ Current machine state only. Portable scope and ordered work are in
   not the historical root ledgers retained at `3bf43c4`.
 - Its current-main preview is now qualified with the unchanged23/22 profile.
   No feature opt-ins, seed, launcher or accepted frontend assets were promoted
-  or replaced. Next objective: coherent supported child-entry/navigation/recovery
-  journeys beyond the accepted parent/metadata path, not another private kernel.
+  or replaced. Supported child-entry/navigation/recovery and explicit lifecycle
+  journeys now pass on that same binary. Next objective: coherent priority-report
+  selection/options/preview/publication/reopen, not another private kernel.
 - The old preview remains immutable. Manifest `files[].sha256` owns payload
   hashes; `acceptedCandidateSHA256` is predecessor lineage, not the packaged EXE.
 - No release dispatch or all-platform runtime acceptance occurred.
@@ -67,7 +68,9 @@ All1930 inputs/3873 protected artifacts,49 canonical inputs/21 assets,
 sixteen closed native families and package/embed discovery match.
 SHA256:
 `5d7670609bb683ff6f2db175cd1aa083f7a28d6297dfd52d95d1a9d9e75984b7`.
-Only six acceptance-status documents change after the freeze.
+That integration's six acceptance-status documents are not application changes.
+The later source guidance correction below is separately checked; no new
+full-root race acceptance is claimed.
 
 The preserved fixture-receipt failure encountered an existing soil BLOB;
 continuation verified all fixture/source hashes before typed serialization.
@@ -82,6 +85,29 @@ This is an explicit desktop operation, not source implicit-buffer/callback or
 random allocator parity, deletion/restoration, whole-form or default/demo
 promotion. The current preview below deliberately leaves these soil creation
 gates off; a bounded feature gate is not the overall completion condition.
+
+## Supported child journeys
+
+- Same delivered EXE/profile; no seed/ZIP/flag change. Private
+  `supported-entry-journey-20261018/acceptance-seal.json`, SHA256
+  `8d46f6fb1e4ef78a3233f63ce5affa2591772e06e8fcf1aaaec683557aa7d641`,
+  seals invalid-draft/close barriers, one Cover1/HeightA Save/two audits,
+  selected restoration/pruning and Collected Save/navigation/fresh reopen.
+  Both retained harness failures are resolved without repeating a mutation.
+  Four sequential owners of one family close normally; fresh CancelClose200
+  precedes correction and held completed-response release.
+- Private `delivery-child-lifecycle-20261018/acceptance-seal.json`, SHA256
+  `a432678fe33bb1f2e0f5e5981c75d33895e65e14c97b10ee2cd874e9bfa657f4`,
+  seals one extended-A child create/delete/restore/creation-Undo journey in one
+  fresh family. All44 cells/peers, two creation audits, three deletion audits
+  including Flag0, selected pruning, permanent ID reservation and retained
+  history match. Final business tables/audits equal baseline; owner closes.
+- Source changes only the false blanket-unavailable creator guidance and its
+  existing compiled regression assertions. 33 client cases, check0/0 and isolated
+  23-flag build pass; all21 protected assets/49 canonical inputs match.
+  Go inputs remain at the accepted lineage. The immutable ZIP does not contain
+  that wording correction. No parent creation/original Access undelete or
+  whole-form parity follows from this evidence.
 
 ## Source boundaries that must not be reopened casually
 
