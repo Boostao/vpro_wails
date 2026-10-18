@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-linked-soil.zip`, 17,549,069 bytes.
+`VPRO-Demo-2026-10-18-reference-reports.zip`, 17,549,901 bytes.
 
 SHA256:
-`4f3f6ed92a9d38cd02bc10e4eafd88dd1af867030a567cbef883f894d9f19fd5`.
+`b31cc3038bf5742486a84dfc6bff3406da17a5769b7eff568f600555cbc94a5e`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-40 frontend and 36 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+41 frontend and 37 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -66,29 +66,47 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
    horizon in Normal and a Mineral horizon in CHARS, acknowledging each receipt.
    Edit Depth Up/memo, Save explicitly and acknowledge; switch variants to
    inspect the saved rows. **Undo drafts does not delete a committed horizon.**
+8. In Summary's explicit DemoReports scope, select effective references and
+   common names; review/publish to a new destination and acknowledge. Select
+   guide names for a separate publication: this seed's guide names are NULL,
+   not ordinary-name fallbacks. Load presentation, stage Constancy without Save,
+   clear environmental rows and review/publish its separate vegetation workbook.
+   Acknowledge, then Undo the presentation draft before leaving.
 
-Application source is committed `bc9e129`; app/backend/seed/defaults are unchanged.
-Three existing linked-soil review/writing/creation gates extend the preceding
-profile. No new application kernel, service or dependency was introduced.
-The new native journey checks normal117/CHARS119 hosts, two explicit creations
-with complete18/28-cell defaults, two field Saves, six exact physical source
-audits, four persisted histories and permanent ID reservations. All historical
-physical peers remain exact. P1 starts without soil rows; unrelated historical
-records are not repointed. The server-owned positive allocator is an explicit
-adaptation, not Access random `GenUniqueID()` compatibility.
+Application source is committed `14f0dac`; app/backend/seed/defaults are unchanged.
+One existing effective-reference gate extends the preceding profile. No new
+application kernel, service or dependency was introduced. Three native outputs
+check39 independently calculated vegetation rows/physical names,278 typed cells
+including60 environmental cells against the reviewed plan, numeric Lifeforms1..13
+and complete very-hidden provenance. Environmental calibration retains kernel
+lineage. Guide-name NULL is preserved, not repaired.
 
-Invalid drafts block creation/parent/variant/Home/native close. Fresh CancelClose
-acknowledgements precede Undo and held-response release. One held creation is
-cancelled and recovered read-only, never replayed. Saved rows survive variant
-remounts; the other15 family files remain exact. Three independent backend-off
-reopens refuse review/writing/creation, load saved fields/source choices and
-preserve all16 files. All four owners close normally. Fields, actions and
-disclosures are measured at980/1400.
+P3's physical LF1 zero is retained by the Constancy Lifeform stage: frequency1.00,
+other frequencies0.75, mean1.56. The None stage excludes zero entries but retains
+all four memberships in the denominator. Invalid destination, cancellation/
+remount/stale response, fresh CancelClose-before-release and acknowledgement/Home
+barriers pass. All15 databases stay exact; selecting DemoReports changes config.
+A separate references-off reopening refuses all three modes but retains ordinary
+13-row workbook review/P1 parent117, preserving all16 files. Both owners close.
+Controls are measured at980/1400.
 
-All105 related client cases, launcher races, soil Go races, check0/0, isolated
-Vite/Go builds, exact embed discovery and independent read-only review pass.
-No new full-root race, implicit creation, soil deletion/restoration or whole-form
-callback qualification is claimed. Ordinary Save and Enter cannot create soil.
+All107 related client cases, launcher races, focused reference/Constancy/common
+Go races, check0/0, isolated Vite/Go and exact embed discovery pass. Independent
+review found one stale walkthrough evidence section; it was corrected and the
+focused follow-up found no remaining material contradiction. Preserved inspector
+errors were corrected on the same successful outputs without publication replay.
+No new full-root race, populated guide-name witness, original Report/guide schema
+rename callbacks, formatting/printing or whole-form qualification is claimed.
+
+The immutable soil predecessor remains unchanged, SHA256
+`4f3f6ed92a9d38cd02bc10e4eafd88dd1af867030a567cbef883f894d9f19fd5`.
+It owns normal117/CHARS119 hosts, two explicit creations with18/28 defaults,
+two field Saves, six exact audits/four histories/permanent reservations, untouched
+peers, read-only outcome recovery, retained remounts and three gate-off reopens.
+Four owners close; other15 files stay exact after writes/16 exact per reopen.
+Those mutations were not replayed on this binary. Positive allocation is an
+adaptation, not Access random `GenUniqueID()` compatibility. Ordinary Save/Enter
+cannot create soil; implicit creation and soil deletion/restoration remain off.
 
 The immutable Summary predecessor remains unchanged, SHA256
 `507acfd1dc5ee943c261019a504839cb8287fd0bcfde63c8b3a49d9b9904437c`.
@@ -97,8 +115,8 @@ scientific-name vegetation rows,30 environmental cells against the reviewed
 plan, four physical memberships and very-hidden provenance. Environmental
 calibration also retains kernel lineage. P1 appears twice; P3 has physical LF1
 zero cover, not missing vegetation. Absent master long names produce no invented
-ReportSummary unit-name row. Common/guide/Constancy, original Report callbacks
-and full formatting/printing remain unqualified in this profile.
+ReportSummary unit-name row. Its no-reference publication was not replayed here;
+the current binary separately qualifies the three reference-based outputs.
 
 The immutable entry-performance predecessor remains unchanged, SHA256
 `0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`.
@@ -108,9 +126,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is988,749 bytes versus5,202,547 before
-deferral (80.99% less); total JavaScript is5,306,806. The extra entry surface
-slightly increases payload and EXE size; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is988,615 bytes versus5,202,547 before
+deferral (81.00% less); total JavaScript is5,306,672. The EXE size is unchanged
+from the soil preview; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
@@ -141,8 +159,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,138,560 bytes, 41,984 bytes larger than the
-Summary preview; deferred loading is not a binary-size reduction. An earlier
+The qualified preview executable is43,138,560 bytes, unchanged from the soil
+preview; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 
