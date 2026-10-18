@@ -37,6 +37,7 @@ const strataReferenceWire = JSON.parse(readFileSync(path.join(__dirname, 'summar
 const groupedAttributeWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedAttributesWire.json'), 'utf8'));
 const groupedAncillaryWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookGroupedAncillaryWire.json'), 'utf8'));
 const constancyWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookConstancyWire.json'), 'utf8'));
+const unanimousWire = JSON.parse(readFileSync(path.join(__dirname, 'summaryVegetationWorkbookUnanimousCommonWire.json'), 'utf8'));
 const owner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath']
   .map(key => [key, wire.vegetation.preview[key]]));
 const yieldNow = () => Promise.resolve();
@@ -66,6 +67,157 @@ function outcome(value, status = 'published') {
   return { status, requestedDestination: destination, path: 'C:\\output\\resolved.xlsx',
     sha256: value.workbookSHA256, errorMessage: status === 'published' ? '' : 'Committed, source changed; do not replay.' };
 }
+
+test('sixteen strict Go unanimous common vectors detach real proxies and preserve original keys, NULL output and composition', async () => {
+  assert.equal(Object.keys(unanimousWire).length, 16);
+  for (const value of Object.values(unanimousWire)) {
+    const source = proxy(structuredClone(value));
+    assert.throws(() => structuredClone(source));
+    const result = await client.validateSummaryVegetationWorkbookReview(source, owner, value.options, yieldNow);
+    assert.deepEqual(plain(result), value);
+    assert.equal(result.scope, client.summaryVegetationUnanimousCommonScope);
+    assert.equal(result.options.showClass, 20);
+    assert.equal(result.preview.rows.length, 3);
+    const alpha = result.preview.rows[0];
+    assert.equal(alpha.species.text, 'Alpha');
+    assert.equal(alpha.layer.storage, value.options.groupAndOrder === 13 ? 'text' : 'null');
+    assert.equal(alpha.layer.text, value.options.groupAndOrder === 13 ? '01' : null);
+    assert.equal(alpha.commonName.text, value.options.references.useGuideNames ? 'Guide common' : 'Common');
+    assert.equal(alpha.order.storage, 'real');
+    assert.equal(alpha.order.real, 15);
+    assert.deepEqual(plain(alpha.covers.map(cell => cell.text)), ['15.00', value.options.average === 1 ? '11.00' : '5.50']);
+    assert.ok(result.preview.rows.slice(1).every(row => row.commonName.storage === 'null'));
+    assert.equal(Object.isFrozen(alpha.commonName), true);
+    source.preview.rows[0].commonName.text = 'Changed';
+    assert.deepEqual(plain(result), value);
+  }
+});
+
+test('unanimous wire rejects marker, legacy scope/body, duplicate original keys and empty First output', async () => {
+  for (const base of Object.values(unanimousWire)) {
+    for (const mutate of [
+      value => { delete value.options.unanimousCommon; },
+      ...[false, null, 1, 'true'].map(marker => value => { value.options.unanimousCommon = marker; }),
+      value => { value.options.constancy = true; },
+      value => { value.options.groupAndOrder = 12; },
+      value => { value.options.display = 3; },
+      value => { value.options.references = { showCommon: false, useGuideNames: false }; },
+      value => { value.scope = client.summaryVegetationGroupedAttributesScope; },
+      value => { value.scope = client.summaryVegetationConstancyScope; },
+      value => { value.preview.source = 'literal-normal-su-effective-references'; },
+      value => { value.preview.ordering = 'literal-null-first-layer-species-common'; },
+      value => { value.preview.groupField.daoType = 4; },
+      value => { value.preview.rows[0].commonName.text = ''; },
+      value => { value.preview.rows[0].rawSpecies = structuredClone(value.preview.rows[0].species); },
+      value => {
+        const row = structuredClone(value.preview.rows[0]);
+        row.commonName.text = 'ZZ different';
+        value.preview.rows.splice(1, 0, row);
+      },
+      ...(base.environment ? [value => { value.environment.vegetation.source = 'literal-normal-su-effective-references'; }] : []),
+    ]) {
+      const value = structuredClone(base);
+      mutate(value);
+      await assert.rejects(client.validateSummaryVegetationWorkbookReview(value, owner, value.options, yieldNow));
+    }
+    const missing = structuredClone(base.options);
+    delete missing.unanimousCommon;
+    assert.equal(client.sameSummaryWorkbookOptions(missing, base.options), false);
+    assert.equal(vegetation.summaryVegetationReferenceGroupingAvailable(base.options.groupAndOrder, true), false);
+    assert.throws(() => vegetation.validateSummaryVegetation(base.preview, owner, base.options.average, 6, 20,
+      base.options.groupAndOrder));
+  }
+});
+
+test('compiled unanimous panels require only grouped and reference gates and retain reviewed publication across remount', async () => {
+  for (const grouping of [13, 14]) for (const mode of ['common', 'guide']) {
+    const value = unanimousWire[`group${grouping}Average1${mode}`];
+    for (let mask = 0; mask < 4; mask++) {
+      const session = sessionFor(value);
+      let reads = 0, writes = 0;
+      const services = {
+        GetReview(contextId, json) {
+          reads++;
+          assert.equal(contextId, owner.contextId);
+          assert.deepEqual(JSON.parse(json), value.options);
+          return Promise.resolve(proxy(structuredClone(value)));
+        },
+        ExportReviewed(contextId, json) {
+          writes++;
+          assert.equal(contextId, owner.contextId);
+          assert.deepEqual(JSON.parse(json), { options: value.options, approvalHash: value.approvalHash, destination });
+          return Promise.resolve(outcome(value));
+        },
+      };
+      const pane = mountPanel(session, services, false, value.options, false, !!(mask & 1), !!(mask & 2));
+      await pane.review();
+      assert.equal(reads, mask === 3 ? 1 : 0);
+      if (mask === 3) {
+        assert.equal(pane.view().review.scope, client.summaryVegetationUnanimousCommonScope);
+        pane.edit('destination', destination);
+        await pane.publish();
+        assert.equal(writes, 1);
+      }
+      pane.destroy();
+      const remount = mountPanel(session, services, false, value.options, false, !!(mask & 1), !!(mask & 2));
+      assert.deepEqual(plain(session.options(value.options)), value.options);
+      if (mask === 3) {
+        await remount.publish();
+        assert.equal(writes, 1);
+        assert.equal(remount.view().publication.outcome.sha256, value.workbookSHA256);
+        remount.acknowledge();
+        assert.equal(session.held(), false);
+        assert.equal(remount.view().publication.outcome.sha256, value.workbookSHA256);
+      }
+      remount.destroy();
+    }
+  }
+});
+
+test('all other Lifeform and None name displays stay unavailable without rewriting retained selections', async () => {
+  for (const groupAndOrder of [13, 14]) for (const display of [1, 2, 3, 4, 5]) for (const guide of [false, true]) {
+    const session = sessionFor(unanimousWire.group13Average1common);
+    if (guide) session.selectReferences('guide', true);
+    const calculation = { average: 1, display, showClass: 20, groupAndOrder };
+    let reads = 0;
+    const pane = mountPanel(session, { GetReview() { reads++; throw new Error('Unsupported name mode dispatched'); } },
+      false, calculation, false, true, true);
+    await pane.review();
+    assert.equal(reads, 0);
+    assert.equal(pane.view().showCommon, true);
+    assert.equal(pane.view().useGuideNames, guide);
+    pane.destroy();
+  }
+});
+
+test('consumed unanimous table exposes source adaptation only after executing the actual component', async () => {
+  const value = unanimousWire.group14Average1combined;
+  const session = sessionFor(value);
+  await session.review(value.options, { review: () => Promise.resolve(proxy(structuredClone(value))), validationYield: yieldNow });
+  let subscribed = 0;
+  const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
+    'SummaryVegetationWorkbookPanel.svelte', {
+      svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
+      '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+      './summaryVegetation': vegetation,
+      './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
+      './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => { subscribed++; return session; } },
+    }, { VITE_SUMMARY_VEGETATION_WORKBOOK: 'true', VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: 'true',
+      VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: 'true', VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: 'true' });
+  const html = require('svelte/server').render(component, { props: {
+    owner, calculation: value.options, disabled: false, onBusyChange() {},
+  } }).body.replace(/<!--[\s\S]*?-->/g, '');
+  assert.equal(subscribed, 1);
+  assert.match(html, /data-summary-workbook-unanimous-common/);
+  assert.match(html, /differing names stop review/);
+  assert.match(html, /empty name is projected as NULL/);
+  assert.match(html, /Guide-name selection is an effective reference projection/);
+  assert.match(html, /<th\b[^>]*scope="col"[^>]*>Group<\/th>/);
+  assert.match(html, /<th\b[^>]*scope="col"[^>]*>Common name<\/th>/);
+  assert.match(html, /<td\b[^>]*>\(NULL\)<\/td>/);
+  assert.match(html, /<td\b[^>]*>Common<\/td>/);
+  assert.equal(html.indexOf('data-summary-workbook-unanimous-common') > html.indexOf('data-summary-workbook-destination'), true);
+});
 
 test('eight strict Go Constancy vectors preserve numeric and raw identity through actual proxies and composition', async () => {
   assert.equal(Object.keys(constancyWire).length, 8);
@@ -227,30 +379,32 @@ test('consumed outer Summary takes only loaded presentation Constancy intent and
   }
 });
 
-test('Constancy validation holds cancellation ownership through a remount without installing the old numeric result', { timeout: 10000 }, async () => {
-  const value = constancyWire.combinedSummaryAverage2;
-  const session = sessionFor(value), reached = deferred(), hold = deferred();
-  let yields = 0, reads = 0;
-  const loading = session.review(value.options, {
-    review: () => { reads++; return Promise.resolve(proxy(structuredClone(value))); },
-    validationYield() {
-      if (++yields === 2) { reached.resolve(); return hold.promise; }
-      return Promise.resolve();
-    },
-  });
-  await reached.promise;
-  session.cancel();
-  assert.equal(session.held(), true);
-  const mounted = mountPanel(session, { GetReview() { reads++; throw new Error('Must remain held'); } },
-    false, value.options, true, true, true, true);
-  await mounted.review();
-  assert.equal(reads, 1);
-  assert.equal(session.view().review, null);
-  hold.resolve();
-  assert.equal(await loading, false);
-  assert.equal(session.view().review, null);
-  assert.equal(session.held(), false);
-  mounted.destroy();
+test('explicit inspection validation holds cancellation ownership through remount without installing stale source identities', { timeout: 10000 }, async () => {
+  for (const value of [constancyWire.combinedSummaryAverage2, unanimousWire.group13Average2combined,
+    unanimousWire.group14Average1combined]) {
+    const session = sessionFor(value), reached = deferred(), hold = deferred();
+    let yields = 0, reads = 0;
+    const loading = session.review(value.options, {
+      review: () => { reads++; return Promise.resolve(proxy(structuredClone(value))); },
+      validationYield() {
+        if (++yields === 2) { reached.resolve(); return hold.promise; }
+        return Promise.resolve();
+      },
+    });
+    await reached.promise;
+    session.cancel();
+    assert.equal(session.held(), true);
+    const mounted = mountPanel(session, { GetReview() { reads++; throw new Error('Must remain held'); } },
+      false, value.options, true, true, true, true);
+    await mounted.review();
+    assert.equal(reads, 1);
+    assert.equal(session.view().review, null);
+    hold.resolve();
+    assert.equal(await loading, false);
+    assert.equal(session.view().review, null);
+    assert.equal(session.held(), false);
+    mounted.destroy();
+  }
 });
 
 test('Constancy publication transports detached exact authority and retains receipt separately from manual names and mode changes', async () => {
@@ -1191,7 +1345,7 @@ test('group changes invalidate reviewed publication while receipts and invalid d
 });
 
 test('compiled grouped panel gate refuses dispatch, preserves incompatible selections and publishes only explicit authority', async () => {
-  const value = groupedWire.lifeform;
+  const value = groupedWire.nonePresence;
   for (const enabled of [false, true]) {
     const session = sessionFor(value);
     let reads = 0, writes = 0;
@@ -1303,7 +1457,7 @@ test('consumed grouped panel renders accurate grouping and explicit unavailable 
         VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: enabled ? 'true' : 'false',
         VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES: 'true', VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK: 'true' });
     const html = require('svelte/server').render(component, { props: {
-      owner, calculation: value.options, disabled: false, onBusyChange() {},
+      owner, calculation: { ...value.options, display: 3 }, disabled: false, onBusyChange() {},
     } }).body;
     assert.equal(subscriptions, 1);
     assert.match(html, /Workbook grouping: Lifeform/);
@@ -1419,7 +1573,7 @@ test('compiled Strata reference panel requires both existing flags and retains i
       session.includeAncillary(false);
     }
     pane.destroy();
-    const incompatible = mountPanel(session, services, false, { ...value.options, groupAndOrder: 13 }, true, references, grouped);
+    const incompatible = mountPanel(session, services, false, { ...value.options, groupAndOrder: 13, display: 3 }, true, references, grouped);
     await incompatible.review();
     await incompatible.publish();
     assert.equal(reads, grouped && references ? 1 : 0);
@@ -1550,7 +1704,7 @@ test('grouped attribute reviews reject name selection, scope confusion and malfo
 });
 
 test('compiled grouped attribute panels require both gates and retain unsupported common and guide drafts across remounts', async () => {
-  for (const value of [groupedAttributeWire.lifeform, groupedAttributeWire.none]) {
+  for (const value of [groupedAttributeWire.lifeformDistribution, groupedAttributeWire.noneDistribution]) {
     for (const grouped of [false, true]) for (const references of [false, true]) {
       const session = sessionFor(value);
       let reads = 0, writes = 0;
@@ -1608,7 +1762,7 @@ test('compiled grouped attribute panels require both gates and retain unsupporte
   }
 });
 
-test('consumed grouped attribute rendering distinguishes supported references from retained unavailable names', () => {
+test('consumed grouped attribute rendering distinguishes ordinary references from explicit unanimous common names', () => {
   for (const grouped of [false, true]) for (const references of [false, true]) {
     let selected, subscribed = 0;
     const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
@@ -1632,9 +1786,9 @@ test('consumed grouped attribute rendering distinguishes supported references fr
         } }).body;
         const button = html.match(/<button[^>]*data-summary-workbook-review[^>]*>/);
         assert.ok(button);
-        assert.equal(/\bdisabled\b/.test(button[0]), !grouped || !references || mode !== 'attributes');
+        assert.equal(/\bdisabled\b/.test(button[0]), !grouped || !references);
         assert.equal(selected.view().includeReferences, true);
-        if (mode !== 'attributes') assert.match(html, /Lifeform\/None support attribute references with both names off/);
+        if (mode !== 'attributes') assert.match(html, /data-summary-workbook-unanimous-common/);
       }
     }
     assert.equal(subscribed, 6);

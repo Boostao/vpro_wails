@@ -61,9 +61,9 @@ unchanged fixture files and six normally closed owners. A retained larger-
 fixture witness was corrected after independently checking the first completed
 publication; no write was replayed. Full race passes in4861.766s, preserving1918
 inputs/332 artifacts and ten closed native families.
-Group13/14 common/guide First, Strata/Lifeform Display2 and original Report
-callbacks remain unavailable; None Display2 is supported. The qualified demo
-and defaults are unchanged.
+That revision did not enable Group13/14 common/guide First; the accepted successor
+is described below. Strata/Lifeform Display2 and original Report callbacks remain
+unavailable; None Display2 is supported. The qualified demo and defaults are unchanged.
 
 Private Constancy preparation is now independently reviewed and full-race
 integrated. Ten disposable source-query cases qualify numeric nullable
@@ -97,7 +97,7 @@ parity. Projected query calibration is not full original Report execution.
 Unbound two-page Picture Manager
 procedures remain dormant, not a missing live event to implement.
 
-Current private successor: unanimous common-name preparation for normal-SU
+Accepted private prerequisite: unanimous common-name preparation for normal-SU
 Group13/14 Display6. Twenty-four original projected Access queries, exact DAO
 metadata and independent physical arithmetic establish unchanged nonempty/NULL
 names and output-only empty-to-NULL `First()` behavior. Source review accepts
@@ -110,8 +110,26 @@ exact compatibility vectors pass. Distinct application review finds no significa
 issues. Full root race integration passes in5005.937s with1924 managed inputs/
 3662 artifacts,38 canonical inputs/21 assets and fourteen closed native families
 unchanged. Public common/guide13/14 remains unavailable; no new service, binding,
-production file, flag, default or demo promotion. Publish this accepted private
-prerequisite, then define its separate retained desktop consumer.
+production file, flag, default or demo promotion. This prerequisite is published
+as `f11817da7ecdcb9956b339492d8f9152c7aae82a`.
+
+Accepted successor: the separate unanimous-name workbook consumer.
+It reuses the existing panel, retained session, typed source reader, renderer and
+publisher under independent grouped/reference gates. The strict true-only
+`unanimousCommon` request authorizes13/14 Display6 with names; absent markers
+keep ordinary/basic guards unchanged. Distinct source/scope/approval, exact
+source/body authority, original-key uniqueness, uniform-empty output NULL and
+retained ShowClass normalization are wired through optional environment/ancillary
+composition. Frozen focused/coupled races119.500s/783.250s,241 related client/
+57 browser cases, check/build/vet/production and250 exact legacy comparisons
+pass. Distinct review finds no significant issues. Fresh Wails accepts five
+reopened outputs, guide correction of ambiguous None common names, four
+remounts/exact close acknowledgements,54 responsive observations and independent
+grouped/reference backend denials with16 fixture files unchanged. Full root race
+integration passes in5077.500s, preserving1926 inputs/3733 artifacts,38 canonical
+inputs/21 assets, unchanged discovery and fifteen closed native families.
+No original Report/guide callback, printing, default/demo, release or overall
+forms/report/ribbon completion is inferred; continue the ordered deliverables.
 
 The accepted correction applies the source-qualified changed-NULL refusal
 for SV_FloodPlain/SpeciesListComplete to existing normal, two-page and ordinary

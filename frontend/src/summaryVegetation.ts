@@ -25,8 +25,8 @@ export type SummaryVegetationRow = {
 export type SummaryVegetationPreview = SummaryVegetationOwner & {
   average: number; display: number; showClass?: number; groupAndOrder?: number;
   groupField?: SummaryVegetationField; orderField?: SummaryVegetationField;
-  source: 'literal-normal-su-layer' | 'literal-normal-su-grouped' | 'literal-normal-su-effective-references' | 'literal-normal-su-constancy';
-  ordering: 'literal-null-first-layer-species' | 'literal-null-first-group-species' | 'literal-null-first-layer-species-common' | 'literal-null-first-numeric-lifeform-species-raw-code';
+  source: 'literal-normal-su-layer' | 'literal-normal-su-grouped' | 'literal-normal-su-effective-references' | 'literal-normal-su-constancy' | 'literal-normal-su-unanimous-common';
+  ordering: 'literal-null-first-layer-species' | 'literal-null-first-group-species' | 'literal-null-first-layer-species-common' | 'literal-null-first-numeric-lifeform-species-raw-code' | 'literal-null-first-group-species-unanimous-common';
   references?: SummaryVegetationReferenceMetadata;
   memberships: { rowId: string; plotNumber: LifeformTextCell; siteUnit: LifeformTextCell }[];
   units: SummaryVegetationUnit[]; columns: string[]; rows: SummaryVegetationRow[];
@@ -64,6 +64,9 @@ function compareGroup(a: SummaryVegetationGroup, b: SummaryVegetationGroup, cons
 export function summaryVegetationReferenceGroupingAvailable(groupAndOrder: number, common: boolean): boolean {
   return groupAndOrder === 11 || groupAndOrder === 12 || !common && (groupAndOrder === 13 || groupAndOrder === 14);
 }
+export function summaryVegetationUnanimousCommonAvailable(groupAndOrder: number, display: number, common: boolean): boolean {
+  return (groupAndOrder === 13 || groupAndOrder === 14) && display === 6 && common;
+}
 export function summaryVegetationOptionError(average: unknown, display: unknown, showClass: unknown = 0, groupAndOrder: unknown = 11): string {
   if (groupAndOrder !== 11 && groupAndOrder !== 12 && groupAndOrder !== 13 && groupAndOrder !== 14)
     return 'Choose a supported Group by option; no settings were saved.';
@@ -88,15 +91,17 @@ function summaryOrderCell(value: unknown, grouped: boolean): value is SummaryVeg
 
 function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOwner,
   average: number, display: number, showClass = 0, groupAndOrder = 11,
-  references?: SummaryVegetationReferenceMode, constancy = false): Generator<void, SummaryVegetationPreview> {
+  references?: SummaryVegetationReferenceMode, constancy = false, unanimousCommon = false): Generator<void, SummaryVegetationPreview> {
   const classMode = display === 4 || display === 5;
   const grouped = groupAndOrder !== 11;
   const common = !!references && (references.showCommon || references.useGuideNames);
-  const source = constancy ? 'literal-normal-su-constancy' : references ? 'literal-normal-su-effective-references' :
+  const source = constancy ? 'literal-normal-su-constancy' : unanimousCommon ? 'literal-normal-su-unanimous-common' : references ? 'literal-normal-su-effective-references' :
     grouped ? 'literal-normal-su-grouped' : 'literal-normal-su-layer';
-  const ordering = constancy ? 'literal-null-first-numeric-lifeform-species-raw-code' : common ? 'literal-null-first-layer-species-common' :
+  const ordering = constancy ? 'literal-null-first-numeric-lifeform-species-raw-code' : unanimousCommon ? 'literal-null-first-group-species-unanimous-common' : common ? 'literal-null-first-layer-species-common' :
     grouped ? 'literal-null-first-group-species' : 'literal-null-first-layer-species';
-  if (references && (!summaryVegetationReferenceGroupingAvailable(groupAndOrder, common) ||
+  if (typeof constancy !== 'boolean' || typeof unanimousCommon !== 'boolean' || constancy && unanimousCommon ||
+      unanimousCommon && !summaryVegetationUnanimousCommonAvailable(groupAndOrder, display, common)) reject();
+  if (references && (!unanimousCommon && !summaryVegetationReferenceGroupingAvailable(groupAndOrder, common) ||
       !lifeformShape(references, ['showCommon', 'useGuideNames']) ||
       typeof references.showCommon !== 'boolean' || typeof references.useGuideNames !== 'boolean')) reject();
   if (constancy && (groupAndOrder !== 13 || display !== 1 || !references || common)) reject();
@@ -177,7 +182,7 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
         (display === 2 || display === 6 || classMode) && item.order.storage === 'null') reject();
     let commonName: LifeformTextCell | undefined;
     if (common) {
-      if (!lifeformCell(item.commonName, 255)) reject();
+      if (!lifeformCell(item.commonName, 255) || unanimousCommon && item.commonName.text === '') reject();
       commonName = { ...item.commonName };
     }
     let rawSpecies: LifeformTextCell | undefined;
@@ -186,7 +191,7 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
       rawSpecies = { ...item.rawSpecies };
     }
     const key = JSON.stringify([item.layer.storage, constancy ? item.layer.integer : item.layer.text,
-      item.species.storage, item.species.text, ...(commonName ? [commonName.storage, commonName.text] : []),
+      item.species.storage, item.species.text, ...(commonName && !unanimousCommon ? [commonName.storage, commonName.text] : []),
       ...(rawSpecies ? [rawSpecies.storage, rawSpecies.text] : [])]);
     if (groups.has(key)) reject();
     groups.add(key);
@@ -259,7 +264,7 @@ function* summaryVegetationValidation(value: unknown, owner: SummaryVegetationOw
     if (rows.length) {
       const prior = rows[rows.length - 1];
       if ((compareGroup(prior.layer, row.layer, constancy) || compareCell(prior.species, row.species) ||
-          (common ? compareCell(prior.commonName!, row.commonName!) : 0) ||
+          (common && !unanimousCommon ? compareCell(prior.commonName!, row.commonName!) : 0) ||
           (constancy ? compareCell(prior.rawSpecies!, row.rawSpecies!) : 0)) >= 0) reject();
     }
     rows.push(row);
@@ -290,8 +295,8 @@ export function validateSummaryVegetation(value: unknown, owner: SummaryVegetati
 
 export async function validateSummaryVegetationAsync(value: unknown, owner: SummaryVegetationOwner,
   average: number, display: number, showClass: number, groupAndOrder: number, port: SummaryVegetationPort,
-  current: () => boolean, references?: SummaryVegetationReferenceMode, constancy = false): Promise<SummaryVegetationPreview | null> {
-  const validation = summaryVegetationValidation(value, owner, average, display, showClass, groupAndOrder, references, constancy);
+  current: () => boolean, references?: SummaryVegetationReferenceMode, constancy = false, unanimousCommon = false): Promise<SummaryVegetationPreview | null> {
+  const validation = summaryVegetationValidation(value, owner, average, display, showClass, groupAndOrder, references, constancy, unanimousCommon);
   let count = 0;
   for (;;) {
     if (!current()) return null;

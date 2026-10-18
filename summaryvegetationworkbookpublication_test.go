@@ -71,13 +71,15 @@ func TestSummaryDraftWorkbookPublicationInvisibleDrift(t *testing.T) {
 }
 
 func TestSummaryDraftWorkbookPublicationCancellationCleanupAndRetry(t *testing.T) {
-	for _, mode := range []string{"legacy", "memberships", "summary", "constancy"} {
+	for _, mode := range []string{"legacy", "memberships", "summary", "constancy", "unanimous13", "unanimous14"} {
 		for _, phase := range []string{"first-commit", "first-cleanup", "prelink-cleanup", "published-cleanup", "prelink-cancel", "published-cancel"} {
 			t.Run(mode+"/"+phase, func(t *testing.T) {
 				var service *SummaryVegetationWorkbookService
 				var state ProjectState
 				if mode == "constancy" {
 					service, state = summaryConstancyDesktopFixture(t, false)
+				} else if mode == "unanimous13" || mode == "unanimous14" {
+					service, state = summaryCommonFirstDesktopFixture(t, false)
 				} else {
 					service, state = summaryAncillaryDesktopFixture(t, false)
 				}
@@ -87,6 +89,15 @@ func TestSummaryDraftWorkbookPublicationCancellationCleanupAndRetry(t *testing.T
 				}
 				if mode == "constancy" {
 					options = summaryConstancyWorkbookOptions()
+					options.IncludeEnv = true
+					options.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{CreateSummary: true}
+				}
+				if mode == "unanimous13" || mode == "unanimous14" {
+					grouping := 13
+					if mode == "unanimous14" {
+						grouping = 14
+					}
+					options = summaryCommonFirstWorkbookOptions(grouping, 1)
 					options.IncludeEnv = true
 					options.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{CreateSummary: true}
 				}

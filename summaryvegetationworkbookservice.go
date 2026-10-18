@@ -29,6 +29,7 @@ const summaryVegetationStrataReferencesScope = "Explicit read-only normal-SU Str
 const summaryVegetationGroupedAttributesScope = "Explicit read-only normal-SU Lifeform/None effective-attribute inspection; typed XLSX, no common/guide names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity"
 const summaryVegetationGroupedAncillaryScope = "Explicit read-only normal-SU Strata/Lifeform/None inspection with optional effective references, SU Table and optional ReportSummary; typed XLSX, no Lifeform/None common names, original Report callbacks or formatting/printing parity"
 const summaryVegetationConstancyScope = "Explicit read-only normal-SU Constancy inspection with numeric lifeform and raw-species grouping; typed XLSX with optional environment/ancillary composition, adapted raw-code tie ordering, not original Report callbacks or formatting/printing parity"
+const summaryVegetationUnanimousCommonScope = "Explicit read-only normal-SU Lifeform/None unanimous common-name inspection; typed XLSX with optional environment/ancillary composition, source First empty-to-NULL output and explicit mixed-name refusal, not original Report/guide callbacks, Access collation or formatting/printing parity"
 
 type SummaryVegetationWorkbookAncillaryUnit struct {
 	Code     string  `json:"code"`
@@ -140,7 +141,7 @@ func (s *SummaryVegetationWorkbookService) readSource(ctx context.Context, plots
 
 func (s *SummaryVegetationWorkbookService) readSourceAt(ctx context.Context, plots *PlotService, owner *sqliteContext,
 	tx *sql.Tx, contextID string, options SummaryVegetationWorkbookOptions, createdAt string) (summaryVegetationWorkbookSource, error) {
-	if err := validateSummaryConstancyWorkbookOptions(options); err != nil {
+	if err := validateSummaryWorkbookInspectionOptions(options); err != nil {
 		return summaryVegetationWorkbookSource{}, err
 	}
 	if options.Constancy && !s.presentationEnabled {
@@ -223,6 +224,9 @@ func summaryVegetationWorkbookApproval(source summaryVegetationWorkbookSource, w
 	}
 	if options.Constancy {
 		domain = "VPRO Summary Constancy workbook approval v1\x00"
+	}
+	if options.UnanimousCommon {
+		domain = "VPRO Summary unanimous common-name workbook approval v1\x00"
 	}
 	digest := sha256.Sum256(append([]byte(domain), data...))
 	return hex.EncodeToString(digest[:]), nil

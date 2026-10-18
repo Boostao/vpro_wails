@@ -2838,6 +2838,74 @@ prerequisite, not a new desktop consumer, original Report/preflight/formatting/
 printing or whole-collation guarantee. No new production file/service/binding/
 flag/preference/default/demo change follows.
 
+### Unanimous common-name workbook consumer
+
+This separate candidate consumes the published private prerequisite through
+the existing inspection workbook path. Frozen validation, independent review,
+disposable native acceptance and full root integration pass.
+The delivered demo is unchanged.
+
+The optional `unanimousCommon` request must be literal true when present.
+NULL, false, mistyped values, nonexact or duplicate/escaped-duplicate keys refuse.
+Require explicit Group13/14, Display6 and effective common/guide references;
+Constancy and unanimous-common requests are mutually exclusive. Marker omission
+retains existing ordinary/basic availability. Retained ShowClass0/1/10/20
+transports unchanged while Display6 calculates with0.
+
+Source `literal-normal-su-unanimous-common`, ordering
+`literal-null-first-group-species-unanimous-common`, a distinct inspection scope
+and the `VPRO Summary unanimous common-name workbook approval v1` NUL-terminated
+domain separate this authority from ordinary, attributes-only and Constancy.
+The ordering retains the original literal group/species key: the unanimous
+name is not a tie-breaker permitting duplicate original keys. Both typed writer
+and client reject duplicate original keys even with different names, and reject
+empty text output because original First projects a unanimous empty as NULL.
+Complete source/body previews, calculations, reference choices, title,
+environmental selection and normalized class must match the retained request.
+Physical NULL/empty references and origins remain unchanged in provenance.
+
+Existing grouped and effective-reference frontend/backend gates are independent
+requirements. Presentation is not an additional prerequisite for this mode;
+Constancy retains its own presentation gate. No new editor/service/flag/
+dependency is introduced. The same availability predicate controls request
+assembly, current-review equality, presentation and Review/Publish handlers.
+Manual name/basic drafts survive mode changes; selecting guide names retains the
+existing common-output coupling without persisting source preferences.
+
+The existing typed renderer/publisher supports optional environmental rows,
+SU Table and ReportSummary. The new common-name first header uses original
+group-field metadata (LifeForm or Group); legacy common-name headers are
+unchanged. Order remains DOUBLE in its shifted column. Environmental and
+ancillary caption precedence, physical source witnesses, cancellation,
+lease/snapshot cleanup and irreversible publication receipts remain shared.
+Guide selection projects effective names; it does not execute original rename
+callbacks. Other named13/14 displays, basic/generic named routes, original
+Report/preflight/formatting/printing and general Access collation remain excluded.
+
+Development validation passes32 reopened synthetic publications,16 strict-Go
+wire vectors and57 browser-conditioned cases with real proxies and consumed
+Svelte rendering. Independent arithmetic retains MAX and duplicate physical
+membership counts4/1: Alpha A15.00 for both averages, B11.00/5.50, DOUBLE Order15.
+Source NULL and uniform-empty name rows both emit NULL without merging their
+distinct physical metadata. Bidirectional approval reuse, physical-reference
+drift, source ambiguity/guide correction, collision, cancellation/cleanup/retry,
+independent gates, retained receipts and stale validation are covered.
+Frozen focused/coupled races119.500s/783.250s,241 related client/57 browser cases,
+check/build/vet/production and250 exact legacy outputs pass. Distinct read-only
+review finds no significant issues. Five once-only Wails outputs qualify common,
+guide, environment and ancillary composition, complete hidden provenance and
+typed cells; ambiguous None common names correct through guide selection.
+The native seed's missing lifeform2 map remains a NULL group, independently
+verified against physical LayerCode rows rather than inventing a label.
+Four remounts/exact close acknowledgements,54 responsive observations and two
+independent backend denials preserve16 fixture files. Completed publications
+were never replayed after correcting inherited harness expectations. Full root
+race integration passes in5077.500s, preserving1926 managed inputs/3733 artifacts,
+38 canonical inputs/21 assets, unchanged discovery and fifteen closed native
+families. Only six directly related acceptance-status docs change after the
+freeze. No default/demo, original Report/guide callbacks/formatting/printing or
+overall forms/report/ribbon completion follows.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes

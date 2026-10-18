@@ -39,35 +39,37 @@ func (options *SummaryVegetationWorkbookAncillaryOptions) UnmarshalJSON(data []b
 }
 
 type SummaryVegetationWorkbookOptions struct {
-	Title         string                                     `json:"title"`
-	Average       int                                        `json:"average"`
-	Display       int                                        `json:"display"`
-	ShowClass     int                                        `json:"showClass"`
-	IncludeEnv    bool                                       `json:"includeEnv"`
-	Ancillary     *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary,omitempty"`
-	References    *SummaryVegetationReferenceOptions         `json:"references,omitempty"`
-	GroupAndOrder *int                                       `json:"groupAndOrder,omitempty"`
-	Constancy     bool                                       `json:"constancy,omitempty"`
+	Title           string                                     `json:"title"`
+	Average         int                                        `json:"average"`
+	Display         int                                        `json:"display"`
+	ShowClass       int                                        `json:"showClass"`
+	IncludeEnv      bool                                       `json:"includeEnv"`
+	Ancillary       *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary,omitempty"`
+	References      *SummaryVegetationReferenceOptions         `json:"references,omitempty"`
+	GroupAndOrder   *int                                       `json:"groupAndOrder,omitempty"`
+	Constancy       bool                                       `json:"constancy,omitempty"`
+	UnanimousCommon bool                                       `json:"unanimousCommon,omitempty"`
 }
 
 func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) error {
 	var raw struct {
-		Title         *string                                    `json:"title"`
-		Average       *int                                       `json:"average"`
-		Display       *int                                       `json:"display"`
-		ShowClass     *int                                       `json:"showClass"`
-		IncludeEnv    *bool                                      `json:"includeEnv"`
-		Ancillary     *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary"`
-		References    *SummaryVegetationReferenceOptions         `json:"references"`
-		GroupAndOrder *int                                       `json:"groupAndOrder"`
-		Constancy     *bool                                      `json:"constancy"`
+		Title           *string                                    `json:"title"`
+		Average         *int                                       `json:"average"`
+		Display         *int                                       `json:"display"`
+		ShowClass       *int                                       `json:"showClass"`
+		IncludeEnv      *bool                                      `json:"includeEnv"`
+		Ancillary       *SummaryVegetationWorkbookAncillaryOptions `json:"ancillary"`
+		References      *SummaryVegetationReferenceOptions         `json:"references"`
+		GroupAndOrder   *int                                       `json:"groupAndOrder"`
+		Constancy       *bool                                      `json:"constancy"`
+		UnanimousCommon *bool                                      `json:"unanimousCommon"`
 	}
 	properties, err := sourceChildJSONObject(data, "Summary draft workbook options",
-		[]string{"title", "average", "display", "showClass", "includeEnv"}, []string{"ancillary", "references", "groupAndOrder", "constancy"})
+		[]string{"title", "average", "display", "showClass", "includeEnv"}, []string{"ancillary", "references", "groupAndOrder", "constancy", "unanimousCommon"})
 	if err != nil {
 		return err
 	}
-	if err := sourceChildJSONNonNull(properties, "Summary draft workbook options", "ancillary", "references", "groupAndOrder", "constancy"); err != nil {
+	if err := sourceChildJSONNonNull(properties, "Summary draft workbook options", "ancillary", "references", "groupAndOrder", "constancy", "unanimousCommon"); err != nil {
 		return err
 	}
 	if err := json.Unmarshal(data, &raw); err != nil {
@@ -79,20 +81,31 @@ func (options *SummaryVegetationWorkbookOptions) UnmarshalJSON(data []byte) erro
 	if raw.Constancy != nil && !*raw.Constancy {
 		return errors.New("Summary Constancy selection must be true when present; omit it for ordinary inspection")
 	}
+	if raw.UnanimousCommon != nil && !*raw.UnanimousCommon {
+		return errors.New("Summary unanimous common-name selection must be true when present; omit it for ordinary inspection")
+	}
 	parsed := SummaryVegetationWorkbookOptions{Title: *raw.Title, Average: *raw.Average, Display: *raw.Display,
 		ShowClass: *raw.ShowClass, IncludeEnv: *raw.IncludeEnv, Ancillary: raw.Ancillary, References: raw.References,
-		GroupAndOrder: raw.GroupAndOrder, Constancy: raw.Constancy != nil}
-	if err := validateSummaryConstancyWorkbookOptions(parsed); err != nil {
+		GroupAndOrder: raw.GroupAndOrder, Constancy: raw.Constancy != nil, UnanimousCommon: raw.UnanimousCommon != nil}
+	if err := validateSummaryWorkbookInspectionOptions(parsed); err != nil {
 		return err
 	}
 	*options = parsed
 	return nil
 }
 
-func validateSummaryConstancyWorkbookOptions(options SummaryVegetationWorkbookOptions) error {
+func validateSummaryWorkbookInspectionOptions(options SummaryVegetationWorkbookOptions) error {
+	if options.Constancy && options.UnanimousCommon {
+		return errors.New("Summary Constancy and unanimous common-name workbook selections are mutually exclusive")
+	}
 	if options.Constancy && (options.GroupAndOrder == nil || *options.GroupAndOrder != 13 ||
 		options.Display != 1 || options.References == nil || options.References.ShowCommon || options.References.UseGuideNames) {
 		return errors.New("Summary Constancy workbook requires explicit Group13/Display1 and effective references without common/guide names")
+	}
+	if options.UnanimousCommon && (options.GroupAndOrder == nil || options.References == nil ||
+		!summaryVegetationUnanimousCommonAvailable(*options.GroupAndOrder, options.Display,
+			options.References.ShowCommon || options.References.UseGuideNames)) {
+		return errors.New("Summary unanimous common-name workbook requires explicit Group13/14 Display6 and common/guide references")
 	}
 	return nil
 }

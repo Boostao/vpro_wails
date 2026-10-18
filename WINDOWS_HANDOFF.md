@@ -25,14 +25,33 @@ Current machine state only. Portable scope and ordered work are in
 
 ## Current accepted integration
 
-Published desktop baseline: `84bad2998d642c466488fcbeba2cb1eec9631e3f` on `main`,
-the accepted Constancy consumer described below. The four-path private
-common-First prerequisite is independently reviewed and full-race accepted;
-Git and its private publication association identify the exact revision.
-This is not desktop/public availability acceptance.
+The accepted unanimous common-name workbook consumer is based on published
+`main` baseline `f11817da7ecdcb9956b339492d8f9152c7aae82a`, the independently
+reviewed/full-race accepted private prerequisite atop the Constancy consumer.
+The consumer is independently reviewed, disposable-native verified and
+full-race integrated, not default/demo or original Report acceptance.
 
-Current successor contract: `summary-common-first-kernel-contract.json` in the
-active session. Two closed disposable source families preserve the failed empty
+Current successor contract: `summary-common-first-desktop-contract.json` in the
+active session. The accepted consumer wires a strict true-only request,
+distinct source/scope/approval and typed internal dispatch through the existing
+workbook panel/session/source/renderer/publisher. Existing grouped/reference
+gates remain independent; no new service/flag/default or implicit preference
+writes. Frozen mode-guard validation accepts focused/coupled
+races119.500s/783.250s,241 related client/57 browser cases, check/build/vet/
+production and250 exact legacy vectors. Distinct review finds no significant
+issues. `native-summary-unanimous-common-workbook/native-acceptance.json`
+accepts five reopened outputs, four remounts/exact close acknowledgements,
+54 responsive observations, two independent backend denials and16 unchanged
+fixture files. Four owned profiles closed normally. The smoke retained a
+missing lifeform2 map as NULL, corrected inherited ancillary witness counts
+without fixture/application changes, and never replayed completed publications.
+Full root race passes in5077.500s, UTC2026-10-18T07:29:51.538560 to
+08:54:29.063694. All1926 managed inputs/3733 artifacts,38 canonical inputs/
+21 assets, unchanged discovery and fifteen closed native families match.
+`summary-common-first-desktop-integration/receipt.json` SHA256:
+`242e493daf622d65205666fd20be85dee7337cf0393051fe09b9d3c19c1f71c1`.
+Only these six acceptance-status docs change after the freeze.
+Two closed disposable source families preserve the failed empty
 expectation and fresh24-case qualification. Physical empty/NULL remain distinct;
 original First projects uniform empty as NULL. Source review accepts exact typed
 unanimity across actual joined rows/all units, with mixed-input refusal.
@@ -50,8 +69,16 @@ base/candidate vectors. Distinct application review finds no significant issues.
 38 canonical inputs/21 assets, discovery and fourteen closed native families
 match. Receipt SHA256:
 `ef3d4569cdc66619344c6b9cd51fea8240aeb333005e7554e9dcaa0b9204798b`.
-The freeze is released for five status-only documentation updates and feature
-publication, then the separate workbook consumer. No native owner remains.
+The accepted prerequisite freeze is closed and its publication association
+preserved. The consumer's successful second validation and250-vector legacy
+receipts are in `summary-common-first-desktop-mode-guard-{validation,legacy}`.
+The first interrupted validation/logs/assets remain unaccepted and preserved.
+The first integration adapter stopped before any race because protectedFiles
+was a count, not a hash map; the accepted successor explicitly seals both
+validation folders and matching receipts/logs. Preserve both drivers.
+All23 implementation paths remain unchanged except these six status docs.
+Next: normal authorized feature publication, then continue ordered forms/report/
+ribbon work. No native owner remains.
 
 The published Constancy panel consumes the loaded presentation draft, retaining
 basic/manual drafts under independent grouped/reference/presentation gates.
@@ -64,8 +91,9 @@ accepted with16 unchanged fixture files. Root race5011.094s preserves1923 inputs
 Full portable scope and original-query/consumer limitations are in the
 [workbook contract](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#constancy-workbook-consumer).
 Preserve the sealed native families and exact native-close acknowledgements.
-Group13/14 common/guide desktop selection, Strata/Lifeform Display2, original
-Report callbacks and whole-form/ribbon gaps remain. None Display2 is supported.
+Group13/14 Display6 common/guide inspection is accepted under its existing
+independent gates. Strata/Lifeform Display2, original Report callbacks and
+whole-form/ribbon gaps remain. None Display2 is supported.
 The delivered demo/release is unchanged.
 
 The attempted two-page Picture Manager route was rejected before any native

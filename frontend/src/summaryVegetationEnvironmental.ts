@@ -38,7 +38,7 @@ export interface SummaryEnvironmentalLifeformPreview extends SummaryEnvironmenta
 }
 type SummaryEnvironmentalCalculation = {
   average: number; display: number; showClass: number; references?: SummaryVegetationReferenceMode; groupAndOrder?: number;
-  constancy?: true;
+  constancy?: true; unanimousCommon?: true;
 };
 const numericFunctions = new Set(['SVSeepage', 'SVRootingDepth', 'SVStandAge', 'SVElevation', 'SVSlope', 'SVSubstrate', 'SVStrataCover']);
 export function validateSummaryEnvironmentalNumeric(value: unknown, owner: SummaryVegetationOwner,
@@ -92,7 +92,7 @@ async function validateSummaryEnvironmentalRows<V>(value: unknown, owner: Summar
       !lifeformText(value.sourcePath) || !value.sourcePath || value.envSourcePath !== owner.projectPath ||
       value.source !== source || !Array.isArray(value.rows)) reject();
   const vegetation = await validateSummaryVegetationAsync(value.vegetation, owner, options.average, options.display, options.showClass, options.groupAndOrder ?? 11,
-    { preview: () => Promise.reject(new Error('Validation cannot dispatch a read')), cancel: () => {}, validationYield }, current, options.references, options.constancy);
+    { preview: () => Promise.reject(new Error('Validation cannot dispatch a read')), cancel: () => {}, validationYield }, current, options.references, options.constancy, options.unanimousCommon);
   if (!current() || vegetation === null) return null;
   const table = fieldListTable(value.fieldList), index = fieldListIndex(table);
   if (index.error || index.selected.length !== value.rows.length) reject();

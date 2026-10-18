@@ -481,6 +481,52 @@ fourteen closed native families. Only five acceptance-status docs change after
 the freeze. No new Wails/public availability, Report/guide callback, general
 collation, stable First ordering, default or demo/release acceptance is claimed.
 
+## Unanimous common-name workbook consumer
+
+The published private prerequisite is now composed through the existing workbook
+inspection source/panel/session/renderer/publisher without a new service, flag,
+dependency or preference write. Only explicit true-only `unanimousCommon`
+requests authorize13/14 Display6 names, with distinct source/ordering/scope/
+approval and complete source/body/options authority. Basic/generic routes stay
+unchanged. Original group/species duplicates cannot be hidden by different
+display names; uniform empty output must be NULL. Effective guide selection
+reuses its existing projection and common-output coupling, not source callbacks.
+
+Synthetic fixtures retain duplicate memberships, raw MAX peers and independent
+fixed4/1 denominators. Thirty-two physically reopened test publications cover
+both averages/groupings and common/guide/environment/ancillary composition.
+Sixteen strict production-Go round-trip vectors feed actual client proxies;
+57 browser-conditioned cases cover strict authority, consumed rendering, retained
+drafts/receipts, independent flags, unsupported displays and held stale validation
+across remounts. A standalone source-mode downgrade gap was independently
+reproduced with a failing test; the source kind now requires grouped metadata
+validation even when the DTO claims Layer11. The initial frozen runner was
+stopped and its logs/assets preserved for a fresh validation.
+Focused publication tests include bidirectional approval refusal,
+invisible physical-reference drift and committed-state preservation; both modes
+share explicit cancellation/cleanup/retry cases.
+
+The fresh frozen validation accepts focused/coupled races119.500s/783.250s,
+241 related client/57 browser cases, check/build/vet/production and250 exact
+legacy vectors. Distinct read-only review finds no significant issues.
+Actual Wails accepts five once-only publications with every typed vegetation
+cell, complete hidden provenance and independent physical ancillary rows
+reopened. Both grouping modes page50/24 or50/23; ambiguous None common names
+correct through guide selection without source mutation. The inherited seed
+maps lifeform1 to01 but leaves lifeform2 unmatched/NULL, not the harness's assumed2.
+Inherited60-membership/54-unit witness constants were corrected to the sealed
+eight-membership/two-unit fixture after four completed outputs; those outputs
+were reopened rather than replayed. Four host remounts/exact close acknowledgements,
+54 responsive observations, retained committed unknown receipts and two
+independent backend denials preserve16 fixture files. Four owned profiles close
+normally. Full root race integration passes in5077.500s, preserving1926 managed
+inputs/3733 artifacts,38 canonical inputs/21 assets, unchanged discovery and
+fifteen closed native families. Only six acceptance-status documents change
+after the freeze. The first integration adapter stopped before race startup
+because a protected-file count was mistaken for a hash map; its preserved
+successor explicitly seals both validation folders and private logs/receipts.
+No new demo/release or original Report/printing acceptance is claimed.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

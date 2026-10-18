@@ -32,6 +32,10 @@ func summaryVegetationReferenceGroupingAvailable(grouping int, common bool) bool
 	return grouping == 11 || grouping == 12 || !common && (grouping == 13 || grouping == 14)
 }
 
+func summaryVegetationUnanimousCommonAvailable(grouping, display int, common bool) bool {
+	return (grouping == 13 || grouping == 14) && display == 6 && common
+}
+
 func summaryVegetationMasterLongInteger(cell ProjectMetadataCell) (*int, error) {
 	if _, err := metadataCellValue(cell); err != nil {
 		return nil, err

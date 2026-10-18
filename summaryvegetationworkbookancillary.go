@@ -19,6 +19,9 @@ func summaryWorkbookScope(options SummaryVegetationWorkbookOptions) string {
 	if options.Constancy {
 		return summaryVegetationConstancyScope
 	}
+	if options.UnanimousCommon {
+		return summaryVegetationUnanimousCommonScope
+	}
 	if options.GroupAndOrder != nil {
 		if options.Ancillary != nil {
 			return summaryVegetationGroupedAncillaryScope
@@ -45,10 +48,10 @@ func summaryWorkbookScope(options SummaryVegetationWorkbookOptions) string {
 
 func prepareSummaryWorkbookSource(ctx context.Context, source summaryVegetationWorkbookSource,
 	options SummaryVegetationWorkbookOptions) (summaryVegetationWorkbook, error) {
-	if err := validateSummaryConstancyWorkbookSource(source, options); err != nil {
+	if err := validateSummaryWorkbookInspectionSource(source, options); err != nil {
 		return summaryVegetationWorkbook{}, err
 	}
-	if options.GroupAndOrder != nil && (options.References != nil && !summaryVegetationReferenceGroupingAvailable(*options.GroupAndOrder,
+	if options.GroupAndOrder != nil && (!options.UnanimousCommon && options.References != nil && !summaryVegetationReferenceGroupingAvailable(*options.GroupAndOrder,
 		options.References.ShowCommon || options.References.UseGuideNames) ||
 		(options.References != nil) != (source.Input.Vegetation.References != nil) ||
 		(options.References != nil) != (source.Raw.Preview.References != nil) ||
@@ -91,17 +94,31 @@ func prepareSummaryWorkbookSource(ctx context.Context, source summaryVegetationW
 	return result, nil
 }
 
-func validateSummaryConstancyWorkbookSource(source summaryVegetationWorkbookSource, options SummaryVegetationWorkbookOptions) error {
-	if err := validateSummaryConstancyWorkbookOptions(options); err != nil {
+func validateSummaryWorkbookInspectionSource(source summaryVegetationWorkbookSource, options SummaryVegetationWorkbookOptions) error {
+	if err := validateSummaryWorkbookInspectionOptions(options); err != nil {
 		return err
 	}
 	if options.Constancy != (source.Input.Vegetation.Source == summaryVegetationConstancySource) ||
 		options.Constancy != (source.Raw.Preview.Source == summaryVegetationConstancySource) {
 		return errors.New("Summary Constancy workbook options differ from source/body authority")
 	}
-	if options.Constancy && (!reflect.DeepEqual(source.Input.Vegetation, source.Raw.Preview) ||
+	if options.UnanimousCommon != (source.Input.Vegetation.Source == summaryVegetationUnanimousCommonSource) ||
+		options.UnanimousCommon != (source.Raw.Preview.Source == summaryVegetationUnanimousCommonSource) {
+		return errors.New("Summary unanimous common-name workbook options differ from source/body authority")
+	}
+	if options.UnanimousCommon && (source.Input.Vegetation.References == nil ||
+		source.Input.Title != options.Title || options.IncludeEnv != (source.Input.Environment != nil) ||
+		options.ShowClass != 0 && options.ShowClass != 1 && options.ShowClass != 10 && options.ShowClass != 20 ||
+		source.Input.Vegetation.References.ShowCommon != (options.References.ShowCommon || options.References.UseGuideNames) ||
+		source.Input.Vegetation.References.UseGuideNames != options.References.UseGuideNames) {
+		return errors.New("Summary unanimous common-name workbook reference selection differs from source/body authority")
+	}
+	if (options.Constancy || options.UnanimousCommon) && (!reflect.DeepEqual(source.Input.Vegetation, source.Raw.Preview) ||
 		source.Input.Vegetation.Average != options.Average ||
 		source.Input.Vegetation.Display != options.Display || source.Input.Vegetation.ShowClass != 0) {
+		if options.UnanimousCommon {
+			return errors.New("Summary unanimous common-name workbook requires matching complete source/body calculation and original grouping identities")
+		}
 		return errors.New("Summary Constancy workbook requires matching complete source/body calculation and raw-species identities")
 	}
 	return nil

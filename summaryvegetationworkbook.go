@@ -35,10 +35,11 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 	}
 	preview := input.Vegetation
 	constancy := preview.Source == summaryVegetationConstancySource
+	unanimousCommon := preview.Source == summaryVegetationUnanimousCommonSource
 	if err := validateSummaryVegetationDisplayOptions(ctx, preview.Average, preview.Display, preview.ShowClass); err != nil {
 		return fail(err)
 	}
-	grouped := preview.Source == "literal-normal-su-grouped" || preview.GroupAndOrder != 0 && preview.GroupAndOrder != 11
+	grouped := unanimousCommon || preview.Source == "literal-normal-su-grouped" || preview.GroupAndOrder != 0 && preview.GroupAndOrder != 11
 	groupLabel := "Layer"
 	if grouped {
 		var err error
@@ -68,6 +69,9 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 	}
 	if constancy {
 		source, ordering = summaryVegetationConstancySource, summaryVegetationConstancyOrdering
+	}
+	if unanimousCommon {
+		source, ordering = summaryVegetationUnanimousCommonSource, summaryVegetationUnanimousCommonOrdering
 	}
 	if preview.ContextID == "" || preview.ProjectPath == "" || preview.SUPath == "" || preview.Project == "" ||
 		preview.SU == "" || preview.SU == "None" || preview.SU == "USysSuTableDynamic" ||
@@ -108,6 +112,9 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 	if common {
 		leading = 4
 		labels = []string{"Layer", "Spp", "Common Name", "Order"}
+		if unanimousCommon {
+			labels[0] = groupLabel
+		}
 	}
 	caption := "Vegetation Table"
 	if constancy {
@@ -155,6 +162,9 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 		if len(row.Covers) != len(preview.Columns) || len(row.Witnesses) == 0 ||
 			(row.CommonName != nil) != common {
 			return fail(errors.New("Summary workbook body requires distinct source-ordered groups and complete pivot values"))
+		}
+		if unanimousCommon && row.CommonName.Text != nil && *row.CommonName.Text == "" {
+			return fail(errors.New("Summary unanimous common-name workbook requires source First empty text projected as NULL"))
 		}
 		var number *int
 		if constancy {
@@ -206,7 +216,7 @@ func prepareSummaryVegetationWorkbookWithSheets(ctx context.Context, input summa
 			prior := preview.Rows[i-1]
 			ordered := less(prior.Layer, row.Layer) || reflect.DeepEqual(prior.Layer, row.Layer) &&
 				(less(prior.Species, row.Species) || reflect.DeepEqual(prior.Species, row.Species) &&
-					common && less(*prior.CommonName, *row.CommonName))
+					common && !unanimousCommon && less(*prior.CommonName, *row.CommonName))
 			if constancy {
 				sameGroup := priorNumber == nil && number == nil ||
 					priorNumber != nil && number != nil && *priorNumber == *number
@@ -240,7 +250,12 @@ func summaryVegetationWorkbookGroup(ctx context.Context, preview SummaryVegetati
 	if err := validateSummaryVegetationGroupedOptions(ctx, preview.Average, preview.GroupAndOrder, preview.Display, preview.ShowClass); err != nil {
 		return "", err
 	}
-	if preview.References != nil && !summaryVegetationReferenceGroupingAvailable(preview.GroupAndOrder,
+	unanimousCommon := preview.Source == summaryVegetationUnanimousCommonSource
+	if unanimousCommon && (preview.ShowClass != 0 || preview.References == nil ||
+		!summaryVegetationUnanimousCommonAvailable(preview.GroupAndOrder, preview.Display, preview.References.ShowCommon)) {
+		return "", errors.New("Summary unanimous common-name workbook requires Group13/14 Display6 and effective common/guide references")
+	}
+	if !unanimousCommon && preview.References != nil && !summaryVegetationReferenceGroupingAvailable(preview.GroupAndOrder,
 		preview.References.ShowCommon || preview.References.UseGuideNames) {
 		return "", errors.New("Summary grouped common/guide references require Strata12; First(common name) for13/14 is not qualified")
 	}

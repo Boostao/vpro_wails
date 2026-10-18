@@ -165,23 +165,35 @@ func (s *SummaryVegetationService) readSnapshotWithReferences(ctx context.Contex
 	owner *sqliteContext, tx *sql.Tx, average, display, showClass, groupAndOrder int,
 	options *SummaryVegetationReferenceOptions) (summaryVegetationSnapshotPreview, error) {
 	return s.readSnapshotWithReferenceMode(ctx, contextID, plots, owner, tx,
-		average, display, showClass, groupAndOrder, options, false)
+		average, display, showClass, groupAndOrder, options, summaryVegetationGroupedOrdinary)
 }
 
 const summaryVegetationConstancySource = "literal-normal-su-constancy"
 const summaryVegetationConstancyOrdering = "literal-null-first-numeric-lifeform-species-raw-code"
+const summaryVegetationUnanimousCommonSource = "literal-normal-su-unanimous-common"
+const summaryVegetationUnanimousCommonOrdering = "literal-null-first-group-species-unanimous-common"
 
 func (s *SummaryVegetationService) readSnapshotWithReferenceMode(ctx context.Context, contextID string, plots *PlotService,
 	owner *sqliteContext, tx *sql.Tx, average, display, showClass, groupAndOrder int,
-	options *SummaryVegetationReferenceOptions, constancy bool) (summaryVegetationSnapshotPreview, error) {
+	options *SummaryVegetationReferenceOptions, mode summaryVegetationGroupedMode) (summaryVegetationSnapshotPreview, error) {
 	fail := func(err error) (summaryVegetationSnapshotPreview, error) {
 		return summaryVegetationSnapshotPreview{}, err
 	}
+	if mode != summaryVegetationGroupedOrdinary && mode != summaryVegetationGroupedConstancy &&
+		mode != summaryVegetationGroupedUnanimousCommon {
+		return fail(errors.New("Summary snapshot requires a supported explicit grouping mode"))
+	}
+	constancy := mode == summaryVegetationGroupedConstancy
+	unanimousCommon := mode == summaryVegetationGroupedUnanimousCommon
 	if constancy && (groupAndOrder != 13 || display != 1 || showClass != 0 || options == nil ||
 		options.ShowCommon || options.UseGuideNames) {
 		return fail(errors.New("Summary Constancy snapshot requires Group13/Display1 and effective references without common/guide names"))
 	}
-	if options != nil && !summaryVegetationReferenceGroupingAvailable(groupAndOrder, options.ShowCommon || options.UseGuideNames) {
+	if unanimousCommon && (showClass != 0 || options == nil ||
+		!summaryVegetationUnanimousCommonAvailable(groupAndOrder, display, options.ShowCommon || options.UseGuideNames)) {
+		return fail(errors.New("Summary unanimous common-name snapshot requires Group13/14 Display6 and effective common/guide references"))
+	}
+	if !unanimousCommon && options != nil && !summaryVegetationReferenceGroupingAvailable(groupAndOrder, options.ShowCommon || options.UseGuideNames) {
 		return fail(errors.New("Summary effective common/guide references require Layer11 or Strata12 inspection; First(common name) for13/14 remains unavailable"))
 	}
 
@@ -250,6 +262,10 @@ func (s *SummaryVegetationService) readSnapshotWithReferenceMode(ctx context.Con
 		grouped, err = prepareSummaryVegetationConstancyReferences(ctx, owner.selection.Project, owner.selection.SU,
 			tables[0], tables[1], tables[2], tables[3], tables[4], average, references)
 		report = grouped.Report
+	} else if unanimousCommon {
+		grouped, err = prepareSummaryVegetationUnanimousCommonReferences(ctx, owner.selection.Project, owner.selection.SU,
+			tables[0], tables[1], tables[2], tables[3], tables[4], average, groupAndOrder, references)
+		report = grouped.Report
 	} else {
 		grouped, err = prepareSummaryVegetationGroupedReferences(ctx, owner.selection.Project, owner.selection.SU,
 			tables[0], tables[1], tables[2], tables[3], tables[4], average, groupAndOrder, display, showClass, references)
@@ -287,6 +303,9 @@ func (s *SummaryVegetationService) readSnapshotWithReferenceMode(ctx context.Con
 	}
 	if constancy {
 		result.Source, result.Ordering = summaryVegetationConstancySource, summaryVegetationConstancyOrdering
+	}
+	if unanimousCommon {
+		result.Source, result.Ordering = summaryVegetationUnanimousCommonSource, summaryVegetationUnanimousCommonOrdering
 	}
 	uc, err := siteUnitTransferColumns(tables[1], "PlotNumber", "SiteUnit")
 	if err != nil {

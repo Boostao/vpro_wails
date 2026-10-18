@@ -658,7 +658,24 @@ are reused. Focused/coupled race19.296s/763.687s, production vet/build and250 ex
 legacy comparisons pass. Distinct application review finds no significant issues.
 Full root race integration passes in5005.937s, preserving1924 managed inputs,
 3662 artifacts,38 canonical inputs/21 assets and fourteen closed native families.
-Public Group13/14 common/guide selection and the delivered demo remain unchanged.
+That private prerequisite alone did not change public Group13/14 common/guide
+selection or the delivered demo; the separate consumer follows.
+
+The separate [unanimous-name workbook consumer](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#unanimous-common-name-workbook-consumer)
+now composes this calculation through the retained inspection panel and existing
+publisher. Its explicit true-only request, distinct source/scope/approval,
+original-key uniqueness and empty-to-NULL output guards preserve ordinary/basic
+availability. The existing grouped and effective-reference gates remain required;
+no new service, flag, dependency or preference writes. Frozen focused/coupled
+races119.500s/783.250s,241 related client/57 browser cases, check/build/vet/
+production and250 exact legacy comparisons pass. Distinct review finds no
+significant issues. Actual Wails accepts five reopened workbooks, ambiguity
+correction through guide selection, four remounts/exact close acknowledgements,
+54 responsive observations and two independent backend denials, preserving16
+fixture files. Full root race integration passes in5077.500s, preserving1926
+managed inputs/3733 artifacts,38 canonical inputs/21 assets, unchanged discovery
+and fifteen closed native families. This default-off inspection does not change
+the delivered demo or establish original Report/printing parity.
 
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus

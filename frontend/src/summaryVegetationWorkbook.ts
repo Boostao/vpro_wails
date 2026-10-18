@@ -2,7 +2,7 @@ import type { SummaryVegetationWorkbookOptions as GeneratedSummaryWorkbookOption
   SummaryVegetationWorkbookReportSummary, VegetationWorkbookOutcome } from '../bindings/github.com/boostao/vpro-wails';
 import { lifeformShape as shape } from './lifeformSummary';
 import { workbookText, workbookWorksheetName, workbookFoldedName } from './lifeformWorkbook';
-import { summaryVegetationOptionError, summaryVegetationReferenceGroupingAvailable, validateSummaryVegetationAsync,
+import { summaryVegetationOptionError, summaryVegetationReferenceGroupingAvailable, summaryVegetationUnanimousCommonAvailable, validateSummaryVegetationAsync,
   type SummaryVegetationOwner, type SummaryVegetationPreview, type SummaryVegetationReferenceMode } from './summaryVegetation';
 import { validateSummaryEnvironmentalLifeformOptions,
   type SummaryEnvironmentalLifeformPreview } from './summaryVegetationEnvironmental';
@@ -18,8 +18,9 @@ export const summaryVegetationStrataReferencesScope = 'Explicit read-only normal
 export const summaryVegetationGroupedAttributesScope = 'Explicit read-only normal-SU Lifeform/None effective-attribute inspection; typed XLSX, no common/guide names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity';
 export const summaryVegetationGroupedAncillaryScope = 'Explicit read-only normal-SU Strata/Lifeform/None inspection with optional effective references, SU Table and optional ReportSummary; typed XLSX, no Lifeform/None common names, original Report callbacks or formatting/printing parity';
 export const summaryVegetationConstancyScope = 'Explicit read-only normal-SU Constancy inspection with numeric lifeform and raw-species grouping; typed XLSX with optional environment/ancillary composition, adapted raw-code tie ordering, not original Report callbacks or formatting/printing parity';
-type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references' | 'groupAndOrder' | 'constancy'> & {
-  references?: SummaryVegetationReferenceMode; groupAndOrder?: number; constancy?: true;
+export const summaryVegetationUnanimousCommonScope = 'Explicit read-only normal-SU Lifeform/None unanimous common-name inspection; typed XLSX with optional environment/ancillary composition, source First empty-to-NULL output and explicit mixed-name refusal, not original Report/guide callbacks, Access collation or formatting/printing parity';
+type SummaryVegetationWorkbookOptions = Omit<GeneratedSummaryWorkbookOptions, 'references' | 'groupAndOrder' | 'constancy' | 'unanimousCommon'> & {
+  references?: SummaryVegetationReferenceMode; groupAndOrder?: number; constancy?: true; unanimousCommon?: true;
 };
 export type SummaryWorkbookCalculation = Pick<SummaryVegetationWorkbookOptions, 'average' | 'display' | 'showClass' | 'groupAndOrder' | 'constancy'>;
 type SummaryWorkbookReportSummary = Omit<SummaryVegetationWorkbookReportSummary, 'units'> & {
@@ -51,7 +52,7 @@ function reject(): never {
 }
 function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
   const keys = ['title', 'average', 'display', 'showClass', 'includeEnv'];
-  const optional = ['ancillary', 'references', 'groupAndOrder', 'constancy'].filter(key =>
+  const optional = ['ancillary', 'references', 'groupAndOrder', 'constancy', 'unanimousCommon'].filter(key =>
     value !== null && typeof value === 'object' && Object.hasOwn(value, key));
   if (!shape(value, [...keys, ...optional]) ||
       !workbookText(value.title) || typeof value.includeEnv !== 'boolean' ||
@@ -71,21 +72,27 @@ function optionsValue(value: unknown): SummaryVegetationWorkbookOptions {
     if (!shape(value.references, ['showCommon', 'useGuideNames']) ||
         typeof value.references.showCommon !== 'boolean' || typeof value.references.useGuideNames !== 'boolean') reject();
     result.references = { showCommon: value.references.showCommon, useGuideNames: value.references.useGuideNames };
-    if (!summaryVegetationReferenceGroupingAvailable(result.groupAndOrder ?? 11,
-      result.references.showCommon || result.references.useGuideNames)) reject();
   }
   if (Object.hasOwn(value, 'constancy')) {
     if (value.constancy !== true || result.groupAndOrder !== 13 || result.display !== 1 ||
         !result.references || result.references.showCommon || result.references.useGuideNames) reject();
     result.constancy = true;
   }
+  if (Object.hasOwn(value, 'unanimousCommon')) {
+    if (value.unanimousCommon !== true || result.constancy || !result.references ||
+        !summaryVegetationUnanimousCommonAvailable(result.groupAndOrder ?? 11, result.display,
+          result.references.showCommon || result.references.useGuideNames)) reject();
+    result.unanimousCommon = true;
+  }
+  if (result.references && !result.unanimousCommon && !summaryVegetationReferenceGroupingAvailable(result.groupAndOrder ?? 11,
+    result.references.showCommon || result.references.useGuideNames)) reject();
   return result;
 }
 export function sameSummaryWorkbookOptions(left: SummaryVegetationWorkbookOptions,
   right: SummaryVegetationWorkbookOptions): boolean {
   return left.title === right.title && left.average === right.average && left.display === right.display &&
     left.showClass === right.showClass && left.includeEnv === right.includeEnv && left.groupAndOrder === right.groupAndOrder &&
-    left.constancy === right.constancy &&
+    left.constancy === right.constancy && left.unanimousCommon === right.unanimousCommon &&
     (left.ancillary === undefined ? right.ancillary === undefined :
       !!left.ancillary && !!right.ancillary && left.ancillary.createSummary === right.ancillary.createSummary) &&
     (left.references === undefined ? right.references === undefined : !!left.references && !!right.references &&
@@ -144,7 +151,7 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
   current: () => boolean = () => true): Promise<ValidatedSummaryVegetationWorkbookReview | null> {
   if (!current()) return null;
   const options = optionsValue(requested);
-  const scope = options.constancy ? summaryVegetationConstancyScope : options.groupAndOrder !== undefined
+  const scope = options.constancy ? summaryVegetationConstancyScope : options.unanimousCommon ? summaryVegetationUnanimousCommonScope : options.groupAndOrder !== undefined
     ? options.ancillary ? summaryVegetationGroupedAncillaryScope :
       options.references ? options.groupAndOrder === 12 ? summaryVegetationStrataReferencesScope :
       summaryVegetationGroupedAttributesScope : summaryVegetationGroupedWorkbookScope : options.references
@@ -164,7 +171,7 @@ export async function validateSummaryVegetationWorkbookReview(value: unknown, ow
     options.average, options.display, options.showClass, options.groupAndOrder ?? 11, {
       preview: () => Promise.reject(new Error('Workbook validation cannot dispatch a read')),
       cancel() {}, validationYield,
-    }, current, options.references, options.constancy);
+    }, current, options.references, options.constancy, options.unanimousCommon);
   if (!current() || preview === null) return null;
   const environment = options.includeEnv
     ? await validateSummaryEnvironmentalLifeformOptions(value.environment, owner, options, validationYield, current)
@@ -243,9 +250,13 @@ export class SummaryVegetationWorkbookSession {
     return !this.state.reviewing && !publication.busy && !publication.blocked;
   }
   options(calculation: SummaryWorkbookCalculation): SummaryVegetationWorkbookOptions {
+    const unanimousCommon = !calculation.constancy && this.state.includeReferences &&
+      summaryVegetationUnanimousCommonAvailable(calculation.groupAndOrder ?? 11, calculation.display,
+        this.state.showCommon || this.state.useGuideNames);
     return optionsValue({ average: calculation.average, display: calculation.display, showClass: calculation.showClass,
       ...(calculation.groupAndOrder !== undefined ? { groupAndOrder: calculation.groupAndOrder } : {}),
       ...(calculation.constancy !== undefined ? { constancy: calculation.constancy } : {}),
+      ...(unanimousCommon ? { unanimousCommon: true } : {}),
       title: this.state.title, includeEnv: this.state.includeEnv,
       ...(this.state.includeAncillary ? { ancillary: { createSummary: this.state.createSummary } } : {}),
       ...(calculation.constancy ? { references: { showCommon: false, useGuideNames: false } } :

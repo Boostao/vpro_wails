@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
   import { SummaryVegetationWorkbookService } from '../bindings/github.com/boostao/vpro-wails';
-  import { summaryVegetationReferenceGroupingAvailable, type SummaryVegetationOwner } from './summaryVegetation';
+  import { summaryVegetationReferenceGroupingAvailable, summaryVegetationUnanimousCommonAvailable, type SummaryVegetationOwner } from './summaryVegetation';
   import { summaryEnvironmentalLifeformEnabled } from './summaryVegetationEnvironmentalDesktop';
   import { summaryVegetationWorkbookSession, sameSummaryWorkbookOptions,
     type SummaryWorkbookCalculation } from './summaryVegetationWorkbook';
@@ -30,8 +30,11 @@
   const effectiveReferences = $derived(constancy || viewState.includeReferences);
   const effectiveCommon = $derived(!constancy && viewState.showCommon);
   const effectiveGuide = $derived(!constancy && viewState.useGuideNames);
+  const unanimousCommon = $derived(effectiveReferences &&
+    summaryVegetationUnanimousCommonAvailable(calculation.groupAndOrder ?? 11, calculation.display,
+      effectiveCommon || effectiveGuide));
   const groupingUnavailable = $derived(grouped && (!groupedEnabled ||
-    effectiveReferences && !summaryVegetationReferenceGroupingAvailable(calculation.groupAndOrder ?? 11,
+    effectiveReferences && !unanimousCommon && !summaryVegetationReferenceGroupingAvailable(calculation.groupAndOrder ?? 11,
       effectiveCommon || effectiveGuide)));
   const modeUnavailable = $derived(groupingUnavailable || viewState.includeEnv && !environmentEnabled ||
     viewState.includeAncillary && !ancillaryEnabled || effectiveReferences && !referencesEnabled ||
@@ -43,6 +46,7 @@
     title: viewState.title, includeEnv: viewState.includeEnv,
     ...(grouped ? { groupAndOrder: calculation.groupAndOrder } : {}),
     ...(constancy ? { constancy: true } : {}),
+    ...(unanimousCommon ? { unanimousCommon: true } : {}),
     ...(viewState.includeAncillary ? { ancillary: { createSummary: viewState.createSummary } } : {}),
     ...(effectiveReferences ? { references: {
       showCommon: effectiveCommon, useGuideNames: effectiveGuide } } : {}),
@@ -143,7 +147,8 @@
   {/if}
   {#if groupingUnavailable}
     <p role="alert">Grouped publication requires its independent build flag and compatible reference options.
-      Common/guide names support Layer or Strata only. Lifeform/None support attribute references with both names off.
+      Common/guide names support Layer, Strata, or Lifeform/None Display Values6 with unanimous names.
+      Other Lifeform/None displays support attribute references with both names off.
       Clear incompatible modes or choose a supported grouping.
       No options were changed automatically.</p>
   {/if}
@@ -177,7 +182,8 @@
       <input type="checkbox" data-summary-workbook-common checked={effectiveCommon}
         disabled={!enabled || held || !referencesEnabled || !viewState.includeReferences || viewState.useGuideNames || constancy}
         onchange={event => selectReferences('common', event)} />
-      Include common names in grouping and the workbook
+      {#if unanimousCommon}Include unanimous common names in the workbook
+      {:else}Include common names in grouping and the workbook{/if}
     </label>
     <label class="checkbox">
       <input type="checkbox" data-summary-workbook-guide checked={effectiveGuide}
@@ -190,6 +196,12 @@
         oninput={event => edit('destination', event.currentTarget.value)} />
     </label>
   </div>
+  {#if unanimousCommon}
+    <p data-summary-workbook-unanimous-common>Lifeform/None Display Values6 retains the original group and species key.
+      Every contributing source name across all units must agree exactly; differing names stop review rather than
+      split groups or choose an arbitrary name. Original First projects a unanimous empty name as NULL.
+      Guide-name selection is an effective reference projection, not the original saved callback.</p>
+  {/if}
   <div class="actions">
     <button data-summary-workbook-review disabled={!enabled || held || modeUnavailable || !!viewState.draftError} onclick={review}>Review inspection workbook</button>
     <button data-summary-workbook-cancel disabled={!viewState.reviewing || barrier} onclick={() => session.cancel()}>Cancel review</button>
@@ -216,7 +228,10 @@
             Common names: {reference.showCommon ? 'included' : 'not included'}.
             Guide names: {reference.useGuideNames ? 'master CombinedEnglishName' : 'not selected'}.</p>
           <p>Derived origins identify physical attribute-description rows, not invented master records.
-            Name groups are shown below; cover values are in the workbook. NULL and empty names remain distinct.</p>
+            Name groups are shown below; cover values are in the workbook.
+            {#if viewState.review.options.unanimousCommon}Source NULL and empty remain distinct for unanimity;
+              a unanimous empty name is projected as NULL by original First.
+            {:else}NULL and empty names remain distinct.{/if}</p>
           <div class="unit-table">
             <table aria-label="Reviewed effective reference groups">
               <thead><tr><th scope="col">{viewState.review.preview.groupField?.name ?? 'Layer'}</th><th scope="col">Scientific name/code</th>

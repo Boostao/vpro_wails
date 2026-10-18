@@ -2578,6 +2578,7 @@ export interface SummaryVegetationWorkbookOptions {
     "references"?: SummaryVegetationReferenceOptions | null;
     "groupAndOrder"?: number | null;
     "constancy"?: boolean;
+    "unanimousCommon"?: boolean;
 }
 
 export interface SummaryVegetationWorkbookReportSummary {

@@ -38,7 +38,7 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 	if err := ctx.Err(); err != nil {
 		return fail(err)
 	}
-	if err := validateSummaryConstancyWorkbookOptions(options); err != nil {
+	if err := validateSummaryWorkbookInspectionOptions(options); err != nil {
 		return fail(err)
 	}
 	if service == nil || service.environment == nil || service.environment.report == nil ||
@@ -73,7 +73,7 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 	}
 	grouping := 11
 	if options.GroupAndOrder != nil {
-		if options.References != nil && !summaryVegetationReferenceGroupingAvailable(
+		if !options.UnanimousCommon && options.References != nil && !summaryVegetationReferenceGroupingAvailable(
 			*options.GroupAndOrder, options.References.ShowCommon || options.References.UseGuideNames) {
 			return fail(errors.New("Summary Lifeform/None common/guide names are not qualified; attribute references without names remain supported"))
 		}
@@ -82,8 +82,14 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 			return fail(err)
 		}
 	}
+	mode := summaryVegetationGroupedOrdinary
+	if options.Constancy {
+		mode = summaryVegetationGroupedConstancy
+	} else if options.UnanimousCommon {
+		mode = summaryVegetationGroupedUnanimousCommon
+	}
 	raw, err := environment.report.readSnapshotWithReferenceMode(ctx, contextID, plots, owner, tx,
-		options.Average, options.Display, calculationClass, grouping, options.References, options.Constancy)
+		options.Average, options.Display, calculationClass, grouping, options.References, mode)
 	if err != nil {
 		return fail(err)
 	}
