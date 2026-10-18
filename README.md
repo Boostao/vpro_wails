@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-summary-workbook.zip`, 17,534,060 bytes.
+`VPRO-Demo-2026-10-18-linked-soil.zip`, 17,549,069 bytes.
 
 SHA256:
-`507acfd1dc5ee943c261019a504839cb8287fd0bcfde63c8b3a49d9b9904437c`.
+`4f3f6ed92a9d38cd02bc10e4eafd88dd1af867030a567cbef883f894d9f19fd5`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-37 frontend and 33 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+40 frontend and 36 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -62,31 +62,43 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
    and retain None grouping/display6/average1/show1. Select environmental rows,
    SU Table and ReportSummary, review the complete plan, then explicitly publish
    to a new `.xlsx` destination and acknowledge the outcome.
+7. In P1 complete entry, load linked Humus/Mineral. Explicitly create a Humus
+   horizon in Normal and a Mineral horizon in CHARS, acknowledging each receipt.
+   Edit Depth Up/memo, Save explicitly and acknowledge; switch variants to
+   inspect the saved rows. **Undo drafts does not delete a committed horizon.**
 
-Application source is committed `5dee2ee`; app/backend/seed/defaults are unchanged.
-Only three existing Summary workbook/grouped/ancillary gates were added to the
-previous profile. No new reporting kernel, service or dependency was introduced.
-The new native journey checks one publication, 13 independently calculated
-vegetation rows, 30 environmental cells against the reviewed plan, four physical
-memberships, ancillary sheets and very-hidden complete provenance. Environmental
-calculation qualification also relies on existing kernel tests, not a new oracle.
-P1 appears twice; P3 has a physical LF1 zero-cover row, not missing vegetation.
-Absent master long names produce no invented ReportSummary unit-name row.
+Application source is committed `bc9e129`; app/backend/seed/defaults are unchanged.
+Three existing linked-soil review/writing/creation gates extend the preceding
+profile. No new application kernel, service or dependency was introduced.
+The new native journey checks normal117/CHARS119 hosts, two explicit creations
+with complete18/28-cell defaults, two field Saves, six exact physical source
+audits, four persisted histories and permanent ID reservations. All historical
+physical peers remain exact. P1 starts without soil rows; unrelated historical
+records are not repointed. The server-owned positive allocator is an explicit
+adaptation, not Access random `GenUniqueID()` compatibility.
 
-Invalid destination, cancellation/remount/stale response, native close and
-publication acknowledgement guards pass. A fresh CancelClose response precedes
-held-response release. The source's 15 databases remain byte-identical; selecting
-DemoReports intentionally changes configuration (initial config bytes were not
-retained). A separate backend-off reopening refuses workbook review, loads P1's
-117 complete-parent fields and leaves all 16 family files exact. Both owners
-close normally. Two inspector assumptions were corrected after publication
-without replay: wire-key casing and scientific-name projection.
+Invalid drafts block creation/parent/variant/Home/native close. Fresh CancelClose
+acknowledgements precede Undo and held-response release. One held creation is
+cancelled and recovered read-only, never replayed. Saved rows survive variant
+remounts; the other15 family files remain exact. Three independent backend-off
+reopens refuse review/writing/creation, load saved fields/source choices and
+preserve all16 files. All four owners close normally. Fields, actions and
+disclosures are measured at980/1400.
 
-All 123 related client cases, launcher races, Summary-workbook Go races,
-check0/0, isolated Vite/Go builds, exact embed discovery and independent read-only
-review pass. Summary controls are measured at980/1400. No new full-root race,
-original Report callback, full formatting/printing or common/guide/Constancy
-qualification is claimed.
+All105 related client cases, launcher races, soil Go races, check0/0, isolated
+Vite/Go builds, exact embed discovery and independent read-only review pass.
+No new full-root race, implicit creation, soil deletion/restoration or whole-form
+callback qualification is claimed. Ordinary Save and Enter cannot create soil.
+
+The immutable Summary predecessor remains unchanged, SHA256
+`507acfd1dc5ee943c261019a504839cb8287fd0bcfde63c8b3a49d9b9904437c`.
+It owns the combined workbook's one publication,13 independently calculated
+scientific-name vegetation rows,30 environmental cells against the reviewed
+plan, four physical memberships and very-hidden provenance. Environmental
+calibration also retains kernel lineage. P1 appears twice; P3 has physical LF1
+zero cover, not missing vegetation. Absent master long names produce no invented
+ReportSummary unit-name row. Common/guide/Constancy, original Report callbacks
+and full formatting/printing remain unqualified in this profile.
 
 The immutable entry-performance predecessor remains unchanged, SHA256
 `0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`.
@@ -96,8 +108,8 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is963,111 bytes versus5,202,547 before
-deferral (81.49% less); total JavaScript is5,264,587. The extra report surface
+Current initial transitive JavaScript is988,749 bytes versus5,202,547 before
+deferral (80.99% less); total JavaScript is5,306,806. The extra entry surface
 slightly increases payload and EXE size; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
@@ -129,8 +141,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,096,576 bytes, 34,816 bytes larger than the
-entry-performance preview; deferred loading is not a binary-size reduction. An earlier
+The qualified preview executable is43,138,560 bytes, 41,984 bytes larger than the
+Summary preview; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 

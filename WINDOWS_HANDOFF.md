@@ -29,13 +29,13 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is the reviewed37/33 Summary workbook profile on5dee2ee.
-  Three existing gates extend the entry-performance profile; app/backend/seed/
-  defaults are unchanged. Native None/display6/environment/SU Table/ReportSummary
-  publication, cancellation/close/acknowledgement and independent backend denial
-  pass.15 source databases stay exact; SU selection deliberately changes config.
-  Entry typing/Save/reopen retain the immutable predecessor's binary lineage.
-  Current initial JS falls81.49%; EXE slightly grows. No new timing/shrink claim.
+- Current preview is the reviewed40/36 linked-soil profile onbc9e129.
+  Three existing soil gates extend Summary; app/backend/seed/defaults unchanged.
+  Normal/CHARS two creates/two Saves, complete defaults/six audits/four histories,
+  read-only recovery/close/acknowledgement and independent denials pass.
+  Other15 files stay exact after writes;3 read-only reopens preserve all16.
+  Summary/typing/parent Save/Long reports retain predecessor binary lineage.
+  Current initial JS falls80.99%; EXE slightly grows. No new timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -43,7 +43,7 @@ Current machine state only. Portable scope and ordered work are in
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
 - Current-source draft release run39149407850 passes seven jobs and all asset
-  checks. Default release is not the private37/33 profile or all-platform runtime
+  checks. Default release is not the private40/36 profile or all-platform runtime
   acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
@@ -90,9 +90,9 @@ hash-exactly from the earlier frozen production binary's embed table.
 Restoration intent/result and failed receipts remain private.
 
 This is an explicit desktop operation, not source implicit-buffer/callback or
-random allocator parity, deletion/restoration, whole-form or default/demo
-promotion. The current preview below deliberately leaves these soil creation
-gates off; a bounded feature gate is not the overall completion condition.
+random allocator parity, deletion/restoration, whole-form or product-default
+enablement. The current preview below qualifies its existing soil gates on P1;
+that bounded journey is not the overall completion condition.
 
 ## Supported child journeys
 
@@ -159,46 +159,50 @@ gates off; a bounded feature gate is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-summary-workbook.zip`:17,534,060 bytes.
-  SHA256 `507acfd1dc5ee943c261019a504839cb8287fd0bcfde63c8b3a49d9b9904437c`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-linked-soil.zip`:17,549,069 bytes.
+  SHA256 `4f3f6ed92a9d38cd02bc10e4eafd88dd1af867030a567cbef883f894d9f19fd5`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Source5dee2ee; SQLite-only EXE43,096,576 bytes, SHA256
-  `1a52fd2425fc9fbdfd8b7ee561fb6f7e3c7c0ef8bc3fa7fe6927411e0f4b1a72`.
-  Exact37 frontend/33 runtime gates; private launcher SHA256
-  `48604f764443503c195e39c675a79426079ba66a9c4f1b67590f32090f33a4d4`.
-  Only workbook/grouped/ancillary Summary flags were added. Backend/source/seed/
-  defaults unchanged; explicit inherited-environment stripping tests pass.
-- Private `summary-workbook-demo-20261018/validation-seal.json`, SHA256
-  `383e9c278d8b9f695d4bf7ca3bfb0756d8c5521b29ada2dd30b6dfa12cbb3aa1`,
-  pins1931 inputs,21 protected assets/58 canonical input records and native proofs.
-  Initial transitive JS963,111 vs5,202,547; total5,264,587.
-  EXE grows34,816 bytes versus entry-performance; no new timing/shrink claim.
-- Native uses explicit DemoReports, saved None14/display6/average1/show1 and one
-  reviewed XLSX publication.108 reopened cells include13 independently calculated
-  scientific-name vegetation rows,30 environmental cells matching the reviewed
-  plan, SU Table4 memberships and ReportSummary. Environmental calibration also
-  retains kernel lineage; no new oracle. Full very-hidden provenance matches.
-  Duplicate P1 and physical P3 LF1 Cover1=0 remain. Absent DemoA master long
-  name yields no fabricated summary unit row.
-- Invalid destination, cancellation/remount/stale review, Home/acknowledgement
-  and fresh CancelClose-before-held-release pass.15 DBs stay byte-exact against
-  packaged seed. Config intentionally selects Report->DemoReports; initial
-  config bytes were not retained. A separate workbook-off owner refuses the
-  backend, loads ordinary P1/117 complete fields and preserves all16 files.
-  Both owners close normally and are freshly absent.
-- Two inspector failures after successful publication remain preserved:
-  membershipIDs versus membershipIds, and raw code versus ScientificName.
-  `continue-summary-workbook-demo.py`/`finish-summary-workbook-demo.py` inspect
-  the same owned held response without replay. `native-evidence-correction.json`
-  supersedes the erroneous missing-P3 label; the calculation was already correct.
-  ZIP verification first mismatched portable/Windows member-name separators;
-  all20 payloads passed after key normalization without rewriting archive bytes.
-- All123 related client cases, launcher races, Summary workbook race496.588s,
-  check0/0, Vite/Go/exact26 embeds and responsive controls980/1400 pass.
-  Reviewer `d6fa48eb-68c8-450e-830f-206e20ab78a7` finds no significant issues.
-  All20 payload hashes and final prepare-only pass. No new full-root race,
-  original Report/formatting/printing/common/guide/Constancy or whole-form grant.
+- Sourcebc9e129; SQLite-only EXE43,138,560 bytes, SHA256
+  `e7e5543ea40d4f5b1fe2db21c71bea2085074fb50b18538c10eb5894f569c311`.
+  Exact40 frontend/36 runtime gates; private launcher SHA256
+  `9d8d83efa07f16c4b7cb7d24a0a2313e93acfabb1320a2d7c2cb84f32a9b301b`.
+  Only soil review/writing/creation flags added; source/backend/seed/defaults
+  unchanged. Inherited false/case variants are stripped without changing caller.
+- Private `linked-soil-demo-20261018/validation-seal.json`, SHA256
+  `46ecfba2bc10565e31214e2ca790d4a38b54ee52452d0a649d73716cfeb7ecdf`,
+  pins1931 inputs/21 assets/58 canonical records and native proofs.
+  Initial JS988,749 versus5,202,547; total5,306,806. EXE grows41,984 bytes versus
+  Summary; no new timing/shrink claim.
+- Native normal117/CHARS119 P1: two explicit Humus/Mineral creations, complete
+  18/28 defaults, two UpperDepth/memo Saves, six exact physical source audits,
+  four exact persisted histories and permanent positive IDs. Every old physical
+  peer remains exact. P1 initially has no soil rows; no old records repointed.
+  Invalid9-unit Horizon blocks creation/parent/variant/Home/close; fresh
+  CancelClose precedes Undo. Both creations held; one cancelled/recovered
+  read-only with fresh close acknowledgement before release. No mutation replay.
+- Normal/CHARS remount retains saved rows. Source choices actually load in saved
+  reopening; first disclosure opens. Labelled12/18 fields and actions/disclosures
+  are measured980/1400. Three backend-off reopens independently disable review,
+  writing or creation and deny four calls with fresh UUIDs. All16 saved family
+  files stay exact after each; first run changes only project, other15 exact.
+  All four owners close normally and are freshly absent.
+- All105 client cases, launcher races, soil race113.113s/check0/0/Vite/Go/exact26
+  embeds pass. Reviewer `0f4f74a3-6e0f-4401-9e2f-917acb9b12a9` finds no significant
+  issues. All20 payload hashes/final prepare-only pass. Native journey first-pass;
+  offline reservation inspector corrects exact quoted table-key expectations.
+  Earlier generator preflight corrections occurred before any native action.
+  No new full-root race, implicit creation/random allocator compatibility,
+  soil deletion/restoration, whole callbacks or Source4 grant.
+- Preserved Summary ZIP SHA256
+  `507acfd1dc5ee943c261019a504839cb8287fd0bcfde63c8b3a49d9b9904437c`
+  owns its combined publication,108 checked cells/13 independent vegetation rows/
+  30 reviewed environmental rows,4 memberships/full provenance and close guards.
+  Environmental calibration retains kernel lineage. P3 has physical zero cover,
+  not missing vegetation. Missing long name yields no invented summary unit.
+  Two owners close/15 DBs exact with declared config selection/16 exact in denial
+  reopening. Its wire-key/scientific-name and ZIP separator inspector corrections
+  remain preserved without replay. This publication was not repeated on40/36.
 - Preserved entry-performance ZIP SHA256
   `0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`
   owns normal117/CHARS119 layouts, one3scope Save/three audits, saved reopening,
@@ -228,7 +232,7 @@ gates off; a bounded feature gate is not the overall completion condition.
 - The old `VPRO-Demo-2026-10-18-current-main.zip` remains unchanged, SHA256
   `fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
   Parent/metadata, SIVI/CHARS, Summary/log/Matrix and child lifecycle evidence is
-  inherited with its exact23/22 scope, not every mutation rerun on new37/33.
+  inherited with its exact23/22 scope, not every mutation rerun on new40/36.
   Its private delivery receipt remains SHA256
   `0e9914e6c339cadc884165279c8fb6e6d5b27bfb78bf5b98a9ae642b579ce877`.
 - Previous `VPRO-Demo-2026-10-16-refresh.zip` stays unchanged, SHA256

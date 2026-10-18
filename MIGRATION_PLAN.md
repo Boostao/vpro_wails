@@ -33,7 +33,7 @@ These states describe availability, not confidence percentages:
 | Select existing data and browse plots | Core/Preview: original SQLite family, configuration, owned project/SU/hierarchy selection, filtering and context switching | Production onboarding/administration is separate; attachment is not conversion |
 | Enter ordinary FS882 data | Core/Preview: 98 mapped writable parent fields; bounded soil/Other/vegetation editors, draft/Save/Undo/Lock/close behavior | Complete remaining source events, calculations and whole linked-form journeys |
 | Enter SIVI/CHARS data | Preview: parent panels, mixed child Save/restore, Collected navigation/reopen and explicit child create/delete/restore/creation Undo journeys. Development: wider separately gated species/ID and cross-host combinations | Whole-form callback/navigation equivalence; child creation/deletion is not plot/parent creation |
-| Use two-page entry | Preview: complete normal117/CHARS119 parent controls, three-scope Save, guards and saved reopen. Development: metadata, linked soil/vegetation editing and explicit soil creation have separate acceptance | Whole-form/picture integration, remaining callbacks; soil creation and wider child opt-ins are not enabled by parent promotion |
+| Use two-page entry | Preview: complete normal117/CHARS119 parents plus explicit linked Humus/Mineral creation/editing, guards and saved reopen. Development: metadata/vegetation and wider host combinations have separate acceptance | Whole-form/picture integration, remaining callbacks; implicit creation and soil deletion/restoration remain unavailable |
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
 | Work with pictures | Development: owned reads/metadata and independently gated explicit lifecycle operations | Original Add/save/default/confirmation/Current timing and complete host integration |
 | Run profiles, Find and transfers | Development: bounded rule lifecycle/results, explicit navigation, owned-project Env/SU transfers | Unsupported criteria, external-file mutations and administration |
@@ -51,51 +51,59 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-summary-workbook.zip`,17,534,060 bytes, SHA256
-`507acfd1dc5ee943c261019a504839cb8287fd0bcfde63c8b3a49d9b9904437c`.
+`VPRO-Demo-2026-10-18-linked-soil.zip`,17,549,069 bytes, SHA256
+`4f3f6ed92a9d38cd02bc10e4eafd88dd1af867030a567cbef883f894d9f19fd5`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
-37 frontend/33 runtime flags, packaged binary SHA256
-`1a52fd2425fc9fbdfd8b7ee561fb6f7e3c7c0ef8bc3fa7fe6927411e0f4b1a72`,
+40 frontend/36 runtime flags, packaged binary SHA256
+`e7e5543ea40d4f5b1fe2db21c71bea2085074fb50b18538c10eb5894f569c311`,
 source-input SHA256
-`c543b8a20d4235e13805324b0691777b074e0d4f410a928f6098aad723410aba`.
+`177bbc3017d0bdc62be0735e89bf56d3b3db51e4cf4d89f4e6a3a624ac981a8e`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. `files[].sha256` owns application/seed hashes; `launcher`
 and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
 named, not a substitute for the packaged EXE identity.
 
-Application source is committed `5dee2ee`; app/backend/seed/defaults are unchanged.
-Three existing Summary workbook/grouped/ancillary gates extend the previous
-profile; no business kernel/service/dependency was added. Initial transitive JS
-is963,111 bytes, down81.49% from5,202,547; total5,264,587. The43,096,576-byte EXE
-is34,816 bytes larger than the predecessor. No startup/binary-shrink claim.
+Application source is committed `bc9e129`; app/backend/seed/defaults are unchanged.
+Three existing linked-soil review/writing/creation gates extend the previous
+profile; no kernel/service/dependency was added. Initial JS is988,749 bytes,
+down80.99% from5,202,547; total5,306,806. The43,138,560-byte EXE grows41,984 bytes
+versus Summary. No new timing/binary-shrink claim.
 
-Current native acceptance uses explicit DemoReports, saved None14/display6/
-average1/show1, 13 vegetation rows, 30 environmental rows and four physical
-memberships. One reviewed publication produces Sample, SU Table, ReportSummary
-and very-hidden complete provenance. Of108 checked cells, vegetation is
-independently calculated/projected from physical records; environmental cells
-match the reviewed plan and retain inherited kernel calibration. Duplicate P1
-and the physical P3 LF1 zero-cover row remain; denominator four is preserved.
-Missing master long names yield no invented ReportSummary unit-name row.
+Current native acceptance uses P1 in normal117/CHARS119 complete-entry hosts:
+two explicit Humus/Mineral creations with complete18/28-cell defaults, two
+UpperDepth/memo Saves, six exact physical audits/four persisted histories and
+permanent positive IDs. Historical physical peers stay exact; unrelated old
+soil rows are not repointed. The allocator is an explicit adaptation, not
+source random GenUniqueID compatibility. Ordinary Save/Enter cannot create.
 
-Invalid destination, held review cancellation/remount/stale absence, outcome
-acknowledgement/Home and fresh CancelClose-before-release barriers pass.
-All15 database files stay exact; configuration intentionally selects DemoReports,
-and initial config bytes were not retained. A separate workbook-backend-off
-reopening refuses review, loads ordinary P1/117 complete-parent fields and
-preserves all16 files. Both owners close normally. Two inspector failures
-(wire-key casing and raw-code/scientific-name expectations) remain preserved;
-the same successful publication continued without replay. A corrected receipt
-supersedes the erroneous description of P3 as missing vegetation.
+Invalid drafts block create/parent/variant/Home/native close. Fresh CancelClose
+responses precede Undo and held-response release. Both creations are held;
+one is cancelled/recovered read-only without replay. Saved rows survive variant
+remounts. The other15 files remain exact. Three independent backend-off reopens
+deny four calls, load saved fields/live choices and preserve all16 files.
+All four owners close. Fields/actions/disclosures are measured at980/1400.
 
-All123 related client cases, launcher races, Summary workbook race496.588s,
-check0/0, isolated Vite/Go and exact26 embed patterns pass;1931 frozen inputs,
-21 assets and58 canonical input records match. Distinct read-only review finds
-no significant issues. Controls are measured at980/1400. No new full-root race,
-original Report callbacks, full formatting/printing, common/guide/Constancy modes
-or whole-migration grant.
+All105 client cases, launcher races, soil race113.113s, check0/0, isolated Vite/Go
+and exact26 embeds pass;1931 inputs/21 assets/58 canonical records match.
+Distinct read-only review finds no significant issues. Native journey is first
+pass; offline inspection corrects quoted reservation-key expectations without
+replay. No new full-root race, implicit creation, soil deletion/restoration,
+whole callbacks or whole-migration grant.
+
+The preserved Summary ZIP, SHA256
+`507acfd1dc5ee943c261019a504839cb8287fd0bcfde63c8b3a49d9b9904437c`,
+owns saved None14/display6/average1/show1, one combined XLSX publication,
+108 checked cells (13 independently calculated scientific-name vegetation rows,
+30 environmental cells matching the reviewed plan), four memberships and full
+very-hidden provenance. Environmental calibration retains kernel lineage.
+Duplicate P1 and physical zero-cover P3 remain. Absent master long names yield no
+invented ReportSummary unit row. Both owners close;15 databases stay exact
+with declared SU/config selection and16 files stay exact in the denial reopen.
+Its wire/scientific-name inspector corrections continued without replay.
+Common/guide/Constancy, original callbacks and full formatting/printing remain
+outside this profile; that publication was not repeated on the soil binary.
 
 The preserved entry-performance ZIP, SHA256
 `0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`,
@@ -132,7 +140,7 @@ The immutable23/22 predecessor remains preserved at SHA256
 Its parent/metadata, SIVI/CHARS, Summary/log/Matrix and child Save/restore,
 Collected/reopen, create/delete/restore/creation-Undo receipts retain their exact
 scope. Source and prior gates are retained, not every child mutation rerun on
-the new37/33 binary. These are explicit desktop safety adaptations, not original
+the new40/36 binary. These are explicit desktop safety adaptations, not original
 Access undelete, parent creation or whole-form callback parity.
 
 The current source, that pinned preview and default CI release are distinct.
@@ -151,7 +159,7 @@ before writing another service, state machine, flag or preparation layer.
 | 1 - supported journeys verified | Preserve parent/metadata and child entry/recovery/lifecycle acceptance with its exact inherited23/22 scope. Source/gates are retained; parent Undo/navigation is rechecked on31/28. Consolidate only demonstrably equivalent behavior. Wider host/source combinations remain in priority4. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
 | 2 - supported subset verified | Long Environment/Vegetation title/preview/XLSX and Summary None/display6/environment/SU Table/ReportSummary publication pass in the pinned profile; preserve inherited Matrix scope. Other options/combined/formatted variants and printing remain separate. | Independent vegetation/membership, reviewed environment, reopened outputs and cancellation/stale/close/acknowledgement barriers are sealed; environmental calibration retains kernel lineage |
 | 3 - blocked prerequisites | Real-data onboarding/project administration needs production go-mdbtools reader integration, source schema/default/identity qualification and platform/licensing closure. New-project Description/default oracle retry is explicitly closed after two attempts; do not reopen it under another name. Reuse completed F1-F3 and continue independent deliverables. | Disposable complete import/new-project/reopen/recovery before authorization; private scalar staging is not production import and merge/splinter/compare remain separate |
-| 4 | Finish remaining forms/pictures/profiles/ribbon workflows in client-priority order. Resolve genuine business choices without inventing callbacks or reproducing destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
+| 4 | Preserve newly delivered linked-soil creation/editing; finish remaining forms/vegetation/pictures/profiles/ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
 | 5 | Complete required report variants/options, labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
 
 Priorities organize, not delete, the former thirteen deliverables:
@@ -174,7 +182,7 @@ Source contracts retain the detailed outstanding requirements.
 - Measure startup, representative large-project reads, interaction and bundle/
   binary size on the exact supported profile. Existing bounded fast reads do
   not prove every performance problem is fixed. Current deferred-entry/report
-  profile reduces initial transitive JS81.49%; measure startup and larger-project interactions
+  profile reduces initial transitive JS80.99%; measure startup and larger-project interactions
   separately rather than treating the payload budget as overall performance proof.
 - Use named profiles to control combinations. Independent backend denials stay;
   consolidation is not permission to turn all experimental flags on.
