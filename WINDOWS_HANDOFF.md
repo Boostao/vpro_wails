@@ -25,7 +25,21 @@ Current machine state only. Portable scope and ordered work are in
 - Private evidence, closed builds, Access copies and profiles stay local.
   Do not publish or delete them.
 
-## Current accepted integration
+## Current delivery objective
+
+- The delivery reset is documentation-only; no application flags, data or
+  accepted assets are changed. The current plan is the workflow-level authority,
+  not the historical root ledgers retained at Git commit `3bf43c4`.
+- Next objective: one current-main preview using the existing qualified23/22
+  profile unchanged, followed by complete packaged user journeys. Do not select
+  another isolated parity preparation merely because it is ready.
+- The old preview stays immutable. Its payload EXE hash is
+  `78652d39020a4961cfbb9822b1de1dcbbf4b6c0f99880af4e7338cca820aec53`
+  from manifest `files[].sha256`; `acceptedCandidateSHA256` is a different
+  predecessor identity, not the packaged EXE hash.
+- No new preview, native suite or release dispatch is implied by this reset.
+
+## Current accepted application integration
 
 Linked Humus/Mineral explicit creation is independently reviewed, disposable-
 native verified and full-race integrated on source baseline
