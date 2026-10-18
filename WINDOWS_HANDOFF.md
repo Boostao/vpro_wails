@@ -29,19 +29,21 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is reviewed49/45 saved-coordinate Location/Google Earth/KML
-  on4b328ad. Four existing gates extend saved-label; app/backend/seed/defaults
-  unchanged. One coordinate Save/two audits/one history, Location1 DISTINCT row
-  versus direct Env/SU2 pairs/KML2 placemarks preserve duplicate memberships.
-  One KML independently reopens exact UTF-8/XML/title/hash/coordinates/period.
-  Held-read Cancel/late-remount rejection, held successful export/release/ack/
-  receipt-only remount and four fresh CancelClose acknowledgements pass.
-  Four independent gate-off reopens/six denials preserve normal117/coordinates.
-  Five owners close;16 saved files/full physical peers exact after intended Save.
-  Missing harness ast and wrong one-row raw expectation are corrected on the
-  same owner without mutation replay; native is not first-pass.
-  Labels/Species/vegetation/reports/soil/parent/Long retain predecessor lineage.
-  Initial JS falls79.67%; EXE grows29,184 bytes. No new timing/shrink claim.
+- Current preview is reviewed54/45 standalone profile editing/preview/navigation,
+  built from bab29fc plus exact manifest-pinned caption/test delta, not a clean-
+  commit build. Five existing frontend flags added; Go/backend/launcher/seed/
+  defaults unchanged. Client flags are not server gates. One rule8 four-text
+  Save/one history/zero source audits preserves389 audits/counts/Description/peers.
+  Explicit78-row lump, zero then P1/P2 matches, eight steps, actual revalidated
+  Apply/Next/Previous/Clear, invalid32768/Undo and held-read/Save guards pass.
+  Three fresh CancelClose receipts precede corrections/releases. Saved None
+  denies Review/Save/Run while lump/ordinary117 remain available. Explicit Sample
+  restore leaves16 saved files exact;14 other DBs unchanged throughout.
+  Two owners close. Four harness failures/same-owner continuations retained;
+  no completed mutation replay.128 inputs/actions/representative source cells/
+  all preview cells measured980/1400. Original mapped callbacks remain off.
+  Coordinate/KML/labels/Species/reports/soil/parent retain predecessor lineage.
+  Initial JS falls79.59%; EXE grows4,096 bytes. No new timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -49,7 +51,7 @@ Current machine state only. Portable scope and ordered work are in
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
 - Current-source draft release run39149407850 passes seven jobs and all asset
-  checks. Default release is not the private49/45 profile or all-platform runtime
+  checks. Default release is not the private54/45 profile or all-platform runtime
   acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
@@ -165,42 +167,57 @@ qualification; that bounded journey is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-coordinate-kml.zip`:17,571,483 bytes.
-  SHA256 `3e09db767075a2f194b542ca60ade4b22e075231140aa36174b4a248ba08f6de`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-standalone-profile.zip`:17,573,549 bytes.
+  SHA256 `6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Source4b328ad; SQLite-only EXE43,226,112 bytes, SHA256
-  `b0ab7f300341fb805eaa38147697b70b9b7129d3c8996630024f3d4fce466751`.
-  Exact49 frontend/45 runtime gates; private launcher SHA256
+- Source bab29fc plus the exact two-file working-tree caption/test delta;
+  SQLite-only EXE43,230,208 bytes, SHA256
+  `5d7ace8476a3d436ab3dfc99c4454d722147cc2b124829e7a3c958ac37ce9083`.
+  Exact54 frontend/45 runtime gates; private launcher SHA256
   `2a6066585e8b846494ffccce2590812f97603485b6e2a74258728f44c358c39e`.
-  PLOT_LOCATION_REVIEW/GOOGLE_EARTH_REVIEW/GOOGLE_EARTH_KML_PREVIEW/
-  GOOGLE_EARTH_KML_EXPORT added; app/backend/seed/defaults unchanged.
-  Inherited false aliases stripped without caller mutation; no new engine/service.
-- Private `coordinate-kml-demo-20261018/validation-seal.json`, SHA256
-  `2c4ab8bb33647a0c6245082c7169086eeca812a828806bd9ad8d6cc9023ff17b`,
-  pins source/canonical/21 protected assets and native proofs; source input SHA256
-  `62460642eddb04380ad1408ea24d0c0752faf6ab6a9a48f62fce8e4750b7fe39`.
-  Initial JS1,057,710 versus5,202,547; total5,390,313. EXE grows29,184 bytes;
+  PLOT_PROFILE_SELECTION, PROJECT_PLOT_PROFILE_REVIEW,
+  PROJECT_PLOT_PROFILE_RUN, PROJECT_PLOT_PROFILE_EDITING and
+  PROJECT_PLOT_PROFILE_FILTERING added as five frontend flags;
+  no runtime flag, Go/seed/default change.
+- Private `profile-demo-20261018/validation-seal.json`, SHA256
+  `dee8f57fe29127d97dbf676ad16df5ff757116e7c345097d7e7a2eff9701945f`,
+  pins source/74 canonical records/21 protected assets and native proofs;
+  source input SHA256
+  `d5ef7ca8aab10d1651387b722fd1eec8560f7371da4b1a69972be10b940f350b`.
+  Initial JS1,061,662 versus5,202,547; total5,394,710. EXE grows4,096 bytes;
   no new timing/shrink claim.
-- Current native: one P1 Save Latitude50.25/Longitude123.25, two audits/one history;
-  389 historical audits/all peers/unmapped cells/other15 files exact. DISTINCT
-  Location1 row; direct Earth2 Env/SU pairs/KML2 placemarks, each P1/
-  -123.25,50.25,0/period. NULL raw description stays NULL. KML SHA256
-  `fa59321d65b3beba9a23ae9bcf732def5bab0676c983fcf374a9b80dbaf37de8`.
-  Actual held review Cancel/late-remount rejection, actual successful export
-  held/released once, ack/receipt-only remount pass. Four fresh CancelClose
-  acknowledgements precede release/ack. Controls/actions/all report cells/long
-  outcomes visible/contained980/1400. Four separate saved reopens disable only one
-  gate each; six denials, independent KML reads and normal117/coordinates remain
-  available. Five owners close;16 saved files/full physical peers exact.
-- All62 clients/launcher races/coupled Go race137.302s/check0/0/Vite/Go/exact26
-  embeds pass. Reviewer `cb262170-667a-4c20-b46e-e7de655ca7e7` finds no material
-  issues. All20 payload hashes/final prepare-only pass. Native NOT first-pass:
-  assembled harness missing ast before UI actions, then one-row raw expectation
-  ignored existing duplicate SU membership. Both failures/same-owner corrections
-  retained; no Save/export replay or app repair. No new full-root race/oracle,
-  KML readonly recovery/lost-response simulation, formal-schema/viewer,
-  preference/DMS/single-plot callbacks or whole-migration grant.
+- Current native: rule8 Species=LF1/Operator=>/Criteria=0/Operation=Add plots;
+  one Save/one typed history/no source audits.389 audits/other rules/counts/
+  Description/full peers exact; internal sqlite_sequence records history ID1.
+  Only Sample.db and explicit source-selection YAML change, not14 other DBs.
+  Zero then P1/P2 preview, eight expected steps/78 lump rows, actual revalidated
+  Apply/Next/Previous/Clear, held-preview Cancel/late-remount rejection,
+  invalid32768 across tabs/Lock/Home/close blocking/Undo and held actual void
+  Save response pass. Three fresh CancelClose receipts precede corrections/
+  releases. Saved None source denies Review/Save/Run while lump/normal117 remain
+  available; explicit Sample restore leaves all16 saved files exact. Both owners
+  close.128 inputs, representative source table cells/headers, all preview cells
+  and actions measured980/1400. Native Description witness VP05-2; NULL/empty
+  Description cases remain fast tests.
+- All29 clients/launcher races/coupled Go race74.402s/check0/0/Vite/Go/exact26
+  embeds pass. Reviewer `1351fb3d-27f2-44e0-bdaa-7552504f6fc5` accepts with no
+  significant issues. All20 payload hashes/final prepare-only pass. Four native
+  harness failures remain sealed: known transition dialog obscured Undo, readonly
+  positional arguments, refusal capitalization and missing Home. Same owners
+  continue without completed mutation replay. The first closed-family receipt's
+  misleading15-other-files label is explicitly superseded by the14-other-DBs
+  closed-profile evidence; YAML was an explicit change. No new full-root race/
+  Access oracle or original mapped callback/count/scratch/source zero-filter
+  grant. Rule/file/table lifecycle, external ownership, Save as SU, species-only
+  and subvarieties remain off.
+- Preserved49/45 coordinate/KML ZIP SHA256
+  `3e09db767075a2f194b542ca60ade4b22e075231140aa36174b4a248ba08f6de`
+  owns one coordinate Save/two audits/one history, Location1 DISTINCT row versus
+  direct Env/SU2 pairs/KML2 placemarks, reopened XML/hash, held review/export/
+  receipt guards, six denials/four saved reopens and five closed owners.
+  No coordinate mutation/KML export rerun on54/45. Seal SHA256
+  `2c4ab8bb33647a0c6245082c7169086eeca812a828806bd9ad8d6cc9023ff17b`.
 - Preserved45/41 saved-label ZIP SHA256
   `35714f1c79ba444912d218b39fe33e9276fa75d4b19c5d2319cac4e0800235d4`
   owns one P1 PDF/five exact strings/Arial/Letter page, NULL/empty/P3 refusal/retry,
@@ -224,7 +241,7 @@ qualification; that bounded journey is not the overall completion condition.
   owns Normal Cover1/Collected and CHARS Cover5a, two Saves/three audits/two histories,
   TEXT1 NULL/C/V, invalid100/narrowed100/CC, recovery/remount/alias/two saved reopens,
   three closed owners. Its combined124 startup selector and bound-editor fixture
-  correction remain sealed. Collected was not replayed on49/45. Seal SHA256
+  correction remain sealed. Collected was not replayed on54/45. Seal SHA256
   `de4c2b777478c552960317f6a57e3b49f5429ef1c9e1b147269b813026798a85`.
 - Preserved41/37 reference-report ZIP SHA256
   `b31cc3038bf5742486a84dfc6bff3406da17a5769b7eff568f600555cbc94a5e`
@@ -237,14 +254,14 @@ qualification; that bounded journey is not the overall completion condition.
   vegetation. Inspector/source-mode and reviewed walkthrough corrections remain
   preserved, without publication replay. Seal SHA256
   `d8a3d314569f6860930d2d0f0ab26d5167e9d3f173640c6c6c5f207726653f21`.
-  These publications were not repeated on49/45. Use a fresh launcher run for report
+  These publications were not repeated on54/45. Use a fresh launcher run for report
   examples after vegetation edits. No populated guide/original callback grant.
 - Preserved soil ZIP SHA256
   `4f3f6ed92a9d38cd02bc10e4eafd88dd1af867030a567cbef883f894d9f19fd5`
   owns normal117/CHARS119, two Creates/two Saves/six audits/four histories/
   18/28 defaults/permanent reservations/exact peers, read-only outcome recovery,
   retained remounts/three denials reopens. Four owners close;other15 files exact
-  after writes/16 per reopen. Those mutations were not repeated on49/45.
+  after writes/16 per reopen. Those mutations were not repeated on54/45.
   Explicit positive allocator is an adaptation; implicit creation/random allocator
   compatibility/soil deletion/restoration remain unavailable.
 - Preserved Summary ZIP SHA256

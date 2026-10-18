@@ -109,6 +109,26 @@ test('Profile selection is independently default-off and uses shared draft publi
   assert.match(form,/allowEditing=\{profileEditingEnabled && \$projectState\?\.plotProfile\?\.writable === true\}/);
 });
 
+test('Profile opener caption uses the same editing and selected-source ownership as its editor',()=>{
+  const form=read('FS882Form.svelte');
+  const start=form.indexOf('data-project-profile-review-open');
+  assert.ok(start>=0);
+  const button=form.slice(start,form.indexOf('</button>',start));
+  const expression=button.match(/\{(profileEditingEnabled && [^\n]+)\}/);
+  assert.ok(expression);
+  const caption=new Function('profileEditingEnabled','$projectState',`return (${expression[1]});`);
+  const readonly='Review project profile (read-only)';
+  for(const [enabled,state,expected] of [
+    [false,null,readonly],
+    [false,{plotProfile:{writable:true}},readonly],
+    [true,null,readonly],
+    [true,{},readonly],
+    [true,{plotProfile:{writable:false}},readonly],
+    [true,{plotProfile:{writable:true}},'Review project profile rules'],
+  ]) assert.equal(caption(enabled,state),expected);
+  assert.deepEqual(compile(form,{filename:'FS882Form.svelte',generate:'client'}).warnings,[]);
+});
+
 test('Project-local profile review and editing are separately gated, resident across tabs and preserve independent draft ownership',()=>{
   const component=read('ProjectPlotProfileReview.svelte');
   const form=read('FS882Form.svelte');

@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-coordinate-kml.zip`, 17,571,483 bytes.
+`VPRO-Demo-2026-10-18-standalone-profile.zip`, 17,573,549 bytes.
 
 SHA256:
-`3e09db767075a2f194b542ca60ade4b22e075231140aa36174b4a248ba08f6de`.
+`6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-49 frontend and 45 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+54 frontend and 45 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -94,31 +94,55 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
     new destination. This seed has two P1 SU memberships: both raw rows and both
     placemarks are intentionally retained. Acknowledge the retained outcome.
     Viewer launch, remote icons, saved preferences and implicit Save remain off.
+13. Explicitly select the project-owned **Sample_Profile** source and open P1.
+    **Review project profile rules**, then **Review and select project lump table**.
+    The original eight rules match no plots. On physical rule8 set Species=LF1,
+    Operator=>, Criteria=0 and Operation=Add plots; **Save profile rules** once.
+    Preview matches P1/P2, excluding P3's zero cover. **Apply reviewed profile
+    navigation**, open P1, use Next/Previous, then Clear profile navigation.
+    Ordinary plot Save never saves rules. This is a standalone adaptation, not
+    the original mapped Access callbacks or implicit count/filter changes.
 
-Source is committed `4b328ad`; production app/backend/seed/defaults are unchanged.
-Four existing Location/Google Earth/KML gates extend the preceding profile.
-No application kernel, service, dependency or seed change was added.
+Binary source is base `bab29fc` plus the manifest-pinned two-file caption/test
+delta, not a clean-commit build. The opener caption follows existing editing
+and selected-source write authority. Five existing frontend flags extend the
+profile; Go/backend/launcher/seed/defaults are unchanged. These client flags
+are not server authorization gates.
 
-Current native acceptance saves exactly two P1 coordinates with two audits and
-one technical history;389 historical audits, all peers/unmapped cells and the
-other15 files remain unchanged. Location has one DISTINCT row; direct Env/SU
-preparation and one KML export retain both physical memberships. Independently
-reopened UTF-8/XML/hash proves the literal title and two P1 placemarks, each
-`-123.25,50.25,0`; raw NULL description remains NULL and renders as a period.
-Actual held-review Cancel/remount rejects its late result. Actual successful
-publication is held/released once; acknowledgement/remount retains the receipt
-without XML. Four fresh native-close acknowledgements precede release/ack.
-Controls/actions/all report cells/long receipts are visible/contained980/1400.
-Four saved reopens disable one runtime gate each: six backend denials,
-independent KML reads and ordinary117/saved coordinates remain available.
-All five owners close;16 saved files and complete physical peers stay exact.
-All62 focused clients, launcher races, coupled Go races137.302s/check0/0 and
-isolated Vite/Go/exact26 embeds pass; independent review finds no material issues.
-Native was not first-pass: missing harness `ast` before UI actions, then an
-incorrect one-row raw expectation. Both same-owner corrections are preserved;
-no Save/export replay or application repair. No new full-root race/oracle,
-formal KML schema/viewer, DMS/single-plot callbacks or complete-parity claim.
-This KML service does not have the PDF service's readonly recovery API.
+Current native acceptance saves four text fields on physical rule8 exactly
+once, with one complete typed history and no source audits.389 historical audits,
+other rules, historical PlotCount, descriptions and complete physical peers stay
+exact. Internal `sqlite_sequence` records history ID1. Explicit source selection
+changes YAML separately; the14 other databases never change.
+Explicit78-row lump selection, eight expected steps, initial zero matches and
+edited P1/P2 matches pass. Apply independently revalidates; actual Next/Previous
+and Clear restore the exact ordinary page. No scratch/count/SU writes occur.
+Actual held-preview Cancel/remount rejects its late result. Invalid Order32768
+survives tabs and blocks Save/Lock/Home/native close; Undo restores9. The actual
+successful void Save response is held/released once after a physical checkpoint.
+Three fresh CancelClose acknowledgements precede corrections/releases.
+Saved reopen preserves rules/source/history. Selecting None denies profile
+Review/Save/Run while independent lump and normal117-field entry remain available.
+Explicitly restoring Sample leaves all16 saved files exact; both owners close.
+All128 inputs, representative source cells/headers, all preview cells and actions
+are visible/contained980/1400. Native Description witness is VP05-2; NULL/empty
+metadata distinctions retain fast-test coverage, not extra native cases.
+29 clients, launcher races, coupled profile race74.402s/check0/0 and isolated
+Vite/Go/exact26 embeds pass; independent review finds no material issues.
+Four harness failures and same-owner corrections are retained: a known transition
+dialog, readonly argument shape, refusal capitalization and missing Home step.
+No successful mutation was replayed. No new full-root race/oracle, mapped Access
+callback, stored-count/scratch, source zero-filter or whole-parity claim.
+Profile creation/deletion/restoration, external grants, Save as SU, species-only
+and subvarieties remain unavailable in this preview.
+
+The immutable49/45 coordinate/KML predecessor remains unchanged, SHA256
+`3e09db767075a2f194b542ca60ade4b22e075231140aa36174b4a248ba08f6de`.
+It owns the coordinate Save/two audits/one history, DISTINCT Location1 versus
+direct Env/SU2 rows/KML2 placemarks, independent XML/hash reopening, held
+review/export/receipt guards, six denials/four saved reopens and five closed
+owners. Those mutations/publication were not repeated on54/45. KML has no
+PDF-style readonly recovery API; viewer/preferences/DMS callbacks remain off.
 
 The immutable45/41 saved-label predecessor remains unchanged, SHA256
 `35714f1c79ba444912d218b39fe33e9276fa75d4b19c5d2319cac4e0800235d4`.
@@ -191,9 +215,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is1,057,710 bytes versus5,202,547 before
-deferral (79.67% less); total JavaScript is5,390,313. The EXE grows29,184 bytes
-versus the saved-label predecessor; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is1,061,662 bytes versus5,202,547 before
+deferral (79.59% less); total JavaScript is5,394,710. The EXE grows4,096 bytes
+versus the coordinate/KML predecessor; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
@@ -224,7 +248,7 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,196,928 bytes,18,432 above the Species
+The qualified preview executable is43,230,208 bytes,4,096 above the coordinate/KML
 predecessor; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.

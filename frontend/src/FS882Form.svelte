@@ -3416,14 +3416,14 @@
           disabled={busy || headerWorkflowBusy || !capabilitiesReady} onclick={onFindPlot}>Find Plot</button>
       {/if}
       {#if profileReviewEnabled}
-        <button type="button" class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
+        <button type="button" data-project-profile-review-open class="px-3 py-1 rounded text-xs border border-stone-300 bg-white disabled:opacity-50"
           disabled={busy || headerWorkflowBusy || siviSourceBarrier || profileReviewOpen || !capabilitiesReady ||
             (profileEditingEnabled && $projectState?.plotProfile?.writable === true && (metadataOpen || codeCheckOpen || personalDraft !== null || deletionReview !== null || creationDraft !== null))}
           onclick={() => {
             if (siviSourceBarrier) { error = 'Observe the ProjectID source preference outcome before opening profile rules.'; return; }
             profileReviewOpen = true;
           }}>
-          Review project profile (read-only)
+          {profileEditingEnabled && $projectState?.plotProfile?.writable === true ? 'Review project profile rules' : 'Review project profile (read-only)'}
         </button>
       {/if}
       <button
