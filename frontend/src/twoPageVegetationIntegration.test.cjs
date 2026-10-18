@@ -325,7 +325,7 @@ test('actual root native-close and context transition barriers survive unmounted
   const context = componentFunctions('App.svelte', ['handleCloseRequest', 'requestTransition', 'loadPlots', 'refresh', 'loadHierarchy'], {
     view: 'fs882', localEditorBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false, summaryEnvironmentalBusy: false, projectReportBusy: false,
     busy: false, editor: { getCloseState: () => ({ busy: false, blocked: false, unsaved: false, canSave: false, error: null }) },
-    transitionWorking: false, archivePublicationBusy: false,
+    transitionWorking: false, archivePublicationBusy: false, editorInitializing: false,
     vegetationPublicationBusy: false, lifeformPublicationBusy: false, summaryPublicationBusy: false,
     pendingTransition: null, closeWorking: false, closeRequest: '', closeError: '', error: '', transitionError: '',
     request: 0, stateRequest: 0, hierarchyRequest: 0, $projectState: { contextId },
