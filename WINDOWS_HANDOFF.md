@@ -43,8 +43,11 @@ Current machine state only. Portable scope and ordered work are in
   audits/history. Two pre-read harness failures/same-owner corrections retained;
   not first-pass. Controls/images/viewers measured980/1400. Independent review
   accepts; all23 ZIP hashes/final prepare-only pass. Profile54/45 and older
-  workflows retain predecessor lineage, not rerun mutations. Picture mutations/
-  original callbacks/registry discovery/two-page composition remain unqualified.
+  workflows retain predecessor lineage, not rerun mutations. Later same-binary
+  supplement qualifies Normal117/CHARS119 readonly picture children and held-read
+  source/close/remount guards; two additional owners close with all19 files exact.
+  Ordinary host is replaced, not duplicated; no speculative code fix. ZIP remains
+  immutable. Picture mutations/original callbacks/registry discovery stay off.
   Initial JS falls79.00%; EXE grows36,864 bytes. No new timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
@@ -200,8 +203,19 @@ qualification; that bounded journey is not the overall completion condition.
   without material findings. All23 ZIP hashes/final prepare-only pass.
   Two pre-read harness failures retained: rebound config vs template hash and
   uninitialized response map. Same-owner continuation; no mutation replay.
-  Picture mutations/original callbacks/registry discovery/two-page composition
-  remain unqualified; no new full-root race/Access oracle claim.
+  Picture mutations/original callbacks/registry discovery remain unqualified;
+  no new full-root race/Access oracle claim.
+- Later same-binary supplement: `picture-demo-20261018/entry-native` qualifies
+  Normal117/CHARS119 picture children, exact row membership/owned400x240 PNG,
+  associated labels and980/1400 images/viewers/actions. Held successful child
+  read blocks source replacement/load/close; fresh specific CancelClose precedes
+  Cancel/remount/release; late image cannot populate the new entry. All19 files/
+  full snapshots exact; entry owner and hypothesis-baseline owner normally close.
+  Distinct `entry-picture-evidence-review` accepts without material findings.
+  `composition-validation-seal.json` pins this later proof, not a rewritten ZIP.
+  The earlier driver incorrectly expected simultaneous ordinary/complete panels;
+  native proved one correctly associated host, so no application fix was made.
+  Full new entry journey is first-pass; earlier hypothesis/correction retained.
 - Preserved54/45 profile ZIP SHA256
   `6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`
   owns rule8 four-text Save/one history/zero audits, unchanged389 audits/counts/

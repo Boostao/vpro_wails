@@ -34,9 +34,9 @@ These states describe availability, not confidence percentages:
 | Select existing data and browse plots | Core/Preview: original SQLite family, configuration, owned project/SU/hierarchy selection, filtering and context switching | Production onboarding/administration is separate; attachment is not conversion |
 | Enter ordinary FS882 data | Core/Preview: 98 mapped writable parent fields; bounded soil/Other/vegetation editors, draft/Save/Undo/Lock/close behavior | Complete remaining source events, calculations and whole linked-form journeys |
 | Enter SIVI/CHARS data | Preview: parent panels, mixed child Save/restore, Collected navigation/reopen and explicit child create/delete/restore/creation Undo journeys. Development: wider separately gated species/ID and cross-host combinations | Whole-form callback/navigation equivalence; child creation/deletion is not plot/parent creation |
-| Use two-page entry | Preview: complete normal117/CHARS119 parents, linked Humus/Mineral creation/editing, demonstrated vegetation cover/Collected and exact existing-list Species coedits, guards and saved reopen; C/D empty memberships remain read-only. Development: broader Species/metadata/heights and host combinations have separate boundaries | Whole-form/picture integration, populated C/D and remaining field/callback journeys; manual/NotInList, implicit creation and soil deletion/restoration remain unavailable |
+| Use two-page entry | Preview: complete normal117/CHARS119 parents, linked Humus/Mineral creation/editing, demonstrated vegetation cover/Collected and exact existing-list Species coedits, readonly picture children, guards and saved reopen; C/D empty memberships remain read-only. Development: broader Species/metadata/heights and host combinations have separate boundaries | Whole-form/picture mutations, populated C/D and remaining field/callback journeys; manual/NotInList, implicit creation and soil deletion/restoration remain unavailable |
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
-| Work with pictures | Preview: readonly Picture Manager and ordinary linked child, separate owned library/directories, explicit metadata/image selection/viewer. Development: independently gated metadata/lifecycle operations | Original Add/save/default/confirmation/Current timing, mutations and complete two-page/host integration |
+| Work with pictures | Preview: readonly Picture Manager, ordinary child and later same-binary Normal/CHARS complete-entry children; separate owned library/directories, explicit metadata/image selection/viewer. Development: independently gated metadata/lifecycle operations | Original Add/save/default/confirmation/Current timing, mutations and wider host integration |
 | Run profiles, Find and transfers | Preview: explicit project-owned existing-rule Save, ordered readonly preview and revalidated Apply/Next/Previous/Clear navigation. Development: wider rule lifecycle, Find and owned-project Env/SU transfers | Original mapped callbacks/count/scratch/filter side effects, unsupported criteria, external-file mutations and administration |
 | Produce priority reports | Preview: inherited Long Environment/Vegetation and Matrix; Summary None/display6/environment/ancillary plus effective common/guide-NULL references and numeric Constancy inspection/publication. Development: other summaries/options/workbooks | Remaining combined/formatted variants, populated guide/attribute data and options/user journeys; original callbacks/printing remain separate |
 | Review locations and prepare map output | Preview: explicit saved decimal coordinates, DISTINCT Location review and direct Env/SU Google Earth/KML with duplicate memberships preserved | Preferences, DMS/single-plot callbacks, viewer/remote resources and broader map journeys remain separate |
@@ -87,8 +87,18 @@ readonly coupled race16.291s/check0/0/Vite/Go/exact26 embeds pass.
 Independent read-only review accepts with no material findings; all23 ZIP hashes/
 final prepare-only pass. Two retained pre-read harness failures continue on the
 same owner; native is not first-pass. No new full-root race/Access oracle claim.
-Picture mutations/original callbacks/registry discovery/two-page composition,
-production import and complete migration remain unqualified.
+Picture mutations/original callbacks/registry discovery, production import and
+complete migration remain unqualified.
+
+Subsequent same-binary acceptance independently qualifies Normal117/CHARS119
+complete-entry picture children: exact physical memberships/owned400x240 image,
+associated labels and980/1400 images/viewers/actions. Pending child read blocks
+source replacement/load/close; fresh specific CancelClose precedes Cancel/remount/
+release, and late image cannot populate the new entry. All19 files/full snapshots
+stay exact; two additional owners close. Ordinary host is replaced, not duplicated:
+the initial two-panels hypothesis was disproved without changing application code.
+The ZIP/embedded walkthrough remain immutable and retain their earlier boundary;
+this later reviewed supplement is not a fresh build/test/race/Access claim.
 
 The preserved54/45 profile ZIP, SHA256
 `6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`,
@@ -225,7 +235,7 @@ before writing another service, state machine, flag or preparation layer.
 | 1 - supported journeys verified | Preserve parent/metadata and child entry/recovery/lifecycle acceptance with its exact inherited23/22 scope. Source/gates are retained; parent Undo/navigation is rechecked on31/28. Consolidate only demonstrably equivalent behavior. Wider host/source combinations remain in priority4. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
 | 2 - supported subset verified | Preserve Long/Matrix lineage and Summary None/display6/environment/ancillary plus common/guide-NULL and numeric Constancy publications. Other options/combined/formatted variants and printing remain separate. | Independent vegetation/names/membership, reviewed environment, reopened outputs and cancellation/stale/close/acknowledgement barriers sealed; environmental calibration retains kernel lineage |
 | 3 - blocked prerequisites | Real-data onboarding/project administration needs production go-mdbtools reader integration, source schema/default/identity qualification and platform/licensing closure. New-project Description/default oracle retry is explicitly closed after two attempts; do not reopen it under another name. Reuse completed F1-F3 and continue independent deliverables. | Disposable complete import/new-project/reopen/recovery before authorization; private scalar staging is not production import and merge/splinter/compare remain separate |
-| 4 | Preserve delivered linked-soil, vegetation/existing-list Species, standalone profile Save/preview/navigation and readonly Picture Manager/ordinary child; finish broader Species/field/populated-C/D, picture mutations/two-page integration, wider profile and ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
+| 4 | Preserve delivered linked-soil, vegetation/existing-list Species, standalone profile Save/preview/navigation and readonly Picture Manager/ordinary/complete-entry children; finish broader Species/field/populated-C/D, picture mutations/wider hosts, wider profile and ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
 | 5 | Preserve saved-coordinate Location/KML and saved-label portable PDF; complete required report variants/options, physical labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
 
 Priorities organize, not delete, the former thirteen deliverables:

@@ -130,8 +130,19 @@ races, coupled readonly race16.291s, check0/0 and isolated Vite/Go/exact26 embed
 pass. Independent review finds no material issues; all23 ZIP payload hashes
 and final launcher prepare-only pass. Two harness failures are retained and
 corrected on the same owner before its first metadata request; not first-pass.
-Picture metadata/Add/create/delete/restoration, original automatic callbacks,
-registry discovery and two-page picture composition remain unqualified.
+Picture metadata/Add/create/delete/restoration, original automatic callbacks
+and registry discovery remain unqualified.
+
+A later independently reviewed supplement qualifies this exact binary's linked
+picture child inside Normal117 and CHARS119 complete entry. Both hosts show the
+same physical membership and owned400x240 image, with associated selection labels
+and980/1400 images/viewers/actions. A pending child read blocks source replacement/
+close; a fresh specific CancelClose precedes Cancel/remount/release, and its late
+image cannot populate the remounted entry. All19 files/full snapshots remain
+exact; two additional owners close. The ordinary panel is replaced by the complete
+entry host, not mounted alongside it; a suspected duplicate-ID bug was disproved,
+so no speculative application change was made. The immutable ZIP and its earlier
+walkthrough were not rewritten; this is subsequent same-binary acceptance.
 
 The immutable54/45 profile predecessor, SHA256
 `6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`,
