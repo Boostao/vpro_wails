@@ -168,14 +168,15 @@ func planSummaryVegetationLayerOptions(ctx context.Context,
 }
 
 type summaryVegetationStageProjection struct {
-	joinField    string
-	joinLimit    int
-	labelField   string
-	labelLimit   int
-	nullGroup    bool
-	numericOrder bool
-	references   *summaryVegetationReferencePlan
-	constancy    bool
+	joinField       string
+	joinLimit       int
+	labelField      string
+	labelLimit      int
+	nullGroup       bool
+	numericOrder    bool
+	references      *summaryVegetationReferencePlan
+	constancy       bool
+	unanimousCommon bool
 }
 
 func planSummaryVegetationStage(ctx context.Context,
@@ -184,6 +185,10 @@ func planSummaryVegetationStage(ctx context.Context,
 	fail := func(err error) (summaryVegetationLayerReport, error) { return summaryVegetationLayerReport{}, err }
 	if err := validateSummaryVegetationDisplayOptions(ctx, average, display, showClass); err != nil {
 		return fail(err)
+	}
+	if projection.unanimousCommon && (projection.constancy || projection.references == nil ||
+		!projection.references.Review.ShowCommon || !projection.numericOrder || display != 6 || showClass != 0) {
+		return fail(errors.New("summary vegetation unanimous First(common name) requires a non-Constancy effective common Display6 projection"))
 	}
 	units, err := prepareSummaryVegetationUnits(ctx, raw, su)
 	if err != nil {
@@ -293,8 +298,9 @@ func planSummaryVegetationStage(ctx context.Context,
 	}
 	type groupKey struct{ layer, species, common, rawSpecies string }
 	type group struct {
-		row    summaryVegetationLayerRow
-		covers map[string][]ProjectMetadataCell
+		row          summaryVegetationLayerRow
+		covers       map[string][]ProjectMetadataCell
+		sourceCommon string
 	}
 	groups := map[groupKey]*group{}
 	pivot := map[string]bool{}
@@ -361,10 +367,13 @@ func planSummaryVegetationStage(ctx context.Context,
 						key.layer = "integer:" + value
 					}
 				}
-				if showCommon {
+				if showCommon && !projection.unanimousCommon {
 					key.common = vegetationTextKey(common)
 				}
 				g := groups[key]
+				if g != nil && projection.unanimousCommon && g.sourceCommon != vegetationTextKey(common) {
+					return fail(fmt.Errorf("summary vegetation First(common name) is ambiguous for literal group %q species %q; all contributing common names must match, including NULL/empty", key.layer, key.species))
+				}
 				if g == nil {
 					g = &group{row: summaryVegetationLayerRow{Layer: cloneSiteUnitCell(label),
 						Species: cloneSiteUnitCell(name), Witnesses: []summaryVegetationLayerWitness{}, numericGroup: number},
@@ -376,6 +385,13 @@ func planSummaryVegetationStage(ctx context.Context,
 					}
 					if showCommon {
 						value := cloneSiteUnitCell(common)
+						if projection.unanimousCommon {
+							g.sourceCommon = vegetationTextKey(common)
+							// Original First projects empty TEXT as NULL; provenance remains unchanged.
+							if value.Text != nil && *value.Text == "" {
+								value = ProjectMetadataCell{Storage: "null"}
+							}
+						}
 						g.row.CommonName = &value
 					}
 				}

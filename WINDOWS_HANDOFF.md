@@ -25,79 +25,48 @@ Current machine state only. Portable scope and ordered work are in
 
 ## Current accepted integration
 
-The accepted private-kernel baseline is published `f55957b647028a688455480e682e30206389087f`
-(parent `48cc9d9f6e0982290bad0492f064c475ab05cf8d`).
-The accepted private Constancy preparation reuses existing effective references,
-Group13 MAX/SINGLE staging, aggregation, formatting and physical witnesses.
-Its numeric nullable Lifeform group is DAO LONG4/size4, not ordinary Group13's
-LifeForm TEXT3. Order remains TEXT10/size0. Raw Species is a separate grouping
-identity: two visibly identical rows survive the source DISTINCTROW query.
-Deterministic raw-code ordering among equal displayed keys is an explicit read-
-model adaptation, not Access tie-order parity.
+Published desktop baseline: `84bad2998d642c466488fcbeba2cb1eec9631e3f` on `main`,
+the accepted Constancy consumer described below. The four-path private
+common-First prerequisite is independently reviewed and full-race accepted;
+Git and its private publication association identify the exact revision.
+This is not desktop/public availability acceptance.
 
-One disposable `summary-constancy-source` family calibrates ten projected query
-cases across both averages, NULL/missing groups, equal names with equal/distinct
-values and numeric source policies. Readonly reopen, independently expected
-values/metadata, fresh owner/lock absence and source/fixture hashes pass.
-This executes original extracted query/helper boundaries on explicitly staged
-inputs, not full original Report/preflight/BuildLifeFormTable execution.
-No Excel/clipboard action or canonical mutation occurred.
+Current successor contract: `summary-common-first-kernel-contract.json` in the
+active session. Two closed disposable source families preserve the failed empty
+expectation and fresh24-case qualification. Physical empty/NULL remain distinct;
+original First projects uniform empty as NULL. Source review accepts exact typed
+unanimity across actual joined rows/all units, with mixed-input refusal.
+Reobservations use snapshot recordsets after exclusive database reopen, not
+database-level readonly mode. Both owners/locks are absent, canonical unchanged.
 
-Explicit integer-reader variants let only the new Constancy caller stage an
-already validated master LONG32/personal INTEGER16 reference union. Legacy
-wrappers remain signed16. Unused wide master values are accepted, while selected
-formatted lifeforms still must fit original TEXT3 staging. Derived attribute
-origins, cross-stage aggregation, raw MAX peers, detachment, cancellation/retry
-and helper/caller compatibility have independent tests.
-Frozen six-path/1919-input validation passes focused race15.688s, coupled
-race1507.859s, production vet/build and246 exact legacy comparisons, including
-the just-published grouped ancillary outputs. Distinct read-only review finds
-no significant issues. No frontend/public DTO/service/binding/flag/prefs/default/
-demo change; inherited client inputs and strict-Go wire fixtures remain exact.
+The private Group13/14 Display6 mode reuses existing MAX/SINGLE/reference/
+aggregation/witness boundaries; public guards, frontend, bindings and flags stay
+unchanged. `summary-common-first-validation/receipt.json` accepts focused
+race19.296s/coupled race763.687s, production vet/build and1924 managed inputs/
+3638 protected files. `summary-common-first-legacy/receipt.json` accepts250 exact
+base/candidate vectors. Distinct application review finds no significant issues.
+`summary-common-first-integration/receipt.json` accepts exit0, UTC2026-10-18
+04:55:23.384699 to06:18:51.059546,5005.937s. All1924 managed inputs/3662 artifacts,
+38 canonical inputs/21 assets, discovery and fourteen closed native families
+match. Receipt SHA256:
+`ef3d4569cdc66619344c6b9cd51fea8240aeb333005e7554e9dcaa0b9204798b`.
+The freeze is released for five status-only documentation updates and feature
+publication, then the separate workbook consumer. No native owner remains.
 
-`summary-constancy-integration/receipt.json` accepts exit0:
-UTC2026-10-17T23:01:02.041833 to2026-10-18T00:54:47.548940;6823.438s.
-All1919 inputs/2904 protected artifact entries, discovery,38 canonical inputs/
-21 protected assets and eleven closed native families match (ten prior Wails
-families plus the new Access source-query family). Receipt SHA256:
-`8c1c9d6fb6a010c678405bfab57864d895ce4afa0f304a3e5f0007fde5f2f52b`.
-That revision is published; Git and the private publication association identify
-its exact accepted tree. The following consumer has separate native and full
-integration acceptance; Git and the private association identify its publication.
-
-Active consumer: the existing workbook panel consumes the loaded presentation
-Constancy draft without changing basic calculation or independent workbook-name
-drafts, adding another editor/flag/service, or persisting YAML. Strict true-only
-requests, distinct source/scope/approval, public raw identity, numeric validation/
-rendering and retained duplicate rows are wired behind existing independent
-grouped/reference/presentation flags. Wails interfaces use `-ts -i`.
-Frozen validation passes focused race87.188s/coupled race749.172s,236 related
-client/52 browser cases, eight strict-Go composition vectors, check0/0, build/
-vet/production and250 exact compatibility comparisons. Independent review and
-focused follow-up accept the corrected numeric-leading ordering guard with seven
-explicit cases. Native acceptance seals five reopened outputs, actual numeric/
-NULL/negative/raw-twin rows, retained presentation/manual/basic drafts, four real
-remounts/exact close acknowledgements,54 responsive observations and three
-independent backend denials. All16 source/config/audit fixture files are unchanged;
-five final owners and one rejected-fixture owner normally closed.
-The bounded contract and resolved development failures are in the current
-session's `summary-constancy-desktop-contract.json` and
-`summary-constancy-desktop-development.json`. Final receipt family is
-`summary-constancy-desktop-review-fix-validation`; native receipt is
-`native-summary-constancy-workbook/native-acceptance.json`. The initial LF2
-fixture is closed/preserved: its attribute-reference fanout is not an equal-value
-twin. Fresh TWIN/TWN2 qualify duplicate visible values; the sealed seed has8
-memberships/2 units, not its older expanded smoke frame. Completed publications
-were never replayed. No native owner remains. Full root integration accepts exit0,
-UTC2026-10-18T02:42:08.181410 to2026-10-18T04:05:39.278581;5011.094s.
-All1923 inputs/2964 artifact entries,38 canonical inputs/21 assets, discovery and
-twelve closed native families match. Receipt:
-`summary-constancy-desktop-integration/receipt.json`; SHA256:
+The published Constancy panel consumes the loaded presentation draft, retaining
+basic/manual drafts under independent grouped/reference/presentation gates.
+Its numeric/raw identity, five reopened outputs, four remounts/exact close
+acknowledgements,54 responsive observations and three backend denials are
+accepted with16 unchanged fixture files. Root race5011.094s preserves1923 inputs,
+2964 artifacts and twelve closed native families. Receipt:
+`summary-constancy-desktop-integration/receipt.json`, SHA256
 `ed92a5e8aada3d994cb77f97204949488d9148345840abfcbe07d1bf36109292`.
-Preserve exact native-close acknowledgements.
-Group13/14 common/guide First, Strata/Lifeform Display2, original Report callbacks
-and whole-form/ribbon gaps remain. None Display2 is supported. Continue the
-ordered work after publication; the delivered demo/release is unchanged.
+Full portable scope and original-query/consumer limitations are in the
+[workbook contract](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#constancy-workbook-consumer).
+Preserve the sealed native families and exact native-close acknowledgements.
+Group13/14 common/guide desktop selection, Strata/Lifeform Display2, original
+Report callbacks and whole-form/ribbon gaps remain. None Display2 is supported.
+The delivered demo/release is unchanged.
 
 The attempted two-page Picture Manager route was rejected before any native
 action: both canonical buttons lack OnClick bindings, as already documented in

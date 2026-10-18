@@ -97,6 +97,22 @@ parity. Projected query calibration is not full original Report execution.
 Unbound two-page Picture Manager
 procedures remain dormant, not a missing live event to implement.
 
+Current private successor: unanimous common-name preparation for normal-SU
+Group13/14 Display6. Twenty-four original projected Access queries, exact DAO
+metadata and independent physical arithmetic establish unchanged nonempty/NULL
+names and output-only empty-to-NULL `First()` behavior. Source review accepts
+this bounded basis; observations use snapshot recordsets after exclusive
+database reopen, not a database-level readonly-mode claim. The new explicit
+private mode rejects differing typed common values across actual joined rows/
+units, preserving existing MAX/SINGLE staging, guide preparation and complete
+physical origins. Focused/coupled race19.296s/763.687s, production vet/build and250
+exact compatibility vectors pass. Distinct application review finds no significant
+issues. Full root race integration passes in5005.937s with1924 managed inputs/
+3662 artifacts,38 canonical inputs/21 assets and fourteen closed native families
+unchanged. Public common/guide13/14 remains unavailable; no new service, binding,
+production file, flag, default or demo promotion. Publish this accepted private
+prerequisite, then define its separate retained desktop consumer.
+
 The accepted correction applies the source-qualified changed-NULL refusal
 for SV_FloodPlain/SpeciesListComplete to existing normal, two-page and ordinary
 update paths. Shared guards and client request re-preparation preserve historical

@@ -74,7 +74,7 @@ func TestSummaryConstancyOriginalProjectedQueries(t *testing.T) {
 					t.Fatal(err)
 				}
 				got, err := planSummaryVegetationGroupedStageQuery(t.Context(), raw, su, stage, master, personal,
-					summaryGroupedLayers(), average, 13, 1, 0, &plan, true)
+					summaryGroupedLayers(), average, 13, 1, 0, &plan, summaryVegetationGroupedConstancy)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -128,7 +128,7 @@ func TestSummaryConstancyOriginalProjectedQueries(t *testing.T) {
 				}
 				for attempt := 0; attempt < 10; attempt++ {
 					repeated, err := planSummaryVegetationGroupedStageQuery(t.Context(), raw, su, stage, master, personal,
-						summaryGroupedLayers(), average, 13, 1, 0, &plan, true)
+						summaryGroupedLayers(), average, 13, 1, 0, &plan, summaryVegetationGroupedConstancy)
 					encoded, marshalErr := json.Marshal(repeated)
 					if err != nil || marshalErr != nil || string(encoded) != string(first) {
 						t.Fatal("explicit raw-code tie adaptation is nondeterministic", err, marshalErr)
@@ -288,7 +288,7 @@ func TestSummaryConstancyGuardsCancellationAndRetry(t *testing.T) {
 	plan := summaryConstancyReferencePlan(t, master, personal)
 	for _, mode := range [][3]int{{12, 1, 0}, {14, 1, 0}, {13, 3, 0}, {13, 6, 0}, {13, 1, 10}} {
 		got, err := prepareSummaryVegetationGroupedQuery(t.Context(), "Sample", "Selected", veg, su, master, personal,
-			layers, 1, mode[0], mode[1], mode[2], &plan, true)
+			layers, 1, mode[0], mode[1], mode[2], &plan, summaryVegetationGroupedConstancy)
 		if err == nil || !reflect.DeepEqual(got, summaryVegetationGroupedReport{}) {
 			t.Fatal("incompatible Constancy mode returned output", mode, got, err)
 		}
@@ -313,7 +313,7 @@ func TestSummaryConstancyGuardsCancellationAndRetry(t *testing.T) {
 		bad.References.Table.Rows[0].Cells[2] = value
 		_, _, stage, _, _, _ := summaryLayerFixture()
 		got, err := planSummaryVegetationGroupedStageQuery(t.Context(), veg, su, stage, master, personal, layers,
-			1, 13, 1, 0, &bad, true)
+			1, 13, 1, 0, &bad, summaryVegetationGroupedConstancy)
 		if err == nil || !reflect.DeepEqual(got, summaryVegetationGroupedReport{}) {
 			t.Fatal("malformed numeric reference returned output", got, err)
 		}

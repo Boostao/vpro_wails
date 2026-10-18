@@ -647,6 +647,19 @@ independent backend denials preserve16 fixture files. Full race integration pass
 in5011.094s, preserving1923 inputs/2964 artifacts and twelve closed native families.
 This is not accepted original Report/formatting/printing parity or a demo update.
 
+The [private common-name prerequisite](docs/LONG_VEGETATION_WORKBOOK_CONTRACT.md#private-unanimous-common-name-preparation)
+now prepares Group13/14 Display6 only when every contributing joined row across
+all units has the same typed effective common name. Twenty-four original Access
+query projections qualify this boundary: physical empty text remains distinct
+from NULL, but original `First()` projects uniform empty names as NULL. Mixed
+names are explicitly refused, never split into extra groups or arbitrarily
+chosen. Existing staging, aggregation, guide references and physical provenance
+are reused. Focused/coupled race19.296s/763.687s, production vet/build and250 exact
+legacy comparisons pass. Distinct application review finds no significant issues.
+Full root race integration passes in5005.937s, preserving1924 managed inputs,
+3662 artifacts,38 canonical inputs/21 assets and fourteen closed native families.
+Public Group13/14 common/guide selection and the delivered demo remain unchanged.
+
 The explicit [SQLite-only Windows build profile](duckdbdriver_sqliteonly.go) removes
 unused optional DuckDB linkage rather than removing features: about 38.4 MB versus
 87.8 MB for the same stripped frontend build. Sample native startup and first

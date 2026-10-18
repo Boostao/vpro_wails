@@ -19,11 +19,26 @@ type summaryVegetationGroupedReport struct {
 	Report     summaryVegetationLayerReport
 }
 
+type summaryVegetationGroupedMode uint8
+
+const (
+	summaryVegetationGroupedOrdinary summaryVegetationGroupedMode = iota
+	summaryVegetationGroupedConstancy
+	summaryVegetationGroupedUnanimousCommon
+)
+
+func prepareSummaryVegetationUnanimousCommonReferences(ctx context.Context, project, suName string,
+	veg, su, master, personal, layers ProjectMetadataTable, average, grouping int,
+	references *summaryVegetationReferencePlan) (summaryVegetationGroupedReport, error) {
+	return prepareSummaryVegetationGroupedQuery(ctx, project, suName, veg, su, master, personal, layers,
+		average, grouping, 6, 0, references, summaryVegetationGroupedUnanimousCommon)
+}
+
 func prepareSummaryVegetationConstancyReferences(ctx context.Context, project, suName string,
 	veg, su, master, personal, layers ProjectMetadataTable, average int,
 	references *summaryVegetationReferencePlan) (summaryVegetationGroupedReport, error) {
 	return prepareSummaryVegetationGroupedQuery(ctx, project, suName, veg, su, master, personal, layers,
-		average, 13, 1, 0, references, true)
+		average, 13, 1, 0, references, summaryVegetationGroupedConstancy)
 }
 
 func prepareSummaryVegetationGrouped(ctx context.Context, project, suName string,
@@ -54,17 +69,27 @@ func prepareSummaryVegetationGroupedReferences(ctx context.Context, project, suN
 	veg, su, master, personal, layers ProjectMetadataTable, average, grouping, display, showClass int,
 	references *summaryVegetationReferencePlan) (summaryVegetationGroupedReport, error) {
 	return prepareSummaryVegetationGroupedQuery(ctx, project, suName, veg, su, master, personal, layers,
-		average, grouping, display, showClass, references, false)
+		average, grouping, display, showClass, references, summaryVegetationGroupedOrdinary)
 }
 
 func validateSummaryVegetationGroupedQuery(ctx context.Context, average, grouping, display, showClass int,
-	references *summaryVegetationReferencePlan, constancy bool) error {
+	references *summaryVegetationReferencePlan, mode summaryVegetationGroupedMode) error {
 	if err := validateSummaryVegetationGroupedOptions(ctx, average, grouping, display, showClass); err != nil {
 		return err
 	}
-	if constancy && (grouping != 13 || display != 1 || showClass != 0 || references == nil ||
+	if mode > summaryVegetationGroupedUnanimousCommon {
+		return errors.New("summary vegetation grouped projection mode is unavailable")
+	}
+	if mode == summaryVegetationGroupedConstancy && (grouping != 13 || display != 1 || showClass != 0 || references == nil ||
 		references.Review.ShowCommon || references.Review.UseGuideNames) {
 		return errors.New("summary vegetation Constancy requires Group13/Display1 and effective references without common/guide names")
+	}
+	if mode == summaryVegetationGroupedUnanimousCommon {
+		if grouping != 13 && grouping != 14 || display != 6 || showClass != 0 ||
+			references == nil || !references.Review.ShowCommon {
+			return errors.New("summary vegetation unanimous First(common name) requires Group13/14 Display6 and effective common/guide references")
+		}
+		return nil
 	}
 	if references != nil && !summaryVegetationReferenceGroupingAvailable(grouping, references.Review.ShowCommon || references.Review.UseGuideNames) {
 		return errors.New("summary vegetation grouped common/guide references require GroupAndOrder12; First(common name) for13/14 is unqualified")
@@ -74,9 +99,9 @@ func validateSummaryVegetationGroupedQuery(ctx context.Context, average, groupin
 
 func prepareSummaryVegetationGroupedQuery(ctx context.Context, project, suName string,
 	veg, su, master, personal, layers ProjectMetadataTable, average, grouping, display, showClass int,
-	references *summaryVegetationReferencePlan, constancy bool) (summaryVegetationGroupedReport, error) {
+	references *summaryVegetationReferencePlan, mode summaryVegetationGroupedMode) (summaryVegetationGroupedReport, error) {
 	fail := func(err error) (summaryVegetationGroupedReport, error) { return summaryVegetationGroupedReport{}, err }
-	if err := validateSummaryVegetationGroupedQuery(ctx, average, grouping, display, showClass, references, constancy); err != nil {
+	if err := validateSummaryVegetationGroupedQuery(ctx, average, grouping, display, showClass, references, mode); err != nil {
 		return fail(err)
 	}
 	prepared, err := prepareLongVegetation(ctx, project, suName, veg, su, layers)
@@ -94,7 +119,7 @@ func prepareSummaryVegetationGroupedQuery(ctx context.Context, project, suName s
 		union = legacy.Table
 	}
 	readInteger := vegetationLifeformInteger
-	if constancy {
+	if mode == summaryVegetationGroupedConstancy {
 		readInteger = summaryVegetationMasterLongInteger
 	}
 	stage, err := prepareSummaryVegetationGroupedEntriesWithInteger(ctx, prepared, union, grouping, readInteger)
@@ -102,7 +127,7 @@ func prepareSummaryVegetationGroupedQuery(ctx context.Context, project, suName s
 		return fail(err)
 	}
 	report, err := planSummaryVegetationGroupedStageQuery(ctx, veg, su, stage, master, personal, layers,
-		average, grouping, display, showClass, references, constancy)
+		average, grouping, display, showClass, references, mode)
 	if err != nil {
 		return fail(err)
 	}
@@ -154,19 +179,27 @@ func planSummaryVegetationGroupedStageReferences(ctx context.Context,
 	raw, su, stage, master, personal, layers ProjectMetadataTable, average, grouping, display, showClass int,
 	references *summaryVegetationReferencePlan) (summaryVegetationGroupedReport, error) {
 	return planSummaryVegetationGroupedStageQuery(ctx, raw, su, stage, master, personal, layers,
-		average, grouping, display, showClass, references, false)
+		average, grouping, display, showClass, references, summaryVegetationGroupedOrdinary)
+}
+
+func planSummaryVegetationUnanimousCommonStage(ctx context.Context,
+	raw, su, stage, master, personal, layers ProjectMetadataTable, average, grouping int,
+	references *summaryVegetationReferencePlan) (summaryVegetationGroupedReport, error) {
+	return planSummaryVegetationGroupedStageQuery(ctx, raw, su, stage, master, personal, layers,
+		average, grouping, 6, 0, references, summaryVegetationGroupedUnanimousCommon)
 }
 
 func planSummaryVegetationGroupedStageQuery(ctx context.Context,
 	raw, su, stage, master, personal, layers ProjectMetadataTable, average, grouping, display, showClass int,
-	references *summaryVegetationReferencePlan, constancy bool) (summaryVegetationGroupedReport, error) {
+	references *summaryVegetationReferencePlan, mode summaryVegetationGroupedMode) (summaryVegetationGroupedReport, error) {
 	fail := func(err error) (summaryVegetationGroupedReport, error) { return summaryVegetationGroupedReport{}, err }
-	if err := validateSummaryVegetationGroupedQuery(ctx, average, grouping, display, showClass, references, constancy); err != nil {
+	if err := validateSummaryVegetationGroupedQuery(ctx, average, grouping, display, showClass, references, mode); err != nil {
 		return fail(err)
 	}
 	// Class4/5 override the earlier numeric grouped Order in the source.
 	projection := summaryVegetationStageProjection{joinField: "Layer1234567", joinLimit: 2, labelField: "Strata", labelLimit: 1,
-		numericOrder: display == 6, references: references, constancy: constancy}
+		numericOrder: display == 6, references: references, constancy: mode == summaryVegetationGroupedConstancy,
+		unanimousCommon: mode == summaryVegetationGroupedUnanimousCommon}
 	orderField := summaryVegetationGroupField{Name: "Order", DAOType: 10}
 	if display == 6 {
 		orderField.DAOType, orderField.Size = 7, 8
@@ -184,7 +217,7 @@ func planSummaryVegetationGroupedStageQuery(ctx context.Context,
 	default:
 		return fail(errors.New("summary vegetation grouped stage requires original GroupAndOrder12,13 or14"))
 	}
-	if constancy {
+	if mode == summaryVegetationGroupedConstancy {
 		field = summaryVegetationGroupField{Name: "Lifeform", DAOType: 4, Size: 4}
 	}
 	report, err := planSummaryVegetationStage(ctx, raw, su, stage, master, personal, layers, average, display, showClass, projection)

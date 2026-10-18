@@ -446,6 +446,41 @@ Full root race integration passes in5011.094s with1923 managed inputs/2964 artif
 families. Only six acceptance-status docs change after that freeze. The delivered demo,
 default availability and original Report/printing status are unchanged.
 
+## Private unanimous common-name preparation
+
+Original Group13/14 select `First(USysAllSpecies.EnglishName)` without grouping
+by EnglishName. A separate disposable query family calibrates24 explicit
+Group13/14 Display6 projections: six input scenarios, both averages, fixed
+denominators4/1, duplicate P1 membership, master LONG/personal INTEGER inputs
+and exact original SELECT/GROUP/joins/order/equations. Actual effective-reference
+and stage inputs are captured. Result group metadata is TEXT3/BINARY0,
+Common Name is TEXT10/size0 and Order is DOUBLE7/size8.
+
+Unanimous nonempty/NULL names project unchanged. Physical/UNION empty text stays
+empty, but original First projects it as NULL. The first family's false empty
+expectation is retained with its normally closed owner; the fresh second family
+qualifies the correction. Twelve conflicting-name projections are observations
+only, not stable representative acceptance. Snapshot reads after database reopen
+match; the host reopen was exclusive, not database-level read-only. Source and
+fixture hashes, both absent owners and DAO-lock absence pass. Distinct source
+review accepts this bounded basis with that explicit reopen qualification.
+
+The private calculation mode reuses existing references/staging/aggregation.
+It requires exact typed unanimity across all actually contributing joined rows
+and units, normalizes empty only in the projected common cell, and preserves
+physical NULL/empty metadata, UNION origins and lower MAX peers. Ambiguity
+returns an explicit error with no partial report. Independent raw/stage cases,
+guide selection, original grouping, physical fanout, unused/nonmember differences,
+contributing NULL covers, all cancellation points, correction/retry and detached
+results pass. Frozen four-path/1924-input validation passes focused race19.296s,
+coupled race763.687s, production vet/build and250 exact base/candidate vectors.
+All3638 protected files remain exact. Distinct application review finds no
+significant issues. Full root race integration passes in5005.937s with1924 managed
+inputs,3662 artifacts,38 canonical inputs/21 assets, unchanged discovery and
+fourteen closed native families. Only five acceptance-status docs change after
+the freeze. No new Wails/public availability, Report/guide callback, general
+collation, stable First ordering, default or demo/release acceptance is claimed.
+
 ## Hosted release acceptance
 
 [Run38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)

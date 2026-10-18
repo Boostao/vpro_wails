@@ -2798,6 +2798,46 @@ Full root race integration passes in5011.094s, preserving1923 managed inputs/
 2964 artifacts,38 canonical inputs/21 assets and twelve closed native families.
 No new service/flag/default/demo promotion or original Report/printing claim.
 
+### Private unanimous common-name preparation
+
+Group13/14 omit EnglishName from the original GROUP BY while selecting
+`First(USysAllSpecies.EnglishName)`. The private successor therefore does not
+reuse Group12's common-name grouping or invent a first reference representative.
+Its explicit mode accepts only normal-SU13/14, Display6, showClass0 and an
+effective common/guide reference plan. Ordinary/Constancy modes are separate
+typed values; legacy wrappers and public availability guards remain unchanged.
+
+Twenty-four original projected queries cover six equivalent scenarios across
+both groupings/averages. Nonempty/NULL unanimity is stable in this bounded
+projection. Uniform physical empty TEXT projects NULL through original First;
+physical/UNION values and metadata remain empty. Mixed text, NULL/empty and
+unit-separated choices are observations only. The failed initial expectation
+and its normally closed family remain preserved; a fresh second family passes
+all inputs, exact output metadata/arithmetic and reopened snapshot observations.
+The Access database reopen is exclusive, not a database-level read-only mode.
+Source review accepts the bounded invariant with that qualification.
+
+The shared aggregation checks exact typed common values within the original
+literal group across all contributing units, before returning any report.
+Different values fail explicitly, including case/space differences and NULL
+versus empty; they are not extra groups or a fallback name. An unused reference
+or nonmember stage row does not create a conflict, but a contributing NULL-cover
+row still participates in First. Uniform empty normalizes only the output cell.
+The raw reference plan, complete UNION origins, raw MAX peers, fanout and
+membership witnesses remain unchanged. Guide names consume the already accepted
+effective EnglishName plan, not newly executed rename callbacks.
+
+Independent24-case raw/stage combinations and additional grouping/guide/fanout/
+provenance/cancellation/retry/detachment checks pass. Frozen focused/coupled races
+pass in19.296s/763.687s; production vet/build and250 exact legacy comparisons pass.
+Distinct application review finds no significant issues. Full root race
+integration passes in5005.937s, preserving1924 managed inputs/3662 artifacts,
+38 canonical inputs/21 assets and fourteen closed native families.
+This is a private
+prerequisite, not a new desktop consumer, original Report/preflight/formatting/
+printing or whole-collation guarantee. No new production file/service/binding/
+flag/preference/default/demo change follows.
+
 ### Class threshold neighbors
 
 Thirty-two independent physical inputs yield192 typed original helper outcomes
