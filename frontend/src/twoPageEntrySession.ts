@@ -35,6 +35,13 @@ const same = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.str
 const record = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === 'object' && !Array.isArray(value);
 const textOrNull = (value: unknown) => value === null || typeof value === 'string';
+function freezeSnapshot<T>(value: T): T {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    for (const child of Object.values(value)) freezeSnapshot(child);
+  }
+  return value;
+}
 function cellFromWire(cell: unknown): ProjectMetadataCell {
   return siviMetadataTableFromWire({ columns: [{ name: 'value', declaredType: '' }],
     rows: [{ rowId: '1', cells: [cell] }] }).rows[0].cells[0];
@@ -122,8 +129,8 @@ function decode(wire: unknown, owner: SIVIParentOwner, form: TwoPageParentForm):
   });
   const choices = siviProjectChoicesFromWire(wire.ProjectChoices, owner);
   if (choices.SourceOption !== wire.ProjectSource) throw new Error('Complete-entry project source proof changed.');
-  return structuredClone({ ...wire, Original: original, Fields: fields, Policies: wire.Policies, ProjectChoices: choices,
-    Zone: cellFromWire(wire.Zone), SubZone: cellFromWire(wire.SubZone) }) as TwoPageEntrySnapshot;
+  return freezeSnapshot(structuredClone({ ...wire, Original: original, Fields: fields, Policies: wire.Policies, ProjectChoices: choices,
+    Zone: cellFromWire(wire.Zone), SubZone: cellFromWire(wire.SubZone) })) as TwoPageEntrySnapshot;
 }
 function receipt(snapshot: TwoPageEntrySnapshot, draft: TwoPageEntryDraft): TwoPageEntryCodeAcknowledgement {
   const reference = snapshot.Fields.find(field => field.column === draft.column);
@@ -268,7 +275,7 @@ export class TwoPageEntrySession extends SIVIParentScopedWriteSession<string, Tw
     this.references = state; this.entryOwner = structuredClone(owner); this.validationErrors = errors;
   }
   override view() {
-    const view = super.view(), snapshot = view.original ? structuredClone(this.references.snapshot) : null;
+    const view = super.view(), snapshot = view.original ? this.references.snapshot : null;
     const advisories: Record<string, string> = {};
     for (const draft of Object.values(view.drafts)) {
       const result = issue(snapshot, draft, this.references.revision); draft.error ||= result.error;

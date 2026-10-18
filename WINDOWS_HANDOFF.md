@@ -29,11 +29,13 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is the reviewed34/30 complete-parent profile on184c332.
+- Current preview is the reviewed34/30 entry-performance profile: base67afa71
+  plus the pinned immutable reference-snapshot delta.
   Normal117/CHARS119 parent fields, one three-scope Save/three audits,
-  saved reopening and independent backend denials pass. App/backend/seed and
-  earlier ZIPs remain unchanged; the private launcher adds two existing gates.
-  Initial transitive JS falls82.14%; no timing/binary-shrink claim.
+  saved reopening and independent backend denials pass. Launcher/backend/seed/
+  gates and earlier ZIPs remain unchanged. Native input/flush medians8.8/9.4ms;
+  session view medians fall98.85/95.72ms to0.65/0.50ms on the actual saved wire.
+  Initial transitive JS falls82.14%; no startup-time/binary-shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -155,20 +157,21 @@ gates off; a bounded feature gate is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-complete-parent.zip`:17,522,456 bytes.
-  SHA256 `d16b9c70c904bc0ad8ac1baf3fcc0384f3abff5f73c9ad9e011cb0ed67c8e214`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-entry-performance.zip`:17,523,481 bytes.
+  SHA256 `0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Source184c332; SQLite-only EXE43,061,760 bytes,
-  SHA256 `fa932dacdadc5ffa556c365693759dd7c661776be5d090b6eb4750b4fc051837`.
+- Source base67afa71 plus pinned reviewed snapshot delta; SQLite-only EXE
+  43,061,760 bytes, SHA256
+  `56b2a5fe6610899ea24cd39923c5d7e9c5ff49388d1521a200cd87f42fc9f5f6`.
   Exact34 frontend/30 runtime gates; private launcher SHA256
   `cc9789e2d81898d65e3861420cfd3e2e4d96e9a2aa852ad675fefea1f77e6e93`.
-  App/backend/seed/defaults unchanged; two launcher gates have independent tests.
-- Private `two-page-demo-20261018/validation-seal.json`, SHA256
-  `37df466b2f91b337d62ee9dcc1989c6f4f0ef612d9e7ccdf8d547e1ac307c6c6`,
-  pins1931 inputs,21 assets/56 canonical inputs and58 native evidence files.
-  Initial transitive JS929,255 vs5,202,547; total5,230,628.
-  The EXE grows3,072 bytes from startup; no measured startup/binary-shrink claim.
+  Launcher/backend/seed/defaults unchanged; two runtime gates retain their tests.
+- Private `entry-snapshot-demo-20261018/validation-seal.json`, SHA256
+  `97f5b8a2b811fb51cc2c1c7fa2352f01cb65f2c3ce779365b793f62b7357083a`,
+  pins1931 inputs,21 assets/56 canonical input records and43 native evidence files.
+  Initial transitive JS929,255 vs5,202,547; total5,230,739.
+  EXE size unchanged from complete-parent; no startup/binary-shrink claim.
 - Normal117/CHARS119 unique labelled fields measured980/1400. Invalid drafts
   block Save/Lock/Home/variant/native close. Fresh CancelClose precedes Undo and
   held release. One Save changes only FieldNumber/SV_CanopyComposition/
@@ -176,14 +179,26 @@ gates off; a bounded feature gate is not the overall completion condition.
   CHARS refresh and ordinary P2/P1 pass; saved reopen and independent review/
   editing-off denials each preserve all sixteen closed files. Four owners absent.
   Current report smoke loads options/titles only, with no SU/config mutation.
-- Focused38 entry cases, launcher race, check0/0, Vite/Go and26 embed patterns
-  pass. Distinct reviewer `1e3c96ec-9845-4475-a95f-4d4cd39934c8` finds no
+- Focused40 entry cases, three startup-budget cases, launcher race, check0/0,
+  Vite/Go and26 embed patterns pass. Distinct reviewer
+  `3f1718a5-fe17-4474-af71-aeb7ce4f3df7` finds no
   significant issues. Private review/delivery receipts and all20 payload hashes/
-  prepare-only pass. No new full-root race or whole-form/child parity grant.
-- The prewrite harness Undo null-selector stop and same-fixture continuation
-  remain in `two-page-demo-20261018/native`; `continued/closed-family.json` owns
-  the single successful Save. Three `reopen-*` families preserve that exact saved
-  snapshot. Do not replay Save or rerun occupied native output roots.
+  prepare-only pass; reviewer independently reruns40 cases. No new full-root race
+  or whole-form/child parity grant. Svelte-derived test alone does not prove
+  reactive invalidation; actual native typing covers that boundary.
+- Native root `entry-snapshot-demo-20261018/native/closed-family.json` owns the
+  once-only Save; three `reopen-*` runs preserve its exact saved snapshot.
+  Two20-edit typing runs Undo without writes, median8.8ms normal/9.4ms CHARS.
+  Production session benchmark on6,040,765-byte compact wire falls from98.85/
+  95.72ms to0.65/0.50ms median clean/dirty view. Paired fresh-process rerun also
+  passes<10ms/80%-reduction; `paired-performance.json` SHA256
+  `21826002ac5836c17871cad9022e1fc961df82834374366dc08b3b798598ff92`.
+  Initial read/decode is not faster; no transport/SQL/startup claim.
+- Prior complete-parent ZIP remains exact, SHA256
+  `d16b9c70c904bc0ad8ac1baf3fcc0384f3abff5f73c9ad9e011cb0ed67c8e214`.
+  Its prewrite Undo null-selector stop and zero-write continuation remain in
+  `two-page-demo-20261018/native`; never replay that successful Save or rerun
+  occupied native output roots.
 - Prior `VPRO-Demo-2026-10-18-startup.zip` remains exact, SHA256
   `bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`.
   Its fixed-root validation seal owns cold-load/context/plot, failed import,

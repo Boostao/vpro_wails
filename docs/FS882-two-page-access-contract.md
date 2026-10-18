@@ -3145,6 +3145,15 @@ Obsolete acknowledgements are omitted when refreshed choices list the literal.
 Invalid drafts/references and unknown outcomes retain their owner/error and
 block disposal or replay. Explicit Undo/reload recovers uncertain outcomes.
 
+Complete-entry reference snapshots are detached at validated receipt decoding,
+then deeply frozen and reused by panel-facing views until a successful original
+or reference reload replaces the receipt. They are read models, not mutable
+drafts: callers needing a writable copy must clone explicitly. Parent originals
+and drafts still have defensive view copies. Freezing retains every physical
+definition, typed cell, NULL/empty distinction and source-specific choice;
+it does not replace witnesses with hashes or weaken acknowledgement validation.
+Client-derived and actual native typing/Save/reopen checks cover this boundary.
+
 32 focused tests plus701 existing frontend regressions and check0/0 pass.
 Isolated enabled/default assets and actual-main Wails production builds pass.
 Five final normally closed owners prove18 cases on one unseeded disposable

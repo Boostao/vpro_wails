@@ -51,25 +51,25 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-complete-parent.zip`,17,522,456 bytes, SHA256
-`d16b9c70c904bc0ad8ac1baf3fcc0384f3abff5f73c9ad9e011cb0ed67c8e214`.
+`VPRO-Demo-2026-10-18-entry-performance.zip`,17,523,481 bytes, SHA256
+`0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
 34 frontend/30 runtime flags, packaged binary SHA256
-`fa932dacdadc5ffa556c365693759dd7c661776be5d090b6eb4750b4fc051837`,
+`56b2a5fe6610899ea24cd39923c5d7e9c5ff49388d1521a200cd87f42fc9f5f6`,
 source-input SHA256
-`960038d6ca18a7c7119126d6c311b7460d737cf77bf12e46fa8d3893ae65da8e`.
+`eec3672ad917fcc82a4ea0f9a33afc69b2cf7bcd42418b26ede9232d40ce8a79`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. `files[].sha256` owns application/seed hashes; `launcher`
 and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
 named, not a substitute for the packaged EXE identity.
 
-Application source is `184c332`; the only implementation delta is two existing
-runtime launcher gates and independent tests. Three existing frontend gates
-complete the34/30 profile. App/backend/seed/defaults are unchanged.
-Initial transitive JS is929,255 bytes, down82.14% from5,202,547; total5,230,628.
-The43,061,760-byte EXE grows3,072 bytes from the startup preview.
+Application source is base `67afa71` plus the manifest-pinned reviewed
+complete-entry immutable-snapshot delta and tests. The34/30 profile, launcher,
+backend, seed and defaults are unchanged.
+Initial transitive JS is929,255 bytes, down82.14% from5,202,547; total5,230,739.
+The43,061,760-byte EXE is unchanged from the complete-parent preview.
 Neither wall-clock startup nor binary shrink is inferred.
 
 Current native acceptance measures normal117/CHARS119 unique labelled parent
@@ -80,16 +80,28 @@ with three exact audits/one technical history and every physical peer exact.
 CHARS refresh and ordinary P2/P1 navigation pass. Saved reopen plus independent
 backend review/write denials each leave all sixteen closed files exact.
 All four owners are freshly absent; no successful mutation was replayed.
-The prewrite harness's transient Undo selector failure remains preserved and
-was continued only after independent zero-write/readiness checks.
+The predecessor's transient Undo selector failure remains preserved and was
+continued only after independent zero-write/readiness checks. This candidate's
+native run completes without a harness failure.
 
-Focused38 entry cases, launcher race, check0/0, production Vite/Go builds and
-exact26-pattern overlay discovery pass;1931 inputs,21 protected assets and
-56 canonical inputs are exact. Distinct read-only review finds no significant
-issues. The current report smoke loads options/titles on original Report scope
-only; no report preview/publication was replayed. No new full-root race claim.
+Focused40 entry cases, three startup-budget cases, launcher race, check0/0,
+production Vite/Go builds and exact26-pattern overlay discovery pass;1931 inputs,
+21 protected assets and56 canonical input records are exact. Distinct read-only
+review finds no significant issues and independently reruns all40 focused cases.
+The current report smoke loads options/titles on original Report scope only;
+no report preview/publication was replayed. No new full-root race claim.
 Complete **parent** entry does not grant whole two-page callbacks/children,
 pictures, Source4, identity, implicit creation or soil creation.
+
+Validated detached reference snapshots are now deeply immutable and reused
+between actual receipts, rather than cloned on every reactive view. Original/
+draft copies, full physical references, NULL distinctions and all source guards
+remain. On the same6,040,765-byte wire, median clean/dirty reads98.85/95.72ms
+become0.65/0.50ms; a second sequential-process comparison also passes under10ms/
+80%-reduction. Native20-edit input/flush medians are8.8/9.4ms normal/CHARS.
+No initial-load/transport/SQL speedup is claimed. The prior complete-parent ZIP
+remains exact at SHA256
+`d16b9c70c904bc0ad8ac1baf3fcc0384f3abff5f73c9ad9e011cb0ed67c8e214`.
 
 The preserved31/28 startup ZIP, SHA256
 `bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`,

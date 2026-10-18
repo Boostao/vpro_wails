@@ -165,6 +165,64 @@ test('both complete form cohorts load one owned pair, 117/119 policies and 56/55
     assert.throws(() => f.session.stage('PlotNumber', text('new')), /owned/);
   }
 });
+test('validated complete-entry snapshots are immutable, detached and shared only until a new receipt', async () => {
+  for (const form of forms) {
+    const wire = fixtureSnapshot(form);
+    const expected = structuredClone(wire);
+    let reads = 0;
+    const f = fixture({ form, overrides: { read: async () => reads++ === 0 ? wire : f.current() } });
+    assert.equal(await f.session.load(), true);
+    const first = f.session.view();
+    assert.deepEqual(first.snapshot, expected);
+    assert.notEqual(first.snapshot, wire);
+    const pending = [first.snapshot], seen = new Set();
+    while (pending.length) {
+      const value = pending.pop();
+      if (!value || typeof value !== 'object' || seen.has(value)) continue;
+      seen.add(value);
+      assert.equal(Object.isFrozen(value), true);
+      pending.push(...Object.values(value));
+    }
+    assert.equal(Reflect.set(first.snapshot.Original, 'ContextID', 'foreign'), false);
+    assert.equal(Reflect.set(first.references[0].choices[0], 'code', 'forged'), false);
+    assert.throws(() => first.snapshot.Policies.pop(), TypeError);
+    first.original.ContextID = 'detached-view';
+    wire.Fields[0].choices[0].description = 'changed transport';
+    assert.deepEqual(first.snapshot, expected);
+    assert.equal(f.session.view().original.ContextID, owner.contextId);
+    for (let i = 0; i < 10; i++) {
+      f.session.stage('FieldNumber', text('owned-' + i));
+      const next = f.session.view();
+      assert.equal(next.snapshot, first.snapshot);
+      assert.equal(next.references, first.references);
+    }
+    assert.equal(await f.session.loadReferences(), true);
+    const refreshed = f.session.view().snapshot;
+    assert.notEqual(refreshed, first.snapshot);
+    assert.deepEqual(refreshed, expected);
+    assert.equal(await f.session.undo(), true);
+    const reloaded = f.session.view().snapshot;
+    assert.notEqual(reloaded, refreshed);
+    assert.deepEqual(first.snapshot, expected);
+    f.session.stage('FieldNumber', text('saved'));
+    assert.equal(await f.session.save(), true);
+    assert.notEqual(f.session.view().snapshot, reloaded);
+  }
+});
+test('actual Svelte client derived views retain immutable snapshots and cloneable transport boundaries', async () => {
+  const { derived, get } = await import('svelte/internal/client');
+  const f = fixture(); assert.equal(await f.session.load(), true);
+  const current = derived(() => f.session.view());
+  const snapshot = get(current).snapshot;
+  assert.equal(snapshot, f.session.view().snapshot);
+  const clone = structuredClone(snapshot);
+  clone.Fields[0].choices[0].description = 'detached client copy';
+  assert.notEqual(snapshot.Fields[0].choices[0].description, clone.Fields[0].choices[0].description);
+  assert.equal(Object.isFrozen(snapshot.Fields[0].definitions.rows[0].cells[0]), true);
+  f.session.stage('FieldNumber', text('client'));
+  assert.equal(await f.session.save(), true);
+  assert.equal(f.calls.save, 1);
+});
 test('panel-facing view and cell reads retain stable names; physical selection drafts use public input intents', async () => {
   const f = fixture(); await f.session.load();
   const view = f.session.view();

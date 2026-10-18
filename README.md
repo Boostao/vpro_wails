@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-complete-parent.zip`, 17,522,456 bytes.
+`VPRO-Demo-2026-10-18-entry-performance.zip`, 17,523,481 bytes.
 
 SHA256:
-`d16b9c70c904bc0ad8ac1baf3fcc0384f3abff5f73c9ad9e011cb0ed67c8e214`.
+`0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -59,8 +59,9 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
    each supported XLSX to a new destination. Title Save/Undo is separate from
    workbook publication. Select the original **Report** SU for Summary.
 
-Application source is `184c332`; this profile enables three existing frontend
-gates and two runtime gates without changing application code or seed data.
+Application source is base `67afa71` plus the manifest-pinned reviewed immutable
+reference-snapshot optimization. The34/30 profile, launcher, backend, seed and
+validation rules are unchanged.
 Normal117/CHARS119 unique parent controls have visible associated labels and
 native980/1400 layout checks. One held three-scope Save changes FieldNumber,
 SV_CanopyComposition and ProvinceStateTerritory with three exact source audits
@@ -70,19 +71,31 @@ precede correction and held-response release. Saved reopening verifies both
 variants and ordinary P2/P1 navigation; independent backend review/write denials
 pass. All sixteen closed files stay exact after each read-only reopen.
 
-Focused38 entry cases, launcher race, check0/0, production Vite/Go builds and
-independent read-only review pass. This is complete **parent** entry, not complete
+Focused40 entry cases, three startup-budget cases, launcher race, check0/0,
+production Vite/Go builds and independent read-only review pass. The reviewer
+also reran all40 focused cases. This is complete **parent** entry, not complete
 two-page children, pictures, source callbacks, identity or implicit creation.
 No new full-root race is claimed. Current-binary report smoke loads options/
 titles only; actual publications retain their predecessor lineage.
 
 Deferred FS882/CHARS loading retains its owner keys and eager operation guards.
 Initial transitive JavaScript is929,255 bytes versus5,202,547 before deferral
-(82.14% less); total JavaScript is5,230,628. Neither measured startup latency nor
+(82.14% less); total JavaScript is5,230,739. Neither measured startup latency nor
 binary shrink is inferred. The preserved31/28 startup ZIP, SHA256
 `bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`,
 owns cold-load Home/context/plot replacement, failed-import recovery, close while
 loading, parent Save and held child Save/restore/reopen acceptance.
+
+Complete entry no longer copies its full reference snapshot on every reactive
+read. Validated detached snapshots are deeply immutable and shared until an
+actual receipt changes; originals and drafts retain defensive copies. On the
+same6,040,765-byte captured wire, median clean/dirty view reads fell from98.85/
+95.72ms to0.65/0.50ms; a sequential fresh-process comparison also passed the
+under10ms/80%-reduction threshold. Actual native input-to-reactive-flush medians
+are8.8ms normal/9.4ms CHARS over20 edits each. These are bounded session/typing
+measurements, not an initial-load, transport-size, SQL or whole-app speedup.
+The previous complete-parent ZIP remains unchanged at SHA256
+`d16b9c70c904bc0ad8ac1baf3fcc0384f3abff5f73c9ad9e011cb0ed67c8e214`.
 
 The seed and earlier report opt-ins remain unchanged. The
 preserved report ZIP, SHA256
@@ -121,8 +134,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,061,760 bytes,3,072 bytes larger than
-the startup preview; deferred loading is not a binary-size reduction. An earlier
+The qualified preview executable is43,061,760 bytes, unchanged from the
+complete-parent preview; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 
