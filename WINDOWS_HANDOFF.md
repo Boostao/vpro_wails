@@ -29,21 +29,23 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is reviewed54/45 standalone profile editing/preview/navigation,
-  built from bab29fc plus exact manifest-pinned caption/test delta, not a clean-
-  commit build. Five existing frontend flags added; Go/backend/launcher/seed/
-  defaults unchanged. Client flags are not server gates. One rule8 four-text
-  Save/one history/zero source audits preserves389 audits/counts/Description/peers.
-  Explicit78-row lump, zero then P1/P2 matches, eight steps, actual revalidated
-  Apply/Next/Previous/Clear, invalid32768/Undo and held-read/Save guards pass.
-  Three fresh CancelClose receipts precede corrections/releases. Saved None
-  denies Review/Save/Run while lump/ordinary117 remain available. Explicit Sample
-  restore leaves16 saved files exact;14 other DBs unchanged throughout.
-  Two owners close. Four harness failures/same-owner continuations retained;
-  no completed mutation replay.128 inputs/actions/representative source cells/
-  all preview cells measured980/1400. Original mapped callbacks remain off.
-  Coordinate/KML/labels/Species/reports/soil/parent retain predecessor lineage.
-  Initial JS falls79.59%; EXE grows4,096 bytes. No new timing/shrink claim.
+- Current preview is reviewed56/46 readonly Picture Manager and ordinary linked
+  child, clean source a6f9bae. Two existing frontend/one backend flag added;
+  production app/backend/bindings/defaults unchanged. Launcher owns three new
+  synthetic resources, preserving prior16 seeds. Separate external tblVPics
+  library and independently owned400x240 child/600x360 manager PNGs are verified
+  by exact bytes/dimensions/hashes and native viewers. No canonical photo copying.
+  Duplicate-ID/NULL/empty metadata and invalid-directory/name/missing-file/
+  foreign-parent refusals pass. Held successful image Cancel/remount rejects
+  late results; fresh specific CancelClose precedes correction/release.
+  Reading-off reopen denies both APIs while ordinary117 entry remains available.
+  Two owners close; all19 files/full project/library peers exact; zero writes/
+  audits/history. Two pre-read harness failures/same-owner corrections retained;
+  not first-pass. Controls/images/viewers measured980/1400. Independent review
+  accepts; all23 ZIP hashes/final prepare-only pass. Profile54/45 and older
+  workflows retain predecessor lineage, not rerun mutations. Picture mutations/
+  original callbacks/registry discovery/two-page composition remain unqualified.
+  Initial JS falls79.00%; EXE grows36,864 bytes. No new timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -51,7 +53,7 @@ Current machine state only. Portable scope and ordered work are in
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
 - Current-source draft release run39149407850 passes seven jobs and all asset
-  checks. Default release is not the private54/45 profile or all-platform runtime
+  checks. Default release is not the private56/46 profile or all-platform runtime
   acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
@@ -167,56 +169,55 @@ qualification; that bounded journey is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-standalone-profile.zip`:17,573,549 bytes.
-  SHA256 `6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-pictures.zip`:17,588,619 bytes.
+  SHA256 `cf11508f34a5af0aab0f1943f4115be07fefccecfbc372149362122579a7e775`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Source bab29fc plus the exact two-file working-tree caption/test delta;
-  SQLite-only EXE43,230,208 bytes, SHA256
-  `5d7ace8476a3d436ab3dfc99c4454d722147cc2b124829e7a3c958ac37ce9083`.
-  Exact54 frontend/45 runtime gates; private launcher SHA256
-  `2a6066585e8b846494ffccce2590812f97603485b6e2a74258728f44c358c39e`.
-  PLOT_PROFILE_SELECTION, PROJECT_PLOT_PROFILE_REVIEW,
-  PROJECT_PLOT_PROFILE_RUN, PROJECT_PLOT_PROFILE_EDITING and
-  PROJECT_PLOT_PROFILE_FILTERING added as five frontend flags;
-  no runtime flag, Go/seed/default change.
-- Private `profile-demo-20261018/validation-seal.json`, SHA256
-  `dee8f57fe29127d97dbf676ad16df5ff757116e7c345097d7e7a2eff9701945f`,
-  pins source/74 canonical records/21 protected assets and native proofs;
+- Clean source a6f9bae; SQLite-only EXE43,267,072 bytes, SHA256
+  `82464aaad993682dcd1e8e9489417ead0e465c9862ea2c342451066b1595f02d`.
+  Exact56 frontend/46 runtime gates; private launcher SHA256
+  `94a991bc849244b76e6691d8acf192685e9e29a0310be5238f8d76524ec25d4c`.
+  PICTURE_READING/PICTURE_MANAGER frontend and PICTURE_READING backend added;
+  production app/Go/bindings/defaults unchanged; prior16 seeds plus3 synthetic
+  owned library/image resources. No canonical photos are redistributed.
+- Private `picture-demo-20261018/validation-seal.json`, SHA256
+  `10fe3b8c095888784960064cce102fa35e877f0ecf762771294ec0efae74af52`,
+  pins source/81 canonical records/21 protected assets and native proofs;
   source input SHA256
-  `d5ef7ca8aab10d1651387b722fd1eec8560f7371da4b1a69972be10b940f350b`.
-  Initial JS1,061,662 versus5,202,547; total5,394,710. EXE grows4,096 bytes;
+  `d027395dfb5fcce6060b0c57b173f70b80b2094b3e2c3eabb40cf8f5c85b2ea0`.
+  Initial JS1,092,673 versus5,202,547; total5,426,894. EXE grows36,864 bytes;
   no new timing/shrink claim.
-- Current native: rule8 Species=LF1/Operator=>/Criteria=0/Operation=Add plots;
-  one Save/one typed history/no source audits.389 audits/other rules/counts/
-  Description/full peers exact; internal sqlite_sequence records history ID1.
-  Only Sample.db and explicit source-selection YAML change, not14 other DBs.
-  Zero then P1/P2 preview, eight expected steps/78 lump rows, actual revalidated
-  Apply/Next/Previous/Clear, held-preview Cancel/late-remount rejection,
-  invalid32768 across tabs/Lock/Home/close blocking/Undo and held actual void
-  Save response pass. Three fresh CancelClose receipts precede corrections/
-  releases. Saved None source denies Review/Save/Run while lump/normal117 remain
-  available; explicit Sample restore leaves all16 saved files exact. Both owners
-  close.128 inputs, representative source table cells/headers, all preview cells
-  and actions measured980/1400. Native Description witness VP05-2; NULL/empty
-  Description cases remain fast tests.
-- All29 clients/launcher races/coupled Go race74.402s/check0/0/Vite/Go/exact26
-  embeds pass. Reviewer `1351fb3d-27f2-44e0-bdaa-7552504f6fc5` accepts with no
-  significant issues. All20 payload hashes/final prepare-only pass. Four native
-  harness failures remain sealed: known transition dialog obscured Undo, readonly
-  positional arguments, refusal capitalization and missing Home. Same owners
-  continue without completed mutation replay. The first closed-family receipt's
-  misleading15-other-files label is explicitly superseded by the14-other-DBs
-  closed-profile evidence; YAML was an explicit change. No new full-root race/
-  Access oracle or original mapped callback/count/scratch/source zero-filter
-  grant. Rule/file/table lifecycle, external ownership, Save as SU, species-only
-  and subvarieties remain off.
+- Native: manager and ordinary child use different independently verified PNGs.
+  Physical rowids/duplicate IDs/NULL/empty metadata preserved; invalid directory/
+  filename/missing-file/literal foreign-parent refusals pass. Held actual image
+  Cancel/remount rejects late results; one fresh specific CancelClose precedes
+  correction/release. Reading-off reopen denies both APIs, ordinary117 remains
+  available. Two owners close; all19 files/project/library snapshots exact;
+  zero metadata writes/audits/history. Images/actions/fields/viewers measured
+  at980/1400, including actual visibility/intersection/containment.
+- All23 clients/launcher races/readonly coupled race16.291s/check0/0/Vite/Go/
+  exact26 embeds pass. Distinct read-only `picture-delivery-review` accepts
+  without material findings. All23 ZIP hashes/final prepare-only pass.
+  Two pre-read harness failures retained: rebound config vs template hash and
+  uninitialized response map. Same-owner continuation; no mutation replay.
+  Picture mutations/original callbacks/registry discovery/two-page composition
+  remain unqualified; no new full-root race/Access oracle claim.
+- Preserved54/45 profile ZIP SHA256
+  `6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`
+  owns rule8 four-text Save/one history/zero audits, unchanged389 audits/counts/
+  Description, zero then P1/P2 preview/eight steps/78 lump rows, actual profile
+  navigation, invalid/held-response guards and saved source-authority reopen.
+  29 clients/race74.402s/two owners are inherited, not rerun on56/46.
+  Seal `dee8f57fe29127d97dbf676ad16df5ff757116e7c345097d7e7a2eff9701945f`.
+  Original closed receipt's15-other-files label remains superseded by exact
+  14-other-DB evidence; YAML source selection was explicit. Profile lifecycle/
+  external grants/Save as SU/species-only/subvarieties remain off.
 - Preserved49/45 coordinate/KML ZIP SHA256
   `3e09db767075a2f194b542ca60ade4b22e075231140aa36174b4a248ba08f6de`
   owns one coordinate Save/two audits/one history, Location1 DISTINCT row versus
   direct Env/SU2 pairs/KML2 placemarks, reopened XML/hash, held review/export/
   receipt guards, six denials/four saved reopens and five closed owners.
-  No coordinate mutation/KML export rerun on54/45. Seal SHA256
+  No coordinate mutation/KML export rerun on56/46. Seal SHA256
   `2c4ab8bb33647a0c6245082c7169086eeca812a828806bd9ad8d6cc9023ff17b`.
 - Preserved45/41 saved-label ZIP SHA256
   `35714f1c79ba444912d218b39fe33e9276fa75d4b19c5d2319cac4e0800235d4`

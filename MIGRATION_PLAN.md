@@ -36,7 +36,7 @@ These states describe availability, not confidence percentages:
 | Enter SIVI/CHARS data | Preview: parent panels, mixed child Save/restore, Collected navigation/reopen and explicit child create/delete/restore/creation Undo journeys. Development: wider separately gated species/ID and cross-host combinations | Whole-form callback/navigation equivalence; child creation/deletion is not plot/parent creation |
 | Use two-page entry | Preview: complete normal117/CHARS119 parents, linked Humus/Mineral creation/editing, demonstrated vegetation cover/Collected and exact existing-list Species coedits, guards and saved reopen; C/D empty memberships remain read-only. Development: broader Species/metadata/heights and host combinations have separate boundaries | Whole-form/picture integration, populated C/D and remaining field/callback journeys; manual/NotInList, implicit creation and soil deletion/restoration remain unavailable |
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
-| Work with pictures | Development: owned reads/metadata and independently gated explicit lifecycle operations | Original Add/save/default/confirmation/Current timing and complete host integration |
+| Work with pictures | Preview: readonly Picture Manager and ordinary linked child, separate owned library/directories, explicit metadata/image selection/viewer. Development: independently gated metadata/lifecycle operations | Original Add/save/default/confirmation/Current timing, mutations and complete two-page/host integration |
 | Run profiles, Find and transfers | Preview: explicit project-owned existing-rule Save, ordered readonly preview and revalidated Apply/Next/Previous/Clear navigation. Development: wider rule lifecycle, Find and owned-project Env/SU transfers | Original mapped callbacks/count/scratch/filter side effects, unsupported criteria, external-file mutations and administration |
 | Produce priority reports | Preview: inherited Long Environment/Vegetation and Matrix; Summary None/display6/environment/ancillary plus effective common/guide-NULL references and numeric Constancy inspection/publication. Development: other summaries/options/workbooks | Remaining combined/formatted variants, populated guide/attribute data and options/user journeys; original callbacks/printing remain separate |
 | Review locations and prepare map output | Preview: explicit saved decimal coordinates, DISTINCT Location review and direct Env/SU Google Earth/KML with duplicate memberships preserved | Preferences, DMS/single-plot callbacks, viewer/remote resources and broader map journeys remain separate |
@@ -53,56 +53,58 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-standalone-profile.zip`,17,573,549 bytes, SHA256
-`6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`.
+`VPRO-Demo-2026-10-18-pictures.zip`,17,588,619 bytes, SHA256
+`cf11508f34a5af0aab0f1943f4115be07fefccecfbc372149362122579a7e775`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
-54 frontend/45 runtime flags, packaged binary SHA256
-`5d7ace8476a3d436ab3dfc99c4454d722147cc2b124829e7a3c958ac37ce9083`,
+56 frontend/46 runtime flags, packaged binary SHA256
+`82464aaad993682dcd1e8e9489417ead0e465c9862ea2c342451066b1595f02d`,
 source-input SHA256
-`d5ef7ca8aab10d1651387b722fd1eec8560f7371da4b1a69972be10b940f350b`.
+`d027395dfb5fcce6060b0c57b173f70b80b2094b3e2c3eabb40cf8f5c85b2ea0`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. `files[].sha256` owns application/seed hashes; `launcher`
 and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
 named, not a substitute for the packaged EXE identity.
 
-Binary source is `bab29fc` plus the manifest-pinned caption/test delta, not a
-clean-commit build. Five existing frontend flags add explicit profile selection,
-review/editing/preview/navigation; these are not server authorization gates.
-Go/backend/launcher/seed/defaults unchanged. Initial JS1,061,662,
-down79.59% from5,202,547; total5,394,710. EXE43,230,208 grows4,096 bytes
-versus coordinate/KML. No new timing/binary-shrink claim.
+Binary source is clean `a6f9bae`. Two existing frontend picture flags and one
+backend reading flag extend this private profile; production app/backend/
+bindings/defaults are unchanged. Launcher ownership adds exactly three synthetic
+resources to the unchanged prior16 seeds: external five-column library and
+independent child/manager PNGs. Initial JS1,092,673, down79.00% from5,202,547;
+total5,426,894. EXE43,267,072 grows36,864 bytes versus profile54/45.
+No new timing/binary-shrink claim.
 
-Current native acceptance makes exactly one four-text existing-rule8 Save,
-one complete typed history and no source audits. Other rules/counts/Description/
-389 historical audits/full peers stay exact; internal history sequence is1.
-Only Sample.db and explicit profile-selection YAML change;14 other DBs stay exact.
-Explicit78-row lump, zero initial matches, eight expected steps and edited
-P1/P2 matches pass. Independently revalidated Apply and actual Next/Previous/
-Clear restore the exact ordinary page without scratch/count/SU writes.
-Held-preview Cancel/late-remount rejection, invalid32768 draft across tabs,
-Save/Lock/Home/native close blocking and Undo pass. Actual successful void Save
-response is held/released once after its physical checkpoint; three fresh
-CancelClose acknowledgements precede corrections/releases.
-Saved reopen verifies rules/source/history. None denies Review/Save/Run while
-independent lump and ordinary117 entry remain available. Explicit Sample restore
-leaves all16 saved files exact; both owners close.128 inputs, representative
-source table cells/headers, all preview cells and actions measured980/1400.
-Native Description is VP05-2; NULL/empty metadata remains fast-test coverage.
-29 clients/launcher races/coupled profile race74.402s/check0/0/Vite/Go/exact26
-embeds pass; independent review finds no material issues. Four retained harness
-failures continue on the same owners without completed mutation replay.
-No new full-root race/oracle or original mapped callback/count/scratch/zero-filter
-claim. Rule/file/table lifecycle, external grants, Save as SU, species-only and
-subvarieties remain off; whole migration remains incomplete.
+Current native proof covers Picture Manager and ordinary linked child selection,
+physical duplicate-ID/NULL/empty metadata, independent PNG bytes/hash/dimensions,
+actual previews/viewers and fields/actions at980/1400. Explicit invalid directory/
+filename/missing-file and foreign literal-parent errors pass. A held successful
+image Cancel/remount rejects late population; fresh specific CancelClose precedes
+correction/release. Reading-off reopen denies both backend APIs while normal117
+entry remains available. Two owners close; all19 files/full project and library
+snapshots remain exact; zero writes/audits/history.23 clients/launcher races/
+readonly coupled race16.291s/check0/0/Vite/Go/exact26 embeds pass.
+Independent read-only review accepts with no material findings; all23 ZIP hashes/
+final prepare-only pass. Two retained pre-read harness failures continue on the
+same owner; native is not first-pass. No new full-root race/Access oracle claim.
+Picture mutations/original callbacks/registry discovery/two-page composition,
+production import and complete migration remain unqualified.
+
+The preserved54/45 profile ZIP, SHA256
+`6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`,
+owns one four-text rule8 Save/one history/zero source audits, unchanged389 audits/
+counts/Description, explicit78-row lump, zero then P1/P2 matches/eight steps,
+actual Apply/Next/Previous/Clear, invalid/held-response guards and saved source
+authority reopen.29 clients/race74.402s/two-owner proof are inherited, not rerun.
+Profile lifecycle/external grants/Save as SU/species-only/subvarieties and original
+mapped callbacks/count/scratch/source zero-filter changes remain unavailable.
 
 The preserved49/45 coordinate/KML ZIP, SHA256
 `3e09db767075a2f194b542ca60ade4b22e075231140aa36174b4a248ba08f6de`,
 owns one coordinate Save/two audits/one history, Location1 DISTINCT row versus
 direct Env/SU2 pairs/KML2 placemarks, exact reopened XML/hash, held review/export/
 receipt guards, six gate denials/four saved reopens and five closed owners.
-Those mutations/publication were not repeated on54/45. KML readonly recovery,
+Those mutations/publication were not repeated on56/46. KML readonly recovery,
 formal schema/viewer, preferences/DMS/single-plot callbacks remain unqualified.
 
 The preserved45/41 saved-label ZIP, SHA256
@@ -223,7 +225,7 @@ before writing another service, state machine, flag or preparation layer.
 | 1 - supported journeys verified | Preserve parent/metadata and child entry/recovery/lifecycle acceptance with its exact inherited23/22 scope. Source/gates are retained; parent Undo/navigation is rechecked on31/28. Consolidate only demonstrably equivalent behavior. Wider host/source combinations remain in priority4. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
 | 2 - supported subset verified | Preserve Long/Matrix lineage and Summary None/display6/environment/ancillary plus common/guide-NULL and numeric Constancy publications. Other options/combined/formatted variants and printing remain separate. | Independent vegetation/names/membership, reviewed environment, reopened outputs and cancellation/stale/close/acknowledgement barriers sealed; environmental calibration retains kernel lineage |
 | 3 - blocked prerequisites | Real-data onboarding/project administration needs production go-mdbtools reader integration, source schema/default/identity qualification and platform/licensing closure. New-project Description/default oracle retry is explicitly closed after two attempts; do not reopen it under another name. Reuse completed F1-F3 and continue independent deliverables. | Disposable complete import/new-project/reopen/recovery before authorization; private scalar staging is not production import and merge/splinter/compare remain separate |
-| 4 | Preserve delivered linked-soil, vegetation/existing-list Species and standalone profile Save/preview/navigation; finish broader Species/field/populated-C/D, pictures, wider profile and ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
+| 4 | Preserve delivered linked-soil, vegetation/existing-list Species, standalone profile Save/preview/navigation and readonly Picture Manager/ordinary child; finish broader Species/field/populated-C/D, picture mutations/two-page integration, wider profile and ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
 | 5 | Preserve saved-coordinate Location/KML and saved-label portable PDF; complete required report variants/options, physical labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
 
 Priorities organize, not delete, the former thirteen deliverables:
@@ -246,7 +248,7 @@ Source contracts retain the detailed outstanding requirements.
 - Measure startup, representative large-project reads, interaction and bundle/
   binary size on the exact supported profile. Existing bounded fast reads do
   not prove every performance problem is fixed. Current deferred-entry/report
-  profile reduces initial transitive JS79.59%; measure startup and larger-project interactions
+  profile reduces initial transitive JS79.00%; measure startup and larger-project interactions
   separately rather than treating the payload budget as overall performance proof.
 - Use named profiles to control combinations. Independent backend denials stay;
   consolidation is not permission to turn all experimental flags on.

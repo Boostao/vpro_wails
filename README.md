@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-standalone-profile.zip`, 17,573,549 bytes.
+`VPRO-Demo-2026-10-18-pictures.zip`, 17,588,619 bytes.
 
 SHA256:
-`6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`.
+`cf11508f34a5af0aab0f1943f4115be07fefccecfbc372149362122579a7e775`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-54 frontend and 45 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+56 frontend and 46 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -103,45 +103,51 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
     Ordinary plot Save never saves rules. This is a standalone adaptation, not
     the original mapped Access callbacks or implicit count/filter changes.
 
-Binary source is base `bab29fc` plus the manifest-pinned two-file caption/test
-delta, not a clean-commit build. The opener caption follows existing editing
-and selected-source write authority. Five existing frontend flags extend the
-profile; Go/backend/launcher/seed/defaults are unchanged. These client flags
-are not server authorization gates.
+14. Forms > **Plot Pictures — Read-only**: select literal P1, **Load linked
+    pictures**, select physical row1, preview and open its full-size viewer.
+    The manager uses its owned600x360 synthetic image; ordinary P1's linked
+    picture panel uses a different owned400x240 image for the same row.
+    Invalid directories/names and missing files refuse explicitly, without repair.
 
-Current native acceptance saves four text fields on physical rule8 exactly
-once, with one complete typed history and no source audits.389 historical audits,
-other rules, historical PlotCount, descriptions and complete physical peers stay
-exact. Internal `sqlite_sequence` records history ID1. Explicit source selection
-changes YAML separately; the14 other databases never change.
-Explicit78-row lump selection, eight expected steps, initial zero matches and
-edited P1/P2 matches pass. Apply independently revalidates; actual Next/Previous
-and Clear restore the exact ordinary page. No scratch/count/SU writes occur.
-Actual held-preview Cancel/remount rejects its late result. Invalid Order32768
-survives tabs and blocks Save/Lock/Home/native close; Undo restores9. The actual
-successful void Save response is held/released once after a physical checkpoint.
-Three fresh CancelClose acknowledgements precede corrections/releases.
-Saved reopen preserves rules/source/history. Selecting None denies profile
-Review/Save/Run while independent lump and normal117-field entry remain available.
-Explicitly restoring Sample leaves all16 saved files exact; both owners close.
-All128 inputs, representative source cells/headers, all preview cells and actions
-are visible/contained980/1400. Native Description witness is VP05-2; NULL/empty
-metadata distinctions retain fast-test coverage, not extra native cases.
-29 clients, launcher races, coupled profile race74.402s/check0/0 and isolated
-Vite/Go/exact26 embeds pass; independent review finds no material issues.
-Four harness failures and same-owner corrections are retained: a known transition
-dialog, readonly argument shape, refusal capitalization and missing Home step.
-No successful mutation was replayed. No new full-root race/oracle, mapped Access
-callback, stored-count/scratch, source zero-filter or whole-parity claim.
-Profile creation/deletion/restoration, external grants, Save as SU, species-only
-and subvarieties remain unavailable in this preview.
+Binary source is clean `a6f9bae`. Existing picture-reading/manager frontend flags
+and the independently enforced backend reading flag extend the private profile.
+The launcher owns a separate five-column `tblVPics` SQLite library and separate
+child/manager directories. Three synthetic resources supplement the exact prior16
+seed files; no canonical photos are copied. Production app/backend/bindings/defaults
+are unchanged. This is a readonly adapter workflow, not production Access import.
+
+Current native acceptance independently verifies returned image bytes, hashes,
+decoded dimensions and actual images/viewers at980/1400. Physical rowids,
+duplicate application IDs and typed NULL/empty metadata remain distinguishable.
+NULL/external directories, NULL/empty/traversal filenames, missing files and
+literal foreign parents refuse explicitly. A held successful image response
+cannot populate a remounted panel after Cancel; Home/native close are blocked
+until correction, with a fresh specific CancelClose acknowledgement before release.
+Reading-off reopen denies GetMetadata/GetImage while ordinary117-field entry
+remains available. Both owners close; all19 files and full project/library
+snapshots remain exact, with zero writes/audits/history.23 clients, launcher
+races, coupled readonly race16.291s, check0/0 and isolated Vite/Go/exact26 embeds
+pass. Independent review finds no material issues; all23 ZIP payload hashes
+and final launcher prepare-only pass. Two harness failures are retained and
+corrected on the same owner before its first metadata request; not first-pass.
+Picture metadata/Add/create/delete/restoration, original automatic callbacks,
+registry discovery and two-page picture composition remain unqualified.
+
+The immutable54/45 profile predecessor, SHA256
+`6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`,
+owns one four-text rule8 Save/one history/zero source audits, preserved389 audits/
+counts/Description, explicit78-row lump, zero then P1/P2 matches, eight steps,
+actual Apply/Next/Previous/Clear, invalid-draft/held-response guards and saved
+source-authority reopen. Its29 clients/coupled race74.402s and two-owner native
+proof are inherited, not replayed on56/46. Profile lifecycle/external grants/
+Save as SU/species-only/subvarieties and original mapped callbacks remain off.
 
 The immutable49/45 coordinate/KML predecessor remains unchanged, SHA256
 `3e09db767075a2f194b542ca60ade4b22e075231140aa36174b4a248ba08f6de`.
 It owns the coordinate Save/two audits/one history, DISTINCT Location1 versus
 direct Env/SU2 rows/KML2 placemarks, independent XML/hash reopening, held
 review/export/receipt guards, six denials/four saved reopens and five closed
-owners. Those mutations/publication were not repeated on54/45. KML has no
+owners. Those mutations/publication were not repeated on56/46. KML has no
 PDF-style readonly recovery API; viewer/preferences/DMS callbacks remain off.
 
 The immutable45/41 saved-label predecessor remains unchanged, SHA256
@@ -215,9 +221,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is1,061,662 bytes versus5,202,547 before
-deferral (79.59% less); total JavaScript is5,394,710. The EXE grows4,096 bytes
-versus the coordinate/KML predecessor; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is1,092,673 bytes versus5,202,547 before
+deferral (79.00% less); total JavaScript is5,426,894. The EXE grows36,864 bytes
+versus the profile predecessor; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
@@ -248,7 +254,7 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,230,208 bytes,4,096 above the coordinate/KML
+The qualified preview executable is43,267,072 bytes,36,864 above the profile
 predecessor; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
