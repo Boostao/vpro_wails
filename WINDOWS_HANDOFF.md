@@ -29,16 +29,17 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is reviewed44/40 existing-list Species on91fcc46.
-  One existing selection gate extends vegetation; production app/backend/seed/
-  defaults unchanged. Normal LF2/Cover1 and CHARS LF3/Cover5a: two selection Saves/
-  four audits/two histories, complete peers/metadata/refs, five fresh CancelClose
-  acknowledgements, held-response recovery, joint soil guards and alias/remount pass.
-  Six backend denials/three saved reopens preserve16 files each; four owners close.
-  C/D memberships0 remain physical read-only, no selector. Native guard-harness
-  failure before Save was corrected on the same zero-write owner, never replayed.
-  Reports/soil/parent/Long mutations retain predecessor binary lineage.
-  Initial JS falls80.51%; EXE equals vegetation predecessor. No new timing/shrink claim.
+- Current preview is reviewed45/41 saved-label portable PDF on12d71f6.
+  One existing PDF gate extends Species; production app/backend/seed/defaults
+  unchanged. One P1 PDF/five exact strings/Arial/Letter page, P1 NULL/P2 empty/
+  P3 refusal/retry, held-read Cancel and held successful export/loss/readonly
+  recovery/receipt-only remount pass. Four fresh CancelClose acknowledgements.
+  Two backend denials/retired-owner unknown/ordinary117 saved reopen pass.
+  Both owners close,16 files/full physical snapshots exact, zero source writes.
+  Saved-reopen cleanup omission is corrected on the same exact owner after a
+  fresh close cancellation; main PDF first-pass, overall native not first-pass.
+  Species/vegetation/reports/soil/parent/Long retain predecessor binary lineage.
+  Initial JS falls80.18%; EXE grows18,432 bytes. No new timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -46,7 +47,7 @@ Current machine state only. Portable scope and ordered work are in
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
 - Current-source draft release run39149407850 passes seven jobs and all asset
-  checks. Default release is not the private44/40 profile or all-platform runtime
+  checks. Default release is not the private45/41 profile or all-platform runtime
   acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
@@ -162,49 +163,58 @@ qualification; that bounded journey is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-species-list.zip`:17,560,824 bytes.
-  SHA256 `6fc79320bc1ae16bae2e2bb345042dcc15611b12d1ec662fc95f3e132ce705af`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-saved-label.zip`:17,565,074 bytes.
+  SHA256 `35714f1c79ba444912d218b39fe33e9276fa75d4b19c5d2319cac4e0800235d4`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Source91fcc46; SQLite-only EXE43,178,496 bytes, SHA256
-  `4d180f4265d990cfb5c5cf8fc74ebe83c9bfad7dab575a3b463177300b388b57`.
-  Exact44 frontend/40 runtime gates; private launcher SHA256
-  `2c9bf32646eb8b99e85f5d2ad4770962d85b2c18183637fdeb008aa26f6fc034`.
-  Only Species-list added; production app/backend/seed/defaults unchanged.
-  Inherited false alias stripped without caller mutation; no new engine/service.
-- Private `species-list-demo-20261018/validation-seal.json`, SHA256
-  `ff7f4ed950f932fe91b7d1a387bd93d414c861e7976ed31186685239c8378af0`,
+- Source12d71f6; SQLite-only EXE43,196,928 bytes, SHA256
+  `53a53f6e9ce4c344c5d9c5a919abcf4f05e6ad590fbdb4c7c8efee7c34118337`.
+  Exact45 frontend/41 runtime gates; private launcher SHA256
+  `c814c9034dc7aeac52523e172d22b149e5ae8136857fd2e3556c1f7eacbc7caf`.
+  Only PLOT_LABEL_PDF_EXPORT added; production app/backend/seed/defaults unchanged.
+  Inherited false alias stripped without caller mutation; no new engine/service/fonts.
+- Private `saved-label-demo-20261018/validation-seal.json`, SHA256
+  `4d2e8a96665294b20366002937dc85504792e1572f007e6071d2d5cbe9514082`,
   pins source/canonical/21 protected assets and native proofs; source input SHA256
-  `e753ef4ed5ef3958e8596fd3ed9247eee590e6154ea3db094d6fc0281074195b`.
-  Initial JS1,014,098 versus5,202,547; total5,346,677. EXE equals43/39;
+  `18d88f8e3fed79509347f7f5c4295c4109eeb403c9128b63773c6502c0fbec4a`.
+  Initial JS1,030,948 versus5,202,547; total5,363,574. EXE grows18,432 bytes;
   no new timing/shrink claim.
-- Current native: actual keyboard Normal LF1->LF2/Cover1 and CHARS LF2->LF3/Cover5a,
-  exactly two selection-service Saves/four physical/history audits/two histories
-  on row1/negative ID-100001. Complete peers/unmapped cells/metadata/refs exact.
-  Four master options LF1..LF4; master13/personal0, both DELETE journals.
-  A membership13; C/D0/read-only/no selector. Joint soil guards, five fresh
-  CancelClose responses before correction/release/ack, held-save read-only recovery,
-  alias reload, normal117/CHARS119 receipt remount and980/1400 fields/labels/actions
-  pass. Three saved gate-off reopens deny6 calls including legacy Save; parent117/
-  saved normal117/CHARS119/readonly refs remain available. All16 files exact each,
-  all four owners close. Independent closed audit inspection checks all before/
-  after/provenance/flags/ID and preserves16 files.
-- All121 client cases, launcher races, coupled vegetation/Species-list
-  race136.687s/check0/0/Vite/Go/exact26 embeds pass. Reviewer
-  `47513a75-5d88-45dc-a290-0e447058e3da` finds no material issues.
-  All20 payload hashes/final prepare-only pass. Native was NOT first-pass:
-  reused invalid-draft guard expected own valid Save disabled. It stopped before
-  any Save; all16 hashes/LF2 draft verified, same-owner continuation corrected
-  only that expectation. Failure/correction preserved, no completed Save replay.
-  No new full-root race/oracle, populated personal/duplicate-reference/whole-Unicode,
-  populated-C/D/every-field, manual/alias/NotInList/personal creation, heights/
-  identity/lifecycle/implicit events or whole-form grant.
+- Current native: exactly one P1 PDF, independently reopened five exact strings/
+  embedded Arial Regular/Bold/612x792 Letter page/all spans contained. Source P1
+  NULL/P2 empty assignments/P3 NULL Zone explicit refusal and correction pass.
+  Actual held review Cancel rejects late result after remount. Actual successful
+  export response held/lost; readonly recovery without replay, acknowledgement/
+  receipt-only remount pass. Four fresh CancelClose responses before release/
+  cleanup. Planned labels/actions/opened assignments/long hashes/destination/
+  receipts actually visible/contained980/1400. Saved PDF-backend-off denies review/
+  export; retired-owner readonly recovery stays unknown, not no-publication.
+  Ordinary117 remains available. Both owners close;16 files/whole physical snapshots
+  unchanged, zero source database/audit/configuration/printer mutations.
+- All30 focused clients/launcher races/label race16.781s/check0/0/Vite/Go/exact26
+  embeds pass. Reviewer `bc76ed21-0018-4c57-87a1-ab2f482d7796` finds no significant
+  issues. All20 payload hashes/final prepare-only pass. Main PDF first-pass;
+  overall native NOT first-pass: saved-reopen harness omitted closing complete-
+  entry review/Home before normal close. Exact family/PDF/current owner verified,
+  fresh CancelClose then established same-owner cleanup; no Save/export replay.
+  Initial sorted-root preflight failed before any build/native; original builder/
+  assessment/failure receipt/corrected continuation preserved and associated.
+  No new full-root race/oracle, physical Print/positions/stock/Print All, live-form
+  staging, Unicode/multiline/overflow output or whole-migration grant.
+- Preserved44/40 Species ZIP SHA256
+  `6fc79320bc1ae16bae2e2bb345042dcc15611b12d1ec662fc95f3e132ce705af`
+  owns Normal LF2/Cover1, CHARS LF3/Cover5a, two Saves/four audits/two histories,
+  peers/metadata/refs, joint soil guards/recovery/alias/remount, six denials/three
+  saved reopens, four closed owners/16 exact each. Master13/selectableLF1..LF4/
+  personal0/common-seven-cover scope and manual/alias/NotInList/personal creation/
+  populated personal/duplicate/whole-Unicode/C-D/heights/identity/lifecycle/
+  implicit-event exclusions remain. No mutation rerun here. Seal SHA256
+  `ff7f4ed950f932fe91b7d1a387bd93d414c861e7976ed31186685239c8378af0`.
 - Preserved43/39 vegetation ZIP SHA256
   `5c3e9ece6accd6fffdfed392e8aae99fa6819d2a54a57276d5cc724525f7f57f`
   owns Normal Cover1/Collected and CHARS Cover5a, two Saves/three audits/two histories,
   TEXT1 NULL/C/V, invalid100/narrowed100/CC, recovery/remount/alias/two saved reopens,
   three closed owners. Its combined124 startup selector and bound-editor fixture
-  correction remain sealed. Collected was not replayed on44/40. Seal SHA256
+  correction remain sealed. Collected was not replayed on45/41. Seal SHA256
   `de4c2b777478c552960317f6a57e3b49f5429ef1c9e1b147269b813026798a85`.
 - Preserved41/37 reference-report ZIP SHA256
   `b31cc3038bf5742486a84dfc6bff3406da17a5769b7eff568f600555cbc94a5e`
@@ -217,14 +227,14 @@ qualification; that bounded journey is not the overall completion condition.
   vegetation. Inspector/source-mode and reviewed walkthrough corrections remain
   preserved, without publication replay. Seal SHA256
   `d8a3d314569f6860930d2d0f0ab26d5167e9d3f173640c6c6c5f207726653f21`.
-  These publications were not repeated on44/40. Use a fresh launcher run for report
+  These publications were not repeated on45/41. Use a fresh launcher run for report
   examples after vegetation edits. No populated guide/original callback grant.
 - Preserved soil ZIP SHA256
   `4f3f6ed92a9d38cd02bc10e4eafd88dd1af867030a567cbef883f894d9f19fd5`
   owns normal117/CHARS119, two Creates/two Saves/six audits/four histories/
   18/28 defaults/permanent reservations/exact peers, read-only outcome recovery,
   retained remounts/three denials reopens. Four owners close;other15 files exact
-  after writes/16 per reopen. Those mutations were not repeated on44/40.
+  after writes/16 per reopen. Those mutations were not repeated on45/41.
   Explicit positive allocator is an adaptation; implicit creation/random allocator
   compatibility/soil deletion/restoration remain unavailable.
 - Preserved Summary ZIP SHA256
@@ -236,7 +246,7 @@ qualification; that bounded journey is not the overall completion condition.
   Two owners close/15 DBs exact with declared config selection/16 exact in denial
   reopening. Its wire-key/scientific-name and ZIP separator inspector corrections
   remain preserved without replay. This no-reference publication was not repeated
-  on44/40; three reference-based publications retain their41/37 lineage above.
+  on45/41; three reference-based publications retain their41/37 lineage above.
 - Preserved entry-performance ZIP SHA256
   `0de8422f3e7d24d73fe9155ba03b9aefebb3cf3694d3ba09a4e6eb043c9fb76e`
   owns normal117/CHARS119 layouts, one3scope Save/three audits, saved reopening,
@@ -266,7 +276,7 @@ qualification; that bounded journey is not the overall completion condition.
 - The old `VPRO-Demo-2026-10-18-current-main.zip` remains unchanged, SHA256
   `fcf4104370f00f7305b46aa26c64b0d663f7c22a0089991fd2933a21a585d41b`.
   Parent/metadata, SIVI/CHARS, Summary/log/Matrix and child lifecycle evidence is
-  inherited with its exact23/22 scope, not every mutation rerun on new44/40.
+  inherited with its exact23/22 scope, not every mutation rerun on new45/41.
   Its private delivery receipt remains SHA256
   `0e9914e6c339cadc884165279c8fb6e6d5b27bfb78bf5b98a9ae642b579ce877`.
 - Previous `VPRO-Demo-2026-10-16-refresh.zip` stays unchanged, SHA256

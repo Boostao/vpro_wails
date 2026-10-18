@@ -39,7 +39,7 @@ These states describe availability, not confidence percentages:
 | Work with pictures | Development: owned reads/metadata and independently gated explicit lifecycle operations | Original Add/save/default/confirmation/Current timing and complete host integration |
 | Run profiles, Find and transfers | Development: bounded rule lifecycle/results, explicit navigation, owned-project Env/SU transfers | Unsupported criteria, external-file mutations and administration |
 | Produce priority reports | Preview: inherited Long Environment/Vegetation and Matrix; Summary None/display6/environment/ancillary plus effective common/guide-NULL references and numeric Constancy inspection/publication. Development: other summaries/options, XLSX/KML | Remaining combined/formatted variants, populated guide/attribute data and options/user journeys; original callbacks/printing remain separate |
-| Produce labels | Development: saved preview and portable single-label PDF | Physical printing, Print All, positions/stock and broader regional calibration |
+| Produce labels | Preview: exact saved single-plot card and portable Letter PDF, runtime Arial/calibrated en-US date, guarded once-only export/read-only recovery and retained receipt | Physical printing, Print All, positions/stock, live-form callbacks, Unicode/multiline/overflow output and broader regional calibration |
 | Create/import/manage projects | Incomplete: private Access reader/staging/template/DDL groundwork only | Safe end-user creation/import/conversion, merge/splinter/compare and recovery |
 | Use the ribbon and auxiliary tools | Partial: some guarded routes and read-only hierarchy/log/location replacements exist | Remaining project/SU/hierarchy administration, standards, Help and auxiliary forms |
 | Install/release | Qualified private Windows preview; fourteen default-profile release payloads verified in CI | Current-profile packaging acceptance, platform runtime checks, signing/distribution boundaries |
@@ -52,47 +52,58 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-species-list.zip`,17,560,824 bytes, SHA256
-`6fc79320bc1ae16bae2e2bb345042dcc15611b12d1ec662fc95f3e132ce705af`.
+`VPRO-Demo-2026-10-18-saved-label.zip`,17,565,074 bytes, SHA256
+`35714f1c79ba444912d218b39fe33e9276fa75d4b19c5d2319cac4e0800235d4`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
-44 frontend/40 runtime flags, packaged binary SHA256
-`4d180f4265d990cfb5c5cf8fc74ebe83c9bfad7dab575a3b463177300b388b57`,
+45 frontend/41 runtime flags, packaged binary SHA256
+`53a53f6e9ce4c344c5d9c5a919abcf4f05e6ad590fbdb4c7c8efee7c34118337`,
 source-input SHA256
-`e753ef4ed5ef3958e8596fd3ed9247eee590e6154ea3db094d6fc0281074195b`.
+`18d88f8e3fed79509347f7f5c4295c4109eeb403c9128b63773c6502c0fbec4a`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. `files[].sha256` owns application/seed hashes; `launcher`
 and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
 named, not a substitute for the packaged EXE identity.
 
-Source is committed `91fcc46`; production app/backend/seed/defaults unchanged.
-One existing Species-list gate extends the previous profile, reusing reference/
-planner/writer/history/session infrastructure; no kernel/service/dependency added.
-Initial JS1,014,098, down80.51% from5,202,547; total5,346,677.
-EXE43,178,496 equals its vegetation predecessor.
+Source is committed `12d71f6`; production app/backend/seed/defaults unchanged.
+One existing PDF gate extends the previous profile, reusing saved physical reads,
+native date/runtime fonts, artifact publisher and retained session.
+No kernel/service/dependency/font payload added. Initial JS1,030,948,
+down80.18% from5,202,547; total5,363,574.
+EXE43,196,928 grows18,432 bytes versus Species.
 No new timing/binary-shrink claim.
 
-Current native acceptance selects Normal LF1->LF2 with Cover1 and CHARS LF2->LF3
-with Cover5a: two selection-service Saves, four independently checked physical/
-history audits and two histories on row1/negative signed32 ID-100001.
-Complete peers/unmapped cells, metadata/reference files exact. Options are four
-master LF1..LF4 codes; personal empty. Original/planned common-seven cover must
-not all be NULL. Joint soil draft guards, five fresh CancelClose responses before
-correction/release/ack, held-response read-only recovery, alias reload, receipt
-remounts and labelled fields/selects/actions980/1400 pass.
-Three saved gate-off reopens deny six calls including legacy Save's lack of
-Species authority, preserve16 files each, retain parent117 and writing/selection-
-off saved normal117/CHARS119/reference reads. All four owners close.
+Current native acceptance publishes one P1 portable PDF, independently reopened
+as five exact strings, embedded Arial Regular/Bold, one612x792 Letter page with
+all spans contained. P1 NULL/P2 empty assignments, P3 NULL Zone refusal/retry,
+actual held-review Cancel/late-remount rejection, actual held/lost successful
+export response/readonly recovery/no replay, acknowledgement/receipt-only remount
+pass. Four fresh CancelClose responses precede release/cleanup. Planned labelled
+controls/actions/opened assignments/long hashes/destination/retained receipt are
+actually visible/contained980/1400. Saved backend-off denies review/export and
+keeps retired-owner readonly outcome explicitly unknown; ordinary117 remains
+available. Both owners close; all16 files/full physical snapshots unchanged,
+zero source database/audit/configuration/printer mutations.
 
-All121 related client cases, launcher races, coupled vegetation/Species-list
-race136.687s/check0/0/Vite/Go/exact26 embeds pass; independent review finds no
-material issues. A reused invalid-draft guard expected valid Save disabled;
-its failure preceded any Save, then zero-write hashes/existing LF2 draft were
-verified and the same owner continued. The native journey was not first-pass;
-no completed mutation replay. No new full-root race/oracle, populated personal/
-duplicate-reference/whole-Unicode, populated-C/D/every-field, manual/alias/
-NotInList/personal creation, heights/identity/lifecycle/implicit-event grant.
+All30 focused clients/launcher races/label race16.781s/check0/0/Vite/Go/exact26
+embeds pass; independent review finds no significant issues. Main PDF first-pass;
+overall native not first-pass: saved-reopen harness omitted Close complete-entry
+review/Home before normal close. Verified exact files/PDF/current owner, then
+fresh CancelClose before established same-owner cleanup; no Save/export replay.
+Initial sorted-root preflight failed before build/native and is preserved.
+No new full-root race/oracle, physical Print/positions/stock/Print All, live-form
+staging, Unicode/multiline/overflow or whole-migration grant.
+
+The preserved44/40 Species ZIP, SHA256
+`6fc79320bc1ae16bae2e2bb345042dcc15611b12d1ec662fc95f3e132ce705af`,
+owns Normal LF1->LF2/Cover1 and CHARS LF2->LF3/Cover5a, two Saves/four audits/two
+histories, exact peers/metadata/refs, joint soil guards/recovery/alias/remount,
+six denials/three saved reopens. Four owners close;16 files exact each. Synthetic
+LF1..LF4 master/personal0/common-seven-cover and list-only scope remain bounded;
+manual/alias/NotInList/personal creation, populated personal/duplicate/whole-Unicode,
+populated C/D/heights/identity/lifecycle/implicit events remain excluded.
+Those mutations were not replayed on45/41.
 
 The preserved43/39 vegetation ZIP, SHA256
 `5c3e9ece6accd6fffdfed392e8aae99fa6819d2a54a57276d5cc724525f7f57f`,
@@ -113,7 +124,7 @@ drops zero stage entries but retains denominator4. Cancellation/close/ack guards
 references-off denial/ordinary review, two closed owners and exact15 DBs with
 declared SU config change/16 files per reopen belong to that binary.
 Its inspector/source-mode and reviewed walkthrough corrections remain preserved
-without publication replay. These publications were not repeated on44/40.
+without publication replay. These publications were not repeated on45/41.
 Use a fresh launcher run for report examples after vegetation edits.
 
 The preserved soil ZIP, SHA256
@@ -121,7 +132,7 @@ The preserved soil ZIP, SHA256
 owns two explicit creations with18/28 defaults, two Saves/six audits/four histories/
 permanent IDs, exact peers, retained normal117/CHARS119 remounts/read-only recovery
 and three gate-off reopens. Four owners close;15 other files exact after writes/
-16 exact per reopen. These mutations were not replayed on44/40. Positive allocation
+16 exact per reopen. These mutations were not replayed on45/41. Positive allocation
 is an adaptation, not GenUniqueID compatibility; no implicit creation or soil
 deletion/restoration.
 
@@ -135,7 +146,7 @@ Duplicate P1 and physical zero-cover P3 remain. Absent master long names yield n
 invented ReportSummary unit row. Both owners close;15 databases stay exact
 with declared SU/config selection and16 files stay exact in the denial reopen.
 Its wire/scientific-name inspector corrections continued without replay.
-That no-reference publication was not repeated on44/40; the41/37 predecessor
+That no-reference publication was not repeated on45/41; the41/37 predecessor
 separately qualifies the three reference-based outputs. Original callbacks and
 full formatting/printing remain separate.
 
@@ -174,7 +185,7 @@ The immutable23/22 predecessor remains preserved at SHA256
 Its parent/metadata, SIVI/CHARS, Summary/log/Matrix and child Save/restore,
 Collected/reopen, create/delete/restore/creation-Undo receipts retain their exact
 scope. Source and prior gates are retained, not every child mutation rerun on
-the new44/40 binary. These are explicit desktop safety adaptations, not original
+the new45/41 binary. These are explicit desktop safety adaptations, not original
 Access undelete, parent creation or whole-form callback parity.
 
 The current source, that pinned preview and default CI release are distinct.
@@ -194,7 +205,7 @@ before writing another service, state machine, flag or preparation layer.
 | 2 - supported subset verified | Preserve Long/Matrix lineage and Summary None/display6/environment/ancillary plus common/guide-NULL and numeric Constancy publications. Other options/combined/formatted variants and printing remain separate. | Independent vegetation/names/membership, reviewed environment, reopened outputs and cancellation/stale/close/acknowledgement barriers sealed; environmental calibration retains kernel lineage |
 | 3 - blocked prerequisites | Real-data onboarding/project administration needs production go-mdbtools reader integration, source schema/default/identity qualification and platform/licensing closure. New-project Description/default oracle retry is explicitly closed after two attempts; do not reopen it under another name. Reuse completed F1-F3 and continue independent deliverables. | Disposable complete import/new-project/reopen/recovery before authorization; private scalar staging is not production import and merge/splinter/compare remain separate |
 | 4 | Preserve delivered linked-soil, demonstrated vegetation and exact existing-list Species coedits; finish broader Species/field/populated-C/D, pictures/profiles/ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
-| 5 | Complete required report variants/options, labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
+| 5 | Preserve saved-label portable PDF; complete required report variants/options, physical labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
 
 Priorities organize, not delete, the former thirteen deliverables:
 stabilization; F1-F3 context/configuration; ownership/performance; FS882 parent;

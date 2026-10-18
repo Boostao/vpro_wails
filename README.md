@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-species-list.zip`, 17,560,824 bytes.
+`VPRO-Demo-2026-10-18-saved-label.zip`, 17,565,074 bytes.
 
 SHA256:
-`6fc79320bc1ae16bae2e2bb345042dcc15611b12d1ec662fc95f3e132ce705af`.
+`35714f1c79ba444912d218b39fe33e9276fa75d4b19c5d2319cac4e0800235d4`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-44 frontend and 40 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+45 frontend and 41 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -81,32 +81,51 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
     (read only)**. Choose an exact LF1..LF4 code in Normal or CHARS, optionally
     coedit covers, Save explicitly and acknowledge. Reload the other alias before
     further edits. Manual/alias/NotInList/personal creation remain unavailable.
+11. Reports > **Saved plot label PDF — Portable**: review P1, inspect raw
+    assignments and enter a new full PDF destination in an existing folder.
+    Export once, recover readonly if needed, then acknowledge. P2 demonstrates
+    empty assignments; P3's NULL Zone explicitly refuses. Correct and review again.
+    Receipts survive remount. This is not physical Print/positions/Print All.
 
-Source is committed `91fcc46`; production app/backend/seed/defaults are unchanged.
-One existing Species-list gate extends the preceding profile, reusing the same
-reference reader, planner, atomic writer, history and retained session.
-No application kernel, service or dependency was added.
+Source is committed `12d71f6`; production app/backend/seed/defaults are unchanged.
+One existing PDF gate extends the preceding profile, reusing its saved physical
+reader, native date/font preparation, artifact publisher and retained session.
+No application kernel, service, dependency or font payload was added.
 
-Current native acceptance covers Normal Species LF1->LF2 with Cover1 and CHARS
-LF2->LF3 with Cover5a: two selection-service Saves, four independently checked
-physical/history audits and two histories on row1/legacy ID-100001.
-Complete peers/unmapped cells, project metadata and reference files remain exact.
-The seed offers four exact master codes LF1..LF4 and no personal definitions;
-original/planned common-seven covers must not all be NULL. Both soil panels
-load; soil drafts block Species/cover staging and Species drafts block new soil
-actions. Five fresh close acknowledgements, held-response read-only recovery,
-alias reload, receipt remount and labelled980/1400 fields/actions pass.
-Three saved gate-off reopens deny six calls, including legacy Save's lack of
-Species authority, preserving16 files each. Parent117 remains available;
-writing/selection-off reads show saved normal117/CHARS119. All four owners close.
-All121 related client cases, launcher races, coupled vegetation/Species-list
-races136.687s/check0/0 and isolated Vite/Go/exact26 embeds pass. Independent
-review finds no material issues. A harness expected a valid draft's own Save
-disabled; its pre-Save failure/zero-write family and corrected same-owner
-continuation remain preserved. No completed Save was replayed.
-No new full-root race/oracle, populated personal/duplicate-reference/whole-Unicode,
-populated C/D/every-field, manual/alias/NotInList/personal creation, heights,
-identity/lifecycle or implicit event/focus qualification is claimed.
+Current native acceptance publishes one P1 PDF: five independently reopened exact
+strings, embedded Arial Regular/Bold, one612x792 Letter page and contained spans.
+P1 NULL/P2 empty assignments remain distinct; P3 NULL Zone refuses without stale
+card or repair, then P2 succeeds. Actual held review Cancel discards its late
+result after remount. Actual successful export response is held/lost, recovered
+readonly without replay, acknowledged and retained without a card after remount.
+Four fresh native-close acknowledgements precede release/cleanup.
+Labelled controls/actions/opened assignments, long hashes/destination/receipts
+are actually visible/contained980/1400. One saved backend-off reopen denies
+review/export; retired service-owner recovery explicitly stays unknown, not
+no-publication. Ordinary parent117 remains available. Both owners close; all16
+database/config files and complete physical snapshots stay exact, with zero
+source audits/writes/printer actions. All30 focused clients, launcher races,
+label races16.781s/check0/0 and isolated Vite/Go/exact26 embeds pass. Independent
+review finds no significant issues. Main PDF passes first attempt; overall
+native was not first-pass: saved-reopen cleanup omitted closing complete-entry
+review/Home. Exact files/PDF and same owner were verified, then a fresh close
+cancellation preceded established cleanup. Initial sorted-root build preflight
+failure is also preserved. No Save/export replay or new full-root race/oracle.
+Supported output is unclipped single-line printable ASCII with calibrated en-US
+dates and suitable runtime fonts. Physical printing, positions/stock/Print All,
+live-form staging callbacks, Unicode/multiline/overflow output and whole parity
+remain unavailable.
+
+The immutable44/40 Species predecessor remains unchanged, SHA256
+`6fc79320bc1ae16bae2e2bb345042dcc15611b12d1ec662fc95f3e132ce705af`.
+It owns Normal LF1->LF2/Cover1 and CHARS LF2->LF3/Cover5a: two Saves/four audits/
+two histories on row1/ID-100001, complete peers/metadata/reference preservation,
+joint soil guards, recovery/alias/remount and six denials/three saved reopens.
+All four owners close;16 files exact each. Four master LF1..LF4 codes/personal0
+and original/planned common-seven-cover requirement retain their exact scope.
+Manual/alias/NotInList/personal creation, populated personal/duplicate-reference/
+whole-Unicode, populated C/D, heights/identity/lifecycle and implicit callbacks
+remain excluded. Those mutations were not replayed here.
 
 The immutable43/39 vegetation predecessor remains unchanged, SHA256
 `5c3e9ece6accd6fffdfed392e8aae99fa6819d2a54a57276d5cc724525f7f57f`.
@@ -158,9 +177,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is1,014,098 bytes versus5,202,547 before
-deferral (80.51% less); total JavaScript is5,346,677. The EXE equals the43/39
-vegetation predecessor; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is1,030,948 bytes versus5,202,547 before
+deferral (80.18% less); total JavaScript is5,363,574. The EXE grows18,432 bytes
+versus the Species predecessor; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
@@ -191,7 +210,7 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,178,496 bytes, equal to the vegetation
+The qualified preview executable is43,196,928 bytes,18,432 above the Species
 predecessor; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
