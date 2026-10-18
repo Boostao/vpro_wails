@@ -42,7 +42,9 @@ Current machine state only. Portable scope and ordered work are in
   ribbon deliverables without restarting F1-F3 or creating another private kernel.
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
-- No release dispatch or all-platform runtime acceptance occurred.
+- Current-source draft release run39149407850 passes seven jobs and all asset
+  checks. Default release is not the private34/30 profile or all-platform runtime
+  acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
 
@@ -223,16 +225,19 @@ gates off; a bounded feature gate is not the overall completion condition.
   `c064b158719f5936fa8c7618777d58936ef10cc7c1df8affa42ce16cad3b19db`.
   Its earlier absence/recovery and private backup remain recorded; cause unknown.
   Its synthetic10,052-plot reads46-79ms are historical, not new-preview evidence.
-- Hardened source `842ca946` release run `38929085479` passes all seven jobs.
-  Draft/prerelease `v0.1.0-demo.20261016.2`, release415147921, retains fourteen
+- Current source `7f4dd231559ae9bf40f654c885722dfce9b5bcf9` release run
+  `39149407850` passes all seven jobs. Draft/prerelease
+  `v0.1.0-demo.20261018`, release416595367, retains fourteen
   payloads plus manifest with re-download/API digest checks. Manifest SHA256:
-  `75489b24dade03ce076f164e37119233b33783dcf98682a442bd2c011644f692`.
-  `refreshed-demo-20261016/hosted-current/verified-release.json` and
-  `release-job.txt` retain private acceptance.
+  `7f750b963b3b5e8466c98a577f7e933fc7f8e43e7ed0f3c6f08746d2cec86d3a`.
+  `entry-snapshot-demo-20261018/hosted-current/verified-release.json`, SHA256
+  `4c28da999824c97dcc222d3c0c9e23932cfff0ef5f10318f0e185726cb2211b7`,
+  and `release-job.txt` retain acceptance. Source/CPU witnesses, remote bytes and
+  independent API digests match; older drafts/evidence remain unchanged.
 - Old run `38924414719` used the obsolete `cb5c523` workflow and failed Windows
   DuckDB/cgo builds; it is not current-pipeline acceptance. Default release and
-  the immutable opt-in demo are separate. No new release dispatch, production
-  promotion or all-platform runtime acceptance follows from the soil gate.
+  the immutable opt-in demo are separate. Current default packaging acceptance
+  grants no private-profile, production or all-platform native functional parity.
 
 ## Validation settings
 

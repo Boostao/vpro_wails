@@ -194,9 +194,11 @@ Do not remove safety checks or explicit parity cases to meet a LOC/file target.
 The [manual release workflow](.github/workflows/release.yml) builds fourteen
 Windows/macOS/Linux payloads and verifies package/source/CPU/checksum identities
 through [release tooling](scripts/release.py). Hosted
-[run 38929085479](https://github.com/Boostao/vpro_wails/actions/runs/38929085479)
-passed all seven jobs on `842ca946ac810393f9d548349f693ac0f51e1f13`;
-`v0.1.0-demo.20261016.2` is a draft/prerelease.
+[run 39149407850](https://github.com/Boostao/vpro_wails/actions/runs/39149407850)
+passed all seven jobs on `7f4dd231559ae9bf40f654c885722dfce9b5bcf9`;
+`v0.1.0-demo.20261018` is a draft/prerelease. All fourteen payloads and the
+checksum manifest are attached; source/CPU witnesses, remote byte verification
+and independent API digest checks pass.
 
 That is default-profile packaging acceptance, not promotion of the private
 preview or all-platform native functional acceptance. Windows packages may be

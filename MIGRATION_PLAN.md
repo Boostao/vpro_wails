@@ -132,7 +132,8 @@ the new34/30 binary. These are explicit desktop safety adaptations, not original
 Access undelete, parent creation or whole-form callback parity.
 
 The current source, that pinned preview and default CI release are distinct.
-Seven-job release run38929085479 on `842ca946` validates default packaging;
+Seven-job release run39149407850 on `7f4dd23` validates default packaging,
+fourteen attached payloads plus manifest and independent API checksums;
 it does not qualify an updated preview or every platform's runtime.
 This current-main preview deliberately does not enable every accepted opt-in.
 
