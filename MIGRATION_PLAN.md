@@ -45,6 +45,28 @@ feature-sized revision's entry points, guards and exclusions.
 ## Next forms/report work
 
 Forms, the complete report pipeline and the Access ribbon remain unfinished.
+SIVI new-ID completion remains blocked after two bounded read-only source
+inspections. Normal ProjectID has `LimitToList=False` despite the bound
+NotInList callback; the second observed original master SQL after distinct
+focus, but its unretained preference variant prevented qualification.
+No new-ID input, metadata creation or Save was attempted. Both owners normally
+closed with physical data, registry, canonical exports and seed unchanged.
+Do not reopen this exhausted probe or widen existing physical-choice assignment;
+continue an independent ready deliverable. The [parent contract](docs/FS1333-parent-access-contract.md#private-projectid-choice-planning-candidate)
+records the exact remaining unknowns.
+
+Next independent forms boundary: linked Humus/Mineral creation. Static
+form/query/module trace plus disposable engine calibration qualify complete
+18/28-column defaults, literal parent linkage, TEXT7/TEXT8 widths and actual
+AutoIncr/random-LONG/unique-index distinctions. Two independently reopened
+insertions preserve old rows and five parent/metadata/audit tables. Original
+form callbacks and allocator collision/retry equivalence are not accepted;
+desktop creation stays unavailable pending its typed writer/retained UI and
+independent/native acceptance. Reuse existing soil readers/planners, atomic
+receipt handling and permanent child-ID reservations, not a parallel editor.
+The [linked-soil contract](docs/FS882-two-page-access-contract.md#linked-soil-creation-qualified-engine-boundary)
+records the accepted engine boundary and retained pre-mutation correction.
+
 The grouped ancillary successor is independently reviewed, disposable-native
 accepted and full-race integrated. It composes SU Table/optional ReportSummary
 with supported Strata12/Lifeform13/None14 and existing supported effective

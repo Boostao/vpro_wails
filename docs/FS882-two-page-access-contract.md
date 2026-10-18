@@ -772,6 +772,37 @@ parent/child draft boundary and stable unknown-mutation receipt handling
 remain necessary before existing-row editing; creation/deletion and whole-form
 acceptance are separate unresolved boundaries.
 
+### Linked soil creation: qualified engine boundary
+
+Twelve canonical form/query/table/module inputs and a disposable ACE engine
+calibration establish the next creation boundary, not a desktop creation grant.
+Normal and CHARS parents link both XL soil forms through literal PlotNumber.
+The physical Humus/Mineral tables have18/28 columns; their required PlotNumber
+is TEXT7 and nullable Horizon is TEXT8. Both ID fields are LONG/size4 with
+attributes17, including AutoIncr16, `GenUniqueID()` DefaultValue and a unique
+ID index. The SQL export's LONG declaration alone must not erase AutoIncr.
+
+DAO AddNew independently observed NULL ordinary defaults, False Flag and an
+engine-generated signed32 ID in each table, including a negative Mineral ID.
+Assigning only an existing parent and Horizon committed exactly one complete
+row per table. Exclusive close/reopen preserved every old soil row and all five
+parent/metadata/audit tables. Canonical inputs and the seed stayed unchanged.
+The first pre-mutation assertion incorrectly excluded AutoIncr; its actual
+metadata and failure are preserved. Continuation verified all seven unchanged
+logical snapshots before either insertion; no completed insert was replayed.
+Compact engine receipt SHA256:
+`5129315072066abf7aafed1b46352949dba4617ee8d64a12581bc9926decf0fa`.
+
+This engine-only run did not execute original form callbacks or AuditTrail.
+Static AuditTrail skips controls named PlotNumber/ID and audits NULL additions
+only at strengths2/3; it does not justify invented default/option audits.
+Original new-buffer/Current/implicit-Save timing and allocator collision/retry
+equivalence remain unverified. A desktop successor must use explicit creation,
+complete typed rows, permanent identity reservations, atomic data/audits/history,
+stable-request recovery and the existing retained owner/barriers. Do not widen
+existing-row Save, infer source deletion/restoration, enable creation, or claim
+whole-form parity from this qualification.
+
 ### Existing soil assignment planning
 
 The next private prerequisite is [existing-row assignment planning](../twopagesoilplan.go),

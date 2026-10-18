@@ -2329,6 +2329,19 @@ NotInList path invokes metadata editing, concatenates raw input into RowSource,
 requests SaveRecord and Refresh. It is not a safe free-text assignment/create
 shortcut and is not implemented by this candidate.
 
+Callback binding is not proof of runtime reachability. Two bounded disposable
+read-only inspections observed `LimitToList=False` on the original normal
+ProjectID control despite its bound NotInList procedure. The second explicitly
+focused FieldNumber before ProjectID and observed the exact original master
+query, but its Python preference comparison expected the local query. The raw
+preference variant was not retained, so that mismatch remains unresolved, not
+proof of an inactive or defective source callback. CHARS inspection and new-ID
+input were not reached. Both attempts normally closed with all five physical
+parent/metadata/audit snapshots, registry, canonical exports and seed unchanged.
+The source-debugging budget is exhausted; new-ID completion remains unavailable.
+Do not enable it, repair source SQL, or infer automatic metadata creation from
+these observations. Existing physical-choice assignment is unchanged.
+
 The [selection planner](../siviprojectassignment.go) requires an explicit
 physical metadata row with its raw ID/title pair, exact source preference/
 alias/table/context and normal control identity. Duplicate IDs do not choose a

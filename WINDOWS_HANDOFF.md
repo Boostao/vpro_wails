@@ -77,8 +77,31 @@ The first integration adapter stopped before any race because protectedFiles
 was a count, not a hash map; the accepted successor explicitly seals both
 validation folders and matching receipts/logs. Preserve both drivers.
 All23 implementation paths remain unchanged except these six status docs.
-Next: normal authorized feature publication, then continue ordered forms/report/
-ribbon work. No native owner remains.
+Published consumer: `d3105b238181a237a138b391364db64dc90352d3`, normally pushed
+to `origin/main`; exact publication association is preserved in the session.
+No new release/default promotion follows. Continue ordered forms/report/ribbon
+work. No native owner remains.
+
+SIVI ProjectID source calibration is blocked, not accepted. Two read-only
+attempts in `evidence\private\source-sivi-project-id-completion` normally closed
+with five physical snapshots, registry, canonical inputs and seed unchanged.
+Normal ProjectID has inherited `LimitToList=False` despite a bound NotInList
+procedure. Attempt2 forced FieldNumber/ProjectID focus and preserved actual
+master SQL versus the harness's local expectation, but not the raw preference
+variant. CHARS/new-ID input/metadata creation/Save were not reached. Preserve
+both failed drivers and `source-qualification-blocked.json`; no third debugging
+launch or desktop widening. Continue an independent ready deliverable.
+
+Selected successor: linked Humus/Mineral creation. Private
+`source-two-page-soil-creation/engine-qualification.json` SHA256
+`5129315072066abf7aafed1b46352949dba4617ee8d64a12581bc9926decf0fa`
+accepts two engine-only insertions with exact reopened complete rows, old soil
+rows/five parent-metadata-audit tables unchanged, seed/canonical unchanged and
+no remaining lock. Actual ID attributes17 include AutoIncr16 plus GenUniqueID;
+preserve the failed non-AutoIncr assumption and independently checked zero-write
+continuation. No Access UI/form callback/AuditTrail or desktop creation
+acceptance is inferred. Reuse existing physical soil/typed writer/retained
+session boundaries for the independently gated successor; no new editor family.
 
 The published Constancy panel consumes the loaded presentation draft, retaining
 basic/manual drafts under independent grouped/reference/presentation gates.
