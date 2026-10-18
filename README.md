@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-startup.zip`, 17,522,075 bytes.
+`VPRO-Demo-2026-10-18-complete-parent.zip`, 17,522,456 bytes.
 
 SHA256:
-`bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`.
+`d16b9c70c904bc0ad8ac1baf3fcc0384f3abff5f73c9ad9e011cb0ed67c8e214`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,42 +46,50 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-31 frontend and 28 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+34 frontend and 30 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
 3. With a clean unlocked selected plot, review/edit an explicit metadata record.
+   Alternatively, use **Load complete entry** for the complete normal/CHARS
+   two-page **parent** editor. Save/Undo there, then close its review explicitly.
 4. Inspect Summary, saved User log paging and the bounded Matrix XLSX workflow.
 5. Explicitly select the synthetic **DemoReports** SU for Long Environment and
    Long Vegetation: load titles/options, preview, review and explicitly publish
    each supported XLSX to a new destination. Title Save/Undo is separate from
    workbook publication. Select the original **Report** SU for Summary.
 
-The manifest pins source base `8184550` plus the exact reviewed deferred-entry
-delta; it does not identify the executable as unmodified base source. FS882 and
-CHARS entry panels now load on demand, keeping their existing context/form/plot
-keys and eager draft/operation guards. Actual initial transitive JavaScript falls
-from5,202,547 to928,901 bytes (82.15% less). Total JavaScript is5,227,533 bytes,
-24,986 bytes more; this is not a measured startup-time or binary-size reduction.
+Application source is `184c332`; this profile enables three existing frontend
+gates and two runtime gates without changing application code or seed data.
+Normal117/CHARS119 unique parent controls have visible associated labels and
+native980/1400 layout checks. One held three-scope Save changes FieldNumber,
+SV_CanopyComposition and ProvinceStateTerritory with three exact source audits
+and one technical history; all physical peers remain exact. Invalid drafts block
+Save/Lock/Home/variant/native close. Fresh native CancelClose acknowledgements
+precede correction and held-response release. Saved reopening verifies both
+variants and ordinary P2/P1 navigation; independent backend review/write denials
+pass. All sixteen closed files stay exact after each read-only reopen.
 
-Native Windows acceptance holds module requests across Home, plot and SU-context
-replacement, verifies only the current owner mounts, and checks visible import
-failure/Home recovery and clean close while a module is held. Parent Undo,
-P1-P2-P1, one actual parent Save/two audits, invalid child/close guards, one held
-child Save/two audits and explicit restoration pass without replay. Child history
-is retained and marked restored; only its selected audits are pruned. The same
-saved family reopens with exact parent/child values, normal SIVI77/CHARS71 fields,
-metadata and responsive980/1400 layouts. Long report reads retain72 Environment
-rows and13 Vegetation rows. All sixteen closed family files remain exact after
-those reads. Focused110 cases, check0/0, production builds and independent review
-pass. Backend sources are unchanged; no new full-root race is claimed.
+Focused38 entry cases, launcher race, check0/0, production Vite/Go builds and
+independent read-only review pass. This is complete **parent** entry, not complete
+two-page children, pictures, source callbacks, identity or implicit creation.
+No new full-root race is claimed. Current-binary report smoke loads options/
+titles only; actual publications retain their predecessor lineage.
 
-The unchanged launcher and seed retain the prior31/28 report profile. The
+Deferred FS882/CHARS loading retains its owner keys and eager operation guards.
+Initial transitive JavaScript is929,255 bytes versus5,202,547 before deferral
+(82.14% less); total JavaScript is5,230,628. Neither measured startup latency nor
+binary shrink is inferred. The preserved31/28 startup ZIP, SHA256
+`bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`,
+owns cold-load Home/context/plot replacement, failed-import recovery, close while
+loading, parent Save and held child Save/restore/reopen acceptance.
+
+The seed and earlier report opt-ins remain unchanged. The
 preserved report ZIP, SHA256
 `f9d1d26c94b119165cd0bec0511a996933e1b33e7340fd917066cc5751cc9383`,
 owns216 canonical Environment values, Vegetation pivots, two title Saves/two XLSX
 publications, independent file reopening and report cancellation/stale/no-replace
-guards. Those mutations were not replayed on the startup candidate. Missing names,
+guards. Those mutations were not replayed on this candidate. Missing names,
 NULL Strata and duplicate DemoReports membership remain preserved.
 
 Other parent/metadata Saves, Summary/log/Matrix and child lifecycle acceptance
@@ -113,8 +121,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,058,688 bytes,30,720 bytes larger than
-the report preview; deferred loading is not a binary-size reduction. An earlier
+The qualified preview executable is43,061,760 bytes,3,072 bytes larger than
+the startup preview; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 

@@ -33,7 +33,7 @@ These states describe availability, not confidence percentages:
 | Select existing data and browse plots | Core/Preview: original SQLite family, configuration, owned project/SU/hierarchy selection, filtering and context switching | Production onboarding/administration is separate; attachment is not conversion |
 | Enter ordinary FS882 data | Core/Preview: 98 mapped writable parent fields; bounded soil/Other/vegetation editors, draft/Save/Undo/Lock/close behavior | Complete remaining source events, calculations and whole linked-form journeys |
 | Enter SIVI/CHARS data | Preview: parent panels, mixed child Save/restore, Collected navigation/reopen and explicit child create/delete/restore/creation Undo journeys. Development: wider separately gated species/ID and cross-host combinations | Whole-form callback/navigation equivalence; child creation/deletion is not plot/parent creation |
-| Use two-page entry | Development: parent mixed Save, metadata editing, linked soil/vegetation editing and explicit soil creation accepted in qualified profiles | Whole-form/picture integration, remaining callbacks; not included automatically in the pinned preview |
+| Use two-page entry | Preview: complete normal117/CHARS119 parent controls, three-scope Save, guards and saved reopen. Development: metadata, linked soil/vegetation editing and explicit soil creation have separate acceptance | Whole-form/picture integration, remaining callbacks; soil creation and wider child opt-ins are not enabled by parent promotion |
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
 | Work with pictures | Development: owned reads/metadata and independently gated explicit lifecycle operations | Original Add/save/default/confirmation/Current timing and complete host integration |
 | Run profiles, Find and transfers | Development: bounded rule lifecycle/results, explicit navigation, owned-project Env/SU transfers | Unsupported criteria, external-file mutations and administration |
@@ -51,44 +51,53 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-startup.zip`,17,522,075 bytes, SHA256
-`bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`.
+`VPRO-Demo-2026-10-18-complete-parent.zip`,17,522,456 bytes, SHA256
+`d16b9c70c904bc0ad8ac1baf3fcc0384f3abff5f73c9ad9e011cb0ed67c8e214`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
-31 frontend/28 runtime flags, packaged binary SHA256
-`82c8acca6697655926f855d064ca95060ff9f78de78dca44c8afb721542fc40f`,
+34 frontend/30 runtime flags, packaged binary SHA256
+`fa932dacdadc5ffa556c365693759dd7c661776be5d090b6eb4750b4fc051837`,
 source-input SHA256
-`62c046bb303fd7a541e3f7ea389a3be863d2fe856eea6ef8dd30178f849191d0`.
+`960038d6ca18a7c7119126d6c311b7460d737cf77bf12e46fa8d3893ae65da8e`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. `files[].sha256` owns application/seed hashes; `launcher`
 and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
 named, not a substitute for the packaged EXE identity.
 
-The source is base `8184550` plus the exact frozen/reviewed deferred-entry delta
-identified in the manifest, not unmodified base source. FS882/CHARS load on demand
-inside their existing owner keys. Actual initial transitive JS is928,901 bytes,
-down82.15% from5,202,547; total JS is5,227,533 (+24,986). The43,058,688-byte EXE
-grew30,720 bytes. Neither wall-clock startup nor binary shrink is inferred.
+Application source is `184c332`; the only implementation delta is two existing
+runtime launcher gates and independent tests. Three existing frontend gates
+complete the34/30 profile. App/backend/seed/defaults are unchanged.
+Initial transitive JS is929,255 bytes, down82.14% from5,202,547; total5,230,628.
+The43,061,760-byte EXE grows3,072 bytes from the startup preview.
+Neither wall-clock startup nor binary shrink is inferred.
 
-Native acceptance holds both module loads across Home/owner replacement, including
-an SU-context switch, and proves current-P2-only mounting. Rejected import alert/
-Home and native close while a module is held pass. Parent Undo/P1-P2-P1 and a
-once-only Save/two exact audits pass. Invalid child100 blocks Save/Lock/Home/close;
-fresh CancelClose acknowledgements precede correction and held-save release.
-One two-cell child Save/restore preserves every peer and parent audit, prunes only
-the child audits and retains marked-restored technical history. Same-family reopen
-checks persisted values, SIVI77/CHARS71, metadata and980/1400 layouts; report reads
-show72 Environment/13 Vegetation rows. All sixteen closed files remain unchanged
-after reads. Six distinct owners are freshly absent; no mutation was replayed.
+Current native acceptance measures normal117/CHARS119 unique labelled parent
+fields at980/1400. Invalid drafts block Save/Lock/Home/variant/native close.
+Fresh CancelClose acknowledgements precede Undo and held-response release.
+One Save commits FieldNumber, SV_CanopyComposition and ProvinceStateTerritory
+with three exact audits/one technical history and every physical peer exact.
+CHARS refresh and ordinary P2/P1 navigation pass. Saved reopen plus independent
+backend review/write denials each leave all sixteen closed files exact.
+All four owners are freshly absent; no successful mutation was replayed.
+The prewrite harness's transient Undo selector failure remains preserved and
+was continued only after independent zero-write/readiness checks.
 
-Focused110 client cases, check0/0, production Vite/Go builds and exact26-pattern
-overlay discovery pass;21 protected assets/54 canonical inputs are exact.
-Distinct read-only review finds no significant issues. The resolved-module/
-pre-bind interval has predicate/compiler coverage, not a held native interval.
-No backend change or new full-root race claim.
+Focused38 entry cases, launcher race, check0/0, production Vite/Go builds and
+exact26-pattern overlay discovery pass;1931 inputs,21 protected assets and
+56 canonical inputs are exact. Distinct read-only review finds no significant
+issues. The current report smoke loads options/titles on original Report scope
+only; no report preview/publication was replayed. No new full-root race claim.
+Complete **parent** entry does not grant whole two-page callbacks/children,
+pictures, Source4, identity, implicit creation or soil creation.
 
-The unchanged launcher/seed retain the qualified report profile. Its preserved
+The preserved31/28 startup ZIP, SHA256
+`bad5cec8574d6dbdfbf9ceaf9d8157d5c4d856ea1e88176812c77a2d468cacfb`,
+owns deferred-module Home/context/plot replacement, failure recovery, close while
+loading, parent Save and held child Save/restore/reopen. Its pre-bind interval
+remains predicate/compiler coverage, not a deterministically held native interval.
+
+The seed/earlier opt-ins retain the qualified report profile. Its preserved
 ZIP, SHA256 `f9d1d26c94b119165cd0bec0511a996933e1b33e7340fd917066cc5751cc9383`,
 owns216 Environment values,13 Vegetation pivots, report controls at1400/760/420,
 two title Saves/two XLSX publications/independent reopening and cancellation/
@@ -107,7 +116,7 @@ The immutable23/22 predecessor remains preserved at SHA256
 Its parent/metadata, SIVI/CHARS, Summary/log/Matrix and child Save/restore,
 Collected/reopen, create/delete/restore/creation-Undo receipts retain their exact
 scope. Source and prior gates are retained, not every child mutation rerun on
-the new31/28 binary. These are explicit desktop safety adaptations, not original
+the new34/30 binary. These are explicit desktop safety adaptations, not original
 Access undelete, parent creation or whole-form callback parity.
 
 The current source, that pinned preview and default CI release are distinct.
