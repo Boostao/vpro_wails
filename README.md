@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-picture-lifecycle.zip`, 17,595,458 bytes.
+`VPRO-Demo-2026-10-18-profile-transfers.zip`, 17,597,033 bytes.
 
 SHA256:
-`b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`.
+`25403bd9be9dff7c583cc4b762479d106d2a108a8ca39010b4d06a93758f137d`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-60 frontend and 49 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+67 frontend and 50 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -144,39 +144,74 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
     `LookupReceipt` / `LookupRestorationReceipt` without repeating the mutation.
     Ordinary FS882 and complete two-page child panels do not expose deletion.
 
-Binary source is `98a3c52` plus the manifest-pinned 1-line mock update in
-`frontend/src/pictureLifecycleIntegration.test.cjs` (`editorInitializing: false`);
-production app, Go backend, bindings, defaults and all 19 seed files remain
-unchanged. Existing `PICTURE_DELETION_WRITING` and `PICTURE_DELETION_RESTORING`
-are added at both frontend (60 flags) and runtime (49 flags). Frozen full-root
-race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`,
-exit 0 in 4878.25s) is inherited because no production Go/C/frontend file changed.
+18. With **Sample_Profile** selected, open P1 and click **Review project profile
+    rules**: click **Review new profile rule**, uncheck the NULL boxes, enter
+    `Order=10`, `Table=Veg`, `Field=Species`, `Operator=>`, `Layer=Any`,
+    `Species=LF1`, `Criteria=2`, `Operation=Add plots`, and click **Create reviewed
+    profile rule**. Physical rowid 9 is allocated and permanently reserved in
+    `__VPRO_ProfileIdentity` with durable history in `__VPRO_ProfileHistory`. Click
+    **Review and select project lump table**, then **Preview saved species-only
+    matches** or **Run stored profile preview**. When matched plots have unique
+    `SiteUnit` records in the selected SU (such as `P2` in `Report_SU`), click
+    **Review Save as SU** to publish a new external SQLite SU file (**Create
+    reviewed SU file**) or click **Review Save as SU in current project file** to
+    create a new `*_SU` table in the owned project (**Create reviewed SU in project
+    file**), each with `__VPRO_ProfileSUHistory` provenance. Click **Review deletion
+    of rule 9** and **Confirm profile rule deletion** to remove rule 9 while keeping
+    rowid 9 permanently reserved. In FS882 with an active SU selected (such as
+    `ProfileProj`), use **SU Into Env** to review and copy selected SU values into
+    `Sample_Admin.UserSiteUnit` (`__VPRO_SUEnvironmentHistory`), and **Env Into SU**
+    to review and copy `Sample_Admin.UserSiteUnit` values into the selected `*_SU`
+    table (`__VPRO_EnvironmentSUHistory`).
 
-Current native acceptance across four closed owners (PIDs 460, 12304, 10944,
-12004) verifies duplicate-ID 101 deletion refusal, unconfirmed review and
-unacknowledged receipt close barriers with two fresh specific `CancelClose`
-acknowledgements, `Discard uncommitted review` without writes, and two deletions
-plus two restorations in P1 (row 3 ID 103 and row 8 ID 108): permanent ID
-reservations `[103, 108]` in `__VPRO_PictureDeletionIdentity`, two durable records
-with `Restored` provenance in `__VPRO_PictureDeletionHistory`, final `tblVPics`
-equal to baseline, zero source `AuditTrail` changes and untouched PNG files. Held
-Delete response on row 8 is cancelled into unknown-outcome blocked state and
-recovered via `LookupReceipt` (`replayed=true`, zero extra writes);
-`LookupRestorationReceipt` is verified read-only for row 8's restoration.
-Picture Manager lifecycle fields, confirmation checkbox, actions and history
-disclosure are visible/contained at 980/1400; deletion controls are absent in
-ordinary FS882 and complete two-page child panels. Three saved reopens verify
-persisted tables, cross-session `LookupReceipt` provenance collision refusal,
-fresh null `LookupReceipt`, and 18 backend denials across restoring-off (4),
-deleting-off (6) and reading-off (8) while ordinary 117-field entry remains
-available. All 18 non-library run files and complete `Sample.db` tables remain
-byte-exact. 46 combined client cases, launcher races, focused Go picture
-deletion/restoration race 65.17s, check 0/0, isolated Vite/Go/exact 26 embeds,
-independent review (`gemini-4-argon`), all 23 ZIP payload hashes and final
-prepare-only pass. Native acceptance is not first-pass: one client-test mock fix
-and two same-owner harness continuations were retained without replaying any
-mutation. Picture Add/creation, child-panel deletion and original Access callbacks
-remain unqualified.
+Binary source is clean `c760425`. Seven existing frontend flags
+(`PROFILE_SPECIES_PRESENCE_PREVIEW`, `PROJECT_PLOT_PROFILE_CREATION`,
+`PROJECT_PLOT_PROFILE_DELETION`, `PROJECT_PLOT_PROFILE_SAVE_SU`,
+`PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT`, `SOURCE_ENV_SU_TRANSFER`,
+`SOURCE_SU_ENV_TRANSFER`) and one existing runtime flag
+(`PROFILE_SPECIES_PRESENCE_PREVIEW`) extend this private profile (67 frontend /
+50 runtime flags); production app, Go backend, bindings, defaults and all 19 seed
+files remain unchanged. Frozen full-root race integration
+(`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`, exit 0 in
+4878.25s) is inherited because no production Go/C/frontend file changed.
+
+Current native acceptance across three closed owners (PIDs 456, 7840, 2028)
+verifies rule 9 creation, edition (`Layer=Any`, `Criteria=2`) and deletion on
+`Sample_Profile` with permanent reservations `[1..9]` in `__VPRO_ProfileIdentity`
+and 4 durable records in `__VPRO_ProfileHistory`; species-only presence preview
+missing-Lump refusal and readonly Table/Species intersection after explicit Lump
+review; ordered preview NULL-Layer refusal and 9-step `P2` match; Save as SU
+duplicate-plot refusal on `Report_SU` when `P1` is matched twice plus verified
+creation of both external `ProfileExportSU.db` (`ProfileExt_SU`) and in-project
+`ProfileProj_SU` with `__VPRO_ProfileSUHistory` provenance; and owned-project
+**SU Into Env** (`__VPRO_SUEnvironmentHistory`) and **Env Into SU**
+(`__VPRO_EnvironmentSUHistory`) transfers on `P2` plus complete-entry
+`UserSiteUnit` empty-string refusal and explicit `Clear to NULL` save. Four panel
+families are measured at 980/1400, and two fresh specific `CancelClose`
+acknowledgements precede mutations. Reopen with
+`VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW=false` and `None` profile verifies
+persisted tables, external SU file hash (`b7a791007d3e21dfc09f00a67235a7c37346827979f715fe2b709de073431f9f`)
+and 4 backend denials while ordinary 117-field entry remains available. All 17
+non-project, non-config run files stay byte-exact. 37 combined client cases,
+launcher races, focused Go profile/transfer race 83.25s, check 0/0, isolated
+Vite/Go/exact 26 embeds, independent review (`gemini-4-argon`), all 23 ZIP
+payload hashes and final prepare-only pass. Native acceptance is not first-pass:
+attempt 1 (PID 456) closed cleanly before any mutation to add
+`VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW` to the launcher, and same-owner
+continuations on PIDs 7840 and 2028 were retained without replaying any mutation.
+External profile write grants, external profile file/table creation and original
+Access callbacks remain unqualified.
+
+The immutable60/49 picture-lifecycle predecessor, SHA256
+`b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`,
+owns Picture Manager reference deletion and historical restoration on P1 (rows 3
+and 8, permanent ID reservations `[103, 108]` in `__VPRO_PictureDeletionIdentity`,
+two records with `Restored` provenance in `__VPRO_PictureDeletionHistory`),
+duplicate-ID 101 refusal, unconfirmed review and unacknowledged receipt close
+barriers, `Discard uncommitted review`, held-Delete `LookupReceipt` recovery and
+read-only `LookupRestorationReceipt` verification, absence of child-panel deletion
+controls and 18 reopen denials across four closed owners. Those picture-lifecycle
+mutations were not replayed on 67/50.
 
 The immutable58/47 picture-metadata predecessor, SHA256
 `8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`,
@@ -297,9 +332,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is1,121,115 bytes versus5,202,547 before
-deferral (78.45% less); total JavaScript is5,455,303. The EXE grows15,872 bytes
-versus the picture-metadata predecessor; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is1,126,518 bytes versus5,202,547 before
+deferral (78.35% less); total JavaScript is5,461,565. The EXE grows6,144 bytes
+versus the picture-lifecycle predecessor; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
@@ -330,8 +365,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,295,744 bytes,15,872 above the
-picture-metadata predecessor; deferred loading is not a binary-size reduction. An earlier
+The qualified preview executable is43,301,888 bytes,6,144 above the
+picture-lifecycle predecessor; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 

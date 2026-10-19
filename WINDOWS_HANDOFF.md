@@ -29,39 +29,40 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is reviewed60/49 Picture Manager reference deletion and
-  historical restoration, built from `98a3c52` plus the manifest-pinned 1-line
-  mock update in `frontend/src/pictureLifecycleIntegration.test.cjs`
-  (`editorInitializing: false`). `PICTURE_DELETION_WRITING` and
-  `PICTURE_DELETION_RESTORING` are added at both frontend and runtime;
-  production app/backend/bindings/defaults and all19 seeds remain unchanged.
-  Frozen full-root race integration (`ce0dbd2d`, exit0 in4878.25s) is inherited
-  because no production Go/C/frontend file changed. Native proof across four
-  closed owners (PIDs460,12304,10944,12004) verifies duplicate-ID101 deletion
-  refusal, unconfirmed review and unacknowledged receipt close barriers with two
-  fresh specific `CancelClose` acknowledgements, `Discard uncommitted review`
-  without writes, and two deletions plus two restorations in P1 (row3 ID103 and
-  row8 ID108): permanent ID reservations `[103, 108]` in
-  `__VPRO_PictureDeletionIdentity`, two durable records with `Restored`
-  provenance in `__VPRO_PictureDeletionHistory`, final `tblVPics` equal to
-  baseline, zero source `AuditTrail` changes and untouched PNG files. Held
-  Delete response on row8 is cancelled into unknown-outcome blocked state and
-  recovered via `LookupReceipt` (`replayed=true`, zero extra writes);
-  `LookupRestorationReceipt` is verified read-only for row8's restoration.
-  Picture Manager lifecycle fields, confirmation checkbox, actions and history
-  disclosure measured at980/1400; deletion controls absent in ordinary FS882
-  and complete two-page child panels. Three saved reopens verify persisted
-  tables, cross-session `LookupReceipt` provenance collision refusal, fresh null
-  `LookupReceipt`, and18 backend denials across restoring-off (4), deleting-off
-  (6) and reading-off (8) while ordinary117 entry remains available. All18
-  non-library run files and complete `Sample.db` tables stay byte-exact.46
-  clients, launcher races, focused Go picture lifecycle race65.17s, check0/0,
-  Vite/Go/exact26 embeds, independent review (`gemini-4-argon`), all23 ZIP
-  hashes and final prepare-only pass. Not first-pass: one client-test mock fix
-  and two same-owner harness continuations retained without mutation replay.
-  Picture Metadata58/47, Find57/46, Picture56/46 and older workflows retain
-  predecessor lineage. Initial JS falls78.45%; EXE grows15,872 bytes. No new
-  timing/shrink claim.
+- Current preview is reviewed67/50 project-owned profile rule creation/deletion,
+  species-only presence preview, Save as SU (external file and in-project table)
+  and owned-project Env Into SU / SU Into Env transfers, built from clean
+  `c760425`. Seven existing frontend flags and one runtime flag
+  (`PROFILE_SPECIES_PRESENCE_PREVIEW`) are added; production app/backend/
+  bindings/defaults and all19 seeds remain unchanged. Frozen full-root race
+  integration (`ce0dbd2d`, exit0 in4878.25s) is inherited because no production
+  Go/C/frontend file changed. Native proof across three closed owners (PIDs456,
+  7840,2028) verifies rule9 creation, edition (`Layer=Any`, `Criteria=2`) and
+  deletion on `Sample_Profile` with permanent reservations `[1..9]` in
+  `__VPRO_ProfileIdentity` and4 durable records in `__VPRO_ProfileHistory`;
+  species-only presence preview missing-Lump refusal and readonly Table/Species
+  intersection after explicit Lump review; ordered preview NULL-Layer refusal
+  and9-step `P2` match; Save as SU duplicate-plot refusal on `Report_SU` when
+  `P1` is matched twice plus verified creation of both external
+  `ProfileExportSU.db` (`ProfileExt_SU`) and in-project `ProfileProj_SU` with
+  `__VPRO_ProfileSUHistory` provenance; and owned-project **SU Into Env**
+  (`__VPRO_SUEnvironmentHistory`) and **Env Into SU**
+  (`__VPRO_EnvironmentSUHistory`) transfers on `P2` plus complete-entry
+  `UserSiteUnit` empty-string refusal and explicit `Clear to NULL` save. Four
+  panel families measured at980/1400; two fresh specific `CancelClose`
+  acknowledgements precede mutations. Reopen with
+  `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW=false` and `None` profile verifies
+  persisted tables, external SU file hash (`b7a79100`) and4 backend denials
+  while ordinary117 entry remains available. All17 non-project, non-config run
+  files stay byte-exact.37 clients, launcher races, focused Go profile/transfer
+  race83.25s, check0/0, Vite/Go/exact26 embeds, independent review
+  (`gemini-4-argon`), all23 ZIP hashes and final prepare-only pass. Not
+  first-pass: attempt1 (PID456) closed cleanly before any mutation to add
+  `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW` to the launcher, and same-owner
+  continuations on PIDs7840 and2028 retained without mutation replay. Picture
+  Lifecycle60/49, Picture Metadata58/47, Find57/46, Picture56/46 and older
+  workflows retain predecessor lineage. Initial JS falls78.35%; EXE grows6,144
+  bytes. No new timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -69,7 +70,7 @@ Current machine state only. Portable scope and ordered work are in
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
 - Current-source draft release run39149407850 passes seven jobs and all asset
-  checks. Default release is not the private60/49 profile or all-platform runtime
+  checks. Default release is not the private67/50 profile or all-platform runtime
   acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
@@ -185,53 +186,69 @@ qualification; that bounded journey is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-picture-lifecycle.zip`:17,595,458 bytes.
-  SHA256 `b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-profile-transfers.zip`:17,597,033 bytes.
+  SHA256 `25403bd9be9dff7c583cc4b762479d106d2a108a8ca39010b4d06a93758f137d`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Source `98a3c52` plus manifest-pinned `frontend/src/pictureLifecycleIntegration.test.cjs`
-  mock update (`editorInitializing: false`); SQLite-only EXE43,295,744 bytes,
-  SHA256 `338740aaf2935eb8b44bc561ae8ff93190b6565c5c407f0b994f6a541c5524ba`.
-  Exact60 frontend/49 runtime gates; private launcher SHA256
-  `dccad6b0eccbd73f70de8cfaec5fea611f983bc764e7fe272eedcffe564e2e7f`.
-  `PICTURE_DELETION_WRITING` and `PICTURE_DELETION_RESTORING` added at both
-  frontend and runtime; production app/Go/bindings/defaults and all19 seeds
-  unchanged.
-- Private `picture-lifecycle-demo-20261018/validation-seal.json`, SHA256
-  `3321012193629fa1aac9fd2d8e6f42c77022f7bea7e9475343facc9c9a129662`,
+- Clean source `c760425`; SQLite-only EXE43,301,888 bytes, SHA256
+  `e0c0d6b2041f9132c6c32a2808b54ae691a4641592bed4e3cdbc0e31cb534ef8`.
+  Exact67 frontend/50 runtime gates; private launcher SHA256
+  `10a3a1c022e3ff4ad9c112605f33f9470d0eee721ce6616dd15060a567003645`.
+  Seven existing frontend flags (`PROFILE_SPECIES_PRESENCE_PREVIEW`,
+  `PROJECT_PLOT_PROFILE_CREATION`, `PROJECT_PLOT_PROFILE_DELETION`,
+  `PROJECT_PLOT_PROFILE_SAVE_SU`, `PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT`,
+  `SOURCE_ENV_SU_TRANSFER`, `SOURCE_SU_ENV_TRANSFER`) and one runtime flag
+  (`PROFILE_SPECIES_PRESENCE_PREVIEW`) added; production app/Go/bindings/defaults
+  and all19 seeds unchanged.
+- Private `profile-transfers-demo-20261018/validation-seal.json`, SHA256
+  `ac712118662d6539de57d11624e290a402acb260353e8cfd2373ed6c639b980f`,
   pins source/canonical records/21 protected assets, native proofs and inherited
   frozen full-root race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`);
   source-input SHA256
-  `3c4d279fa74f0b7b0c501b5d0d0564bc2a12677376dae174be3676d2791d6def`.
-  Initial JS1,121,115 versus5,202,547; total5,455,303. EXE grows15,872 bytes;
+  `cd70253cc3d456773c3a51b38e83dcd05ff260108522ae7449d48f560303bb5f`.
+  Initial JS1,126,518 versus5,202,547; total5,461,565. EXE grows6,144 bytes;
   no new timing/shrink claim.
-- Native: four closed owners (PIDs460,12304,10944,12004). Duplicate-ID101
-  deletion refusal, unconfirmed review and unacknowledged receipt close barriers
-  with two fresh specific `CancelClose` acknowledgements, `Discard uncommitted
-  review` without writes, and two deletions plus two restorations in P1 (row3
-  ID103 and row8 ID108): permanent ID reservations `[103, 108]` in
-  `__VPRO_PictureDeletionIdentity`, two durable records with `Restored`
-  provenance in `__VPRO_PictureDeletionHistory`, final `tblVPics` equal to
-  baseline, zero source `AuditTrail` changes and untouched PNG files. Held
-  Delete response on row8 is cancelled into unknown-outcome blocked state and
-  recovered via `LookupReceipt` (`replayed=true`, zero extra writes);
-  `LookupRestorationReceipt` is verified read-only for row8's restoration.
-  Picture Manager lifecycle fields, confirmation checkbox, actions and history
-  disclosure measured at980/1400; deletion controls absent in ordinary FS882
-  and complete two-page child panels. Three saved reopens verify persisted
-  tables, cross-session `LookupReceipt` provenance collision refusal, fresh null
-  `LookupReceipt`, and18 backend denials across restoring-off (4), deleting-off
-  (6) and reading-off (8) while ordinary117 entry remains available. All18
-  non-library run files and complete `Sample.db` tables stay byte-exact.
--46 combined clients, launcher races, focused Go picture lifecycle race65.17s,
+- Native: three closed owners (PIDs456,7840,2028). Rule9 creation, edition
+  (`Layer=Any`, `Criteria=2`) and deletion on `Sample_Profile` with permanent
+  reservations `[1..9]` in `__VPRO_ProfileIdentity` and4 durable records in
+  `__VPRO_ProfileHistory`; species-only presence preview missing-Lump refusal
+  and readonly Table/Species intersection after explicit Lump review; ordered
+  preview NULL-Layer refusal and9-step `P2` match; Save as SU duplicate-plot
+  refusal on `Report_SU` when `P1` is matched twice plus verified creation of
+  both external `ProfileExportSU.db` (`ProfileExt_SU`, SHA256
+  `b7a791007d3e21dfc09f00a67235a7c37346827979f715fe2b709de073431f9f`) and
+  in-project `ProfileProj_SU` with `__VPRO_ProfileSUHistory` provenance; and
+  owned-project **SU Into Env** (`__VPRO_SUEnvironmentHistory`) and **Env Into
+  SU** (`__VPRO_EnvironmentSUHistory`) transfers on `P2` plus complete-entry
+  `UserSiteUnit` empty-string refusal and explicit `Clear to NULL` save. Four
+  panel families measured at980/1400; two fresh specific `CancelClose`
+  acknowledgements precede mutations. Reopen with
+  `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW=false` and `None` profile verifies
+  persisted tables, external SU file hash and4 backend denials while ordinary117
+  entry remains available. All17 non-project, non-config run files stay byte-exact.
+-37 combined clients, launcher races, focused Go profile/transfer race83.25s,
   check0/0, Vite/Go/exact26 embeds pass. Distinct read-only
-  `picture-lifecycle-delivery-review` (`gemini-4-argon`) accepts
+  `profile-transfers-delivery-review` (`gemini-4-argon`) accepts
   (`review-disposition.json` SHA256
-  `12d308b6afb080c9e1545d6f707a79e60f5d18ef83eb91091dded7045a790226`). All23
-  ZIP hashes/final prepare-only pass. Not first-pass: one client-test mock fix
-  and two same-owner harness continuations retained without mutation replay.
-  Picture Add/creation, child-panel deletion and original callbacks remain
-  unqualified.
+  `e1b098fb7176e1f2d9b8f3474cf25ec5b821dfde19d8be0e3cfef25e79cc8cb0`). All23
+  ZIP hashes/final prepare-only pass. Not first-pass: attempt1 (PID456) closed
+  cleanly before any mutation to add `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW` to
+  the launcher, and same-owner continuations on PIDs7840 and2028 retained
+  without mutation replay. External profile write grants, external profile file/
+  table creation and original callbacks remain unqualified.
+- Preserved60/49 picture-lifecycle ZIP SHA256
+  `b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`
+  (binary SHA256 `338740aaf2935eb8b44bc561ae8ff93190b6565c5c407f0b994f6a541c5524ba`,
+  source input SHA256 `3c4d279fa74f0b7b0c501b5d0d0564bc2a12677376dae174be3676d2791d6def`,
+  seal SHA256 `3321012193629fa1aac9fd2d8e6f42c77022f7bea7e9475343facc9c9a129662`)
+  owns Picture Manager reference deletion and historical restoration on P1
+  (rows3 and8, permanent ID reservations `[103, 108]` in
+  `__VPRO_PictureDeletionIdentity`, two records with `Restored` provenance in
+  `__VPRO_PictureDeletionHistory`), duplicate-ID101 refusal, unconfirmed review
+  and unacknowledged receipt close barriers, `Discard uncommitted review`,
+  held-Delete `LookupReceipt` recovery and read-only `LookupRestorationReceipt`
+  verification, absence of child-panel deletion controls and18 reopen denials
+  across four closed owners; inherited, not rerun on67/50.
 - Preserved58/47 picture-metadata ZIP SHA256
   `8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`
   (binary SHA256 `fba0f22f0689e8d249419ef3d19c5824015b93e007368ba5b8e59a335cea8652`,

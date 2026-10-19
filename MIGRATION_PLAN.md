@@ -37,7 +37,7 @@ These states describe availability, not confidence percentages:
 | Use two-page entry | Preview: complete normal117/CHARS119 parents, linked Humus/Mineral creation/editing, demonstrated vegetation cover/Collected and exact existing-list Species coedits, readonly picture children, guards and saved reopen; C/D empty memberships remain read-only. Development: broader Species/metadata/heights and host combinations have separate boundaries | Whole-form/picture mutations, populated C/D and remaining field/callback journeys; manual/NotInList, implicit creation and soil deletion/restoration remain unavailable |
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
 | Work with pictures | Preview: Picture Manager and ordinary child metadata/image selection/viewer, reviewed `PicDir`/`PicName` metadata editing and `LookupReceipt` recovery, plus Picture Manager reference deletion and historical restoration with permanent ID reservation and durable history; later same-binary Normal/CHARS complete-entry picture children remain read-only; separate owned library/directories. Development: independently gated creation operation | Original Add/save/default/confirmation/Current timing, creation in preview and child-panel picture mutations |
-| Run profiles, Find and transfers | Preview: explicit project-owned existing-rule Save, ordered readonly preview, revalidated Apply/Next/Previous/Clear navigation and strict literal scoped Find/revalidated Open. Development: wider rule lifecycle and owned-project Env/SU transfers | Original mapped callbacks/count/scratch/filter side effects, standard Access Find dialog options/patterns/focus, unsupported criteria, external-file mutations and administration |
+| Run profiles, Find and transfers | Preview: explicit project-owned profile rule Save/create/delete with permanent ID reservation, ordered readonly preview, species-only presence preview, Save as SU (external file and in-project table), revalidated Apply/Next/Previous/Clear navigation, strict literal scoped Find/revalidated Open, and owned-project Env Into SU / SU Into Env transfers. Development: external SU Into Env and external profile administration | Original mapped callbacks/count/scratch/filter side effects, standard Access Find dialog options/patterns/focus, unsupported criteria, external-file profile write grants and administration |
 | Produce priority reports | Preview: inherited Long Environment/Vegetation and Matrix; Summary None/display6/environment/ancillary plus effective common/guide-NULL references and numeric Constancy inspection/publication. Development: other summaries/options/workbooks | Remaining combined/formatted variants, populated guide/attribute data and options/user journeys; original callbacks/printing remain separate |
 | Review locations and prepare map output | Preview: explicit saved decimal coordinates, DISTINCT Location review and direct Env/SU Google Earth/KML with duplicate memberships preserved | Preferences, DMS/single-plot callbacks, viewer/remote resources and broader map journeys remain separate |
 | Produce labels | Preview: exact saved single-plot card and portable Letter PDF, runtime Arial/calibrated en-US date, guarded once-only export/read-only recovery and retained receipt | Physical printing, Print All, positions/stock, live-form callbacks, Unicode/multiline/overflow output and broader regional calibration |
@@ -53,54 +53,68 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-picture-lifecycle.zip`,17,595,458 bytes, SHA256
-`b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`.
+`VPRO-Demo-2026-10-18-profile-transfers.zip`,17,597,033 bytes, SHA256
+`25403bd9be9dff7c583cc4b762479d106d2a108a8ca39010b4d06a93758f137d`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
-60 frontend/49 runtime flags, packaged binary SHA256
-`338740aaf2935eb8b44bc561ae8ff93190b6565c5c407f0b994f6a541c5524ba`,
+67 frontend/50 runtime flags, packaged binary SHA256
+`e0c0d6b2041f9132c6c32a2808b54ae691a4641592bed4e3cdbc0e31cb534ef8`,
 source-input SHA256
-`3c4d279fa74f0b7b0c501b5d0d0564bc2a12677376dae174be3676d2791d6def`.
+`cd70253cc3d456773c3a51b38e83dcd05ff260108522ae7449d48f560303bb5f`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. `files[].sha256` owns application/seed hashes; `launcher`
 and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
 named, not a substitute for the packaged EXE identity.
 
-Binary source is `98a3c52` plus the manifest-pinned 1-line mock update in
-`frontend/src/pictureLifecycleIntegration.test.cjs` (`editorInitializing: false`);
-production app/backend/bindings/defaults and all19 seeds remain unchanged.
-Existing `PICTURE_DELETION_WRITING` and `PICTURE_DELETION_RESTORING` are added
-at both frontend and runtime. Frozen full-root race integration
-(`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`, exit0
-in4878.25s) is inherited because no production Go/C/frontend file changed.
-Initial JS1,121,115, down78.45% from5,202,547; total5,455,303. EXE43,295,744
-grows15,872 bytes versus picture-metadata58/47. No new timing/binary-shrink claim.
+Binary source is clean `c760425`. Seven existing frontend flags
+(`PROFILE_SPECIES_PRESENCE_PREVIEW`, `PROJECT_PLOT_PROFILE_CREATION`,
+`PROJECT_PLOT_PROFILE_DELETION`, `PROJECT_PLOT_PROFILE_SAVE_SU`,
+`PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT`, `SOURCE_ENV_SU_TRANSFER`,
+`SOURCE_SU_ENV_TRANSFER`) and one existing runtime flag
+(`PROFILE_SPECIES_PRESENCE_PREVIEW`) extend this private profile; production
+app/backend/bindings/defaults and all19 seeds remain unchanged. Frozen full-root
+race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`,
+exit0 in4878.25s) is inherited because no production Go/C/frontend file changed.
+Initial JS1,126,518, down78.35% from5,202,547; total5,461,565. EXE43,301,888
+grows6,144 bytes versus picture-lifecycle60/49. No new timing/binary-shrink claim.
 
-Current native proof across four closed owners (PIDs460,12304,10944,12004)
-verifies duplicate-ID101 deletion refusal, unconfirmed review and unacknowledged
-receipt close barriers with two fresh specific `CancelClose` acknowledgements,
-`Discard uncommitted review` without writes, and two deletions plus two
-restorations in P1 (row3 ID103 and row8 ID108): permanent ID reservations
-`[103, 108]` in `__VPRO_PictureDeletionIdentity`, two durable records with
-`Restored` provenance in `__VPRO_PictureDeletionHistory`, final `tblVPics` equal
-to baseline, zero source `AuditTrail` changes and untouched PNG files. Held
-Delete response on row8 is cancelled into unknown-outcome blocked state and
-recovered via `LookupReceipt` (`replayed=true`, zero extra writes);
-`LookupRestorationReceipt` is verified read-only for row8's restoration.
-Picture Manager lifecycle fields, confirmation checkbox, actions and history
-disclosure are visible/contained at980/1400; deletion controls are absent in
-ordinary FS882 and complete two-page child panels. Three saved reopens verify
-persisted tables, cross-session `LookupReceipt` provenance collision refusal,
-fresh null `LookupReceipt`, and18 backend denials across restoring-off (4),
-deleting-off (6) and reading-off (8) while ordinary117-field entry remains
-available. All18 non-library run files and complete `Sample.db` tables remain
-byte-exact.46 combined clients, launcher races, focused Go picture lifecycle
-race65.17s, check0/0, Vite/Go/exact26 embeds, independent review
-(`gemini-4-argon`), all23 ZIP hashes and final prepare-only pass. Native
-acceptance is not first-pass: one client-test mock fix and two same-owner
-harness continuations were retained without replaying any mutation. Picture
-Add/creation, child-panel deletion and original Access callbacks remain off.
+Current native proof across three closed owners (PIDs456,7840,2028) verifies
+rule9 creation, edition (`Layer=Any`, `Criteria=2`) and deletion on
+`Sample_Profile` with permanent reservations `[1..9]` in `__VPRO_ProfileIdentity`
+and4 durable records in `__VPRO_ProfileHistory`; species-only presence preview
+missing-Lump refusal and readonly Table/Species intersection after explicit Lump
+review; ordered preview NULL-Layer refusal and9-step `P2` match; Save as SU
+duplicate-plot refusal on `Report_SU` when `P1` is matched twice plus verified
+creation of both external `ProfileExportSU.db` (`ProfileExt_SU`) and in-project
+`ProfileProj_SU` with `__VPRO_ProfileSUHistory` provenance; and owned-project
+**SU Into Env** (`__VPRO_SUEnvironmentHistory`) and **Env Into SU**
+(`__VPRO_EnvironmentSUHistory`) transfers on `P2` plus complete-entry
+`UserSiteUnit` empty-string refusal and explicit `Clear to NULL` save. Four panel
+families are measured at980/1400, and two fresh specific `CancelClose`
+acknowledgements precede mutations. Reopen with
+`VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW=false` and `None` profile verifies
+persisted tables, external SU file hash (`b7a791007d3e21dfc09f00a67235a7c37346827979f715fe2b709de073431f9f`)
+and4 backend denials while ordinary117-field entry remains available. All17
+non-project, non-config run files stay byte-exact.37 combined clients, launcher
+races, focused Go profile/transfer race83.25s, check0/0, Vite/Go/exact26 embeds,
+independent review (`gemini-4-argon`), all23 ZIP hashes and final prepare-only
+pass. Native acceptance is not first-pass: attempt1 (PID456) closed cleanly
+before any mutation to add `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW` to the
+launcher, and same-owner continuations on PIDs7840 and2028 were retained without
+replaying any mutation. External profile write grants, external profile file/
+table creation and original Access callbacks remain off.
+
+The preserved60/49 picture-lifecycle ZIP, SHA256
+`b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`,
+owns Picture Manager reference deletion and historical restoration on P1 (rows3
+and8, permanent ID reservations `[103, 108]` in `__VPRO_PictureDeletionIdentity`,
+two records with `Restored` provenance in `__VPRO_PictureDeletionHistory`),
+duplicate-ID101 refusal, unconfirmed review and unacknowledged receipt close
+barriers, `Discard uncommitted review`, held-Delete `LookupReceipt` recovery and
+read-only `LookupRestorationReceipt` verification, absence of child-panel deletion
+controls and18 reopen denials across four closed owners. Those picture-lifecycle
+mutations are inherited, not rerun on67/50.
 
 The preserved58/47 picture-metadata ZIP, SHA256
 `8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`,
@@ -268,7 +282,7 @@ before writing another service, state machine, flag or preparation layer.
 | 1 - supported journeys verified | Preserve parent/metadata and child entry/recovery/lifecycle acceptance with its exact inherited23/22 scope. Source/gates are retained; parent Undo/navigation is rechecked on31/28. Consolidate only demonstrably equivalent behavior. Wider host/source combinations remain in priority4. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
 | 2 - supported subset verified | Preserve Long/Matrix lineage and Summary None/display6/environment/ancillary plus common/guide-NULL and numeric Constancy publications. Other options/combined/formatted variants and printing remain separate. | Independent vegetation/names/membership, reviewed environment, reopened outputs and cancellation/stale/close/acknowledgement barriers sealed; environmental calibration retains kernel lineage |
 | 3 - blocked prerequisites | Real-data onboarding/project administration needs production go-mdbtools reader integration, source schema/default/identity qualification and platform/licensing closure. New-project Description/default oracle retry is explicitly closed after two attempts; do not reopen it under another name. Reuse completed F1-F3 and continue independent deliverables. | Disposable complete import/new-project/reopen/recovery before authorization; private scalar staging is not production import and merge/splinter/compare remain separate |
-| 4 | Preserve delivered linked-soil, vegetation/existing-list Species, standalone profile Save/preview/navigation, Picture Manager/ordinary picture metadata editing and `LookupReceipt` recovery, Picture Manager reference deletion/historical restoration, readonly complete-entry picture children and strict literal scoped Find/Open; finish broader Species/field/populated-C/D, picture creation/wider hosts, wider profile/Find/transfer and ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
+| 4 | Preserve delivered linked-soil, vegetation/existing-list Species, standalone profile Save/create/delete/preview/species-presence/Save-as-SU/navigation, owned-project Env/SU transfers, Picture Manager/ordinary picture metadata editing and `LookupReceipt` recovery, Picture Manager reference deletion/historical restoration, readonly complete-entry picture children and strict literal scoped Find/Open; finish broader Species/field/populated-C/D, picture creation/wider hosts, external profile/transfer and ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
 | 5 | Preserve saved-coordinate Location/KML and saved-label portable PDF; complete required report variants/options, physical labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
 
 Priorities organize, not delete, the former thirteen deliverables:
@@ -291,7 +305,7 @@ Source contracts retain the detailed outstanding requirements.
 - Measure startup, representative large-project reads, interaction and bundle/
   binary size on the exact supported profile. Existing bounded fast reads do
   not prove every performance problem is fixed. Current deferred-entry/report
-  profile reduces initial transitive JS78.45%; measure startup and larger-project interactions
+  profile reduces initial transitive JS78.35%; measure startup and larger-project interactions
   separately rather than treating the payload budget as overall performance proof.
 - Use named profiles to control combinations. Independent backend denials stay;
   consolidation is not permission to turn all experimental flags on.
