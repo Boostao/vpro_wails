@@ -55,8 +55,8 @@ func (s *ContextService) LookupScopedPlot(ctx context.Context, contextID string,
 		var env, admin int
 		project := owner.selection.Project
 		if err := tx.QueryRowContext(ctx, `SELECT
-			(SELECT COUNT(*) FROM project.`+quoteHeaderIdentifier(project+"_Env")+` WHERE PlotNumber COLLATE BINARY=?),
-			(SELECT COUNT(*) FROM project.`+quoteHeaderIdentifier(project+"_Admin")+` WHERE Plot COLLATE BINARY=?)`,
+			(SELECT COUNT(*) FROM project.`+quoteHeaderIdentifier(project+"_Env")+` WHERE typeof(PlotNumber)='text' AND CAST(PlotNumber AS BLOB)=CAST(? AS BLOB)),
+			(SELECT COUNT(*) FROM project.`+quoteHeaderIdentifier(project+"_Admin")+` WHERE typeof(Plot)='text' AND CAST(Plot AS BLOB)=CAST(? AS BLOB))`,
 			request.PlotNumber, request.PlotNumber).Scan(&env, &admin); err != nil {
 			return result, err
 		}
@@ -64,7 +64,7 @@ func (s *ContextService) LookupScopedPlot(ctx context.Context, contextID string,
 			return result, errors.New("literal plot requires exactly one original Env and Admin record; missing or ambiguous identity cannot be opened")
 		}
 		if err := tx.QueryRowContext(ctx, `SELECT PlotNumber,FieldNumber,PlotRepresenting,Zone,SubZone,SiteSeries
-			FROM USysEnv WHERE PlotNumber COLLATE BINARY=?`, request.PlotNumber).
+			FROM USysEnv WHERE typeof(PlotNumber)='text' AND CAST(PlotNumber AS BLOB)=CAST(? AS BLOB)`, request.PlotNumber).
 			Scan(&result.Plot.PlotNumber, &result.Plot.FieldNumber, &result.Plot.PlotRepresenting,
 				&result.Plot.Zone, &result.Plot.SubZone, &result.Plot.SiteSeries); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {

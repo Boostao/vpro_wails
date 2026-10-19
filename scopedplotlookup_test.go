@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -85,6 +86,77 @@ func TestScopedPlotLookupCancellationWhileCoordinatorIsBusy(t *testing.T) {
 	}
 	if _, err := service.LookupScopedPlot(context.Background(), state.ContextID, ScopedPlotLookup{"108050"}); err != nil {
 		t.Fatal("cancelled lookup leaked an ownership lease", err)
+	}
+}
+
+func TestScopedPlotLookupIdentityStorageAndAffinity(t *testing.T) {
+	for _, affinity := range []struct{ name, storage string }{
+		{"INTEGER", "integer"}, {"NUMERIC", "integer"}, {"REAL", "real"},
+		{"TEXT", "text"}, {"BLOB", "blob"}, {"", "integer"},
+	} {
+		for _, target := range []string{"Sample_Env", "Sample_Admin", "both"} {
+			t.Run(affinity.name+"/"+target, func(t *testing.T) {
+				service, state := contextServiceFixture(t)
+				ctx := context.Background()
+				db, err := sql.Open("sqlite3", sqliteFileURI(state.ProjectPath, "rw"))
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer db.Close()
+				for _, table := range []struct{ name, identity string }{
+					{"Sample_Env", "PlotNumber"}, {"Sample_Admin", "Plot"},
+				} {
+					columnAffinity, expectedStorage := affinity.name, affinity.storage
+					if target != "both" && target != table.name {
+						columnAffinity, expectedStorage = "TEXT", "text"
+					}
+					columns, err := readSQLiteStorageColumns(ctx, db, "main", table.name)
+					if err != nil {
+						t.Fatal(err)
+					}
+					projection := make([]string, len(columns))
+					for i, column := range columns {
+						projection[i] = quoteHeaderIdentifier(column.Name)
+						if column.Name == table.identity {
+							expression := "CAST(" + projection[i] + " AS " + columnAffinity + ")"
+							if columnAffinity == "" {
+								expression = "CASE WHEN 1 THEN CAST(" + projection[i] + " AS INTEGER) END"
+							}
+							projection[i] = expression + " AS " + projection[i]
+						}
+					}
+					name, identity := quoteHeaderIdentifier(table.name), quoteHeaderIdentifier(table.identity)
+					if _, err := db.Exec(`PRAGMA legacy_alter_table=ON; CREATE TABLE FindReplacement AS SELECT ` + strings.Join(projection, ",") +
+						` FROM ` + name + ` WHERE CAST(` + identity + ` AS BLOB)=CAST('108050' AS BLOB);
+					DROP TABLE ` + name + `; ALTER TABLE FindReplacement RENAME TO ` + name + `; PRAGMA legacy_alter_table=OFF`); err != nil {
+						t.Fatal(err)
+					}
+					var storage string
+					if err := db.QueryRow(`SELECT typeof(` + identity + `) FROM ` + name).Scan(&storage); err != nil || storage != expectedStorage {
+						t.Fatal("fixture did not retain intended physical storage", table.name, storage, err)
+					}
+					if _, err := db.Exec(`INSERT INTO `+name+`(`+identity+`) VALUES(?)`, " A' # "); err != nil {
+						t.Fatal(err)
+					}
+				}
+				before := databaseBytes(t, service.projects.sqlite.attachments)
+				for _, number := range []string{"108050", "0108050", "108050.0", "1.0805e5"} {
+					result, err := service.LookupScopedPlot(ctx, state.ContextID, ScopedPlotLookup{number})
+					if affinity.name == "TEXT" && number == "108050" {
+						if err != nil || result.Plot.PlotNumber != number {
+							t.Fatal("actual text identity was refused", result, err)
+						}
+					} else if err == nil || result.ContextID != "" {
+						t.Fatal("storage affinity invented literal text ownership", number, result, err)
+					}
+				}
+				result, err := service.LookupScopedPlot(ctx, state.ContextID, ScopedPlotLookup{" A' # "})
+				if err != nil || result.Plot.PlotNumber != " A' # " {
+					t.Fatal("exact nonnumeric text identity was refused", result, err)
+				}
+				assertProfileSUFiles(t, service, before)
+			})
+		}
 	}
 }
 
