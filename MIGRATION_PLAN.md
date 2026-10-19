@@ -36,7 +36,7 @@ These states describe availability, not confidence percentages:
 | Enter SIVI/CHARS data | Preview: parent panels, mixed child Save/restore, Collected navigation/reopen and explicit child create/delete/restore/creation Undo journeys. Development: wider separately gated species/ID and cross-host combinations | Whole-form callback/navigation equivalence; child creation/deletion is not plot/parent creation |
 | Use two-page entry | Preview: complete normal117/CHARS119 parents, linked Humus/Mineral creation/editing, demonstrated vegetation cover/Collected and exact existing-list Species coedits, readonly picture children, guards and saved reopen; C/D empty memberships remain read-only. Development: broader Species/metadata/heights and host combinations have separate boundaries | Whole-form/picture mutations, populated C/D and remaining field/callback journeys; manual/NotInList, implicit creation and soil deletion/restoration remain unavailable |
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
-| Work with pictures | Preview: Picture Manager and ordinary child metadata/image selection/viewer plus reviewed `PicDir`/`PicName` metadata editing and `LookupReceipt` recovery; later same-binary Normal/CHARS complete-entry picture children remain read-only; separate owned library/directories. Development: independently gated creation/lifecycle operations | Original Add/save/default/confirmation/Current timing, creation/deletion/restoration in preview and two-page picture writes |
+| Work with pictures | Preview: Picture Manager and ordinary child metadata/image selection/viewer, reviewed `PicDir`/`PicName` metadata editing and `LookupReceipt` recovery, plus Picture Manager reference deletion and historical restoration with permanent ID reservation and durable history; later same-binary Normal/CHARS complete-entry picture children remain read-only; separate owned library/directories. Development: independently gated creation operation | Original Add/save/default/confirmation/Current timing, creation in preview and child-panel picture mutations |
 | Run profiles, Find and transfers | Preview: explicit project-owned existing-rule Save, ordered readonly preview, revalidated Apply/Next/Previous/Clear navigation and strict literal scoped Find/revalidated Open. Development: wider rule lifecycle and owned-project Env/SU transfers | Original mapped callbacks/count/scratch/filter side effects, standard Access Find dialog options/patterns/focus, unsupported criteria, external-file mutations and administration |
 | Produce priority reports | Preview: inherited Long Environment/Vegetation and Matrix; Summary None/display6/environment/ancillary plus effective common/guide-NULL references and numeric Constancy inspection/publication. Development: other summaries/options/workbooks | Remaining combined/formatted variants, populated guide/attribute data and options/user journeys; original callbacks/printing remain separate |
 | Review locations and prepare map output | Preview: explicit saved decimal coordinates, DISTINCT Location review and direct Env/SU Google Earth/KML with duplicate memberships preserved | Preferences, DMS/single-plot callbacks, viewer/remote resources and broader map journeys remain separate |
@@ -53,50 +53,64 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-picture-metadata.zip`,17,592,002 bytes, SHA256
-`8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`.
+`VPRO-Demo-2026-10-18-picture-lifecycle.zip`,17,595,458 bytes, SHA256
+`b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
-58 frontend/47 runtime flags, packaged binary SHA256
-`fba0f22f0689e8d249419ef3d19c5824015b93e007368ba5b8e59a335cea8652`,
+60 frontend/49 runtime flags, packaged binary SHA256
+`338740aaf2935eb8b44bc561ae8ff93190b6565c5c407f0b994f6a541c5524ba`,
 source-input SHA256
-`4067af9919a88927277c593aa86991fbf73cfff8f7efd5d02c9a9a4ffecd6861`.
+`3c4d279fa74f0b7b0c501b5d0d0564bc2a12677376dae174be3676d2791d6def`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. `files[].sha256` owns application/seed hashes; `launcher`
 and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
 named, not a substitute for the packaged EXE identity.
 
-Binary source is clean `2f1eaf0`. Existing `PICTURE_METADATA_WRITING` is added
-at both frontend and runtime; production app/backend/bindings/defaults and all19
-seeds remain unchanged. Frozen full-root race integration
+Binary source is `98a3c52` plus the manifest-pinned 1-line mock update in
+`frontend/src/pictureLifecycleIntegration.test.cjs` (`editorInitializing: false`);
+production app/backend/bindings/defaults and all19 seeds remain unchanged.
+Existing `PICTURE_DELETION_WRITING` and `PICTURE_DELETION_RESTORING` are added
+at both frontend and runtime. Frozen full-root race integration
 (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`, exit0
-in4878.25s) is inherited because no tracked source file changed after `2f1eaf0`.
-Initial JS1,105,490, down78.75% from5,202,547; total5,439,673. EXE43,279,872
-grows8,704 bytes versus Find57/46. No new timing/binary-shrink claim.
+in4878.25s) is inherited because no production Go/C/frontend file changed.
+Initial JS1,121,115, down78.45% from5,202,547; total5,455,303. EXE43,295,744
+grows15,872 bytes versus picture-metadata58/47. No new timing/binary-shrink claim.
 
-Current native proof across three closed owners (PIDs7332,7804,1400) verifies
-duplicate-ID101 refusal, empty and256-unit overlength `PicName` refusals,
-`Discard draft and reload picture` before writes, and three exact metadata Saves
-(`__VPRO_PictureMetadataHistory` IDs1..3, zero source `AuditTrail` changes):
-manager row3 `PicDir` -> `Default` (followed by600x360 preview), manager row4
-`PicDir` -> `NULL` and `PicName` -> `demo-plot.png` (held Save response cancelled
-into unknown-outcome blocked state, then resolved via `LookupReceipt` with
-`replayed=true` and zero extra writes), and ordinary FS882 child row8 `PicName` ->
-`demo-plot.png` after tab remount retention (followed by400x240 preview). Two
-fresh specific `CancelClose` acknowledgements precede correction/resolution, and
-complete two-page picture children remain read-only. Inputs, NULL checkboxes,
-labels and actions are visible/contained at980/1400. Saved writing-off reopen
-verifies persisted rows3/4/8 and3 history records, allows `GetMetadata`/`GetImage`
-and denies `Save`/`LookupReceipt` (2 denials); reading-off reopen denies all four
-methods (4 denials) while ordinary117-field entry remains available. All18
-non-library run files and complete `Sample.db` tables remain byte-exact.46
-combined clients, launcher races, focused Go picture race91.61s, check0/0,
-Vite/Go/exact26 embeds, independent review (`gemini-4-argon`), all23 ZIP hashes
-and final prepare-only pass. Native acceptance is not first-pass: one build-test
-env-count update and three same-owner harness selector/reload corrections were
-retained without replaying any mutation. Picture Add/creation, deletion/
-restoration, two-page picture writes and original Access callbacks remain off.
+Current native proof across four closed owners (PIDs460,12304,10944,12004)
+verifies duplicate-ID101 deletion refusal, unconfirmed review and unacknowledged
+receipt close barriers with two fresh specific `CancelClose` acknowledgements,
+`Discard uncommitted review` without writes, and two deletions plus two
+restorations in P1 (row3 ID103 and row8 ID108): permanent ID reservations
+`[103, 108]` in `__VPRO_PictureDeletionIdentity`, two durable records with
+`Restored` provenance in `__VPRO_PictureDeletionHistory`, final `tblVPics` equal
+to baseline, zero source `AuditTrail` changes and untouched PNG files. Held
+Delete response on row8 is cancelled into unknown-outcome blocked state and
+recovered via `LookupReceipt` (`replayed=true`, zero extra writes);
+`LookupRestorationReceipt` is verified read-only for row8's restoration.
+Picture Manager lifecycle fields, confirmation checkbox, actions and history
+disclosure are visible/contained at980/1400; deletion controls are absent in
+ordinary FS882 and complete two-page child panels. Three saved reopens verify
+persisted tables, cross-session `LookupReceipt` provenance collision refusal,
+fresh null `LookupReceipt`, and18 backend denials across restoring-off (4),
+deleting-off (6) and reading-off (8) while ordinary117-field entry remains
+available. All18 non-library run files and complete `Sample.db` tables remain
+byte-exact.46 combined clients, launcher races, focused Go picture lifecycle
+race65.17s, check0/0, Vite/Go/exact26 embeds, independent review
+(`gemini-4-argon`), all23 ZIP hashes and final prepare-only pass. Native
+acceptance is not first-pass: one client-test mock fix and two same-owner
+harness continuations were retained without replaying any mutation. Picture
+Add/creation, child-panel deletion and original Access callbacks remain off.
+
+The preserved58/47 picture-metadata ZIP, SHA256
+`8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`,
+owns Picture Manager and ordinary FS882 child `PicDir`/`PicName` editing,
+duplicate-ID101 and empty/256-unit `PicName` refusals, `Discard draft and reload
+picture`, three exact Saves (`__VPRO_PictureMetadataHistory` IDs1..3, zero
+`AuditTrail` changes), held-Save `LookupReceipt` recovery without replay, tab
+remount retention, two-page picture child read-only preservation and six reopen
+denials across three closed owners. Those metadata mutations are inherited, not
+rerun on60/49.
 
 The preserved57/46 Find ZIP, SHA256
 `8e0874cf0f6165422661fc08cd5d110aca6e8cf136ff55a58f41876b5b781c4d`,
@@ -254,7 +268,7 @@ before writing another service, state machine, flag or preparation layer.
 | 1 - supported journeys verified | Preserve parent/metadata and child entry/recovery/lifecycle acceptance with its exact inherited23/22 scope. Source/gates are retained; parent Undo/navigation is rechecked on31/28. Consolidate only demonstrably equivalent behavior. Wider host/source combinations remain in priority4. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
 | 2 - supported subset verified | Preserve Long/Matrix lineage and Summary None/display6/environment/ancillary plus common/guide-NULL and numeric Constancy publications. Other options/combined/formatted variants and printing remain separate. | Independent vegetation/names/membership, reviewed environment, reopened outputs and cancellation/stale/close/acknowledgement barriers sealed; environmental calibration retains kernel lineage |
 | 3 - blocked prerequisites | Real-data onboarding/project administration needs production go-mdbtools reader integration, source schema/default/identity qualification and platform/licensing closure. New-project Description/default oracle retry is explicitly closed after two attempts; do not reopen it under another name. Reuse completed F1-F3 and continue independent deliverables. | Disposable complete import/new-project/reopen/recovery before authorization; private scalar staging is not production import and merge/splinter/compare remain separate |
-| 4 | Preserve delivered linked-soil, vegetation/existing-list Species, standalone profile Save/preview/navigation, Picture Manager/ordinary picture metadata editing and `LookupReceipt` recovery, readonly complete-entry picture children and strict literal scoped Find/Open; finish broader Species/field/populated-C/D, picture creation/lifecycle/wider hosts, wider profile/Find/transfer and ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
+| 4 | Preserve delivered linked-soil, vegetation/existing-list Species, standalone profile Save/preview/navigation, Picture Manager/ordinary picture metadata editing and `LookupReceipt` recovery, Picture Manager reference deletion/historical restoration, readonly complete-entry picture children and strict literal scoped Find/Open; finish broader Species/field/populated-C/D, picture creation/wider hosts, wider profile/Find/transfer and ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
 | 5 | Preserve saved-coordinate Location/KML and saved-label portable PDF; complete required report variants/options, physical labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
 
 Priorities organize, not delete, the former thirteen deliverables:
@@ -277,7 +291,7 @@ Source contracts retain the detailed outstanding requirements.
 - Measure startup, representative large-project reads, interaction and bundle/
   binary size on the exact supported profile. Existing bounded fast reads do
   not prove every performance problem is fixed. Current deferred-entry/report
-  profile reduces initial transitive JS78.75%; measure startup and larger-project interactions
+  profile reduces initial transitive JS78.45%; measure startup and larger-project interactions
   separately rather than treating the payload budget as overall performance proof.
 - Use named profiles to control combinations. Independent backend denials stay;
   consolidation is not permission to turn all experimental flags on.

@@ -356,7 +356,7 @@ test('persistent lifecycle ownership blocks root close, transitions and backgrou
   const context = componentFunctions('App.svelte', ['handleCloseRequest', 'respondToClose', 'requestTransition',
     'respondToTransition', 'navigate', 'loadPlots', 'refresh', 'loadHierarchy'], {
     view: 'picture-manager', localEditorBusy: false, pictureCreationBusy: false, pictureLifecycleBusy: false, summaryEnvironmentalBusy: false, projectReportBusy: false,
-    busy: false, editor: null, transitionWorking: false, archivePublicationBusy: false,
+    busy: false, editor: null, editorInitializing: false, transitionWorking: false, archivePublicationBusy: false,
     vegetationPublicationBusy: false, lifeformPublicationBusy: false, summaryPublicationBusy: false,
     pendingTransition: null, closeWorking: false, closeRequest: '', closeError: '', error: '', transitionError: '',
     request: 0, stateRequest: 0, hierarchyRequest: 0, $projectState: { contextId: owner.contextId },

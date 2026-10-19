@@ -29,34 +29,39 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is reviewed58/47 picture metadata editing (`PicDir` and `PicName`)
-  and `LookupReceipt` recovery in Picture Manager and ordinary FS882 child, built
-  from clean `2f1eaf0`. `PICTURE_METADATA_WRITING` is added at both frontend and
-  runtime; production app/backend/bindings/defaults and all19 seeds remain
-  unchanged. Frozen full-root race integration (`ce0dbd2d`, exit0 in4878.25s) is
-  inherited because no tracked source file changed after `2f1eaf0`. Native proof
-  across three closed owners (PIDs7332,7804,1400) verifies duplicate-ID101
-  refusal, empty and256-unit overlength `PicName` refusals, `Discard draft and
-  reload picture` before writes, and three exact metadata Saves
-  (`__VPRO_PictureMetadataHistory` IDs1..3, zero source `AuditTrail` changes):
-  manager row3 `PicDir` -> `Default` (600x360 preview), manager row4 `PicDir` ->
-  `NULL` and `PicName` -> `demo-plot.png` (held Save cancelled into unknown-outcome
-  blocked state, then resolved via `LookupReceipt` with `replayed=true` and zero
-  extra writes), and ordinary FS882 child row8 `PicName` -> `demo-plot.png` after
-  tab remount retention (400x240 preview). Two fresh specific `CancelClose`
-  acknowledgements precede correction/resolution; complete two-page picture
-  children remain read-only. Inputs, NULL checkboxes, labels and actions measured
-  at980/1400. Saved writing-off reopen verifies persisted rows3/4/8 and3 history
-  records, allows `GetMetadata`/`GetImage` and denies `Save`/`LookupReceipt`
-  (2 denials); reading-off reopen denies all four methods (4 denials) while
-  ordinary117 entry remains available. All18 non-library run files and complete
-  `Sample.db` tables stay byte-exact.46 clients, launcher races, focused Go
-  picture race91.61s, check0/0, Vite/Go/exact26 embeds, independent review
-  (`gemini-4-argon`), all23 ZIP hashes and final prepare-only pass. Not first-pass:
-  one build-test env-count update and three same-owner harness selector/reload
-  corrections retained without mutation replay. Find57/46, Picture56/46 and older
-  workflows retain predecessor lineage. Initial JS falls78.75%; EXE grows8,704
-  bytes. No new timing/shrink claim.
+- Current preview is reviewed60/49 Picture Manager reference deletion and
+  historical restoration, built from `98a3c52` plus the manifest-pinned 1-line
+  mock update in `frontend/src/pictureLifecycleIntegration.test.cjs`
+  (`editorInitializing: false`). `PICTURE_DELETION_WRITING` and
+  `PICTURE_DELETION_RESTORING` are added at both frontend and runtime;
+  production app/backend/bindings/defaults and all19 seeds remain unchanged.
+  Frozen full-root race integration (`ce0dbd2d`, exit0 in4878.25s) is inherited
+  because no production Go/C/frontend file changed. Native proof across four
+  closed owners (PIDs460,12304,10944,12004) verifies duplicate-ID101 deletion
+  refusal, unconfirmed review and unacknowledged receipt close barriers with two
+  fresh specific `CancelClose` acknowledgements, `Discard uncommitted review`
+  without writes, and two deletions plus two restorations in P1 (row3 ID103 and
+  row8 ID108): permanent ID reservations `[103, 108]` in
+  `__VPRO_PictureDeletionIdentity`, two durable records with `Restored`
+  provenance in `__VPRO_PictureDeletionHistory`, final `tblVPics` equal to
+  baseline, zero source `AuditTrail` changes and untouched PNG files. Held
+  Delete response on row8 is cancelled into unknown-outcome blocked state and
+  recovered via `LookupReceipt` (`replayed=true`, zero extra writes);
+  `LookupRestorationReceipt` is verified read-only for row8's restoration.
+  Picture Manager lifecycle fields, confirmation checkbox, actions and history
+  disclosure measured at980/1400; deletion controls absent in ordinary FS882
+  and complete two-page child panels. Three saved reopens verify persisted
+  tables, cross-session `LookupReceipt` provenance collision refusal, fresh null
+  `LookupReceipt`, and18 backend denials across restoring-off (4), deleting-off
+  (6) and reading-off (8) while ordinary117 entry remains available. All18
+  non-library run files and complete `Sample.db` tables stay byte-exact.46
+  clients, launcher races, focused Go picture lifecycle race65.17s, check0/0,
+  Vite/Go/exact26 embeds, independent review (`gemini-4-argon`), all23 ZIP
+  hashes and final prepare-only pass. Not first-pass: one client-test mock fix
+  and two same-owner harness continuations retained without mutation replay.
+  Picture Metadata58/47, Find57/46, Picture56/46 and older workflows retain
+  predecessor lineage. Initial JS falls78.45%; EXE grows15,872 bytes. No new
+  timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -64,7 +69,7 @@ Current machine state only. Portable scope and ordered work are in
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
 - Current-source draft release run39149407850 passes seven jobs and all asset
-  checks. Default release is not the private58/47 profile or all-platform runtime
+  checks. Default release is not the private60/49 profile or all-platform runtime
   acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
@@ -180,47 +185,64 @@ qualification; that bounded journey is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-picture-metadata.zip`:17,592,002 bytes.
-  SHA256 `8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-picture-lifecycle.zip`:17,595,458 bytes.
+  SHA256 `b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Clean source `2f1eaf0`; SQLite-only EXE43,279,872 bytes, SHA256
-  `fba0f22f0689e8d249419ef3d19c5824015b93e007368ba5b8e59a335cea8652`.
-  Exact58 frontend/47 runtime gates; private launcher SHA256
-  `c88c5a9e4984dbe70d3aed98b6a7cbeddc1700f270ed1708194b3d89f61ee6de`.
-  `PICTURE_METADATA_WRITING` added at both frontend and runtime; production app/
-  Go/bindings/defaults and all19 seeds unchanged.
-- Private `picture-metadata-demo-20261018/validation-seal.json`, SHA256
-  `cc85f042130dc57fe31942a9e19880f1b7c17f321b26fd63f77385297a380384`,
+- Source `98a3c52` plus manifest-pinned `frontend/src/pictureLifecycleIntegration.test.cjs`
+  mock update (`editorInitializing: false`); SQLite-only EXE43,295,744 bytes,
+  SHA256 `338740aaf2935eb8b44bc561ae8ff93190b6565c5c407f0b994f6a541c5524ba`.
+  Exact60 frontend/49 runtime gates; private launcher SHA256
+  `dccad6b0eccbd73f70de8cfaec5fea611f983bc764e7fe272eedcffe564e2e7f`.
+  `PICTURE_DELETION_WRITING` and `PICTURE_DELETION_RESTORING` added at both
+  frontend and runtime; production app/Go/bindings/defaults and all19 seeds
+  unchanged.
+- Private `picture-lifecycle-demo-20261018/validation-seal.json`, SHA256
+  `3321012193629fa1aac9fd2d8e6f42c77022f7bea7e9475343facc9c9a129662`,
   pins source/canonical records/21 protected assets, native proofs and inherited
   frozen full-root race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`);
   source-input SHA256
-  `4067af9919a88927277c593aa86991fbf73cfff8f7efd5d02c9a9a4ffecd6861`.
-  Initial JS1,105,490 versus5,202,547; total5,439,673. EXE grows8,704 bytes;
+  `3c4d279fa74f0b7b0c501b5d0d0564bc2a12677376dae174be3676d2791d6def`.
+  Initial JS1,121,115 versus5,202,547; total5,455,303. EXE grows15,872 bytes;
   no new timing/shrink claim.
-- Native: three closed owners (PIDs7332,7804,1400). Duplicate-ID101 refusal,
-  empty/256-unit overlength `PicName` refusals, `Discard draft and reload picture`
-  before writes, and three exact metadata Saves (`__VPRO_PictureMetadataHistory`
-  IDs1..3, zero source `AuditTrail` changes): manager row3 `PicDir` -> `Default`
-  (600x360 preview), manager row4 `PicDir` -> `NULL` and `PicName` -> `demo-plot.png`
-  (held Save cancelled into unknown-outcome blocked state, then resolved via
-  `LookupReceipt` with `replayed=true` and zero extra writes), and ordinary FS882
-  child row8 `PicName` -> `demo-plot.png` after tab remount retention (400x240
-  preview). Two fresh specific `CancelClose` acknowledgements precede correction/
-  resolution; complete two-page picture children remain read-only. Inputs, NULL
-  checkboxes, labels and actions measured at980/1400. Saved writing-off reopen
-  verifies persisted rows3/4/8 and3 history records, allows `GetMetadata`/`GetImage`
-  and denies `Save`/`LookupReceipt` (2 denials); reading-off reopen denies all
-  four methods (4 denials) while ordinary117 entry remains available. All18
+- Native: four closed owners (PIDs460,12304,10944,12004). Duplicate-ID101
+  deletion refusal, unconfirmed review and unacknowledged receipt close barriers
+  with two fresh specific `CancelClose` acknowledgements, `Discard uncommitted
+  review` without writes, and two deletions plus two restorations in P1 (row3
+  ID103 and row8 ID108): permanent ID reservations `[103, 108]` in
+  `__VPRO_PictureDeletionIdentity`, two durable records with `Restored`
+  provenance in `__VPRO_PictureDeletionHistory`, final `tblVPics` equal to
+  baseline, zero source `AuditTrail` changes and untouched PNG files. Held
+  Delete response on row8 is cancelled into unknown-outcome blocked state and
+  recovered via `LookupReceipt` (`replayed=true`, zero extra writes);
+  `LookupRestorationReceipt` is verified read-only for row8's restoration.
+  Picture Manager lifecycle fields, confirmation checkbox, actions and history
+  disclosure measured at980/1400; deletion controls absent in ordinary FS882
+  and complete two-page child panels. Three saved reopens verify persisted
+  tables, cross-session `LookupReceipt` provenance collision refusal, fresh null
+  `LookupReceipt`, and18 backend denials across restoring-off (4), deleting-off
+  (6) and reading-off (8) while ordinary117 entry remains available. All18
   non-library run files and complete `Sample.db` tables stay byte-exact.
--46 combined clients, launcher races, focused Go picture race91.61s, check0/0,
-  Vite/Go/exact26 embeds pass. Distinct read-only `picture-metadata-delivery-review`
-  (`gemini-4-argon`) accepts (`review-disposition.json` SHA256
-  `d584160d2e6bd8596b0f9b39c8eab48d8428170c80e77fceed358c9c7ef5acb6`). All23
-  ZIP hashes/final prepare-only pass. Not first-pass: one build-test env-count
-  update and three same-owner harness selector/reload corrections retained
-  without mutation replay. Picture Add/creation, deletion/restoration, two-page
-  picture writes and original callbacks remain unqualified.
+-46 combined clients, launcher races, focused Go picture lifecycle race65.17s,
+  check0/0, Vite/Go/exact26 embeds pass. Distinct read-only
+  `picture-lifecycle-delivery-review` (`gemini-4-argon`) accepts
+  (`review-disposition.json` SHA256
+  `12d308b6afb080c9e1545d6f707a79e60f5d18ef83eb91091dded7045a790226`). All23
+  ZIP hashes/final prepare-only pass. Not first-pass: one client-test mock fix
+  and two same-owner harness continuations retained without mutation replay.
+  Picture Add/creation, child-panel deletion and original callbacks remain
+  unqualified.
+- Preserved58/47 picture-metadata ZIP SHA256
+  `8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`
+  (binary SHA256 `fba0f22f0689e8d249419ef3d19c5824015b93e007368ba5b8e59a335cea8652`,
+  source input SHA256 `4067af9919a88927277c593aa86991fbf73cfff8f7efd5d02c9a9a4ffecd6861`,
+  seal SHA256 `cc85f042130dc57fe31942a9e19880f1b7c17f321b26fd63f77385297a380384`)
+  owns Picture Manager and ordinary FS882 child `PicDir`/`PicName` editing,
+  duplicate-ID101 and empty/256-unit `PicName` refusals, `Discard draft and
+  reload picture`, three exact Saves (`__VPRO_PictureMetadataHistory` IDs1..3,
+  zero `AuditTrail` changes), held-Save `LookupReceipt` recovery without replay,
+  tab remount retention, two-page picture child read-only preservation and six
+  reopen denials across three closed owners; inherited, not rerun on60/49.
 - Preserved57/46 Find ZIP SHA256
   `8e0874cf0f6165422661fc08cd5d110aca6e8cf136ff55a58f41876b5b781c4d`
   (binary SHA256 `e8a583202bf35c92978ff0ada49954966ce7c22930c61d1d5cc0a0301b14f10c`,

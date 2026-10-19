@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-picture-metadata.zip`, 17,592,002 bytes.
+`VPRO-Demo-2026-10-18-picture-lifecycle.zip`, 17,595,458 bytes.
 
 SHA256:
-`8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`.
+`b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-58 frontend and 47 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+60 frontend and 49 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -129,36 +129,64 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
     `__VPRO_PictureMetadataHistory` via `LookupReceipt` without repeating the write.
     Complete two-page picture children remain read-only.
 
-Binary source is clean `2f1eaf0`. Existing `PICTURE_METADATA_WRITING` is added at
-both frontend (58 flags) and runtime (47 flags) in this private profile; production
-app, Go backend, bindings, defaults and all 19 seed files remain unchanged.
-Frozen full-root race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`,
-exit 0 in 4878.25s) is inherited because no tracked source file changed after
-`2f1eaf0`.
+17. In Forms > **Plot Pictures — Read-only**, select literal `P1` and **Load
+    linked pictures**. Select a row with a unique signed32 Long ID (such as row 3,
+    ID 103 or row 8, ID 108) and click **Review deletion of selected picture
+    reference**. Confirm the checkbox and click **Delete reviewed picture
+    reference**, then **Acknowledge committed picture receipt**. The reference is
+    removed from `tblVPics`, its ID is permanently reserved in
+    `__VPRO_PictureDeletionIdentity` and its complete 5-column original is recorded
+    in `__VPRO_PictureDeletionHistory`; the image file is untouched. Open
+    **Historical picture deletions**, click **Load deletion history**, click
+    **Review historical restoration**, confirm and click **Restore historical
+    picture reference**, then **Acknowledge committed picture receipt**. If a
+    mutation response is interrupted, **Recover picture receipt read-only** queries
+    `LookupReceipt` / `LookupRestorationReceipt` without repeating the mutation.
+    Ordinary FS882 and complete two-page child panels do not expose deletion.
 
-Current native acceptance across three closed owners (PIDs 7332, 7804, 1400)
-verifies duplicate-ID 101 refusal, empty and 256-unit overlength `PicName`
-refusals, `Discard draft and reload picture` before writes, and three exact
-metadata Saves (`__VPRO_PictureMetadataHistory` IDs 1..3, zero source `AuditTrail`
-changes): manager row 3 `PicDir` -> `Default` (followed by 600x360 preview),
-manager row 4 `PicDir` -> `NULL` and `PicName` -> `demo-plot.png` (held Save
-response cancelled into unknown-outcome blocked state, then resolved via
-`LookupReceipt` with `replayed=true` and zero extra writes), and ordinary FS882
-child row 8 `PicName` -> `demo-plot.png` after tab remount retention (followed by
-400x240 preview). Two fresh specific `CancelClose` acknowledgements precede
-correction/resolution, and complete two-page picture children remain read-only.
-Inputs, NULL checkboxes, labels and actions are visible/contained at 980/1400.
-Saved writing-off reopen verifies persisted rows 3/4/8 and 3 history records,
-allows `GetMetadata`/`GetImage` and denies `Save`/`LookupReceipt` (2 denials);
-reading-off reopen denies all four methods (4 denials) while ordinary 117-field
-entry remains available. All 18 non-library run files and complete `Sample.db`
-tables remain byte-exact. 46 combined client cases, launcher races, focused Go
-picture race 91.61s, check 0/0, isolated Vite/Go/exact 26 embeds, independent
-review (`gemini-4-argon`), all 23 ZIP payload hashes and final prepare-only pass.
-Native acceptance is not first-pass: one build-test env-count update and three
-same-owner harness selector/reload corrections were retained without replaying any
-mutation. Picture Add/creation, deletion/restoration, two-page picture writes and
-original Access callbacks remain unqualified.
+Binary source is `98a3c52` plus the manifest-pinned 1-line mock update in
+`frontend/src/pictureLifecycleIntegration.test.cjs` (`editorInitializing: false`);
+production app, Go backend, bindings, defaults and all 19 seed files remain
+unchanged. Existing `PICTURE_DELETION_WRITING` and `PICTURE_DELETION_RESTORING`
+are added at both frontend (60 flags) and runtime (49 flags). Frozen full-root
+race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`,
+exit 0 in 4878.25s) is inherited because no production Go/C/frontend file changed.
+
+Current native acceptance across four closed owners (PIDs 460, 12304, 10944,
+12004) verifies duplicate-ID 101 deletion refusal, unconfirmed review and
+unacknowledged receipt close barriers with two fresh specific `CancelClose`
+acknowledgements, `Discard uncommitted review` without writes, and two deletions
+plus two restorations in P1 (row 3 ID 103 and row 8 ID 108): permanent ID
+reservations `[103, 108]` in `__VPRO_PictureDeletionIdentity`, two durable records
+with `Restored` provenance in `__VPRO_PictureDeletionHistory`, final `tblVPics`
+equal to baseline, zero source `AuditTrail` changes and untouched PNG files. Held
+Delete response on row 8 is cancelled into unknown-outcome blocked state and
+recovered via `LookupReceipt` (`replayed=true`, zero extra writes);
+`LookupRestorationReceipt` is verified read-only for row 8's restoration.
+Picture Manager lifecycle fields, confirmation checkbox, actions and history
+disclosure are visible/contained at 980/1400; deletion controls are absent in
+ordinary FS882 and complete two-page child panels. Three saved reopens verify
+persisted tables, cross-session `LookupReceipt` provenance collision refusal,
+fresh null `LookupReceipt`, and 18 backend denials across restoring-off (4),
+deleting-off (6) and reading-off (8) while ordinary 117-field entry remains
+available. All 18 non-library run files and complete `Sample.db` tables remain
+byte-exact. 46 combined client cases, launcher races, focused Go picture
+deletion/restoration race 65.17s, check 0/0, isolated Vite/Go/exact 26 embeds,
+independent review (`gemini-4-argon`), all 23 ZIP payload hashes and final
+prepare-only pass. Native acceptance is not first-pass: one client-test mock fix
+and two same-owner harness continuations were retained without replaying any
+mutation. Picture Add/creation, child-panel deletion and original Access callbacks
+remain unqualified.
+
+The immutable58/47 picture-metadata predecessor, SHA256
+`8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`,
+owns Picture Manager and ordinary FS882 child `PicDir`/`PicName` editing,
+duplicate-ID 101 and empty/256-unit `PicName` refusals, `Discard draft and reload
+picture`, three exact Saves (`__VPRO_PictureMetadataHistory` IDs 1..3, zero
+`AuditTrail` changes), held-Save `LookupReceipt` recovery without replay, tab
+remount retention, two-page picture child read-only preservation and six reopen
+denials across three closed owners. Those metadata mutations were not replayed
+on 60/49.
 
 The immutable57/46 Find predecessor, SHA256
 `8e0874cf0f6165422661fc08cd5d110aca6e8cf136ff55a58f41876b5b781c4d`,
@@ -269,9 +297,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is1,105,490 bytes versus5,202,547 before
-deferral (78.75% less); total JavaScript is5,439,673. The EXE grows8,704 bytes
-versus the Find predecessor; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is1,121,115 bytes versus5,202,547 before
+deferral (78.45% less); total JavaScript is5,455,303. The EXE grows15,872 bytes
+versus the picture-metadata predecessor; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
@@ -302,8 +330,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,279,872 bytes,8,704 above the Find
-predecessor; deferred loading is not a binary-size reduction. An earlier
+The qualified preview executable is43,295,744 bytes,15,872 above the
+picture-metadata predecessor; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 
