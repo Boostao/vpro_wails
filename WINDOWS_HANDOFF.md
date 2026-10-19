@@ -29,29 +29,34 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is reviewed57/46 strict literal scoped Find and revalidated
-  Open, built from458bcd7 plus the manifest-pinned scopedplotlookup.go and
-  scopedplotlookup_test.go delta, not a clean-commit build. SOURCE_PLOT_FIND is
-  the only added frontend flag; runtime46 flags, exact launcher and all19 seeds
-  remain unchanged. Three Find predicates require actual text storage and
-  byte-exact CAST-AS-BLOB identity in Env, Admin and USysEnv, avoiding SQLite
-  numeric-affinity normalization while leaving other readers/defaults unchanged.
-  First-pass corrected-binary native proof covers P2 review without leaving P1,
-  five literal refusals (empty, case/space variants, missing P99), already-open
-  target refusal, dirty Cancel/Discard, actual revalidated P2/P1 navigation and
-  original field restoration. Held successful lookup disables lookup/dismiss,
-  requires a fresh specific CancelClose before release and does not navigate
-  until explicit Open. Find has no Cancel/remount claim. Input label and three
-  actions measured980/1400. One owner closes; all19 files/full project/library
-  snapshots exact; zero writes/audits/history. Native scope is Report; other
-  SU/profile combinations retain fast-test coverage.18 affinity cases,6 clients,
-  launcher races, focused lookup race5.423s, check0/0, Vite/Go/exact26 embeds and
-  frozen full-root race integration (exit0 in4878.25s with explicit90m budget;
-  failed45m timeout receipt preserved) pass. Independent review accepts; all23
-  ZIP hashes/final prepare-only pass. Uncorrected57/46 candidate remains
-  preserved and unpromoted. Picture56/46 (including its later same-binary
-  Normal117/CHARS119 supplement) and older workflows retain predecessor lineage.
-  Initial JS falls78.93%; EXE grows4,096 bytes. No new timing/shrink claim.
+- Current preview is reviewed58/47 picture metadata editing (`PicDir` and `PicName`)
+  and `LookupReceipt` recovery in Picture Manager and ordinary FS882 child, built
+  from clean `2f1eaf0`. `PICTURE_METADATA_WRITING` is added at both frontend and
+  runtime; production app/backend/bindings/defaults and all19 seeds remain
+  unchanged. Frozen full-root race integration (`ce0dbd2d`, exit0 in4878.25s) is
+  inherited because no tracked source file changed after `2f1eaf0`. Native proof
+  across three closed owners (PIDs7332,7804,1400) verifies duplicate-ID101
+  refusal, empty and256-unit overlength `PicName` refusals, `Discard draft and
+  reload picture` before writes, and three exact metadata Saves
+  (`__VPRO_PictureMetadataHistory` IDs1..3, zero source `AuditTrail` changes):
+  manager row3 `PicDir` -> `Default` (600x360 preview), manager row4 `PicDir` ->
+  `NULL` and `PicName` -> `demo-plot.png` (held Save cancelled into unknown-outcome
+  blocked state, then resolved via `LookupReceipt` with `replayed=true` and zero
+  extra writes), and ordinary FS882 child row8 `PicName` -> `demo-plot.png` after
+  tab remount retention (400x240 preview). Two fresh specific `CancelClose`
+  acknowledgements precede correction/resolution; complete two-page picture
+  children remain read-only. Inputs, NULL checkboxes, labels and actions measured
+  at980/1400. Saved writing-off reopen verifies persisted rows3/4/8 and3 history
+  records, allows `GetMetadata`/`GetImage` and denies `Save`/`LookupReceipt`
+  (2 denials); reading-off reopen denies all four methods (4 denials) while
+  ordinary117 entry remains available. All18 non-library run files and complete
+  `Sample.db` tables stay byte-exact.46 clients, launcher races, focused Go
+  picture race91.61s, check0/0, Vite/Go/exact26 embeds, independent review
+  (`gemini-4-argon`), all23 ZIP hashes and final prepare-only pass. Not first-pass:
+  one build-test env-count update and three same-owner harness selector/reload
+  corrections retained without mutation replay. Find57/46, Picture56/46 and older
+  workflows retain predecessor lineage. Initial JS falls78.75%; EXE grows8,704
+  bytes. No new timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -59,7 +64,7 @@ Current machine state only. Portable scope and ordered work are in
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
 - Current-source draft release run39149407850 passes seven jobs and all asset
-  checks. Default release is not the private57/46 profile or all-platform runtime
+  checks. Default release is not the private58/47 profile or all-platform runtime
   acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
@@ -175,48 +180,58 @@ qualification; that bounded journey is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-scoped-find.zip`:17,589,461 bytes.
-  SHA256 `8e0874cf0f6165422661fc08cd5d110aca6e8cf136ff55a58f41876b5b781c4d`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-picture-metadata.zip`:17,592,002 bytes.
+  SHA256 `8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Source `458bcd7` plus manifest-pinned `scopedplotlookup.go` and
-  `scopedplotlookup_test.go` delta, not a clean-commit build; SQLite-only
-  EXE43,271,168 bytes, SHA256
-  `e8a583202bf35c92978ff0ada49954966ce7c22930c61d1d5cc0a0301b14f10c`.
-  Exact57 frontend/46 runtime gates; private launcher SHA256
-  `94a991bc849244b76e6691d8acf192685e9e29a0310be5238f8d76524ec25d4c`.
-  `SOURCE_PLOT_FIND` frontend added; runtime flags, launcher,all19 seeds and
-  defaults unchanged. Three Find predicates require `typeof(...)='text'` and
-  `CAST(... AS BLOB)` in `Env`, `Admin` and `USysEnv`; other readers unchanged.
-- Private `scoped-find-literal-demo-20261018/validation-seal.json`, SHA256
-  `d73f7c8f2d5dd7986fd35940bfcf1cea59685a51a1cfdd77bc792bd4d513eeab`,
-  pins source/canonical records/21 protected assets, native proofs and
-  frozen full-root race integration (`find-literal-storage-20261018/retry-90m/integration.json`,
-  SHA256 `ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`,
-  exit0 in4878.25s with source input SHA256
-  `efdb2da555ef7b3efef234b11908a9bd688b0619c1852873950e0da8d04f0047` and output
-  SHA256 `8d20e356e517fb309af227f4483d0b1f449b140a10cddeca25daca834a97e336`,
-  plus preserved failed45m timeout receipt SHA256
-  `a98f403c6845fbea3b1c4e8eec995839c4075d435fbf8146fde550b9d553c06c`);
-  candidate source-input SHA256
-  `dd0fb111b410b71bdc7a836710fb84d1add5c46b56788c5f2f9adf900e2de944`.
-  Initial JS1,096,394 versus5,202,547; total5,430,528. EXE grows4,096 bytes;
+- Clean source `2f1eaf0`; SQLite-only EXE43,279,872 bytes, SHA256
+  `fba0f22f0689e8d249419ef3d19c5824015b93e007368ba5b8e59a335cea8652`.
+  Exact58 frontend/47 runtime gates; private launcher SHA256
+  `c88c5a9e4984dbe70d3aed98b6a7cbeddc1700f270ed1708194b3d89f61ee6de`.
+  `PICTURE_METADATA_WRITING` added at both frontend and runtime; production app/
+  Go/bindings/defaults and all19 seeds unchanged.
+- Private `picture-metadata-demo-20261018/validation-seal.json`, SHA256
+  `cc85f042130dc57fe31942a9e19880f1b7c17f321b26fd63f77385297a380384`,
+  pins source/canonical records/21 protected assets, native proofs and inherited
+  frozen full-root race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`);
+  source-input SHA256
+  `4067af9919a88927277c593aa86991fbf73cfff8f7efd5d02c9a9a4ffecd6861`.
+  Initial JS1,105,490 versus5,202,547; total5,439,673. EXE grows8,704 bytes;
   no new timing/shrink claim.
-- Native: first-pass on corrected binary. P2 review leaves P1 open; five literal
-  refusals, already-open target refusal, dirty Cancel/Discard, revalidated P2/P1
-  navigation and original field restoration pass. Held successful lookup disables
-  lookup/dismiss, requires fresh specific CancelClose before release and does not
-  navigate until explicit Open. Find has no Cancel/remount claim. Input label and
-  three actions measured at980/1400. One owner closes (PID8676); all19 files/full
-  project/library snapshots exact; zero writes/audits/history. Native scope is
-  Report; alternate SU/profile combinations retain fast-test coverage.
--18 affinity cases,6 combined Find/startup clients, launcher races, focused
-  lookup race5.423s, check0/0, Vite/Go/exact26 embeds and90m full-root race pass.
-  Distinct read-only `strict-find-review` accepts (`review-disposition.json`
-  SHA256 `a23d552210dfef233c42e8f849c50677f42336d198f5fb30dc697982a8857ef3`).
-  All23 ZIP hashes/final prepare-only pass. Uncorrected `scoped-find-demo-20261018`
-  (closed owner14884) remains preserved and unpromoted. Standard Access Find
-  options/patterns/focus callbacks remain unqualified.
+- Native: three closed owners (PIDs7332,7804,1400). Duplicate-ID101 refusal,
+  empty/256-unit overlength `PicName` refusals, `Discard draft and reload picture`
+  before writes, and three exact metadata Saves (`__VPRO_PictureMetadataHistory`
+  IDs1..3, zero source `AuditTrail` changes): manager row3 `PicDir` -> `Default`
+  (600x360 preview), manager row4 `PicDir` -> `NULL` and `PicName` -> `demo-plot.png`
+  (held Save cancelled into unknown-outcome blocked state, then resolved via
+  `LookupReceipt` with `replayed=true` and zero extra writes), and ordinary FS882
+  child row8 `PicName` -> `demo-plot.png` after tab remount retention (400x240
+  preview). Two fresh specific `CancelClose` acknowledgements precede correction/
+  resolution; complete two-page picture children remain read-only. Inputs, NULL
+  checkboxes, labels and actions measured at980/1400. Saved writing-off reopen
+  verifies persisted rows3/4/8 and3 history records, allows `GetMetadata`/`GetImage`
+  and denies `Save`/`LookupReceipt` (2 denials); reading-off reopen denies all
+  four methods (4 denials) while ordinary117 entry remains available. All18
+  non-library run files and complete `Sample.db` tables stay byte-exact.
+-46 combined clients, launcher races, focused Go picture race91.61s, check0/0,
+  Vite/Go/exact26 embeds pass. Distinct read-only `picture-metadata-delivery-review`
+  (`gemini-4-argon`) accepts (`review-disposition.json` SHA256
+  `d584160d2e6bd8596b0f9b39c8eab48d8428170c80e77fceed358c9c7ef5acb6`). All23
+  ZIP hashes/final prepare-only pass. Not first-pass: one build-test env-count
+  update and three same-owner harness selector/reload corrections retained
+  without mutation replay. Picture Add/creation, deletion/restoration, two-page
+  picture writes and original callbacks remain unqualified.
+- Preserved57/46 Find ZIP SHA256
+  `8e0874cf0f6165422661fc08cd5d110aca6e8cf136ff55a58f41876b5b781c4d`
+  (binary SHA256 `e8a583202bf35c92978ff0ada49954966ce7c22930c61d1d5cc0a0301b14f10c`,
+  source input SHA256 `dd0fb111b410b71bdc7a836710fb84d1add5c46b56788c5f2f9adf900e2de944`,
+  seal SHA256 `d73f7c8f2d5dd7986fd35940bfcf1cea59685a51a1cfdd77bc792bd4d513eeab`)
+  owns strict literal scoped Find and revalidated Open, first-pass P2 review
+  without leaving P1, five literal refusals, already-open target refusal, dirty
+  Cancel/Discard, revalidated P2/P1 navigation, held-lookup `CancelClose` guard,
+  18 affinity cases,90m full-root race integration (`ce0dbd2d`, exit0 in4878.25s,
+  plus preserved failed45m timeout receipt `a98f403c`) and one closed owner
+  (PID8676) with all19 files exact; inherited, not rerun on58/47.
 - Preserved56/46 picture ZIP SHA256
   `cf11508f34a5af0aab0f1943f4115be07fefccecfbc372149362122579a7e775`
   (binary SHA256 `82464aaad993682dcd1e8e9489417ead0e465c9862ea2c342451066b1595f02d`,

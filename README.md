@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-scoped-find.zip`, 17,589,461 bytes.
+`VPRO-Demo-2026-10-18-picture-metadata.zip`, 17,592,002 bytes.
 
 SHA256:
-`8e0874cf0f6165422661fc08cd5d110aca6e8cf136ff55a58f41876b5b781c4d`.
+`8f79b91415a46e62d08e9c88722bb7dda946fe48d22b4ad5637fe96a18cf27b8`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-57 frontend and 46 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+58 frontend and 47 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -116,32 +116,58 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
     draft. Empty, case/space variants and missing identifiers refuse; already-open
     targets cannot replace the editor. No record is created.
 
-Binary source is `458bcd7` plus the manifest-pinned `scopedplotlookup.go` and
-`scopedplotlookup_test.go` delta, not a clean-commit build. `SOURCE_PLOT_FIND`
-is the only added frontend flag; runtime 46 flags, the exact launcher and all 19
-seed files remain unchanged. Three Find predicates require actual text storage
-(`typeof(...)='text'`) and byte-exact `CAST(... AS BLOB)` identity in `Env`,
-`Admin` and `USysEnv`, avoiding SQLite numeric-affinity normalization while
-leaving other readers and defaults unchanged.
+16. In Forms > **Plot Pictures — Read-only** (or ordinary P1 FS882 > Site &
+    Location > Pictures), **Load linked pictures**. Selecting duplicate-ID rows 1
+    or 2 (both ID 101) and clicking **Edit selected picture metadata** refuses
+    because an unambiguous signed32 Long ID is required. Select row 3 (ID 103),
+    click **Edit selected picture metadata**, set Picture Directory to `Default`,
+    and click **Save picture metadata only**; row 3 then previews the owned 600x360
+    manager image. Empty Picture File Name refuses while NULL Picture File Name and
+    empty/NULL Picture Directory are allowed. **Discard draft and reload picture**
+    restores stored values without undoing committed Saves. If a Save response is
+    interrupted, **Resolve picture Save receipt** checks durable
+    `__VPRO_PictureMetadataHistory` via `LookupReceipt` without repeating the write.
+    Complete two-page picture children remain read-only.
 
-Current native acceptance is first-pass on the corrected binary: P2 review leaves
-P1 open, five literal refusals (empty, case/space variants and missing `P99`),
-already-open target refusal, dirty Cancel/Discard, actual revalidated P2/P1
-navigation and original field restoration pass. A held successful lookup disables
-lookup/dismiss, requires a fresh specific `CancelClose` acknowledgement before
-release and leaves the editor on the original plot until explicit Open. Find has
-no Cancel/late-remount claim. Input label and three named actions are visible and
-contained at 980/1400. One owner closes normally; all 19 files and full project/
-library snapshots remain exact, with zero writes/audits/history. Native scope is
-`Report`; alternate SU/profile combinations retain fast-test coverage, not new
-native claims. Eighteen independent affinity cases, 6 combined Find/startup
-clients, launcher races, focused lookup race 5.423s, check 0/0, isolated Vite/Go/
-exact 26 embeds and frozen full-root race integration (exit 0 in 4878.25s under an
-explicit 90-minute budget, with the failed 45-minute timeout receipt preserved)
-pass. Independent review accepts; all 23 ZIP payload hashes and final prepare-only
-pass. The earlier uncorrected 57/46 candidate remains preserved and unpromoted.
-This is a modern literal Find/Open adaptation, not the original Access Find
-dialog's match/options/pattern/focus callbacks.
+Binary source is clean `2f1eaf0`. Existing `PICTURE_METADATA_WRITING` is added at
+both frontend (58 flags) and runtime (47 flags) in this private profile; production
+app, Go backend, bindings, defaults and all 19 seed files remain unchanged.
+Frozen full-root race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`,
+exit 0 in 4878.25s) is inherited because no tracked source file changed after
+`2f1eaf0`.
+
+Current native acceptance across three closed owners (PIDs 7332, 7804, 1400)
+verifies duplicate-ID 101 refusal, empty and 256-unit overlength `PicName`
+refusals, `Discard draft and reload picture` before writes, and three exact
+metadata Saves (`__VPRO_PictureMetadataHistory` IDs 1..3, zero source `AuditTrail`
+changes): manager row 3 `PicDir` -> `Default` (followed by 600x360 preview),
+manager row 4 `PicDir` -> `NULL` and `PicName` -> `demo-plot.png` (held Save
+response cancelled into unknown-outcome blocked state, then resolved via
+`LookupReceipt` with `replayed=true` and zero extra writes), and ordinary FS882
+child row 8 `PicName` -> `demo-plot.png` after tab remount retention (followed by
+400x240 preview). Two fresh specific `CancelClose` acknowledgements precede
+correction/resolution, and complete two-page picture children remain read-only.
+Inputs, NULL checkboxes, labels and actions are visible/contained at 980/1400.
+Saved writing-off reopen verifies persisted rows 3/4/8 and 3 history records,
+allows `GetMetadata`/`GetImage` and denies `Save`/`LookupReceipt` (2 denials);
+reading-off reopen denies all four methods (4 denials) while ordinary 117-field
+entry remains available. All 18 non-library run files and complete `Sample.db`
+tables remain byte-exact. 46 combined client cases, launcher races, focused Go
+picture race 91.61s, check 0/0, isolated Vite/Go/exact 26 embeds, independent
+review (`gemini-4-argon`), all 23 ZIP payload hashes and final prepare-only pass.
+Native acceptance is not first-pass: one build-test env-count update and three
+same-owner harness selector/reload corrections were retained without replaying any
+mutation. Picture Add/creation, deletion/restoration, two-page picture writes and
+original Access callbacks remain unqualified.
+
+The immutable57/46 Find predecessor, SHA256
+`8e0874cf0f6165422661fc08cd5d110aca6e8cf136ff55a58f41876b5b781c4d`,
+owns strict literal scoped Find and revalidated Open (`typeof(...)='text'` and
+`CAST(... AS BLOB)` in `Env`, `Admin` and `USysEnv`), first-pass P2 review without
+leaving P1, five literal refusals, already-open target refusal, dirty Cancel/
+Discard, revalidated P2/P1 navigation, held-lookup `CancelClose` guard, 18
+independent affinity cases, 90-minute full-root race integration and one closed
+owner with all 19 files exact. Those Find steps were not replayed on 58/47.
 
 The immutable56/46 picture predecessor, SHA256
 `cf11508f34a5af0aab0f1943f4115be07fefccecfbc372149362122579a7e775`,
@@ -152,8 +178,8 @@ Cancel/late-remount rejection, reading-off reopen denials and two closed owners
 with all19 files exact. A later independently reviewed supplement on that same
 56/46 binary qualifies Normal117/CHARS119 complete-entry picture children and
 held-read source/close/remount guards across two additional closed owners; those
-picture journeys were not replayed on57/46. Picture mutations, original callbacks
-and registry discovery remain unqualified.
+picture journeys were not replayed on58/47. Picture Add/lifecycle, original
+callbacks and registry discovery remain unqualified.
 
 The immutable54/45 profile predecessor, SHA256
 `6034be31ab38ee2ed5dc593409a366fdb791ef3d5f3414b0e0a6775b747dcea5`,
@@ -243,9 +269,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is1,096,394 bytes versus5,202,547 before
-deferral (78.93% less); total JavaScript is5,430,528. The EXE grows4,096 bytes
-versus the picture predecessor; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is1,105,490 bytes versus5,202,547 before
+deferral (78.75% less); total JavaScript is5,439,673. The EXE grows8,704 bytes
+versus the Find predecessor; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
@@ -276,7 +302,7 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,271,168 bytes,4,096 above the picture
+The qualified preview executable is43,279,872 bytes,8,704 above the Find
 predecessor; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
