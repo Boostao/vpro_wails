@@ -38,11 +38,11 @@ These states describe availability, not confidence percentages:
 | Edit project metadata | Preview: existing explicit record selection/editing. Development: additional creation/template/restoration boundaries | Complete original Add/copy/reference behavior and distinguish project/master storage |
 | Work with pictures | Preview: Picture Manager and ordinary child metadata/image selection/viewer, reviewed `PicDir`/`PicName` metadata editing and `LookupReceipt` recovery, plus Picture Manager reference deletion and historical restoration with permanent ID reservation and durable history; later same-binary Normal/CHARS complete-entry picture children remain read-only; separate owned library/directories. Development: independently gated creation operation | Original Add/save/default/confirmation/Current timing, creation in preview and child-panel picture mutations |
 | Run profiles, Find and transfers | Preview: explicit project-owned profile rule Save/create/delete with permanent ID reservation, ordered readonly preview, species-only presence preview, Save as SU (external file and in-project table), revalidated Apply/Next/Previous/Clear navigation, strict literal scoped Find/revalidated Open, and owned-project Env Into SU / SU Into Env transfers. Development: external SU Into Env and external profile administration | Original mapped callbacks/count/scratch/filter side effects, standard Access Find dialog options/patterns/focus, unsupported criteria, external-file profile write grants and administration |
-| Produce priority reports | Preview: inherited Long Environment/Vegetation and Matrix; Summary None/display6/environment/ancillary plus effective common/guide-NULL references and numeric Constancy inspection/publication. Development: other summaries/options/workbooks | Remaining combined/formatted variants, populated guide/attribute data and options/user journeys; original callbacks/printing remain separate |
+| Produce priority reports | Preview: all five priority report families enabled on Home — Long Environment/Vegetation, Summary Environment (options/Layer/Lifeform/Species preview and XLSX publication), Lifeform Summary (preview, Species attribute summaries and XLSX publication), Summary Vegetation (None/display6/environment/ancillary, effective common/guide-NULL references and numeric Constancy inspection/publication), plus Subzone Matrix and PC-ORD Break Report. Development: other combined/formatted options | Remaining combined/formatted variants, populated guide/attribute data and options/user journeys; original callbacks/printing remain separate |
 | Review locations and prepare map output | Preview: explicit saved decimal coordinates, DISTINCT Location review and direct Env/SU Google Earth/KML with duplicate memberships preserved | Preferences, DMS/single-plot callbacks, viewer/remote resources and broader map journeys remain separate |
 | Produce labels | Preview: exact saved single-plot card and portable Letter PDF, runtime Arial/calibrated en-US date, guarded once-only export/read-only recovery and retained receipt | Physical printing, Print All, positions/stock, live-form callbacks, Unicode/multiline/overflow output and broader regional calibration |
 | Create/import/manage projects | Incomplete: private Access reader/staging/template/DDL groundwork only | Safe end-user creation/import/conversion, merge/splinter/compare and recovery |
-| Use the ribbon and auxiliary tools | Partial: some guarded routes and read-only hierarchy/log/location replacements exist | Remaining project/SU/hierarchy administration, standards, Help and auxiliary forms |
+| Use the ribbon and auxiliary tools | Preview: read-only hierarchy/log/location/PC-ORD Break Report replacements, Project table CSV review and reviewed ZIP archive export, plus guarded SIVI/CHARS/Metadata/Picture routes | Remaining project/SU/hierarchy administration, standards, Help and auxiliary forms |
 | Install/release | Qualified private Windows preview; fourteen default-profile release payloads verified in CI | Current-profile packaging acceptance, platform runtime checks, signing/distribution boundaries |
 
 Details: [capability contracts](docs/FEATURE_CAPABILITIES.md),
@@ -53,57 +53,72 @@ that a narrower preparation or acceptance gate is complete.
 ## Supported preview profile
 
 The current supported private preview is
-`VPRO-Demo-2026-10-18-profile-transfers.zip`,17,597,033 bytes, SHA256
-`25403bd9be9dff7c583cc4b762479d106d2a108a8ca39010b4d06a93758f137d`.
+`VPRO-Demo-2026-10-18-priority-reports-ribbon.zip`,17,623,550 bytes, SHA256
+`6b4e9a2afb9747b8abda25458d47ce057d3bd0d6d5d3b9c1bde1f58e5873ccbc`.
 Run its `Launch-Demo.exe` on disposable retained data.
 
 Its embedded `package-manifest.json` is the exact profile authority:
-67 frontend/50 runtime flags, packaged binary SHA256
-`e0c0d6b2041f9132c6c32a2808b54ae691a4641592bed4e3cdbc0e31cb534ef8`,
+79 frontend/62 runtime flags, packaged binary SHA256
+`ae100e8c87ea7fe0a97278cc0ca59a79f67db2688a48aade9064bac6ffaed25e`,
 source-input SHA256
-`cd70253cc3d456773c3a51b38e83dcd05ff260108522ae7449d48f560303bb5f`.
+`5e7a713b7b76fe2f6d205f8c9143e39261d14c45326cdd359c3ff7f7d51a7ccf`.
 Do not reconstruct the profile from remembered flag aliases or silently add
 new source features. `files[].sha256` owns application/seed hashes; `launcher`
 and `walkthrough` pin those separate payloads. Predecessor lineage is explicitly
 named, not a substitute for the packaged EXE identity.
 
-Binary source is clean `c760425`. Seven existing frontend flags
-(`PROFILE_SPECIES_PRESENCE_PREVIEW`, `PROJECT_PLOT_PROFILE_CREATION`,
-`PROJECT_PLOT_PROFILE_DELETION`, `PROJECT_PLOT_PROFILE_SAVE_SU`,
-`PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT`, `SOURCE_ENV_SU_TRANSFER`,
-`SOURCE_SU_ENV_TRANSFER`) and one existing runtime flag
-(`PROFILE_SPECIES_PRESENCE_PREVIEW`) extend this private profile; production
-app/backend/bindings/defaults and all19 seeds remain unchanged. Frozen full-root
-race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`,
+Binary source is `50b39fa` plus two manifest-pinned test-mock updates in
+`frontend/src/siteUnitSummaryExtendedWorkbook.test.cjs` and
+`frontend/src/tableCSVArchiveExport.test.cjs`; production app/backend/bindings/
+defaults and all19 seeds remain unchanged. Twelve existing flags
+(`BREAK_REPORT_REVIEW`, `LIFEFORM_SUMMARY`, `LIFEFORM_WORKBOOK`,
+`SITE_UNIT_SUMMARY`, `SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK`,
+`SITE_UNIT_SUMMARY_LIFEFORMS`, `SITE_UNIT_SUMMARY_PREFERENCES`,
+`SITE_UNIT_SUMMARY_SPECIES`, `SITE_UNIT_SUMMARY_WORKBOOK`,
+`SPECIES_ATTRIBUTE_SUMMARY`, `TABLE_CSV_ARCHIVE_EXPORT`, `TABLE_CSV_REVIEW`)
+extend this private profile at both frontend and runtime. Frozen full-root race
+integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`,
 exit0 in4878.25s) is inherited because no production Go/C/frontend file changed.
-Initial JS1,126,518, down78.35% from5,202,547; total5,461,565. EXE43,301,888
-grows6,144 bytes versus picture-lifecycle60/49. No new timing/binary-shrink claim.
+Initial JS1,228,174, down76.39% from5,202,547; total5,563,324. EXE43,409,920
+grows108,032 bytes versus profile-transfers67/50. No new timing/binary-shrink claim.
 
-Current native proof across three closed owners (PIDs456,7840,2028) verifies
-rule9 creation, edition (`Layer=Any`, `Criteria=2`) and deletion on
-`Sample_Profile` with permanent reservations `[1..9]` in `__VPRO_ProfileIdentity`
-and4 durable records in `__VPRO_ProfileHistory`; species-only presence preview
-missing-Lump refusal and readonly Table/Species intersection after explicit Lump
-review; ordered preview NULL-Layer refusal and9-step `P2` match; Save as SU
-duplicate-plot refusal on `Report_SU` when `P1` is matched twice plus verified
-creation of both external `ProfileExportSU.db` (`ProfileExt_SU`) and in-project
-`ProfileProj_SU` with `__VPRO_ProfileSUHistory` provenance; and owned-project
-**SU Into Env** (`__VPRO_SUEnvironmentHistory`) and **Env Into SU**
-(`__VPRO_EnvironmentSUHistory`) transfers on `P2` plus complete-entry
-`UserSiteUnit` empty-string refusal and explicit `Clear to NULL` save. Four panel
-families are measured at980/1400, and two fresh specific `CancelClose`
-acknowledgements precede mutations. Reopen with
-`VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW=false` and `None` profile verifies
-persisted tables, external SU file hash (`b7a791007d3e21dfc09f00a67235a7c37346827979f715fe2b709de073431f9f`)
-and4 backend denials while ordinary117-field entry remains available. All17
-non-project, non-config run files stay byte-exact.37 combined clients, launcher
-races, focused Go profile/transfer race83.25s, check0/0, Vite/Go/exact26 embeds,
-independent review (`gemini-4-argon`), all23 ZIP hashes and final prepare-only
-pass. Native acceptance is not first-pass: attempt1 (PID456) closed cleanly
-before any mutation to add `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW` to the
-launcher, and same-owner continuations on PIDs7840 and2028 were retained without
-replaying any mutation. External profile write grants, external profile file/
-table creation and original Access callbacks remain off.
+Current native proof across two closed owners (PIDs8380,8068) verifies Home
+`DemoReadiness` with all5 priority report families enabled; **Lifeform Summary**
+preview (1 unit,4 physical plots), **Species attribute summary** preview (6
+attribute families) and Lifeform XLSX publication (`LifeformDemoReports.xlsx`,
+SHA256 `e8551342cee9ec9c94082046a733d36c0cc87cdd2f10b522a79f0883106fd0d0`) with
+fresh `CancelClose` before acknowledgement; **Summary Environment**
+saved-preference load, Layer preview (39 fields), Lifeform preview (49 fields),
+Species preview and Extended XLSX publication (`SummaryEnvironmentExtended.xlsx`,
+SHA256 `193284558b74af240e8afbe7ee22d16420ef1070cba4da76137337218595dc22`) with
+acknowledgement; **PC-ORD Break Report** review on seed `VPro64.db`
+`USysBreakTable` (0 rows, verified source SHA256 and disabled paging); and
+**Project table CSV review** on `Sample_Env` (55 physical rows,98 columns) plus
+ZIP archive publication (`SampleEnvMigration.zip`, SHA256
+`c765b52c489a734c727cfa655b90730849e229a6f6e5731b5641850ebeda438d`, containing
+`table.csv` and `manifest.json`) with fresh `CancelClose` before acknowledgement.
+Four panel families are measured at980/1400. Reopen with all12 runtime flags
+disabled verifies12 backend denials while ordinary117-field entry remains
+available; all18 database/image run files and complete `Sample.db`/`VPics.sqlite`
+snapshots stay byte-exact.125 combined clients, launcher races, focused Go
+report/CSV race79.16s, check0/0, Vite/Go/exact26 embeds, independent review
+(`gemini-4-argon`), all23 ZIP hashes and final prepare-only pass. Native
+acceptance is not first-pass: two test-mock updates and three same-owner
+harness continuations on PID8380 were retained without repeating any
+publication. Original Access printing/Excel callbacks and production import
+remain off.
+
+The preserved67/50 profile-transfers ZIP, SHA256
+`25403bd9be9dff7c583cc4b762479d106d2a108a8ca39010b4d06a93758f137d`,
+owns `Sample_Profile` rule9 creation, edition and deletion with permanent
+reservations `[1..9]` in `__VPRO_ProfileIdentity` and4 records in
+`__VPRO_ProfileHistory`, species-only presence preview and missing-Lump refusal,
+ordered preview and NULL-Layer refusal, Save as SU duplicate-plot refusal plus
+external `ProfileExportSU.db` and in-project `ProfileProj_SU` creation with
+`__VPRO_ProfileSUHistory` provenance, owned-project **SU Into Env** and **Env
+Into SU** transfers on `P2`, complete-entry `UserSiteUnit` empty-string refusal
+and `Clear to NULL` save, and4 reopen denials across three closed owners. Those
+profile/transfer mutations are inherited, not rerun on79/62.
 
 The preserved60/49 picture-lifecycle ZIP, SHA256
 `b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`,
@@ -280,7 +295,7 @@ before writing another service, state machine, flag or preparation layer.
 | Priority | User outcome and bounded work | Completion evidence |
 | --- | --- | --- |
 | 1 - supported journeys verified | Preserve parent/metadata and child entry/recovery/lifecycle acceptance with its exact inherited23/22 scope. Source/gates are retained; parent Undo/navigation is rechecked on31/28. Consolidate only demonstrably equivalent behavior. Wider host/source combinations remain in priority4. | Exact physical NULL/history/audits, navigation/reopen and acknowledgement/close barriers are sealed; this is not every enabled mutation or whole-form parity |
-| 2 - supported subset verified | Preserve Long/Matrix lineage and Summary None/display6/environment/ancillary plus common/guide-NULL and numeric Constancy publications. Other options/combined/formatted variants and printing remain separate. | Independent vegetation/names/membership, reviewed environment, reopened outputs and cancellation/stale/close/acknowledgement barriers sealed; environmental calibration retains kernel lineage |
+| 2 - supported subset verified | Preserve Long/Matrix lineage, Summary Environment (options/Layer/Lifeform/Species preview and XLSX publication), Lifeform Summary (preview, Species attribute summaries and XLSX publication), PC-ORD Break Report, and Summary Vegetation None/display6/environment/ancillary plus common/guide-NULL and numeric Constancy publications. Other options/combined/formatted variants and printing remain separate. | Independent vegetation/names/membership, reviewed environment, reopened outputs and cancellation/stale/close/acknowledgement barriers sealed; environmental calibration retains kernel lineage |
 | 3 - blocked prerequisites | Real-data onboarding/project administration needs production go-mdbtools reader integration, source schema/default/identity qualification and platform/licensing closure. New-project Description/default oracle retry is explicitly closed after two attempts; do not reopen it under another name. Reuse completed F1-F3 and continue independent deliverables. | Disposable complete import/new-project/reopen/recovery before authorization; private scalar staging is not production import and merge/splinter/compare remain separate |
 | 4 | Preserve delivered linked-soil, vegetation/existing-list Species, standalone profile Save/create/delete/preview/species-presence/Save-as-SU/navigation, owned-project Env/SU transfers, Picture Manager/ordinary picture metadata editing and `LookupReceipt` recovery, Picture Manager reference deletion/historical restoration, readonly complete-entry picture children and strict literal scoped Find/Open; finish broader Species/field/populated-C/D, picture creation/wider hosts, external profile/transfer and ribbon workflows. Resolve genuine business choices without inventing callbacks or destructive defects. | Every retained action mapped to an accepted user workflow or an explicitly agreed exclusion |
 | 5 | Preserve saved-coordinate Location/KML and saved-label portable PDF; complete required report variants/options, physical labels/printing and final distribution/platform acceptance. | Qualified outputs/devices/stock where required, platform runtime receipts and the exact published supported profile, not CI build success alone |
@@ -305,7 +320,7 @@ Source contracts retain the detailed outstanding requirements.
 - Measure startup, representative large-project reads, interaction and bundle/
   binary size on the exact supported profile. Existing bounded fast reads do
   not prove every performance problem is fixed. Current deferred-entry/report
-  profile reduces initial transitive JS78.35%; measure startup and larger-project interactions
+  profile reduces initial transitive JS76.39%; measure startup and larger-project interactions
   separately rather than treating the payload budget as overall performance proof.
 - Use named profiles to control combinations. Independent backend denials stay;
   consolidation is not permission to turn all experimental flags on.

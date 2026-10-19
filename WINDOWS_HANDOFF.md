@@ -29,40 +29,38 @@ Current machine state only. Portable scope and ordered work are in
 
 - Delivery reset `58c4723` is published. The current plan owns workflow status,
   not the historical root ledgers retained at `3bf43c4`.
-- Current preview is reviewed67/50 project-owned profile rule creation/deletion,
-  species-only presence preview, Save as SU (external file and in-project table)
-  and owned-project Env Into SU / SU Into Env transfers, built from clean
-  `c760425`. Seven existing frontend flags and one runtime flag
-  (`PROFILE_SPECIES_PRESENCE_PREVIEW`) are added; production app/backend/
-  bindings/defaults and all19 seeds remain unchanged. Frozen full-root race
-  integration (`ce0dbd2d`, exit0 in4878.25s) is inherited because no production
-  Go/C/frontend file changed. Native proof across three closed owners (PIDs456,
-  7840,2028) verifies rule9 creation, edition (`Layer=Any`, `Criteria=2`) and
-  deletion on `Sample_Profile` with permanent reservations `[1..9]` in
-  `__VPRO_ProfileIdentity` and4 durable records in `__VPRO_ProfileHistory`;
-  species-only presence preview missing-Lump refusal and readonly Table/Species
-  intersection after explicit Lump review; ordered preview NULL-Layer refusal
-  and9-step `P2` match; Save as SU duplicate-plot refusal on `Report_SU` when
-  `P1` is matched twice plus verified creation of both external
-  `ProfileExportSU.db` (`ProfileExt_SU`) and in-project `ProfileProj_SU` with
-  `__VPRO_ProfileSUHistory` provenance; and owned-project **SU Into Env**
-  (`__VPRO_SUEnvironmentHistory`) and **Env Into SU**
-  (`__VPRO_EnvironmentSUHistory`) transfers on `P2` plus complete-entry
-  `UserSiteUnit` empty-string refusal and explicit `Clear to NULL` save. Four
-  panel families measured at980/1400; two fresh specific `CancelClose`
-  acknowledgements precede mutations. Reopen with
-  `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW=false` and `None` profile verifies
-  persisted tables, external SU file hash (`b7a79100`) and4 backend denials
-  while ordinary117 entry remains available. All17 non-project, non-config run
-  files stay byte-exact.37 clients, launcher races, focused Go profile/transfer
-  race83.25s, check0/0, Vite/Go/exact26 embeds, independent review
-  (`gemini-4-argon`), all23 ZIP hashes and final prepare-only pass. Not
-  first-pass: attempt1 (PID456) closed cleanly before any mutation to add
-  `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW` to the launcher, and same-owner
-  continuations on PIDs7840 and2028 retained without mutation replay. Picture
-  Lifecycle60/49, Picture Metadata58/47, Find57/46, Picture56/46 and older
-  workflows retain predecessor lineage. Initial JS falls78.35%; EXE grows6,144
-  bytes. No new timing/shrink claim.
+- Current preview is reviewed79/62 Lifeform Summary/workbook, Species attribute
+  summary, Summary Environment/extended workbook, PC-ORD Break Report and
+  Project table CSV/archive, built from `50b39fa` plus two manifest-pinned
+  test-mock updates (`siteUnitSummaryExtendedWorkbook.test.cjs` and
+  `tableCSVArchiveExport.test.cjs`). Twelve existing flags are added at both
+  frontend and runtime; production app/backend/bindings/defaults and all19
+  seeds remain unchanged. Frozen full-root race integration (`ce0dbd2d`, exit0
+  in4878.25s) is inherited because no production Go/C/frontend file changed.
+  Native proof across two closed owners (PIDs8380,8068) verifies Home
+  `DemoReadiness` with all5 priority report families enabled; **Lifeform
+  Summary** preview (1 unit,4 physical plots), **Species attribute summary**
+  preview (6 attribute families) and Lifeform XLSX publication
+  (`LifeformDemoReports.xlsx`, SHA256 `e8551342`) with fresh `CancelClose`
+  before acknowledgement; **Summary Environment** saved-preference load, Layer
+  preview (39 fields), Lifeform preview (49 fields), Species preview and
+  Extended XLSX publication (`SummaryEnvironmentExtended.xlsx`, SHA256
+  `19328455`) with acknowledgement; **PC-ORD Break Report** review on seed
+  `VPro64.db` `USysBreakTable` (0 rows, verified source SHA256 and disabled
+  paging); and **Project table CSV review** on `Sample_Env` (55 physical rows,
+  98 columns) plus ZIP archive publication (`SampleEnvMigration.zip`, SHA256
+  `c765b52c`, containing `table.csv` and `manifest.json`) with fresh
+  `CancelClose` before acknowledgement. Four panel families measured at980/1400.
+  Reopen with all12 runtime flags disabled verifies12 backend denials while
+  ordinary117 entry remains available; all18 database/image run files and
+  complete `Sample.db`/`VPics.sqlite` snapshots stay byte-exact.125 clients,
+  launcher races, focused Go report/CSV race79.16s, check0/0, Vite/Go/exact26
+  embeds, independent review (`gemini-4-argon`), all23 ZIP hashes and final
+  prepare-only pass. Not first-pass: two test-mock updates and three same-owner
+  harness continuations on PID8380 retained without repeating any publication.
+  Profile Transfers67/50, Picture Lifecycle60/49, Picture Metadata58/47,
+  Find57/46, Picture56/46 and older workflows retain predecessor lineage.
+  Initial JS falls76.39%; EXE grows108,032 bytes. No new timing/shrink claim.
 - Real-data onboarding has explicit reader/schema/platform/licensing blockers.
   New-project Description/default probe has `noFurtherOracleRetry:true`; no new
   Access action is authorized by this checkpoint. Continue safe forms/report/
@@ -70,7 +68,7 @@ Current machine state only. Portable scope and ordered work are in
 - All previews remain immutable. The manifest separates current parent proofs,
   inherited cold-load/child proofs, report publications and older child lifecycle.
 - Current-source draft release run39149407850 passes seven jobs and all asset
-  checks. Default release is not the private67/50 profile or all-platform runtime
+  checks. Default release is not the private79/62 profile or all-platform runtime
   acceptance; no public release promotion occurred.
 
 ## Current accepted application integration
@@ -186,56 +184,74 @@ qualification; that bounded journey is not the overall completion condition.
 
 ## Delivered demo and hosted release
 
-- Current: `build\bin\VPRO-Demo-2026-10-18-profile-transfers.zip`:17,597,033 bytes.
-  SHA256 `25403bd9be9dff7c583cc4b762479d106d2a108a8ca39010b4d06a93758f137d`.
+- Current: `build\bin\VPRO-Demo-2026-10-18-priority-reports-ribbon.zip`:17,623,550 bytes.
+  SHA256 `6b4e9a2afb9747b8abda25458d47ce057d3bd0d6d5d3b9c1bde1f58e5873ccbc`.
   The adjacent checksum is supplied. Extract all files and run `Launch-Demo.exe`;
   every launch makes a fresh retained disposable run, not a reused seed.
-- Clean source `c760425`; SQLite-only EXE43,301,888 bytes, SHA256
-  `e0c0d6b2041f9132c6c32a2808b54ae691a4641592bed4e3cdbc0e31cb534ef8`.
-  Exact67 frontend/50 runtime gates; private launcher SHA256
-  `10a3a1c022e3ff4ad9c112605f33f9470d0eee721ce6616dd15060a567003645`.
-  Seven existing frontend flags (`PROFILE_SPECIES_PRESENCE_PREVIEW`,
-  `PROJECT_PLOT_PROFILE_CREATION`, `PROJECT_PLOT_PROFILE_DELETION`,
-  `PROJECT_PLOT_PROFILE_SAVE_SU`, `PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT`,
-  `SOURCE_ENV_SU_TRANSFER`, `SOURCE_SU_ENV_TRANSFER`) and one runtime flag
-  (`PROFILE_SPECIES_PRESENCE_PREVIEW`) added; production app/Go/bindings/defaults
-  and all19 seeds unchanged.
-- Private `profile-transfers-demo-20261018/validation-seal.json`, SHA256
-  `ac712118662d6539de57d11624e290a402acb260353e8cfd2373ed6c639b980f`,
+- Source `50b39fa` plus manifest-pinned test-mock updates in
+  `frontend/src/siteUnitSummaryExtendedWorkbook.test.cjs` and
+  `frontend/src/tableCSVArchiveExport.test.cjs`; SQLite-only EXE43,409,920 bytes,
+  SHA256 `ae100e8c87ea7fe0a97278cc0ca59a79f67db2688a48aade9064bac6ffaed25e`.
+  Exact79 frontend/62 runtime gates; private launcher SHA256
+  `90fc71a191187cd012c3776e595aaf1b993fb53c0b001060c54d14d12facf0e7`.
+  Twelve existing flags (`BREAK_REPORT_REVIEW`, `LIFEFORM_SUMMARY`,
+  `LIFEFORM_WORKBOOK`, `SITE_UNIT_SUMMARY`,
+  `SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK`, `SITE_UNIT_SUMMARY_LIFEFORMS`,
+  `SITE_UNIT_SUMMARY_PREFERENCES`, `SITE_UNIT_SUMMARY_SPECIES`,
+  `SITE_UNIT_SUMMARY_WORKBOOK`, `SPECIES_ATTRIBUTE_SUMMARY`,
+  `TABLE_CSV_ARCHIVE_EXPORT`, `TABLE_CSV_REVIEW`) added at both frontend and
+  runtime; production app/Go/bindings/defaults and all19 seeds unchanged.
+- Private `priority-reports-ribbon-demo-20261018/validation-seal.json`, SHA256
+  `5671e8be6afaf1980c5f24281d310e28ef5637c0093dcbdf0f7f84395039179a`,
   pins source/canonical records/21 protected assets, native proofs and inherited
   frozen full-root race integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`);
   source-input SHA256
-  `cd70253cc3d456773c3a51b38e83dcd05ff260108522ae7449d48f560303bb5f`.
-  Initial JS1,126,518 versus5,202,547; total5,461,565. EXE grows6,144 bytes;
+  `5e7a713b7b76fe2f6d205f8c9143e39261d14c45326cdd359c3ff7f7d51a7ccf`.
+  Initial JS1,228,174 versus5,202,547; total5,563,324. EXE grows108,032 bytes;
   no new timing/shrink claim.
-- Native: three closed owners (PIDs456,7840,2028). Rule9 creation, edition
-  (`Layer=Any`, `Criteria=2`) and deletion on `Sample_Profile` with permanent
-  reservations `[1..9]` in `__VPRO_ProfileIdentity` and4 durable records in
-  `__VPRO_ProfileHistory`; species-only presence preview missing-Lump refusal
-  and readonly Table/Species intersection after explicit Lump review; ordered
-  preview NULL-Layer refusal and9-step `P2` match; Save as SU duplicate-plot
-  refusal on `Report_SU` when `P1` is matched twice plus verified creation of
-  both external `ProfileExportSU.db` (`ProfileExt_SU`, SHA256
-  `b7a791007d3e21dfc09f00a67235a7c37346827979f715fe2b709de073431f9f`) and
-  in-project `ProfileProj_SU` with `__VPRO_ProfileSUHistory` provenance; and
-  owned-project **SU Into Env** (`__VPRO_SUEnvironmentHistory`) and **Env Into
-  SU** (`__VPRO_EnvironmentSUHistory`) transfers on `P2` plus complete-entry
-  `UserSiteUnit` empty-string refusal and explicit `Clear to NULL` save. Four
-  panel families measured at980/1400; two fresh specific `CancelClose`
-  acknowledgements precede mutations. Reopen with
-  `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW=false` and `None` profile verifies
-  persisted tables, external SU file hash and4 backend denials while ordinary117
-  entry remains available. All17 non-project, non-config run files stay byte-exact.
--37 combined clients, launcher races, focused Go profile/transfer race83.25s,
-  check0/0, Vite/Go/exact26 embeds pass. Distinct read-only
-  `profile-transfers-delivery-review` (`gemini-4-argon`) accepts
+- Native: two closed owners (PIDs8380,8068). Home `DemoReadiness` confirms all5
+  priority report families enabled. **Lifeform Summary** preview (1 unit,4
+  physical plots), **Species attribute summary** preview (6 attribute families)
+  and Lifeform XLSX publication (`LifeformDemoReports.xlsx`, SHA256
+  `e8551342cee9ec9c94082046a733d36c0cc87cdd2f10b522a79f0883106fd0d0`) with
+  fresh `CancelClose` before acknowledgement; **Summary Environment**
+  saved-preference load, Layer preview (39 fields), Lifeform preview (49 fields),
+  Species preview and Extended XLSX publication
+  (`SummaryEnvironmentExtended.xlsx`, SHA256
+  `193284558b74af240e8afbe7ee22d16420ef1070cba4da76137337218595dc22`) with
+  acknowledgement; **PC-ORD Break Report** review on seed `VPro64.db`
+  `USysBreakTable` (0 rows, verified source SHA256 and disabled paging); and
+  **Project table CSV review** on `Sample_Env` (55 physical rows,98 columns)
+  plus ZIP archive publication (`SampleEnvMigration.zip`, SHA256
+  `c765b52c489a734c727cfa655b90730849e229a6f6e5731b5641850ebeda438d`,
+  containing `table.csv` and `manifest.json`) with fresh `CancelClose` before
+  acknowledgement. Four panel families measured at980/1400. Reopen with all12
+  runtime flags disabled verifies12 backend denials while ordinary117 entry
+  remains available; all18 database/image run files and complete
+  `Sample.db`/`VPics.sqlite` snapshots stay byte-exact.
+-125 combined clients, launcher races, focused Go report/CSV race79.16s, check0/0,
+  Vite/Go/exact26 embeds pass. Distinct read-only
+  `priority-reports-ribbon-delivery-review` (`gemini-4-argon`) accepts
   (`review-disposition.json` SHA256
-  `e1b098fb7176e1f2d9b8f3474cf25ec5b821dfde19d8be0e3cfef25e79cc8cb0`). All23
-  ZIP hashes/final prepare-only pass. Not first-pass: attempt1 (PID456) closed
-  cleanly before any mutation to add `VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW` to
-  the launcher, and same-owner continuations on PIDs7840 and2028 retained
-  without mutation replay. External profile write grants, external profile file/
-  table creation and original callbacks remain unqualified.
+  `5d77e22c5f94a595bf99a1ef17d4fc15238bb5f30ee41ca6d5b2fd0a69553dc6`). All23
+  ZIP hashes/final prepare-only pass. Not first-pass: two test-mock updates and
+  three same-owner harness continuations on PID8380 retained without repeating
+  any publication. Original Access printing/Excel callbacks and production
+  import remain unqualified.
+- Preserved67/50 profile-transfers ZIP SHA256
+  `25403bd9be9dff7c583cc4b762479d106d2a108a8ca39010b4d06a93758f137d`
+  (binary SHA256 `e0c0d6b2041f9132c6c32a2808b54ae691a4641592bed4e3cdbc0e31cb534ef8`,
+  source input SHA256 `cd70253cc3d456773c3a51b38e83dcd05ff260108522ae7449d48f560303bb5f`,
+  seal SHA256 `ac712118662d6539de57d11624e290a402acb260353e8cfd2373ed6c639b980f`)
+  owns `Sample_Profile` rule9 creation, edition and deletion with permanent
+  reservations `[1..9]` in `__VPRO_ProfileIdentity` and4 records in
+  `__VPRO_ProfileHistory`, species-only presence preview and missing-Lump
+  refusal, ordered preview and NULL-Layer refusal, Save as SU duplicate-plot
+  refusal plus external `ProfileExportSU.db` and in-project `ProfileProj_SU`
+  creation with `__VPRO_ProfileSUHistory` provenance, owned-project **SU Into
+  Env** and **Env Into SU** transfers on `P2`, complete-entry `UserSiteUnit`
+  empty-string refusal and `Clear to NULL` save, and4 reopen denials across
+  three closed owners; inherited, not rerun on79/62.
 - Preserved60/49 picture-lifecycle ZIP SHA256
   `b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`
   (binary SHA256 `338740aaf2935eb8b44bc561ae8ff93190b6565c5c407f0b994f6a541c5524ba`,

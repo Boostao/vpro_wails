@@ -35,10 +35,10 @@ inferring availability from menus, source files or a passed component test.
 ## Qualified Windows preview
 
 The current supported private preview is:
-`VPRO-Demo-2026-10-18-profile-transfers.zip`, 17,597,033 bytes.
+`VPRO-Demo-2026-10-18-priority-reports-ribbon.zip`, 17,623,550 bytes.
 
 SHA256:
-`25403bd9be9dff7c583cc4b762479d106d2a108a8ca39010b4d06a93758f137d`.
+`6b4e9a2afb9747b8abda25458d47ce057d3bd0d6d5d3b9c1bde1f58e5873ccbc`.
 
 Extract the entire archive and run `Launch-Demo.exe`, not `VPRO-Demo.exe`.
 Microsoft Edge WebView2 Runtime is required. Every launch creates a fresh retained
@@ -46,7 +46,7 @@ disposable run; changes persist in that run, not in the seed or next launch.
 This is a private preview, not a signed production installer.
 
 Its embedded `package-manifest.json` pins the exact binary, source-input identity,
-67 frontend and 50 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
+79 frontend and 62 runtime opt-ins. Its `DEMO.txt` gives the qualified walkthrough:
 
 1. Select P1 and open the FS882 editor; edit, Undo/Save, then inspect P2/P1.
 2. Open separately enabled SIVI/CHARS entry and its available linked workflows.
@@ -164,43 +164,74 @@ Its embedded `package-manifest.json` pins the exact binary, source-input identit
     to review and copy `Sample_Admin.UserSiteUnit` values into the selected `*_SU`
     table (`__VPRO_EnvironmentSUHistory`).
 
-Binary source is clean `c760425`. Seven existing frontend flags
-(`PROFILE_SPECIES_PRESENCE_PREVIEW`, `PROJECT_PLOT_PROFILE_CREATION`,
-`PROJECT_PLOT_PROFILE_DELETION`, `PROJECT_PLOT_PROFILE_SAVE_SU`,
-`PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT`, `SOURCE_ENV_SU_TRANSFER`,
-`SOURCE_SU_ENV_TRANSFER`) and one existing runtime flag
-(`PROFILE_SPECIES_PRESENCE_PREVIEW`) extend this private profile (67 frontend /
-50 runtime flags); production app, Go backend, bindings, defaults and all 19 seed
-files remain unchanged. Frozen full-root race integration
-(`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`, exit 0 in
-4878.25s) is inherited because no production Go/C/frontend file changed.
+19. On **Home**, verify all five priority report families (**Long Environment**,
+    **Long Vegetation**, **Summary Environment**, **Lifeform Summary**, **Summary
+    Vegetation**) are enabled. Select **DemoReports**, then open Reports >
+    **Lifeform Summary**: click **Preview Lifeform Summary** (14 lifeform rows) and
+    **Preview species attribute summaries** (6 attribute families), then **Review
+    summary workbook**, enter a new `.xlsx` path, click **Export reviewed summary
+    workbook**, and click **Acknowledge workbook outcome**. Open Reports > **Summary
+    Environment**: load saved summary options, preview **Layer covers** (39 fields),
+    switch to **Lifeform cover values** (49 fields), check **Include species list in
+    preview**, click **Review summary workbook**, enter a new `.xlsx` path, click
+    **Publish reviewed workbook**, and click **Acknowledge workbook outcome**. Open
+    Reports > **PC-ORD Break Report** and click **Review break codes** to inspect
+    the owned `VPro64` `USysBreakTable` snapshot. Open Interchange > **Project table
+    CSV review**, select `Sample_Env`, click **Review core table CSV**, enter a new
+    `.zip` path, click **Export reviewed Sample_Env migration archive** (producing
+    `table.csv` and `manifest.json`), and click **Acknowledge archive outcome;
+    retain all receipts**.
 
-Current native acceptance across three closed owners (PIDs 456, 7840, 2028)
-verifies rule 9 creation, edition (`Layer=Any`, `Criteria=2`) and deletion on
-`Sample_Profile` with permanent reservations `[1..9]` in `__VPRO_ProfileIdentity`
-and 4 durable records in `__VPRO_ProfileHistory`; species-only presence preview
-missing-Lump refusal and readonly Table/Species intersection after explicit Lump
-review; ordered preview NULL-Layer refusal and 9-step `P2` match; Save as SU
-duplicate-plot refusal on `Report_SU` when `P1` is matched twice plus verified
-creation of both external `ProfileExportSU.db` (`ProfileExt_SU`) and in-project
-`ProfileProj_SU` with `__VPRO_ProfileSUHistory` provenance; and owned-project
-**SU Into Env** (`__VPRO_SUEnvironmentHistory`) and **Env Into SU**
-(`__VPRO_EnvironmentSUHistory`) transfers on `P2` plus complete-entry
-`UserSiteUnit` empty-string refusal and explicit `Clear to NULL` save. Four panel
-families are measured at 980/1400, and two fresh specific `CancelClose`
-acknowledgements precede mutations. Reopen with
-`VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW=false` and `None` profile verifies
-persisted tables, external SU file hash (`b7a791007d3e21dfc09f00a67235a7c37346827979f715fe2b709de073431f9f`)
-and 4 backend denials while ordinary 117-field entry remains available. All 17
-non-project, non-config run files stay byte-exact. 37 combined client cases,
-launcher races, focused Go profile/transfer race 83.25s, check 0/0, isolated
-Vite/Go/exact 26 embeds, independent review (`gemini-4-argon`), all 23 ZIP
-payload hashes and final prepare-only pass. Native acceptance is not first-pass:
-attempt 1 (PID 456) closed cleanly before any mutation to add
-`VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW` to the launcher, and same-owner
-continuations on PIDs 7840 and 2028 were retained without replaying any mutation.
-External profile write grants, external profile file/table creation and original
-Access callbacks remain unqualified.
+Binary source is `50b39fa` plus two manifest-pinned test-mock updates in
+`frontend/src/siteUnitSummaryExtendedWorkbook.test.cjs` and
+`frontend/src/tableCSVArchiveExport.test.cjs`; production app, Go backend,
+bindings, defaults and all 19 seed files remain unchanged. Twelve existing flags
+(`BREAK_REPORT_REVIEW`, `LIFEFORM_SUMMARY`, `LIFEFORM_WORKBOOK`,
+`SITE_UNIT_SUMMARY`, `SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK`,
+`SITE_UNIT_SUMMARY_LIFEFORMS`, `SITE_UNIT_SUMMARY_PREFERENCES`,
+`SITE_UNIT_SUMMARY_SPECIES`, `SITE_UNIT_SUMMARY_WORKBOOK`,
+`SPECIES_ATTRIBUTE_SUMMARY`, `TABLE_CSV_ARCHIVE_EXPORT`, `TABLE_CSV_REVIEW`) are
+added at both frontend (79 flags) and runtime (62 flags). Frozen full-root race
+integration (`ce0dbd2d25dd266944ed31536267b24b53d234c178c35da63ff180537cccb7f0`,
+exit 0 in 4878.25s) is inherited because no production Go/C/frontend file changed.
+
+Current native acceptance across two closed owners (PIDs 8380, 8068) verifies
+Home `DemoReadiness` with all 5 priority report families enabled; **Lifeform
+Summary** preview (1 unit, 4 physical plots), **Species attribute summary**
+preview (6 attribute families) and Lifeform XLSX publication
+(`LifeformDemoReports.xlsx`, SHA256
+`e8551342cee9ec9c94082046a733d36c0cc87cdd2f10b522a79f0883106fd0d0`) with fresh
+`CancelClose` before acknowledgement; **Summary Environment** saved-preference
+load, Layer preview (39 fields), Lifeform preview (49 fields), Species preview
+and Extended XLSX publication (`SummaryEnvironmentExtended.xlsx`, SHA256
+`193284558b74af240e8afbe7ee22d16420ef1070cba4da76137337218595dc22`) with
+acknowledgement; **PC-ORD Break Report** review on seed `VPro64.db`
+`USysBreakTable` (0 rows, verified source SHA256 and disabled paging); and
+**Project table CSV review** on `Sample_Env` (55 physical rows, 98 columns) plus
+ZIP archive publication (`SampleEnvMigration.zip`, SHA256
+`c765b52c489a734c727cfa655b90730849e229a6f6e5731b5641850ebeda438d`, containing
+`table.csv` and `manifest.json`) with fresh `CancelClose` before acknowledgement.
+Four panel families are measured at 980/1400. Reopen with all 12 runtime flags
+disabled verifies 12 backend denials while ordinary 117-field entry remains
+available; all 18 database/image run files and complete `Sample.db`/`VPics.sqlite`
+snapshots stay byte-exact. 125 combined client cases, launcher races, focused Go
+report/CSV race 79.16s, check 0/0, isolated Vite/Go/exact 26 embeds, independent
+review (`gemini-4-argon`), all 23 ZIP payload hashes and final prepare-only pass.
+Native acceptance is not first-pass: two test-mock updates and three same-owner
+harness continuations on PID 8380 were retained without repeating any publication.
+Original Access printing/Excel callbacks and production import remain unqualified.
+
+The immutable67/50 profile-transfers predecessor, SHA256
+`25403bd9be9dff7c583cc4b762479d106d2a108a8ca39010b4d06a93758f137d`,
+owns `Sample_Profile` rule 9 creation, edition and deletion with permanent
+reservations `[1..9]` in `__VPRO_ProfileIdentity` and 4 records in
+`__VPRO_ProfileHistory`, species-only presence preview and missing-Lump refusal,
+ordered preview and NULL-Layer refusal, Save as SU duplicate-plot refusal plus
+external `ProfileExportSU.db` and in-project `ProfileProj_SU` creation with
+`__VPRO_ProfileSUHistory` provenance, owned-project **SU Into Env** and **Env Into
+SU** transfers on `P2`, complete-entry `UserSiteUnit` empty-string refusal and
+`Clear to NULL` save, and 4 reopen denials across three closed owners. Those
+profile/transfer mutations were not replayed on 79/62.
 
 The immutable60/49 picture-lifecycle predecessor, SHA256
 `b64ea45f46c56f7f8ada1d8a2aa346bdfe1ae517452b5c4f732fcb9e79332384`,
@@ -332,9 +363,9 @@ reference-snapshot optimization remains: clean/dirty session view medians fell
 98.85/95.72ms to0.65/0.50ms on the captured6,040,765-byte wire. These are inherited
 bounded measurements, not fresh timing or initial-load/SQL speedup claims.
 
-Current initial transitive JavaScript is1,126,518 bytes versus5,202,547 before
-deferral (78.35% less); total JavaScript is5,461,565. The EXE grows6,144 bytes
-versus the picture-lifecycle predecessor; no new startup or binary-shrink claim.
+Current initial transitive JavaScript is1,228,174 bytes versus5,202,547 before
+deferral (76.39% less); total JavaScript is5,563,324. The EXE grows108,032 bytes
+versus the profile-transfers predecessor; no new startup or binary-shrink claim.
 Cold-load/child Save/restore proofs retain the startup predecessor's exact binary
 lineage. Long report publications retain the report predecessor's lineage; other
 metadata/child lifecycle mutations retain their23/22 predecessor scope. They
@@ -365,8 +396,8 @@ wails3 task windows:build:sqliteonly
 
 The explicit SQLite-only Windows profile omits optional DuckDB linkage without
 removing canonical SQLite workflows. It does not enable experimental features.
-The qualified preview executable is43,301,888 bytes,6,144 above the
-picture-lifecycle predecessor; deferred loading is not a binary-size reduction. An earlier
+The qualified preview executable is43,409,920 bytes,108,032 above the
+profile-transfers predecessor; deferred loading is not a binary-size reduction. An earlier
 controlled same-assets comparison measured about 38.4 MB SQLite-only versus 87.8 MB with
 optional DuckDB; do not confuse those different build identities.
 
