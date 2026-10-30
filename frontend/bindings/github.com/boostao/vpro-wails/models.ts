@@ -5,6 +5,58 @@
 // @ts-ignore: Unused imports
 import * as breakreport$0 from "./internal/reports/breakreport/models.js";
 
+export interface AccessDatabaseInspection {
+    "sourcePath": string;
+    "sourceSha256": string;
+    "projects": AccessProjectCandidate[] | null;
+}
+
+export interface AccessImportTableSummary {
+    "suffix": string;
+    "sourceTable": string;
+    "description": string;
+    "rowCount": number;
+    "columnCount": number;
+    "action": string;
+    "present": boolean;
+}
+
+export interface AccessProjectCandidate {
+    "sourceProject": string;
+    "suggestedTarget": string;
+    "suggestedDestPath": string;
+    "sourceVersion": string;
+    "conversionMode": string;
+    "compatible": boolean;
+    "statusMessage": string;
+    "plotCount": number;
+    "tables": AccessImportTableSummary[] | null;
+    "optionalSUs": string[] | null;
+}
+
+export interface AccessProjectImportRequest {
+    "sourcePath": string;
+    "sourceProject": string;
+    "targetProject": string;
+    "destinationPath": string;
+    "activateOnSuccess": boolean;
+}
+
+export interface AccessProjectImportResult {
+    "sourcePath": string;
+    "sourceProject": string;
+    "sourceVersion": string;
+    "conversionMode": string;
+    "targetProject": string;
+    "destinationPath": string;
+    "destinationSha256": string;
+    "plotCount": number;
+    "tables": AccessImportTableSummary[] | null;
+    "importedSUs": string[] | null;
+    "activated": boolean;
+    "state"?: ProjectState | null;
+}
+
 /**
  * AuditEntry represents a record in <Project>_Audit.
  */
@@ -235,6 +287,12 @@ export interface EnvironmentWorkbookReview {
 export interface EnvironmentWorkbookSheet {
     "unit": string;
     "name": string;
+}
+
+export interface ExternalSQLiteFileInspection {
+    "selectedPath": string;
+    "projects": ProjectInfo[] | null;
+    "sus": SUInfo[] | null;
 }
 
 export interface ExternalSUEnvironmentAttemptOutcome {

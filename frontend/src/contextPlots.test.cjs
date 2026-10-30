@@ -57,6 +57,15 @@ test('verified external attachment defaults on and project choices visibly ident
   assert.match(root, /class="project-location"/);
   assert.match(root, /item\.name === project\.name/);
   assert.match(root, /\? project\.file : project\.path/);
+  assert.match(root, /id="browse-external-sqlite"/);
+  assert.match(root, /ContextService\.ChooseExternalSQLiteFile/);
+  assert.match(root, /id="reveal-explorer-btn"/);
+  assert.match(root, /id="reveal-root-explorer-btn"/);
+  assert.match(root, /ContextService\.RevealInFileExplorer/);
+  assert.match(root, /id="access-import-wizard"/);
+  assert.match(root, /ContextService\.ChooseAccessDatabaseFile/);
+  assert.match(root, /ContextService\.InspectAccessDatabase/);
+  assert.match(root, /ContextService\.ImportAccessProject/);
 });
 
 test('actual editor service merge scopes nullable Audit and rejects a delayed read after context switching', async () => {

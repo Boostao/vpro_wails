@@ -178,6 +178,11 @@ export {
 } from "./models.js";
 
 export type {
+    AccessDatabaseInspection,
+    AccessImportTableSummary,
+    AccessProjectCandidate,
+    AccessProjectImportRequest,
+    AccessProjectImportResult,
     AuditEntry,
     AuditRestoreResult,
     BECCatalogueStatus,
@@ -201,6 +206,7 @@ export type {
     EnvironmentWorkbookOutcome,
     EnvironmentWorkbookReview,
     EnvironmentWorkbookSheet,
+    ExternalSQLiteFileInspection,
     ExternalSUEnvironmentAttemptOutcome,
     ExternalSUEnvironmentOutcome,
     ExternalSUEnvironmentReview,

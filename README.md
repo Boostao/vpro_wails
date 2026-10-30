@@ -18,7 +18,13 @@ complete or production-ready Access replacement. Use disposable data for writes.
 ## What can be used?
 
 The ordinary build provides existing SQLite-family selection, project/plot
-browsing, read-only hierarchy browsing and bounded FS882 entry. The 98 mapped
+browsing, native `.db` file picker attachment (`ChooseExternalSQLiteFile`),
+**Reveal in File Explorer** (`RevealInFileExplorer`) to open the active project `.db`
+or VPRO database root folder in Windows Explorer, and an **Access (`.mdb` / `.accdb`)
+Import & Autoconversion Wizard** (`InspectAccessDatabase` / `ImportAccessProject`)
+supporting `VP08`, `VP07` (`ImportVPro07`), `VP06` (`ImportVPro06`) and `VP05`
+(`ImportVPro05`) project conversion into canonical `VP08` SQLite `.db` files,
+alongside read-only hierarchy browsing and bounded FS882 entry. The 98 mapped
 parent fields and ordinary child editors have native verification within their
 documented boundaries.
 

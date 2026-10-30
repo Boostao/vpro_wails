@@ -13,6 +13,18 @@ export function CanEditMasterBEC(contextID: string): $CancellablePromise<boolean
     return $Call.ByID(3701656016, contextID);
 }
 
+export function ChooseAccessDatabaseFile(contextID: string): $CancellablePromise<string> {
+    return $Call.ByID(2171308614, contextID);
+}
+
+export function ChooseExternalSQLiteFile(contextID: string): $CancellablePromise<$models.ExternalSQLiteFileInspection> {
+    return $Call.ByID(2647311902, contextID);
+}
+
+export function ChooseNewSQLiteProjectFile(contextID: string, suggestedProject: string): $CancellablePromise<string> {
+    return $Call.ByID(127877150, contextID, suggestedProject);
+}
+
 export function CreateBlankProjectMetadata(contextID: string, request: $models.ProjectMetadataCreate): $CancellablePromise<$models.ProjectMetadataRow> {
     return $Call.ByID(2706173128, contextID, request);
 }
@@ -133,6 +145,18 @@ export function GetVegetationReadAvailability(contextID: string, plot: string): 
     return $Call.ByID(2293660121, contextID, plot);
 }
 
+export function ImportAccessProject(contextID: string, request: $models.AccessProjectImportRequest): $CancellablePromise<$models.AccessProjectImportResult> {
+    return $Call.ByID(2501692602, contextID, request);
+}
+
+export function InspectAccessDatabase(contextID: string, sourcePath: string): $CancellablePromise<$models.AccessDatabaseInspection> {
+    return $Call.ByID(4149486817, contextID, sourcePath);
+}
+
+export function InspectExternalSQLiteFile(contextID: string, path: string): $CancellablePromise<$models.ExternalSQLiteFileInspection> {
+    return $Call.ByID(3680650959, contextID, path);
+}
+
 export function ListAuditEntries(contextID: string, plot: string): $CancellablePromise<$models.AuditEntry[] | null> {
     return $Call.ByID(2687960619, contextID, plot);
 }
@@ -247,6 +271,10 @@ export function RestoreSIVIProjectAssignment(contextID: string, plot: string, hi
 
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
+}
+
+export function RevealInFileExplorer(contextID: string, target: string): $CancellablePromise<string> {
+    return $Call.ByID(1995476601, contextID, target);
 }
 
 export function ReviewEnvironmentSiteUnits(contextID: string): $CancellablePromise<$models.EnvironmentSiteUnitReview> {
