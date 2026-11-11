@@ -1,363 +1,98 @@
-# VPRO migration instructions
+# VPRO 2.0 Engineering & Multi-Agent Instructions (`vpro_wails`)
 
-## Source and safety
+## 1. Authoritative Specification & Product Direction
 
-- Build Go/Wails/Svelte with SQLite canonical. DuckDB remains optional.
-- Read `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64_forAI` Forms, Queries,
-  Modules and Tables_Def first. Preserve bindings, labels, logical grouping,
-  child links and event paths; retain exported geometry as evidence, not a fixed
-  desktop pixel-layout requirement. Never rewrite canonical Access/data.
-- Access is a selective runtime oracle on disposable copies, not the default
-  way to rediscover static properties. R APIs are precedents, not parity proof.
-- Keep unavailable workflows disabled. Distinguish mapped storage, implemented
-  drafts and verified native behavior. Record adaptations and gaps in README.
-- Access reading belongs to go-mdbtools; integrate fixture-tested import
-  boundaries rather than duplicating it.
-- Preserve the R SQLite database family, per-project physical names and
-  `_table_metadata` as native table Description storage, not just a version flag.
-  Frozen editor catalogues are read models, never substitutes for that family.
-  Foundation F1-F3 is complete: reuse default-init/runtime YAML with explicit
-  lossless JSON migration, SQLite-owned external-path contexts/TEMP views and
-  draft-safe switching. Do not restart that infrastructure. R is architectural
-  precedent, not parity proof; do not import obsolete paths or require DuckDB
-  extensions for offline startup.
+- **Single Source of Truth:** Read `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\okf\00_index.md` first, together with:
+  - `okf/02_present_state/capability_matrix.md` & `data_dictionary.md`
+  - `okf/03_future_architecture/transition_and_adoption.md`
+  - `okf/03_future_architecture/target_stack_recommendation.md`
+  - `okf/03_future_architecture/analytics_and_governance.md` (In-App MapLibre v6 + WebGPU + `PMTiles`, GeoPackage, TurboVeg 3 + XML, R `.rds`)
+  - `okf/03_future_architecture/intelligent_automation_and_abstractions.md` (`Auto-1`..`Auto-7`)
+  - `okf/03_future_architecture/documentation_help_and_release_portal.md` (Offline `F1` `LMH25` help, guided tours, BC Gov Design System portal)
+  - `okf/04_evidence_and_sources/decisions_and_gaps.md`
+- **Historical Archive Only:** Superseded October 2026 slice-by-slice parity ledgers (`MIGRATION_PLAN.md`, `WINDOWS_HANDOFF.md`, `CLIENT_SCOPE.md`, `FEATURE_CAPABILITIES.md`, `*_CONTRACT.md`) are archived in `archive/oct2026-parity-ledgers/` strictly for historical lookup. **They do NOT govern scope, feature gating, or work organization.**
+- **Feature Graduation & Anti-Drift Rules:**
+  - Graduate validated workflows to **default-ON** in standard `-tags sqliteonly` builds (`PRAGMA journal_mode = WAL`). Do **not** introduce new `VITE_*` or `VPRO_*` feature-flag sprawl; replace per-slice env flags with a clean `config.yml` `release_channel: stable | experimental` setting.
+  - Follow Will MacKenzie's verified `VPro2.0_Functions` triage (`Red = Remove`, `Orange = Deferred`, `Green/Unmarked = Priority Retain/Modify`): remove Red-marked over-builds (`PC-ORD Break Report` and standalone `CHARS` forms/menus) and expose CHARS (`Cover5a..5c`, `SnowCoverregime`, `ActiveLayerDepth`) via a single `"Show extended shrub layers"` toggle on standard FS882 / 2-Page / SIVI forms.
+  - Consolidate the flat root Go package and 86 granular Wails bindings toward cohesive domain packages/services (~12 services) while preserving existing behavior and test coverage.
+  - Product identity is **`VPro`** (*VENUS — Vegetation and Environment NexUS — Professional*, **B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program**), never `"My Company"`, `"My Product"`, `"Wails Edition"`, or `vpro-wails.app`.
+  - Release packages are **unsigned for Phase 1** (relying on static `release-manifest.json` + `SHA256SUMS.txt` verification); `VTrees` / standalone Mensuration, CWD, and WHA remain **out of scope** for Phase 1.
 
-## Work organization
+### 1.1 Surrounding Workspace & Sibling Asset Map (`C:\Users\BrunoTremblay\Work\*`)
 
-- Follow MIGRATION_PLAN.md; WINDOWS_HANDOFF.md holds only current machine state.
-  Replace stale status instead of appending another chronology.
-- One primary integrates. At most one independent delegated task runs alongside
-  it, with exclusive file ownership and a compact contract. No nested agents or
-  sibling broadcasts. One owner controls native Access.
-- Batch equivalent fields by source properties/events; reuse proven shared
-  behavior explicitly and probe differences. Keep exhaustive combinations in
-  fast tests. Time-box broken oracle debugging to 20 minutes or two attempts.
-- Keep one current baseline and candidate, one active fixture per workflow, and
-  compact data/audit differences plus representative visuals. Preserve existing
-  evidence; archive closed builds with hashes before any later deletion.
-- Stop work on user pause. Cleanup/replanning is not write enablement or permission
-  to launch another native suite.
-- Continue autonomously until the migration/work order is complete, not until
-  a fixed number of gates, batches or checkpoints is reached. Do not use a
-  gate-batch task as the overall completion condition. Record each verified
-  result, select the next safe ready backlog item and continue without another
-  "resume". Checkpoints preserve evidence and context; they are not stopping
-  points. Before declaring completion, reconcile all ordered deliverables with
-  verified outcomes or explicitly agreed exclusions.
-- Perform tests, independent review and disposable native acceptance yourself.
-  Do not ask the user to verify routine technical results or approve each next
-  step. For genuine unresolved client choices, preserve source behavior or keep
-  the affected workflow unavailable, record the question and continue independent
-  deliverables. Stop only for a user pause, a concrete safety/permission blocker
-  or a decision that blocks all remaining safe work; never invent approval or parity.
+**IMPORTANT DISCOVERY RULE:** Workspace `glob` and `grep` tools default solely to `C:\Users\BrunoTremblay\Work\vpro_wails`. Always pass explicit absolute `paths` when inspecting the sibling directories below, and **always include relevant sibling paths in subagent prompts**. Never mutate legacy `.accdb`/`.mdb`/`.zip` source archives (inspect read-only or copy to `$env:TEMP` first):
 
-## Complexity, review and commits
+1. **Authoritative Knowledge Repository (`okf/`):** `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\okf\` (start at `00_index.md`; 17 cross-linked specs across `01_history_and_evolution\`, `02_present_state\`, `03_future_architecture\`, `04_evidence_and_sources\`).
+2. **Legacy Manuals, Triage, Emails & `VPro64` Exports:** `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\`
+   - Field Manuals: `LMH25_2023_web.pdf` (2023 ed.) & `Lmh25_2015.pdf` (2015 ed.), `VProXP_Userguide.pdf`
+   - Client Scope & Triage: `VPro2.0_Functions to remove-retain-modify.pdf` (`.docx`), `_BEC_data_system_fs1a_schedule_of_services_v2 (13).md`, `VproMailExchange\` (106 emails incl. executed contract `RE26OCF433` in `0072`), `SCREENCAPS\` (21 VPro 64 PNGs)
+   - Decompiled Access Forms/VBA/Tables: `VPro64_forAI\`, `VPro64\`, `VLists\`, `VUser\`, `VMetaData\`, `Diagnostic10.xla`
+3. **545 MB Production Scale Dataset (`BECMaster`):** `C:\Users\BrunoTremblay\Work\VPRO_ACCESS_1\VPro64\`
+   - `BECMaster_fixing.accdb` (`71,567` plots, `1,651,842` veg rows, `597,277` audit rows, `BECMaster_fixing_edatopic` `57,023` rows, `spatial_overlay_BGCv13_4/8`), `Haida_Gwaii_2019.accdb`, `Manning_TEM_Vpro19.accdb`
+4. **Fresh 2026 Official `BECWeb` Master Standards:** `C:\Users\BrunoTremblay\Work\becweb_standards_2025_2026\`
+   - `BECdb_v13_2026.zip` (`BECdb_v13_2026.accdb` `2026-05-28` Version 13 + `Current_BGCunits_v13.csv` + `Current_Unique_SiteUnits_v13.csv`)
+   - `BCPlantTaxa2025_access.zip` (`BCPlantTaxonomy.accdb` `2026-02-09` Version 19 `USysAllSpecs`) + `Species_Readme_Feb_2025_Ver19.docx` + `Tree_codes_2021.docx`
+5. **Staged BC Gov Spatial Layers:** `C:\Users\BrunoTremblay\Work\spatial_assets\`
+   - `bc_ecosections_epsg4326.geojson` (`139` polygons), `bc_nr_districts_epsg4326.geojson` (`23` polygons), plus live unauthenticated BC OpenMaps WFS `pub:WHSE_FOREST_VEGETATION.BEC_BIOGEOCLIMATIC_POLY` (`17,870` BGC polygons)
+6. **Cloned MoF & BCGov R / Quarto / Vector-Tile Reference Repos:**
+   - `C:\Users\BrunoTremblay\Work\MoF-Skeena-Research\`: `BEC_R_working` (`_functions/*.R`), `BEC_Classification_Analysis`, `BEC_Unit_Reporting` (`unit.report.qmd`), `aSMR-x-rSMR` (`CMD -> aSMR`), `EdatopicGrid_Spp_Distribution`, `BEC_Clean_BECdb`, `BEC_soils_fixing`, `BGC_Postgres`, `CCISS_VectorTiles`
+   - `C:\Users\BrunoTremblay\Work\bcgov_ref\`: `BEC_ReportR`, `cciss-docs` (Quarto book reference)
+7. **Sibling Headless R Package & MDB Reader:**
+   - `C:\Users\BrunoTremblay\Work\vpro\` (`master` headless R/DuckDB/SQLite package + git commits `68b7d8b` `R/mod_becweb_map.R` / `scripts/publish_dataset.R` and `fde9833` `bcgov/climr`)
+   - `C:\Users\BrunoTremblay\Work\go-mdbtools-windows-readiness\` (CGO `libmdb` upstream hardening reference)
 
-- Assess application core and tests separately. Test volume is not application
-  complexity; retain explicit parity cases and independent expected results.
-  Do not target a helper count or split functions merely to reduce line counts.
-- Extract a shared guard/helper only for demonstrated equivalent behavior or a
-  clearer invariant boundary. Search prior art first; keep operation-specific
-  errors, cancellation, lease ownership, transaction cleanup and NULL/empty
-  distinctions visible. Test helpers and their callers; avoid helpers that
-  reproduce the implementation to calculate test expectations.
-- Before a nontrivial implementation/refactoring batch, define its contract,
-  owned files, exclusions, acceptance checks and completion condition. Track
-  implementation, validation and independent review as separate dependent tasks.
-- Independent read-only review is a default acceptance gate for nontrivial
-  application changes, not contingent on another user request. Use one reviewer
-  distinct from the implementer, with the exact diff/base and bounded contract;
-  ask for correctness, source alignment and missing acceptance coverage.
-  No nested agents, overlapping writers or native actions by the reviewer.
-  Small documentation-only checks can be direct unless delegation is requested.
-- Passing tests does not replace review. Resolve findings and rerun affected
-  checks before acceptance; obtain a focused follow-up for substantive fixes.
-  Record reviewer disposition, validation evidence and remaining unknowns.
-  If review is unavailable, checkpoint honestly as unreviewed, not accepted.
-- When a commit is authorized, inspect status and intended staged diff, separate
-  app/test/docs from private evidence or generated artifacts, and use the existing
-  commit convention and required co-author trailer. Stage explicit intended paths
-  unless the invoked commit workflow requires otherwise; preserve unrelated work.
-  Use non-interactive commands without bypassing hooks/signing, then verify the
-  commit and worktree status. No amendment or push without explicit authorization.
+---
 
-## Validation and invariant checks
+## 2. Local Windows Toolchain & Build Commands
 
-- Focused Go tests first, then `go test -race ./...` at integration. Frontend changes
-  require tests, `npm run check` and `npm run build`. Bindings/lifecycle need Wails,
-  not browser preview. Use disposable data/config/profile directories.
-- Mutations and audits share transactions; test cancellation, collision,
-  ownership, rollback, retry and restoration aliases. Reserve deleted child IDs.
-- Normalize Access BOOLEAN reads explicitly; preserve true=-1 in storage/audit.
-- Preserve unchanged historical invalid values by omitting unchanged assignments.
-  Reject malformed/new overlength text and raw JSON Unicode before decoder repair;
-  Access bounds are UTF-16 units. Do not silently trim, complete or change case.
-- Draft errors must survive tab remounts and block Save/Lock/close; clear them on
-  valid correction, Save or Undo with the appropriate editor/original identity.
-- Reference NULL/empty metadata and duplicate definitions remain distinguishable.
-  Availability, physical validity and membership are different decisions.
-- Never inherit phantom option audits, rejected-save history commits, destructive
-  restoration or implicit identity changes as desktop requirements.
-- Source action guards compare planned focus/value/context with independent
-  observations. Capture source state before fallible host COM reads; unknown
-  dialogs stop. IsLoaded is not Form view, and helper comparison must preserve
-  literals while accounting only for explicitly allowed VBA identifier recasing.
-- Verify current PID/start/path and owned windows, not remembered IDs. Restore
-  changed fixture code/bindings/settings and seal cleanup; retain unknowns honestly.
+Verified User `PATH` (`ExecutionPolicy = RemoteSigned`) already includes:
 
-Detailed behavioral evidence is in docs/FS882-6x4XL-access-contract.md. Historical
-forensic instructions and execution notes remain in the ignored maintenance
-archive; consult them for a specific issue, not as a growing default prompt.
+- **Node 22:** `C:\Users\BrunoTremblay\tools\node-v22.14.0-win-x64` (`npm` / `node`)
+- **Go & CLIs:** `C:\Program Files\Go\bin` + `C:\Users\BrunoTremblay\go\bin` (`wails3`, `task` v3.54, `pmtiles` v1.31)
+- **GitHub & Quarto CLIs:** `C:\Users\BrunoTremblay\tools\gh\bin\gh.exe` (`v2.103.3`), `C:\Users\BrunoTremblay\tools\quarto\bin\quarto.exe` (`v1.11.9`)
+- **CGO x64 GCC & NSIS (`makensis`):** `C:\Users\BrunoTremblay\tools\w64devkit\bin` (or `C:\Users\BrunoTremblay\tools\mingw64\bin`)
+- **CGO ARM64 LLVM Cross-Compiler:** `C:\Users\BrunoTremblay\tools\llvm-mingw-20260922-ucrt-x86_64\bin`
+- **R Runtime (Headless `vpro` / `BEC_R` Sidecar):** `C:\Program Files\R\R-4.5.3\bin\x64\Rscript.exe`
 
-## Learnings
+Key commands:
+- **Regenerate Wails TypeScript bindings:** Always pass **`-ts -i`** (`wails3 generate bindings -ts -i`) to preserve interface-style nullable-array contracts (`-ts` alone emits classes and breaks frontend callers).
+- **Default Desktop Build (SQLite canonical, ~38 MB without DuckDB):** `go test -tags sqliteonly ./...` and `wails3 task windows:build:sqliteonly`.
+- **Frontend Validation:** In `frontend/`, run `npm.cmd test`, `npm.cmd run check`, and `npm.cmd run build`.
+- **CGO Rebuild Note:** After changing C headers/sources nested under an amalgamating CGO file (`internal/accessreader`), force a fresh compile with `-a` (`-count=1` alone can reuse cached C objects). For full-repo `-race` runs on Windows, pass `-timeout 45m` (or `-timeout 150m` across all packages).
 
-- `GenUniqueID()` in a DAO TableDef field DefaultValue is an Access database-engine
-  random Long ID expression, not a missing VBA module function. Read actual field/
-  index metadata and the DAO DefaultValue contract before searching more modules.
-  Preserve AutoIncr/default/index distinctions; this alone does not prove allocator
-  compatibility, collision/retry/deleted-ID behavior or grant desktop creation.
+---
 
-- Bound control ValidationRule is independent of the table's storage type/range
-  and query membership; catalogue it for every live binding before acceptance.
-  For example, vegetation `<100 Or Is Null` rejects100 but does not imply a zero
-  lower bound, and unchanged historical out-of-rule values still omit assignments.
-  A binary64 value just below100 can narrow to SINGLE100; draft boundary tests
-  do not establish source conversion/validation timing without native calibration.
+## 3. Multi-Agent Parallel Orchestration
 
-- Source-equivalent vegetation SINGLE calibration narrows before the control
-  rule:99.999996 stores99.99999237060547,99.999999 rejects, and negative underflow
-  becomes source negative zero. Prepare new canonical typed assignments without
-  reinterpreting old binary64 receipts; unchanged historical omission and readonly
-  request/history validation must precede or remain separate from new-write rules.
+- Track multi-wave execution in the session SQLite `todos` and `todo_deps` tables and continue autonomously across waves until all deliverables are verified.
+- **Parallel Subagents Encouraged with Worktree Isolation:** Fan out independent tracks concurrently using `general-purpose` subagents, giving **each mutating subagent its own isolated `git worktree`** (`../vpro_wails.worktrees/waveN-<track>`) and strictly disjoint file ownership (especially around `frontend/bindings/` and shared root state).
+- Use `task` subagents to run verbose Go/Node/`svelte-check` suites and `code-review` / `rubber-duck` subagents as read-only quality gates before merging each wave into `main`.
 
-- Access database text comparison/UNION is not byte ownership or JavaScript
-  case conversion. The bounded LCID1033 Species probe equates case variants and
-  trailing spaces but distinguishes E/accented E; UCase preserves sharp-s,
-  dotless-i and long-s instead of JS/Go Unicode mappings. Preserve physical
-  definitions and NULL/empty metadata; do not infer a stable UNION representative,
-  whole-Unicode equivalence or original callback parity from these engine cases.
+---
 
-- An Access combo's COM Text setter can invoke NotInList/modal callbacks before
-  a subsequent focus change. Record source state and intent first; dispatch the
-  setter on the owned marshalled COM worker so exact known dialogs remain
-  observable. A retained prompt can continue once from that checkpoint without
-  replaying Text assignment; use native PID/start/path/window checks during modal
-  observation rather than another potentially blocked host COM property read.
+## 4. Preserved Technical & Domain Invariants (Must Not Regress)
 
-- Original Species NotInList decisions can intentionally retain codes absent
-  from the displayed layer/union: alias No, same-code/layer confirmation and
-  existing-personal paths are separate authorization decisions. Missing-code No
-  can retain typed BASE/raw input/focus while the COM setter returns Access3021;
-  preserve the error/draft distinction, never an empty value or success fallback.
-
-- Species physical sources have distinct widths: master USysAllSpecs.Lifeform
-  is LONG/signed32, personal USysUserSpp.LifeForm is INTEGER/signed16. Imported
-  SQLite INTEGER declarations do not erase that distinction. Reuse projection/
-  read invariants with explicit source policies; never silently widen an
-  independently accepted legacy consumer while correcting a new workflow.
-
-- Original A/CHARS concatenated-NULL cover warnings execute after physical Save
-  and can navigate to a clean new-record buffer without insertion; they are
-  not Save cancellation rules. An immediate independent ACE read after C
-  Dirty=False can lag final closed storage. Retain both observations and never
-  replay a completed Save to align a delayed read or recover failed capture.
-
-- Access COM ActiveControl/SetFocus is not Windows foreground/UIA focus.
-  A global GetFocusedElement can identify the VSCode document while the source
-  reports Collected. Verify the actual owned native PID/control/display before
-  input; a rejected foreign provider does not prove source inaccessibility.
-
-- Svelte deep-reactive rows are proxies, not cloneable plain objects. Use
-  `$state.snapshot` inside the guarded operation before serializing a reviewed
-  row. Extracted-function tests with plain objects cannot prove this path;
-  exercise an actual client-runtime proxy, in that runtime's object realm.
-
-- Svelte server rendering can be lazy: consume `render(...).body` and assert
-  callback execution before claiming compiled flag/profile coverage. DOM test
-  doubles placed in deep-reactive state need nonproxied class instances, like
-  real DOM nodes; plain-object mocks can cache raw dataset changes and falsely
-  hide an independently observed owner/row mismatch.
-
-- Read exact production prerequisite flag names before building a native
-  profile; a successful Vite build can still leave the intended panel gated.
-  For example, vegetation also requires `VITE_TWO_PAGE_PARENT_REVIEW` and
-  `VITE_TWO_PAGE_PARENT_ENTRY_REVIEW`, not guessed shorter aliases. Preserve
-  a failed candidate/profile and verify zero writes before correcting it.
-
-- SQLite BINARY collation alone does not establish literal text ownership:
-  column affinity can still coerce numeric or leading-zero identities. For a
-  literal source scope, require text storage and byte-exact comparison with
-  `CAST(column AS BLOB)=CAST(? AS BLOB)`; test INTEGER/NUMERIC/REAL as well as
-  TEXT/BLOB/untyped columns without changing legacy readers implicitly.
-
-- Nullable/mutable application-ID editing must check parent and peer read DTOs,
-  not just its writer. A legacy numeric-ID reader must never invent ID=0 for
-  NULL; return explicit unavailable ordinary rows/actions/totals while independent
-  physical-row views continue, and propagate unrelated read failures. Scope
-  restoration acknowledgements to the actual audit policy: ID-only technical
-  history requires a history ID but zero source audit pruning.
-
-- Collision/restoration witnesses must include complete physical peer rows, not
-  only rowid and a mutable ID. SQLite can reuse a deleted rowid: a replacement
-  peer with the same ID but different Species/PlotNumber would pass a reduced
-  witness. Test actual automatic rowid reuse and reject changed peer snapshots
-  without pruning history; permit explicit retry only after exact source recovery.
-
-- Trace active VBA control flow before planning callback effects. For example,
-  `UpdateMetadataSppList` jumps unconditionally to `MyExit` before opening or
-  editing metadata; its named purpose and dormant AddNew/Edit body are not
-  write requirements. Preserve the no-op, not invented rows, columns or audits.
-
-- Typed history changes are the audited subset, not necessarily the complete
-  committed plan. At audit strength1, a NULL addition can commit unaudited while
-  another changed field is audited. Record the full typed source plan separately
-  when proving mixed provenance, but restore only the audited subset; never reject
-  legitimate unaudited differences or implicitly restore them.
-
-- SQLite can contain malformed UTF-8 even in TEXT columns (for example
-  `CAST(X'FF' AS TEXT)`). A direct string scan must reject it before constructing
-  typed reference metadata; a nonselectable diagnostic is not sufficient because
-  later JSON serialization repairs the bytes. Keep valid empty/overlength text
-  distinct from malformed source text, and test read-error correction/retry.
-
-- Insert new top-level functions beside a unique adjacent declaration, not a
-  function signature plus an ambiguous closing brace: a patch can match the
-  first inner block and silently nest the insertion. Prefer a separate cohesive
-  file when the boundary is unclear; formatting/compilation must check the actual
-  scope before further implementation.
-
-- Closed build archives containing Go overlays must be outside package discovery
-  (an underscore-prefixed directory or an existing separate module). A copied
-  `main.go` with relative embed paths is evidence, not a runnable application
-  package. Preserve the archive/manifest bytes when moving it; verify `go list`
-  and full-suite discovery rather than treating new archive setup errors as
-  unrelated pre-existing failures.
-
-- ACE/DAO fixed-decimal Format first converts DOUBLE to fifteen significant
-  decimal digits, then rounds half-away; `math.Round(value*scale)` is not an
-  equivalent helper. Probe adjacent DOUBLEs as well as exact-looking midpoints:
-  source `1.005` becomes `1.01` at two decimals and the DOUBLE just below `0.15`
-  becomes `0.2` at one decimal. Reuse the shared calibrated decimal formatter;
-  source species criteria compare formatted values, not raw pre-format numbers.
-
-- Workbook collision guards must match the XLSX library's own name equivalence.
-  Excelize resolves sheets with `strings.EqualFold`; `strings.ToLower` keys miss
-  Unicode pairs such as `S`/long-s and can silently reuse/overwrite an existing
-  worksheet. Compare all allocated and reserved names with EqualFold and require
-  zero-output refusal in tests.
-
-- JavaScript casing is not a version-independent Go `strings.EqualFold` contract.
-  For strict client identifier ownership, generate and pin compiler SimpleFold
-  classes and check every rune against that compiler, not just selected aliases.
-  Verify reviewer witnesses on the target: Greek/ligature pairs introduced in
-  newer Unicode can remain distinct in Go1.25/Unicode15. Never fold data values
-  merely because schema identifiers need this comparison.
-
-- Client captions establish scope intent; unmarked screenshots are candidate
-  retain, not approved as-is parity, and colour-only marks need a legend before
-  excluding functionality. Help/manual explain domain intent, not current Access
-  execution or new constraints on historical data. The current target is a
-  Go/Wails desktop plus UI-free R automation; historical Shiny/cloud outcomes
-  remain separate scope tracks in docs/CLIENT_SCOPE.md.
-
-- After changing C sources nested under an amalgamating cgo file, force a fresh
-  build (`go test -a -race ./...`); `-count=1` alone can reuse stale included C
-  objects. Do not clear shared machine caches. MinGW CRT encoding tests must
-  pass environment variables at child-process startup rather than assume Go
-  `os.Setenv` changes are visible to C `getenv`.
-- The Windows root race suite currently exceeds Go's default ten-minute runner
-  timeout. Use an explicit integration budget (`go test -race -timeout 45m ./...`)
-  and retain timeout receipts as failed runner evidence, not accepted tests.
-- Generate Wails TypeScript bindings with `-ts -i`, preserving the repository's
-  interface-style nullable-array contracts; `-ts` alone generates classes and
-  changes those contracts. Do not repair consumers to accommodate the wrong mode.
-- Go 1.25 can reuse stale package-index embed patterns across different source
-  overlays; `-a` does not repair discovery. For isolated overlay builds, use
-  `GODEBUG=goindex=0` and verify `go list` reports the exact planned `EmbedPatterns`
-  before compiling; never clear shared caches or replace accepted frontend assets.
-- Shared preference editors must retain per-context drafts, draft validation and
-  irreversible mutation receipts separately. Validation blocks Save/native close
-  while keeping correction/Undo live; acknowledgement must not erase receipts.
-  In Svelte input handlers, capture the current DOM value before validating rather
-  than assuming `bind:value` has already updated its reactive variable.
-- SQLite REAL storage can normalize binary64 negative zero even when the Go
-  parameter preserves its sign. Lossless import staging must compare independently
-  reopened tagged storage and real bits, refusing unsupported normalization rather
-  than claiming scalar adaptation alone proves exact database preservation.
-- PowerShell evidence JSON must contain projected primitives, not extended
-  objects: use `Select-String ... | ForEach-Object { $_.Line }` before
-  `ConvertTo-Json`. Serializing MatchInfo/PSPath objects can recursively include
-  provider/assembly graphs and inflate a compact receipt into tens of megabytes.
-- Windows Go path-based `os.Stat` can defer physical file-ID loading until
-  `os.SameFile`, so it does not freeze identity across rename/replacement.
-  Capture planned identities with an opened handle's `Stat`, surface stat/close
-  errors, and test replacement before staging as well as after staging.
-- Native formatting must check complete output capacity, including NUL, before
-  trimming or copying a suffix. Test the actual bound-column path at the minimum
-  buffer size and size-1, not only the Go bridge's large fixed buffer; truncated
-  fractional timestamps must become sticky errors, never successful partial dates.
-- Scoped operations already hold the context's operation read lease; pool borrows
-  must reuse it rather than recursively taking the same RWMutex read lock, which
-  can deadlock behind a queued switch writer. Only unscoped read borrows acquire
-  their own lifetime lease; test release, queued switch and owned shutdown.
-- Holding the SQLite owner's mutex blocks new pool borrows, not writes through
-  already-borrowed pools: ordinary header/child transactions execute outside
-  that mutex. Independent completed snapshots prove observation-time equality,
-  not source equality at a later file link. Preserve committed publication
-  results after postcommit drift/cleanup errors; never wrap publication in a
-  snapshot helper that zeroes its result on transaction-cleanup errors.
-- A persistent pinned SQLite coordinator must use caller-owned read snapshot
-  cleanup (`beginReadSnapshot`): database/sql's automatic rollback on a cancelled
-  transaction context can discard that connection and lose all attachments/TEMP
-  views. Keep every query on the request context, check cancellation before
-  commit and surface rollback errors. Verify in-flight cancellation followed
-  by a successful read, not only cancellation before acquiring a lease.
-- Build SQLite file URIs from resolved absolute paths with proper URI escaping
-  (`net/url` in Go; `Path.as_uri()` in Python). Raw paths containing `#` can drop
-  `mode=ro` and accidentally create a truncated-name file; prove readonly behavior
-  with quotes, spaces, Unicode and URI delimiters. Verify wrapped path labels
-  for clipping as well as visibility before accepting same-name disambiguation.
-- With yaml.v3, use a map alias (`type configValues = map[string]any`) when nested
-  sections are asserted as `map[string]any`; a named map type can propagate into
-  nested decoding and invalidate those assertions. Test real Windows config
-  replacement with a handle that denies FILE_SHARE_DELETE, including rollback,
-  staging cleanup and retry; first installation must not overwrite a concurrent
-  target. Keep failed persistence from changing effective service preferences.
-- FS882 presentation should preserve field relationships, labels and meaningful
-  row/group order, not Access's tiny controls or absolute coordinates. Use the
-  Shiny `mod_fs882_6x4.R` layout as a grouping precedent and the existing Svelte/
-  Tailwind styling with responsive CSS Grid: related fields side-by-side when wide,
-  then stacked with their labels when narrow. Keep one live control per field and
-  unchanged validation/lifecycle behavior; widening the window alone does not fix
-  fixed-size inputs. Do not enable unavailable workflows during a presentation pass.
-- Native layout checks must use actual visibility (`checkVisibility()`), not just
-  nonzero rectangles: descendants of closed `details` can retain measurable boxes.
-  CSS visibility does not imply viewport intersection. After resizing, scroll the
-  intended controls/image into view, assert viewport intersection and containment,
-  then capture; use separate scrolled segments when vertical scrolling is intended.
-  Require every planned selector to resolve; an empty list must not pass an
-  `every`/`any` assertion vacuously. Measure interactive buttons/disclosures as
-  well as data fields; measure disclosed fields only after actually opening them.
-  Table cells use their column headers and row-specific accessible names; ordinary
-  fields need visible associated labels. After a tab remount, wait for reference
-  loading and Save readiness before clicking, without resetting drafts or replaying
-  completed writes. Keep routine guidance below the fields, never safety feedback.
-- Keep immutable reviewed DTOs in Svelte `$state.raw`, or explicitly snapshot them
-  at a transport boundary before defensive `structuredClone`; cloning a reactive
-  `$state` proxy fails in WebView2 even when plain-object unit tests pass.
-- Long approval hashes and destination paths can expand an implicit CSS Grid
-  track beyond its container. Use `minmax(0, 1fr)` and appropriate wrapping for
-  report panels; `width: 100%` and border-box inputs alone do not fix that overflow.
-- WebView2-hosted JavaScript confirmations can block CDP, including the mouse
-  response that opened them. For example, observe the exact `Delete this
-  SubOtherXL record?` message and OK/Cancel controls through the current owned
-  window's UI Automation descendants, then invoke only that planned decision;
-  unknown dialogs stop. Continue from the last sealed mutation checkpoint,
-  never replay a successful create/save to recover a blocked harness.
-- Raw-Unicode validation and Go JSON `DisallowUnknownFields` do not reject
-  duplicate object properties. For a strict request, check tokenized exact keys
-  and decoded-key collisions before struct decoding: `"title"` repeated or
-  escaped as `"\u0074itle"` must not silently replace an earlier value.
+1. **Canonical SQLite Family & Context Isolation (`sqlitecontext.go`):**
+   - Preserve the 7-database SQLite family (`<Project>.db`, `VPro64.db`, `VLists.db`, `VUser.db`, `VMetaData.db`, `VMessageBoard.db`, `VPics.db`), `_table_metadata` (`'VP08'`), and `config.yml` (with lossless legacy JSON migration). Embedded reference `.db` files are read-models, not replacements for `VLists.db` / `VUser.db`.
+   - Build SQLite `file:` URIs from resolved absolute paths with proper `net/url` escaping (`#` in raw paths can truncate `mode=ro`!).
+   - On the pinned `:memory:` read coordinator, use caller-owned read snapshot cleanup (`beginReadSnapshot`) so cancelled queries never drop `ATTACH`ed databases or `TEMP` `USys*` views.
+   - Scoped operations already holding the context's operation read lease must reuse it when borrowing pools rather than recursively re-acquiring `RWMutex.RLock` (prevents deadlock behind a queued context switch).
+   - Every context switch mints a new 128-bit `contextID`; reject stale requests deterministically.
+2. **Data Types, Validation & Access Calibration:**
+   - **Mutations + `<Project>_Audit` + `__VPRO_*` Identity Reservations** share a single atomic SQLite transaction (`BEGIN IMMEDIATE`). Never reuse deleted child IDs.
+   - **Access `BOOLEAN`:** Normalize reads explicitly and preserve `true = -1`, `false = 0` in SQLite storage and audit rows.
+   - **IEEE-754 `SINGLE` (`float32`) Cover Narrowing:** Narrow `float64` inputs to `float32` *before* evaluating `<100 Or Is Null` (`99.999996` narrows to `99.99999237060547` and passes; `99.999999` narrows to `100` and rejects).
+   - **ACE Fixed-Decimal Rounding:** Format `DOUBLE` to 15 significant decimal digits before half-away rounding (`1.005 -> 1.01` at 2 decimals; reuse the calibrated decimal formatter in Plot Profiling and reports).
+   - **UTF-16 Bounds & Malformed Text:** Enforce Access field lengths in UTF-16 code units (`PlotNumber <= 7`, `Species <= 8`, `Horizon <= 8`, `Texture <= 4`, `Colour <= 14`). Reject malformed UTF-8 (`CAST(X'FF' AS TEXT)`) and duplicate/raw-surrogate JSON keys prior to Go JSON repair.
+   - **Historical Field Tolerance:** Omit unchanged historical out-of-rule columns on `UPDATE` so legacy plots can be edited without failing on untouched fields.
+   - **Literal Scoped Plot Lookup:** Use `typeof(col)='text'` and `CAST(col AS BLOB)=CAST(? AS BLOB)` so SQLite numeric affinity never coerces leading-zero plot numbers (e.g., `'00337'`).
+   - **Species Lifeform Widths:** `VLists.USysAllSpecs.Lifeform` is `INT32` (`LONG`) while `VUser.USysUserSpp.LifeForm` is `INT16` (`INTEGER`); preserve explicit projection rules and `NotInList` synonym (`OldCode -> Code`) vs. personal species decisions.
+   - **Soil Horizon Ordering & `LMH25` Depth Sign:** Upland `L/F/H` humus horizons measure upward from `0 cm` (`UpperDepth > LowerDepth`, ordered `UpperDepth DESC`); wetland `Of/Om/Oh` and mineral `A/B/C/R/W` measure downward (`UpperDepth < LowerDepth`, ordered `UpperDepth ASC`).
+3. **Frontend Svelte 5, Wails IPC & Excelize Guards:**
+   - Detach Svelte 5 deep-reactive proxies with `$state.snapshot(...)` (or store immutable DTOs in `$state.raw`) before passing to Wails bindings or `structuredClone`.
+   - Draft validation errors must survive tab remounts and block Save/Lock/context-switch/window-close (`CloseService` cryptographic nonce handshake `"vpro:close-request"` $\rightarrow$ `ConfirmClose` / `CancelClose`). Wait for explicit `CancelClose` acknowledgement in lifecycle tests before mutating barriers.
+   - Use `strings.EqualFold` (matching `excelize/v2`) when checking worksheet name collisions, and validate case-folded joined grouping keys *before* threshold filtering in reports.
+   - With `gopkg.in/yaml.v3`, keep `type configValues = map[string]any` as a type alias so nested map assertions stay `map[string]any`.
 - After awaited client-side result validation, recheck the request generation
   before assigning UI state. Large XML validation must yield so Cancel/remount/
   close guards can run; test a held validation yield in actual Wails, release it
