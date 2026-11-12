@@ -43,7 +43,7 @@ test('Collected has independent literal frontend/backend gates and actual native
   assert.match(parent, /read: extended => siviCollectedReads.track\(PlotEntryService.GetSIVICollectedOriginal/);
   assert.match(parent, /siviCollectedSession\?\.dispose\(\);[\s\S]{0,70}siviCollectedReads\.cancelAll\(\)/);
   assert.match(parent, /data-sivi-collected-cancel-read[\s\S]{0,110}siviCollectedReads\.cancelAll/);
-  assert.match(parent, /siviCollectedSession\?\.presentation\(extendedShrubs\)/);
+  assert.match(parent, /siviCollectedSession\?\.presentation\(next\)/);
 });
 
 test('Collected owns root Save Undo Lock close busy and every mutually exclusive editor guard', () => {

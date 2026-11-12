@@ -37,7 +37,7 @@ test('identity is independently default-off in actual main and uses tracked owne
   assert.match(parent, /siviIdentityReads.track\(PlotEntryService.GetSIVIIdentityOriginal/);
   assert.match(parent, /siviIdentitySession\?\.dispose\(\);[\s\S]{0,70}siviIdentityReads\.cancelAll\(\)/);
   assert.match(parent, /data-sivi-identity-cancel-read[\s\S]{0,110}siviIdentityReads\.cancelAll/);
-  assert.match(parent, /siviIdentitySession\?\.presentation\(extendedShrubs\)/);
+  assert.match(parent, /siviIdentitySession\?\.presentation\(next\)/);
   assert.match(parent, /siviIdentityEnabled\s*\? reads.track\(ContextService.GetVegetationReadAvailability/);
   assert.match(parent, /vegetationReadUnavailable[\s\S]*Ordinary vegetation rows, totals and actions/);
 });

@@ -324,7 +324,7 @@ test('Parent integrates hidden validation, lifecycle/reset gates and default-on/
   assert.match(form, /<SourcePage name="Soil\/Terrain" values=\{sourceHeaderValues\} \{editor\}/);
   assert.match(form, /invalid header input on Soils or Undo/);
   assert.match(form, /Object\.keys\(headerValidation\)\.length > 0/);
-  assert.match(form, /draft = newDraft\(\);\s+original = null;\s+dirty = false;\s+headerValidation = \{\}/);
+  assert.match(form, /draft = newDraft\(\);\s+original = null;\s+activeLayerDepthRaw = null;\s+dirty = false;\s+headerValidation = \{\}/);
   assert.match(source, /onDestroy[\s\S]*hiddenViews[\s\S]*onvalidation\('soilCodes', soilCodeValidation/);
   assert.match(source, /raw === '' \? null : raw/);
   assert.match(source, /soilCodeAcknowledged\(draft, draft\)/);

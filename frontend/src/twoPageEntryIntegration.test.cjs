@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { readFileSync } = require('node:fs');
+const path = require('node:path');
 const { render } = require('svelte/server');
 const { componentFunctions: extractFunctions, serverComponent } = require('./svelteTestHelpers.cjs');
 const componentFunctions = (name, functions, values) => extractFunctions(name, functions, {
@@ -85,7 +86,7 @@ test('source-held callbacks cannot stage, save, switch or close a retained sourc
 });
 
 test('actual mapped picture activity holds parent callbacks and source action until owner-local Cancel completes', async () => {
-  const source = readFileSync(`${__dirname}\\FS882Form.svelte`, 'utf8');
+  const source = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   const expression = source.match(/childBlocked=\{([^}]+)\}/)?.[1];
   assert.ok(expression);
   const keys = ['twoPageSoilBusy', 'twoPageSoilBlocked', 'twoPageVegetationBusy', 'twoPageVegetationBlocked', 'pictureBusy', 'pictureMetadataPending'];
@@ -124,7 +125,7 @@ test('actual mapped picture activity holds parent callbacks and source action un
 });
 
 test('actual reference option keys preserve Zone DISTINCT tuples and duplicate physical code identities', () => {
-  const source = readFileSync(`${__dirname}\\TwoPageEntryEditor.svelte`, 'utf8');
+  const source = readFileSync(path.join(__dirname, 'TwoPageEntryEditor.svelte'), 'utf8');
   const expression = source.match(/as choice \((.*)\)\}/)?.[1];
   assert.ok(expression);
   const key = new Function('choice', `return ${expression};`);
@@ -145,7 +146,7 @@ test('actual reference option keys preserve Zone DISTINCT tuples and duplicate p
 });
 
 test('actual root visibility expression hides the ordinary host for entry independently of the older source-layout gate', () => {
-  const source = readFileSync(`${__dirname}\\FS882Form.svelte`, 'utf8');
+  const source = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   const expression = source.match(/<div hidden=\{([^}]*)\} data-two-page-ordinary-host>/)?.[1];
   assert.ok(expression);
   const Component = serverComponent(`<script>

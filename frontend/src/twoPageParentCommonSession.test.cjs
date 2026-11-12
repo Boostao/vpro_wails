@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { readFileSync } = require('node:fs');
+const path = require('node:path');
 const { render } = require('svelte/server');
 const { loadTypeScript, serverComponent, componentFunctions } = require('./svelteTestHelpers.cjs');
 const { editor, writeSession, transport, source, cell, metadata } = require('./siviParentTestHelpers.cjs');
@@ -140,7 +141,7 @@ test('common source scope preserves every instance with one live owner per logic
 });
 
 function headerComponents() {
-  const read = name => readFileSync(`${__dirname}\\${name}.svelte`, 'utf8')
+  const read = name => readFileSync(path.join(__dirname, `${name}.svelte`), 'utf8')
     .replace(/import\.meta\.env\.VITE_[A-Z_]+/g, "'true'");
   const bec = loadTypeScript('becEditor.ts');
   const reference = loadTypeScript('referenceCodeEditor.ts', { './becEditor': bec, './qualityEditor': quality });
@@ -168,7 +169,7 @@ function headerComponents() {
     './SourcePage.svelte': { default: SourcePage }, './twoPageEntryProjection': projection,
     './coordinateEditor': coordinates,
   });
-  const model = readFileSync(`${__dirname}\\..\\bindings\\github.com\\boostao\\vpro-wails\\models.ts`, 'utf8')
+  const model = readFileSync(path.join(__dirname, '..', 'bindings', 'github.com', 'boostao', 'vpro-wails', 'models.ts'), 'utf8')
     .match(/export interface FS882Header \{([\s\S]*?)\n\}/)[1];
   const draft = Object.fromEntries([...model.matchAll(/"([^"]+)":/g)].map(match => [match[1], null]));
   draft.plotNumber = 'P'; draft.locked = false; draft.fieldNo = '  literal field  ';
@@ -595,11 +596,11 @@ test('complete source pages group every visible control once and bound options e
   }
 });
 test('complete entry layout composes exact source pages and dispatches pictures only with explicit reader availability', () => {
-  const SourcePage = serverComponent(readFileSync(`${__dirname}\\SourcePage.svelte`, 'utf8'), 'SourcePage.svelte', {
+  const SourcePage = serverComponent(readFileSync(path.join(__dirname, 'SourcePage.svelte'), 'utf8'), 'SourcePage.svelte', {
     './paperLayout': { ...paper, paperPage: () => { throw new Error('Complete entry must not select XL pages'); } },
     './formPresentation': presentation,
   });
-  const Layout = serverComponent(readFileSync(`${__dirname}\\TwoPageEntryLayout.svelte`, 'utf8'), 'TwoPageEntryLayout.svelte', {
+  const Layout = serverComponent(readFileSync(path.join(__dirname, 'TwoPageEntryLayout.svelte'), 'utf8'), 'TwoPageEntryLayout.svelte', {
     './SourcePage.svelte': { default: SourcePage }, './twoPageEntryProjection': projection,
     './coordinateEditor': coordinates,
   });
@@ -687,7 +688,7 @@ test('complete layout values preserve exact physical storage and reject foreign 
   }
 });
 test('real Common and Extra inputs compose into the complete source layout with one associated label and unchanged safety feedback', async () => {
-  const read = file => readFileSync(`${__dirname}\\${file}.svelte`, 'utf8');
+  const read = file => readFileSync(path.join(__dirname, `${file}.svelte`), 'utf8');
   const SourcePage = serverComponent(read('SourcePage'), 'SourcePage.svelte', {
     './paperLayout': paper, './formPresentation': presentation,
   });

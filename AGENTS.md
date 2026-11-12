@@ -2,7 +2,7 @@
 
 ## 1. Authoritative Specification & Product Direction
 
-- **Single Source of Truth:** Read `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\okf\00_index.md` first, together with:
+- **Single Source of Truth:** Read `~/Work/VPRO_ACCESS/okf/00_index.md` first, together with:
   - `okf/02_present_state/capability_matrix.md` & `data_dictionary.md`
   - `okf/03_future_architecture/transition_and_adoption.md`
   - `okf/03_future_architecture/target_stack_recommendation.md`
@@ -18,46 +18,45 @@
   - Product identity is **`VPro`** (*VENUS — Vegetation and Environment NexUS — Professional*, **B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program**), never `"My Company"`, `"My Product"`, `"Wails Edition"`, or `vpro-wails.app`.
   - Release packages are **unsigned for Phase 1** (relying on static `release-manifest.json` + `SHA256SUMS.txt` verification); `VTrees` / standalone Mensuration, CWD, and WHA remain **out of scope** for Phase 1.
 
-### 1.1 Surrounding Workspace & Sibling Asset Map (`C:\Users\BrunoTremblay\Work\*`)
+### 1.1 Surrounding Workspace & Sibling Asset Map (`~/Work/`)
 
-**IMPORTANT DISCOVERY RULE:** Workspace `glob` and `grep` tools default solely to `C:\Users\BrunoTremblay\Work\vpro_wails`. Always pass explicit absolute `paths` when inspecting the sibling directories below, and **always include relevant sibling paths in subagent prompts**. Never mutate legacy `.accdb`/`.mdb`/`.zip` source archives (inspect read-only or copy to `$env:TEMP` first):
+**IMPORTANT DISCOVERY RULE:** Workspace `glob` and `grep` tools default solely to `~/Work/vpro_wails`. Always pass explicit absolute `paths` (expand `~` to `/home/$USER`) when inspecting the sibling directories below, and **always include relevant sibling paths in subagent prompts**. Never mutate legacy `.accdb`/`.mdb`/`.zip` source archives (inspect read-only or copy to a temporary directory first):
 
-1. **Authoritative Knowledge Repository (`okf/`):** `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\okf\` (start at `00_index.md`; 17 cross-linked specs across `01_history_and_evolution\`, `02_present_state\`, `03_future_architecture\`, `04_evidence_and_sources\`).
-2. **Legacy Manuals, Triage, Emails & `VPro64` Exports:** `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\`
+1. **Authoritative Knowledge Repository (`okf/`):** `~/Work/VPRO_ACCESS/okf/` (start at `00_index.md`; 17 Markdown files across `01_history_and_evolution/`, `02_present_state/`, `03_future_architecture/`, `04_evidence_and_sources/`).
+2. **Legacy Manuals, Triage, Emails & `VPro64` Exports:** `~/Work/VPRO_ACCESS/`
    - Field Manuals: `LMH25_2023_web.pdf` (2023 ed.) & `Lmh25_2015.pdf` (2015 ed.), `VProXP_Userguide.pdf`
-   - Client Scope & Triage: `VPro2.0_Functions to remove-retain-modify.pdf` (`.docx`), `_BEC_data_system_fs1a_schedule_of_services_v2 (13).md`, `VproMailExchange\` (106 emails incl. executed contract `RE26OCF433` in `0072`), `SCREENCAPS\` (21 VPro 64 PNGs)
-   - Decompiled Access Forms/VBA/Tables: `VPro64_forAI\`, `VPro64\`, `VLists\`, `VUser\`, `VMetaData\`, `Diagnostic10.xla`
-3. **545 MB Production Scale Dataset (`BECMaster`):** `C:\Users\BrunoTremblay\Work\VPRO_ACCESS_1\VPro64\`
+   - Client Scope & Triage: `VPro2.0_Functions to remove-retain-modify.pdf` (`.docx`), `_BEC_data_system_fs1a_schedule_of_services_v2 (13).md`, `VproMailExchange/` (106 emails incl. executed contract `RE26OCF433` in `0072`), `SCREENCAPS/` (21 VPro 64 PNGs)
+   - Decompiled Access Forms/VBA/Tables: `VPro64_forAI/`, `VPro64/`, `VLists/`, `VUser/`, `VMetaData/`, `Diagnostic10.xla`
+3. **545 MB Production Scale Dataset (`BECMaster`):** `~/Work/VPRO_ACCESS_1/VPro64/`
    - `BECMaster_fixing.accdb` (`71,567` plots, `1,651,842` veg rows, `597,277` audit rows, `BECMaster_fixing_edatopic` `57,023` rows, `spatial_overlay_BGCv13_4/8`), `Haida_Gwaii_2019.accdb`, `Manning_TEM_Vpro19.accdb`
-4. **Fresh 2026 Official `BECWeb` Master Standards:** `C:\Users\BrunoTremblay\Work\becweb_standards_2025_2026\`
+4. **Fresh 2026 Official `BECWeb` Master Standards:** `~/Work/becweb_standards_2025_2026/`
    - `BECdb_v13_2026.zip` (`BECdb_v13_2026.accdb` `2026-05-28` Version 13 + `Current_BGCunits_v13.csv` + `Current_Unique_SiteUnits_v13.csv`)
    - `BCPlantTaxa2025_access.zip` (`BCPlantTaxonomy.accdb` `2026-02-09` Version 19 `USysAllSpecs`) + `Species_Readme_Feb_2025_Ver19.docx` + `Tree_codes_2021.docx`
-5. **Staged BC Gov Spatial Layers:** `C:\Users\BrunoTremblay\Work\spatial_assets\`
+5. **Staged BC Gov Spatial Layers:** `~/Work/spatial_assets/`
    - `bc_ecosections_epsg4326.geojson` (`139` polygons), `bc_nr_districts_epsg4326.geojson` (`23` polygons), plus live unauthenticated BC OpenMaps WFS `pub:WHSE_FOREST_VEGETATION.BEC_BIOGEOCLIMATIC_POLY` (`17,870` BGC polygons)
 6. **Cloned MoF & BCGov R / Quarto / Vector-Tile Reference Repos:**
-   - `C:\Users\BrunoTremblay\Work\MoF-Skeena-Research\`: `BEC_R_working` (`_functions/*.R`), `BEC_Classification_Analysis`, `BEC_Unit_Reporting` (`unit.report.qmd`), `aSMR-x-rSMR` (`CMD -> aSMR`), `EdatopicGrid_Spp_Distribution`, `BEC_Clean_BECdb`, `BEC_soils_fixing`, `BGC_Postgres`, `CCISS_VectorTiles`
-   - `C:\Users\BrunoTremblay\Work\bcgov_ref\`: `BEC_ReportR`, `cciss-docs` (Quarto book reference)
+   - `~/Work/MoF-Skeena-Research/`: `BEC_R_working` (`_functions/*.R`), `BEC_Classification_Analysis`, `BEC_Unit_Reporting` (`unit.report.qmd`), `aSMR-x-rSMR` (`CMD -> aSMR`), `EdatopicGrid_Spp_Distribution`, `BEC_Clean_BECdb`, `BEC_soils_fixing`, `BGC_Postgres`, `CCISS_VectorTiles`
+   - `~/Work/bcgov_ref/`: `BEC_ReportR`, `cciss-docs` (Quarto book reference)
 7. **Sibling Headless R Package & MDB Reader:**
-   - `C:\Users\BrunoTremblay\Work\vpro\` (`master` headless R/DuckDB/SQLite package + git commits `68b7d8b` `R/mod_becweb_map.R` / `scripts/publish_dataset.R` and `fde9833` `bcgov/climr`)
-   - `C:\Users\BrunoTremblay\Work\go-mdbtools-windows-readiness\` (CGO `libmdb` upstream hardening reference)
+   - `~/Work/vpro/` (`master` headless R/DuckDB/SQLite package + git commits `68b7d8b` `R/mod_becweb_map.R` / `scripts/publish_dataset.R` and `fde9833` `bcgov/climr`)
+   - `~/Work/go-mdbtools-windows-readiness/` (optional CGO `libmdb` upstream hardening reference; copy it when needed)
 
 ---
 
-## 2. Local Windows Toolchain & Build Commands
+## 2. Local Linux Toolchain & Build Commands
 
-Verified User `PATH` (`ExecutionPolicy = RemoteSigned`) already includes:
+Fedora toolchain (ensure `~/go/bin` and `~/.local/bin` are on `PATH`):
 
-- **Node 22:** `C:\Users\BrunoTremblay\tools\node-v22.14.0-win-x64` (`npm` / `node`)
-- **Go & CLIs:** `C:\Program Files\Go\bin` + `C:\Users\BrunoTremblay\go\bin` (`wails3`, `task` v3.54, `pmtiles` v1.31)
-- **GitHub & Quarto CLIs:** `C:\Users\BrunoTremblay\tools\gh\bin\gh.exe` (`v2.103.3`), `C:\Users\BrunoTremblay\tools\quarto\bin\quarto.exe` (`v1.11.9`)
-- **CGO x64 GCC & NSIS (`makensis`):** `C:\Users\BrunoTremblay\tools\w64devkit\bin` (or `C:\Users\BrunoTremblay\tools\mingw64\bin`)
-- **CGO ARM64 LLVM Cross-Compiler:** `C:\Users\BrunoTremblay\tools\llvm-mingw-20260922-ucrt-x86_64\bin`
-- **R Runtime (Headless `vpro` / `BEC_R` Sidecar):** `C:\Program Files\R\R-4.5.3\bin\x64\Rscript.exe`
+- **Node 22:** `node` and `npm` from the system `PATH`.
+- **Go & CLIs:** `go` plus `~/go/bin` (`wails3` v3.0.0-beta.26, `task`, `nfpm`) and `~/.local/bin` (`pmtiles`, `tippecanoe`).
+- **GitHub & Quarto CLIs:** `gh` and `quarto` on `PATH`.
+- **CGO & Windows x64:** native `gcc`, `x86_64-w64-mingw32-gcc`, and `makensis`; Wails defaults to GTK4 and WebKitGTK 6.0 development packages, with GTK3 and WebKitGTK 4.1 required for the legacy `gtk3` build tag.
+- **R Runtime:** `Rscript` on `PATH` with the headless `vpro` and `climr` packages.
 
 Key commands:
 - **Regenerate Wails TypeScript bindings:** Always pass **`-ts -i`** (`wails3 generate bindings -ts -i`) to preserve interface-style nullable-array contracts (`-ts` alone emits classes and breaks frontend callers).
-- **Default Desktop Build (SQLite canonical, ~38 MB without DuckDB):** `go test -tags sqliteonly ./...` and `wails3 task windows:build:sqliteonly`.
-- **Frontend Validation:** In `frontend/`, run `npm.cmd test`, `npm.cmd run check`, and `npm.cmd run build`.
+- **Default Desktop Tests (SQLite canonical):** `go test -tags sqliteonly ./...`; use `wails3 task linux:build EXTRA_TAGS=sqliteonly` for a native Linux build and `wails3 task windows:build:sqliteonly` for the Windows target when its toolchain is available.
+- **Frontend Validation:** In `frontend/`, run `npm test`, `npm run check`, and `npm run build`.
 - **CGO Rebuild Note:** After changing C headers/sources nested under an amalgamating CGO file (`internal/accessreader`), force a fresh compile with `-a` (`-count=1` alone can reuse cached C objects). For full-repo `-race` runs on Windows, pass `-timeout 45m` (or `-timeout 150m` across all packages).
 
 ---

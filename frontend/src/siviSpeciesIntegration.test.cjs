@@ -43,7 +43,7 @@ test('Species independently gates actual main registration and coordinates both 
   }
   assert.match(parent, /siviSpeciesSession\?\.dispose\(\);[\s\S]{0,70}siviSpeciesReads\.cancelAll\(\)/);
   assert.match(parent, /data-sivi-species-cancel-read[\s\S]{0,110}siviSpeciesReads\.cancelAll/);
-  assert.match(parent, /siviSpeciesSession\?\.presentation\(extendedShrubs\)/);
+  assert.match(parent, /siviSpeciesSession\?\.presentation\(next\)/);
 });
 test('Species participates in root Save Undo Lock close and all peer/parent barriers', () => {
   assert.match(parent, /independentHeaderWorkflowBusy = \$derived\([^\n]*\|\| siviSpeciesBusy/);
