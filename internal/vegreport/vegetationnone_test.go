@@ -1,0 +1,118 @@
+package vegreport
+
+import (
+	"github.com/boostao/vpro-wails/internal/reports/reportcore"
+	"github.com/boostao/vpro-wails/internal/vprocore"
+	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
+)
+
+import (
+	"bytes"
+	"context"
+	"os"
+	"reflect"
+	"testing"
+)
+
+func TestLongVegetationNoneRetainsLayerStatisticsAndSourceOrdering(t *testing.T) {
+	prepared, species, layers := vegetationLayerFixture(t)
+	options := layerTestOptions()
+	options.ConstantSpeciesList = false
+	options.PresenceGreaterThan, options.MeanCoverGreaterThan = -1, -999
+	for _, order := range []string{"species", "presence"} {
+		options.Order = order
+		options.NoneGrouping = false
+		layer, err := planLongVegetationLayers(context.Background(), prepared, species, layers, options)
+		if err != nil {
+			t.Fatal(err)
+		}
+		options.NoneGrouping = true
+		none, err := planLongVegetationLayers(context.Background(), prepared, species, layers, options)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for i, unit := range none.Units {
+			if unit.NumPlots != layer.Units[i].NumPlots || len(unit.Rows) != len(layer.Units[i].Rows) {
+				t.Fatal("None pooled or removed layer observations", unit)
+			}
+			for _, row := range unit.Rows {
+				found := false
+				for _, original := range layer.Units[i].Rows {
+					if reflect.DeepEqual(original, row) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Fatal("None changed an existing statistic/projection", row)
+				}
+			}
+			for j := 1; j < len(unit.Rows); j++ {
+				a, b := unit.Rows[j-1], unit.Rows[j]
+				if order == "presence" && *a.Presence != *b.Presence {
+					if *a.Presence < *b.Presence {
+						t.Fatal("source None presence order differs", unit.Rows)
+					}
+				} else if reportcore.VegetationTextKey(a.Species) > reportcore.VegetationTextKey(b.Species) {
+					t.Fatal("source None species order differs", unit.Rows)
+				}
+			}
+		}
+	}
+	options.ConstantSpeciesList = true
+	options.NoneGrouping = false
+	layer, err := planLongVegetationLayers(context.Background(), prepared, species, layers, options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	options.NoneGrouping = true
+	none, err := planLongVegetationLayers(context.Background(), prepared, species, layers, options)
+	if err != nil || !reflect.DeepEqual(layer, none) {
+		t.Fatal("constant list lost source layer-first ordering", err)
+	}
+}
+
+func TestLongVegetationNoneDecodeAndIndependentPublicGate(t *testing.T) {
+	values := longVegetationOptionsFixture(t)
+	values["ReportOptions"].(map[string]any)["LVGroupBy"] = 4
+	options, err := decodeLongVegetationOptions(values)
+	if err != nil || !options.NoneGrouping || vegetationSettings(options).Grouping != "none" {
+		t.Fatal("source mode4 unavailable", options, err)
+	}
+	for _, external := range []bool{false, true} {
+		service, state := vprotest.ReportServiceFixture(t, external)
+		if err := service.Projects.Preferences.Update("ReportOptions", map[string]any{"LVGroupBy": 4}); err != nil {
+			t.Fatal(err)
+		}
+		before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
+		config, err := os.ReadFile(service.Projects.Preferences.Path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if result, err := GetLongVegetationOptions(service, context.Background(), state.ContextID); err == nil || !reflect.DeepEqual(result, LongVegetationOptions{}) {
+			t.Fatal("default options gate enabled", result, err)
+		}
+		if result, err := PreviewLongVegetation(service, context.Background(), state.ContextID); err == nil || !reflect.DeepEqual(result, LongVegetationPreview{}) {
+			t.Fatal("default preview gate enabled", result, err)
+		}
+		if result, err := PreviewLongVegetationLayers(service, context.Background(), state.ContextID); err == nil || !reflect.DeepEqual(result, vegetationLayerReport{}) {
+			t.Fatal("private context entry bypassed gate", result, err)
+		}
+		service.LongVegetationNoneEnabled = true
+		result, err := PreviewLongVegetation(service, context.Background(), state.ContextID)
+		if err != nil || result.Settings.Grouping != "none" {
+			t.Fatal("enabled owned None preview failed", result, err)
+		}
+		vprotest.AssertProfileSUFiles(t, service, before)
+		after, err := os.ReadFile(service.Projects.Preferences.Path)
+		if err != nil || !bytes.Equal(config, after) {
+			t.Fatal("None read repaired retained preferences", err)
+		}
+	}
+	if enabled, err := vprocore.SiviFeature(LongVegetationNoneFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || !enabled {
+		t.Fatal("default gate disabled", err)
+	}
+	if _, err := vprocore.SiviFeature(LongVegetationNoneFeatureEnvironment, func(string) (string, bool) { return "TRUE", true }); err == nil {
+		t.Fatal("malformed gate accepted")
+	}
+}

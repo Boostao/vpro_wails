@@ -7,6 +7,10 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as pictures$0 from "./internal/pictures/models.js";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
 export function AcknowledgeCreationReceipt(token: string): $CancellablePromise<void> {
@@ -29,11 +33,11 @@ export function GetDeletionHistory(contextID: string, plot: string): $Cancellabl
     return $Call.ByID(4095650293, contextID, plot);
 }
 
-export function GetImage(contextID: string, plot: string, requestJSON: string): $CancellablePromise<$models.PictureImage | null> {
+export function GetImage(contextID: string, plot: string, requestJSON: string): $CancellablePromise<pictures$0.PictureImage | null> {
     return $Call.ByID(433911198, contextID, plot, requestJSON);
 }
 
-export function GetMetadata(contextID: string, plot: string): $CancellablePromise<$models.PictureMetadataReview | null> {
+export function GetMetadata(contextID: string, plot: string): $CancellablePromise<pictures$0.PictureMetadataReview | null> {
     return $Call.ByID(2102712636, contextID, plot);
 }
 

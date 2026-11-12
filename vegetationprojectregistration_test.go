@@ -84,7 +84,7 @@ func TestProjectRegistrationUsesOneImmutableDefaultOffCapability(t *testing.T) {
 	})
 	if flagReads != 1 || !reflect.DeepEqual(constructors, map[string][]string{
 		"NewLongVegetationReportScopeService":     {"contextService", "longVegetationProjectScopeEnabled"},
-		"NewLongVegetationProjectWorkbookService": {"contextService", "longVegetationProjectScopeEnabled", "vegetationWorkbook.private.enabled"},
+		"NewLongVegetationProjectWorkbookService": {"contextService", "longVegetationProjectScopeEnabled", "vegetationWorkbook.Private.Enabled"},
 	}) {
 		t.Fatal("project service registration does not share one immutable default-off capability", flagReads, constructors)
 	}

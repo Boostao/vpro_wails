@@ -4,6 +4,7 @@ import (
 	"embed"
 	"log"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -252,27 +253,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	contextService.siviHeightEnabled = siviHeightEnabled
+	contextService.SiviHeightEnabled = siviHeightEnabled
 	plotLabelRegional, err := NewPlotLabelRegionalService(contextService)
 	if err != nil {
 		log.Fatal(err)
 	}
-	contextService.siviParentReviewEnabled = siviParentReviewEnabled
-	contextService.siviParentEditingEnabled = siviParentEditingEnabled
-	contextService.siviParentActionEditingEnabled = siviParentActionEditingEnabled
-	contextService.siviProjectAssignmentEnabled = siviProjectAssignmentEnabled
-	contextService.tableCSVReviewEnabled = tableCSVReviewEnabled
-	contextService.plotLocationReviewEnabled = plotLocationReviewEnabled
-	contextService.siteUnitSummaryEnabled = siteUnitSummaryEnabled
-	contextService.siteUnitSummaryLifeformsEnabled = siteUnitSummaryLifeformsEnabled
-	contextService.siteUnitSummarySpeciesEnabled = siteUnitSummarySpeciesEnabled
-	contextService.longVegetationNoneEnabled = longVegetationNoneEnabled
-	contextService.longVegetationLifeformEnabled = longVegetationLifeformEnabled
-	contextService.longVegetationStrataEnabled = longVegetationStrataEnabled
-	contextService.longVegetationCodeEnabled = longVegetationCodeEnabled
-	contextService.longVegetationSelectedFieldEnabled = longVegetationSelectedFieldEnabled
-	contextService.longVegetationNoneUnitsEnabled = longVegetationNoneUnitsEnabled
-	contextService.longVegetationSelectedUnitsEnabled = longVegetationSelectedUnitsEnabled
+	contextService.SiviParentReviewEnabled = siviParentReviewEnabled
+	contextService.SiviParentEditingEnabled = siviParentEditingEnabled
+	contextService.SiviParentActionEditingEnabled = siviParentActionEditingEnabled
+	contextService.SiviProjectAssignmentEnabled = siviProjectAssignmentEnabled
+	contextService.TableCSVReviewEnabled = tableCSVReviewEnabled
+	contextService.PlotLocationReviewEnabled = plotLocationReviewEnabled
+	contextService.SiteUnitSummaryEnabled = siteUnitSummaryEnabled
+	contextService.SiteUnitSummaryLifeformsEnabled = siteUnitSummaryLifeformsEnabled
+	contextService.SiteUnitSummarySpeciesEnabled = siteUnitSummarySpeciesEnabled
+	contextService.LongVegetationNoneEnabled = longVegetationNoneEnabled
+	contextService.LongVegetationLifeformEnabled = longVegetationLifeformEnabled
+	contextService.LongVegetationStrataEnabled = longVegetationStrataEnabled
+	contextService.LongVegetationCodeEnabled = longVegetationCodeEnabled
+	contextService.LongVegetationSelectedFieldEnabled = longVegetationSelectedFieldEnabled
+	contextService.LongVegetationNoneUnitsEnabled = longVegetationNoneUnitsEnabled
+	contextService.LongVegetationSelectedUnitsEnabled = longVegetationSelectedUnitsEnabled
 	siviParentShared, err := NewSIVIParentSharedService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -333,9 +334,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pictures.metadata = pictureMetadata
-	pictures.creation = pictureCreation
-	pictures.deletion = pictureDeletion
+	pictures.Metadata = pictureMetadata
+	pictures.Creation = pictureCreation
+	pictures.Deletion = pictureDeletion
 	summaryVegetation, err := NewSummaryVegetationService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -352,15 +353,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	summaryVegetationWorkbook.ancillaryEnabled, err = siviFeature(summaryVegetationAncillaryWorkbookFeatureEnvironment, os.LookupEnv)
+	summaryVegetationWorkbook.AncillaryEnabled, err = siviFeature(summaryVegetationAncillaryWorkbookFeatureEnvironment, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
 	}
-	summaryVegetationWorkbook.referencesEnabled, err = siviFeature(summaryVegetationEffectiveReferencesFeatureEnvironment, os.LookupEnv)
+	summaryVegetationWorkbook.ReferencesEnabled, err = siviFeature(summaryVegetationEffectiveReferencesFeatureEnvironment, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
 	}
-	summaryVegetationWorkbook.groupedEnabled, err = siviFeature(summaryVegetationGroupedWorkbookFeatureEnvironment, os.LookupEnv)
+	summaryVegetationWorkbook.GroupedEnabled, err = siviFeature(summaryVegetationGroupedWorkbookFeatureEnvironment, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -372,12 +373,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	summaryVegetation.qualityPreferences = summaryVegetationQualityEnabled
+	summaryVegetation.QualityPreferences = summaryVegetationQualityEnabled
 	summaryVegetationPresentationEnabled, err := summaryVegetationPresentationPreferencesFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
 	}
-	summaryVegetationWorkbook.presentationEnabled = summaryVegetationPresentationEnabled
+	summaryVegetationWorkbook.PresentationEnabled = summaryVegetationPresentationEnabled
 	summaryVegetationFieldListEnabled, err := summaryVegetationFieldListFeature(os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -431,7 +432,7 @@ func main() {
 		log.Printf("Warning: failed to initialize QualityService: %v", err)
 	}
 	siteCodes, err := NewSiteCodeService(dataDir)
-	plots.siteCodes, plots.siteCodesError = siteCodes, err
+	plots.SiteCodes, plots.SiteCodesError = siteCodes, err
 	if err != nil {
 		log.Printf("Warning: failed to initialize SiteCodeService: %v", err)
 	}
@@ -448,41 +449,41 @@ func main() {
 		log.Printf("Warning: failed to initialize GeologyCodeService: %v", err)
 	}
 	parentCodes, err := NewParentCodeService(dataDir)
-	plots.parentCodes, plots.parentCodesError = parentCodes, err
+	plots.ParentCodes, plots.ParentCodesError = parentCodes, err
 	if err != nil {
 		log.Printf("Warning: failed to initialize ParentCodeService: %v", err)
 	}
-	siviParentShared.references = siviParentSharedReferenceReaders{
-		site: siteCodes, region: regionCodes, parent: parentCodes,
-		geology: geologyCodes, bec: becService,
+	siviParentShared.References = siviParentSharedReferenceReaders{
+		Site: siteCodes, Region: regionCodes, Parent: parentCodes,
+		Geology: geologyCodes, Bec: becService,
 	}
-	siviCHARSParentEntry, err := newSIVICHARSParentEntryService(contextService, siviParentShared.references, siviCHARSParentEntryEnabled)
+	siviCHARSParentEntry, err := newSIVICHARSParentEntryService(contextService, siviParentShared.References, siviCHARSParentEntryEnabled)
 	if err != nil {
 		log.Fatal(err)
 	}
 	entryReaders := twoPageEntryReferenceReaders{}
 	if siteCodes != nil {
-		entryReaders.shared.site = siteCodes
+		entryReaders.Shared.Site = siteCodes
 	}
 	if regionCodes != nil {
-		entryReaders.shared.region = regionCodes
-		entryReaders.ecosection = regionCodes
+		entryReaders.Shared.Region = regionCodes
+		entryReaders.Ecosection = regionCodes
 	}
 	if parentCodes != nil {
-		entryReaders.shared.parent = parentCodes
+		entryReaders.Shared.Parent = parentCodes
 	}
 	if geologyCodes != nil {
-		entryReaders.shared.geology = geologyCodes
+		entryReaders.Shared.Geology = geologyCodes
 	}
 	if becService != nil {
-		entryReaders.shared.bec = becService
-		entryReaders.series = becService
+		entryReaders.Shared.Bec = becService
+		entryReaders.Series = becService
 	}
 	if qualityService != nil {
-		entryReaders.quality = qualityService
+		entryReaders.Quality = qualityService
 	}
 	if soilCodes != nil {
-		entryReaders.soil = soilCodes
+		entryReaders.Soil = soilCodes
 	}
 	twoPageParentEntry, err := NewTwoPageParentEntryService(contextService, entryReaders, os.LookupEnv)
 	if err != nil {
@@ -536,7 +537,7 @@ func main() {
 	if err != nil {
 		log.Printf("Warning: failed to initialize WorkingUnitService: %v", err)
 	}
-	releaseChannel, err := preferences.releaseChannel()
+	releaseChannel, err := preferences.ReleaseChannel()
 	if err != nil {
 		runStartupRecovery(windows, configDir, err)
 		return
@@ -554,9 +555,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	startupService := &StartupService{state: StartupState{
+	startupService := &StartupService{State: StartupState{
 		Ready:          true,
-		ConfigPath:     preferences.path,
+		ConfigPath:     preferences.Path,
 		ReleaseChannel: releaseChannel,
 	}}
 	lifecycleService := NewLifecycleService(startupService, closeService, userLog)
@@ -611,7 +612,7 @@ func main() {
 		summaryEnvironment:             summaryEnvironment,
 		summaryEnvironmentLifeform:     summaryEnvironmentLifeform,
 		summaryWorkbook:                summaryVegetationWorkbook,
-		summaryPreferences:             NewSummaryVegetationPreferencesService(contextService, summaryVegetationPreferencesEnabled, summaryVegetation.enabled),
+		summaryPreferences:             NewSummaryVegetationPreferencesService(contextService, summaryVegetationPreferencesEnabled, summaryVegetation.Enabled),
 		summaryQualityPreferences:      NewSummaryVegetationQualityPreferencesService(contextService, summaryVegetationQualityEnabled),
 		summaryPresentationPreferences: NewSummaryVegetationPresentationPreferencesService(contextService, summaryVegetationPresentationEnabled),
 		summaryFieldList:               NewSummaryVegetationFieldListService(contextService, summaryVegetationFieldListEnabled),
@@ -628,7 +629,7 @@ func main() {
 		longUnitPreferences:            NewLongVegetationUnitPreferencesService(contextService, longVegetationUnitPreferencesEnabled),
 		longSelectedUnitSelection:      NewLongVegetationSelectedUnitSelectionService(contextService, longVegetationSelectedUnitSelectionEnabled),
 		longReportScope:                NewLongVegetationReportScopeService(contextService, longVegetationProjectScopeEnabled),
-		longProjectWorkbook:            NewLongVegetationProjectWorkbookService(contextService, longVegetationProjectScopeEnabled, vegetationWorkbook.private.enabled),
+		longProjectWorkbook:            NewLongVegetationProjectWorkbookService(contextService, longVegetationProjectScopeEnabled, vegetationWorkbook.Private.Enabled),
 		vegetationWorkbook:             vegetationWorkbook,
 		lifeformSummary:                lifeformSummary,
 		lifeformWorkbook:               lifeformWorkbook,
@@ -673,9 +674,9 @@ func main() {
 		Description: "VENUS (Vegetation and Environment NexUS) Professional — B.C. Ministry of Forests, Research Branch (BEC Program)",
 		Services:    services,
 		Windows:     windows,
-		ShouldQuit:  closeService.shouldQuit,
+		ShouldQuit:  closeService.ShouldQuit,
 		OnShutdown: func() {
-			if err := projects.closeSQLiteContext(); err != nil {
+			if err := projects.CloseSQLiteContext(); err != nil {
 				log.Printf("Warning: failed to close project context: %v", err)
 			}
 			if parentCodes != nil {
@@ -738,14 +739,41 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			window.SetMinSize(dimensions.minWidth, dimensions.minHeight)
-			window.SetSize(dimensions.width, dimensions.height)
+			window.SetMinSize(dimensions.MinWidth, dimensions.MinHeight)
+			window.SetSize(dimensions.Width, dimensions.Height)
 			window.Center()
 		})
 	})
-	window.RegisterHook(events.Common.WindowClosing, closeService.handleWindowClosing)
+	window.RegisterHook(events.Common.WindowClosing, closeService.HandleWindowClosing)
 	err = app.Run()
 	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func runStartupRecovery(windows application.WindowsOptions, configDir string, cause error) {
+	log.Printf("Saved context remains unavailable: %v", cause)
+	startup := &StartupService{State: StartupState{
+		Message:        cause.Error(),
+		ConfigPath:     filepath.Join(configDir, "config.yml"),
+		ReleaseChannel: ReleaseChannelStable,
+	}}
+	var app *application.App
+	closeService, err := NewCloseService(func(nonce string) bool { return app.Event.Emit(closeRequestEvent, nonce) }, func() { app.Quit() })
+	if err != nil {
+		log.Fatal(err)
+	}
+	lifecycleService := NewLifecycleService(startup, closeService, nil)
+	app = application.New(application.Options{
+		Name: "VPro", Windows: windows, ShouldQuit: closeService.ShouldQuit,
+		Services: []application.Service{application.NewService(lifecycleService)},
+		Assets:   application.AssetOptions{Handler: application.AssetFileServerFS(assets)},
+	})
+	window := app.Window.NewWithOptions(application.WebviewWindowOptions{
+		Name: "main", Title: "VPro", Width: 1000, Height: 720, MinWidth: 560, MinHeight: 520, URL: "/",
+	})
+	window.RegisterHook(events.Common.WindowClosing, closeService.HandleWindowClosing)
+	if err := app.Run(); err != nil {
 		log.Fatal(err)
 	}
 }

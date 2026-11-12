@@ -6,33 +6,33 @@ import (
 )
 
 type VegetationReportService struct {
-	contexts                        *ContextService
-	summary                         *SummaryVegetationService
-	summaryEnvironment              *SummaryVegetationEnvironmentalService
-	summaryEnvironmentLifeform      *SummaryVegetationEnvironmentalLifeformService
-	summaryWorkbook                 *SummaryVegetationWorkbookService
-	summaryPreferences              *SummaryVegetationPreferencesService
-	summaryQualityPreferences       *SummaryVegetationQualityPreferencesService
-	summaryPresentationPreferences  *SummaryVegetationPresentationPreferencesService
-	summaryFieldList                *SummaryVegetationFieldListService
-	longPreferences                 *LongVegetationPreferencesService
-	longStatisticsPreferences       *LongVegetationStatisticsPreferencesService
-	longSwitchPreferences           *LongVegetationSwitchPreferencesService
-	longThresholdPreferences        *LongVegetationThresholdPreferencesService
-	longGroupPreferences            *LongVegetationGroupPreferencesService
-	longQualityNullPreferences      *LongVegetationQualityNullPreferencesService
-	longQualityMinimumPreferences   *LongVegetationQualityMinimumPreferencesService
-	longNamingPreferences           *LongVegetationNamingPreferencesService
-	longSelectedFieldPreferences    *LongVegetationSelectedFieldPreferencesService
-	longEnforcementPreferences      *LongVegetationEnforcementPreferencesService
-	longUnitPreferences             *LongVegetationUnitPreferencesService
-	longSelectedUnitSelection       *LongVegetationSelectedUnitSelectionService
-	longReportScope                 *LongVegetationReportScopeService
-	longProjectWorkbook             *LongVegetationProjectWorkbookService
-	vegetationWorkbook              *VegetationWorkbookService
-	lifeformSummary                 *LifeformSummaryService
-	lifeformWorkbook                *LifeformWorkbookService
-	speciesAttributeSummary         *SpeciesAttributeSummaryService
+	contexts                       *ContextService
+	summary                        *SummaryVegetationService
+	summaryEnvironment             *SummaryVegetationEnvironmentalService
+	summaryEnvironmentLifeform     *SummaryVegetationEnvironmentalLifeformService
+	summaryWorkbook                *SummaryVegetationWorkbookService
+	summaryPreferences             *SummaryVegetationPreferencesService
+	summaryQualityPreferences      *SummaryVegetationQualityPreferencesService
+	summaryPresentationPreferences *SummaryVegetationPresentationPreferencesService
+	summaryFieldList               *SummaryVegetationFieldListService
+	longPreferences                *LongVegetationPreferencesService
+	longStatisticsPreferences      *LongVegetationStatisticsPreferencesService
+	longSwitchPreferences          *LongVegetationSwitchPreferencesService
+	longThresholdPreferences       *LongVegetationThresholdPreferencesService
+	longGroupPreferences           *LongVegetationGroupPreferencesService
+	longQualityNullPreferences     *LongVegetationQualityNullPreferencesService
+	longQualityMinimumPreferences  *LongVegetationQualityMinimumPreferencesService
+	longNamingPreferences          *LongVegetationNamingPreferencesService
+	longSelectedFieldPreferences   *LongVegetationSelectedFieldPreferencesService
+	longEnforcementPreferences     *LongVegetationEnforcementPreferencesService
+	longUnitPreferences            *LongVegetationUnitPreferencesService
+	longSelectedUnitSelection      *LongVegetationSelectedUnitSelectionService
+	longReportScope                *LongVegetationReportScopeService
+	longProjectWorkbook            *LongVegetationProjectWorkbookService
+	vegetationWorkbook             *VegetationWorkbookService
+	lifeformSummary                *LifeformSummaryService
+	lifeformWorkbook               *LifeformWorkbookService
+	speciesAttributeSummary        *SpeciesAttributeSummaryService
 }
 
 // Summary Vegetation report & workbook delegates

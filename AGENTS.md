@@ -61,11 +61,16 @@ Key commands:
 
 ---
 
-## 3. Multi-Agent Parallel Orchestration
+## 3. Multi-Agent Parallel Orchestration & 4-Layer `internal/*` Architecture
 
 - Track multi-wave execution in the session SQLite `todos` and `todo_deps` tables and continue autonomously across waves until all deliverables are verified.
 - **Parallel Subagents Encouraged with Worktree Isolation:** Fan out independent tracks concurrently using `general-purpose` subagents, giving **each mutating subagent its own isolated `git worktree`** (`../vpro_wails.worktrees/waveN-<track>`) and strictly disjoint file ownership (especially around `frontend/bindings/` and shared root state).
 - Use `task` subagents to run verbose Go/Node/`svelte-check` suites and `code-review` / `rubber-duck` subagents as read-only quality gates before merging each wave into `main`.
+- **4-Layer Acyclic Package Architecture (Zero Sibling Imports in Layer 2; Strictly 12 Registered Wails Services in `main.go`):**
+  - **Layer 0 (Assets & Foundations):** `resources` (`resources/embed.go` exporting all embedded `embed.FS` and `[]byte` assets + `RepoRoot()`/`Path(...)`), `internal/sqlutil`, `internal/accessreader` (with `-fvisibility=hidden` on Linux CGO so vendored `fakeglib` never interposes on GTK), `internal/accessimport`, `internal/accessinventory`, `internal/accesslayout`, `internal/accesscompare`, `internal/fs882layout`, `internal/listcatalog`, `internal/reports/{breakreport,subzonematrix}`.
+  - **Layer 1 (Core, Reference Catalogues & Shared Engines):** `internal/references` (`BECService`, `ReferenceService`, `Site/Soil/Parent/Geology/Region/Quality` code services), `internal/vprocore` (`SQLiteContext`, `DesktopConfig`, `DatabaseFamily`, `ProjectService`, `ContextService`, `PlotService` + `internal/vprocore/vprotest`), `internal/sourceform` (+ `internal/sourceform/sftest`), and `internal/reports/reportcore`.
+  - **Layer 2 (12 Independent Parallel Domain Packages — zero sibling imports):** `internal/lifecycle`, `internal/plotentry`, `internal/sivi`, `internal/twopage`, `internal/datasheet`, `internal/classification`, `internal/validation`, `internal/vegreport`, `internal/envreport`, `internal/spatial`, `internal/pictures`, `internal/interchange` (plus cross-domain `*_test.go` suites in `internal/integration`).
+  - **Layer 3 (Thin Wails Host `package main`):** `main.go`, `native_options.go`, `aliases.go`, and `domainservices_*.go` registering strictly 12 cohesive domain services (`LifecycleService`, `ContextService`, `PlotEntryService`, `DatasheetService`, `ClassificationService`, `ValidationService`, `ImportExportService`, `VegetationReportService`, `EnvironmentReportService`, `SpatialService`, `PictureService`, `HelpService`).
 
 ---
 

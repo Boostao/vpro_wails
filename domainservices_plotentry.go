@@ -1,6 +1,11 @@
 package main
 
 import (
+	"github.com/boostao/vpro-wails/internal/plotentry"
+	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
+)
+
+import (
 	"context"
 	"errors"
 )
@@ -83,7 +88,7 @@ func (s *PlotEntryService) DeleteReviewedVegetation(plot string, request Vegetat
 	if s == nil || s.plots == nil {
 		return errors.New("plot service is unavailable")
 	}
-	return s.plots.DeleteReviewedVegetation(plot, request)
+	return plotentry.DeleteReviewedVegetation(s.plots, plot, request)
 }
 
 func (s *PlotEntryService) DeleteVegRecord(plotNumber string, id int64) error {
@@ -167,7 +172,7 @@ func (s *PlotEntryService) RestoreSelectedAuditRecords(plotNumber string, rowIDs
 	if s == nil || s.plots == nil {
 		return nil, errors.New("plot service is unavailable")
 	}
-	return s.plots.RestoreSelectedAuditRecords(plotNumber, rowIDs, action)
+	return s.plots.RestoreSelectedAuditRecords(plotNumber, rowIDs, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) SaveHumusRecord(r HumusRecord) error {
@@ -293,7 +298,7 @@ func (s *PlotEntryService) UpdateVegetationAttributes(plot string, updates []Veg
 	if s == nil || s.plots == nil {
 		return errors.New("plot service is unavailable")
 	}
-	return s.plots.UpdateVegetationAttributes(plot, updates)
+	return plotentry.UpdateVegetationAttributes(s.plots, plot, updates)
 }
 
 func (s *PlotEntryService) UpdateVegetationNumbers(plot string, updates []VegetationNumberUpdate) error {
@@ -337,7 +342,7 @@ func (s *PlotEntryService) RestoreSIVIParentShared(ctx context.Context, contextI
 	if s == nil || s.siviParentShared == nil {
 		return nil, errors.New("SIVI parent shared service is unavailable")
 	}
-	return s.siviParentShared.Restore(ctx, contextID, plot, historyID, action)
+	return s.siviParentShared.Restore(ctx, contextID, plot, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) ReviewSIVICHARSParentEntry(ctx context.Context, contextID, plot string) (*SIVICHARSParentEntryReview, error) {
@@ -358,7 +363,7 @@ func (s *PlotEntryService) RestoreSIVICHARSParentEntry(ctx context.Context, cont
 	if s == nil || s.siviCHARSParentEntry == nil {
 		return nil, errors.New("SIVI CHARS parent entry service is unavailable")
 	}
-	return s.siviCHARSParentEntry.Restore(ctx, contextID, plot, historyID, action)
+	return s.siviCHARSParentEntry.Restore(ctx, contextID, plot, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) GetSIVICoverOriginal(ctx context.Context, contextID, plot string, extended bool) ([]SIVIVegetationProjection, error) {
@@ -379,7 +384,7 @@ func (s *PlotEntryService) RestoreSIVICoverReviewed(ctx context.Context, context
 	if s == nil || s.siviCovers == nil {
 		return nil, errors.New("SIVI cover service is unavailable")
 	}
-	return s.siviCovers.RestoreReviewed(ctx, contextID, plot, historyID, action)
+	return s.siviCovers.RestoreReviewed(ctx, contextID, plot, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) GetSIVICombinedOriginal(ctx context.Context, contextID, plot string, extended bool) ([]SIVIVegetationProjection, error) {
@@ -400,7 +405,7 @@ func (s *PlotEntryService) RestoreSIVICombinedReviewed(ctx context.Context, cont
 	if s == nil || s.siviCombined == nil {
 		return nil, errors.New("SIVI combined service is unavailable")
 	}
-	return s.siviCombined.RestoreReviewed(ctx, contextID, plot, historyID, action)
+	return s.siviCombined.RestoreReviewed(ctx, contextID, plot, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) GetSIVICollectedOriginal(ctx context.Context, contextID, plot string, extended bool) ([]SIVIVegetationProjection, error) {
@@ -421,7 +426,7 @@ func (s *PlotEntryService) RestoreSIVICollectedReviewed(ctx context.Context, con
 	if s == nil || s.siviCollected == nil {
 		return nil, errors.New("SIVI collected service is unavailable")
 	}
-	return s.siviCollected.RestoreReviewed(ctx, contextID, plot, historyID, action)
+	return s.siviCollected.RestoreReviewed(ctx, contextID, plot, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) GetSIVISpeciesOriginal(ctx context.Context, contextID, plot string, extended bool) ([]SIVIVegetationProjection, error) {
@@ -449,7 +454,7 @@ func (s *PlotEntryService) RestoreSIVISpeciesReviewed(ctx context.Context, conte
 	if s == nil || s.siviSpecies == nil {
 		return nil, errors.New("SIVI species service is unavailable")
 	}
-	return s.siviSpecies.RestoreReviewed(ctx, contextID, plot, historyID, action)
+	return s.siviSpecies.RestoreReviewed(ctx, contextID, plot, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) GetSIVIIdentityOriginal(ctx context.Context, contextID, plot string, extended bool) ([]SIVIVegetationProjection, error) {
@@ -470,7 +475,7 @@ func (s *PlotEntryService) RestoreSIVIIdentityReviewed(ctx context.Context, cont
 	if s == nil || s.siviIdentity == nil {
 		return nil, errors.New("SIVI identity service is unavailable")
 	}
-	return s.siviIdentity.RestoreReviewed(ctx, contextID, plot, historyID, action)
+	return s.siviIdentity.RestoreReviewed(ctx, contextID, plot, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) CreateSIVIVegetation(ctx context.Context, contextID, requestJSON string) (*SIVICreationResult, error) {
@@ -598,7 +603,7 @@ func (s *PlotEntryService) RestoreTwoPageParentExtra(ctx context.Context, contex
 	if s == nil || s.twoPageParentExtra == nil {
 		return nil, errors.New("two-page parent extra service is unavailable")
 	}
-	return s.twoPageParentExtra.Restore(ctx, contextID, plot, form, historyID, action)
+	return s.twoPageParentExtra.Restore(ctx, contextID, plot, form, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) GetTwoPageParentCommonOriginal(ctx context.Context, contextID, plot, form string) (*SIVIParentProjection, error) {
@@ -619,7 +624,7 @@ func (s *PlotEntryService) RestoreTwoPageParentCommon(ctx context.Context, conte
 	if s == nil || s.twoPageParentCommon == nil {
 		return nil, errors.New("two-page parent common service is unavailable")
 	}
-	return s.twoPageParentCommon.Restore(ctx, contextID, plot, form, historyID, action)
+	return s.twoPageParentCommon.Restore(ctx, contextID, plot, form, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) GetTwoPageParentEntryOriginal(ctx context.Context, contextID, plot, form string) (*TwoPageEntryReferenceSnapshot, error) {
@@ -647,7 +652,7 @@ func (s *PlotEntryService) RestoreTwoPageParentEntry(ctx context.Context, contex
 	if s == nil || s.twoPageParentEntry == nil {
 		return nil, errors.New("two-page parent entry service is unavailable")
 	}
-	return s.twoPageParentEntry.Restore(ctx, contextID, plot, form, historyID, action)
+	return s.twoPageParentEntry.Restore(ctx, contextID, plot, form, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) CreateTwoPageSoilHorizon(ctx context.Context, contextID, requestJSON string) (*TwoPageSoilWriteResult, error) {

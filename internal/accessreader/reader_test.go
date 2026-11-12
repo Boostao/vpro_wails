@@ -30,6 +30,11 @@ func TestOpenInvalidAndMissing(t *testing.T) {
 		project string
 		version string
 	}{
+		{"/home/bruno/Work/VPRO_ACCESS/VPro64/VPro64.accdb", "Sample", "VP08"},
+		{"/home/bruno/Work/VPRO_ACCESS/VPro64/Templates/TemplateVPro15.accdb", "VPro15", "VP07"},
+		{"/home/bruno/Work/VPRO_ACCESS/VPro64/Templates/TemplateVPro13.accdb", "VPro13", "VP06"},
+		{"/home/bruno/Work/VPRO_ACCESS/VPro64/Templates/TemplateVPro03.mdb", "VPro03", "VP05"},
+		{"/home/bruno/Work/VPRO_ACCESS/VPro64/Templates/TemplateVProXP.mdb", "VProXP", "VP05"},
 		{`C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\VPro64.accdb`, "Sample", "VP08"},
 		{`C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVPro15.accdb`, "VPro15", "VP07"},
 		{`C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVPro13.accdb`, "VPro13", "VP06"},

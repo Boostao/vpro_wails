@@ -62,4 +62,4 @@ __pycache__/
 *.pfx
 *.p12
 .DS_Store
-Thumbs.db
+Thumbs.db/vpro-wails

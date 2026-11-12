@@ -62,7 +62,7 @@ function receipt(status = 'published') {
 const source = () => readFileSync(path.join(__dirname, 'SiteUnitSummaryWorkbookPanel.svelte'), 'utf8');
 
 test('exact 39-field source registry matches kernel and detached review retains method override, NULL and empty', () => {
-  const kernel = readFileSync(path.join(__dirname, '..', '..', 'siteunitdetailreport.go'), 'utf8');
+  const kernel = readFileSync(path.join(__dirname, '..', '..', 'internal', 'envreport', 'siteunitdetailreport.go'), 'utf8');
   const section = kernel.slice(kernel.indexOf('func siteUnitSummaryFields()'), kernel.indexOf('func planSiteUnitSummary'));
   const fields = [...section.matchAll(/\{"([^"]+)", "([^"]+)", "([^"]+)", "([^"]+)", "([^"]+)"\}/g)]
     .map(([, source, key, label, section, kind]) => ({ source, key, label, section, kind }));

@@ -9,9 +9,9 @@
     {"left": "I", "right": "\u0130", "equal": false},
     {"left": "\u00df", "right": "\u1e9e", "equal": true},
     {"left": "ss", "right": "\u00df", "equal": false},
-    {"left": "\u0390", "right": "\u1fd3", "equal": true},
-    {"left": "\u03b0", "right": "\u1fe3", "equal": true},
-    {"left": "\ufb05", "right": "\ufb06", "equal": true}
+    {"left": "\u0390", "right": "\u1fd3", "equal": false},
+    {"left": "\u03b0", "right": "\u1fe3", "equal": false},
+    {"left": "\ufb05", "right": "\ufb06", "equal": false}
   ],
   "request": {
     "requestId": "b0cbfa00-1234-4123-8123-000000000001",

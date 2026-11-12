@@ -738,7 +738,11 @@ test('supplementary Code metadata is explicit nullable text and independently ga
   ]) {
     const invalid=structuredClone(value);mutate(invalid);assert.throws(()=>validate(invalid));
   }
-  const bindings=readFileSync(path.join(__dirname,'..','bindings','github.com','boostao','vpro-wails','models.ts'),'utf8');
+  const bindingsRoot=path.join(__dirname,'..','bindings','github.com','boostao','vpro-wails');
+  const bindings=[
+    readFileSync(path.join(bindingsRoot,'models.ts'),'utf8'),
+    readFileSync(path.join(bindingsRoot,'internal','vegreport','models.ts'),'utf8'),
+  ].join('\n');
   assert.match(bindings,/"showSpeciesCode": boolean/);
 });
 test('Code presentation preserves source caption but labels literal list/matched master codes',()=>{
