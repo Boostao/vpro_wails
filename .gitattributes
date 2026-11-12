@@ -1,1 +1,2 @@
 resources/*fixture*.json -text
+build/linux/** text eol=lf
