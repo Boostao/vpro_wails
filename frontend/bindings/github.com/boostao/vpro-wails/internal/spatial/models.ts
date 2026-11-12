@@ -5,6 +5,58 @@
 // @ts-ignore: Unused imports
 import * as vprocore$0 from "../vprocore/models.js";
 
+export interface ApplySpatialAttributesRequest {
+    "plotNumbers": string[] | null;
+    "allScopedPlots": boolean;
+    "stampGisBgc": boolean;
+    "stampAdminFields": boolean;
+    "onlyWhenBlank": boolean;
+    "normalizeLongitudeSign": boolean;
+    "syncUtmFromLatLon": boolean;
+    "syncLatLonFromUtm": boolean;
+}
+
+export interface ApplySpatialAttributesResult {
+    "contextId": string;
+    "project": string;
+    "updatedPlots": number;
+    "updatedCells": number;
+    "auditRows": number;
+}
+
+/**
+ * AssignSpatialAOIToSURequest configures transactional assignment of AOI-selected plots into a *_SU table.
+ */
+export interface AssignSpatialAOIToSURequest {
+    /**
+     * "update_active" | "create_project_su" | "create_su_file"
+     */
+    "mode": string;
+    "suName": string;
+    "filePath": string;
+    "siteUnit": string;
+    "plotNumbers": string[] | null;
+    "polygon": number[][] | null;
+    "rings": (number[][] | null)[] | null;
+    "includeNonAoiPlotsAsUnassigned": boolean;
+    "activate": boolean;
+}
+
+/**
+ * AssignSpatialAOIToSUResult reports the committed *_SU table write outcome.
+ */
+export interface AssignSpatialAOIToSUResult {
+    "contextId": string;
+    "suName": string;
+    "tableName": string;
+    "filePath": string;
+    "siteUnit": string;
+    "matchedPlots": number;
+    "changedRows": number;
+    "activated": boolean;
+    "newState"?: vprocore$0.ProjectState | null;
+}
+
 export interface GoogleEarthDescriptionFields {
     "contextId": string;
     "project": string;
@@ -85,6 +137,283 @@ export interface GoogleEarthReviewRow {
     "longitude": vprocore$0.ProjectMetadataCell;
     "latitude": vprocore$0.ProjectMetadataCell;
     "description": vprocore$0.ProjectMetadataCell;
+}
+
+/**
+ * NAD83LatLonProjection is the Wails IPC DTO for NAD83 UTM -> Lat/Lon projection.
+ */
+export interface NAD83LatLonProjection {
+    "latitude": number;
+    "longitude": number;
+    "ntsMapSheet": string;
+}
+
+/**
+ * NAD83UTMProjection is the Wails IPC DTO for NAD83 Lat/Lon -> UTM projection.
+ */
+export interface NAD83UTMProjection {
+    "zone": number;
+    "easting": number;
+    "northing": number;
+    "ntsMapSheet": string;
+}
+
+/**
+ * PMTilesArchiveStatus describes the resolution state of a single .pmtiles archive.
+ */
+export interface PMTilesArchiveStatus {
+    "name": string;
+    "url": string;
+
+    /**
+     * "dataDir" | "extraDir" | "embedded-overview" | "missing"
+     */
+    "source": string;
+    "available": boolean;
+    "fullResolution": boolean;
+    "fallbackOverview": boolean;
+    "minZoom": number;
+    "maxZoom": number;
+    "sizeBytes": number;
+}
+
+/**
+ * PMTilesManifest reports available offline PMTiles archives to the Svelte 5 MapLibre workbench.
+ */
+export interface PMTilesManifest {
+    "schemaVersion": number;
+    "archives": { [_ in string]?: PMTilesArchiveStatus } | null;
+    "ordered": PMTilesArchiveStatus[] | null;
+}
+
+/**
+ * PlotGeodesyEvaluation reports bidirectional NAD83 projection, sign normalization, and UTM-vs-DD divergence.
+ */
+export interface PlotGeodesyEvaluation {
+    "hasLatLon": boolean;
+    "hasUtm": boolean;
+    "normalizedLat": number | null;
+    "normalizedLon": number | null;
+    "longitudeSignFlipped": boolean;
+    "computedUtmZone": number | null;
+    "computedUtmEasting": number | null;
+    "computedUtmNorthing": number | null;
+    "utmDerivedLat": number | null;
+    "utmDerivedLon": number | null;
+    "divergenceMeters": number | null;
+    "thresholdMeters": number;
+    "divergenceFlagged": boolean;
+    "bcgsMapSheet": string;
+    "outOfBounds": boolean;
+    "diagnostics": string[] | null;
+}
+
+/**
+ * PlotGeodesyInput supplies stored or draft plot coordinate fields for Auto-1 geodetic evaluation.
+ */
+export interface PlotGeodesyInput {
+    "latitude": number | null;
+    "longitude": number | null;
+    "utmZone": string | null;
+    "utmEasting": number | null;
+    "utmNorthing": number | null;
+    "locationAccuracy": number | null;
+}
+
+/**
+ * SpatialAOIMatchedPlot describes a plot inside the selected AOI polygon.
+ */
+export interface SpatialAOIMatchedPlot {
+    "plotNumber": string;
+    "lon": number;
+    "lat": number;
+    "fieldBgc": string;
+    "gisBgc": string;
+    "siteUnit": string;
+}
+
+/**
+ * SpatialAOISelectionRequest specifies a lasso/polygon AOI in EPSG:4326 [lon, lat] coordinates.
+ */
+export interface SpatialAOISelectionRequest {
+    /**
+     * Single exterior ring of [lon, lat] vertices
+     */
+    "polygon": number[][] | null;
+
+    /**
+     * Optional multi-ring / polygon-with-holes [lon, lat]
+     */
+    "rings": (number[][] | null)[] | null;
+
+    /**
+     * Optional BEC Zone filter
+     */
+    "zone": string;
+}
+
+/**
+ * SpatialAOISelectionResult returns matched plots and AOI geometry summary.
+ */
+export interface SpatialAOISelectionResult {
+    "contextId": string;
+    "project": string;
+    "su": string;
+    "totalEvaluated": number;
+    "matchedCount": number;
+    "plotNumbers": string[] | null;
+    "plots": SpatialAOIMatchedPlot[] | null;
+    "boundingBox": number[];
+    "approxAreaKm2": number;
+}
+
+/**
+ * SpatialAttributeSuggestion holds the complete Auto-1 coordinate-driven geodetic, BGC v13, administrative, and terrain result.
+ */
+export interface SpatialAttributeSuggestion {
+    "normalizedLat": number;
+    "normalizedLon": number;
+    "longitudeSignFlipped": boolean;
+    "utmZone": number;
+    "utmEasting": number;
+    "utmNorthing": number;
+    "ntsMapSheet": string;
+    "gisBgc": string;
+    "gisBgcVer": number;
+    "bgcLabel": string;
+    "mapLabel": string;
+    "zone": string;
+    "subZone": string;
+    "variant": string;
+    "phase": string;
+    "vproSubZone": string;
+    "zoneName": string;
+    "bgcZoom": number;
+    "bgcSource": string;
+    "ecosection": string;
+    "ecosectionName": string;
+    "parentEcoregion": string;
+    "fsRegionDistrict": string;
+    "districtName": string;
+    "regionOrgUnit": string;
+    "orgUnit": string;
+    "adminZoom": number;
+    "adminSource": string;
+    "provinceStateTerritory": string;
+    "expectedElevationMinM": number | null;
+    "expectedElevationMaxM": number | null;
+    "expectedSlopeRangePct": string;
+    "expectedAspectRangeDeg": string;
+    "terrainSanityNote": string;
+    "diagnostics": string[] | null;
+}
+
+export interface SpatialBatchAuditReport {
+    "contextId": string;
+    "project": string;
+    "su": string;
+    "totalPlots": number;
+    "coordinatizedPlots": number;
+    "unsignedLonCount": number;
+    "utmDivergenceCount": number;
+    "bgcMismatchCount": number;
+    "missingGisBgcCount": number;
+    "elevationIssueCount": number;
+    "rows": SpatialPlotQARow[] | null;
+}
+
+/**
+ * SpatialGeoArrowColumns provides compact columnar SOA arrays for zero-parse WebGPU / Deck.gl transfer.
+ */
+export interface SpatialGeoArrowColumns {
+    "count": number;
+    "plotNumber": string[] | null;
+    "lon": number[] | null;
+    "lat": number[] | null;
+    "hasUtm": boolean[] | null;
+    "utmDerivedLon": number[] | null;
+    "utmDerivedLat": number[] | null;
+    "divergenceMeters": number[] | null;
+    "divergenceFlagged": boolean[] | null;
+    "longitudeFlipped": boolean[] | null;
+    "hasElevation": boolean[] | null;
+    "elevation": number[] | null;
+    "hasSlope": boolean[] | null;
+    "slope": number[] | null;
+    "hasAspect": boolean[] | null;
+    "aspect": number[] | null;
+    "zone": string[] | null;
+    "subZone": string[] | null;
+    "fieldBgc": string[] | null;
+    "gisBgc": string[] | null;
+    "bgcMismatch": boolean[] | null;
+    "siteUnit": string[] | null;
+    "ecosection": string[] | null;
+    "fsRegionDistrict": string[] | null;
+}
+
+export interface SpatialPlotQARow {
+    "plotNumber": string;
+    "siteUnit": string;
+    "zone": string;
+    "subZone": string;
+    "fieldBgc": string;
+    "storedGisBgc": string;
+    "storedGisBgcVer": number | null;
+    "suggestedGisBgc": string;
+    "suggestedBgcLabel": string;
+    "bgcMismatch": boolean;
+    "storedEcosection": string;
+    "suggestedEcosection": string;
+    "storedFsRegionDistrict": string;
+    "suggestedFsRegionDistrict": string;
+    "storedNtsMapSheet": string;
+    "suggestedNtsMapSheet": string;
+    "latitude": number | null;
+    "longitude": number | null;
+    "normalizedLat": number | null;
+    "normalizedLon": number | null;
+    "longitudeSignFlipped": boolean;
+    "utmZone": string | null;
+    "utmEasting": number | null;
+    "utmNorthing": number | null;
+    "computedUtmZone": number | null;
+    "computedUtmEasting": number | null;
+    "computedUtmNorthing": number | null;
+    "utmDerivedLat": number | null;
+    "utmDerivedLon": number | null;
+    "divergenceMeters": number | null;
+    "divergenceFlagged": boolean;
+    "elevation": number | null;
+    "expectedElevationMinM": number | null;
+    "expectedElevationMaxM": number | null;
+    "elevationFlagged": boolean;
+    "diagnostics": string[] | null;
+}
+
+/**
+ * SpatialWorkbenchPayload bundles context metadata, PMTiles manifest, and GeoArrow plot columns for GeospatialWorkbench.svelte.
+ */
+export interface SpatialWorkbenchPayload {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "totalPlots": number;
+    "plottableCount": number;
+    "bgcMismatchCount": number;
+    "utmDivergenceCount": number;
+    "unsignedLonCount": number;
+
+    /**
+     * [minLon, minLat, maxLon, maxLat]
+     */
+    "boundingBox": number[];
+    "availableSus": string[] | null;
+    "siteUnits": string[] | null;
+    "manifest": PMTilesManifest;
+    "geoArrow": SpatialGeoArrowColumns;
 }
 
 export interface TwoPageGoogleEarthOptions {
