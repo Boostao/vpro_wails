@@ -45,6 +45,7 @@ type FS882Header struct {
 	FieldNotes               *string  `json:"fieldNotes"`
 	OfficeNotes              *string  `json:"officeNotes"`
 	StartDate                *int     `json:"startDate"`
+	ActiveLayerDepth         *float64 `json:"activeLayerDepth"`
 	AirPhotoNum              *string  `json:"airPhotoNum"`
 	BECSiteUnit              *string  `json:"becSiteUnit"`
 	BedrockGeology1          *string  `json:"bedrockGeology1"`
@@ -80,6 +81,7 @@ type FS882Header struct {
 	SiteDisturbance2         *string  `json:"siteDisturbance2"`
 	SiteDisturbance3         *string  `json:"siteDisturbance3"`
 	SitePlotQuality          *string  `json:"sitePlotQuality"`
+	SnowCoverRegime          *string  `json:"snowCoverRegime"`
 	SoilClassGroup           *string  `json:"soilClassGroup"`
 	SoilClassSubGroup        *string  `json:"soilClassSubGroup"`
 	SoilDrainage             *string  `json:"soilDrainage"`
@@ -319,27 +321,14 @@ func (s *PlotService) SetCurrentUser(user string) error {
 
 // Callers release the borrow, not the context-owned pool.
 func (s *PlotService) getActiveReadDB() (*sql.DB, string, func(), error) {
-	release := func() {}
-	if !s.contextScoped {
-		s.projects.operationMu.RLock()
-		var once sync.Once
-		release = func() { once.Do(s.projects.operationMu.RUnlock) }
-	}
-	s.projects.mu.RLock()
-	coordinator := s.projects.sqlite
-	s.projects.mu.RUnlock()
-	if coordinator != nil {
-		db, err := coordinator.projectReadDatabase(s.operationContext())
-		if err != nil {
-			release()
-			return nil, "", nil, err
-		}
-		return db, coordinator.selection.Project, release, nil
-	}
-	return s.getActiveDB()
+	return s.openActiveDB(true)
 }
 
 func (s *PlotService) getActiveDB() (*sql.DB, string, func(), error) {
+	return s.openActiveDB(false)
+}
+
+func (s *PlotService) openActiveDB(readOnly bool) (*sql.DB, string, func(), error) {
 	release := func() {}
 	if !s.contextScoped {
 		s.projects.operationMu.RLock()
@@ -350,7 +339,15 @@ func (s *PlotService) getActiveDB() (*sql.DB, string, func(), error) {
 	coordinator := s.projects.sqlite
 	s.projects.mu.RUnlock()
 	if coordinator != nil {
-		db, err := coordinator.projectDatabase(s.operationContext())
+		var (
+			db  *sql.DB
+			err error
+		)
+		if readOnly {
+			db, err = coordinator.projectReadDatabase(s.operationContext())
+		} else {
+			db, err = coordinator.projectDatabase(s.operationContext())
+		}
 		if err != nil {
 			release()
 			return nil, "", nil, err
@@ -380,7 +377,11 @@ func (s *PlotService) getActiveDB() (*sql.DB, string, func(), error) {
 		release()
 		return nil, "", nil, err
 	}
-	db, err := sql.Open("sqlite3", sqliteFileURI(dbPath, "rw")+"&_foreign_keys=on")
+	dsn := sqliteFileURI(dbPath, "rw") + "&_foreign_keys=on"
+	if readOnly {
+		dsn = sqliteFileURI(dbPath, "ro") + "&_foreign_keys=on&_busy_timeout=5000"
+	}
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		release()
 		return nil, "", nil, err

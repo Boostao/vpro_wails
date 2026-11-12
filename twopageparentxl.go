@@ -54,6 +54,12 @@ func twoPageXLFields(form string) (map[string]twoPageXLField, error) {
 		if field.column == "" || field.column == "PlotNumber" || !source[field.column] {
 			continue
 		}
+		if _, inCommon := twoPageParentCommonFields[field.column]; inCommon {
+			continue
+		}
+		if _, inExtra := twoPageParentExtraFields[field.column]; inExtra {
+			continue
+		}
 		member, exists := header.FieldByName(field.member)
 		if !exists || member.Type.Kind() != reflect.Pointer {
 			return nil, fmt.Errorf("two-page XL %s has no accepted nullable header type", field.column)

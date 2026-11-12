@@ -26,7 +26,7 @@
     { key: NumberKey; label: string; kind: 'number'; step?: string };
 
   type HeaderSlot = { columns: readonly string[]; controls: readonly string[]; input: Snippet<[PaperControl, string]>; labelled: true };
-  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, masterAllowed = false, extendedShrubs = false, snowCoverRegime = '', activeLayerDepth = '', onSnowCoverRegimeChange, onActiveLayerDepthChange, editor, additionalEditor, onMetadata, metadataDisabled = true, pictureEditor, sourcePage, coordinateMode = $bindable<CoordinateDisplayMode>('dd'), children: layoutContent }: {
+  let { draft = $bindable(), original, capabilities, disabled, existing, lists, onchange, onerror, onvalidation, onCoordinateBusyChange, onWorkingUnitBusyChange, onQualityBusyChange, onSiteCodeBusyChange, onRegionCodeBusyChange, workingUnitSession, masterAllowed = false, extendedShrubs = false, snowCoverRegime = '', activeLayerDepth = '', snowCoverRegimeError = null, activeLayerDepthError = null, onSnowCoverRegimeChange, onActiveLayerDepthChange, editor, additionalEditor, onMetadata, metadataDisabled = true, pictureEditor, sourcePage, coordinateMode = $bindable<CoordinateDisplayMode>('dd'), children: layoutContent }: {
     draft: FS882Header;
     original: (BECCodes & WorkingUnitCodes & QualityCodes & SubstrateValues & SiteCodes & RegionCodes) | null;
     capabilities: Record<string, boolean | undefined>;
@@ -40,6 +40,8 @@
     extendedShrubs?: boolean;
     snowCoverRegime?: string;
     activeLayerDepth?: string;
+    snowCoverRegimeError?: string | null;
+    activeLayerDepthError?: string | null;
     onSnowCoverRegimeChange?: (value: string) => void;
     onActiveLayerDepthChange?: (value: string) => void;
     onCoordinateBusyChange?: (busy: boolean) => void;
@@ -306,16 +308,20 @@
         <div class="form-field">
           <label class="field-label" for="header-snowCoverregime">Snow cover regime</label>
           <input class="paper-control" id="header-snowCoverregime" data-column="SnowCoverregime" type="text"
-            value={snowCoverRegime} disabled={disabled || !onSnowCoverRegimeChange}
+            value={snowCoverRegime} disabled={disabled || capabilities.snowCoverRegime !== true || !onSnowCoverRegimeChange}
+            aria-invalid={snowCoverRegimeError ? 'true' : undefined}
             title={onSnowCoverRegimeChange ? 'SnowCoverregime' : 'Use Complete two-page entry or SIVI parent editor to save SnowCoverregime'}
             oninput={(event) => onSnowCoverRegimeChange?.(event.currentTarget.value)} />
+          {#if snowCoverRegimeError}<p role="alert" class="text-xs text-red-700 mt-1">{snowCoverRegimeError}</p>{/if}
         </div>
         <div class="form-field">
           <label class="field-label" for="header-activeLayerDepth">Active layer depth (cm)</label>
           <input class="paper-control" id="header-activeLayerDepth" data-column="ActiveLayerDepth" type="text" inputmode="decimal"
-            value={activeLayerDepth} disabled={disabled || !onActiveLayerDepthChange}
+            value={activeLayerDepth} disabled={disabled || capabilities.activeLayerDepth !== true || !onActiveLayerDepthChange}
+            aria-invalid={activeLayerDepthError ? 'true' : undefined}
             title={onActiveLayerDepthChange ? 'ActiveLayerDepth' : 'Use Complete two-page entry or Two-page additional fields to save ActiveLayerDepth'}
             oninput={(event) => onActiveLayerDepthChange?.(event.currentTarget.value)} />
+          {#if activeLayerDepthError}<p role="alert" class="text-xs text-red-700 mt-1">{activeLayerDepthError}</p>{/if}
         </div>
       </div>
     </fieldset>

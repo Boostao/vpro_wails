@@ -348,6 +348,7 @@ export interface FS882Header {
     "fieldNotes": string | null;
     "officeNotes": string | null;
     "startDate": number | null;
+    "activeLayerDepth": number | null;
     "airPhotoNum": string | null;
     "becSiteUnit": string | null;
     "bedrockGeology1": string | null;
@@ -383,6 +384,7 @@ export interface FS882Header {
     "siteDisturbance2": string | null;
     "siteDisturbance3": string | null;
     "sitePlotQuality": string | null;
+    "snowCoverRegime": string | null;
     "soilClassGroup": string | null;
     "soilClassSubGroup": string | null;
     "soilDrainage": string | null;

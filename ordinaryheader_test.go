@@ -10,6 +10,12 @@ import (
 )
 
 func setOrdinaryTestValue(h *FS882Header, member string, value any) {
+	for _, mapping := range headerFields {
+		if mapping.column == member || mapping.member == member {
+			member = mapping.member
+			break
+		}
+	}
 	field := reflect.ValueOf(h).Elem().FieldByName(member)
 	if value == nil {
 		field.SetZero()
@@ -26,6 +32,8 @@ func TestOrdinaryTextBoundsUnicodeMemoAndHistoricalPreservation(t *testing.T) {
 			valid := "  raw q'X4\r\n\U0001f600"
 			if field.maximum == 0 {
 				valid = strings.Repeat(valid, 10000)
+			} else if field.maximum < 12 {
+				valid = strings.Repeat("S", field.maximum)
 			}
 			setOrdinaryTestValue(&h, field.name, &valid)
 			if err := s.CreatePlot(h); err != nil {

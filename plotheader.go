@@ -23,7 +23,8 @@ type headerField struct {
 // its AfterUpdate saves the record then toggles AllowEdits on this form/children.
 // UTM coordinates and slope are SINGLE/SQLite REAL; StartDate is INTEGER
 // (the form labels it "Yr."). LocationAccuracy is INTEGER, not a text code.
-// All 98 unique parent ControlSource columns exist in the packaged Env/Admin
+// All 98 unique parent ControlSource columns plus the two Arctic extended site
+// columns (SnowCoverregime, ActiveLayerDepth) exist in the packaged Env/Admin
 // schema. Metadata-only and unbound/computed controls are not header fields.
 var headerFields = []headerField{
 	{"plotNumber", "PlotNumber", "Env", "PlotNumber"},
@@ -56,6 +57,7 @@ var headerFields = []headerField{
 	{"fieldNotes", "FieldNotes", "Env", "SiteNotes"},
 	{"officeNotes", "OfficeNotes", "Admin", "OfficeNotes"},
 	{"startDate", "StartDate", "Admin", "StartDate"},
+	{"activeLayerDepth", "ActiveLayerDepth", "Env", "ActiveLayerDepth"},
 	{"airPhotoNum", "AirPhotoNum", "Env", "AirPhotoNum"},
 	{"becSiteUnit", "BECSiteUnit", "Admin", "BECSiteUnit"},
 	{"bedrockGeology1", "BedrockGeology1", "Env", "BedrockGeology1"},
@@ -91,6 +93,7 @@ var headerFields = []headerField{
 	{"siteDisturbance2", "SiteDisturbance2", "Env", "SiteDisturbance2"},
 	{"siteDisturbance3", "SiteDisturbance3", "Env", "SiteDisturbance3"},
 	{"sitePlotQuality", "SitePlotQuality", "Admin", "SitePlotQuality"},
+	{"snowCoverRegime", "SnowCoverRegime", "Env", "SnowCoverregime"},
 	{"soilClassGroup", "SoilClassGroup", "Env", "SoilClassGroup"},
 	{"soilClassSubGroup", "SoilClassSubGroup", "Env", "SoilClassSubGroup"},
 	{"soilDrainage", "SoilDrainage", "Env", "SoilDrainage"},
@@ -174,7 +177,7 @@ func headerCapabilities(db headerDB, project string) (map[string]bool, error) {
 // GetHeaderCapabilities returns exact DTO JSON keys, not guessed schema aliases.
 // locked is always false: the Access option is runtime UI state, not stored data.
 func (s *PlotService) GetHeaderCapabilities() (map[string]bool, error) {
-	db, project, release, err := s.getActiveDB()
+	db, project, release, err := s.getActiveReadDB()
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +212,7 @@ func readHeader(db headerDB, project, plot string, caps map[string]bool) (*FS882
 
 // GetPlot reads supported nullable fields; unsupported properties remain nil/false.
 func (s *PlotService) GetPlot(plotNumber string) (*FS882Header, error) {
-	db, project, release, err := s.getActiveDB()
+	db, project, release, err := s.getActiveReadDB()
 	if err != nil {
 		return nil, err
 	}

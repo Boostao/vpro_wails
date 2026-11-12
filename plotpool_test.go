@@ -28,13 +28,33 @@ func poolFixture(t *testing.T) (*ContextService, ProjectState, *FS882Header) {
 	return service, state, header
 }
 
-func TestPlotPoolWarmReadsReuseOwnedHandleAndPreserveFiles(t *testing.T) {
-	service, state, original := poolFixture(t)
-	owner, pool := service.projects.sqlite, service.projects.sqlite.projectDB
-	if pool == nil {
-		t.Fatal("first scoped read did not initialise the owned project pool")
+func assertNoWALSidecars(t *testing.T, dbPath string) {
+	t.Helper()
+	for _, suffix := range []string{"-wal", "-shm"} {
+		if _, err := os.Stat(dbPath + suffix); !errors.Is(err, os.ErrNotExist) {
+			t.Fatalf("unexpected SQLite sidecar %s%s after read-only workload: %v", dbPath, suffix, err)
+		}
 	}
+}
+
+func TestPlotPoolWarmReadsReuseOwnedHandleAndPreserveFiles(t *testing.T) {
+	seedBytes, err := sampleFiles.ReadFile("resources/Sample.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	service, state, original := poolFixture(t)
+	owner, pool := service.projects.sqlite, service.projects.sqlite.projectReadDB
+	if pool == nil {
+		t.Fatal("first scoped read did not initialise the owned read-only project pool")
+	}
+	if owner.projectDB != nil {
+		t.Fatal("read-only GetPlot unexpectedly initialised writable WAL project pool")
+	}
+	assertNoWALSidecars(t, state.ProjectPath)
 	before := databaseBytes(t, owner.attachments)
+	if !bytes.Equal(before["project"], seedBytes) {
+		t.Fatal("initial GetPlot mutated Sample.db bytes")
+	}
 	config, err := os.ReadFile(service.projects.preferences.path)
 	if err != nil {
 		t.Fatal(err)
@@ -47,27 +67,55 @@ func TestPlotPoolWarmReadsReuseOwnedHandleAndPreserveFiles(t *testing.T) {
 		if _, err := service.GetHeaderCapabilities(context.Background(), state.ContextID); err != nil {
 			t.Fatal(err)
 		}
-		if owner.projectDB != pool {
-			t.Fatal("operation replaced or closed the session pool")
+		if owner.projectReadDB != pool || owner.projectDB != nil {
+			t.Fatal("operation replaced read pool or opened writable pool")
 		}
 	}
 	stats := pool.Stats()
 	if stats.MaxOpenConnections != 2 || stats.OpenConnections != 1 || stats.InUse != 0 || stats.Idle != 1 {
 		t.Fatalf("serial warm workload did not reuse one idle connection: %+v", stats)
 	}
+	assertNoWALSidecars(t, state.ProjectPath)
 	after := databaseBytes(t, owner.attachments)
-	if !reflect.DeepEqual(before, after) {
+	if !reflect.DeepEqual(before, after) || !bytes.Equal(after["project"], seedBytes) {
 		t.Fatal("readonly plot workload changed project/support bytes")
 	}
 	current, err := os.ReadFile(service.projects.preferences.path)
 	if err != nil || !bytes.Equal(config, current) {
 		t.Fatal("warm reads changed configuration")
 	}
+	// Verify non-coordinator fallback in getActiveReadDB also opens mode=ro without file/WAL mutation.
+	legacyDir := t.TempDir()
+	legacyProjects, err := NewProjectServiceWithConfig(legacyDir, legacyDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	legacyState, err := legacyProjects.GetState(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	legacyPath := legacyProjects.projectFile(compatibleProject(legacyState.Projects, legacyState.ActiveProject))
+	legacyBefore, err := os.ReadFile(legacyPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	legacyPlots := NewPlotService(legacyProjects)
+	if _, err := legacyPlots.GetHeaderCapabilities(); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := legacyPlots.GetPlot(original.PlotNumber); err != nil || !reflect.DeepEqual(got, original) {
+		t.Fatalf("legacy read-only GetPlot mismatch: %v", err)
+	}
+	assertNoWALSidecars(t, legacyPath)
+	legacyAfter, err := os.ReadFile(legacyPath)
+	if err != nil || !bytes.Equal(legacyBefore, legacyAfter) {
+		t.Fatal("legacy non-coordinator GetPlot/GetHeaderCapabilities mutated project bytes")
+	}
 }
 
 func TestPlotPoolEveryConnectionKeepsForeignKeysAndBusyPolicy(t *testing.T) {
 	service, _, _ := poolFixture(t)
-	pool := service.projects.sqlite.projectDB
+	pool := service.projects.sqlite.projectReadDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	first, err := pool.Conn(ctx)
@@ -99,7 +147,7 @@ func TestPlotPoolEveryConnectionKeepsForeignKeysAndBusyPolicy(t *testing.T) {
 
 func TestPlotPoolConcurrentReadsKeepOneOwnerAndBoundedConnections(t *testing.T) {
 	service, state, header := poolFixture(t)
-	pool := service.projects.sqlite.projectDB
+	pool := service.projects.sqlite.projectReadDB
 	results := make(chan error, 24)
 	var wait sync.WaitGroup
 	for i := 0; i < cap(results); i++ {
@@ -122,14 +170,15 @@ func TestPlotPoolConcurrentReadsKeepOneOwnerAndBoundedConnections(t *testing.T) 
 			t.Fatal(err)
 		}
 	}
-	if service.projects.sqlite.projectDB != pool || pool.Stats().OpenConnections > 2 || pool.Stats().InUse != 0 {
-		t.Fatal("concurrent reads lost ownership or exceeded the pool bound")
+	assertNoWALSidecars(t, state.ProjectPath)
+	if service.projects.sqlite.projectReadDB != pool || service.projects.sqlite.projectDB != nil || pool.Stats().OpenConnections > 2 || pool.Stats().InUse != 0 {
+		t.Fatal("concurrent reads lost ownership, opened writable pool, or exceeded the pool bound")
 	}
 }
 
 func TestPlotPoolFailedPublicationRetainsPoolAndSwitchClosesIt(t *testing.T) {
 	service, state, header := poolFixture(t)
-	owner, pool := service.projects.sqlite, service.projects.sqlite.projectDB
+	owner, pool := service.projects.sqlite, service.projects.sqlite.projectReadDB
 	preferences := service.projects.preferences
 	replace := preferences.replace
 	preferences.replace = func(string, string) error { return errors.New("pool publication failure") }
@@ -137,7 +186,7 @@ func TestPlotPoolFailedPublicationRetainsPoolAndSwitchClosesIt(t *testing.T) {
 		t.Fatalf("failed publication accepted: %v", err)
 	}
 	preferences.replace = replace
-	if service.projects.sqlite != owner || owner.projectDB != pool {
+	if service.projects.sqlite != owner || owner.projectReadDB != pool {
 		t.Fatal("failed publication retired the original pool")
 	}
 	if _, err := service.GetPlot(context.Background(), state.ContextID, header.PlotNumber); err != nil {
@@ -147,13 +196,13 @@ func TestPlotPoolFailedPublicationRetainsPoolAndSwitchClosesIt(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := pool.Ping(); err == nil || owner.projectDB != nil {
+	if err := pool.Ping(); err == nil || owner.projectReadDB != nil {
 		t.Fatal("successful switch left old project pool open")
 	}
 	if _, err := service.GetPlot(context.Background(), next.ContextID, header.PlotNumber); err != nil {
 		t.Fatal(err)
 	}
-	newPool := service.projects.sqlite.projectDB
+	newPool := service.projects.sqlite.projectReadDB
 	if newPool == pool || newPool == nil {
 		t.Fatal("new context reused a retired project pool")
 	}
@@ -167,7 +216,7 @@ func TestPlotPoolFailedPublicationRetainsPoolAndSwitchClosesIt(t *testing.T) {
 
 func TestPlotPoolUnscopedReadBorrowBlocksSwitchAndReleasesOnce(t *testing.T) {
 	service, state, _ := poolFixture(t)
-	db, _, release, err := service.plots.getActiveDB()
+	db, _, release, err := service.plots.getActiveReadDB()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -199,7 +248,10 @@ func TestPlotPoolUnscopedReadBorrowBlocksSwitchAndReleasesOnce(t *testing.T) {
 
 func TestPlotPoolAuditFailureRollsBackAndRetryKeepsTheSamePool(t *testing.T) {
 	service, state, original := poolFixture(t)
-	pool := service.projects.sqlite.projectDB
+	pool, err := service.projects.sqlite.projectDatabase(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
 	var before int
 	if err := pool.QueryRow(`SELECT COUNT(*) FROM Sample_Audit`).Scan(&before); err != nil {
 		t.Fatal(err)

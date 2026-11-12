@@ -4,7 +4,7 @@ const { readFileSync } = require('node:fs');
 const path = require('node:path');
 const { render } = require('svelte/server');
 const { compile } = require('svelte/compiler');
-const { loadTypeScript, presentationHelpers, serverComponent } = require('./svelteTestHelpers.cjs');
+const { loadTypeScript, presentationHelpers, serverComponent, componentFunctions } = require('./svelteTestHelpers.cjs');
 const numeric = loadTypeScript('numericEditor.ts');
 const height = loadTypeScript('heightEditor.ts', { './numericEditor': numeric });
 const { paper, presentation } = presentationHelpers();
@@ -72,7 +72,10 @@ test('shared option gates extended presentation and restricts heights without cl
   assert.match(form, /VITE_EXTENDED_SHRUBS !== 'false'/);
   assert.match(form, /data-extended-shrubs/);
   assert.match(form, /Show extended shrub layers/);
-  assert.match(form, /if \(extendedShrubs\) vegetationMode = 'cover'/);
+  assert.match(form, /function setExtendedShrubs\(next: boolean\)/);
+  assert.match(form, /if \(next\) vegetationMode = 'cover'/);
+  assert.match(form, /onchange=\{\(event\) => setExtendedShrubs\(event\.currentTarget\.checked\)\}/);
+  assert.equal((form.match(/onExtendedShrubsChange=\{extendedShrubsEnabled \? setExtendedShrubs : undefined\}/g) || []).length, 4);
   assert.match(form, /heightToggleDisabled=\{extendedShrubs \|\| busy \|\| headerWorkflowBusy\}/);
   assert.match(form, /extendedShrubs && originalChild\.form === 'SubVegAXL_BC' \? 'SubVegAXL'/);
   assert.match(form, /name === 'SubVegAXL_BC' \|\| name === 'SubVegAXL'/);
@@ -86,8 +89,104 @@ test('shared option gates extended presentation and restricts heights without cl
   assert.match(twoPage, /Show extended shrub layers/);
   const siviShared = read('SIVIParentSharedFields.svelte');
   assert.match(siviShared, /data-sivi-extended-shrubs/);
+  assert.match(siviShared, /data-sivi-arctic-fields/);
   assert.match(siviShared, /Show extended shrub layers/);
   for (const file of ['FS882Form.svelte', 'HeaderEditor.svelte', 'TwoPageEntryEditor.svelte', 'SIVIParentSharedFields.svelte', 'SourcePage.svelte', 'SourceChild.svelte']) {
     assert.equal(compile(read(file), { filename: file, generate: 'client' }).warnings.length, 0);
   }
+});
+
+test('setExtendedShrubs synchronizes all six SIVI vegetation sessions and forces cover mode when enabled', () => {
+  const calls = [];
+  const makeSession = name => ({ presentation: next => calls.push([name, next]) });
+  const ctx = componentFunctions('FS882Form.svelte', ['setExtendedShrubs'], {
+    extendedShrubs: false,
+    vegetationMode: 'height',
+    siviSession: makeSession('height'),
+    siviCoverSession: makeSession('cover'),
+    siviCombinedSession: makeSession('combined'),
+    siviCollectedSession: makeSession('collected'),
+    siviSpeciesSession: makeSession('species'),
+    siviIdentitySession: makeSession('identity'),
+  });
+  ctx.actions.setExtendedShrubs(true);
+  assert.equal(ctx.extendedShrubs, true);
+  assert.equal(ctx.vegetationMode, 'cover');
+  assert.deepEqual(calls, [
+    ['height', true], ['cover', true], ['combined', true],
+    ['collected', true], ['species', true], ['identity', true],
+  ]);
+  calls.length = 0;
+  ctx.actions.setExtendedShrubs(false);
+  assert.equal(ctx.extendedShrubs, false);
+  assert.equal(ctx.vegetationMode, 'cover');
+  assert.deepEqual(calls, [
+    ['height', false], ['cover', false], ['combined', false],
+    ['collected', false], ['species', false], ['identity', false],
+  ]);
+});
+
+test('SnowCoverregime and ActiveLayerDepth stage, validate, and project non-blank values on FS882 and SIVI', () => {
+  const bec = loadTypeScript('becEditor.ts');
+  const quality = loadTypeScript('qualityEditor.ts', { './becEditor': bec });
+  const ordinary = loadTypeScript('ordinaryEditor.ts', { './qualityEditor': quality, './numericEditor': numeric });
+  let dirtyCount = 0;
+  const validations = {};
+  const ctx = componentFunctions('FS882Form.svelte', ['stageSnowCoverRegime', 'stageActiveLayerDepth'], {
+    headerInputsDisabled: false,
+    capabilities: { snowCoverRegime: true, activeLayerDepth: true },
+    draft: { snowCoverRegime: null, activeLayerDepth: null },
+    original: { snowCoverRegime: 'S', activeLayerDepth: 42.5 },
+    activeLayerDepthRaw: null,
+    ordinaryTextError: ordinary.ordinaryTextError,
+    ordinaryNumberValue: ordinary.ordinaryNumberValue,
+    validateHeader: (key, msg) => { if (msg === null) delete validations[key]; else validations[key] = msg; },
+    markDirty: () => { dirtyCount++; },
+  });
+  ctx.actions.stageSnowCoverRegime('Z');
+  assert.equal(ctx.draft.snowCoverRegime, 'Z');
+  assert.equal(validations.snowCoverRegime, undefined);
+  ctx.actions.stageSnowCoverRegime('AB');
+  assert.match(validations.snowCoverRegime, /at most 1 UTF-16/);
+  ctx.actions.stageSnowCoverRegime('');
+  assert.equal(ctx.draft.snowCoverRegime, null);
+  assert.equal(validations.snowCoverRegime, undefined);
+
+  ctx.actions.stageActiveLayerDepth('35.25');
+  assert.equal(ctx.draft.activeLayerDepth, 35.25);
+  assert.equal(validations.activeLayerDepth, undefined);
+  ctx.actions.stageActiveLayerDepth('3.5e38');
+  assert.match(validations.activeLayerDepth, /Single/);
+  ctx.actions.stageActiveLayerDepth('');
+  assert.equal(ctx.draft.activeLayerDepth, null);
+  assert.equal(validations.activeLayerDepth, undefined);
+  assert.equal(dirtyCount, 6);
+
+  const { editor, writeSession, transport, source, metadata } = require('./siviParentTestHelpers.cjs');
+  const shared = loadTypeScript('siviParentSharedSession.ts', {
+    '../../resources/fs1333-sivi-layout.json': source, './ordinaryEditor': ordinary,
+    './projectMetadataEditor': metadata, './siviParentEditor': editor,
+    './siviParentWriteSession': writeSession, './siviParentTransport': transport,
+    './coordinateEditor': loadTypeScript('coordinateEditor.ts'),
+    './siviDateTimestamp': loadTypeScript('siviDateTimestamp.ts'),
+    './referenceEditor': loadTypeScript('referenceEditor.ts', {
+      './qualityEditor': quality, './projectMetadataEditor': metadata, './siviParentTransport': transport,
+    }),
+  });
+  const SIVIParentSharedFields = serverComponent(read('SIVIParentSharedFields.svelte'), 'SIVIParentSharedFields.svelte', {
+    './projectMetadataEditor': metadata, './siviParentSharedSession': shared,
+  });
+  const siviMarkup = render(SIVIParentSharedFields, {
+    props: {
+      view: { original: null, drafts: {}, busy: false, operation: null, blocked: false, error: null, historyId: null },
+      disabled: false, canSave: false, onstage() {}, onoperation() {}, oncancel() {},
+      extendedShrubs: true, onExtendedShrubsChange() {},
+      snowCoverRegime: 'S', activeLayerDepth: '42.5',
+      onSnowCoverRegimeChange() {}, onActiveLayerDepthChange() {},
+    },
+  }).body;
+  assert.match(siviMarkup, /id="sivi-arctic-SnowCoverregime"[^>]*value="S"/);
+  assert.match(siviMarkup, /id="sivi-arctic-ActiveLayerDepth"[^>]*value="42\.5"/);
+  assert.doesNotMatch(siviMarkup, /id="sivi-arctic-SnowCoverregime"[^>]*disabled/);
+  assert.doesNotMatch(siviMarkup, /id="sivi-arctic-ActiveLayerDepth"[^>]*disabled/);
 });

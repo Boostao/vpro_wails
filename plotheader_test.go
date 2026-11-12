@@ -87,6 +87,9 @@ func fullHeader(plot string) FS882Header {
 			if isOrdinaryProperty(v.Type().Field(i).Tag.Get("json")) {
 				text = "raw q'X4"
 			}
+			if v.Type().Field(i).Name == "SnowCoverRegime" {
+				text = "S"
+			}
 			value.Elem().SetString(text)
 		}
 		field.Set(value)
@@ -198,6 +201,7 @@ func TestPlotHeader_AllFieldsRoundTripAndAudit(t *testing.T) {
 		"Aspect": *h.Aspect, "MesoSlopePosition": *h.MesoSlopePos, "SurfaceShape": *h.SurfaceShape,
 		"SurfaceTopographyType": *h.MicrotopType, "SurfaceTopographySize": *h.MicrotopSize,
 		"SiteNotes": *h.FieldNotes, "OfficeNotes": *h.OfficeNotes, "StartDate": *h.StartDate,
+		"SnowCoverregime": *h.SnowCoverRegime, "ActiveLayerDepth": *h.ActiveLayerDepth,
 	}
 	for column, want := range wantColumns {
 		table := "Sample_Env"
@@ -301,6 +305,8 @@ func TestPlotHeader_AllFieldsRoundTripAndAudit(t *testing.T) {
 				f.Elem().SetString("p")
 			case "BedrockGeology1", "BedrockGeology2", "BedrockGeology3":
 				f.Elem().SetString("aB")
+			case "SnowCoverRegime":
+				f.Elem().SetString("Z")
 			}
 			if isParentCodeProperty(v.Type().Field(i).Tag.Get("json")) {
 				f.Elem().SetString("x")

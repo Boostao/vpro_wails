@@ -70,7 +70,7 @@ func (c *sqliteContext) projectReadDatabase(ctx context.Context) (*sql.DB, error
 	if c.projectReadDB != nil {
 		return c.projectReadDB, nil
 	}
-	db, err := sql.Open("sqlite3", sqliteFileURI(c.selection.ProjectPath, "ro")+"&_busy_timeout=5000")
+	db, err := sql.Open("sqlite3", sqliteFileURI(c.selection.ProjectPath, "ro")+"&_foreign_keys=on&_busy_timeout=5000")
 	if err != nil {
 		return nil, err
 	}

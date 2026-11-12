@@ -11,6 +11,7 @@ func ordinaryTextFields(h FS882Header) []becHeaderField {
 	return []becHeaderField{
 		{"AirPhotoNum", "airPhotoNum", "Env", 20, h.AirPhotoNum},
 		{"EnteredBy", "enteredBy", "Admin", 50, h.EnteredBy},
+		{"SnowCoverregime", "snowCoverRegime", "Env", 1, h.SnowCoverRegime},
 		{"SoilSurveyor", "soilSurveyor", "Env", 30, h.SoilSurveyor},
 		{"VegSurveyor", "vegSurveyor", "Env", 30, h.VegSurveyor},
 		{"SoilNotes", "soilNotes", "Env", 0, h.SoilNotes},
@@ -31,6 +32,7 @@ func ordinaryNumberFields(h FS882Header) []ordinaryNumberField {
 		{"RootRestrictingDepth", "rootRestrictingDepth", "Env", h.RootRestrictingDepth, nil, true},
 		{"RootingDepth", "rootingDepth", "Env", h.RootingDepth, nil, true},
 		{"SeepageDepth", "seepageDepth", "Env", h.SeepageDepth, nil, true},
+		{"ActiveLayerDepth", "activeLayerDepth", "Env", nil, h.ActiveLayerDepth, false},
 		{"HumusThickness", "humusThickness", "Admin", nil, h.HumusThickness, false},
 		{"StrataCoverHerb", "strataCoverHerb", "Env", nil, h.StrataCoverHerb, false},
 		{"StrataCoverMoss", "strataCoverMoss", "Env", nil, h.StrataCoverMoss, false},

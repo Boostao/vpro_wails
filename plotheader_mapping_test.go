@@ -38,8 +38,12 @@ func TestPlotHeader_SourceBindingsAndTypes(t *testing.T) {
 			}
 		}
 	}
-	if len(bound) != 98 || len(headerFields) != 99 {
-		t.Fatalf("bound columns %d, mappings %d; want 98 stored plus runtime lock", len(bound), len(headerFields))
+	arcticExtended := map[string]bool{
+		"SnowCoverregime":  true,
+		"ActiveLayerDepth": true,
+	}
+	if len(bound) != 98 || len(headerFields) != 101 {
+		t.Fatalf("bound columns %d, mappings %d; want 98 FS882-6x4XL + 2 Arctic extended + runtime lock", len(bound), len(headerFields))
 	}
 	_, db := headerFixture(t)
 	schemas := map[string]map[string]string{}
@@ -82,7 +86,7 @@ func TestPlotHeader_SourceBindingsAndTypes(t *testing.T) {
 			}
 			continue
 		}
-		if !bound[field.column] || mapped[field.column] {
+		if (!bound[field.column] && !arcticExtended[field.column]) || mapped[field.column] {
 			t.Fatalf("unbound or duplicate source mapping: %#v", field)
 		}
 		mapped[field.column] = true
@@ -115,7 +119,14 @@ func TestPlotHeader_SourceBindingsAndTypes(t *testing.T) {
 		counts[field.table]++
 		types[got]++
 	}
-	if !reflect.DeepEqual(mapped, bound) {
+	expectedMapped := map[string]bool{}
+	for k := range bound {
+		expectedMapped[k] = true
+	}
+	for k := range arcticExtended {
+		expectedMapped[k] = true
+	}
+	if !reflect.DeepEqual(mapped, expectedMapped) {
 		t.Fatal("parent bindings and stored mappings differ")
 	}
 	t.Logf("verified mappings: tables=%v types=%v", counts, types)

@@ -2,7 +2,9 @@
   import { metadataCellText } from './projectMetadataEditor';
   import { siviParentSharedFieldsFor, siviParentSharedCell, siviParentSharedDirty, type SIVIParentSharedColumn,
     type SIVIParentSharedInput, type SIVIParentSharedView } from './siviParentSharedSession';
-  let { view, disabled = true, canSave = false, onstage, onoperation, oncancel, onreferences, extendedShrubs = false, onExtendedShrubsChange }: {
+  let { view, disabled = true, canSave = false, onstage, onoperation, oncancel, onreferences, extendedShrubs = false, onExtendedShrubsChange,
+    snowCoverRegime, activeLayerDepth, snowCoverRegimeDisabled = false, activeLayerDepthDisabled = false,
+    snowCoverRegimeError = null, activeLayerDepthError = null, onSnowCoverRegimeChange, onActiveLayerDepthChange }: {
     view: SIVIParentSharedView; disabled?: boolean; canSave?: boolean;
     onstage: (column: SIVIParentSharedColumn, input: SIVIParentSharedInput) => void;
     onoperation: (operation: 'load' | 'save' | 'undo' | 'retain' | 'prune') => void;
@@ -10,7 +12,24 @@
     onreferences?: () => void;
     extendedShrubs?: boolean;
     onExtendedShrubsChange?: (enabled: boolean) => void;
+    snowCoverRegime?: string;
+    activeLayerDepth?: string;
+    snowCoverRegimeDisabled?: boolean;
+    activeLayerDepthDisabled?: boolean;
+    snowCoverRegimeError?: string | null;
+    activeLayerDepthError?: string | null;
+    onSnowCoverRegimeChange?: (value: string) => void;
+    onActiveLayerDepthChange?: (value: string) => void;
   } = $props();
+  function projectedEnvCellText(column: string): string {
+    if (!view.original?.Rows[0]?.Env) return '';
+    const index = view.original.EnvColumns.findIndex(col => col.name.toLowerCase() === column.toLowerCase());
+    if (index < 0) return '';
+    const cell = view.original.Rows[0].Env.cells[index];
+    return !cell || cell.storage === 'null' ? '' : metadataCellText(cell);
+  }
+  const displayedSnowCoverRegime = $derived(snowCoverRegime ?? projectedEnvCellText('SnowCoverregime'));
+  const displayedActiveLayerDepth = $derived(activeLayerDepth ?? projectedEnvCellText('ActiveLayerDepth'));
   const groups = [
     { label: 'Plot & survey', scope: 'plot' },
     { label: 'Site description', scope: 'site' },
@@ -38,6 +57,29 @@
   </div>
   {#if extendedShrubs}
     <p class="text-xs text-stone-600" data-sivi-extended-summary>Extended shrub layers (Cover5a–Cover5c, Height5a–Height5c) and Arctic site fields (SnowCoverregime, ActiveLayerDepth) are active.</p>
+    <fieldset class="space-y-2 rounded border border-stone-200 p-3" data-sivi-arctic-fields>
+      <legend class="px-1 text-sm font-medium">Arctic / extended site fields</legend>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div class="min-w-0 space-y-1">
+          <label for="sivi-arctic-SnowCoverregime" class="block text-sm font-medium">Snow cover regime</label>
+          <input id="sivi-arctic-SnowCoverregime" data-column="SnowCoverregime" type="text"
+            class="w-full rounded border p-2" value={displayedSnowCoverRegime}
+            disabled={snowCoverRegimeDisabled || view.busy || view.blocked || dirty || !onSnowCoverRegimeChange}
+            aria-invalid={snowCoverRegimeError ? 'true' : undefined}
+            oninput={event => onSnowCoverRegimeChange?.(event.currentTarget.value)} />
+          {#if snowCoverRegimeError}<p role="alert" class="text-sm text-red-700">{snowCoverRegimeError}</p>{/if}
+        </div>
+        <div class="min-w-0 space-y-1">
+          <label for="sivi-arctic-ActiveLayerDepth" class="block text-sm font-medium">Active layer depth (cm)</label>
+          <input id="sivi-arctic-ActiveLayerDepth" data-column="ActiveLayerDepth" type="text" inputmode="decimal"
+            class="w-full rounded border p-2" value={displayedActiveLayerDepth}
+            disabled={activeLayerDepthDisabled || view.busy || view.blocked || dirty || !onActiveLayerDepthChange}
+            aria-invalid={activeLayerDepthError ? 'true' : undefined}
+            oninput={event => onActiveLayerDepthChange?.(event.currentTarget.value)} />
+          {#if activeLayerDepthError}<p role="alert" class="text-sm text-red-700">{activeLayerDepthError}</p>{/if}
+        </div>
+      </div>
+    </fieldset>
   {/if}
   {#if view.error}<p role="alert" class="text-sm text-red-700">{view.error}</p>{/if}
   {#if view.referenceError}<p role="alert" data-sivi-reference-error>{view.referenceError}</p>{/if}

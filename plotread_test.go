@@ -10,11 +10,16 @@ import (
 )
 
 func TestScopedReadsRejectCancellationWithoutChangingData(t *testing.T) {
-	service, state, original := poolFixture(t)
-	before, err := os.ReadFile(state.ProjectPath)
+	seedBytes, err := sampleFiles.ReadFile("resources/Sample.db")
 	if err != nil {
 		t.Fatal(err)
 	}
+	service, state, original := poolFixture(t)
+	before, err := os.ReadFile(state.ProjectPath)
+	if err != nil || !bytes.Equal(before, seedBytes) {
+		t.Fatal("initial GetPlot mutated project bytes", err)
+	}
+	assertNoWALSidecars(t, state.ProjectPath)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	reads := []func() error{
@@ -47,6 +52,7 @@ func TestScopedReadsRejectCancellationWithoutChangingData(t *testing.T) {
 	if _, err := service.GetPlot(context.Background(), state.ContextID, original.PlotNumber); err != nil {
 		t.Fatal("valid retrieval failed after cancellation", err)
 	}
+	assertNoWALSidecars(t, state.ProjectPath)
 	after, err := os.ReadFile(state.ProjectPath)
 	if err != nil || !bytes.Equal(before, after) {
 		t.Fatal("cancelled reads changed project/audit bytes", err)
@@ -70,7 +76,10 @@ func TestScopedReadCancellationWhileSwitchLeaseIsUnavailable(t *testing.T) {
 
 func TestScopedReadCancellationReleasesPoolWaitAndInterruptsSQLite(t *testing.T) {
 	service, state, original := poolFixture(t)
-	db := service.projects.sqlite.projectDB
+	db := service.projects.sqlite.projectReadDB
+	if db == nil || service.projects.sqlite.projectDB != nil {
+		t.Fatal("expected read-only project pool without writable pool")
+	}
 	first, err := db.Conn(context.Background())
 	if err != nil {
 		t.Fatal(err)
@@ -90,7 +99,7 @@ func TestScopedReadCancellationReleasesPoolWaitAndInterruptsSQLite(t *testing.T)
 	ctx, cancel = context.WithTimeout(context.Background(), 50*time.Millisecond)
 	defer cancel()
 	_, err = withContextPlotRequest(ctx, service, state.ContextID, func(plots *PlotService) (int, error) {
-		db, _, release, err := plots.getActiveDB()
+		db, _, release, err := plots.getActiveReadDB()
 		if err != nil {
 			return 0, err
 		}
@@ -111,4 +120,5 @@ func TestScopedReadCancellationReleasesPoolWaitAndInterruptsSQLite(t *testing.T)
 	if _, err := service.GetPlot(context.Background(), state.ContextID, original.PlotNumber); err != nil {
 		t.Fatal("subsequent valid scoped read failed", err)
 	}
+	assertNoWALSidecars(t, state.ProjectPath)
 }

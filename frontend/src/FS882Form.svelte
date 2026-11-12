@@ -88,6 +88,7 @@
   import { controlLabel } from './formPresentation';
   import type { EditorCloseState } from './closeLifecycle';
   import { heightField, stageHeight, heightDirty, heightErrors, heightSourceNotices, aCoverSourceNotice, aCoverSourceNotices, heightUpdates, vegetationNumberUpdates, type HeightDrafts } from './heightEditor';
+  import { ordinaryTextError, ordinaryNumberValue } from './ordinaryEditor';
   import { otherField, stageOther, otherDirty, otherErrors, otherUpdates, type OtherDrafts, type OtherValue } from './otherEditor';
   import { soilField, stageSoil, soilDirty, soilErrors, soilUpdates, type SoilDrafts, type SoilKind } from './soilChildEditor';
   import { vegetationAttributeField, stageVegetationAttribute, vegetationAttributeDirty, vegetationAttributeErrors, vegetationAttributeUpdates, type VegetationAttributeDrafts } from './vegetationAttributeEditor';
@@ -253,6 +254,16 @@
   let vegetationMode = $state<VegetationMode>('initial');
   const extendedShrubsEnabled = import.meta.env.VITE_EXTENDED_SHRUBS !== 'false';
   let extendedShrubs = $state(false);
+  function setExtendedShrubs(next: boolean) {
+    extendedShrubs = next;
+    siviSession?.presentation(next);
+    siviCoverSession?.presentation(next);
+    siviCombinedSession?.presentation(next);
+    siviCollectedSession?.presentation(next);
+    siviSpeciesSession?.presentation(next);
+    siviIdentitySession?.presentation(next);
+    if (next) vegetationMode = 'cover';
+  }
   let busy = $state(false);
   let coordinateBusy = $state(false);
   let workingUnitBusy = $state(false);
@@ -646,6 +657,7 @@
     fieldNotes: null,
     officeNotes: null,
     startDate: null,
+    activeLayerDepth: null,
     airPhotoNum: null,
     becSiteUnit: null,
     bedrockGeology1: null,
@@ -681,6 +693,7 @@
     siteDisturbance2: null,
     siteDisturbance3: null,
     sitePlotQuality: null,
+    snowCoverRegime: null,
     soilClassGroup: null,
     soilClassSubGroup: null,
     soilDrainage: null,
@@ -722,6 +735,35 @@
   const sourceHeaderValues = $derived(new Map(Object.entries(draft).map(([key, value]) => [key.toLowerCase(), value])));
 
   let original = $state<FS882Header | null>(null);
+  let activeLayerDepthRaw = $state<string | null>(null);
+  const snowCoverRegimeInput = $derived(draft.snowCoverRegime ?? '');
+  const activeLayerDepthInput = $derived(
+    activeLayerDepthRaw ?? (draft.activeLayerDepth == null ? '' : String(draft.activeLayerDepth)),
+  );
+  function stageSnowCoverRegime(raw: string) {
+    if (headerInputsDisabled || capabilities.snowCoverRegime !== true) return;
+    const value = raw === '' ? null : raw;
+    draft.snowCoverRegime = value;
+    const message = ordinaryTextError(
+      { label: 'Snow cover regime', kind: 'text', maximum: 1 },
+      value,
+      original?.snowCoverRegime ?? null,
+    );
+    validateHeader('snowCoverRegime', message);
+    markDirty();
+  }
+  function stageActiveLayerDepth(raw: string) {
+    if (headerInputsDisabled || capabilities.activeLayerDepth !== true) return;
+    activeLayerDepthRaw = raw;
+    const cell = ordinaryNumberValue(
+      { label: 'Active layer depth', kind: 'single' },
+      raw,
+      original?.activeLayerDepth ?? null,
+    );
+    if (cell.error === null) draft.activeLayerDepth = cell.value;
+    validateHeader('activeLayerDepth', cell.error);
+    markDirty();
+  }
   const headerInputsDisabled = $derived(draft.locked || busy || siviSourceBarrier || !capabilitiesReady || childUnsaved || pictureBusy || pictureMetadataPending);
   const twoPageLinkedParentBlocked = $derived.by(() => {
     twoPageRevision;
@@ -904,6 +946,7 @@
     }
     draft = { ...header };
     original = structuredClone(header);
+    activeLayerDepthRaw = null;
     dirty = false;
     headerValidation = {};
     await loadChildData(plot);
@@ -1675,6 +1718,7 @@
     const locked = draft.locked;
     draft = { ...header, locked };
     original = JSON.parse(JSON.stringify(header));
+    activeLayerDepthRaw = null;
     dirty = false;
     headerValidation = {};
   }
@@ -1880,6 +1924,7 @@
       if (res !== null) {
         draft = { ...res };
         original = JSON.parse(JSON.stringify(res));
+        activeLayerDepthRaw = null;
         dirty = false;
         headerValidation = {};
         if (siviParentReviewEnabled && $projectState?.contextId === siviContextId) {
@@ -2014,6 +2059,7 @@
       } else {
         draft = newDraft();
         original = null;
+        activeLayerDepthRaw = null;
         dirty = false;
         headerValidation = {};
       }
@@ -3049,15 +3095,19 @@
     error = null;
     successMsg = null;
     try {
-      const payload = { ...draft, locked: capabilities.locked === true && draft.locked };
+      const payload = $state.snapshot({ ...draft, locked: capabilities.locked === true && draft.locked });
       if (original) await PlotService.UpdatePlot(payload);
       else await PlotService.CreatePlot(payload);
       original = JSON.parse(JSON.stringify(draft));
+      activeLayerDepthRaw = null;
       workingUnitSession.plot = draft.plotNumber;
       dirty = false;
       headerValidation = {};
       successMsg = `Plot ${draft.plotNumber} saved successfully.`;
       await loadChildData(draft.plotNumber);
+      if (siviParentSession?.view().original || siviParentSession?.view().error) {
+        await refreshSIVIParent(draft.plotNumber, [siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession, siviParentSharedSession]);
+      }
       if (onSaved) await onSaved(draft.plotNumber);
     } catch (e) {
       error = String(e);
@@ -3197,6 +3247,7 @@
     } else {
       draft = newDraft();
     }
+    activeLayerDepthRaw = null;
     dirty = false;
     headerValidation = {};
     error = null;
@@ -3555,7 +3606,7 @@
       {#if extendedShrubsEnabled && !twoPageOpen}
         <label class="inline-flex items-center gap-2 text-xs font-medium cursor-pointer">
           <input type="checkbox" data-extended-shrubs checked={extendedShrubs} disabled={busy || headerWorkflowBusy}
-            onchange={(event) => { extendedShrubs = event.currentTarget.checked; siviSession?.presentation(extendedShrubs); siviCoverSession?.presentation(extendedShrubs); siviCombinedSession?.presentation(extendedShrubs); siviCollectedSession?.presentation(extendedShrubs); siviSpeciesSession?.presentation(extendedShrubs); siviIdentitySession?.presentation(extendedShrubs); if (extendedShrubs) vegetationMode = 'cover'; }} />
+            onchange={(event) => setExtendedShrubs(event.currentTarget.checked)} />
           Show extended shrub layers
         </label>
       {/if}
@@ -3581,7 +3632,15 @@
           onreferences={() => { void siviParentSharedSession?.refreshReferences(); }}
           oncancel={() => siviParentSharedSession?.cancel()}
           {extendedShrubs}
-          onExtendedShrubsChange={extendedShrubsEnabled ? (next) => { extendedShrubs = next; siviSession?.presentation(next); siviCoverSession?.presentation(next); siviCombinedSession?.presentation(next); siviCollectedSession?.presentation(next); siviSpeciesSession?.presentation(next); siviIdentitySession?.presentation(next); } : undefined} />
+          onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
+          snowCoverRegime={snowCoverRegimeInput}
+          activeLayerDepth={activeLayerDepthInput}
+          snowCoverRegimeDisabled={headerInputsDisabled || capabilities.snowCoverRegime !== true}
+          activeLayerDepthDisabled={headerInputsDisabled || capabilities.activeLayerDepth !== true}
+          snowCoverRegimeError={headerValidation.snowCoverRegime ?? null}
+          activeLayerDepthError={headerValidation.activeLayerDepth ?? null}
+          onSnowCoverRegimeChange={stageSnowCoverRegime}
+          onActiveLayerDepthChange={stageActiveLayerDepth} />
       {/if}
     {/snippet}
     {#if activeTab === 'siviParent' && siviParentOpen && siviParentView && !metadataOpen && (!siviStandalone || siviStandaloneEnabled)}
@@ -3673,7 +3732,7 @@
       {#if twoPageScope === 'entry'}
         <TwoPageEntryEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
           initialForm={twoPageEntryInitialForm}
-          onExtendedShrubsChange={extendedShrubsEnabled ? (next) => { extendedShrubs = next; } : undefined}
+          onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
           pictureReaderAvailable={pictureReadingEnabled}
           auditReaderAvailable={import.meta.env.VITE_TWO_PAGE_SOURCE_AUDIT_REVIEW !== 'false'}
           googleEarthReaderAvailable={import.meta.env.VITE_TWO_PAGE_GOOGLE_EARTH_REVIEW !== 'false'}
@@ -3697,7 +3756,7 @@
       {:else if twoPageScope === 'common'}
         <TwoPageParentCommonEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
           initialForm={twoPageEntryInitialForm}
-          onExtendedShrubsChange={extendedShrubsEnabled ? (next) => { extendedShrubs = next; } : undefined}
+          onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
           cache={twoPageCommonSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
           onbusy={value => twoPageBusy = value}
           onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
@@ -3705,7 +3764,7 @@
       {:else}
         <TwoPageParentEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
           initialForm={twoPageEntryInitialForm}
-          onExtendedShrubsChange={extendedShrubsEnabled ? (next) => { extendedShrubs = next; } : undefined}
+          onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
           cache={twoPageSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
           onbusy={value => twoPageBusy = value}
           onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
@@ -3956,6 +4015,12 @@
         <HeaderEditor bind:draft {original} {capabilities} disabled={headerInputsDisabled}
           onMetadata={metadataEnabled ? openProjectMetadata : undefined} metadataDisabled={!canOpenProjectMetadata()}
           {editor} additionalEditor={ordinaryEditor} {masterAllowed} {extendedShrubs}
+          snowCoverRegime={snowCoverRegimeInput}
+          activeLayerDepth={activeLayerDepthInput}
+          snowCoverRegimeError={headerValidation.snowCoverRegime ?? null}
+          activeLayerDepthError={headerValidation.activeLayerDepth ?? null}
+          onSnowCoverRegimeChange={stageSnowCoverRegime}
+          onActiveLayerDepthChange={stageActiveLayerDepth}
           existing={original !== null}
           lists={{ moistureRegime: moistureList, nutrientRegime: nutrientList, mesoSlopePos: mesoSlopeList, surfaceShape: surfaceShapeList }}
           onchange={markDirty} onerror={(message) => error = message} onvalidation={validateHeader}
