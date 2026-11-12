@@ -539,10 +539,11 @@ func CreateSUFromEnvFields(
 							return err
 						}
 					} else {
-						if _, err := wtx.ExecContext(ctx,
-							`UPDATE main.`+qTarget+` SET "SiteUnit" = ? WHERE typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
-							w.unit, w.plot,
-						); err != nil {
+						updSQL := `UPDATE main.` + qTarget + ` SET "SiteUnit" = ? WHERE typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`
+						if mode == "fill_unassigned_only" {
+							updSQL += ` AND ("SiteUnit" IS NULL OR TRIM("SiteUnit") = '')`
+						}
+						if _, err := wtx.ExecContext(ctx, updSQL, w.unit, w.plot); err != nil {
 							return err
 						}
 					}

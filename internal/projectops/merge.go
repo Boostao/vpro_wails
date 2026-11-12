@@ -406,14 +406,6 @@ func ExecuteThreeWayMerge(s *vprocore.ContextService, ctx context.Context, conte
 	}
 
 	runMergeOnConn := func(conn *sql.Conn) (ThreeWayMergeResult, error) {
-		preview, srcSnap, tgtSnap, _, pErr := buildThreeWayMergePreviewInternal(ctx, srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj)
-		if pErr != nil {
-			return ThreeWayMergeResult{}, pErr
-		}
-		if exp := strings.TrimSpace(req.ExpectedPreviewDigest); exp != "" && exp != preview.PreviewDigest {
-			return ThreeWayMergeResult{}, errors.New("source or target database changed since preview; re-run PreviewThreeWayMerge before executing")
-		}
-
 		tx, err := conn.BeginTx(ctx, nil)
 		if err != nil {
 			return ThreeWayMergeResult{}, err
@@ -424,6 +416,14 @@ func ExecuteThreeWayMerge(s *vprocore.ContextService, ctx context.Context, conte
 				txErr = errors.Join(txErr, rb)
 			}
 		}()
+
+		preview, srcSnap, tgtSnap, _, pErr := buildThreeWayMergePreviewInternal(ctx, srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj)
+		if pErr != nil {
+			return ThreeWayMergeResult{}, pErr
+		}
+		if exp := strings.TrimSpace(req.ExpectedPreviewDigest); exp != "" && exp != preview.PreviewDigest {
+			return ThreeWayMergeResult{}, errors.New("source or target database changed since preview; re-run PreviewThreeWayMerge before executing")
+		}
 
 		if err := ensureChildIdentityTable(ctx, tx); err != nil {
 			return ThreeWayMergeResult{}, err

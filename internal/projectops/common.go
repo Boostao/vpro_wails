@@ -117,13 +117,36 @@ func inspectContextSnapshot(ctx context.Context, s *vprocore.ContextService, con
 	})
 }
 
+func truncateUTF16(s string, maxUnits int) string {
+	if maxUnits <= 0 {
+		return ""
+	}
+	units := 0
+	for idx, r := range s {
+		cost := 1
+		if r > 0xFFFF {
+			cost = 2
+		}
+		if units+cost > maxUnits {
+			return s[:idx]
+		}
+		units += cost
+	}
+	return s
+}
+
 func computeFileSHA256(path string) (string, error) {
+	h := sha256.New()
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
-	sum := sha256.Sum256(raw)
-	return hex.EncodeToString(sum[:]), nil
+	_, _ = h.Write(raw)
+	if wal, walErr := os.ReadFile(path + "-wal"); walErr == nil && len(wal) > 0 {
+		_, _ = h.Write([]byte("|WAL|"))
+		_, _ = h.Write(wal)
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
 // readVListsVersionStamps reads USysAllSpecs and USysTableOfLists version descriptions

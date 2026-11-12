@@ -269,13 +269,22 @@ func loadProjectSnapshotForDiff(ctx context.Context, dbPath, project string) (*l
 				return strings.Compare(sortSig(a), sortSig(b))
 			})
 
+			baseGroupCounts := map[string]int{}
+			for _, r := range plotRows {
+				baseGroupCounts[baseKeyFn(r)]++
+			}
+			idIdx, hasIDCol := colIndex["ID"]
 			keyCounts := map[string]int{}
 			for _, r := range plotRows {
 				baseKey := baseKeyFn(r)
 				keyCounts[baseKey]++
 				rowKey := baseKey
-				if suffix != "Env" && suffix != "Admin" && keyCounts[baseKey] > 1 {
-					rowKey = fmt.Sprintf("%s#%d", baseKey, keyCounts[baseKey])
+				if suffix != "Env" && suffix != "Admin" && baseGroupCounts[baseKey] > 1 {
+					if hasIDCol && r[idIdx].storage == "integer" {
+						rowKey = fmt.Sprintf("%s[ID=%d]", baseKey, r[idIdx].intVal)
+					} else {
+						rowKey = fmt.Sprintf("%s#%d", baseKey, keyCounts[baseKey])
+					}
 				}
 				colMap := make(map[string]*string, len(cols))
 				rawMap := make(map[string]rawSQLiteCell, len(cols))

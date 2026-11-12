@@ -355,14 +355,16 @@ func extractLongVegObservations(
 		su := suByPlot[plot]
 		coll := strings.TrimSpace(collected)
 
+		emittedAny := false
 		for idx, sl := range canonicalVegSublayers {
 			if !covers[idx].Valid {
 				continue
 			}
 			cov := float64(float32(covers[idx].Float64))
-			if cov <= 0 {
+			if cov < 0 {
 				continue
 			}
+			emittedAny = true
 			// Clean float32 decimal artifacts to 4 decimals
 			cov = math.Round(cov*10000) / 10000
 			var htPtr *float64
@@ -383,6 +385,24 @@ func extractLongVegObservations(
 				Lifeform:       meta.Lifeform,
 				Cover:          cov,
 				Height:         htPtr,
+				Collected:      coll,
+			})
+		}
+		if !emittedAny {
+			// Preserve presence-only / voucher species rows whose sublayer covers are all NULL.
+			rawObs = append(rawObs, longVegObservation{
+				PlotNumber:     plot,
+				SiteUnit:       su,
+				ID:             id,
+				LayerIndex:     9, // Herb/presence default slot
+				Layer:          "C",
+				TVGroup:        "Herb",
+				StrataGroup:    "C",
+				Species:        code,
+				ScientificName: meta.ScientificName,
+				Lifeform:       meta.Lifeform,
+				Cover:          0,
+				Height:         nil,
 				Collected:      coll,
 			})
 		}

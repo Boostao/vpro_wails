@@ -506,7 +506,7 @@ func ApplyProjectMetadataAutomation(s *vprocore.ContextService, ctx context.Cont
 		targetPID = derived.ProjectID
 	}
 	if utf16Len(targetPID) > 20 {
-		targetPID = string([]rune(targetPID)[:20])
+		targetPID = truncateUTF16(targetPID, 20)
 	}
 	if err := validateUTF16Max("Metadata.ProjectID", targetPID, 20); err != nil {
 		return ApplyProjectMetadataAutomationResult{}, err

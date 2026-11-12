@@ -344,8 +344,14 @@ func classifyColumnMeta(tableKey string, col vprocore.ProjectMetadataColumn, pin
 
 	editable := true
 	protected := false
-	// Child row surrogate IDs and Hierarchy auto-IDs are immutable in grid mode.
+	// Child row surrogate IDs, Hierarchy auto-IDs, and relational PlotNumber/Plot/SppCode keys are immutable in single-table grid mode.
 	if col.Name == "ID" && (tableKey == "Veg" || tableKey == "Humus" || tableKey == "Mineral" || tableKey == "Other" || tableKey == "Hierarchy") {
+		editable = false
+		protected = true
+	}
+	if (col.Name == "PlotNumber" && (tableKey == "Env" || tableKey == "Veg" || tableKey == "Humus" || tableKey == "Mineral" || tableKey == "Other" || tableKey == "SU")) ||
+		(col.Name == "Plot" && tableKey == "Admin") ||
+		(col.Name == "SppCode" && tableKey == "Lump") {
 		editable = false
 		protected = true
 	}

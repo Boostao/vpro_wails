@@ -874,6 +874,40 @@ func ExportSplinterProject(s *vprocore.ContextService, ctx context.Context, cont
 		rows: filterRowsByColumn(metaCols, metaAllRows, "ProjectID", selectedProjectIDs),
 	}
 
+	var sourceIdentityReservations []struct {
+		suffix string
+		id     int64
+	}
+	var hasSourceIdentity bool
+	if err := srcTx.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name='__VPRO_ChildIdentity')`).Scan(&hasSourceIdentity); err != nil {
+		return ExportSplinterResult{}, err
+	}
+	if hasSourceIdentity {
+		idRows, qErr := srcTx.QueryContext(ctx, `SELECT ChildTable, ID FROM "__VPRO_ChildIdentity" WHERE ID > 0`)
+		if qErr != nil {
+			return ExportSplinterResult{}, qErr
+		}
+		srcPrefix := strings.Trim(vprocore.QuoteHeaderIdentifier(snap.Project+"_"), `"`)
+		for idRows.Next() {
+			var childTbl string
+			var reservedID int64
+			if sErr := idRows.Scan(&childTbl, &reservedID); sErr != nil {
+				_ = idRows.Close()
+				return ExportSplinterResult{}, sErr
+			}
+			unquoted := strings.Trim(childTbl, `"`)
+			if strings.HasPrefix(unquoted, srcPrefix) {
+				sourceIdentityReservations = append(sourceIdentityReservations, struct {
+					suffix string
+					id     int64
+				}{suffix: strings.TrimPrefix(unquoted, srcPrefix), id: reservedID})
+			}
+		}
+		if err := errors.Join(idRows.Err(), idRows.Close()); err != nil {
+			return ExportSplinterResult{}, err
+		}
+	}
+
 	tmpFile, err := os.CreateTemp(filepath.Dir(resolvedDest), ".vpro-splinter-*.db")
 	if err != nil {
 		return ExportSplinterResult{}, err
@@ -925,6 +959,11 @@ func ExportSplinterProject(s *vprocore.ContextService, ctx context.Context, cont
 		}
 		if err := ensureChildIdentityTable(ctx, dstTx); err != nil {
 			return err
+		}
+		for _, res := range sourceIdentityReservations {
+			if err := reserveChildID(ctx, dstTx, splinterName+"_"+res.suffix, res.id); err != nil {
+				return err
+			}
 		}
 
 		for _, suffix := range []string{"Env", "Admin", "Veg", "Humus", "Mineral", "Other", "Audit", "Metadata"} {
