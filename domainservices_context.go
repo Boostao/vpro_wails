@@ -7,9 +7,11 @@ import (
 	envreportpkg "github.com/boostao/vpro-wails/internal/envreport"
 	interchangepkg "github.com/boostao/vpro-wails/internal/interchange"
 	plotentrypkg "github.com/boostao/vpro-wails/internal/plotentry"
+	projectopspkg "github.com/boostao/vpro-wails/internal/projectops"
 	sivipkg "github.com/boostao/vpro-wails/internal/sivi"
 	sourceformpkg "github.com/boostao/vpro-wails/internal/sourceform"
 	spatialpkg "github.com/boostao/vpro-wails/internal/spatial"
+	twopagepkg "github.com/boostao/vpro-wails/internal/twopage"
 	validationpkg "github.com/boostao/vpro-wails/internal/validation"
 	vegreportpkg "github.com/boostao/vpro-wails/internal/vegreport"
 	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
@@ -337,4 +339,80 @@ func (s *ContextService) RestoreSelectedAuditRecords(contextID, plot string, row
 		return nil, errors.New("project context is unavailable")
 	}
 	return s.ContextService.RestoreSelectedAuditRecords(contextID, plot, rowIDs, vprocorepkg.AuditRestoreAction(action))
+}
+
+func (s *ContextService) CreateNewProject(ctx context.Context, contextID string, req projectopspkg.NewProjectRequest) (projectopspkg.NewProjectResult, error) {
+	return projectopspkg.CreateNewProject(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) SaveProjectAs(ctx context.Context, contextID string, req projectopspkg.SaveProjectAsRequest) (projectopspkg.SaveProjectAsResult, error) {
+	return projectopspkg.SaveProjectAs(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) ExportSplinterProject(ctx context.Context, contextID string, req projectopspkg.ExportSplinterRequest) (projectopspkg.ExportSplinterResult, error) {
+	return projectopspkg.ExportSplinterProject(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) CompareProjects(ctx context.Context, contextID string, req projectopspkg.CompareProjectsRequest) (projectopspkg.CompareProjectsResult, error) {
+	return projectopspkg.CompareProjects(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) PreviewOptimizeVeg(ctx context.Context, contextID string, opts projectopspkg.OptimizeVegOptions) (projectopspkg.OptimizeVegPreview, error) {
+	return projectopspkg.PreviewOptimizeVeg(unwrapContextService(s), ctx, contextID, opts)
+}
+
+func (s *ContextService) ApplyOptimizeVeg(ctx context.Context, contextID string, req projectopspkg.ApplyOptimizeVegRequest) (projectopspkg.OptimizeVegResult, error) {
+	return projectopspkg.ApplyOptimizeVeg(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) PreviewThreeWayMerge(ctx context.Context, contextID string, req projectopspkg.ThreeWayMergePreviewRequest) (projectopspkg.ThreeWayMergePreview, error) {
+	return projectopspkg.PreviewThreeWayMerge(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) ExecuteThreeWayMerge(ctx context.Context, contextID string, req projectopspkg.ThreeWayMergeExecuteRequest) (projectopspkg.ThreeWayMergeResult, error) {
+	return projectopspkg.ExecuteThreeWayMerge(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) DeriveProjectMetadataFromPlots(ctx context.Context, contextID, projectID string) (projectopspkg.DerivedProjectMetadata, error) {
+	return projectopspkg.DeriveProjectMetadataFromPlots(unwrapContextService(s), ctx, contextID, projectID)
+}
+
+func (s *ContextService) ListProjectMetadataPresets() []projectopspkg.ProjectMetadataPreset {
+	return projectopspkg.ListProjectMetadataPresets()
+}
+
+func (s *ContextService) ApplyProjectMetadataAutomation(ctx context.Context, contextID string, req projectopspkg.ApplyProjectMetadataAutomationRequest) (projectopspkg.ApplyProjectMetadataAutomationResult, error) {
+	return projectopspkg.ApplyProjectMetadataAutomation(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) RunComplianceValidation(ctx context.Context, contextID string, opts validationpkg.ComplianceOptions) (validationpkg.ComplianceValidationReport, error) {
+	return validationpkg.RunComplianceValidation(unwrapContextService(s), ctx, contextID, opts)
+}
+
+func (s *ContextService) QuarantineOrphanRecords(ctx context.Context, contextID string, req validationpkg.QuarantineOrphanRequest) (validationpkg.QuarantineOrphanResult, error) {
+	return validationpkg.QuarantineOrphanRecords(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) DeleteTwoPageSoilHorizon(ctx context.Context, contextID string, req twopagepkg.DeleteTwoPageSoilHorizonRequest) (twopagepkg.DeleteTwoPageSoilHorizonResult, error) {
+	return twopagepkg.DeleteTwoPageSoilHorizon(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) RestoreTwoPageSoilHorizon(ctx context.Context, contextID string, req twopagepkg.RestoreTwoPageSoilHorizonRequest) (twopagepkg.RestoreTwoPageSoilHorizonResult, error) {
+	return twopagepkg.RestoreTwoPageSoilHorizon(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) ListTwoPageSoilDeletedHorizons(ctx context.Context, contextID, plotNumber, form string) ([]twopagepkg.DeletedTwoPageSoilHorizonEntry, error) {
+	return twopagepkg.ListTwoPageSoilDeletedHorizons(unwrapContextService(s), ctx, contextID, plotNumber, form)
+}
+
+func (s *ContextService) CreateSIVIPlot(ctx context.Context, contextID string, req sivipkg.CreateSIVIPlotRequest) (sivipkg.CreateSIVIPlotResult, error) {
+	return sivipkg.CreateSIVIPlot(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) UndoCreateSIVIPlot(ctx context.Context, contextID string, req sivipkg.UndoCreateSIVIPlotRequest) (sivipkg.UndoCreateSIVIPlotResult, error) {
+	return sivipkg.UndoCreateSIVIPlot(unwrapContextService(s), ctx, contextID, req)
+}
+
+func (s *ContextService) ListCreatedSIVIPlots(ctx context.Context, contextID string) ([]sivipkg.SIVICreatedPlotEntry, error) {
+	return sivipkg.ListCreatedSIVIPlots(unwrapContextService(s), ctx, contextID)
 }
