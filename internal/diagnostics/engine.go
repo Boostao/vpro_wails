@@ -775,7 +775,7 @@ func computeSnapshotInReadTx(
 				return 0, false
 			}
 			s := float32(nf.Float64)
-			if math.IsNaN(float64(s)) || math.IsInf(float64(s), 0) || s <= 0 {
+			if math.IsNaN(float64(s)) || math.IsInf(float64(s), 0) || s < 0 {
 				return 0, false
 			}
 			return float64(s), true
@@ -932,11 +932,7 @@ func computeSnapshotInReadTx(
 		psMap := plotSpeciesTotals[i]
 		for sp, ps := range psMap {
 			cov := ps.cover
-			if ps.lumped && cov > foldedLumpCoverCap {
-				cov = foldedLumpCoverCap
-				lumpCappedCells++
-			}
-			if cov <= 0 {
+			if cov < 0 {
 				continue
 			}
 			p.speciesCovers[sp] = cov
@@ -1442,6 +1438,18 @@ func ReassignSynthesisPlotUnit(
 			}
 			_ = tx.QueryRowContext(ctx, `SELECT MAX(ID) FROM main.`+vprocore.QuoteHeaderIdentifier(synthesisSUHistoryTable)).Scan(&historyID)
 
+			if vprocore.SameDesktopPath(owner.Selection.ProjectPath, owner.Selection.SUPath) && changed {
+				actor := strings.TrimSpace(plots.CurrentUser)
+				if actor == "" {
+					actor = "VProUser"
+				}
+				qAudit := vprocore.QuoteHeaderIdentifier(owner.Selection.Project + "_Audit")
+				_, _ = tx.ExecContext(ctx,
+					`INSERT INTO main.`+qAudit+` ("Project","User","PlotNumber","Table","EditField","EditWhen","BeforeEdit","AfterEdit","Restore","Flag") VALUES (?,?,?,?,?,?,?,?,0,0)`,
+					owner.Selection.Project, actor, req.PlotNumber, "_SU", "SiteUnit", time.Now().Format("2006-01-02 15:04:05"), beforePtr, afterCopy,
+				)
+			}
+
 			if err := validateFiles(); err != nil {
 				return err
 			}
@@ -1458,10 +1466,8 @@ func ReassignSynthesisPlotUnit(
 		if recomputeOpts.UnitSource == "" {
 			recomputeOpts.UnitSource = "su"
 		}
-		snap, err := computeSnapshotForPlots(ctx, owner, contextID, recomputeOpts)
-		if err != nil {
-			return nil, err
-		}
+		snap, snapErr := computeSnapshotForPlots(ctx, owner, contextID, recomputeOpts)
+		_ = snapErr // Commit already succeeded; return committed receipt even if optional refresh was cancelled.
 
 		latencyMs := float64(time.Since(started).Microseconds()) / 1000.0
 		return &ReassignSynthesisPlotResult{
@@ -1598,6 +1604,26 @@ func UndoSynthesisReassignment(
 			}
 			if d.BeforeSiteUnit != nil {
 				afterUnit = *d.BeforeSiteUnit
+			}
+
+			var currentSU sql.NullString
+			curErr := tx.QueryRowContext(ctx,
+				`SELECT "SiteUnit" FROM main.`+qTable+` WHERE typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
+				d.PlotNumber,
+			).Scan(&currentSU)
+			if curErr != nil && !errors.Is(curErr, sql.ErrNoRows) {
+				return curErr
+			}
+			expectedAfter := ""
+			if d.AfterSiteUnit != nil {
+				expectedAfter = strings.TrimSpace(*d.AfterSiteUnit)
+			}
+			actualCurrent := ""
+			if curErr == nil && currentSU.Valid {
+				actualCurrent = strings.TrimSpace(currentSU.String)
+			}
+			if errors.Is(curErr, sql.ErrNoRows) || actualCurrent != expectedAfter {
+				return fmt.Errorf("plot %q SiteUnit changed since reassignment (%q != %q); undo refused", d.PlotNumber, actualCurrent, expectedAfter)
 			}
 
 			if !d.ExistedBefore {

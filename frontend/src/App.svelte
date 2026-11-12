@@ -69,7 +69,7 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'geospatial-map' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
+  let view = $state<'home' | 'plots' | 'geospatial-map' | 'diagnostic-synthesis' | 'r-sidecar' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
   let newSiviModalOpen = $state(false);
   let pictureManagerPlot = $state('');
   let plotLabelNumber = $state('');
@@ -1634,6 +1634,35 @@
               contextId={$projectState.contextId ?? ''}
               operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
               onBusyChange={(value) => { localEditorBusy = value; }}
+            />
+          {/await}
+        {/key}
+      {:else if view === 'diagnostic-synthesis' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          {#await import('./ClassificationSynthesisView.svelte')}
+            <p role="status" class="p-4 text-sm">Loading BEC Diagnostic &amp; Pairwise Synthesis Workbench...</p>
+          {:then { default: ClassificationSynthesisView }}
+            <ClassificationSynthesisView
+              contextId={$projectState.contextId ?? ''}
+              project={$projectState.activeProject}
+              su={$projectState.activeSU}
+              onBusyChange={(value) => { localEditorBusy = value; }}
+              onOpenPlot={(p) => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; }}
+            />
+          {/await}
+        {/key}
+      {:else if view === 'r-sidecar' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          {#await import('./RSidecarWorkbench.svelte')}
+            <p role="status" class="p-4 text-sm">Loading R Sidecar, climr &amp; Quarto Workbench...</p>
+          {:then { default: RSidecarWorkbench }}
+            <RSidecarWorkbench
+              contextId={$projectState.contextId ?? ''}
+              activeProject={$projectState.activeProject}
+              activeSu={$projectState.activeSU}
+              oncontextswitched={async () => { await refresh(); }}
             />
           {/await}
         {/key}

@@ -9,6 +9,14 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function ComputePlotClimateAndDualEdatopic(contextID: string, request: $models.ClimateEdatopicRequest): $CancellablePromise<$models.ClimateEdatopicResult | null> {
+    return $Call.ByID(3066977789, contextID, request);
+}
+
+export function DetectRRuntime(): $CancellablePromise<$models.RRuntimeStatus | null> {
+    return $Call.ByID(2721621459);
+}
+
 export function ExportReviewedEnvironmentWorkbook(contextID: string, requestJSON: string): $CancellablePromise<$models.EnvironmentWorkbookOutcome | null> {
     return $Call.ByID(4243266642, contextID, requestJSON);
 }
@@ -23,6 +31,10 @@ export function ExportReviewedSiteUnitSummaryWorkbook(contextID: string, request
 
 export function ExportReviewedSubzoneMatrix(contextID: string, requestJSON: string): $CancellablePromise<$models.SubzoneMatrixWorkbookOutcome | null> {
     return $Call.ByID(4152512754, contextID, requestJSON);
+}
+
+export function GetCachedPlotClimate(contextID: string, refPeriod: string): $CancellablePromise<$models.PlotClimateRow[] | null> {
+    return $Call.ByID(1215206286, contextID, refPeriod);
 }
 
 export function GetEnvironmentWorkbookReview(contextID: string, requestJSON: string): $CancellablePromise<$models.EnvironmentWorkbookReview | null> {
@@ -75,6 +87,18 @@ export function PreviewSiteUnitSummaryLifeforms(contextID: string, request: $mod
 
 export function PreviewSiteUnitSummarySpecies(contextID: string, request: $models.SiteUnitSpeciesListRequest): $CancellablePromise<$models.SiteUnitSpeciesListPreview> {
     return $Call.ByID(2806244493, contextID, request);
+}
+
+export function PromoteClusterCandidateToSU(contextID: string, request: $models.PromoteCandidateSURequest): $CancellablePromise<$models.PromoteCandidateSUResult | null> {
+    return $Call.ByID(1462471488, contextID, request);
+}
+
+export function RenderQuartoGuide(contextID: string, request: $models.QuartoGuideRequest): $CancellablePromise<$models.QuartoGuideResult | null> {
+    return $Call.ByID(1500506254, contextID, request);
+}
+
+export function RunMultivariateClustering(contextID: string, request: $models.ClusteringRequest): $CancellablePromise<$models.ClusteringResult | null> {
+    return $Call.ByID(81138482, contextID, request);
 }
 
 export function SaveLongEnvironmentPreferences(contextID: string, requestJSON: string): $CancellablePromise<$models.LongEnvironmentPreferencesOutcome | null> {

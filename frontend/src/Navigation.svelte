@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'geospatial-map' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
+  type View = 'home' | 'plots' | 'geospatial-map' | 'diagnostic-synthesis' | 'r-sidecar' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
   type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'new-sivi' | 'metadata' };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate, siviAvailable = false, onopensivi, newSiviAvailable = false, onopennewsivi,
@@ -46,8 +46,10 @@
         { name: 'Long Environment', icon: TableProperties, view: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT !== 'false' ? 'long-environment' : undefined },
         { name: 'Summary Environment', icon: ChartColumn, view: import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false' ? 'summary-environment' : undefined }
       ] },
-      { label: 'Spatial', items: [
-        { name: '3D Geospatial Workbench (BGC, QA & AOI)', icon: Globe, view: 'geospatial-map' }
+      { label: 'Spatial & Synthesis', items: [
+        { name: '3D Geospatial Workbench (BGC, QA & AOI)', icon: Globe, view: 'geospatial-map' },
+        { name: 'BEC Diagnostic & Pairwise Synthesis', icon: ChartColumn, view: 'diagnostic-synthesis' },
+        { name: 'R Analytics, climr aSMR & Quarto Guides', icon: Network, view: 'r-sidecar' }
       ] },
       { label: 'Others', items: [
         { name: 'Subzone Matrix of Units', icon: Table, view: import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'false' ? 'subzone-matrix' : undefined },

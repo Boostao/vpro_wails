@@ -372,6 +372,9 @@ func RunMultivariateClustering(
 		materializedRows := 0
 		candidateTableName := ""
 		if req.MaterializeCandidate {
+			if strings.EqualFold(candidateSUName, activeSU) && vprocore.SameDesktopPath(projectPath, owner.Selection.SUPath) {
+				return nil, fmt.Errorf("candidate SU %q is currently active; switch to another SU before overwriting", candidateSUName)
+			}
 			candidateTableName = candidateSUName + "_SU"
 			user := strings.TrimSpace(plots.CurrentUser)
 			if user == "" {

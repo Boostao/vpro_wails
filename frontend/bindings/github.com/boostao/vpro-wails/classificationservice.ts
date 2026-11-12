@@ -17,6 +17,10 @@ export function AssignPlotsToSiteUnit(contextID: string, request: $models.Assign
     return $Call.ByID(700659912, contextID, request);
 }
 
+export function ComputeSynthesisSnapshot(contextID: string, opts: $models.SynthesisOptions): $CancellablePromise<$models.SynthesisSnapshot | null> {
+    return $Call.ByID(482243664, contextID, opts);
+}
+
 export function CreateHierarchyTable(contextID: string, request: $models.CreateHierarchyTableRequest): $CancellablePromise<$models.HierarchyTableLifecycleResult | null> {
     return $Call.ByID(280424840, contextID, request);
 }
@@ -47,6 +51,10 @@ export function DeleteHierarchyNode(contextID: string, request: $models.Hierarch
 
 export function DeleteProjectPlotProfileRule(contextID: string, request: $models.ProjectPlotProfileDeletion): $CancellablePromise<void> {
     return $Call.ByID(1689031355, contextID, request);
+}
+
+export function ExportDiagnosticWorkbook(contextID: string, request: $models.ExportDiagnosticWorkbookRequest): $CancellablePromise<$models.ExportDiagnosticWorkbookResult | null> {
+    return $Call.ByID(3261844204, contextID, request);
 }
 
 export function GetBECCatalogueStatus(): $CancellablePromise<$models.BECCatalogueStatus> {
@@ -109,8 +117,16 @@ export function ListProjectPlotProfileChoices(contextID: string): $CancellablePr
     return $Call.ByID(3927908438, contextID);
 }
 
+export function ListSynthesisLumpTables(contextID: string): $CancellablePromise<$models.SynthesisLumpTableOption[] | null> {
+    return $Call.ByID(626775006, contextID);
+}
+
 export function PreviewSpeciesPresence(contextID: string, requestJSON: string): $CancellablePromise<$models.ProjectProfileSpeciesPresencePreview | null> {
     return $Call.ByID(1561421638, contextID, requestJSON);
+}
+
+export function ReassignSynthesisPlotUnit(contextID: string, request: $models.ReassignSynthesisPlotRequest): $CancellablePromise<$models.ReassignSynthesisPlotResult | null> {
+    return $Call.ByID(1530997076, contextID, request);
 }
 
 export function RecoverExternalSUEnvironmentOutcome(contextID: string, requestJSON: string): $CancellablePromise<$models.ExternalSUEnvironmentAttemptOutcome | null> {
@@ -219,4 +235,8 @@ export function TransferSiteUnitEnvironment(contextID: string, request: $models.
 
 export function UndoSUAssignment(contextID: string, historyID: number): $CancellablePromise<$models.AssignPlotsToSiteUnitResult | null> {
     return $Call.ByID(3322399182, contextID, historyID);
+}
+
+export function UndoSynthesisReassignment(contextID: string, request: $models.UndoSynthesisReassignmentRequest): $CancellablePromise<$models.ReassignSynthesisPlotResult | null> {
+    return $Call.ByID(2312318011, contextID, request);
 }

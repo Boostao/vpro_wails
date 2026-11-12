@@ -157,9 +157,9 @@ if (!is.null(req$uncachedPoints) && length(req$uncachedPoints) > 0L) {
         lat = as.numeric(pts_dt$lat),
         elev = as.numeric(pts_dt$elev)
       )
-      vars_req <- c("MAT", "MWMT", "MCMT", "MAP", "MSP", "PAS", "CMD",
+      vars_req <- c("MAT", "MWMT", "MCMT", "MAP", "MSP", "PAS_an", "CMD_an",
                     "PPT_05", "PPT_06", "PPT_07", "PPT_08", "PPT_09",
-                    "PPT_at", "PPT_wt", "DD5", "NFFD")
+                    "PPT_at", "PPT_wt", "DD5_an", "NFFD_an")
       dl <- climr::downscale(
         xyz = xyz,
         vars = vars_req,
@@ -194,8 +194,8 @@ if (!is.null(req$uncachedPoints) && length(req$uncachedPoints) > 0L) {
               mcmt = round(pick_col(dl_dt, c("MCMT"))[[i]], 2),
               map = round(pick_col(dl_dt, c("MAP"))[[i]], 1),
               msp = round(pick_col(dl_dt, c("MSP"))[[i]], 1),
-              pas = round(pick_col(dl_dt, c("PAS"))[[i]], 1),
-              cmd = round(pick_col(dl_dt, c("CMD", "CMD_an"))[[i]], 1),
+              pas = round(pick_col(dl_dt, c("PAS_an", "PAS"))[[i]], 1),
+              cmd = round(pick_col(dl_dt, c("CMD_an", "CMD"))[[i]], 1),
               ppt05 = round(ppt05_v[[i]], 1),
               ppt06 = round(ppt06_v[[i]], 1),
               ppt07 = round(ppt07_v[[i]], 1),
@@ -203,8 +203,8 @@ if (!is.null(req$uncachedPoints) && length(req$uncachedPoints) > 0L) {
               ppt09 = round(ppt09_v[[i]], 1),
               pptAt = round(pick_col(dl_dt, c("PPT_at"))[[i]], 1),
               pptWt = round(pick_col(dl_dt, c("PPT_wt"))[[i]], 1),
-              dd5 = round(pick_col(dl_dt, c("DD5"))[[i]], 1),
-              nffd = round(pick_col(dl_dt, c("NFFD"))[[i]], 1)
+              dd5 = round(pick_col(dl_dt, c("DD5_an", "DD5"))[[i]], 1),
+              nffd = round(pick_col(dl_dt, c("NFFD_an", "NFFD"))[[i]], 1)
             )
           }
           out_c
@@ -301,7 +301,7 @@ if (!is.null(req$plots) && length(req$plots) > 0L) {
     multiplier <- 1.0 + (moist_flag / 5.0)
     cmd_gs <- as.numeric(clim$cmd) / multiplier
 
-    # Dormant-season recharge deficit (_calculate_aSMR.R lines 29-40)
+    # Dormant-season recharge deficit (BEC_Classification_Analysis/_functions/add_climate_data.R)
     ppt_dorm <- as.numeric(clim$pptAt) + as.numeric(clim$pptWt)
     def_val <- max(0.0, 350.0 - ppt_dorm)
     cmd_total <- cmd_gs + def_val

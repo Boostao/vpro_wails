@@ -310,8 +310,8 @@ func buildQuartoVegSummary(
 		if shrubCov <= 0 {
 			shrubCov = combineStratumCovers(c4.Float64, c5.Float64, c5a.Float64, c5b.Float64, c5c.Float64)
 		}
-		herbCov := combineStratumCovers(c6.Float64, c8.Float64, c9.Float64, c10.Float64)
-		mossCov := c7.Float64
+		herbCov := c6.Float64
+		mossCov := combineStratumCovers(c7.Float64, c8.Float64, c9.Float64, c10.Float64)
 
 		addCover(1, "Tree (A)", spp, plot, treeCov)
 		addCover(2, "Shrub (B)", spp, plot, shrubCov)
@@ -496,6 +496,36 @@ func RenderQuartoGuide(
 		return nil, fmt.Errorf("R runtime unavailable for Quarto guide generation: %w", rErr)
 	}
 
+	resolvedTargetUnit := strings.TrimSpace(req.TargetUnit)
+	if guideType == "single_unit" && resolvedTargetUnit == "" {
+		resolved, rErr := vprocore.WithContextPlotRequest(ctx, contexts, contextID, func(plots *vprocore.PlotService) (*string, error) {
+			candidates, cErr := readScopedEnvPlots(ctx, plots.Projects.Sqlite, req.UseActiveSU, req.BGCFilter, "", nil)
+			if cErr != nil {
+				return nil, cErr
+			}
+			counts := make(map[string]int)
+			best := ""
+			bestCnt := 0
+			for _, ep := range candidates {
+				if ep.SiteUnit == "" {
+					continue
+				}
+				counts[ep.SiteUnit]++
+				if counts[ep.SiteUnit] > bestCnt || (counts[ep.SiteUnit] == bestCnt && ep.SiteUnit < best) {
+					bestCnt = counts[ep.SiteUnit]
+					best = ep.SiteUnit
+				}
+			}
+			return &best, nil
+		})
+		if rErr != nil {
+			return nil, rErr
+		}
+		if resolved != nil {
+			resolvedTargetUnit = *resolved
+		}
+	}
+
 	// Step 1: Compute/fetch cached __VPRO_PlotClimate & Dual Edatopic Grids for the requested scope
 	climReq := ClimateEdatopicRequest{
 		RefPeriod:      req.RefPeriod,
@@ -504,8 +534,8 @@ func RenderQuartoGuide(
 		SiteUnitFilter: "",
 		UseActiveSU:    req.UseActiveSU,
 	}
-	if guideType == "single_unit" && strings.TrimSpace(req.TargetUnit) != "" {
-		climReq.SiteUnitFilter = strings.TrimSpace(req.TargetUnit)
+	if guideType == "single_unit" && resolvedTargetUnit != "" {
+		climReq.SiteUnitFilter = resolvedTargetUnit
 	}
 	climRes, err := ComputePlotClimateAndDualEdatopic(ctx, contexts, contextID, climReq, cfg)
 	if err != nil {
@@ -516,7 +546,7 @@ func RenderQuartoGuide(
 		owner := plots.Projects.Sqlite
 		unitFilter := ""
 		if guideType == "single_unit" {
-			unitFilter = strings.TrimSpace(req.TargetUnit)
+			unitFilter = resolvedTargetUnit
 		}
 		envPlots, err := readScopedEnvPlots(ctx, owner, req.UseActiveSU, req.BGCFilter, unitFilter, nil)
 		if err != nil {

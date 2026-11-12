@@ -9,6 +9,9 @@ import * as classification$0 from "./internal/classification/models.js";
 import * as datasheet$0 from "./internal/datasheet/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as diagnostics$0 from "./internal/diagnostics/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as envreport$0 from "./internal/envreport/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
@@ -28,6 +31,9 @@ import * as references$0 from "./internal/references/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
 import * as reportcore$0 from "./internal/reports/reportcore/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as rsidecar$0 from "./internal/rsidecar/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
 import * as sivi$0 from "./internal/sivi/models.js";
@@ -101,6 +107,14 @@ export type BECUnitPickerRequest = classification$0.BECUnitPickerRequest;
 
 export type BECZone = references$0.BECZone;
 
+export type ClimateEdatopicRequest = rsidecar$0.ClimateEdatopicRequest;
+
+export type ClimateEdatopicResult = rsidecar$0.ClimateEdatopicResult;
+
+export type ClusteringRequest = rsidecar$0.ClusteringRequest;
+
+export type ClusteringResult = rsidecar$0.ClusteringResult;
+
 export type CollectedRecordUpdate = vprocore$0.CollectedRecordUpdate;
 
 export type ContextSelection = vprocore$0.ContextSelection;
@@ -165,6 +179,10 @@ export type EnvironmentWorkbookOutcome = envreport$0.EnvironmentWorkbookOutcome;
 export type EnvironmentWorkbookReview = envreport$0.EnvironmentWorkbookReview;
 
 export type EnvironmentWorkbookSheet = envreport$0.EnvironmentWorkbookSheet;
+
+export type ExportDiagnosticWorkbookRequest = diagnostics$0.ExportDiagnosticWorkbookRequest;
+
+export type ExportDiagnosticWorkbookResult = diagnostics$0.ExportDiagnosticWorkbookResult;
 
 export type ExternalSQLiteFileInspection = vprocore$0.ExternalSQLiteFileInspection;
 
@@ -426,6 +444,8 @@ export type PictureRestorationResult = pictures$0.PictureRestorationResult;
 
 export type PictureRestorationReview = pictures$0.PictureRestorationReview;
 
+export type PlotClimateRow = rsidecar$0.PlotClimateRow;
+
 export type PlotGeodesyEvaluation = spatial$0.PlotGeodesyEvaluation;
 
 export type PlotGeodesyInput = spatial$0.PlotGeodesyInput;
@@ -543,6 +563,20 @@ export type ProjectProfileSpeciesPresencePreview = classification$0.ProjectProfi
 export type ProjectState = vprocore$0.ProjectState;
 
 export type ProjectTableCSVReview = interchange$0.ProjectTableCSVReview;
+
+export type PromoteCandidateSURequest = rsidecar$0.PromoteCandidateSURequest;
+
+export type PromoteCandidateSUResult = rsidecar$0.PromoteCandidateSUResult;
+
+export type QuartoGuideRequest = rsidecar$0.QuartoGuideRequest;
+
+export type QuartoGuideResult = rsidecar$0.QuartoGuideResult;
+
+export type RRuntimeStatus = rsidecar$0.RRuntimeStatus;
+
+export type ReassignSynthesisPlotRequest = diagnostics$0.ReassignSynthesisPlotRequest;
+
+export type ReassignSynthesisPlotResult = diagnostics$0.ReassignSynthesisPlotResult;
 
 export type RegionCodeChoice = references$0.RegionCodeChoice;
 
@@ -814,6 +848,12 @@ export type SummaryVegetationWorkbookReportSummary = vegreport$0.SummaryVegetati
 
 export type SummaryVegetationWorkbookReview = vegreport$0.SummaryVegetationWorkbookReview;
 
+export type SynthesisLumpTableOption = diagnostics$0.SynthesisLumpTableOption;
+
+export type SynthesisOptions = diagnostics$0.SynthesisOptions;
+
+export type SynthesisSnapshot = diagnostics$0.SynthesisSnapshot;
+
 export type TableCSVArchiveOutcome = interchange$0.TableCSVArchiveOutcome;
 
 export type TableCSVArchiveReview = interchange$0.TableCSVArchiveReview;
@@ -871,6 +911,8 @@ export type TwoPageVegetationTableReview = datasheet$0.TwoPageVegetationTableRev
 export type TwoPageVegetationTableRow = datasheet$0.TwoPageVegetationTableRow;
 
 export type TwoPageVegetationWriteResult = twopage$0.TwoPageVegetationWriteResult;
+
+export type UndoSynthesisReassignmentRequest = diagnostics$0.UndoSynthesisReassignmentRequest;
 
 export type UserLogReview = lifecycle$0.UserLogReview;
 

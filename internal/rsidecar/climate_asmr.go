@@ -578,7 +578,7 @@ func readScopedEnvPlots(
 	}
 	if adminExists > 0 {
 		aRows, aErr := tx.QueryContext(ctx, fmt.Sprintf(
-			`SELECT CAST("PlotNumber" AS TEXT), TRIM(COALESCE(CAST("GIS_BGC" AS TEXT), '')) FROM %s.%s WHERE typeof("PlotNumber")='text'`,
+			`SELECT CAST("Plot" AS TEXT), TRIM(COALESCE(CAST("GIS_BGC" AS TEXT), '')) FROM %s.%s WHERE typeof("Plot")='text'`,
 			envSchema, vprocore.QuoteHeaderIdentifier(adminTableName),
 		))
 		if aErr == nil {
