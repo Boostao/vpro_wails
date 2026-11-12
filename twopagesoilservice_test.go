@@ -28,9 +28,8 @@ func TestTwoPageSoilServiceIndependentGatesAndNoWrites(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, values := range []map[string]string{
-		{},
+		{twoPageSoilReviewEnvironment: "false"},
 		{twoPageSoilReviewEnvironment: "false", twoPageSoilWritingEnvironment: "false"},
-		{twoPageSoilWritingEnvironment: "true"},
 		{twoPageSoilReviewEnvironment: "false", twoPageSoilWritingEnvironment: "true"},
 	} {
 		service := soilFacade(t, contexts, values)
@@ -51,7 +50,7 @@ func TestTwoPageSoilServiceIndependentGatesAndNoWrites(t *testing.T) {
 			t.Fatal("default-off gate checks changed source/schema")
 		}
 	}
-	review := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true"})
+	review := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "false"})
 	if original, err := review.GetOriginal(context.Background(), state.ContextID, "108050", "SoilHumusXL"); err != nil ||
 		!reflect.DeepEqual(original, request.Original) {
 		t.Fatal("independent read-only review changed raw original", original, err)

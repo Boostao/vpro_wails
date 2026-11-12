@@ -168,7 +168,7 @@ func TestSummaryEnvironmentalLifeformSnapshotGatesAndCleanup(t *testing.T) {
 			return value, value != ""
 		})
 		if value == "" || value == "false" || value == "true" {
-			if err != nil || service == nil || service.enabled != (value == "true") {
+			if err != nil || service == nil || service.enabled != (value != "false") {
 				t.Fatal(value, service, err)
 			}
 		} else if err == nil || service != nil {

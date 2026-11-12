@@ -219,7 +219,7 @@ test('actual report retains minimum validation on remount and independently gate
     const owner = { ...scope, contextId: `quality-minimum-composition-${enabled}` };
     const session = prefs.longVegetationQualityMinimumPreferencesSession(owner);
     session.apply(review(undefined, owner)); session.editMinimum('vegMinimum', '\ud800');
-    const component = serverComponent(reportSource.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g, 'false')
+    const component = serverComponent(reportSource.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
       .replace('const qualityMinimaEnabled = false;', `const qualityMinimaEnabled = ${enabled};`), 'LongVegetationReport.svelte', {
         '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
         './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},

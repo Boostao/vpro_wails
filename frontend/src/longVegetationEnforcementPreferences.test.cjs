@@ -146,7 +146,7 @@ test('actual report retains enforcement draft barriers across remounts behind it
     const owner = { ...scope, contextId: `enforcement-root-${enabled}` };
     const registry = prefs.createLongVegetationEnforcementPreferencesRegistry(), session = registry(owner);
     session.apply({ ...review(), ...owner }); session.editEnforce(null);
-    const reportSource = source('LongVegetationReport.svelte').replace(/import\.meta\.env\.(\w+) === 'true'/g,
+    const reportSource = source('LongVegetationReport.svelte').replace(/import\.meta\.env\.(\w+) !== 'false'/g,
       (_, flag) => String(enabled && flag === 'VITE_LONG_VEGETATION_ENFORCEMENT_PREFERENCES'));
     const dependencies = {
       '../bindings/github.com/boostao/vpro-wails': {}, './longEnvironmentReport': {}, './longVegetationReport': {},

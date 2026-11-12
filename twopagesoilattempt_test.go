@@ -219,7 +219,7 @@ func TestTwoPageSoilAttemptContextRotationNeverCertifiesAbsentOldHistory(t *test
 func TestTwoPageSoilAttemptRecoveryGatesStrictTransportAndLeaseCancellation(t *testing.T) {
 	contexts, state, _, request := soilWriteFixture(t, false, "SoilHumusXL", 3)
 	raw := soilAttemptJSON(t, request)
-	for _, values := range []map[string]string{{}, {twoPageSoilWritingEnvironment: "true"}} {
+	for _, values := range []map[string]string{{twoPageSoilReviewEnvironment: "false"}, {twoPageSoilReviewEnvironment: "false", twoPageSoilWritingEnvironment: "true"}} {
 		service := soilFacade(t, contexts, values)
 		if outcome, err := service.RecoverOutcome(context.Background(), state.ContextID, raw); err == nil || outcome != nil {
 			t.Fatal("outcome recovery bypassed independent review", outcome, err)

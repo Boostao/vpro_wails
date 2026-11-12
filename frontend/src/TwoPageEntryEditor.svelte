@@ -26,7 +26,8 @@
 
   let { contextId, project, plot, cache, revision, onchange, onbusy, onclosed, oncommitted, embedded: childContent, childBlocked = false, pictureReaderAvailable = false, auditReaderAvailable = false, googleEarthReaderAvailable = false, vegetationTableReaderAvailable = false, environmentTableReaderAvailable = false, projectMetadataReaderAvailable = false, vegetationTableSU = '', vegetationTableSUPath = '', sourceProjectPath = '',
     projectMetadataClient, metadataRestorationAvailable = false,
-    profilingReaderAvailable = false, profilingSource = null, externalScope = null, sourceBlocked = true, initialForm = 'FS882-8x6XL' }: {
+    profilingReaderAvailable = false, profilingSource = null, externalScope = null, sourceBlocked = true, initialForm = 'FS882-8x6XL',
+    onExtendedShrubsChange }: {
     contextId: string; project: string; plot: string; cache: TwoPageEntrySessionCache; revision: number;
     onchange: () => void; onbusy: (busy: boolean) => void; onclosed: () => void; oncommitted: () => Promise<void>;
     embedded: Snippet<[TwoPageEntryChild, PaperControl]>;
@@ -36,12 +37,13 @@
     projectMetadataClient?: ReturnType<typeof bindContextPlots>; metadataRestorationAvailable?: boolean;
     profilingReaderAvailable?: boolean; profilingSource?: { name: string; path: string } | null;
     externalScope?: GoogleEarthScope | null; sourceBlocked?: boolean; initialForm?: TwoPageParentForm;
+    onExtendedShrubsChange?: (enabled: boolean) => void;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot }));
-  const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW === 'true'
-    && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW === 'true';
-  const editingEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_EDITING === 'true';
-  const metadataEditingEnabled = reviewEnabled && import.meta.env.VITE_PROJECT_METADATA_EDITING === 'true';
+  const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW !== 'false'
+    && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW !== 'false';
+  const editingEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_EDITING !== 'false';
+  const metadataEditingEnabled = reviewEnabled && import.meta.env.VITE_PROJECT_METADATA_EDITING !== 'false';
   const metadataClient = untrack(() => projectMetadataClient);
   const metadataRestore = untrack(() => metadataRestorationAvailable);
   const sessions = untrack(() => {
@@ -278,7 +280,7 @@
     if (externalOpen || auditOpen || googleEarthOpen || vegetationTableOpen || environmentTableOpen || projectMetadataOpen || profilingOpen || childBlocked || close.unsaved || close.busy || close.blocked) {
       error = 'Save or Undo the owned complete-entry draft before changing source variant.'; return;
     }
-    form = next; session = makeSession(next); onchange();
+    form = next; session = makeSession(next); onExtendedShrubsChange?.(next === 'FS882-8x6XL-CHARS'); onchange();
     await operation('load');
   }
   async function operation(action: 'load' | 'save' | 'undo' | 'retain' | 'prune' | 'references') {
@@ -473,6 +475,12 @@
           || [...sessions.values()].some(peer => Boolean(peer.view().error || peer.view().referenceError))}
         onclick={openExternalTransfer}>{projection.reverseAction.caption}: separate file</button>
     {/if}
+    <label class="inline-flex items-center gap-2 rounded border px-2 py-1 text-sm">
+      <input type="checkbox" data-extended-shrubs checked={form === 'FS882-8x6XL-CHARS'}
+        disabled={childBlocked || close.unsaved || close.busy || close.blocked}
+        onchange={event => chooseForm(event.currentTarget.checked ? 'FS882-8x6XL-CHARS' : 'FS882-8x6XL')} />
+      Show extended shrub layers
+    </label>
     <button type="button" disabled={childBlocked || close.unsaved || close.busy || close.blocked} aria-pressed={form === 'FS882-8x6XL'}
       onclick={() => chooseForm('FS882-8x6XL')}>Normal two-page source</button>
     <button type="button" disabled={childBlocked || close.unsaved || close.busy || close.blocked} aria-pressed={form === 'FS882-8x6XL-CHARS'}

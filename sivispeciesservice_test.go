@@ -112,7 +112,11 @@ func TestSIVISpeciesServiceIndependentGateNilCancellationAndReferences(t *testin
 		t.Fatal("references lost duplicate definitions or nullable metadata", request.References)
 	}
 	contexts.siviHeightEnabled = true
-	for _, present := range []bool{false, true} {
+	defaultSpecies, err := NewSIVISpeciesService(contexts, func(string) (string, bool) { return "", false })
+	if err != nil || !defaultSpecies.enabled {
+		t.Fatal("default species gate disabled", defaultSpecies, err)
+	}
+	for _, present := range []bool{true} {
 		disabled, err := NewSIVISpeciesService(contexts, func(name string) (string, bool) {
 			if name != siviSpeciesFeatureEnvironment {
 				t.Fatal("foreign gate", name)

@@ -19,8 +19,8 @@
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
     operationHeld?: boolean; onBusyChange: (busy: boolean) => void;
   } = $props();
-  const enabled = import.meta.env.VITE_SUMMARY_VEGETATION === 'true';
-  const groupedWorkbookEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK === 'true';
+  const enabled = import.meta.env.VITE_SUMMARY_VEGETATION !== 'false';
+  const groupedWorkbookEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK !== 'false';
   const reads = new ReadRequests();
   function ownedContext() { return { contextId, project, projectPath, su, suPath }; }
   const session = summaryVegetationSession(ownedContext());
@@ -315,7 +315,7 @@
         presentationMutationHeld || presentationInvalid}
       onBusyChange={() => { environmentalHeld = summaryEnvironmentalDesktop.activity().busy; reportBusy(); }} />
   {/if}
-  {#if import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK === 'true'}
+  {#if import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK !== 'false'}
     <SummaryVegetationWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }}
       calculation={{ average: viewState.average, display: workbookConstancy ? 1 : viewState.display, showClass: viewState.showClass,
         ...(workbookConstancy ? { groupAndOrder: 13, constancy: true } :

@@ -653,8 +653,8 @@ func main() {
 	services = append(services, application.NewService(closeService))
 
 	app = application.New(application.Options{
-		Name:        "VPRO",
-		Description: "Vegetation Processor",
+		Name:        "VPro",
+		Description: "VENUS (Vegetation and Environment NexUS) Professional — B.C. Ministry of Forests, Research Branch (BEC Program)",
 		Services:    services,
 		Windows:     windows,
 		ShouldQuit:  closeService.shouldQuit,
@@ -703,7 +703,7 @@ func main() {
 
 	window := app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Name:             "main",
-		Title:            "VPRO",
+		Title:            "VPro",
 		Width:            1400,
 		Height:           900,
 		MinWidth:         560,

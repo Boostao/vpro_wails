@@ -28,7 +28,7 @@ test('Find rejects incomplete, normalized or foreign responses rather than openi
 test('Read-only Find and explicit Open retain SU/profile scope, immutable identity and shared transition ownership', () => {
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(app, /VITE_SOURCE_PLOT_FIND === 'true'/);
+  assert.match(app, /VITE_SOURCE_PLOT_FIND !== 'false'/);
   assert.match(app, /aria-label="Find scoped plot"/);
   assert.match(app, /<label for="find-scoped-plot"/);
   assert.match(form, /\{#if onFindPlot\}/);

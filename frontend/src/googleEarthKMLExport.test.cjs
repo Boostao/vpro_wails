@@ -123,7 +123,7 @@ test('KML publication receipt and busy barrier survive remount and reject owners
 test('KML export panel shares single labels uses independent gate and keeps receipt above routine guidance', () => {
   const source = readFileSync(path.join(__dirname, 'GoogleEarthReview.svelte'), 'utf8');
   assert.ok(compile(source, { filename: 'GoogleEarthReview.svelte', generate: 'client' }).js.code);
-  assert.match(source, /VITE_GOOGLE_EARTH_KML_EXPORT === 'true'/);
+  assert.match(source, /VITE_GOOGLE_EARTH_KML_EXPORT !== 'false'/);
   assert.equal((source.match(/id="google-earth-place-name"/g) || []).length, 1);
   assert.match(source, /<label for="google-earth-kml-destination">New output file:/);
   assert.match(source, /data-google-earth-kml-acknowledge/);

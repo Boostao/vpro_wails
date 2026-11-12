@@ -157,7 +157,7 @@ test('actual report composition preserves default-off switches and propagates re
     const owner = { ...scope, contextId: `switch-composition-${enabled}` };
     const session = prefs.longVegetationSwitchPreferencesSession(owner); session.apply(review(undefined, owner));
     session.editSwitch('reportSummary', null);
-    const component = serverComponent(reportSource.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g, 'false')
+    const component = serverComponent(reportSource.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
       .replace('const switchesEnabled = false;', `const switchesEnabled = ${enabled};`), 'LongVegetationReport.svelte', {
         '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
         './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': prefs,

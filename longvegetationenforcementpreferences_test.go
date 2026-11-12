@@ -108,7 +108,7 @@ func TestLongVegetationEnforcementStrictRequestsMalformedStorageAndFeature(t *te
 		present bool
 		valid   bool
 		enabled bool
-	}{{"", false, true, false}, {"true", true, true, true}, {"false", true, true, false}, {"TRUE", true, false, false}, {"1", true, false, false}} {
+	}{{"", false, true, true}, {"true", true, true, true}, {"false", true, true, false}, {"TRUE", true, false, false}, {"1", true, false, false}} {
 		got, err := longVegetationEnforcementPreferencesFeature(func(key string) (string, bool) {
 			if key != "VPRO_LONG_VEGETATION_ENFORCEMENT_PREFERENCES" {
 				t.Fatal(key)

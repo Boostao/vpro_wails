@@ -1,3 +1,4 @@
+release_channel: "stable"
 Audit:
   AuditStrength: 1
 CHARS:
@@ -29,7 +30,9 @@ Message:
 PictureOptions:
   PictureLibrary: 0
 Program:
-  Name: "VPro64"
+  Name: "VPro"
+  FullName: "VENUS (Vegetation and Environment NexUS) Professional"
+  Organization: "B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program"
 ReportOptions:
   DataQualityFilterBECUse: 1
   DataQualityFilterBECUseLV: "True"

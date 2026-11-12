@@ -12,7 +12,7 @@
   let { owner, disabled, onBusyChange }: {
     owner: LifeformSummaryOwner; disabled: boolean; onBusyChange: (held: boolean) => void;
   } = $props();
-  const enabled = import.meta.env.VITE_LIFEFORM_WORKBOOK === 'true';
+  const enabled = import.meta.env.VITE_LIFEFORM_WORKBOOK !== 'false';
   const owned = untrack(() => structuredClone(owner));
   const session = lifeformWorkbookPublicationSession(owned);
   const reads = new ReadRequests();

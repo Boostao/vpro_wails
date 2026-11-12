@@ -230,7 +230,7 @@ for (const flag of [undefined, false, true, 'false', 'TRUE', '1', 'true']) {
     const body = render(component, { props: { view: 'home', onnavigate: () => {} } }).body;
     const button = [...body.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].find(match => match[2].includes('Subzone Matrix'));
     assert.ok(button, 'matrix menu selector must resolve');
-    assert.equal(/\bdisabled(?:=|\s|$)/.test(button[1]), flag !== 'true');
+    assert.equal(/\bdisabled(?:=|\s|$)/.test(button[1]), flag === 'false');
   });
 }
 test('actual application refresh/paging guards do not borrow plot reads during matrix work', async () => {

@@ -97,9 +97,9 @@ test('either independent lifecycle flag constructs an idle manager without notif
   const { compile } = require('svelte/compiler');
   const ts = require('typescript');
   for (const flags of [
-    { VITE_PICTURE_DELETION_WRITING: 'true' },
-    { VITE_PICTURE_DELETION_RESTORING: 'true' },
-    { VITE_PICTURE_DELETION_WRITING: 'true', VITE_PICTURE_DELETION_RESTORING: 'true' },
+    { VITE_PICTURE_DELETION_WRITING: 'true', VITE_PICTURE_DELETION_RESTORING: 'false', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_CREATION_WRITING: 'false' },
+    { VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'true', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_CREATION_WRITING: 'false' },
+    { VITE_PICTURE_DELETION_WRITING: 'true', VITE_PICTURE_DELETION_RESTORING: 'true', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_CREATION_WRITING: 'false' },
   ]) {
     const retained = registry({ PictureService: {}, PictureDeletionService: {} });
     const rootBusy = client.state(false);
@@ -198,7 +198,7 @@ test('lifecycle panel renders associated source fields and retained safety feedb
   await value.reviewDeletion('-7'); value.confirm(true);
   const component = serverComponent(source('PictureLifecyclePanel.svelte'), 'PictureLifecyclePanel.svelte', {
     './pictureRead': picture,
-  });
+  }, { VITE_PICTURE_DELETION_RESTORING: 'false' });
   let html = render(component, { props: { session: value } }).body;
   assert.equal((html.match(/<output(?:\s[^>]*)?>/g) || []).length, 5);
   for (const column of review().records.columns) assert.match(html, new RegExp(`<label[^>]*>${column.name}<output(?:\\s[^>]*)?>`));

@@ -5,22 +5,22 @@
   import { createLongVegetationEnforcementPreferencesRegistry } from './longVegetationEnforcementPreferences';
   import { createLongVegetationUnitPreferencesRegistry } from './longVegetationUnitPreferences';
   import { createSelectedUnitSelectionRegistry } from './longVegetationSelectedUnitSelection';
-  const selectedUnitSession = import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNIT_SELECTION === 'true'
+  const selectedUnitSession = import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNIT_SELECTION !== 'false'
     ? createSelectedUnitSelectionRegistry() : null;
-  const groupingSession = import.meta.env.VITE_LONG_VEGETATION_GROUP_PREFERENCES === 'true'
+  const groupingSession = import.meta.env.VITE_LONG_VEGETATION_GROUP_PREFERENCES !== 'false'
     ? createLongVegetationGroupPreferencesRegistry({
-      strata: import.meta.env.VITE_LONG_VEGETATION_STRATA === 'true',
-      lifeform: import.meta.env.VITE_LONG_VEGETATION_LIFEFORM === 'true',
+      strata: import.meta.env.VITE_LONG_VEGETATION_STRATA !== 'false',
+      lifeform: import.meta.env.VITE_LONG_VEGETATION_LIFEFORM !== 'false',
     }) : null;
-  const namingSession = import.meta.env.VITE_LONG_VEGETATION_NAMING_PREFERENCES === 'true'
-    ? createLongVegetationNamingPreferencesRegistry({ code: import.meta.env.VITE_LONG_VEGETATION_CODE === 'true' }) : null;
-  const selectedFieldSession = import.meta.env.VITE_LONG_VEGETATION_SELECTED_FIELD_PREFERENCES === 'true'
+  const namingSession = import.meta.env.VITE_LONG_VEGETATION_NAMING_PREFERENCES !== 'false'
+    ? createLongVegetationNamingPreferencesRegistry({ code: import.meta.env.VITE_LONG_VEGETATION_CODE !== 'false' }) : null;
+  const selectedFieldSession = import.meta.env.VITE_LONG_VEGETATION_SELECTED_FIELD_PREFERENCES !== 'false'
     ? createLongVegetationSelectedFieldPreferencesRegistry() : null;
-  const enforcementSession = import.meta.env.VITE_LONG_VEGETATION_ENFORCEMENT_PREFERENCES === 'true'
+  const enforcementSession = import.meta.env.VITE_LONG_VEGETATION_ENFORCEMENT_PREFERENCES !== 'false'
     ? createLongVegetationEnforcementPreferencesRegistry() : null;
-  const unitSession = import.meta.env.VITE_LONG_VEGETATION_UNIT_PREFERENCES === 'true'
-    ? createLongVegetationUnitPreferencesRegistry(import.meta.env.VITE_LONG_VEGETATION_NONE_UNITS === 'true',
-      import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNITS === 'true') : null;
+  const unitSession = import.meta.env.VITE_LONG_VEGETATION_UNIT_PREFERENCES !== 'false'
+    ? createLongVegetationUnitPreferencesRegistry(import.meta.env.VITE_LONG_VEGETATION_NONE_UNITS !== 'false',
+      import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNITS !== 'false') : null;
 </script>
 
 <script lang="ts">
@@ -64,19 +64,19 @@
   const reads = new ReadRequests();
   let generation = 0;
   let disposed = false;
-  const lifeformEnabled = import.meta.env.VITE_LONG_VEGETATION_LIFEFORM === 'true';
-  const strataEnabled = import.meta.env.VITE_LONG_VEGETATION_STRATA === 'true';
-  const codeEnabled = import.meta.env.VITE_LONG_VEGETATION_CODE === 'true';
-  const selectedFieldEnabled = import.meta.env.VITE_LONG_VEGETATION_SELECTED_FIELD === 'true';
-  const noneUnitsEnabled = import.meta.env.VITE_LONG_VEGETATION_NONE_UNITS === 'true';
-  const selectedUnitsEnabled = import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNITS === 'true';
-  const workbookEnabled = import.meta.env.VITE_LONG_VEGETATION_WORKBOOK === 'true';
-  const preferencesEnabled = import.meta.env.VITE_LONG_VEGETATION_PREFERENCES === 'true';
-  const statisticsEnabled = import.meta.env.VITE_LONG_VEGETATION_STATISTICS_PREFERENCES === 'true';
-  const switchesEnabled = import.meta.env.VITE_LONG_VEGETATION_SWITCH_PREFERENCES === 'true';
-  const thresholdsEnabled = import.meta.env.VITE_LONG_VEGETATION_THRESHOLD_PREFERENCES === 'true';
-  const qualityNullsEnabled = import.meta.env.VITE_LONG_VEGETATION_QUALITY_NULL_PREFERENCES === 'true';
-  const qualityMinimaEnabled = import.meta.env.VITE_LONG_VEGETATION_QUALITY_MINIMUM_PREFERENCES === 'true';
+  const lifeformEnabled = import.meta.env.VITE_LONG_VEGETATION_LIFEFORM !== 'false';
+  const strataEnabled = import.meta.env.VITE_LONG_VEGETATION_STRATA !== 'false';
+  const codeEnabled = import.meta.env.VITE_LONG_VEGETATION_CODE !== 'false';
+  const selectedFieldEnabled = import.meta.env.VITE_LONG_VEGETATION_SELECTED_FIELD !== 'false';
+  const noneUnitsEnabled = import.meta.env.VITE_LONG_VEGETATION_NONE_UNITS !== 'false';
+  const selectedUnitsEnabled = import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNITS !== 'false';
+  const workbookEnabled = import.meta.env.VITE_LONG_VEGETATION_WORKBOOK !== 'false';
+  const preferencesEnabled = import.meta.env.VITE_LONG_VEGETATION_PREFERENCES !== 'false';
+  const statisticsEnabled = import.meta.env.VITE_LONG_VEGETATION_STATISTICS_PREFERENCES !== 'false';
+  const switchesEnabled = import.meta.env.VITE_LONG_VEGETATION_SWITCH_PREFERENCES !== 'false';
+  const thresholdsEnabled = import.meta.env.VITE_LONG_VEGETATION_THRESHOLD_PREFERENCES !== 'false';
+  const qualityNullsEnabled = import.meta.env.VITE_LONG_VEGETATION_QUALITY_NULL_PREFERENCES !== 'false';
+  const qualityMinimaEnabled = import.meta.env.VITE_LONG_VEGETATION_QUALITY_MINIMUM_PREFERENCES !== 'false';
   const workbookOwner = untrack(() => ({ contextId, project, projectPath, su, suPath }));
   const projectWorkspace = untrack(() => projectReportWorkspace?.(workbookOwner) ?? null);
   let projectView = $state.raw(untrack(() => projectWorkspace?.view() ?? null));

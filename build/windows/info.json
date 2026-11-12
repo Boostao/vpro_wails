@@ -5,11 +5,11 @@
 	"info": {
 		"0000": {
 			"ProductVersion": "0.1.0",
-			"CompanyName": "My Company",
-			"FileDescription": "A vpro-wails application",
-			"LegalCopyright": "© 2026, My Company",
-			"ProductName": "VPRO",
-			"Comments": "This is a comment"
+			"CompanyName": "B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program",
+			"FileDescription": "VPro — VENUS (Vegetation and Environment NexUS) Professional",
+			"LegalCopyright": "© 2026 Province of British Columbia",
+			"ProductName": "VPro",
+			"Comments": "VENUS (Vegetation and Environment NexUS) Professional"
 		}
 	}
 }

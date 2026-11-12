@@ -4,7 +4,7 @@
   import { CatalogueLookup } from './catalogueLookup';
 
   let { disabled = false }: { disabled?: boolean } = $props();
-  const enabled = import.meta.env.VITE_SOIL_CODES_REFERENCE === 'true';
+  const enabled = import.meta.env.VITE_SOIL_CODES_REFERENCE !== 'false';
   const groupLookup = new CatalogueLookup(async (force, requests) => {
     if (force) await requests.track(SoilCodeService.ReloadCatalogue());
     const rows = await requests.track(SoilCodeService.ListGreatGroupChoices());

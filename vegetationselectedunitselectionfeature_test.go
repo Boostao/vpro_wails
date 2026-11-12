@@ -10,7 +10,7 @@ func TestSelectedUnitSelectionAndConsumerFeaturesRemainIndependentDefaultOff(t *
 			enabled bool
 			fail    bool
 		}{
-			{"", false, false, false}, {"false", true, false, false}, {"true", true, true, false},
+			{"", false, true, false}, {"false", true, false, false}, {"true", true, true, false},
 			{"", true, false, true}, {"True", true, false, true}, {"1", true, false, true},
 		} {
 			enabled, err := siviFeature(name, func(requested string) (string, bool) {

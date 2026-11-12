@@ -98,7 +98,7 @@ test('KML panel remains independently gated and renders XML only in a labelled r
   const source = readFileSync(path.join(__dirname, 'GoogleEarthReview.svelte'), 'utf8');
   const compiled = compile(source, { filename: 'GoogleEarthReview.svelte', generate: 'client' });
   assert.ok(compiled.js.code);
-  assert.match(source, /VITE_GOOGLE_EARTH_KML_PREVIEW === 'true'/);
+  assert.match(source, /VITE_GOOGLE_EARTH_KML_PREVIEW !== 'false'/);
   assert.match(source, /GetGoogleEarthKMLReview/);
   assert.match(source, /<label for="google-earth-place-name">Place Name:/);
   assert.match(source, /<textarea id="google-earth-kml-text" readonly/);

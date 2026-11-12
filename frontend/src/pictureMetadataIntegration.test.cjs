@@ -86,7 +86,7 @@ test('remounted picture panel exposes retained correction and recovery before it
     './pictureLifecycleEditor': require('./pictureLifecycleTestHelpers.cjs').editor,
     './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
     './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
-  });
+  }, { VITE_PICTURE_CREATION_WRITING: 'false', VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'false' });
   const output = render(panel, { props: { ...owner, onBusyChange() {}, metadataSession: {
     subscribe: () => () => {},
     view: () => ({ draft: retained, busy: false, blocked: true, error: 'retained remount error',
@@ -103,8 +103,8 @@ test('remounted picture panel exposes retained correction and recovery before it
 
 test('metadata wiring does not broaden image, creation/deletion or parent write authority', () => {
   const root = source('FS882Form.svelte'), panel = source('PicturePanel.svelte'), manager = source('PictureManager.svelte');
-  assert.match(root, /VITE_PICTURE_METADATA_WRITING === 'true'/);
-  assert.match(manager, /VITE_PICTURE_METADATA_WRITING === 'true'/);
+  assert.match(root, /VITE_PICTURE_METADATA_WRITING !== 'false'/);
+  assert.match(manager, /VITE_PICTURE_METADATA_WRITING !== 'false'/);
   assert.match(root, /headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);
   assert.match(root, /disabled=\{busy \|\| otherHeaderWorkflowBusy \|\| !capabilitiesReady \|\| dirty \|\| childUnsaved\}/);
   assert.match(panel, /metadataPending/);

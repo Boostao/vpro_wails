@@ -21,11 +21,15 @@ func presenceFeatureLookup(value string, present bool) func(string) (string, boo
 
 func TestProjectProfileSpeciesPresenceServiceFeatureGate(t *testing.T) {
 	contexts := &ContextService{}
+	defaultService, err := NewProjectProfileSpeciesPresenceService(contexts, presenceFeatureLookup("", false))
+	if err != nil || !defaultService.enabled {
+		t.Fatal("default presence feature not enabled", defaultService, err)
+	}
 	for _, value := range []struct {
 		value   string
 		present bool
 	}{
-		{"", false}, {"false", true},
+		{"false", true},
 	} {
 		service, err := NewProjectProfileSpeciesPresenceService(contexts, presenceFeatureLookup(value.value, value.present))
 		if err != nil {

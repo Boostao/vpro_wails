@@ -41,7 +41,7 @@ func TestTwoPageVegetationServiceIndependentGatesAndReadonlyRecovery(t *testing.
 			raw := vegetationAttemptJSON(t, request)
 			before := databaseBytes(t, contexts.projects.sqlite.attachments)
 			for _, values := range []map[string]string{
-				{}, {twoPageVegetationReviewEnvironment: "false"}, {twoPageVegetationWritingEnvironment: "true"},
+				{twoPageVegetationReviewEnvironment: "false"},
 				{twoPageVegetationReviewEnvironment: "false", twoPageVegetationWritingEnvironment: "true"},
 			} {
 				facade := vegetationFacade(t, contexts, values)
@@ -58,7 +58,7 @@ func TestTwoPageVegetationServiceIndependentGatesAndReadonlyRecovery(t *testing.
 					t.Fatal("disabled recovery granted", result, err)
 				}
 			}
-			readonly := vegetationFacade(t, contexts, map[string]string{twoPageVegetationReviewEnvironment: "true"})
+			readonly := vegetationFacade(t, contexts, map[string]string{twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "false"})
 			if result, err := readonly.GetOriginal(context.Background(), state.ContextID, "108050", form); result == nil || err != nil {
 				t.Fatal("review-only physical original refused", result, err)
 			}

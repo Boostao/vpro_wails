@@ -186,9 +186,9 @@ test('actual root owner watcher keeps unmounted None-context project work in agg
     CloseService:{GetPendingCloseRequest:async()=>'close',CancelClose:async()=>{cancelled++;},ConfirmClose:async()=>{confirmed++;}},
   });
   Object.defineProperty(context,'editorBusy',{get:()=>context.projectReportBusy});
-  vm.runInContext(ts.transpileModule(effect.replaceAll("import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'true'",'false')+
+  vm.runInContext(ts.transpileModule(effect.replaceAll("import.meta.env.VITE_LONG_VEGETATION_REPORT === 'false'",'false')+
     close+transition+'\nthis.actions={handleCloseRequest,respondToClose,requestTransition};',
-    {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,context);
+    {compilerOptions:{target:ts.ScriptTarget.ES2022, editorInitializing: false}}).outputText,Object.assign(context,{editorInitializing:false}));
   assert.equal(effects.length,1);const unsubscribe=effects[0]();
   value.state.closeBlocked=true;value.notify();
   assert.equal(context.projectReportBusy,true);assert.equal(context.view,'long-vegetation');

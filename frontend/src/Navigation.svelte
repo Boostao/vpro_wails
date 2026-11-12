@@ -1,76 +1,60 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'break-report' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
-  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'sivi-chars' | 'metadata' };
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
+  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'metadata' };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
-  let { view, onnavigate, siviAvailable = false, onopensivi, charsAvailable = false, onopenchars, charsLinkedVegetation = false, charsCollected = false, charsSpecies = false, charsIdentity = false, charsCreation = false, charsDeletion = false, charsRestoration = false, charsCreationUndo = false,
+  let { view, onnavigate, siviAvailable = false, onopensivi,
     metadataAvailable = false, onopenmetadata }: {
     view: View; onnavigate: (view: View) => void;
     siviAvailable?: boolean; onopensivi?: () => void;
-    charsAvailable?: boolean; onopenchars?: () => void;
-    charsLinkedVegetation?: boolean;
-    charsCollected?: boolean;
-    charsSpecies?: boolean;
-    charsIdentity?: boolean;
-    charsCreation?: boolean;
-    charsDeletion?: boolean; charsRestoration?: boolean; charsCreationUndo?: boolean;
     metadataAvailable?: boolean; onopenmetadata?: () => void;
   } = $props();
-  const charsScope = $derived([charsLinkedVegetation ? 'covers/heights' : '', charsCollected ? 'Collected cycles' : '',
-    charsSpecies ? 'Species selections' : '', charsIdentity ? 'vegetation IDs' : '',
-    charsCreation ? 'source-bound row creation' : '', charsDeletion ? 'reviewed row deletion' : '',
-    charsRestoration ? 'typed deleted-row restoration' : '', charsCreationUndo ? 'historical creation Undo' : ''].filter(Boolean).join(' and '));
-  const charsUnavailable = $derived([charsSpecies ? '' : 'Species', charsCollected ? '' : 'Collected',
-    charsIdentity ? '' : 'identity', charsCreation ? '' : 'creation', charsDeletion ? '' : 'deletion',
-    charsRestoration ? '' : 'typed restoration', charsCreationUndo ? '' : 'historical creation Undo'].filter(Boolean).join(', '));
   let navigation: HTMLElement;
   let openMenu = $state<string | null>(null);
 
   const menus: Menu[] = [
     { label: 'Forms', icon: ClipboardList, groups: [
       { label: 'Data Entry', items: [
-        { name: 'FS882 Data Forms (6x4) — Experimental', icon: ClipboardList, view: 'fs882' },
-        { name: 'Enter/Edit SIVI Data', icon: Tent, action: 'sivi' },
-        { name: 'CHARS SIVI parent — Experimental', icon: Tent, action: 'sivi-chars' }
+        { name: 'FS882 Data Forms (6x4)', icon: ClipboardList, view: 'fs882' },
+        { name: 'Enter/Edit SIVI Data', icon: Tent, action: 'sivi' }
       ] },
       { label: 'Others', items: [
         { name: 'Metadata', icon: Table, action: 'metadata' },
         { name: 'Combine Species', icon: Link },
         { name: 'Herbarium', icon: Leaf },
-        { name: 'Plot Pictures — Read-only', icon: FileText, view: import.meta.env.VITE_PICTURE_MANAGER === 'true' ? 'picture-manager' : undefined },
+        { name: 'Plot Pictures', icon: FileText, view: import.meta.env.VITE_PICTURE_MANAGER !== 'false' ? 'picture-manager' : undefined },
         { name: 'Colour-theme', icon: Palette },
         { name: 'User setup', icon: UserCog },
-        { name: 'User log — Read-only', icon: History, view: import.meta.env.VITE_USER_LOG_REVIEW === 'true' ? 'user-log' : undefined }
+        { name: 'User log', icon: History, view: import.meta.env.VITE_USER_LOG_REVIEW !== 'false' ? 'user-log' : undefined }
       ] }
     ] },
     { label: 'Reports', icon: ChartColumn, groups: [
       { label: 'Vegetation', items: [
-        { name: 'Long Vegetation', icon: TableProperties, view: import.meta.env.VITE_LONG_VEGETATION_REPORT === 'true' ? 'long-vegetation' : undefined },
-        { name: 'Lifeform Summary', icon: Leaf, view: import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' ? 'lifeform-summary' : undefined },
-        { name: 'Summary Vegetation', icon: ChartColumn, view: import.meta.env.VITE_SUMMARY_VEGETATION === 'true' ? 'summary-vegetation' : undefined }
+        { name: 'Long Vegetation', icon: TableProperties, view: import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'false' ? 'long-vegetation' : undefined },
+        { name: 'Lifeform Summary', icon: Leaf, view: import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false' ? 'lifeform-summary' : undefined },
+        { name: 'Summary Vegetation', icon: ChartColumn, view: import.meta.env.VITE_SUMMARY_VEGETATION !== 'false' ? 'summary-vegetation' : undefined }
       ] },
       { label: 'Environment', items: [
-        { name: 'Long Environment', icon: TableProperties, view: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' ? 'long-environment' : undefined },
-        { name: 'Summary Environment', icon: ChartColumn, view: import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true' ? 'summary-environment' : undefined }
+        { name: 'Long Environment', icon: TableProperties, view: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT !== 'false' ? 'long-environment' : undefined },
+        { name: 'Summary Environment', icon: ChartColumn, view: import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false' ? 'summary-environment' : undefined }
       ] },
       { label: 'Others', items: [
-        { name: 'Subzone Matrix of Units', icon: Table, view: import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK === 'true' ? 'subzone-matrix' : undefined },
-        { name: 'PC-ORD Break Report', icon: Table, view: import.meta.env.VITE_BREAK_REPORT_REVIEW === 'true' ? 'break-report' : undefined },
+        { name: 'Subzone Matrix of Units', icon: Table, view: import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'false' ? 'subzone-matrix' : undefined },
         { name: 'Hierarchy table', icon: Network, view: 'hierarchy' },
         { name: 'Hierarchy Diagram', icon: Network },
         { name: 'Print a Plot Label', icon: Tag },
-        { name: import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT === 'true' ? 'Saved plot label PDF — Portable' : 'Saved plot label preview — Read-only', icon: Tag,
-          view: (import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT === 'true') ? 'plot-label-preview' : undefined },
-        { name: 'Plot location review', icon: FileText, view: import.meta.env.VITE_PLOT_LOCATION_REVIEW === 'true' ? 'plot-locations' : undefined },
-        { name: 'Google Earth location preparation', icon: Globe, view: import.meta.env.VITE_GOOGLE_EARTH_REVIEW === 'true' ? 'google-earth-review' : undefined },
+        { name: import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'false' ? 'Saved plot label PDF' : 'Saved plot label preview', icon: Tag,
+          view: (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'false' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'false') ? 'plot-label-preview' : undefined },
+        { name: 'Plot location review', icon: FileText, view: import.meta.env.VITE_PLOT_LOCATION_REVIEW !== 'false' ? 'plot-locations' : undefined },
+        { name: 'Google Earth location preparation', icon: Globe, view: import.meta.env.VITE_GOOGLE_EARTH_REVIEW !== 'false' ? 'google-earth-review' : undefined },
         { name: 'Create Plot Locations File', icon: FileText },
         { name: 'Show Plot Locations in Google Earth', icon: Globe }
       ] }
     ] },
     { label: 'Interchange', icon: Table, groups: [
-      { label: 'Read-only preparation', items: [
-        { name: 'Project table CSV review', icon: Table, view: import.meta.env.VITE_TABLE_CSV_REVIEW === 'true' ? 'table-csv' : undefined }
+      { label: 'Table export', items: [
+        { name: 'Project table CSV review', icon: Table, view: import.meta.env.VITE_TABLE_CSV_REVIEW !== 'false' ? 'table-csv' : undefined }
       ] }
     ] },
     { label: 'Help', icon: HelpCircle, groups: [
@@ -108,7 +92,6 @@
 
   function itemEnabled(item: Item) {
     if (item.action === 'sivi') return siviAvailable && !!onopensivi;
-    if (item.action === 'sivi-chars') return charsAvailable && !!onopenchars;
     if (item.action === 'metadata') return metadataAvailable && !!onopenmetadata;
     return !!item.view;
   }
@@ -118,9 +101,6 @@
     if (item.action === 'sivi' && onopensivi) {
       closeMenu(true);
       onopensivi();
-    } else if (item.action === 'sivi-chars' && onopenchars) {
-      closeMenu(true);
-      onopenchars();
     } else if (item.action === 'metadata' && onopenmetadata) {
       closeMenu(true);
       onopenmetadata();
@@ -162,16 +142,11 @@
                 class:current={item.view === view}
                 aria-current={item.view === view ? 'page' : undefined}
                 title={item.action === 'sivi'
-                  ? itemEnabled(item) ? 'Experimental normal SIVI / FS1333 for the selected plot. Existing draft and close guards apply. Use disposable projects only.'
-                    : 'Select a plot and enable the independent SIVI standalone and parent-review gates.'
-                  : item.action === 'sivi-chars'
-                    ? itemEnabled(item) ? charsScope
-                      ? `Experimental CHARS parent with separately gated linked ${charsScope}. ${charsUnavailable ? `${charsUnavailable}, ` : ''}unqualified callbacks remain unavailable. Existing draft and close guards apply.`
-                      : 'Experimental CHARS parent-only entry with Comp./Part. Save. Child workflows and ProjectID/PlotType remain unavailable. Existing draft and close guards apply.'
-                      : 'Select a plot and enable the independent CHARS parent-entry gate.'
+                  ? itemEnabled(item) ? 'SIVI / FS1333 editor for the selected plot. Existing draft and close guards apply.'
+                    : 'Select a plot to open SIVI / FS1333 data entry.'
                   : item.action === 'metadata'
-                    ? 'Project metadata for the open plot. Requires the existing metadata gate and a clean, unlocked editor; finish or Undo drafts first.'
-                  : item.view === 'fs882' ? 'Experimental: only verified workflows are writable. Use disposable projects only.' : item.view ? item.name : 'Not yet available in the desktop app'}
+                    ? 'Project metadata for the open plot. Requires a clean, unlocked editor; finish or Undo drafts first.'
+                  : item.view === 'fs882' ? 'FS882 data entry: only verified workflows are writable.' : item.view ? item.name : 'Not yet available in the desktop app'}
                 onclick={() => activate(item)}
               >
                 <item.icon size={16} aria-hidden="true" />

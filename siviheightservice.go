@@ -15,7 +15,10 @@ func siviHeightFeature(lookup func(string) (string, bool)) (bool, error) {
 func siviFeature(name string, lookup func(string) (string, bool)) (bool, error) {
 	value, present := lookup(name)
 	if !present {
-		return false, nil
+		if name == breakReportReviewEnvironment || name == "VPRO_SIVI_CHARS_PARENT_ENTRY" {
+			return false, nil
+		}
+		return true, nil
 	}
 	switch value {
 	case "true":

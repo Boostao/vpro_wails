@@ -14,7 +14,7 @@
   let busy = $state(false);
   let error = $state('');
   let review = $state<ValidatedProjectTableCSVReview | null>(null);
-  const archiveEnabled = import.meta.env.VITE_TABLE_CSV_ARCHIVE_EXPORT === 'true';
+  const archiveEnabled = import.meta.env.VITE_TABLE_CSV_ARCHIVE_EXPORT !== 'false';
   const scope = () => ({ contextId, project, projectPath });
   const publicationSession = archiveEnabled ? tableCSVArchivePublicationSession(scope()) : null;
   let publication = $state(publicationSession?.view() ?? null);

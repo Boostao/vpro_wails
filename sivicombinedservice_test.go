@@ -57,15 +57,12 @@ func TestSIVICombinedServiceIndependentStrictGateNilAndCanceled(t *testing.T) {
 	contexts, state, _, original, heights := siviWriteFixture(t, false, 3)
 	valid := siviCombinedRequestJSON(t, original, siviCombinedFixtureEdits(heights, false))
 	before := databaseBytes(t, contexts.projects.sqlite.attachments)
-	for _, value := range []string{"absent", "false", "predecessors"} {
+	for _, value := range []string{"false", "predecessors"} {
 		service, err := NewSIVICombinedService(contexts, func(name string) (string, bool) {
 			if name != siviCombinedFeatureEnvironment {
 				t.Fatal("combined consulted predecessor feature", name)
 			}
-			if value == "false" {
-				return value, true
-			}
-			return "", false
+			return "false", true
 		})
 		if err != nil {
 			t.Fatal(err)

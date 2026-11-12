@@ -150,7 +150,7 @@ test('actual root remount retains field errors and independently gates every rep
     const owner = { ...scope, contextId: `selected-field-root-${enabled}` };
     const registry = prefs.createLongVegetationSelectedFieldPreferencesRegistry(), session = registry(owner);
     session.apply({ ...review(), ...owner }); session.editField('new\0field');
-    const reportSource = source('LongVegetationReport.svelte').replace(/import\.meta\.env\.(\w+) === 'true'/g,
+    const reportSource = source('LongVegetationReport.svelte').replace(/import\.meta\.env\.(\w+) !== 'false'/g,
       (_, flag) => String(enabled && flag === 'VITE_LONG_VEGETATION_SELECTED_FIELD_PREFERENCES'));
     const child = serverComponent(source('LongVegetationSelectedFieldPreferences.svelte'), 'LongVegetationSelectedFieldPreferences.svelte', {
       '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationSelectedFieldPreferences': prefs,

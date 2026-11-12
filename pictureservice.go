@@ -69,7 +69,14 @@ func NewPictureService(contexts *ContextService, lookup func(string) (string, bo
 		return service, nil
 	}
 	path, present := lookup(pictureLibraryEnvironment)
-	if !present || path == "" {
+	if !present {
+		if _, readingExplicit := lookup(pictureReadingEnvironment); readingExplicit {
+			return nil, errors.New("picture reading requires VPRO_PICTURE_LIBRARY_PATH; no installed library was inferred")
+		}
+		service.enabled = false
+		return service, nil
+	}
+	if path == "" {
 		return nil, errors.New("picture reading requires VPRO_PICTURE_LIBRARY_PATH; no installed library was inferred")
 	}
 	service.source, err = newOwnedPictureLibrary(path)

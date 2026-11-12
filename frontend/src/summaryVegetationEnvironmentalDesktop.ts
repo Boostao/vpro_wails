@@ -1,12 +1,12 @@
 import { SummaryVegetationEnvironmentalService, SummaryVegetationEnvironmentalLifeformService } from '../bindings/github.com/boostao/vpro-wails';
 import { summaryEnvironmentalRegistry, summaryEnvironmentalNumericRegistry, summaryEnvironmentalLifeformRegistry, type SummaryEnvironmentalPort } from './summaryVegetationEnvironmental';
 
-export const summaryEnvironmentalEnabled = import.meta.env.VITE_SUMMARY_VEGETATION === 'true' &&
-  import.meta.env.VITE_SUMMARY_VEGETATION_ENVIRONMENT === 'true';
+export const summaryEnvironmentalEnabled = import.meta.env.VITE_SUMMARY_VEGETATION !== 'false' &&
+  import.meta.env.VITE_SUMMARY_VEGETATION_ENVIRONMENT !== 'false';
 export const summaryEnvironmentalNumericEnabled = summaryEnvironmentalEnabled &&
-  import.meta.env.VITE_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC === 'true';
+  import.meta.env.VITE_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC !== 'false';
 export const summaryEnvironmentalLifeformEnabled = summaryEnvironmentalNumericEnabled &&
-  import.meta.env.VITE_SUMMARY_VEGETATION_ENVIRONMENT_LIFEFORM === 'true';
+  import.meta.env.VITE_SUMMARY_VEGETATION_ENVIRONMENT_LIFEFORM !== 'false';
 export const summaryEnvironmentalDesktop = summaryEnvironmentalLifeformEnabled ?
   summaryEnvironmentalLifeformRegistry(true) : summaryEnvironmentalNumericEnabled ?
   summaryEnvironmentalNumericRegistry(true) : summaryEnvironmentalRegistry(summaryEnvironmentalEnabled);

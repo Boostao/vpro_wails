@@ -1,10 +1,10 @@
-//go:build !linux && !windows
+//go:build !linux && !windows && !darwin
 
 package accessreader
 
 import "errors"
 
-var errUnsupportedPlatform = errors.New("Access database reading is only supported on Windows and Linux")
+var errUnsupportedPlatform = errors.New("Access database reading is only supported on Windows, macOS, and Linux")
 
 type DB struct{ path string }
 

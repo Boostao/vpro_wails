@@ -49,9 +49,10 @@ func TestPictureDeletionServiceIndependentGates(t *testing.T) {
 					}
 					return
 				}
-				if err != nil || service.writing != (environment == pictureDeletionWritingEnvironment && value == "true") ||
-					service.restoring != (environment == pictureDeletionRestoringEnvironment && value == "true") {
-					t.Fatal("independent default-off gate changed", service, err)
+				wantWriting := value != "false" || environment != pictureDeletionWritingEnvironment
+				wantRestoring := value != "false" || environment != pictureDeletionRestoringEnvironment
+				if err != nil || service.writing != wantWriting || service.restoring != wantRestoring {
+					t.Fatal("independent default-on gate changed", service, err)
 				}
 				if !service.writing {
 					if result, err := service.Delete(t.Context(), request.ContextID, pictureLifecycleTestWire(t, request)); err == nil || result != nil {

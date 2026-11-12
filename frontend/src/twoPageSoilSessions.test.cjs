@@ -37,14 +37,14 @@ function stage(session) {
 }
 
 test('default and writing-only cannot grant review; read-only cannot stage or dispatch mutation', async () => {
-  for (const environment of [{}, { VITE_TWO_PAGE_SOIL_REVIEW: 'false' }, { VITE_TWO_PAGE_SOIL_WRITING: 'true' }]) {
+  for (const environment of [{ VITE_TWO_PAGE_SOIL_REVIEW: 'false' }, { VITE_TWO_PAGE_SOIL_REVIEW: 'false', VITE_TWO_PAGE_SOIL_WRITING: 'true' }]) {
     const api = registry(environment);
     assert.equal(api.twoPageSoilReviewEnabled, false);
     assert.equal(api.twoPageSoilWritingEnabled, false);
     assert.throws(() => api.twoPageSoilSession(owner), /disabled/);
     assert.equal(api.calls.length, 0);
   }
-  const api = registry({ VITE_TWO_PAGE_SOIL_REVIEW: 'true' });
+  const api = registry({ VITE_TWO_PAGE_SOIL_REVIEW: 'true', VITE_TWO_PAGE_SOIL_WRITING: 'false' });
   const session = api.twoPageSoilSession(owner);
   assert.equal(await session.load(), true);
   assert.throws(() => session.stage('-7', 'Horizon', 'LF', false), /disabled/);
@@ -58,9 +58,12 @@ test('independent creation profile retains drafts and dispatches only its exact 
   const entry = structuredClone(require('./twoPageSoilCreationWire.json')[0]);
   const { contextId, project, plot, form } = entry.request.original;
   const creationOwner = { contextId, project, plot, form };
-  for (const environment of [enabled, { VITE_TWO_PAGE_SOIL_CREATION: 'true' },
-    { VITE_TWO_PAGE_SOIL_REVIEW: 'true', VITE_TWO_PAGE_SOIL_CREATION: 'true' },
-    { VITE_TWO_PAGE_SOIL_WRITING: 'true', VITE_TWO_PAGE_SOIL_CREATION: 'true' }]) {
+  for (const environment of [
+    { ...enabled, VITE_TWO_PAGE_SOIL_CREATION: 'false' },
+    { VITE_TWO_PAGE_SOIL_REVIEW: 'false', VITE_TWO_PAGE_SOIL_WRITING: 'false', VITE_TWO_PAGE_SOIL_CREATION: 'true' },
+    { VITE_TWO_PAGE_SOIL_REVIEW: 'true', VITE_TWO_PAGE_SOIL_WRITING: 'false', VITE_TWO_PAGE_SOIL_CREATION: 'true' },
+    { VITE_TWO_PAGE_SOIL_REVIEW: 'false', VITE_TWO_PAGE_SOIL_WRITING: 'true', VITE_TWO_PAGE_SOIL_CREATION: 'true' },
+  ]) {
     assert.equal(registry(environment).twoPageSoilCreationEnabled, false);
   }
   const creates = [];

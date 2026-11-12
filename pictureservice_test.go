@@ -19,6 +19,9 @@ func pictureServiceLookup(values map[string]string) func(string) (string, bool) 
 func TestPictureServiceIndependentGateAndExplicitSources(t *testing.T) {
 	for _, flag := range []string{"", "false", "true", "TRUE", " true", "1"} {
 		lookup := func(name string) (string, bool) {
+			if name == pictureLibraryEnvironment {
+				return "", false
+			}
 			if name != pictureReadingEnvironment {
 				t.Fatal("disabled picture read inferred a library or borrowed authority", name)
 			}

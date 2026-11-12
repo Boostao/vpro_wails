@@ -100,7 +100,7 @@ test('lifeform exact SINGLE sums preserve cancellation of large historical value
 test('standalone lifeform component is gated, read-only, responsive and cancels on destroy', () => {
   const source = readFileSync(path.join(__dirname, 'LifeformSummary.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'LifeformSummary.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_LIFEFORM_SUMMARY === 'true'/);
+  assert.match(source, /VITE_LIFEFORM_SUMMARY !== 'false'/);
   assert.match(source, /LifeformSummaryService\.Preview\(contextId\)/);
   assert.match(source, /onDestroy\(cancel\)/);
   assert.match(source, /request !== generation \|\| key !== ownerKey/);
@@ -121,9 +121,9 @@ test('lifeform read-only catalogue descriptions preserve numeric labels and NULL
   input.report.catalogue[0].definition = cell('  coniferous tree  ');
   input.report.catalogue[0].shortName = cell('1Conifer');
   const source = readFileSync(path.join(__dirname, 'LifeformSummary.svelte'), 'utf8')
-    .replace("import.meta.env.VITE_LIFEFORM_SUMMARY === 'true'", 'true')
-    .replace("import.meta.env.VITE_SPECIES_ATTRIBUTE_SUMMARY === 'true'", 'false')
-    .replace("import.meta.env.VITE_LIFEFORM_WORKBOOK === 'true'", 'false')
+    .replace("import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false'", 'true')
+    .replace("import.meta.env.VITE_SPECIES_ATTRIBUTE_SUMMARY !== 'false'", 'false')
+    .replace("import.meta.env.VITE_LIFEFORM_WORKBOOK !== 'false'", 'false')
     .replace('let preview = $state<LifeformSummaryPreview | null>(null);',
       `let preview = $state<LifeformSummaryPreview | null>(${JSON.stringify(input)});`)
     .replace("let previewKey = $state('');",

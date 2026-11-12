@@ -17,6 +17,7 @@ type sqliteContext struct {
 	mu             sync.Mutex
 	db             *sql.DB
 	conn           *sql.Conn
+	projectReadDB  *sql.DB
 	projectDB      *sql.DB
 	selection      desktopSelection
 	attachments    map[string]string
@@ -55,6 +56,33 @@ func sqliteFileURI(path, mode string) string {
 	return address.String()
 }
 
+func (c *sqliteContext) projectReadDatabase(ctx context.Context) (*sql.DB, error) {
+	if err := acquireMutexLease(ctx, &c.mu); err != nil {
+		return nil, err
+	}
+	defer c.mu.Unlock()
+	if c.conn == nil {
+		return nil, errors.New("project context is closed")
+	}
+	if c.projectDB != nil {
+		return c.projectDB, nil
+	}
+	if c.projectReadDB != nil {
+		return c.projectReadDB, nil
+	}
+	db, err := sql.Open("sqlite3", sqliteFileURI(c.selection.ProjectPath, "ro")+"&_busy_timeout=5000")
+	if err != nil {
+		return nil, err
+	}
+	db.SetMaxOpenConns(2)
+	db.SetMaxIdleConns(2)
+	if err := db.PingContext(ctx); err != nil {
+		return nil, errors.Join(err, db.Close())
+	}
+	c.projectReadDB = db
+	return db, nil
+}
+
 func (c *sqliteContext) projectDatabase(ctx context.Context) (*sql.DB, error) {
 	if err := acquireMutexLease(ctx, &c.mu); err != nil {
 		return nil, err
@@ -66,14 +94,18 @@ func (c *sqliteContext) projectDatabase(ctx context.Context) (*sql.DB, error) {
 	if c.projectDB != nil {
 		return c.projectDB, nil
 	}
-	db, err := sql.Open("sqlite3", sqliteFileURI(c.selection.ProjectPath, "rw")+"&_foreign_keys=on&_busy_timeout=5000")
+	db, err := sql.Open("sqlite3", sqliteFileURI(c.selection.ProjectPath, "rw")+"&_foreign_keys=on&_busy_timeout=5000&_journal_mode=WAL")
 	if err != nil {
 		return nil, err
 	}
 	db.SetMaxOpenConns(2)
 	db.SetMaxIdleConns(2)
-	if err := db.PingContext(ctx); err != nil {
+	var journalMode string
+	if err := db.QueryRowContext(ctx, "PRAGMA journal_mode = WAL;").Scan(&journalMode); err != nil {
 		return nil, errors.Join(err, db.Close())
+	}
+	if !strings.EqualFold(journalMode, "wal") {
+		return nil, errors.Join(fmt.Errorf("expected SQLite WAL journal mode, got %q", journalMode), db.Close())
 	}
 	c.projectDB = db
 	return db, nil
@@ -463,12 +495,18 @@ func (c *sqliteContext) Close() error {
 	if c.conn == nil {
 		return nil
 	}
+	connErr := errors.Join(c.conn.Close(), c.db.Close())
+	var readErr error
+	if c.projectReadDB != nil {
+		readErr = c.projectReadDB.Close()
+	}
 	var projectErr error
 	if c.projectDB != nil {
 		projectErr = c.projectDB.Close()
 	}
-	err := errors.Join(projectErr, c.conn.Close(), c.db.Close())
+	err := errors.Join(connErr, readErr, projectErr)
 	c.conn, c.db = nil, nil
+	c.projectReadDB = nil
 	c.projectDB = nil
 	return err
 }

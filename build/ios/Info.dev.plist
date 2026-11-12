@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleExecutable</key>
-    <string>vpro-wails</string>
+    <string>VPro</string>
     <key>CFBundleIdentifier</key>
-    <string>ca.bc.gov.vpro.dev</string>
+    <string>ca.bc.gov.for.bec.vpro.dev</string>
     <key>CFBundleName</key>
-    <string>VPRO (Dev)</string>
+    <string>VPro (Dev)</string>
     <key>CFBundleDisplayName</key>
-    <string>VPRO (Dev)</string>
+    <string>VPro (Dev)</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -51,11 +51,11 @@
     <true/>
     
     <key>NSHumanReadableCopyright</key>
-    <string>© 2026, My Company</string>
+    <string>© 2026 Province of British Columbia — Ministry of Forests, Research Branch (BEC Program)</string>
     
     
     <key>CFBundleGetInfoString</key>
-    <string>This is a comment</string>
+    <string>VENUS (Vegetation and Environment NexUS) Professional</string>
     
 </dict>
 </plist>

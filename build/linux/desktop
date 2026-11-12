@@ -1,13 +1,13 @@
 [Desktop Entry]
 Version=1.0
-Name=VPRO
-Comment=A vpro-wails application
+Name=VPro
+Comment=VENUS (Vegetation and Environment NexUS) Professional — B.C. Ministry of Forests, Research Branch (BEC Program)
 # The Exec line includes %u to pass the URL to the application
-Exec=/usr/local/bin/vpro-wails %u
+Exec=/usr/local/bin/VPro %u
 Terminal=false
 Type=Application
-Icon=vpro-wails
-Categories=Utility;
-StartupWMClass=vpro-wails
+Icon=VPro
+Categories=Science;Education;Utility;
+StartupWMClass=VPro
 
  

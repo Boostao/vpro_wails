@@ -34,7 +34,7 @@ func TestSummaryEnvironmentalCountServiceGateAndRequest(t *testing.T) {
 	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
 		service, err := NewSummaryVegetationEnvironmentalCountService(nil, func(string) (string, bool) { return flag, flag != "" })
 		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag == "true") {
+			if err != nil || service.enabled != (flag != "false") {
 				t.Fatal(flag, service, err)
 			}
 			unit := "A"

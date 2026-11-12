@@ -16,7 +16,8 @@ func TestProjectProfilingExternalProjectAndSelectedSUScopePreserveFiles(t *testi
 		t.Fatal(err)
 	}
 	_, err = db.Exec(`CREATE TABLE Preview_SU(PlotNumber TEXT,SiteUnit TEXT);
-		INSERT INTO Preview_SU VALUES('108050','A'),('9003104','A'),('off-project','A')`)
+		INSERT INTO Preview_SU VALUES('108050','A'),('9003104','A'),('off-project','A');
+		PRAGMA wal_checkpoint(PASSIVE)`)
 	release()
 	if err != nil {
 		t.Fatal(err)

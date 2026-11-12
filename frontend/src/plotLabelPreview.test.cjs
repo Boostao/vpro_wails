@@ -163,8 +163,8 @@ test('saved-label server render and navigation remain independently default-off/
   assert.match(body, /six-position printing and Print All Plots remain unavailable/);
   const nav = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
-  assert.match(nav, /VITE_PLOT_LABEL_PREVIEW === 'true' \|\| import\.meta\.env\.VITE_PLOT_LABEL_PDF_EXPORT === 'true'\) \? 'plot-label-preview' : undefined/);
-  assert.match(app, /view === 'plot-label-preview' && \(import\.meta\.env\.VITE_PLOT_LABEL_PREVIEW === 'true' \|\| import\.meta\.env\.VITE_PLOT_LABEL_PDF_EXPORT === 'true'\)/);
+  assert.match(nav, /VITE_PLOT_LABEL_PREVIEW !== 'false' \|\| import\.meta\.env\.VITE_PLOT_LABEL_PDF_EXPORT !== 'false'\) \? 'plot-label-preview' : undefined/);
+  assert.match(app, /view === 'plot-label-preview' && \(import\.meta\.env\.VITE_PLOT_LABEL_PREVIEW !== 'false' \|\| import\.meta\.env\.VITE_PLOT_LABEL_PDF_EXPORT !== 'false'\)/);
   assert.match(app, /<PlotLabelPreview[^>]*onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/s);
   assert.match(source, /onDestroy\(\(\) => \{ unsubscribe\?\.\(\); cancel\(\); \}\)/);
 });

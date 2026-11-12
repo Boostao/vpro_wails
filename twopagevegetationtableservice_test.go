@@ -256,7 +256,7 @@ func TestTwoPageVegetationTableGatesAndRequestGuards(t *testing.T) {
 			}
 			continue
 		}
-		if err != nil || got.review != (value == "true") {
+		if err != nil || got.review != (value != "false") {
 			t.Fatal("independent gate default changed", value, got, err)
 		}
 	}

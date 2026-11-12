@@ -111,11 +111,11 @@ test('actual Summary parent prevents method, preview and preference changes whil
 test('Summary root and parent wire independent default-off gates and persistent publication authority', () => {
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const parent = readFileSync(path.join(__dirname, 'SiteUnitSummary.svelte'), 'utf8');
-  assert.match(app, /VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'true' && import\.meta\.env\.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'true'/);
+  assert.match(app, /VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'false' && import\.meta\.env\.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK === 'false'/);
   assert.match(app, /summaryEnvironmentPublicationBusy = publication.busy \|\| publication.blocked/);
   assert.match(app, /summaryPublicationBusy = \$derived\(summaryEnvironmentPublicationBusy \|\| summaryVegetationPublicationBusy\)/);
   assert.match(app, /publication.blocked && view === 'home'\) view = 'summary-environment'/);
-  assert.match(parent, /VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'true'/);
+  assert.match(parent, /VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'false'/);
   assert.match(parent, /<SiteUnitSummaryWorkbookPanel owner=\{\{ contextId, project, projectPath, su, suPath \}\} \{method\}/);
   assert.match(parent, /onBusyChange=\{\(held\) => \{ workbookBusy = held; reportBusy\(\); \}\}/);
   for (const selector of ['undo', 'normal', 'acknowledge']) {

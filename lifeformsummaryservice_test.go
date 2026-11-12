@@ -30,7 +30,7 @@ func TestLifeformSummaryServiceGateAndOwnedZeroWrites(t *testing.T) {
 	for _, gate := range []string{"", "false", "true", "TRUE", "1", " true"} {
 		service, err := NewLifeformSummaryService(nil, func(string) (string, bool) { return gate, gate != "" })
 		if gate == "" || gate == "false" || gate == "true" {
-			if err != nil || service.enabled != (gate == "true") {
+			if err != nil || service.enabled != (gate != "false") {
 				t.Fatal(gate, service, err)
 			}
 			if _, err := service.Preview(context.Background(), "owned"); err == nil {

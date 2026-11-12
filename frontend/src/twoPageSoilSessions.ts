@@ -3,9 +3,9 @@ import { TwoPageSoilSession } from './twoPageSoilSession';
 import type { TwoPageSoilOwner } from './twoPageSoilEditor';
 import { wellFormedUTF16 } from './qualityEditor';
 
-export const twoPageSoilReviewEnabled = import.meta.env.VITE_TWO_PAGE_SOIL_REVIEW === 'true';
-export const twoPageSoilWritingEnabled = twoPageSoilReviewEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_WRITING === 'true';
-export const twoPageSoilCreationEnabled = twoPageSoilWritingEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_CREATION === 'true';
+export const twoPageSoilReviewEnabled = import.meta.env.VITE_TWO_PAGE_SOIL_REVIEW !== 'false';
+export const twoPageSoilWritingEnabled = twoPageSoilReviewEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_WRITING !== 'false';
+export const twoPageSoilCreationEnabled = twoPageSoilWritingEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_CREATION !== 'false';
 const sessions = new Map<string, { owner: TwoPageSoilOwner; session: TwoPageSoilSession; unsubscribe: () => void }>();
 const observers = new Set<(activity: TwoPageSoilActivity) => void>();
 export interface TwoPageSoilActivity {

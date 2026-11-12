@@ -30,7 +30,7 @@ func TestLongVegetationGroupPreferencesGateAndStrictWire(t *testing.T) {
 		raw              string
 		present, enabled bool
 		invalid          bool
-	}{{"", false, false, false}, {"true", true, true, false}, {"false", true, false, false},
+	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
 		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
 		got, err := longVegetationGroupPreferencesFeature(func(name string) (string, bool) {
 			if name != "VPRO_LONG_VEGETATION_GROUP_PREFERENCES" {

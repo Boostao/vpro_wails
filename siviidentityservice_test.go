@@ -23,10 +23,10 @@ func TestSIVIIdentityServiceIndependentGateAndUnavailableContext(t *testing.T) {
 			}
 			continue
 		}
-		if err != nil || service.enabled != (flag == "true") {
-			t.Fatal("identity flag is not independently default-off", service, err)
+		if err != nil || service.enabled != (flag != "false") {
+			t.Fatal("identity flag is not independently default-on", service, err)
 		}
-		if flag != "true" {
+		if flag == "false" {
 			if result, err := service.GetOriginal(context.Background(), "owned", "P", false); result != nil || err == nil {
 				t.Fatal("disabled identity source read succeeded", result, err)
 			}

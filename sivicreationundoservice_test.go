@@ -50,8 +50,8 @@ func TestSIVICreationUndoServiceIndependentFlagsAndGuards(t *testing.T) {
 			}
 			return value, value != "absent"
 		})
-		if err != nil || service.enabled != (value == "true") {
-			t.Fatal("independent default-off flag failed", service, err)
+		if err != nil || service.enabled != (value != "false") {
+			t.Fatal("independent default-on flag failed", service, err)
 		}
 		if !service.enabled {
 			for _, operation := range siviCreationUndoServiceOperations(service, context.Background()) {

@@ -143,7 +143,7 @@ jobs:
         run: |
           set -euo pipefail
           task darwin:package:universal
-          python scripts/release.py cpu bin/vpro-wails.app/Contents/MacOS/vpro-wails --format macho --arch universal
+          python scripts/release.py cpu bin/VPro.app/Contents/MacOS/VPro --format macho --arch universal
           task darwin:create:dmg
           python scripts/release.py package macos
       - uses: actions/upload-artifact@v4
@@ -171,7 +171,7 @@ jobs:
       CC: gcc
       CXX: g++
       NO_STRIP: '1'
-      GIT_COMMITTER_NAME: VPRO
+      GIT_COMMITTER_NAME: VPro
       GIT_COMMITTER_EMAIL: noreply@github.com
     steps:
       - uses: actions/checkout@v4
@@ -248,7 +248,7 @@ jobs:
           flags=()
           if [ "$RELEASE_DRAFT" = "true" ]; then flags+=(--draft); fi
           if [ "$RELEASE_PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
-          gh release create "$RELEASE_TAG" "${assets[@]}" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "VPRO $RELEASE_TAG" --notes "Windows amd64/arm64 EXE, ZIP and NSIS; macOS universal DMG and ZIP; Linux amd64/arm64 AppImage, deb and tar. Verify downloads against SHA256SUMS.txt. macOS is ad-hoc signed, not notarized." "${flags[@]}"
+          gh release create "$RELEASE_TAG" "${assets[@]}" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "VPro $RELEASE_TAG" --notes "Windows amd64/arm64 EXE, ZIP and NSIS; macOS universal DMG and ZIP; Linux amd64/arm64 AppImage, deb and tar. Verify downloads against SHA256SUMS.txt. macOS is ad-hoc signed, not notarized." "${flags[@]}"
       - name: Verify remotely attached names and bytes
         run: |
           set -euo pipefail

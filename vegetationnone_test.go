@@ -103,8 +103,8 @@ func TestLongVegetationNoneDecodeAndIndependentPublicGate(t *testing.T) {
 			t.Fatal("None read repaired retained preferences", err)
 		}
 	}
-	if enabled, err := siviFeature(longVegetationNoneFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || enabled {
-		t.Fatal("default gate enabled", err)
+	if enabled, err := siviFeature(longVegetationNoneFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || !enabled {
+		t.Fatal("default gate disabled", err)
 	}
 	if _, err := siviFeature(longVegetationNoneFeatureEnvironment, func(string) (string, bool) { return "TRUE", true }); err == nil {
 		t.Fatal("malformed gate accepted")

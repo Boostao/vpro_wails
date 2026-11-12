@@ -168,47 +168,15 @@ test('held operations, context drift, backend refusals and post-validation cance
   await validating.actions.show();
   assert.equal(validating.context.review, null); assert.equal(validating.context.busy, false);
 });
-test('root refresh/list/hierarchy retain break-report read activity barriers', async () => {
-  for (const name of ['refresh', 'loadPlots', 'loadHierarchy']) {
-    const context = Object.fromEntries([
-      'projectReportBusy', 'twoPageVegetationBusy', 'twoPageSoilBusy', 'pictureCreationBusy',
-      'pictureLifecycleBusy', 'vegetationPublicationBusy', 'lifeformPublicationBusy', 'summaryPublicationBusy',
-      'summaryPreferenceBusy', 'externalSUEnvironmentBusy',
-    ].map(key => [key, false]));
-    Object.assign(context, { view: 'break-report', editorBusy: true });
-    await componentFunctions('App.svelte', [name], context)[name](0);
-  }
-});
-test('compiled SSR executes cleanup, code/reference columns, NULL/empty labels and explicit limitations', async () => {
-  let source = readFileSync(path.join(__dirname, 'BreakReportReview.svelte'), 'utf8');
-  const marker = 'let review = $state.raw<BreakReportPage | null>(null);';
-  assert.equal(source.split(marker).length, 2);
-  source = source.replace(marker, `let review = $state.raw<BreakReportPage | null>(${JSON.stringify(fixture().first)});`);
-  const component = serverComponent(source, 'BreakReportReview.svelte', {
-    '../bindings/github.com/boostao/vpro-wails': { BreakReportService: {} },
-    './breakReportReview': report,
+test('PC-ORD Break Report is removed from Navigation and App per VPro2.0_Functions triage', async () => {
+  const navSource = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
+  const appSource = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
+  assert.doesNotMatch(navSource, /PC-ORD Break Report|break-report/);
+  assert.doesNotMatch(appSource, /BreakReportReview|break-report/);
+  const component = serverComponent(navSource, 'Navigation.svelte', {
+    '@lucide/svelte': new Proxy({}, { get: () => () => {} }),
   });
   const { render } = await import(pathToFileURL(require.resolve('svelte/server')).href);
-  let callbacks = 0;
-  const body = render(component, { props: { contextId: 'break-context', onBusyChange: () => callbacks++ } }).body;
-  assert.ok(callbacks > 0, 'lazy SSR must actually execute cleanup callbacks');
-  assert.ok(body.indexOf('>PC-ORD Break Code</th>') < body.indexOf('>VPro Reference</th>'));
-  for (const caption of ['PC-ORD Break Code', 'VPro Reference']) assert.ok(body.includes(`>${caption}</th>`));
-  assert.equal((body.match(/aria-label="Break-code pair /g) ?? []).length, 7);
-  for (const text of ['VPro Break Report', '(NULL)', '(empty text)', '=1+1', '001',
-    'Complete original source SHA256', 'report printing and export generation are not implemented']) assert.ok(body.includes(text));
-  assert.equal(compile(source, { filename: 'BreakReportReview.svelte', generate: 'client' }).warnings.length, 0);
-  assert.doesNotMatch(source, /\b(?:Save|Delete|Publish|Export)\s*\(/);
+  const body = render(component, { props: { view: 'home', onnavigate: () => {} } }).body;
+  assert.equal(body.includes('PC-ORD Break Report'), false);
 });
-for (const flag of [undefined, false, true, 'false', 'TRUE', '1', 'true']) {
-  test(`compiled PC-ORD menu requires its exact independent literal ${String(flag)}`, async () => {
-    const component = serverComponent(readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8'), 'Navigation.svelte', {
-      '@lucide/svelte': new Proxy({}, { get: () => () => {} }),
-    }, { VITE_BREAK_REPORT_REVIEW: flag, VITE_SUBZONE_MATRIX_WORKBOOK: 'true', VITE_USER_LOG_REVIEW: 'true' });
-    const { render } = await import(pathToFileURL(require.resolve('svelte/server')).href);
-    const body = render(component, { props: { view: 'home', onnavigate: () => {} } }).body;
-    const button = [...body.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].find(match => match[2].includes('PC-ORD Break Report'));
-    assert.ok(button, 'planned PC-ORD menu selector must resolve');
-    assert.equal(/\bdisabled(?:=|\s|$)/.test(button[1]), flag !== 'true');
-  });
-}

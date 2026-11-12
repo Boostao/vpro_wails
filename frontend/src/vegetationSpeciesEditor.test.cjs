@@ -125,7 +125,7 @@ test('Personal creation checks independent metadata and only recognizes explicit
 
 test('Personal definition has separate explicit save, persistent metadata and native close/Undo gates', () => {
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(form, /VITE_PERSONAL_SPECIES_EDITING === 'true'/);
+  assert.match(form, /VITE_PERSONAL_SPECIES_EDITING !== 'false'/);
   assert.match(form, /personalDraft !== null \? 'Save the personal definition explicitly/);
   assert.match(form, /if \(personalDraft !== null\) \{ cancelPersonalSpecies\(\); return; \}/);
   assert.match(form, /ordinary plot Save never writes the user database/);

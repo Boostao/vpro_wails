@@ -113,7 +113,7 @@ func plotLabelText(value, name string, limit int) error {
 }
 
 func readSavedPlotLabelHeader(plots *PlotService, plot string) (header *SavedPlotLabelHeader, err error) {
-	db, project, release, err := plots.getActiveDB()
+	db, project, release, err := plots.getActiveReadDB()
 	if err != nil {
 		return nil, err
 	}

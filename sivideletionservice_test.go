@@ -76,9 +76,10 @@ func TestSIVIDeletionServiceIndependentDefaultOffStrictFlagsAndGuards(t *testing
 		{siviDeletionWritingFeatureEnvironment: "true", siviDeletionRestoringFeatureEnvironment: "true"},
 	} {
 		service, err := NewSIVIDeletionService(&ContextService{}, siviDeletionServiceLookup(flags))
-		if err != nil || service.writing != (flags[siviDeletionWritingFeatureEnvironment] == "true") ||
-			service.restoring != (flags[siviDeletionRestoringFeatureEnvironment] == "true") {
-			t.Fatal("flags not independent/default-off", service, err)
+		wantWriting := flags[siviDeletionWritingFeatureEnvironment] != "false"
+		wantRestoring := flags[siviDeletionRestoringFeatureEnvironment] != "false"
+		if err != nil || service.writing != wantWriting || service.restoring != wantRestoring {
+			t.Fatal("flags not independent/default-on", service, err)
 		}
 		for i, operation := range siviDeletionServiceOperations(service, context.Background(), "C", "P", "SubVegA-SIVI", "1", "{}", "{}", "H") {
 			enabled := service.writing

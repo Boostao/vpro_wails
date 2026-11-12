@@ -4,7 +4,7 @@
   import { pictureCellLabel } from './pictureRead';
 
   let { session, disabled = false }: { session: PictureLifecycleSession; disabled?: boolean } = $props();
-  const restoringEnabled = import.meta.env.VITE_PICTURE_DELETION_RESTORING === 'true';
+  const restoringEnabled = import.meta.env.VITE_PICTURE_DELETION_RESTORING !== 'false';
   let view = $state.raw<PictureLifecycleView>(untrack(() => session.view()));
   let localError = $state('');
   $effect(() => session.subscribe(() => { view = session.view(); }));

@@ -40,10 +40,14 @@ func TestSIVICoverServiceIndependentDefaultOffAndStrictFeature(t *testing.T) {
 	edit := siviHeightEdit{heights[0].RowID, "SubVegA-SIVI_BC", "Cover1", siviReal(0), siviReal(3)}
 	valid := siviCoverRequestJSON(t, original, edit)
 	before := databaseBytes(t, contexts.projects.sqlite.attachments)
+	defaultCover := siviCoverServiceFixture(t, contexts, "", false)
+	if !defaultCover.enabled {
+		t.Fatal("default cover gate disabled")
+	}
 	for _, flag := range []struct {
 		value   string
 		present bool
-	}{{"", false}, {"false", true}} {
+	}{{"false", true}} {
 		service := siviCoverServiceFixture(t, contexts, flag.value, flag.present)
 		if result, err := service.GetOriginal(context.Background(), state.ContextID, "108050", false); err == nil || result != nil {
 			t.Fatal("disabled cover read leaked source", result, err)

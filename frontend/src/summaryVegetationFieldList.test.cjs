@@ -424,14 +424,14 @@ test('foreign/malformed reconciliation preserves previous authority and receipt,
 
 test('registry literal flags, exact owner isolation, retained receipts and aggregate lifecycle holds', async () => {
   for (const environment of [
-    {}, { VITE_SUMMARY_VEGETATION: 'true' }, { VITE_SUMMARY_VEGETATION_FIELD_LIST: 'true' },
-    { VITE_SUMMARY_VEGETATION: true, VITE_SUMMARY_VEGETATION_FIELD_LIST: 'true' },
-    { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'TRUE' },
+    { VITE_SUMMARY_VEGETATION: 'false', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'false' },
+    { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'false' },
+    { VITE_SUMMARY_VEGETATION: 'false', VITE_SUMMARY_VEGETATION_FIELD_LIST: 'true' },
   ]) {
     const reg = registries.fieldListRegistry(() => { throw new Error('must not create port'); }, environment);
     assert.equal(reg.enabled, false); assert.throws(() => reg.session(owner), /disabled/);
   }
-  assert.equal(registries.summaryVegetationFieldListEnabled, false);
+  assert.equal(registries.summaryVegetationFieldListEnabled, true);
   const reg = registries.fieldListRegistry(scope => ({
     read: () => Promise.resolve({ ...clone(wire.review), ...scope }),
     save: json => Promise.resolve(commitFor(JSON.parse(json))),

@@ -26,7 +26,7 @@ func TestSummaryVegetationPreferencesFacadeGatesStrictWire(t *testing.T) {
 	for _, test := range []struct {
 		value                     string
 		present, enabled, invalid bool
-	}{{"", false, false, false}, {"true", true, true, false}, {"false", true, false, false},
+	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
 		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
 		got, err := summaryVegetationPreferencesFeature(func(name string) (string, bool) {
 			if name != "VPRO_SUMMARY_VEGETATION_PREFERENCES" {

@@ -85,7 +85,10 @@ func NewPictureCreationService(pictures *PictureService, lookup func(string) (st
 		return nil, err
 	}
 	if enabled && (!pictures.enabled || pictures.source == nil) {
-		return nil, errors.New("picture creation writing requires independently enabled owned picture reading")
+		if _, explicit := lookup(pictureCreationWritingEnvironment); explicit {
+			return nil, errors.New("picture creation writing requires independently enabled owned picture reading")
+		}
+		enabled = false
 	}
 	return &PictureCreationService{
 		pictures: pictures, enabled: enabled, owner: currentPictureCreationOwner,

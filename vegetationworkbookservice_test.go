@@ -61,8 +61,12 @@ func TestLongVegetationWorkbookPublicServiceUnavailable(t *testing.T) {
 		}
 	}
 	service, err := NewVegetationWorkbookService(nil, func(string) (string, bool) { return "", false })
-	if err != nil || service.private.enabled {
-		t.Fatal("public service is not default-off", err)
+	if err != nil || !service.private.enabled {
+		t.Fatal("public service is not default-on", err)
+	}
+	disabledService, err := NewVegetationWorkbookService(nil, func(string) (string, bool) { return "false", true })
+	if err != nil || disabledService.private.enabled {
+		t.Fatal("explicit false did not disable public service", err)
 	}
 	if _, err := service.GetReview(context.Background(), "owned", `{"scope":"unlumped"}`); err == nil {
 		t.Fatal("default-off public service exposed review")

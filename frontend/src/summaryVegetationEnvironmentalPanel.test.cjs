@@ -201,14 +201,15 @@ test('retained completed result survives remount without another dispatch or los
 test('both literal client feature flags required and fixed wire API calls only one combined service', async () => {
   const desktop = fs.readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalDesktop.ts'), 'utf8');
   for (const [base, environment, expected] of [['true', 'true', true], ['true', 'false', false],
-    ['false', 'true', false], ['true', 'TRUE', false], ['', 'true', false]]) {
+    ['false', 'true', false], [undefined, undefined, true], ['false', 'false', false]]) {
     const calls = [];
     const module = execute(desktop, {
       '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationEnvironmentalService: {
         PreviewEnvironmental: (...args) => { calls.push(args); return Promise.resolve(wire); },
       } },
       './summaryVegetationEnvironmental': client,
-    }, { __environment: { VITE_SUMMARY_VEGETATION: base, VITE_SUMMARY_VEGETATION_ENVIRONMENT: environment }, setTimeout });
+    }, { __environment: { VITE_SUMMARY_VEGETATION: base, VITE_SUMMARY_VEGETATION_ENVIRONMENT: environment,
+      VITE_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC: 'false' }, setTimeout });
     assert.equal(module.summaryEnvironmentalEnabled, expected);
     if (expected) {
       await module.summaryEnvironmentalDesktop.session(owner).show(module.summaryEnvironmentalPort);
@@ -230,8 +231,8 @@ test('independent numeric client flag selects one correct service and preserves 
         } },
         './summaryVegetationEnvironmental': client,
       }, { __environment: { VITE_SUMMARY_VEGETATION: base, VITE_SUMMARY_VEGETATION_ENVIRONMENT: environment,
-        VITE_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC: numeric }, setTimeout });
-      const enabled = base === 'true' && environment === 'true', typed = enabled && numeric === 'true';
+        VITE_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC: numeric, VITE_SUMMARY_VEGETATION_ENVIRONMENT_LIFEFORM: 'false' }, setTimeout });
+      const enabled = base !== 'false' && environment !== 'false', typed = enabled && numeric !== 'false';
       assert.equal(module.summaryEnvironmentalEnabled, enabled);
       assert.equal(module.summaryEnvironmentalNumericEnabled, typed);
       if (enabled) {
@@ -264,8 +265,8 @@ test('literal lifeform client gate requires all three predecessors and selects e
         './summaryVegetationEnvironmental': client,
       }, { __environment: { VITE_SUMMARY_VEGETATION: base, VITE_SUMMARY_VEGETATION_ENVIRONMENT: environment,
         VITE_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC: numeric, VITE_SUMMARY_VEGETATION_ENVIRONMENT_LIFEFORM: lifeform }, setTimeout });
-      const enabled = base === 'true' && environment === 'true', typed = enabled && numeric === 'true';
-      const full = typed && lifeform === 'true';
+      const enabled = base !== 'false' && environment !== 'false', typed = enabled && numeric !== 'false';
+      const full = typed && lifeform !== 'false';
       assert.equal(module.summaryEnvironmentalLifeformEnabled, full);
       if (!enabled) {
         assert.throws(() => module.summaryEnvironmentalDesktop.session(owner), /disabled/);

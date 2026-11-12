@@ -16,9 +16,9 @@
   let selected = $state(startingPlot);
   let error = $state('');
   let busy = $state(false);
-  const metadataWritingEnabled = import.meta.env.VITE_PICTURE_METADATA_WRITING === 'true';
-  const creationEnabled = import.meta.env.VITE_PICTURE_CREATION_WRITING === 'true';
-  const lifecycleEnabled = import.meta.env.VITE_PICTURE_DELETION_WRITING === 'true' || import.meta.env.VITE_PICTURE_DELETION_RESTORING === 'true';
+  const metadataWritingEnabled = import.meta.env.VITE_PICTURE_METADATA_WRITING !== 'false';
+  const creationEnabled = import.meta.env.VITE_PICTURE_CREATION_WRITING !== 'false';
+  const lifecycleEnabled = import.meta.env.VITE_PICTURE_DELETION_WRITING !== 'false' || import.meta.env.VITE_PICTURE_DELETION_RESTORING !== 'false';
   const lifecycleSession = $derived(lifecycleEnabled && selected && contextId && project
     ? pictureLifecycleSession({ contextId, project, plotNumber: selected }) : undefined);
   let lifecycleRevision = $state(0);

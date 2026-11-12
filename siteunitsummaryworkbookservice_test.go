@@ -89,7 +89,7 @@ func TestSiteUnitSummaryWorkbookServiceGateStrictRequestsAndRetainedScope(t *tes
 	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
 		service, err := NewSiteUnitSummaryWorkbookService(nil, func(string) (string, bool) { return flag, flag != "" })
 		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag == "true") {
+			if err != nil || service.enabled != (flag != "false") {
 				t.Fatal("literal independent gate differs", flag, err)
 			}
 			if _, err := service.GetReview(context.Background(), "owned", `{"method":1}`); err == nil {

@@ -65,7 +65,7 @@ test('Reverse uses shared persistent panel and independent source gate, retiring
   for(const file of ['FS882Form.svelte','EnvironmentSUTransfer.svelte']) {
     assert.equal(compile(readFileSync(path.join(__dirname,file),'utf8'),{filename:file,generate:'client'}).warnings.length,0);
   }
-  assert.match(root,/VITE_SOURCE_SU_ENV_TRANSFER === 'true'/);
+  assert.match(root,/VITE_SOURCE_SU_ENV_TRANSFER !== 'false'/);
   assert.match(root,/data-source-control="btnSuIntoEnv"/);
   assert.match(root,/environmentSUDirection === 'reverse'\) void load\(original\?\.plotNumber\)/);
   assert.match(panel,/committed = true; review = null;[\s\S]*validateSiteUnitEnvironmentResult/);

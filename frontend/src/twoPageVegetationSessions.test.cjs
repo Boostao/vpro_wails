@@ -53,15 +53,17 @@ test('every review/writing flag combination stays independent with actual defaul
   for (const review of ['true', 'false', undefined]) {
     for (const writing of ['true', 'false', undefined]) {
       const api = registry({ VITE_TWO_PAGE_VEGETATION_REVIEW: review, VITE_TWO_PAGE_VEGETATION_WRITING: writing });
-      assert.equal(api.twoPageVegetationReviewEnabled, review === 'true');
-      assert.equal(api.twoPageVegetationWritingEnabled, review === 'true' && writing === 'true');
-      if (review !== 'true') {
+      const reviewEnabled = review !== 'false';
+      const writingEnabled = reviewEnabled && writing !== 'false';
+      assert.equal(api.twoPageVegetationReviewEnabled, reviewEnabled);
+      assert.equal(api.twoPageVegetationWritingEnabled, writingEnabled);
+      if (!reviewEnabled) {
         assert.throws(() => api.twoPageVegetationSession(owner), /disabled/);
         assert.equal(api.calls.length, 0);
       } else {
         const session = api.twoPageVegetationSession(owner);
         assert.equal(await session.load(), true);
-        if (writing !== 'true') {
+        if (!writingEnabled) {
           assert.throws(() => stage(session), /disabled/);
           await assert.rejects(session.save(request.requestId), /disabled/);
           assert.equal(api.releaseTwoPageVegetationSession(owner), true);
@@ -100,9 +102,10 @@ test('all27 Species review/writing/selection combinations keep the new dispatch 
             return Promise.resolve(client.proxy(refs));
           },
         });
-        const enabled = review === 'true' && writing === 'true' && selection === 'true';
+        const reviewEnabled = review !== 'false';
+        const enabled = reviewEnabled && writing !== 'false' && selection !== 'false';
         assert.equal(api.twoPageVegetationSpeciesListEnabled, enabled);
-        if (review !== 'true') {
+        if (!reviewEnabled) {
           assert.throws(() => api.twoPageVegetationSession(owner), /disabled/);
           assert.equal(api.calls.length, 0);
           continue;

@@ -312,11 +312,14 @@ func TestTwoPageEnvironmentTableInFlightCancellationPreservesCoordinator(t *test
 
 func TestTwoPageEnvironmentTableGateCancellationAndOpeningScope(t *testing.T) {
 	service, state, _ := twoPageEnvironmentTableFixture(t, false)
+	if defaultGated, err := NewTwoPageEnvironmentTableService(service.contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultGated.review {
+		t.Fatal("default gate not enabled", defaultGated, err)
+	}
 	for _, test := range []struct {
 		value   string
 		present bool
 		valid   bool
-	}{{"", false, true}, {"false", true, true}, {"TRUE", true, false}, {"1", true, false}, {" true ", true, false}} {
+	}{{"false", true, true}, {"TRUE", true, false}, {"1", true, false}, {" true ", true, false}} {
 		gated, err := NewTwoPageEnvironmentTableService(service.contexts, func(string) (string, bool) { return test.value, test.present })
 		if (err == nil) != test.valid {
 			t.Fatal(test, err)

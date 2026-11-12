@@ -91,9 +91,9 @@ test('actual manager derived session creation does not notify reactive root obse
   const code = ast.statements.filter(node => !ts.isImportDeclaration(node)).map(node => node.getText(ast)).join('\n')
     .replace('export default function', 'function');
   const manager = new Function('$', 'untrack', 'plotLookupInputError', 'pictureMetadataSession',
-    'pictureCreationSession', '__testEnvironment', code + '\nreturn _unknown_;')(
+    'pictureCreationSession', 'pictureLifecycleSession', '__testEnvironment', code + '\nreturn _unknown_;')(
       client, client.untrack, () => null, () => { throw new Error('Metadata remains disabled'); },
-      registry.pictureCreationSession, { VITE_PICTURE_CREATION_WRITING: 'true' });
+      registry.pictureCreationSession, () => { throw new Error('Lifecycle remains disabled'); }, { VITE_PICTURE_CREATION_WRITING: 'true', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'false' });
   const activity = [];
   const dispose = client.effect_root(() => manager(null, {
     ...owner, initialPlot: owner.plotNumber, onBusyChange: value => activity.push(value),
@@ -378,7 +378,7 @@ test('actual peer receipt effects refresh loaded owners once and discard late de
   const code = ast.statements.filter(node => !ts.isImportDeclaration(node)).map(node => node.getText(ast)).join('\n')
     .replace('export default function', 'function');
   const harness = new Function('$', 'untrack', 'onDestroy', 'ReadRequests', 'PictureService',
-    'pictureMetadataFromWire', 'pictureImageFromWire', 'pictureCellLabel', 'pictureCreationSession',
+    'pictureMetadataFromWire', 'pictureImageFromWire', 'pictureCellLabel', 'pictureCreationSession', 'pictureLifecycleSession',
     'equalCell', '__testEnvironment', code + '\nreturn _unknown_;');
   for (const mode of ['normal', 'drift', 'cancel', 'dispose', 'owner-change']) {
     const pending = [], snapshots = [], properties = [], disposers = [];
@@ -394,7 +394,7 @@ test('actual peer receipt effects refresh loaded owners once and discard late de
     } };
     const peer = harness(client, client.untrack, lifecycle.onDestroy, reads.ReadRequests, service,
       picture.pictureMetadataFromWire, picture.pictureImageFromWire, picture.pictureCellLabel,
-      () => session, metadata.equalCell, { VITE_PICTURE_CREATION_WRITING: 'true' });
+      () => session, () => undefined, metadata.equalCell, { VITE_PICTURE_CREATION_WRITING: 'true', VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'false' });
     for (let index = 0; index < 2; index++) {
       const props = client.proxy({ ...owner, view: index ? 'child' : 'manager',
         onBusyChange() {}, inspect(value) { snapshots[index] = value; } });

@@ -22,7 +22,7 @@ func TestGoogleEarthKMLExportIndependentGateAndUnavailableAuthorization(t *testi
 			t.Fatal("export flag inherited another environment key", key)
 			return "true", true
 		})
-		if enabled != (value == "true") || (err != nil) != (value != "" && value != "true" && value != "false") {
+		if enabled != (value == "" || value == "true") || (err != nil) != (value != "" && value != "true" && value != "false") {
 			t.Fatal("literal gate", value, enabled, err)
 		}
 	}

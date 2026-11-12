@@ -26,34 +26,29 @@ test('entry panels compile as guarded deferred components with explicit loading 
   const source = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const compiled = compile(source, { filename: 'App.svelte', generate: 'client', dev: false });
   assert.deepEqual(compiled.warnings, []);
-  for (const [component, owner] of [['FS882Form', 'fs882'], ['SIVICHARSForm', 'sivi-chars']]) {
+  for (const [component, owner] of [['FS882Form', 'fs882']]) {
     assert.doesNotMatch(source, new RegExp(`import ${component} from`));
     assert.match(compiled.js.code, new RegExp(`import\\(['"]\\./${component}\\.svelte['"]\\)`));
     assert.match(source, new RegExp(`role="status" data-entry-loading="${owner}"`));
     assert.match(source, new RegExp(`role="alert" data-entry-load-error="${owner}"`));
   }
+  assert.doesNotMatch(source, /SIVICHARSForm/);
   assert.match(source, /\{#key \$projectState\?\.contextId\}[\s\S]*?\{#key editorEntryForm\}[\s\S]*?\{#key editorPlotNumber\}/);
-  assert.equal((source.match(/bind:this=\{editor\}/g) ?? []).length, 2);
+  assert.equal((source.match(/bind:this=\{editor\}/g) ?? []).length, 1);
 });
 
 test('only a resolved module awaiting its editor binding blocks navigation and close', () => {
   const source = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const expression = source.match(/const editorInitializing = \$derived\(([\s\S]*?)\);/);
   assert.ok(expression);
-  const initializing = new Function('view', 'editor', 'editorEntryForm',
-    'fs882ModuleLoaded', 'siviCHARSModuleLoaded', `return (${expression[1]});`);
-  for (const form of ['xl', 'sivi', 'sivi-chars']) {
-    for (const loaded of [false, true]) {
-      const fs882 = form === 'sivi-chars' ? !loaded : loaded;
-      const chars = form === 'sivi-chars' ? loaded : !loaded;
-      assert.equal(initializing('fs882', undefined, form, fs882, chars), loaded);
-      assert.equal(initializing('fs882', {}, form, fs882, chars), false);
-      assert.equal(initializing('home', undefined, form, fs882, chars), false);
-    }
+  const initializing = new Function('view', 'editor', 'fs882ModuleLoaded', `return (${expression[1]});`);
+  for (const loaded of [false, true]) {
+    assert.equal(initializing('fs882', undefined, loaded), loaded);
+    assert.equal(initializing('fs882', {}, loaded), false);
+    assert.equal(initializing('home', undefined, loaded), false);
   }
   assert.equal((source.match(/closeDisposition\([^\n]*editorInitializing/g) ?? []).length, 3);
   assert.match(source, /await import\('\.\/FS882Form\.svelte'\);\s*fs882ModuleLoaded = true/);
-  assert.match(source, /await import\('\.\/SIVICHARSForm\.svelte'\);\s*siviCHARSModuleLoaded = true/);
 });
 
 test('actual preview build halves initial transitive JS without removing entry layouts or inflating total JS', async t => {
@@ -95,9 +90,9 @@ test('actual preview build halves initial transitive JS without removing entry l
     const modules = names => new Set([...names].flatMap(name =>
       Object.keys(chunks.get(name).modules).map(id => id.replaceAll('\\', '/'))));
     const eager = modules(initial), all = modules(chunks.keys());
-    for (const filename of ['FS882Form.svelte', 'SIVICHARSForm.svelte',
+    for (const filename of ['FS882Form.svelte',
       'fs882-xl-layout.json', 'fs882-two-page-layout.json', 'fs882-two-page-chars-layout.json',
-      'fs1333-sivi-layout.json', 'fs1333-chars-sivi-layout.json', 'project-metadata-layout.json']) {
+      'fs1333-sivi-layout.json', 'project-metadata-layout.json']) {
       const suffix = '/' + filename;
       assert.ok([...all].some(id => id.endsWith(suffix)), `Required entry source disappeared: ${filename}`);
       if (filename !== 'fs1333-sivi-layout.json') {

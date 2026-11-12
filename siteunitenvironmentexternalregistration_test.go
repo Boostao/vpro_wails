@@ -15,7 +15,7 @@ func TestExternalSUEnvironmentRegistrationIndependentDefaultOff(t *testing.T) {
 		enabled bool
 		valid   bool
 	}{
-		{"", false, false, true}, {"false", true, false, true}, {"true", true, true, true},
+		{"", false, true, true}, {"false", true, false, true}, {"true", true, true, true},
 		{"", true, false, false}, {"1", true, false, false}, {"TRUE", true, false, false}, {" true", true, false, false},
 	} {
 		enabled, err := siviFeature(externalSUEnvironmentEditingEnvironment, func(name string) (string, bool) {

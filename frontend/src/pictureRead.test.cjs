@@ -171,7 +171,7 @@ test('picture source slot is independently gated and participates in root pendin
   const root = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   const header = readFileSync(path.join(__dirname, 'HeaderEditor.svelte'), 'utf8');
   const panel = readFileSync(path.join(__dirname, 'PicturePanel.svelte'), 'utf8');
-  assert.match(root, /VITE_PICTURE_READING === 'true'/);
+  assert.match(root, /VITE_PICTURE_READING !== 'false'/);
   assert.match(root, /pictureEditor=\{pictureReadingEnabled && !twoPageOpen \? linkedPictures : undefined\}/);
   assert.match(root, /<TwoPageEntryEditor[\s\S]*?pictureReaderAvailable=\{pictureReadingEnabled\}/);
   const entry = readFileSync(path.join(__dirname, 'TwoPageEntryEditor.svelte'), 'utf8');
@@ -416,9 +416,9 @@ test('standalone manager has independent default-off navigation and shares root 
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const nav = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
   const manager = readFileSync(path.join(__dirname, 'PictureManager.svelte'), 'utf8');
-  assert.match(nav, /VITE_PICTURE_MANAGER === 'true' \? 'picture-manager' : undefined/);
-  assert.match(app, /view === 'picture-manager' && import\.meta\.env\.VITE_PICTURE_MANAGER === 'true'/);
-  assert.match(app, /if \(import\.meta\.env\.VITE_PICTURE_MANAGER !== 'true'\)/);
+  assert.match(nav, /VITE_PICTURE_MANAGER !== 'false' \? 'picture-manager' : undefined/);
+  assert.match(app, /view === 'picture-manager' && import\.meta\.env\.VITE_PICTURE_MANAGER !== 'false'/);
+  assert.match(app, /if \(import\.meta\.env\.VITE_PICTURE_MANAGER === 'false'\)/);
   assert.match(app, /<PictureManager[^>]*onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/s);
   assert.match(app, /editorBusy = \$derived\(localEditorBusy \|\| matrixPublicationBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy \|\| externalSUEnvironmentBusy \|\| summaryPreferenceBusy \|\| summaryFieldListBusy \|\| summaryEnvironmentalBusy \|\| projectReportBusy\)/);
   assert.match(manager, /<PicturePanel[^>]*view="manager" onBusyChange=\{reading\}/);
@@ -435,16 +435,16 @@ test('manager server render retains source caption, literal parent and separate 
     './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
     './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
     './PictureMetadataEditor.svelte': { default: () => { throw new Error('Default-off metadata editor rendered'); } },
-  });
+  }, { VITE_PICTURE_CREATION_WRITING: 'false', VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'false' });
   const manager = serverComponent(readFileSync(path.join(__dirname, 'PictureManager.svelte'), 'utf8')
-    .replace("import.meta.env.VITE_PICTURE_METADATA_WRITING === 'true'", 'false'), 'PictureManager.svelte', {
+    .replace("import.meta.env.VITE_PICTURE_METADATA_WRITING !== 'false'", 'false'), 'PictureManager.svelte', {
     './PicturePanel.svelte': { default: panel }, './scopedPlotLookup': lookup,
     './pictureMetadataSessions': { pictureMetadataSession: () => { throw new Error('Default-off metadata session created'); } },
     './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
     './PictureCreationPanel.svelte': { default: () => { throw new Error('Default-off Add panel rendered'); } },
     './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
     './PictureLifecyclePanel.svelte': { default: () => { throw new Error('Default-off lifecycle panel rendered'); } },
-  });
+  }, { VITE_PICTURE_CREATION_WRITING: 'false', VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'false' });
   const output = render(manager, { props: { contextId: owner.contextId, project: owner.project,
     initialPlot: owner.plotNumber, onBusyChange() {} } }).body;
   assert.match(output, /Plot Pictures/);

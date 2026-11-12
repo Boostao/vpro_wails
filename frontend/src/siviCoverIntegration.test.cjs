@@ -48,7 +48,7 @@ function host(overrides = {}) {
 
 test('cover facade and source panel are independently gated without widening height saves', () => {
   assert.equal(compile(parent, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(parent, /VITE_SIVI_COVER_EDITING === 'true'/);
+  assert.match(parent, /VITE_SIVI_COVER_EDITING !== 'false'/);
   for (const method of ['GetOriginal', 'SaveReviewed', 'RestoreReviewed']) {
     assert.ok(parent.includes(`SIVICoverService.${method}(`));
   }
@@ -59,7 +59,7 @@ test('cover facade and source panel are independently gated without widening hei
 });
 
 test('literal default-off source notice gate is forwarded to all owned child writers without granting backend authority', () => {
-  assert.match(parent, /siviChildSourceNoticesEnabled = import\.meta\.env\.VITE_SIVI_CHILD_SOURCE_NOTICES === 'true'/);
+  assert.match(parent, /siviChildSourceNoticesEnabled = import\.meta\.env\.VITE_SIVI_CHILD_SOURCE_NOTICES !== 'false'/);
   for (const [Writer, revision] of [['Height', 'siviRevision'], ['Cover', 'siviCoverRevision'], ['Combined', 'siviCombinedRevision'], ['Collected', 'siviCollectedRevision']]) {
     assert.match(parent, new RegExp(`new SIVI${Writer}Session\\(plot, \\{[\\s\\S]*?\\}, \\(\\) => ${revision}\\+\\+, extendedShrubs, siviChildSourceNoticesEnabled\\)`));
   }
@@ -172,7 +172,7 @@ test('acknowledged child changes refresh only an already-loaded peer and preserv
 });
 
     test('combined facade is independently gated and wired through Save Undo Lock close and disposal', () => {
-      assert.match(parent, /VITE_SIVI_COMBINED_EDITING === 'true'/);
+      assert.match(parent, /VITE_SIVI_COMBINED_EDITING !== 'false'/);
       for (const method of ['GetOriginal', 'SaveReviewed', 'RestoreReviewed']) assert.ok(parent.includes(`SIVICombinedService.${method}(`));
       assert.match(parent, /siviCombinedSession\?\.dispose\(\);[\s\S]{0,70}siviCombinedReads\.cancelAll\(\)/);
       assert.match(parent, /if \(siviCombinedUnsaved\) \{ await siviCombinedOperation\('save'\); return; \}/);

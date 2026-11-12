@@ -138,7 +138,7 @@ test('independent default/title/statistics gates render live labelled choices an
   for (const enabled of [false, true]) for (const titleEnabled of [false, true]) {
     const owner = { ...scope, contextId: `statistics-render-${enabled}-${titleEnabled}` };
     const session = prefs.longVegetationStatisticsPreferencesSession(owner); session.apply(review(undefined, owner)); session.editAverage('');
-    const component = serverComponent(source.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g, 'false')
+    const component = serverComponent(source.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
       .replace('const statisticsEnabled = false;', `const statisticsEnabled = ${enabled};`)
       .replace('const preferencesEnabled = false;', `const preferencesEnabled = ${titleEnabled};`), 'LongVegetationReport.svelte', {
         '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': titles,

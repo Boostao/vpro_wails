@@ -269,7 +269,10 @@ func TestTwoPageProjectMetadataGateBoundsAndMasterIndependence(t *testing.T) {
 			t.Fatal("invalid page returned result", page, got, err)
 		}
 	}
-	for _, value := range []string{"", "false", "TRUE", "1", " true "} {
+	if defaultGated, err := NewTwoPageProjectMetadataService(service.contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultGated.review {
+		t.Fatal("default metadata gate not enabled", defaultGated, err)
+	}
+	for _, value := range []string{"false", "TRUE", "1", " true "} {
 		gated, err := NewTwoPageProjectMetadataService(service.contexts, func(string) (string, bool) { return value, value != "" })
 		if value == "" || value == "false" {
 			if err != nil {

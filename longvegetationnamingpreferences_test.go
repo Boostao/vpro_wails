@@ -142,7 +142,7 @@ func TestLongVegetationNamingPreferencesGateOwnedReadAndHistoricalAvailability(t
 	for _, test := range []struct {
 		value                     string
 		present, enabled, invalid bool
-	}{{"", false, false, false}, {"true", true, true, false}, {"false", true, false, false},
+	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
 		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}} {
 		enabled, err := longVegetationNamingPreferencesFeature(func(key string) (string, bool) {
 			if key != "VPRO_LONG_VEGETATION_NAMING_PREFERENCES" {

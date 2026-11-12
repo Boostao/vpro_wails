@@ -28,7 +28,7 @@ function host(overrides = {}) {
 }
 test('identity is independently default-off in actual main and uses tracked owned reads without requiring audited peers', () => {
   assert.equal(compile(parent, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(parent, /VITE_SIVI_IDENTITY_EDITING === 'true'/);
+  assert.match(parent, /VITE_SIVI_IDENTITY_EDITING !== 'false'/);
   assert.match(main, /siviFeature\(siviIdentityFeatureEnvironment, os.LookupEnv\)/);
   assert.match(main, /NewSIVIIdentityService\(contextService, os.LookupEnv\)/);
   assert.match(main, /application.NewService\(siviIdentity\)/);

@@ -3,26 +3,26 @@
 #
 # The lines below are called `modelines`. See `:help modeline`
 
-name: "vpro-wails"
+name: "vpro"
 arch: ${GOARCH}
 platform: "linux"
 version: "0.1.0"
 section: "default"
 priority: "extra"
 maintainer: ${GIT_COMMITTER_NAME} <${GIT_COMMITTER_EMAIL}>
-description: "A vpro-wails application"
-vendor: "My Company"
-homepage: "https://wails.io"
+description: "VENUS (Vegetation and Environment NexUS) Professional — B.C. Ministry of Forests, Research Branch (BEC Program)"
+vendor: "B.C. Ministry of Forests, Research Branch (BEC Program)"
+homepage: "https://www.for.gov.bc.ca/hre/becweb/"
 license: "MIT"
 release: "1"
 
 contents:
-  - src: "./bin/vpro-wails"
-    dst: "/usr/local/bin/vpro-wails"
+  - src: "./bin/VPro"
+    dst: "/usr/local/bin/VPro"
   - src: "./build/appicon.png"
-    dst: "/usr/share/icons/hicolor/128x128/apps/vpro-wails.png"
-  - src: "./build/linux/vpro-wails.desktop"
-    dst: "/usr/share/applications/vpro-wails.desktop"
+    dst: "/usr/share/icons/hicolor/128x128/apps/VPro.png"
+  - src: "./build/linux/VPro.desktop"
+    dst: "/usr/share/applications/VPro.desktop"
 
 # Default dependencies for the GTK4 + WebKitGTK 6.0 stack (Ubuntu 24.04+ / Debian 13+)
 depends:

@@ -71,10 +71,10 @@ def tar_bytes(entries):
 
 
 def deb(arch, version="2.3.4"):
-    control = f"Package: vpro-wails\nVersion: {version}-1\nArchitecture: {arch}\n".encode()
+    control = f"Package: vpro\nVersion: {version}-1\nArchitecture: {arch}\n".encode()
     entries = (("debian-binary", b"2.0\n"),
                ("control.tar.gz", tar_bytes([("./control", control)])),
-               ("data.tar.gz", tar_bytes([("./usr/local/bin/vpro-wails", elf(arch))])))
+               ("data.tar.gz", tar_bytes([("./usr/local/bin/VPro", elf(arch))])))
     data = bytearray(b"!<arch>\n")
     for name, content in entries:
         header = f"{name + '/':<16}{0:<12}{0:<6}{0:<6}{'100644':<8}{len(content):<10}`\n"
@@ -94,14 +94,14 @@ def asset_fixture(directory):
         (directory / f"vpro-windows-{arch}.exe").write_bytes(pe(arch))
         (directory / f"vpro-windows-{arch}-installer.exe").write_bytes(b"installer fixture")
         with zipfile.ZipFile(directory / f"vpro-windows-{arch}.zip", "w") as archive:
-            archive.writestr("vpro-wails.exe", pe(arch))
+            archive.writestr("VPro.exe", pe(arch))
         (directory / f"vpro-linux-{arch}.AppImage").write_bytes(elf(arch, True))
         (directory / f"vpro-linux-{arch}.deb").write_bytes(deb(arch))
-        (directory / f"vpro-linux-{arch}.tar.gz").write_bytes(tar_bytes([("vpro-wails", elf(arch))]))
+        (directory / f"vpro-linux-{arch}.tar.gz").write_bytes(tar_bytes([("VPro", elf(arch))]))
     (directory / "vpro-macos-universal.dmg").write_bytes(b"DMG fixture")
     with zipfile.ZipFile(directory / "vpro-macos-universal.zip", "w") as archive:
-        archive.writestr("vpro-wails.app/Contents/MacOS/vpro-wails", universal())
-        archive.writestr("vpro-wails.app/Contents/Info.plist", bundle_info())
+        archive.writestr("VPro.app/Contents/MacOS/VPro", universal())
+        archive.writestr("VPro.app/Contents/Info.plist", bundle_info())
     for group in ("windows-amd64", "windows-arm64", "macos-universal", "linux-amd64", "linux-arm64"):
         names = [name for name in EXPECTED if name.startswith("vpro-" + group)]
         witness = {"schema": 1, "group": group, "version": "2.3.4", "commit": "abc123",
@@ -248,7 +248,7 @@ class ReleaseTests(unittest.TestCase):
         info = plistlib.loads((self.root / "build/darwin/Info.plist").read_bytes())
         self.assertEqual(info["CFBundleVersion"], "2.3.4")
         self.assertEqual(info["CFBundleShortVersionString"], "2.3.4")
-        self.assertEqual(info["CFBundleExecutable"], "vpro-wails")
+        self.assertEqual(info["CFBundleExecutable"], "VPro")
 
     def test_metadata_fails_before_writing_on_drift(self):
         with patch.dict(os.environ, {"CI": "true", "GITHUB_ACTIONS": "true",
@@ -389,13 +389,13 @@ class ReleaseTests(unittest.TestCase):
 
     def test_windows_inspects_nsis_payload_not_launcher_cpu(self):
         (self.root / "bin").mkdir()
-        (self.root / "bin/vpro-wails.exe").write_bytes(pe("arm64"))
-        (self.root / "bin/vpro-wails-arm64-installer.exe").write_bytes(b"x86 NSIS launcher")
+        (self.root / "bin/VPro.exe").write_bytes(pe("arm64"))
+        (self.root / "bin/VPro-arm64-installer.exe").write_bytes(b"x86 NSIS launcher")
 
         def extract(*args, **kwargs):
             self.assertEqual(args[:3], ("7z", "x", "-y"))
-            self.assertTrue(args[3].endswith("vpro-wails-arm64-installer.exe"))
-            (Path(args[4][2:]) / "vpro-wails.exe").write_bytes(pe("arm64"))
+            self.assertTrue(args[3].endswith("VPro-arm64-installer.exe"))
+            (Path(args[4][2:]) / "VPro.exe").write_bytes(pe("arm64"))
 
         with patch.dict(os.environ, {"RELEASE_ARCH": "arm64"}), patch.object(release, "run", side_effect=extract):
             release.package(self.root, "windows")
@@ -405,8 +405,8 @@ class ReleaseTests(unittest.TestCase):
 
     def test_packaging_command_failure_never_creates_witness(self):
         (self.root / "bin").mkdir()
-        (self.root / "bin/vpro-wails.exe").write_bytes(pe("amd64"))
-        (self.root / "bin/vpro-wails-amd64-installer.exe").write_bytes(b"NSIS")
+        (self.root / "bin/VPro.exe").write_bytes(pe("amd64"))
+        (self.root / "bin/VPro-amd64-installer.exe").write_bytes(b"NSIS")
         with patch.dict(os.environ, {"RELEASE_ARCH": "amd64"}), \
                 patch.object(release, "run", side_effect=subprocess.CalledProcessError(1, "7z")):
             with self.assertRaises(subprocess.CalledProcessError):
@@ -415,13 +415,13 @@ class ReleaseTests(unittest.TestCase):
 
     def test_linux_native_packaging_requires_all_formats_and_extracts_payload(self):
         (self.root / "bin").mkdir()
-        (self.root / "bin/vpro-wails").write_bytes(elf("arm64"))
-        (self.root / "bin/vpro-wails-aarch64.AppImage").write_bytes(elf("arm64", True))
-        (self.root / "bin/vpro-wails.deb").write_bytes(deb("arm64"))
+        (self.root / "bin/VPro").write_bytes(elf("arm64"))
+        (self.root / "bin/VPro-aarch64.AppImage").write_bytes(elf("arm64", True))
+        (self.root / "bin/VPro.deb").write_bytes(deb("arm64"))
 
         def extract(*args, **kwargs):
             self.assertEqual(args[1], "--appimage-extract")
-            payload = Path(kwargs["cwd"]) / "squashfs-root/usr/bin/vpro-wails"
+            payload = Path(kwargs["cwd"]) / "squashfs-root/usr/bin/VPro"
             payload.parent.mkdir(parents=True)
             payload.write_bytes(elf("arm64"))
 
@@ -434,8 +434,8 @@ class ReleaseTests(unittest.TestCase):
 
     def test_linux_extract_error_is_fatal(self):
         (self.root / "bin").mkdir()
-        (self.root / "bin/vpro-wails").write_bytes(elf("amd64"))
-        (self.root / "bin/vpro-wails-x86_64.AppImage").write_bytes(elf("amd64", True))
+        (self.root / "bin/VPro").write_bytes(elf("amd64"))
+        (self.root / "bin/VPro-x86_64.AppImage").write_bytes(elf("amd64", True))
         with patch.dict(os.environ, {"RELEASE_ARCH": "amd64"}), \
                 patch.object(release, "run", side_effect=subprocess.CalledProcessError(1, "AppImage")):
             with self.assertRaises(subprocess.CalledProcessError):
@@ -452,17 +452,17 @@ class ReleaseTests(unittest.TestCase):
             release.unique_output(self.root, ".deb")
 
     def test_mac_dmg_payload_and_detach_even_on_validation_failure(self):
-        bundle = self.root / "bin/vpro-wails.app/Contents"
+        bundle = self.root / "bin/VPro.app/Contents"
         (bundle / "MacOS").mkdir(parents=True)
-        (bundle / "MacOS/vpro-wails").write_bytes(universal())
+        (bundle / "MacOS/VPro").write_bytes(universal())
         (bundle / "Info.plist").write_bytes(bundle_info())
-        (self.root / "bin/vpro-wails.dmg").write_bytes(b"dmg")
+        (self.root / "bin/VPro.dmg").write_bytes(b"dmg")
 
         def mount(*args, **kwargs):
             if args[1] == "attach":
                 directory = Path(args[args.index("-mountpoint") + 1])
-                (directory / "vpro-wails.app/Contents/MacOS").mkdir(parents=True)
-                (directory / "vpro-wails.app/Contents/MacOS/vpro-wails").write_bytes(pe("amd64"))
+                (directory / "VPro.app/Contents/MacOS").mkdir(parents=True)
+                (directory / "VPro.app/Contents/MacOS/VPro").write_bytes(pe("amd64"))
 
         with patch.object(release, "run", side_effect=mount) as commands:
             with self.assertRaisesRegex(ValueError, "fat Mach-O"):
@@ -471,20 +471,20 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(list((self.root / "dist-artifacts").iterdir()), [])
 
     def test_mac_success_validates_both_archives_and_detach_failure_is_fatal(self):
-        bundle = self.root / "bin/vpro-wails.app/Contents"
+        bundle = self.root / "bin/VPro.app/Contents"
         (bundle / "MacOS").mkdir(parents=True)
-        (bundle / "MacOS/vpro-wails").write_bytes(universal())
+        (bundle / "MacOS/VPro").write_bytes(universal())
         (bundle / "Info.plist").write_bytes(bundle_info())
-        (self.root / "bin/vpro-wails.dmg").write_bytes(b"dmg")
+        (self.root / "bin/VPro.dmg").write_bytes(b"dmg")
 
         def tools(*args, **kwargs):
             if args[0:2] == ("hdiutil", "attach"):
                 mount = Path(args[args.index("-mountpoint") + 1])
-                shutil.copytree(bundle.parent, mount / "vpro-wails.app")
+                shutil.copytree(bundle.parent, mount / "VPro.app")
             elif args[0] == "ditto":
                 with zipfile.ZipFile(args[-1], "w") as archive:
-                    archive.writestr("vpro-wails.app/Contents/MacOS/vpro-wails", universal())
-                    archive.writestr("vpro-wails.app/Contents/Info.plist", bundle_info())
+                    archive.writestr("VPro.app/Contents/MacOS/VPro", universal())
+                    archive.writestr("VPro.app/Contents/Info.plist", bundle_info())
 
         with patch.object(release, "run", side_effect=tools):
             release.package(self.root, "macos")

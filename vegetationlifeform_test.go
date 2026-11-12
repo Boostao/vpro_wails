@@ -43,8 +43,8 @@ func TestLongVegetationLifeformDecodeAndDefaultIndependentGate(t *testing.T) {
 	if err != nil || !bytes.Equal(config, after) {
 		t.Fatal("Lifeform default refusal changed retained settings", err)
 	}
-	if enabled, err := siviFeature(longVegetationLifeformFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || enabled {
-		t.Fatal("Lifeform default gate enabled", err)
+	if enabled, err := siviFeature(longVegetationLifeformFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || !enabled {
+		t.Fatal("Lifeform default gate disabled", err)
 	}
 	if _, err := siviFeature(longVegetationLifeformFeatureEnvironment, func(string) (string, bool) { return "TRUE", true }); err == nil {
 		t.Fatal("malformed Lifeform gate accepted")

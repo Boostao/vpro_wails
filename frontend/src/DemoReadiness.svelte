@@ -1,10 +1,10 @@
 <script lang="ts">
   const reports = [
-    { name: 'Long Environment', enabled: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' },
-    { name: 'Long Vegetation', enabled: import.meta.env.VITE_LONG_VEGETATION_REPORT === 'true' },
-    { name: 'Summary Environment', enabled: import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true' },
-    { name: 'Lifeform Summary', enabled: import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' },
-    { name: 'Summary Vegetation', enabled: import.meta.env.VITE_SUMMARY_VEGETATION === 'true' },
+    { name: 'Long Environment', enabled: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT !== 'false' },
+    { name: 'Long Vegetation', enabled: import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'false' },
+    { name: 'Summary Environment', enabled: import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false' },
+    { name: 'Lifeform Summary', enabled: import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false' },
+    { name: 'Summary Vegetation', enabled: import.meta.env.VITE_SUMMARY_VEGETATION !== 'false' },
   ];
 </script>
 

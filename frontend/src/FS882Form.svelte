@@ -115,24 +115,24 @@
   } = $props();
   const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
   const siviContextId = untrack(() => contextId);
-  const siviHeightEnabled = import.meta.env.VITE_SIVI_HEIGHT_EDITING === 'true';
-  const siviCoverEnabled = import.meta.env.VITE_SIVI_COVER_EDITING === 'true';
-  const siviCombinedEnabled = import.meta.env.VITE_SIVI_COMBINED_EDITING === 'true';
-  const siviCollectedEnabled = import.meta.env.VITE_SIVI_COLLECTED_EDITING === 'true';
-  const siviSpeciesEnabled = import.meta.env.VITE_SIVI_SPECIES_EDITING === 'true';
-  const siviIdentityEnabled = import.meta.env.VITE_SIVI_IDENTITY_EDITING === 'true';
-  const siviCreationEnabled = import.meta.env.VITE_SIVI_CREATION_WRITING === 'true';
-  const siviDeletionEnabled = import.meta.env.VITE_SIVI_DELETION_WRITING === 'true';
-  const siviRestorationEnabled = import.meta.env.VITE_SIVI_DELETION_RESTORING === 'true';
-  const siviCreationUndoEnabled = import.meta.env.VITE_SIVI_CREATION_UNDO === 'true';
-  const pictureReadingEnabled = import.meta.env.VITE_PICTURE_READING === 'true';
-  const siviChildSourceNoticesEnabled = import.meta.env.VITE_SIVI_CHILD_SOURCE_NOTICES === 'true';
-  const siviParentReviewEnabled = import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
+  const siviHeightEnabled = import.meta.env.VITE_SIVI_HEIGHT_EDITING !== 'false';
+  const siviCoverEnabled = import.meta.env.VITE_SIVI_COVER_EDITING !== 'false';
+  const siviCombinedEnabled = import.meta.env.VITE_SIVI_COMBINED_EDITING !== 'false';
+  const siviCollectedEnabled = import.meta.env.VITE_SIVI_COLLECTED_EDITING !== 'false';
+  const siviSpeciesEnabled = import.meta.env.VITE_SIVI_SPECIES_EDITING !== 'false';
+  const siviIdentityEnabled = import.meta.env.VITE_SIVI_IDENTITY_EDITING !== 'false';
+  const siviCreationEnabled = import.meta.env.VITE_SIVI_CREATION_WRITING !== 'false';
+  const siviDeletionEnabled = import.meta.env.VITE_SIVI_DELETION_WRITING !== 'false';
+  const siviRestorationEnabled = import.meta.env.VITE_SIVI_DELETION_RESTORING !== 'false';
+  const siviCreationUndoEnabled = import.meta.env.VITE_SIVI_CREATION_UNDO !== 'false';
+  const pictureReadingEnabled = import.meta.env.VITE_PICTURE_READING !== 'false';
+  const siviChildSourceNoticesEnabled = import.meta.env.VITE_SIVI_CHILD_SOURCE_NOTICES !== 'false';
+  const siviParentReviewEnabled = import.meta.env.VITE_SIVI_PARENT_REVIEW !== 'false';
   const siviStandalone = untrack(() => entryForm === 'sivi');
-  const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE === 'true' && siviParentReviewEnabled;
-  const siviParentEditingEnabled = siviParentReviewEnabled && import.meta.env.VITE_SIVI_PARENT_EDITING === 'true';
-  const siviParentSharedEnabled = siviParentReviewEnabled && import.meta.env.VITE_SIVI_PARENT_SHARED_EDITING === 'true';
-  const siviParentReferenceEnabled = siviParentSharedEnabled && import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING === 'true';
+  const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE !== 'false' && siviParentReviewEnabled;
+  const siviParentEditingEnabled = siviParentReviewEnabled && import.meta.env.VITE_SIVI_PARENT_EDITING !== 'false';
+  const siviParentSharedEnabled = siviParentReviewEnabled && import.meta.env.VITE_SIVI_PARENT_SHARED_EDITING !== 'false';
+  const siviParentReferenceEnabled = siviParentSharedEnabled && import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING !== 'false';
   const siviParentSharedColumns: readonly SIVIParentSharedColumn[] =
     siviParentSharedFieldsFor(siviParentReferenceEnabled).map(field => field.column);
   const siviParentSharedReads = new ReadRequests();
@@ -147,14 +147,14 @@
   const siviParentWriteView = $derived.by(() => { siviParentWriteRevision; return siviParentWriteSession?.view() ?? null; });
   const siviParentWriteClose = $derived.by(() => { siviParentWriteRevision; return siviParentWriteSession?.closeState() ?? null; });
   const siviParentWriteUnsaved = $derived(siviParentWriteClose?.unsaved ?? false);
-  const siviParentActionEditingEnabled = siviParentEditingEnabled && import.meta.env.VITE_SIVI_PARENT_ACTION_EDITING === 'true';
+  const siviParentActionEditingEnabled = siviParentEditingEnabled && import.meta.env.VITE_SIVI_PARENT_ACTION_EDITING !== 'false';
   const siviParentActionReads = new ReadRequests();
   let siviParentActionSession = $state<SIVIParentActionWriteSession | null>(null);
   let siviParentActionRevision = $state(0);
   const siviParentActionView = $derived.by(() => { siviParentActionRevision; return siviParentActionSession?.view() ?? null; });
   const siviParentActionClose = $derived.by(() => { siviParentActionRevision; return siviParentActionSession?.closeState() ?? null; });
   const siviParentActionUnsaved = $derived(siviParentActionClose?.unsaved ?? false);
-  const siviProjectAssignmentEnabled = siviParentEditingEnabled && import.meta.env.VITE_SIVI_PROJECT_ASSIGNMENT === 'true';
+  const siviProjectAssignmentEnabled = siviParentEditingEnabled && import.meta.env.VITE_SIVI_PROJECT_ASSIGNMENT !== 'false';
   const siviProjectAssignmentReads = new ReadRequests();
   let siviProjectAssignmentSession = $state<SIVIProjectAssignmentSession | null>(null);
   let siviProjectAssignmentRevision = $state(0);
@@ -236,11 +236,11 @@
   let deletionRequest = 0;
   let deletionBusy = $state(false);
   let deletionReview = $state<VegetationDeletionReview | null>(null);
-  const deletionEnabled = import.meta.env.VITE_VEGETATION_DELETE_EDITING === 'true';
-  const creationEnabled = import.meta.env.VITE_VEGETATION_CREATE_EDITING === 'true';
+  const deletionEnabled = import.meta.env.VITE_VEGETATION_DELETE_EDITING !== 'false';
+  const creationEnabled = import.meta.env.VITE_VEGETATION_CREATE_EDITING !== 'false';
   let creationDraft = $state<VegetationCreationDraft | null>(null);
   let creationChoices = $state<SpeciesChoices | null>(null);
-  const personalSpeciesEnabled = import.meta.env.VITE_PERSONAL_SPECIES_EDITING === 'true';
+  const personalSpeciesEnabled = import.meta.env.VITE_PERSONAL_SPECIES_EDITING !== 'false';
   let personalDraft = $state<PersonalSpeciesDraft | null>(null);
   let savedPersonalCodes = $state<string[]>([]);
   const personalInvalid = $derived(personalDraft ? personalSpeciesErrors(personalDraft) : []);
@@ -258,7 +258,7 @@
     document.querySelector<HTMLInputElement>('#header-soilSurveyor')?.focus();
   }
   let vegetationMode = $state<VegetationMode>('initial');
-  const extendedShrubsEnabled = import.meta.env.VITE_EXTENDED_SHRUBS === 'true';
+  const extendedShrubsEnabled = import.meta.env.VITE_EXTENDED_SHRUBS !== 'false';
   let extendedShrubs = $state(false);
   let busy = $state(false);
   let coordinateBusy = $state(false);
@@ -271,15 +271,15 @@
   let parentCodeBusy = $state(false);
   let drainageBusy = $state(false);
   const soilCodeEditingEnabled = import.meta.env.VITE_SOIL_CODES_EDITING !== 'false';
-  const codeCheckEnabled = import.meta.env.VITE_SPECIES_CODE_CHECK_EDITING === 'true';
+  const codeCheckEnabled = import.meta.env.VITE_SPECIES_CODE_CHECK_EDITING !== 'false';
   let codeCheckOpen = $state(false);
   let codeCheckBusy = $state(false);
   let codeCheckEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const metadataEnabled = import.meta.env.VITE_PROJECT_METADATA_EDITING === 'true';
-  const metadataCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_CREATION === 'true';
-  const metadataTemplateCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_TEMPLATE_CREATION === 'true';
-  const metadataRestorationEnabled = import.meta.env.VITE_PROJECT_METADATA_RESTORE === 'true';
-  const sourceEnterEnabled = import.meta.env.VITE_SOURCE_ENTER_NAVIGATION === 'true';
+  const metadataEnabled = import.meta.env.VITE_PROJECT_METADATA_EDITING !== 'false';
+  const metadataCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_CREATION !== 'false';
+  const metadataTemplateCreationEnabled = import.meta.env.VITE_PROJECT_METADATA_TEMPLATE_CREATION !== 'false';
+  const metadataRestorationEnabled = import.meta.env.VITE_PROJECT_METADATA_RESTORE !== 'false';
+  const sourceEnterEnabled = import.meta.env.VITE_SOURCE_ENTER_NAVIGATION !== 'false';
   function sourceEnter(event: KeyboardEvent) {
     if (!sourceEnterEnabled || !container) return;
     try { navigateSourceEnter(event, container); }
@@ -288,7 +288,7 @@
   let metadataOpen = $state(false);
   let metadataBusy = $state(false);
   let pictureBusy = $state(false);
-  const pictureMetadataWritingEnabled = import.meta.env.VITE_PICTURE_METADATA_WRITING === 'true';
+  const pictureMetadataWritingEnabled = import.meta.env.VITE_PICTURE_METADATA_WRITING !== 'false';
   const pictureMetadataSession = $derived.by(() => pictureMetadataWritingEnabled && siviContextId && $projectState?.activeProject && original?.plotNumber
     ? ownedPictureMetadataSession({ contextId: siviContextId, project: $projectState.activeProject, plotNumber: original.plotNumber }) : undefined);
   let pictureMetadataRevision = $state(0);
@@ -336,10 +336,10 @@
     historyId: event.historyId, restored: event.consumed,
     label: `${event.form}; Species ${event.species === null ? 'NULL' : event.species === '' ? '(empty text)' : event.species}; application ID ${event.id}; physical row ${event.rowId}; ${event.editWhen}`,
   })));
-  const twoPageReviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW === 'true';
-  const twoPageSourceLayoutEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT === 'true';
-  const twoPageCommonReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW === 'true';
-  const twoPageEntryReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW === 'true';
+  const twoPageReviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW !== 'false';
+  const twoPageSourceLayoutEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT !== 'false';
+  const twoPageCommonReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW !== 'false';
+  const twoPageEntryReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW !== 'false';
   const ordinarySoilUnavailable = twoPageSoilReviewEnabled && twoPageEntryReviewEnabled
     ? 'Ordinary numeric-ID soil rows, counts and actions are unavailable in this experimental physical-soil review profile. Use complete-entry linked soil review; historical rows are not absent or discarded.'
     : null;
@@ -371,12 +371,12 @@
     twoPageVegetationBusy = activity.busy; twoPageVegetationBlocked = activity.blocked;
     untrack(() => twoPageVegetationActivityRevision++);
   }));
-  const environmentSUEnabled = import.meta.env.VITE_SOURCE_ENV_SU_TRANSFER === 'true';
-  const siteUnitEnvironmentEnabled = import.meta.env.VITE_SOURCE_SU_ENV_TRANSFER === 'true';
+  const environmentSUEnabled = import.meta.env.VITE_SOURCE_ENV_SU_TRANSFER !== 'false';
+  const siteUnitEnvironmentEnabled = import.meta.env.VITE_SOURCE_SU_ENV_TRANSFER !== 'false';
   let environmentSUOpen = $state(false);
   let environmentSUDirection = $state<'forward' | 'reverse' | 'external-reverse'>('forward');
   let environmentSUEditor = $state<{ getCloseState(): EditorCloseState; undo(): void }>();
-  const externalSUEnvironmentEnabled = import.meta.env.VITE_EXTERNAL_SU_ENVIRONMENT_EDITING === 'true';
+  const externalSUEnvironmentEnabled = import.meta.env.VITE_EXTERNAL_SU_ENVIRONMENT_EDITING !== 'false';
   let externalSUEnvironmentBusy = $state(false);
   let externalSUEnvironmentBlocked = $state(false);
   const separateSUSelected = $derived(Boolean($projectState?.activeSU && $projectState.activeSU !== 'None' &&
@@ -399,14 +399,14 @@
     }
     return unsubscribe;
   });
-  const profileReviewEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_REVIEW === 'true';
-  const profileRunEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_RUN === 'true';
-  const profileSpeciesPresenceEnabled = import.meta.env.VITE_PROFILE_SPECIES_PRESENCE_PREVIEW === 'true';
-  const profileEditingEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_EDITING === 'true';
-  const profileCreationEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_CREATION === 'true';
-  const profileDeletionEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_DELETION === 'true';
-  const profileFilteringEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_FILTERING === 'true';
-  const profileSaveSUEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_SAVE_SU === 'true';
+  const profileReviewEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_REVIEW !== 'false';
+  const profileRunEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_RUN !== 'false';
+  const profileSpeciesPresenceEnabled = import.meta.env.VITE_PROFILE_SPECIES_PRESENCE_PREVIEW !== 'false';
+  const profileEditingEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_EDITING !== 'false';
+  const profileCreationEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_CREATION !== 'false';
+  const profileDeletionEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_DELETION !== 'false';
+  const profileFilteringEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_FILTERING !== 'false';
+  const profileSaveSUEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_SAVE_SU !== 'false';
   let profileReviewOpen = $state(false);
   let profileReviewBusy = $state(false);
   let profileReviewBlocked = $state(false);
@@ -1594,6 +1594,7 @@
       error = 'Finish or Undo existing drafts and unlock the available plot before reviewing two-page additional fields.';
       return;
     }
+    twoPageEntryInitialForm = extendedShrubs ? 'FS882-8x6XL-CHARS' : 'FS882-8x6XL';
     twoPageScope = 'extra';
     twoPageProject = project; twoPageOpen = true; error = null; successMsg = null;
   }
@@ -3556,12 +3557,21 @@
     </button>
     {/if}
   </nav>
-  {#if siviParentReviewEnabled && !siviStandalone}
-    <div class="border-b border-stone-200 px-4 py-2">
-      <button type="button" data-sivi-parent-open aria-pressed={activeTab === 'siviParent'}
-        class="rounded border px-3 py-1 text-sm disabled:opacity-50"
-        disabled={busy || headerWorkflowBusy || dirty || nonParentChildUnsaved || !siviParentSession}
-        onclick={() => void showSIVIParentPanel()}>SIVI parent (read-only)</button>
+  {#if (extendedShrubsEnabled && !twoPageOpen) || (siviParentReviewEnabled && !siviStandalone)}
+    <div class="border-b border-stone-200 px-4 py-2 flex flex-wrap items-center gap-4">
+      {#if extendedShrubsEnabled && !twoPageOpen}
+        <label class="inline-flex items-center gap-2 text-xs font-medium cursor-pointer">
+          <input type="checkbox" data-extended-shrubs checked={extendedShrubs} disabled={busy || headerWorkflowBusy}
+            onchange={(event) => { extendedShrubs = event.currentTarget.checked; siviSession?.presentation(extendedShrubs); siviCoverSession?.presentation(extendedShrubs); siviCombinedSession?.presentation(extendedShrubs); siviCollectedSession?.presentation(extendedShrubs); siviSpeciesSession?.presentation(extendedShrubs); siviIdentitySession?.presentation(extendedShrubs); if (extendedShrubs) vegetationMode = 'cover'; }} />
+          Show extended shrub layers
+        </label>
+      {/if}
+      {#if siviParentReviewEnabled && !siviStandalone}
+        <button type="button" data-sivi-parent-open aria-pressed={activeTab === 'siviParent'}
+          class="rounded border px-3 py-1 text-sm disabled:opacity-50"
+          disabled={busy || headerWorkflowBusy || dirty || nonParentChildUnsaved || !siviParentSession}
+          onclick={() => void showSIVIParentPanel()}>SIVI parent (read-only)</button>
+      {/if}
     </div>
   {/if}
 
@@ -3576,7 +3586,9 @@
           canSave={siviParentSharedClose?.canSave ?? false} onstage={stageSIVIParentShared}
           onoperation={operation => { void siviParentSharedOperation(operation); }}
           onreferences={() => { void siviParentSharedSession?.refreshReferences(); }}
-          oncancel={() => siviParentSharedSession?.cancel()} />
+          oncancel={() => siviParentSharedSession?.cancel()}
+          {extendedShrubs}
+          onExtendedShrubsChange={extendedShrubsEnabled ? (next) => { extendedShrubs = next; siviSession?.presentation(next); siviCoverSession?.presentation(next); siviCombinedSession?.presentation(next); siviCollectedSession?.presentation(next); siviSpeciesSession?.presentation(next); siviIdentitySession?.presentation(next); } : undefined} />
       {/if}
     {/snippet}
     {#if activeTab === 'siviParent' && siviParentOpen && siviParentView && !metadataOpen && (!siviStandalone || siviStandaloneEnabled)}
@@ -3668,14 +3680,15 @@
       {#if twoPageScope === 'entry'}
         <TwoPageEntryEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
           initialForm={twoPageEntryInitialForm}
+          onExtendedShrubsChange={extendedShrubsEnabled ? (next) => { extendedShrubs = next; } : undefined}
           pictureReaderAvailable={pictureReadingEnabled}
-          auditReaderAvailable={import.meta.env.VITE_TWO_PAGE_SOURCE_AUDIT_REVIEW === 'true'}
-          googleEarthReaderAvailable={import.meta.env.VITE_TWO_PAGE_GOOGLE_EARTH_REVIEW === 'true'}
-          vegetationTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_VEGETATION_TABLE_REVIEW === 'true'}
-          environmentTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_ENVIRONMENT_TABLE_REVIEW === 'true'}
-          projectMetadataReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROJECT_METADATA_REVIEW === 'true'}
+          auditReaderAvailable={import.meta.env.VITE_TWO_PAGE_SOURCE_AUDIT_REVIEW !== 'false'}
+          googleEarthReaderAvailable={import.meta.env.VITE_TWO_PAGE_GOOGLE_EARTH_REVIEW !== 'false'}
+          vegetationTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_VEGETATION_TABLE_REVIEW !== 'false'}
+          environmentTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_ENVIRONMENT_TABLE_REVIEW !== 'false'}
+          projectMetadataReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROJECT_METADATA_REVIEW !== 'false'}
           projectMetadataClient={PlotService} metadataRestorationAvailable={metadataRestorationEnabled}
-          profilingReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROFILING_REVIEW === 'true'}
+          profilingReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROFILING_REVIEW !== 'false'}
           profilingSource={$projectState?.plotProfile?.source ?? null}
           vegetationTableSU={$projectState?.activeSU ?? ''}
           vegetationTableSUPath={$projectState?.suPath ?? ''}
@@ -3690,12 +3703,16 @@
           oncommitted={() => refreshTwoPagePeers('entry')} embedded={twoPageLinkedChild} />
       {:else if twoPageScope === 'common'}
         <TwoPageParentCommonEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
+          initialForm={twoPageEntryInitialForm}
+          onExtendedShrubsChange={extendedShrubsEnabled ? (next) => { extendedShrubs = next; } : undefined}
           cache={twoPageCommonSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
           onbusy={value => twoPageBusy = value}
           onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
           oncommitted={() => refreshTwoPagePeers('common')} embedded={twoPageLinkedChild} />
       {:else}
         <TwoPageParentEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
+          initialForm={twoPageEntryInitialForm}
+          onExtendedShrubsChange={extendedShrubsEnabled ? (next) => { extendedShrubs = next; } : undefined}
           cache={twoPageSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
           onbusy={value => twoPageBusy = value}
           onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
@@ -3945,7 +3962,7 @@
         {#snippet children(ordinaryEditor)}
         <HeaderEditor bind:draft {original} {capabilities} disabled={headerInputsDisabled}
           onMetadata={metadataEnabled ? openProjectMetadata : undefined} metadataDisabled={!canOpenProjectMetadata()}
-          {editor} additionalEditor={ordinaryEditor} {masterAllowed}
+          {editor} additionalEditor={ordinaryEditor} {masterAllowed} {extendedShrubs}
           existing={original !== null}
           lists={{ moistureRegime: moistureList, nutrientRegime: nutrientList, mesoSlopePos: mesoSlopeList, surfaceShape: surfaceShapeList }}
           onchange={markDirty} onerror={(message) => error = message} onvalidation={validateHeader}
@@ -4030,15 +4047,8 @@
           disabled={busy || headerWorkflowBusy || !siviIdentityPanelOpen && siviIdentityEditingDisabled && !siviIdentityUnsaved}
           onclick={() => void showSIVIIdentityPanel()}>{siviIdentityPanelOpen ? 'Close ID view' : 'Show SIVI IDs'}</button>
       {/if}
-      {#if extendedShrubsEnabled}
-        <label class="mb-3 flex items-center gap-2">
-          <input type="checkbox" data-extended-shrubs checked={extendedShrubs} disabled={busy || headerWorkflowBusy}
-            onchange={(event) => { extendedShrubs = event.currentTarget.checked; siviSession?.presentation(extendedShrubs); siviCoverSession?.presentation(extendedShrubs); siviCombinedSession?.presentation(extendedShrubs); siviCollectedSession?.presentation(extendedShrubs); siviSpeciesSession?.presentation(extendedShrubs); siviIdentitySession?.presentation(extendedShrubs); if (extendedShrubs) vegetationMode = 'cover'; }} />
-          Show extended shrub layers (CHARS)
-        </label>
-        {#if extendedShrubs && !siviPanelOpen && !siviCoverPanelOpen && !siviCombinedPanelOpen && !siviCollectedPanelOpen && !siviSpeciesPanelOpen && !siviIdentityPanelOpen}
-          <p class="mb-3 text-sm" role="status">Extended shrubs use cover mode. Turn this option off to use height mode; hidden values, drafts and errors are retained.</p>
-        {/if}
+      {#if extendedShrubs && !siviPanelOpen && !siviCoverPanelOpen && !siviCombinedPanelOpen && !siviCollectedPanelOpen && !siviSpeciesPanelOpen && !siviIdentityPanelOpen}
+        <p class="mb-3 text-sm" role="status">Extended shrubs use cover mode (Cover5a–Cover5c / Height5a–Height5c). Turn this option off to use height mode; hidden values, drafts and errors are retained.</p>
       {/if}
       {#if siviIdentityPanelOpen && siviIdentityView}
         {#if siviIdentityReading && siviIdentityBusy}

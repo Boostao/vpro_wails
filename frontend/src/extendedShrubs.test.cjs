@@ -69,15 +69,25 @@ test('extended renderer has one labelled live control per field and normal rende
 
 test('shared option gates extended presentation and restricts heights without clearing drafts or replacing parent identity', () => {
   const form = read('FS882Form.svelte');
-  assert.match(form, /VITE_EXTENDED_SHRUBS === 'true'/);
+  assert.match(form, /VITE_EXTENDED_SHRUBS !== 'false'/);
   assert.match(form, /data-extended-shrubs/);
+  assert.match(form, /Show extended shrub layers/);
   assert.match(form, /if \(extendedShrubs\) vegetationMode = 'cover'/);
   assert.match(form, /heightToggleDisabled=\{extendedShrubs \|\| busy \|\| headerWorkflowBusy\}/);
   assert.match(form, /extendedShrubs && originalChild\.form === 'SubVegAXL_BC' \? 'SubVegAXL'/);
   assert.match(form, /name === 'SubVegAXL_BC' \|\| name === 'SubVegAXL'/);
   assert.match(form, /hidden values, drafts and errors are retained/);
   assert.doesNotMatch(form, /onchange=\{[^}]*heightDrafts\s*=/);
-  for (const file of ['FS882Form.svelte', 'SourcePage.svelte', 'SourceChild.svelte']) {
+  const header = read('HeaderEditor.svelte');
+  assert.match(header, /data-column="SnowCoverregime"/);
+  assert.match(header, /data-column="ActiveLayerDepth"/);
+  const twoPage = read('TwoPageEntryEditor.svelte');
+  assert.match(twoPage, /data-extended-shrubs/);
+  assert.match(twoPage, /Show extended shrub layers/);
+  const siviShared = read('SIVIParentSharedFields.svelte');
+  assert.match(siviShared, /data-sivi-extended-shrubs/);
+  assert.match(siviShared, /Show extended shrub layers/);
+  for (const file of ['FS882Form.svelte', 'HeaderEditor.svelte', 'TwoPageEntryEditor.svelte', 'SIVIParentSharedFields.svelte', 'SourcePage.svelte', 'SourceChild.svelte']) {
     assert.equal(compile(read(file), { filename: file, generate: 'client' }).warnings.length, 0);
   }
 });

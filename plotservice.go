@@ -318,6 +318,27 @@ func (s *PlotService) SetCurrentUser(user string) error {
 }
 
 // Callers release the borrow, not the context-owned pool.
+func (s *PlotService) getActiveReadDB() (*sql.DB, string, func(), error) {
+	release := func() {}
+	if !s.contextScoped {
+		s.projects.operationMu.RLock()
+		var once sync.Once
+		release = func() { once.Do(s.projects.operationMu.RUnlock) }
+	}
+	s.projects.mu.RLock()
+	coordinator := s.projects.sqlite
+	s.projects.mu.RUnlock()
+	if coordinator != nil {
+		db, err := coordinator.projectReadDatabase(s.operationContext())
+		if err != nil {
+			release()
+			return nil, "", nil, err
+		}
+		return db, coordinator.selection.Project, release, nil
+	}
+	return s.getActiveDB()
+}
+
 func (s *PlotService) getActiveDB() (*sql.DB, string, func(), error) {
 	release := func() {}
 	if !s.contextScoped {
@@ -384,7 +405,7 @@ func (s *PlotService) RestoreAuditRecords(plotNumber string, removeAuditRows boo
 
 // ListAuditEntries returns the audit trail for a plot.
 func (s *PlotService) ListAuditEntries(plotNumber string) ([]AuditEntry, error) {
-	db, project, release, err := s.getActiveDB()
+	db, project, release, err := s.getActiveReadDB()
 	if err != nil {
 		return nil, err
 	}

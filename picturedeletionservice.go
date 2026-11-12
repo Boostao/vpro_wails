@@ -38,7 +38,12 @@ func NewPictureDeletionService(pictures *PictureService, lookup func(string) (st
 		return nil, err
 	}
 	if (writing || restoring) && (!pictures.enabled || pictures.source == nil) {
-		return nil, errors.New("picture deletion/restoration requires independently enabled owned picture reading")
+		_, writingExplicit := lookup(pictureDeletionWritingEnvironment)
+		_, restoringExplicit := lookup(pictureDeletionRestoringEnvironment)
+		if (writing && writingExplicit) || (restoring && restoringExplicit) {
+			return nil, errors.New("picture deletion/restoration requires independently enabled owned picture reading")
+		}
+		writing, restoring = false, false
 	}
 	return &PictureDeletionService{pictures: pictures, writing: writing, restoring: restoring,
 		mutations: map[string]bool{}, reads: map[string]map[*pictureLifecycleReceiptObservation]struct{}{}}, nil

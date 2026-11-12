@@ -141,8 +141,8 @@ test('actual parent module retains grouping validation across remount without re
     subscribe() { return () => {}; }
   }
   const component = serverComponent(source('LongVegetationReport.svelte')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_GROUP_PREFERENCES === 'true'/g, 'true')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g, 'false'),
+    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_GROUP_PREFERENCES !== 'false'/g, 'true')
+    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false'),
     'LongVegetationReport.svelte', {
       '../bindings/github.com/boostao/vpro-wails': {},
       './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': { createLongVegetationGroupPreferencesRegistry() { created++; return registry; } },

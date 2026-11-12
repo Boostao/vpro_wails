@@ -63,7 +63,10 @@ func TestTwoPageParentExtraServiceIndependentGatesAndOwnedReads(t *testing.T) {
 			t.Fatal("malformed flag silently defaulted", name)
 		}
 	}
-	service, err := NewTwoPageParentExtraService(contexts, func(string) (string, bool) { return "", false })
+	if defaultService, err := NewTwoPageParentExtraService(contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultService.reviewEnabled || !defaultService.editsEnabled {
+		t.Fatal("default extra flags disabled", defaultService, err)
+	}
+	service, err := NewTwoPageParentExtraService(contexts, func(string) (string, bool) { return "false", true })
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -18,7 +18,6 @@
   import { summaryEnvironmentalDesktop, summaryEnvironmentalEnabled } from './summaryVegetationEnvironmentalDesktop';
   import ProjectTableCSVReview from './ProjectTableCSVReview.svelte';
   import UserLogReview from './UserLogReview.svelte';
-  import BreakReportReview from './BreakReportReview.svelte';
   import SubzoneMatrixReport from './SubzoneMatrixReport.svelte';
   import { matrixPublicationSession } from './subzoneMatrixReport';
   import PlotLocationReview from './PlotLocationReview.svelte';
@@ -54,18 +53,9 @@
   let profileNavigation = $state<ProfileNavigation | null>(null);
   const profileIndex = $derived(profileNavigation?.plots.findIndex(plot => plot.plotNumber === editorPlotNumber) ?? -1);
   let editorPlotNumber = $state<string | undefined>(undefined);
-  let editorEntryForm = $state<'fs882' | 'sivi' | 'sivi-chars'>('fs882');
-  const editorLabel = $derived(editorEntryForm === 'sivi-chars' ? 'CHARS SIVI parent' : editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882');
-  const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE === 'true' && import.meta.env.VITE_SIVI_PARENT_REVIEW === 'true';
-  const siviCHARSParentEntryEnabled = import.meta.env.VITE_SIVI_CHARS_PARENT_ENTRY === 'true';
-  const siviCHARSLinkedVegetationEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_COMBINED_EDITING === 'true';
-  const siviCHARSCollectedEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_COLLECTED_EDITING === 'true';
-  const siviCHARSSpeciesEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_SPECIES_EDITING === 'true';
-  const siviCHARSIdentityEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_IDENTITY_EDITING === 'true';
-  const siviCHARSCreationEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_CREATION_WRITING === 'true';
-  const siviCHARSDeletionEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_DELETION_WRITING === 'true';
-  const siviCHARSRestorationEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_DELETION_RESTORING === 'true';
-  const siviCHARSCreationUndoEnabled = siviCHARSParentEntryEnabled && import.meta.env.VITE_SIVI_CREATION_UNDO === 'true';
+  let editorEntryForm = $state<'fs882' | 'sivi'>('fs882');
+  const editorLabel = $derived(editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882');
+  const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE !== 'false' && import.meta.env.VITE_SIVI_PARENT_REVIEW !== 'false';
   let offset = $state(0);
   let busy = $state(false);
   let error = $state('');
@@ -79,7 +69,7 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'break-report' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
   let pictureManagerPlot = $state('');
   let plotLabelNumber = $state('');
   let contextExpanded = $state(false);
@@ -97,7 +87,7 @@
   const editorBusy = $derived(localEditorBusy || matrixPublicationBusy || pictureCreationBusy || pictureLifecycleBusy || twoPageSoilBusy || twoPageVegetationBusy || externalSUEnvironmentBusy || summaryPreferenceBusy || summaryFieldListBusy || summaryEnvironmentalBusy || projectReportBusy);
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'true' || !state?.contextId ||
+    if (import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK === 'false' || !state?.contextId ||
         state.activeHierarchy === 'None' || !state.hierarchyPath) { matrixPublicationBusy = false; return; }
     const session = matrixPublicationSession({ contextId: state.contextId,
       hierarchy: state.activeHierarchy, hierarchyPath: state.hierarchyPath });
@@ -144,7 +134,7 @@
   });
   $effect(() => {
     const state = $projectState;
-    if (!projectReportWorkspace || import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'true' ||
+    if (!projectReportWorkspace || import.meta.env.VITE_LONG_VEGETATION_REPORT === 'false' ||
         !state?.contextId || !state.projectPath || state.activeSU !== 'None' && !state.suPath) {
       projectReportBusy = false;
       return;
@@ -159,30 +149,30 @@
   $effect(() => subscribeTwoPageSoilActivity(activity => { twoPageSoilBusy = activity.busy || activity.blocked; }));
   $effect(() => subscribeTwoPageVegetationActivity(activity => { twoPageVegetationBusy = activity.busy || activity.blocked; }));
   $effect(() => {
-    if (import.meta.env.VITE_EXTERNAL_SU_ENVIRONMENT_EDITING !== 'true') return;
+    if (import.meta.env.VITE_EXTERNAL_SU_ENVIRONMENT_EDITING === 'false') return;
     return subscribeExternalSUEnvironmentActivity(activity => { externalSUEnvironmentBusy = activity.busy || activity.blocked; });
   });
   $effect(() => {
-    if (import.meta.env.VITE_PICTURE_DELETION_WRITING !== 'true' && import.meta.env.VITE_PICTURE_DELETION_RESTORING !== 'true') return;
+    if (import.meta.env.VITE_PICTURE_DELETION_WRITING === 'false' && import.meta.env.VITE_PICTURE_DELETION_RESTORING === 'false') return;
     const state = $projectState;
     return subscribePictureLifecycleActivity(activity => {
       pictureLifecycleBusy = activity.busy || activity.blocked;
       if (activity.owner && activity.owner.contextId === state?.contextId &&
           activity.owner.project === state.activeProject && view === 'home' &&
-          import.meta.env.VITE_PICTURE_MANAGER === 'true') {
+          import.meta.env.VITE_PICTURE_MANAGER !== 'false') {
         pictureManagerPlot = activity.owner.plotNumber;
         view = 'picture-manager';
       }
     });
   });
   $effect(() => {
-    if (import.meta.env.VITE_PICTURE_CREATION_WRITING !== 'true') return;
+    if (import.meta.env.VITE_PICTURE_CREATION_WRITING === 'false') return;
     const state = $projectState;
     return subscribePictureCreationActivity(activity => {
       pictureCreationBusy = activity.busy || activity.blocked;
       if (activity.owner && activity.owner.contextId === state?.contextId &&
           activity.owner.project === state.activeProject && view === 'home' &&
-          import.meta.env.VITE_PICTURE_MANAGER === 'true') {
+          import.meta.env.VITE_PICTURE_MANAGER !== 'false') {
         pictureManagerPlot = activity.owner.plotNumber;
         view = 'picture-manager';
       }
@@ -196,11 +186,11 @@
   const summaryPublicationBusy = $derived(summaryEnvironmentPublicationBusy || summaryVegetationPublicationBusy);
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_LONG_VEGETATION_WORKBOOK !== 'true' || import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'true' ||
+    if (import.meta.env.VITE_LONG_VEGETATION_WORKBOOK === 'false' || import.meta.env.VITE_LONG_VEGETATION_REPORT === 'false' ||
         !state?.contextId || state.activeSU === 'None' || !state.suPath) { vegetationPublicationBusy = false; return; }
     const session = vegetationWorkbookPublicationSession({ contextId: state.contextId,
       project: state.activeProject, projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath },
-      import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNITS === 'true');
+      import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNITS !== 'false');
     return session.subscribe(() => {
       const publication = session.view();
       vegetationPublicationBusy = publication.busy || publication.blocked;
@@ -209,7 +199,7 @@
   });
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_LIFEFORM_WORKBOOK !== 'true' || import.meta.env.VITE_LIFEFORM_SUMMARY !== 'true' ||
+    if (import.meta.env.VITE_LIFEFORM_WORKBOOK === 'false' || import.meta.env.VITE_LIFEFORM_SUMMARY === 'false' ||
         !state?.contextId || state.activeSU === 'None' || !state.suPath) { lifeformPublicationBusy = false; return; }
     const session = lifeformWorkbookPublicationSession({ contextId: state.contextId,
       project: state.activeProject, projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath });
@@ -221,7 +211,7 @@
   });
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_TABLE_CSV_ARCHIVE_EXPORT !== 'true' || import.meta.env.VITE_TABLE_CSV_REVIEW !== 'true' ||
+    if (import.meta.env.VITE_TABLE_CSV_ARCHIVE_EXPORT === 'false' || import.meta.env.VITE_TABLE_CSV_REVIEW === 'false' ||
         !state?.contextId) { archivePublicationBusy = false; return; }
     const session = tableCSVArchivePublicationSession({ contextId: state.contextId,
       project: state.activeProject, projectPath: state.projectPath ?? '' });
@@ -234,15 +224,15 @@
   });
   $effect(() => {
     const state = $projectState;
-    if ((import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'true' && import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'true') ||
-        import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'true' ||
+    if ((import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'false' && import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK === 'false') ||
+        import.meta.env.VITE_SITE_UNIT_SUMMARY === 'false' ||
         !state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryEnvironmentPublicationBusy = false; return; }
     const owner = { contextId: state.contextId, project: state.activeProject,
       projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath };
     const sessions: Array<ReturnType<typeof siteUnitSummaryWorkbookPublicationSession> |
       ReturnType<typeof extendedSummaryWorkbookPublicationSession>> = [];
-    if (import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'true') sessions.push(siteUnitSummaryWorkbookPublicationSession(owner));
-    if (import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK === 'true') sessions.push(extendedSummaryWorkbookPublicationSession(owner));
+    if (import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'false') sessions.push(siteUnitSummaryWorkbookPublicationSession(owner));
+    if (import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'false') sessions.push(extendedSummaryWorkbookPublicationSession(owner));
     const update = () => {
       const states = sessions.map(session => session.view());
       const publication = { busy: states.some(state => state.busy), blocked: states.some(state => state.blocked) };
@@ -254,7 +244,7 @@
   });
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK !== 'true' || import.meta.env.VITE_SUMMARY_VEGETATION !== 'true' ||
+    if (import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK === 'false' || import.meta.env.VITE_SUMMARY_VEGETATION === 'false' ||
         !state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryVegetationPublicationBusy = false; return; }
     const session = summaryVegetationWorkbookSession({ contextId: state.contextId, project: state.activeProject,
       projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath });
@@ -269,19 +259,11 @@
     canOpenMetadataInPlace?: () => boolean;
   } | undefined = $state();
   let fs882ModuleLoaded = $state(false);
-  let siviCHARSModuleLoaded = $state(false);
-  const editorInitializing = $derived(view === 'fs882' && !editor &&
-    (editorEntryForm === 'sivi-chars' ? siviCHARSModuleLoaded : fs882ModuleLoaded));
+  const editorInitializing = $derived(view === 'fs882' && !editor && fs882ModuleLoaded);
 
   async function loadFS882Editor() {
     const module = await import('./FS882Form.svelte');
     fs882ModuleLoaded = true;
-    return module;
-  }
-
-  async function loadSIVICHARSEditor() {
-    const module = await import('./SIVICHARSForm.svelte');
-    siviCHARSModuleLoaded = true;
     return module;
   }
 
@@ -309,10 +291,10 @@
   let accessResult = $state<AccessProjectImportResult | null>(null);
   const accessSelectedCandidate = $derived(accessInspection?.projects?.find(p => p.sourceProject === accessSelectedSourceProject) ?? null);
   const externalProjectsEnabled = import.meta.env.VITE_EXTERNAL_PROJECTS !== 'false';
-  const profileSelectionEnabled = import.meta.env.VITE_PLOT_PROFILE_SELECTION === 'true';
-  const profileWriteOwnershipEnabled = import.meta.env.VITE_PLOT_PROFILE_WRITE_OWNERSHIP === 'true';
-  const profileFileCreationEnabled = import.meta.env.VITE_PLOT_PROFILE_FILE_CREATION === 'true';
-  const profileTableCreationEnabled = import.meta.env.VITE_PLOT_PROFILE_TABLE_CREATION === 'true';
+  const profileSelectionEnabled = import.meta.env.VITE_PLOT_PROFILE_SELECTION !== 'false';
+  const profileWriteOwnershipEnabled = import.meta.env.VITE_PLOT_PROFILE_WRITE_OWNERSHIP !== 'false';
+  const profileFileCreationEnabled = import.meta.env.VITE_PLOT_PROFILE_FILE_CREATION !== 'false';
+  const profileTableCreationEnabled = import.meta.env.VITE_PLOT_PROFILE_TABLE_CREATION !== 'false';
   let profileTableReview = $state<ReviewedProfileTable | null>(null);
   let profileTableContext = $state('');
   let profileTableName = $state('');
@@ -340,14 +322,14 @@
   let suError = $state('');
   let suSuccess = $state('');
   let suCommitted = $state(false);
-  const suProjectEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT === 'true';
+  const suProjectEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT !== 'false';
   let suProjectReview = $state<ReviewedProjectSU | null>(null);
   let suProjectContext = $state('');
   let suProjectName = $state('');
   let suProjectError = $state('');
   let suProjectSuccess = $state('');
   let suProjectCommitted = $state(false);
-  const plotFindEnabled = import.meta.env.VITE_SOURCE_PLOT_FIND === 'true';
+  const plotFindEnabled = import.meta.env.VITE_SOURCE_PLOT_FIND !== 'false';
   let plotFindOpen = $state(false);
   let plotFindQuery = $state('');
   let plotFindResult = $state<Awaited<ReturnType<typeof ContextService.LookupScopedPlot>> | null>(null);
@@ -467,14 +449,14 @@
       error = '';
       if (next === 'fs882') { editorPlotNumber = selected?.plotNumber; editorEntryForm = 'fs882'; }
       if (next === 'picture-manager') {
-        if (import.meta.env.VITE_PICTURE_MANAGER !== 'true') {
-          error = 'The read-only picture manager is disabled in this build.';
+        if (import.meta.env.VITE_PICTURE_MANAGER === 'false') {
+          error = 'The picture manager is disabled in this build.';
           return;
         }
         pictureManagerPlot = selected?.plotNumber ?? '';
       }
       if (next === 'plot-label-preview') {
-        if (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'true' && import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'true') {
+        if (import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'false' && import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT === 'false') {
           error = 'Saved plot label preview is disabled in this build.';
           return;
         }
@@ -484,21 +466,15 @@
     });
   }
 
-  async function openSIVI(form: 'sivi' | 'sivi-chars' = 'sivi') {
-    const enabled = form === 'sivi' ? siviStandaloneEnabled : siviCHARSParentEntryEnabled;
-    if (!enabled || !selected || !$projectState?.contextId) {
-      error = form === 'sivi' ? 'Standalone SIVI requires its independent entry gate, parent review and a selected owned plot.'
-        : 'CHARS parent entry requires its independent gate and a selected owned plot.';
+  async function openSIVI() {
+    if (!siviStandaloneEnabled || !selected || !$projectState?.contextId) {
+      error = 'Standalone SIVI requires its independent entry gate, parent review and a selected owned plot.';
       return;
     }
     const plot = selected.plotNumber;
-    const context = $projectState.contextId, project = $projectState.activeProject;
     await requestTransition(async () => {
       if (selected?.plotNumber !== plot) throw new Error('Selected plot changed before opening SIVI; no owner replaced.');
-      if (form === 'sivi-chars' && ($projectState?.contextId !== context || $projectState.activeProject !== project)) {
-        throw new Error('CHARS context/project changed before opening; no owner replaced.');
-      }
-      editorPlotNumber = plot; editorEntryForm = form; view = 'fs882'; error = '';
+      editorPlotNumber = plot; editorEntryForm = 'sivi'; view = 'fs882'; error = '';
     });
   }
 
@@ -629,7 +605,7 @@
   }
 
   async function loadPlots(nextOffset: number) {
-    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix' || view === 'break-report') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
     const current = ++request;
     plotReads.cancelAll();
     busy = true;
@@ -652,7 +628,7 @@
   }
 
   async function refresh() {
-    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix' || view === 'break-report') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
     const current = ++stateRequest;
     stateReads.cancelAll();
     busy = true;
@@ -681,7 +657,7 @@
   }
 
   async function loadHierarchy() {
-    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix' || view === 'break-report') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
     const current = ++hierarchyRequest;
     hierarchyReads.cancelAll();
     try {
@@ -1192,21 +1168,11 @@
 
 <div class="app-shell">
   <header class="topbar">
-    <div class="brand"><span class="brand-symbol" aria-hidden="true">V</span><span>VPRO</span></div>
+    <div class="brand"><span class="brand-symbol" aria-hidden="true">V</span><span>VPro</span></div>
     <button class="context-toggle" type="button" disabled={startupFailure !== null} aria-expanded={contextExpanded} aria-controls="project-context" onclick={() => contextExpanded = !contextExpanded}>Projects &amp; context</button>
     {#if !startupFailure}<Navigation {view} onnavigate={navigate}
       siviAvailable={siviStandaloneEnabled && !!selected && !!$projectState?.contextId}
       onopensivi={() => void openSIVI()}
-      charsAvailable={siviCHARSParentEntryEnabled && !!selected && !!$projectState?.contextId}
-      charsLinkedVegetation={siviCHARSLinkedVegetationEnabled}
-      charsCollected={siviCHARSCollectedEnabled}
-      charsSpecies={siviCHARSSpeciesEnabled}
-      charsIdentity={siviCHARSIdentityEnabled}
-      charsCreation={siviCHARSCreationEnabled}
-      charsDeletion={siviCHARSDeletionEnabled}
-      charsRestoration={siviCHARSRestorationEnabled}
-      charsCreationUndo={siviCHARSCreationUndoEnabled}
-      onopenchars={() => void openSIVI('sivi-chars')}
       metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
       onopenmetadata={() => void openProjectMetadata()} />{/if}
     <div class="topbar-context"><Database size={16} strokeWidth={1.8} /><span>{$projectState?.activeProject ?? 'No project'}</span></div>
@@ -1523,7 +1489,7 @@
           <p>Correct the unavailable paths or malformed preferences in <code>{startupFailure.configPath}</code>, then restart VPRO.</p>
         </section>
       {:else if view === 'home'}
-        <div class="content-heading"><div><div class="eyebrow">VPRO</div><h1>Home</h1></div></div>
+        <div class="content-heading"><div><div class="eyebrow">VPro</div><h1>Home</h1></div></div>
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         <div class="home-summary">
           <div><span class="eyebrow">CURRENT PROJECT</span><h2>{$projectState?.activeProject ?? 'No project selected'}</h2></div>
@@ -1533,7 +1499,6 @@
         <DemoReadiness />
       {:else if view === 'fs882'}
         <div class="h-full flex flex-col p-2">
-          <p class="project-warning"><strong>Experimental {editorLabel} editor</strong> Only verified workflows are writable. Use disposable projects only.</p>
           {#if error}<p class="error" role="alert">{error}</p>{/if}
           {#if plotFindEnabled && plotFindOpen}
             <section aria-label="Find scoped plot" class="mb-2 p-3 border rounded">
@@ -1563,18 +1528,6 @@
           {#key $projectState?.contextId}
           {#key editorEntryForm}
           {#key editorPlotNumber}
-          {#if editorEntryForm === 'sivi-chars'}
-          {#await loadSIVICHARSEditor()}
-            <p role="status" data-entry-loading="sivi-chars">Loading CHARS SIVI parent editor...</p>
-          {:then { default: SIVICHARSForm }}
-          <SIVICHARSForm bind:this={editor}
-            contextId={$projectState?.contextId ?? ''} project={$projectState?.activeProject ?? ''} plotNumber={editorPlotNumber ?? ''}
-            onSaved={async (p) => { editorPlotNumber = p; await loadPlots(offset); }}
-            onBusyChange={(busy) => { localEditorBusy = busy; }} />
-          {:catch error}
-            <p class="error" role="alert" data-entry-load-error="sivi-chars">CHARS SIVI parent editor could not load: {String(error)}</p>
-          {/await}
-          {:else}
           {#await loadFS882Editor()}
             <p role="status" data-entry-loading="fs882">Loading {editorLabel} editor...</p>
           {:then { default: FS882Form }}
@@ -1593,7 +1546,6 @@
           {:catch error}
             <p class="error" role="alert" data-entry-load-error="fs882">{editorLabel} editor could not load: {String(error)}</p>
           {/await}
-          {/if}
           {/key}
           {/key}
           {/key}
@@ -1607,21 +1559,21 @@
           saveReason={closeState?.saveReason ?? `Return to the ${editorLabel} editor before saving.`}
           error={closeRequest ? closeError : transitionError}
           onrespond={closeRequest ? respondToClose : respondToTransition} />
-      {:else if view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY === 'true' && $projectState}
+      {:else if view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <SiteUnitSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU}
             suPath={$projectState.suPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'long-environment' && import.meta.env.VITE_LONG_ENVIRONMENT_REPORT === 'true' && $projectState}
+      {:else if view === 'long-environment' && import.meta.env.VITE_LONG_ENVIRONMENT_REPORT !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <LongEnvironmentReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'long-vegetation' && import.meta.env.VITE_LONG_VEGETATION_REPORT === 'true' && $projectState}
+      {:else if view === 'long-vegetation' && import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <LongVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
@@ -1629,7 +1581,7 @@
             operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
             onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'summary-vegetation' && import.meta.env.VITE_SUMMARY_VEGETATION === 'true' && $projectState}
+      {:else if view === 'summary-vegetation' && import.meta.env.VITE_SUMMARY_VEGETATION !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <SummaryVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
@@ -1637,62 +1589,54 @@
             operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
             onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'lifeform-summary' && import.meta.env.VITE_LIFEFORM_SUMMARY === 'true' && $projectState}
+      {:else if view === 'lifeform-summary' && import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <LifeformSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'table-csv' && import.meta.env.VITE_TABLE_CSV_REVIEW === 'true' && $projectState}
-        <!-- Archive export uses this existing review navigation; its separate UI and backend gates remain default-off. -->
+      {:else if view === 'table-csv' && import.meta.env.VITE_TABLE_CSV_REVIEW !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <ProjectTableCSVReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'user-log' && import.meta.env.VITE_USER_LOG_REVIEW === 'true' && $projectState}
+      {:else if view === 'user-log' && import.meta.env.VITE_USER_LOG_REVIEW !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <UserLogReview contextId={$projectState.contextId ?? ''}
             operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
             onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'break-report' && import.meta.env.VITE_BREAK_REPORT_REVIEW === 'true' && $projectState}
-        {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <BreakReportReview contextId={$projectState.contextId ?? ''}
-            operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
-            onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
-      {:else if view === 'plot-label-preview' && (import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'true' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT === 'true') && $projectState}
+      {:else if view === 'plot-label-preview' && (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'false' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'false') && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <PlotLabelPreview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             initialPlot={plotLabelNumber} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'picture-manager' && import.meta.env.VITE_PICTURE_MANAGER === 'true' && $projectState}
+      {:else if view === 'picture-manager' && import.meta.env.VITE_PICTURE_MANAGER !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <PictureManager contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             initialPlot={pictureManagerPlot} onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'plot-locations' && import.meta.env.VITE_PLOT_LOCATION_REVIEW === 'true' && $projectState}
+      {:else if view === 'plot-locations' && import.meta.env.VITE_PLOT_LOCATION_REVIEW !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <PlotLocationReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'google-earth-review' && import.meta.env.VITE_GOOGLE_EARTH_REVIEW === 'true' && $projectState}
+      {:else if view === 'google-earth-review' && import.meta.env.VITE_GOOGLE_EARTH_REVIEW !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <GoogleEarthReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             onBusyChange={(value) => { localEditorBusy = value; }} />
         {/key}
-      {:else if view === 'subzone-matrix' && import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK === 'true' && $projectState}
+      {:else if view === 'subzone-matrix' && import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
           <SubzoneMatrixReport contextId={$projectState.contextId ?? ''} hierarchy={$projectState.activeHierarchy}
@@ -1760,19 +1704,13 @@
             class="w-full py-1.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-semibold"
             onclick={() => navigate('fs882')}
           >
-            Open in FS882 Editor (Experimental)
+            Open in FS882 Editor
           </button>
           {#if siviStandaloneEnabled}
             <button type="button" data-sivi-standalone-open
               class="mt-2 w-full py-1.5 px-3 border rounded text-xs font-semibold"
               disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
-              onclick={() => void openSIVI()}>Open SIVI / FS1333 (Experimental)</button>
-          {/if}
-          {#if siviCHARSParentEntryEnabled}
-            <button type="button" data-chars-standalone-open
-              class="mt-2 w-full py-1.5 px-3 border rounded text-xs font-semibold"
-              disabled={busy || editorBusy || transitionWorking || pendingTransition !== null}
-              onclick={() => void openSIVI('sivi-chars')}>Open CHARS SIVI parent (Experimental)</button>
+              onclick={() => void openSIVI()}>Open SIVI / FS1333</button>
           {/if}
         </div>
       </aside>

@@ -8,13 +8,14 @@ const source = readFileSync(path.join(__dirname, 'DemoReadiness.svelte'), 'utf8'
 const flags = ['VITE_LONG_ENVIRONMENT_REPORT', 'VITE_LONG_VEGETATION_REPORT',
   'VITE_SITE_UNIT_SUMMARY', 'VITE_LIFEFORM_SUMMARY', 'VITE_SUMMARY_VEGETATION'];
 
-test('actual Svelte rendering reports literal build availability without changing any gate', () => {
+test('actual Svelte rendering reports default-on build availability and honors explicit false disablement', () => {
   for (const value of [undefined, '', 'false', 'TRUE', 'true']) {
     const environment = Object.fromEntries(flags.map(flag => [flag, value]));
     const html = render(serverComponent(source, 'DemoReadiness.svelte', {}, environment)).body;
+    const expectedEnabled = value !== 'false';
     assert.equal((html.match(/data-demo-report=/g) ?? []).length, 5);
-    assert.equal((html.match(/>Enabled in this build</g) ?? []).length, value === 'true' ? 5 : 0);
-    assert.equal((html.match(/>Not enabled in this build</g) ?? []).length, value === 'true' ? 0 : 5);
+    assert.equal((html.match(/>Enabled in this build</g) ?? []).length, expectedEnabled ? 5 : 0);
+    assert.equal((html.match(/>Not enabled in this build</g) ?? []).length, expectedEnabled ? 0 : 5);
     assert.match(html, /Use disposable projects for writes/);
     assert.match(html, /Not yet a complete Access replacement/);
     assert.match(html, /complete combined/);

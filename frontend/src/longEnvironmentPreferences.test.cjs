@@ -185,8 +185,8 @@ test('rendered title has one labelled conditional control: enabled two-row texta
   session.apply(review(saved));
   for (const enabled of [true, false]) {
     const component = serverComponent(source.replace(
-      "import.meta.env.VITE_LONG_ENVIRONMENT_PREFERENCES === 'true'", String(enabled))
-      .replace("import.meta.env.VITE_LONG_ENVIRONMENT_WORKBOOK === 'true'", 'false'),
+      "import.meta.env.VITE_LONG_ENVIRONMENT_PREFERENCES !== 'false'", String(enabled))
+      .replace("import.meta.env.VITE_LONG_ENVIRONMENT_WORKBOOK !== 'false'", 'false'),
     'LongEnvironmentReport.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { ContextService: {}, LongEnvironmentPreferencesService: {} },
       './longEnvironmentPreferences': { longEnvironmentPreferencesSession: () => session },
@@ -217,7 +217,7 @@ test('rendered title has one labelled conditional control: enabled two-row texta
 test('default-off panel has one live title and explicit cancellable Load/noncancellable Save barriers', () => {
   const panel = readFileSync(path.join(__dirname, 'LongEnvironmentReport.svelte'), 'utf8');
   assert.equal(compile(panel, { filename: 'LongEnvironmentReport.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(panel, /VITE_LONG_ENVIRONMENT_PREFERENCES === 'true'/);
+  assert.match(panel, /VITE_LONG_ENVIRONMENT_PREFERENCES !== 'false'/);
   assert.equal((panel.match(/id="long-environment-title"/g) ?? []).length, 2);
   assert.match(panel, /if \(!preferencesEnabled\) void options\(\)/);
   assert.match(panel, /if \(!preferencesEnabled\) title = value.title/);

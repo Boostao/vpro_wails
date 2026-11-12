@@ -1,10 +1,12 @@
-//go:build linux || windows
+//go:build linux || windows || darwin
 
 package accessreader
 
 /*
 #cgo linux CFLAGS: -I${SRCDIR}/third_party/mdbtools/include -D_GNU_SOURCE -DHAVE_ICONV=1 -DHAVE_FMEMOPEN=1 -DHAVE_VASPRINTF=1 -DHAVE_GMTIME_R=1 -DHAVE_DECL_PROGRAM_INVOCATION_SHORT_NAME=1 -DHAVE_ATTRIBUTE_ALIAS=1 -DTLS=__thread -DICONV_CONST=
 #cgo linux LDFLAGS: -lm
+#cgo darwin CFLAGS: -I${SRCDIR}/third_party/mdbtools/include -DHAVE_ICONV=1 -DTLS=__thread -DICONV_CONST=
+#cgo darwin LDFLAGS: -liconv -lm
 #cgo windows CFLAGS: -I${SRCDIR}/third_party/mdbtools/include -DTLS=__thread
 #cgo windows LDFLAGS: -lm
 #include "bridge.h"

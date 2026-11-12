@@ -11,30 +11,32 @@
   import { TwoPageParentCommonSession, type TwoPageParentCommonColumn,
     type TwoPageParentCommonInput, type TwoPageParentCommonSessionCache } from './twoPageParentCommonSession';
 
-  let { contextId, project, plot, cache, revision, onchange, onbusy, onclosed, oncommitted, embedded: childContent }: {
+  let { contextId, project, plot, cache, revision, onchange, onbusy, onclosed, oncommitted, embedded: childContent, initialForm = 'FS882-8x6XL', onExtendedShrubsChange }: {
     contextId: string; project: string; plot: string; cache: TwoPageParentCommonSessionCache;
     revision: number; onchange: () => void; onbusy: (value: boolean) => void;
     onclosed: () => void; oncommitted: () => Promise<void>;
     embedded?: Snippet<[TwoPageEntryChild, PaperControl]>;
+    initialForm?: TwoPageParentForm;
+    onExtendedShrubsChange?: (enabled: boolean) => void;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot }));
-  const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW === 'true'
-    && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW === 'true';
-  const editingEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_EDITING === 'true';
-  const sourceLayoutEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT === 'true';
+  const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW !== 'false'
+    && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW !== 'false';
+  const editingEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_EDITING !== 'false';
+  const sourceLayoutEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT !== 'false';
   const reads = new ReadRequests();
   const key = JSON.stringify(owner);
   const sessions = untrack(() => {
     const owned = cache.get(key) ?? new Map<TwoPageParentForm, TwoPageParentCommonSession>();
     cache.set(key, owned); return owned;
   });
-  let form = $state<TwoPageParentForm>('FS882-8x6XL');
+  let form = $state<TwoPageParentForm>(untrack(() => initialForm));
   let error = $state<string | null>(null);
   let choices = $state<ListItem[] | null>(null);
   let choicesBusy = $state(false);
   let choicesError = $state<string | null>(null);
   let choicesRequest = 0;
-  let session = $state(makeSession('FS882-8x6XL'));
+  let session = $state(makeSession(untrack(() => initialForm)));
   const view = $derived.by(() => { revision; return session.view(); });
   const close = $derived.by(() => { revision; return session.closeState(); });
 
@@ -69,7 +71,7 @@
     if (close.unsaved || close.busy || close.blocked) {
       error = 'Finish or Undo the current source variant before changing its owner.'; return;
     }
-    form = next; session = makeSession(next); onchange(); error = null;
+    form = next; session = makeSession(next); onExtendedShrubsChange?.(next === 'FS882-8x6XL-CHARS'); onchange(); error = null;
     await operation('load');
   }
   function stage(column: TwoPageParentCommonColumn, input: TwoPageParentCommonInput) {
@@ -124,6 +126,12 @@
 <section class="space-y-3" aria-label="Two-page common source review">
   {#if error}<p role="alert" class="text-sm text-red-700">{error}</p>{/if}
   <div class="flex flex-wrap gap-2">
+    <label class="inline-flex items-center gap-2 rounded border px-2 py-1 text-sm">
+      <input type="checkbox" data-extended-shrubs checked={form === 'FS882-8x6XL-CHARS'}
+        disabled={close.unsaved || close.busy || close.blocked}
+        onchange={event => chooseForm(event.currentTarget.checked ? 'FS882-8x6XL-CHARS' : 'FS882-8x6XL')} />
+      Show extended shrub layers
+    </label>
     <button type="button" disabled={close.unsaved || close.busy || close.blocked}
       aria-pressed={form === 'FS882-8x6XL'} onclick={() => chooseForm('FS882-8x6XL')}>Normal two-page source</button>
     <button type="button" disabled={close.unsaved || close.busy || close.blocked}

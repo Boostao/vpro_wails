@@ -27,8 +27,8 @@ func TestSiteUnitSummaryPreferencesGateStrictRequestAndOwnership(t *testing.T) {
 			t.Fatal("invalid preference grant accepted", value)
 		}
 	}
-	if enabled, err := siteUnitSummaryPreferencesFeature(func(string) (string, bool) { return "", false }); err != nil || enabled {
-		t.Fatal("default enabled", enabled, err)
+	if enabled, err := siteUnitSummaryPreferencesFeature(func(string) (string, bool) { return "", false }); err != nil || !enabled {
+		t.Fatal("default disabled", enabled, err)
 	}
 	for _, raw := range []string{`{}`, `{"expected":null,"proposed":{"method":1,"siteUnitType":1}}`,
 		`{"expected":{"method":1,"siteUnitType":1},"proposed":{"method":null,"siteUnitType":1}}`,

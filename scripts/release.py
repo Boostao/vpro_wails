@@ -270,14 +270,14 @@ def validate_deb(path, arch, full_version):
     # nFPM maps the SemVer prerelease separator to Debian's sorting separator.
     deb_version = full_version.replace("-", "~", 1) if "-" in full_version.split("+")[0] else full_version
     for key, expected in (("Architecture", arch),
-                          ("Version", deb_version + "-1"), ("Package", "vpro-wails")):
+                          ("Version", deb_version + "-1"), ("Package", "vpro")):
         values = re.findall(rf"^{key}: (.+)$", text, flags=re.MULTILINE)
         require(values == [expected], f"deb {key} mismatch: {values}, expected {expected}")
-    cpu(tar_payload(members[payload[0]], "usr/local/bin/vpro-wails"), "elf", arch)
+    cpu(tar_payload(members[payload[0]], "usr/local/bin/VPro"), "elf", arch)
 
 
 def check_bundle(bundle, numeric):
-    check_cpu(bundle / "Contents/MacOS/vpro-wails", "macho", "universal")
+    check_cpu(bundle / "Contents/MacOS/VPro", "macho", "universal")
     info = plistlib.loads((bundle / "Contents/Info.plist").read_bytes())
     require(info["CFBundleVersion"] == info["CFBundleShortVersionString"] == numeric,
             "macOS bundle version mismatch")
@@ -297,22 +297,22 @@ def package(root, platform):
     require(group in ASSETS, f"Unsupported release target: {group}")
     destination = root / "dist-artifacts"
     destination.mkdir()  # Refuse stale outputs from a previous attempt.
-    binary = root / "bin/vpro-wails"
+    binary = root / "bin/VPro"
     if platform == "windows":
         binary = binary.with_suffix(".exe")
         check_cpu(binary, "pe", arch)
-        installer = root / f"bin/vpro-wails-{arch}-installer.exe"
+        installer = root / f"bin/VPro-{arch}-installer.exe"
         require(installer.is_file(), f"Missing exact NSIS output: {installer}")
         # NSIS has an x86 launcher even for ARM64; inspect the installed payload.
         with tempfile.TemporaryDirectory() as temporary:
             run("7z", "x", "-y", str(installer), f"-o{temporary}")
-            payloads = list(Path(temporary).rglob("vpro-wails.exe"))
+            payloads = list(Path(temporary).rglob("VPro.exe"))
             require(len(payloads) == 1, "Missing/ambiguous NSIS application payload")
             check_cpu(payloads[0], "pe", arch)
             require(sha256(payloads[0]) == sha256(binary), "NSIS payload differs from built EXE")
         shutil.copyfile(binary, destination / ASSETS[group][0])
         with zipfile.ZipFile(destination / ASSETS[group][1], "w", zipfile.ZIP_DEFLATED) as archive:
-            archive.write(binary, "vpro-wails.exe")
+            archive.write(binary, "VPro.exe")
         shutil.copyfile(installer, destination / ASSETS[group][2])
     elif platform == "linux":
         check_cpu(binary, "elf", arch)
@@ -321,27 +321,27 @@ def package(root, platform):
         require(appimage.read_bytes()[8:11] == b"AI\x02", "Expected type-2 AppImage")
         with tempfile.TemporaryDirectory() as temporary:
             run(str(appimage.resolve()), "--appimage-extract", cwd=temporary)
-            check_cpu(Path(temporary) / "squashfs-root/usr/bin/vpro-wails", "elf", arch)
+            check_cpu(Path(temporary) / "squashfs-root/usr/bin/VPro", "elf", arch)
         deb = unique_output(root, ".deb")
         validate_deb(deb, arch, full)
         shutil.copyfile(appimage, destination / ASSETS[group][0])
         (destination / ASSETS[group][0]).chmod(0o755)
         shutil.copyfile(deb, destination / ASSETS[group][1])
         with tarfile.open(destination / ASSETS[group][2], "w:gz") as archive:
-            archive.add(binary, arcname="vpro-wails")
+            archive.add(binary, arcname="VPro")
     else:
-        bundle = root / "bin/vpro-wails.app"
+        bundle = root / "bin/VPro.app"
         check_bundle(bundle, numeric)
-        dmg = root / "bin/vpro-wails.dmg"
+        dmg = root / "bin/VPro.dmg"
         require(dmg.is_file(), "Missing exact DMG output")
         with tempfile.TemporaryDirectory() as temporary:
             mount = Path(temporary) / "mount"
             mount.mkdir()
             run("hdiutil", "attach", "-readonly", "-nobrowse", "-mountpoint", str(mount), str(dmg))
             try:
-                check_bundle(mount / "vpro-wails.app", numeric)
-                require(sha256(mount / "vpro-wails.app/Contents/MacOS/vpro-wails") ==
-                        sha256(bundle / "Contents/MacOS/vpro-wails"), "DMG payload differs")
+                check_bundle(mount / "VPro.app", numeric)
+                require(sha256(mount / "VPro.app/Contents/MacOS/VPro") ==
+                        sha256(bundle / "Contents/MacOS/VPro"), "DMG payload differs")
             finally:
                 run("hdiutil", "detach", str(mount))
         shutil.copyfile(dmg, destination / ASSETS[group][0])
@@ -363,18 +363,18 @@ def validate_portable(directory, group, full):
         binary = (directory / ASSETS[group][0]).read_bytes()
         cpu(binary, "pe", arch)
         with zipfile.ZipFile(directory / ASSETS[group][1]) as archive:
-            require(archive.namelist() == ["vpro-wails.exe"], "Unexpected Windows ZIP entries")
-            require(archive.read("vpro-wails.exe") == binary, "Windows ZIP payload differs")
+            require(archive.namelist() == ["VPro.exe"], "Unexpected Windows ZIP entries")
+            require(archive.read("VPro.exe") == binary, "Windows ZIP payload differs")
     elif group.startswith("linux-"):
         arch = group.removeprefix("linux-")
         check_cpu(directory / ASSETS[group][0], "elf", arch)
         validate_deb(directory / ASSETS[group][1], arch, full)
-        cpu(tar_payload((directory / ASSETS[group][2]).read_bytes(), "vpro-wails"), "elf", arch)
+        cpu(tar_payload((directory / ASSETS[group][2]).read_bytes(), "VPro"), "elf", arch)
     else:
         with zipfile.ZipFile(directory / ASSETS[group][1]) as archive:
             names = archive.namelist()
-            executable = "vpro-wails.app/Contents/MacOS/vpro-wails"
-            info_path = "vpro-wails.app/Contents/Info.plist"
+            executable = "VPro.app/Contents/MacOS/VPro"
+            info_path = "VPro.app/Contents/Info.plist"
             require(names.count(executable) == names.count(info_path) == 1,
                     "Missing/duplicate macOS ZIP bundle entries")
             cpu(archive.read(executable), "macho", "universal")

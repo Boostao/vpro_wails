@@ -66,7 +66,7 @@ test('compiled Forms menu requires an available owned entry and callback without
       assert.ok(button, 'the actual compiled menu must render its SIVI action');
       const ownButton = button.slice(button.lastIndexOf('<button'));
       assert.equal(/\bdisabled(?:\s|=|>)/.test(ownButton), !(available && callback));
-      assert.match(ownButton, available && callback ? /Existing draft and close guards apply/ : /Select a plot and enable/);
+      assert.match(ownButton, available && callback ? /Existing draft and close guards apply/ : /Select a plot to open SIVI/);
       for (const label of ['Metadata', 'Herbarium', 'Colour-theme', 'User setup']) {
         const menuButton = html.match(new RegExp(`<button\\b[^>]*>[\\s\\S]*?<span>${label}<\\/span>\\s*<\\/button>`))?.[0];
         assert.ok(menuButton);
@@ -105,14 +105,14 @@ test('root menu availability shares the existing standalone gate, selected plot 
   assert.doesNotMatch(source('Navigation.svelte'), /VITE_SIVI/);
 });
 
-test('actual root gate requires both literal feature flags in every prerequisite combination', () => {
+test('actual root gate defaults on unless explicitly disabled in every prerequisite combination', () => {
   const initializer = source('App.svelte').match(/const siviStandaloneEnabled = ([^;]+);/)?.[1];
   assert.ok(initializer);
   const enabled = new Function('environment', `return ${initializer.replaceAll('import.meta.env', 'environment')}`);
   for (const standalone of [undefined, 'false', 'TRUE', 'true']) {
     for (const parent of [undefined, 'false', 'TRUE', 'true']) {
       assert.equal(enabled({ VITE_SIVI_STANDALONE: standalone, VITE_SIVI_PARENT_REVIEW: parent }),
-        standalone === 'true' && parent === 'true');
+        standalone !== 'false' && parent !== 'false');
     }
   }
 });
@@ -163,9 +163,9 @@ test('standalone host uses the existing editor owner/close guards, not a duplica
   for (const [filename, text] of [['App.svelte', app], ['FS882Form.svelte', host]]) {
     assert.equal(compile(text, { filename, generate: 'client' }).warnings.length, 0);
   }
-  assert.match(app, /VITE_SIVI_STANDALONE === 'true' && import\.meta\.env\.VITE_SIVI_PARENT_REVIEW === 'true'/);
+  assert.match(app, /VITE_SIVI_STANDALONE !== 'false' && import\.meta\.env\.VITE_SIVI_PARENT_REVIEW !== 'false'/);
   assert.match(app, /entryForm=\{editorEntryForm\}/);
-  assert.match(app, /const editorLabel = \$derived\(editorEntryForm === 'sivi-chars' \? 'CHARS SIVI parent' : editorEntryForm === 'sivi' \? 'SIVI \/ FS1333' : 'FS882'\)/);
+  assert.match(app, /const editorLabel = \$derived\(editorEntryForm === 'sivi' \? 'SIVI \/ FS1333' : 'FS882'\)/);
   assert.match(app, /\{editorLabel\}/);
   const close = source('CloseConfirm.svelte');
   assert.match(close, /editorLabel = 'FS882'/);
@@ -177,7 +177,7 @@ test('standalone host uses the existing editor owner/close guards, not a duplica
   assert.match(host, /No FS882 fallback|no FS882 fallback/);
   assert.match(host, /async function loadSIVIParentOriginals/);
   assert.match(host, /siviStandalone && siviStandaloneEnabled && siviParentSession/);
-  assert.match(host, /VITE_SIVI_COMBINED_EDITING === 'true'/);
+  assert.match(host, /VITE_SIVI_COMBINED_EDITING !== 'false'/);
   assert.match(host, /\{#if siviCombinedEnabled\}/);
   assert.match(host, /Species creation\/deletion and original species-list callbacks remain unavailable/);
   assert.match(host, /Close SIVI form/);

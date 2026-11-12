@@ -14,7 +14,7 @@ func TestSIVIHeightFeatureRequiresExplicitLiteralOptIn(t *testing.T) {
 		value                     string
 		present, enabled, invalid bool
 	}{
-		{"", false, false, false},
+		{"", false, true, false},
 		{"true", true, true, false},
 		{"false", true, false, false},
 		{"", true, false, true},

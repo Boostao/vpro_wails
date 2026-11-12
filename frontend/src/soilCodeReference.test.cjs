@@ -13,7 +13,7 @@ const row = (listName, note) => ({
   selectable: false, diagnostic: 'Empty Item is not selectable'
 });
 function component(enabled) {
-  return serverComponent(source.replace("import.meta.env.VITE_SOIL_CODES_REFERENCE === 'true'", String(enabled)),
+  return serverComponent(source.replace("import.meta.env.VITE_SOIL_CODES_REFERENCE !== 'false'", String(enabled)),
     'SoilCodeReference.svelte', {
       '../bindings/github.com/boostao/vpro-wails': {
         SoilCodeService: {
@@ -37,7 +37,7 @@ function component(enabled) {
 
 test('Soil reference compiles, remains opt-in and cannot mutate a draft or source record', () => {
   assert.equal(compile(source, { filename: 'SoilCodeReference.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_SOIL_CODES_REFERENCE === 'true'/);
+  assert.match(source, /VITE_SOIL_CODES_REFERENCE !== 'false'/);
   assert.match(source, /ListGreatGroupChoices/);
   assert.match(source, /ListSubgroupChoices/);
   assert.match(source, /Retry \{label\} reference/);

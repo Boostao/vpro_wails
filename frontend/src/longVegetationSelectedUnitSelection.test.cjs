@@ -189,8 +189,8 @@ test('actual report module retains selector draft safety across remount with ind
     let created=0;
     const source=readFileSync(path.join(__dirname,'LongVegetationReport.svelte'),'utf8');
     const component=serverComponent(source
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_SELECTED_UNIT_SELECTION === 'true'/g,'true')
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g,'false'),'LongVegetationReport.svelte',{
+      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_SELECTED_UNIT_SELECTION !== 'false'/g,'true')
+      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g,'false'),'LongVegetationReport.svelte',{
       '../bindings/github.com/boostao/vpro-wails':{},
       './longVegetationSelectedUnitSelection':{createSelectedUnitSelectionRegistry(){created++;return registry}},
       './LongVegetationSelectedUnitSelection.svelte':{default:child},

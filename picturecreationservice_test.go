@@ -77,7 +77,7 @@ func TestPictureCreationServiceFeatureAndActualOwnerDenials(t *testing.T) {
 			t.Fatal("invalid flag accepted", value)
 		}
 	}
-	for _, flags := range []map[string]string{nil, {pictureCreationWritingEnvironment: "false"}, {pictureMetadataWritingEnvironment: "true"}} {
+	for _, flags := range []map[string]string{{pictureCreationWritingEnvironment: "false"}, {pictureCreationWritingEnvironment: "false", pictureMetadataWritingEnvironment: "true"}} {
 		disabled, err := NewPictureCreationService(service.pictures, pictureServiceLookup(flags))
 		if err != nil {
 			t.Fatal(err)
@@ -589,7 +589,7 @@ func TestPictureCreationServiceRecoverSelectionFreshOwnership(t *testing.T) {
 func TestPictureCreationServiceDisabledSelectionRecoveryRequiresOwnedReadingAndNativeScope(t *testing.T) {
 	service, ctx, request := pictureCreationFacadeFixture(t, "png")
 	before := pictureCreationRawRows(t, service.pictures.source)
-	for _, flags := range []map[string]string{nil, {pictureCreationWritingEnvironment: "false"}, {pictureMetadataWritingEnvironment: "true"}} {
+	for _, flags := range []map[string]string{{pictureCreationWritingEnvironment: "false"}, {pictureCreationWritingEnvironment: "false", pictureMetadataWritingEnvironment: "true"}} {
 		disabled, err := NewPictureCreationService(service.pictures, pictureServiceLookup(flags))
 		if err != nil {
 			t.Fatal(err)

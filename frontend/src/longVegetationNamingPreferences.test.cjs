@@ -162,7 +162,7 @@ test('actual report remount retains naming draft errors and root close barriers 
     const registry = prefs.createLongVegetationNamingPreferencesRegistry({ code: true });
     const session = registry(owner); session.apply(review(1, 'old field', true, owner)); session.editMode('');
     const reportSource = source('LongVegetationReport.svelte')
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g, 'false')
+      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
       .replace('const namingSession = false', `const namingSession = ${enabled}`);
     const component = serverComponent(reportSource, 'LongVegetationReport.svelte', {
       '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},

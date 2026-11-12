@@ -247,6 +247,8 @@ func TestTwoPageSoilCreationIndependentGatesAndStrictTransport(t *testing.T) {
 		for bit, name := range []string{twoPageSoilReviewEnvironment, twoPageSoilWritingEnvironment, twoPageSoilCreationEnvironment} {
 			if mask&(1<<bit) != 0 {
 				flags[name] = "true"
+			} else {
+				flags[name] = "false"
 			}
 		}
 		if result, err := soilFacade(t, service.contexts, flags).CreateHorizon(context.Background(), state.ContextID, raw); err == nil || result != nil {

@@ -316,7 +316,7 @@ func TestSIVIParentSharedGateAndStrictTransport(t *testing.T) {
 		if name != siviParentSharedFeatureEnvironment && name != siviParentSharedReferenceEnvironment {
 			t.Fatal("wrong gate", name)
 		}
-		return "", false
+		return "false", true
 	})
 	if err != nil {
 		t.Fatal(err)

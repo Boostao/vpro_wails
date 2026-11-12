@@ -63,7 +63,7 @@ test('SU transfer remains independently gated and shared lifecycle guards preven
     assert.equal(compile(read(file),{filename:file,generate:'client'}).warnings.length,0);
   }
   const panel=read('EnvironmentSUTransfer.svelte'), root=read('FS882Form.svelte');
-  assert.match(root,/VITE_SOURCE_ENV_SU_TRANSFER === 'true'/);
+  assert.match(root,/VITE_SOURCE_ENV_SU_TRANSFER !== 'false'/);
   assert.match(root,/independentHeaderWorkflowBusy = \$derived\([^;]+environmentSUOpen/);
   assert.match(root,/otherHeaderWorkflowBusy = \$derived\(independentHeaderWorkflowBusy \|\| twoPageOpen \|\| twoPageBusy\)/);
   assert.match(root,/headerWorkflowBusy = \$derived\(otherHeaderWorkflowBusy \|\| pictureBusy \|\| pictureMetadataPending \|\| twoPageSoilBusy \|\| twoPageSoilBlocked \|\| twoPageVegetationBusy \|\| twoPageVegetationBlocked\)/);

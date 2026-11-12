@@ -934,7 +934,7 @@ test('read cancellation rejects late originals; active commits cannot be cancell
   assert.equal(await pending, true);
 });
 const component = serverComponent(readFileSync(path.join(__dirname, 'SIVIParentSharedFields.svelte'), 'utf8')
-  .replace('import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING', 'undefined'),
+  .replace('import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING', "'false'"),
   'SIVIParentSharedFields.svelte', { './siviParentSharedSession': shared, './projectMetadataEditor': metadata });
   const enabledReferenceComponent = serverComponent(
     readFileSync(path.join(__dirname, 'SIVIParentSharedFields.svelte'), 'utf8')

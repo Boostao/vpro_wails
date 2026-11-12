@@ -65,7 +65,10 @@ func TestTwoPageParentCommonServiceIndependentAuthorization(t *testing.T) {
 	if _, err := NewTwoPageParentCommonService(contexts, nil); err == nil {
 		t.Fatal("common implicit environment lookup accepted")
 	}
-	service, err := NewTwoPageParentCommonService(contexts, func(string) (string, bool) { return "", false })
+	if defaultService, err := NewTwoPageParentCommonService(contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultService.reviewEnabled || !defaultService.editsEnabled {
+		t.Fatal("default common flags disabled", defaultService, err)
+	}
+	service, err := NewTwoPageParentCommonService(contexts, func(string) (string, bool) { return "false", true })
 	if err != nil {
 		t.Fatal(err)
 	}

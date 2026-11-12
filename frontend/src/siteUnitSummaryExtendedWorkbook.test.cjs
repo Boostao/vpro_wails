@@ -247,7 +247,7 @@ test('extended UI keeps gates, visible labels and held authority while restoring
   assert.match(parent, /retainedOptions\?\.orderBy === 2 \? 'lifeform'/);
   assert.match(parent, /extendedAuthority\?\.view\(\)\.blocked/);
   assert.match(parent, /\{extendedOptions\}/);
-  assert.match(panel, /VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK === 'true'/);
+  assert.match(panel, /VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'false'/);
   assert.match(panel, /sameExtendedSummaryWorkbookOptions\(requestedOptions, extendedOptions/);
   assert.match(panel, /extendedSession\.publish\(review, destination/);
   assert.doesNotMatch(panel, /reads\.track\(SiteUnitSummaryExtendedWorkbookService\.ExportReviewed/);

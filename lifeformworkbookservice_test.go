@@ -94,7 +94,7 @@ func TestLifeformWorkbookServiceIndependentGateAndRawShapeRefusal(t *testing.T) 
 	for _, gate := range []string{"", "false", "true", "TRUE", "1", " true"} {
 		service, err := NewLifeformWorkbookService(nil, func(string) (string, bool) { return gate, gate != "" })
 		if gate == "" || gate == "false" || gate == "true" {
-			if err != nil || service.enabled != (gate == "true") {
+			if err != nil || service.enabled != (gate != "false") {
 				t.Fatal("independent literal gate differs", gate, err)
 			}
 			if _, err := service.GetReview(context.Background(), "owned", `{}`); err == nil {

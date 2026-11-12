@@ -97,8 +97,8 @@ func TestSiteUnitSummaryStrictRequestAndFeature(t *testing.T) {
 	if _, err := siviFeature(siteUnitSummaryFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil {
 		t.Fatal(err)
 	}
-	if enabled, err := siviFeature(siteUnitSummaryFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || enabled {
-		t.Fatal("default not off", err)
+	if enabled, err := siviFeature(siteUnitSummaryFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || !enabled {
+		t.Fatal("default not on", err)
 	}
 	if _, err := siviFeature(siteUnitSummaryFeatureEnvironment, func(string) (string, bool) { return "TRUE", true }); err == nil {
 		t.Fatal("malformed flag accepted")

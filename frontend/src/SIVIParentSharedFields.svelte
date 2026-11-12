@@ -2,12 +2,14 @@
   import { metadataCellText } from './projectMetadataEditor';
   import { siviParentSharedFieldsFor, siviParentSharedCell, siviParentSharedDirty, type SIVIParentSharedColumn,
     type SIVIParentSharedInput, type SIVIParentSharedView } from './siviParentSharedSession';
-  let { view, disabled = true, canSave = false, onstage, onoperation, oncancel, onreferences }: {
+  let { view, disabled = true, canSave = false, onstage, onoperation, oncancel, onreferences, extendedShrubs = false, onExtendedShrubsChange }: {
     view: SIVIParentSharedView; disabled?: boolean; canSave?: boolean;
     onstage: (column: SIVIParentSharedColumn, input: SIVIParentSharedInput) => void;
     onoperation: (operation: 'load' | 'save' | 'undo' | 'retain' | 'prune') => void;
     oncancel: () => void;
     onreferences?: () => void;
+    extendedShrubs?: boolean;
+    onExtendedShrubsChange?: (enabled: boolean) => void;
   } = $props();
   const groups = [
     { label: 'Plot & survey', scope: 'plot' },
@@ -20,11 +22,23 @@
   ];
   const dirty = $derived(siviParentSharedDirty(view.drafts));
   const fields = $derived(siviParentSharedFieldsFor(Boolean(view.referencesEnabled) &&
-    import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING === 'true'));
+    import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING !== 'false'));
 </script>
 
 <section class="space-y-4 rounded border border-stone-200 bg-white p-4" aria-label="SIVI shared-field editor" data-sivi-shared-panel>
-  <h3 class="font-semibold">SIVI / FS1333 shared fields</h3>
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <h3 class="font-semibold">SIVI / FS1333 shared fields</h3>
+    {#if onExtendedShrubsChange}
+      <label class="inline-flex items-center gap-2 text-xs font-medium">
+        <input type="checkbox" data-sivi-extended-shrubs checked={extendedShrubs} disabled={view.busy}
+          onchange={event => onExtendedShrubsChange(event.currentTarget.checked)} />
+        Show extended shrub layers
+      </label>
+    {/if}
+  </div>
+  {#if extendedShrubs}
+    <p class="text-xs text-stone-600" data-sivi-extended-summary>Extended shrub layers (Cover5a–Cover5c, Height5a–Height5c) and Arctic site fields (SnowCoverregime, ActiveLayerDepth) are active.</p>
+  {/if}
   {#if view.error}<p role="alert" class="text-sm text-red-700">{view.error}</p>{/if}
   {#if view.referenceError}<p role="alert" data-sivi-reference-error>{view.referenceError}</p>{/if}
   {#if view.blocked}<p role="alert">Commit outcome or refresh is unresolved. Undo / reload before continuing; never replay Save.</p>{/if}

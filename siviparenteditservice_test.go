@@ -19,7 +19,7 @@ func TestSIVIParentDirectFeatureIsLiteralAndIndependent(t *testing.T) {
 				return value, present
 			})
 			valid := !present || value == "true" || value == "false"
-			if (err == nil) != valid || got != (present && value == "true") {
+			if (err == nil) != valid || got != (valid && (!present || value == "true")) {
 				t.Fatal("parent editing flag silently defaulted/coerced", value, present, got, err)
 			}
 		}

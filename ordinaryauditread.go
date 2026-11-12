@@ -29,7 +29,7 @@ func (s *ContextService) ListAuditReadEntries(ctx context.Context, contextID, pl
 }
 
 func (s *PlotService) ListAuditReadEntries(plot string) ([]OrdinaryAuditReadEntry, error) {
-	db, project, release, err := s.getActiveDB()
+	db, project, release, err := s.getActiveReadDB()
 	if err != nil {
 		return nil, err
 	}

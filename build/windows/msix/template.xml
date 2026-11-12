@@ -8,27 +8,27 @@
         AllowPromptForPassword="false">
     </Settings>
     <Installer
-        Path="vpro-wails"
+        Path="VPro"
         Arguments=""
-        InstallLocation="C:\Program Files\My Company\VPRO">
+        InstallLocation="C:\Program Files\B.C. Ministry of Forests\VPro">
     </Installer>
     <PackageInformation
-        PackageName="VPRO"
-        PackageDisplayName="VPRO"
-        PublisherName="CN=My Company"
-        PublisherDisplayName="My Company"
+        PackageName="VPro"
+        PackageDisplayName="VPro"
+        PublisherName="CN=Province of British Columbia"
+        PublisherDisplayName="B.C. Ministry of Forests, Research Branch (BEC Program)"
         Version="0.1.0.0"
-        PackageDescription="A vpro-wails application">
+        PackageDescription="VENUS (Vegetation and Environment NexUS) Professional">
         <Capabilities>
             <Capability Name="runFullTrust" />
             
         </Capabilities>
         <Applications>
             <Application
-                Id="ca.bc.gov.vpro"
-                Description="A vpro-wails application"
-                DisplayName="VPRO"
-                ExecutableName="vpro-wails"
+                Id="ca.bc.gov.for.bec.vpro"
+                Description="VENUS (Vegetation and Environment NexUS) Professional"
+                DisplayName="VPro"
+                ExecutableName="VPro"
                 EntryPoint="Windows.FullTrustApplication">
                 
             </Application>
@@ -41,13 +41,13 @@
         </Dependencies>
         <Properties>
             <Framework>false</Framework>
-            <DisplayName>VPRO</DisplayName>
-            <PublisherDisplayName>My Company</PublisherDisplayName>
-            <Description>A vpro-wails application</Description>
+            <DisplayName>VPro</DisplayName>
+            <PublisherDisplayName>B.C. Ministry of Forests, Research Branch (BEC Program)</PublisherDisplayName>
+            <Description>VENUS (Vegetation and Environment NexUS) Professional</Description>
             <Logo>Assets\AppIcon.png</Logo>
         </Properties>
     </PackageInformation>
-    <SaveLocation PackagePath="vpro-wails.msix" />
+    <SaveLocation PackagePath="VPro.msix" />
     <PackageIntegrity>
         <CertificatePath></CertificatePath>
     </PackageIntegrity>

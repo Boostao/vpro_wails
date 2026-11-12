@@ -229,7 +229,7 @@ test('panel independently gates preferences shares one title and field and prote
   const source = readFileSync(path.join(__dirname, 'GoogleEarthReview.svelte'), 'utf8');
   const compiled = compile(source, { filename: 'GoogleEarthReview.svelte', generate: 'client', dev: true });
   assert.equal(compiled.warnings.filter(w => w.code.startsWith('a11y')).length, 0);
-  assert.match(source, /const preferencesEnabled = import\.meta\.env\.VITE_GOOGLE_EARTH_PREFERENCES === 'true'/);
+  assert.match(source, /const preferencesEnabled = import\.meta\.env\.VITE_GOOGLE_EARTH_PREFERENCES !== 'false'/);
   assert.match(source, /\{#if preferencesEnabled && preferences\}/);
   for (const action of ['load', 'save', 'outcome', 'acknowledge']) {
     assert.equal((source.match(new RegExp(`data-google-earth-preferences-${action}\\b`, 'g')) || []).length, 1);

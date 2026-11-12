@@ -17,8 +17,8 @@ func TestSummaryExtendedWorkbookServiceIndependentFlagAndMethods(t *testing.T) {
 			return flag, flag != ""
 		})
 		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag == "true") {
-				t.Fatal("independent default-off flag differs", service, err)
+			if err != nil || service.enabled != (flag != "false") {
+				t.Fatal("independent default-on flag differs", service, err)
 			}
 		} else if err == nil || service != nil {
 			t.Fatal("malformed flag accepted", flag)

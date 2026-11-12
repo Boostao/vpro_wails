@@ -28,7 +28,7 @@ func TestLongVegetationUnitPreferencesIndependentGateAndStrictRequest(t *testing
 		present bool
 		want    bool
 		invalid bool
-	}{{"", false, false, false}, {"true", true, true, false}, {"false", true, false, false},
+	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
 		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
 		enabled, err := longVegetationUnitPreferencesFeature(func(name string) (string, bool) {
 			if name != "VPRO_LONG_VEGETATION_UNIT_PREFERENCES" {

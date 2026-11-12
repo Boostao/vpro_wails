@@ -60,6 +60,18 @@ func TestDesktopConfigDefaultsAndExistingRValues(t *testing.T) {
 	if mode, err := store.workingUnitMode(); err != nil || mode != "env" {
 		t.Fatalf("Working Unit default: %s %v", mode, err)
 	}
+	if channel, err := store.releaseChannel(); err != nil || channel != ReleaseChannelStable {
+		t.Fatalf("release_channel default: %q %v", channel, err)
+	}
+	expData, expConfig := configFixture(t)
+	writeConfigFixture(t, expConfig, "config.yml", "release_channel: \"experimental\"\n")
+	expStore, err := openDesktopConfig(expData, expConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if channel, err := expStore.releaseChannel(); err != nil || channel != ReleaseChannelExperimental {
+		t.Fatalf("explicit experimental release_channel lost: %q %v", channel, err)
+	}
 	data, config = configFixture(t)
 	writeConfigFixture(t, config, "config.yml", "Current:\n  CoordMethod: 3\n  User: \" R User \"\nReportOptions:\n  DataQualityFilterVegNull: \"True\"\nCustom:\n  Values: [false, \"False\", null, 0]\n")
 	store, err = openDesktopConfig(data, config)
@@ -198,6 +210,7 @@ func TestDesktopConfigMalformedYAMLAndChangedLegacyNeverDefault(t *testing.T) {
 		"Current:\n  CoordMethod: 2\n  CoordMethod: 3", "Current:\n  CoordMethod: false",
 		"Current:\n  CoordMethod: \"2\"", "Audit:\n  AuditStrength: 4",
 		"Desktop:\n  SchemaVersion: 2", "{}\n---\n{}", "Current:\n  User: \"\"",
+		"release_channel: null", "release_channel: \"beta\"", "release_channel: 1",
 	} {
 		t.Run(bad, func(t *testing.T) {
 			data, config := configFixture(t)

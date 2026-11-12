@@ -12,11 +12,11 @@
   } = $props();
   const owned = untrack(() => structuredClone(owner));
   const session = summaryVegetationWorkbookSession(owned);
-  const enabled = import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK === 'true';
-  const ancillaryEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK === 'true';
-  const referencesEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES === 'true';
-  const groupedEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK === 'true';
-  const presentationEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_PRESENTATION_PREFERENCES === 'true';
+  const enabled = import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK !== 'false';
+  const ancillaryEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK !== 'false';
+  const referencesEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES !== 'false';
+  const groupedEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK !== 'false';
+  const presentationEnabled = import.meta.env.VITE_SUMMARY_VEGETATION_PRESENTATION_PREFERENCES !== 'false';
   const environmentEnabled = summaryEnvironmentalLifeformEnabled;
   let viewState = $state.raw(session.view());
   let error = $state('');

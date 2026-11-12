@@ -166,7 +166,10 @@ func TestTwoPageProfilingExplicitSelectionScopeAndRetirement(t *testing.T) {
 
 func TestTwoPageProfilingGateInputsAndPaging(t *testing.T) {
 	service, state, db := twoPageProfilingFixture(t, false, false)
-	for _, value := range []string{"", "false", "TRUE", "1", " true "} {
+	if defaultGated, err := NewTwoPageProfilingService(service.contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultGated.review {
+		t.Fatal("default profiling gate not enabled", defaultGated, err)
+	}
+	for _, value := range []string{"false", "TRUE", "1", " true "} {
 		gated, err := NewTwoPageProfilingService(service.contexts, func(string) (string, bool) { return value, value != "" })
 		if value == "" || value == "false" {
 			if err != nil {

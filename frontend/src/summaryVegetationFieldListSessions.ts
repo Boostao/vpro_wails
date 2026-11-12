@@ -5,7 +5,7 @@ export interface FieldListEnvironment {
   VITE_SUMMARY_VEGETATION_FIELD_LIST?: unknown;
 }
 export function fieldListEnabled(environment: FieldListEnvironment): boolean {
-  return environment.VITE_SUMMARY_VEGETATION === 'true' && environment.VITE_SUMMARY_VEGETATION_FIELD_LIST === 'true';
+  return environment.VITE_SUMMARY_VEGETATION !== 'false' && environment.VITE_SUMMARY_VEGETATION_FIELD_LIST !== 'false';
 }
 export const summaryVegetationFieldListEnabled = fieldListEnabled(import.meta.env);
 export interface FieldListActivity { busy: boolean; blocked: boolean; owner: FieldListOwner | null }

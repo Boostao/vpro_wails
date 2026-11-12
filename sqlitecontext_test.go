@@ -52,6 +52,51 @@ func TestSQLitePinnedReadSnapshotCancellationPreservesContext(t *testing.T) {
 	}
 }
 
+func TestSQLiteContextProjectDatabaseEnablesWALAndPreservesReadCoordinator(t *testing.T) {
+	selection, support := sqliteContextFixture(t)
+	supportBefore := databaseBytes(t, support)
+	owner, err := newSQLiteContext(context.Background(), selection, support)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer owner.Close()
+	projectDB, err := owner.projectDatabase(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	var journalMode string
+	var foreignKeys, busyTimeout int
+	if err := projectDB.QueryRowContext(context.Background(), "PRAGMA journal_mode").Scan(&journalMode); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.EqualFold(journalMode, "wal") {
+		t.Fatalf("expected WAL journal_mode on project database, got %q", journalMode)
+	}
+	if err := projectDB.QueryRowContext(context.Background(), "PRAGMA foreign_keys").Scan(&foreignKeys); err != nil || foreignKeys != 1 {
+		t.Fatalf("expected foreign_keys=1 on project database, got %d (%v)", foreignKeys, err)
+	}
+	if err := projectDB.QueryRowContext(context.Background(), "PRAGMA busy_timeout").Scan(&busyTimeout); err != nil || busyTimeout != 5000 {
+		t.Fatalf("expected busy_timeout=5000 on project database, got %d (%v)", busyTimeout, err)
+	}
+	tx, err := owner.beginReadSnapshot(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	var envCount int
+	if err := tx.QueryRowContext(context.Background(), "SELECT COUNT(*) FROM USysEnv").Scan(&envCount); err != nil || envCount == 0 {
+		t.Fatalf("read snapshot failed while project database in WAL mode: count=%d err=%v", envCount, err)
+	}
+	if err := tx.Rollback(); err != nil && !errors.Is(err, sql.ErrTxDone) {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(supportBefore, databaseBytes(t, support)) {
+		t.Fatal("opening WAL project database modified support databases")
+	}
+	if err := owner.Close(); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func sqliteContextFixture(t *testing.T) (desktopSelection, map[string]string) {
 	t.Helper()
 	root := t.TempDir()

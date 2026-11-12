@@ -101,9 +101,9 @@ test('Earth UI independently gates only preparation, shares context/close barrie
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const navigation = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
   assert.equal(compile(component, { filename: 'GoogleEarthReview.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(navigation, /VITE_GOOGLE_EARTH_REVIEW === 'true' \? 'google-earth-review' : undefined/);
+  assert.match(navigation, /VITE_GOOGLE_EARTH_REVIEW !== 'false' \? 'google-earth-review' : undefined/);
   assert.match(navigation, /name: 'Show Plot Locations in Google Earth', icon: Globe \}/);
-  assert.match(app, /view === 'google-earth-review' && import\.meta\.env\.VITE_GOOGLE_EARTH_REVIEW === 'true'/);
+  assert.match(app, /view === 'google-earth-review' && import\.meta\.env\.VITE_GOOGLE_EARTH_REVIEW !== 'false'/);
   assert.match(app, /function navigate[\s\S]*?requestTransition/);
   assert.match(component, /onDestroy\(cancel\)/); assert.match(component, /reads\.cancelAll\(\)/);
   assert.match(component, /label for="google-earth-description"/);

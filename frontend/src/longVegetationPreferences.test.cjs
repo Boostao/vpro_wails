@@ -141,7 +141,7 @@ test('enabled title presentation has one visible labelled control and retained s
     const owner = { ...scope, contextId: `render-title-${enabled}` };
     const session = prefs.longVegetationPreferencesSession(owner);
     session.apply(review('First\r\nSecond', owner)); session.edit('invalid\0draft');
-    const component = serverComponent(source.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g, 'false')
+    const component = serverComponent(source.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
       .replace('const preferencesEnabled = false;', `const preferencesEnabled = ${enabled};`),
       'LongVegetationReport.svelte', {
         '../bindings/github.com/boostao/vpro-wails': {},

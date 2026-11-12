@@ -124,7 +124,7 @@ test('actual species dispatch, late cancellation and workbook/preference/error b
   context.actions.resetSpeciesCriteria();assert.equal(criteria.view().error,'');
   const panel=readFileSync(path.join(__dirname,'SiteUnitSummary.svelte'),'utf8');
   assert.equal(compile(panel,{filename:'SiteUnitSummary.svelte',generate:'client'}).warnings.length,0);
-  assert.match(panel,/VITE_SITE_UNIT_SUMMARY_SPECIES === 'true'/);
+  assert.match(panel,/VITE_SITE_UNIT_SUMMARY_SPECIES !== 'false'/);
   assert.match(panel,/mode === 'layer' && !speciesView\?\.enabled/);
   assert.match(panel,/onBusyChange\(busy \|\| preferenceBarrier \|\| workbookBusy \|\| speciesBarrier\)/);
   assert.match(panel,/<fieldset disabled=\{busy \|\| workbookBusy \|\| preferenceBarrier\}>\s*<legend>Species preview criteria/);

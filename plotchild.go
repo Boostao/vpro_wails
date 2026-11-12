@@ -227,7 +227,7 @@ func (s *PlotService) GetChildCapabilities(kind string) (map[string]bool, error)
 	default:
 		return nil, fmt.Errorf("unsupported child kind %q", kind)
 	}
-	db, project, release, err := s.getActiveDB()
+	db, project, release, err := s.getActiveReadDB()
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +245,7 @@ func (s *PlotService) GetChildCapabilities(kind string) (map[string]bool, error)
 }
 
 func listChildRecords[T any](s *PlotService, kind, plot string) ([]T, error) {
-	db, project, release, err := s.getActiveDB()
+	db, project, release, err := s.getActiveReadDB()
 	if err != nil {
 		return nil, err
 	}

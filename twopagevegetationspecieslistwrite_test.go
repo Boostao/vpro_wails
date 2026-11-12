@@ -93,9 +93,9 @@ func TestTwoPageSpeciesListIndependentGatesAndLegacySaveDenial(t *testing.T) {
 	raw := vegetationAttemptJSON(t, request)
 	before := databaseBytes(t, contexts.projects.sqlite.attachments)
 	for _, values := range []map[string]string{
-		{}, {twoPageVegetationSpeciesListEnvironment: "true"},
-		{twoPageVegetationReviewEnvironment: "true", twoPageVegetationSpeciesListEnvironment: "true"},
-		{twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true"},
+		{twoPageVegetationReviewEnvironment: "false", twoPageVegetationWritingEnvironment: "false", twoPageVegetationSpeciesListEnvironment: "false"},
+		{twoPageVegetationReviewEnvironment: "false", twoPageVegetationWritingEnvironment: "false", twoPageVegetationSpeciesListEnvironment: "true"},
+		{twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "false", twoPageVegetationSpeciesListEnvironment: "true"},
 		{twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true", twoPageVegetationSpeciesListEnvironment: "false"},
 	} {
 		service := twoPageSpeciesListFacade(t, contexts, values)

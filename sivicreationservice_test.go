@@ -27,7 +27,10 @@ func TestSIVICreationServiceIndependentGateAndGuards(t *testing.T) {
 			t.Fatalf("malformed present creation gate %q accepted", value)
 		}
 	}
-	for _, absent := range []bool{false, true} {
+	if defaultService, err := NewSIVICreationService(&ContextService{}, lookup("", false)); err != nil || !defaultService.enabled {
+		t.Fatalf("default creation gate not enabled: %+v %v", defaultService, err)
+	}
+	for _, absent := range []bool{false} {
 		service, err := NewSIVICreationService(&ContextService{}, lookup("false", !absent))
 		if err != nil || service.enabled {
 			t.Fatalf("default/off gate: %+v %v", service, err)

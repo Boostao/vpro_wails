@@ -125,7 +125,7 @@ test('actual parent/child composition keeps threshold gate independent and propa
     const session = prefs.longVegetationThresholdPreferencesSession(owner); session.apply(review(undefined, owner));
     session.editThreshold('presenceGreaterThan', '');
     const component = serverComponent(source('LongVegetationReport.svelte')
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g, 'false')
+      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
       .replace('const thresholdsEnabled = false;', `const thresholdsEnabled = ${enabled};`), 'LongVegetationReport.svelte', {
         '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {}, './longVegetationStatisticsPreferences': {},
         './longVegetationSwitchPreferences': {}, './LongVegetationSwitchPreferences.svelte': { default() {} },

@@ -24,7 +24,10 @@ func NewPictureMetadataService(pictures *PictureService, lookup func(string) (st
 		return nil, err
 	}
 	if enabled && (!pictures.enabled || pictures.source == nil) {
-		return nil, errors.New("picture metadata writing requires independently enabled owned picture reading")
+		if _, explicit := lookup(pictureMetadataWritingEnvironment); explicit {
+			return nil, errors.New("picture metadata writing requires independently enabled owned picture reading")
+		}
+		enabled = false
 	}
 	return &PictureMetadataService{pictures: pictures, enabled: enabled}, nil
 }

@@ -10,8 +10,8 @@
     contextId: string; project: string; projectPath: string; su: string; suPath: string;
     onBusyChange: (busy: boolean) => void;
   } = $props();
-  const enabled = import.meta.env.VITE_LIFEFORM_SUMMARY === 'true';
-  const attributesEnabled = import.meta.env.VITE_SPECIES_ATTRIBUTE_SUMMARY === 'true';
+  const enabled = import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false';
+  const attributesEnabled = import.meta.env.VITE_SPECIES_ATTRIBUTE_SUMMARY !== 'false';
   const reads = new ReadRequests();
   let generation = 0;
   let busy = $state(false);
@@ -56,7 +56,7 @@
     <button onclick={() => show('attributes')} disabled={!enabled || !attributesEnabled || busy || workbookBusy || su === 'None' || su === 'USysSuTableDynamic'}>Preview species attribute summaries</button>
     {#if busy}<button onclick={cancel}>Cancel preview</button><p role="status">Reading owned project and SU…</p>{/if}
   </div>
-  {#if import.meta.env.VITE_LIFEFORM_WORKBOOK === 'true'}
+  {#if import.meta.env.VITE_LIFEFORM_WORKBOOK !== 'false'}
     <LifeformWorkbookPanel owner={{ contextId, project, projectPath, su, suPath }} disabled={busy}
       onBusyChange={(held) => { workbookBusy = held; reportBusy(); }} />
   {/if}

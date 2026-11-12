@@ -67,7 +67,10 @@ func TestTwoPageParentEntryServiceIndependentGates(t *testing.T) {
 	if _, err := NewTwoPageParentEntryService(contexts, provider.readers, nil); err == nil {
 		t.Fatal("implicit flag lookup accepted")
 	}
-	service, err := NewTwoPageParentEntryService(contexts, provider.readers, osAbsentEntryFlags)
+	if defaultEntry, err := NewTwoPageParentEntryService(contexts, provider.readers, osAbsentEntryFlags); err != nil || !defaultEntry.reviewEnabled || !defaultEntry.editsEnabled {
+		t.Fatal("default entry flags disabled", defaultEntry, err)
+	}
+	service, err := NewTwoPageParentEntryService(contexts, provider.readers, func(string) (string, bool) { return "false", true })
 	if err != nil {
 		t.Fatal(err)
 	}

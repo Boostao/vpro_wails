@@ -351,7 +351,7 @@ function sdkRegistry(environment,bindings) {
 }
 
 test('public SDK registry routes only distinct project APIs using production-Go full requests and one immutable client capability',async()=>{
-  for(const flag of [undefined,'false','1',true]) {
+  for(const flag of ['false']) {
     assert.equal(sdkRegistry({VITE_LONG_VEGETATION_PROJECT_SCOPE:flag},{}),null);
   }
   const input=structuredClone(wire[0]),owner=physicalOwner(input.review.scope),calls=[],cancelled=[];

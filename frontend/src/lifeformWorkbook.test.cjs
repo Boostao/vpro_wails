@@ -260,7 +260,7 @@ test('panel compiles and exposes source options, independent gate, cancellable r
   const source = readFileSync(path.join(__dirname, 'LifeformWorkbookPanel.svelte'), 'utf8');
   const compiled = compile(source, { filename: 'LifeformWorkbookPanel.svelte', generate: 'client' });
   assert.equal(compiled.warnings.length, 0);
-  assert.match(source, /VITE_LIFEFORM_WORKBOOK === 'true'/);
+  assert.match(source, /VITE_LIFEFORM_WORKBOOK !== 'false'/);
   assert.match(source, /details = \$state<boolean\[\]>\(\[false, false, false, false, false, false\]\)/);
   assert.match(source, /onBusyChange\(busy \|\| publication.busy \|\| publication.blocked\)/);
   assert.match(source, /reads\.track\(LifeformWorkbookService\.GetReview/);

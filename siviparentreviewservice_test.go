@@ -14,7 +14,7 @@ func TestSIVIParentReviewFeatureRequiresIndependentLiteralOptIn(t *testing.T) {
 		value                     string
 		present, enabled, invalid bool
 	}{
-		{"", false, false, false}, {"true", true, true, false}, {"false", true, false, false},
+		{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
 		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true},
 	} {
 		enabled, err := siviParentReviewFeature(func(name string) (string, bool) {

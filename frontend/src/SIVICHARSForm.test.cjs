@@ -933,14 +933,7 @@ test('compiled linked snippet requires exact parent and independent combined/Col
   assert.match(parent, /group\.name === 'Vegetation'\}\{@render linkedVegetation\?\.\(\)\}/);
   assert.ok(parent.indexOf("name: 'Vegetation'") < parent.indexOf("name: 'Notes'"));
   const app = source('App.svelte');
-  assert.match(app, /const siviCHARSLinkedVegetationEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_COMBINED_EDITING === 'true'/);
-  assert.match(app, /charsLinkedVegetation=\{siviCHARSLinkedVegetationEnabled\}/);
-  assert.match(app, /const siviCHARSCollectedEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_COLLECTED_EDITING === 'true'/);
-  assert.match(app, /charsCollected=\{siviCHARSCollectedEnabled\}/);
-  assert.match(app, /const siviCHARSSpeciesEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_SPECIES_EDITING === 'true'/);
-  assert.match(app, /charsSpecies=\{siviCHARSSpeciesEnabled\}/);
-  assert.match(app, /const siviCHARSIdentityEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_IDENTITY_EDITING === 'true'/);
-  assert.match(app, /charsIdentity=\{siviCHARSIdentityEnabled\}/);
+  assert.doesNotMatch(app, /SIVICHARSForm|sivi-chars/);
 });
 
 test('compiled creator gate is independent of all four child gates and exposes only actual CHARS source forms', () => {
@@ -982,8 +975,7 @@ test('compiled creator gate is independent of all four child gates and exposes o
     assert.equal(panels, enabled ? 1 : 0);
     assert.equal(html.includes('data-creator-proof'), enabled);
   }
-  assert.match(source('App.svelte'), /const siviCHARSCreationEnabled = siviCHARSParentEntryEnabled && import\.meta\.env\.VITE_SIVI_CREATION_WRITING === 'true'/);
-  assert.match(source('App.svelte'), /charsCreation=\{siviCHARSCreationEnabled\}/);
+  assert.doesNotMatch(source('App.svelte'), /siviCHARSCreationEnabled/);
 });
 
 test('compiled lifecycle gates remain literal and independent of creator and typed child flags', () => {
@@ -1026,9 +1018,7 @@ test('compiled lifecycle gates remain literal and independent of creator and typ
       assert.equal(counts[kind], parent === 'true' && [deletion, restoration, undo][index] === 'true' ? 1 : 0);
     }
   }
-  for (const name of ['Deletion', 'Restoration', 'CreationUndo']) {
-    assert.match(source('App.svelte'), new RegExp(`chars${name}=\\{siviCHARS${name}Enabled\\}`));
-  }
+  assert.doesNotMatch(source('App.svelte'), /siviCHARSDeletionEnabled/);
 });
 
 async function lifecycleFixture(options = {}) {

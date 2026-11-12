@@ -158,8 +158,8 @@ test('actual parent unit registry retains invalid drafts across remount and reac
     subscribe(){return ()=>{}}
   }
   const component=serverComponent(source('LongVegetationReport.svelte')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_UNIT_PREFERENCES === 'true'/g,'true')
-    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g,'false'),
+    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_UNIT_PREFERENCES !== 'false'/g,'true')
+    .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g,'false'),
     'LongVegetationReport.svelte',{
       '../bindings/github.com/boostao/vpro-wails':{},
       './longVegetationUnitPreferences':{createLongVegetationUnitPreferencesRegistry(){created++;return registry}},

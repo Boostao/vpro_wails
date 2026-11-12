@@ -4,15 +4,17 @@
         <key>CFBundlePackageType</key>
             <string>APPL</string>
         <key>CFBundleName</key>
-            <string>VPRO</string>
+            <string>VPro</string>
+        <key>CFBundleDisplayName</key>
+            <string>VPro</string>
         <key>CFBundleExecutable</key>
-            <string>vpro-wails</string>
+            <string>VPro</string>
         <key>CFBundleIdentifier</key>
-            <string>ca.bc.gov.vpro</string>
+            <string>ca.bc.gov.for.bec.vpro</string>
         <key>CFBundleVersion</key>
             <string>0.1.0</string>
         <key>CFBundleGetInfoString</key>
-            <string>This is a comment</string>
+            <string>VENUS (Vegetation and Environment NexUS) Professional — B.C. Ministry of Forests, Research Branch (BEC Program)</string>
         <key>CFBundleShortVersionString</key>
             <string>0.1.0</string>
         <key>CFBundleIconFile</key>
@@ -24,6 +26,6 @@
         <key>NSHighResolutionCapable</key>
             <string>true</string>
         <key>NSHumanReadableCopyright</key>
-            <string>© 2026, My Company</string>
+            <string>© 2026 Province of British Columbia — Ministry of Forests, Research Branch (BEC Program)</string>
     </dict>
 </plist>

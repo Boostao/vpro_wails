@@ -16,7 +16,7 @@ func TestUserLogServiceIndependentLiteralGateAndRead(t *testing.T) {
 		enabled bool
 		invalid bool
 	}{
-		{"", false, false, false}, {"false", true, false, false}, {"true", true, true, false},
+		{"", false, true, false}, {"false", true, false, false}, {"true", true, true, false},
 		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true", true, false, true},
 	} {
 		service, err := NewUserLogService(contexts, func(name string) (string, bool) {

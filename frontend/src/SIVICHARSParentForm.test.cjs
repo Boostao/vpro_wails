@@ -127,80 +127,17 @@ test('compiled linked recovery remains rendered exactly once when parent origina
   }
 });
 
-test('actual CHARS route needs its exact independent gate and defers ownership replacement until transition completion', async () => {
-  let pending;
-  const state = componentFunctions('App.svelte', ['openSIVI'], {
-    siviStandaloneEnabled: false, siviCHARSParentEntryEnabled: false,
-    selected: { plotNumber: ' P ' }, $projectState: { contextId: 'owned', activeProject: 'Project' },
-    error: '', editorPlotNumber: 'original', editorEntryForm: 'fs882', view: 'plots',
-    requestTransition: async run => { pending = run; },
-  });
-  await state.actions.openSIVI('sivi-chars');
-  assert.equal(pending, undefined);
-  assert.match(state.error, /independent gate/);
-  state.siviCHARSParentEntryEnabled = true;
-  await state.actions.openSIVI('sivi-chars');
-  assert.equal(state.editorEntryForm, 'fs882');
-  state.$projectState.contextId = 'new owner';
-  await assert.rejects(pending(), /context\/project changed/);
-  assert.equal(state.editorEntryForm, 'fs882');
-  state.$projectState.contextId = 'owned';
-  await state.actions.openSIVI('sivi-chars');
-  await pending();
-  assert.equal(state.editorEntryForm, 'sivi-chars');
-  assert.equal(state.editorPlotNumber, ' P ');
-});
-
-test('compiled CHARS menu is independently gated and discloses its exact parent/linked scope', () => {
-  for (const combined of [undefined, 'false', 'TRUE', 'true']) {
-  const component = serverComponent(code('Navigation.svelte'), 'Navigation.svelte', {
+test('standalone CHARS SIVI parent menu and route are removed per VPro2.0_Functions triage in favor of inline toggle', () => {
+  const nav = code('Navigation.svelte');
+  const app = code('App.svelte');
+  const form = code('SIVICHARSParentForm.svelte');
+  assert.doesNotMatch(nav, /sivi-chars|CHARS SIVI parent/);
+  assert.doesNotMatch(app, /SIVICHARSForm|sivi-chars/);
+  const component = serverComponent(nav, 'Navigation.svelte', {
     '@lucide/svelte': new Proxy({}, { get: () => () => {} }),
   });
-  for (const available of [false, true]) {
-    for (const callback of [undefined, () => {}]) {
-      for (const collected of [false, true]) for (const species of [false, true]) for (const identity of [false, true]) {
-      const html = render(component, { props: { view: 'plots', onnavigate: () => {},
-        charsAvailable: available, onopenchars: callback, charsLinkedVegetation: combined === 'true',
-        charsCollected: collected, charsSpecies: species, charsIdentity: identity } }).body;
-      const match = html.match(/<button\b[^>]*>[\s\S]*?<span>CHARS SIVI parent — Experimental<\/span>\s*<\/button>/)?.[0];
-      assert.ok(match);
-      const button = match.slice(match.lastIndexOf('<button'));
-      assert.equal(/\bdisabled(?:\s|=|>)/.test(button), !(available && callback));
-      assert.match(button, available && callback
-        ? combined === 'true' ? /separately gated linked covers\/heights/
-          : collected ? /separately gated linked Collected cycles/
-            : species ? /separately gated linked Species selections/
-              : identity ? /separately gated linked vegetation IDs/ : /parent-only entry/
-        : /independent CHARS parent-entry gate/);
-      assert.equal(button.includes('Collected cycles'), Boolean(available && callback && collected));
-      assert.equal(button.includes('Species selections'), Boolean(available && callback && species));
-      assert.equal(button.includes('vegetation IDs'), Boolean(available && callback && identity));
-      }
-    }
-  }
-  }
-});
-
-test('actual CHARS menu delegates once only after restoring owned navigation focus', () => {
-  const calls = [];
-  const state = componentFunctions('Navigation.svelte', ['itemEnabled', 'activate', 'closeMenu', 'navigate'], {
-    charsAvailable: false, onopenchars: undefined, openMenu: 'Forms',
-    navigation: { querySelector: () => ({ querySelector: () => ({ focus: () => calls.push('focus') }) }) },
-    onnavigate: view => calls.push(view),
-  });
-  state.actions.activate({ action: 'sivi-chars' });
-  state.charsAvailable = true;
-  state.actions.activate({ action: 'sivi-chars' });
-  assert.deepEqual(calls, []);
-  state.onopenchars = () => { assert.equal(state.openMenu, null); calls.push('chars'); };
-  state.actions.activate({ action: 'sivi-chars' });
-  assert.deepEqual(calls, ['focus', 'chars']);
-});
-
-test('CHARS shares the root native-close and navigation interface without replacing the normal FS882 host', () => {
-  const app = code('App.svelte'), form = code('SIVICHARSParentForm.svelte');
-  assert.match(app, /siviCHARSParentEntryEnabled = import\.meta\.env\.VITE_SIVI_CHARS_PARENT_ENTRY === 'true'/);
-  assert.match(app, /\{#if editorEntryForm === 'sivi-chars'\}[\s\S]*?<SIVICHARSForm bind:this=\{editor\}[\s\S]*?\{:else\}[\s\S]*?<FS882Form/);
+  const html = render(component, { props: { view: 'plots', onnavigate: () => {} } }).body;
+  assert.equal(html.includes('CHARS SIVI parent'), false);
   assert.match(form, /\$state\.raw<ReturnType<SIVICHARSParentEntrySession\['view'\]>/);
   for (const method of ['getCloseState', 'saveForClose', 'canOpenProjectMetadata', 'openProjectMetadata']) {
     assert.match(form, new RegExp(`export (?:async )?function ${method}\\(`));

@@ -64,7 +64,11 @@ func TestSIVICollectedServiceIndependentStrictGateNilAndCanceled(t *testing.T) {
 	contexts.siviHeightEnabled = true
 	_ = siviCoverServiceFixture(t, contexts, "true", true)
 	_ = siviCombinedServiceFixture(t, contexts)
-	for _, present := range []bool{false, true} {
+	defaultEnabled, err := NewSIVICollectedService(contexts, func(string) (string, bool) { return "", false })
+	if err != nil || !defaultEnabled.enabled {
+		t.Fatal("default SIVI collected gate disabled", defaultEnabled, err)
+	}
+	for _, present := range []bool{true} {
 		disabled, err := NewSIVICollectedService(contexts, func(name string) (string, bool) {
 			if name != siviCollectedFeatureEnvironment {
 				t.Fatal("gate consulted predecessor", name)

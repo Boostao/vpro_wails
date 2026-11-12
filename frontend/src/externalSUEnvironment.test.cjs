@@ -199,7 +199,7 @@ test('normal/CHARS integration keeps independent gates, shared parent lifecycle 
     assert.equal(compile(readFileSync(path.join(__dirname, name), 'utf8'), { filename: name, generate: 'client' }).warnings.length, 0);
   }
   const root = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(root, /VITE_EXTERNAL_SU_ENVIRONMENT_EDITING === 'true'/);
+  assert.match(root, /VITE_EXTERNAL_SU_ENVIRONMENT_EDITING !== 'false'/);
   assert.match(root, /environmentSUDirection = 'external-reverse'; environmentSUOpen = true/);
   assert.match(root, /ExternalSUEnvironmentTransfer bind:this=\{environmentSUEditor\}/);
   assert.match(root, /externalSUEnvironmentBusy \|\| externalSUEnvironmentBlocked/);

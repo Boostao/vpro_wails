@@ -148,7 +148,7 @@ test('actual report retains errors across remount and propagates independent def
     const owner = { ...scope, contextId: `quality-null-composition-${enabled}` };
     const session = prefs.longVegetationQualityNullPreferencesSession(owner); session.apply(review(undefined, owner));
     session.editNullFlag('vegIncludeNulls', null);
-    const component = serverComponent(reportSource.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ === 'true'/g, 'false')
+    const component = serverComponent(reportSource.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
       .replace('const qualityNullsEnabled = false;', `const qualityNullsEnabled = ${enabled};`), 'LongVegetationReport.svelte', {
         '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
         './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},

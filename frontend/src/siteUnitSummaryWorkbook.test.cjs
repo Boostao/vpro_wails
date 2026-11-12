@@ -236,7 +236,7 @@ test('malformed destinations and stale current methods never dispatch; literal v
 test('panel compiles with accessible scoped source tables, default-off gate, current-method guard and cancellation isolation', () => {
   const text = source();
   assert.equal(compile(text, { filename: 'SiteUnitSummaryWorkbookPanel.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(text, /VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'true'/);
+  assert.match(text, /VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'false'/);
   assert.match(text, /onBusyChange\(busy \|\| publication.busy \|\| publication.blocked\)/);
   assert.match(text, /method !== requestedMethod/);
   assert.match(text, /review\.preview\.report\.method === method/);

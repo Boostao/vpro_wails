@@ -34,7 +34,7 @@
   });
   const visible = $derived(unresolved.slice(offset, offset + 25));
   const pending = $derived(session ? Object.values(session.cells).filter(cell => cell.raw !== cell.row.code).length : 0);
-  const personalEnabled = import.meta.env.VITE_PERSONAL_SPECIES_EDITING === 'true';
+  const personalEnabled = import.meta.env.VITE_PERSONAL_SPECIES_EDITING !== 'false';
 
   $effect(() => onbusy(busy));
   onMount(() => { void reload(); });

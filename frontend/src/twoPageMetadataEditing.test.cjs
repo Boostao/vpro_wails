@@ -77,8 +77,9 @@ test('actual complete-entry client requires all literal metadata prerequisites, 
   for (const name of names) for (const value of [undefined, false, 'false', 'TRUE', '1', 'true']) {
     const panel = await mountEntry({ [name]: value, VITE_TWO_PAGE_PARENT_ENTRY_EDITING: 'false' });
     try {
-      assert.equal(panel.actions().canOpenMetadataEditor(), value === 'true', `${name}=${value}`);
-      if (value !== 'true') {
+      const expected = value !== 'false';
+      assert.equal(panel.actions().canOpenMetadataEditor(), expected, `${name}=${value}`);
+      if (!expected) {
         panel.actions().openMetadataEditor(); panel.flush();
         assert.equal(panel.actions().mode, null); assert.match(panel.actions().error, /Resolve/);
       }

@@ -10,17 +10,19 @@
   import { TwoPageParentSession, type TwoPageParentForm, type TwoPageParentColumn,
     type TwoPageParentInput, type TwoPageParentSessionCache } from './twoPageParentSession';
 
-  let { contextId, project, plot, cache, revision, onchange, onbusy, onclosed, oncommitted, embedded: childContent }: {
+  let { contextId, project, plot, cache, revision, onchange, onbusy, onclosed, oncommitted, embedded: childContent, initialForm = 'FS882-8x6XL', onExtendedShrubsChange }: {
     contextId: string; project: string; plot: string;
     cache: TwoPageParentSessionCache; revision: number; onchange: () => void;
     onbusy: (value: boolean) => void; onclosed: () => void;
     oncommitted: () => Promise<void>;
     embedded?: Snippet<[TwoPageEntryChild, PaperControl]>;
+    initialForm?: TwoPageParentForm;
+    onExtendedShrubsChange?: (enabled: boolean) => void;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot }));
-  const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW === 'true';
-  const editingEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_EXTRA_EDITING === 'true';
-  const sourceLayoutEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT === 'true';
+  const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW !== 'false';
+  const editingEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_EXTRA_EDITING !== 'false';
+  const sourceLayoutEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT !== 'false';
   const reads = new ReadRequests();
   const key = JSON.stringify(owner);
   const sessions = untrack(() => {
@@ -28,9 +30,9 @@
     cache.set(key, owned);
     return owned;
   });
-  let form = $state<TwoPageParentForm>('FS882-8x6XL');
+  let form = $state<TwoPageParentForm>(untrack(() => initialForm));
   let error = $state<string | null>(null);
-  let session = $state(makeSession('FS882-8x6XL'));
+  let session = $state(makeSession(untrack(() => initialForm)));
   const view = $derived.by(() => { revision; return session.view(); });
   const close = $derived.by(() => { revision; return session.closeState(); });
 
@@ -71,6 +73,7 @@
     }
     form = next;
     session = makeSession(next);
+    onExtendedShrubsChange?.(next === 'FS882-8x6XL-CHARS');
     onchange(); error = null;
     await operation('load');
   }
@@ -109,6 +112,12 @@
 <section class="space-y-3" aria-label="Two-page source review">
   {#if error}<p role="alert" class="text-sm text-red-700">{error}</p>{/if}
   <div class="flex flex-wrap gap-2">
+    <label class="inline-flex items-center gap-2 rounded border px-2 py-1 text-sm">
+      <input type="checkbox" data-extended-shrubs checked={form === 'FS882-8x6XL-CHARS'}
+        disabled={close.unsaved || close.busy || close.blocked}
+        onchange={event => chooseForm(event.currentTarget.checked ? 'FS882-8x6XL-CHARS' : 'FS882-8x6XL')} />
+      Show extended shrub layers
+    </label>
     <button type="button" disabled={close.unsaved || close.busy || close.blocked}
       aria-pressed={form === 'FS882-8x6XL'} onclick={() => chooseForm('FS882-8x6XL')}>Normal two-page source</button>
     <button type="button" disabled={close.unsaved || close.busy || close.blocked}

@@ -31,14 +31,14 @@ func TestSummaryEnvironmentalNumericIndependentFeature(t *testing.T) {
 				}
 				continue
 			}
-			if err != nil || service.enabled != (base == "true") || service.numericEnabled != (numeric == "true") {
+			if err != nil || service.enabled != (base != "false") || service.numericEnabled != (numeric != "false") {
 				t.Fatal(base, numeric, service, err)
 			}
 			got, err := service.PreviewEnvironmentalNumeric(t.Context(), "owned", 1, 6, 0)
 			if got != nil || err == nil {
 				t.Fatal("unowned numeric request dispatched", base, numeric, got, err)
 			}
-			if numeric != "true" && !strings.Contains(err.Error(), "numeric environmental preview is disabled") {
+			if numeric == "false" && !strings.Contains(err.Error(), "numeric environmental preview is disabled") {
 				t.Fatal("missing independent refusal", err)
 			}
 		}

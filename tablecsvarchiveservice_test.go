@@ -21,7 +21,7 @@ func TestTableCSVArchiveServiceIndependentGateAndAuthorization(t *testing.T) {
 			}
 			return value, value != ""
 		})
-		if enabled != (value == "true") || (err != nil) != (value != "" && value != "true" && value != "false") {
+		if enabled != (value == "" || value == "true") || (err != nil) != (value != "" && value != "true" && value != "false") {
 			t.Fatal("literal flag semantics", value, enabled, err)
 		}
 	}

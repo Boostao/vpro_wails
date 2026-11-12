@@ -115,7 +115,7 @@ func TestSummaryDraftWorkbookServiceGateStrictOptionsAndApproval(t *testing.T) {
 	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
 		service, err := NewSummaryVegetationWorkbookService(nil, func(string) (string, bool) { return flag, flag != "" })
 		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag == "true") {
+			if err != nil || service.enabled != (flag != "false") {
 				t.Fatal("independent literal gate differs", flag, err)
 			}
 			if review, err := service.GetReview(t.Context(), "owned", `{}`); err == nil || review != nil {

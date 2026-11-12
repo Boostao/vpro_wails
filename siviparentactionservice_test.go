@@ -25,7 +25,7 @@ func TestSIVIParentActionEditingFeatureLiteralAndIndependent(t *testing.T) {
 		present bool
 		enabled bool
 		valid   bool
-	}{{"", false, false, true}, {"true", true, true, true}, {"false", true, false, true},
+	}{{"", false, true, true}, {"true", true, true, true}, {"false", true, false, true},
 		{"TRUE", true, false, false}, {" true", true, false, false}, {"1", true, false, false}, {"", true, false, false}} {
 		result, err := siviParentActionEditingFeature(func(name string) (string, bool) {
 			if name != siviParentActionEditingFeatureEnvironment {

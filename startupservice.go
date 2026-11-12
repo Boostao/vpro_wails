@@ -31,12 +31,12 @@ func runStartupRecovery(windows application.WindowsOptions, configDir string, ca
 		log.Fatal(err)
 	}
 	app = application.New(application.Options{
-		Name: "VPRO", Windows: windows, ShouldQuit: closeService.shouldQuit,
+		Name: "VPro", Windows: windows, ShouldQuit: closeService.shouldQuit,
 		Services: []application.Service{application.NewService(startup), application.NewService(closeService)},
 		Assets:   application.AssetOptions{Handler: application.AssetFileServerFS(assets)},
 	})
 	window := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Name: "main", Title: "VPRO", Width: 1000, Height: 720, MinWidth: 560, MinHeight: 520, URL: "/",
+		Name: "main", Title: "VPro", Width: 1000, Height: 720, MinWidth: 560, MinHeight: 520, URL: "/",
 	})
 	window.RegisterHook(events.Common.WindowClosing, closeService.handleWindowClosing)
 	if err := app.Run(); err != nil {

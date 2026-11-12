@@ -464,8 +464,8 @@ func TestSIVIParentSharedIndependentRuntimeGates(t *testing.T) {
 	omitted, err := NewSIVIParentSharedService(service.contexts, func(name string) (string, bool) {
 		return "true", name == siviParentSharedFeatureEnvironment
 	})
-	if err != nil || omitted.referencesEnabled || !omitted.enabled {
-		t.Fatal("omitted reference gate did not preserve default 32", err)
+	if err != nil || !omitted.referencesEnabled || !omitted.enabled {
+		t.Fatal("omitted reference gate did not default-enable", err)
 	}
 	assertProfileSUFiles(t, service.contexts, before)
 }

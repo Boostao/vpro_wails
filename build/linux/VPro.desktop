@@ -1,0 +1,11 @@
+﻿[Desktop Entry]
+Type=Application
+Name=VPro
+Comment=VENUS (Vegetation and Environment NexUS) Professional
+Exec=VPro
+Icon=VPro
+Categories=Science;Education;Utility;
+Terminal=false
+Keywords=vpro;bec;ecology;vegetation;
+Version=1.0
+StartupNotify=false

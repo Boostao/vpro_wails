@@ -11,9 +11,9 @@ const nav = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
 
 test('summary report native route, backend and build gates are independent default-off', () => {
   assert.equal(compile(component, { filename: 'SummaryVegetationReport.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(nav, /name: 'Summary Vegetation'.*VITE_SUMMARY_VEGETATION === 'true' \? 'summary-vegetation' : undefined/);
-  assert.match(app, /view === 'summary-vegetation' && import\.meta\.env\.VITE_SUMMARY_VEGETATION === 'true' && \$projectState/);
-  assert.match(component, /const enabled = import\.meta\.env\.VITE_SUMMARY_VEGETATION === 'true'/);
+  assert.match(nav, /name: 'Summary Vegetation'.*VITE_SUMMARY_VEGETATION !== 'false' \? 'summary-vegetation' : undefined/);
+  assert.match(app, /view === 'summary-vegetation' && import\.meta\.env\.VITE_SUMMARY_VEGETATION !== 'false' && \$projectState/);
+  assert.match(component, /const enabled = import\.meta\.env\.VITE_SUMMARY_VEGETATION !== 'false'/);
   assert.match(component, /\$state\.raw\(session\.view\(\)\)/);
   assert.doesNotMatch(component, /structuredClone|SummaryVegetationService\.Save|ExportReviewed|\.update/);
   assert.match(component, /SummaryVegetationPreferencesService\.SaveSummaryVegetationPreferences/);

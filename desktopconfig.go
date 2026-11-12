@@ -23,6 +23,11 @@ var desktopDefaults []byte
 
 type configValues = map[string]any
 
+const (
+	ReleaseChannelStable       = "stable"
+	ReleaseChannelExperimental = "experimental"
+)
+
 type desktopConfig struct {
 	mu      sync.Mutex
 	path    string
@@ -88,6 +93,12 @@ func configInt(values configValues, section, key string, minimum, maximum int) (
 }
 
 func validateDesktopConfig(values configValues) error {
+	if rawChannel, present := values["release_channel"]; present {
+		channel, ok := rawChannel.(string)
+		if !ok || (channel != ReleaseChannelStable && channel != ReleaseChannelExperimental) {
+			return errors.New(`release_channel must be "stable" or "experimental"`)
+		}
+	}
 	for _, field := range []struct {
 		section, key string
 		min, max     int
@@ -126,11 +137,15 @@ func mergeConfigDefaults(values configValues) error {
 			values[section] = raw
 			continue
 		}
+		defaultMap, isMap := raw.(map[string]any)
+		if !isMap {
+			continue
+		}
 		fields, err := configSection(values, section)
 		if err != nil {
 			return err
 		}
-		for key, value := range raw.(map[string]any) {
+		for key, value := range defaultMap {
 			if _, present := fields[key]; !present {
 				fields[key] = value
 			}
@@ -561,6 +576,22 @@ func (s *desktopConfig) workingUnitMode() (string, error) {
 		return "", err
 	}
 	return []string{"env", "master", "su"}[number-1], nil
+}
+
+func (s *desktopConfig) releaseChannel() (string, error) {
+	values, err := s.snapshot()
+	if err != nil {
+		return "", err
+	}
+	raw, present := values["release_channel"]
+	if !present {
+		return ReleaseChannelStable, nil
+	}
+	channel, ok := raw.(string)
+	if !ok || (channel != ReleaseChannelStable && channel != ReleaseChannelExperimental) {
+		return "", errors.New(`release_channel must be "stable" or "experimental"`)
+	}
+	return channel, nil
 }
 
 func (s *desktopConfig) selection() (desktopSelection, error) {

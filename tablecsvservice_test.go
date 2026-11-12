@@ -18,7 +18,7 @@ func TestTableCSVReviewFeatureRequiresIndependentLiteralOptIn(t *testing.T) {
 		name, value               string
 		present, enabled, invalid bool
 	}{
-		{"unset", "", false, false, false},
+		{"unset", "", false, true, false},
 		{"true", "true", true, true, false},
 		{"false", "false", true, false, false},
 		{"empty", "", true, false, true},
@@ -47,7 +47,7 @@ func TestTableCSVReviewFeatureRequiresIndependentLiteralOptIn(t *testing.T) {
 	}
 	enabled, err := tableCSVReviewFeature(func(name string) (string, bool) {
 		if name == "VPRO_TABLE_CSV_REVIEW" {
-			return "", false
+			return "false", true
 		}
 		return "true", true
 	})

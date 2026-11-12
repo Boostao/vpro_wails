@@ -42,7 +42,7 @@ func TestSummaryVegetationServiceGateAndOwnedZeroWrites(t *testing.T) {
 	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
 		service, err := NewSummaryVegetationService(nil, func(string) (string, bool) { return flag, flag != "" })
 		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag == "true") {
+			if err != nil || service.enabled != (flag != "false") {
 				t.Fatal(flag, service, err)
 			}
 			if _, err := service.Preview(context.Background(), "owned", 1, 6); err == nil {
