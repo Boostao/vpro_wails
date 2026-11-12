@@ -9,8 +9,16 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function AcknowledgeWhatsNew(version: string): $CancellablePromise<$models.WhatsNewStatus> {
+    return $Call.ByID(3151151505, version);
+}
+
 export function GetAboutInfo(): $CancellablePromise<$models.AboutInfo> {
     return $Call.ByID(1509671463);
+}
+
+export function GetHelpBundle(): $CancellablePromise<$models.HelpBundle> {
+    return $Call.ByID(3314425149);
 }
 
 export function GetLibraryStamps(): $CancellablePromise<$models.LibraryStamps> {
@@ -19,4 +27,20 @@ export function GetLibraryStamps(): $CancellablePromise<$models.LibraryStamps> {
 
 export function GetReleaseChannel(): $CancellablePromise<string> {
     return $Call.ByID(1331633842);
+}
+
+export function GetWhatsNewStatus(): $CancellablePromise<$models.WhatsNewStatus> {
+    return $Call.ByID(1548460623);
+}
+
+export function LookupHelpTopic(helpID: string): $CancellablePromise<$models.HelpLookupResult> {
+    return $Call.ByID(2392758638, helpID);
+}
+
+export function ResetWorkspaceToSample(contextID: string): $CancellablePromise<$models.ProjectState> {
+    return $Call.ByID(600594213, contextID);
+}
+
+export function SearchHelp(query: string): $CancellablePromise<$models.HelpSearchHit[] | null> {
+    return $Call.ByID(1184810209, query);
 }

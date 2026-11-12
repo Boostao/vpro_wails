@@ -1106,24 +1106,9 @@ func (s *HelpService) ResetWorkspaceToSample(ctx context.Context, contextID stri
 	projects.Mu.RLock()
 	currentID := projects.ContextID
 	sqliteCtx := projects.Sqlite
-	sampleAttached := false
 	profileUsesSample := false
-	if sqliteCtx != nil {
-		if vprocore.SameDesktopPath(sqliteCtx.Selection.ProjectPath, samplePath) ||
-			vprocore.SameDesktopPath(sqliteCtx.Selection.SUPath, samplePath) ||
-			vprocore.SameDesktopPath(sqliteCtx.Selection.HierarchyPath, samplePath) {
-			sampleAttached = true
-		}
-		for _, attachedPath := range sqliteCtx.Attachments {
-			if vprocore.SameDesktopPath(attachedPath, samplePath) {
-				sampleAttached = true
-				break
-			}
-		}
-		if sqliteCtx.Profile != nil && vprocore.SameDesktopPath(sqliteCtx.Profile.Path, samplePath) {
-			sampleAttached = true
-			profileUsesSample = true
-		}
+	if sqliteCtx != nil && sqliteCtx.Profile != nil && vprocore.SameDesktopPath(sqliteCtx.Profile.Path, samplePath) {
+		profileUsesSample = true
 	}
 	projects.Mu.RUnlock()
 
@@ -1134,42 +1119,53 @@ func (s *HelpService) ResetWorkspaceToSample(ctx context.Context, contextID stri
 		return vprocore.ProjectState{}, err
 	}
 
+	stagingDir, err := os.MkdirTemp(projects.Root, ".sample-reset-staging-*")
+	if err != nil {
+		return vprocore.ProjectState{}, err
+	}
+	cleanupStaging := true
+	defer func() {
+		if cleanupStaging {
+			_ = os.RemoveAll(stagingDir)
+		}
+	}()
+	stagingPath := filepath.Join(stagingDir, "Sample_Staging.db")
+	if err := writePristineSampleFile(stagingPath); err != nil {
+		return vprocore.ProjectState{}, err
+	}
+
 	activeID := contextID
-	stagingPath := filepath.Join(projects.Root, ".sample-reset-staging", "Sample_Staging.db")
-	if sampleAttached {
-		defer removeSampleStagingFiles(stagingPath)
-		if err := writePristineSampleFile(stagingPath); err != nil {
-			return vprocore.ProjectState{}, err
-		}
-		if profileUsesSample {
-			profState, err := s.contexts.SelectPlotProfile(activeID, vprocore.PlotProfileSource{
-				Name: "Sample",
-				Path: stagingPath,
-			})
-			if err != nil {
-				return vprocore.ProjectState{}, err
-			}
-			activeID = profState.ContextID
-		}
-		stagedState, err := s.contexts.SwitchContext(activeID, vprocore.ContextSelection{
-			Project:       "Sample",
-			ProjectPath:   stagingPath,
-			SU:            "Sample",
-			SUPath:        stagingPath,
-			Hierarchy:     "Sample",
-			HierarchyPath: stagingPath,
+	if profileUsesSample {
+		profState, err := s.contexts.SelectPlotProfile(activeID, vprocore.PlotProfileSource{
+			Name: "Sample",
+			Path: stagingPath,
 		})
 		if err != nil {
 			return vprocore.ProjectState{}, err
 		}
-		activeID = stagedState.ContextID
+		activeID = profState.ContextID
 	}
+
+	// Atomically verify activeID under projects.Mu.Lock and detach Sample.db before overwriting it.
+	stagedState, err := s.contexts.SwitchContext(activeID, vprocore.ContextSelection{
+		Project:       "Sample",
+		ProjectPath:   stagingPath,
+		SU:            "Sample",
+		SUPath:        stagingPath,
+		Hierarchy:     "Sample",
+		HierarchyPath: stagingPath,
+	})
+	if err != nil {
+		return vprocore.ProjectState{}, err
+	}
+	// Preserve stagingDir if final replacement/switch fails so the active staged context is never stranded.
+	cleanupStaging = false
 
 	if err := writePristineSampleFile(samplePath); err != nil {
 		return vprocore.ProjectState{}, err
 	}
 
-	finalState, err := s.contexts.SwitchContext(activeID, vprocore.ContextSelection{
+	finalState, err := s.contexts.SwitchContext(stagedState.ContextID, vprocore.ContextSelection{
 		Project:       "Sample",
 		ProjectPath:   samplePath,
 		SU:            "Sample",
@@ -1190,6 +1186,8 @@ func (s *HelpService) ResetWorkspaceToSample(ctx context.Context, contextID stri
 			return vprocore.ProjectState{}, err
 		}
 	}
+	removeSampleStagingFiles(stagingPath)
+	_ = os.RemoveAll(stagingDir)
 
 	return finalState, nil
 }

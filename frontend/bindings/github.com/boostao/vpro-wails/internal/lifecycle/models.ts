@@ -15,6 +15,126 @@ export interface AboutInfo {
     "libraryStamps": LibraryStamps;
 }
 
+export interface HelpBundle {
+    "schemaVersion": number;
+    "productName": string;
+    "fullName": string;
+    "organization": string;
+    "lmh25Edition": string;
+    "libraryStamps": LibraryStamps;
+    "fields": HelpFieldTopic[] | null;
+    "decisionKeys": HelpDecisionKey[] | null;
+    "guides": HelpGuide[] | null;
+    "tours": HelpTour[] | null;
+    "shortcuts": HelpShortcut[] | null;
+    "whatsNew": HelpWhatsNewEntry[] | null;
+    "dataUseAgreement": HelpDataUseAgreement;
+}
+
+export interface HelpCodeOption {
+    "code": string;
+    "label": string;
+}
+
+export interface HelpDataUseAgreement {
+    "title": string;
+    "authority": string;
+    "sourceUrl": string;
+    "citation": string;
+    "clauses": string[] | null;
+}
+
+export interface HelpDecisionKey {
+    "id": string;
+    "code": string;
+    "title": string;
+    "lmh25Page": number;
+    "steps": HelpDecisionStep[] | null;
+}
+
+export interface HelpDecisionStep {
+    "step": number;
+    "prompt": string;
+    "yes"?: string;
+    "no"?: string;
+}
+
+export interface HelpFieldTopic {
+    "id": string;
+    "code": string;
+    "section": string;
+    "title": string;
+    "column": string;
+    "unit": string;
+    "lmh25Page": number;
+    "keyRef"?: string;
+    "summary": string;
+    "rules": string[] | null;
+    "codes": HelpCodeOption[] | null;
+}
+
+export interface HelpGuide {
+    "id": string;
+    "slug": string;
+    "category": string;
+    "title": string;
+    "summary": string;
+    "sections": HelpGuideSection[] | null;
+}
+
+export interface HelpGuideSection {
+    "heading": string;
+    "body": string;
+}
+
+export interface HelpLookupResult {
+    "requestedId": string;
+    "resolvedId": string;
+    "matchKind": string;
+    "field"?: HelpFieldTopic | null;
+    "decisionKey"?: HelpDecisionKey | null;
+    "relatedGuides": HelpGuide[] | null;
+}
+
+export interface HelpSearchHit {
+    "kind": string;
+    "id": string;
+    "code"?: string;
+    "title": string;
+    "section"?: string;
+    "snippet": string;
+    "lmh25Page"?: number;
+    "score": number;
+}
+
+export interface HelpShortcut {
+    "keys": string;
+    "scope": string;
+    "action": string;
+}
+
+export interface HelpTour {
+    "id": string;
+    "title": string;
+    "duration": string;
+    "description": string;
+    "steps": HelpTourStep[] | null;
+}
+
+export interface HelpTourStep {
+    "target": string;
+    "view": string;
+    "title": string;
+    "body": string;
+}
+
+export interface HelpWhatsNewEntry {
+    "version": string;
+    "date": string;
+    "channel": string;
+    "highlights": string[] | null;
+}
+
 export interface LibraryStamps {
     "schemaVersion": number;
     "generator": string;
@@ -59,4 +179,12 @@ export interface UserLogReview {
     "limit": number;
     "total": number;
     "table": vprocore$0.ProjectMetadataTable;
+}
+
+export interface WhatsNewStatus {
+    "latestVersion": string;
+    "lastSeenVersion": string;
+    "hasUnread": boolean;
+    "unreadCount": number;
+    "entries": HelpWhatsNewEntry[] | null;
 }

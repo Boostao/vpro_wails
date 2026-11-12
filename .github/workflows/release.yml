@@ -222,6 +222,8 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      pages: write
+      id-token: write
     env:
       RELEASE_VERSION: ${{ needs.validate.outputs.version }}
       RELEASE_TAG: ${{ needs.validate.outputs.tag }}
@@ -250,7 +252,7 @@ jobs:
           mapfile -t assets < release-assets.txt
           flags=()
           if [ "$RELEASE_DRAFT" = "true" ]; then flags+=(--draft); fi
-          if [ "$RELEASE_PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
+          if [ "$RELEASE_PRERELEASE" = "true" ] || [[ "${RELEASE_VERSION%%+*}" == *-* ]]; then flags+=(--prerelease); fi
           gh release create "$RELEASE_TAG" "${assets[@]}" release-assets/release-manifest.json --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "VPro $RELEASE_TAG" --notes "Windows amd64/arm64 EXE, ZIP and NSIS; macOS universal DMG and ZIP; Linux amd64/arm64 AppImage, deb and tar. Verify downloads against SHA256SUMS.txt and release-manifest.json. macOS VPro.app is ad-hoc signed, not notarized." "${flags[@]}"
       - name: Verify remotely attached names and bytes
         run: |
@@ -259,3 +261,22 @@ jobs:
           python scripts/release.py remote release-remote.json --require-release-manifest
           gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir release-downloaded
           python scripts/release.py verify release-downloaded --manifest release-assets/SHA256SUMS.txt --release-manifest release-assets/release-manifest.json
+      - uses: actions/setup-node@v4
+        if: inputs.draft != true
+        with:
+          node-version: '22'
+      - name: Build Pages portal with verified release-manifest.json
+        if: inputs.draft != true
+        run: |
+          set -euo pipefail
+          cp release-assets/release-manifest.json site/release-manifest.json
+          node scripts/build-docs-src.mjs
+          node site/build.mjs
+      - name: Upload Pages artifact
+        if: inputs.draft != true
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'site/dist'
+      - name: Deploy updated release portal to GitHub Pages
+        if: inputs.draft != true
+        uses: actions/deploy-pages@v4

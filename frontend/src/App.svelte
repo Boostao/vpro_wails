@@ -1219,6 +1219,8 @@
   }
 
   async function confirmResetWorkspaceToSample() {
+    resetSampleConfirmOpen = false;
+    const ownedDiscardOnSample = $projectState?.activeProject === 'Sample' ? () => !editorBusy : undefined;
     await requestTransition(async (contextId) => {
       busy = true;
       error = '';
@@ -1251,7 +1253,7 @@
       } finally {
         busy = false;
       }
-    });
+    }, ownedDiscardOnSample);
   }
 
   onMount(() => {
@@ -2105,7 +2107,7 @@
         activeProject={$projectState?.activeProject ?? 'Sample'}
         onensurecontextopen={() => { contextExpanded = true; }}
         onnavigateview={(nextView) => { navigate(nextView as typeof view); }}
-        onresetsample={async () => { await confirmResetWorkspaceToSample(); }}
+        onresetsample={async () => { tourOpen = false; resetSampleConfirmOpen = true; }}
         onclose={() => { tourOpen = false; tourInitialId = null; }}
       />
     {/await}

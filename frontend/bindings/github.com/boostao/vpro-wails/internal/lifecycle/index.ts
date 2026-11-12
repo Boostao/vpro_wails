@@ -3,9 +3,24 @@
 
 export type {
     AboutInfo,
+    HelpBundle,
+    HelpCodeOption,
+    HelpDataUseAgreement,
+    HelpDecisionKey,
+    HelpDecisionStep,
+    HelpFieldTopic,
+    HelpGuide,
+    HelpGuideSection,
+    HelpLookupResult,
+    HelpSearchHit,
+    HelpShortcut,
+    HelpTour,
+    HelpTourStep,
+    HelpWhatsNewEntry,
     LibraryStamps,
     StandardsArtifactStamp,
     StandardsSourceStamp,
     StartupState,
-    UserLogReview
+    UserLogReview,
+    WhatsNewStatus
 } from "./models.js";

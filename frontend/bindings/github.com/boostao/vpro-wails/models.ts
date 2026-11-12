@@ -216,6 +216,34 @@ export type GoogleEarthReviewRow = spatial$0.GoogleEarthReviewRow;
 
 export type HeightRecordUpdate = vprocore$0.HeightRecordUpdate;
 
+export type HelpBundle = lifecycle$0.HelpBundle;
+
+export type HelpCodeOption = lifecycle$0.HelpCodeOption;
+
+export type HelpDataUseAgreement = lifecycle$0.HelpDataUseAgreement;
+
+export type HelpDecisionKey = lifecycle$0.HelpDecisionKey;
+
+export type HelpDecisionStep = lifecycle$0.HelpDecisionStep;
+
+export type HelpFieldTopic = lifecycle$0.HelpFieldTopic;
+
+export type HelpGuide = lifecycle$0.HelpGuide;
+
+export type HelpGuideSection = lifecycle$0.HelpGuideSection;
+
+export type HelpLookupResult = lifecycle$0.HelpLookupResult;
+
+export type HelpSearchHit = lifecycle$0.HelpSearchHit;
+
+export type HelpShortcut = lifecycle$0.HelpShortcut;
+
+export type HelpTour = lifecycle$0.HelpTour;
+
+export type HelpTourStep = lifecycle$0.HelpTourStep;
+
+export type HelpWhatsNewEntry = lifecycle$0.HelpWhatsNewEntry;
+
 export type HierarchyAddNodeRequest = classification$0.HierarchyAddNodeRequest;
 
 export type HierarchyBreakpointRequest = vegreport$0.HierarchyBreakpointRequest;
@@ -953,6 +981,8 @@ export type VegetationWorkbookSheet = reportcore$0.VegetationWorkbookSheet;
 export type VegetationWorkbookSkippedUnit = vegreport$0.VegetationWorkbookSkippedUnit;
 
 export type VegetationWorkbookSummary = vegreport$0.VegetationWorkbookSummary;
+
+export type WhatsNewStatus = lifecycle$0.WhatsNewStatus;
 
 export type WorkingUnitChoice = vprocore$0.WorkingUnitChoice;
 

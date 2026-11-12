@@ -27,6 +27,18 @@ declare module "@wailsio/runtime" {
             "vpro:model:ExternalSQLiteFileInspection": main$0.ExternalSQLiteFileInspection;
             "vpro:model:GoogleEarthPreferenceValues": main$0.GoogleEarthPreferenceValues;
             "vpro:model:GoogleEarthReviewRow": main$0.GoogleEarthReviewRow;
+            "vpro:model:HelpCodeOption": main$0.HelpCodeOption;
+            "vpro:model:HelpDataUseAgreement": main$0.HelpDataUseAgreement;
+            "vpro:model:HelpDecisionKey": main$0.HelpDecisionKey;
+            "vpro:model:HelpDecisionStep": main$0.HelpDecisionStep;
+            "vpro:model:HelpFieldTopic": main$0.HelpFieldTopic;
+            "vpro:model:HelpGuide": main$0.HelpGuide;
+            "vpro:model:HelpGuideSection": main$0.HelpGuideSection;
+            "vpro:model:HelpSearchHit": main$0.HelpSearchHit;
+            "vpro:model:HelpShortcut": main$0.HelpShortcut;
+            "vpro:model:HelpTour": main$0.HelpTour;
+            "vpro:model:HelpTourStep": main$0.HelpTourStep;
+            "vpro:model:HelpWhatsNewEntry": main$0.HelpWhatsNewEntry;
             "vpro:model:HierarchyInfo": main$0.HierarchyInfo;
             "vpro:model:LifeformSummaryCatalogueRow": main$0.LifeformSummaryCatalogueRow;
             "vpro:model:LifeformSummaryEntry": main$0.LifeformSummaryEntry;
