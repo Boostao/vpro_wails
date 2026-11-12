@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { TwoPageEnvironmentTableService } from '../bindings/github.com/boostao/vpro-wails';
+  import { DatasheetService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { twoPageEnvironmentTableFromWire, twoPageEnvironmentCellLabel, twoPageEnvironmentGroups,
     type TwoPageEnvironmentOwner, type TwoPageEnvironmentView } from './twoPageEnvironmentTable';
@@ -25,7 +25,7 @@
     cancel(); const request = generation;
     review = null; error = ''; disclosed = ''; busy = true; onBusyChange(true);
     try {
-      const value = await reads.track(TwoPageEnvironmentTableService.GetReview(owner.contextId, owner.plot, offset, pageSize));
+      const value = await reads.track(DatasheetService.GetEnvironmentTableReview(owner.contextId, owner.plot, offset, pageSize));
       if (request !== generation) return;
       const validated = twoPageEnvironmentTableFromWire(value, owner, offset, pageSize);
       if (request !== generation) return;

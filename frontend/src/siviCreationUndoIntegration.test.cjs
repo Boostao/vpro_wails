@@ -32,7 +32,8 @@ test('actual main and root independently gate historical creation Undo without g
   const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
   assert.ok(main.indexOf('siviCreationUndoFeatureEnvironment') < main.indexOf('userDataDir()'));
   assert.match(main, /NewSIVICreationUndoService\(contextService, os.LookupEnv\)/);
-  assert.match(main, /application.NewService\(siviCreationUndo\)/);
+  assert.match(main, /siviCreationUndo:\s*siviCreationUndo/);
+  assert.match(main, /application\.NewService\(plotEntryService\)/);
   assert.match(root, /VITE_SIVI_CREATION_UNDO !== 'false'/);
   assert.match(root, /ownedSIVICreationUndoSession\(\{ contextId: siviContextId, project: \$projectState.activeProject, plot: original.plotNumber \}\)/);
   assert.match(root, /siviCreationUndoSession\?\.subscribe\(\(\) => untrack\(\(\) => siviCreationUndoRevision\+\+\)\)/);

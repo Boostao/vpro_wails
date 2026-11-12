@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
-  import { ParentCodeService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import { CatalogueLookup } from './catalogueLookup';
   import type { PaperControl } from './paperLayout';
   import FieldGuidance from './FieldGuidance.svelte';
@@ -13,8 +13,8 @@
   } = $props();
   const editingEnabled = import.meta.env.VITE_SOIL_DRAINAGE_EDITING !== 'false';
   const lookup = new CatalogueLookup(async (force, requests) => {
-    if (force) await requests.track(ParentCodeService.ReloadCatalogue());
-    const rows = await requests.track(ParentCodeService.ListChoices('SoilDrainage'));
+    if (force) await requests.track(PlotEntryService.ReloadParentCodeCatalogue());
+    const rows = await requests.track(PlotEntryService.ListParentCodeChoices('SoilDrainage'));
     if (rows === null) throw new Error('Soil drainage service did not return reference rows.');
     return rows;
   }, next => { view = next; }, 'Soil drainage');

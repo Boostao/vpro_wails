@@ -80,7 +80,7 @@ function driver(getReview) {
   const values = {
     generation: 0, reads: new ReadRequests(), mode: 2, busy: false, error: '', review: null,
     contextId: 'owned-context', limit: 50, operationHeld: false,
-    onBusyChange: value => activity.push(value), UserLogService: { GetReview: getReview },
+    onBusyChange: value => activity.push(value), LifecycleService: { GetUserLogReview: getReview },
     userLogFromWire: log.userLogFromWire,
   };
   const context = componentFunctions('UserLogReview.svelte', ['cancel', 'changeMode', 'show'], values);
@@ -153,8 +153,8 @@ async function renderComponent(source, props, populated = false) {
     source = source.replace(marker, `let review = $state.raw<UserLogView | null>(${JSON.stringify(fixture().all)});`);
   }
   let code = compile(source, { filename: 'UserLogReview.svelte', generate: 'server' }).js.code;
-  code = code.replace(/import\s*\{\s*UserLogService\s*\}\s*from\s*['"][^'"]+['"];?/,
-    'const UserLogService = {GetReview(){throw new Error("SSR must not invoke reads")}};');
+  code = code.replace(/import\s*\{\s*LifecycleService\s*\}\s*from\s*['"][^'"]+['"];?/,
+    'const LifecycleService = {GetUserLogReview(){throw new Error("SSR must not invoke reads")}};');
   code = code.replace(/import\s*\{\s*ReadRequests\s*\}\s*from\s*['"][^'"]+['"];?/,
     'class ReadRequests {cancelAll(){}}');
   code = code.replace(/import\s*\{[^}]*userLogFromWire[^}]*\}\s*from\s*['"][^'"]+['"];?/,

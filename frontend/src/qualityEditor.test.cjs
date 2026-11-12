@@ -142,15 +142,15 @@ test('explicit catalogue Retry forces verification while normal refresh remains 
   assert.deepEqual(calls, [false, true]);
   assert.equal(lookup.snapshot().ready, true);
   for (const [file, service] of [
-    ['ParentCodeFields.svelte', 'ParentCodeService'],
-    ['GeologyCodeFields.svelte', 'GeologyCodeService'],
-    ['SoilCodeFields.svelte', 'SoilCodeService'],
-    ['SiteCodeFields.svelte', 'SiteCodeService'],
-    ['RegionCodeFields.svelte', 'RegionCodeService'],
-    ['SoilCodeReference.svelte', 'SoilCodeService']
+    ['ParentCodeFields.svelte', 'ReloadParentCodeCatalogue'],
+    ['GeologyCodeFields.svelte', 'ReloadGeologyCodeCatalogue'],
+    ['SoilCodeFields.svelte', 'ReloadSoilCodeCatalogue'],
+    ['SiteCodeFields.svelte', 'ReloadSiteCodeCatalogue'],
+    ['RegionCodeFields.svelte', 'ReloadRegionCodeCatalogue'],
+    ['SoilCodeReference.svelte', 'ReloadSoilCodeCatalogue']
   ]) {
     const source = readFileSync(path.join(__dirname, file), 'utf8');
-    assert.match(source, new RegExp(`if \\(force\\) await requests\\.track\\(${service}\\.ReloadCatalogue\\(\\)\\)`));
+    assert.match(source, new RegExp(`if \\(force\\) await requests\\.track\\(PlotEntryService\\.${service}\\(\\)\\)`));
     assert.match(source, /refresh\(true\)/);
     assert.equal(compile(source, { filename: file, generate: 'client' }).warnings.length, 0);
   }

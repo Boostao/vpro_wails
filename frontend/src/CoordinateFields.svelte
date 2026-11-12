@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, untrack, type Snippet } from 'svelte';
-  import { CoordinateService, CoordinateMode, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
+  import { SpatialService, CoordinateMode, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
   import { CoordinateEditor, coordinateSession, rememberCoordinateSession, coordinateBusy, coordinateControls, coordinateOptions,
     type CoordinateDisplayMode, type CoordinateAxis } from './coordinateEditor';
@@ -26,10 +26,10 @@
   const busyOwner = {};
   const reportBusy = untrack(() => onbusy);
   const editor = new CoordinateEditor({
-    getMode: () => CoordinateService.GetCoordinateMode(),
-    setMode: value => CoordinateService.SetCoordinateMode(serviceModes[value]),
-    decompose: (value, valueMode) => CoordinateService.DecomposeCoordinate(value, serviceModes[valueMode]),
-    convert: (axis, valueMode, parts) => CoordinateService.ConvertCoordinate(axis, serviceModes[valueMode], parts)
+    getMode: () => SpatialService.GetCoordinateMode(),
+    setMode: value => SpatialService.SetCoordinateMode(serviceModes[value]),
+    decompose: (value, valueMode) => SpatialService.DecomposeCoordinate(value, serviceModes[valueMode]),
+    convert: (axis, valueMode, parts) => SpatialService.ConvertCoordinate(axis, serviceModes[valueMode], parts)
   }, {
     state: next => { view = next; mode = next.mode; rememberCoordinateSession(identity, next); },
     busy: value => reportBusy?.(coordinateBusy(busyIdentity, busyOwner, value)),

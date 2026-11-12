@@ -81,8 +81,8 @@ function owned(source = complete(), port = {}) {
   });
 }
 const dependencies = session => ({
-  '../bindings/github.com/boostao/vpro-wails': { TwoPageSoilService: {
-    GetReferences() { throw new Error('Unexpected source reference read'); },
+  '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {
+    GetTwoPageSoilReferences() { throw new Error('Unexpected source reference read'); },
   } },
   './twoPageSoilReferences': soilReferences,
   './SoilReferenceChoices.svelte': { default: sourceChoices },
@@ -174,14 +174,14 @@ async function mountScript(client, session, parent = false, dom = {}) {
   const mount = new Function('$', 'tick', 'untrack', 'twoPageSoilSession', 'twoPageSoilWritingEnabled',
     'twoPageSoilKind', 'metadataCellText', 'equalCell', 'soilFields', 'twoPageSoilGroups', 'twoPageSoilCell',
     'twoPageSoilStoredText', 'twoPageSoilRowDiagnostic', 'twoPageSoilDepthOrder', 'enterNavigationMode',
-    'document', 'HTMLInputElement', 'HTMLTextAreaElement', 'crypto', 'SoilReferenceLookup', 'TwoPageSoilService',
+    'document', 'HTMLInputElement', 'HTMLTextAreaElement', 'crypto', 'SoilReferenceLookup', 'PlotEntryService',
     code + '\nreturn _unknown_;')(
     client, async () => client.flush(), client.untrack, () => session, true, editor.twoPageSoilKind,
     metadata.metadataCellText, metadata.equalCell, soil.soilFields, presentation.twoPageSoilGroups, presentation.twoPageSoilCell,
     presentation.twoPageSoilStoredText, presentation.twoPageSoilRowDiagnostic, presentation.twoPageSoilDepthOrder,
     navigation.enterNavigationMode, dom.document, dom.HTMLInputElement, dom.HTMLTextAreaElement,
     { randomUUID: () => fixture.request.requestId }, soilReferences.SoilReferenceLookup, {
-      GetReferences: (...args) => {
+      GetTwoPageSoilReferences: (...args) => {
         if (!dom.referenceRead) throw new Error('Unexpected source reference read');
         return dom.referenceRead(...args);
       },
@@ -448,7 +448,7 @@ test('actual root close, context transition and background reads remain blocked 
     request: 0, stateRequest: 0, hierarchyRequest: 0, $projectState: { contextId: fixture.owner.contextId },
     document: { activeElement: null }, HTMLElement: class {},
     closeDisposition: loadTypeScript('closeLifecycle.ts').closeDisposition, tick: async () => {},
-    CloseService: { CancelClose: id => { cancelled.push(id); }, GetPendingCloseRequest: () => operation('soil-close') },
+    LifecycleService: { CancelClose: id => { cancelled.push(id); }, GetPendingCloseRequest: () => operation('soil-close') },
   });
   const expression = read('App.svelte').match(/const editorBusy = \$derived\(([^;]+)\);/)[1];
   const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', 'summaryPreferenceBusy', 'summaryFieldListBusy', 'summaryEnvironmentalBusy', 'projectReportBusy', 'externalSUEnvironmentBusy', 'matrixPublicationBusy', `return ${expression}`);

@@ -9,9 +9,10 @@ import (
 )
 
 type StartupState struct {
-	Ready      bool   `json:"ready"`
-	Message    string `json:"message"`
-	ConfigPath string `json:"configPath"`
+	Ready          bool   `json:"ready"`
+	Message        string `json:"message"`
+	ConfigPath     string `json:"configPath"`
+	ReleaseChannel string `json:"releaseChannel"`
 }
 
 type StartupService struct {
@@ -24,15 +25,20 @@ func (s *StartupService) GetState() StartupState {
 
 func runStartupRecovery(windows application.WindowsOptions, configDir string, cause error) {
 	log.Printf("Saved context remains unavailable: %v", cause)
-	startup := &StartupService{state: StartupState{Message: cause.Error(), ConfigPath: filepath.Join(configDir, "config.yml")}}
+	startup := &StartupService{state: StartupState{
+		Message:        cause.Error(),
+		ConfigPath:     filepath.Join(configDir, "config.yml"),
+		ReleaseChannel: ReleaseChannelStable,
+	}}
 	var app *application.App
 	closeService, err := NewCloseService(func(nonce string) bool { return app.Event.Emit(closeRequestEvent, nonce) }, func() { app.Quit() })
 	if err != nil {
 		log.Fatal(err)
 	}
+	lifecycleService := NewLifecycleService(startup, closeService, nil)
 	app = application.New(application.Options{
 		Name: "VPro", Windows: windows, ShouldQuit: closeService.shouldQuit,
-		Services: []application.Service{application.NewService(startup), application.NewService(closeService)},
+		Services: []application.Service{application.NewService(lifecycleService)},
 		Assets:   application.AssetOptions{Handler: application.AssetFileServerFS(assets)},
 	})
 	window := app.Window.NewWithOptions(application.WebviewWindowOptions{

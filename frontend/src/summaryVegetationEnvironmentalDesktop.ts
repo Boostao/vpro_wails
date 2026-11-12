@@ -1,4 +1,4 @@
-import { SummaryVegetationEnvironmentalService, SummaryVegetationEnvironmentalLifeformService } from '../bindings/github.com/boostao/vpro-wails';
+import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
 import { summaryEnvironmentalRegistry, summaryEnvironmentalNumericRegistry, summaryEnvironmentalLifeformRegistry, type SummaryEnvironmentalPort } from './summaryVegetationEnvironmental';
 
 export const summaryEnvironmentalEnabled = import.meta.env.VITE_SUMMARY_VEGETATION !== 'false' &&
@@ -12,8 +12,8 @@ export const summaryEnvironmentalDesktop = summaryEnvironmentalLifeformEnabled ?
   summaryEnvironmentalNumericRegistry(true) : summaryEnvironmentalRegistry(summaryEnvironmentalEnabled);
 export const summaryEnvironmentalPort: SummaryEnvironmentalPort = {
   preview: contextId => summaryEnvironmentalLifeformEnabled ?
-    SummaryVegetationEnvironmentalLifeformService.PreviewEnvironmentalLifeform(contextId, 1, 6, 0) : summaryEnvironmentalNumericEnabled ?
-    SummaryVegetationEnvironmentalService.PreviewEnvironmentalNumeric(contextId, 1, 6, 0) :
-    SummaryVegetationEnvironmentalService.PreviewEnvironmental(contextId, 1, 6, 0),
+    VegetationReportService.PreviewSummaryVegetationEnvironmentalLifeform(contextId, 1, 6, 0) : summaryEnvironmentalNumericEnabled ?
+    VegetationReportService.PreviewSummaryVegetationEnvironmentalNumeric(contextId, 1, 6, 0) :
+    VegetationReportService.PreviewSummaryVegetationEnvironmental(contextId, 1, 6, 0),
   validationYield: () => new Promise<void>(resolve => setTimeout(resolve, 0)),
 };

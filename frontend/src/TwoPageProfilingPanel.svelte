@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { TwoPageProfilingService } from '../bindings/github.com/boostao/vpro-wails';
+  import { ClassificationService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { twoPageProfilingFromWire, twoPageProfilingCellLabel, twoPageProfilingRowFields,
     type TwoPageProfilingOwner, type TwoPageProfilingView } from './twoPageProfiling';
@@ -27,7 +27,7 @@
     cancel(); const request = generation;
     review = null; error = ''; disclosed = ''; originalsOpen = false; descriptionOffset = 0; busy = true; onBusyChange(true);
     try {
-      const value = await reads.track(TwoPageProfilingService.GetReview(owner.contextId, owner.plot, offset, pageSize));
+      const value = await reads.track(ClassificationService.GetTwoPageProfilingReview(owner.contextId, owner.plot, offset, pageSize));
       if (request !== generation) return;
       const validated = await twoPageProfilingFromWire(value, owner, offset, pageSize, async () => {
         await new Promise<void>(resolve => setTimeout(resolve, 0));

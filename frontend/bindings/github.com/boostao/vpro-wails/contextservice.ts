@@ -89,6 +89,10 @@ export function GetHeaderCapabilities(contextID: string): $CancellablePromise<{ 
     return $Call.ByID(849894441, contextID);
 }
 
+export function GetHierarchyNodes(): $CancellablePromise<$models.HierarchyNode[] | null> {
+    return $Call.ByID(2285666570);
+}
+
 export function GetLongEnvironmentOptions(contextID: string): $CancellablePromise<$models.LongEnvironmentOptions> {
     return $Call.ByID(3203512685, contextID);
 }
@@ -141,6 +145,10 @@ export function GetSiteUnitSummaryOptions(contextID: string): $CancellablePromis
     return $Call.ByID(1799826469, contextID);
 }
 
+export function GetState(): $CancellablePromise<$models.ProjectState> {
+    return $Call.ByID(1033432855);
+}
+
 export function GetVegetationReadAvailability(contextID: string, plot: string): $CancellablePromise<$models.VegetationReadAvailability | null> {
     return $Call.ByID(2293660121, contextID, plot);
 }
@@ -179,6 +187,10 @@ export function ListOtherRecords(contextID: string, plot: string): $CancellableP
 
 export function ListPlotProfileSources(contextID: string, path: string): $CancellablePromise<$models.PlotProfileSourceInfo[] | null> {
     return $Call.ByID(4245035728, contextID, path);
+}
+
+export function ListPlots(offset: number, limit: number): $CancellablePromise<$models.PlotPage> {
+    return $Call.ByID(3378718882, offset, limit);
 }
 
 export function ListProjectMetadataFields(contextID: string): $CancellablePromise<$models.ProjectMetadataEditorField[] | null> {
@@ -381,8 +393,20 @@ export function SaveVegRecord(contextID: string, record: $models.VegRecord): $Ca
     return $Call.ByID(2006819882, contextID, record);
 }
 
+export function SelectHierarchy(name: string, file: string): $CancellablePromise<$models.ProjectState> {
+    return $Call.ByID(3372616705, name, file);
+}
+
 export function SelectPlotProfile(expectedID: string, requested: $models.PlotProfileSource): $CancellablePromise<$models.ProjectState> {
     return $Call.ByID(641014026, expectedID, requested);
+}
+
+export function SelectProject(name: string): $CancellablePromise<$models.ProjectState> {
+    return $Call.ByID(428391407, name);
+}
+
+export function SelectSU(name: string): $CancellablePromise<$models.ProjectState> {
+    return $Call.ByID(2230292438, name);
 }
 
 export function SetAuditRestoreSelection(contextID: string, plot: string, rowIDs: string[] | null): $CancellablePromise<void> {

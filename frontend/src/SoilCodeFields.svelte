@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
-  import { SoilCodeService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
   import FieldGuidance from './FieldGuidance.svelte';
   import type { PlotQualityChoice } from './qualityEditor';
@@ -18,14 +18,14 @@
   } = $props();
   const editingEnabled = import.meta.env.VITE_SOIL_CODES_EDITING !== 'false';
   const groupLookup = new CatalogueLookup(async (force, requests) => {
-    if (force) await requests.track(SoilCodeService.ReloadCatalogue());
-    const rows = await requests.track(SoilCodeService.ListGreatGroupChoices());
+    if (force) await requests.track(PlotEntryService.ReloadSoilCodeCatalogue());
+    const rows = await requests.track(PlotEntryService.ListGreatGroupChoices());
     if (rows === null) throw new Error('Soil great-group service did not return reference rows.');
     return rows;
   }, next => { group = next; }, 'Soil great group');
   const subgroupLookup = new CatalogueLookup(async (force, requests) => {
-    if (force) await requests.track(SoilCodeService.ReloadCatalogue());
-    const rows = await requests.track(SoilCodeService.ListSubgroupChoices());
+    if (force) await requests.track(PlotEntryService.ReloadSoilCodeCatalogue());
+    const rows = await requests.track(PlotEntryService.ListSubgroupChoices());
     if (rows === null) throw new Error('Soil subgroup service did not return reference rows.');
     return rows;
   }, next => { subgroup = next; }, 'Soil subgroup');

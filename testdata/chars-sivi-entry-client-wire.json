@@ -7292,14 +7292,14 @@
         {
           "rowId": "",
           "code": "ESSF",
-          "description": "Engelmann Spruce -- Subalpine Fir",
+          "description": "Engelmann Spruce – Subalpine Fir",
           "selectable": true,
           "diagnostic": ""
         },
         {
           "rowId": "",
           "code": "ICH",
-          "description": "Interior Cedar -- Hemlock",
+          "description": "Interior Cedar – Hemlock",
           "selectable": true,
           "diagnostic": ""
         },
@@ -7341,7 +7341,7 @@
         {
           "rowId": "",
           "code": "SBPS",
-          "description": "Sub-Boreal Pine -- Spruce",
+          "description": "Sub-Boreal Pine – Spruce",
           "selectable": true,
           "diagnostic": ""
         },
@@ -7355,7 +7355,7 @@
         {
           "rowId": "",
           "code": "SWB",
-          "description": "Spruce -- Willow -- Birch",
+          "description": "Spruce – Willow – Birch",
           "selectable": true,
           "diagnostic": ""
         }
@@ -14567,6 +14567,81 @@
                 "storage": "real",
                 "text": null,
                 "integer": null,
+                "real": 3.5,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "CO",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Cold aspect",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Exposure",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "2",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "5",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "Exposure",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
                 "real": 4,
                 "blobHex": null
               },
@@ -14622,7 +14697,7 @@
             ]
           },
           {
-            "rowId": "5",
+            "rowId": "6",
             "cells": [
               {
                 "storage": "text",
@@ -14697,7 +14772,7 @@
             ]
           },
           {
-            "rowId": "6",
+            "rowId": "7",
             "cells": [
               {
                 "storage": "text",
@@ -14772,7 +14847,7 @@
             ]
           },
           {
-            "rowId": "7",
+            "rowId": "8",
             "cells": [
               {
                 "storage": "text",
@@ -14847,7 +14922,7 @@
             ]
           },
           {
-            "rowId": "8",
+            "rowId": "9",
             "cells": [
               {
                 "storage": "text",
@@ -14922,7 +14997,7 @@
             ]
           },
           {
-            "rowId": "9",
+            "rowId": "10",
             "cells": [
               {
                 "storage": "text",
@@ -14997,7 +15072,7 @@
             ]
           },
           {
-            "rowId": "10",
+            "rowId": "11",
             "cells": [
               {
                 "storage": "text",
@@ -15072,7 +15147,7 @@
             ]
           },
           {
-            "rowId": "11",
+            "rowId": "12",
             "cells": [
               {
                 "storage": "text",
@@ -15147,7 +15222,7 @@
             ]
           },
           {
-            "rowId": "12",
+            "rowId": "13",
             "cells": [
               {
                 "storage": "text",
@@ -15247,62 +15322,69 @@
         },
         {
           "rowId": "4",
+          "code": "CO",
+          "description": "Cold aspect",
+          "selectable": true,
+          "diagnostic": ""
+        },
+        {
+          "rowId": "5",
           "code": "FR",
           "description": "Frost",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "5",
+          "rowId": "6",
           "code": "IN",
           "description": "Insolation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "6",
+          "rowId": "7",
           "code": "NA",
           "description": "Not Applicable",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "7",
+          "rowId": "8",
           "code": "RN",
           "description": "Localized Rainshadow",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "8",
+          "rowId": "9",
           "code": "SA",
           "description": "Salt spray",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "9",
+          "rowId": "10",
           "code": "SF",
           "description": "Fresh Water Spray",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "10",
+          "rowId": "11",
           "code": "SN",
           "description": "Snow Accumulation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "11",
+          "rowId": "12",
           "code": "WI",
           "description": "Wind",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "12",
+          "rowId": "13",
           "code": "X",
           "description": "Miscellaneous",
           "selectable": true,
@@ -15607,6 +15689,81 @@
                 "storage": "real",
                 "text": null,
                 "integer": null,
+                "real": 3.5,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "CO",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Cold aspect",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Exposure",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "2",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "5",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "Exposure",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
                 "real": 4,
                 "blobHex": null
               },
@@ -15662,7 +15819,7 @@
             ]
           },
           {
-            "rowId": "5",
+            "rowId": "6",
             "cells": [
               {
                 "storage": "text",
@@ -15737,7 +15894,7 @@
             ]
           },
           {
-            "rowId": "6",
+            "rowId": "7",
             "cells": [
               {
                 "storage": "text",
@@ -15812,7 +15969,7 @@
             ]
           },
           {
-            "rowId": "7",
+            "rowId": "8",
             "cells": [
               {
                 "storage": "text",
@@ -15887,7 +16044,7 @@
             ]
           },
           {
-            "rowId": "8",
+            "rowId": "9",
             "cells": [
               {
                 "storage": "text",
@@ -15962,7 +16119,7 @@
             ]
           },
           {
-            "rowId": "9",
+            "rowId": "10",
             "cells": [
               {
                 "storage": "text",
@@ -16037,7 +16194,7 @@
             ]
           },
           {
-            "rowId": "10",
+            "rowId": "11",
             "cells": [
               {
                 "storage": "text",
@@ -16112,7 +16269,7 @@
             ]
           },
           {
-            "rowId": "11",
+            "rowId": "12",
             "cells": [
               {
                 "storage": "text",
@@ -16187,7 +16344,7 @@
             ]
           },
           {
-            "rowId": "12",
+            "rowId": "13",
             "cells": [
               {
                 "storage": "text",
@@ -16287,62 +16444,69 @@
         },
         {
           "rowId": "4",
+          "code": "CO",
+          "description": "Cold aspect",
+          "selectable": true,
+          "diagnostic": ""
+        },
+        {
+          "rowId": "5",
           "code": "FR",
           "description": "Frost",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "5",
+          "rowId": "6",
           "code": "IN",
           "description": "Insolation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "6",
+          "rowId": "7",
           "code": "NA",
           "description": "Not Applicable",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "7",
+          "rowId": "8",
           "code": "RN",
           "description": "Localized Rainshadow",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "8",
+          "rowId": "9",
           "code": "SA",
           "description": "Salt spray",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "9",
+          "rowId": "10",
           "code": "SF",
           "description": "Fresh Water Spray",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "10",
+          "rowId": "11",
           "code": "SN",
           "description": "Snow Accumulation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "11",
+          "rowId": "12",
           "code": "WI",
           "description": "Wind",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "12",
+          "rowId": "13",
           "code": "X",
           "description": "Miscellaneous",
           "selectable": true,
@@ -17322,6 +17486,156 @@
                 "storage": "real",
                 "text": null,
                 "integer": null,
+                "real": 12.1,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A.w.th",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Windthrow (uprooting)",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "3",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "14",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 12.2,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A.w.br",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Windbreak (stem snap)",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "3",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "15",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
                 "real": 13,
                 "blobHex": null
               },
@@ -17377,7 +17691,7 @@
             ]
           },
           {
-            "rowId": "14",
+            "rowId": "16",
             "cells": [
               {
                 "storage": "text",
@@ -17452,7 +17766,7 @@
             ]
           },
           {
-            "rowId": "15",
+            "rowId": "17",
             "cells": [
               {
                 "storage": "text",
@@ -17527,7 +17841,7 @@
             ]
           },
           {
-            "rowId": "16",
+            "rowId": "18",
             "cells": [
               {
                 "storage": "text",
@@ -17602,7 +17916,7 @@
             ]
           },
           {
-            "rowId": "17",
+            "rowId": "19",
             "cells": [
               {
                 "storage": "text",
@@ -17677,7 +17991,7 @@
             ]
           },
           {
-            "rowId": "18",
+            "rowId": "20",
             "cells": [
               {
                 "storage": "text",
@@ -17752,7 +18066,7 @@
             ]
           },
           {
-            "rowId": "19",
+            "rowId": "21",
             "cells": [
               {
                 "storage": "text",
@@ -17827,7 +18141,7 @@
             ]
           },
           {
-            "rowId": "20",
+            "rowId": "22",
             "cells": [
               {
                 "storage": "text",
@@ -17902,7 +18216,7 @@
             ]
           },
           {
-            "rowId": "21",
+            "rowId": "23",
             "cells": [
               {
                 "storage": "text",
@@ -17977,7 +18291,7 @@
             ]
           },
           {
-            "rowId": "22",
+            "rowId": "24",
             "cells": [
               {
                 "storage": "text",
@@ -18052,7 +18366,7 @@
             ]
           },
           {
-            "rowId": "23",
+            "rowId": "25",
             "cells": [
               {
                 "storage": "text",
@@ -18127,7 +18441,7 @@
             ]
           },
           {
-            "rowId": "24",
+            "rowId": "26",
             "cells": [
               {
                 "storage": "text",
@@ -18202,7 +18516,7 @@
             ]
           },
           {
-            "rowId": "25",
+            "rowId": "27",
             "cells": [
               {
                 "storage": "text",
@@ -18277,7 +18591,7 @@
             ]
           },
           {
-            "rowId": "26",
+            "rowId": "28",
             "cells": [
               {
                 "storage": "text",
@@ -18352,7 +18666,7 @@
             ]
           },
           {
-            "rowId": "27",
+            "rowId": "29",
             "cells": [
               {
                 "storage": "text",
@@ -18427,7 +18741,7 @@
             ]
           },
           {
-            "rowId": "28",
+            "rowId": "30",
             "cells": [
               {
                 "storage": "text",
@@ -18502,7 +18816,7 @@
             ]
           },
           {
-            "rowId": "29",
+            "rowId": "31",
             "cells": [
               {
                 "storage": "text",
@@ -18577,7 +18891,7 @@
             ]
           },
           {
-            "rowId": "30",
+            "rowId": "32",
             "cells": [
               {
                 "storage": "text",
@@ -18652,7 +18966,7 @@
             ]
           },
           {
-            "rowId": "31",
+            "rowId": "33",
             "cells": [
               {
                 "storage": "text",
@@ -18727,7 +19041,7 @@
             ]
           },
           {
-            "rowId": "32",
+            "rowId": "34",
             "cells": [
               {
                 "storage": "text",
@@ -18802,7 +19116,7 @@
             ]
           },
           {
-            "rowId": "33",
+            "rowId": "35",
             "cells": [
               {
                 "storage": "text",
@@ -18877,7 +19191,7 @@
             ]
           },
           {
-            "rowId": "34",
+            "rowId": "36",
             "cells": [
               {
                 "storage": "text",
@@ -18952,7 +19266,7 @@
             ]
           },
           {
-            "rowId": "35",
+            "rowId": "37",
             "cells": [
               {
                 "storage": "text",
@@ -19027,7 +19341,7 @@
             ]
           },
           {
-            "rowId": "36",
+            "rowId": "38",
             "cells": [
               {
                 "storage": "text",
@@ -19102,7 +19416,7 @@
             ]
           },
           {
-            "rowId": "37",
+            "rowId": "39",
             "cells": [
               {
                 "storage": "text",
@@ -19177,7 +19491,7 @@
             ]
           },
           {
-            "rowId": "38",
+            "rowId": "40",
             "cells": [
               {
                 "storage": "text",
@@ -19252,7 +19566,7 @@
             ]
           },
           {
-            "rowId": "39",
+            "rowId": "41",
             "cells": [
               {
                 "storage": "text",
@@ -19327,7 +19641,7 @@
             ]
           },
           {
-            "rowId": "40",
+            "rowId": "42",
             "cells": [
               {
                 "storage": "text",
@@ -19402,7 +19716,7 @@
             ]
           },
           {
-            "rowId": "41",
+            "rowId": "43",
             "cells": [
               {
                 "storage": "text",
@@ -19477,7 +19791,7 @@
             ]
           },
           {
-            "rowId": "42",
+            "rowId": "44",
             "cells": [
               {
                 "storage": "text",
@@ -19552,7 +19866,7 @@
             ]
           },
           {
-            "rowId": "43",
+            "rowId": "45",
             "cells": [
               {
                 "storage": "text",
@@ -19627,7 +19941,7 @@
             ]
           },
           {
-            "rowId": "44",
+            "rowId": "46",
             "cells": [
               {
                 "storage": "text",
@@ -19702,7 +20016,7 @@
             ]
           },
           {
-            "rowId": "45",
+            "rowId": "47",
             "cells": [
               {
                 "storage": "text",
@@ -19777,7 +20091,7 @@
             ]
           },
           {
-            "rowId": "46",
+            "rowId": "48",
             "cells": [
               {
                 "storage": "text",
@@ -19852,7 +20166,7 @@
             ]
           },
           {
-            "rowId": "47",
+            "rowId": "49",
             "cells": [
               {
                 "storage": "text",
@@ -19927,7 +20241,7 @@
             ]
           },
           {
-            "rowId": "48",
+            "rowId": "50",
             "cells": [
               {
                 "storage": "text",
@@ -20002,7 +20316,7 @@
             ]
           },
           {
-            "rowId": "49",
+            "rowId": "51",
             "cells": [
               {
                 "storage": "text",
@@ -20077,7 +20391,7 @@
             ]
           },
           {
-            "rowId": "50",
+            "rowId": "52",
             "cells": [
               {
                 "storage": "text",
@@ -20152,7 +20466,7 @@
             ]
           },
           {
-            "rowId": "51",
+            "rowId": "53",
             "cells": [
               {
                 "storage": "text",
@@ -20227,7 +20541,7 @@
             ]
           },
           {
-            "rowId": "52",
+            "rowId": "54",
             "cells": [
               {
                 "storage": "text",
@@ -20302,7 +20616,7 @@
             ]
           },
           {
-            "rowId": "53",
+            "rowId": "55",
             "cells": [
               {
                 "storage": "text",
@@ -20377,7 +20691,7 @@
             ]
           },
           {
-            "rowId": "54",
+            "rowId": "56",
             "cells": [
               {
                 "storage": "text",
@@ -20452,7 +20766,7 @@
             ]
           },
           {
-            "rowId": "55",
+            "rowId": "57",
             "cells": [
               {
                 "storage": "text",
@@ -20527,7 +20841,7 @@
             ]
           },
           {
-            "rowId": "56",
+            "rowId": "58",
             "cells": [
               {
                 "storage": "text",
@@ -20602,7 +20916,7 @@
             ]
           },
           {
-            "rowId": "57",
+            "rowId": "59",
             "cells": [
               {
                 "storage": "text",
@@ -20677,7 +20991,7 @@
             ]
           },
           {
-            "rowId": "58",
+            "rowId": "60",
             "cells": [
               {
                 "storage": "text",
@@ -20752,7 +21066,7 @@
             ]
           },
           {
-            "rowId": "59",
+            "rowId": "61",
             "cells": [
               {
                 "storage": "text",
@@ -20827,7 +21141,7 @@
             ]
           },
           {
-            "rowId": "60",
+            "rowId": "62",
             "cells": [
               {
                 "storage": "text",
@@ -20902,7 +21216,7 @@
             ]
           },
           {
-            "rowId": "61",
+            "rowId": "63",
             "cells": [
               {
                 "storage": "text",
@@ -20977,7 +21291,7 @@
             ]
           },
           {
-            "rowId": "62",
+            "rowId": "64",
             "cells": [
               {
                 "storage": "text",
@@ -21052,7 +21366,7 @@
             ]
           },
           {
-            "rowId": "63",
+            "rowId": "65",
             "cells": [
               {
                 "storage": "text",
@@ -21127,7 +21441,7 @@
             ]
           },
           {
-            "rowId": "64",
+            "rowId": "66",
             "cells": [
               {
                 "storage": "text",
@@ -21202,7 +21516,7 @@
             ]
           },
           {
-            "rowId": "65",
+            "rowId": "67",
             "cells": [
               {
                 "storage": "text",
@@ -21277,7 +21591,7 @@
             ]
           },
           {
-            "rowId": "66",
+            "rowId": "68",
             "cells": [
               {
                 "storage": "text",
@@ -21352,7 +21666,7 @@
             ]
           },
           {
-            "rowId": "67",
+            "rowId": "69",
             "cells": [
               {
                 "storage": "text",
@@ -21427,7 +21741,7 @@
             ]
           },
           {
-            "rowId": "68",
+            "rowId": "70",
             "cells": [
               {
                 "storage": "text",
@@ -21502,7 +21816,7 @@
             ]
           },
           {
-            "rowId": "69",
+            "rowId": "71",
             "cells": [
               {
                 "storage": "text",
@@ -21577,7 +21891,7 @@
             ]
           },
           {
-            "rowId": "70",
+            "rowId": "72",
             "cells": [
               {
                 "storage": "text",
@@ -21652,7 +21966,7 @@
             ]
           },
           {
-            "rowId": "71",
+            "rowId": "73",
             "cells": [
               {
                 "storage": "text",
@@ -21727,7 +22041,7 @@
             ]
           },
           {
-            "rowId": "72",
+            "rowId": "74",
             "cells": [
               {
                 "storage": "text",
@@ -21802,7 +22116,7 @@
             ]
           },
           {
-            "rowId": "73",
+            "rowId": "75",
             "cells": [
               {
                 "storage": "text",
@@ -21877,7 +22191,7 @@
             ]
           },
           {
-            "rowId": "74",
+            "rowId": "76",
             "cells": [
               {
                 "storage": "text",
@@ -21952,7 +22266,7 @@
             ]
           },
           {
-            "rowId": "75",
+            "rowId": "77",
             "cells": [
               {
                 "storage": "text",
@@ -22027,7 +22341,7 @@
             ]
           },
           {
-            "rowId": "76",
+            "rowId": "78",
             "cells": [
               {
                 "storage": "text",
@@ -22102,7 +22416,7 @@
             ]
           },
           {
-            "rowId": "77",
+            "rowId": "79",
             "cells": [
               {
                 "storage": "text",
@@ -22177,7 +22491,7 @@
             ]
           },
           {
-            "rowId": "78",
+            "rowId": "80",
             "cells": [
               {
                 "storage": "text",
@@ -22252,7 +22566,7 @@
             ]
           },
           {
-            "rowId": "79",
+            "rowId": "81",
             "cells": [
               {
                 "storage": "text",
@@ -22327,7 +22641,7 @@
             ]
           },
           {
-            "rowId": "80",
+            "rowId": "82",
             "cells": [
               {
                 "storage": "text",
@@ -22402,7 +22716,7 @@
             ]
           },
           {
-            "rowId": "81",
+            "rowId": "83",
             "cells": [
               {
                 "storage": "text",
@@ -22477,7 +22791,7 @@
             ]
           },
           {
-            "rowId": "82",
+            "rowId": "84",
             "cells": [
               {
                 "storage": "text",
@@ -22552,7 +22866,7 @@
             ]
           },
           {
-            "rowId": "83",
+            "rowId": "85",
             "cells": [
               {
                 "storage": "text",
@@ -22627,7 +22941,7 @@
             ]
           },
           {
-            "rowId": "84",
+            "rowId": "86",
             "cells": [
               {
                 "storage": "text",
@@ -22702,7 +23016,7 @@
             ]
           },
           {
-            "rowId": "85",
+            "rowId": "87",
             "cells": [
               {
                 "storage": "text",
@@ -22777,7 +23091,7 @@
             ]
           },
           {
-            "rowId": "86",
+            "rowId": "88",
             "cells": [
               {
                 "storage": "text",
@@ -22852,7 +23166,7 @@
             ]
           },
           {
-            "rowId": "87",
+            "rowId": "89",
             "cells": [
               {
                 "storage": "text",
@@ -22927,7 +23241,7 @@
             ]
           },
           {
-            "rowId": "88",
+            "rowId": "90",
             "cells": [
               {
                 "storage": "text",
@@ -23002,7 +23316,7 @@
             ]
           },
           {
-            "rowId": "89",
+            "rowId": "91",
             "cells": [
               {
                 "storage": "text",
@@ -23077,7 +23391,7 @@
             ]
           },
           {
-            "rowId": "90",
+            "rowId": "92",
             "cells": [
               {
                 "storage": "text",
@@ -23152,7 +23466,7 @@
             ]
           },
           {
-            "rowId": "91",
+            "rowId": "93",
             "cells": [
               {
                 "storage": "text",
@@ -23227,7 +23541,7 @@
             ]
           },
           {
-            "rowId": "92",
+            "rowId": "94",
             "cells": [
               {
                 "storage": "text",
@@ -23302,7 +23616,7 @@
             ]
           },
           {
-            "rowId": "93",
+            "rowId": "95",
             "cells": [
               {
                 "storage": "text",
@@ -23377,7 +23691,7 @@
             ]
           },
           {
-            "rowId": "94",
+            "rowId": "96",
             "cells": [
               {
                 "storage": "text",
@@ -23452,7 +23766,7 @@
             ]
           },
           {
-            "rowId": "95",
+            "rowId": "97",
             "cells": [
               {
                 "storage": "text",
@@ -23527,7 +23841,7 @@
             ]
           },
           {
-            "rowId": "96",
+            "rowId": "98",
             "cells": [
               {
                 "storage": "text",
@@ -23602,7 +23916,7 @@
             ]
           },
           {
-            "rowId": "97",
+            "rowId": "99",
             "cells": [
               {
                 "storage": "text",
@@ -23677,7 +23991,7 @@
             ]
           },
           {
-            "rowId": "98",
+            "rowId": "100",
             "cells": [
               {
                 "storage": "text",
@@ -23752,7 +24066,7 @@
             ]
           },
           {
-            "rowId": "99",
+            "rowId": "101",
             "cells": [
               {
                 "storage": "text",
@@ -23827,7 +24141,7 @@
             ]
           },
           {
-            "rowId": "100",
+            "rowId": "102",
             "cells": [
               {
                 "storage": "text",
@@ -23902,7 +24216,7 @@
             ]
           },
           {
-            "rowId": "101",
+            "rowId": "103",
             "cells": [
               {
                 "storage": "text",
@@ -23977,7 +24291,7 @@
             ]
           },
           {
-            "rowId": "102",
+            "rowId": "104",
             "cells": [
               {
                 "storage": "text",
@@ -24052,7 +24366,7 @@
             ]
           },
           {
-            "rowId": "103",
+            "rowId": "105",
             "cells": [
               {
                 "storage": "text",
@@ -24127,7 +24441,7 @@
             ]
           },
           {
-            "rowId": "104",
+            "rowId": "106",
             "cells": [
               {
                 "storage": "text",
@@ -24202,7 +24516,7 @@
             ]
           },
           {
-            "rowId": "105",
+            "rowId": "107",
             "cells": [
               {
                 "storage": "text",
@@ -24277,7 +24591,7 @@
             ]
           },
           {
-            "rowId": "106",
+            "rowId": "108",
             "cells": [
               {
                 "storage": "text",
@@ -24352,7 +24666,7 @@
             ]
           },
           {
-            "rowId": "107",
+            "rowId": "109",
             "cells": [
               {
                 "storage": "text",
@@ -24427,7 +24741,7 @@
             ]
           },
           {
-            "rowId": "108",
+            "rowId": "110",
             "cells": [
               {
                 "storage": "text",
@@ -24502,7 +24816,7 @@
             ]
           },
           {
-            "rowId": "109",
+            "rowId": "111",
             "cells": [
               {
                 "storage": "text",
@@ -24577,7 +24891,7 @@
             ]
           },
           {
-            "rowId": "110",
+            "rowId": "112",
             "cells": [
               {
                 "storage": "text",
@@ -24652,7 +24966,7 @@
             ]
           },
           {
-            "rowId": "111",
+            "rowId": "113",
             "cells": [
               {
                 "storage": "text",
@@ -24727,7 +25041,7 @@
             ]
           },
           {
-            "rowId": "112",
+            "rowId": "114",
             "cells": [
               {
                 "storage": "text",
@@ -24802,7 +25116,7 @@
             ]
           },
           {
-            "rowId": "113",
+            "rowId": "115",
             "cells": [
               {
                 "storage": "text",
@@ -24877,7 +25191,7 @@
             ]
           },
           {
-            "rowId": "114",
+            "rowId": "116",
             "cells": [
               {
                 "storage": "text",
@@ -24952,7 +25266,7 @@
             ]
           },
           {
-            "rowId": "115",
+            "rowId": "117",
             "cells": [
               {
                 "storage": "text",
@@ -25027,7 +25341,7 @@
             ]
           },
           {
-            "rowId": "116",
+            "rowId": "118",
             "cells": [
               {
                 "storage": "text",
@@ -25102,7 +25416,7 @@
             ]
           },
           {
-            "rowId": "117",
+            "rowId": "119",
             "cells": [
               {
                 "storage": "text",
@@ -25177,7 +25491,7 @@
             ]
           },
           {
-            "rowId": "118",
+            "rowId": "120",
             "cells": [
               {
                 "storage": "text",
@@ -25252,7 +25566,7 @@
             ]
           },
           {
-            "rowId": "119",
+            "rowId": "121",
             "cells": [
               {
                 "storage": "text",
@@ -25327,7 +25641,7 @@
             ]
           },
           {
-            "rowId": "120",
+            "rowId": "122",
             "cells": [
               {
                 "storage": "text",
@@ -25402,7 +25716,7 @@
             ]
           },
           {
-            "rowId": "121",
+            "rowId": "123",
             "cells": [
               {
                 "storage": "text",
@@ -25477,7 +25791,7 @@
             ]
           },
           {
-            "rowId": "122",
+            "rowId": "124",
             "cells": [
               {
                 "storage": "text",
@@ -25552,7 +25866,7 @@
             ]
           },
           {
-            "rowId": "123",
+            "rowId": "125",
             "cells": [
               {
                 "storage": "text",
@@ -25627,7 +25941,7 @@
             ]
           },
           {
-            "rowId": "124",
+            "rowId": "126",
             "cells": [
               {
                 "storage": "text",
@@ -25702,7 +26016,7 @@
             ]
           },
           {
-            "rowId": "125",
+            "rowId": "127",
             "cells": [
               {
                 "storage": "text",
@@ -25777,7 +26091,7 @@
             ]
           },
           {
-            "rowId": "126",
+            "rowId": "128",
             "cells": [
               {
                 "storage": "text",
@@ -25852,7 +26166,7 @@
             ]
           },
           {
-            "rowId": "127",
+            "rowId": "129",
             "cells": [
               {
                 "storage": "text",
@@ -26015,804 +26329,818 @@
         },
         {
           "rowId": "13",
+          "code": "A.w.th",
+          "description": "Windthrow (uprooting)",
+          "selectable": true,
+          "diagnostic": ""
+        },
+        {
+          "rowId": "14",
+          "code": "A.w.br",
+          "description": "Windbreak (stem snap)",
+          "selectable": true,
+          "diagnostic": ""
+        },
+        {
+          "rowId": "15",
           "code": "B",
           "description": "Biotic effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "14",
+          "rowId": "16",
           "code": "B.b",
           "description": "beaver tree cutting",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "15",
+          "rowId": "17",
           "code": "B.d",
           "description": "domestic grazing/browsing",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "16",
+          "rowId": "18",
           "code": "B.w",
           "description": "wildlife grazing/browsing",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "17",
+          "rowId": "19",
           "code": "B.e",
           "description": "excrement accumulation (other than that normally associated with",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "18",
+          "rowId": "20",
           "code": "B.i",
           "description": "insects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "19",
+          "rowId": "21",
           "code": "B.i.ki",
           "description": "insect kill",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "20",
+          "rowId": "22",
           "code": "B.i.in",
           "description": "infestation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "21",
+          "rowId": "23",
           "code": "B.p",
           "description": "disease",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "22",
+          "rowId": "24",
           "code": "B.t",
           "description": "turbation (soil)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "23",
+          "rowId": "25",
           "code": "B.v",
           "description": "aggressive vegetation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "24",
+          "rowId": "26",
           "code": "D",
           "description": "Disposals",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "25",
+          "rowId": "27",
           "code": "D.c",
           "description": "chemical spill or disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "26",
+          "rowId": "28",
           "code": "D.e",
           "description": "effluent disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "27",
+          "rowId": "29",
           "code": "D.g",
           "description": "domestic garbage disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "28",
+          "rowId": "30",
           "code": "D.o",
           "description": "oil spill or disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "29",
+          "rowId": "31",
           "code": "D.r",
           "description": "radioactive waste disposal or exposure",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "30",
+          "rowId": "32",
           "code": "F",
           "description": "Fires",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "31",
+          "rowId": "33",
           "code": "F.c",
           "description": "overstorey crown fire",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "32",
+          "rowId": "34",
           "code": "F.g",
           "description": "light surface (ground) fire",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "33",
+          "rowId": "35",
           "code": "F.r",
           "description": "repeated light surface fires",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "34",
+          "rowId": "36",
           "code": "F.s",
           "description": "severe surface fire",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "35",
+          "rowId": "37",
           "code": "F.i",
           "description": "repeated severe surface fires",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "36",
+          "rowId": "38",
           "code": "F.l",
           "description": "burning of logging slash",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "37",
+          "rowId": "39",
           "code": "F.l.bb",
           "description": "broadcast burn",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "38",
+          "rowId": "40",
           "code": "F.l.pb",
           "description": "piled and burned",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "39",
+          "rowId": "41",
           "code": "F.l.wb",
           "description": "burned windrows",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "40",
+          "rowId": "42",
           "code": "L",
           "description": "Forest harvesting",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "41",
+          "rowId": "43",
           "code": "L.l",
           "description": "land clearing (includes abandoned agriculture)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "42",
+          "rowId": "44",
           "code": "L.a",
           "description": "patch cut system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "43",
+          "rowId": "45",
           "code": "L.a.wr",
           "description": "with reserves",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "44",
+          "rowId": "46",
           "code": "L.c",
           "description": "clearcut system (if slashburned, see also \"Fires\")",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "45",
+          "rowId": "47",
           "code": "L.c.wr",
           "description": "with reserves (patch retention)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "46",
+          "rowId": "48",
           "code": "L.d",
           "description": "seed tree system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "47",
+          "rowId": "49",
           "code": "L.d.un",
           "description": "uniform",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "48",
+          "rowId": "50",
           "code": "L.d.gr",
           "description": "grouped",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "49",
+          "rowId": "51",
           "code": "L.e",
           "description": "selection system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "50",
+          "rowId": "52",
           "code": "L.e.gr",
           "description": "group selection",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "51",
+          "rowId": "53",
           "code": "L.e.si",
           "description": "single tree",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "52",
+          "rowId": "54",
           "code": "L.e.st",
           "description": "strip",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "53",
+          "rowId": "55",
           "code": "L.s",
           "description": "shelterwood system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "54",
+          "rowId": "56",
           "code": "L.s.un",
           "description": "uniform",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "55",
+          "rowId": "57",
           "code": "L.s.gr",
           "description": "group",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "56",
+          "rowId": "58",
           "code": "L.s.st",
           "description": "strip",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "57",
+          "rowId": "59",
           "code": "L.s.ir",
           "description": "irregular",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "58",
+          "rowId": "60",
           "code": "L.s.na",
           "description": "natural",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "59",
+          "rowId": "61",
           "code": "L.s.nu",
           "description": "nurse tree",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "60",
+          "rowId": "62",
           "code": "L.o",
           "description": "coppice",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "61",
+          "rowId": "63",
           "code": "M",
           "description": "Plant or site modification effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "62",
+          "rowId": "64",
           "code": "M.c",
           "description": "herbicide use (chemical)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "63",
+          "rowId": "65",
           "code": "M.f",
           "description": "fertilization (specify type under \"Notes\")",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "64",
+          "rowId": "66",
           "code": "M.i",
           "description": "irrigation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "65",
+          "rowId": "67",
           "code": "M.g",
           "description": "seeded or planted to grasses",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "66",
+          "rowId": "68",
           "code": "M.h",
           "description": "seeded or planted to herbs",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "67",
+          "rowId": "69",
           "code": "M.s",
           "description": "planted or seeded to shrubs",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "68",
+          "rowId": "70",
           "code": "M.t",
           "description": "planted or seeded to trees",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "69",
+          "rowId": "71",
           "code": "M.p",
           "description": "gathering or removal of plant products",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "70",
+          "rowId": "72",
           "code": "M.f",
           "description": "firewood gathering",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "71",
+          "rowId": "73",
           "code": "M.m",
           "description": "mushrooms",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "72",
+          "rowId": "74",
           "code": "M.o",
           "description": "moss",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "73",
+          "rowId": "75",
           "code": "M.s",
           "description": "shrubs (e.g., salal, falsebox)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "74",
+          "rowId": "76",
           "code": "M.x",
           "description": "other (specify under \"Notes\")",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "75",
+          "rowId": "77",
           "code": "R",
           "description": "Recreation-related effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "76",
+          "rowId": "78",
           "code": "R.m",
           "description": "motorized trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "77",
+          "rowId": "79",
           "code": "R.m.ec",
           "description": "constructed trail",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "78",
+          "rowId": "80",
           "code": "R.m.it",
           "description": "informal trail",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "79",
+          "rowId": "81",
           "code": "R.m.bt",
           "description": "braided trail sections",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "80",
+          "rowId": "82",
           "code": "R.m.tr",
           "description": "trampling – temporary use",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "81",
+          "rowId": "83",
           "code": "R.m.mb",
           "description": "mud bogging/rutting",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "82",
+          "rowId": "84",
           "code": "R.m.wi",
           "description": "winter use trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "83",
+          "rowId": "85",
           "code": "R.t",
           "description": "non-motorized trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "84",
+          "rowId": "86",
           "code": "R.t.ec",
           "description": "constructed trail",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "85",
+          "rowId": "87",
           "code": "R.t.it",
           "description": "informal trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "86",
+          "rowId": "88",
           "code": "R.t.bt",
           "description": "braided trails section",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "87",
+          "rowId": "89",
           "code": "R.t.tr",
           "description": "trampling – single use",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "88",
+          "rowId": "90",
           "code": "R.t.mb",
           "description": "mucking and trail entrenchment",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "89",
+          "rowId": "91",
           "code": "R.t.wi",
           "description": "winter use trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "90",
+          "rowId": "92",
           "code": "R.c",
           "description": "camping",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "91",
+          "rowId": "93",
           "code": "R.c.ec",
           "description": "established camp site",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "92",
+          "rowId": "94",
           "code": "R.c.ic",
           "description": "informal camp site",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "93",
+          "rowId": "95",
           "code": "R.l",
           "description": "litter and debris",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "94",
+          "rowId": "96",
           "code": "R.p",
           "description": "plant introductions",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "95",
+          "rowId": "97",
           "code": "S",
           "description": "Soil disturbance",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "96",
+          "rowId": "98",
           "code": "S.a",
           "description": "cultivation (agricultural)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "97",
+          "rowId": "99",
           "code": "S.c",
           "description": "compaction",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "98",
+          "rowId": "100",
           "code": "S.g",
           "description": "gouging (\u003e 5 cm into mineral soil)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "99",
+          "rowId": "101",
           "code": "S.s",
           "description": "scalping (forest floor removed)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "100",
+          "rowId": "102",
           "code": "S.f",
           "description": "sidecast/fill",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "101",
+          "rowId": "103",
           "code": "S.r",
           "description": "road bed, abandoned",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "102",
+          "rowId": "104",
           "code": "S.t",
           "description": "railway, abandoned",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "103",
+          "rowId": "105",
           "code": "S.e",
           "description": "excavation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "104",
+          "rowId": "106",
           "code": "S.m",
           "description": "mining effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "105",
+          "rowId": "107",
           "code": "S.m.pt",
           "description": "placer tailings",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "106",
+          "rowId": "108",
           "code": "S.m.rq",
           "description": "rock quarrying (including open pit mines)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "107",
+          "rowId": "109",
           "code": "S.m.ta",
           "description": "tailings",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "108",
+          "rowId": "110",
           "code": "S.p",
           "description": "mechanical site preparation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "109",
+          "rowId": "111",
           "code": "S.p.bb",
           "description": "brush blading",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "110",
+          "rowId": "112",
           "code": "S.p.ds",
           "description": "drag scarification (anchor chain or shark fin)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "111",
+          "rowId": "113",
           "code": "S.p.dt",
           "description": "disc trenching",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "112",
+          "rowId": "114",
           "code": "S.p.md",
           "description": "mounding",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "113",
+          "rowId": "115",
           "code": "S.p.ps",
           "description": "patch scarification",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "114",
+          "rowId": "116",
           "code": "S.p.vp",
           "description": "V-plowing",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "115",
+          "rowId": "117",
           "code": "S.p.xx",
           "description": "other (specify under “Notes”)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "116",
+          "rowId": "118",
           "code": "T",
           "description": "Terrain-related effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "117",
+          "rowId": "119",
           "code": "T.a",
           "description": "avalanche",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "118",
+          "rowId": "120",
           "code": "T.d",
           "description": "recent deglaciation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "119",
+          "rowId": "121",
           "code": "T.e",
           "description": "eolian (active deflation or deposition)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "120",
+          "rowId": "122",
           "code": "T.s",
           "description": "terrain failures (active/recent slumps, slides, solifluction, etc.)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "121",
+          "rowId": "123",
           "code": "T.v",
           "description": "volcanic activity",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "122",
+          "rowId": "124",
           "code": "W",
           "description": "Water-related effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "123",
+          "rowId": "125",
           "code": "W.i",
           "description": "inundation (including temporary inundation resulting from beaver activity)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "124",
+          "rowId": "126",
           "code": "W.s",
           "description": "temporary seepage (usually artificially induced; excludes intermittent seepage resulting from climate",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "125",
+          "rowId": "127",
           "code": "W.d",
           "description": "water table control (diking, damming)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "126",
+          "rowId": "128",
           "code": "W.e",
           "description": "water table depression (associated with extensive water extraction from wells)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "127",
+          "rowId": "129",
           "code": "X",
           "description": "Miscellaneous (For other disturbance types, enter “X” and describe under “Notes\")",
           "selectable": true,
@@ -27792,6 +28120,156 @@
                 "storage": "real",
                 "text": null,
                 "integer": null,
+                "real": 12.1,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A.w.th",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Windthrow (uprooting)",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "3",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "14",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 12.2,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A.w.br",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Windbreak (stem snap)",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "3",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "15",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
                 "real": 13,
                 "blobHex": null
               },
@@ -27847,7 +28325,7 @@
             ]
           },
           {
-            "rowId": "14",
+            "rowId": "16",
             "cells": [
               {
                 "storage": "text",
@@ -27922,7 +28400,7 @@
             ]
           },
           {
-            "rowId": "15",
+            "rowId": "17",
             "cells": [
               {
                 "storage": "text",
@@ -27997,7 +28475,7 @@
             ]
           },
           {
-            "rowId": "16",
+            "rowId": "18",
             "cells": [
               {
                 "storage": "text",
@@ -28072,7 +28550,7 @@
             ]
           },
           {
-            "rowId": "17",
+            "rowId": "19",
             "cells": [
               {
                 "storage": "text",
@@ -28147,7 +28625,7 @@
             ]
           },
           {
-            "rowId": "18",
+            "rowId": "20",
             "cells": [
               {
                 "storage": "text",
@@ -28222,7 +28700,7 @@
             ]
           },
           {
-            "rowId": "19",
+            "rowId": "21",
             "cells": [
               {
                 "storage": "text",
@@ -28297,7 +28775,7 @@
             ]
           },
           {
-            "rowId": "20",
+            "rowId": "22",
             "cells": [
               {
                 "storage": "text",
@@ -28372,7 +28850,7 @@
             ]
           },
           {
-            "rowId": "21",
+            "rowId": "23",
             "cells": [
               {
                 "storage": "text",
@@ -28447,7 +28925,7 @@
             ]
           },
           {
-            "rowId": "22",
+            "rowId": "24",
             "cells": [
               {
                 "storage": "text",
@@ -28522,7 +29000,7 @@
             ]
           },
           {
-            "rowId": "23",
+            "rowId": "25",
             "cells": [
               {
                 "storage": "text",
@@ -28597,7 +29075,7 @@
             ]
           },
           {
-            "rowId": "24",
+            "rowId": "26",
             "cells": [
               {
                 "storage": "text",
@@ -28672,7 +29150,7 @@
             ]
           },
           {
-            "rowId": "25",
+            "rowId": "27",
             "cells": [
               {
                 "storage": "text",
@@ -28747,7 +29225,7 @@
             ]
           },
           {
-            "rowId": "26",
+            "rowId": "28",
             "cells": [
               {
                 "storage": "text",
@@ -28822,7 +29300,7 @@
             ]
           },
           {
-            "rowId": "27",
+            "rowId": "29",
             "cells": [
               {
                 "storage": "text",
@@ -28897,7 +29375,7 @@
             ]
           },
           {
-            "rowId": "28",
+            "rowId": "30",
             "cells": [
               {
                 "storage": "text",
@@ -28972,7 +29450,7 @@
             ]
           },
           {
-            "rowId": "29",
+            "rowId": "31",
             "cells": [
               {
                 "storage": "text",
@@ -29047,7 +29525,7 @@
             ]
           },
           {
-            "rowId": "30",
+            "rowId": "32",
             "cells": [
               {
                 "storage": "text",
@@ -29122,7 +29600,7 @@
             ]
           },
           {
-            "rowId": "31",
+            "rowId": "33",
             "cells": [
               {
                 "storage": "text",
@@ -29197,7 +29675,7 @@
             ]
           },
           {
-            "rowId": "32",
+            "rowId": "34",
             "cells": [
               {
                 "storage": "text",
@@ -29272,7 +29750,7 @@
             ]
           },
           {
-            "rowId": "33",
+            "rowId": "35",
             "cells": [
               {
                 "storage": "text",
@@ -29347,7 +29825,7 @@
             ]
           },
           {
-            "rowId": "34",
+            "rowId": "36",
             "cells": [
               {
                 "storage": "text",
@@ -29422,7 +29900,7 @@
             ]
           },
           {
-            "rowId": "35",
+            "rowId": "37",
             "cells": [
               {
                 "storage": "text",
@@ -29497,7 +29975,7 @@
             ]
           },
           {
-            "rowId": "36",
+            "rowId": "38",
             "cells": [
               {
                 "storage": "text",
@@ -29572,7 +30050,7 @@
             ]
           },
           {
-            "rowId": "37",
+            "rowId": "39",
             "cells": [
               {
                 "storage": "text",
@@ -29647,7 +30125,7 @@
             ]
           },
           {
-            "rowId": "38",
+            "rowId": "40",
             "cells": [
               {
                 "storage": "text",
@@ -29722,7 +30200,7 @@
             ]
           },
           {
-            "rowId": "39",
+            "rowId": "41",
             "cells": [
               {
                 "storage": "text",
@@ -29797,7 +30275,7 @@
             ]
           },
           {
-            "rowId": "40",
+            "rowId": "42",
             "cells": [
               {
                 "storage": "text",
@@ -29872,7 +30350,7 @@
             ]
           },
           {
-            "rowId": "41",
+            "rowId": "43",
             "cells": [
               {
                 "storage": "text",
@@ -29947,7 +30425,7 @@
             ]
           },
           {
-            "rowId": "42",
+            "rowId": "44",
             "cells": [
               {
                 "storage": "text",
@@ -30022,7 +30500,7 @@
             ]
           },
           {
-            "rowId": "43",
+            "rowId": "45",
             "cells": [
               {
                 "storage": "text",
@@ -30097,7 +30575,7 @@
             ]
           },
           {
-            "rowId": "44",
+            "rowId": "46",
             "cells": [
               {
                 "storage": "text",
@@ -30172,7 +30650,7 @@
             ]
           },
           {
-            "rowId": "45",
+            "rowId": "47",
             "cells": [
               {
                 "storage": "text",
@@ -30247,7 +30725,7 @@
             ]
           },
           {
-            "rowId": "46",
+            "rowId": "48",
             "cells": [
               {
                 "storage": "text",
@@ -30322,7 +30800,7 @@
             ]
           },
           {
-            "rowId": "47",
+            "rowId": "49",
             "cells": [
               {
                 "storage": "text",
@@ -30397,7 +30875,7 @@
             ]
           },
           {
-            "rowId": "48",
+            "rowId": "50",
             "cells": [
               {
                 "storage": "text",
@@ -30472,7 +30950,7 @@
             ]
           },
           {
-            "rowId": "49",
+            "rowId": "51",
             "cells": [
               {
                 "storage": "text",
@@ -30547,7 +31025,7 @@
             ]
           },
           {
-            "rowId": "50",
+            "rowId": "52",
             "cells": [
               {
                 "storage": "text",
@@ -30622,7 +31100,7 @@
             ]
           },
           {
-            "rowId": "51",
+            "rowId": "53",
             "cells": [
               {
                 "storage": "text",
@@ -30697,7 +31175,7 @@
             ]
           },
           {
-            "rowId": "52",
+            "rowId": "54",
             "cells": [
               {
                 "storage": "text",
@@ -30772,7 +31250,7 @@
             ]
           },
           {
-            "rowId": "53",
+            "rowId": "55",
             "cells": [
               {
                 "storage": "text",
@@ -30847,7 +31325,7 @@
             ]
           },
           {
-            "rowId": "54",
+            "rowId": "56",
             "cells": [
               {
                 "storage": "text",
@@ -30922,7 +31400,7 @@
             ]
           },
           {
-            "rowId": "55",
+            "rowId": "57",
             "cells": [
               {
                 "storage": "text",
@@ -30997,7 +31475,7 @@
             ]
           },
           {
-            "rowId": "56",
+            "rowId": "58",
             "cells": [
               {
                 "storage": "text",
@@ -31072,7 +31550,7 @@
             ]
           },
           {
-            "rowId": "57",
+            "rowId": "59",
             "cells": [
               {
                 "storage": "text",
@@ -31147,7 +31625,7 @@
             ]
           },
           {
-            "rowId": "58",
+            "rowId": "60",
             "cells": [
               {
                 "storage": "text",
@@ -31222,7 +31700,7 @@
             ]
           },
           {
-            "rowId": "59",
+            "rowId": "61",
             "cells": [
               {
                 "storage": "text",
@@ -31297,7 +31775,7 @@
             ]
           },
           {
-            "rowId": "60",
+            "rowId": "62",
             "cells": [
               {
                 "storage": "text",
@@ -31372,7 +31850,7 @@
             ]
           },
           {
-            "rowId": "61",
+            "rowId": "63",
             "cells": [
               {
                 "storage": "text",
@@ -31447,7 +31925,7 @@
             ]
           },
           {
-            "rowId": "62",
+            "rowId": "64",
             "cells": [
               {
                 "storage": "text",
@@ -31522,7 +32000,7 @@
             ]
           },
           {
-            "rowId": "63",
+            "rowId": "65",
             "cells": [
               {
                 "storage": "text",
@@ -31597,7 +32075,7 @@
             ]
           },
           {
-            "rowId": "64",
+            "rowId": "66",
             "cells": [
               {
                 "storage": "text",
@@ -31672,7 +32150,7 @@
             ]
           },
           {
-            "rowId": "65",
+            "rowId": "67",
             "cells": [
               {
                 "storage": "text",
@@ -31747,7 +32225,7 @@
             ]
           },
           {
-            "rowId": "66",
+            "rowId": "68",
             "cells": [
               {
                 "storage": "text",
@@ -31822,7 +32300,7 @@
             ]
           },
           {
-            "rowId": "67",
+            "rowId": "69",
             "cells": [
               {
                 "storage": "text",
@@ -31897,7 +32375,7 @@
             ]
           },
           {
-            "rowId": "68",
+            "rowId": "70",
             "cells": [
               {
                 "storage": "text",
@@ -31972,7 +32450,7 @@
             ]
           },
           {
-            "rowId": "69",
+            "rowId": "71",
             "cells": [
               {
                 "storage": "text",
@@ -32047,7 +32525,7 @@
             ]
           },
           {
-            "rowId": "70",
+            "rowId": "72",
             "cells": [
               {
                 "storage": "text",
@@ -32122,7 +32600,7 @@
             ]
           },
           {
-            "rowId": "71",
+            "rowId": "73",
             "cells": [
               {
                 "storage": "text",
@@ -32197,7 +32675,7 @@
             ]
           },
           {
-            "rowId": "72",
+            "rowId": "74",
             "cells": [
               {
                 "storage": "text",
@@ -32272,7 +32750,7 @@
             ]
           },
           {
-            "rowId": "73",
+            "rowId": "75",
             "cells": [
               {
                 "storage": "text",
@@ -32347,7 +32825,7 @@
             ]
           },
           {
-            "rowId": "74",
+            "rowId": "76",
             "cells": [
               {
                 "storage": "text",
@@ -32422,7 +32900,7 @@
             ]
           },
           {
-            "rowId": "75",
+            "rowId": "77",
             "cells": [
               {
                 "storage": "text",
@@ -32497,7 +32975,7 @@
             ]
           },
           {
-            "rowId": "76",
+            "rowId": "78",
             "cells": [
               {
                 "storage": "text",
@@ -32572,7 +33050,7 @@
             ]
           },
           {
-            "rowId": "77",
+            "rowId": "79",
             "cells": [
               {
                 "storage": "text",
@@ -32647,7 +33125,7 @@
             ]
           },
           {
-            "rowId": "78",
+            "rowId": "80",
             "cells": [
               {
                 "storage": "text",
@@ -32722,7 +33200,7 @@
             ]
           },
           {
-            "rowId": "79",
+            "rowId": "81",
             "cells": [
               {
                 "storage": "text",
@@ -32797,7 +33275,7 @@
             ]
           },
           {
-            "rowId": "80",
+            "rowId": "82",
             "cells": [
               {
                 "storage": "text",
@@ -32872,7 +33350,7 @@
             ]
           },
           {
-            "rowId": "81",
+            "rowId": "83",
             "cells": [
               {
                 "storage": "text",
@@ -32947,7 +33425,7 @@
             ]
           },
           {
-            "rowId": "82",
+            "rowId": "84",
             "cells": [
               {
                 "storage": "text",
@@ -33022,7 +33500,7 @@
             ]
           },
           {
-            "rowId": "83",
+            "rowId": "85",
             "cells": [
               {
                 "storage": "text",
@@ -33097,7 +33575,7 @@
             ]
           },
           {
-            "rowId": "84",
+            "rowId": "86",
             "cells": [
               {
                 "storage": "text",
@@ -33172,7 +33650,7 @@
             ]
           },
           {
-            "rowId": "85",
+            "rowId": "87",
             "cells": [
               {
                 "storage": "text",
@@ -33247,7 +33725,7 @@
             ]
           },
           {
-            "rowId": "86",
+            "rowId": "88",
             "cells": [
               {
                 "storage": "text",
@@ -33322,7 +33800,7 @@
             ]
           },
           {
-            "rowId": "87",
+            "rowId": "89",
             "cells": [
               {
                 "storage": "text",
@@ -33397,7 +33875,7 @@
             ]
           },
           {
-            "rowId": "88",
+            "rowId": "90",
             "cells": [
               {
                 "storage": "text",
@@ -33472,7 +33950,7 @@
             ]
           },
           {
-            "rowId": "89",
+            "rowId": "91",
             "cells": [
               {
                 "storage": "text",
@@ -33547,7 +34025,7 @@
             ]
           },
           {
-            "rowId": "90",
+            "rowId": "92",
             "cells": [
               {
                 "storage": "text",
@@ -33622,7 +34100,7 @@
             ]
           },
           {
-            "rowId": "91",
+            "rowId": "93",
             "cells": [
               {
                 "storage": "text",
@@ -33697,7 +34175,7 @@
             ]
           },
           {
-            "rowId": "92",
+            "rowId": "94",
             "cells": [
               {
                 "storage": "text",
@@ -33772,7 +34250,7 @@
             ]
           },
           {
-            "rowId": "93",
+            "rowId": "95",
             "cells": [
               {
                 "storage": "text",
@@ -33847,7 +34325,7 @@
             ]
           },
           {
-            "rowId": "94",
+            "rowId": "96",
             "cells": [
               {
                 "storage": "text",
@@ -33922,7 +34400,7 @@
             ]
           },
           {
-            "rowId": "95",
+            "rowId": "97",
             "cells": [
               {
                 "storage": "text",
@@ -33997,7 +34475,7 @@
             ]
           },
           {
-            "rowId": "96",
+            "rowId": "98",
             "cells": [
               {
                 "storage": "text",
@@ -34072,7 +34550,7 @@
             ]
           },
           {
-            "rowId": "97",
+            "rowId": "99",
             "cells": [
               {
                 "storage": "text",
@@ -34147,7 +34625,7 @@
             ]
           },
           {
-            "rowId": "98",
+            "rowId": "100",
             "cells": [
               {
                 "storage": "text",
@@ -34222,7 +34700,7 @@
             ]
           },
           {
-            "rowId": "99",
+            "rowId": "101",
             "cells": [
               {
                 "storage": "text",
@@ -34297,7 +34775,7 @@
             ]
           },
           {
-            "rowId": "100",
+            "rowId": "102",
             "cells": [
               {
                 "storage": "text",
@@ -34372,7 +34850,7 @@
             ]
           },
           {
-            "rowId": "101",
+            "rowId": "103",
             "cells": [
               {
                 "storage": "text",
@@ -34447,7 +34925,7 @@
             ]
           },
           {
-            "rowId": "102",
+            "rowId": "104",
             "cells": [
               {
                 "storage": "text",
@@ -34522,7 +35000,7 @@
             ]
           },
           {
-            "rowId": "103",
+            "rowId": "105",
             "cells": [
               {
                 "storage": "text",
@@ -34597,7 +35075,7 @@
             ]
           },
           {
-            "rowId": "104",
+            "rowId": "106",
             "cells": [
               {
                 "storage": "text",
@@ -34672,7 +35150,7 @@
             ]
           },
           {
-            "rowId": "105",
+            "rowId": "107",
             "cells": [
               {
                 "storage": "text",
@@ -34747,7 +35225,7 @@
             ]
           },
           {
-            "rowId": "106",
+            "rowId": "108",
             "cells": [
               {
                 "storage": "text",
@@ -34822,7 +35300,7 @@
             ]
           },
           {
-            "rowId": "107",
+            "rowId": "109",
             "cells": [
               {
                 "storage": "text",
@@ -34897,7 +35375,7 @@
             ]
           },
           {
-            "rowId": "108",
+            "rowId": "110",
             "cells": [
               {
                 "storage": "text",
@@ -34972,7 +35450,7 @@
             ]
           },
           {
-            "rowId": "109",
+            "rowId": "111",
             "cells": [
               {
                 "storage": "text",
@@ -35047,7 +35525,7 @@
             ]
           },
           {
-            "rowId": "110",
+            "rowId": "112",
             "cells": [
               {
                 "storage": "text",
@@ -35122,7 +35600,7 @@
             ]
           },
           {
-            "rowId": "111",
+            "rowId": "113",
             "cells": [
               {
                 "storage": "text",
@@ -35197,7 +35675,7 @@
             ]
           },
           {
-            "rowId": "112",
+            "rowId": "114",
             "cells": [
               {
                 "storage": "text",
@@ -35272,7 +35750,7 @@
             ]
           },
           {
-            "rowId": "113",
+            "rowId": "115",
             "cells": [
               {
                 "storage": "text",
@@ -35347,7 +35825,7 @@
             ]
           },
           {
-            "rowId": "114",
+            "rowId": "116",
             "cells": [
               {
                 "storage": "text",
@@ -35422,7 +35900,7 @@
             ]
           },
           {
-            "rowId": "115",
+            "rowId": "117",
             "cells": [
               {
                 "storage": "text",
@@ -35497,7 +35975,7 @@
             ]
           },
           {
-            "rowId": "116",
+            "rowId": "118",
             "cells": [
               {
                 "storage": "text",
@@ -35572,7 +36050,7 @@
             ]
           },
           {
-            "rowId": "117",
+            "rowId": "119",
             "cells": [
               {
                 "storage": "text",
@@ -35647,7 +36125,7 @@
             ]
           },
           {
-            "rowId": "118",
+            "rowId": "120",
             "cells": [
               {
                 "storage": "text",
@@ -35722,7 +36200,7 @@
             ]
           },
           {
-            "rowId": "119",
+            "rowId": "121",
             "cells": [
               {
                 "storage": "text",
@@ -35797,7 +36275,7 @@
             ]
           },
           {
-            "rowId": "120",
+            "rowId": "122",
             "cells": [
               {
                 "storage": "text",
@@ -35872,7 +36350,7 @@
             ]
           },
           {
-            "rowId": "121",
+            "rowId": "123",
             "cells": [
               {
                 "storage": "text",
@@ -35947,7 +36425,7 @@
             ]
           },
           {
-            "rowId": "122",
+            "rowId": "124",
             "cells": [
               {
                 "storage": "text",
@@ -36022,7 +36500,7 @@
             ]
           },
           {
-            "rowId": "123",
+            "rowId": "125",
             "cells": [
               {
                 "storage": "text",
@@ -36097,7 +36575,7 @@
             ]
           },
           {
-            "rowId": "124",
+            "rowId": "126",
             "cells": [
               {
                 "storage": "text",
@@ -36172,7 +36650,7 @@
             ]
           },
           {
-            "rowId": "125",
+            "rowId": "127",
             "cells": [
               {
                 "storage": "text",
@@ -36247,7 +36725,7 @@
             ]
           },
           {
-            "rowId": "126",
+            "rowId": "128",
             "cells": [
               {
                 "storage": "text",
@@ -36322,7 +36800,7 @@
             ]
           },
           {
-            "rowId": "127",
+            "rowId": "129",
             "cells": [
               {
                 "storage": "text",
@@ -36485,804 +36963,818 @@
         },
         {
           "rowId": "13",
+          "code": "A.w.th",
+          "description": "Windthrow (uprooting)",
+          "selectable": true,
+          "diagnostic": ""
+        },
+        {
+          "rowId": "14",
+          "code": "A.w.br",
+          "description": "Windbreak (stem snap)",
+          "selectable": true,
+          "diagnostic": ""
+        },
+        {
+          "rowId": "15",
           "code": "B",
           "description": "Biotic effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "14",
+          "rowId": "16",
           "code": "B.b",
           "description": "beaver tree cutting",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "15",
+          "rowId": "17",
           "code": "B.d",
           "description": "domestic grazing/browsing",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "16",
+          "rowId": "18",
           "code": "B.w",
           "description": "wildlife grazing/browsing",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "17",
+          "rowId": "19",
           "code": "B.e",
           "description": "excrement accumulation (other than that normally associated with",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "18",
+          "rowId": "20",
           "code": "B.i",
           "description": "insects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "19",
+          "rowId": "21",
           "code": "B.i.ki",
           "description": "insect kill",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "20",
+          "rowId": "22",
           "code": "B.i.in",
           "description": "infestation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "21",
+          "rowId": "23",
           "code": "B.p",
           "description": "disease",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "22",
+          "rowId": "24",
           "code": "B.t",
           "description": "turbation (soil)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "23",
+          "rowId": "25",
           "code": "B.v",
           "description": "aggressive vegetation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "24",
+          "rowId": "26",
           "code": "D",
           "description": "Disposals",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "25",
+          "rowId": "27",
           "code": "D.c",
           "description": "chemical spill or disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "26",
+          "rowId": "28",
           "code": "D.e",
           "description": "effluent disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "27",
+          "rowId": "29",
           "code": "D.g",
           "description": "domestic garbage disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "28",
+          "rowId": "30",
           "code": "D.o",
           "description": "oil spill or disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "29",
+          "rowId": "31",
           "code": "D.r",
           "description": "radioactive waste disposal or exposure",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "30",
+          "rowId": "32",
           "code": "F",
           "description": "Fires",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "31",
+          "rowId": "33",
           "code": "F.c",
           "description": "overstorey crown fire",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "32",
+          "rowId": "34",
           "code": "F.g",
           "description": "light surface (ground) fire",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "33",
+          "rowId": "35",
           "code": "F.r",
           "description": "repeated light surface fires",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "34",
+          "rowId": "36",
           "code": "F.s",
           "description": "severe surface fire",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "35",
+          "rowId": "37",
           "code": "F.i",
           "description": "repeated severe surface fires",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "36",
+          "rowId": "38",
           "code": "F.l",
           "description": "burning of logging slash",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "37",
+          "rowId": "39",
           "code": "F.l.bb",
           "description": "broadcast burn",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "38",
+          "rowId": "40",
           "code": "F.l.pb",
           "description": "piled and burned",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "39",
+          "rowId": "41",
           "code": "F.l.wb",
           "description": "burned windrows",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "40",
+          "rowId": "42",
           "code": "L",
           "description": "Forest harvesting",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "41",
+          "rowId": "43",
           "code": "L.l",
           "description": "land clearing (includes abandoned agriculture)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "42",
+          "rowId": "44",
           "code": "L.a",
           "description": "patch cut system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "43",
+          "rowId": "45",
           "code": "L.a.wr",
           "description": "with reserves",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "44",
+          "rowId": "46",
           "code": "L.c",
           "description": "clearcut system (if slashburned, see also \"Fires\")",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "45",
+          "rowId": "47",
           "code": "L.c.wr",
           "description": "with reserves (patch retention)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "46",
+          "rowId": "48",
           "code": "L.d",
           "description": "seed tree system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "47",
+          "rowId": "49",
           "code": "L.d.un",
           "description": "uniform",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "48",
+          "rowId": "50",
           "code": "L.d.gr",
           "description": "grouped",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "49",
+          "rowId": "51",
           "code": "L.e",
           "description": "selection system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "50",
+          "rowId": "52",
           "code": "L.e.gr",
           "description": "group selection",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "51",
+          "rowId": "53",
           "code": "L.e.si",
           "description": "single tree",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "52",
+          "rowId": "54",
           "code": "L.e.st",
           "description": "strip",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "53",
+          "rowId": "55",
           "code": "L.s",
           "description": "shelterwood system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "54",
+          "rowId": "56",
           "code": "L.s.un",
           "description": "uniform",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "55",
+          "rowId": "57",
           "code": "L.s.gr",
           "description": "group",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "56",
+          "rowId": "58",
           "code": "L.s.st",
           "description": "strip",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "57",
+          "rowId": "59",
           "code": "L.s.ir",
           "description": "irregular",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "58",
+          "rowId": "60",
           "code": "L.s.na",
           "description": "natural",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "59",
+          "rowId": "61",
           "code": "L.s.nu",
           "description": "nurse tree",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "60",
+          "rowId": "62",
           "code": "L.o",
           "description": "coppice",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "61",
+          "rowId": "63",
           "code": "M",
           "description": "Plant or site modification effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "62",
+          "rowId": "64",
           "code": "M.c",
           "description": "herbicide use (chemical)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "63",
+          "rowId": "65",
           "code": "M.f",
           "description": "fertilization (specify type under \"Notes\")",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "64",
+          "rowId": "66",
           "code": "M.i",
           "description": "irrigation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "65",
+          "rowId": "67",
           "code": "M.g",
           "description": "seeded or planted to grasses",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "66",
+          "rowId": "68",
           "code": "M.h",
           "description": "seeded or planted to herbs",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "67",
+          "rowId": "69",
           "code": "M.s",
           "description": "planted or seeded to shrubs",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "68",
+          "rowId": "70",
           "code": "M.t",
           "description": "planted or seeded to trees",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "69",
+          "rowId": "71",
           "code": "M.p",
           "description": "gathering or removal of plant products",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "70",
+          "rowId": "72",
           "code": "M.f",
           "description": "firewood gathering",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "71",
+          "rowId": "73",
           "code": "M.m",
           "description": "mushrooms",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "72",
+          "rowId": "74",
           "code": "M.o",
           "description": "moss",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "73",
+          "rowId": "75",
           "code": "M.s",
           "description": "shrubs (e.g., salal, falsebox)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "74",
+          "rowId": "76",
           "code": "M.x",
           "description": "other (specify under \"Notes\")",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "75",
+          "rowId": "77",
           "code": "R",
           "description": "Recreation-related effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "76",
+          "rowId": "78",
           "code": "R.m",
           "description": "motorized trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "77",
+          "rowId": "79",
           "code": "R.m.ec",
           "description": "constructed trail",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "78",
+          "rowId": "80",
           "code": "R.m.it",
           "description": "informal trail",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "79",
+          "rowId": "81",
           "code": "R.m.bt",
           "description": "braided trail sections",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "80",
+          "rowId": "82",
           "code": "R.m.tr",
           "description": "trampling – temporary use",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "81",
+          "rowId": "83",
           "code": "R.m.mb",
           "description": "mud bogging/rutting",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "82",
+          "rowId": "84",
           "code": "R.m.wi",
           "description": "winter use trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "83",
+          "rowId": "85",
           "code": "R.t",
           "description": "non-motorized trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "84",
+          "rowId": "86",
           "code": "R.t.ec",
           "description": "constructed trail",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "85",
+          "rowId": "87",
           "code": "R.t.it",
           "description": "informal trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "86",
+          "rowId": "88",
           "code": "R.t.bt",
           "description": "braided trails section",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "87",
+          "rowId": "89",
           "code": "R.t.tr",
           "description": "trampling – single use",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "88",
+          "rowId": "90",
           "code": "R.t.mb",
           "description": "mucking and trail entrenchment",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "89",
+          "rowId": "91",
           "code": "R.t.wi",
           "description": "winter use trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "90",
+          "rowId": "92",
           "code": "R.c",
           "description": "camping",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "91",
+          "rowId": "93",
           "code": "R.c.ec",
           "description": "established camp site",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "92",
+          "rowId": "94",
           "code": "R.c.ic",
           "description": "informal camp site",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "93",
+          "rowId": "95",
           "code": "R.l",
           "description": "litter and debris",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "94",
+          "rowId": "96",
           "code": "R.p",
           "description": "plant introductions",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "95",
+          "rowId": "97",
           "code": "S",
           "description": "Soil disturbance",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "96",
+          "rowId": "98",
           "code": "S.a",
           "description": "cultivation (agricultural)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "97",
+          "rowId": "99",
           "code": "S.c",
           "description": "compaction",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "98",
+          "rowId": "100",
           "code": "S.g",
           "description": "gouging (\u003e 5 cm into mineral soil)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "99",
+          "rowId": "101",
           "code": "S.s",
           "description": "scalping (forest floor removed)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "100",
+          "rowId": "102",
           "code": "S.f",
           "description": "sidecast/fill",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "101",
+          "rowId": "103",
           "code": "S.r",
           "description": "road bed, abandoned",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "102",
+          "rowId": "104",
           "code": "S.t",
           "description": "railway, abandoned",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "103",
+          "rowId": "105",
           "code": "S.e",
           "description": "excavation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "104",
+          "rowId": "106",
           "code": "S.m",
           "description": "mining effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "105",
+          "rowId": "107",
           "code": "S.m.pt",
           "description": "placer tailings",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "106",
+          "rowId": "108",
           "code": "S.m.rq",
           "description": "rock quarrying (including open pit mines)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "107",
+          "rowId": "109",
           "code": "S.m.ta",
           "description": "tailings",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "108",
+          "rowId": "110",
           "code": "S.p",
           "description": "mechanical site preparation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "109",
+          "rowId": "111",
           "code": "S.p.bb",
           "description": "brush blading",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "110",
+          "rowId": "112",
           "code": "S.p.ds",
           "description": "drag scarification (anchor chain or shark fin)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "111",
+          "rowId": "113",
           "code": "S.p.dt",
           "description": "disc trenching",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "112",
+          "rowId": "114",
           "code": "S.p.md",
           "description": "mounding",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "113",
+          "rowId": "115",
           "code": "S.p.ps",
           "description": "patch scarification",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "114",
+          "rowId": "116",
           "code": "S.p.vp",
           "description": "V-plowing",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "115",
+          "rowId": "117",
           "code": "S.p.xx",
           "description": "other (specify under “Notes”)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "116",
+          "rowId": "118",
           "code": "T",
           "description": "Terrain-related effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "117",
+          "rowId": "119",
           "code": "T.a",
           "description": "avalanche",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "118",
+          "rowId": "120",
           "code": "T.d",
           "description": "recent deglaciation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "119",
+          "rowId": "121",
           "code": "T.e",
           "description": "eolian (active deflation or deposition)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "120",
+          "rowId": "122",
           "code": "T.s",
           "description": "terrain failures (active/recent slumps, slides, solifluction, etc.)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "121",
+          "rowId": "123",
           "code": "T.v",
           "description": "volcanic activity",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "122",
+          "rowId": "124",
           "code": "W",
           "description": "Water-related effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "123",
+          "rowId": "125",
           "code": "W.i",
           "description": "inundation (including temporary inundation resulting from beaver activity)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "124",
+          "rowId": "126",
           "code": "W.s",
           "description": "temporary seepage (usually artificially induced; excludes intermittent seepage resulting from climate",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "125",
+          "rowId": "127",
           "code": "W.d",
           "description": "water table control (diking, damming)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "126",
+          "rowId": "128",
           "code": "W.e",
           "description": "water table depression (associated with extensive water extraction from wells)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "127",
+          "rowId": "129",
           "code": "X",
           "description": "Miscellaneous (For other disturbance types, enter “X” and describe under “Notes\")",
           "selectable": true,
@@ -38262,6 +38754,156 @@
                 "storage": "real",
                 "text": null,
                 "integer": null,
+                "real": 12.1,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A.w.th",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Windthrow (uprooting)",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "3",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "14",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
+                "real": 12.2,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "A.w.br",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "Windbreak (stem snap)",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "text",
+                "text": "3",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "-1",
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "integer",
+                "text": null,
+                "integer": "0",
+                "real": null,
+                "blobHex": null
+              }
+            ]
+          },
+          {
+            "rowId": "15",
+            "cells": [
+              {
+                "storage": "text",
+                "text": "SiteDisturbance",
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "null",
+                "text": null,
+                "integer": null,
+                "real": null,
+                "blobHex": null
+              },
+              {
+                "storage": "real",
+                "text": null,
+                "integer": null,
                 "real": 13,
                 "blobHex": null
               },
@@ -38317,7 +38959,7 @@
             ]
           },
           {
-            "rowId": "14",
+            "rowId": "16",
             "cells": [
               {
                 "storage": "text",
@@ -38392,7 +39034,7 @@
             ]
           },
           {
-            "rowId": "15",
+            "rowId": "17",
             "cells": [
               {
                 "storage": "text",
@@ -38467,7 +39109,7 @@
             ]
           },
           {
-            "rowId": "16",
+            "rowId": "18",
             "cells": [
               {
                 "storage": "text",
@@ -38542,7 +39184,7 @@
             ]
           },
           {
-            "rowId": "17",
+            "rowId": "19",
             "cells": [
               {
                 "storage": "text",
@@ -38617,7 +39259,7 @@
             ]
           },
           {
-            "rowId": "18",
+            "rowId": "20",
             "cells": [
               {
                 "storage": "text",
@@ -38692,7 +39334,7 @@
             ]
           },
           {
-            "rowId": "19",
+            "rowId": "21",
             "cells": [
               {
                 "storage": "text",
@@ -38767,7 +39409,7 @@
             ]
           },
           {
-            "rowId": "20",
+            "rowId": "22",
             "cells": [
               {
                 "storage": "text",
@@ -38842,7 +39484,7 @@
             ]
           },
           {
-            "rowId": "21",
+            "rowId": "23",
             "cells": [
               {
                 "storage": "text",
@@ -38917,7 +39559,7 @@
             ]
           },
           {
-            "rowId": "22",
+            "rowId": "24",
             "cells": [
               {
                 "storage": "text",
@@ -38992,7 +39634,7 @@
             ]
           },
           {
-            "rowId": "23",
+            "rowId": "25",
             "cells": [
               {
                 "storage": "text",
@@ -39067,7 +39709,7 @@
             ]
           },
           {
-            "rowId": "24",
+            "rowId": "26",
             "cells": [
               {
                 "storage": "text",
@@ -39142,7 +39784,7 @@
             ]
           },
           {
-            "rowId": "25",
+            "rowId": "27",
             "cells": [
               {
                 "storage": "text",
@@ -39217,7 +39859,7 @@
             ]
           },
           {
-            "rowId": "26",
+            "rowId": "28",
             "cells": [
               {
                 "storage": "text",
@@ -39292,7 +39934,7 @@
             ]
           },
           {
-            "rowId": "27",
+            "rowId": "29",
             "cells": [
               {
                 "storage": "text",
@@ -39367,7 +40009,7 @@
             ]
           },
           {
-            "rowId": "28",
+            "rowId": "30",
             "cells": [
               {
                 "storage": "text",
@@ -39442,7 +40084,7 @@
             ]
           },
           {
-            "rowId": "29",
+            "rowId": "31",
             "cells": [
               {
                 "storage": "text",
@@ -39517,7 +40159,7 @@
             ]
           },
           {
-            "rowId": "30",
+            "rowId": "32",
             "cells": [
               {
                 "storage": "text",
@@ -39592,7 +40234,7 @@
             ]
           },
           {
-            "rowId": "31",
+            "rowId": "33",
             "cells": [
               {
                 "storage": "text",
@@ -39667,7 +40309,7 @@
             ]
           },
           {
-            "rowId": "32",
+            "rowId": "34",
             "cells": [
               {
                 "storage": "text",
@@ -39742,7 +40384,7 @@
             ]
           },
           {
-            "rowId": "33",
+            "rowId": "35",
             "cells": [
               {
                 "storage": "text",
@@ -39817,7 +40459,7 @@
             ]
           },
           {
-            "rowId": "34",
+            "rowId": "36",
             "cells": [
               {
                 "storage": "text",
@@ -39892,7 +40534,7 @@
             ]
           },
           {
-            "rowId": "35",
+            "rowId": "37",
             "cells": [
               {
                 "storage": "text",
@@ -39967,7 +40609,7 @@
             ]
           },
           {
-            "rowId": "36",
+            "rowId": "38",
             "cells": [
               {
                 "storage": "text",
@@ -40042,7 +40684,7 @@
             ]
           },
           {
-            "rowId": "37",
+            "rowId": "39",
             "cells": [
               {
                 "storage": "text",
@@ -40117,7 +40759,7 @@
             ]
           },
           {
-            "rowId": "38",
+            "rowId": "40",
             "cells": [
               {
                 "storage": "text",
@@ -40192,7 +40834,7 @@
             ]
           },
           {
-            "rowId": "39",
+            "rowId": "41",
             "cells": [
               {
                 "storage": "text",
@@ -40267,7 +40909,7 @@
             ]
           },
           {
-            "rowId": "40",
+            "rowId": "42",
             "cells": [
               {
                 "storage": "text",
@@ -40342,7 +40984,7 @@
             ]
           },
           {
-            "rowId": "41",
+            "rowId": "43",
             "cells": [
               {
                 "storage": "text",
@@ -40417,7 +41059,7 @@
             ]
           },
           {
-            "rowId": "42",
+            "rowId": "44",
             "cells": [
               {
                 "storage": "text",
@@ -40492,7 +41134,7 @@
             ]
           },
           {
-            "rowId": "43",
+            "rowId": "45",
             "cells": [
               {
                 "storage": "text",
@@ -40567,7 +41209,7 @@
             ]
           },
           {
-            "rowId": "44",
+            "rowId": "46",
             "cells": [
               {
                 "storage": "text",
@@ -40642,7 +41284,7 @@
             ]
           },
           {
-            "rowId": "45",
+            "rowId": "47",
             "cells": [
               {
                 "storage": "text",
@@ -40717,7 +41359,7 @@
             ]
           },
           {
-            "rowId": "46",
+            "rowId": "48",
             "cells": [
               {
                 "storage": "text",
@@ -40792,7 +41434,7 @@
             ]
           },
           {
-            "rowId": "47",
+            "rowId": "49",
             "cells": [
               {
                 "storage": "text",
@@ -40867,7 +41509,7 @@
             ]
           },
           {
-            "rowId": "48",
+            "rowId": "50",
             "cells": [
               {
                 "storage": "text",
@@ -40942,7 +41584,7 @@
             ]
           },
           {
-            "rowId": "49",
+            "rowId": "51",
             "cells": [
               {
                 "storage": "text",
@@ -41017,7 +41659,7 @@
             ]
           },
           {
-            "rowId": "50",
+            "rowId": "52",
             "cells": [
               {
                 "storage": "text",
@@ -41092,7 +41734,7 @@
             ]
           },
           {
-            "rowId": "51",
+            "rowId": "53",
             "cells": [
               {
                 "storage": "text",
@@ -41167,7 +41809,7 @@
             ]
           },
           {
-            "rowId": "52",
+            "rowId": "54",
             "cells": [
               {
                 "storage": "text",
@@ -41242,7 +41884,7 @@
             ]
           },
           {
-            "rowId": "53",
+            "rowId": "55",
             "cells": [
               {
                 "storage": "text",
@@ -41317,7 +41959,7 @@
             ]
           },
           {
-            "rowId": "54",
+            "rowId": "56",
             "cells": [
               {
                 "storage": "text",
@@ -41392,7 +42034,7 @@
             ]
           },
           {
-            "rowId": "55",
+            "rowId": "57",
             "cells": [
               {
                 "storage": "text",
@@ -41467,7 +42109,7 @@
             ]
           },
           {
-            "rowId": "56",
+            "rowId": "58",
             "cells": [
               {
                 "storage": "text",
@@ -41542,7 +42184,7 @@
             ]
           },
           {
-            "rowId": "57",
+            "rowId": "59",
             "cells": [
               {
                 "storage": "text",
@@ -41617,7 +42259,7 @@
             ]
           },
           {
-            "rowId": "58",
+            "rowId": "60",
             "cells": [
               {
                 "storage": "text",
@@ -41692,7 +42334,7 @@
             ]
           },
           {
-            "rowId": "59",
+            "rowId": "61",
             "cells": [
               {
                 "storage": "text",
@@ -41767,7 +42409,7 @@
             ]
           },
           {
-            "rowId": "60",
+            "rowId": "62",
             "cells": [
               {
                 "storage": "text",
@@ -41842,7 +42484,7 @@
             ]
           },
           {
-            "rowId": "61",
+            "rowId": "63",
             "cells": [
               {
                 "storage": "text",
@@ -41917,7 +42559,7 @@
             ]
           },
           {
-            "rowId": "62",
+            "rowId": "64",
             "cells": [
               {
                 "storage": "text",
@@ -41992,7 +42634,7 @@
             ]
           },
           {
-            "rowId": "63",
+            "rowId": "65",
             "cells": [
               {
                 "storage": "text",
@@ -42067,7 +42709,7 @@
             ]
           },
           {
-            "rowId": "64",
+            "rowId": "66",
             "cells": [
               {
                 "storage": "text",
@@ -42142,7 +42784,7 @@
             ]
           },
           {
-            "rowId": "65",
+            "rowId": "67",
             "cells": [
               {
                 "storage": "text",
@@ -42217,7 +42859,7 @@
             ]
           },
           {
-            "rowId": "66",
+            "rowId": "68",
             "cells": [
               {
                 "storage": "text",
@@ -42292,7 +42934,7 @@
             ]
           },
           {
-            "rowId": "67",
+            "rowId": "69",
             "cells": [
               {
                 "storage": "text",
@@ -42367,7 +43009,7 @@
             ]
           },
           {
-            "rowId": "68",
+            "rowId": "70",
             "cells": [
               {
                 "storage": "text",
@@ -42442,7 +43084,7 @@
             ]
           },
           {
-            "rowId": "69",
+            "rowId": "71",
             "cells": [
               {
                 "storage": "text",
@@ -42517,7 +43159,7 @@
             ]
           },
           {
-            "rowId": "70",
+            "rowId": "72",
             "cells": [
               {
                 "storage": "text",
@@ -42592,7 +43234,7 @@
             ]
           },
           {
-            "rowId": "71",
+            "rowId": "73",
             "cells": [
               {
                 "storage": "text",
@@ -42667,7 +43309,7 @@
             ]
           },
           {
-            "rowId": "72",
+            "rowId": "74",
             "cells": [
               {
                 "storage": "text",
@@ -42742,7 +43384,7 @@
             ]
           },
           {
-            "rowId": "73",
+            "rowId": "75",
             "cells": [
               {
                 "storage": "text",
@@ -42817,7 +43459,7 @@
             ]
           },
           {
-            "rowId": "74",
+            "rowId": "76",
             "cells": [
               {
                 "storage": "text",
@@ -42892,7 +43534,7 @@
             ]
           },
           {
-            "rowId": "75",
+            "rowId": "77",
             "cells": [
               {
                 "storage": "text",
@@ -42967,7 +43609,7 @@
             ]
           },
           {
-            "rowId": "76",
+            "rowId": "78",
             "cells": [
               {
                 "storage": "text",
@@ -43042,7 +43684,7 @@
             ]
           },
           {
-            "rowId": "77",
+            "rowId": "79",
             "cells": [
               {
                 "storage": "text",
@@ -43117,7 +43759,7 @@
             ]
           },
           {
-            "rowId": "78",
+            "rowId": "80",
             "cells": [
               {
                 "storage": "text",
@@ -43192,7 +43834,7 @@
             ]
           },
           {
-            "rowId": "79",
+            "rowId": "81",
             "cells": [
               {
                 "storage": "text",
@@ -43267,7 +43909,7 @@
             ]
           },
           {
-            "rowId": "80",
+            "rowId": "82",
             "cells": [
               {
                 "storage": "text",
@@ -43342,7 +43984,7 @@
             ]
           },
           {
-            "rowId": "81",
+            "rowId": "83",
             "cells": [
               {
                 "storage": "text",
@@ -43417,7 +44059,7 @@
             ]
           },
           {
-            "rowId": "82",
+            "rowId": "84",
             "cells": [
               {
                 "storage": "text",
@@ -43492,7 +44134,7 @@
             ]
           },
           {
-            "rowId": "83",
+            "rowId": "85",
             "cells": [
               {
                 "storage": "text",
@@ -43567,7 +44209,7 @@
             ]
           },
           {
-            "rowId": "84",
+            "rowId": "86",
             "cells": [
               {
                 "storage": "text",
@@ -43642,7 +44284,7 @@
             ]
           },
           {
-            "rowId": "85",
+            "rowId": "87",
             "cells": [
               {
                 "storage": "text",
@@ -43717,7 +44359,7 @@
             ]
           },
           {
-            "rowId": "86",
+            "rowId": "88",
             "cells": [
               {
                 "storage": "text",
@@ -43792,7 +44434,7 @@
             ]
           },
           {
-            "rowId": "87",
+            "rowId": "89",
             "cells": [
               {
                 "storage": "text",
@@ -43867,7 +44509,7 @@
             ]
           },
           {
-            "rowId": "88",
+            "rowId": "90",
             "cells": [
               {
                 "storage": "text",
@@ -43942,7 +44584,7 @@
             ]
           },
           {
-            "rowId": "89",
+            "rowId": "91",
             "cells": [
               {
                 "storage": "text",
@@ -44017,7 +44659,7 @@
             ]
           },
           {
-            "rowId": "90",
+            "rowId": "92",
             "cells": [
               {
                 "storage": "text",
@@ -44092,7 +44734,7 @@
             ]
           },
           {
-            "rowId": "91",
+            "rowId": "93",
             "cells": [
               {
                 "storage": "text",
@@ -44167,7 +44809,7 @@
             ]
           },
           {
-            "rowId": "92",
+            "rowId": "94",
             "cells": [
               {
                 "storage": "text",
@@ -44242,7 +44884,7 @@
             ]
           },
           {
-            "rowId": "93",
+            "rowId": "95",
             "cells": [
               {
                 "storage": "text",
@@ -44317,7 +44959,7 @@
             ]
           },
           {
-            "rowId": "94",
+            "rowId": "96",
             "cells": [
               {
                 "storage": "text",
@@ -44392,7 +45034,7 @@
             ]
           },
           {
-            "rowId": "95",
+            "rowId": "97",
             "cells": [
               {
                 "storage": "text",
@@ -44467,7 +45109,7 @@
             ]
           },
           {
-            "rowId": "96",
+            "rowId": "98",
             "cells": [
               {
                 "storage": "text",
@@ -44542,7 +45184,7 @@
             ]
           },
           {
-            "rowId": "97",
+            "rowId": "99",
             "cells": [
               {
                 "storage": "text",
@@ -44617,7 +45259,7 @@
             ]
           },
           {
-            "rowId": "98",
+            "rowId": "100",
             "cells": [
               {
                 "storage": "text",
@@ -44692,7 +45334,7 @@
             ]
           },
           {
-            "rowId": "99",
+            "rowId": "101",
             "cells": [
               {
                 "storage": "text",
@@ -44767,7 +45409,7 @@
             ]
           },
           {
-            "rowId": "100",
+            "rowId": "102",
             "cells": [
               {
                 "storage": "text",
@@ -44842,7 +45484,7 @@
             ]
           },
           {
-            "rowId": "101",
+            "rowId": "103",
             "cells": [
               {
                 "storage": "text",
@@ -44917,7 +45559,7 @@
             ]
           },
           {
-            "rowId": "102",
+            "rowId": "104",
             "cells": [
               {
                 "storage": "text",
@@ -44992,7 +45634,7 @@
             ]
           },
           {
-            "rowId": "103",
+            "rowId": "105",
             "cells": [
               {
                 "storage": "text",
@@ -45067,7 +45709,7 @@
             ]
           },
           {
-            "rowId": "104",
+            "rowId": "106",
             "cells": [
               {
                 "storage": "text",
@@ -45142,7 +45784,7 @@
             ]
           },
           {
-            "rowId": "105",
+            "rowId": "107",
             "cells": [
               {
                 "storage": "text",
@@ -45217,7 +45859,7 @@
             ]
           },
           {
-            "rowId": "106",
+            "rowId": "108",
             "cells": [
               {
                 "storage": "text",
@@ -45292,7 +45934,7 @@
             ]
           },
           {
-            "rowId": "107",
+            "rowId": "109",
             "cells": [
               {
                 "storage": "text",
@@ -45367,7 +46009,7 @@
             ]
           },
           {
-            "rowId": "108",
+            "rowId": "110",
             "cells": [
               {
                 "storage": "text",
@@ -45442,7 +46084,7 @@
             ]
           },
           {
-            "rowId": "109",
+            "rowId": "111",
             "cells": [
               {
                 "storage": "text",
@@ -45517,7 +46159,7 @@
             ]
           },
           {
-            "rowId": "110",
+            "rowId": "112",
             "cells": [
               {
                 "storage": "text",
@@ -45592,7 +46234,7 @@
             ]
           },
           {
-            "rowId": "111",
+            "rowId": "113",
             "cells": [
               {
                 "storage": "text",
@@ -45667,7 +46309,7 @@
             ]
           },
           {
-            "rowId": "112",
+            "rowId": "114",
             "cells": [
               {
                 "storage": "text",
@@ -45742,7 +46384,7 @@
             ]
           },
           {
-            "rowId": "113",
+            "rowId": "115",
             "cells": [
               {
                 "storage": "text",
@@ -45817,7 +46459,7 @@
             ]
           },
           {
-            "rowId": "114",
+            "rowId": "116",
             "cells": [
               {
                 "storage": "text",
@@ -45892,7 +46534,7 @@
             ]
           },
           {
-            "rowId": "115",
+            "rowId": "117",
             "cells": [
               {
                 "storage": "text",
@@ -45967,7 +46609,7 @@
             ]
           },
           {
-            "rowId": "116",
+            "rowId": "118",
             "cells": [
               {
                 "storage": "text",
@@ -46042,7 +46684,7 @@
             ]
           },
           {
-            "rowId": "117",
+            "rowId": "119",
             "cells": [
               {
                 "storage": "text",
@@ -46117,7 +46759,7 @@
             ]
           },
           {
-            "rowId": "118",
+            "rowId": "120",
             "cells": [
               {
                 "storage": "text",
@@ -46192,7 +46834,7 @@
             ]
           },
           {
-            "rowId": "119",
+            "rowId": "121",
             "cells": [
               {
                 "storage": "text",
@@ -46267,7 +46909,7 @@
             ]
           },
           {
-            "rowId": "120",
+            "rowId": "122",
             "cells": [
               {
                 "storage": "text",
@@ -46342,7 +46984,7 @@
             ]
           },
           {
-            "rowId": "121",
+            "rowId": "123",
             "cells": [
               {
                 "storage": "text",
@@ -46417,7 +47059,7 @@
             ]
           },
           {
-            "rowId": "122",
+            "rowId": "124",
             "cells": [
               {
                 "storage": "text",
@@ -46492,7 +47134,7 @@
             ]
           },
           {
-            "rowId": "123",
+            "rowId": "125",
             "cells": [
               {
                 "storage": "text",
@@ -46567,7 +47209,7 @@
             ]
           },
           {
-            "rowId": "124",
+            "rowId": "126",
             "cells": [
               {
                 "storage": "text",
@@ -46642,7 +47284,7 @@
             ]
           },
           {
-            "rowId": "125",
+            "rowId": "127",
             "cells": [
               {
                 "storage": "text",
@@ -46717,7 +47359,7 @@
             ]
           },
           {
-            "rowId": "126",
+            "rowId": "128",
             "cells": [
               {
                 "storage": "text",
@@ -46792,7 +47434,7 @@
             ]
           },
           {
-            "rowId": "127",
+            "rowId": "129",
             "cells": [
               {
                 "storage": "text",
@@ -46955,804 +47597,818 @@
         },
         {
           "rowId": "13",
+          "code": "A.w.th",
+          "description": "Windthrow (uprooting)",
+          "selectable": true,
+          "diagnostic": ""
+        },
+        {
+          "rowId": "14",
+          "code": "A.w.br",
+          "description": "Windbreak (stem snap)",
+          "selectable": true,
+          "diagnostic": ""
+        },
+        {
+          "rowId": "15",
           "code": "B",
           "description": "Biotic effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "14",
+          "rowId": "16",
           "code": "B.b",
           "description": "beaver tree cutting",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "15",
+          "rowId": "17",
           "code": "B.d",
           "description": "domestic grazing/browsing",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "16",
+          "rowId": "18",
           "code": "B.w",
           "description": "wildlife grazing/browsing",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "17",
+          "rowId": "19",
           "code": "B.e",
           "description": "excrement accumulation (other than that normally associated with",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "18",
+          "rowId": "20",
           "code": "B.i",
           "description": "insects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "19",
+          "rowId": "21",
           "code": "B.i.ki",
           "description": "insect kill",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "20",
+          "rowId": "22",
           "code": "B.i.in",
           "description": "infestation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "21",
+          "rowId": "23",
           "code": "B.p",
           "description": "disease",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "22",
+          "rowId": "24",
           "code": "B.t",
           "description": "turbation (soil)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "23",
+          "rowId": "25",
           "code": "B.v",
           "description": "aggressive vegetation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "24",
+          "rowId": "26",
           "code": "D",
           "description": "Disposals",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "25",
+          "rowId": "27",
           "code": "D.c",
           "description": "chemical spill or disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "26",
+          "rowId": "28",
           "code": "D.e",
           "description": "effluent disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "27",
+          "rowId": "29",
           "code": "D.g",
           "description": "domestic garbage disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "28",
+          "rowId": "30",
           "code": "D.o",
           "description": "oil spill or disposal",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "29",
+          "rowId": "31",
           "code": "D.r",
           "description": "radioactive waste disposal or exposure",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "30",
+          "rowId": "32",
           "code": "F",
           "description": "Fires",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "31",
+          "rowId": "33",
           "code": "F.c",
           "description": "overstorey crown fire",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "32",
+          "rowId": "34",
           "code": "F.g",
           "description": "light surface (ground) fire",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "33",
+          "rowId": "35",
           "code": "F.r",
           "description": "repeated light surface fires",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "34",
+          "rowId": "36",
           "code": "F.s",
           "description": "severe surface fire",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "35",
+          "rowId": "37",
           "code": "F.i",
           "description": "repeated severe surface fires",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "36",
+          "rowId": "38",
           "code": "F.l",
           "description": "burning of logging slash",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "37",
+          "rowId": "39",
           "code": "F.l.bb",
           "description": "broadcast burn",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "38",
+          "rowId": "40",
           "code": "F.l.pb",
           "description": "piled and burned",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "39",
+          "rowId": "41",
           "code": "F.l.wb",
           "description": "burned windrows",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "40",
+          "rowId": "42",
           "code": "L",
           "description": "Forest harvesting",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "41",
+          "rowId": "43",
           "code": "L.l",
           "description": "land clearing (includes abandoned agriculture)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "42",
+          "rowId": "44",
           "code": "L.a",
           "description": "patch cut system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "43",
+          "rowId": "45",
           "code": "L.a.wr",
           "description": "with reserves",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "44",
+          "rowId": "46",
           "code": "L.c",
           "description": "clearcut system (if slashburned, see also \"Fires\")",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "45",
+          "rowId": "47",
           "code": "L.c.wr",
           "description": "with reserves (patch retention)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "46",
+          "rowId": "48",
           "code": "L.d",
           "description": "seed tree system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "47",
+          "rowId": "49",
           "code": "L.d.un",
           "description": "uniform",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "48",
+          "rowId": "50",
           "code": "L.d.gr",
           "description": "grouped",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "49",
+          "rowId": "51",
           "code": "L.e",
           "description": "selection system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "50",
+          "rowId": "52",
           "code": "L.e.gr",
           "description": "group selection",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "51",
+          "rowId": "53",
           "code": "L.e.si",
           "description": "single tree",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "52",
+          "rowId": "54",
           "code": "L.e.st",
           "description": "strip",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "53",
+          "rowId": "55",
           "code": "L.s",
           "description": "shelterwood system",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "54",
+          "rowId": "56",
           "code": "L.s.un",
           "description": "uniform",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "55",
+          "rowId": "57",
           "code": "L.s.gr",
           "description": "group",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "56",
+          "rowId": "58",
           "code": "L.s.st",
           "description": "strip",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "57",
+          "rowId": "59",
           "code": "L.s.ir",
           "description": "irregular",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "58",
+          "rowId": "60",
           "code": "L.s.na",
           "description": "natural",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "59",
+          "rowId": "61",
           "code": "L.s.nu",
           "description": "nurse tree",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "60",
+          "rowId": "62",
           "code": "L.o",
           "description": "coppice",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "61",
+          "rowId": "63",
           "code": "M",
           "description": "Plant or site modification effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "62",
+          "rowId": "64",
           "code": "M.c",
           "description": "herbicide use (chemical)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "63",
+          "rowId": "65",
           "code": "M.f",
           "description": "fertilization (specify type under \"Notes\")",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "64",
+          "rowId": "66",
           "code": "M.i",
           "description": "irrigation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "65",
+          "rowId": "67",
           "code": "M.g",
           "description": "seeded or planted to grasses",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "66",
+          "rowId": "68",
           "code": "M.h",
           "description": "seeded or planted to herbs",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "67",
+          "rowId": "69",
           "code": "M.s",
           "description": "planted or seeded to shrubs",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "68",
+          "rowId": "70",
           "code": "M.t",
           "description": "planted or seeded to trees",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "69",
+          "rowId": "71",
           "code": "M.p",
           "description": "gathering or removal of plant products",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "70",
+          "rowId": "72",
           "code": "M.f",
           "description": "firewood gathering",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "71",
+          "rowId": "73",
           "code": "M.m",
           "description": "mushrooms",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "72",
+          "rowId": "74",
           "code": "M.o",
           "description": "moss",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "73",
+          "rowId": "75",
           "code": "M.s",
           "description": "shrubs (e.g., salal, falsebox)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "74",
+          "rowId": "76",
           "code": "M.x",
           "description": "other (specify under \"Notes\")",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "75",
+          "rowId": "77",
           "code": "R",
           "description": "Recreation-related effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "76",
+          "rowId": "78",
           "code": "R.m",
           "description": "motorized trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "77",
+          "rowId": "79",
           "code": "R.m.ec",
           "description": "constructed trail",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "78",
+          "rowId": "80",
           "code": "R.m.it",
           "description": "informal trail",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "79",
+          "rowId": "81",
           "code": "R.m.bt",
           "description": "braided trail sections",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "80",
+          "rowId": "82",
           "code": "R.m.tr",
           "description": "trampling – temporary use",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "81",
+          "rowId": "83",
           "code": "R.m.mb",
           "description": "mud bogging/rutting",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "82",
+          "rowId": "84",
           "code": "R.m.wi",
           "description": "winter use trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "83",
+          "rowId": "85",
           "code": "R.t",
           "description": "non-motorized trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "84",
+          "rowId": "86",
           "code": "R.t.ec",
           "description": "constructed trail",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "85",
+          "rowId": "87",
           "code": "R.t.it",
           "description": "informal trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "86",
+          "rowId": "88",
           "code": "R.t.bt",
           "description": "braided trails section",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "87",
+          "rowId": "89",
           "code": "R.t.tr",
           "description": "trampling – single use",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "88",
+          "rowId": "90",
           "code": "R.t.mb",
           "description": "mucking and trail entrenchment",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "89",
+          "rowId": "91",
           "code": "R.t.wi",
           "description": "winter use trails",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "90",
+          "rowId": "92",
           "code": "R.c",
           "description": "camping",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "91",
+          "rowId": "93",
           "code": "R.c.ec",
           "description": "established camp site",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "92",
+          "rowId": "94",
           "code": "R.c.ic",
           "description": "informal camp site",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "93",
+          "rowId": "95",
           "code": "R.l",
           "description": "litter and debris",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "94",
+          "rowId": "96",
           "code": "R.p",
           "description": "plant introductions",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "95",
+          "rowId": "97",
           "code": "S",
           "description": "Soil disturbance",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "96",
+          "rowId": "98",
           "code": "S.a",
           "description": "cultivation (agricultural)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "97",
+          "rowId": "99",
           "code": "S.c",
           "description": "compaction",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "98",
+          "rowId": "100",
           "code": "S.g",
           "description": "gouging (\u003e 5 cm into mineral soil)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "99",
+          "rowId": "101",
           "code": "S.s",
           "description": "scalping (forest floor removed)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "100",
+          "rowId": "102",
           "code": "S.f",
           "description": "sidecast/fill",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "101",
+          "rowId": "103",
           "code": "S.r",
           "description": "road bed, abandoned",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "102",
+          "rowId": "104",
           "code": "S.t",
           "description": "railway, abandoned",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "103",
+          "rowId": "105",
           "code": "S.e",
           "description": "excavation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "104",
+          "rowId": "106",
           "code": "S.m",
           "description": "mining effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "105",
+          "rowId": "107",
           "code": "S.m.pt",
           "description": "placer tailings",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "106",
+          "rowId": "108",
           "code": "S.m.rq",
           "description": "rock quarrying (including open pit mines)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "107",
+          "rowId": "109",
           "code": "S.m.ta",
           "description": "tailings",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "108",
+          "rowId": "110",
           "code": "S.p",
           "description": "mechanical site preparation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "109",
+          "rowId": "111",
           "code": "S.p.bb",
           "description": "brush blading",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "110",
+          "rowId": "112",
           "code": "S.p.ds",
           "description": "drag scarification (anchor chain or shark fin)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "111",
+          "rowId": "113",
           "code": "S.p.dt",
           "description": "disc trenching",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "112",
+          "rowId": "114",
           "code": "S.p.md",
           "description": "mounding",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "113",
+          "rowId": "115",
           "code": "S.p.ps",
           "description": "patch scarification",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "114",
+          "rowId": "116",
           "code": "S.p.vp",
           "description": "V-plowing",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "115",
+          "rowId": "117",
           "code": "S.p.xx",
           "description": "other (specify under “Notes”)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "116",
+          "rowId": "118",
           "code": "T",
           "description": "Terrain-related effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "117",
+          "rowId": "119",
           "code": "T.a",
           "description": "avalanche",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "118",
+          "rowId": "120",
           "code": "T.d",
           "description": "recent deglaciation",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "119",
+          "rowId": "121",
           "code": "T.e",
           "description": "eolian (active deflation or deposition)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "120",
+          "rowId": "122",
           "code": "T.s",
           "description": "terrain failures (active/recent slumps, slides, solifluction, etc.)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "121",
+          "rowId": "123",
           "code": "T.v",
           "description": "volcanic activity",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "122",
+          "rowId": "124",
           "code": "W",
           "description": "Water-related effects",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "123",
+          "rowId": "125",
           "code": "W.i",
           "description": "inundation (including temporary inundation resulting from beaver activity)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "124",
+          "rowId": "126",
           "code": "W.s",
           "description": "temporary seepage (usually artificially induced; excludes intermittent seepage resulting from climate",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "125",
+          "rowId": "127",
           "code": "W.d",
           "description": "water table control (diking, damming)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "126",
+          "rowId": "128",
           "code": "W.e",
           "description": "water table depression (associated with extensive water extraction from wells)",
           "selectable": true,
           "diagnostic": ""
         },
         {
-          "rowId": "127",
+          "rowId": "129",
           "code": "X",
           "description": "Miscellaneous (For other disturbance types, enter “X” and describe under “Notes\")",
           "selectable": true,

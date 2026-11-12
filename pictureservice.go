@@ -54,6 +54,9 @@ type PictureService struct {
 	enabled     bool
 	source      *ownedPictureLibrary
 	directories pictureImageDirectories
+	metadata    *PictureMetadataService
+	creation    *PictureCreationService
+	deletion    *PictureDeletionService
 }
 
 func NewPictureService(contexts *ContextService, lookup func(string) (string, bool)) (*PictureService, error) {

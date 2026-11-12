@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
-  import { TwoPageParentExtraService, AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService, AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import type { EditorCloseState } from './closeLifecycle';
   import TwoPageParentFields from './TwoPageParentFields.svelte';
@@ -40,10 +40,10 @@
     const existing = sessions.get(sourceForm);
     if (existing) return existing;
     const next = new TwoPageParentSession(owner, sourceForm, {
-      read: () => reads.track(TwoPageParentExtraService.GetOriginal(owner.contextId, owner.plot, sourceForm)),
+      read: () => reads.track(PlotEntryService.GetTwoPageParentExtraOriginal(owner.contextId, owner.plot, sourceForm)),
       cancelRead: () => reads.cancelAll(),
-      save: request => TwoPageParentExtraService.Save(owner.contextId, owner.plot, sourceForm, request),
-      restore: (history, action) => TwoPageParentExtraService.Restore(owner.contextId, owner.plot, sourceForm, history, action),
+      save: request => PlotEntryService.SaveTwoPageParentExtra(owner.contextId, owner.plot, sourceForm, request),
+      restore: (history, action) => PlotEntryService.RestoreTwoPageParentExtra(owner.contextId, owner.plot, sourceForm, history, action),
       refreshParent: async () => {
         await oncommitted();
         for (const [variant, peer] of sessions) {

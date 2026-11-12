@@ -49,10 +49,10 @@ function host(overrides = {}) {
 test('cover facade and source panel are independently gated without widening height saves', () => {
   assert.equal(compile(parent, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
   assert.match(parent, /VITE_SIVI_COVER_EDITING !== 'false'/);
-  for (const method of ['GetOriginal', 'SaveReviewed', 'RestoreReviewed']) {
-    assert.ok(parent.includes(`SIVICoverService.${method}(`));
+  for (const method of ['GetSIVICoverOriginal', 'SaveSIVICoverReviewed', 'RestoreSIVICoverReviewed']) {
+    assert.ok(parent.includes(`PlotEntryService.${method}(`));
   }
-  assert.match(parent, /read: extended => siviCoverReads\.track\(SIVICoverService\.GetOriginal/);
+  assert.match(parent, /read: extended => siviCoverReads\.track\(PlotEntryService\.GetSIVICoverOriginal/);
   assert.match(parent, /siviCoverSession\?\.dispose\(\);[\s\S]{0,70}siviCoverReads\.cancelAll\(\)/);
   assert.match(parent, /data-sivi-cover-cancel-read[\s\S]{0,110}siviCoverReads\.cancelAll/);
   assert.match(parent, /siviCoverSession = new SIVICoverSession/);
@@ -173,7 +173,7 @@ test('acknowledged child changes refresh only an already-loaded peer and preserv
 
     test('combined facade is independently gated and wired through Save Undo Lock close and disposal', () => {
       assert.match(parent, /VITE_SIVI_COMBINED_EDITING !== 'false'/);
-      for (const method of ['GetOriginal', 'SaveReviewed', 'RestoreReviewed']) assert.ok(parent.includes(`SIVICombinedService.${method}(`));
+      for (const method of ['GetSIVICombinedOriginal', 'SaveSIVICombinedReviewed', 'RestoreSIVICombinedReviewed']) assert.ok(parent.includes(`PlotEntryService.${method}(`));
       assert.match(parent, /siviCombinedSession\?\.dispose\(\);[\s\S]{0,70}siviCombinedReads\.cancelAll\(\)/);
       assert.match(parent, /if \(siviCombinedUnsaved\) \{ await siviCombinedOperation\('save'\); return; \}/);
       assert.match(parent, /if \(siviCombinedUnsaved\) \{ void siviCombinedOperation\('undo'\); return; \}/);

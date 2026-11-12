@@ -93,14 +93,15 @@ test('creation independently gates actual root/main registration and binds only 
   const main = readFileSync(path.join(__dirname, '..', '..', 'main.go'), 'utf8');
   assert.match(root, /VITE_SIVI_CREATION_WRITING !== 'false'/);
   assert.match(main, /NewSIVICreationService\(contextService, os.LookupEnv\)/);
-  assert.match(main, /application.NewService\(siviCreation\)/);
+  assert.match(main, /siviCreation:\s*siviCreation/);
+  assert.match(main, /application\.NewService\(plotEntryService\)/);
   const calls = [];
   class Session { constructor(owner, port) { this.owner = owner; this.port = port; } }
   const cache = loadTypeScript('siviCreationSessions.ts', {
-    '../bindings/github.com/boostao/vpro-wails': { SIVICreationService: {
-      GetReferences: (...args) => calls.push(['references', ...args]),
-      Create: (...args) => calls.push(['create', ...args]),
-      LookupReceipt: (...args) => calls.push(['lookup', ...args]),
+    '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {
+      GetSIVICreationReferences: (...args) => calls.push(['references', ...args]),
+      CreateSIVIVegetation: (...args) => calls.push(['create', ...args]),
+      LookupSIVICreationReceipt: (...args) => calls.push(['lookup', ...args]),
     } }, './siviCreationSession': { SIVICreationSession: Session },
   });
   const first = cache.siviCreationSession(owner);

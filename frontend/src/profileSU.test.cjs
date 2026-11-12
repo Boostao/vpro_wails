@@ -49,7 +49,7 @@ test('Project-file SU insertion is separately gated, immutable-destination revie
   assert.match(action,/await tick\(\);\s*const response = await ContextService.SaveProjectPlotProfileSUInProject/);
   assert.match(action,/suProjectCommitted = true/);
   assert.match(action,/Profile SU table committed, but/);
-  assert.match(action,/stateReads\.track\(ProjectService\.GetState\(\)\)/);
+  assert.match(action,/stateReads\.track\(ContextService\.GetState\(\)\)/);
   assert.match(action,/state\.contextId !== contextId \|\| \$projectState\?\.contextId !== contextId/);
   assert.match(action,/projectState\.set\(state\)/);
   assert.doesNotMatch(action,/SwitchContext|SelectPlotProfile/);

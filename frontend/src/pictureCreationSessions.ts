@@ -1,4 +1,4 @@
-import { PictureCreationService } from '../bindings/github.com/boostao/vpro-wails';
+import { PictureService } from '../bindings/github.com/boostao/vpro-wails';
 import { PictureCreationSession } from './pictureCreationSession';
 import type { PictureOwner } from './pictureRead';
 
@@ -34,13 +34,13 @@ export function pictureCreationSession(owner: PictureOwner): PictureCreationSess
   const retainedOwner = { contextId: owner.contextId, project: owner.project, plotNumber: owner.plotNumber };
   const { contextId, project, plotNumber } = retainedOwner;
   const session = new PictureCreationSession(retainedOwner, {
-    choose: () => PictureCreationService.Choose(contextId, project, plotNumber),
-    recoverSelection: () => PictureCreationService.RecoverSelection(contextId, project, plotNumber),
-    create: (token, request) => PictureCreationService.Create(token, request),
-    receipt: request => PictureCreationService.LookupReceipt(request),
-    image: (token, request) => PictureCreationService.GetSelectedImage(token, request),
-    release: token => PictureCreationService.ReleaseSelection(token),
-    acknowledge: token => PictureCreationService.AcknowledgeReceipt(token),
+    choose: () => PictureService.ChooseCreationImage(contextId, project, plotNumber),
+    recoverSelection: () => PictureService.RecoverCreationSelection(contextId, project, plotNumber),
+    create: (token, request) => PictureService.CreatePicture(token, request),
+    receipt: request => PictureService.LookupCreationReceipt(request),
+    image: (token, request) => PictureService.GetSelectedCreationImage(token, request),
+    release: token => PictureService.ReleaseCreationSelection(token),
+    acknowledge: token => PictureService.AcknowledgeCreationReceipt(token),
   });
   sessions.set(key, { owner: retainedOwner, session });
   // Idle construction can run in a derived expression and does not change activity.

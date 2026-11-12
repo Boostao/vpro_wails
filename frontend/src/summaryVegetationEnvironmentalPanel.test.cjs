@@ -204,8 +204,8 @@ test('both literal client feature flags required and fixed wire API calls only o
     ['false', 'true', false], [undefined, undefined, true], ['false', 'false', false]]) {
     const calls = [];
     const module = execute(desktop, {
-      '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationEnvironmentalService: {
-        PreviewEnvironmental: (...args) => { calls.push(args); return Promise.resolve(wire); },
+      '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {
+        PreviewSummaryVegetationEnvironmental: (...args) => { calls.push(args); return Promise.resolve(wire); },
       } },
       './summaryVegetationEnvironmental': client,
     }, { __environment: { VITE_SUMMARY_VEGETATION: base, VITE_SUMMARY_VEGETATION_ENVIRONMENT: environment,
@@ -225,9 +225,9 @@ test('independent numeric client flag selects one correct service and preserves 
     for (const numeric of ['true', 'false', 'TRUE', '']) {
       const calls = [];
       const module = execute(desktop, {
-        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationEnvironmentalService: {
-          PreviewEnvironmental: (...args) => { calls.push(['legacy', ...args]); return Promise.resolve(wire); },
-          PreviewEnvironmentalNumeric: (...args) => { calls.push(['numeric', ...args]); return Promise.resolve(numericWire); },
+        '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {
+          PreviewSummaryVegetationEnvironmental: (...args) => { calls.push(['legacy', ...args]); return Promise.resolve(wire); },
+          PreviewSummaryVegetationEnvironmentalNumeric: (...args) => { calls.push(['numeric', ...args]); return Promise.resolve(numericWire); },
         } },
         './summaryVegetationEnvironmental': client,
       }, { __environment: { VITE_SUMMARY_VEGETATION: base, VITE_SUMMARY_VEGETATION_ENVIRONMENT: environment,
@@ -254,12 +254,10 @@ test('literal lifeform client gate requires all three predecessors and selects e
       const calls = [];
       const module = execute(fs.readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalDesktop.ts'), 'utf8'), {
         '../bindings/github.com/boostao/vpro-wails': {
-          SummaryVegetationEnvironmentalService: {
-            PreviewEnvironmental: (...args) => { calls.push(['legacy', ...args]); return Promise.resolve(wire); },
-            PreviewEnvironmentalNumeric: (...args) => { calls.push(['numeric', ...args]); return Promise.resolve(numericWire); },
-          },
-          SummaryVegetationEnvironmentalLifeformService: {
-            PreviewEnvironmentalLifeform: (...args) => { calls.push(['lifeform', ...args]); return Promise.resolve(lifeformWire); },
+          VegetationReportService: {
+            PreviewSummaryVegetationEnvironmental: (...args) => { calls.push(['legacy', ...args]); return Promise.resolve(wire); },
+            PreviewSummaryVegetationEnvironmentalNumeric: (...args) => { calls.push(['numeric', ...args]); return Promise.resolve(numericWire); },
+            PreviewSummaryVegetationEnvironmentalLifeform: (...args) => { calls.push(['lifeform', ...args]); return Promise.resolve(lifeformWire); },
           },
         },
         './summaryVegetationEnvironmental': client,

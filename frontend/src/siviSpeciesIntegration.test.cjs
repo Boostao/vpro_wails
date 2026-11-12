@@ -33,12 +33,13 @@ test('Species independently gates actual main registration and coordinates both 
   assert.match(parent, /VITE_SIVI_SPECIES_EDITING !== 'false'/);
   assert.match(main, /siviFeature\(siviSpeciesFeatureEnvironment, os.LookupEnv\)/);
   assert.match(main, /NewSIVISpeciesService\(contextService, os.LookupEnv\)/);
-  assert.match(main, /application.NewService\(siviSpecies\)/);
-  for (const method of ['GetOriginal', 'GetReferences', 'SaveReviewed', 'RestoreReviewed']) {
-    assert.ok(parent.includes(`SIVISpeciesService.${method}(`));
+  assert.match(main, /siviSpecies:\s*siviSpecies/);
+  assert.match(main, /application\.NewService\(plotEntryService\)/);
+  for (const method of ['GetSIVISpeciesOriginal', 'GetSIVISpeciesReferences', 'SaveSIVISpeciesReviewed', 'RestoreSIVISpeciesReviewed']) {
+    assert.ok(parent.includes(`PlotEntryService.${method}(`));
   }
-  for (const method of ['GetOriginal', 'GetReferences']) {
-    assert.match(parent, new RegExp(`siviSpeciesReads.track\\(SIVISpeciesService.${method}`));
+  for (const method of ['GetSIVISpeciesOriginal', 'GetSIVISpeciesReferences']) {
+    assert.match(parent, new RegExp(`siviSpeciesReads.track\\(PlotEntryService.${method}`));
   }
   assert.match(parent, /siviSpeciesSession\?\.dispose\(\);[\s\S]{0,70}siviSpeciesReads\.cancelAll\(\)/);
   assert.match(parent, /data-sivi-species-cancel-read[\s\S]{0,110}siviSpeciesReads\.cancelAll/);

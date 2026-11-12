@@ -246,13 +246,13 @@ test('owned snapshots cannot mutate retained historical44 review or source audit
 test('owner cache uses actual four generated SDK methods, survives remount and isolates original plots', async () => {
   const calls = [], delivery = deferred();
   const sdk = {
-    GetHistory(...args) { calls.push(['GetHistory', ...args]); return read(history()); },
-    Review(...args) { calls.push(['Review', ...args]); return read(review()); },
-    Undo(...args) { calls.push(['Undo', ...args]); return delivery.promise; },
-    LookupReceipt(...args) { calls.push(['LookupReceipt', ...args]); return read(result(review(), JSON.parse(args[1]), true)); },
+    GetSIVICreationUndoHistory(...args) { calls.push(['GetHistory', ...args]); return read(history()); },
+    ReviewSIVICreationUndo(...args) { calls.push(['Review', ...args]); return read(review()); },
+    UndoSIVICreation(...args) { calls.push(['Undo', ...args]); return delivery.promise; },
+    LookupSIVICreationUndoReceipt(...args) { calls.push(['LookupReceipt', ...args]); return read(result(review(), JSON.parse(args[1]), true)); },
   };
   const cache = loadTypeScript('siviCreationUndoSessions.ts', {
-    '../bindings/github.com/boostao/vpro-wails': { SIVICreationUndoService: sdk },
+    '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: sdk },
     './siviCreationUndoSession': sessions,
   }).siviCreationUndoSession;
   const mutable = copy(owner), session = cache(mutable); mutable.plot = 'Changed';

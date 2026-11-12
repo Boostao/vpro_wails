@@ -213,7 +213,7 @@ test('saved reads cancel by generation and cannot populate remounted Summary con
     preferenceGeneration: 0, preferenceReadBusy: false, preferenceReadError: '', contextId: scope.contextId,
     reportBusy() { reports++; },
     preferenceReads: { track: request => request, cancelAll() { cancelled++; } },
-    SummaryVegetationPreferencesService: { GetSummaryVegetationPreferences() { return new Promise(resolve => { release = resolve; }); } },
+    VegetationReportService: { GetSummaryVegetationPreferences() { return new Promise(resolve => { release = resolve; }); } },
   });
   const pending = context.actions.loadPreferences();
   assert.equal(context.preferenceReadBusy, true);
@@ -242,7 +242,7 @@ test('failed owned reload blocks Save and Preview across remount until a success
     preferences: session, viewState: { busy: false }, operationHeld: false, preferenceHeld: false,
     preferenceGeneration: 0, preferenceReadBusy: false, preferenceReadError: '', contextId: owner.contextId,
     reportBusy() {}, preferenceReads: { track: request => request, cancelAll() {} },
-    SummaryVegetationPreferencesService: {
+    VegetationReportService: {
       GetSummaryVegetationPreferences() { return Promise.reject(new Error('Owned reload unavailable')); },
     },
   });
@@ -260,7 +260,7 @@ test('failed owned reload blocks Save and Preview across remount until a success
     assert.match(body.match(new RegExp(`<button[^>]*${selector}[^>]*>`))[0], /\bdisabled\b/);
   }
   assert.doesNotMatch(body.match(/<button[^>]*data-summary-preferences-load[^>]*>/)[0], /\bdisabled\b/);
-  context.SummaryVegetationPreferencesService.GetSummaryVegetationPreferences = async () => review(values(4, 1, 6), true, owner);
+  context.VegetationReportService.GetSummaryVegetationPreferences = async () => review(values(4, 1, 6), true, owner);
   await context.actions.loadPreferences();
   assert.equal(session.view().readError, '');
   body = render(panel(remounted), { props: { ...owner, onBusyChange() {} } }).body;

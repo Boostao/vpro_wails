@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
-  import { AuditRestoreAction, TwoPageParentEntryService, type SIVIParentSharedReference } from '../bindings/github.com/boostao/vpro-wails';
+  import { AuditRestoreAction, PlotEntryService, type SIVIParentSharedReference } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import type { EditorCloseState } from './closeLifecycle';
   import type { TwoPageParentForm } from './twoPageParentSession';
@@ -84,11 +84,11 @@
     if (existing) return existing;
     const requests = new ReadRequests();
     const created = new TwoPageEntrySession(owner, sourceForm, {
-      read: () => requests.track(TwoPageParentEntryService.GetOriginal(owner.contextId, owner.plot, sourceForm)),
-      readReferences: filters => requests.track(TwoPageParentEntryService.GetReferences(owner.contextId, owner.plot, sourceForm, filters)),
+      read: () => requests.track(PlotEntryService.GetTwoPageParentEntryOriginal(owner.contextId, owner.plot, sourceForm)),
+      readReferences: filters => requests.track(PlotEntryService.GetTwoPageParentEntryReferences(owner.contextId, owner.plot, sourceForm, filters)),
       cancelRead: () => requests.cancelAll(),
-      save: request => TwoPageParentEntryService.Save(owner.contextId, owner.plot, sourceForm, request),
-      restore: (history, action) => TwoPageParentEntryService.Restore(owner.contextId, owner.plot, sourceForm, history, action),
+      save: request => PlotEntryService.SaveTwoPageParentEntry(owner.contextId, owner.plot, sourceForm, request),
+      restore: (history, action) => PlotEntryService.RestoreTwoPageParentEntry(owner.contextId, owner.plot, sourceForm, history, action),
       refreshParent: async () => {
         await oncommitted();
         for (const [variant, peer] of sessions) {

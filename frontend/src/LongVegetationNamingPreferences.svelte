@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { LongVegetationNamingPreferencesService } from '../bindings/github.com/boostao/vpro-wails';
+  import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { longVegetationNamingChoices, type LongVegetationNamingPreferencesSession } from './longVegetationNamingPreferences';
 
@@ -29,7 +29,7 @@
     cancel(); const request = generation, token = preferences.beginLoad();
     error = ''; busy = true; onReadBusyChange(true);
     try {
-      const value = await reads.track(LongVegetationNamingPreferencesService.GetLongVegetationNamingPreferences(contextId));
+      const value = await reads.track(VegetationReportService.GetLongVegetationNamingPreferences(contextId));
       if (request !== generation) return;
       preferences.applyLoaded(value, token);
     } catch (cause) {
@@ -42,7 +42,7 @@
     if (busy || operationHeld || view.busy || view.blocked || view.authorityUnknown || view.draftError) return;
     cancel(); const request = generation; error = '';
     try {
-      await preferences.save(value => LongVegetationNamingPreferencesService.SaveLongVegetationNamingPreferences(contextId, JSON.stringify(value)));
+      await preferences.save(value => VegetationReportService.SaveLongVegetationNamingPreferences(contextId, JSON.stringify(value)));
     } catch (cause) {
       if (request === generation) error = String(cause);
     }

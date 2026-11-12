@@ -107,7 +107,7 @@ test('CSV UI is independently default-off and shares existing draft, context and
   assert.match(app,/view === 'table-csv' && import\.meta\.env\.VITE_TABLE_CSV_REVIEW !== 'false'/);
   assert.match(app,/function navigate[\s\S]*?requestTransition/);
   assert.match(app,/busy \|\| editorBusy \|\| transitionWorking/);
-  assert.match(component,/reads\.track\(ContextService\.GetProjectTableCSVReview\(contextId, table\)\)/);
+  assert.match(component,/reads\.track\(ImportExportService\.GetProjectTableCSVReview\(contextId, table\)\)/);
   assert.match(component,/const validated = await validateProjectTableCSVReview[\s\S]*?if \(request !== generation\) return;[\s\S]*?review = validated/);
   assert.match(component,/onDestroy\(cancel\)/);
   assert.match(component,/reads\.cancelAll\(\)/);

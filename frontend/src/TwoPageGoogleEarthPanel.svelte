@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { TwoPageGoogleEarthService } from '../bindings/github.com/boostao/vpro-wails';
+  import { SpatialService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { googleEarthXMLText } from './googleEarthKMLReview';
   import { metadataCellText } from './projectMetadataEditor';
@@ -46,7 +46,7 @@
     cancel(); const request = generation;
     options = null; review = null; title = ''; descriptionField = ''; error = ''; busy = true; onBusyChange(true);
     try {
-      const value = await reads.track(TwoPageGoogleEarthService.GetOptions(owner.contextId, owner.plot, owner.form));
+      const value = await reads.track(SpatialService.GetTwoPageGoogleEarthOptions(owner.contextId, owner.plot, owner.form));
       if (request !== generation) return;
       options = twoPageGoogleEarthOptionsFromWire(value, owner);
       title = options.title; descriptionField = options.descriptionField;
@@ -65,7 +65,7 @@
     cancel(); const request = generation, field = descriptionField, name = title;
     review = null; error = ''; busy = true; onBusyChange(true);
     try {
-      const value = await reads.track(TwoPageGoogleEarthService.GetReview(owner.contextId, owner.plot, owner.form,
+      const value = await reads.track(SpatialService.GetTwoPageGoogleEarthReview(owner.contextId, owner.plot, owner.form,
         JSON.stringify({ descriptionField: field, title: name })));
       if (request !== generation) return;
       const validated = await twoPageGoogleEarthReviewFromWire(value, owner, field, name);

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { LongVegetationQualityNullPreferencesService } from '../bindings/github.com/boostao/vpro-wails';
+  import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { longVegetationQualityNullFields, type LongVegetationQualityNullPreferencesSession, type LongVegetationQualityNullPreferenceValues } from './longVegetationQualityNullPreferences';
 
@@ -25,7 +25,7 @@
     cancel(); const request = generation, token = preferences.beginLoad();
     error = ''; busy = true; onReadBusyChange(true);
     try {
-      const value = await reads.track(LongVegetationQualityNullPreferencesService.GetLongVegetationQualityNullPreferences(contextId));
+      const value = await reads.track(VegetationReportService.GetLongVegetationQualityNullPreferences(contextId));
       if (request !== generation) return;
       preferences.applyLoaded(value, token);
     } catch (cause) {
@@ -38,7 +38,7 @@
     if (busy || operationHeld || view.busy || view.blocked || view.authorityUnknown || view.draftError) return;
     cancel(); const request = generation; error = '';
     try {
-      await preferences.save(value => LongVegetationQualityNullPreferencesService.SaveLongVegetationQualityNullPreferences(contextId, JSON.stringify(value)));
+      await preferences.save(value => VegetationReportService.SaveLongVegetationQualityNullPreferences(contextId, JSON.stringify(value)));
     } catch (cause) {
       if (request === generation) error = String(cause);
     }

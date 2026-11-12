@@ -37,9 +37,10 @@ test('Collected has independent literal frontend/backend gates and actual native
   assert.match(parent, /VITE_SIVI_COLLECTED_EDITING !== 'false'/);
   assert.match(main, /siviFeature\(siviCollectedFeatureEnvironment, os.LookupEnv\)/);
   assert.match(main, /NewSIVICollectedService\(contextService, os.LookupEnv\)/);
-  assert.match(main, /application.NewService\(siviCollected\)/);
-  for (const method of ['GetOriginal', 'SaveReviewed', 'RestoreReviewed']) assert.ok(parent.includes(`SIVICollectedService.${method}(`));
-  assert.match(parent, /read: extended => siviCollectedReads.track\(SIVICollectedService.GetOriginal/);
+  assert.match(main, /siviCollected:\s*siviCollected/);
+  assert.match(main, /application\.NewService\(plotEntryService\)/);
+  for (const method of ['GetSIVICollectedOriginal', 'SaveSIVICollectedReviewed', 'RestoreSIVICollectedReviewed']) assert.ok(parent.includes(`PlotEntryService.${method}(`));
+  assert.match(parent, /read: extended => siviCollectedReads.track\(PlotEntryService.GetSIVICollectedOriginal/);
   assert.match(parent, /siviCollectedSession\?\.dispose\(\);[\s\S]{0,70}siviCollectedReads\.cancelAll\(\)/);
   assert.match(parent, /data-sivi-collected-cancel-read[\s\S]{0,110}siviCollectedReads\.cancelAll/);
   assert.match(parent, /siviCollectedSession\?\.presentation\(extendedShrubs\)/);

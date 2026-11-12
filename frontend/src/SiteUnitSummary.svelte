@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, untrack } from 'svelte';
-  import { ContextService, SiteUnitSummaryPreferencesService } from '../bindings/github.com/boostao/vpro-wails';
+  import { EnvironmentReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { validateSiteUnitSummary, validateSiteUnitSummaryOptions, type ValidatedSiteUnitSummary, type SiteUnitSummaryMode } from './siteUnitSummary';
   import { reportCellText } from './longEnvironmentReport';
@@ -63,7 +63,7 @@
     cancel(); const request = generation;
     ready = false; error = ''; preview = null; speciesPreview = null; busy = true; reportBusy();
     try {
-      const value = await reads.track(ContextService.GetSiteUnitSummaryOptions(contextId));
+      const value = await reads.track(EnvironmentReportService.GetSiteUnitSummaryOptions(contextId));
       if (request !== generation) return;
       const configured = validateSiteUnitSummaryOptions(value, contextId, project, projectPath, su, suPath);
       method = configured.method; siteUnitType = configured.siteUnitType;
@@ -82,14 +82,14 @@
     error = ''; preview = null; speciesPreview = null; busy = true; reportBusy();
     try {
       if (speciesRequest) {
-        const value = await reads.track(ContextService.PreviewSiteUnitSummarySpecies(contextId, speciesRequest));
+        const value = await reads.track(EnvironmentReportService.PreviewSiteUnitSummarySpecies(contextId, speciesRequest));
         if (request !== generation) return;
         speciesPreview = validateSummarySpecies(value, { contextId, project, projectPath, su, suPath }, speciesRequest);
         preview = speciesPreview.environment;
       } else {
         const value = await reads.track(requestedMode === 'lifeform'
-          ? ContextService.PreviewSiteUnitSummaryLifeforms(contextId, { method: requestedMethod })
-          : ContextService.PreviewSiteUnitSummary(contextId, { method: requestedMethod }));
+          ? EnvironmentReportService.PreviewSiteUnitSummaryLifeforms(contextId, { method: requestedMethod })
+          : EnvironmentReportService.PreviewSiteUnitSummary(contextId, { method: requestedMethod }));
         if (request !== generation) return;
         preview = validateSiteUnitSummary(value, contextId, project, projectPath, su, suPath, requestedMethod, requestedMode);
       }
@@ -104,7 +104,7 @@
     cancel(); const request = generation; const token = preferences.beginLoad();
     error = ''; busy = true; reportBusy();
     try {
-      const value = await reads.track(SiteUnitSummaryPreferencesService.GetSiteUnitSummaryPreferences(contextId));
+      const value = await reads.track(EnvironmentReportService.GetSiteUnitSummaryPreferences(contextId));
       if (request !== generation) return;
       preferences.applyLoaded(value, token);
     } catch (cause) {
@@ -118,7 +118,7 @@
     if (!preferences || busy || speciesBarrier || preferenceView?.busy || preferenceView?.blocked) return;
     cancel(); error = '';
     try {
-      await preferences.save(request => SiteUnitSummaryPreferencesService.SaveSiteUnitSummaryPreferences(contextId, JSON.stringify(request)));
+      await preferences.save(request => EnvironmentReportService.SaveSiteUnitSummaryPreferences(contextId, JSON.stringify(request)));
     } catch (cause) { error = String(cause); }
   }
   function editMethod(value: number) {

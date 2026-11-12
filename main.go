@@ -333,6 +333,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	pictures.metadata = pictureMetadata
+	pictures.creation = pictureCreation
+	pictures.deletion = pictureDeletion
 	summaryVegetation, err := NewSummaryVegetationService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -513,10 +516,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	breakReport, err := NewBreakReportService(contextService, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
 	twoPageProfiling, err := NewTwoPageProfilingService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -537,109 +536,14 @@ func main() {
 	if err != nil {
 		log.Printf("Warning: failed to initialize WorkingUnitService: %v", err)
 	}
-
-	services := []application.Service{
-		application.NewService(&StartupService{state: StartupState{Ready: true, ConfigPath: preferences.path}}),
-		application.NewService(projects),
-		application.NewService(plots),
-		application.NewService(contextService),
-		application.NewService(plotLabelRegional),
-		application.NewService(NewPlotLabelPDFExportService(contextService, plotLabelPDFExportEnabled)),
-		application.NewService(NewExternalSUEnvironmentService(contextService, externalSUEnvironmentEditingEnabled)),
-		application.NewService(NewGoogleEarthReviewService(contextService, googleEarthReviewEnabled)),
-		application.NewService(NewGoogleEarthKMLService(contextService, googleEarthKMLEnabled)),
-		application.NewService(NewGoogleEarthKMLExportService(contextService, googleEarthKMLExportEnabled)),
-		application.NewService(NewGoogleEarthPreferencesService(contextService, googleEarthPreferencesEnabled)),
-		application.NewService(NewLongEnvironmentPreferencesService(contextService, longEnvironmentPreferencesEnabled)),
-		application.NewService(NewLongVegetationPreferencesService(contextService, longVegetationPreferencesEnabled)),
-		application.NewService(NewLongVegetationStatisticsPreferencesService(contextService, longVegetationStatisticsPreferencesEnabled)),
-		application.NewService(NewLongVegetationSwitchPreferencesService(contextService, longVegetationSwitchPreferencesEnabled)),
-		application.NewService(NewLongVegetationThresholdPreferencesService(contextService, longVegetationThresholdPreferencesEnabled)),
-		application.NewService(NewLongVegetationGroupPreferencesService(contextService, longVegetationGroupPreferencesEnabled)),
-		application.NewService(NewLongVegetationQualityNullPreferencesService(contextService, longVegetationQualityNullPreferencesEnabled)),
-		application.NewService(NewLongVegetationQualityMinimumPreferencesService(contextService, longVegetationQualityMinimumPreferencesEnabled)),
-		application.NewService(NewLongVegetationNamingPreferencesService(contextService, longVegetationNamingPreferencesEnabled)),
-		application.NewService(NewLongVegetationSelectedFieldPreferencesService(contextService, longVegetationSelectedFieldPreferencesEnabled)),
-		application.NewService(NewLongVegetationEnforcementPreferencesService(contextService, longVegetationEnforcementPreferencesEnabled)),
-		application.NewService(NewLongVegetationUnitPreferencesService(contextService, longVegetationUnitPreferencesEnabled)),
-		application.NewService(NewLongVegetationSelectedUnitSelectionService(contextService, longVegetationSelectedUnitSelectionEnabled)),
-		application.NewService(NewLongVegetationReportScopeService(contextService, longVegetationProjectScopeEnabled)),
-		application.NewService(NewLongVegetationProjectWorkbookService(contextService, longVegetationProjectScopeEnabled, vegetationWorkbook.private.enabled)),
-		application.NewService(NewSiteUnitSummaryPreferencesService(contextService, siteUnitSummaryPreferencesEnabled)),
-		application.NewService(siviParentShared),
-		application.NewService(siviCHARSParentEntry),
-		application.NewService(twoPageParentExtra),
-		application.NewService(twoPageParentCommon),
-		application.NewService(twoPageParentEntry),
-		application.NewService(twoPageSoil),
-		application.NewService(twoPageSourceAudit),
-		application.NewService(twoPageGoogleEarth),
-		application.NewService(twoPageVegetationTable),
-		application.NewService(twoPageEnvironmentTable),
-		application.NewService(twoPageProjectMetadata),
-		application.NewService(userLog),
-		application.NewService(breakReport),
-		application.NewService(twoPageProfiling),
-		application.NewService(profileSpeciesPresence),
-		application.NewService(twoPageVegetation),
-		application.NewService(twoPageVegetationSpeciesList),
-		application.NewService(siviCovers),
-		application.NewService(siviCombined),
-		application.NewService(siviCollected),
-		application.NewService(siviSpecies),
-		application.NewService(siviIdentity),
-		application.NewService(siviCreation),
-		application.NewService(siviCreationUndo),
-		application.NewService(siviDeletion),
-		application.NewService(pictures),
-		application.NewService(pictureMetadata),
-		application.NewService(pictureCreation),
-		application.NewService(pictureDeletion),
-		application.NewService(summaryVegetation),
-		application.NewService(summaryEnvironment),
-		application.NewService(summaryEnvironmentLifeform),
-		application.NewService(summaryVegetationWorkbook),
-		application.NewService(NewSummaryVegetationPreferencesService(contextService, summaryVegetationPreferencesEnabled, summaryVegetation.enabled)),
-		application.NewService(NewSummaryVegetationQualityPreferencesService(contextService, summaryVegetationQualityEnabled)),
-		application.NewService(NewSummaryVegetationPresentationPreferencesService(contextService, summaryVegetationPresentationEnabled)),
-		application.NewService(NewSummaryVegetationFieldListService(contextService, summaryVegetationFieldListEnabled)),
-		application.NewService(lifeformSummary),
-		application.NewService(speciesAttributeSummary),
-		application.NewService(lifeformWorkbook),
-		application.NewService(subzoneMatrix),
-		application.NewService(siteUnitSummaryWorkbook),
-		application.NewService(siteUnitSummaryExtendedWorkbook),
-		application.NewService(environmentWorkbook),
-		application.NewService(vegetationWorkbook),
-		application.NewService(NewTableCSVArchiveService(contextService, tableCSVArchiveEnabled)),
-		application.NewService(coordinates),
+	releaseChannel, err := preferences.releaseChannel()
+	if err != nil {
+		runStartupRecovery(windows, configDir, err)
+		return
 	}
-	if refService != nil {
-		services = append(services, application.NewService(refService))
-	}
-	if becService != nil {
-		services = append(services, application.NewService(becService))
-	}
-	if qualityService != nil {
-		services = append(services, application.NewService(qualityService))
-	}
-	if siteCodes != nil {
-		services = append(services, application.NewService(siteCodes))
-	}
-	if regionCodes != nil {
-		services = append(services, application.NewService(regionCodes))
-	}
-	if soilCodes != nil {
-		services = append(services, application.NewService(soilCodes))
-	}
-	if geologyCodes != nil {
-		services = append(services, application.NewService(geologyCodes))
-	}
-	if parentCodes != nil {
-		services = append(services, application.NewService(parentCodes))
-	}
-	if workingUnits != nil {
-		services = append(services, application.NewService(workingUnits))
+	helpService, err := NewHelpService(preferences)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	var app *application.App
@@ -650,7 +554,119 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	services = append(services, application.NewService(closeService))
+	startupService := &StartupService{state: StartupState{
+		Ready:          true,
+		ConfigPath:     preferences.path,
+		ReleaseChannel: releaseChannel,
+	}}
+	lifecycleService := NewLifecycleService(startupService, closeService, userLog)
+	plotEntryService := &PlotEntryService{
+		contexts:                     contextService,
+		plots:                        plots,
+		siviParentShared:             siviParentShared,
+		siviCHARSParentEntry:         siviCHARSParentEntry,
+		siviCovers:                   siviCovers,
+		siviCombined:                 siviCombined,
+		siviCollected:                siviCollected,
+		siviSpecies:                  siviSpecies,
+		siviIdentity:                 siviIdentity,
+		siviCreation:                 siviCreation,
+		siviCreationUndo:             siviCreationUndo,
+		siviDeletion:                 siviDeletion,
+		twoPageParentExtra:           twoPageParentExtra,
+		twoPageParentCommon:          twoPageParentCommon,
+		twoPageParentEntry:           twoPageParentEntry,
+		twoPageSoil:                  twoPageSoil,
+		twoPageVegetation:            twoPageVegetation,
+		twoPageVegetationSpeciesList: twoPageVegetationSpeciesList,
+		twoPageSourceAudit:           twoPageSourceAudit,
+		twoPageProjectMetadata:       twoPageProjectMetadata,
+		references:                   refService,
+		siteCodes:                    siteCodes,
+		soilCodes:                    soilCodes,
+		parentCodes:                  parentCodes,
+		geologyCodes:                 geologyCodes,
+		regionCodes:                  regionCodes,
+		quality:                      qualityService,
+	}
+	datasheetService := NewDatasheetService(twoPageEnvironmentTable, twoPageVegetationTable)
+	classificationService := NewClassificationService(
+		contextService,
+		becService,
+		workingUnits,
+		NewExternalSUEnvironmentService(contextService, externalSUEnvironmentEditingEnabled),
+		twoPageProfiling,
+		profileSpeciesPresence,
+	)
+	validationService := NewValidationService(contextService)
+	importExportService := NewImportExportService(
+		contextService,
+		NewTableCSVArchiveService(contextService, tableCSVArchiveEnabled),
+		plotLabelRegional,
+		NewPlotLabelPDFExportService(contextService, plotLabelPDFExportEnabled),
+	)
+	vegetationReportService := &VegetationReportService{
+		contexts:                       contextService,
+		summary:                        summaryVegetation,
+		summaryEnvironment:             summaryEnvironment,
+		summaryEnvironmentLifeform:     summaryEnvironmentLifeform,
+		summaryWorkbook:                summaryVegetationWorkbook,
+		summaryPreferences:             NewSummaryVegetationPreferencesService(contextService, summaryVegetationPreferencesEnabled, summaryVegetation.enabled),
+		summaryQualityPreferences:      NewSummaryVegetationQualityPreferencesService(contextService, summaryVegetationQualityEnabled),
+		summaryPresentationPreferences: NewSummaryVegetationPresentationPreferencesService(contextService, summaryVegetationPresentationEnabled),
+		summaryFieldList:               NewSummaryVegetationFieldListService(contextService, summaryVegetationFieldListEnabled),
+		longPreferences:                NewLongVegetationPreferencesService(contextService, longVegetationPreferencesEnabled),
+		longStatisticsPreferences:      NewLongVegetationStatisticsPreferencesService(contextService, longVegetationStatisticsPreferencesEnabled),
+		longSwitchPreferences:          NewLongVegetationSwitchPreferencesService(contextService, longVegetationSwitchPreferencesEnabled),
+		longThresholdPreferences:       NewLongVegetationThresholdPreferencesService(contextService, longVegetationThresholdPreferencesEnabled),
+		longGroupPreferences:           NewLongVegetationGroupPreferencesService(contextService, longVegetationGroupPreferencesEnabled),
+		longQualityNullPreferences:     NewLongVegetationQualityNullPreferencesService(contextService, longVegetationQualityNullPreferencesEnabled),
+		longQualityMinimumPreferences:  NewLongVegetationQualityMinimumPreferencesService(contextService, longVegetationQualityMinimumPreferencesEnabled),
+		longNamingPreferences:          NewLongVegetationNamingPreferencesService(contextService, longVegetationNamingPreferencesEnabled),
+		longSelectedFieldPreferences:   NewLongVegetationSelectedFieldPreferencesService(contextService, longVegetationSelectedFieldPreferencesEnabled),
+		longEnforcementPreferences:     NewLongVegetationEnforcementPreferencesService(contextService, longVegetationEnforcementPreferencesEnabled),
+		longUnitPreferences:            NewLongVegetationUnitPreferencesService(contextService, longVegetationUnitPreferencesEnabled),
+		longSelectedUnitSelection:      NewLongVegetationSelectedUnitSelectionService(contextService, longVegetationSelectedUnitSelectionEnabled),
+		longReportScope:                NewLongVegetationReportScopeService(contextService, longVegetationProjectScopeEnabled),
+		longProjectWorkbook:            NewLongVegetationProjectWorkbookService(contextService, longVegetationProjectScopeEnabled, vegetationWorkbook.private.enabled),
+		vegetationWorkbook:             vegetationWorkbook,
+		lifeformSummary:                lifeformSummary,
+		lifeformWorkbook:               lifeformWorkbook,
+		speciesAttributeSummary:        speciesAttributeSummary,
+	}
+	environmentReportService := &EnvironmentReportService{
+		contexts:                        contextService,
+		environmentWorkbook:             environmentWorkbook,
+		longEnvironmentPreferences:      NewLongEnvironmentPreferencesService(contextService, longEnvironmentPreferencesEnabled),
+		siteUnitSummaryPreferences:      NewSiteUnitSummaryPreferencesService(contextService, siteUnitSummaryPreferencesEnabled),
+		siteUnitSummaryWorkbook:         siteUnitSummaryWorkbook,
+		siteUnitSummaryExtendedWorkbook: siteUnitSummaryExtendedWorkbook,
+		subzoneMatrix:                   subzoneMatrix,
+	}
+	spatialService := &SpatialService{
+		contexts:               contextService,
+		coordinates:            coordinates,
+		googleEarthReview:      NewGoogleEarthReviewService(contextService, googleEarthReviewEnabled),
+		googleEarthKML:         NewGoogleEarthKMLService(contextService, googleEarthKMLEnabled),
+		googleEarthKMLExport:   NewGoogleEarthKMLExportService(contextService, googleEarthKMLExportEnabled),
+		googleEarthPreferences: NewGoogleEarthPreferencesService(contextService, googleEarthPreferencesEnabled),
+		twoPageGoogleEarth:     twoPageGoogleEarth,
+	}
+
+	services := []application.Service{
+		application.NewService(lifecycleService),
+		application.NewService(contextService),
+		application.NewService(plotEntryService),
+		application.NewService(datasheetService),
+		application.NewService(classificationService),
+		application.NewService(validationService),
+		application.NewService(importExportService),
+		application.NewService(vegetationReportService),
+		application.NewService(environmentReportService),
+		application.NewService(spatialService),
+		application.NewService(pictures),
+		application.NewService(helpService),
+	}
 
 	app = application.New(application.Options{
 		Name:        "VPro",

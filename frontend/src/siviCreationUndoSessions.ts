@@ -1,4 +1,4 @@
-import { SIVICreationUndoService } from '../bindings/github.com/boostao/vpro-wails';
+import { PlotEntryService } from '../bindings/github.com/boostao/vpro-wails';
 import { SIVICreationUndoSession } from './siviCreationUndoSession';
 import type { SIVISpeciesOwner } from './siviSpeciesEditor';
 
@@ -9,10 +9,10 @@ export function siviCreationUndoSession(owner: SIVISpeciesOwner): SIVICreationUn
   if (!session) {
     const { contextId, project, plot } = owner;
     session = new SIVICreationUndoSession({ contextId, project, plot }, {
-      history: () => SIVICreationUndoService.GetHistory(contextId, plot),
-      review: historyId => SIVICreationUndoService.Review(contextId, plot, historyId),
-      undo: request => SIVICreationUndoService.Undo(contextId, request),
-      receipt: request => SIVICreationUndoService.LookupReceipt(contextId, request),
+      history: () => PlotEntryService.GetSIVICreationUndoHistory(contextId, plot),
+      review: historyId => PlotEntryService.ReviewSIVICreationUndo(contextId, plot, historyId),
+      undo: request => PlotEntryService.UndoSIVICreation(contextId, request),
+      receipt: request => PlotEntryService.LookupSIVICreationUndoReceipt(contextId, request),
     });
     sessions.set(identity, session);
   }

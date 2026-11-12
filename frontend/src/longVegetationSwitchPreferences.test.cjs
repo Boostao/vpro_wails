@@ -116,7 +116,7 @@ test('actual switch component handlers cancel stale reads and refuse external he
     contextId: scope.contextId, preferences: session, view: session.view(), busy: false, error: '',
     operationHeld: false, mutationHeld: false, generation: 0, reads: new ReadRequests(),
     onReadBusyChange(value) { held.push(value); },
-    LongVegetationSwitchPreferencesService: {
+    VegetationReportService: {
       GetLongVegetationSwitchPreferences() {
         const value = new Promise(done => { release = done; }); value.cancel = () => { cancelled++; }; return value;
       },
@@ -180,7 +180,7 @@ test('actual report composition preserves default-off switches and propagates re
   }
   const panel = source('LongVegetationSwitchPreferences.svelte');
   assert.match(panel, /const value = event.currentTarget.checked; edit\(field.key, value\)/);
-  assert.doesNotMatch(panel, /reads\.track\(LongVegetationSwitchPreferencesService\.Save/);
+  assert.doesNotMatch(panel, /reads\.track\(VegetationReportService\.Save/);
   assert.match(reportSource, /switchView = switches.view\(\); invalidateReports\(\)/);
   assert.match(reportSource, /function invalidateReports\(\) \{\s*preview = null; workbookReview = null;\s*projectWorkspace\?\.invalidate\(\)/);
   assert.ok(reportSource.indexOf('data-vegetation-workbook-unknown') < reportSource.indexOf('<LongVegetationSwitchPreferences'));

@@ -241,8 +241,8 @@ test('panel compiles with accessible scoped source tables, default-off gate, cur
   assert.match(text, /method !== requestedMethod/);
   assert.match(text, /review\.preview\.report\.method === method/);
   assert.match(text, /!currentReview/);
-  assert.match(text, /reads\.track\(SiteUnitSummaryWorkbookService\.GetReview/);
-  assert.doesNotMatch(text, /reads\.track\(SiteUnitSummaryWorkbookService\.ExportReviewed/);
+  assert.match(text, /reads\.track\(EnvironmentReportService\.GetSiteUnitSummaryWorkbookReview/);
+  assert.doesNotMatch(text, /reads\.track\(EnvironmentReportService\.ExportReviewedSiteUnitSummaryWorkbook/);
   assert.match(text, /disposed \|\| requestGeneration !== generation/);
   assert.match(text, /originalSession\.publish\(review, destination/);
   assert.match(text, /session\.acknowledge\(\); review = null/);
@@ -263,7 +263,7 @@ test('actual server-rendered panel exposes label, disabled gate and explicit rem
     .replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK", "'false'")
     .replace('structuredClone(owner)', '({ ...owner })'),
     'SiteUnitSummaryWorkbookPanel.svelte', {
-      '../bindings/github.com/boostao/vpro-wails': { SiteUnitSummaryWorkbookService: {} },
+      '../bindings/github.com/boostao/vpro-wails': { EnvironmentReportService: {} },
       './siteUnitSummaryWorkbook': workbook,
       './siteUnitSummaryExtendedWorkbook': {},
       './longEnvironmentReport': {},
@@ -317,14 +317,14 @@ function panelScript(owned) {
     },
     siteUnitSummaryWorkbookPublicationSession: workbook.siteUnitSummaryWorkbookPublicationSession,
     validateSiteUnitSummaryWorkbookReview: workbook.validateSiteUnitSummaryWorkbookReview,
-    SiteUnitSummaryWorkbookService: {
-      GetReview(contextId, json) {
+    EnvironmentReportService: {
+      GetSiteUnitSummaryWorkbookReview(contextId, json) {
         let resolve; const promise = new Promise(done => resolve = done);
         promise.cancelled = false; promise.cancel = () => promise.cancelled = true;
         promise.resolve = resolve; promise.contextId = contextId; promise.request = JSON.parse(json);
         return promise;
       },
-      ExportReviewed: async () => { throw new Error('lost receipt'); },
+      ExportReviewedSiteUnitSummaryWorkbook: async () => { throw new Error('lost receipt'); },
     },
   });
   return { ...exports, props, holds, requests };

@@ -1,4 +1,4 @@
-import { PictureDeletionService, PictureService } from '../bindings/github.com/boostao/vpro-wails';
+import { PictureService } from '../bindings/github.com/boostao/vpro-wails';
 import { PictureLifecycleSession } from './pictureLifecycleSession';
 import type { PictureOwner } from './pictureRead';
 
@@ -32,12 +32,12 @@ export function pictureLifecycleSession(owner: PictureOwner): PictureLifecycleSe
   const { contextId, plotNumber } = retainedOwner;
   const session = new PictureLifecycleSession(retainedOwner, {
     read: () => PictureService.GetMetadata(contextId, plotNumber),
-    history: () => PictureDeletionService.GetHistory(contextId, plotNumber),
-    review: historyId => PictureDeletionService.ReviewRestoration(contextId, plotNumber, historyId),
-    delete: request => PictureDeletionService.Delete(contextId, request),
-    deletionReceipt: request => PictureDeletionService.LookupReceipt(contextId, request),
-    restore: request => PictureDeletionService.Restore(contextId, request),
-    restorationReceipt: request => PictureDeletionService.LookupRestorationReceipt(contextId, request),
+    history: () => PictureService.GetDeletionHistory(contextId, plotNumber),
+    review: historyId => PictureService.ReviewDeletionRestoration(contextId, plotNumber, historyId),
+    delete: request => PictureService.DeletePicture(contextId, request),
+    deletionReceipt: request => PictureService.LookupDeletionReceipt(contextId, request),
+    restore: request => PictureService.RestoreDeletedPicture(contextId, request),
+    restorationReceipt: request => PictureService.LookupDeletionRestorationReceipt(contextId, request),
   });
   sessions.set(key, { owner: retainedOwner, session });
   let initialized = false;

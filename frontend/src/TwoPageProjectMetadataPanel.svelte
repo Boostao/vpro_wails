@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { TwoPageProjectMetadataService } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { twoPageProjectMetadataFromWire, twoPageProjectMetadataCellLabel, twoPageProjectMetadataGroups,
     type TwoPageProjectMetadataOwner, type TwoPageProjectMetadataView } from './twoPageProjectMetadata';
@@ -25,7 +25,7 @@
     cancel(); const request = generation;
     review = null; error = ''; disclosed = ''; busy = true; onBusyChange(true);
     try {
-      const value = await reads.track(TwoPageProjectMetadataService.GetReview(owner.contextId, owner.plot, offset, pageSize));
+      const value = await reads.track(PlotEntryService.GetTwoPageProjectMetadataReview(owner.contextId, owner.plot, offset, pageSize));
       if (request !== generation) return;
       const validated = twoPageProjectMetadataFromWire(value, owner, offset, pageSize);
       if (request !== generation) return;

@@ -101,7 +101,7 @@ test('standalone lifeform component is gated, read-only, responsive and cancels 
   const source = readFileSync(path.join(__dirname, 'LifeformSummary.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'LifeformSummary.svelte', generate: 'client' }).warnings.length, 0);
   assert.match(source, /VITE_LIFEFORM_SUMMARY !== 'false'/);
-  assert.match(source, /LifeformSummaryService\.Preview\(contextId\)/);
+  assert.match(source, /VegetationReportService\.PreviewLifeformSummary\(contextId\)/);
   assert.match(source, /onDestroy\(cancel\)/);
   assert.match(source, /request !== generation \|\| key !== ownerKey/);
   assert.match(source, /previewKey === ownerKey/);
@@ -129,7 +129,7 @@ test('lifeform read-only catalogue descriptions preserve numeric labels and NULL
     .replace("let previewKey = $state('');",
       `let previewKey = $state(${JSON.stringify(JSON.stringify([owner.contextId, owner.project, owner.projectPath, owner.su, owner.suPath]))});`);
   const component = serverComponent(source, 'LifeformSummary.svelte', {
-    '../bindings/github.com/boostao/vpro-wails': { LifeformSummaryService: {} },
+    '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
     './LifeformWorkbookPanel.svelte': { default() { assert.fail('Disabled workbook panel must not mount'); } },
     './lifeformSummary': summary,
     './speciesAttributeSummary': loadTypeScript('speciesAttributeSummary.ts', { './lifeformSummary': summary })

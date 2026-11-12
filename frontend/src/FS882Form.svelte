@@ -1,15 +1,8 @@
 <script lang="ts">
   import {
-    PlotService as LegacyPlotService,
+    PlotEntryService,
     ContextService,
-    SIVIParentSharedService,
-    SIVICoverService,
-    SIVICombinedService,
-    SIVICollectedService,
-    SIVISpeciesService,
-    SIVIIdentityService,
     AuditRestoreAction,
-    ReferenceService,
     type FS882Header,
     type VegRecord,
     type HumusRecord,
@@ -113,7 +106,7 @@
     onProfileNavigation?: (proposal: ProjectPlotProfileFilterRequest, contextId: string) => Promise<void>;
     onProfileSUReview?: (proposal: ProjectPlotProfileFilterRequest, contextId: string) => Promise<void>;
   } = $props();
-  const PlotService = { ...LegacyPlotService, ...bindContextPlots(untrack(() => contextId)) };
+  const PlotService = { ...PlotEntryService, ...bindContextPlots(untrack(() => contextId)) };
   const siviContextId = untrack(() => contextId);
   const siviHeightEnabled = import.meta.env.VITE_SIVI_HEIGHT_EDITING !== 'false';
   const siviCoverEnabled = import.meta.env.VITE_SIVI_COVER_EDITING !== 'false';
@@ -1938,11 +1931,11 @@
           if (siviParentSharedEnabled) {
             siviParentSharedSession = new SIVIParentSharedSession(
               { contextId: siviContextId, project: $projectState.activeProject, plot }, {
-                read: () => siviParentSharedReads.track(SIVIParentSharedService.GetOriginal(siviContextId, plot)),
-                readReferences: zone => siviParentSharedReads.track(SIVIParentSharedService.GetReferences(siviContextId, plot, zone)),
+                read: () => siviParentSharedReads.track(PlotEntryService.GetSIVIParentSharedOriginal(siviContextId, plot)),
+                readReferences: zone => siviParentSharedReads.track(PlotEntryService.GetSIVIParentSharedReferences(siviContextId, plot, zone)),
                 cancelRead: () => siviParentSharedReads.cancelAll(),
-                save: request => SIVIParentSharedService.Save(siviContextId, plot, request),
-                restore: (historyId, action) => SIVIParentSharedService.Restore(siviContextId, plot, historyId, action),
+                save: request => PlotEntryService.SaveSIVIParentShared(siviContextId, plot, request),
+                restore: (historyId, action) => PlotEntryService.RestoreSIVIParentShared(siviContextId, plot, historyId, action),
                 refreshParent: () => refreshSIVIParent(plot, [siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession]),
               }, () => siviParentSharedRevision++, siviParentReferenceEnabled);
             siviParentSharedRevision++;
@@ -1963,9 +1956,9 @@
         if (siviCoverEnabled) {
           const plot = res.plotNumber;
           siviCoverSession = new SIVICoverSession(plot, {
-            read: extended => siviCoverReads.track(SIVICoverService.GetOriginal(siviContextId, plot, extended)),
-            save: (extended, request) => SIVICoverService.SaveReviewed(siviContextId, plot, extended, request),
-            restore: (historyId, action) => SIVICoverService.RestoreReviewed(siviContextId, plot, historyId, action),
+            read: extended => siviCoverReads.track(PlotEntryService.GetSIVICoverOriginal(siviContextId, plot, extended)),
+            save: (extended, request) => PlotEntryService.SaveSIVICoverReviewed(siviContextId, plot, extended, request),
+            restore: (historyId, action) => PlotEntryService.RestoreSIVICoverReviewed(siviContextId, plot, historyId, action),
             refreshParent: () => refreshSIVIChildEditors(plot, 'cover'),
           }, () => siviCoverRevision++, extendedShrubs, siviChildSourceNoticesEnabled);
           siviCoverRevision++;
@@ -1973,9 +1966,9 @@
         if (siviCombinedEnabled) {
           const plot = res.plotNumber;
           siviCombinedSession = new SIVICombinedSession(plot, {
-            read: extended => siviCombinedReads.track(SIVICombinedService.GetOriginal(siviContextId, plot, extended)),
-            save: (extended, request) => SIVICombinedService.SaveReviewed(siviContextId, plot, extended, request),
-            restore: (historyId, action) => SIVICombinedService.RestoreReviewed(siviContextId, plot, historyId, action),
+            read: extended => siviCombinedReads.track(PlotEntryService.GetSIVICombinedOriginal(siviContextId, plot, extended)),
+            save: (extended, request) => PlotEntryService.SaveSIVICombinedReviewed(siviContextId, plot, extended, request),
+            restore: (historyId, action) => PlotEntryService.RestoreSIVICombinedReviewed(siviContextId, plot, historyId, action),
             refreshParent: () => refreshSIVIChildEditors(plot, 'combined'),
           }, () => siviCombinedRevision++, extendedShrubs, siviChildSourceNoticesEnabled);
           siviCombinedRevision++;
@@ -1983,9 +1976,9 @@
         if (siviCollectedEnabled) {
           const plot = res.plotNumber;
           siviCollectedSession = new SIVICollectedSession(plot, {
-            read: extended => siviCollectedReads.track(SIVICollectedService.GetOriginal(siviContextId, plot, extended)),
-            save: (extended, request) => SIVICollectedService.SaveReviewed(siviContextId, plot, extended, request),
-            restore: (historyId, action) => SIVICollectedService.RestoreReviewed(siviContextId, plot, historyId, action),
+            read: extended => siviCollectedReads.track(PlotEntryService.GetSIVICollectedOriginal(siviContextId, plot, extended)),
+            save: (extended, request) => PlotEntryService.SaveSIVICollectedReviewed(siviContextId, plot, extended, request),
+            restore: (historyId, action) => PlotEntryService.RestoreSIVICollectedReviewed(siviContextId, plot, historyId, action),
             refreshParent: () => refreshSIVIChildEditors(plot, 'collected'),
           }, () => siviCollectedRevision++, extendedShrubs, siviChildSourceNoticesEnabled);
           siviCollectedRevision++;
@@ -1997,13 +1990,13 @@
           siviSpeciesSession = new SIVISpeciesSession({ contextId: siviContextId, project, plot }, {
             read: async extended => {
               const [original, references] = await Promise.all([
-                siviSpeciesReads.track(SIVISpeciesService.GetOriginal(siviContextId, plot, extended)),
-                siviSpeciesReads.track(SIVISpeciesService.GetReferences(siviContextId, plot)),
+                siviSpeciesReads.track(PlotEntryService.GetSIVISpeciesOriginal(siviContextId, plot, extended)),
+                siviSpeciesReads.track(PlotEntryService.GetSIVISpeciesReferences(siviContextId, plot)),
               ]);
               return { original, references };
             },
-            save: (extended, request) => SIVISpeciesService.SaveReviewed(siviContextId, plot, extended, request),
-            restore: (historyId, action) => SIVISpeciesService.RestoreReviewed(siviContextId, plot, historyId, action),
+            save: (extended, request) => PlotEntryService.SaveSIVISpeciesReviewed(siviContextId, plot, extended, request),
+            restore: (historyId, action) => PlotEntryService.RestoreSIVISpeciesReviewed(siviContextId, plot, historyId, action),
             refreshParent: () => refreshSIVIChildEditors(plot, 'species'),
           }, () => siviSpeciesRevision++, extendedShrubs, siviChildSourceNoticesEnabled);
           siviSpeciesRevision++;
@@ -2011,9 +2004,9 @@
         if (siviIdentityEnabled) {
           const plot = res.plotNumber;
           siviIdentitySession = new SIVIIdentitySession(plot, {
-            read: extended => siviIdentityReads.track(SIVIIdentityService.GetOriginal(siviContextId, plot, extended)),
-            save: (extended, request) => SIVIIdentityService.SaveReviewed(siviContextId, plot, extended, request),
-            restore: (historyId, action) => SIVIIdentityService.RestoreReviewed(siviContextId, plot, historyId, action),
+            read: extended => siviIdentityReads.track(PlotEntryService.GetSIVIIdentityOriginal(siviContextId, plot, extended)),
+            save: (extended, request) => PlotEntryService.SaveSIVIIdentityReviewed(siviContextId, plot, extended, request),
+            restore: (historyId, action) => PlotEntryService.RestoreSIVIIdentityReviewed(siviContextId, plot, historyId, action),
             refreshParent: () => refreshSIVIChildEditors(plot, 'identity'),
           }, () => siviIdentityRevision++, extendedShrubs, siviChildSourceNoticesEnabled);
           siviIdentityRevision++;
@@ -2079,10 +2072,10 @@
     referenceReads.cancelAll();
     try {
       const [m, n, ms, ss] = await Promise.all([
-        referenceReads.track(ReferenceService.GetListItems('MoistureRegime')),
-        referenceReads.track(ReferenceService.GetListItems('NutrientRegime')),
-        referenceReads.track(ReferenceService.GetListItems('MesoSlopePosition')),
-        referenceReads.track(ReferenceService.GetListItems('SurfaceShape')),
+        referenceReads.track(PlotEntryService.GetListItems('MoistureRegime')),
+        referenceReads.track(PlotEntryService.GetListItems('NutrientRegime')),
+        referenceReads.track(PlotEntryService.GetListItems('MesoSlopePosition')),
+        referenceReads.track(PlotEntryService.GetListItems('SurfaceShape')),
       ]);
       if (request !== referenceRequest) return;
       moistureList = m ?? [];
@@ -2121,7 +2114,7 @@
     }
     searchingSpecies = true;
     try {
-      const res = await speciesReads.track(ReferenceService.SearchSpecies(speciesSearchQuery, 15));
+      const res = await speciesReads.track(PlotEntryService.SearchSpecies(speciesSearchQuery, 15));
       if (request !== speciesRequest) return;
       speciesSearchResults = res ?? [];
     } catch (e) {

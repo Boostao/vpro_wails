@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { ContextService, TableCSVArchiveService } from '../bindings/github.com/boostao/vpro-wails';
+  import { ImportExportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { coreTableSuffixes, validateProjectTableCSVReview, type ValidatedProjectTableCSVReview } from './projectTableCSV';
   import { reportCellText } from './longEnvironmentReport';
@@ -37,14 +37,14 @@
     review = null; error = ''; busy = true; updateBusy();
     try {
       if (archiveEnabled) {
-        const value = await reads.track(TableCSVArchiveService.GetTableCSVArchiveReview(contextId, JSON.stringify({ table })));
+        const value = await reads.track(ImportExportService.GetTableCSVArchiveReview(contextId, JSON.stringify({ table })));
         if (request !== generation) return;
         const validated = await validateTableCSVArchiveReview(value, { contextId, project, projectPath }, table);
         if (request !== generation) return;
         approval = validated; review = validated.review;
         return;
       }
-      const value = await reads.track(ContextService.GetProjectTableCSVReview(contextId, table));
+      const value = await reads.track(ImportExportService.GetProjectTableCSVReview(contextId, table));
       if (request !== generation) return;
       const validated = await validateProjectTableCSVReview(value, contextId, project, projectPath, table);
       if (request !== generation) return;
@@ -70,7 +70,7 @@
     approval = null; review = null; error = '';
     try {
       await publicationSession.publish(approved, table, destination, request =>
-        TableCSVArchiveService.ExportReviewedTableCSVArchive(contextId, JSON.stringify(request)));
+        ImportExportService.ExportReviewedTableCSVArchive(contextId, JSON.stringify(request)));
     } catch (cause) { error = `Archive export not invoked; review again before proceeding: ${String(cause)}`; }
   }
   function acknowledge() {

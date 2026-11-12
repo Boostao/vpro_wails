@@ -81,12 +81,12 @@ test('only owned cancelled read acknowledgements are handled, including after ed
 test('browse, hierarchy, reference and species consumers own only their read generations', () => {
   const root = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(root, /plotReads\.track\(ProjectService\.ListPlots/);
-  assert.match(root, /hierarchyReads\.track\(ProjectService\.GetHierarchyNodes/);
+  assert.match(root, /plotReads\.track\(ContextService\.ListPlots/);
+  assert.match(root, /hierarchyReads\.track\(ContextService\.GetHierarchyNodes/);
   assert.match(root, /if \(current === hierarchyRequest\) hierarchyNodes/);
   assert.match(root, /request\+\+;\s+hierarchyRequest\+\+;\s+stateRequest\+\+;\s+plotReads\.cancelAll\(\);\s+hierarchyReads\.cancelAll\(\);\s+stateReads\.cancelAll\(\)/);
-  assert.match(form, /referenceReads\.track\(ReferenceService\.GetListItems/);
-  assert.match(form, /speciesReads\.track\(ReferenceService\.SearchSpecies/);
+  assert.match(form, /referenceReads\.track\(PlotEntryService\.GetListItems/);
+  assert.match(form, /speciesReads\.track\(PlotEntryService\.SearchSpecies/);
   assert.match(form, /if \(request !== speciesRequest\) return/);
   assert.match(form, /if \(request === speciesRequest\) searchingSpecies = false/);
   assert.doesNotMatch(root, /Reads\.track\(ContextService\.SwitchContext/);
@@ -203,7 +203,7 @@ test('Working Unit disposal cancels choice reads, never preference initializatio
 test('state generations cancel discovery and guard publication without tracking context commits', () => {
   const source = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   assert.match(source, /const stateReads = new ReadRequests\(\)/);
-  assert.match(source, /stateReads\.track\(ProjectService\.GetState\(\)\)/);
+  assert.match(source, /stateReads\.track\(ContextService\.GetState\(\)\)/);
   assert.match(source, /if \(current !== stateRequest\) return;\s*projectState\.set\(state\)/);
   assert.match(source, /stateRequest\+\+;[\s\S]*stateReads\.cancelAll\(\)/);
   assert.doesNotMatch(source, /stateReads\.track\(ContextService\.SwitchContext/);

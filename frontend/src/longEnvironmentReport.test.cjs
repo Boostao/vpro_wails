@@ -63,7 +63,7 @@ test('report view is independently gated, scoped, cancellable and participates i
   assert.match(read('Navigation.svelte'),/VITE_LONG_ENVIRONMENT_REPORT !== 'false'/);
   assert.match(panel,/onDestroy\(\(\) => \{ unsubscribe\?\.\(\); unsubscribeWorkbook\(\); cancel\(\); \}\)/);
   assert.match(panel,/request !== generation/);
-  assert.match(panel,/ContextService\.PreviewLongEnvironment\(contextId/);
+  assert.match(panel,/EnvironmentReportService\.PreviewLongEnvironment\(contextId/);
   assert.match(panel,/data-source-control="rptSvTitle"/);
   assert.match(panel,/data-source-control="btnViewReport"/);
   assert.match(panel,/edits affect only this preview/);

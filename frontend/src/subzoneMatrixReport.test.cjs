@@ -133,10 +133,15 @@ function deferred() {
 }
 function driver(port) {
   const activity = [];
+  const mappedPort = {
+    GetSubzoneMatrixPreview: port.GetSubzoneMatrixPreview ?? port.GetPreview,
+    GetSubzoneMatrixReview: port.GetSubzoneMatrixReview ?? port.GetReview,
+    ExportReviewedSubzoneMatrix: port.ExportReviewedSubzoneMatrix ?? port.ExportReviewed,
+  };
   const values = {
     ...owner, owner, session: new matrix.MatrixPublicationSession(owner), destination,
     busy: false, barrier: false, available: true, preview: null, workbook: null, error: '',
-    generation: 0, reads: new ReadRequests(), limit: 25, SubzoneMatrixService: port,
+    generation: 0, reads: new ReadRequests(), limit: 25, EnvironmentReportService: mappedPort,
     onBusyChange: value => activity.push(value),
     matrixPageFromWire: matrix.matrixPageFromWire, matrixWorkbookFromWire: matrix.matrixWorkbookFromWire,
     sameMatrixSource: matrix.sameMatrixSource,
@@ -153,7 +158,7 @@ test('actual component paging never requests XLSX and refuses changed-source con
   await d.actions.show();
   assert.deepEqual(calls, [[owner.contextId, '{"offset":0,"limit":25}']]);
   assert.equal(d.context.preview.total, 3); assert.equal(d.context.workbook, null);
-  d.context.SubzoneMatrixService.GetPreview = () => {
+  d.context.EnvironmentReportService.GetSubzoneMatrixPreview = () => {
     const changed = fixture().end; changed.sourceSHA256 = 'a'.repeat(64);
     return Object.assign(Promise.resolve(changed), { cancel() {} });
   };
@@ -206,7 +211,7 @@ test('compiled SSR consumes callbacks, literal table/group captions and portable
   source = source.replace('let workbook = $state.raw<MatrixWorkbookReview | null>(null);',
     `let workbook = $state.raw<MatrixWorkbookReview | null>(${JSON.stringify(fixture().review)});`);
   const component = serverComponent(source, 'SubzoneMatrixReport.svelte', {
-    '../bindings/github.com/boostao/vpro-wails': { SubzoneMatrixService: {} },
+    '../bindings/github.com/boostao/vpro-wails': { EnvironmentReportService: {} },
     './subzoneMatrixReport': { ...matrix, matrixPublicationSession: () => new matrix.MatrixPublicationSession(owner) },
   });
   const { render } = await import(pathToFileURL(require.resolve('svelte/server')).href);

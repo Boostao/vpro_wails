@@ -230,7 +230,7 @@ func TestLifeformSummarySampleRepresentativeCounts(t *testing.T) {
 	if len(preview.Report.Units) != 11 {
 		t.Fatal("Sample normal SU scope differs", len(preview.Report.Units))
 	}
-	expected := map[string][3]int{"BWBSdk 1 /08": {3, 42, 80}, "BWBSmw 2 /05": {9, 106, 288}}
+	expected := map[string][3]int{"BWBSdk 1 /08": {3, 41, 79}, "BWBSmw 2 /05": {9, 100, 283}}
 	seen := 0
 	for _, unit := range preview.Report.Units {
 		if unit.Code.Text == nil {

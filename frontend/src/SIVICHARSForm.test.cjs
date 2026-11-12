@@ -219,44 +219,41 @@ function fixture(options = {}) {
         await options.metadataSave?.(calls.metadataRequest);
       },
     },
-    SIVIDeletionService: {
-      GetTargets: async () => lifecycleRead('deletion', { ...parentOwner(), columns: deletionOriginal.columns,
+    AuditRestoreAction: { AuditRestoreRetain: 'retain', AuditRestorePrune: 'prune' },
+    PlotEntryService: {
+      GetSIVIDeletionTargets: async () => lifecycleRead('deletion', { ...parentOwner(), columns: deletionOriginal.columns,
         rows: [...(deletionRecord && !deletionConsumed ? [] : [deletionOriginal.original]), ...additionalDeletionRows] }),
-      GetOriginal: async (_context, _plot, form, rowId) => {
+      GetSIVIDeletionOriginal: async (_context, _plot, form, rowId) => {
         calls.lifecycle.deletion.review++;
         const row = rowId === deletionOriginal.original.rowId ? deletionOriginal.original
           : additionalDeletionRows.find(row => row.rowId === rowId);
         assert.ok(row);
         return { ...clone(deletionOriginal), form, original: clone(row) };
       },
-      Delete: async (_context, raw) => lifecycleMutation('deletion', raw),
-      LookupReceipt: async (_context, raw) => lifecycleLookup('deletion', raw),
-      GetHistory: async () => lifecycleRead('restoration', { ...parentOwner(), historyPresent: deletionRecord !== null,
+      DeleteSIVIVegetation: async (_context, raw) => lifecycleMutation('deletion', raw),
+      LookupSIVIDeletionReceipt: async (_context, raw) => lifecycleLookup('deletion', raw),
+      GetSIVIDeletionHistory: async () => lifecycleRead('restoration', { ...parentOwner(), historyPresent: deletionRecord !== null,
         events: deletionRecord ? [{ historyId: deletionRecord.historyId, form: deletionRecord.form, rowId: deletionRecord.rowId,
           id: deletionRecord.id, species: deletionOriginal.original.cells[deletionOriginal.columns.findIndex(column => column.name === 'Species')].text,
           actor: deletionRecord.actor, editWhen: deletionRecord.editWhen, restored: deletionConsumed, consumed: deletionConsumed }] : [] }),
-      ReviewRestoration: async () => { calls.lifecycle.restoration.review++; return restorationReview(); },
-      Restore: async (_context, raw) => lifecycleMutation('restoration', raw),
-      LookupRestorationReceipt: async (_context, raw) => lifecycleLookup('restoration', raw),
-    },
-    SIVICreationUndoService: {
-      GetHistory: async () => lifecycleRead('creationUndo', { ...parentOwner(), historyPresent: true, events: [{
+      ReviewSIVIDeletionRestoration: async () => { calls.lifecycle.restoration.review++; return restorationReview(); },
+      RestoreSIVIDeletion: async (_context, raw) => lifecycleMutation('restoration', raw),
+      LookupSIVIDeletionRestorationReceipt: async (_context, raw) => lifecycleLookup('restoration', raw),
+      GetSIVICreationUndoHistory: async () => lifecycleRead('creationUndo', { ...parentOwner(), historyPresent: true, events: [{
         historyId: historicalCreation.historyId, form: historicalCreation.form, rowId: historicalCreation.rowId, id: historicalCreation.id,
         species: 'TREE', actor: historicalCreation.creation.actor, editWhen: historicalCreation.creation.editWhen,
         undone: creationConsumed, consumed: creationConsumed, reviewAvailable: !creationConsumed,
         unavailableReason: creationConsumed ? 'This creation history has already been consumed.' : null }] }),
-      Review: async () => { calls.lifecycle.creationUndo.review++; return clone(historicalCreation); },
-      Undo: async (_context, raw) => lifecycleMutation('creationUndo', raw),
-      LookupReceipt: async (_context, raw) => lifecycleLookup('creationUndo', raw),
-    },
-    SIVICreationService: {
-      GetReferences: async (context, plot) => {
+      ReviewSIVICreationUndo: async () => { calls.lifecycle.creationUndo.review++; return clone(historicalCreation); },
+      UndoSIVICreation: async (_context, raw) => lifecycleMutation('creationUndo', raw),
+      LookupSIVICreationUndoReceipt: async (_context, raw) => lifecycleLookup('creationUndo', raw),
+      GetSIVICreationReferences: async (context, plot) => {
         calls.creationReferences++;
         assert.equal(context, wire.Original.ContextID);
         assert.equal(plot, wire.Original.Plot);
         return options.creationReferences ? options.creationReferences(calls.creationReferences, clone(references)) : clone(references);
       },
-      Create: async (context, raw) => {
+      CreateSIVIVegetation: async (context, raw) => {
         calls.create++;
         assert.equal(context, wire.Original.ContextID);
         calls.creationRequest = JSON.parse(raw);
@@ -269,20 +266,17 @@ function fixture(options = {}) {
         }
         return options.create ? options.create(calls.creationRequest, result) : result;
       },
-      LookupReceipt: async (context, raw) => {
+      LookupSIVICreationReceipt: async (context, raw) => {
         calls.creationLookup++;
         assert.equal(context, wire.Original.ContextID);
         assert.deepEqual(JSON.parse(raw), calls.creationRequest);
         return options.creationLookup ? options.creationLookup(calls.creationRequest) : creationReceipt(calls.creationRequest, true);
       },
-    },
-    AuditRestoreAction: { AuditRestoreRetain: 'retain', AuditRestorePrune: 'prune' },
-    SIVICHARSParentEntryService: {
-      Review: async () => {
+      ReviewSIVICHARSParentEntry: async () => {
         calls.parentRead++;
         return options.parentRead ? options.parentRead(calls.parentRead, clone(currentParent)) : clone(currentParent);
       },
-      Save: async (_context, _plot, request) => {
+      SaveSIVICHARSParentEntry: async (_context, _plot, request) => {
         calls.parentSave++;
         for (const edit of request.edits) {
           const binding = currentParent.Original.Bindings.find(row => row.Binding === edit.column);
@@ -291,11 +285,9 @@ function fixture(options = {}) {
         }
         return { ChangedCells: request.edits.length + (request.actions?.length ?? 0), HistoryID: '101' };
       },
-      Restore: async () => { currentParent = clone(originalParent); return { restoredRows: 1, prunedAuditRows: 1,
+      RestoreSIVICHARSParentEntry: async () => { currentParent = clone(originalParent); return { restoredRows: 1, prunedAuditRows: 1,
         cleanedVegRows: 0, cancelled: false }; },
-    },
-    SIVICombinedService: {
-      GetOriginal: async (context, plot, extended) => {
+      GetSIVICombinedOriginal: async (context, plot, extended) => {
         calls.childRead++;
         assert.equal(context, wire.Original.ContextID);
         assert.equal(plot, wire.Original.Plot);
@@ -303,7 +295,7 @@ function fixture(options = {}) {
         if (options.read) return options.read(calls.childRead, clone(currentChild));
         return clone(currentChild);
       },
-      SaveReviewed: async (_context, _plot, extended, raw) => {
+      SaveSIVICombinedReviewed: async (_context, _plot, extended, raw) => {
         calls.childSave++;
         assert.equal(extended, true);
         const request = JSON.parse(raw);
@@ -318,7 +310,7 @@ function fixture(options = {}) {
         if (options.save) return options.save(request);
         return { ChangedCells: request.edits.length, HistoryID: '201' };
       },
-      RestoreReviewed: async (_context, _plot, history, action) => {
+      RestoreSIVICombinedReviewed: async (_context, _plot, history, action) => {
         calls.restore++;
         assert.equal(history, '201');
         requireCommittedRows(calls.request.edits, calls.committedChild);
@@ -329,16 +321,14 @@ function fixture(options = {}) {
         return { restoredRows: calls.request.edits.length, prunedAuditRows: action === 'prune' ? calls.request.edits.length : 0,
           cleanedVegRows: 0, cancelled: false };
       },
-    },
-    SIVICollectedService: {
-      GetOriginal: async (context, plot, extended) => {
+      GetSIVICollectedOriginal: async (context, plot, extended) => {
         calls.collectedRead++;
         assert.equal(context, wire.Original.ContextID);
         assert.equal(plot, wire.Original.Plot);
         assert.equal(extended, true);
         return options.collectedRead ? options.collectedRead(calls.collectedRead, clone(currentChild)) : clone(currentChild);
       },
-      SaveReviewed: async (_context, _plot, extended, raw) => {
+      SaveSIVICollectedReviewed: async (_context, _plot, extended, raw) => {
         calls.collectedSave++;
         assert.equal(extended, true);
         calls.collectedRequest = JSON.parse(raw);
@@ -354,7 +344,7 @@ function fixture(options = {}) {
         return options.collectedSave ? options.collectedSave(calls.collectedRequest)
           : { ChangedCells: calls.collectedRequest.edits.length, HistoryID: '301' };
       },
-      RestoreReviewed: async (_context, _plot, history, action) => {
+      RestoreSIVICollectedReviewed: async (_context, _plot, history, action) => {
         calls.collectedRestore++;
         assert.equal(history, '301');
         requireCommittedRows(calls.collectedRequest.edits, calls.committedCollected);
@@ -364,75 +354,71 @@ function fixture(options = {}) {
         return { restoredRows: calls.collectedRequest.edits.length,
           prunedAuditRows: action === 'prune' ? calls.collectedRequest.edits.length : 0, cleanedVegRows: 0, cancelled: false };
       },
-    },
-  };
-  api.SIVISpeciesService = {
-    GetOriginal: async (context, plot, extended) => {
-      calls.speciesRead++;
-      assert.equal(context, wire.Original.ContextID);
-      assert.equal(plot, wire.Original.Plot);
-      assert.equal(extended, true);
-      return options.speciesRead ? options.speciesRead(calls.speciesRead, clone(currentChild)) : clone(currentChild);
-    },
-    GetReferences: async (context, plot) => {
-      calls.speciesReferences++;
-      assert.equal(context, wire.Original.ContextID);
-      assert.equal(plot, wire.Original.Plot);
-      return options.speciesReferences ? options.speciesReferences(calls.speciesReferences, clone(references)) : clone(references);
-    },
-    SaveReviewed: async (_context, _plot, extended, raw) => {
-      calls.speciesSave++;
-      assert.equal(extended, true);
-      calls.speciesRequest = JSON.parse(raw);
-      assert.deepEqual(calls.speciesRequest.references, references);
-      for (const edit of calls.speciesRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
-        if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('Species')] = cell('text', edit.value);
-      }
-      calls.committedSpecies = clone(currentChild);
-      return options.speciesSave ? options.speciesSave(calls.speciesRequest)
-        : { ChangedCells: calls.speciesRequest.edits.length, HistoryID: '401' };
-    },
-    RestoreReviewed: async (_context, _plot, history, action) => {
-      calls.speciesRestore++;
-      assert.equal(history, '401');
-      requireCommittedRows(calls.speciesRequest.edits, calls.committedSpecies);
-      for (const edit of calls.speciesRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
-        if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('Species')] = clone(edit.expected);
-      }
-      return { restoredRows: calls.speciesRequest.edits.length,
-        prunedAuditRows: action === 'prune' ? calls.speciesRequest.edits.length : 0, cleanedVegRows: 0, cancelled: false };
-    },
-  };
-  api.SIVIIdentityService = {
-    GetOriginal: async (context, plot, extended) => {
-      calls.identityRead++;
-      assert.equal(context, wire.Original.ContextID);
-      assert.equal(plot, wire.Original.Plot);
-      assert.equal(extended, true);
-      return options.identityRead ? options.identityRead(calls.identityRead, clone(currentChild)) : clone(currentChild);
-    },
-    SaveReviewed: async (_context, _plot, extended, raw) => {
-      calls.identitySave++;
-      assert.equal(extended, true);
-      calls.identityRequest = JSON.parse(raw);
-      for (const edit of calls.identityRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
-        assert.equal(edit.column, 'ID');
-        if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('ID')] = clone(edit.value);
-      }
-      calls.committedIdentity = clone(currentChild);
-      return options.identitySave ? options.identitySave(calls.identityRequest)
-        : { ChangedCells: calls.identityRequest.edits.length, HistoryID: '501' };
-    },
-    RestoreReviewed: async (_context, _plot, history, action) => {
-      calls.identityRestore++;
-      assert.equal(history, '501');
-      assert.ok(['retain', 'prune'].includes(action));
-      requireCommittedRows(calls.identityRequest.edits, calls.committedIdentity);
-      for (const edit of calls.identityRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
-        if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('ID')] = clone(edit.expected);
-      }
-      return options.identityRestore ? options.identityRestore()
-        : { restoredRows: calls.identityRequest.edits.length, prunedAuditRows: 0, cleanedVegRows: 0, cancelled: false };
+      GetSIVISpeciesOriginal: async (context, plot, extended) => {
+        calls.speciesRead++;
+        assert.equal(context, wire.Original.ContextID);
+        assert.equal(plot, wire.Original.Plot);
+        assert.equal(extended, true);
+        return options.speciesRead ? options.speciesRead(calls.speciesRead, clone(currentChild)) : clone(currentChild);
+      },
+      GetSIVISpeciesReferences: async (context, plot) => {
+        calls.speciesReferences++;
+        assert.equal(context, wire.Original.ContextID);
+        assert.equal(plot, wire.Original.Plot);
+        return options.speciesReferences ? options.speciesReferences(calls.speciesReferences, clone(references)) : clone(references);
+      },
+      SaveSIVISpeciesReviewed: async (_context, _plot, extended, raw) => {
+        calls.speciesSave++;
+        assert.equal(extended, true);
+        calls.speciesRequest = JSON.parse(raw);
+        assert.deepEqual(calls.speciesRequest.references, references);
+        for (const edit of calls.speciesRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
+          if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('Species')] = cell('text', edit.value);
+        }
+        calls.committedSpecies = clone(currentChild);
+        return options.speciesSave ? options.speciesSave(calls.speciesRequest)
+          : { ChangedCells: calls.speciesRequest.edits.length, HistoryID: '401' };
+      },
+      RestoreSIVISpeciesReviewed: async (_context, _plot, history, action) => {
+        calls.speciesRestore++;
+        assert.equal(history, '401');
+        requireCommittedRows(calls.speciesRequest.edits, calls.committedSpecies);
+        for (const edit of calls.speciesRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
+          if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('Species')] = clone(edit.expected);
+        }
+        return { restoredRows: calls.speciesRequest.edits.length,
+          prunedAuditRows: action === 'prune' ? calls.speciesRequest.edits.length : 0, cleanedVegRows: 0, cancelled: false };
+      },
+      GetSIVIIdentityOriginal: async (context, plot, extended) => {
+        calls.identityRead++;
+        assert.equal(context, wire.Original.ContextID);
+        assert.equal(plot, wire.Original.Plot);
+        assert.equal(extended, true);
+        return options.identityRead ? options.identityRead(calls.identityRead, clone(currentChild)) : clone(currentChild);
+      },
+      SaveSIVIIdentityReviewed: async (_context, _plot, extended, raw) => {
+        calls.identitySave++;
+        assert.equal(extended, true);
+        calls.identityRequest = JSON.parse(raw);
+        for (const edit of calls.identityRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
+          assert.equal(edit.column, 'ID');
+          if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('ID')] = clone(edit.value);
+        }
+        calls.committedIdentity = clone(currentChild);
+        return options.identitySave ? options.identitySave(calls.identityRequest)
+          : { ChangedCells: calls.identityRequest.edits.length, HistoryID: '501' };
+      },
+      RestoreSIVIIdentityReviewed: async (_context, _plot, history, action) => {
+        calls.identityRestore++;
+        assert.equal(history, '501');
+        assert.ok(['retain', 'prune'].includes(action));
+        requireCommittedRows(calls.identityRequest.edits, calls.committedIdentity);
+        for (const edit of calls.identityRequest.edits) for (const group of currentChild) for (const row of group.Rows) {
+          if (row.rowId === edit.rowId) row.cells[group.Columns.indexOf('ID')] = clone(edit.expected);
+        }
+        return options.identityRestore ? options.identityRestore()
+          : { restoredRows: calls.identityRequest.edits.length, prunedAuditRows: 0, cleanedVegRows: 0, cancelled: false };
+      },
     },
   };
   const cache = new Map();
@@ -891,7 +877,7 @@ test('compiled linked snippet requires exact parent and independent combined/Col
       './SIVISpeciesPanel.svelte': { default() {} },
       './SIVICreationPanel.svelte': { default() {} },
       './siviCreationSessions': { siviCreationSession() { throw new Error('Creation must remain independently gated.'); } },
-      '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {}, SIVISpeciesService: {}, SIVIIdentityService: {}, AuditRestoreAction: {} },
+      '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {}, AuditRestoreAction: {} },
       './siviCombinedSession': { SIVICombinedSession: class {
         view() { return { busy: false }; }
         closeState() { return { busy: false, unsaved: false, blocked: false }; }
@@ -956,8 +942,7 @@ test('compiled creator gate is independent of all four child gates and exposes o
     }
     const component = serverComponent(source('SIVICHARSForm.svelte'), 'SIVICHARSForm.svelte', {
       ...lifecycleOff,
-      '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {},
-        SIVISpeciesService: {}, SIVIIdentityService: {}, AuditRestoreAction: {} },
+      '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {}, AuditRestoreAction: {} },
       './SIVICHARSParentForm.svelte': { default: parentStub },
       ...Object.fromEntries(['Combined', 'Collected', 'Species', 'Identity'].map(name => ['./SIVI' + name + 'Panel.svelte', { default() {} }])),
       ...Object.fromEntries(['Combined', 'Collected', 'Species', 'Identity']
@@ -1000,8 +985,7 @@ test('compiled lifecycle gates remain literal and independent of creator and typ
     const component = serverComponent(source('SIVICHARSForm.svelte'), 'SIVICHARSForm.svelte', {
       ...lifecycleOff,
       './SIVICHARSParentForm.svelte': { default: parentStub },
-      '../bindings/github.com/boostao/vpro-wails': { SIVICombinedService: {}, SIVICollectedService: {},
-        SIVISpeciesService: {}, SIVIIdentityService: {}, AuditRestoreAction: {} },
+      '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {}, AuditRestoreAction: {} },
       ...Object.fromEntries(['Combined', 'Collected', 'Species', 'Identity'].map(name => ['./SIVI' + name + 'Panel.svelte', { default() {} }])),
       ...Object.fromEntries(['Combined', 'Collected', 'Species', 'Identity'].map(name =>
         ['./sivi' + name + 'Session', { ['SIVI' + name + 'Session']: Child }])),

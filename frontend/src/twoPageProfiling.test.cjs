@@ -129,8 +129,10 @@ async function mountPanel(service, validator = api.twoPageProfilingFromWire) {
   const reads = loadTypeScript('readRequests.ts', {
     '@wailsio/runtime': { Call: { RuntimeError: class extends Error {} }, CancelledRejectionError: class extends Error {} },
   });
-  const mount = new Function('$', 'onDestroy', 'untrack', 'ReadRequests', 'TwoPageProfilingService', 'twoPageProfilingFromWire',
-    code + '\nreturn _unknown_;')(runtime, onDestroy, runtime.untrack, reads.ReadRequests, service, validator);
+  const mount = new Function('$', 'onDestroy', 'untrack', 'ReadRequests', 'ClassificationService', 'twoPageProfilingFromWire',
+    code + '\nreturn _unknown_;')(runtime, onDestroy, runtime.untrack, reads.ReadRequests, {
+      GetTwoPageProfilingReview: service.GetTwoPageProfilingReview ?? service.GetReview,
+    }, validator);
   let actions; const activity = [];
   const dispose = runtime.effect_root(() => mount(null, { ...owner, form: 'FS882-8x6XL-CHARS', onBusyChange: v => activity.push(v), inspect: v => actions = v }));
   runtime.flush();
@@ -256,7 +258,7 @@ test('complete original disclosure renders only its local50-Description page whi
     .replace('let originalsOpen = $state(false)', 'let originalsOpen = $state(untrack(() => initialOpen))')
     .replace('let descriptionOffset = $state(0)', 'let descriptionOffset = $state(untrack(() => initialOffset))');
   const Panel = serverComponent(source, 'TwoPageProfilingPanel.svelte', {
-    '../bindings/github.com/boostao/vpro-wails': { TwoPageProfilingService: {} },
+    '../bindings/github.com/boostao/vpro-wails': { ClassificationService: {} },
     './twoPageProfiling': api,
   });
   const markup = (open, offset) => render(Panel, { props: { ...owner, form: 'FS882-8x6XL',

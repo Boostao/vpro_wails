@@ -214,7 +214,7 @@ function componentHarness({ enabled = true, service = {}, mod = moduleFor(), csv
   const destroy = [], changes = [], reads = { tracked: 0, cancelled: 0 };
   const dependencies = {
     svelte: { onDestroy: callback => destroy.push(callback) },
-    '../bindings/github.com/boostao/vpro-wails': { ContextService: service, TableCSVArchiveService: service },
+    '../bindings/github.com/boostao/vpro-wails': { ImportExportService: service },
     './readRequests': { ReadRequests: class { track(value) { reads.tracked++; return value; } cancelAll() { reads.cancelled++; } } },
     './projectTableCSV': csvModule, './longEnvironmentReport': { reportCellText: String }, './tableCSVArchiveExport': mod,
   };
@@ -313,7 +313,7 @@ test('actual App close handlers and navigation transition refuse pending/unackno
     closeWorking: false, closeRequest: '', view: 'table-csv', editor: null, error: '', transitionError: '',
     closeError: '', $projectState: { contextId: owner.contextId }, calls: { cancelled: 0, confirmed: 0, navigated: 0 },
     document: { activeElement: null }, HTMLElement: class {}, tick: async () => {}, closeDisposition: close.closeDisposition };
-  context.CloseService = { GetPendingCloseRequest: async () => 'owned-close',
+  context.LifecycleService = { GetPendingCloseRequest: async () => 'owned-close',
     CancelClose: async () => { context.calls.cancelled++; }, ConfirmClose: async () => { context.calls.confirmed++; } };
   const nativeClose = app.slice(app.indexOf('  async function handleCloseRequest'), app.indexOf('  let activeHierarchyIndex'));
   const transition = app.slice(app.indexOf('  async function requestTransition'), app.indexOf('  async function respondToTransition'));

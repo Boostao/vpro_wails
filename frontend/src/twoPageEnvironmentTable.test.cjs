@@ -129,8 +129,10 @@ async function mountPanel(service) {
   const reads = loadTypeScript('readRequests.ts', {
     '@wailsio/runtime': { Call: { RuntimeError: class extends Error {} }, CancelledRejectionError: class extends Error {} },
   });
-  const mount = new Function('$', 'onDestroy', 'untrack', 'ReadRequests', 'TwoPageEnvironmentTableService', 'twoPageEnvironmentTableFromWire',
-    code + '\nreturn _unknown_;')(runtime, onDestroy, runtime.untrack, reads.ReadRequests, service, table.twoPageEnvironmentTableFromWire);
+  const mount = new Function('$', 'onDestroy', 'untrack', 'ReadRequests', 'DatasheetService', 'twoPageEnvironmentTableFromWire',
+    code + '\nreturn _unknown_;')(runtime, onDestroy, runtime.untrack, reads.ReadRequests, {
+      GetEnvironmentTableReview: service.GetEnvironmentTableReview ?? service.GetReview,
+    }, table.twoPageEnvironmentTableFromWire);
   let actions; const activity = [];
   const dispose = runtime.effect_root(() => mount(null, { ...owner, form: 'FS882-8x6XL-CHARS', onBusyChange: value => activity.push(value), inspect: value => actions = value }));
   runtime.flush();

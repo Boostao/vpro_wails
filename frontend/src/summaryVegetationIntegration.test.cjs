@@ -15,8 +15,8 @@ test('summary report native route, backend and build gates are independent defau
   assert.match(app, /view === 'summary-vegetation' && import\.meta\.env\.VITE_SUMMARY_VEGETATION !== 'false' && \$projectState/);
   assert.match(component, /const enabled = import\.meta\.env\.VITE_SUMMARY_VEGETATION !== 'false'/);
   assert.match(component, /\$state\.raw\(session\.view\(\)\)/);
-  assert.doesNotMatch(component, /structuredClone|SummaryVegetationService\.Save|ExportReviewed|\.update/);
-  assert.match(component, /SummaryVegetationPreferencesService\.SaveSummaryVegetationPreferences/);
+  assert.doesNotMatch(component, /structuredClone|VegetationReportService\.SaveSummaryVegetation\(|ExportReviewed|\.update/);
+  assert.match(component, /VegetationReportService\.SaveSummaryVegetationPreferences/);
 });
 
 test('owned tab remount and cancellable root-close/navigation/selection holds are wired', () => {
@@ -53,7 +53,7 @@ test('compiled panel renders retained production result with labels and immutabl
   await session.show({ preview: async () => structuredClone(wire[6]), cancel() {} });
   const panel = serverComponent(component, 'SummaryVegetationReport.svelte', {
     './summaryVegetation': summary,
-    '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationService: { Preview() { throw new Error('Rendering must not replay a read'); } } },
+    '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: { PreviewSummaryVegetation() { throw new Error('Rendering must not replay a read'); } } },
   }, { VITE_SUMMARY_VEGETATION: 'true' });
   const held = [];
   let body = render(panel, { props: { ...owner, onBusyChange: value => held.push(value) } }).body;

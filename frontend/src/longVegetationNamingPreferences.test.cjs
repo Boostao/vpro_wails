@@ -127,7 +127,7 @@ test('actual naming handlers cancel stale reads and separately gate Save versus 
     contextId: scope.contextId, preferences: session, view: session.view(), busy: false, operationHeld: false, mutationHeld: false,
     generation: 0, error: '', onReadBusyChange() {},
     reads: { cancelAll() { cancellations++; }, track(value) { return value; } },
-    LongVegetationNamingPreferencesService: {
+    VegetationReportService: {
       GetLongVegetationNamingPreferences() { reads++; return new Promise(done => { resolveRead = done; }); },
       SaveLongVegetationNamingPreferences(id, raw) {
         saves++; assert.equal(id, scope.contextId); assert.deepEqual(JSON.parse(raw), wire.request); return Promise.resolve(wire.outcome);

@@ -267,12 +267,12 @@ test('actual controller factories retain variant histories across remounts and r
     sessions, owner, TwoPageParentSession: api.TwoPageParentSession,
     reads: { track: value => value, cancelAll() {} }, onchange() {},
     oncommitted: async () => calls.refresh++,
-    TwoPageParentExtraService: {
-      GetOriginal: async (context, plot, form) => {
+    PlotEntryService: {
+      GetTwoPageParentExtraOriginal: async (context, plot, form) => {
         assert.equal(context, owner.contextId); assert.equal(plot, owner.plot);
         calls.read.push(form); return structuredClone(current[form]);
       },
-      Save: async (context, plot, form, request) => {
+      SaveTwoPageParentExtra: async (context, plot, form, request) => {
         assert.equal(context, owner.contextId); assert.equal(plot, owner.plot);
         calls.save++;
         for (const edit of request.edits) for (const [variant, r] of Object.entries(current)) {

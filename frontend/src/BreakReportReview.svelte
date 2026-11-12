@@ -1,11 +1,13 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { BreakReportService } from '../bindings/github.com/boostao/vpro-wails';
-  import { ReadRequests } from './readRequests';
+  import { ReadRequests, type CancellableRead } from './readRequests';
   import { breakReportFields, breakReportFromWire, sameBreakReportSource, type BreakReportPage } from './breakReportReview';
 
-  let { contextId, operationHeld = false, onBusyChange }: {
+  let { contextId, operationHeld = false, onBusyChange, BreakReportService = {
+    GetReview: () => Object.assign(Promise.reject(new Error('PC-ORD Break Report has been retired.')), { cancel() {} })
+  } }: {
     contextId: string; operationHeld?: boolean; onBusyChange: (busy: boolean) => void;
+    BreakReportService?: { GetReview: (contextId: string, offset: number, limit: number) => CancellableRead<unknown> };
   } = $props();
   let busy = $state(false);
   let error = $state('');

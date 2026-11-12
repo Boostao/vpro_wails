@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { ContextService } from '../bindings/github.com/boostao/vpro-wails';
+  import { SpatialService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { validatePlotLocationReview, type ValidatedPlotLocationReview } from './plotLocationReview';
   import { reportCellText } from './longEnvironmentReport';
@@ -23,7 +23,7 @@
     cancel(); const request = generation;
     review = null; error = ''; offset = 0; busy = true; onBusyChange(true);
     try {
-      const value = await reads.track(ContextService.GetPlotLocationReview(contextId));
+      const value = await reads.track(SpatialService.GetPlotLocationReview(contextId));
       if (request !== generation) return;
       const validated = await validatePlotLocationReview(value, contextId, project, projectPath, su, suPath);
       if (request !== generation) return;

@@ -2,7 +2,7 @@
   import { onMount, onDestroy, tick } from 'svelte';
   import { Events } from '@wailsio/runtime';
   import { ChevronLeft, ChevronRight, Database, FolderOpen, RefreshCw } from '@lucide/svelte';
-  import { CloseService, ContextService, ProjectService, StartupService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary, type ProjectPlotProfileFilterRequest, type PlotProfileSource, type PlotProfileSourceInfo, type AccessDatabaseInspection, type AccessProjectCandidate, type AccessProjectImportResult } from '../bindings/github.com/boostao/vpro-wails';
+  import { ContextService, ImportExportService, LifecycleService, type StartupState, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary, type ProjectPlotProfileFilterRequest, type PlotProfileSource, type PlotProfileSourceInfo, type AccessDatabaseInspection, type AccessProjectCandidate, type AccessProjectImportResult } from '../bindings/github.com/boostao/vpro-wails';
   import { projectState } from './state';
   import Navigation from './Navigation.svelte';
   import DemoReadiness from './DemoReadiness.svelte';
@@ -340,16 +340,16 @@
   async function handleCloseRequest(requestId: string) {
     if (closeWorking || closeRequest === requestId) return;
     try {
-      if (await CloseService.GetPendingCloseRequest() !== requestId) return;
+      if (await LifecycleService.GetPendingCloseRequest() !== requestId) return;
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       await tick();
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
       const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || editorInitializing);
       if (disposition === 'busy') {
-        await CloseService.CancelClose(requestId);
+        await LifecycleService.CancelClose(requestId);
         error = 'Wait for the current operation to finish before closing VPRO.';
       } else if (disposition === 'clean') {
-        await CloseService.ConfirmClose(requestId);
+        await LifecycleService.ConfirmClose(requestId);
       } else {
         closeError = '';
         closeRequest = requestId;
@@ -366,7 +366,7 @@
     closeError = '';
     try {
       if (decision === 'cancel') {
-        await CloseService.CancelClose(requestId);
+        await LifecycleService.CancelClose(requestId);
         closeRequest = '';
         return;
       }
@@ -381,7 +381,7 @@
           return;
         }
       }
-      await CloseService.ConfirmClose(requestId);
+      await LifecycleService.ConfirmClose(requestId);
     } catch (cause) {
       closeError = `VPRO remains open: ${String(cause)}`;
     } finally {
@@ -524,8 +524,8 @@
       busy = true;
       try {
         await tick();
-        const next = await plotReads.track(ProjectService.ListPlots(0, pageSize));
-        const state = await stateReads.track(ProjectService.GetState());
+        const next = await plotReads.track(ContextService.ListPlots(0, pageSize));
+        const state = await stateReads.track(ContextService.GetState());
         if (state.contextId !== contextId || $projectState?.contextId !== contextId) throw new Error('Context changed before clearing navigation.');
         request++; plotReads.cancelAll();
         profileNavigation = null; page = next; offset = 0; selected = null;
@@ -614,7 +614,7 @@
       const source = profileNavigation;
       const next = source ? await resolveNavigation(source.proposal, source.contextId) : null;
       const result = next ? profileNavigationPage(next, next.contextId, nextOffset, pageSize) :
-        await plotReads.track(ProjectService.ListPlots(nextOffset, pageSize));
+        await plotReads.track(ContextService.ListPlots(nextOffset, pageSize));
       if (current !== request) return;
       if (next) profileNavigation = next;
       page = result;
@@ -634,14 +634,14 @@
     busy = true;
     error = '';
     try {
-      const startup = await stateReads.track(StartupService.GetState());
+      const startup = await stateReads.track(LifecycleService.GetStartupState());
       if (current !== stateRequest) return;
       if (!startup.ready) {
         startupFailure = startup;
         busy = false;
         return;
       }
-      const state = await stateReads.track(ProjectService.GetState());
+      const state = await stateReads.track(ContextService.GetState());
       if (current !== stateRequest) return;
       projectState.set(state);
       if (profileNavigation && profileNavigation.contextId !== state.contextId) profileNavigation = null;
@@ -661,7 +661,7 @@
     const current = ++hierarchyRequest;
     hierarchyReads.cancelAll();
     try {
-      const nodes = await hierarchyReads.track(ProjectService.GetHierarchyNodes());
+      const nodes = await hierarchyReads.track(ContextService.GetHierarchyNodes());
       if (current === hierarchyRequest) hierarchyNodes = nodes ?? [];
     } catch (cause) {
       if (current === hierarchyRequest) throw cause;
@@ -771,7 +771,7 @@
         const created = validateProjectSUCreated(response, proposal.name, proposal.review.su.plots.length, proposal.review.path);
         suProjectSuccess = `Created ${created.name}_SU with ${created.plotCount} stored plots in ${created.path}. Existing data/descriptions and project/SU selection are unchanged; select it separately.`;
         view = 'plots'; editorPlotNumber = undefined;
-        const state = await stateReads.track(ProjectService.GetState());
+        const state = await stateReads.track(ContextService.GetState());
         if (state.contextId !== contextId || $projectState?.contextId !== contextId) {
           throw new Error('SU table committed, but context changed before destination discovery refresh; do not replay creation.');
         }
@@ -1062,7 +1062,7 @@
     accessError = '';
     accessResult = null;
     try {
-      const chosen = await ContextService.ChooseAccessDatabaseFile(contextId);
+      const chosen = await ImportExportService.ChooseAccessDatabaseFile(contextId);
       if (!chosen) return;
       accessSourcePath = chosen;
       await inspectAccessSource(chosen);
@@ -1078,7 +1078,7 @@
     accessError = '';
     accessResult = null;
     try {
-      const inspection = await ContextService.InspectAccessDatabase(contextId, pathToInspect);
+      const inspection = await ImportExportService.InspectAccessDatabase(contextId, pathToInspect);
       accessInspection = inspection;
       accessSourcePath = inspection.sourcePath;
       const projects = inspection.projects ?? [];
@@ -1120,7 +1120,7 @@
       accessError = '';
       accessResult = null;
       try {
-        const result = await ContextService.ImportAccessProject(contextId, {
+        const result = await ImportExportService.ImportAccessProject(contextId, {
           sourcePath,
           sourceProject,
           targetProject,
@@ -1158,7 +1158,7 @@
       }
       void handleCloseRequest(requestId);
     });
-    void CloseService.GetPendingCloseRequest().then((requestId) => {
+    void LifecycleService.GetPendingCloseRequest().then((requestId) => {
       if (requestId) void handleCloseRequest(requestId);
     }).catch((cause) => { error = `Window close handler could not initialise: ${String(cause)}`; });
     void refresh();

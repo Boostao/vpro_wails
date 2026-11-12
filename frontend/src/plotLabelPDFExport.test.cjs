@@ -42,13 +42,13 @@ function host(operation = () => Promise.resolve(review())) {
       plotLookupInputError: lookup.plotLookupInputError,
       onBusyChange(value) { changes.push(value); },
       reads: { track(value) { return value; }, cancelAll() { calls.push('cancel'); } },
-      PlotLabelPDFExportService: {
-        GetReview(...args) { calls.push(['review', ...args]); return operation(...args); },
-        ExportReviewed(...args) { calls.push(['export', ...args]); return Promise.resolve(wire.outcome); },
-        RecoverOutcome(...args) { calls.push(['recover', ...args]); return Promise.resolve(wire.recovery); },
+      ImportExportService: {
+        GetPlotLabelPDFReview(...args) { calls.push(['review', ...args]); return operation(...args); },
+        ExportReviewedPlotLabelPDF(...args) { calls.push(['export', ...args]); return Promise.resolve(wire.outcome); },
+        RecoverPlotLabelPDFOutcome(...args) { calls.push(['recover', ...args]); return Promise.resolve(wire.recovery); },
+        GetPlotLabelRegionalPreview() { throw new Error('regional PDF fallback forbidden'); },
       },
       ContextService: { GetPlot() { throw new Error('legacy PDF fallback forbidden'); } },
-      PlotLabelRegionalService: { GetPreview() { throw new Error('regional PDF fallback forbidden'); } },
     });
   target.subscribe(() => { context.publication = target.view(); context.actions.updateBusy(); });
   return { context, changes, calls, target };

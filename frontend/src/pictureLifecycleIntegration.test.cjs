@@ -101,7 +101,7 @@ test('either independent lifecycle flag constructs an idle manager without notif
     { VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'true', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_CREATION_WRITING: 'false' },
     { VITE_PICTURE_DELETION_WRITING: 'true', VITE_PICTURE_DELETION_RESTORING: 'true', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_CREATION_WRITING: 'false' },
   ]) {
-    const retained = registry({ PictureService: {}, PictureDeletionService: {} });
+    const retained = registry({ PictureService: {} });
     const rootBusy = client.state(false);
     let notifications = 0;
     const stop = retained.subscribePictureLifecycleActivity(activity => {
@@ -135,19 +135,19 @@ test('either independent lifecycle flag constructs an idle manager without notif
 test('binding registry retains unknown requests across remount, recovers without replay and preserves both committed receipts', async () => {
   const calls = [];
   const retained = registry({
-    PictureService: { GetMetadata: (...args) => { calls.push(['read', ...args]); return operation(review()); } },
-    PictureDeletionService: {
-      Delete: (...args) => { calls.push(['delete', ...args]); return operation(Promise.reject(new Error('Lost delivery'))); },
-      LookupReceipt: (contextId, json) => {
+    PictureService: {
+      GetMetadata: (...args) => { calls.push(['read', ...args]); return operation(review()); },
+      DeletePicture: (...args) => { calls.push(['delete', ...args]); return operation(Promise.reject(new Error('Lost delivery'))); },
+      LookupDeletionReceipt: (contextId, json) => {
         calls.push(['lookup', contextId, json]);
         return operation({ ...deletion(), request: JSON.parse(json), replayed: true });
       },
-      GetHistory: (...args) => {
+      GetDeletionHistory: (...args) => {
         calls.push(['history', ...args]);
         return operation({ ...owner, events: [{ deletion: deletion(), restoration: null }] });
       },
-      ReviewRestoration: (...args) => { calls.push(['review', ...args]); return operation(restorationReview()); },
-      Restore: (contextId, json) => {
+      ReviewDeletionRestoration: (...args) => { calls.push(['review', ...args]); return operation(restorationReview()); },
+      RestoreDeletedPicture: (contextId, json) => {
         calls.push(['restore', contextId, json]); return operation(restoration(JSON.parse(json)));
       },
     },
@@ -362,7 +362,7 @@ test('persistent lifecycle ownership blocks root close, transitions and backgrou
     request: 0, stateRequest: 0, hierarchyRequest: 0, $projectState: { contextId: owner.contextId },
     document: { activeElement: null }, HTMLElement: class {},
     closeDisposition: loadTypeScript('closeLifecycle.ts').closeDisposition,
-    tick: async () => {}, CloseService: {
+    tick: async () => {}, LifecycleService: {
       GetPendingCloseRequest: () => operation('owned-close'),
       CancelClose: id => { closed.push(['cancel', id]); },
       ConfirmClose: id => { closed.push(['confirm', id]); },

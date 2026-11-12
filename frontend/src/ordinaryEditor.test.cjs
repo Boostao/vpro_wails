@@ -284,7 +284,7 @@ test('Actual drainage component owns only its strict source slot and retains exp
   const source = readFileSync(path.join(__dirname, 'DrainageFields.svelte'), 'utf8');
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'DrainageFields.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /requests\.track\(ParentCodeService\.ListChoices\('SoilDrainage'\)\)/);
+  assert.match(source, /requests\.track\(PlotEntryService\.ListParentCodeChoices\('SoilDrainage'\)\)/);
   assert.match(source, /onDestroy[\s\S]*lookup\.dispose\(\)[\s\S]*onvalidation\('soilDrainage'/);
   assert.match(form, /parentCodeBusy \|\| drainageBusy/);
   assert.doesNotMatch(source, /type="checkbox"|rememberAcknowledgement|maxlength=/);
@@ -292,7 +292,7 @@ test('Actual drainage component owns only its strict source slot and retains exp
     const Component = serverComponent(source.replace('import.meta.env.VITE_SOIL_DRAINAGE_EDITING',
       enabled ? "'true'" : "'false'"), 'DrainageFields.svelte', {
       './drainageEditor': drainage, './qualityEditor': quality,
-      '../bindings/github.com/boostao/vpro-wails': { ParentCodeService: {} }
+      '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {} }
     });
     const fixture = `<script>import Drainage from './Drainage.svelte';let draft={soilDrainage:'legacy-long'};</script>
       <label>Drainage class

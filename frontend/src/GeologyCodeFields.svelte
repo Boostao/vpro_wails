@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
-  import { GeologyCodeService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import { CatalogueLookup } from './catalogueLookup';
   import type { PaperControl } from './paperLayout';
   import FieldGuidance from './FieldGuidance.svelte';
@@ -16,8 +16,8 @@
   } = $props();
   const editingEnabled = import.meta.env.VITE_GEOLOGY_CODES_EDITING !== 'false';
   const lookup = new CatalogueLookup(async (force, requests) => {
-    if (force) await requests.track(GeologyCodeService.ReloadCatalogue());
-    const rows = await requests.track(GeologyCodeService.ListBedrockChoices());
+    if (force) await requests.track(PlotEntryService.ReloadGeologyCodeCatalogue());
+    const rows = await requests.track(PlotEntryService.ListBedrockChoices());
     if (rows === null) throw new Error('Bedrock service did not return reference rows.');
     return rows;
   }, next => { view = next; }, 'Bedrock type');

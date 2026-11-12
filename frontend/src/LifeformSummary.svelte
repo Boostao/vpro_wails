@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { LifeformSummaryService, SpeciesAttributeSummaryService } from '../bindings/github.com/boostao/vpro-wails';
+  import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { validateLifeformSummary, lifeformCellText, lifeformRatioText, type LifeformSummaryPreview } from './lifeformSummary';
   import { validateSpeciesAttributeSummary, speciesAttributeCountText, type SpeciesAttributeSummaryPreview } from './speciesAttributeSummary';
@@ -31,7 +31,7 @@
     const owner = { contextId, project, projectPath, su, suPath };
     busy = true; error = ''; preview = null; attributePreview = null; reportBusy();
     try {
-      const value = await reads.track<unknown>(kind === 'attributes' ? SpeciesAttributeSummaryService.Preview(contextId) : LifeformSummaryService.Preview(contextId));
+      const value = await reads.track<unknown>(kind === 'attributes' ? VegetationReportService.PreviewSpeciesAttributeSummary(contextId) : VegetationReportService.PreviewLifeformSummary(contextId));
       if (request !== generation || key !== ownerKey) return;
       if (kind === 'attributes') attributePreview = validateSpeciesAttributeSummary(value, owner);
       else preview = validateLifeformSummary(value, owner);

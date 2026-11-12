@@ -179,14 +179,14 @@ test('actual extended panel handlers reject late canceled and changed-criteria r
       reads: { track: value => value, cancelAll: () => requests.forEach(value => value.cancel()) },
       sameExtendedSummaryWorkbookOptions: extended.sameExtendedSummaryWorkbookOptions,
       validateExtendedSummaryWorkbookReview: extended.validateExtendedSummaryWorkbookReview,
-      SiteUnitSummaryExtendedWorkbookService: {
-        GetReview(id, json) {
+      EnvironmentReportService: {
+        GetSiteUnitSummaryExtendedWorkbookReview(id, json) {
           let resolve;
           const value = new Promise(done => resolve = done);
           Object.assign(value, { resolve, id, json, canceled: false, cancel() { this.canceled = true; } });
           requests.push(value); return value;
         },
-        ExportReviewed: async (id, json) => {
+        ExportReviewedSiteUnitSummaryExtendedWorkbook: async (id, json) => {
           assert.equal(id, owner.contextId);
           assert.deepEqual(JSON.parse(json), { ...request, approvalHash: 'a'.repeat(64), destination });
           return receipt();
@@ -250,7 +250,7 @@ test('extended UI keeps gates, visible labels and held authority while restoring
   assert.match(panel, /VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'false'/);
   assert.match(panel, /sameExtendedSummaryWorkbookOptions\(requestedOptions, extendedOptions/);
   assert.match(panel, /extendedSession\.publish\(review, destination/);
-  assert.doesNotMatch(panel, /reads\.track\(SiteUnitSummaryExtendedWorkbookService\.ExportReviewed/);
+  assert.doesNotMatch(panel, /reads\.track\(EnvironmentReportService\.ExportReviewed/);
   for (const heading of ['Scientific Name', 'Common Name', '%Cover', '%Presence']) assert.ok(panel.includes(heading));
   assert.match(panel, /scope="row" aria-label=/);
 });

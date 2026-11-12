@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, untrack, type Snippet } from 'svelte';
-  import { SIVICHARSParentEntryService, AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService, AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { SIVICHARSParentEntrySession } from './siviCHARSParentEntrySession';
   import { siviCHARSParentFields, siviCHARSParentSpeciesAction } from './siviCHARSParentEntry';
@@ -25,10 +25,10 @@
   let locked = $state(true);
   let operationError = $state('');
   const session = new SIVICHARSParentEntrySession(owner, {
-    read: () => reads.track(SIVICHARSParentEntryService.Review(owner.contextId, owner.plot)),
+    read: () => reads.track(PlotEntryService.ReviewSIVICHARSParentEntry(owner.contextId, owner.plot)),
     cancelRead: () => reads.cancelAll(),
-    save: request => SIVICHARSParentEntryService.Save(owner.contextId, owner.plot, request),
-    restore: (history, action) => SIVICHARSParentEntryService.Restore(owner.contextId, owner.plot, history, action),
+    save: request => PlotEntryService.SaveSIVICHARSParentEntry(owner.contextId, owner.plot, request),
+    restore: (history, action) => PlotEntryService.RestoreSIVICHARSParentEntry(owner.contextId, owner.plot, history, action),
     refreshParent: async () => { await onSaved?.(owner.plot); },
   }, () => { view = session.view(); });
   view = session.view();

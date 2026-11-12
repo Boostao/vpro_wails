@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
-  import { BECService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
+  import { ClassificationService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
   import { ReadRequests } from './readRequests';
   import { BECLookup, becKey, becLabels, becLengths, becGroups, becChanged, becWarnings,
@@ -20,9 +20,9 @@
   }
   const reads = new ReadRequests();
   const lookup = new BECLookup({
-    zones: async () => catalogueRows(await reads.track(BECService.ListBECZones())),
-    subZones: async zone => catalogueRows(await reads.track(BECService.ListBECSubZones(zone))),
-    siteSeries: async (zone, subZone) => catalogueRows(await reads.track(BECService.ListBECSiteSeries(zone, subZone)))
+    zones: async () => catalogueRows(await reads.track(ClassificationService.ListBECZones())),
+    subZones: async zone => catalogueRows(await reads.track(ClassificationService.ListBECSubZones(zone))),
+    siteSeries: async (zone, subZone) => catalogueRows(await reads.track(ClassificationService.ListBECSiteSeries(zone, subZone)))
   }, next => view = next, () => reads.cancelAll());
   let view = $state(lookup.snapshot());
   let acknowledged = $state(false);

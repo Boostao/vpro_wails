@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { LongVegetationSelectedUnitSelectionService } from '../bindings/github.com/boostao/vpro-wails';
+  import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import type { SelectedUnitSelectionSession } from './longVegetationSelectedUnitSelection';
 
@@ -17,13 +17,13 @@
   function cancel() { reads.cancelAll(); selection.cancel(); }
   async function load() {
     if (operationHeld || view.busy) return;
-    await selection.load(() => reads.track(LongVegetationSelectedUnitSelectionService.GetLongVegetationSelectedUnitSelection(contextId)));
+    await selection.load(() => reads.track(VegetationReportService.GetLongVegetationSelectedUnitSelection(contextId)));
   }
   async function build() {
     if (operationHeld || view.busy || view.authorityUnknown || view.draftError || !view.review) return;
     await selection.build(
-      request => reads.track(LongVegetationSelectedUnitSelectionService.SetLongVegetationSelectedUnitFields(contextId, JSON.stringify(request))),
-      revision => reads.track(LongVegetationSelectedUnitSelectionService.BuildLongVegetationSelectedUnitSelection(contextId, revision)),
+      request => reads.track(VegetationReportService.SetLongVegetationSelectedUnitFields(contextId, JSON.stringify(request))),
+      revision => reads.track(VegetationReportService.BuildLongVegetationSelectedUnitSelection(contextId, revision)),
     );
   }
   function edit(fields: string[]) {

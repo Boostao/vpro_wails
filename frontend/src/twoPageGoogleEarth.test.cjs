@@ -103,9 +103,12 @@ async function mountPanel(service, validateReview = earth.twoPageGoogleEarthRevi
   const reads = loadTypeScript('readRequests.ts', {
     '@wailsio/runtime': { Call: { RuntimeError: class extends Error {} }, CancelledRejectionError: class extends Error {} },
   });
-  const mount = new Function('$', 'onDestroy', 'untrack', 'ReadRequests', 'TwoPageGoogleEarthService', 'googleEarthXMLText',
+  const mount = new Function('$', 'onDestroy', 'untrack', 'ReadRequests', 'SpatialService', 'googleEarthXMLText',
     'twoPageGoogleEarthOptionsFromWire', 'twoPageGoogleEarthReviewFromWire', 'twoPageGoogleEarthCell', 'metadataCellText',
-    code + '\nreturn _unknown_;')(runtime, onDestroy, runtime.untrack, reads.ReadRequests, service, kml.googleEarthXMLText,
+    code + '\nreturn _unknown_;')(runtime, onDestroy, runtime.untrack, reads.ReadRequests, {
+      GetTwoPageGoogleEarthOptions: service.GetTwoPageGoogleEarthOptions ?? service.GetOptions,
+      GetTwoPageGoogleEarthReview: service.GetTwoPageGoogleEarthReview ?? service.GetReview,
+    }, kml.googleEarthXMLText,
     earth.twoPageGoogleEarthOptionsFromWire, validateReview, earth.twoPageGoogleEarthCell, metadata.metadataCellText);
   let actions; const activity = [];
   const dispose = runtime.effect_root(() => mount(null, { ...owner, onBusyChange: value => activity.push(value), inspect: value => actions = value }));

@@ -23,7 +23,7 @@ function host(operation = () => Promise.resolve(wire)) {
     onBusyChange(value) { changes.push(value); },
     reads: { track(value) { return value; }, cancelAll() { calls.push('cancel'); } },
     ContextService: { GetPlot() { throw new Error('legacy fallback forbidden'); } },
-    PlotLabelRegionalService: { GetPreview(...args) { calls.push(['regional', ...args]); return operation(...args); } },
+    ImportExportService: { GetPlotLabelRegionalPreview(...args) { calls.push(['regional', ...args]); return operation(...args); } },
   });
   return { context, calls, changes };
 }
@@ -117,7 +117,7 @@ test('held native label completion is discarded by cancel, owner change and tear
   context.actions.cancel();
   release(wire);
   await pending;
-  context.PlotLabelRegionalService.GetPreview = () => Promise.resolve(wire);
+  context.ImportExportService.GetPlotLabelRegionalPreview = () => Promise.resolve(wire);
   await context.actions.load();
   assert.equal(context.labelDate, 'Sunday, October 11, 2026');
   const source = readFileSync(path.join(__dirname, 'PlotLabelPreview.svelte'), 'utf8');

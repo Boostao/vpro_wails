@@ -1,4 +1,4 @@
-import { PictureService, PictureMetadataService } from '../bindings/github.com/boostao/vpro-wails';
+import { PictureService } from '../bindings/github.com/boostao/vpro-wails';
 import { PictureMetadataSession } from './pictureMetadataSession';
 import type { PictureOwner } from './pictureRead';
 
@@ -11,8 +11,8 @@ export function pictureMetadataSession(owner: PictureOwner): PictureMetadataSess
     const { contextId, project, plotNumber } = owner;
     session = new PictureMetadataSession({ contextId, project, plotNumber }, {
       read: () => PictureService.GetMetadata(contextId, plotNumber),
-      save: request => PictureMetadataService.Save(contextId, plotNumber, request),
-      receipt: request => PictureMetadataService.LookupReceipt(contextId, plotNumber, request),
+      save: request => PictureService.SaveMetadata(contextId, plotNumber, request),
+      receipt: request => PictureService.LookupMetadataReceipt(contextId, plotNumber, request),
     });
     sessions.set(key, session);
   }

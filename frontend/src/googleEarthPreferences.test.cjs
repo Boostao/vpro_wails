@@ -261,7 +261,7 @@ test('panel independently gates preferences shares one title and field and prote
   assert.match(source, /Text preparation itself creates no file, saves no preference and launches no viewer/);
   assert.match(source, /onDestroy\(\(\) => unsubscribePreferences\?\.\(\)\)/);
   assert.doesNotMatch(source, /\$effect[\s\S]*loadPreferences/);
-  const generated = readFileSync(path.join(__dirname, '..', 'bindings', 'github.com', 'boostao', 'vpro-wails', 'googleearthpreferencesservice.ts'), 'utf8');
+  const generated = readFileSync(path.join(__dirname, '..', 'bindings', 'github.com', 'boostao', 'vpro-wails', 'spatialservice.ts'), 'utf8');
   assert.match(generated, /export function SaveGoogleEarthPreferences/);
   assert.match(generated, /GoogleEarthPreferencesOutcome/);
 });

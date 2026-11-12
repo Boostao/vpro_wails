@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { GoogleEarthReviewService, GoogleEarthKMLService, GoogleEarthKMLExportService, GoogleEarthPreferencesService, type GoogleEarthKMLReview, type GoogleEarthKMLExportReview } from '../bindings/github.com/boostao/vpro-wails';
+  import { SpatialService, type GoogleEarthKMLReview, type GoogleEarthKMLExportReview } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { reportCellText } from './longEnvironmentReport';
   import { validateGoogleEarthFields, validateGoogleEarthReview, type ValidatedGoogleEarthFields, type ValidatedGoogleEarthReview } from './googleEarthReview';
@@ -67,7 +67,7 @@
     cancel(); const request = generation, preferenceRequest = preferenceSession.beginLoad();
     error = ''; busy = true; updateBusy();
     try {
-      const value = await reads.track(GoogleEarthPreferencesService.GetGoogleEarthPreferences(contextId));
+      const value = await reads.track(SpatialService.GetGoogleEarthPreferences(contextId));
       if (request !== generation) return;
       if (!preferenceSession.applyLoaded(value, preferenceRequest)) return;
       const applied = preferenceSession.view().draft;
@@ -85,7 +85,7 @@
     error = '';
     try {
       await preferenceSession.save(fields?.fields.map(field => field.name) ?? [], request =>
-        GoogleEarthPreferencesService.SaveGoogleEarthPreferences(contextId, JSON.stringify(request)));
+        SpatialService.SaveGoogleEarthPreferences(contextId, JSON.stringify(request)));
     } catch (cause) { error = String(cause); }
   }
   async function loadFields() {
@@ -93,7 +93,7 @@
     cancel(); const request = generation, expected = scope();
     fields = null; if (!preferencesEnabled) selectedField = ''; review = null; kml = null; approval = null; error = ''; busy = true; onBusyChange(true);
     try {
-      const value = await reads.track(GoogleEarthReviewService.GetGoogleEarthDescriptionFields(contextId));
+      const value = await reads.track(SpatialService.GetGoogleEarthDescriptionFields(contextId));
       if (request !== generation) return;
       fields = validateGoogleEarthFields(value, expected);
       preferenceSession?.setPhysicalFields(fields.fields.map(field => field.name));
@@ -113,13 +113,13 @@
     try {
       const payload = JSON.stringify({ descriptionField, title: placeName });
       if (kmlExportEnabled) {
-        const value = await reads.track(GoogleEarthKMLExportService.GetGoogleEarthKMLExportReview(contextId, payload));
+        const value = await reads.track(SpatialService.GetGoogleEarthKMLExportReview(contextId, payload));
         if (request !== generation) return;
         const validated = await validateGoogleEarthKMLExportReview(value, expected, descriptionField, placeName);
         if (request !== generation) return;
         approval = validated; kml = validated.review;
       } else {
-        const value = await reads.track(GoogleEarthKMLService.GetGoogleEarthKMLReview(contextId, payload));
+        const value = await reads.track(SpatialService.GetGoogleEarthKMLReview(contextId, payload));
         if (request !== generation) return;
         const validated = await validateGoogleEarthKMLReview(value, expected, descriptionField, placeName);
         if (request !== generation) return;
@@ -139,7 +139,7 @@
     cancel(); const request = generation, expected = scope(), descriptionField = selectedField;
     review = null; error = ''; busy = true; onBusyChange(true);
     try {
-      const value = await reads.track(GoogleEarthReviewService.GetGoogleEarthReview(contextId,
+      const value = await reads.track(SpatialService.GetGoogleEarthReview(contextId,
         JSON.stringify({ descriptionField, offset, limit: pageSize })));
       if (request !== generation) return;
       const validated = await validateGoogleEarthReview(value, expected, descriptionField, offset, pageSize);
@@ -156,7 +156,7 @@
     error = '';
     try {
       await publicationSession.publish(approval, destination, request =>
-        GoogleEarthKMLExportService.ExportReviewedGoogleEarthKML(contextId, JSON.stringify(request)));
+        SpatialService.ExportReviewedGoogleEarthKML(contextId, JSON.stringify(request)));
     } catch (cause) {
       error = `KML publication request unavailable: ${String(cause)}`;
     }

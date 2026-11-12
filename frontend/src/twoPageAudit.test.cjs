@@ -80,9 +80,11 @@ async function mountPanel(service) {
   const reads = loadTypeScript('readRequests.ts', {
     '@wailsio/runtime': { Call: { RuntimeError: class extends Error {} }, CancelledRejectionError: class extends Error {} },
   });
-  const mount = new Function('$', 'onDestroy', 'untrack', 'ReadRequests', 'TwoPageSourceAuditService',
+  const mount = new Function('$', 'onDestroy', 'untrack', 'ReadRequests', 'PlotEntryService',
     'sourceAuditFields', 'twoPageAuditFromWire', 'twoPageAuditLabel', code + '\nreturn _unknown_;')(
-    runtime, onDestroy, runtime.untrack, reads.ReadRequests, service,
+    runtime, onDestroy, runtime.untrack, reads.ReadRequests, {
+      GetTwoPageSourceAuditOriginal: service.GetTwoPageSourceAuditOriginal ?? service.GetOriginal,
+    },
     audit.sourceAuditFields, audit.twoPageAuditFromWire, audit.twoPageAuditLabel);
   const activity = [];
   let actions;

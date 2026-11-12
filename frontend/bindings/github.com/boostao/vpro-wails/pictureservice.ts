@@ -9,10 +9,70 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function AcknowledgeCreationReceipt(token: string): $CancellablePromise<void> {
+    return $Call.ByID(2898896068, token);
+}
+
+export function ChooseCreationImage(contextID: string, project: string, plot: string): $CancellablePromise<$models.PictureCreationSelection | null> {
+    return $Call.ByID(3319007936, contextID, project, plot);
+}
+
+export function CreatePicture(token: string, requestJSON: string): $CancellablePromise<$models.PictureCreationResult | null> {
+    return $Call.ByID(2573859167, token, requestJSON);
+}
+
+export function DeletePicture(contextID: string, requestJSON: string): $CancellablePromise<$models.PictureDeletionResult | null> {
+    return $Call.ByID(315808366, contextID, requestJSON);
+}
+
+export function GetDeletionHistory(contextID: string, plot: string): $CancellablePromise<$models.PictureDeletionHistoryList | null> {
+    return $Call.ByID(4095650293, contextID, plot);
+}
+
 export function GetImage(contextID: string, plot: string, requestJSON: string): $CancellablePromise<$models.PictureImage | null> {
     return $Call.ByID(433911198, contextID, plot, requestJSON);
 }
 
 export function GetMetadata(contextID: string, plot: string): $CancellablePromise<$models.PictureMetadataReview | null> {
     return $Call.ByID(2102712636, contextID, plot);
+}
+
+export function GetSelectedCreationImage(token: string, requestJSON: string): $CancellablePromise<$models.PictureImage | null> {
+    return $Call.ByID(2383290342, token, requestJSON);
+}
+
+export function LookupCreationReceipt(requestJSON: string): $CancellablePromise<$models.PictureCreationResult | null> {
+    return $Call.ByID(313519788, requestJSON);
+}
+
+export function LookupDeletionReceipt(contextID: string, requestJSON: string): $CancellablePromise<$models.PictureDeletionResult | null> {
+    return $Call.ByID(1460164845, contextID, requestJSON);
+}
+
+export function LookupDeletionRestorationReceipt(contextID: string, requestJSON: string): $CancellablePromise<$models.PictureRestorationResult | null> {
+    return $Call.ByID(3136361895, contextID, requestJSON);
+}
+
+export function LookupMetadataReceipt(contextID: string, plot: string, requestJSON: string): $CancellablePromise<$models.PictureMetadataWriteResult | null> {
+    return $Call.ByID(2353764976, contextID, plot, requestJSON);
+}
+
+export function RecoverCreationSelection(contextID: string, project: string, plot: string): $CancellablePromise<$models.PictureCreationSelection | null> {
+    return $Call.ByID(2819386746, contextID, project, plot);
+}
+
+export function ReleaseCreationSelection(token: string): $CancellablePromise<void> {
+    return $Call.ByID(981331277, token);
+}
+
+export function RestoreDeletedPicture(contextID: string, requestJSON: string): $CancellablePromise<$models.PictureRestorationResult | null> {
+    return $Call.ByID(1586942994, contextID, requestJSON);
+}
+
+export function ReviewDeletionRestoration(contextID: string, plot: string, historyID: string): $CancellablePromise<$models.PictureRestorationReview | null> {
+    return $Call.ByID(138086475, contextID, plot, historyID);
+}
+
+export function SaveMetadata(contextID: string, plot: string, requestJSON: string): $CancellablePromise<$models.PictureMetadataWriteResult | null> {
+    return $Call.ByID(3697269487, contextID, plot, requestJSON);
 }

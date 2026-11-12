@@ -124,7 +124,7 @@ test('actual enforcement handlers drop cancelled reads and capture DOM Boolean w
   const values = { preferences: session, view: session.view(), busy: false, error: '', generation: 0,
     operationHeld: false, mutationHeld: false, contextId: scope.contextId, onReadBusyChange() {},
     reads: { track: value => value, cancelAll: () => { cancelled++; } },
-    LongVegetationEnforcementPreferencesService: { GetLongVegetationEnforcementPreferences: () => request } };
+    VegetationReportService: { GetLongVegetationEnforcementPreferences: () => request } };
   const ctx = componentFunctions('LongVegetationEnforcementPreferences.svelte', ['cancel', 'load', 'edit'], values);
   const load = ctx.actions.load(); ctx.actions.cancel(); resolveRead(review(true, 3)); await load;
   assert.deepEqual(session.view().saved, { enforce: false, unitGroups: 2 });

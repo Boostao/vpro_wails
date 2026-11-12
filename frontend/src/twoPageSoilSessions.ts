@@ -1,4 +1,4 @@
-import { TwoPageSoilService } from '../bindings/github.com/boostao/vpro-wails';
+import { PlotEntryService } from '../bindings/github.com/boostao/vpro-wails';
 import { TwoPageSoilSession } from './twoPageSoilSession';
 import type { TwoPageSoilOwner } from './twoPageSoilEditor';
 import { wellFormedUTF16 } from './qualityEditor';
@@ -42,10 +42,10 @@ export function twoPageSoilSession(owner: TwoPageSoilOwner): TwoPageSoilSession 
   const retainedOwner = { contextId: owner.contextId, project: owner.project, plot: owner.plot, form: owner.form };
   const { contextId, plot, form } = retainedOwner;
   const session = new TwoPageSoilSession(retainedOwner, {
-    read: () => TwoPageSoilService.GetOriginal(contextId, plot, form),
-    save: request => TwoPageSoilService.Save(contextId, request),
-    create: request => TwoPageSoilService.CreateHorizon(contextId, request),
-    outcome: request => TwoPageSoilService.RecoverOutcome(contextId, request),
+    read: () => PlotEntryService.GetTwoPageSoilOriginal(contextId, plot, form),
+    save: request => PlotEntryService.SaveTwoPageSoil(contextId, request),
+    create: request => PlotEntryService.CreateTwoPageSoilHorizon(contextId, request),
+    outcome: request => PlotEntryService.RecoverTwoPageSoilOutcome(contextId, request),
   }, twoPageSoilWritingEnabled, twoPageSoilCreationEnabled);
   let initialized = false;
   const unsubscribe = session.subscribe(() => { if (initialized) changed(); });

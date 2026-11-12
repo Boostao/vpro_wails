@@ -170,7 +170,7 @@ test('component review cancellation and remount generation reject late results w
     scope, session: session(), reading: false, generation: 0, error: '', review: null,
     reads: { track: value => value, cancelAll() {} },
     validateExternalSUEnvironmentReview: external.validateExternalSUEnvironmentReview,
-    ExternalSUEnvironmentService: { GetReview: () => held },
+    ClassificationService: { GetExternalSUEnvironmentReview: () => held },
   });
   const operation = host.actions.reload();
   assert.equal(host.reading, true); host.actions.cancel();
@@ -185,7 +185,7 @@ test('card-independent retained receipt and readonly recovery controls survive s
   const source = readFileSync(path.join(__dirname, 'ExternalSUEnvironmentTransfer.svelte'), 'utf8');
   const component = serverComponent(source, 'ExternalSUEnvironmentTransfer.svelte', {
     './externalSUEnvironment': external,
-    '../bindings/github.com/boostao/vpro-wails': { ExternalSUEnvironmentService: {} },
+    '../bindings/github.com/boostao/vpro-wails': { ClassificationService: {} },
   });
   let body = render(component, { props: { ...scope, onclosed() {} } }).body;
   assert.match(body, /Recover transfer outcome readonly/); assert.match(body, new RegExp(wire.request.requestId));

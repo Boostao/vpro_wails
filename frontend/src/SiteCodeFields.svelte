@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
-  import { SiteCodeService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
   import FieldGuidance from './FieldGuidance.svelte';
   import type { PlotQualityChoice } from './qualityEditor';
@@ -19,14 +19,14 @@
   const editingEnabled = import.meta.env.VITE_SITE_CODES_EDITING !== 'false';
   const listId = $props.id();
   const disturbanceLookup = new CatalogueLookup(async (force, requests) => {
-    if (force) await requests.track(SiteCodeService.ReloadCatalogue());
-    const rows = await requests.track(SiteCodeService.ListSiteDisturbanceChoices());
+    if (force) await requests.track(PlotEntryService.ReloadSiteCodeCatalogue());
+    const rows = await requests.track(PlotEntryService.ListSiteDisturbanceChoices());
     if (rows === null) throw new Error('Disturbance service did not return choice rows.');
     return rows;
   }, next => { disturbance = next; }, 'Disturbance');
   const exposureLookup = new CatalogueLookup(async (force, requests) => {
-    if (force) await requests.track(SiteCodeService.ReloadCatalogue());
-    const rows = await requests.track(SiteCodeService.ListExposureChoices());
+    if (force) await requests.track(PlotEntryService.ReloadSiteCodeCatalogue());
+    const rows = await requests.track(PlotEntryService.ListExposureChoices());
     if (rows === null) throw new Error('Exposure service did not return choice rows.');
     return rows;
   }, next => { exposure = next; }, 'Exposure');

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
-  import { WorkingUnitService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
+  import { ClassificationService, type FS882Header } from '../bindings/github.com/boostao/vpro-wails';
   import type { PaperControl } from './paperLayout';
   import { ReadRequests } from './readRequests';
   import FieldGuidance from './FieldGuidance.svelte';
@@ -28,10 +28,10 @@
   }
   const reads = new ReadRequests();
   const lookup = new WorkingUnitLookup({
-    getMode: () => WorkingUnitService.GetWorkingUnitMode(),
-    setMode: mode => WorkingUnitService.SetWorkingUnitMode(mode),
-    choices: async mode => rows(await reads.track(WorkingUnitService.GetWorkingUnitChoices(mode))),
-    master: async () => rows(await reads.track(WorkingUnitService.GetMasterWorkingUnitChoices()))
+    getMode: () => ClassificationService.GetWorkingUnitMode(),
+    setMode: mode => ClassificationService.SetWorkingUnitMode(mode),
+    choices: async mode => rows(await reads.track(ClassificationService.GetWorkingUnitChoices(mode))),
+    master: async () => rows(await reads.track(ClassificationService.GetMasterWorkingUnitChoices()))
   }, next => { view = next; onbusy?.(next.busy); }, untrack(() => session), () => reads.cancelAll());
   let view = $state(lookup.snapshot());
   let acknowledged = $state(false);

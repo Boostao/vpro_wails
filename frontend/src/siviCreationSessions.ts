@@ -1,4 +1,4 @@
-import { SIVICreationService } from '../bindings/github.com/boostao/vpro-wails';
+import { PlotEntryService } from '../bindings/github.com/boostao/vpro-wails';
 import { SIVICreationSession } from './siviCreationSession';
 import type { SIVISpeciesOwner } from './siviSpeciesEditor';
 
@@ -10,9 +10,9 @@ export function siviCreationSession(owner: SIVISpeciesOwner): SIVICreationSessio
   if (!session) {
     const { contextId, project, plot } = owner;
     session = new SIVICreationSession({ contextId, project, plot }, {
-      references: () => SIVICreationService.GetReferences(contextId, plot),
-      create: request => SIVICreationService.Create(contextId, request),
-      receipt: request => SIVICreationService.LookupReceipt(contextId, request),
+      references: () => PlotEntryService.GetSIVICreationReferences(contextId, plot),
+      create: request => PlotEntryService.CreateSIVIVegetation(contextId, request),
+      receipt: request => PlotEntryService.LookupSIVICreationReceipt(contextId, request),
     });
     sessions.set(key, session);
   }

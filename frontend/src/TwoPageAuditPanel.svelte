@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { TwoPageSourceAuditService } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { sourceAuditFields, twoPageAuditFromWire, twoPageAuditLabel, type TwoPageAuditOwner, type TwoPageAuditReview } from './twoPageAudit';
 
@@ -27,7 +27,7 @@
     review = null; error = ''; busy = true;
     onBusyChange(true);
     try {
-      const value = await reads.track(TwoPageSourceAuditService.GetOriginal(owner.contextId, owner.plot, owner.form));
+      const value = await reads.track(PlotEntryService.GetTwoPageSourceAuditOriginal(owner.contextId, owner.plot, owner.form));
       if (request !== generation) return;
       review = twoPageAuditFromWire(value, owner);
     } catch (cause) {

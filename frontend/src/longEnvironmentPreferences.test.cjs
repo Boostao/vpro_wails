@@ -188,7 +188,7 @@ test('rendered title has one labelled conditional control: enabled two-row texta
       "import.meta.env.VITE_LONG_ENVIRONMENT_PREFERENCES !== 'false'", String(enabled))
       .replace("import.meta.env.VITE_LONG_ENVIRONMENT_WORKBOOK !== 'false'", 'false'),
     'LongEnvironmentReport.svelte', {
-      '../bindings/github.com/boostao/vpro-wails': { ContextService: {}, LongEnvironmentPreferencesService: {} },
+      '../bindings/github.com/boostao/vpro-wails': { EnvironmentReportService: {} },
       './longEnvironmentPreferences': { longEnvironmentPreferencesSession: () => session },
       './longEnvironmentReport': { reportTitleError: () => null },
       './environmentWorkbook': { environmentWorkbookPublicationSession: () => ({
@@ -227,8 +227,8 @@ test('default-off panel has one live title and explicit cancellable Load/noncanc
   assert.match(panel, /Preference receipt: outcome unknown; changed unknown; committed unknown/);
   assert.doesNotMatch(readFileSync(path.join(__dirname, 'longEnvironmentPreferences.ts'), 'utf8'), /Long Evironment Report/);
   assert.match(panel, /const value = event.currentTarget.value; editTitle\(value\)/);
-  assert.match(panel, /preferences\.save\(request => LongEnvironmentPreferencesService\.SaveLongEnvironmentPreferences/);
-  assert.doesNotMatch(panel, /reads\.track\(LongEnvironmentPreferencesService\.Save/);
+  assert.match(panel, /preferences\.save\(request => EnvironmentReportService\.SaveLongEnvironmentPreferences/);
+  assert.doesNotMatch(panel, /reads\.track\(EnvironmentReportService\.Save/);
   assert.match(panel, /preferenceView\.authorityUnknown \|\| !!preferenceView\.draftError/);
   assert.match(panel, /This report preparation made no data\/configuration writes/);
   for (const selector of ['load','save','undo','acknowledge','receipt']) assert.match(panel, new RegExp(`data-long-environment-preferences-${selector}`));

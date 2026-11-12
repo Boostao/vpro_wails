@@ -46,7 +46,7 @@ func TestTwoPageEntryReferenceCompositionCompleteOwnedSnapshotAndSources(t *test
 					if field.Required {
 						required++
 					}
-					if field.Column == "BECSiteUnit" && len(field.Definitions.Rows) != 3504 {
+					if field.Column == "BECSiteUnit" && len(field.Definitions.Rows) != 6067 {
 						t.Fatal("actual configured Master reference did not retain full definitions", len(field.Definitions.Rows))
 					}
 				}
@@ -160,7 +160,7 @@ func TestTwoPageEntryReferenceCompositionFailuresNoPartialResultAndRetry(t *test
 		} else if !field.Available {
 			t.Fatal("None-SU affected an independent catalogue", field.Column)
 		}
-		if field.Column == "SubZone" && len(field.Choices) != 281 {
+		if field.Column == "SubZone" && len(field.Choices) != 331 {
 			t.Fatal("source All did not select complete current SubZone list", len(field.Choices))
 		}
 		if field.Column == "SiteSeries" && len(field.Choices) != 0 {

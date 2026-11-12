@@ -198,12 +198,12 @@ function routeHarness() {
     projectActive: false, projectWorkspace: null, projectView: null, sharedPreferenceBarrier: false,
     reads, preferences: null, statistics: null, preferenceBarrier: false, workbookSession: session, destination, reportBusy() {},
     requireLongVegetationGrouping: report.requireLongVegetationGrouping,
-    VegetationWorkbookService: { GetReview(_context, request) {
+    VegetationReportService: { GetVegetationWorkbookReview(_context, request) {
       assert.equal(request, '{"scope":"unlumped"}');
       const pending = new Promise(done => { resolve = done; });
       pending.cancel = () => { cancelled++; };
       return pending;
-    }, ExportReviewed(_context, request) {
+    }, ExportReviewedVegetationWorkbook(_context, request) {
       exports++;
       const planned = JSON.parse(request);
       assert.equal(planned.createdDate, '2026-10-06'); assert.equal(planned.scope, 'unlumped');
@@ -289,7 +289,7 @@ test('actual root transition and both native-close paths reject unresolved publi
     pendingTransition: null, transitionError: '', $projectState: { contextId: owner.contextId },
     document: { activeElement: null }, HTMLElement: class {}, tick: async () => {},
     closeDisposition: loadTypeScript('closeLifecycle.ts').closeDisposition,
-    CloseService: { GetPendingCloseRequest: async () => 'request', CancelClose: async () => { cancelled++; },
+    LifecycleService: { GetPendingCloseRequest: async () => 'request', CancelClose: async () => { cancelled++; },
       ConfirmClose: async () => { confirmed++; } },
   });
   vm.runInContext(ts.transpileModule(close + transition + '\nthis.actions = { handleCloseRequest, respondToClose, requestTransition };',
@@ -337,8 +337,8 @@ test('route and root wiring keep held navigation/native close, no cancellable ex
   }
   assert.match(panel, /VITE_LONG_VEGETATION_WORKBOOK !== 'false'/);
   assert.match(panel, /workbookReview = \$state\.raw<ValidatedVegetationWorkbookReview/);
-  assert.match(panel, /reads\.track\(VegetationWorkbookService\.GetReview/);
-  assert.doesNotMatch(panel, /reads\.track\(VegetationWorkbookService\.ExportReviewed/);
+  assert.match(panel, /reads\.track\(VegetationReportService\.GetVegetationWorkbookReview/);
+  assert.doesNotMatch(panel, /reads\.track\(VegetationReportService\.ExportReviewedVegetationWorkbook/);
   assert.match(panel, /if \(publication\.blocked\) workbookReview = null/);
   assert.match(panel, /onBusyChange\(busy \|\| workbookBarrier \|\| sharedPreferenceBarrier \|\| !!projectView\?\.closeBlocked\)/);
   assert.match(panel, /label for="vegetation-workbook-destination"/);
@@ -372,7 +372,7 @@ test('SSR remount shows persistent unknown alert and explicit acknowledgement wi
     .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_SELECTED_UNIT(?:S|_SELECTION) !== 'false'/g, 'false')
     .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'true'),
     'LongVegetationReport.svelte', {
-      '../bindings/github.com/boostao/vpro-wails': { ContextService: {}, VegetationWorkbookService: {} },
+      '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
       './longEnvironmentReport': environment, './longVegetationReport': report, './vegetationWorkbook': workbook, './longVegetationPreferences': {},
       './longVegetationStatisticsPreferences': {},
       './longVegetationSwitchPreferences': {},

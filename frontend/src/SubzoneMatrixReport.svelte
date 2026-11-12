@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { SubzoneMatrixService } from '../bindings/github.com/boostao/vpro-wails';
+  import { EnvironmentReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { matrixPageFromWire, matrixWorkbookFromWire, sameMatrixSource, matrixCellText,
     matrixPublicationSession, type MatrixPage, type MatrixWorkbookReview } from './subzoneMatrixReport';
@@ -32,7 +32,7 @@
     cancel(); const request = generation;
     error = ''; busy = true; reportBusy();
     try {
-      const value = await reads.track(SubzoneMatrixService.GetPreview(contextId, JSON.stringify({ offset, limit })));
+      const value = await reads.track(EnvironmentReportService.GetSubzoneMatrixPreview(contextId, JSON.stringify({ offset, limit })));
       if (request !== generation) return;
       const validated = matrixPageFromWire(value, owner, offset, limit);
       if (prior && !sameMatrixSource(prior, validated)) {
@@ -55,7 +55,7 @@
     cancel(); const request = generation;
     error = ''; workbook = null; busy = true; reportBusy();
     try {
-      const value = await reads.track(SubzoneMatrixService.GetReview(contextId));
+      const value = await reads.track(EnvironmentReportService.GetSubzoneMatrixReview(contextId));
       if (request !== generation) return;
       const validated = matrixWorkbookFromWire(value, owner);
       if (request !== generation) return;
@@ -71,7 +71,7 @@
     cancel(); error = '';
     try {
       await session.publish(workbook, destination, request =>
-        SubzoneMatrixService.ExportReviewed(contextId, JSON.stringify(request)));
+        EnvironmentReportService.ExportReviewedSubzoneMatrix(contextId, JSON.stringify(request)));
     } catch (cause) { error = String(cause); }
   }
   function acknowledge() { session.acknowledge(); workbook = null; }

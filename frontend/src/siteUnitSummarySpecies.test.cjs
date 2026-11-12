@@ -96,7 +96,7 @@ test('actual species dispatch, late cancellation and workbook/preference/error b
     ...owner,preferences:{save(){throw Error('Unexpected preference write');}},
     cancel(){context.generation++;context.busy=false;},reportBusy(){},
     reads:{track(value){return value;}},
-    ContextService:{PreviewSiteUnitSummarySpecies(){calls++;return new Promise(done=>resolve=done);}},
+    EnvironmentReportService:{PreviewSiteUnitSummarySpecies(){calls++;return new Promise(done=>resolve=done);}},
     validateSummarySpecies:species.validateSummarySpecies,validateSiteUnitSummary:summary.validateSiteUnitSummary
   });
   const pending=context.actions.show();assert.equal(calls,1);

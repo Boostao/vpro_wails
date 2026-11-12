@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { SummaryVegetationService, SummaryVegetationPreferencesService, SummaryVegetationQualityPreferencesService, SummaryVegetationPresentationPreferencesService } from '../bindings/github.com/boostao/vpro-wails';
+  import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { summaryVegetationSession, type SummaryVegetationPort } from './summaryVegetation';
   import { summaryVegetationPreferenceSession } from './summaryVegetationPreferenceSessions';
@@ -52,10 +52,10 @@
   let preferenceGeneration = 0;
   const preferenceReads = new ReadRequests();
   const port: SummaryVegetationPort = {
-    preview: (average, display) => reads.track(SummaryVegetationService.Preview(contextId, average, display)),
-    previewClass: (average, display, showClass) => reads.track(SummaryVegetationService.PreviewClass(contextId, average, display, showClass)),
-    previewGrouped: (average, groupAndOrder) => reads.track(SummaryVegetationService.PreviewGrouped(contextId, average, groupAndOrder)),
-    previewGroupedDisplay: (average, groupAndOrder, display, showClass) => reads.track(SummaryVegetationService.PreviewGroupedDisplay(contextId, average, groupAndOrder, display, showClass)),
+    preview: (average, display) => reads.track(VegetationReportService.PreviewSummaryVegetation(contextId, average, display)),
+    previewClass: (average, display, showClass) => reads.track(VegetationReportService.PreviewSummaryVegetationClass(contextId, average, display, showClass)),
+    previewGrouped: (average, groupAndOrder) => reads.track(VegetationReportService.PreviewSummaryVegetationGrouped(contextId, average, groupAndOrder)),
+    previewGroupedDisplay: (average, groupAndOrder, display, showClass) => reads.track(VegetationReportService.PreviewSummaryVegetationGroupedDisplay(contextId, average, groupAndOrder, display, showClass)),
     cancel: () => reads.cancelAll(),
     validationYield: () => new Promise(resolve => setTimeout(resolve, 0)),
   };
@@ -128,7 +128,7 @@
     const request = preferenceGeneration, token = preferences.beginLoad();
     preferenceReadError = ''; preferenceReadBusy = true; reportBusy();
     try {
-      const value = await preferenceReads.track(SummaryVegetationPreferencesService.GetSummaryVegetationPreferences(contextId));
+      const value = await preferenceReads.track(VegetationReportService.GetSummaryVegetationPreferences(contextId));
       if (request !== preferenceGeneration) return;
       preferences.applyLoaded(value, token);
     } catch (cause) {
@@ -141,7 +141,7 @@
     if (!preferences || viewState.busy || operationHeld || fieldListHeld || preferenceHeld || preferenceInvalid || qualityMutationHeld || qualityInvalid || presentationMutationHeld || presentationInvalid) return;
     cancelPreferenceRead(); preferenceReadError = '';
     try {
-      await preferences.save(value => SummaryVegetationPreferencesService.SaveSummaryVegetationPreferences(contextId, JSON.stringify(value)));
+      await preferences.save(value => VegetationReportService.SaveSummaryVegetationPreferences(contextId, JSON.stringify(value)));
     } catch (cause) {
       preferenceReadError = String(cause);
     }
@@ -252,8 +252,8 @@
   {/if}
   {#if quality}
     <SummaryVegetationQualityPreferences contextId={contextId} preferences={quality}
-      port={{ read: id => SummaryVegetationQualityPreferencesService.GetSummaryVegetationQualityPreferences(id),
-        save: (id, request) => SummaryVegetationQualityPreferencesService.SaveSummaryVegetationQualityPreferences(id, request) }}
+      port={{ read: id => VegetationReportService.GetSummaryVegetationQualityPreferences(id),
+        save: (id, request) => VegetationReportService.SaveSummaryVegetationQualityPreferences(id, request) }}
       operationHeld={operationHeld || fieldListHeld || viewState.busy || preferenceHeld || preferenceInvalid || presentationMutationHeld || presentationInvalid}
       mutationHeld={operationHeld || fieldListBusy || viewState.busy || preferenceHeld || presentationMutationHeld}
       onReadBusyChange={value => { qualityReadBusy = value; reportBusy(); }} />
@@ -262,8 +262,8 @@
   {/if}
   {#if presentation}
     <SummaryVegetationPresentationPreferences contextId={contextId} preferences={presentation}
-      port={{ read: id => SummaryVegetationPresentationPreferencesService.GetSummaryVegetationPresentationPreferences(id),
-        save: (id, request) => SummaryVegetationPresentationPreferencesService.SaveSummaryVegetationPresentationPreferences(id, request) }}
+      port={{ read: id => VegetationReportService.GetSummaryVegetationPresentationPreferences(id),
+        save: (id, request) => VegetationReportService.SaveSummaryVegetationPresentationPreferences(id, request) }}
       operationHeld={operationHeld || fieldListHeld || viewState.busy || preferenceHeld || preferenceInvalid || qualityMutationHeld || qualityInvalid}
       mutationHeld={operationHeld || fieldListBusy || viewState.busy || preferenceHeld || qualityMutationHeld}
       onReadBusyChange={value => { presentationReadBusy = value; reportBusy(); }} />

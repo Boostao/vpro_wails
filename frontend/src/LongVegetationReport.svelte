@@ -25,7 +25,7 @@
 
 <script lang="ts">
   import { onMount, onDestroy, untrack } from 'svelte';
-  import { ContextService, LongVegetationPreferencesService, LongVegetationStatisticsPreferencesService, VegetationWorkbookService, type LongVegetationSettings, type ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
+  import { VegetationReportService, type LongVegetationSettings, type ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { reportCellText } from './longEnvironmentReport';
   import { requireLongVegetationGrouping, validateLongVegetationOptions, validateLongVegetationPreview, type ValidatedLongVegetationPreview } from './longVegetationReport';
@@ -289,7 +289,7 @@
     cancel(); const request = generation; settings = null; error = ''; preview = null; workbookReview = null;
     busy = true; reportBusy();
     try {
-      const value = await reads.track(ContextService.GetLongVegetationOptions(contextId));
+      const value = await reads.track(VegetationReportService.GetLongVegetationOptions(contextId));
       if (request !== generation) return;
       const candidate = validateLongVegetationOptions(value, contextId, project, projectPath, su, suPath, selectedUnitsEnabled).settings;
       requireLongVegetationGrouping(candidate, lifeformEnabled, strataEnabled, codeEnabled, selectedFieldEnabled, noneUnitsEnabled, selectedUnitsEnabled);
@@ -306,7 +306,7 @@
     cancel(); const request = generation; error = ''; preview = null; workbookReview = null;
     busy = true; reportBusy();
     try {
-      const value = await reads.track(ContextService.PreviewLongVegetation(contextId));
+      const value = await reads.track(VegetationReportService.PreviewLongVegetation(contextId));
       if (request !== generation) return;
       const candidate = validateLongVegetationPreview(value, contextId, project, projectPath, su, suPath, selectedUnitsEnabled);
       requireLongVegetationGrouping(candidate.settings, lifeformEnabled, strataEnabled, codeEnabled, selectedFieldEnabled, noneUnitsEnabled, selectedUnitsEnabled);
@@ -327,7 +327,7 @@
     cancel(); const request = generation;
     error = ''; preview = null; workbookReview = null; busy = true; reportBusy();
     try {
-      const value = await reads.track(VegetationWorkbookService.GetReview(contextId, JSON.stringify({ scope: 'unlumped' })));
+      const value = await reads.track(VegetationReportService.GetVegetationWorkbookReview(contextId, JSON.stringify({ scope: 'unlumped' })));
       if (request !== generation) return;
       if (!value) throw new Error('No owned workbook review returned.');
       const reviewed = workbookSession.prepare(value);
@@ -353,7 +353,7 @@
     cancel(); error = '';
     try {
       await workbookSession.publish(workbookReview, destination, request =>
-        VegetationWorkbookService.ExportReviewed(contextId, JSON.stringify(request)));
+        VegetationReportService.ExportReviewedVegetationWorkbook(contextId, JSON.stringify(request)));
     } catch (cause) { error = String(cause); }
   }
   function acknowledgeWorkbook() {
@@ -365,7 +365,7 @@
     cancel(); const request = generation, token = preferences.beginLoad();
     error = ''; busy = true; reportBusy();
     try {
-      const value = await reads.track(LongVegetationPreferencesService.GetLongVegetationPreferences(contextId));
+      const value = await reads.track(VegetationReportService.GetLongVegetationPreferences(contextId));
       if (request !== generation) return;
       preferences.applyLoaded(value, token);
     } catch (cause) {
@@ -378,7 +378,7 @@
     if (!preferences || busy || operationHeld || workbookBarrier || preferenceBarrier) return;
     cancel(); const request = generation; error = '';
     try {
-      await preferences.save(value => LongVegetationPreferencesService.SaveLongVegetationPreferences(contextId, JSON.stringify(value)));
+      await preferences.save(value => VegetationReportService.SaveLongVegetationPreferences(contextId, JSON.stringify(value)));
     } catch (cause) {
       if (request === generation) error = String(cause);
     }
@@ -392,7 +392,7 @@
     cancel(); const request = generation, token = statistics.beginLoad();
     error = ''; busy = true; reportBusy();
     try {
-      const value = await reads.track(LongVegetationStatisticsPreferencesService.GetLongVegetationStatisticsPreferences(contextId));
+      const value = await reads.track(VegetationReportService.GetLongVegetationStatisticsPreferences(contextId));
       if (request !== generation) return;
       statistics.applyLoaded(value, token);
     } catch (cause) {
@@ -405,7 +405,7 @@
     if (!statistics || busy || operationHeld || workbookBarrier || preferenceBarrier) return;
     cancel(); const request = generation; error = '';
     try {
-      await statistics.save(value => LongVegetationStatisticsPreferencesService.SaveLongVegetationStatisticsPreferences(contextId, JSON.stringify(value)));
+      await statistics.save(value => VegetationReportService.SaveLongVegetationStatisticsPreferences(contextId, JSON.stringify(value)));
     } catch (cause) {
       if (request === generation) error = String(cause);
     }

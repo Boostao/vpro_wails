@@ -20,8 +20,8 @@ func TestVegetationSpeciesSourceClassesAndAliasAmbiguity(t *testing.T) {
 		form  string
 		count int
 	}{
-		{"SubVegAXL_BC", 547}, {"SubVegAXL", 547}, {"SubVegAhtXL", 547},
-		{"SubVegCXL", 4742}, {"SubVegChtXL", 4742}, {"SubVegDXL", 3319},
+		{"SubVegAXL_BC", 565}, {"SubVegAXL", 565}, {"SubVegAhtXL", 565},
+		{"SubVegCXL", 4739}, {"SubVegChtXL", 4739}, {"SubVegDXL", 3317},
 	} {
 		options, err := service.ListVegetationSpecies(context.Background(), state.ContextID, entry.form)
 		if err != nil || len(options) != entry.count {

@@ -263,7 +263,7 @@ test('parent and root barriers block hidden retained vegetation drafts while pre
   const root = componentFunctions('App.svelte', ['loadPlots', 'refresh', 'loadHierarchy'], {
     twoPageVegetationBusy: true, pictureCreationBusy: false, pictureLifecycleBusy: false,
     vegetationPublicationBusy: false, lifeformPublicationBusy: false, summaryPublicationBusy: false,
-    ProjectService: { ListPlots: () => { calls++; } },
+    ContextService: { ListPlots: () => { calls++; } },
   });
   await root.actions.loadPlots(0); await root.actions.refresh(); await root.actions.loadHierarchy();
   assert.equal(calls, 0);
@@ -331,7 +331,7 @@ test('actual root native-close and context transition barriers survive unmounted
     request: 0, stateRequest: 0, hierarchyRequest: 0, $projectState: { contextId },
     document: { activeElement: null }, HTMLElement: class {},
     closeDisposition: loadTypeScript('closeLifecycle.ts').closeDisposition, tick: async () => {},
-    CloseService: { CancelClose: id => { cancellations.push(id); }, GetPendingCloseRequest: () => operation('vegetation-close') },
+    LifecycleService: { CancelClose: id => { cancellations.push(id); }, GetPendingCloseRequest: () => operation('vegetation-close') },
   });
   const expression = read('App.svelte').match(/const editorBusy = \$derived\(([^;]+)\);/)[1];
   const aggregate = new Function('localEditorBusy', 'pictureCreationBusy', 'pictureLifecycleBusy', 'twoPageSoilBusy', 'twoPageVegetationBusy', 'summaryPreferenceBusy', 'summaryFieldListBusy', 'summaryEnvironmentalBusy', 'projectReportBusy', 'externalSUEnvironmentBusy', 'matrixPublicationBusy', `return ${expression}`);

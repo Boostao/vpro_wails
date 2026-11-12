@@ -118,7 +118,7 @@ test('actual statistics handlers cancel borrowed reads, suppress stale loads and
       preferences: null, statistics: session, statisticsView: session.view(), busy: false, operationHeld: false, projectWorkspace: null,
       workbookBarrier: false, preferenceBarrier: false, titleBarrier: false, switchBarrier: false, thresholdBarrier: false, groupBarrier: false, qualityNullBarrier: false, qualityMinimumBarrier: false, namingBarrier: false, selectedFieldBarrier: false, enforcementBarrier: false, unitBarrier: false, unitMutationHeld: false, generation: 0, error: '',
       reads: new ReadRequests(), contextId: scope.contextId, reportBusy() {},
-      LongVegetationStatisticsPreferencesService: {
+      VegetationReportService: {
         GetLongVegetationStatisticsPreferences() {
           const read = new Promise(done => { release = done; }); read.cancel = () => { cancellations++; }; return read;
         },

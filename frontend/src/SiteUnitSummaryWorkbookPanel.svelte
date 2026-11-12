@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { SiteUnitSummaryWorkbookService, SiteUnitSummaryExtendedWorkbookService } from '../bindings/github.com/boostao/vpro-wails';
+  import { EnvironmentReportService } from '../bindings/github.com/boostao/vpro-wails';
   import type { GoogleEarthScope } from './googleEarthReview';
   import { ReadRequests } from './readRequests';
   import {
@@ -58,13 +58,13 @@
     busy = true; error = ''; reportBusy();
     try {
       if (extended && requestedOptions) {
-        const value = await reads.track(SiteUnitSummaryExtendedWorkbookService.GetReview(owned.contextId,
+        const value = await reads.track(EnvironmentReportService.GetSiteUnitSummaryExtendedWorkbookReview(owned.contextId,
           JSON.stringify(requestedOptions)));
         if (disposed || requestGeneration !== generation || method !== requestedMethod ||
             !sameExtendedSummaryWorkbookOptions(requestedOptions, extendedOptions ?? null)) return;
         review = validateExtendedSummaryWorkbookReview(value, owned, requestedOptions);
       } else {
-        const value = await reads.track(SiteUnitSummaryWorkbookService.GetReview(owned.contextId,
+        const value = await reads.track(EnvironmentReportService.GetSiteUnitSummaryWorkbookReview(owned.contextId,
           JSON.stringify({ method: requestedMethod })));
         if (disposed || requestGeneration !== generation || method !== requestedMethod) return;
         review = validateSiteUnitSummaryWorkbookReview(value, owned, requestedMethod);
@@ -83,10 +83,10 @@
     try {
       if ('environment' in review && extendedSession && extendedOptions) {
         await extendedSession.publish(review, destination, request =>
-          SiteUnitSummaryExtendedWorkbookService.ExportReviewed(owned.contextId, JSON.stringify(request)), extendedOptions);
+          EnvironmentReportService.ExportReviewedSiteUnitSummaryExtendedWorkbook(owned.contextId, JSON.stringify(request)), extendedOptions);
       } else if ('preview' in review && originalSession) {
         await originalSession.publish(review, destination, request =>
-          SiteUnitSummaryWorkbookService.ExportReviewed(owned.contextId, JSON.stringify(request)), method);
+          EnvironmentReportService.ExportReviewedSiteUnitSummaryWorkbook(owned.contextId, JSON.stringify(request)), method);
       }
     } catch (cause) {
       if (!disposed) error = String(cause);

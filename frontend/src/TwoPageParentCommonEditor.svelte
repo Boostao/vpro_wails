@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack, type Snippet } from 'svelte';
-  import { TwoPageParentCommonService, ReferenceService, AuditRestoreAction, type ListItem } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService, AuditRestoreAction, type ListItem } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import type { EditorCloseState } from './closeLifecycle';
   import TwoPageParentCommonFields from './TwoPageParentCommonFields.svelte';
@@ -44,10 +44,10 @@
     const existing = sessions.get(sourceForm);
     if (existing) return existing;
     const next = new TwoPageParentCommonSession(owner, sourceForm, {
-      read: () => reads.track(TwoPageParentCommonService.GetOriginal(owner.contextId, owner.plot, sourceForm)),
+      read: () => reads.track(PlotEntryService.GetTwoPageParentCommonOriginal(owner.contextId, owner.plot, sourceForm)),
       cancelRead: () => reads.cancelAll(),
-      save: request => TwoPageParentCommonService.Save(owner.contextId, owner.plot, sourceForm, request),
-      restore: (history, action) => TwoPageParentCommonService.Restore(owner.contextId, owner.plot, sourceForm, history, action),
+      save: request => PlotEntryService.SaveTwoPageParentCommon(owner.contextId, owner.plot, sourceForm, request),
+      restore: (history, action) => PlotEntryService.RestoreTwoPageParentCommon(owner.contextId, owner.plot, sourceForm, history, action),
       refreshParent: async () => {
         await oncommitted();
         for (const [variant, peer] of sessions) {
@@ -85,7 +85,7 @@
     choicesBusy = true; choicesError = null;
     try {
       if (!reviewEnabled) throw new Error('Two-page common review is independently disabled.');
-      const result = await reads.track(ReferenceService.GetListItems('PlotType'));
+      const result = await reads.track(PlotEntryService.GetListItems('PlotType'));
       if (request !== choicesRequest) return;
       if (!Array.isArray(result) || result.some(item => !item || item.listName !== 'PlotType'
         || typeof item.item !== 'string' || typeof item.itemDescription !== 'string')) {

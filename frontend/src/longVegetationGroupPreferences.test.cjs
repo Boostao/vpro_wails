@@ -110,7 +110,7 @@ test('actual grouping handlers cancel stale reads and refuse mutation under exte
   const context = componentFunctions('LongVegetationGroupPreferences.svelte', ['cancel', 'load', 'save', 'edit'], {
     preferences: session, view: session.view(), busy: false, error: '', generation: 0, operationHeld: false, mutationHeld: false,
     contextId: scope.contextId, reads: new ReadRequests(), onReadBusyChange() {},
-    LongVegetationGroupPreferencesService: {
+    VegetationReportService: {
       GetLongVegetationGroupPreferences() { const promise = new Promise(done => { release = done; }); promise.cancel = () => { cancelled++; }; return promise; },
       SaveLongVegetationGroupPreferences() { saves++; return Promise.resolve(outcome()); },
     },

@@ -1,4 +1,4 @@
-import { TwoPageVegetationService, TwoPageVegetationSpeciesListService } from '../bindings/github.com/boostao/vpro-wails';
+import { PlotEntryService } from '../bindings/github.com/boostao/vpro-wails';
 import { TwoPageVegetationSession } from './twoPageVegetationSession';
 import type { TwoPageVegetationOwner } from './twoPageVegetationWire';
 import { wellFormedUTF16 } from './qualityEditor';
@@ -46,11 +46,11 @@ export function twoPageVegetationSession(owner: TwoPageVegetationOwner): TwoPage
   const retainedOwner = { contextId: owner.contextId, project: owner.project, plot: owner.plot, form: owner.form };
   const { contextId, plot, form } = retainedOwner;
   const session = new TwoPageVegetationSession(retainedOwner, {
-    read: () => TwoPageVegetationService.GetOriginal(contextId, plot, form),
-    save: request => TwoPageVegetationService.Save(contextId, request),
-    saveSpeciesList: request => TwoPageVegetationSpeciesListService.Save(contextId, request),
-    outcome: request => TwoPageVegetationService.RecoverOutcome(contextId, request),
-    references: () => TwoPageVegetationService.GetSpeciesReferences(contextId, plot, form),
+    read: () => PlotEntryService.GetTwoPageVegetationOriginal(contextId, plot, form),
+    save: request => PlotEntryService.SaveTwoPageVegetation(contextId, request),
+    saveSpeciesList: request => PlotEntryService.SaveTwoPageVegetationSpeciesList(contextId, request),
+    outcome: request => PlotEntryService.RecoverTwoPageVegetationOutcome(contextId, request),
+    references: () => PlotEntryService.GetTwoPageVegetationSpeciesReferences(contextId, plot, form),
   }, twoPageVegetationWritingEnabled, twoPageVegetationSpeciesListEnabled);
   let initialized = false;
   const unsubscribe = session.subscribe(() => { if (initialized) changed(); });

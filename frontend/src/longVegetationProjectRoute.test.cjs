@@ -134,8 +134,8 @@ function routeHarness(value) {
     busy:false,operationHeld:false,workbookEnabled:true,error:'',settings:null,preview:null,workbookReview:null,
     preferences:null,statistics:null,generation:0,destination:value.input.exportRequest.destination,
     reportBusy(){},reads:{cancelAll(){}},
-    ContextService:{GetLongVegetationOptions:rejectLegacy,PreviewLongVegetation:rejectLegacy},
-    VegetationWorkbookService:{GetReview:rejectLegacy,ExportReviewed:rejectLegacy}});
+    VegetationReportService:{GetLongVegetationOptions:rejectLegacy,PreviewLongVegetation:rejectLegacy,
+      GetVegetationWorkbookReview:rejectLegacy,ExportReviewedVegetationWorkbook:rejectLegacy}});
   vm.runInContext(ts.transpileModule(handlers+'\nthis.actions={options,show,reviewWorkbook,publishWorkbook,cancel};',
     {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,context);
   return {context,actions:context.actions};
@@ -183,7 +183,7 @@ test('actual root owner watcher keeps unmounted None-context project work in agg
     closeRequest:'',closeError:'',error:'',editor:undefined,transitionError:'',
     document:{activeElement:null},HTMLElement:class{},tick:async()=>{},
     closeDisposition:loadTypeScript('closeLifecycle.ts').closeDisposition,
-    CloseService:{GetPendingCloseRequest:async()=>'close',CancelClose:async()=>{cancelled++;},ConfirmClose:async()=>{confirmed++;}},
+    LifecycleService:{GetPendingCloseRequest:async()=>'close',CancelClose:async()=>{cancelled++;},ConfirmClose:async()=>{confirmed++;}},
   });
   Object.defineProperty(context,'editorBusy',{get:()=>context.projectReportBusy});
   vm.runInContext(ts.transpileModule(effect.replaceAll("import.meta.env.VITE_LONG_VEGETATION_REPORT === 'false'",'false')+
@@ -272,8 +272,8 @@ test('retained project holds suppress all three actual root background readers o
       lifeformPublicationBusy:false,summaryPublicationBusy:false,view,editorBusy:false,
       request:0,stateRequest:0,hierarchyRequest:0,busy:false,error:'',profileNavigation:null,pageSize:25,
       plotReads:reads,stateReads:reads,hierarchyReads:reads,
-      StartupService:{GetState:async()=>{dispatch.push('startup');return {ready:true};}},
-      ProjectService:{ListPlots:async()=>dispatch.push('plots'),GetState:async()=>dispatch.push('state'),
+      LifecycleService:{GetStartupState:async()=>{dispatch.push('startup');return {ready:true,releaseChannel:'stable'};}},
+      ContextService:{ListPlots:async()=>dispatch.push('plots'),GetState:async()=>dispatch.push('state'),
         GetHierarchyNodes:async()=>dispatch.push('hierarchy')},
     });
     await context.actions.loadPlots(0);await context.actions.refresh();await context.actions.loadHierarchy();

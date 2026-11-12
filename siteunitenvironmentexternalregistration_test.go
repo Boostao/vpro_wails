@@ -33,7 +33,8 @@ func TestExternalSUEnvironmentRegistrationIndependentDefaultOff(t *testing.T) {
 		t.Fatal(err)
 	}
 	var flagReads int
-	var registrations [][]string
+	var constructorArgs [][]string
+	var domainRegistered int
 	ast.Inspect(file, func(node ast.Node) bool {
 		call, ok := node.(*ast.CallExpr)
 		if !ok {
@@ -44,30 +45,33 @@ func TestExternalSUEnvironmentRegistrationIndependentDefaultOff(t *testing.T) {
 				flagReads++
 			}
 		}
-		selector, ok := call.Fun.(*ast.SelectorExpr)
-		if !ok || selector.Sel.Name != "NewService" || len(call.Args) != 1 {
-			return true
-		}
-		constructor, ok := call.Args[0].(*ast.CallExpr)
-		if !ok {
-			return true
-		}
-		name, ok := constructor.Fun.(*ast.Ident)
-		if !ok || name.Name != "NewExternalSUEnvironmentService" {
-			return true
-		}
-		var arguments []string
-		for _, argument := range constructor.Args {
-			name, ok := argument.(*ast.Ident)
+		if name, ok := call.Fun.(*ast.Ident); ok && name.Name == "NewClassificationService" && len(call.Args) == 6 {
+			constructor, ok := call.Args[3].(*ast.CallExpr)
 			if !ok {
-				t.Fatal("external transfer registration infers its capability")
+				return true
 			}
-			arguments = append(arguments, name.Name)
+			fn, ok := constructor.Fun.(*ast.Ident)
+			if !ok || fn.Name != "NewExternalSUEnvironmentService" {
+				return true
+			}
+			var arguments []string
+			for _, argument := range constructor.Args {
+				ident, ok := argument.(*ast.Ident)
+				if !ok {
+					t.Fatal("external transfer registration infers its capability")
+				}
+				arguments = append(arguments, ident.Name)
+			}
+			constructorArgs = append(constructorArgs, arguments)
 		}
-		registrations = append(registrations, arguments)
+		if selector, ok := call.Fun.(*ast.SelectorExpr); ok && selector.Sel.Name == "NewService" && len(call.Args) == 1 {
+			if ident, ok := call.Args[0].(*ast.Ident); ok && ident.Name == "classificationService" {
+				domainRegistered++
+			}
+		}
 		return true
 	})
-	if flagReads != 1 || !reflect.DeepEqual(registrations, [][]string{{"contextService", "externalSUEnvironmentEditingEnabled"}}) {
-		t.Fatal("external transfer not independently registered once", flagReads, registrations)
+	if flagReads != 1 || domainRegistered != 1 || !reflect.DeepEqual(constructorArgs, [][]string{{"contextService", "externalSUEnvironmentEditingEnabled"}}) {
+		t.Fatal("external transfer not independently registered on ClassificationService once", flagReads, domainRegistered, constructorArgs)
 	}
 }

@@ -9,7 +9,7 @@ const read = name => readFileSync(path.join(__dirname, name), 'utf8');
 const output = {};
 vm.runInNewContext(ts.transpileModule(read('contextPlots.ts'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
-}).outputText, { exports: output, require: () => ({ ContextService: {} }) });
+}).outputText, { exports: output, require: () => ({ ClassificationService: {}, ContextService: {}, ValidationService: {} }) });
 
 test('every editor read and mutation carries the original context identity and unchanged payload', async () => {
   const calls = [];
@@ -17,12 +17,15 @@ test('every editor read and mutation carries the original context identity and u
     calls.push([method, ...args]);
     return Promise.resolve('result');
   } });
-  const client = output.bindContextPlots('original-context', port, port);
+  const client = output.bindContextPlots('original-context', port, port, port);
   for (const [name, invoke] of Object.entries(client)) {
     const payload = { name, raw: "don't trim  " };
     assert.equal(await invoke(payload, ['row'], 'retain'), 'result');
     const call = calls.at(-1);
-    assert.equal(call[0], name === 'PreviewProjectProfileSpeciesPresence' ? 'Preview' : name);
+    const expectedMethod = name === 'PreviewProjectProfileSpeciesPresence' ? 'PreviewSpeciesPresence'
+      : name === 'ReviewSpeciesCodes' ? 'CheckSpeciesCodes'
+      : name === 'SaveSpeciesCodeCheck' ? 'ApplySpeciesCodeCheck' : name;
+    assert.equal(call[0], expectedMethod);
     assert.equal(call[1], 'original-context');
     if (name === 'PreviewProjectProfileSpeciesPresence') {
       assert.deepEqual(JSON.parse(call[2]), payload);
@@ -63,9 +66,9 @@ test('verified external attachment defaults on and project choices visibly ident
   assert.match(root, /id="reveal-root-explorer-btn"/);
   assert.match(root, /ContextService\.RevealInFileExplorer/);
   assert.match(root, /id="access-import-wizard"/);
-  assert.match(root, /ContextService\.ChooseAccessDatabaseFile/);
-  assert.match(root, /ContextService\.InspectAccessDatabase/);
-  assert.match(root, /ContextService\.ImportAccessProject/);
+  assert.match(root, /ImportExportService\.ChooseAccessDatabaseFile/);
+  assert.match(root, /ImportExportService\.InspectAccessDatabase/);
+  assert.match(root, /ImportExportService\.ImportAccessProject/);
 });
 
 test('actual editor service merge scopes nullable Audit and rejects a delayed read after context switching', async () => {
@@ -87,6 +90,6 @@ test('actual editor service merge scopes nullable Audit and rejects a delayed re
   await assert.rejects(pending, /stale context/);
   assert.deepEqual(calls, [['scoped', 'original-context', ' literal plot ']]);
   const root = read('FS882Form.svelte');
-  assert.match(root, /const PlotService = \{ \.\.\.LegacyPlotService, \.\.\.bindContextPlots\(untrack\(\(\) => contextId\)\) \}/);
+  assert.match(root, /const PlotService = \{ \.\.\.PlotEntryService, \.\.\.bindContextPlots\(untrack\(\(\) => contextId\)\) \}/);
   assert.match(root, /reads\.track\(PlotService\.ListAuditReadEntries\(p\)\)/);
 });

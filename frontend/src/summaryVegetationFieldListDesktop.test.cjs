@@ -23,7 +23,7 @@ function execute(code, dependencies = {}, globals = {}) {
 const client = execute(fs.readFileSync(path.join(__dirname, 'summaryVegetationFieldList.ts'), 'utf8'));
 const registry = execute(fs.readFileSync(path.join(__dirname, 'summaryVegetationFieldListSessions.ts'), 'utf8'),
   { './summaryVegetationFieldList': client });
-const bindings = { SummaryVegetationFieldListService: {
+const bindings = { VegetationReportService: {
   GetSummaryVegetationFieldList: () => { throw new Error('No implicit network reads'); },
   SaveSummaryVegetationFieldList: () => { throw new Error('No implicit writes'); },
 } };

@@ -31,9 +31,10 @@ test('identity is independently default-off in actual main and uses tracked owne
   assert.match(parent, /VITE_SIVI_IDENTITY_EDITING !== 'false'/);
   assert.match(main, /siviFeature\(siviIdentityFeatureEnvironment, os.LookupEnv\)/);
   assert.match(main, /NewSIVIIdentityService\(contextService, os.LookupEnv\)/);
-  assert.match(main, /application.NewService\(siviIdentity\)/);
-  for (const method of ['GetOriginal', 'SaveReviewed', 'RestoreReviewed']) assert.ok(parent.includes(`SIVIIdentityService.${method}(`));
-  assert.match(parent, /siviIdentityReads.track\(SIVIIdentityService.GetOriginal/);
+  assert.match(main, /siviIdentity:\s*siviIdentity/);
+  assert.match(main, /application\.NewService\(plotEntryService\)/);
+  for (const method of ['GetSIVIIdentityOriginal', 'SaveSIVIIdentityReviewed', 'RestoreSIVIIdentityReviewed']) assert.ok(parent.includes(`PlotEntryService.${method}(`));
+  assert.match(parent, /siviIdentityReads.track\(PlotEntryService.GetSIVIIdentityOriginal/);
   assert.match(parent, /siviIdentitySession\?\.dispose\(\);[\s\S]{0,70}siviIdentityReads\.cancelAll\(\)/);
   assert.match(parent, /data-sivi-identity-cancel-read[\s\S]{0,110}siviIdentityReads\.cancelAll/);
   assert.match(parent, /siviIdentitySession\?\.presentation\(extendedShrubs\)/);

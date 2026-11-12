@@ -389,7 +389,11 @@ test('public SDK registry routes only distinct project APIs using production-Go 
   };
   const environment={VITE_LONG_VEGETATION_PROJECT_SCOPE:'true',VITE_LONG_VEGETATION_WORKBOOK:'true'};
   const registry=sdkRegistry(environment,{
-    LongVegetationReportScopeService:scopeService,LongVegetationProjectWorkbookService:workbookService
+    VegetationReportService:{
+      ...scopeService,
+      GetLongVegetationProjectWorkbookReview:workbookService.GetReview,
+      ExportReviewedLongVegetationProjectWorkbook:workbookService.ExportReviewed,
+    }
   });
   environment.VITE_LONG_VEGETATION_PROJECT_SCOPE='false';environment.VITE_LONG_VEGETATION_WORKBOOK='false';
   const workspace=registry(owner);
@@ -424,7 +428,7 @@ test('actual public SDK read ownership cancels getter requests but never an issu
     },
   };
   const registry=sdkRegistry({VITE_LONG_VEGETATION_PROJECT_SCOPE:'true'},{
-    LongVegetationReportScopeService:service,LongVegetationProjectWorkbookService:{}
+    VegetationReportService:service
   });
   const workspace=registry(owner);
   await workspace.selection.load();

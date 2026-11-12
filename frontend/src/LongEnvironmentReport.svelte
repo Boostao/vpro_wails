@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, untrack } from 'svelte';
-  import { ContextService, LongEnvironmentPreferencesService, EnvironmentWorkbookService, type LongEnvironmentPreview } from '../bindings/github.com/boostao/vpro-wails';
+  import { EnvironmentReportService, type LongEnvironmentPreview } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { reportTitleError, reportCellText, validateLongEnvironmentPreview } from './longEnvironmentReport';
   import { longEnvironmentPreferencesSession } from './longEnvironmentPreferences';
@@ -49,7 +49,7 @@
     cancel(); const request = generation; ready = false; error = ''; preview = null; workbookReview = null;
     busy = true; reportBusy();
     try {
-      const value = await reads.track(ContextService.GetLongEnvironmentOptions(contextId));
+      const value = await reads.track(EnvironmentReportService.GetLongEnvironmentOptions(contextId));
       if (request !== generation) return;
       if (value.contextId !== contextId || typeof value.title !== 'string' || reportTitleError(value.title)) {
         throw new Error('Configured report title is incomplete or belongs to another context.');
@@ -67,7 +67,7 @@
     cancel(); const request = generation; const requestedTitle = title; error = ''; preview = null; workbookReview = null;
     busy = true; reportBusy();
     try {
-      const value = await reads.track(ContextService.PreviewLongEnvironment(contextId, { title: requestedTitle }));
+      const value = await reads.track(EnvironmentReportService.PreviewLongEnvironment(contextId, { title: requestedTitle }));
       if (request !== generation) return;
       preview = validateLongEnvironmentPreview(value, contextId, project, projectPath, su, suPath, requestedTitle);
     } catch (cause) {
@@ -80,7 +80,7 @@
     if (!preferences || preferenceView?.busy || preferenceView?.blocked || workbookBarrier) return;
     cancel(); const request = generation; const token = preferences.beginLoad(); error = ''; busy = true; reportBusy();
     try {
-      const value = await reads.track(LongEnvironmentPreferencesService.GetLongEnvironmentPreferences(contextId));
+      const value = await reads.track(EnvironmentReportService.GetLongEnvironmentPreferences(contextId));
       if (request !== generation) return;
       preferences.applyLoaded(value, token);
     } catch (cause) {
@@ -93,7 +93,7 @@
     if (!preferences || busy || preferenceView?.busy || preferenceView?.blocked || workbookBarrier) return;
     cancel(); error = '';
     try {
-      await preferences.save(request => LongEnvironmentPreferencesService.SaveLongEnvironmentPreferences(contextId, JSON.stringify(request)));
+      await preferences.save(request => EnvironmentReportService.SaveLongEnvironmentPreferences(contextId, JSON.stringify(request)));
     } catch (cause) { error = String(cause); }
   }
   function editTitle(value: string) {
@@ -106,7 +106,7 @@
     cancel(); const request = generation, requestedTitle = title;
     error = ''; preview = null; workbookReview = null; busy = true; reportBusy();
     try {
-      const value = await reads.track(EnvironmentWorkbookService.GetReview(contextId, JSON.stringify({ title: requestedTitle })));
+      const value = await reads.track(EnvironmentReportService.GetEnvironmentWorkbookReview(contextId, JSON.stringify({ title: requestedTitle })));
       if (request !== generation) return;
       workbookReview = validateEnvironmentWorkbookReview(value, workbookOwner, requestedTitle);
       preview = workbookReview.preview;
@@ -121,7 +121,7 @@
     cancel(); error = '';
     try {
       await workbookSession.publish(workbookReview, destination, request =>
-        EnvironmentWorkbookService.ExportReviewed(contextId, JSON.stringify(request)));
+        EnvironmentReportService.ExportReviewedEnvironmentWorkbook(contextId, JSON.stringify(request)));
     } catch (cause) { error = String(cause); }
   }
   function acknowledgeWorkbook() {

@@ -518,7 +518,7 @@ test('shared unit names preserve empty/NULL/duplicate candidates and reject inve
   assert.throws(()=>names.validateReportUnitNames({...unassigned,nameCandidates:[{rowId:'1',value:cell(null)}]},true));
 });
 test('vegetation bindings are cancellable and report UI is independently default-off and draft-safe',()=>{
-  const bindings=readFileSync(path.join(__dirname,'..','bindings','github.com','boostao','vpro-wails','contextservice.ts'),'utf8');
+  const bindings=readFileSync(path.join(__dirname,'..','bindings','github.com','boostao','vpro-wails','vegetationreportservice.ts'),'utf8');
   for (const name of ['GetLongVegetationOptions','PreviewLongVegetation']) {
     assert.match(bindings,new RegExp(`export function ${name}\\(`));
     assert.match(bindings,new RegExp(`${name}\\([^)]*\\): \\$CancellablePromise<`));
@@ -540,7 +540,7 @@ test('vegetation bindings are cancellable and report UI is independently default
   }
   assert.match(teardown,/cancel\(\)/);
   assert.match(panel,/request !== generation/);
-  assert.match(panel,/reads\.track\(ContextService\.PreviewLongVegetation\(contextId\)\)/);
+  assert.match(panel,/reads\.track\(VegetationReportService\.PreviewLongVegetation\(contextId\)\)/);
   assert.match(panel,/const candidate = validateLongVegetationPreview/);
   assert.match(panel,/requireLongVegetationGrouping\(candidate\.settings, lifeformEnabled, strataEnabled, codeEnabled, selectedFieldEnabled, noneUnitsEnabled, selectedUnitsEnabled\)/);
   assert.match(panel,/preview = candidate/);

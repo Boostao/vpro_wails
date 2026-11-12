@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { UserLogService } from '../bindings/github.com/boostao/vpro-wails';
+  import { LifecycleService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { userLogFromWire, userLogFields, userLogCellLabel, type UserLogView } from './userLogReview';
 
@@ -30,7 +30,7 @@
     review = null; error = ''; busy = true; onBusyChange(true);
     try {
       if (!owner || selectedMode !== 1 && selectedMode !== 2) throw new Error('Choose a current context and a source Show mode.');
-      const value = await reads.track(UserLogService.GetReview(owner, selectedMode, offset, limit));
+      const value = await reads.track(LifecycleService.GetUserLogReview(owner, selectedMode, offset, limit));
       if (request !== generation || owner !== contextId) return;
       const validated = userLogFromWire(value, owner, selectedMode, offset, limit);
       if (request !== generation || owner !== contextId) return;

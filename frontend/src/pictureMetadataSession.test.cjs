@@ -215,7 +215,7 @@ test('unchanged historical-invalid assignments do not generate a write or fabric
 
 test('manager and child reuse one owner-scoped session without inheriting a foreign context or project', () => {
   const cached = loadTypeScript('pictureMetadataSessions.ts', {
-    '../bindings/github.com/boostao/vpro-wails': { PictureService: {}, PictureMetadataService: {} },
+    '../bindings/github.com/boostao/vpro-wails': { PictureService: {} },
     './pictureMetadataSession': session,
   });
   const first = cached.pictureMetadataSession(owner);

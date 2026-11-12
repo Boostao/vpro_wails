@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, untrack } from 'svelte';
-  import { ExternalSUEnvironmentService } from '../bindings/github.com/boostao/vpro-wails';
+  import { ClassificationService } from '../bindings/github.com/boostao/vpro-wails';
   import type { ExternalSUEnvironmentReview, ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
   import { externalSUEnvironmentSession, validateExternalSUEnvironmentReview } from './externalSUEnvironment';
   import { ReadRequests } from './readRequests';
@@ -45,7 +45,7 @@
     const request = ++generation;
     reading = true; error = ''; review = null;
     try {
-      const value = await reads.track(ExternalSUEnvironmentService.GetReview(scope.contextId));
+      const value = await reads.track(ClassificationService.GetExternalSUEnvironmentReview(scope.contextId));
       if (request !== generation) return;
       const checked = validateExternalSUEnvironmentReview(value, scope);
       if (request !== generation) return;
@@ -61,12 +61,12 @@
     }
     const approved = review;
     try {
-      await session.transfer(approved, request => ExternalSUEnvironmentService.TransferReviewed(scope.contextId, JSON.stringify(request)));
+      await session.transfer(approved, request => ClassificationService.TransferExternalSUEnvironmentReviewed(scope.contextId, JSON.stringify(request)));
       review = null;
     } catch (cause) { error = `Transfer was not started: ${String(cause)}`; }
   }
   async function recover() {
-    try { await session.recover(request => ExternalSUEnvironmentService.RecoverOutcome(scope.contextId, JSON.stringify(request))); }
+    try { await session.recover(request => ClassificationService.RecoverExternalSUEnvironmentOutcome(scope.contextId, JSON.stringify(request))); }
     catch (cause) { error = `Readonly recovery unavailable; retain the exact request: ${String(cause)}`; }
   }
   function acknowledge() {

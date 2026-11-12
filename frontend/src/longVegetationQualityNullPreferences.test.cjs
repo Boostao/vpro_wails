@@ -108,7 +108,7 @@ test('actual panel handlers cancel stale reads and enforce outside holds before 
     contextId: scope.contextId, preferences: session, view: session.view(), busy: false, error: '',
     operationHeld: false, mutationHeld: false, generation: 0, reads: new ReadRequests(),
     onReadBusyChange(value) { held.push(value); },
-    LongVegetationQualityNullPreferencesService: {
+    VegetationReportService: {
       GetLongVegetationQualityNullPreferences() {
         const value = new Promise(done => { release = done; }); value.cancel = () => { cancelled++; }; return value;
       },
@@ -178,5 +178,5 @@ test('actual report retains errors across remount and propagates independent def
   assert.match(reportSource, /groupBarrier \|\| qualityNullBarrier/);
   assert.match(reportSource, /unsubscribeQualityNulls\?\.\(\)/);
   assert.match(source('LongVegetationQualityNullPreferences.svelte'), /const checked = event.currentTarget.checked; edit\(field.key, checked\)/);
-  assert.doesNotMatch(source('LongVegetationQualityNullPreferences.svelte'), /reads\.track\(LongVegetationQualityNullPreferencesService\.Save/);
+  assert.doesNotMatch(source('LongVegetationQualityNullPreferences.svelte'), /reads\.track\(VegetationReportService\.Save/);
 });

@@ -118,7 +118,7 @@ test('actual title handlers cancel reads and refuse stale publication without ca
       preferences: session, preferenceView: session.view(), busy: false, operationHeld: false, projectWorkspace: null,
       workbookBarrier: false, preferenceBarrier: false, statistics: null, statisticsBarrier: false, switchBarrier: false, thresholdBarrier: false, groupBarrier: false, qualityNullBarrier: false, qualityMinimumBarrier: false, namingBarrier: false, selectedFieldBarrier: false, enforcementBarrier: false, unitBarrier: false, unitMutationHeld: false, generation: 0, error: '',
       reads: new ReadRequests(), contextId: scope.contextId, reportBusy() {},
-      LongVegetationPreferencesService: {
+      VegetationReportService: {
         GetLongVegetationPreferences() {
           const read = new Promise(done => { release = done; }); read.cancel = () => { cancellations++; };
           return read;
@@ -176,6 +176,6 @@ test('enabled title presentation has one visible labelled control and retained s
     }
   }
   assert.match(source, /const value = event.currentTarget.value; editTitle\(value\)/);
-  assert.doesNotMatch(source, /reads\.track\(LongVegetationPreferencesService\.Save/);
+  assert.doesNotMatch(source, /reads\.track\(VegetationReportService\.Save/);
   assert.match(source, /workbookBarrier \|\| preferenceBarrier \|\| !workbookReview/);
 });

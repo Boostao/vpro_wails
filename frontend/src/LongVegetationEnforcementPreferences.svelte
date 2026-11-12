@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { LongVegetationEnforcementPreferencesService } from '../bindings/github.com/boostao/vpro-wails';
+  import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import type { LongVegetationEnforcementPreferencesSession } from './longVegetationEnforcementPreferences';
 
@@ -28,7 +28,7 @@
     cancel(); const request = generation, token = preferences.beginLoad();
     error = ''; busy = true; onReadBusyChange(true);
     try {
-      const value = await reads.track(LongVegetationEnforcementPreferencesService.GetLongVegetationEnforcementPreferences(contextId));
+      const value = await reads.track(VegetationReportService.GetLongVegetationEnforcementPreferences(contextId));
       if (request !== generation) return;
       preferences.applyLoaded(value, token);
     } catch (cause) {
@@ -41,7 +41,7 @@
     if (busy || operationHeld || view.busy || view.blocked || view.authorityUnknown || view.draftError) return;
     cancel(); const request = generation; error = '';
     try {
-      await preferences.saveWithPrinters(value => LongVegetationEnforcementPreferencesService.SaveLongVegetationEnforcementPreferences(contextId, JSON.stringify(value)));
+      await preferences.saveWithPrinters(value => VegetationReportService.SaveLongVegetationEnforcementPreferences(contextId, JSON.stringify(value)));
     } catch (cause) {
       if (request === generation) error = String(cause);
     }

@@ -13,7 +13,7 @@ test('actual root native close and context transition reject retained summary pu
     transitionError: '', $projectState: { contextId: 'owned' }, document: { activeElement: null },
     HTMLElement: class {}, tick: async () => {},
     closeDisposition: (state, busy) => busy ? 'busy' : 'clean',
-    CloseService: { GetPendingCloseRequest: async () => 'request',
+    LifecycleService: { GetPendingCloseRequest: async () => 'request',
       CancelClose: async () => { cancelled++; }, ConfirmClose: async () => { confirmed++; } },
   });
   await context.actions.handleCloseRequest('request');

@@ -130,9 +130,18 @@ func TestPictureServiceStrictReviewedPreviewAndReadOnlyMethods(t *testing.T) {
 	if got, err := service.GetImage(context.Background(), state.ContextID, "108050", string(data)); err == nil || got != nil {
 		t.Fatal("manager preview implicitly inherited child directory permission", got, err)
 	}
+	if _, err := service.SaveMetadata(context.Background(), state.ContextID, "108050", "{}"); err == nil {
+		t.Fatal("read-only PictureService without attached metadata writer accepted SaveMetadata")
+	}
+	if _, err := service.CreatePicture(context.Background(), "token", "{}"); err == nil {
+		t.Fatal("read-only PictureService without attached creation writer accepted CreatePicture")
+	}
+	if _, err := service.DeletePicture(context.Background(), state.ContextID, "{}"); err == nil {
+		t.Fatal("read-only PictureService without attached deletion writer accepted DeletePicture")
+	}
 	kind := reflect.TypeOf(service)
-	if kind.NumMethod() != 2 || kind.Method(0).Name != "GetImage" || kind.Method(1).Name != "GetMetadata" {
-		t.Fatal("picture read facade accidentally exposed write/import/installation authority", kind)
+	if kind.NumMethod() != 17 {
+		t.Fatal("consolidated PictureService domain method count changed", kind.NumMethod())
 	}
 }
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { tick, untrack } from 'svelte';
-  import { TwoPageSoilService, type ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService, type ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
   import SoilReferenceChoices from './SoilReferenceChoices.svelte';
   import { SoilReferenceLookup, type SoilReferenceView } from './twoPageSoilReferences';
   import { twoPageSoilSession, twoPageSoilWritingEnabled, twoPageSoilCreationEnabled } from './twoPageSoilSessions';
@@ -26,7 +26,7 @@
   $effect(() => {
     const owner = { contextId, project, plot, form };
     const lookup = new SoilReferenceLookup(owner,
-      owner => TwoPageSoilService.GetReferences(owner.contextId, owner.plot, owner.form),
+      owner => PlotEntryService.GetTwoPageSoilReferences(owner.contextId, owner.plot, owner.form),
       next => { referenceView = next; });
     untrack(() => { referenceLookup = lookup; referenceView = lookup.snapshot(); });
     return () => lookup.dispose();

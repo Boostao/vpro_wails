@@ -198,7 +198,7 @@ test('consumed unanimous table exposes source adaptation only after executing th
   const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
     'SummaryVegetationWorkbookPanel.svelte', {
       svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
-      '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+      '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
       './summaryVegetation': vegetation,
       './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
       './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => { subscribed++; return session; } },
@@ -315,7 +315,7 @@ test('consumed Constancy table renders numeric lifeforms and duplicate visible g
   const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
     'SummaryVegetationWorkbookPanel.svelte', {
       svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
-      '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+      '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
       './summaryVegetation': vegetation,
       './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
       './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => { subscribed++; return session; } },
@@ -363,7 +363,7 @@ test('consumed outer Summary takes only loaded presentation Constancy intent and
       'SummaryVegetationReport.svelte', {
         svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
         './summaryVegetation': vegetation,
-        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationService: {} },
+        '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
         './summaryVegetationPresentationPreferenceSessions': { summaryVegetationPresentationPreferenceSession: () => presentation },
         './SummaryVegetationWorkbookPanel.svelte': { default: (_payload, props) => { calls.push(props); } },
       }, { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
@@ -745,7 +745,7 @@ function mountPanel(session, services, held = false, calculation = wire.environm
   const dependencies = {
     'svelte/internal/client': runtime,
     svelte: { onDestroy: callback => { destroy = callback; }, untrack: runtime.untrack },
-    '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: services },
+    '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: { GetSummaryVegetationWorkbookReview: services.GetSummaryVegetationWorkbookReview ?? services.GetReview, ExportReviewedSummaryVegetationWorkbook: services.ExportReviewedSummaryVegetationWorkbook ?? services.ExportReviewed } },
     './summaryVegetation': vegetation,
     './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
     './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => session },
@@ -1048,7 +1048,7 @@ test('actual consumed server rendering bounds summary DOM to fifty units and dis
   const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
     'SummaryVegetationWorkbookPanel.svelte', {
       svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
-      '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+      '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
       './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
       './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
         subscribed++; return session;
@@ -1238,7 +1238,7 @@ test('consumed reference rendering bounds name groups to fifty with labelled con
   const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
     'SummaryVegetationWorkbookPanel.svelte', {
       svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
-      '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+      '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
       './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
       './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => { subscribed++; return session; } },
       './summaryVegetation': vegetation,
@@ -1422,7 +1422,7 @@ test('consumed outer Summary rendering forwards only flag-authorized Group By se
       'SummaryVegetationReport.svelte', {
         svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
         './summaryVegetation': vegetation,
-        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationService: {} },
+        '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
         './SummaryVegetationWorkbookPanel.svelte': { default: (_payload, props) => { calls.push(props); } },
       }, { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_WORKBOOK: 'true',
         VITE_SUMMARY_VEGETATION_GROUPED_WORKBOOK: enabled ? 'true' : 'false' });
@@ -1447,7 +1447,7 @@ test('consumed grouped panel renders accurate grouping and explicit unavailable 
     const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
       'SummaryVegetationWorkbookPanel.svelte', {
         svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
-        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+        '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
         './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
         './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
           subscriptions++; return session;
@@ -1625,7 +1625,7 @@ test('consumed reference tables retain original group captions and display typed
     const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
       'SummaryVegetationWorkbookPanel.svelte', {
         svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
-        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+        '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
         './summaryVegetation': vegetation,
         './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
         './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
@@ -1768,7 +1768,7 @@ test('consumed grouped attribute rendering distinguishes ordinary references fro
     const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
       'SummaryVegetationWorkbookPanel.svelte', {
         svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
-        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+        '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
         './summaryVegetation': vegetation,
         './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
         './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
@@ -1803,7 +1803,7 @@ test('consumed Strata reference panel rendering preserves independent gates and 
     const component = serverComponent(readFileSync(path.join(__dirname, 'SummaryVegetationWorkbookPanel.svelte'), 'utf8'),
       'SummaryVegetationWorkbookPanel.svelte', {
         svelte: require(path.join(path.dirname(require.resolve('svelte/package.json')), 'src', 'index-server.js')),
-        '../bindings/github.com/boostao/vpro-wails': { SummaryVegetationWorkbookService: {} },
+        '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
         './summaryVegetationEnvironmentalDesktop': { summaryEnvironmentalLifeformEnabled: true },
         './summaryVegetationWorkbook': { ...client, summaryVegetationWorkbookSession: () => {
           subscriptions++; return session;

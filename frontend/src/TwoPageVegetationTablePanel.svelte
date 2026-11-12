@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { TwoPageVegetationTableService } from '../bindings/github.com/boostao/vpro-wails';
+  import { DatasheetService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { twoPageVegetationTableFromWire, twoPageVegetationTableCellLabel,
     type TwoPageVegetationTableOwner, type TwoPageVegetationTableView } from './twoPageVegetationTable';
@@ -24,7 +24,7 @@
     cancel(); const request = generation;
     review = null; error = ''; busy = true; onBusyChange(true);
     try {
-      const value = await reads.track(TwoPageVegetationTableService.GetReview(owner.contextId, owner.plot, owner.form, offset, pageSize));
+      const value = await reads.track(DatasheetService.GetVegetationTableReview(owner.contextId, owner.plot, owner.form, offset, pageSize));
       if (request !== generation) return;
       const validated = twoPageVegetationTableFromWire(value, owner, offset, pageSize);
       if (request !== generation) return;

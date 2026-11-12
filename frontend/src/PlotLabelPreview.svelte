@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { ContextService, PlotLabelRegionalService, PlotLabelPDFExportService } from '../bindings/github.com/boostao/vpro-wails';
+  import { ContextService, ImportExportService } from '../bindings/github.com/boostao/vpro-wails';
   import type { PlotLabelPDFExportReview, PlotLabelPDFExportOutcome } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { plotLookupInputError } from './scopedPlotLookup';
@@ -47,14 +47,14 @@
     preview = null; error = ''; labelDate = ''; regionalEvidence = null; pdfReview = null; busy = true; updateBusy();
     try {
       if (pdfEnabled) {
-        const value = await reads.track(PlotLabelPDFExportService.GetReview(contextId, JSON.stringify({ plotNumber: requestedPlot })));
+        const value = await reads.track(ImportExportService.GetPlotLabelPDFReview(contextId, JSON.stringify({ plotNumber: requestedPlot })));
         if (request !== generation || key !== ownerKey) return;
         const candidate = validatePlotLabelPDFReview(value, { contextId, project, projectPath, su, suPath }, requestedPlot);
         const native = validatePlotLabelRegionalPreview(candidate.preview, contextId, requestedPlot);
         if (request !== generation || key !== ownerKey) return;
         pdfReview = candidate; preview = native.label; labelDate = native.labelDate; regionalEvidence = native.evidence;
       } else if (regionalDateEnabled) {
-        const value = await reads.track(PlotLabelRegionalService.GetPreview(contextId, requestedPlot));
+        const value = await reads.track(ImportExportService.GetPlotLabelRegionalPreview(contextId, requestedPlot));
         if (request !== generation || key !== ownerKey) return;
         const candidate = validatePlotLabelRegionalPreview(value, contextId, requestedPlot);
         if (request !== generation || key !== ownerKey) return;
@@ -76,14 +76,14 @@
     if (!pdfSession || !pdfReview || busy || publication.busy || publication.blocked) { error = 'Prepare an owned PDF review and resolve the prior operation first.'; return; }
     error = '';
     try {
-      await pdfSession.publish(pdfReview, destination, request => PlotLabelPDFExportService.ExportReviewed(contextId, JSON.stringify(request)));
+      await pdfSession.publish(pdfReview, destination, request => ImportExportService.ExportReviewedPlotLabelPDF(contextId, JSON.stringify(request)));
     } catch (cause) { error = `Label PDF publication unavailable: ${String(cause)}`; }
   }
   async function recoverPDF() {
     if (!pdfSession) return;
     error = '';
     try {
-      await pdfSession.recover(request => PlotLabelPDFExportService.RecoverOutcome(contextId, JSON.stringify(request)));
+      await pdfSession.recover(request => ImportExportService.RecoverPlotLabelPDFOutcome(contextId, JSON.stringify(request)));
     } catch (cause) { error = `Readonly PDF recovery unavailable: ${String(cause)}`; }
   }
   function acknowledgePDF() {

@@ -89,7 +89,7 @@ test('location UI remains independently gated, cancellable and uses shared draft
   assert.match(app,/view === 'plot-locations' && import\.meta\.env\.VITE_PLOT_LOCATION_REVIEW !== 'false'/);
   assert.match(app,/function navigate[\s\S]*?requestTransition/);
   assert.match(app,/busy \|\| editorBusy \|\| transitionWorking/);
-  assert.match(component,/reads\.track\(ContextService\.GetPlotLocationReview\(contextId\)\)/);
+  assert.match(component,/reads\.track\(SpatialService\.GetPlotLocationReview\(contextId\)\)/);
   assert.match(component,/const validated = await validatePlotLocationReview[\s\S]*?if \(request !== generation\) return;[\s\S]*?review = validated/);
   assert.match(component,/onDestroy\(cancel\)/);assert.match(component,/reads\.cancelAll\(\)/);
   assert.match(component,/scope="col"/);assert.match(component,/aria-label=.*Env row/);

@@ -156,7 +156,8 @@ func TestTwoPageVegetationServiceActualMainRegistration(t *testing.T) {
 	}
 	for _, required := range []string{
 		"NewTwoPageVegetationService(contextService, os.LookupEnv)",
-		"application.NewService(twoPageVegetation)",
+		"twoPageVegetation:            twoPageVegetation",
+		"application.NewService(plotEntryService)",
 	} {
 		if strings.Count(string(data), required) != 1 {
 			t.Fatal("actual main registration missing/duplicated", required)

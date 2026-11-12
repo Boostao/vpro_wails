@@ -93,7 +93,7 @@ test('actual threshold handlers cancel stale reads and respect external holds be
   const context = componentFunctions('LongVegetationThresholdPreferences.svelte', ['cancel', 'load', 'save', 'edit'], {
     preferences: session, view: session.view(), busy: false, error: '', generation: 0, operationHeld: false, mutationHeld: false,
     contextId: scope.contextId, reads: new ReadRequests(), onReadBusyChange() {},
-    LongVegetationThresholdPreferencesService: {
+    VegetationReportService: {
       GetLongVegetationThresholdPreferences() { reads++; const promise = new Promise(done => { release = done; }); promise.cancel = () => { cancelled++; }; return promise; },
       SaveLongVegetationThresholdPreferences(_id, raw) { saves++; assert.equal(JSON.parse(raw).proposed.presenceGreaterThan, -1); return Promise.resolve(outcome()); },
     },
@@ -117,7 +117,7 @@ test('source labels and percent suffixes preserve one live field with retained s
   assert.doesNotMatch(body, /data-long-vegetation-threshold-undo[^>]*disabled/);
   assert.ok(body.indexOf('role="alert"') < body.indexOf('Load saved thresholds before editing'));
   assert.match(source('LongVegetationThresholdPreferences.svelte'), /const raw = event.currentTarget.value; edit\(field.key, raw\)/);
-  assert.doesNotMatch(source('LongVegetationThresholdPreferences.svelte'), /reads\.track\(LongVegetationThresholdPreferencesService\.Save/);
+  assert.doesNotMatch(source('LongVegetationThresholdPreferences.svelte'), /reads\.track\(VegetationReportService\.Save/);
 });
 test('actual parent/child composition keeps threshold gate independent and propagates retained barriers', () => {
   for (const enabled of [false, true]) {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { SummaryVegetationWorkbookService } from '../bindings/github.com/boostao/vpro-wails';
+  import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { summaryVegetationReferenceGroupingAvailable, summaryVegetationUnanimousCommonAvailable, type SummaryVegetationOwner } from './summaryVegetation';
   import { summaryEnvironmentalLifeformEnabled } from './summaryVegetationEnvironmentalDesktop';
   import { summaryVegetationWorkbookSession, sameSummaryWorkbookOptions,
@@ -90,7 +90,7 @@
     referencePage = 0;
     try {
       await session.review(calculation, {
-        review: (contextId, options) => SummaryVegetationWorkbookService.GetReview(contextId, JSON.stringify(options)),
+        review: (contextId, options) => VegetationReportService.GetSummaryVegetationWorkbookReview(contextId, JSON.stringify(options)),
         validationYield: () => new Promise(resolve => setTimeout(resolve, 0)),
       });
     } catch (cause) { error = String(cause); }
@@ -100,7 +100,7 @@
     error = '';
     try {
       await session.publish(calculation, request =>
-        SummaryVegetationWorkbookService.ExportReviewed(owned.contextId, JSON.stringify(request)));
+        VegetationReportService.ExportReviewedSummaryVegetationWorkbook(owned.contextId, JSON.stringify(request)));
     } catch (cause) { error = String(cause); }
   }
   function acknowledge() {

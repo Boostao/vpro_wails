@@ -221,11 +221,11 @@ test('actual complete-entry panel caches read ports per session and refuses repl
     async load() { calls.push(`load:${this.form}`); return true; }
   }
   const values = { owner, sessions, onchange() {}, ReadRequests: Requests, TwoPageEntrySession: Session,
-    TwoPageParentEntryService: {
-      GetOriginal: (context, plot, form) => { calls.push(['read', context, plot, form]); return Promise.resolve({}); },
-      GetReferences: (context, plot, form, filters) => { calls.push(['references', context, plot, form, filters]); return Promise.resolve({}); },
-      Save: (context, plot, form, request) => { calls.push(['save', context, plot, form, request]); return Promise.resolve({}); },
-      Restore: (context, plot, form, history, action) => { calls.push(['restore', context, plot, form, history, action]); return Promise.resolve({}); },
+    PlotEntryService: {
+      GetTwoPageParentEntryOriginal: (context, plot, form) => { calls.push(['read', context, plot, form]); return Promise.resolve({}); },
+      GetTwoPageParentEntryReferences: (context, plot, form, filters) => { calls.push(['references', context, plot, form, filters]); return Promise.resolve({}); },
+      SaveTwoPageParentEntry: (context, plot, form, request) => { calls.push(['save', context, plot, form, request]); return Promise.resolve({}); },
+      RestoreTwoPageParentEntry: (context, plot, form, history, action) => { calls.push(['restore', context, plot, form, history, action]); return Promise.resolve({}); },
     },
     oncommitted: async () => calls.push('parent'),
   };

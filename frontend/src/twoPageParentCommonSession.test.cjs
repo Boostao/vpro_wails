@@ -403,12 +403,12 @@ test('actual common controller caches variant owners and refreshes clean peers w
   let writes = 0, refreshes = 0;
   const values = { owner, sessions, onchange() {}, TwoPageParentCommonSession: api.TwoPageParentCommonSession,
     reads: { track: value => value, cancelAll() {} }, oncommitted: async () => refreshes++,
-    TwoPageParentCommonService: {
-      GetOriginal: async (context, plot, form) => {
+    PlotEntryService: {
+      GetTwoPageParentCommonOriginal: async (context, plot, form) => {
         assert.equal(context, owner.contextId); assert.equal(plot, owner.plot);
         return structuredClone(current[form]);
       },
-      Save: async (_, __, form, request) => {
+      SaveTwoPageParentCommon: async (_, __, form, request) => {
         writes++;
         for (const edit of request.edits) for (const r of Object.values(current)) set(r, edit.column, edit.value);
         return { ChangedCells: request.edits.length, HistoryID: '51' };
@@ -464,7 +464,7 @@ test('actual PlotType loader rejects unavailable, foreign and late reference res
   let deliver;
   const controller = componentFunctions('TwoPageParentCommonEditor.svelte', ['loadChoices'], {
     reviewEnabled: true, choicesRequest: 0, choices: null, choicesBusy: false, choicesError: null,
-    reads: { track: value => value }, ReferenceService: { GetListItems: () => new Promise(resolve => { deliver = resolve; }) },
+    reads: { track: value => value }, PlotEntryService: { GetListItems: () => new Promise(resolve => { deliver = resolve; }) },
   });
   for (const response of [null, [{ listName: 'Other', item: 'Other', itemDescription: '' }]]) {
     const pending = controller.actions.loadChoices(); deliver(response); await pending;

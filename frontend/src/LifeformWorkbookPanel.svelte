@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { LifeformWorkbookService } from '../bindings/github.com/boostao/vpro-wails';
+  import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { lifeformCellText, lifeformRatioText, type LifeformSummaryOwner } from './lifeformSummary';
   import { speciesAttributeCountText } from './speciesAttributeSummary';
@@ -46,7 +46,7 @@
     const requestGeneration = generation, requestedDetails = [...details];
     busy = true; error = ''; reportBusy();
     try {
-      const value = await reads.track(LifeformWorkbookService.GetReview(owned.contextId, JSON.stringify({ details: requestedDetails })));
+      const value = await reads.track(VegetationReportService.GetLifeformWorkbookReview(owned.contextId, JSON.stringify({ details: requestedDetails })));
       if (disposed || requestGeneration !== generation) return;
       review = validateLifeformWorkbookReview(value, owned, requestedDetails);
     } catch (cause) {
@@ -60,7 +60,7 @@
     error = '';
     try {
       await session.publish(review, destination, request =>
-        LifeformWorkbookService.ExportReviewed(owned.contextId, JSON.stringify(request)));
+        VegetationReportService.ExportReviewedLifeformWorkbook(owned.contextId, JSON.stringify(request)));
     } catch (cause) {
       if (!disposed) error = String(cause);
     }

@@ -53,7 +53,7 @@ test('actual mode dispatch shares cancellation/owner checks and cannot change wo
     contextId:'owned',project:'Sample',projectPath:'C:\\project.db',suPath:'C:\\external.db',
     cancel(){context.generation++;cancellations++;},reportBusy(){},
     reads:{track(value){return value;}},
-    ContextService:{
+    EnvironmentReportService:{
       PreviewSiteUnitSummary(){layerCalls++;return fixture();},
       PreviewSiteUnitSummaryLifeforms(){lifeformCalls++;return lifeformFixture();}
     },validateSiteUnitSummary:summary.validateSiteUnitSummary,

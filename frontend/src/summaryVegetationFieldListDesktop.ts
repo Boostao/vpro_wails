@@ -1,4 +1,4 @@
-import { SummaryVegetationFieldListService } from '../bindings/github.com/boostao/vpro-wails';
+import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
 import { fieldListJSON, fieldListOwner, validateFieldListReview, type FieldListOwner, type FieldListRead,
   type FieldListReview, type SummaryVegetationFieldListSession } from './summaryVegetationFieldList';
 import { fieldListRegistry, type FieldListEnvironment } from './summaryVegetationFieldListSessions';
@@ -163,7 +163,7 @@ export function fieldListDesktop(port: FieldListDesktopPort,
 }
 
 export const summaryVegetationFieldListDesktop = fieldListDesktop({
-  read: id => SummaryVegetationFieldListService.GetSummaryVegetationFieldList(id),
-  save: (id, json) => SummaryVegetationFieldListService.SaveSummaryVegetationFieldList(id, json),
+  read: id => VegetationReportService.GetSummaryVegetationFieldList(id),
+  save: (id, json) => VegetationReportService.SaveSummaryVegetationFieldList(id, json),
   validationYield: () => new Promise(resolve => setTimeout(resolve, 0)),
 });

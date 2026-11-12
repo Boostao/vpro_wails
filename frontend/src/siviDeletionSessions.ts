@@ -1,4 +1,4 @@
-import { SIVIDeletionService } from '../bindings/github.com/boostao/vpro-wails';
+import { PlotEntryService } from '../bindings/github.com/boostao/vpro-wails';
 import { SIVIDeletionSession } from './siviDeletionSession';
 import { SIVIDeletionRestorationSession } from './siviDeletionRestorationSession';
 import type { SIVISpeciesOwner } from './siviSpeciesEditor';
@@ -12,10 +12,10 @@ export function siviDeletionSession(owner: SIVISpeciesOwner): SIVIDeletionSessio
   if (!session) {
     const { contextId, project, plot } = owner;
     session = new SIVIDeletionSession({ contextId, project, plot }, {
-      targets: () => SIVIDeletionService.GetTargets(contextId, plot),
-      original: (form, rowId) => SIVIDeletionService.GetOriginal(contextId, plot, form, rowId),
-      delete: request => SIVIDeletionService.Delete(contextId, request),
-      receipt: request => SIVIDeletionService.LookupReceipt(contextId, request),
+      targets: () => PlotEntryService.GetSIVIDeletionTargets(contextId, plot),
+      original: (form, rowId) => PlotEntryService.GetSIVIDeletionOriginal(contextId, plot, form, rowId),
+      delete: request => PlotEntryService.DeleteSIVIVegetation(contextId, request),
+      receipt: request => PlotEntryService.LookupSIVIDeletionReceipt(contextId, request),
     });
     deletions.set(identity, session);
   }
@@ -27,10 +27,10 @@ export function siviDeletionRestorationSession(owner: SIVISpeciesOwner): SIVIDel
   if (!session) {
     const { contextId, project, plot } = owner;
     session = new SIVIDeletionRestorationSession({ contextId, project, plot }, {
-      history: () => SIVIDeletionService.GetHistory(contextId, plot),
-      review: historyId => SIVIDeletionService.ReviewRestoration(contextId, plot, historyId),
-      restore: request => SIVIDeletionService.Restore(contextId, request),
-      receipt: request => SIVIDeletionService.LookupRestorationReceipt(contextId, request),
+      history: () => PlotEntryService.GetSIVIDeletionHistory(contextId, plot),
+      review: historyId => PlotEntryService.ReviewSIVIDeletionRestoration(contextId, plot, historyId),
+      restore: request => PlotEntryService.RestoreSIVIDeletion(contextId, request),
+      receipt: request => PlotEntryService.LookupSIVIDeletionRestorationReceipt(contextId, request),
     });
     restorations.set(identity, session);
   }

@@ -1,4 +1,4 @@
-import { LongVegetationProjectWorkbookService, LongVegetationReportScopeService } from '../bindings/github.com/boostao/vpro-wails';
+import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
 import { ReadRequests } from './readRequests';
 import { createProjectReportWorkspaceRegistry, type ProjectWorkspacePort } from './longVegetationProjectWorkspace.svelte';
 import type { ProjectReportOwner } from './longVegetationProjectReport';
@@ -21,18 +21,18 @@ function ownedPorts(owner: ProjectReportOwner): ProjectWorkspacePort {
   };
   return {
     scope: {
-      scope: async () => nonnull(await scopeReads.track(LongVegetationReportScopeService.GetLongVegetationReportScope(context)), 'scope'),
-      catalogue: async () => nonnull(await scopeReads.track(LongVegetationReportScopeService.GetLongVegetationProjectFieldDefinitions(context)), 'field catalogue'),
-      switchScope: async request => nonnull(await LongVegetationReportScopeService.SetLongVegetationReportScope(context, JSON.stringify(request)), 'scope switch'),
-      fields: async request => nonnull(await LongVegetationReportScopeService.SetLongVegetationProjectFields(context, JSON.stringify(request)), 'field draft'),
-      build: async revision => nonnull(await LongVegetationReportScopeService.BuildLongVegetationProjectScope(context, revision), 'Build'),
+      scope: async () => nonnull(await scopeReads.track(VegetationReportService.GetLongVegetationReportScope(context)), 'scope'),
+      catalogue: async () => nonnull(await scopeReads.track(VegetationReportService.GetLongVegetationProjectFieldDefinitions(context)), 'field catalogue'),
+      switchScope: async request => nonnull(await VegetationReportService.SetLongVegetationReportScope(context, JSON.stringify(request)), 'scope switch'),
+      fields: async request => nonnull(await VegetationReportService.SetLongVegetationProjectFields(context, JSON.stringify(request)), 'field draft'),
+      build: async revision => nonnull(await VegetationReportService.BuildLongVegetationProjectScope(context, revision), 'Build'),
     },
-    options: request => reportReads.track(LongVegetationReportScopeService.GetLongVegetationProjectOptions(context, JSON.stringify(request))),
-    preview: request => reportReads.track(LongVegetationReportScopeService.PreviewLongVegetationProject(context, JSON.stringify(request))),
-    unitPreferences: request => unitReads.track(LongVegetationReportScopeService.GetLongVegetationProjectUnitPreferences(context, JSON.stringify(request))),
-    saveUnits: request => LongVegetationReportScopeService.SaveLongVegetationProjectUnits(context, JSON.stringify(request)),
-    workbookReview: request => reportReads.track(LongVegetationProjectWorkbookService.GetReview(context, JSON.stringify(request))),
-    publishWorkbook: request => LongVegetationProjectWorkbookService.ExportReviewed(context, JSON.stringify(request)),
+    options: request => reportReads.track(VegetationReportService.GetLongVegetationProjectOptions(context, JSON.stringify(request))),
+    preview: request => reportReads.track(VegetationReportService.PreviewLongVegetationProject(context, JSON.stringify(request))),
+    unitPreferences: request => unitReads.track(VegetationReportService.GetLongVegetationProjectUnitPreferences(context, JSON.stringify(request))),
+    saveUnits: request => VegetationReportService.SaveLongVegetationProjectUnits(context, JSON.stringify(request)),
+    workbookReview: request => reportReads.track(VegetationReportService.GetLongVegetationProjectWorkbookReview(context, JSON.stringify(request))),
+    publishWorkbook: request => VegetationReportService.ExportReviewedLongVegetationProjectWorkbook(context, JSON.stringify(request)),
     cancelScopeReads: () => scopeReads.cancelAll(),
     cancelUnitReads: () => unitReads.cancelAll(),
     cancelReportReads: () => reportReads.cancelAll(),

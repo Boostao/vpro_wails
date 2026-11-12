@@ -102,8 +102,8 @@ test('workbook panel keeps title/preferences/read/navigation/native-close barrie
   assert.match(source, /VITE_LONG_ENVIRONMENT_WORKBOOK !== 'false'/);
   assert.match(source, /workbookReview = \$state\.raw<ValidatedEnvironmentWorkbookReview/);
   assert.match(source, /onBusyChange\(busy \|\| preferenceBarrier \|\| workbookBarrier\)/);
-  assert.match(source, /reads\.track\(EnvironmentWorkbookService\.GetReview/);
-  assert.doesNotMatch(source, /reads\.track\(EnvironmentWorkbookService\.ExportReviewed/);
+  assert.match(source, /reads\.track\(EnvironmentReportService\.GetEnvironmentWorkbookReview/);
+  assert.doesNotMatch(source, /reads\.track\(EnvironmentReportService\.ExportReviewedEnvironmentWorkbook/);
   assert.match(source, /workbookSession\.publish\(workbookReview, destination/);
   assert.match(source, /generation\+\+; reads\.cancelAll/);
   assert.match(source, /function acknowledgeWorkbook\(\) \{\s*workbookSession\.acknowledge\(\);\s*workbookReview = null;/);

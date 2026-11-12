@@ -157,7 +157,7 @@ test('actual panel handlers cancel stale references and enforce sibling holds be
     contextId: scope.contextId, preferences: session, view: session.view(), busy: false, error: '',
     operationHeld: false, mutationHeld: false, generation: 0, reads: new ReadRequests(),
     onReadBusyChange(value) { holds.push(value); },
-    LongVegetationQualityMinimumPreferencesService: {
+    VegetationReportService: {
       GetLongVegetationQualityMinimumPreferences() {
         const pending = new Promise(resolve => { release = resolve; });
         pending.cancel = () => { cancelled++; };
@@ -255,5 +255,5 @@ test('actual report retains minimum validation on remount and independently gate
   assert.match(reportSource, /unsubscribeQualityMinima\?\.\(\)/);
   const panel = source('LongVegetationQualityMinimumPreferences.svelte');
   assert.match(panel, /const value = event.currentTarget.value; edit\(field.key, value\)/);
-  assert.doesNotMatch(panel, /reads\.track\(LongVegetationQualityMinimumPreferencesService\.Save/);
+  assert.doesNotMatch(panel, /reads\.track\(VegetationReportService\.Save/);
 });

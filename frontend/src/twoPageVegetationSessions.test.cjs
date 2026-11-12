@@ -16,19 +16,17 @@ const owner = { contextId, project, plot, form };
 const enabled = { VITE_TWO_PAGE_VEGETATION_REVIEW: 'true', VITE_TWO_PAGE_VEGETATION_WRITING: 'true' };
 function registry(environment = {}, overrides = {}) {
   const calls = [], dependencies = {
-    '../bindings/github.com/boostao/vpro-wails': { TwoPageVegetationService: {
-      GetOriginal: (...args) => { calls.push(['read', ...args]); return Promise.resolve(client.proxy(sample().history.Request.original)); },
-      Save: (...args) => { calls.push(['save', ...args]); return Promise.resolve(client.proxy(sample())); },
-      RecoverOutcome: (...args) => { calls.push(['outcome', ...args]); return Promise.resolve(client.proxy(structuredClone(outcomes[3]))); },
-      GetSpeciesReferences: (...args) => {
+    '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {
+      GetTwoPageVegetationOriginal: overrides.GetTwoPageVegetationOriginal ?? overrides.GetOriginal ?? ((...args) => { calls.push(['read', ...args]); return Promise.resolve(client.proxy(sample().history.Request.original)); }),
+      SaveTwoPageVegetation: overrides.SaveTwoPageVegetation ?? overrides.Save ?? ((...args) => { calls.push(['save', ...args]); return Promise.resolve(client.proxy(sample())); }),
+      RecoverTwoPageVegetationOutcome: overrides.RecoverTwoPageVegetationOutcome ?? overrides.RecoverOutcome ?? ((...args) => { calls.push(['outcome', ...args]); return Promise.resolve(client.proxy(structuredClone(outcomes[3]))); }),
+      GetTwoPageVegetationSpeciesReferences: overrides.GetTwoPageVegetationSpeciesReferences ?? overrides.GetSpeciesReferences ?? ((...args) => {
         calls.push(['references', ...args]);
         const wire = structuredClone(require('./twoPageVegetationReferenceWire.json'));
         Object.assign(wire, owner);
         return Promise.resolve(client.proxy(wire));
-      },
-      ...overrides,
-    }, TwoPageVegetationSpeciesListService: {
-      Save: (...args) => { calls.push(['species-list-save', ...args]); return Promise.reject(new Error('Held independent Species transport failure')); },
+      }),
+      SaveTwoPageVegetationSpeciesList: overrides.SaveTwoPageVegetationSpeciesList ?? ((...args) => { calls.push(['species-list-save', ...args]); return Promise.reject(new Error('Held independent Species transport failure')); }),
     } },
     './twoPageVegetationSession': { TwoPageVegetationSession },
     './qualityEditor': loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') }),

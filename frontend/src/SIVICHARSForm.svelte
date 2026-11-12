@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
-  import { SIVICombinedService, SIVICollectedService, SIVISpeciesService, SIVIIdentityService, AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
+  import { PlotEntryService, AuditRestoreAction, type SIVIVegetationProjection, type SIVIHeightWriteResult, type AuditRestoreResult } from '../bindings/github.com/boostao/vpro-wails';
   import { ReadRequests } from './readRequests';
   import { SIVICombinedSession } from './siviCombinedSession';
   import { SIVICollectedSession } from './siviCollectedSession';
@@ -62,7 +62,11 @@
   const lifecycleKinds: Lifecycle[] = ['deletion', 'restoration', 'creationUndo'];
   const targets: Child[] = ['combined', 'collected', 'species', 'identity'];
   type Operation = 'load' | 'save' | 'undo' | 'retain' | 'prune';
-  type ChildService = Pick<typeof SIVICombinedService, 'GetOriginal' | 'SaveReviewed' | 'RestoreReviewed'>;
+  type ChildService = {
+    GetOriginal: (contextID: string, plot: string, extended: boolean) => ReturnType<typeof PlotEntryService.GetSIVICombinedOriginal>;
+    SaveReviewed: (contextID: string, plot: string, extended: boolean, requestJSON: string) => ReturnType<typeof PlotEntryService.SaveSIVICombinedReviewed>;
+    RestoreReviewed: (contextID: string, plot: string, historyID: string, action: AuditRestoreAction) => ReturnType<typeof PlotEntryService.RestoreSIVICombinedReviewed>;
+  };
   let parent = $state<{
     getCloseState(): EditorCloseState;
     saveForClose(): Promise<boolean>;
@@ -80,24 +84,40 @@
   let disposed = false;
   const reads = { combined: new ReadRequests(), collected: new ReadRequests(), species: new ReadRequests(), identity: new ReadRequests() };
   const refreshNeeded: Record<Child, boolean> = { combined: false, collected: false, species: false, identity: false };
-  const child = new SIVICombinedSession(owner.plot, port('combined', SIVICombinedService),
+  const child = new SIVICombinedSession(owner.plot, port('combined', {
+    GetOriginal: PlotEntryService.GetSIVICombinedOriginal,
+    SaveReviewed: PlotEntryService.SaveSIVICombinedReviewed,
+    RestoreReviewed: PlotEntryService.RestoreSIVICombinedReviewed,
+  }),
     () => { childView = child.view(); }, true);
   let childView = $state.raw(child.view());
-  const collected = new SIVICollectedSession(owner.plot, port('collected', SIVICollectedService),
+  const collected = new SIVICollectedSession(owner.plot, port('collected', {
+    GetOriginal: PlotEntryService.GetSIVICollectedOriginal,
+    SaveReviewed: PlotEntryService.SaveSIVICollectedReviewed,
+    RestoreReviewed: PlotEntryService.RestoreSIVICollectedReviewed,
+  }),
     () => { collectedView = collected.view(); }, true);
   let collectedView = $state.raw(collected.view());
   const species = new SIVISpeciesSession(owner, {
-    ...port('species', SIVISpeciesService),
+    ...port('species', {
+      GetOriginal: PlotEntryService.GetSIVISpeciesOriginal,
+      SaveReviewed: PlotEntryService.SaveSIVISpeciesReviewed,
+      RestoreReviewed: PlotEntryService.RestoreSIVISpeciesReviewed,
+    }),
     read: async (extended: boolean) => {
       const [original, references] = await Promise.all([
-        reads.species.track(SIVISpeciesService.GetOriginal(owner.contextId, owner.plot, extended)),
-        reads.species.track(SIVISpeciesService.GetReferences(owner.contextId, owner.plot)),
+        reads.species.track(PlotEntryService.GetSIVISpeciesOriginal(owner.contextId, owner.plot, extended)),
+        reads.species.track(PlotEntryService.GetSIVISpeciesReferences(owner.contextId, owner.plot)),
       ]);
       return { original, references };
     },
   }, () => { speciesView = species.view(); }, true);
   let speciesView = $state.raw(species.view());
-  const identity = new SIVIIdentitySession(owner.plot, port('identity', SIVIIdentityService),
+  const identity = new SIVIIdentitySession(owner.plot, port('identity', {
+    GetOriginal: PlotEntryService.GetSIVIIdentityOriginal,
+    SaveReviewed: PlotEntryService.SaveSIVIIdentityReviewed,
+    RestoreReviewed: PlotEntryService.RestoreSIVIIdentityReviewed,
+  }),
     () => { identityView = identity.view(); }, true);
   let identityView = $state.raw(identity.view());
   const creation = creationEnabled ? ownedCreationSession(owner) : null;

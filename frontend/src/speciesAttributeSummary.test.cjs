@@ -80,7 +80,7 @@ test('attribute read uses the shared cancellable busy boundary and independent d
   assert.equal(compile(source, { filename: 'LifeformSummary.svelte', generate: 'client' }).warnings.length, 0);
   assert.match(source, /VITE_SPECIES_ATTRIBUTE_SUMMARY !== 'false'/);
   assert.match(source, /!attributesEnabled \|\| busy/);
-  assert.match(source, /SpeciesAttributeSummaryService\.Preview\(contextId\)/);
+  assert.match(source, /VegetationReportService\.PreviewSpeciesAttributeSummary\(contextId\)/);
   assert.match(source, /validateSpeciesAttributeSummary\(value, owner\)/);
   assert.match(source, /reads\.track<unknown>\(kind === 'attributes'/);
   assert.match(source, /onDestroy\(cancel\)/);
@@ -98,7 +98,7 @@ test('attribute preview renders six source families, nullable counts and visible
     .replace("let previewKey = $state('');",
       `let previewKey = $state(${JSON.stringify(JSON.stringify([owner.contextId, owner.project, owner.projectPath, owner.su, owner.suPath]))});`);
   const component = serverComponent(source, 'LifeformSummary.svelte', {
-    '../bindings/github.com/boostao/vpro-wails': { LifeformSummaryService: {}, SpeciesAttributeSummaryService: {} },
+    '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {} },
     './LifeformWorkbookPanel.svelte': { default() { assert.fail('Disabled workbook panel must not mount'); } },
     './lifeformSummary': lifeform, './speciesAttributeSummary': summary,
   });

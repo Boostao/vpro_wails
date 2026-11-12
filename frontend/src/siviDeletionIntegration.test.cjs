@@ -38,7 +38,8 @@ test('actual main preflights both independent deletion flags before data work an
   assert.match(main, /siviDeletionWritingFeatureEnvironment, siviDeletionRestoringFeatureEnvironment/);
   assert.ok(main.indexOf('siviDeletionWritingFeatureEnvironment') < main.indexOf('userDataDir()'));
   assert.match(main, /NewSIVIDeletionService\(contextService, os.LookupEnv\)/);
-  assert.match(main, /application.NewService\(siviDeletion\)/);
+  assert.match(main, /siviDeletion:\s*siviDeletion/);
+  assert.match(main, /application\.NewService\(plotEntryService\)/);
   assert.match(root, /VITE_SIVI_DELETION_WRITING !== 'false'/);
   assert.match(root, /VITE_SIVI_DELETION_RESTORING !== 'false'/);
   assert.match(root, /ownedSIVIDeletionSession\(\{ contextId: siviContextId, project: \$projectState.activeProject, plot: original.plotNumber \}\)/);
@@ -47,11 +48,20 @@ test('actual main preflights both independent deletion flags before data work an
 
 test('cached deletion/restoration ownership binds all eight actual methods without replacing pending sessions on remount', () => {
   const calls = [];
-  const service = Object.fromEntries(['GetTargets', 'GetOriginal', 'Delete', 'LookupReceipt', 'GetHistory',
-    'ReviewRestoration', 'Restore', 'LookupRestorationReceipt'].map(method => [method, (...args) => calls.push([method, ...args])]));
+  const methodMap = {
+    GetSIVIDeletionTargets: 'GetTargets',
+    GetSIVIDeletionOriginal: 'GetOriginal',
+    DeleteSIVIVegetation: 'Delete',
+    LookupSIVIDeletionReceipt: 'LookupReceipt',
+    GetSIVIDeletionHistory: 'GetHistory',
+    ReviewSIVIDeletionRestoration: 'ReviewRestoration',
+    RestoreSIVIDeletion: 'Restore',
+    LookupSIVIDeletionRestorationReceipt: 'LookupRestorationReceipt',
+  };
+  const service = Object.fromEntries(Object.entries(methodMap).map(([method, label]) => [method, (...args) => calls.push([label, ...args])]));
   class Session { constructor(owner, port) { this.owner = owner; this.port = port; } }
   const cache = loadTypeScript('siviDeletionSessions.ts', {
-    '../bindings/github.com/boostao/vpro-wails': { SIVIDeletionService: service },
+    '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: service },
     './siviDeletionSession': { SIVIDeletionSession: Session },
     './siviDeletionRestorationSession': { SIVIDeletionRestorationSession: Session },
   });

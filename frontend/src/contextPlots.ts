@@ -1,7 +1,7 @@
-import { ContextService, ProjectProfileSpeciesPresenceService, type ProjectPlotProfileRunRequest, type FS882Header, type VegRecord, type HumusRecord, type MineralRecord,
+import { ClassificationService, ContextService, ValidationService, type ProjectPlotProfileRunRequest, type FS882Header, type VegRecord, type HumusRecord, type MineralRecord,
   type OtherRecord, type OtherRecordUpdate, type SoilRecordUpdate, type VegetationAttributeUpdate, type CollectedRecordUpdate, type VegetationSpeciesLookup, type VegetationSpeciesUpdate, type VegetationNumberUpdate, type VegetationDeletionRequest, type VegetationCreationRequest, type PersonalSpeciesDefinitionRequest, type SpeciesCodeCheckUpdate, type HeightRecordUpdate, type AuditRestoreAction } from '../bindings/github.com/boostao/vpro-wails';
 
-export function bindContextPlots(contextId: string, port = ContextService, presencePort = ProjectProfileSpeciesPresenceService) {
+export function bindContextPlots(contextId: string, port = ContextService, presencePort = ClassificationService, validationPort = ValidationService) {
   if (!contextId) throw new Error('An editor requires a loaded project context identity.');
   return {
     GetPlot: (plot: string) => port.GetPlot(contextId, plot),
@@ -16,7 +16,7 @@ export function bindContextPlots(contextId: string, port = ContextService, prese
     ListProjectPlotProfileChoices: () => port.ListProjectPlotProfileChoices(contextId),
     ReviewProjectPlotProfileLump: () => port.ReviewProjectPlotProfileLump(contextId),
     RunProjectPlotProfile: (request: Parameters<typeof port.RunProjectPlotProfile>[1]) => port.RunProjectPlotProfile(contextId, request),
-    PreviewProjectProfileSpeciesPresence: (request: ProjectPlotProfileRunRequest) => presencePort.Preview(contextId, JSON.stringify(request)),
+    PreviewProjectProfileSpeciesPresence: (request: ProjectPlotProfileRunRequest) => presencePort.PreviewSpeciesPresence(contextId, JSON.stringify(request)),
     ResolveProjectPlotProfileNavigation: (request: Parameters<typeof port.ResolveProjectPlotProfileNavigation>[1]) => port.ResolveProjectPlotProfileNavigation(contextId, request),
     ReviewProjectMetadata: (plot: string) => port.ReviewProjectMetadata(contextId, plot),
     SaveProjectMetadata: (request: Parameters<typeof port.SaveProjectMetadata>[1]) => port.SaveProjectMetadata(contextId, request),
@@ -65,9 +65,9 @@ export function bindContextPlots(contextId: string, port = ContextService, prese
     DeleteReviewedVegetation: (plot: string, request: VegetationDeletionRequest) => port.DeleteReviewedVegetation(contextId, plot, request),
     CreateSourceVegetation: (plot: string, request: VegetationCreationRequest) => port.CreateSourceVegetation(contextId, plot, request),
     CreatePersonalSpeciesDefinition: (request: PersonalSpeciesDefinitionRequest) => port.CreatePersonalSpeciesDefinition(contextId, request),
-    ReviewSpeciesCodes: () => port.ReviewSpeciesCodes(contextId),
-    LookupSpeciesCodeCheckTarget: (lookup: VegetationSpeciesLookup) => port.LookupSpeciesCodeCheckTarget(contextId, lookup),
-    SaveSpeciesCodeCheck: (updates: SpeciesCodeCheckUpdate[] | null) => port.SaveSpeciesCodeCheck(contextId, updates),
+    ReviewSpeciesCodes: () => validationPort.CheckSpeciesCodes(contextId),
+    LookupSpeciesCodeCheckTarget: (lookup: VegetationSpeciesLookup) => validationPort.LookupSpeciesCodeCheckTarget(contextId, lookup),
+    SaveSpeciesCodeCheck: (updates: SpeciesCodeCheckUpdate[] | null) => validationPort.ApplySpeciesCodeCheck(contextId, updates),
     SetAuditRestoreSelection: (plot: string, rowIds: string[] | null) => port.SetAuditRestoreSelection(contextId, plot, rowIds),
     RestoreSelectedAuditRecords: (plot: string, rowIds: string[] | null, action: AuditRestoreAction) =>
       port.RestoreSelectedAuditRecords(contextId, plot, rowIds, action),
