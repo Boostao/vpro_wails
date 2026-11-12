@@ -3,7 +3,31 @@ package main
 import (
 	"context"
 	"errors"
+
+	rsidecarpkg "github.com/boostao/vpro-wails/internal/rsidecar"
 )
+
+type RPackageStatus = rsidecarpkg.RPackageStatus
+type RRuntimeStatus = rsidecarpkg.RRuntimeStatus
+type PlotClimateRow = rsidecarpkg.PlotClimateRow
+type EdatopicGridCell = rsidecarpkg.EdatopicGridCell
+type EdatopicGridMatrix = rsidecarpkg.EdatopicGridMatrix
+type DualUnitEdatopicSummary = rsidecarpkg.DualUnitEdatopicSummary
+type ClimateEdatopicRequest = rsidecarpkg.ClimateEdatopicRequest
+type ClimateEdatopicResult = rsidecarpkg.ClimateEdatopicResult
+type ClusterIndicatorSpecies = rsidecarpkg.ClusterIndicatorSpecies
+type ClusterUnitSummary = rsidecarpkg.ClusterUnitSummary
+type ClusterPlotMembership = rsidecarpkg.ClusterPlotMembership
+type DendrogramSegment = rsidecarpkg.DendrogramSegment
+type DendrogramLeaf = rsidecarpkg.DendrogramLeaf
+type DendrogramGeometry = rsidecarpkg.DendrogramGeometry
+type ClusteringRequest = rsidecarpkg.ClusteringRequest
+type ClusteringResult = rsidecarpkg.ClusteringResult
+type PromoteCandidateSURequest = rsidecarpkg.PromoteCandidateSURequest
+type PromoteCandidateSUResult = rsidecarpkg.PromoteCandidateSUResult
+type QuartoVegSummaryRow = rsidecarpkg.QuartoVegSummaryRow
+type QuartoGuideRequest = rsidecarpkg.QuartoGuideRequest
+type QuartoGuideResult = rsidecarpkg.QuartoGuideResult
 
 type EnvironmentReportService struct {
 	contexts                        *ContextService
@@ -146,4 +170,43 @@ func (s *EnvironmentReportService) ExportReviewedSubzoneMatrix(ctx context.Conte
 		return nil, errors.New("subzone matrix service is unavailable")
 	}
 	return s.subzoneMatrix.ExportReviewed(ctx, contextID, requestJSON)
+}
+
+func (s *EnvironmentReportService) DetectRRuntime(ctx context.Context) (*RRuntimeStatus, error) {
+	return rsidecarpkg.DetectRRuntime(ctx)
+}
+
+func (s *EnvironmentReportService) GetCachedPlotClimate(ctx context.Context, contextID, refPeriod string) ([]PlotClimateRow, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("environment report context is unavailable")
+	}
+	return rsidecarpkg.GetCachedPlotClimate(ctx, unwrapContextService(s.contexts), contextID, refPeriod)
+}
+
+func (s *EnvironmentReportService) ComputePlotClimateAndDualEdatopic(ctx context.Context, contextID string, request ClimateEdatopicRequest) (*ClimateEdatopicResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("environment report context is unavailable")
+	}
+	return rsidecarpkg.ComputePlotClimateAndDualEdatopic(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *EnvironmentReportService) RunMultivariateClustering(ctx context.Context, contextID string, request ClusteringRequest) (*ClusteringResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("environment report context is unavailable")
+	}
+	return rsidecarpkg.RunMultivariateClustering(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *EnvironmentReportService) PromoteClusterCandidateToSU(ctx context.Context, contextID string, request PromoteCandidateSURequest) (*PromoteCandidateSUResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("environment report context is unavailable")
+	}
+	return rsidecarpkg.PromoteClusterCandidateToSU(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *EnvironmentReportService) RenderQuartoGuide(ctx context.Context, contextID string, request QuartoGuideRequest) (*QuartoGuideResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("environment report context is unavailable")
+	}
+	return rsidecarpkg.RenderQuartoGuide(ctx, unwrapContextService(s.contexts), contextID, request)
 }
