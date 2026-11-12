@@ -39,16 +39,98 @@
     error: message => onerror(message)
   }, coordinateSession(identity));
   let view = $state(editor.snapshot());
+  let auto1Busy = $state(false);
+  let auto1Summary = $state('');
+  let auto1Generation = 0;
   const invalid = $derived(Object.values(view.axes).some(axis => axis.error !== null));
   function readonly(axis: CoordinateAxis) {
     return !editingEnabled || disabled || capabilities[axis] !== true || !view.ready || !view.axes[axis].ready;
+  }
+  async function runAuto1CoordinateAttribution() {
+    if (!editingEnabled || disabled || view.busy || auto1Busy || invalid) return;
+    const targetDraft = identity;
+    const gen = ++auto1Generation;
+    auto1Busy = true;
+    auto1Summary = '';
+    reportBusy?.(coordinateBusy(busyIdentity, busyOwner, true));
+    try {
+      let lat = targetDraft.latitude;
+      let lon = targetDraft.longitude;
+      let changed = false;
+
+      if ((lat === null || lon === null) && targetDraft.utmZone && targetDraft.easting !== null && targetDraft.northing !== null) {
+        const zoneNum = Number.parseInt(String(targetDraft.utmZone).trim(), 10);
+        if (!Number.isFinite(zoneNum)) {
+          throw new Error(`Invalid UTM zone ${targetDraft.utmZone} for NAD83 projection.`);
+        }
+        const projected = await SpatialService.ProjectNAD83UTMToLatLon(zoneNum, targetDraft.easting, targetDraft.northing);
+        if (gen !== auto1Generation || identity !== targetDraft) return;
+        lat = Math.round(projected.latitude * 1e6) / 1e6;
+        lon = Math.round(projected.longitude * 1e6) / 1e6;
+        if (capabilities.latitude === true) { targetDraft.latitude = lat; changed = true; }
+        if (capabilities.longitude === true) { targetDraft.longitude = lon; changed = true; }
+        editor.syncDraft(targetDraft.latitude, targetDraft.longitude);
+      }
+
+      if (lat === null || lon === null) {
+        throw new Error('Enter Latitude/Longitude or NAD83 UTM Zone/Easting/Northing before running Auto-1 attribution.');
+      }
+
+      const suggestion = await SpatialService.SuggestSpatialAttributes(lat, lon);
+      if (gen !== auto1Generation || identity !== targetDraft || !suggestion) return;
+
+      if (suggestion.longitudeSignFlipped && capabilities.longitude === true) {
+        targetDraft.longitude = suggestion.normalizedLon;
+        editor.syncDraft(targetDraft.latitude, targetDraft.longitude);
+        changed = true;
+      }
+      if (suggestion.utmZone > 0) {
+        const zText = String(suggestion.utmZone);
+        const eVal = Math.round(suggestion.utmEasting * 10) / 10;
+        const nVal = Math.round(suggestion.utmNorthing * 10) / 10;
+        if (capabilities.utmZone === true && !targetDraft.utmZone) { targetDraft.utmZone = zText; changed = true; }
+        if (capabilities.easting === true && targetDraft.easting === null) { targetDraft.easting = eVal; changed = true; }
+        if (capabilities.northing === true && targetDraft.northing === null) { targetDraft.northing = nVal; changed = true; }
+      }
+      if (suggestion.ntsMapSheet && capabilities.mapSheet === true && !targetDraft.mapSheet) {
+        targetDraft.mapSheet = suggestion.ntsMapSheet;
+        changed = true;
+      }
+      if (suggestion.ecosection && capabilities.ecosection === true && !targetDraft.ecosection) {
+        targetDraft.ecosection = suggestion.ecosection;
+        changed = true;
+      }
+      if (suggestion.fsRegionDistrict && capabilities.fsRegionDistrict === true && !targetDraft.fsRegionDistrict) {
+        targetDraft.fsRegionDistrict = suggestion.fsRegionDistrict;
+        changed = true;
+      }
+      if (changed) onchange();
+
+      const parts = [
+        suggestion.gisBgc ? `GIS_BGC: ${suggestion.gisBgc}` : '',
+        suggestion.utmZone > 0 ? `NAD83 UTM ${suggestion.utmZone}: ${suggestion.utmEasting.toFixed(1)}E ${suggestion.utmNorthing.toFixed(1)}N` : '',
+        suggestion.ecosection ? `Eco: ${suggestion.ecosection}` : '',
+        suggestion.fsRegionDistrict ? `Dist: ${suggestion.fsRegionDistrict}` : '',
+        suggestion.ntsMapSheet ? `Sheet: ${suggestion.ntsMapSheet}` : ''
+      ].filter(Boolean);
+      auto1Summary = parts.join(' | ');
+    } catch (cause) {
+      if (gen === auto1Generation) {
+        onerror(cause instanceof Error ? cause.message : String(cause));
+      }
+    } finally {
+      if (gen === auto1Generation) {
+        auto1Busy = false;
+        reportBusy?.(coordinateBusy(busyIdentity, busyOwner, view.busy));
+      }
+    }
   }
   $effect(() => {
     identity = draft;
     editor.syncDraft(draft.latitude, draft.longitude);
   });
   onMount(() => { void editor.initialize(); });
-  onDestroy(() => { editor.dispose(); });
+  onDestroy(() => { auto1Generation++; editor.dispose(); });
 </script>
 
 <div class="coordinate-toolbar" aria-label="Coordinate safety controls">
@@ -64,7 +146,13 @@
       </label>
     {/each}
   {/if}
-  {#if view.busy}<span role="status">Preparing coordinate values…</span>{/if}
+  <button type="button" data-auto1-spatial-stamp
+    disabled={!editingEnabled || disabled || view.busy || auto1Busy || invalid || (capabilities.latitude !== true && capabilities.easting !== true)}
+    onclick={() => void runAuto1CoordinateAttribution()}>
+    Project NAD83 UTM &lt;-&gt; DD &amp; Suggest BGC/Admin
+  </button>
+  {#if view.busy || auto1Busy}<span role="status">Preparing coordinate values…</span>{/if}
+  {#if auto1Summary}<span role="status" class="auto1-summary">{auto1Summary}</span>{/if}
   {#if (!view.ready || !view.axes.latitude.ready || !view.axes.longitude.ready) && !view.busy}<button type="button" disabled={disabled} onclick={() => void editor.initialize()}>Retry coordinate display</button>{/if}
   {#each axes as axis}
     {#if view.axes[axis].error}<span id={`coordinate-error-${axis}`} role="alert">{view.axes[axis].error}</span>{/if}

@@ -644,6 +644,8 @@ func main() {
 		siteUnitSummaryExtendedWorkbook: siteUnitSummaryExtendedWorkbook,
 		subzoneMatrix:                   subzoneMatrix,
 	}
+	spatialExtraDirs := []string{"/home/bruno/Work/spatial_assets"}
+	spatialAttributor := NewPMTilesAttributor(dataDir, spatialExtraDirs...)
 	spatialService := &SpatialService{
 		contexts:               contextService,
 		coordinates:            coordinates,
@@ -652,6 +654,9 @@ func main() {
 		googleEarthKMLExport:   NewGoogleEarthKMLExportService(contextService, googleEarthKMLExportEnabled),
 		googleEarthPreferences: NewGoogleEarthPreferencesService(contextService, googleEarthPreferencesEnabled),
 		twoPageGoogleEarth:     twoPageGoogleEarth,
+		dataDir:                dataDir,
+		extraDirs:              spatialExtraDirs,
+		attributor:             spatialAttributor,
 	}
 
 	services := []application.Service{
@@ -709,9 +714,14 @@ func main() {
 					log.Printf("Warning: failed to close BECService: %v", err)
 				}
 			}
+			if spatialAttributor != nil {
+				if err := spatialAttributor.Close(); err != nil {
+					log.Printf("Warning: failed to close PMTilesAttributor: %v", err)
+				}
+			}
 		},
 		Assets: application.AssetOptions{
-			Handler: application.AssetFileServerFS(assets),
+			Handler: NewPMTilesAssetHandler(application.AssetFileServerFS(assets), dataDir, spatialExtraDirs...),
 		},
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: true,

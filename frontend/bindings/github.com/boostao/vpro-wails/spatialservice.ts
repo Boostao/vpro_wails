@@ -9,12 +9,32 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function ApplySpatialAttributes(contextID: string, request: $models.ApplySpatialAttributesRequest): $CancellablePromise<$models.ApplySpatialAttributesResult | null> {
+    return $Call.ByID(1028910256, contextID, request);
+}
+
+export function AssignSpatialAOIToSU(contextID: string, request: $models.AssignSpatialAOIToSURequest): $CancellablePromise<$models.AssignSpatialAOIToSUResult | null> {
+    return $Call.ByID(2086822246, contextID, request);
+}
+
+export function BatchAuditSpatialQA(contextID: string): $CancellablePromise<$models.SpatialBatchAuditReport | null> {
+    return $Call.ByID(3788178792, contextID);
+}
+
+export function ComputeBCGSMapSheet(lat: number, lon: number): $CancellablePromise<string> {
+    return $Call.ByID(2692800350, lat, lon);
+}
+
 export function ConvertCoordinate(axis: string, mode: $models.CoordinateMode, parts: $models.CoordinateParts): $CancellablePromise<number | null> {
     return $Call.ByID(1607614358, axis, mode, parts);
 }
 
 export function DecomposeCoordinate(value: number | null, mode: $models.CoordinateMode): $CancellablePromise<$models.CoordinateParts> {
     return $Call.ByID(2173045060, value, mode);
+}
+
+export function EvaluatePlotGeodesy(input: $models.PlotGeodesyInput): $CancellablePromise<$models.PlotGeodesyEvaluation> {
+    return $Call.ByID(3775635969, input);
 }
 
 export function ExportReviewedGoogleEarthKML(contextID: string, requestJSON: string): $CancellablePromise<$models.GoogleEarthKMLExportOutcome | null> {
@@ -45,8 +65,20 @@ export function GetGoogleEarthReview(contextID: string, requestJSON: string): $C
     return $Call.ByID(4112364392, contextID, requestJSON);
 }
 
+export function GetPMTilesManifest(): $CancellablePromise<$models.PMTilesManifest> {
+    return $Call.ByID(1328931156);
+}
+
 export function GetPlotLocationReview(contextID: string): $CancellablePromise<$models.PlotLocationReview | null> {
     return $Call.ByID(791070671, contextID);
+}
+
+export function GetSpatialPlotsFlatGeobuf(contextID: string): $CancellablePromise<string | null> {
+    return $Call.ByID(2581031038, contextID);
+}
+
+export function GetSpatialWorkbenchPayload(contextID: string): $CancellablePromise<$models.SpatialWorkbenchPayload | null> {
+    return $Call.ByID(2809273996, contextID);
 }
 
 export function GetTwoPageGoogleEarthOptions(contextID: string, plot: string, form: string): $CancellablePromise<$models.TwoPageGoogleEarthOptions | null> {
@@ -57,10 +89,26 @@ export function GetTwoPageGoogleEarthReview(contextID: string, plot: string, for
     return $Call.ByID(2579238665, contextID, plot, form, requestJSON);
 }
 
+export function ProjectNAD83LatLonToUTM(lat: number, lon: number): $CancellablePromise<$models.NAD83UTMProjection> {
+    return $Call.ByID(2175726061, lat, lon);
+}
+
+export function ProjectNAD83UTMToLatLon(zone: number, easting: number, northing: number): $CancellablePromise<$models.NAD83LatLonProjection> {
+    return $Call.ByID(2406240371, zone, easting, northing);
+}
+
 export function SaveGoogleEarthPreferences(contextID: string, requestJSON: string): $CancellablePromise<$models.GoogleEarthPreferencesOutcome | null> {
     return $Call.ByID(3530246777, contextID, requestJSON);
 }
 
+export function SelectPlotsInPolygonAOI(contextID: string, request: $models.SpatialAOISelectionRequest): $CancellablePromise<$models.SpatialAOISelectionResult | null> {
+    return $Call.ByID(1339350149, contextID, request);
+}
+
 export function SetCoordinateMode(mode: $models.CoordinateMode): $CancellablePromise<void> {
     return $Call.ByID(1519650298, mode);
+}
+
+export function SuggestSpatialAttributes(lat: number, lon: number): $CancellablePromise<$models.SpatialAttributeSuggestion | null> {
+    return $Call.ByID(1817188758, lat, lon);
 }

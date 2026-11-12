@@ -62,9 +62,17 @@ export type AccessProjectImportRequest = interchange$0.AccessProjectImportReques
 
 export type AccessProjectImportResult = interchange$0.AccessProjectImportResult;
 
+export type ApplySpatialAttributesRequest = spatial$0.ApplySpatialAttributesRequest;
+
+export type ApplySpatialAttributesResult = spatial$0.ApplySpatialAttributesResult;
+
 export type AssignPlotsToSiteUnitRequest = classification$0.AssignPlotsToSiteUnitRequest;
 
 export type AssignPlotsToSiteUnitResult = classification$0.AssignPlotsToSiteUnitResult;
+
+export type AssignSpatialAOIToSURequest = spatial$0.AssignSpatialAOIToSURequest;
+
+export type AssignSpatialAOIToSUResult = spatial$0.AssignSpatialAOIToSUResult;
 
 export type AuditEntry = vprocore$0.AuditEntry;
 
@@ -378,6 +386,10 @@ export type LongVegetationUnitPreferencesReview = vegreport$0.LongVegetationUnit
 
 export type MineralRecord = vprocore$0.MineralRecord;
 
+export type NAD83LatLonProjection = spatial$0.NAD83LatLonProjection;
+
+export type NAD83UTMProjection = spatial$0.NAD83UTMProjection;
+
 export type OrdinaryAuditReadEntry = vprocore$0.OrdinaryAuditReadEntry;
 
 export type OtherFlagUpdate = vprocore$0.OtherFlagUpdate;
@@ -387,6 +399,8 @@ export type OtherRecord = vprocore$0.OtherRecord;
 export type OtherRecordUpdate = vprocore$0.OtherRecordUpdate;
 
 export type OtherTextUpdate = vprocore$0.OtherTextUpdate;
+
+export type PMTilesManifest = spatial$0.PMTilesManifest;
 
 export type ParentCodeChoice = references$0.ParentCodeChoice;
 
@@ -411,6 +425,10 @@ export type PictureMetadataWriteResult = pictures$0.PictureMetadataWriteResult;
 export type PictureRestorationResult = pictures$0.PictureRestorationResult;
 
 export type PictureRestorationReview = pictures$0.PictureRestorationReview;
+
+export type PlotGeodesyEvaluation = spatial$0.PlotGeodesyEvaluation;
+
+export type PlotGeodesyInput = spatial$0.PlotGeodesyInput;
 
 export type PlotInspectorSummary = classification$0.PlotInspectorSummary;
 
@@ -677,6 +695,16 @@ export type SoilRecordUpdate = vprocore$0.SoilRecordUpdate;
 export type SoilSuggestion = plotentry$0.SoilSuggestion;
 
 export type SoilTextUpdate = vprocore$0.SoilTextUpdate;
+
+export type SpatialAOISelectionRequest = spatial$0.SpatialAOISelectionRequest;
+
+export type SpatialAOISelectionResult = spatial$0.SpatialAOISelectionResult;
+
+export type SpatialAttributeSuggestion = spatial$0.SpatialAttributeSuggestion;
+
+export type SpatialBatchAuditReport = spatial$0.SpatialBatchAuditReport;
+
+export type SpatialWorkbenchPayload = spatial$0.SpatialWorkbenchPayload;
 
 export type SpeciesAttributeCount = vegreport$0.SpeciesAttributeCount;
 

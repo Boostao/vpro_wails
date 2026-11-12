@@ -69,7 +69,7 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
+  let view = $state<'home' | 'plots' | 'geospatial-map' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
   let newSiviModalOpen = $state(false);
   let pictureManagerPlot = $state('');
   let plotLabelNumber = $state('');
@@ -1634,6 +1634,22 @@
               contextId={$projectState.contextId ?? ''}
               operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
               onBusyChange={(value) => { localEditorBusy = value; }}
+            />
+          {/await}
+        {/key}
+      {:else if view === 'geospatial-map' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          {#await import('./GeospatialWorkbench.svelte')}
+            <p role="status" class="p-4 text-sm">Loading 3D Geospatial Workbench...</p>
+          {:then { default: GeospatialWorkbench }}
+            <GeospatialWorkbench
+              contextId={$projectState.contextId ?? ''}
+              project={$projectState.activeProject}
+              su={$projectState.activeSU}
+              onBusyChange={(value) => { localEditorBusy = value; }}
+              onContextChanged={async () => { await refresh(); }}
+              onOpenPlot={(p) => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; }}
             />
           {/await}
         {/key}

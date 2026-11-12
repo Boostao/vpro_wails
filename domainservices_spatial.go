@@ -3,8 +3,33 @@ package main
 import (
 	"context"
 	"errors"
+
+	spatialpkg "github.com/boostao/vpro-wails/internal/spatial"
 	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 )
+
+type PMTilesArchiveStatus = spatialpkg.PMTilesArchiveStatus
+type PMTilesManifest = spatialpkg.PMTilesManifest
+type NAD83UTMProjection = spatialpkg.NAD83UTMProjection
+type NAD83LatLonProjection = spatialpkg.NAD83LatLonProjection
+type PlotGeodesyInput = spatialpkg.PlotGeodesyInput
+type PlotGeodesyEvaluation = spatialpkg.PlotGeodesyEvaluation
+type SpatialAttributeSuggestion = spatialpkg.SpatialAttributeSuggestion
+type SpatialPlotQARow = spatialpkg.SpatialPlotQARow
+type SpatialBatchAuditReport = spatialpkg.SpatialBatchAuditReport
+type ApplySpatialAttributesRequest = spatialpkg.ApplySpatialAttributesRequest
+type ApplySpatialAttributesResult = spatialpkg.ApplySpatialAttributesResult
+type SpatialPlotRecord = spatialpkg.SpatialPlotRecord
+type SpatialGeoArrowColumns = spatialpkg.SpatialGeoArrowColumns
+type SpatialWorkbenchPayload = spatialpkg.SpatialWorkbenchPayload
+type SpatialAOISelectionRequest = spatialpkg.SpatialAOISelectionRequest
+type SpatialAOIMatchedPlot = spatialpkg.SpatialAOIMatchedPlot
+type SpatialAOISelectionResult = spatialpkg.SpatialAOISelectionResult
+type AssignSpatialAOIToSURequest = spatialpkg.AssignSpatialAOIToSURequest
+type AssignSpatialAOIToSUResult = spatialpkg.AssignSpatialAOIToSUResult
+
+var NewPMTilesAssetHandler = spatialpkg.NewPMTilesAssetHandler
+var NewPMTilesAttributor = spatialpkg.NewPMTilesAttributor
 
 type SpatialService struct {
 	contexts               *ContextService
@@ -14,6 +39,9 @@ type SpatialService struct {
 	googleEarthKMLExport   *GoogleEarthKMLExportService
 	googleEarthPreferences *GoogleEarthPreferencesService
 	twoPageGoogleEarth     *TwoPageGoogleEarthService
+	dataDir                string
+	extraDirs              []string
+	attributor             *spatialpkg.PMTilesAttributor
 }
 
 func (s *SpatialService) GetCoordinateMode() (CoordinateMode, error) {
@@ -113,4 +141,124 @@ func (s *SpatialService) GetPlotLocationReview(ctx context.Context, contextID st
 		return nil, errors.New("spatial context is unavailable")
 	}
 	return s.contexts.GetPlotLocationReview(ctx, contextID)
+}
+
+func (s *SpatialService) GetPMTilesManifest(ctx context.Context) (PMTilesManifest, error) {
+	if ctx != nil {
+		if err := ctx.Err(); err != nil {
+			return PMTilesManifest{}, err
+		}
+	}
+	if s == nil {
+		return spatialpkg.BuildPMTilesManifest("", spatialpkg.DefaultSpatialAssetsDir), nil
+	}
+	return spatialpkg.BuildPMTilesManifest(s.dataDir, s.extraDirs...), nil
+}
+
+func (s *SpatialService) ProjectNAD83LatLonToUTM(ctx context.Context, lat, lon float64) (NAD83UTMProjection, error) {
+	if ctx != nil {
+		if err := ctx.Err(); err != nil {
+			return NAD83UTMProjection{}, err
+		}
+	}
+	normLat, normLon, _, _ := spatialpkg.NormalizeBCWesternCoordinates(lat, lon)
+	z, e, n, err := spatialpkg.ProjectNAD83LatLonToUTM(normLat, normLon)
+	if err != nil {
+		return NAD83UTMProjection{}, err
+	}
+	return NAD83UTMProjection{
+		Zone:        z,
+		Easting:     e,
+		Northing:    n,
+		NtsMapSheet: spatialpkg.ComputeBCGSMapSheet(normLat, normLon),
+	}, nil
+}
+
+func (s *SpatialService) ProjectNAD83UTMToLatLon(ctx context.Context, zone int, easting, northing float64) (NAD83LatLonProjection, error) {
+	if ctx != nil {
+		if err := ctx.Err(); err != nil {
+			return NAD83LatLonProjection{}, err
+		}
+	}
+	lat, lon, err := spatialpkg.ProjectNAD83UTMToLatLon(zone, easting, northing)
+	if err != nil {
+		return NAD83LatLonProjection{}, err
+	}
+	return NAD83LatLonProjection{
+		Latitude:    lat,
+		Longitude:   lon,
+		NtsMapSheet: spatialpkg.ComputeBCGSMapSheet(lat, lon),
+	}, nil
+}
+
+func (s *SpatialService) ComputeBCGSMapSheet(ctx context.Context, lat, lon float64) (string, error) {
+	if ctx != nil {
+		if err := ctx.Err(); err != nil {
+			return "", err
+		}
+	}
+	return spatialpkg.ComputeBCGSMapSheet(lat, lon), nil
+}
+
+func (s *SpatialService) EvaluatePlotGeodesy(ctx context.Context, input PlotGeodesyInput) (PlotGeodesyEvaluation, error) {
+	if ctx != nil {
+		if err := ctx.Err(); err != nil {
+			return PlotGeodesyEvaluation{}, err
+		}
+	}
+	return spatialpkg.EvaluatePlotGeodesy(input), nil
+}
+
+func (s *SpatialService) SuggestSpatialAttributes(ctx context.Context, lat, lon float64) (*SpatialAttributeSuggestion, error) {
+	if ctx != nil {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+	}
+	if s != nil && s.attributor != nil {
+		return s.attributor.SuggestSpatialAttributes(lat, lon)
+	}
+	return spatialpkg.SuggestSpatialAttributes(lat, lon)
+}
+
+func (s *SpatialService) BatchAuditSpatialQA(ctx context.Context, contextID string) (*SpatialBatchAuditReport, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("spatial context is unavailable")
+	}
+	return spatialpkg.BatchAuditSpatialQA(ctx, unwrapContextService(s.contexts), contextID, s.attributor)
+}
+
+func (s *SpatialService) ApplySpatialAttributes(ctx context.Context, contextID string, request ApplySpatialAttributesRequest) (*ApplySpatialAttributesResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("spatial context is unavailable")
+	}
+	return spatialpkg.ApplySpatialAttributes(ctx, unwrapContextService(s.contexts), contextID, request, s.attributor)
+}
+
+func (s *SpatialService) GetSpatialWorkbenchPayload(ctx context.Context, contextID string) (*SpatialWorkbenchPayload, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("spatial context is unavailable")
+	}
+	return spatialpkg.GetSpatialWorkbenchPayload(ctx, unwrapContextService(s.contexts), contextID, s.dataDir, s.extraDirs, s.attributor)
+}
+
+func (s *SpatialService) GetSpatialPlotsFlatGeobuf(ctx context.Context, contextID string) ([]byte, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("spatial context is unavailable")
+	}
+	return spatialpkg.GetSpatialPlotsFlatGeobuf(ctx, unwrapContextService(s.contexts), contextID, s.attributor)
+}
+
+func (s *SpatialService) SelectPlotsInPolygonAOI(ctx context.Context, contextID string, request SpatialAOISelectionRequest) (*SpatialAOISelectionResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("spatial context is unavailable")
+	}
+	return spatialpkg.SelectPlotsInPolygonAOI(ctx, unwrapContextService(s.contexts), contextID, request, s.attributor)
+}
+
+func (s *SpatialService) AssignSpatialAOIToSU(ctx context.Context, contextID string, request AssignSpatialAOIToSURequest) (*AssignSpatialAOIToSUResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("spatial context is unavailable")
+	}
+	return spatialpkg.AssignSpatialAOIToSU(ctx, unwrapContextService(s.contexts), contextID, request, s.attributor)
 }

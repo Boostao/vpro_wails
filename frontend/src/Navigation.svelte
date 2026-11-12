@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
+  type View = 'home' | 'plots' | 'geospatial-map' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
   type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'new-sivi' | 'metadata' };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate, siviAvailable = false, onopensivi, newSiviAvailable = false, onopennewsivi,
@@ -45,6 +45,9 @@
       { label: 'Environment', items: [
         { name: 'Long Environment', icon: TableProperties, view: import.meta.env.VITE_LONG_ENVIRONMENT_REPORT !== 'false' ? 'long-environment' : undefined },
         { name: 'Summary Environment', icon: ChartColumn, view: import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false' ? 'summary-environment' : undefined }
+      ] },
+      { label: 'Spatial', items: [
+        { name: '3D Geospatial Workbench (BGC, QA & AOI)', icon: Globe, view: 'geospatial-map' }
       ] },
       { label: 'Others', items: [
         { name: 'Subzone Matrix of Units', icon: Table, view: import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'false' ? 'subzone-matrix' : undefined },
@@ -130,6 +133,9 @@
   </button>
   <button class:current={view === 'plots'} aria-current={view === 'plots' ? 'page' : undefined} onclick={() => navigate('plots')}>
     <List size={16} aria-hidden="true" />Plots
+  </button>
+  <button class:current={view === 'geospatial-map'} aria-current={view === 'geospatial-map' ? 'page' : undefined} onclick={() => navigate('geospatial-map')}>
+    <Globe size={16} aria-hidden="true" />3D Map
   </button>
   {#each menus as menu (menu.label)}
     <details class="nav-menu" open={openMenu === menu.label}>

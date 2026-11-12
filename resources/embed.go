@@ -92,6 +92,9 @@ var FS882TwoPageLayoutJSON []byte
 //go:embed fs882-two-page-chars-layout.json
 var FS882TwoPageCHARSLayoutJSON []byte
 
+//go:embed maps/bc-overview.pmtiles
+var BCOverviewPMTiles []byte
+
 // PrefixedFS wraps an embed.FS embedded inside resources/ so callers passing
 // either "resources/foo" or "foo" resolve identically.
 type PrefixedFS struct {
