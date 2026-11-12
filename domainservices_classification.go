@@ -3,7 +3,37 @@ package main
 import (
 	"context"
 	"errors"
+
+	classificationpkg "github.com/boostao/vpro-wails/internal/classification"
 )
+
+type CreateSUTableRequest = classificationpkg.CreateSUTableRequest
+type SaveSUTableAsRequest = classificationpkg.SaveSUTableAsRequest
+type SUTableLifecycleResult = classificationpkg.SUTableLifecycleResult
+type SUPlotLeaf = classificationpkg.SUPlotLeaf
+type SUUnitBucket = classificationpkg.SUUnitBucket
+type SUPlotTree = classificationpkg.SUPlotTree
+type PlotInspectorSpecies = classificationpkg.PlotInspectorSpecies
+type PlotInspectorSummary = classificationpkg.PlotInspectorSummary
+type BECUnitPickerRequest = classificationpkg.BECUnitPickerRequest
+type BECUnitPickerChoice = classificationpkg.BECUnitPickerChoice
+type AssignPlotsToSiteUnitRequest = classificationpkg.AssignPlotsToSiteUnitRequest
+type AssignPlotsToSiteUnitResult = classificationpkg.AssignPlotsToSiteUnitResult
+type CreateSUFromEnvFieldsRequest = classificationpkg.CreateSUFromEnvFieldsRequest
+type SUFromEnvPlotPreview = classificationpkg.SUFromEnvPlotPreview
+type CreateSUFromEnvFieldsResult = classificationpkg.CreateSUFromEnvFieldsResult
+type HierarchyExplorerNode = classificationpkg.HierarchyExplorerNode
+type FlatHierarchyRow = classificationpkg.FlatHierarchyRow
+type HierarchyDiagnostics = classificationpkg.HierarchyDiagnostics
+type HierarchyExplorerView = classificationpkg.HierarchyExplorerView
+type CreateHierarchyTableRequest = classificationpkg.CreateHierarchyTableRequest
+type HierarchyTableLifecycleResult = classificationpkg.HierarchyTableLifecycleResult
+type HierarchyAddNodeRequest = classificationpkg.HierarchyAddNodeRequest
+type HierarchyRenameNodeRequest = classificationpkg.HierarchyRenameNodeRequest
+type HierarchyReparentNodeRequest = classificationpkg.HierarchyReparentNodeRequest
+type HierarchyDeleteNodeRequest = classificationpkg.HierarchyDeleteNodeRequest
+type HierarchyMutationResult = classificationpkg.HierarchyMutationResult
+type SaveFlatHierarchyRequest = classificationpkg.SaveFlatHierarchyRequest
 
 type ClassificationService struct {
 	contexts              *ContextService
@@ -289,4 +319,116 @@ func (s *ClassificationService) TransferSiteUnitEnvironment(ctx context.Context,
 		return nil, errors.New("classification context is unavailable")
 	}
 	return s.contexts.TransferSiteUnitEnvironment(ctx, contextID, request)
+}
+
+func (s *ClassificationService) CreateSUTable(ctx context.Context, contextID string, request CreateSUTableRequest) (*SUTableLifecycleResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.CreateSUTable(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) SaveSUTableAs(ctx context.Context, contextID string, request SaveSUTableAsRequest) (*SUTableLifecycleResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.SaveSUTableAs(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) GetSUPlotTree(ctx context.Context, contextID, filterText string) (*SUPlotTree, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.GetSUPlotTree(ctx, unwrapContextService(s.contexts), contextID, filterText)
+}
+
+func (s *ClassificationService) GetPlotInspectorSummary(ctx context.Context, contextID, plotNumber string) (*PlotInspectorSummary, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.GetPlotInspectorSummary(ctx, unwrapContextService(s.contexts), contextID, plotNumber)
+}
+
+func (s *ClassificationService) SearchBECUnitPicker(ctx context.Context, contextID string, request BECUnitPickerRequest) ([]BECUnitPickerChoice, error) {
+	if s == nil {
+		return nil, errors.New("classification service is unavailable")
+	}
+	return classificationpkg.SearchBECUnitPicker(ctx, unwrapContextService(s.contexts), s.bec, contextID, request)
+}
+
+func (s *ClassificationService) AssignPlotsToSiteUnit(ctx context.Context, contextID string, request AssignPlotsToSiteUnitRequest) (*AssignPlotsToSiteUnitResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.AssignPlotsToSiteUnit(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) UndoSUAssignment(ctx context.Context, contextID string, historyID int64) (*AssignPlotsToSiteUnitResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.UndoSUAssignment(ctx, unwrapContextService(s.contexts), contextID, historyID)
+}
+
+func (s *ClassificationService) CreateSUFromEnvFields(ctx context.Context, contextID string, request CreateSUFromEnvFieldsRequest) (*CreateSUFromEnvFieldsResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.CreateSUFromEnvFields(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) GetHierarchyExplorer(ctx context.Context, contextID string) (*HierarchyExplorerView, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.GetHierarchyExplorer(ctx, unwrapContextService(s.contexts), contextID)
+}
+
+func (s *ClassificationService) CreateHierarchyTable(ctx context.Context, contextID string, request CreateHierarchyTableRequest) (*HierarchyTableLifecycleResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.CreateHierarchyTable(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) AddHierarchyNode(ctx context.Context, contextID string, request HierarchyAddNodeRequest) (*HierarchyMutationResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.AddHierarchyNode(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) RenameHierarchyNode(ctx context.Context, contextID string, request HierarchyRenameNodeRequest) (*HierarchyMutationResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.RenameHierarchyNode(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) ReparentHierarchyNode(ctx context.Context, contextID string, request HierarchyReparentNodeRequest) (*HierarchyMutationResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.ReparentHierarchyNode(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) ToggleHierarchyBreakpoint(ctx context.Context, contextID string, nodeID int64) (*HierarchyMutationResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.ToggleHierarchyBreakpoint(ctx, unwrapContextService(s.contexts), contextID, nodeID)
+}
+
+func (s *ClassificationService) DeleteHierarchyNode(ctx context.Context, contextID string, request HierarchyDeleteNodeRequest) (*HierarchyMutationResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.DeleteHierarchyNode(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) SaveFlatHierarchyRows(ctx context.Context, contextID string, request SaveFlatHierarchyRequest) (*HierarchyMutationResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return classificationpkg.SaveFlatHierarchyRows(ctx, unwrapContextService(s.contexts), contextID, request)
 }

@@ -3,7 +3,25 @@ package main
 import (
 	"context"
 	"errors"
+
+	vegreportpkg "github.com/boostao/vpro-wails/internal/vegreport"
 )
+
+type SiteUnitExclusionRule = vegreportpkg.SiteUnitExclusionRule
+type ExcludedSiteUnitInfo = vegreportpkg.ExcludedSiteUnitInfo
+type RetainedSiteUnitInfo = vegreportpkg.RetainedSiteUnitInfo
+type SiteUnitExclusionSummary = vegreportpkg.SiteUnitExclusionSummary
+type HierarchyBreakpointOptions = vegreportpkg.HierarchyBreakpointOptions
+type HierarchyBreakpointUnitMapping = vegreportpkg.HierarchyBreakpointUnitMapping
+type HierarchyBreakpointBucket = vegreportpkg.HierarchyBreakpointBucket
+type HierarchyBreakpointResolution = vegreportpkg.HierarchyBreakpointResolution
+type HierarchyBreakpointRequest = vegreportpkg.HierarchyBreakpointRequest
+type SiteUnitExclusionPreviewRequest = vegreportpkg.SiteUnitExclusionPreviewRequest
+type SiteUnitExclusionPreview = vegreportpkg.SiteUnitExclusionPreview
+type SummaryVegetationExclusionRequest = vegreportpkg.SummaryVegetationExclusionRequest
+type SummaryVegetationExclusionPreview = vegreportpkg.SummaryVegetationExclusionPreview
+type LongVegetationExclusionRequest = vegreportpkg.LongVegetationExclusionRequest
+type LongVegetationExclusionPreview = vegreportpkg.LongVegetationExclusionPreview
 
 type VegetationReportService struct {
 	contexts                       *ContextService
@@ -478,4 +496,38 @@ func (s *VegetationReportService) PreviewSpeciesAttributeSummary(ctx context.Con
 		return SpeciesAttributeSummaryPreview{}, errors.New("species attribute summary service is unavailable")
 	}
 	return s.speciesAttributeSummary.Preview(ctx, contextID)
+}
+
+// SiteUnit Exclusion Filters (.support, .poor, .nudum) & Dynamic Hierarchy Breakpoint (~) delegates
+
+func (s *VegetationReportService) GetDefaultSiteUnitExclusions() []string {
+	return vegreportpkg.DefaultSiteUnitExclusionPatterns()
+}
+
+func (s *VegetationReportService) PreviewSiteUnitExclusions(ctx context.Context, contextID string, request SiteUnitExclusionPreviewRequest) (*SiteUnitExclusionPreview, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("vegetation report context is unavailable")
+	}
+	return vegreportpkg.PreviewSiteUnitExclusions(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *VegetationReportService) ResolveHierarchyBreakpointUnits(ctx context.Context, contextID string, request HierarchyBreakpointRequest) (*HierarchyBreakpointResolution, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("vegetation report context is unavailable")
+	}
+	return vegreportpkg.ResolveHierarchyBreakpointUnits(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *VegetationReportService) PreviewSummaryVegetationWithExclusions(ctx context.Context, contextID string, request SummaryVegetationExclusionRequest) (*SummaryVegetationExclusionPreview, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("vegetation report context is unavailable")
+	}
+	return vegreportpkg.PreviewSummaryVegetationWithExclusions(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *VegetationReportService) PreviewLongVegetationWithExclusions(ctx context.Context, contextID string, request LongVegetationExclusionRequest) (*LongVegetationExclusionPreview, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("vegetation report context is unavailable")
+	}
+	return vegreportpkg.PreviewLongVegetationWithExclusions(ctx, unwrapContextService(s.contexts), contextID, request)
 }
