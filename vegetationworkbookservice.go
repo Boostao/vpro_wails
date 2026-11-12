@@ -20,11 +20,6 @@ type VegetationWorkbookSummary struct {
 	VersionDefinitions ProjectMetadataTable `json:"versionDefinitions"`
 }
 
-type VegetationWorkbookSheet struct {
-	Unit ProjectMetadataCell `json:"unit"`
-	Name string              `json:"name"`
-}
-
 type VegetationWorkbookSkippedUnit struct {
 	Unit   ProjectMetadataCell `json:"unit"`
 	Reason string              `json:"reason"`

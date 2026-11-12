@@ -5,7 +5,6 @@ import (
 	"errors"
 )
 
-const siviCHARSParentEntryHistoryTable = "__VPRO_SIVICHARSParentEntryHistory"
 const siviCHARSParentEntryHistorySQL = `CREATE TABLE "__VPRO_SIVICHARSParentEntryHistory"(ID INTEGER PRIMARY KEY,Created TEXT NOT NULL,Proposal TEXT NOT NULL,Restored TEXT)`
 
 var siviCHARSParentEntryHistory = siviParentHistoryDomain{

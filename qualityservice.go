@@ -3,21 +3,20 @@ package main
 import (
 	"context"
 	"database/sql"
-	_ "embed"
+
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"github.com/boostao/vpro-wails/resources"
 	"math"
 	"os"
 	"path/filepath"
 	"sync"
 )
 
-//go:embed resources/plot-quality-site.db
-var qualityDatabase []byte
+var qualityDatabase = resources.PlotQualitySiteDB
 
-//go:embed resources/plot-quality-site-provenance.json
-var qualityProvenanceJSON []byte
+var qualityProvenanceJSON = resources.PlotQualitySiteProvenanceJSON
 
 type PlotQualityChoice struct {
 	RowID         string   `json:"rowId"`

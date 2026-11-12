@@ -10,27 +10,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
-	"sync"
 )
-
-const (
-	longVegetationProjectScopeFeatureEnvironment = "VPRO_LONG_VEGETATION_PROJECT_SCOPE"
-	vegetationSelectedListScope                  = "selected-list"
-	vegetationProjectFieldsScope                 = "project-selected-fields"
-	vegetationProjectAllScope                    = "project-all-plots"
-)
-
-type LongVegetationProjectUnit struct {
-	EnvRowID   string              `json:"envRowId"`
-	AdminRowID *string             `json:"adminRowId"`
-	PlotNumber ProjectMetadataCell `json:"plotNumber"`
-	SiteUnit   ProjectMetadataCell `json:"siteUnit"`
-}
-
-type LongVegetationProjectBuild struct {
-	ApprovalHash  string                      `json:"approvalHash"`
-	ProjectTuples []LongVegetationProjectUnit `json:"projectTuples"`
-}
 
 type LongVegetationReportScope struct {
 	ContextID    string                      `json:"contextId"`
@@ -61,52 +41,6 @@ func (request *vegetationScopeRequest) UnmarshalJSON(data []byte) error {
 		return errors.New("Long Vegetation report scope requires its exact explicit source kind")
 	}
 	*request = vegetationScopeRequest(decoded)
-	return nil
-}
-
-type vegetationProjectScopeEntry struct {
-	revision   int64
-	sourceKind string
-	fields     []string
-	build      *LongVegetationProjectBuild
-}
-
-type vegetationProjectScopeLedger struct {
-	mu      sync.Mutex
-	entries map[string]vegetationProjectScopeEntry
-}
-
-func cloneProjectScopeEntry(entry vegetationProjectScopeEntry) vegetationProjectScopeEntry {
-	if entry.sourceKind == "" {
-		entry.sourceKind = vegetationSelectedListScope
-	}
-	entry.fields = append([]string{}, entry.fields...)
-	if entry.build != nil {
-		build := &LongVegetationProjectBuild{ApprovalHash: entry.build.ApprovalHash,
-			ProjectTuples: make([]LongVegetationProjectUnit, len(entry.build.ProjectTuples))}
-		for i, row := range entry.build.ProjectTuples {
-			row.AdminRowID = cloneCatalogueValue(row.AdminRowID)
-			row.PlotNumber, row.SiteUnit = cloneSiteUnitCell(row.PlotNumber), cloneSiteUnitCell(row.SiteUnit)
-			build.ProjectTuples[i] = row
-		}
-		entry.build = build
-	}
-	return entry
-}
-
-func (ledger *vegetationProjectScopeLedger) read(contextID string) vegetationProjectScopeEntry {
-	ledger.mu.Lock()
-	defer ledger.mu.Unlock()
-	return cloneProjectScopeEntry(ledger.entries[contextID])
-}
-
-func (s *ContextService) requireSelectedListReportScope(contextID string) error {
-	s.projectReportScopes.mu.Lock()
-	kind := s.projectReportScopes.entries[contextID].sourceKind
-	s.projectReportScopes.mu.Unlock()
-	if kind != "" && kind != vegetationSelectedListScope {
-		return errors.New("Long Vegetation has an explicit project report scope; this selected-list consumer is unavailable")
-	}
 	return nil
 }
 

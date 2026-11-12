@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-	"unicode/utf8"
 )
 
 const googleEarthReviewFeatureEnvironment = "VPRO_GOOGLE_EARTH_REVIEW"
@@ -84,15 +83,6 @@ func (s *GoogleEarthReviewService) requireReview(ctx context.Context) error {
 	}
 	if s.contexts == nil {
 		return errors.New("Google Earth review context service is unavailable")
-	}
-	return nil
-}
-
-func validateGoogleEarthReviewStrings(values ...string) error {
-	for _, value := range values {
-		if !utf8.ValidString(value) {
-			return errors.New("Google Earth review requires valid UTF-8; no transport text was repaired")
-		}
 	}
 	return nil
 }

@@ -10,8 +10,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"unicode/utf16"
-	"unicode/utf8"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -24,45 +22,6 @@ type EnvironmentWorkbookSheet struct {
 type environmentWorkbook struct {
 	Bytes  []byte
 	Sheets []EnvironmentWorkbookSheet
-}
-
-func environmentWorkbookText(value string) error {
-	if !utf8.ValidString(value) || len(utf16.Encode([]rune(value))) > 32767 {
-		return errors.New("workbook text requires valid Unicode within Excel's 32767 UTF-16 units; no truncation")
-	}
-	for _, r := range value {
-		if r != '\t' && r != '\n' && r != '\r' && (r < 0x20 || r == 0xfffe || r == 0xffff) {
-			return errors.New("workbook text contains an unsupported XML character; no replacement")
-		}
-	}
-	return nil
-}
-
-func environmentWorkbookSheetName(code string, index int) (string, error) {
-	if err := environmentWorkbookText(code); err != nil {
-		return "", err
-	}
-	name := code
-	if name == "" {
-		name = fmt.Sprintf("NoName%d", index)
-	}
-	units := utf16.Encode([]rune(name))
-	if len(units) > 31 {
-		if units[30] >= 0xd800 && units[30] <= 0xdbff {
-			return "", errors.New("source 31-unit worksheet truncation would split Unicode; choose a valid unit name explicitly")
-		}
-		name = string(utf16.Decode(units[:31]))
-	}
-	name = strings.Map(func(r rune) rune {
-		if strings.ContainsRune(`:/\[]*?`, r) {
-			return '-'
-		}
-		return r
-	}, name)
-	if strings.HasPrefix(name, "'") || strings.HasSuffix(name, "'") || strings.EqualFold(name, "_VPRO_Source") {
-		return "", errors.New("worksheet name conflicts with Excel/provenance rules; no implicit identity change")
-	}
-	return name, nil
 }
 
 func prepareLongEnvironmentWorkbook(ctx context.Context, report EnvironmentReport) (result environmentWorkbook, resultErr error) {

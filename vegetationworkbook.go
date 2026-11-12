@@ -22,11 +22,6 @@ type vegetationWorkbookLayout struct {
 	Summary            *vegetationWorkbookSummary
 }
 
-type vegetationWorkbookSheet struct {
-	Unit ProjectMetadataCell
-	Name string
-}
-
 type vegetationWorkbookSkippedUnit struct {
 	Unit   ProjectMetadataCell
 	Reason string

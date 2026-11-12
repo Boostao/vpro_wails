@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"database/sql"
-	_ "embed"
+
 	"errors"
 	"fmt"
+	"github.com/boostao/vpro-wails/resources"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -13,11 +14,9 @@ import (
 	"sync"
 )
 
-//go:embed resources/working-unit.db
-var workingUnitDatabase []byte
+var workingUnitDatabase = resources.WorkingUnitDB
 
-//go:embed resources/working-unit-provenance.json
-var workingUnitProvenanceJSON []byte
+var workingUnitProvenanceJSON = resources.WorkingUnitProvenanceJSON
 
 type WorkingUnitChoice struct {
 	RowID          string  `json:"rowId"`

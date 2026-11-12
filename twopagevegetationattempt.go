@@ -3,20 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"sync"
 )
-
-type twoPageVegetationAttempt struct {
-	payload string
-	active  int
-	sealed  bool
-}
-
-type twoPageVegetationAttemptLedger struct {
-	mu       sync.Mutex
-	requests map[string]*twoPageVegetationAttempt
-}
 
 type TwoPageVegetationAttemptOutcome struct {
 	ContextID   string                        `json:"contextId"`
@@ -27,33 +14,13 @@ type TwoPageVegetationAttemptOutcome struct {
 	Receipt     *TwoPageVegetationWriteResult `json:"receipt"`
 }
 
-func (ledger *twoPageVegetationAttemptLedger) entry(request twoPageVegetationRequest) (*twoPageVegetationAttempt, error) {
-	raw, err := json.Marshal(request)
-	if err != nil {
-		return nil, err
-	}
-	payload := string(raw)
-	if ledger.requests == nil {
-		ledger.requests = map[string]*twoPageVegetationAttempt{}
-	}
-	if existing := ledger.requests[request.RequestID]; existing != nil {
-		if existing.payload != payload {
-			return nil, errors.New("two-page vegetation UUID already belongs to another exact request payload")
-		}
-		return existing, nil
-	}
-	entry := &twoPageVegetationAttempt{payload: payload}
-	ledger.requests[request.RequestID] = entry
-	return entry, nil
-}
-
 func (s *ContextService) beginTwoPageVegetationAttempt(ctx context.Context, request twoPageVegetationRequest) (bool, error) {
 	ledger := &s.twoPageVegetationAttempts
 	if err := acquireMutexLease(ctx, &ledger.mu); err != nil {
 		return false, err
 	}
 	defer ledger.mu.Unlock()
-	entry, err := ledger.entry(request)
+	entry, err := ledger.entry(request.RequestID, request)
 	if err != nil {
 		return false, err
 	}
@@ -89,7 +56,7 @@ func (s *TwoPageVegetationService) recoverTwoPageVegetationOutcome(ctx context.C
 		return nil, err
 	}
 	defer ledger.mu.Unlock()
-	entry, err := ledger.entry(request)
+	entry, err := ledger.entry(request.RequestID, request)
 	if err != nil {
 		return nil, err
 	}

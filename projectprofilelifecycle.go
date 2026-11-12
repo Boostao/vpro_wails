@@ -1,10 +1,9 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
-	"encoding/json"
+
 	"errors"
 	"fmt"
 	"math"
@@ -22,28 +21,6 @@ type ProjectPlotProfileDeletion struct {
 	OriginalRules ProjectMetadataTable `json:"originalRules"`
 	RowID         string               `json:"rowId"`
 	Confirmed     bool                 `json:"confirmed"`
-}
-
-func decodeProfileLifecycleJSON(data []byte, target any, required ...string) error {
-	if err := validateMetadataDraftJSON(data); err != nil {
-		return fmt.Errorf("profile lifecycle JSON: %w", err)
-	}
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(target); err != nil {
-		return err
-	}
-	var properties map[string]json.RawMessage
-	if err := json.Unmarshal(data, &properties); err != nil {
-		return err
-	}
-	for _, name := range required {
-		value, present := properties[name]
-		if !present || bytes.Equal(bytes.TrimSpace(value), []byte("null")) {
-			return fmt.Errorf("profile lifecycle requires explicit non-NULL %s", name)
-		}
-	}
-	return nil
 }
 
 func (request *ProjectPlotProfileCreation) UnmarshalJSON(data []byte) error {

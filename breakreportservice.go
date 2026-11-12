@@ -5,8 +5,6 @@ import (
 	"errors"
 )
 
-const breakReportReviewEnvironment = "VPRO_BREAK_REPORT_REVIEW"
-
 type BreakReportService struct {
 	contexts *ContextService
 	enabled  bool

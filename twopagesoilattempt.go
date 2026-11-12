@@ -3,21 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"reflect"
-	"sync"
 )
-
-type twoPageSoilAttempt struct {
-	request twoPageSoilRequest
-	active  int
-	sealed  bool
-}
-
-type twoPageSoilAttemptLedger struct {
-	mu       sync.Mutex
-	requests map[string]*twoPageSoilAttempt
-}
 
 type TwoPageSoilAttemptOutcome struct {
 	ContextID   string                  `json:"contextId"`
@@ -28,29 +14,13 @@ type TwoPageSoilAttemptOutcome struct {
 	Receipt     *TwoPageSoilWriteResult `json:"receipt"`
 }
 
-func (ledger *twoPageSoilAttemptLedger) entry(request twoPageSoilRequest) (*twoPageSoilAttempt, error) {
-	if ledger.requests == nil {
-		ledger.requests = map[string]*twoPageSoilAttempt{}
-	}
-	existing := ledger.requests[request.RequestID]
-	if existing != nil {
-		if !reflect.DeepEqual(existing.request, request) {
-			return nil, errors.New("two-page soil UUID already belongs to another exact request payload")
-		}
-		return existing, nil
-	}
-	entry := &twoPageSoilAttempt{request: request}
-	ledger.requests[request.RequestID] = entry
-	return entry, nil
-}
-
 func (s *ContextService) beginTwoPageSoilAttempt(ctx context.Context, request twoPageSoilRequest) (bool, error) {
 	ledger := &s.twoPageSoilAttempts
 	if err := acquireMutexLease(ctx, &ledger.mu); err != nil {
 		return false, err
 	}
 	defer ledger.mu.Unlock()
-	entry, err := ledger.entry(request)
+	entry, err := ledger.entry(request.RequestID, request)
 	if err != nil {
 		return false, err
 	}
@@ -86,7 +56,7 @@ func (s *TwoPageSoilService) recoverTwoPageSoilOutcome(ctx context.Context, cont
 		return nil, err
 	}
 	defer ledger.mu.Unlock()
-	entry, err := ledger.entry(request)
+	entry, err := ledger.entry(request.RequestID, request)
 	if err != nil {
 		return nil, err
 	}

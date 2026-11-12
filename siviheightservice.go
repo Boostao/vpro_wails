@@ -3,31 +3,12 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 )
 
 const siviHeightFeatureEnvironment = "VPRO_SIVI_HEIGHT_EDITING"
 
 func siviHeightFeature(lookup func(string) (string, bool)) (bool, error) {
 	return siviFeature(siviHeightFeatureEnvironment, lookup)
-}
-
-func siviFeature(name string, lookup func(string) (string, bool)) (bool, error) {
-	value, present := lookup(name)
-	if !present {
-		if name == breakReportReviewEnvironment || name == "VPRO_SIVI_CHARS_PARENT_ENTRY" {
-			return false, nil
-		}
-		return true, nil
-	}
-	switch value {
-	case "true":
-		return true, nil
-	case "false":
-		return false, nil
-	default:
-		return false, fmt.Errorf("%s requires literal true or false", name)
-	}
 }
 
 func (s *ContextService) requireSIVIHeights(ctx context.Context) error {

@@ -69,17 +69,6 @@ func NewGoogleEarthPreferencesService(contexts *ContextService, enabled bool) *G
 	return &GoogleEarthPreferencesService{contexts: contexts, enabled: enabled}
 }
 
-func withOwnedPreferenceSnapshot[T any](ctx context.Context, plots *PlotService, hooks publicationReadSnapshotHooks,
-	read func(*sqliteContext, *sql.Tx) (T, error)) (T, error) {
-	owner := plots.projects.sqlite
-	if err := acquireMutexLease(ctx, &owner.mu); err != nil {
-		var zero T
-		return zero, err
-	}
-	defer owner.mu.Unlock()
-	return withPublicationReadSnapshot(ctx, owner, hooks, func(tx *sql.Tx) (T, error) { return read(owner, tx) })
-}
-
 func (s *GoogleEarthPreferencesService) require(ctx context.Context, contextID string) error {
 	if ctx == nil {
 		return errors.New("Google Earth preferences require a context")

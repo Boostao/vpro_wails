@@ -2,18 +2,17 @@ package main
 
 import (
 	"context"
-	_ "embed"
+
 	"errors"
 	"sync"
 
 	"github.com/boostao/vpro-wails/internal/listcatalog"
+	"github.com/boostao/vpro-wails/resources"
 )
 
-//go:embed resources/region-codes.db
-var regionCodeDatabase []byte
+var regionCodeDatabase = resources.RegionCodesDB
 
-//go:embed resources/region-codes-provenance.json
-var regionCodeProvenanceJSON []byte
+var regionCodeProvenanceJSON = resources.RegionCodesProvenanceJSON
 
 type RegionCodeChoice listcatalog.Choice
 

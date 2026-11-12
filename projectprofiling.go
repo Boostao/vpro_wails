@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"os"
+
 	"reflect"
 	"strings"
 	"unicode/utf8"
@@ -49,19 +49,6 @@ func readProjectProfileLump(ctx context.Context, c *sqliteContext) (ProjectMetad
 		return ProjectMetadataTable{}, fmt.Errorf("explicit project-local lump table unavailable: %w", err)
 	}
 	return readSQLiteStorageRows(ctx, c.conn, "project", table, "", nil, "")
-}
-
-func profileOwnedFiles(c *sqliteContext) error {
-	for role, path := range c.attachments {
-		info, err := os.Stat(path)
-		if err != nil {
-			return err
-		}
-		if !os.SameFile(info, c.attachmentInfo[role]) {
-			return fmt.Errorf("profile %s file identity changed; reload the context", role)
-		}
-	}
-	return nil
 }
 
 func (s *ContextService) RunProjectPlotProfile(ctx context.Context, contextID string, request ProjectPlotProfileRunRequest) (ProjectPlotProfileResult, error) {
@@ -242,30 +229,7 @@ func queryProfilePlots(ctx context.Context, db interface {
 	return plots, nil
 }
 
-func profileDriverNull(value any) bool {
-	// go-sqlite3's generic function argument represents SQL NULL as a nil []byte.
-	blob, isBlob := value.([]byte)
-	return value == nil || isBlob && blob == nil
-}
-
-func profileNumeric(value any) (any, error) {
-	if profileDriverNull(value) {
-		return nil, nil
-	}
-	var number float64
-	switch value := value.(type) {
-	case int64:
-		number = float64(value)
-	case float64:
-		number = value
-	default:
-		return nil, errors.New("profile numeric storage is not numeric; historical values were not coerced")
-	}
-	if math.IsNaN(number) || math.IsInf(number, 0) {
-		return nil, errors.New("profile numeric value is not finite")
-	}
-	return number, nil
-}
+// go-sqlite3's generic function argument represents SQL NULL as a nil []byte.
 
 func profileMax(values ...any) (float64, error) {
 	var maximum float32

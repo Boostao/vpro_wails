@@ -170,26 +170,3 @@ func googleEarthKMLExportOutcome(requested string, result artifactPublication, e
 		Path: receipt.Path, SHA256: receipt.SHA256, ErrorMessage: receipt.ErrorMessage,
 	}
 }
-
-type artifactPublicationReceipt struct {
-	Status, RequestedDestination, Path, SHA256, ErrorMessage string
-}
-
-func artifactPublicationOutcome(requested string, result artifactPublication, err error, label string) artifactPublicationReceipt {
-	outcome := artifactPublicationReceipt{RequestedDestination: requested, Path: result.Path, SHA256: result.SHA256}
-	switch {
-	case result.Published && err == nil:
-		outcome.Status = "published"
-	case result.Published:
-		outcome.Status = "published-with-errors"
-	case err != nil:
-		outcome.Status = "not-published"
-	default:
-		outcome.Status = "not-published"
-		err = fmt.Errorf("%s publication returned no committed artifact", label)
-	}
-	if err != nil {
-		outcome.ErrorMessage = err.Error()
-	}
-	return outcome
-}

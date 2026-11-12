@@ -4,13 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"regexp"
+
 	"slices"
 	"strconv"
 	"strings"
 )
 
-var profileDecimal = regexp.MustCompile(`^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$`)
 var profileCovers = []string{"Cover1", "Cover2", "Cover3", "Cover4", "Cover5", "Cover5a", "Cover5b", "Cover5c", "Cover6", "Cover7"}
 
 type plotProfileRule struct {

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	"embed"
+
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,11 +16,11 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/boostao/vpro-wails/resources"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-//go:embed resources/Sample.db
-var sampleFiles embed.FS
+var sampleFiles = resources.SampleFiles
 
 var projectNamePattern = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_]{0,30}$`)
 var coreTables = []string{"Admin", "Audit", "Env", "Humus", "Metadata", "Mineral", "Other", "Veg"}
@@ -88,48 +88,6 @@ type ProjectService struct {
 	sqlite          *sqliteContext
 	supportPaths    map[string]string
 	contextID       string
-}
-
-func userDataDir() (string, error) {
-	if directory := os.Getenv("VPRO_DATA_DIR"); directory != "" {
-		return filepath.Abs(directory)
-	}
-	if runtime.GOOS == "windows" {
-		if directory := os.Getenv("LOCALAPPDATA"); directory != "" {
-			return filepath.Join(directory, "vpro"), nil
-		}
-	}
-	if runtime.GOOS == "darwin" {
-		directory, err := os.UserConfigDir()
-		if err != nil {
-			return "", err
-		}
-		return filepath.Join(directory, "vpro"), nil
-	}
-	if runtime.GOOS == "linux" {
-		if directory := os.Getenv("XDG_DATA_HOME"); directory != "" {
-			return filepath.Join(directory, "vpro"), nil
-		}
-	}
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	if runtime.GOOS == "windows" {
-		return filepath.Join(home, "AppData", "Local", "vpro"), nil
-	}
-	return filepath.Join(home, ".local", "share", "vpro"), nil
-}
-
-func userConfigDir() (string, error) {
-	if directory := os.Getenv("VPRO_CONFIG_DIR"); directory != "" {
-		return filepath.Abs(directory)
-	}
-	directory, err := os.UserConfigDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(directory, "vpro"), nil
 }
 
 func NewProjectService(root string) (*ProjectService, error) {
@@ -448,32 +406,6 @@ func (service *ProjectService) discoverSUsContext(ctx context.Context, project P
 		sus = append(sus, su)
 	}
 	return sus, nil
-}
-
-func openReadOnly(path string) (*sql.DB, error) {
-	return openReadOnlyContext(context.Background(), path)
-}
-
-func openReadOnlyContext(ctx context.Context, path string) (*sql.DB, error) {
-	if err := ctx.Err(); err != nil {
-		return nil, err
-	}
-	absolute, err := filepath.Abs(path)
-	if err != nil {
-		return nil, err
-	}
-	database, err := sql.Open("sqlite3", sqliteFileURI(absolute, "ro"))
-	if err == nil {
-		database.SetMaxOpenConns(1)
-		err = database.PingContext(ctx)
-	}
-	if err != nil {
-		if database != nil {
-			database.Close()
-		}
-		return nil, err
-	}
-	return database, nil
 }
 
 func inspectFile(path string) ([]ProjectInfo, error) {

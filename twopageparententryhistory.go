@@ -6,10 +6,6 @@ import (
 	"reflect"
 )
 
-func twoPageEntryProjectHistoryTable(table string) bool {
-	return table == "__VPRO_TwoPageParentEntryHistory" || table == "__VPRO_TwoPageCHARSParentEntryHistory"
-}
-
 func twoPageEntryHistoryAssignments(ctx context.Context, form string, masterAllowed bool,
 	event siviParentHistory, project, plot string) ([]siviParentScalarAssignment, error) {
 	if event.Original == nil || event.Committed == nil || event.Original.Form != form || event.Committed.Form != form {

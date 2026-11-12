@@ -130,11 +130,6 @@ var headerFields = []headerField{
 	{"locked", "Locked", "", ""},
 }
 
-type headerDB interface {
-	Query(string, ...any) (*sql.Rows, error)
-	QueryRow(string, ...any) *sql.Row
-}
-
 func quoteHeaderIdentifier(name string) string {
 	return `"` + strings.ReplaceAll(name, `"`, `""`) + `"`
 }

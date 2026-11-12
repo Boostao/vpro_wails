@@ -84,44 +84,6 @@ func planEnvironmentSiteUnits(env, admin, su ProjectMetadataTable) ([]Environmen
 	return changes, nil
 }
 
-func siteUnitTransferIndex(table ProjectMetadataTable, column int) (map[string][]ProjectMetadataRow, error) {
-	result := map[string][]ProjectMetadataRow{}
-	for _, row := range table.Rows {
-		cell := row.Cells[column]
-		if _, err := metadataCellValue(cell); err != nil {
-			return nil, err
-		}
-		if cell.Storage == "null" {
-			continue
-		}
-		if cell.Storage != "text" {
-			return nil, errors.New("transfer identities require original text storage; no coercion")
-		}
-		result[*cell.Text] = append(result[*cell.Text], row)
-	}
-	return result, nil
-}
-
-func cloneSiteUnitCell(cell ProjectMetadataCell) ProjectMetadataCell {
-	if cell.Text != nil {
-		text := *cell.Text
-		cell.Text = &text
-	}
-	if cell.Integer != nil {
-		integer := *cell.Integer
-		cell.Integer = &integer
-	}
-	if cell.Real != nil {
-		real := *cell.Real
-		cell.Real = &real
-	}
-	if cell.BlobHex != nil {
-		blob := *cell.BlobHex
-		cell.BlobHex = &blob
-	}
-	return cell
-}
-
 type EnvironmentSiteUnitReview struct {
 	ContextID   string                      `json:"contextId"`
 	Project     string                      `json:"project"`
@@ -243,26 +205,6 @@ func (s *ContextService) ReviewEnvironmentSiteUnits(ctx context.Context, context
 	})
 }
 
-func environmentSiteUnitTables(ctx context.Context, tx *sql.Tx) (map[string]ProjectMetadataTable, error) {
-	schema, err := readSQLiteStorageRows(ctx, tx, "main", "sqlite_master", "", nil, "")
-	if err != nil {
-		return nil, err
-	}
-	tables := map[string]ProjectMetadataTable{"sqlite_master": schema}
-	for _, row := range schema.Rows {
-		if row.Cells[0].Text == nil || *row.Cells[0].Text != "table" {
-			continue
-		}
-		name := *row.Cells[1].Text
-		table, err := readSQLiteStorageRows(ctx, tx, "main", name, "", nil, "")
-		if err != nil {
-			return nil, err
-		}
-		tables[name] = table
-	}
-	return tables, nil
-}
-
 func (s *ContextService) TransferEnvironmentSiteUnits(ctx context.Context, contextID string, request EnvironmentSiteUnitTransfer) (*EnvironmentSiteUnitResult, error) {
 	return withContextPlotRequest(ctx, s, contextID, func(plots *PlotService) (*EnvironmentSiteUnitResult, error) {
 		if !request.Confirmed || request.Review.ContextID != contextID || len(request.Review.Changes) == 0 {
@@ -367,68 +309,4 @@ func (s *ContextService) TransferEnvironmentSiteUnits(ctx context.Context, conte
 		}
 		return result, nil
 	})
-}
-
-func siteUnitTransferColumns(table ProjectMetadataTable, required ...string) (map[string]int, error) {
-	index := map[string]int{}
-	for i, column := range table.Columns {
-		if _, duplicate := index[column.Name]; duplicate || column.Name == "" {
-			return nil, errors.New("transfer schema has missing or ambiguous column identities")
-		}
-		index[column.Name] = i
-	}
-	for _, name := range required {
-		if _, present := index[name]; !present {
-			return nil, fmt.Errorf("transfer requires original %s column", name)
-		}
-	}
-	seen := map[string]bool{}
-	for _, row := range table.Rows {
-		id, err := strconv.ParseInt(row.RowID, 10, 64)
-		if err != nil || strconv.FormatInt(id, 10) != row.RowID || seen[row.RowID] || len(row.Cells) != len(table.Columns) {
-			return nil, errors.New("transfer requires complete rows with distinct exact signed64 physical identities")
-		}
-		seen[row.RowID] = true
-	}
-	return index, nil
-}
-
-func verifySiteUnitTransferTables(original, observed, expected map[string]ProjectMetadataTable, history string) error {
-	for name, before := range original {
-		if planned, changed := expected[name]; changed {
-			before = planned
-		}
-		switch name {
-		case history:
-			after := observed[name]
-			if !reflect.DeepEqual(after.Columns, before.Columns) || len(after.Rows) != len(before.Rows)+1 ||
-				!reflect.DeepEqual(after.Rows[:len(before.Rows)], before.Rows) {
-				return errors.New("original SU transfer history changed; all changes rolled back")
-			}
-			continue
-		case "sqlite_master":
-			filter := func(schema ProjectMetadataTable) ProjectMetadataTable {
-				schema.Rows = append([]ProjectMetadataRow(nil), schema.Rows...)
-				rows := schema.Rows[:0]
-				for _, row := range schema.Rows {
-					if row.Cells[2].Text == nil || *row.Cells[2].Text != history {
-						rows = append(rows, row)
-					}
-				}
-				schema.Rows = rows
-				return schema
-			}
-			if !reflect.DeepEqual(filter(observed[name]), filter(before)) {
-				return errors.New("original project schema changed during SU transfer; all changes rolled back")
-			}
-			continue
-		}
-		if !reflect.DeepEqual(observed[name], before) {
-			return fmt.Errorf("project table %s differs from the reviewed SU transfer plan; all changes rolled back", name)
-		}
-	}
-	if len(observed) != len(original) && !(len(observed) == len(original)+1 && original[history].Columns == nil) {
-		return errors.New("SU transfer introduced unexpected project tables; all changes rolled back")
-	}
-	return nil
 }

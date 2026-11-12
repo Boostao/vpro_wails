@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"unicode/utf16"
+
 	"unicode/utf8"
 )
 
@@ -37,19 +37,6 @@ func validateQualityRestoreValue(table, column string, value any) error {
 			return fmt.Errorf("%s audit restore requires a nullable string", column)
 		}
 		return validateQualityValue(column, &text)
-	}
-	return nil
-}
-
-func validateQualityValue(name string, value *string) error {
-	if value == nil {
-		return nil
-	}
-	if !utf8.ValidString(*value) {
-		return fmt.Errorf("%s must contain valid Unicode (invalid UTF-8)", name)
-	}
-	if *value == "" || len(utf16.Encode([]rune(*value))) > 15 {
-		return fmt.Errorf("%s must be NULL or a nonempty string of at most 15 UTF-16 units", name)
 	}
 	return nil
 }
@@ -130,94 +117,4 @@ func (h *FS882Header) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, (*headerAlias)(h))
 }
 
-func validateJSONTextProperties(data []byte, names map[string]string) error {
-	var syntax json.RawMessage
-	if err := json.Unmarshal(data, &syntax); err != nil {
-		return err
-	}
-	if len(syntax) == 0 || syntax[0] != '{' {
-		return nil
-	}
-	decoder := json.NewDecoder(strings.NewReader(string(data)))
-	token, err := decoder.Token()
-	if err != nil {
-		return err
-	}
-	if token == nil {
-		return nil
-	}
-	for decoder.More() {
-		key, err := decoder.Token()
-		if err != nil {
-			return err
-		}
-		var raw json.RawMessage
-		if err := decoder.Decode(&raw); err != nil {
-			return err
-		}
-		name, ok := key.(string)
-		if !ok {
-			continue
-		}
-		for property, label := range names {
-			if strings.EqualFold(name, property) {
-				if err := validateQualityJSONToken(raw); err != nil {
-					return fmt.Errorf("%s: %w", label, err)
-				}
-				break
-			}
-		}
-	}
-	return nil
-}
-
-func validateQualityJSONToken(raw []byte) error {
-	if len(raw) == 0 || raw[0] != '"' {
-		return nil // The standard decoder retains its type/syntax errors.
-	}
-	if !utf8.Valid(raw) {
-		return fmt.Errorf("invalid UTF-8 in quality JSON string")
-	}
-	for i := 1; i < len(raw)-1; i++ {
-		if raw[i] != '\\' {
-			continue
-		}
-		i++
-		if raw[i] != 'u' {
-			continue
-		}
-		unit := qualityHexUnit(raw[i+1 : i+5])
-		i += 4
-		if unit >= 0xDC00 && unit <= 0xDFFF {
-			return fmt.Errorf("unpaired low UTF-16 surrogate in quality JSON string")
-		}
-		if unit < 0xD800 || unit > 0xDBFF {
-			continue
-		}
-		if i+6 >= len(raw) || raw[i+1] != '\\' || raw[i+2] != 'u' {
-			return fmt.Errorf("unpaired high UTF-16 surrogate in quality JSON string")
-		}
-		low := qualityHexUnit(raw[i+3 : i+7])
-		if low < 0xDC00 || low > 0xDFFF {
-			return fmt.Errorf("mismatched UTF-16 surrogate pair in quality JSON string")
-		}
-		i += 6
-	}
-	return nil
-}
-
-func qualityHexUnit(data []byte) uint16 {
-	var value uint16
-	for _, digit := range data {
-		value <<= 4
-		switch {
-		case digit >= '0' && digit <= '9':
-			value += uint16(digit - '0')
-		case digit >= 'a' && digit <= 'f':
-			value += uint16(digit-'a') + 10
-		case digit >= 'A' && digit <= 'F':
-			value += uint16(digit-'A') + 10
-		}
-	}
-	return value
-}
+// The standard decoder retains its type/syntax errors.

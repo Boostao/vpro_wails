@@ -113,14 +113,6 @@ type LongVegetationReport struct {
 	ExcludedProjectUnitIndexes []int                                  `json:"excludedProjectUnitIndexes,omitempty"`
 }
 
-type LongVegetationSelectedUnitOccurrence struct {
-	MembershipID string              `json:"membershipId"`
-	EnvRowID     *string             `json:"envRowId"`
-	AdminRowID   *string             `json:"adminRowId"`
-	PlotNumber   ProjectMetadataCell `json:"plotNumber"`
-	SiteUnit     ProjectMetadataCell `json:"siteUnit"`
-}
-
 type LongVegetationNoneUnitOccurrence struct {
 	EnvRowID          string              `json:"envRowId"`
 	MembershipID      string              `json:"membershipId"`

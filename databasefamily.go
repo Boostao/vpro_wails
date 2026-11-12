@@ -2,15 +2,15 @@ package main
 
 import (
 	"crypto/sha256"
-	"embed"
+
 	"errors"
 	"fmt"
+	"github.com/boostao/vpro-wails/resources"
 	"os"
 	"path/filepath"
 )
 
-//go:embed resources/database-family/*.db
-var databaseFamilyFiles embed.FS
+var databaseFamilyFiles = resources.DatabaseFamilyFS
 
 type databaseFamilySeed struct {
 	name, hash string

@@ -2,56 +2,9 @@ package main
 
 import (
 	"context"
-	"errors"
+
 	"fmt"
-	"sort"
 )
-
-type reportUnitNames struct {
-	LongName   *string
-	Status     string
-	Candidates []EnvironmentReportName
-}
-
-func resolveReportUnitNames(ctx context.Context, rows []ProjectMetadataRow, column int, label string) (reportUnitNames, error) {
-	result := reportUnitNames{Status: "missing", Candidates: []EnvironmentReportName{}}
-	names, unsupported := map[string]bool{}, false
-	for _, row := range rows {
-		if err := ctx.Err(); err != nil {
-			return reportUnitNames{}, err
-		}
-		if column < 0 || column >= len(row.Cells) {
-			return reportUnitNames{}, errors.New("report unit name column is outside the original reference row")
-		}
-		cell := row.Cells[column]
-		if _, err := metadataCellValue(cell); err != nil {
-			return reportUnitNames{}, fmt.Errorf("%s master name value: %w", label, err)
-		}
-		result.Candidates = append(result.Candidates, EnvironmentReportName{row.RowID, cloneSiteUnitCell(cell)})
-		switch cell.Storage {
-		case "text":
-			names[*cell.Text] = true
-		case "null":
-		default:
-			unsupported = true
-		}
-	}
-	sort.Slice(result.Candidates, func(i, j int) bool { return result.Candidates[i].RowID < result.Candidates[j].RowID })
-	switch {
-	case unsupported:
-		result.Status = "unsupported_storage"
-	case len(names) > 1:
-		result.Status = "conflicting"
-	case len(names) == 1:
-		result.Status = "unique"
-		name := sortedEnvironmentReportKeys(names)[0]
-		result.LongName = &name
-	}
-	if err := ctx.Err(); err != nil {
-		return reportUnitNames{}, err
-	}
-	return result, nil
-}
 
 func addLongVegetationUnitNames(ctx context.Context, report *vegetationLayerReport, master ProjectMetadataTable) error {
 	columns, err := siteUnitTransferColumns(master, "SiteSeries", "SiteSeriesLongName")

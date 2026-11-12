@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	"embed"
+
 	"fmt"
 	"io"
 	"os"
@@ -11,11 +11,11 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/boostao/vpro-wails/resources"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-//go:embed resources/vlists.db
-var vlistsFiles embed.FS
+var vlistsFiles = resources.VListsFiles
 
 type SpeciesItem struct {
 	Code           string `json:"code"`

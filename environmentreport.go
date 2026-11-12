@@ -4,21 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
+
 	"unicode/utf8"
 )
-
-type EnvironmentReportField struct {
-	Source  string `json:"source"`
-	Key     string `json:"key"`
-	Label   string `json:"label"`
-	Heading bool   `json:"heading"`
-}
-
-type EnvironmentReportName struct {
-	RowID string              `json:"rowId"`
-	Value ProjectMetadataCell `json:"value"`
-}
 
 type EnvironmentReportPlot struct {
 	PlotNumber string                `json:"plotNumber"`
@@ -281,13 +269,4 @@ func environmentReportIdentity(cell ProjectMetadataCell) (*string, error) {
 		return nil, errors.New("Long Environment membership identities require original text/NULL without coercion")
 	}
 	return cell.Text, nil
-}
-
-func sortedEnvironmentReportKeys[T any](values map[string]T) []string {
-	keys := make([]string, 0, len(values))
-	for key := range values {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-	return keys
 }

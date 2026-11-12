@@ -3,19 +3,19 @@ package main
 import (
 	"context"
 	"database/sql"
-	_ "embed"
+
 	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
 
 	"github.com/boostao/vpro-wails/internal/fs882layout"
+	"github.com/boostao/vpro-wails/resources"
 )
 
 const siviCHARSParentForm = "frmSIVIsite-CHARS"
 
-//go:embed resources/fs1333-chars-sivi-layout.json
-var siviCHARSParentLayoutJSON []byte
+var siviCHARSParentLayoutJSON = resources.FS1333CHARSSIVILayoutJSON
 
 var siviCHARSParentSourceLayout = sync.OnceValues(func() (*fs882layout.Layout, error) {
 	var layout fs882layout.Layout

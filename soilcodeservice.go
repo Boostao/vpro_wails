@@ -2,18 +2,17 @@ package main
 
 import (
 	"context"
-	_ "embed"
+
 	"errors"
 	"sync"
 
 	"github.com/boostao/vpro-wails/internal/listcatalog"
+	"github.com/boostao/vpro-wails/resources"
 )
 
-//go:embed resources/soil-codes.db
-var soilCodeDatabase []byte
+var soilCodeDatabase = resources.SoilCodesDB
 
-//go:embed resources/soil-codes-provenance.json
-var soilCodeProvenanceJSON []byte
+var soilCodeProvenanceJSON = resources.SoilCodesProvenanceJSON
 
 type SoilCodeChoice listcatalog.Choice
 

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"unicode/utf16"
+
 	"unicode/utf8"
 )
 
@@ -25,19 +25,6 @@ func isSiteCodeProperty(property string) bool {
 		}
 	}
 	return false
-}
-
-func validateSiteCodeText(name string, value *string, limit int) error {
-	if value == nil {
-		return nil
-	}
-	if !utf8.ValidString(*value) {
-		return fmt.Errorf("%s must contain valid Unicode (invalid UTF-8)", name)
-	}
-	if *value == "" || len(utf16.Encode([]rune(*value))) > limit {
-		return fmt.Errorf("%s must be NULL or a nonempty string of at most %d UTF-16 units", name, limit)
-	}
-	return nil
 }
 
 func sameSiteCode(before, after *string) bool {
@@ -141,4 +128,20 @@ func (s *PlotService) validateSiteCodeRestoreValue(table, column string, value a
 		return s.validateSiteCodeHeaderValues(h, nil)
 	}
 	return nil
+}
+
+func (s *PlotService) exposureChoices() ([]SiteCodeChoice, error) {
+	if s.siteCodesError != nil {
+		return nil, s.siteCodesError
+	}
+	if s.siteCodes != nil {
+		return s.siteCodes.ListExposureChoices(s.operationContext())
+	}
+
+	catalogue, err := NewSiteCodeService(s.projects.root)
+	if err != nil {
+		return nil, err
+	}
+	rows, readErr := catalogue.ListExposureChoices(s.operationContext())
+	return rows, errors.Join(readErr, catalogue.Close())
 }

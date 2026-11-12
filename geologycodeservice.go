@@ -2,18 +2,17 @@ package main
 
 import (
 	"context"
-	_ "embed"
+
 	"errors"
 	"sync"
 
 	"github.com/boostao/vpro-wails/internal/listcatalog"
+	"github.com/boostao/vpro-wails/resources"
 )
 
-//go:embed resources/geology-codes.db
-var geologyCodeDatabase []byte
+var geologyCodeDatabase = resources.GeologyCodesDB
 
-//go:embed resources/geology-codes-provenance.json
-var geologyCodeProvenanceJSON []byte
+var geologyCodeProvenanceJSON = resources.GeologyCodesProvenanceJSON
 
 type GeologyCodeChoice listcatalog.Choice
 

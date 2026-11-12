@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	_ "embed"
+
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,13 +10,12 @@ import (
 	"sync"
 
 	"github.com/boostao/vpro-wails/internal/fs882layout"
+	"github.com/boostao/vpro-wails/resources"
 )
 
-//go:embed resources/fs882-two-page-layout.json
-var twoPageParentLayoutJSON []byte
+var twoPageParentLayoutJSON = resources.FS882TwoPageLayoutJSON
 
-//go:embed resources/fs882-two-page-chars-layout.json
-var twoPageCHARSParentLayoutJSON []byte
+var twoPageCHARSParentLayoutJSON = resources.FS882TwoPageCHARSLayoutJSON
 
 var twoPageParentSources = sync.OnceValues(func() (map[string]*fs882layout.Layout, error) {
 	result := make(map[string]*fs882layout.Layout, 2)

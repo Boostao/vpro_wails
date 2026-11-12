@@ -4,32 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
-	"github.com/wailsapp/wails/v3/pkg/application"
 )
-
-func pictureNativeChooserOwner(ctx context.Context) (*application.App, *application.WebviewWindow, error) {
-	if ctx == nil {
-		return nil, nil, errors.New("picture selection requires a native request context")
-	}
-	if err := ctx.Err(); err != nil {
-		return nil, nil, err
-	}
-	window, ok := ctx.Value(application.WindowKey).(*application.WebviewWindow)
-	if !ok || window == nil || window.NativeWindow() == nil {
-		return nil, nil, errors.New("picture selection requires its live native request window")
-	}
-	app := application.Get()
-	if app == nil || app.Window == nil || app.Dialog == nil {
-		return nil, nil, errors.New("picture selection requires the active native application")
-	}
-	registered, present := app.Window.GetByID(window.ID())
-	native, ok := registered.(*application.WebviewWindow)
-	if !present || !ok || native != window {
-		return nil, nil, errors.New("picture selection request window is no longer owned by this application")
-	}
-	return app, window, nil
-}
 
 func chooseNativePictureFile(ctx context.Context) (string, error) {
 	app, window, err := pictureNativeChooserOwner(ctx)

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
-	_ "embed"
+
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,11 +16,11 @@ import (
 	"sync"
 	"unicode/utf8"
 
+	"github.com/boostao/vpro-wails/resources"
 	"gopkg.in/yaml.v3"
 )
 
-//go:embed resources/config.init.yml
-var desktopDefaults []byte
+var desktopDefaults = resources.ConfigInitYML
 
 type configValues = map[string]any
 

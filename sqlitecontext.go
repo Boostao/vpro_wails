@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"net/url"
+
 	"os"
 	"path/filepath"
 	"slices"
@@ -43,17 +43,6 @@ func (c *sqliteContext) beginReadSnapshot(ctx context.Context) (*sql.Tx, error) 
 		return nil, errors.Join(err, tx.Rollback())
 	}
 	return tx, nil
-}
-
-func sqliteFileURI(path, mode string) string {
-	clean := filepath.ToSlash(filepath.Clean(path))
-	if !strings.HasPrefix(clean, "/") {
-		clean = "/" + clean
-	}
-	address := url.URL{Scheme: "file", Path: clean}
-	query := url.Values{"mode": {mode}}
-	address.RawQuery = query.Encode()
-	return address.String()
 }
 
 func (c *sqliteContext) projectReadDatabase(ctx context.Context) (*sql.DB, error) {

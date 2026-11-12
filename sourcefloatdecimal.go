@@ -15,11 +15,6 @@ func sourceDoubleDecimalString(value float64) string {
 	return strconv.FormatFloat(value, 'g', 15, 64)
 }
 
-type profileSQLNumber struct {
-	value   float64
-	decimal string
-}
-
 func profileEnvNumberCriterion(value float64) (profileSQLNumber, error) {
 	literal := sourceDoubleDecimalString(value)
 	number, err := strconv.ParseFloat(literal, 64)

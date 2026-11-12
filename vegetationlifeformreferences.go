@@ -36,24 +36,6 @@ func appendVegetationLifeformUnionRow(result *vegetationLifeformReferences, seen
 	return nil
 }
 
-func vegetationLifeformInteger(cell ProjectMetadataCell) (*int, error) {
-	if _, err := metadataCellValue(cell); err != nil {
-		return nil, err
-	}
-	if cell.Storage == "null" {
-		return nil, nil
-	}
-	if cell.Storage != "integer" {
-		return nil, errors.New("lifeform requires exact nullable INTEGER storage; no coercion")
-	}
-	value, err := strconv.ParseInt(*cell.Integer, 10, 16)
-	if err != nil {
-		return nil, errors.New("lifeform exceeds source INTEGER range")
-	}
-	result := int(value)
-	return &result, nil
-}
-
 func vegetationLifeformReferenceSchema(ctx context.Context, table ProjectMetadataTable) (map[string]int, error) {
 	return vegetationLifeformReferenceSourceSchema(ctx, table, "Lifeform")
 }

@@ -2,19 +2,18 @@ package main
 
 import (
 	"context"
-	_ "embed"
+
 	"errors"
 	"fmt"
 	"sync"
 
 	"github.com/boostao/vpro-wails/internal/listcatalog"
+	"github.com/boostao/vpro-wails/resources"
 )
 
-//go:embed resources/parent-codes.db
-var parentCodeDatabase []byte
+var parentCodeDatabase = resources.ParentCodesDB
 
-//go:embed resources/parent-codes-provenance.json
-var parentCodeProvenanceJSON []byte
+var parentCodeProvenanceJSON = resources.ParentCodesProvenanceJSON
 
 type ParentCodeChoice listcatalog.Choice
 

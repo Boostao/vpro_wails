@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"strings"
 )
 
 type siviCategoricalChoices struct {
@@ -127,23 +126,4 @@ func readOwnedSIVICategoricalChoices(ctx context.Context, plots *PlotService, co
 
 func validateSIVICategoricalSchema(ctx context.Context, tx *sql.Tx, alias, table string) error {
 	return validateSIVIPhysicalSchema(ctx, tx, alias, table, "categorical definitions")
-}
-
-func validateSIVIPhysicalSchema(ctx context.Context, tx *sql.Tx, alias, table, scope string) error {
-	rows, err := tx.QueryContext(ctx, "PRAGMA "+quoteHeaderIdentifier(alias)+".table_xinfo("+quoteHeaderIdentifier(table)+")")
-	if err != nil {
-		return err
-	}
-	for rows.Next() {
-		var position, required, primary, hidden int
-		var name, kind string
-		var defaultValue sql.NullString
-		if err := rows.Scan(&position, &name, &kind, &required, &defaultValue, &primary, &hidden); err != nil {
-			return errors.Join(err, rows.Close())
-		}
-		if hidden != 0 || strings.EqualFold(name, "rowid") || strings.EqualFold(name, "_rowid_") || strings.EqualFold(name, "oid") {
-			return errors.Join(fmt.Errorf("SIVI %s require unshadowed physical identities and ordinary columns", scope), rows.Close())
-		}
-	}
-	return errors.Join(rows.Err(), rows.Close())
 }

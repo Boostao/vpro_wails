@@ -2,18 +2,17 @@ package main
 
 import (
 	"context"
-	_ "embed"
+
 	"errors"
 	"sync"
 
 	"github.com/boostao/vpro-wails/internal/listcatalog"
+	"github.com/boostao/vpro-wails/resources"
 )
 
-//go:embed resources/site-codes.db
-var siteCodeDatabase []byte
+var siteCodeDatabase = resources.SiteCodesDB
 
-//go:embed resources/site-codes-provenance.json
-var siteCodeProvenanceJSON []byte
+var siteCodeProvenanceJSON = resources.SiteCodesProvenanceJSON
 
 type SiteCodeChoice listcatalog.Choice
 
@@ -107,18 +106,4 @@ func (s *SiteCodeService) ListExposureChoices(ctx context.Context) ([]SiteCodeCh
 	return s.listChoices(ctx, "Exposure")
 }
 
-func (s *PlotService) exposureChoices() ([]SiteCodeChoice, error) {
-	if s.siteCodesError != nil {
-		return nil, s.siteCodesError
-	}
-	if s.siteCodes != nil {
-		return s.siteCodes.ListExposureChoices(s.operationContext())
-	}
-	// Legacy constructors remain guarded without retaining an unowned DB handle.
-	catalogue, err := NewSiteCodeService(s.projects.root)
-	if err != nil {
-		return nil, err
-	}
-	rows, readErr := catalogue.ListExposureChoices(s.operationContext())
-	return rows, errors.Join(readErr, catalogue.Close())
-}
+// Legacy constructors remain guarded without retaining an unowned DB handle.

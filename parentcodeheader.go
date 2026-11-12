@@ -53,18 +53,6 @@ func isParentCodeProperty(property string) bool {
 	return false
 }
 
-func parentCodeListMaximum(list string) (int, bool) {
-	if list == "SoilDrainage" {
-		return 5, true
-	}
-	for _, field := range parentCodeDescriptors {
-		if list == field.list {
-			return field.maximum, true
-		}
-	}
-	return 0, false
-}
-
 func validateParentCodeHeaderValues(h FS882Header, old *FS882Header) error {
 	return validateCodeHeaderValues(h, old, parentCodeHeaderFields, false)
 }

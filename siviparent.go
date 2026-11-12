@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	_ "embed"
+
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,10 +11,10 @@ import (
 	"unicode/utf8"
 
 	"github.com/boostao/vpro-wails/internal/fs882layout"
+	"github.com/boostao/vpro-wails/resources"
 )
 
-//go:embed resources/fs1333-sivi-layout.json
-var siviParentLayoutJSON []byte
+var siviParentLayoutJSON = resources.FS1333SIVILayoutJSON
 
 type SIVIParentBinding struct {
 	ControlID, Binding, Table string

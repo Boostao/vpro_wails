@@ -4,6 +4,7 @@ import (
 	"embed"
 	"log"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -746,6 +747,34 @@ func main() {
 	window.RegisterHook(events.Common.WindowClosing, closeService.handleWindowClosing)
 	err = app.Run()
 	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+
+func runStartupRecovery(windows application.WindowsOptions, configDir string, cause error) {
+	log.Printf("Saved context remains unavailable: %v", cause)
+	startup := &StartupService{state: StartupState{
+		Message:        cause.Error(),
+		ConfigPath:     filepath.Join(configDir, "config.yml"),
+		ReleaseChannel: ReleaseChannelStable,
+	}}
+	var app *application.App
+	closeService, err := NewCloseService(func(nonce string) bool { return app.Event.Emit(closeRequestEvent, nonce) }, func() { app.Quit() })
+	if err != nil {
+		log.Fatal(err)
+	}
+	lifecycleService := NewLifecycleService(startup, closeService, nil)
+	app = application.New(application.Options{
+		Name: "VPro", Windows: windows, ShouldQuit: closeService.shouldQuit,
+		Services: []application.Service{application.NewService(lifecycleService)},
+		Assets:   application.AssetOptions{Handler: application.AssetFileServerFS(assets)},
+	})
+	window := app.Window.NewWithOptions(application.WebviewWindowOptions{
+		Name: "main", Title: "VPro", Width: 1000, Height: 720, MinWidth: 560, MinHeight: 520, URL: "/",
+	})
+	window.RegisterHook(events.Common.WindowClosing, closeService.handleWindowClosing)
+	if err := app.Run(); err != nil {
 		log.Fatal(err)
 	}
 }

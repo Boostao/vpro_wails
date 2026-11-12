@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"math"
 	"strconv"
-	"sync"
 )
 
 const longVegetationSelectedUnitsFeatureEnvironment = "VPRO_LONG_VEGETATION_SELECTED_UNITS"
@@ -22,11 +21,6 @@ type LongVegetationSelectedUnitField struct {
 	DeclaredType string `json:"declaredType"`
 	Available    bool   `json:"available"`
 	Reason       string `json:"reason"`
-}
-
-type LongVegetationSelectedUnitBuild struct {
-	ApprovalHash string                                 `json:"approvalHash"`
-	Occurrences  []LongVegetationSelectedUnitOccurrence `json:"occurrences"`
 }
 
 type LongVegetationSelectedUnitSelection struct {
@@ -58,17 +52,6 @@ func (request *selectedUnitSelectionDraft) UnmarshalJSON(data []byte) error {
 	}
 	*request = selectedUnitSelectionDraft(decoded)
 	return nil
-}
-
-type selectedUnitSelectionEntry struct {
-	revision int64
-	fields   []string
-	build    *LongVegetationSelectedUnitBuild
-}
-
-type selectedUnitSelectionLedger struct {
-	mu      sync.Mutex
-	entries map[string]selectedUnitSelectionEntry
 }
 
 type LongVegetationSelectedUnitSelectionService struct {
@@ -109,29 +92,6 @@ func selectedUnitRevision(value string) (int64, error) {
 		return 0, errors.New("selected report unit selection requires its exact nonnegative revision")
 	}
 	return number, nil
-}
-
-func cloneSelectedUnitBuild(build *LongVegetationSelectedUnitBuild) *LongVegetationSelectedUnitBuild {
-	if build == nil {
-		return nil
-	}
-	result := &LongVegetationSelectedUnitBuild{ApprovalHash: build.ApprovalHash,
-		Occurrences: make([]LongVegetationSelectedUnitOccurrence, len(build.Occurrences))}
-	for i, row := range build.Occurrences {
-		row.EnvRowID, row.AdminRowID = cloneCatalogueValue(row.EnvRowID), cloneCatalogueValue(row.AdminRowID)
-		row.PlotNumber, row.SiteUnit = cloneSiteUnitCell(row.PlotNumber), cloneSiteUnitCell(row.SiteUnit)
-		result.Occurrences[i] = row
-	}
-	return result
-}
-
-func (ledger *selectedUnitSelectionLedger) read(contextID string) selectedUnitSelectionEntry {
-	ledger.mu.Lock()
-	defer ledger.mu.Unlock()
-	entry := ledger.entries[contextID]
-	entry.fields = append([]string{}, entry.fields...)
-	entry.build = cloneSelectedUnitBuild(entry.build)
-	return entry
 }
 
 func readSelectedUnitSelectionTables(ctx context.Context, owner *sqliteContext, tx *sql.Tx) ([3]ProjectMetadataTable, error) {

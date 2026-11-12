@@ -156,10 +156,6 @@ func (request *TwoPageParentEntryWrite) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func validateTwoPageEntryJSONProperties(data []byte) error {
-	return validateSourceParentEntryJSONProperties(data, "complete-entry")
-}
-
 type TwoPageParentEntryService struct {
 	contexts                    *ContextService
 	readers                     twoPageEntryReferenceReaders

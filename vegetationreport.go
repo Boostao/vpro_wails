@@ -5,17 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/big"
+
 	"sort"
 	"strings"
 	"unicode/utf8"
 )
-
-type VegetationReportMembership struct {
-	RowID      string              `json:"rowId"`
-	PlotNumber ProjectMetadataCell `json:"plotNumber"`
-	SiteUnit   ProjectMetadataCell `json:"siteUnit"`
-}
 
 type VegetationReportLayer struct {
 	RowID       string `json:"rowId"`
@@ -241,31 +235,4 @@ func reduceLongVegetationEntries(ctx context.Context, veg, layers ProjectMetadat
 		return fail(err)
 	}
 	return result, nil
-}
-
-func vegetationReportIdentity(cell ProjectMetadataCell) (*string, error) {
-	if _, err := metadataCellValue(cell); err != nil {
-		return nil, err
-	}
-	if cell.Storage != "text" && cell.Storage != "null" {
-		return nil, errors.New("report identities require original text/NULL without coercion")
-	}
-	return cell.Text, nil
-}
-
-func vegetationReportNumber(cell ProjectMetadataCell) (*big.Rat, error) {
-	value, err := metadataCellValue(cell)
-	if err != nil {
-		return nil, err
-	}
-	switch value := value.(type) {
-	case nil:
-		return nil, nil
-	case int64:
-		return new(big.Rat).SetInt64(value), nil
-	case float64:
-		return new(big.Rat).SetFloat64(value), nil
-	default:
-		return nil, errors.New("report cover requires original finite numeric/NULL storage; no historical text/blob was converted")
-	}
 }

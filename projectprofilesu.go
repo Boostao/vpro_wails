@@ -259,25 +259,6 @@ func profileSUDestination(request ProfileSUCreation) (string, os.FileInfo, error
 	return freshSQLiteDestination(request.Path, "SU")
 }
 
-func freshSQLiteDestination(requested, kind string) (string, os.FileInfo, error) {
-	if !utf8.ValidString(requested) || !filepath.IsAbs(requested) || !strings.EqualFold(filepath.Ext(requested), ".db") {
-		return "", nil, fmt.Errorf("%s destination must be an explicit absolute new SQLite .db file", kind)
-	}
-	parent, err := filepath.EvalSymlinks(filepath.Dir(requested))
-	if err != nil {
-		return "", nil, err
-	}
-	info, err := os.Stat(parent)
-	if err != nil || !info.IsDir() {
-		return "", nil, errors.Join(err, fmt.Errorf("%s destination parent must be an existing directory", kind))
-	}
-	path := filepath.Join(parent, filepath.Base(requested))
-	if _, err := os.Lstat(path); !errors.Is(err, os.ErrNotExist) {
-		return "", nil, errors.Join(err, fmt.Errorf("%s destination already exists or cannot be checked; existing files are never replaced", kind))
-	}
-	return path, info, nil
-}
-
 func (s *ContextService) SaveProjectPlotProfileSU(ctx context.Context, contextID string, request ProfileSUCreation) (_ ProfileSUCreated, resultErr error) {
 	path, parent, err := profileSUDestination(request)
 	if err != nil {

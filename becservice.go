@@ -2,23 +2,19 @@ package main
 
 import (
 	"context"
-	"crypto/sha256"
 	"database/sql"
-	_ "embed"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/boostao/vpro-wails/resources"
 	"os"
 	"path/filepath"
 	"sync"
 )
 
-//go:embed resources/bec.db
-var becDatabase []byte
+var becDatabase = resources.BECDB
 
-//go:embed resources/bec-provenance.json
-var becProvenanceJSON []byte
+var becProvenanceJSON = resources.BECProvenanceJSON
 
 type BECZone struct {
 	Zone        *string `json:"zone"`
@@ -137,11 +133,6 @@ func NewBECService(dataDir string) (*BECService, error) {
 		return nil, err
 	}
 	return &BECService{db: db, status: status}, nil
-}
-
-func becHash(data []byte) string {
-	sum := sha256.Sum256(data)
-	return hex.EncodeToString(sum[:])
 }
 
 func (s *BECService) Close() error {

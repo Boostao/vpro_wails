@@ -4,16 +4,16 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
-	_ "embed"
+
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/boostao/vpro-wails/resources"
 	"reflect"
 	"strconv"
 )
 
-//go:embed resources/project-metadata-template.json
-var metadataTemplateMappingJSON []byte
+var metadataTemplateMappingJSON = resources.ProjectMetadataTemplateJSON
 
 type ProjectMetadataTemplateCreate struct {
 	Blank  ProjectMetadataCreate   `json:"blank"`

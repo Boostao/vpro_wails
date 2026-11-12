@@ -3,15 +3,15 @@ package main
 import (
 	"bytes"
 	"context"
-	_ "embed"
+
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/boostao/vpro-wails/resources"
 	"strings"
 )
 
-//go:embed resources/standards-2026-provenance.json
-var standards2026ProvenanceJSON []byte
+var standards2026ProvenanceJSON = resources.Standards2026ProvenanceJSON
 
 var appVersion = "0.1.0"
 

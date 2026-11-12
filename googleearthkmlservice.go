@@ -1,11 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
+
 	"strings"
 )
 
@@ -36,41 +35,6 @@ func (request *GoogleEarthKMLRequest) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*request = GoogleEarthKMLRequest(decoded)
-	return nil
-}
-
-func decodeGoogleEarthKMLJSON(data []byte, target any, operation string, properties ...string) error {
-	return decodeStrictRequiredJSON(data, target, operation, properties...)
-}
-
-func decodeStrictRequiredJSON(data []byte, target any, operation string, properties ...string) error {
-	if err := decodeProfileLifecycleJSON(data, target, properties...); err != nil {
-		return fmt.Errorf("%s request: %w", operation, err)
-	}
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	if _, err := decoder.Token(); err != nil {
-		return err
-	}
-	seen := map[string]bool{}
-	allowed := map[string]bool{}
-	for _, property := range properties {
-		allowed[property] = true
-	}
-	for decoder.More() {
-		token, err := decoder.Token()
-		if err != nil {
-			return err
-		}
-		key, ok := token.(string)
-		if !ok || !allowed[key] || seen[key] {
-			return fmt.Errorf("%s has an unknown or duplicate property %q", operation, key)
-		}
-		seen[key] = true
-		var value json.RawMessage
-		if err := decoder.Decode(&value); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 

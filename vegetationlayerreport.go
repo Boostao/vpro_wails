@@ -45,13 +45,6 @@ type vegetationLayerReport struct {
 	ProjectUnits       []vegetationProjectUnitInput
 }
 
-func vegetationTextKey(cell ProjectMetadataCell) string {
-	if cell.Text == nil {
-		return "null"
-	}
-	return "text:" + *cell.Text
-}
-
 func planLongVegetationLayers(ctx context.Context, prepared VegetationReportPreparation,
 	species, layers ProjectMetadataTable, options longVegetationOptions) (vegetationLayerReport, error) {
 	fail := func(err error) (vegetationLayerReport, error) { return vegetationLayerReport{}, err }

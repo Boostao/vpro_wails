@@ -7,7 +7,6 @@ import (
 	"math"
 	"math/big"
 	"strconv"
-	"unicode/utf16"
 )
 
 type LifeformSummaryEntry struct {
@@ -334,27 +333,6 @@ func planLifeformSummary(ctx context.Context, project, suName string, veg, su, s
 
 func metadataLifeformText(value string) ProjectMetadataCell {
 	return ProjectMetadataCell{Storage: "text", Text: &value}
-}
-
-func lifeformSummarySingle(value *big.Rat) (float64, error) {
-	precision := uint(value.Num().BitLen() + value.Denom().BitLen() + 32)
-	single, _ := new(big.Float).SetPrec(precision).SetMode(big.ToNearestEven).SetRat(value).Float32()
-	result := float64(single)
-	if math.IsInf(result, 0) || math.IsNaN(result) {
-		return 0, errors.New("cannot assign a finite SINGLE; no clamping applied")
-	}
-	return result, nil
-}
-
-func lifeformSummaryText(cell ProjectMetadataCell, limit int) error {
-	value, err := vegetationReportIdentity(cell)
-	if err != nil {
-		return err
-	}
-	if value != nil && len(utf16.Encode([]rune(*value))) > limit {
-		return fmt.Errorf("historical text exceeds source TEXT(%d) UTF-16 units; no repair or truncation applied", limit)
-	}
-	return nil
 }
 
 func lifeformSummaryInteger(cell ProjectMetadataCell) (*int, error) {

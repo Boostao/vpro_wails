@@ -24,12 +24,6 @@ type lifeformWorkbook struct {
 }
 
 // Validate provenance before JSON can replace malformed Unicode or typed cells.
-func lifeformWorkbookSourceValue(value reflect.Value) error {
-	return reportWorkbookSourceValue(value, func(cell ProjectMetadataCell) error {
-		_, err := vegetationReportIdentity(cell)
-		return err
-	}, "Lifeform")
-}
 
 func validateLifeformWorkbook(ctx context.Context, lifeform LifeformSummaryPreview, attributes SpeciesAttributeSummaryPreview) error {
 	lf, at := lifeform.Report, attributes.Report
