@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"path/filepath"
 	"strings"
 	"unicode/utf16"
 	"unicode/utf8"
@@ -441,6 +442,11 @@ func AssignSpatialAOIToSU(ctx context.Context, contexts *vprocore.ContextService
 			}
 			tableName := suName + "_SU"
 			targetPath := owner.Selection.SUPath
+			for _, supRole := range []string{"VPro64", "VLists", "VUser", "VMetaData", "VMessageBoard", "VPics"} {
+				if supPath := owner.Attachments[supRole]; supPath != "" && vprocore.SameDesktopPath(supPath, targetPath) {
+					return struct{}{}, fmt.Errorf("active SU file aliases protected support database %s", supRole)
+				}
+			}
 			role := "su"
 			if owner.Selection.SUPath == owner.Selection.ProjectPath {
 				role = "project"
@@ -549,25 +555,35 @@ func AssignSpatialAOIToSU(ctx context.Context, contexts *vprocore.ContextService
 			if fErr != nil {
 				return struct{}{}, fErr
 			}
+			tmpFile, tErr := os.CreateTemp(filepath.Dir(freshPath), ".vpro-spatial-su-*.db")
+			if tErr != nil {
+				return struct{}{}, tErr
+			}
+			tmpPath := tmpFile.Name()
+			if err := tmpFile.Close(); err != nil {
+				_ = os.Remove(tmpPath)
+				return struct{}{}, err
+			}
+			defer func() {
+				_ = os.Remove(tmpPath)
+				for _, suf := range []string{"-journal", "-wal", "-shm"} {
+					_ = os.Remove(tmpPath + suf)
+				}
+			}()
 			tableName := suName + "_SU"
-			committed := false
-			db, oErr := sql.Open("sqlite3", sqlutil.SqliteFileURI(freshPath, "rwc")+"&_foreign_keys=on&_busy_timeout=5000&_journal_mode=WAL&_txlock=immediate")
+			db, oErr := sql.Open("sqlite3", sqlutil.SqliteFileURI(tmpPath, "rw")+"&_foreign_keys=on&_busy_timeout=5000&_journal_mode=DELETE&_synchronous=FULL&_txlock=immediate")
 			if oErr != nil {
 				return struct{}{}, oErr
 			}
-			defer func() {
-				_ = db.Close()
-				if !committed {
-					_ = os.Remove(freshPath)
-				}
-			}()
 			db.SetMaxOpenConns(1)
 			tx, bErr := db.BeginTx(ctx, nil)
 			if bErr != nil {
+				_ = db.Close()
 				return struct{}{}, bErr
 			}
 			if err := createSpatialSUTableInTx(ctx, tx, suName); err != nil {
 				_ = tx.Rollback()
+				_ = db.Close()
 				return struct{}{}, err
 			}
 			qTable := vprocore.QuoteHeaderIdentifier(tableName)
@@ -575,6 +591,7 @@ func AssignSpatialAOIToSU(ctx context.Context, contexts *vprocore.ContextService
 			for _, p := range plotOrder {
 				if _, err := tx.ExecContext(ctx, `INSERT INTO main.`+qTable+` ("PlotNumber", "SiteUnit") VALUES (?, ?)`, p, siteUnit); err != nil {
 					_ = tx.Rollback()
+					_ = db.Close()
 					return struct{}{}, err
 				}
 				inserted++
@@ -585,18 +602,26 @@ func AssignSpatialAOIToSU(ctx context.Context, contexts *vprocore.ContextService
 				}
 				if _, err := tx.ExecContext(ctx, `INSERT INTO main.`+qTable+` ("PlotNumber", "SiteUnit") VALUES (?, NULL)`, p); err != nil {
 					_ = tx.Rollback()
+					_ = db.Close()
 					return struct{}{}, err
 				}
 				inserted++
 			}
 			if err := vprocore.AppendTechnicalProvenance(ctx, tx, spatialAOISUHistoryTable, spatialAOISUHistorySQL, string(proposalJSON), "Spatial AOI SU file creation"); err != nil {
 				_ = tx.Rollback()
+				_ = db.Close()
 				return struct{}{}, err
 			}
 			if err := tx.Commit(); err != nil {
+				_ = db.Close()
 				return struct{}{}, err
 			}
-			committed = true
+			if err := db.Close(); err != nil {
+				return struct{}{}, err
+			}
+			if err := os.Link(tmpPath, freshPath); err != nil {
+				return struct{}{}, fmt.Errorf("SU publication requires atomic no-replace linking; destination unchanged: %w", err)
+			}
 			out = &AssignSpatialAOIToSUResult{
 				ContextID:    contextID,
 				SUName:       suName,
@@ -623,12 +648,11 @@ func AssignSpatialAOIToSU(ctx context.Context, contexts *vprocore.ContextService
 			Hierarchy:     currentSelection.Hierarchy,
 			HierarchyPath: currentSelection.HierarchyPath,
 		})
-		if swErr != nil {
-			return nil, swErr
+		if swErr == nil {
+			out.Activated = true
+			out.ContextID = nextState.ContextID
+			out.NewState = &nextState
 		}
-		out.Activated = true
-		out.ContextID = nextState.ContextID
-		out.NewState = &nextState
 	}
 	return out, nil
 }

@@ -486,13 +486,17 @@
     }
   }
 
+  let aoiPreviewBusy = $state(false);
+
   async function previewAOIPolygon() {
+    aoiPreview = null;
     if (!contextId || aoiVertices.length < 3) {
-      aoiPreview = null;
+      aoiPreviewBusy = false;
       refreshDeckOverlay();
       return;
     }
     const gen = ++aoiGeneration;
+    aoiPreviewBusy = true;
     const ringSnapshot = $state.snapshot(aoiVertices);
     // Immediate client-side feedback using pointInPolygonRing while Go verifies against authoritative SQLite
     const localMatches = plotPoints.filter((p) => pointInPolygonRing(p.lon, p.lat, ringSnapshot));
@@ -510,9 +514,12 @@
       }
       refreshDeckOverlay();
     } catch (cause) {
-      if (alive && gen === aoiGeneration) {
+      if (alive && gen !== aoiGeneration) return;
+      if (alive) {
         errorMsg = `AOI polygon preview failed: ${cause instanceof Error ? cause.message : String(cause)}`;
       }
+    } finally {
+      if (alive && gen === aoiGeneration) aoiPreviewBusy = false;
     }
   }
 
@@ -551,7 +558,7 @@
   }
 
   async function commitAOIToSU() {
-    if (!contextId || mutating || loading || !aoiPreview || aoiPreview.matchedCount === 0) return;
+    if (!contextId || mutating || loading || aoiPreviewBusy || !aoiPreview || aoiPreview.matchedCount === 0) return;
     if (!aoiSiteUnit.trim()) {
       errorMsg = 'Enter a target SiteUnit code (for example SBSmk1/01) before saving the AOI selection.';
       return;

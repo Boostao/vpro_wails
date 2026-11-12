@@ -58,7 +58,7 @@
       let lon = targetDraft.longitude;
       let changed = false;
 
-      if ((lat === null || lon === null) && targetDraft.utmZone && targetDraft.easting !== null && targetDraft.northing !== null) {
+      if (lat === null && lon === null && targetDraft.utmZone && targetDraft.easting !== null && targetDraft.northing !== null) {
         const zoneNum = Number.parseInt(String(targetDraft.utmZone).trim(), 10);
         if (!Number.isFinite(zoneNum)) {
           throw new Error(`Invalid UTM zone ${targetDraft.utmZone} for NAD83 projection.`);

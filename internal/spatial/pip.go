@@ -1049,25 +1049,26 @@ func (a *PMTilesAttributor) Close() error {
 func (a *PMTilesAttributor) ensureLoaded() error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	if a.loaded {
-		return nil
-	}
-	if len(resources.BCOverviewPMTiles) >= 127 {
+	if a.ovwRdr == nil && len(resources.BCOverviewPMTiles) >= 127 {
 		if rdr, err := openPMTilesReaderFromBytes("embedded:bc-overview.pmtiles", resources.BCOverviewPMTiles); err == nil {
 			a.ovwRdr = rdr
 		}
 	}
-	if resolved, ok := resolvePMTilesArchive(PMTilesBGCArchiveName, a.dataDir, a.extraDirs); ok && resolved.filePath != "" {
-		if rdr, err := openPMTilesReaderFromFile(resolved.filePath); err == nil {
-			a.bgcRdr = rdr
+	if a.bgcRdr == nil {
+		if resolved, ok := resolvePMTilesArchive(PMTilesBGCArchiveName, a.dataDir, a.extraDirs); ok && resolved.filePath != "" {
+			if rdr, err := openPMTilesReaderFromFile(resolved.filePath); err == nil {
+				a.bgcRdr = rdr
+			}
 		}
 	}
-	if resolved, ok := resolvePMTilesArchive(PMTilesAdminArchiveName, a.dataDir, a.extraDirs); ok && resolved.filePath != "" {
-		if rdr, err := openPMTilesReaderFromFile(resolved.filePath); err == nil {
-			a.adminRdr = rdr
+	if a.adminRdr == nil {
+		if resolved, ok := resolvePMTilesArchive(PMTilesAdminArchiveName, a.dataDir, a.extraDirs); ok && resolved.filePath != "" {
+			if rdr, err := openPMTilesReaderFromFile(resolved.filePath); err == nil {
+				a.adminRdr = rdr
+			}
 		}
 	}
-	a.loaded = true
+	a.loaded = a.ovwRdr != nil || a.bgcRdr != nil || a.adminRdr != nil
 	return nil
 }
 
@@ -1731,28 +1732,23 @@ func ApplySpatialAttributes(ctx context.Context, contexts *vprocore.ContextServi
 				}
 				eastRounded := math.Round(*geod.ComputedUTMEasting*10.0) / 10.0
 				northRounded := math.Round(*geod.ComputedUTMNorthing*10.0) / 10.0
-				if !req.OnlyWhenBlank || r.utmZone == nil || strings.TrimSpace(*r.utmZone) == "" {
-					var beforeZ any
+				allUTMBlank := (r.utmZone == nil || strings.TrimSpace(*r.utmZone) == "") && r.utmEasting == nil && r.utmNorthing == nil
+				if !req.OnlyWhenBlank || allUTMBlank {
+					var beforeZ, beforeE, beforeN any
 					if r.utmZone != nil {
 						beforeZ = *r.utmZone
+					}
+					if r.utmEasting != nil {
+						beforeE = *r.utmEasting
+					}
+					if r.utmNorthing != nil {
+						beforeN = *r.utmNorthing
 					}
 					if beforeZ != zStr {
 						muts = append(muts, cellMutation{"Env", "UTMZone", beforeZ, zStr})
 					}
-				}
-				if !req.OnlyWhenBlank || r.utmEasting == nil {
-					var beforeE any
-					if r.utmEasting != nil {
-						beforeE = *r.utmEasting
-					}
 					if r.utmEasting == nil || math.Abs(*r.utmEasting-eastRounded) > 0.05 {
 						muts = append(muts, cellMutation{"Env", "UTMEasting", beforeE, eastRounded})
-					}
-				}
-				if !req.OnlyWhenBlank || r.utmNorthing == nil {
-					var beforeN any
-					if r.utmNorthing != nil {
-						beforeN = *r.utmNorthing
 					}
 					if r.utmNorthing == nil || math.Abs(*r.utmNorthing-northRounded) > 0.05 {
 						muts = append(muts, cellMutation{"Env", "UTMNorthing", beforeN, northRounded})
@@ -1763,19 +1759,17 @@ func ApplySpatialAttributes(ctx context.Context, contexts *vprocore.ContextServi
 			if req.SyncLatLonFromUTM && geod.UTMDerivedLat != nil && geod.UTMDerivedLon != nil {
 				latRounded := math.Round(*geod.UTMDerivedLat*1e6) / 1e6
 				lonRounded := math.Round(*geod.UTMDerivedLon*1e6) / 1e6
-				if !req.OnlyWhenBlank || r.latitude == nil {
-					var beforeLat any
+				bothDDBlank := r.latitude == nil && r.longitude == nil
+				if !req.OnlyWhenBlank || bothDDBlank {
+					var beforeLat, beforeLon any
 					if r.latitude != nil {
 						beforeLat = *r.latitude
 					}
-					if r.latitude == nil || math.Abs(*r.latitude-latRounded) > 1e-6 {
-						muts = append(muts, cellMutation{"Env", "Latitude", beforeLat, latRounded})
-					}
-				}
-				if !req.OnlyWhenBlank || r.longitude == nil {
-					var beforeLon any
 					if r.longitude != nil {
 						beforeLon = *r.longitude
+					}
+					if r.latitude == nil || math.Abs(*r.latitude-latRounded) > 1e-6 {
+						muts = append(muts, cellMutation{"Env", "Latitude", beforeLat, latRounded})
 					}
 					if r.longitude == nil || math.Abs(*r.longitude-lonRounded) > 1e-6 {
 						muts = append(muts, cellMutation{"Env", "Longitude", beforeLon, lonRounded})
