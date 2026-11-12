@@ -58,7 +58,7 @@ jobs:
           python-version: '3.11'
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.26'
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -119,7 +119,7 @@ jobs:
           python-version: '3.11'
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.26'
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -180,7 +180,7 @@ jobs:
           python-version: '3.11'
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.26'
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -238,7 +238,10 @@ jobs:
           path: release-assets
           merge-multiple: true
       - name: Require exact assets, architecture witnesses and checksums
-        run: python scripts/release.py manifest release-assets
+        run: |
+          set -euo pipefail
+          python scripts/release.py manifest release-assets
+          python scripts/release.py release-manifest release-assets --output release-assets/release-manifest.json --base-manifest site/release-manifest.json
       - name: Refuse an existing tag built from different source
         run: python scripts/release.py source-tag
       - name: Create release with every validated asset
@@ -248,11 +251,11 @@ jobs:
           flags=()
           if [ "$RELEASE_DRAFT" = "true" ]; then flags+=(--draft); fi
           if [ "$RELEASE_PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
-          gh release create "$RELEASE_TAG" "${assets[@]}" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "VPro $RELEASE_TAG" --notes "Windows amd64/arm64 EXE, ZIP and NSIS; macOS universal DMG and ZIP; Linux amd64/arm64 AppImage, deb and tar. Verify downloads against SHA256SUMS.txt. macOS is ad-hoc signed, not notarized." "${flags[@]}"
+          gh release create "$RELEASE_TAG" "${assets[@]}" release-assets/release-manifest.json --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "VPro $RELEASE_TAG" --notes "Windows amd64/arm64 EXE, ZIP and NSIS; macOS universal DMG and ZIP; Linux amd64/arm64 AppImage, deb and tar. Verify downloads against SHA256SUMS.txt and release-manifest.json. macOS VPro.app is ad-hoc signed, not notarized." "${flags[@]}"
       - name: Verify remotely attached names and bytes
         run: |
           set -euo pipefail
           gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets > release-remote.json
-          python scripts/release.py remote release-remote.json
+          python scripts/release.py remote release-remote.json --require-release-manifest
           gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir release-downloaded
-          python scripts/release.py verify release-downloaded --manifest release-assets/SHA256SUMS.txt
+          python scripts/release.py verify release-downloaded --manifest release-assets/SHA256SUMS.txt --release-manifest release-assets/release-manifest.json
