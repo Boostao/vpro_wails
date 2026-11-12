@@ -116,9 +116,9 @@ func workingUnitSnapshotFixture(t *testing.T) ([]byte, workingUnitProvenance, wo
 
 func TestWorkingUnitImportAllTypedCellsAndSourceGuards(t *testing.T) {
 	data, p, snapshot := workingUnitSnapshotFixture(t)
-	if len(snapshot.Tables["MasterSiteUnitList"]) != 3504 || len(snapshot.Tables["UserSiteUnitList"]) != 4 ||
-		workingUnitProvenanceFixture(t).SnapshotSHA256 != "f5f7ad951e46e0c4c031067199781a72037917715a8bbd9bd0f199c6c3eba0f3" {
-		t.Fatal("frozen native row boundary changed")
+	if len(snapshot.Tables["MasterSiteUnitList"]) != 6067 || len(snapshot.Tables["UserSiteUnitList"]) != 4 ||
+		workingUnitProvenanceFixture(t).SnapshotSHA256 != "ab17dee2ef287629e4dac45e05b8935f8bfbb9806ee82b5088eab87fc3573016" {
+		t.Fatal("frozen 2026 Working Unit row boundary changed")
 	}
 	db, err := sql.Open("sqlite3", filepath.Join(becTestDir(t), "import.db"))
 	if err != nil {
@@ -191,5 +191,61 @@ func TestWorkingUnitImportAllTypedCellsAndSourceGuards(t *testing.T) {
 	var created int
 	if err := failed.QueryRow(`SELECT COUNT(*) FROM sqlite_master WHERE name IN ('WorkingUnits','WorkingUnitProvenance')`).Scan(&created); err != nil || created != 0 {
 		t.Fatalf("failed typed import left partially committed data/schema: %d %v", created, err)
+	}
+}
+
+func TestWorkingUnitV1SnapshotValidationPreserved(t *testing.T) {
+	p2 := workingUnitProvenanceFixture(t)
+	lvl := 11
+	tables := map[string][]workingUnitSourceRow{
+		"MasterSiteUnitList": {{SourceOrdinal: "1", ID: becString("101"), SiteSeries: becString("BG  xh 1 /01"), Level: &lvl}},
+		"UserSiteUnitList":   {{SourceOrdinal: "1", ID: becString("201"), SiteSeries: becString("Custom /01"), Level: &lvl}},
+	}
+	cellsBytes, err := json.Marshal(tables)
+	if err != nil {
+		t.Fatal(err)
+	}
+	masterHash := strings.Repeat("a", 64)
+	userHash := strings.Repeat("b", 64)
+	snap := workingUnitSnapshot{
+		Version:                       1,
+		Exporter:                      workingUnitExporterV1,
+		ReadOnlyNativeReferenceAccess: true,
+		SourceCopies: []workingUnitSourceCopy{
+			{Path: `C:\VPro64\VLists.accda`, Hash: strings.ToUpper(masterHash)},
+			{Path: `C:\VPro64\VUser.accda`, Hash: strings.ToUpper(userHash)},
+		},
+		Schema:           p2.SourceSchema,
+		Tables:           tables,
+		IdentityEncoding: p2.IdentityEncoding,
+		SourceContext:    workingUnitSourceContextV1,
+	}
+	rawSnap, err := json.Marshal(snap)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p1 := workingUnitProvenance{
+		Version:          1,
+		Exporter:         workingUnitExporterV1,
+		SnapshotSHA256:   becHash(rawSnap),
+		MasterSHA256:     masterHash,
+		UserSHA256:       userHash,
+		MasterRows:       1,
+		UserRows:         1,
+		MasterDuplicates: 0,
+		UserDuplicates:   0,
+		TypedCellsSHA256: becHash(cellsBytes),
+		SourceCopies:     snap.SourceCopies,
+		SourceSchema:     p2.SourceSchema,
+		IdentityEncoding: p2.IdentityEncoding,
+		SourceContext:    workingUnitSourceContextV1,
+	}
+	db, err := sql.Open("sqlite3", filepath.Join(becTestDir(t), "v1.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if err := importWorkingUnitSnapshot(db, rawSnap, p1); err != nil {
+		t.Fatalf("v1 snapshot import failed: %v", err)
 	}
 }

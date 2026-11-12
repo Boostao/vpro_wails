@@ -25,11 +25,11 @@ func TestSoilCatalogueAll1010CellsAndExact13FieldShape(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, err := listcatalog.DecodeProvenanceFor(soilCodeProvenanceJSON, listcatalog.SoilProfile())
+	p, err := listcatalog.DecodeProvenanceFor(soilCodeProvenanceJSON, listcatalog.SoilBundledProfile2026())
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected, err := listcatalog.SoilSnapshotRows(fixture, p)
+	expected, _, err := listcatalog.SoilBundled2026Rows(fixture)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,16 +1,20 @@
 {
-  "version": 1,
-  "exporter": "native-access-dao-working-unit-v1",
-  "snapshotSha256": "f5f7ad951e46e0c4c031067199781a72037917715a8bbd9bd0f199c6c3eba0f3",
-  "databaseSha256": "94475866a0732284d4b4cdbc8e1dd977777b2b312cf35b6b9594d6496a5f7de3",
-  "masterSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
+  "version": 2,
+  "exporter": "accessreader-becdb-v13-working-unit-v2",
+  "snapshotSha256": "ab17dee2ef287629e4dac45e05b8935f8bfbb9806ee82b5088eab87fc3573016",
+  "databaseSha256": "c06e28659124339121fa4982d1b033b9cfa71edc7b68471eadba0a421ddb4974",
+  "masterSha256": "7b19bd03e0a7cf0a9df453118fe42d8fecd9433f9c85634df3e556e6632161ba",
   "userSha256": "dab83cabc8436e31bcb25d78fc0d766bb6f00683279a0959d2c988974b03bfb0",
-  "masterRows": 3504,
+  "masterRows": 6067,
   "userRows": 4,
   "masterDuplicates": 34,
   "userDuplicates": 1,
-  "typedCellsSha256": "b50c467ba2ebb8b3bff153f55371bd2dca0a5fd6b0e9be29f10c3031a485b432",
+  "typedCellsSha256": "12ac0eee4a6be40853ec02ce230ce71bfb68d088d91730b08e08e9f117bac4bc",
   "sourceCopies": [
+    {
+      "Path": "C:\\Users\\BrunoTremblay\\Work\\becweb_standards_2025_2026\\BECdb_v13_2026.accdb",
+      "Hash": "7B19BD03E0A7CF0A9DF453118FE42D8FECD9433F9C85634DF3E556E6632161BA"
+    },
     {
       "Path": "C:\\Users\\BrunoTremblay\\Work\\VPRO_ACCESS\\VPro64\\VLists.accda",
       "Hash": "2A5AD098CF4665991ACFBBCA5F011C9488AFCBB8272140AD262FE4F7B58F084D"
@@ -287,5 +291,5 @@
     ]
   },
   "identityEncoding": "exact signed32 string, not float; frozen exact sourceOrdinal string retained",
-  "sourceContext": "USysMasterSiteUnitList direct link to owned VLists.MasterSiteUnitList; USysUserSiteUnitList direct link to owned VUser.UserSiteUnitList"
+  "sourceContext": "BECdb_v13_2026.accdb Current_Unique_SiteUnits_v13 merged with historical VLists.MasterSiteUnitList; VUser.UserSiteUnitList preserved"
 }

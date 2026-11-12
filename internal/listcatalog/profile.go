@@ -6,24 +6,35 @@ type ListDefinition struct {
 }
 
 type Profile struct {
-	Exporter       string
-	SourceSHA256   string
-	SnapshotSHA256 string
-	SQL            string
-	Lists          []ListDefinition
+	Version              int
+	Exporter             string
+	SourceSHA256         string
+	SnapshotSHA256       string
+	LegacyDatabaseSHA256 string
+	SQL                  string
+	Lists                []ListDefinition
 }
 
 func SiteProfile() Profile {
-	return Profile{Exporter, SourceSHA256, SnapshotSHA256, SourceSQL,
-		[]ListDefinition{{"Exposure", 12}, {"SiteDisturbance", 127}}}
+	return Profile{
+		Exporter:       Exporter,
+		SourceSHA256:   SourceSHA256,
+		SnapshotSHA256: SnapshotSHA256,
+		SQL:            SourceSQL,
+		Lists:          []ListDefinition{{"Exposure", 12}, {"SiteDisturbance", 127}},
+	}
 }
 
 const RegionSnapshotSHA256 = "73661609828f78625b083327a750e10819dc05a1a20e78e8c9c91b177ae739ee"
 
 func RegionProfile() Profile {
-	return Profile{"native-access-dao-region-codes-v1", SourceSHA256, RegionSnapshotSHA256,
-		`Region: SELECT * FROM USysTableOfLists WHERE ListName="Region" ORDER BY ItemOrder; Ecosection: SELECT * FROM USysTableOfLists WHERE ListName="ecosection"`,
-		[]ListDefinition{{"Ecosection", 137}, {"Region", 27}}}
+	return Profile{
+		Exporter:       "native-access-dao-region-codes-v1",
+		SourceSHA256:   SourceSHA256,
+		SnapshotSHA256: RegionSnapshotSHA256,
+		SQL:            `Region: SELECT * FROM USysTableOfLists WHERE ListName="Region" ORDER BY ItemOrder; Ecosection: SELECT * FROM USysTableOfLists WHERE ListName="ecosection"`,
+		Lists:          []ListDefinition{{"Ecosection", 137}, {"Region", 27}},
+	}
 }
 
 const SoilSnapshotSHA256 = "20e309d5e34445109d2024406e451e601257b2d94d877c54dd9a87e8b79d0f5d"
@@ -41,12 +52,21 @@ const GeologySnapshotSHA256 = "2e8585380babdb7110615a43321900edeac882d573f25c99e
 const GeologyNativeTypedCellsSHA256 = "926d81a2100d88ac6ba6b9f548ae9ac7d3b48b75a41016a9eba1836d4a9241d0"
 
 func GeologyProfile() Profile {
-	return Profile{"current-readonly-dao-bedrock-codes-v1", SourceSHA256, GeologySnapshotSHA256,
-		DAOSourceSQL("BedrockType"), []ListDefinition{{"BedrockType", 87}}}
+	return Profile{
+		Exporter:       "current-readonly-dao-bedrock-codes-v1",
+		SourceSHA256:   SourceSHA256,
+		SnapshotSHA256: GeologySnapshotSHA256,
+		SQL:            DAOSourceSQL("BedrockType"),
+		Lists:          []ListDefinition{{"BedrockType", 87}},
+	}
 }
 
 func SoilProfile() Profile {
-	return Profile{"current-readonly-dao-soil-codes-v1", SourceSHA256, SoilSnapshotSHA256,
-		SoilSourceSQL("SoilClassGroup") + " " + SoilSourceSQL("SoilClassSubgroup"),
-		[]ListDefinition{{"SoilClassGroup", 39}, {"SoilClassSubgroup", 62}}}
+	return Profile{
+		Exporter:       "current-readonly-dao-soil-codes-v1",
+		SourceSHA256:   SourceSHA256,
+		SnapshotSHA256: SoilSnapshotSHA256,
+		SQL:            SoilSourceSQL("SoilClassGroup") + " " + SoilSourceSQL("SoilClassSubgroup"),
+		Lists:          []ListDefinition{{"SoilClassGroup", 39}, {"SoilClassSubgroup", 62}},
+	}
 }

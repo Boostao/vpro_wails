@@ -66,7 +66,11 @@ func ValidateProvenanceFor(p Provenance, profile Profile) error {
 	for _, list := range profile.Lists {
 		count += list.Rows
 	}
-	if p.Version != 1 || p.Exporter != profile.Exporter || p.SourceSHA256 != profile.SourceSHA256 ||
+	expectedVersion := profile.Version
+	if expectedVersion == 0 {
+		expectedVersion = 1
+	}
+	if p.Version != expectedVersion || p.Exporter != profile.Exporter || p.SourceSHA256 != profile.SourceSHA256 ||
 		p.SnapshotSHA256 != profile.SnapshotSHA256 || p.Rows != count || p.Cells != count*10 ||
 		p.SourceTable != "USysTableOfLists" || p.SQL != profile.SQL ||
 		!reflect.DeepEqual(p.SourceSchema, ExpectedSchema()) || p.ItemOrderEncoding != ItemOrderEncoding {

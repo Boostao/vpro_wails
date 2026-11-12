@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "generator": "cmd/standards2026",
+  "sources": [
+    {
+      "archiveName": "BECdb_v13_2026.zip",
+      "archiveSha256": "2dafc90ca934487a745199455c678b6b960c6f39684a9b2bb3e918292af1bdc6",
+      "extractedName": "BECdb_v13_2026.accdb",
+      "extractedSha256": "7b19bd03e0a7cf0a9df453118fe42d8fecd9433f9c85634df3e556e6632161ba",
+      "version": "BECdb_v13_2026 (2026-05-28)"
+    },
+    {
+      "archiveName": "BCPlantTaxa2025_access.zip",
+      "archiveSha256": "3ec9f20d064b486e29f9dadc570b284866950e8874ac4a0043f49491d352d163",
+      "extractedName": "BCPlantTaxonomy.accdb",
+      "extractedSha256": "41d60607c2e84487d95d49a73d425555d16679d1513e4c027690b4729b89281a",
+      "version": "BCPlantTaxa_v19_2025 (2026-02-09)"
+    }
+  ],
+  "lmh25Pdf2023Sha256": "ebf47444eab4d0862d3209e5108963c579c13e196ccb1d99f89a857bfcb6617a",
+  "artifacts": [
+    {
+      "path": "resources/database-family/VLists.db",
+      "sha256": "81e259244106b14d6dd3c65f0a7e7e87bdb06f60e6c54947c0506e2039379441",
+      "counts": {
+        "MasterSiteUnitList": 6067,
+        "USysAllSpecs": 16728,
+        "USysSiteSeriesNames": 8900,
+        "USysTableOfLists": 1566,
+        "USysZoneList": 331
+      }
+    },
+    {
+      "path": "resources/vlists.db",
+      "sha256": "d750d66613b569bf67be6ade904a98d7eaf0f7c8cf44f45a51e192bda8144701",
+      "counts": {
+        "Species": 10476
+      }
+    },
+    {
+      "path": "resources/bec.db",
+      "sha256": "6f106e2af85b47869780f4ce0645ee9c4dafff2442059677bfe9cfa061f91b0e",
+      "counts": {
+        "BECSiteSeries": 8900,
+        "BECZoneList": 331,
+        "duplicateKeys": 2253
+      }
+    },
+    {
+      "path": "resources/working-unit.db",
+      "sha256": "c06e28659124339121fa4982d1b033b9cfa71edc7b68471eadba0a421ddb4974",
+      "counts": {
+        "MasterSiteUnitList": 6067,
+        "UserSiteUnitList": 4
+      }
+    },
+    {
+      "path": "resources/site-codes.db",
+      "sha256": "f51500c489ceb3f493c1de0949f67ddc52eff038355e621534d44a4a13a3e90e",
+      "counts": {
+        "rows": 142
+      }
+    },
+    {
+      "path": "resources/soil-codes.db",
+      "sha256": "f45a8e8c35c48da873eedbf0bb96bd4fcbeb98485c7db9ffd9daa6effac21592",
+      "counts": {
+        "rows": 101
+      }
+    },
+    {
+      "path": "resources/parent-codes.db",
+      "sha256": "769d0fa1280f1e104a53714f2e5d312c5db8b482120100cb38a74543bed014b3",
+      "counts": {
+        "rows": 347
+      }
+    }
+  ]
+}

@@ -115,6 +115,15 @@ func NewBECService(dataDir string) (*BECService, error) {
 	if err != nil {
 		return nil, err
 	}
+	if becHash(data) == becLegacyDatabaseSHA256 && provenance.DatabaseSHA256 != becLegacyDatabaseSHA256 {
+		if err := replaceBundledCatalogueFile(target, becDatabase, 0644); err != nil {
+			return nil, err
+		}
+		data, err = os.ReadFile(target)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if becHash(data) != provenance.DatabaseSHA256 {
 		return nil, errors.New("existing BEC catalogue checksum mismatch; file was not replaced")
 	}

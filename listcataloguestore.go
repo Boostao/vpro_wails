@@ -62,7 +62,15 @@ func openListCatalogue(dataDir, filename, label string, database, provenanceJSON
 		if writeErr != nil || closeErr != nil {
 			return "", p, nil, errors.Join(writeErr, closeErr, os.Remove(target))
 		}
-	} else if !errors.Is(err, os.ErrExist) {
+	} else if errors.Is(err, os.ErrExist) {
+		if profile.LegacyDatabaseSHA256 != "" {
+			if existing, readErr := os.ReadFile(target); readErr == nil && becHash(existing) == profile.LegacyDatabaseSHA256 {
+				if err := replaceBundledCatalogueFile(target, database, 0644); err != nil {
+					return "", p, nil, err
+				}
+			}
+		}
+	} else {
 		return "", p, nil, err
 	}
 	cache := &listCatalogueCache{}
@@ -70,6 +78,31 @@ func openListCatalogue(dataDir, filename, label string, database, provenanceJSON
 		return "", p, nil, err
 	}
 	return target, p, cache, nil
+}
+
+func replaceBundledCatalogueFile(target string, data []byte, perm os.FileMode) error {
+	file, err := os.CreateTemp(filepath.Dir(target), ".catalogue-upgrade-*.db")
+	if err != nil {
+		return err
+	}
+	tempName := file.Name()
+	defer os.Remove(tempName)
+	if err := file.Chmod(perm); err != nil {
+		file.Close()
+		return err
+	}
+	if _, err := file.Write(data); err != nil {
+		file.Close()
+		return err
+	}
+	if err := file.Sync(); err != nil {
+		file.Close()
+		return err
+	}
+	if err := file.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tempName, target)
 }
 
 func (c *listCatalogueCache) choices(path string, p listcatalog.Provenance, profile listcatalog.Profile, label, list string, force bool) ([]listcatalog.Choice, error) {

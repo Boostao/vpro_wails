@@ -70,4 +70,37 @@ func TestReferenceService_SpeciesAndLists(t *testing.T) {
 	if _, ok := all["MoistureRegime"]; !ok {
 		t.Errorf("expected MoistureRegime in GetAllLists")
 	}
+
+	// Test 5: 2025/2026 Taxonomy & LMH25 (2023) vocabulary extensions
+	for _, code := range []string{"CALLNOO", "PINUALB", "PINUCON1", "POPUHAS", "CORNNUT", "BREWBRE", "ACAUTRI"} {
+		sp2026, err := svc.GetSpecies(context.Background(), code)
+		if err != nil || sp2026 == nil || sp2026.Code != code {
+			t.Fatalf("expected 2025/2026 taxon %s in vlists.db, got %+v (%v)", code, sp2026, err)
+		}
+	}
+	for _, expected := range []struct{ list, item string }{
+		{"StructuralStage", "3c"},
+		{"StructuralStage", "3d"},
+		{"SiviStructuralStage", "3c"},
+		{"SiviStructuralStage", "3d"},
+		{"StructuralStageMod", "v"},
+		{"StructuralStageMod", "k"},
+		{"SiteDisturbance", "A.w.th"},
+		{"SiteDisturbance", "A.w.br"},
+		{"Exposure", "CO"},
+		{"FloodingRegimeDur", "S"},
+		{"FloodingRegimeFreq", "S"},
+	} {
+		listItems := all[expected.list]
+		found := false
+		for _, it := range listItems {
+			if it.Item == expected.item {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("expected LMH25 2023 item %s in list %s", expected.item, expected.list)
+		}
+	}
 }

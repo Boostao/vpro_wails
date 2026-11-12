@@ -3,6 +3,7 @@ package listcatalog
 import (
 	"bytes"
 	"compress/gzip"
+	"database/sql"
 	"encoding/json"
 	"io"
 	"math"
@@ -179,5 +180,34 @@ func TestSoilScalarAndNativeHashEncoding(t *testing.T) {
 	encoded, err := json.Marshal(Choice{})
 	if err != nil || !bytes.Contains(encoded, []byte(`"diagnostic":""`)) {
 		t.Fatal("DTO defaults changed")
+	}
+}
+
+func TestBundledSoilCatalogue2026(t *testing.T) {
+	database := filepath.Join("..", "..", "resources", "soil-codes.db")
+	provenance := filepath.Join("..", "..", "resources", "soil-codes-provenance.json")
+	data, err := os.ReadFile(database)
+	if err != nil {
+		t.Fatal(err)
+	}
+	encoded, err := os.ReadFile(provenance)
+	if err != nil {
+		t.Fatal(err)
+	}
+	profile := SoilBundledProfile2026()
+	p, err := DecodeProvenanceFor(encoded, profile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if checksum(data) != p.DatabaseSHA256 {
+		t.Fatal("bundled soil database checksum mismatch")
+	}
+	db, err := sql.Open("sqlite3", "file:"+database+"?mode=ro")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if err := ValidateDatabaseFor(db, p, profile); err != nil {
+		t.Fatal(err)
 	}
 }

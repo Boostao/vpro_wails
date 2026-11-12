@@ -20,7 +20,7 @@ type databaseFamilySeed struct {
 var databaseFamilySeeds = []databaseFamilySeed{
 	{"VPro64", "4f299ffb69fd5d90ba7fd454ac200a935153acc762bfe45112659a8adc672c8b",
 		[]string{"USysEnvTable", "USysVegTable", "USysSuTable", "USysHierarchyTable"}},
-	{"VLists", "dd80135e45878d92dee626701ba29bd4cc1d69549d6784c2a91dc276f6a79a51",
+	{"VLists", "81e259244106b14d6dd3c65f0a7e7e87bdb06f60e6c54947c0506e2039379441",
 		[]string{"USysAllSpecs", "USysTableOfLists", "MasterSiteUnitList", "USysMetadataTemplates",
 			"USysZoneList", "USysMasterAudit", "USysSiteSeriesNames", "USysSppAttributes",
 			"USysSppAttributeFieldList", "USysSppAttributeDescription"}},
@@ -31,6 +31,8 @@ var databaseFamilySeeds = []databaseFamilySeed{
 	{"VMessageBoard", "9b6803b16389e88bca3aae45e589c46e2cfd3011809daa26f3331987dd15bac0",
 		[]string{"tblMessageBoard", "tblMessageList"}},
 }
+
+const legacyVListsSeedSHA256 = "dd80135e45878d92dee626701ba29bd4cc1d69549d6784c2a91dc276f6a79a51"
 
 func installDatabaseFamily(root string) (map[string]string, error) {
 	directory := filepath.Join(root, "database-family")
@@ -53,6 +55,19 @@ func installDatabaseFamily(root string) (map[string]string, error) {
 			}
 		} else if err != nil {
 			return nil, err
+		} else if seed.name == "VLists" && seed.hash != legacyVListsSeedSHA256 {
+			if existing, readErr := os.ReadFile(destination); readErr == nil && fmt.Sprintf("%x", sha256.Sum256(existing)) == legacyVListsSeedSHA256 {
+				data, err := databaseFamilyFiles.ReadFile("resources/database-family/VLists.db")
+				if err != nil {
+					return nil, err
+				}
+				if fmt.Sprintf("%x", sha256.Sum256(data)) != seed.hash {
+					return nil, fmt.Errorf("bundled %s seed hash does not match its provenance seal", seed.name)
+				}
+				if err := replaceBundledCatalogueFile(destination, data, 0600); err != nil {
+					return nil, fmt.Errorf("upgrade %s: %w", seed.name, err)
+				}
+			}
 		}
 		paths[seed.name] = destination
 	}

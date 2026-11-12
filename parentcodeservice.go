@@ -28,7 +28,7 @@ type ParentCodeService struct {
 
 func NewParentCodeService(dataDir string) (*ParentCodeService, error) {
 	path, provenance, cache, err := openListCatalogue(dataDir, "parent-codes.db", "parent code",
-		parentCodeDatabase, parentCodeProvenanceJSON, listcatalog.ParentProfile())
+		parentCodeDatabase, parentCodeProvenanceJSON, listcatalog.ParentBundledProfile2026())
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (s *ParentCodeService) ListChoices(ctx context.Context, listName string) ([
 	if s.closed {
 		return nil, errors.New("parent code catalogue is closed")
 	}
-	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.ParentProfile(), "parent code", listName, false)
+	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.ParentBundledProfile2026(), "parent code", listName, false)
 	if err != nil {
 		return nil, fmt.Errorf("parent code catalogue: %w", err)
 	}
@@ -77,7 +77,7 @@ func (s *ParentCodeService) ReloadCatalogue(ctx context.Context) error {
 	if s.closed {
 		return errors.New("parent code catalogue is closed")
 	}
-	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.ParentProfile(), "parent code", "", true)
+	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.ParentBundledProfile2026(), "parent code", "", true)
 	return err
 }
 

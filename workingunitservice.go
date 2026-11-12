@@ -80,6 +80,15 @@ func NewWorkingUnitService(projects *ProjectService, configDir string) (*Working
 	if err != nil {
 		return nil, err
 	}
+	if becHash(data) == workingUnitLegacyDatabaseSHA256 && provenance.DatabaseSHA256 != workingUnitLegacyDatabaseSHA256 {
+		if err := replaceBundledCatalogueFile(target, workingUnitDatabase, 0644); err != nil {
+			return nil, err
+		}
+		data, err = os.ReadFile(target)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if becHash(data) != provenance.DatabaseSHA256 {
 		return nil, errors.New("existing Working Unit catalogue checksum mismatch; file was not replaced")
 	}
