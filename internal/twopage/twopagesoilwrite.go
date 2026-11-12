@@ -80,13 +80,18 @@ func (request *twoPageSoilRequest) UnmarshalJSON(data []byte) error {
 }
 
 type twoPageSoilHistory struct {
-	Request       twoPageSoilRequest
-	Committed     vprocore.ProjectMetadataTable
-	Actor         string
-	AuditStrength int
-	EditWhen      string
-	Audits        []vprocore.AuditEntry
-	CreatedRowID  *string `json:"CreatedRowID,omitempty"`
+	Request            twoPageSoilRequest
+	Committed          vprocore.ProjectMetadataTable
+	Actor              string
+	AuditStrength      int
+	EditWhen           string
+	Audits             []vprocore.AuditEntry
+	CreatedRowID       *string                      `json:"CreatedRowID,omitempty"`
+	Action             string                       `json:"Action,omitempty"`
+	DeletedID          *int64                       `json:"DeletedID,omitempty"`
+	DeletedRow         *vprocore.ProjectMetadataRow `json:"DeletedRow,omitempty"`
+	RestoreOfRequestID *string                      `json:"RestoreOfRequestID,omitempty"`
+	RestoredRowID      *string                      `json:"RestoredRowID,omitempty"`
 }
 
 type twoPageSoilWriteResult struct {
@@ -113,6 +118,9 @@ func twoPageSoilPlannedTable(original vprocore.ProjectMetadataTable, assignments
 }
 
 func validateTwoPageSoilHistory(ctx context.Context, history twoPageSoilHistory) error {
+	if history.Action == "delete" || history.Action == "restore" {
+		return validateTwoPageSoilDeleteRestoreHistory(ctx, history)
+	}
 	if history.Request.Horizon != nil {
 		ordinary, err := twoPageSoilCreationEditHistory(ctx, history)
 		if err != nil {
@@ -209,7 +217,8 @@ func readTwoPageSoilReceipt(ctx context.Context, request twoPageSoilRequest, tab
 		seen[*id.Text] = true
 		raw := []byte(*proposal.Text)
 		properties, err := sourceform.SourceChildJSONObject(raw, "two-page soil history",
-			[]string{"Request", "Committed", "Actor", "AuditStrength", "EditWhen", "Audits"}, []string{"CreatedRowID"})
+			[]string{"Request", "Committed", "Actor", "AuditStrength", "EditWhen", "Audits"},
+			[]string{"CreatedRowID", "Action", "DeletedID", "DeletedRow", "RestoreOfRequestID", "RestoredRowID"})
 		if err != nil {
 			return nil, err
 		}
@@ -219,8 +228,16 @@ func readTwoPageSoilReceipt(ctx context.Context, request twoPageSoilRequest, tab
 			}
 		}
 		var history twoPageSoilHistory
-		if err := json.Unmarshal(raw, &history); err != nil {
-			return nil, err
+		if _, present := properties["Action"]; present {
+			var uErr error
+			history, uErr = unmarshalAnyTwoPageSoilHistory(*proposal.Text)
+			if uErr != nil {
+				return nil, uErr
+			}
+		} else {
+			if err := json.Unmarshal(raw, &history); err != nil {
+				return nil, err
+			}
 		}
 		canonical, err := json.Marshal(history)
 		if err != nil || string(canonical) != *proposal.Text || *id.Text != history.Request.RequestID || *when.Text != history.EditWhen {
@@ -230,7 +247,7 @@ func readTwoPageSoilReceipt(ctx context.Context, request twoPageSoilRequest, tab
 			return nil, err
 		}
 		if *id.Text == request.RequestID {
-			if !reflect.DeepEqual(history.Request, request) {
+			if history.Action != "" || !reflect.DeepEqual(history.Request, request) {
 				return nil, errors.New("two-page soil request UUID belongs to another exact source plan")
 			}
 			matched = &history
