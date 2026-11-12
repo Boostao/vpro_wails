@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/boostao/vpro-wails/internal/lmh25rules"
 	"github.com/boostao/vpro-wails/internal/plotentry"
 	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 )
@@ -880,3 +881,17 @@ func (s *PlotEntryService) ListPlotQualityChoices(ctx context.Context) ([]PlotQu
 	}
 	return s.quality.ListPlotQualityChoices(ctx)
 }
+
+// LMH25 (2023) Pedon, Substrate, HumusThickness & rSMR/rSNR Rule Engine (Auto-2)
+
+func (s *PlotEntryService) EvaluatePlotDiagnostics(header FS882Header, humus []HumusRecord, mineral []MineralRecord) lmh25rules.PlotDiagnosticsResult {
+	return lmh25rules.EvaluatePlotDiagnostics(header, humus, mineral)
+}
+
+func (s *PlotEntryService) EvaluateStoredPlotDiagnostics(ctx context.Context, contextID, plotNumber string) (lmh25rules.PlotDiagnosticsResult, error) {
+	if s == nil || unwrapContextService(s.contexts) == nil {
+		return lmh25rules.PlotDiagnosticsResult{}, errors.New("plot entry context is unavailable")
+	}
+	return lmh25rules.EvaluateStoredPlotDiagnostics(unwrapContextService(s.contexts), ctx, contextID, plotNumber)
+}
+
