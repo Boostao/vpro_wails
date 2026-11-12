@@ -263,7 +263,7 @@ func CreateSUFromEnvFields(
 		qSQL := `SELECT ` + strings.Join(selectExprs, ", ") +
 			` FROM "project".` + vprocore.QuoteHeaderIdentifier(project+"_Env") + ` AS env` +
 			` LEFT JOIN "project".` + vprocore.QuoteHeaderIdentifier(project+"_Admin") + ` AS admin` +
-			` ON typeof(env."PlotNumber")='text' AND typeof(admin."Plot")='text'` +
+			` ON admin."Plot" = env."PlotNumber" AND typeof(env."PlotNumber")='text' AND typeof(admin."Plot")='text'` +
 			` AND CAST(env."PlotNumber" AS BLOB)=CAST(admin."Plot" AS BLOB)` +
 			` WHERE env."PlotNumber" IS NOT NULL AND TRIM(CAST(env."PlotNumber" AS TEXT)) <> ''` +
 			` ORDER BY env."PlotNumber" COLLATE NOCASE ASC, env.rowid ASC`

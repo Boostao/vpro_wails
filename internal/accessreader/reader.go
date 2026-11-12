@@ -231,10 +231,30 @@ func (db *DB) Tables() ([]Table, error) {
 
 // Reader streams one local table. Close it when finished.
 type Reader struct {
-	native  *C.GoMdbReader
-	Columns []Column
-	row     Row
-	err     error
+	native         *C.GoMdbReader
+	Columns        []Column
+	row            Row
+	err            error
+	quarantineRows bool
+	rowNumber      int
+	Quarantined    []QuarantinedRow
+}
+
+// EnableRowQuarantine configures Next to quarantine individual historical rows
+// with corrupted text/row metadata (resetting native iconv/mdb row error state)
+// while keeping I/O and schema errors fatal. Default Reader behavior remains fail-closed.
+func (reader *Reader) EnableRowQuarantine() {
+	if reader != nil {
+		reader.quarantineRows = true
+	}
+}
+
+// EstimatedRowCount returns the table header's catalog row count without scanning pages.
+func (reader *Reader) EstimatedRowCount() int {
+	if reader == nil || reader.native == nil || reader.native.table == nil {
+		return 0
+	}
+	return int(reader.native.table.num_rows)
 }
 
 // Scan opens a local table for sequential iteration. Linked tables cannot be scanned.
@@ -289,75 +309,120 @@ func (reader *Reader) Next() bool {
 	if reader.native == nil || reader.err != nil {
 		return false
 	}
-	status := C.go_mdb_next(reader.native)
-	if status < 0 {
-		reader.err = sourceError(reader.native.mdb.go_error)
-		if reader.err == nil {
-			reader.err = errors.New("could not decode Access row")
-		}
-		return false
-	}
-	if status == 0 {
-		return false
-	}
-	reader.row = make(Row, len(reader.Columns))
-	for index, column := range reader.Columns {
-		if C.go_mdb_is_null(reader.native, C.int(index)) != 0 && column.Type != "boolean" {
-			continue
-		}
-		nativeColumn := C.go_mdb_column(reader.native, C.int(index))
-		if C.go_mdb_memo_too_large(reader.native, C.int(index)) != 0 {
-			reader.err = fmt.Errorf("Access memo in column %q exceeds safe bind buffer", column.Name)
+nextRow:
+	for {
+		reader.rowNumber++
+		status := C.go_mdb_next(reader.native)
+		if status < 0 {
+			code := reader.native.mdb.go_error
+			rowErr := sourceError(code)
+			if rowErr == nil {
+				rowErr = errors.New("could not decode Access row")
+			}
+			if reader.quarantineRows && (code == C.GO_MDB_ERROR_TEXT || code == C.GO_MDB_ERROR_ROW) {
+				reader.Quarantined = append(reader.Quarantined, QuarantinedRow{
+					RowNumber: reader.rowNumber,
+					Reason:    rowErr.Error(),
+				})
+				C.go_mdb_clear_row_error(reader.native)
+				continue nextRow
+			}
+			reader.err = rowErr
 			return false
 		}
-		if column.Type == "unsupported" {
-			reader.err = fmt.Errorf("unsupported Access type %d in column %q", nativeColumn.col_type, column.Name)
+		if status == 0 {
 			return false
 		}
-		if column.Type == "binary" {
-			var size C.size_t
-			value := C.go_mdb_blob(reader.native, C.int(index), &size)
-			if err := sourceError(reader.native.mdb.go_error); err != nil {
+		reader.row = make(Row, len(reader.Columns))
+		for index, column := range reader.Columns {
+			if C.go_mdb_is_null(reader.native, C.int(index)) != 0 && column.Type != "boolean" {
+				continue
+			}
+			nativeColumn := C.go_mdb_column(reader.native, C.int(index))
+			if C.go_mdb_memo_too_large(reader.native, C.int(index)) != 0 {
+				cellErr := fmt.Errorf("Access memo in column %q exceeds safe bind buffer", column.Name)
+				if reader.quarantineRows {
+					reader.Quarantined = append(reader.Quarantined, QuarantinedRow{RowNumber: reader.rowNumber, Reason: cellErr.Error()})
+					C.go_mdb_clear_row_error(reader.native)
+					continue nextRow
+				}
+				reader.err = cellErr
+				return false
+			}
+			if column.Type == "unsupported" {
+				reader.err = fmt.Errorf("unsupported Access type %d in column %q", nativeColumn.col_type, column.Name)
+				return false
+			}
+			if column.Type == "binary" {
+				var size C.size_t
+				value := C.go_mdb_blob(reader.native, C.int(index), &size)
+				if err := sourceError(reader.native.mdb.go_error); err != nil {
+					C.free(value)
+					cellErr := fmt.Errorf("binary column %q: %w", column.Name, err)
+					if reader.quarantineRows {
+						reader.Quarantined = append(reader.Quarantined, QuarantinedRow{RowNumber: reader.rowNumber, Reason: cellErr.Error()})
+						C.go_mdb_clear_row_error(reader.native)
+						continue nextRow
+					}
+					reader.err = cellErr
+					return false
+				}
+				if value == nil || uint64(size) > 1<<31-1 {
+					C.free(value)
+					cellErr := fmt.Errorf("binary column %q is unreadable or too large", column.Name)
+					if reader.quarantineRows {
+						reader.Quarantined = append(reader.Quarantined, QuarantinedRow{RowNumber: reader.rowNumber, Reason: cellErr.Error()})
+						C.go_mdb_clear_row_error(reader.native)
+						continue nextRow
+					}
+					reader.err = cellErr
+					return false
+				}
+				reader.row[index] = C.GoBytes(value, C.int(size))
 				C.free(value)
-				reader.err = fmt.Errorf("binary column %q: %w", column.Name, err)
+				continue
+			}
+			if C.go_mdb_length(reader.native, C.int(index)) >= C.int(reader.native.mdb.bind_size)-1 {
+				cellErr := fmt.Errorf("Access value in column %q exceeds bind buffer", column.Name)
+				if reader.quarantineRows {
+					reader.Quarantined = append(reader.Quarantined, QuarantinedRow{RowNumber: reader.rowNumber, Reason: cellErr.Error()})
+					C.go_mdb_clear_row_error(reader.native)
+					continue nextRow
+				}
+				reader.err = cellErr
 				return false
 			}
-			if value == nil || uint64(size) > 1<<31-1 {
-				C.free(value)
-				reader.err = fmt.Errorf("binary column %q is unreadable or too large", column.Name)
+			value := C.GoString(C.go_mdb_text(reader.native, C.int(index)))
+			var parseErr error
+			switch column.Type {
+			case "boolean":
+				if value != "0" && value != "1" {
+					parseErr = fmt.Errorf("column %q: invalid Access boolean %q", column.Name, value)
+				} else {
+					reader.row[index] = value == "1"
+				}
+			case "integer":
+				reader.row[index], parseErr = strconv.ParseInt(value, 10, 64)
+			case "real":
+				reader.row[index], parseErr = strconv.ParseFloat(value, 64)
+			case "datetime":
+				reader.row[index], parseErr = time.ParseInLocation("2006-01-02 15:04:05", value, time.UTC)
+			default:
+				reader.row[index] = value // Decimals remain exact text, not float64.
+			}
+			if parseErr != nil {
+				cellErr := fmt.Errorf("column %q: %w", column.Name, parseErr)
+				if reader.quarantineRows {
+					reader.Quarantined = append(reader.Quarantined, QuarantinedRow{RowNumber: reader.rowNumber, Reason: cellErr.Error()})
+					C.go_mdb_clear_row_error(reader.native)
+					continue nextRow
+				}
+				reader.err = cellErr
 				return false
 			}
-			reader.row[index] = C.GoBytes(value, C.int(size))
-			C.free(value)
-			continue
 		}
-		if C.go_mdb_length(reader.native, C.int(index)) >= C.int(reader.native.mdb.bind_size)-1 {
-			reader.err = fmt.Errorf("Access value in column %q exceeds bind buffer", column.Name)
-			return false
-		}
-		value := C.GoString(C.go_mdb_text(reader.native, C.int(index)))
-		switch column.Type {
-		case "boolean":
-			if value != "0" && value != "1" {
-				reader.err = fmt.Errorf("column %q: invalid Access boolean %q", column.Name, value)
-				return false
-			}
-			reader.row[index] = value == "1"
-		case "integer":
-			reader.row[index], reader.err = strconv.ParseInt(value, 10, 64)
-		case "real":
-			reader.row[index], reader.err = strconv.ParseFloat(value, 64)
-		case "datetime":
-			reader.row[index], reader.err = time.ParseInLocation("2006-01-02 15:04:05", value, time.UTC)
-		default:
-			reader.row[index] = value // Decimals remain exact text, not float64.
-		}
-		if reader.err != nil {
-			reader.err = fmt.Errorf("column %q: %w", column.Name, reader.err)
-			return false
-		}
+		return true
 	}
-	return true
 }
 
 // Row returns a snapshot of the current row; it remains valid after Next.

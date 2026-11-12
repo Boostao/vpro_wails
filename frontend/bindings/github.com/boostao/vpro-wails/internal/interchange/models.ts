@@ -51,6 +51,8 @@ export interface AccessProjectImportResult {
     "destinationPath": string;
     "destinationSha256": string;
     "plotCount": number;
+    "quarantinedMalformedRows": number;
+    "quarantinedOrphanRows": number;
     "tables": AccessImportTableSummary[] | null;
     "importedSUs": string[] | null;
     "activated": boolean;

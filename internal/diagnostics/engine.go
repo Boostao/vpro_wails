@@ -571,20 +571,38 @@ func computeSnapshotInReadTx(
 	envMap := map[string]envPlotInfo{}
 	envOrder := []string{}
 
+	adminMap := map[string]string{}
+	adminRows, aErr := tx.QueryContext(ctx,
+		`SELECT CAST("Plot" AS TEXT), COALESCE(CAST("UserSiteUnit" AS TEXT), '')
+		 FROM "project".`+vprocore.QuoteHeaderIdentifier(project+"_Admin")+`
+		 WHERE typeof("Plot")='text'`)
+	if aErr != nil {
+		return nil, aErr
+	}
+	for adminRows.Next() {
+		var pNum, uSU string
+		if err := adminRows.Scan(&pNum, &uSU); err != nil {
+			adminRows.Close()
+			return nil, err
+		}
+		if _, dup := adminMap[pNum]; !dup {
+			adminMap[pNum] = uSU
+		}
+	}
+	if err := errors.Join(adminRows.Err(), adminRows.Close()); err != nil {
+		return nil, err
+	}
+
 	envRows, err := tx.QueryContext(ctx,
 		`SELECT CAST(env."PlotNumber" AS TEXT),
 		        COALESCE(CAST(env."FieldNumber" AS TEXT), ''),
 		        COALESCE(CAST(env."Zone" AS TEXT), ''),
 		        COALESCE(CAST(env."SubZone" AS TEXT), ''),
 		        COALESCE(CAST(env."SiteSeries" AS TEXT), ''),
-		        COALESCE(CAST(admin."UserSiteUnit" AS TEXT), ''),
 		        COALESCE(CAST(env."MoistureRegime" AS TEXT), ''),
 		        COALESCE(CAST(env."NutrientRegime" AS TEXT), '')
 		 FROM "project".`+vprocore.QuoteHeaderIdentifier(project+"_Env")+` AS env
-		 INNER JOIN "project".`+vprocore.QuoteHeaderIdentifier(project+"_Admin")+` AS admin
-		   ON typeof(env."PlotNumber")='text' AND typeof(admin."Plot")='text'
-		  AND CAST(env."PlotNumber" AS BLOB)=CAST(admin."Plot" AS BLOB)
-		 WHERE env."PlotNumber" IS NOT NULL AND TRIM(CAST(env."PlotNumber" AS TEXT)) <> ''
+		 WHERE typeof(env."PlotNumber")='text' AND TRIM(CAST(env."PlotNumber" AS TEXT)) <> ''
 		 ORDER BY env."PlotNumber" COLLATE NOCASE ASC, env.rowid ASC`)
 	if err != nil {
 		return nil, err
@@ -593,11 +611,16 @@ func computeSnapshotInReadTx(
 		var rec envPlotInfo
 		if err := envRows.Scan(
 			&rec.plotNumber, &rec.fieldNumber, &rec.zone, &rec.subZone, &rec.siteSeries,
-			&rec.userSiteUnit, &rec.moistureRegime, &rec.nutrientRegime,
+			&rec.moistureRegime, &rec.nutrientRegime,
 		); err != nil {
 			envRows.Close()
 			return nil, err
 		}
+		uSU, inAdmin := adminMap[rec.plotNumber]
+		if !inAdmin {
+			continue
+		}
+		rec.userSiteUnit = uSU
 		if _, dup := envMap[rec.plotNumber]; !dup {
 			envOrder = append(envOrder, rec.plotNumber)
 			envMap[rec.plotNumber] = rec
@@ -758,6 +781,17 @@ func computeSnapshotInReadTx(
 	foldedSourceTaxa := map[string]bool{}
 
 	if len(classifiedPlots) > 0 {
+		vegWhere := `WHERE typeof(v."PlotNumber")='text' AND v."Species" IS NOT NULL`
+		var vegArgs []any
+		if len(classifiedPlots) <= 900 {
+			placeholders := make([]string, len(classifiedPlots))
+			vegArgs = make([]any, len(classifiedPlots))
+			for i := range classifiedPlots {
+				placeholders[i] = "?"
+				vegArgs[i] = classifiedPlots[i].plotNumber
+			}
+			vegWhere = `WHERE v."PlotNumber" IN (` + strings.Join(placeholders, ",") + `) AND typeof(v."PlotNumber")='text' AND v."Species" IS NOT NULL`
+		}
 		vegRows, err := tx.QueryContext(ctx,
 			`SELECT CAST(v."PlotNumber" AS TEXT),
 			        COALESCE(CAST(v."Species" AS TEXT), ''),
@@ -765,7 +799,7 @@ func computeSnapshotInReadTx(
 			        v."Cover4", v."Cover5", v."Cover5a", v."Cover5b", v."Cover5c", v."TotalB",
 			        v."Cover6", v."Cover7", v."Cover8", v."Cover9", v."Cover10"
 			 FROM "project".`+vprocore.QuoteHeaderIdentifier(project+"_Veg")+` AS v
-			 WHERE typeof(v."PlotNumber")='text' AND v."Species" IS NOT NULL`)
+			 `+vegWhere, vegArgs...)
 		if err != nil {
 			return nil, err
 		}

@@ -26,6 +26,7 @@ typedef struct {
 GoMdbReader *go_mdb_open_reader(const char *path, const char *table_name, int *error);
 void go_mdb_close_reader(GoMdbReader *reader);
 int go_mdb_next(GoMdbReader *reader);
+void go_mdb_clear_row_error(GoMdbReader *reader);
 MdbColumn *go_mdb_column(GoMdbReader *reader, int index);
 MdbCatalogEntry *go_mdb_entry(GPtrArray *catalog, unsigned int index);
 MdbProperties *go_mdb_property_block(MdbCatalogEntry *entry, unsigned int index);

@@ -102,6 +102,19 @@ int go_mdb_next(GoMdbReader *reader) {
     return 1;
 }
 
+void go_mdb_clear_row_error(GoMdbReader *reader) {
+    if (!reader || !reader->mdb) return;
+    reader->mdb->go_error = 0;
+    if (reader->table && reader->table->strategy != MDB_INDEX_SCAN) {
+        reader->table->cur_row++;
+    }
+#ifdef HAVE_ICONV
+    if (reader->mdb->iconv_in != (iconv_t)-1) {
+        iconv(reader->mdb->iconv_in, NULL, NULL, NULL, NULL);
+    }
+#endif
+}
+
 void *go_mdb_blob(GoMdbReader *reader, int index, size_t *size) {
     MdbColumn *col = go_mdb_column(reader, index);
     *size = 0;

@@ -628,7 +628,11 @@ func buildDatasheetWhereAndOrder(
 	if len(orderParts) == 0 {
 		if pinned, ok := colLookup[strings.ToLower(target.pinnedColumn)]; ok {
 			qPin := vprocore.QuoteHeaderIdentifier(pinned.Name)
-			orderParts = append(orderParts, "CASE WHEN "+qPin+" IS NULL THEN 1 ELSE 0 END ASC", qPin+" COLLATE NOCASE ASC", qPin+" COLLATE BINARY ASC")
+			if target.key == "Env" || target.key == "Veg" {
+				orderParts = append(orderParts, qPin+" COLLATE NOCASE ASC", qPin+" COLLATE BINARY ASC")
+			} else {
+				orderParts = append(orderParts, "CASE WHEN "+qPin+" IS NULL THEN 1 ELSE 0 END ASC", qPin+" COLLATE NOCASE ASC", qPin+" COLLATE BINARY ASC")
+			}
 		}
 		if target.key == "Humus" {
 			if _, ok := colLookup["upperdepth"]; ok {

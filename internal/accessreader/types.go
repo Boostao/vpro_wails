@@ -67,3 +67,9 @@ type TableDescriptionObservation struct {
 // Row contains values in the same order as a reader's Columns.
 // NULL is nil; binary fields are []byte.
 type Row []any
+
+// QuarantinedRow records a 1-based row index skipped when EnableRowQuarantine is active.
+type QuarantinedRow struct {
+	RowNumber int
+	Reason    string
+}

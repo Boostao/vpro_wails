@@ -10,8 +10,10 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"slices"
@@ -60,18 +62,20 @@ type AccessProjectImportRequest struct {
 }
 
 type AccessProjectImportResult struct {
-	SourcePath      string                     `json:"sourcePath"`
-	SourceProject   string                     `json:"sourceProject"`
-	SourceVersion   string                     `json:"sourceVersion"`
-	ConversionMode  string                     `json:"conversionMode"`
-	TargetProject   string                     `json:"targetProject"`
-	DestinationPath string                     `json:"destinationPath"`
-	DestinationSHA  string                     `json:"destinationSha256"`
-	PlotCount       int                        `json:"plotCount"`
-	Tables          []AccessImportTableSummary `json:"tables"`
-	ImportedSUs     []string                   `json:"importedSUs"`
-	Activated       bool                       `json:"activated"`
-	State           *vprocore.ProjectState     `json:"state,omitempty"`
+	SourcePath              string                     `json:"sourcePath"`
+	SourceProject           string                     `json:"sourceProject"`
+	SourceVersion           string                     `json:"sourceVersion"`
+	ConversionMode          string                     `json:"conversionMode"`
+	TargetProject           string                     `json:"targetProject"`
+	DestinationPath         string                     `json:"destinationPath"`
+	DestinationSHA          string                     `json:"destinationSha256"`
+	PlotCount               int                        `json:"plotCount"`
+	QuarantinedMalformedRow int                        `json:"quarantinedMalformedRows"`
+	QuarantinedOrphanRows   int                        `json:"quarantinedOrphanRows"`
+	Tables                  []AccessImportTableSummary `json:"tables"`
+	ImportedSUs             []string                   `json:"importedSUs"`
+	Activated               bool                       `json:"activated"`
+	State                   *vprocore.ProjectState     `json:"state,omitempty"`
 }
 
 var vp07EnvMapping = [][2]string{
@@ -308,13 +312,26 @@ func sanitizeProjectSuggestion(raw string) string {
 	if len(candidate) > 31 {
 		candidate = candidate[:31]
 	}
-	if strings.EqualFold(candidate, "Sample") || strings.EqualFold(candidate, "None") {
+	if strings.EqualFold(candidate, "Sample") || strings.EqualFold(candidate, "None") || strings.EqualFold(candidate, "Master") {
 		candidate += "_Imp"
 		if len(candidate) > 31 {
 			candidate = candidate[:31]
 		}
 	}
 	return candidate
+}
+
+func streamFileSHA256(path string) (string, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
 func resolveAccessSourcePath(requested string) (string, string, error) {
@@ -329,12 +346,11 @@ func resolveAccessSourcePath(requested string) (string, string, error) {
 	if err != nil {
 		return "", "", fmt.Errorf("resolve Access database %q: %w", requested, err)
 	}
-	data, err := os.ReadFile(resolved)
+	digest, err := streamFileSHA256(resolved)
 	if err != nil {
 		return "", "", fmt.Errorf("read Access database %q: %w", resolved, err)
 	}
-	digest := sha256.Sum256(data)
-	return resolved, hex.EncodeToString(digest[:]), nil
+	return resolved, digest, nil
 }
 
 func InspectAccessDatabase(s *vprocore.ContextService, ctx context.Context, contextID, sourcePath string) (AccessDatabaseInspection, error) {
@@ -446,15 +462,28 @@ func InspectAccessDatabase(s *vprocore.ContextService, ctx context.Context, cont
 			if exists {
 				summary.SourceTable = srcTbl.Name
 				summary.Description = srcTbl.Description
-				cols, rows, readErr := db.ReadAll(srcTbl.Name)
+				reader, readErr := db.Scan(srcTbl.Name)
 				if readErr != nil {
 					allPresent = false
-					candidate.StatusMessage = fmt.Sprintf("Failed reading %s: %v", srcTbl.Name, readErr)
+					candidate.StatusMessage = fmt.Sprintf("Failed opening %s: %v", srcTbl.Name, readErr)
 				} else {
-					summary.ColumnCount = len(cols)
-					summary.RowCount = len(rows)
-					if suffix == "Env" {
-						candidate.PlotCount = len(rows)
+					reader.EnableRowQuarantine()
+					rowCnt := 0
+					for reader.Next() {
+						rowCnt++
+					}
+					iterErr := reader.Err()
+					colCnt := len(reader.Columns)
+					_ = reader.Close()
+					if iterErr != nil {
+						allPresent = false
+						candidate.StatusMessage = fmt.Sprintf("Failed reading %s: %v", srcTbl.Name, iterErr)
+					} else {
+						summary.ColumnCount = colCnt
+						summary.RowCount = rowCnt
+						if suffix == "Env" {
+							candidate.PlotCount = rowCnt
+						}
 					}
 				}
 				if version == "VP08" {
@@ -515,75 +544,269 @@ func adaptAccessRows(ctx context.Context, cols []accessreader.Column, rows []acc
 	return colIndex, adapted, nil
 }
 
-func insertMappedRows(ctx context.Context, tx *sql.Tx, targetTable string, targetToSource [][2]string, colIndex map[string]int, rows [][]any, computed map[string]func([]any) any) error {
-	targetCols := make([]string, 0, len(targetToSource)+len(computed))
-	sourceIndices := make([]int, len(targetToSource))
-	for i, pair := range targetToSource {
-		idx, ok := colIndex[strings.ToLower(pair[1])]
-		if !ok {
-			if strings.EqualFold(pair[1], "Collected") {
-				sourceIndices[i] = -1
-			} else {
-				return fmt.Errorf("source table for %s is missing column %q", targetTable, pair[1])
-			}
-		} else {
-			sourceIndices[i] = idx
-		}
-		targetCols = append(targetCols, vprocore.QuoteHeaderIdentifier(pair[0]))
-	}
-	computedKeys := make([]string, 0, len(computed))
-	for k := range computed {
-		computedKeys = append(computedKeys, k)
-	}
-	slices.Sort(computedKeys)
-	for _, k := range computedKeys {
-		targetCols = append(targetCols, vprocore.QuoteHeaderIdentifier(k))
-	}
-	marks := make([]string, len(targetCols))
-	for i := range marks {
-		marks[i] = "?"
-	}
-	stmtSQL := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
-		vprocore.QuoteHeaderIdentifier(targetTable),
-		strings.Join(targetCols, ", "),
-		strings.Join(marks, ", "))
-	stmt, err := tx.PrepareContext(ctx, stmtSQL)
+func querySQLiteTableColumns(ctx context.Context, tx *sql.Tx, tableName string) (map[string]string, error) {
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("PRAGMA table_info(%s)", vprocore.QuoteHeaderIdentifier(tableName)))
 	if err != nil {
-		return fmt.Errorf("prepare insert into %s: %w", targetTable, err)
+		return nil, err
 	}
-	defer stmt.Close()
-	for rIdx, row := range rows {
-		args := make([]any, 0, len(targetCols))
-		for _, idx := range sourceIndices {
-			if idx < 0 {
-				args = append(args, nil)
-			} else {
-				args = append(args, row[idx])
-			}
+	defer rows.Close()
+	cols := make(map[string]string)
+	for rows.Next() {
+		var cid, notNull, pk int
+		var name, colType string
+		var dflt sql.NullString
+		if err := rows.Scan(&cid, &name, &colType, &notNull, &dflt, &pk); err != nil {
+			return nil, err
 		}
-		for _, k := range computedKeys {
-			args = append(args, computed[k](row))
-		}
-		if _, err := stmt.ExecContext(ctx, args...); err != nil {
-			return fmt.Errorf("insert row %d into %s: %w", rIdx+1, targetTable, err)
-		}
+		cols[strings.ToLower(name)] = name
 	}
-	return nil
+	return cols, rows.Err()
 }
 
-func identityColumnPairs(columns []string) [][2]string {
-	pairs := make([][2]string, len(columns))
-	for i, c := range columns {
-		pairs[i] = [2]string{c, c}
+type streamInsertSpec struct {
+	targetTable    string
+	targetToSource [][2]string // nil means intersect source columns with target SQLite columns
+	computed       map[string]func([]any, map[string]int) any
+	requireEnvPlot bool
+	plotSourceCol  string
+	dedupePlotKey  bool
+	recordEnvPlots map[string]struct{}
+}
+
+type streamTableMetrics struct {
+	actualSourceTable string
+	columnCount       int
+	importedRows      int
+	malformedRows     int
+	orphanRows        int
+}
+
+func streamAccessTableIntoSQLite(
+	ctx context.Context,
+	db *accessreader.DB,
+	tx *sql.Tx,
+	quarantineStmt *sql.Stmt,
+	sourceTable string,
+	validEnvPlots map[string]struct{},
+	specs []streamInsertSpec,
+) (streamTableMetrics, error) {
+	var metrics streamTableMetrics
+	reader, err := db.Scan(sourceTable)
+	if err != nil {
+		return metrics, fmt.Errorf("open %s: %w", sourceTable, err)
 	}
-	return pairs
+	defer reader.Close()
+	reader.EnableRowQuarantine()
+	metrics.actualSourceTable = sourceTable
+	metrics.columnCount = len(reader.Columns)
+
+	srcCols := make([]accessimport.SourceColumn, len(reader.Columns))
+	colIndex := make(map[string]int, len(reader.Columns))
+	for i, c := range reader.Columns {
+		srcCols[i] = accessimport.SourceColumn{Name: c.Name, Type: c.Type}
+		colIndex[strings.ToLower(c.Name)] = i
+	}
+	colPlan, err := accessimport.PlanColumns(ctx, srcCols)
+	if err != nil {
+		return metrics, err
+	}
+
+	type preparedTarget struct {
+		spec          streamInsertSpec
+		stmt          *sql.Stmt
+		sourceIndices []int
+		computedKeys  []string
+		seenPlots     map[string]struct{}
+		plotIdx       int
+	}
+	targets := make([]preparedTarget, len(specs))
+	for sIdx, spec := range specs {
+		mapping := spec.targetToSource
+		if mapping == nil {
+			dstCols, err := querySQLiteTableColumns(ctx, tx, spec.targetTable)
+			if err != nil {
+				return metrics, err
+			}
+			for _, c := range reader.Columns {
+				if canonical, ok := dstCols[strings.ToLower(c.Name)]; ok {
+					mapping = append(mapping, [2]string{canonical, c.Name})
+				}
+			}
+		}
+		targetCols := make([]string, 0, len(mapping)+len(spec.computed))
+		sourceIndices := make([]int, len(mapping))
+		for i, pair := range mapping {
+			idx, ok := colIndex[strings.ToLower(pair[1])]
+			if !ok {
+				if strings.EqualFold(pair[1], "Collected") {
+					sourceIndices[i] = -1
+				} else {
+					return metrics, fmt.Errorf("source table %s for %s is missing column %q", sourceTable, spec.targetTable, pair[1])
+				}
+			} else {
+				sourceIndices[i] = idx
+			}
+			targetCols = append(targetCols, vprocore.QuoteHeaderIdentifier(pair[0]))
+		}
+		var computedKeys []string
+		for k := range spec.computed {
+			computedKeys = append(computedKeys, k)
+		}
+		slices.Sort(computedKeys)
+		for _, k := range computedKeys {
+			targetCols = append(targetCols, vprocore.QuoteHeaderIdentifier(k))
+		}
+		marks := make([]string, len(targetCols))
+		for i := range marks {
+			marks[i] = "?"
+		}
+		stmtSQL := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)",
+			vprocore.QuoteHeaderIdentifier(spec.targetTable),
+			strings.Join(targetCols, ", "),
+			strings.Join(marks, ", "))
+		stmt, err := tx.PrepareContext(ctx, stmtSQL)
+		if err != nil {
+			return metrics, fmt.Errorf("prepare insert into %s: %w", spec.targetTable, err)
+		}
+		defer stmt.Close()
+
+		plotCol := spec.plotSourceCol
+		if plotCol == "" {
+			plotCol = "PlotNumber"
+		}
+		pIdx, hasPlot := colIndex[strings.ToLower(plotCol)]
+		if !hasPlot {
+			pIdx = -1
+		}
+		var seen map[string]struct{}
+		if spec.dedupePlotKey || spec.recordEnvPlots != nil {
+			seen = make(map[string]struct{})
+		}
+		targets[sIdx] = preparedTarget{
+			spec:          spec,
+			stmt:          stmt,
+			sourceIndices: sourceIndices,
+			computedKeys:  computedKeys,
+			seenPlots:     seen,
+			plotIdx:       pIdx,
+		}
+	}
+
+	adapted := make([]any, len(colPlan))
+	rowOrdinal := 0
+	for reader.Next() {
+		rowOrdinal++
+		if rowOrdinal&4095 == 0 {
+			if err := ctx.Err(); err != nil {
+				return metrics, err
+			}
+		}
+		rawRow := reader.Row()
+		var adaptErr error
+		for cIdx, cellVal := range rawRow {
+			adapted[cIdx], adaptErr = accessimport.SQLiteValue(cellVal)
+			if adaptErr != nil {
+				break
+			}
+		}
+		if adaptErr != nil {
+			metrics.malformedRows++
+			if quarantineStmt != nil {
+				_, _ = quarantineStmt.ExecContext(ctx, sourceTable, rowOrdinal, "", "malformed_value: "+adaptErr.Error(), "{}")
+			}
+			continue
+		}
+
+		skipRow := false
+		for tIdx := range targets {
+			tg := &targets[tIdx]
+			plotKey := ""
+			if tg.plotIdx >= 0 && adapted[tg.plotIdx] != nil {
+				plotKey = fmt.Sprint(adapted[tg.plotIdx])
+			}
+			if tg.spec.requireEnvPlot && validEnvPlots != nil {
+				if _, ok := validEnvPlots[plotKey]; !ok {
+					metrics.orphanRows++
+					if quarantineStmt != nil {
+						payload, _ := json.Marshal(adapted)
+						_, _ = quarantineStmt.ExecContext(ctx, sourceTable, rowOrdinal, plotKey, "orphan_missing_env_plot", string(payload))
+					}
+					skipRow = true
+					break
+				}
+			}
+			if tg.seenPlots != nil && plotKey != "" {
+				if _, dup := tg.seenPlots[plotKey]; dup {
+					metrics.malformedRows++
+					if quarantineStmt != nil {
+						payload, _ := json.Marshal(adapted)
+						_, _ = quarantineStmt.ExecContext(ctx, sourceTable, rowOrdinal, plotKey, "duplicate_plot_key", string(payload))
+					}
+					skipRow = true
+					break
+				}
+			}
+		}
+		if skipRow {
+			continue
+		}
+
+		insertedPrimary := false
+		for tIdx := range targets {
+			tg := &targets[tIdx]
+			args := make([]any, 0, len(tg.sourceIndices)+len(tg.computedKeys))
+			for _, idx := range tg.sourceIndices {
+				if idx < 0 {
+					args = append(args, nil)
+				} else {
+					args = append(args, adapted[idx])
+				}
+			}
+			for _, k := range tg.computedKeys {
+				args = append(args, tg.spec.computed[k](adapted, colIndex))
+			}
+			if _, execErr := tg.stmt.ExecContext(ctx, args...); execErr != nil {
+				metrics.malformedRows++
+				if quarantineStmt != nil {
+					payload, _ := json.Marshal(adapted)
+					_, _ = quarantineStmt.ExecContext(ctx, sourceTable, rowOrdinal, "", "sqlite_insert_constraint: "+execErr.Error(), string(payload))
+				}
+				break
+			}
+			if tg.plotIdx >= 0 && adapted[tg.plotIdx] != nil {
+				pk := fmt.Sprint(adapted[tg.plotIdx])
+				if tg.seenPlots != nil && pk != "" {
+					tg.seenPlots[pk] = struct{}{}
+				}
+				if tg.spec.recordEnvPlots != nil && pk != "" {
+					tg.spec.recordEnvPlots[pk] = struct{}{}
+				}
+			}
+			if tIdx == 0 {
+				insertedPrimary = true
+			}
+		}
+		if insertedPrimary {
+			metrics.importedRows++
+		}
+	}
+	if err := reader.Err(); err != nil {
+		return metrics, fmt.Errorf("scan %s: %w", sourceTable, err)
+	}
+	for _, q := range reader.Quarantined {
+		metrics.malformedRows++
+		if quarantineStmt != nil {
+			_, _ = quarantineStmt.ExecContext(ctx, sourceTable, q.RowNumber, "", "access_decode: "+q.Reason, "{}")
+		}
+	}
+	return metrics, nil
 }
 
 func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contextID string, request AccessProjectImportRequest) (_ AccessProjectImportResult, resultErr error) {
 	targetProject := strings.TrimSpace(request.TargetProject)
 	if !vprocore.ProjectNamePattern.MatchString(targetProject) || strings.EqualFold(targetProject, "None") ||
-		strings.EqualFold(targetProject, "Sample") || strings.Contains(strings.ToLower(targetProject), "master") {
-		return AccessProjectImportResult{}, errors.New("target project name must start with a letter, use only letters/digits/underscore (max 31 chars), and not be None, Sample, or master")
+		strings.EqualFold(targetProject, "Sample") || strings.EqualFold(targetProject, "Master") {
+		return AccessProjectImportResult{}, errors.New("target project name must start with a letter, use only letters/digits/underscore (max 31 chars), and not be None, Sample, or Master")
 	}
 	destPath := strings.TrimSpace(request.DestinationPath)
 	if destPath != "" && !strings.EqualFold(filepath.Ext(destPath), ".db") {
@@ -630,63 +853,44 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 		return AccessProjectImportResult{}, fmt.Errorf("source project %s has unsupported version %q (supported: VP05, VP06, VP07, VP08)", sourceProject, version)
 	}
 
-	readAdapted := func(suffix string) ([]accessreader.Column, map[string]int, [][]any, string, error) {
+	requireSourceTable := func(suffix string) (string, error) {
 		tbl, exists := byLower[strings.ToLower(sourceProject+"_"+suffix)]
 		if !exists {
-			return nil, nil, nil, "", fmt.Errorf("missing required table %s_%s", sourceProject, suffix)
+			return "", fmt.Errorf("missing required table %s_%s", sourceProject, suffix)
 		}
-		cols, rows, err := db.ReadAll(tbl.Name)
-		if err != nil {
-			return nil, nil, nil, "", fmt.Errorf("read %s: %w", tbl.Name, err)
-		}
-		idx, adapted, err := adaptAccessRows(ctx, cols, rows)
-		if err != nil {
-			return nil, nil, nil, "", fmt.Errorf("adapt %s: %w", tbl.Name, err)
-		}
-		return cols, idx, adapted, tbl.Name, nil
+		return tbl.Name, nil
 	}
 
-	envCols, envIdx, envRows, envActualName, err := readAdapted("Env")
+	envActualName, err := requireSourceTable("Env")
 	if err != nil {
 		return AccessProjectImportResult{}, err
 	}
-	vegCols, vegIdx, vegRows, vegActualName, err := readAdapted("Veg")
+	vegActualName, err := requireSourceTable("Veg")
 	if err != nil {
 		return AccessProjectImportResult{}, err
 	}
-	otherCols, otherIdx, otherRows, otherActualName, err := readAdapted("Other")
+	otherActualName, err := requireSourceTable("Other")
 	if err != nil {
 		return AccessProjectImportResult{}, err
 	}
-	humusCols, humusIdx, humusRows, humusActualName, err := readAdapted("Humus")
+	humusActualName, err := requireSourceTable("Humus")
 	if err != nil {
 		return AccessProjectImportResult{}, err
 	}
-	mineralCols, mineralIdx, mineralRows, mineralActualName, err := readAdapted("Mineral")
+	mineralActualName, err := requireSourceTable("Mineral")
 	if err != nil {
 		return AccessProjectImportResult{}, err
 	}
-	auditCols, auditIdx, auditRows, auditActualName, err := readAdapted("Audit")
+	auditActualName, err := requireSourceTable("Audit")
 	if err != nil {
 		return AccessProjectImportResult{}, err
 	}
-
-	var metaCols []accessreader.Column
-	var metaIdx map[string]int
-	var metaRows [][]any
-	var metaActualName string
-	var adminCols []accessreader.Column
-	var adminIdx map[string]int
-	var adminRows [][]any
-	var adminActualName string
-
+	var metaActualName, adminActualName string
 	if version == "VP08" {
-		metaCols, metaIdx, metaRows, metaActualName, err = readAdapted("Metadata")
-		if err != nil {
+		if metaActualName, err = requireSourceTable("Metadata"); err != nil {
 			return AccessProjectImportResult{}, err
 		}
-		adminCols, adminIdx, adminRows, adminActualName, err = readAdapted("Admin")
-		if err != nil {
+		if adminActualName, err = requireSourceTable("Admin"); err != nil {
 			return AccessProjectImportResult{}, err
 		}
 	} else if version == "VP07" {
@@ -695,12 +899,10 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 		}
 	}
 
-	type suImportPayload struct {
-		name string
-		idx  map[string]int
-		rows [][]any
+	var suSourceTables []struct {
+		prefix string
+		table  string
 	}
-	var suPayloads []suImportPayload
 	for _, tbl := range tables {
 		if tbl.Linked || len(tbl.Name) <= 3 || !strings.EqualFold(tbl.Name[len(tbl.Name)-3:], "_SU") ||
 			strings.HasPrefix(strings.ToUpper(tbl.Name), "USYS") {
@@ -710,18 +912,24 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 		if !vprocore.ProjectNamePattern.MatchString(suPrefix) {
 			continue
 		}
-		cols, rows, readErr := db.ReadAll(tbl.Name)
-		if readErr != nil {
+		r, rErr := db.Scan(tbl.Name)
+		if rErr != nil {
 			continue
 		}
-		idx, adapted, adaptErr := adaptAccessRows(ctx, cols, rows)
-		if adaptErr != nil {
-			continue
-		}
-		if _, hasPlot := idx["plotnumber"]; hasPlot {
-			if _, hasSU := idx["siteunit"]; hasSU {
-				suPayloads = append(suPayloads, suImportPayload{name: suPrefix, idx: idx, rows: adapted})
+		hasPlot, hasSU := false, false
+		for _, c := range r.Columns {
+			if strings.EqualFold(c.Name, "PlotNumber") {
+				hasPlot = true
+			} else if strings.EqualFold(c.Name, "SiteUnit") {
+				hasSU = true
 			}
+		}
+		_ = r.Close()
+		if hasPlot && hasSU {
+			suSourceTables = append(suSourceTables, struct {
+				prefix string
+				table  string
+			}{prefix: suPrefix, table: tbl.Name})
 		}
 	}
 
@@ -734,6 +942,8 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 	defer func() {
 		if !published {
 			_ = os.Remove(tmpPath)
+			_ = os.Remove(tmpPath + "-wal")
+			_ = os.Remove(tmpPath + "-shm")
 		}
 	}()
 	if err := tmpFile.Chmod(0600); err != nil {
@@ -744,7 +954,7 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 		return AccessProjectImportResult{}, err
 	}
 
-	sqlDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(tmpPath, "rw")+"&_journal_mode=DELETE&_synchronous=FULL")
+	sqlDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(tmpPath, "rw")+"&_foreign_keys=0&_journal_mode=MEMORY&_synchronous=OFF")
 	if err != nil {
 		return AccessProjectImportResult{}, err
 	}
@@ -755,11 +965,22 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 		return AccessProjectImportResult{}, err
 	}
 
+	var envM, vegM, otherM, humusM, mineralM, auditM, metaM, adminM streamTableMetrics
+	var importedSUs []string
+	totalMalformed := 0
+	totalOrphan := 0
+
 	writeTables := func() error {
+		var deferredIndexes []string
 		for _, tblPlan := range ddlPlan.Tables {
 			for _, mapping := range tblPlan.Schema {
 				if mapping.SQL != nil {
-					if _, err := tx.ExecContext(ctx, *mapping.SQL); err != nil {
+					stmtText := strings.TrimSpace(*mapping.SQL)
+					if strings.HasPrefix(strings.ToUpper(stmtText), "CREATE INDEX") || strings.HasPrefix(strings.ToUpper(stmtText), "CREATE UNIQUE INDEX") {
+						deferredIndexes = append(deferredIndexes, stmtText)
+						continue
+					}
+					if _, err := tx.ExecContext(ctx, stmtText); err != nil {
 						return fmt.Errorf("create schema for %s: %w", tblPlan.TargetTable, err)
 					}
 				}
@@ -773,105 +994,210 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 				return err
 			}
 		}
+		if _, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS "__VPRO_ImportQuarantine" (
+			"ID" INTEGER PRIMARY KEY AUTOINCREMENT,
+			"SourceTable" TEXT NOT NULL,
+			"SourceRow" INTEGER NOT NULL,
+			"PlotNumber" TEXT NOT NULL,
+			"Reason" TEXT NOT NULL,
+			"PayloadJSON" TEXT NOT NULL
+		)`); err != nil {
+			return err
+		}
+		quarantineStmt, err := tx.PrepareContext(ctx, `INSERT INTO "__VPRO_ImportQuarantine" ("SourceTable","SourceRow","PlotNumber","Reason","PayloadJSON") VALUES (?,?,?,?,?)`)
+		if err != nil {
+			return err
+		}
+		defer quarantineStmt.Close()
+
+		validEnvPlots := make(map[string]struct{}, 1024)
+		accumulate := func(m streamTableMetrics) {
+			totalMalformed += m.malformedRows
+			totalOrphan += m.orphanRows
+		}
 
 		switch version {
 		case "VP08":
-			for _, item := range []struct {
-				suffix string
-				cols   []accessreader.Column
-				idx    map[string]int
-				rows   [][]any
-			}{
-				{"Env", envCols, envIdx, envRows},
-				{"Veg", vegCols, vegIdx, vegRows},
-				{"Other", otherCols, otherIdx, otherRows},
-				{"Humus", humusCols, humusIdx, humusRows},
-				{"Mineral", mineralCols, mineralIdx, mineralRows},
-				{"Audit", auditCols, auditIdx, auditRows},
-				{"Metadata", metaCols, metaIdx, metaRows},
-				{"Admin", adminCols, adminIdx, adminRows},
-			} {
-				names := make([]string, len(item.cols))
-				for i, c := range item.cols {
-					names[i] = c.Name
-				}
-				if err := insertMappedRows(ctx, tx, targetProject+"_"+item.suffix, identityColumnPairs(names), item.idx, item.rows, nil); err != nil {
-					return err
-				}
+			if envM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, envActualName, nil, []streamInsertSpec{
+				{targetTable: targetProject + "_Env", dedupePlotKey: true, recordEnvPlots: validEnvPlots},
+			}); err != nil {
+				return err
 			}
+			accumulate(envM)
+			if vegM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, vegActualName, validEnvPlots, []streamInsertSpec{
+				{targetTable: targetProject + "_Veg", requireEnvPlot: true},
+			}); err != nil {
+				return err
+			}
+			accumulate(vegM)
+			if otherM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, otherActualName, validEnvPlots, []streamInsertSpec{
+				{targetTable: targetProject + "_Other", requireEnvPlot: true},
+			}); err != nil {
+				return err
+			}
+			accumulate(otherM)
+			if humusM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, humusActualName, validEnvPlots, []streamInsertSpec{
+				{targetTable: targetProject + "_Humus", requireEnvPlot: true},
+			}); err != nil {
+				return err
+			}
+			accumulate(humusM)
+			if mineralM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, mineralActualName, validEnvPlots, []streamInsertSpec{
+				{targetTable: targetProject + "_Mineral", requireEnvPlot: true},
+			}); err != nil {
+				return err
+			}
+			accumulate(mineralM)
+			if auditM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, auditActualName, nil, []streamInsertSpec{
+				{targetTable: targetProject + "_Audit"},
+			}); err != nil {
+				return err
+			}
+			accumulate(auditM)
+			if metaM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, metaActualName, nil, []streamInsertSpec{
+				{targetTable: targetProject + "_Metadata"},
+			}); err != nil {
+				return err
+			}
+			accumulate(metaM)
+			if adminM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, adminActualName, validEnvPlots, []streamInsertSpec{
+				{targetTable: targetProject + "_Admin", requireEnvPlot: true, plotSourceCol: "Plot", dedupePlotKey: true},
+			}); err != nil {
+				return err
+			}
+			accumulate(adminM)
 		case "VP07":
-			if err := insertMappedRows(ctx, tx, targetProject+"_Env", vp07EnvMapping, envIdx, envRows, nil); err != nil {
+			if envM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, envActualName, nil, []streamInsertSpec{
+				{targetTable: targetProject + "_Env", targetToSource: vp07EnvMapping, dedupePlotKey: true, recordEnvPlots: validEnvPlots},
+				{targetTable: targetProject + "_Admin", targetToSource: vp07AdminFromEnvMapping},
+			}); err != nil {
 				return err
 			}
-			if err := insertMappedRows(ctx, tx, targetProject+"_Admin", vp07AdminFromEnvMapping, envIdx, envRows, nil); err != nil {
-				return err
-			}
+			accumulate(envM)
+			adminM = streamTableMetrics{actualSourceTable: envActualName, columnCount: 20, importedRows: envM.importedRows}
 		case "VP06":
-			if err := insertMappedRows(ctx, tx, targetProject+"_Env", vp06EnvMapping, envIdx, envRows, nil); err != nil {
+			if envM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, envActualName, nil, []streamInsertSpec{
+				{targetTable: targetProject + "_Env", targetToSource: vp06EnvMapping, dedupePlotKey: true, recordEnvPlots: validEnvPlots},
+				{targetTable: targetProject + "_Admin", targetToSource: vp06AdminFromEnvMapping},
+			}); err != nil {
 				return err
 			}
-			if err := insertMappedRows(ctx, tx, targetProject+"_Admin", vp06AdminFromEnvMapping, envIdx, envRows, nil); err != nil {
-				return err
-			}
+			accumulate(envM)
+			adminM = streamTableMetrics{actualSourceTable: envActualName, columnCount: 20, importedRows: envM.importedRows}
 		case "VP05":
-			lonDegIdx, hasLonDeg := envIdx["longitudedegrees"]
-			lonMinIdx := envIdx["longitudeminutes"]
-			lonSecIdx := envIdx["longitudeseconds"]
-			latDegIdx, hasLatDeg := envIdx["latitudedegrees"]
-			latMinIdx := envIdx["latitudeminutes"]
-			latSecIdx := envIdx["latitudeseconds"]
+			rCheck, err := db.Scan(envActualName)
+			if err != nil {
+				return err
+			}
+			hasLonDeg, hasLatDeg := false, false
+			for _, c := range rCheck.Columns {
+				if strings.EqualFold(c.Name, "LongitudeDegrees") {
+					hasLonDeg = true
+				} else if strings.EqualFold(c.Name, "LatitudeDegrees") {
+					hasLatDeg = true
+				}
+			}
+			_ = rCheck.Close()
 			if !hasLonDeg || !hasLatDeg {
 				return errors.New("VP05 Env table is missing LongitudeDegrees or LatitudeDegrees")
 			}
-			computed := map[string]func([]any) any{
-				"Longitude": func(r []any) any {
-					return convertLongLatToDeg(r[lonDegIdx], r[lonMinIdx], r[lonSecIdx])
+			getCol := func(r []any, idx map[string]int, name string) any {
+				if i, ok := idx[strings.ToLower(name)]; ok && i >= 0 && i < len(r) {
+					return r[i]
+				}
+				return nil
+			}
+			computed := map[string]func([]any, map[string]int) any{
+				"Longitude": func(r []any, idx map[string]int) any {
+					return convertLongLatToDeg(getCol(r, idx, "LongitudeDegrees"), getCol(r, idx, "LongitudeMinutes"), getCol(r, idx, "LongitudeSeconds"))
 				},
-				"Latitude": func(r []any) any {
-					return convertLongLatToDeg(r[latDegIdx], r[latMinIdx], r[latSecIdx])
+				"Latitude": func(r []any, idx map[string]int) any {
+					return convertLongLatToDeg(getCol(r, idx, "LatitudeDegrees"), getCol(r, idx, "LatitudeMinutes"), getCol(r, idx, "LatitudeSeconds"))
 				},
 			}
-			if err := insertMappedRows(ctx, tx, targetProject+"_Env", vp05EnvMapping, envIdx, envRows, computed); err != nil {
+			if envM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, envActualName, nil, []streamInsertSpec{
+				{targetTable: targetProject + "_Env", targetToSource: vp05EnvMapping, computed: computed, dedupePlotKey: true, recordEnvPlots: validEnvPlots},
+				{targetTable: targetProject + "_Admin", targetToSource: vp05AdminFromEnvMapping},
+			}); err != nil {
 				return err
 			}
-			if err := insertMappedRows(ctx, tx, targetProject+"_Admin", vp05AdminFromEnvMapping, envIdx, envRows, nil); err != nil {
-				return err
-			}
+			accumulate(envM)
+			adminM = streamTableMetrics{actualSourceTable: envActualName, columnCount: 20, importedRows: envM.importedRows}
 		}
 
 		if version != "VP08" {
-			for _, item := range []struct {
+			legacyPairs := []struct {
 				suffix string
+				src    string
 				cols   []string
-				idx    map[string]int
-				rows   [][]any
+				reqEnv bool
+				dst    *streamTableMetrics
 			}{
-				{"Veg", legacyVegColumns, vegIdx, vegRows},
-				{"Other", legacyOtherColumns, otherIdx, otherRows},
-				{"Humus", legacyHumusColumns, humusIdx, humusRows},
-				{"Mineral", legacyMineralColumns, mineralIdx, mineralRows},
-				{"Audit", legacyAuditColumns, auditIdx, auditRows},
-			} {
-				if err := insertMappedRows(ctx, tx, targetProject+"_"+item.suffix, identityColumnPairs(item.cols), item.idx, item.rows, nil); err != nil {
-					return err
+				{"Veg", vegActualName, legacyVegColumns, true, &vegM},
+				{"Other", otherActualName, legacyOtherColumns, true, &otherM},
+				{"Humus", humusActualName, legacyHumusColumns, true, &humusM},
+				{"Mineral", mineralActualName, legacyMineralColumns, true, &mineralM},
+				{"Audit", auditActualName, legacyAuditColumns, false, &auditM},
+			}
+			for _, item := range legacyPairs {
+				pairs := make([][2]string, len(item.cols))
+				for i, c := range item.cols {
+					pairs[i] = [2]string{c, c}
 				}
+				var envSet map[string]struct{}
+				if item.reqEnv {
+					envSet = validEnvPlots
+				}
+				m, sErr := streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, item.src, envSet, []streamInsertSpec{
+					{targetTable: targetProject + "_" + item.suffix, targetToSource: pairs, requireEnvPlot: item.reqEnv},
+				})
+				if sErr != nil {
+					return sErr
+				}
+				*item.dst = m
+				accumulate(m)
 			}
 		}
 
-		for _, su := range suPayloads {
-			suTable := vprocore.QuoteHeaderIdentifier(su.name + "_SU")
+		for _, su := range suSourceTables {
+			suTable := vprocore.QuoteHeaderIdentifier(su.prefix + "_SU")
 			if _, err := tx.ExecContext(ctx, `CREATE TABLE `+suTable+`("PlotNumber" VARCHAR,"SiteUnit" VARCHAR);
-				CREATE UNIQUE INDEX `+vprocore.QuoteHeaderIdentifier("uidx_"+su.name+"_SU_PlotNumber")+` ON `+suTable+`("PlotNumber");
-				CREATE INDEX `+vprocore.QuoteHeaderIdentifier("idx_"+su.name+"_SU_SiteUnit")+` ON `+suTable+`("SiteUnit")`); err != nil {
+				CREATE UNIQUE INDEX `+vprocore.QuoteHeaderIdentifier("uidx_"+su.prefix+"_SU_PlotNumber")+` ON `+suTable+`("PlotNumber");
+				CREATE INDEX `+vprocore.QuoteHeaderIdentifier("idx_"+su.prefix+"_SU_SiteUnit")+` ON `+suTable+`("SiteUnit")`); err != nil {
 				return err
 			}
-			if err := insertMappedRows(ctx, tx, su.name+"_SU", [][2]string{{"PlotNumber", "PlotNumber"}, {"SiteUnit", "SiteUnit"}}, su.idx, su.rows, nil); err != nil {
+			suM, suErr := streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, su.table, validEnvPlots, []streamInsertSpec{
+				{
+					targetTable:    su.prefix + "_SU",
+					targetToSource: [][2]string{{"PlotNumber", "PlotNumber"}, {"SiteUnit", "SiteUnit"}},
+					requireEnvPlot: true,
+					dedupePlotKey:  true,
+				},
+			})
+			if suErr != nil {
+				return suErr
+			}
+			accumulate(suM)
+			if _, err := tx.ExecContext(ctx, `INSERT INTO "_table_metadata" ("table_name", "description") VALUES (?, 'VP04')`, su.prefix+"_SU"); err != nil {
 				return err
 			}
-			if _, err := tx.ExecContext(ctx, `INSERT INTO "_table_metadata" ("table_name", "description") VALUES (?, 'VP04')`, su.name+"_SU"); err != nil {
-				return err
+			importedSUs = append(importedSUs, su.prefix)
+		}
+		for _, idxSQL := range deferredIndexes {
+			if _, err := tx.ExecContext(ctx, idxSQL); err != nil {
+				return fmt.Errorf("create deferred index: %w", err)
 			}
 		}
+		for _, suffix := range []string{"Env", "Veg"} {
+			qTbl := vprocore.QuoteHeaderIdentifier(targetProject + "_" + suffix)
+			qIdx := vprocore.QuoteHeaderIdentifier("idx_vpro_nocase_" + targetProject + "_" + suffix + "_PlotNumber")
+			_, _ = tx.ExecContext(ctx, fmt.Sprintf(`CREATE INDEX IF NOT EXISTS %s ON %s ("PlotNumber" COLLATE NOCASE ASC, "PlotNumber" COLLATE BINARY ASC)`, qIdx, qTbl))
+			qBin := vprocore.QuoteHeaderIdentifier("idx_vpro_bin_" + targetProject + "_" + suffix + "_PlotNumber")
+			_, _ = tx.ExecContext(ctx, fmt.Sprintf(`CREATE INDEX IF NOT EXISTS %s ON %s ("PlotNumber")`, qBin, qTbl))
+		}
+		qAdm := vprocore.QuoteHeaderIdentifier(targetProject + "_Admin")
+		qAdmIdx := vprocore.QuoteHeaderIdentifier("idx_vpro_bin_" + targetProject + "_Admin_Plot")
+		_, _ = tx.ExecContext(ctx, fmt.Sprintf(`CREATE INDEX IF NOT EXISTS %s ON %s ("Plot")`, qAdmIdx, qAdm))
 		return nil
 	}
 
@@ -884,6 +1210,7 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 		_ = sqlDB.Close()
 		return AccessProjectImportResult{}, err
 	}
+	_, _ = sqlDB.ExecContext(ctx, "PRAGMA wal_checkpoint(TRUNCATE); PRAGMA journal_mode = DELETE;")
 	if err := sqlDB.Close(); err != nil {
 		return AccessProjectImportResult{}, err
 	}
@@ -920,38 +1247,35 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 	published = true
 	_ = os.Remove(tmpPath)
 
-	destBytes, err := os.ReadFile(resolvedDest)
+	destDigestHex, err := streamFileSHA256(resolvedDest)
 	if err != nil {
 		return AccessProjectImportResult{}, err
 	}
-	destDigest := sha256.Sum256(destBytes)
 
-	importedSUs := make([]string, len(suPayloads))
-	for i, su := range suPayloads {
-		importedSUs[i] = su.name
-	}
 	summaries := []AccessImportTableSummary{
-		{Suffix: "Env", SourceTable: envActualName, Description: "VP08", RowCount: len(envRows), ColumnCount: 112, Present: true, Action: "Imported"},
-		{Suffix: "Veg", SourceTable: vegActualName, Description: "VP08", RowCount: len(vegRows), ColumnCount: 44, Present: true, Action: "Imported"},
-		{Suffix: "Other", SourceTable: otherActualName, Description: "VP08", RowCount: len(otherRows), ColumnCount: 11, Present: true, Action: "Imported"},
-		{Suffix: "Humus", SourceTable: humusActualName, Description: "VP08", RowCount: len(humusRows), ColumnCount: 18, Present: true, Action: "Imported"},
-		{Suffix: "Mineral", SourceTable: mineralActualName, Description: "VP08", RowCount: len(mineralRows), ColumnCount: 28, Present: true, Action: "Imported"},
-		{Suffix: "Audit", SourceTable: auditActualName, Description: "VP08", RowCount: len(auditRows), ColumnCount: 11, Present: true, Action: "Imported"},
-		{Suffix: "Metadata", SourceTable: metaActualName, Description: "VP08", RowCount: len(metaRows), ColumnCount: 75, Present: version == "VP08", Action: "Imported"},
-		{Suffix: "Admin", SourceTable: adminActualName, Description: "VP08", RowCount: len(envRows), ColumnCount: 20, Present: version == "VP08", Action: "Imported"},
+		{Suffix: "Env", SourceTable: envActualName, Description: "VP08", RowCount: envM.importedRows, ColumnCount: 112, Present: true, Action: "Imported"},
+		{Suffix: "Veg", SourceTable: vegActualName, Description: "VP08", RowCount: vegM.importedRows, ColumnCount: 44, Present: true, Action: "Imported"},
+		{Suffix: "Other", SourceTable: otherActualName, Description: "VP08", RowCount: otherM.importedRows, ColumnCount: 11, Present: true, Action: "Imported"},
+		{Suffix: "Humus", SourceTable: humusActualName, Description: "VP08", RowCount: humusM.importedRows, ColumnCount: 18, Present: true, Action: "Imported"},
+		{Suffix: "Mineral", SourceTable: mineralActualName, Description: "VP08", RowCount: mineralM.importedRows, ColumnCount: 28, Present: true, Action: "Imported"},
+		{Suffix: "Audit", SourceTable: auditActualName, Description: "VP08", RowCount: auditM.importedRows, ColumnCount: 11, Present: true, Action: "Imported"},
+		{Suffix: "Metadata", SourceTable: metaActualName, Description: "VP08", RowCount: metaM.importedRows, ColumnCount: 75, Present: version == "VP08", Action: "Imported"},
+		{Suffix: "Admin", SourceTable: adminActualName, Description: "VP08", RowCount: adminM.importedRows, ColumnCount: 20, Present: true, Action: "Imported"},
 	}
 
 	result := AccessProjectImportResult{
-		SourcePath:      resolvedSource,
-		SourceProject:   sourceProject,
-		SourceVersion:   version,
-		ConversionMode:  fmt.Sprintf("%s -> VP08", version),
-		TargetProject:   targetProject,
-		DestinationPath: resolvedDest,
-		DestinationSHA:  hex.EncodeToString(destDigest[:]),
-		PlotCount:       len(envRows),
-		Tables:          summaries,
-		ImportedSUs:     importedSUs,
+		SourcePath:              resolvedSource,
+		SourceProject:           sourceProject,
+		SourceVersion:           version,
+		ConversionMode:          fmt.Sprintf("%s -> VP08", version),
+		TargetProject:           targetProject,
+		DestinationPath:         resolvedDest,
+		DestinationSHA:          destDigestHex,
+		PlotCount:               envM.importedRows,
+		QuarantinedMalformedRow: totalMalformed,
+		QuarantinedOrphanRows:   totalOrphan,
+		Tables:                  summaries,
+		ImportedSUs:             importedSUs,
 	}
 
 	if request.ActivateOnSuccess {

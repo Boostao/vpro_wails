@@ -9,8 +9,12 @@ var errUnsupportedPlatform = errors.New("Access database reading is only support
 type DB struct{ path string }
 
 type Reader struct {
-	Columns []Column
+	Columns     []Column
+	Quarantined []QuarantinedRow
 }
+
+func (reader *Reader) EnableRowQuarantine()  {}
+func (reader *Reader) EstimatedRowCount() int { return 0 }
 
 func Open(path string) (*DB, error) {
 	return nil, errUnsupportedPlatform

@@ -148,6 +148,68 @@ func ReadSQLiteLiteralTextRows(ctx context.Context, db ProjectMetadataQueryer, a
 	return readSQLiteStorageRowsScoped(ctx, db, alias, table, filterColumn, &filterValue, orderColumn, true)
 }
 
+func ReadSQLiteStorageRowsIn(ctx context.Context, db ProjectMetadataQueryer, alias, table, filterColumn string, filterValues []string, orderColumn string) (ProjectMetadataTable, error) {
+	columns, err := ReadSQLiteStorageColumns(ctx, db, alias, table)
+	if err != nil {
+		return ProjectMetadataTable{}, err
+	}
+	result := ProjectMetadataTable{Columns: columns, Rows: []ProjectMetadataRow{}}
+	if len(filterValues) == 0 {
+		return result, nil
+	}
+	fields := []string{"rowid"}
+	for _, column := range result.Columns {
+		name := QuoteHeaderIdentifier(column.Name)
+		fields = append(fields, "typeof("+name+")", "CASE typeof("+name+
+			") WHEN 'integer' THEN CAST("+name+" AS INTEGER) WHEN 'real' THEN CAST("+name+
+			" AS REAL) ELSE CAST("+name+" AS BLOB) END")
+	}
+	relation := QuoteHeaderIdentifier(alias) + "." + QuoteHeaderIdentifier(table)
+	qCol := QuoteHeaderIdentifier(filterColumn)
+	marks := make([]string, len(filterValues))
+	arguments := make([]any, len(filterValues))
+	for i, v := range filterValues {
+		marks[i] = "?"
+		arguments[i] = v
+	}
+	query := "SELECT " + strings.Join(fields, ",") + " FROM " + relation +
+		" WHERE " + qCol + " IN (" + strings.Join(marks, ",") + ") AND typeof(" + qCol + ")='text' ORDER BY "
+	if orderColumn != "" {
+		query += QuoteHeaderIdentifier(orderColumn) + ","
+	}
+	query += "rowid"
+	rows, err := db.QueryContext(ctx, query, arguments...)
+	if err != nil {
+		return ProjectMetadataTable{}, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var rowID int64
+		storage := make([]string, len(result.Columns))
+		values := make([]any, len(result.Columns))
+		destinations := []any{&rowID}
+		for i := range values {
+			destinations = append(destinations, &storage[i], &values[i])
+		}
+		if err := rows.Scan(destinations...); err != nil {
+			return ProjectMetadataTable{}, err
+		}
+		row := ProjectMetadataRow{RowID: strconv.FormatInt(rowID, 10), Cells: make([]ProjectMetadataCell, 0, len(values))}
+		for i, value := range values {
+			cell, err := ProjectMetadataCellInternal(storage[i], value)
+			if err != nil {
+				return ProjectMetadataTable{}, fmt.Errorf("row %d column %s: %w", rowID, result.Columns[i].Name, err)
+			}
+			row.Cells = append(row.Cells, cell)
+		}
+		result.Rows = append(result.Rows, row)
+	}
+	if err := rows.Err(); err != nil {
+		return ProjectMetadataTable{}, err
+	}
+	return result, nil
+}
+
 func readSQLiteStorageRowsScoped(ctx context.Context, db ProjectMetadataQueryer, alias, table, filterColumn string, filterValue *string, orderColumn string, literalText bool) (ProjectMetadataTable, error) {
 	columns, err := ReadSQLiteStorageColumns(ctx, db, alias, table)
 	if err != nil {

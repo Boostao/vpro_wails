@@ -14,6 +14,15 @@ import (
 	"testing"
 )
 
+func firstExistingPath(paths ...string) string {
+	for _, p := range paths {
+		if _, err := os.Stat(p); err == nil {
+			return p
+		}
+	}
+	return paths[0]
+}
+
 func TestConvertLongLatToDeg(t *testing.T) {
 	if got := convertLongLatToDeg(nil, int64(30), float64(0)); got != nil {
 		t.Fatalf("expected nil when degrees is nil, got %v", got)
@@ -60,7 +69,7 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 	}{
 		{
 			name:          "VP08_VPro64_Sample",
-			sourcePath:    `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\VPro64.accdb`,
+			sourcePath:    firstExistingPath(`/home/bruno/Work/VPRO_ACCESS/VPro64/VPro64.accdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\VPro64.accdb`),
 			sourceProject: "Sample",
 			targetProject: "ImportedVP08",
 			wantVersion:   "VP08",
@@ -69,7 +78,7 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 		},
 		{
 			name:          "VP08_Haida_Gwaii_2019",
-			sourcePath:    `C:\Users\BrunoTremblay\Work\VPRO_ACCESS_1\VPro64\Haida_Gwaii_2019.accdb`,
+			sourcePath:    firstExistingPath(`/home/bruno/Work/VPRO_ACCESS_1/VPro64/Haida_Gwaii_2019.accdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS_1\VPro64\Haida_Gwaii_2019.accdb`),
 			sourceProject: "Haida_Gwaii_VPro19_2019",
 			targetProject: "Haida2019",
 			wantVersion:   "VP08",
@@ -78,7 +87,7 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 		},
 		{
 			name:          "VP08_Manning_TEM",
-			sourcePath:    `C:\Users\BrunoTremblay\Work\VPRO_ACCESS_1\VPro64\Manning_TEM_Vpro19.accdb`,
+			sourcePath:    firstExistingPath(`/home/bruno/Work/VPRO_ACCESS_1/VPro64/Manning_TEM_Vpro19.accdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS_1\VPro64\Manning_TEM_Vpro19.accdb`),
 			sourceProject: "Manning_TEM_Vpro19",
 			targetProject: "ManningTEM",
 			wantVersion:   "VP08",
@@ -87,7 +96,7 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 		},
 		{
 			name:          "VP07_TemplateVPro15",
-			sourcePath:    `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVPro15.accdb`,
+			sourcePath:    firstExistingPath(`/home/bruno/Work/VPRO_ACCESS/VPro64/Templates/TemplateVPro15.accdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVPro15.accdb`),
 			sourceProject: "VPro15",
 			targetProject: "ConvertedVP07",
 			wantVersion:   "VP07",
@@ -96,7 +105,7 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 		},
 		{
 			name:          "VP06_TemplateVPro13",
-			sourcePath:    `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVPro13.accdb`,
+			sourcePath:    firstExistingPath(`/home/bruno/Work/VPRO_ACCESS/VPro64/Templates/TemplateVPro13.accdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVPro13.accdb`),
 			sourceProject: "VPro13",
 			targetProject: "ConvertedVP06",
 			wantVersion:   "VP06",
@@ -105,7 +114,7 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 		},
 		{
 			name:          "VP05_TemplateVPro03",
-			sourcePath:    `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVPro03.mdb`,
+			sourcePath:    firstExistingPath(`/home/bruno/Work/VPRO_ACCESS/VPro64/Templates/TemplateVPro03.mdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVPro03.mdb`),
 			sourceProject: "VPro03",
 			targetProject: "ConvertedVP05",
 			wantVersion:   "VP05",
@@ -114,7 +123,7 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 		},
 		{
 			name:          "VP05_TemplateVProXP",
-			sourcePath:    `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVProXP.mdb`,
+			sourcePath:    firstExistingPath(`/home/bruno/Work/VPRO_ACCESS/VPro64/Templates/TemplateVProXP.mdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\Templates\TemplateVProXP.mdb`),
 			sourceProject: "VProXP",
 			targetProject: "ConvertedXP",
 			wantVersion:   "VP05",

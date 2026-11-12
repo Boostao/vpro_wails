@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 )
 
 const summaryVegetationFeatureEnvironment = "VPRO_SUMMARY_VEGETATION"
@@ -215,13 +216,15 @@ func (s *SummaryVegetationService) readSnapshotWithReferenceMode(ctx context.Con
 		return fail(errors.New("Summary Vegetation requires a selected normal SU; hierarchy/dynamic-break scope is unavailable"))
 	}
 	tables := make([]vprocore.ProjectMetadataTable, 5)
-	for i, source := range []struct{ role, table string }{
+	sources := []struct{ role, table string }{
 		{"project", owner.Selection.Project + "_Veg"},
 		{"su", owner.Selection.SU + "_SU"},
 		{"VLists", "USysAllSpecs"},
 		{"VUser", "USysUserSpp"},
 		{"VPro64", "LayerCode"},
-	} {
+	}
+	for _, idx := range []int{1, 2, 3, 4, 0} {
+		source := sources[idx]
 		var count int
 		if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+vprocore.QuoteHeaderIdentifier(source.role)+
 			`.sqlite_master WHERE type='table' AND name COLLATE BINARY=?`, source.table).Scan(&count); err != nil {
@@ -230,8 +233,44 @@ func (s *SummaryVegetationService) readSnapshotWithReferenceMode(ctx context.Con
 		if count != 1 {
 			return fail(fmt.Errorf("Summary Vegetation requires original physical table %s.%s", source.role, source.table))
 		}
+		var suPlotFilter []string
+		if idx == 0 {
+			var totalVegRows int
+			_ = tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+vprocore.QuoteHeaderIdentifier(source.role)+`.`+vprocore.QuoteHeaderIdentifier(source.table)).Scan(&totalVegRows)
+			if totalVegRows > 50000 && len(tables[1].Rows) > 0 && len(tables[1].Rows) <= 900 {
+				plotColIdx := -1
+				for cIdx, col := range tables[1].Columns {
+					if strings.EqualFold(col.Name, "PlotNumber") {
+						plotColIdx = cIdx
+						break
+					}
+				}
+				if plotColIdx >= 0 {
+					seen := make(map[string]struct{}, len(tables[1].Rows))
+					allText := true
+					for _, r := range tables[1].Rows {
+						cell := r.Cells[plotColIdx]
+						if cell.Storage != "text" || cell.Text == nil {
+							allText = false
+							break
+						}
+						if _, ok := seen[*cell.Text]; !ok {
+							seen[*cell.Text] = struct{}{}
+							suPlotFilter = append(suPlotFilter, *cell.Text)
+						}
+					}
+					if !allText {
+						suPlotFilter = nil
+					}
+				}
+			}
+		}
 		var err error
-		tables[i], err = vprocore.ReadSQLiteStorageRows(ctx, tx, source.role, source.table, "", nil, "")
+		if len(suPlotFilter) > 0 {
+			tables[idx], err = vprocore.ReadSQLiteStorageRowsIn(ctx, tx, source.role, source.table, "PlotNumber", suPlotFilter, "")
+		} else {
+			tables[idx], err = vprocore.ReadSQLiteStorageRows(ctx, tx, source.role, source.table, "", nil, "")
+		}
 		if err != nil {
 			return fail(err)
 		}

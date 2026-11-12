@@ -1334,17 +1334,62 @@ func queryScopedSpatialPlotRows(ctx context.Context, owner *vprocore.SqliteConte
 	qEnv := `"project".` + vprocore.QuoteHeaderIdentifier(project+"_Env")
 	qAdmin := `"project".` + vprocore.QuoteHeaderIdentifier(project+"_Admin")
 
-	suJoin := ""
-	suExpr := "''"
-	if owner.Selection.SU != "" && owner.Selection.SU != "None" {
+	type adminInfo struct {
+		gisBGC   string
+		gisVer   sql.NullInt64
+		province string
+	}
+	adminByPlot := make(map[string]adminInfo)
+	adminRows, aErr := tx.QueryContext(ctx, `SELECT
+		CAST("Plot" AS TEXT),
+		COALESCE(CAST("GIS_BGC" AS TEXT), ''),
+		"GIS_BGC_VER",
+		COALESCE(CAST("ProvinceStateTerritory" AS TEXT), '')
+	FROM `+qAdmin+` WHERE typeof("Plot")='text'`)
+	if aErr == nil {
+		for adminRows.Next() {
+			var pKey string
+			var info adminInfo
+			if sErr := adminRows.Scan(&pKey, &info.gisBGC, &info.gisVer, &info.province); sErr == nil {
+				if _, exists := adminByPlot[pKey]; !exists {
+					adminByPlot[pKey] = info
+				}
+			}
+		}
+		_ = adminRows.Close()
+	}
+
+	hasActiveSU := owner.Selection.SU != "" && owner.Selection.SU != "None"
+	var suByPlot map[string]string
+	if hasActiveSU {
+		suByPlot = make(map[string]string)
 		qSU := `"su".` + vprocore.QuoteHeaderIdentifier(owner.Selection.SU+"_SU")
-		suJoin = ` INNER JOIN ` + qSU + ` AS su ON typeof(env."PlotNumber")='text' AND typeof(su."PlotNumber")='text' AND CAST(env."PlotNumber" AS BLOB)=CAST(su."PlotNumber" AS BLOB)`
-		suExpr = `COALESCE(CAST(su."SiteUnit" AS TEXT), '')`
+		suRows, sErr := tx.QueryContext(ctx, `SELECT
+			CAST("PlotNumber" AS TEXT),
+			COALESCE(CAST("SiteUnit" AS TEXT), '')
+		FROM `+qSU+` WHERE typeof("PlotNumber")='text'`)
+		if sErr != nil {
+			return nil, sErr
+		}
+		for suRows.Next() {
+			var pKey, suVal string
+			if err := suRows.Scan(&pKey, &suVal); err != nil {
+				_ = suRows.Close()
+				return nil, err
+			}
+			if _, exists := suByPlot[pKey]; !exists {
+				suByPlot[pKey] = suVal
+			}
+		}
+		if err := suRows.Err(); err != nil {
+			_ = suRows.Close()
+			return nil, err
+		}
+		_ = suRows.Close()
 	}
 
 	query := `SELECT
 		CAST(env."PlotNumber" AS TEXT),
-		` + suExpr + `,
 		COALESCE(CAST(env."Zone" AS TEXT), ''),
 		COALESCE(CAST(env."SubZone" AS TEXT), ''),
 		COALESCE(CAST(env."Ecosection" AS TEXT), ''),
@@ -1358,14 +1403,8 @@ func queryScopedSpatialPlotRows(ctx context.Context, owner *vprocore.SqliteConte
 		env."LocationAccuracy",
 		env."Elevation",
 		env."SlopeGradient",
-		env."Aspect",
-		COALESCE(CAST(admin."GIS_BGC" AS TEXT), ''),
-		admin."GIS_BGC_VER",
-		COALESCE(CAST(admin."ProvinceStateTerritory" AS TEXT), '')
+		env."Aspect"
 	FROM ` + qEnv + ` AS env
-	LEFT JOIN ` + qAdmin + ` AS admin
-		ON typeof(env."PlotNumber")='text' AND typeof(admin."Plot")='text' AND CAST(env."PlotNumber" AS BLOB)=CAST(admin."Plot" AS BLOB)` +
-		suJoin + `
 	WHERE typeof(env."PlotNumber")='text' AND TRIM(CAST(env."PlotNumber" AS TEXT)) <> ''
 	ORDER BY env."PlotNumber" COLLATE NOCASE ASC, env.rowid ASC`
 
@@ -1384,24 +1423,33 @@ func queryScopedSpatialPlotRows(ctx context.Context, owner *vprocore.SqliteConte
 		var r rawSpatialPlotRow
 		var lat, lon, east, north, slope sql.NullFloat64
 		var utmZ sql.NullString
-		var acc, elev, aspect, gisVer sql.NullInt64
+		var acc, elev, aspect sql.NullInt64
 		if err := rows.Scan(
 			&r.plotNumber,
-			&r.siteUnit,
 			&r.zone,
 			&r.subZone,
 			&r.ecosection,
 			&r.fsRegionDistrict,
 			&r.ntsMapSheet,
 			&lat, &lon, &utmZ, &east, &north, &acc, &elev, &slope, &aspect,
-			&r.gisBGC, &gisVer, &r.province,
 		); err != nil {
 			return nil, err
+		}
+		if hasActiveSU {
+			suVal, inSU := suByPlot[r.plotNumber]
+			if !inSU {
+				continue
+			}
+			r.siteUnit = suVal
 		}
 		if seen[r.plotNumber] {
 			continue
 		}
 		seen[r.plotNumber] = true
+		adm := adminByPlot[r.plotNumber]
+		r.gisBGC = adm.gisBGC
+		gisVer := adm.gisVer
+		r.province = adm.province
 		if lat.Valid && !math.IsNaN(lat.Float64) && !math.IsInf(lat.Float64, 0) {
 			v := lat.Float64
 			r.latitude = &v
