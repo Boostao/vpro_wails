@@ -521,12 +521,26 @@
 {#snippet identityField(field: TwoPageEntryField)}
   <label class="block text-sm font-medium" for="complete-entry-identity">Plot number</label>
   <input id="complete-entry-identity" class="w-full rounded border p-2" disabled
-    data-column={field.column} value={owner.plot} />
+    data-column={field.column} data-help-id="site.plot_number" value={owner.plot} />
 {/snippet}
 
 {#snippet fieldInput(control: PaperControl, _position: string)}
   {#if view.original && view.snapshot && control.column}
     {@const column = control.column}
+    {@const colLower = column.toLowerCase()}
+    {@const helpId = colLower === 'moistureregime' ? 'site.moisture_regime'
+      : colLower === 'nutrientregime' ? 'site.nutrient_regime'
+      : colLower === 'zone' || colLower === 'subzone' || colLower === 'siteseries' || colLower === 'becsiteunit' || colLower === 'usersiteunit' ? 'site.bgc_zone'
+      : colLower === 'ecosection' || colLower === 'fsregiondistrict' ? 'site.ecosection'
+      : colLower === 'latitude' || colLower === 'longitude' || colLower === 'utmzone' || colLower === 'utmeasting' || colLower === 'utmnorthing' ? 'site.coordinates'
+      : colLower === 'elevation' || colLower === 'slopegradient' || colLower === 'aspect' ? 'site.elevation'
+      : colLower === 'mesoslopeposition' || colLower === 'surfaceshape' ? 'site.meso_slope'
+      : colLower.startsWith('substrate') ? 'site.substrate_cover'
+      : colLower === 'structuralstage' || colLower === 'successionalstatus' ? 'site.successional_structural'
+      : colLower === 'realmclass' || colLower === 'snowcoverregime' || colLower === 'activelayerdepth' ? 'site.realm_class'
+      : colLower === 'humusform' ? 'humus.humus_form'
+      : colLower === 'rootingdepth' || colLower === 'rootrestrictingtype' || colLower === 'rootrestrictingdepth' || colLower === 'seepagedepth' || colLower === 'soildrainage' ? 'soil.rooting_seepage'
+      : 'site.plot_number'}
     {@const policy = view.snapshot.Policies.find(field => field.column === column)}
     {@const draft = view.drafts[column]}
     {@const originalCell = twoPageEntryCell(view.original, column)}
@@ -536,7 +550,7 @@
     {@const reference = view.snapshot.Fields.find(field => field.column === column)}
     {@const id = `complete-entry-${column}`}
     {@const unavailable = !editingEnabled || close.busy || view.blocked || childBlocked && !draft || column === 'BECSiteUnit' && !view.snapshot.MasterEditingAvailable}
-    <div class="min-w-0 space-y-1" data-two-page-entry-field={column} data-source-control={control.controlId}>
+    <div class="min-w-0 space-y-1" data-two-page-entry-field={column} data-source-control={control.controlId} data-help-id={helpId}>
       <label class="block text-sm font-medium" for={id}>{controlLabel(control, true)}</label>
       {#if column === 'ProjectID'}
         <select {id} class="w-full rounded border p-2" value={view.projectRowId ?? ''}

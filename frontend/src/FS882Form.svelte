@@ -3410,7 +3410,7 @@
 
 <svelte:window onkeydown={sourceEnter} />
 
-<div bind:this={container} class="fs882-container bg-white rounded-lg shadow border border-stone-200 flex flex-col h-full text-stone-800 text-sm">
+<div bind:this={container} data-help-id={siviStandalone ? 'sivi.plot_type' : 'site.plot_number'} class="fs882-container bg-white rounded-lg shadow border border-stone-200 flex flex-col h-full text-stone-800 text-sm">
   <!-- Header Bar -->
   <header class="fs882-toolbar p-3 bg-stone-100 border-b border-stone-200 flex justify-between items-center">
     <div class="flex items-center gap-3">
@@ -3542,7 +3542,7 @@
   <!-- Navigation Tabs -->
   <nav aria-label={siviStandalone ? 'SIVI sections' : 'FS882 sections'} class="fs882-tabs flex border-b border-stone-200 bg-stone-50 px-3 text-xs font-medium">
     {#if siviStandalone}
-      <button type="button" data-sivi-site-tab aria-current={activeTab === 'siviParent' ? 'page' : undefined}
+      <button type="button" data-sivi-site-tab data-help-id="sivi.plot_type" aria-current={activeTab === 'siviParent' ? 'page' : undefined}
         class="px-4 py-2 border-b-2 {activeTab === 'siviParent' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
         disabled={tabWorkflowBusy || !siviStandaloneEnabled}
         onclick={() => { activeTab = 'siviParent'; siviParentOpen = true; }}>
@@ -3550,6 +3550,7 @@
       </button>
     {:else}
     <button
+      data-help-id="site.moisture_regime"
       aria-current={activeTab === 'site' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'site' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'site'}
@@ -3559,6 +3560,7 @@
     </button>
     {/if}
     <button
+      data-help-id="veg.covers"
       aria-current={activeTab === 'veg' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'veg' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'veg'}
@@ -3568,6 +3570,7 @@
     </button>
     {#if !siviStandalone}
     <button
+      data-help-id="veg.species"
       aria-current={activeTab === 'vegOther' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'vegOther' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'vegOther'}
@@ -3576,6 +3579,7 @@
       Veg Other
     </button>
     <button
+      data-help-id="humus.upper_lower_depth"
       aria-current={activeTab === 'soils' ? 'page' : undefined}
       class="px-4 py-2 border-b-2 {activeTab === 'soils' ? 'border-emerald-600 text-emerald-800 font-bold bg-white' : 'border-transparent text-stone-600 hover:text-stone-900'}"
       onclick={() => activeTab = 'soils'}
@@ -3604,7 +3608,7 @@
   {#if (extendedShrubsEnabled && !twoPageOpen) || (siviParentReviewEnabled && !siviStandalone)}
     <div class="border-b border-stone-200 px-4 py-2 flex flex-wrap items-center gap-4">
       {#if extendedShrubsEnabled && !twoPageOpen}
-        <label class="inline-flex items-center gap-2 text-xs font-medium cursor-pointer">
+        <label class="inline-flex items-center gap-2 text-xs font-medium cursor-pointer" data-help-id="veg.covers">
           <input type="checkbox" data-extended-shrubs checked={extendedShrubs} disabled={busy || headerWorkflowBusy}
             onchange={(event) => setExtendedShrubs(event.currentTarget.checked)} />
           Show extended shrub layers
@@ -4482,7 +4486,7 @@
         <summary class="text-xs font-semibold cursor-pointer">Experimental soil record actions</summary>
       <div class="space-y-6">
         <!-- Humus Section -->
-        <div class="space-y-3">
+        <div class="space-y-3" data-help-id="humus.upper_lower_depth">
           <div class="flex justify-between items-center">
             <h3 class="font-bold text-xs uppercase tracking-wider text-stone-600">Humus Layers ({humusList.length})</h3>
             <button
@@ -4537,7 +4541,7 @@
         </div>
 
         <!-- Mineral Section -->
-        <div class="space-y-3">
+        <div class="space-y-3" data-help-id="mineral.texture_cf">
           <h3 class="font-bold text-xs uppercase tracking-wider text-stone-600">Mineral Layers ({mineralList.length})</h3>
           <div class="border border-stone-200 rounded overflow-x-auto bg-white">
             <table class="w-full text-left text-xs">

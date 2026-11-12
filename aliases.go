@@ -78,6 +78,20 @@ type googleEarthReview = spatialpkg.GoogleEarthReview
 type GoogleEarthReviewRow = spatialpkg.GoogleEarthReviewRow
 type GoogleEarthReviewService = spatialpkg.GoogleEarthReviewService
 type HeightRecordUpdate = vprocorepkg.HeightRecordUpdate
+type HelpBundle = lifecyclepkg.HelpBundle
+type HelpCodeOption = lifecyclepkg.HelpCodeOption
+type HelpDataUseAgreement = lifecyclepkg.HelpDataUseAgreement
+type HelpDecisionKey = lifecyclepkg.HelpDecisionKey
+type HelpDecisionStep = lifecyclepkg.HelpDecisionStep
+type HelpFieldTopic = lifecyclepkg.HelpFieldTopic
+type HelpGuide = lifecyclepkg.HelpGuide
+type HelpGuideSection = lifecyclepkg.HelpGuideSection
+type HelpLookupResult = lifecyclepkg.HelpLookupResult
+type HelpSearchHit = lifecyclepkg.HelpSearchHit
+type HelpShortcut = lifecyclepkg.HelpShortcut
+type HelpTour = lifecyclepkg.HelpTour
+type HelpTourStep = lifecyclepkg.HelpTourStep
+type HelpWhatsNewEntry = lifecyclepkg.HelpWhatsNewEntry
 type HierarchyInfo = vprocorepkg.HierarchyInfo
 type HierarchyNode = vprocorepkg.HierarchyNode
 type HumusRecord = vprocorepkg.HumusRecord
@@ -478,6 +492,7 @@ type VegetationWorkbookService = vegreportpkg.VegetationWorkbookService
 type VegetationWorkbookSheet = reportcorepkg.VegetationWorkbookSheet
 type VegetationWorkbookSkippedUnit = vegreportpkg.VegetationWorkbookSkippedUnit
 type VegetationWorkbookSummary = vegreportpkg.VegetationWorkbookSummary
+type WhatsNewStatus = lifecyclepkg.WhatsNewStatus
 type WorkingUnitChoice = vprocorepkg.WorkingUnitChoice
 type WorkingUnitModeState = vprocorepkg.WorkingUnitModeState
 type WorkingUnitService = vprocorepkg.WorkingUnitService
@@ -955,6 +970,18 @@ func init() {
 	application.RegisterEvent[ExternalSQLiteFileInspection]("vpro:model:ExternalSQLiteFileInspection")
 	application.RegisterEvent[GoogleEarthPreferenceValues]("vpro:model:GoogleEarthPreferenceValues")
 	application.RegisterEvent[GoogleEarthReviewRow]("vpro:model:GoogleEarthReviewRow")
+	application.RegisterEvent[HelpCodeOption]("vpro:model:HelpCodeOption")
+	application.RegisterEvent[HelpDataUseAgreement]("vpro:model:HelpDataUseAgreement")
+	application.RegisterEvent[HelpDecisionKey]("vpro:model:HelpDecisionKey")
+	application.RegisterEvent[HelpDecisionStep]("vpro:model:HelpDecisionStep")
+	application.RegisterEvent[HelpFieldTopic]("vpro:model:HelpFieldTopic")
+	application.RegisterEvent[HelpGuide]("vpro:model:HelpGuide")
+	application.RegisterEvent[HelpGuideSection]("vpro:model:HelpGuideSection")
+	application.RegisterEvent[HelpSearchHit]("vpro:model:HelpSearchHit")
+	application.RegisterEvent[HelpShortcut]("vpro:model:HelpShortcut")
+	application.RegisterEvent[HelpTour]("vpro:model:HelpTour")
+	application.RegisterEvent[HelpTourStep]("vpro:model:HelpTourStep")
+	application.RegisterEvent[HelpWhatsNewEntry]("vpro:model:HelpWhatsNewEntry")
 	application.RegisterEvent[HierarchyInfo]("vpro:model:HierarchyInfo")
 	application.RegisterEvent[LifeformSummaryCatalogueRow]("vpro:model:LifeformSummaryCatalogueRow")
 	application.RegisterEvent[LifeformSummaryEntry]("vpro:model:LifeformSummaryEntry")

@@ -1,15 +1,19 @@
 <script lang="ts">
-  import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
+  import { BookOpen, ChartColumn, ChevronDown, ClipboardList, Compass, FileText, Globe, HelpCircle, History, House, Info, Keyboard, Leaf, Link, List, Network, Newspaper, Palette, RotateCcw, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
   type View = 'home' | 'plots' | 'geospatial-map' | 'diagnostic-synthesis' | 'r-sidecar' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
-  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'new-sivi' | 'metadata' };
+  type HelpMenuAction = 'guide' | 'tours' | 'shortcuts' | 'whats-new' | 'reset-sample' | 'about';
+  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'new-sivi' | 'metadata'; helpAction?: HelpMenuAction };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate, siviAvailable = false, onopensivi, newSiviAvailable = false, onopennewsivi,
-    metadataAvailable = false, onopenmetadata }: {
+    metadataAvailable = false, onopenmetadata, onhelpaction, whatsNewUnreadCount = 0, resetSampleAvailable = true }: {
     view: View; onnavigate: (view: View) => void;
     siviAvailable?: boolean; onopensivi?: () => void;
     newSiviAvailable?: boolean; onopennewsivi?: () => void;
     metadataAvailable?: boolean; onopenmetadata?: () => void;
+    onhelpaction?: (action: HelpMenuAction) => void;
+    whatsNewUnreadCount?: number;
+    resetSampleAvailable?: boolean;
   } = $props();
   let navigation: HTMLElement;
   let openMenu = $state<string | null>(null);
@@ -71,7 +75,16 @@
       ] }
     ] },
     { label: 'Help', icon: HelpCircle, groups: [
-      { label: 'Help', items: [{ name: "What's New", icon: Newspaper }] }
+      { label: 'Documentation & Onboarding', items: [
+        { name: 'VPro User Guide & LMH25 Reference (F1)', icon: BookOpen, helpAction: 'guide' },
+        { name: 'Interactive Walkthroughs (4 Tours)', icon: Compass, helpAction: 'tours' },
+        { name: 'Keyboard Shortcuts (?)', icon: Keyboard, helpAction: 'shortcuts' }
+      ] },
+      { label: 'Release & Workspace', items: [
+        { name: "What's New / Release Notes", icon: Newspaper, helpAction: 'whats-new' },
+        { name: 'Reset Workspace to Sample', icon: RotateCcw, helpAction: 'reset-sample' },
+        { name: 'About VPro & Standards Libraries', icon: Info, helpAction: 'about' }
+      ] }
     ] }
   ];
 
@@ -107,6 +120,8 @@
     if (item.action === 'sivi') return siviAvailable && !!onopensivi;
     if (item.action === 'new-sivi') return newSiviAvailable && !!onopennewsivi;
     if (item.action === 'metadata') return metadataAvailable && !!onopenmetadata;
+    if (item.helpAction === 'reset-sample') return resetSampleAvailable;
+    if (item.helpAction) return true;
     return !!item.view;
   }
 
@@ -121,6 +136,9 @@
     } else if (item.action === 'metadata' && onopenmetadata) {
       closeMenu(true);
       onopenmetadata();
+    } else if (item.helpAction) {
+      closeMenu(true);
+      if (typeof onhelpaction === 'function') onhelpaction(item.helpAction);
     } else if (item.view) {
       navigate(item.view);
     }
@@ -140,7 +158,7 @@
     <Globe size={16} aria-hidden="true" />3D Map
   </button>
   {#each menus as menu (menu.label)}
-    <details class="nav-menu" open={openMenu === menu.label}>
+    <details class="nav-menu" data-nav-group={menu.label} open={openMenu === menu.label}>
       <summary
         class:current={menu.groups.some(group => group.items.some(item => item.view === view))}
         onclick={(event) => {
@@ -149,28 +167,36 @@
         }}
       >
         <menu.icon size={16} aria-hidden="true" />
-        {menu.label}<ChevronDown size={14} aria-hidden="true" />
+        {menu.label}
+        {#if menu.label === 'Help' && whatsNewUnreadCount > 0}
+          <span class="rounded bg-[#FCBA19] px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#003366]" data-nav-whats-new-badge>{whatsNewUnreadCount}</span>
+        {/if}
+        <ChevronDown size={14} aria-hidden="true" />
       </summary>
       <div class="nav-menu-content">
         <p class="nav-unavailable">Unavailable workflows are disabled.</p>
         {#each menu.groups as group (group.label)}
-          <section aria-labelledby={`nav-${menu.label}-${group.label.replaceAll(' ', '-')}`}>
+          <section data-nav-group={group.label === 'Project & Classification' ? 'Project' : group.label} aria-labelledby={`nav-${menu.label}-${group.label.replaceAll(' ', '-')}`}>
             <h2 class="nav-group-label" id={`nav-${menu.label}-${group.label.replaceAll(' ', '-')}`}>{group.label}</h2>
             {#each group.items as item (item.name)}
               <button
                 disabled={!itemEnabled(item)}
                 class:current={item.view === view}
+                data-help-menu-item={item.helpAction}
                 aria-current={item.view === view ? 'page' : undefined}
                 title={item.action === 'sivi'
                   ? itemEnabled(item) ? 'SIVI / FS1333 editor for the selected plot. Existing draft and close guards apply.'
                     : 'Select a plot to open SIVI / FS1333 data entry.'
                   : item.action === 'metadata'
                     ? 'Project metadata for the open plot. Requires a clean, unlocked editor; finish or Undo drafts first.'
+                  : item.helpAction === 'reset-sample'
+                    ? 'Non-destructive recovery: materializes a fresh Sample.db and switches session to Sample without deleting user .db files.'
+                  : item.helpAction ? item.name
                   : item.view === 'fs882' ? 'FS882 data entry: only verified workflows are writable.' : item.view ? item.name : 'Not yet available in the desktop app'}
                 onclick={() => activate(item)}
               >
                 <item.icon size={16} aria-hidden="true" />
-                <span>{item.name}</span>
+                <span>{item.name}{item.helpAction === 'whats-new' && whatsNewUnreadCount > 0 ? ` (${whatsNewUnreadCount} new)` : ''}</span>
               </button>
             {/each}
           </section>

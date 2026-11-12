@@ -20,6 +20,12 @@ func NewHelpService(preferences *vprocorepkg.DesktopConfig) (*HelpService, error
 	return &HelpService{core: core}, nil
 }
 
+func (s *HelpService) setContext(contexts *ContextService) {
+	if s != nil && s.core != nil {
+		s.core.SetContext(unwrapContextService(contexts))
+	}
+}
+
 func (s *HelpService) GetLibraryStamps(ctx context.Context) (LibraryStamps, error) {
 	if s == nil || s.core == nil {
 		return LibraryStamps{}, errors.New("help service is unavailable")
@@ -39,4 +45,46 @@ func (s *HelpService) GetAboutInfo(ctx context.Context) (AboutInfo, error) {
 		return AboutInfo{}, errors.New("help service is unavailable")
 	}
 	return s.core.GetAboutInfo(ctx)
+}
+
+func (s *HelpService) GetHelpBundle(ctx context.Context) (HelpBundle, error) {
+	if s == nil || s.core == nil {
+		return HelpBundle{}, errors.New("help service is unavailable")
+	}
+	return s.core.GetHelpBundle(ctx)
+}
+
+func (s *HelpService) LookupHelpTopic(ctx context.Context, helpID string) (HelpLookupResult, error) {
+	if s == nil || s.core == nil {
+		return HelpLookupResult{}, errors.New("help service is unavailable")
+	}
+	return s.core.LookupHelpTopic(ctx, helpID)
+}
+
+func (s *HelpService) SearchHelp(ctx context.Context, query string) ([]HelpSearchHit, error) {
+	if s == nil || s.core == nil {
+		return nil, errors.New("help service is unavailable")
+	}
+	return s.core.SearchHelp(ctx, query)
+}
+
+func (s *HelpService) GetWhatsNewStatus(ctx context.Context) (WhatsNewStatus, error) {
+	if s == nil || s.core == nil {
+		return WhatsNewStatus{}, errors.New("help service is unavailable")
+	}
+	return s.core.GetWhatsNewStatus(ctx)
+}
+
+func (s *HelpService) AcknowledgeWhatsNew(ctx context.Context, version string) (WhatsNewStatus, error) {
+	if s == nil || s.core == nil {
+		return WhatsNewStatus{}, errors.New("help service is unavailable")
+	}
+	return s.core.AcknowledgeWhatsNew(ctx, version)
+}
+
+func (s *HelpService) ResetWorkspaceToSample(ctx context.Context, contextID string) (ProjectState, error) {
+	if s == nil || s.core == nil {
+		return ProjectState{}, errors.New("help service is unavailable")
+	}
+	return s.core.ResetWorkspaceToSample(ctx, contextID)
 }

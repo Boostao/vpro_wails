@@ -45,6 +45,7 @@
   import { subscribeTwoPageSoilActivity } from './twoPageSoilSessions';
   import { subscribeTwoPageVegetationActivity } from './twoPageVegetationSessions';
   import { subscribeExternalSUEnvironmentActivity } from './externalSUEnvironment';
+  import { classifyGlobalHelpShortcut, defaultHelpPort, resolveContextualHelpTarget, type HelpDrawerTab, type HelpMenuAction, type WhatsNewStatus } from './helpSystem';
 
   const pageSize = 25;
   let page = $state<PlotPage | null>(null);
@@ -71,6 +72,18 @@
   });
   let view = $state<'home' | 'plots' | 'geospatial-map' | 'diagnostic-synthesis' | 'r-sidecar' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
   let newSiviModalOpen = $state(false);
+  let helpDrawerOpen = $state(false);
+  let helpDrawerTopicId = $state('site.plot_number');
+  let helpDrawerTab = $state<HelpDrawerTab>('inspector');
+  let tourOpen = $state(false);
+  let tourInitialId = $state<string | null>(null);
+  let shortcutsModalOpen = $state(false);
+  let whatsNewModalOpen = $state(false);
+  let aboutModalOpen = $state(false);
+  let resetSampleConfirmOpen = $state(false);
+  let resetSampleNotice = $state('');
+  let whatsNewStatus = $state.raw<WhatsNewStatus | null>(null);
+  let whatsNewPromptDismissed = $state(false);
   let pictureManagerPlot = $state('');
   let plotLabelNumber = $state('');
   let contextExpanded = $state(false);
@@ -1150,6 +1163,97 @@
     });
   }
 
+  function openContextualHelp(topicOverride?: string, tabOverride: HelpDrawerTab = 'inspector') {
+    const activeEl = typeof document !== 'undefined' ? document.activeElement : null;
+    helpDrawerTopicId = topicOverride ?? resolveContextualHelpTarget(activeEl, view, editorEntryForm);
+    helpDrawerTab = tabOverride;
+    helpDrawerOpen = true;
+  }
+
+  function handleGlobalHelpKeydown(event: KeyboardEvent) {
+    if (startupFailure !== null) return;
+    const activeEl = typeof document !== 'undefined' ? (document.activeElement as HTMLElement | null) : null;
+    const action = classifyGlobalHelpShortcut(event, activeEl);
+    if (action === 'f1') {
+      event.preventDefault();
+      openContextualHelp();
+      return;
+    }
+    if (action === 'shortcuts') {
+      event.preventDefault();
+      shortcutsModalOpen = !shortcutsModalOpen;
+      return;
+    }
+    if (event.key === 'Escape' && helpDrawerOpen && !shortcutsModalOpen && !whatsNewModalOpen && !aboutModalOpen && !tourOpen && !resetSampleConfirmOpen && !closeRequest && !pendingTransition) {
+      event.preventDefault();
+      helpDrawerOpen = false;
+    }
+  }
+
+  function handleHelpMenuAction(action: HelpMenuAction) {
+    resetSampleNotice = '';
+    if (action === 'guide') {
+      openContextualHelp(undefined, 'inspector');
+    } else if (action === 'tours') {
+      tourInitialId = null;
+      tourOpen = true;
+    } else if (action === 'shortcuts') {
+      shortcutsModalOpen = true;
+    } else if (action === 'whats-new') {
+      whatsNewModalOpen = true;
+    } else if (action === 'reset-sample') {
+      resetSampleConfirmOpen = true;
+    } else if (action === 'about') {
+      aboutModalOpen = true;
+    }
+  }
+
+  async function acknowledgeUnreadWhatsNew() {
+    if (!whatsNewStatus?.latestVersion) return;
+    try {
+      const updated = await defaultHelpPort.acknowledgeWhatsNew(whatsNewStatus.latestVersion);
+      whatsNewStatus = updated;
+    } catch (cause) {
+      error = `Could not acknowledge What's New: ${String(cause)}`;
+    }
+  }
+
+  async function confirmResetWorkspaceToSample() {
+    await requestTransition(async (contextId) => {
+      busy = true;
+      error = '';
+      resetSampleNotice = '';
+      try {
+        const nextState = await defaultHelpPort.resetWorkspaceToSample(contextId);
+        request++;
+        hierarchyRequest++;
+        stateRequest++;
+        plotReads.cancelAll();
+        hierarchyReads.cancelAll();
+        stateReads.cancelAll();
+        projectState.set(nextState);
+        profileNavigation = null;
+        profileSources = [];
+        profileSourceContext = '';
+        selected = null;
+        page = null;
+        hierarchyNodes = [];
+        editorPlotNumber = undefined;
+        resetSampleConfirmOpen = false;
+        view = 'plots';
+        resetSampleNotice = 'Workspace reset to pristine Sample.db (Project: Sample, SU: Sample, Hierarchy: Sample). User project .db files were preserved.';
+        await loadPlots(0);
+        try {
+          await loadHierarchy();
+        } catch (cause) {
+          error = `Sample workspace activated, but hierarchy refresh failed: ${String(cause)}`;
+        }
+      } finally {
+        busy = false;
+      }
+    });
+  }
+
   onMount(() => {
     const stopCloseEvents = Events.On('vpro:close-request', (event) => {
       const requestId: unknown = event.data;
@@ -1162,10 +1266,15 @@
     void LifecycleService.GetPendingCloseRequest().then((requestId) => {
       if (requestId) void handleCloseRequest(requestId);
     }).catch((cause) => { error = `Window close handler could not initialise: ${String(cause)}`; });
+    void defaultHelpPort.getWhatsNewStatus().then((st) => {
+      whatsNewStatus = st;
+    }).catch(() => {});
     void refresh();
     return () => { request++; stopCloseEvents(); };
   });
 </script>
+
+<svelte:window onkeydown={handleGlobalHelpKeydown} />
 
 <div class="app-shell">
   <header class="topbar">
@@ -1177,7 +1286,10 @@
       newSiviAvailable={!!$projectState?.contextId && !busy && !editorBusy && !transitionWorking}
       onopennewsivi={() => { newSiviModalOpen = true; }}
       metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
-      onopenmetadata={() => void openProjectMetadata()} />{/if}
+      onopenmetadata={() => void openProjectMetadata()}
+      whatsNewUnreadCount={whatsNewStatus?.unreadCount ?? 0}
+      resetSampleAvailable={!!$projectState?.contextId && !busy && !editorBusy && !transitionWorking}
+      onhelpaction={handleHelpMenuAction} />{/if}
     <div class="topbar-context"><Database size={16} strokeWidth={1.8} /><span>{$projectState?.activeProject ?? 'No project'}</span></div>
   </header>
 
@@ -1303,6 +1415,47 @@
     </aside>
 
     <main class="content">
+      {#if !startupFailure && whatsNewStatus?.hasUnread && !whatsNewPromptDismissed}
+        <section
+          aria-label="Unread release notes"
+          data-whats-new-banner
+          class="mb-4 flex flex-wrap items-center justify-between gap-2 rounded border border-[#003366] border-l-[4px] border-l-[#FCBA19] bg-white px-3.5 py-2.5 text-xs text-[#313132]"
+        >
+          <div>
+            <strong class="font-semibold text-[#003366]">What's New in VPro v{whatsNewStatus.latestVersion}:</strong>
+            <span> {whatsNewStatus.unreadCount} unread release update{whatsNewStatus.unreadCount === 1 ? '' : 's'} available.</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              class="rounded bg-[#003366] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#002244]"
+              onclick={() => { whatsNewModalOpen = true; }}
+            >
+              Read Release Notes
+            </button>
+            <button
+              type="button"
+              class="rounded border border-[#003366] bg-white px-2.5 py-1 text-xs font-semibold text-[#003366] hover:bg-slate-50"
+              onclick={() => void acknowledgeUnreadWhatsNew()}
+            >
+              Mark as Read
+            </button>
+            <button
+              type="button"
+              class="rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+              onclick={() => { whatsNewPromptDismissed = true; }}
+            >
+              Dismiss
+            </button>
+          </div>
+        </section>
+      {/if}
+      {#if resetSampleNotice}
+        <div role="status" data-reset-sample-notice class="mb-4 flex items-center justify-between gap-2 rounded border border-[#2E8540] bg-emerald-50 px-3.5 py-2 text-xs text-[#1E5128]">
+          <span>{resetSampleNotice}</span>
+          <button type="button" class="rounded border border-emerald-700/30 bg-white px-2 py-0.5 text-[11px]" onclick={() => { resetSampleNotice = ''; }}>Dismiss</button>
+        </div>
+      {/if}
       {#if suReview}
         <section class="m-2 p-3 border rounded" aria-label="Reviewed Save as SU">
           <h2 class="font-semibold">Save reviewed profile as a new SU file</h2>
@@ -1883,4 +2036,107 @@
       {/await}
     {/if}
   </div>
+
+  {#if resetSampleConfirmOpen && !startupFailure}
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" data-reset-sample-modal>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="reset-sample-modal-title"
+        class="w-full max-w-md overflow-hidden rounded border border-slate-300 bg-white text-[#313132] shadow-2xl"
+      >
+        <header class="border-b-[3px] border-b-[#FCBA19] bg-[#003366] px-4 py-3 text-white">
+          <div class="font-mono text-[11px] uppercase tracking-wider text-[#FCBA19]">Safe Non-Destructive Recovery</div>
+          <h2 id="reset-sample-modal-title" class="text-sm font-semibold text-white">Reset Workspace to Sample</h2>
+        </header>
+        <div class="space-y-3 p-4 text-xs leading-relaxed">
+          <p>
+            Materialize a fresh, pristine copy of embedded <code class="font-mono text-[#003366]">Sample.db</code> and switch the active session cleanly to
+            <strong>Project = Sample</strong>, <strong>SU = Sample</strong>, and <strong>Hierarchy = Sample</strong>?
+          </p>
+          <p class="rounded border border-slate-200 bg-[#F2F2F2] p-2.5 text-slate-700">
+            Existing user project <code class="font-mono">.db</code> files in your projects directory are <strong>never deleted or modified</strong>.
+          </p>
+          <div class="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              disabled={busy || transitionWorking}
+              class="rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-[#313132] hover:bg-slate-50"
+              onclick={() => { resetSampleConfirmOpen = false; }}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              data-confirm-reset-sample
+              disabled={busy || editorBusy || transitionWorking || !$projectState?.contextId}
+              class="rounded bg-[#003366] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#002244] disabled:opacity-50"
+              onclick={() => void confirmResetWorkspaceToSample()}
+            >
+              {busy ? 'Resetting...' : 'Reset Workspace to Sample'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if helpDrawerOpen && !startupFailure}
+    {#await import('./HelpDrawer.svelte') then { default: HelpDrawer }}
+      <HelpDrawer
+        open={helpDrawerOpen}
+        topicId={helpDrawerTopicId}
+        initialTab={helpDrawerTab}
+        onclose={() => { helpDrawerOpen = false; }}
+        onstarttour={(tid) => {
+          helpDrawerOpen = false;
+          tourInitialId = tid ?? null;
+          tourOpen = true;
+        }}
+      />
+    {/await}
+  {/if}
+
+  {#if tourOpen && !startupFailure}
+    {#await import('./OnboardingTour.svelte') then { default: OnboardingTour }}
+      <OnboardingTour
+        open={tourOpen}
+        initialTourId={tourInitialId}
+        activeProject={$projectState?.activeProject ?? 'Sample'}
+        onensurecontextopen={() => { contextExpanded = true; }}
+        onnavigateview={(nextView) => { navigate(nextView as typeof view); }}
+        onresetsample={async () => { await confirmResetWorkspaceToSample(); }}
+        onclose={() => { tourOpen = false; tourInitialId = null; }}
+      />
+    {/await}
+  {/if}
+
+  {#if shortcutsModalOpen && !startupFailure}
+    {#await import('./KeyboardShortcutsModal.svelte') then { default: KeyboardShortcutsModal }}
+      <KeyboardShortcutsModal
+        open={shortcutsModalOpen}
+        onclose={() => { shortcutsModalOpen = false; }}
+      />
+    {/await}
+  {/if}
+
+  {#if whatsNewModalOpen && !startupFailure}
+    {#await import('./WhatsNewModal.svelte') then { default: WhatsNewModal }}
+      <WhatsNewModal
+        open={whatsNewModalOpen}
+        initialStatus={whatsNewStatus}
+        onstatuschange={(updated) => { whatsNewStatus = updated; }}
+        onclose={() => { whatsNewModalOpen = false; }}
+      />
+    {/await}
+  {/if}
+
+  {#if aboutModalOpen && !startupFailure}
+    {#await import('./AboutVProModal.svelte') then { default: AboutVProModal }}
+      <AboutVProModal
+        open={aboutModalOpen}
+        onclose={() => { aboutModalOpen = false; }}
+      />
+    {/await}
+  {/if}
 </div>
