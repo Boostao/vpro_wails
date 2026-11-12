@@ -157,6 +157,29 @@
       ? 'header-realmClass' : control.column === 'PlotNumber' ? 'header-plotNumber' : `header-source-${control.controlId}`;
   }
 
+  function headerHelpId(column?: string, controlName?: string): string | undefined {
+    if (controlName && isCoordinateControl(controlName)) return 'site.coordinates';
+    if (controlName && isWorkingUnitControl(controlName)) return 'site.bgc_zone';
+    const col = (column ?? '').toLowerCase();
+    if (!col) return undefined;
+    if (col === 'plotnumber') return 'site.plot_number';
+    if (col === 'fieldnumber' || col === 'projectid') return 'site.field_number';
+    if (col === 'date' || col === 'sitesurveyor' || col === 'vegsurveyor' || col === 'soilsurveyor' || col === 'startdate') return 'site.date';
+    if (col === 'zone' || col === 'subzone' || col === 'siteseries' || col === 'becsiteunit' || col === 'usersiteunit' || col === 'mapunit' || col === 'plotrepresenting' || col === 'transdistrib') return 'site.bgc_zone';
+    if (col === 'ecosection' || col === 'fsregiondistrict') return 'site.ecosection';
+    if (col === 'latitude' || col === 'longitude' || col === 'utmzone' || col === 'utmeasting' || col === 'utmnorthing' || col === 'locationaccuracy' || col === 'ntsmapsheet' || col === 'location') return 'site.coordinates';
+    if (col === 'elevation' || col === 'slopegradient' || col === 'aspect') return 'site.elevation';
+    if (col === 'mesoslopeposition' || col === 'surfaceshape' || col === 'surfacetopographytype' || col === 'surfacetopographysize') return 'site.meso_slope';
+    if (col === 'moistureregime') return 'site.moisture_regime';
+    if (col === 'nutrientregime') return 'site.nutrient_regime';
+    if (col.startsWith('substrate')) return 'site.substrate_cover';
+    if (col === 'structuralstage' || col === 'successionalstatus' || col === 'standage') return 'site.successional_structural';
+    if (col === 'realmclass' || col === 'snowcoverregime' || col === 'activelayerdepth') return 'site.realm_class';
+    if (col === 'humusform') return 'humus.humus_form';
+    if (col === 'rootingdepth' || col === 'rootrestrictingtype' || col === 'rootrestrictingdepth' || col === 'seepagedepth' || col === 'soildrainage') return 'soil.rooting_seepage';
+    return 'site.plot_number';
+  }
+
   function setText(key: NullableTextKey, value: string) {
     draft[key] = value === '' ? null : value;
     onchange();
@@ -235,20 +258,24 @@
           <input class="paper-control" id="header-plotNumber" data-column={control.column} data-source-control={control.controlName} aria-label="Plot number"
             title={existing ? 'Existing plot identities cannot be renamed here' : 'Plot number'}
             value={draft.plotNumber} readonly={existing} disabled={unavailable || capabilities.plotNumber !== true}
+            data-help-id="site.plot_number"
             oninput={(event) => { draft.plotNumber = event.currentTarget.value; onchange(); }} />
         {:else if field}
           {#if field.kind === 'number'}
             <input class="paper-control" id={`header-${field.key}`} data-column={control.column} data-source-control={control.controlName} aria-label={field.label}
               type="number" step={field.step ?? '1'} value={draft[field.key] ?? ''}
               disabled={unavailable || capabilities[field.key] !== true}
+              data-help-id={headerHelpId(control.column, control.controlName)}
               oninput={(event) => setNumber(field.key, event.currentTarget)} />
           {:else if field.kind === 'notes'}
             <textarea class="paper-control" id={`header-${field.key}`} data-column={control.column} data-source-control={control.controlName} aria-label={field.label}
               value={draft[field.key] ?? ''} disabled={unavailable || capabilities[field.key] !== true}
+              data-help-id={headerHelpId(control.column, control.controlName)}
               oninput={(event) => setText(field.key, event.currentTarget.value)}></textarea>
           {:else if field.list}
             <select class="paper-control" id={`header-${field.key}`} data-column={control.column} data-source-control={control.controlName} aria-label={field.label}
               value={draft[field.key] ?? ''} disabled={unavailable || capabilities[field.key] !== true || !lists[field.key]?.length}
+              data-help-id={headerHelpId(control.column, control.controlName)}
               onchange={(event) => setText(field.key, event.currentTarget.value)}>
               <option value="">-</option>
               {#if draft[field.key] && !lists[field.key]?.some(item => item.item === draft[field.key])}
@@ -261,6 +288,7 @@
           {:else}
             <input class="paper-control" id={`header-${field.key}`} data-column={control.column} data-source-control={control.controlName} aria-label={field.label}
               value={draft[field.key] ?? ''} disabled={unavailable || capabilities[field.key] !== true}
+              data-help-id={headerHelpId(control.column, control.controlName)}
               oninput={(event) => setText(field.key, event.currentTarget.value)} />
           {/if}
         {:else if control.type === 'CommandButton' || control.type === 'ToggleButton'}
@@ -294,7 +322,7 @@
       <div class="field-grid">
       {#each group.controls as control (control.controlId)}
         {@const action = control.type === 'CommandButton' || control.type === 'ToggleButton' || control.type === 'Subform'}
-        <div class="form-field" class:full-width={wideControl(control)} class:action-field={action}>
+        <div class="form-field" class:full-width={wideControl(control)} class:action-field={action} data-help-id={action ? undefined : headerHelpId(control.column, control.controlName)}>
         {@render fieldInput(control)}
         </div>
       {/each}
@@ -302,24 +330,26 @@
     </fieldset>
   {/each}
   {#if extendedShrubs}
-    <fieldset class="form-group" data-extended-arctic-fields>
+    <fieldset class="form-group" data-extended-arctic-fields data-help-id="site.realm_class">
       <legend>Arctic / extended site fields</legend>
       <div class="field-grid">
-        <div class="form-field">
+        <div class="form-field" data-help-id="site.realm_class">
           <label class="field-label" for="header-snowCoverregime">Snow cover regime</label>
           <input class="paper-control" id="header-snowCoverregime" data-column="SnowCoverregime" type="text"
             value={snowCoverRegime} disabled={disabled || capabilities.snowCoverRegime !== true || !onSnowCoverRegimeChange}
             aria-invalid={snowCoverRegimeError ? 'true' : undefined}
             title={onSnowCoverRegimeChange ? 'SnowCoverregime' : 'Use Complete two-page entry or SIVI parent editor to save SnowCoverregime'}
+            data-help-id="site.realm_class"
             oninput={(event) => onSnowCoverRegimeChange?.(event.currentTarget.value)} />
           {#if snowCoverRegimeError}<p role="alert" class="text-xs text-red-700 mt-1">{snowCoverRegimeError}</p>{/if}
         </div>
-        <div class="form-field">
+        <div class="form-field" data-help-id="site.realm_class">
           <label class="field-label" for="header-activeLayerDepth">Active layer depth (cm)</label>
           <input class="paper-control" id="header-activeLayerDepth" data-column="ActiveLayerDepth" type="text" inputmode="decimal"
             value={activeLayerDepth} disabled={disabled || capabilities.activeLayerDepth !== true || !onActiveLayerDepthChange}
             aria-invalid={activeLayerDepthError ? 'true' : undefined}
             title={onActiveLayerDepthChange ? 'ActiveLayerDepth' : 'Use Complete two-page entry or Two-page additional fields to save ActiveLayerDepth'}
+            data-help-id="site.realm_class"
             oninput={(event) => onActiveLayerDepthChange?.(event.currentTarget.value)} />
           {#if activeLayerDepthError}<p role="alert" class="text-xs text-red-700 mt-1">{activeLayerDepthError}</p>{/if}
         </div>

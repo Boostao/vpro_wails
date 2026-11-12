@@ -546,6 +546,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	helpService.setContext(contextService)
 
 	var app *application.App
 	closeService, err := NewCloseService(

@@ -327,9 +327,20 @@
       session.stage(row.rowId, column, raw, nullValue); error = null;
     } catch (cause) { error = `Linked soil draft refused; owned state retained: ${String(cause)}`; }
   }
+  function soilHelpId(soilForm: TwoPageSoilForm, column: string): string {
+    const lower = column.toLowerCase();
+    if (soilForm === 'SoilHumusXL') {
+      if (lower === 'horizon') return 'humus.horizon';
+      if (lower === 'upperdepth' || lower === 'lowerdepth') return 'humus.upper_lower_depth';
+      if (lower === 'vonpost') return 'humus.von_post';
+      return 'humus.humus_form';
+    }
+    if (lower === 'horizon' || lower === 'upperdepth' || lower === 'lowerdepth') return 'mineral.horizon';
+    return 'mineral.texture_cf';
+  }
 </script>
 
-<section bind:this={panel} class="min-w-0 space-y-3 rounded border bg-white p-3" aria-label={`${form} linked soil`} data-two-page-soil-panel={form} data-soil-current-row={row?.rowId}>
+<section bind:this={panel} class="min-w-0 space-y-3 rounded border bg-white p-3" aria-label={`${form} linked soil`} data-two-page-soil-panel={form} data-soil-current-row={row?.rowId} data-help-id={form === 'SoilHumusXL' ? 'humus.upper_lower_depth' : 'mineral.horizon'}>
   <h4 class="font-semibold">{form === 'SoilHumusXL' ? 'Humus' : 'Mineral soil'}</h4>
   {#if parentBlocked}<p role="status">Finish actual parent drafts/operations and unlock the plot before new soil staging.</p>{/if}
   {#if error}<p role="alert" class="break-words text-sm text-red-700">{error}</p>{/if}
@@ -408,7 +419,7 @@
     <fieldset class="min-w-0 space-y-2 rounded border p-3">
       <legend class="font-semibold">New {twoPageSoilKind(form)} horizon for {plot}</legend>
       <label class="block text-sm font-medium" for={`${form}-new-horizon`}>New Horizon</label>
-      <input id={`${form}-new-horizon`} data-soil-new-horizon type="text" class="w-full min-w-0 rounded border p-2"
+      <input id={`${form}-new-horizon`} data-soil-new-horizon data-help-id={form === 'SoilHumusXL' ? 'humus.horizon' : 'mineral.horizon'} type="text" class="w-full min-w-0 rounded border p-2"
         value={view.creation.raw} aria-invalid={!!view.creation.error}
         disabled={parentBlocked || referenceView.busy || view.busy || view.blocked || view.acknowledgementRequired}
         oninput={event => stageCreation(event.currentTarget.value)} />
@@ -450,7 +461,7 @@
                 {@const memo = soilFields[twoPageSoilKind(form)].find(field => field.column === column)?.kind === 'memo'}
                 {@const reference = referenceView.data?.fields.find(field => field.column === column)}
                 {@const plannedRow = row.rowId}
-                <div class={`min-w-0 space-y-1 ${memo ? 'sm:col-span-2' : ''}`} data-soil-column={column}>
+                <div class={`min-w-0 space-y-1 ${memo ? 'sm:col-span-2' : ''}`} data-soil-column={column} data-help-id={soilHelpId(form, column)}>
                   <label class="block text-sm font-medium" for={id}>{label}</label>
                   {#if memo}
                     <textarea {id} class="w-full min-w-0 rounded border p-2" rows="3" value={nullValue ? '' : raw} disabled={fieldsDisabled} placeholder={nullValue ? 'NULL' : undefined}

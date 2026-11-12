@@ -60,7 +60,9 @@ type AboutInfo struct {
 
 type HelpService struct {
 	preferences *vprocore.DesktopConfig
+	contexts    *vprocore.ContextService
 	stamps      LibraryStamps
+	bundle      HelpBundle
 }
 
 func parseStandards2026Provenance(data []byte) (LibraryStamps, error) {
@@ -141,10 +143,21 @@ func NewHelpService(preferences *vprocore.DesktopConfig) (*HelpService, error) {
 	if err != nil {
 		return nil, err
 	}
+	bundle, err := parseHelpBundle(helpBundleJSON, stamps)
+	if err != nil {
+		return nil, err
+	}
 	return &HelpService{
 		preferences: preferences,
 		stamps:      stamps,
+		bundle:      bundle,
 	}, nil
+}
+
+func (s *HelpService) SetContext(contexts *vprocore.ContextService) {
+	if s != nil {
+		s.contexts = contexts
+	}
 }
 
 func (s *HelpService) GetLibraryStamps(ctx context.Context) (LibraryStamps, error) {
