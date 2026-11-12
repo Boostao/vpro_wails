@@ -1,10 +1,13 @@
 .task
 bin
+/dist-artifacts/
 /site/dist/
 frontend/dist
 frontend/dist-*/
 frontend/node_modules
 build/linux/appimage/build
+build/linux/appimage/VPro
+build/linux/appimage/VPro.png
 build/windows/nsis/MicrosoftEdgeWebview2Setup.exe
 # Mobile generated (per-machine; overlays hold absolute paths)
 build/ios/xcode/overlay.json
