@@ -1,0 +1,235 @@
+---
+title: "BEC Biogeoclimatic Subzone / Variant Synthesis Guide"
+format:
+  html:
+    embed-resources: true
+    toc: false
+    theme: none
+    minimal: true
+params:
+  payload_json: "guide_payload.json"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(jsonlite)
+library(knitr)
+
+payload <- jsonlite::fromJSON(params$payload_json, simplifyVector = FALSE)
+
+esc_html <- function(x) {
+  if (is.null(x) || length(x) == 0L || is.na(x)) return("")
+  s <- as.character(x)
+  s <- gsub("&", "&amp;", s, fixed = TRUE)
+  s <- gsub("<", "&lt;", s, fixed = TRUE)
+  s <- gsub(">", "&gt;", s, fixed = TRUE)
+  s <- gsub('"', "&quot;", s, fixed = TRUE)
+  s
+}
+
+render_edatopic_svg <- function(grid_obj, title_text, is_actual = FALSE) {
+  snrs <- c("A", "B", "C", "D", "E")
+  rows <- if (is_actual) {
+    c("0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5", "5.5", "6", "6.5", "7", "7.5", "8")
+  } else {
+    c("0", "1", "2", "3", "4", "5", "6", "7", "8")
+  }
+  cell_w <- 46
+  cell_h <- if (is_actual) 18 else 30
+  pad_l <- 52
+  pad_t <- 44
+  w <- pad_l + length(snrs) * cell_w + 18
+  h <- pad_t + length(rows) * cell_h + 24
+
+  cells_list <- if (!is.null(grid_obj) && !is.null(grid_obj$cells)) grid_obj$cells else list()
+  max_cnt <- 1L
+  cell_map <- new.env(hash = TRUE, parent = emptyenv())
+  for (c_item in cells_list) {
+    key <- paste0(as.character(c_item$moisture), "|", toupper(as.character(c_item$nutrient)))
+    cnt <- as.integer(c_item$count)
+    if (cnt > max_cnt) max_cnt <- cnt
+    assign(key, c_item, envir = cell_map)
+  }
+
+  parts <- c(
+    sprintf('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height="%d" role="img" aria-label="%s">', w, h, w, h, esc_html(title_text)),
+    sprintf('<rect x="0" y="0" width="%d" height="%d" fill="#ffffff" stroke="#cbd5e1" rx="4"/>', w, h),
+    sprintf('<text x="%d" y="18" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#003366">%s</text>', as.integer(w / 2), esc_html(title_text))
+  )
+
+  for (ci in seq_along(snrs)) {
+    cx <- pad_l + (ci - 1L) * cell_w + (cell_w / 2)
+    parts <- c(parts, sprintf('<text x="%.1f" y="36" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#1e293b">%s</text>', cx, snrs[[ci]]))
+  }
+
+  for (ri in seq_along(rows)) {
+    ry <- pad_t + (ri - 1L) * cell_h
+    r_lbl <- rows[[ri]]
+    parts <- c(parts, sprintf('<text x="%d" y="%.1f" text-anchor="end" font-family="monospace" font-size="10" font-weight="600" fill="#334155">%s</text>', pad_l - 6, ry + (cell_h * 0.68), r_lbl))
+    for (ci in seq_along(snrs)) {
+      cx <- pad_l + (ci - 1L) * cell_w
+      key <- paste0(r_lbl, "|", snrs[[ci]])
+      cnt <- 0L
+      if (exists(key, envir = cell_map, inherits = FALSE)) {
+        cnt <- as.integer(get(key, envir = cell_map)$count)
+      }
+      fill <- "#f8fafc"
+      txt_col <- "#64748b"
+      if (cnt > 0L) {
+        ratio <- cnt / max_cnt
+        if (ratio >= 0.75) {
+          fill <- "#003366"
+          txt_col <- "#ffffff"
+        } else if (ratio >= 0.40) {
+          fill <- "#2563eb"
+          txt_col <- "#ffffff"
+        } else {
+          fill <- "#bfdbfe"
+          txt_col <- "#0f172a"
+        }
+      }
+      parts <- c(parts, sprintf('<rect x="%d" y="%d" width="%d" height="%d" fill="%s" stroke="#94a3b8" stroke-width="0.8"/>', cx, ry, cell_w, cell_h, fill))
+      if (cnt > 0L) {
+        parts <- c(parts, sprintf('<text x="%.1f" y="%.1f" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="%s">%d</text>', cx + (cell_w / 2), ry + (cell_h * 0.68), txt_col, cnt))
+      }
+    }
+  }
+  parts <- c(parts, "</svg>")
+  paste(parts, collapse = "\n")
+}
+
+render_aspect_rose_svg <- function(sectors_list) {
+  labels <- c("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+  counts <- integer(8L)
+  if (!is.null(sectors_list)) {
+    for (s_item in sectors_list) {
+      idx <- match(toupper(as.character(s_item$sector)), labels)
+      if (!is.na(idx)) counts[[idx]] <- as.integer(s_item$count)
+    }
+  }
+  max_c <- max(1L, counts)
+  cx <- 120
+  cy <- 125
+  r_max <- 78
+
+  parts <- c(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 245" width="240" height="245" role="img" aria-label="BGC Aspect Rose">',
+    '<rect x="0" y="0" width="240" height="245" fill="#ffffff" stroke="#cbd5e1" rx="4"/>',
+    '<text x="120" y="18" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="700" fill="#003366">Subzone Aspect Rose</text>',
+    sprintf('<circle cx="%d" cy="%d" r="%d" fill="none" stroke="#cbd5e1"/>', cx, cy, r_max)
+  )
+  for (i in seq_len(8L)) {
+    ang_deg <- (i - 1L) * 45.0 - 90.0
+    a1 <- (ang_deg - 18.0) * pi / 180.0
+    a2 <- (ang_deg + 18.0) * pi / 180.0
+    rad <- if (counts[[i]] > 0L) max(10.0, (counts[[i]] / max_c) * r_max) else 0.0
+    if (rad > 0.0) {
+      parts <- c(parts, sprintf(
+        '<path d="M %d %d L %.1f %.1f A %.1f %.1f 0 0 1 %.1f %.1f Z" fill="#003366" fill-opacity="0.82" stroke="#FCBA19" stroke-width="1.2"/>',
+        cx, cy, cx + rad * cos(a1), cy + rad * sin(a1), rad, rad, cx + rad * cos(a2), cy + rad * sin(a2)
+      ))
+    }
+    am <- ang_deg * pi / 180.0
+    parts <- c(parts, sprintf('<text x="%.1f" y="%.1f" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="#1e293b">%s (%d)</text>', cx + (r_max + 15.0) * cos(am), cy + (r_max + 15.0) * sin(am) + 4.0, labels[[i]], counts[[i]]))
+  }
+  parts <- c(parts, "</svg>")
+  paste(parts, collapse = "\n")
+}
+```
+
+```{=html}
+<style>
+  body {
+    font-family: "BCSans", "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #0f172a;
+    margin: 0;
+    padding: 0;
+    background: #f8fafc;
+  }
+  .bcgov-banner {
+    background: #003366;
+    color: #ffffff;
+    border-bottom: 4px solid #FCBA19;
+    padding: 18px 28px;
+  }
+  .bcgov-banner h1 { margin: 0; font-size: 22px; }
+  .bcgov-banner .subtitle { margin-top: 4px; font-size: 13px; color: #e2e8f0; }
+  .guide-container { max-width: 1120px; margin: 20px auto; padding: 0 24px 36px; }
+  .card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 16px 20px; margin-bottom: 18px; }
+  .card h2 { margin: 0 0 10px 0; font-size: 16px; color: #003366; border-bottom: 2px solid #FCBA19; padding-bottom: 5px; }
+  .grid-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+  table.bec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.bec-table th { background: #003366; color: #ffffff; text-align: left; padding: 7px 9px; font-weight: 600; }
+  table.bec-table td { padding: 6px 9px; border-bottom: 1px solid #e2e8f0; }
+  table.bec-table tr:nth-child(even) td { background: #f8fafc; }
+  .sci-name { font-style: italic; }
+  @media print {
+    body { background: #ffffff; }
+    .guide-container { max-width: 100%; margin: 0; padding: 10px; }
+    .card { break-inside: avoid; }
+  }
+</style>
+```
+
+```{r render_bgc_body, results='asis'}
+cat(sprintf(
+  '<div class="bcgov-banner"><h1>%s — BGC Unit Synthesis Guide</h1><div class="subtitle">B.C. Ministry of Forests — BEC Program | BGC: %s | Project: %s | Total Plots: %d | Generated: %s</div></div>',
+  esc_html(payload$title),
+  esc_html(payload$bgcLabel),
+  esc_html(payload$project),
+  as.integer(payload$plotCount),
+  esc_html(payload$generatedAt)
+))
+
+cat('<div class="guide-container">')
+cat(sprintf('<div class="card"><h2>Subzone / Variant Overview</h2><p>%s</p></div>', gsub("\n", "<br/>", esc_html(payload$conceptNotes))))
+
+# Site Series Summary Table across the BGC unit
+unit_rows <- if (!is.null(payload$unitBreakdown)) payload$unitBreakdown else list()
+if (length(unit_rows) > 0L) {
+  cat('<div class="card"><h2>Component Site Units Summary</h2><table class="bec-table"><thead><tr><th>Site Unit</th><th>Plots</th><th>Modal rSMR / rSNR</th><th>Mean aSMR</th><th>Mean Elevation (m)</th><th>Mean CMD.site</th></tr></thead><tbody>')
+  for (ur in unit_rows) {
+    cat(sprintf(
+      '<tr><td><strong>%s</strong></td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>',
+      esc_html(ur$siteUnit),
+      as.integer(ur$plotCount),
+      esc_html(ur$modalEdatope),
+      esc_html(ur$meanAsmr),
+      esc_html(ur$meanElevation),
+      esc_html(ur$meanCmdSite)
+    ))
+  }
+  cat('</tbody></table></div>')
+}
+
+cat('<div class="card"><h2>Subzone Edatopic Envelope & Aspect Distribution</h2><div class="grid-row">')
+cat(render_edatopic_svg(payload$relativeGrid, "Subzone Relative Edatopic Grid (rSMR x rSNR)", FALSE))
+cat(render_edatopic_svg(payload$actualGrid, "Subzone Actual Edatopic Grid (aSMR x rSNR)", TRUE))
+cat(render_aspect_rose_svg(payload$aspectRose))
+cat('</div></div>')
+
+cat('<div class="card"><h2>Subzone Characteristic Species Summary</h2>')
+veg_rows <- if (!is.null(payload$vegetationTable)) payload$vegetationTable else list()
+if (length(veg_rows) == 0L) {
+  cat('<p>No vegetation records met the summary threshold.</p>')
+} else {
+  cat('<table class="bec-table"><thead><tr><th>Stratum</th><th>Code</th><th>Scientific Name</th><th>Common Name</th><th>Constancy (%)</th><th>Class</th><th>Mean Cover (%)</th></tr></thead><tbody>')
+  for (vr in veg_rows) {
+    cat(sprintf(
+      '<tr><td>%s</td><td><code>%s</code></td><td class="sci-name">%s</td><td>%s</td><td>%.1f</td><td>%s</td><td>%.2f</td></tr>',
+      esc_html(vr$layer),
+      esc_html(vr$species),
+      esc_html(vr$scientificName),
+      esc_html(vr$englishName),
+      as.numeric(vr$constancyPct),
+      esc_html(vr$constancyClass),
+      as.numeric(vr$meanCover)
+    ))
+  }
+  cat('</tbody></table>')
+}
+cat('</div></div>')
+```
