@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "repository": "Boostao/vpro_wails",
+  "defaultChannel": "stable",
+  "channels": {
+    "stable": null,
+    "preview": null
+  }
+}

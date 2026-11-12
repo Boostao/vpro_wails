@@ -505,11 +505,111 @@ class ReleaseTests(unittest.TestCase):
                 release.package(self.root, "macos")
         self.assertEqual(list((self.root / "dist-artifacts").iterdir()), [])
 
+    def test_release_manifest_generation_channel_merging_and_validation(self):
+        asset_fixture(self.root)
+        with working_directory(self.root):
+            release.manifest(self.root)
+        stable_path = self.root / "release-manifest.json"
+        doc = release.release_manifest(
+            self.root,
+            stable_path,
+            published_at="2026-11-12T12:00:00Z",
+            root=ROOT,
+        )
+        self.assertEqual(doc["schemaVersion"], 1)
+        self.assertEqual(doc["repository"], "Boostao/vpro_wails")
+        self.assertEqual(doc["defaultChannel"], "stable")
+        self.assertIsNone(doc["channels"]["preview"])
+        stable = doc["channels"]["stable"]
+        self.assertEqual(stable["tag"], "v2.3.4")
+        self.assertEqual(stable["version"], "2.3.4")
+        self.assertIs(stable["prerelease"], False)
+        self.assertIs(stable["unsignedNotice"], True)
+        self.assertEqual(
+            stable["sha256sumsUrl"],
+            "https://github.com/Boostao/vpro_wails/releases/download/v2.3.4/SHA256SUMS.txt",
+        )
+        self.assertIn("BECdb v13", stable["standards"]["becVersion"])
+        self.assertIn("BCPlantTaxonomy v19", stable["standards"]["taxonomyVersion"])
+        self.assertEqual(stable["standards"]["lmh25Edition"], "LMH25 (2023)")
+        self.assertEqual([a["name"] for a in stable["assets"]], sorted([*EXPECTED, "SHA256SUMS.txt"]))
+        for entry in stable["assets"]:
+            expected_bytes = (self.root / entry["name"]).read_bytes()
+            self.assertEqual(entry["sizeBytes"], len(expected_bytes))
+            self.assertEqual(entry["sha256"], hashlib.sha256(expected_bytes).hexdigest())
+
+        # Verify remote & downloaded release verification with release-manifest.json attached.
+        remote_json = self.root / "remote-with-manifest.json"
+        remote_names = [*EXPECTED, "SHA256SUMS.txt", "release-manifest.json"]
+        remote_json.write_text(json.dumps({"assets": [{"name": n} for n in remote_names]}))
+        release.remote(remote_json, require_release_manifest=True)
+        remote_without = self.root / "remote-without-manifest.json"
+        remote_without.write_text(json.dumps({"assets": [{"name": n} for n in remote_names[:-1]]}))
+        with self.assertRaisesRegex(ValueError, "missing release-manifest.json"):
+            release.remote(remote_without, require_release_manifest=True)
+
+        downloaded = self.root / "downloaded-with-manifest"
+        downloaded.mkdir()
+        for name in remote_names:
+            shutil.copyfile(self.root / name, downloaded / name)
+        release.verify(downloaded, self.root / "SHA256SUMS.txt", release_manifest_path=stable_path)
+        (downloaded / "release-manifest.json").write_text("{}", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "differs from validated manifest"):
+            release.verify(downloaded, self.root / "SHA256SUMS.txt", release_manifest_path=stable_path)
+
+        # Merge a preview RC release on top of the existing stable release-manifest.json via CLI.
+        rc_dir = self.root / "rc-assets"
+        rc_dir.mkdir()
+        with patch.dict(os.environ, {"RELEASE_VERSION": "v2.4.0-rc.1", "RELEASE_PRERELEASE": "true"}):
+            for arch in ("amd64", "arm64"):
+                (rc_dir / f"vpro-windows-{arch}.exe").write_bytes(pe(arch))
+                (rc_dir / f"vpro-windows-{arch}-installer.exe").write_bytes(b"rc installer")
+                with zipfile.ZipFile(rc_dir / f"vpro-windows-{arch}.zip", "w") as archive:
+                    archive.writestr("VPro.exe", pe(arch))
+                (rc_dir / f"vpro-linux-{arch}.AppImage").write_bytes(elf(arch, True))
+                (rc_dir / f"vpro-linux-{arch}.deb").write_bytes(deb(arch, "2.4.0~rc.1"))
+                (rc_dir / f"vpro-linux-{arch}.tar.gz").write_bytes(tar_bytes([("VPro", elf(arch))]))
+            (rc_dir / "vpro-macos-universal.dmg").write_bytes(b"rc DMG")
+            with zipfile.ZipFile(rc_dir / "vpro-macos-universal.zip", "w") as archive:
+                archive.writestr("VPro.app/Contents/MacOS/VPro", universal())
+                archive.writestr("VPro.app/Contents/Info.plist",
+                                 plistlib.dumps({"CFBundleVersion": "2.4.0", "CFBundleShortVersionString": "2.4.0"}))
+            for group in ("windows-amd64", "windows-arm64", "macos-universal", "linux-amd64", "linux-arm64"):
+                names = [name for name in EXPECTED if name.startswith("vpro-" + group)]
+                witness = {"schema": 1, "group": group, "version": "2.4.0-rc.1", "commit": "abc123",
+                           "architectures": ["amd64", "arm64"] if group == "macos-universal" else [group.split("-")[1]],
+                           "sha256": {name: hashlib.sha256((rc_dir / name).read_bytes()).hexdigest() for name in names}}
+                (rc_dir / f"release-witness-{group}.json").write_text(json.dumps(witness), encoding="utf-8")
+            with working_directory(rc_dir):
+                release.manifest(rc_dir)
+            with self.assertRaisesRegex(ValueError, "cannot publish to stable"):
+                release.release_manifest(rc_dir, self.root / "bad.json", channel="stable")
+            merged_path = self.root / "merged-manifest.json"
+            with patch("sys.argv", [
+                "release.py", "release-manifest", str(rc_dir),
+                "--output", str(merged_path),
+                "--base-manifest", str(stable_path),
+                "--published-at", "2026-11-13T08:30:00Z",
+            ]):
+                release.main()
+        merged = json.loads(merged_path.read_text(encoding="utf-8"))
+        release.validate_release_manifest(merged)
+        self.assertEqual(merged["channels"]["stable"]["tag"], "v2.3.4")
+        self.assertIs(merged["channels"]["stable"]["prerelease"], False)
+        self.assertEqual(merged["channels"]["preview"]["tag"], "v2.4.0-rc.1")
+        self.assertIs(merged["channels"]["preview"]["prerelease"], True)
+
+        # Repository site/release-manifest.json must satisfy strict schema validation.
+        repo_manifest = json.loads((ROOT / "site/release-manifest.json").read_text(encoding="utf-8"))
+        release.validate_release_manifest(repo_manifest)
+
     def test_workflow_contract(self):
         workflow = (ROOT / ".github/workflows/release.yml").read_text()
         self.assertNotIn("|| true", workflow)
         self.assertNotIn("continue-on-error", workflow)
         self.assertNotIn("darwin:package:dmg", workflow)
+        self.assertNotIn("go-version: '1.25'", workflow)
+        self.assertEqual(workflow.count("go-version: '1.26'"), 3)
         self.assertIn("task darwin:package:universal", workflow)
         self.assertIn("task darwin:create:dmg", workflow)
         self.assertIn("runner: ubuntu-24.04-arm", workflow)
@@ -520,8 +620,15 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(workflow.count("contents: write"), 1)
         self.assertIn("contents: read", workflow)
         self.assertIn("python scripts/release.py manifest release-assets", workflow)
-        self.assertIn("python scripts/release.py verify release-downloaded", workflow)
-        self.assertIn("enablement: true", (ROOT / ".github/workflows/pages.yml").read_text())
+        self.assertIn("python scripts/release.py release-manifest release-assets --output release-assets/release-manifest.json", workflow)
+        self.assertIn("python scripts/release.py remote release-remote.json --require-release-manifest", workflow)
+        self.assertIn("python scripts/release.py verify release-downloaded --manifest release-assets/SHA256SUMS.txt --release-manifest release-assets/release-manifest.json", workflow)
+        pages = (ROOT / ".github/workflows/pages.yml").read_text()
+        self.assertNotIn("enablement: true", pages)
+        self.assertNotIn("path: 'docs'", pages)
+        self.assertIn("node-version: '22'", pages)
+        self.assertIn("node scripts/build-docs-src.mjs && node site/build.mjs", pages)
+        self.assertIn("path: 'site/dist'", pages)
 
 
 if __name__ == "__main__":

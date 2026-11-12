@@ -1,6 +1,7 @@
 """Fail-closed release packaging, CPU witnesses and CI-only version preparation."""
 
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import io
 import json
@@ -16,6 +17,7 @@ import tempfile
 import zipfile
 
 
+REPOSITORY = "Boostao/vpro_wails"
 ARCHES = ("amd64", "arm64")
 GROUPS = ("windows-amd64", "windows-arm64", "macos-universal",
           "linux-amd64", "linux-arm64")
@@ -30,6 +32,12 @@ ASSETS = {
 }
 REQUIRED = frozenset(name for names in ASSETS.values() for name in names)
 MANIFEST = "SHA256SUMS.txt"
+RELEASE_MANIFEST = "release-manifest.json"
+DEFAULT_STANDARDS = {
+    "becVersion": "BECdb v13 (2026-05-28)",
+    "taxonomyVersion": "BCPlantTaxonomy v19 (2026-02-09)",
+    "lmh25Edition": "LMH25 (2023)",
+}
 METADATA = ("build/config.yml", "build/windows/info.json",
             "build/windows/nsis/wails_tools.nsh", "build/darwin/Info.plist",
             "build/linux/nfpm/nfpm.yaml")
@@ -418,21 +426,193 @@ def parse_manifest(content):
     return entries
 
 
-def verify(directory, trusted_manifest):
+def verify(directory, trusted_manifest, *, release_manifest_path=None):
     content = trusted_manifest.read_text(encoding="ascii")
     expected = parse_manifest(content)
-    exact_files(directory, REQUIRED | {MANIFEST})
+    expected_set = REQUIRED | {MANIFEST}
+    if release_manifest_path is not None:
+        expected_set = expected_set | {RELEASE_MANIFEST}
+    exact_files(directory, expected_set)
     require((directory / MANIFEST).read_bytes() == trusted_manifest.read_bytes(),
             "Downloaded checksum manifest differs from validated manifest")
     for name, digest in expected.items():
         require(sha256(directory / name) == digest, f"SHA256 mismatch: {name}")
+    if release_manifest_path is not None:
+        trusted_bytes = release_manifest_path.read_bytes()
+        require((directory / RELEASE_MANIFEST).read_bytes() == trusted_bytes,
+                "Downloaded release-manifest.json differs from validated manifest")
+        validate_release_manifest(json.loads(trusted_bytes.decode("utf-8")))
 
 
-def remote(path):
+def remote(path, *, require_release_manifest=False):
     assets = json.loads(path.read_text(encoding="utf-8"))["assets"]
     names = [asset["name"] for asset in assets]
-    require(len(names) == len(REQUIRED) + 1 and set(names) == REQUIRED | {MANIFEST},
-            "Remote release has missing, duplicate or unexpected assets")
+    require(len(names) == len(set(names)), "Remote release has duplicate asset names")
+    base_expected = REQUIRED | {MANIFEST}
+    with_portal_manifest = base_expected | {RELEASE_MANIFEST}
+    if require_release_manifest:
+        require(set(names) == with_portal_manifest,
+                "Remote release is missing release-manifest.json or has unexpected assets")
+    else:
+        require(set(names) in (base_expected, with_portal_manifest),
+                "Remote release has missing, duplicate or unexpected assets")
+
+
+def standards_metadata(root=None):
+    base = (root or Path(__file__).resolve().parents[1]) / "resources/standards-2026-provenance.json"
+    standards = dict(DEFAULT_STANDARDS)
+    if base.is_file():
+        provenance = json.loads(base.read_text(encoding="utf-8"))
+        for source in provenance.get("sources", ()):
+            label = source.get("version", "")
+            if label.startswith("BECdb_v13_2026"):
+                date_suffix = label.split("(", 1)[1].rstrip(")") if "(" in label else "2026"
+                standards["becVersion"] = f"BECdb v13 ({date_suffix})"
+            elif label.startswith("BCPlantTaxa_v19"):
+                date_suffix = label.split("(", 1)[1].rstrip(")") if "(" in label else "2026"
+                standards["taxonomyVersion"] = f"BCPlantTaxonomy v19 ({date_suffix})"
+    return standards
+
+
+def validate_download_url(url, name, tag, repository=REPOSITORY):
+    require(isinstance(url, str) and "?" not in url and "#" not in url,
+            f"Invalid download URL for {name}")
+    expected = f"https://github.com/{repository}/releases/download/{tag}/{name}"
+    require(url == expected, f"Unexpected download URL for {name}: {url} != {expected}")
+    return url
+
+
+def validate_channel_entry(entry, channel_name, repository=REPOSITORY):
+    require(isinstance(entry, dict), f"Channel {channel_name} must be an object or null")
+    full_ver = entry.get("version")
+    require(isinstance(full_ver, str), f"Channel {channel_name} is missing version")
+    normalized, _ = version(full_ver)
+    require(normalized == full_ver, f"Channel {channel_name} version must not carry leading v")
+    tag = entry.get("tag")
+    require(tag == f"v{full_ver}", f"Channel {channel_name} tag must match v{full_ver}")
+    published_at = entry.get("publishedAt")
+    require(isinstance(published_at, str) and re.fullmatch(
+        r"\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)?", published_at) is not None,
+        f"Channel {channel_name} has invalid ISO-8601 publishedAt")
+    prerelease = entry.get("prerelease")
+    expected_prerelease = channel_name == "preview"
+    require(type(prerelease) is bool and prerelease is expected_prerelease,
+            f"Channel {channel_name} prerelease must be {expected_prerelease}")
+    require(type(entry.get("unsignedNotice")) is bool,
+            f"Channel {channel_name} unsignedNotice must be boolean")
+    validate_download_url(entry.get("sha256sumsUrl"), MANIFEST, tag, repository)
+    standards = entry.get("standards")
+    require(isinstance(standards, dict), f"Channel {channel_name} standards must be an object")
+    for key in ("becVersion", "taxonomyVersion", "lmh25Edition"):
+        require(isinstance(standards.get(key), str) and len(standards[key].strip()) > 0,
+                f"Channel {channel_name} standards.{key} must be a non-empty string")
+    assets = entry.get("assets")
+    require(isinstance(assets, list) and len(assets) > 0,
+            f"Channel {channel_name} assets must be a non-empty list")
+    allowed_names = REQUIRED | {MANIFEST}
+    seen = set()
+    for asset in assets:
+        require(isinstance(asset, dict), f"Channel {channel_name} contains malformed asset")
+        name = asset.get("name")
+        require(isinstance(name, str) and name in allowed_names and name not in seen,
+                f"Channel {channel_name} contains unexpected or duplicate asset: {name!r}")
+        seen.add(name)
+        validate_download_url(asset.get("url"), name, tag, repository)
+        digest = asset.get("sha256")
+        require(isinstance(digest, str) and re.fullmatch(r"[0-9a-f]{64}", digest) is not None,
+                f"Channel {channel_name} asset {name} has invalid sha256")
+        size_bytes = asset.get("sizeBytes")
+        require(type(size_bytes) is int and size_bytes > 0,
+                f"Channel {channel_name} asset {name} has invalid sizeBytes")
+    require(REQUIRED.issubset(seen),
+            f"Channel {channel_name} is missing required release assets")
+
+
+def validate_release_manifest(doc):
+    require(isinstance(doc, dict), "Release manifest must be a JSON object")
+    require(set(doc) == {"schemaVersion", "repository", "defaultChannel", "channels"},
+            "Unexpected top-level keys in release-manifest.json")
+    require(type(doc.get("schemaVersion")) is int and doc["schemaVersion"] == 1,
+            "Unsupported release-manifest.json schemaVersion")
+    require(doc.get("repository") == REPOSITORY,
+            f"Unexpected release-manifest.json repository: {doc.get('repository')!r}")
+    require(doc.get("defaultChannel") in ("stable", "preview"),
+            "defaultChannel must be 'stable' or 'preview'")
+    channels = doc.get("channels")
+    require(isinstance(channels, dict) and "stable" in channels and
+            set(channels).issubset({"stable", "preview"}),
+            "channels must contain 'stable' and optional 'preview' only")
+    for channel_name in ("stable", "preview"):
+        entry = channels.get(channel_name)
+        if entry is not None:
+            validate_channel_entry(entry, channel_name, doc["repository"])
+    return doc
+
+
+def release_manifest(directory, output, *, channel=None, published_at=None,
+                     base_manifest=None, default_channel=None, root=None):
+    full, _ = release_version()
+    tag = f"v{full}"
+    manifest_file = directory / MANIFEST
+    require(manifest_file.is_file() and not manifest_file.is_symlink() and
+            manifest_file.stat().st_size > 0, f"Missing validated {MANIFEST} in {directory}")
+    expected_hashes = parse_manifest(manifest_file.read_text(encoding="ascii"))
+    for name in REQUIRED:
+        asset_path = directory / name
+        require(asset_path.is_file() and not asset_path.is_symlink() and
+                asset_path.stat().st_size > 0, f"Missing or empty release asset: {name}")
+        require(sha256(asset_path) == expected_hashes[name],
+                f"Asset {name} does not match {MANIFEST}")
+    env_prerelease = os.environ.get("RELEASE_PRERELEASE", "").strip().lower()
+    inferred_prerelease = env_prerelease == "true" or "-" in full.split("+", 1)[0]
+    if channel is None:
+        target_channel = "preview" if inferred_prerelease else "stable"
+    else:
+        require(channel in ("stable", "preview"), f"Unsupported release channel: {channel}")
+        if channel == "stable":
+            require(not inferred_prerelease,
+                    "Prerelease version or RELEASE_PRERELEASE=true cannot publish to stable channel")
+        target_channel = channel
+    timestamp = published_at or os.environ.get("RELEASE_PUBLISHED_AT") or (
+        datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    )
+    doc = {
+        "schemaVersion": 1,
+        "repository": REPOSITORY,
+        "defaultChannel": "stable",
+        "channels": {"stable": None, "preview": None},
+    }
+    if base_manifest is not None and base_manifest.is_file():
+        existing = validate_release_manifest(json.loads(base_manifest.read_text(encoding="utf-8")))
+        doc["defaultChannel"] = existing["defaultChannel"]
+        doc["channels"]["stable"] = existing["channels"].get("stable")
+        doc["channels"]["preview"] = existing["channels"].get("preview")
+    if default_channel is not None:
+        require(default_channel in ("stable", "preview"), "Invalid default_channel")
+        doc["defaultChannel"] = default_channel
+    asset_names = sorted(REQUIRED | {MANIFEST})
+    doc["channels"][target_channel] = {
+        "tag": tag,
+        "version": full,
+        "publishedAt": timestamp,
+        "prerelease": target_channel == "preview",
+        "unsignedNotice": True,
+        "sha256sumsUrl": f"https://github.com/{REPOSITORY}/releases/download/{tag}/{MANIFEST}",
+        "standards": standards_metadata(root),
+        "assets": [
+            {
+                "name": name,
+                "url": f"https://github.com/{REPOSITORY}/releases/download/{tag}/{name}",
+                "sha256": sha256(directory / name),
+                "sizeBytes": (directory / name).stat().st_size,
+            }
+            for name in asset_names
+        ],
+    }
+    validate_release_manifest(doc)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8", newline="\n")
+    return doc
 
 
 def main():
@@ -449,11 +629,21 @@ def main():
     architecture.add_argument("path", type=Path)
     architecture.add_argument("--format", choices=("pe", "elf", "macho"), required=True)
     architecture.add_argument("--arch", choices=(*ARCHES, "universal"), required=True)
+    portal_manifest = commands.add_parser("release-manifest")
+    portal_manifest.add_argument("path", type=Path)
+    portal_manifest.add_argument("--output", type=Path, required=True)
+    portal_manifest.add_argument("--channel", choices=("stable", "preview"))
+    portal_manifest.add_argument("--published-at")
+    portal_manifest.add_argument("--base-manifest", type=Path)
+    portal_manifest.add_argument("--default-channel", choices=("stable", "preview"))
     for command in ("manifest", "remote", "verify"):
         subparser = commands.add_parser(command)
         subparser.add_argument("path", type=Path)
+        if command == "remote":
+            subparser.add_argument("--require-release-manifest", action="store_true")
         if command == "verify":
             subparser.add_argument("--manifest", type=Path, required=True)
+            subparser.add_argument("--release-manifest", type=Path)
     args = parser.parse_args()
     if args.command == "version":
         full, _ = release_version()
@@ -471,10 +661,19 @@ def main():
         check_cpu(args.path, args.format, args.arch)
     elif args.command == "manifest":
         manifest(args.path)
+    elif args.command == "release-manifest":
+        release_manifest(
+            args.path,
+            args.output,
+            channel=args.channel,
+            published_at=args.published_at,
+            base_manifest=args.base_manifest,
+            default_channel=args.default_channel,
+        )
     elif args.command == "remote":
-        remote(args.path)
+        remote(args.path, require_release_manifest=args.require_release_manifest)
     else:
-        verify(args.path, args.manifest)
+        verify(args.path, args.manifest, release_manifest_path=args.release_manifest)
 
 
 if __name__ == "__main__":

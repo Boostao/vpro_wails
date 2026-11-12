@@ -6,7 +6,9 @@ on:
       - main
       - master
     paths:
-      - 'docs/**'
+      - 'site/**'
+      - 'docs-src/**'
+      - 'scripts/build-docs-src.mjs'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -31,17 +33,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build single-source docs and BC Gov release portal
+        run: node scripts/build-docs-src.mjs && node site/build.mjs
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        with:
-          # Attempt with the existing token; permission/site failures remain fatal.
-          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Deploy content from the docs directory
-          path: 'docs'
+          path: 'site/dist'
 
       - name: Deploy to GitHub Pages
         id: deployment
