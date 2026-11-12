@@ -84,18 +84,34 @@ func decodeWorkingUnitJSON(data []byte, target any) error {
 	return nil
 }
 
+const (
+	workingUnitLegacyDatabaseSHA256 = "94475866a0732284d4b4cdbc8e1dd977777b2b312cf35b6b9594d6496a5f7de3"
+	workingUnitExporterV1           = "native-access-dao-working-unit-v1"
+	workingUnitExporterV2           = "accessreader-becdb-v13-working-unit-v2"
+	workingUnitSourceContextV1      = "USysMasterSiteUnitList direct link to owned VLists.MasterSiteUnitList; USysUserSiteUnitList direct link to owned VUser.UserSiteUnitList"
+	workingUnitSourceContextV2      = "BECdb_v13_2026.accdb Current_Unique_SiteUnits_v13 merged with historical VLists.MasterSiteUnitList; VUser.UserSiteUnitList preserved"
+)
+
 func validateWorkingUnitSnapshot(data []byte, p workingUnitProvenance) (*workingUnitSnapshot, error) {
-	if p.Version != 1 || p.Exporter != "native-access-dao-working-unit-v1" || becHash(data) != p.SnapshotSHA256 {
+	validExporter := (p.Version == 1 && p.Exporter == workingUnitExporterV1) ||
+		(p.Version == 2 && p.Exporter == workingUnitExporterV2)
+	if !validExporter || becHash(data) != p.SnapshotSHA256 {
 		return nil, errors.New("Working Unit snapshot checksum/provenance mismatch")
 	}
 	var snapshot workingUnitSnapshot
 	if err := decodeWorkingUnitJSON(data, &snapshot); err != nil {
 		return nil, fmt.Errorf("Working Unit snapshot: %w", err)
 	}
+	expectedContext := workingUnitSourceContextV1
+	masterFile := "vlists.accda"
+	if p.Version == 2 {
+		expectedContext = workingUnitSourceContextV2
+		masterFile = "becdb_v13_2026.accdb"
+	}
 	if snapshot.Version != p.Version || snapshot.Exporter != p.Exporter || !snapshot.ReadOnlyNativeReferenceAccess ||
 		len(snapshot.Tables) != 2 || len(snapshot.Schema) != 2 ||
 		snapshot.IdentityEncoding != "exact signed32 string, not float; frozen exact sourceOrdinal string retained" ||
-		snapshot.SourceContext != "USysMasterSiteUnitList direct link to owned VLists.MasterSiteUnitList; USysUserSiteUnitList direct link to owned VUser.UserSiteUnitList" {
+		snapshot.SourceContext != expectedContext {
 		return nil, errors.New("Working Unit snapshot source boundary mismatch")
 	}
 	found := map[string]bool{}
@@ -103,7 +119,7 @@ func validateWorkingUnitSnapshot(data []byte, p workingUnitProvenance) (*working
 		name := strings.ToLower(source.Path[strings.LastIndexAny(source.Path, `\/`)+1:])
 		expected := ""
 		switch name {
-		case "vlists.accda":
+		case masterFile:
 			expected = p.MasterSHA256
 		case "vuser.accda":
 			expected = p.UserSHA256

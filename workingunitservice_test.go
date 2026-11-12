@@ -55,13 +55,14 @@ func workingUnitCodes(rows []WorkingUnitChoice) []string {
 func TestWorkingUnitFrozenMasterChoicesAndReadOnly(t *testing.T) {
 	service, _, _ := workingUnitServiceFixture(t)
 	p := workingUnitProvenanceFixture(t)
-	if p.DatabaseSHA256 != "94475866a0732284d4b4cdbc8e1dd977777b2b312cf35b6b9594d6496a5f7de3" ||
-		p.TypedCellsSHA256 != "b50c467ba2ebb8b3bff153f55371bd2dca0a5fd6b0e9be29f10c3031a485b432" ||
-		p.MasterRows+p.UserRows != 3508 || len(p.SourceCopies) != 5 {
-		t.Fatal("native reference integrity boundary changed")
+	if p.Version != 2 ||
+		p.DatabaseSHA256 != "c06e28659124339121fa4982d1b033b9cfa71edc7b68471eadba0a421ddb4974" ||
+		p.TypedCellsSHA256 != "12ac0eee4a6be40853ec02ce230ce71bfb68d088d91730b08e08e9f117bac4bc" ||
+		p.MasterRows+p.UserRows != 6071 || len(p.SourceCopies) != 6 {
+		t.Fatalf("2026 Working Unit integrity boundary mismatch: %+v", p)
 	}
 	rows, err := service.GetMasterWorkingUnitChoices(context.Background())
-	if err != nil || len(rows) != 3504 {
+	if err != nil || len(rows) != 6067 {
 		t.Fatalf("master catalogue %d: %v", len(rows), err)
 	}
 	same, err := service.GetWorkingUnitChoices(context.Background(), "master")
@@ -72,12 +73,12 @@ func TestWorkingUnitFrozenMasterChoicesAndReadOnly(t *testing.T) {
 	if len(data) == 0 {
 		t.Fatal("empty snapshot")
 	}
-	first, last := false, false
+	first, last, foundV13 := false, false, false
 	codes := map[string]int{}
 	negative, positive := false, false
 	for _, row := range rows {
 		ordinal, err := strconv.Atoi(row.RowID)
-		if err != nil || ordinal < 1 || ordinal > 3504 || row.Origin != "master" || row.SourceID == nil {
+		if err != nil || ordinal < 1 || ordinal > 6067 || row.Origin != "master" || row.SourceID == nil {
 			t.Fatalf("inexact raw identity: %#v", row)
 		}
 		source := snapshot.Tables["MasterSiteUnitList"][ordinal-1]
@@ -87,7 +88,8 @@ func TestWorkingUnitFrozenMasterChoicesAndReadOnly(t *testing.T) {
 			!reflect.DeepEqual(row.Level, source.Level) || !row.Selectable || row.Diagnostic != "" {
 			t.Fatalf("raw source metadata changed at ordinal %s", row.RowID)
 		}
-		first, last = first || row.RowID == "1", last || row.RowID == "3504"
+		first, last = first || row.RowID == "1", last || row.RowID == "6067"
+		foundV13 = foundV13 || (row.Code != nil && *row.Code == "BG  xh 1 /101")
 		id, err := strconv.ParseInt(*row.SourceID, 10, 32)
 		if err != nil {
 			t.Fatal(err)
@@ -101,8 +103,8 @@ func TestWorkingUnitFrozenMasterChoicesAndReadOnly(t *testing.T) {
 			duplicates++
 		}
 	}
-	if !first || !last || !negative || !positive || duplicates != 34 {
-		t.Fatalf("source identities/duplicates lost: first=%v last=%v signs=%v/%v duplicates=%d", first, last, negative, positive, duplicates)
+	if !first || !last || !foundV13 || !negative || !positive || duplicates != 34 {
+		t.Fatalf("source identities/duplicates lost: first=%v last=%v v13=%v signs=%v/%v duplicates=%d", first, last, foundV13, negative, positive, duplicates)
 	}
 	if _, err := service.db.Exec(`DELETE FROM WorkingUnits`); err == nil {
 		t.Fatal("frozen connection permits reference writes")

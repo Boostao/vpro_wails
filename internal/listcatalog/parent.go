@@ -23,8 +23,13 @@ func ParentProfile() Profile {
 	for i, list := range lists {
 		queries[i] = DAOSourceSQL(list.Name)
 	}
-	return Profile{"current-readonly-dao-parent-codes-v1", SourceSHA256, ParentSnapshotSHA256,
-		strings.Join(queries, " "), lists}
+	return Profile{
+		Exporter:       "current-readonly-dao-parent-codes-v1",
+		SourceSHA256:   SourceSHA256,
+		SnapshotSHA256: ParentSnapshotSHA256,
+		SQL:            strings.Join(queries, " "),
+		Lists:          lists,
+	}
 }
 
 // The 15-list capture and the earlier Bedrock capture have separate immutable seals.

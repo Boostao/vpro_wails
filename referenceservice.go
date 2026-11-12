@@ -40,6 +40,8 @@ type ReferenceService struct {
 	db      *sql.DB
 }
 
+const legacyVListsReferenceSHA256 = "abf77c39d1591441390e7de5302748b24a4a789e23fe3966daf3f198e5058f2e"
+
 func NewReferenceService(dataDir string) (*ReferenceService, error) {
 	if dataDir == "" {
 		var err error
@@ -68,6 +70,18 @@ func NewReferenceService(dataDir string) (*ReferenceService, error) {
 
 		if _, err := io.Copy(dst, src); err != nil {
 			return nil, fmt.Errorf("copy vlists.db: %w", err)
+		}
+	} else if err == nil {
+		if existing, readErr := os.ReadFile(targetPath); readErr == nil && becHash(existing) == legacyVListsReferenceSHA256 {
+			embedded, err := vlistsFiles.ReadFile("resources/vlists.db")
+			if err != nil {
+				return nil, fmt.Errorf("read embedded vlists.db: %w", err)
+			}
+			if becHash(embedded) != legacyVListsReferenceSHA256 {
+				if err := replaceBundledCatalogueFile(targetPath, embedded, 0o644); err != nil {
+					return nil, fmt.Errorf("upgrade vlists.db: %w", err)
+				}
+			}
 		}
 	}
 

@@ -27,7 +27,7 @@ type SoilCodeService struct {
 
 func NewSoilCodeService(dataDir string) (*SoilCodeService, error) {
 	path, provenance, cache, err := openListCatalogue(dataDir, "soil-codes.db", "soil code",
-		soilCodeDatabase, soilCodeProvenanceJSON, listcatalog.SoilProfile())
+		soilCodeDatabase, soilCodeProvenanceJSON, listcatalog.SoilBundledProfile2026())
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (s *SoilCodeService) listChoices(ctx context.Context, list string) ([]SoilC
 	if s.closed {
 		return nil, errors.New("soil code catalogue is closed")
 	}
-	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SoilProfile(), "soil code", list, false)
+	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SoilBundledProfile2026(), "soil code", list, false)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (s *SoilCodeService) ReloadCatalogue(ctx context.Context) error {
 	if s.closed {
 		return errors.New("soil code catalogue is closed")
 	}
-	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SoilProfile(), "soil code", "", true)
+	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SoilBundledProfile2026(), "soil code", "", true)
 	return err
 }
 

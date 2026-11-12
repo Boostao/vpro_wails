@@ -40,11 +40,11 @@ func becString(value string) *string { return &value }
 func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 	s := becFixture(t)
 	status, err := s.GetBECCatalogueStatus(context.Background())
-	if err != nil || status.ZoneRows != 281 || status.SiteSeriesRows != 3532 || status.DuplicateKeys != 983 ||
-		status.UnselectableRows != 73 ||
-		status.SourceSHA256 != "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d" ||
-		status.SnapshotSHA256 != "0b4d7c15a02b7e7b7b82417622604b27dde4d20b95aa21cffdeba9e0448ef315" ||
-		becHash(becDatabase) != "9e087c097d472e88e64caf6ef8dddfe50959fd5b7557e45e676befedfe4cfe58" {
+	if err != nil || status.Version != 2 || status.ZoneRows != 331 || status.SiteSeriesRows != 8900 ||
+		status.DuplicateKeys != 2253 || status.UnselectableRows != 67 ||
+		status.SourceSHA256 != "7b19bd03e0a7cf0a9df453118fe42d8fecd9433f9c85634df3e556e6632161ba" ||
+		status.SnapshotSHA256 != "568c964b10f7ea83201a793bbe2c050fa6df45641a4640fab8a55a602adca814" ||
+		becHash(becDatabase) != "6f106e2af85b47869780f4ce0645ee9c4dafff2442059677bfe9cfa061f91b0e" {
 		t.Fatalf("catalogue status %#v: %v", status, err)
 	}
 	zones, err := s.ListBECZones(context.Background())
@@ -52,7 +52,7 @@ func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 		t.Fatalf("zones %d: %v", len(zones), err)
 	}
 	all, err := s.ListBECSubZones(context.Background(), nil)
-	if err != nil || len(all) != 281 {
+	if err != nil || len(all) != 331 {
 		t.Fatalf("all subzones %d: %v", len(all), err)
 	}
 	upper, err := s.ListBECSubZones(context.Background(), becString("BG"))
@@ -64,14 +64,14 @@ func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 		t.Fatalf("ASCII lookup changed raw subzones: %v", err)
 	}
 	series, err := s.ListBECSiteSeries(context.Background(), becString("BG"), becString("xh1"))
-	if err != nil || len(series) != 10 {
+	if err != nil || len(series) != 58 {
 		t.Fatalf("BG xh1 rows %d: %v", len(series), err)
 	}
 	mixed, err := s.ListBECSiteSeries(context.Background(), becString("bg"), becString("XH1"))
 	if err != nil || !reflect.DeepEqual(series, mixed) {
 		t.Fatalf("ASCII lookup changed raw definitions: %v", err)
 	}
-	var leadingZero, duplicate bool
+	var leadingZero, v13Unit, duplicate bool
 	codes := map[string]int{}
 	for _, row := range series {
 		if row.SiteSeries == nil || row.SourceID == nil || !row.Selectable || row.Diagnostic != "" {
@@ -79,32 +79,40 @@ func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 		}
 		codes[*row.SiteSeries]++
 		leadingZero = leadingZero || *row.SiteSeries == "01"
+		v13Unit = v13Unit || *row.SiteSeries == "101"
 		duplicate = duplicate || codes[*row.SiteSeries] > 1
 	}
-	if !leadingZero || !duplicate {
-		t.Fatalf("lost leading zeros/duplicates: %#v", codes)
+	if !leadingZero || !v13Unit || !duplicate {
+		t.Fatalf("lost historical leading zeros, v13 101 unit, or duplicates: %#v", codes)
+	}
+	v13Haida, err := s.ListBECSiteSeries(context.Background(), becString("CWH"), becString("vh3"))
+	if err != nil || len(v13Haida) == 0 {
+		t.Fatalf("missing BECdb v13 CWH vh3 units: %d %v", len(v13Haida), err)
 	}
 	emptyCodes, err := s.ListBECSiteSeries(context.Background(), becString("CMA"), becString("wh"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	var unselectable int
+	var unselectable, selectableCMA int
 	for _, row := range emptyCodes {
 		if row.SiteSeries != nil && *row.SiteSeries == "" {
 			unselectable++
 			if row.Selectable || row.Diagnostic == "" {
 				t.Fatalf("empty source code not marked: %#v", row)
 			}
+		} else if row.Selectable {
+			selectableCMA++
 		}
 	}
-	if unselectable == 0 {
-		t.Fatal("source empty codes silently hidden")
+	if unselectable == 0 || selectableCMA == 0 {
+		t.Fatalf("CMA wh missing preserved unselectable (%d) or v13 selectable (%d) rows", unselectable, selectableCMA)
 	}
 	for _, identity := range []struct {
-		row, source, zone, subZone, code, description string
+		source, zone, subZone, code string
 	}{
-		{"1", "64", "ESSF", "xv1", "07", "Bl - Valerian - Arnica"},
-		{"3532", "3756", "CWH", "vh2", "19", "Ss - Pacific crab apple"},
+		{"64", "ESSF", "xv1", "07"},
+		{"6698", "BG", "xh1", "101"},
+		{"1593", "SWB", "mk", "09"},
 	} {
 		rows, err := s.ListBECSiteSeries(context.Background(), &identity.zone, &identity.subZone)
 		if err != nil {
@@ -112,16 +120,12 @@ func TestBECFrozenCatalogueAndLookups(t *testing.T) {
 		}
 		found := false
 		for _, row := range rows {
-			if row.RowID == identity.row {
+			if row.SourceID != nil && *row.SourceID == identity.source && row.SiteSeries != nil && *row.SiteSeries == identity.code {
 				found = true
-				if row.SourceID == nil || *row.SourceID != identity.source || row.SiteSeries == nil ||
-					*row.SiteSeries != identity.code || row.Description == nil || *row.Description != identity.description {
-					t.Fatalf("source first/last row changed: %#v", row)
-				}
 			}
 		}
 		if !found {
-			t.Fatalf("source row %s skipped", identity.row)
+			t.Fatalf("source row %s (%s %s /%s) missing", identity.source, identity.zone, identity.subZone, identity.code)
 		}
 	}
 	for _, code := range []string{"All", "ZZ", "O'Q"} {
@@ -287,23 +291,33 @@ func TestBECImportAllMetadataAndNullableSignedIdentities(t *testing.T) {
 		}
 		i++
 	}
-	if err := rows.Err(); err != nil || i != 3532 {
+	if err := rows.Err(); err != nil || i != len(snapshot.SiteSeries) {
 		t.Fatalf("imported rows %d: %v", i, err)
 	}
 	rows.Close()
-	if _, err := db.Exec(`UPDATE BECSiteSeries SET SiteSeries=NULL WHERE RowID='1';
- UPDATE BECSiteSeries SET SiteSeries='' WHERE RowID='3532'`); err != nil {
+	firstRow := snapshot.SiteSeries[0]
+	lastRow := snapshot.SiteSeries[len(snapshot.SiteSeries)-1]
+	// Ensure firstRow has non-empty Zone & SubZone for lookup test; pick first non-empty SubZone row if RowID 1 has empty SubZone
+	targetFirst := firstRow
+	for _, cand := range snapshot.SiteSeries {
+		if cand.Zone != nil && *cand.Zone != "" && cand.SubZone != nil && *cand.SubZone != "" {
+			targetFirst = cand
+			break
+		}
+	}
+	if _, err := db.Exec(`UPDATE BECSiteSeries SET SiteSeries=NULL WHERE RowID=?;
+ UPDATE BECSiteSeries SET SiteSeries='' WHERE RowID=?`, targetFirst.RowID, lastRow.RowID); err != nil {
 		t.Fatal(err)
 	}
 	service := &BECService{db: db}
-	for _, pair := range [][2]string{{"ESSF", "xv1"}, {"CWH", "vh2"}} {
+	for _, pair := range [][2]string{{*targetFirst.Zone, *targetFirst.SubZone}, {*lastRow.Zone, *lastRow.SubZone}} {
 		rows, err := service.ListBECSiteSeries(context.Background(), &pair[0], &pair[1])
 		if err != nil {
 			t.Fatal(err)
 		}
 		found := false
 		for _, row := range rows {
-			if row.RowID == "1" || row.RowID == "3532" {
+			if row.RowID == targetFirst.RowID || row.RowID == lastRow.RowID {
 				found = true
 				if row.Selectable || row.Diagnostic == "" {
 					t.Fatalf("NULL/empty code not explicitly unselectable: %#v", row)
@@ -313,6 +327,40 @@ func TestBECImportAllMetadataAndNullableSignedIdentities(t *testing.T) {
 		if !found {
 			t.Fatal("NULL/empty code was filtered out")
 		}
+	}
+}
+
+func TestBECV1SnapshotValidationPreserved(t *testing.T) {
+	zones, series := becExpectedSchema()
+	v1Snap := becSnapshot{
+		Version:            1,
+		Exporter:           becExporterV1,
+		SourceAccessSHA256: strings.Repeat("a", 64),
+		ZoneSchema:         zones,
+		SeriesSchema:       series,
+		Zones:              []BECSubZone{{RowID: "1", Zone: becString("BG"), SubZone: becString("xh1"), ZoneDescription: becString("Bunchgrass"), Description: becString("Okanagan Very Dry Hot")}},
+		SiteSeries:         []BECSiteSeries{{RowID: "1", SourceID: becString("64"), Zone: becString("BG"), SubZone: becString("xh1"), SiteSeries: becString("01"), AddedDate: becString("2000-10-11T00:00:00")}},
+	}
+	raw, err := json.Marshal(v1Snap)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p := becProvenance{
+		Version:        1,
+		Exporter:       becExporterV1,
+		SourceSHA256:   strings.Repeat("a", 64),
+		SnapshotSHA256: becHash(raw),
+		ZoneRows:       1,
+		SiteSeriesRows: 1,
+		DuplicateKeys:  0,
+	}
+	db := becMemory(t)
+	if err := importBECSnapshot(db, raw, p); err != nil {
+		t.Fatalf("v1 snapshot import failed: %v", err)
+	}
+	status, err := validateBECDatabase(db, p)
+	if err != nil || status.Version != 1 || status.ZoneRows != 1 || status.SiteSeriesRows != 1 {
+		t.Fatalf("v1 validation mismatch: %+v %v", status, err)
 	}
 }
 

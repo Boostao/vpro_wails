@@ -1,10 +1,10 @@
 {
-  "version": 1,
-  "exporter": "native-access-dao-bec-v1",
-  "sourceSha256": "2a5ad098cf4665991acfbbca5f011c9488afcbb8272140ad262fe4f7b58f084d",
-  "snapshotSha256": "0b4d7c15a02b7e7b7b82417622604b27dde4d20b95aa21cffdeba9e0448ef315",
-  "databaseSha256": "9e087c097d472e88e64caf6ef8dddfe50959fd5b7557e45e676befedfe4cfe58",
-  "zoneRows": 281,
-  "siteSeriesRows": 3532,
-  "duplicateKeys": 983
+  "version": 2,
+  "exporter": "accessreader-becdb-v13-2026",
+  "sourceSha256": "7b19bd03e0a7cf0a9df453118fe42d8fecd9433f9c85634df3e556e6632161ba",
+  "snapshotSha256": "568c964b10f7ea83201a793bbe2c050fa6df45641a4640fab8a55a602adca814",
+  "databaseSha256": "6f106e2af85b47869780f4ce0645ee9c4dafff2442059677bfe9cfa061f91b0e",
+  "zoneRows": 331,
+  "siteSeriesRows": 8900,
+  "duplicateKeys": 2253
 }

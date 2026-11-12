@@ -72,9 +72,16 @@ func becExpectedSchema() ([]becSourceColumn, []becSourceColumn) {
 	return zones, series
 }
 
+const (
+	becLegacyDatabaseSHA256 = "9e087c097d472e88e64caf6ef8dddfe50959fd5b7557e45e676befedfe4cfe58"
+	becExporterV1           = "native-access-dao-bec-v1"
+	becExporterV2           = "accessreader-becdb-v13-2026"
+)
+
 func validateBECSnapshot(data []byte, provenance becProvenance) (*becSnapshot, error) {
-	if provenance.Version != 1 || provenance.Exporter != "native-access-dao-bec-v1" ||
-		len(provenance.SourceSHA256) != 64 || becHash(data) != provenance.SnapshotSHA256 {
+	validExporter := (provenance.Version == 1 && provenance.Exporter == becExporterV1) ||
+		(provenance.Version == 2 && provenance.Exporter == becExporterV2)
+	if !validExporter || len(provenance.SourceSHA256) != 64 || becHash(data) != provenance.SnapshotSHA256 {
 		return nil, errors.New("BEC snapshot provenance/checksum mismatch")
 	}
 	decoder := json.NewDecoder(bytes.NewReader(data))

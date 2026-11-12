@@ -13,7 +13,7 @@ import (
 	"github.com/boostao/vpro-wails/internal/listcatalog"
 )
 
-func parentCatalogueExpected(t *testing.T, p listcatalog.Provenance) []listcatalog.Choice {
+func parentCatalogueExpected(t *testing.T, _ listcatalog.Provenance) []listcatalog.Choice {
 	t.Helper()
 	var inputs [][]byte
 	for _, name := range []string{"parent-codes-fixture.json", "parent-codes-source-provenance.json",
@@ -24,7 +24,7 @@ func parentCatalogueExpected(t *testing.T, p listcatalog.Provenance) []listcatal
 		}
 		inputs = append(inputs, data)
 	}
-	rows, err := listcatalog.ParentSnapshotRows(inputs[0], inputs[1], inputs[2], inputs[3], p)
+	rows, _, err := listcatalog.ParentBundled2026Rows(inputs[0], inputs[1], inputs[2], inputs[3])
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -158,7 +158,8 @@ func TestBundledCatalogue(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, err := DecodeProvenance(encoded)
+	profile := SiteBundledProfile2026()
+	p, err := DecodeProvenanceFor(encoded, profile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -170,8 +171,37 @@ func TestBundledCatalogue(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	if err := ValidateDatabase(db, p); err != nil {
+	if err := ValidateDatabaseFor(db, p, profile); err != nil {
 		t.Fatal(err)
+	}
+	exposures, err := ReadChoicesFor(db, "Exposure", profile)
+	if err != nil || len(exposures) != 13 {
+		t.Fatalf("bundled Exposure choices: %d %v", len(exposures), err)
+	}
+	foundCO := false
+	for _, r := range exposures {
+		if r.Code != nil && *r.Code == "CO" && r.Description != nil && *r.Description == "Cold aspect" {
+			foundCO = true
+		}
+	}
+	if !foundCO {
+		t.Fatal("bundled Exposure missing LMH25 2023 CO (Cold aspect)")
+	}
+	disturbances, err := ReadChoicesFor(db, "SiteDisturbance", profile)
+	if err != nil || len(disturbances) != 129 {
+		t.Fatalf("bundled SiteDisturbance choices: %d %v", len(disturbances), err)
+	}
+	foundTh, foundBr := false, false
+	for _, r := range disturbances {
+		if r.Code != nil && *r.Code == "A.w.th" {
+			foundTh = true
+		}
+		if r.Code != nil && *r.Code == "A.w.br" {
+			foundBr = true
+		}
+	}
+	if !foundTh || !foundBr {
+		t.Fatal("bundled SiteDisturbance missing LMH25 2023 A.w.th / A.w.br")
 	}
 	if _, err := db.Exec(`DELETE FROM SiteCodeChoices`); err == nil {
 		t.Fatal("bundled validator connection is not read-only")

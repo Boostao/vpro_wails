@@ -2,6 +2,7 @@ package listcatalog
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -14,22 +15,37 @@ func parentFixture(t *testing.T) ([][]byte, Provenance, []Choice) {
 	t.Helper()
 	var inputs [][]byte
 	for _, name := range []string{"parent-codes-fixture.json", "parent-codes-source-provenance.json",
-		"parent-codes-fixture-manifest.json", "geology-codes-fixture.json.gz", "parent-codes-provenance.json"} {
+		"parent-codes-fixture-manifest.json", "geology-codes-fixture.json.gz"} {
 		data, err := os.ReadFile(filepath.Join("..", "..", "resources", name))
 		if err != nil {
 			t.Fatal(err)
 		}
 		inputs = append(inputs, data)
 	}
-	p, err := DecodeProvenanceFor(inputs[4], ParentProfile())
-	if err != nil {
-		t.Fatal(err)
+	profile := ParentProfile()
+	p := Provenance{
+		Version:           1,
+		Exporter:          profile.Exporter,
+		SourceSHA256:      profile.SourceSHA256,
+		SnapshotSHA256:    profile.SnapshotSHA256,
+		DatabaseSHA256:    strings.Repeat("0", 64),
+		TypedCellsSHA256:  strings.Repeat("0", 64),
+		Rows:              347,
+		Cells:             3470,
+		SourceTable:       "USysTableOfLists",
+		SQL:               profile.SQL,
+		SourceSchema:      ExpectedSchema(),
+		ItemOrderEncoding: ItemOrderEncoding,
 	}
 	rows, err := ParentSnapshotRows(inputs[0], inputs[1], inputs[2], inputs[3], p)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return inputs[:4], p, rows
+	p.TypedCellsSHA256, err = TypedHash(rows)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return inputs, p, rows
 }
 
 func TestParentDAO3470Cells16ListsAndStorage(t *testing.T) {
@@ -112,4 +128,46 @@ func TestParentSnapshotIndependentSealsAndSourceGuards(t *testing.T) {
 func TestParentStorageNullableDuplicateFractionalSignedZeroAndRollback(t *testing.T) {
 	_, p, rows := parentFixture(t)
 	testDAOStorage(t, ParentProfile(), p, rows)
+}
+
+func TestBundledParentCatalogue2026(t *testing.T) {
+	database := filepath.Join("..", "..", "resources", "parent-codes.db")
+	provenance := filepath.Join("..", "..", "resources", "parent-codes-provenance.json")
+	data, err := os.ReadFile(database)
+	if err != nil {
+		t.Fatal(err)
+	}
+	encoded, err := os.ReadFile(provenance)
+	if err != nil {
+		t.Fatal(err)
+	}
+	profile := ParentBundledProfile2026()
+	p, err := DecodeProvenanceFor(encoded, profile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if checksum(data) != p.DatabaseSHA256 {
+		t.Fatal("bundled parent database checksum mismatch")
+	}
+	db, err := sql.Open("sqlite3", "file:"+database+"?mode=ro")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if err := ValidateDatabaseFor(db, p, profile); err != nil {
+		t.Fatal(err)
+	}
+	durRows, err := ReadChoicesFor(db, "FloodingRegimeDur", profile)
+	if err != nil || len(durRows) != 9 {
+		t.Fatalf("FloodingRegimeDur: %d %v", len(durRows), err)
+	}
+	foundS := false
+	for _, r := range durRows {
+		if r.Code != nil && *r.Code == "S" && r.Description != nil && strings.Contains(*r.Description, "subirrigated") {
+			foundS = true
+		}
+	}
+	if !foundS {
+		t.Fatal("bundled FloodingRegimeDur missing LMH25 2023 S description")
+	}
 }

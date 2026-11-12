@@ -27,7 +27,7 @@ type SiteCodeService struct {
 
 func NewSiteCodeService(dataDir string) (*SiteCodeService, error) {
 	target, provenance, cache, err := openListCatalogue(dataDir, "site-codes.db", "site code",
-		siteCodeDatabase, siteCodeProvenanceJSON, listcatalog.SiteProfile())
+		siteCodeDatabase, siteCodeProvenanceJSON, listcatalog.SiteBundledProfile2026())
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (s *SiteCodeService) listChoices(ctx context.Context, list string) ([]SiteC
 	if s.closed {
 		return nil, errors.New("site code catalogue is closed")
 	}
-	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SiteProfile(), "site code", list, false)
+	rows, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SiteBundledProfile2026(), "site code", list, false)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (s *SiteCodeService) ReloadCatalogue(ctx context.Context) error {
 	if s.closed {
 		return errors.New("site code catalogue is closed")
 	}
-	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SiteProfile(), "site code", "", true)
+	_, err := s.cache.choicesContext(ctx, s.path, s.provenance, listcatalog.SiteBundledProfile2026(), "site code", "", true)
 	return err
 }
 

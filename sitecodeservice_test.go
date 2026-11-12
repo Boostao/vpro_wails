@@ -20,7 +20,7 @@ func TestSiteCodeCatalogueFrozenCellsDTOOrderAndDuplicates(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer service.Close()
-	p, err := listcatalog.DecodeProvenance(siteCodeProvenanceJSON)
+	p, err := listcatalog.DecodeProvenanceFor(siteCodeProvenanceJSON, listcatalog.SiteBundledProfile2026())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,12 +28,13 @@ func TestSiteCodeCatalogueFrozenCellsDTOOrderAndDuplicates(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected, err := listcatalog.SnapshotRows(data, p)
+	expected, _, err := listcatalog.SiteBundled2026Rows(data)
 	if err != nil {
 		t.Fatal(err)
 	}
 	var actual []listcatalog.Choice
 	duplicates := map[string][]SiteCodeChoice{}
+	seen2023 := map[string]bool{}
 	for _, list := range []string{"Exposure", "SiteDisturbance"} {
 		var rows []SiteCodeChoice
 		if list == "Exposure" {
@@ -44,9 +45,9 @@ func TestSiteCodeCatalogueFrozenCellsDTOOrderAndDuplicates(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		wantCount, wantSelectable := 127, 126
+		wantCount, wantSelectable := 129, 128
 		if list == "Exposure" {
-			wantCount, wantSelectable = 12, 11
+			wantCount, wantSelectable = 13, 12
 		}
 		if len(rows) != wantCount {
 			t.Fatalf("%s: %d rows", list, len(rows))
@@ -73,6 +74,9 @@ func TestSiteCodeCatalogueFrozenCellsDTOOrderAndDuplicates(t *testing.T) {
 			if row.Code != nil && (*row.Code == "M.f" || *row.Code == "M.s") {
 				duplicates[*row.Code] = append(duplicates[*row.Code], row)
 			}
+			if row.Code != nil && (*row.Code == "CO" || *row.Code == "A.w.th" || *row.Code == "A.w.br") && row.Selectable {
+				seen2023[*row.Code] = true
+			}
 			row.Selectable, row.Diagnostic = false, ""
 			actual = append(actual, listcatalog.Choice(row))
 		}
@@ -80,8 +84,11 @@ func TestSiteCodeCatalogueFrozenCellsDTOOrderAndDuplicates(t *testing.T) {
 			t.Fatalf("%s selectable %d, want %d", list, selectable, wantSelectable)
 		}
 	}
+	if len(seen2023) != 3 {
+		t.Fatalf("missing selectable LMH25 2023 site codes: %v", seen2023)
+	}
 	if !reflect.DeepEqual(actual, expected) {
-		t.Fatal("1390 typed metadata cells changed")
+		t.Fatal("1420 typed metadata cells changed")
 	}
 	hash, err := listcatalog.TypedHash(actual)
 	if err != nil || hash != p.TypedCellsSHA256 {
