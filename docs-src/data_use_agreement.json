@@ -1,0 +1,17 @@
+{
+  "title": "B.C. Ministry of Forests — BECWeb &BECMaster Data Use Agreement",
+  "authority": "Province of British Columbia — Ministry of Forests, Research Branch, Biogeoclimatic Ecosystem Classification (BEC) Program",
+  "sourceUrl": "https://www.for.gov.bc.ca/hre/becweb/resources/information-requests/Data-request-use.html",
+  "citation": "B.C. Ministry of Forests. 2026. Biogeoclimatic Ecosystem Classification (BEC) Database (BECdb v13) and VPro 2.0 Ecosystem Plot Software. Forest Science, Planning and Practices Branch, Victoria, B.C. https://www.for.gov.bc.ca/hre/becweb/",
+  "clauses": [
+    "1. Custodianship & Crown Copyright: Official provincial BEC classifications (BECdb), master taxonomy lists (BCPlantTaxonomy), and published BECMaster reference datasets remain under Crown copyright of the Province of British Columbia, administered by the Ministry of Forests BEC Program.",
+    "2. Permitted Scientific, Operational & Educational Use: VPro 2.0 and public BEC reference libraries are provided free of charge for ecological field sampling, forest & range stewardship, environmental assessment, academic research, and First Nations territorial stewardship.",
+    "3. Attribution & Mandatory Citation: Publications, maps, technical reports, and derivative models using BECdb, BCPlantTaxonomy, or BECMaster plot data must cite the B.C. Ministry of Forests BEC Program and report the exact database version stamp (for example BECdb v13, BCPlantTaxonomy v19).",
+    "4. Sensitive Rare Species & Plot Location Stewardship: Exact coordinates of plots containing Conservation Data Centre (CDC) masked/red-listed taxa or confidential research installations must not be redistributed publicly without written authorization.",
+    "5. Distinction Between Working Classifications & Official BEC Units: Project-level *_SU, *_ClusterCandidate_SU, and personal USysUserSpp entries created in VPro represent working project classifications and do not constitute official provincial BEC site series until ratified in BECdb.",
+    "6. Data Quality & Historical Plot Tolerance: Legacy plots span multiple decades of sampling standards (DEIF, FS882,LMH25 1998/2010/2015/2023); users are responsible for screening plot quality, coordinate precision, and taxonomic lumping appropriate to their analytical objective.",
+    "7. Contribution of Field Plots to Provincial Archive: Ecologists collecting public-land FS882 / SIVI plots under Ministry contracts or research permits are encouraged to submit quality-checked VPro SQLite (.db) or VENUS 5.0 archives to the provincial BEC custodian.",
+    "8. Software Integrity & Checksum Verification: Phase 1 VPro 2.0 desktop packages are distributed as unsigned builds accompanied by cryptographic SHA-256 digests in SHA256SUMS.txt and release-manifest.json; verify package checksums prior to enterprise deployment.",
+    "9. No Warranty & Limitation of Liability: Software and reference datasets are provided \"as is\" without warranty of fitness for a particular regulatory determination; consult regional Ministry Research Ecologists and published Land Management Handbooks for authoritative field interpretation."
+  ]
+}

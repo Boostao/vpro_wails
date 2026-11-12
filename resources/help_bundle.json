@@ -1,0 +1,1144 @@
+{
+  "schemaVersion": 1,
+  "productName": "VPro",
+  "fullName": "VENUS — Vegetation and Environment NexUS — Professional",
+  "organization": "B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program",
+  "lmh25Edition": "LMH25 (2023)",
+  "provenance": {
+    "schemaVersion": 1,
+    "generator": "cmd/standards2026",
+    "sources": [
+      {
+        "archiveName": "BECdb_v13_2026.zip",
+        "archiveSha256": "2dafc90ca934487a745199455c678b6b960c6f39684a9b2bb3e918292af1bdc6",
+        "extractedName": "BECdb_v13_2026.accdb",
+        "extractedSha256": "7b19bd03e0a7cf0a9df453118fe42d8fecd9433f9c85634df3e556e6632161ba",
+        "version": "BECdb_v13_2026 (2026-05-28)"
+      },
+      {
+        "archiveName": "BCPlantTaxa2025_access.zip",
+        "archiveSha256": "3ec9f20d064b486e29f9dadc570b284866950e8874ac4a0043f49491d352d163",
+        "extractedName": "BCPlantTaxonomy.accdb",
+        "extractedSha256": "41d60607c2e84487d95d49a73d425555d16679d1513e4c027690b4729b89281a",
+        "version": "BCPlantTaxa_v19_2025 (2026-02-09)"
+      }
+    ],
+    "lmh25Pdf2023Sha256": "ebf47444eab4d0862d3209e5108963c579c13e196ccb1d99f89a857bfcb6617a",
+    "artifacts": [
+      {
+        "path": "resources/database-family/VLists.db",
+        "sha256": "81e259244106b14d6dd3c65f0a7e7e87bdb06f60e6c54947c0506e2039379441",
+        "counts": {
+          "MasterSiteUnitList": 6067,
+          "USysAllSpecs": 16728,
+          "USysSiteSeriesNames": 8900,
+          "USysTableOfLists": 1566,
+          "USysZoneList": 331
+        }
+      },
+      {
+        "path": "resources/vlists.db",
+        "sha256": "d750d66613b569bf67be6ade904a98d7eaf0f7c8cf44f45a51e192bda8144701",
+        "counts": {
+          "Species": 10476
+        }
+      },
+      {
+        "path": "resources/bec.db",
+        "sha256": "6f106e2af85b47869780f4ce0645ee9c4dafff2442059677bfe9cfa061f91b0e",
+        "counts": {
+          "BECSiteSeries": 8900,
+          "BECZoneList": 331,
+          "duplicateKeys": 2253
+        }
+      },
+      {
+        "path": "resources/working-unit.db",
+        "sha256": "c06e28659124339121fa4982d1b033b9cfa71edc7b68471eadba0a421ddb4974",
+        "counts": {
+          "MasterSiteUnitList": 6067,
+          "UserSiteUnitList": 4
+        }
+      },
+      {
+        "path": "resources/site-codes.db",
+        "sha256": "f51500c489ceb3f493c1de0949f67ddc52eff038355e621534d44a4a13a3e90e",
+        "counts": {
+          "rows": 142
+        }
+      },
+      {
+        "path": "resources/soil-codes.db",
+        "sha256": "f45a8e8c35c48da873eedbf0bb96bd4fcbeb98485c7db9ffd9daa6effac21592",
+        "counts": {
+          "rows": 101
+        }
+      },
+      {
+        "path": "resources/parent-codes.db",
+        "sha256": "769d0fa1280f1e104a53714f2e5d312c5db8b482120100cb38a74543bed014b3",
+        "counts": {
+          "rows": 347
+        }
+      }
+    ]
+  },
+  "fields": [
+    {
+      "id": "site.plot_number",
+      "code": "SITE 1",
+      "section": "Site & Plot Identification",
+      "title": "Plot Number",
+      "column": "PlotNumber",
+      "unit": "Text (<= 7 UTF-16 code units)",
+      "lmh25Page": 14,
+      "summary": "Unique literal plot identifier within the project (up to 7 characters; leading zeroes such as 00337 are preserved verbatim).",
+      "rules": [
+        "Maximum 7 UTF-16 code units; leading zeroes are never coerced to integers.",
+        "Links <Project>_Env to <Project>_Veg, <Project>_Humus, <Project>_Mineral, <Project>_Other, and *_SU."
+      ],
+      "codes": []
+    },
+    {
+      "id": "site.field_number",
+      "code": "SITE 2",
+      "section": "Site & Plot Identification",
+      "title": "Field Number & Project ID",
+      "column": "FieldNumber / ProjectID",
+      "unit": "Text",
+      "lmh25Page": 15,
+      "summary": "Original field card number assigned by the sampling crew and parent project code.",
+      "rules": [
+        "Retained unchanged when plots are merged into regional or provincial BECMaster compilations."
+      ],
+      "codes": []
+    },
+    {
+      "id": "site.date",
+      "code": "SITE 3",
+      "section": "Site & Plot Identification",
+      "title": "Survey Date & Surveyors",
+      "column": "Date / SiteSurveyor / VegSurveyor / SoilSurveyor",
+      "unit": "ISO Date (YYYY-MM-DD)",
+      "lmh25Page": 16,
+      "summary": "Sampling date and lead ecological, botanical, and pedological surveyors.",
+      "rules": [
+        "Used to align historical species taxonomy synonyms and seasonal phenology notes."
+      ],
+      "codes": []
+    },
+    {
+      "id": "site.bgc_zone",
+      "code": "SITE 7",
+      "section": "Biogeoclimatic & Administrative Classification",
+      "title": "Biogeoclimatic Zone, Subzone, Variant & Phase",
+      "column": "Zone / SubZone / SiteSeries",
+      "unit": "BEC v13 Code",
+      "lmh25Page": 19,
+      "summary": "Regional climate unit from BECdb v13 (for example SBS dk, CWH vm 1, ESSF wk 1a) and field-assigned site series.",
+      "rules": [
+        "Validated against official BECdb v13 (2026) Zone / Subzone / Variant combinations.",
+        "Auto-1 Geospatial QA compares field-recorded Zone/SubZone against provincial BGC v13 polygons."
+      ],
+      "codes": [
+        {
+          "code": "BG",
+          "label": "Bunchgrass"
+        },
+        {
+          "code": "BWBS",
+          "label": "Boreal White and Black Spruce"
+        },
+        {
+          "code": "CDF",
+          "label": "Coastal Douglas-fir"
+        },
+        {
+          "code": "CMA",
+          "label": "Coastal Mountain-heather Alpine"
+        },
+        {
+          "code": "CWH",
+          "label": "Coastal Western Hemlock"
+        },
+        {
+          "code": "ESSF",
+          "label": "Engelmann Spruce — Subalpine Fir"
+        },
+        {
+          "code": "ICH",
+          "label": "Interior Cedar — Hemlock"
+        },
+        {
+          "code": "IDF",
+          "label": "Interior Douglas-fir"
+        },
+        {
+          "code": "IMA",
+          "label": "Interior Mountain-heather Alpine"
+        },
+        {
+          "code": "MH",
+          "label": "Mountain Hemlock"
+        },
+        {
+          "code": "MS",
+          "label": "Montane Spruce"
+        },
+        {
+          "code": "PP",
+          "label": "Ponderosa Pine"
+        },
+        {
+          "code": "SBPS",
+          "label": "Sub-Boreal Pine — Spruce"
+        },
+        {
+          "code": "SBS",
+          "label": "Sub-Boreal Spruce"
+        },
+        {
+          "code": "SWB",
+          "label": "Spruce — Willow — Birch"
+        }
+      ]
+    },
+    {
+      "id": "site.ecosection",
+      "code": "SITE 9",
+      "section": "Biogeoclimatic & Administrative Classification",
+      "title": "Ecosection & Forest District",
+      "column": "Ecosection / ForestRegionDistrict",
+      "unit": "BC Demarchi Ecosection / NR District Code",
+      "lmh25Page": 21,
+      "summary": "Physiographic ecosection (139 provincial polygons) and Natural Resource District (23 provincial polygons).",
+      "rules": [
+        "Auto-1 point-in-polygon prefill derives Ecosection, NR District, and BCGS 1:20,000 mapsheet offline from plot coordinates."
+      ],
+      "codes": []
+    },
+    {
+      "id": "site.coordinates",
+      "code": "SITE 11",
+      "section": "Location & Topography",
+      "title": "Latitude, Longitude & NAD83 UTM Coordinates",
+      "column": "Latitude / Longitude / UTMZone / UTMEasting / UTMNorthing",
+      "unit": "Decimal Degrees (WGS84/NAD83) or Metres (UTM Zones 7N–11N)",
+      "lmh25Page": 23,
+      "summary": "Geodetic plot location stored in NAD83 decimal degrees (West longitude negative in B.C.) and/or UTM Zone, Easting, and Northing.",
+      "rules": [
+        "Pure-Go NAD83 Transverse Mercator conversion synchronizes UTM <-> Decimal Degrees deterministically.",
+        "Positive longitudes inside B.C. bounding latitudes are flagged by Spatial QA as sign-inverted."
+      ],
+      "codes": []
+    },
+    {
+      "id": "site.elevation",
+      "code": "SITE 14",
+      "section": "Location & Topography",
+      "title": "Elevation, Slope Gradient & Aspect",
+      "column": "Elevation / SlopeGradient / Aspect",
+      "unit": "m ASL / % Slope / Degrees True North (0–360, 999 = level)",
+      "lmh25Page": 26,
+      "summary": "Plot elevation in metres above sea level, percent slope gradient, and azimuth aspect in degrees.",
+      "rules": [
+        "Level sites (Slope = 0%) record Aspect = 999 (or blank) per LMH25.",
+        "Steep slopes (> 35%) on warm SW aspects (180–270 deg) vs. cool N/NE aspects (315–45 deg) adjust solar CMD in Ministry aSMR modelling."
+      ],
+      "codes": [
+        {
+          "code": "0–360",
+          "label": "Azimuth degrees clockwise from true north"
+        },
+        {
+          "code": "999",
+          "label": "No aspect (level ground, 0% slope)"
+        }
+      ]
+    },
+    {
+      "id": "site.meso_slope",
+      "code": "SITE 17",
+      "section": "Location & Topography",
+      "title": "Meso Slope Position & Surface Shape",
+      "column": "MesoSlopePosition / SurfaceShape",
+      "unit": "LMH25 Code",
+      "lmh25Page": 29,
+      "summary": "Relative position of the plot along the local catchment slope segment affecting lateral water movement.",
+      "rules": [
+        "Primary topographic input to Key 9.3 / Key 9.4 Relative Soil Moisture Regime (rSMR) estimation."
+      ],
+      "codes": [
+        {
+          "code": "CR",
+          "label": "Crest — shedding summit convexities"
+        },
+        {
+          "code": "UP",
+          "label": "Upper slope — shedding upper third"
+        },
+        {
+          "code": "MD",
+          "label": "Middle slope — normal transport zone"
+        },
+        {
+          "code": "LW",
+          "label": "Lower slope — receiving seepage toe/lower third"
+        },
+        {
+          "code": "TO",
+          "label": "Toe — gentle receiving transition"
+        },
+        {
+          "code": "DP",
+          "label": "Depression — closed receiving basin"
+        },
+        {
+          "code": "LV",
+          "label": "Level — flat plain/terrace (< 2–5%)"
+        }
+      ]
+    },
+    {
+      "id": "site.moisture_regime",
+      "code": "SITE 20",
+      "section": "Edaphic & Hydrologic Regime",
+      "title": "Relative Soil Moisture Regime (rSMR)",
+      "column": "MoistureRegime",
+      "unit": "0–8 Ordinal Scale (Key 9.3 / 9.4)",
+      "lmh25Page": 34,
+      "keyRef": "key.rsmr_9_4",
+      "summary": "Relative growing-season soil water availability within a biogeoclimatic subzone/variant (0 = very xeric through 8 = hydric).",
+      "rules": [
+        "Evaluated via LMH25 Key 9.3 (wet/water-table soils) and Key 9.4 (upland soils from slope position, soil depth, coarse fragments, texture, and seepage).",
+        "Paired with rSNR (A–E) on the 9 x 5 BEC Edatopic Grid and transformed via climr CMD into Actual SMR (aSMR)."
+      ],
+      "codes": [
+        {
+          "code": "0",
+          "label": "Very Xeric — very shallow/lithic or steep south coarse talus"
+        },
+        {
+          "code": "1",
+          "label": "Xeric — shallow or very coarse shedding upper slopes"
+        },
+        {
+          "code": "2",
+          "label": "Subxeric — moderately dry coarse/shallow soils"
+        },
+        {
+          "code": "3",
+          "label": "Submesic — slightly drier than zonal normal"
+        },
+        {
+          "code": "4",
+          "label": "Mesic — normal water balance reflecting regional climate"
+        },
+        {
+          "code": "5",
+          "label": "Subhygric — temporary growing-season seepage or deep fine receiving soil"
+        },
+        {
+          "code": "6",
+          "label": "Hygric — permanent seepage / gleying within 30–60 cm"
+        },
+        {
+          "code": "7",
+          "label": "Subhydric — water table at or near surface (< 30 cm) most of year"
+        },
+        {
+          "code": "8",
+          "label": "Hydric — standing water above soil surface throughout growing season"
+        }
+      ]
+    },
+    {
+      "id": "site.nutrient_regime",
+      "code": "SITE 21",
+      "section": "Edaphic & Hydrologic Regime",
+      "title": "Relative Soil Nutrient Regime (rSNR)",
+      "column": "NutrientRegime",
+      "unit": "A–E Scale (Key 9.6)",
+      "lmh25Page": 38,
+      "keyRef": "key.rsnr_9_6",
+      "summary": "Available plant nutrient supply (particularly mineralizable N and base cations) from Very Poor (A) to Very Rich (E), plus Saline/Alkaline (F).",
+      "rules": [
+        "Evaluated via LMH25 Key 9.6 using humus form (Mor/Moder/Mull or Peat), A-horizon type (Ae vs. Ah), soil colour/SOM, texture, mineralogy, and seepage.",
+        "Auto-2 flags contradictions such as Mor humus + thick Ae horizon paired with Rich/Very Rich (D/E) without seepage."
+      ],
+      "codes": [
+        {
+          "code": "A",
+          "label": "Very Poor — oligotrophic (Mor/Sphagnum peat, quartzose/acidic)"
+        },
+        {
+          "code": "B",
+          "label": "Poor — suboligotrophic (Hemimor/Mormoder, prominent Ae)"
+        },
+        {
+          "code": "C",
+          "label": "Medium — mesotrophic (Moder/Humimor, balanced base status)"
+        },
+        {
+          "code": "D",
+          "label": "Rich — permesotrophic (Leptomoder/Vermimull, Ah present or seepage)"
+        },
+        {
+          "code": "E",
+          "label": "Very Rich — eutrophic (Mull, dark Ah >= 10 cm, carbonate/telluric seepage)"
+        },
+        {
+          "code": "F",
+          "label": "Saline / Hyper-alkaline wetland or playa"
+        }
+      ]
+    },
+    {
+      "id": "site.substrate_cover",
+      "code": "SITE 28",
+      "section": "Surface Substrate & Ground Cover",
+      "title": "Surface Substrate Percentages (100% Sum Rule)",
+      "column": "SubstrateDecWood / SubstrateBedRock / SubstrateRocks / SubstrateMineralSoil / SubstrateOrganicMatter / SubstrateWater",
+      "unit": "Percent (%) summing to 100%",
+      "lmh25Page": 44,
+      "summary": "Six mutually exclusive ground-surface substrate fractions (Decaying Wood, Bedrock, Cobbles/Stones, Mineral Soil, Organic Matter, Water).",
+      "rules": [
+        "LMH25 requires the 6 surface substrate components to sum to 100% (+/- 1% rounding tolerance).",
+        "Auto-2 displays a live 100% progress bar on FS882 / Two-Page forms without silently overwriting historical legacy plots."
+      ],
+      "codes": []
+    },
+    {
+      "id": "site.successional_structural",
+      "code": "SITE 33",
+      "section": "Stand Structure & Disturbance",
+      "title": "Structural Stage & Successional Status",
+      "column": "StructuralStage / SuccessionalStatus",
+      "unit": "LMH25 Structural Stage (1–7)",
+      "lmh25Page": 52,
+      "summary": "Physiognomic stand development stage from Non-vegetated/Sparse (1) through Old Forest (7).",
+      "rules": [
+        "Used to filter climax/late-seral plots during BEC site unit synthesis."
+      ],
+      "codes": [
+        {
+          "code": "1",
+          "label": "Sparse / Bryoid (1a Sparse, 1b Bryoid)"
+        },
+        {
+          "code": "2",
+          "label": "Herb (2a Forb, 2b Graminoid, 2c Aquatic, 2d Dwarf shrub)"
+        },
+        {
+          "code": "3",
+          "label": "Shrub / Herb (< 10 m tall; 3a Low shrub < 2 m, 3b Tall shrub 2–10 m)"
+        },
+        {
+          "code": "4",
+          "label": "Pole / Sapling (> 10 m tall, dense self-thinning canopy)"
+        },
+        {
+          "code": "5",
+          "label": "Young Forest (differentiated canopy, < 80–140 yr)"
+        },
+        {
+          "code": "6",
+          "label": "Mature Forest (established understory regeneration)"
+        },
+        {
+          "code": "7",
+          "label": "Old Forest (multi-layered uneven-aged canopy, large snags/CWD)"
+        }
+      ]
+    },
+    {
+      "id": "site.realm_class",
+      "code": "SITE 36",
+      "section": "Realm & Wetland/Terrestrial Classification",
+      "title": "Realm / Group / Class & Snow/Permafrost (CHARS)",
+      "column": "RealmClass / SnowCoverRegime / ActiveLayerDepth",
+      "unit": "LMH25 Ecosystem Realm + Optional Extended Arctic/Alpine Fields",
+      "lmh25Page": 58,
+      "summary": "High-level Terrestrial, Wetland, Estuarine, Marine, or Alpine realm code, plus optional extended arctic/alpine snow cover and active layer depth.",
+      "rules": [
+        "Extended CHARS fields are tucked behind \"Show extended shrub layers\" so standard forest plots stay uncluttered."
+      ],
+      "codes": []
+    },
+    {
+      "id": "humus.horizon",
+      "code": "SOIL 4",
+      "section": "Organic & Humus Horizons (<Project>_Humus)",
+      "title": "Humus / Wetland Organic Horizon Designation",
+      "column": "Horizon",
+      "unit": "Text (<= 8 UTF-16 code units)",
+      "lmh25Page": 78,
+      "summary": "Master organic horizon code: upland ectorganic L, F, H (Lv, Fm, Fa, Fz, Hh, Hz) or wetland peat Of, Om, Oh.",
+      "rules": [
+        "Maximum 8 UTF-16 code units.",
+        "Determines depth measurement direction: upland L/F/H measure UPWARD from 0 cm mineral contact; wetland Of/Om/Oh measure DOWNWARD from 0 cm surface."
+      ],
+      "codes": [
+        {
+          "code": "L / Lv",
+          "label": "Litter — freshly fallen recognizable plant residues"
+        },
+        {
+          "code": "Fm",
+          "label": "Mycogenous F — matted fungal mycelia fabric (Mor)"
+        },
+        {
+          "code": "Fz",
+          "label": "Zoogenous F — loose insect/faunal droppings fabric (Moder/Mull)"
+        },
+        {
+          "code": "Fa",
+          "label": "Amphimorphic F — mixed fungal & faunal fabric (Mormoder)"
+        },
+        {
+          "code": "Hh / Hz / Hr",
+          "label": "Humic H — amorphous well-humified organic matter (< 17% mineral)"
+        },
+        {
+          "code": "Of",
+          "label": "Fibric peat — weakly decomposed (von Post 1–4)"
+        },
+        {
+          "code": "Om",
+          "label": "Mesic peat — moderately decomposed (von Post 5–6)"
+        },
+        {
+          "code": "Oh",
+          "label": "Humic peat — strongly decomposed amorphous peat (von Post 7–10)"
+        }
+      ]
+    },
+    {
+      "id": "humus.upper_lower_depth",
+      "code": "SOIL 5",
+      "section": "Organic & Humus Horizons (<Project>_Humus)",
+      "title": "Organic Horizon Upper & Lower Depth (LMH25 Sign Rule)",
+      "column": "UpperDepth / LowerDepth",
+      "unit": "cm from Mineral-Organic Interface (Upland) or Surface (Wetland)",
+      "lmh25Page": 80,
+      "summary": "Directional depth boundaries in centimetres obeying the Canadian System of Soil Classification & LMH25 zero-datum convention.",
+      "rules": [
+        "Upland L/F/H horizons measure UPWARD from the mineral contact (0 cm): UpperDepth > LowerDepth (for example L: 8 -> 6 cm, Fm: 6 -> 1 cm, Hh: 1 -> 0 cm), ordered UpperDepth DESC.",
+        "Wetland Of/Om/Oh horizons measure DOWNWARD from the peat surface (0 cm): UpperDepth < LowerDepth (for example Of1: 0 -> 25 cm, Om1: 25 -> 65 cm), ordered UpperDepth ASC.",
+        "Auto-2 computes total HumusThickness automatically from valid upland L/F/H spans."
+      ],
+      "codes": []
+    },
+    {
+      "id": "humus.von_post",
+      "code": "SOIL 9",
+      "section": "Organic & Humus Horizons (<Project>_Humus)",
+      "title": "von Post Humification Scale (1–10)",
+      "column": "VonPost",
+      "unit": "Integer 1–10",
+      "lmh25Page": 84,
+      "summary": "Ten-class field squeeze test measuring peat decomposition and water/paste extrusion for Of, Om, and Oh horizons.",
+      "rules": [
+        "Of requires von Post 1–4; Om requires von Post 5–6; Oh requires von Post 7–10.",
+        "Auto-2 highlights horizon/von Post mismatches immediately during soil entry."
+      ],
+      "codes": [
+        {
+          "code": "1–4",
+          "label": "Fibric (Of) — clear to turbid water squeezed out, plant structure distinct"
+        },
+        {
+          "code": "5–6",
+          "label": "Mesic (Om) — up to half peat escapes between fingers, structure indistinct"
+        },
+        {
+          "code": "7–10",
+          "label": "Humic (Oh) — > half to entire amorphous paste escapes between fingers"
+        }
+      ]
+    },
+    {
+      "id": "humus.humus_form",
+      "code": "SOIL 14",
+      "section": "Organic & Humus Horizons (<Project>_Env)",
+      "title": "Humus Form Classification",
+      "column": "HumusForm",
+      "unit": "Green et al. (1993) / LMH25 Code",
+      "lmh25Page": 88,
+      "summary": "Taxonomic humus form integrating L/F/H/Ah diagnostic horizon thickness, fungal vs. faunal fabric, and aeration.",
+      "rules": [
+        "Key input to Key 9.6 Relative Soil Nutrient Regime (Mor -> A/B; Moder -> B/C/D; Mull -> D/E)."
+      ],
+      "codes": [
+        {
+          "code": "HM / MR",
+          "label": "Hemimor / Humimor / Resimor (Fungal Fm dominant, slow N turnover)"
+        },
+        {
+          "code": "MM / LM",
+          "label": "Mormoder / Leptomoder / Mullmoder (Faunal Fz + mycogenous fabric)"
+        },
+        {
+          "code": "VM / RM",
+          "label": "Vermimull / Rhizomull (Earthworm/root mixed Ah >= 2 cm, rapid N cycling)"
+        },
+        {
+          "code": "PM / MD / ML",
+          "label": "Peatymor / Hydromoder / Hydromull (Wetland/seepage humus forms)"
+        }
+      ]
+    },
+    {
+      "id": "mineral.horizon",
+      "code": "SOIL 18",
+      "section": "Mineral Soil Horizons (<Project>_Mineral)",
+      "title": "Mineral Horizon & Suffixes",
+      "column": "Horizon / UpperDepth / LowerDepth",
+      "unit": "CSSC Horizon Code (<= 8 UTF-16 code units) & cm Downward",
+      "lmh25Page": 94,
+      "summary": "Mineral master horizon (A, B, C, R, W) with diagnostic pedogenic suffixes (e, h, f, g, j, t, k, ca, x) measured downward from 0 cm.",
+      "rules": [
+        "Mineral horizons ALWAYS measure downward from 0 cm mineral contact: UpperDepth < LowerDepth (for example Ae: 0 -> 6 cm, Bf: 6 -> 38 cm, BC: 38 -> 72 cm), ordered UpperDepth ASC.",
+        "Gleyed/mottled suffixes (g, gj) within 60 cm indicate fluctuating water tables in Key 9.3 / 9.4."
+      ],
+      "codes": [
+        {
+          "code": "Ae / Aej",
+          "label": "Eluvial A — leached light-coloured ash-grey horizon"
+        },
+        {
+          "code": "Ah / Ahe",
+          "label": "Organo-mineral A — dark humus-enriched surface mineral horizon"
+        },
+        {
+          "code": "Bf / Bhf",
+          "label": "Podzolic B — enriched in amorphous Fe/Al + organic complexes"
+        },
+        {
+          "code": "Bm / Bt",
+          "label": "Brunisolic Bm (slight alteration) or Luvisolic Bt (illuvial clay)"
+        },
+        {
+          "code": "Bg / Cg",
+          "label": "Gleysolic — dull/gleyed matrix or prominent redox mottles"
+        },
+        {
+          "code": "C / Ck / R",
+          "label": "Parent material (C / calcareous Ck) or consolidated bedrock (R)"
+        }
+      ]
+    },
+    {
+      "id": "mineral.texture_cf",
+      "code": "SOIL 22",
+      "section": "Mineral Soil Horizons (<Project>_Mineral)",
+      "title": "Soil Texture & Coarse Fragment Content",
+      "column": "Texture / PercentCoarseFragsTotal / Gravel / Cobbles / Stones",
+      "unit": "CSSC Texture Code (<= 4 chars) & Volume %",
+      "lmh25Page": 102,
+      "summary": "Fine-earth (< 2 mm) textural class (S, LS, SL, L, SiL, SCL, CL, SiCL, SC, SiC, C) and volumetric % gravel, cobbles, and stones.",
+      "rules": [
+        "Texture <= 4 UTF-16 code units; Munsell Colour <= 14 UTF-16 code units.",
+        "Particle-size class and coarse fragment % (> 35% vs. > 70% skeletal) drive water-holding capacity in Key 9.4."
+      ],
+      "codes": [
+        {
+          "code": "S / LS",
+          "label": "Sand / Loamy Sand (Very coarse — low water retention)"
+        },
+        {
+          "code": "SL / L",
+          "label": "Sandy Loam / Loam (Medium-coarse to medium)"
+        },
+        {
+          "code": "SiL / Si",
+          "label": "Silt Loam / Silt (Medium-fine, high plant-available water)"
+        },
+        {
+          "code": "CL / SiCL / C",
+          "label": "Clay Loam / Silty Clay Loam / Clay (Fine — high CEC & water retention)"
+        }
+      ]
+    },
+    {
+      "id": "soil.rooting_seepage",
+      "code": "SOIL 30",
+      "section": "Soil Profile Summary (<Project>_Env)",
+      "title": "Rooting Depth, Root Restricting Layer & Water Source",
+      "column": "RootingDepth / RootRestrictingType / RootRestrictingDepth / SeepageDepth",
+      "unit": "cm",
+      "lmh25Page": 112,
+      "summary": "Effective rooting zone depth, depth to bedrock/ortstein/basal till/permafrost/water table, and growing-season seepage depth.",
+      "rules": [
+        "Shallow restricting layers (< 30 cm or < 50 cm) without seepage shift rSMR drier; seepage < 60 cm shifts rSMR moister (5–6)."
+      ],
+      "codes": []
+    },
+    {
+      "id": "veg.species",
+      "code": "VEG 1",
+      "section": "Vegetation Strata & Taxonomy (<Project>_Veg)",
+      "title": "Species Code & Taxonomic Validation",
+      "column": "Species",
+      "unit": "BCPlantTaxonomy v19 Code (<= 8 UTF-16 code units)",
+      "lmh25Page": 140,
+      "summary": "Standard 4- to 8-character B.C. provincial vascular, bryophyte, and lichen code from USysAllSpecs (2026 v19, 8,900+ taxa) or USysUserSpp.",
+      "rules": [
+        "Maximum 8 UTF-16 code units.",
+        "NotInList workflow checks retired OldCode -> current Code synonyms in USysAllSpecs before offering personal species creation in VUser.db."
+      ],
+      "codes": []
+    },
+    {
+      "id": "veg.covers",
+      "code": "VEG 2",
+      "section": "Vegetation Strata & Taxonomy (<Project>_Veg)",
+      "title": "Stratum Percent Covers (A1–A3, B1–B2, C, D / Cover1–Cover10)",
+      "column": "Cover1..Cover10 / TotalA / TotalB",
+      "unit": "IEEE-754 SINGLE Percent Cover (> 0 to < 100%, chart on LMH25 p. 274)",
+      "lmh25Page": 144,
+      "keyRef": "key.cover_chart",
+      "summary": "Vertical crown/foliar cover (%) across Tree (A1=Cover1, A2=Cover2, A3=Cover3), Shrub (B1=Cover4, B2=Cover5), Herb (C=Cover6), Moss/Bryoid (D=Cover7), and Epiphyte/Seedling layers (Cover8–10).",
+      "rules": [
+        "Inputs are narrowed to IEEE-754 SINGLE (float32) before checking < 100 Or Is Null (matching legacy Access calibration).",
+        "Extended CHARS shrub sub-layers (Cover5a Tall, Cover5b Medium, Cover5c Low) toggle cleanly via \"Show extended shrub layers\".",
+        "Trace occurrences (< 0.1%) are typically recorded as 0.1% or 0.01%."
+      ],
+      "codes": [
+        {
+          "code": "Cover1 (A1)",
+          "label": "Dominant Trees (> 10 m, upper main canopy)"
+        },
+        {
+          "code": "Cover2 (A2)",
+          "label": "Main Canopy Trees (> 10 m, codominant)"
+        },
+        {
+          "code": "Cover3 (A3)",
+          "label": "Subcanopy Trees (> 10 m, beneath main canopy)"
+        },
+        {
+          "code": "Cover4 (B1)",
+          "label": "Tall Shrubs & Regenerating Trees (2 m to 10 m)"
+        },
+        {
+          "code": "Cover5 (B2)",
+          "label": "Low Shrubs & Woody Regeneration (< 2 m; optional 5a/5b/5c)"
+        },
+        {
+          "code": "Cover6 (C)",
+          "label": "Herb Layer (all vascular herbs, graminoids, dwarf woody < 15 cm)"
+        },
+        {
+          "code": "Cover7 (D)",
+          "label": "Moss, Liverwort, Hornwort & Terrestrial Lichen Layer (on mineral/humus)"
+        },
+        {
+          "code": "Cover8–10",
+          "label": "Bryophytes/Lichens on decaying wood (8), rock (9), and epiphytes (10)"
+        }
+      ]
+    },
+    {
+      "id": "sivi.plot_type",
+      "code": "SIVI 1",
+      "section": "SIVI Rapid Ecological & Wildlife Habitat Entry",
+      "title": "SIVI Plot Type, Observers & Rapid Site Header",
+      "column": "Representing / PlotType / Zone / SubZone / SiteSeries",
+      "unit": "SIVI Form Layout",
+      "lmh25Page": 210,
+      "summary": "Streamlined single-screen Ecological/Silviculture plot entry writing directly into standard <Project>_Env, <Project>_Veg, <Project>_Humus, and <Project>_Mineral tables.",
+      "rules": [
+        "Creating a new SIVI plot uses the same atomic SQLite transaction and <Project>_Audit provenance as FS882.",
+        "Supports optional \"Show extended shrub layers\" toggle for subalpine/northern shrub structure."
+      ],
+      "codes": []
+    }
+  ],
+  "decisionKeys": [
+    {
+      "id": "key.rsmr_9_4",
+      "code": "LMH25 Keys 9.3 & 9.4",
+      "title": "Relative Soil Moisture Regime (rSMR 0–8) Decision Key",
+      "lmh25Page": 35,
+      "steps": [
+        {
+          "step": 1,
+          "prompt": "Standing water continuously above soil surface during growing season?",
+          "yes": "8 — Hydric",
+          "no": "Go to Step 2"
+        },
+        {
+          "step": 2,
+          "prompt": "Water table or prominent gleying at <= 30 cm throughout most of growing season (or wetland peat > 40 cm)?",
+          "yes": "7 — Subhydric",
+          "no": "Go to Step 3"
+        },
+        {
+          "step": 3,
+          "prompt": "Permanent growing-season seepage or distinct mottles/gleying within 30–60 cm on lower/toe/depression positions?",
+          "yes": "6 — Hygric",
+          "no": "Go to Step 4"
+        },
+        {
+          "step": 4,
+          "prompt": "Temporary seepage (< 60–100 cm) OR deep medium/fine receiving lower/toe slope?",
+          "yes": "5 — Subhygric",
+          "no": "Go to Step 5 (Upland Water-Deficit Key 9.4)"
+        },
+        {
+          "step": 5,
+          "prompt": "Very shallow lithic soil (< 20 cm to bedrock) on crest/upper steep warm aspect, OR > 70% coarse fragments in sand?",
+          "yes": "0 (Very Xeric) or 1 (Xeric)",
+          "no": "Go to Step 6"
+        },
+        {
+          "step": 6,
+          "prompt": "Shallow soil (20–50 cm) OR coarse sandy/skeletal (> 35–70% CF) on shedding crest/upper slope?",
+          "yes": "2 — Subxeric (or 3 — Submesic if medium texture / middle slope)",
+          "no": "4 — Mesic (deep >= 100 cm medium-textured middle/level normal site)"
+        }
+      ]
+    },
+    {
+      "id": "key.rsnr_9_6",
+      "code": "LMH25 Key 9.6",
+      "title": "Relative Soil Nutrient Regime (rSNR A–E) Decision Key",
+      "lmh25Page": 39,
+      "steps": [
+        {
+          "step": 1,
+          "prompt": "Wetland Sphagnum bog peat (Of, pH < 4.5) OR very shallow quartzitic/granitic soil with thick Mor humus + white Ae?",
+          "yes": "A — Very Poor",
+          "no": "Go to Step 2"
+        },
+        {
+          "step": 2,
+          "prompt": "Mor or Mormoder humus, continuous Ae (>= 2 cm), coarse acidic parent material, no Ah and no seepage?",
+          "yes": "B — Poor",
+          "no": "Go to Step 3"
+        },
+        {
+          "step": 3,
+          "prompt": "Moder or thin Humimor humus, weak/absent Ae (< 2 cm), medium-textured non-calcareous till/fluvial without Ah?",
+          "yes": "C — Medium",
+          "no": "Go to Step 4"
+        },
+        {
+          "step": 4,
+          "prompt": "Mullmoder/Vermimull OR Ah horizon (2–10 cm) OR telluric seepage / dark base-rich parent material?",
+          "yes": "D — Rich",
+          "no": "Go to Step 5"
+        },
+        {
+          "step": 5,
+          "prompt": "Vermimull humus with dark friable Ah >= 10 cm, alluvial/carbonate enrichment, or Minerotrophic rich fen/seepage?",
+          "yes": "E — Very Rich (use F for Saline/Alkaline)",
+          "no": "Re-check humus form, Ah thickness, and seepage"
+        }
+      ]
+    },
+    {
+      "id": "key.cover_chart",
+      "code": "LMH25 Appendix (% Cover Comparison)",
+      "title": "Visual Foliar Percent Cover Reference Scale (LMH25 p. 274)",
+      "lmh25Page": 274,
+      "steps": [
+        {
+          "step": 1,
+          "prompt": "0.1% — Solitary small individual (< 32 cm x 32 cm in a 10 m x 10 m = 100 m2 macroplot; 0.1 m2 total)."
+        },
+        {
+          "step": 2,
+          "prompt": "1% — 1.0 m x 1.0 m aggregate area (1 m2 in 100 m2 plot; ten 32 cm x 32 cm patches)."
+        },
+        {
+          "step": 3,
+          "prompt": "5% — 2.24 m x 2.24 m aggregate area (5 m2 in 100 m2 plot)."
+        },
+        {
+          "step": 4,
+          "prompt": "10% — 3.16 m x 3.16 m aggregate area (10 m2 in 100 m2 plot)."
+        },
+        {
+          "step": 5,
+          "prompt": "25% — 5.0 m x 5.0 m aggregate area (one full quadrant of a 10 m x 10 m plot)."
+        },
+        {
+          "step": 6,
+          "prompt": "50% — 7.07 m x 7.07 m aggregate area (half of plot area covered by vertical crown projection)."
+        },
+        {
+          "step": 7,
+          "prompt": "75% — Three quadrants covered; gaps occupy 25 m2."
+        }
+      ]
+    }
+  ],
+  "guides": [
+    {
+      "id": "migrating-from-vpro64",
+      "slug": "migrating-from-vpro64",
+      "category": "Onboarding & Migration",
+      "title": "Migrating from Microsoft Access VPro 64 to VPro 2.0",
+      "summary": "How VPro 64 concepts (Data Centre, .accdb/.mdb projects, VLists, SU tables, and Diagnostic10.xla) map 1:1 into VPro 2.0 SQLite WAL workspaces.",
+      "sections": [
+        {
+          "heading": "Zero Microsoft Access Runtime Required",
+          "body": "VPro 2.0 reads legacy Microsoft Access .mdb and .accdb databases (Table Versions VP05 through VP08) directly via an embedded C/Go reader and stores canonical working projects in fast, transactional SQLite WAL (.db) files."
+        },
+        {
+          "heading": "From Floating Data Centre to Persistent Session Context",
+          "body": "The left Session Context bar replaces the legacy floating Data Centre dialog, showing your active Project, Site Unit (*_SU), Hierarchy, Lump (*_Lump), and Theme tables at all times with cryptographic stale-request protection."
+        },
+        {
+          "heading": "Importing BECMaster & Field Projects Safely",
+          "body": "Open Project Admin or Interchange Hub to import .accdb/.mdb archives. Malformed or orphaned child vegetation/soil rows without a parent _Env plot are quarantined with a full audit receipt rather than silently dropped."
+        }
+      ]
+    },
+    {
+      "id": "fs882-sivi-datasheet-entry",
+      "slug": "fs882-sivi-datasheet-entry",
+      "category": "Data Entry & Validation",
+      "title": "FS882, Two-Page, SIVI & Universal Datasheet Entry",
+      "summary": "High-speed keyboard plot entry, LMH25 (2023) live diagnostics, NotInList species synonym resolution, and multi-plot spreadsheet editing.",
+      "sections": [
+        {
+          "heading": "FS882, Two-Page & SIVI Forms",
+          "body": "Press Enter to advance across header fields and down vegetation/soil subgrids. Toggle \"Show extended shrub layers\" only when entering northern/subalpine Cover5a..5c, SnowCoverRegime, or ActiveLayerDepth."
+        },
+        {
+          "heading": "Contextual F1 LMH25 (2023) Field Inspector",
+          "body": "Focus any Site, Soil, Vegetation, or SIVI input and press F1 to open the offline LMH25 (2023) specification, valid picklist codes, directional humus depth sign rules, and interactive rSMR/rSNR keys."
+        },
+        {
+          "heading": "Universal 9-Table Datasheet Grid",
+          "body": "Edit <Project>_Env, _Veg, _Humus, _Mineral, _Other, _Admin, _Audit, *_SU, and *_Hierarchy in a virtualized grid supporting TSV clipboard paste, Find/Replace, and atomic <Project>_Audit logging."
+        }
+      ]
+    },
+    {
+      "id": "classification-lumping-diagnostics",
+      "slug": "classification-lumping-diagnostics",
+      "category": "Classification & BEC Synthesis",
+      "title": "Site Unit Explorer, Taxon Lumping & Reactive BEC Diagnostics",
+      "summary": "Dual-pane SU/Hierarchy management, versioned LumpSpec recipes, and sub-50ms Diagnostic10.xla differential species synthesis.",
+      "sections": [
+        {
+          "heading": "Dual-Pane Site Unit & Hierarchy Explorer",
+          "body": "Drag or reassign plots across Site Units, manage 12-level classifications with tilde (~) report breakpoints, sync SU <-> Env, and filter .support, .poor, or .nudum units from summary tables."
+        },
+        {
+          "heading": "Reactive BEC Differential & Pairwise Synthesis",
+          "body": "Replaces Excel Diagnostic10.xla macros: computes Presence Class (I–V), Goldstream Mean Cover, Differential Value (d, d1–d3, dd1–dd4, cd), and Cramér/Sørensen pairwise similarity, updating in under 10 ms when plots move between units and exporting a 4-sheet formatted .xlsx."
+        }
+      ]
+    },
+    {
+      "id": "geospatial-and-r-sidecar",
+      "slug": "geospatial-and-r-sidecar",
+      "category": "Spatial QA & R / Quarto Analytics",
+      "title": "3D MapLibre + WebGPU Spatial QA, climr aSMR & Quarto Guides",
+      "summary": "Offline PMTiles BGC v13 point-in-polygon prefill, polygon lasso -> *_SU assignment, climr climate normals, vegan/vegclust clustering, and Quarto BEC guides.",
+      "sections": [
+        {
+          "heading": "Offline PMTiles Geospatial Workbench",
+          "body": "Streams provincial BGC v13, Ecosections, and Natural Resource Districts via HTTP 206 byte-range PMTiles with WebGPU/deck.gl plot rendering, flagging coordinate sign errors and BGC boundary mismatches offline."
+        },
+        {
+          "heading": "Headless R Sidecar (climr, vegan/vegclust & Quarto)",
+          "body": "When a local R runtime is installed, VPro caches downscaled climate normals in __VPRO_PlotClimate, maps CMD -> aSMR alongside rSMR x rSNR edatopic grids, writes non-destructive *_ClusterCandidate_SU tables, and renders BC Gov styled Quarto HTML/PDF unit guides."
+        }
+      ]
+    },
+    {
+      "id": "standards-and-interchange",
+      "slug": "standards-and-interchange",
+      "category": "Standards & Open Interchange",
+      "title": "2026 BECWeb Master Standards & Open Scientific Interchange",
+      "summary": "Embedded BECdb v13 (2026) and BCPlantTaxonomy v19 (2026) provenance plus lossless VENUS 5.0 XML, TurboVeg 3, GeoPackage, CSV, and native R .rds exports.",
+      "sections": [
+        {
+          "heading": "Pinned 2026 Provincial Standards",
+          "body": "Every VPro 2.0 build embeds SHA-256 verified read-models of BECdb v13 (2026-05-28) and BCPlantTaxonomy v19 (2026-02-09) alongside LMH25 (2023) rules, visible at any time under Help -> About VPro & Standards Libraries."
+        },
+        {
+          "heading": "Open Ecosystem Interchange",
+          "body": "Import and export VENUS 5.0 XML, TurboVeg 3 (.sqlite + XML), OGC GeoPackage (.gpkg in EPSG:3005 BC Albers or EPSG:4326), Long/Wide CSV matrices, and native R version-2 .rds lists."
+        }
+      ]
+    }
+  ],
+  "tours": [
+    {
+      "id": "tour-session-import",
+      "title": "Tour 1 — Session Context & Access Import",
+      "duration": "90 sec",
+      "description": "Explore the left Session Context bar (replacing legacy Data Centre) and see how .accdb/.mdb projects import into SQLite WAL.",
+      "steps": [
+        {
+          "target": "#project-context",
+          "view": "home",
+          "title": "Persistent Session Context Bar",
+          "body": "Replaces the floating VPro 64 Data Centre. Your active Project, Site Unit (*_SU), Hierarchy, and Lump tables stay visible and cryptographically scoped."
+        },
+        {
+          "target": "[data-nav-group=\"Project\"]",
+          "view": "project-admin",
+          "title": "Project Admin & Access .accdb/.mdb Import",
+          "body": "Create projects, run 3-way merges, OptimizeVeg, or import legacy Access VP05–VP08 databases with full FK orphan quarantine."
+        },
+        {
+          "target": "[data-nav-group=\"Interchange\"]",
+          "view": "interchange-hub",
+          "title": "Open Scientific Interchange Hub",
+          "body": "Exchange data cleanly with VENUS 5.0 XML, TurboVeg 3, GeoPackage (BC Albers EPSG:3005), CSV matrices, and R .rds."
+        }
+      ]
+    },
+    {
+      "id": "tour-card-datasheet",
+      "title": "Tour 2 — Fast FS882 Card & Datasheet Entry",
+      "duration": "90 sec",
+      "description": "Navigate FS882, Two-Page, SIVI, LMH25 live rules, CHARS shrub layer toggle, and the virtualized 9-table Datasheet Grid.",
+      "steps": [
+        {
+          "target": "main",
+          "view": "fs882",
+          "title": "FS882 Ecological Field Card",
+          "body": "Enter Site, Soil, and Vegetation strata with Enter-key subgrid navigation, IEEE-754 SINGLE cover calibration, and F1 contextual LMH25 help on any field."
+        },
+        {
+          "target": "main",
+          "view": "datasheet",
+          "title": "Virtualized 9-Table Datasheet Grid",
+          "body": "Inspect and batch-edit _Env, _Veg, _Humus, _Mineral, _Audit, and *_SU with TSV clipboard paste and atomic audit trail."
+        }
+      ]
+    },
+    {
+      "id": "tour-classification-profiling",
+      "title": "Tour 3 — Classification Explorer & Taxon Lumping",
+      "duration": "90 sec",
+      "description": "Manage Site Unit (*_SU) assignments, 12-level Hierarchies with ~ breakpoints, and versioned *_Lump species recipes.",
+      "steps": [
+        {
+          "target": "main",
+          "view": "classification-explorer",
+          "title": "Dual-Pane SU & Hierarchy Explorer",
+          "body": "Assign plots across Site Units, synchronize SU <-> Env, and organize 12-level classification trees with ~ report breakpoints."
+        },
+        {
+          "target": "main",
+          "view": "lump-editor",
+          "title": "Taxon Lumping (*_Lump) & Recipes",
+          "body": "Build repeatable species lumping tables for regional synthesis without mutating raw field plot codes."
+        }
+      ]
+    },
+    {
+      "id": "tour-map-diagnostics-reports",
+      "title": "Tour 4 — 3D Geospatial QA, BEC Diagnostics & Reports",
+      "duration": "90 sec",
+      "description": "Audit BGC v13 plot coordinates on the 3D MapLibre/WebGPU globe, run live BEC Differential Synthesis, and export .xlsx / Quarto guides.",
+      "steps": [
+        {
+          "target": "main",
+          "view": "geospatial-map",
+          "title": "3D MapLibre + WebGPU Geospatial Workbench",
+          "body": "Stream provincial BGC v13 & Ecosection PMTiles offline, run Point-in-Polygon spatial QA, and lasso plots directly into *_SU units."
+        },
+        {
+          "target": "main",
+          "view": "diagnostic-synthesis",
+          "title": "Reactive BEC Differential & Pairwise Synthesis",
+          "body": "Inspect Presence Class, Differential Value (d1–d3, dd1–dd4), and Cramér similarity with < 10 ms live plot reassignment and 4-sheet .xlsx export."
+        },
+        {
+          "target": "main",
+          "view": "r-sidecar",
+          "title": "R Sidecar: climr aSMR, Clustering & Quarto Guides",
+          "body": "Downscale climate normals into __VPRO_PlotClimate, compare rSMR vs. aSMR grids, run vegan/vegclust candidate clustering, and publish Quarto unit guides."
+        }
+      ]
+    }
+  ],
+  "shortcuts": [
+    {
+      "keys": "F1",
+      "scope": "Global / Focused Input",
+      "action": "Open offline LMH25 (2023) Field & Key Inspector for the focused field"
+    },
+    {
+      "keys": "? or Ctrl+/",
+      "scope": "Global (outside text input)",
+      "action": "Open Keyboard Shortcut Cheat-Sheet"
+    },
+    {
+      "keys": "Enter",
+      "scope": "FS882 / Two-Page / SIVI / Datasheet",
+      "action": "Advance across header fields or down subgrid rows"
+    },
+    {
+      "keys": "Shift+Enter",
+      "scope": "FS882 / Datasheet Subgrids",
+      "action": "Move to previous cell/row in subgrid"
+    },
+    {
+      "keys": "Ctrl+S",
+      "scope": "Plot Editors & Metadata",
+      "action": "Validate and commit atomic SQLite + _Audit save"
+    },
+    {
+      "keys": "Ctrl+F",
+      "scope": "Plots / Datasheet / Explorer",
+      "action": "Focus quick plot/taxon filter input"
+    },
+    {
+      "keys": "Esc",
+      "scope": "Drawers / Modals / Cell Edit",
+      "action": "Close active help drawer/modal or cancel active cell edit"
+    }
+  ],
+  "whatsNew": [
+    {
+      "version": "2.0.0",
+      "date": "2026-11-12",
+      "channel": "stable",
+      "highlights": [
+        "Complete native cross-platform SQLite WAL desktop architecture replacing 32/64-bit Microsoft Access runtime dependency.",
+        "Embedded SHA-256 verified 2026 Master Standards: BECdb v13 (2026-05-28), BCPlantTaxonomy v19 (2026-02-09), and LMH25 (2023) live field validation.",
+        "In-App 3D MapLibre v6 + WebGPU + offline PMTiles Geospatial Workbench with BGC v13 / Ecosection Point-in-Polygon QA and AOI -> *_SU assignment.",
+        "Reactive BEC Differential & Pairwise Synthesis Workbench (< 10 ms plot reassignment + 4-sheet Diagnostic10.xla-compatible .xlsx export).",
+        "Optional out-of-process R & Quarto Sidecar for climr climate normals, Ministry CMD -> aSMR edatopic grids, vegan/vegclust candidate clustering, and Quarto HTML/PDF unit guides.",
+        "100% offline Contextual F1 LMH25 (2023) Field & Key Inspector, interactive Sample.db guided tours, and open scientific interchange (VENUS 5.0, TurboVeg 3, GeoPackage, CSV, R .rds)."
+      ]
+    },
+    {
+      "version": "0.1.0",
+      "date": "2026-10-01",
+      "channel": "preview",
+      "highlights": [
+        "Initial Wails v3 + Svelte 5 foundation with VP08 Access calibration, FS882 / Two-Page / SIVI editors, Plot Profiling, and Summary/Long Excel/PDF reports."
+      ]
+    }
+  ],
+  "dataUseAgreement": {
+    "title": "B.C. Ministry of Forests — BECWeb &BECMaster Data Use Agreement",
+    "authority": "Province of British Columbia — Ministry of Forests, Research Branch, Biogeoclimatic Ecosystem Classification (BEC) Program",
+    "sourceUrl": "https://www.for.gov.bc.ca/hre/becweb/resources/information-requests/Data-request-use.html",
+    "citation": "B.C. Ministry of Forests. 2026. Biogeoclimatic Ecosystem Classification (BEC) Database (BECdb v13) and VPro 2.0 Ecosystem Plot Software. Forest Science, Planning and Practices Branch, Victoria, B.C. https://www.for.gov.bc.ca/hre/becweb/",
+    "clauses": [
+      "1. Custodianship & Crown Copyright: Official provincial BEC classifications (BECdb), master taxonomy lists (BCPlantTaxonomy), and published BECMaster reference datasets remain under Crown copyright of the Province of British Columbia, administered by the Ministry of Forests BEC Program.",
+      "2. Permitted Scientific, Operational & Educational Use: VPro 2.0 and public BEC reference libraries are provided free of charge for ecological field sampling, forest & range stewardship, environmental assessment, academic research, and First Nations territorial stewardship.",
+      "3. Attribution & Mandatory Citation: Publications, maps, technical reports, and derivative models using BECdb, BCPlantTaxonomy, or BECMaster plot data must cite the B.C. Ministry of Forests BEC Program and report the exact database version stamp (for example BECdb v13, BCPlantTaxonomy v19).",
+      "4. Sensitive Rare Species & Plot Location Stewardship: Exact coordinates of plots containing Conservation Data Centre (CDC) masked/red-listed taxa or confidential research installations must not be redistributed publicly without written authorization.",
+      "5. Distinction Between Working Classifications & Official BEC Units: Project-level *_SU, *_ClusterCandidate_SU, and personal USysUserSpp entries created in VPro represent working project classifications and do not constitute official provincial BEC site series until ratified in BECdb.",
+      "6. Data Quality & Historical Plot Tolerance: Legacy plots span multiple decades of sampling standards (DEIF, FS882,LMH25 1998/2010/2015/2023); users are responsible for screening plot quality, coordinate precision, and taxonomic lumping appropriate to their analytical objective.",
+      "7. Contribution of Field Plots to Provincial Archive: Ecologists collecting public-land FS882 / SIVI plots under Ministry contracts or research permits are encouraged to submit quality-checked VPro SQLite (.db) or VENUS 5.0 archives to the provincial BEC custodian.",
+      "8. Software Integrity & Checksum Verification: Phase 1 VPro 2.0 desktop packages are distributed as unsigned builds accompanied by cryptographic SHA-256 digests in SHA256SUMS.txt and release-manifest.json; verify package checksums prior to enterprise deployment.",
+      "9. No Warranty & Limitation of Liability: Software and reference datasets are provided \"as is\" without warranty of fitness for a particular regulatory determination; consult regional Ministry Research Ecologists and published Land Management Handbooks for authoritative field interpretation."
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "keys": "F1",
+    "scope": "Global / Focused Input",
+    "action": "Open offline LMH25 (2023) Field & Key Inspector for the focused field"
+  },
+  {
+    "keys": "? or Ctrl+/",
+    "scope": "Global (outside text input)",
+    "action": "Open Keyboard Shortcut Cheat-Sheet"
+  },
+  {
+    "keys": "Enter",
+    "scope": "FS882 / Two-Page / SIVI / Datasheet",
+    "action": "Advance across header fields or down subgrid rows"
+  },
+  {
+    "keys": "Shift+Enter",
+    "scope": "FS882 / Datasheet Subgrids",
+    "action": "Move to previous cell/row in subgrid"
+  },
+  {
+    "keys": "Ctrl+S",
+    "scope": "Plot Editors & Metadata",
+    "action": "Validate and commit atomic SQLite + _Audit save"
+  },
+  {
+    "keys": "Ctrl+F",
+    "scope": "Plots / Datasheet / Explorer",
+    "action": "Focus quick plot/taxon filter input"
+  },
+  {
+    "keys": "Esc",
+    "scope": "Drawers / Modals / Cell Edit",
+    "action": "Close active help drawer/modal or cancel active cell edit"
+  }
+]

@@ -77,6 +77,9 @@ var PlotQualitySiteProvenanceJSON []byte
 //go:embed standards-2026-provenance.json
 var Standards2026ProvenanceJSON []byte
 
+//go:embed help_bundle.json
+var HelpBundleJSON []byte
+
 //go:embed project-metadata-template.json
 var ProjectMetadataTemplateJSON []byte
 
