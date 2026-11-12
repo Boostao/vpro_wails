@@ -35,7 +35,7 @@ const views = () => Object.fromEntries(fields.map(field => [field.list, {
 }]));
 
 test('Every parent descriptor matches its backend field, list and UTF-16 storage length', () => {
-  const backend = readFileSync(path.join(__dirname, '..', '..', 'parentcodeheader.go'), 'utf8');
+  const backend = readFileSync(path.join(__dirname, '..', '..', 'internal', 'vprocore', 'parentcodeheader.go'), 'utf8');
   const source = JSON.parse(readFileSync(path.join(__dirname, '..', '..', 'resources', 'fs882-xl-layout.json'), 'utf8'));
   assert.equal(fields.length, 21);
   assert.equal(new Set(fields.map(field => field.column)).size, 21);

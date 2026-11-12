@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 )
 
 type SpatialService struct {
@@ -19,28 +20,29 @@ func (s *SpatialService) GetCoordinateMode() (CoordinateMode, error) {
 	if s == nil || s.coordinates == nil {
 		return "", errors.New("coordinate service is unavailable")
 	}
-	return s.coordinates.GetCoordinateMode()
+	m, err := s.coordinates.GetCoordinateMode()
+	return CoordinateMode(m), err
 }
 
 func (s *SpatialService) SetCoordinateMode(mode CoordinateMode) error {
 	if s == nil || s.coordinates == nil {
 		return errors.New("coordinate service is unavailable")
 	}
-	return s.coordinates.SetCoordinateMode(mode)
+	return s.coordinates.SetCoordinateMode(vprocorepkg.CoordinateMode(mode))
 }
 
 func (s *SpatialService) DecomposeCoordinate(value *float64, mode CoordinateMode) (CoordinateParts, error) {
 	if s == nil || s.coordinates == nil {
 		return CoordinateParts{}, errors.New("coordinate service is unavailable")
 	}
-	return s.coordinates.DecomposeCoordinate(value, mode)
+	return s.coordinates.DecomposeCoordinate(value, vprocorepkg.CoordinateMode(mode))
 }
 
 func (s *SpatialService) ConvertCoordinate(axis string, mode CoordinateMode, parts CoordinateParts) (*float64, error) {
 	if s == nil || s.coordinates == nil {
 		return nil, errors.New("coordinate service is unavailable")
 	}
-	return s.coordinates.ConvertCoordinate(axis, mode, parts)
+	return s.coordinates.ConvertCoordinate(axis, vprocorepkg.CoordinateMode(mode), parts)
 }
 
 func (s *SpatialService) GetGoogleEarthDescriptionFields(ctx context.Context, contextID string) (*GoogleEarthDescriptionFields, error) {

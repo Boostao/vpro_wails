@@ -7,6 +7,10 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as vprocore$0 from "./internal/vprocore/models.js";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
 export function CanEditMasterBEC(contextID: string): $CancellablePromise<boolean> {
@@ -17,7 +21,7 @@ export function ChooseAccessDatabaseFile(contextID: string): $CancellablePromise
     return $Call.ByID(2171308614, contextID);
 }
 
-export function ChooseExternalSQLiteFile(contextID: string): $CancellablePromise<$models.ExternalSQLiteFileInspection> {
+export function ChooseExternalSQLiteFile(contextID: string): $CancellablePromise<vprocore$0.ExternalSQLiteFileInspection> {
     return $Call.ByID(2647311902, contextID);
 }
 
@@ -25,35 +29,35 @@ export function ChooseNewSQLiteProjectFile(contextID: string, suggestedProject: 
     return $Call.ByID(127877150, contextID, suggestedProject);
 }
 
-export function CreateBlankProjectMetadata(contextID: string, request: $models.ProjectMetadataCreate): $CancellablePromise<$models.ProjectMetadataRow> {
-    return $Call.ByID(2706173128, contextID, request);
+export function CreateBlankProjectMetadata(p1: string, p2: $models.ProjectMetadataCreate): $CancellablePromise<$models.ProjectMetadataRow> {
+    return $Call.ByID(2706173128, p1, p2);
 }
 
-export function CreatePersonalSpeciesDefinition(contextID: string, request: $models.PersonalSpeciesDefinitionRequest): $CancellablePromise<$models.VegetationSpeciesOption> {
-    return $Call.ByID(2624543201, contextID, request);
+export function CreatePersonalSpeciesDefinition(p1: string, p2: $models.PersonalSpeciesDefinitionRequest): $CancellablePromise<$models.VegetationSpeciesOption> {
+    return $Call.ByID(2624543201, p1, p2);
 }
 
-export function CreatePlot(contextID: string, header: $models.FS882Header): $CancellablePromise<void> {
+export function CreatePlot(contextID: string, header: vprocore$0.FS882Header): $CancellablePromise<void> {
     return $Call.ByID(3214660085, contextID, header);
 }
 
-export function CreatePlotProfileFile(contextID: string, request: $models.PlotProfileFileCreation): $CancellablePromise<$models.PlotProfileFileCreated> {
-    return $Call.ByID(3970127352, contextID, request);
+export function CreatePlotProfileFile(p1: string, p2: $models.PlotProfileFileCreation): $CancellablePromise<$models.PlotProfileFileCreated> {
+    return $Call.ByID(3970127352, p1, p2);
 }
 
-export function CreatePlotProfileTable(contextID: string, request: $models.PlotProfileTableCreation): $CancellablePromise<$models.PlotProfileFileCreated> {
-    return $Call.ByID(3187505682, contextID, request);
+export function CreatePlotProfileTable(p1: string, p2: $models.PlotProfileTableCreation): $CancellablePromise<$models.PlotProfileFileCreated> {
+    return $Call.ByID(3187505682, p1, p2);
 }
 
-export function CreateProjectMetadataFromTemplate(contextID: string, request: $models.ProjectMetadataTemplateCreate): $CancellablePromise<$models.ProjectMetadataRow> {
-    return $Call.ByID(598864844, contextID, request);
+export function CreateProjectMetadataFromTemplate(p1: string, p2: $models.ProjectMetadataTemplateCreate): $CancellablePromise<$models.ProjectMetadataRow> {
+    return $Call.ByID(598864844, p1, p2);
 }
 
-export function CreateProjectPlotProfileRule(contextID: string, request: $models.ProjectPlotProfileCreation): $CancellablePromise<$models.ProjectMetadataRow> {
-    return $Call.ByID(1762638127, contextID, request);
+export function CreateProjectPlotProfileRule(p1: string, p2: $models.ProjectPlotProfileCreation): $CancellablePromise<$models.ProjectMetadataRow> {
+    return $Call.ByID(1762638127, p1, p2);
 }
 
-export function CreateSourceVegetation(contextID: string, plot: string, request: $models.VegetationCreationRequest): $CancellablePromise<number> {
+export function CreateSourceVegetation(contextID: string, plot: string, request: vprocore$0.VegetationCreationRequest): $CancellablePromise<number> {
     return $Call.ByID(2288682951, contextID, plot, request);
 }
 
@@ -69,16 +73,20 @@ export function DeleteOtherRecord(contextID: string, plot: string, id: number): 
     return $Call.ByID(3941385392, contextID, plot, id);
 }
 
-export function DeleteProjectPlotProfileRule(contextID: string, request: $models.ProjectPlotProfileDeletion): $CancellablePromise<void> {
-    return $Call.ByID(66266464, contextID, request);
+export function DeleteProjectPlotProfileRule(p1: string, p2: $models.ProjectPlotProfileDeletion): $CancellablePromise<void> {
+    return $Call.ByID(66266464, p1, p2);
 }
 
-export function DeleteReviewedVegetation(contextID: string, plot: string, request: $models.VegetationDeletionRequest): $CancellablePromise<void> {
-    return $Call.ByID(4082659024, contextID, plot, request);
+export function DeleteReviewedVegetation(p0: string, p1: string, p2: $models.VegetationDeletionRequest): $CancellablePromise<void> {
+    return $Call.ByID(4082659024, p0, p1, p2);
 }
 
 export function DeleteVegRecord(contextID: string, plot: string, id: number): $CancellablePromise<void> {
     return $Call.ByID(1524181516, contextID, plot, id);
+}
+
+export function Edit(expectedID: string, operation: any): $CancellablePromise<void> {
+    return $Call.ByID(3627133354, expectedID, operation);
 }
 
 export function GetChildCapabilities(contextID: string, kind: string): $CancellablePromise<{ [_ in string]?: boolean } | null> {
@@ -93,99 +101,99 @@ export function GetHierarchyNodes(): $CancellablePromise<$models.HierarchyNode[]
     return $Call.ByID(2285666570);
 }
 
-export function GetLongEnvironmentOptions(contextID: string): $CancellablePromise<$models.LongEnvironmentOptions> {
-    return $Call.ByID(3203512685, contextID);
+export function GetLongEnvironmentOptions(p1: string): $CancellablePromise<$models.LongEnvironmentOptions> {
+    return $Call.ByID(3203512685, p1);
 }
 
-export function GetLongVegetationOptions(contextID: string): $CancellablePromise<$models.LongVegetationOptions> {
-    return $Call.ByID(2160778518, contextID);
+export function GetLongVegetationOptions(p1: string): $CancellablePromise<$models.LongVegetationOptions> {
+    return $Call.ByID(2160778518, p1);
 }
 
-export function GetPlot(contextID: string, plot: string): $CancellablePromise<$models.FS882Header | null> {
+export function GetPlot(contextID: string, plot: string): $CancellablePromise<vprocore$0.FS882Header | null> {
     return $Call.ByID(2787654197, contextID, plot);
 }
 
-export function GetPlotLocationReview(contextID: string): $CancellablePromise<$models.PlotLocationReview | null> {
-    return $Call.ByID(4147890270, contextID);
+export function GetPlotLocationReview(p1: string): $CancellablePromise<$models.PlotLocationReview | null> {
+    return $Call.ByID(4147890270, p1);
 }
 
-export function GetProjectTableCSVReview(contextID: string, table: string): $CancellablePromise<$models.ProjectTableCSVReview | null> {
-    return $Call.ByID(1325296887, contextID, table);
+export function GetProjectTableCSVReview(p1: string, p2: string): $CancellablePromise<$models.ProjectTableCSVReview | null> {
+    return $Call.ByID(1325296887, p1, p2);
 }
 
-export function GetSIVIParentActionOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentProjection | null> {
-    return $Call.ByID(3334566454, contextID, plot);
+export function GetSIVIParentActionOriginal(p1: string, p2: string): $CancellablePromise<$models.SIVIParentProjection | null> {
+    return $Call.ByID(3334566454, p1, p2);
 }
 
-export function GetSIVIParentDirectOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentProjection | null> {
-    return $Call.ByID(4106383313, contextID, plot);
+export function GetSIVIParentDirectOriginal(p1: string, p2: string): $CancellablePromise<$models.SIVIParentProjection | null> {
+    return $Call.ByID(4106383313, p1, p2);
 }
 
-export function GetSIVIParentJoinReview(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentJoinReview | null> {
-    return $Call.ByID(4016192195, contextID, plot);
+export function GetSIVIParentJoinReview(p1: string, p2: string): $CancellablePromise<$models.SIVIParentJoinReview | null> {
+    return $Call.ByID(4016192195, p1, p2);
 }
 
-export function GetSIVIParentOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIParentProjection | null> {
-    return $Call.ByID(1022342976, contextID, plot);
+export function GetSIVIParentOriginal(p1: string, p2: string): $CancellablePromise<$models.SIVIParentProjection | null> {
+    return $Call.ByID(1022342976, p1, p2);
 }
 
-export function GetSIVIProjectAssignmentOriginal(contextID: string, plot: string): $CancellablePromise<$models.SIVIProjectAssignmentOriginal | null> {
-    return $Call.ByID(1326648454, contextID, plot);
+export function GetSIVIProjectAssignmentOriginal(p1: string, p2: string): $CancellablePromise<$models.SIVIProjectAssignmentOriginal | null> {
+    return $Call.ByID(1326648454, p1, p2);
 }
 
-export function GetSIVIProjectIDChoices(contextID: string): $CancellablePromise<$models.SIVIProjectChoices | null> {
-    return $Call.ByID(3430452039, contextID);
+export function GetSIVIProjectIDChoices(p1: string): $CancellablePromise<$models.SIVIProjectChoices | null> {
+    return $Call.ByID(3430452039, p1);
 }
 
-export function GetSIVIVegetation(contextID: string, plot: string, extended: boolean): $CancellablePromise<$models.SIVIVegetationProjection[] | null> {
-    return $Call.ByID(2362715051, contextID, plot, extended);
+export function GetSIVIVegetation(p1: string, p2: string, p3: boolean): $CancellablePromise<$models.SIVIVegetationProjection[] | null> {
+    return $Call.ByID(2362715051, p1, p2, p3);
 }
 
-export function GetSiteUnitSummaryOptions(contextID: string): $CancellablePromise<$models.SiteUnitSummaryOptions> {
-    return $Call.ByID(1799826469, contextID);
+export function GetSiteUnitSummaryOptions(p1: string): $CancellablePromise<$models.SiteUnitSummaryOptions> {
+    return $Call.ByID(1799826469, p1);
 }
 
 export function GetState(): $CancellablePromise<$models.ProjectState> {
     return $Call.ByID(1033432855);
 }
 
-export function GetVegetationReadAvailability(contextID: string, plot: string): $CancellablePromise<$models.VegetationReadAvailability | null> {
+export function GetVegetationReadAvailability(contextID: string, plot: string): $CancellablePromise<vprocore$0.VegetationReadAvailability | null> {
     return $Call.ByID(2293660121, contextID, plot);
 }
 
-export function ImportAccessProject(contextID: string, request: $models.AccessProjectImportRequest): $CancellablePromise<$models.AccessProjectImportResult> {
-    return $Call.ByID(2501692602, contextID, request);
+export function ImportAccessProject(p1: string, p2: $models.AccessProjectImportRequest): $CancellablePromise<$models.AccessProjectImportResult> {
+    return $Call.ByID(2501692602, p1, p2);
 }
 
-export function InspectAccessDatabase(contextID: string, sourcePath: string): $CancellablePromise<$models.AccessDatabaseInspection> {
-    return $Call.ByID(4149486817, contextID, sourcePath);
+export function InspectAccessDatabase(p1: string, p2: string): $CancellablePromise<$models.AccessDatabaseInspection> {
+    return $Call.ByID(4149486817, p1, p2);
 }
 
-export function InspectExternalSQLiteFile(contextID: string, path: string): $CancellablePromise<$models.ExternalSQLiteFileInspection> {
+export function InspectExternalSQLiteFile(contextID: string, path: string): $CancellablePromise<vprocore$0.ExternalSQLiteFileInspection> {
     return $Call.ByID(3680650959, contextID, path);
 }
 
-export function ListAuditEntries(contextID: string, plot: string): $CancellablePromise<$models.AuditEntry[] | null> {
+export function ListAuditEntries(contextID: string, plot: string): $CancellablePromise<vprocore$0.AuditEntry[] | null> {
     return $Call.ByID(2687960619, contextID, plot);
 }
 
-export function ListAuditReadEntries(contextID: string, plot: string): $CancellablePromise<$models.OrdinaryAuditReadEntry[] | null> {
+export function ListAuditReadEntries(contextID: string, plot: string): $CancellablePromise<vprocore$0.OrdinaryAuditReadEntry[] | null> {
     return $Call.ByID(218608203, contextID, plot);
 }
 
-export function ListHumusRecords(contextID: string, plot: string): $CancellablePromise<$models.HumusRecord[] | null> {
+export function ListHumusRecords(contextID: string, plot: string): $CancellablePromise<vprocore$0.HumusRecord[] | null> {
     return $Call.ByID(295703714, contextID, plot);
 }
 
-export function ListMineralRecords(contextID: string, plot: string): $CancellablePromise<$models.MineralRecord[] | null> {
+export function ListMineralRecords(contextID: string, plot: string): $CancellablePromise<vprocore$0.MineralRecord[] | null> {
     return $Call.ByID(4018995846, contextID, plot);
 }
 
-export function ListOtherRecords(contextID: string, plot: string): $CancellablePromise<$models.OtherRecord[] | null> {
+export function ListOtherRecords(contextID: string, plot: string): $CancellablePromise<vprocore$0.OtherRecord[] | null> {
     return $Call.ByID(989824098, contextID, plot);
 }
 
-export function ListPlotProfileSources(contextID: string, path: string): $CancellablePromise<$models.PlotProfileSourceInfo[] | null> {
+export function ListPlotProfileSources(contextID: string, path: string): $CancellablePromise<vprocore$0.PlotProfileSourceInfo[] | null> {
     return $Call.ByID(4245035728, contextID, path);
 }
 
@@ -193,92 +201,104 @@ export function ListPlots(offset: number, limit: number): $CancellablePromise<$m
     return $Call.ByID(3378718882, offset, limit);
 }
 
-export function ListProjectMetadataFields(contextID: string): $CancellablePromise<$models.ProjectMetadataEditorField[] | null> {
-    return $Call.ByID(4089336027, contextID);
+export function ListProjectMetadataFields(p1: string): $CancellablePromise<$models.ProjectMetadataEditorField[] | null> {
+    return $Call.ByID(4089336027, p1);
 }
 
-export function ListProjectMetadataRestoreHistory(contextID: string, plot: string): $CancellablePromise<$models.ProjectMetadataRestoreHistory> {
-    return $Call.ByID(618860380, contextID, plot);
+export function ListProjectMetadataRestoreHistory(p1: string, p2: string): $CancellablePromise<$models.ProjectMetadataRestoreHistory> {
+    return $Call.ByID(618860380, p1, p2);
 }
 
-export function ListProjectPlotProfileChoices(contextID: string): $CancellablePromise<$models.ProjectPlotProfileChoices> {
-    return $Call.ByID(1233139099, contextID);
+export function ListProjectPlotProfileChoices(p1: string): $CancellablePromise<$models.ProjectPlotProfileChoices> {
+    return $Call.ByID(1233139099, p1);
 }
 
-export function ListSoilSuggestions(contextID: string): $CancellablePromise<$models.SoilSuggestion[] | null> {
-    return $Call.ByID(357605878, contextID);
+export function ListSoilSuggestions(p1: string): $CancellablePromise<$models.SoilSuggestion[] | null> {
+    return $Call.ByID(357605878, p1);
 }
 
-export function ListVegRecords(contextID: string, plot: string): $CancellablePromise<$models.VegRecord[] | null> {
+export function ListVegRecords(contextID: string, plot: string): $CancellablePromise<vprocore$0.VegRecord[] | null> {
     return $Call.ByID(1360779990, contextID, plot);
 }
 
-export function ListVegetationAttributeSuggestions(contextID: string): $CancellablePromise<$models.SoilSuggestion[] | null> {
-    return $Call.ByID(409085583, contextID);
+export function ListVegetationAttributeSuggestions(p1: string): $CancellablePromise<$models.SoilSuggestion[] | null> {
+    return $Call.ByID(409085583, p1);
 }
 
-export function ListVegetationSpecies(contextID: string, form: string): $CancellablePromise<$models.VegetationSpeciesOption[] | null> {
+export function ListVegetationSpecies(contextID: string, form: string): $CancellablePromise<vprocore$0.VegetationSpeciesOption[] | null> {
     return $Call.ByID(3698188052, contextID, form);
 }
 
-export function ListVegetationSpeciesAliases(contextID: string, lookup: $models.VegetationSpeciesLookup): $CancellablePromise<$models.VegetationSpeciesAlias[] | null> {
+export function ListVegetationSpeciesAliases(contextID: string, lookup: vprocore$0.VegetationSpeciesLookup): $CancellablePromise<vprocore$0.VegetationSpeciesAlias[] | null> {
     return $Call.ByID(4003025460, contextID, lookup);
 }
 
-export function ListVegetationSpeciesUsers(contextID: string, lookup: $models.VegetationSpeciesLookup): $CancellablePromise<$models.VegetationSpeciesOption[] | null> {
+export function ListVegetationSpeciesUsers(contextID: string, lookup: vprocore$0.VegetationSpeciesLookup): $CancellablePromise<vprocore$0.VegetationSpeciesOption[] | null> {
     return $Call.ByID(3585380524, contextID, lookup);
 }
 
-export function LookupScopedPlot(contextID: string, request: $models.ScopedPlotLookup): $CancellablePromise<$models.ScopedPlotLookupResult> {
+export function LookupScopedPlot(contextID: string, request: vprocore$0.ScopedPlotLookup): $CancellablePromise<vprocore$0.ScopedPlotLookupResult> {
     return $Call.ByID(25132359, contextID, request);
 }
 
-export function LookupSpeciesCodeCheckTarget(contextID: string, lookup: $models.VegetationSpeciesLookup): $CancellablePromise<$models.SpeciesCodeCheckOption[] | null> {
-    return $Call.ByID(1738673856, contextID, lookup);
+export function LookupSpeciesCodeCheckTarget(p1: string, p2: $models.VegetationSpeciesLookup): $CancellablePromise<$models.SpeciesCodeCheckOption[] | null> {
+    return $Call.ByID(1738673856, p1, p2);
 }
 
-export function PreviewLongEnvironment(contextID: string, request: $models.LongEnvironmentRequest): $CancellablePromise<$models.LongEnvironmentPreview> {
-    return $Call.ByID(3771463957, contextID, request);
+export function PreviewLongEnvironment(p1: string, p2: $models.LongEnvironmentRequest): $CancellablePromise<$models.LongEnvironmentPreview> {
+    return $Call.ByID(3771463957, p1, p2);
 }
 
-export function PreviewLongVegetation(contextID: string): $CancellablePromise<$models.LongVegetationPreview> {
-    return $Call.ByID(3202635744, contextID);
+export function PreviewLongVegetation(p1: string): $CancellablePromise<$models.LongVegetationPreview> {
+    return $Call.ByID(3202635744, p1);
 }
 
-export function PreviewSiteUnitSummary(contextID: string, request: $models.SiteUnitSummaryRequest): $CancellablePromise<$models.SiteUnitSummaryPreview> {
-    return $Call.ByID(639495149, contextID, request);
+export function PreviewSiteUnitSummary(p1: string, p2: $models.SiteUnitSummaryRequest): $CancellablePromise<$models.SiteUnitSummaryPreview> {
+    return $Call.ByID(639495149, p1, p2);
 }
 
-export function PreviewSiteUnitSummaryLifeforms(contextID: string, request: $models.SiteUnitSummaryRequest): $CancellablePromise<$models.SiteUnitSummaryPreview> {
-    return $Call.ByID(747248442, contextID, request);
+export function PreviewSiteUnitSummaryLifeforms(p1: string, p2: $models.SiteUnitSummaryRequest): $CancellablePromise<$models.SiteUnitSummaryPreview> {
+    return $Call.ByID(747248442, p1, p2);
 }
 
-export function PreviewSiteUnitSummarySpecies(contextID: string, request: $models.SiteUnitSpeciesListRequest): $CancellablePromise<$models.SiteUnitSpeciesListPreview> {
-    return $Call.ByID(927926337, contextID, request);
+export function PreviewSiteUnitSummarySpecies(p1: string, p2: $models.SiteUnitSpeciesListRequest): $CancellablePromise<$models.SiteUnitSpeciesListPreview> {
+    return $Call.ByID(927926337, p1, p2);
 }
 
-export function ResolveProjectPlotProfileNavigation(contextID: string, request: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProjectPlotProfileNavigation> {
-    return $Call.ByID(3203258907, contextID, request);
+export function ReadNewProjectTemplates(contextID: string): $CancellablePromise<vprocore$0.NewProjectTemplateReview | null> {
+    return $Call.ByID(778060672, contextID);
 }
 
-export function RestoreProjectMetadata(contextID: string, request: $models.ProjectMetadataRestore): $CancellablePromise<$models.AuditRestoreResult | null> {
-    return $Call.ByID(685958956, contextID, request);
+export function ReadPlotLocations(contextID: string): $CancellablePromise<vprocore$0.PlotLocationReview | null> {
+    return $Call.ByID(4098818915, contextID);
 }
 
-export function RestoreSIVIHeights(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
-    return $Call.ByID(2974312123, contextID, plot, historyID, action);
+export function RequireSelectedListReportScope(contextID: string): $CancellablePromise<void> {
+    return $Call.ByID(2516561526, contextID);
 }
 
-export function RestoreSIVIParentActions(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
-    return $Call.ByID(2453265924, contextID, plot, historyID, action);
+export function ResolveProjectPlotProfileNavigation(p1: string, p2: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProjectPlotProfileNavigation> {
+    return $Call.ByID(3203258907, p1, p2);
 }
 
-export function RestoreSIVIParentDirect(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
-    return $Call.ByID(2012647100, contextID, plot, historyID, action);
+export function RestoreProjectMetadata(p1: string, p2: $models.ProjectMetadataRestore): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(685958956, p1, p2);
 }
 
-export function RestoreSIVIProjectAssignment(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
-    return $Call.ByID(1243337619, contextID, plot, historyID, action);
+export function RestoreSIVIHeights(p1: string, p2: string, p3: string, p4: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(2974312123, p1, p2, p3, p4);
+}
+
+export function RestoreSIVIParentActions(p1: string, p2: string, p3: string, p4: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(2453265924, p1, p2, p3, p4);
+}
+
+export function RestoreSIVIParentDirect(p1: string, p2: string, p3: string, p4: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(2012647100, p1, p2, p3, p4);
+}
+
+export function RestoreSIVIProjectAssignment(p1: string, p2: string, p3: string, p4: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
+    return $Call.ByID(1243337619, p1, p2, p3, p4);
 }
 
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
@@ -289,107 +309,107 @@ export function RevealInFileExplorer(contextID: string, target: string): $Cancel
     return $Call.ByID(1995476601, contextID, target);
 }
 
-export function ReviewEnvironmentSiteUnits(contextID: string): $CancellablePromise<$models.EnvironmentSiteUnitReview> {
-    return $Call.ByID(1114788839, contextID);
+export function ReviewEnvironmentSiteUnits(p1: string): $CancellablePromise<$models.EnvironmentSiteUnitReview> {
+    return $Call.ByID(1114788839, p1);
 }
 
-export function ReviewPlotProfileFileCreation(contextID: string): $CancellablePromise<$models.PlotProfileFileReview> {
-    return $Call.ByID(1138163877, contextID);
+export function ReviewPlotProfileFileCreation(p1: string): $CancellablePromise<$models.PlotProfileFileReview> {
+    return $Call.ByID(1138163877, p1);
 }
 
-export function ReviewPlotProfileTableCreation(contextID: string): $CancellablePromise<$models.PlotProfileTableReview> {
-    return $Call.ByID(2423698239, contextID);
+export function ReviewPlotProfileTableCreation(p1: string): $CancellablePromise<$models.PlotProfileTableReview> {
+    return $Call.ByID(2423698239, p1);
 }
 
-export function ReviewProjectMetadata(contextID: string, plot: string): $CancellablePromise<$models.ProjectMetadataReview> {
+export function ReviewProjectMetadata(contextID: string, plot: string): $CancellablePromise<vprocore$0.ProjectMetadataReview> {
     return $Call.ByID(90084514, contextID, plot);
 }
 
-export function ReviewProjectMetadataRestoration(contextID: string, plot: string, historyID: string): $CancellablePromise<$models.ProjectMetadataRestoreReview> {
-    return $Call.ByID(659636998, contextID, plot, historyID);
+export function ReviewProjectMetadataRestoration(p1: string, p2: string, p3: string): $CancellablePromise<$models.ProjectMetadataRestoreReview> {
+    return $Call.ByID(659636998, p1, p2, p3);
 }
 
-export function ReviewProjectPlotProfile(contextID: string): $CancellablePromise<$models.ProjectPlotProfileReview> {
-    return $Call.ByID(922462901, contextID);
+export function ReviewProjectPlotProfile(p1: string): $CancellablePromise<$models.ProjectPlotProfileReview> {
+    return $Call.ByID(922462901, p1);
 }
 
-export function ReviewProjectPlotProfileLump(contextID: string): $CancellablePromise<$models.ProjectMetadataTable> {
-    return $Call.ByID(4282519119, contextID);
+export function ReviewProjectPlotProfileLump(p1: string): $CancellablePromise<$models.ProjectMetadataTable> {
+    return $Call.ByID(4282519119, p1);
 }
 
-export function ReviewProjectPlotProfileSU(contextID: string, filter: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProfileSUReview> {
-    return $Call.ByID(729221061, contextID, filter);
+export function ReviewProjectPlotProfileSU(p1: string, p2: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProfileSUReview> {
+    return $Call.ByID(729221061, p1, p2);
 }
 
-export function ReviewProjectPlotProfileSUInProject(contextID: string, filter: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProfileSUProjectReview> {
-    return $Call.ByID(3566405375, contextID, filter);
+export function ReviewProjectPlotProfileSUInProject(p1: string, p2: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProfileSUProjectReview> {
+    return $Call.ByID(3566405375, p1, p2);
 }
 
-export function ReviewSiteUnitEnvironment(contextID: string): $CancellablePromise<$models.SiteUnitEnvironmentReview> {
-    return $Call.ByID(2910868168, contextID);
+export function ReviewSiteUnitEnvironment(p1: string): $CancellablePromise<$models.SiteUnitEnvironmentReview> {
+    return $Call.ByID(2910868168, p1);
 }
 
-export function ReviewSpeciesCodes(contextID: string): $CancellablePromise<$models.SpeciesCodeCheckReview> {
-    return $Call.ByID(3045258678, contextID);
+export function ReviewSpeciesCodes(p1: string): $CancellablePromise<$models.SpeciesCodeCheckReview> {
+    return $Call.ByID(3045258678, p1);
 }
 
-export function ReviewVegetationDeletion(contextID: string, plot: string, form: string, id: number): $CancellablePromise<$models.VegetationDeletionReview> {
-    return $Call.ByID(2363268444, contextID, plot, form, id);
+export function ReviewVegetationDeletion(p1: string, p2: string, p3: string, p4: number): $CancellablePromise<$models.VegetationDeletionReview> {
+    return $Call.ByID(2363268444, p1, p2, p3, p4);
 }
 
-export function RunProjectPlotProfile(contextID: string, request: $models.ProjectPlotProfileRunRequest): $CancellablePromise<$models.ProjectPlotProfileResult> {
-    return $Call.ByID(2115295500, contextID, request);
+export function RunProjectPlotProfile(p1: string, p2: $models.ProjectPlotProfileRunRequest): $CancellablePromise<$models.ProjectPlotProfileResult> {
+    return $Call.ByID(2115295500, p1, p2);
 }
 
-export function SaveHumusRecord(contextID: string, record: $models.HumusRecord): $CancellablePromise<void> {
+export function SaveHumusRecord(contextID: string, record: vprocore$0.HumusRecord): $CancellablePromise<void> {
     return $Call.ByID(2291049458, contextID, record);
 }
 
-export function SaveMineralRecord(contextID: string, record: $models.MineralRecord): $CancellablePromise<void> {
+export function SaveMineralRecord(contextID: string, record: vprocore$0.MineralRecord): $CancellablePromise<void> {
     return $Call.ByID(2868675354, contextID, record);
 }
 
-export function SaveOtherRecord(contextID: string, record: $models.OtherRecord): $CancellablePromise<void> {
+export function SaveOtherRecord(contextID: string, record: vprocore$0.OtherRecord): $CancellablePromise<void> {
     return $Call.ByID(638265830, contextID, record);
 }
 
-export function SaveProjectMetadata(contextID: string, request: $models.ProjectMetadataEdit): $CancellablePromise<void> {
+export function SaveProjectMetadata(contextID: string, request: vprocore$0.ProjectMetadataEdit): $CancellablePromise<void> {
     return $Call.ByID(1214954997, contextID, request);
 }
 
-export function SaveProjectPlotProfile(contextID: string, request: $models.ProjectPlotProfileEdit): $CancellablePromise<void> {
-    return $Call.ByID(853163152, contextID, request);
+export function SaveProjectPlotProfile(p1: string, p2: $models.ProjectPlotProfileEdit): $CancellablePromise<void> {
+    return $Call.ByID(853163152, p1, p2);
 }
 
-export function SaveProjectPlotProfileSU(contextID: string, request: $models.ProfileSUCreation): $CancellablePromise<$models.ProfileSUCreated> {
-    return $Call.ByID(4210909380, contextID, request);
+export function SaveProjectPlotProfileSU(p1: string, p2: $models.ProfileSUCreation): $CancellablePromise<$models.ProfileSUCreated> {
+    return $Call.ByID(4210909380, p1, p2);
 }
 
-export function SaveProjectPlotProfileSUInProject(contextID: string, request: $models.ProfileSUProjectCreation): $CancellablePromise<$models.ProfileSUCreated> {
-    return $Call.ByID(2218873064, contextID, request);
+export function SaveProjectPlotProfileSUInProject(p1: string, p2: $models.ProfileSUProjectCreation): $CancellablePromise<$models.ProfileSUCreated> {
+    return $Call.ByID(2218873064, p1, p2);
 }
 
-export function SaveSIVIHeights(contextID: string, plot: string, extended: boolean, original: $models.SIVIVegetationProjection[] | null, edits: $models.SIVIHeightEdit[] | null): $CancellablePromise<$models.SIVIHeightWriteResult | null> {
-    return $Call.ByID(4150680302, contextID, plot, extended, original, edits);
+export function SaveSIVIHeights(p1: string, p2: string, p3: boolean, p4: $models.SIVIVegetationProjection[] | null, p5: $models.SIVIHeightEdit[] | null): $CancellablePromise<$models.SIVIHeightWriteResult | null> {
+    return $Call.ByID(4150680302, p1, p2, p3, p4, p5);
 }
 
-export function SaveSIVIParentActions(contextID: string, plot: string, request: $models.SIVIParentActionWrite): $CancellablePromise<$models.SIVIParentActionSaveResult | null> {
-    return $Call.ByID(633791945, contextID, plot, request);
+export function SaveSIVIParentActions(p1: string, p2: string, p3: $models.SIVIParentActionWrite): $CancellablePromise<$models.SIVIParentActionSaveResult | null> {
+    return $Call.ByID(633791945, p1, p2, p3);
 }
 
-export function SaveSIVIParentDirect(contextID: string, plot: string, request: $models.SIVIParentDirectWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {
-    return $Call.ByID(2639883219, contextID, plot, request);
+export function SaveSIVIParentDirect(p1: string, p2: string, p3: $models.SIVIParentDirectWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {
+    return $Call.ByID(2639883219, p1, p2, p3);
 }
 
-export function SaveSIVIProjectAssignment(contextID: string, plot: string, request: $models.SIVIProjectAssignmentWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {
-    return $Call.ByID(3061670770, contextID, plot, request);
+export function SaveSIVIProjectAssignment(p1: string, p2: string, p3: $models.SIVIProjectAssignmentWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {
+    return $Call.ByID(3061670770, p1, p2, p3);
 }
 
-export function SaveSpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {
-    return $Call.ByID(1191229246, contextID, updates);
+export function SaveSpeciesCodeCheck(p0: string, p1: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(1191229246, p0, p1);
 }
 
-export function SaveVegRecord(contextID: string, record: $models.VegRecord): $CancellablePromise<void> {
+export function SaveVegRecord(contextID: string, record: vprocore$0.VegRecord): $CancellablePromise<void> {
     return $Call.ByID(2006819882, contextID, record);
 }
 
@@ -397,7 +417,7 @@ export function SelectHierarchy(name: string, file: string): $CancellablePromise
     return $Call.ByID(3372616705, name, file);
 }
 
-export function SelectPlotProfile(expectedID: string, requested: $models.PlotProfileSource): $CancellablePromise<$models.ProjectState> {
+export function SelectPlotProfile(expectedID: string, requested: vprocore$0.PlotProfileSource): $CancellablePromise<vprocore$0.ProjectState> {
     return $Call.ByID(641014026, expectedID, requested);
 }
 
@@ -413,70 +433,70 @@ export function SetAuditRestoreSelection(contextID: string, plot: string, rowIDs
     return $Call.ByID(2095651677, contextID, plot, rowIDs);
 }
 
-export function SetPlotProfileEditing(expectedID: string, request: $models.PlotProfileWriteRequest): $CancellablePromise<$models.ProjectState> {
-    return $Call.ByID(1839630602, expectedID, request);
+export function SetPlotProfileEditing(p1: string, p2: $models.PlotProfileWriteRequest): $CancellablePromise<$models.ProjectState> {
+    return $Call.ByID(1839630602, p1, p2);
 }
 
-export function SetSIVIProjectIDSource(contextID: string, expected: number, source: number): $CancellablePromise<$models.SIVIProjectChoices | null> {
-    return $Call.ByID(3729314756, contextID, expected, source);
+export function SetSIVIProjectIDSource(p1: string, p2: number, p3: number): $CancellablePromise<$models.SIVIProjectChoices | null> {
+    return $Call.ByID(3729314756, p1, p2, p3);
 }
 
-export function SwitchContext(expectedID: string, requested: $models.ContextSelection): $CancellablePromise<$models.ProjectState> {
+export function SwitchContext(expectedID: string, requested: vprocore$0.ContextSelection): $CancellablePromise<vprocore$0.ProjectState> {
     return $Call.ByID(1469329417, expectedID, requested);
 }
 
-export function TransferEnvironmentSiteUnits(contextID: string, request: $models.EnvironmentSiteUnitTransfer): $CancellablePromise<$models.EnvironmentSiteUnitResult | null> {
-    return $Call.ByID(1924456504, contextID, request);
+export function TransferEnvironmentSiteUnits(p1: string, p2: $models.EnvironmentSiteUnitTransfer): $CancellablePromise<$models.EnvironmentSiteUnitResult | null> {
+    return $Call.ByID(1924456504, p1, p2);
 }
 
-export function TransferSiteUnitEnvironment(contextID: string, request: $models.SiteUnitEnvironmentTransfer): $CancellablePromise<$models.SiteUnitEnvironmentResult | null> {
-    return $Call.ByID(2917528945, contextID, request);
+export function TransferSiteUnitEnvironment(p1: string, p2: $models.SiteUnitEnvironmentTransfer): $CancellablePromise<$models.SiteUnitEnvironmentResult | null> {
+    return $Call.ByID(2917528945, p1, p2);
 }
 
-export function UpdateCollectedRecords(contextID: string, plot: string, updates: $models.CollectedRecordUpdate[] | null): $CancellablePromise<void> {
+export function UpdateCollectedRecords(contextID: string, plot: string, updates: vprocore$0.CollectedRecordUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(3289076996, contextID, plot, updates);
 }
 
-export function UpdateHeightRecords(contextID: string, plot: string, updates: $models.HeightRecordUpdate[] | null): $CancellablePromise<void> {
+export function UpdateHeightRecords(contextID: string, plot: string, updates: vprocore$0.HeightRecordUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(1221733762, contextID, plot, updates);
 }
 
-export function UpdateHumusRecord(contextID: string, record: $models.HumusRecord): $CancellablePromise<void> {
+export function UpdateHumusRecord(contextID: string, record: vprocore$0.HumusRecord): $CancellablePromise<void> {
     return $Call.ByID(4069893094, contextID, record);
 }
 
-export function UpdateMineralRecord(contextID: string, record: $models.MineralRecord): $CancellablePromise<void> {
+export function UpdateMineralRecord(contextID: string, record: vprocore$0.MineralRecord): $CancellablePromise<void> {
     return $Call.ByID(1709012342, contextID, record);
 }
 
-export function UpdateOtherRecord(contextID: string, record: $models.OtherRecord): $CancellablePromise<void> {
+export function UpdateOtherRecord(contextID: string, record: vprocore$0.OtherRecord): $CancellablePromise<void> {
     return $Call.ByID(3386625786, contextID, record);
 }
 
-export function UpdateOtherRecords(contextID: string, plot: string, updates: $models.OtherRecordUpdate[] | null): $CancellablePromise<void> {
+export function UpdateOtherRecords(contextID: string, plot: string, updates: vprocore$0.OtherRecordUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(1309024683, contextID, plot, updates);
 }
 
-export function UpdatePlot(contextID: string, header: $models.FS882Header): $CancellablePromise<void> {
+export function UpdatePlot(contextID: string, header: vprocore$0.FS882Header): $CancellablePromise<void> {
     return $Call.ByID(3840380656, contextID, header);
 }
 
-export function UpdateSoilRecords(contextID: string, plot: string, updates: $models.SoilRecordUpdate[] | null): $CancellablePromise<void> {
+export function UpdateSoilRecords(contextID: string, plot: string, updates: vprocore$0.SoilRecordUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(4096973070, contextID, plot, updates);
 }
 
-export function UpdateVegRecord(contextID: string, record: $models.VegRecord): $CancellablePromise<void> {
+export function UpdateVegRecord(contextID: string, record: vprocore$0.VegRecord): $CancellablePromise<void> {
     return $Call.ByID(1523295806, contextID, record);
 }
 
-export function UpdateVegetationAttributes(contextID: string, plot: string, updates: $models.VegetationAttributeUpdate[] | null): $CancellablePromise<void> {
-    return $Call.ByID(4158838458, contextID, plot, updates);
+export function UpdateVegetationAttributes(p0: string, p1: string, p2: $models.VegetationAttributeUpdate[] | null): $CancellablePromise<void> {
+    return $Call.ByID(4158838458, p0, p1, p2);
 }
 
-export function UpdateVegetationNumbers(contextID: string, plot: string, updates: $models.VegetationNumberUpdate[] | null): $CancellablePromise<void> {
+export function UpdateVegetationNumbers(contextID: string, plot: string, updates: vprocore$0.VegetationNumberUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(3656385183, contextID, plot, updates);
 }
 
-export function UpdateVegetationSpecies(contextID: string, plot: string, updates: $models.VegetationSpeciesUpdate[] | null): $CancellablePromise<void> {
+export function UpdateVegetationSpecies(contextID: string, plot: string, updates: vprocore$0.VegetationSpeciesUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(2708281787, contextID, plot, updates);
 }

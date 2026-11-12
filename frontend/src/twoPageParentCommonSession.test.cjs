@@ -169,8 +169,11 @@ function headerComponents() {
     './SourcePage.svelte': { default: SourcePage }, './twoPageEntryProjection': projection,
     './coordinateEditor': coordinates,
   });
-  const model = readFileSync(path.join(__dirname, '..', 'bindings', 'github.com', 'boostao', 'vpro-wails', 'models.ts'), 'utf8')
-    .match(/export interface FS882Header \{([\s\S]*?)\n\}/)[1];
+  const bindingsRoot = path.join(__dirname, '..', 'bindings', 'github.com', 'boostao', 'vpro-wails');
+  const model = [
+    readFileSync(path.join(bindingsRoot, 'models.ts'), 'utf8'),
+    readFileSync(path.join(bindingsRoot, 'internal', 'vprocore', 'models.ts'), 'utf8'),
+  ].join('\n').match(/export interface FS882Header \{([\s\S]*?)\n\}/)[1];
   const draft = Object.fromEntries([...model.matchAll(/"([^"]+)":/g)].map(match => [match[1], null]));
   draft.plotNumber = 'P'; draft.locked = false; draft.fieldNo = '  literal field  ';
   return { Header, Layout, draft };

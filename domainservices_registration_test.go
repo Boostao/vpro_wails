@@ -140,7 +140,7 @@ func TestLifecycleServiceConsolidatesStartupAndCloseHandshake(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	startupSvc := &StartupService{state: StartupState{
+	startupSvc := &StartupService{State: StartupState{
 		Ready:          true,
 		ConfigPath:     `C:\config\config.yml`,
 		ReleaseChannel: ReleaseChannelStable,
@@ -150,27 +150,27 @@ func TestLifecycleServiceConsolidatesStartupAndCloseHandshake(t *testing.T) {
 	if !state.Ready || state.ReleaseChannel != ReleaseChannelStable {
 		t.Fatalf("unexpected startup state: %+v", state)
 	}
-	if closeSvc.shouldQuit() {
+	if closeSvc.ShouldQuit() {
 		t.Fatal("close should remain blocked until pending nonce is confirmed")
 	}
 	pending := lifecycle.GetPendingCloseRequest()
 	if pending == "" || pending != emitted {
 		t.Fatalf("expected emitted nonce %q to match pending %q", emitted, pending)
 	}
-	if err := lifecycle.CancelClose("forged"); !errors.Is(err, errInvalidCloseRequest) {
+	if err := lifecycle.CancelClose("forged"); !errors.Is(err, ErrInvalidCloseRequest) {
 		t.Fatalf("forged nonce must be rejected, got %v", err)
 	}
 	if err := lifecycle.CancelClose(pending); err != nil || lifecycle.GetPendingCloseRequest() != "" {
 		t.Fatalf("CancelClose failed: %v", err)
 	}
-	if closeSvc.shouldQuit() {
+	if closeSvc.ShouldQuit() {
 		t.Fatal("close should mint a fresh nonce after cancellation")
 	}
 	next := lifecycle.GetPendingCloseRequest()
 	if next == "" || next == pending {
 		t.Fatalf("expected fresh nonce after cancel, got %q vs %q", next, pending)
 	}
-	if err := lifecycle.ConfirmClose(next); err != nil || quitCalled != 1 || !closeSvc.shouldQuit() {
+	if err := lifecycle.ConfirmClose(next); err != nil || quitCalled != 1 || !closeSvc.ShouldQuit() {
 		t.Fatalf("ConfirmClose did not approve native quit: err=%v quitCalled=%d", err, quitCalled)
 	}
 }

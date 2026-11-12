@@ -1,0 +1,280 @@
+package references
+
+import (
+	"github.com/boostao/vpro-wails/internal/sqlutil"
+)
+
+import (
+	"context"
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/boostao/vpro-wails/resources"
+	"os"
+	"path/filepath"
+	"sync"
+)
+
+var BecDatabase = resources.BECDB
+
+var BecProvenanceJSON = resources.BECProvenanceJSON
+
+type BECZone struct {
+	Zone        *string `json:"zone"`
+	Description *string `json:"description"`
+}
+
+type BECSubZone struct {
+	RowID           string  `json:"rowId"`
+	Zone            *string `json:"zone"`
+	SubZone         *string `json:"subZone"`
+	ZoneDescription *string `json:"zoneDescription"`
+	Description     *string `json:"description"`
+}
+
+type BECSiteSeries struct {
+	RowID            string   `json:"rowId"`
+	SourceID         *string  `json:"sourceId"`
+	SSCode           *string  `json:"ssCode"`
+	Name             *string  `json:"name"`
+	Region           *string  `json:"region"`
+	Zone             *string  `json:"zone"`
+	SubZone          *string  `json:"subZone"`
+	BaseSubZone      *string  `json:"baseSubZone"`
+	Variant          *string  `json:"variant"`
+	Phase            *string  `json:"phase"`
+	SiteSeries       *string  `json:"siteSeries"`
+	SiteSeriesPhase  *string  `json:"siteSeriesPhase"`
+	Variation        *string  `json:"variation"`
+	Seral            *string  `json:"seral"`
+	Description      *string  `json:"description"`
+	PlantAssociation *string  `json:"plantAssociation"`
+	Comments         *string  `json:"comments"`
+	ReferenceID      *float64 `json:"referenceId"`
+	AddedDate        *string  `json:"addedDate"`
+	ExpiredDate      *string  `json:"expiredDate"`
+	OriginalSourceID *string  `json:"originalSourceId"`
+	MergedBGC        *string  `json:"mergedBGC"`
+	Suballiance      *string  `json:"suballiance"`
+	Alliance         *string  `json:"alliance"`
+	MissingNpeNa     *string  `json:"missingNpeNa"`
+	TransferID       *string  `json:"transferId"`
+	Flag             *bool    `json:"flag"`
+	Selectable       bool     `json:"selectable"`
+	Diagnostic       string   `json:"diagnostic"`
+}
+
+type BECCatalogueStatus struct {
+	Version          int    `json:"version"`
+	ZoneRows         int    `json:"zoneRows"`
+	SiteSeriesRows   int    `json:"siteSeriesRows"`
+	DuplicateKeys    int    `json:"duplicateKeys"`
+	UnselectableRows int    `json:"unselectableRows"`
+	SourceSHA256     string `json:"sourceSha256"`
+	SnapshotSHA256   string `json:"snapshotSha256"`
+}
+
+type BECService struct {
+	Mu     sync.RWMutex `json:"-" yaml:"-"`
+	Db     *sql.DB      `json:"-" yaml:"-"`
+	status BECCatalogueStatus
+}
+
+func NewBECService(dataDir string) (*BECService, error) {
+	if dataDir == "" {
+		var err error
+		dataDir, err = sqlutil.UserDataDir()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		return nil, err
+	}
+	var provenance BecProvenance
+	if err := json.Unmarshal(BecProvenanceJSON, &provenance); err != nil {
+		return nil, fmt.Errorf("BEC provenance: %w", err)
+	}
+	if sqlutil.BecHash(BecDatabase) != provenance.DatabaseSHA256 {
+		return nil, errors.New("embedded BEC catalogue checksum mismatch")
+	}
+	target := filepath.Join(dataDir, "bec.db")
+	file, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+	if err == nil {
+		_, writeErr := file.Write(BecDatabase)
+		closeErr := file.Close()
+		if writeErr != nil || closeErr != nil {
+			os.Remove(target)
+			return nil, errors.Join(writeErr, closeErr)
+		}
+	} else if !errors.Is(err, os.ErrExist) {
+		return nil, err
+	}
+	data, err := os.ReadFile(target)
+	if err != nil {
+		return nil, err
+	}
+	if sqlutil.BecHash(data) == becLegacyDatabaseSHA256 && provenance.DatabaseSHA256 != becLegacyDatabaseSHA256 {
+		if err := sqlutil.ReplaceBundledCatalogueFile(target, BecDatabase, 0644); err != nil {
+			return nil, err
+		}
+		data, err = os.ReadFile(target)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if sqlutil.BecHash(data) != provenance.DatabaseSHA256 {
+		return nil, errors.New("existing BEC catalogue checksum mismatch; file was not replaced")
+	}
+	db, err := sqlutil.OpenReadOnly(target)
+	if err != nil {
+		return nil, err
+	}
+	status, err := ValidateBECDatabase(db, provenance)
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
+	return &BECService{Db: db, status: status}, nil
+}
+
+func (s *BECService) Close() error {
+	s.Mu.Lock()
+	defer s.Mu.Unlock()
+	if s.Db == nil {
+		return nil
+	}
+	err := s.Db.Close()
+	s.Db = nil
+	return err
+}
+
+func (s *BECService) GetBECCatalogueStatus(ctx context.Context) (BECCatalogueStatus, error) {
+	if err := sqlutil.AcquireReadLease(ctx, &s.Mu); err != nil {
+		return BECCatalogueStatus{}, err
+	}
+	defer s.Mu.RUnlock()
+	if s.Db == nil {
+		return BECCatalogueStatus{}, errors.New("BEC catalogue is closed")
+	}
+	return s.status, nil
+}
+
+func (s *BECService) ListBECZones(ctx context.Context) ([]BECZone, error) {
+	if err := sqlutil.AcquireReadLease(ctx, &s.Mu); err != nil {
+		return nil, err
+	}
+	defer s.Mu.RUnlock()
+	result := []BECZone{}
+	if s.Db == nil {
+		return nil, errors.New("BEC catalogue is closed")
+	}
+	rows, err := s.Db.QueryContext(ctx, `SELECT DISTINCT Zone, ZoneDescription FROM BECZoneList ORDER BY Zone COLLATE NOCASE, Zone, ZoneDescription`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var row BECZone
+		if err := rows.Scan(&row.Zone, &row.Description); err != nil {
+			return nil, err
+		}
+		result = append(result, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (s *BECService) ListBECSubZones(ctx context.Context, zone *string) ([]BECSubZone, error) {
+	if err := ValidateBECCode("Zone", zone, 4); err != nil {
+		return nil, err
+	}
+	if err := sqlutil.AcquireReadLease(ctx, &s.Mu); err != nil {
+		return nil, err
+	}
+	defer s.Mu.RUnlock()
+	if s.Db == nil {
+		return nil, errors.New("BEC catalogue is closed")
+	}
+	query := `SELECT RowID, Zone, SubZone, ZoneDescription, Description FROM BECZoneList`
+	var args []any
+	if zone != nil {
+		query += ` WHERE Zone = ? COLLATE NOCASE`
+		args = append(args, *zone)
+	}
+	query += ` ORDER BY Zone COLLATE NOCASE, Zone, SubZone COLLATE NOCASE, SubZone, CAST(RowID AS INTEGER)`
+	rows, err := s.Db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := []BECSubZone{}
+	for rows.Next() {
+		var row BECSubZone
+		if err := rows.Scan(&row.RowID, &row.Zone, &row.SubZone, &row.ZoneDescription, &row.Description); err != nil {
+			return nil, err
+		}
+		result = append(result, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+const BecSeriesColumns = `RowID, SourceID, SSCode, Name, Region, Zone, SubZone, BaseSubZone, Variant, Phase, SiteSeries,
+ SiteSeriesPhase, Variation, Seral, Description, PlantAssociation, Comments, ReferenceID, AddedDate, ExpiredDate,
+ OriginalSourceID, MergedBGC, Suballiance, Alliance, MissingNpeNa, TransferID, Flag`
+
+func BecSeriesScan(row *BECSiteSeries) []any {
+	return []any{&row.RowID, &row.SourceID, &row.SSCode, &row.Name, &row.Region, &row.Zone, &row.SubZone,
+		&row.BaseSubZone, &row.Variant, &row.Phase, &row.SiteSeries, &row.SiteSeriesPhase, &row.Variation,
+		&row.Seral, &row.Description, &row.PlantAssociation, &row.Comments, &row.ReferenceID, &row.AddedDate,
+		&row.ExpiredDate, &row.OriginalSourceID, &row.MergedBGC, &row.Suballiance, &row.Alliance,
+		&row.MissingNpeNa, &row.TransferID, &row.Flag}
+}
+
+func (s *BECService) ListBECSiteSeries(ctx context.Context, zone, subZone *string) ([]BECSiteSeries, error) {
+	if err := ValidateBECCode("Zone", zone, 4); err != nil {
+		return nil, err
+	}
+	if err := ValidateBECCode("SubZone", subZone, 8); err != nil {
+		return nil, err
+	}
+	if err := sqlutil.AcquireReadLease(ctx, &s.Mu); err != nil {
+		return nil, err
+	}
+	defer s.Mu.RUnlock()
+	if s.Db == nil {
+		return nil, errors.New("BEC catalogue is closed")
+	}
+	result := []BECSiteSeries{}
+	if zone == nil || subZone == nil {
+		return result, nil
+	}
+	rows, err := s.Db.QueryContext(ctx, `SELECT `+BecSeriesColumns+` FROM BECSiteSeries
+ WHERE Zone = ? COLLATE NOCASE AND SubZone = ? COLLATE NOCASE
+ ORDER BY SiteSeries COLLATE NOCASE, SiteSeries, CAST(RowID AS INTEGER)`, *zone, *subZone)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var row BECSiteSeries
+		if err := rows.Scan(BecSeriesScan(&row)...); err != nil {
+			return nil, err
+		}
+		row.Selectable = row.SiteSeries != nil && ValidateBECCode("SiteSeries", row.SiteSeries, 5) == nil
+		if !row.Selectable {
+			row.Diagnostic = "Catalogue SiteSeries code is NULL, empty, or exceeds the stored five-character limit"
+		}
+		result = append(result, row)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
+}

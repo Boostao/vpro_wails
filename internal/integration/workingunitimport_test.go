@@ -1,0 +1,257 @@
+package integration
+
+import (
+	"github.com/boostao/vpro-wails/internal/sqlutil"
+	"github.com/boostao/vpro-wails/internal/vprocore"
+	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
+)
+
+import (
+	"bytes"
+	"database/sql"
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"testing"
+)
+
+func workingUnitProvenanceFixture(t *testing.T) vprocore.WorkingUnitProvenance {
+	t.Helper()
+	var p vprocore.WorkingUnitProvenance
+	if err := vprocore.DecodeWorkingUnitJSON(vprocore.WorkingUnitProvenanceJSON, &p); err != nil {
+		t.Fatal(err)
+	}
+	return p
+}
+
+func TestWorkingUnitFreezeNativeSnapshot(t *testing.T) {
+	if os.Getenv("VPRO_FREEZE_WORKING_UNIT") != "1" {
+		t.Skip("one-time explicit typed native snapshot resource generation")
+	}
+	if bytes.HasPrefix(vprocore.WorkingUnitDatabase, []byte("SQLite format 3")) {
+		t.Fatal("Working Unit resource is already frozen")
+	}
+	data, err := os.ReadFile(filepath.Join("evidence", "private", "working-unit-native", "working-unit-reference-snapshot.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	p := workingUnitProvenanceFixture(t)
+	snapshot, err := vprocore.ValidateWorkingUnitSnapshot(data, p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p.SourceCopies, p.SourceSchema = snapshot.SourceCopies, snapshot.Schema
+	p.IdentityEncoding, p.SourceContext = snapshot.IdentityEncoding, snapshot.SourceContext
+	cells, err := json.Marshal(snapshot.Tables)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p.TypedCellsSHA256 = sqlutil.BecHash(cells)
+	file, err := os.CreateTemp("resources", ".working-unit-import-*.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := file.Name()
+	if err := file.Close(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+			t.Error(err)
+		}
+	})
+	db, err := sql.Open("sqlite3", path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vprocore.ImportWorkingUnitSnapshot(db, data, p)
+	closeErr := db.Close()
+	if err != nil || closeErr != nil {
+		t.Fatalf("freeze/import every typed source cell: %v / %v", err, closeErr)
+	}
+	database, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p.DatabaseSHA256 = sqlutil.BecHash(database)
+	if err := os.Rename(path, filepath.Join("resources", "working-unit.db")); err != nil {
+		t.Fatal(err)
+	}
+	provenance, err := json.MarshalIndent(p, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join("resources", "working-unit-provenance.json"), append(provenance, '\n'), 0644); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("3508 rows / 17540 typed cells frozen; database SHA256=%s cells SHA256=%s", p.DatabaseSHA256, p.TypedCellsSHA256)
+}
+
+func workingUnitSnapshotFixture(t *testing.T) ([]byte, vprocore.WorkingUnitProvenance, vprocore.WorkingUnitSnapshot) {
+	t.Helper()
+	p := workingUnitProvenanceFixture(t)
+	root := vprotest.BecTestDir(t)
+	path := filepath.Join(root, "catalogue.db")
+	if err := os.WriteFile(path, vprocore.WorkingUnitDatabase, 0644); err != nil {
+		t.Fatal(err)
+	}
+	db, err := sqlutil.OpenReadOnly(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if err := vprocore.ValidateWorkingUnitDatabase(db, p); err != nil {
+		t.Fatal(err)
+	}
+	tables, err := vprocore.WorkingUnitSourceTables(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	snapshot := vprocore.WorkingUnitSnapshot{Version: p.Version, Exporter: p.Exporter, ReadOnlyNativeReferenceAccess: true,
+		SourceCopies: p.SourceCopies, Schema: p.SourceSchema, Tables: tables,
+		IdentityEncoding: p.IdentityEncoding, SourceContext: p.SourceContext}
+	data, err := json.Marshal(snapshot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p.SnapshotSHA256 = sqlutil.BecHash(data)
+	return data, p, snapshot
+}
+
+func TestWorkingUnitImportAllTypedCellsAndSourceGuards(t *testing.T) {
+	data, p, snapshot := workingUnitSnapshotFixture(t)
+	if len(snapshot.Tables["MasterSiteUnitList"]) != 6067 || len(snapshot.Tables["UserSiteUnitList"]) != 4 ||
+		workingUnitProvenanceFixture(t).SnapshotSHA256 != "ab17dee2ef287629e4dac45e05b8935f8bfbb9806ee82b5088eab87fc3573016" {
+		t.Fatal("frozen 2026 Working Unit row boundary changed")
+	}
+	db, err := sql.Open("sqlite3", filepath.Join(vprotest.BecTestDir(t), "import.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if err := vprocore.ImportWorkingUnitSnapshot(db, data, p); err != nil {
+		t.Fatal(err)
+	}
+	actual, err := vprocore.WorkingUnitSourceTables(db)
+	if err != nil || !reflect.DeepEqual(actual, snapshot.Tables) {
+		t.Fatalf("17540 source cells changed: %v", err)
+	}
+	for _, mutation := range []string{"hash", "schema", "default", "identity", "ordinal", "source", "level", "count", "null-id"} {
+		t.Run(mutation, func(t *testing.T) {
+			var changed vprocore.WorkingUnitSnapshot
+			if err := json.Unmarshal(data, &changed); err != nil {
+				t.Fatal(err)
+			}
+			switch mutation {
+			case "schema":
+				changed.Schema["MasterSiteUnitList"][2].Size = 100
+			case "default":
+				changed.Schema["UserSiteUnitList"][5].Default = "99"
+			case "identity":
+				changed.Tables["MasterSiteUnitList"][0].ID = vprotest.BecString("2147483648")
+			case "ordinal":
+				changed.Tables["MasterSiteUnitList"][0].SourceOrdinal = "01"
+			case "source":
+				changed.SourceCopies[0].Hash = strings.Repeat("0", 64)
+			case "level":
+				value := 32768
+				changed.Tables["MasterSiteUnitList"][0].Level = &value
+			case "count":
+				changed.Tables["MasterSiteUnitList"] = changed.Tables["MasterSiteUnitList"][1:]
+			case "null-id":
+				changed.Tables["MasterSiteUnitList"][0].ID = nil
+			}
+			invalid, err := json.Marshal(changed)
+			if err != nil {
+				t.Fatal(err)
+			}
+			provenance := p
+			if mutation == "hash" {
+				provenance.SnapshotSHA256 = strings.Repeat("0", 64)
+			} else {
+				provenance.SnapshotSHA256 = sqlutil.BecHash(invalid)
+			}
+			if _, err := vprocore.ValidateWorkingUnitSnapshot(invalid, provenance); err == nil {
+				t.Fatal("invalid native snapshot accepted")
+			}
+		})
+	}
+	if _, err := db.Exec(`UPDATE WorkingUnits SET Description='corrupt cell' WHERE Origin='master' AND RowID='1'`); err != nil {
+		t.Fatal(err)
+	}
+	if err := vprocore.ValidateWorkingUnitDatabase(db, p); err == nil {
+		t.Fatal("typed cell corruption passed integrity validation")
+	}
+	failed, err := sql.Open("sqlite3", filepath.Join(vprotest.BecTestDir(t), "rejected-import.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer failed.Close()
+	wrongCells := p
+	wrongCells.TypedCellsSHA256 = strings.Repeat("0", 64)
+	if err := vprocore.ImportWorkingUnitSnapshot(failed, data, wrongCells); err == nil {
+		t.Fatal("import cell integrity failure accepted")
+	}
+	var created int
+	if err := failed.QueryRow(`SELECT COUNT(*) FROM sqlite_master WHERE name IN ('WorkingUnits','WorkingUnitProvenance')`).Scan(&created); err != nil || created != 0 {
+		t.Fatalf("failed typed import left partially committed data/schema: %d %v", created, err)
+	}
+}
+
+func TestWorkingUnitV1SnapshotValidationPreserved(t *testing.T) {
+	p2 := workingUnitProvenanceFixture(t)
+	lvl := 11
+	tables := map[string][]vprocore.WorkingUnitSourceRow{
+		"MasterSiteUnitList": {{SourceOrdinal: "1", ID: vprotest.BecString("101"), SiteSeries: vprotest.BecString("BG  xh 1 /01"), Level: &lvl}},
+		"UserSiteUnitList":   {{SourceOrdinal: "1", ID: vprotest.BecString("201"), SiteSeries: vprotest.BecString("Custom /01"), Level: &lvl}},
+	}
+	cellsBytes, err := json.Marshal(tables)
+	if err != nil {
+		t.Fatal(err)
+	}
+	masterHash := strings.Repeat("a", 64)
+	userHash := strings.Repeat("b", 64)
+	snap := vprocore.WorkingUnitSnapshot{
+		Version:                       1,
+		Exporter:                      vprocore.WorkingUnitExporterV1,
+		ReadOnlyNativeReferenceAccess: true,
+		SourceCopies: []vprocore.WorkingUnitSourceCopy{
+			{Path: `C:\VPro64\VLists.accda`, Hash: strings.ToUpper(masterHash)},
+			{Path: `C:\VPro64\VUser.accda`, Hash: strings.ToUpper(userHash)},
+		},
+		Schema:           p2.SourceSchema,
+		Tables:           tables,
+		IdentityEncoding: p2.IdentityEncoding,
+		SourceContext:    vprocore.WorkingUnitSourceContextV1,
+	}
+	rawSnap, err := json.Marshal(snap)
+	if err != nil {
+		t.Fatal(err)
+	}
+	p1 := vprocore.WorkingUnitProvenance{
+		Version:          1,
+		Exporter:         vprocore.WorkingUnitExporterV1,
+		SnapshotSHA256:   sqlutil.BecHash(rawSnap),
+		MasterSHA256:     masterHash,
+		UserSHA256:       userHash,
+		MasterRows:       1,
+		UserRows:         1,
+		MasterDuplicates: 0,
+		UserDuplicates:   0,
+		TypedCellsSHA256: sqlutil.BecHash(cellsBytes),
+		SourceCopies:     snap.SourceCopies,
+		SourceSchema:     p2.SourceSchema,
+		IdentityEncoding: p2.IdentityEncoding,
+		SourceContext:    vprocore.WorkingUnitSourceContextV1,
+	}
+	db, err := sql.Open("sqlite3", filepath.Join(vprotest.BecTestDir(t), "v1.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if err := vprocore.ImportWorkingUnitSnapshot(db, rawSnap, p1); err != nil {
+		t.Fatalf("v1 snapshot import failed: %v", err)
+	}
+}
