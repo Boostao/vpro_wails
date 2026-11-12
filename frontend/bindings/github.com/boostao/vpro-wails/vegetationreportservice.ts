@@ -33,6 +33,10 @@ export function ExportReviewedVegetationWorkbook(contextID: string, requestJSON:
     return $Call.ByID(1145600040, contextID, requestJSON);
 }
 
+export function GetDefaultSiteUnitExclusions(): $CancellablePromise<string[] | null> {
+    return $Call.ByID(2811305870);
+}
+
 export function GetLifeformWorkbookReview(contextID: string, requestJSON: string): $CancellablePromise<$models.LifeformWorkbookReview | null> {
     return $Call.ByID(2898235065, contextID, requestJSON);
 }
@@ -149,6 +153,14 @@ export function PreviewLongVegetationProject(contextID: string, requestJSON: str
     return $Call.ByID(3716680152, contextID, requestJSON);
 }
 
+export function PreviewLongVegetationWithExclusions(contextID: string, request: $models.LongVegetationExclusionRequest): $CancellablePromise<$models.LongVegetationExclusionPreview | null> {
+    return $Call.ByID(1120955874, contextID, request);
+}
+
+export function PreviewSiteUnitExclusions(contextID: string, request: $models.SiteUnitExclusionPreviewRequest): $CancellablePromise<$models.SiteUnitExclusionPreview | null> {
+    return $Call.ByID(1428779133, contextID, request);
+}
+
 export function PreviewSpeciesAttributeSummary(contextID: string): $CancellablePromise<$models.SpeciesAttributeSummaryPreview> {
     return $Call.ByID(2912521101, contextID);
 }
@@ -179,6 +191,14 @@ export function PreviewSummaryVegetationGrouped(contextID: string, average: numb
 
 export function PreviewSummaryVegetationGroupedDisplay(contextID: string, average: number, groupAndOrder: number, display: number, showClass: number): $CancellablePromise<$models.SummaryVegetationPreview> {
     return $Call.ByID(2114124515, contextID, average, groupAndOrder, display, showClass);
+}
+
+export function PreviewSummaryVegetationWithExclusions(contextID: string, request: $models.SummaryVegetationExclusionRequest): $CancellablePromise<$models.SummaryVegetationExclusionPreview | null> {
+    return $Call.ByID(1022565410, contextID, request);
+}
+
+export function ResolveHierarchyBreakpointUnits(contextID: string, request: $models.HierarchyBreakpointRequest): $CancellablePromise<$models.HierarchyBreakpointResolution | null> {
+    return $Call.ByID(1130310882, contextID, request);
 }
 
 export function SaveLongVegetationEnforcementPreferences(contextID: string, requestJSON: string): $CancellablePromise<$models.LongVegetationEnforcementPreferencesOutcome | null> {

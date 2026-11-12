@@ -5,6 +5,134 @@
 // @ts-ignore: Unused imports
 import * as vprocore$0 from "../vprocore/models.js";
 
+export interface AssignPlotsToSiteUnitRequest {
+    "plotNumbers": string[] | null;
+
+    /**
+     * nil or "" means Unassigned
+     */
+    "targetSiteUnit": string | null;
+    "removeFromSuWhenUnassigned": boolean;
+}
+
+export interface AssignPlotsToSiteUnitResult {
+    "contextId": string;
+    "su": string;
+    "tableName": string;
+    "changedPlots": number;
+    "historyId": number;
+}
+
+export interface BECUnitPickerChoice {
+    "siteSeries": string;
+    "longName": string;
+    "scientificName": string;
+    "zone": string;
+    "subZone": string;
+    "alliance"?: string;
+    "suballiance"?: string;
+
+    /**
+     * "master" | "user" | "becdb_v13"
+     */
+    "source": string;
+    "maskValid": boolean;
+}
+
+export interface BECUnitPickerRequest {
+    "query": string;
+    "zone": string;
+    "subZone": string;
+    "limit": number;
+}
+
+export interface CreateHierarchyTableRequest {
+    "name": string;
+
+    /**
+     * "project" (default) | "new_file"
+     */
+    "destination": string;
+    "filePath": string;
+    "activate": boolean;
+}
+
+export interface CreateSUFromEnvFieldsRequest {
+    /**
+     * e.g. ["Zone", "SubZone", "SiteSeries"]
+     */
+    "fields": string[] | null;
+
+    /**
+     * e.g. "/" or "-"
+     */
+    "separator": string;
+
+    /**
+     * optional len(fields)-1 explicit separators, e.g. ["", "/"] for Zone+SubZone+"/"+SiteSeries
+     */
+    "fieldSeparators"?: string[] | null;
+
+    /**
+     * when true on Zone+SubZone+SiteSeries, formats as Zone+SubZone+"/"+SiteSeries
+     */
+    "useBecSlashFormat": boolean;
+
+    /**
+     * "overwrite" | "fill_unassigned_only" | "new_table"
+     */
+    "mode": string;
+
+    /**
+     * required when mode == "new_table", optional override otherwise
+     */
+    "targetSuName"?: string;
+
+    /**
+     * "project" (default) | "new_file" (for mode == "new_table")
+     */
+    "destination"?: string;
+    "filePath"?: string;
+    "scopeToExistingSuRowsOnly": boolean;
+
+    /**
+     * when true, skip plots where any selected field is blank/NULL
+     */
+    "skipIncompleteRows": boolean;
+    "previewOnly": boolean;
+    "activate": boolean;
+}
+
+export interface CreateSUFromEnvFieldsResult {
+    "contextId": string;
+    "mode": string;
+    "targetSu": string;
+    "tableName": string;
+    "filePath": string;
+    "previewOnly": boolean;
+    "insertedCount": number;
+    "updatedCount": number;
+    "preservedCount": number;
+    "skippedCount": number;
+    "unchangedCount": number;
+    "items": SUFromEnvPlotPreview[] | null;
+    "activated": boolean;
+    "newState"?: vprocore$0.ProjectState | null;
+}
+
+export interface CreateSUTableRequest {
+    "name": string;
+
+    /**
+     * "project" (default) | "new_file"
+     */
+    "destination": string;
+    "filePath": string;
+    "populateAllProjectPlots": boolean;
+    "seedFromUserSiteUnit": boolean;
+    "activate": boolean;
+}
+
 export interface EnvironmentSiteUnitChange {
     "plotNumber": string;
     "envRowId": string;
@@ -57,6 +185,136 @@ export interface ExternalSUEnvironmentReview {
     "sourceHash": string;
     "approvalHash": string;
     "sessionId": string;
+}
+
+/**
+ * FlatHierarchyRow represents one root-to-leaf classification chain in the editable wide rank table:
+ * Class | Order | SubOrder | Alliance | SubAlliance | Association | SubAssociation | Facies | WorkingUnit | SiteSeries
+ */
+export interface FlatHierarchyRow {
+    "leafId": number;
+    "superclass"?: string;
+    "class": string;
+    "subclass"?: string;
+    "order": string;
+    "subOrder": string;
+    "alliance": string;
+    "subAlliance": string;
+    "association": string;
+    "subAssociation": string;
+    "facies": string;
+    "workingUnit": string;
+    "siteSeries": string;
+    "breakpointRank"?: string;
+}
+
+export interface HierarchyAddNodeRequest {
+    "name": string;
+    "parentId": number | null;
+    "level": number;
+    "tag"?: string;
+    "isBreakpoint": boolean;
+}
+
+export interface HierarchyDeleteNodeRequest {
+    "nodeId": number;
+    "cascadeChildren": boolean;
+}
+
+export interface HierarchyDiagnostics {
+    "totalNodes": number;
+    "rootNodes": number;
+    "breakpointNodes": number;
+    "blankNameNodes": number;
+    "orphanNodes": number[] | null;
+    "cycleNodeIds": number[] | null;
+}
+
+export interface HierarchyExplorerNode {
+    "id": number;
+    "name": string;
+    "cleanName": string;
+    "parent": number | null;
+    "level": number;
+    "rankName": string;
+    "tag"?: string;
+    "isBreakpoint": boolean;
+    "depth": number;
+    "children": HierarchyExplorerNode[] | null;
+}
+
+export interface HierarchyExplorerView {
+    "contextId": string;
+    "project": string;
+    "hierarchy": string;
+    "hierarchyPath": string;
+    "tableName": string;
+    "roots": HierarchyExplorerNode[] | null;
+    "flatNodes": HierarchyExplorerNode[] | null;
+    "flatRankRows": FlatHierarchyRow[] | null;
+    "diagnostics": HierarchyDiagnostics;
+}
+
+export interface HierarchyMutationResult {
+    "contextId": string;
+    "hierarchy": string;
+    "tableName": string;
+    "nodeId"?: number;
+    "nodeName"?: string;
+    "affectedRows": number;
+}
+
+export interface HierarchyRenameNodeRequest {
+    "nodeId": number;
+    "newName": string;
+}
+
+export interface HierarchyReparentNodeRequest {
+    "nodeId": number;
+    "newParentId": number | null;
+    "newLevel"?: number | null;
+}
+
+export interface HierarchyTableLifecycleResult {
+    "contextId": string;
+    "name": string;
+    "tableName": string;
+    "filePath": string;
+    "activated": boolean;
+    "newState"?: vprocore$0.ProjectState | null;
+}
+
+export interface PlotInspectorSpecies {
+    "species": string;
+    "scientificName": string;
+    "englishName": string;
+    "coverA": string;
+    "coverB": string;
+    "coverC": string;
+    "coverD": string;
+    "totalCover": number;
+    "totalFormatted": string;
+}
+
+export interface PlotInspectorSummary {
+    "contextId": string;
+    "plotNumber": string;
+    "fieldNumber": string;
+    "projectId": string;
+    "zone": string;
+    "subZone": string;
+    "siteSeries": string;
+    "userSiteUnit": string;
+    "becSiteUnit": string;
+    "currentSuUnit": string;
+    "moistureRegime": string;
+    "nutrientRegime": string;
+    "elevation": number | null;
+    "slope": string;
+    "aspect": number | null;
+    "latitude": number | null;
+    "longitude": number | null;
+    "topSpecies": PlotInspectorSpecies[] | null;
 }
 
 export interface PlotProfileFileCreated {
@@ -272,6 +530,89 @@ export interface ProjectProfileSpeciesPresencePreview {
     "su": string;
     "totalPlots": number;
     "plotNumbers": string[] | null;
+}
+
+export interface SUFromEnvPlotPreview {
+    "plotNumber": string;
+    "beforeSiteUnit": string;
+    "afterSiteUnit": string;
+
+    /**
+     * "insert" | "update" | "preserve_existing" | "skip_blank" | "unchanged"
+     */
+    "action": string;
+}
+
+export interface SUPlotLeaf {
+    "plotNumber": string;
+    "fieldNumber": string;
+    "zone": string;
+    "subZone": string;
+    "siteSeries": string;
+    "userSiteUnit": string;
+    "moistureRegime": string;
+    "nutrientRegime": string;
+    "elevation": number | null;
+    "siteUnit": string;
+    "presentInSu": boolean;
+    "inProjectEnv": boolean;
+    "locked": boolean;
+}
+
+export interface SUPlotTree {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "suPath": string;
+    "units": SUUnitBucket[] | null;
+    "unassignedPlots": SUPlotLeaf[] | null;
+    "orphanPlots": SUPlotLeaf[] | null;
+    "totalProject": number;
+    "totalAssigned": number;
+    "totalUnassigned": number;
+}
+
+export interface SUTableLifecycleResult {
+    "contextId": string;
+    "name": string;
+    "tableName": string;
+    "filePath": string;
+    "plotCount": number;
+    "activated": boolean;
+    "newState"?: vprocore$0.ProjectState | null;
+}
+
+export interface SUUnitBucket {
+    "siteUnit": string;
+    "longName": string;
+
+    /**
+     * "master" | "user" | ""
+     */
+    "origin": string;
+    "maskValid": boolean;
+    "plotCount": number;
+    "plots": SUPlotLeaf[] | null;
+}
+
+export interface SaveFlatHierarchyRequest {
+    "rows": FlatHierarchyRow[] | null;
+}
+
+export interface SaveSUTableAsRequest {
+    /**
+     * defaults to active SU when empty
+     */
+    "sourceSu": string;
+    "newName": string;
+
+    /**
+     * "project" (default) | "new_file"
+     */
+    "destination": string;
+    "filePath": string;
+    "activate": boolean;
 }
 
 export interface SiteUnitEnvironmentChange {

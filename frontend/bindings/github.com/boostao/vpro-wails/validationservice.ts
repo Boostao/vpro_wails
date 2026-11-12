@@ -7,7 +7,18 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as projectops$0 from "./internal/projectops/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as validation$0 from "./internal/validation/models.js";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as $models from "./models.js";
+
+export function ApplyOptimizeVeg(contextID: string, req: projectops$0.ApplyOptimizeVegRequest): $CancellablePromise<projectops$0.OptimizeVegResult> {
+    return $Call.ByID(3354325941, contextID, req);
+}
 
 export function ApplySpeciesCodeCheck(contextID: string, updates: $models.SpeciesCodeCheckUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(2398060775, contextID, updates);
@@ -17,6 +28,26 @@ export function CheckSpeciesCodes(contextID: string): $CancellablePromise<$model
     return $Call.ByID(1628234778, contextID);
 }
 
+export function ExecuteThreeWayMerge(contextID: string, req: projectops$0.ThreeWayMergeExecuteRequest): $CancellablePromise<projectops$0.ThreeWayMergeResult> {
+    return $Call.ByID(2117038238, contextID, req);
+}
+
 export function LookupSpeciesCodeCheckTarget(contextID: string, lookup: $models.VegetationSpeciesLookup): $CancellablePromise<$models.SpeciesCodeCheckOption[] | null> {
     return $Call.ByID(2927391748, contextID, lookup);
+}
+
+export function PreviewOptimizeVeg(contextID: string, opts: projectops$0.OptimizeVegOptions): $CancellablePromise<projectops$0.OptimizeVegPreview> {
+    return $Call.ByID(401867945, contextID, opts);
+}
+
+export function PreviewThreeWayMerge(contextID: string, req: projectops$0.ThreeWayMergePreviewRequest): $CancellablePromise<projectops$0.ThreeWayMergePreview> {
+    return $Call.ByID(3292183647, contextID, req);
+}
+
+export function QuarantineOrphanRecords(contextID: string, req: validation$0.QuarantineOrphanRequest): $CancellablePromise<validation$0.QuarantineOrphanResult> {
+    return $Call.ByID(2517518930, contextID, req);
+}
+
+export function RunComplianceValidation(contextID: string, opts: validation$0.ComplianceOptions): $CancellablePromise<validation$0.ComplianceValidationReport> {
+    return $Call.ByID(1552519499, contextID, opts);
 }

@@ -5,6 +5,145 @@
 // @ts-ignore: Unused imports
 import * as vprocore$0 from "../vprocore/models.js";
 
+export interface DatasheetCellEdit {
+    "rowId": string;
+    "column": string;
+    "before": vprocore$0.ProjectMetadataCell;
+    "after": vprocore$0.ProjectMetadataCell;
+}
+
+export interface DatasheetColumnMeta {
+    "name": string;
+    "declaredType": string;
+
+    /**
+     * "text" | "integer" | "single" | "double" | "boolean"
+     */
+    "kind": string;
+    "pinned": boolean;
+    "editable": boolean;
+    "protected": boolean;
+    "maxUtf16": number;
+    "isCoverSingle": boolean;
+    "isBoolean": boolean;
+}
+
+export interface DatasheetEditRequest {
+    "tableKey": string;
+    "edits": DatasheetCellEdit[] | null;
+}
+
+export interface DatasheetEditResult {
+    "contextId": string;
+    "tableKey": string;
+    "tableName": string;
+    "updatedRows": number;
+    "updatedCells": number;
+    "auditRows": number;
+}
+
+export interface DatasheetFilterSpec {
+    "column": string;
+
+    /**
+     * "contains" | "eq" | "starts_with" | "ends_with" | "is_null" | "not_null"
+     */
+    "op": string;
+    "value": string;
+}
+
+export interface DatasheetFindReplaceItem {
+    "rowId": string;
+    "pinnedIdentity": string;
+    "column": string;
+    "beforeText": string;
+    "afterText": string;
+    "edit": DatasheetCellEdit;
+    "validationError"?: string;
+    "beforeCell": vprocore$0.ProjectMetadataCell;
+    "afterCell": vprocore$0.ProjectMetadataCell;
+}
+
+export interface DatasheetFindReplacePreview {
+    "contextId": string;
+    "tableKey": string;
+    "tableName": string;
+    "column": string;
+    "matchedRows": number;
+    "validCount": number;
+    "invalidCount": number;
+    "items": DatasheetFindReplaceItem[] | null;
+    "truncated": boolean;
+}
+
+export interface DatasheetFindReplaceRequest {
+    "tableKey": string;
+    "column": string;
+    "findText": string;
+    "replaceText": string;
+    "matchCase": boolean;
+    "exactCell": boolean;
+    "filters": DatasheetFilterSpec[] | null;
+    "globalSearch": string;
+    "scopeToActiveSU": boolean;
+    "maxPreview": number;
+}
+
+export interface DatasheetPage {
+    "contextId": string;
+    "project": string;
+    "projectPath": string;
+    "su": string;
+    "hierarchy": string;
+    "tableKey": string;
+    "tableName": string;
+    "pinnedColumn": string;
+    "columns": DatasheetColumnMeta[] | null;
+    "rows": DatasheetRow[] | null;
+    "offset": number;
+    "limit": number;
+    "totalRows": number;
+    "canEditMaster": boolean;
+    "scopeToActiveSU": boolean;
+}
+
+export interface DatasheetPageRequest {
+    "tableKey": string;
+    "offset": number;
+    "limit": number;
+    "sort": DatasheetSortSpec[] | null;
+    "filters": DatasheetFilterSpec[] | null;
+    "globalSearch": string;
+    "scopeToActiveSU": boolean;
+}
+
+export interface DatasheetRow {
+    "rowId": string;
+    "cells": vprocore$0.ProjectMetadataCell[] | null;
+}
+
+export interface DatasheetSortSpec {
+    "column": string;
+
+    /**
+     * "asc" | "desc"
+     */
+    "direction": string;
+}
+
+export interface DatasheetTableInfo {
+    "key": string;
+    "label": string;
+    "role": string;
+    "tableName": string;
+    "pinnedColumn": string;
+    "available": boolean;
+    "unavailableReason"?: string;
+    "editable": boolean;
+    "rowCount": number;
+    "columns": DatasheetColumnMeta[] | null;
+}
+
 export interface TwoPageEnvironmentTableReview {
     "contextId": string;
     "project": string;

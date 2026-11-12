@@ -69,7 +69,8 @@
     request++; hierarchyRequest++; stateRequest++;
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
-  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
+  let view = $state<'home' | 'plots' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
+  let newSiviModalOpen = $state(false);
   let pictureManagerPlot = $state('');
   let plotLabelNumber = $state('');
   let contextExpanded = $state(false);
@@ -1173,6 +1174,8 @@
     {#if !startupFailure}<Navigation {view} onnavigate={navigate}
       siviAvailable={siviStandaloneEnabled && !!selected && !!$projectState?.contextId}
       onopensivi={() => void openSIVI()}
+      newSiviAvailable={!!$projectState?.contextId && !busy && !editorBusy && !transitionWorking}
+      onopennewsivi={() => { newSiviModalOpen = true; }}
       metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
       onopenmetadata={() => void openProjectMetadata()} />{/if}
     <div class="topbar-context"><Database size={16} strokeWidth={1.8} /><span>{$projectState?.activeProject ?? 'No project'}</span></div>
@@ -1552,13 +1555,102 @@
           </fieldset>
         </div>
 
-        <CloseConfirm requestId={closeRequest || (pendingTransition ? 'context' : '')}
+          <CloseConfirm requestId={closeRequest || (pendingTransition ? 'context' : '')}
           purpose={closeRequest ? 'close' : 'context'}
           {editorLabel}
           working={closeWorking || transitionWorking} canSave={closeState?.canSave ?? false}
           saveReason={closeState?.saveReason ?? `Return to the ${editorLabel} editor before saving.`}
           error={closeRequest ? closeError : transitionError}
           onrespond={closeRequest ? respondToClose : respondToTransition} />
+        {#if editorPlotNumber && $projectState?.contextId}
+          {#await import('./LMH25DiagnosticsBar.svelte') then { default: LMH25DiagnosticsBar }}
+            <div class="px-2 pb-2">
+              <LMH25DiagnosticsBar contextId={$projectState.contextId} plotNumber={editorPlotNumber} />
+            </div>
+          {/await}
+        {/if}
+      {:else if view === 'datasheet' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          {#await import('./UniversalDatasheetGrid.svelte')}
+            <p role="status" class="p-4 text-sm">Loading Universal Datasheet Grid...</p>
+          {:then { default: UniversalDatasheetGrid }}
+            <UniversalDatasheetGrid
+              contextId={$projectState.contextId ?? ''}
+              project={$projectState.activeProject}
+              su={$projectState.activeSU}
+              hierarchy={$projectState.activeHierarchy}
+              onBusyChange={(value) => { localEditorBusy = value; }}
+              onOpenPlot={(p) => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; }}
+            />
+          {/await}
+        {/key}
+      {:else if view === 'classification-explorer' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          {#await import('./ClassificationExplorer.svelte')}
+            <p role="status" class="p-4 text-sm">Loading Classification Explorer...</p>
+          {:then { default: ClassificationExplorer }}
+            <ClassificationExplorer
+              contextId={$projectState.contextId ?? ''}
+              project={$projectState.activeProject}
+              su={$projectState.activeSU}
+              hierarchy={$projectState.activeHierarchy}
+              onBusyChange={(value) => { localEditorBusy = value; }}
+              onContextChanged={async () => { await refresh(); }}
+              onOpenPlot={(p) => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; }}
+            />
+          {/await}
+        {/key}
+      {:else if view === 'project-admin' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          <div class="p-3 space-y-4">
+            {#await import('./ProjectAdminWorkbench.svelte')}
+              <p role="status" class="p-4 text-sm">Loading Project Admin Workbench...</p>
+            {:then { default: ProjectAdminWorkbench }}
+              <ProjectAdminWorkbench
+                contextId={$projectState.contextId ?? ''}
+                activeProject={$projectState.activeProject}
+                activeSu={$projectState.activeSU}
+                oncontextswitched={async () => { await refresh(); }}
+              />
+            {/await}
+            {#await import('./ProjectMetadataPresets.svelte') then { default: ProjectMetadataPresets }}
+              <ProjectMetadataPresets
+                contextId={$projectState.contextId ?? ''}
+                projectId={$projectState.activeProject}
+              />
+            {/await}
+          </div>
+        {/key}
+      {:else if view === 'lump-editor' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          {#await import('./LumpEditor.svelte')}
+            <p role="status" class="p-4 text-sm">Loading Combine Species &amp; LumpSpec Editor...</p>
+          {:then { default: LumpEditor }}
+            <LumpEditor
+              contextId={$projectState.contextId ?? ''}
+              operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
+              onBusyChange={(value) => { localEditorBusy = value; }}
+            />
+          {/await}
+        {/key}
+      {:else if view === 'interchange-hub' && $projectState}
+        {#if error}<p class="error" role="alert">{error}</p>{/if}
+        {#key $projectState.contextId}
+          {#await import('./InterchangeHub.svelte')}
+            <p role="status" class="p-4 text-sm">Loading Interchange Hub...</p>
+          {:then { default: InterchangeHub }}
+            <InterchangeHub
+              contextId={$projectState.contextId ?? ''}
+              operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
+              onBusyChange={(value) => { localEditorBusy = value; }}
+              onProjectActivated={async () => { await refresh(); }}
+            />
+          {/await}
+        {/key}
       {:else if view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}
@@ -1588,6 +1680,17 @@
             projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
             operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
             onBusyChange={(value) => { localEditorBusy = value; }} />
+          {#await import('./SiteUnitExclusionFilter.svelte') then { default: SiteUnitExclusionFilter }}
+            <div class="px-3 pb-4">
+              <SiteUnitExclusionFilter
+                contextId={$projectState.contextId ?? ''}
+                su={$projectState.activeSU}
+                hierarchy={$projectState.activeHierarchy}
+                reportMode="summary"
+                onBusyChange={(value) => { localEditorBusy = value; }}
+              />
+            </div>
+          {/await}
         {/key}
       {:else if view === 'lifeform-summary' && import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
@@ -1714,6 +1817,25 @@
           {/if}
         </div>
       </aside>
+    {/if}
+    {#if newSiviModalOpen && $projectState?.contextId}
+      {#await import('./SIVIParentCreateModal.svelte') then { default: SIVIParentCreateModal }}
+        <SIVIParentCreateModal
+          contextId={$projectState.contextId}
+          activeProject={$projectState.activeProject}
+          activeSu={$projectState.activeSU}
+          open={newSiviModalOpen}
+          oncreated={async (res) => {
+            newSiviModalOpen = false;
+            await loadPlots(offset);
+            editorPlotNumber = res.plotNumber;
+            editorEntryForm = 'sivi';
+            view = 'fs882';
+          }}
+          onundone={async () => { await loadPlots(offset); }}
+          onclose={() => { newSiviModalOpen = false; }}
+        />
+      {/await}
     {/if}
   </div>
 </div>

@@ -40,7 +40,7 @@ func NewDatasheetService(environmentTable *TwoPageEnvironmentTableService, veget
 	}
 }
 
-func (s *DatasheetService) SetContext(contexts *ContextService) {
+func (s *DatasheetService) setContext(contexts *ContextService) {
 	if s == nil {
 		return
 	}

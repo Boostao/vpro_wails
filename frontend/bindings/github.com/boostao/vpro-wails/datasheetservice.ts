@@ -9,10 +9,26 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function ApplyDatasheetEdits(contextID: string, request: $models.DatasheetEditRequest): $CancellablePromise<$models.DatasheetEditResult | null> {
+    return $Call.ByID(126167658, contextID, request);
+}
+
+export function GetDatasheetPage(contextID: string, request: $models.DatasheetPageRequest): $CancellablePromise<$models.DatasheetPage | null> {
+    return $Call.ByID(437576142, contextID, request);
+}
+
 export function GetEnvironmentTableReview(contextID: string, plot: string, offset: number, limit: number): $CancellablePromise<$models.TwoPageEnvironmentTableReview | null> {
     return $Call.ByID(4212526461, contextID, plot, offset, limit);
 }
 
 export function GetVegetationTableReview(contextID: string, plot: string, form: string, offset: number, limit: number): $CancellablePromise<$models.TwoPageVegetationTableReview | null> {
     return $Call.ByID(3108625530, contextID, plot, form, offset, limit);
+}
+
+export function ListDatasheetTables(contextID: string): $CancellablePromise<$models.DatasheetTableInfo[] | null> {
+    return $Call.ByID(229611324, contextID);
+}
+
+export function PreviewDatasheetFindReplace(contextID: string, request: $models.DatasheetFindReplaceRequest): $CancellablePromise<$models.DatasheetFindReplacePreview | null> {
+    return $Call.ByID(1276456198, contextID, request);
 }

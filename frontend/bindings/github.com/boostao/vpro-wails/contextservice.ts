@@ -7,11 +7,31 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as projectops$0 from "./internal/projectops/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as sivi$0 from "./internal/sivi/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as twopage$0 from "./internal/twopage/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as validation$0 from "./internal/validation/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as vprocore$0 from "./internal/vprocore/models.js";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
+
+export function ApplyOptimizeVeg(contextID: string, req: projectops$0.ApplyOptimizeVegRequest): $CancellablePromise<projectops$0.OptimizeVegResult> {
+    return $Call.ByID(3355731105, contextID, req);
+}
+
+export function ApplyProjectMetadataAutomation(contextID: string, req: projectops$0.ApplyProjectMetadataAutomationRequest): $CancellablePromise<projectops$0.ApplyProjectMetadataAutomationResult> {
+    return $Call.ByID(2850448861, contextID, req);
+}
 
 export function CanEditMasterBEC(contextID: string): $CancellablePromise<boolean> {
     return $Call.ByID(3701656016, contextID);
@@ -29,8 +49,16 @@ export function ChooseNewSQLiteProjectFile(contextID: string, suggestedProject: 
     return $Call.ByID(127877150, contextID, suggestedProject);
 }
 
+export function CompareProjects(contextID: string, req: projectops$0.CompareProjectsRequest): $CancellablePromise<projectops$0.CompareProjectsResult> {
+    return $Call.ByID(1284711039, contextID, req);
+}
+
 export function CreateBlankProjectMetadata(p1: string, p2: $models.ProjectMetadataCreate): $CancellablePromise<$models.ProjectMetadataRow> {
     return $Call.ByID(2706173128, p1, p2);
+}
+
+export function CreateNewProject(contextID: string, req: projectops$0.NewProjectRequest): $CancellablePromise<projectops$0.NewProjectResult> {
+    return $Call.ByID(2749208049, contextID, req);
 }
 
 export function CreatePersonalSpeciesDefinition(p1: string, p2: $models.PersonalSpeciesDefinitionRequest): $CancellablePromise<$models.VegetationSpeciesOption> {
@@ -57,6 +85,10 @@ export function CreateProjectPlotProfileRule(p1: string, p2: $models.ProjectPlot
     return $Call.ByID(1762638127, p1, p2);
 }
 
+export function CreateSIVIPlot(contextID: string, req: sivi$0.CreateSIVIPlotRequest): $CancellablePromise<sivi$0.CreateSIVIPlotResult> {
+    return $Call.ByID(569801660, contextID, req);
+}
+
 export function CreateSourceVegetation(contextID: string, plot: string, request: vprocore$0.VegetationCreationRequest): $CancellablePromise<number> {
     return $Call.ByID(2288682951, contextID, plot, request);
 }
@@ -81,12 +113,28 @@ export function DeleteReviewedVegetation(p0: string, p1: string, p2: $models.Veg
     return $Call.ByID(4082659024, p0, p1, p2);
 }
 
+export function DeleteTwoPageSoilHorizon(contextID: string, req: twopage$0.DeleteTwoPageSoilHorizonRequest): $CancellablePromise<twopage$0.DeleteTwoPageSoilHorizonResult> {
+    return $Call.ByID(3191096952, contextID, req);
+}
+
 export function DeleteVegRecord(contextID: string, plot: string, id: number): $CancellablePromise<void> {
     return $Call.ByID(1524181516, contextID, plot, id);
 }
 
+export function DeriveProjectMetadataFromPlots(contextID: string, projectID: string): $CancellablePromise<projectops$0.DerivedProjectMetadata> {
+    return $Call.ByID(3409539417, contextID, projectID);
+}
+
 export function Edit(expectedID: string, operation: any): $CancellablePromise<void> {
     return $Call.ByID(3627133354, expectedID, operation);
+}
+
+export function ExecuteThreeWayMerge(contextID: string, req: projectops$0.ThreeWayMergeExecuteRequest): $CancellablePromise<projectops$0.ThreeWayMergeResult> {
+    return $Call.ByID(1873291042, contextID, req);
+}
+
+export function ExportSplinterProject(contextID: string, req: projectops$0.ExportSplinterRequest): $CancellablePromise<projectops$0.ExportSplinterResult> {
+    return $Call.ByID(2515306062, contextID, req);
 }
 
 export function GetChildCapabilities(contextID: string, kind: string): $CancellablePromise<{ [_ in string]?: boolean } | null> {
@@ -181,6 +229,10 @@ export function ListAuditReadEntries(contextID: string, plot: string): $Cancella
     return $Call.ByID(218608203, contextID, plot);
 }
 
+export function ListCreatedSIVIPlots(contextID: string): $CancellablePromise<sivi$0.SIVICreatedPlotEntry[] | null> {
+    return $Call.ByID(2351693737, contextID);
+}
+
 export function ListHumusRecords(contextID: string, plot: string): $CancellablePromise<vprocore$0.HumusRecord[] | null> {
     return $Call.ByID(295703714, contextID, plot);
 }
@@ -205,6 +257,10 @@ export function ListProjectMetadataFields(p1: string): $CancellablePromise<$mode
     return $Call.ByID(4089336027, p1);
 }
 
+export function ListProjectMetadataPresets(): $CancellablePromise<projectops$0.ProjectMetadataPreset[] | null> {
+    return $Call.ByID(1555639866);
+}
+
 export function ListProjectMetadataRestoreHistory(p1: string, p2: string): $CancellablePromise<$models.ProjectMetadataRestoreHistory> {
     return $Call.ByID(618860380, p1, p2);
 }
@@ -215,6 +271,10 @@ export function ListProjectPlotProfileChoices(p1: string): $CancellablePromise<$
 
 export function ListSoilSuggestions(p1: string): $CancellablePromise<$models.SoilSuggestion[] | null> {
     return $Call.ByID(357605878, p1);
+}
+
+export function ListTwoPageSoilDeletedHorizons(contextID: string, plotNumber: string, form: string): $CancellablePromise<twopage$0.DeletedTwoPageSoilHorizonEntry[] | null> {
+    return $Call.ByID(1912568241, contextID, plotNumber, form);
 }
 
 export function ListVegRecords(contextID: string, plot: string): $CancellablePromise<vprocore$0.VegRecord[] | null> {
@@ -253,6 +313,10 @@ export function PreviewLongVegetation(p1: string): $CancellablePromise<$models.L
     return $Call.ByID(3202635744, p1);
 }
 
+export function PreviewOptimizeVeg(contextID: string, opts: projectops$0.OptimizeVegOptions): $CancellablePromise<projectops$0.OptimizeVegPreview> {
+    return $Call.ByID(1222856429, contextID, opts);
+}
+
 export function PreviewSiteUnitSummary(p1: string, p2: $models.SiteUnitSummaryRequest): $CancellablePromise<$models.SiteUnitSummaryPreview> {
     return $Call.ByID(639495149, p1, p2);
 }
@@ -263,6 +327,14 @@ export function PreviewSiteUnitSummaryLifeforms(p1: string, p2: $models.SiteUnit
 
 export function PreviewSiteUnitSummarySpecies(p1: string, p2: $models.SiteUnitSpeciesListRequest): $CancellablePromise<$models.SiteUnitSpeciesListPreview> {
     return $Call.ByID(927926337, p1, p2);
+}
+
+export function PreviewThreeWayMerge(contextID: string, req: projectops$0.ThreeWayMergePreviewRequest): $CancellablePromise<projectops$0.ThreeWayMergePreview> {
+    return $Call.ByID(1579715019, contextID, req);
+}
+
+export function QuarantineOrphanRecords(contextID: string, req: validation$0.QuarantineOrphanRequest): $CancellablePromise<validation$0.QuarantineOrphanResult> {
+    return $Call.ByID(2724084822, contextID, req);
 }
 
 export function ReadNewProjectTemplates(contextID: string): $CancellablePromise<vprocore$0.NewProjectTemplateReview | null> {
@@ -303,6 +375,10 @@ export function RestoreSIVIProjectAssignment(p1: string, p2: string, p3: string,
 
 export function RestoreSelectedAuditRecords(contextID: string, plot: string, rowIDs: string[] | null, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(736886098, contextID, plot, rowIDs, action);
+}
+
+export function RestoreTwoPageSoilHorizon(contextID: string, req: twopage$0.RestoreTwoPageSoilHorizonRequest): $CancellablePromise<twopage$0.RestoreTwoPageSoilHorizonResult> {
+    return $Call.ByID(1568611893, contextID, req);
 }
 
 export function RevealInFileExplorer(contextID: string, target: string): $CancellablePromise<string> {
@@ -357,6 +433,10 @@ export function ReviewVegetationDeletion(p1: string, p2: string, p3: string, p4:
     return $Call.ByID(2363268444, p1, p2, p3, p4);
 }
 
+export function RunComplianceValidation(contextID: string, opts: validation$0.ComplianceOptions): $CancellablePromise<validation$0.ComplianceValidationReport> {
+    return $Call.ByID(3786704103, contextID, opts);
+}
+
 export function RunProjectPlotProfile(p1: string, p2: $models.ProjectPlotProfileRunRequest): $CancellablePromise<$models.ProjectPlotProfileResult> {
     return $Call.ByID(2115295500, p1, p2);
 }
@@ -371,6 +451,10 @@ export function SaveMineralRecord(contextID: string, record: vprocore$0.MineralR
 
 export function SaveOtherRecord(contextID: string, record: vprocore$0.OtherRecord): $CancellablePromise<void> {
     return $Call.ByID(638265830, contextID, record);
+}
+
+export function SaveProjectAs(contextID: string, req: projectops$0.SaveProjectAsRequest): $CancellablePromise<projectops$0.SaveProjectAsResult> {
+    return $Call.ByID(808245936, contextID, req);
 }
 
 export function SaveProjectMetadata(contextID: string, request: vprocore$0.ProjectMetadataEdit): $CancellablePromise<void> {
@@ -451,6 +535,10 @@ export function TransferEnvironmentSiteUnits(p1: string, p2: $models.Environment
 
 export function TransferSiteUnitEnvironment(p1: string, p2: $models.SiteUnitEnvironmentTransfer): $CancellablePromise<$models.SiteUnitEnvironmentResult | null> {
     return $Call.ByID(2917528945, p1, p2);
+}
+
+export function UndoCreateSIVIPlot(contextID: string, req: sivi$0.UndoCreateSIVIPlotRequest): $CancellablePromise<sivi$0.UndoCreateSIVIPlotResult> {
+    return $Call.ByID(3397446566, contextID, req);
 }
 
 export function UpdateCollectedRecords(contextID: string, plot: string, updates: vprocore$0.CollectedRecordUpdate[] | null): $CancellablePromise<void> {

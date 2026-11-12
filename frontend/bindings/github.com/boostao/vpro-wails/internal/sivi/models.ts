@@ -8,6 +8,39 @@ import * as sourceform$0 from "../sourceform/models.js";
 // @ts-ignore: Unused imports
 import * as vprocore$0 from "../vprocore/models.js";
 
+export interface CreateSIVIPlotRequest {
+    "requestId"?: string;
+    "plotNumber": string;
+
+    /**
+     * "Ground" | "Visual" | "Note" | "Other"
+     */
+    "plotType": string;
+    "projectId"?: string;
+    "fieldNumber"?: string;
+    "date"?: string;
+    "siteSurveyor"?: string;
+    "svPolygonNumber"?: string;
+    "zone"?: string;
+    "subZone"?: string;
+    "siteSeries"?: string;
+    "userSiteUnit"?: string;
+    "addToActiveSu"?: boolean;
+}
+
+export interface CreateSIVIPlotResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "plotType": string;
+    "addedToSu": boolean;
+    "auditRowCount": number;
+    "createdAt": string;
+    "actor": string;
+    "replayed": boolean;
+}
+
 export interface SIVICHARSParentEntryPolicy {
     "column": string;
     "binding": string;
@@ -37,6 +70,19 @@ export interface SIVICHARSParentEntryWrite {
 export interface SIVICoverWriteResult {
     "ChangedCells": number;
     "HistoryID": string;
+}
+
+export interface SIVICreatedPlotEntry {
+    "requestId": string;
+    "plotNumber": string;
+    "plotType": string;
+    "projectId"?: string;
+    "svPolygonNumber"?: string;
+    "createdAt": string;
+    "actor": string;
+    "undone": boolean;
+    "undoneAt"?: string;
+    "canUndo": boolean;
 }
 
 export type SIVICreationResult = sourceform$0.SiviCreationResult;
@@ -77,6 +123,24 @@ export interface SIVIParentActionSaveResult {
 export interface SIVIParentActionWrite {
     "original": sourceform$0.SIVIParentProjection | null;
     "actions": SIVIParentActionInput[] | null;
+}
+
+export interface UndoCreateSIVIPlotRequest {
+    "requestId"?: string;
+    "creationRequestId": string;
+    "plotNumber": string;
+}
+
+export interface UndoCreateSIVIPlotResult {
+    "requestId": string;
+    "creationRequestId": string;
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "removedFromSu": boolean;
+    "undoneAt": string;
+    "actor": string;
+    "replayed": boolean;
 }
 
 export interface siviCreationUndoHistoryEvent {

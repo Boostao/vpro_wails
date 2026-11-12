@@ -8,6 +8,60 @@ import * as reportcore$0 from "../reports/reportcore/models.js";
 // @ts-ignore: Unused imports
 import * as vprocore$0 from "../vprocore/models.js";
 
+export interface ExcludedSiteUnitInfo {
+    "siteUnit": string;
+    "matchedPattern": string;
+    "plotCount": number;
+}
+
+export interface HierarchyBreakpointBucket {
+    "breakpointUnit": string;
+    "sourceUnits": string[] | null;
+    "plotCount": number;
+}
+
+export interface HierarchyBreakpointOptions {
+    /**
+     * "lowest" (default) | "highest"
+     */
+    "breakpointPolicy": string;
+
+    /**
+     * "keep_original" (default) | "exclude_unbroken"
+     */
+    "unbrokenUnitPolicy": string;
+    "stripTildePrefix": boolean;
+}
+
+export interface HierarchyBreakpointRequest {
+    "rules": SiteUnitExclusionRule[] | null;
+    "useDefaultPresets": boolean;
+    "options": HierarchyBreakpointOptions;
+}
+
+export interface HierarchyBreakpointResolution {
+    "contextId": string;
+    "project": string;
+    "su": string;
+    "hierarchy": string;
+    "breakpointPolicy": string;
+    "totalUnitsBefore": number;
+    "totalUnitsAfter": number;
+    "rolledUpPlotCount": number;
+    "unmappedUnits": string[] | null;
+    "mappings": HierarchyBreakpointUnitMapping[] | null;
+    "buckets": HierarchyBreakpointBucket[] | null;
+}
+
+export interface HierarchyBreakpointUnitMapping {
+    "originalUnit": string;
+    "effectiveUnit": string;
+    "rolledUp": boolean;
+    "matchedInTree": boolean;
+    "excluded": boolean;
+    "plotCount": number;
+}
+
 export interface LifeformSummaryCatalogueRow {
     "rowId": string;
     "lifeform": number;
@@ -107,6 +161,19 @@ export interface LongVegetationEnforcementPreferencesReview {
     "suPath": string;
     "values": LongVegetationEnforcementPreferenceValues;
     "printers": vprocore$0.PrinterObservation;
+}
+
+export interface LongVegetationExclusionPreview {
+    "preview": LongVegetationPreview;
+    "exclusions": SiteUnitExclusionSummary;
+    "breakpoints"?: HierarchyBreakpointResolution | null;
+}
+
+export interface LongVegetationExclusionRequest {
+    "rules": SiteUnitExclusionRule[] | null;
+    "useDefaultPresets": boolean;
+    "useHierarchyBreakpoints": boolean;
+    "breakpointOptions": HierarchyBreakpointOptions;
 }
 
 export interface LongVegetationGroupAvailability {
@@ -544,6 +611,46 @@ export interface LongVegetationUnitPreferencesReview {
     "availability": LongVegetationUnitAvailability;
 }
 
+export interface RetainedSiteUnitInfo {
+    "siteUnit": string;
+    "plotCount": number;
+}
+
+export interface SiteUnitExclusionPreview {
+    "contextId": string;
+    "project": string;
+    "su": string;
+    "hierarchy": string;
+    "exclusions": SiteUnitExclusionSummary;
+    "breakpoints"?: HierarchyBreakpointResolution | null;
+}
+
+export interface SiteUnitExclusionPreviewRequest {
+    "rules": SiteUnitExclusionRule[] | null;
+    "useDefaultPresets": boolean;
+    "useHierarchyBreakpoints": boolean;
+    "breakpointOptions": HierarchyBreakpointOptions;
+}
+
+export interface SiteUnitExclusionRule {
+    "pattern": string;
+
+    /**
+     * "auto" (default) | "suffix" | "contains" | "wildcard"
+     */
+    "matchMode": string;
+    "enabled": boolean;
+}
+
+export interface SiteUnitExclusionSummary {
+    "appliedRules": SiteUnitExclusionRule[] | null;
+    "totalPlotsBefore": number;
+    "retainedPlots": number;
+    "excludedPlots": number;
+    "retainedUnits": RetainedSiteUnitInfo[] | null;
+    "excludedUnits": ExcludedSiteUnitInfo[] | null;
+}
+
 export interface SpeciesAttributeCount {
     "field": string;
     "count": number | null;
@@ -633,6 +740,24 @@ export interface SummaryVegetationEnvironmentalRow {
 export interface SummaryVegetationEnvironmentalValue {
     "kind": string;
     "cell": vprocore$0.ProjectMetadataCell | null;
+}
+
+export interface SummaryVegetationExclusionPreview {
+    "preview": SummaryVegetationPreview;
+    "exclusions": SiteUnitExclusionSummary;
+    "breakpoints"?: HierarchyBreakpointResolution | null;
+}
+
+export interface SummaryVegetationExclusionRequest {
+    "average": number;
+    "display": number;
+    "showClass": number;
+    "groupAndOrder": number;
+    "rules": SiteUnitExclusionRule[] | null;
+    "useDefaultPresets": boolean;
+    "useHierarchyBreakpoints": boolean;
+    "breakpointOptions": HierarchyBreakpointOptions;
+    "references"?: SummaryVegetationReferenceOptions | null;
 }
 
 export interface SummaryVegetationField {

@@ -8,6 +8,66 @@ import * as sourceform$0 from "../sourceform/models.js";
 // @ts-ignore: Unused imports
 import * as vprocore$0 from "../vprocore/models.js";
 
+export interface DeleteTwoPageSoilHorizonRequest {
+    "requestId"?: string;
+    "plotNumber": string;
+    "form": string;
+    "id": number;
+    "rowId"?: string;
+}
+
+export interface DeleteTwoPageSoilHorizonResult {
+    "requestId": string;
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "form": string;
+    "kind": string;
+    "deletedId": number;
+    "horizon": string;
+    "reservedInLedger": boolean;
+    "auditRowCount": number;
+    "editWhen": string;
+    "replayed": boolean;
+}
+
+export interface DeletedTwoPageSoilHorizonEntry {
+    "deleteRequestId": string;
+    "plotNumber": string;
+    "form": string;
+    "kind": string;
+    "deletedId": number;
+    "horizon": string;
+    "upperDepth"?: number | null;
+    "lowerDepth"?: number | null;
+    "deletedBy": string;
+    "deletedAt": string;
+    "restored": boolean;
+}
+
+export interface RestoreTwoPageSoilHorizonRequest {
+    "requestId"?: string;
+    "plotNumber": string;
+    "form": string;
+    "deleteRequestId": string;
+}
+
+export interface RestoreTwoPageSoilHorizonResult {
+    "requestId": string;
+    "deleteRequestId": string;
+    "contextId": string;
+    "project": string;
+    "plotNumber": string;
+    "form": string;
+    "kind": string;
+    "restoredId": number;
+    "restoredRowId": string;
+    "horizon": string;
+    "auditRowCount": number;
+    "editWhen": string;
+    "replayed": boolean;
+}
+
 export interface TwoPageEntryCodeAcknowledgement {
     "contextId": string;
     "project": string;
@@ -123,6 +183,11 @@ export interface twoPageSoilHistory {
     "EditWhen": string;
     "Audits": vprocore$0.AuditEntry[] | null;
     "CreatedRowID"?: string | null;
+    "Action"?: string;
+    "DeletedID"?: number | null;
+    "DeletedRow"?: vprocore$0.ProjectMetadataRow | null;
+    "RestoreOfRequestID"?: string | null;
+    "RestoredRowID"?: string | null;
 }
 
 export interface twoPageSoilOriginal {

@@ -7,10 +7,45 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as interchange$0 from "./internal/interchange/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as lumping$0 from "./internal/lumping/models.js";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
 export function ChooseAccessDatabaseFile(contextID: string): $CancellablePromise<string> {
     return $Call.ByID(2808944134, contextID);
+}
+
+export function CreateLumpTable(contextID: string, name: string): $CancellablePromise<lumping$0.LumpTableSummary> {
+    return $Call.ByID(3850841348, contextID, name);
+}
+
+export function DeleteLumpRow(contextID: string, tableName: string, sppCode: string): $CancellablePromise<void> {
+    return $Call.ByID(1066587881, contextID, tableName, sppCode);
+}
+
+export function DeleteLumpTable(contextID: string, name: string): $CancellablePromise<void> {
+    return $Call.ByID(4170299109, contextID, name);
+}
+
+export function DiscoverLumpTables(contextID: string, externalPaths: string[] | null): $CancellablePromise<lumping$0.LumpTableSummary[] | null> {
+    return $Call.ByID(1542846762, contextID, externalPaths);
+}
+
+export function ExportGeoPackage(contextID: string, request: interchange$0.GeoPackageExportRequest): $CancellablePromise<interchange$0.GeoPackageExportOutcome> {
+    return $Call.ByID(2272283223, contextID, request);
+}
+
+export function ExportLongTidyCSV(contextID: string, request: interchange$0.LongTidyCSVRequest): $CancellablePromise<interchange$0.CSVExportOutcome> {
+    return $Call.ByID(186692554, contextID, request);
+}
+
+export function ExportProjectRDS(contextID: string, request: interchange$0.RDSExportRequest): $CancellablePromise<interchange$0.RDSExportOutcome> {
+    return $Call.ByID(3481055260, contextID, request);
 }
 
 export function ExportReviewedPlotLabelPDF(contextID: string, requestJSON: string): $CancellablePromise<$models.PlotLabelPDFExportOutcome | null> {
@@ -19,6 +54,22 @@ export function ExportReviewedPlotLabelPDF(contextID: string, requestJSON: strin
 
 export function ExportReviewedTableCSVArchive(contextID: string, requestJSON: string): $CancellablePromise<$models.TableCSVArchiveOutcome | null> {
     return $Call.ByID(692682453, contextID, requestJSON);
+}
+
+export function ExportTurboVeg(contextID: string, request: interchange$0.TurboVegExportRequest): $CancellablePromise<interchange$0.TurboVegExportOutcome> {
+    return $Call.ByID(690582766, contextID, request);
+}
+
+export function ExportUserSpeciesList(contextID: string, request: interchange$0.UserSpeciesExportRequest): $CancellablePromise<interchange$0.UserSpeciesExportResult> {
+    return $Call.ByID(102245419, contextID, request);
+}
+
+export function ExportWideMatrixCSV(contextID: string, request: interchange$0.WideMatrixCSVRequest): $CancellablePromise<interchange$0.CSVExportOutcome> {
+    return $Call.ByID(418293510, contextID, request);
+}
+
+export function GetLumpTableRows(contextID: string, tableName: string, dbPath: string): $CancellablePromise<lumping$0.LumpRow[] | null> {
+    return $Call.ByID(237698377, contextID, tableName, dbPath);
 }
 
 export function GetPlotLabelPDFReview(contextID: string, requestJSON: string): $CancellablePromise<$models.PlotLabelPDFExportReview | null> {
@@ -41,10 +92,66 @@ export function ImportAccessProject(contextID: string, request: $models.AccessPr
     return $Call.ByID(2786781818, contextID, request);
 }
 
+export function ImportTurboVeg(contextID: string, request: interchange$0.TurboVegImportRequest): $CancellablePromise<interchange$0.TurboVegImportOutcome> {
+    return $Call.ByID(2356577269, contextID, request);
+}
+
+export function ImportUserSpeciesList(contextID: string, request: interchange$0.UserSpeciesImportRequest): $CancellablePromise<interchange$0.UserSpeciesImportResult> {
+    return $Call.ByID(1841740594, contextID, request);
+}
+
+export function ImportVenusProject(contextID: string, request: interchange$0.VenusImportRequest): $CancellablePromise<interchange$0.VenusImportResult> {
+    return $Call.ByID(2425541105, contextID, request);
+}
+
 export function InspectAccessDatabase(contextID: string, sourcePath: string): $CancellablePromise<$models.AccessDatabaseInspection> {
     return $Call.ByID(38771105, contextID, sourcePath);
 }
 
+export function InspectVenusSource(contextID: string, sourcePath: string): $CancellablePromise<interchange$0.VenusSourceInspection> {
+    return $Call.ByID(4104221674, contextID, sourcePath);
+}
+
+export function ListLumpPresets(): $CancellablePromise<lumping$0.LumpPresetInfo[] | null> {
+    return $Call.ByID(3160375300);
+}
+
+export function MaterializeLumpSpec(contextID: string, targetName: string, spec: lumping$0.LumpSpec, replaceExisting: boolean): $CancellablePromise<lumping$0.LumpMaterializeResult> {
+    return $Call.ByID(1028226662, contextID, targetName, spec, replaceExisting);
+}
+
+export function PreviewLumpImpact(contextID: string, tableName: string, dbPath: string): $CancellablePromise<lumping$0.LumpImpactPreview> {
+    return $Call.ByID(3476910986, contextID, tableName, dbPath);
+}
+
+export function PreviewLumpSpec(contextID: string, spec: lumping$0.LumpSpec): $CancellablePromise<lumping$0.LumpSpecPreview> {
+    return $Call.ByID(1343818739, contextID, spec);
+}
+
+export function PreviewUserSpeciesImport(contextID: string, request: interchange$0.UserSpeciesImportRequest): $CancellablePromise<interchange$0.UserSpeciesImportPreview> {
+    return $Call.ByID(2789259064, contextID, request);
+}
+
 export function RecoverPlotLabelPDFOutcome(contextID: string, requestJSON: string): $CancellablePromise<$models.PlotLabelPDFAttemptOutcome | null> {
     return $Call.ByID(3835263451, contextID, requestJSON);
+}
+
+export function SaveAsLumpTable(contextID: string, sourceTable: string, sourceDBPath: string, targetName: string): $CancellablePromise<lumping$0.LumpTableSummary> {
+    return $Call.ByID(3452965867, contextID, sourceTable, sourceDBPath, targetName);
+}
+
+export function SetAllLumpRowsUse(contextID: string, tableName: string, use: boolean): $CancellablePromise<number> {
+    return $Call.ByID(1281892757, contextID, tableName, use);
+}
+
+export function ToggleLumpRow(contextID: string, tableName: string, sppCode: string, use: boolean): $CancellablePromise<lumping$0.LumpRow> {
+    return $Call.ByID(1088235616, contextID, tableName, sppCode, use);
+}
+
+export function UpdateLumpRow(contextID: string, tableName: string, existingSppCode: string, input: lumping$0.LumpRowInput): $CancellablePromise<lumping$0.LumpRow> {
+    return $Call.ByID(2391116559, contextID, tableName, existingSppCode, input);
+}
+
+export function UpsertLumpRow(contextID: string, tableName: string, input: lumping$0.LumpRowInput): $CancellablePromise<lumping$0.LumpRow> {
+    return $Call.ByID(1744628969, contextID, tableName, input);
 }

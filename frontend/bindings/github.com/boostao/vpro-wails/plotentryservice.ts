@@ -7,6 +7,10 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as lmh25rules$0 from "./internal/lmh25rules/models.js";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
 export function CanEditMasterBEC(): $CancellablePromise<boolean> {
@@ -51,6 +55,14 @@ export function DeleteSIVIVegetation(contextID: string, requestJSON: string): $C
 
 export function DeleteVegRecord(plotNumber: string, id: number): $CancellablePromise<void> {
     return $Call.ByID(4046311226, plotNumber, id);
+}
+
+export function EvaluatePlotDiagnostics(header: $models.FS882Header, humus: $models.HumusRecord[] | null, mineral: $models.MineralRecord[] | null): $CancellablePromise<lmh25rules$0.PlotDiagnosticsResult> {
+    return $Call.ByID(2412519352, header, humus, mineral);
+}
+
+export function EvaluateStoredPlotDiagnostics(contextID: string, plotNumber: string): $CancellablePromise<lmh25rules$0.PlotDiagnosticsResult> {
+    return $Call.ByID(3113377637, contextID, plotNumber);
 }
 
 export function GetAllLists(): $CancellablePromise<{ [_ in string]?: $models.ListItem[] | null } | null> {

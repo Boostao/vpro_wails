@@ -62,6 +62,10 @@ export type AccessProjectImportRequest = interchange$0.AccessProjectImportReques
 
 export type AccessProjectImportResult = interchange$0.AccessProjectImportResult;
 
+export type AssignPlotsToSiteUnitRequest = classification$0.AssignPlotsToSiteUnitRequest;
+
+export type AssignPlotsToSiteUnitResult = classification$0.AssignPlotsToSiteUnitResult;
+
 export type AuditEntry = vprocore$0.AuditEntry;
 
 export enum AuditRestoreAction {
@@ -83,6 +87,10 @@ export type BECSiteSeries = references$0.BECSiteSeries;
 
 export type BECSubZone = references$0.BECSubZone;
 
+export type BECUnitPickerChoice = classification$0.BECUnitPickerChoice;
+
+export type BECUnitPickerRequest = classification$0.BECUnitPickerRequest;
+
 export type BECZone = references$0.BECZone;
 
 export type CollectedRecordUpdate = vprocore$0.CollectedRecordUpdate;
@@ -101,6 +109,28 @@ export enum CoordinateMode {
 };
 
 export type CoordinateParts = vprocore$0.CoordinateParts;
+
+export type CreateHierarchyTableRequest = classification$0.CreateHierarchyTableRequest;
+
+export type CreateSUFromEnvFieldsRequest = classification$0.CreateSUFromEnvFieldsRequest;
+
+export type CreateSUFromEnvFieldsResult = classification$0.CreateSUFromEnvFieldsResult;
+
+export type CreateSUTableRequest = classification$0.CreateSUTableRequest;
+
+export type DatasheetEditRequest = datasheet$0.DatasheetEditRequest;
+
+export type DatasheetEditResult = datasheet$0.DatasheetEditResult;
+
+export type DatasheetFindReplacePreview = datasheet$0.DatasheetFindReplacePreview;
+
+export type DatasheetFindReplaceRequest = datasheet$0.DatasheetFindReplaceRequest;
+
+export type DatasheetPage = datasheet$0.DatasheetPage;
+
+export type DatasheetPageRequest = datasheet$0.DatasheetPageRequest;
+
+export type DatasheetTableInfo = datasheet$0.DatasheetTableInfo;
 
 export type EnvironmentReport = reportcore$0.EnvironmentReport;
 
@@ -160,9 +190,27 @@ export type GoogleEarthReviewRow = spatial$0.GoogleEarthReviewRow;
 
 export type HeightRecordUpdate = vprocore$0.HeightRecordUpdate;
 
+export type HierarchyAddNodeRequest = classification$0.HierarchyAddNodeRequest;
+
+export type HierarchyBreakpointRequest = vegreport$0.HierarchyBreakpointRequest;
+
+export type HierarchyBreakpointResolution = vegreport$0.HierarchyBreakpointResolution;
+
+export type HierarchyDeleteNodeRequest = classification$0.HierarchyDeleteNodeRequest;
+
+export type HierarchyExplorerView = classification$0.HierarchyExplorerView;
+
 export type HierarchyInfo = vprocore$0.HierarchyInfo;
 
+export type HierarchyMutationResult = classification$0.HierarchyMutationResult;
+
 export type HierarchyNode = vprocore$0.HierarchyNode;
+
+export type HierarchyRenameNodeRequest = classification$0.HierarchyRenameNodeRequest;
+
+export type HierarchyReparentNodeRequest = classification$0.HierarchyReparentNodeRequest;
+
+export type HierarchyTableLifecycleResult = classification$0.HierarchyTableLifecycleResult;
 
 export type HumusRecord = vprocore$0.HumusRecord;
 
@@ -205,6 +253,10 @@ export type LongVegetationEnforcementPreferenceValues = vegreport$0.LongVegetati
 export type LongVegetationEnforcementPreferencesOutcome = vegreport$0.LongVegetationEnforcementPreferencesOutcome;
 
 export type LongVegetationEnforcementPreferencesReview = vegreport$0.LongVegetationEnforcementPreferencesReview;
+
+export type LongVegetationExclusionPreview = vegreport$0.LongVegetationExclusionPreview;
+
+export type LongVegetationExclusionRequest = vegreport$0.LongVegetationExclusionRequest;
 
 export type LongVegetationGroupAvailability = vegreport$0.LongVegetationGroupAvailability;
 
@@ -359,6 +411,8 @@ export type PictureMetadataWriteResult = pictures$0.PictureMetadataWriteResult;
 export type PictureRestorationResult = pictures$0.PictureRestorationResult;
 
 export type PictureRestorationReview = pictures$0.PictureRestorationReview;
+
+export type PlotInspectorSummary = classification$0.PlotInspectorSummary;
 
 export type PlotLabelPDFAttemptOutcome = interchange$0.PlotLabelPDFAttemptOutcome;
 
@@ -548,6 +602,14 @@ export type SIVIVegetationProjection = sourceform$0.SIVIVegetationProjection;
 
 export type SUInfo = vprocore$0.SUInfo;
 
+export type SUPlotTree = classification$0.SUPlotTree;
+
+export type SUTableLifecycleResult = classification$0.SUTableLifecycleResult;
+
+export type SaveFlatHierarchyRequest = classification$0.SaveFlatHierarchyRequest;
+
+export type SaveSUTableAsRequest = classification$0.SaveSUTableAsRequest;
+
 export type SavedPlotLabelHeader = interchange$0.SavedPlotLabelHeader;
 
 export type ScopedPlotLookup = vprocore$0.ScopedPlotLookup;
@@ -563,6 +625,10 @@ export type SiteUnitEnvironmentResult = classification$0.SiteUnitEnvironmentResu
 export type SiteUnitEnvironmentReview = classification$0.SiteUnitEnvironmentReview;
 
 export type SiteUnitEnvironmentTransfer = classification$0.SiteUnitEnvironmentTransfer;
+
+export type SiteUnitExclusionPreview = vegreport$0.SiteUnitExclusionPreview;
+
+export type SiteUnitExclusionPreviewRequest = vegreport$0.SiteUnitExclusionPreviewRequest;
 
 export type SiteUnitSpeciesListGroup = envreport$0.SiteUnitSpeciesListGroup;
 
@@ -659,6 +725,10 @@ export type SummaryVegetationEnvironmentalPreview = vegreport$0.SummaryVegetatio
 export type SummaryVegetationEnvironmentalRow = vegreport$0.SummaryVegetationEnvironmentalRow;
 
 export type SummaryVegetationEnvironmentalValue = vegreport$0.SummaryVegetationEnvironmentalValue;
+
+export type SummaryVegetationExclusionPreview = vegreport$0.SummaryVegetationExclusionPreview;
+
+export type SummaryVegetationExclusionRequest = vegreport$0.SummaryVegetationExclusionRequest;
 
 export type SummaryVegetationField = vegreport$0.SummaryVegetationField;
 

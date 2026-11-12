@@ -57,6 +57,48 @@ export interface AccessProjectImportResult {
     "state"?: vprocore$0.ProjectState | null;
 }
 
+export interface CSVExportOutcome {
+    "mode": string;
+    "rowCount": number;
+    "plotCount": number;
+    "speciesCount": number;
+    "columnCount": number;
+    "path"?: string;
+    "sha256": string;
+    "previewCsv": string;
+}
+
+export interface GeoPackageExportOutcome {
+    "path": string;
+    "sha256": string;
+    "crs": string;
+    "srsId": number;
+    "featureCount": number;
+    "locatedPlotCount": number;
+    "skippedUnlocatedCount": number;
+    "normalizedWestLongitudes": number;
+    "attributeTables": string[] | null;
+}
+
+export interface GeoPackageExportRequest {
+    "destinationPath": string;
+
+    /**
+     * "EPSG:3005" | "EPSG:4326"
+     */
+    "crs": string;
+    "includeAttributeTables": boolean;
+    "includeUnlocatedPlots": boolean;
+    "lumpTable"?: string;
+    "lumpDbPath"?: string;
+}
+
+export interface LongTidyCSVRequest {
+    "destinationPath"?: string;
+    "lumpTable"?: string;
+    "lumpDbPath"?: string;
+}
+
 export interface PlotLabelPDFAttemptOutcome {
     "contextId": string;
     "requestId": string;
@@ -105,6 +147,26 @@ export interface ProjectTableCSVReview {
     "csv": string;
 }
 
+export interface RDSExportOutcome {
+    "path": string;
+    "sha256": string;
+    "byteSize": number;
+    "plotCount": number;
+    "tables": RDSTableSummary[] | null;
+}
+
+export interface RDSExportRequest {
+    "destinationPath": string;
+    "lumpTable"?: string;
+    "lumpDbPath"?: string;
+}
+
+export interface RDSTableSummary {
+    "name": string;
+    "rowCount": number;
+    "columnCount": number;
+}
+
 export interface SavedPlotLabelHeader {
     "plotNumber": string;
     "zone": string | null;
@@ -144,4 +206,190 @@ export interface TableCSVManifest {
     "storage": (string[] | null)[] | null;
     "descriptions": TableCSVDescription[] | null;
     "sha256": string;
+}
+
+export interface TurboVegExportOutcome {
+    "format": string;
+    "path": string;
+    "sha256": string;
+    "plotCount": number;
+    "speciesCount": number;
+    "observationCount": number;
+}
+
+export interface TurboVegExportRequest {
+    /**
+     * "xml" | "sqlite"
+     */
+    "format": string;
+    "destinationPath": string;
+    "lumpTable"?: string;
+    "lumpDbPath"?: string;
+}
+
+export interface TurboVegImportOutcome {
+    "sourcePath": string;
+    "format": string;
+    "targetProject": string;
+    "destinationPath": string;
+    "destinationSha256": string;
+    "plotCount": number;
+    "speciesCount": number;
+    "observationCount": number;
+    "activated": boolean;
+    "state"?: vprocore$0.ProjectState | null;
+}
+
+export interface TurboVegImportRequest {
+    "sourcePath": string;
+
+    /**
+     * "xml" | "sqlite" (inferred from extension if omitted)
+     */
+    "format"?: string;
+    "targetProject": string;
+    "destinationPath"?: string;
+    "activateOnSuccess": boolean;
+}
+
+export enum UserSpeciesCollisionPolicy {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    CollisionSkip = "skip",
+    CollisionOverwrite = "overwrite",
+};
+
+export interface UserSpeciesExportRequest {
+    /**
+     * "json" | "csv"
+     */
+    "format": string;
+    "destinationPath"?: string;
+}
+
+export interface UserSpeciesExportResult {
+    "format": string;
+    "rowCount": number;
+    "path"?: string;
+    "fileSha256": string;
+    "payloadSha256": string;
+    "content": string;
+    "species": UserSpeciesRecord[] | null;
+}
+
+export interface UserSpeciesImportItemReview {
+    "code": string;
+    "scientificName": string;
+    "lifeForm"?: number | null;
+
+    /**
+     * "new" | "collision_user" | "collision_master"
+     */
+    "status": string;
+
+    /**
+     * "insert" | "overwrite" | "skip"
+     */
+    "action": string;
+    "reason"?: string;
+}
+
+export interface UserSpeciesImportPreview {
+    "totalRows": number;
+    "newCount": number;
+    "userCollisions": number;
+    "masterCollisions": number;
+    "payloadSha256": string;
+    "items": UserSpeciesImportItemReview[] | null;
+}
+
+export interface UserSpeciesImportRequest {
+    "sourcePath"?: string;
+
+    /**
+     * "json" | "csv"
+     */
+    "format"?: string;
+    "content"?: string;
+    "collisionPolicy": UserSpeciesCollisionPolicy;
+}
+
+export interface UserSpeciesImportResult {
+    "preview": UserSpeciesImportPreview;
+    "insertedCount": number;
+    "overwrittenCount": number;
+    "skippedCount": number;
+}
+
+export interface UserSpeciesRecord {
+    "code": string;
+    "scientificName": string | null;
+    "lifeForm": number | null;
+    "englishName": string | null;
+    "report"?: number | null;
+    "sppNumber"?: number | null;
+    "codetype"?: string | null;
+}
+
+export interface VenusImportRequest {
+    "sourcePath": string;
+    "sourceProject"?: string;
+    "targetProject": string;
+    "destinationPath"?: string;
+    "activateOnSuccess": boolean;
+}
+
+export interface VenusImportResult {
+    "sourcePath": string;
+    "sourceFormat": string;
+    "venusVersion": string;
+    "sourceProject": string;
+    "targetProject": string;
+    "destinationPath": string;
+    "destinationSha256": string;
+    "plotCount": number;
+    "vegRowCount": number;
+    "humusRowCount": number;
+    "mineralRowCount": number;
+    "activated": boolean;
+    "state"?: vprocore$0.ProjectState | null;
+}
+
+export interface VenusProjectCandidate {
+    "projectId": string;
+    "projectName": string;
+    "suggestedTarget": string;
+    "suggestedDestPath": string;
+    "plotCount": number;
+    "vegObsCount": number;
+    "humusRowCount": number;
+    "mineralRowCount": number;
+}
+
+export interface VenusSourceInspection {
+    "sourcePath": string;
+
+    /**
+     * "mdb" | "xml"
+     */
+    "sourceFormat": string;
+    "venusVersion": string;
+    "sourceSha256": string;
+    "projects": VenusProjectCandidate[] | null;
+}
+
+export interface WideMatrixCSVRequest {
+    "destinationPath"?: string;
+
+    /**
+     * "rollup_all" | "strata_4" | "species_layer"
+     */
+    "layerMode": string;
+    "zeroFill": boolean;
+    "includeSiteUnit": boolean;
+    "lumpTable"?: string;
+    "lumpDbPath"?: string;
 }

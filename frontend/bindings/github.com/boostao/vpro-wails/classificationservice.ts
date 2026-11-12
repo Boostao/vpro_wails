@@ -9,6 +9,18 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function AddHierarchyNode(contextID: string, request: $models.HierarchyAddNodeRequest): $CancellablePromise<$models.HierarchyMutationResult | null> {
+    return $Call.ByID(3610207003, contextID, request);
+}
+
+export function AssignPlotsToSiteUnit(contextID: string, request: $models.AssignPlotsToSiteUnitRequest): $CancellablePromise<$models.AssignPlotsToSiteUnitResult | null> {
+    return $Call.ByID(700659912, contextID, request);
+}
+
+export function CreateHierarchyTable(contextID: string, request: $models.CreateHierarchyTableRequest): $CancellablePromise<$models.HierarchyTableLifecycleResult | null> {
+    return $Call.ByID(280424840, contextID, request);
+}
+
 export function CreatePlotProfileFile(contextID: string, request: $models.PlotProfileFileCreation): $CancellablePromise<$models.PlotProfileFileCreated> {
     return $Call.ByID(830654197, contextID, request);
 }
@@ -19,6 +31,18 @@ export function CreatePlotProfileTable(contextID: string, request: $models.PlotP
 
 export function CreateProjectPlotProfileRule(contextID: string, request: $models.ProjectPlotProfileCreation): $CancellablePromise<$models.ProjectMetadataRow> {
     return $Call.ByID(736278176, contextID, request);
+}
+
+export function CreateSUFromEnvFields(contextID: string, request: $models.CreateSUFromEnvFieldsRequest): $CancellablePromise<$models.CreateSUFromEnvFieldsResult | null> {
+    return $Call.ByID(1106905405, contextID, request);
+}
+
+export function CreateSUTable(contextID: string, request: $models.CreateSUTableRequest): $CancellablePromise<$models.SUTableLifecycleResult | null> {
+    return $Call.ByID(759794755, contextID, request);
+}
+
+export function DeleteHierarchyNode(contextID: string, request: $models.HierarchyDeleteNodeRequest): $CancellablePromise<$models.HierarchyMutationResult | null> {
+    return $Call.ByID(2759705473, contextID, request);
 }
 
 export function DeleteProjectPlotProfileRule(contextID: string, request: $models.ProjectPlotProfileDeletion): $CancellablePromise<void> {
@@ -33,12 +57,24 @@ export function GetExternalSUEnvironmentReview(contextID: string): $CancellableP
     return $Call.ByID(1559769905, contextID);
 }
 
+export function GetHierarchyExplorer(contextID: string): $CancellablePromise<$models.HierarchyExplorerView | null> {
+    return $Call.ByID(4288111937, contextID);
+}
+
 export function GetHierarchyNodes(): $CancellablePromise<$models.HierarchyNode[] | null> {
     return $Call.ByID(3221034195);
 }
 
 export function GetMasterWorkingUnitChoices(): $CancellablePromise<$models.WorkingUnitChoice[] | null> {
     return $Call.ByID(257189526);
+}
+
+export function GetPlotInspectorSummary(contextID: string, plotNumber: string): $CancellablePromise<$models.PlotInspectorSummary | null> {
+    return $Call.ByID(1060855387, contextID, plotNumber);
+}
+
+export function GetSUPlotTree(contextID: string, filterText: string): $CancellablePromise<$models.SUPlotTree | null> {
+    return $Call.ByID(3811316072, contextID, filterText);
 }
 
 export function GetTwoPageProfilingReview(contextID: string, plot: string, offset: number, limit: number): $CancellablePromise<$models.TwoPageProfilingReview | null> {
@@ -81,6 +117,14 @@ export function RecoverExternalSUEnvironmentOutcome(contextID: string, requestJS
     return $Call.ByID(1048789767, contextID, requestJSON);
 }
 
+export function RenameHierarchyNode(contextID: string, request: $models.HierarchyRenameNodeRequest): $CancellablePromise<$models.HierarchyMutationResult | null> {
+    return $Call.ByID(2839106766, contextID, request);
+}
+
+export function ReparentHierarchyNode(contextID: string, request: $models.HierarchyReparentNodeRequest): $CancellablePromise<$models.HierarchyMutationResult | null> {
+    return $Call.ByID(1421228015, contextID, request);
+}
+
 export function ResolveProjectPlotProfileNavigation(contextID: string, request: $models.ProjectPlotProfileFilterRequest): $CancellablePromise<$models.ProjectPlotProfileNavigation> {
     return $Call.ByID(2309313070, contextID, request);
 }
@@ -121,6 +165,10 @@ export function RunProjectPlotProfile(contextID: string, request: $models.Projec
     return $Call.ByID(967550309, contextID, request);
 }
 
+export function SaveFlatHierarchyRows(contextID: string, request: $models.SaveFlatHierarchyRequest): $CancellablePromise<$models.HierarchyMutationResult | null> {
+    return $Call.ByID(872848259, contextID, request);
+}
+
 export function SaveProjectPlotProfile(contextID: string, request: $models.ProjectPlotProfileEdit): $CancellablePromise<void> {
     return $Call.ByID(3380239779, contextID, request);
 }
@@ -131,6 +179,14 @@ export function SaveProjectPlotProfileSU(contextID: string, request: $models.Pro
 
 export function SaveProjectPlotProfileSUInProject(contextID: string, request: $models.ProfileSUProjectCreation): $CancellablePromise<$models.ProfileSUCreated> {
     return $Call.ByID(3636362537, contextID, request);
+}
+
+export function SaveSUTableAs(contextID: string, request: $models.SaveSUTableAsRequest): $CancellablePromise<$models.SUTableLifecycleResult | null> {
+    return $Call.ByID(4186824244, contextID, request);
+}
+
+export function SearchBECUnitPicker(contextID: string, request: $models.BECUnitPickerRequest): $CancellablePromise<$models.BECUnitPickerChoice[] | null> {
+    return $Call.ByID(2496868857, contextID, request);
 }
 
 export function SelectPlotProfile(expectedID: string, requested: $models.PlotProfileSource): $CancellablePromise<$models.ProjectState> {
@@ -145,6 +201,10 @@ export function SetWorkingUnitMode(mode: string): $CancellablePromise<$models.Wo
     return $Call.ByID(849633067, mode);
 }
 
+export function ToggleHierarchyBreakpoint(contextID: string, nodeID: number): $CancellablePromise<$models.HierarchyMutationResult | null> {
+    return $Call.ByID(2427089291, contextID, nodeID);
+}
+
 export function TransferEnvironmentSiteUnits(contextID: string, request: $models.EnvironmentSiteUnitTransfer): $CancellablePromise<$models.EnvironmentSiteUnitResult | null> {
     return $Call.ByID(2352735643, contextID, request);
 }
@@ -155,4 +215,8 @@ export function TransferExternalSUEnvironmentReviewed(contextID: string, request
 
 export function TransferSiteUnitEnvironment(contextID: string, request: $models.SiteUnitEnvironmentTransfer): $CancellablePromise<$models.SiteUnitEnvironmentResult | null> {
     return $Call.ByID(2141122932, contextID, request);
+}
+
+export function UndoSUAssignment(contextID: string, historyID: number): $CancellablePromise<$models.AssignPlotsToSiteUnitResult | null> {
+    return $Call.ByID(3322399182, contextID, historyID);
 }

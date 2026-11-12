@@ -1,13 +1,14 @@
 <script lang="ts">
   import { ChartColumn, ChevronDown, ClipboardList, FileText, Globe, HelpCircle, History, House, Leaf, Link, List, Network, Newspaper, Palette, Table, TableProperties, Tag, Tent, UserCog } from '@lucide/svelte';
 
-  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
-  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'metadata' };
+  type View = 'home' | 'plots' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
+  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'new-sivi' | 'metadata' };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
-  let { view, onnavigate, siviAvailable = false, onopensivi,
+  let { view, onnavigate, siviAvailable = false, onopensivi, newSiviAvailable = false, onopennewsivi,
     metadataAvailable = false, onopenmetadata }: {
     view: View; onnavigate: (view: View) => void;
     siviAvailable?: boolean; onopensivi?: () => void;
+    newSiviAvailable?: boolean; onopennewsivi?: () => void;
     metadataAvailable?: boolean; onopenmetadata?: () => void;
   } = $props();
   let navigation: HTMLElement;
@@ -17,11 +18,17 @@
     { label: 'Forms', icon: ClipboardList, groups: [
       { label: 'Data Entry', items: [
         { name: 'FS882 Data Forms (6x4)', icon: ClipboardList, view: 'fs882' },
-        { name: 'Enter/Edit SIVI Data', icon: Tent, action: 'sivi' }
+        { name: 'Enter/Edit SIVI Data', icon: Tent, action: 'sivi' },
+        { name: 'New SIVI / FS1333 Plot', icon: Tent, action: 'new-sivi' },
+        { name: 'Universal Datasheet Grid', icon: TableProperties, view: 'datasheet' }
+      ] },
+      { label: 'Project & Classification', items: [
+        { name: 'Project Admin, QA & Merge', icon: ClipboardList, view: 'project-admin' },
+        { name: 'SU & Hierarchy Explorer', icon: Network, view: 'classification-explorer' }
       ] },
       { label: 'Others', items: [
         { name: 'Metadata', icon: Table, action: 'metadata' },
-        { name: 'Combine Species', icon: Link },
+        { name: 'Combine Species', icon: Link, view: 'lump-editor' },
         { name: 'Herbarium', icon: Leaf },
         { name: 'Plot Pictures', icon: FileText, view: import.meta.env.VITE_PICTURE_MANAGER !== 'false' ? 'picture-manager' : undefined },
         { name: 'Colour-theme', icon: Palette },
@@ -53,7 +60,8 @@
       ] }
     ] },
     { label: 'Interchange', icon: Table, groups: [
-      { label: 'Table export', items: [
+      { label: 'Import & Export', items: [
+        { name: 'Interchange Hub (VENUS 5, TurboVeg, RDS, GeoPackage)', icon: Globe, view: 'interchange-hub' },
         { name: 'Project table CSV review', icon: Table, view: import.meta.env.VITE_TABLE_CSV_REVIEW !== 'false' ? 'table-csv' : undefined }
       ] }
     ] },
@@ -92,6 +100,7 @@
 
   function itemEnabled(item: Item) {
     if (item.action === 'sivi') return siviAvailable && !!onopensivi;
+    if (item.action === 'new-sivi') return newSiviAvailable && !!onopennewsivi;
     if (item.action === 'metadata') return metadataAvailable && !!onopenmetadata;
     return !!item.view;
   }
@@ -101,6 +110,9 @@
     if (item.action === 'sivi' && onopensivi) {
       closeMenu(true);
       onopensivi();
+    } else if (item.action === 'new-sivi' && onopennewsivi) {
+      closeMenu(true);
+      onopennewsivi();
     } else if (item.action === 'metadata' && onopenmetadata) {
       closeMenu(true);
       onopenmetadata();
