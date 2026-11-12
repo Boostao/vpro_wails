@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	classificationpkg "github.com/boostao/vpro-wails/internal/classification"
+	diagnosticspkg "github.com/boostao/vpro-wails/internal/diagnostics"
 )
 
 type CreateSUTableRequest = classificationpkg.CreateSUTableRequest
@@ -34,6 +35,15 @@ type HierarchyReparentNodeRequest = classificationpkg.HierarchyReparentNodeReque
 type HierarchyDeleteNodeRequest = classificationpkg.HierarchyDeleteNodeRequest
 type HierarchyMutationResult = classificationpkg.HierarchyMutationResult
 type SaveFlatHierarchyRequest = classificationpkg.SaveFlatHierarchyRequest
+
+type SynthesisLumpTableOption = diagnosticspkg.SynthesisLumpTableOption
+type SynthesisOptions = diagnosticspkg.SynthesisOptions
+type SynthesisSnapshot = diagnosticspkg.SynthesisSnapshot
+type ReassignSynthesisPlotRequest = diagnosticspkg.ReassignSynthesisPlotRequest
+type UndoSynthesisReassignmentRequest = diagnosticspkg.UndoSynthesisReassignmentRequest
+type ReassignSynthesisPlotResult = diagnosticspkg.ReassignSynthesisPlotResult
+type ExportDiagnosticWorkbookRequest = diagnosticspkg.ExportDiagnosticWorkbookRequest
+type ExportDiagnosticWorkbookResult = diagnosticspkg.ExportDiagnosticWorkbookResult
 
 type ClassificationService struct {
 	contexts              *ContextService
@@ -432,3 +442,39 @@ func (s *ClassificationService) SaveFlatHierarchyRows(ctx context.Context, conte
 	}
 	return classificationpkg.SaveFlatHierarchyRows(ctx, unwrapContextService(s.contexts), contextID, request)
 }
+
+func (s *ClassificationService) ListSynthesisLumpTables(ctx context.Context, contextID string) ([]SynthesisLumpTableOption, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return diagnosticspkg.ListSynthesisLumpTables(ctx, unwrapContextService(s.contexts), contextID)
+}
+
+func (s *ClassificationService) ComputeSynthesisSnapshot(ctx context.Context, contextID string, opts SynthesisOptions) (*SynthesisSnapshot, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return diagnosticspkg.ComputeSynthesisSnapshot(ctx, unwrapContextService(s.contexts), contextID, opts)
+}
+
+func (s *ClassificationService) ReassignSynthesisPlotUnit(ctx context.Context, contextID string, request ReassignSynthesisPlotRequest) (*ReassignSynthesisPlotResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return diagnosticspkg.ReassignSynthesisPlotUnit(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) UndoSynthesisReassignment(ctx context.Context, contextID string, request UndoSynthesisReassignmentRequest) (*ReassignSynthesisPlotResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return diagnosticspkg.UndoSynthesisReassignment(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
+func (s *ClassificationService) ExportDiagnosticWorkbook(ctx context.Context, contextID string, request ExportDiagnosticWorkbookRequest) (*ExportDiagnosticWorkbookResult, error) {
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("classification context is unavailable")
+	}
+	return diagnosticspkg.ExportDiagnosticWorkbook(ctx, unwrapContextService(s.contexts), contextID, request)
+}
+
