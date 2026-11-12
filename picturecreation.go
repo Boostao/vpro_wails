@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"path/filepath"
 	"reflect"
 	"runtime"
 	"sort"
@@ -150,9 +149,45 @@ func preparePictureCreation(request pictureCreationRequest) (string, string, err
 
 func splitPictureCreationPath(path string) (string, string, error) {
 	refuse := func() (string, string, error) {
-		return "", "", errors.New("picture creation requires an unambiguous literal fully qualified Windows file path")
+		return "", "", errors.New("picture creation requires an unambiguous literal fully qualified file path")
 	}
-	if runtime.GOOS != "windows" || !utf8.ValidString(path) || strings.ContainsAny(path, "\x00/") {
+	if !utf8.ValidString(path) || strings.ContainsRune(path, 0) {
+		return refuse()
+	}
+	// Support POSIX literal absolute paths on non-Windows runtimes while keeping
+	// literal Win32 drive/UNC path parsing deterministic across all platforms.
+	if runtime.GOOS != "windows" && strings.HasPrefix(path, "/") && !strings.ContainsRune(path, '\\') {
+		if path == "/" {
+			return refuse()
+		}
+		components := strings.Split(path[1:], "/")
+		for _, component := range components {
+			if component == "" || component == "." || component == ".." {
+				return refuse()
+			}
+			for _, r := range component {
+				if r < 32 {
+					return refuse()
+				}
+			}
+		}
+		sep := strings.LastIndexByte(path, '/')
+		if sep < 0 {
+			return refuse()
+		}
+		dir, name := path[:sep+1], path[sep+1:]
+		if name == "" || !strings.HasSuffix(dir, "/") || dir+name != path {
+			return refuse()
+		}
+		if err := validateChildPhysicalText("Picture.PicDir", dir, 255); err != nil {
+			return "", "", err
+		}
+		if err := validateChildPhysicalText("Picture.PicName", name, 255); err != nil {
+			return "", "", err
+		}
+		return dir, name, nil
+	}
+	if strings.ContainsRune(path, '/') {
 		return refuse()
 	}
 	var components []string
@@ -191,11 +226,11 @@ func splitPictureCreationPath(path string) (string, string, error) {
 			}
 		}
 	}
-	if !filepath.IsAbs(path) {
+	sep := strings.LastIndexByte(path, '\\')
+	if sep < 0 {
 		return refuse()
 	}
-	// Split, unlike Clean/Dir, retains the selected literal prefix and separator.
-	dir, name := filepath.Split(path)
+	dir, name := path[:sep+1], path[sep+1:]
 	if name == "" || !strings.HasSuffix(dir, `\`) || dir+name != path {
 		return refuse()
 	}

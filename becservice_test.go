@@ -13,16 +13,7 @@ import (
 
 func becTestDir(t *testing.T) string {
 	t.Helper()
-	root, err := os.MkdirTemp(".", ".bec-test-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() {
-		if err := os.RemoveAll(root); err != nil {
-			t.Error(err)
-		}
-	})
-	return root
+	return t.TempDir()
 }
 
 func becFixture(t *testing.T) *BECService {

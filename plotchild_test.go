@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"math"
-	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -12,11 +11,7 @@ import (
 
 func childFixture(t *testing.T) (*PlotService, *sql.DB) {
 	t.Helper()
-	root, err := os.MkdirTemp(".", ".child-test-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { os.RemoveAll(root) })
+	root := t.TempDir()
 	projects, err := NewProjectServiceWithConfig(root, root)
 	if err != nil {
 		t.Fatal(err)

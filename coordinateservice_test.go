@@ -11,12 +11,7 @@ import (
 
 func coordinateConfigFixture(t *testing.T) string {
 	t.Helper()
-	root, err := os.MkdirTemp(".", ".coordinate-test-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { os.RemoveAll(root) })
-	return root
+	return t.TempDir()
 }
 
 func TestCoordinateService_DefaultPersistReopenAndSeparateSettings(t *testing.T) {

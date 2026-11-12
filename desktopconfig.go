@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"sync"
 	"unicode/utf8"
 
@@ -391,7 +392,7 @@ func decodeLegacySelection(data []byte, dataDir string) (map[string]any, error) 
 		changes[yamlKey] = value
 	}
 	file := fields["hierarchyFile"]
-	if file != "" && (filepath.Base(file) != file || filepath.Ext(file) != ".db") {
+	if file != "" && (filepath.Base(file) != file || strings.ContainsAny(file, `/\`) || file == "." || file == ".." || filepath.Ext(file) != ".db") {
 		return nil, errors.New("legacy hierarchyFile must be a local database filename")
 	}
 	path := ""

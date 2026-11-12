@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strings"
@@ -51,7 +52,7 @@ func metadataTemplateFixture(t *testing.T) (*ContextService, ProjectState, Proje
 }
 
 func TestProjectMetadataTemplateMappingMatchesSourceInsertAndSelect(t *testing.T) {
-	source, err := os.ReadFile(`testdata\projectmetadata\template-copy.vba`)
+	source, err := os.ReadFile(filepath.Join("testdata", "projectmetadata", "template-copy.vba"))
 	if err != nil {
 		t.Fatal(err)
 	}
