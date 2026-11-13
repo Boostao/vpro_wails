@@ -5,9 +5,11 @@
     NavigationControl,
     ScaleControl,
     addProtocol,
+    setWorkerUrl,
     type GeoJSONSource,
     type IControl,
   } from 'maplibre-gl';
+  import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
   import 'maplibre-gl/dist/maplibre-gl.css';
   import { Protocol } from 'pmtiles';
   import { MapboxOverlay } from '@deck.gl/mapbox';
@@ -349,6 +351,7 @@
     if (!mapContainer || mapInstance) return;
     ensurePMTilesProtocol();
     try {
+      setWorkerUrl(maplibreWorkerUrl);
       const style = buildMapLibreGeospatialStyle(payload?.manifest, $state.snapshot(visibility));
       const map = new MapLibreMap({
         container: mapContainer,

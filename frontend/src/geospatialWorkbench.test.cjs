@@ -237,8 +237,16 @@ test('GeospatialWorkbench, Navigation, App, and CoordinateFields compile cleanly
 
   // SSR render smoke check of GeospatialWorkbench.svelte
   const SSRWorkbench = serverComponent(wbSource, 'GeospatialWorkbench.svelte', {
-    'maplibre-gl': { Map: class {}, NavigationControl: class {}, ScaleControl: class {}, addProtocol() {} },
+    'maplibre-gl': {
+      default: { setWorkerUrl() {} },
+      Map: class {},
+      NavigationControl: class {},
+      ScaleControl: class {},
+      addProtocol() {},
+      setWorkerUrl() {},
+    },
     'maplibre-gl/dist/maplibre-gl.css': {},
+    'maplibre-gl/dist/maplibre-gl-worker.mjs?url': { default: '/assets/maplibre-gl-worker-test.mjs' },
     pmtiles: { Protocol: class { tile = () => {}; } },
     '@deck.gl/mapbox': { MapboxOverlay: class {} },
     '@deck.gl/layers': { LineLayer: class {}, ScatterplotLayer: class {} },
@@ -252,4 +260,103 @@ test('GeospatialWorkbench, Navigation, App, and CoordinateFields compile cleanly
   assert.match(html, /Plot Inspector/);
   assert.match(html, /Lasso \/ AOI/);
   assert.match(html, /Auto-1 QA Stamp/);
+});
+
+test('GeospatialWorkbench imports bundled maplibre-gl-worker.mjs?url and configures worker URL before instantiating Map', async () => {
+  const vm = require('node:vm');
+  const ts = require('typescript');
+  const client = await import('svelte/internal/client');
+  const wbSource = readFileSync(path.join(__dirname, 'GeospatialWorkbench.svelte'), 'utf8');
+
+  assert.match(
+    wbSource,
+    /import maplibreWorkerUrl from ['"]maplibre-gl\/dist\/maplibre-gl-worker\.mjs\?url['"];/
+  );
+  assert.match(wbSource, /setWorkerUrl\(maplibreWorkerUrl\)/);
+
+  let script = wbSource.match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  script = script.replace('onOpenPlot?: (plotNumber: string) => void;', 'onOpenPlot?: (plotNumber: string) => void; inspect?: (v: any) => void;');
+  script = script.replace('onOpenPlot,', 'onOpenPlot, inspect,');
+  script += `\n$effect(() => inspect?.({
+    mountCanvas(el) { mapContainer = el; initializeMapCanvas(); },
+  }));`;
+
+  const compiled = compile(`<script lang="ts">${script}</script>`, {
+    filename: 'GeospatialWorkbench.svelte',
+    generate: 'client',
+  });
+  assert.equal(compiled.warnings.length, 0);
+
+  const callOrder = [];
+  const modObj = { exports: {} };
+  const transpiled = ts.transpileModule(compiled.js.code, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
+  }).outputText;
+
+  const maplibreMock = {
+    setWorkerUrl(url) {
+      callOrder.push(`setWorkerUrl:${url}`);
+    },
+    addProtocol() {
+      callOrder.push('addProtocol');
+    },
+    Map: class {
+      constructor() {
+        callOrder.push('new Map');
+      }
+      addControl() {}
+      on() {}
+      remove() {}
+    },
+    NavigationControl: class {},
+    ScaleControl: class {},
+  };
+  maplibreMock.default = maplibreMock;
+
+  vm.runInNewContext(transpiled, {
+    module: modObj,
+    exports: modObj.exports,
+    structuredClone,
+    require(name) {
+      if (name === 'svelte') {
+        return {
+          onMount: () => {},
+          onDestroy: () => {},
+        };
+      }
+      if (name === 'svelte/internal/client') return client;
+      if (name.startsWith('svelte/')) return require(name);
+      if (name === 'maplibre-gl') return maplibreMock;
+      if (name === 'maplibre-gl/dist/maplibre-gl.css') return {};
+      if (name === 'maplibre-gl/dist/maplibre-gl-worker.mjs?url') {
+        return { __esModule: true, default: '/assets/maplibre-gl-worker-bundled.mjs' };
+      }
+      if (name === 'pmtiles') return { Protocol: class { tile = () => {}; } };
+      if (name === '@deck.gl/mapbox') return { MapboxOverlay: class { setProps() {} } };
+      if (name === '@deck.gl/layers') return { LineLayer: class {}, ScatterplotLayer: class {} };
+      if (name === '../bindings/github.com/boostao/vpro-wails') return { SpatialService: {} };
+      if (name === './geospatialWorkbench') return wb;
+      throw new Error(`Unexpected module ${name}`);
+    },
+  });
+
+  let api;
+  const dispose = client.effect_root(() => {
+    modObj.exports.default(null, {
+      contextId: 'ctx-worker',
+      project: 'Sample',
+      su: 'None',
+      inspect: v => { api = v; },
+    });
+  });
+  try {
+    client.flush();
+    api.mountCanvas({});
+    const workerIdx = callOrder.indexOf('setWorkerUrl:/assets/maplibre-gl-worker-bundled.mjs');
+    const mapIdx = callOrder.indexOf('new Map');
+    assert.ok(workerIdx >= 0, 'setWorkerUrl must be called with bundled worker URL');
+    assert.ok(mapIdx > workerIdx, 'setWorkerUrl must execute before new Map(...)');
+  } finally {
+    dispose();
+  }
 });
