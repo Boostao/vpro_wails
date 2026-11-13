@@ -1,7 +1,6 @@
 package envreport
 
 import (
-	"github.com/boostao/vpro-wails/internal/spatial"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
 )
@@ -251,8 +250,10 @@ func TestReportStringPreferencesRejectsAmbiguousKeysAndReadsAllTypesBeforeCAS(t 
 	if err := store.Commit(raw); err != nil {
 		t.Fatal(err)
 	}
-	result, err := spatial.CompareAndSetGoogleEarthPreferences(store, context.Background(),
-		spatial.GoogleEarthPreferences{PlaceName: "stale", DescriptionField: "expected"}, spatial.GoogleEarthPreferences{PlaceName: "new", DescriptionField: "Zone"})
+	result, err := store.CompareAndSetReportStrings(context.Background(), "Google Earth preferences", []vprocore.ReportStringPreferenceChange{
+		{Key: "GoogleEarthPlaceName", Expected: "stale", Proposed: "new"},
+		{Key: "GoogleEarthDescField", Expected: "expected", Proposed: "Zone"},
+	})
 	if err == nil || !strings.Contains(err.Error(), "GoogleEarthDescField") || result.Committed {
 		t.Fatal("shared extraction changed strict decode/CAS error precedence", result, err)
 	}

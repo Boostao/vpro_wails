@@ -1,7 +1,6 @@
 package envreport
 
 import (
-	"github.com/boostao/vpro-wails/internal/lifecycle"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
 )
@@ -69,7 +68,7 @@ func TestBreakReportServiceNilCancelledAndUnrelatedGate(t *testing.T) {
 		t.Fatal("nil service succeeded", result, err)
 	}
 	service, err := NewBreakReportService(contexts, func(name string) (string, bool) {
-		if name == lifecycle.UserLogReviewEnvironment || name == SubzoneMatrixFeatureEnvironment {
+		if name == "VPRO_USER_LOG_REVIEW" || name == SubzoneMatrixFeatureEnvironment {
 			return "true", true
 		}
 		return "", false
