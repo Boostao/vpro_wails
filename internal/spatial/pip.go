@@ -25,9 +25,12 @@ import (
 	"github.com/boostao/vpro-wails/resources"
 )
 
-const CurrentBECGISVersion = 13
+const (
+	SpatialAssetsEnvVar  = "VPRO_SPATIAL_ASSETS_DIR"
+	CurrentBECGISVersion = 13
+)
 
-// DefaultSpatialAssetsDir resolves ~/Work/spatial_assets or sibling spatial_assets dynamically across Linux, Windows, and macOS.
+// DefaultSpatialAssetsDir resolves VPRO_SPATIAL_ASSETS_DIR or sibling spatial_assets dynamically across Linux, Windows, and macOS.
 var DefaultSpatialAssetsDir = ResolveDefaultSpatialAssetsDir()
 
 func resolveDefaultSpatialAssetsDir() string {
@@ -36,7 +39,7 @@ func resolveDefaultSpatialAssetsDir() string {
 
 func resolveSpatialAssetsDir(getenv func(string) string, repoRoot string) string {
 	if getenv != nil {
-		if envDir := strings.TrimSpace(getenv("VPRO_SPATIAL_ASSETS_DIR")); envDir != "" {
+		if envDir := strings.TrimSpace(getenv(SpatialAssetsEnvVar)); envDir != "" {
 			cleaned := filepath.Clean(envDir)
 			if info, err := os.Stat(cleaned); err == nil && info.IsDir() {
 				return cleaned
@@ -70,14 +73,6 @@ func ResolveDefaultSpatialAssetsDir() string {
 		}
 	}
 	return ""
-}
-
-// ResolveSpatialExtraDirs returns the default cross-platform extra spatial asset search directories.
-func ResolveSpatialExtraDirs() []string {
-	if d := ResolveDefaultSpatialAssetsDir(); d != "" {
-		return []string{d}
-	}
-	return nil
 }
 
 type pmtilesHeaderV3 struct {
@@ -1263,7 +1258,8 @@ var (
 
 func getDefaultPMTilesAttributor() *PMTilesAttributor {
 	defaultAttributorOnce.Do(func() {
-		defaultAttributorInst = NewPMTilesAttributor("", DefaultSpatialAssetsDir)
+		dataDir, _ := sqlutil.UserDataDir()
+		defaultAttributorInst = NewPMTilesAttributor(dataDir, ResolveSpatialExtraDirs()...)
 	})
 	return defaultAttributorInst
 }

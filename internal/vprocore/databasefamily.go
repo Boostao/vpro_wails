@@ -38,10 +38,53 @@ var DatabaseFamilySeeds = []databaseFamilySeed{
 }
 
 const legacyVListsSeedSHA256 = "dd80135e45878d92dee626701ba29bd4cc1d69549d6784c2a91dc276f6a79a51"
+const VPicsSeedSHA256 = "671ef38d6341a7a917107c457079dff336b24886369b4a3af339b45559c8312a"
+
+// InstallVPicsDatabase installs the canonical VPics.db (tblVPics 5-column schema)
+// inside <root>/database-family/VPics.db without adding VPics to the read-only
+// attached DatabaseFamilySeeds map (preserving len(support) == len(DatabaseFamilySeeds)
+// and allowing owned picture mutations against VPics.db).
+func InstallVPicsDatabase(root string) (string, error) {
+	directory := filepath.Join(root, "database-family")
+	if err := os.MkdirAll(directory, 0700); err != nil {
+		return "", err
+	}
+	destination := filepath.Join(directory, "VPics.db")
+	if _, err := os.Stat(destination); errors.Is(err, os.ErrNotExist) {
+		data, err := DatabaseFamilyFiles.ReadFile("resources/database-family/VPics.db")
+		if err != nil {
+			return "", err
+		}
+		if fmt.Sprintf("%x", sha256.Sum256(data)) != VPicsSeedSHA256 {
+			return "", errors.New("bundled VPics seed hash does not match its provenance seal")
+		}
+		if err := installDatabaseSeed(destination, data); err != nil {
+			return "", fmt.Errorf("install VPics: %w", err)
+		}
+	} else if err != nil {
+		return "", err
+	}
+	return destination, nil
+}
+
+// EnsurePictureDirectory provisions the default <root>/pictures folder.
+func EnsurePictureDirectory(root string) (string, error) {
+	directory := filepath.Join(root, "pictures")
+	if err := os.MkdirAll(directory, 0700); err != nil {
+		return "", err
+	}
+	return directory, nil
+}
 
 func InstallDatabaseFamily(root string) (map[string]string, error) {
 	directory := filepath.Join(root, "database-family")
 	if err := os.MkdirAll(directory, 0700); err != nil {
+		return nil, err
+	}
+	if _, err := InstallVPicsDatabase(root); err != nil {
+		return nil, err
+	}
+	if _, err := EnsurePictureDirectory(root); err != nil {
 		return nil, err
 	}
 	paths := make(map[string]string, len(DatabaseFamilySeeds))

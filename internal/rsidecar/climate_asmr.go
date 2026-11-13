@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -1011,10 +1010,6 @@ func ComputePlotClimateAndDualEdatopic(
 			if err := CheckpointProjectWAL(ctx, projDB); err != nil {
 				return nil, err
 			}
-			projectDir := ""
-			if owner.Selection.ProjectPath != "" {
-				projectDir = filepath.Dir(owner.Selection.ProjectPath)
-			}
 			var rResp rClimateScriptResponse
 			rReq := map[string]any{
 				"assetsDir":         ".",
@@ -1027,7 +1022,7 @@ func ComputePlotClimateAndDualEdatopic(
 			err := executeRScriptJSON(
 				ctx,
 				cfg,
-				projectDir,
+				"",
 				"compute_climate_asmr.R",
 				[]string{"aSMR_Rules_HalfStep.csv", "CMD_adjustments.csv", "bgc_climate_normals.csv"},
 				rReq,

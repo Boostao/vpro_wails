@@ -26,6 +26,27 @@ func (s *LifecycleService) GetStartupState() StartupState {
 	return s.startup.GetState()
 }
 
+func (s *LifecycleService) ChooseStartupDatabaseFile(ctx context.Context) (string, error) {
+	if s == nil || s.startup == nil {
+		return "", errors.New("startup service is unavailable")
+	}
+	return s.startup.ChooseDatabaseFile(ctx)
+}
+
+func (s *LifecycleService) ResetStartupToSample(ctx context.Context) (StartupState, error) {
+	if s == nil || s.startup == nil {
+		return StartupState{}, errors.New("startup service is unavailable")
+	}
+	return s.startup.ResetToSample(ctx)
+}
+
+func (s *LifecycleService) RecoverStartupWithPaths(ctx context.Context, request StartupRecoveryRequest) (StartupState, error) {
+	if s == nil || s.startup == nil {
+		return StartupState{}, errors.New("startup service is unavailable")
+	}
+	return s.startup.RecoverWithPaths(ctx, request)
+}
+
 func (s *LifecycleService) GetPendingCloseRequest() string {
 	if s == nil || s.close == nil {
 		return ""

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -357,7 +356,7 @@ func RunMultivariateClustering(
 		err := executeRScriptJSON(
 			ctx,
 			cfg,
-			filepath.Dir(projectPath),
+			"",
 			"run_clustering.R",
 			nil,
 			rPayload,

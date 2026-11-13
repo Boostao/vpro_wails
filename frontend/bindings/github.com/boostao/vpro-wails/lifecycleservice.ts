@@ -13,6 +13,10 @@ export function CancelClose(requestID: string): $CancellablePromise<void> {
     return $Call.ByID(2550327629, requestID);
 }
 
+export function ChooseStartupDatabaseFile(): $CancellablePromise<string> {
+    return $Call.ByID(1256822246);
+}
+
 export function ConfirmClose(requestID: string): $CancellablePromise<void> {
     return $Call.ByID(2359863265, requestID);
 }
@@ -27,4 +31,12 @@ export function GetStartupState(): $CancellablePromise<$models.StartupState> {
 
 export function GetUserLogReview(contextID: string, mode: number, offset: number, limit: number): $CancellablePromise<$models.UserLogReview> {
     return $Call.ByID(2416761778, contextID, mode, offset, limit);
+}
+
+export function RecoverStartupWithPaths(request: $models.StartupRecoveryRequest): $CancellablePromise<$models.StartupState> {
+    return $Call.ByID(1869568060, request);
+}
+
+export function ResetStartupToSample(): $CancellablePromise<$models.StartupState> {
+    return $Call.ByID(3276973486);
 }

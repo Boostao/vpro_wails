@@ -191,7 +191,7 @@ func CreatePlotProfileFile(s *vprocore.ContextService, ctx context.Context, cont
 		if err := ctx.Err(); err != nil {
 			return struct{}{}, err
 		}
-		if err := os.Link(temporary, path); err != nil {
+		if err := sqlutil.LinkOrCreateExclusive(temporary, path); err != nil {
 			return struct{}{}, fmt.Errorf("profile publication requires atomic no-replace linking; destination unchanged: %w", err)
 		}
 		published = true

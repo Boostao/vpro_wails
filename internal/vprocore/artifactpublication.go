@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 )
 
 // A private preparation kernel, not a project lease or desktop export API.
@@ -215,8 +217,17 @@ func PublishArtifactChecked(ctx context.Context, requested string, format Artifa
 	if link == nil {
 		link = os.Link
 	}
-	if err := link(temporary, path); err != nil {
+	usedExclusiveCopy, err := sqlutil.LinkOrCreateExclusiveWith(temporary, path, link)
+	if err != nil {
 		return result, fmt.Errorf("%s requires atomic no-replace linking: %w", format.Label, err)
+	}
+	committedExpected := owned
+	if usedExclusiveCopy {
+		copiedInfo, statErr := os.Lstat(path)
+		if statErr != nil {
+			return result, fmt.Errorf("%s committed destination stat: %w", format.Label, statErr)
+		}
+		committedExpected = copiedInfo
 	}
 	result.Published = true // The irreversible commit boundary precedes every fallible callback.
 	if err := observe("published", temporary); err != nil {
@@ -225,7 +236,7 @@ func PublishArtifactChecked(ctx context.Context, requested string, format Artifa
 	if err := artifactPublicationIdentity(filepath.Dir(path), parent, true); err != nil {
 		return result, fmt.Errorf("%s committed parent: %w", format.Label, err)
 	}
-	if err := artifactPublicationIdentity(path, owned, false); err != nil {
+	if err := artifactPublicationIdentity(path, committedExpected, false); err != nil {
 		return result, fmt.Errorf("%s committed destination: %w", format.Label, err)
 	}
 	return result, nil

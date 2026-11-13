@@ -619,7 +619,7 @@ func AssignSpatialAOIToSU(ctx context.Context, contexts *vprocore.ContextService
 			if err := db.Close(); err != nil {
 				return struct{}{}, err
 			}
-			if err := os.Link(tmpPath, freshPath); err != nil {
+			if err := sqlutil.LinkOrCreateExclusive(tmpPath, freshPath); err != nil {
 				return struct{}{}, fmt.Errorf("SU publication requires atomic no-replace linking; destination unchanged: %w", err)
 			}
 			out = &AssignSpatialAOIToSUResult{

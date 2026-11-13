@@ -258,6 +258,33 @@ test('late read transport/cancel and picker errors cannot install approval, publ
   await harness.publish(); assert.equal(writes, 0); harness.destroy(); failingPicker.destroy();
 });
 
+test('default session storage falls back to in-memory storage when localStorage is unavailable or throws SecurityError/QuotaExceededError', async () => {
+  const unavailableMod = loadTypeScript('tableCSVArchiveExport.ts', {
+    './qualityEditor': quality, './projectTableCSV': csv, '@wailsio/runtime': { Dialogs: { SaveFile: async () => '' } },
+  }, { localStorage: undefined });
+  const unavailSession = unavailableMod.tableCSVArchivePublicationSession(owner);
+  assert.equal(unavailSession.view().blocked, false);
+  await unavailSession.publish(review(), table, destination, async () => outcome());
+  assert.equal(unavailSession.view().receipts.length, 1);
+  unavailSession.acknowledge();
+  assert.equal(unavailSession.view().blocked, false);
+
+  const throwingStorage = {
+    getItem() { const err = new Error('Access is denied'); err.name = 'SecurityError'; throw err; },
+    setItem() { const err = new Error('Quota exceeded'); err.name = 'QuotaExceededError'; throw err; },
+  };
+  const throwingMod = loadTypeScript('tableCSVArchiveExport.ts', {
+    './qualityEditor': quality, './projectTableCSV': csv, '@wailsio/runtime': { Dialogs: { SaveFile: async () => '' } },
+  }, { localStorage: throwingStorage });
+  const fallbackSession = throwingMod.tableCSVArchivePublicationSession(owner);
+  assert.equal(fallbackSession.view().blocked, false);
+  assert.equal(fallbackSession.view().storageError, '');
+  await fallbackSession.publish(review(), table, destination, async () => outcome());
+  assert.equal(fallbackSession.view().receipts[0].outcome.status, 'published');
+  fallbackSession.acknowledge();
+  assert.equal(fallbackSession.view().blocked, false);
+});
+
 test('component exact approved table, explicit export, picker and persistent acknowledgement drive close/navigation barrier', async () => {
   const gate = deferred(), pickerGate = deferred(), store = storage(), started = deferred();
   const mod = moduleFor(store, () => pickerGate.promise);

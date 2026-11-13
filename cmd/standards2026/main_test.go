@@ -47,7 +47,13 @@ func TestStandards2026CLIArgGuards(t *testing.T) {
 	if err := run([]string{"unexpected-positional"}, &out); err == nil {
 		t.Fatal("accepted unexpected positional argument")
 	}
+	if err := run(nil, &out); err == nil {
+		t.Fatal("accepted missing required -bec-zip and -taxa-zip flags")
+	}
 	if err := run([]string{"-bec-zip", "nonexistent.zip"}, &out); err == nil {
+		t.Fatal("accepted missing -taxa-zip flag")
+	}
+	if err := run([]string{"-bec-zip", "nonexistent.zip", "-taxa-zip", "nonexistent-taxa.zip"}, &out); err == nil {
 		t.Fatal("accepted missing BEC zip")
 	}
 }

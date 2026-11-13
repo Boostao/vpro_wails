@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 const (
@@ -64,6 +65,30 @@ type PictureService struct {
 	Deletion    *PictureDeletionService `json:"-" yaml:"-"`
 }
 
+func configuredPictureOptions(contexts *vprocore.ContextService) (libraryPath, childDir, managerDir string) {
+	if contexts == nil || contexts.Projects == nil || contexts.Projects.Preferences == nil {
+		return "", "", ""
+	}
+	values, err := contexts.Projects.Preferences.Snapshot()
+	if err != nil {
+		return "", "", ""
+	}
+	section, err := vprocore.ConfigSection(values, "PictureOptions")
+	if err != nil {
+		return "", "", ""
+	}
+	if raw, ok := section["PictureLibraryPath"].(string); ok {
+		libraryPath = strings.TrimSpace(raw)
+	}
+	if raw, ok := section["ChildDirectory"].(string); ok {
+		childDir = strings.TrimSpace(raw)
+	}
+	if raw, ok := section["ManagerDirectory"].(string); ok {
+		managerDir = strings.TrimSpace(raw)
+	}
+	return libraryPath, childDir, managerDir
+}
+
 func NewPictureService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*PictureService, error) {
 	if contexts == nil || lookup == nil {
 		return nil, errors.New("picture service requires context ownership and an explicit feature lookup")
@@ -76,36 +101,64 @@ func NewPictureService(contexts *vprocore.ContextService, lookup func(string) (s
 	if !enabled {
 		return service, nil
 	}
-	path, present := lookup(pictureLibraryEnvironment)
-	if !present {
-		if _, readingExplicit := lookup(PictureReadingEnvironment); readingExplicit {
-			return nil, errors.New("picture reading requires VPRO_PICTURE_LIBRARY_PATH; no installed library was inferred")
+	cfgLibPath, cfgChildDir, cfgManagerDir := configuredPictureOptions(contexts)
+	path, libExplicit := lookup(pictureLibraryEnvironment)
+	if !libExplicit {
+		if contexts.Projects == nil || strings.TrimSpace(contexts.Projects.Root) == "" {
+			if _, readingExplicit := lookup(PictureReadingEnvironment); readingExplicit {
+				return nil, errors.New("picture reading requires VPRO_PICTURE_LIBRARY_PATH; no installed library was inferred")
+			}
+			service.Enabled = false
+			return service, nil
 		}
-		service.Enabled = false
-		return service, nil
-	}
-	if path == "" {
+		if cfgLibPath != "" {
+			path = cfgLibPath
+		} else {
+			installedPath, installErr := vprocore.InstallVPicsDatabase(contexts.Projects.Root)
+			if installErr != nil {
+				return nil, fmt.Errorf("install canonical VPics.db: %w", installErr)
+			}
+			path = installedPath
+		}
+	} else if path == "" {
 		return nil, errors.New("picture reading requires VPRO_PICTURE_LIBRARY_PATH; no installed library was inferred")
 	}
 	service.source, err = newOwnedPictureLibrary(path)
 	if err != nil {
 		return nil, err
 	}
-	for _, entry := range []struct {
-		name   string
-		target **ownedPictureDirectory
-	}{
-		{pictureChildDirectoryEnvironment, &service.directories.child},
-		{pictureManagerDirectoryEnvironment, &service.directories.manager},
-	} {
-		path, present := lookup(entry.name)
-		if !present {
-			continue
+	defaultPicDir := ""
+	if !libExplicit && contexts.Projects != nil && strings.TrimSpace(contexts.Projects.Root) != "" {
+		defaultPicDir, err = vprocore.EnsurePictureDirectory(contexts.Projects.Root)
+		if err != nil {
+			return nil, fmt.Errorf("ensure default picture directory: %w", err)
 		}
-		if path == "" {
+	}
+	for _, entry := range []struct {
+		name       string
+		cfgPath    string
+		defaultDir string
+		target     **ownedPictureDirectory
+	}{
+		{pictureChildDirectoryEnvironment, cfgChildDir, defaultPicDir, &service.directories.child},
+		{pictureManagerDirectoryEnvironment, cfgManagerDir, defaultPicDir, &service.directories.manager},
+	} {
+		dirPath, present := lookup(entry.name)
+		if !present {
+			if !libExplicit {
+				if entry.cfgPath != "" {
+					dirPath = entry.cfgPath
+				} else if entry.defaultDir != "" {
+					dirPath = entry.defaultDir
+				}
+			}
+			if dirPath == "" {
+				continue
+			}
+		} else if dirPath == "" {
 			return nil, fmt.Errorf("%s must be an explicit directory when configured", entry.name)
 		}
-		directory, err := newOwnedPictureDirectory(path)
+		directory, err := newOwnedPictureDirectory(dirPath)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", entry.name, err)
 		}

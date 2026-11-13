@@ -4,7 +4,6 @@ import (
 	"embed"
 	"io/fs"
 	"path/filepath"
-	"runtime"
 	"strings"
 )
 
@@ -98,6 +97,12 @@ var FS882TwoPageCHARSLayoutJSON []byte
 //go:embed maps/bc-overview.pmtiles
 var BCOverviewPMTiles []byte
 
+//go:embed fonts/LiberationSans-Regular.ttf
+var LiberationSansRegularTTF []byte
+
+//go:embed fonts/LiberationSans-Bold.ttf
+var LiberationSansBoldTTF []byte
+
 // PrefixedFS wraps an embed.FS embedded inside resources/ so callers passing
 // either "resources/foo" or "foo" resolve identically.
 type PrefixedFS struct {
@@ -126,24 +131,10 @@ var (
 	DatabaseFamilyFS = PrefixedFS{inner: rawDatabaseFamilyFS}
 )
 
-var repoRoot = func() string {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		abs, _ := filepath.Abs(".")
-		return abs
-	}
-	return filepath.Dir(filepath.Dir(file))
-}()
-
-// RepoRoot returns the absolute path to the repository root directory.
-func RepoRoot() string {
-	return repoRoot
-}
-
 // Path joins relative path segments onto RepoRoot().
 func Path(elem ...string) string {
 	parts := make([]string, 0, len(elem)+1)
-	parts = append(parts, repoRoot)
+	parts = append(parts, RepoRoot())
 	parts = append(parts, elem...)
 	return filepath.Join(parts...)
 }

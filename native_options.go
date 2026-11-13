@@ -8,9 +8,12 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-func nativeWindowsOptions(debugPort, configDir string) (application.WindowsOptions, error) {
+func nativeWindowsOptions(debugPort, dataDir, configDir string) (application.WindowsOptions, error) {
 	options := application.WindowsOptions{}
 	if debugPort == "" {
+		if dataDir != "" {
+			options.WebviewUserDataPath = filepath.Join(dataDir, "webview")
+		}
 		return options, nil
 	}
 	port, err := strconv.Atoi(debugPort)

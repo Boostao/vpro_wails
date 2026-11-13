@@ -1545,7 +1545,7 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 	if err != nil || !os.SameFile(parentInfo, currentParent) {
 		return AccessProjectImportResult{}, errors.New("destination parent directory changed during import; publication aborted")
 	}
-	if err := os.Link(tmpPath, resolvedDest); err != nil {
+	if err := sqlutil.LinkOrCreateExclusive(tmpPath, resolvedDest); err != nil {
 		return AccessProjectImportResult{}, fmt.Errorf("publish SQLite database %s: %w", resolvedDest, err)
 	}
 	published = true

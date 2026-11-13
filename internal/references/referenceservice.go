@@ -5,11 +5,11 @@ import (
 )
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -59,29 +59,44 @@ func NewReferenceService(dataDir string) (*ReferenceService, error) {
 	}
 
 	targetPath := filepath.Join(dataDir, "vlists.db")
-	if _, err := os.Stat(targetPath); os.IsNotExist(err) {
-		src, err := vlistsFiles.Open("resources/vlists.db")
+	sqliteMagic := []byte("SQLite format 3\x00")
+	loadValidEmbedded := func() ([]byte, error) {
+		embedded, err := vlistsFiles.ReadFile("resources/vlists.db")
 		if err != nil {
 			return nil, fmt.Errorf("read embedded vlists.db: %w", err)
 		}
-		defer src.Close()
+		if len(embedded) < 100 || !bytes.Equal(embedded[:16], sqliteMagic) {
+			return nil, fmt.Errorf("embedded vlists.db has invalid SQLite header")
+		}
+		return embedded, nil
+	}
 
-		dst, err := os.OpenFile(targetPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o644)
+	if info, err := os.Stat(targetPath); os.IsNotExist(err) {
+		embedded, err := loadValidEmbedded()
 		if err != nil {
-			return nil, fmt.Errorf("create vlists.db: %w", err)
+			return nil, err
 		}
-		defer dst.Close()
-
-		if _, err := io.Copy(dst, src); err != nil {
-			return nil, fmt.Errorf("copy vlists.db: %w", err)
+		if err := sqlutil.ReplaceBundledCatalogueFile(targetPath, embedded, 0o644); err != nil {
+			return nil, fmt.Errorf("install vlists.db: %w", err)
 		}
-	} else if err == nil {
-		if existing, readErr := os.ReadFile(targetPath); readErr == nil && sqlutil.BecHash(existing) == legacyVListsReferenceSHA256 {
-			embedded, err := vlistsFiles.ReadFile("resources/vlists.db")
-			if err != nil {
-				return nil, fmt.Errorf("read embedded vlists.db: %w", err)
+	} else if err != nil {
+		return nil, fmt.Errorf("stat vlists.db: %w", err)
+	} else {
+		needsReplace := !info.Mode().IsRegular() || info.Size() < 100
+		if !needsReplace {
+			existing, readErr := os.ReadFile(targetPath)
+			if readErr != nil || len(existing) < 100 || !bytes.Equal(existing[:16], sqliteMagic) {
+				needsReplace = true
+			} else if sqlutil.BecHash(existing) == legacyVListsReferenceSHA256 {
+				needsReplace = true
 			}
-			if sqlutil.BecHash(embedded) != legacyVListsReferenceSHA256 {
+		}
+		if needsReplace {
+			embedded, err := loadValidEmbedded()
+			if err != nil {
+				return nil, err
+			}
+			if sqlutil.BecHash(embedded) != legacyVListsReferenceSHA256 || info.Size() < 100 {
 				if err := sqlutil.ReplaceBundledCatalogueFile(targetPath, embedded, 0o644); err != nil {
 					return nil, fmt.Errorf("upgrade vlists.db: %w", err)
 				}
@@ -92,6 +107,21 @@ func NewReferenceService(dataDir string) (*ReferenceService, error) {
 	db, err := sqlutil.OpenReadOnly(targetPath)
 	if err != nil {
 		return nil, fmt.Errorf("open vlists.db: %w", err)
+	}
+	var speciesTables int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='Species'`).Scan(&speciesTables); err != nil || speciesTables != 1 {
+		_ = db.Close()
+		embedded, embErr := loadValidEmbedded()
+		if embErr != nil {
+			return nil, fmt.Errorf("verify vlists.db schema: %w", err)
+		}
+		if repErr := sqlutil.ReplaceBundledCatalogueFile(targetPath, embedded, 0o644); repErr != nil {
+			return nil, fmt.Errorf("repair corrupt vlists.db: %w", repErr)
+		}
+		db, err = sqlutil.OpenReadOnly(targetPath)
+		if err != nil {
+			return nil, fmt.Errorf("reopen vlists.db: %w", err)
+		}
 	}
 
 	return &ReferenceService{

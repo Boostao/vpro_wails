@@ -960,3 +960,43 @@ export function summarizeArchiveResolution(payload: SpatialWorkbenchPayload | nu
   }
   return `Embedded Overview Fallback (z${bgc.minZoom}..${bgc.maxZoom})`;
 }
+
+export function classifyWMSMapError(
+  event: unknown,
+  wmsEnabled: boolean,
+  online?: boolean
+): string | null {
+  if (!wmsEnabled) return null;
+  if (online === false) {
+    return 'BC OpenMaps WMS imagery is unreachable while offline. Offline BGC v13, Ecosections, NR Districts, and plot layers remain active.';
+  }
+  if (!event || typeof event !== 'object') return null;
+  const rec = event as Record<string, any>;
+  const sourceId = typeof rec.sourceId === 'string' ? rec.sourceId : '';
+  const errObj = rec.error;
+  const errMsg =
+    errObj instanceof Error
+      ? errObj.message
+      : typeof errObj?.message === 'string'
+        ? errObj.message
+        : typeof rec.message === 'string'
+          ? rec.message
+          : '';
+  const errUrl =
+    typeof errObj?.url === 'string'
+      ? errObj.url
+      : typeof rec.tile?.tileID === 'object' || typeof rec.url === 'string'
+        ? String(rec.url ?? '')
+        : '';
+  if (
+    sourceId === 'bc_openmaps_wms' ||
+    errUrl.includes('openmaps.gov.bc.ca') ||
+    errMsg.toLowerCase().includes('openmaps.gov.bc.ca') ||
+    errMsg.toLowerCase().includes('failed to fetch') ||
+    errMsg.toLowerCase().includes('networkerror') ||
+    errMsg.toLowerCase().includes('load tile')
+  ) {
+    return 'BC OpenMaps WMS tile request failed (offline or remote service unreachable). Offline PMTiles vector layers remain active.';
+  }
+  return null;
+}

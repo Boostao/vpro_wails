@@ -61,5 +61,5 @@ func loadPlotLabelPDFFonts(ctx context.Context) (plotLabelPDFFonts, error) {
 			boldName:    cand.boldName,
 		}, nil
 	}
-	return plotLabelPDFFonts{}, errors.New("runtime Arial or metric-compatible LiberationSans label PDF fonts are unavailable on this platform")
+	return loadBundledPlotLabelPDFFonts(ctx)
 }

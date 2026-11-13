@@ -37,6 +37,14 @@ type EnvironmentReportService struct {
 	siteUnitSummaryWorkbook         *SiteUnitSummaryWorkbookService
 	siteUnitSummaryExtendedWorkbook *SiteUnitSummaryExtendedWorkbookService
 	subzoneMatrix                   *SubzoneMatrixService
+	dataDir                         string
+}
+
+func (s *EnvironmentReportService) rRuntimeOptions() []rsidecarpkg.RuntimeOptions {
+	if s == nil || s.dataDir == "" {
+		return nil
+	}
+	return []rsidecarpkg.RuntimeOptions{{DataDir: s.dataDir}}
 }
 
 func (s *EnvironmentReportService) GetLongEnvironmentOptions(ctx context.Context, contextID string) (LongEnvironmentOptions, error) {
@@ -173,7 +181,7 @@ func (s *EnvironmentReportService) ExportReviewedSubzoneMatrix(ctx context.Conte
 }
 
 func (s *EnvironmentReportService) DetectRRuntime(ctx context.Context) (*RRuntimeStatus, error) {
-	return rsidecarpkg.DetectRRuntime(ctx)
+	return rsidecarpkg.DetectRRuntime(ctx, s.rRuntimeOptions()...)
 }
 
 func (s *EnvironmentReportService) GetCachedPlotClimate(ctx context.Context, contextID, refPeriod string) ([]PlotClimateRow, error) {
@@ -187,14 +195,14 @@ func (s *EnvironmentReportService) ComputePlotClimateAndDualEdatopic(ctx context
 	if s == nil || s.contexts == nil {
 		return nil, errors.New("environment report context is unavailable")
 	}
-	return rsidecarpkg.ComputePlotClimateAndDualEdatopic(ctx, unwrapContextService(s.contexts), contextID, request)
+	return rsidecarpkg.ComputePlotClimateAndDualEdatopic(ctx, unwrapContextService(s.contexts), contextID, request, s.rRuntimeOptions()...)
 }
 
 func (s *EnvironmentReportService) RunMultivariateClustering(ctx context.Context, contextID string, request ClusteringRequest) (*ClusteringResult, error) {
 	if s == nil || s.contexts == nil {
 		return nil, errors.New("environment report context is unavailable")
 	}
-	return rsidecarpkg.RunMultivariateClustering(ctx, unwrapContextService(s.contexts), contextID, request)
+	return rsidecarpkg.RunMultivariateClustering(ctx, unwrapContextService(s.contexts), contextID, request, s.rRuntimeOptions()...)
 }
 
 func (s *EnvironmentReportService) PromoteClusterCandidateToSU(ctx context.Context, contextID string, request PromoteCandidateSURequest) (*PromoteCandidateSUResult, error) {
@@ -208,5 +216,5 @@ func (s *EnvironmentReportService) RenderQuartoGuide(ctx context.Context, contex
 	if s == nil || s.contexts == nil {
 		return nil, errors.New("environment report context is unavailable")
 	}
-	return rsidecarpkg.RenderQuartoGuide(ctx, unwrapContextService(s.contexts), contextID, request)
+	return rsidecarpkg.RenderQuartoGuide(ctx, unwrapContextService(s.contexts), contextID, request, s.rRuntimeOptions()...)
 }

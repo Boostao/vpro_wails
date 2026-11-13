@@ -112,9 +112,9 @@ SumVeg:
   optSiteUnitType: 1
 System:
   Build: "Thursday, February 23, 2023"
-  GEProgram: "C:/Program Files/Google/Google Earth/client/googleearth.exe"
+  GEProgram: ""
   RDataIn: "Three column"
-  RExeLocation: "C:/Program Files/R/R-*/bin/R.exe"
+  RExeLocation: ""
   RunOnce: true
   Version: 3
   Website: "http://www.vuser.ca/VPro19/"

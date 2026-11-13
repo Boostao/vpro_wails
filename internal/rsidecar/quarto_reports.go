@@ -401,6 +401,37 @@ func sanitizeSlug(raw string) string {
 	return res
 }
 
+func canWriteExportDirectory(dir string) bool {
+	if strings.TrimSpace(dir) == "" {
+		return false
+	}
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return false
+	}
+	probe, err := os.CreateTemp(dir, ".vpro-export-probe-*")
+	if err != nil {
+		return false
+	}
+	name := probe.Name()
+	_ = probe.Close()
+	_ = os.Remove(name)
+	return true
+}
+
+func resolveDefaultGuideExportPath(projectDir, configuredDataDir, filename string) string {
+	projectExports := filepath.Join(projectDir, "exports")
+	if canWriteExportDirectory(projectExports) {
+		return filepath.Join(projectExports, filename)
+	}
+	if trimmed := strings.TrimSpace(configuredDataDir); trimmed != "" {
+		return filepath.Join(trimmed, "exports", filename)
+	}
+	if resolvedDataDir, err := sqlutil.UserDataDir(); err == nil && strings.TrimSpace(resolvedDataDir) != "" {
+		return filepath.Join(resolvedDataDir, "exports", filename)
+	}
+	return filepath.Join(projectExports, filename)
+}
+
 func publishBytesAtomically(destPath string, content []byte) (int64, string, error) {
 	absDest, err := filepath.Abs(destPath)
 	if err != nil {
@@ -734,8 +765,10 @@ func RenderQuartoGuide(
 
 		projectDir := filepath.Dir(owner.Selection.ProjectPath)
 		baseWork := strings.TrimSpace(cfg.WorkRootDir)
-		if baseWork == "" {
-			baseWork = projectDir
+		if baseWork == "" && strings.TrimSpace(cfg.DataDir) != "" {
+			if resolved, rErr := defaultRWorkRootDir(cfg.DataDir); rErr == nil {
+				baseWork = resolved
+			}
 		}
 		runDir, tmpDir, cleanup, err := prepareIsolatedRunDir(baseWork)
 		if err != nil {
@@ -824,7 +857,7 @@ func RenderQuartoGuide(
 		destHTML := strings.TrimSpace(req.DestinationPath)
 		if destHTML == "" {
 			slug := sanitizeSlug(owner.Selection.Project + "_" + guideType + "_" + targetUnitLabel)
-			destHTML = filepath.Join(projectDir, "exports", slug+".html")
+			destHTML = resolveDefaultGuideExportPath(projectDir, cfg.DataDir, slug+".html")
 		} else if !strings.EqualFold(filepath.Ext(destHTML), ".html") {
 			destHTML += ".html"
 		}

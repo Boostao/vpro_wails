@@ -61,80 +61,96 @@ ENV MACOS_SDK_PATH=/opt/macos-sdk
 # Darwin arm64
 COPY <<'ZIGWRAP' /usr/local/bin/zcc-darwin-arm64
 #!/bin/sh
-ARGS=""
 SKIP_NEXT=0
-for arg in "$@"; do
-    if [ $SKIP_NEXT -eq 1 ]; then
+COUNT=$#
+i=0
+while [ "$i" -lt "$COUNT" ]; do
+    arg=$1
+    shift
+    i=$((i + 1))
+    if [ "$SKIP_NEXT" -eq 1 ]; then
         SKIP_NEXT=0
         continue
     fi
     case "$arg" in
         -target) SKIP_NEXT=1 ;;
         -mmacosx-version-min=*) ;;
-        *) ARGS="$ARGS $arg" ;;
+        *) set -- "$@" "$arg" ;;
     esac
 done
-exec zig cc -fno-sanitize=all -target aarch64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w $ARGS
+exec zig cc -fno-sanitize=all -target aarch64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w "$@"
 ZIGWRAP
 RUN chmod +x /usr/local/bin/zcc-darwin-arm64
 
 # Darwin amd64
 COPY <<'ZIGWRAP' /usr/local/bin/zcc-darwin-amd64
 #!/bin/sh
-ARGS=""
 SKIP_NEXT=0
-for arg in "$@"; do
-    if [ $SKIP_NEXT -eq 1 ]; then
+COUNT=$#
+i=0
+while [ "$i" -lt "$COUNT" ]; do
+    arg=$1
+    shift
+    i=$((i + 1))
+    if [ "$SKIP_NEXT" -eq 1 ]; then
         SKIP_NEXT=0
         continue
     fi
     case "$arg" in
         -target) SKIP_NEXT=1 ;;
         -mmacosx-version-min=*) ;;
-        *) ARGS="$ARGS $arg" ;;
+        *) set -- "$@" "$arg" ;;
     esac
 done
-exec zig cc -fno-sanitize=all -target x86_64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w $ARGS
+exec zig cc -fno-sanitize=all -target x86_64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w "$@"
 ZIGWRAP
 RUN chmod +x /usr/local/bin/zcc-darwin-amd64
 
 # Windows amd64 - uses Zig's bundled mingw
 COPY <<'ZIGWRAP' /usr/local/bin/zcc-windows-amd64
 #!/bin/sh
-ARGS=""
 SKIP_NEXT=0
-for arg in "$@"; do
-    if [ $SKIP_NEXT -eq 1 ]; then
+COUNT=$#
+i=0
+while [ "$i" -lt "$COUNT" ]; do
+    arg=$1
+    shift
+    i=$((i + 1))
+    if [ "$SKIP_NEXT" -eq 1 ]; then
         SKIP_NEXT=0
         continue
     fi
     case "$arg" in
         -target) SKIP_NEXT=1 ;;
         -Wl,*) ;;
-        *) ARGS="$ARGS $arg" ;;
+        *) set -- "$@" "$arg" ;;
     esac
 done
-exec zig cc -target x86_64-windows-gnu $ARGS
+exec zig cc -target x86_64-windows-gnu "$@"
 ZIGWRAP
 RUN chmod +x /usr/local/bin/zcc-windows-amd64
 
 # Windows arm64 - uses Zig's bundled mingw
 COPY <<'ZIGWRAP' /usr/local/bin/zcc-windows-arm64
 #!/bin/sh
-ARGS=""
 SKIP_NEXT=0
-for arg in "$@"; do
-    if [ $SKIP_NEXT -eq 1 ]; then
+COUNT=$#
+i=0
+while [ "$i" -lt "$COUNT" ]; do
+    arg=$1
+    shift
+    i=$((i + 1))
+    if [ "$SKIP_NEXT" -eq 1 ]; then
         SKIP_NEXT=0
         continue
     fi
     case "$arg" in
         -target) SKIP_NEXT=1 ;;
         -Wl,*) ;;
-        *) ARGS="$ARGS $arg" ;;
+        *) set -- "$@" "$arg" ;;
     esac
 done
-exec zig cc -target aarch64-windows-gnu $ARGS
+exec zig cc -target aarch64-windows-gnu "$@"
 ZIGWRAP
 RUN chmod +x /usr/local/bin/zcc-windows-arm64
 
@@ -194,7 +210,7 @@ if [ -d "frontend" ] && [ -f "frontend/package.json" ] && [ ! -d "frontend/dist"
 fi
 
 # Build
-APP=${APP_NAME:-$(basename $(pwd))}
+APP=${APP_NAME:-$(basename "$(pwd)")}
 mkdir -p bin
 
 EXT=""
@@ -204,18 +220,21 @@ if [ "$GOOS" = "windows" ]; then
     LDFLAGS="-s -w -H windowsgui"
 fi
 
-TAGS="production"
+TAGS="production,sqliteonly"
 if [ -n "$EXTRA_TAGS" ]; then
-    TAGS="${TAGS},${EXTRA_TAGS}"
+    case ",$EXTRA_TAGS," in
+        *,sqliteonly,*) TAGS="production,${EXTRA_TAGS}" ;;
+        *) TAGS="${TAGS},${EXTRA_TAGS}" ;;
+    esac
 fi
 
-COMPILER="go build"
 if [ "$OBFUSCATED" = "true" ]; then
-    COMPILER="garble ${GARBLE_ARGS} build"
     TAGS="${TAGS},wails_obfuscated"
+    # shellcheck disable=SC2086
+    garble ${GARBLE_ARGS} build -tags "$TAGS" -trimpath -buildvcs=false -ldflags="$LDFLAGS" -o "bin/${APP}-${GOOS}-${GOARCH}${EXT}" .
+else
+    go build -tags "$TAGS" -trimpath -buildvcs=false -ldflags="$LDFLAGS" -o "bin/${APP}-${GOOS}-${GOARCH}${EXT}" .
 fi
-
-${COMPILER} -tags "$TAGS" -trimpath -buildvcs=false -ldflags="$LDFLAGS" -o bin/${APP}-${GOOS}-${GOARCH}${EXT} .
 echo "Built: bin/${APP}-${GOOS}-${GOARCH}${EXT}"
 SCRIPT
 RUN chmod +x /usr/local/bin/build.sh

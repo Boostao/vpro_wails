@@ -86,13 +86,30 @@ func plotLabelPDFFields(preview PlotLabelRegionalPreview) ([]plotLabelPDFField, 
 }
 
 func validatePlotLabelPDFFont(data []byte, expectedName string) error {
+	return validatePlotLabelPDFFontNames(data, expectedName)
+}
+
+func validatePlotLabelPDFFontNames(data []byte, allowedNames ...string) error {
 	font, err := sfnt.Parse(data)
 	if err != nil {
 		return fmt.Errorf("label PDF font parse: %w", err)
 	}
 	name, err := font.Name(nil, sfnt.NameID(6))
-	if err != nil || name != expectedName {
-		return errors.Join(err, fmt.Errorf("label PDF requires original %s, not substituted font %q", expectedName, name))
+	matched := false
+	if err == nil {
+		for _, allowed := range allowedNames {
+			if allowed != "" && name == allowed {
+				matched = true
+				break
+			}
+		}
+	}
+	if err != nil || !matched {
+		expectedLabel := ""
+		if len(allowedNames) > 0 {
+			expectedLabel = allowedNames[0]
+		}
+		return errors.Join(err, fmt.Errorf("label PDF requires original %s, not substituted font %q", expectedLabel, name))
 	}
 	if len(data) < 12 || binary.BigEndian.Uint32(data[:4]) != 0x00010000 {
 		return errors.New("label PDF requires TrueType outlines")
@@ -149,24 +166,27 @@ func renderPlotLabelPDF(ctx context.Context, preview PlotLabelRegionalPreview, f
 	pdf.SetCatalogSort(true)
 	pdf.SetCreationDate(date)
 	pdf.SetModificationDate(date)
-	regName, bldName := fonts.regularName, fonts.boldName
-	if regName == "" {
-		regName = "ArialMT"
+	regNames := []string{"ArialMT", "LiberationSans"}
+	if fonts.regularName != "" {
+		regNames = []string{fonts.regularName}
 	}
-	if bldName == "" {
-		bldName = "Arial-BoldMT"
+	bldNames := []string{"Arial-BoldMT", "LiberationSans-Bold"}
+	if fonts.boldName != "" {
+		bldNames = []string{fonts.boldName}
 	}
 	for _, font := range []struct {
-		data        []byte
-		name, style string
+		data  []byte
+		names []string
+		style string
 	}{
-		{fonts.regular, regName, ""}, {fonts.bold, bldName, "B"},
+		{fonts.regular, regNames, ""},
+		{fonts.bold, bldNames, "B"},
 	} {
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
 		data := bytes.Clone(font.data)
-		if err := validatePlotLabelPDFFont(data, font.name); err != nil {
+		if err := validatePlotLabelPDFFontNames(data, font.names...); err != nil {
 			return nil, err
 		}
 		pdf.AddUTF8FontFromBytes("VPROSystemArial", font.style, data)

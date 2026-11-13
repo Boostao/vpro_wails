@@ -28,7 +28,7 @@
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINST_KEY_NAME}"
 
 !ifndef WAILS_INSTALL_SCOPE
-    !define WAILS_INSTALL_SCOPE "machine"
+    !define WAILS_INSTALL_SCOPE "user"
 !endif
 
 !ifndef REQUEST_EXECUTION_LEVEL
@@ -167,39 +167,53 @@ RequestExecutionLevel "${REQUEST_EXECUTION_LEVEL}"
     ${EndIf}
 !macroend
 
-# Install webview2 by launching the bootstrapper
+# Install webview2 by launching the bootstrapper when absent, without aborting offline installs
 # See https://docs.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution#online-only-deployment
 !macro wails.webview2runtime
     !ifndef WAILS_INSTALL_WEBVIEW_DETAILPRINT
-        !define WAILS_INSTALL_WEBVIEW_DETAILPRINT "Installing: WebView2 Runtime"
+        !define WAILS_INSTALL_WEBVIEW_DETAILPRINT "Checking / Installing: WebView2 Runtime"
     !endif
 
     SetRegView 64
-	# If the admin key exists and is not empty then webview2 is already installed
-	ReadRegStr $0 HKLM "SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}" "pv"
+    ReadRegStr $0 HKLM "SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}" "pv"
     ${If} $0 != ""
+    ${AndIf} $0 != "0.0.0.0"
         Goto ok
     ${EndIf}
 
-    ${If} ${REQUEST_EXECUTION_LEVEL} == "user"
-        # If the installer is run in user level, check the user specific key exists and is not empty then webview2 is already installed
-	    ReadRegStr $0 HKCU "Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}" "pv"
-        ${If} $0 != ""
-            Goto ok
-        ${EndIf}
-     ${EndIf}
-    
-	SetDetailsPrint both
+    ReadRegStr $0 HKLM "SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}" "pv"
+    ${If} $0 != ""
+    ${AndIf} $0 != "0.0.0.0"
+        Goto ok
+    ${EndIf}
+
+    ReadRegStr $0 HKCU "Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}" "pv"
+    ${If} $0 != ""
+    ${AndIf} $0 != "0.0.0.0"
+        Goto ok
+    ${EndIf}
+
+    SetDetailsPrint both
     DetailPrint "${WAILS_INSTALL_WEBVIEW_DETAILPRINT}"
     SetDetailsPrint listonly
-    
+
     InitPluginsDir
     CreateDirectory "$pluginsdir\webview2bootstrapper"
     SetOutPath "$pluginsdir\webview2bootstrapper"
-    File "MicrosoftEdgeWebview2Setup.exe"
-    ExecWait '"$pluginsdir\webview2bootstrapper\MicrosoftEdgeWebview2Setup.exe" /silent /install'
-    
-    SetDetailsPrint both
+    File /nonfatal "MicrosoftEdgeWebview2Setup.exe"
+    IfFileExists "$pluginsdir\webview2bootstrapper\MicrosoftEdgeWebview2Setup.exe" 0 webview_missing
+        ClearErrors
+        ExecWait '"$pluginsdir\webview2bootstrapper\MicrosoftEdgeWebview2Setup.exe" /silent /install' $1
+        SetDetailsPrint both
+        ${If} $1 != 0
+            DetailPrint "Warning: WebView2 Runtime bootstrapper exited with code $1 (offline or restricted network). Install the Microsoft Edge WebView2 Evergreen Standalone Installer if VPro cannot open a browser window."
+        ${EndIf}
+        Goto webview_done
+    webview_missing:
+        SetDetailsPrint both
+        DetailPrint "Warning: WebView2 Runtime was not detected in the registry and no bundled bootstrapper was present. Windows 11 includes WebView2; on offline Windows 10 systems, install the WebView2 Evergreen Standalone Runtime."
+    webview_done:
+    SetOutPath $INSTDIR
     ok:
 !macroend
 

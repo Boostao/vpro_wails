@@ -392,6 +392,7 @@ export type {
     SpeciesItem,
     StandardsArtifactStamp,
     StandardsSourceStamp,
+    StartupRecoveryRequest,
     StartupState,
     SubzoneMatrixPreview,
     SubzoneMatrixRow,

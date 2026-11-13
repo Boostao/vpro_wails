@@ -308,7 +308,7 @@ func SaveProjectPlotProfileSU(s *vprocore.ContextService, ctx context.Context, c
 			if err != nil || !os.SameFile(parent, current) {
 				return errors.Join(err, errors.New("SU destination directory identity changed; file was not published"))
 			}
-			if err := os.Link(temporary, path); err != nil {
+			if err := sqlutil.LinkOrCreateExclusive(temporary, path); err != nil {
 				return fmt.Errorf("SU publication requires atomic no-replace linking; destination unchanged: %w", err)
 			}
 			published = true

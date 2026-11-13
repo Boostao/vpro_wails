@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -17,26 +16,11 @@ import (
 
 	"github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/boostao/vpro-wails/internal/vprocore"
-	"github.com/boostao/vpro-wails/resources"
 )
-
-var scratchCounter atomic.Uint64
 
 func workspaceScratchDir(tb testing.TB) string {
 	tb.Helper()
-	base := filepath.Join(resources.RepoRoot(), ".diag-test-scratch")
-	if err := os.MkdirAll(base, 0o700); err != nil {
-		tb.Fatal(err)
-	}
-	dir := filepath.Join(base, fmt.Sprintf("run-%d-%d", os.Getpid(), scratchCounter.Add(1)))
-	if err := os.MkdirAll(dir, 0o700); err != nil {
-		tb.Fatal(err)
-	}
-	tb.Cleanup(func() {
-		_ = os.RemoveAll(dir)
-		_ = os.Remove(base) // removes parent when empty
-	})
-	return dir
+	return tb.TempDir()
 }
 
 func codePtr(s string) *string { return &s }

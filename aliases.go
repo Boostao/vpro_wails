@@ -376,6 +376,7 @@ type SpeciesCodeCheckUpdate = validationpkg.SpeciesCodeCheckUpdate
 type SpeciesItem = referencespkg.SpeciesItem
 type StandardsArtifactStamp = lifecyclepkg.StandardsArtifactStamp
 type StandardsSourceStamp = lifecyclepkg.StandardsSourceStamp
+type StartupRecoveryRequest = lifecyclepkg.StartupRecoveryRequest
 type StartupService = lifecyclepkg.StartupService
 type startupService = lifecyclepkg.StartupService
 type StartupState = lifecyclepkg.StartupState
@@ -503,6 +504,8 @@ var DecomposeCoordinate = vprocorepkg.DecomposeCoordinate
 
 var NewBECService = referencespkg.NewBECService
 
+var PopulateStartupRecoveryHints = lifecyclepkg.PopulateRecoveryHints
+var ConfigSection = vprocorepkg.ConfigSection
 var NewCloseService = lifecyclepkg.NewCloseService
 
 func NewEnvironmentWorkbookService(p0 *ContextService, p1 func(string) (string, bool)) (*envreportpkg.EnvironmentWorkbookService, error) {

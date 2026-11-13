@@ -136,43 +136,6 @@ tasks:
     vars:
       SCRIPT: "{{.SCRIPT}}"
 
-  frontend:vendor:puppertino:
-    summary: Fetches Puppertino CSS into frontend/public for consistent mobile styling
-    sources:
-      - frontend/public/puppertino/puppertino.css
-    generates:
-      - frontend/public/puppertino/puppertino.css
-    cmds:
-      - |
-        set -euo pipefail
-        mkdir -p frontend/public/puppertino
-        # If bundled Puppertino exists, prefer it. Otherwise, try to fetch, but don't fail build on error.
-        if [ ! -f frontend/public/puppertino/puppertino.css ]; then
-          echo "No bundled Puppertino found. Attempting to fetch from GitHub..."
-          if curl -fsSL https://raw.githubusercontent.com/codedgar/Puppertino/main/dist/css/full.css -o frontend/public/puppertino/puppertino.css; then
-            curl -fsSL https://raw.githubusercontent.com/codedgar/Puppertino/main/LICENSE -o frontend/public/puppertino/LICENSE || true
-            echo "Puppertino CSS downloaded to frontend/public/puppertino/puppertino.css"
-          else
-            echo "Warning: Could not fetch Puppertino CSS. Proceeding without download since template may bundle it."
-          fi
-        else
-          echo "Using bundled Puppertino at frontend/public/puppertino/puppertino.css"
-        fi
-        # Ensure index.html includes Puppertino CSS and button classes
-        INDEX_HTML=frontend/index.html
-        if [ -f "$INDEX_HTML" ]; then
-          if ! grep -q 'href="/puppertino/puppertino.css"' "$INDEX_HTML"; then
-            # Insert Puppertino link tag after style.css link
-            awk '
-              /href="\/style.css"\/?/ && !x { print; print "    <link rel=\"stylesheet\" href=\"/puppertino/puppertino.css\"/>"; x=1; next }1
-            ' "$INDEX_HTML" > "$INDEX_HTML.tmp" && mv "$INDEX_HTML.tmp" "$INDEX_HTML"
-          fi
-          # Replace default .btn with Puppertino primary button classes if present
-          sed -E -i'' 's/class=\"btn\"/class=\"p-btn p-prim-col\"/g' "$INDEX_HTML" || true
-        fi
-
-
-
   generate:bindings:
     summary: Generates bindings for the frontend
     run: once
@@ -262,7 +225,10 @@ tasks:
     cmds:
       - '{{if eq .OBFUSCATED "true"}}garble {{.GARBLE_ARGS}} build{{else}}go build{{end}} {{.BUILD_FLAGS}} -o "{{.BIN_DIR}}/{{.APP_NAME}}-server{{exeExt}}"'
     vars:
-      BUILD_FLAGS: '-tags server{{if eq .DEV "true"}}{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}}{{if .EXTRA_TAGS}},{{.EXTRA_TAGS}}{{end}} -buildvcs=false -gcflags=all="-l"{{else}},production{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}}{{if .EXTRA_TAGS}},{{.EXTRA_TAGS}}{{end}} -trimpath -buildvcs=false -ldflags="-w -s"{{end}}'
+      EFFECTIVE_TAGS: '{{if contains "sqliteonly" (.EXTRA_TAGS | default "")}}{{.EXTRA_TAGS}}{{else if .EXTRA_TAGS}}sqliteonly,{{.EXTRA_TAGS}}{{else}}sqliteonly{{end}}'
+      BUILD_FLAGS: '-tags server{{if eq .DEV "true"}}{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}},{{.EFFECTIVE_TAGS}} -buildvcs=false -gcflags=all="-l"{{else}},production{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}},{{.EFFECTIVE_TAGS}} -trimpath -buildvcs=false -ldflags="-w -s"{{end}}'
+    env:
+      CGO_ENABLED: '{{.CGO_ENABLED | default "1"}}'
 
   run:server:
     summary: Builds and runs a development server (DEV=true)
@@ -277,26 +243,21 @@ tasks:
     summary: Builds a Docker image for server mode deployment
     desc: |
       Creates a minimal Docker image containing the production server binary.
-      Defaults to a pure-Go static binary on a distroless/static base. The
-      production frontend is built first so the embedded assets are current.
+      Defaults to a CGO-enabled SQLite canonical build on a glibc-compatible
+      distroless base with writable VPRO_DATA_DIR and VPRO_CONFIG_DIR paths.
 
       Usage: task build:docker [TAG=myapp:latest] [CGO_ENABLED=1] [GO_IMAGE=...] [RUNTIME_IMAGE=...]
-      For CGO apps, set CGO_ENABLED=1 with libc-compatible builder/runtime images, e.g.:
-        task build:docker CGO_ENABLED=1 GO_IMAGE=golang:bookworm RUNTIME_IMAGE=gcr.io/distroless/base-debian12
     deps:
-      # Build the production frontend so frontend/dist (embedded by the Go build
-      # inside the image) is present and current in the Docker build context.
-      # Pass the server,production tags so binding generation analyses the same
-      # build the Docker image compiles, not the default-tag build.
       - task: build:frontend
         vars:
-          BUILD_FLAGS: "-tags server,production"
+          BUILD_FLAGS: "-tags server,production,sqliteonly"
     cmds:
       - >-
         docker build
-        --build-arg CGO_ENABLED={{.CGO_ENABLED | default "0"}}
-        --build-arg GO_IMAGE={{.GO_IMAGE | default "golang:alpine"}}
-        --build-arg RUNTIME_IMAGE={{.RUNTIME_IMAGE | default "gcr.io/distroless/static-debian12"}}
+        --build-arg CGO_ENABLED={{.CGO_ENABLED | default "1"}}
+        --build-arg EXTRA_TAGS={{.EXTRA_TAGS | default "sqliteonly"}}
+        --build-arg GO_IMAGE={{.GO_IMAGE | default "golang:1.26-trixie"}}
+        --build-arg RUNTIME_IMAGE={{.RUNTIME_IMAGE | default "debian:trixie-slim"}}
         -t {{.TAG | default (printf "%s:latest" .APP_NAME)}}
         -f build/docker/Dockerfile.server .
     vars:

@@ -794,6 +794,8 @@ export type StandardsArtifactStamp = lifecycle$0.StandardsArtifactStamp;
 
 export type StandardsSourceStamp = lifecycle$0.StandardsSourceStamp;
 
+export type StartupRecoveryRequest = lifecycle$0.StartupRecoveryRequest;
+
 export type StartupState = lifecycle$0.StartupState;
 
 export type SubzoneMatrixPreview = envreport$0.SubzoneMatrixPreview;

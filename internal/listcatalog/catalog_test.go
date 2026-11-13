@@ -166,7 +166,11 @@ func TestBundledCatalogue(t *testing.T) {
 	if checksum(data) != p.DatabaseSHA256 {
 		t.Fatal("bundled database checksum mismatch")
 	}
-	db, err := sql.Open("sqlite3", "file:"+database+"?mode=ro")
+	uri, err := SqliteFileURI(database, "ro")
+	if err != nil {
+		t.Fatal(err)
+	}
+	db, err := sql.Open("sqlite3", uri)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,6 +209,32 @@ func TestBundledCatalogue(t *testing.T) {
 	}
 	if _, err := db.Exec(`DELETE FROM SiteCodeChoices`); err == nil {
 		t.Fatal("bundled validator connection is not read-only")
+	}
+
+	// Regression: paths containing `#`, `?`, `%`, and spaces must preserve `mode=ro`
+	// and never truncate query parameters or create phantom files.
+	trickyDir := filepath.Join(t.TempDir(), "dir #1 ?query %25 spaces")
+	if err := os.MkdirAll(trickyDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	trickyDBPath := filepath.Join(trickyDir, "site #codes?v=1%20 copy.db")
+	if err := os.WriteFile(trickyDBPath, data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	trickyURI, err := SqliteFileURI(trickyDBPath, "ro")
+	if err != nil {
+		t.Fatal(err)
+	}
+	trickyDB, err := sql.Open("sqlite3", trickyURI)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer trickyDB.Close()
+	if err := ValidateDatabaseFor(trickyDB, p, profile); err != nil {
+		t.Fatalf("escaped SQLite URI failed validation on special characters: %v", err)
+	}
+	if _, err := trickyDB.Exec(`DELETE FROM SiteCodeChoices`); err == nil {
+		t.Fatal("escaped SQLite URI truncated ?mode=ro on `#` or `?` path")
 	}
 }
 

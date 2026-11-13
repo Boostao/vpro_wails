@@ -18,6 +18,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 	"unicode/utf8"
 
 	"github.com/boostao/vpro-wails/resources"
@@ -611,4 +612,107 @@ func (s *DesktopConfig) Selection() (DesktopSelection, error) {
 	return DesktopSelection{current["CurrProject"].(string), current["CurrPlotlist"].(string),
 		current["CurrHierarchy"].(string), current["ProjectPath"].(string),
 		current["SUPath"].(string), current["HierarchyPath"].(string)}, nil
+}
+
+// BackupDesktopConfigFile preserves an existing config.yml to config.backup-<timestamp>.yml
+// without ever overwriting an existing backup file. Returns ("", nil) if configPath does not exist.
+func BackupDesktopConfigFile(configPath string, now time.Time) (string, error) {
+	raw, err := os.ReadFile(configPath)
+	if errors.Is(err, os.ErrNotExist) {
+		return "", nil
+	}
+	if err != nil {
+		return "", fmt.Errorf("read existing config.yml for backup: %w", err)
+	}
+	dir := filepath.Dir(configPath)
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return "", err
+	}
+	stamp := now.UTC().Format("20060102-150405")
+	stage, err := os.CreateTemp(dir, ".config-backup-*.yml")
+	if err != nil {
+		return "", err
+	}
+	stageName := stage.Name()
+	defer os.Remove(stageName)
+	if err := stage.Chmod(0o600); err != nil {
+		_ = stage.Close()
+		return "", err
+	}
+	if _, err := stage.Write(raw); err != nil {
+		_ = stage.Close()
+		return "", err
+	}
+	if err := stage.Sync(); err != nil {
+		_ = stage.Close()
+		return "", err
+	}
+	if err := stage.Close(); err != nil {
+		return "", err
+	}
+	for attempt := 0; attempt < 1000; attempt++ {
+		suffix := ""
+		if attempt > 0 {
+			suffix = fmt.Sprintf("-%d", attempt)
+		}
+		candidate := filepath.Join(dir, fmt.Sprintf("config.backup-%s%s.yml", stamp, suffix))
+		err := sqlutil.LinkOrCreateExclusive(stageName, candidate)
+		if err == nil {
+			return candidate, nil
+		}
+		if errors.Is(err, os.ErrExist) {
+			continue
+		}
+		return "", fmt.Errorf("write config backup %q: %w", candidate, err)
+	}
+	return "", errors.New("could not allocate unique config backup filename")
+}
+
+// StampLegacyImportHashes records the current SHA-256 (or "absent") of retained legacy JSON
+// preference files so recovered YAML configurations do not re-trigger legacy JSON conflicts.
+func StampLegacyImportHashes(dataDir, configDir string) map[string]any {
+	imports := map[string]any{}
+	for _, name := range []string{"desktop-selection.json", "coordinate-settings.json", "working-unit-settings.json"} {
+		path := filepath.Join(configDir, name)
+		data, err := os.ReadFile(path)
+		if errors.Is(err, os.ErrNotExist) && name == "desktop-selection.json" && dataDir != "" && configDir != dataDir {
+			data, err = os.ReadFile(filepath.Join(dataDir, name))
+		}
+		if err == nil {
+			imports[name] = fmt.Sprintf("%x", sha256.Sum256(data))
+		} else {
+			imports[name] = "absent"
+		}
+	}
+	return imports
+}
+
+// WriteDesktopConfigAtomically writes complete validated YAML bytes atomically to configPath.
+func WriteDesktopConfigAtomically(configPath string, encoded []byte) error {
+	dir := filepath.Dir(configPath)
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return err
+	}
+	stage, err := os.CreateTemp(dir, ".config-recover-*.yml")
+	if err != nil {
+		return err
+	}
+	stageName := stage.Name()
+	defer os.Remove(stageName)
+	if err := stage.Chmod(0o600); err != nil {
+		_ = stage.Close()
+		return err
+	}
+	if _, err := stage.Write(encoded); err != nil {
+		_ = stage.Close()
+		return err
+	}
+	if err := stage.Sync(); err != nil {
+		_ = stage.Close()
+		return err
+	}
+	if err := stage.Close(); err != nil {
+		return err
+	}
+	return os.Rename(stageName, configPath)
 }

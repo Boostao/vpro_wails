@@ -6,8 +6,30 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"net/url"
+	"path/filepath"
 	"strconv"
+	"strings"
 )
+
+// SqliteFileURI resolves path to an absolute path and builds a properly escaped
+// SQLite file: URI so `#`, `?`, `%`, and spaces in paths never truncate query flags.
+func SqliteFileURI(path, mode string) (string, error) {
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return "", err
+	}
+	clean := filepath.ToSlash(filepath.Clean(abs))
+	if !strings.HasPrefix(clean, "/") {
+		clean = "/" + clean
+	}
+	address := url.URL{Scheme: "file", Path: clean}
+	if mode != "" {
+		query := url.Values{"mode": {mode}}
+		address.RawQuery = query.Encode()
+	}
+	return address.String(), nil
+}
 
 const schemaSQL = `
 CREATE TABLE SiteCodeChoices(
