@@ -25,6 +25,11 @@ type NewProjectRequest struct {
 	ActivateOnSuccess bool   `json:"activateOnSuccess"`
 }
 
+func (r *NewProjectRequest) UnmarshalJSON(data []byte) error {
+	type plain NewProjectRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type NewProjectResult struct {
 	ProjectName     string                 `json:"projectName"`
 	ProjectID       string                 `json:"projectId"`
@@ -245,6 +250,11 @@ type SaveProjectAsRequest struct {
 	NewProjectName    string `json:"newProjectName"`
 	DestinationPath   string `json:"destinationPath,omitempty"`
 	ActivateOnSuccess bool   `json:"activateOnSuccess"`
+}
+
+func (r *SaveProjectAsRequest) UnmarshalJSON(data []byte) error {
+	type plain SaveProjectAsRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type SaveProjectAsResult struct {
@@ -654,6 +664,11 @@ type ExportSplinterRequest struct {
 	SiteUnits         []string `json:"siteUnits,omitempty"`
 	PlotNumbers       []string `json:"plotNumbers,omitempty"`
 	ActivateOnSuccess bool     `json:"activateOnSuccess"`
+}
+
+func (r *ExportSplinterRequest) UnmarshalJSON(data []byte) error {
+	type plain ExportSplinterRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type ExportSplinterResult struct {

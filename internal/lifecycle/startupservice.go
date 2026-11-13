@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 	"gopkg.in/yaml.v3"
 )
@@ -35,6 +36,11 @@ type StartupRecoveryRequest struct {
 	ClearSU        bool   `json:"clearSu"`
 	HierarchyPath  string `json:"hierarchyPath"`
 	ClearHierarchy bool   `json:"clearHierarchy"`
+}
+
+func (r *StartupRecoveryRequest) UnmarshalJSON(data []byte) error {
+	type plain StartupRecoveryRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type StartupService struct {

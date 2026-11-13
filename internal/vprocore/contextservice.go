@@ -18,6 +18,11 @@ type ContextSelection struct {
 	HierarchyPath string `json:"hierarchyPath"`
 }
 
+func (r *ContextSelection) UnmarshalJSON(data []byte) error {
+	type plain ContextSelection
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type ContextService struct {
 	Projects                           *ProjectService                `json:"-" yaml:"-"`
 	Plots                              *PlotService                   `json:"-" yaml:"-"`

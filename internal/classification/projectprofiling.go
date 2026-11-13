@@ -1,6 +1,7 @@
 package classification
 
 import (
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 )
 
@@ -22,6 +23,11 @@ type ProjectPlotProfileRunRequest struct {
 	OriginalRules vprocore.ProjectMetadataTable  `json:"originalRules"`
 	ProjectLump   *vprocore.ProjectMetadataTable `json:"projectLump"`
 	Subvarieties  bool                           `json:"subvarieties"`
+}
+
+func (r *ProjectPlotProfileRunRequest) UnmarshalJSON(data []byte) error {
+	type plain ProjectPlotProfileRunRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type ProjectPlotProfileStep struct {

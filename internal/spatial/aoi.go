@@ -29,6 +29,11 @@ type SpatialAOISelectionRequest struct {
 	Zone    string         `json:"zone"`    // Optional BEC Zone filter
 }
 
+func (r *SpatialAOISelectionRequest) UnmarshalJSON(data []byte) error {
+	type plain SpatialAOISelectionRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 // SpatialAOIMatchedPlot describes a plot inside the selected AOI polygon.
 type SpatialAOIMatchedPlot struct {
 	PlotNumber string  `json:"plotNumber"`
@@ -63,6 +68,11 @@ type AssignSpatialAOIToSURequest struct {
 	Rings                          [][][2]float64 `json:"rings"`
 	IncludeNonAOIPlotsAsUnassigned bool           `json:"includeNonAoiPlotsAsUnassigned"`
 	Activate                       bool           `json:"activate"`
+}
+
+func (r *AssignSpatialAOIToSURequest) UnmarshalJSON(data []byte) error {
+	type plain AssignSpatialAOIToSURequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 // AssignSpatialAOIToSUResult reports the committed *_SU table write outcome.

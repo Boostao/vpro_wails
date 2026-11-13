@@ -61,6 +61,11 @@ type AccessProjectImportRequest struct {
 	ActivateOnSuccess bool   `json:"activateOnSuccess"`
 }
 
+func (r *AccessProjectImportRequest) UnmarshalJSON(data []byte) error {
+	type plain AccessProjectImportRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type AccessProjectImportResult struct {
 	SourcePath              string                     `json:"sourcePath"`
 	SourceProject           string                     `json:"sourceProject"`

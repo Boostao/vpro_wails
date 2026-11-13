@@ -85,9 +85,6 @@ var ProjectMetadataTemplateJSON []byte
 //go:embed fs1333-sivi-layout.json
 var FS1333SIVILayoutJSON []byte
 
-//go:embed fs1333-chars-sivi-layout.json
-var FS1333CHARSSIVILayoutJSON []byte
-
 //go:embed fs882-two-page-layout.json
 var FS882TwoPageLayoutJSON []byte
 

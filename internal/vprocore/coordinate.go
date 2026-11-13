@@ -3,6 +3,8 @@ package vprocore
 import (
 	"fmt"
 	"math"
+
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 )
 
 type CoordinateMode string
@@ -18,6 +20,11 @@ type CoordinateParts struct {
 	Minutes  *float64 `json:"minutes"`
 	Seconds  *float64 `json:"seconds"`
 	Negative bool     `json:"negative"`
+}
+
+func (r *CoordinateParts) UnmarshalJSON(data []byte) error {
+	type plain CoordinateParts
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 func validateCoordinateMode(mode CoordinateMode) error {

@@ -67,6 +67,11 @@ type QuartoGuideRequest struct {
 	DestinationPath string  `json:"destinationPath"` // Target .html path (optional; defaults to <ProjectDir>/exports/<slug>.html)
 }
 
+func (r *QuartoGuideRequest) UnmarshalJSON(data []byte) error {
+	type plain QuartoGuideRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 // QuartoGuideResult reports the atomically published HTML/PDF guide artifacts and summary preview.
 type QuartoGuideResult struct {
 	ContextID       string                `json:"contextId"`

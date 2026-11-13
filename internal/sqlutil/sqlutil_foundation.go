@@ -212,9 +212,19 @@ func ValidateJSONTextProperties(data []byte, names map[string]string) error {
 	if token == nil {
 		return nil
 	}
+	seen := make(map[string]string)
+	var duplicateErr error
 	for decoder.More() {
+		start := decoder.InputOffset()
 		key, err := decoder.Token()
 		if err != nil {
+			return err
+		}
+		rawKey := strings.TrimSpace(string(data[start:decoder.InputOffset()]))
+		for len(rawKey) > 0 && (rawKey[0] == ',' || rawKey[0] == '{') {
+			rawKey = strings.TrimSpace(rawKey[1:])
+		}
+		if err := ValidateQualityJSONToken([]byte(rawKey)); err != nil {
 			return err
 		}
 		var raw json.RawMessage
@@ -233,13 +243,22 @@ func ValidateJSONTextProperties(data []byte, names map[string]string) error {
 				break
 			}
 		}
+		folded := simpleFoldKey(name)
+		if prev, dup := seen[folded]; dup && duplicateErr == nil && (prev == name || strings.EqualFold(prev, name)) {
+			duplicateErr = fmt.Errorf("duplicate JSON object key %q (conflicts with %q)", name, prev)
+		} else if !dup {
+			seen[folded] = name
+		}
 	}
-	return nil
+	return duplicateErr
 }
 
 func ValidateQualityJSONToken(raw []byte) error {
 	if len(raw) == 0 || raw[0] != '"' {
 		return nil
+	}
+	if len(raw) < 2 || raw[len(raw)-1] != '"' {
+		return fmt.Errorf("unterminated quality JSON string")
 	}
 	if !utf8.Valid(raw) {
 		return fmt.Errorf("invalid UTF-8 in quality JSON string")
@@ -249,8 +268,14 @@ func ValidateQualityJSONToken(raw []byte) error {
 			continue
 		}
 		i++
+		if i >= len(raw)-1 {
+			return fmt.Errorf("incomplete escape in quality JSON string")
+		}
 		if raw[i] != 'u' {
 			continue
+		}
+		if i+4 >= len(raw)-1 {
+			return fmt.Errorf("truncated Unicode escape in quality JSON string")
 		}
 		unit := qualityHexUnit(raw[i+1 : i+5])
 		i += 4
@@ -260,7 +285,7 @@ func ValidateQualityJSONToken(raw []byte) error {
 		if unit < 0xD800 || unit > 0xDBFF {
 			continue
 		}
-		if i+6 >= len(raw) || raw[i+1] != '\\' || raw[i+2] != 'u' {
+		if i+6 >= len(raw)-1 || raw[i+1] != '\\' || raw[i+2] != 'u' {
 			return fmt.Errorf("unpaired high UTF-16 surrogate in quality JSON string")
 		}
 		low := qualityHexUnit(raw[i+3 : i+7])

@@ -297,10 +297,6 @@ export function RestoreAuditRecords(plotNumber: string, removeAuditRows: boolean
     return $Call.ByID(584715629, plotNumber, removeAuditRows);
 }
 
-export function RestoreSIVICHARSParentEntry(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
-    return $Call.ByID(2127509812, contextID, plot, historyID, action);
-}
-
 export function RestoreSIVICollectedReviewed(contextID: string, plot: string, historyID: string, action: $models.AuditRestoreAction): $CancellablePromise<$models.AuditRestoreResult | null> {
     return $Call.ByID(392982495, contextID, plot, historyID, action);
 }
@@ -345,10 +341,6 @@ export function RestoreTwoPageParentExtra(contextID: string, plot: string, form:
     return $Call.ByID(3418363751, contextID, plot, form, historyID, action);
 }
 
-export function ReviewSIVICHARSParentEntry(contextID: string, plot: string): $CancellablePromise<$models.SIVICHARSParentEntryReview | null> {
-    return $Call.ByID(2266246378, contextID, plot);
-}
-
 export function ReviewSIVICreationUndo(contextID: string, plot: string, historyID: string): $CancellablePromise<$models.SIVICreationUndoReview | null> {
     return $Call.ByID(3834218402, contextID, plot, historyID);
 }
@@ -371,10 +363,6 @@ export function SaveOtherRecord(r: $models.OtherRecord): $CancellablePromise<voi
 
 export function SavePlot(h: $models.FS882Header): $CancellablePromise<void> {
     return $Call.ByID(1352653522, h);
-}
-
-export function SaveSIVICHARSParentEntry(contextID: string, plot: string, request: $models.SIVICHARSParentEntryWrite): $CancellablePromise<$models.SIVIParentWriteResult | null> {
-    return $Call.ByID(3669085943, contextID, plot, request);
 }
 
 export function SaveSIVICollectedReviewed(contextID: string, plot: string, extended: boolean, requestJSON: string): $CancellablePromise<$models.SIVIHeightWriteResult | null> {

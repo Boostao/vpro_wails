@@ -104,7 +104,7 @@ func ChildJSONKey(value reflect.Value, field ChildField) string {
 }
 
 func decodeChildJSON(data []byte, record any) (map[string]bool, error) {
-	if err := json.Unmarshal(data, record); err != nil {
+	if err := sqlutil.DecodeStrictJSON(data, record, sqlutil.StrictJSONOptions{AllowUnknownFields: true}); err != nil {
 		return nil, err
 	}
 	var properties map[string]json.RawMessage

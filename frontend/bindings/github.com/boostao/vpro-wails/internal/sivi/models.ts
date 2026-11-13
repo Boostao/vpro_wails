@@ -41,32 +41,6 @@ export interface CreateSIVIPlotResult {
     "replayed": boolean;
 }
 
-export interface SIVICHARSParentEntryPolicy {
-    "column": string;
-    "binding": string;
-    "controlId": string;
-    "owner": string;
-    "kind": string;
-    "maximum": number;
-    "allowEmpty": boolean;
-    "lower": number | null;
-    "upper": number | null;
-    "writable": boolean;
-    "diagnostic": string;
-}
-
-export interface SIVICHARSParentEntryReview {
-    "Original": sourceform$0.SiviParentProjection | null;
-    "Fields": sourceform$0.SIVIParentSharedReference[] | null;
-    "Policies": SIVICHARSParentEntryPolicy[] | null;
-}
-
-export interface SIVICHARSParentEntryWrite {
-    "original": sourceform$0.SIVIParentProjection | null;
-    "edits": sourceform$0.SIVIParentCellEdit[] | null;
-    "actions"?: SIVIParentActionInput[] | null;
-}
-
 export interface SIVICoverWriteResult {
     "ChangedCells": number;
     "HistoryID": string;

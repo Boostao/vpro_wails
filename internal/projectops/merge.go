@@ -32,6 +32,11 @@ type ThreeWayMergePreviewRequest struct {
 	BaseProject   string `json:"baseProject,omitempty"`
 }
 
+func (r *ThreeWayMergePreviewRequest) UnmarshalJSON(data []byte) error {
+	type plain ThreeWayMergePreviewRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type MergeConflictItem struct {
 	ConflictID        string  `json:"conflictId"`
 	PlotNumber        string  `json:"plotNumber"`
@@ -79,6 +84,11 @@ type ThreeWayMergeExecuteRequest struct {
 	DefaultConflictResolution string            `json:"defaultConflictResolution,omitempty"`
 	PlotResolutions           map[string]string `json:"plotResolutions,omitempty"`
 	FieldResolutions          map[string]string `json:"fieldResolutions,omitempty"`
+}
+
+func (r *ThreeWayMergeExecuteRequest) UnmarshalJSON(data []byte) error {
+	type plain ThreeWayMergeExecuteRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type ThreeWayMergeResult struct {

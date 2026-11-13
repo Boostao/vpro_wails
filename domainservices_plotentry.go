@@ -15,7 +15,6 @@ type PlotEntryService struct {
 	contexts                     *ContextService
 	plots                        *PlotService
 	siviParentShared             *SIVIParentSharedService
-	siviCHARSParentEntry         *SIVICHARSParentEntryService
 	siviCovers                   *SIVICoverService
 	siviCombined                 *SIVICombinedService
 	siviCollected                *SIVICollectedService
@@ -344,27 +343,6 @@ func (s *PlotEntryService) RestoreSIVIParentShared(ctx context.Context, contextI
 		return nil, errors.New("SIVI parent shared service is unavailable")
 	}
 	return s.siviParentShared.Restore(ctx, contextID, plot, historyID, vprocorepkg.AuditRestoreAction(action))
-}
-
-func (s *PlotEntryService) ReviewSIVICHARSParentEntry(ctx context.Context, contextID, plot string) (*SIVICHARSParentEntryReview, error) {
-	if s == nil || s.siviCHARSParentEntry == nil {
-		return nil, errors.New("SIVI CHARS parent entry service is unavailable")
-	}
-	return s.siviCHARSParentEntry.Review(ctx, contextID, plot)
-}
-
-func (s *PlotEntryService) SaveSIVICHARSParentEntry(ctx context.Context, contextID, plot string, request SIVICHARSParentEntryWrite) (*SIVIParentWriteResult, error) {
-	if s == nil || s.siviCHARSParentEntry == nil {
-		return nil, errors.New("SIVI CHARS parent entry service is unavailable")
-	}
-	return s.siviCHARSParentEntry.Save(ctx, contextID, plot, request)
-}
-
-func (s *PlotEntryService) RestoreSIVICHARSParentEntry(ctx context.Context, contextID, plot, historyID string, action AuditRestoreAction) (*AuditRestoreResult, error) {
-	if s == nil || s.siviCHARSParentEntry == nil {
-		return nil, errors.New("SIVI CHARS parent entry service is unavailable")
-	}
-	return s.siviCHARSParentEntry.Restore(ctx, contextID, plot, historyID, vprocorepkg.AuditRestoreAction(action))
 }
 
 func (s *PlotEntryService) GetSIVICoverOriginal(ctx context.Context, contextID, plot string, extended bool) ([]SIVIVegetationProjection, error) {

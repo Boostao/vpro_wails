@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 )
 
 const (
@@ -357,6 +359,11 @@ type PlotGeodesyInput struct {
 	UTMEasting       *float64 `json:"utmEasting"`
 	UTMNorthing      *float64 `json:"utmNorthing"`
 	LocationAccuracy *int     `json:"locationAccuracy"`
+}
+
+func (r *PlotGeodesyInput) UnmarshalJSON(data []byte) error {
+	type plain PlotGeodesyInput
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 // PlotGeodesyEvaluation reports bidirectional NAD83 projection, sign normalization, and UTM-vs-DD divergence.

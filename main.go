@@ -130,9 +130,6 @@ func main() {
 	if _, err := siviFeature(subzoneMatrixFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
-	if _, err := siviFeature(breakReportReviewEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
 	if _, err := siviFeature(siteUnitSummaryWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
 		log.Fatal(err)
 	}
@@ -157,10 +154,6 @@ func main() {
 		log.Fatal(err)
 	}
 	siviProjectAssignmentEnabled, err := siviProjectAssignmentFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	siviCHARSParentEntryEnabled, err := siviFeature("VPRO_SIVI_CHARS_PARENT_ENTRY", os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -615,10 +608,6 @@ func main() {
 			Site: siteCodes, Region: regionCodes, Parent: parentCodes,
 			Geology: geologyCodes, Bec: becService,
 		}
-		siviCHARSParentEntry, err := newSIVICHARSParentEntryService(contextService, siviParentShared.References, siviCHARSParentEntryEnabled)
-		if err != nil {
-			return abort(err)
-		}
 		entryReaders := twoPageEntryReferenceReaders{}
 		if siteCodes != nil {
 			entryReaders.Shared.Site = siteCodes
@@ -709,7 +698,6 @@ func main() {
 			contexts:                     contextService,
 			plots:                        plots,
 			siviParentShared:             siviParentShared,
-			siviCHARSParentEntry:         siviCHARSParentEntry,
 			siviCovers:                   siviCovers,
 			siviCombined:                 siviCombined,
 			siviCollected:                siviCollected,

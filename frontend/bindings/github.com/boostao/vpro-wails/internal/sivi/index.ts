@@ -4,9 +4,6 @@
 export type {
     CreateSIVIPlotRequest,
     CreateSIVIPlotResult,
-    SIVICHARSParentEntryPolicy,
-    SIVICHARSParentEntryReview,
-    SIVICHARSParentEntryWrite,
     SIVICoverWriteResult,
     SIVICreatedPlotEntry,
     SIVICreationResult,

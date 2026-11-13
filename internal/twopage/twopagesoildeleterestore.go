@@ -26,6 +26,11 @@ type DeleteTwoPageSoilHorizonRequest struct {
 	RowID      string `json:"rowId,omitempty"`
 }
 
+func (r *DeleteTwoPageSoilHorizonRequest) UnmarshalJSON(data []byte) error {
+	type plain DeleteTwoPageSoilHorizonRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type DeleteTwoPageSoilHorizonResult struct {
 	RequestID        string `json:"requestId"`
 	ContextID        string `json:"contextId"`
@@ -60,6 +65,11 @@ type RestoreTwoPageSoilHorizonRequest struct {
 	PlotNumber      string `json:"plotNumber"`
 	Form            string `json:"form"`
 	DeleteRequestID string `json:"deleteRequestId"`
+}
+
+func (r *RestoreTwoPageSoilHorizonRequest) UnmarshalJSON(data []byte) error {
+	type plain RestoreTwoPageSoilHorizonRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type RestoreTwoPageSoilHorizonResult struct {

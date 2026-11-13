@@ -1,5 +1,7 @@
 package diagnostics
 
+import "github.com/boostao/vpro-wails/internal/sqlutil"
+
 // SMRRows defines the canonical 9 BEC Relative Soil Moisture Regime rows (0 = Very Xeric .. 8 = Hydric).
 var SMRRows = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8"}
 
@@ -29,6 +31,11 @@ type PairwiseParams struct {
 	DominantCover  float64 `json:"dominantCover,omitempty"`
 }
 
+func (r *PairwiseParams) UnmarshalJSON(data []byte) error {
+	type plain PairwiseParams
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 // SynthesisOptions configures ComputeSynthesisSnapshot.
 type SynthesisOptions struct {
 	UnitSource               string         `json:"unitSource,omitempty"`               // "auto" (default) | "su" | "user_site_unit"
@@ -40,6 +47,11 @@ type SynthesisOptions struct {
 	UnitOrder                []string       `json:"unitOrder,omitempty"`                // optional explicit unit column order
 	MinMaxPresencePct        float64        `json:"minMaxPresencePct,omitempty"`        // optional display threshold (0 keeps all)
 	Pairwise                 PairwiseParams `json:"pairwise,omitempty"`                 // optional BEC do_pairwise overrides
+}
+
+func (r *SynthesisOptions) UnmarshalJSON(data []byte) error {
+	type plain SynthesisOptions
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 // OrderedUnitCode represents a single ordered (Unit, PresSignifCode) pair for V7mdlDiagnostic.Diagnostic.
@@ -277,10 +289,20 @@ type ReassignSynthesisPlotRequest struct {
 	Options        SynthesisOptions `json:"options"`
 }
 
+func (r *ReassignSynthesisPlotRequest) UnmarshalJSON(data []byte) error {
+	type plain ReassignSynthesisPlotRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 // UndoSynthesisReassignmentRequest requests undoing a synthesis SU reassignment + instant recompute.
 type UndoSynthesisReassignmentRequest struct {
 	HistoryID int64            `json:"historyId,omitempty"` // 0 = undo latest reversible synthesis reassignment
 	Options   SynthesisOptions `json:"options"`
+}
+
+func (r *UndoSynthesisReassignmentRequest) UnmarshalJSON(data []byte) error {
+	type plain UndoSynthesisReassignmentRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 // ReassignSynthesisPlotResult returns the provenance receipt, elapsed latencyMs, and updated SynthesisSnapshot.
@@ -308,6 +330,11 @@ type ExportDiagnosticWorkbookRequest struct {
 	EdatopicSheetName       string           `json:"edatopicSheetName,omitempty"`
 	IncludeUnitEdatopicTabs bool             `json:"includeUnitEdatopicTabs,omitempty"`
 	Options                 SynthesisOptions `json:"options"`
+}
+
+func (r *ExportDiagnosticWorkbookRequest) UnmarshalJSON(data []byte) error {
+	type plain ExportDiagnosticWorkbookRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 // ExportDiagnosticWorkbookResult reports the atomically published .xlsx artifact metadata.

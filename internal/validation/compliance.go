@@ -24,6 +24,11 @@ type ComplianceOptions struct {
 	UseActiveSU bool `json:"useActiveSu"`
 }
 
+func (r *ComplianceOptions) UnmarshalJSON(data []byte) error {
+	type plain ComplianceOptions
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type EnvironmentCodeFinding struct {
 	ListName   string `json:"listName"`
 	Field      string `json:"field"`
@@ -1516,6 +1521,11 @@ func checkTaxonomyCompliance(
 
 type QuarantineOrphanRequest struct {
 	Tables []string `json:"tables,omitempty"` // Optional subset of ["Veg", "Humus", "Mineral", "Other"]; defaults to all 4
+}
+
+func (r *QuarantineOrphanRequest) UnmarshalJSON(data []byte) error {
+	type plain QuarantineOrphanRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type QuarantinedTableSummary struct {

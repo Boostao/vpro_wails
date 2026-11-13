@@ -278,6 +278,11 @@ type RDSExportRequest struct {
 	LumpDBPath      string `json:"lumpDbPath,omitempty"`
 }
 
+func (r *RDSExportRequest) UnmarshalJSON(data []byte) error {
+	type plain RDSExportRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type RDSTableSummary struct {
 	Name        string `json:"name"`
 	RowCount    int    `json:"rowCount"`

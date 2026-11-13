@@ -95,6 +95,11 @@ type ClusteringRequest struct {
 	MaterializeCandidate bool     `json:"materializeCandidate"` // Write <Name>_ClusterCandidate_SU inside <Project>.db
 }
 
+func (r *ClusteringRequest) UnmarshalJSON(data []byte) error {
+	type plain ClusteringRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 // ClusteringResult returns cluster memberships, indicator species, dendrogram coordinates, and candidate *_SU metadata.
 type ClusteringResult struct {
 	ContextID             string                  `json:"contextId"`
@@ -126,6 +131,11 @@ type PromoteCandidateSURequest struct {
 	ExcludeNoise     bool   `json:"excludeNoise"`     // Omit *_Noise assignments during promotion
 	ConfirmOverwrite bool   `json:"confirmOverwrite"` // Required true if TargetSUName_SU already exists!
 	Activate         bool   `json:"activate"`         // Switch active SU to TargetSUName after commit
+}
+
+func (r *PromoteCandidateSURequest) UnmarshalJSON(data []byte) error {
+	type plain PromoteCandidateSURequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 // PromoteCandidateSUResult reports the outcome of promoting a cluster candidate table to a *_SU table.
