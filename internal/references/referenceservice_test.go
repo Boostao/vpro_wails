@@ -103,4 +103,19 @@ func TestReferenceService_SpeciesAndLists(t *testing.T) {
 			t.Fatalf("expected LMH25 2023 item %s in list %s", expected.item, expected.list)
 		}
 	}
+
+	// Test 6: Truncated/corrupt vlists.db is atomically repaired on open
+	_ = svc.Close()
+	if err := os.WriteFile(tempDir+"/vlists.db", []byte("truncated"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	repaired, err := NewReferenceService(tempDir)
+	if err != nil {
+		t.Fatalf("NewReferenceService failed to repair truncated vlists.db: %v", err)
+	}
+	defer repaired.Close()
+	spRepaired, err := repaired.GetSpecies(context.Background(), "ABIELAS")
+	if err != nil || spRepaired == nil || spRepaired.Code != "ABIELAS" {
+		t.Fatalf("repaired vlists.db failed species lookup: %+v (%v)", spRepaired, err)
+	}
 }

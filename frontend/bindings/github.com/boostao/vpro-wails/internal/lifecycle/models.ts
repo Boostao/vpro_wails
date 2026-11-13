@@ -164,11 +164,27 @@ export interface StandardsSourceStamp {
     "version": string;
 }
 
+export interface StartupRecoveryRequest {
+    "projectPath": string;
+    "projectName": string;
+    "suPath": string;
+    "clearSu": boolean;
+    "hierarchyPath": string;
+    "clearHierarchy": boolean;
+}
+
 export interface StartupState {
     "ready": boolean;
     "message": string;
     "configPath": string;
     "releaseChannel": string;
+    "backupPath": string;
+    "configuredProject": string;
+    "projectPath": string;
+    "configuredSu": string;
+    "suPath": string;
+    "configuredHierarchy": string;
+    "hierarchyPath": string;
 }
 
 export interface UserLogReview {

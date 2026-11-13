@@ -42,12 +42,51 @@ function requireOwner(value: PictureOwner, owner: PictureOwner) {
   }
 }
 
-function selectedParts(path: unknown): { directory: string; name: string } {
-  if (!literal(path) || path.includes('/') || !/^(?:[A-Za-z]:\\|\\\\[^\\]+\\[^\\]+\\)/.test(path) ||
-      path.startsWith('\\\\?\\') || path.startsWith('\\\\.\\')) {
-    throw new Error('Picture selection requires the complete literal Windows file path returned by the owned chooser.');
+function hasControlCharacters(value: string): boolean {
+  for (let i = 0; i < value.length; i++) {
+    if (value.charCodeAt(i) < 32) return true;
   }
-  const last = path.lastIndexOf('\\'), directory = path.slice(0, last + 1), name = path.slice(last + 1);
+  return false;
+}
+
+function selectedParts(path: unknown): { directory: string; name: string } {
+  if (!literal(path) || hasControlCharacters(path)) {
+    throw new Error('Picture selection requires the complete literal file path returned by the owned chooser.');
+  }
+  let directory = '';
+  let name = '';
+  if (path.startsWith('/') && !path.includes('\\')) {
+    if (path === '/') {
+      throw new Error('Picture selection requires a complete POSIX file path, not root directory.');
+    }
+    const components = path.slice(1).split('/');
+    for (const component of components) {
+      if (component === '' || component === '.' || component === '..') {
+        throw new Error('Picture selection requires a canonical literal POSIX file path without empty or relative segments.');
+      }
+    }
+    const last = path.lastIndexOf('/');
+    directory = path.slice(0, last + 1);
+    name = path.slice(last + 1);
+  } else {
+    if (path.includes('/') || !/^(?:[A-Za-z]:\\|\\\\[^\\]+\\[^\\]+\\)/.test(path) ||
+        path.startsWith('\\\\?\\') || path.startsWith('\\\\.\\')) {
+      throw new Error('Picture selection requires the complete literal file path returned by the owned chooser.');
+    }
+    const tail = /^[A-Za-z]:\\/.test(path) ? path.slice(3) : path.slice(2);
+    const components = tail.split('\\');
+    if (path.startsWith('\\\\') && components.length < 3) {
+      throw new Error('Picture selection requires a complete UNC server, share and filename.');
+    }
+    for (const component of components) {
+      if (component === '' || component === '.' || component === '..') {
+        throw new Error('Picture selection requires a canonical literal Windows file path without empty or relative segments.');
+      }
+    }
+    const last = path.lastIndexOf('\\');
+    directory = path.slice(0, last + 1);
+    name = path.slice(last + 1);
+  }
   if (!literal(directory, 255) || !literal(name, 255)) {
     throw new Error('Selected picture directory and filename must each fit the source 255 UTF-16 units without repair.');
   }

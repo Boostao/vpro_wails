@@ -202,7 +202,11 @@ func TestBundledSoilCatalogue2026(t *testing.T) {
 	if checksum(data) != p.DatabaseSHA256 {
 		t.Fatal("bundled soil database checksum mismatch")
 	}
-	db, err := sql.Open("sqlite3", "file:"+database+"?mode=ro")
+	uri, err := SqliteFileURI(database, "ro")
+	if err != nil {
+		t.Fatal(err)
+	}
+	db, err := sql.Open("sqlite3", uri)
 	if err != nil {
 		t.Fatal(err)
 	}

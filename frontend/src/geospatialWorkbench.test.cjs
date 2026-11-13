@@ -253,3 +253,21 @@ test('GeospatialWorkbench, Navigation, App, and CoordinateFields compile cleanly
   assert.match(html, /Lasso \/ AOI/);
   assert.match(html, /Auto-1 QA Stamp/);
 });
+
+test('classifyWMSMapError surfaces offline WMS warnings without blocking offline PMTiles', () => {
+  assert.equal(wb.classifyWMSMapError({ sourceId: 'bc_openmaps_wms' }, false, false), null);
+  assert.match(wb.classifyWMSMapError({}, true, false), /offline.*Offline BGC v13/i);
+  assert.match(
+    wb.classifyWMSMapError({ sourceId: 'bc_openmaps_wms', error: new Error('Failed to fetch') }, true, true),
+    /WMS tile request failed.*Offline PMTiles/i
+  );
+  assert.match(
+    wb.classifyWMSMapError(
+      { error: { url: 'https://openmaps.gov.bc.ca/geo/pub/ows?service=WMS', message: 'NetworkError' } },
+      true,
+      true
+    ),
+    /WMS tile request failed/i
+  );
+  assert.equal(wb.classifyWMSMapError({ sourceId: 'bc_bgc_pmtiles', error: new Error(' unrelated ') }, true, true), null);
+});

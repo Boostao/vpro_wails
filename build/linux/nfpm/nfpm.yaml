@@ -18,7 +18,7 @@ release: "1"
 
 contents:
   - src: "./bin/VPro"
-    dst: "/usr/local/bin/VPro"
+    dst: "/usr/bin/VPro"
   - src: "./build/appicon.png"
     dst: "/usr/share/icons/hicolor/128x128/apps/VPro.png"
   - src: "./build/linux/VPro.desktop"

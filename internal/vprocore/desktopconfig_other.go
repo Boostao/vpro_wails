@@ -2,8 +2,8 @@
 
 package vprocore
 
-import "os"
+import "github.com/boostao/vpro-wails/internal/sqlutil"
 
 func InstallDesktopConfig(from, to string) error {
-	return os.Link(from, to)
+	return sqlutil.LinkOrCreateExclusive(from, to)
 }

@@ -262,10 +262,20 @@ func NewProjectServiceWithPreferences(root, config string, preferences *DesktopC
 }
 
 func SameDesktopPath(left, right string) bool {
-	if runtime.GOOS == "windows" {
-		return strings.EqualFold(left, right)
+	if left == "" || right == "" {
+		return left == right
 	}
-	return left == right
+	if infoLeft, errLeft := os.Stat(left); errLeft == nil {
+		if infoRight, errRight := os.Stat(right); errRight == nil {
+			return os.SameFile(infoLeft, infoRight)
+		}
+	}
+	cleanLeft := filepath.Clean(left)
+	cleanRight := filepath.Clean(right)
+	if runtime.GOOS == "windows" {
+		return strings.EqualFold(cleanLeft, cleanRight)
+	}
+	return cleanLeft == cleanRight
 }
 
 func installSample(destination string) error {
@@ -292,10 +302,14 @@ func installSample(destination string) error {
 		temporary.Close()
 		return err
 	}
+	if err := temporary.Sync(); err != nil {
+		temporary.Close()
+		return err
+	}
 	if err := temporary.Close(); err != nil {
 		return err
 	}
-	if err := os.Link(temporary.Name(), destination); err != nil && !errors.Is(err, os.ErrExist) {
+	if err := sqlutil.LinkOrCreateExclusive(temporary.Name(), destination); err != nil && !errors.Is(err, os.ErrExist) {
 		return err
 	}
 	return nil

@@ -15,6 +15,16 @@ type ExternalSQLiteFileInspection struct {
 	SUs          []SUInfo      `json:"sus"`
 }
 
+// ChooseNativeSQLiteDatabaseFile opens a native OS file dialog filtered to VPro SQLite database files.
+func ChooseNativeSQLiteDatabaseFile(ctx context.Context, title string) (string, error) {
+	if strings.TrimSpace(title) == "" {
+		title = "Locate VPro SQLite Project Database"
+	}
+	return chooseNativeOpenFileWithFilters(ctx, title, []nativeFileFilter{
+		{DisplayName: "VPro SQLite Databases (*.db;*.sqlite;*.sqlite3)", Pattern: "*.db;*.sqlite;*.sqlite3"},
+	})
+}
+
 func chooseNativeOpenFileWithFilters(ctx context.Context, title string, filters []nativeFileFilter) (string, error) {
 	app, window, err := PictureNativeChooserOwner(ctx)
 	if err != nil {

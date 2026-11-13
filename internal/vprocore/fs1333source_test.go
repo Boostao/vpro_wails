@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/boostao/vpro-wails/internal/fs882layout"
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 )
 
 func TestFS1333PackagedAggregateHeightsAndChildLinksRemainUnmapped(t *testing.T) {
@@ -105,7 +106,7 @@ func TestFS1333HeightBRemainsPhysicalTextNotNumericCoercion(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	db, err := sql.Open("sqlite3", "file:"+filepath.ToSlash(path)+"?mode=ro")
+	db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(path, "ro"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -156,7 +157,7 @@ func TestFS1333ParentBindingsAndEventOwnershipRemainDistinct(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	db, err := sql.Open("sqlite3", "file:"+filepath.ToSlash(path)+"?mode=ro")
+	db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(path, "ro"))
 	if err != nil {
 		t.Fatal(err)
 	}

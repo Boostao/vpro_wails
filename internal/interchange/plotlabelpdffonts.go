@@ -2,9 +2,11 @@ package interchange
 
 import (
 	"github.com/boostao/vpro-wails/internal/vprocore"
+	"github.com/boostao/vpro-wails/resources"
 )
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -83,4 +85,28 @@ func readPlotLabelPDFFonts(ctx context.Context, directory string, open func(stri
 		return plotLabelPDFFonts{}, err
 	}
 	return plotLabelPDFFonts{regular, bold}, nil
+}
+
+func loadBundledPlotLabelPDFFonts(ctx context.Context) (plotLabelPDFFonts, error) {
+	if ctx == nil {
+		return plotLabelPDFFonts{}, errors.New("runtime label font requires a context")
+	}
+	if err := ctx.Err(); err != nil {
+		return plotLabelPDFFonts{}, err
+	}
+	regular := bytes.Clone(resources.LiberationSansRegularTTF)
+	if err := validatePlotLabelPDFFont(regular, "LiberationSans"); err != nil {
+		return plotLabelPDFFonts{}, err
+	}
+	if err := ctx.Err(); err != nil {
+		return plotLabelPDFFonts{}, err
+	}
+	bold := bytes.Clone(resources.LiberationSansBoldTTF)
+	if err := validatePlotLabelPDFFont(bold, "LiberationSans-Bold"); err != nil {
+		return plotLabelPDFFonts{}, err
+	}
+	if err := ctx.Err(); err != nil {
+		return plotLabelPDFFonts{}, err
+	}
+	return plotLabelPDFFonts{regular: regular, bold: bold}, nil
 }

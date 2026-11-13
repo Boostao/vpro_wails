@@ -17,6 +17,7 @@ import (
 	"unicode/utf16"
 
 	"github.com/boostao/vpro-wails/internal/accessreader"
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 )
 
 type becSourceCol struct {
@@ -224,7 +225,7 @@ func buildBECSchemas() ([]becSourceCol, []becSourceCol) {
 }
 
 func loadExistingBEC(becDBPath string) ([]becZoneRow, []becSeriesRow, error) {
-	db, err := sql.Open("sqlite3", "file:"+becDBPath+"?mode=ro")
+	db, err := sqlutil.OpenReadOnly(becDBPath)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -729,7 +730,7 @@ func buildAndWriteWorkingUnitv13(becAccdb *accessreader.DB, becAccdbSHA, existin
 		return nil, wuProvDoc{}, err
 	}
 
-	oldDB, err := sql.Open("sqlite3", "file:"+existingWUPath+"?mode=ro")
+	oldDB, err := sqlutil.OpenReadOnly(existingWUPath)
 	if err != nil {
 		return nil, wuProvDoc{}, err
 	}
@@ -853,18 +854,19 @@ func buildAndWriteWorkingUnitv13(becAccdb *accessreader.DB, becAccdbSHA, existin
 		userRows[i].SourceOrdinal = strconv.Itoa(i + 1)
 	}
 
-	// Build sourceCopies ensuring BECdb_v13_2026.accdb and VUser.accda are recorded
+	// Build sourceCopies ensuring BECdb_v13_2026.accdb and VUser.accda are recorded with portable basenames
 	copies := []wuCopy{
-		{Path: `C:\Users\BrunoTremblay\Work\becweb_standards_2025_2026\BECdb_v13_2026.accdb`, Hash: strings.ToUpper(becAccdbSHA)},
+		{Path: "BECdb_v13_2026.accdb", Hash: strings.ToUpper(becAccdbSHA)},
 	}
 	seenCopy := map[string]bool{"becdb_v13_2026.accdb": true}
 	for _, sc := range oldProv.SourceCopies {
-		base := strings.ToLower(filepath.Base(sc.Path))
+		portableName := filepath.Base(strings.ReplaceAll(sc.Path, `\`, `/`))
+		base := strings.ToLower(portableName)
 		if seenCopy[base] {
 			continue
 		}
 		seenCopy[base] = true
-		copies = append(copies, sc)
+		copies = append(copies, wuCopy{Path: portableName, Hash: sc.Hash})
 	}
 
 	tables := map[string][]wuRow{

@@ -25,8 +25,8 @@ import (
 )
 
 const (
-	DefaultSpatialAssetsDir = "/home/bruno/Work/spatial_assets"
-	CurrentBECGISVersion    = 13
+	SpatialAssetsEnvVar  = "VPRO_SPATIAL_ASSETS_DIR"
+	CurrentBECGISVersion = 13
 )
 
 type pmtilesHeaderV3 struct {
@@ -1212,7 +1212,8 @@ var (
 
 func getDefaultPMTilesAttributor() *PMTilesAttributor {
 	defaultAttributorOnce.Do(func() {
-		defaultAttributorInst = NewPMTilesAttributor("", DefaultSpatialAssetsDir)
+		dataDir, _ := sqlutil.UserDataDir()
+		defaultAttributorInst = NewPMTilesAttributor(dataDir, ResolveSpatialExtraDirs()...)
 	})
 	return defaultAttributorInst
 }

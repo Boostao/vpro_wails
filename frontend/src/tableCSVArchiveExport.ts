@@ -70,6 +70,34 @@ export interface ArchiveReceiptStorage {
 type PublicationPort = (request: { table: string; approvalHash: string; destination: string }) =>
   PromiseLike<TableCSVArchiveOutcome | null>;
 
+const fallbackReceiptMemoryStorage = new Map<string, string>();
+
+function defaultArchiveReceiptStorage(): ArchiveReceiptStorage {
+  let useMemory = typeof localStorage === 'undefined' || localStorage === null;
+  return {
+    getItem(key: string): string | null {
+      if (!useMemory) {
+        try {
+          return localStorage.getItem(key);
+        } catch {
+          useMemory = true;
+        }
+      }
+      return fallbackReceiptMemoryStorage.get(key) ?? null;
+    },
+    setItem(key: string, value: string): void {
+      fallbackReceiptMemoryStorage.set(key, value);
+      if (!useMemory) {
+        try {
+          localStorage.setItem(key, value);
+        } catch {
+          useMemory = true;
+        }
+      }
+    },
+  };
+}
+
 export class TableCSVArchivePublicationSession {
   private readonly owner: TableCSVArchiveOwner;
   private readonly key: string;
@@ -77,9 +105,7 @@ export class TableCSVArchivePublicationSession {
   private state: TableCSVArchivePublicationView = { busy: false, blocked: false, storageError: '', receipts: [] };
   private listeners = new Set<() => void>();
 
-  constructor(owner: TableCSVArchiveOwner, storage: ArchiveReceiptStorage = {
-    getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value),
-  }) {
+  constructor(owner: TableCSVArchiveOwner, storage: ArchiveReceiptStorage = defaultArchiveReceiptStorage()) {
     this.owner = structuredClone(owner); this.storage = storage;
     this.key = `vpro-owned-table-csv-receipts-v1:${owner.contextId}`;
     try {

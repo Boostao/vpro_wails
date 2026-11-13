@@ -78,3 +78,34 @@ test('receipt provenance, allocator bound, typed columns and durable history rem
   assert.equal(longActor.actor.length, 255);
   assert.equal(longActor.replayed, true);
 });
+
+test('POSIX literal absolute paths split directory and filename cleanly while rejecting non-canonical segments', () => {
+  for (const [posixPath, wantDir, wantName] of [
+    ['/home/jane/Pictures/Plot 00337 #1.jpg', '/home/jane/Pictures/', 'Plot 00337 #1.jpg'],
+    ['/Users/Jane Doe/Desktop/photo.PNG', '/Users/Jane Doe/Desktop/', 'photo.PNG'],
+    ['/rootFile.jpeg', '/', 'rootFile.jpeg'],
+  ]) {
+    const sel = editor.pictureSelectionFromWire({ ...selection(), selectedPath: posixPath }, owner);
+    assert.equal(sel.selectedPath, posixPath);
+    const req = editor.pictureCreationRequest(sel, owner, requestId);
+    const wireReceipt = receipt(req);
+    wireReceipt.committed.cells[1] = cell('text', wantDir);
+    wireReceipt.committed.cells[2] = cell('text', wantName);
+    const parsed = editor.pictureCreationReceiptFromWire(wireReceipt, req, owner);
+    assert.equal(parsed.committed.cells[1].text, wantDir);
+    assert.equal(parsed.committed.cells[2].text, wantName);
+  }
+
+  for (const invalidPath of [
+    '/',
+    '//double.jpg',
+    '/dir//file.jpg',
+    '/dir/./file.jpg',
+    '/dir/../file.jpg',
+    '/dir/trailing/',
+    '/dir/mixed\\slash.jpg',
+    '/dir/ctrl\nname.jpg',
+  ]) {
+    assert.throws(() => editor.pictureSelectionFromWire({ ...selection(), selectedPath: invalidPath }, owner));
+  }
+});

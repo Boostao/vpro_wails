@@ -17,6 +17,8 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 )
 
 const (
@@ -35,6 +37,7 @@ type RuntimeOptions struct {
 	RscriptPath string
 	QuartoPath  string
 	WorkRootDir string
+	DataDir     string
 	LookupEnv   func(string) (string, bool)
 }
 
@@ -234,16 +237,84 @@ func defaultSetupInstructions(missingR bool, missingQuarto bool, missingPkgs []s
 	return steps
 }
 
+func defaultRWorkRootDir(dataDir string) (string, error) {
+	if cacheRoot, err := os.UserCacheDir(); err == nil && strings.TrimSpace(cacheRoot) != "" {
+		candidate := filepath.Join(cacheRoot, "vpro")
+		if mkErr := os.MkdirAll(candidate, 0o700); mkErr == nil {
+			return candidate, nil
+		}
+	}
+	if trimmed := strings.TrimSpace(dataDir); trimmed != "" {
+		if mkErr := os.MkdirAll(trimmed, 0o700); mkErr == nil {
+			return trimmed, nil
+		}
+	}
+	if resolvedDataDir, err := sqlutil.UserDataDir(); err == nil && strings.TrimSpace(resolvedDataDir) != "" {
+		if mkErr := os.MkdirAll(resolvedDataDir, 0o700); mkErr == nil {
+			return resolvedDataDir, nil
+		}
+	}
+	fallback := filepath.Join(os.TempDir(), "vpro-rsidecar")
+	if err := os.MkdirAll(fallback, 0o700); err != nil {
+		return "", fmt.Errorf("resolve writable R sidecar work root: %w", err)
+	}
+	return fallback, nil
+}
+
+func resolveSpaceFreeRTmpDir(existingTmp string) (resolvedTmp string, cleanupDir string) {
+	if !strings.ContainsAny(existingTmp, " \t") {
+		return existingTmp, ""
+	}
+	if short := tryPlatformSpaceFreePath(existingTmp); short != "" && !strings.ContainsAny(short, " \t") {
+		return short, ""
+	}
+
+	candidates := []string{""}
+	if runtime.GOOS == "windows" {
+		if sysDrive := strings.TrimSpace(os.Getenv("SystemDrive")); sysDrive != "" {
+			candidates = append(candidates, filepath.Join(sysDrive+`\`, "Temp"))
+		}
+		if winDir := strings.TrimSpace(os.Getenv("SystemRoot")); winDir != "" {
+			candidates = append(candidates, filepath.Join(winDir, "Temp"))
+		}
+	} else {
+		candidates = append(candidates, "/tmp", "/var/tmp")
+	}
+	if cacheRoot, err := os.UserCacheDir(); err == nil && strings.TrimSpace(cacheRoot) != "" {
+		candidates = append(candidates, cacheRoot)
+	}
+
+	for _, root := range candidates {
+		if root != "" {
+			if info, err := os.Stat(root); err != nil || !info.IsDir() {
+				continue
+			}
+		}
+		created, err := os.MkdirTemp(root, "vpro-r-*")
+		if err != nil {
+			continue
+		}
+		if !strings.ContainsAny(created, " \t") {
+			return created, created
+		}
+		if short := tryPlatformSpaceFreePath(created); short != "" && !strings.ContainsAny(short, " \t") {
+			return short, created
+		}
+		_ = os.RemoveAll(created)
+	}
+	return existingTmp, ""
+}
+
 // prepareIsolatedRunDir creates a clean per-invocation work directory under baseDir/.vpro_rsidecar_work
-// (never touching system temporary directories) and returns runDir, spaceFreeTmpDir, plus cleanup closure.
+// (defaulting to <UserCacheDir>/vpro when baseDir is empty) and returns runDir, spaceFreeTmpDir, plus cleanup closure.
 func prepareIsolatedRunDir(baseDir string) (string, string, func(), error) {
 	root := strings.TrimSpace(baseDir)
 	if root == "" {
-		cwd, err := os.Getwd()
+		resolved, err := defaultRWorkRootDir("")
 		if err != nil {
-			return "", "", nil, fmt.Errorf("resolve working directory for R sidecar: %w", err)
+			return "", "", nil, err
 		}
-		root = cwd
+		root = resolved
 	}
 	absRoot, err := filepath.Abs(root)
 	if err != nil {
@@ -266,34 +337,14 @@ func prepareIsolatedRunDir(baseDir string) (string, string, func(), error) {
 
 	// GNU R aborts at C startup ("Fatal error: 'R_TempDir' contains space") if TMPDIR contains whitespace.
 	// Keep script/JSON/data files in runDir (even with spaces!) while ensuring R's session TMPDIR is space-free.
-	altTmpParent := ""
-	altTmpDir := ""
-	if strings.ContainsAny(tmpDir, " \t") {
-		cacheRoot, cErr := os.UserCacheDir()
-		if cErr != nil || strings.ContainsAny(cacheRoot, " \t") {
-			if cwd, wErr := os.Getwd(); wErr == nil && !strings.ContainsAny(cwd, " \t") {
-				cacheRoot = cwd
-			}
-		}
-		if cacheRoot != "" && !strings.ContainsAny(cacheRoot, " \t") {
-			altTmpParent = filepath.Join(cacheRoot, "vpro-rsidecar-tmp")
-			altTmpDir = filepath.Join(altTmpParent, runToken)
-			if mkErr := os.MkdirAll(altTmpDir, 0700); mkErr == nil {
-				tmpDir = altTmpDir
-			} else {
-				altTmpDir = ""
-			}
-		}
-	}
+	resolvedTmp, altTmpCleanup := resolveSpaceFreeRTmpDir(tmpDir)
+	tmpDir = resolvedTmp
 
 	cleanup := func() {
 		_ = os.RemoveAll(runDir)
 		_ = os.Remove(parent)
-		if altTmpDir != "" {
-			_ = os.RemoveAll(altTmpDir)
-		}
-		if altTmpParent != "" {
-			_ = os.Remove(altTmpParent)
+		if altTmpCleanup != "" {
+			_ = os.RemoveAll(altTmpCleanup)
 		}
 	}
 	return runDir, tmpDir, cleanup, nil
@@ -390,7 +441,12 @@ func executeRScriptJSON(
 
 	baseDir := strings.TrimSpace(opts.WorkRootDir)
 	if baseDir == "" {
-		baseDir = workBaseDir
+		baseDir = strings.TrimSpace(workBaseDir)
+	}
+	if baseDir == "" && strings.TrimSpace(opts.DataDir) != "" {
+		if resolved, rErr := defaultRWorkRootDir(opts.DataDir); rErr == nil {
+			baseDir = resolved
+		}
 	}
 	runDir, tmpDir, cleanup, err := prepareIsolatedRunDir(baseDir)
 	if err != nil {

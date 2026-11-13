@@ -281,7 +281,7 @@ def validate_deb(path, arch, full_version):
                           ("Version", deb_version + "-1"), ("Package", "vpro")):
         values = re.findall(rf"^{key}: (.+)$", text, flags=re.MULTILINE)
         require(values == [expected], f"deb {key} mismatch: {values}, expected {expected}")
-    cpu(tar_payload(members[payload[0]], "usr/local/bin/VPro"), "elf", arch)
+    cpu(tar_payload(members[payload[0]], "usr/bin/VPro"), "elf", arch)
 
 
 def check_bundle(bundle, numeric):

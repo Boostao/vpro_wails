@@ -96,7 +96,7 @@ jobs:
           GOARCH: ${{ matrix.arch }}
         shell: pwsh
         run: |
-          task windows:create:nsis:installer "ARCH=$env:RELEASE_ARCH" CGO_ENABLED=1
+          task windows:create:nsis:installer "ARCH=$env:RELEASE_ARCH" CGO_ENABLED=1 EXTRA_TAGS=sqliteonly INSTALL_SCOPE=user
           if ($LASTEXITCODE -ne 0) { throw "Windows build/NSIS packaging failed" }
           python scripts/release.py package windows
           if ($LASTEXITCODE -ne 0) { throw "Windows artifact validation failed" }
@@ -142,7 +142,7 @@ jobs:
       - name: Build universal app and DMG without host rebuild
         run: |
           set -euo pipefail
-          task darwin:package:universal
+          task darwin:package:universal EXTRA_TAGS=sqliteonly
           python scripts/release.py cpu bin/VPro.app/Contents/MacOS/VPro --format macho --arch universal
           task darwin:create:dmg
           python scripts/release.py package macos
@@ -209,7 +209,7 @@ jobs:
       - name: Build native AppImage and deb
         run: |
           set -euo pipefail
-          task linux:create:appimage linux:create:deb "ARCH=$RELEASE_ARCH"
+          task linux:create:appimage linux:create:deb "ARCH=$RELEASE_ARCH" EXTRA_TAGS=sqliteonly
           python scripts/release.py package linux
       - uses: actions/upload-artifact@v4
         with:

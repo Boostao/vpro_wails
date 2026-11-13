@@ -28,7 +28,9 @@ type SpatialAOISelectionResult = spatialpkg.SpatialAOISelectionResult
 type AssignSpatialAOIToSURequest = spatialpkg.AssignSpatialAOIToSURequest
 type AssignSpatialAOIToSUResult = spatialpkg.AssignSpatialAOIToSUResult
 
+var ResolveSpatialExtraDirs = spatialpkg.ResolveSpatialExtraDirs
 var NewPMTilesAssetHandler = spatialpkg.NewPMTilesAssetHandler
+var NewDynamicPMTilesAssetHandler = spatialpkg.NewDynamicPMTilesAssetHandler
 var NewPMTilesAttributor = spatialpkg.NewPMTilesAttributor
 
 type SpatialService struct {
@@ -150,7 +152,7 @@ func (s *SpatialService) GetPMTilesManifest(ctx context.Context) (PMTilesManifes
 		}
 	}
 	if s == nil {
-		return spatialpkg.BuildPMTilesManifest("", spatialpkg.DefaultSpatialAssetsDir), nil
+		return spatialpkg.BuildPMTilesManifest("", spatialpkg.ResolveSpatialExtraDirs()...), nil
 	}
 	return spatialpkg.BuildPMTilesManifest(s.dataDir, s.extraDirs...), nil
 }

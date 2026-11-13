@@ -24,6 +24,35 @@ func (service *ProjectService) ProjectFile(project ProjectInfo) string {
 	return filepath.Join(service.Root, "projects", project.File)
 }
 
+func reanchorPortableManagedPath(rawPath, currentRoot string, subdirs ...string) (string, bool) {
+	trimmed := strings.TrimSpace(rawPath)
+	if trimmed == "" {
+		return "", false
+	}
+	if filepath.IsAbs(trimmed) {
+		if info, err := os.Stat(trimmed); err == nil && info.Mode().IsRegular() {
+			return trimmed, false
+		}
+	}
+	slashed := strings.ReplaceAll(trimmed, `\`, `/`)
+	for _, subdir := range subdirs {
+		marker := "/" + subdir + "/"
+		idx := strings.LastIndex(slashed, marker)
+		if idx < 0 {
+			continue
+		}
+		tail := slashed[idx+len(marker):]
+		if tail == "" || strings.Contains(tail, "/") || tail == "." || tail == ".." || !strings.EqualFold(filepath.Ext(tail), ".db") {
+			continue
+		}
+		candidate := filepath.Join(currentRoot, subdir, tail)
+		if info, err := os.Stat(candidate); err == nil && info.Mode().IsRegular() {
+			return candidate, true
+		}
+	}
+	return rawPath, false
+}
+
 func NewSQLiteProjectService(root, config string, preferences *DesktopConfig) (_ *ProjectService, resultErr error) {
 	if preferences == nil {
 		return nil, errors.New("SQLite application context requires shared YAML preferences")
@@ -46,6 +75,8 @@ func NewSQLiteProjectService(root, config string, preferences *DesktopConfig) (_
 	if err != nil {
 		return nil, err
 	}
+	reanchoredSupport := false
+	reanchoredSupportMap := map[string]any{}
 	if raw, present := values["Desktop"].(map[string]any)["DatabasePaths"]; present {
 		paths, ok := raw.(map[string]any)
 		if !ok {
@@ -53,16 +84,36 @@ func NewSQLiteProjectService(root, config string, preferences *DesktopConfig) (_
 		}
 		for role, value := range paths {
 			path, valid := value.(string)
-			if _, known := support[role]; !known || !valid || !filepath.IsAbs(path) {
+			if _, known := support[role]; !known || !valid {
+				return nil, fmt.Errorf("Desktop.DatabasePaths.%s must name a known support role and absolute file path", role)
+			}
+			if anchored, ok := reanchorPortableManagedPath(path, root, "database-family"); ok {
+				path = anchored
+				reanchoredSupport = true
+			} else if !filepath.IsAbs(path) {
 				return nil, fmt.Errorf("Desktop.DatabasePaths.%s must name a known support role and absolute file path", role)
 			}
 			support[role] = path
+			reanchoredSupportMap[role] = path
 		}
 	}
 	service := &ProjectService{Root: root, Config: config, Preferences: preferences, SupportPaths: support}
 	selection, err := preferences.Selection()
 	if err != nil {
 		return nil, err
+	}
+	if anchored, ok := reanchorPortableManagedPath(selection.ProjectPath, root, "projects"); ok {
+		selection.ProjectPath = anchored
+	}
+	if selection.SU != "None" {
+		if anchored, ok := reanchorPortableManagedPath(selection.SUPath, root, "projects"); ok {
+			selection.SUPath = anchored
+		}
+	}
+	if selection.Hierarchy != "None" {
+		if anchored, ok := reanchorPortableManagedPath(selection.HierarchyPath, root, "projects"); ok {
+			selection.HierarchyPath = anchored
+		}
 	}
 	if selection.ProjectPath == "" {
 		projects, _, err := service.discover()
@@ -96,6 +147,11 @@ func NewSQLiteProjectService(root, config string, preferences *DesktopConfig) (_
 	if err != nil {
 		return nil, err
 	}
+	if profile != nil && profile.Name != "None" {
+		if anchored, ok := reanchorPortableManagedPath(profile.Path, root, "projects", "database-family"); ok {
+			profile.Path = anchored
+		}
+	}
 	candidate, err := NewSQLiteContext(context.Background(), selection, support, profile)
 	if err != nil {
 		return nil, fmt.Errorf("configured context could not be opened; YAML was retained: %w", err)
@@ -112,6 +168,11 @@ func NewSQLiteProjectService(root, config string, preferences *DesktopConfig) (_
 	id, err := NewContextIdentity()
 	if err != nil {
 		return nil, err
+	}
+	if reanchoredSupport {
+		if err := preferences.Update("Desktop", map[string]any{"DatabasePaths": reanchoredSupportMap}); err != nil {
+			return nil, err
+		}
 	}
 	if err := service.persistSQLiteContext(candidate); err != nil {
 		return nil, err

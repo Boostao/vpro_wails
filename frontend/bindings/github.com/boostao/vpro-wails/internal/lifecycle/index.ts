@@ -20,6 +20,7 @@ export type {
     LibraryStamps,
     StandardsArtifactStamp,
     StandardsSourceStamp,
+    StartupRecoveryRequest,
     StartupState,
     UserLogReview,
     WhatsNewStatus

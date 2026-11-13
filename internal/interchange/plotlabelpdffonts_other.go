@@ -4,9 +4,21 @@ package interchange
 
 import (
 	"context"
-	"errors"
+	"path/filepath"
 )
 
 func loadPlotLabelPDFFonts(ctx context.Context) (plotLabelPDFFonts, error) {
-	return plotLabelPDFFonts{}, errors.New("runtime Arial label PDF fonts are unavailable on this platform")
+	for _, candidateDir := range []string{
+		"/Library/Fonts",
+		"/System/Library/Fonts/Supplemental",
+		"/usr/share/fonts/truetype/msttcorefonts",
+	} {
+		if fonts, err := readPlotLabelPDFFonts(ctx, filepath.Clean(candidateDir), nil); err == nil {
+			return fonts, nil
+		}
+		if ctx != nil && ctx.Err() != nil {
+			return plotLabelPDFFonts{}, ctx.Err()
+		}
+	}
+	return loadBundledPlotLabelPDFFonts(ctx)
 }

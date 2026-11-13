@@ -74,7 +74,7 @@ def deb(arch, version="2.3.4"):
     control = f"Package: vpro\nVersion: {version}-1\nArchitecture: {arch}\n".encode()
     entries = (("debian-binary", b"2.0\n"),
                ("control.tar.gz", tar_bytes([("./control", control)])),
-               ("data.tar.gz", tar_bytes([("./usr/local/bin/VPro", elf(arch))])))
+               ("data.tar.gz", tar_bytes([("./usr/bin/VPro", elf(arch))])))
     data = bytearray(b"!<arch>\n")
     for name, content in entries:
         header = f"{name + '/':<16}{0:<12}{0:<6}{0:<6}{'100644':<8}{len(content):<10}`\n"

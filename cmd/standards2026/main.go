@@ -3,7 +3,6 @@ package main
 import (
 	"archive/zip"
 	"crypto/sha256"
-	"database/sql"
 	"encoding/hex"
 	"encoding/json"
 	"flag"
@@ -11,9 +10,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/boostao/vpro-wails/internal/accessreader"
 	"github.com/boostao/vpro-wails/internal/listcatalog"
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -112,9 +113,9 @@ func generateListCatalogDB(resDir, dbName, provName string, rows []listcatalog.C
 func run(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("standards2026", flag.ContinueOnError)
 	fs.SetOutput(stdout)
-	becZip := fs.String("bec-zip", `C:\Users\BrunoTremblay\Work\becweb_standards_2025_2026\BECdb_v13_2026.zip`, "Read-only path to BECdb_v13_2026.zip")
-	taxaZip := fs.String("taxa-zip", `C:\Users\BrunoTremblay\Work\becweb_standards_2025_2026\BCPlantTaxa2025_access.zip`, "Read-only path to BCPlantTaxa2025_access.zip")
-	lmh25PDF := fs.String("lmh25-pdf", `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\LMH25_2023_web.pdf`, "Optional read-only path to LMH25_2023_web.pdf")
+	becZip := fs.String("bec-zip", "", "Required read-only path to BECdb_v13_2026.zip")
+	taxaZip := fs.String("taxa-zip", "", "Required read-only path to BCPlantTaxa2025_access.zip")
+	lmh25PDF := fs.String("lmh25-pdf", "", "Optional read-only path to LMH25_2023_web.pdf")
 	resDir := fs.String("resources", "resources", "Path to resources directory")
 	if err := fs.Parse(args); err != nil {
 		return err
@@ -122,14 +123,22 @@ func run(args []string, stdout io.Writer) error {
 	if fs.NArg() != 0 {
 		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
 	}
+	if strings.TrimSpace(*becZip) == "" {
+		return fmt.Errorf("-bec-zip is required (path to BECdb_v13_2026.zip)")
+	}
+	if strings.TrimSpace(*taxaZip) == "" {
+		return fmt.Errorf("-taxa-zip is required (path to BCPlantTaxa2025_access.zip)")
+	}
 
 	lmhSHA := listcatalog.LMH252023PDFSHA256
-	if *lmh25PDF != "" {
-		if pdfBytes, err := os.ReadFile(*lmh25PDF); err == nil {
-			actual := sha256Hex(pdfBytes)
-			if actual != lmhSHA {
-				return fmt.Errorf("LMH25_2023_web.pdf SHA256 %s != expected %s", actual, lmhSHA)
-			}
+	if strings.TrimSpace(*lmh25PDF) != "" {
+		pdfBytes, err := os.ReadFile(*lmh25PDF)
+		if err != nil {
+			return fmt.Errorf("read -lmh25-pdf %q: %w", *lmh25PDF, err)
+		}
+		actual := sha256Hex(pdfBytes)
+		if actual != lmhSHA {
+			return fmt.Errorf("LMH25_2023_web.pdf SHA256 %s != expected %s", actual, lmhSHA)
 		}
 	}
 
@@ -187,7 +196,7 @@ func run(args []string, stdout io.Writer) error {
 	// 3. Upgrade VLists.db + vlists.db
 	vlistsFamilyPath := filepath.Join(*resDir, "database-family", "VLists.db")
 	vlistsReadPath := filepath.Join(*resDir, "vlists.db")
-	vlistsRO, err := sql.Open("sqlite3", "file:"+vlistsFamilyPath+"?mode=ro")
+	vlistsRO, err := sqlutil.OpenReadOnly(vlistsFamilyPath)
 	if err != nil {
 		return err
 	}
@@ -264,14 +273,14 @@ func run(args []string, stdout io.Writer) error {
 		Generator:     "cmd/standards2026",
 		Sources: []SourceArchiveProvenance{
 			{
-				ArchiveName:   "BECdb_v13_2026.zip",
+				ArchiveName:   filepath.Base(strings.ReplaceAll(*becZip, `\`, `/`)),
 				ArchiveSHA256: becZipSHA,
 				ExtractedName: "BECdb_v13_2026.accdb",
 				ExtractedSHA:  becAccdbSHA,
 				Version:       "BECdb_v13_2026 (2026-05-28)",
 			},
 			{
-				ArchiveName:   "BCPlantTaxa2025_access.zip",
+				ArchiveName:   filepath.Base(strings.ReplaceAll(*taxaZip, `\`, `/`)),
 				ArchiveSHA256: taxaZipSHA,
 				ExtractedName: "BCPlantTaxonomy.accdb",
 				ExtractedSHA:  taxaAccdbSHA,

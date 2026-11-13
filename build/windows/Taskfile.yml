@@ -30,20 +30,25 @@ tasks:
   build:
     summary: Builds the application for Windows
     cmds:
-      # Auto-detect CGO: if CGO_ENABLED=1, use Docker; otherwise use native Go cross-compile
-      - task: '{{if and (ne OS "windows") (eq .CGO_ENABLED "1")}}build:docker{{else}}build:native{{end}}'
+      # Default to CGO_ENABLED=1 + sqliteonly. On non-Windows hosts, use native MinGW
+      # cross-compiler when available, falling back to Docker wails-cross otherwise.
+      - task: '{{if and (ne OS "windows") (eq .CGO_ENABLED "1") (ne .HAS_WINDOWS_CC "true")}}build:docker{{else}}build:native{{end}}'
         vars:
-          ARCH: '{{.ARCH}}'
+          ARCH: '{{.TARGET_ARCH}}'
           DEV: '{{.DEV}}'
-          EXTRA_TAGS: '{{.EXTRA_TAGS}}'
+          EXTRA_TAGS: '{{.EFFECTIVE_TAGS}}'
           OBFUSCATED: '{{.OBFUSCATED}}'
           GARBLE_ARGS: '{{.GARBLE_ARGS}}'
+          CGO_ENABLED: '{{.CGO_ENABLED}}'
     vars:
-      # Default to CGO_ENABLED=0 if not explicitly set
-      CGO_ENABLED: '{{.CGO_ENABLED | default "0"}}'
+      CGO_ENABLED: '{{.CGO_ENABLED | default "1"}}'
+      TARGET_ARCH: '{{.ARCH | default ARCH}}'
+      EFFECTIVE_TAGS: '{{if contains "sqliteonly" (.EXTRA_TAGS | default "")}}{{.EXTRA_TAGS}}{{else if .EXTRA_TAGS}}sqliteonly,{{.EXTRA_TAGS}}{{else}}sqliteonly{{end}}'
+      HAS_WINDOWS_CC:
+        sh: '{{if eq OS "windows"}}echo true{{else if eq (.ARCH | default ARCH) "arm64"}}wails3 tool has "aarch64-w64-mingw32-clang|aarch64-w64-mingw32-gcc"{{else}}wails3 tool has "x86_64-w64-mingw32-gcc|x86_64-w64-mingw32-clang"{{end}}'
 
   build:native:
-    summary: Builds the application using native Go cross-compilation
+    summary: Builds the application using native Go compilation or MinGW cross-compilation
     internal: true
     deps:
       - task: common:go:mod:tidy
@@ -69,11 +74,15 @@ tasks:
       - cmd: rm -f *.syso
         platforms: [linux, darwin]
     vars:
-      BUILD_FLAGS: '{{if eq .DEV "true"}}{{if or .EXTRA_TAGS (eq .OBFUSCATED "true")}}-tags {{if eq .OBFUSCATED "true"}}wails_obfuscated{{if .EXTRA_TAGS}},{{end}}{{end}}{{.EXTRA_TAGS}} {{end}}-buildvcs=false -gcflags=all="-l"{{else}}-tags production{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}}{{if .EXTRA_TAGS}},{{.EXTRA_TAGS}}{{end}} -trimpath -buildvcs=false -ldflags="-w -s -H windowsgui"{{end}}'
+      EFFECTIVE_TAGS: '{{if contains "sqliteonly" (.EXTRA_TAGS | default "")}}{{.EXTRA_TAGS}}{{else if .EXTRA_TAGS}}sqliteonly,{{.EXTRA_TAGS}}{{else}}sqliteonly{{end}}'
+      BUILD_FLAGS: '{{if eq .DEV "true"}}-tags {{if eq .OBFUSCATED "true"}}wails_obfuscated,{{end}}{{.EFFECTIVE_TAGS}} -buildvcs=false -gcflags=all="-l"{{else}}-tags production{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}},{{.EFFECTIVE_TAGS}} -trimpath -buildvcs=false -ldflags="-w -s -H windowsgui"{{end}}'
+      CROSS_CC:
+        sh: '{{if eq OS "windows"}}printf "%s" "${CC:-}"{{else if eq (.ARCH | default ARCH) "arm64"}}if [ -n "${CC:-}" ]; then printf "%s" "$CC"; elif command -v aarch64-w64-mingw32-clang >/dev/null 2>&1; then printf aarch64-w64-mingw32-clang; else printf aarch64-w64-mingw32-gcc; fi{{else}}if [ -n "${CC:-}" ]; then printf "%s" "$CC"; elif command -v x86_64-w64-mingw32-gcc >/dev/null 2>&1; then printf x86_64-w64-mingw32-gcc; else printf x86_64-w64-mingw32-clang; fi{{end}}'
     env:
       GOOS: windows
-      CGO_ENABLED: '{{.CGO_ENABLED | default "0"}}'
+      CGO_ENABLED: '{{.CGO_ENABLED | default "1"}}'
       GOARCH: '{{.ARCH | default ARCH}}'
+      CC: '{{.CROSS_CC}}'
 
   build:docker:
     summary: Cross-compiles for Windows using Docker with Zig (for CGO builds on non-Windows)
@@ -111,10 +120,10 @@ tasks:
     cmds:
       - task: '{{if eq (.FORMAT | default "nsis") "msix"}}create:msix:package{{else}}create:nsis:installer{{end}}'
         vars:
-          INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "machine"}}'
+          INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "user"}}'
     vars:
       FORMAT: '{{.FORMAT | default "nsis"}}'
-      INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "machine"}}'
+      INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "user"}}'
 
   generate:syso:
     summary: Generates Windows `.syso` file
@@ -137,14 +146,14 @@ tasks:
       - wails3 generate webview2bootstrapper -dir "{{.ROOT_DIR}}/build/windows/nsis"
       - |
         {{if eq OS "windows"}}
-        makensis {{if eq .INSTALL_SCOPE "user"}}-DWAILS_INSTALL_SCOPE=user -DREQUEST_EXECUTION_LEVEL=user {{end}}-DARG_WAILS_{{.ARG_FLAG}}_BINARY="{{.ROOT_DIR}}\{{.BIN_DIR}}\{{.APP_NAME}}.exe" project.nsi
+        makensis -DWAILS_INSTALL_SCOPE={{.INSTALL_SCOPE}} -DREQUEST_EXECUTION_LEVEL={{if eq .INSTALL_SCOPE "user"}}user{{else}}admin{{end}} -DARG_WAILS_{{.ARG_FLAG}}_BINARY="{{.ROOT_DIR}}\{{.BIN_DIR}}\{{.APP_NAME}}.exe" project.nsi
         {{else}}
-        makensis {{if eq .INSTALL_SCOPE "user"}}-DWAILS_INSTALL_SCOPE=user -DREQUEST_EXECUTION_LEVEL=user {{end}}-DARG_WAILS_{{.ARG_FLAG}}_BINARY="{{.ROOT_DIR}}/{{.BIN_DIR}}/{{.APP_NAME}}.exe" project.nsi
+        makensis -DWAILS_INSTALL_SCOPE={{.INSTALL_SCOPE}} -DREQUEST_EXECUTION_LEVEL={{if eq .INSTALL_SCOPE "user"}}user{{else}}admin{{end}} -DARG_WAILS_{{.ARG_FLAG}}_BINARY="{{.ROOT_DIR}}/{{.BIN_DIR}}/{{.APP_NAME}}.exe" project.nsi
         {{end}}
     vars:
       ARCH: '{{.ARCH | default ARCH}}'
       ARG_FLAG: '{{if eq .ARCH "amd64"}}AMD64{{else}}ARM64{{end}}'
-      INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "machine"}}'
+      INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "user"}}'
 
   create:msix:package:
     summary: Creates an MSIX package
@@ -200,8 +209,8 @@ tasks:
     deps:
       - task: create:nsis:installer
         vars:
-          INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "machine"}}'
+          INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "user"}}'
     vars:
-      INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "machine"}}'
+      INSTALL_SCOPE: '{{.INSTALL_SCOPE | default "user"}}'
     cmds:
       - wails3 tool sign --input "build/windows/nsis/{{.APP_NAME}}-installer.exe" {{if .SIGN_CERTIFICATE}}--certificate "{{.SIGN_CERTIFICATE}}"{{end}} {{if .SIGN_THUMBPRINT}}--thumbprint "{{.SIGN_THUMBPRINT}}"{{end}} {{if .TIMESTAMP_SERVER}}--timestamp "{{.TIMESTAMP_SERVER}}"{{end}}

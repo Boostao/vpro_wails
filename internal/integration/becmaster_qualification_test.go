@@ -28,22 +28,20 @@ import (
 
 func locateDisposableBECMasterCopy(t *testing.T) string {
 	t.Helper()
-	staged := "/tmp/vpro_wave6_becmaster/BECMaster_fixing.accdb"
-	if st, err := os.Stat(staged); err == nil && st.Size() > 100*1024*1024 {
-		return staged
-	}
-	candidates := []string{
-		"/home/bruno/Work/VPRO_ACCESS_1/VPro64/BECMaster_fixing.accdb",
-		`C:\Users\BrunoTremblay\Work\VPRO_ACCESS_1\VPro64\BECMaster_fixing.accdb`,
+	var candidates []string
+	if explicit := strings.TrimSpace(os.Getenv("VPRO_BECMASTER_ACCDB")); explicit != "" {
+		candidates = append(candidates, explicit)
+	} else if home, err := os.UserHomeDir(); err == nil && home != "" {
+		candidates = append(candidates, filepath.Join(home, "Work", "VPRO_ACCESS_1", "VPro64", "BECMaster_fixing.accdb"))
 	}
 	for _, src := range candidates {
-		if st, err := os.Stat(src); err == nil && st.Size() > 100*1024*1024 {
+		if st, err := os.Stat(src); err == nil && st.Mode().IsRegular() && st.Size() > 100*1024*1024 {
 			dst := filepath.Join(t.TempDir(), "BECMaster_fixing_disposable.accdb")
 			inF, err := os.Open(src)
 			if err != nil {
 				t.Fatalf("open BECMaster source: %v", err)
 			}
-			outF, err := os.Create(dst)
+			outF, err := os.OpenFile(dst, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
 			if err != nil {
 				inF.Close()
 				t.Fatalf("create disposable BECMaster copy: %v", err)
@@ -53,12 +51,17 @@ func locateDisposableBECMasterCopy(t *testing.T) string {
 				outF.Close()
 				t.Fatalf("copy BECMaster to disposable temp: %v", err)
 			}
-			inF.Close()
-			outF.Close()
+			if err := inF.Close(); err != nil {
+				outF.Close()
+				t.Fatalf("close BECMaster source: %v", err)
+			}
+			if err := outF.Close(); err != nil {
+				t.Fatalf("close disposable BECMaster copy: %v", err)
+			}
 			return dst
 		}
 	}
-	t.Skip("BECMaster_fixing.accdb production dataset not available on this host")
+	t.Skip("BECMaster_fixing.accdb production dataset not available (set VPRO_BECMASTER_ACCDB to run)")
 	return ""
 }
 
@@ -180,7 +183,7 @@ func TestBECMasterProductionScaleQualification(t *testing.T) {
 	}
 
 	// 3. Spatial FlatGeobuf streaming + Polygon Lasso AOI -> *_SU + PMTiles Point-in-Polygon + Headless Chromium MapLibre v6 WebGPU/WebGL2 check
-	attr := spatial.NewPMTilesAttributor(workDir, spatial.DefaultSpatialAssetsDir)
+	attr := spatial.NewPMTilesAttributor(workDir, spatial.ResolveSpatialExtraDirs()...)
 	tFgb0 := time.Now()
 	fgbBytes, err := spatial.GetSpatialPlotsFlatGeobuf(ctx, svc, activeCtxID, attr)
 	fgbDur := time.Since(tFgb0)
@@ -398,7 +401,7 @@ func runHeadlessChromiumWebGPUMapQualification(t *testing.T, fgbBytes []byte, pl
 
 	reportCh := make(chan string, 1)
 	mux := http.NewServeMux()
-	pmHandler := spatial.NewPMTilesAssetHandler(http.NotFoundHandler(), workDir, spatial.DefaultSpatialAssetsDir)
+	pmHandler := spatial.NewPMTilesAssetHandler(http.NotFoundHandler(), workDir, spatial.ResolveSpatialExtraDirs()...)
 	mux.Handle("/maps/", pmHandler)
 	mux.HandleFunc("/api/fgb-meta", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

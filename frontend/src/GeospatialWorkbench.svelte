@@ -27,6 +27,7 @@
     BEC_ZONE_PALETTE,
     DEFAULT_BC_VIEW_STATE,
     buildMapLibreGeospatialStyle,
+    classifyWMSMapError,
     decodeFlatGeobufPoints,
     detectSpatialComputeBackend,
     executeSpatialFilterKernel,
@@ -69,6 +70,7 @@
   let errorMsg = $state('');
   let statusMsg = $state('');
   let mapRenderWarning = $state('');
+  let wmsOfflineWarning = $state('');
 
   let computeInfo = $state<SpatialComputeBackendInfo>({
     backend: 'webgl2-cpu',
@@ -309,6 +311,15 @@
   }
 
   function applyLayerVisibilities() {
+    if (!visibility.bcOpenMapsWMS) {
+      wmsOfflineWarning = '';
+    } else if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      wmsOfflineWarning =
+        classifyWMSMapError({}, true, false) ??
+        'BC OpenMaps WMS imagery is unreachable while offline. Offline PMTiles layers remain active.';
+    } else {
+      wmsOfflineWarning = '';
+    }
     if (!mapInstance) return;
     const style = buildMapLibreGeospatialStyle(payload?.manifest, $state.snapshot(visibility));
     mapInstance.setStyle(style as any);
@@ -375,6 +386,15 @@
       map.on('moveend', () => {
         if (!alive) return;
         void runViewportKernel();
+      });
+
+      map.on('error', (evt) => {
+        if (!alive) return;
+        const online = typeof navigator !== 'undefined' ? navigator.onLine : undefined;
+        const wmsWarn = classifyWMSMapError(evt, visibility.bcOpenMapsWMS, online);
+        if (wmsWarn) {
+          wmsOfflineWarning = wmsWarn;
+        }
       });
 
       map.on('click', (evt) => {
@@ -680,16 +700,35 @@
     refreshDeckOverlay();
   });
 
+  function handleBrowserOffline() {
+    if (!alive || !visibility.bcOpenMapsWMS) return;
+    const msg = classifyWMSMapError({}, true, false);
+    if (msg) wmsOfflineWarning = msg;
+  }
+
+  function handleBrowserOnline() {
+    if (!alive) return;
+    wmsOfflineWarning = '';
+  }
+
   onMount(() => {
     void detectSpatialComputeBackend().then((info) => {
       if (alive) computeInfo = info;
     });
+    if (typeof window !== 'undefined') {
+      window.addEventListener('offline', handleBrowserOffline);
+      window.addEventListener('online', handleBrowserOnline);
+    }
     initializeMapCanvas();
     void loadWorkbenchData();
   });
 
   onDestroy(() => {
     alive = false;
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('offline', handleBrowserOffline);
+      window.removeEventListener('online', handleBrowserOnline);
+    }
     loadGeneration++;
     qaGeneration++;
     aoiGeneration++;
@@ -795,6 +834,9 @@
   {/if}
   {#if mapRenderWarning}
     <div role="status" class="wb-alert wb-alert-info">{mapRenderWarning}</div>
+  {/if}
+  {#if wmsOfflineWarning}
+    <div role="status" data-wms-offline-warning class="wb-alert wb-alert-info">{wmsOfflineWarning}</div>
   {/if}
 
   <div class="wb-main-split">

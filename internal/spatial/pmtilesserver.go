@@ -100,6 +100,51 @@ func inspectPMTilesZoomBoundsFromFile(path string) (minZ, maxZ int) {
 	return inspectPMTilesZoomBoundsFromBytes(buf[:n])
 }
 
+// ResolveSpatialExtraDirs discovers optional offline PMTiles directories from
+// VPRO_SPATIAL_ASSETS_DIR, optional configured paths (e.g. config.yml), and
+// read-only bundle resource locations adjacent to os.Executable().
+func ResolveSpatialExtraDirs(configured ...string) []string {
+	var candidates []string
+	if envVal := strings.TrimSpace(os.Getenv(SpatialAssetsEnvVar)); envVal != "" {
+		for _, item := range filepath.SplitList(envVal) {
+			if trimmed := strings.TrimSpace(item); trimmed != "" {
+				candidates = append(candidates, trimmed)
+			}
+		}
+	}
+	for _, raw := range configured {
+		if trimmed := strings.TrimSpace(raw); trimmed != "" {
+			candidates = append(candidates, trimmed)
+		}
+	}
+	if exePath, err := os.Executable(); err == nil && strings.TrimSpace(exePath) != "" {
+		resolvedExe := exePath
+		if eval, evalErr := filepath.EvalSymlinks(exePath); evalErr == nil && eval != "" {
+			resolvedExe = eval
+		}
+		exeDir := filepath.Dir(resolvedExe)
+		candidates = append(candidates,
+			filepath.Join(exeDir, "maps"),
+			filepath.Join(exeDir, "..", "Resources", "maps"),
+			filepath.Join(exeDir, "..", "share", "vpro", "maps"),
+		)
+	}
+	seen := make(map[string]struct{}, len(candidates))
+	out := make([]string, 0, len(candidates))
+	for _, c := range candidates {
+		clean := filepath.Clean(c)
+		if clean == "" || clean == "." {
+			continue
+		}
+		if _, dup := seen[clean]; dup {
+			continue
+		}
+		seen[clean] = struct{}{}
+		out = append(out, clean)
+	}
+	return out
+}
+
 func resolvePMTilesArchive(name, dataDir string, extraDirs []string) (resolvedPMTilesSource, bool) {
 	clean, ok := validatePMTilesBasename(name)
 	if !ok {
@@ -236,7 +281,17 @@ func BuildPMTilesManifest(dataDir string, extraDirs ...string) PMTilesManifest {
 // with RFC 7233 HTTP Range (206 Partial Content) support and /maps/manifest.json.
 func NewPMTilesAssetHandler(fallback http.Handler, dataDir string, extraDirs ...string) http.Handler {
 	copiedExtra := append([]string(nil), extraDirs...)
+	return NewDynamicPMTilesAssetHandler(fallback, dataDir, func() []string { return copiedExtra })
+}
+
+// NewDynamicPMTilesAssetHandler wraps Wails' asset file server using a dynamic extraDirs provider
+// so config.yml Spatial.AssetsDir updates and startup recovery take effect immediately.
+func NewDynamicPMTilesAssetHandler(fallback http.Handler, dataDir string, getExtraDirs func() []string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var copiedExtra []string
+		if getExtraDirs != nil {
+			copiedExtra = getExtraDirs()
+		}
 		rawURI := r.URL.EscapedPath()
 		if rawURI == "" {
 			rawURI = r.URL.Path

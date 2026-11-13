@@ -1102,7 +1102,7 @@ func publishStagedDatabase(tmpPath, resolvedDest string, expectedParent os.FileI
 	if err != nil || !os.SameFile(expectedParent, currentParent) {
 		return errors.New("destination parent directory changed during staging; publication aborted")
 	}
-	if err := os.Link(tmpPath, resolvedDest); err != nil {
+	if err := sqlutil.LinkOrCreateExclusive(tmpPath, resolvedDest); err != nil {
 		return fmt.Errorf("atomic no-overwrite link to %s failed: %w", resolvedDest, err)
 	}
 	return nil

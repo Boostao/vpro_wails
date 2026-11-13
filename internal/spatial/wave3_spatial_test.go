@@ -92,18 +92,22 @@ func TestWave3PMTilesHTTPByteRangeAndManifest(t *testing.T) {
 		t.Fatalf("unexpected fresh manifest: %+v", freshManifest)
 	}
 
-	// 4. Full-res extraDirs resolution if staged on disk
-	if info, err := os.Stat(filepath.Join(DefaultSpatialAssetsDir, PMTilesBGCArchiveName)); err == nil && info.Size() > 1024 {
-		fullHandler := NewPMTilesAssetHandler(fallback, "", DefaultSpatialAssetsDir)
-		fullReq := httptest.NewRequest(http.MethodGet, "/maps/bc-bgc-v13.pmtiles", nil)
-		fullReq.Header.Set("Range", "bytes=0-126")
-		fullRec := httptest.NewRecorder()
-		fullHandler.ServeHTTP(fullRec, fullReq)
-		if fullRec.Code != http.StatusPartialContent || fullRec.Header().Get("X-VPro-PMTiles-Source") != "extraDir" {
-			t.Fatalf("expected extraDir full-res PMTiles 206, got code=%d src=%q", fullRec.Code, fullRec.Header().Get("X-VPro-PMTiles-Source"))
-		}
-		if fullRec.Body.Bytes()[101] != 10 {
-			t.Fatalf("expected maxZoom=10 in bc-bgc-v13.pmtiles header, got %d", fullRec.Body.Bytes()[101])
+	// 4. Full-res extraDirs resolution if staged via VPRO_SPATIAL_ASSETS_DIR or bundle dirs
+	extraDirs := ResolveSpatialExtraDirs()
+	for _, dir := range extraDirs {
+		if info, err := os.Stat(filepath.Join(dir, PMTilesBGCArchiveName)); err == nil && info.Size() > 1024 {
+			fullHandler := NewPMTilesAssetHandler(fallback, "", dir)
+			fullReq := httptest.NewRequest(http.MethodGet, "/maps/bc-bgc-v13.pmtiles", nil)
+			fullReq.Header.Set("Range", "bytes=0-126")
+			fullRec := httptest.NewRecorder()
+			fullHandler.ServeHTTP(fullRec, fullReq)
+			if fullRec.Code != http.StatusPartialContent || fullRec.Header().Get("X-VPro-PMTiles-Source") != "extraDir" {
+				t.Fatalf("expected extraDir full-res PMTiles 206, got code=%d src=%q", fullRec.Code, fullRec.Header().Get("X-VPro-PMTiles-Source"))
+			}
+			if fullRec.Body.Bytes()[101] != 10 {
+				t.Fatalf("expected maxZoom=10 in bc-bgc-v13.pmtiles header, got %d", fullRec.Body.Bytes()[101])
+			}
+			break
 		}
 	}
 
@@ -213,11 +217,14 @@ func TestWave3SuggestSpatialAttributesFullResAndEmbeddedOverview(t *testing.T) {
 	}{
 		{"embedded-overview-z6", NewPMTilesAttributor("")},
 	}
-	if _, err := os.Stat(filepath.Join(DefaultSpatialAssetsDir, PMTilesBGCArchiveName)); err == nil {
-		attributors = append(attributors, struct {
-			label string
-			attr  *PMTilesAttributor
-		}{"full-res-z10", NewPMTilesAttributor("", DefaultSpatialAssetsDir)})
+	for _, dir := range ResolveSpatialExtraDirs() {
+		if _, err := os.Stat(filepath.Join(dir, PMTilesBGCArchiveName)); err == nil {
+			attributors = append(attributors, struct {
+				label string
+				attr  *PMTilesAttributor
+			}{"full-res-z10", NewPMTilesAttributor("", dir)})
+			break
+		}
 	}
 	defer func() {
 		for _, a := range attributors {
@@ -266,11 +273,12 @@ func TestWave3FlatGeobufWorkbenchAuditStampAndAOIToSU(t *testing.T) {
 	`)
 
 	ctx := context.Background()
-	attr := NewPMTilesAttributor("", DefaultSpatialAssetsDir)
+	extraDirs := ResolveSpatialExtraDirs()
+	attr := NewPMTilesAttributor("", extraDirs...)
 	defer attr.Close()
 
 	// 1. Workbench GeoArrow Payload
-	payload, err := GetSpatialWorkbenchPayload(ctx, contexts, state.ContextID, "", []string{DefaultSpatialAssetsDir}, attr)
+	payload, err := GetSpatialWorkbenchPayload(ctx, contexts, state.ContextID, "", extraDirs, attr)
 	if err != nil {
 		t.Fatalf("GetSpatialWorkbenchPayload: %v", err)
 	}
