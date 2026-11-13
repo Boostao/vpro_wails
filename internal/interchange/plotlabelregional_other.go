@@ -7,6 +7,13 @@ import (
 	"time"
 )
 
-func formatPlotLabelNativeDate(time.Time) (plotLabelNativeDate, error) {
-	return plotLabelNativeDate{}, errors.New("native Windows regional label dates are unavailable on this platform; no locale fallback was inferred")
+func formatPlotLabelNativeDate(date time.Time) (plotLabelNativeDate, error) {
+	if date.Year() < 1601 || date.Year() > 9999 {
+		return plotLabelNativeDate{}, errors.New("native label date is outside the supported Windows calendar range")
+	}
+	return plotLabelNativeDate{
+		text:    date.Format("Monday, January 2, 2006"),
+		locale:  "en-US",
+		pattern: "dddd, MMMM d, yyyy",
+	}, nil
 }

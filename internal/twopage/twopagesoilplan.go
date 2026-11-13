@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"unicode/utf8"
 )
 
@@ -175,5 +176,82 @@ func planTwoPageSoilEdits(ctx context.Context, original *twoPageSoilOriginal, ed
 		assignments = append(assignments, twoPageSoilAssignment{edit.RowID, edit.Column, id,
 			vprocore.CloneSiteUnitCell(before), vprocore.CloneSiteUnitCell(edit.Value), value})
 	}
+	if err := validateTwoPageSoilLMH25DepthSigns(kind, original.Records, columns, rows, assignments); err != nil {
+		return nil, err
+	}
 	return assignments, ctx.Err()
+}
+
+func validateTwoPageSoilLMH25DepthSigns(
+	kind string,
+	records vprocore.ProjectMetadataTable,
+	columns map[string]int,
+	rows map[string]vprocore.ProjectMetadataRow,
+	assignments []twoPageSoilAssignment,
+) error {
+	hzIdx, hasHz := columns["Horizon"]
+	upIdx, hasUp := columns["UpperDepth"]
+	loIdx, hasLo := columns["LowerDepth"]
+	if !hasHz || !hasUp || !hasLo || len(assignments) == 0 {
+		return nil
+	}
+	_ = records
+
+	touchedRows := map[string]bool{}
+	var rowOrder []string
+	afterCell := map[[2]string]vprocore.ProjectMetadataCell{}
+	for _, a := range assignments {
+		afterCell[[2]string{a.RowID, a.Column}] = a.After
+		if a.Column == "Horizon" || a.Column == "UpperDepth" || a.Column == "LowerDepth" {
+			if !touchedRows[a.RowID] {
+				touchedRows[a.RowID] = true
+				rowOrder = append(rowOrder, a.RowID)
+			}
+		}
+	}
+
+	effective := func(rowID, col string, colIdx int, row vprocore.ProjectMetadataRow) vprocore.ProjectMetadataCell {
+		if c, ok := afterCell[[2]string{rowID, col}]; ok {
+			return c
+		}
+		return row.Cells[colIdx]
+	}
+
+	for _, rowID := range rowOrder {
+		row := rows[rowID]
+		hzCell := effective(rowID, "Horizon", hzIdx, row)
+		upCell := effective(rowID, "UpperDepth", upIdx, row)
+		loCell := effective(rowID, "LowerDepth", loIdx, row)
+		if hzCell.Storage != "text" || hzCell.Text == nil ||
+			upCell.Storage != "real" || upCell.Real == nil ||
+			loCell.Storage != "real" || loCell.Real == nil {
+			continue
+		}
+		hzUpper := strings.ToUpper(strings.TrimSpace(*hzCell.Text))
+		if hzUpper == "" {
+			continue
+		}
+		upper, lower := *upCell.Real, *loCell.Real
+		switch kind {
+		case "Humus":
+			if strings.HasPrefix(hzUpper, "OF") || strings.HasPrefix(hzUpper, "OM") || strings.HasPrefix(hzUpper, "OH") {
+				if upper >= lower {
+					return fmt.Errorf("LMH25 wetland %s horizon requires UpperDepth < LowerDepth (got %g..%g)", strings.TrimSpace(*hzCell.Text), upper, lower)
+				}
+			} else if strings.HasPrefix(hzUpper, "L") || strings.HasPrefix(hzUpper, "F") || strings.HasPrefix(hzUpper, "H") {
+				if upper <= lower {
+					return fmt.Errorf("LMH25 upland %s horizon requires UpperDepth > LowerDepth (got %g..%g)", strings.TrimSpace(*hzCell.Text), upper, lower)
+				}
+			}
+		case "Mineral":
+			rest := strings.TrimLeft(hzUpper, "0123456789IV")
+			if strings.HasPrefix(rest, "A") || strings.HasPrefix(rest, "B") || strings.HasPrefix(rest, "C") ||
+				strings.HasPrefix(rest, "R") || strings.HasPrefix(rest, "W") {
+				if upper >= lower {
+					return fmt.Errorf("LMH25 mineral %s horizon requires UpperDepth < LowerDepth (got %g..%g)", strings.TrimSpace(*hzCell.Text), upper, lower)
+				}
+			}
+		}
+	}
+	return nil
 }

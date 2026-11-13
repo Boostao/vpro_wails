@@ -11,6 +11,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -24,10 +25,37 @@ import (
 	"github.com/boostao/vpro-wails/resources"
 )
 
-const (
-	DefaultSpatialAssetsDir = "/home/bruno/Work/spatial_assets"
-	CurrentBECGISVersion    = 13
-)
+const CurrentBECGISVersion = 13
+
+var DefaultSpatialAssetsDir = resolveDefaultSpatialAssetsDir()
+
+func resolveDefaultSpatialAssetsDir() string {
+	return resolveSpatialAssetsDir(os.Getenv, resources.RepoRoot())
+}
+
+func resolveSpatialAssetsDir(getenv func(string) string, repoRoot string) string {
+	if getenv != nil {
+		if envDir := strings.TrimSpace(getenv("VPRO_SPATIAL_ASSETS_DIR")); envDir != "" {
+			cleaned := filepath.Clean(envDir)
+			if info, err := os.Stat(cleaned); err == nil && info.IsDir() {
+				return cleaned
+			}
+		}
+	}
+	if strings.TrimSpace(repoRoot) != "" {
+		parent := filepath.Dir(filepath.Clean(repoRoot))
+		candidates := []string{filepath.Join(parent, "spatial_assets")}
+		if strings.HasSuffix(strings.ToLower(filepath.Base(parent)), ".worktrees") {
+			candidates = append(candidates, filepath.Join(filepath.Dir(parent), "spatial_assets"))
+		}
+		for _, cand := range candidates {
+			if info, err := os.Stat(cand); err == nil && info.IsDir() {
+				return cand
+			}
+		}
+	}
+	return ""
+}
 
 type pmtilesHeaderV3 struct {
 	rootDirOffset       uint64
