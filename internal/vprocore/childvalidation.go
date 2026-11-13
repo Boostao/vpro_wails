@@ -93,3 +93,36 @@ func validateChildField(kind, column string, value any) error {
 	}
 	return ValidateSoilChildField(kind, column, value)
 }
+
+// ValidateSoilHorizonDepthSign enforces LMH25 depth sign conventions when Horizon,
+// UpperDepth, and LowerDepth are all non-nil:
+//   - Upland L/F/H (!OF/!OM/!OH) requires UpperDepth > LowerDepth
+//   - Wetland Of/Om/Oh and mineral A/B/C/R/W require UpperDepth < LowerDepth
+func ValidateSoilHorizonDepthSign(kind string, horizon *string, upperDepth, lowerDepth *float64) error {
+	if horizon == nil || upperDepth == nil || lowerDepth == nil {
+		return nil
+	}
+	hz := strings.ToUpper(strings.TrimSpace(*horizon))
+	if hz == "" {
+		return nil
+	}
+	switch kind {
+	case "Humus":
+		if strings.HasPrefix(hz, "OF") || strings.HasPrefix(hz, "OM") || strings.HasPrefix(hz, "OH") {
+			if !(*upperDepth < *lowerDepth) {
+				return fmt.Errorf("Humus wetland horizon %q requires UpperDepth < LowerDepth (got %v .. %v)", *horizon, *upperDepth, *lowerDepth)
+			}
+		} else if strings.HasPrefix(hz, "L") || strings.HasPrefix(hz, "F") || strings.HasPrefix(hz, "H") {
+			if !(*upperDepth > *lowerDepth) {
+				return fmt.Errorf("Humus upland horizon %q requires UpperDepth > LowerDepth (got %v .. %v)", *horizon, *upperDepth, *lowerDepth)
+			}
+		}
+	case "Mineral":
+		if strings.HasPrefix(hz, "A") || strings.HasPrefix(hz, "B") || strings.HasPrefix(hz, "C") || strings.HasPrefix(hz, "R") || strings.HasPrefix(hz, "W") {
+			if !(*upperDepth < *lowerDepth) {
+				return fmt.Errorf("Mineral horizon %q requires UpperDepth < LowerDepth (got %v .. %v)", *horizon, *upperDepth, *lowerDepth)
+			}
+		}
+	}
+	return nil
+}

@@ -14,6 +14,28 @@ var VegetationSingleColumns = map[string]bool{
 	"Height1": true, "Height2": true, "Height3": true, "Height4": true, "Height5": true, "Height6": true,
 }
 
+var VegetationCoverColumns = map[string]bool{
+	"Cover1": true, "Cover2": true, "Cover3": true, "TotalA": true,
+	"Cover4": true, "Cover5": true, "Cover5a": true, "Cover5b": true, "Cover5c": true, "TotalB": true,
+	"Cover6": true, "Cover7": true, "Cover8": true, "Cover9": true, "Cover10": true,
+}
+
+// ValidateSingleCoverChange narrows float64 cover inputs to IEEE-754 float32 before
+// enforcing >= 0 and < 100 (while preserving unchanged historical out-of-range values).
+func ValidateSingleCoverChange(property string, before, after *float64) error {
+	if err := ValidateSingleRangeChange(property, before, after); err != nil {
+		return err
+	}
+	if after == nil || SameHeightValue(before, after) {
+		return nil
+	}
+	narrowed := float32(*after)
+	if narrowed < 0 || narrowed >= 100 {
+		return fmt.Errorf("property %q must be >= 0 and < 100 in IEEE-754 SINGLE", property)
+	}
+	return nil
+}
+
 var VegetationIntegerColumns = map[string]bool{
 	"AF": true, "DC": true, "UT": true, "VI": true, "PG": true, "FFA": true,
 	"Cultural1": true, "Cultural2": true, "Other1": true, "Other2": true,

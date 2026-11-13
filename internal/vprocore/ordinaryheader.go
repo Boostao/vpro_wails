@@ -78,7 +78,14 @@ func ValidateOrdinaryInteger(name string, value *int) error {
 	return nil
 }
 
-func validateOrdinaryHeaderValues(h FS882Header, old *FS882Header) error {
+var strataCoverHeaderColumns = map[string]bool{
+	"StrataCoverHerb":  true,
+	"StrataCoverMoss":  true,
+	"StrataCoverShrub": true,
+	"StrataCoverTree":  true,
+}
+
+func validateOrdinaryHeaderValuesWithCoverMode(h FS882Header, old *FS882Header, enforceCoverBounds bool) error {
 	previous := FS882Header{}
 	if old != nil {
 		previous = *old
@@ -101,6 +108,10 @@ func validateOrdinaryHeaderValues(h FS882Header, old *FS882Header) error {
 			if err := ValidateOrdinaryInteger(field.Name, field.integer); err != nil {
 				return err
 			}
+		} else if enforceCoverBounds && strataCoverHeaderColumns[field.Name] {
+			if err := ValidateSingleCoverChange(field.Name, numbers[index].single, field.single); err != nil {
+				return err
+			}
 		} else if err := ValidateSingleRangeChange(field.Name, numbers[index].single, field.single); err != nil {
 			return err
 		}
@@ -108,8 +119,16 @@ func validateOrdinaryHeaderValues(h FS882Header, old *FS882Header) error {
 	return ValidateSourceParentBooleanNull("SpeciesListComplete", previous.SpeciesListComplete == nil, h.SpeciesListComplete == nil)
 }
 
-func validateOrdinaryHeaderBeforeTransaction(db *sql.DB, project string, h FS882Header, mode headerSaveMode) error {
-	return validateCodeHeaderBeforeTransaction(db, project, h, mode, validateOrdinaryHeaderValues)
+func validateOrdinaryHeaderValues(h FS882Header, old *FS882Header) error {
+	return validateOrdinaryHeaderValuesWithCoverMode(h, old, true)
+}
+
+func (s *PlotService) validateOrdinaryHeaderValues(h FS882Header, old *FS882Header) error {
+	return validateOrdinaryHeaderValuesWithCoverMode(h, old, s.ContextScoped)
+}
+
+func (s *PlotService) validateOrdinaryHeaderBeforeTransaction(db *sql.DB, project string, h FS882Header, mode headerSaveMode) error {
+	return validateCodeHeaderBeforeTransaction(db, project, h, mode, s.validateOrdinaryHeaderValues)
 }
 
 func ValidateOrdinaryRestoreValue(table, column string, value any) error {

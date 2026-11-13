@@ -391,8 +391,26 @@ func AuditChildFieldsTracked(tx *sql.Tx, project, kind, plot string, id int64, f
 // New IDs intentionally use positive Access LONG (signed32) range, so they
 // remain exact in the unchanged numeric JS DTO. Imported signed IDs are kept.
 func AllocateChildID(tx *sql.Tx, table string) (int64, error) {
-	rows, err := tx.Query(`SELECT "ID" FROM `+table+` WHERE "ID" > 0
-		UNION SELECT "ID" FROM "__VPRO_ChildIdentity" WHERE "ChildTable" = ? AND "ID" > 0 ORDER BY "ID"`, table)
+	unquoted := strings.ReplaceAll(strings.Trim(table, `"`), `""`, `"`)
+	query := `SELECT "ID" FROM ` + table + ` WHERE typeof("ID")='integer' AND "ID" > 0
+		UNION SELECT "ID" FROM "__VPRO_ChildIdentity" WHERE "ChildTable" IN (?, ?) AND typeof("ID")='integer' AND "ID" > 0`
+	args := []any{table, unquoted}
+
+	if lastSep := strings.LastIndexByte(unquoted, '_'); lastSep > 0 {
+		project := unquoted[:lastSep]
+		suffix := unquoted[lastSep:]
+		var hasAudit bool
+		if err := tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name=?)`, project+"_Audit").Scan(&hasAudit); err != nil {
+			return 0, err
+		}
+		if hasAudit {
+			auditTable := QuoteHeaderIdentifier(project + "_Audit")
+			query += ` UNION SELECT "ID" FROM ` + auditTable + ` WHERE "Table" COLLATE NOCASE IN (?, ?) AND typeof("ID")='integer' AND "ID" > 0`
+			args = append(args, suffix, unquoted)
+		}
+	}
+	query += ` ORDER BY "ID"`
+	rows, err := tx.Query(query, args...)
 	if err != nil {
 		return 0, err
 	}
@@ -611,7 +629,7 @@ func (s *PlotService) saveChildWithChecks(kind string, record any, mode childSav
 	if kind == "Veg" && !deleting {
 		for i, field := range fields {
 			property := ChildJSONKey(value, field)
-			if !HeightProperties[property] {
+			if !VegetationCoverColumns[field.Column] && !HeightProperties[property] {
 				continue
 			}
 			var oldNumber, newNumber *float64
@@ -623,8 +641,44 @@ func (s *PlotService) saveChildWithChecks(kind string, record any, mode childSav
 				number := after[i].(float64)
 				newNumber = &number
 			}
-			if err := ValidateHeightNumericChange(property, oldNumber, newNumber); err != nil {
-				return fmt.Errorf("Veg identity (%q, %d): %w", plot, id, err)
+			var vErr error
+			if VegetationCoverColumns[field.Column] {
+				vErr = ValidateSingleCoverChange("Veg."+field.Column, oldNumber, newNumber)
+			} else {
+				vErr = ValidateHeightNumericChange(property, oldNumber, newNumber)
+			}
+			if vErr != nil {
+				return fmt.Errorf("Veg identity (%q, %d): %w", plot, id, vErr)
+			}
+		}
+	}
+	if (kind == "Humus" || kind == "Mineral") && !deleting {
+		depthOrHorizonModified := creating
+		if !depthOrHorizonModified {
+			for _, field := range fields {
+				if field.Column == "Horizon" || field.Column == "UpperDepth" || field.Column == "LowerDepth" {
+					depthOrHorizonModified = true
+					break
+				}
+			}
+		}
+		if depthOrHorizonModified {
+			var effHorizon *string
+			var effUpper, effLower *float64
+			if hVal := value.FieldByName("Horizon"); hVal.Kind() == reflect.Pointer && !hVal.IsNil() {
+				s := hVal.Elem().String()
+				effHorizon = &s
+			}
+			if uVal := value.FieldByName("UpperDepth"); uVal.Kind() == reflect.Pointer && !uVal.IsNil() {
+				v := uVal.Elem().Float()
+				effUpper = &v
+			}
+			if lVal := value.FieldByName("LowerDepth"); lVal.Kind() == reflect.Pointer && !lVal.IsNil() {
+				v := lVal.Elem().Float()
+				effLower = &v
+			}
+			if err := ValidateSoilHorizonDepthSign(kind, effHorizon, effUpper, effLower); err != nil {
+				return fmt.Errorf("%s identity (%q, %d): %w", kind, plot, id, err)
 			}
 		}
 	}

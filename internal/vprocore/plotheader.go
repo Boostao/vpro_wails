@@ -12,6 +12,8 @@ import (
 	"reflect"
 	"strings"
 	"time"
+	"unicode/utf16"
+	"unicode/utf8"
 )
 
 type HeaderField struct {
@@ -317,6 +319,9 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 	user, strength := s.CurrentUser, s.AuditStrength
 	s.Mu.RUnlock()
 	masterAllowed := MasterBECAllowed(user)
+	if !utf8.ValidString(h.PlotNumber) || strings.ContainsRune(h.PlotNumber, 0) {
+		return errors.New("PlotNumber must be valid UTF-8 without NUL bytes")
+	}
 	if strings.TrimSpace(h.PlotNumber) == "" {
 		return errors.New("PlotNumber is required")
 	}
@@ -349,7 +354,7 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 	if err := validateParentCodeHeaderBeforeTransaction(db, project, h, mode); err != nil {
 		return err
 	}
-	if err := validateOrdinaryHeaderBeforeTransaction(db, project, h, mode); err != nil {
+	if err := s.validateOrdinaryHeaderBeforeTransaction(db, project, h, mode); err != nil {
 		return err
 	}
 	if err := s.validateSoilDrainageBeforeTransaction(db, project, h, mode); err != nil {
@@ -359,6 +364,9 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 		return validateMasterBECHeaderValues(next, old, masterAllowed)
 	}); err != nil {
 		return err
+	}
+	if mode == headerCreate && s.ContextScoped && len(utf16.Encode([]rune(h.PlotNumber))) > 7 {
+		return errors.New("PlotNumber exceeds 7 UTF-16 code units")
 	}
 	tx, err := db.Begin()
 	if err != nil {
@@ -436,7 +444,7 @@ func (s *PlotService) saveHeader(h FS882Header, mode headerSaveMode) error {
 	if err := validateParentCodeHeaderValues(h, qualityOld); err != nil {
 		return err
 	}
-	if err := validateOrdinaryHeaderValues(h, qualityOld); err != nil {
+	if err := s.validateOrdinaryHeaderValues(h, qualityOld); err != nil {
 		return err
 	}
 	if err := s.validateSoilDrainageHeaderValues(h, qualityOld); err != nil {

@@ -104,6 +104,7 @@ func validateQualityHeaderBeforeTransaction(db *sql.DB, project string, h FS882H
 func (h *FS882Header) UnmarshalJSON(data []byte) error {
 	type headerAlias FS882Header
 	fields := append(QualityHeaderFields(FS882Header{}), SiteCodeHeaderFields(FS882Header{})...)
+	fields = append(fields, BecHeaderFields(FS882Header{})...)
 	fields = append(fields, RegionHeaderFields(FS882Header{})...)
 	fields = append(fields, SoilHeaderFields(FS882Header{})...)
 	fields = append(fields, GeologyHeaderFields(FS882Header{})...)
@@ -111,7 +112,8 @@ func (h *FS882Header) UnmarshalJSON(data []byte) error {
 	fields = append(fields, OrdinaryTextFields(FS882Header{})...)
 	fields = append(fields, soilDrainageHeaderField(FS882Header{}))
 	fields = append(fields, masterBECHeaderField(FS882Header{}))
-	names := make(map[string]string, len(fields))
+	names := make(map[string]string, len(fields)+1)
+	names["plotnumber"] = "PlotNumber"
 	for _, field := range fields {
 		names[strings.ToLower(field.Property)] = field.Name
 	}

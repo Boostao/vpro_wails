@@ -847,39 +847,78 @@ func ExecuteThreeWayMerge(s *vprocore.ContextService, ctx context.Context, conte
 	return runMergeOnConn(conn)
 }
 
+var mergedEnvTextMax = map[string]int{
+	"PlotNumber": 7, "FieldNumber": 50, "ProjectID": 30, "FSRegionDistrict": 7,
+	"Ecosection": 3, "NtsMapSheet": 8, "AirPhotoNum": 20,
+	"Zone": 4, "SubZone": 8, "SiteSeries": 5, "RealmClass": 5, "MapUnit": 30,
+	"SnowCoverregime": 1, "Exposure1": 2, "Exposure2": 2,
+	"SiteDisturbance1": 8, "SiteDisturbance2": 8, "SiteDisturbance3": 8,
+	"Photo": 50, "SoilSurveyor": 30, "VegSurveyor": 30,
+	"BedrockGeology1": 4, "BedrockGeology2": 4, "BedrockGeology3": 4,
+	"CoarseFragLith1": 12, "CoarseFragLith2": 12, "CoarseFragLith3": 12,
+	"FloodingRegimeDur": 2, "FloodingRegimeFreq": 7,
+	"GeoMorProSubSurf": 3, "GeoMorProSurf": 3,
+	"HumusForm": 4, "HumusFormPhase": 50,
+	"HydroGeoSubSystem": 2, "HydroGeoSystem": 3,
+	"RootRestrictingType": 1, "RootZoneParticleSize": 6,
+	"SoilDrainage": 5, "SoilClassGroup": 4, "SoilClassSubGroup": 4,
+	"SurfaceExpSubSurf": 3, "SurfaceExpSurf": 3,
+	"SurficialMaterialSubSurf": 6, "SurficialMaterialSurf": 6,
+	"TerrainTextureSubSurf": 3, "TerrainTextureSurf": 3,
+	"WaterSource": 5,
+}
+
+var mergedAdminTextMax = map[string]int{
+	"Plot": 7, "PlotType": 10, "SitePlotQuality": 15, "VegPlotQuality": 15, "SoilPlotQuality": 15,
+	"EnteredBy": 50, "UserSiteUnit": 100, "BECSiteUnit": 100,
+}
+
+var mergedEnvStrataCoverCols = []string{
+	"StrataCoverTree", "StrataCoverShrub", "StrataCoverHerb", "StrataCoverMoss",
+}
+
 func validateMergedCell(suffix, col string, cell rawSQLiteCell) error {
 	if cell.storage == "null" {
 		return nil
 	}
 	if cell.storage == "text" {
 		txt := string(cell.bytes)
+		if err := validateUTF16Max(suffix+"."+col, txt, 0); err != nil {
+			return err
+		}
 		switch suffix {
+		case "Env":
+			if maxLen, ok := mergedEnvTextMax[col]; ok {
+				return validateUTF16Max("Env."+col, txt, maxLen)
+			}
+		case "Admin":
+			if maxLen, ok := mergedAdminTextMax[col]; ok {
+				return validateUTF16Max("Admin."+col, txt, maxLen)
+			}
 		case "Veg":
-			if col == "Species" {
-				return validateUTF16Max("Veg.Species", txt, 8)
+			if maxLen, ok := vprocore.VegetationTextMaximum[col]; ok {
+				return validateUTF16Max("Veg."+col, txt, maxLen)
 			}
-		case "Humus":
-			if col == "Horizon" {
-				return validateUTF16Max("Humus.Horizon", txt, 8)
+		case "Humus", "Mineral":
+			if maxLen, ok := vprocore.SoilChildTextMaximum[suffix][col]; ok && maxLen > 0 {
+				return validateUTF16Max(suffix+"."+col, txt, maxLen)
 			}
-		case "Mineral":
-			switch col {
-			case "Horizon":
-				return validateUTF16Max("Mineral.Horizon", txt, 8)
-			case "Texture":
-				return validateUTF16Max("Mineral.Texture", txt, 4)
-			case "Colour":
-				return validateUTF16Max("Mineral.Colour", txt, 14)
+		case "Other":
+			if maxLen, ok := vprocore.OtherTextMaximum[col]; ok {
+				return validateUTF16Max("Other."+col, txt, maxLen)
 			}
 		}
 	}
-	if suffix == "Veg" && slices.Contains(vegCoverCols, col) && (cell.storage == "real" || cell.storage == "integer") {
+	isCoverCol := (suffix == "Veg" && slices.Contains(vegCoverCols, col)) ||
+		(suffix == "Env" && slices.Contains(mergedEnvStrataCoverCols, col)) ||
+		(suffix == "Admin" && col == "StrataCoverTotal")
+	if isCoverCol && (cell.storage == "real" || cell.storage == "integer") {
 		val := cell.realVal
 		if cell.storage == "integer" {
 			val = float64(cell.intVal)
 		}
 		if _, ok := NarrowSingleCover(val); !ok {
-			return fmt.Errorf("cover %s=%v must be >= 0 and < 100 in IEEE-754 SINGLE", col, val)
+			return fmt.Errorf("cover %s.%s=%v must be >= 0 and < 100 in IEEE-754 SINGLE", suffix, col, val)
 		}
 	}
 	return nil
