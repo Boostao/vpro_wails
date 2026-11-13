@@ -147,8 +147,8 @@ func TestSynthesisSnapshotAndReassign71kBECMasterCohortUnder50ms(t *testing.T) {
 		t.Fatalf("unexpected 438-cohort snapshot counts: classified=%d total=%d units=%d",
 			snap.ClassifiedPlotCount, snap.TotalProjectPlots, len(snap.Units))
 	}
-	if snapDur >= 50*time.Millisecond {
-		t.Fatalf("ComputeSynthesisSnapshot on 71.5k plots / 500k veg rows took %v, want < 50ms", snapDur)
+	if snapDur >= synthesisLatencyBudget {
+		t.Fatalf("ComputeSynthesisSnapshot on 71.5k plots / 500k veg rows took %v, want < %v", snapDur, synthesisLatencyBudget)
 	}
 
 	tReassign := time.Now()
@@ -161,8 +161,8 @@ func TestSynthesisSnapshotAndReassign71kBECMasterCohortUnder50ms(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ReassignSynthesisPlotUnit(00337): %v", err)
 	}
-	if !reassigned.Changed || reassignDur >= 50*time.Millisecond {
-		t.Fatalf("ReassignSynthesisPlotUnit on 71.5k plots / 500k veg rows took %v (reported %.2fms), want < 50ms",
-			reassignDur, reassigned.LatencyMs)
+	if !reassigned.Changed || reassignDur >= synthesisLatencyBudget {
+		t.Fatalf("ReassignSynthesisPlotUnit on 71.5k plots / 500k veg rows took %v (reported %.2fms), want < %v",
+			reassignDur, reassigned.LatencyMs, synthesisLatencyBudget)
 	}
 }
