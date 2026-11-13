@@ -9,6 +9,7 @@ on:
       - 'site/**'
       - 'docs-src/**'
       - 'scripts/build-docs-src.mjs'
+      - 'scripts/release.py'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -28,15 +29,25 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Hydrate release-manifest.json from published GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/release.py sync-release-manifest --base-manifest site/release-manifest.json --output site/release-manifest.json
 
       - name: Build single-source docs and BC Gov release portal
         run: node scripts/build-docs-src.mjs && node site/build.mjs

@@ -410,6 +410,9 @@ test('BC Gov Design System build outputs self-hosted fonts, searchable LMH25 doc
   const distDownloads = readFileSync(path.join(distDir, 'downloads.mjs'), 'utf8');
   const distPortalDocs = readFileSync(path.join(distDir, 'portal-docs.mjs'), 'utf8');
   assert.equal(distHtml, docsHtml);
+  assert.ok(existsSync(path.join(distDir, 'favicon.ico')), 'Missing site/dist/favicon.ico');
+  assert.ok(existsSync(path.join(repoRoot, 'docs', 'favicon.ico')), 'Missing docs/favicon.ico');
+  assert.match(distHtml, /<link rel="icon" href="\.\/favicon\.ico"/);
 
   // Required self-hosted WOFF2 fonts in site/dist/fonts/
   for (const fontName of [

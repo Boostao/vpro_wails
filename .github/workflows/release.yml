@@ -6,7 +6,7 @@ on:
       version:
         description: 'SemVer, optionally prefixed with v (numeric components <= 65535)'
         required: true
-        default: 'v0.1.0'
+        default: 'v2.0.0'
       prerelease:
         description: 'Publish as Pre-release'
         type: boolean
@@ -108,7 +108,7 @@ jobs:
 
   build-macos:
     needs: validate
-    runs-on: macos-14
+    runs-on: macos-15
     env:
       RELEASE_VERSION: ${{ needs.validate.outputs.version }}
       CGO_ENABLED: '1'
@@ -222,8 +222,6 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
-      pages: write
-      id-token: write
     env:
       RELEASE_VERSION: ${{ needs.validate.outputs.version }}
       RELEASE_TAG: ${{ needs.validate.outputs.tag }}
@@ -242,8 +240,9 @@ jobs:
       - name: Require exact assets, architecture witnesses and checksums
         run: |
           set -euo pipefail
+          python scripts/release.py sync-release-manifest --base-manifest site/release-manifest.json --output base-release-manifest.json
           python scripts/release.py manifest release-assets
-          python scripts/release.py release-manifest release-assets --output release-assets/release-manifest.json --base-manifest site/release-manifest.json
+          python scripts/release.py release-manifest release-assets --output release-assets/release-manifest.json --base-manifest base-release-manifest.json
       - name: Refuse an existing tag built from different source
         run: python scripts/release.py source-tag
       - name: Create release with every validated asset
@@ -261,22 +260,48 @@ jobs:
           python scripts/release.py remote release-remote.json --require-release-manifest
           gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir release-downloaded
           python scripts/release.py verify release-downloaded --manifest release-assets/SHA256SUMS.txt --release-manifest release-assets/release-manifest.json
-      - uses: actions/setup-node@v4
+      - uses: actions/upload-artifact@v4
         if: inputs.draft != true
         with:
+          name: release-manifest
+          path: release-assets/release-manifest.json
+          if-no-files-found: error
+
+  deploy-pages:
+    needs: [release]
+    if: inputs.draft != true
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: 'pages'
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
           node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-manifest
+          path: release-manifest
       - name: Build Pages portal with verified release-manifest.json
-        if: inputs.draft != true
         run: |
           set -euo pipefail
-          cp release-assets/release-manifest.json site/release-manifest.json
+          cp release-manifest/release-manifest.json site/release-manifest.json
           node scripts/build-docs-src.mjs
           node site/build.mjs
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
       - name: Upload Pages artifact
-        if: inputs.draft != true
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'site/dist'
       - name: Deploy updated release portal to GitHub Pages
-        if: inputs.draft != true
+        id: deployment
         uses: actions/deploy-pages@v4

@@ -175,7 +175,7 @@ tasks:
       APP_NAME: '{{.APP_NAME}}'
       EXEC: '{{.APP_NAME}}'
       ICON: '{{.APP_NAME}}'
-      CATEGORIES: 'Science;Education;Utility;'
+      CATEGORIES: 'Science;Biology;Geoscience;DataVisualization;'
       COMMENT: 'VENUS (Vegetation and Environment NexUS) Professional'
       KEYWORDS: 'vpro;bec;ecology;vegetation;'
       OUTPUTFILE: '{{.ROOT_DIR}}/build/linux/{{.APP_NAME}}.desktop'

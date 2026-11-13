@@ -1129,7 +1129,7 @@
   "whatsNew": [
     {
       "version": "2.0.0",
-      "date": "2026-11-12",
+      "date": "2026-11-13",
       "channel": "stable",
       "highlights": [
         "Complete native cross-platform SQLite WAL desktop architecture replacing 32/64-bit Microsoft Access runtime dependency.",

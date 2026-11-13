@@ -603,11 +603,95 @@ class ReleaseTests(unittest.TestCase):
         repo_manifest = json.loads((ROOT / "site/release-manifest.json").read_text(encoding="utf-8"))
         release.validate_release_manifest(repo_manifest)
 
+    def test_sync_release_manifest_hydrates_non_draft_channels_and_skips_drafts(self):
+        asset_fixture(self.root)
+        with working_directory(self.root):
+            release.manifest(self.root)
+        stable_manifest = self.root / "stable-release-manifest.json"
+        release.release_manifest(
+            self.root,
+            stable_manifest,
+            published_at="2026-11-13T17:00:00Z",
+            root=ROOT,
+        )
+
+        rc_dir = self.root / "sync-rc"
+        rc_dir.mkdir()
+        with patch.dict(os.environ, {"RELEASE_VERSION": "v2.4.0-rc.1", "RELEASE_PRERELEASE": "true"}):
+            for arch in ("amd64", "arm64"):
+                (rc_dir / f"vpro-windows-{arch}.exe").write_bytes(pe(arch))
+                (rc_dir / f"vpro-windows-{arch}-installer.exe").write_bytes(b"rc installer")
+                with zipfile.ZipFile(rc_dir / f"vpro-windows-{arch}.zip", "w") as archive:
+                    archive.writestr("VPro.exe", pe(arch))
+                (rc_dir / f"vpro-linux-{arch}.AppImage").write_bytes(elf(arch, True))
+                (rc_dir / f"vpro-linux-{arch}.deb").write_bytes(deb(arch, "2.4.0~rc.1"))
+                (rc_dir / f"vpro-linux-{arch}.tar.gz").write_bytes(tar_bytes([("VPro", elf(arch))]))
+            (rc_dir / "vpro-macos-universal.dmg").write_bytes(b"rc DMG")
+            with zipfile.ZipFile(rc_dir / "vpro-macos-universal.zip", "w") as archive:
+                archive.writestr("VPro.app/Contents/MacOS/VPro", universal())
+                archive.writestr("VPro.app/Contents/Info.plist",
+                                 plistlib.dumps({"CFBundleVersion": "2.4.0", "CFBundleShortVersionString": "2.4.0"}))
+            for group in ("windows-amd64", "windows-arm64", "macos-universal", "linux-amd64", "linux-arm64"):
+                names = [name for name in EXPECTED if name.startswith("vpro-" + group)]
+                witness = {"schema": 1, "group": group, "version": "2.4.0-rc.1", "commit": "abc123",
+                           "architectures": ["amd64", "arm64"] if group == "macos-universal" else [group.split("-")[1]],
+                           "sha256": {name: hashlib.sha256((rc_dir / name).read_bytes()).hexdigest() for name in names}}
+                (rc_dir / f"release-witness-{group}.json").write_text(json.dumps(witness), encoding="utf-8")
+            with working_directory(rc_dir):
+                release.manifest(rc_dir)
+            rc_manifest = self.root / "rc-release-manifest.json"
+            release.release_manifest(
+                rc_dir,
+                rc_manifest,
+                published_at="2026-11-13T18:00:00Z",
+                root=ROOT,
+            )
+
+        complete_assets = [{"name": n} for n in (*EXPECTED, "SHA256SUMS.txt", "release-manifest.json")]
+        releases_feed = self.root / "releases-feed.json"
+        releases_feed.write_text(json.dumps([
+            {"tag_name": "v9.9.9-draft", "draft": True, "prerelease": False, "assets": complete_assets},
+            {"tag_name": "v2.5.0-incomplete", "draft": False, "prerelease": False, "assets": [{"name": "SHA256SUMS.txt"}]},
+            {"tag_name": "v2.4.0-rc.1", "draft": False, "prerelease": True, "assets": complete_assets},
+            {"tag_name": "v2.3.4", "draft": False, "prerelease": False, "assets": complete_assets},
+        ]), encoding="utf-8")
+
+        manifests_by_tag = {
+            "v2.3.4": stable_manifest.read_text(encoding="utf-8"),
+            "v2.4.0-rc.1": rc_manifest.read_text(encoding="utf-8"),
+        }
+        synced_out = self.root / "synced-release-manifest.json"
+        synced = release.sync_release_manifest(
+            synced_out,
+            base_manifest=ROOT / "site/release-manifest.json",
+            releases_json=releases_feed,
+            asset_loader=lambda tag, _: manifests_by_tag[tag],
+        )
+        self.assertEqual(synced["channels"]["stable"]["tag"], "v2.3.4")
+        self.assertEqual(synced["channels"]["preview"]["tag"], "v2.4.0-rc.1")
+
+        # Empty/draft-only feed clears channels cleanly instead of leaving dead download URLs.
+        draft_only_feed = self.root / "draft-only.json"
+        draft_only_feed.write_text(json.dumps([
+            {"tag_name": "v0.1.0-demo", "draft": True, "prerelease": False, "assets": complete_assets},
+        ]), encoding="utf-8")
+        cleared_out = self.root / "cleared-release-manifest.json"
+        cleared = release.sync_release_manifest(
+            cleared_out,
+            base_manifest=synced_out,
+            releases_json=draft_only_feed,
+            asset_loader=lambda tag, _: manifests_by_tag[tag],
+        )
+        self.assertIsNone(cleared["channels"]["stable"])
+        self.assertIsNone(cleared["channels"]["preview"])
+
     def test_workflow_contract(self):
         workflow = (ROOT / ".github/workflows/release.yml").read_text()
         self.assertNotIn("|| true", workflow)
         self.assertNotIn("continue-on-error", workflow)
         self.assertNotIn("darwin:package:dmg", workflow)
+        self.assertNotIn("macos-14", workflow)
+        self.assertIn("runs-on: macos-15", workflow)
         self.assertNotIn("go-version: '1.25'", workflow)
         self.assertEqual(workflow.count("go-version: '1.26'"), 3)
         self.assertIn("task darwin:package:universal", workflow)
@@ -619,14 +703,18 @@ class ReleaseTests(unittest.TestCase):
         self.assertNotIn("${{ inputs.version }}", workflow.split("run:", 1)[-1])
         self.assertEqual(workflow.count("contents: write"), 1)
         self.assertIn("contents: read", workflow)
+        self.assertIn("python scripts/release.py sync-release-manifest", workflow)
         self.assertIn("python scripts/release.py manifest release-assets", workflow)
         self.assertIn("python scripts/release.py release-manifest release-assets --output release-assets/release-manifest.json", workflow)
         self.assertIn("python scripts/release.py remote release-remote.json --require-release-manifest", workflow)
         self.assertIn("python scripts/release.py verify release-downloaded --manifest release-assets/SHA256SUMS.txt --release-manifest release-assets/release-manifest.json", workflow)
+        self.assertIn("name: github-pages", workflow)
+        self.assertIn("actions/configure-pages@v5", workflow)
         pages = (ROOT / ".github/workflows/pages.yml").read_text()
         self.assertNotIn("enablement: true", pages)
         self.assertNotIn("path: 'docs'", pages)
         self.assertIn("node-version: '22'", pages)
+        self.assertIn("python scripts/release.py sync-release-manifest", pages)
         self.assertIn("node scripts/build-docs-src.mjs && node site/build.mjs", pages)
         self.assertIn("path: 'site/dist'", pages)
 

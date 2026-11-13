@@ -126,7 +126,8 @@ const lmh25Fields = [
     ],
     codes: [
       { code: '0–360', label: 'Azimuth degrees clockwise from true north' },
-      { code: '999', label: 'No aspect (level ground, 0% slope)' }
+      { code: '999', label: 'No aspect (level ground, 0% slope)' },
+      { code: 'CO', label: 'Cold aspect exposure (LMH25 2023)' }
     ]
   },
   {
@@ -227,10 +228,14 @@ const lmh25Fields = [
       { code: '1', label: 'Sparse / Bryoid (1a Sparse, 1b Bryoid)' },
       { code: '2', label: 'Herb (2a Forb, 2b Graminoid, 2c Aquatic, 2d Dwarf shrub)' },
       { code: '3', label: 'Shrub / Herb (< 10 m tall; 3a Low shrub < 2 m, 3b Tall shrub 2–10 m)' },
+      { code: '3c', label: 'Short stunted trees (LMH25 2023)' },
+      { code: '3d', label: 'Tall stunted trees (LMH25 2023)' },
       { code: '4', label: 'Pole / Sapling (> 10 m tall, dense self-thinning canopy)' },
       { code: '5', label: 'Young Forest (differentiated canopy, < 80–140 yr)' },
       { code: '6', label: 'Mature Forest (established understory regeneration)' },
-      { code: '7', label: 'Old Forest (multi-layered uneven-aged canopy, large snags/CWD)' }
+      { code: '7', label: 'Old Forest (multi-layered uneven-aged canopy, large snags/CWD)' },
+      { code: 'A.w.th', label: 'SiteDisturbance — Windthrow (uprooting, LMH25 2023)' },
+      { code: 'A.w.br', label: 'SiteDisturbance — Windbreak (stem snap, LMH25 2023)' }
     ]
   },
   {
@@ -369,12 +374,14 @@ const lmh25Fields = [
     code: 'SOIL 30',
     section: 'Soil Profile Summary (<Project>_Env)',
     title: 'Rooting Depth, Root Restricting Layer & Water Source',
-    column: 'RootingDepth / RootRestrictingType / RootRestrictingDepth / SeepageDepth',
+    column: 'RootingDepth / RootRestrictingType / RootRestrictingDepth / SeepageDepth / FloodingRegimeDur',
     unit: 'cm',
     lmh25Page: 112,
     summary: 'Effective rooting zone depth, depth to bedrock/ortstein/basal till/permafrost/water table, and growing-season seepage depth.',
     rules: ['Shallow restricting layers (< 30 cm or < 50 cm) without seepage shift rSMR drier; seepage < 60 cm shifts rSMR moister (5–6).'],
-    codes: []
+    codes: [
+      { code: 'S', label: 'FloodingRegimeDur — Semi-permanent / Merely subirrigated during flood events (LMH25 2023)' }
+    ]
   },
   // VEG 1-10 (Vegetation Strata, CoverNarrowing, CHARS, Lumping)
   {
@@ -635,7 +642,7 @@ const shortcuts = [
 const whatsNew = [
   {
     version: '2.0.0',
-    date: '2026-11-12',
+    date: '2026-11-13',
     channel: 'stable',
     highlights: [
       'Complete native cross-platform SQLite WAL desktop architecture replacing 32/64-bit Microsoft Access runtime dependency.',

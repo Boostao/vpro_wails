@@ -310,6 +310,7 @@ export function renderPortalHtml({
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VPro — VENUS (Vegetation and Environment NexUS) Professional | B.C. Ministry of Forests BEC Program</title>
   <meta name="description" content="Official release portal, LMH25 (2023) field reference, and BECWeb Data Use Agreement for VPro (VENUS — Vegetation and Environment NexUS — Professional), B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program.">
+  <link rel="icon" href="./favicon.ico" sizes="any">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -819,6 +820,14 @@ export function buildSite({
     fs.copyFileSync(srcFont, path.join(outDir, 'fonts', fontFile));
   }
 
+  const faviconSrc = fs.existsSync(path.join(siteDir, 'favicon.ico'))
+    ? path.join(siteDir, 'favicon.ico')
+    : path.join(repoRoot, 'frontend', 'public', 'favicon.ico');
+  if (!fs.existsSync(faviconSrc)) {
+    throw new Error(`Missing required favicon.ico: ${faviconSrc}`);
+  }
+  fs.copyFileSync(faviconSrc, path.join(outDir, 'favicon.ico'));
+
   fs.writeFileSync(path.join(outDir, 'index.html'), html, 'utf8');
   fs.writeFileSync(path.join(outDir, 'styles.css'), css, 'utf8');
   fs.writeFileSync(path.join(outDir, 'downloads.mjs'), downloadsJs, 'utf8');
@@ -829,6 +838,7 @@ export function buildSite({
   if (syncDocs) {
     const docsDir = path.join(repoRoot, 'docs');
     fs.mkdirSync(docsDir, { recursive: true });
+    fs.copyFileSync(faviconSrc, path.join(docsDir, 'favicon.ico'));
     fs.writeFileSync(path.join(docsDir, 'index.html'), html, 'utf8');
     fs.writeFileSync(path.join(docsDir, 'styles.css'), css, 'utf8');
     fs.writeFileSync(path.join(docsDir, 'downloads.mjs'), downloadsJs, 'utf8');

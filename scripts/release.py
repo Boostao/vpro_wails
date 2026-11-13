@@ -615,6 +615,70 @@ def release_manifest(directory, output, *, channel=None, published_at=None,
     return doc
 
 
+def sync_release_manifest(output, *, base_manifest=None, releases_json=None,
+                          asset_loader=None, repository=REPOSITORY):
+    default_channel = "stable"
+    if base_manifest is not None and base_manifest.is_file():
+        existing = validate_release_manifest(json.loads(base_manifest.read_text(encoding="utf-8")))
+        default_channel = existing["defaultChannel"]
+    if releases_json is not None:
+        releases = json.loads(releases_json.read_text(encoding="utf-8"))
+    else:
+        result = subprocess.run(
+            ["gh", "api", f"repos/{repository}/releases?per_page=50"],
+            check=True, capture_output=True, text=True,
+        )
+        releases = json.loads(result.stdout)
+    require(isinstance(releases, list), "Expected GitHub releases JSON array")
+
+    required_remote = REQUIRED | {MANIFEST, RELEASE_MANIFEST}
+    matched = {}
+    for rel in releases:
+        if not isinstance(rel, dict) or rel.get("draft") is not False:
+            continue
+        is_prerelease = rel.get("prerelease")
+        if type(is_prerelease) is not bool:
+            continue
+        channel_name = "preview" if is_prerelease else "stable"
+        if channel_name in matched:
+            continue
+        tag = rel.get("tag_name")
+        assets = rel.get("assets")
+        if not isinstance(tag, str) or not tag or not isinstance(assets, list):
+            continue
+        asset_names = {a.get("name") for a in assets if isinstance(a, dict)}
+        if not required_remote.issubset(asset_names):
+            continue
+        matched[channel_name] = tag
+        if "stable" in matched and "preview" in matched:
+            break
+
+    doc = {
+        "schemaVersion": 1,
+        "repository": repository,
+        "defaultChannel": default_channel,
+        "channels": {"stable": None, "preview": None},
+    }
+    for channel_name, tag in matched.items():
+        if asset_loader is not None:
+            raw = asset_loader(tag, RELEASE_MANIFEST)
+        else:
+            with tempfile.TemporaryDirectory() as tmp:
+                run("gh", "release", "download", tag, "--repo", repository,
+                    "--pattern", RELEASE_MANIFEST, "--dir", tmp)
+                raw = (Path(tmp) / RELEASE_MANIFEST).read_text(encoding="utf-8")
+        remote_doc = validate_release_manifest(json.loads(raw))
+        entry = remote_doc["channels"].get(channel_name)
+        require(entry is not None and entry.get("tag") == tag,
+                f"Downloaded {RELEASE_MANIFEST} for {tag} is missing matching {channel_name} channel")
+        doc["channels"][channel_name] = entry
+
+    validate_release_manifest(doc)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8", newline="\n")
+    return doc
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -636,6 +700,10 @@ def main():
     portal_manifest.add_argument("--published-at")
     portal_manifest.add_argument("--base-manifest", type=Path)
     portal_manifest.add_argument("--default-channel", choices=("stable", "preview"))
+    sync_manifest = commands.add_parser("sync-release-manifest")
+    sync_manifest.add_argument("--output", type=Path, required=True)
+    sync_manifest.add_argument("--base-manifest", type=Path)
+    sync_manifest.add_argument("--releases-json", type=Path)
     for command in ("manifest", "remote", "verify"):
         subparser = commands.add_parser(command)
         subparser.add_argument("path", type=Path)
@@ -669,6 +737,12 @@ def main():
             published_at=args.published_at,
             base_manifest=args.base_manifest,
             default_channel=args.default_channel,
+        )
+    elif args.command == "sync-release-manifest":
+        sync_release_manifest(
+            args.output,
+            base_manifest=args.base_manifest,
+            releases_json=args.releases_json,
         )
     elif args.command == "remote":
         remote(args.path, require_release_manifest=args.require_release_manifest)

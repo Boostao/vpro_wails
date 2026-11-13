@@ -36,7 +36,7 @@ cp -f "${APP_BINARY}" "${APP_DIR}/usr/bin/${APP_NAME}"
 chmod 0755 "${APP_DIR}/usr/bin/${APP_NAME}"
 cp -f "${ICON_PATH}" "${APP_DIR}/.DirIcon"
 cp -f "${ICON_PATH}" "${APP_DIR}/${APP_NAME}.png"
-cp -f "${DESKTOP_FILE}" "${APP_DIR}/"
+cp -f "${DESKTOP_FILE}" "${APP_DIR}/${APP_NAME}.desktop"
 
 # Bundle WebKitGTK helper processes and injected bundle so WEBKIT_EXEC_PATH resolves inside the AppImage.
 LD_OUT="$(ldd "${APP_BINARY}" || true)"
@@ -70,7 +70,9 @@ fi
 
 # Custom AppRun: preserve native Wayland/X11 selection (never force GDK_BACKEND=x11)
 # and honor or populate WEBKIT_EXEC_PATH for bundled WebKitGTK subprocesses.
-cat > "${APP_DIR}/AppRun" <<EOF
+# Stage outside APP_DIR so linuxdeploy --custom-apprun never unlinks its own source file.
+CUSTOM_APPRUN="${BUILD_DIR}/AppRun.${APP_NAME}"
+cat > "${CUSTOM_APPRUN}" <<EOF
 #!/usr/bin/env bash
 set -e
 APPDIR="\${APPDIR:-\$(dirname "\$(readlink -f "\$0")")}"
@@ -104,7 +106,7 @@ if [[ -d "\${APPDIR}/apprun-hooks" ]]; then
 fi
 exec "\${APPDIR}/usr/bin/${APP_NAME}" "\$@"
 EOF
-chmod 0755 "${APP_DIR}/AppRun"
+chmod 0755 "${CUSTOM_APPRUN}"
 
 cd "${BUILD_DIR}"
 LINUXDEPLOY_BIN="${BUILD_DIR}/linuxdeploy-${LINUXDEPLOY_ARCH}.AppImage"
@@ -129,7 +131,9 @@ for probe_lib in /usr/lib/libgtk-4.so.1 /usr/lib64/libgtk-4.so.1 /usr/lib/x86_64
 done
 
 rm -f "${BUILD_DIR}/${APP_NAME}"*.AppImage
-"${LINUXDEPLOY_BIN}" --appimage-extract-and-run --appdir "${APP_DIR}" --custom-apprun "${APP_DIR}/AppRun"
+"${LINUXDEPLOY_BIN}" --appimage-extract-and-run \
+    --appdir "${APP_DIR}" \
+    --custom-apprun "${CUSTOM_APPRUN}"
 
 if [[ -d "${APP_DIR}/apprun-hooks" ]]; then
     for hook in "${APP_DIR}/apprun-hooks/"*.sh; do
@@ -139,7 +143,18 @@ if [[ -d "${APP_DIR}/apprun-hooks" ]]; then
     done
 fi
 
-"${LINUXDEPLOY_BIN}" --appimage-extract-and-run --appdir "${APP_DIR}" --custom-apprun "${APP_DIR}/AppRun" --output appimage
+install -m 0755 "${CUSTOM_APPRUN}" "${APP_DIR}/AppRun"
+cp -f "${ICON_PATH}" "${APP_DIR}/.DirIcon"
+cp -f "${ICON_PATH}" "${APP_DIR}/${APP_NAME}.png"
+cp -f "${DESKTOP_FILE}" "${APP_DIR}/${APP_NAME}.desktop"
+chmod -R u+rwX,go+rX "${APP_DIR}"
+chmod 0755 "${APP_DIR}/AppRun" "${APP_DIR}/usr/bin/${APP_NAME}"
+
+"${LINUXDEPLOY_BIN}" --appimage-extract-and-run \
+    --appdir "${APP_DIR}" \
+    --custom-apprun "${CUSTOM_APPRUN}" \
+    --output appimage
+rm -f "${CUSTOM_APPRUN}"
 
 # Rename the generated AppImage using an unquoted wildcard expansion.
 shopt -s nullglob
