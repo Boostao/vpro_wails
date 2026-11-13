@@ -305,11 +305,12 @@ export async function validateXMLSnippetChunked(
       } else if (code >= 0xdc00 && code <= 0xdfff) {
         return { valid: false, plotTagCount: 0, error: 'XML contains unpaired UTF-16 low surrogate.' };
       }
-    }
-    const slice = xmlText.slice(offset, end);
-    const matches = slice.match(/<(Plot|Releve|tblPlotData|tblEnv)\b/gi);
-    if (matches) {
-      plotTagCount += matches.length;
+      if (code === 0x3c) {
+        const probe = xmlText.slice(i, Math.min(xmlText.length, i + 20));
+        if (/^<(Plot|Releve|tblPlotData|tblEnv)(?=[\s/>]|$)/i.test(probe)) {
+          plotTagCount++;
+        }
+      }
     }
     await yieldFn();
     if (isCancelled()) {
@@ -324,9 +325,10 @@ export const TURBOVEG_LAYER_CROSSWALK: ReadonlyArray<{
   tvGroup: string;
   description: string;
 }> = [
-  { vproLayers: 'Cover1..Cover3, TotalA', tvGroup: 'Tree', description: 'Dominant, main canopy, and sub-canopy trees' },
-  { vproLayers: 'Cover4..Cover5c, TotalB', tvGroup: 'Shrub', description: 'Tall, low, and CHARS extended shrub sub-layers' },
-  { vproLayers: 'Cover6', tvGroup: 'Herb', description: 'Herbaceous and dwarf woody layer (C)' },
-  { vproLayers: 'Cover7..Cover9', tvGroup: 'Moss', description: 'Terrestrial (D), epixylic (Dw), and epilithic (Dr) bryoids' },
-  { vproLayers: 'Cover10', tvGroup: 'Epiphyte', description: 'Arboreal lichens and epiphytes (Ep)' },
+  { vproLayers: 'Cover1..Cover3, TotalA', tvGroup: '1..3 = t1..t3 (Tree)', description: 'Dominant (A1), main canopy (A2), sub-canopy (A3); TotalA via VPRO_LAYER UDF' },
+  { vproLayers: 'Cover4..Cover5c, TotalB', tvGroup: '4..5 = s1..s2 (Shrub)', description: 'Tall (B1) & low (B2) shrubs; CHARS 5a..5c & TotalB via VPRO_LAYER UDF' },
+  { vproLayers: 'Cover6', tvGroup: '6 = hl (Herb)', description: 'Herbaceous layer (C); untagged external 7=jl non-woody & 8=sl seedlings' },
+  { vproLayers: 'Cover5 (woody) / Cover6', tvGroup: '7..8 = jl, sl (Juvenile)', description: 'External Turboveg juvenile woody -> Cover5; non-woody & seedlings -> Cover6' },
+  { vproLayers: 'Cover7..Cover9', tvGroup: '9 = ml (Cryptogam)', description: 'Terrestrial (D), epixylic (Dw), and epilithic (Dr) bryoids/lichens via VPRO_LAYER UDF' },
+  { vproLayers: 'Cover10', tvGroup: '10 = ep (Epiphyte)', description: 'Arboreal lichens and epiphytes (Ep)' },
 ];

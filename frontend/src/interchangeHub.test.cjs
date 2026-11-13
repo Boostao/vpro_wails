@@ -30,8 +30,14 @@ test('validateTargetProjectName rejects None, Sample, master, and non-identifier
 });
 
 test('validateXMLSnippetChunked yields cooperatively across chunks and aborts when cancelled mid-yield', async () => {
+  // Single-plot <Plot_package> must count strictly 1 <Plot>, never matching <Plot_package> or <Plots>, even across tiny chunk boundaries
+  const singlePkg = '<Plot_package><Plots><Plot releve_nr="1"><header_data><standard_record releve_nr="1"/></header_data></Plot></Plots></Plot_package>';
+  const singleRes = await hub.validateXMLSnippetChunked(singlePkg, 7, async () => {});
+  assert.equal(singleRes.valid, true);
+  assert.equal(singleRes.plotTagCount, 1);
+
   let yields = 0;
-  const bigXml = '<Turboveg><Plots>' + '<Plot plot_number="001"><Header/></Plot>'.repeat(120) + '</Plots></Turboveg>';
+  const bigXml = '<Plot_package><Plots>' + '<Plot releve_nr="1"><header_data/></Plot>'.repeat(120) + '</Plots></Plot_package>';
   const ok = await hub.validateXMLSnippetChunked(
     bigXml,
     512,
@@ -61,9 +67,13 @@ test('validateXMLSnippetChunked yields cooperatively across chunks and aborts wh
   await assert.rejects(pending, /cancelled/);
 
   // Malformed surrogate in XML is rejected cleanly
-  const badSurrogate = await hub.validateXMLSnippetChunked('<Turboveg>\uD800</Turboveg>', 512);
+  const badSurrogate = await hub.validateXMLSnippetChunked('<Plot_package>\uD800</Plot_package>', 512);
   assert.equal(badSurrogate.valid, false);
   assert.match(badSurrogate.error, /surrogate/);
+
+  // Canonical Alterra Turboveg 3 crosswalk documents 9 = ml (Cryptogam) and 10 = ep (Epiphyte)
+  assert.ok(hub.TURBOVEG_LAYER_CROSSWALK.some((cw) => cw.tvGroup.includes('9 = ml')));
+  assert.ok(hub.TURBOVEG_LAYER_CROSSWALK.some((cw) => cw.tvGroup.includes('10 = ep')));
 });
 
 test('defaultInterchangeHubPort invokes all expected ImportExportService methods via Call.ByName', async () => {

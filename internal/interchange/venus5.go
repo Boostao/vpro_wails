@@ -1343,7 +1343,7 @@ func writeVenusToVP08Tx(
 			if wv.collected == "" && strings.TrimSpace(vo.Collected) != "" {
 				wv.collected = truncateUTF16Units(strings.TrimSpace(vo.Collected), 1)
 			}
-			cCol, hCol := resolveIncomingTurboVegLayer(vo.Layer, "")
+			cCol, hCol := resolveIncomingVenusLayer(vo.Layer)
 			if err := accumulateImportedSingleCover(wv.covers, cCol, vo.Cover, pNum, code); err != nil {
 				return 0, 0, 0, err
 			}
@@ -1469,3 +1469,41 @@ func writeVenusToVP08Tx(
 		projIDVal, sourceProject+" (VENUS "+venusVer+" Import)", len(seenPlots))
 	return vegCount, humusCount, mineralCount, err
 }
+
+func resolveIncomingVenusLayer(layerCode string) (coverCol, heightCol string) {
+	switch strings.ToUpper(strings.TrimSpace(layerCode)) {
+	case "1", "A1":
+		return "Cover1", "Height1"
+	case "2", "A2":
+		return "Cover2", "Height2"
+	case "3", "A3":
+		return "Cover3", "Height3"
+	case "TOTALA", "A":
+		return "TotalA", "HeightA"
+	case "4", "B1":
+		return "Cover4", "Height4"
+	case "5", "B2":
+		return "Cover5", "Height5"
+	case "5A", "B2A":
+		return "Cover5a", "Height5a"
+	case "5B", "B2B":
+		return "Cover5b", "Height5b"
+	case "5C", "B2C":
+		return "Cover5c", "Height5c"
+	case "TOTALB", "B":
+		return "TotalB", "HeightB"
+	case "6", "C", "HERB":
+		return "Cover6", "Height6"
+	case "7", "D", "DH", "MOSS":
+		return "Cover7", ""
+	case "8", "DW":
+		return "Cover8", ""
+	case "9", "DR":
+		return "Cover9", ""
+	case "10", "EP", "EPIPHYTE":
+		return "Cover10", ""
+	default:
+		return "Cover6", "Height6"
+	}
+}
+
