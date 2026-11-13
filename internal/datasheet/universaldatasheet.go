@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 	"unicode/utf16"
 	"unicode/utf8"
@@ -681,25 +683,32 @@ func buildDatasheetWhereAndOrder(
 		likeArg := "%" + escapeSQLiteLike(trimmedGlobal) + "%"
 		matchNum := canMatchFormattedNumeric(trimmedGlobal)
 		matchBool := canMatchFormattedBoolean(trimmedGlobal)
+		paramIdx := len(args) + 1
+		paramRef := "?" + strconv.Itoa(paramIdx)
+		likeExpr := " LIKE " + paramRef
+		if strings.ContainsAny(trimmedGlobal, `%_\`) {
+			likeExpr = " LIKE " + paramRef + " ESCAPE '\\'"
+		}
 		var orParts []string
 		for _, colMeta := range columns {
 			qCol := `__t.` + vprocore.QuoteHeaderIdentifier(colMeta.Name)
 			if colMeta.Kind == "text" {
-				orParts = append(orParts, qCol+" LIKE ? ESCAPE '\\'")
-				args = append(args, likeArg)
+				orParts = append(orParts, qCol+likeExpr)
 				continue
 			}
 			if colMeta.Kind == "boolean" {
 				if !matchBool {
+					orParts = append(orParts, "(+"+qCol+" >= '' AND typeof("+qCol+") = 'text' AND "+qCol+likeExpr+")")
 					continue
 				}
 			} else if !matchNum {
+				orParts = append(orParts, "(+"+qCol+" >= '' AND typeof("+qCol+") = 'text' AND "+qCol+likeExpr+")")
 				continue
 			}
-			orParts = append(orParts, "CAST("+qCol+" AS TEXT) LIKE ? ESCAPE '\\'")
-			args = append(args, likeArg)
+			orParts = append(orParts, "CAST("+qCol+" AS TEXT)"+likeExpr)
 		}
 		if len(orParts) > 0 {
+			args = append(args, likeArg)
 			clauses = append(clauses, "("+strings.Join(orParts, " OR ")+")")
 		} else {
 			clauses = append(clauses, "1=0")
@@ -711,6 +720,11 @@ func buildDatasheetWhereAndOrder(
 		whereSQL = " WHERE " + strings.Join(clauses, " AND ")
 	}
 
+	orderPrefix := ""
+	if trimmedGlobal != "" && len(filters) == 0 && !scopeToActiveSU {
+		// Prevent SQLite from scanning 1M rows in random index->rowid order to satisfy ORDER BY during an unindexed full-table GlobalSearch!
+		orderPrefix = "+"
+	}
 	var orderParts []string
 	seenSort := map[string]bool{}
 	for _, s := range sortSpecs {
@@ -727,7 +741,7 @@ func buildDatasheetWhereAndOrder(
 		if strings.EqualFold(strings.TrimSpace(s.Direction), "desc") {
 			dir = "DESC"
 		}
-		qCol := `__t.` + vprocore.QuoteHeaderIdentifier(colMeta.Name)
+		qCol := orderPrefix + `__t.` + vprocore.QuoteHeaderIdentifier(colMeta.Name)
 		// NULLs always sort last for predictable spreadsheet ergonomics, with case-insensitive text ordering.
 		if colMeta.Kind == "text" {
 			orderParts = append(orderParts, "CASE WHEN "+qCol+" IS NULL THEN 1 ELSE 0 END ASC", qCol+" COLLATE NOCASE "+dir, qCol+" COLLATE BINARY "+dir)
@@ -737,7 +751,7 @@ func buildDatasheetWhereAndOrder(
 	}
 	if len(orderParts) == 0 {
 		if pinned, ok := colLookup[strings.ToLower(target.pinnedColumn)]; ok {
-			qPin := `__t.` + vprocore.QuoteHeaderIdentifier(pinned.Name)
+			qPin := orderPrefix + `__t.` + vprocore.QuoteHeaderIdentifier(pinned.Name)
 			if target.key == "Env" || target.key == "Veg" {
 				orderParts = append(orderParts, qPin+" COLLATE NOCASE ASC", qPin+" COLLATE BINARY ASC")
 			} else {
@@ -852,6 +866,201 @@ func queryDatasheetWindowRows(
 	if err := errors.Join(idRows.Err(), idRows.Close()); err != nil {
 		return nil, err
 	}
+	return fetchDatasheetRowsByRowIDs(ctx, tx, relation, selectFields, columns, winRowIDs)
+}
+
+func queryFilteredDatasheetWindowAndCount(
+	ctx context.Context,
+	tx *sql.Tx,
+	owner *vprocore.SqliteContext,
+	role, tableName string,
+	columns []DatasheetColumnMeta,
+	whereSQL string,
+	whereArgs []any,
+	orderSQL string,
+	scopeToActiveSU bool,
+	limit int,
+) ([]DatasheetRow, int64, error) {
+	relation := vprocore.QuoteHeaderIdentifier(role) + "." + vprocore.QuoteHeaderIdentifier(tableName)
+	selectFields := make([]string, 0, 1+len(columns)*2)
+	selectFields = append(selectFields, "__t.rowid")
+	for _, col := range columns {
+		qCol := `__t.` + vprocore.QuoteHeaderIdentifier(col.Name)
+		selectFields = append(selectFields,
+			"typeof("+qCol+")",
+			"CASE typeof("+qCol+") WHEN 'integer' THEN CAST("+qCol+" AS INTEGER) WHEN 'real' THEN CAST("+qCol+" AS REAL) ELSE CAST("+qCol+" AS BLOB) END",
+		)
+	}
+
+	if !scopeToActiveSU && owner != nil {
+		if dbPath := strings.TrimSpace(owner.Attachments[role]); dbPath != "" {
+			var minRowID, maxRowID sql.NullInt64
+			if rErr := tx.QueryRowContext(ctx, "SELECT MIN(rowid), MAX(rowid) FROM "+relation).Scan(&minRowID, &maxRowID); rErr == nil &&
+				minRowID.Valid && maxRowID.Valid && maxRowID.Int64-minRowID.Int64 >= 100000 {
+				workers := min(max(runtime.NumCPU(), 2), 8)
+				if workers*limit <= 900 {
+					if pRows, pTotal, pOK, pErr := parallelRangeScanDatasheetWindow(
+						ctx, tx, dbPath, relation, tableName, selectFields, columns,
+						whereSQL, whereArgs, orderSQL, minRowID.Int64, maxRowID.Int64, limit, workers,
+					); pErr != nil {
+						return nil, 0, pErr
+					} else if pOK {
+						return pRows, pTotal, nil
+					}
+				}
+			}
+		}
+	}
+
+	idQuery := "SELECT __t.rowid, COUNT(*) OVER () FROM " + relation + " AS __t" + whereSQL + orderSQL + " LIMIT ?"
+	idArgs := append(append([]any{}, whereArgs...), limit)
+	idRows, err := tx.QueryContext(ctx, idQuery, idArgs...)
+	if err != nil {
+		return nil, 0, err
+	}
+	var winRowIDs []int64
+	var totalRows int64
+	for idRows.Next() {
+		var rid, cnt int64
+		if err := idRows.Scan(&rid, &cnt); err != nil {
+			idRows.Close()
+			return nil, 0, err
+		}
+		winRowIDs = append(winRowIDs, rid)
+		totalRows = cnt
+	}
+	if err := errors.Join(idRows.Err(), idRows.Close()); err != nil {
+		return nil, 0, err
+	}
+	rows, err := fetchDatasheetRowsByRowIDs(ctx, tx, relation, selectFields, columns, winRowIDs)
+	return rows, totalRows, err
+}
+
+func parallelRangeScanDatasheetWindow(
+	ctx context.Context,
+	tx *sql.Tx,
+	dbPath, relation, tableName string,
+	selectFields []string,
+	columns []DatasheetColumnMeta,
+	whereSQL string,
+	whereArgs []any,
+	orderSQL string,
+	minRowID, maxRowID int64,
+	limit, workers int,
+) ([]DatasheetRow, int64, bool, error) {
+	roDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(dbPath, "ro"))
+	if err != nil {
+		return nil, 0, false, nil
+	}
+	defer roDB.Close()
+	roDB.SetMaxOpenConns(workers)
+	roDB.SetMaxIdleConns(workers)
+
+	whereBody := strings.TrimPrefix(whereSQL, " WHERE ")
+	qTable := vprocore.QuoteHeaderIdentifier(tableName)
+	chunkSQL := fmt.Sprintf(
+		"SELECT __t.rowid, COUNT(*) OVER () FROM %s AS __t WHERE (%s) AND __t.rowid BETWEEN ? AND ?%s LIMIT ?",
+		qTable, whereBody, orderSQL,
+	)
+
+	span := maxRowID - minRowID + 1
+	step := (span + int64(workers) - 1) / int64(workers)
+
+	type chunkResult struct {
+		ids   []int64
+		count int64
+		err   error
+	}
+	results := make([]chunkResult, workers)
+	var wg sync.WaitGroup
+	for w := 0; w < workers; w++ {
+		lo := minRowID + int64(w)*step
+		if lo > maxRowID {
+			continue
+		}
+		hi := min(lo+step-1, maxRowID)
+		wg.Add(1)
+		go func(idx int, loID, hiID int64) {
+			defer wg.Done()
+			cArgs := make([]any, 0, len(whereArgs)+3)
+			cArgs = append(cArgs, whereArgs...)
+			cArgs = append(cArgs, loID, hiID, limit)
+			rRows, qErr := roDB.QueryContext(ctx, chunkSQL, cArgs...)
+			if qErr != nil {
+				results[idx].err = qErr
+				return
+			}
+			var ids []int64
+			var cnt int64
+			for rRows.Next() {
+				var rid, c int64
+				if sErr := rRows.Scan(&rid, &c); sErr != nil {
+					rRows.Close()
+					results[idx].err = sErr
+					return
+				}
+				ids = append(ids, rid)
+				cnt = c
+			}
+			results[idx].err = errors.Join(rRows.Err(), rRows.Close())
+			results[idx].ids = ids
+			results[idx].count = cnt
+		}(w, lo, hi)
+	}
+	wg.Wait()
+
+	var totalRows int64
+	var candidateIDs []int64
+	for _, res := range results {
+		if res.err != nil {
+			if ctx.Err() != nil {
+				return nil, 0, false, res.err
+			}
+			return nil, 0, false, nil
+		}
+		totalRows += res.count
+		candidateIDs = append(candidateIDs, res.ids...)
+	}
+	if len(candidateIDs) == 0 {
+		return []DatasheetRow{}, 0, true, nil
+	}
+
+	ph := make([]string, len(candidateIDs))
+	mergeArgs := make([]any, len(candidateIDs)+1)
+	for i, id := range candidateIDs {
+		ph[i] = "?"
+		mergeArgs[i] = id
+	}
+	mergeArgs[len(candidateIDs)] = limit
+	mergeQuery := "SELECT __t.rowid FROM " + relation + " AS __t WHERE __t.rowid IN (" + strings.Join(ph, ",") + ")" + orderSQL + " LIMIT ?"
+	mRows, err := tx.QueryContext(ctx, mergeQuery, mergeArgs...)
+	if err != nil {
+		return nil, 0, false, err
+	}
+	var winRowIDs []int64
+	for mRows.Next() {
+		var rid int64
+		if err := mRows.Scan(&rid); err != nil {
+			mRows.Close()
+			return nil, 0, false, err
+		}
+		winRowIDs = append(winRowIDs, rid)
+	}
+	if err := errors.Join(mRows.Err(), mRows.Close()); err != nil {
+		return nil, 0, false, err
+	}
+	rows, err := fetchDatasheetRowsByRowIDs(ctx, tx, relation, selectFields, columns, winRowIDs)
+	return rows, totalRows, true, err
+}
+
+func fetchDatasheetRowsByRowIDs(
+	ctx context.Context,
+	tx *sql.Tx,
+	relation string,
+	selectFields []string,
+	columns []DatasheetColumnMeta,
+	winRowIDs []int64,
+) ([]DatasheetRow, error) {
 	if len(winRowIDs) == 0 {
 		return []DatasheetRow{}, nil
 	}
@@ -999,7 +1208,15 @@ func GetDatasheetPage(ctx context.Context, contexts *vprocore.ContextService, co
 		relation := vprocore.QuoteHeaderIdentifier(target.role) + "." + vprocore.QuoteHeaderIdentifier(target.tableName)
 		var rows []DatasheetRow
 		var totalRows int64
-		if request.Offset == 0 {
+		if request.Offset == 0 && whereSQL != "" && limit > 0 && limit <= 900 {
+			rows, totalRows, err = queryFilteredDatasheetWindowAndCount(
+				ctx, tx, owner, target.role, target.tableName, columns,
+				whereSQL, whereArgs, orderSQL, request.ScopeToActiveSU, limit,
+			)
+			if err != nil {
+				return nil, err
+			}
+		} else if request.Offset == 0 {
 			rows, err = queryDatasheetWindowRows(ctx, tx, target.role, target.tableName, columns, whereSQL, whereArgs, orderSQL, 0, limit)
 			if err != nil {
 				return nil, err
@@ -1388,7 +1605,10 @@ func validateSoilHorizonDepthSign(tableKey string, horizon string, upper, lower 
 	if trimmed == "" {
 		return nil
 	}
-	first := strings.ToUpper(trimmed)
+	first := strings.TrimSpace(strings.TrimLeft(strings.ToUpper(trimmed), "0123456789IVX"))
+	if first == "" {
+		return nil
+	}
 	if tableKey == "Humus" {
 		// Upland L/F/H measure upward from 0 cm (UpperDepth > LowerDepth); wetland Of/Om/Oh measure downward (UpperDepth < LowerDepth).
 		if strings.HasPrefix(first, "OF") || strings.HasPrefix(first, "OM") || strings.HasPrefix(first, "OH") {

@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -1116,9 +1117,16 @@ func writeVenusToVP08Tx(
 		return 0, 0, 0, err
 	}
 
-	quarantineSoilHorizon := func(suffix string, id int64, plotNum string, hz any, upper, lower *float64, reason string) error {
+	quarantineSoilHorizon := func(suffix string, id int64, plotNum string, hz any, upper, lower *float64, reason string, rawRow map[string]string) error {
 		qTbl := vprocore.QuoteHeaderIdentifier("__VPRO_Quarantine_" + suffix)
 		srcTbl := vprocore.QuoteHeaderIdentifier(targetProject + "_" + suffix)
+		if rawRow == nil {
+			rawRow = map[string]string{}
+		}
+		payloadBytes, err := json.Marshal(rawRow)
+		if err != nil {
+			return err
+		}
 		if _, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS `+qTbl+` (
 			"__QuarantinedAt" TEXT NOT NULL,
 			"__Reason" TEXT NOT NULL,
@@ -1126,17 +1134,18 @@ func writeVenusToVP08Tx(
 			"PlotNumber" VARCHAR,
 			"Horizon" VARCHAR,
 			"UpperDepth" DOUBLE,
-			"LowerDepth" DOUBLE
+			"LowerDepth" DOUBLE,
+			"PayloadJSON" TEXT NOT NULL
 		)`); err != nil {
 			return err
 		}
 		if _, err := tx.ExecContext(ctx,
-			`INSERT INTO `+qTbl+` ("__QuarantinedAt","__Reason","ID","PlotNumber","Horizon","UpperDepth","LowerDepth") VALUES (?,?,?,?,?,?,?)`,
-			nowStr, reason, id, plotNum, hz, upper, lower,
+			`INSERT INTO `+qTbl+` ("__QuarantinedAt","__Reason","ID","PlotNumber","Horizon","UpperDepth","LowerDepth","PayloadJSON") VALUES (?,?,?,?,?,?,?,?)`,
+			nowStr, reason, id, plotNum, hz, upper, lower, string(payloadBytes),
 		); err != nil {
 			return err
 		}
-		_, err := tx.ExecContext(ctx,
+		_, err = tx.ExecContext(ctx,
 			`INSERT INTO "__VPRO_ChildIdentity" ("ChildTable","ID") VALUES (?,?) ON CONFLICT DO NOTHING`,
 			srcTbl, id,
 		)
@@ -1380,7 +1389,7 @@ func writeVenusToVP08Tx(
 			id := nextHumusID
 			nextHumusID++
 			if qReason != "" {
-				if err := quarantineSoilHorizon("Humus", id, pNum, hzAny, rawU, rawL, qReason); err != nil {
+				if err := quarantineSoilHorizon("Humus", id, pNum, hzAny, rawU, rawL, qReason, hr); err != nil {
 					return 0, 0, 0, err
 				}
 				continue
@@ -1415,7 +1424,7 @@ func writeVenusToVP08Tx(
 			id := nextMineralID
 			nextMineralID++
 			if qReason != "" {
-				if err := quarantineSoilHorizon("Mineral", id, pNum, hzAny, rawU, rawL, qReason); err != nil {
+				if err := quarantineSoilHorizon("Mineral", id, pNum, hzAny, rawU, rawL, qReason, mr); err != nil {
 					return 0, 0, 0, err
 				}
 				continue

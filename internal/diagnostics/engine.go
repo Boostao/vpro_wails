@@ -280,47 +280,183 @@ func loadActiveLumpMap(ctx context.Context, tx *sql.Tx, owner *vprocore.SqliteCo
 	return mapping, actual, err
 }
 
+type dbFileStamp struct {
+	path         string
+	size         int64
+	mtimeNano    int64
+	dbHeader4    [4]byte
+	walPresent   bool
+	walSize      int64
+	walMtimeNano int64
+	shmHdr48     [48]byte
+}
+
+func statDBFileWithWAL(dbPath string) (dbFileStamp, bool) {
+	if strings.TrimSpace(dbPath) == "" {
+		return dbFileStamp{}, false
+	}
+	info, err := os.Stat(dbPath)
+	if err != nil {
+		return dbFileStamp{}, false
+	}
+	stamp := dbFileStamp{
+		path:      dbPath,
+		size:      info.Size(),
+		mtimeNano: info.ModTime().UnixNano(),
+	}
+	if info.Size() >= 28 {
+		if f, oErr := os.Open(dbPath); oErr == nil {
+			_, _ = f.ReadAt(stamp.dbHeader4[:], 24)
+			_ = f.Close()
+		}
+	}
+	if walInfo, walErr := os.Stat(dbPath + "-wal"); walErr == nil {
+		stamp.walPresent = true
+		stamp.walSize = walInfo.Size()
+		stamp.walMtimeNano = walInfo.ModTime().UnixNano()
+		if shmFile, sErr := os.Open(dbPath + "-shm"); sErr == nil {
+			_, _ = shmFile.ReadAt(stamp.shmHdr48[:], 0)
+			_ = shmFile.Close()
+		}
+	}
+	return stamp, true
+}
+
 type supportFileStampKey struct {
-	vlistsPath  string
-	vlistsSize  int64
-	vlistsMtime int64
-	vuserPath   string
-	vuserSize   int64
-	vuserMtime  int64
+	vlists dbFileStamp
+	vuser  dbFileStamp
+}
+
+type projectPlotsCacheKey struct {
+	stamp   dbFileStamp
+	project string
 }
 
 var (
-	diagCatalogCacheMu sync.Mutex
-	cachedTaxonKey     supportFileStampKey
-	cachedTaxonMap     map[string]SpeciesTaxonMeta
-	cachedUnitNamesKey supportFileStampKey
-	cachedUnitNamesMap map[string]string
-	cachedEnvCountKey  struct {
-		projectPath string
-		project     string
-		maxRowID    int64
-	}
-	cachedEnvCountVal int
-	cachedEnvCountOK  bool
+	diagCatalogCacheMu     sync.Mutex
+	cachedTaxonKey         supportFileStampKey
+	cachedTaxonMap         map[string]SpeciesTaxonMeta
+	cachedUnitNamesKey     supportFileStampKey
+	cachedUnitNamesMap     map[string]string
+	cachedProjectPlotsKey  projectPlotsCacheKey
+	cachedProjectPlotsList []SynthesisUnitPlot
+	cachedProjectPlotsIdx  map[string]int
+	cachedProjectPlotsOK   bool
 )
+
+func advanceProjectPlotsCacheStamp(project string, preStamp, postStamp dbFileStamp, ok bool) {
+	if !ok {
+		return
+	}
+	diagCatalogCacheMu.Lock()
+	if cachedProjectPlotsOK && cachedProjectPlotsKey.project == project && cachedProjectPlotsKey.stamp == preStamp {
+		cachedProjectPlotsKey.stamp = postStamp
+	}
+	diagCatalogCacheMu.Unlock()
+}
 
 func buildSupportStampKey(owner *vprocore.SqliteContext) (supportFileStampKey, bool) {
 	if owner == nil {
 		return supportFileStampKey{}, false
 	}
-	vlInfo := owner.AttachmentInfo["VLists"]
-	vuInfo := owner.AttachmentInfo["VUser"]
-	if vlInfo == nil || vuInfo == nil {
+	vlStamp, vlOK := statDBFileWithWAL(owner.Attachments["VLists"])
+	vuStamp, vuOK := statDBFileWithWAL(owner.Attachments["VUser"])
+	if !vlOK || !vuOK {
 		return supportFileStampKey{}, false
 	}
 	return supportFileStampKey{
-		vlistsPath:  owner.Attachments["VLists"],
-		vlistsSize:  vlInfo.Size(),
-		vlistsMtime: vlInfo.ModTime().UnixNano(),
-		vuserPath:   owner.Attachments["VUser"],
-		vuserSize:   vuInfo.Size(),
-		vuserMtime:  vuInfo.ModTime().UnixNano(),
+		vlists: vlStamp,
+		vuser:  vuStamp,
 	}, true
+}
+
+func loadOrderedProjectPlots(ctx context.Context, tx *sql.Tx, owner *vprocore.SqliteContext, project string) ([]SynthesisUnitPlot, map[string]int, error) {
+	stamp, hasStamp := statDBFileWithWAL(owner.Selection.ProjectPath)
+	if hasStamp {
+		wantKey := projectPlotsCacheKey{stamp: stamp, project: project}
+		diagCatalogCacheMu.Lock()
+		if cachedProjectPlotsOK && cachedProjectPlotsKey == wantKey {
+			list := cachedProjectPlotsList
+			idx := cachedProjectPlotsIdx
+			diagCatalogCacheMu.Unlock()
+			return list, idx, nil
+		}
+		diagCatalogCacheMu.Unlock()
+	}
+
+	qEnvTbl := `"project".` + vprocore.QuoteHeaderIdentifier(project+"_Env")
+	qAdmTbl := `"project".` + vprocore.QuoteHeaderIdentifier(project+"_Admin")
+
+	adminMap := map[string]string{}
+	adminRows, aErr := tx.QueryContext(ctx,
+		`SELECT CAST("Plot" AS TEXT), COALESCE(CAST("UserSiteUnit" AS TEXT), '')
+		 FROM `+qAdmTbl+`
+		 WHERE typeof("Plot")='text'`)
+	if aErr != nil {
+		return nil, nil, aErr
+	}
+	for adminRows.Next() {
+		var pNum, uSU string
+		if err := adminRows.Scan(&pNum, &uSU); err != nil {
+			adminRows.Close()
+			return nil, nil, err
+		}
+		if _, dup := adminMap[pNum]; !dup {
+			adminMap[pNum] = uSU
+		}
+	}
+	if err := errors.Join(adminRows.Err(), adminRows.Close()); err != nil {
+		return nil, nil, err
+	}
+
+	envRows, err := tx.QueryContext(ctx,
+		`SELECT CAST(env."PlotNumber" AS TEXT),
+		        COALESCE(CAST(env."FieldNumber" AS TEXT), ''),
+		        COALESCE(CAST(env."Zone" AS TEXT), ''),
+		        COALESCE(CAST(env."SubZone" AS TEXT), ''),
+		        COALESCE(CAST(env."SiteSeries" AS TEXT), ''),
+		        COALESCE(CAST(env."MoistureRegime" AS TEXT), ''),
+		        COALESCE(CAST(env."NutrientRegime" AS TEXT), '')
+		 FROM `+qEnvTbl+` AS env
+		 WHERE typeof(env."PlotNumber")='text' AND TRIM(CAST(env."PlotNumber" AS TEXT)) <> ''
+		 ORDER BY env."PlotNumber" COLLATE NOCASE ASC, env.rowid ASC`)
+	if err != nil {
+		return nil, nil, err
+	}
+	ordered := make([]SynthesisUnitPlot, 0, len(adminMap))
+	idxByPlot := make(map[string]int, len(adminMap))
+	for envRows.Next() {
+		var rec SynthesisUnitPlot
+		if err := envRows.Scan(
+			&rec.PlotNumber, &rec.FieldNumber, &rec.Zone, &rec.SubZone, &rec.SiteSeries,
+			&rec.MoistureRegime, &rec.NutrientRegime,
+		); err != nil {
+			envRows.Close()
+			return nil, nil, err
+		}
+		uSU, inAdmin := adminMap[rec.PlotNumber]
+		if !inAdmin {
+			continue
+		}
+		if _, dup := idxByPlot[rec.PlotNumber]; !dup {
+			rec.UserSiteUnit = uSU
+			idxByPlot[rec.PlotNumber] = len(ordered)
+			ordered = append(ordered, rec)
+		}
+	}
+	if err := errors.Join(envRows.Err(), envRows.Close()); err != nil {
+		return nil, nil, err
+	}
+
+	if hasStamp {
+		diagCatalogCacheMu.Lock()
+		cachedProjectPlotsKey = projectPlotsCacheKey{stamp: stamp, project: project}
+		cachedProjectPlotsList = ordered
+		cachedProjectPlotsIdx = idxByPlot
+		cachedProjectPlotsOK = true
+		diagCatalogCacheMu.Unlock()
+	}
+	return ordered, idxByPlot, nil
 }
 
 func loadFullSpeciesCatalog(ctx context.Context, tx *sql.Tx) (map[string]SpeciesTaxonMeta, error) {
@@ -661,24 +797,7 @@ func computeSnapshotInReadTx(
 		return nil, err
 	}
 
-	// 2 & 3. Read scoped <SU>_SU, <Project>_Env, and <Project>_Admin (pushing down active SU plot keys on large projects)
-	type envPlotInfo struct {
-		plotNumber     string
-		fieldNumber    string
-		zone           string
-		subZone        string
-		siteSeries     string
-		userSiteUnit   string
-		moistureRegime string
-		nutrientRegime string
-	}
-	envMap := map[string]envPlotInfo{}
-	envOrder := []string{}
-	rawUnitByPlot := map[string]string{}
-
-	qEnvTbl := `"project".` + vprocore.QuoteHeaderIdentifier(project+"_Env")
-	qAdmTbl := `"project".` + vprocore.QuoteHeaderIdentifier(project+"_Admin")
-
+	// 2 & 3. Read scoped <SU>_SU and ordered <Project>_Env + <Project>_Admin headers (live file + WAL stamp cached)
 	var suRawUnits map[string]string
 	var suPlotKeys []string
 	if unitSourceUsed == "su" {
@@ -708,200 +827,17 @@ func computeSnapshotInReadTx(
 		}
 	}
 
-	var maxEnvRowID int64
-	_ = tx.QueryRowContext(ctx, `SELECT COALESCE(MAX(rowid), 0) FROM `+qEnvTbl).Scan(&maxEnvRowID)
-	var totalEnvCount int
-	if maxEnvRowID > 2000 {
-		envKey := struct {
-			projectPath string
-			project     string
-			maxRowID    int64
-		}{owner.Selection.ProjectPath, project, maxEnvRowID}
-		diagCatalogCacheMu.Lock()
-		if cachedEnvCountOK && cachedEnvCountKey == envKey {
-			totalEnvCount = cachedEnvCountVal
-			diagCatalogCacheMu.Unlock()
-		} else {
-			diagCatalogCacheMu.Unlock()
-			_ = tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+qEnvTbl).Scan(&totalEnvCount)
-			diagCatalogCacheMu.Lock()
-			cachedEnvCountKey = envKey
-			cachedEnvCountVal = totalEnvCount
-			cachedEnvCountOK = true
-			diagCatalogCacheMu.Unlock()
-		}
-	} else {
-		_ = tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+qEnvTbl).Scan(&totalEnvCount)
+	orderedProjectPlots, projectPlotIdx, err := loadOrderedProjectPlots(ctx, tx, owner, project)
+	if err != nil {
+		return nil, err
 	}
 
-	useScopedSUPushdown := unitSourceUsed == "su" && totalEnvCount > 2000 && len(suPlotKeys) <= 10000
-	var totalProjectPlotsOverride int
-
-	if useScopedSUPushdown {
-		totalProjectPlotsOverride = totalEnvCount
-		adminMap := make(map[string]string, len(suPlotKeys))
-		const plotBatch = 800
-		for start := 0; start < len(suPlotKeys); start += plotBatch {
-			end := min(start+plotBatch, len(suPlotKeys))
-			chunk := suPlotKeys[start:end]
-			ph := make([]string, len(chunk))
-			args := make([]any, len(chunk))
-			for i, p := range chunk {
-				ph[i] = "?"
-				args[i] = p
-			}
-			inList := strings.Join(ph, ",")
-
-			adminRows, aErr := tx.QueryContext(ctx,
-				`SELECT CAST("Plot" AS TEXT), COALESCE(CAST("UserSiteUnit" AS TEXT), '')
-				 FROM `+qAdmTbl+`
-				 WHERE "Plot" IN (`+inList+`) AND typeof("Plot")='text'`, args...)
-			if aErr != nil {
-				return nil, aErr
-			}
-			for adminRows.Next() {
-				var pNum, uSU string
-				if err := adminRows.Scan(&pNum, &uSU); err != nil {
-					adminRows.Close()
-					return nil, err
-				}
-				if _, dup := adminMap[pNum]; !dup {
-					adminMap[pNum] = uSU
-				}
-			}
-			if err := errors.Join(adminRows.Err(), adminRows.Close()); err != nil {
-				return nil, err
-			}
-		}
-
-		for start := 0; start < len(suPlotKeys); start += plotBatch {
-			end := min(start+plotBatch, len(suPlotKeys))
-			chunk := suPlotKeys[start:end]
-			ph := make([]string, len(chunk))
-			args := make([]any, len(chunk))
-			for i, p := range chunk {
-				ph[i] = "?"
-				args[i] = p
-			}
-			inList := strings.Join(ph, ",")
-
-			envRows, eErr := tx.QueryContext(ctx,
-				`SELECT CAST(env."PlotNumber" AS TEXT),
-				        COALESCE(CAST(env."FieldNumber" AS TEXT), ''),
-				        COALESCE(CAST(env."Zone" AS TEXT), ''),
-				        COALESCE(CAST(env."SubZone" AS TEXT), ''),
-				        COALESCE(CAST(env."SiteSeries" AS TEXT), ''),
-				        COALESCE(CAST(env."MoistureRegime" AS TEXT), ''),
-				        COALESCE(CAST(env."NutrientRegime" AS TEXT), '')
-				 FROM `+qEnvTbl+` AS env
-				 WHERE env."PlotNumber" IN (`+inList+`) AND typeof(env."PlotNumber")='text' AND TRIM(env."PlotNumber") <> ''`,
-				args...)
-			if eErr != nil {
-				return nil, eErr
-			}
-			for envRows.Next() {
-				var rec envPlotInfo
-				if err := envRows.Scan(
-					&rec.plotNumber, &rec.fieldNumber, &rec.zone, &rec.subZone, &rec.siteSeries,
-					&rec.moistureRegime, &rec.nutrientRegime,
-				); err != nil {
-					envRows.Close()
-					return nil, err
-				}
-				if _, inSU := suRawUnits[rec.plotNumber]; !inSU {
-					continue
-				}
-				uSU, inAdmin := adminMap[rec.plotNumber]
-				if !inAdmin {
-					continue
-				}
-				rec.userSiteUnit = uSU
-				if _, dup := envMap[rec.plotNumber]; !dup {
-					envOrder = append(envOrder, rec.plotNumber)
-					envMap[rec.plotNumber] = rec
-					rawUnitByPlot[rec.plotNumber] = suRawUnits[rec.plotNumber]
-				}
-			}
-			if err := errors.Join(envRows.Err(), envRows.Close()); err != nil {
-				return nil, err
-			}
-		}
-
-		slices.SortFunc(envOrder, func(a, b string) int {
-			if cmp := strings.Compare(strings.ToLower(a), strings.ToLower(b)); cmp != 0 {
-				return cmp
-			}
-			return strings.Compare(a, b)
-		})
-	} else {
-		adminMap := map[string]string{}
-		adminRows, aErr := tx.QueryContext(ctx,
-			`SELECT CAST("Plot" AS TEXT), COALESCE(CAST("UserSiteUnit" AS TEXT), '')
-			 FROM `+qAdmTbl+`
-			 WHERE typeof("Plot")='text'`)
-		if aErr != nil {
-			return nil, aErr
-		}
-		for adminRows.Next() {
-			var pNum, uSU string
-			if err := adminRows.Scan(&pNum, &uSU); err != nil {
-				adminRows.Close()
-				return nil, err
-			}
-			if _, dup := adminMap[pNum]; !dup {
-				adminMap[pNum] = uSU
-			}
-		}
-		if err := errors.Join(adminRows.Err(), adminRows.Close()); err != nil {
-			return nil, err
-		}
-
-		envRows, err := tx.QueryContext(ctx,
-			`SELECT CAST(env."PlotNumber" AS TEXT),
-			        COALESCE(CAST(env."FieldNumber" AS TEXT), ''),
-			        COALESCE(CAST(env."Zone" AS TEXT), ''),
-			        COALESCE(CAST(env."SubZone" AS TEXT), ''),
-			        COALESCE(CAST(env."SiteSeries" AS TEXT), ''),
-			        COALESCE(CAST(env."MoistureRegime" AS TEXT), ''),
-			        COALESCE(CAST(env."NutrientRegime" AS TEXT), '')
-			 FROM `+qEnvTbl+` AS env
-			 WHERE typeof(env."PlotNumber")='text' AND TRIM(CAST(env."PlotNumber" AS TEXT)) <> ''
-			 ORDER BY env."PlotNumber" COLLATE NOCASE ASC, env.rowid ASC`)
-		if err != nil {
-			return nil, err
-		}
-		for envRows.Next() {
-			var rec envPlotInfo
-			if err := envRows.Scan(
-				&rec.plotNumber, &rec.fieldNumber, &rec.zone, &rec.subZone, &rec.siteSeries,
-				&rec.moistureRegime, &rec.nutrientRegime,
-			); err != nil {
-				envRows.Close()
-				return nil, err
-			}
-			uSU, inAdmin := adminMap[rec.plotNumber]
-			if !inAdmin {
-				continue
-			}
-			rec.userSiteUnit = uSU
-			if _, dup := envMap[rec.plotNumber]; !dup {
-				envOrder = append(envOrder, rec.plotNumber)
-				envMap[rec.plotNumber] = rec
-			}
-		}
-		if err := errors.Join(envRows.Err(), envRows.Close()); err != nil {
-			return nil, err
-		}
-
-		if unitSourceUsed == "su" {
-			for p, u := range suRawUnits {
-				if _, inEnv := envMap[p]; inEnv {
-					rawUnitByPlot[p] = u
-				}
-			}
-		} else {
-			for _, p := range envOrder {
-				rawUnitByPlot[p] = strings.TrimSpace(envMap[p].userSiteUnit)
+	var suUnitsByPlotIdx []string
+	if unitSourceUsed == "su" && len(orderedProjectPlots) > 0 {
+		suUnitsByPlotIdx = make([]string, len(orderedProjectPlots))
+		for _, p := range suPlotKeys {
+			if idx, ok := projectPlotIdx[p]; ok {
+				suUnitsByPlotIdx[idx] = suRawUnits[p]
 			}
 		}
 	}
@@ -909,26 +845,27 @@ func computeSnapshotInReadTx(
 	// 4. Filter excluded units (.support / .poor / .nudum + custom patterns) and partition plots
 	excludedMap := map[string]*ExcludedUnitSummary{}
 	excludedPlotCount := 0
-	unassignedPlots := []SynthesisUnitPlot{}
-	classifiedPlots := make([]classifiedPlotRecord, 0, len(envOrder))
-	classifiedIndexByPlot := map[string]int{}
+	unassignedCap := 0
+	classifiedCap := len(orderedProjectPlots)
+	if unitSourceUsed == "su" {
+		classifiedCap = min(len(suPlotKeys), len(orderedProjectPlots))
+		unassignedCap = max(0, len(orderedProjectPlots)-classifiedCap)
+	}
+	unassignedPlots := make([]SynthesisUnitPlot, 0, unassignedCap)
+	classifiedPlots := make([]classifiedPlotRecord, 0, classifiedCap)
+	classifiedIndexByPlot := make(map[string]int, classifiedCap)
 	unitSet := map[string]bool{}
 
-	for _, p := range envOrder {
-		info := envMap[p]
-		unitCode := rawUnitByPlot[p]
+	for i := range orderedProjectPlots {
+		info := orderedProjectPlots[i]
+		var unitCode string
+		if unitSourceUsed == "su" {
+			unitCode = suUnitsByPlotIdx[i]
+		} else {
+			unitCode = strings.TrimSpace(info.UserSiteUnit)
+		}
 		if unitCode == "" {
-			unassignedPlots = append(unassignedPlots, SynthesisUnitPlot{
-				PlotNumber:     info.plotNumber,
-				FieldNumber:    info.fieldNumber,
-				SiteUnit:       "",
-				Zone:           info.zone,
-				SubZone:        info.subZone,
-				SiteSeries:     info.siteSeries,
-				UserSiteUnit:   info.userSiteUnit,
-				MoistureRegime: info.moistureRegime,
-				NutrientRegime: info.nutrientRegime,
-			})
+			unassignedPlots = append(unassignedPlots, info)
 			continue
 		}
 		if excluded, matched := MatchUnitExcluded(unitCode, opts.ExcludeStandardModifiers, opts.ExcludePatterns); excluded {
@@ -945,17 +882,17 @@ func computeSnapshotInReadTx(
 			continue
 		}
 		unitSet[unitCode] = true
-		classifiedIndexByPlot[p] = len(classifiedPlots)
+		classifiedIndexByPlot[info.PlotNumber] = len(classifiedPlots)
 		classifiedPlots = append(classifiedPlots, classifiedPlotRecord{
-			plotNumber:     info.plotNumber,
-			fieldNumber:    info.fieldNumber,
+			plotNumber:     info.PlotNumber,
+			fieldNumber:    info.FieldNumber,
 			siteUnit:       unitCode,
-			zone:           info.zone,
-			subZone:        info.subZone,
-			siteSeries:     info.siteSeries,
-			userSiteUnit:   info.userSiteUnit,
-			moistureRegime: info.moistureRegime,
-			nutrientRegime: info.nutrientRegime,
+			zone:           info.Zone,
+			subZone:        info.SubZone,
+			siteSeries:     info.SiteSeries,
+			userSiteUnit:   info.UserSiteUnit,
+			moistureRegime: info.MoistureRegime,
+			nutrientRegime: info.NutrientRegime,
 			speciesCovers:  map[string]float64{},
 		})
 	}
@@ -1036,7 +973,7 @@ func computeSnapshotInReadTx(
 			}
 		}
 
-		consumeVegQuery := func(vegWhere string, vegArgs []any) error {
+		consumeVegQuery := func(vegWhere string, vegArgs []any, batchSet map[string]struct{}) error {
 			vegRows, err := tx.QueryContext(ctx,
 				`SELECT CAST(v."PlotNumber" AS TEXT),
 				        COALESCE(CAST(v."Species" AS TEXT), ''),
@@ -1059,6 +996,11 @@ func computeSnapshotInReadTx(
 				); err != nil {
 					vegRows.Close()
 					return err
+				}
+				if batchSet != nil {
+					if _, inBatch := batchSet[plotNum]; !inBatch {
+						continue
+					}
 				}
 				pIdx, ok := classifiedIndexByPlot[plotNum]
 				if !ok {
@@ -1127,17 +1069,19 @@ func computeSnapshotInReadTx(
 				chunk := classifiedPlots[start:end]
 				placeholders := make([]string, len(chunk))
 				vegArgs := make([]any, len(chunk))
+				batchSet := make(map[string]struct{}, len(chunk))
 				for i := range chunk {
 					placeholders[i] = "?"
 					vegArgs[i] = chunk[i].plotNumber
+					batchSet[chunk[i].plotNumber] = struct{}{}
 				}
-				vegWhere := `WHERE v."PlotNumber" IN (` + strings.Join(placeholders, ",") + `) AND typeof(v."PlotNumber")='text' AND v."Species" IS NOT NULL`
-				if err := consumeVegQuery(vegWhere, vegArgs); err != nil {
+				vegWhere := `WHERE v."PlotNumber" COLLATE BINARY IN (` + strings.Join(placeholders, ",") + `) AND typeof(v."PlotNumber")='text' AND v."Species" IS NOT NULL`
+				if err := consumeVegQuery(vegWhere, vegArgs, batchSet); err != nil {
 					return nil, err
 				}
 			}
 		} else {
-			if err := consumeVegQuery(`WHERE typeof(v."PlotNumber")='text' AND v."Species" IS NOT NULL`, nil); err != nil {
+			if err := consumeVegQuery(`WHERE typeof(v."PlotNumber")='text' AND v."Species" IS NOT NULL`, nil, nil); err != nil {
 				return nil, err
 			}
 		}
@@ -1470,12 +1414,8 @@ func computeSnapshotInReadTx(
 
 	elapsedMs := float64(time.Since(started).Microseconds()) / 1000.0
 
-	totalProjPlots := len(envOrder)
+	totalProjPlots := len(orderedProjectPlots)
 	unassignedCount := len(unassignedPlots)
-	if useScopedSUPushdown {
-		totalProjPlots = totalProjectPlotsOverride
-		unassignedCount = max(0, totalProjPlots-len(classifiedPlots)-excludedPlotCount)
-	}
 
 	return &SynthesisSnapshot{
 		ContextID:           contextID,
@@ -1653,6 +1593,7 @@ func ReassignSynthesisPlotUnit(
 		var historyID int64
 
 		err := owner.WithSelectedFileWriter(ctx, "su", validateFiles, func(conn *sql.Conn) (txErr error) {
+			preStamp, preOK := statDBFileWithWAL(owner.Selection.ProjectPath)
 			tx, bErr := conn.BeginTx(ctx, nil) // BEGIN IMMEDIATE via _txlock=immediate
 			if bErr != nil {
 				return bErr
@@ -1737,7 +1678,12 @@ func ReassignSynthesisPlotUnit(
 			if err := ctx.Err(); err != nil {
 				return err
 			}
-			return tx.Commit()
+			if err := tx.Commit(); err != nil {
+				return err
+			}
+			postStamp, postOK := statDBFileWithWAL(owner.Selection.ProjectPath)
+			advanceProjectPlotsCacheStamp(owner.Selection.Project, preStamp, postStamp, preOK && postOK)
+			return nil
 		})
 		if err != nil {
 			return nil, err
@@ -1798,6 +1744,7 @@ func UndoSynthesisReassignment(
 		var undoHistoryID int64
 
 		err := owner.WithSelectedFileWriter(ctx, "su", validateFiles, func(conn *sql.Conn) (txErr error) {
+			preStamp, preOK := statDBFileWithWAL(owner.Selection.ProjectPath)
 			tx, bErr := conn.BeginTx(ctx, nil)
 			if bErr != nil {
 				return bErr
@@ -1966,7 +1913,12 @@ func UndoSynthesisReassignment(
 			if err := ctx.Err(); err != nil {
 				return err
 			}
-			return tx.Commit()
+			if err := tx.Commit(); err != nil {
+				return err
+			}
+			postStamp, postOK := statDBFileWithWAL(owner.Selection.ProjectPath)
+			advanceProjectPlotsCacheStamp(owner.Selection.Project, preStamp, postStamp, preOK && postOK)
+			return nil
 		})
 		if err != nil {
 			return nil, err

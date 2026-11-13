@@ -2,6 +2,8 @@ package interchange_test
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
 	"math"
 	"os"
 	"path/filepath"
@@ -266,3 +268,204 @@ func TestTurboVegAndVenusAuditBooleansFloat32CoverUTF16AndSoilDepthSigns(t *test
 		t.Fatalf("expected 1 degenerate humus row quarantined in __VPRO_Quarantine_Humus, got %d (err=%v)", qCount, err)
 	}
 }
+
+func TestVenusQuarantinedSoilHorizonsPreserveFullPayloadJSON(t *testing.T) {
+	ctx := context.Background()
+	service, state := vprotest.ContextServiceFixture(t)
+	dir := t.TempDir()
+
+	venusPath := filepath.Join(dir, "venus_quarantine_payload.xml")
+	venusXML := `<?xml version="1.0" encoding="UTF-8"?>
+<VenusArchive version="5.0" projectName="VenusQ">
+  <Plot PlotNumber="VQ001" Zone="CWH">
+    <Humus horizon="Fm" upperdepth="5" lowerdepth="5" phorganic="4.2" vonpost="3" comment="fibric zero thickness"/>
+    <Mineral horizon="Bm1" upperdepth="15" lowerdepth="15" texture="SiL" colour="10YR 4/3" phmineral="5.6" comments="silt loam zero thickness"/>
+  </Plot>
+</VenusArchive>`
+	if err := os.WriteFile(venusPath, []byte(venusXML), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	destPath := filepath.Join(dir, "VenusQImp.db")
+	if _, err := interchange.ImportVenusProject(service, ctx, state.ContextID, interchange.VenusImportRequest{
+		SourcePath:      venusPath,
+		SourceProject:   "VenusQ",
+		TargetProject:   "VenusQImp",
+		DestinationPath: destPath,
+	}); err != nil {
+		t.Fatalf("ImportVenusProject failed: %v", err)
+	}
+
+	db, err := sqlutil.OpenReadOnly(destPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	var humusPayloadRaw string
+	if err := db.QueryRow(`SELECT "PayloadJSON" FROM "__VPRO_Quarantine_Humus" WHERE "PlotNumber" = 'VQ001'`).Scan(&humusPayloadRaw); err != nil {
+		t.Fatalf("expected PayloadJSON column on __VPRO_Quarantine_Humus: %v", err)
+	}
+	var humusMap map[string]string
+	if err := json.Unmarshal([]byte(humusPayloadRaw), &humusMap); err != nil {
+		t.Fatalf("invalid Humus PayloadJSON %q: %v", humusPayloadRaw, err)
+	}
+	if humusMap["phorganic"] != "4.2" || humusMap["vonpost"] != "3" || humusMap["comment"] != "fibric zero thickness" {
+		t.Fatalf("quarantined Humus PayloadJSON lost fields: got %+v", humusMap)
+	}
+
+	var mineralPayloadRaw string
+	if err := db.QueryRow(`SELECT "PayloadJSON" FROM "__VPRO_Quarantine_Mineral" WHERE "PlotNumber" = 'VQ001'`).Scan(&mineralPayloadRaw); err != nil {
+		t.Fatalf("expected PayloadJSON column on __VPRO_Quarantine_Mineral: %v", err)
+	}
+	var mineralMap map[string]string
+	if err := json.Unmarshal([]byte(mineralPayloadRaw), &mineralMap); err != nil {
+		t.Fatalf("invalid Mineral PayloadJSON %q: %v", mineralPayloadRaw, err)
+	}
+	if mineralMap["texture"] != "SiL" || mineralMap["colour"] != "10YR 4/3" || mineralMap["phmineral"] != "5.6" || mineralMap["comments"] != "silt loam zero thickness" {
+		t.Fatalf("quarantined Mineral PayloadJSON lost fields: got %+v", mineralMap)
+	}
+}
+
+func TestTurboVegLongPlotIDCollisionDisambiguationAndExactDuplicateError(t *testing.T) {
+	ctx := context.Background()
+	service, state := vprotest.ContextServiceFixture(t)
+	dir := t.TempDir()
+
+	// 1. TurboVeg3 SQLite with two distinct >7-UTF-16 PlotNumbers ("1234567A" and "1234567B")
+	// plus a literal 7-char "1234567" plot to ensure disambiguation never steals a literal short key!
+	tvSQLitePath := filepath.Join(dir, "tv_long_collide.db")
+	srcDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(tvSQLitePath, "rwc"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := srcDB.Exec(`
+		CREATE TABLE SpeciesList (SpeciesNR INTEGER PRIMARY KEY, SpeciesCode TEXT, ScientificName TEXT, EnglishName TEXT, Lifeform INTEGER, Authority TEXT);
+		CREATE TABLE Plots (PlotID INTEGER PRIMARY KEY, PlotNumber TEXT, FieldNumber TEXT, ProjectID TEXT, Date TEXT, Latitude REAL, Longitude REAL, Elevation INTEGER, Slope REAL, Aspect INTEGER, PlotSize REAL);
+		CREATE TABLE HeaderData (PlotID INTEGER PRIMARY KEY, Zone TEXT, SubZone TEXT, SiteSeries TEXT, SiteUnit TEXT, MoistureRegime TEXT, NutrientRegime TEXT, MesoSlopePosition TEXT, SurfaceShape TEXT, SoilDrainage TEXT, HumusForm TEXT, Surveyor TEXT, Location TEXT, SiteNotes TEXT, VegNotes TEXT, SoilNotes TEXT);
+		CREATE TABLE SpeciesData (ID INTEGER PRIMARY KEY AUTOINCREMENT, PlotID INTEGER, SpeciesNR INTEGER, SpeciesCode TEXT, LayerCode TEXT, TurboVegGroup TEXT, Cover REAL, Height REAL, Collected TEXT);
+
+		INSERT INTO Plots (PlotID, PlotNumber) VALUES
+			(1, '1234567A'),
+			(2, '1234567B'),
+			(3, '1234567');
+		INSERT INTO HeaderData (PlotID, Zone, SiteUnit) VALUES
+			(1, 'CWH', 'CWHvm1/01'),
+			(2, 'IDF', 'IDFdk1/01'),
+			(3, 'ESSF', 'ESSFmw/01');
+		INSERT INTO SpeciesData (PlotID, SpeciesNR, SpeciesCode, LayerCode, TurboVegGroup, Cover) VALUES
+			(1, 1, 'PSEUMEN', '1', 'Tree', 40.0),
+			(2, 2, 'PINUPON', '1', 'Tree', 55.0),
+			(3, 3, 'ABIEAMA', '1', 'Tree', 30.0);
+	`); err != nil {
+		srcDB.Close()
+		t.Fatal(err)
+	}
+	srcDB.Close()
+
+	tvDest := filepath.Join(dir, "TVCollideImp.db")
+	out, err := interchange.ImportTurboVeg(service, ctx, state.ContextID, interchange.TurboVegImportRequest{
+		SourcePath:      tvSQLitePath,
+		Format:          interchange.TurboVegFormatSQLite,
+		TargetProject:   "TVCollide",
+		DestinationPath: tvDest,
+	})
+	if err != nil {
+		t.Fatalf("ImportTurboVeg(1234567A, 1234567B, 1234567) failed: %v", err)
+	}
+	if out.PlotCount != 3 {
+		t.Fatalf("expected PlotCount=3, got %d", out.PlotCount)
+	}
+
+	roDB, err := sqlutil.OpenReadOnly(tvDest)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer roDB.Close()
+
+	var envCount, vegCount, suCount int
+	if err := roDB.QueryRow(`SELECT COUNT(*) FROM TVCollide_Env`).Scan(&envCount); err != nil || envCount != 3 {
+		t.Fatalf("expected all 3 plots preserved in TVCollide_Env (no silent truncation drop), got %d (err=%v)", envCount, err)
+	}
+	if err := roDB.QueryRow(`SELECT COUNT(*) FROM TVCollide_Veg`).Scan(&vegCount); err != nil || vegCount != 3 {
+		t.Fatalf("expected all 3 plots' Veg observations preserved in TVCollide_Veg, got %d (err=%v)", vegCount, err)
+	}
+	if err := roDB.QueryRow(`SELECT COUNT(*) FROM TVCollide_SU`).Scan(&suCount); err != nil || suCount != 3 {
+		t.Fatalf("expected all 3 plots preserved in TVCollide_SU, got %d (err=%v)", suCount, err)
+	}
+
+	rows, err := roDB.Query(`SELECT "PlotNumber" FROM TVCollide_Env`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	seenImported := map[string]bool{}
+	for rows.Next() {
+		var p string
+		if err := rows.Scan(&p); err != nil {
+			rows.Close()
+			t.Fatal(err)
+		}
+		if !utf8.ValidString(p) || utf16LenTest(p) > 7 {
+			rows.Close()
+			t.Fatalf("disambiguated PlotNumber %q exceeded 7 UTF-16 units (%d)", p, utf16LenTest(p))
+		}
+		seenImported[p] = true
+	}
+	rows.Close()
+	if len(seenImported) != 3 || !seenImported["1234567"] {
+		t.Fatalf("expected 3 unique <=7-UTF-16 PlotNumbers preserving literal '1234567', got %v", seenImported)
+	}
+
+	// 2. Also verify XML format disambiguates "1234567A" vs "1234567B" without dropping the second plot!
+	xmlCollidePath := filepath.Join(dir, "tv_xml_collide.xml")
+	xmlCollide := `<?xml version="1.0" encoding="UTF-8"?>
+<Turboveg version="3.0">
+  <Plots>
+    <Plot releve_nr="1" plot_number="1234567A"><SpeciesData><Species code="PSEUMEN" layer="1" cover="20"/></SpeciesData></Plot>
+    <Plot releve_nr="2" plot_number="1234567B"><SpeciesData><Species code="TSUGHET" layer="1" cover="30"/></SpeciesData></Plot>
+  </Plots>
+</Turboveg>`
+	if err := os.WriteFile(xmlCollidePath, []byte(xmlCollide), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	xmlDest := filepath.Join(dir, "TVXMLCollide.db")
+	if _, err := interchange.ImportTurboVeg(service, ctx, state.ContextID, interchange.TurboVegImportRequest{
+		SourcePath:      xmlCollidePath,
+		Format:          interchange.TurboVegFormatXML,
+		TargetProject:   "TVXMLCol",
+		DestinationPath: xmlDest,
+	}); err != nil {
+		t.Fatalf("ImportTurboVeg XML collision failed: %v", err)
+	}
+	xmlDB, err := sqlutil.OpenReadOnly(xmlDest)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer xmlDB.Close()
+	var xmlEnvCnt int
+	if err := xmlDB.QueryRow(`SELECT COUNT(*) FROM TVXMLCol_Env`).Scan(&xmlEnvCnt); err != nil || xmlEnvCnt != 2 {
+		t.Fatalf("expected 2 XML plots preserved after >7-UTF-16 disambiguation, got %d (err=%v)", xmlEnvCnt, err)
+	}
+
+	// 3. Exact duplicate source plot keys ("1234567A" and "1234567A") MUST return an explicit error, never drop silently!
+	dupXMLPath := filepath.Join(dir, "tv_exact_dup.xml")
+	dupXML := `<?xml version="1.0" encoding="UTF-8"?>
+<Turboveg version="3.0">
+  <Plots>
+    <Plot releve_nr="1" plot_number="1234567A"><SpeciesData><Species code="PSEUMEN" layer="1" cover="20"/></SpeciesData></Plot>
+    <Plot releve_nr="2" plot_number="1234567A"><SpeciesData><Species code="TSUGHET" layer="1" cover="30"/></SpeciesData></Plot>
+  </Plots>
+</Turboveg>`
+	if err := os.WriteFile(dupXMLPath, []byte(dupXML), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := interchange.ImportTurboVeg(service, ctx, state.ContextID, interchange.TurboVegImportRequest{
+		SourcePath:      dupXMLPath,
+		Format:          interchange.TurboVegFormatXML,
+		TargetProject:   "TVDup",
+		DestinationPath: filepath.Join(dir, "TVDup.db"),
+	}); err == nil {
+		t.Fatalf("expected ImportTurboVeg to return an explicit error on exact duplicate source plot number '1234567A'")
+	}
+}
+

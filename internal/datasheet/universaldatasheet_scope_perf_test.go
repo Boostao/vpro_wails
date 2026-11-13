@@ -169,4 +169,41 @@ func TestDatasheetScopeToActiveSUTautologyAndVegGlobalSearchPerf(t *testing.T) {
 	if err != nil || numPage.TotalRows == 0 {
 		t.Fatalf("numeric GlobalSearch='25' failed to match numeric Cover1=25.0: total=%d err=%v", numPage.TotalRows, err)
 	}
+
+	// 3. Historical text ('unknown' / 'legacy_bool') stored inside REAL/INTEGER/BOOLEAN columns MUST still match non-numeric GlobalSearch!
+	vprotest.MutateContextFixture(t, stateInt.ProjectPath, `
+		INSERT INTO Sample_Veg (PlotNumber, Species, ID, Cover1, Flag) VALUES
+			('00337', 'ABIEAMA', 99051, 'unknown_cover', 0),
+			('00337', 'THUJPLI', 99052, 15.0, 'legacy_bool_note');
+	`)
+	stateAfterHist, err := service.SwitchContext(stateInt.ContextID, vprotest.ContextSelection(stateInt))
+	if err != nil {
+		t.Fatal(err)
+	}
+	histRealPage, err := GetDatasheetPage(ctx, service, stateAfterHist.ContextID, DatasheetPageRequest{
+		TableKey:     "Veg",
+		GlobalSearch: "unknown_cover",
+		Offset:       0,
+		Limit:        50,
+	})
+	if err != nil {
+		t.Fatalf("GetDatasheetPage(unknown_cover) error: %v", err)
+	}
+	if histRealPage.TotalRows != 1 {
+		t.Fatalf("expected GlobalSearch='unknown_cover' to find historical text inside REAL Cover1 column, got total=%d",
+			histRealPage.TotalRows)
+	}
+	histBoolPage, err := GetDatasheetPage(ctx, service, stateAfterHist.ContextID, DatasheetPageRequest{
+		TableKey:     "Veg",
+		GlobalSearch: "legacy_bool_note",
+		Offset:       0,
+		Limit:        50,
+	})
+	if err != nil {
+		t.Fatalf("GetDatasheetPage(legacy_bool_note) error: %v", err)
+	}
+	if histBoolPage.TotalRows != 1 {
+		t.Fatalf("expected GlobalSearch='legacy_bool_note' to find historical text inside BOOLEAN Flag column, got total=%d",
+			histBoolPage.TotalRows)
+	}
 }

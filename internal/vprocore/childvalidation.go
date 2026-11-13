@@ -102,7 +102,7 @@ func ValidateSoilHorizonDepthSign(kind string, horizon *string, upperDepth, lowe
 	if horizon == nil || upperDepth == nil || lowerDepth == nil {
 		return nil
 	}
-	hz := strings.ToUpper(strings.TrimSpace(*horizon))
+	hz := strings.TrimSpace(strings.TrimLeft(strings.ToUpper(strings.TrimSpace(*horizon)), "0123456789IVX"))
 	if hz == "" {
 		return nil
 	}

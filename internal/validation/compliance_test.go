@@ -2,6 +2,8 @@ package validation_test
 
 import (
 	"context"
+	"database/sql"
+	"strings"
 	"testing"
 
 	"github.com/boostao/vpro-wails/internal/sqlutil"
@@ -149,3 +151,75 @@ func TestRunComplianceValidationAndQuarantineOrphanRecords(t *testing.T) {
 		t.Fatalf("expected 0 orphan child rows after quarantine, got %d (%+v)", afterReport.Summary.OrphanChildRows, afterReport.OrphanFindings)
 	}
 }
+
+func TestDuplicateVegSpeciesMixedIntegerAndTextPlotNumberPrefilter(t *testing.T) {
+	ctx := context.Background()
+	svc, state := vprotest.ContextServiceFixture(t)
+
+	// Recreate Sample_Veg with NONE affinity (PlotNumber BLOB) preserving all 44 original columns,
+	// and insert integer 337 + text '337' for the same species 'PSEUMEN' on Cover1!
+	rwDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.ProjectPath, "rw"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	colRows, err := rwDB.Query(`PRAGMA table_info("Sample_Veg")`)
+	if err != nil {
+		rwDB.Close()
+		t.Fatal(err)
+	}
+	var colDefs []string
+	for colRows.Next() {
+		var cid, notNull, pk int
+		var name, ctype string
+		var dflt sql.NullString
+		if err := colRows.Scan(&cid, &name, &ctype, &notNull, &dflt, &pk); err != nil {
+			colRows.Close()
+			rwDB.Close()
+			t.Fatal(err)
+		}
+		if name == "PlotNumber" {
+			ctype = "BLOB"
+		}
+		colDefs = append(colDefs, `"`+name+`" `+ctype)
+	}
+	colRows.Close()
+	rwDB.Close()
+
+	vprotest.MutateContextFixture(t, state.ProjectPath, `
+		PRAGMA foreign_keys = OFF;
+		INSERT OR IGNORE INTO Sample_Env (PlotNumber, Zone) VALUES ('337', 'CWH');
+		INSERT OR IGNORE INTO Sample_Admin (Plot, PlotType) VALUES ('337', 'FS882');
+
+		ALTER TABLE Sample_Veg RENAME TO Sample_Veg_Orig;
+		CREATE TABLE Sample_Veg (`+strings.Join(colDefs, ", ")+`);
+		INSERT INTO Sample_Veg SELECT * FROM Sample_Veg_Orig WHERE CAST(PlotNumber AS TEXT) <> '337';
+		DROP TABLE Sample_Veg_Orig;
+
+		INSERT INTO Sample_Veg (PlotNumber, Species, Cover1, Flag, ID) VALUES
+			(337,   'PSEUMEN', 20.0, 0, 9501),
+			('337', 'PSEUMEN', 35.0, 0, 9502);
+	`)
+	state, err = svc.SwitchContext(state.ContextID, vprotest.ContextSelection(state))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rep, err := validation.RunComplianceValidation(svc, ctx, state.ContextID, validation.ComplianceOptions{})
+	if err != nil {
+		t.Fatalf("RunComplianceValidation: %v", err)
+	}
+
+	var matched *validation.DuplicateVegSpeciesFinding
+	for i := range rep.DuplicateVegFindings {
+		d := &rep.DuplicateVegFindings[i]
+		if d.PlotNumber == "337" && d.Species == "PSEUMEN" {
+			matched = d
+			break
+		}
+	}
+	if matched == nil || matched.RowCount != 2 || len(matched.OverlappingLayers) == 0 || matched.OverlappingLayers[0] != "1" {
+		t.Fatalf("expected mixed integer 337 + text '337' duplicate PSEUMEN finding with RowCount=2 & OverlappingLayers=['1'], got %+v (all=%+v)",
+			matched, rep.DuplicateVegFindings)
+	}
+}
+

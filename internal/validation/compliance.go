@@ -1226,24 +1226,36 @@ func checkProjectBounds(
 func checkDuplicateVegSpecies(ctx context.Context, tx *sql.Tx, project string, report *ComplianceValidationReport) error {
 	vegTbl := `"project".` + vprocore.QuoteHeaderIdentifier(project+"_Veg")
 
-	// Pre-filter duplicate (PlotNumber, Species) plots in C-level SQLite (streaming index group-by on PlotNumber)
+	// Pre-filter duplicate (PlotNumber, Species) plots in C-level SQLite
 	// so clean 1.65M-row datasets never materialize per-row layer bitmasks in Go.
-	dupPlotRows, err := tx.QueryContext(ctx, `SELECT DISTINCT COALESCE(CAST("PlotNumber" AS TEXT), '')
+	// Group by CAST("PlotNumber" AS TEXT), CAST("Species" AS TEXT) so mixed-storage integer 337 + text '337'
+	// duplicates match the exact final duplicate-grouping semantics.
+	dupPlotRows, err := tx.QueryContext(ctx, `SELECT COALESCE(CAST("PlotNumber" AS TEXT), ''),
+		       MAX(CASE WHEN typeof("PlotNumber") <> 'text' THEN 1 ELSE 0 END)
 		FROM `+vegTbl+`
 		WHERE "PlotNumber" IS NOT NULL AND "Species" IS NOT NULL
-		GROUP BY "PlotNumber", "Species"
+		GROUP BY CAST("PlotNumber" AS TEXT), CAST("Species" AS TEXT)
 		HAVING COUNT(*) > 1`)
 	if err != nil {
 		return err
 	}
 	var candidatePlots []string
+	seenCandPlot := map[string]struct{}{}
+	anyNonTextCandidate := false
 	for dupPlotRows.Next() {
 		var p string
-		if err := dupPlotRows.Scan(&p); err != nil {
+		var nonText int
+		if err := dupPlotRows.Scan(&p, &nonText); err != nil {
 			dupPlotRows.Close()
 			return err
 		}
-		candidatePlots = append(candidatePlots, p)
+		if nonText != 0 {
+			anyNonTextCandidate = true
+		}
+		if _, exists := seenCandPlot[p]; !exists {
+			seenCandPlot[p] = struct{}{}
+			candidatePlots = append(candidatePlots, p)
+		}
 	}
 	if err := errors.Join(dupPlotRows.Err(), dupPlotRows.Close()); err != nil {
 		return err
@@ -1272,7 +1284,16 @@ func checkDuplicateVegSpecies(ctx context.Context, tx *sql.Tx, project string, r
 	}
 	whereExtra := ""
 	var qArgs []any
-	if pre, args := buildSUPlotInPreFilter(`"PlotNumber"`, vegTypes["plotnumber"], candidatePlots); pre != "" {
+	plotFilterCol := `"PlotNumber"`
+	plotFilterType := vegTypes["plotnumber"]
+	uDecl := strings.ToUpper(strings.TrimSpace(plotFilterType))
+	isStrictTextCol := uDecl != "" && !strings.Contains(uDecl, "INT") && !strings.Contains(uDecl, "BLOB") &&
+		(strings.Contains(uDecl, "CHAR") || strings.Contains(uDecl, "CLOB") || strings.Contains(uDecl, "TEXT"))
+	if anyNonTextCandidate || !isStrictTextCol {
+		plotFilterCol = `CAST("PlotNumber" AS TEXT)`
+		plotFilterType = "TEXT"
+	}
+	if pre, args := buildSUPlotInPreFilter(plotFilterCol, plotFilterType, candidatePlots); pre != "" {
 		whereExtra = ` AND ` + pre
 		qArgs = append(qArgs, args...)
 	}

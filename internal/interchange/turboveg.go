@@ -999,10 +999,9 @@ func parseTurboVegXMLFile(ctx context.Context, path string) (tvDataset, error) {
 				return tvDataset{}, err
 			}
 			pNum := strings.TrimSpace(xp.PlotNumber)
-			if pNum == "" {
+			if pNum == "" && xp.ReleveNR != 0 {
 				pNum = strconv.Itoa(xp.ReleveNR)
 			}
-			pNum = truncateUTF16Units(pNum, 7)
 			pb := tvPlotBundle{
 				Header: tvPlotHeader{
 					PlotID:            plotCounter,
@@ -1238,16 +1237,30 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 
 	var nextVegID int64 = 1
 	suRows := [][2]string{}
-	seenPlots := map[string]bool{}
+	seenRawPlots := map[string]bool{}
+	reservedLiteralShort := map[string]bool{}
+	for _, pb := range ds.Plots {
+		rawPlot := strings.TrimSpace(pb.Header.PlotNumber)
+		if rawPlot == "" {
+			return fmt.Errorf("TurboVeg plot %d has an empty plot number", pb.Header.PlotID)
+		}
+		if seenRawPlots[rawPlot] {
+			return fmt.Errorf("duplicate TurboVeg source plot number %q", rawPlot)
+		}
+		seenRawPlots[rawPlot] = true
+		if len(utf16.Encode([]rune(rawPlot))) <= 7 {
+			reservedLiteralShort[rawPlot] = true
+		}
+	}
+
+	usedTargetPlots := map[string]bool{}
 	nowStr := time.Now().Format("2006-01-02 15:04:05")
 
 	for _, pb := range ds.Plots {
 		h := pb.Header
-		pNum := truncateUTF16Units(strings.TrimSpace(h.PlotNumber), 7)
-		if pNum == "" || seenPlots[pNum] {
-			continue
-		}
-		seenPlots[pNum] = true
+		rawPlot := strings.TrimSpace(h.PlotNumber)
+		pNum := allocateUniqueTVPlotNumber(rawPlot, usedTargetPlots, reservedLiteralShort)
+		usedTargetPlots[pNum] = true
 
 		projID := h.ProjectID
 		if strings.TrimSpace(projID) == "" {
@@ -1372,6 +1385,29 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 	_, err = tx.ExecContext(ctx, `
 		INSERT INTO `+metaTbl+` ("ID", "ProjectID", "ProjectTitle", "NumberOfFS882Plots", "VegCoverMethod", "Datum")
 		VALUES (1, ?, ?, ?, '1', '2')`,
-		project, project+" (TurboVeg Import)", len(seenPlots))
+		project, project+" (TurboVeg Import)", len(usedTargetPlots))
 	return err
+}
+
+func allocateUniqueTVPlotNumber(rawPlot string, usedTargetPlots, reservedLiteralShort map[string]bool) string {
+	cand := truncateUTF16Units(rawPlot, 7)
+	if cand != "" && !usedTargetPlots[cand] && (cand == rawPlot || !reservedLiteralShort[cand]) {
+		return cand
+	}
+	for seq := 1; ; seq++ {
+		suffix := "~" + strconv.Itoa(seq)
+		var disambig string
+		if maxPrefix := 7 - len(suffix); maxPrefix > 0 {
+			disambig = truncateUTF16Units(rawPlot, maxPrefix) + suffix
+		} else {
+			b36 := strings.ToUpper(strconv.FormatInt(int64(seq), 36))
+			if len(b36) < 7 {
+				b36 = strings.Repeat("0", 7-len(b36)) + b36
+			}
+			disambig = truncateUTF16Units(b36, 7)
+		}
+		if disambig != "" && !usedTargetPlots[disambig] && !reservedLiteralShort[disambig] {
+			return disambig
+		}
+	}
 }

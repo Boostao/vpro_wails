@@ -1,6 +1,7 @@
 package interchange
 
 import (
+	"github.com/boostao/vpro-wails/internal/accessreader"
 	"github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
@@ -14,8 +15,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/boostao/vpro-wails/internal/sqlutil"
 )
 
 func firstExistingPath(paths ...string) string {
@@ -361,3 +360,133 @@ func TestSeedImportedChildIdentitiesBlocksDeletedAuditIDReuse(t *testing.T) {
 		t.Fatalf("deleted historical child ID=1 was reused or unexpected ID allocated: got %d, want 3", newID)
 	}
 }
+
+type fakeAccessRowSource struct {
+	cols []accessreader.Column
+	rows []accessreader.Row
+	pos  int
+}
+
+func (f *fakeAccessRowSource) ColumnsList() []accessreader.Column             { return f.cols }
+func (f *fakeAccessRowSource) EnableRowQuarantine()                           {}
+func (f *fakeAccessRowSource) Next() bool                                     { f.pos++; return f.pos <= len(f.rows) }
+func (f *fakeAccessRowSource) Row() accessreader.Row                          { return f.rows[f.pos-1] }
+func (f *fakeAccessRowSource) Err() error                                     { return nil }
+func (f *fakeAccessRowSource) QuarantinedRows() []accessreader.QuarantinedRow { return nil }
+func (f *fakeAccessRowSource) Close() error                                   { return nil }
+
+func TestLegacyAuditImportSynthesizesMissingProjectColumn(t *testing.T) {
+	ctx := context.Background()
+	dbPath := filepath.Join(t.TempDir(), "LegacyAuditNoProj.db")
+	sqlDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(dbPath, "rwc"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer sqlDB.Close()
+
+	tx, err := sqlDB.BeginTx(ctx, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	if _, err := tx.ExecContext(ctx, `CREATE TABLE "ConvertedVP06_Audit" (
+		"Project" VARCHAR,
+		"User" VARCHAR,
+		"PlotNumber" VARCHAR,
+		"Table" VARCHAR,
+		"EditField" VARCHAR,
+		"EditWhen" VARCHAR,
+		"BeforeEdit" VARCHAR,
+		"AfterEdit" VARCHAR,
+		"Restore" BOOLEAN,
+		"Flag" BOOLEAN,
+		"ID" INTEGER
+	)`); err != nil {
+		t.Fatal(err)
+	}
+
+	// Legacy VP05/VP06/VP07 _Audit source table WITHOUT a "Project" column:
+	src := &fakeAccessRowSource{
+		cols: []accessreader.Column{
+			{Name: "User", Type: "text"},
+			{Name: "PlotNumber", Type: "text"},
+			{Name: "Table", Type: "text"},
+			{Name: "EditField", Type: "text"},
+			{Name: "EditWhen", Type: "text"},
+			{Name: "BeforeEdit", Type: "text"},
+			{Name: "AfterEdit", Type: "text"},
+			{Name: "Restore", Type: "boolean"},
+			{Name: "Flag", Type: "boolean"},
+			{Name: "ID", Type: "integer"},
+		},
+		rows: []accessreader.Row{
+			{"LegacyUser", "00337", "_Env", "Zone", "2014-05-01 10:00:00", "IDF", "CWH", nil, false, int64(42)},
+		},
+	}
+
+	pairs := make([][2]string, len(legacyAuditColumns))
+	for i, c := range legacyAuditColumns {
+		pairs[i] = [2]string{c, c}
+	}
+	coalesceFalseBool := func(v any) any {
+		if v == nil {
+			return int64(0)
+		}
+		return v
+	}
+	auditOverrides := map[string]func(any) any{
+		"Project": func(any) any { return "ConvertedVP06" },
+		"Restore": coalesceFalseBool,
+		"Flag":    coalesceFalseBool,
+	}
+
+	m, err := streamAccessSourceIntoSQLite(ctx, src, tx, nil, nil, "OldVP06_Audit", nil, []streamInsertSpec{
+		{
+			targetTable:     "ConvertedVP06_Audit",
+			targetToSource:  pairs,
+			columnOverrides: auditOverrides,
+		},
+	})
+	if err != nil {
+		t.Fatalf("legacy _Audit lacking Project column failed to synthesize Project: %v", err)
+	}
+	if m.importedRows != 1 {
+		t.Fatalf("expected 1 imported _Audit row, got %d", m.importedRows)
+	}
+
+	var gotProj, gotPlot, gotUser string
+	var gotRestore, gotFlag, gotID int64
+	if err := tx.QueryRowContext(ctx,
+		`SELECT "Project", "User", "PlotNumber", CAST("Restore" AS INTEGER), CAST("Flag" AS INTEGER), "ID" FROM "ConvertedVP06_Audit"`,
+	).Scan(&gotProj, &gotUser, &gotPlot, &gotRestore, &gotFlag, &gotID); err != nil {
+		t.Fatal(err)
+	}
+	if gotProj != "ConvertedVP06" || gotUser != "LegacyUser" || gotPlot != "00337" || gotRestore != 0 || gotFlag != 0 || gotID != 42 {
+		t.Fatalf("unexpected synthesized _Audit row: proj=%q user=%q plot=%q restore=%d flag=%d id=%d",
+			gotProj, gotUser, gotPlot, gotRestore, gotFlag, gotID)
+	}
+
+	// Also verify computed["Project"] synthesizes Project cleanly when targetToSource is legacyAuditColumns or nil!
+	src.pos = 0
+	if _, err := tx.ExecContext(ctx, `DELETE FROM "ConvertedVP06_Audit"`); err != nil {
+		t.Fatal(err)
+	}
+	m2, err := streamAccessSourceIntoSQLite(ctx, src, tx, nil, nil, "OldVP06_Audit", nil, []streamInsertSpec{
+		{
+			targetTable:    "ConvertedVP06_Audit",
+			targetToSource: pairs,
+			computed: map[string]func([]any, map[string]int) any{
+				"Project": func([]any, map[string]int) any { return "ComputedVP06" },
+			},
+			columnOverrides: auditOverrides,
+		},
+	})
+	if err != nil || m2.importedRows != 1 {
+		t.Fatalf("computed Project synthesis failed: rows=%d err=%v", m2.importedRows, err)
+	}
+	if err := tx.QueryRowContext(ctx, `SELECT "Project" FROM "ConvertedVP06_Audit"`).Scan(&gotProj); err != nil || gotProj != "ComputedVP06" {
+		t.Fatalf("expected computed Project='ComputedVP06', got %q (err=%v)", gotProj, err)
+	}
+}
+

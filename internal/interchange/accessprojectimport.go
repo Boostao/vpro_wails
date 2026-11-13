@@ -593,6 +593,23 @@ func adaptedPlotKey(v any) string {
 	return fmt.Sprint(v)
 }
 
+type accessRowSource interface {
+	ColumnsList() []accessreader.Column
+	EnableRowQuarantine()
+	Next() bool
+	Row() accessreader.Row
+	Err() error
+	QuarantinedRows() []accessreader.QuarantinedRow
+	Close() error
+}
+
+type accessReaderAdapter struct {
+	*accessreader.Reader
+}
+
+func (a accessReaderAdapter) ColumnsList() []accessreader.Column            { return a.Reader.Columns }
+func (a accessReaderAdapter) QuarantinedRows() []accessreader.QuarantinedRow { return a.Reader.Quarantined }
+
 func streamAccessTableIntoSQLite(
 	ctx context.Context,
 	db *accessreader.DB,
@@ -603,19 +620,33 @@ func streamAccessTableIntoSQLite(
 	validEnvPlots map[string]struct{},
 	specs []streamInsertSpec,
 ) (streamTableMetrics, error) {
-	var metrics streamTableMetrics
 	reader, err := db.Scan(sourceTable)
 	if err != nil {
-		return metrics, fmt.Errorf("open %s: %w", sourceTable, err)
+		return streamTableMetrics{}, fmt.Errorf("open %s: %w", sourceTable, err)
 	}
 	defer reader.Close()
-	reader.EnableRowQuarantine()
-	metrics.actualSourceTable = sourceTable
-	metrics.columnCount = len(reader.Columns)
+	return streamAccessSourceIntoSQLite(ctx, accessReaderAdapter{reader}, tx, quarantineStmt, childIdStmt, sourceTable, validEnvPlots, specs)
+}
 
-	srcCols := make([]accessimport.SourceColumn, len(reader.Columns))
-	colIndex := make(map[string]int, len(reader.Columns))
-	for i, c := range reader.Columns {
+func streamAccessSourceIntoSQLite(
+	ctx context.Context,
+	reader accessRowSource,
+	tx *sql.Tx,
+	quarantineStmt *sql.Stmt,
+	childIdStmt *sql.Stmt,
+	sourceTable string,
+	validEnvPlots map[string]struct{},
+	specs []streamInsertSpec,
+) (streamTableMetrics, error) {
+	var metrics streamTableMetrics
+	reader.EnableRowQuarantine()
+	cols := reader.ColumnsList()
+	metrics.actualSourceTable = sourceTable
+	metrics.columnCount = len(cols)
+
+	srcCols := make([]accessimport.SourceColumn, len(cols))
+	colIndex := make(map[string]int, len(cols))
+	for i, c := range cols {
 		srcCols[i] = accessimport.SourceColumn{Name: c.Name, Type: c.Type}
 		colIndex[strings.ToLower(c.Name)] = i
 	}
@@ -646,7 +677,7 @@ func streamAccessTableIntoSQLite(
 			if err != nil {
 				return metrics, err
 			}
-			for _, c := range reader.Columns {
+			for _, c := range cols {
 				if canonical, ok := dstCols[strings.ToLower(c.Name)]; ok {
 					mapping = append(mapping, [2]string{canonical, c.Name})
 				}
@@ -674,9 +705,10 @@ func streamAccessTableIntoSQLite(
 		sourceIndices := make([]int, len(mapping))
 		overrides := make([]func(any) any, len(mapping))
 		for i, pair := range mapping {
+			overrideFn := overrideByLower[strings.ToLower(pair[0])]
 			idx, ok := colIndex[strings.ToLower(pair[1])]
 			if !ok {
-				if strings.EqualFold(pair[1], "Collected") {
+				if strings.EqualFold(pair[1], "Collected") || (strings.EqualFold(pair[0], "Project") && overrideFn != nil) {
 					sourceIndices[i] = -1
 				} else {
 					return metrics, fmt.Errorf("source table %s for %s is missing column %q", sourceTable, spec.targetTable, pair[1])
@@ -684,7 +716,7 @@ func streamAccessTableIntoSQLite(
 			} else {
 				sourceIndices[i] = idx
 			}
-			overrides[i] = overrideByLower[strings.ToLower(pair[0])]
+			overrides[i] = overrideFn
 			targetCols = append(targetCols, vprocore.QuoteHeaderIdentifier(pair[0]))
 		}
 		var computedKeys []string
@@ -850,7 +882,7 @@ func streamAccessTableIntoSQLite(
 	if err := reader.Err(); err != nil {
 		return metrics, fmt.Errorf("scan %s: %w", sourceTable, err)
 	}
-	for _, q := range reader.Quarantined {
+	for _, q := range reader.QuarantinedRows() {
 		metrics.malformedRows++
 		if quarantineStmt != nil {
 			_, _ = quarantineStmt.ExecContext(ctx, sourceTable, q.RowNumber, "", "access_decode: "+q.Reason, "{}")
@@ -1180,6 +1212,9 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 			"Restore": coalesceFalseBool,
 			"Flag":    coalesceFalseBool,
 		}
+		auditComputed := map[string]func([]any, map[string]int) any{
+			"Project": func([]any, map[string]int) any { return targetProject },
+		}
 
 		validEnvPlots := make(map[string]struct{}, 1024)
 		accumulate := func(m streamTableMetrics) {
@@ -1220,7 +1255,7 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 			}
 			accumulate(mineralM)
 			if auditM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, childIdStmt, auditActualName, nil, []streamInsertSpec{
-				{targetTable: targetProject + "_Audit", columnOverrides: auditOverrides, childIdentityTable: vprocore.QuoteHeaderIdentifier(targetProject + "_Audit")},
+				{targetTable: targetProject + "_Audit", computed: auditComputed, columnOverrides: auditOverrides, childIdentityTable: vprocore.QuoteHeaderIdentifier(targetProject + "_Audit")},
 			}); err != nil {
 				return err
 			}
@@ -1326,6 +1361,7 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 					childIdentityTable: vprocore.QuoteHeaderIdentifier(targetProject + "_" + item.suffix),
 				}
 				if item.suffix == "Audit" {
+					spec.computed = auditComputed
 					spec.columnOverrides = auditOverrides
 				}
 				m, sErr := streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, childIdStmt, item.src, envSet, []streamInsertSpec{spec})

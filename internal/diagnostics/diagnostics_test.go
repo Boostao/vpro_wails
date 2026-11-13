@@ -769,3 +769,191 @@ func BenchmarkReassignSynthesisPlotUnit(b *testing.B) {
 		}
 	}
 }
+
+func TestSynthesisCaseDistinctNOCASEBatchesScopedUnassignedAndLiveWALCache(t *testing.T) {
+	ctx := context.Background()
+	root := workspaceScratchDir(t)
+	dataDir := filepath.Join(root, "data")
+	cfgDir := filepath.Join(root, "config")
+	for _, d := range []string{dataDir, cfgDir} {
+		if err := os.MkdirAll(d, 0o700); err != nil {
+			t.Fatal(err)
+		}
+	}
+	preferences, err := vprocore.OpenDesktopConfig(dataDir, cfgDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	projects, err := vprocore.NewSQLiteProjectService(dataDir, cfgDir, preferences)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = projects.CloseSQLiteContext() })
+	plots, err := vprocore.NewPlotServiceWithPreferences(projects)
+	if err != nil {
+		t.Fatal(err)
+	}
+	contexts, err := vprocore.NewContextService(projects, plots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	initState, err := projects.GetState(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// 1. Recreate Sample_Veg with PlotNumber VARCHAR COLLATE NOCASE and seed >2000 Env/Admin plots
+	// (2100 total plots, 850 classified across 2 batches of 800) with case-distinct 'A1' (in batch 1,
+	// sorted before 'B0001'..'B0848') and 'z1'/'Z1' spanning batch 1 (index < 800) and batch 2 (index >= 800)!
+	// Specifically: 'A1' (index 0, batch 1) and 'a1' — wait: inNOCASE sort, 'A1' and 'a1' are adjacent,
+	// so put 799 'A0001'..'A0799' plots first, then 'M1' at index 799 (end of batch 1) and 'm1' at index 800 (start of batch 2)!
+	db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(initState.ProjectPath, "rw")+"&_foreign_keys=off&_journal_mode=WAL")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.Exec(`
+		DELETE FROM Sample_Veg;
+		DELETE FROM Sample_Admin;
+		DELETE FROM Sample_Env;
+
+		DROP TABLE Sample_Veg;
+		CREATE TABLE Sample_Veg (
+			"ID" INTEGER,
+			"PlotNumber" VARCHAR COLLATE NOCASE,
+			"Species" VARCHAR,
+			"Layer" VARCHAR,
+			"Cover1" REAL, "Height1" REAL, "Cover2" REAL, "Height2" REAL, "Cover3" REAL, "Height3" REAL, "TotalA" REAL, "HeightA" REAL,
+			"Cover4" REAL, "Height4" REAL, "Cover5" REAL, "Height5" REAL, "Cover5a" REAL, "Height5a" REAL, "Cover5b" REAL, "Height5b" REAL, "Cover5c" REAL, "Height5c" REAL, "TotalB" REAL, "HeightB" VARCHAR,
+			"Cover6" REAL, "Height6" REAL, "Cover7" REAL, "Cover8" REAL, "Cover9" REAL, "Cover10" REAL,
+			"Collected" VARCHAR, "Flag" BOOLEAN, "LL" INTEGER, "PV" INTEGER
+		);
+		CREATE INDEX idx_Sample_Veg_Plot_Nocase ON Sample_Veg("PlotNumber" COLLATE NOCASE);
+
+		CREATE TABLE CaseScope_SU ("PlotNumber" VARCHAR, "SiteUnit" VARCHAR);
+		INSERT OR REPLACE INTO _table_metadata (table_name, description) VALUES ('CaseScope_SU', 'VP04');
+
+		-- 799 filler classified plots A0001..A0799 in UnitFiller so index 799 is 'M1' (batch 1) and index 800 is 'm1' (batch 2)!
+		WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 799)
+		INSERT INTO Sample_Env ("PlotNumber", "Zone") SELECT printf('A%04d', n), 'CWH' FROM seq;
+		WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 799)
+		INSERT INTO Sample_Admin ("Plot", "UserSiteUnit") SELECT printf('A%04d', n), 'UnitFiller' FROM seq;
+		WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 799)
+		INSERT INTO CaseScope_SU ("PlotNumber", "SiteUnit") SELECT printf('A%04d', n), 'UnitFiller' FROM seq;
+
+		-- Case-distinct plots 'M1' (UnitUpper, PSEUMEN=40) and 'm1' (UnitLower, PSEUMEN=10) straddling batch 1 / batch 2 boundary!
+		INSERT INTO Sample_Env ("PlotNumber", "Zone") VALUES ('M1', 'CWH'), ('m1', 'IDF');
+		INSERT INTO Sample_Admin ("Plot", "UserSiteUnit") VALUES ('M1', 'UnitUpper'), ('m1', 'UnitLower');
+		INSERT INTO CaseScope_SU ("PlotNumber", "SiteUnit") VALUES ('M1', 'UnitUpper'), ('m1', 'UnitLower');
+		INSERT INTO Sample_Veg ("ID", "PlotNumber", "Species", "Cover1") VALUES
+			(1, 'M1', 'PSEUMEN', 40.0),
+			(2, 'm1', 'PSEUMEN', 10.0);
+
+		-- 1300 unassigned plots U0001..U1300 so totalEnvCount = 2101 (> 2000, triggering scoped pushdown)!
+		WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 1300)
+		INSERT INTO Sample_Env ("PlotNumber", "Zone") SELECT printf('U%04d', n), 'ESSF' FROM seq;
+		WITH RECURSIVE seq(n) AS (SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 1300)
+		INSERT INTO Sample_Admin ("Plot", "UserSiteUnit") SELECT printf('U%04d', n), '' FROM seq;
+	`); err != nil {
+		db.Close()
+		t.Fatal(err)
+	}
+	db.Close()
+
+	state, err := contexts.SwitchContext(initState.ContextID, vprocore.ContextSelection{
+		Project:       initState.ActiveProject,
+		ProjectPath:   initState.ProjectPath,
+		SU:            "CaseScope",
+		SUPath:        initState.ProjectPath,
+		Hierarchy:     initState.ActiveHierarchy,
+		HierarchyPath: initState.HierarchyPath,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	snap, err := ComputeSynthesisSnapshot(ctx, contexts, state.ContextID, SynthesisOptions{UnitSource: "su"})
+	if err != nil {
+		t.Fatalf("ComputeSynthesisSnapshot failed: %v", err)
+	}
+
+	// Sub-issue 4A: Verify 'M1' and 'm1' across batches were NOT double-counted by COLLATE NOCASE!
+	var pseu *SynthesisSpeciesRow
+	for i := range snap.Species {
+		if snap.Species[i].Species == "PSEUMEN" {
+			pseu = &snap.Species[i]
+			break
+		}
+	}
+	if pseu == nil {
+		t.Fatalf("missing PSEUMEN row in synthesis snapshot")
+	}
+	for _, cell := range pseu.Cells {
+		switch cell.SiteUnit {
+		case "UnitUpper":
+			if cell.MeanCoverAll != 40.0 {
+				t.Fatalf("COLLATE NOCASE batch double-count on 'M1': expected MeanCoverAll=40.0, got %v", cell.MeanCoverAll)
+			}
+		case "UnitLower":
+			if cell.MeanCoverAll != 10.0 {
+				t.Fatalf("COLLATE NOCASE batch double-count on 'm1': expected MeanCoverAll=10.0, got %v", cell.MeanCoverAll)
+			}
+		}
+	}
+
+	// Sub-issue 4B: Scoped path (totalEnvCount = 2101 > 2000) MUST populate UnassignedPlots matching UnassignedPlotCount (1300)!
+	if snap.UnassignedPlotCount != 1300 || len(snap.UnassignedPlots) != 1300 {
+		t.Fatalf("scoped path UnassignedPlots mismatch: UnassignedPlotCount=%d len(UnassignedPlots)=%d (want both 1300)",
+			snap.UnassignedPlotCount, len(snap.UnassignedPlots))
+	}
+
+	// Sub-issue 4C (part 1): Mid-table deletion in WAL (deleting U0500 without changing MAX(rowid)!) must invalidate project cache immediately!
+	mutDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(initState.ProjectPath, "rw")+"&_foreign_keys=off&_journal_mode=WAL")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := mutDB.Exec(`
+		DELETE FROM Sample_Env WHERE "PlotNumber" = 'U0500';
+		DELETE FROM Sample_Admin WHERE "Plot" = 'U0500';
+	`); err != nil {
+		mutDB.Close()
+		t.Fatal(err)
+	}
+	mutDB.Close()
+
+	snapAfterDel, err := ComputeSynthesisSnapshot(ctx, contexts, state.ContextID, SynthesisOptions{UnitSource: "su"})
+	if err != nil {
+		t.Fatalf("ComputeSynthesisSnapshot after mid-table WAL delete: %v", err)
+	}
+	if snapAfterDel.TotalProjectPlots != 2100 || snapAfterDel.UnassignedPlotCount != 1299 || len(snapAfterDel.UnassignedPlots) != 1299 {
+		t.Fatalf("stale cache after mid-table WAL deletion (MAX(rowid) unchanged): total=%d unassignedCount=%d len(unassigned)=%d (want 2100, 1299, 1299)",
+			snapAfterDel.TotalProjectPlots, snapAfterDel.UnassignedPlotCount, len(snapAfterDel.UnassignedPlots))
+	}
+
+	// Sub-issue 4C (part 2): Live WAL mutation to VUser.db (UserSiteUnitList) without re-attaching must invalidate support stamp cache!
+	vuserPath := projects.Sqlite.Attachments["VUser"]
+	vuDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(vuserPath, "rw")+"&_journal_mode=WAL")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := vuDB.Exec(`INSERT INTO "UserSiteUnitList" ("SiteSeries", "SiteSeriesLongName") VALUES ('UnitUpper', 'Live WAL Upper Unit Name')`); err != nil {
+		vuDB.Close()
+		t.Fatal(err)
+	}
+	vuDB.Close()
+
+	snapAfterVUser, err := ComputeSynthesisSnapshot(ctx, contexts, state.ContextID, SynthesisOptions{UnitSource: "su"})
+	if err != nil {
+		t.Fatalf("ComputeSynthesisSnapshot after VUser WAL update: %v", err)
+	}
+	var gotUpperLongName string
+	for _, u := range snapAfterVUser.Units {
+		if u.SiteUnit == "UnitUpper" {
+			gotUpperLongName = u.LongName
+			break
+		}
+	}
+	if gotUpperLongName != "Live WAL Upper Unit Name" {
+		t.Fatalf("stale support cache after VUser WAL mutation: got LongName=%q, want 'Live WAL Upper Unit Name'", gotUpperLongName)
+	}
+}
+

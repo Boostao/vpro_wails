@@ -190,6 +190,62 @@ func TestVProCoreCalibrationGuards(t *testing.T) {
 			t.Fatalf("expected inverted mineral Bf (30 -> 5) to be rejected")
 		}
 
+		// Lithologic discontinuity digits & Roman numerals ('2Bm', '3C', 'IIBm', 'IVCg', '2Of', 'IIFm') must strip prefix before checking LMH25 depth sign!
+		for _, minHz := range []string{"2Bm", "3C", "IIBm", "IVCg"} {
+			if err := svc.SaveMineralRecord(state.ContextID, vprocore.MineralRecord{
+				PlotNumber: "SOIL01",
+				Horizon:    strPtr(minHz),
+				UpperDepth: f64Ptr(40.0),
+				LowerDepth: f64Ptr(15.0),
+			}); err == nil {
+				t.Fatalf("expected inverted lithologic discontinuity mineral horizon %q (40 -> 15) to be rejected", minHz)
+			}
+			if err := svc.SaveMineralRecord(state.ContextID, vprocore.MineralRecord{
+				PlotNumber: "SOIL01",
+				Horizon:    strPtr(minHz),
+				UpperDepth: f64Ptr(15.0),
+				LowerDepth: f64Ptr(40.0),
+			}); err != nil {
+				t.Fatalf("expected valid lithologic discontinuity mineral horizon %q (15 -> 40) to succeed, got: %v", minHz, err)
+			}
+		}
+		for _, wetHz := range []string{"2Of", "IIOm"} {
+			if err := svc.SaveHumusRecord(state.ContextID, vprocore.HumusRecord{
+				PlotNumber: "SOIL01",
+				Horizon:    strPtr(wetHz),
+				UpperDepth: f64Ptr(25.0),
+				LowerDepth: f64Ptr(10.0),
+			}); err == nil {
+				t.Fatalf("expected inverted lithologic discontinuity wetland humus horizon %q (25 -> 10) to be rejected", wetHz)
+			}
+			if err := svc.SaveHumusRecord(state.ContextID, vprocore.HumusRecord{
+				PlotNumber: "SOIL01",
+				Horizon:    strPtr(wetHz),
+				UpperDepth: f64Ptr(10.0),
+				LowerDepth: f64Ptr(25.0),
+			}); err != nil {
+				t.Fatalf("expected valid lithologic discontinuity wetland humus horizon %q (10 -> 25) to succeed, got: %v", wetHz, err)
+			}
+		}
+		for _, upHz := range []string{"2Fm", "IILv"} {
+			if err := svc.SaveHumusRecord(state.ContextID, vprocore.HumusRecord{
+				PlotNumber: "SOIL01",
+				Horizon:    strPtr(upHz),
+				UpperDepth: f64Ptr(1.0),
+				LowerDepth: f64Ptr(5.0),
+			}); err == nil {
+				t.Fatalf("expected inverted lithologic discontinuity upland humus horizon %q (1 -> 5) to be rejected", upHz)
+			}
+			if err := svc.SaveHumusRecord(state.ContextID, vprocore.HumusRecord{
+				PlotNumber: "SOIL01",
+				Horizon:    strPtr(upHz),
+				UpperDepth: f64Ptr(5.0),
+				LowerDepth: f64Ptr(1.0),
+			}); err != nil {
+				t.Fatalf("expected valid lithologic discontinuity upland humus horizon %q (5 -> 1) to succeed, got: %v", upHz, err)
+			}
+		}
+
 		// Historical untouched depth anomaly in DB must survive unrelated Comment update!
 		vprotest.MutateContextFixture(t, state.ProjectPath, `
 			INSERT INTO "Sample_Humus" ("PlotNumber", "ID", "Horizon", "UpperDepth", "LowerDepth")
