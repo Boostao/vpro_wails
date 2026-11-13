@@ -125,10 +125,6 @@ export function DeriveProjectMetadataFromPlots(contextID: string, projectID: str
     return $Call.ByID(3409539417, contextID, projectID);
 }
 
-export function Edit(expectedID: string, operation: any): $CancellablePromise<void> {
-    return $Call.ByID(3627133354, expectedID, operation);
-}
-
 export function ExecuteThreeWayMerge(contextID: string, req: projectops$0.ThreeWayMergeExecuteRequest): $CancellablePromise<projectops$0.ThreeWayMergeResult> {
     return $Call.ByID(1873291042, contextID, req);
 }
