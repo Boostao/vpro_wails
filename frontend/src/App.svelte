@@ -68,6 +68,7 @@
   let stateRequest = 0;
   onDestroy(() => {
     request++; hierarchyRequest++; stateRequest++;
+    secondaryPanelBusy = false; siviModalBusy = false; workbenchDirtyLabel = '';
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
   let view = $state<'home' | 'plots' | 'geospatial-map' | 'diagnostic-synthesis' | 'r-sidecar' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
@@ -99,6 +100,10 @@
   let summaryFieldListBusy = $state(false);
   let summaryEnvironmentalBusy = $state(false);
   const editorBusy = $derived(localEditorBusy || matrixPublicationBusy || pictureCreationBusy || pictureLifecycleBusy || twoPageSoilBusy || twoPageVegetationBusy || externalSUEnvironmentBusy || summaryPreferenceBusy || summaryFieldListBusy || summaryEnvironmentalBusy || projectReportBusy);
+  let secondaryPanelBusy = $state(false);
+  let siviModalBusy = $state(false);
+  const companionPanelBusy = $derived(secondaryPanelBusy || siviModalBusy);
+  let workbenchDirtyLabel = $state('');
   $effect(() => {
     const state = $projectState;
     if (import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK === 'false' || !state?.contextId ||
@@ -358,10 +363,15 @@
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       await tick();
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || editorInitializing);
+      const disposition = closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || editorInitializing || (typeof companionPanelBusy !== 'undefined' && companionPanelBusy));
       if (disposition === 'busy') {
         await LifecycleService.CancelClose(requestId);
-        error = 'Wait for the current operation to finish before closing VPRO.';
+        error = (typeof workbenchDirtyLabel !== 'undefined' && workbenchDirtyLabel)
+          ? 'Save or discard unsaved workbench edits before closing VPro.'
+          : 'Wait for the current operation to finish before closing VPRO.';
+      } else if (typeof workbenchDirtyLabel !== 'undefined' && workbenchDirtyLabel) {
+        await LifecycleService.CancelClose(requestId);
+        error = 'Save or discard unsaved workbench edits before closing VPro.';
       } else if (disposition === 'clean') {
         await LifecycleService.ConfirmClose(requestId);
       } else {
@@ -385,7 +395,7 @@
         return;
       }
       const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-      if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || editorInitializing) === 'busy') {
+      if (closeDisposition(state, busy || editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || editorInitializing || (typeof companionPanelBusy !== 'undefined' && companionPanelBusy)) === 'busy') {
         closeError = 'Wait for the current operation to finish before closing VPRO.';
         return;
       }
@@ -416,8 +426,12 @@
       error = 'Owned action or editor availability changed; no editor replaced.';
       return;
     }
+    if (!ownedAction && typeof workbenchDirtyLabel !== 'undefined' && workbenchDirtyLabel) {
+      error = 'Save or discard unsaved workbench edits before changing context or view.';
+      return;
+    }
     const state = view === 'fs882' ? editor?.getCloseState() ?? null : null;
-    if (closeDisposition(ownedAction ? null : state, busy || !ownedAction && editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || !!closeRequest || editorInitializing) === 'busy') {
+    if (closeDisposition(ownedAction ? null : state, busy || !ownedAction && editorBusy || transitionWorking || archivePublicationBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || pendingTransition !== null || !!closeRequest || editorInitializing || (!ownedAction && typeof companionPanelBusy !== 'undefined' && companionPanelBusy)) === 'busy') {
       error = 'Wait for the current operation or decision before changing context.';
       return;
     }
@@ -440,7 +454,7 @@
     transitionError = '';
     try {
       const state = editor?.getCloseState();
-      if (!state || closeDisposition(state, busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy) === 'busy') {
+      if (!state || closeDisposition(state, busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || (typeof companionPanelBusy !== 'undefined' && companionPanelBusy)) === 'busy') {
         transitionError = 'Wait for the current editor operation to finish.';
         return;
       }
@@ -566,7 +580,7 @@
 
   async function findScopedPlot() {
     const contextId = $projectState?.contextId;
-    if (!plotFindEnabled || !contextId || busy || editorBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
+    if (!plotFindEnabled || !contextId || busy || editorBusy || (typeof companionPanelBusy !== 'undefined' && companionPanelBusy) || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || transitionWorking || pendingTransition !== null || closeRequest) return;
     const number = plotFindQuery;
     busy = true; plotFindError = ''; plotFindResult = null;
     try {
@@ -619,7 +633,7 @@
   }
 
   async function loadPlots(nextOffset: number) {
-    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (typeof companionPanelBusy !== 'undefined' && companionPanelBusy) || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
     const current = ++request;
     plotReads.cancelAll();
     busy = true;
@@ -642,7 +656,7 @@
   }
 
   async function refresh() {
-    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (typeof companionPanelBusy !== 'undefined' && companionPanelBusy) || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
     const current = ++stateRequest;
     stateReads.cancelAll();
     busy = true;
@@ -671,7 +685,7 @@
   }
 
   async function loadHierarchy() {
-    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
+    if (projectReportBusy || twoPageVegetationBusy || twoPageSoilBusy || pictureCreationBusy || pictureLifecycleBusy || vegetationPublicationBusy || lifeformPublicationBusy || summaryPublicationBusy || summaryPreferenceBusy || externalSUEnvironmentBusy || (typeof companionPanelBusy !== 'undefined' && companionPanelBusy) || (view === 'long-vegetation' || view === 'lifeform-summary' || view === 'summary-environment' || view === 'summary-vegetation' || view === 'user-log' || view === 'subzone-matrix') && editorBusy) return;
     const current = ++hierarchyRequest;
     hierarchyReads.cancelAll();
     try {
@@ -1220,7 +1234,7 @@
 
   async function confirmResetWorkspaceToSample() {
     resetSampleConfirmOpen = false;
-    const ownedDiscardOnSample = $projectState?.activeProject === 'Sample' ? () => !editorBusy : undefined;
+    const ownedDiscardOnSample = $projectState?.activeProject === 'Sample' ? () => !editorBusy && !companionPanelBusy : undefined;
     await requestTransition(async (contextId) => {
       busy = true;
       error = '';
@@ -1285,12 +1299,12 @@
     {#if !startupFailure}<Navigation {view} onnavigate={navigate}
       siviAvailable={siviStandaloneEnabled && !!selected && !!$projectState?.contextId}
       onopensivi={() => void openSIVI()}
-      newSiviAvailable={!!$projectState?.contextId && !busy && !editorBusy && !transitionWorking}
+      newSiviAvailable={!!$projectState?.contextId && !busy && !editorBusy && !companionPanelBusy && !transitionWorking}
       onopennewsivi={() => { newSiviModalOpen = true; }}
       metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
       onopenmetadata={() => void openProjectMetadata()}
       whatsNewUnreadCount={whatsNewStatus?.unreadCount ?? 0}
-      resetSampleAvailable={!!$projectState?.contextId && !busy && !editorBusy && !transitionWorking}
+      resetSampleAvailable={!!$projectState?.contextId && !busy && !editorBusy && !companionPanelBusy && !transitionWorking}
       onhelpaction={handleHelpMenuAction} />{/if}
     <div class="topbar-context"><Database size={16} strokeWidth={1.8} /><span>{$projectState?.activeProject ?? 'No project'}</span></div>
   </header>
@@ -1307,7 +1321,7 @@
       {#if revealError}<p role="alert" class="px-3 py-1 text-xs text-red-800 break-words">{revealError}</p>{/if}
       <nav aria-label="Project list">
         {#each $projectState?.projects ?? [] as project ((project.path ?? project.file) + project.name)}
-          <button class:active={project.name === $projectState?.activeProject && project.path === $projectState?.projectPath} disabled={!project.compatible || busy || transitionWorking} title={project.compatible ? project.path : `${project.version} is not a complete VP08 project`} onclick={() => chooseProject(project)}>
+          <button class:active={project.name === $projectState?.activeProject && project.path === $projectState?.projectPath} disabled={!project.compatible || busy || editorBusy || companionPanelBusy || transitionWorking} title={project.compatible ? project.path : `${project.version} is not a complete VP08 project`} onclick={() => chooseProject(project)}>
             <span class="project-name">{project.name}
               <span class="project-location">{$projectState?.projects?.filter(item => item.name === project.name).length === 1 ? project.file : project.path}</span>
             </span>
@@ -1317,7 +1331,7 @@
       </nav>
       <div class="su-picker">
         <label for="active-su">SITE UNIT</label>
-        <select id="active-su" value={String(activeSUIndex)} onchange={chooseSU} disabled={busy || transitionWorking || !$projectState}>
+        <select id="active-su" value={String(activeSUIndex)} onchange={chooseSU} disabled={busy || editorBusy || companionPanelBusy || transitionWorking || !$projectState}>
           <option value="-1">None</option>
           {#each $projectState?.sus ?? [] as su, index ((su.path ?? '') + su.name)}
             <option value={String(index)} disabled={!su.compatible} title={su.path}>{su.name}{su.kind === 'master' ? ' (master)' : ''}</option>
@@ -1326,7 +1340,7 @@
       </div>
       <div class="su-picker">
         <label for="active-hierarchy">HIERARCHY</label>
-        <select id="active-hierarchy" value={String(activeHierarchyIndex)} onchange={chooseHierarchy} disabled={busy || transitionWorking || !$projectState}>
+        <select id="active-hierarchy" value={String(activeHierarchyIndex)} onchange={chooseHierarchy} disabled={busy || editorBusy || companionPanelBusy || transitionWorking || !$projectState}>
           <option value="-1">None</option>
           {#each $projectState?.hierarchies ?? [] as hierarchy, index ((hierarchy.path ?? hierarchy.file) + hierarchy.name)}
             <option value={String(index)} disabled={!hierarchy.compatible} title={hierarchy.path}>{hierarchy.name} ({hierarchy.file})</option>
@@ -1337,23 +1351,23 @@
         <details class="su-picker">
           <summary>Attach external SQLite project</summary>
           <form onsubmit={attachExternalProject}>
-            <button type="button" id="browse-external-sqlite" disabled={busy || transitionWorking || !$projectState?.contextId} onclick={() => void browseExternalSQLiteProject()}>Browse SQLite .db file…</button>
+            <button type="button" id="browse-external-sqlite" disabled={busy || editorBusy || companionPanelBusy || transitionWorking || !$projectState?.contextId} onclick={() => void browseExternalSQLiteProject()}>Browse SQLite .db file…</button>
             {#if externalPickMessage}<p role="status" class="text-emerald-800 break-words">{externalPickMessage}</p>{/if}
             {#if externalPickError}<p role="alert" class="text-red-800 break-words">{externalPickError}</p>{/if}
             {#if externalDiscoveredProjects.length > 1}
               <label for="external-project-select">DISCOVERED PROJECTS IN FILE</label>
-              <select id="external-project-select" value={externalProject} onchange={(e) => { externalProject = (e.currentTarget as HTMLSelectElement).value; }} disabled={busy || transitionWorking}>
+              <select id="external-project-select" value={externalProject} onchange={(e) => { externalProject = (e.currentTarget as HTMLSelectElement).value; }} disabled={busy || editorBusy || companionPanelBusy || transitionWorking}>
                 {#each externalDiscoveredProjects as p (p.name)}
                   <option value={p.name} disabled={!p.compatible}>{p.name} ({p.version})</option>
                 {/each}
               </select>
             {/if}
             <label for="external-project">PROJECT PREFIX</label>
-            <input id="external-project" bind:value={externalProject} required disabled={busy || transitionWorking} />
+            <input id="external-project" bind:value={externalProject} required disabled={busy || editorBusy || companionPanelBusy || transitionWorking} />
             <label for="external-path">FULL SQLITE FILE PATH</label>
-            <input id="external-path" bind:value={externalPath} required disabled={busy || transitionWorking} />
+            <input id="external-path" bind:value={externalPath} required disabled={busy || editorBusy || companionPanelBusy || transitionWorking} />
             <p>Attach does not copy or alter the file. Verified editors write to the attached file. Use disposable copies only.</p>
-            <button type="submit" disabled={busy || transitionWorking}>Attach project</button>
+            <button type="submit" disabled={busy || editorBusy || companionPanelBusy || transitionWorking}>Attach project</button>
           </form>
         </details>
         <details class="su-picker" id="access-import-wizard">
@@ -1736,7 +1750,8 @@
               su={$projectState.activeSU}
               hierarchy={$projectState.activeHierarchy}
               onBusyChange={(value) => { localEditorBusy = value; }}
-              onOpenPlot={(p) => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; }}
+              onDirtyChange={(dirty) => { workbenchDirtyLabel = dirty ? 'datasheet' : ''; }}
+              onOpenPlot={(p) => { void requestTransition(async () => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; error = ''; }); }}
             />
           {/await}
         {/key}
@@ -1751,9 +1766,11 @@
               project={$projectState.activeProject}
               su={$projectState.activeSU}
               hierarchy={$projectState.activeHierarchy}
+              operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
               onBusyChange={(value) => { localEditorBusy = value; }}
+              onDirtyChange={(dirty) => { workbenchDirtyLabel = dirty ? 'classification-explorer' : ''; }}
               onContextChanged={async () => { await refresh(); }}
-              onOpenPlot={(p) => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; }}
+              onOpenPlot={(p) => { void requestTransition(async () => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; error = ''; }); }}
             />
           {/await}
         {/key}
@@ -1768,6 +1785,8 @@
                 contextId={$projectState.contextId ?? ''}
                 activeProject={$projectState.activeProject}
                 activeSu={$projectState.activeSU}
+                operationHeld={busy || companionPanelBusy || transitionWorking || pendingTransition !== null || !!closeRequest}
+                onBusyChange={(value) => { localEditorBusy = value; }}
                 oncontextswitched={async () => { await refresh(); }}
               />
             {/await}
@@ -1775,6 +1794,8 @@
               <ProjectMetadataPresets
                 contextId={$projectState.contextId ?? ''}
                 projectId={$projectState.activeProject}
+                operationHeld={busy || localEditorBusy || transitionWorking || pendingTransition !== null || !!closeRequest}
+                onBusyChange={(value) => { secondaryPanelBusy = value; }}
               />
             {/await}
           </div>
@@ -1803,7 +1824,7 @@
               project={$projectState.activeProject}
               su={$projectState.activeSU}
               onBusyChange={(value) => { localEditorBusy = value; }}
-              onOpenPlot={(p) => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; }}
+              onOpenPlot={(p) => { void requestTransition(async () => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; error = ''; }); }}
             />
           {/await}
         {/key}
@@ -1817,6 +1838,8 @@
               contextId={$projectState.contextId ?? ''}
               activeProject={$projectState.activeProject}
               activeSu={$projectState.activeSU}
+              operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
+              onBusyChange={(value) => { localEditorBusy = value; }}
               oncontextswitched={async () => { await refresh(); }}
             />
           {/await}
@@ -1833,7 +1856,7 @@
               su={$projectState.activeSU}
               onBusyChange={(value) => { localEditorBusy = value; }}
               onContextChanged={async () => { await refresh(); }}
-              onOpenPlot={(p) => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; }}
+              onOpenPlot={(p) => { void requestTransition(async () => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; error = ''; }); }}
             />
           {/await}
         {/key}
@@ -1887,7 +1910,7 @@
                 su={$projectState.activeSU}
                 hierarchy={$projectState.activeHierarchy}
                 reportMode="summary"
-                onBusyChange={(value) => { localEditorBusy = value; }}
+                onBusyChange={(value) => { secondaryPanelBusy = value; }}
               />
             </div>
           {/await}
@@ -2025,6 +2048,8 @@
           activeProject={$projectState.activeProject}
           activeSu={$projectState.activeSU}
           open={newSiviModalOpen}
+          operationHeld={busy || editorBusy || secondaryPanelBusy || transitionWorking || pendingTransition !== null || !!closeRequest}
+          onBusyChange={(value) => { siviModalBusy = value; }}
           oncreated={async (res) => {
             newSiviModalOpen = false;
             await loadPlots(offset);
@@ -2071,7 +2096,7 @@
             <button
               type="button"
               data-confirm-reset-sample
-              disabled={busy || editorBusy || transitionWorking || !$projectState?.contextId}
+              disabled={busy || editorBusy || companionPanelBusy || transitionWorking || !$projectState?.contextId}
               class="rounded bg-[#003366] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#002244] disabled:opacity-50"
               onclick={() => void confirmResetWorkspaceToSample()}
             >

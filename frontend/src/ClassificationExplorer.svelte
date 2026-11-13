@@ -30,8 +30,10 @@
     su?: string;
     hierarchy?: string;
     initialMode?: ExplorerMode;
+    operationHeld?: boolean;
     port?: ClassificationBackendPort;
     onBusyChange?: (busy: boolean) => void;
+    onDirtyChange?: (dirty: boolean) => void;
     onContextChanged?: (nextContextId: string, newState: unknown) => void;
     onOpenPlot?: (plotNumber: string) => void;
     onRequestSUSync?: (direction: 'su_to_env' | 'env_to_su') => void;
@@ -43,8 +45,10 @@
     su = 'None',
     hierarchy = 'None',
     initialMode = 'su_tree',
+    operationHeld = false,
     port = defaultClassificationBackendPort,
     onBusyChange,
+    onDirtyChange,
     onContextChanged,
     onOpenPlot,
     onRequestSUSync,
@@ -168,7 +172,8 @@
   );
 
   $effect(() => {
-    onBusyChange?.(busy || mutating || !!flatValidationError);
+    onBusyChange?.(busy || mutating || flatDirty || !!flatValidationError);
+    onDirtyChange?.(!busy && !mutating && flatDirty);
   });
 
   async function reloadActivePane() {
@@ -682,6 +687,7 @@
   onDestroy(() => {
     generation++;
     reads.cancelAll();
+    onDirtyChange?.(false);
     onBusyChange?.(false);
   });
 </script>

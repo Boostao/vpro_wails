@@ -15,12 +15,16 @@
   let {
     contextId,
     projectId = '',
+    operationHeld = false,
     port = defaultProjectMetadataAutomationPort,
+    onBusyChange,
     onapplied,
   }: {
     contextId: string;
     projectId?: string;
+    operationHeld?: boolean;
     port?: ProjectMetadataAutomationPort;
+    onBusyChange?: (busy: boolean) => void;
     onapplied?: (result: ApplyProjectMetadataAutomationResult) => void;
   } = $props();
 
@@ -36,6 +40,11 @@
   let status = $state<string | null>(null);
   let generation = 0;
 
+  function setBusy(next: boolean) {
+    busy = next;
+    onBusyChange?.(next);
+  }
+
   $effect(() => {
     if (projectId && targetProjectId === '') {
       targetProjectId = projectId;
@@ -50,11 +59,13 @@
 
   onDestroy(() => {
     generation++;
+    onBusyChange?.(false);
   });
 
   async function loadPreviewAndPresets() {
+    if (operationHeld) return;
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     try {
       const pidSnapshot = $state.snapshot(targetProjectId);
@@ -72,11 +83,15 @@
     } catch (cause) {
       if (gen === generation) error = `Metadata derivation preview unavailable: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function commitAutomation() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before applying ProjectMetadata presets.';
+      return;
+    }
     const req = $state.snapshot({
       projectId: targetProjectId.trim(),
       applyDerived,
@@ -88,7 +103,7 @@
       return;
     }
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     status = null;
     try {
@@ -101,7 +116,7 @@
     } catch (cause) {
       if (gen === generation) error = `Apply ProjectMetadata automation failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 </script>

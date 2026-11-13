@@ -122,8 +122,8 @@
   const validEditCount = $derived(draftEntries.filter(d => d.error === '' && d.after !== null).length);
 
   function notifyHost() {
-    onBusyChange?.(busy || saving || findBusy || invalidDraftCount > 0);
-    onDirtyChange?.(draftEntries.length > 0);
+    onBusyChange?.(busy || saving || findBusy || draftEntries.length > 0);
+    onDirtyChange?.(!busy && !saving && !findBusy && draftEntries.length > 0);
   }
 
   $effect(() => {
@@ -495,6 +495,7 @@
   onDestroy(() => {
     generation++;
     reads.cancelAll();
+    onDirtyChange?.(false);
     onBusyChange?.(false);
   });
 </script>
