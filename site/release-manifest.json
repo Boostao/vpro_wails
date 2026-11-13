@@ -4,12 +4,12 @@
   "defaultChannel": "stable",
   "channels": {
     "stable": {
-      "tag": "v2.0.0",
-      "version": "2.0.0",
-      "publishedAt": "2026-11-13T18:00:51Z",
+      "tag": "v2.0.1",
+      "version": "2.0.1",
+      "publishedAt": "2026-11-13T19:17:05Z",
       "prerelease": false,
       "unsignedNotice": true,
-      "sha256sumsUrl": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/SHA256SUMS.txt",
+      "sha256sumsUrl": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/SHA256SUMS.txt",
       "standards": {
         "becVersion": "BECdb v13 (2026-05-28)",
         "taxonomyVersion": "BCPlantTaxonomy v19 (2026-02-09)",
@@ -18,93 +18,93 @@
       "assets": [
         {
           "name": "SHA256SUMS.txt",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/SHA256SUMS.txt",
-          "sha256": "84fc0bcb586657e8270e8072f463a0a202e2635e68f4f4d63a51c1923ed123d4",
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/SHA256SUMS.txt",
+          "sha256": "5bc0def69d06551729b191217ca07ef35ad3fb4d605bba5ac5d2151e9c8e5918",
           "sizeBytes": 1274
         },
         {
           "name": "vpro-linux-amd64.AppImage",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-linux-amd64.AppImage",
-          "sha256": "a577e22aee5934c3ff3a9dab3ae5ec95862f0a1aa6dae1ce798b965274ce2e13",
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-linux-amd64.AppImage",
+          "sha256": "d22ecd01fd4e869cda9ac25dfc0e81e8a2ae006f88592107fdbf4210f96bb5b7",
           "sizeBytes": 89475576
         },
         {
           "name": "vpro-linux-amd64.deb",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-linux-amd64.deb",
-          "sha256": "3f8f8b2ea0f7315935c6cb91aad66d6a7b7423f4574f32d447298274c6d5609e",
-          "sizeBytes": 20019606
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-linux-amd64.deb",
+          "sha256": "c7a803427307756285cf5c7cd627855325b8eafb68936e7ed0aa1fcdf2f8c1a5",
+          "sizeBytes": 20019610
         },
         {
           "name": "vpro-linux-amd64.tar.gz",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-linux-amd64.tar.gz",
-          "sha256": "9c01f6f2167f0bb14bd7fc80704c71918ca8e4bb4a5399f0e8fa3c143f8c54bf",
-          "sizeBytes": 19488850
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-linux-amd64.tar.gz",
+          "sha256": "d00aea1665e6c9df4e77b8b921da788e51efaa393aed829a0c462d0967fcc3d2",
+          "sizeBytes": 19488834
         },
         {
           "name": "vpro-linux-arm64.AppImage",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-linux-arm64.AppImage",
-          "sha256": "782334df3fa16ee614cddd59e27a99f6a53bdc91be8496f3b9b2fca91739ef6a",
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-linux-arm64.AppImage",
+          "sha256": "8d9a55a9fac93623bb23fd6d89a3069314a01d4a45997ebff9d2b143efab82b6",
           "sizeBytes": 86907400
         },
         {
           "name": "vpro-linux-arm64.deb",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-linux-arm64.deb",
-          "sha256": "3cfc741cbde89acac9893a1d79b59a379b7182548c5bd84a80dcd0dabc5ff8e6",
-          "sizeBytes": 19189284
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-linux-arm64.deb",
+          "sha256": "8a7b9617f6422a95b3c13993e60a8e7bd4763cb22089be50f0a65671e0b463fa",
+          "sizeBytes": 19189298
         },
         {
           "name": "vpro-linux-arm64.tar.gz",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-linux-arm64.tar.gz",
-          "sha256": "e3815d28e981a63684e1655f40696256bc6351a2d36a301509069d7f2c3da321",
-          "sizeBytes": 18585820
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-linux-arm64.tar.gz",
+          "sha256": "9532f41cabe01771d17a3149684873d7afebf43ede4242206d92a0684e8f3461",
+          "sizeBytes": 18585822
         },
         {
           "name": "vpro-macos-universal.dmg",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-macos-universal.dmg",
-          "sha256": "d4e23578c507214a9050a53745001156a2d1c8e624e16134b4324a8680e8b7e8",
-          "sizeBytes": 40102200
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-macos-universal.dmg",
+          "sha256": "e1848f2da5c4af877f376828f102178e1dc02c8ce5275ea26bf9997889045e41",
+          "sizeBytes": 40102201
         },
         {
           "name": "vpro-macos-universal.zip",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-macos-universal.zip",
-          "sha256": "59b03446722c742450fe13730378594283b377699681f64150128576b012d6fc",
-          "sizeBytes": 40183457
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-macos-universal.zip",
+          "sha256": "ee5e1b9887b531cf3b33f4fe41556b95e2c726aaf855fb776d167d3e2111b6c4",
+          "sizeBytes": 40183460
         },
         {
           "name": "vpro-windows-amd64-installer.exe",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-windows-amd64-installer.exe",
-          "sha256": "116bdbfffce43d652c17163178375a1af3b3abf6ffa2ed1d76b9e71beea97924",
-          "sizeBytes": 21552567
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-windows-amd64-installer.exe",
+          "sha256": "ef87cc10d5d64266d8a175a65fceb7de045d3d8123929f5db7ca927aafcf583b",
+          "sizeBytes": 21573226
         },
         {
           "name": "vpro-windows-amd64.exe",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-windows-amd64.exe",
-          "sha256": "673cff219784863d34b498c93d139e1c4829cb6fb71cb58e2a1c04e62566c9cb",
-          "sizeBytes": 59049984
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-windows-amd64.exe",
+          "sha256": "7e03089e726ee0e398869c22c6ed5367696e10cc3a6517555591a5aa127ce99a",
+          "sizeBytes": 59105792
         },
         {
           "name": "vpro-windows-amd64.zip",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-windows-amd64.zip",
-          "sha256": "0acaf7fea221299a34c6e11562f1f3f30f23c5230bab80b8dcf3b63b1dab3733",
-          "sizeBytes": 19847626
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-windows-amd64.zip",
+          "sha256": "1d4c446c9892c7a7e6c7f8d0991e8a961edcc9a5cf8b534a74c5b151837c3ed0",
+          "sizeBytes": 19860506
         },
         {
           "name": "vpro-windows-arm64-installer.exe",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-windows-arm64-installer.exe",
-          "sha256": "6fb0ac1b5b84608715daea268ed1677f0c59a3d03445506ba6f2ea7485e3a182",
-          "sizeBytes": 20564790
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-windows-arm64-installer.exe",
+          "sha256": "9c70d3227420fbaee50b387126242ce9b0f81eeb5f6d5d23e0fec974ebeeab1d",
+          "sizeBytes": 20564673
         },
         {
           "name": "vpro-windows-arm64.exe",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-windows-arm64.exe",
-          "sha256": "553c4553274e55dba9e074d37f3cd526f18042cee23aedb454ed414e2bb59383",
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-windows-arm64.exe",
+          "sha256": "d4a66bb5babe09ec39151c375a86823ff299c4fda83507a8ba38b306b53ca316",
           "sizeBytes": 56230400
         },
         {
           "name": "vpro-windows-arm64.zip",
-          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.0/vpro-windows-arm64.zip",
-          "sha256": "bdab0184b7bb45c215dd671c39874387cd4bab13f1612b135f1cfb9f21f5cec8",
-          "sizeBytes": 18836655
+          "url": "https://github.com/Boostao/vpro_wails/releases/download/v2.0.1/vpro-windows-arm64.zip",
+          "sha256": "3f6abdcaa000208cb0d96aef03161661ee8cbae7eef2448c0ebf5bab9f6cbf5e",
+          "sizeBytes": 18836651
         }
       ]
     },
