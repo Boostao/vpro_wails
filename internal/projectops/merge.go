@@ -4,9 +4,12 @@ import (
 	"context"
 	"crypto/sha256"
 	"database/sql"
+	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"hash"
+	"math"
 	"slices"
 	"strings"
 	"time"
@@ -152,36 +155,97 @@ func resolveMergeEndpoints(ctx context.Context, s *vprocore.ContextService, cont
 	return srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj, actor, nil
 }
 
-func computeMergeDigest(srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj string) (string, error) {
-	srcSHA, err := computeFileSHA256(srcPath)
-	if err != nil {
-		return "", err
-	}
-	tgtSHA, err := computeFileSHA256(tgtPath)
-	if err != nil {
-		return "", err
-	}
-	baseSHA := ""
-	if basePath != "" {
-		baseSHA, err = computeFileSHA256(basePath)
-		if err != nil {
-			return "", err
-		}
-	}
-	h := sha256.Sum256([]byte(fmt.Sprintf("%s|%s|%s|%s|%s|%s", srcProj, srcSHA, tgtProj, tgtSHA, baseProj, baseSHA)))
-	return hex.EncodeToString(h[:]), nil
+func writeDigestBytes(h hash.Hash, b []byte) {
+	var lenBuf [8]byte
+	binary.BigEndian.PutUint64(lenBuf[:], uint64(len(b)))
+	_, _ = h.Write(lenBuf[:])
+	_, _ = h.Write(b)
 }
 
-func buildThreeWayMergePreviewInternal(ctx context.Context, srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj string) (ThreeWayMergePreview, *loadedProjectSnapshot, *loadedProjectSnapshot, *loadedProjectSnapshot, error) {
-	digest, err := computeMergeDigest(srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj)
-	if err != nil {
-		return ThreeWayMergePreview{}, nil, nil, nil, err
+func writeDigestString(h hash.Hash, s string) {
+	writeDigestBytes(h, []byte(s))
+}
+
+func writeDigestUint64(h hash.Hash, v uint64) {
+	var buf [8]byte
+	binary.BigEndian.PutUint64(buf[:], v)
+	_, _ = h.Write(buf[:])
+}
+
+func hashLoadedProjectSnapshot(snap *loadedProjectSnapshot) string {
+	if snap == nil {
+		return ""
 	}
+	h := sha256.New()
+	writeDigestString(h, snap.project)
+	writeDigestString(h, snap.path)
+
+	for _, suffix := range compareTableSuffixes {
+		writeDigestString(h, suffix)
+		cols := snap.columns[suffix]
+		writeDigestUint64(h, uint64(len(cols)))
+		for _, col := range cols {
+			writeDigestString(h, col)
+		}
+
+		byPlot := snap.rawCells[suffix]
+		plots := make([]string, 0, len(byPlot))
+		for plot := range byPlot {
+			plots = append(plots, plot)
+		}
+		slices.Sort(plots)
+		writeDigestUint64(h, uint64(len(plots)))
+
+		for _, plot := range plots {
+			writeDigestString(h, plot)
+			byKey := byPlot[plot]
+			keys := make([]string, 0, len(byKey))
+			for k := range byKey {
+				keys = append(keys, k)
+			}
+			slices.Sort(keys)
+			writeDigestUint64(h, uint64(len(keys)))
+
+			for _, k := range keys {
+				writeDigestString(h, k)
+				rowMap := byKey[k]
+				for _, col := range cols {
+					cell := rowMap[col]
+					writeDigestString(h, cell.storage)
+					switch cell.storage {
+					case "integer":
+						writeDigestUint64(h, uint64(cell.intVal))
+					case "real":
+						writeDigestUint64(h, math.Float64bits(cell.realVal))
+					case "text", "blob":
+						writeDigestBytes(h, cell.bytes)
+					}
+				}
+			}
+		}
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func computeMergeSnapshotDigest(srcSnap, tgtSnap, baseSnap *loadedProjectSnapshot) string {
+	h := sha256.New()
+	writeDigestString(h, hashLoadedProjectSnapshot(srcSnap))
+	writeDigestString(h, hashLoadedProjectSnapshot(tgtSnap))
+	writeDigestString(h, hashLoadedProjectSnapshot(baseSnap))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+func buildThreeWayMergePreviewInternal(ctx context.Context, srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj string, tgtQueryer sqliteQueryer) (ThreeWayMergePreview, *loadedProjectSnapshot, *loadedProjectSnapshot, *loadedProjectSnapshot, error) {
 	srcSnap, err := loadProjectSnapshotForDiff(ctx, srcPath, srcProj)
 	if err != nil {
 		return ThreeWayMergePreview{}, nil, nil, nil, err
 	}
-	tgtSnap, err := loadProjectSnapshotForDiff(ctx, tgtPath, tgtProj)
+	var tgtSnap *loadedProjectSnapshot
+	if tgtQueryer != nil {
+		tgtSnap, err = loadProjectSnapshotFromQueryer(ctx, tgtQueryer, tgtPath, tgtProj)
+	} else {
+		tgtSnap, err = loadProjectSnapshotForDiff(ctx, tgtPath, tgtProj)
+	}
 	if err != nil {
 		return ThreeWayMergePreview{}, nil, nil, nil, err
 	}
@@ -192,6 +256,7 @@ func buildThreeWayMergePreviewInternal(ctx context.Context, srcPath, srcProj, tg
 			return ThreeWayMergePreview{}, nil, nil, nil, err
 		}
 	}
+	digest := computeMergeSnapshotDigest(srcSnap, tgtSnap, baseSnap)
 
 	diff := diffLoadedSnapshots(srcSnap, tgtSnap)
 	preview := ThreeWayMergePreview{
@@ -349,7 +414,7 @@ func PreviewThreeWayMerge(s *vprocore.ContextService, ctx context.Context, conte
 	if err != nil {
 		return ThreeWayMergePreview{}, err
 	}
-	preview, _, _, _, err := buildThreeWayMergePreviewInternal(ctx, srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj)
+	preview, _, _, _, err := buildThreeWayMergePreviewInternal(ctx, srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj, nil)
 	return preview, err
 }
 
@@ -417,7 +482,7 @@ func ExecuteThreeWayMerge(s *vprocore.ContextService, ctx context.Context, conte
 			}
 		}()
 
-		preview, srcSnap, tgtSnap, _, pErr := buildThreeWayMergePreviewInternal(ctx, srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj)
+		preview, srcSnap, tgtSnap, _, pErr := buildThreeWayMergePreviewInternal(ctx, srcPath, srcProj, tgtPath, tgtProj, basePath, baseProj, tx)
 		if pErr != nil {
 			return ThreeWayMergeResult{}, pErr
 		}

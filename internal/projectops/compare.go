@@ -140,6 +140,10 @@ func loadProjectSnapshotForDiff(ctx context.Context, dbPath, project string) (*l
 	}
 	defer func() { _ = tx.Rollback() }()
 
+	return loadProjectSnapshotFromQueryer(ctx, tx, dbPath, project)
+}
+
+func loadProjectSnapshotFromQueryer(ctx context.Context, tx sqliteQueryer, dbPath, project string) (*loadedProjectSnapshot, error) {
 	snap := &loadedProjectSnapshot{
 		project:  project,
 		path:     dbPath,
