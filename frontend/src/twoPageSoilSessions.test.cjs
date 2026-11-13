@@ -17,6 +17,7 @@ function registry(environment = {}, overrides = {}) {
       RecoverTwoPageSoilOutcome: overrides.RecoverTwoPageSoilOutcome ?? overrides.RecoverOutcome ?? ((...args) => { calls.push(['receipt', ...args]); return Promise.resolve(outcome(args[1])); }),
     } },
     './twoPageSoilSession': { TwoPageSoilSession }, './qualityEditor': quality,
+    './twoPageSoilActivity': loadTypeScript('twoPageSoilActivity.ts', { './qualityEditor': quality }),
   };
   const module = { exports: {} };
   const source = readFileSync(path.join(__dirname, 'twoPageSoilSessions.ts'), 'utf8').replaceAll('import.meta.env', '__environment');

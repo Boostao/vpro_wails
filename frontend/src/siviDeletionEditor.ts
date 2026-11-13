@@ -1,7 +1,7 @@
 import type { ProjectMetadataColumn } from '../bindings/github.com/boostao/vpro-wails';
 import defaults from '../../resources/sivi-new-row-defaults.json';
 import { wellFormedUTF16 } from './qualityEditor';
-import { siviMetadataTableFromWire } from './siviParentTransport';
+import { siviMetadataTableFromWire } from './siviMetadataWire';
 import { validSIVIRequestId } from './siviRequestId';
 import type { SIVICreationForm } from './siviCreationEditor';
 import type { SIVISpeciesOwner } from './siviSpeciesEditor';

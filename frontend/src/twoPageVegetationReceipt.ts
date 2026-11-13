@@ -1,5 +1,5 @@
 import type { AuditEntry, ProjectMetadataCell, TwoPageVegetationAttemptOutcome } from '../bindings/github.com/boostao/vpro-wails';
-import { completeMetadataCellFromWire } from './siviParentTransport';
+import { completeMetadataCellFromWire } from './siviMetadataWire';
 import { equalCell } from './projectMetadataEditor';
 import { exactSigned64 } from './projectMetadataRestore';
 import { wellFormedUTF16 } from './qualityEditor';

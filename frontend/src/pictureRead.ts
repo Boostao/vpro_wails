@@ -1,5 +1,5 @@
 import type { ProjectMetadataCell } from '../bindings/github.com/boostao/vpro-wails';
-import { siviMetadataTableFromWire } from './siviParentTransport';
+import { siviMetadataTableFromWire } from './siviMetadataWire';
 import { metadataCellText } from './projectMetadataEditor';
 
 export interface PictureOwner {

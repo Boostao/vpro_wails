@@ -3,7 +3,7 @@ import { equalCell } from './projectMetadataEditor';
 import { exactSigned64 } from './projectMetadataRestore';
 import { wellFormedUTF16 } from './qualityEditor';
 import { siviSourceAuditText } from './siviDeletionReceipt';
-import { completeMetadataCellFromWire } from './siviParentTransport';
+import { completeMetadataCellFromWire } from './siviMetadataWire';
 import { validSIVIRequestId } from './siviRequestId';
 import { soilFields } from './soilChildEditor';
 import { twoPageSoilOriginalFromWire, twoPageSoilEditableID, twoPageSoilKind, twoPageSoilRequest,

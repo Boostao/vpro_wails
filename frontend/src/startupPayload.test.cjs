@@ -3,6 +3,7 @@ const { readFileSync } = require('node:fs');
 const path = require('node:path');
 const { test } = require('node:test');
 const { compile } = require('svelte/compiler');
+const { componentFunctions } = require('./svelteTestHelpers.cjs');
 
 const frontend = path.resolve(__dirname, '..');
 const baselineBytes = 5_202_547;
@@ -22,6 +23,19 @@ const previewFlags = [
   'USER_LOG_REVIEW',
 ];
 
+const deferredViews = [
+  'LongEnvironmentReport', 'SiteUnitSummary', 'LongVegetationReport', 'LifeformSummary',
+  'SummaryVegetationReport', 'ProjectTableCSVReview', 'UserLogReview', 'SubzoneMatrixReport',
+  'PlotLocationReview', 'PictureManager', 'PlotLabelPreview', 'GoogleEarthReview',
+];
+
+const deferredFS882SubEditors = [
+  'TwoPageEntryEditor', 'TwoPageParentCommonEditor', 'TwoPageParentEditor',
+  'TwoPageSoilPanel', 'TwoPageVegetationPanel', 'ProjectMetadataEditor',
+  'ProjectPlotProfileReview', 'SpeciesCodeCheck', 'EnvironmentSUTransfer',
+  'ExternalSUEnvironmentTransfer',
+];
+
 test('entry panels compile as guarded deferred components with explicit loading and failure states', () => {
   const source = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const compiled = compile(source, { filename: 'App.svelte', generate: 'client', dev: false });
@@ -32,9 +46,21 @@ test('entry panels compile as guarded deferred components with explicit loading 
     assert.match(source, new RegExp(`role="status" data-entry-loading="${owner}"`));
     assert.match(source, new RegExp(`role="alert" data-entry-load-error="${owner}"`));
   }
+  for (const component of deferredViews) {
+    assert.doesNotMatch(source, new RegExp(`import ${component} from`));
+    assert.match(compiled.js.code, new RegExp(`import\\(['"]\\./${component}\\.svelte['"]\\)`));
+  }
   assert.doesNotMatch(source, /SIVICHARSForm/);
   assert.match(source, /\{#key \$projectState\?\.contextId\}[\s\S]*?\{#key editorEntryForm\}[\s\S]*?\{#key editorPlotNumber\}/);
   assert.equal((source.match(/bind:this=\{editor\}/g) ?? []).length, 1);
+
+  const fs882Source = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
+  const fs882Compiled = compile(fs882Source, { filename: 'FS882Form.svelte', generate: 'client', dev: false });
+  assert.deepEqual(fs882Compiled.warnings, []);
+  for (const subEditor of deferredFS882SubEditors) {
+    assert.doesNotMatch(fs882Source, new RegExp(`import ${subEditor} from`));
+    assert.match(fs882Compiled.js.code, new RegExp(`import\\(['"]\\./${subEditor}\\.svelte['"]\\)`));
+  }
 });
 
 test('only a resolved module awaiting its editor binding blocks navigation and close', () => {
@@ -49,6 +75,50 @@ test('only a resolved module awaiting its editor binding blocks navigation and c
   }
   assert.equal((source.match(/closeDisposition\([^\n]*editorInitializing/g) ?? []).length, 3);
   assert.match(source, /await import\('\.\/FS882Form\.svelte'\);\s*fs882ModuleLoaded = true/);
+});
+
+test('failed deferred FS882 sub-editor imports clear open and busy guards instead of wedging close', async () => {
+  const host = componentFunctions('FS882Form.svelte', ['loadSubEditor', 'openProjectMetadata', 'canOpenProjectMetadata'], {
+    subEditorGeneration: 1,
+    error: null,
+    successMsg: 'prior',
+    metadataEnabled: true,
+    twoPageOpen: false,
+    childParentDisabled: false,
+    childUnsaved: false,
+    headerValidation: {},
+    metadataOpen: false,
+    metadataBusy: false,
+  });
+  host.actions.openProjectMetadata();
+  assert.equal(host.metadataOpen, true);
+  assert.equal(host.metadataBusy, true);
+
+  await assert.rejects(
+    host.actions.loadSubEditor(
+      () => Promise.reject(new Error('network chunk missing')),
+      'Project metadata editor',
+      () => { host.metadataOpen = false; host.metadataBusy = false; },
+    ),
+    /network chunk missing/,
+  );
+  assert.equal(host.metadataOpen, false);
+  assert.equal(host.metadataBusy, false);
+  assert.match(host.error, /Project metadata editor could not load: Error: network chunk missing/);
+
+  let staleResetCalled = false;
+  let rejectStale;
+  const stalePromise = host.actions.loadSubEditor(
+    () => new Promise((_, reject) => { rejectStale = reject; }),
+    'Two-page complete entry',
+    () => { staleResetCalled = true; },
+  );
+  host.subEditorGeneration++;
+  host.error = null;
+  rejectStale(new Error('late teardown rejection'));
+  await assert.rejects(stalePromise, /late teardown rejection/);
+  assert.equal(staleResetCalled, false);
+  assert.equal(host.error, null);
 });
 
 test('actual preview build halves initial transitive JS without removing entry layouts or inflating total JS', async t => {
@@ -81,26 +151,63 @@ test('actual preview build halves initial transitive JS without removing entry l
     visit(entries[0].fileName);
     const bytes = names => [...names].reduce((sum, name) =>
       sum + Buffer.byteLength(chunks.get(name).code, 'utf8'), 0);
+    const entryBytes = Buffer.byteLength(entries[0].code, 'utf8');
     const initialBytes = bytes(initial);
     const totalBytes = bytes(chunks.keys());
-    t.diagnostic(JSON.stringify({ baselineBytes, initialBytes, totalBytes,
+    t.diagnostic(JSON.stringify({ baselineBytes, entryBytes, initialBytes, totalBytes,
       initialChunks: [...initial], deferredChunks: chunks.size - initial.size }));
-    assert.ok(initialBytes <= baselineBytes * .5, `Initial transitive JS ${initialBytes} exceeds half of ${baselineBytes}`);
+    assert.ok(entryBytes < 500_000, `Initial entry chunk JS ${entryBytes} exceeds 500 KB ceiling`);
+    assert.ok(initialBytes < 600_000, `Initial transitive startup JS ${initialBytes} exceeds 600 KB ceiling`);
     assert.ok(totalBytes <= baselineBytes * 3.0, `Total JS across deferred feature chunks ${totalBytes} exceeds budget`);
     const modules = names => new Set([...names].flatMap(name =>
       Object.keys(chunks.get(name).modules).map(id => id.replaceAll('\\', '/'))));
     const eager = modules(initial), all = modules(chunks.keys());
-    for (const filename of ['FS882Form.svelte',
-      'fs882-xl-layout.json', 'fs882-two-page-layout.json', 'fs882-two-page-chars-layout.json',
-      'fs1333-sivi-layout.json', 'project-metadata-layout.json']) {
+    for (const filename of [
+      'FS882Form.svelte',
+      'GeospatialWorkbench.svelte',
+      ...deferredViews.map(viewName => `${viewName}.svelte`),
+      'fs882-xl-layout.json',
+      'fs882-two-page-layout.json',
+      'fs882-two-page-chars-layout.json',
+      'fs1333-sivi-layout.json',
+      'project-metadata-layout.json',
+    ]) {
       const suffix = '/' + filename;
-      assert.ok([...all].some(id => id.endsWith(suffix)), `Required entry source disappeared: ${filename}`);
-      if (filename !== 'fs1333-sivi-layout.json') {
-        assert.ok(![...eager].some(id => id.endsWith(suffix)), `Entry source still loads at startup: ${filename}`);
-      }
+      assert.ok([...all].some(id => id.endsWith(suffix)), `Required deferred source disappeared: ${filename}`);
+      assert.ok(![...eager].some(id => id.endsWith(suffix)), `Deferred source still loads at startup: ${filename}`);
     }
-    assert.ok([...eager].some(id => id.endsWith('/fs1333-sivi-layout.json')),
-      'Retain the source parent validator shared by existing log/picture wire readers');
+    for (const vendorSegment of ['/node_modules/maplibre-gl/', '/node_modules/pmtiles/', '/node_modules/@deck.gl/', '/node_modules/@luma.gl/']) {
+      assert.ok([...all].some(id => id.includes(vendorSegment)), `Expected vendor dependency missing from build: ${vendorSegment}`);
+      assert.ok(![...eager].some(id => id.includes(vendorSegment)), `Vendor dependency leaked into startup payload: ${vendorSegment}`);
+    }
+    for (const vendorChunkPrefix of ['assets/vendor-maplibre-', 'assets/vendor-deckgl-']) {
+      const matching = [...chunks.keys()].filter(name => name.startsWith(vendorChunkPrefix));
+      assert.equal(matching.length, 1, `Expected dedicated chunk for ${vendorChunkPrefix}`);
+      assert.ok(!initial.has(matching[0]), `Dedicated vendor chunk ${matching[0]} must not be in initial startup graph`);
+    }
+    const findChunkWithModule = suffix => {
+      for (const [name, chunk] of chunks.entries()) {
+        if (Object.keys(chunk.modules).some(id => id.replaceAll('\\', '/').endsWith(suffix))) return name;
+      }
+      return null;
+    };
+    const fs882Chunk = findChunkWithModule('/FS882Form.svelte');
+    const twoPageEditorChunk = findChunkWithModule('/TwoPageEntryEditor.svelte');
+    const twoPageLayoutChunk = findChunkWithModule('/fs882-two-page-layout.json');
+    const twoPageCharsLayoutChunk = findChunkWithModule('/fs882-two-page-chars-layout.json');
+    assert.ok(fs882Chunk && twoPageEditorChunk && twoPageLayoutChunk && twoPageCharsLayoutChunk);
+    assert.notEqual(twoPageEditorChunk, fs882Chunk, 'TwoPageEntryEditor.svelte must split into a separate chunk from FS882Form.svelte');
+    assert.notEqual(twoPageLayoutChunk, fs882Chunk, 'fs882-two-page-layout.json must split into a separate chunk from FS882Form.svelte');
+    assert.notEqual(twoPageCharsLayoutChunk, fs882Chunk, 'fs882-two-page-chars-layout.json must split into a separate chunk from FS882Form.svelte');
+    const fs882StaticGraph = new Set();
+    (function visitFS882(name) {
+      if (fs882StaticGraph.has(name)) return;
+      fs882StaticGraph.add(name);
+      for (const dependency of chunks.get(name).imports) visitFS882(dependency);
+    })(fs882Chunk);
+    assert.ok(!fs882StaticGraph.has(twoPageEditorChunk), 'FS882Form chunk must not statically import TwoPageEntryEditor chunk');
+    assert.ok(!fs882StaticGraph.has(twoPageLayoutChunk), 'FS882Form chunk must not statically import fs882-two-page-layout.json chunk');
+    assert.ok(!fs882StaticGraph.has(twoPageCharsLayoutChunk), 'FS882Form chunk must not statically import fs882-two-page-chars-layout.json chunk');
   } finally {
     for (const name of Object.keys(process.env).filter(name => name.startsWith('VITE_'))) delete process.env[name];
     for (const [name, value] of saved) process.env[name] = value;

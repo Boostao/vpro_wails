@@ -6,24 +6,12 @@
   import { projectState } from './state';
   import Navigation from './Navigation.svelte';
   import DemoReadiness from './DemoReadiness.svelte';
-  import LongEnvironmentReport from './LongEnvironmentReport.svelte';
-  import SiteUnitSummary from './SiteUnitSummary.svelte';
-  import LongVegetationReport from './LongVegetationReport.svelte';
-  import LifeformSummary from './LifeformSummary.svelte';
-  import SummaryVegetationReport from './SummaryVegetationReport.svelte';
   import { summaryVegetationPreferenceSession } from './summaryVegetationPreferenceSessions';
   import { summaryVegetationQualityPreferenceSession } from './summaryVegetationQualityPreferenceSessions';
   import { summaryVegetationPresentationPreferenceSession } from './summaryVegetationPresentationPreferenceSessions';
   import { summaryVegetationFieldListDesktop } from './summaryVegetationFieldListDesktop';
   import { summaryEnvironmentalDesktop, summaryEnvironmentalEnabled } from './summaryVegetationEnvironmentalDesktop';
-  import ProjectTableCSVReview from './ProjectTableCSVReview.svelte';
-  import UserLogReview from './UserLogReview.svelte';
-  import SubzoneMatrixReport from './SubzoneMatrixReport.svelte';
   import { matrixPublicationSession } from './subzoneMatrixReport';
-  import PlotLocationReview from './PlotLocationReview.svelte';
-  import PictureManager from './PictureManager.svelte';
-  import PlotLabelPreview from './PlotLabelPreview.svelte';
-  import GoogleEarthReview from './GoogleEarthReview.svelte';
   import CloseConfirm from './CloseConfirm.svelte';
   import { closeDisposition, type CloseDecision, type EditorCloseState } from './closeLifecycle';
   import { ReadRequests } from './readRequests';
@@ -40,10 +28,10 @@
   import { siteUnitSummaryWorkbookPublicationSession } from './siteUnitSummaryWorkbook';
   import { extendedSummaryWorkbookPublicationSession } from './siteUnitSummaryExtendedWorkbook';
   import { summaryVegetationWorkbookSession } from './summaryVegetationWorkbook';
-  import { subscribePictureCreationActivity } from './pictureCreationSessions';
-  import { subscribePictureLifecycleActivity } from './pictureLifecycleSessions';
-  import { subscribeTwoPageSoilActivity } from './twoPageSoilSessions';
-  import { subscribeTwoPageVegetationActivity } from './twoPageVegetationSessions';
+  import { subscribePictureCreationActivity } from './pictureCreationActivity';
+  import { subscribePictureLifecycleActivity } from './pictureLifecycleActivity';
+  import { subscribeTwoPageSoilActivity } from './twoPageSoilActivity';
+  import { subscribeTwoPageVegetationActivity } from './twoPageVegetationActivity';
   import { subscribeExternalSUEnvironmentActivity } from './externalSUEnvironment';
   import { classifyGlobalHelpShortcut, defaultHelpPort, resolveContextualHelpTarget, type HelpDrawerTab, type HelpMenuAction, type WhatsNewStatus } from './helpSystem';
 
@@ -2091,98 +2079,170 @@
         {/key}
       {:else if view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <SiteUnitSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU}
-            suPath={$projectState.suPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./SiteUnitSummary.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Site Unit Summary...</p>
+        {:then { default: SiteUnitSummary }}
+          {#key $projectState.contextId}
+            <SiteUnitSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU}
+              suPath={$projectState.suPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Site Unit Summary could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'long-environment' && import.meta.env.VITE_LONG_ENVIRONMENT_REPORT !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <LongEnvironmentReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./LongEnvironmentReport.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Long Environment Report...</p>
+        {:then { default: LongEnvironmentReport }}
+          {#key $projectState.contextId}
+            <LongEnvironmentReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+              onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Long Environment Report could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'long-vegetation' && import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <LongVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
-            onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./LongVegetationReport.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Long Vegetation Report...</p>
+        {:then { default: LongVegetationReport }}
+          {#key $projectState.contextId}
+            <LongVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+              operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
+              onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Long Vegetation Report could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'summary-vegetation' && import.meta.env.VITE_SUMMARY_VEGETATION !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <SummaryVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
-            onBusyChange={(value) => { localEditorBusy = value; }} />
-          {#await import('./SiteUnitExclusionFilter.svelte') then { default: SiteUnitExclusionFilter }}
-            <div class="px-3 pb-4">
-              <SiteUnitExclusionFilter
-                contextId={$projectState.contextId ?? ''}
-                su={$projectState.activeSU}
-                hierarchy={$projectState.activeHierarchy}
-                reportMode="summary"
-                onBusyChange={(value) => { secondaryPanelBusy = value; }}
-              />
-            </div>
-          {/await}
-        {/key}
+        {#await import('./SummaryVegetationReport.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Summary Vegetation Report...</p>
+        {:then { default: SummaryVegetationReport }}
+          {#key $projectState.contextId}
+            <SummaryVegetationReport contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+              operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
+              onBusyChange={(value) => { localEditorBusy = value; }} />
+            {#await import('./SiteUnitExclusionFilter.svelte') then { default: SiteUnitExclusionFilter }}
+              <div class="px-3 pb-4">
+                <SiteUnitExclusionFilter
+                  contextId={$projectState.contextId ?? ''}
+                  su={$projectState.activeSU}
+                  hierarchy={$projectState.activeHierarchy}
+                  reportMode="summary"
+                  onBusyChange={(value) => { secondaryPanelBusy = value; }}
+                />
+              </div>
+            {/await}
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Summary Vegetation Report could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'lifeform-summary' && import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <LifeformSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./LifeformSummary.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Lifeform Summary...</p>
+        {:then { default: LifeformSummary }}
+          {#key $projectState.contextId}
+            <LifeformSummary contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+              onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Lifeform Summary could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'table-csv' && import.meta.env.VITE_TABLE_CSV_REVIEW !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <ProjectTableCSVReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./ProjectTableCSVReview.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Table CSV Review...</p>
+        {:then { default: ProjectTableCSVReview }}
+          {#key $projectState.contextId}
+            <ProjectTableCSVReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              projectPath={$projectState.projectPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Table CSV Review could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'user-log' && import.meta.env.VITE_USER_LOG_REVIEW !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <UserLogReview contextId={$projectState.contextId ?? ''}
-            operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
-            onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./UserLogReview.svelte')}
+          <p role="status" class="p-4 text-sm">Loading User Log Review...</p>
+        {:then { default: UserLogReview }}
+          {#key $projectState.contextId}
+            <UserLogReview contextId={$projectState.contextId ?? ''}
+              operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
+              onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">User Log Review could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'plot-label-preview' && (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'false' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'false') && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <PlotLabelPreview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            initialPlot={plotLabelNumber} onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./PlotLabelPreview.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Plot Label Preview...</p>
+        {:then { default: PlotLabelPreview }}
+          {#key $projectState.contextId}
+            <PlotLabelPreview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+              initialPlot={plotLabelNumber} onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Plot Label Preview could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'picture-manager' && import.meta.env.VITE_PICTURE_MANAGER !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <PictureManager contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            initialPlot={pictureManagerPlot} onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./PictureManager.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Picture Manager...</p>
+        {:then { default: PictureManager }}
+          {#key $projectState.contextId}
+            <PictureManager contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              initialPlot={pictureManagerPlot} onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Picture Manager could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'plot-locations' && import.meta.env.VITE_PLOT_LOCATION_REVIEW !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <PlotLocationReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./PlotLocationReview.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Plot Location Review...</p>
+        {:then { default: PlotLocationReview }}
+          {#key $projectState.contextId}
+            <PlotLocationReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+              onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Plot Location Review could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'google-earth-review' && import.meta.env.VITE_GOOGLE_EARTH_REVIEW !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <GoogleEarthReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
-            projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
-            onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./GoogleEarthReview.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Google Earth Review...</p>
+        {:then { default: GoogleEarthReview }}
+          {#key $projectState.contextId}
+            <GoogleEarthReview contextId={$projectState.contextId ?? ''} project={$projectState.activeProject}
+              projectPath={$projectState.projectPath ?? ''} su={$projectState.activeSU} suPath={$projectState.suPath ?? ''}
+              onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Google Earth Review could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'subzone-matrix' && import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'false' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <SubzoneMatrixReport contextId={$projectState.contextId ?? ''} hierarchy={$projectState.activeHierarchy}
-            hierarchyPath={$projectState.hierarchyPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
-        {/key}
+        {#await import('./SubzoneMatrixReport.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Subzone Matrix Report...</p>
+        {:then { default: SubzoneMatrixReport }}
+          {#key $projectState.contextId}
+            <SubzoneMatrixReport contextId={$projectState.contextId ?? ''} hierarchy={$projectState.activeHierarchy}
+              hierarchyPath={$projectState.hierarchyPath ?? ''} onBusyChange={(value) => { localEditorBusy = value; }} />
+          {/key}
+        {:catch loadError}
+          <p class="error" role="alert">Subzone Matrix Report could not load: {String(loadError)}</p>
+        {/await}
       {:else if view === 'hierarchy'}
       <div class="content-heading">
         <div><div class="eyebrow">{$projectState?.hierarchyFile ?? 'HIERARCHY'}</div><h1>Hierarchy</h1></div>

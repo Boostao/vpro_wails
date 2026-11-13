@@ -25,21 +25,9 @@
   import OrdinaryFields from './OrdinaryFields.svelte';
   import DrainageFields from './DrainageFields.svelte';
   import SourceChild from './SourceChild.svelte';
-  import TwoPageSoilPanel from './TwoPageSoilPanel.svelte';
-  import { subscribeTwoPageSoilActivity, twoPageSoilReviewEnabled } from './twoPageSoilSessions';
-  import TwoPageVegetationPanel from './TwoPageVegetationPanel.svelte';
-  import { subscribeTwoPageVegetationActivity, twoPageVegetationActivity, twoPageVegetationReviewEnabled } from './twoPageVegetationSessions';
+  import { subscribeTwoPageSoilActivity } from './twoPageSoilActivity';
+  import { subscribeTwoPageVegetationActivity, twoPageVegetationActivity } from './twoPageVegetationActivity';
   import type { TwoPageVegetationForm } from './twoPageVegetationWire';
-  import SIVIHeightPanel from './SIVIHeightPanel.svelte';
-  import SIVICoverPanel from './SIVICoverPanel.svelte';
-  import SIVICombinedPanel from './SIVICombinedPanel.svelte';
-  import SIVICollectedPanel from './SIVICollectedPanel.svelte';
-  import SIVISpeciesPanel from './SIVISpeciesPanel.svelte';
-  import SIVIIdentityPanel from './SIVIIdentityPanel.svelte';
-  import SIVICreationPanel from './SIVICreationPanel.svelte';
-  import SIVIDeletionPanel from './SIVIDeletionPanel.svelte';
-  import SIVIDeletionRestorationPanel from './SIVIDeletionRestorationPanel.svelte';
-  import SIVICreationUndoPanel from './SIVICreationUndoPanel.svelte';
   import { siviCreationUndoSession as ownedSIVICreationUndoSession } from './siviCreationUndoSessions';
   import { siviDeletionSession as ownedSIVIDeletionSession,
     siviDeletionRestorationSession as ownedSIVIRestorationSession } from './siviDeletionSessions';
@@ -47,8 +35,6 @@
   import type { SIVICreationDraft, SIVICreationForm } from './siviCreationEditor';
   import PicturePanel from './PicturePanel.svelte';
   import { pictureMetadataSession as ownedPictureMetadataSession } from './pictureMetadataSessions';
-  import SIVIParentReadPanel from './SIVIParentReadPanel.svelte';
-  import SIVIParentSharedFields from './SIVIParentSharedFields.svelte';
   import { SIVIParentSharedSession, siviParentSharedFieldsFor, type SIVIParentSharedColumn, type SIVIParentSharedInput } from './siviParentSharedSession';
   import { SIVIParentReadSession } from './siviParentReadSession';
   import { SIVIParentSourceSession } from './siviParentSourceSession';
@@ -68,19 +54,11 @@
   import type { SIVICombinedColumn } from './siviCombinedEditor';
   import NewChild from './NewChild.svelte';
   import PersonalSpeciesFields from './PersonalSpeciesFields.svelte';
-  import SpeciesCodeCheck from './SpeciesCodeCheck.svelte';
-  import ProjectMetadataEditor from './ProjectMetadataEditor.svelte';
-  import TwoPageParentEditor from './TwoPageParentEditor.svelte';
-  import TwoPageParentCommonEditor from './TwoPageParentCommonEditor.svelte';
-  import TwoPageEntryEditor from './TwoPageEntryEditor.svelte';
   import type { TwoPageEntrySessionCache } from './twoPageEntrySession';
   import type { TwoPageParentSessionCache, TwoPageParentForm } from './twoPageParentSession';
   import type { TwoPageParentCommonSessionCache } from './twoPageParentCommonSession';
   import type { TwoPageEntryChild } from './twoPageEntryProjection';
-  import EnvironmentSUTransfer from './EnvironmentSUTransfer.svelte';
-  import ExternalSUEnvironmentTransfer from './ExternalSUEnvironmentTransfer.svelte';
   import { externalSUEnvironmentSession, subscribeExternalSUEnvironmentActivity } from './externalSUEnvironment';
-  import ProjectPlotProfileReview from './ProjectPlotProfileReview.svelte';
   import { navigateSourceEnter } from './enterNavigation';
   import AuditRestore, { auditRestoreReason } from './AuditRestore.svelte';
   import { projectState } from './state';
@@ -341,6 +319,8 @@
     historyId: event.historyId, restored: event.consumed,
     label: `${event.form}; Species ${event.species === null ? 'NULL' : event.species === '' ? '(empty text)' : event.species}; application ID ${event.id}; physical row ${event.rowId}; ${event.editWhen}`,
   })));
+  const twoPageSoilReviewEnabled = import.meta.env.VITE_TWO_PAGE_SOIL_REVIEW !== 'false';
+  const twoPageVegetationReviewEnabled = import.meta.env.VITE_TWO_PAGE_VEGETATION_REVIEW !== 'false';
   const twoPageReviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW !== 'false';
   const twoPageSourceLayoutEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT !== 'false';
   const twoPageCommonReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW !== 'false';
@@ -502,8 +482,27 @@
     speciesReferenceRequest++; speciesReferenceReads.cancelAll();
     speciesChoiceRequest++; speciesChoiceReads.cancelAll();
     deletionRequest++; deletionReads.cancelAll();
+    subEditorGeneration++;
   });
   let container: HTMLDivElement;
+  let subEditorGeneration = 0;
+
+  async function loadSubEditor<T>(
+    loader: () => Promise<T>,
+    label: string,
+    onFailed: () => void,
+  ): Promise<T> {
+    const request = subEditorGeneration;
+    try {
+      return await loader();
+    } catch (cause) {
+      if (request === subEditorGeneration) {
+        onFailed();
+        error = `${label} could not load: ${String(cause)}`;
+      }
+      throw cause;
+    }
+  }
 
   $effect(() => { onBusyChange?.(busy || headerWorkflowBusy || siviSourceAuthorityUnknown); });
 
@@ -1601,7 +1600,9 @@
       error = 'Finish or Undo existing drafts and unlock the available plot before reviewing species codes.';
       return;
     }
-    codeCheckOpen = true; error = null; successMsg = null;
+    codeCheckOpen = true;
+    if (typeof codeCheckBusy !== 'undefined') codeCheckBusy = true;
+    error = null; successMsg = null;
   }
 
   export function canOpenProjectMetadata() {
@@ -1618,7 +1619,10 @@
       return;
     }
     if (twoPageOpen) twoPageEditor?.openMetadataEditor?.();
-    else metadataOpen = true;
+    else {
+      metadataOpen = true;
+      if (typeof metadataBusy !== 'undefined') metadataBusy = true;
+    }
     error = null; successMsg = null;
   }
 
@@ -3520,6 +3524,7 @@
           onclick={() => {
             if (siviSourceBarrier) { error = 'Observe the ProjectID source preference outcome before opening profile rules.'; return; }
             profileReviewOpen = true;
+            profileReviewBusy = true;
           }}>
           {profileEditingEnabled && $projectState?.plotProfile?.writable === true ? 'Review project profile rules' : 'Review project profile (read-only)'}
         </button>
@@ -3683,92 +3688,136 @@
     {/if}
     {#snippet sharedSIVIFields()}
       {#if siviParentSharedView}
-        <SIVIParentSharedFields view={siviParentSharedView} disabled={siviParentSharedEditingDisabled}
-          canSave={siviParentSharedClose?.canSave ?? false} onstage={stageSIVIParentShared}
-          onoperation={operation => { void siviParentSharedOperation(operation); }}
-          onreferences={() => { void siviParentSharedSession?.refreshReferences(); }}
-          oncancel={() => siviParentSharedSession?.cancel()}
-          {extendedShrubs}
-          onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
-          snowCoverRegime={snowCoverRegimeInput}
-          activeLayerDepth={activeLayerDepthInput}
-          snowCoverRegimeDisabled={headerInputsDisabled || capabilities.snowCoverRegime !== true}
-          activeLayerDepthDisabled={headerInputsDisabled || capabilities.activeLayerDepth !== true}
-          snowCoverRegimeError={headerValidation.snowCoverRegime ?? null}
-          activeLayerDepthError={headerValidation.activeLayerDepth ?? null}
-          onSnowCoverRegimeChange={stageSnowCoverRegime}
-          onActiveLayerDepthChange={stageActiveLayerDepth} />
+        {#await import('./SIVIParentSharedFields.svelte')}
+          <p role="status" class="p-2 text-xs">Loading shared SIVI fields...</p>
+        {:then { default: SIVIParentSharedFields }}
+          <SIVIParentSharedFields view={siviParentSharedView} disabled={siviParentSharedEditingDisabled}
+            canSave={siviParentSharedClose?.canSave ?? false} onstage={stageSIVIParentShared}
+            onoperation={operation => { void siviParentSharedOperation(operation); }}
+            onreferences={() => { void siviParentSharedSession?.refreshReferences(); }}
+            oncancel={() => siviParentSharedSession?.cancel()}
+            {extendedShrubs}
+            onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
+            snowCoverRegime={snowCoverRegimeInput}
+            activeLayerDepth={activeLayerDepthInput}
+            snowCoverRegimeDisabled={headerInputsDisabled || capabilities.snowCoverRegime !== true}
+            activeLayerDepthDisabled={headerInputsDisabled || capabilities.activeLayerDepth !== true}
+            snowCoverRegimeError={headerValidation.snowCoverRegime ?? null}
+            activeLayerDepthError={headerValidation.activeLayerDepth ?? null}
+            onSnowCoverRegimeChange={stageSnowCoverRegime}
+            onActiveLayerDepthChange={stageActiveLayerDepth} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">Shared SIVI fields could not load: {String(loadError)}</p>
+        {/await}
       {/if}
     {/snippet}
     {#if activeTab === 'siviParent' && siviParentOpen && siviParentView && !metadataOpen && (!siviStandalone || siviStandaloneEnabled)}
-      <SIVIParentReadPanel view={siviParentView} sourceView={siviParentSourceView}
-        sharedEditor={siviParentSharedView ? {
-          liveColumns: siviParentSharedView.original ? siviParentSharedColumns : [],
-          content: sharedSIVIFields, busy: siviParentSharedView.busy,
-          unsaved: siviParentSharedUnsaved || (siviParentSharedClose?.blocked ?? false),
-        } : null}
-        onMetadata={metadataEnabled ? openProjectMetadata : undefined}
-        metadataDisabled={!canOpenProjectMetadata()}
-        writeView={siviParentWriteView} writeDisabled={siviParentWriteEditingDisabled}
-        writeCanSave={siviParentWriteClose?.canSave ?? false}
-        onWriteOperation={operation => { void siviParentWriteOperation(operation); }}
-        onWriteStage={stageSIVIParentCell}
-        onWriteCancel={() => siviParentWriteSession?.cancel()}
-        actionView={siviParentActionView} actionDisabled={siviParentActionEditingDisabled}
-        actionCanSave={siviParentActionClose?.canSave ?? false}
-        onActionOperation={operation => { void siviParentActionOperation(operation); }}
-        onActionStage={stageSIVIParentAction}
-        onActionCancel={() => siviParentActionSession?.cancel()}
-        assignmentView={siviProjectAssignmentView} assignmentDisabled={siviProjectAssignmentEditingDisabled}
-        assignmentCanSave={siviProjectAssignmentClose?.canSave ?? false}
-        onAssignmentOperation={operation => { void siviProjectAssignmentOperation(operation); }}
-        onAssignmentStage={stageSIVIProjectAssignment}
-        onAssignmentCancel={() => siviProjectAssignmentSession?.cancel()}
-        reloadDisabled={busy || dirty || childUnsaved || siviParentBusy}
-        onreload={() => { if (siviParentSession) void siviParentSession.load(); }}
-        onSourceReload={() => { void reloadSIVIProjectSource(); }}
-        onSourceCancel={() => siviParentSourceSession?.cancel()}
-        onSourceChange={source => { void changeSIVIProjectSource(source); }}
-        oncancel={() => siviParentSession?.cancel()} />
+      {#await import('./SIVIParentReadPanel.svelte')}
+        <p role="status" class="p-3 text-xs">Loading SIVI parent panel...</p>
+      {:then { default: SIVIParentReadPanel }}
+        <SIVIParentReadPanel view={siviParentView} sourceView={siviParentSourceView}
+          sharedEditor={siviParentSharedView ? {
+            liveColumns: siviParentSharedView.original ? siviParentSharedColumns : [],
+            content: sharedSIVIFields, busy: siviParentSharedView.busy,
+            unsaved: siviParentSharedUnsaved || (siviParentSharedClose?.blocked ?? false),
+          } : null}
+          onMetadata={metadataEnabled ? openProjectMetadata : undefined}
+          metadataDisabled={!canOpenProjectMetadata()}
+          writeView={siviParentWriteView} writeDisabled={siviParentWriteEditingDisabled}
+          writeCanSave={siviParentWriteClose?.canSave ?? false}
+          onWriteOperation={operation => { void siviParentWriteOperation(operation); }}
+          onWriteStage={stageSIVIParentCell}
+          onWriteCancel={() => siviParentWriteSession?.cancel()}
+          actionView={siviParentActionView} actionDisabled={siviParentActionEditingDisabled}
+          actionCanSave={siviParentActionClose?.canSave ?? false}
+          onActionOperation={operation => { void siviParentActionOperation(operation); }}
+          onActionStage={stageSIVIParentAction}
+          onActionCancel={() => siviParentActionSession?.cancel()}
+          assignmentView={siviProjectAssignmentView} assignmentDisabled={siviProjectAssignmentEditingDisabled}
+          assignmentCanSave={siviProjectAssignmentClose?.canSave ?? false}
+          onAssignmentOperation={operation => { void siviProjectAssignmentOperation(operation); }}
+          onAssignmentStage={stageSIVIProjectAssignment}
+          onAssignmentCancel={() => siviProjectAssignmentSession?.cancel()}
+          reloadDisabled={busy || dirty || childUnsaved || siviParentBusy}
+          onreload={() => { if (siviParentSession) void siviParentSession.load(); }}
+          onSourceReload={() => { void reloadSIVIProjectSource(); }}
+          onSourceCancel={() => siviParentSourceSession?.cancel()}
+          onSourceChange={source => { void changeSIVIProjectSource(source); }}
+          oncancel={() => siviParentSession?.cancel()} />
+      {:catch loadError}
+        <p role="alert" class="p-3 text-xs text-red-700">SIVI parent panel could not load: {String(loadError)}</p>
+      {/await}
     {/if}
     {#if environmentSUOpen && environmentSUDirection !== 'external-reverse' && $projectState?.projectPath}
-      <EnvironmentSUTransfer bind:this={environmentSUEditor} client={PlotService} {contextId}
-        project={$projectState.activeProject} su={$projectState.activeSU} path={$projectState.projectPath}
-        direction={environmentSUDirection === 'reverse' ? 'reverse' : 'forward'}
-        onclosed={() => { environmentSUOpen = false; error = null; if (environmentSUDirection === 'reverse') void load(original?.plotNumber); }} />
+      {#await loadSubEditor(() => import('./EnvironmentSUTransfer.svelte'), 'SU transfer review', () => { environmentSUOpen = false; })}
+        <p role="status" class="p-3 text-xs">Loading SU transfer review...</p>
+      {:then { default: EnvironmentSUTransfer }}
+        <EnvironmentSUTransfer bind:this={environmentSUEditor} client={PlotService} {contextId}
+          project={$projectState.activeProject} su={$projectState.activeSU} path={$projectState.projectPath}
+          direction={environmentSUDirection === 'reverse' ? 'reverse' : 'forward'}
+          onclosed={() => { environmentSUOpen = false; error = null; if (environmentSUDirection === 'reverse') void load(original?.plotNumber); }} />
+      {:catch loadError}
+        <p role="alert" class="p-3 text-xs text-red-700">SU transfer review could not load: {String(loadError)}</p>
+      {/await}
     {/if}
     {#if environmentSUOpen && environmentSUDirection === 'external-reverse' && $projectState?.projectPath && $projectState.suPath}
-      <ExternalSUEnvironmentTransfer bind:this={environmentSUEditor} {contextId}
-        project={$projectState.activeProject} projectPath={$projectState.projectPath}
-        su={$projectState.activeSU} suPath={$projectState.suPath}
-        onclosed={() => { environmentSUOpen = false; error = null; void load(original?.plotNumber); }} />
+      {#await loadSubEditor(() => import('./ExternalSUEnvironmentTransfer.svelte'), 'External SU transfer review', () => { environmentSUOpen = false; })}
+        <p role="status" class="p-3 text-xs">Loading external SU transfer review...</p>
+      {:then { default: ExternalSUEnvironmentTransfer }}
+        <ExternalSUEnvironmentTransfer bind:this={environmentSUEditor} {contextId}
+          project={$projectState.activeProject} projectPath={$projectState.projectPath}
+          su={$projectState.activeSU} suPath={$projectState.suPath}
+          onclosed={() => { environmentSUOpen = false; error = null; void load(original?.plotNumber); }} />
+      {:catch loadError}
+        <p role="alert" class="p-3 text-xs text-red-700">External SU transfer review could not load: {String(loadError)}</p>
+      {/await}
     {/if}
     {#if profileReviewOpen}
-      <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
-        allowPresence={profileSpeciesPresenceEnabled && $projectState !== null} {contextId} activeSU={$projectState?.activeSU}
-        authorityBlocked={siviSourceBarrier}
-        allowEditing={profileEditingEnabled && $projectState?.plotProfile?.writable === true} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}
-        allowSaveSU={profileSaveSUEnabled} onsureview={async proposal => {
-          if (!onProfileSUReview) throw new Error('Save as SU review is unavailable.');
-          await onProfileSUReview(proposal, contextId);
-        }} allowFiltering={profileFilteringEnabled} onapply={async proposal => {
-          if (!onProfileNavigation) throw new Error('Profile navigation publication is unavailable.');
-          await onProfileNavigation(proposal, contextId);
-        }}
-        onblocked={value => profileReviewBlocked = value} onbusy={value => profileReviewBusy = value}
-        onclosed={() => { profileReviewOpen = false; }} />
+      {#await loadSubEditor(() => import('./ProjectPlotProfileReview.svelte'), 'Project plot profile review', () => { profileReviewOpen = false; profileReviewBusy = false; profileReviewBlocked = false; })}
+        <p role="status" class="p-3 text-xs">Loading project plot profile review...</p>
+      {:then { default: ProjectPlotProfileReview }}
+        {#if profileReviewOpen}
+          <ProjectPlotProfileReview bind:this={profileEditor} client={PlotService} allowRun={profileRunEnabled}
+            allowPresence={profileSpeciesPresenceEnabled && $projectState !== null} {contextId} activeSU={$projectState?.activeSU}
+            authorityBlocked={siviSourceBarrier}
+            allowEditing={profileEditingEnabled && $projectState?.plotProfile?.writable === true} allowCreation={profileCreationEnabled} allowDeletion={profileDeletionEnabled}
+            allowSaveSU={profileSaveSUEnabled} onsureview={async proposal => {
+              if (!onProfileSUReview) throw new Error('Save as SU review is unavailable.');
+              await onProfileSUReview(proposal, contextId);
+            }} allowFiltering={profileFilteringEnabled} onapply={async proposal => {
+              if (!onProfileNavigation) throw new Error('Profile navigation publication is unavailable.');
+              await onProfileNavigation(proposal, contextId);
+            }}
+            onblocked={value => profileReviewBlocked = value} onbusy={value => profileReviewBusy = value}
+            onclosed={() => { profileReviewOpen = false; }} />
+        {/if}
+      {:catch loadError}
+        <p role="alert" class="p-3 text-xs text-red-700">Project plot profile review could not load: {String(loadError)}</p>
+      {/await}
     {/if}
     {#snippet twoPageLinkedChild(child: TwoPageEntryChild, _control: PaperControl)}
       {#if twoPageSoilReviewEnabled && twoPageScope === 'entry' && twoPageProject !== null &&
         (child.form === 'SoilHumusXL' || child.form === 'SoilMineralXL')}
-        <TwoPageSoilPanel {contextId} project={twoPageProject} plot={draft.plotNumber} form={child.form}
-          parentBlocked={twoPageSoilParentBlocked} />
+        {#await import('./TwoPageSoilPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading linked soil panel...</p>
+        {:then { default: TwoPageSoilPanel }}
+          <TwoPageSoilPanel {contextId} project={twoPageProject} plot={draft.plotNumber} form={child.form}
+            parentBlocked={twoPageSoilParentBlocked} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">Linked soil panel could not load: {String(loadError)}</p>
+        {/await}
       {:else if twoPageVegetationReviewEnabled && twoPageScope === 'entry' && twoPageProject !== null &&
         (child.form === 'SubVegAXL_BC' || child.form === 'SubVegAXL' || child.form === 'SubVegCXL' || child.form === 'SubVegDXL')}
-        {#key JSON.stringify([contextId, twoPageProject, draft.plotNumber, child.form])}
-          <TwoPageVegetationPanel {contextId} project={twoPageProject} plot={draft.plotNumber} form={child.form}
-            parentBlocked={linkedVegetationParentBlocked(child.form)} />
-        {/key}
+        {#await import('./TwoPageVegetationPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading linked vegetation panel...</p>
+        {:then { default: TwoPageVegetationPanel }}
+          {#key JSON.stringify([contextId, twoPageProject, draft.plotNumber, child.form])}
+            <TwoPageVegetationPanel {contextId} project={twoPageProject} plot={draft.plotNumber} form={child.form}
+              parentBlocked={linkedVegetationParentBlocked(child.form)} />
+          {/key}
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">Linked vegetation panel could not load: {String(loadError)}</p>
+        {/await}
       {:else if pictureReadingEnabled && twoPageScope === 'entry' && twoPageProject !== null && child.form === 'frmVPicsXL'}
         <div data-two-page-picture-child={child.form} data-source-control={_control.controlId}
           data-source-image-control="form:frmVPicsXL/imgCtl">
@@ -3787,60 +3836,90 @@
     {/snippet}
     {#if twoPageOpen && twoPageProject !== null}
       {#if twoPageScope === 'entry'}
-        <TwoPageEntryEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
-          initialForm={twoPageEntryInitialForm}
-          onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
-          pictureReaderAvailable={pictureReadingEnabled}
-          auditReaderAvailable={import.meta.env.VITE_TWO_PAGE_SOURCE_AUDIT_REVIEW !== 'false'}
-          googleEarthReaderAvailable={import.meta.env.VITE_TWO_PAGE_GOOGLE_EARTH_REVIEW !== 'false'}
-          vegetationTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_VEGETATION_TABLE_REVIEW !== 'false'}
-          environmentTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_ENVIRONMENT_TABLE_REVIEW !== 'false'}
-          projectMetadataReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROJECT_METADATA_REVIEW !== 'false'}
-          projectMetadataClient={PlotService} metadataRestorationAvailable={metadataRestorationEnabled}
-          profilingReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROFILING_REVIEW !== 'false'}
-          profilingSource={$projectState?.plotProfile?.source ?? null}
-          vegetationTableSU={$projectState?.activeSU ?? ''}
-          vegetationTableSUPath={$projectState?.suPath ?? ''}
-          sourceProjectPath={$projectState?.projectPath ?? ''}
-          externalScope={externalSUEnvironmentEnabled && separateSUSelected && !siviStandalone && $projectState?.projectPath && $projectState.suPath
-            ? { contextId, project: $projectState.activeProject, projectPath: $projectState.projectPath, su: $projectState.activeSU, suPath: $projectState.suPath } : null}
-          sourceBlocked={twoPageLinkedParentBlocked || Object.keys(headerValidation).length > 0 || twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked}
-          cache={twoPageEntrySessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
-          childBlocked={twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked || pictureBusy || pictureMetadataPending}
-          onbusy={value => twoPageBusy = value}
-          onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
-          oncommitted={() => refreshTwoPagePeers('entry')} embedded={twoPageLinkedChild} />
+        {#await loadSubEditor(() => import('./TwoPageEntryEditor.svelte'), 'Two-page complete entry', () => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; })}
+          <p role="status" data-two-page-loading="entry" class="p-3 text-xs">Loading two-page complete entry...</p>
+        {:then { default: TwoPageEntryEditor }}
+          <TwoPageEntryEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
+            initialForm={twoPageEntryInitialForm}
+            onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
+            pictureReaderAvailable={pictureReadingEnabled}
+            auditReaderAvailable={import.meta.env.VITE_TWO_PAGE_SOURCE_AUDIT_REVIEW !== 'false'}
+            googleEarthReaderAvailable={import.meta.env.VITE_TWO_PAGE_GOOGLE_EARTH_REVIEW !== 'false'}
+            vegetationTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_VEGETATION_TABLE_REVIEW !== 'false'}
+            environmentTableReaderAvailable={import.meta.env.VITE_TWO_PAGE_ENVIRONMENT_TABLE_REVIEW !== 'false'}
+            projectMetadataReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROJECT_METADATA_REVIEW !== 'false'}
+            projectMetadataClient={PlotService} metadataRestorationAvailable={metadataRestorationEnabled}
+            profilingReaderAvailable={import.meta.env.VITE_TWO_PAGE_PROFILING_REVIEW !== 'false'}
+            profilingSource={$projectState?.plotProfile?.source ?? null}
+            vegetationTableSU={$projectState?.activeSU ?? ''}
+            vegetationTableSUPath={$projectState?.suPath ?? ''}
+            sourceProjectPath={$projectState?.projectPath ?? ''}
+            externalScope={externalSUEnvironmentEnabled && separateSUSelected && !siviStandalone && $projectState?.projectPath && $projectState.suPath
+              ? { contextId, project: $projectState.activeProject, projectPath: $projectState.projectPath, su: $projectState.activeSU, suPath: $projectState.suPath } : null}
+            sourceBlocked={twoPageLinkedParentBlocked || Object.keys(headerValidation).length > 0 || twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked}
+            cache={twoPageEntrySessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
+            childBlocked={twoPageSoilBusy || twoPageSoilBlocked || twoPageVegetationBusy || twoPageVegetationBlocked || pictureBusy || pictureMetadataPending}
+            onbusy={value => twoPageBusy = value}
+            onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
+            oncommitted={() => refreshTwoPagePeers('entry')} embedded={twoPageLinkedChild} />
+        {:catch loadError}
+          <p role="alert" data-two-page-load-error="entry" class="p-3 text-xs text-red-700">Two-page complete entry could not load: {String(loadError)}</p>
+        {/await}
       {:else if twoPageScope === 'common'}
-        <TwoPageParentCommonEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
-          initialForm={twoPageEntryInitialForm}
-          onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
-          cache={twoPageCommonSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
-          onbusy={value => twoPageBusy = value}
-          onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
-          oncommitted={() => refreshTwoPagePeers('common')} embedded={twoPageLinkedChild} />
+        {#await loadSubEditor(() => import('./TwoPageParentCommonEditor.svelte'), 'Two-page common fields', () => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; })}
+          <p role="status" data-two-page-loading="common" class="p-3 text-xs">Loading two-page common fields...</p>
+        {:then { default: TwoPageParentCommonEditor }}
+          <TwoPageParentCommonEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
+            initialForm={twoPageEntryInitialForm}
+            onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
+            cache={twoPageCommonSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
+            onbusy={value => twoPageBusy = value}
+            onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
+            oncommitted={() => refreshTwoPagePeers('common')} embedded={twoPageLinkedChild} />
+        {:catch loadError}
+          <p role="alert" data-two-page-load-error="common" class="p-3 text-xs text-red-700">Two-page common fields could not load: {String(loadError)}</p>
+        {/await}
       {:else}
-        <TwoPageParentEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
-          initialForm={twoPageEntryInitialForm}
-          onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
-          cache={twoPageSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
-          onbusy={value => twoPageBusy = value}
-          onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
-          oncommitted={() => refreshTwoPagePeers('extra')} embedded={twoPageLinkedChild} />
+        {#await loadSubEditor(() => import('./TwoPageParentEditor.svelte'), 'Two-page additional fields', () => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; })}
+          <p role="status" data-two-page-loading="extra" class="p-3 text-xs">Loading two-page additional fields...</p>
+        {:then { default: TwoPageParentEditor }}
+          <TwoPageParentEditor bind:this={twoPageEditor} {contextId} project={twoPageProject} plot={draft.plotNumber}
+            initialForm={twoPageEntryInitialForm}
+            onExtendedShrubsChange={extendedShrubsEnabled ? setExtendedShrubs : undefined}
+            cache={twoPageSessions} revision={twoPageRevision} onchange={() => twoPageRevision++}
+            onbusy={value => twoPageBusy = value}
+            onclosed={() => { twoPageOpen = false; twoPageBusy = false; twoPageProject = null; error = null; }}
+            oncommitted={() => refreshTwoPagePeers('extra')} embedded={twoPageLinkedChild} />
+        {:catch loadError}
+          <p role="alert" data-two-page-load-error="extra" class="p-3 text-xs text-red-700">Two-page additional fields could not load: {String(loadError)}</p>
+        {/await}
       {/if}
     {/if}
     {#if metadataOpen}
-      <ProjectMetadataEditor bind:this={metadataEditor} client={PlotService} {contextId} plot={draft.plotNumber}
-        allowCreation={metadataCreationEnabled} allowTemplateCreation={metadataTemplateCreationEnabled}
-        allowRestoration={metadataRestorationEnabled}
-        onbusy={value => metadataBusy = value}
-        onclosed={() => { metadataOpen = false; error = null; }}
-        oncommitted={refreshProjectMetadata} />
+      {#await loadSubEditor(() => import('./ProjectMetadataEditor.svelte'), 'Project metadata editor', () => { metadataOpen = false; metadataBusy = false; })}
+        <p role="status" class="p-3 text-xs">Loading project metadata editor...</p>
+      {:then { default: ProjectMetadataEditor }}
+        <ProjectMetadataEditor bind:this={metadataEditor} client={PlotService} {contextId} plot={draft.plotNumber}
+          allowCreation={metadataCreationEnabled} allowTemplateCreation={metadataTemplateCreationEnabled}
+          allowRestoration={metadataRestorationEnabled}
+          onbusy={value => metadataBusy = value}
+          onclosed={() => { metadataOpen = false; error = null; }}
+          oncommitted={refreshProjectMetadata} />
+      {:catch loadError}
+        <p role="alert" class="p-3 text-xs text-red-700">Project metadata editor could not load: {String(loadError)}</p>
+      {/await}
     {/if}
     {#if codeCheckOpen}
-      <SpeciesCodeCheck bind:this={codeCheckEditor} client={PlotService}
-        onbusy={value => codeCheckBusy = value}
-        onclosed={() => { codeCheckOpen = false; error = null; }}
-        oncommitted={() => loadChildData(draft.plotNumber)} />
+      {#await loadSubEditor(() => import('./SpeciesCodeCheck.svelte'), 'Species code check', () => { codeCheckOpen = false; codeCheckBusy = false; })}
+        <p role="status" class="p-3 text-xs">Loading species code check...</p>
+      {:then { default: SpeciesCodeCheck }}
+        <SpeciesCodeCheck bind:this={codeCheckEditor} client={PlotService}
+          onbusy={value => codeCheckBusy = value}
+          onclosed={() => { codeCheckOpen = false; error = null; }}
+          oncommitted={() => loadChildData(draft.plotNumber)} />
+      {:catch loadError}
+        <p role="alert" class="p-3 text-xs text-red-700">Species code check could not load: {String(loadError)}</p>
+      {/await}
     {/if}
     {#if speciesUnsaved}
       <div class="species-draft-toolbar mb-3 p-2 border border-amber-300 bg-amber-50 text-xs" aria-label="Species draft controls">
@@ -4104,33 +4183,57 @@
       {/key}
     {:else if activeTab === 'veg' && (!siviStandalone || siviStandaloneEnabled)}
       {#if siviDeletionEnabled && siviDeletionView && siviDeletionClose}
-        <SIVIDeletionPanel view={siviDeletionView} close={siviDeletionClose} targets={siviDeletionView.targets ?? []}
-          disabled={siviDeletionEditingDisabled} recoveryDisabled={siviDeletionRecoveryDisabled}
-          onreview={(form, rowId) => void siviLifecycleOperation('deletion', 'review', rowId, form)}
-          onconfirm={confirmed => stageSIVILifecycle('deletion', confirmed)}
-          onoperation={operation => void siviLifecycleOperation('deletion', operation)} />
+        {#await import('./SIVIDeletionPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI deletion panel...</p>
+        {:then { default: SIVIDeletionPanel }}
+          <SIVIDeletionPanel view={siviDeletionView} close={siviDeletionClose} targets={siviDeletionView.targets ?? []}
+            disabled={siviDeletionEditingDisabled} recoveryDisabled={siviDeletionRecoveryDisabled}
+            onreview={(form, rowId) => void siviLifecycleOperation('deletion', 'review', rowId, form)}
+            onconfirm={confirmed => stageSIVILifecycle('deletion', confirmed)}
+            onoperation={operation => void siviLifecycleOperation('deletion', operation)} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI deletion panel could not load: {String(loadError)}</p>
+        {/await}
       {/if}
       {#if siviRestorationEnabled && siviRestorationView && siviRestorationClose}
-        <SIVIDeletionRestorationPanel view={siviRestorationView} close={siviRestorationClose} targets={siviRestorationTargets}
-          disabled={siviRestorationEditingDisabled} recoveryDisabled={siviRestorationRecoveryDisabled}
-          onreview={historyId => void siviLifecycleOperation('restoration', 'review', historyId)}
-          onchoose={action => stageSIVILifecycle('restoration', false, action)}
-          onconfirm={confirmed => stageSIVILifecycle('restoration', confirmed)}
-          onoperation={operation => void siviLifecycleOperation('restoration', operation)} />
+        {#await import('./SIVIDeletionRestorationPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI restoration panel...</p>
+        {:then { default: SIVIDeletionRestorationPanel }}
+          <SIVIDeletionRestorationPanel view={siviRestorationView} close={siviRestorationClose} targets={siviRestorationTargets}
+            disabled={siviRestorationEditingDisabled} recoveryDisabled={siviRestorationRecoveryDisabled}
+            onreview={historyId => void siviLifecycleOperation('restoration', 'review', historyId)}
+            onchoose={action => stageSIVILifecycle('restoration', false, action)}
+            onconfirm={confirmed => stageSIVILifecycle('restoration', confirmed)}
+            onoperation={operation => void siviLifecycleOperation('restoration', operation)} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI restoration panel could not load: {String(loadError)}</p>
+        {/await}
       {/if}
       {#if siviCreationUndoEnabled && siviCreationUndoView && siviCreationUndoClose}
-        <SIVICreationUndoPanel view={siviCreationUndoView} close={siviCreationUndoClose}
-          disabled={siviCreationUndoEditingDisabled} recoveryDisabled={siviCreationUndoRecoveryDisabled}
-          onreview={historyId => void siviCreationUndoOperation('review', historyId)}
-          onchoose={action => stageSIVICreationUndo(false, action)}
-          onconfirm={confirmed => stageSIVICreationUndo(confirmed)}
-          onoperation={operation => void siviCreationUndoOperation(operation)} />
+        {#await import('./SIVICreationUndoPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI creation undo panel...</p>
+        {:then { default: SIVICreationUndoPanel }}
+          <SIVICreationUndoPanel view={siviCreationUndoView} close={siviCreationUndoClose}
+            disabled={siviCreationUndoEditingDisabled} recoveryDisabled={siviCreationUndoRecoveryDisabled}
+            onreview={historyId => void siviCreationUndoOperation('review', historyId)}
+            onchoose={action => stageSIVICreationUndo(false, action)}
+            onconfirm={confirmed => stageSIVICreationUndo(confirmed)}
+            onoperation={operation => void siviCreationUndoOperation(operation)} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI creation undo panel could not load: {String(loadError)}</p>
+        {/await}
       {/if}
       {#if siviCreationEnabled && siviCreationSession && siviCreationView && siviCreationClose}
-        <SIVICreationPanel view={siviCreationView} close={siviCreationClose}
-          owner={{ contextId: siviContextId, project: siviCreationView.references?.project ?? $projectState?.activeProject ?? '', plot: original?.plotNumber ?? '' }}
-          disabled={siviCreationEditingDisabled} recoveryDisabled={siviCreationRecoveryDisabled}
-          onoperation={(operation, form) => void siviCreationOperation(operation, form)} onchange={stageSIVICreation} />
+        {#await import('./SIVICreationPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI creation panel...</p>
+        {:then { default: SIVICreationPanel }}
+          <SIVICreationPanel view={siviCreationView} close={siviCreationClose}
+            owner={{ contextId: siviContextId, project: siviCreationView.references?.project ?? $projectState?.activeProject ?? '', plot: original?.plotNumber ?? '' }}
+            disabled={siviCreationEditingDisabled} recoveryDisabled={siviCreationRecoveryDisabled}
+            onoperation={(operation, form) => void siviCreationOperation(operation, form)} onchange={stageSIVICreation} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI creation panel could not load: {String(loadError)}</p>
+        {/await}
       {/if}
       {#if siviHeightEnabled}
         <button type="button" class="mb-3 rounded border px-3 py-1 disabled:opacity-50" data-sivi-open
@@ -4170,49 +4273,85 @@
           <button type="button" class="rounded border px-3 py-1" data-sivi-identity-cancel-read
             onclick={() => siviIdentityReads.cancelAll()}>Cancel ID source read</button>
         {/if}
-        <SIVIIdentityPanel view={siviIdentityView} disabled={siviIdentityEditingDisabled} canSave={siviIdentityClose?.canSave ?? false}
-          onstage={stageSIVIIdentity} onsave={() => void siviIdentityOperation('save')} onundo={() => void siviIdentityOperation('undo')}
-          onreload={() => void siviIdentityOperation('load')}
-          onrestore={(action) => void siviIdentityOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {#await import('./SIVIIdentityPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI ID panel...</p>
+        {:then { default: SIVIIdentityPanel }}
+          <SIVIIdentityPanel view={siviIdentityView} disabled={siviIdentityEditingDisabled} canSave={siviIdentityClose?.canSave ?? false}
+            onstage={stageSIVIIdentity} onsave={() => void siviIdentityOperation('save')} onundo={() => void siviIdentityOperation('undo')}
+            onreload={() => void siviIdentityOperation('load')}
+            onrestore={(action) => void siviIdentityOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI ID panel could not load: {String(loadError)}</p>
+        {/await}
       {:else if siviSpeciesPanelOpen && siviSpeciesView}
         {#if siviSpeciesReading && siviSpeciesBusy}
           <button type="button" class="rounded border px-3 py-1" data-sivi-species-cancel-read
             onclick={() => siviSpeciesReads.cancelAll()}>Cancel Species source/reference read</button>
         {/if}
-        <SIVISpeciesPanel view={siviSpeciesView} disabled={siviSpeciesEditingDisabled} canSave={siviSpeciesClose?.canSave ?? false}
-          onstage={(rowId, raw) => stageSIVISpecies(rowId, 'Species', raw)}
-          oncontext={(rowId, group) => stageSIVISpecies(rowId, 'context', String(group))}
-          onchoose={(rowId, kind, selected) => stageSIVISpecies(rowId, kind, selected ?? '')}
-          onsave={() => void siviSpeciesOperation('save')} onundo={() => void siviSpeciesOperation('undo')}
-          onreload={() => void siviSpeciesOperation('load')} onrestore={(action) => void siviSpeciesOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {#await import('./SIVISpeciesPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI Species panel...</p>
+        {:then { default: SIVISpeciesPanel }}
+          <SIVISpeciesPanel view={siviSpeciesView} disabled={siviSpeciesEditingDisabled} canSave={siviSpeciesClose?.canSave ?? false}
+            onstage={(rowId, raw) => stageSIVISpecies(rowId, 'Species', raw)}
+            oncontext={(rowId, group) => stageSIVISpecies(rowId, 'context', String(group))}
+            onchoose={(rowId, kind, selected) => stageSIVISpecies(rowId, kind, selected ?? '')}
+            onsave={() => void siviSpeciesOperation('save')} onundo={() => void siviSpeciesOperation('undo')}
+            onreload={() => void siviSpeciesOperation('load')} onrestore={(action) => void siviSpeciesOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI Species panel could not load: {String(loadError)}</p>
+        {/await}
       {:else if siviCollectedPanelOpen && siviCollectedView}
         {#if siviCollectedReading && siviCollectedBusy}
           <button type="button" class="mb-3 rounded border px-3 py-1" data-sivi-collected-cancel-read
             onclick={() => siviCollectedReads.cancelAll()}>Cancel Collected source read</button>
         {/if}
-        <SIVICollectedPanel view={siviCollectedView} disabled={siviCollectedEditingDisabled} canSave={siviCollectedClose?.canSave ?? false}
-          oncycle={cycleSIVICollected} onsave={() => void siviCollectedOperation('save')} onundo={() => void siviCollectedOperation('undo')}
-          onreload={() => void siviCollectedOperation('load')} onrestore={(action) => void siviCollectedOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {#await import('./SIVICollectedPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI Collected panel...</p>
+        {:then { default: SIVICollectedPanel }}
+          <SIVICollectedPanel view={siviCollectedView} disabled={siviCollectedEditingDisabled} canSave={siviCollectedClose?.canSave ?? false}
+            oncycle={cycleSIVICollected} onsave={() => void siviCollectedOperation('save')} onundo={() => void siviCollectedOperation('undo')}
+            onreload={() => void siviCollectedOperation('load')} onrestore={(action) => void siviCollectedOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI Collected panel could not load: {String(loadError)}</p>
+        {/await}
       {:else if siviCombinedPanelOpen && siviCombinedView}
         {#if siviCombinedReading && siviCombinedBusy}
           <button type="button" class="mb-3 rounded border px-3 py-1" data-sivi-combined-cancel-read
             onclick={() => siviCombinedReads.cancelAll()}>Cancel combined source read</button>
         {/if}
-        <SIVICombinedPanel view={siviCombinedView} disabled={siviCombinedEditingDisabled} canSave={siviCombinedClose?.canSave ?? false}
-          onstage={stageSIVICombinedCell} onsave={() => void siviCombinedOperation('save')} onundo={() => void siviCombinedOperation('undo')}
-          onreload={() => void siviCombinedOperation('load')} onrestore={(action) => void siviCombinedOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {#await import('./SIVICombinedPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI combined panel...</p>
+        {:then { default: SIVICombinedPanel }}
+          <SIVICombinedPanel view={siviCombinedView} disabled={siviCombinedEditingDisabled} canSave={siviCombinedClose?.canSave ?? false}
+            onstage={stageSIVICombinedCell} onsave={() => void siviCombinedOperation('save')} onundo={() => void siviCombinedOperation('undo')}
+            onreload={() => void siviCombinedOperation('load')} onrestore={(action) => void siviCombinedOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI combined panel could not load: {String(loadError)}</p>
+        {/await}
       {:else if siviPanelOpen && siviView}
-        <SIVIHeightPanel view={siviView} disabled={siviEditingDisabled} canSave={siviClose?.canSave ?? false}
-          onstage={stageSIVICell} onsave={() => void siviOperation('save')} onundo={() => void siviOperation('undo')}
-          onreload={() => void siviOperation('load')} onrestore={(action) => void siviOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {#await import('./SIVIHeightPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI height panel...</p>
+        {:then { default: SIVIHeightPanel }}
+          <SIVIHeightPanel view={siviView} disabled={siviEditingDisabled} canSave={siviClose?.canSave ?? false}
+            onstage={stageSIVICell} onsave={() => void siviOperation('save')} onundo={() => void siviOperation('undo')}
+            onreload={() => void siviOperation('load')} onrestore={(action) => void siviOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI height panel could not load: {String(loadError)}</p>
+        {/await}
       {:else if siviCoverPanelOpen && siviCoverView}
         {#if siviCoverReading && siviCoverBusy}
           <button type="button" class="mb-3 rounded border px-3 py-1" data-sivi-cover-cancel-read
             onclick={() => siviCoverReads.cancelAll()}>Cancel source cover read</button>
         {/if}
-        <SIVICoverPanel view={siviCoverView} disabled={siviCoverEditingDisabled} canSave={siviCoverClose?.canSave ?? false}
-          onstage={stageSIVICoverCell} onsave={() => void siviCoverOperation('save')} onundo={() => void siviCoverOperation('undo')}
-          onreload={() => void siviCoverOperation('load')} onrestore={(action) => void siviCoverOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {#await import('./SIVICoverPanel.svelte')}
+          <p role="status" class="p-2 text-xs">Loading SIVI cover panel...</p>
+        {:then { default: SIVICoverPanel }}
+          <SIVICoverPanel view={siviCoverView} disabled={siviCoverEditingDisabled} canSave={siviCoverClose?.canSave ?? false}
+            onstage={stageSIVICoverCell} onsave={() => void siviCoverOperation('save')} onundo={() => void siviCoverOperation('undo')}
+            onreload={() => void siviCoverOperation('load')} onrestore={(action) => void siviCoverOperation(action === AuditRestoreAction.AuditRestoreRetain ? 'retain' : 'prune')} />
+        {:catch loadError}
+          <p role="alert" class="p-2 text-xs text-red-700">SIVI cover panel could not load: {String(loadError)}</p>
+        {/await}
       {:else if vegetationReadUnavailable}
         <p role="alert" class="p-4">Ordinary ID-keyed vegetation is unavailable: {vegetationReadUnavailable}
           Independently enabled physical-row SIVI views remain available; no NULL identity is converted to zero and no row is omitted from an ordinary result.</p>

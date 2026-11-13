@@ -95,14 +95,25 @@ export interface SIVIParentProposal {
   actions: SIVIParentActionEdit[];
 }
 
-const parent = source.forms[0];
-const direct = parent.fields.filter(field => field.binding);
-const columns = Object.keys(policies) as SIVIParentColumn[];
+function computeParentLayout() {
+  const parent = source.forms[0];
+  return {
+    parent,
+    direct: parent.fields.filter(field => field.binding),
+    columns: Object.keys(policies) as SIVIParentColumn[],
+  };
+}
+let cachedParentLayout: ReturnType<typeof computeParentLayout> | null = null;
+function parentLayout() {
+  cachedParentLayout ??= computeParentLayout();
+  return cachedParentLayout;
+}
 const nullCell = (): ProjectMetadataCell => ({ storage: 'null', text: null, integer: null, real: null, blobHex: null });
 const validIdentity = (value: string) => typeof value === 'string' && value !== '' && wellFormedUTF16(value) && !value.includes('\0');
 const isColumn = (value: string): value is SIVIParentColumn => Object.hasOwn(policies, value);
 
 function controlId(column: SIVIParentColumn): string {
+  const { parent } = parentLayout();
   const action = column === 'PlotType' ? 'optPlotType' : column === 'SpeciesListComplete' ? 'optSpeciesListComplete' : null;
   const fields = parent.fields.filter(field => action ? field.controlName === action : field.binding === column);
   if (fields.length !== 1 || !fields[0].readOnly || fields[0].implementation !== 'unmapped' ||
@@ -113,6 +124,7 @@ function controlId(column: SIVIParentColumn): string {
 }
 
 export function validateSIVIParentOriginal(original: SIVIParentOriginal): SIVIParentOriginal {
+  const { parent, direct, columns } = parentLayout();
   if (!original || !validIdentity(original.ContextID) || !validIdentity(original.Project) || !validIdentity(original.Plot) ||
       original.Form !== 'frmSIVIsite' || original.Query !== 'USysEnv' ||
       original.Membership !== 'literal-binary-inner-pairs' || original.EnvTable !== `${original.Project}_Env` ||

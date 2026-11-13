@@ -131,6 +131,25 @@ function loadTypeScript(filename, dependencies = {}, globals = {}) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true }
   }).outputText, { ...globals, module, exports: module.exports, structuredClone, require(name) {
     if (name in dependencies) return dependencies[name];
+    if (name === './siviMetadataWire') {
+      if ('./siviParentTransport' in dependencies) return dependencies['./siviParentTransport'];
+      const quality = dependencies['./qualityEditor'] || loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
+      return loadTypeScript('siviMetadataWire.ts', {
+        './projectMetadataRestore': dependencies['./projectMetadataRestore'] || loadTypeScript('projectMetadataRestore.ts', {
+          './qualityEditor': quality, './projectMetadataEditor': {},
+        }),
+      });
+    }
+    if (name === './pictureCreationActivity') return loadTypeScript('pictureCreationActivity.ts');
+    if (name === './pictureLifecycleActivity') return loadTypeScript('pictureLifecycleActivity.ts');
+    if (name === './twoPageSoilActivity') {
+      const quality = dependencies['./qualityEditor'] || loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
+      return loadTypeScript('twoPageSoilActivity.ts', { './qualityEditor': quality });
+    }
+    if (name === './twoPageVegetationActivity') {
+      const quality = dependencies['./qualityEditor'] || loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });
+      return loadTypeScript('twoPageVegetationActivity.ts', { './qualityEditor': quality });
+    }
     if (name === './qualityMinimumReference') return qualityPreferenceHelpers().reference;
     if (name === './siviChildSourceNotices') {
       const quality = dependencies['./qualityEditor'] || loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') });

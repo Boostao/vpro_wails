@@ -30,6 +30,9 @@ function registry(environment = {}, overrides = {}) {
     } },
     './twoPageVegetationSession': { TwoPageVegetationSession },
     './qualityEditor': loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') }),
+    './twoPageVegetationActivity': loadTypeScript('twoPageVegetationActivity.ts', {
+      './qualityEditor': loadTypeScript('qualityEditor.ts', { './becEditor': loadTypeScript('becEditor.ts') }),
+    }),
   };
   const module = { exports: {} };
   const source = readFileSync(path.join(__dirname, 'twoPageVegetationSessions.ts'), 'utf8').replaceAll('import.meta.env', '__environment');

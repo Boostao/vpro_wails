@@ -1,7 +1,7 @@
 import type {
   ProjectMetadataCell, ProjectMetadataColumn, TwoPageSoilWriteResult,
 } from '../bindings/github.com/boostao/vpro-wails';
-import { completeMetadataCellFromWire } from './siviParentTransport';
+import { completeMetadataCellFromWire } from './siviMetadataWire';
 import { exactSigned64 } from './projectMetadataRestore';
 import { equalCell, metadataCellText } from './projectMetadataEditor';
 import { wellFormedUTF16 } from './qualityEditor';

@@ -1,32 +1,12 @@
 import { PictureService } from '../bindings/github.com/boostao/vpro-wails';
 import { PictureLifecycleSession } from './pictureLifecycleSession';
+import { notifyPictureLifecycleActivity, pictureLifecycleEntries, subscribePictureLifecycleActivity, type PictureLifecycleActivity } from './pictureLifecycleActivity';
 import type { PictureOwner } from './pictureRead';
 
-const sessions = new Map<string, { owner: PictureOwner; session: PictureLifecycleSession }>();
-const observers = new Set<(activity: PictureLifecycleActivity) => void>();
-export interface PictureLifecycleActivity {
-  busy: boolean;
-  blocked: boolean;
-  owner: PictureOwner | null;
-}
-function activity(): PictureLifecycleActivity {
-  let busy = false, blocked = false, owner: PictureOwner | null = null;
-  for (const entry of sessions.values()) {
-    const state = entry.session.closeState();
-    busy ||= state.busy;
-    blocked ||= state.blocked === true || state.unsaved;
-    if (owner === null && (state.busy || state.blocked || state.unsaved)) owner = { ...entry.owner };
-  }
-  return { busy, blocked, owner };
-}
-function changed() { for (const observer of observers) observer(activity()); }
-export function subscribePictureLifecycleActivity(observer: (activity: PictureLifecycleActivity) => void) {
-  observers.add(observer); observer(activity());
-  return () => { observers.delete(observer); };
-}
+export { subscribePictureLifecycleActivity, type PictureLifecycleActivity };
 export function pictureLifecycleSession(owner: PictureOwner): PictureLifecycleSession {
   const key = JSON.stringify([owner.contextId, owner.project, owner.plotNumber]);
-  const existing = sessions.get(key);
+  const existing = pictureLifecycleEntries.get(key);
   if (existing) return existing.session;
   const retainedOwner = { contextId: owner.contextId, project: owner.project, plotNumber: owner.plotNumber };
   const { contextId, plotNumber } = retainedOwner;
@@ -39,9 +19,9 @@ export function pictureLifecycleSession(owner: PictureOwner): PictureLifecycleSe
     restore: request => PictureService.RestoreDeletedPicture(contextId, request),
     restorationReceipt: request => PictureService.LookupDeletionRestorationReceipt(contextId, request),
   });
-  sessions.set(key, { owner: retainedOwner, session });
+  pictureLifecycleEntries.set(key, { owner: retainedOwner, session });
   let initialized = false;
-  session.subscribe(() => { if (initialized) changed(); });
+  session.subscribe(() => { if (initialized) notifyPictureLifecycleActivity(); });
   initialized = true;
   return session;
 }

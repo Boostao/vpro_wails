@@ -1,6 +1,6 @@
 import type { ProjectMetadataCell, ProjectMetadataColumn } from '../bindings/github.com/boostao/vpro-wails';
 import type { TwoPageVegetationOwner } from './twoPageVegetationWire';
-import { completeMetadataCellFromWire } from './siviParentTransport';
+import { completeMetadataCellFromWire } from './siviMetadataWire';
 import { exactSigned64 } from './projectMetadataRestore';
 import { wellFormedUTF16 } from './qualityEditor';
 

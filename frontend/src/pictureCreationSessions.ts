@@ -1,35 +1,12 @@
 import { PictureService } from '../bindings/github.com/boostao/vpro-wails';
 import { PictureCreationSession } from './pictureCreationSession';
+import { notifyPictureCreationActivity, pictureCreationEntries, subscribePictureCreationActivity, type PictureCreationActivity } from './pictureCreationActivity';
 import type { PictureOwner } from './pictureRead';
 
-const sessions = new Map<string, { owner: PictureOwner; session: PictureCreationSession }>();
-const observers = new Set<(activity: PictureCreationActivity) => void>();
-export interface PictureCreationActivity {
-  busy: boolean;
-  blocked: boolean;
-  owner: PictureOwner | null;
-}
-function activity(): PictureCreationActivity {
-  let busy = false, blocked = false, owner: PictureOwner | null = null;
-  for (const entry of sessions.values()) {
-    const state = entry.session.closeState();
-    busy ||= state.busy;
-    blocked ||= state.blocked === true || state.unsaved;
-    if (owner === null && (state.busy || state.blocked || state.unsaved)) owner = { ...entry.owner };
-  }
-  return { busy, blocked, owner };
-}
-function changed() {
-  for (const observer of observers) observer(activity());
-}
-export function subscribePictureCreationActivity(observer: (activity: PictureCreationActivity) => void) {
-  observers.add(observer);
-  observer(activity());
-  return () => { observers.delete(observer); };
-}
+export { subscribePictureCreationActivity, type PictureCreationActivity };
 export function pictureCreationSession(owner: PictureOwner): PictureCreationSession {
   const key = JSON.stringify([owner.contextId, owner.project, owner.plotNumber]);
-  const existing = sessions.get(key);
+  const existing = pictureCreationEntries.get(key);
   if (existing) return existing.session;
   const retainedOwner = { contextId: owner.contextId, project: owner.project, plotNumber: owner.plotNumber };
   const { contextId, project, plotNumber } = retainedOwner;
@@ -42,11 +19,11 @@ export function pictureCreationSession(owner: PictureOwner): PictureCreationSess
     release: token => PictureService.ReleaseCreationSelection(token),
     acknowledge: token => PictureService.AcknowledgeCreationReceipt(token),
   });
-  sessions.set(key, { owner: retainedOwner, session });
+  pictureCreationEntries.set(key, { owner: retainedOwner, session });
   // Idle construction can run in a derived expression and does not change activity.
   let initialized = false;
   session.subscribe(() => {
-    if (initialized) changed();
+    if (initialized) notifyPictureCreationActivity();
   });
   initialized = true;
   return session;

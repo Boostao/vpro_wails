@@ -1,7 +1,7 @@
 import type { ProjectMetadataTable } from '../bindings/github.com/boostao/vpro-wails';
 import { lifeformShape } from './lifeformSummary';
 import { exactSigned64 } from './projectMetadataRestore';
-import { completeMetadataCellFromWire } from './siviParentTransport';
+import { completeMetadataCellFromWire } from './siviMetadataWire';
 
 const schema = [
   ['ListName', 'TEXT'], ['ListFilter', 'TEXT'], ['ItemOrder', 'REAL'], ['Item', 'TEXT'],
