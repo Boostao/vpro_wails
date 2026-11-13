@@ -270,12 +270,42 @@ func CreateSUTable(ctx context.Context, contexts *vprocore.ContextService, conte
 				owner.Mu.Unlock()
 				return struct{}{}, snapErr
 			}
+			adminUnits := map[string]string{}
+			if request.SeedFromUserSiteUnit {
+				aRows, aErr := tx.QueryContext(ctx,
+					`SELECT CAST("Plot" AS BLOB), CAST("UserSiteUnit" AS TEXT)
+					 FROM "project".`+vprocore.QuoteHeaderIdentifier(project+"_Admin")+`
+					 WHERE typeof("Plot")='text' AND "UserSiteUnit" IS NOT NULL`)
+				if aErr != nil {
+					_ = tx.Rollback()
+					owner.Mu.Unlock()
+					return struct{}{}, aErr
+				}
+				for aRows.Next() {
+					var rawPlot []byte
+					var u sql.NullString
+					if sErr := aRows.Scan(&rawPlot, &u); sErr != nil {
+						aRows.Close()
+						_ = tx.Rollback()
+						owner.Mu.Unlock()
+						return struct{}{}, sErr
+					}
+					key := string(rawPlot)
+					if _, exists := adminUnits[key]; !exists && u.Valid {
+						adminUnits[key] = u.String
+					}
+				}
+				if aErr := errors.Join(aRows.Err(), aRows.Close()); aErr != nil {
+					_ = tx.Rollback()
+					owner.Mu.Unlock()
+					return struct{}{}, aErr
+				}
+			}
+
 			rows, qErr := tx.QueryContext(ctx,
-				`SELECT CAST(env."PlotNumber" AS TEXT), CAST(admin."UserSiteUnit" AS TEXT)
+				`SELECT CAST(env."PlotNumber" AS BLOB), CAST(env."PlotNumber" AS TEXT)
 				 FROM "project".`+vprocore.QuoteHeaderIdentifier(project+"_Env")+` AS env
-				 LEFT JOIN "project".`+vprocore.QuoteHeaderIdentifier(project+"_Admin")+` AS admin
-				 ON typeof(env."PlotNumber")='text' AND typeof(admin."Plot")='text' AND CAST(env."PlotNumber" AS BLOB)=CAST(admin."Plot" AS BLOB)
-				 WHERE env."PlotNumber" IS NOT NULL AND TRIM(CAST(env."PlotNumber" AS TEXT)) <> ''
+				 WHERE typeof(env."PlotNumber")='text' AND TRIM(env."PlotNumber") <> ''
 				 ORDER BY env."PlotNumber" COLLATE NOCASE ASC, env.rowid ASC`)
 			if qErr != nil {
 				_ = tx.Rollback()
@@ -284,22 +314,25 @@ func CreateSUTable(ctx context.Context, contexts *vprocore.ContextService, conte
 			}
 			seen := map[string]bool{}
 			for rows.Next() {
+				var rawPlot []byte
 				var p string
-				var u sql.NullString
-				if sErr := rows.Scan(&p, &u); sErr != nil {
+				if sErr := rows.Scan(&rawPlot, &p); sErr != nil {
 					rows.Close()
 					_ = tx.Rollback()
 					owner.Mu.Unlock()
 					return struct{}{}, sErr
 				}
-				if seen[p] || len(utf16.Encode([]rune(p))) > 7 {
+				rawKey := string(rawPlot)
+				if seen[rawKey] || len(utf16.Encode([]rune(p))) > 7 {
 					continue
 				}
-				seen[p] = true
+				seen[rawKey] = true
 				var unitPtr *string
-				if request.SeedFromUserSiteUnit && u.Valid && strings.TrimSpace(u.String) != "" && len(utf16.Encode([]rune(u.String))) <= 255 {
-					val := u.String
-					unitPtr = &val
+				if request.SeedFromUserSiteUnit {
+					if uStr, ok := adminUnits[rawKey]; ok && strings.TrimSpace(uStr) != "" && len(utf16.Encode([]rune(uStr))) <= 255 {
+						val := uStr
+						unitPtr = &val
+					}
 				}
 				seeds = append(seeds, seedPlot{plot: p, unit: unitPtr})
 			}
@@ -334,9 +367,16 @@ func CreateSUTable(ctx context.Context, contexts *vprocore.ContextService, conte
 					return err
 				}
 				qTable := vprocore.QuoteHeaderIdentifier(tableName)
-				for _, s := range seeds {
-					if _, err := tx.ExecContext(ctx, `INSERT INTO main.`+qTable+` ("PlotNumber","SiteUnit") VALUES (?,?)`, s.plot, s.unit); err != nil {
-						return err
+				if len(seeds) > 0 {
+					stmt, pErr := tx.PrepareContext(ctx, `INSERT INTO main.`+qTable+` ("PlotNumber","SiteUnit") VALUES (?,?)`)
+					if pErr != nil {
+						return pErr
+					}
+					defer stmt.Close()
+					for _, s := range seeds {
+						if _, err := stmt.ExecContext(ctx, s.plot, s.unit); err != nil {
+							return err
+						}
 					}
 				}
 				if err := vprocore.AppendTechnicalProvenance(ctx, tx, suCreationHistoryTable, suCreationHistorySQL, string(proposalBytes), "SU table creation"); err != nil {
@@ -377,11 +417,20 @@ func CreateSUTable(ctx context.Context, contexts *vprocore.ContextService, conte
 				return struct{}{}, err
 			}
 			qTable := vprocore.QuoteHeaderIdentifier(tableName)
-			for _, s := range seeds {
-				if _, err := tx.ExecContext(ctx, `INSERT INTO main.`+qTable+` ("PlotNumber","SiteUnit") VALUES (?,?)`, s.plot, s.unit); err != nil {
+			if len(seeds) > 0 {
+				stmt, pErr := tx.PrepareContext(ctx, `INSERT INTO main.`+qTable+` ("PlotNumber","SiteUnit") VALUES (?,?)`)
+				if pErr != nil {
 					_ = tx.Rollback()
-					return struct{}{}, err
+					return struct{}{}, pErr
 				}
+				for _, s := range seeds {
+					if _, err := stmt.ExecContext(ctx, s.plot, s.unit); err != nil {
+						_ = stmt.Close()
+						_ = tx.Rollback()
+						return struct{}{}, err
+					}
+				}
+				_ = stmt.Close()
 			}
 			if err := vprocore.AppendTechnicalProvenance(ctx, tx, suCreationHistoryTable, suCreationHistorySQL, string(proposalBytes), "SU file creation"); err != nil {
 				_ = tx.Rollback()
@@ -672,36 +721,60 @@ func GetSUPlotTree(ctx context.Context, contexts *vprocore.ContextService, conte
 		}()
 
 		project := owner.Selection.Project
+		adminUserUnits := map[string]string{}
+		adminRows, err := tx.QueryContext(ctx,
+			`SELECT CAST("Plot" AS BLOB), COALESCE(CAST("UserSiteUnit" AS TEXT), '')
+			 FROM "project".`+vprocore.QuoteHeaderIdentifier(project+"_Admin")+`
+			 WHERE typeof("Plot")='text'`)
+		if err != nil {
+			return nil, err
+		}
+		for adminRows.Next() {
+			var rawPlot []byte
+			var userUnit string
+			if err := adminRows.Scan(&rawPlot, &userUnit); err != nil {
+				adminRows.Close()
+				return nil, err
+			}
+			key := string(rawPlot)
+			if _, exists := adminUserUnits[key]; !exists {
+				adminUserUnits[key] = userUnit
+			}
+		}
+		if err := errors.Join(adminRows.Err(), adminRows.Close()); err != nil {
+			return nil, err
+		}
+
 		envMap := map[string]SUPlotLeaf{}
 		envOrder := []string{}
 
 		envRows, err := tx.QueryContext(ctx,
-			`SELECT CAST(env."PlotNumber" AS TEXT),
+			`SELECT typeof(env."PlotNumber"),
+			        CAST(env."PlotNumber" AS BLOB),
+			        CAST(env."PlotNumber" AS TEXT),
 			        COALESCE(CAST(env."FieldNumber" AS TEXT), ''),
 			        COALESCE(CAST(env."Zone" AS TEXT), ''),
 			        COALESCE(CAST(env."SubZone" AS TEXT), ''),
 			        COALESCE(CAST(env."SiteSeries" AS TEXT), ''),
-			        COALESCE(CAST(admin."UserSiteUnit" AS TEXT), ''),
 			        COALESCE(CAST(env."MoistureRegime" AS TEXT), ''),
 			        COALESCE(CAST(env."NutrientRegime" AS TEXT), ''),
 			        env."Elevation",
 			        COALESCE(CAST(env."Flag" AS INTEGER), 0)
 			 FROM "project".`+vprocore.QuoteHeaderIdentifier(project+"_Env")+` AS env
-			 LEFT JOIN "project".`+vprocore.QuoteHeaderIdentifier(project+"_Admin")+` AS admin
-			   ON typeof(env."PlotNumber")='text' AND typeof(admin."Plot")='text'
-			  AND CAST(env."PlotNumber" AS BLOB)=CAST(admin."Plot" AS BLOB)
 			 WHERE env."PlotNumber" IS NOT NULL
 			 ORDER BY env."PlotNumber" COLLATE NOCASE ASC, env.rowid ASC`)
 		if err != nil {
 			return nil, err
 		}
 		for envRows.Next() {
+			var plotType string
+			var rawPlot []byte
 			var leaf SUPlotLeaf
 			var elev sql.NullInt64
 			var flagInt int64
 			if err := envRows.Scan(
-				&leaf.PlotNumber, &leaf.FieldNumber, &leaf.Zone, &leaf.SubZone, &leaf.SiteSeries,
-				&leaf.UserSiteUnit, &leaf.MoistureRegime, &leaf.NutrientRegime, &elev, &flagInt,
+				&plotType, &rawPlot, &leaf.PlotNumber, &leaf.FieldNumber, &leaf.Zone, &leaf.SubZone, &leaf.SiteSeries,
+				&leaf.MoistureRegime, &leaf.NutrientRegime, &elev, &flagInt,
 			); err != nil {
 				envRows.Close()
 				return nil, err
@@ -712,10 +785,16 @@ func GetSUPlotTree(ctx context.Context, contexts *vprocore.ContextService, conte
 			}
 			leaf.InProjectEnv = true
 			leaf.Locked = flagInt != 0
-			if _, exists := envMap[leaf.PlotNumber]; !exists {
-				envOrder = append(envOrder, leaf.PlotNumber)
+			typedKey := plotType + ":" + leaf.PlotNumber
+			if plotType == "text" {
+				rawKey := string(rawPlot)
+				typedKey = "text:" + rawKey
+				leaf.UserSiteUnit = adminUserUnits[rawKey]
 			}
-			envMap[leaf.PlotNumber] = leaf
+			if _, exists := envMap[typedKey]; !exists {
+				envOrder = append(envOrder, typedKey)
+			}
+			envMap[typedKey] = leaf
 		}
 		if err := errors.Join(envRows.Err(), envRows.Close()); err != nil {
 			return nil, err
@@ -781,7 +860,7 @@ func GetSUPlotTree(ctx context.Context, contexts *vprocore.ContextService, conte
 		} else {
 			suTable := owner.Selection.SU + "_SU"
 			suRows, sErr := tx.QueryContext(ctx,
-				`SELECT CAST("PlotNumber" AS TEXT), CAST("SiteUnit" AS TEXT)
+				`SELECT typeof("PlotNumber"), CAST("PlotNumber" AS BLOB), CAST("PlotNumber" AS TEXT), CAST("SiteUnit" AS TEXT)
 				 FROM "su".`+vprocore.QuoteHeaderIdentifier(suTable)+` ORDER BY rowid ASC`)
 			if sErr != nil {
 				return nil, sErr
@@ -790,21 +869,36 @@ func GetSUPlotTree(ctx context.Context, contexts *vprocore.ContextService, conte
 			bucketMap := map[string]*SUUnitBucket{}
 
 			for suRows.Next() {
+				var plotType string
+				var rawPlot []byte
 				var p, u sql.NullString
-				if err := suRows.Scan(&p, &u); err != nil {
+				if err := suRows.Scan(&plotType, &rawPlot, &p, &u); err != nil {
 					suRows.Close()
 					return nil, err
 				}
-				if !p.Valid || strings.TrimSpace(p.String) == "" {
+				if plotType == "null" || !p.Valid || strings.TrimSpace(p.String) == "" {
 					continue
 				}
 				plotNum := p.String
-				seenSUPlot[plotNum] = true
 				unitCode := ""
 				if u.Valid {
 					unitCode = strings.TrimSpace(u.String)
 				}
-				baseLeaf, inEnv := envMap[plotNum]
+				if plotType != "text" {
+					orphan := SUPlotLeaf{
+						PlotNumber:   plotNum,
+						SiteUnit:     unitCode,
+						PresentInSU:  true,
+						InProjectEnv: false,
+					}
+					if matchesFilter(orphan, unitNames[unitCode].longName) {
+						tree.OrphanPlots = append(tree.OrphanPlots, orphan)
+					}
+					continue
+				}
+				typedKey := "text:" + string(rawPlot)
+				seenSUPlot[typedKey] = true
+				baseLeaf, inEnv := envMap[typedKey]
 				if !inEnv {
 					orphan := SUPlotLeaf{
 						PlotNumber:   plotNum,
@@ -955,9 +1049,9 @@ func GetPlotInspectorSummary(ctx context.Context, contexts *vprocore.ContextServ
 			        env."Longitude"
 			 FROM "project".`+vprocore.QuoteHeaderIdentifier(project+"_Env")+` AS env
 			 LEFT JOIN "project".`+vprocore.QuoteHeaderIdentifier(project+"_Admin")+` AS admin
-			   ON typeof(admin."Plot")='text' AND CAST(admin."Plot" AS BLOB)=CAST(env."PlotNumber" AS BLOB)
-			 WHERE typeof(env."PlotNumber")='text' AND CAST(env."PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
-			plotNumber,
+			   ON admin."Plot" = env."PlotNumber" AND typeof(admin."Plot")='text' AND CAST(admin."Plot" AS BLOB)=CAST(env."PlotNumber" AS BLOB)
+			 WHERE env."PlotNumber" = ? AND typeof(env."PlotNumber")='text' AND CAST(env."PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
+			plotNumber, plotNumber,
 		).Scan(
 			&summary.PlotNumber, &summary.FieldNumber, &summary.ProjectID,
 			&summary.Zone, &summary.SubZone, &summary.SiteSeries,
@@ -995,8 +1089,8 @@ func GetPlotInspectorSummary(ctx context.Context, contexts *vprocore.ContextServ
 			var suUnit sql.NullString
 			suErr := tx.QueryRowContext(ctx,
 				`SELECT CAST("SiteUnit" AS TEXT) FROM "su".`+vprocore.QuoteHeaderIdentifier(owner.Selection.SU+"_SU")+
-					` WHERE typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
-				plotNumber,
+					` WHERE "PlotNumber" = ? AND typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
+				plotNumber, plotNumber,
 			).Scan(&suUnit)
 			if suErr == nil && suUnit.Valid {
 				summary.CurrentSUUnit = suUnit.String
@@ -1011,8 +1105,8 @@ func GetPlotInspectorSummary(ctx context.Context, contexts *vprocore.ContextServ
 			        COALESCE(v."Cover6", 0),
 			        COALESCE(v."Cover7", 0)+COALESCE(v."Cover8", 0)+COALESCE(v."Cover9", 0)+COALESCE(v."Cover10", 0)
 			 FROM "project".`+vprocore.QuoteHeaderIdentifier(project+"_Veg")+` AS v
-			 WHERE typeof(v."PlotNumber")='text' AND CAST(v."PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
-			plotNumber,
+			 WHERE v."PlotNumber" = ? AND typeof(v."PlotNumber")='text' AND CAST(v."PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
+			plotNumber, plotNumber,
 		)
 		if err != nil {
 			return nil, err
@@ -1403,8 +1497,8 @@ func AssignPlotsToSiteUnit(ctx context.Context, contexts *vprocore.ContextServic
 				var existing sql.NullString
 				qErr := tx.QueryRowContext(ctx,
 					`SELECT rowid, CAST("SiteUnit" AS TEXT) FROM main.`+qTable+
-						` WHERE typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
-					plotNum,
+						` WHERE "PlotNumber" = ? AND typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
+					plotNum, plotNum,
 				).Scan(&rowID, &existing)
 
 				existedBefore := qErr == nil
@@ -1588,16 +1682,16 @@ func UndoSUAssignment(ctx context.Context, contexts *vprocore.ContextService, co
 				d := receipt.Deltas[i]
 				if !d.ExistedBefore {
 					if _, err := tx.ExecContext(ctx,
-						`DELETE FROM main.`+qTable+` WHERE typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
-						d.PlotNumber,
+						`DELETE FROM main.`+qTable+` WHERE "PlotNumber" = ? AND typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
+						d.PlotNumber, d.PlotNumber,
 					); err != nil {
 						return err
 					}
 				} else {
 					var existingRowID int64
 					rErr := tx.QueryRowContext(ctx,
-						`SELECT rowid FROM main.`+qTable+` WHERE typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
-						d.PlotNumber,
+						`SELECT rowid FROM main.`+qTable+` WHERE "PlotNumber" = ? AND typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`,
+						d.PlotNumber, d.PlotNumber,
 					).Scan(&existingRowID)
 					if errors.Is(rErr, sql.ErrNoRows) {
 						if _, err := tx.ExecContext(ctx, `INSERT INTO main.`+qTable+` ("PlotNumber","SiteUnit") VALUES (?,?)`, d.PlotNumber, d.BeforeSiteUnit); err != nil {
