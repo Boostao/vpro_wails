@@ -175,6 +175,115 @@ def sha256(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+WINDOWS_SYSTEM_DLLS = frozenset({
+    "advapi32.dll", "bcrypt.dll", "bcryptprimitives.dll", "cfgmgr32.dll",
+    "comctl32.dll", "comdlg32.dll", "crypt32.dll", "d2d1.dll", "d3d11.dll",
+    "dbghelp.dll", "dnsapi.dll", "dwmapi.dll", "dwrite.dll", "dxgi.dll",
+    "gdi32.dll", "gdiplus.dll", "imm32.dll", "iphlpapi.dll", "kernel32.dll",
+    "kernelbase.dll", "msimg32.dll", "msvcrt.dll", "ncrypt.dll", "netapi32.dll",
+    "ntdll.dll", "ole32.dll", "oleaut32.dll", "opengl32.dll", "powrprof.dll",
+    "profapi.dll", "psapi.dll", "rpcrt4.dll", "rstrtmgr.dll", "secur32.dll",
+    "setupapi.dll", "shcore.dll", "shell32.dll", "shlwapi.dll", "ucrtbase.dll",
+    "user32.dll", "userenv.dll", "uxtheme.dll", "version.dll", "winhttp.dll",
+    "wininet.dll", "winmm.dll", "winspool.drv", "ws2_32.dll", "wsock32.dll",
+    "wtsapi32.dll",
+})
+
+
+def is_windows_system_dll(name):
+    lower = name.lower()
+    if lower in WINDOWS_SYSTEM_DLLS:
+        return True
+    return lower.startswith(("api-ms-win-", "ext-ms-win-")) and lower.endswith(".dll")
+
+
+def pe_imports(data, offset=None):
+    if offset is None:
+        require(data[:2] == b"MZ" and len(data) >= 64, "Invalid PE executable")
+        offset = struct.unpack_from("<I", data, 60)[0]
+    require(offset + 26 <= len(data) and data[offset:offset + 4] == b"PE\0\0",
+            "Missing PE header")
+    require(struct.unpack_from("<H", data, offset + 24)[0] == 0x20B,
+            "Expected PE32+ application")
+    num_sections, = struct.unpack_from("<H", data, offset + 6)
+    opt_size, = struct.unpack_from("<H", data, offset + 20)
+    opt_offset = offset + 24
+    sec_offset = opt_offset + opt_size
+    require(sec_offset + num_sections * 40 <= len(data), "Truncated PE section table")
+    if opt_size == 0 and num_sections == 0:
+        return []
+    require(opt_size >= 112, "Truncated PE32+ optional header")
+    num_rva_and_sizes, = struct.unpack_from("<I", data, opt_offset + 108)
+    require(num_rva_and_sizes <= (opt_size - 112) // 8,
+            "Truncated PE32+ data directories")
+    sections = []
+    for index in range(num_sections):
+        vsize, vrva, rsize, roff = struct.unpack_from("<IIII", data, sec_offset + index * 40 + 8)
+        require(rsize == 0 or roff + rsize <= len(data), "Truncated PE section data")
+        sections.append((vsize, vrva, rsize, roff))
+
+    def rva_to_offset(rva):
+        for vsize, vrva, rsize, roff in sections:
+            span = max(vsize, rsize)
+            if vrva <= rva < vrva + span:
+                delta = rva - vrva
+                require(delta < rsize, f"PE RVA {rva:#x} points outside raw section data")
+                return roff + delta
+        raise ValueError(f"Unmapped PE RVA: {rva:#x}")
+
+    def read_dll_name(rva):
+        pos = rva_to_offset(rva)
+        end = data.find(b"\x00", pos)
+        require(end != -1 and 0 < end - pos <= 256, "Malformed PE import DLL name")
+        try:
+            name = data[pos:end].decode("ascii")
+        except UnicodeDecodeError as exc:
+            raise ValueError("Non-ASCII PE import DLL name") from exc
+        require(all(32 < ord(ch) < 127 for ch in name),
+                "Control or whitespace character in PE import DLL name")
+        return name
+
+    dlls = []
+    if num_rva_and_sizes > 1:
+        imp_rva, imp_size = struct.unpack_from("<II", data, opt_offset + 112 + 8)
+        if imp_rva != 0 or imp_size != 0:
+            require(imp_rva != 0 and imp_size >= 20, "Malformed PE import directory")
+            pos = rva_to_offset(imp_rva)
+            while True:
+                require(pos + 20 <= len(data), "Truncated PE import descriptor table")
+                descriptor = struct.unpack_from("<IIIII", data, pos)
+                if descriptor == (0, 0, 0, 0, 0):
+                    break
+                name_rva = descriptor[3]
+                require(name_rva != 0, "PE import descriptor missing DLL name RVA")
+                dlls.append(read_dll_name(name_rva))
+                pos += 20
+    if num_rva_and_sizes > 13:
+        delay_rva, delay_size = struct.unpack_from("<II", data, opt_offset + 112 + 13 * 8)
+        if delay_rva != 0 or delay_size != 0:
+            require(delay_rva != 0 and delay_size >= 32, "Malformed PE delay-import directory")
+            pos = rva_to_offset(delay_rva)
+            while True:
+                require(pos + 32 <= len(data), "Truncated PE delay-import descriptor table")
+                fields = struct.unpack_from("<IIIIIIII", data, pos)
+                if fields == (0,) * 8:
+                    break
+                attrs, name_rva = fields[0], fields[1]
+                require((attrs & 1) != 0 and name_rva != 0,
+                        "Invalid PE delay-import descriptor")
+                dlls.append(read_dll_name(name_rva))
+                pos += 32
+    return dlls
+
+
+def validate_pe_imports(data, offset=None):
+    dlls = pe_imports(data, offset)
+    non_system = sorted({name for name in dlls if not is_windows_system_dll(name)},
+                        key=str.lower)
+    require(not non_system,
+            f"Non-system Windows DLL dependency in PE imports: {', '.join(non_system)}")
+
+
 def cpu(data, kind, arch):
     require(arch in (*ARCHES, "universal"), f"Unsupported CPU: {arch}")
     if kind == "pe":
@@ -188,6 +297,7 @@ def cpu(data, kind, arch):
                 f"PE CPU mismatch: {machine:#x}, expected {arch}")
         require(struct.unpack_from("<H", data, offset + 24)[0] == 0x20B,
                 "Expected PE32+ application")
+        validate_pe_imports(data, offset)
     elif kind == "elf":
         require(arch in ARCHES and len(data) >= 64 and
                 data[:6] == b"\x7fELF\x02\x01", "Expected little-endian ELF64")

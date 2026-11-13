@@ -9,7 +9,7 @@ package accessreader
 #cgo darwin CFLAGS: -fvisibility=hidden -I${SRCDIR}/third_party/mdbtools/include -DHAVE_ICONV=1 -DHAVE_REALLOCF=1 -DTLS=__thread -DICONV_CONST=
 #cgo darwin LDFLAGS: -liconv -lm
 #cgo windows CFLAGS: -I${SRCDIR}/third_party/mdbtools/include -DTLS=__thread
-#cgo windows LDFLAGS: -lm
+#cgo windows LDFLAGS: -static -lm
 #include "bridge.h"
 */
 import "C"

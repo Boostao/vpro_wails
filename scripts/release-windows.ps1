@@ -30,11 +30,11 @@ if (!(Test-Path -LiteralPath $cc -PathType Leaf) -or !(Test-Path -LiteralPath $c
 $env:PATH = "$bin;$env:PATH"
 $probe = Join-Path $env:RUNNER_TEMP 'release-cgo-probe.c'
 $output = Join-Path $env:RUNNER_TEMP 'release-cgo-probe.exe'
-'int main(void) { return 0; }' | Set-Content -LiteralPath $probe -Encoding ascii
-& $cc $probe -o $output
+'static __thread int tls_probe = 1; int main(void) { return tls_probe - 1; }' | Set-Content -LiteralPath $probe -Encoding ascii
+& $cc -static $probe -o $output
 if ($LASTEXITCODE -ne 0) { throw 'Target C compiler/linker probe failed' }
 python scripts/release.py cpu $output --format pe --arch $env:RELEASE_ARCH
-if ($LASTEXITCODE -ne 0) { throw 'C compiler produced the wrong architecture' }
+if ($LASTEXITCODE -ne 0) { throw 'C compiler produced the wrong architecture or leaked non-system DLL imports' }
 
 $bin >> $env:GITHUB_PATH
 "CC=$cc" >> $env:GITHUB_ENV

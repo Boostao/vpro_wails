@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import plistlib
+import re
 import shutil
 import struct
 import subprocess
@@ -31,13 +32,59 @@ EXPECTED = (
 )
 
 
-def pe(arch):
-    data = bytearray(256)
+def pe(arch, imports=("KERNEL32.dll", "api-ms-win-crt-runtime-l1-1-0.dll"), delay_imports=()):
+    pe_offset = 128
+    opt_offset = pe_offset + 24
+    opt_size = 240
+    sec_offset = opt_offset + opt_size
+    rdata_rva = 0x1000
+    rdata_raw = 512
+
+    section_payload = bytearray()
+    imp_rva = imp_size = 0
+    if imports:
+        imp_rva = rdata_rva + len(section_payload)
+        imp_size = (len(imports) + 1) * 20
+        desc_start = len(section_payload)
+        section_payload.extend(b"\x00" * imp_size)
+        for index, dll in enumerate(imports):
+            name_rva = rdata_rva + len(section_payload)
+            section_payload.extend(dll.encode("ascii") + b"\x00")
+            struct.pack_into("<IIIII", section_payload, desc_start + index * 20,
+                             0, 0, 0, name_rva, 0)
+
+    delay_rva = delay_size = 0
+    if delay_imports:
+        if len(section_payload) % 4:
+            section_payload.extend(b"\x00" * (4 - len(section_payload) % 4))
+        delay_rva = rdata_rva + len(section_payload)
+        delay_size = (len(delay_imports) + 1) * 32
+        desc_start = len(section_payload)
+        section_payload.extend(b"\x00" * delay_size)
+        for index, dll in enumerate(delay_imports):
+            name_rva = rdata_rva + len(section_payload)
+            section_payload.extend(dll.encode("ascii") + b"\x00")
+            struct.pack_into("<IIIIIIII", section_payload, desc_start + index * 32,
+                             1, name_rva, 0, 0, 0, 0, 0, 0)
+
+    raw_size = max(64, ((len(section_payload) + 15) // 16) * 16)
+    section_payload.extend(b"\x00" * (raw_size - len(section_payload)))
+
+    data = bytearray(rdata_raw + len(section_payload))
     data[:2] = b"MZ"
-    struct.pack_into("<I", data, 60, 128)
-    data[128:132] = b"PE\0\0"
-    struct.pack_into("<H", data, 132, 0x8664 if arch == "amd64" else 0xAA64)
-    struct.pack_into("<H", data, 152, 0x20B)
+    struct.pack_into("<I", data, 60, pe_offset)
+    data[pe_offset:pe_offset + 4] = b"PE\0\0"
+    struct.pack_into("<HH", data, pe_offset + 4,
+                     0x8664 if arch == "amd64" else 0xAA64, 1)
+    struct.pack_into("<H", data, pe_offset + 20, opt_size)
+    struct.pack_into("<H", data, opt_offset, 0x20B)
+    struct.pack_into("<I", data, opt_offset + 108, 16)
+    struct.pack_into("<II", data, opt_offset + 112 + 8, imp_rva, imp_size)
+    struct.pack_into("<II", data, opt_offset + 112 + 13 * 8, delay_rva, delay_size)
+    data[sec_offset:sec_offset + 6] = b".rdata"
+    struct.pack_into("<IIII", data, sec_offset + 8,
+                     len(section_payload), rdata_rva, raw_size, rdata_raw)
+    data[rdata_raw:rdata_raw + len(section_payload)] = section_payload
     return bytes(data)
 
 
@@ -165,7 +212,56 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn("Join-Path $bin $toolchain.cc", setup)
         self.assertIn("Join-Path $bin $toolchain.cxx", setup)
         self.assertIn("Get-FileHash $archive -Algorithm SHA256", setup)
+        self.assertIn("& $cc -static $probe -o $output", setup)
+        self.assertIn("static __thread int tls_probe", setup)
         self.assertIn("python scripts/release.py cpu $output --format pe --arch $env:RELEASE_ARCH", setup)
+
+    def test_windows_static_runtime_linkage_and_pe_import_allowlist(self):
+        access_reader = (ROOT / "internal/accessreader/reader.go").read_text(encoding="utf-8")
+        self.assertIn("#cgo windows LDFLAGS: -static -lm", access_reader)
+        win_taskfile = (ROOT / "build/windows/Taskfile.yml").read_text(encoding="utf-8")
+        self.assertEqual(win_taskfile.count("-extldflags=-static"), 2)
+        cross_docker = (ROOT / "build/docker/Dockerfile.cross").read_text(encoding="utf-8")
+        self.assertIn('-H windowsgui -extldflags=-static', cross_docker)
+
+        # Standard inbox Win32 + UCRT API-set DLLs pass on both amd64 and arm64.
+        for arch in ("amd64", "arm64"):
+            clean = pe(arch, imports=(
+                "KERNEL32.dll", "USER32.dll", "ole32.dll", "msvcrt.dll", "ucrtbase.dll",
+                "api-ms-win-crt-runtime-l1-1-0.dll", "ext-ms-win-ntuser-window-l1-1-0.dll",
+            ))
+            release.cpu(clean, "pe", arch)
+
+        # MinGW / LLVM / VC++ redistributable / third-party runtime DLLs fail closed.
+        for forbidden in (
+            "libwinpthread-1.dll", "libgcc_s_seh-1.dll", "libstdc++-6.dll",
+            "libc++.dll", "libunwind.dll", "vcruntime140.dll", "sqlite3.dll", "duckdb.dll",
+        ):
+            with self.subTest(forbidden=forbidden):
+                pattern = rf"Non-system Windows DLL.*{re.escape(forbidden)}"
+                leaked = pe("amd64", imports=("KERNEL32.dll", forbidden))
+                with self.assertRaisesRegex(ValueError, pattern):
+                    release.cpu(leaked, "pe", "amd64")
+                delayed = pe("arm64", imports=("KERNEL32.dll",), delay_imports=(forbidden,))
+                with self.assertRaisesRegex(ValueError, pattern):
+                    release.cpu(delayed, "pe", "arm64")
+
+        # Packaging rejects NSIS payload or standalone EXE leaking libwinpthread-1.dll.
+        (self.root / "bin").mkdir()
+        (self.root / "bin/VPro.exe").write_bytes(
+            pe("amd64", imports=("KERNEL32.dll", "libwinpthread-1.dll"))
+        )
+        (self.root / "bin/VPro-amd64-installer.exe").write_bytes(b"NSIS")
+        with patch.dict(os.environ, {"RELEASE_ARCH": "amd64"}):
+            with self.assertRaisesRegex(ValueError, "libwinpthread-1.dll"):
+                release.package(self.root, "windows")
+        self.assertEqual(list((self.root / "dist-artifacts").iterdir()), [])
+
+        # Corrupted / truncated import directory RVA fails closed.
+        corrupted = bytearray(pe("amd64"))
+        struct.pack_into("<II", corrupted, 128 + 24 + 112 + 8, 0x9999, 40)
+        with self.assertRaisesRegex(ValueError, "Unmapped PE RVA"):
+            release.cpu(bytes(corrupted), "pe", "amd64")
 
     def test_windows_target_goarch_reaches_dependencies_without_cross_building_cli(self):
         workflow = (ROOT / ".github/workflows/release.yml").read_text()
