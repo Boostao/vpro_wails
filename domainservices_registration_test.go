@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 )
 
 func TestMainRegistersStrictlyTwelveCohesiveDomainServices(t *testing.T) {
@@ -174,3 +176,96 @@ func TestLifecycleServiceConsolidatesStartupAndCloseHandshake(t *testing.T) {
 		t.Fatalf("ConfirmClose did not approve native quit: err=%v quitCalled=%d", err, quitCalled)
 	}
 }
+
+func TestColdBootPictureLibraryWiringAndNilPictureServiceGuards(t *testing.T) {
+	ctx := context.Background()
+
+	// 1. Nil receiver guards on *PictureService must not panic!
+	var nilPic *PictureService
+	if _, err := nilPic.GetMetadata(ctx, "cid", "00337"); err == nil {
+		t.Fatal("expected nil PictureService.GetMetadata to return error without panic")
+	}
+	if _, err := nilPic.GetImage(ctx, "cid", "00337", "{}"); err == nil {
+		t.Fatal("expected nil PictureService.GetImage to return error without panic")
+	}
+
+	// 2. Cold boot EnsureDefaultPictureLibrary + newDefaultPictureEnvLookup enables all 4 picture services out-of-the-box!
+	dataDir := t.TempDir()
+	configDir := t.TempDir()
+	preferences, err := openDesktopConfig(dataDir, configDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	projects, err := newSQLiteProjectService(dataDir, configDir, preferences)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if projects.Sqlite != nil {
+			_ = projects.Sqlite.Close()
+		}
+	})
+	plots, err := newPlotServiceWithPreferences(projects)
+	if err != nil {
+		t.Fatal(err)
+	}
+	contextSvc, err := NewContextService(projects, plots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	state, err := projects.GetState(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	defaultVPicsPath, defaultImagesDir, err := vprocorepkg.EnsureDefaultPictureLibrary(dataDir)
+	if err != nil {
+		t.Fatalf("EnsureDefaultPictureLibrary failed: %v", err)
+	}
+	emptyEnv := func(string) (string, bool) { return "", false }
+	picLookup := newDefaultPictureEnvLookup(emptyEnv, defaultVPicsPath, defaultImagesDir)
+
+	picSvc, err := NewPictureService(contextSvc, picLookup)
+	if err != nil {
+		t.Fatalf("NewPictureService failed on cold boot: %v", err)
+	}
+	picMeta, err := NewPictureMetadataService(picSvc, picLookup)
+	if err != nil {
+		t.Fatalf("NewPictureMetadataService failed on cold boot: %v", err)
+	}
+	picCreate, err := NewPictureCreationService(picSvc, picLookup)
+	if err != nil {
+		t.Fatalf("NewPictureCreationService failed on cold boot: %v", err)
+	}
+	picDelete, err := NewPictureDeletionService(picSvc, picLookup)
+	if err != nil {
+		t.Fatalf("NewPictureDeletionService failed on cold boot: %v", err)
+	}
+	picSvc.Metadata = picMeta
+	picSvc.Creation = picCreate
+	picSvc.Deletion = picDelete
+
+	review, err := picSvc.GetMetadata(ctx, state.ContextID, "00337")
+	if err != nil {
+		t.Fatalf("GetMetadata on cold-boot seeded VPics.db failed: %v", err)
+	}
+	if review == nil || len(review.Records.Columns) != 5 || len(review.Records.Rows) != 0 {
+		t.Fatalf("unexpected initial VPics metadata review: %+v", review)
+	}
+
+	// Explicit env override must take precedence over defaults.
+	overrideLookup := newDefaultPictureEnvLookup(func(key string) (string, bool) {
+		if key == "VPRO_PICTURE_READING" {
+			return "false", true
+		}
+		return "", false
+	}, defaultVPicsPath, defaultImagesDir)
+	disabledPicSvc, err := NewPictureService(contextSvc, overrideLookup)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := disabledPicSvc.GetMetadata(ctx, state.ContextID, "00337"); err == nil {
+		t.Fatal("expected explicit VPRO_PICTURE_READING=false env override to disable reading")
+	}
+}
+

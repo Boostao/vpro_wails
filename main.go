@@ -7,9 +7,37 @@ import (
 	"path/filepath"
 	"sync"
 
+	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
+
+func newDefaultPictureEnvLookup(base func(string) (string, bool), defaultVPicsPath, defaultImagesDir string) func(string) (string, bool) {
+	return func(key string) (string, bool) {
+		if base != nil {
+			if val, ok := base(key); ok {
+				return val, true
+			}
+		}
+		switch key {
+		case "VPRO_PICTURE_LIBRARY_PATH":
+			if defaultVPicsPath != "" {
+				return defaultVPicsPath, true
+			}
+		case "VPRO_PICTURE_CHILD_DIRECTORY", "VPRO_PICTURE_MANAGER_DIRECTORY":
+			if defaultImagesDir != "" {
+				return defaultImagesDir, true
+			}
+		case "VPRO_PICTURE_READING",
+			"VPRO_PICTURE_METADATA_WRITING",
+			"VPRO_PICTURE_CREATION_WRITING",
+			"VPRO_PICTURE_DELETION_WRITING",
+			"VPRO_PICTURE_DELETION_RESTORING":
+			return "true", true
+		}
+		return "", false
+	}
+}
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -318,19 +346,24 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pictures, err := NewPictureService(contextService, os.LookupEnv)
+	defaultVPicsPath, defaultImagesDir, err := vprocorepkg.EnsureDefaultPictureLibrary(dataDir)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pictureMetadata, err := NewPictureMetadataService(pictures, os.LookupEnv)
+	pictureLookup := newDefaultPictureEnvLookup(os.LookupEnv, defaultVPicsPath, defaultImagesDir)
+	pictures, err := NewPictureService(contextService, pictureLookup)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pictureCreation, err := NewPictureCreationService(pictures, os.LookupEnv)
+	pictureMetadata, err := NewPictureMetadataService(pictures, pictureLookup)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pictureDeletion, err := NewPictureDeletionService(pictures, os.LookupEnv)
+	pictureCreation, err := NewPictureCreationService(pictures, pictureLookup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pictureDeletion, err := NewPictureDeletionService(pictures, pictureLookup)
 	if err != nil {
 		log.Fatal(err)
 	}

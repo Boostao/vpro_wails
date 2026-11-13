@@ -6,12 +6,13 @@ import (
 
 import (
 	"crypto/sha256"
-
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/boostao/vpro-wails/resources"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var DatabaseFamilyFiles = resources.DatabaseFamilyFS
@@ -104,3 +105,78 @@ func installDatabaseSeed(destination string, data []byte) error {
 	}
 	return nil
 }
+
+// EnsureDefaultPictureLibrary ensures dataDir/pics/images exists and seeds dataDir/pics/VPics.db
+// (if absent) with the canonical 5-column tblVPics schema and VP08 _table_metadata tag.
+func EnsureDefaultPictureLibrary(dataDir string) (dbPath string, imagesDir string, err error) {
+	if strings.TrimSpace(dataDir) == "" {
+		return "", "", errors.New("dataDir must not be empty")
+	}
+	picsDir := filepath.Join(dataDir, "pics")
+	imagesDir = filepath.Join(picsDir, "images")
+	if err := os.MkdirAll(imagesDir, 0700); err != nil {
+		return "", "", err
+	}
+	dbPath = filepath.Join(picsDir, "VPics.db")
+	if _, statErr := os.Stat(dbPath); statErr == nil {
+		return dbPath, imagesDir, nil
+	} else if !errors.Is(statErr, os.ErrNotExist) {
+		return "", "", statErr
+	}
+
+	tmpFile, err := os.CreateTemp(picsDir, ".vpics-seed-*.db")
+	if err != nil {
+		return "", "", err
+	}
+	tmpPath := tmpFile.Name()
+	defer func() { _ = os.Remove(tmpPath) }()
+	if err := tmpFile.Chmod(0600); err != nil {
+		_ = tmpFile.Close()
+		return "", "", err
+	}
+	if err := tmpFile.Close(); err != nil {
+		return "", "", err
+	}
+
+	sqlDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(tmpPath, "rw")+"&_journal_mode=DELETE&_synchronous=FULL&_txlock=immediate")
+	if err != nil {
+		return "", "", err
+	}
+	sqlDB.SetMaxOpenConns(1)
+	tx, err := sqlDB.Begin()
+	if err != nil {
+		_ = sqlDB.Close()
+		return "", "", err
+	}
+	const vpicsDDL = `
+		CREATE TABLE "tblVPics" (
+			"ID" INTEGER,
+			"PicDir" TEXT,
+			"PicName" TEXT,
+			"PlotNumber" TEXT,
+			"PicComment" TEXT
+		);
+		CREATE TABLE "_table_metadata" (
+			"table_name" TEXT PRIMARY KEY,
+			"description" TEXT
+		);
+		INSERT INTO "_table_metadata" ("table_name", "description") VALUES ('tblVPics', 'VP08');
+	`
+	if _, err := tx.Exec(vpicsDDL); err != nil {
+		_ = tx.Rollback()
+		_ = sqlDB.Close()
+		return "", "", err
+	}
+	if err := tx.Commit(); err != nil {
+		_ = sqlDB.Close()
+		return "", "", err
+	}
+	if err := sqlDB.Close(); err != nil {
+		return "", "", err
+	}
+	if err := InstallDesktopConfig(tmpPath, dbPath); err != nil && !errors.Is(err, os.ErrExist) {
+		return "", "", err
+	}
+	return dbPath, imagesDir, nil
+}
+

@@ -141,3 +141,67 @@ func TestDatabaseFamilyPreservesCustomExistingFiles(t *testing.T) {
 		t.Fatal("custom VLists.db was unexpectedly overwritten")
 	}
 }
+
+func TestEnsureDefaultPictureLibraryCanonical5ColumnSchema(t *testing.T) {
+	dataDir := t.TempDir()
+	dbPath, imagesDir, err := EnsureDefaultPictureLibrary(dataDir)
+	if err != nil {
+		t.Fatalf("EnsureDefaultPictureLibrary failed: %v", err)
+	}
+	if dbPath != filepath.Join(dataDir, "pics", "VPics.db") || imagesDir != filepath.Join(dataDir, "pics", "images") {
+		t.Fatalf("unexpected paths dbPath=%q imagesDir=%q", dbPath, imagesDir)
+	}
+	if info, err := os.Stat(imagesDir); err != nil || !info.IsDir() {
+		t.Fatalf("expected images directory %s to exist: %v", imagesDir, err)
+	}
+
+	db, err := sqlutil.OpenReadOnly(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query(`PRAGMA table_info("tblVPics")`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+
+	var colNames []string
+	for rows.Next() {
+		var cid, notNull, pk int
+		var name, ctype string
+		var dflt sql.NullString
+		if err := rows.Scan(&cid, &name, &ctype, &notNull, &dflt, &pk); err != nil {
+			t.Fatal(err)
+		}
+		if dflt.Valid {
+			t.Fatalf("tblVPics column %s must not declare default value (%q)", name, dflt.String)
+		}
+		colNames = append(colNames, name)
+	}
+	wantCols := []string{"ID", "PicDir", "PicName", "PlotNumber", "PicComment"}
+	if strings.Join(colNames, ",") != strings.Join(wantCols, ",") {
+		t.Fatalf("tblVPics columns = %v, want exact %v", colNames, wantCols)
+	}
+
+	var vp08 string
+	if err := db.QueryRow(`SELECT description FROM "_table_metadata" WHERE table_name = 'tblVPics'`).Scan(&vp08); err != nil || vp08 != "VP08" {
+		t.Fatalf("expected _table_metadata VP08 tag on tblVPics, got %q (%v)", vp08, err)
+	}
+
+	// Second call must preserve existing VPics.db without overwriting.
+	db.Close()
+	beforeBytes, err := os.ReadFile(dbPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := EnsureDefaultPictureLibrary(dataDir); err != nil {
+		t.Fatal(err)
+	}
+	afterBytes, err := os.ReadFile(dbPath)
+	if err != nil || string(beforeBytes) != string(afterBytes) {
+		t.Fatal("EnsureDefaultPictureLibrary mutated existing VPics.db on subsequent call")
+	}
+}
+

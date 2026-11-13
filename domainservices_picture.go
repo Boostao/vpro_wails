@@ -26,6 +26,20 @@ func NewPictureService(contexts *ContextService, lookup func(string) (string, bo
 	return &PictureService{PictureService: core}, nil
 }
 
+func (s *PictureService) GetMetadata(ctx context.Context, contextID, plot string) (*PictureMetadataReview, error) {
+	if s == nil || s.PictureService == nil {
+		return nil, errors.New("picture service is unavailable")
+	}
+	return s.PictureService.GetMetadata(ctx, contextID, plot)
+}
+
+func (s *PictureService) GetImage(ctx context.Context, contextID, plot, requestJSON string) (*PictureImage, error) {
+	if s == nil || s.PictureService == nil {
+		return nil, errors.New("picture service is unavailable")
+	}
+	return s.PictureService.GetImage(ctx, contextID, plot, requestJSON)
+}
+
 func (s *PictureService) SaveMetadata(ctx context.Context, contextID, plot, requestJSON string) (*PictureMetadataWriteResult, error) {
 	if s == nil || s.PictureService == nil || s.Metadata == nil {
 		return nil, errors.New("picture metadata service is unavailable")
