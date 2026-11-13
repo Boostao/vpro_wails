@@ -116,6 +116,10 @@ type SpatialWorkbenchPayload struct {
 }
 
 func extractSpatialPlotRecords(ctx context.Context, owner *vprocore.SqliteContext, attr *PMTilesAttributor) ([]SpatialPlotRecord, int, error) {
+	return extractSpatialPlotRecordsWithOptions(ctx, owner, attr, true)
+}
+
+func extractSpatialPlotRecordsWithOptions(ctx context.Context, owner *vprocore.SqliteContext, attr *PMTilesAttributor, needEcoAndDist bool) ([]SpatialPlotRecord, int, error) {
 	rawRows, err := queryScopedSpatialPlotRows(ctx, owner)
 	if err != nil {
 		return nil, 0, err
@@ -153,7 +157,7 @@ func extractSpatialPlotRecords(ctx context.Context, owner *vprocore.SqliteContex
 		gisBGC := strings.TrimSpace(r.gisBGC)
 		eco := strings.TrimSpace(r.ecosection)
 		dist := strings.TrimSpace(r.fsRegionDistrict)
-		if (gisBGC == "" || eco == "" || dist == "") && attr != nil {
+		if (gisBGC == "" || (needEcoAndDist && (eco == "" || dist == ""))) && attr != nil {
 			if sug, sErr := attr.SuggestSpatialAttributes(lat, lon); sErr == nil && sug != nil {
 				if gisBGC == "" {
 					gisBGC = sug.GISBGC
@@ -250,7 +254,7 @@ func GetSpatialWorkbenchPayload(ctx context.Context, contexts *vprocore.ContextS
 
 	return vprocore.WithContextPlotRequest(ctx, contexts, contextID, func(plots *vprocore.PlotService) (*SpatialWorkbenchPayload, error) {
 		owner := plots.Projects.Sqlite
-		records, totalPlots, err := extractSpatialPlotRecords(ctx, owner, attr)
+		records, totalPlots, err := extractSpatialPlotRecordsWithOptions(ctx, owner, attr, true)
 		if err != nil {
 			return nil, err
 		}
@@ -977,7 +981,7 @@ func GetSpatialPlotsFlatGeobuf(ctx context.Context, contexts *vprocore.ContextSe
 
 	return vprocore.WithContextPlotRequest(ctx, contexts, contextID, func(plots *vprocore.PlotService) ([]byte, error) {
 		owner := plots.Projects.Sqlite
-		records, _, err := extractSpatialPlotRecords(ctx, owner, attr)
+		records, _, err := extractSpatialPlotRecordsWithOptions(ctx, owner, attr, false)
 		if err != nil {
 			return nil, err
 		}

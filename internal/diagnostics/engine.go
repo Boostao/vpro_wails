@@ -295,6 +295,13 @@ var (
 	cachedTaxonMap     map[string]SpeciesTaxonMeta
 	cachedUnitNamesKey supportFileStampKey
 	cachedUnitNamesMap map[string]string
+	cachedEnvCountKey  struct {
+		projectPath string
+		project     string
+		maxRowID    int64
+	}
+	cachedEnvCountVal int
+	cachedEnvCountOK  bool
 )
 
 func buildSupportStampKey(owner *vprocore.SqliteContext) (supportFileStampKey, bool) {
@@ -701,8 +708,31 @@ func computeSnapshotInReadTx(
 		}
 	}
 
+	var maxEnvRowID int64
+	_ = tx.QueryRowContext(ctx, `SELECT COALESCE(MAX(rowid), 0) FROM `+qEnvTbl).Scan(&maxEnvRowID)
 	var totalEnvCount int
-	_ = tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+qEnvTbl).Scan(&totalEnvCount)
+	if maxEnvRowID > 2000 {
+		envKey := struct {
+			projectPath string
+			project     string
+			maxRowID    int64
+		}{owner.Selection.ProjectPath, project, maxEnvRowID}
+		diagCatalogCacheMu.Lock()
+		if cachedEnvCountOK && cachedEnvCountKey == envKey {
+			totalEnvCount = cachedEnvCountVal
+			diagCatalogCacheMu.Unlock()
+		} else {
+			diagCatalogCacheMu.Unlock()
+			_ = tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+qEnvTbl).Scan(&totalEnvCount)
+			diagCatalogCacheMu.Lock()
+			cachedEnvCountKey = envKey
+			cachedEnvCountVal = totalEnvCount
+			cachedEnvCountOK = true
+			diagCatalogCacheMu.Unlock()
+		}
+	} else {
+		_ = tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+qEnvTbl).Scan(&totalEnvCount)
+	}
 
 	useScopedSUPushdown := unitSourceUsed == "su" && totalEnvCount > 2000 && len(suPlotKeys) <= 10000
 	var totalProjectPlotsOverride int
