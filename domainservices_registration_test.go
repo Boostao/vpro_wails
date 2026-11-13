@@ -269,3 +269,88 @@ func TestColdBootPictureLibraryWiringAndNilPictureServiceGuards(t *testing.T) {
 	}
 }
 
+func TestContextServiceOmitsFuncParametersAndForwardsAllVProCoreRPCs(t *testing.T) {
+	mainType := reflect.TypeOf(&ContextService{})
+	coreType := reflect.TypeOf(&vprocorepkg.ContextService{})
+
+	// 1. main.ContextService MUST NOT expose Edit or any method with reflect.Func parameters/returns!
+	if _, hasEdit := mainType.MethodByName("Edit"); hasEdit {
+		t.Fatal("main.ContextService must not expose Edit(string, func(*PlotService) error) error to Wails bindings")
+	}
+	for i := 0; i < mainType.NumMethod(); i++ {
+		m := mainType.Method(i)
+		mt := m.Type
+		for p := 1; p < mt.NumIn(); p++ {
+			if mt.In(p).Kind() == reflect.Func {
+				t.Fatalf("main.ContextService.%s parameter %d is a func (%s), which triggers Wails JSON binding warning", m.Name, p, mt.In(p))
+			}
+		}
+		for r := 0; r < mt.NumOut(); r++ {
+			if mt.Out(r).Kind() == reflect.Func {
+				t.Fatalf("main.ContextService.%s return %d is a func (%s)", m.Name, r, mt.Out(r))
+			}
+		}
+	}
+
+	// 2. Every exported method on *vprocore.ContextService EXCEPT Edit MUST exist on *main.ContextService!
+	for i := 0; i < coreType.NumMethod(); i++ {
+		cm := coreType.Method(i)
+		if cm.Name == "Edit" {
+			continue
+		}
+		mm, ok := mainType.MethodByName(cm.Name)
+		if !ok {
+			t.Fatalf("main.ContextService is missing forwarded RPC method %s from vprocore.ContextService", cm.Name)
+		}
+		if mm.Type.NumIn() != cm.Type.NumIn() || mm.Type.NumOut() != cm.Type.NumOut() {
+			t.Fatalf("main.ContextService.%s arity (%d in, %d out) differs from vprocore.ContextService.%s (%d in, %d out)",
+				cm.Name, mm.Type.NumIn(), mm.Type.NumOut(), cm.Name, cm.Type.NumIn(), cm.Type.NumOut())
+		}
+	}
+}
+
+func TestSpatialExtraDirsNoHardcodedHomePath(t *testing.T) {
+	rawMain, err := os.ReadFile("main.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(rawMain), "/home/bruno") {
+		t.Fatal("main.go must not contain hardcoded developer path /home/bruno")
+	}
+
+	existingDir := t.TempDir()
+	missingDir := filepath.Join(t.TempDir(), "does_not_exist")
+
+	dirs := resolveSpatialExtraDirs(func(key string) (string, bool) {
+		if key == "VPRO_SPATIAL_ASSETS_DIR" {
+			return existingDir, true
+		}
+		return "", false
+	})
+	found := false
+	for _, d := range dirs {
+		if d == existingDir {
+			found = true
+		}
+		if info, err := os.Stat(d); err != nil || !info.IsDir() {
+			t.Fatalf("resolveSpatialExtraDirs included non-existent directory %q: %v", d, err)
+		}
+	}
+	if !found {
+		t.Fatalf("expected existing VPRO_SPATIAL_ASSETS_DIR %q in %v", existingDir, dirs)
+	}
+
+	dirsMissing := resolveSpatialExtraDirs(func(key string) (string, bool) {
+		if key == "VPRO_SPATIAL_ASSETS_DIR" {
+			return missingDir, true
+		}
+		return "", false
+	})
+	for _, d := range dirsMissing {
+		if d == missingDir {
+			t.Fatalf("resolveSpatialExtraDirs must omit non-existent directory %q", missingDir)
+		}
+	}
+}
+
+

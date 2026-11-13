@@ -15,6 +15,62 @@ func SourceDoubleDecimalString(value float64) string {
 	return strconv.FormatFloat(value, 'g', 15, 64)
 }
 
+// FormatCalibratedDecimal formats a float64 to 15 significant decimal digits first
+// (matching ACE DOUBLE calibration) and rounds half-away-from-zero in base-10 to
+// the requested fixed decimal places (e.g. 1.005 -> "1.01", 35.855 -> "35.86" at 2 decimals).
+func FormatCalibratedDecimal(value float64, decimals int) string {
+	if math.IsNaN(value) || math.IsInf(value, 0) {
+		return strconv.FormatFloat(value, 'f', decimals, 64)
+	}
+	if decimals < 0 {
+		decimals = 0
+	}
+	literal := SourceDoubleDecimalString(value)
+	rat, ok := new(big.Rat).SetString(literal)
+	if !ok {
+		return strconv.FormatFloat(value, 'f', decimals, 64)
+	}
+	neg := rat.Sign() < 0
+	absRat := new(big.Rat).Abs(rat)
+	scale := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(decimals)), nil)
+	scaled := new(big.Rat).Mul(absRat, new(big.Rat).SetInt(scale))
+	scaled.Add(scaled, big.NewRat(1, 2))
+	roundedInt := new(big.Int).Quo(scaled.Num(), scaled.Denom())
+
+	if decimals == 0 {
+		if neg && roundedInt.Sign() > 0 {
+			return "-" + roundedInt.String()
+		}
+		return roundedInt.String()
+	}
+
+	intPart := new(big.Int)
+	fracPart := new(big.Int)
+	intPart.QuoRem(roundedInt, scale, fracPart)
+	fracStr := fracPart.String()
+	if pad := decimals - len(fracStr); pad > 0 {
+		fracStr = strings.Repeat("0", pad) + fracStr
+	}
+	signPrefix := ""
+	if neg && roundedInt.Sign() > 0 {
+		signPrefix = "-"
+	}
+	return signPrefix + intPart.String() + "." + fracStr
+}
+
+// RoundCalibratedDecimal returns the float64 parsed from FormatCalibratedDecimal(value, decimals).
+func RoundCalibratedDecimal(value float64, decimals int) float64 {
+	if math.IsNaN(value) || math.IsInf(value, 0) {
+		return value
+	}
+	formatted := FormatCalibratedDecimal(value, decimals)
+	parsed, err := strconv.ParseFloat(formatted, 64)
+	if err != nil {
+		return value
+	}
+	return parsed
+}
+
 func ProfileEnvNumberCriterion(value float64) (ProfileSQLNumber, error) {
 	literal := SourceDoubleDecimalString(value)
 	number, err := strconv.ParseFloat(literal, 64)
