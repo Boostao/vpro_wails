@@ -320,6 +320,64 @@ test('ordinary vegetation read profile bypasses numeric readers only when both r
   }
 });
 
+test('default production build (unset VITE_TWO_PAGE_* env vars) keeps both two-page vegetation review and ordinary 6-tab FS882 vegetation/NotInList/SpeciesCodeCheck enabled', async () => {
+  const root = read('FS882Form.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  function declarations(source, names) {
+    const ast = ts.createSourceFile('profile.ts', source, ts.ScriptTarget.Latest, true);
+    const selected = ast.statements.filter(node => ts.isVariableStatement(node) &&
+      node.declarationList.declarations.some(declaration => names.includes(declaration.name.getText(ast))));
+    assert.equal(selected.length, names.length);
+    return selected.map(node => node.getText(ast).replace(/^export /, '')).join('\n');
+  }
+  let profile;
+  const script = `<script lang="ts">let { inspect } = $props();
+    const vegList = [{ totalA: 25, totalB: 10, cover6: 5, cover7: 2 }];
+    ${declarations(read('twoPageVegetationSessions.ts'), ['twoPageVegetationReviewEnabled'])}
+    ${declarations(root, ['twoPageReviewEnabled', 'twoPageEntryReviewEnabled', 'ordinaryVegetationUnavailable'])}
+    const vegetationReadUnavailable = ordinaryVegetationUnavailable;
+    ${declarations(root, ['totalTreeCover', 'totalShrubCover', 'totalHerbCover', 'totalMossCover'])}
+    function inspectProfile() {
+      inspect({
+        twoPageVegetationReviewEnabled,
+        twoPageEntryReviewEnabled,
+        ordinaryVegetationUnavailable,
+        totals: [totalTreeCover, totalShrubCover, totalHerbCover, totalMossCover],
+      });
+    }
+    inspectProfile();</script>`;
+  const body = render(serverComponent(script, 'DefaultVegProfileTest.svelte', {}, {}), {
+    props: { inspect: value => { profile = value; } },
+  }).body;
+  assert.equal(typeof body, 'string');
+  assert.ok(profile);
+  assert.equal(profile.twoPageVegetationReviewEnabled, true);
+  assert.equal(profile.twoPageEntryReviewEnabled, true);
+  assert.equal(profile.ordinaryVegetationUnavailable, null);
+  assert.deepEqual(Array.from(profile.totals), [25, 10, 5, 2]);
+
+  let ordinary = 0;
+  const readPort = value => Promise.resolve(value);
+  const context = componentFunctions('FS882Form.svelte', ['loadChildData', 'openSpeciesCodeCheck'], {
+    loadRequest: 1, ordinaryVegetationUnavailable: profile.ordinaryVegetationUnavailable,
+    siviIdentityEnabled: false, siviContextId: contextId,
+    reads: { track: readPort }, childRevision: 0,
+    codeCheckEnabled: true, childParentDisabled: false, childUnsaved: false, headerValidation: {},
+    codeCheckOpen: false, error: null, successMsg: null,
+    PlotService: {
+      ListVegRecords: () => { ordinary++; return readPort([{ id: 42, species: 'PSEUMEN' }]); },
+      ListHumusRecords: () => readPort([]), ListMineralRecords: () => readPort([]), ListOtherRecords: () => readPort([]),
+      ListAuditReadEntries: () => readPort([]), GetChildCapabilities: () => readPort({}),
+    }, ContextService: { GetVegetationReadAvailability: () => { throw new Error('Unexpected fallback'); } },
+  });
+  await context.actions.loadChildData(plot);
+  assert.equal(ordinary, 1);
+  assert.equal(context.vegetationReadUnavailable, null);
+  assert.equal(context.vegList.length, 1);
+  context.actions.openSpeciesCodeCheck();
+  assert.equal(context.codeCheckOpen, true);
+  assert.equal(context.error, null);
+});
+
 test('actual root native-close and context transition barriers survive unmounted failed vegetation Save and certified absence', async () => {
   const cancellations = [], transitions = [];
   const context = componentFunctions('App.svelte', ['handleCloseRequest', 'requestTransition', 'loadPlots', 'refresh', 'loadHierarchy'], {
