@@ -1335,6 +1335,11 @@ type ApplySpatialAttributesRequest struct {
 	SyncLatLonFromUTM      bool     `json:"syncLatLonFromUtm"`
 }
 
+func (r *ApplySpatialAttributesRequest) UnmarshalJSON(data []byte) error {
+	type plain ApplySpatialAttributesRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type ApplySpatialAttributesResult struct {
 	ContextID    string `json:"contextId"`
 	Project      string `json:"project"`

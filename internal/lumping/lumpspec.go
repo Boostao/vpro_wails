@@ -34,6 +34,11 @@ type LumpSpec struct {
 	ScopeToProjectSpecies           bool           `json:"scopeToProjectSpecies"`
 }
 
+func (r *LumpSpec) UnmarshalJSON(data []byte) error {
+	type plain LumpSpec
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type LumpSpecPreview struct {
 	EffectiveSpec LumpSpec          `json:"effectiveSpec"`
 	Rows          []LumpRow         `json:"rows"`

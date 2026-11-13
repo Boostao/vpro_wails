@@ -74,6 +74,11 @@ type FlatHierarchyRow struct {
 	BreakpointRank string `json:"breakpointRank,omitempty"`
 }
 
+func (r *FlatHierarchyRow) UnmarshalJSON(data []byte) error {
+	type plain FlatHierarchyRow
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type HierarchyDiagnostics struct {
 	TotalNodes      int     `json:"totalNodes"`
 	RootNodes       int     `json:"rootNodes"`
@@ -102,6 +107,11 @@ type CreateHierarchyTableRequest struct {
 	Activate    bool   `json:"activate"`
 }
 
+func (r *CreateHierarchyTableRequest) UnmarshalJSON(data []byte) error {
+	type plain CreateHierarchyTableRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type HierarchyTableLifecycleResult struct {
 	ContextID string                 `json:"contextId"`
 	Name      string                 `json:"name"`
@@ -119,9 +129,19 @@ type HierarchyAddNodeRequest struct {
 	IsBreakpoint bool   `json:"isBreakpoint"`
 }
 
+func (r *HierarchyAddNodeRequest) UnmarshalJSON(data []byte) error {
+	type plain HierarchyAddNodeRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type HierarchyRenameNodeRequest struct {
 	NodeID  int64  `json:"nodeId"`
 	NewName string `json:"newName"`
+}
+
+func (r *HierarchyRenameNodeRequest) UnmarshalJSON(data []byte) error {
+	type plain HierarchyRenameNodeRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type HierarchyReparentNodeRequest struct {
@@ -130,9 +150,19 @@ type HierarchyReparentNodeRequest struct {
 	NewLevel    *int64 `json:"newLevel,omitempty"`
 }
 
+func (r *HierarchyReparentNodeRequest) UnmarshalJSON(data []byte) error {
+	type plain HierarchyReparentNodeRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type HierarchyDeleteNodeRequest struct {
 	NodeID          int64 `json:"nodeId"`
 	CascadeChildren bool  `json:"cascadeChildren"`
+}
+
+func (r *HierarchyDeleteNodeRequest) UnmarshalJSON(data []byte) error {
+	type plain HierarchyDeleteNodeRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type HierarchyMutationResult struct {
@@ -146,6 +176,11 @@ type HierarchyMutationResult struct {
 
 type SaveFlatHierarchyRequest struct {
 	Rows []FlatHierarchyRow `json:"rows"`
+}
+
+func (r *SaveFlatHierarchyRequest) UnmarshalJSON(data []byte) error {
+	type plain SaveFlatHierarchyRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 func levelToRankName(level int64, tag string) string {

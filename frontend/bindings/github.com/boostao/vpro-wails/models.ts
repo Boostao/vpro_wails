@@ -608,12 +608,6 @@ export type ReassignSynthesisPlotResult = diagnostics$0.ReassignSynthesisPlotRes
 
 export type RegionCodeChoice = references$0.RegionCodeChoice;
 
-export type SIVICHARSParentEntryPolicy = sivi$0.SIVICHARSParentEntryPolicy;
-
-export type SIVICHARSParentEntryReview = sivi$0.SIVICHARSParentEntryReview;
-
-export type SIVICHARSParentEntryWrite = sivi$0.SIVICHARSParentEntryWrite;
-
 export type SIVICoverWriteResult = sivi$0.SIVICoverWriteResult;
 
 export type SIVICreationResult = sivi$0.SIVICreationResult;

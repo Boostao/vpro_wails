@@ -54,6 +54,11 @@ type LumpRowInput struct {
 	AllowUnlisted bool   `json:"allowUnlisted,omitempty"`
 }
 
+func (r *LumpRowInput) UnmarshalJSON(data []byte) error {
+	type plain LumpRowInput
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type LumpGroupImpact struct {
 	LumpCode           string   `json:"lumpCode"`
 	SourceSpecies      []string `json:"sourceSpecies"`

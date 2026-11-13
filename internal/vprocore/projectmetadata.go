@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 )
 
 type ProjectMetadataColumn struct {
@@ -23,6 +25,11 @@ type ProjectMetadataCell struct {
 	Integer *string  `json:"integer"`
 	Real    *float64 `json:"real"`
 	BlobHex *string  `json:"blobHex"`
+}
+
+func (r *ProjectMetadataCell) UnmarshalJSON(data []byte) error {
+	type plain ProjectMetadataCell
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type ProjectMetadataRow struct {

@@ -50,6 +50,11 @@ type UserSpeciesExportRequest struct {
 	DestinationPath string `json:"destinationPath,omitempty"`
 }
 
+func (r *UserSpeciesExportRequest) UnmarshalJSON(data []byte) error {
+	type plain UserSpeciesExportRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type UserSpeciesExportResult struct {
 	Format        string              `json:"format"`
 	RowCount      int                 `json:"rowCount"`
@@ -72,6 +77,11 @@ type UserSpeciesImportRequest struct {
 	Format          string                     `json:"format,omitempty"` // "json" | "csv"
 	Content         string                     `json:"content,omitempty"`
 	CollisionPolicy UserSpeciesCollisionPolicy `json:"collisionPolicy"`
+}
+
+func (r *UserSpeciesImportRequest) UnmarshalJSON(data []byte) error {
+	type plain UserSpeciesImportRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type UserSpeciesImportItemReview struct {

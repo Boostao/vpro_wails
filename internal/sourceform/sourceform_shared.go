@@ -1,7 +1,5 @@
 package sourceform
 
-const SiviCHARSParentEntryHistoryTable = "__VPRO_SIVICHARSParentEntryHistory"
-
 func TwoPageEntryProjectHistoryTable(table string) bool {
 	return table == "__VPRO_TwoPageParentEntryHistory" || table == "__VPRO_TwoPageCHARSParentEntryHistory"
 }

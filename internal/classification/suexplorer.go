@@ -39,12 +39,22 @@ type CreateSUTableRequest struct {
 	Activate                bool   `json:"activate"`
 }
 
+func (r *CreateSUTableRequest) UnmarshalJSON(data []byte) error {
+	type plain CreateSUTableRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type SaveSUTableAsRequest struct {
 	SourceSU    string `json:"sourceSu"` // defaults to active SU when empty
 	NewName     string `json:"newName"`
 	Destination string `json:"destination"` // "project" (default) | "new_file"
 	FilePath    string `json:"filePath"`
 	Activate    bool   `json:"activate"`
+}
+
+func (r *SaveSUTableAsRequest) UnmarshalJSON(data []byte) error {
+	type plain SaveSUTableAsRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type SUTableLifecycleResult struct {
@@ -136,6 +146,11 @@ type BECUnitPickerRequest struct {
 	Limit   int    `json:"limit"`
 }
 
+func (r *BECUnitPickerRequest) UnmarshalJSON(data []byte) error {
+	type plain BECUnitPickerRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type BECUnitPickerChoice struct {
 	SiteSeries     string `json:"siteSeries"`
 	LongName       string `json:"longName"`
@@ -152,6 +167,11 @@ type AssignPlotsToSiteUnitRequest struct {
 	PlotNumbers                []string `json:"plotNumbers"`
 	TargetSiteUnit             *string  `json:"targetSiteUnit"` // nil or "" means Unassigned
 	RemoveFromSUWhenUnassigned bool     `json:"removeFromSuWhenUnassigned"`
+}
+
+func (r *AssignPlotsToSiteUnitRequest) UnmarshalJSON(data []byte) error {
+	type plain AssignPlotsToSiteUnitRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type suPlotAssignmentDelta struct {

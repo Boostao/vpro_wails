@@ -137,6 +137,11 @@ type ClimateEdatopicRequest struct {
 	ForceOfflineModel bool     `json:"forceOfflineModel"`
 }
 
+func (r *ClimateEdatopicRequest) UnmarshalJSON(data []byte) error {
+	type plain ClimateEdatopicRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 // ClimateEdatopicResult returns cached/newly-computed plot climate rows and side-by-side Relative vs Actual edatopic grids.
 type ClimateEdatopicResult struct {
 	ContextID          string                    `json:"contextId"`

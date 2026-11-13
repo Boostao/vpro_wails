@@ -215,6 +215,11 @@ type GeoPackageExportRequest struct {
 	LumpDBPath             string `json:"lumpDbPath,omitempty"`
 }
 
+func (r *GeoPackageExportRequest) UnmarshalJSON(data []byte) error {
+	type plain GeoPackageExportRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type GeoPackageExportOutcome struct {
 	Path                     string   `json:"path"`
 	SHA256                   string   `json:"sha256"`

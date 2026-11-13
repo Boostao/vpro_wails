@@ -120,7 +120,12 @@ func (h *FS882Header) UnmarshalJSON(data []byte) error {
 	if err := sqlutil.ValidateJSONTextProperties(data, names); err != nil {
 		return err
 	}
-	return json.Unmarshal(data, (*headerAlias)(h))
+	decoded := sqlutil.CloneForStaging(headerAlias(*h))
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		return err
+	}
+	*h = FS882Header(decoded)
+	return nil
 }
 
 // The standard decoder retains its type/syntax errors.

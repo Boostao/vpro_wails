@@ -96,7 +96,6 @@ declare module "@wailsio/runtime" {
             "vpro:model:ProjectMetadataReview": main$0.ProjectMetadataReview;
             "vpro:model:ProjectPlotProfileRuleDraft": main$0.ProjectPlotProfileRuleDraft;
             "vpro:model:ProjectPlotProfileStep": main$0.ProjectPlotProfileStep;
-            "vpro:model:SIVICHARSParentEntryPolicy": main$0.SIVICHARSParentEntryPolicy;
             "vpro:model:SIVIParentActionInput": main$0.SIVIParentActionInput;
             "vpro:model:SIVIParentBinding": main$0.SIVIParentBinding;
             "vpro:model:SIVIParentCellEdit": main$0.SIVIParentCellEdit;

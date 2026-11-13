@@ -182,6 +182,11 @@ type TurboVegExportRequest struct {
 	LumpDBPath      string `json:"lumpDbPath,omitempty"`
 }
 
+func (r *TurboVegExportRequest) UnmarshalJSON(data []byte) error {
+	type plain TurboVegExportRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type TurboVegExportOutcome struct {
 	Format           string `json:"format"`
 	Path             string `json:"path"`
@@ -197,6 +202,11 @@ type TurboVegImportRequest struct {
 	TargetProject     string `json:"targetProject"`
 	DestinationPath   string `json:"destinationPath,omitempty"`
 	ActivateOnSuccess bool   `json:"activateOnSuccess"`
+}
+
+func (r *TurboVegImportRequest) UnmarshalJSON(data []byte) error {
+	type plain TurboVegImportRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type TurboVegImportOutcome struct {

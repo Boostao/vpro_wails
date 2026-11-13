@@ -1,6 +1,7 @@
 package sourceform
 
 import (
+	"github.com/boostao/vpro-wails/internal/fs882layout"
 	"github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
@@ -9,7 +10,9 @@ import (
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -290,4 +293,78 @@ func TestSIVIParentOwnedRejectsPhysicalViewWithoutWrites(t *testing.T) {
 		t.Fatal("view impersonated the original physical parent", got, err)
 	}
 	vprotest.AssertProfileSUFiles(t, service, before)
+}
+
+func TestSourceSIVIParentBindingsRejectsMalformedCatalogue(t *testing.T) {
+	for _, kind := range []string{"duplicate-binding", "missing-control", "writable", "mapped", "implicit-direct", "count"} {
+		t.Run(kind, func(t *testing.T) {
+			layout, err := SiviParentSourceLayout()
+			if err != nil {
+				t.Fatal(err)
+			}
+			fields := []fs882layout.Field{}
+			for _, field := range layout.Forms[0].Fields {
+				if field.Binding != "" {
+					fields = append(fields, field)
+				}
+			}
+			switch kind {
+			case "duplicate-binding":
+				fields[1].Binding = strings.ToUpper(fields[0].Binding)
+			case "missing-control":
+				fields[0].ControlID = ""
+			case "writable":
+				fields[0].ReadOnly = false
+			case "mapped":
+				fields[0].Implementation = "implemented"
+			case "implicit-direct":
+				fields[0].Binding = "SpeciesListComplete"
+			case "count":
+				fields = fields[1:]
+			}
+			if got, err := SourceSIVIParentBindings(fields, 77); err == nil || got != nil {
+				t.Fatal("invalid source catalogue returned success", got, err)
+			}
+		})
+	}
+}
+
+func TestSourceParentProjectionStorageEqualityMatchesExactRealBits(t *testing.T) {
+	env, admin := vprotest.SiviParentTables(t)
+	posZero := 0.0
+	negZero := math.Copysign(0.0, -1.0)
+	for i, col := range env.Columns {
+		if col.Name == "SlopeGradient" {
+			env.Rows[0].Cells[i] = vprotest.SiviReal(posZero)
+		}
+	}
+	original, err := ProjectSIVIParent(context.Background(), "owned", "Sample", "108050", env, admin)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := json.Marshal(original)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cloned SiviParentProjection
+	if err := json.Unmarshal(data, &cloned); err != nil {
+		t.Fatal(err)
+	}
+	if !SourceParentProjectionStorageEqual(original, &cloned) || !SourceParentProjectionStorageEqual(nil, nil) {
+		t.Fatal("equal sources were rejected")
+	}
+	for i, col := range cloned.EnvColumns {
+		if col.Name == "SlopeGradient" {
+			cloned.Rows[0].Env.Cells[i] = vprotest.SiviReal(negZero)
+		}
+	}
+	if SourceParentProjectionStorageEqual(original, &cloned) {
+		t.Fatal("signed-zero bit difference compared equal")
+	}
+	cloned = *original
+	cloned.Rows = append([]SiviParentRow{}, original.Rows...)
+	cloned.Rows[0].Env.RowID = "different"
+	if SourceParentProjectionStorageEqual(original, &cloned) || SourceParentProjectionStorageEqual(original, nil) {
+		t.Fatal("different source owner compared equal")
+	}
 }

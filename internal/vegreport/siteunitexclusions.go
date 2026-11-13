@@ -27,6 +27,11 @@ type SiteUnitExclusionRule struct {
 	Enabled   bool   `json:"enabled"`
 }
 
+func (r *SiteUnitExclusionRule) UnmarshalJSON(data []byte) error {
+	type plain SiteUnitExclusionRule
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type ExcludedSiteUnitInfo struct {
 	SiteUnit       string `json:"siteUnit"`
 	MatchedPattern string `json:"matchedPattern"`
@@ -51,6 +56,11 @@ type HierarchyBreakpointOptions struct {
 	BreakpointPolicy   string `json:"breakpointPolicy"`   // "lowest" (default) | "highest"
 	UnbrokenUnitPolicy string `json:"unbrokenUnitPolicy"` // "keep_original" (default) | "exclude_unbroken"
 	StripTildePrefix   bool   `json:"stripTildePrefix"`
+}
+
+func (r *HierarchyBreakpointOptions) UnmarshalJSON(data []byte) error {
+	type plain HierarchyBreakpointOptions
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type HierarchyBreakpointUnitMapping struct {
@@ -88,11 +98,21 @@ type HierarchyBreakpointRequest struct {
 	Options           HierarchyBreakpointOptions `json:"options"`
 }
 
+func (r *HierarchyBreakpointRequest) UnmarshalJSON(data []byte) error {
+	type plain HierarchyBreakpointRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type SiteUnitExclusionPreviewRequest struct {
 	Rules                   []SiteUnitExclusionRule    `json:"rules"`
 	UseDefaultPresets       bool                       `json:"useDefaultPresets"`
 	UseHierarchyBreakpoints bool                       `json:"useHierarchyBreakpoints"`
 	BreakpointOptions       HierarchyBreakpointOptions `json:"breakpointOptions"`
+}
+
+func (r *SiteUnitExclusionPreviewRequest) UnmarshalJSON(data []byte) error {
+	type plain SiteUnitExclusionPreviewRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type SiteUnitExclusionPreview struct {
@@ -116,6 +136,11 @@ type SummaryVegetationExclusionRequest struct {
 	References              *SummaryVegetationReferenceOptions `json:"references,omitempty"`
 }
 
+func (r *SummaryVegetationExclusionRequest) UnmarshalJSON(data []byte) error {
+	type plain SummaryVegetationExclusionRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type SummaryVegetationExclusionPreview struct {
 	Preview     SummaryVegetationPreview       `json:"preview"`
 	Exclusions  SiteUnitExclusionSummary       `json:"exclusions"`
@@ -127,6 +152,11 @@ type LongVegetationExclusionRequest struct {
 	UseDefaultPresets       bool                       `json:"useDefaultPresets"`
 	UseHierarchyBreakpoints bool                       `json:"useHierarchyBreakpoints"`
 	BreakpointOptions       HierarchyBreakpointOptions `json:"breakpointOptions"`
+}
+
+func (r *LongVegetationExclusionRequest) UnmarshalJSON(data []byte) error {
+	type plain LongVegetationExclusionRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type LongVegetationExclusionPreview struct {

@@ -141,8 +141,7 @@ func RestoreSourceParentHistoryCompared(s *vprocore.ContextService, ctx context.
 				return err
 			}
 			project := owner.Selection.Project
-			if event.EntryPlan != nil && !TwoPageEntryProjectHistoryTable(historyDomain.Table) &&
-				historyDomain.Table != SiviCHARSParentEntryHistoryTable {
+			if event.EntryPlan != nil && !TwoPageEntryProjectHistoryTable(historyDomain.Table) {
 				return errors.New("complete-entry source plans belong only to their exact entry history")
 			}
 			if historyDomain.Table != siviProjectAssignmentHistoryTable && !TwoPageEntryProjectHistoryTable(historyDomain.Table) && event.ProjectAssignment != nil {

@@ -47,6 +47,11 @@ type CreateSIVIPlotRequest struct {
 	AddToActiveSU   bool   `json:"addToActiveSu,omitempty"`
 }
 
+func (r *CreateSIVIPlotRequest) UnmarshalJSON(data []byte) error {
+	type plain CreateSIVIPlotRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type CreateSIVIPlotResult struct {
 	RequestID     string `json:"requestId"`
 	ContextID     string `json:"contextId"`
@@ -64,6 +69,11 @@ type UndoCreateSIVIPlotRequest struct {
 	RequestID         string `json:"requestId,omitempty"`
 	CreationRequestID string `json:"creationRequestId"`
 	PlotNumber        string `json:"plotNumber"`
+}
+
+func (r *UndoCreateSIVIPlotRequest) UnmarshalJSON(data []byte) error {
+	type plain UndoCreateSIVIPlotRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type UndoCreateSIVIPlotResult struct {
@@ -91,13 +101,18 @@ type SIVICreatedPlotEntry struct {
 	CanUndo         bool   `json:"canUndo"`
 }
 
+// siviStoredCreatePlotRequest decouples SQLite __VPRO_SIVICreationPlotHistory readers from
+// CreateSIVIPlotRequest's strict Wails IPC DisallowUnknownFields guard so historical/forward
+// provenance snapshots decode without losing AddedToSU or SUTable metadata.
+type siviStoredCreatePlotRequest CreateSIVIPlotRequest
+
 type siviPlotCreationProposal struct {
-	Request   CreateSIVIPlotRequest `json:"request"`
-	Project   string                `json:"project"`
-	Actor     string                `json:"actor"`
-	CreatedAt string                `json:"createdAt"`
-	AddedToSU bool                  `json:"addedToSu"`
-	SUTable   string                `json:"suTable,omitempty"`
+	Request   siviStoredCreatePlotRequest `json:"request"`
+	Project   string                      `json:"project"`
+	Actor     string                      `json:"actor"`
+	CreatedAt string                      `json:"createdAt"`
+	AddedToSU bool                        `json:"addedToSu"`
+	SUTable   string                      `json:"suTable,omitempty"`
 }
 
 func newSIVIPlotUUIDv4() (string, error) {
@@ -235,7 +250,9 @@ func CreateSIVIPlot(s *vprocore.ContextService, ctx context.Context, contextID s
 					return errors.New("requestId already belongs to a different SIVI plot creation")
 				}
 				var prop siviPlotCreationProposal
-				_ = json.Unmarshal([]byte(existingProposal), &prop)
+				if err := json.Unmarshal([]byte(existingProposal), &prop); err != nil {
+					return fmt.Errorf("decode SIVI plot creation proposal for %s: %w", requestID, err)
+				}
 				out = CreateSIVIPlotResult{
 					RequestID:     requestID,
 					ContextID:     contextID,
@@ -373,7 +390,7 @@ func CreateSIVIPlot(s *vprocore.ContextService, ctx context.Context, contextID s
 			reqCopy.PlotType = plotType
 			reqCopy.ProjectID = effectivePID
 			propBytes, err := json.Marshal(siviPlotCreationProposal{
-				Request:   reqCopy,
+				Request:   siviStoredCreatePlotRequest(reqCopy),
 				Project:   project,
 				Actor:     actor,
 				CreatedAt: now,
@@ -494,7 +511,9 @@ func UndoCreateSIVIPlot(s *vprocore.ContextService, ctx context.Context, context
 			}
 
 			var prop siviPlotCreationProposal
-			_ = json.Unmarshal([]byte(storedProposal), &prop)
+			if err := json.Unmarshal([]byte(storedProposal), &prop); err != nil {
+				return fmt.Errorf("decode SIVI plot creation proposal for %s: %w", creationReqID, err)
+			}
 
 			if undone != 0 {
 				if prevUndoID.Valid && prevUndoID.String == undoReqID {
@@ -670,7 +689,10 @@ func ListCreatedSIVIPlots(s *vprocore.ContextService, ctx context.Context, conte
 				return nil, err
 			}
 			var prop siviPlotCreationProposal
-			_ = json.Unmarshal([]byte(rawProp), &prop)
+			if err := json.Unmarshal([]byte(rawProp), &prop); err != nil {
+				rows.Close()
+				return nil, fmt.Errorf("decode SIVI plot creation proposal for %s: %w", rID, err)
+			}
 			isUndone := undone != 0
 			entries = append(entries, SIVICreatedPlotEntry{
 				RequestID:       rID,

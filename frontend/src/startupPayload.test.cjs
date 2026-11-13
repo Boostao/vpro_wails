@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const { readFileSync } = require('node:fs');
+const { existsSync, readFileSync } = require('node:fs');
 const path = require('node:path');
 const { test } = require('node:test');
 const { compile } = require('svelte/compiler');
@@ -12,7 +12,7 @@ const previewFlags = [
   'LONG_VEGETATION_CODE', 'LONG_VEGETATION_PREFERENCES', 'LONG_VEGETATION_REPORT',
   'LONG_VEGETATION_STRATA', 'LONG_VEGETATION_WORKBOOK',
   'PROJECT_METADATA_EDITING', 'PROJECT_METADATA_RESTORE',
-  'SIVI_CHARS_PARENT_ENTRY', 'SIVI_COLLECTED_EDITING', 'SIVI_COMBINED_EDITING',
+  'SIVI_COLLECTED_EDITING', 'SIVI_COMBINED_EDITING',
   'SIVI_CREATION_UNDO', 'SIVI_CREATION_WRITING', 'SIVI_DELETION_RESTORING',
   'SIVI_DELETION_WRITING', 'SIVI_IDENTITY_EDITING', 'SIVI_PARENT_REVIEW',
   'SIVI_SPECIES_EDITING', 'SIVI_STANDALONE', 'SUBZONE_MATRIX_WORKBOOK',
@@ -126,7 +126,7 @@ test('actual preview build halves initial transitive JS without removing entry l
   for (const name of saved.keys()) delete process.env[name];
   for (const name of previewFlags) process.env[`VITE_${name}`] = 'true';
   try {
-    assert.equal(previewFlags.length, 31);
+    assert.equal(previewFlags.length, 30);
     const { build } = await import('vite');
     const result = await build({
       root: frontend,
@@ -211,5 +211,60 @@ test('actual preview build halves initial transitive JS without removing entry l
   } finally {
     for (const name of Object.keys(process.env).filter(name => name.startsWith('VITE_'))) delete process.env[name];
     for (const [name, value] of saved) process.env[name] = value;
+  }
+});
+
+test('Red-triaged PC-ORD Break Report and standalone SIVI CHARS stay purged while inline extended shrub layouts remain', () => {
+  for (const hostFile of ['Navigation.svelte', 'App.svelte', 'CloseConfirm.svelte']) {
+    const source = readFileSync(path.join(__dirname, hostFile), 'utf8');
+    for (const retiredPattern of [
+      /PC-ORD Break Report/,
+      /BreakReportReview/,
+      /breakReportReview/,
+      /break-report/,
+      /SIVICHARSForm/,
+      /SIVICHARSParentForm/,
+      /siviCHARSParentEntry/,
+      /CHARS SIVI parent/,
+      /sivi-chars/,
+    ]) {
+      assert.doesNotMatch(source, retiredPattern, `${hostFile} must not reference ${retiredPattern}`);
+    }
+  }
+
+  for (const deletedSrcFile of [
+    'BreakReportReview.svelte',
+    'breakReportReview.ts',
+    'breakReportReview.test.cjs',
+    'breakReportWire.json',
+    'SIVICHARSForm.svelte',
+    'SIVICHARSForm.test.cjs',
+    'SIVICHARSParentForm.svelte',
+    'SIVICHARSParentForm.test.cjs',
+    'siviCHARSParentEntry.ts',
+    'siviCHARSParentEntry.test.cjs',
+    'siviCHARSParentEntrySession.ts',
+    'siviCHARSParentEntrySession.test.cjs',
+  ]) {
+    assert.equal(existsSync(path.join(__dirname, deletedSrcFile)), false, `Retired file must stay deleted: src/${deletedSrcFile}`);
+  }
+
+  const testdataDir = path.resolve(frontend, '..', 'testdata');
+  for (const deletedFixture of [
+    'chars-sivi-entry-client-wire.json',
+    'chars-sivi-entry-source.json',
+    'chars-sivi-reference-source.json',
+  ]) {
+    assert.equal(existsSync(path.join(testdataDir, deletedFixture)), false, `Retired fixture must stay deleted: testdata/${deletedFixture}`);
+  }
+
+  const resourcesDir = path.resolve(frontend, '..', 'resources');
+  assert.equal(existsSync(path.join(resourcesDir, 'fs1333-chars-sivi-layout.json')), false, 'Standalone fs1333-chars-sivi-layout.json must stay deleted');
+  for (const retainedLayout of [
+    'fs882-two-page-chars-layout.json',
+    'fs882-extended-shrub-layout.json',
+    'fs1333-extended-shrub-layout.json',
+  ]) {
+    assert.equal(existsSync(path.join(resourcesDir, retainedLayout)), true, `Active extended shrub layout must remain: ${retainedLayout}`);
   }
 });

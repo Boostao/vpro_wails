@@ -19,6 +19,11 @@ type CompareProjectsRequest struct {
 	TargetProject string `json:"targetProject,omitempty"`
 }
 
+func (r *CompareProjectsRequest) UnmarshalJSON(data []byte) error {
+	type plain CompareProjectsRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type FieldDiff struct {
 	Table      string  `json:"table"`
 	PlotNumber string  `json:"plotNumber"`

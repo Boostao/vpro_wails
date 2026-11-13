@@ -31,8 +31,6 @@ import (
 	"unicode/utf8"
 )
 
-const BreakReportReviewEnvironment = "VPRO_BREAK_REPORT_REVIEW"
-
 type EnvironmentReportField struct {
 	Source  string `json:"source"`
 	Key     string `json:"key"`
@@ -214,10 +212,8 @@ func DecodeProfileLifecycleJSON(data []byte, target any, required ...string) err
 	if err := ValidateMetadataDraftJSON(data); err != nil {
 		return fmt.Errorf("profile lifecycle JSON: %w", err)
 	}
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(target); err != nil {
-		return err
+	if err := sqlutil.DecodeStrictJSON(data, target); err != nil {
+		return fmt.Errorf("profile lifecycle JSON: %w", err)
 	}
 	var properties map[string]json.RawMessage
 	if err := json.Unmarshal(data, &properties); err != nil {
@@ -437,9 +433,6 @@ var SiviDeletionUUID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}
 func SiviFeature(name string, lookup func(string) (string, bool)) (bool, error) {
 	value, present := lookup(name)
 	if !present {
-		if name == BreakReportReviewEnvironment || name == "VPRO_SIVI_CHARS_PARENT_ENTRY" {
-			return false, nil
-		}
 		return true, nil
 	}
 	switch value {
@@ -506,42 +499,10 @@ func ValidateSourceParentEntryJSONProperties(data []byte, operation string) erro
 	if err := ValidateMetadataDraftJSON(data); err != nil {
 		return err
 	}
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	var walk func() error
-	walk = func() error {
-		token, err := decoder.Token()
-		if err != nil {
-			return err
-		}
-		switch token {
-		case json.Delim('{'):
-			seen := map[string]bool{}
-			for decoder.More() {
-				key, err := decoder.Token()
-				if err != nil {
-					return err
-				}
-				name, ok := key.(string)
-				if !ok || seen[name] {
-					return fmt.Errorf("duplicate %s JSON property %q", operation, key)
-				}
-				seen[name] = true
-				if err := walk(); err != nil {
-					return err
-				}
-			}
-			_, err = decoder.Token()
-		case json.Delim('['):
-			for decoder.More() {
-				if err := walk(); err != nil {
-					return err
-				}
-			}
-			_, err = decoder.Token()
-		}
-		return err
+	if err := sqlutil.ValidateRawJSONWire(data); err != nil {
+		return fmt.Errorf("%s JSON wire: %w", operation, err)
 	}
-	return walk()
+	return nil
 }
 
 func ValidateTwoPageEntryJSONProperties(data []byte) error {

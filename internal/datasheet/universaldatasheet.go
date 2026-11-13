@@ -63,10 +63,20 @@ type DatasheetSortSpec struct {
 	Direction string `json:"direction"` // "asc" | "desc"
 }
 
+func (r *DatasheetSortSpec) UnmarshalJSON(data []byte) error {
+	type plain DatasheetSortSpec
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type DatasheetFilterSpec struct {
 	Column string `json:"column"`
 	Op     string `json:"op"` // "contains" | "eq" | "starts_with" | "ends_with" | "is_null" | "not_null"
 	Value  string `json:"value"`
+}
+
+func (r *DatasheetFilterSpec) UnmarshalJSON(data []byte) error {
+	type plain DatasheetFilterSpec
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type DatasheetPageRequest struct {
@@ -77,6 +87,11 @@ type DatasheetPageRequest struct {
 	Filters         []DatasheetFilterSpec `json:"filters"`
 	GlobalSearch    string                `json:"globalSearch"`
 	ScopeToActiveSU bool                  `json:"scopeToActiveSU"`
+}
+
+func (r *DatasheetPageRequest) UnmarshalJSON(data []byte) error {
+	type plain DatasheetPageRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type DatasheetRow struct {
@@ -109,9 +124,19 @@ type DatasheetCellEdit struct {
 	After  vprocore.ProjectMetadataCell `json:"after"`
 }
 
+func (r *DatasheetCellEdit) UnmarshalJSON(data []byte) error {
+	type plain DatasheetCellEdit
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type DatasheetEditRequest struct {
 	TableKey string              `json:"tableKey"`
 	Edits    []DatasheetCellEdit `json:"edits"`
+}
+
+func (r *DatasheetEditRequest) UnmarshalJSON(data []byte) error {
+	type plain DatasheetEditRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type DatasheetEditResult struct {
@@ -134,6 +159,11 @@ type DatasheetFindReplaceRequest struct {
 	GlobalSearch    string                `json:"globalSearch"`
 	ScopeToActiveSU bool                  `json:"scopeToActiveSU"`
 	MaxPreview      int                   `json:"maxPreview"`
+}
+
+func (r *DatasheetFindReplaceRequest) UnmarshalJSON(data []byte) error {
+	type plain DatasheetFindReplaceRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type DatasheetFindReplaceItem struct {

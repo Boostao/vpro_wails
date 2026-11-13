@@ -35,6 +35,11 @@ type CreateSUFromEnvFieldsRequest struct {
 	Activate                  bool     `json:"activate"`
 }
 
+func (r *CreateSUFromEnvFieldsRequest) UnmarshalJSON(data []byte) error {
+	type plain CreateSUFromEnvFieldsRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type SUFromEnvPlotPreview struct {
 	PlotNumber     string `json:"plotNumber"`
 	BeforeSiteUnit string `json:"beforeSiteUnit"`

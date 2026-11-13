@@ -2,6 +2,7 @@ package sivi_test
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/boostao/vpro-wails/internal/sivi"
@@ -122,3 +123,73 @@ func TestCreateSIVIPlotAndUndoCreateSIVIPlot(t *testing.T) {
 			envCnt, adminCnt, histUndone, auditReceiptCnt)
 	}
 }
+
+func TestUndoCreateSIVIPlotToleratesForwardFieldsInStoredHistory(t *testing.T) {
+	svc, state := vprotest.ContextServiceFixture(t)
+	ctx := context.Background()
+
+	// Create Sample_SU and switch active SU to "Sample" so AddToActiveSU writes into Sample_SU.
+	rw, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.ProjectPath, "rw"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := rw.Exec(`CREATE TABLE IF NOT EXISTS "Sample_SU"("PlotNumber" VARCHAR, "SiteUnit" VARCHAR)`); err != nil {
+		rw.Close()
+		t.Fatal(err)
+	}
+	rw.Close()
+
+	suState, err := svc.SwitchContext(state.ContextID, vprocore.ContextSelection{
+		Project:       state.ActiveProject,
+		ProjectPath:   state.ProjectPath,
+		SU:            "Sample",
+		SUPath:        state.ProjectPath,
+		Hierarchy:     state.ActiveHierarchy,
+		HierarchyPath: state.HierarchyPath,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	created, err := sivi.CreateSIVIPlot(svc, ctx, suState.ContextID, sivi.CreateSIVIPlotRequest{
+		RequestID:     "33333333-3333-4444-8555-666666666661",
+		PlotNumber:    "00882",
+		PlotType:      "Ground",
+		UserSiteUnit:  "CWHvm1/01",
+		AddToActiveSU: true,
+	})
+	if err != nil || !created.AddedToSU {
+		t.Fatalf("CreateSIVIPlot with AddToActiveSU failed: %+v, err=%v", created, err)
+	}
+
+	// Simulate a forward/historical unknown field inside stored __VPRO_SIVICreationPlotHistory.Proposal.request!
+	rw2, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.ProjectPath, "rw"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := rw2.Exec(`UPDATE "__VPRO_SIVICreationPlotHistory"
+		SET "Proposal" = replace("Proposal", '"plotNumber":"00882"', '"plotNumber":"00882","legacyForwardProp":true')
+		WHERE "RequestID" = ?`, created.RequestID); err != nil {
+		rw2.Close()
+		t.Fatal(err)
+	}
+	rw2.Close()
+
+	entries, err := sivi.ListCreatedSIVIPlots(svc, ctx, suState.ContextID)
+	if err != nil || len(entries) != 1 {
+		t.Fatalf("ListCreatedSIVIPlots failed on forward history row: %v", err)
+	}
+
+	undone, err := sivi.UndoCreateSIVIPlot(svc, ctx, suState.ContextID, sivi.UndoCreateSIVIPlotRequest{
+		RequestID:         "33333333-3333-4444-8555-666666666662",
+		CreationRequestID: created.RequestID,
+		PlotNumber:        "00882",
+	})
+	if err != nil {
+		t.Fatalf("UndoCreateSIVIPlot failed on forward history row: %v", err)
+	}
+	if !undone.RemovedFromSU {
+		t.Fatalf("UndoCreateSIVIPlot lost AddedToSU / failed to remove SU row due to strict request decoder on history row: %+v", undone)
+	}
+}
+

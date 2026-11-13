@@ -22,6 +22,11 @@ type OptimizeVegOptions struct {
 	PlotNumbers []string `json:"plotNumbers,omitempty"`
 }
 
+func (r *OptimizeVegOptions) UnmarshalJSON(data []byte) error {
+	type plain OptimizeVegOptions
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type OptimizeVegGroup struct {
 	PlotNumber                string             `json:"plotNumber"`
 	Species                   string             `json:"species"`
@@ -50,6 +55,11 @@ type OptimizeVegPreview struct {
 type ApplyOptimizeVegRequest struct {
 	PlotNumbers    []string `json:"plotNumbers,omitempty"`
 	ExpectedDigest string   `json:"expectedDigest,omitempty"`
+}
+
+func (r *ApplyOptimizeVegRequest) UnmarshalJSON(data []byte) error {
+	type plain ApplyOptimizeVegRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type OptimizeVegResult struct {

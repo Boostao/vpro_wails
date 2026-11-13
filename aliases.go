@@ -276,10 +276,6 @@ type qualityService = referencespkg.QualityService
 type ReferenceService = referencespkg.ReferenceService
 type RegionCodeChoice = referencespkg.RegionCodeChoice
 type RegionCodeService = referencespkg.RegionCodeService
-type SIVICHARSParentEntryPolicy = sivipkg.SIVICHARSParentEntryPolicy
-type SIVICHARSParentEntryReview = sivipkg.SIVICHARSParentEntryReview
-type SIVICHARSParentEntryService = sivipkg.SIVICHARSParentEntryService
-type SIVICHARSParentEntryWrite = sivipkg.SIVICHARSParentEntryWrite
 type SIVICollectedService = sivipkg.SIVICollectedService
 type SIVICombinedService = sivipkg.SIVICombinedService
 type SIVICoverService = sivipkg.SIVICoverService
@@ -786,8 +782,6 @@ const ReleaseChannelExperimental = vprocorepkg.ReleaseChannelExperimental
 
 const ReleaseChannelStable = vprocorepkg.ReleaseChannelStable
 
-const breakReportReviewEnvironment = vprocorepkg.BreakReportReviewEnvironment
-
 const closeRequestEvent = lifecyclepkg.CloseRequestEvent
 
 var ErrInvalidCloseRequest = lifecyclepkg.ErrInvalidCloseRequest
@@ -849,10 +843,6 @@ var longVegetationUnitPreferencesFeature = vegreportpkg.LongVegetationUnitPrefer
 var newCoordinateService = vprocorepkg.NewCoordinateServiceInternal
 
 var newPlotServiceWithPreferences = vprocorepkg.NewPlotServiceWithPreferences
-
-func newSIVICHARSParentEntryService(p0 *ContextService, p1 sourceformpkg.SiviParentSharedReferenceReaders, p2 bool) (*sivipkg.SIVICHARSParentEntryService, error) {
-	return sivipkg.NewSIVICHARSParentEntryService(unwrapContextService(p0), p1, p2)
-}
 
 var newSQLiteProjectService = vprocorepkg.NewSQLiteProjectService
 
@@ -1042,7 +1032,6 @@ func init() {
 	application.RegisterEvent[ProjectMetadataReview]("vpro:model:ProjectMetadataReview")
 	application.RegisterEvent[ProjectPlotProfileRuleDraft]("vpro:model:ProjectPlotProfileRuleDraft")
 	application.RegisterEvent[ProjectPlotProfileStep]("vpro:model:ProjectPlotProfileStep")
-	application.RegisterEvent[SIVICHARSParentEntryPolicy]("vpro:model:SIVICHARSParentEntryPolicy")
 	application.RegisterEvent[SIVIParentActionInput]("vpro:model:SIVIParentActionInput")
 	application.RegisterEvent[SIVIParentBinding]("vpro:model:SIVIParentBinding")
 	application.RegisterEvent[SIVIParentCellEdit]("vpro:model:SIVIParentCellEdit")

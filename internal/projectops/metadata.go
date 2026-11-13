@@ -521,6 +521,11 @@ type ApplyProjectMetadataAutomationRequest struct {
 	PresetID     string `json:"presetId,omitempty"`
 }
 
+func (r *ApplyProjectMetadataAutomationRequest) UnmarshalJSON(data []byte) error {
+	type plain ApplyProjectMetadataAutomationRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type ApplyProjectMetadataAutomationResult struct {
 	Project        string                 `json:"project"`
 	ProjectID      string                 `json:"projectId"`

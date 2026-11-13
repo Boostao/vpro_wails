@@ -64,6 +64,11 @@ type LongTidyCSVRequest struct {
 	LumpDBPath      string `json:"lumpDbPath,omitempty"`
 }
 
+func (r *LongTidyCSVRequest) UnmarshalJSON(data []byte) error {
+	type plain LongTidyCSVRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
+}
+
 type WideMatrixCSVRequest struct {
 	DestinationPath string `json:"destinationPath,omitempty"`
 	LayerMode       string `json:"layerMode"` // "rollup_all" | "strata_4" | "species_layer"
@@ -71,6 +76,11 @@ type WideMatrixCSVRequest struct {
 	IncludeSiteUnit bool   `json:"includeSiteUnit"`
 	LumpTable       string `json:"lumpTable,omitempty"`
 	LumpDBPath      string `json:"lumpDbPath,omitempty"`
+}
+
+func (r *WideMatrixCSVRequest) UnmarshalJSON(data []byte) error {
+	type plain WideMatrixCSVRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type CSVExportOutcome struct {

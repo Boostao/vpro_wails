@@ -67,10 +67,8 @@ func (request *ProjectMetadataEdit) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	type plain ProjectMetadataEdit
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	var decoded plain
-	if err := decoder.Decode(&decoded); err != nil {
+	if err := sqlutil.DecodeStrictJSON(data, &decoded); err != nil {
 		return err
 	}
 	var properties map[string]json.RawMessage

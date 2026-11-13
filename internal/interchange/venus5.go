@@ -20,6 +20,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/boostao/vpro-wails/internal/accessreader"
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 )
 
@@ -48,6 +49,11 @@ type VenusImportRequest struct {
 	TargetProject     string `json:"targetProject"`
 	DestinationPath   string `json:"destinationPath,omitempty"`
 	ActivateOnSuccess bool   `json:"activateOnSuccess"`
+}
+
+func (r *VenusImportRequest) UnmarshalJSON(data []byte) error {
+	type plain VenusImportRequest
+	return sqlutil.DecodeStrictJSON(data, (*plain)(r))
 }
 
 type VenusImportResult struct {
