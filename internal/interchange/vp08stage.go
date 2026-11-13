@@ -156,6 +156,13 @@ func stageAndPublishVP08Project(
 	published = true
 	_ = os.Remove(tmpPath)
 
+	if err := vprocore.InitializeSQLiteWAL(ctx, resolvedDest); err != nil {
+		_ = os.Remove(resolvedDest + "-wal")
+		_ = os.Remove(resolvedDest + "-shm")
+		_ = os.Remove(resolvedDest)
+		return "", "", false, nil, fmt.Errorf("initialize SQLite WAL on %s: %w", resolvedDest, err)
+	}
+
 	destBytes, err := os.ReadFile(resolvedDest)
 	if err != nil {
 		return "", "", false, nil, err
@@ -171,6 +178,7 @@ func stageAndPublishVP08Project(
 			Hierarchy:   "None",
 		})
 		if switchErr == nil {
+			_ = s.Projects.EnsureActiveProjectWAL(ctx)
 			activated = true
 			newState = &state
 		}

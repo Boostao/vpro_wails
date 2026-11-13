@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -761,16 +762,7 @@ func RenderQuartoGuide(
 
 		renderedHTMLName := "rendered_guide.html"
 		renderedHTMLPath := filepath.Join(runDir, renderedHTMLName)
-		childEnv := buildIsolatedChildEnv(tmpDir)
-		// Ensure Quarto finds the exact Rscript binary discovered by VPro
-		rBinDir := filepath.Dir(rscriptBin)
-		childEnv = append(childEnv, "QUARTO_R="+rscriptBin)
-		for i, kv := range childEnv {
-			if strings.HasPrefix(kv, "PATH=") {
-				childEnv[i] = "PATH=" + rBinDir + string(os.PathListSeparator) + strings.TrimPrefix(kv, "PATH=")
-				break
-			}
-		}
+		childEnv := ConfigureChildREnv(buildIsolatedChildEnv(tmpDir), runtime.GOOS, rscriptBin, ResolveBundledPandocDir(cfg))
 
 		quartoBin := resolveQuartoBinary(cfg)
 		rendererUsed := ""

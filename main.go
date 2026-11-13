@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"log"
 	"os"
@@ -244,6 +245,9 @@ func main() {
 	if err != nil {
 		runStartupRecovery(windows, configDir, err)
 		return
+	}
+	if err := projects.EnsureActiveProjectWAL(context.Background()); err != nil {
+		log.Printf("Warning: failed to initialize active project WAL mode: %v", err)
 	}
 	plots, err := newPlotServiceWithPreferences(projects)
 	if err != nil {
@@ -645,7 +649,7 @@ func main() {
 		siteUnitSummaryExtendedWorkbook: siteUnitSummaryExtendedWorkbook,
 		subzoneMatrix:                   subzoneMatrix,
 	}
-	spatialExtraDirs := []string{"/home/bruno/Work/spatial_assets"}
+	spatialExtraDirs := ResolveSpatialExtraDirs()
 	spatialAttributor := NewPMTilesAttributor(dataDir, spatialExtraDirs...)
 	spatialService := &SpatialService{
 		contexts:               contextService,

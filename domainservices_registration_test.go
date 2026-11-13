@@ -174,3 +174,145 @@ func TestLifecycleServiceConsolidatesStartupAndCloseHandshake(t *testing.T) {
 		t.Fatalf("ConfirmClose did not approve native quit: err=%v quitCalled=%d", err, quitCalled)
 	}
 }
+
+func TestImportAccessProjectRenamedAuditAndChildLoadingViaPlotEntryService(t *testing.T) {
+	candidates := []struct {
+		paths         []string
+		sourceProject string
+		targetProject string
+	}{
+		{
+			paths:         []string{`/home/bruno/Work/VPRO_ACCESS_1/VPro64/Haida_Gwaii_2019.accdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS_1\VPro64\Haida_Gwaii_2019.accdb`},
+			sourceProject: "Haida_Gwaii_VPro19_2019",
+			targetProject: "Haida2019",
+		},
+		{
+			paths:         []string{`/home/bruno/Work/VPRO_ACCESS/VPro64/VPro64.accdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\VPro64.accdb`},
+			sourceProject: "Sample",
+			targetProject: "SampleRenamed",
+		},
+	}
+
+	var chosenPath, sourceProject, targetProject string
+	for _, cand := range candidates {
+		for _, p := range cand.paths {
+			if _, err := os.Stat(p); err == nil {
+				chosenPath = p
+				sourceProject = cand.sourceProject
+				targetProject = cand.targetProject
+				break
+			}
+		}
+		if chosenPath != "" {
+			break
+		}
+	}
+	if chosenPath == "" {
+		t.Skip("no sibling Access .accdb fixture available on this host")
+	}
+
+	dataDir := t.TempDir()
+	configDir := t.TempDir()
+	prefs, err := openDesktopConfig(dataDir, configDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	projects, err := newSQLiteProjectService(dataDir, configDir, prefs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer projects.CloseSQLiteContext()
+	plots, err := newPlotServiceWithPreferences(projects)
+	if err != nil {
+		t.Fatal(err)
+	}
+	contextSvc, err := NewContextService(projects, plots)
+	if err != nil {
+		t.Fatal(err)
+	}
+	importExportSvc := NewImportExportService(contextSvc, nil, nil, nil)
+	plotEntrySvc := &PlotEntryService{
+		contexts: contextSvc,
+		plots:    plots,
+	}
+
+	ctx := context.Background()
+	initState, err := contextSvc.GetState(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	destPath := filepath.Join(dataDir, "projects", targetProject+".db")
+	impRes, err := importExportSvc.ImportAccessProject(ctx, initState.ContextID, AccessProjectImportRequest{
+		SourcePath:        chosenPath,
+		SourceProject:     sourceProject,
+		TargetProject:     targetProject,
+		DestinationPath:   destPath,
+		ActivateOnSuccess: true,
+	})
+	if err != nil {
+		t.Fatalf("ImportAccessProject(%s -> %s) failed: %v", sourceProject, targetProject, err)
+	}
+	if !impRes.Activated || impRes.State == nil || impRes.State.ActiveProject != targetProject {
+		t.Fatalf("expected activated %s state, got %+v", targetProject, impRes)
+	}
+	activeCtxID := impRes.State.ContextID
+
+	page, err := contextSvc.ListPlots(ctx, 0, 50)
+	if err != nil || len(page.Plots) == 0 {
+		t.Fatalf("ListPlots on renamed project failed: page=%+v err=%v", page, err)
+	}
+
+	totalAuditRows := 0
+	for _, summary := range page.Plots {
+		pNum := summary.PlotNumber
+		if _, err := plotEntrySvc.GetPlot(pNum); err != nil {
+			t.Fatalf("PlotEntryService.GetPlot(%s) failed: %v", pNum, err)
+		}
+		if _, err := plotEntrySvc.ListVegRecords(pNum); err != nil {
+			t.Fatalf("PlotEntryService.ListVegRecords(%s) failed: %v", pNum, err)
+		}
+		if _, err := plotEntrySvc.ListHumusRecords(pNum); err != nil {
+			t.Fatalf("PlotEntryService.ListHumusRecords(%s) failed: %v", pNum, err)
+		}
+		if _, err := plotEntrySvc.ListMineralRecords(pNum); err != nil {
+			t.Fatalf("PlotEntryService.ListMineralRecords(%s) failed: %v", pNum, err)
+		}
+		if _, err := plotEntrySvc.ListOtherRecords(pNum); err != nil {
+			t.Fatalf("PlotEntryService.ListOtherRecords(%s) failed: %v", pNum, err)
+		}
+		auditEntries, err := plotEntrySvc.ListAuditReadEntries(pNum)
+		if err != nil {
+			t.Fatalf("PlotEntryService.ListAuditReadEntries(%s) failed: %v", pNum, err)
+		}
+		for _, entry := range auditEntries {
+			if entry.Project != targetProject {
+				t.Fatalf("audit row %s for plot %s retained foreign Project=%q instead of %q", entry.RowID, pNum, entry.Project, targetProject)
+			}
+		}
+		trail, err := plotEntrySvc.ListAuditEntries(pNum)
+		if err != nil {
+			t.Fatalf("PlotEntryService.ListAuditEntries(%s) failed: %v", pNum, err)
+		}
+		totalAuditRows += len(trail)
+	}
+	if totalAuditRows == 0 {
+		t.Fatalf("expected non-zero audit trail rows across %s plots to exercise project ownership normalization", targetProject)
+	}
+
+	// Verify editing and saving an imported plot under renamed TargetProject succeeds and records new audit rows
+	firstPlot := page.Plots[0].PlotNumber
+	hdr, err := plotEntrySvc.GetPlot(firstPlot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	note := "Verified Wave 6.1 renamed import edit"
+	hdr.OfficeNotes = &note
+	if err := contextSvc.UpdatePlot(activeCtxID, *hdr); err != nil {
+		t.Fatalf("UpdatePlot on renamed imported plot %s failed: %v", firstPlot, err)
+	}
+	afterAudits, err := contextSvc.ListAuditReadEntries(ctx, activeCtxID, firstPlot)
+	if err != nil || len(afterAudits) == 0 {
+		t.Fatalf("expected audit entries after UpdatePlot on %s, got len=%d err=%v", firstPlot, len(afterAudits), err)
+	}
+}

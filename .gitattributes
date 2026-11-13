@@ -1,2 +1,7 @@
 resources/*fixture*.json -text
 build/linux/** text eol=lf
+frontend/bindings/** text eol=lf
+*.ts text eol=lf
+*.svelte text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf

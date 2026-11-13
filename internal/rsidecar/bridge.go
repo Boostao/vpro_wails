@@ -152,34 +152,33 @@ func resolveRscriptBinary(opts RuntimeOptions) (string, bool, error) {
 	return "", false, errors.New("Rscript was not found on PATH or in standard R installation directories")
 }
 
-func resolveQuartoBinary(opts RuntimeOptions) string {
-	if explicit := strings.TrimSpace(opts.QuartoPath); explicit != "" {
-		if strings.EqualFold(explicit, "none") || strings.EqualFold(explicit, "disabled") {
-			return ""
-		}
-		if isExecutableRegularFile(explicit) {
-			if abs, err := filepath.Abs(explicit); err == nil {
-				return abs
+func preferWindowsQuartoExe(p string) string {
+	if runtime.GOOS == "windows" {
+		ext := strings.ToLower(filepath.Ext(p))
+		if ext == ".cmd" || ext == ".bat" {
+			exe := strings.TrimSuffix(p, filepath.Ext(p)) + ".exe"
+			if isExecutableRegularFile(exe) {
+				return exe
 			}
-			return explicit
 		}
-		return ""
 	}
-	if envVal, ok := opts.LookupEnv("VPRO_QUARTO_PATH"); ok && strings.TrimSpace(envVal) != "" {
-		trimmed := strings.TrimSpace(envVal)
-		if strings.EqualFold(trimmed, "none") || strings.EqualFold(trimmed, "disabled") {
-			return ""
-		}
-		if isExecutableRegularFile(trimmed) {
-			if abs, err := filepath.Abs(trimmed); err == nil {
-				return abs
+	return p
+}
+
+func resolveSystemQuartoBinary(lookupEnv func(string) (string, bool)) string {
+	if lookupEnv != nil {
+		if envVal, ok := lookupEnv("VPRO_QUARTO_PATH"); ok && strings.TrimSpace(envVal) != "" {
+			trimmed := strings.TrimSpace(envVal)
+			if !strings.EqualFold(trimmed, "none") && !strings.EqualFold(trimmed, "disabled") && isExecutableRegularFile(trimmed) {
+				if abs, err := filepath.Abs(trimmed); err == nil {
+					return preferWindowsQuartoExe(abs)
+				}
+				return preferWindowsQuartoExe(trimmed)
 			}
-			return trimmed
 		}
-		return ""
 	}
 	if lp, err := exec.LookPath("quarto"); err == nil && isExecutableRegularFile(lp) {
-		return lp
+		return preferWindowsQuartoExe(lp)
 	}
 	var candidates []string
 	if runtime.GOOS == "windows" {
@@ -202,7 +201,114 @@ func resolveQuartoBinary(opts RuntimeOptions) string {
 	}
 	for _, c := range candidates {
 		if isExecutableRegularFile(c) {
-			return c
+			return preferWindowsQuartoExe(c)
+		}
+	}
+	return ""
+}
+
+func resolveQuartoBinary(opts RuntimeOptions) string {
+	if explicit := strings.TrimSpace(opts.QuartoPath); explicit != "" {
+		if strings.EqualFold(explicit, "none") || strings.EqualFold(explicit, "disabled") {
+			return ""
+		}
+		if isExecutableRegularFile(explicit) {
+			if abs, err := filepath.Abs(explicit); err == nil {
+				return preferWindowsQuartoExe(abs)
+			}
+			return preferWindowsQuartoExe(explicit)
+		}
+		return ""
+	}
+	if opts.LookupEnv != nil {
+		if envVal, ok := opts.LookupEnv("VPRO_QUARTO_PATH"); ok && strings.TrimSpace(envVal) != "" {
+			trimmed := strings.TrimSpace(envVal)
+			if strings.EqualFold(trimmed, "none") || strings.EqualFold(trimmed, "disabled") {
+				return ""
+			}
+			if isExecutableRegularFile(trimmed) {
+				if abs, err := filepath.Abs(trimmed); err == nil {
+					return preferWindowsQuartoExe(abs)
+				}
+				return preferWindowsQuartoExe(trimmed)
+			}
+			return ""
+		}
+	}
+	return resolveSystemQuartoBinary(opts.LookupEnv)
+}
+
+func hasPandocBinaryInDir(dir string) bool {
+	if strings.TrimSpace(dir) == "" {
+		return false
+	}
+	for _, name := range []string{"pandoc.exe", "pandoc"} {
+		if isExecutableRegularFile(filepath.Join(dir, name)) {
+			return true
+		}
+	}
+	return false
+}
+
+func pandocOnPath(opts RuntimeOptions) bool {
+	if opts.LookupEnv != nil {
+		if pathVal, ok := opts.LookupEnv("PATH"); ok {
+			for _, dir := range filepath.SplitList(pathVal) {
+				if hasPandocBinaryInDir(dir) {
+					return true
+				}
+			}
+			return false
+		}
+	}
+	lp, err := exec.LookPath("pandoc")
+	return err == nil && isExecutableRegularFile(lp)
+}
+
+// ResolveBundledPandocDir locates Quarto's bundled pandoc directory (<quarto_bin>/tools or <quarto_root>/bin/tools)
+// when RSTUDIO_PANDOC is unset and pandoc is not already on PATH, so rmarkdown::render() succeeds on Windows.
+func ResolveBundledPandocDir(opts RuntimeOptions) string {
+	cfg := effectiveOptions(opts)
+	if val, ok := cfg.LookupEnv("RSTUDIO_PANDOC"); ok && strings.TrimSpace(val) != "" {
+		return ""
+	}
+	if pandocOnPath(cfg) {
+		return ""
+	}
+
+	var quartoCandidates []string
+	if q := resolveQuartoBinary(cfg); q != "" {
+		quartoCandidates = append(quartoCandidates, q)
+	}
+	if sysQ := resolveSystemQuartoBinary(cfg.LookupEnv); sysQ != "" && (len(quartoCandidates) == 0 || quartoCandidates[0] != sysQ) {
+		quartoCandidates = append(quartoCandidates, sysQ)
+	}
+
+	var toolDirs []string
+	for _, qBin := range quartoCandidates {
+		resolved := qBin
+		if sym, err := filepath.EvalSymlinks(qBin); err == nil && sym != "" {
+			resolved = sym
+		}
+		binDir := filepath.Dir(resolved)
+		toolDirs = append(toolDirs,
+			filepath.Join(binDir, "tools"),
+			filepath.Join(filepath.Dir(binDir), "bin", "tools"),
+			filepath.Join(binDir, "tools", "x86_64"),
+			filepath.Join(binDir, "tools", "amd64"),
+			filepath.Join(binDir, "tools", "aarch64"),
+			filepath.Join(binDir, "tools", "arm64"),
+		)
+	}
+	if runtime.GOOS == "windows" {
+		toolDirs = append(toolDirs,
+			`C:\Program Files\Pandoc`,
+			`C:\Program Files\RStudio\resources\app\bin\quarto\bin\tools`,
+		)
+	}
+	for _, d := range toolDirs {
+		if hasPandocBinaryInDir(d) {
+			return d
 		}
 	}
 	return ""
@@ -326,6 +432,86 @@ func buildIsolatedChildEnv(tmpDir string) []string {
 	return filtered
 }
 
+func dirForOS(goOS, p string) string {
+	if goOS == "windows" {
+		idx := strings.LastIndexAny(p, `\/`)
+		if idx <= 0 {
+			return "."
+		}
+		if idx == 2 && p[1] == ':' {
+			return p[:3]
+		}
+		return p[:idx]
+	}
+	return filepath.Dir(p)
+}
+
+// ConfigureChildREnv prepends filepath.Dir(rscriptBin) case-insensitively to PATH/Path,
+// configures QUARTO_R safely per OS (omitting QUARTO_R on Windows where Quarto CLI's rBinaryPath
+// drops .exe when QUARTO_R is set, relying instead on prepended Path + PATHEXT), and populates
+// RSTUDIO_PANDOC when pandocDir is provided and RSTUDIO_PANDOC is unset.
+func ConfigureChildREnv(baseEnv []string, goOS, rscriptBin, pandocDir string) []string {
+	rBinDir := ""
+	if strings.TrimSpace(rscriptBin) != "" {
+		rBinDir = dirForOS(goOS, rscriptBin)
+	}
+	out := make([]string, 0, len(baseEnv)+4)
+	pathUpdated := false
+	hasRStudioPandoc := false
+	hasPathExt := false
+	sep := string(os.PathListSeparator)
+	if goOS == "windows" {
+		sep = ";"
+	}
+
+	for _, kv := range baseEnv {
+		eq := strings.IndexByte(kv, '=')
+		if eq <= 0 {
+			out = append(out, kv)
+			continue
+		}
+		keyUpper := strings.ToUpper(kv[:eq])
+		val := kv[eq+1:]
+		switch keyUpper {
+		case "QUARTO_R":
+			// Strip inherited QUARTO_R; non-Windows re-adds exact rscriptBin below,
+			// while Windows uses prepended Path so Quarto's `where Rscript` resolves Rscript.exe.
+			continue
+		case "PATH":
+			if rBinDir != "" && !pathUpdated {
+				out = append(out, kv[:eq+1]+rBinDir+sep+val)
+				pathUpdated = true
+			} else {
+				out = append(out, kv)
+			}
+		case "RSTUDIO_PANDOC":
+			if strings.TrimSpace(val) != "" {
+				hasRStudioPandoc = true
+				out = append(out, kv)
+			}
+		case "PATHEXT":
+			hasPathExt = true
+			out = append(out, kv)
+		default:
+			out = append(out, kv)
+		}
+	}
+
+	if rBinDir != "" && !pathUpdated {
+		out = append(out, "PATH="+rBinDir)
+	}
+	if goOS == "windows" && !hasPathExt {
+		out = append(out, "PATHEXT=.COM;.EXE;.BAT;.CMD")
+	}
+	if goOS != "windows" && strings.TrimSpace(rscriptBin) != "" {
+		out = append(out, "QUARTO_R="+rscriptBin)
+	}
+	if !hasRStudioPandoc && strings.TrimSpace(pandocDir) != "" {
+		out = append(out, "RSTUDIO_PANDOC="+pandocDir)
+	}
+	return out
+}
+
 func stageEmbeddedAsset(runDir, assetName string) (string, error) {
 	raw, err := embeddedAssets.ReadFile("assets/" + assetName)
 	if err != nil {
@@ -420,7 +606,7 @@ func executeRScriptJSON(
 
 	cmd := exec.CommandContext(ctx, rscriptBin, "--vanilla", scriptPath, reqPath, respPath)
 	cmd.Dir = runDir
-	cmd.Env = buildIsolatedChildEnv(tmpDir)
+	cmd.Env = ConfigureChildREnv(buildIsolatedChildEnv(tmpDir), runtime.GOOS, rscriptBin, ResolveBundledPandocDir(opts))
 	cmd.WaitDelay = 2 * time.Second
 
 	var stdoutBuf, stderrBuf bytes.Buffer

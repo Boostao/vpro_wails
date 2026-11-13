@@ -268,6 +268,23 @@ func SameDesktopPath(left, right string) bool {
 	return left == right
 }
 
+func InitializeSQLiteWAL(ctx context.Context, path string) error {
+	db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(path, "rw")+"&_busy_timeout=5000")
+	if err != nil {
+		return err
+	}
+	db.SetMaxOpenConns(1)
+	var journalMode string
+	if err := db.QueryRowContext(ctx, "PRAGMA journal_mode = WAL;").Scan(&journalMode); err != nil {
+		return errors.Join(err, db.Close())
+	}
+	if !strings.EqualFold(journalMode, "wal") {
+		return errors.Join(fmt.Errorf("expected SQLite WAL journal mode on %s, got %q", filepath.Base(path), journalMode), db.Close())
+	}
+	_, _ = db.ExecContext(ctx, "PRAGMA wal_checkpoint(TRUNCATE);")
+	return db.Close()
+}
+
 func installSample(destination string) error {
 	if _, err := os.Stat(destination); err == nil {
 		return nil

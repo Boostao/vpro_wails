@@ -633,6 +633,20 @@ func streamAccessTableIntoSQLite(
 				}
 			}
 		}
+		if len(spec.computed) > 0 {
+			computedLower := make(map[string]struct{}, len(spec.computed))
+			for k := range spec.computed {
+				computedLower[strings.ToLower(k)] = struct{}{}
+			}
+			filtered := make([][2]string, 0, len(mapping))
+			for _, pair := range mapping {
+				if _, overridden := computedLower[strings.ToLower(pair[0])]; overridden {
+					continue
+				}
+				filtered = append(filtered, pair)
+			}
+			mapping = filtered
+		}
 		targetCols := make([]string, 0, len(mapping)+len(spec.computed))
 		sourceIndices := make([]int, len(mapping))
 		for i, pair := range mapping {
@@ -1016,6 +1030,12 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 			totalOrphan += m.orphanRows
 		}
 
+		auditProjectComputed := map[string]func([]any, map[string]int) any{
+			"Project": func(_ []any, _ map[string]int) any {
+				return targetProject
+			},
+		}
+
 		switch version {
 		case "VP08":
 			if envM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, envActualName, nil, []streamInsertSpec{
@@ -1049,7 +1069,7 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 			}
 			accumulate(mineralM)
 			if auditM, err = streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, auditActualName, nil, []streamInsertSpec{
-				{targetTable: targetProject + "_Audit"},
+				{targetTable: targetProject + "_Audit", computed: auditProjectComputed},
 			}); err != nil {
 				return err
 			}
@@ -1148,8 +1168,12 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 				if item.reqEnv {
 					envSet = validEnvPlots
 				}
+				var itemComputed map[string]func([]any, map[string]int) any
+				if item.suffix == "Audit" {
+					itemComputed = auditProjectComputed
+				}
 				m, sErr := streamAccessTableIntoSQLite(ctx, db, tx, quarantineStmt, item.src, envSet, []streamInsertSpec{
-					{targetTable: targetProject + "_" + item.suffix, targetToSource: pairs, requireEnvPlot: item.reqEnv},
+					{targetTable: targetProject + "_" + item.suffix, targetToSource: pairs, computed: itemComputed, requireEnvPlot: item.reqEnv},
 				})
 				if sErr != nil {
 					return sErr
@@ -1247,6 +1271,13 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 	published = true
 	_ = os.Remove(tmpPath)
 
+	if err := vprocore.InitializeSQLiteWAL(ctx, resolvedDest); err != nil {
+		_ = os.Remove(resolvedDest + "-wal")
+		_ = os.Remove(resolvedDest + "-shm")
+		_ = os.Remove(resolvedDest)
+		return AccessProjectImportResult{}, fmt.Errorf("initialize SQLite WAL on %s: %w", resolvedDest, err)
+	}
+
 	destDigestHex, err := streamFileSHA256(resolvedDest)
 	if err != nil {
 		return AccessProjectImportResult{}, err
@@ -1290,6 +1321,7 @@ func ImportAccessProject(s *vprocore.ContextService, ctx context.Context, contex
 		if switchErr != nil {
 			return result, fmt.Errorf("project imported to %s, but switching context failed: %w", resolvedDest, switchErr)
 		}
+		_ = s.Projects.EnsureActiveProjectWAL(ctx)
 		result.Activated = true
 		result.State = &state
 	} else {

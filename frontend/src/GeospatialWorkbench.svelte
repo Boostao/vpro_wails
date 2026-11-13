@@ -5,9 +5,11 @@
     NavigationControl,
     ScaleControl,
     addProtocol,
+    setWorkerUrl,
     type GeoJSONSource,
     type IControl,
   } from 'maplibre-gl';
+  import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
   import 'maplibre-gl/dist/maplibre-gl.css';
   import { Protocol } from 'pmtiles';
   import { MapboxOverlay } from '@deck.gl/mapbox';
@@ -165,8 +167,18 @@
     onBusyChange?.(nextBusy);
   }
 
+  let maplibreWorkerConfigured = false;
+  function ensureMapLibreWorker() {
+    if (maplibreWorkerConfigured) return;
+    if (typeof setWorkerUrl === 'function' && maplibreWorkerUrl) {
+      setWorkerUrl(maplibreWorkerUrl);
+    }
+    maplibreWorkerConfigured = true;
+  }
+
   let pmtilesProtocolAdded = false;
   function ensurePMTilesProtocol() {
+    ensureMapLibreWorker();
     if (pmtilesProtocolAdded) return;
     try {
       const protocol = new Protocol();

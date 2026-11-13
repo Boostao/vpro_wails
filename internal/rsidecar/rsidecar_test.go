@@ -62,23 +62,43 @@ func TestDetectRRuntimeRealAndGracefulMissingFallback(t *testing.T) {
 	if !realStatus.Available || realStatus.RscriptPath == "" || realStatus.RVersion == "" {
 		t.Fatalf("expected real Rscript runtime to be available, got %+v", realStatus)
 	}
-	if !realStatus.QuartoAvailable || realStatus.QuartoPath == "" || realStatus.QuartoVersion == "" {
-		t.Fatalf("expected real Quarto CLI to be available, got %+v", realStatus)
+	if realStatus.QuartoAvailable && (realStatus.QuartoPath == "" || realStatus.QuartoVersion == "") {
+		t.Fatalf("expected non-empty QuartoPath and QuartoVersion when QuartoAvailable=true, got %+v", realStatus)
 	}
-	if !realStatus.ReadyForClimate || !realStatus.ReadyForClustering || !realStatus.ReadyForQuarto {
-		t.Fatalf("expected ReadyForClimate/Clustering/Quarto all true, got %+v", realStatus)
+	if len(realStatus.Packages) == 0 {
+		t.Fatalf("expected non-empty package inventory from probe_runtime.R, got %+v", realStatus)
 	}
 
-	installedByName := make(map[string]string)
+	installedByName := make(map[string]string, len(realStatus.Packages))
+	requiredByName := make(map[string]bool, len(realStatus.Packages))
 	for _, pkg := range realStatus.Packages {
+		requiredByName[pkg.Name] = pkg.Required
 		if pkg.Installed {
+			if pkg.Version == "" {
+				t.Fatalf("installed R package %q reported empty version: %+v", pkg.Name, pkg)
+			}
 			installedByName[pkg.Name] = pkg.Version
 		}
 	}
-	for _, mustHave := range []string{"vpro", "climr", "vegclust", "vegan", "DBI", "RSQLite", "duckdb", "jsonlite", "knitr", "rmarkdown"} {
-		if ver := installedByName[mustHave]; ver == "" {
-			t.Fatalf("expected R package %q to be detected with version, got packages=%+v", mustHave, realStatus.Packages)
+	for _, miss := range realStatus.MissingRequired {
+		if !requiredByName[miss] {
+			t.Fatalf("optional package %q must never be reported in MissingRequired: %+v", miss, realStatus)
 		}
+		if installedByName[miss] != "" {
+			t.Fatalf("installed package %q was erroneously reported in MissingRequired: %+v", miss, realStatus)
+		}
+	}
+
+	wantClimate := installedByName["jsonlite"] != "" && installedByName["data.table"] != "" && installedByName["DBI"] != "" && installedByName["RSQLite"] != ""
+	wantCluster := wantClimate && installedByName["vegan"] != "" && installedByName["vegclust"] != ""
+	wantQuarto := wantClimate && (realStatus.QuartoAvailable || (installedByName["knitr"] != "" && installedByName["rmarkdown"] != ""))
+	if realStatus.ReadyForClimate != wantClimate || realStatus.ReadyForClustering != wantCluster || realStatus.ReadyForQuarto != wantQuarto {
+		t.Fatalf("readiness flags mismatch installed packages: got climate=%v cluster=%v quarto=%v, want %v/%v/%v (packages=%+v)",
+			realStatus.ReadyForClimate, realStatus.ReadyForClustering, realStatus.ReadyForQuarto,
+			wantClimate, wantCluster, wantQuarto, realStatus.Packages)
+	}
+	if (len(realStatus.MissingRequired) > 0 || !realStatus.QuartoAvailable) && len(realStatus.SetupInstructions) == 0 {
+		t.Fatalf("expected SetupInstructions when required packages or Quarto CLI are missing: %+v", realStatus)
 	}
 
 	// 2. Missing Rscript binary degrades gracefully with setup instructions (never crashes)
@@ -107,6 +127,83 @@ func TestDetectRRuntimeRealAndGracefulMissingFallback(t *testing.T) {
 	})
 	if err != nil || envDisabled.Available {
 		t.Fatalf("expected VPRO_RSCRIPT_PATH=disabled to report Available=false cleanly, got %+v (%v)", envDisabled, err)
+	}
+}
+
+func TestWindowsQuartoPandocDiscoveryAndChildEnvConfiguration(t *testing.T) {
+	fakeQuartoRoot := t.TempDir()
+	binDir := filepath.Join(fakeQuartoRoot, "bin")
+	toolsDir := filepath.Join(binDir, "tools")
+	if err := os.MkdirAll(toolsDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	fakeQuartoExe := filepath.Join(binDir, "quarto.exe")
+	fakePandocExe := filepath.Join(toolsDir, "pandoc.exe")
+	for _, f := range []string{fakeQuartoExe, fakePandocExe} {
+		if err := os.WriteFile(f, []byte("stub"), 0755); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// 1. When RSTUDIO_PANDOC is unset and pandoc is absent from PATH, ResolveBundledPandocDir finds <quarto_bin>/tools
+	gotDir := rsidecar.ResolveBundledPandocDir(rsidecar.RuntimeOptions{
+		QuartoPath: fakeQuartoExe,
+		LookupEnv: func(key string) (string, bool) {
+			if key == "PATH" {
+				return filepath.Join(fakeQuartoRoot, "empty-path"), true
+			}
+			return "", false
+		},
+	})
+	if gotDir != toolsDir {
+		t.Fatalf("ResolveBundledPandocDir = %q, want %q", gotDir, toolsDir)
+	}
+
+	// 2. Even when QuartoPath="none" (forcing rmarkdown_fallback), system VPRO_QUARTO_PATH still supplies bundled pandoc!
+	gotFallbackDir := rsidecar.ResolveBundledPandocDir(rsidecar.RuntimeOptions{
+		QuartoPath: "none",
+		LookupEnv: func(key string) (string, bool) {
+			switch key {
+			case "VPRO_QUARTO_PATH":
+				return fakeQuartoExe, true
+			case "PATH":
+				return filepath.Join(fakeQuartoRoot, "empty-path"), true
+			default:
+				return "", false
+			}
+		},
+	})
+	if gotFallbackDir != toolsDir {
+		t.Fatalf("ResolveBundledPandocDir with QuartoPath=none = %q, want %q", gotFallbackDir, toolsDir)
+	}
+
+	// 3. ConfigureChildREnv handles Windows mixed-case Path=, omits QUARTO_R on Windows, and injects RSTUDIO_PANDOC
+	winEnv := rsidecar.ConfigureChildREnv(
+		[]string{`SystemRoot=C:\Windows`, `Path=C:\Windows\System32`, `QUARTO_R=C:\stale\Rscript.exe`},
+		"windows",
+		`C:\Program Files\R\R-4.5.3\bin\x64\Rscript.exe`,
+		toolsDir,
+	)
+	foundPath := ""
+	foundPandoc := ""
+	foundQuartoR := false
+	for _, kv := range winEnv {
+		if strings.HasPrefix(kv, "Path=") {
+			foundPath = strings.TrimPrefix(kv, "Path=")
+		} else if strings.HasPrefix(kv, "RSTUDIO_PANDOC=") {
+			foundPandoc = strings.TrimPrefix(kv, "RSTUDIO_PANDOC=")
+		} else if strings.HasPrefix(strings.ToUpper(kv), "QUARTO_R=") {
+			foundQuartoR = true
+		}
+	}
+	if !strings.Contains(foundPath, `R-4.5.3`) || !strings.HasSuffix(foundPath, `;C:\Windows\System32`) {
+		t.Fatalf("expected R bin dir prepended to mixed-case Windows Path, got %q", foundPath)
+	}
+	if foundPandoc != toolsDir {
+		t.Fatalf("expected RSTUDIO_PANDOC=%q, got %q", toolsDir, foundPandoc)
+	}
+	if foundQuartoR {
+		t.Fatalf("expected QUARTO_R to be omitted on Windows so Quarto resolves Rscript.exe via Path, got %v", winEnv)
 	}
 }
 

@@ -11,6 +11,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -25,9 +26,27 @@ import (
 )
 
 const (
-	DefaultSpatialAssetsDir = "/home/bruno/Work/spatial_assets"
-	CurrentBECGISVersion    = 13
+	CurrentBECGISVersion = 13
 )
+
+// DefaultSpatialAssetsDir resolves ~/Work/spatial_assets dynamically across Linux, Windows, and macOS.
+var DefaultSpatialAssetsDir = ResolveDefaultSpatialAssetsDir()
+
+// ResolveDefaultSpatialAssetsDir returns filepath.Join(home, "Work", "spatial_assets") via os.UserHomeDir().
+func ResolveDefaultSpatialAssetsDir() string {
+	if home, err := os.UserHomeDir(); err == nil && strings.TrimSpace(home) != "" {
+		return filepath.Join(home, "Work", "spatial_assets")
+	}
+	return filepath.Join("Work", "spatial_assets")
+}
+
+// ResolveSpatialExtraDirs returns the default cross-platform extra spatial asset search directories.
+func ResolveSpatialExtraDirs() []string {
+	if d := ResolveDefaultSpatialAssetsDir(); d != "" {
+		return []string{d}
+	}
+	return nil
+}
 
 type pmtilesHeaderV3 struct {
 	rootDirOffset       uint64

@@ -30,6 +30,7 @@ type AssignSpatialAOIToSUResult = spatialpkg.AssignSpatialAOIToSUResult
 
 var NewPMTilesAssetHandler = spatialpkg.NewPMTilesAssetHandler
 var NewPMTilesAttributor = spatialpkg.NewPMTilesAttributor
+var ResolveSpatialExtraDirs = spatialpkg.ResolveSpatialExtraDirs
 
 type SpatialService struct {
 	contexts               *ContextService

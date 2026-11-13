@@ -229,6 +229,10 @@ test('GeospatialWorkbench, Navigation, App, and CoordinateFields compile cleanly
   assert.match(wbSource, /#003366/i);
   assert.match(wbSource, /#fcba19/i);
 
+  // Explicit bundled MapLibre worker URL configured for WebView2 http://wails.localhost/
+  assert.match(wbSource, /maplibre-gl\/dist\/maplibre-gl-worker\.mjs\?worker&url/);
+  assert.match(wbSource, /setWorkerUrl\(/);
+
   // Lazy route in App.svelte, Spatial entry in Navigation.svelte, Auto-1 button in CoordinateFields.svelte
   assert.match(appSource, /import\('\.\/GeospatialWorkbench\.svelte'\)/);
   assert.match(navSource, /3D Geospatial Workbench/);
@@ -237,7 +241,8 @@ test('GeospatialWorkbench, Navigation, App, and CoordinateFields compile cleanly
 
   // SSR render smoke check of GeospatialWorkbench.svelte
   const SSRWorkbench = serverComponent(wbSource, 'GeospatialWorkbench.svelte', {
-    'maplibre-gl': { Map: class {}, NavigationControl: class {}, ScaleControl: class {}, addProtocol() {} },
+    'maplibre-gl': { Map: class {}, NavigationControl: class {}, ScaleControl: class {}, addProtocol() {}, setWorkerUrl() {} },
+    'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url': { default: '/assets/maplibre-gl-worker.js' },
     'maplibre-gl/dist/maplibre-gl.css': {},
     pmtiles: { Protocol: class { tile = () => {}; } },
     '@deck.gl/mapbox': { MapboxOverlay: class {} },

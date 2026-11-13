@@ -137,6 +137,23 @@ func (service *ProjectService) PublishSQLiteSelection(candidate *SqliteContext, 
 	}
 }
 
+// EnsureActiveProjectWAL initializes the active project database pool in SQLite WAL journal mode
+// so newly materialized Sample.db and newly activated project databases operate in WAL immediately.
+func (service *ProjectService) EnsureActiveProjectWAL(ctx context.Context) error {
+	if service == nil {
+		return errors.New("project service is unavailable")
+	}
+	if err := sqlutil.AcquireReadLease(ctx, &service.Mu); err != nil {
+		return err
+	}
+	defer service.Mu.RUnlock()
+	if service.Sqlite == nil {
+		return errors.New("project context is closed")
+	}
+	_, err := service.Sqlite.ProjectDatabase(ctx)
+	return err
+}
+
 func (service *ProjectService) switchSQLiteLocked(selection DesktopSelection) (ProjectState, error) {
 	if service.Sqlite == nil {
 		return ProjectState{}, errors.New("project context is closed")

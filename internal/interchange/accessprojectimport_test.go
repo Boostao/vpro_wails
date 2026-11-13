@@ -7,11 +7,14 @@ import (
 
 import (
 	"context"
+	"database/sql"
 	"math"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 )
 
 func firstExistingPath(paths ...string) string {
@@ -133,6 +136,23 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 	}
 
 	currentContextID := state.ContextID
+	assertFileWAL := func(t *testing.T, dbPath string) {
+		t.Helper()
+		ro, oErr := sql.Open("sqlite3", sqlutil.SqliteFileURI(dbPath, "ro"))
+		if oErr != nil {
+			t.Fatalf("open %s for WAL check: %v", dbPath, oErr)
+		}
+		defer ro.Close()
+		var mode string
+		if qErr := ro.QueryRow("PRAGMA journal_mode;").Scan(&mode); qErr != nil || !strings.EqualFold(mode, "wal") {
+			t.Fatalf("expected WAL journal_mode on %s, got %q (%v)", filepath.Base(dbPath), mode, qErr)
+		}
+	}
+	if err := service.Projects.EnsureActiveProjectWAL(context.Background()); err != nil {
+		t.Fatalf("EnsureActiveProjectWAL on Sample.db: %v", err)
+	}
+	assertFileWAL(t, state.ProjectPath)
+
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			if _, err := os.Stat(tc.sourcePath); err != nil {
@@ -170,6 +190,11 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 			if res.TargetProject != tc.targetProject || res.PlotCount != tc.wantPlots || res.SourceVersion != tc.wantVersion {
 				t.Fatalf("unexpected import result: %+v", res)
 			}
+			assertFileWAL(t, destFile)
+			actualSHA, shaErr := streamFileSHA256(destFile)
+			if shaErr != nil || actualSHA != res.DestinationSHA {
+				t.Fatalf("DestinationSHA mismatch after WAL init: got %q want %q (%v)", actualSHA, res.DestinationSHA, shaErr)
+			}
 			if tc.activate {
 				if !res.Activated || res.State == nil || res.State.ActiveProject != tc.targetProject {
 					t.Fatalf("expected activated state for %s, got %+v", tc.targetProject, res.State)
@@ -178,6 +203,17 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 				page, err := service.Projects.ListPlots(context.Background(), 0, 10)
 				if err != nil || page.Total != tc.wantPlots {
 					t.Fatalf("GetPlots after activation: total=%d want=%d err=%v", page.Total, tc.wantPlots, err)
+				}
+				for _, pl := range page.Plots {
+					audits, aErr := service.ListAuditReadEntries(context.Background(), currentContextID, pl.PlotNumber)
+					if aErr != nil {
+						t.Fatalf("ListAuditReadEntries(%s/%s) failed: %v", tc.targetProject, pl.PlotNumber, aErr)
+					}
+					for _, entry := range audits {
+						if entry.Project != tc.targetProject {
+							t.Fatalf("expected normalized Audit.Project=%q, got %q", tc.targetProject, entry.Project)
+						}
+					}
 				}
 			}
 		})
