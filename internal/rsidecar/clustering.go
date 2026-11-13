@@ -308,23 +308,21 @@ func RunMultivariateClustering(
 			}
 		}
 
-		projDB, err := owner.ProjectDatabase(ctx)
-		if err != nil {
-			return nil, err
-		}
-		if err := CheckpointProjectWAL(ctx, projDB); err != nil {
-			return nil, err
-		}
-
-		vlistsPath := ""
 		if err := sqlutil.AcquireMutexLease(ctx, &owner.Mu); err != nil {
 			return nil, err
 		}
-		vlistsPath = owner.Attachments["VLists"]
+		vlistsPath := owner.Attachments["VLists"]
 		projectPath := owner.Selection.ProjectPath
 		projectName := owner.Selection.Project
 		activeSU := owner.Selection.SU
+		existingProjDB := owner.ProjectDB
 		owner.Mu.Unlock()
+
+		if existingProjDB != nil {
+			if err := CheckpointProjectWAL(ctx, existingProjDB); err != nil {
+				return nil, err
+			}
+		}
 
 		lumpTable := ""
 		if req.ApplyLump {
@@ -356,7 +354,7 @@ func RunMultivariateClustering(
 		}
 
 		var rResp rClusteringScriptResponse
-		err = executeRScriptJSON(
+		err := executeRScriptJSON(
 			ctx,
 			cfg,
 			filepath.Dir(projectPath),
@@ -374,6 +372,10 @@ func RunMultivariateClustering(
 		if req.MaterializeCandidate {
 			if strings.EqualFold(candidateSUName, activeSU) && vprocore.SameDesktopPath(projectPath, owner.Selection.SUPath) {
 				return nil, fmt.Errorf("candidate SU %q is currently active; switch to another SU before overwriting", candidateSUName)
+			}
+			projDB, err := owner.ProjectDatabase(ctx)
+			if err != nil {
+				return nil, err
 			}
 			candidateTableName = candidateSUName + "_SU"
 			user := strings.TrimSpace(plots.CurrentUser)
