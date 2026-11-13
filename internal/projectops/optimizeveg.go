@@ -109,107 +109,79 @@ func buildOptimizeVegPlan(ctx context.Context, db sqliteQueryer, project string,
 		return OptimizeVegPreview{}, nil, nil, colErr
 	}
 
-	selectParts := []string{"rowid"}
-	for _, c := range cols {
-		q := vprocore.QuoteHeaderIdentifier(c)
-		selectParts = append(selectParts,
-			"typeof("+q+")",
-			"CASE typeof("+q+") WHEN 'integer' THEN CAST("+q+" AS INTEGER) WHEN 'real' THEN CAST("+q+" AS REAL) ELSE CAST("+q+" AS BLOB) END",
-		)
-	}
-	rows, err := db.QueryContext(ctx, "SELECT "+strings.Join(selectParts, ", ")+" FROM "+quotedVeg+" ORDER BY rowid")
+	cntRows, err := db.QueryContext(ctx, "SELECT COUNT(*) FROM "+quotedVeg)
 	if err != nil {
 		return OptimizeVegPreview{}, nil, nil, err
 	}
-	defer rows.Close()
-
-	plotFilter := map[string]bool{}
-	for _, p := range filterPlots {
-		if strings.TrimSpace(p) != "" {
-			plotFilter[p] = true
-		}
-	}
-
-	var allRows []vegRowWithRowID
-	digestHasher := sha256.New()
-
-	for rows.Next() {
-		if err := ctx.Err(); err != nil {
+	var beforeRowCount int
+	if cntRows.Next() {
+		if err := cntRows.Scan(&beforeRowCount); err != nil {
+			_ = cntRows.Close()
 			return OptimizeVegPreview{}, nil, nil, err
 		}
-		var rid int64
-		storages := make([]string, len(cols))
-		vals := make([]any, len(cols))
-		dest := make([]any, 0, 1+len(cols)*2)
-		dest = append(dest, &rid)
-		for i := range cols {
-			dest = append(dest, &storages[i], &vals[i])
-		}
-		if err := rows.Scan(dest...); err != nil {
-			return OptimizeVegPreview{}, nil, nil, err
-		}
-		cellMap := make(map[string]rawSQLiteCell, len(cols))
-		_, _ = fmt.Fprintf(digestHasher, "row:%d|", rid)
-		for i, col := range cols {
-			c := rawSQLiteCell{storage: storages[i]}
-			switch storages[i] {
-			case "integer":
-				if v, ok := vals[i].(int64); ok {
-					c.intVal = v
-				}
-				_, _ = fmt.Fprintf(digestHasher, "%s=i:%d;", col, c.intVal)
-			case "real":
-				if v, ok := vals[i].(float64); ok {
-					c.realVal = v
-				}
-				_, _ = fmt.Fprintf(digestHasher, "%s=r:%g;", col, c.realVal)
-			case "text", "blob":
-				switch b := vals[i].(type) {
-				case []byte:
-					c.bytes = append([]byte(nil), b...)
-				case string:
-					c.bytes = []byte(b)
-				}
-				_, _ = fmt.Fprintf(digestHasher, "%s=%s:%x;", col, storages[i], c.bytes)
-			default:
-				_, _ = fmt.Fprintf(digestHasher, "%s=null;", col)
-			}
-			cellMap[col] = c
-		}
-		allRows = append(allRows, vegRowWithRowID{rowID: rid, cells: cellMap})
 	}
-	if err := rows.Err(); err != nil {
+	if err := errors.Join(cntRows.Err(), cntRows.Close()); err != nil {
 		return OptimizeVegPreview{}, nil, nil, err
 	}
+
+	plotFilter := map[string]bool{}
+	var sortedFilterPlots []string
+	for _, p := range filterPlots {
+		if strings.TrimSpace(p) != "" && !plotFilter[p] {
+			plotFilter[p] = true
+			sortedFilterPlots = append(sortedFilterPlots, p)
+		}
+	}
+	slices.Sort(sortedFilterPlots)
 
 	type groupKey struct {
 		plot    string
 		species string
 	}
-	grouped := map[groupKey][]vegRowWithRowID{}
+	dupKeys := map[groupKey]bool{}
+	dupPlotsSet := map[string]bool{}
+	var dupPlots []string
 	var groupOrder []groupKey
 
-	for _, r := range allRows {
-		pCell := r.cells["PlotNumber"]
-		sCell := r.cells["Species"]
-		if pCell.storage != "text" || sCell.storage != "text" {
-			continue
+	dupKeyQuery := `SELECT CAST("PlotNumber" AS BLOB), CAST("Species" AS BLOB) FROM ` + quotedVeg + `
+		WHERE typeof("PlotNumber")='text' AND typeof("Species")='text'
+		  AND "PlotNumber" <> '' AND "Species" <> ''
+		GROUP BY "PlotNumber" COLLATE BINARY, "Species" COLLATE BINARY
+		HAVING COUNT(*) > 1`
+	dupKeyRows, err := db.QueryContext(ctx, dupKeyQuery)
+	if err != nil {
+		return OptimizeVegPreview{}, nil, nil, err
+	}
+	for dupKeyRows.Next() {
+		if err := ctx.Err(); err != nil {
+			_ = dupKeyRows.Close()
+			return OptimizeVegPreview{}, nil, nil, err
 		}
-		plot := string(pCell.bytes)
-		spp := string(sCell.bytes)
-		if plot == "" || spp == "" {
-			continue
+		var plotBytes, sppBytes []byte
+		if err := dupKeyRows.Scan(&plotBytes, &sppBytes); err != nil {
+			_ = dupKeyRows.Close()
+			return OptimizeVegPreview{}, nil, nil, err
 		}
+		plot := string(plotBytes)
+		spp := string(sppBytes)
 		if len(plotFilter) > 0 && !plotFilter[plot] {
 			continue
 		}
 		gk := groupKey{plot: plot, species: spp}
-		if _, seen := grouped[gk]; !seen {
+		if !dupKeys[gk] {
+			dupKeys[gk] = true
 			groupOrder = append(groupOrder, gk)
 		}
-		grouped[gk] = append(grouped[gk], r)
+		if !dupPlotsSet[plot] {
+			dupPlotsSet[plot] = true
+			dupPlots = append(dupPlots, plot)
+		}
+	}
+	if err := errors.Join(dupKeyRows.Err(), dupKeyRows.Close()); err != nil {
+		return OptimizeVegPreview{}, nil, nil, err
 	}
 
+	slices.Sort(dupPlots)
 	slices.SortFunc(groupOrder, func(a, b groupKey) int {
 		if c := strings.Compare(a.plot, b.plot); c != 0 {
 			return c
@@ -217,10 +189,143 @@ func buildOptimizeVegPlan(ctx context.Context, db sqliteQueryer, project string,
 		return strings.Compare(a.species, b.species)
 	})
 
+	plotColIdx, sppColIdx := -1, -1
+	selectParts := []string{"rowid"}
+	for i, c := range cols {
+		if c == "PlotNumber" {
+			plotColIdx = i
+		} else if c == "Species" {
+			sppColIdx = i
+		}
+		q := vprocore.QuoteHeaderIdentifier(c)
+		selectParts = append(selectParts,
+			"typeof("+q+")",
+			"CASE typeof("+q+") WHEN 'integer' THEN CAST("+q+" AS INTEGER) WHEN 'real' THEN CAST("+q+" AS REAL) ELSE CAST("+q+" AS BLOB) END",
+		)
+	}
+
+	var dupRows []vegRowWithRowID
+	if len(dupPlots) > 0 && plotColIdx >= 0 && sppColIdx >= 0 {
+		const batchSize = 400
+		storages := make([]string, len(cols))
+		vals := make([]any, len(cols))
+		var rid int64
+		dest := make([]any, 0, 1+len(cols)*2)
+		dest = append(dest, &rid)
+		for i := range cols {
+			dest = append(dest, &storages[i], &vals[i])
+		}
+
+		for start := 0; start < len(dupPlots); start += batchSize {
+			end := min(start+batchSize, len(dupPlots))
+			chunk := dupPlots[start:end]
+			marks := make([]string, len(chunk))
+			args := make([]any, len(chunk))
+			for i, p := range chunk {
+				marks[i] = "?"
+				args[i] = p
+			}
+			q := "SELECT " + strings.Join(selectParts, ", ") + " FROM " + quotedVeg +
+				` WHERE typeof("PlotNumber")='text' AND typeof("Species")='text' AND "PlotNumber" IN (` + strings.Join(marks, ",") + `) ORDER BY rowid`
+			rows, qErr := db.QueryContext(ctx, q, args...)
+			if qErr != nil {
+				return OptimizeVegPreview{}, nil, nil, qErr
+			}
+			for rows.Next() {
+				if err := ctx.Err(); err != nil {
+					_ = rows.Close()
+					return OptimizeVegPreview{}, nil, nil, err
+				}
+				if err := rows.Scan(dest...); err != nil {
+					_ = rows.Close()
+					return OptimizeVegPreview{}, nil, nil, err
+				}
+				if storages[plotColIdx] != "text" || storages[sppColIdx] != "text" {
+					continue
+				}
+				var plot, spp string
+				switch b := vals[plotColIdx].(type) {
+				case []byte:
+					plot = string(b)
+				case string:
+					plot = b
+				}
+				switch b := vals[sppColIdx].(type) {
+				case []byte:
+					spp = string(b)
+				case string:
+					spp = b
+				}
+				if !dupKeys[groupKey{plot: plot, species: spp}] {
+					continue
+				}
+
+				cellMap := make(map[string]rawSQLiteCell, len(cols))
+				for i, col := range cols {
+					c := rawSQLiteCell{storage: storages[i]}
+					switch storages[i] {
+					case "integer":
+						if v, ok := vals[i].(int64); ok {
+							c.intVal = v
+						}
+					case "real":
+						if v, ok := vals[i].(float64); ok {
+							c.realVal = v
+						}
+					case "text", "blob":
+						switch b := vals[i].(type) {
+						case []byte:
+							c.bytes = append([]byte(nil), b...)
+						case string:
+							c.bytes = []byte(b)
+						}
+					}
+					cellMap[col] = c
+				}
+				dupRows = append(dupRows, vegRowWithRowID{rowID: rid, cells: cellMap})
+			}
+			if err := errors.Join(rows.Err(), rows.Close()); err != nil {
+				return OptimizeVegPreview{}, nil, nil, err
+			}
+		}
+	}
+
+	slices.SortFunc(dupRows, func(a, b vegRowWithRowID) int {
+		if a.rowID < b.rowID {
+			return -1
+		}
+		if a.rowID > b.rowID {
+			return 1
+		}
+		return 0
+	})
+
+	digestHasher := sha256.New()
+	_, _ = fmt.Fprintf(digestHasher, "count:%d|filters:%s|", beforeRowCount, strings.Join(sortedFilterPlots, ","))
+	grouped := make(map[groupKey][]vegRowWithRowID, len(groupOrder))
+	for _, r := range dupRows {
+		_, _ = fmt.Fprintf(digestHasher, "row:%d|", r.rowID)
+		for _, col := range cols {
+			c := r.cells[col]
+			switch c.storage {
+			case "integer":
+				_, _ = fmt.Fprintf(digestHasher, "%s=i:%d;", col, c.intVal)
+			case "real":
+				_, _ = fmt.Fprintf(digestHasher, "%s=r:%g;", col, c.realVal)
+			case "text", "blob":
+				_, _ = fmt.Fprintf(digestHasher, "%s=%s:%x;", col, c.storage, c.bytes)
+			default:
+				_, _ = fmt.Fprintf(digestHasher, "%s=null;", col)
+			}
+		}
+		gk := groupKey{plot: string(r.cells["PlotNumber"].bytes), species: string(r.cells["Species"].bytes)}
+		grouped[gk] = append(grouped[gk], r)
+	}
+
 	preview := OptimizeVegPreview{
 		Project:        project,
-		BeforeRowCount: len(allRows),
-		AfterRowCount:  len(allRows),
+		BeforeRowCount: beforeRowCount,
+		AfterRowCount:  beforeRowCount,
 		PreviewDigest:  hex.EncodeToString(digestHasher.Sum(nil)),
 		Groups:         []OptimizeVegGroup{},
 	}
