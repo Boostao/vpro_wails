@@ -156,7 +156,7 @@ function componentFunctions(filename, names, values) {
   const selected = ast.statements.filter(node => ts.isFunctionDeclaration(node) && names.includes(node.name.text));
   assert.equal(selected.length, names.length);
   const defaultSoilReviewProfile = filename === 'App.svelte' || filename === 'FS882Form.svelte'
-    ? { twoPageSoilBusy: false, twoPageSoilBlocked: false, ordinarySoilUnavailable: null,
+    ? { twoPageSoilBusy: false, twoPageSoilBlocked: false, ordinarySoilUnavailable: null, historicalSoilUnavailable: null,
       twoPageVegetationBusy: false, twoPageVegetationBlocked: false, ordinaryVegetationUnavailable: null } : {};
   const context = vm.createContext({ exports: {}, __testEnvironment: {},
     ...(filename === 'TwoPageEntryEditor.svelte' ? { vegetationTableOpen: false, vegetationTableBusy: false, environmentTableOpen: false, environmentTableBusy: false, projectMetadataOpen: false, projectMetadataBusy: false, profilingOpen: false, profilingBusy: false } : {}),

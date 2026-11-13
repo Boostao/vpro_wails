@@ -230,3 +230,211 @@ test('SIVIParentCreateModal SSR and client mount create FS1333 SIVI plots, detac
     dispose();
   }
 });
+
+test('SIVIParentCreateModal releases onBusyChange(false) before awaiting oncreated/onundone so App.svelte loadPlots refreshes immediately', async () => {
+  const { componentFunctions } = require('./svelteTestHelpers.cjs');
+  const client = await import('svelte/internal/client');
+  let script = read('SIVIParentCreateModal.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  script = script.replace('onclose,', 'onclose, inspect,');
+  script += `\n$effect(() => inspect({
+    setForm(p, t) { plotNumber = p; plotType = t; },
+    submitCreate,
+    executeUndo,
+    getState: () => ({ createdPlots, error }),
+  }));`;
+
+  const compiled = compile(`<script lang="ts">${script}</script>`, { generate: 'client' });
+  assert.equal(compiled.warnings.length, 0);
+  const ast = ts.createSourceFile('siviModalBusyOrder.js', compiled.js.code, ts.ScriptTarget.Latest, true);
+  const code = ast.statements
+    .filter(n => !ts.isImportDeclaration(n))
+    .map(n => n.getText(ast))
+    .join('\n')
+    .replace('export default function', 'function');
+
+  let seq = 0;
+  const mountFn = new Function(
+    '$',
+    'onDestroy',
+    'onMount',
+    'defaultSIVIParentCreatePort',
+    'SIVI_PLOT_TYPES',
+    'validateCreateSIVIPlotDraft',
+    'crypto',
+    code + '\nreturn _unknown_;'
+  );
+
+  const events = [];
+  let siviModalBusy = false;
+  let listPlotsCalls = 0;
+  const appCtx = componentFunctions('App.svelte', ['loadPlots'], {
+    view: 'home',
+    busy: false,
+    editorBusy: false,
+    twoPageVegetationBusy: false,
+    twoPageSoilBusy: false,
+    pictureCreationBusy: false,
+    pictureLifecycleBusy: false,
+    vegetationPublicationBusy: false,
+    lifeformPublicationBusy: false,
+    summaryPublicationBusy: false,
+    summaryPreferenceBusy: false,
+    externalSUEnvironmentBusy: false,
+    projectReportBusy: false,
+    profileNavigation: null,
+    request: 0,
+    pageSize: 50,
+    offset: 0,
+    page: null,
+    selected: null,
+    error: '',
+    plotReads: { track: p => p, cancelAll() {} },
+    ContextService: {
+      ListPlots: async (off, lim) => {
+        listPlotsCalls++;
+        events.push(`listPlots:${off}:${lim}`);
+        return { plots: [{ plotNumber: '00771' }], total: 1 };
+      },
+    },
+  });
+  Object.defineProperty(appCtx, 'companionPanelBusy', {
+    get: () => siviModalBusy,
+  });
+
+  let failNextCreate = false;
+  let failNextUndo = false;
+  const history = [];
+  const mockPort = {
+    async listCreatedPlots() {
+      return structuredClone(history);
+    },
+    async createPlot(cid, req) {
+      if (failNextCreate) throw new Error('simulated create error');
+      const entry = {
+        requestId: req.requestId,
+        plotNumber: req.plotNumber,
+        plotType: req.plotType,
+        createdAt: '2026-11-12 12:00:00',
+        actor: 'Surveyor',
+        undone: false,
+        canUndo: true,
+      };
+      history.unshift(entry);
+      return {
+        requestId: req.requestId,
+        contextId: cid,
+        project: 'Sample',
+        plotNumber: req.plotNumber,
+        plotType: req.plotType,
+        addedToSu: false,
+        auditRowCount: 3,
+        createdAt: entry.createdAt,
+        actor: entry.actor,
+        replayed: false,
+      };
+    },
+    async undoCreatePlot(cid, req) {
+      if (failNextUndo) throw new Error('simulated undo error');
+      const found = history.find(h => h.requestId === req.creationRequestId);
+      found.undone = true;
+      found.canUndo = false;
+      return {
+        requestId: req.requestId,
+        creationRequestId: req.creationRequestId,
+        contextId: cid,
+        project: 'Sample',
+        plotNumber: req.plotNumber,
+        removedFromSu: false,
+        undoneAt: '2026-11-12 12:05:00',
+        actor: 'Surveyor',
+        replayed: false,
+      };
+    },
+  };
+
+  let api;
+  const dispose = client.effect_root(() =>
+    mountFn(
+      client,
+      () => {},
+      fn => fn(),
+      siviCreate.defaultSIVIParentCreatePort,
+      siviCreate.SIVI_PLOT_TYPES,
+      siviCreate.validateCreateSIVIPlotDraft,
+      { randomUUID: () => `55555555-5555-4666-8777-88888888880${++seq}` }
+    )(null, {
+      contextId: 'ctx-sivi',
+      activeProject: 'Sample',
+      activeSu: 'Sample',
+      open: true,
+      port: mockPort,
+      onBusyChange: value => {
+        siviModalBusy = value;
+        events.push(`busy:${value}`);
+      },
+      oncreated: async () => {
+        events.push(`oncreated:busy=${siviModalBusy}`);
+        await appCtx.actions.loadPlots(0);
+      },
+      onundone: async () => {
+        events.push(`onundone:busy=${siviModalBusy}`);
+        await appCtx.actions.loadPlots(0);
+      },
+      inspect: v => {
+        api = v;
+      },
+    })
+  );
+  client.flush();
+  await Promise.resolve();
+  client.flush();
+  events.length = 0;
+
+  try {
+    api.setForm('00771', 'Ground');
+    client.flush();
+    await api.submitCreate();
+    client.flush();
+
+    assert.deepEqual(events, [
+      'busy:true',
+      'busy:false',
+      'oncreated:busy=false',
+      'listPlots:0:50',
+    ]);
+    assert.equal(listPlotsCalls, 1);
+
+    events.length = 0;
+    await api.executeUndo(api.getState().createdPlots[0]);
+    client.flush();
+
+    assert.deepEqual(events, [
+      'busy:true',
+      'busy:false',
+      'onundone:busy=false',
+      'listPlots:0:50',
+    ]);
+    assert.equal(listPlotsCalls, 2);
+
+    // Error paths still release busy via finally
+    events.length = 0;
+    failNextCreate = true;
+    api.setForm('00772', 'Visual');
+    client.flush();
+    await api.submitCreate();
+    client.flush();
+    assert.equal(siviModalBusy, false);
+    assert.deepEqual(events, ['busy:true', 'busy:false']);
+    assert.match(api.getState().error, /simulated create error/);
+
+    events.length = 0;
+    failNextUndo = true;
+    await api.executeUndo({ requestId: 'missing', plotNumber: '00772', plotType: 'Visual', createdAt: '', actor: '', undone: false, canUndo: true });
+    client.flush();
+    assert.equal(siviModalBusy, false);
+    assert.deepEqual(events, ['busy:true', 'busy:false']);
+    assert.match(api.getState().error, /simulated undo error/);
+  } finally {
+    dispose();
+  }
+});

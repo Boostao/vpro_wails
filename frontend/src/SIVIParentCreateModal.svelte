@@ -29,8 +29,8 @@
     operationHeld?: boolean;
     port?: SIVIParentCreatePort;
     onBusyChange?: (busy: boolean) => void;
-    oncreated?: (result: CreateSIVIPlotResult) => void;
-    onundone?: (plotNumber: string) => void;
+    oncreated?: (result: CreateSIVIPlotResult) => void | Promise<void>;
+    onundone?: (plotNumber: string) => void | Promise<void>;
     onclose?: () => void;
   } = $props();
 
@@ -58,6 +58,11 @@
 
   function reportBusy() {
     onBusyChange?.(busy || historyBusy);
+  }
+
+  function setBusy(next: boolean) {
+    busy = next;
+    reportBusy();
   }
 
   const draftErrors = $derived(
@@ -133,8 +138,9 @@
       return;
     }
     const gen = ++generation;
-    busy = true;
-    reportBusy();
+    historyGen++;
+    historyBusy = false;
+    setBusy(true);
     error = null;
     status = null;
     try {
@@ -144,14 +150,15 @@
       plotNumber = '';
       fieldNumber = '';
       const list = await port.listCreatedPlots(contextId);
-      if (gen === generation) createdPlots = list ?? [];
-      if (oncreated) oncreated(res);
+      if (gen !== generation) return;
+      createdPlots = list ?? [];
+      setBusy(false);
+      if (oncreated) await oncreated(res);
     } catch (cause) {
       if (gen === generation) error = `Create SIVI plot failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) {
-        busy = false;
-        reportBusy();
+      if (gen === generation && busy) {
+        setBusy(false);
       }
     }
   }
@@ -167,8 +174,9 @@
       plotNumber: entry.plotNumber,
     });
     const gen = ++generation;
-    busy = true;
-    reportBusy();
+    historyGen++;
+    historyBusy = false;
+    setBusy(true);
     error = null;
     status = null;
     try {
@@ -177,14 +185,15 @@
       confirmUndoId = null;
       status = `Undid SIVI plot creation "${res.plotNumber}" cleanly.`;
       const list = await port.listCreatedPlots(contextId);
-      if (gen === generation) createdPlots = list ?? [];
-      if (onundone) onundone(res.plotNumber);
+      if (gen !== generation) return;
+      createdPlots = list ?? [];
+      setBusy(false);
+      if (onundone) await onundone(res.plotNumber);
     } catch (cause) {
       if (gen === generation) error = `Undo SIVI plot creation failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) {
-        busy = false;
-        reportBusy();
+      if (gen === generation && busy) {
+        setBusy(false);
       }
     }
   }

@@ -758,3 +758,130 @@ test('profile blocks ordinary soil callbacks before transport, confirmations or 
     assert.equal(context.childRevision, 1);
   }
 });
+
+test('default 6-tab FS882 guards historical NULL/invalid soil rows per-plot while propagating transport and stale-context errors', async () => {
+  const historicalFailures = [
+    ['humus', () => Promise.reject(new Error('Humus row for plot "108050" has unsupported NULL ID; repair its identity before editing')), () => operation([{ id: 2, horizon: 'Bm' }])],
+    ['mineral', () => operation([{ id: 1, horizon: 'L' }]), () => Promise.reject(new Error('Mineral row for plot "108050" has unsupported NULL ID; repair its identity before editing'))],
+    ['depth-scan', () => operation([{ id: 1, horizon: 'L' }]), () => Promise.reject(new Error('sql: Scan error on column index 3, name "UpperDepth": converting driver.Value type string ("10-20") to a float64: invalid syntax'))],
+    ['id-scan', () => Promise.reject(new Error('sql: Scan error on column index 0, name "ID": converting driver.Value type string ("01") to a int64: invalid syntax')), () => operation([])],
+    ['overflow-id', () => operation([{ id: 9223372036854775807, horizon: 'L' }]), () => operation([])],
+    ['duplicate-id', () => operation([]), () => operation([{ id: 0, horizon: 'Ah' }, { id: 0, horizon: 'Bm' }])],
+  ];
+
+  for (const [label, listHumus, listMineral] of historicalFailures) {
+    const context = componentFunctions('FS882Form.svelte', ['loadChildData'], {
+      loadRequest: 1, childRevision: 0, siviIdentityEnabled: false, ordinarySoilUnavailable: null,
+      historicalSoilUnavailable: null,
+      reads: { track: value => value }, PlotService: {
+        ListVegRecords: () => operation([{ id: 7, species: 'PSEUMEN' }]),
+        ListHumusRecords: listHumus,
+        ListMineralRecords: listMineral,
+        ListOtherRecords: () => operation([{ id: 9, dataName: 'Note' }]),
+        ListAuditReadEntries: () => operation([{ rowId: '1' }]),
+        GetChildCapabilities: () => operation({ horizon: true }),
+      },
+    });
+    await context.actions.loadChildData(fixture.owner.plot);
+    assert.equal(context.childRevision, 1, label);
+    assert.equal(context.vegList.length, 1, label);
+    assert.equal(context.otherList.length, 1, label);
+    assert.equal(context.auditList.length, 1, label);
+    assert.deepEqual(Array.from(context.humusList), [], label);
+    assert.deepEqual(Array.from(context.mineralList), [], label);
+    assert.equal(typeof context.historicalSoilUnavailable, 'string', label);
+    assert.match(context.historicalSoilUnavailable, /Two-page|physical/i, label);
+  }
+
+  // Subsequent clean plot reload clears historicalSoilUnavailable and restores ordinary rows
+  const recovery = componentFunctions('FS882Form.svelte', ['loadChildData'], {
+    loadRequest: 1, childRevision: 0, siviIdentityEnabled: false, ordinarySoilUnavailable: null,
+    historicalSoilUnavailable: 'Stale historical soil warning.',
+    reads: { track: value => value }, PlotService: {
+      ListVegRecords: () => operation([]),
+      ListHumusRecords: () => operation([{ id: 1, horizon: 'L' }]),
+      ListMineralRecords: () => operation([{ id: 2, horizon: 'Bm' }]),
+      ListOtherRecords: () => operation([]),
+      ListAuditReadEntries: () => operation([]),
+      GetChildCapabilities: () => operation({ horizon: true }),
+    },
+  });
+  await recovery.actions.loadChildData(fixture.owner.plot);
+  assert.equal(recovery.historicalSoilUnavailable, null);
+  assert.equal(recovery.humusList.length, 1);
+  assert.equal(recovery.mineralList.length, 1);
+
+  // Genuine transport, cancellation, schema, and stale-context errors must still reject loadChildData
+  for (const transportError of [
+    'editor context is stale or closed; reload before editing',
+    'context canceled',
+    'network transport disconnected',
+    'Humus is missing verified ID/PlotNumber identity columns',
+  ]) {
+    for (const which of ['humus', 'mineral']) {
+      const context = componentFunctions('FS882Form.svelte', ['loadChildData'], {
+        loadRequest: 1, childRevision: 0, siviIdentityEnabled: false, ordinarySoilUnavailable: null,
+        historicalSoilUnavailable: null,
+        reads: { track: value => value }, PlotService: {
+          ListVegRecords: () => operation([]),
+          ListHumusRecords: () => which === 'humus' ? Promise.reject(new Error(transportError)) : operation([]),
+          ListMineralRecords: () => which === 'mineral' ? Promise.reject(new Error(transportError)) : operation([]),
+          ListOtherRecords: () => operation([]),
+          ListAuditReadEntries: () => operation([]),
+          GetChildCapabilities: () => operation({ horizon: true }),
+        },
+      });
+      await assert.rejects(
+        context.actions.loadChildData(fixture.owner.plot),
+        new RegExp(transportError.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      );
+      assert.equal(context.childRevision, 0);
+    }
+  }
+
+  // Soils tab notice + derived soilEditingDisabled + disabled ordinary soil edits when historicalSoilUnavailable is set
+  const source = read('FS882Form.svelte');
+  assert.match(source, /{#if historicalSoilUnavailable}<p role="status" data-soil-historical-unavailable>{historicalSoilUnavailable}<\/p>{\/if}/);
+  assert.match(source, /{:else if historicalSoilUnavailable}\s*<p role="status" data-soil-historical-unavailable={child\.form}>{historicalSoilUnavailable}<\/p>/);
+
+  const root = source.match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  const derivedDecl = root.match(/const soilEditingDisabled = \$derived\([^;]+\);/)[0];
+  const DerivedProbe = serverComponent(`<script lang="ts">
+    let { historicalSoilUnavailable, inspect } = $props();
+    const ordinarySoilUnavailable = null, soilEditingEnabled = true, soilReferenceReady = true, soilReferenceBusy = false,
+      childParentDisabled = false, siviUnsaved = false, siviCoverUnsaved = false, siviCombinedUnsaved = false,
+      siviCollectedUnsaved = false, siviSpeciesUnsaved = false, siviIdentityUnsaved = false, heightUnsaved = false,
+      otherUnsaved = false, attributeUnsaved = false, collectedUnsaved = false, speciesUnsaved = false;
+    ${derivedDecl}
+    function inspectStates() { inspect(soilEditingDisabled); }
+    inspectStates();
+  </script>`, 'DerivedHistoricalSoilDisabledTest.svelte', {}, {});
+  let cleanDisabled, historicalDisabled;
+  assert.equal(typeof render(DerivedProbe, { props: { historicalSoilUnavailable: null, inspect: v => { cleanDisabled = v; } } }).body, 'string');
+  assert.equal(typeof render(DerivedProbe, { props: { historicalSoilUnavailable: 'Historical soil row incompatible.', inspect: v => { historicalDisabled = v; } } }).body, 'string');
+  assert.equal(cleanDisabled, false);
+  assert.equal(historicalDisabled, true);
+
+  const reason = 'Ordinary ID-keyed humus rows are unavailable for this historical plot.';
+  for (const kind of ['humus', 'mineral']) {
+    const context = componentFunctions('FS882Form.svelte',
+      ['openNewChild', 'createChild', 'editSourceChild', 'deleteSourceChild', 'stageSoilCell', 'saveSoilDrafts'], {
+        ordinarySoilUnavailable: null, historicalSoilUnavailable: reason, soilEditingDisabled: true, soilUnsaved: false,
+        childEditingDisabled: false, newChild: kind, error: null, childRevision: 0,
+        PlotService: new Proxy({}, { get() { throw new Error('No ordinary soil transport permitted'); } }),
+        window: { confirm() { throw new Error('No confirmation permitted'); } },
+      });
+    context.actions.openNewChild(kind);
+    assert.match(context.error, /available child workflow/);
+    await context.actions.createChild('H', 'text');
+    assert.equal(context.error, reason);
+    await context.actions.editSourceChild(kind === 'humus' ? 'SoilHumusXL' : 'SoilMineralXL', 1, 'Horizon', 'H');
+    assert.equal(context.error, reason);
+    await context.actions.deleteSourceChild(kind === 'humus' ? 'SoilHumusXL' : 'SoilMineralXL', 1);
+    assert.match(context.error, /available child workflow/);
+    context.actions.stageSoilCell(kind === 'humus' ? 'Humus' : 'Mineral', 1, 'Horizon', 'H');
+    assert.match(context.error, /Soil draft failed.*unavailable/);
+    await context.actions.saveSoilDrafts();
+    assert.match(context.error, /available references/);
+  }
+});
