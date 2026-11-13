@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -117,6 +118,7 @@ export function renderPortalHtml({
   dataUseAgreement,
   provenance,
   manifest,
+  assetVersions = {},
 }) {
   const reviewedManifest = reviewManifest(manifest);
   if (!Array.isArray(dataUseAgreement?.clauses) || dataUseAgreement.clauses.length !== 9) {
@@ -303,6 +305,10 @@ export function renderPortalHtml({
               </tr>`;
   }).join('');
 
+  const cssHref = assetVersions.css ? `./styles.css?v=${encodeURIComponent(assetVersions.css)}` : './styles.css';
+  const downloadsSrc = assetVersions.downloads ? `./downloads.mjs?v=${encodeURIComponent(assetVersions.downloads)}` : './downloads.mjs';
+  const portalDocsSrc = assetVersions.portalDocs ? `./portal-docs.mjs?v=${encodeURIComponent(assetVersions.portalDocs)}` : './portal-docs.mjs';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -311,7 +317,7 @@ export function renderPortalHtml({
   <title>VPro — VENUS (Vegetation and Environment NexUS) Professional | B.C. Ministry of Forests BEC Program</title>
   <meta name="description" content="Official release portal, LMH25 (2023) field reference, and BECWeb Data Use Agreement for VPro (VENUS — Vegetation and Environment NexUS — Professional), B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program.">
   <link rel="icon" href="./favicon.ico" sizes="any">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="${cssHref}">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -381,7 +387,15 @@ export function renderPortalHtml({
           </div>
 
           <div id="detected-platform-banner" class="detected-row">
-            Detected workstation: <strong id="detected-platform-name">Detecting...</strong>
+            <span id="detected-platform-label">Detected workstation:</span> <strong id="detected-platform-name">Detecting...</strong>
+          </div>
+
+          <div id="platform-switcher" class="platform-switcher" role="group" aria-label="Select workstation platform and architecture">
+            <button type="button" id="plat-btn-win-amd64" class="platform-pill" aria-pressed="false">Windows x64</button>
+            <button type="button" id="plat-btn-win-arm64" class="platform-pill" aria-pressed="false">Windows ARM64</button>
+            <button type="button" id="plat-btn-mac-universal" class="platform-pill" aria-pressed="false">macOS</button>
+            <button type="button" id="plat-btn-linux-amd64" class="platform-pill" aria-pressed="false">Linux x64</button>
+            <button type="button" id="plat-btn-linux-arm64" class="platform-pill" aria-pressed="false">Linux ARM64</button>
           </div>
 
           <a id="primary-download-btn" href="#downloads" class="primary-btn">
@@ -504,7 +518,7 @@ export function renderPortalHtml({
                 <span>Linux</span>
                 <span class="os-tag">GTK4 / WebKitGTK 6.0</span>
               </h3>
-              <p>Native GTK4 and WebKitGTK 6.0 packages for Ubuntu 24.04+, Debian 13+, and Fedora workstations.</p>
+              <p>Standalone AppImage runs directly on Fedora, RHEL, Ubuntu 24.04+, and Debian 13+; native <code>.deb</code> provided for Debian and Ubuntu.</p>
 
               <div class="arch-heading">x86_64 (amd64)</div>
               <div class="asset-list">
@@ -727,8 +741,8 @@ sudo apt install ./vpro-linux-amd64.deb</pre>
     </div>
   </footer>
 
-  <script type="module" src="./downloads.mjs"></script>
-  <script type="module" src="./portal-docs.mjs"></script>
+  <script type="module" src="${downloadsSrc}"></script>
+  <script type="module" src="${portalDocsSrc}"></script>
 </body>
 </html>
 `;
@@ -756,7 +770,14 @@ export function validateBuiltAssets({ html, css, downloadsJs, portalDocsJs }) {
   }
   const uniqueIds = [
     ...Object.keys(assetLinks),
+    'detected-platform-label',
     'detected-platform-name',
+    'platform-switcher',
+    'plat-btn-win-amd64',
+    'plat-btn-win-arm64',
+    'plat-btn-mac-universal',
+    'plat-btn-linux-amd64',
+    'plat-btn-linux-arm64',
     'primary-download-btn',
     'primary-download-text',
     'release-version-tag',
@@ -796,6 +817,7 @@ export function buildSite({
   const css = fs.readFileSync(path.join(siteDir, 'src', 'styles.css'), 'utf8');
   const downloadsJs = fs.readFileSync(path.join(siteDir, 'src', 'downloads.mjs'), 'utf8');
   const portalDocsJs = fs.readFileSync(path.join(siteDir, 'src', 'portal-docs.mjs'), 'utf8');
+  const shortHash = content => crypto.createHash('sha256').update(content, 'utf8').digest('hex').slice(0, 8);
   const html = renderPortalHtml({
     guides,
     lmh25,
@@ -804,6 +826,11 @@ export function buildSite({
     dataUseAgreement,
     provenance,
     manifest,
+    assetVersions: {
+      css: shortHash(css),
+      downloads: shortHash(downloadsJs),
+      portalDocs: shortHash(portalDocsJs),
+    },
   });
   const manifestJson = JSON.stringify(manifest, null, 2) + '\n';
 

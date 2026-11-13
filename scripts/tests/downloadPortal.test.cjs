@@ -113,7 +113,13 @@ function makeElement(id) {
 function documentFixture(links) {
   const elements = new Map();
   const baseIds = [
+    'detected-platform-label',
     'detected-platform-name',
+    'plat-btn-win-amd64',
+    'plat-btn-win-arm64',
+    'plat-btn-mac-universal',
+    'plat-btn-linux-amd64',
+    'plat-btn-linux-arm64',
     'primary-download-btn',
     'primary-download-text',
     'release-version-tag',
@@ -148,16 +154,27 @@ function documentFixture(links) {
   };
 }
 
-test('architecture hints override emulated Windows UA; every supported and mobile platform is explicit', async () => {
+test('architecture hints override emulated Windows UA; redacted/blocked hints preserve UA fallback; 32-bit and mobile reject', async () => {
   const { detectPlatform, recommendedAsset } = await portal;
   const rows = [
     [{ userAgent: 'Windows NT Win64 x64', platform: 'Win32',
       userAgentData: { platform: 'Windows', getHighEntropyValues: async () => ({ architecture: 'arm', bitness: '64' }) } }, 'windows', 'arm64', 'dl-win-arm64-installer'],
     [{ userAgent: 'Windows NT Win64 x64', platform: 'Win32' }, 'windows', 'amd64', 'dl-win-x64-installer'],
+    [{ userAgent: 'Mozilla/5.0 (Windows NT 10.0; rv:159.0) Gecko/20100101 Firefox/159.0', platform: 'Win32' }, 'windows', 'amd64', 'dl-win-x64-installer'],
+    [{ userAgent: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36', platform: 'Win32' }, 'windows', 'amd64', 'dl-win-x64-installer'],
     [{ userAgent: 'Linux aarch64', platform: 'Linux' }, 'linux', 'arm64', 'dl-linux-arm64-appimage'],
     [{ userAgent: 'Linux x86_64', platform: 'Linux' }, 'linux', 'amd64', 'dl-linux-appimage'],
+    [{ userAgent: 'Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:159.0) Gecko/20100101 Firefox/159.0', platform: 'Linux x86_64', oscpu: 'Linux x86_64' }, 'linux', 'amd64', 'dl-linux-appimage'],
+    [{ userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/156.0.0.0', platform: 'Linux x86_64',
+      userAgentData: { platform: 'Unknown', getHighEntropyValues: async () => ({ architecture: '', bitness: '' }) } }, 'linux', 'amd64', 'dl-linux-appimage'],
+    [{ userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/156.0.0.0', platform: 'Linux x86_64',
+      userAgentData: { platform: 'Linux', getHighEntropyValues: async () => ({ architecture: 'x86_64', bitness: 64 }) } }, 'linux', 'amd64', 'dl-linux-appimage'],
     [{ userAgent: 'Macintosh', platform: 'MacIntel' }, 'darwin', 'universal', 'dl-mac-dmg'],
+    [{ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/156.0', platform: 'MacIntel', maxTouchPoints: 5,
+      userAgentData: { platform: 'macOS', mobile: false } }, 'darwin', 'universal', 'dl-mac-dmg'],
+    [{ userAgent: '', platform: 'darwin' }, 'darwin', 'universal', 'dl-mac-dmg'],
     [{ userAgent: 'Windows NT', platform: 'Win32' }, 'windows', 'unknown', null],
+    [{ userAgent: 'Mozilla/5.0 (X11; Linux i686)', platform: 'Linux i686' }, 'linux', 'unknown', null],
     [{ userAgent: 'Android Linux aarch64', platform: 'Linux' }, 'unknown', 'unknown', null],
     [{ userAgent: 'iPhone', platform: 'iPhone' }, 'unknown', 'unknown', null],
     [{ userAgent: 'Macintosh', platform: 'MacIntel', maxTouchPoints: 5 }, 'unknown', 'unknown', null],
@@ -165,20 +182,32 @@ test('architecture hints override emulated Windows UA; every supported and mobil
   ];
   for (const [navigator, os, arch, asset] of rows) {
     const client = await detectPlatform(navigator);
-    assert.equal(client.os, os);
-    assert.equal(client.arch, arch);
-    assert.equal(recommendedAsset(client), asset);
+    assert.equal(client.os, os, JSON.stringify(navigator));
+    assert.equal(client.arch, arch, JSON.stringify(navigator));
+    assert.equal(recommendedAsset(client), asset, JSON.stringify(navigator));
   }
-  const rejected = await detectPlatform({
-    userAgent: 'Windows Win64 x64',
+
+  // Redacted/empty or rejected high-entropy hints fall back to UA/platform arch when present, and warn when UA lacks arch.
+  const redactedLinux = await detectPlatform({
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64)',
+    platform: 'Linux x86_64',
+    userAgentData: { platform: 'Linux', getHighEntropyValues: async () => ({}) },
+  });
+  assert.equal(redactedLinux.os, 'linux');
+  assert.equal(redactedLinux.arch, 'amd64');
+
+  const rejectedWithNoUAArch = await detectPlatform({
+    userAgent: 'Windows NT',
+    platform: 'Win32',
     userAgentData: {
       platform: 'Windows',
       getHighEntropyValues: async () => { throw Error('hints denied'); },
     },
   });
-  assert.equal(rejected.arch, 'unknown');
-  assert.match(rejected.warning, /hints denied/);
-  for (const hints of [{ architecture: 'x86', bitness: '32' }, { architecture: 'arm', bitness: '32' }, {}]) {
+  assert.equal(rejectedWithNoUAArch.arch, 'unknown');
+  assert.match(rejectedWithNoUAArch.warning, /hints denied/);
+
+  for (const hints of [{ architecture: 'x86', bitness: '32' }, { architecture: 'arm', bitness: '32' }, { architecture: 'riscv64', bitness: '64' }]) {
     const client = await detectPlatform({
       userAgent: 'Windows Win64 x64',
       userAgentData: {
@@ -346,6 +375,15 @@ test('loadPortal fetches local ./release-manifest.json with zero api.github.com 
     document.getElementById('channel-btn-stable').click();
     assert.equal(controller.getChannel(), 'stable');
     assert.equal(document.getElementById('primary-download-btn').href, url(assetLinks[primary], 'v2.0.0'));
+
+    // Interactive platform switcher overrides spoofed UA in 1 click
+    document.getElementById('plat-btn-mac-universal').click();
+    assert.deepEqual(controller.getPlatform(), { os: 'darwin', arch: 'universal', warning: '' });
+    assert.equal(document.getElementById('primary-download-btn').href, url(assetLinks['dl-mac-dmg'], 'v2.0.0'));
+    assert.equal(document.getElementById('card-macos').classList.contains('is-detected-platform'), true);
+    assert.equal(document.getElementById('card-windows').classList.contains('is-detected-platform'), false);
+    document.getElementById('plat-btn-linux-amd64').click();
+    assert.equal(document.getElementById('primary-download-btn').href, url(assetLinks['dl-linux-appimage'], 'v2.0.0'));
   }
 });
 
@@ -450,7 +488,7 @@ test('BC Gov Design System build outputs self-hosted fonts, searchable LMH25 doc
   assert.match(distHtml, /sha256sum/);
   assert.match(distHtml, /Get-FileHash/);
   assert.match(distHtml, /shasum -a 256/);
-  assert.match(distHtml, /<script type="module" src="\.\/downloads\.mjs"><\/script>/);
+  assert.match(distHtml, /<script type="module" src="\.\/downloads\.mjs\?v=[0-9a-f]{8}"><\/script>/);
 
   // Every planned HTML selector exists once
   for (const id of [...Object.keys(assetLinks), 'download-status', 'channel-btn-stable', 'channel-btn-preview']) {

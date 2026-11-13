@@ -252,14 +252,14 @@ a:hover {
 .hero-section {
   background: linear-gradient(180deg, var(--bcgov-navy) 0%, var(--bcgov-navy-dark) 100%);
   color: var(--bcgov-surface);
-  padding: 2.75rem 0 3rem;
+  padding: 2rem 0 2.25rem;
   border-bottom: 1px solid var(--bcgov-border);
 }
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 2rem;
+  grid-template-columns: minmax(0, 1.15fr) minmax(305px, 0.95fr);
+  gap: 1.5rem;
   align-items: start;
 }
 
@@ -367,11 +367,42 @@ a:hover {
 .detected-row {
   font-size: 0.86rem;
   color: var(--bcgov-text-secondary);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.45rem;
 }
 
 .detected-row strong {
   color: var(--bcgov-text);
+}
+
+.platform-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.platform-pill {
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.22rem 0.52rem;
+  border-radius: 3px;
+  border: 1px solid var(--bcgov-border-strong);
+  background: var(--bcgov-neutral);
+  color: var(--bcgov-text);
+  cursor: pointer;
+}
+
+.platform-pill:hover {
+  border-color: var(--bcgov-navy);
+  color: var(--bcgov-navy);
+}
+
+.platform-pill.is-active,
+.platform-pill[aria-pressed="true"] {
+  background: var(--bcgov-navy);
+  border-color: var(--bcgov-navy);
+  color: var(--bcgov-surface);
 }
 
 .primary-btn {
@@ -980,9 +1011,14 @@ kbd {
 }
 
 @media (max-width: 960px) {
-  .hero-grid,
   .three-col-grid,
   .install-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero-grid {
     grid-template-columns: 1fr;
   }
 }

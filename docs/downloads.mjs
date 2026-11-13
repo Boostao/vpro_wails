@@ -40,29 +40,135 @@ export function formatBytes(bytes) {
   return `${value >= 100 ? value.toFixed(0) : value.toFixed(1)} ${units[unitIndex]}`;
 }
 
-export async function detectPlatform(navigator) {
-  const ua = (navigator?.userAgent || '').toLowerCase();
-  const platform = (navigator?.userAgentData?.platform || navigator?.platform || '').toLowerCase();
-  if (/android|iphone|ipad|ipod/.test(ua + ' ' + platform) ||
-      (/mac/.test(platform) && (navigator?.maxTouchPoints || 0) > 1)) {
-    return { os: 'unknown', arch: 'unknown', warning: 'Desktop packages are not available for this mobile platform.' };
+function normalizePlatformToken(value) {
+  const token = String(value || '').trim().toLowerCase();
+  return token === 'unknown' ? '' : token;
+}
+
+function parseHintArch(hints) {
+  if (!hints || typeof hints !== 'object') return null;
+  const rawBitness = String(hints.bitness ?? '').trim();
+  const rawArch = String(hints.architecture ?? '').trim().toLowerCase();
+  if (rawBitness === '32') {
+    return {
+      arch: 'unknown',
+      warning: '32-bit operating systems are not supported; choose a 64-bit package below.',
+    };
   }
-  const os = /win/.test(platform) || /windows/.test(ua) ? 'windows'
-    : /mac/.test(platform) || /macintosh|mac os x/.test(ua) ? 'darwin'
-    : /linux/.test(platform + ' ' + ua) ? 'linux' : 'unknown';
-  if (os === 'darwin') return { os, arch: 'universal', warning: '' };
-  let arch = /arm64|aarch64/.test(ua + ' ' + platform) ? 'arm64'
-    : /x86_64|amd64|win64|x64/.test(ua + ' ' + platform) ? 'amd64' : 'unknown';
+  if (!rawArch) {
+    return null;
+  }
+  if (/^(?:arm|arm64|aarch64|armv8[a-z]*)$/.test(rawArch) && (!rawBitness || rawBitness === '64')) {
+    return { arch: 'arm64', warning: '' };
+  }
+  if (/^(?:x86|x86[-_]64|amd64|x64)$/.test(rawArch) && (!rawBitness || rawBitness === '64')) {
+    return { arch: 'amd64', warning: '' };
+  }
+  return {
+    arch: 'unknown',
+    warning: `Unsupported CPU architecture (${rawArch}${rawBitness ? `/${rawBitness}-bit` : ''}); choose a package below.`,
+  };
+}
+
+export function formatPlatformName(client) {
+  if (!client || client.os === 'unknown') return 'No supported desktop platform detected';
+  if (client.os === 'darwin') return 'macOS (Universal — Apple Silicon & Intel)';
+  const osLabel = client.os === 'windows' ? 'Windows' : 'Linux';
+  const archLabel = client.arch === 'arm64' ? 'ARM64' : client.arch === 'amd64' ? 'x86_64' : 'architecture unknown';
+  return `${osLabel} (${archLabel})`;
+}
+
+export async function detectPlatform(navigator) {
+  const ua = String(navigator?.userAgent || '').toLowerCase();
+  const navPlatform = normalizePlatformToken(navigator?.platform);
+  const oscpu = normalizePlatformToken(navigator?.oscpu);
+  const uaDataPlatform = normalizePlatformToken(navigator?.userAgentData?.platform);
+
+  let hints = null;
+  let hintsError = null;
   if (navigator?.userAgentData?.getHighEntropyValues) {
     try {
-      const hints = await navigator.userAgentData.getHighEntropyValues(['architecture', 'bitness']);
-      arch = hints.bitness === '64' && hints.architecture === 'arm' ? 'arm64'
-        : hints.bitness === '64' && hints.architecture === 'x86' ? 'amd64' : 'unknown';
+      hints = await navigator.userAgentData.getHighEntropyValues(['platform', 'architecture', 'bitness']);
     } catch (error) {
-      return { os, arch: 'unknown', warning: `Architecture detection unavailable: ${String(error)}. Choose a package below.` };
+      hintsError = error;
     }
   }
-  return { os, arch, warning: arch === 'unknown' ? 'Architecture not detected; choose a package below.' : '' };
+  const hintPlatform = normalizePlatformToken(hints?.platform);
+  const allSignals = [hintPlatform, uaDataPlatform, navPlatform, oscpu, ua].filter(Boolean).join(' ');
+
+  const isIPadDesktopMode = navigator?.userAgentData?.mobile !== true &&
+    navigator?.userAgentData?.mobile !== false &&
+    !uaDataPlatform &&
+    /\bmac/.test(navPlatform) &&
+    (navigator?.maxTouchPoints || 0) > 1 &&
+    !/\b(?:firefox|electron)\b/.test(ua);
+
+  if (navigator?.userAgentData?.mobile === true ||
+      /\b(?:android|iphone|ipad|ipod|windows phone|iemobile|crios|fxios|edgios)\b/.test(allSignals) ||
+      isIPadDesktopMode) {
+    return { os: 'unknown', arch: 'unknown', warning: 'Desktop packages are not available for this mobile platform.' };
+  }
+
+  const structuredPlatform = hintPlatform || uaDataPlatform;
+  let os = 'unknown';
+  if (/^(?:macos|mac os x|mac|darwin)$/.test(structuredPlatform)) {
+    os = 'darwin';
+  } else if (/^win(?:dows|32|64)?$/.test(structuredPlatform)) {
+    os = 'windows';
+  } else if (/^(?:linux|chrome os|chromium os|ubuntu|fedora|debian|arch|opensuse|rhel)$/.test(structuredPlatform)) {
+    os = 'linux';
+  } else if (/\b(?:macintosh|mac os x|macintel|macppc|mac_powerpc|darwin)\b/.test(allSignals)) {
+    os = 'darwin';
+  } else if (/\b(?:windows|win32|win64|wow64)\b/.test(allSignals)) {
+    os = 'windows';
+  } else if (/\b(?:linux|cros)\b/.test(allSignals)) {
+    os = 'linux';
+  }
+
+  if (os === 'unknown') {
+    return { os: 'unknown', arch: 'unknown', warning: '' };
+  }
+  if (os === 'darwin') {
+    return { os: 'darwin', arch: 'universal', warning: '' };
+  }
+
+  const archSignals = [navPlatform, oscpu, ua].filter(Boolean).join(' ');
+  const has64Token = /\b(?:x86[-_]64|amd64|win64|wow64|x64|arm64|aarch64|armv8[a-z]*)\b/.test(archSignals);
+  const has32OnlyToken = !has64Token && /\b(?:i[3456]86|armv[67][a-z]*|win16)\b/.test(archSignals);
+
+  let arch = 'unknown';
+  let privacyArchNote = '';
+  if (!has32OnlyToken) {
+    if (/\b(?:arm64|aarch64|armv8[a-z]*)\b/.test(archSignals)) {
+      arch = 'arm64';
+    } else if (/\b(?:x86[-_]64|amd64|win64|wow64|x64)\b/.test(archSignals)) {
+      arch = 'amd64';
+    } else if (os === 'windows' && /\bwindows nt 10\.0\b/.test(archSignals)) {
+      arch = 'amd64';
+      privacyArchNote = 'Browser privacy settings hid CPU architecture (defaulted to Windows x86_64; choose ARM64 if on Snapdragon).';
+    }
+  }
+
+  const parsedHint = parseHintArch(hints);
+  if (parsedHint) {
+    return { os, arch: parsedHint.arch, warning: parsedHint.warning };
+  }
+
+  if (arch === 'unknown') {
+    const reason = hintsError
+      ? `Architecture detection unavailable: ${String(hintsError)}. Choose a package below.`
+      : has32OnlyToken
+        ? '32-bit operating systems are not supported; choose a 64-bit package below.'
+        : 'Architecture not detected; choose a package below.';
+    return { os, arch: 'unknown', warning: reason };
+  }
+
+  const fallbackWarning = privacyArchNote || (
+    os === 'windows' && navigator?.userAgentData?.getHighEntropyValues
+      ? 'Verify x86_64 vs. ARM64 above if running Windows on ARM (Snapdragon).'
+      : ''
+  );
+  return { os, arch, warning: fallbackWarning };
 }
 
 function downloadURL(value, name, tag) {
@@ -288,6 +394,14 @@ export async function loadPortal(document, navigator, fetch, options = {}) {
     stable: optional('channel-btn-stable'),
     preview: optional('channel-btn-preview'),
   };
+  const platformLabelEl = optional('detected-platform-label');
+  const platformTargets = [
+    ['windows', 'amd64', optional('plat-btn-win-amd64')],
+    ['windows', 'arm64', optional('plat-btn-win-arm64')],
+    ['darwin', 'universal', optional('plat-btn-mac-universal')],
+    ['linux', 'amd64', optional('plat-btn-linux-amd64')],
+    ['linux', 'arm64', optional('plat-btn-linux-arm64')],
+  ];
   const publishedDateEl = optional('release-published-date');
   const channelBadgeEl = optional('release-channel-badge');
   const primaryMetaEl = optional('primary-download-meta');
@@ -327,20 +441,36 @@ export async function loadPortal(document, navigator, fetch, options = {}) {
   if (primaryShaValueEl) primaryShaValueEl.textContent = '';
   if (primaryShaRowEl) primaryShaRowEl.hidden = true;
 
-  const client = await detectPlatform(navigator);
-  platform.textContent = client.os === 'darwin' ? 'macOS (Universal — Apple Silicon & Intel)'
-    : client.os === 'unknown' ? 'No supported desktop platform detected'
-    : `${client.os === 'windows' ? 'Windows' : 'Linux'} (${client.arch === 'arm64' ? 'ARM64' : client.arch === 'amd64' ? 'x86_64' : 'architecture unknown'})`;
+  const detectedClient = await detectPlatform(navigator);
+  let activeClient = { ...detectedClient };
 
-  if (client.os !== 'unknown') {
-    const targetCard = cards[client.os === 'darwin' ? 'macos' : client.os];
-    targetCard.classList.add('is-detected-platform');
-  }
-  status.textContent = client.warning || 'Loading verified release manifest...';
+  const syncPlatformSelectionUI = isManualOverride => {
+    if (platformLabelEl) {
+      platformLabelEl.textContent = isManualOverride ? 'Selected workstation:' : 'Detected workstation:';
+    }
+    platform.textContent = formatPlatformName(activeClient);
+    for (const card of Object.values(cards)) {
+      card.classList?.remove?.('is-detected-platform');
+    }
+    if (activeClient.os !== 'unknown') {
+      const targetCard = cards[activeClient.os === 'darwin' ? 'macos' : activeClient.os];
+      targetCard?.classList?.add?.('is-detected-platform');
+    }
+    for (const [osName, archName, btn] of platformTargets) {
+      if (!btn) continue;
+      const selected = activeClient.os === osName && activeClient.arch === archName;
+      btn.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      btn.classList?.toggle?.('is-active', selected);
+    }
+  };
+
+  syncPlatformSelectionUI(false);
+  status.textContent = activeClient.warning || 'Loading verified release manifest...';
 
   const endpoint = options.manifestUrl || manifestPath;
   try {
     const response = await fetch(endpoint, {
+      cache: 'no-cache',
       headers: { Accept: 'application/json' },
     });
     if (!response || !response.ok) {
@@ -440,11 +570,11 @@ export async function loadPortal(document, navigator, fetch, options = {}) {
         }
       }
 
-      const recommended = recommendedAsset(client);
+      const recommended = recommendedAsset(activeClient);
       if (recommended && release.links[recommended]) {
         primary.href = release.links[recommended];
-        primaryText.textContent = client.os === 'windows' ? `Download Windows ${client.arch} installer`
-          : client.os === 'darwin' ? 'Download macOS Universal (.dmg)' : `Download Linux ${client.arch} AppImage`;
+        primaryText.textContent = activeClient.os === 'windows' ? `Download Windows ${activeClient.arch} installer`
+          : activeClient.os === 'darwin' ? 'Download macOS Universal (.dmg)' : `Download Linux ${activeClient.arch} AppImage`;
         const recMeta = release.metadata[recommended];
         if (primaryMetaEl) {
           primaryMetaEl.textContent = recMeta ? `${recMeta.name} (${recMeta.formattedSize})` : assetLinks[recommended];
@@ -461,21 +591,42 @@ export async function loadPortal(document, navigator, fetch, options = {}) {
         const unsignedHint = release.unsignedNotice
           ? 'Phase 1 unsigned build — verify SHA-256 against SHA256SUMS.txt before installation.'
           : 'Verify your download against SHA256SUMS.txt before installation.';
-        status.textContent = client.warning || unsignedHint;
+        status.textContent = activeClient.warning ? `${activeClient.warning} ${unsignedHint}` : unsignedHint;
       } else {
         primary.href = '#downloads';
         primaryText.textContent = 'Browse All Downloads';
         if (primaryMetaEl) primaryMetaEl.textContent = '';
         if (primaryShaRowEl) primaryShaRowEl.hidden = true;
-        status.textContent = client.warning || 'The matching package is unavailable in this release; choose an available package below.';
+        status.textContent = activeClient.warning || 'The matching package is unavailable in this release; choose an available package below.';
       }
       if (Object.values(release.links).some(url => !url)) {
         status.textContent += ' Some release assets are unavailable; their links are disabled.';
       }
     };
 
+    const setPlatform = (osName, archName) => {
+      const normalizedArch = osName === 'darwin' ? 'universal' : archName;
+      if (!['windows', 'darwin', 'linux'].includes(osName) ||
+          (osName === 'darwin' ? normalizedArch !== 'universal' : !['amd64', 'arm64'].includes(normalizedArch))) {
+        throw new Error(`Unsupported platform target: ${String(osName)}/${String(archName)}`);
+      }
+      const matchesDetected = detectedClient.os === osName && detectedClient.arch === normalizedArch;
+      activeClient = {
+        os: osName,
+        arch: normalizedArch,
+        warning: matchesDetected ? detectedClient.warning : '',
+      };
+      syncPlatformSelectionUI(!matchesDetected);
+      applyChannel(activeChannel);
+    };
+
     applyChannel(activeChannel);
 
+    for (const [osName, archName, btn] of platformTargets) {
+      if (btn?.addEventListener) {
+        btn.addEventListener('click', () => setPlatform(osName, archName));
+      }
+    }
     for (const name of ['stable', 'preview']) {
       const btn = channelButtons[name];
       if (btn?.addEventListener) {
@@ -499,7 +650,9 @@ export async function loadPortal(document, navigator, fetch, options = {}) {
     }
 
     return {
-      client,
+      client: detectedClient,
+      getPlatform: () => ({ ...activeClient }),
+      setPlatform,
       manifest: reviewed,
       getChannel: () => activeChannel,
       setChannel: applyChannel,

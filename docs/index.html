@@ -6,7 +6,7 @@
   <title>VPro — VENUS (Vegetation and Environment NexUS) Professional | B.C. Ministry of Forests BEC Program</title>
   <meta name="description" content="Official release portal, LMH25 (2023) field reference, and BECWeb Data Use Agreement for VPro (VENUS — Vegetation and Environment NexUS — Professional), B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program.">
   <link rel="icon" href="./favicon.ico" sizes="any">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=b961c6fa">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -76,7 +76,15 @@
           </div>
 
           <div id="detected-platform-banner" class="detected-row">
-            Detected workstation: <strong id="detected-platform-name">Detecting...</strong>
+            <span id="detected-platform-label">Detected workstation:</span> <strong id="detected-platform-name">Detecting...</strong>
+          </div>
+
+          <div id="platform-switcher" class="platform-switcher" role="group" aria-label="Select workstation platform and architecture">
+            <button type="button" id="plat-btn-win-amd64" class="platform-pill" aria-pressed="false">Windows x64</button>
+            <button type="button" id="plat-btn-win-arm64" class="platform-pill" aria-pressed="false">Windows ARM64</button>
+            <button type="button" id="plat-btn-mac-universal" class="platform-pill" aria-pressed="false">macOS</button>
+            <button type="button" id="plat-btn-linux-amd64" class="platform-pill" aria-pressed="false">Linux x64</button>
+            <button type="button" id="plat-btn-linux-arm64" class="platform-pill" aria-pressed="false">Linux ARM64</button>
           </div>
 
           <a id="primary-download-btn" href="#downloads" class="primary-btn">
@@ -279,7 +287,7 @@
                 <span>Linux</span>
                 <span class="os-tag">GTK4 / WebKitGTK 6.0</span>
               </h3>
-              <p>Native GTK4 and WebKitGTK 6.0 packages for Ubuntu 24.04+, Debian 13+, and Fedora workstations.</p>
+              <p>Standalone AppImage runs directly on Fedora, RHEL, Ubuntu 24.04+, and Debian 13+; native <code>.deb</code> provided for Debian and Ubuntu.</p>
 
               <div class="arch-heading">x86_64 (amd64)</div>
               <div class="asset-list">
@@ -1424,7 +1432,7 @@ sudo apt install ./vpro-linux-amd64.deb</pre>
     </div>
   </footer>
 
-  <script type="module" src="./downloads.mjs"></script>
-  <script type="module" src="./portal-docs.mjs"></script>
+  <script type="module" src="./downloads.mjs?v=905c33cf"></script>
+  <script type="module" src="./portal-docs.mjs?v=a6edeab8"></script>
 </body>
 </html>
