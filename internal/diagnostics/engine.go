@@ -370,18 +370,27 @@ func buildSupportStampKey(owner *vprocore.SqliteContext) (supportFileStampKey, b
 	}, true
 }
 
-func loadOrderedProjectPlots(ctx context.Context, tx *sql.Tx, owner *vprocore.SqliteContext, project string) ([]SynthesisUnitPlot, map[string]int, error) {
-	stamp, hasStamp := statDBFileWithWAL(owner.Selection.ProjectPath)
-	if hasStamp {
-		wantKey := projectPlotsCacheKey{stamp: stamp, project: project}
-		diagCatalogCacheMu.Lock()
-		if cachedProjectPlotsOK && cachedProjectPlotsKey == wantKey {
-			list := cachedProjectPlotsList
-			idx := cachedProjectPlotsIdx
+func loadOrderedProjectPlots(
+	ctx context.Context,
+	tx *sql.Tx,
+	owner *vprocore.SqliteContext,
+	project string,
+	preTxStamp dbFileStamp,
+	preTxOK bool,
+) ([]SynthesisUnitPlot, map[string]int, error) {
+	if preTxOK {
+		curStamp, curOK := statDBFileWithWAL(owner.Selection.ProjectPath)
+		if curOK && curStamp == preTxStamp {
+			wantKey := projectPlotsCacheKey{stamp: preTxStamp, project: project}
+			diagCatalogCacheMu.Lock()
+			if cachedProjectPlotsOK && cachedProjectPlotsKey == wantKey {
+				list := cachedProjectPlotsList
+				idx := cachedProjectPlotsIdx
+				diagCatalogCacheMu.Unlock()
+				return list, idx, nil
+			}
 			diagCatalogCacheMu.Unlock()
-			return list, idx, nil
 		}
-		diagCatalogCacheMu.Unlock()
 	}
 
 	qEnvTbl := `"project".` + vprocore.QuoteHeaderIdentifier(project+"_Env")
@@ -448,13 +457,16 @@ func loadOrderedProjectPlots(ctx context.Context, tx *sql.Tx, owner *vprocore.Sq
 		return nil, nil, err
 	}
 
-	if hasStamp {
-		diagCatalogCacheMu.Lock()
-		cachedProjectPlotsKey = projectPlotsCacheKey{stamp: stamp, project: project}
-		cachedProjectPlotsList = ordered
-		cachedProjectPlotsIdx = idxByPlot
-		cachedProjectPlotsOK = true
-		diagCatalogCacheMu.Unlock()
+	if preTxOK {
+		postStamp, postOK := statDBFileWithWAL(owner.Selection.ProjectPath)
+		if postOK && postStamp == preTxStamp {
+			diagCatalogCacheMu.Lock()
+			cachedProjectPlotsKey = projectPlotsCacheKey{stamp: preTxStamp, project: project}
+			cachedProjectPlotsList = ordered
+			cachedProjectPlotsIdx = idxByPlot
+			cachedProjectPlotsOK = true
+			diagCatalogCacheMu.Unlock()
+		}
 	}
 	return ordered, idxByPlot, nil
 }
@@ -748,6 +760,8 @@ func computeSnapshotInReadTx(
 	owner *vprocore.SqliteContext,
 	contextID string,
 	opts SynthesisOptions,
+	preTxStamp dbFileStamp,
+	preTxOK bool,
 ) (*SynthesisSnapshot, error) {
 	started := time.Now()
 	project := owner.Selection.Project
@@ -827,7 +841,7 @@ func computeSnapshotInReadTx(
 		}
 	}
 
-	orderedProjectPlots, projectPlotIdx, err := loadOrderedProjectPlots(ctx, tx, owner, project)
+	orderedProjectPlots, projectPlotIdx, err := loadOrderedProjectPlots(ctx, tx, owner, project, preTxStamp, preTxOK)
 	if err != nil {
 		return nil, err
 	}
@@ -1462,6 +1476,7 @@ func computeSnapshotForPlots(
 	if err := vprocore.ProfileOwnedFiles(owner); err != nil {
 		return nil, err
 	}
+	preTxStamp, preTxOK := statDBFileWithWAL(owner.Selection.ProjectPath)
 	tx, err := owner.BeginReadSnapshot(ctx)
 	if err != nil {
 		return nil, err
@@ -1472,7 +1487,7 @@ func computeSnapshotForPlots(
 		}
 	}()
 
-	snap, err := computeSnapshotInReadTx(ctx, tx, owner, contextID, opts)
+	snap, err := computeSnapshotInReadTx(ctx, tx, owner, contextID, opts, preTxStamp, preTxOK)
 	if err != nil {
 		return nil, err
 	}
@@ -1593,11 +1608,11 @@ func ReassignSynthesisPlotUnit(
 		var historyID int64
 
 		err := owner.WithSelectedFileWriter(ctx, "su", validateFiles, func(conn *sql.Conn) (txErr error) {
-			preStamp, preOK := statDBFileWithWAL(owner.Selection.ProjectPath)
-			tx, bErr := conn.BeginTx(ctx, nil) // BEGIN IMMEDIATE via _txlock=immediate
+			tx, bErr := conn.BeginTx(ctx, nil) // BEGIN IMMEDIATE via _txlock=immediate holds SQLite write lock
 			if bErr != nil {
 				return bErr
 			}
+			preStamp, preOK := statDBFileWithWAL(owner.Selection.ProjectPath)
 			defer func() {
 				if rb := tx.Rollback(); rb != nil && !errors.Is(rb, sql.ErrTxDone) {
 					txErr = errors.Join(txErr, rb)
@@ -1744,11 +1759,11 @@ func UndoSynthesisReassignment(
 		var undoHistoryID int64
 
 		err := owner.WithSelectedFileWriter(ctx, "su", validateFiles, func(conn *sql.Conn) (txErr error) {
-			preStamp, preOK := statDBFileWithWAL(owner.Selection.ProjectPath)
 			tx, bErr := conn.BeginTx(ctx, nil)
 			if bErr != nil {
 				return bErr
 			}
+			preStamp, preOK := statDBFileWithWAL(owner.Selection.ProjectPath)
 			defer func() {
 				if rb := tx.Rollback(); rb != nil && !errors.Is(rb, sql.ErrTxDone) {
 					txErr = errors.Join(txErr, rb)

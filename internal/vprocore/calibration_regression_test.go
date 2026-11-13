@@ -68,7 +68,7 @@ func TestVProCoreCalibrationGuards(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		// Veg cover: 99.999996 narrows to float32 99.99999237 (< 100) -> PASS.
+		// Veg cover (<100 Or Is Null): 99.999996 narrows to float32 99.99999237 (< 100) -> PASS.
 		if err := svc.SaveVegRecord(state.ContextID, vprocore.VegRecord{
 			PlotNumber: "COV001",
 			Species:    "PSEUMEN",
@@ -79,8 +79,8 @@ func TestVProCoreCalibrationGuards(t *testing.T) {
 			t.Fatalf("expected 99.999996 Veg cover to pass float32 narrowing, got: %v", err)
 		}
 
-		// Veg cover: 99.999999 narrows to float32 100 -> REJECT; -0.0001 -> REJECT.
-		for _, badCov := range []float64{99.999999, 100.0, -0.0001} {
+		// Veg cover (<100 Or Is Null): 99.999999 narrows to float32 100 -> REJECT; 100.0 -> REJECT.
+		for _, badCov := range []float64{99.999999, 100.0} {
 			if err := svc.SaveVegRecord(state.ContextID, vprocore.VegRecord{
 				PlotNumber: "COV001",
 				Species:    "TSUGHET",

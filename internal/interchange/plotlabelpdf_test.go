@@ -146,3 +146,18 @@ func TestPlotLabelPDFContextAndMissingFonts(t *testing.T) {
 		t.Fatalf("missing fonts: %q, %v", output, err)
 	}
 }
+
+func TestPlotLabelPDFNativeCrossPlatformFontRender(t *testing.T) {
+	fonts, err := loadPlotLabelPDFFonts(context.Background())
+	if err != nil {
+		t.Skipf("no ArialMT or LiberationSans system fonts installed on host: %v", err)
+	}
+	preview := plotLabelPDFTestPreview()
+	pdfBytes, err := renderPlotLabelPDF(context.Background(), preview, fonts)
+	if err != nil {
+		t.Fatalf("renderPlotLabelPDF with native system fonts (%s/%s) failed: %v", fonts.regularName, fonts.boldName, err)
+	}
+	if !strings.HasPrefix(string(pdfBytes), "%PDF-1.") || len(pdfBytes) < 512 {
+		t.Fatalf("expected valid PDF bytes, got len=%d", len(pdfBytes))
+	}
+}

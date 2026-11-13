@@ -869,10 +869,49 @@ func queryDatasheetWindowRows(
 	return fetchDatasheetRowsByRowIDs(ctx, tx, relation, selectFields, columns, winRowIDs)
 }
 
+type datasheetFileStamp struct {
+	size         int64
+	mtimeNano    int64
+	dbHeader4    [4]byte
+	walPresent   bool
+	walSize      int64
+	walMtimeNano int64
+	shmHdr48     [48]byte
+}
+
+func statDatasheetFileWithWAL(dbPath string) (datasheetFileStamp, bool) {
+	if strings.TrimSpace(dbPath) == "" {
+		return datasheetFileStamp{}, false
+	}
+	info, err := os.Stat(dbPath)
+	if err != nil {
+		return datasheetFileStamp{}, false
+	}
+	st := datasheetFileStamp{size: info.Size(), mtimeNano: info.ModTime().UnixNano()}
+	if info.Size() >= 28 {
+		if f, oErr := os.Open(dbPath); oErr == nil {
+			_, _ = f.ReadAt(st.dbHeader4[:], 24)
+			_ = f.Close()
+		}
+	}
+	if walInfo, walErr := os.Stat(dbPath + "-wal"); walErr == nil {
+		st.walPresent = true
+		st.walSize = walInfo.Size()
+		st.walMtimeNano = walInfo.ModTime().UnixNano()
+		if shmFile, sErr := os.Open(dbPath + "-shm"); sErr == nil {
+			_, _ = shmFile.ReadAt(st.shmHdr48[:], 0)
+			_ = shmFile.Close()
+		}
+	}
+	return st, true
+}
+
 func queryFilteredDatasheetWindowAndCount(
 	ctx context.Context,
 	tx *sql.Tx,
 	owner *vprocore.SqliteContext,
+	preTxStamp datasheetFileStamp,
+	preTxOK bool,
 	role, tableName string,
 	columns []DatasheetColumnMeta,
 	whereSQL string,
@@ -892,7 +931,7 @@ func queryFilteredDatasheetWindowAndCount(
 		)
 	}
 
-	if !scopeToActiveSU && owner != nil {
+	if !scopeToActiveSU && owner != nil && preTxOK {
 		if dbPath := strings.TrimSpace(owner.Attachments[role]); dbPath != "" {
 			var minRowID, maxRowID sql.NullInt64
 			if rErr := tx.QueryRowContext(ctx, "SELECT MIN(rowid), MAX(rowid) FROM "+relation).Scan(&minRowID, &maxRowID); rErr == nil &&
@@ -900,7 +939,7 @@ func queryFilteredDatasheetWindowAndCount(
 				workers := min(max(runtime.NumCPU(), 2), 8)
 				if workers*limit <= 900 {
 					if pRows, pTotal, pOK, pErr := parallelRangeScanDatasheetWindow(
-						ctx, tx, dbPath, relation, tableName, selectFields, columns,
+						ctx, tx, dbPath, preTxStamp, relation, tableName, selectFields, columns,
 						whereSQL, whereArgs, orderSQL, minRowID.Int64, maxRowID.Int64, limit, workers,
 					); pErr != nil {
 						return nil, 0, pErr
@@ -939,7 +978,9 @@ func queryFilteredDatasheetWindowAndCount(
 func parallelRangeScanDatasheetWindow(
 	ctx context.Context,
 	tx *sql.Tx,
-	dbPath, relation, tableName string,
+	dbPath string,
+	preTxStamp datasheetFileStamp,
+	relation, tableName string,
 	selectFields []string,
 	columns []DatasheetColumnMeta,
 	whereSQL string,
@@ -948,7 +989,7 @@ func parallelRangeScanDatasheetWindow(
 	minRowID, maxRowID int64,
 	limit, workers int,
 ) ([]DatasheetRow, int64, bool, error) {
-	roDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(dbPath, "ro"))
+	roDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(dbPath, "ro")+"&_busy_timeout=5000")
 	if err != nil {
 		return nil, 0, false, nil
 	}
@@ -1008,6 +1049,12 @@ func parallelRangeScanDatasheetWindow(
 		}(w, lo, hi)
 	}
 	wg.Wait()
+
+	// Verify the underlying SQLite file + WAL/SHM stamp did not advance relative to tx's snapshot
+	// while workers executed on roDB; if a concurrent writer committed, fall back to tx's single snapshot.
+	if postStamp, postOK := statDatasheetFileWithWAL(dbPath); !postOK || postStamp != preTxStamp {
+		return nil, 0, false, nil
+	}
 
 	var totalRows int64
 	var candidateIDs []int64
@@ -1172,6 +1219,7 @@ func GetDatasheetPage(ctx context.Context, contexts *vprocore.ContextService, co
 		if err := vprocore.ProfileOwnedFiles(owner); err != nil {
 			return nil, err
 		}
+		preTxStamp, preTxOK := statDatasheetFileWithWAL(owner.Attachments[target.role])
 		tx, err := owner.BeginReadSnapshot(ctx)
 		if err != nil {
 			return nil, err
@@ -1210,7 +1258,7 @@ func GetDatasheetPage(ctx context.Context, contexts *vprocore.ContextService, co
 		var totalRows int64
 		if request.Offset == 0 && whereSQL != "" && limit > 0 && limit <= 900 {
 			rows, totalRows, err = queryFilteredDatasheetWindowAndCount(
-				ctx, tx, owner, target.role, target.tableName, columns,
+				ctx, tx, owner, preTxStamp, preTxOK, target.role, target.tableName, columns,
 				whereSQL, whereArgs, orderSQL, request.ScopeToActiveSU, limit,
 			)
 			if err != nil {

@@ -16,7 +16,8 @@ import (
 
 // Private portable preparation, not Access printer geometry or an export API.
 type plotLabelPDFFonts struct {
-	regular, bold []byte
+	regular, bold         []byte
+	regularName, boldName string
 }
 
 type plotLabelPDFField struct {
@@ -148,11 +149,18 @@ func renderPlotLabelPDF(ctx context.Context, preview PlotLabelRegionalPreview, f
 	pdf.SetCatalogSort(true)
 	pdf.SetCreationDate(date)
 	pdf.SetModificationDate(date)
+	regName, bldName := fonts.regularName, fonts.boldName
+	if regName == "" {
+		regName = "ArialMT"
+	}
+	if bldName == "" {
+		bldName = "Arial-BoldMT"
+	}
 	for _, font := range []struct {
 		data        []byte
 		name, style string
 	}{
-		{fonts.regular, "ArialMT", ""}, {fonts.bold, "Arial-BoldMT", "B"},
+		{fonts.regular, regName, ""}, {fonts.bold, bldName, "B"},
 	} {
 		if err := ctx.Err(); err != nil {
 			return nil, err

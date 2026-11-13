@@ -629,7 +629,7 @@ func (s *PlotService) saveChildWithChecks(kind string, record any, mode childSav
 	if kind == "Veg" && !deleting {
 		for i, field := range fields {
 			property := ChildJSONKey(value, field)
-			if !VegetationCoverColumns[field.Column] && !HeightProperties[property] {
+			if !HeightProperties[property] && field.Column != "Cover5a" && field.Column != "Cover5b" && field.Column != "Cover5c" {
 				continue
 			}
 			var oldNumber, newNumber *float64
@@ -641,14 +641,8 @@ func (s *PlotService) saveChildWithChecks(kind string, record any, mode childSav
 				number := after[i].(float64)
 				newNumber = &number
 			}
-			var vErr error
-			if VegetationCoverColumns[field.Column] {
-				vErr = ValidateSingleCoverChange("Veg."+field.Column, oldNumber, newNumber)
-			} else {
-				vErr = ValidateHeightNumericChange(property, oldNumber, newNumber)
-			}
-			if vErr != nil {
-				return fmt.Errorf("Veg identity (%q, %d): %w", plot, id, vErr)
+			if err := ValidateHeightNumericChange(property, oldNumber, newNumber); err != nil {
+				return fmt.Errorf("Veg identity (%q, %d): %w", plot, id, err)
 			}
 		}
 	}

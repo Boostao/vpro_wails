@@ -82,5 +82,5 @@ func readPlotLabelPDFFonts(ctx context.Context, directory string, open func(stri
 	if err != nil {
 		return plotLabelPDFFonts{}, err
 	}
-	return plotLabelPDFFonts{regular, bold}, nil
+	return plotLabelPDFFonts{regular: regular, bold: bold, regularName: "ArialMT", boldName: "Arial-BoldMT"}, nil
 }
