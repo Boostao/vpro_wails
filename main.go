@@ -6,11 +6,66 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
+	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
+	"github.com/boostao/vpro-wails/resources"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
+
+func resolveSpatialExtraDirs(lookup func(string) (string, bool)) []string {
+	var candidates []string
+	if lookup != nil {
+		if envDir, ok := lookup("VPRO_SPATIAL_ASSETS_DIR"); ok && strings.TrimSpace(envDir) != "" {
+			candidates = append(candidates, strings.TrimSpace(envDir))
+		}
+	}
+	if repoRoot := resources.RepoRoot(); strings.TrimSpace(repoRoot) != "" {
+		candidates = append(candidates, filepath.Join(filepath.Dir(repoRoot), "spatial_assets"))
+	}
+	seen := make(map[string]bool, len(candidates))
+	var out []string
+	for _, dir := range candidates {
+		cleaned := filepath.Clean(dir)
+		if seen[cleaned] {
+			continue
+		}
+		if info, err := os.Stat(cleaned); err == nil && info.IsDir() {
+			seen[cleaned] = true
+			out = append(out, cleaned)
+		}
+	}
+	return out
+}
+
+func newDefaultPictureEnvLookup(base func(string) (string, bool), defaultVPicsPath, defaultImagesDir string) func(string) (string, bool) {
+	return func(key string) (string, bool) {
+		if base != nil {
+			if val, ok := base(key); ok {
+				return val, true
+			}
+		}
+		switch key {
+		case "VPRO_PICTURE_LIBRARY_PATH":
+			if defaultVPicsPath != "" {
+				return defaultVPicsPath, true
+			}
+		case "VPRO_PICTURE_CHILD_DIRECTORY", "VPRO_PICTURE_MANAGER_DIRECTORY":
+			if defaultImagesDir != "" {
+				return defaultImagesDir, true
+			}
+		case "VPRO_PICTURE_READING",
+			"VPRO_PICTURE_METADATA_WRITING",
+			"VPRO_PICTURE_CREATION_WRITING",
+			"VPRO_PICTURE_DELETION_WRITING",
+			"VPRO_PICTURE_DELETION_RESTORING":
+			return "true", true
+		}
+		return "", false
+	}
+}
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -257,27 +312,28 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	contextService.SiviHeightEnabled = siviHeightEnabled
+	coreContext := unwrapContextService(contextService)
+	coreContext.SiviHeightEnabled = siviHeightEnabled
 	plotLabelRegional, err := NewPlotLabelRegionalService(contextService)
 	if err != nil {
 		log.Fatal(err)
 	}
-	contextService.SiviParentReviewEnabled = siviParentReviewEnabled
-	contextService.SiviParentEditingEnabled = siviParentEditingEnabled
-	contextService.SiviParentActionEditingEnabled = siviParentActionEditingEnabled
-	contextService.SiviProjectAssignmentEnabled = siviProjectAssignmentEnabled
-	contextService.TableCSVReviewEnabled = tableCSVReviewEnabled
-	contextService.PlotLocationReviewEnabled = plotLocationReviewEnabled
-	contextService.SiteUnitSummaryEnabled = siteUnitSummaryEnabled
-	contextService.SiteUnitSummaryLifeformsEnabled = siteUnitSummaryLifeformsEnabled
-	contextService.SiteUnitSummarySpeciesEnabled = siteUnitSummarySpeciesEnabled
-	contextService.LongVegetationNoneEnabled = longVegetationNoneEnabled
-	contextService.LongVegetationLifeformEnabled = longVegetationLifeformEnabled
-	contextService.LongVegetationStrataEnabled = longVegetationStrataEnabled
-	contextService.LongVegetationCodeEnabled = longVegetationCodeEnabled
-	contextService.LongVegetationSelectedFieldEnabled = longVegetationSelectedFieldEnabled
-	contextService.LongVegetationNoneUnitsEnabled = longVegetationNoneUnitsEnabled
-	contextService.LongVegetationSelectedUnitsEnabled = longVegetationSelectedUnitsEnabled
+	coreContext.SiviParentReviewEnabled = siviParentReviewEnabled
+	coreContext.SiviParentEditingEnabled = siviParentEditingEnabled
+	coreContext.SiviParentActionEditingEnabled = siviParentActionEditingEnabled
+	coreContext.SiviProjectAssignmentEnabled = siviProjectAssignmentEnabled
+	coreContext.TableCSVReviewEnabled = tableCSVReviewEnabled
+	coreContext.PlotLocationReviewEnabled = plotLocationReviewEnabled
+	coreContext.SiteUnitSummaryEnabled = siteUnitSummaryEnabled
+	coreContext.SiteUnitSummaryLifeformsEnabled = siteUnitSummaryLifeformsEnabled
+	coreContext.SiteUnitSummarySpeciesEnabled = siteUnitSummarySpeciesEnabled
+	coreContext.LongVegetationNoneEnabled = longVegetationNoneEnabled
+	coreContext.LongVegetationLifeformEnabled = longVegetationLifeformEnabled
+	coreContext.LongVegetationStrataEnabled = longVegetationStrataEnabled
+	coreContext.LongVegetationCodeEnabled = longVegetationCodeEnabled
+	coreContext.LongVegetationSelectedFieldEnabled = longVegetationSelectedFieldEnabled
+	coreContext.LongVegetationNoneUnitsEnabled = longVegetationNoneUnitsEnabled
+	coreContext.LongVegetationSelectedUnitsEnabled = longVegetationSelectedUnitsEnabled
 	siviParentShared, err := NewSIVIParentSharedService(contextService, os.LookupEnv)
 	if err != nil {
 		log.Fatal(err)
@@ -322,19 +378,24 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pictures, err := NewPictureService(contextService, os.LookupEnv)
+	defaultVPicsPath, defaultImagesDir, err := vprocorepkg.EnsureDefaultPictureLibrary(dataDir)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pictureMetadata, err := NewPictureMetadataService(pictures, os.LookupEnv)
+	pictureLookup := newDefaultPictureEnvLookup(os.LookupEnv, defaultVPicsPath, defaultImagesDir)
+	pictures, err := NewPictureService(contextService, pictureLookup)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pictureCreation, err := NewPictureCreationService(pictures, os.LookupEnv)
+	pictureMetadata, err := NewPictureMetadataService(pictures, pictureLookup)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pictureDeletion, err := NewPictureDeletionService(pictures, os.LookupEnv)
+	pictureCreation, err := NewPictureCreationService(pictures, pictureLookup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pictureDeletion, err := NewPictureDeletionService(pictures, pictureLookup)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -649,7 +710,7 @@ func main() {
 		siteUnitSummaryExtendedWorkbook: siteUnitSummaryExtendedWorkbook,
 		subzoneMatrix:                   subzoneMatrix,
 	}
-	spatialExtraDirs := ResolveSpatialExtraDirs()
+	spatialExtraDirs := resolveSpatialExtraDirs(os.LookupEnv)
 	spatialAttributor := NewPMTilesAttributor(dataDir, spatialExtraDirs...)
 	spatialService := &SpatialService{
 		contexts:               contextService,

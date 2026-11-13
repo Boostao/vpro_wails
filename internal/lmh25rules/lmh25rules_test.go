@@ -176,3 +176,28 @@ func TestKey94And96CrestXericVsRichMullToeSlope(t *testing.T) {
 		t.Fatalf("expected toe KeyedSNR=E, got %s", toe.KeyedSNR)
 	}
 }
+
+func TestACE15SigDigitCalibratedDecimalRounding(t *testing.T) {
+	// In IEEE-754 float64, 1.005 is 1.0049999999999998934... and 35.855 is 35.85499999999999687...
+	// ACE 15-significant-digit decimal calibration must round 1.005 -> 1.01 and 35.855 -> 35.86!
+	diag := lmh25rules.EvaluatePlotDiagnostics(
+		vprocore.FS882Header{
+			PlotNumber:           "ACE01",
+			SubstrateDecWood:     fltPtr(35.855),
+			SubstrateBedRock:     fltPtr(0.0),
+			SubstrateRocks:       fltPtr(0.0),
+			SubstrateMineralSoil: fltPtr(0.0),
+		},
+		[]vprocore.HumusRecord{
+			{ID: 1, PlotNumber: "ACE01", Horizon: strPtr("Fm"), UpperDepth: fltPtr(1.005), LowerDepth: fltPtr(0.0)},
+		},
+		nil,
+	)
+	if diag.DerivedHumusThickness == nil || *diag.DerivedHumusThickness != 1.01 {
+		t.Fatalf("expected DerivedHumusThickness(1.005) == 1.01, got %v", diag.DerivedHumusThickness)
+	}
+	if diag.SubstrateSum == nil || *diag.SubstrateSum != 35.86 {
+		t.Fatalf("expected SubstrateSum(35.855) == 35.86, got %v", diag.SubstrateSum)
+	}
+}
+

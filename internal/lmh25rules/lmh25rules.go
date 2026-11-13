@@ -67,15 +67,12 @@ type PlotDiagnosticsResult struct {
 
 func roundACE2(val float64) float64 {
 	// ACE 15-significant-digit decimal calibration before half-away rounding to 2 decimals
-	formatted := strconv.FormatFloat(val, 'g', 15, 64)
+	formatted := vprocore.FormatCalibratedDecimal(val, 2)
 	parsed, err := strconv.ParseFloat(formatted, 64)
 	if err != nil {
-		parsed = val
+		return val
 	}
-	if parsed >= 0 {
-		return math.Floor(parsed*100+0.5) / 100
-	}
-	return -math.Floor(-parsed*100+0.5) / 100
+	return parsed
 }
 
 func trimUpper(s *string) string {

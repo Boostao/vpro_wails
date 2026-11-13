@@ -355,9 +355,9 @@ func buildQuartoVegSummary(
 				Species:        k.species,
 				ScientificName: sci,
 				EnglishName:    nm.eng,
-				ConstancyPct:   math.Round(constancy*10.0) / 10.0,
+				ConstancyPct:   vprocore.RoundCalibratedDecimal(constancy, 1),
 				ConstancyClass: constancyRomanClass(constancy),
-				MeanCover:      math.Round(meanCov*100.0) / 100.0,
+				MeanCover:      vprocore.RoundCalibratedDecimal(meanCov, 2),
 			},
 		})
 	}

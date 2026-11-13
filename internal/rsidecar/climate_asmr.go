@@ -761,6 +761,21 @@ func readExistingPlotClimateCache(ctx context.Context, db *sql.DB) (map[string]c
 	return out, rows.Err()
 }
 
+func readExistingPlotClimateCacheReadOnly(ctx context.Context, owner *vprocore.SqliteContext) (map[string]cachedNormalRecord, error) {
+	if err := sqlutil.AcquireMutexLease(ctx, &owner.Mu); err != nil {
+		return nil, err
+	}
+	projectPath := owner.Selection.ProjectPath
+	owner.Mu.Unlock()
+
+	roDB, err := sqlutil.OpenReadOnlyContext(ctx, projectPath)
+	if err != nil {
+		return nil, err
+	}
+	defer roDB.Close()
+	return readExistingPlotClimateCache(ctx, roDB)
+}
+
 type rClimatePointInput struct {
 	CoordElevHash string  `json:"coordElevHash"`
 	Lat           float64 `json:"lat"`
@@ -826,11 +841,7 @@ func GetCachedPlotClimate(
 		if err != nil {
 			return nil, err
 		}
-		projDB, err := owner.ProjectDatabase(ctx)
-		if err != nil {
-			return nil, err
-		}
-		cacheMap, err := readExistingPlotClimateCache(ctx, projDB)
+		cacheMap, err := readExistingPlotClimateCacheReadOnly(ctx, owner)
 		if err != nil {
 			return nil, err
 		}
@@ -932,11 +943,7 @@ func ComputePlotClimateAndDualEdatopic(
 			return nil, err
 		}
 
-		projDB, err := owner.ProjectDatabase(ctx)
-		if err != nil {
-			return nil, err
-		}
-		cacheByPlot, err := readExistingPlotClimateCache(ctx, projDB)
+		cacheByPlot, err := readExistingPlotClimateCacheReadOnly(ctx, owner)
 		if err != nil {
 			return nil, err
 		}
@@ -988,6 +995,14 @@ func ComputePlotClimateAndDualEdatopic(
 					uncachedByHash[h] = pt
 					uncachedList = append(uncachedList, pt)
 				}
+			}
+		}
+
+		var projDB *sql.DB
+		if len(uncachedList) > 0 || cacheMisses > 0 {
+			projDB, err = owner.ProjectDatabase(ctx)
+			if err != nil {
+				return nil, err
 			}
 		}
 

@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
@@ -217,6 +216,55 @@ func parseSurveyYear(raw string) (int, bool) {
 	return 0, false
 }
 
+type sqlQueryer interface {
+	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+	QueryRowContext(ctx context.Context, query string, args ...any) *sql.Row
+}
+
+func resolveSingleExistingProjectID(ctx context.Context, q sqlQueryer, projectName, requestedPID string) (string, error) {
+	trimmed := strings.TrimSpace(requestedPID)
+	if trimmed == "" || !strings.EqualFold(trimmed, projectName) {
+		return trimmed, nil
+	}
+	envTbl := vprocore.QuoteHeaderIdentifier(projectName + "_Env")
+	metaTbl := vprocore.QuoteHeaderIdentifier(projectName + "_Metadata")
+
+	var envMatch, metaMatch int
+	if err := q.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM `+envTbl+` WHERE typeof("ProjectID")='text' AND CAST("ProjectID" AS BLOB)=CAST(? AS BLOB))`, trimmed).Scan(&envMatch); err != nil {
+		return "", err
+	}
+	if envMatch != 0 {
+		return trimmed, nil
+	}
+	if err := q.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM `+metaTbl+` WHERE typeof("ProjectID")='text' AND CAST("ProjectID" AS BLOB)=CAST(? AS BLOB))`, trimmed).Scan(&metaMatch); err != nil {
+		return "", err
+	}
+	if metaMatch != 0 {
+		return trimmed, nil
+	}
+
+	rows, err := q.QueryContext(ctx, `SELECT CAST("ProjectID" AS TEXT) FROM `+metaTbl+` WHERE typeof("ProjectID")='text' AND TRIM("ProjectID") <> '' ORDER BY "ID" LIMIT 2`)
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+	var nonEmpty []string
+	for rows.Next() {
+		var pid string
+		if err := rows.Scan(&pid); err != nil {
+			return "", err
+		}
+		nonEmpty = append(nonEmpty, pid)
+	}
+	if err := rows.Err(); err != nil {
+		return "", err
+	}
+	if len(nonEmpty) == 1 {
+		return nonEmpty[0], nil
+	}
+	return trimmed, nil
+}
+
 // DeriveProjectMetadataFromPlots computes Auto-6 metadata aggregations from plots matching projectID
 // (or all plots in the active project when projectID is empty) plus active VLists 2026 version stamps.
 func DeriveProjectMetadataFromPlots(s *vprocore.ContextService, ctx context.Context, contextID, projectID string) (DerivedProjectMetadata, error) {
@@ -233,7 +281,7 @@ func DeriveProjectMetadataFromPlots(s *vprocore.ContextService, ctx context.Cont
 		return DerivedProjectMetadata{}, err
 	}
 
-	regionSvc, err := references.NewRegionCodeService(filepath.Dir(snap.ProjectPath))
+	regionSvc, err := references.NewRegionCodeService(snap.Root)
 	var knownRegions map[string]string
 	if err == nil {
 		defer regionSvc.Close()
@@ -265,7 +313,10 @@ func DeriveProjectMetadataFromPlots(s *vprocore.ContextService, ctx context.Cont
 	humusTbl := vprocore.QuoteHeaderIdentifier(snap.Project + "_Humus")
 	mineralTbl := vprocore.QuoteHeaderIdentifier(snap.Project + "_Mineral")
 
-	targetPID := strings.TrimSpace(projectID)
+	targetPID, err := resolveSingleExistingProjectID(ctx, db, snap.Project, projectID)
+	if err != nil {
+		return DerivedProjectMetadata{}, err
+	}
 	var whereClause string
 	var args []any
 	if targetPID != "" {
@@ -502,7 +553,7 @@ func ApplyProjectMetadataAutomation(s *vprocore.ContextService, ctx context.Cont
 		return ApplyProjectMetadataAutomationResult{}, err
 	}
 	targetPID := strings.TrimSpace(req.ProjectID)
-	if targetPID == "" {
+	if targetPID == "" || strings.EqualFold(targetPID, derived.Project) {
 		targetPID = derived.ProjectID
 	}
 	if utf16Len(targetPID) > 20 {
@@ -534,6 +585,18 @@ func ApplyProjectMetadataAutomation(s *vprocore.ContextService, ctx context.Cont
 			metaTbl := vprocore.QuoteHeaderIdentifier(project + "_Metadata")
 			auditTbl := vprocore.QuoteHeaderIdentifier(project + "_Audit")
 			now := time.Now().Format("2006-01-02 15:04:05")
+
+			effectivePID, rErr := resolveSingleExistingProjectID(ctx, tx, project, targetPID)
+			if rErr != nil {
+				return rErr
+			}
+			if utf16Len(effectivePID) > 20 {
+				effectivePID = truncateUTF16(effectivePID, 20)
+			}
+			if vErr := validateUTF16Max("Metadata.ProjectID", effectivePID, 20); vErr != nil {
+				return vErr
+			}
+			targetPID = effectivePID
 
 			// Locate existing row by literal ProjectID or create one with monotonic ID.
 			var rowID int64
@@ -608,7 +671,7 @@ func ApplyProjectMetadataAutomation(s *vprocore.ContextService, ctx context.Cont
 			auditCount := 0
 			if created {
 				if _, aErr := tx.ExecContext(ctx, `INSERT INTO `+auditTbl+` ("Project","User","PlotNumber","Table","EditField","EditWhen","BeforeEdit","AfterEdit","Restore","Flag","ID") VALUES (?,?,?,?,?,?,?,?,0,0,?)`,
-					project, user, targetPID, "_Metadata", "ProjectID", now, nil, targetPID, metaID); aErr != nil {
+					project, user, nil, "_Metadata", "ProjectID", now, nil, targetPID, metaID); aErr != nil {
 					return aErr
 				}
 				auditCount++
@@ -641,7 +704,7 @@ func ApplyProjectMetadataAutomation(s *vprocore.ContextService, ctx context.Cont
 					afterAudit = *newText
 				}
 				if _, aErr := tx.ExecContext(ctx, `INSERT INTO `+auditTbl+` ("Project","User","PlotNumber","Table","EditField","EditWhen","BeforeEdit","AfterEdit","Restore","Flag","ID") VALUES (?,?,?,?,?,?,?,?,0,0,?)`,
-					project, user, targetPID, "_Metadata", col, now, beforeAudit, afterAudit, metaID); aErr != nil {
+					project, user, nil, "_Metadata", col, now, beforeAudit, afterAudit, metaID); aErr != nil {
 					return aErr
 				}
 				updatedCols = append(updatedCols, col)

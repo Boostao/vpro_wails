@@ -261,16 +261,52 @@ type SaveProjectAsResult struct {
 var companionProjectSuffixes = []string{"SU", "Hierarchy", "Lump", "Profile", "Herbarium", "Theme"}
 
 func rewriteProjectObjectSQL(originalSQL, oldPrefix, newPrefix, oldTable, newTable string) string {
-	rewritten := strings.ReplaceAll(originalSQL, vprocore.QuoteHeaderIdentifier(oldTable), vprocore.QuoteHeaderIdentifier(newTable))
-	rewritten = strings.ReplaceAll(rewritten, vprocore.QuoteHeaderIdentifier(oldPrefix+"_Env"), vprocore.QuoteHeaderIdentifier(newPrefix+"_Env"))
-	// Also rewrite index identifiers containing OldPrefix_
-	oldIdxToken := oldPrefix + "_"
-	newIdxToken := newPrefix + "_"
-	rewritten = strings.ReplaceAll(rewritten, oldIdxToken, newIdxToken)
-	// Handle unquoted CREATE TABLE OldTable ( if present in historical schemas
 	unquotedCreate := regexp.MustCompile(`(?i)^(\s*CREATE\s+TABLE\s+)` + regexp.QuoteMeta(oldTable) + `(\b)`)
-	rewritten = unquotedCreate.ReplaceAllString(rewritten, "${1}"+vprocore.QuoteHeaderIdentifier(newTable)+"${2}")
-	return rewritten
+	normalized := unquotedCreate.ReplaceAllString(originalSQL, "${1}"+vprocore.QuoteHeaderIdentifier(oldTable)+"${2}")
+	replacer := strings.NewReplacer(
+		vprocore.QuoteHeaderIdentifier(oldTable), vprocore.QuoteHeaderIdentifier(newTable),
+		vprocore.QuoteHeaderIdentifier(oldPrefix+"_Env"), vprocore.QuoteHeaderIdentifier(newPrefix+"_Env"),
+		oldPrefix+"_", newPrefix+"_",
+	)
+	return replacer.Replace(normalized)
+}
+
+func rewriteProjectIndexSQL(originalSQL, idxName, oldPrefix, newPrefix, oldTable, newTable string) string {
+	newIdxName := strings.ReplaceAll(idxName, oldPrefix+"_", newPrefix+"_")
+	if newIdxName == idxName {
+		newIdxName = newTable + "__" + idxName
+	}
+	unquotedIdx := regexp.MustCompile(`(?i)^(\s*CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?)` + regexp.QuoteMeta(idxName) + `(\b)`)
+	normalized := unquotedIdx.ReplaceAllString(originalSQL, "${1}"+vprocore.QuoteHeaderIdentifier(idxName)+"${2}")
+	replacer := strings.NewReplacer(
+		vprocore.QuoteHeaderIdentifier(idxName), vprocore.QuoteHeaderIdentifier(newIdxName),
+		vprocore.QuoteHeaderIdentifier(oldTable), vprocore.QuoteHeaderIdentifier(newTable),
+		vprocore.QuoteHeaderIdentifier(oldPrefix+"_Env"), vprocore.QuoteHeaderIdentifier(newPrefix+"_Env"),
+		oldPrefix+"_", newPrefix+"_",
+	)
+	return replacer.Replace(normalized)
+}
+
+func rewriteAuditProjectCells(cols []string, rows [][]rawSQLiteCell, targetProject string) {
+	projIdx := -1
+	for i, c := range cols {
+		if strings.EqualFold(c, "Project") {
+			projIdx = i
+			break
+		}
+	}
+	if projIdx < 0 {
+		return
+	}
+	targetBytes := []byte(targetProject)
+	for i := range rows {
+		cp := make([]byte, len(targetBytes))
+		copy(cp, targetBytes)
+		rows[i][projIdx] = rawSQLiteCell{
+			storage: "text",
+			bytes:   cp,
+		}
+	}
 }
 
 // SaveProjectAs performs a lossless atomic copy of the active <Project>.db renaming
@@ -402,12 +438,7 @@ func SaveProjectAs(s *vprocore.ContextService, ctx context.Context, contextID st
 				idxRows.Close()
 				return SaveProjectAsResult{}, err
 			}
-			newIdxName := strings.ReplaceAll(idxName, oldName+"_", newName+"_")
-			if newIdxName == idxName {
-				newIdxName = newTbl + "__" + idxName
-			}
-			rewrittenIdx := strings.ReplaceAll(idxSQL, vprocore.QuoteHeaderIdentifier(idxName), vprocore.QuoteHeaderIdentifier(newIdxName))
-			rewrittenIdx = rewriteProjectObjectSQL(rewrittenIdx, oldName, newName, oldTbl, newTbl)
+			rewrittenIdx := rewriteProjectIndexSQL(idxSQL, idxName, oldName, newName, oldTbl, newTbl)
 			idxSQLs = append(idxSQLs, rewrittenIdx)
 		}
 		if err := errors.Join(idxRows.Err(), idxRows.Close()); err != nil {
@@ -417,6 +448,9 @@ func SaveProjectAs(s *vprocore.ContextService, ctx context.Context, contextID st
 		cols, tableRows, readErr := readExactTableRows(ctx, srcTx, vprocore.QuoteHeaderIdentifier(oldTbl), "")
 		if readErr != nil {
 			return SaveProjectAsResult{}, readErr
+		}
+		if item.suffix == "Audit" {
+			rewriteAuditProjectCells(cols, tableRows, newName)
 		}
 		tag, hasTag := metaTags[oldTbl]
 		if !item.companion && (tag == "" || item.suffix == "Env") {
@@ -859,9 +893,13 @@ func ExportSplinterProject(s *vprocore.ContextService, ctx context.Context, cont
 		if rErr != nil {
 			return ExportSplinterResult{}, rErr
 		}
+		filteredRows := filterRowsByColumn(cols, allRows, spec.keyCol, selectedPlots)
+		if spec.suffix == "Audit" {
+			rewriteAuditProjectCells(cols, filteredRows, splinterName)
+		}
 		extracted[spec.suffix] = tableData{
 			cols: cols,
-			rows: filterRowsByColumn(cols, allRows, spec.keyCol, selectedPlots),
+			rows: filteredRows,
 		}
 	}
 
@@ -883,7 +921,7 @@ func ExportSplinterProject(s *vprocore.ContextService, ctx context.Context, cont
 		return ExportSplinterResult{}, err
 	}
 	if hasSourceIdentity {
-		idRows, qErr := srcTx.QueryContext(ctx, `SELECT ChildTable, ID FROM "__VPRO_ChildIdentity" WHERE ID > 0`)
+		idRows, qErr := srcTx.QueryContext(ctx, `SELECT ChildTable, ID FROM "__VPRO_ChildIdentity"`)
 		if qErr != nil {
 			return ExportSplinterResult{}, qErr
 		}
