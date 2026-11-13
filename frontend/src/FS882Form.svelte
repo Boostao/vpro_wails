@@ -221,6 +221,7 @@
   const siviIdentityUnsaved = $derived(siviIdentityClose?.unsaved ?? false);
   const siviIdentityBusy = $derived(siviIdentityClose?.busy ?? false);
   let vegetationReadUnavailable = $state<string | null>(null);
+  let historicalSoilUnavailable = $state<string | null>(null);
   const reads = new ReadRequests();
   const referenceReads = new ReadRequests();
   const speciesReads = new ReadRequests();
@@ -546,8 +547,9 @@
 
   async function createChild(first: string, second: string) {
     const kind = newChild;
-    if (ordinarySoilUnavailable && (kind === 'humus' || kind === 'mineral')) {
-      error = ordinarySoilUnavailable;
+    const soilUnavailable = ordinarySoilUnavailable ?? (typeof historicalSoilUnavailable !== 'undefined' ? historicalSoilUnavailable : null);
+    if (soilUnavailable && (kind === 'humus' || kind === 'mineral')) {
+      error = soilUnavailable;
       return;
     }
     let saved = false;
@@ -816,7 +818,7 @@
     Object.keys(headerValidation).length > 0 || siviSourceAuthorityUnknown || Boolean(siviParentSourceView?.error) || (siviProjectAssignmentView?.blocked ?? false));
   const heightEditingDisabled = $derived(!numberEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const otherEditingDisabled = $derived(!otherEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
-  const soilEditingDisabled = $derived(!!ordinarySoilUnavailable || !soilEditingEnabled || !soilReferenceReady || soilReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
+  const soilEditingDisabled = $derived(!!ordinarySoilUnavailable || !soilEditingEnabled || (typeof historicalSoilUnavailable !== 'undefined' && !!historicalSoilUnavailable) || !soilReferenceReady || soilReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || attributeUnsaved || collectedUnsaved || speciesUnsaved);
   const attributeEditingDisabled = $derived(!attributeEditingEnabled || !attributeReferenceReady || attributeReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || collectedUnsaved || speciesUnsaved);
   const collectedEditingDisabled = $derived(!collectedEditingEnabled || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || speciesUnsaved);
   const speciesEditingDisabled = $derived(!speciesEditingEnabled || !speciesReferenceReady || speciesReferenceBusy || childParentDisabled || siviUnsaved || siviCoverUnsaved || siviCombinedUnsaved || siviCollectedUnsaved || siviSpeciesUnsaved || siviIdentityUnsaved || heightUnsaved || otherUnsaved || soilUnsaved || attributeUnsaved || collectedUnsaved);
@@ -1903,6 +1905,7 @@
     savedPersonalCodes = [];
     vegList = [];
     vegetationReadUnavailable = null;
+    historicalSoilUnavailable = null;
     humusList = [];
     mineralList = [];
     otherList = [];
@@ -2079,13 +2082,60 @@
 
   async function loadChildData(p: string) {
     const request = loadRequest;
+    function historicalSoilError(kind: 'Humus' | 'Mineral', cause: unknown): string | null {
+      const detail = cause instanceof Error ? cause.message : String(cause);
+      if (
+        /(?:Humus|Mineral) row for plot .* has unsupported NULL ID/i.test(detail) ||
+        /sql:\s*Scan error on column index \d+,\s*name\b/i.test(detail)
+      ) {
+        return `Ordinary ID-keyed ${kind.toLowerCase()} rows are unavailable for this historical plot: ${detail}. Use Two-page complete entry linked soil review to inspect or edit physical rows.`;
+      }
+      return null;
+    }
+    function validateOrdinarySoilRows<T extends { id: number }>(kind: 'Humus' | 'Mineral', rows: T[]): { records: T[]; reason: string | null } {
+      const seen = new Set<number>();
+      for (const row of rows) {
+        if (!row || !Number.isInteger(row.id) || row.id < -2147483648 || row.id > 2147483647) {
+          return {
+            records: [],
+            reason: `Ordinary ID-keyed ${kind.toLowerCase()} rows are unavailable for this historical plot: ${kind} row ID exceeds exact signed32 ordinary identity. Use Two-page complete entry linked soil review to inspect or edit physical rows.`,
+          };
+        }
+        if (seen.has(row.id)) {
+          return {
+            records: [],
+            reason: `Ordinary ID-keyed ${kind.toLowerCase()} rows are unavailable for this historical plot: ${kind} row ID ${row.id} is duplicated. Use Two-page complete entry linked soil review to inspect or edit physical rows.`,
+          };
+        }
+        seen.add(row.id);
+      }
+      return { records: rows, reason: null };
+    }
     try {
-      const [v, h, m, o, a, vc, hc, mc, oc] = await Promise.all([
+      const [v, hOutcome, mOutcome, o, a, vc, hc, mc, oc] = await Promise.all([
         ordinaryVegetationUnavailable ? { records: [], reason: ordinaryVegetationUnavailable } : siviIdentityEnabled
           ? reads.track(ContextService.GetVegetationReadAvailability(siviContextId, p)).then(vegetationReadAvailability)
           : reads.track(PlotService.ListVegRecords(p)).then(records => ({ records: records ?? [], reason: null })),
-        ordinarySoilUnavailable ? [] : reads.track(PlotService.ListHumusRecords(p)),
-        ordinarySoilUnavailable ? [] : reads.track(PlotService.ListMineralRecords(p)),
+        ordinarySoilUnavailable
+          ? { records: [] as HumusRecord[], reason: null as string | null }
+          : reads.track(PlotService.ListHumusRecords(p)).then(
+              records => validateOrdinarySoilRows('Humus', records ?? []),
+              cause => {
+                const reason = historicalSoilError('Humus', cause);
+                if (reason) return { records: [] as HumusRecord[], reason };
+                throw cause;
+              }
+            ),
+        ordinarySoilUnavailable
+          ? { records: [] as MineralRecord[], reason: null as string | null }
+          : reads.track(PlotService.ListMineralRecords(p)).then(
+              records => validateOrdinarySoilRows('Mineral', records ?? []),
+              cause => {
+                const reason = historicalSoilError('Mineral', cause);
+                if (reason) return { records: [] as MineralRecord[], reason };
+                throw cause;
+              }
+            ),
         reads.track(PlotService.ListOtherRecords(p)),
         reads.track(PlotService.ListAuditReadEntries(p)),
         reads.track(PlotService.GetChildCapabilities('Veg')),
@@ -2095,11 +2145,13 @@
       ]);
       if (request !== loadRequest) return;
       if (vc === null || hc === null || mc === null || oc === null) throw new Error('Child capabilities were not returned.');
+      const soilHistoryReason = [hOutcome.reason, mOutcome.reason].filter(Boolean).join(' ') || null;
       childCapabilities = { Veg: vc, Humus: hc, Mineral: mc, Other: oc };
       vegList = v.records;
       vegetationReadUnavailable = v.reason;
-      humusList = h ?? [];
-      mineralList = m ?? [];
+      historicalSoilUnavailable = soilHistoryReason;
+      humusList = soilHistoryReason ? [] : hOutcome.records;
+      mineralList = soilHistoryReason ? [] : mOutcome.records;
       otherList = o ?? [];
       auditList = a ?? [];
       childRevision++;
@@ -2957,8 +3009,9 @@
       error = ordinaryVegetationUnavailable;
       return;
     }
-    if (ordinarySoilUnavailable && (name === 'SoilHumusXL' || name === 'SoilMineralXL')) {
-      error = ordinarySoilUnavailable;
+    const soilUnavailable = ordinarySoilUnavailable ?? (typeof historicalSoilUnavailable !== 'undefined' ? historicalSoilUnavailable : null);
+    if (soilUnavailable && (name === 'SoilHumusXL' || name === 'SoilMineralXL')) {
+      error = soilUnavailable;
       return;
     }
     const key = column.toLowerCase();
@@ -4420,6 +4473,7 @@
       {/if}
     {:else if activeTab === 'soils'}
       {#if ordinarySoilUnavailable}<p role="status" data-soil-ordinary-unavailable>{ordinarySoilUnavailable}</p>{/if}
+      {#if historicalSoilUnavailable}<p role="status" data-soil-historical-unavailable>{historicalSoilUnavailable}</p>{/if}
       {#if soilEditingEnabled && !ordinarySoilUnavailable}
         {#if soilReferenceBusy}<p role="status">Loading soil reference suggestions...</p>{/if}
         {#if soilReferenceError}
@@ -4457,6 +4511,8 @@
                   {@const child = embeddedForm(control.controlId)}
                   {#if ordinarySoilUnavailable}
                     <p role="status" data-soil-ordinary-unavailable={child.form}>{ordinarySoilUnavailable}</p>
+                  {:else if historicalSoilUnavailable}
+                    <p role="status" data-soil-historical-unavailable={child.form}>{historicalSoilUnavailable}</p>
                   {:else}
                     <SourceChild name={child.form} rows={sourceRows(child.form)} revision={childRevision} disabled={soilEditingDisabled}
                     deleteDisabled={soilUnsaved} onsoilstage={soilEditingEnabled ? stageSoilCell : undefined}
@@ -4532,7 +4588,7 @@
                   </tr>
                 {:else}
                   <tr>
-                    <td colspan="6" class="p-4 text-center text-stone-400">No humus layers recorded.</td>
+                    <td colspan="6" class="p-4 text-center text-stone-400">{historicalSoilUnavailable ?? 'No humus layers recorded.'}</td>
                   </tr>
                 {/each}
               </tbody>
@@ -4567,7 +4623,7 @@
                   </tr>
                 {:else}
                   <tr>
-                    <td colspan="6" class="p-4 text-center text-stone-400">No mineral layers recorded.</td>
+                    <td colspan="6" class="p-4 text-center text-stone-400">{historicalSoilUnavailable ?? 'No mineral layers recorded.'}</td>
                   </tr>
                 {/each}
               </tbody>
