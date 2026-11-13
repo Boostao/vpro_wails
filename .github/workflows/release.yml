@@ -108,7 +108,7 @@ jobs:
 
   build-macos:
     needs: validate
-    runs-on: macos-15
+    runs-on: macos-15-intel
     env:
       RELEASE_VERSION: ${{ needs.validate.outputs.version }}
       CGO_ENABLED: '1'

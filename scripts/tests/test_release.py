@@ -691,7 +691,7 @@ class ReleaseTests(unittest.TestCase):
         self.assertNotIn("continue-on-error", workflow)
         self.assertNotIn("darwin:package:dmg", workflow)
         self.assertNotIn("macos-14", workflow)
-        self.assertIn("runs-on: macos-15", workflow)
+        self.assertIn("runs-on: macos-15-intel", workflow)
         self.assertNotIn("go-version: '1.25'", workflow)
         self.assertEqual(workflow.count("go-version: '1.26'"), 3)
         self.assertIn("task darwin:package:universal", workflow)
