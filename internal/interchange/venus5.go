@@ -378,9 +378,7 @@ func assembleRelationalVenusArchive(
 		if plotNum == "" {
 			plotNum = fmt.Sprintf("VP%05d", i+1)
 		}
-		if len([]rune(plotNum)) > 7 {
-			plotNum = string([]rune(plotNum)[:7])
-		}
+		plotNum = truncateUTF16Units(plotNum, 7)
 		if plotID == "" {
 			plotID = plotNum
 		}
@@ -475,7 +473,7 @@ func assembleRelationalVenusArchive(
 		spp := strings.ToUpper(firstNonEmpty(sr, "species", "speciescode", "code"))
 		covStr := firstNonEmpty(sr, "cover", "percentcover")
 		cov, err := strconv.ParseFloat(covStr, 64)
-		if spp == "" || err != nil || cov <= 0 {
+		if spp == "" || err != nil || cov == 0 {
 			continue
 		}
 		var htPtr *float64
@@ -746,7 +744,7 @@ func decodeHierarchicalVenusPlot(dec *xml.Decoder, start xml.StartElement, defau
 				}
 				spp := strings.ToUpper(firstNonEmpty(m, "species", "code", "speciescode"))
 				cov, cErr := strconv.ParseFloat(firstNonEmpty(m, "cover", "percentcover"), 64)
-				if spp != "" && cErr == nil && cov > 0 {
+				if spp != "" && cErr == nil && cov != 0 {
 					lyr := firstNonEmpty(m, "layer", "layercode")
 					if lyr == "" {
 						lyr = curLayerCode
@@ -811,9 +809,7 @@ func decodeHierarchicalVenusPlot(dec *xml.Decoder, start xml.StartElement, defau
 	if pNum == "" {
 		pNum = fmt.Sprintf("VP%05d", index)
 	}
-	if len([]rune(pNum)) > 7 {
-		pNum = string([]rune(pNum)[:7])
-	}
+	pNum = truncateUTF16Units(pNum, 7)
 	rec.PlotNumber = pNum
 	rec.PlotID = pNum
 	if pName := firstNonEmpty(rec.Fields, "projectname", "projectid"); pName != "" {
@@ -877,8 +873,11 @@ func venusCoarseFrags(code string) *float64 {
 	}
 }
 
-func combineVenusTerrain(a, b, c string) any {
+func combineVenusTerrain(maxUnits int, a, b, c string) any {
 	joined := strings.TrimSpace(a) + strings.TrimSpace(b) + strings.TrimSpace(c)
+	if maxUnits > 0 {
+		joined = truncateUTF16Units(joined, maxUnits)
+	}
 	if joined == "" {
 		return nil
 	}
@@ -943,15 +942,66 @@ func optIntField(f map[string]string, keys ...string) *int {
 	return nil
 }
 
-func optStrField(f map[string]string, maxRunes int, keys ...string) any {
+func optStrField(f map[string]string, maxUTF16 int, keys ...string) any {
 	s := firstNonEmpty(f, keys...)
 	if s == "" {
 		return nil
 	}
-	if maxRunes > 0 && len([]rune(s)) > maxRunes {
-		s = string([]rune(s)[:maxRunes])
+	if maxUTF16 > 0 {
+		s = truncateUTF16Units(s, maxUTF16)
+		if s == "" {
+			return nil
+		}
 	}
 	return s
+}
+
+func optSingleCoverField(f map[string]string, plotNum, label string, keys ...string) (*float64, error) {
+	raw := optFltField(f, keys...)
+	if raw == nil {
+		return nil, nil
+	}
+	v := *raw
+	if math.IsNaN(v) || math.IsInf(v, 0) || v < 0 || math.Abs(v) > math.MaxFloat32 || float32(v) >= 100 {
+		return nil, fmt.Errorf("VENUS plot %s %s %v violates IEEE-754 SINGLE [0, 100) bounds", plotNum, label, v)
+	}
+	narrowed := float64(float32(v))
+	return &narrowed, nil
+}
+
+func normalizeLMH25HorizonDepths(horizon string, isMineral bool, upper, lower *float64) (normUpper, normLower *float64, quarantineReason string) {
+	if upper == nil || lower == nil {
+		return upper, lower, ""
+	}
+	u, l := *upper, *lower
+	if math.IsNaN(u) || math.IsInf(u, 0) || math.IsNaN(l) || math.IsInf(l, 0) {
+		return upper, lower, "non-finite horizon depth"
+	}
+	if u < 0 || l < 0 {
+		u = math.Abs(u)
+		l = math.Abs(l)
+	}
+	if u == l {
+		return upper, lower, "degenerate zero-thickness horizon (UpperDepth == LowerDepth)"
+	}
+	upward := false
+	if !isMineral {
+		hz := strings.ToUpper(strings.TrimSpace(horizon))
+		if !strings.HasPrefix(hz, "OF") && !strings.HasPrefix(hz, "OM") && !strings.HasPrefix(hz, "OH") &&
+			(strings.HasPrefix(hz, "L") || strings.HasPrefix(hz, "F") || strings.HasPrefix(hz, "H")) {
+			upward = true
+		}
+	}
+	if upward {
+		if u < l {
+			u, l = l, u
+		}
+	} else {
+		if u > l {
+			u, l = l, u
+		}
+	}
+	return &u, &l, ""
 }
 
 func writeVenusToVP08Tx(
@@ -1056,13 +1106,45 @@ func writeVenusToVP08Tx(
 	var nextVegID, nextHumusID, nextMineralID int64 = 1, 1, 1
 	seenPlots := map[string]bool{}
 	nowStr := time.Now().Format("2006-01-02 15:04:05")
-	projIDVal := sourceProject
-	if len([]rune(projIDVal)) > 20 {
-		projIDVal = string([]rune(projIDVal)[:20])
+	projIDVal := truncateUTF16Units(sourceProject, 20)
+
+	if _, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS "__VPRO_ChildIdentity" (
+		"ChildTable" TEXT NOT NULL,
+		"ID" INTEGER NOT NULL,
+		PRIMARY KEY ("ChildTable", "ID")
+	)`); err != nil {
+		return 0, 0, 0, err
+	}
+
+	quarantineSoilHorizon := func(suffix string, id int64, plotNum string, hz any, upper, lower *float64, reason string) error {
+		qTbl := vprocore.QuoteHeaderIdentifier("__VPRO_Quarantine_" + suffix)
+		srcTbl := vprocore.QuoteHeaderIdentifier(targetProject + "_" + suffix)
+		if _, err := tx.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS `+qTbl+` (
+			"__QuarantinedAt" TEXT NOT NULL,
+			"__Reason" TEXT NOT NULL,
+			"ID" INTEGER,
+			"PlotNumber" VARCHAR,
+			"Horizon" VARCHAR,
+			"UpperDepth" DOUBLE,
+			"LowerDepth" DOUBLE
+		)`); err != nil {
+			return err
+		}
+		if _, err := tx.ExecContext(ctx,
+			`INSERT INTO `+qTbl+` ("__QuarantinedAt","__Reason","ID","PlotNumber","Horizon","UpperDepth","LowerDepth") VALUES (?,?,?,?,?,?,?)`,
+			nowStr, reason, id, plotNum, hz, upper, lower,
+		); err != nil {
+			return err
+		}
+		_, err := tx.ExecContext(ctx,
+			`INSERT INTO "__VPRO_ChildIdentity" ("ChildTable","ID") VALUES (?,?) ON CONFLICT DO NOTHING`,
+			srcTbl, id,
+		)
+		return err
 	}
 
 	for _, pl := range plots {
-		pNum := strings.TrimSpace(pl.PlotNumber)
+		pNum := truncateUTF16Units(strings.TrimSpace(pl.PlotNumber), 7)
 		if pNum == "" || seenPlots[pNum] {
 			continue
 		}
@@ -1072,7 +1154,7 @@ func writeVenusToVP08Tx(
 		lat := parseVenusCoordDMSOrDD(f, "latitude", "latitudedegree", "latitudeminute", "latitudesecond", false)
 		lon := parseVenusCoordDMSOrDD(f, "longitude", "longitudedegree", "longitudeminute", "longitudesecond", true)
 
-		rzps := firstNonEmpty(f, "rootzoneparticlesize")
+		rzps := truncateUTF16Units(firstNonEmpty(f, "rootzoneparticlesize"), 6)
 		if orgTex := venusOrgSoilTexture(firstNonEmpty(f, "organicsoiltexture")); orgTex != "" && rzps == "" {
 			rzps = orgTex
 		}
@@ -1090,37 +1172,54 @@ func writeVenusToVP08Tx(
 			svCF = cf
 		}
 
-		tTexSurf := optStrField(f, 10, "terraintexturesurf")
+		scHerb, err := optSingleCoverField(f, pNum, "StrataCoverHerb", "stratacoverherb")
+		if err != nil {
+			return 0, 0, 0, err
+		}
+		scMoss, err := optSingleCoverField(f, pNum, "StrataCoverMoss", "stratacovermoss")
+		if err != nil {
+			return 0, 0, 0, err
+		}
+		scShrub, err := optSingleCoverField(f, pNum, "StrataCoverShrub", "stratacovershrub")
+		if err != nil {
+			return 0, 0, 0, err
+		}
+		scTree, err := optSingleCoverField(f, pNum, "StrataCoverTree", "stratacovertree")
+		if err != nil {
+			return 0, 0, 0, err
+		}
+
+		tTexSurf := optStrField(f, 3, "terraintexturesurf")
 		if tTexSurf == nil {
-			tTexSurf = combineVenusTerrain(f["terrainstexture1"], f["terrainstexture2"], f["terrainstexture3"])
+			tTexSurf = combineVenusTerrain(3, f["terrainstexture1"], f["terrainstexture2"], f["terrainstexture3"])
 		}
-		tTexSub := optStrField(f, 10, "terraintexturesubsurf")
+		tTexSub := optStrField(f, 3, "terraintexturesubsurf")
 		if tTexSub == nil {
-			tTexSub = combineVenusTerrain(f["terrainutexture1"], f["terrainutexture2"], f["terrainutexture3"])
+			tTexSub = combineVenusTerrain(3, f["terrainutexture1"], f["terrainutexture2"], f["terrainutexture3"])
 		}
-		sMatSurf := optStrField(f, 10, "surficialmaterialsurf")
+		sMatSurf := optStrField(f, 6, "surficialmaterialsurf")
 		if sMatSurf == nil {
-			sMatSurf = combineVenusTerrain(f["terrainsmaterial1"], f["terrainsmaterial2"], f["terrainsmaterial3"])
+			sMatSurf = combineVenusTerrain(6, f["terrainsmaterial1"], f["terrainsmaterial2"], f["terrainsmaterial3"])
 		}
-		sMatSub := optStrField(f, 10, "surficialmaterialsubsurf")
+		sMatSub := optStrField(f, 6, "surficialmaterialsubsurf")
 		if sMatSub == nil {
-			sMatSub = combineVenusTerrain(f["terrainumaterial1"], f["terrainumaterial2"], f["terrainumaterial3"])
+			sMatSub = combineVenusTerrain(6, f["terrainumaterial1"], f["terrainumaterial2"], f["terrainumaterial3"])
 		}
-		sExpSurf := optStrField(f, 10, "surfaceexpsurf")
+		sExpSurf := optStrField(f, 3, "surfaceexpsurf")
 		if sExpSurf == nil {
-			sExpSurf = combineVenusTerrain(f["terrainsexpression1"], f["terrainsexpression2"], f["terrainsexpression3"])
+			sExpSurf = combineVenusTerrain(3, f["terrainsexpression1"], f["terrainsexpression2"], f["terrainsexpression3"])
 		}
-		sExpSub := optStrField(f, 10, "surfaceexpsubsurf")
+		sExpSub := optStrField(f, 3, "surfaceexpsubsurf")
 		if sExpSub == nil {
-			sExpSub = combineVenusTerrain(f["terrainuexpression1"], f["terrainuexpression2"], f["terrainuexpression3"])
+			sExpSub = combineVenusTerrain(3, f["terrainuexpression1"], f["terrainuexpression2"], f["terrainuexpression3"])
 		}
-		geoSurf := optStrField(f, 10, "geomorprosurf")
+		geoSurf := optStrField(f, 3, "geomorprosurf")
 		if geoSurf == nil {
-			geoSurf = combineVenusTerrain(f["terrainsgeo1"], f["terrainsgeo2"], f["terrainsgeo3"])
+			geoSurf = combineVenusTerrain(3, f["terrainsgeo1"], f["terrainsgeo2"], f["terrainsgeo3"])
 		}
-		geoSub := optStrField(f, 10, "geomorprosubsurf")
+		geoSub := optStrField(f, 3, "geomorprosubsurf")
 		if geoSub == nil {
-			geoSub = combineVenusTerrain(f["terrainugeo1"], f["terrainugeo2"], f["terrainugeo3"])
+			geoSub = combineVenusTerrain(3, f["terrainugeo1"], f["terrainugeo2"], f["terrainugeo3"])
 		}
 
 		if _, err := envStmt.ExecContext(ctx,
@@ -1128,18 +1227,18 @@ func writeVenusToVP08Tx(
 			optStrField(f, 50, "fieldnumber", "sitenumber"),
 			projIDVal,
 			optStrField(f, 40, "date"),
-			optStrField(f, 50, "sitesurveyor"),
+			optStrField(f, 30, "sitesurveyor"),
 			optStrField(f, 255, "location"),
 			optStrField(f, 15, "fsregiondistrict", "region"),
-			optStrField(f, 20, "ntsmapsheet"),
-			optStrField(f, 5, "utmzone"),
+			optStrField(f, 8, "ntsmapsheet"),
+			optStrField(f, 2, "utmzone"),
 			optFltField(f, "utmnorthing"),
 			optFltField(f, "utmeasting"),
 			lat, lon,
-			optStrField(f, 30, "airphotonum"),
+			optStrField(f, 20, "airphotonum"),
 			optFltField(f, "xcoord"),
 			optFltField(f, "ycoord"),
-			optStrField(f, 30, "mapunit"),
+			optStrField(f, 15, "mapunit"),
 			optStrField(f, 255, "plotrepresenting"),
 			optStrField(f, 4, "zone"),
 			optStrField(f, 8, "subzone"),
@@ -1149,19 +1248,19 @@ func writeVenusToVP08Tx(
 			optStrField(f, 3, "moistureregime"),
 			optStrField(f, 3, "moistureregimesub"),
 			optStrField(f, 2, "nutrientregime"),
-			optStrField(f, 4, "successionalstatus"),
-			optStrField(f, 4, "structuralstage"),
+			optStrField(f, 3, "successionalstatus"),
+			optStrField(f, 6, "structuralstage"),
 			optStrField(f, 5, "realmclass"),
-			optStrField(f, 5, "sitedisturbance1"),
-			optStrField(f, 5, "sitedisturbance2"),
+			optStrField(f, 8, "sitedisturbance1"),
+			optStrField(f, 8, "sitedisturbance2"),
 			optIntField(f, "elevation"),
 			optFltField(f, "slopegradient", "slope"),
 			optIntField(f, "aspect"),
 			optStrField(f, 3, "mesoslopeposition"),
 			optStrField(f, 3, "surfaceshape", "surfacetopography"),
-			optStrField(f, 3, "surfacetopographysize", "surfacesize"),
+			optStrField(f, 2, "surfacetopographysize", "surfacesize"),
 			optStrField(f, 3, "surfacetopographytype", "surfacetype"),
-			optStrField(f, 5, "exposure1", "exposure"),
+			optStrField(f, 2, "exposure1", "exposure"),
 			optStrField(f, 50, "photo", "photorollnum"),
 			optFltField(f, "substratedecwood"),
 			optFltField(f, "substratebedrock"),
@@ -1170,31 +1269,31 @@ func writeVenusToVP08Tx(
 			optFltField(f, "substrateorganicmatter"),
 			optFltField(f, "substratewater"),
 			optStrField(f, 0, "sitenotes"),
-			optFltField(f, "stratacoverherb"),
-			optFltField(f, "stratacovermoss"),
-			optFltField(f, "stratacovershrub"),
-			optFltField(f, "stratacovertree"),
-			optStrField(f, 50, "vegsurveyor"),
+			scHerb,
+			scMoss,
+			scShrub,
+			scTree,
+			optStrField(f, 30, "vegsurveyor"),
 			optStrField(f, 0, "vegnotes"),
-			optStrField(f, 5, "bedrockgeology1", "bedrockgeology"),
-			optStrField(f, 5, "bedrockgeology2"),
-			optStrField(f, 5, "bedrockgeology3"),
-			optStrField(f, 5, "coarsefraglith1", "coarsefraglith"),
-			optStrField(f, 5, "coarsefraglith2"),
-			optStrField(f, 5, "coarsefraglith3"),
-			optStrField(f, 50, "soilsurveyor"),
-			optStrField(f, 5, "soilclassgroup"),
-			optStrField(f, 8, "soilclasssubgroup"),
-			optStrField(f, 5, "humusform"),
-			optStrField(f, 5, "hydrogeosystem", "hydrogeo"),
+			optStrField(f, 4, "bedrockgeology1", "bedrockgeology"),
+			optStrField(f, 4, "bedrockgeology2"),
+			optStrField(f, 4, "bedrockgeology3"),
+			optStrField(f, 12, "coarsefraglith1", "coarsefraglith"),
+			optStrField(f, 12, "coarsefraglith2"),
+			optStrField(f, 12, "coarsefraglith3"),
+			optStrField(f, 30, "soilsurveyor"),
+			optStrField(f, 4, "soilclassgroup"),
+			optStrField(f, 4, "soilclasssubgroup"),
+			optStrField(f, 4, "humusform"),
+			optStrField(f, 3, "hydrogeosystem", "hydrogeo"),
 			optIntField(f, "rootingdepth"),
 			rzpsAny,
 			optIntField(f, "rootrestrictingdepth"),
-			optStrField(f, 3, "rootrestrictingtype"),
-			optStrField(f, 3, "watersource"),
+			optStrField(f, 1, "rootrestrictingtype"),
+			optStrField(f, 5, "watersource"),
 			optIntField(f, "seepagedepth"),
-			optStrField(f, 3, "soildrainage"),
-			optStrField(f, 3, "floodingregimefreq", "floodingregime"),
+			optStrField(f, 5, "soildrainage"),
+			optStrField(f, 7, "floodingregimefreq", "floodingregime"),
 			optStrField(f, 3, "phmethodcodeorganic"),
 			optStrField(f, 3, "phmethodcodemineral"),
 			optStrField(f, 0, "soilnotes"),
@@ -1207,10 +1306,7 @@ func writeVenusToVP08Tx(
 		if pl.Graviti {
 			plotType = "1"
 		}
-		var qualAny any
-		if pl.PlotQuality != "" {
-			qualAny = pl.PlotQuality
-		}
+		qualAny := nullTruncatedUTF16(pl.PlotQuality, 15)
 		if _, err := adminStmt.ExecContext(ctx, pNum, plotType, qualAny, optStrField(f, 100, "usersiteunit", "assignedbecunit"), humThick); err != nil {
 			return 0, 0, 0, fmt.Errorf("insert VENUS plot %s _Admin: %w", pNum, err)
 		}
@@ -1225,12 +1321,9 @@ func writeVenusToVP08Tx(
 		bySpp := map[string]*wideVeg{}
 		var sppOrder []string
 		for _, vo := range pl.VegObservations {
-			code := strings.ToUpper(strings.TrimSpace(vo.Species))
-			if code == "" || vo.Cover <= 0 {
+			code := truncateUTF16Units(strings.ToUpper(strings.TrimSpace(vo.Species)), 8)
+			if code == "" || vo.Cover == 0 {
 				continue
-			}
-			if len([]rune(code)) > 8 {
-				code = string([]rune(code)[:8])
 			}
 			wv := bySpp[code]
 			if wv == nil {
@@ -1239,14 +1332,12 @@ func writeVenusToVP08Tx(
 				sppOrder = append(sppOrder, code)
 			}
 			if wv.collected == "" && strings.TrimSpace(vo.Collected) != "" {
-				wv.collected = strings.TrimSpace(vo.Collected)[:1]
+				wv.collected = truncateUTF16Units(strings.TrimSpace(vo.Collected), 1)
 			}
 			cCol, hCol := resolveIncomingTurboVegLayer(vo.Layer, "")
-			sumCov := wv.covers[cCol] + vo.Cover
-			if float32(sumCov) >= 100 {
-				sumCov = 99.0
+			if err := accumulateImportedSingleCover(wv.covers, cCol, vo.Cover, pNum, code); err != nil {
+				return 0, 0, 0, err
 			}
-			wv.covers[cCol] = math.Round(sumCov*10000) / 10000
 			if vo.Height != nil && hCol != "" && *vo.Height > wv.heights[hCol] {
 				wv.heights[hCol] = *vo.Height
 			}
@@ -1281,12 +1372,25 @@ func writeVenusToVP08Tx(
 		}
 
 		for _, hr := range pl.HumusRows {
+			hzAny := optStrField(hr, 8, "horizon")
+			hzStr, _ := hzAny.(string)
+			rawU := optFltField(hr, "depthupper", "upperdepth")
+			rawL := optFltField(hr, "depthlower", "lowerdepth")
+			normU, normL, qReason := normalizeLMH25HorizonDepths(hzStr, false, rawU, rawL)
+			id := nextHumusID
+			nextHumusID++
+			if qReason != "" {
+				if err := quarantineSoilHorizon("Humus", id, pNum, hzAny, rawU, rawL, qReason); err != nil {
+					return 0, 0, 0, err
+				}
+				continue
+			}
 			if _, err := humusStmt.ExecContext(ctx,
-				nextHumusID,
+				id,
 				pNum,
-				optStrField(hr, 8, "horizon"),
-				optFltField(hr, "depthupper", "upperdepth"),
-				optFltField(hr, "depthlower", "lowerdepth"),
+				hzAny,
+				normU,
+				normL,
 				optStrField(hr, 5, "structurekind", "humusstructurekind"),
 				optStrField(hr, 1, "structuredegree", "humusstructuredegree"),
 				optIntField(hr, "vonpost"),
@@ -1299,17 +1403,29 @@ func writeVenusToVP08Tx(
 			); err != nil {
 				return 0, 0, 0, fmt.Errorf("insert VENUS humus %s: %w", pNum, err)
 			}
-			nextHumusID++
 			humusCount++
 		}
 
 		for _, mr := range pl.MineralRows {
+			hzAny := optStrField(mr, 8, "horizon")
+			hzStr, _ := hzAny.(string)
+			rawU := optFltField(mr, "depthupper", "upperdepth")
+			rawL := optFltField(mr, "depthlower", "lowerdepth")
+			normU, normL, qReason := normalizeLMH25HorizonDepths(hzStr, true, rawU, rawL)
+			id := nextMineralID
+			nextMineralID++
+			if qReason != "" {
+				if err := quarantineSoilHorizon("Mineral", id, pNum, hzAny, rawU, rawL, qReason); err != nil {
+					return 0, 0, 0, err
+				}
+				continue
+			}
 			if _, err := mineralStmt.ExecContext(ctx,
-				nextMineralID,
+				id,
 				pNum,
-				optStrField(mr, 8, "horizon"),
-				optFltField(mr, "depthupper", "upperdepth"),
-				optFltField(mr, "depthlower", "lowerdepth"),
+				hzAny,
+				normU,
+				normL,
 				optStrField(mr, 14, "colour"),
 				optIntField(mr, "colouraspect", "asp"),
 				optStrField(mr, 4, "texture"),
@@ -1317,24 +1433,25 @@ func writeVenusToVP08Tx(
 				optIntField(mr, "percentcoarsefragscobbles"),
 				optIntField(mr, "percentcoarsefragsstones"),
 				optIntField(mr, "percentcoarsefragstotal"),
-				optStrField(mr, 3, "percentcoarsefragsshape"),
+				optStrField(mr, 1, "percentcoarsefragsshape"),
 				optStrField(mr, 6, "rootsabundance"),
 				optStrField(mr, 6, "rootssize"),
-				optStrField(mr, 5, "structureclass", "mineralstructureclass"),
-				optStrField(mr, 5, "structurekind", "mineralstructurekind"),
+				optStrField(mr, 3, "structureclass", "mineralstructureclass"),
+				optStrField(mr, 7, "structurekind", "mineralstructurekind"),
 				optFltField(mr, "phmineral", "mineralformph"),
 				optStrField(mr, 0, "comments", "comment"),
 			); err != nil {
 				return 0, 0, 0, fmt.Errorf("insert VENUS mineral %s: %w", pNum, err)
 			}
-			nextMineralID++
 			mineralCount++
 		}
 
-		_, _ = tx.ExecContext(ctx, `
-			INSERT INTO `+auditTbl+` ("Project","User","PlotNumber","Table","EditField","EditWhen")
-			VALUES (?, 'VPro', ?, 'Environment', ?, ?)`,
-			targetProject, pNum, fmt.Sprintf("Imported VENUS ver. %s record. Project: %s", venusVer, sourceProject), nowStr)
+		if _, err := tx.ExecContext(ctx, `
+			INSERT INTO `+auditTbl+` ("Project","User","PlotNumber","Table","EditField","EditWhen","Restore","Flag")
+			VALUES (?, 'VPro', ?, 'Environment', ?, ?, 0, 0)`,
+			targetProject, pNum, fmt.Sprintf("Imported VENUS ver. %s record. Project: %s", venusVer, sourceProject), nowStr); err != nil {
+			return 0, 0, 0, fmt.Errorf("insert VENUS audit for plot %s: %w", pNum, err)
+		}
 	}
 
 	_, err = tx.ExecContext(ctx, `
