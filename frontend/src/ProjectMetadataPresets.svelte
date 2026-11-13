@@ -39,6 +39,7 @@
   let error = $state<string | null>(null);
   let status = $state<string | null>(null);
   let generation = 0;
+  let trackedContextId = '';
 
   function setBusy(next: boolean) {
     busy = next;
@@ -49,6 +50,17 @@
     if (projectId && targetProjectId === '') {
       targetProjectId = projectId;
     }
+  });
+
+  $effect(() => {
+    if (trackedContextId !== '' && trackedContextId !== contextId) {
+      targetProjectId = projectId || '';
+      lastResult = null;
+      trackedContextId = contextId;
+      void loadPreviewAndPresets();
+      return;
+    }
+    trackedContextId = contextId;
   });
 
   const selectedPreset = $derived(presets.find(p => p.id === selectedPresetId) ?? null);

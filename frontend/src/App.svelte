@@ -1757,49 +1757,45 @@
         {/key}
       {:else if view === 'classification-explorer' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          {#await import('./ClassificationExplorer.svelte')}
-            <p role="status" class="p-4 text-sm">Loading Classification Explorer...</p>
-          {:then { default: ClassificationExplorer }}
-            <ClassificationExplorer
-              contextId={$projectState.contextId ?? ''}
-              project={$projectState.activeProject}
-              su={$projectState.activeSU}
-              hierarchy={$projectState.activeHierarchy}
-              operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
-              onBusyChange={(value) => { localEditorBusy = value; }}
-              onDirtyChange={(dirty) => { workbenchDirtyLabel = dirty ? 'classification-explorer' : ''; }}
-              onContextChanged={async () => { await refresh(); }}
-              onOpenPlot={(p) => { void requestTransition(async () => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; error = ''; }); }}
-            />
-          {/await}
-        {/key}
+        {#await import('./ClassificationExplorer.svelte')}
+          <p role="status" class="p-4 text-sm">Loading Classification Explorer...</p>
+        {:then { default: ClassificationExplorer }}
+          <ClassificationExplorer
+            contextId={$projectState.contextId ?? ''}
+            project={$projectState.activeProject}
+            su={$projectState.activeSU}
+            hierarchy={$projectState.activeHierarchy}
+            operationHeld={busy || transitionWorking || pendingTransition !== null || !!closeRequest}
+            onBusyChange={(value) => { localEditorBusy = value; }}
+            onDirtyChange={(dirty) => { workbenchDirtyLabel = dirty ? 'classification-explorer' : ''; }}
+            onContextChanged={async () => { await refresh(); }}
+            onOpenPlot={(p) => { void requestTransition(async () => { editorPlotNumber = p; editorEntryForm = 'fs882'; view = 'fs882'; error = ''; }); }}
+          />
+        {/await}
       {:else if view === 'project-admin' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        {#key $projectState.contextId}
-          <div class="p-3 space-y-4">
-            {#await import('./ProjectAdminWorkbench.svelte')}
-              <p role="status" class="p-4 text-sm">Loading Project Admin Workbench...</p>
-            {:then { default: ProjectAdminWorkbench }}
-              <ProjectAdminWorkbench
-                contextId={$projectState.contextId ?? ''}
-                activeProject={$projectState.activeProject}
-                activeSu={$projectState.activeSU}
-                operationHeld={busy || companionPanelBusy || transitionWorking || pendingTransition !== null || !!closeRequest}
-                onBusyChange={(value) => { localEditorBusy = value; }}
-                oncontextswitched={async () => { await refresh(); }}
-              />
-            {/await}
-            {#await import('./ProjectMetadataPresets.svelte') then { default: ProjectMetadataPresets }}
-              <ProjectMetadataPresets
-                contextId={$projectState.contextId ?? ''}
-                projectId={$projectState.activeProject}
-                operationHeld={busy || localEditorBusy || transitionWorking || pendingTransition !== null || !!closeRequest}
-                onBusyChange={(value) => { secondaryPanelBusy = value; }}
-              />
-            {/await}
-          </div>
-        {/key}
+        <div class="p-3 space-y-4">
+          {#await import('./ProjectAdminWorkbench.svelte')}
+            <p role="status" class="p-4 text-sm">Loading Project Admin Workbench...</p>
+          {:then { default: ProjectAdminWorkbench }}
+            <ProjectAdminWorkbench
+              contextId={$projectState.contextId ?? ''}
+              activeProject={$projectState.activeProject}
+              activeSu={$projectState.activeSU}
+              operationHeld={busy || companionPanelBusy || transitionWorking || pendingTransition !== null || !!closeRequest}
+              onBusyChange={(value) => { localEditorBusy = value; }}
+              oncontextswitched={async () => { await refresh(); }}
+            />
+          {/await}
+          {#await import('./ProjectMetadataPresets.svelte') then { default: ProjectMetadataPresets }}
+            <ProjectMetadataPresets
+              contextId={$projectState.contextId ?? ''}
+              projectId=""
+              operationHeld={busy || localEditorBusy || transitionWorking || pendingTransition !== null || !!closeRequest}
+              onBusyChange={(value) => { secondaryPanelBusy = value; }}
+            />
+          {/await}
+        </div>
       {:else if view === 'lump-editor' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#key $projectState.contextId}

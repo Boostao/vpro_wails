@@ -167,3 +167,153 @@ test('ClassificationExplorer.svelte compiles with zero warnings, renders all 3 m
   assert.match(flatRender.body, /Wide Phytosociological Rank Editor/);
   assert.match(flatRender.body, /SubAlliance/);
 });
+
+test('ClassificationExplorer avoids duplicate reload races on self-activated SU creation and warns when 0 rows change on assignment', async () => {
+  const vm = require('node:vm');
+  const ts = require('typescript');
+  const { compile } = require('svelte/compiler');
+  const client = await import('svelte/internal/client');
+
+  const appSrc = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
+  const clsSectionStart = appSrc.indexOf("{:else if view === 'classification-explorer'");
+  const clsSectionEnd = appSrc.indexOf("{:else if view === 'project-admin'");
+  assert.ok(clsSectionStart > 0 && clsSectionEnd > clsSectionStart);
+  assert.doesNotMatch(
+    appSrc.slice(clsSectionStart, clsSectionEnd),
+    /\{#key \$projectState\.contextId\}/,
+    'classification-explorer must update in place without #key remount'
+  );
+
+  let script = readFileSync(path.join(__dirname, 'ClassificationExplorer.svelte'), 'utf8').match(
+    /<script lang="ts">([\s\S]*?)<\/script>/
+  )[1];
+  script = script.replace(
+    "onRequestSUSync?: (direction: 'su_to_env' | 'env_to_su') => void;",
+    "onRequestSUSync?: (direction: 'su_to_env' | 'env_to_su') => void; inspect?: (v: any) => void;"
+  );
+  script = script.replace('onRequestSUSync,', 'onRequestSUSync, inspect,');
+  script += `\n$effect(() => inspect?.({
+    setNewSUName(name) { newSUName = name; },
+    submitCreateSU,
+    assignPlots,
+    getState: () => ({ effectiveContextId, statusBanner, errorMessage }),
+  }));`;
+
+  const compiled = compile(`<script lang="ts">${script}</script>`, { generate: 'client' });
+  assert.equal(compiled.warnings.length, 0);
+  const modObj = { exports: {} };
+  vm.runInNewContext(
+    ts.transpileModule(compiled.js.code, {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+    }).outputText,
+    {
+      module: modObj,
+      exports: modObj.exports,
+      structuredClone,
+      queueMicrotask,
+      CSS: { escape: s => s },
+      require(name) {
+        if (name === 'svelte') {
+          return {
+            onMount: fn => fn(),
+            onDestroy: () => {},
+            untrack: client.untrack,
+          };
+        }
+        if (name === 'svelte/internal/client') return client;
+        if (name.startsWith('svelte/')) return require(name);
+        if (name === './readRequests') return { ReadRequests: class { track(p) { return p; } cancelAll() {} } };
+        if (name === './universalDatasheetGrid') return grid;
+        if (name === './classificationExplorer') return cls;
+        throw new Error(`Unexpected module ${name}`);
+      },
+    }
+  );
+
+  const treeLoads = [];
+  const ctxProp = client.state('ctx-1');
+  let api;
+  const dispose = client.effect_root(() => {
+    modObj.exports.default(null, {
+      get contextId() {
+        return client.get(ctxProp);
+      },
+      project: 'Sample',
+      su: 'Sample',
+      hierarchy: 'Sample',
+      port: {
+        getSUPlotTree: async cid => {
+          treeLoads.push(cid);
+          return {
+            contextId: cid,
+            project: 'Sample',
+            projectPath: '/Sample.db',
+            su: 'Sample',
+            suPath: '/Sample.db',
+            totalProject: 1,
+            totalAssigned: 1,
+            totalUnassigned: 0,
+            orphanPlots: [],
+            units: [],
+            unassignedPlots: [],
+          };
+        },
+        searchBECUnitPicker: async () => [],
+        createSUTable: async () => ({
+          contextId: 'ctx-2',
+          name: 'Working2026',
+          tableName: 'Working2026_SU',
+          filePath: '/Sample.db',
+          plotCount: 14,
+          activated: true,
+          newState: { contextId: 'ctx-2' },
+        }),
+        assignPlotsToSiteUnit: async cid => ({
+          contextId: cid,
+          su: 'Sample',
+          tableName: 'Sample_SU',
+          changedPlots: 0,
+          historyId: 0,
+        }),
+      },
+      onContextChanged: nextId => {
+        // Simulate asynchronous parent refresh updating contextId prop on a later tick
+        setTimeout(() => {
+          client.set(ctxProp, nextId);
+          client.flush();
+        }, 5);
+      },
+      inspect: v => {
+        api = v;
+      },
+    });
+  });
+
+  try {
+    client.flush();
+    await new Promise(r => setTimeout(r, 10));
+    client.flush();
+    assert.deepEqual(treeLoads, ['ctx-1']);
+    treeLoads.length = 0;
+
+    api.setNewSUName('Working2026');
+    client.flush();
+    await api.submitCreateSU();
+    client.flush();
+    // Wait for delayed parent contextId update
+    await new Promise(r => setTimeout(r, 20));
+    client.flush();
+
+    // Must have loaded 'ctx-2' ONCE without reverting to 'ctx-1' or firing a duplicate 'ctx-2' reload!
+    assert.equal(api.getState().effectiveContextId, 'ctx-2');
+    assert.deepEqual(treeLoads, ['ctx-2']);
+    assert.match(api.getState().statusBanner, /Created and activated Working2026_SU/);
+
+    // 0 changed rows on AssignPlotsToSiteUnit must explain why 0 rows changed
+    await api.assignPlots(['00337'], 'CWHvm1/01');
+    client.flush();
+    assert.match(api.getState().statusBanner, /0 plot\(s\) changed.*already assigned|read-only/i);
+  } finally {
+    dispose();
+  }
+});

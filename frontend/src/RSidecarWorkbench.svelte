@@ -484,8 +484,13 @@
             <span class="badge" class:ok={runtimeStatus.quartoAvailable} class:warn={!runtimeStatus.quartoAvailable}>
               Quarto CLI: {runtimeStatus.quartoAvailable ? `Ready (${runtimeStatus.quartoVersion})` : 'Fallback RMarkdown'}
             </span>
-            <span class="badge" class:ok={runtimeStatus.climrRastersCached} class:neutral={!runtimeStatus.climrRastersCached}>
-              Climate Engine: {runtimeStatus.climrRastersCached ? 'Local climr Rasters' : 'Offline Ministry BGC Lapse Model'}
+            <span
+              class="badge"
+              class:warn={!runtimeStatus.available}
+              class:ok={runtimeStatus.available && runtimeStatus.climrRastersCached}
+              class:neutral={runtimeStatus.available && !runtimeStatus.climrRastersCached}
+            >
+              Climate Engine: {!runtimeStatus.available ? 'Rscript Required (Unavailable)' : runtimeStatus.climrRastersCached ? 'Local climr Rasters' : 'Offline Ministry BGC Lapse Model'}
             </span>
             <span class="badge" class:ok={runtimeStatus.readyForClustering} class:warn={!runtimeStatus.readyForClustering}>
               BEC_R Clustering: {runtimeStatus.readyForClustering ? 'Ready' : 'Missing Packages'}

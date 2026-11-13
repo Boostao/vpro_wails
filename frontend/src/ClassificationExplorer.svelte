@@ -59,12 +59,16 @@
 
   let mode = $state<ExplorerMode>(untrack(() => initialMode));
   let effectiveContextId = $state(untrack(() => contextId));
+  let prevPropContextId = untrack(() => contextId);
 
-  // Keep effectiveContextId synchronized when parent contextId prop updates
+  // Keep effectiveContextId synchronized when parent contextId prop updates externally
   $effect(() => {
-    if (contextId && contextId !== effectiveContextId) {
-      effectiveContextId = contextId;
-      void reloadActivePane();
+    if (contextId && contextId !== prevPropContextId) {
+      prevPropContextId = contextId;
+      if (contextId !== effectiveContextId) {
+        effectiveContextId = contextId;
+        void reloadActivePane();
+      }
     }
   });
 
@@ -321,9 +325,15 @@
         removeFromSuWhenUnassigned: false,
       });
       lastHistoryId = res.historyId;
-      statusBanner = targetUnit
-        ? `Assigned ${res.changedPlots} plot(s) to ${targetUnit}.`
-        : `Moved ${res.changedPlots} plot(s) to Unassigned.`;
+      if (res.changedPlots === 0) {
+        statusBanner = targetUnit
+          ? `0 plot(s) changed in ${res.tableName} (plots are already assigned to ${targetUnit}, or the active Site Unit table is read-only/master).`
+          : `0 plot(s) changed in ${res.tableName} (plots are already unassigned, or the active Site Unit table is read-only/master).`;
+      } else {
+        statusBanner = targetUnit
+          ? `Assigned ${res.changedPlots} plot(s) to ${targetUnit}.`
+          : `Moved ${res.changedPlots} plot(s) to Unassigned.`;
+      }
       await loadSUTreeAndPicker();
       if (inspectedPlot && plotsToMove.includes(inspectedPlot.plotNumber)) {
         await inspectPlot(inspectedPlot.plotNumber);

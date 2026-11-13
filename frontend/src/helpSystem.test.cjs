@@ -303,3 +303,30 @@ test('Navigation Help menu exposes all 6 active items, unread badge, Tour target
     assert.doesNotMatch(src, /HelpDrawer|helpSystem/, `${entryFile} must have zero new static help imports`);
   }
 });
+
+test('index.html embeds inline SVG data-URI favicon and LMH25 2023 help bundle includes 3c, 3d, A.w.th, A.w.br, CO, and FloodingRegimeDur S', () => {
+  const indexHtml = readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  assert.match(indexHtml, /<link\s+rel="icon"\s+type="image\/svg\+xml"\s+href="data:image\/svg\+xml,/);
+
+  const docsFields = JSON.parse(
+    readFileSync(path.join(__dirname, '..', '..', 'docs-src', 'lmh25_fields.json'), 'utf8')
+  );
+  const bundle = JSON.parse(
+    readFileSync(path.join(__dirname, '..', '..', 'resources', 'help_bundle.json'), 'utf8')
+  );
+
+  for (const dataset of [docsFields, bundle]) {
+    const allCodes = dataset.fields.flatMap(f => f.codes.map(c => c.code));
+    for (const requiredCode of ['3c', '3d', 'A.w.th', 'A.w.br', 'CO', 'S']) {
+      assert.ok(allCodes.includes(requiredCode), `LMH25 2023 code ${requiredCode} must be documented`);
+    }
+  }
+
+  const makeColNode = col => ({
+    getAttribute: name => (name === 'data-column' ? col : null),
+    closest: selector => (selector === '[data-column]' ? { getAttribute: () => col } : null),
+  });
+  assert.equal(help.resolveContextualHelpTarget(makeColNode('SiteDisturbance1'), 'fs882'), 'site.successional_structural');
+  assert.equal(help.resolveContextualHelpTarget(makeColNode('Exposure1'), 'fs882'), 'site.elevation');
+  assert.equal(help.resolveContextualHelpTarget(makeColNode('FloodingRegimeDur'), 'fs882'), 'soil.rooting_seepage');
+});

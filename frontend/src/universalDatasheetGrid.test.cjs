@@ -211,3 +211,124 @@ test('UniversalDatasheetGrid.svelte compiles with zero warnings, renders all 9 t
     assert.match(body, new RegExp(`_${key}`));
   }
 });
+
+test('UniversalDatasheetGrid preserves statusBanner across post-commit refreshTablesAndLoad after Save and Find/Replace', async () => {
+  const vm = require('node:vm');
+  const ts = require('typescript');
+  const { compile } = require('svelte/compiler');
+  const client = await import('svelte/internal/client');
+
+  let dsScript = readFileSync(path.join(__dirname, 'UniversalDatasheetGrid.svelte'), 'utf8').match(
+    /<script lang="ts">([\s\S]*?)<\/script>/
+  )[1];
+  dsScript = dsScript.replace(
+    'onOpenPlot?: (plotNumber: string) => void;',
+    'onOpenPlot?: (plotNumber: string) => void; inspect?: (v: any) => void;'
+  );
+  dsScript = dsScript.replace('onOpenPlot,', 'onOpenPlot, inspect,');
+  dsScript += `\n$effect(() => inspect?.({
+    setCellDraft,
+    saveDrafts,
+    setFindArgs(col, f, r) { findColumn = col; findText = f; replaceText = r; },
+    runFindPreview,
+    applyFindReplaceValid,
+    getBanner: () => statusBanner,
+  }));`;
+
+  const compiled = compile(`<script lang="ts">${dsScript}</script>`, { generate: 'client' });
+  assert.equal(compiled.warnings.length, 0);
+  const dsMod = { exports: {} };
+  vm.runInNewContext(
+    ts.transpileModule(compiled.js.code, {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+    }).outputText,
+    {
+      module: dsMod,
+      exports: dsMod.exports,
+      structuredClone,
+      queueMicrotask,
+      require(name) {
+        if (name === 'svelte') {
+          return { onMount: fn => fn(), onDestroy: () => {}, untrack: client.untrack };
+        }
+        if (name === 'svelte/internal/client') return client;
+        if (name.startsWith('svelte/')) return require(name);
+        if (name === './readRequests') return { ReadRequests: class { track(p) { return p; } cancelAll() {} } };
+        if (name === './universalDatasheetGrid') return grid;
+        throw new Error(`Unexpected module ${name}`);
+      },
+    }
+  );
+
+  let api;
+  const dispose = client.effect_root(() => {
+    dsMod.exports.default(null, {
+      contextId: 'ctx-banner',
+      initialTableKey: 'Veg',
+      port: {
+        listTables: async () => [{ key: 'Veg', tableName: 'Sample_Veg', available: true, rowCount: 1 }],
+        getPage: async () => ({
+          tableKey: 'Veg',
+          tableName: 'Sample_Veg',
+          totalRows: 1,
+          offset: 0,
+          limit: 250,
+          canEditMaster: false,
+          columns: [
+            { name: 'PlotNumber', declaredType: 'TEXT', kind: 'text', pinned: true, editable: false, protected: false, maxUtf16: 7, isCoverSingle: false, isBoolean: false },
+            { name: 'Species', declaredType: 'TEXT', kind: 'text', pinned: false, editable: true, protected: false, maxUtf16: 8, isCoverSingle: false, isBoolean: false },
+          ],
+          rows: [{ rowId: '1', cells: [{ storage: 'text', text: '00337' }, { storage: 'text', text: 'PSEUMEN' }] }],
+        }),
+        applyEdits: async () => ({ updatedCells: 1, updatedRows: 1, auditRows: 1 }),
+        previewFindReplace: async () => ({
+          tableKey: 'Veg',
+          tableName: 'Sample_Veg',
+          column: 'Species',
+          matchedRows: 1,
+          validCount: 1,
+          invalidCount: 0,
+          truncated: false,
+          items: [
+            {
+              rowId: '1',
+              plotNumber: '00337',
+              validationError: '',
+              edit: {
+                rowId: '1',
+                column: 'Species',
+                before: { storage: 'text', text: 'PSEUMEN' },
+                after: { storage: 'text', text: 'TSUGHET' },
+              },
+            },
+          ],
+        }),
+      },
+      inspect: v => {
+        api = v;
+      },
+    });
+  });
+
+  try {
+    client.flush();
+    await new Promise(r => setTimeout(r, 10));
+    client.flush();
+
+    api.setCellDraft(0, 1, 'TSUGHET');
+    client.flush();
+    await api.saveDrafts();
+    client.flush();
+    assert.match(api.getBanner(), /^Saved 1 cell\(s\) across 1 row\(s\)/);
+
+    api.setFindArgs('Species', 'PSEUMEN', 'TSUGHET');
+    client.flush();
+    await api.runFindPreview();
+    client.flush();
+    await api.applyFindReplaceValid();
+    client.flush();
+    assert.match(api.getBanner(), /^Applied 1 replacement\(s\) on Sample_Veg/);
+  } finally {
+    dispose();
+  }
+});

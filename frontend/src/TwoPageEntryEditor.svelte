@@ -481,10 +481,6 @@
         onchange={event => chooseForm(event.currentTarget.checked ? 'FS882-8x6XL-CHARS' : 'FS882-8x6XL')} />
       Show extended shrub layers
     </label>
-    <button type="button" disabled={childBlocked || close.unsaved || close.busy || close.blocked} aria-pressed={form === 'FS882-8x6XL'}
-      onclick={() => chooseForm('FS882-8x6XL')}>Normal two-page source</button>
-    <button type="button" disabled={childBlocked || close.unsaved || close.busy || close.blocked} aria-pressed={form === 'FS882-8x6XL-CHARS'}
-      onclick={() => chooseForm('FS882-8x6XL-CHARS')}>CHARS two-page source</button>
     <button type="button" disabled={childBlocked || !reviewEnabled || close.unsaved || close.busy || close.blocked}
       onclick={() => operation('load')}>Load complete entry</button>
     <button type="button" disabled={childBlocked || !editingEnabled || !close.canSave || close.busy || close.blocked}

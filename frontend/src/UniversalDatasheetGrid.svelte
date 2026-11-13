@@ -157,7 +157,11 @@
     return out;
   }
 
-  async function refreshTablesAndLoad(targetKey: DatasheetTableKey = activeTableKey, nextOffset = 0) {
+  async function refreshTablesAndLoad(
+    targetKey: DatasheetTableKey = activeTableKey,
+    nextOffset = 0,
+    options?: { preserveStatus?: boolean }
+  ) {
     if (!contextId) return;
     generation++;
     const reqGen = generation;
@@ -193,7 +197,9 @@
         const firstEditable = loaded.columns.find(c => c.editable && !c.pinned) ?? loaded.columns[0];
         findColumn = firstEditable.name;
       }
-      statusBanner = '';
+      if (!options?.preserveStatus) {
+        statusBanner = '';
+      }
     } catch (err) {
       if (reqGen === generation) {
         errorMessage = String(err);
@@ -317,7 +323,7 @@
       });
       drafts = {};
       statusBanner = `Saved ${res.updatedCells} cell(s) across ${res.updatedRows} row(s) (${res.auditRows} audit record(s)).`;
-      await refreshTablesAndLoad(activeTableKey, offset);
+      await refreshTablesAndLoad(activeTableKey, offset, { preserveStatus: true });
     } catch (err) {
       errorMessage = `Save failed (transaction rolled back): ${String(err)}`;
     } finally {
@@ -478,7 +484,7 @@
       });
       findPreview = null;
       statusBanner = `Applied ${res.updatedCells} replacement(s) on ${page.tableName} (${res.auditRows} audit record(s)).`;
-      await refreshTablesAndLoad(activeTableKey, offset);
+      await refreshTablesAndLoad(activeTableKey, offset, { preserveStatus: true });
     } catch (err) {
       errorMessage = `Find/Replace commit failed (rolled back): ${String(err)}`;
     } finally {
