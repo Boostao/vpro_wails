@@ -15,10 +15,10 @@ import (
 
 func TestSoilDrainageScopedEditsRetainOwnedCatalogueFailures(t *testing.T) {
 	service, state := vprotest.ContextServiceFixture(t)
-	if err := service.CreatePlot(state.ContextID, vprocore.FS882Header{PlotNumber: "DRAIN-SCOPED"}); err != nil {
+	if err := service.CreatePlot(state.ContextID, vprocore.FS882Header{PlotNumber: "DRNSCOP"}); err != nil {
 		t.Fatal(err)
 	}
-	header, err := service.GetPlot(context.Background(), state.ContextID, "DRAIN-SCOPED")
+	header, err := service.GetPlot(context.Background(), state.ContextID, "DRNSCOP")
 	if err != nil {
 		t.Fatal(err)
 	}

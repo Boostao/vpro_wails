@@ -326,7 +326,7 @@ func CreateSUFromEnvFields(
 			}
 			sRows, sErr := rtx.QueryContext(ctx,
 				`SELECT CAST("PlotNumber" AS TEXT), CAST("SiteUnit" AS TEXT) FROM `+
-					vprocore.QuoteHeaderIdentifier(targetRole)+`.`+vprocore.QuoteHeaderIdentifier(suTableName)+` ORDER BY rowid ASC`)
+					vprocore.QuoteHeaderIdentifier(targetRole)+`.`+vprocore.QuoteHeaderIdentifier(suTableName)+` WHERE typeof("PlotNumber")='text' ORDER BY rowid ASC`)
 			if sErr != nil {
 				_ = rtx.Rollback()
 				owner.Mu.Unlock()
@@ -539,11 +539,11 @@ func CreateSUFromEnvFields(
 							return err
 						}
 					} else {
-						updSQL := `UPDATE main.` + qTarget + ` SET "SiteUnit" = ? WHERE typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`
+						updSQL := `UPDATE main.` + qTarget + ` SET "SiteUnit" = ? WHERE "PlotNumber" = ? AND typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB)`
 						if mode == "fill_unassigned_only" {
 							updSQL += ` AND ("SiteUnit" IS NULL OR TRIM("SiteUnit") = '')`
 						}
-						if _, err := wtx.ExecContext(ctx, updSQL, w.unit, w.plot); err != nil {
+						if _, err := wtx.ExecContext(ctx, updSQL, w.unit, w.plot, w.plot); err != nil {
 							return err
 						}
 					}

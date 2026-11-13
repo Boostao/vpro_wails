@@ -257,9 +257,14 @@ func planSummaryVegetationStage(ctx context.Context,
 		if err := ctx.Err(); err != nil {
 			return fail(err)
 		}
-		codeLimit, typeLimit := 8, 1
-		if projection.references != nil {
-			codeLimit, typeLimit = 255, 255
+		codeLimit, typeLimit := 255, 255
+		if projection.references == nil {
+			for _, origin := range references.Origins[row.RowID] {
+				if origin.Table == "USysUserSpp" {
+					codeLimit, typeLimit = 8, 50
+					break
+				}
+			}
 		}
 		for name, limit := range map[string]int{"Code": codeLimit, "ScientificName": 255, "EnglishName": 255, "Codetype": typeLimit} {
 			if err := reportcore.LifeformSummaryText(row.Cells[rc[name]], limit); err != nil {

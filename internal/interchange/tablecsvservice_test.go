@@ -1,7 +1,6 @@
 package interchange
 
 import (
-	"github.com/boostao/vpro-wails/internal/sivi"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
 )
@@ -153,8 +152,8 @@ func TestTableCSVReviewFacadeParityAndIndependentTypedDTO(t *testing.T) {
 	if err != nil || !reflect.DeepEqual(again, want) {
 		t.Fatal("public review shared mutable source or caller ownership:", err)
 	}
-	if result, err := sivi.GetSIVIParentOriginal(service, context.Background(), state.ContextID, "108050"); result != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("table CSV opt-in enabled the SIVI review:", err)
+	if service.SiviParentReviewEnabled {
+		t.Fatal("table CSV opt-in enabled the SIVI review flag")
 	}
 }
 

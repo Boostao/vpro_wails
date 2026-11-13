@@ -25,19 +25,51 @@ import (
 	"github.com/boostao/vpro-wails/resources"
 )
 
-const (
-	CurrentBECGISVersion = 13
-)
+const CurrentBECGISVersion = 13
 
-// DefaultSpatialAssetsDir resolves ~/Work/spatial_assets dynamically across Linux, Windows, and macOS.
+// DefaultSpatialAssetsDir resolves ~/Work/spatial_assets or sibling spatial_assets dynamically across Linux, Windows, and macOS.
 var DefaultSpatialAssetsDir = ResolveDefaultSpatialAssetsDir()
 
-// ResolveDefaultSpatialAssetsDir returns filepath.Join(home, "Work", "spatial_assets") via os.UserHomeDir().
-func ResolveDefaultSpatialAssetsDir() string {
-	if home, err := os.UserHomeDir(); err == nil && strings.TrimSpace(home) != "" {
-		return filepath.Join(home, "Work", "spatial_assets")
+func resolveDefaultSpatialAssetsDir() string {
+	return ResolveDefaultSpatialAssetsDir()
+}
+
+func resolveSpatialAssetsDir(getenv func(string) string, repoRoot string) string {
+	if getenv != nil {
+		if envDir := strings.TrimSpace(getenv("VPRO_SPATIAL_ASSETS_DIR")); envDir != "" {
+			cleaned := filepath.Clean(envDir)
+			if info, err := os.Stat(cleaned); err == nil && info.IsDir() {
+				return cleaned
+			}
+		}
 	}
-	return filepath.Join("Work", "spatial_assets")
+	if strings.TrimSpace(repoRoot) != "" {
+		parent := filepath.Dir(filepath.Clean(repoRoot))
+		candidates := []string{filepath.Join(parent, "spatial_assets")}
+		if strings.HasSuffix(strings.ToLower(filepath.Base(parent)), ".worktrees") {
+			candidates = append(candidates, filepath.Join(filepath.Dir(parent), "spatial_assets"))
+		}
+		for _, cand := range candidates {
+			if info, err := os.Stat(cand); err == nil && info.IsDir() {
+				return cand
+			}
+		}
+	}
+	return ""
+}
+
+// ResolveDefaultSpatialAssetsDir resolves VPRO_SPATIAL_ASSETS_DIR, sibling spatial_assets, or ~/Work/spatial_assets.
+func ResolveDefaultSpatialAssetsDir() string {
+	if resolved := resolveSpatialAssetsDir(os.Getenv, resources.RepoRoot()); resolved != "" {
+		return resolved
+	}
+	if home, err := os.UserHomeDir(); err == nil && strings.TrimSpace(home) != "" {
+		cand := filepath.Join(home, "Work", "spatial_assets")
+		if info, statErr := os.Stat(cand); statErr == nil && info.IsDir() {
+			return cand
+		}
+	}
+	return ""
 }
 
 // ResolveSpatialExtraDirs returns the default cross-platform extra spatial asset search directories.

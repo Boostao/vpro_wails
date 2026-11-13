@@ -19,11 +19,60 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf16"
 	"unicode/utf8"
 
 	"github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 )
+
+func truncateUTF16Units(s string, maxUnits int) string {
+	if maxUnits <= 0 || s == "" {
+		return s
+	}
+	units := utf16.Encode([]rune(s))
+	if len(units) <= maxUnits {
+		return s
+	}
+	cut := maxUnits
+	if cut > 0 && units[cut-1] >= 0xD800 && units[cut-1] <= 0xDBFF {
+		cut--
+	}
+	if cut == 0 {
+		return ""
+	}
+	return string(utf16.Decode(units[:cut]))
+}
+
+func nullTruncatedUTF16(s string, maxUnits int) any {
+	trimmed := strings.TrimSpace(s)
+	if maxUnits > 0 {
+		trimmed = truncateUTF16Units(trimmed, maxUnits)
+	}
+	if trimmed == "" {
+		return nil
+	}
+	return trimmed
+}
+
+func accumulateImportedSingleCover(covers map[string]float64, col string, obsCov float64, plotNum, species string) error {
+	if math.IsNaN(obsCov) || math.IsInf(obsCov, 0) || obsCov < 0 || math.Abs(obsCov) > math.MaxFloat32 || float32(obsCov) >= 100 {
+		return fmt.Errorf("plot %s species %s cover %v violates IEEE-754 SINGLE [0, 100) bounds", plotNum, species, obsCov)
+	}
+	obsSingle := float64(float32(obsCov))
+	prev, hasPrev := covers[col]
+	if !hasPrev {
+		covers[col] = obsSingle
+		return nil
+	}
+	sumSingle := float32(prev + obsSingle)
+	if sumSingle >= 100 {
+		covers[col] = 99.0
+	} else {
+		covers[col] = float64(sumSingle)
+	}
+	return nil
+}
 
 const (
 	TurboVegFormatXML    = "xml"
@@ -953,9 +1002,7 @@ func parseTurboVegXMLFile(ctx context.Context, path string) (tvDataset, error) {
 			if pNum == "" {
 				pNum = strconv.Itoa(xp.ReleveNR)
 			}
-			if len([]rune(pNum)) > 7 {
-				pNum = string([]rune(pNum)[:7])
-			}
+			pNum = truncateUTF16Units(pNum, 7)
 			pb := tvPlotBundle{
 				Header: tvPlotHeader{
 					PlotID:            plotCounter,
@@ -994,7 +1041,7 @@ func parseTurboVegXMLFile(ctx context.Context, path string) (tvDataset, error) {
 				if code == "" && o.Name != "" {
 					code = abbreviateSpeciesName(o.Name)
 				}
-				if code == "" || o.Cover <= 0 {
+				if code == "" || o.Cover == 0 {
 					continue
 				}
 				pb.Observations = append(pb.Observations, tvSpeciesObs{
@@ -1020,20 +1067,11 @@ func abbreviateSpeciesName(sci string) string {
 		return ""
 	}
 	if len(parts) == 1 {
-		if len(parts[0]) > 8 {
-			return parts[0][:8]
-		}
-		return parts[0]
+		return truncateUTF16Units(parts[0], 8)
 	}
-	g := parts[0]
-	if len(g) > 4 {
-		g = g[:4]
-	}
-	sp := parts[1]
-	if len(sp) > 3 {
-		sp = sp[:3]
-	}
-	return g + sp
+	g := truncateUTF16Units(parts[0], 4)
+	sp := truncateUTF16Units(parts[1], 3)
+	return truncateUTF16Units(g+sp, 8)
 }
 
 func readTurboVeg3SQLiteFile(ctx context.Context, path string) (tvDataset, error) {
@@ -1205,7 +1243,7 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 
 	for _, pb := range ds.Plots {
 		h := pb.Header
-		pNum := strings.TrimSpace(h.PlotNumber)
+		pNum := truncateUTF16Units(strings.TrimSpace(h.PlotNumber), 7)
 		if pNum == "" || seenPlots[pNum] {
 			continue
 		}
@@ -1215,24 +1253,35 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 		if strings.TrimSpace(projID) == "" {
 			projID = project
 		}
-		if len([]rune(projID)) > 20 {
-			projID = string([]rune(projID)[:20])
-		}
+		projID = truncateUTF16Units(projID, 20)
 
 		if _, err := envStmt.ExecContext(ctx,
-			pNum, nullEmpty(h.FieldNumber), projID, nullEmpty(h.Date), h.Latitude, h.Longitude,
-			h.Elevation, h.Slope, h.Aspect, nullEmpty(h.Zone), nullEmpty(h.SubZone), nullEmpty(h.SiteSeries),
-			nullEmpty(h.MoistureRegime), nullEmpty(h.NutrientRegime), nullEmpty(h.MesoSlopePosition), nullEmpty(h.SurfaceShape),
-			nullEmpty(h.SoilDrainage), nullEmpty(h.HumusForm), nullEmpty(h.Surveyor), nullEmpty(h.Location),
+			pNum,
+			nullTruncatedUTF16(h.FieldNumber, 50),
+			projID,
+			nullTruncatedUTF16(h.Date, 40),
+			h.Latitude, h.Longitude,
+			h.Elevation, h.Slope, h.Aspect,
+			nullTruncatedUTF16(h.Zone, 4),
+			nullTruncatedUTF16(h.SubZone, 8),
+			nullTruncatedUTF16(h.SiteSeries, 5),
+			nullTruncatedUTF16(h.MoistureRegime, 3),
+			nullTruncatedUTF16(h.NutrientRegime, 2),
+			nullTruncatedUTF16(h.MesoSlopePosition, 3),
+			nullTruncatedUTF16(h.SurfaceShape, 3),
+			nullTruncatedUTF16(h.SoilDrainage, 5),
+			nullTruncatedUTF16(h.HumusForm, 4),
+			nullTruncatedUTF16(h.Surveyor, 30),
+			nullTruncatedUTF16(h.Location, 255),
 			nullEmpty(h.SiteNotes), nullEmpty(h.VegNotes), nullEmpty(h.SoilNotes),
 		); err != nil {
 			return fmt.Errorf("insert plot %s into _Env: %w", pNum, err)
 		}
-		if _, err := adminStmt.ExecContext(ctx, pNum, "FS882", h.PlotSize, nullEmpty(h.SiteUnit)); err != nil {
+		if _, err := adminStmt.ExecContext(ctx, pNum, "FS882", h.PlotSize, nullTruncatedUTF16(h.SiteUnit, 100)); err != nil {
 			return fmt.Errorf("insert plot %s into _Admin: %w", pNum, err)
 		}
-		if strings.TrimSpace(h.SiteUnit) != "" {
-			suRows = append(suRows, [2]string{pNum, strings.TrimSpace(h.SiteUnit)})
+		if suUnit := truncateUTF16Units(strings.TrimSpace(h.SiteUnit), 255); suUnit != "" {
+			suRows = append(suRows, [2]string{pNum, suUnit})
 		}
 
 		// Pivot SpeciesData per species into wide VP08 _Veg rows
@@ -1245,12 +1294,9 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 		bySpp := map[string]*wideRow{}
 		var sppOrder []string
 		for _, o := range pb.Observations {
-			code := strings.ToUpper(strings.TrimSpace(o.SpeciesCode))
-			if code == "" || o.Cover <= 0 {
+			code := truncateUTF16Units(strings.ToUpper(strings.TrimSpace(o.SpeciesCode)), 8)
+			if code == "" || o.Cover == 0 {
 				continue
-			}
-			if len([]rune(code)) > 8 {
-				code = string([]rune(code)[:8])
 			}
 			wr := bySpp[code]
 			if wr == nil {
@@ -1259,14 +1305,12 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 				sppOrder = append(sppOrder, code)
 			}
 			if wr.collected == "" && strings.TrimSpace(o.Collected) != "" {
-				wr.collected = strings.TrimSpace(o.Collected)[:1]
+				wr.collected = truncateUTF16Units(strings.TrimSpace(o.Collected), 1)
 			}
 			cCol, hCol := resolveIncomingTurboVegLayer(o.LayerCode, o.TVGroup)
-			sumCov := wr.covers[cCol] + o.Cover
-			if float32(sumCov) >= 100 {
-				sumCov = 99.0
+			if err := accumulateImportedSingleCover(wr.covers, cCol, o.Cover, pNum, code); err != nil {
+				return err
 			}
-			wr.covers[cCol] = math.Round(sumCov*10000) / 10000
 			if o.Height != nil && hCol != "" {
 				if *o.Height > wr.heights[hCol] {
 					wr.heights[hCol] = *o.Height
@@ -1301,10 +1345,12 @@ func populateVP08FromTVDataset(ctx context.Context, tx *sql.Tx, project string, 
 			}
 		}
 
-		_, _ = tx.ExecContext(ctx, `
-			INSERT INTO `+auditTbl+` ("Project","User","PlotNumber","Table","EditField","EditWhen")
-			VALUES (?, 'VPro', ?, 'Environment', 'Imported TurboVeg record', ?)`,
-			project, pNum, nowStr)
+		if _, err := tx.ExecContext(ctx, `
+			INSERT INTO `+auditTbl+` ("Project","User","PlotNumber","Table","EditField","EditWhen","Restore","Flag")
+			VALUES (?, 'VPro', ?, 'Environment', 'Imported TurboVeg record', ?, 0, 0)`,
+			project, pNum, nowStr); err != nil {
+			return fmt.Errorf("insert audit for plot %s: %w", pNum, err)
+		}
 	}
 
 	if len(suRows) > 0 {

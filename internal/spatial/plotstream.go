@@ -116,6 +116,10 @@ type SpatialWorkbenchPayload struct {
 }
 
 func extractSpatialPlotRecords(ctx context.Context, owner *vprocore.SqliteContext, attr *PMTilesAttributor) ([]SpatialPlotRecord, int, error) {
+	return extractSpatialPlotRecordsWithOptions(ctx, owner, attr, true)
+}
+
+func extractSpatialPlotRecordsWithOptions(ctx context.Context, owner *vprocore.SqliteContext, attr *PMTilesAttributor, needEcoAndDist bool) ([]SpatialPlotRecord, int, error) {
 	rawRows, err := queryScopedSpatialPlotRows(ctx, owner)
 	if err != nil {
 		return nil, 0, err
@@ -153,7 +157,7 @@ func extractSpatialPlotRecords(ctx context.Context, owner *vprocore.SqliteContex
 		gisBGC := strings.TrimSpace(r.gisBGC)
 		eco := strings.TrimSpace(r.ecosection)
 		dist := strings.TrimSpace(r.fsRegionDistrict)
-		if (gisBGC == "" || eco == "" || dist == "") && attr != nil {
+		if (gisBGC == "" || (needEcoAndDist && (eco == "" || dist == ""))) && attr != nil {
 			if sug, sErr := attr.SuggestSpatialAttributes(lat, lon); sErr == nil && sug != nil {
 				if gisBGC == "" {
 					gisBGC = sug.GISBGC
@@ -250,7 +254,7 @@ func GetSpatialWorkbenchPayload(ctx context.Context, contexts *vprocore.ContextS
 
 	return vprocore.WithContextPlotRequest(ctx, contexts, contextID, func(plots *vprocore.PlotService) (*SpatialWorkbenchPayload, error) {
 		owner := plots.Projects.Sqlite
-		records, totalPlots, err := extractSpatialPlotRecords(ctx, owner, attr)
+		records, totalPlots, err := extractSpatialPlotRecordsWithOptions(ctx, owner, attr, true)
 		if err != nil {
 			return nil, err
 		}
@@ -544,11 +548,20 @@ func (b *flatBufBuilder) finishTable(tableEndFromEnd int, fieldSlotsFromEnd []in
 	return tableStartFromEnd
 }
 
-func (b *flatBufBuilder) finishRoot(rootTableFromEnd int) []byte {
+func (b *flatBufBuilder) reset() {
+	b.pos = len(b.buf)
+}
+
+func (b *flatBufBuilder) finishRootView(rootTableFromEnd int) []byte {
 	b.align(4, 4)
 	b.placeUOffset(rootTableFromEnd)
-	out := make([]byte, b.used())
-	copy(out, b.buf[b.pos:])
+	return b.buf[b.pos:]
+}
+
+func (b *flatBufBuilder) finishRoot(rootTableFromEnd int) []byte {
+	view := b.finishRootView(rootTableFromEnd)
+	out := make([]byte, len(view))
+	copy(out, view)
 	return out
 }
 
@@ -617,8 +630,8 @@ func appendFGBBoolProp(buf []byte, colIdx uint16, val bool) []byte {
 	return append(buf, byte(colIdx), byte(colIdx>>8), b)
 }
 
-func buildFGBPointFeatureFlatBuffer(rec SpatialPlotRecord) []byte {
-	props := make([]byte, 0, 160)
+func encodeFGBPointFeatureIntoBuilder(b *flatBufBuilder, props []byte, rec SpatialPlotRecord) ([]byte, []byte) {
+	props = props[:0]
 	props = appendFGBStringProp(props, 0, rec.PlotNumber)
 	props = appendFGBDoubleProp(props, 1, rec.Lat)
 	props = appendFGBDoubleProp(props, 2, rec.Lon)
@@ -651,8 +664,10 @@ func buildFGBPointFeatureFlatBuffer(rec SpatialPlotRecord) []byte {
 		props = appendFGBStringProp(props, 12, rec.SiteUnit)
 	}
 
-	b := newFlatBufBuilder(256 + len(props))
-	xyVecOff := b.createFloat64Vector([]float64{rec.Lon, rec.Lat})
+	b.reset()
+	var xy [2]float64
+	xy[0], xy[1] = rec.Lon, rec.Lat
+	xyVecOff := b.createFloat64Vector(xy[:])
 	gEnd := b.used()
 	// Geometry table: field 1 = xy ([double]), field 7 = type (ubyte)
 	var gSlots [8]int
@@ -667,7 +682,16 @@ func buildFGBPointFeatureFlatBuffer(rec SpatialPlotRecord) []byte {
 	fSlots[0] = b.placeUOffset(geomOff)
 	fSlots[1] = b.placeUOffset(propsVecOff)
 	featRoot := b.finishTable(fEnd, fSlots[:])
-	return b.finishRoot(featRoot)
+	return b.finishRootView(featRoot), props
+}
+
+func buildFGBPointFeatureFlatBuffer(rec SpatialPlotRecord) []byte {
+	b := newFlatBufBuilder(512)
+	props := make([]byte, 0, 192)
+	view, _ := encodeFGBPointFeatureIntoBuilder(b, props, rec)
+	out := make([]byte, len(view))
+	copy(out, view)
+	return out
 }
 
 // EncodeSpatialPlotsFlatGeobuf encodes plot records into a valid OGC FlatGeobuf v3 binary buffer.
@@ -676,9 +700,11 @@ func EncodeSpatialPlotsFlatGeobuf(layerName string, records []SpatialPlotRecord)
 		layerName = "vpro_plots"
 	}
 	var env [4]float64
+	approxPropsBytes := 0
 	if len(records) > 0 {
 		env = [4]float64{math.Inf(1), math.Inf(1), math.Inf(-1), math.Inf(-1)}
-		for _, r := range records {
+		for i := range records {
+			r := &records[i]
 			if r.Lon < env[0] {
 				env[0] = r.Lon
 			}
@@ -691,11 +717,13 @@ func EncodeSpatialPlotsFlatGeobuf(layerName string, records []SpatialPlotRecord)
 			if r.Lat > env[3] {
 				env[3] = r.Lat
 			}
+			approxPropsBytes += len(r.PlotNumber) + len(r.FieldBGC) + len(r.GISBGC) + len(r.SiteUnit)
 		}
 	}
 
 	headerFB := buildFGBHeaderFlatBuffer(layerName, env, spatialFGBColumns, uint64(len(records)))
-	out := make([]byte, 0, 12+len(headerFB)+len(records)*220)
+	estimatedBytes := 16 + len(headerFB) + len(records)*224 + approxPropsBytes
+	out := make([]byte, 0, estimatedBytes)
 	out = append(out, FlatGeobufMagicV3[:]...)
 
 	var lenBuf [4]byte
@@ -703,11 +731,14 @@ func EncodeSpatialPlotsFlatGeobuf(layerName string, records []SpatialPlotRecord)
 	out = append(out, lenBuf[:]...)
 	out = append(out, headerFB...)
 
-	for _, rec := range records {
-		featFB := buildFGBPointFeatureFlatBuffer(rec)
-		binary.LittleEndian.PutUint32(lenBuf[:], uint32(len(featFB)))
+	featBuilder := newFlatBufBuilder(512)
+	propsBuf := make([]byte, 0, 256)
+	for i := range records {
+		var featView []byte
+		featView, propsBuf = encodeFGBPointFeatureIntoBuilder(featBuilder, propsBuf, records[i])
+		binary.LittleEndian.PutUint32(lenBuf[:], uint32(len(featView)))
 		out = append(out, lenBuf[:]...)
-		out = append(out, featFB...)
+		out = append(out, featView...)
 	}
 	return out, nil
 }
@@ -950,7 +981,7 @@ func GetSpatialPlotsFlatGeobuf(ctx context.Context, contexts *vprocore.ContextSe
 
 	return vprocore.WithContextPlotRequest(ctx, contexts, contextID, func(plots *vprocore.PlotService) ([]byte, error) {
 		owner := plots.Projects.Sqlite
-		records, _, err := extractSpatialPlotRecords(ctx, owner, attr)
+		records, _, err := extractSpatialPlotRecordsWithOptions(ctx, owner, attr, false)
 		if err != nil {
 			return nil, err
 		}

@@ -214,8 +214,8 @@ func DeleteTwoPageSoilHorizon(s *vprocore.ContextService, ctx context.Context, c
 	if err := vprocore.ValidateChildPhysicalText("PlotNumber", req.PlotNumber, 7); err != nil {
 		return DeleteTwoPageSoilHorizonResult{}, err
 	}
-	if req.ID == 0 || req.ID < -2147483648 || req.ID > 2147483647 {
-		return DeleteTwoPageSoilHorizonResult{}, errors.New("soil horizon deletion requires a non-zero signed32 child ID")
+	if req.ID < -2147483648 || req.ID > 2147483647 {
+		return DeleteTwoPageSoilHorizonResult{}, errors.New("soil horizon deletion requires a signed32 child ID")
 	}
 	requestID := strings.TrimSpace(req.RequestID)
 	if requestID == "" {
@@ -360,7 +360,7 @@ func DeleteTwoPageSoilHorizon(s *vprocore.ContextService, ctx context.Context, c
 			if err := errors.Join(idScan.Err(), idScan.Close()); err != nil {
 				return err
 			}
-			if req.ID > 0 && !slices.Contains(idsToReserve, req.ID) {
+			if req.ID >= 0 && !slices.Contains(idsToReserve, req.ID) {
 				idsToReserve = append(idsToReserve, req.ID)
 			}
 			for _, v := range idsToReserve {
@@ -493,7 +493,7 @@ func DeleteTwoPageSoilHorizon(s *vprocore.ContextService, ctx context.Context, c
 				Kind:             kind,
 				DeletedID:        req.ID,
 				Horizon:          hz,
-				ReservedInLedger: req.ID > 0,
+				ReservedInLedger: req.ID >= 0,
 				AuditRowCount:    len(auditEntries),
 				EditWhen:         now,
 				Replayed:         false,
@@ -666,17 +666,26 @@ func RestoreTwoPageSoilHorizon(s *vprocore.ContextService, ctx context.Context, 
 			}
 
 			restoredID := *targetDeletion.DeletedID
-			// Verify ID is not currently occupied in <Project>_<Kind>.
+			// Verify ID is not currently occupied (table-wide for positive IDs, plot-scoped for legacy ID <= 0).
 			var occupied int
-			if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+quotedTbl+` WHERE "ID" = ?`, restoredID).Scan(&occupied); err != nil {
-				return err
+			if restoredID > 0 {
+				if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM `+quotedTbl+` WHERE "ID" = ?`, restoredID).Scan(&occupied); err != nil {
+					return err
+				}
+			} else {
+				if err := tx.QueryRowContext(ctx,
+					`SELECT COUNT(*) FROM `+quotedTbl+` WHERE typeof("PlotNumber")='text' AND CAST("PlotNumber" AS BLOB)=CAST(? AS BLOB) AND "ID" = ?`,
+					req.PlotNumber, restoredID,
+				).Scan(&occupied); err != nil {
+					return err
+				}
 			}
 			if occupied != 0 {
 				return fmt.Errorf("cannot restore %s horizon ID %d because that ID is already occupied", kind, restoredID)
 			}
 
 			// Ensure permanent reservation in __VPRO_ChildIdentity remains intact!
-			if restoredID > 0 {
+			if restoredID >= 0 {
 				var reserved int
 				if err := tx.QueryRowContext(ctx, `SELECT COUNT(*) FROM "__VPRO_ChildIdentity" WHERE "ChildTable" = ? AND "ID" = ?`,
 					quotedTbl, restoredID).Scan(&reserved); err != nil {

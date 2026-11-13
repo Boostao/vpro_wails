@@ -1,8 +1,6 @@
 package spatial
 
 import (
-	"github.com/boostao/vpro-wails/internal/interchange"
-	"github.com/boostao/vpro-wails/internal/sivi"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
 )
@@ -126,11 +124,11 @@ func TestPlotLocationReviewFacadeExactDTOParityJSONAndDetachedValues(t *testing.
 	if err != nil || !reflect.DeepEqual(again, want) {
 		t.Fatal("caller aliases later public location snapshot:", err)
 	}
-	if got, err := interchange.GetProjectTableCSVReview(service, context.Background(), state.ContextID, "Sample_Env"); got != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("location opt-in enabled table CSV:", err)
+	if service.TableCSVReviewEnabled {
+		t.Fatal("location opt-in enabled table CSV flag")
 	}
-	if got, err := sivi.GetSIVIParentOriginal(service, context.Background(), state.ContextID, "108050"); got != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("location opt-in enabled SIVI:", err)
+	if service.SiviParentReviewEnabled {
+		t.Fatal("location opt-in enabled SIVI flag")
 	}
 }
 

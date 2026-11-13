@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -12,7 +11,117 @@ import (
 	"github.com/boostao/vpro-wails/internal/reports/reportcore"
 )
 
-var crosstabCodePattern = regexp.MustCompile(`^[1-5] - (\+|[1-9])$`)
+var pow10Uint64 = [20]uint64{
+	1, 10, 100, 1000, 10000,
+	100000, 1000000, 10000000, 100000000, 1000000000,
+	10000000000, 100000000000, 1000000000000, 10000000000000, 100000000000000,
+	1000000000000000, 10000000000000000, 100000000000000000, 1000000000000000000, 10000000000000000000,
+}
+
+var crosstabCodeTable = [6][10]string{
+	{},
+	{"1 - +", "1 - 1", "1 - 2", "1 - 3", "1 - 4", "1 - 5", "1 - 6", "1 - 7", "1 - 8", "1 - 9"},
+	{"2 - +", "2 - 1", "2 - 2", "2 - 3", "2 - 4", "2 - 5", "2 - 6", "2 - 7", "2 - 8", "2 - 9"},
+	{"3 - +", "3 - 1", "3 - 2", "3 - 3", "3 - 4", "3 - 5", "3 - 6", "3 - 7", "3 - 8", "3 - 9"},
+	{"4 - +", "4 - 1", "4 - 2", "4 - 3", "4 - 4", "4 - 5", "4 - 6", "4 - 7", "4 - 8", "4 - 9"},
+	{"5 - +", "5 - 1", "5 - 2", "5 - 3", "5 - 4", "5 - 5", "5 - 6", "5 - 7", "5 - 8", "5 - 9"},
+}
+
+// ace15ScaledUint64 computes round_half_away(15_sig_digits(|value|) * 10^decimals) on the stack
+// without allocating math/big objects when the scaled integer fits comfortably in uint64.
+func ace15ScaledUint64(value float64, decimals int) (scaled uint64, negative bool, ok bool) {
+	if decimals < 0 || decimals > 9 || math.IsNaN(value) || math.IsInf(value, 0) {
+		return 0, false, false
+	}
+	if value == 0 {
+		return 0, false, true
+	}
+	negative = value < 0
+	absVal := math.Abs(value)
+
+	var sci [32]byte
+	b := strconv.AppendFloat(sci[:0], absVal, 'e', 14, 64)
+	// Format is d.ddddddddddddddE±dd (e.g. "1.00500000000000e+00", len >= 20)
+	eIdx := -1
+	for i := 0; i < len(b); i++ {
+		if b[i] == 'e' || b[i] == 'E' {
+			eIdx = i
+			break
+		}
+	}
+	if eIdx != 16 || b[1] != '.' {
+		return 0, false, false
+	}
+	mant := uint64(b[0] - '0')
+	for i := 2; i < 16; i++ {
+		mant = mant*10 + uint64(b[i]-'0')
+	}
+	expSign := 1
+	expPos := eIdx + 1
+	if expPos >= len(b) {
+		return 0, false, false
+	}
+	if b[expPos] == '-' {
+		expSign = -1
+		expPos++
+	} else if b[expPos] == '+' {
+		expPos++
+	}
+	expVal := 0
+	for ; expPos < len(b); expPos++ {
+		if b[expPos] < '0' || b[expPos] > '9' {
+			return 0, false, false
+		}
+		expVal = expVal*10 + int(b[expPos]-'0')
+	}
+	exp := expSign * expVal
+
+	k := exp - 14 + decimals
+	if k >= 0 {
+		if k > 4 {
+			return 0, false, false
+		}
+		return mant * pow10Uint64[k], negative, true
+	}
+	negK := -k
+	if negK > 16 {
+		return 0, false, true
+	}
+	div := pow10Uint64[negK]
+	q := mant / div
+	rem := mant % div
+	if rem >= (div+1)/2 && (div%2 == 0 && rem*2 >= div || div%2 != 0) {
+		q++
+	}
+	if q == 0 {
+		negative = false
+	}
+	return q, negative, true
+}
+
+func formatScaledDecimalBytes(dst []byte, scaled uint64, negative bool, decimals int) []byte {
+	if negative && scaled != 0 {
+		dst = append(dst, '-')
+	}
+	if decimals == 0 {
+		return strconv.AppendUint(dst, scaled, 10)
+	}
+	var digits [24]byte
+	raw := strconv.AppendUint(digits[:0], scaled, 10)
+	if len(raw) <= decimals {
+		dst = append(dst, '0', '.')
+		for i := 0; i < decimals-len(raw); i++ {
+			dst = append(dst, '0')
+		}
+		dst = append(dst, raw...)
+		return dst
+	}
+	split := len(raw) - decimals
+	dst = append(dst, raw[:split]...)
+	dst = append(dst, '.')
+	dst = append(dst, raw[split:]...)
+	return dst
+}
 
 // NarrowSingleCover narrows a float64 cover input to IEEE-754 SINGLE (float32)
 // prior to evaluating Access's `<100 Or Is Null` cover rule (§4 invariant).
@@ -29,6 +138,10 @@ func NarrowSingleCover(value float64) (float32, bool) {
 
 // FormatACE15 formats a float64 via Access/DAO 15-significant-digit half-away rounding.
 func FormatACE15(value float64, decimals int) string {
+	if scaled, neg, ok := ace15ScaledUint64(value, decimals); ok {
+		var buf [32]byte
+		return string(formatScaledDecimalBytes(buf[:0], scaled, neg, decimals))
+	}
 	return reportcore.SiteUnitFixedNumber(value, decimals, 1)
 }
 
@@ -36,6 +149,23 @@ func FormatACE15(value float64, decimals int) string {
 func RoundACE15(value float64, decimals int) float64 {
 	if math.IsNaN(value) || math.IsInf(value, 0) {
 		return 0
+	}
+	if scaled, neg, ok := ace15ScaledUint64(value, decimals); ok {
+		if scaled == 0 {
+			return 0
+		}
+		if decimals == 0 {
+			res := float64(scaled)
+			if neg {
+				return -res
+			}
+			return res
+		}
+		var buf [32]byte
+		s := formatScaledDecimalBytes(buf[:0], scaled, neg, decimals)
+		if parsed, err := strconv.ParseFloat(string(s), 64); err == nil {
+			return parsed
+		}
 	}
 	parsed, err := strconv.ParseFloat(FormatACE15(value, decimals), 64)
 	if err != nil {
@@ -92,10 +222,37 @@ func DominKrajinaSignifClass(signif float64) (string, int) {
 
 // FormatUnitCrosstabCode formats the Access MyRS5 crosstab string ("1 - +" .. "5 - 9").
 func FormatUnitCrosstabCode(presenceClass int, signifClass string) string {
-	if presenceClass < 1 || presenceClass > 5 || signifClass == "" {
-		return ""
+	if presenceClass < 1 || presenceClass > 5 || len(signifClass) != 1 {
+		if presenceClass < 1 || presenceClass > 5 || signifClass == "" {
+			return ""
+		}
+		return fmt.Sprintf("%d - %s", presenceClass, signifClass)
+	}
+	c := signifClass[0]
+	if c == '+' {
+		return crosstabCodeTable[presenceClass][0]
+	}
+	if c >= '1' && c <= '9' {
+		return crosstabCodeTable[presenceClass][c-'0']
 	}
 	return fmt.Sprintf("%d - %s", presenceClass, signifClass)
+}
+
+func parseCrosstabCodeFast(raw string) (pres int, sig int, ok bool) {
+	if len(raw) != 5 || raw[1] != ' ' || raw[2] != '-' || raw[3] != ' ' {
+		return 0, 0, false
+	}
+	if raw[0] < '1' || raw[0] > '5' {
+		return 0, 0, false
+	}
+	pres = int(raw[0] - '0')
+	if raw[4] == '+' {
+		return pres, 0, true
+	}
+	if raw[4] >= '1' && raw[4] <= '9' {
+		return pres, int(raw[4] - '0'), true
+	}
+	return 0, 0, false
 }
 
 // ClassifySpeciesDiagnostic evaluates BEC differential & diagnostic categories across ordered units,
@@ -124,14 +281,9 @@ func ClassifySpeciesDiagnostic(orderedUnits []OrderedUnitCode) (DiagnosticClassi
 			continue
 		}
 		raw := *item.Code
-		if !crosstabCodePattern.MatchString(raw) {
+		pres, sig, valid := parseCrosstabCodeFast(raw)
+		if !valid {
 			return DiagnosticClassification{}, fmt.Errorf("invalid unit crosstab code %q for unit %q; expected '1 - +' through '5 - 9'", raw, item.Unit)
-		}
-		pres := int(raw[0] - '0')
-		sigStr := raw[4:]
-		sig := 0
-		if sigStr != "+" {
-			sig = int(sigStr[0] - '0')
 		}
 		present = append(present, presentEntry{
 			unit:         item.Unit,
@@ -379,28 +531,69 @@ func ComputePairwiseAnalysis(
 	p := normalizePairwiseParams(rawParams)
 	nUnits := len(units)
 
-	meanVecs := make(map[string]map[string]float64, nUnits)
+	// Assign dense species IDs 0..S-1 so pairwise U*(U-1)/2 comparisons run as zero-alloc sorted slice merges.
+	spSet := map[string]struct{}{}
 	for _, u := range units {
-		vec := make(map[string]float64, len(unitSpecies[u]))
-		for sp, st := range unitSpecies[u] {
-			if st.meanCoverAll > 0 {
-				vec[sp] = st.meanCoverAll
-			}
+		for sp := range unitSpecies[u] {
+			spSet[sp] = struct{}{}
 		}
-		meanVecs[u] = vec
+	}
+	spNames := make([]string, 0, len(spSet))
+	for sp := range spSet {
+		spNames = append(spNames, sp)
+	}
+	slices.Sort(spNames)
+	spIDByName := make(map[string]int32, len(spNames))
+	spSciByID := make([]string, len(spNames))
+	eligibleByID := make([]bool, len(spNames))
+	for idx, sp := range spNames {
+		spIDByName[sp] = int32(idx)
+		spSciByID[idx] = speciesMeta[sp].ScientificName
 	}
 
-	// Filter species attaining >= p.MinConstancy in at least one eligible unit for do_pairwise
-	eligiblePairwiseSpecies := map[string]bool{}
 	for _, u := range units {
 		if plotCounts[u] < p.MinPlots {
 			continue
 		}
 		for sp, st := range unitSpecies[u] {
 			if st.constancyPct >= p.MinConstancy {
-				eligiblePairwiseSpecies[sp] = true
+				eligibleByID[spIDByName[sp]] = true
 			}
 		}
+	}
+
+	type indexedUnitSp struct {
+		spID         int32
+		meanCoverAll float64
+		constancyPct float64
+		diagPot      float64
+	}
+	unitVecs := make([][]indexedUnitSp, nUnits)
+	unitSumMeans := make([]float64, nUnits)
+	unitEligible := make([]bool, nUnits)
+	for uIdx, u := range units {
+		unitEligible[uIdx] = plotCounts[u] >= p.MinPlots
+		m := unitSpecies[u]
+		vec := make([]indexedUnitSp, 0, len(m))
+		sumMean := 0.0
+		for sp, st := range m {
+			if st.meanCoverAll > 0 || st.constancyPct > 0 {
+				vec = append(vec, indexedUnitSp{
+					spID:         spIDByName[sp],
+					meanCoverAll: st.meanCoverAll,
+					constancyPct: st.constancyPct,
+					diagPot:      st.diagPot,
+				})
+				if st.meanCoverAll > 0 {
+					sumMean += st.meanCoverAll
+				}
+			}
+		}
+		slices.SortFunc(vec, func(a, b indexedUnitSp) int {
+			return int(a.spID - b.spID)
+		})
+		unitVecs[uIdx] = vec
+		unitSumMeans[uIdx] = sumMean
 	}
 
 	sorensenMat := make([][]float64, nUnits)
@@ -416,47 +609,64 @@ func ComputePairwiseAnalysis(
 
 	for i := 0; i < nUnits; i++ {
 		u1 := units[i]
+		v1 := unitVecs[i]
+		elig1 := unitEligible[i]
 		for j := i + 1; j < nUnits; j++ {
 			u2 := units[j]
-			sor := SorensenSimilarity(meanVecs[u1], meanVecs[u2])
-			sorensenMat[i][j] = sor
-			sorensenMat[j][i] = sor
+			v2 := unitVecs[j]
+			elig2 := unitEligible[j]
 
-			// Evaluate BEC do_pairwise differential comparison between u1 and u2
-			unionSpp := map[string]struct{}{}
-			if plotCounts[u1] >= p.MinPlots {
-				for sp, st := range unitSpecies[u1] {
-					if eligiblePairwiseSpecies[sp] && st.constancyPct > p.NoiseConstancy {
-						unionSpp[sp] = struct{}{}
-					}
-				}
-			}
-			if plotCounts[u2] >= p.MinPlots {
-				for sp, st := range unitSpecies[u2] {
-					if eligiblePairwiseSpecies[sp] && st.constancyPct > p.NoiseConstancy {
-						unionSpp[sp] = struct{}{}
-					}
-				}
-			}
-
+			sumMin := 0.0
 			sharedDiag := 0.0
 			diffTot1 := 0.0
 			diffTot2 := 0.0
-			diffTaxa := make([]PairwiseDifferentialTaxon, 0)
+			var diffTaxa []PairwiseDifferentialTaxon
 
-			for sp := range unionSpp {
-				var st1, st2 unitSpeciesStat
-				if plotCounts[u1] >= p.MinPlots {
-					if cand, ok := unitSpecies[u1][sp]; ok && cand.constancyPct > p.NoiseConstancy {
-						st1 = cand
+			k1, k2 := 0, 0
+			for k1 < len(v1) || k2 < len(v2) {
+				var spID int32
+				var s1, s2 indexedUnitSp
+				var has1, has2 bool
+				if k2 >= len(v2) || (k1 < len(v1) && v1[k1].spID < v2[k2].spID) {
+					s1 = v1[k1]
+					spID = s1.spID
+					has1 = true
+					k1++
+				} else if k1 >= len(v1) || v2[k2].spID < v1[k1].spID {
+					s2 = v2[k2]
+					spID = s2.spID
+					has2 = true
+					k2++
+				} else {
+					s1 = v1[k1]
+					s2 = v2[k2]
+					spID = s1.spID
+					has1, has2 = true, true
+					k1++
+					k2++
+					if s1.meanCoverAll > 0 && s2.meanCoverAll > 0 {
+						if s1.meanCoverAll < s2.meanCoverAll {
+							sumMin += s1.meanCoverAll
+						} else {
+							sumMin += s2.meanCoverAll
+						}
 					}
 				}
-				if plotCounts[u2] >= p.MinPlots {
-					if cand, ok := unitSpecies[u2][sp]; ok && cand.constancyPct > p.NoiseConstancy {
-						st2 = cand
-					}
+
+				if !eligibleByID[spID] {
+					continue
 				}
-				if st1.diagPot <= 0 && st2.diagPot <= 0 {
+				var st1, st2 indexedUnitSp
+				inUnion := false
+				if has1 && elig1 && s1.constancyPct > p.NoiseConstancy {
+					st1 = s1
+					inUnion = true
+				}
+				if has2 && elig2 && s2.constancyPct > p.NoiseConstancy {
+					st2 = s2
+					inUnion = true
+				}
+				if !inUnion || (st1.diagPot <= 0 && st2.diagPot <= 0) {
 					continue
 				}
 				sharedDiag += math.Min(st1.diagPot, st2.diagPot)
@@ -486,8 +696,8 @@ func ComputePairwiseAnalysis(
 						favours = u2
 					}
 					diffTaxa = append(diffTaxa, PairwiseDifferentialTaxon{
-						Species:        sp,
-						ScientificName: speciesMeta[sp].ScientificName,
+						Species:        spNames[spID],
+						ScientificName: spSciByID[spID],
 						ConstancyUnit1: RoundACE15(st1.constancyPct, 1),
 						MeanCoverUnit1: RoundACE15(st1.meanCoverAll, 2),
 						ConstancyUnit2: RoundACE15(st2.constancyPct, 1),
@@ -498,6 +708,16 @@ func ComputePairwiseAnalysis(
 					})
 				}
 			}
+			if diffTaxa == nil {
+				diffTaxa = []PairwiseDifferentialTaxon{}
+			}
+
+			sor := 0.0
+			if sumTot := unitSumMeans[i] + unitSumMeans[j]; sumTot > 0 {
+				sor = (2.0 * sumMin) / sumTot
+			}
+			sorensenMat[i][j] = sor
+			sorensenMat[j][i] = sor
 
 			slices.SortFunc(diffTaxa, func(a, b PairwiseDifferentialTaxon) int {
 				maxA := math.Max(a.DiffPtsUnit1, a.DiffPtsUnit2)
@@ -588,31 +808,91 @@ func ComputeOutlierQueue(
 		return []OutlierPlotCandidate{}
 	}
 
+	nUnits := len(units)
+	unitIdxByName := make(map[string]int, nUnits)
+	spSet := map[string]struct{}{}
+	for i, u := range units {
+		unitIdxByName[u] = i
+		for sp := range unitCoverSums[u] {
+			spSet[sp] = struct{}{}
+		}
+	}
+	for i := range plots {
+		for sp := range plots[i].speciesCovers {
+			spSet[sp] = struct{}{}
+		}
+	}
+	nSp := len(spSet)
+	spIDByName := make(map[string]int32, nSp)
+	nextSpID := int32(0)
+	for sp := range spSet {
+		spIDByName[sp] = nextSpID
+		nextSpID++
+	}
+
+	unitSumsFlat := make([]float64, nUnits*nSp)
+	unitCountsArr := make([]int, nUnits)
+	unitTotalsArr := make([]float64, nUnits)
+	unitInvCounts := make([]float64, nUnits)
+	unitMeanTotals := make([]float64, nUnits)
+	for uIdx, u := range units {
+		cnt := unitPlotCounts[u]
+		unitCountsArr[uIdx] = cnt
+		tot := unitTotalSums[u]
+		unitTotalsArr[uIdx] = tot
+		if cnt > 0 {
+			inv := 1.0 / float64(cnt)
+			unitInvCounts[uIdx] = inv
+			unitMeanTotals[uIdx] = tot * inv
+		}
+		base := uIdx * nSp
+		for sp, s := range unitCoverSums[u] {
+			unitSumsFlat[base+int(spIDByName[sp])] = s
+		}
+	}
+
+	type spCovPair struct {
+		spID int32
+		cov  float64
+	}
+	var plotVec []spCovPair
+
 	out := make([]OutlierPlotCandidate, 0, len(plots))
-	for _, p := range plots {
+	for i := range plots {
+		p := &plots[i]
 		uAssigned := p.siteUnit
-		nAssigned := unitPlotCounts[uAssigned]
+		uAssignedIdx, hasAssigned := unitIdxByName[uAssigned]
+		nAssigned := 0
+		if hasAssigned {
+			nAssigned = unitCountsArr[uAssignedIdx]
+		} else {
+			nAssigned = unitPlotCounts[uAssigned]
+		}
 		singleton := nAssigned <= 1
 
+		plotVec = plotVec[:0]
+		for sp, cov := range p.speciesCovers {
+			if cov > 0 {
+				plotVec = append(plotVec, spCovPair{spID: spIDByName[sp], cov: cov})
+			}
+		}
+
 		ownSim := 0.0
-		if !singleton {
-			nLOO := float64(nAssigned - 1)
-			looTotal := (unitTotalSums[uAssigned] - p.totalCover) / nLOO
+		if !singleton && hasAssigned {
+			invLOO := 1.0 / float64(nAssigned-1)
+			looTotal := (unitTotalsArr[uAssignedIdx] - p.totalCover) * invLOO
 			if looTotal < 0 {
 				looTotal = 0
 			}
 			denom := p.totalCover + looTotal
 			if denom > 0 {
-				uSums := unitCoverSums[uAssigned]
+				uBase := uAssignedIdx * nSp
 				sumMin := 0.0
-				for sp, cov := range p.speciesCovers {
-					if cov <= 0 {
-						continue
-					}
-					looMean := (uSums[sp] - cov) / nLOO
+				for _, pair := range plotVec {
+					looMean := (unitSumsFlat[uBase+int(pair.spID)] - pair.cov) * invLOO
 					if looMean > 0 {
-						if cov < looMean {
-							sumMin += cov
+						if pair.cov < looMean {
+							sumMin += pair.cov
 						} else {
 							sumMin += looMean
 						}
@@ -624,28 +904,25 @@ func ComputeOutlierQueue(
 
 		rivalUnit := ""
 		rivalSim := 0.0
-		for _, candUnit := range units {
-			if candUnit == uAssigned {
+		for uIdx, candUnit := range units {
+			if uIdx == uAssignedIdx && hasAssigned {
 				continue
 			}
-			nCand := unitPlotCounts[candUnit]
+			nCand := unitCountsArr[uIdx]
 			if nCand <= 0 {
 				continue
 			}
-			candMeanTotal := unitTotalSums[candUnit] / float64(nCand)
-			denom := p.totalCover + candMeanTotal
+			denom := p.totalCover + unitMeanTotals[uIdx]
 			sim := 0.0
 			if denom > 0 {
-				cSums := unitCoverSums[candUnit]
+				invCand := unitInvCounts[uIdx]
+				cBase := uIdx * nSp
 				sumMin := 0.0
-				for sp, cov := range p.speciesCovers {
-					if cov <= 0 {
-						continue
-					}
-					candMean := cSums[sp] / float64(nCand)
+				for _, pair := range plotVec {
+					candMean := unitSumsFlat[cBase+int(pair.spID)] * invCand
 					if candMean > 0 {
-						if cov < candMean {
-							sumMin += cov
+						if pair.cov < candMean {
+							sumMin += pair.cov
 						} else {
 							sumMin += candMean
 						}

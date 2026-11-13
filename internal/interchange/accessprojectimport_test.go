@@ -1,6 +1,7 @@
 package interchange
 
 import (
+	"github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
 )
@@ -217,5 +218,146 @@ func TestInspectAndImportAccessProjectsAllVersions(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestImportAccessProjectAuditOwnershipChildIdentityAndCompanions(t *testing.T) {
+	ctx := context.Background()
+	service, state := vprotest.ContextServiceFixture(t)
+	srcPath := firstExistingPath(`/home/bruno/Work/VPRO_ACCESS/VPro64/VPro64.accdb`, `C:\Users\BrunoTremblay\Work\VPRO_ACCESS\VPro64\VPro64.accdb`)
+	if _, err := os.Stat(srcPath); err != nil {
+		t.Skipf("fixture %s not present: %v", srcPath, err)
+	}
+
+	destFile := filepath.Join(t.TempDir(), "RenamedTarget.db")
+	res, err := ImportAccessProject(service, ctx, state.ContextID, AccessProjectImportRequest{
+		SourcePath:        srcPath,
+		SourceProject:     "Sample",
+		TargetProject:     "RenamedTarget",
+		DestinationPath:   destFile,
+		ActivateOnSuccess: true,
+	})
+	if err != nil {
+		t.Fatalf("ImportAccessProject(Sample -> RenamedTarget): %v", err)
+	}
+	activeCtxID := res.State.ContextID
+
+	// 1. Audit Project ownership normalized to "RenamedTarget" so ListAuditEntries & ListAuditReadEntries succeed!
+	entries, err := service.ListAuditEntries(ctx, activeCtxID, "00337")
+	if err != nil || len(entries) == 0 {
+		t.Fatalf("ListAuditEntries('00337') failed on renamed Access import: entries=%d err=%v", len(entries), err)
+	}
+	readEntries, err := service.ListAuditReadEntries(ctx, activeCtxID, "00337")
+	if err != nil || len(readEntries) == 0 {
+		t.Fatalf("ListAuditReadEntries('00337') failed on renamed Access import: entries=%d err=%v", len(readEntries), err)
+	}
+
+	db, err := sqlutil.OpenReadOnly(destFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	var foreignAuditCount int
+	if err := db.QueryRow(`SELECT COUNT(*) FROM "RenamedTarget_Audit" WHERE "Project" IS NULL OR "Project" <> 'RenamedTarget'`).Scan(&foreignAuditCount); err != nil || foreignAuditCount != 0 {
+		t.Fatalf("expected 0 foreign Project rows in RenamedTarget_Audit, got %d (err=%v)", foreignAuditCount, err)
+	}
+
+	// 2. Binary PlotNumber index on <Target>_Audit must exist!
+	var hasAuditIdx bool
+	if err := db.QueryRow(`SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='index' AND name='idx_vpro_bin_RenamedTarget_Audit_PlotNumber')`).Scan(&hasAuditIdx); err != nil || !hasAuditIdx {
+		t.Fatalf("missing idx_vpro_bin_RenamedTarget_Audit_PlotNumber on RenamedTarget.db (err=%v)", err)
+	}
+
+	// 3. __VPRO_ChildIdentity must exist and seed positive IDs from _Veg, _Humus, _Mineral, _Other, _Metadata, and _Audit!
+	for _, suffix := range []string{"Veg", "Humus", "Mineral"} {
+		qChild := vprocore.QuoteHeaderIdentifier("RenamedTarget_" + suffix)
+		var cnt int
+		if err := db.QueryRow(`SELECT COUNT(*) FROM "__VPRO_ChildIdentity" WHERE "ChildTable" = ? AND "ID" > 0`, qChild).Scan(&cnt); err != nil || cnt == 0 {
+			t.Fatalf("expected seeded __VPRO_ChildIdentity entries for %s, got %d (err=%v)", qChild, cnt, err)
+		}
+	}
+
+	// 4. Companion tables *_Hierarchy (VP04), *_Lump (VP05), and *_Profile (VP05-2 / VP05) must be discovered and imported!
+	for _, comp := range []struct {
+		table      string
+		descPrefix string
+	}{
+		{"Sample_Hierarchy", "VP04"},
+		{"Sample_Lump", "VP05"},
+		{"Sample_Profile", "VP05"},
+	} {
+		var rowCnt int
+		if err := db.QueryRow(`SELECT COUNT(*) FROM ` + vprocore.QuoteHeaderIdentifier(comp.table)).Scan(&rowCnt); err != nil || rowCnt == 0 {
+			t.Fatalf("expected imported companion table %s with rows > 0, got %d (err=%v)", comp.table, rowCnt, err)
+		}
+		var desc string
+		if err := db.QueryRow(`SELECT "description" FROM "_table_metadata" WHERE "table_name" = ?`, comp.table).Scan(&desc); err != nil || !strings.HasPrefix(desc, comp.descPrefix) {
+			t.Fatalf("companion table %s _table_metadata description = %q (err=%v), want prefix %q", comp.table, desc, err, comp.descPrefix)
+		}
+	}
+}
+
+func TestSeedImportedChildIdentitiesBlocksDeletedAuditIDReuse(t *testing.T) {
+	ctx := context.Background()
+	service, state := vprotest.ContextServiceFixture(t)
+
+	// Simulate an imported project where Sample_Veg only has ID=2, while Sample_Audit records deleted ID=1!
+	vprotest.MutateContextFixture(t, state.ProjectPath, `
+		DELETE FROM Sample_Veg;
+		DROP TABLE IF EXISTS "__VPRO_ChildIdentity";
+		INSERT INTO Sample_Veg (PlotNumber, Species, ID, Cover1, Flag) VALUES ('00337', 'PSEUMEN', 2, 25.0, 0);
+		INSERT INTO Sample_Audit ("Project", "User", "PlotNumber", "Table", "EditField", "EditWhen", "Restore", "Flag", "ID")
+		VALUES ('Sample', 'VPro', '00337', '_Veg', 'Delete record', '2024-01-01 00:00:00', 0, 0, 1);
+	`)
+
+	rwDB, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.ProjectPath, "rw"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	tx, err := rwDB.BeginTx(ctx, nil)
+	if err != nil {
+		rwDB.Close()
+		t.Fatal(err)
+	}
+	if err := seedImportedChildIdentities(ctx, tx, "OldSource", "Sample"); err != nil {
+		_ = tx.Rollback()
+		rwDB.Close()
+		t.Fatalf("seedImportedChildIdentities: %v", err)
+	}
+	if err := tx.Commit(); err != nil {
+		rwDB.Close()
+		t.Fatal(err)
+	}
+	rwDB.Close()
+
+	// Refresh context file profile after direct test setup mutation, then create a new Veg row (ID=0 -> auto-allocate):
+	// AllocateChildID MUST skip deleted historical ID=1 and existing ID=2, assigning ID=3!
+	state, err = service.SwitchContext(state.ContextID, vprotest.ContextSelection(state))
+	if err != nil {
+		t.Fatal(err)
+	}
+	cov := 12.0
+	if err := service.Edit(state.ContextID, func(plots *vprocore.PlotService) error {
+		return plots.SaveVegRecord(vprocore.VegRecord{
+			PlotNumber: "00337",
+			Species:    "TSUGHET",
+			Cover1:     &cov,
+		})
+	}); err != nil {
+		t.Fatalf("SaveVegRecord: %v", err)
+	}
+
+	roDB, err := sqlutil.OpenReadOnly(state.ProjectPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer roDB.Close()
+	var newID int64
+	if err := roDB.QueryRow(`SELECT "ID" FROM Sample_Veg WHERE PlotNumber='00337' AND Species='TSUGHET'`).Scan(&newID); err != nil {
+		t.Fatal(err)
+	}
+	if newID == 1 || newID != 3 {
+		t.Fatalf("deleted historical child ID=1 was reused or unexpected ID allocated: got %d, want 3", newID)
 	}
 }
