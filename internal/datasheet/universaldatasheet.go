@@ -484,7 +484,40 @@ func escapeSQLiteLike(raw string) string {
 	return replacer.Replace(raw)
 }
 
+func isDatasheetTextOrNoneAffinity(declType string) bool {
+	u := strings.ToUpper(strings.TrimSpace(declType))
+	if u == "" {
+		return true
+	}
+	if strings.Contains(u, "INT") {
+		return false
+	}
+	return strings.Contains(u, "CHAR") || strings.Contains(u, "CLOB") || strings.Contains(u, "TEXT") || strings.Contains(u, "BLOB")
+}
+
+func canMatchFormattedNumeric(needle string) bool {
+	for _, r := range needle {
+		switch {
+		case r >= '0' && r <= '9':
+		case r == '.' || r == '-' || r == '+' || r == 'e' || r == 'E':
+		default:
+			return false
+		}
+	}
+	return needle != ""
+}
+
+func canMatchFormattedBoolean(needle string) bool {
+	if canMatchFormattedNumeric(needle) {
+		return true
+	}
+	lower := strings.ToLower(needle)
+	return strings.Contains("true", lower) || strings.Contains("false", lower)
+}
+
 func buildDatasheetWhereAndOrder(
+	ctx context.Context,
+	tx *sql.Tx,
 	target resolvedDatasheetTarget,
 	columns []DatasheetColumnMeta,
 	filters []DatasheetFilterSpec,
@@ -510,10 +543,66 @@ func buildDatasheetWhereAndOrder(
 			plotCol = "Plot"
 		}
 		if plotCol != "" {
-			suRel := `"su".` + vprocore.QuoteHeaderIdentifier(owner.Selection.SU+"_SU")
-			qPlot := vprocore.QuoteHeaderIdentifier(plotCol)
-			clauses = append(clauses,
-				`EXISTS(SELECT 1 FROM `+suRel+` AS __su WHERE typeof(__su."PlotNumber")='text' AND typeof(`+qPlot+`)='text' AND CAST(__su."PlotNumber" AS BLOB)=CAST(`+qPlot+` AS BLOB))`)
+			suTableName := owner.Selection.SU + "_SU"
+			suRel := `"su".` + vprocore.QuoteHeaderIdentifier(suTableName)
+			qPlot := `__t.` + vprocore.QuoteHeaderIdentifier(plotCol)
+			outerMeta := colLookup[strings.ToLower(plotCol)]
+
+			suCols, suColErr := vprocore.ReadSQLiteStorageColumns(ctx, tx, "su", suTableName)
+			if suColErr != nil {
+				return "", nil, "", suColErr
+			}
+			suPlotDecl := ""
+			for _, sc := range suCols {
+				if strings.EqualFold(sc.Name, "PlotNumber") {
+					suPlotDecl = sc.DeclaredType
+					break
+				}
+			}
+			suHasTextAffinity := isDatasheetTextOrNoneAffinity(suPlotDecl)
+
+			// Probe up to 901 distinct typeof='text' SU plot numbers for fast IN pushdown on large child tables.
+			var suPlots []string
+			allValidUTF8 := true
+			suRows, suErr := tx.QueryContext(ctx, `SELECT DISTINCT CAST("PlotNumber" AS BLOB) FROM `+suRel+` WHERE typeof("PlotNumber")='text' LIMIT 901`)
+			if suErr != nil {
+				return "", nil, "", suErr
+			}
+			for suRows.Next() {
+				var raw []byte
+				if err := suRows.Scan(&raw); err != nil {
+					suRows.Close()
+					return "", nil, "", err
+				}
+				s := string(raw)
+				if !utf8.ValidString(s) || strings.ContainsRune(s, 0) {
+					allValidUTF8 = false
+				}
+				suPlots = append(suPlots, s)
+			}
+			if err := errors.Join(suRows.Err(), suRows.Close()); err != nil {
+				return "", nil, "", err
+			}
+
+			if len(suPlots) == 0 {
+				clauses = append(clauses, "1=0")
+			} else {
+				idxEq := ""
+				if suHasTextAffinity {
+					idxEq = `__su."PlotNumber" COLLATE BINARY = ` + qPlot + ` COLLATE BINARY AND `
+				}
+				existsSQL := `EXISTS(SELECT 1 FROM ` + suRel + ` AS __su WHERE typeof(__su."PlotNumber")='text' AND typeof(` + qPlot + `)='text' AND ` + idxEq + `CAST(__su."PlotNumber" AS BLOB)=CAST(` + qPlot + ` AS BLOB))`
+				if len(suPlots) <= 900 && allValidUTF8 && isDatasheetTextOrNoneAffinity(outerMeta.DeclaredType) {
+					ph := make([]string, len(suPlots))
+					for i, p := range suPlots {
+						ph[i] = "?"
+						args = append(args, p)
+					}
+					clauses = append(clauses, "("+qPlot+" IN ("+strings.Join(ph, ",")+") AND "+existsSQL+")")
+				} else {
+					clauses = append(clauses, existsSQL)
+				}
+			}
 		}
 	}
 
@@ -525,7 +614,7 @@ func buildDatasheetWhereAndOrder(
 		if !utf8.ValidString(f.Value) || strings.ContainsRune(f.Value, 0) {
 			return "", nil, "", fmt.Errorf("filter value for %q must be valid UTF-8 without NUL", colMeta.Name)
 		}
-		qCol := vprocore.QuoteHeaderIdentifier(colMeta.Name)
+		qCol := `__t.` + vprocore.QuoteHeaderIdentifier(colMeta.Name)
 		op := strings.ToLower(strings.TrimSpace(f.Op))
 		if op == "" {
 			op = "contains"
@@ -540,8 +629,13 @@ func buildDatasheetWhereAndOrder(
 				continue
 			}
 			if colMeta.Name == "PlotNumber" || colMeta.Name == "Plot" {
-				clauses = append(clauses, "(typeof("+qCol+")='text' AND CAST("+qCol+" AS BLOB)=CAST(? AS BLOB))")
-				args = append(args, f.Value)
+				if isDatasheetTextOrNoneAffinity(colMeta.DeclaredType) {
+					clauses = append(clauses, "("+qCol+" = ? AND typeof("+qCol+")='text' AND CAST("+qCol+" AS BLOB)=CAST(? AS BLOB))")
+					args = append(args, f.Value, f.Value)
+				} else {
+					clauses = append(clauses, "(typeof("+qCol+")='text' AND CAST("+qCol+" AS BLOB)=CAST(? AS BLOB))")
+					args = append(args, f.Value)
+				}
 			} else if colMeta.IsBoolean {
 				bVal, err := parseFlexibleBoolean(f.Value)
 				if err != nil {
@@ -585,14 +679,30 @@ func buildDatasheetWhereAndOrder(
 			return "", nil, "", errors.New("global search must be valid UTF-8 without NUL")
 		}
 		likeArg := "%" + escapeSQLiteLike(trimmedGlobal) + "%"
+		matchNum := canMatchFormattedNumeric(trimmedGlobal)
+		matchBool := canMatchFormattedBoolean(trimmedGlobal)
 		var orParts []string
 		for _, colMeta := range columns {
-			qCol := vprocore.QuoteHeaderIdentifier(colMeta.Name)
+			qCol := `__t.` + vprocore.QuoteHeaderIdentifier(colMeta.Name)
+			if colMeta.Kind == "text" {
+				orParts = append(orParts, qCol+" LIKE ? ESCAPE '\\'")
+				args = append(args, likeArg)
+				continue
+			}
+			if colMeta.Kind == "boolean" {
+				if !matchBool {
+					continue
+				}
+			} else if !matchNum {
+				continue
+			}
 			orParts = append(orParts, "CAST("+qCol+" AS TEXT) LIKE ? ESCAPE '\\'")
 			args = append(args, likeArg)
 		}
 		if len(orParts) > 0 {
 			clauses = append(clauses, "("+strings.Join(orParts, " OR ")+")")
+		} else {
+			clauses = append(clauses, "1=0")
 		}
 	}
 
@@ -617,7 +727,7 @@ func buildDatasheetWhereAndOrder(
 		if strings.EqualFold(strings.TrimSpace(s.Direction), "desc") {
 			dir = "DESC"
 		}
-		qCol := vprocore.QuoteHeaderIdentifier(colMeta.Name)
+		qCol := `__t.` + vprocore.QuoteHeaderIdentifier(colMeta.Name)
 		// NULLs always sort last for predictable spreadsheet ergonomics, with case-insensitive text ordering.
 		if colMeta.Kind == "text" {
 			orderParts = append(orderParts, "CASE WHEN "+qCol+" IS NULL THEN 1 ELSE 0 END ASC", qCol+" COLLATE NOCASE "+dir, qCol+" COLLATE BINARY "+dir)
@@ -627,7 +737,7 @@ func buildDatasheetWhereAndOrder(
 	}
 	if len(orderParts) == 0 {
 		if pinned, ok := colLookup[strings.ToLower(target.pinnedColumn)]; ok {
-			qPin := vprocore.QuoteHeaderIdentifier(pinned.Name)
+			qPin := `__t.` + vprocore.QuoteHeaderIdentifier(pinned.Name)
 			if target.key == "Env" || target.key == "Veg" {
 				orderParts = append(orderParts, qPin+" COLLATE NOCASE ASC", qPin+" COLLATE BINARY ASC")
 			} else {
@@ -636,15 +746,15 @@ func buildDatasheetWhereAndOrder(
 		}
 		if target.key == "Humus" {
 			if _, ok := colLookup["upperdepth"]; ok {
-				orderParts = append(orderParts, `CASE WHEN "UpperDepth" IS NULL THEN 1 ELSE 0 END ASC`, `"UpperDepth" DESC`)
+				orderParts = append(orderParts, `CASE WHEN __t."UpperDepth" IS NULL THEN 1 ELSE 0 END ASC`, `__t."UpperDepth" DESC`)
 			}
 		} else if target.key == "Mineral" {
 			if _, ok := colLookup["upperdepth"]; ok {
-				orderParts = append(orderParts, `CASE WHEN "UpperDepth" IS NULL THEN 1 ELSE 0 END ASC`, `"UpperDepth" ASC`)
+				orderParts = append(orderParts, `CASE WHEN __t."UpperDepth" IS NULL THEN 1 ELSE 0 END ASC`, `__t."UpperDepth" ASC`)
 			}
 		}
 	}
-	orderParts = append(orderParts, "rowid ASC")
+	orderParts = append(orderParts, "__t.rowid ASC")
 	orderSQL := " ORDER BY " + strings.Join(orderParts, ", ")
 
 	return whereSQL, args, orderSQL, nil
@@ -660,41 +770,125 @@ func queryDatasheetWindowRows(
 	orderSQL string,
 	offset, limit int,
 ) ([]DatasheetRow, error) {
+	relation := vprocore.QuoteHeaderIdentifier(role) + "." + vprocore.QuoteHeaderIdentifier(tableName)
+
 	selectFields := make([]string, 0, 1+len(columns)*2)
-	selectFields = append(selectFields, "rowid")
+	selectFields = append(selectFields, "__t.rowid")
 	for _, col := range columns {
-		qCol := vprocore.QuoteHeaderIdentifier(col.Name)
+		qCol := `__t.` + vprocore.QuoteHeaderIdentifier(col.Name)
 		selectFields = append(selectFields,
 			"typeof("+qCol+")",
 			"CASE typeof("+qCol+") WHEN 'integer' THEN CAST("+qCol+" AS INTEGER) WHEN 'real' THEN CAST("+qCol+" AS REAL) ELSE CAST("+qCol+" AS BLOB) END",
 		)
 	}
-	relation := vprocore.QuoteHeaderIdentifier(role) + "." + vprocore.QuoteHeaderIdentifier(tableName)
-	query := "SELECT " + strings.Join(selectFields, ",") + " FROM " + relation + whereSQL + orderSQL
-	args := append([]any{}, whereArgs...)
-	if limit > 0 {
-		query += " LIMIT ? OFFSET ?"
-		args = append(args, limit, offset)
+
+	if limit <= 0 || limit > 900 {
+		query := "SELECT " + strings.Join(selectFields, ",") + " FROM " + relation + " AS __t" + whereSQL + orderSQL
+		args := append([]any{}, whereArgs...)
+		if limit > 0 {
+			query += " LIMIT ? OFFSET ?"
+			args = append(args, limit, offset)
+		}
+		rows, err := tx.QueryContext(ctx, query, args...)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+
+		result := []DatasheetRow{}
+		storages := make([]string, len(columns))
+		values := make([]any, len(columns))
+		var rowID int64
+		dest := make([]any, 0, 1+len(columns)*2)
+		dest = append(dest, &rowID)
+		for i := range columns {
+			dest = append(dest, &storages[i], &values[i])
+		}
+		for rows.Next() {
+			if err := ctx.Err(); err != nil {
+				return nil, err
+			}
+			for i := range values {
+				values[i] = nil
+			}
+			if err := rows.Scan(dest...); err != nil {
+				return nil, err
+			}
+			cells := make([]vprocore.ProjectMetadataCell, len(columns))
+			for i, val := range values {
+				cell, err := vprocore.ProjectMetadataCellInternal(storages[i], val)
+				if err != nil {
+					return nil, fmt.Errorf("row %d column %s: %w", rowID, columns[i].Name, err)
+				}
+				cells[i] = cell
+			}
+			result = append(result, DatasheetRow{
+				RowID: strconv.FormatInt(rowID, 10),
+				Cells: cells,
+			})
+		}
+		if err := errors.Join(rows.Err(), rows.Close()); err != nil {
+			return nil, err
+		}
+		return result, nil
 	}
 
-	rows, err := tx.QueryContext(ctx, query, args...)
+	// Stage 1: fetch only the bounded window of rowids so SQLite's top-N sorter never materializes 88 cell expressions for non-window rows.
+	idQuery := "SELECT __t.rowid FROM " + relation + " AS __t" + whereSQL + orderSQL + " LIMIT ? OFFSET ?"
+	idArgs := append(append([]any{}, whereArgs...), limit, offset)
+	idRows, err := tx.QueryContext(ctx, idQuery, idArgs...)
+	if err != nil {
+		return nil, err
+	}
+	var winRowIDs []int64
+	for idRows.Next() {
+		var rid int64
+		if err := idRows.Scan(&rid); err != nil {
+			idRows.Close()
+			return nil, err
+		}
+		winRowIDs = append(winRowIDs, rid)
+	}
+	if err := errors.Join(idRows.Err(), idRows.Close()); err != nil {
+		return nil, err
+	}
+	if len(winRowIDs) == 0 {
+		return []DatasheetRow{}, nil
+	}
+
+	// Stage 2: fetch full typed cell storage only for the winning window rowids and preserve window order.
+	ph := make([]string, len(winRowIDs))
+	fetchArgs := make([]any, len(winRowIDs))
+	posByRowID := make(map[int64]int, len(winRowIDs))
+	for i, rid := range winRowIDs {
+		ph[i] = "?"
+		fetchArgs[i] = rid
+		posByRowID[rid] = i
+	}
+	fetchQuery := "SELECT " + strings.Join(selectFields, ",") + " FROM " + relation + " AS __t WHERE __t.rowid IN (" + strings.Join(ph, ",") + ")"
+	rows, err := tx.QueryContext(ctx, fetchQuery, fetchArgs...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	result := []DatasheetRow{}
+	result := make([]DatasheetRow, len(winRowIDs))
+	storages := make([]string, len(columns))
+	values := make([]any, len(columns))
+	var rowID int64
+	dest := make([]any, 0, 1+len(columns)*2)
+	dest = append(dest, &rowID)
+	for i := range columns {
+		dest = append(dest, &storages[i], &values[i])
+	}
+
+	seen := 0
 	for rows.Next() {
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
-		var rowID int64
-		storages := make([]string, len(columns))
-		values := make([]any, len(columns))
-		dest := make([]any, 0, 1+len(columns)*2)
-		dest = append(dest, &rowID)
-		for i := range columns {
-			dest = append(dest, &storages[i], &values[i])
+		for i := range values {
+			values[i] = nil
 		}
 		if err := rows.Scan(dest...); err != nil {
 			return nil, err
@@ -707,13 +901,25 @@ func queryDatasheetWindowRows(
 			}
 			cells[i] = cell
 		}
-		result = append(result, DatasheetRow{
-			RowID: strconv.FormatInt(rowID, 10),
-			Cells: cells,
-		})
+		if idx, ok := posByRowID[rowID]; ok {
+			result[idx] = DatasheetRow{
+				RowID: strconv.FormatInt(rowID, 10),
+				Cells: cells,
+			}
+			seen++
+		}
 	}
 	if err := errors.Join(rows.Err(), rows.Close()); err != nil {
 		return nil, err
+	}
+	if seen != len(winRowIDs) {
+		filtered := make([]DatasheetRow, 0, seen)
+		for _, r := range result {
+			if r.RowID != "" {
+				filtered = append(filtered, r)
+			}
+		}
+		return filtered, nil
 	}
 	return result, nil
 }
@@ -784,26 +990,39 @@ func GetDatasheetPage(ctx context.Context, contexts *vprocore.ContextService, co
 		}
 
 		whereSQL, whereArgs, orderSQL, err := buildDatasheetWhereAndOrder(
-			target, columns, request.Filters, request.GlobalSearch, request.ScopeToActiveSU, owner, request.Sort,
+			ctx, tx, target, columns, request.Filters, request.GlobalSearch, request.ScopeToActiveSU, owner, request.Sort,
 		)
 		if err != nil {
 			return nil, err
 		}
 
 		relation := vprocore.QuoteHeaderIdentifier(target.role) + "." + vprocore.QuoteHeaderIdentifier(target.tableName)
-		var totalRows int64
-		if err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM "+relation+whereSQL, whereArgs...).Scan(&totalRows); err != nil {
-			return nil, err
-		}
-
 		var rows []DatasheetRow
-		if int64(request.Offset) < totalRows {
-			rows, err = queryDatasheetWindowRows(ctx, tx, target.role, target.tableName, columns, whereSQL, whereArgs, orderSQL, request.Offset, limit)
+		var totalRows int64
+		if request.Offset == 0 {
+			rows, err = queryDatasheetWindowRows(ctx, tx, target.role, target.tableName, columns, whereSQL, whereArgs, orderSQL, 0, limit)
 			if err != nil {
 				return nil, err
 			}
+			if len(rows) < limit {
+				totalRows = int64(len(rows))
+			} else {
+				if err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM "+relation+" AS __t"+whereSQL, whereArgs...).Scan(&totalRows); err != nil {
+					return nil, err
+				}
+			}
 		} else {
-			rows = []DatasheetRow{}
+			if err := tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM "+relation+" AS __t"+whereSQL, whereArgs...).Scan(&totalRows); err != nil {
+				return nil, err
+			}
+			if int64(request.Offset) < totalRows {
+				rows, err = queryDatasheetWindowRows(ctx, tx, target.role, target.tableName, columns, whereSQL, whereArgs, orderSQL, request.Offset, limit)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				rows = []DatasheetRow{}
+			}
 		}
 
 		if err := vprocore.ProfileOwnedFiles(owner); err != nil {
@@ -1301,7 +1520,7 @@ func PreviewDatasheetFindReplace(ctx context.Context, contexts *vprocore.Context
 		}
 
 		whereSQL, whereArgs, orderSQL, err := buildDatasheetWhereAndOrder(
-			target, columns, request.Filters, request.GlobalSearch, request.ScopeToActiveSU, owner, nil,
+			ctx, tx, target, columns, request.Filters, request.GlobalSearch, request.ScopeToActiveSU, owner, nil,
 		)
 		if err != nil {
 			return nil, err
