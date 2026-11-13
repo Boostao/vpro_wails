@@ -344,10 +344,10 @@
   const twoPageSourceLayoutEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT !== 'false';
   const twoPageCommonReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW !== 'false';
   const twoPageEntryReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW !== 'false';
-  const ordinarySoilUnavailable = twoPageSoilReviewEnabled && twoPageEntryReviewEnabled
+  const ordinarySoilUnavailable = twoPageSoilReviewEnabled && twoPageEntryReviewEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_REVIEW === 'true' && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW === 'true'
     ? 'Ordinary numeric-ID soil rows, counts and actions are unavailable in this experimental physical-soil review profile. Use complete-entry linked soil review; historical rows are not absent or discarded.'
     : null;
-  const ordinaryVegetationUnavailable = twoPageVegetationReviewEnabled && twoPageEntryReviewEnabled
+  const ordinaryVegetationUnavailable = twoPageVegetationReviewEnabled && twoPageEntryReviewEnabled && import.meta.env.VITE_TWO_PAGE_VEGETATION_REVIEW === 'true' && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW === 'true'
     ? 'Ordinary numeric-ID vegetation rows, counts, totals and actions are unavailable in this experimental physical-vegetation review profile. Use complete-entry linked vegetation review; historical rows are not absent or discarded.'
     : null;
   let twoPageOpen = $state(false);

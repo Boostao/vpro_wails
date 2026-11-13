@@ -109,7 +109,7 @@
   function setBusyState(nextLoading: boolean, nextMutating: boolean) {
     loading = nextLoading;
     mutating = nextMutating;
-    onBusyChange?.(nextLoading || nextMutating);
+    onBusyChange?.(nextLoading || nextMutating || exportingWorkbook);
   }
 
   async function refreshAll(): Promise<void> {
@@ -250,7 +250,9 @@
       errorMessage = validationErr;
       return;
     }
+    const gen = ++requestGeneration;
     exportingWorkbook = true;
+    onBusyChange?.(true);
     errorMessage = '';
     try {
       const plainOpts = $state.snapshot(options);
@@ -265,12 +267,17 @@
         includeUnitEdatopicTabs: exportUnitEdatopicTabs,
         options: plainOpts,
       });
+      if (gen !== requestGeneration) return;
       lastExportResult = res;
       statusNotice = `Published 4-sheet BEC Diagnostic workbook (${res.path}) in ${res.latencyMs.toFixed(1)} ms.`;
     } catch (err) {
+      if (gen !== requestGeneration) return;
       errorMessage = err instanceof Error ? err.message : String(err);
     } finally {
-      exportingWorkbook = false;
+      if (gen === requestGeneration) {
+        exportingWorkbook = false;
+        onBusyChange?.(loading || mutating);
+      }
     }
   }
 
@@ -314,7 +321,9 @@
   });
 
   onDestroy(() => {
+    requestGeneration++;
     reads.cancelAll();
+    onBusyChange?.(false);
   });
 
   const matrixSections = $derived(

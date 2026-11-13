@@ -87,6 +87,10 @@ test('shared option gates extended presentation and restricts heights without cl
   const twoPage = read('TwoPageEntryEditor.svelte');
   assert.match(twoPage, /data-extended-shrubs/);
   assert.match(twoPage, /Show extended shrub layers/);
+  for (const twoPageFile of ['TwoPageEntryEditor.svelte', 'TwoPageParentCommonEditor.svelte', 'TwoPageParentEditor.svelte']) {
+  const tpSrc = read(twoPageFile);
+  assert.doesNotMatch(tpSrc, /Normal two-page source|CHARS two-page source/, `${twoPageFile} must not render redundant CHARS source buttons`);
+  }
   const siviShared = read('SIVIParentSharedFields.svelte');
   assert.match(siviShared, /data-sivi-extended-shrubs/);
   assert.match(siviShared, /data-sivi-arctic-fields/);

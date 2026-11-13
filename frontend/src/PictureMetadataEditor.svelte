@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import type { PictureMetadataSession } from './pictureMetadataSession';
   import { pictureMetadataColumns, pictureMetadataFieldValue, type PictureMetadataColumn } from './pictureMetadataEditor';
 
   let { session, disabled = false }: { session: PictureMetadataSession; disabled?: boolean } = $props();
   let revision = $state(0);
-  $effect(() => session.subscribe(() => revision++));
+  $effect(() => session.subscribe(() => untrack(() => revision++)));
   const view = $derived.by(() => { revision; return session.view(); });
   const close = $derived.by(() => { revision; return session.closeState(); });
   let error = $state('');

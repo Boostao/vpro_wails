@@ -461,3 +461,88 @@ test('RSidecarWorkbench client actions detach Svelte 5 proxies via structuredClo
   destroyCallbacks[0]();
   root();
 });
+
+test('RSidecarWorkbench displays Climate Engine: Rscript Required (Unavailable) when runtimeStatus.available is false', async () => {
+  const client = await import('svelte/internal/client');
+  let script = read('RSidecarWorkbench.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  const fullSrc = read('RSidecarWorkbench.svelte');
+  assert.match(fullSrc, /Rscript Required \(Unavailable\)/);
+
+  const unavailablePort = {
+    async detectRRuntime() {
+      return {
+        available: false,
+        rscriptPath: '',
+        rVersion: '',
+        rVersionFull: '',
+        platform: 'linux',
+        quartoAvailable: false,
+        quartoPath: '',
+        quartoVersion: '',
+        climrCachePath: '',
+        climrRastersCached: false,
+        readyForClimate: false,
+        readyForClustering: false,
+        readyForQuarto: false,
+        missingRequired: ['climr'],
+        packages: [],
+        setupInstructions: [],
+      };
+    },
+  };
+  script = script.replace('oncontextswitched,', 'oncontextswitched, inspect,');
+  script += `\n$effect(() => inspect({ refreshRRuntime, getRuntime: () => runtimeStatus }));`;
+  const compiled = compile(`<script lang="ts">${script}</script>`, { generate: 'client' });
+  assert.equal(compiled.warnings.length, 0);
+  const modObj = { exports: {} };
+  vm.runInNewContext(
+    ts.transpileModule(compiled.js.code, {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+    }).outputText,
+    {
+      module: modObj,
+      exports: modObj.exports,
+      structuredClone,
+      require(name) {
+        if (name === 'svelte') return { onDestroy: () => {} };
+        if (name === 'svelte/internal/client') return client;
+        if (name.startsWith('svelte/')) return require(name);
+        if (name === './rSidecarWorkbench') return wb;
+        throw new Error(`Unexpected module ${name}`);
+      },
+    }
+  );
+  let api;
+  const dispose = client.effect_root(() => {
+    modObj.exports.default(null, {
+      contextId: 'ctx-unavail',
+      activeProject: 'Sample',
+      activeSu: 'None',
+      port: unavailablePort,
+      inspect: v => {
+        api = v;
+      },
+    });
+  });
+  try {
+    client.flush();
+    await api.refreshRRuntime();
+    client.flush();
+    assert.equal(api.getRuntime().available, false);
+    // Also verify SSR render with pre-seeded runtimeStatus renders exact unavailable label
+    const seededSrc = fullSrc.replace(
+      'let runtimeStatus = $state<RRuntimeStatus | null>(null);',
+      'let runtimeStatus = $state<RRuntimeStatus | null>({ available: false, rscriptPath: "", rVersion: "", rVersionFull: "", platform: "linux", quartoAvailable: false, quartoPath: "", quartoVersion: "", climrCachePath: "", climrRastersCached: false, readyForClimate: false, readyForClustering: false, readyForQuarto: false, missingRequired: [], packages: [], setupInstructions: [] });'
+    );
+    const SeededComp = serverComponent(seededSrc, 'RSidecarWorkbench.svelte', {
+      './rSidecarWorkbench': wb,
+    });
+    const html = render(SeededComp, {
+      props: { contextId: 'ctx-ssr', activeProject: 'Sample', activeSu: 'None' },
+    }).body;
+    assert.match(html, /Climate Engine:\s*Rscript Required \(Unavailable\)/);
+    assert.doesNotMatch(html, /Climate Engine:\s*Offline Ministry BGC Lapse Model/);
+  } finally {
+    dispose();
+  }
+});

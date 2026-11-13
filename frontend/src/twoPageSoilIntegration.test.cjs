@@ -656,6 +656,51 @@ test('compiled flag matrix preserves legacy parent reads unless the complete phy
   }
 });
 
+test('default production build (unset VITE_TWO_PAGE_* env vars) keeps both two-page soil review and ordinary 6-tab FS882 soils enabled', async () => {
+  const root = read('FS882Form.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  const sessionsSource = read('twoPageSoilSessions.ts');
+  let sessionFlags;
+  const flagBody = render(
+    serverComponent(
+      `<script lang="ts">let { inspect } = $props();
+        ${sessionsSource.match(/export const twoPageSoilReviewEnabled = [^;]+;/)[0].replace(/^export /, '')}
+        ${root.match(/const twoPageReviewEnabled = [^;]+;/)[0]}
+        ${root.match(/const twoPageEntryReviewEnabled = [^;]+;/)[0]}
+        function inspectFlags() { inspect({ twoPageSoilReviewEnabled, twoPageEntryReviewEnabled }); }
+        inspectFlags();</script>`,
+      'DefaultSoilFlagsTest.svelte',
+      {},
+      {}
+    ),
+    { props: { inspect: value => { sessionFlags = value; } } }
+  ).body;
+  assert.equal(typeof flagBody, 'string');
+  assert.equal(sessionFlags.twoPageSoilReviewEnabled, true);
+  assert.equal(sessionFlags.twoPageEntryReviewEnabled, true);
+
+  const profile = compiledSoilProfile({});
+  assert.equal(profile.ordinarySoilUnavailable, null);
+  assert.equal(profile.soilEditingDisabled, false);
+
+  const calls = [];
+  const context = componentFunctions('FS882Form.svelte', ['loadChildData'], {
+    loadRequest: 1, childRevision: 0, siviIdentityEnabled: false,
+    ...profile,
+    reads: { track: value => value }, PlotService: {
+      ListVegRecords: () => { calls.push('veg'); return operation([]); },
+      ListHumusRecords: () => { calls.push('humus'); return operation([{ id: 1, horizon: 'L' }]); },
+      ListMineralRecords: () => { calls.push('mineral'); return operation([{ id: 2, horizon: 'Bm' }]); },
+      ListOtherRecords: () => { calls.push('other'); return operation([]); },
+      ListAuditReadEntries: () => { calls.push('audit'); return operation([]); },
+      GetChildCapabilities: kind => { calls.push(`cap:${kind}`); return operation({ horizon: true }); },
+    },
+  });
+  await context.actions.loadChildData(fixture.owner.plot);
+  assert.deepEqual(calls, ['veg', 'humus', 'mineral', 'other', 'audit', 'cap:Veg', 'cap:Humus', 'cap:Mineral', 'cap:Other']);
+  assert.equal(context.humusList.length, 1);
+  assert.equal(context.mineralList.length, 1);
+});
+
 test('physical-soil profile propagates unrelated read failures without becoming an empty success', async () => {
   for (const failing of ['veg', 'other', 'audit', 'cap:Humus']) {
     const read = kind => kind === failing ? operation(Promise.reject(new Error(`physical ${kind} read failure`))) : operation([]);

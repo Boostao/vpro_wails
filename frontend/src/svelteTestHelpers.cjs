@@ -167,7 +167,7 @@ function componentFunctions(filename, names, values) {
       presentationMutationHeld: false, presentationInvalid: false,
       fieldListHeld: false, fieldListBusy: false, environmentalHeld: false,
     } : {}),
-    ...(filename === 'App.svelte' ? { projectReportBusy: false, summaryPreferenceBusy: false, summaryFieldListBusy: false, summaryEnvironmentalBusy: false, externalSUEnvironmentBusy: false, editorInitializing: false } : {}), ...defaultSoilReviewProfile, ...values });
+    ...(filename === 'App.svelte' ? { projectReportBusy: false, summaryPreferenceBusy: false, summaryFieldListBusy: false, summaryEnvironmentalBusy: false, externalSUEnvironmentBusy: false, editorInitializing: false, companionPanelBusy: false, workbenchDirtyLabel: '' } : {}), ...defaultSoilReviewProfile, ...values });
   const code = selected.map(node => node.getText(ast)).join('\n').replaceAll('import.meta.env', '__testEnvironment') +
     `\nthis.actions = {${names.join(',')}};`;
   vm.runInContext(ts.transpileModule(code, { compilerOptions: {

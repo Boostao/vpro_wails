@@ -361,6 +361,7 @@
     if (!mapContainer || mapInstance) return;
     ensurePMTilesProtocol();
     try {
+      setWorkerUrl(maplibreWorkerUrl);
       const style = buildMapLibreGeospatialStyle(payload?.manifest, $state.snapshot(visibility));
       const map = new MapLibreMap({
         container: mapContainer,

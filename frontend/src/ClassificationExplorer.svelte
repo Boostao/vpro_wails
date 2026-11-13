@@ -30,8 +30,10 @@
     su?: string;
     hierarchy?: string;
     initialMode?: ExplorerMode;
+    operationHeld?: boolean;
     port?: ClassificationBackendPort;
     onBusyChange?: (busy: boolean) => void;
+    onDirtyChange?: (dirty: boolean) => void;
     onContextChanged?: (nextContextId: string, newState: unknown) => void;
     onOpenPlot?: (plotNumber: string) => void;
     onRequestSUSync?: (direction: 'su_to_env' | 'env_to_su') => void;
@@ -43,8 +45,10 @@
     su = 'None',
     hierarchy = 'None',
     initialMode = 'su_tree',
+    operationHeld = false,
     port = defaultClassificationBackendPort,
     onBusyChange,
+    onDirtyChange,
     onContextChanged,
     onOpenPlot,
     onRequestSUSync,
@@ -55,12 +59,16 @@
 
   let mode = $state<ExplorerMode>(untrack(() => initialMode));
   let effectiveContextId = $state(untrack(() => contextId));
+  let prevPropContextId = untrack(() => contextId);
 
-  // Keep effectiveContextId synchronized when parent contextId prop updates
+  // Keep effectiveContextId synchronized when parent contextId prop updates externally
   $effect(() => {
-    if (contextId && contextId !== effectiveContextId) {
-      effectiveContextId = contextId;
-      void reloadActivePane();
+    if (contextId && contextId !== prevPropContextId) {
+      prevPropContextId = contextId;
+      if (contextId !== effectiveContextId) {
+        effectiveContextId = contextId;
+        void reloadActivePane();
+      }
     }
   });
 
@@ -168,7 +176,8 @@
   );
 
   $effect(() => {
-    onBusyChange?.(busy || mutating || !!flatValidationError);
+    onBusyChange?.(busy || mutating || flatDirty || !!flatValidationError);
+    onDirtyChange?.(!busy && !mutating && flatDirty);
   });
 
   async function reloadActivePane() {
@@ -316,9 +325,15 @@
         removeFromSuWhenUnassigned: false,
       });
       lastHistoryId = res.historyId;
-      statusBanner = targetUnit
-        ? `Assigned ${res.changedPlots} plot(s) to ${targetUnit}.`
-        : `Moved ${res.changedPlots} plot(s) to Unassigned.`;
+      if (res.changedPlots === 0) {
+        statusBanner = targetUnit
+          ? `0 plot(s) changed in ${res.tableName} (plots are already assigned to ${targetUnit}, or the active Site Unit table is read-only/master).`
+          : `0 plot(s) changed in ${res.tableName} (plots are already unassigned, or the active Site Unit table is read-only/master).`;
+      } else {
+        statusBanner = targetUnit
+          ? `Assigned ${res.changedPlots} plot(s) to ${targetUnit}.`
+          : `Moved ${res.changedPlots} plot(s) to Unassigned.`;
+      }
       await loadSUTreeAndPicker();
       if (inspectedPlot && plotsToMove.includes(inspectedPlot.plotNumber)) {
         await inspectPlot(inspectedPlot.plotNumber);
@@ -682,6 +697,7 @@
   onDestroy(() => {
     generation++;
     reads.cancelAll();
+    onDirtyChange?.(false);
     onBusyChange?.(false);
   });
 </script>

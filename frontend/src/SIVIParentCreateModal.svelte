@@ -15,7 +15,9 @@
     activeProject,
     activeSu = 'None',
     open = true,
+    operationHeld = false,
     port = defaultSIVIParentCreatePort,
+    onBusyChange,
     oncreated,
     onundone,
     onclose,
@@ -24,7 +26,9 @@
     activeProject: string;
     activeSu?: string;
     open?: boolean;
+    operationHeld?: boolean;
     port?: SIVIParentCreatePort;
+    onBusyChange?: (busy: boolean) => void;
     oncreated?: (result: CreateSIVIPlotResult) => void;
     onundone?: (plotNumber: string) => void;
     onclose?: () => void;
@@ -46,9 +50,15 @@
   let createdPlots = $state<SIVICreatedPlotEntry[]>([]);
   let confirmUndoId = $state<string | null>(null);
   let busy = $state(false);
+  let historyBusy = $state(false);
   let error = $state<string | null>(null);
   let status = $state<string | null>(null);
   let generation = 0;
+  let historyGen = 0;
+
+  function reportBusy() {
+    onBusyChange?.(busy || historyBusy);
+  }
 
   const draftErrors = $derived(
     validateCreateSIVIPlotDraft({
@@ -75,20 +85,33 @@
 
   onDestroy(() => {
     generation++;
+    historyGen++;
+    onBusyChange?.(false);
   });
 
   async function refreshHistory() {
-    const gen = ++generation;
+    const hGen = ++historyGen;
+    historyBusy = true;
+    reportBusy();
     try {
       const list = await port.listCreatedPlots(contextId);
-      if (gen !== generation) return;
+      if (hGen !== historyGen) return;
       createdPlots = list ?? [];
     } catch (cause) {
-      if (gen === generation) error = `Failed reading SIVI plot creation history: ${String(cause)}`;
+      if (hGen === historyGen) error = `Failed reading SIVI plot creation history: ${String(cause)}`;
+    } finally {
+      if (hGen === historyGen) {
+        historyBusy = false;
+        reportBusy();
+      }
     }
   }
 
   async function submitCreate() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before creating a SIVI plot.';
+      return;
+    }
     const req = $state.snapshot({
       requestId: crypto.randomUUID(),
       plotNumber,
@@ -111,6 +134,7 @@
     }
     const gen = ++generation;
     busy = true;
+    reportBusy();
     error = null;
     status = null;
     try {
@@ -125,11 +149,18 @@
     } catch (cause) {
       if (gen === generation) error = `Create SIVI plot failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) {
+        busy = false;
+        reportBusy();
+      }
     }
   }
 
   async function executeUndo(entry: SIVICreatedPlotEntry) {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before undoing SIVI plot creation.';
+      return;
+    }
     const req = $state.snapshot({
       requestId: crypto.randomUUID(),
       creationRequestId: entry.requestId,
@@ -137,6 +168,7 @@
     });
     const gen = ++generation;
     busy = true;
+    reportBusy();
     error = null;
     status = null;
     try {
@@ -150,7 +182,10 @@
     } catch (cause) {
       if (gen === generation) error = `Undo SIVI plot creation failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) {
+        busy = false;
+        reportBusy();
+      }
     }
   }
 </script>

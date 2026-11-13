@@ -32,7 +32,7 @@ func TestVegetationSpeciesCanonicalContextUsesReadonlyFamilyNotProjectWriter(t *
 		}
 		files[path] = content
 	}
-	if err := service.CreatePlot(state.ContextID, vprocore.FS882Header{PlotNumber: "SPECIES1"}); err != nil {
+	if err := service.CreatePlot(state.ContextID, vprocore.FS882Header{PlotNumber: "SPEC001"}); err != nil {
 		t.Fatal(err)
 	}
 	service.Plots.SetAuditStrength(3)
@@ -41,12 +41,12 @@ func TestVegetationSpeciesCanonicalContextUsesReadonlyFamilyNotProjectWriter(t *
 		t.Fatal(err)
 	}
 	defer release()
-	if _, err := db.Exec(`INSERT INTO Sample_Veg(PlotNumber,Species,ID,Cover1) VALUES ('SPECIES1','RAW',-123,0)`); err != nil {
+	if _, err := db.Exec(`INSERT INTO Sample_Veg(PlotNumber,Species,ID,Cover1) VALUES ('SPEC001','RAW',-123,0)`); err != nil {
 		t.Fatal(err)
 	}
 	before := vprotest.SubstrateSnapshot(t, db)
-	audits := vprotest.AuditCount(t, db, "SPECIES1")
-	if err := service.UpdateVegetationSpecies(state.ContextID, "SPECIES1", []vprocore.VegetationSpeciesUpdate{
+	audits := vprotest.AuditCount(t, db, "SPEC001")
+	if err := service.UpdateVegetationSpecies(state.ContextID, "SPEC001", []vprocore.VegetationSpeciesUpdate{
 		{ID: -123, Form: "SubVegAXL_BC", Expected: "RAW", Value: *options[0].Code},
 	}); err != nil {
 		t.Fatal("writer must validate against the owned canonical family:", err)
@@ -55,7 +55,7 @@ func TestVegetationSpeciesCanonicalContextUsesReadonlyFamilyNotProjectWriter(t *
 	if err := db.QueryRow(`SELECT Species FROM Sample_Veg WHERE ID=-123`).Scan(&stored); err != nil || stored != *options[0].Code {
 		t.Fatal("exact selected source code differs:", stored, err)
 	}
-	if vprotest.AuditCount(t, db, "SPECIES1") != audits+1 {
+	if vprotest.AuditCount(t, db, "SPEC001") != audits+1 {
 		t.Fatal("species selection audit differs")
 	}
 	after := vprotest.SubstrateSnapshot(t, db)

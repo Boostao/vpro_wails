@@ -184,3 +184,90 @@ test('successful reload synchronizes selectable original and clears preview with
   panel.actions.synchronizeMetadataOriginal();
   assert.equal(panel.review.records.rows[0].cells[2].text, refreshed.cells[2].text);
 });
+
+test('client-compiled PictureMetadataEditor mounts with live PictureMetadataSession without effect_update_depth_exceeded loop', async () => {
+  const ts = require('typescript');
+  const { compile } = require('svelte/compiler');
+  const client = await import('svelte/internal/client');
+  const { PictureMetadataSession } = loadTypeScript('pictureMetadataSession.ts', {
+    './readRequests': loadTypeScript('readRequests.ts', { '@wailsio/runtime': {} }),
+    './projectMetadataEditor': metadata,
+    './pictureRead': picture,
+    './pictureMetadataEditor': editor,
+  });
+
+  let script = source('PictureMetadataEditor.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  script = script.replace(
+    'let { session, disabled = false }: { session: PictureMetadataSession; disabled?: boolean } = $props();',
+    'let { session, disabled = false, inspect }: { session: PictureMetadataSession; disabled?: boolean; inspect?: (value: unknown) => void } = $props();'
+  );
+  script += '\n$effect(() => { inspect?.({ view, close, stage }); });';
+
+  const compiled = compile(`<script lang="ts">${script}</script>`, {
+    filename: 'PictureMetadataEditor.svelte',
+    generate: 'client',
+  });
+  assert.equal(compiled.warnings.length, 0);
+
+  const transpiled = ts.transpileModule(compiled.js.code, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  }).outputText;
+
+  const moduleObj = { exports: {} };
+  vm.runInNewContext(transpiled, {
+    module: moduleObj,
+    exports: moduleObj.exports,
+    crypto: { randomUUID: () => '00000000-0000-4000-8000-000000000001' },
+    require(name) {
+      if (name === 'svelte') return { untrack: client.untrack };
+      if (name === 'svelte/internal/client') return client;
+      if (name.startsWith('svelte/')) return require(name);
+      if (name === './pictureMetadataEditor') return editor;
+      throw new Error(`Unexpected PictureMetadataEditor dependency ${name}`);
+    },
+  });
+
+  const review = {
+    ...owner,
+    records: {
+      columns: ['ID', 'PicDir', 'PicName', 'PlotNumber', 'PicComment'].map(name => ({
+        name,
+        declaredType: 'TEXT',
+      })),
+      rows: [
+        {
+          rowId: '9223372036854775806',
+          cells: [cell('integer', '-3'), cell('text', 'Default'), cell('text', 'Original.jpg'), cell('text', 'P'), cell()],
+        },
+      ],
+    },
+  };
+  const liveSession = new PictureMetadataSession(owner, {
+    read: () => Object.assign(Promise.resolve(review), { cancel() {} }),
+    save: () => { throw new Error('Unexpected save'); },
+    receipt: () => { throw new Error('Unexpected receipt'); },
+  });
+  liveSession.select(review, '9223372036854775806');
+
+  let exposed = null;
+  const dispose = client.effect_root(() => {
+    moduleObj.exports.default(null, {
+      session: liveSession,
+      disabled: false,
+      inspect: value => { exposed = value; },
+    });
+  });
+  try {
+    client.flush();
+    assert.ok(exposed);
+    assert.equal(exposed.view.draft.id, -3);
+    assert.equal(exposed.close.unsaved, false);
+    exposed.stage('PicName', 'Updated.jpg', false);
+    client.flush();
+    assert.equal(exposed.close.unsaved, true);
+    assert.equal(exposed.close.canSave, true);
+  } finally {
+    dispose();
+  }
+});
+

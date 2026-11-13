@@ -370,3 +370,13 @@ test('ProjectAdminWorkbench client actions detach Svelte 5 proxies and enforce q
     dispose();
   }
 });
+
+test('App.svelte keeps ProjectAdminWorkbench mounted across context activation so lifecycle receipts remain visible', () => {
+  const appSrc = read('App.svelte');
+  const sectionStart = appSrc.indexOf("{:else if view === 'project-admin'");
+  const sectionEnd = appSrc.indexOf("{:else if view === 'lump-editor'");
+  assert.ok(sectionStart > 0 && sectionEnd > sectionStart);
+  const block = appSrc.slice(sectionStart, sectionEnd);
+  assert.doesNotMatch(block, /\{#key \$projectState\.contextId\}/, 'project-admin must update in place without #key remount');
+  assert.match(block, /projectId=""/, 'ProjectMetadataPresets must receive empty projectId to auto-detect existing _Metadata row');
+});

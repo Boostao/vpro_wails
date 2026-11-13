@@ -25,13 +25,17 @@
     contextId,
     activeProject,
     activeSu = 'None',
+    operationHeld = false,
     port = defaultProjectAdminPort,
+    onBusyChange,
     oncontextswitched,
   }: {
     contextId: string;
     activeProject: string;
     activeSu?: string;
+    operationHeld?: boolean;
     port?: ProjectAdminPort;
+    onBusyChange?: (busy: boolean) => void;
     oncontextswitched?: (state: unknown) => void;
   } = $props();
 
@@ -41,6 +45,11 @@
   let error = $state<string | null>(null);
   let statusMessage = $state<string | null>(null);
   let generation = 0;
+
+  function setBusy(next: boolean) {
+    busy = next;
+    onBusyChange?.(next);
+  }
 
   // Lifecycle state
   let newProjName = $state('');
@@ -126,9 +135,14 @@
 
   onDestroy(() => {
     generation++;
+    onBusyChange?.(false);
   });
 
   async function submitCreateNewProject() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before creating a project.';
+      return;
+    }
     const req = $state.snapshot({
       projectName: newProjName,
       projectId: newProjId || undefined,
@@ -143,7 +157,7 @@
       return;
     }
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -157,11 +171,15 @@
     } catch (cause) {
       if (gen === generation) error = `Create project failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function submitSaveProjectAs() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before saving project copy.';
+      return;
+    }
     const vErr = validateProjectNameInput(saveAsName);
     if (vErr) {
       error = vErr;
@@ -173,7 +191,7 @@
       activateOnSuccess: saveAsActivate,
     });
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -187,11 +205,15 @@
     } catch (cause) {
       if (gen === generation) error = `Save Project As failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function submitExportSplinter() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before exporting splinter project.';
+      return;
+    }
     const req = $state.snapshot({
       splinterProject: splinterName,
       destinationPath: splinterDest || undefined,
@@ -206,7 +228,7 @@
       return;
     }
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -220,14 +242,18 @@
     } catch (cause) {
       if (gen === generation) error = `Export Splinter Project failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function runCompliance() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before running compliance validation.';
+      return;
+    }
     const opts = $state.snapshot({ useActiveSu: complianceUseSu });
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -241,18 +267,22 @@
     } catch (cause) {
       if (gen === generation) error = `Compliance validation failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function runQuarantine() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before quarantining orphan rows.';
+      return;
+    }
     if (!confirmQuarantine) {
       error = 'Confirm orphan quarantine before moving orphan child rows.';
       return;
     }
     const req = $state.snapshot({});
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -266,13 +296,17 @@
     } catch (cause) {
       if (gen === generation) error = `Orphan quarantine failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function runPreviewOptimizeVeg() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before previewing OptimizeVeg.';
+      return;
+    }
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -284,18 +318,22 @@
     } catch (cause) {
       if (gen === generation) error = `Preview OptimizeVeg failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function runApplyOptimizeVeg() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before applying OptimizeVeg.';
+      return;
+    }
     if (!optPreview) {
       error = 'Run Preview OptimizeVeg before applying consolidation.';
       return;
     }
     const req = $state.snapshot({ expectedDigest: optPreview.previewDigest });
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -307,11 +345,15 @@
     } catch (cause) {
       if (gen === generation) error = `Apply OptimizeVeg failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function runCompareProjects() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before comparing projects.';
+      return;
+    }
     if (!cmpTargetPath.trim()) {
       error = 'Target .db file path is required to compare projects.';
       return;
@@ -323,7 +365,7 @@
       targetProject: cmpTargetProject.trim() || undefined,
     });
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -334,11 +376,15 @@
     } catch (cause) {
       if (gen === generation) error = `Compare Projects failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function runPreviewMerge() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before previewing merge.';
+      return;
+    }
     if (!mergeSourcePath.trim()) {
       error = 'Staging source .db path is required for 3-way merge preview.';
       return;
@@ -352,7 +398,7 @@
       baseProject: mergeBaseProject.trim() || undefined,
     });
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -366,11 +412,15 @@
     } catch (cause) {
       if (gen === generation) error = `Preview 3-Way Merge failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function runExecuteMerge() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before executing merge.';
+      return;
+    }
     if (!mergePreview) {
       error = 'Run Preview 3-Way Merge before executing merge.';
       return;
@@ -388,7 +438,7 @@
       fieldResolutions: mergeFieldResolutions,
     });
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -400,7 +450,7 @@
     } catch (cause) {
       if (gen === generation) error = `Execute 3-Way Merge failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 

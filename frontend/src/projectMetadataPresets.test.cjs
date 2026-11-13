@@ -223,3 +223,87 @@ test('ProjectMetadataPresets SSR and client mount preview derived plot metrics a
     dispose();
   }
 });
+
+test('ProjectMetadataPresets refreshes derived preview and auto-detects ProjectID when contextId switches in place', async () => {
+  const client = await import('svelte/internal/client');
+  let script = read('ProjectMetadataPresets.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  script = script.replace('onapplied,', 'onapplied, inspect,');
+  script += `\n$effect(() => inspect({
+    getState: () => ({ targetProjectId, derivedPreview, status }),
+  }));`;
+  const compiled = compile(`<script lang="ts">${script}</script>`, { generate: 'client' });
+  assert.equal(compiled.warnings.length, 0);
+  const ast = ts.createSourceFile('presetsInPlace.js', compiled.js.code, ts.ScriptTarget.Latest, true);
+  const code = ast.statements
+    .filter(n => !ts.isImportDeclaration(n))
+    .map(n => n.getText(ast))
+    .join('\n')
+    .replace('export default function', 'function');
+
+  const mountFn = new Function(
+    '$',
+    'onDestroy',
+    'onMount',
+    'defaultProjectMetadataAutomationPort',
+    'COVER_DESCRIPTION_ORDER',
+    'formatCollectionCode',
+    'formatDatumCode',
+    'validateMetadataAutomationRequest',
+    code + '\nreturn _unknown_;'
+  );
+
+  const deriveCalls = [];
+  const mockPort = {
+    listPresets: () => Promise.resolve(structuredClone(samplePresets)),
+    deriveFromPlots: (cid, pid) => {
+      deriveCalls.push([cid, pid]);
+      return Promise.resolve({
+        ...structuredClone(sampleDerived),
+        projectId: cid === 'ctx-2' ? 'BULK26' : 'SMP26',
+      });
+    },
+    applyAutomation: () => Promise.resolve(null),
+  };
+
+  const ctxProp = client.state('ctx-1');
+  let api;
+  const dispose = client.effect_root(() =>
+    mountFn(
+      client,
+      () => {},
+      fn => fn(),
+      presetsModule.defaultProjectMetadataAutomationPort,
+      presetsModule.COVER_DESCRIPTION_ORDER,
+      presetsModule.formatCollectionCode,
+      presetsModule.formatDatumCode,
+      presetsModule.validateMetadataAutomationRequest
+    )(null, {
+      get contextId() {
+        return client.get(ctxProp);
+      },
+      projectId: '',
+      port: mockPort,
+      inspect: v => {
+        api = v;
+      },
+    })
+  );
+  try {
+    client.flush();
+    await new Promise(r => setTimeout(r, 10));
+    client.flush();
+    assert.equal(api.getState().targetProjectId, 'SMP26');
+
+    client.set(ctxProp, 'ctx-2');
+    client.flush();
+    await new Promise(r => setTimeout(r, 10));
+    client.flush();
+    assert.equal(api.getState().targetProjectId, 'BULK26');
+    assert.deepEqual(deriveCalls, [
+      ['ctx-1', ''],
+      ['ctx-2', ''],
+    ]);
+  } finally {
+    dispose();
+  }
+});

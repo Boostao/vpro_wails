@@ -29,13 +29,17 @@
     contextId,
     activeProject,
     activeSu = 'None',
+    operationHeld = false,
     port = defaultRSidecarPort,
+    onBusyChange,
     oncontextswitched,
   }: {
     contextId: string;
     activeProject: string;
     activeSu?: string;
+    operationHeld?: boolean;
     port?: RSidecarBackendPort;
+    onBusyChange?: (busy: boolean) => void;
     oncontextswitched?: (state: unknown) => void;
   } = $props();
 
@@ -46,6 +50,11 @@
   let statusMessage = $state<string | null>(null);
   let generation = 0;
   let trackedContextId = '';
+
+  function setBusy(next: boolean) {
+    busy = next;
+    onBusyChange?.(next);
+  }
 
   // Tab 1: Runtime & Cached Plot Climate state
   let runtimeStatus = $state<RRuntimeStatus | null>(null);
@@ -101,7 +110,7 @@
   $effect(() => {
     if (trackedContextId !== '' && trackedContextId !== contextId) {
       generation++;
-      busy = false;
+      setBusy(false);
       selectedCellDetail = null;
     }
     trackedContextId = contextId;
@@ -109,6 +118,7 @@
 
   onDestroy(() => {
     generation++;
+    onBusyChange?.(false);
   });
 
   const displayedClimateRows = $derived(
@@ -209,8 +219,9 @@
   );
 
   async function refreshRRuntime() {
+    if (operationHeld) return;
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -223,14 +234,15 @@
     } catch (cause) {
       if (gen === generation) error = `Runtime probe failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function loadCachedPlotClimate() {
+    if (operationHeld) return;
     const periodSnap = $state.snapshot(refPeriod);
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -241,11 +253,15 @@
     } catch (cause) {
       if (gen === generation) error = `Load cached plot climate failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function runClimateAndDualEdatopic() {
+    if (operationHeld) {
+      error = 'Wait for the current operation or decision before computing climate normals.';
+      return;
+    }
     const req = $state.snapshot({
       refPeriod,
       groupBy: climateGroupBy,
@@ -254,7 +270,7 @@
       forceRefresh: climateForceRefresh,
     });
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -268,11 +284,15 @@
     } catch (cause) {
       if (gen === generation) error = `Climate & aSMR computation failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function submitClustering() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before running BEC_R clustering.';
+      return;
+    }
     const req = $state.snapshot({
       method: clusterMethod,
       distance: clusterDistance,
@@ -295,7 +315,7 @@
       return;
     }
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -310,11 +330,15 @@
     } catch (cause) {
       if (gen === generation) error = `BEC_R clustering failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function submitPromoteCandidate() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before promoting candidate SU.';
+      return;
+    }
     const candName = clusterResult?.candidateSuName || `${activeProject}_ClusterCandidate`;
     const req = $state.snapshot({
       candidateSuName: candName,
@@ -329,7 +353,7 @@
       return;
     }
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -343,11 +367,15 @@
     } catch (cause) {
       if (gen === generation) error = `Promote candidate SU failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 
   async function submitRenderQuartoGuide() {
+    if (busy || operationHeld) {
+      error = 'Wait for the current operation or decision before rendering Quarto guide.';
+      return;
+    }
     const req = $state.snapshot({
       guideType: quartoGuideType,
       title: quartoTitle.trim() || undefined,
@@ -367,7 +395,7 @@
       return;
     }
     const gen = ++generation;
-    busy = true;
+    setBusy(true);
     error = null;
     statusMessage = null;
     try {
@@ -378,7 +406,7 @@
     } catch (cause) {
       if (gen === generation) error = `Quarto guide publication failed: ${String(cause)}`;
     } finally {
-      if (gen === generation) busy = false;
+      if (gen === generation) setBusy(false);
     }
   }
 </script>
@@ -456,8 +484,13 @@
             <span class="badge" class:ok={runtimeStatus.quartoAvailable} class:warn={!runtimeStatus.quartoAvailable}>
               Quarto CLI: {runtimeStatus.quartoAvailable ? `Ready (${runtimeStatus.quartoVersion})` : 'Fallback RMarkdown'}
             </span>
-            <span class="badge" class:ok={runtimeStatus.climrRastersCached} class:neutral={!runtimeStatus.climrRastersCached}>
-              Climate Engine: {runtimeStatus.climrRastersCached ? 'Local climr Rasters' : 'Offline Ministry BGC Lapse Model'}
+            <span
+              class="badge"
+              class:warn={!runtimeStatus.available}
+              class:ok={runtimeStatus.available && runtimeStatus.climrRastersCached}
+              class:neutral={runtimeStatus.available && !runtimeStatus.climrRastersCached}
+            >
+              Climate Engine: {!runtimeStatus.available ? 'Rscript Required (Unavailable)' : runtimeStatus.climrRastersCached ? 'Local climr Rasters' : 'Offline Ministry BGC Lapse Model'}
             </span>
             <span class="badge" class:ok={runtimeStatus.readyForClustering} class:warn={!runtimeStatus.readyForClustering}>
               BEC_R Clustering: {runtimeStatus.readyForClustering ? 'Ready' : 'Missing Packages'}
