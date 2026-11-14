@@ -10,7 +10,7 @@ import (
 )
 
 func TestPlotLabelPDFStrictClientWireRoundTrip(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "plotLabelPDFWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "plotLabelPDFWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

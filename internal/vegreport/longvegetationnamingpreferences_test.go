@@ -35,7 +35,7 @@ func TestLongVegetationNamingPreferencesOwnershipCleanupCancellationCollisionAnd
 	if err := store.Update("ReportOptions", map[string]any{"LVShowEnglishName": 1, "LVShowField": "retained field"}); err != nil {
 		t.Fatal(err)
 	}
-	service := NewLongVegetationNamingPreferencesService(contexts, true)
+	service := NewLongVegetationNamingPreferencesService(contexts)
 	expected, proposed := LongVegetationNamingPreferenceValues{1, "retained field"}, LongVegetationNamingPreferenceValues{0, ""}
 	request := vegetationNamingRequest(t, expected, proposed)
 	before, err := os.ReadFile(store.Path)
@@ -111,7 +111,7 @@ func TestLongVegetationNamingPreferencesOwnershipCleanupCancellationCollisionAnd
 	}
 }
 func TestLongVegetationNamingPreferencesStrictGoClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationNamingWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationNamingWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -143,25 +143,10 @@ func TestLongVegetationNamingPreferencesStrictGoClientWire(t *testing.T) {
 	}
 }
 
-func TestLongVegetationNamingPreferencesGateOwnedReadAndHistoricalAvailability(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}} {
-		enabled, err := LongVegetationNamingPreferencesFeature(func(key string) (string, bool) {
-			if key != "VPRO_LONG_VEGETATION_NAMING_PREFERENCES" {
-				t.Fatal(key)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
+func TestLongVegetationNamingPreferencesOwnedReadAndHistoricalAvailability(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*LongVegetationNamingPreferencesService{nil, {}, NewLongVegetationNamingPreferencesService(nil, true)} {
+	for _, service := range []*LongVegetationNamingPreferencesService{nil, {}, NewLongVegetationNamingPreferencesService(nil)} {
 		for _, requestContext := range []context.Context{nil, ctx, context.Background()} {
 			if read, err := service.GetLongVegetationNamingPreferences(requestContext, "id"); read != nil || err == nil {
 				t.Fatal(read, err)
@@ -172,31 +157,28 @@ func TestLongVegetationNamingPreferencesGateOwnedReadAndHistoricalAvailability(t
 		}
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationNamingPreferencesService(contexts, true)
-	for _, code := range []bool{false, true} {
-		contexts.LongVegetationCodeEnabled = code
-		for _, mode := range []int{0, 1, 2, 4} {
-			if err := contexts.Projects.Preferences.Update("ReportOptions", map[string]any{
-				"LVShowEnglishName": mode, "LVShowField": " historical\u0000field ",
-			}); err != nil {
-				t.Fatal(err)
-			}
-			read, err := service.GetLongVegetationNamingPreferences(context.Background(), state.ContextID)
-			if err != nil || read.Values != (LongVegetationNamingPreferenceValues{mode, " historical\u0000field "}) ||
-				read.ContextID != state.ContextID || read.ProjectPath != state.ProjectPath || read.Project != "Sample" ||
-				read.Availability != (LongVegetationNamingAvailability{None: true, English: true, Code: code}) {
-				t.Fatal(mode, code, read, err)
-			}
-			before, err := os.ReadFile(contexts.Projects.Preferences.Path)
-			if err != nil {
-				t.Fatal(err)
-			}
-			saved := service.SaveLongVegetationNamingPreferences(context.Background(), state.ContextID,
-				vegetationNamingRequest(t, read.Values, read.Values))
-			after, err := os.ReadFile(contexts.Projects.Preferences.Path)
-			if saved.Changed || saved.Committed || saved.ErrorMessage != "" || err != nil || !bytes.Equal(before, after) {
-				t.Fatal("historical unavailable/unused-field no-op changed bytes", mode, code, saved, err)
-			}
+	service := NewLongVegetationNamingPreferencesService(contexts)
+	for _, mode := range []int{0, 1, 2, 4} {
+		if err := contexts.Projects.Preferences.Update("ReportOptions", map[string]any{
+			"LVShowEnglishName": mode, "LVShowField": " historical\u0000field ",
+		}); err != nil {
+			t.Fatal(err)
+		}
+		read, err := service.GetLongVegetationNamingPreferences(context.Background(), state.ContextID)
+		if err != nil || read.Values != (LongVegetationNamingPreferenceValues{mode, " historical\u0000field "}) ||
+			read.ContextID != state.ContextID || read.ProjectPath != state.ProjectPath || read.Project != "Sample" ||
+			read.Availability != (LongVegetationNamingAvailability{None: true, English: true, Code: true}) {
+			t.Fatal(mode, read, err)
+		}
+		before, err := os.ReadFile(contexts.Projects.Preferences.Path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		saved := service.SaveLongVegetationNamingPreferences(context.Background(), state.ContextID,
+			vegetationNamingRequest(t, read.Values, read.Values))
+		after, err := os.ReadFile(contexts.Projects.Preferences.Path)
+		if saved.Changed || saved.Committed || saved.ErrorMessage != "" || err != nil || !bytes.Equal(before, after) {
+			t.Fatal("historical unavailable/unused-field no-op changed bytes", mode, saved, err)
 		}
 	}
 	for _, id := range []string{"", "foreign"} {
@@ -206,47 +188,44 @@ func TestLongVegetationNamingPreferencesGateOwnedReadAndHistoricalAvailability(t
 	}
 }
 
-func TestLongVegetationNamingPreferencesSupportedChoicesAtomicClearAndCodeAvailability(t *testing.T) {
+func TestLongVegetationNamingPreferencesSupportedChoicesAndAtomicClear(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationNamingPreferencesService(contexts, true)
+	service := NewLongVegetationNamingPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	for _, code := range []bool{false, true} {
-		contexts.LongVegetationCodeEnabled = code
-		for _, originalMode := range []int{0, 1, 2, 4} {
-			for _, nextMode := range []int{0, 1, 2, 4} {
-				expected := LongVegetationNamingPreferenceValues{originalMode, "Old\u0000 literal"}
-				proposed := LongVegetationNamingPreferenceValues{nextMode, ""}
-				store := contexts.Projects.Preferences
-				if err := store.Update("ReportOptions", map[string]any{"LVShowEnglishName": expected.Mode, "LVShowField": expected.SelectedField}); err != nil {
-					t.Fatal(err)
+	for _, originalMode := range []int{0, 1, 2, 4} {
+		for _, nextMode := range []int{0, 1, 2, 4} {
+			expected := LongVegetationNamingPreferenceValues{originalMode, "Old\u0000 literal"}
+			proposed := LongVegetationNamingPreferenceValues{nextMode, ""}
+			store := contexts.Projects.Preferences
+			if err := store.Update("ReportOptions", map[string]any{"LVShowEnglishName": expected.Mode, "LVShowField": expected.SelectedField}); err != nil {
+				t.Fatal(err)
+			}
+			before, err := store.Snapshot()
+			if err != nil {
+				t.Fatal(err)
+			}
+			result := service.SaveLongVegetationNamingPreferences(context.Background(), state.ContextID,
+				vegetationNamingRequest(t, expected, proposed))
+			allowed := nextMode != 4
+			after, err := store.Snapshot()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if allowed {
+				if !result.Changed || !result.Committed || result.ErrorMessage != "" {
+					t.Fatal(originalMode, nextMode, result)
 				}
-				before, err := store.Snapshot()
-				if err != nil {
-					t.Fatal(err)
-				}
-				result := service.SaveLongVegetationNamingPreferences(context.Background(), state.ContextID,
-					vegetationNamingRequest(t, expected, proposed))
-				allowed := nextMode != 4 && (nextMode != 2 || code)
-				after, err := store.Snapshot()
-				if err != nil {
-					t.Fatal(err)
-				}
-				if allowed {
-					if !result.Changed || !result.Committed || result.ErrorMessage != "" {
-						t.Fatal(originalMode, nextMode, code, result)
-					}
-					before["ReportOptions"].(map[string]any)["LVShowEnglishName"] = proposed.Mode
-					before["ReportOptions"].(map[string]any)["LVShowField"] = ""
-				} else if result.Changed || result.Committed || result.ErrorMessage == "" {
-					t.Fatal("unavailable new choice/clear authorized", originalMode, nextMode, code, result)
-				}
-				if !reflect.DeepEqual(before, after) {
-					t.Fatal("coupled selection changed unrelated storage or refused request", originalMode, nextMode, code)
-				}
-				current, err := service.GetLongVegetationNamingPreferences(context.Background(), state.ContextID)
-				if err != nil || allowed && current.Values != proposed || !allowed && current.Values != expected {
-					t.Fatal(current, err)
-				}
+				before["ReportOptions"].(map[string]any)["LVShowEnglishName"] = proposed.Mode
+				before["ReportOptions"].(map[string]any)["LVShowField"] = ""
+			} else if result.Changed || result.Committed || result.ErrorMessage == "" {
+				t.Fatal("unavailable new choice/clear authorized", originalMode, nextMode, result)
+			}
+			if !reflect.DeepEqual(before, after) {
+				t.Fatal("coupled selection changed unrelated storage or refused request", originalMode, nextMode)
+			}
+			current, err := service.GetLongVegetationNamingPreferences(context.Background(), state.ContextID)
+			if err != nil || allowed && current.Values != proposed || !allowed && current.Values != expected {
+				t.Fatal(current, err)
 			}
 		}
 	}
@@ -261,7 +240,7 @@ func TestLongVegetationNamingPreferencesStrictRequestsCoupledClearAndStaleRefusa
 	if err := store.Update("ReportOptions", map[string]any{"LVShowEnglishName": 1, "LVShowField": "old field"}); err != nil {
 		t.Fatal(err)
 	}
-	service := NewLongVegetationNamingPreferencesService(contexts, true)
+	service := NewLongVegetationNamingPreferencesService(contexts)
 	expected := LongVegetationNamingPreferenceValues{1, "old field"}
 	base := vegetationNamingRequest(t, expected, expected)
 	requests := []string{"", "{}", "null", "[]", base + "{}",
@@ -305,7 +284,7 @@ func TestLongVegetationNamingPreferencesStrictRequestsCoupledClearAndStaleRefusa
 func TestLongVegetationNamingPreferencesMalformedStorageAndCorrection(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
 	store := contexts.Projects.Preferences
-	service := NewLongVegetationNamingPreferencesService(contexts, true)
+	service := NewLongVegetationNamingPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	for _, key := range []string{"LVShowEnglishName", "LVShowField"} {
 		invalid := []any{nil, true, []any{"unexpected"}}

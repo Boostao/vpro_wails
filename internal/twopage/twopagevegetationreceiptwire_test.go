@@ -15,41 +15,7 @@ import (
 )
 
 func TestTwoPageVegetationClientSharedActualReceipts(t *testing.T) {
-	path := filepath.Join("frontend", "src", "twoPageVegetationReceipts.json")
-	if output := os.Getenv("VPRO_VEGETATION_RECEIPT_FIXTURE_OUTPUT"); output != "" {
-		var receipts []twoPageVegetationWriteResult
-		for strength := 0; strength <= 3; strength++ {
-			service, state, _, request := vegetationWriteFixture(t, false, "SubVegAXL", strength)
-			request.Edits = append(request.Edits[:1],
-				vegetationPlanEdit(request.Original, "Cover2", vprocore.ProjectMetadataCell{Storage: "null"}), request.Edits[1])
-			result, err := WriteTwoPageVegetation(service, context.Background(), state.ContextID, request)
-			if err != nil || result == nil || len(result.History.Audits) != strength {
-				t.Fatal("actual fixture commit differs from independently ordered audit policies", result, err)
-			}
-			receipts = append(receipts, *result)
-		}
-		service, state, _, request := vegetationWriteFixture(t, false, "SubVegCXL", 3)
-		request.Edits[0] = vegetationPlanEdit(request.Original, "Cover6", vprocore.ProjectMetadataCell{Storage: "null"})
-		result, err := WriteTwoPageVegetation(service, context.Background(), state.ContextID, request)
-		if err != nil || result == nil {
-			t.Fatal(result, err)
-		}
-		receipts = append(receipts, *result)
-		raw, err := json.MarshalIndent(receipts, "", "  ")
-		if err != nil {
-			t.Fatal(err)
-		}
-		file, err := os.OpenFile(output, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
-		if err != nil {
-			t.Fatal(err)
-		}
-		_, writeErr := file.Write(append(raw, '\n'))
-		closeErr := file.Close()
-		if writeErr != nil || closeErr != nil {
-			t.Fatal(writeErr, closeErr)
-		}
-		path = output
-	}
+	path := filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationReceipts.json")
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
@@ -109,7 +75,7 @@ func TestTwoPageVegetationClientSharedActualReceipts(t *testing.T) {
 }
 
 func TestTwoPageVegetationClientSharedOutcomeWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageVegetationReceipts.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationReceipts.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,38 +83,11 @@ func TestTwoPageVegetationClientSharedOutcomeWire(t *testing.T) {
 	if err := json.Unmarshal(raw, &receipts); err != nil || len(receipts) != 5 {
 		t.Fatal("shared client receipts differ", err)
 	}
-	outcomePath := filepath.Join("frontend", "src", "twoPageVegetationOutcomes.json")
+	outcomePath := filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationOutcomes.json")
 	request := receipts[3].History.Request
 	requestJSON, err := json.Marshal(request)
 	if err != nil {
 		t.Fatal(err)
-	}
-	if output := os.Getenv("VPRO_VEGETATION_OUTCOME_FIXTURE_OUTPUT"); output != "" {
-		var outcomes []TwoPageVegetationAttemptOutcome
-		for _, status := range []string{"running", "unknown", "notCommitted", "committed"} {
-			outcome := TwoPageVegetationAttemptOutcome{ContextID: request.Original.ContextID,
-				RequestID: request.RequestID, RequestJSON: string(requestJSON), Status: status, Reason: "Exact owned attempt outcome."}
-			if status == "committed" {
-				receipt := receipts[3]
-				receipt.DidCommit, receipt.Replayed = false, true
-				outcome.Receipt = &receipt
-			}
-			outcomes = append(outcomes, outcome)
-		}
-		raw, err := json.MarshalIndent(outcomes, "", "  ")
-		if err != nil {
-			t.Fatal(err)
-		}
-		file, err := os.OpenFile(output, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
-		if err != nil {
-			t.Fatal(err)
-		}
-		_, writeErr := file.Write(append(raw, '\n'))
-		closeErr := file.Close()
-		if writeErr != nil || closeErr != nil {
-			t.Fatal(writeErr, closeErr)
-		}
-		outcomePath = output
 	}
 	raw, err = os.ReadFile(outcomePath)
 	if err != nil {

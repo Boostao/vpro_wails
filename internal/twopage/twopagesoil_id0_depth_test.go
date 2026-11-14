@@ -27,7 +27,7 @@ func TestTwoPageSoilLegacyIDZeroDeleteRestoreAndLMH25DepthSigns(t *testing.T) {
 			('SOIL00', 'Bm1', 0.0, 30.0, 'SL', '10YR 4/4', 0, 0);
 	`)
 
-	soilSvc, err := twopage.NewTwoPageSoilService(svc, func(string) (string, bool) { return "true", true })
+	soilSvc, err := twopage.NewTwoPageSoilService(svc)
 	if err != nil {
 		t.Fatal(err)
 	}

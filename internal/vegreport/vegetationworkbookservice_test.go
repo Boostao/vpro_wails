@@ -64,15 +64,11 @@ func TestLongVegetationWorkbookPublicServiceUnavailable(t *testing.T) {
 			t.Fatal("unavailable public service invented receipt", outcome, err)
 		}
 	}
-	service, err := NewVegetationWorkbookService(nil, func(string) (string, bool) { return "", false })
-	if err != nil || !service.Private.Enabled {
-		t.Fatal("public service is not default-on", err)
-	}
-	disabledService, err := NewVegetationWorkbookService(nil, func(string) (string, bool) { return "false", true })
-	if err != nil || disabledService.Private.Enabled {
-		t.Fatal("explicit false did not disable public service", err)
+	service, err := NewVegetationWorkbookService(nil)
+	if err != nil || service == nil || service.Private == nil {
+		t.Fatal("public service constructor failed", service, err)
 	}
 	if _, err := service.GetReview(context.Background(), "owned", `{"scope":"unlumped"}`); err == nil {
-		t.Fatal("default-off public service exposed review")
+		t.Fatal("unconfigured public service exposed review")
 	}
 }

@@ -29,25 +29,10 @@ func vegetationQualityNullRequest(t *testing.T, expected, proposed LongVegetatio
 	return string(raw)
 }
 
-func TestLongVegetationQualityNullPreferencesGateAndStrictWire(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		got, err := LongVegetationQualityNullPreferencesFeature(func(name string) (string, bool) {
-			if name != "VPRO_LONG_VEGETATION_QUALITY_NULL_PREFERENCES" {
-				t.Fatal(name)
-			}
-			return test.value, test.present
-		})
-		if got != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, got, err)
-		}
-	}
+func TestLongVegetationQualityNullPreferencesStrictWire(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*LongVegetationQualityNullPreferencesService{nil, {}, NewLongVegetationQualityNullPreferencesService(nil, true)} {
+	for _, service := range []*LongVegetationQualityNullPreferencesService{nil, {}, NewLongVegetationQualityNullPreferencesService(nil)} {
 		for _, requestCtx := range []context.Context{nil, context.Background(), ctx} {
 			if got, err := service.GetLongVegetationQualityNullPreferences(requestCtx, "id"); got != nil || err == nil {
 				t.Fatal(got, err)
@@ -62,7 +47,7 @@ func TestLongVegetationQualityNullPreferencesGateAndStrictWire(t *testing.T) {
 		Request LongVegetationQualityNullPreferencesRequest `json:"request"`
 		Outcome LongVegetationQualityNullPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationQualityNullWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationQualityNullWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,15 +55,7 @@ func TestLongVegetationQualityNullPreferencesGateAndStrictWire(t *testing.T) {
 		t.Fatal(err)
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityNullPreferencesService(contexts, true)
-	disabled := NewLongVegetationQualityNullPreferencesService(contexts, false)
-	if got, err := disabled.GetLongVegetationQualityNullPreferences(context.Background(), state.ContextID); got != nil || err == nil {
-		t.Fatal(got, err)
-	}
-	if got := disabled.SaveLongVegetationQualityNullPreferences(context.Background(), state.ContextID,
-		vegetationQualityNullRequest(t, wire.Request.Expected, wire.Request.Proposed)); got.Committed || got.ErrorMessage == "" {
-		t.Fatal(got)
-	}
+	service := NewLongVegetationQualityNullPreferencesService(contexts)
 	read, err := service.GetLongVegetationQualityNullPreferences(context.Background(), state.ContextID)
 	if err != nil || read.ContextID != state.ContextID || read.Project != "Sample" || read.SU != "None" ||
 		read.ProjectPath != state.ProjectPath || read.SUPath != state.SUPath {
@@ -116,7 +93,7 @@ func TestLongVegetationQualityNullPreferencesGateAndStrictWire(t *testing.T) {
 
 func TestLongVegetationQualityNullPreferencesRejectMalformedRequests(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityNullPreferencesService(contexts, true)
+	service := NewLongVegetationQualityNullPreferencesService(contexts)
 	values := LongVegetationQualityNullPreferenceValues{true, true, true}
 	base := vegetationQualityNullRequest(t, values, values)
 	before, err := os.ReadFile(contexts.Projects.Preferences.Path)
@@ -149,7 +126,7 @@ func TestLongVegetationQualityNullPreferencesRejectMalformedRequests(t *testing.
 
 func TestLongVegetationQualityNullPreferencesEightCombinationsAndQualification(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityNullPreferencesService(contexts, true)
+	service := NewLongVegetationQualityNullPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	for mask := 0; mask < 8; mask++ {
 		next := LongVegetationQualityNullPreferenceValues{mask&1 != 0, mask&2 != 0, mask&4 != 0}
@@ -215,7 +192,7 @@ func TestLongVegetationQualityNullPreferencesEightCombinationsAndQualification(t
 
 func TestLongVegetationQualityNullPreferencesLegacyStorageNoopOmissionAndInvalid(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityNullPreferencesService(contexts, true)
+	service := NewLongVegetationQualityNullPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	values, err := store.Snapshot()
 	if err != nil {
@@ -308,7 +285,7 @@ func TestLongVegetationQualityNullPreferencesLegacyStorageNoopOmissionAndInvalid
 
 func TestLongVegetationQualityNullPreferencesOwnershipCleanupCancellationCollisionAndRetry(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityNullPreferencesService(contexts, true)
+	service := NewLongVegetationQualityNullPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	expected, proposed := LongVegetationQualityNullPreferenceValues{true, true, true}, LongVegetationQualityNullPreferenceValues{false, false, false}
 	request := vegetationQualityNullRequest(t, expected, proposed)

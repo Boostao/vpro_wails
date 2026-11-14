@@ -17,7 +17,7 @@ import (
 func TestProjectScopeSnapshotFailuresNeverInstallDraftsOrBuilds(t *testing.T) {
 	for _, operation := range []string{"scope", "fields", "build"} {
 		contexts, state, _ := projectOwnedSourceFixture(t, false, true)
-		service := NewLongVegetationReportScopeService(contexts, true)
+		service := NewLongVegetationReportScopeService(contexts)
 		ctx := context.Background()
 		if operation != "scope" {
 			active, err := service.SetLongVegetationReportScope(ctx, state.ContextID,
@@ -65,9 +65,8 @@ func TestProjectScopeSnapshotFailuresNeverInstallDraftsOrBuilds(t *testing.T) {
 func TestProjectScopeSwitchCannotInterleaveWithLegacyUnitCAS(t *testing.T) {
 	private, state := vegetationWorkbookServiceFixture(t, true)
 	contexts := private.contexts
-	contexts.LongVegetationNoneUnitsEnabled = true
-	scope := NewLongVegetationReportScopeService(contexts, true)
-	preferences := NewLongVegetationUnitPreferencesService(contexts, true)
+	scope := NewLongVegetationReportScopeService(contexts)
+	preferences := NewLongVegetationUnitPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	replace := store.Replace
 	store.Replace = func(from, to string) error {
@@ -91,7 +90,7 @@ func TestProjectScopeSwitchCannotInterleaveWithLegacyUnitCAS(t *testing.T) {
 
 func TestProjectScopeContextRetirementClearsAuthorityOnlyAfterSuccessfulSwitch(t *testing.T) {
 	private, state := vegetationWorkbookServiceFixture(t, false)
-	scope := NewLongVegetationReportScopeService(private.contexts, true)
+	scope := NewLongVegetationReportScopeService(private.contexts)
 	ctx := context.Background()
 	if _, err := scope.SetLongVegetationReportScope(ctx, state.ContextID,
 		projectScopeRequestJSON(t, "0", vprocore.VegetationProjectFieldsScope)); err != nil {

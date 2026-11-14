@@ -10,7 +10,7 @@ import (
 )
 
 func TestTwoPageSoilClientSharedOutcomeWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageSoilOutcomeWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageSoilOutcomeWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

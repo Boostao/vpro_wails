@@ -20,12 +20,7 @@ import (
 
 func siviCombinedServiceFixture(t *testing.T, contexts *vprocore.ContextService) *SIVICombinedService {
 	t.Helper()
-	service, err := NewSIVICombinedService(contexts, func(name string) (string, bool) {
-		if name != SiviCombinedFeatureEnvironment {
-			t.Fatal("combined service queried predecessor permission", name)
-		}
-		return "true", true
-	})
+	service, err := NewSIVICombinedService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,45 +55,12 @@ func siviCombinedFixtureEdits(heights []sourceform.SiviHeightEdit, extended bool
 	}
 }
 
-func TestSIVICombinedServiceIndependentStrictGateNilAndCanceled(t *testing.T) {
+func TestSIVICombinedServiceNilAndCanceled(t *testing.T) {
 	contexts, state, _, original, heights := sftest.SiviWriteFixture(t, false, 3)
 	valid := siviCombinedRequestJSON(t, original, siviCombinedFixtureEdits(heights, false))
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	for _, value := range []string{"false", "predecessors"} {
-		service, err := NewSIVICombinedService(contexts, func(name string) (string, bool) {
-			if name != SiviCombinedFeatureEnvironment {
-				t.Fatal("combined consulted predecessor feature", name)
-			}
-			return "false", true
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-		if value == "predecessors" {
-			contexts.SiviHeightEnabled = true
-			_ = siviCoverServiceFixture(t, contexts, "true", true)
-		}
-		if result, err := service.GetOriginal(context.Background(), state.ContextID, "108050", false); err == nil || result != nil {
-			t.Fatal("disabled combined read granted by predecessors", result, err)
-		}
-		if result, err := service.SaveReviewed(context.Background(), state.ContextID, "108050", false, valid); err == nil || result != nil {
-			t.Fatal("disabled combined Save succeeded", result, err)
-		}
-		if result, err := service.RestoreReviewed(context.Background(), state.ContextID, "108050", "1", vprocore.AuditRestoreCancel); err == nil || result != nil {
-			t.Fatal("disabled combined restore succeeded", result, err)
-		}
-		vprotest.AssertProfileSUFiles(t, contexts, before)
-	}
-	for _, value := range []string{"", "TRUE", "1", " true ", "yes"} {
-		if service, err := NewSIVICombinedService(contexts, func(string) (string, bool) { return value, true }); err == nil || service != nil {
-			t.Fatal("malformed combined feature accepted", value, service, err)
-		}
-	}
-	if service, err := NewSIVICombinedService(nil, func(string) (string, bool) { return "true", true }); err == nil || service != nil {
+	if service, err := NewSIVICombinedService(nil); err == nil || service != nil {
 		t.Fatal("constructor accepted nil owner", service, err)
-	}
-	if service, err := NewSIVICombinedService(contexts, nil); err == nil || service != nil {
-		t.Fatal("constructor accepted nil lookup", service, err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
@@ -127,9 +89,6 @@ func TestSIVICombinedServiceMixedTransactionHistoryAndTypedRecovery(t *testing.T
 				original, err := service.GetOriginal(context.Background(), state.ContextID, "108050", extended)
 				if err != nil {
 					t.Fatal(err)
-				}
-				if result, err := GetSIVIVegetation(contexts, context.Background(), state.ContextID, "108050", extended); err == nil || result != nil {
-					t.Fatal("combined enabled predecessor height facade", result, err)
 				}
 				edits := siviCombinedFixtureEdits(heights, extended)
 				saved, err := service.SaveReviewed(context.Background(), state.ContextID, "108050", extended, siviCombinedRequestJSON(t, original, edits))

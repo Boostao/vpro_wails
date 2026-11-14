@@ -16,11 +16,8 @@ func TestLongVegetationGroupPreferencesInvalidateWorkbookApproval(t *testing.T) 
 	for _, external := range []bool{false, true} {
 		t.Run(map[bool]string{false: "attached", true: "external"}[external], func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, external)
-			private.contexts.LongVegetationStrataEnabled = true
-			private.contexts.LongVegetationLifeformEnabled = true
-			private.contexts.LongVegetationNoneEnabled = true
 			workbooks := &VegetationWorkbookService{Private: private}
-			preferences := NewLongVegetationGroupPreferencesService(private.contexts, true)
+			preferences := NewLongVegetationGroupPreferencesService(private.contexts)
 			beforeDB := vprotest.DatabaseBytes(t, private.contexts.Projects.Sqlite.Attachments)
 			for _, mode := range []struct {
 				value int

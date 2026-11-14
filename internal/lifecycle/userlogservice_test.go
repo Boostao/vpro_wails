@@ -11,59 +11,31 @@ import (
 	"testing"
 )
 
-func TestUserLogServiceIndependentLiteralGateAndRead(t *testing.T) {
+func TestUserLogServiceReadOnlyReview(t *testing.T) {
 	contexts, state := userLogFixture(t)
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	for _, item := range []struct {
-		value   string
-		present bool
-		enabled bool
-		invalid bool
-	}{
-		{"", false, true, false}, {"false", true, false, false}, {"true", true, true, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true", true, false, true},
-	} {
-		service, err := NewUserLogService(contexts, func(name string) (string, bool) {
-			if name != "VPRO_USER_LOG_REVIEW" {
-				t.Fatal("unexpected prerequisite flag", name)
-			}
-			return item.value, item.present
-		})
-		if item.invalid {
-			if err == nil {
-				t.Fatal("nonliteral flag accepted", item)
-			}
-			continue
-		}
-		if err != nil {
-			t.Fatal(err)
-		}
-		result, err := service.GetReview(context.Background(), state.ContextID, 2, 0, 50)
-		if item.enabled {
-			if err != nil || result.Total != 3 || result.Mode != 2 {
-				t.Fatal("enabled source filter unavailable", result, err)
-			}
-		} else if err == nil || !reflect.DeepEqual(result, UserLogReview{}) {
-			t.Fatal("disabled reader returned data", result, err)
-		}
+	service, err := NewUserLogService(contexts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	result, err := service.GetReview(context.Background(), state.ContextID, 2, 0, 50)
+	if err != nil || result.Total != 3 || result.Mode != 2 {
+		t.Fatal("enabled source filter unavailable", result, err)
 	}
 	if !reflect.DeepEqual(before, vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)) {
-		t.Fatal("gate checks/read changed the database family")
+		t.Fatal("read changed the database family")
 	}
 }
 
 func TestUserLogServiceInvalidOwnerRequestAndCancellation(t *testing.T) {
 	contexts, state := userLogFixture(t)
-	enabled := &UserLogService{contexts: contexts, enabled: true}
-	if _, err := NewUserLogService(nil, func(string) (string, bool) { return "true", true }); err == nil {
+	enabled := &UserLogService{contexts: contexts}
+	if _, err := NewUserLogService(nil); err == nil {
 		t.Fatal("missing context owner accepted")
 	}
-	if _, err := NewUserLogService(contexts, nil); err == nil {
-		t.Fatal("implicit feature lookup accepted")
-	}
-	for _, service := range []*UserLogService{nil, {}, {enabled: true}} {
+	for _, service := range []*UserLogService{nil, {}} {
 		if result, err := service.GetReview(context.Background(), state.ContextID, 2, 0, 50); err == nil || !reflect.DeepEqual(result, UserLogReview{}) {
-			t.Fatal("absent/disabled service accepted", result, err)
+			t.Fatal("absent service accepted", result, err)
 		}
 	}
 	if _, err := enabled.GetReview(nil, state.ContextID, 2, 0, 50); err == nil {

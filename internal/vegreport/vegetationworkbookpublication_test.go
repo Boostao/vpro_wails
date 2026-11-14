@@ -26,12 +26,7 @@ import (
 func vegetationWorkbookServiceFixture(t *testing.T, external bool) (*vegetationWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	contexts, state := vprotest.ReportServiceFixture(t, external)
-	service, err := newVegetationWorkbookService(contexts, func(name string) (string, bool) {
-		if name != vegetationWorkbookFeatureEnvironment {
-			t.Fatal("vegetation workbook borrowed another workflow gate", name)
-		}
-		return "true", true
-	})
+	service, err := newVegetationWorkbookService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,18 +101,12 @@ func TestLongVegetationWorkbookPublicationOwnedDateBytesCollisionAndNoWrites(t *
 }
 
 func TestLongVegetationWorkbookPublicationStrictGateScopeAndRetainedPreferences(t *testing.T) {
-	for _, gate := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := newVegetationWorkbookService(nil, func(string) (string, bool) { return gate, gate != "" })
-		if gate == "" || gate == "false" || gate == "true" {
-			if err != nil || service.Enabled != (gate != "false") {
-				t.Fatal("literal workbook gate changed", gate, err)
-			}
-			if _, err := service.GetReview(context.Background(), "owned", `{"scope":"unlumped"}`); err == nil {
-				t.Fatal("unavailable gate/context produced review")
-			}
-		} else if err == nil {
-			t.Fatal("nonliteral workbook gate accepted", gate)
-		}
+	nilService, err := newVegetationWorkbookService(nil)
+	if err != nil || nilService == nil {
+		t.Fatal("workbook constructor changed", nilService, err)
+	}
+	if _, err := nilService.GetReview(context.Background(), "owned", `{"scope":"unlumped"}`); err == nil {
+		t.Fatal("unavailable context produced review")
 	}
 	service, state := vegetationWorkbookServiceFixture(t, false)
 	for _, raw := range []string{`{}`, `{"scope":null}`, `{"scope":"unlumped","extra":true}`,

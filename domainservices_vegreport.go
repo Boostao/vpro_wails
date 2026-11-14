@@ -25,32 +25,97 @@ type LongVegetationExclusionPreview = vegreportpkg.LongVegetationExclusionPrevie
 
 type VegetationReportService struct {
 	contexts                       *ContextService
-	summary                        *SummaryVegetationService
-	summaryEnvironment             *SummaryVegetationEnvironmentalService
-	summaryEnvironmentLifeform     *SummaryVegetationEnvironmentalLifeformService
-	summaryWorkbook                *SummaryVegetationWorkbookService
-	summaryPreferences             *SummaryVegetationPreferencesService
-	summaryQualityPreferences      *SummaryVegetationQualityPreferencesService
-	summaryPresentationPreferences *SummaryVegetationPresentationPreferencesService
-	summaryFieldList               *SummaryVegetationFieldListService
-	longPreferences                *LongVegetationPreferencesService
-	longStatisticsPreferences      *LongVegetationStatisticsPreferencesService
-	longSwitchPreferences          *LongVegetationSwitchPreferencesService
-	longThresholdPreferences       *LongVegetationThresholdPreferencesService
-	longGroupPreferences           *LongVegetationGroupPreferencesService
-	longQualityNullPreferences     *LongVegetationQualityNullPreferencesService
-	longQualityMinimumPreferences  *LongVegetationQualityMinimumPreferencesService
-	longNamingPreferences          *LongVegetationNamingPreferencesService
-	longSelectedFieldPreferences   *LongVegetationSelectedFieldPreferencesService
-	longEnforcementPreferences     *LongVegetationEnforcementPreferencesService
-	longUnitPreferences            *LongVegetationUnitPreferencesService
-	longSelectedUnitSelection      *LongVegetationSelectedUnitSelectionService
-	longReportScope                *LongVegetationReportScopeService
-	longProjectWorkbook            *LongVegetationProjectWorkbookService
-	vegetationWorkbook             *VegetationWorkbookService
-	lifeformSummary                *LifeformSummaryService
-	lifeformWorkbook               *LifeformWorkbookService
-	speciesAttributeSummary        *SpeciesAttributeSummaryService
+	summary                        *vegreportpkg.SummaryVegetationService
+	summaryEnvironment             *vegreportpkg.SummaryVegetationEnvironmentalService
+	summaryEnvironmentLifeform     *vegreportpkg.SummaryVegetationEnvironmentalLifeformService
+	summaryWorkbook                *vegreportpkg.SummaryVegetationWorkbookService
+	summaryPreferences             *vegreportpkg.SummaryVegetationPreferencesService
+	summaryQualityPreferences      *vegreportpkg.SummaryVegetationQualityPreferencesService
+	summaryPresentationPreferences *vegreportpkg.SummaryVegetationPresentationPreferencesService
+	summaryFieldList               *vegreportpkg.SummaryVegetationFieldListService
+	longPreferences                *vegreportpkg.LongVegetationPreferencesService
+	longStatisticsPreferences      *vegreportpkg.LongVegetationStatisticsPreferencesService
+	longSwitchPreferences          *vegreportpkg.LongVegetationSwitchPreferencesService
+	longThresholdPreferences       *vegreportpkg.LongVegetationThresholdPreferencesService
+	longGroupPreferences           *vegreportpkg.LongVegetationGroupPreferencesService
+	longQualityNullPreferences     *vegreportpkg.LongVegetationQualityNullPreferencesService
+	longQualityMinimumPreferences  *vegreportpkg.LongVegetationQualityMinimumPreferencesService
+	longNamingPreferences          *vegreportpkg.LongVegetationNamingPreferencesService
+	longSelectedFieldPreferences   *vegreportpkg.LongVegetationSelectedFieldPreferencesService
+	longEnforcementPreferences     *vegreportpkg.LongVegetationEnforcementPreferencesService
+	longUnitPreferences            *vegreportpkg.LongVegetationUnitPreferencesService
+	longSelectedUnitSelection      *vegreportpkg.LongVegetationSelectedUnitSelectionService
+	longReportScope                *vegreportpkg.LongVegetationReportScopeService
+	longProjectWorkbook            *vegreportpkg.LongVegetationProjectWorkbookService
+	vegetationWorkbook             *vegreportpkg.VegetationWorkbookService
+	lifeformSummary                *vegreportpkg.LifeformSummaryService
+	lifeformWorkbook               *vegreportpkg.LifeformWorkbookService
+	speciesAttributeSummary        *vegreportpkg.SpeciesAttributeSummaryService
+}
+
+func buildVegetationReportService(contexts *ContextService) (VegetationReportService, error) {
+	core := unwrapContextService(contexts)
+	summary, err := vegreportpkg.NewSummaryVegetationService(core)
+	if err != nil {
+		return VegetationReportService{}, err
+	}
+	summaryEnvironment, err := vegreportpkg.NewSummaryVegetationEnvironmentalService(summary)
+	if err != nil {
+		return VegetationReportService{}, err
+	}
+	summaryEnvironmentLifeform, err := vegreportpkg.NewSummaryVegetationEnvironmentalLifeformService(summaryEnvironment)
+	if err != nil {
+		return VegetationReportService{}, err
+	}
+	summaryWorkbook, err := vegreportpkg.NewSummaryVegetationWorkbookService(summaryEnvironmentLifeform)
+	if err != nil {
+		return VegetationReportService{}, err
+	}
+	lifeformSummary, err := vegreportpkg.NewLifeformSummaryService(core)
+	if err != nil {
+		return VegetationReportService{}, err
+	}
+	lifeformWorkbook, err := vegreportpkg.NewLifeformWorkbookService(core)
+	if err != nil {
+		return VegetationReportService{}, err
+	}
+	speciesAttributeSummary, err := vegreportpkg.NewSpeciesAttributeSummaryService(core)
+	if err != nil {
+		return VegetationReportService{}, err
+	}
+	vegetationWorkbook, err := vegreportpkg.NewVegetationWorkbookService(core)
+	if err != nil {
+		return VegetationReportService{}, err
+	}
+	return VegetationReportService{
+		contexts:                       contexts,
+		summary:                        summary,
+		summaryEnvironment:             summaryEnvironment,
+		summaryEnvironmentLifeform:     summaryEnvironmentLifeform,
+		summaryWorkbook:                summaryWorkbook,
+		summaryPreferences:             vegreportpkg.NewSummaryVegetationPreferencesService(core),
+		summaryQualityPreferences:      vegreportpkg.NewSummaryVegetationQualityPreferencesService(core),
+		summaryPresentationPreferences: vegreportpkg.NewSummaryVegetationPresentationPreferencesService(core),
+		summaryFieldList:               vegreportpkg.NewSummaryVegetationFieldListService(core),
+		longPreferences:                vegreportpkg.NewLongVegetationPreferencesService(core),
+		longStatisticsPreferences:      vegreportpkg.NewLongVegetationStatisticsPreferencesService(core),
+		longSwitchPreferences:          vegreportpkg.NewLongVegetationSwitchPreferencesService(core),
+		longThresholdPreferences:       vegreportpkg.NewLongVegetationThresholdPreferencesService(core),
+		longGroupPreferences:           vegreportpkg.NewLongVegetationGroupPreferencesService(core),
+		longQualityNullPreferences:     vegreportpkg.NewLongVegetationQualityNullPreferencesService(core),
+		longQualityMinimumPreferences:  vegreportpkg.NewLongVegetationQualityMinimumPreferencesService(core),
+		longNamingPreferences:          vegreportpkg.NewLongVegetationNamingPreferencesService(core),
+		longSelectedFieldPreferences:   vegreportpkg.NewLongVegetationSelectedFieldPreferencesService(core),
+		longEnforcementPreferences:     vegreportpkg.NewLongVegetationEnforcementPreferencesService(core),
+		longUnitPreferences:            vegreportpkg.NewLongVegetationUnitPreferencesService(core),
+		longSelectedUnitSelection:      vegreportpkg.NewLongVegetationSelectedUnitSelectionService(core),
+		longReportScope:                vegreportpkg.NewLongVegetationReportScopeService(core),
+		longProjectWorkbook:            vegreportpkg.NewLongVegetationProjectWorkbookService(core),
+		vegetationWorkbook:             vegetationWorkbook,
+		lifeformSummary:                lifeformSummary,
+		lifeformWorkbook:               lifeformWorkbook,
+		speciesAttributeSummary:        speciesAttributeSummary,
+	}, nil
 }
 
 // Summary Vegetation report & workbook delegates

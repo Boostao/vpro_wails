@@ -14,21 +14,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
 )
 
-const summaryVegetationWorkbookFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_WORKBOOK"
 const summaryVegetationWorkbookDraftScope = "Explicit read-only normal-SU layer inspection; literal XLSX, not original NewShortVeg orchestration, saved callbacks, ancillary sheets or formatting/printing parity"
-const SummaryVegetationAncillaryWorkbookFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_ANCILLARY_WORKBOOK"
 const summaryVegetationAncillaryWorkbookScope = "Explicit read-only normal-SU layer inspection with SU Table and optional ReportSummary; literal XLSX, not original NewShortVeg preflight/callbacks or formatting/printing parity"
-const SummaryVegetationEffectiveReferencesFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_EFFECTIVE_REFERENCES"
 const summaryVegetationEffectiveReferencesScope = "Explicit read-only normal-SU layer inspection with projected attribute/common/guide references; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity"
 const summaryVegetationEffectiveAncillaryScope = "Explicit read-only normal-SU layer inspection with projected attribute/common/guide references, SU Table and optional ReportSummary; literal comparison and XLSX, not original Report callbacks, Access collation or formatting/printing parity"
-const SummaryVegetationGroupedWorkbookFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_GROUPED_WORKBOOK"
 const summaryVegetationGroupedWorkbookScope = "Explicit read-only normal-SU Strata/Lifeform/None inspection; typed XLSX, not grouped common/guide references, ancillary worksheets, original Report callbacks or formatting/printing parity"
 const summaryVegetationStrataReferencesScope = "Explicit read-only normal-SU Strata effective-reference inspection; typed XLSX, not Lifeform/None common names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity"
 const summaryVegetationGroupedAttributesScope = "Explicit read-only normal-SU Lifeform/None effective-attribute inspection; typed XLSX, no common/guide names, grouped ancillary worksheets, original Report callbacks or formatting/printing parity"
@@ -72,13 +67,8 @@ type SummaryVegetationWorkbookReview struct {
 }
 
 type SummaryVegetationWorkbookService struct {
-	source              *SummaryVegetationEnvironmentalLifeformService
-	enabled             bool
-	AncillaryEnabled    bool `json:"-" yaml:"-"`
-	ReferencesEnabled   bool `json:"-" yaml:"-"`
-	GroupedEnabled      bool `json:"-" yaml:"-"`
-	PresentationEnabled bool `json:"-" yaml:"-"`
-	now                 func() time.Time
+	source *SummaryVegetationEnvironmentalLifeformService
+	now    func() time.Time
 }
 
 type summaryVegetationWorkbookHooks struct {
@@ -86,16 +76,8 @@ type summaryVegetationWorkbookHooks struct {
 	publication vprocore.ArtifactPublicationHooks
 }
 
-func NewSummaryVegetationWorkbookService(source *SummaryVegetationEnvironmentalLifeformService,
-	lookup func(string) (string, bool)) (*SummaryVegetationWorkbookService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(summaryVegetationWorkbookFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SummaryVegetationWorkbookService{source: source, enabled: enabled, now: time.Now}, nil
+func NewSummaryVegetationWorkbookService(source *SummaryVegetationEnvironmentalLifeformService) (*SummaryVegetationWorkbookService, error) {
+	return &SummaryVegetationWorkbookService{source: source, now: time.Now}, nil
 }
 
 func (s *SummaryVegetationWorkbookService) authorize(ctx context.Context) error {
@@ -105,12 +87,8 @@ func (s *SummaryVegetationWorkbookService) authorize(ctx context.Context) error 
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Summary draft workbook is disabled in this session")
-	}
-	if s.source == nil || s.source.environment == nil || s.source.environment.report == nil ||
-		!s.source.environment.report.Enabled {
-		return errors.New("Summary draft workbook requires enabled Summary Vegetation")
+	if s == nil || s.source == nil || s.source.environment == nil || s.source.environment.report == nil {
+		return errors.New("Summary draft workbook requires Summary Vegetation")
 	}
 	contexts := s.source.environment.report.contexts
 	if contexts == nil || contexts.Projects == nil || contexts.Projects.Sqlite == nil ||
@@ -149,19 +127,7 @@ func (s *SummaryVegetationWorkbookService) readSourceAt(ctx context.Context, plo
 	if err := validateSummaryWorkbookInspectionOptions(options); err != nil {
 		return summaryVegetationWorkbookSource{}, err
 	}
-	if options.Constancy && !s.PresentationEnabled {
-		return summaryVegetationWorkbookSource{}, errors.New("Summary Constancy workbook requires enabled presentation preferences")
-	}
-	if options.GroupAndOrder != nil && !s.GroupedEnabled {
-		return summaryVegetationWorkbookSource{}, errors.New("Summary grouped workbook is disabled in this session")
-	}
-	if options.References != nil && !s.ReferencesEnabled {
-		return summaryVegetationWorkbookSource{}, errors.New("Summary effective references are disabled in this session")
-	}
 	if options.Ancillary != nil {
-		if !s.AncillaryEnabled {
-			return summaryVegetationWorkbookSource{}, errors.New("Summary ancillary workbook is disabled in this session")
-		}
 		if err := validateSummaryWorkbookCreatedAt(createdAt); err != nil {
 			return summaryVegetationWorkbookSource{}, err
 		}
@@ -250,9 +216,6 @@ func (s *SummaryVegetationWorkbookService) GetReview(ctx context.Context, contex
 		return vprocore.WithOwnedPreferenceSnapshot(ctx, plots, vprocore.PublicationReadSnapshotHooks{}, func(owner *vprocore.SqliteContext, tx *sql.Tx) (*SummaryVegetationWorkbookReview, error) {
 			createdAt := ""
 			if options.Ancillary != nil {
-				if !s.AncillaryEnabled {
-					return nil, errors.New("Summary ancillary workbook is disabled in this session")
-				}
 				if s.now == nil {
 					return nil, errors.New("Summary ancillary workbook review clock is unavailable")
 				}

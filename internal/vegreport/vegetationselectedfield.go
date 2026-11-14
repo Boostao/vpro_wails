@@ -16,8 +16,6 @@ import (
 	"unicode/utf8"
 )
 
-const LongVegetationSelectedFieldFeatureEnvironment = "VPRO_LONG_VEGETATION_SELECTED_FIELD"
-
 type longVegetationSelectedFieldProjection struct {
 	Kind   string
 	values map[string]vprocore.ProjectMetadataCell

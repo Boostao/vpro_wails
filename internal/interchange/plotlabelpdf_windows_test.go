@@ -104,27 +104,4 @@ func TestPlotLabelPDFActualArialPreparation(t *testing.T) {
 			t.Fatalf("%s overflow: %q, %v", field, out, err)
 		}
 	}
-	if evidence := os.Getenv("VPRO_PRIVATE_LABEL_PDF_EVIDENCE"); evidence != "" {
-		for _, blank := range []bool{false, true} {
-			p := plotLabelPDFTestPreview()
-			name := "full.pdf"
-			if blank {
-				p.Header.ProjectID, p.Header.PlotRepresenting = nil, nil
-				name = "null.pdf"
-			}
-			data, err := renderPlotLabelPDF(context.Background(), p, fonts)
-			if err != nil {
-				t.Fatal(err)
-			}
-			file, err := os.OpenFile(filepath.Join(evidence, name), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
-			if err != nil {
-				t.Fatal(err)
-			}
-			n, writeErr := file.Write(data)
-			closeErr := file.Close()
-			if n != len(data) || writeErr != nil || closeErr != nil {
-				t.Fatalf("evidence write: %d/%d, %v, %v", n, len(data), writeErr, closeErr)
-			}
-		}
-	}
 }

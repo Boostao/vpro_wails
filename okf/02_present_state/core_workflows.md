@@ -68,7 +68,7 @@ sequenceDiagram
 4. **Universal Datasheet Grid (`UniversalDatasheetGrid.svelte`, `internal/datasheet`):** Direct spreadsheet editing across `<P>_Env`, `<P>_Admin`, `<P>_Veg`, `<P>_Humus`, `<P>_Mineral`, `<P>_Other`, and `<Name>_SU` (`Email 0035`) with multi-column sort, active-SU scoping, global search, clipboard TSV paste, find/replace, and atomic `<Project>_Audit` transactions.
 
 ### 3.2 Muscle-Memory Keyboard Navigation & Validation Rules
-* **`Enter`-Key Traversal (`frontend/src/enterNavigation.ts:1-68`):** Replicates Access subform data-entry ergonomics:
+* **`Enter`-Key Traversal (`frontend/src/entry/enterNavigation.ts:1-68`):** Replicates Access subform data-entry ergonomics:
   * On parent field panels (`mode === 'field'`), pressing `Enter` advances sequentially across card fields in physical tab order.
   * Inside child grids (`SubVegA*`, `SubVegCXL`, `SubVegDXL`, `SoilHumusXL`, `SoilMineralXL`, `mode === 'record'`), pressing `Enter` moves **vertically down the same column** to the next row for rapid cover/depth transcription, halting immediately if `aria-invalid="true"` and never auto-committing incomplete rows.
 * **Calibrated Access Type & Boundary Validation (`childvalidation.go:11-39`, `vegetationvalidation.go:8-22`, `AGENTS.md:62-94, 134-139`):**

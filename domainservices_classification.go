@@ -6,6 +6,8 @@ import (
 
 	classificationpkg "github.com/boostao/vpro-wails/internal/classification"
 	diagnosticspkg "github.com/boostao/vpro-wails/internal/diagnostics"
+	referencespkg "github.com/boostao/vpro-wails/internal/references"
+	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 )
 
 type CreateSUTableRequest = classificationpkg.CreateSUTableRequest
@@ -47,20 +49,20 @@ type ExportDiagnosticWorkbookResult = diagnosticspkg.ExportDiagnosticWorkbookRes
 
 type ClassificationService struct {
 	contexts              *ContextService
-	bec                   *BECService
-	workingUnits          *WorkingUnitService
-	externalSUEnvironment *ExternalSUEnvironmentService
-	twoPageProfiling      *TwoPageProfilingService
-	speciesPresence       *ProjectProfileSpeciesPresenceService
+	bec                   *referencespkg.BECService
+	workingUnits          *vprocorepkg.WorkingUnitService
+	externalSUEnvironment *classificationpkg.ExternalSUEnvironmentService
+	twoPageProfiling      *classificationpkg.TwoPageProfilingService
+	speciesPresence       *classificationpkg.ProjectProfileSpeciesPresenceService
 }
 
 func NewClassificationService(
 	contexts *ContextService,
-	bec *BECService,
-	workingUnits *WorkingUnitService,
-	externalSUEnvironment *ExternalSUEnvironmentService,
-	twoPageProfiling *TwoPageProfilingService,
-	speciesPresence *ProjectProfileSpeciesPresenceService,
+	bec *referencespkg.BECService,
+	workingUnits *vprocorepkg.WorkingUnitService,
+	externalSUEnvironment *classificationpkg.ExternalSUEnvironmentService,
+	twoPageProfiling *classificationpkg.TwoPageProfilingService,
+	speciesPresence *classificationpkg.ProjectProfileSpeciesPresenceService,
 ) *ClassificationService {
 	return &ClassificationService{
 		contexts:              contexts,
@@ -70,6 +72,30 @@ func NewClassificationService(
 		twoPageProfiling:      twoPageProfiling,
 		speciesPresence:       speciesPresence,
 	}
+}
+
+func buildClassificationService(
+	contexts *ContextService,
+	bec *referencespkg.BECService,
+	workingUnits *vprocorepkg.WorkingUnitService,
+) (*ClassificationService, error) {
+	core := unwrapContextService(contexts)
+	twoPageProfiling, err := classificationpkg.NewTwoPageProfilingService(core)
+	if err != nil {
+		return nil, err
+	}
+	speciesPresence, err := classificationpkg.NewProjectProfileSpeciesPresenceService(core)
+	if err != nil {
+		return nil, err
+	}
+	return NewClassificationService(
+		contexts,
+		bec,
+		workingUnits,
+		classificationpkg.NewExternalSUEnvironmentService(core),
+		twoPageProfiling,
+		speciesPresence,
+	), nil
 }
 
 func (s *ClassificationService) GetBECCatalogueStatus(ctx context.Context) (BECCatalogueStatus, error) {
@@ -477,4 +503,3 @@ func (s *ClassificationService) ExportDiagnosticWorkbook(ctx context.Context, co
 	}
 	return diagnosticspkg.ExportDiagnosticWorkbook(ctx, unwrapContextService(s.contexts), contextID, request)
 }
-

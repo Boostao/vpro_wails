@@ -17,8 +17,6 @@ import (
 
 var standards2026ProvenanceJSON = resources.Standards2026ProvenanceJSON
 
-var appVersion = "0.1.0"
-
 type StandardsSourceStamp struct {
 	ArchiveName     string `json:"archiveName"`
 	ArchiveSHA256   string `json:"archiveSha256"`
@@ -53,14 +51,22 @@ type AboutInfo struct {
 	FullName       string        `json:"fullName"`
 	Organization   string        `json:"organization"`
 	AppVersion     string        `json:"appVersion"`
+	BuildMode      string        `json:"buildMode"`
+	GitCommit      string        `json:"gitCommit"`
+	BuildDate      string        `json:"buildDate"`
+	IsPrerelease   bool          `json:"isPrerelease"`
+	UnsignedNotice bool          `json:"unsignedNotice"`
 	SchemaVersion  string        `json:"schemaVersion"`
 	ReleaseChannel string        `json:"releaseChannel"`
+	ConfigPath     string        `json:"configPath"`
+	DataDir        string        `json:"dataDir"`
 	LibraryStamps  LibraryStamps `json:"libraryStamps"`
 }
 
 type HelpService struct {
 	preferences *vprocore.DesktopConfig
 	contexts    *vprocore.ContextService
+	dataDir     string
 	stamps      LibraryStamps
 	bundle      HelpBundle
 }
@@ -160,6 +166,12 @@ func (s *HelpService) SetContext(contexts *vprocore.ContextService) {
 	}
 }
 
+func (s *HelpService) SetDataDir(dataDir string) {
+	if s != nil {
+		s.dataDir = strings.TrimSpace(dataDir)
+	}
+}
+
 func (s *HelpService) GetLibraryStamps(ctx context.Context) (LibraryStamps, error) {
 	if ctx == nil {
 		return LibraryStamps{}, errors.New("library stamp lookup requires a context")
@@ -195,13 +207,28 @@ func (s *HelpService) GetAboutInfo(ctx context.Context) (AboutInfo, error) {
 	if err != nil {
 		return AboutInfo{}, err
 	}
+	build := CurrentBuildInfo()
+	var configPath, dataDir string
+	if build.BuildMode == BuildModeDev && s != nil {
+		if s.preferences != nil {
+			configPath = s.preferences.Path
+		}
+		dataDir = s.dataDir
+	}
 	return AboutInfo{
 		ProductName:    "VPro",
 		FullName:       "VENUS — Vegetation and Environment NexUS — Professional",
 		Organization:   "B.C. Ministry of Forests, Research Branch — Biogeoclimatic Ecosystem Classification (BEC) Program",
-		AppVersion:     appVersion,
+		AppVersion:     build.AppVersion,
+		BuildMode:      build.BuildMode,
+		GitCommit:      build.GitCommit,
+		BuildDate:      build.BuildDate,
+		IsPrerelease:   build.IsPrerelease,
+		UnsignedNotice: build.UnsignedNotice,
 		SchemaVersion:  "VP08",
 		ReleaseChannel: channel,
+		ConfigPath:     configPath,
+		DataDir:        dataDir,
 		LibraryStamps:  stamps,
 	}, nil
 }

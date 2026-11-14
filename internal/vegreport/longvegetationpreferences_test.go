@@ -29,25 +29,10 @@ func longVegetationTitleRequest(t *testing.T, expected, proposed string) string 
 	return string(raw)
 }
 
-func TestLongVegetationPreferencesIndependentGate(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		got, err := LongVegetationPreferencesFeature(func(name string) (string, bool) {
-			if name != "VPRO_LONG_VEGETATION_PREFERENCES" {
-				t.Fatal(name)
-			}
-			return test.value, test.present
-		})
-		if got != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, got, err)
-		}
-	}
+func TestLongVegetationPreferencesUnavailableGuards(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*LongVegetationPreferencesService{nil, {}, NewLongVegetationPreferencesService(nil, true)} {
+	for _, service := range []*LongVegetationPreferencesService{nil, {}, NewLongVegetationPreferencesService(nil)} {
 		for _, requestCtx := range []context.Context{nil, context.Background(), ctx} {
 			if value, err := service.GetLongVegetationPreferences(requestCtx, "id"); value != nil || err == nil {
 				t.Fatal(value, err)
@@ -65,7 +50,7 @@ func TestLongVegetationPreferencesStrictWireAndYAMLOnly(t *testing.T) {
 		Request LongVegetationPreferencesRequest `json:"request"`
 		Outcome LongVegetationPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationPreferenceWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationPreferenceWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,14 +61,7 @@ func TestLongVegetationPreferencesStrictWireAndYAMLOnly(t *testing.T) {
 		t.Fatal(wire.Request)
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationPreferencesService(contexts, true)
-	disabled := NewLongVegetationPreferencesService(contexts, false)
-	if value, err := disabled.GetLongVegetationPreferences(context.Background(), state.ContextID); value != nil || err == nil {
-		t.Fatal(value, err)
-	}
-	if value := disabled.SaveLongVegetationPreferences(context.Background(), state.ContextID, longVegetationTitleRequest(t, "Long Vegetation Report", "new")); value.Committed || value.ErrorMessage == "" {
-		t.Fatal(value)
-	}
+	service := NewLongVegetationPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	before, err := contexts.Projects.Preferences.Snapshot()
 	if err != nil {
@@ -142,7 +120,7 @@ func TestLongVegetationPreferencesStrictWireAndYAMLOnly(t *testing.T) {
 
 func TestLongVegetationPreferencesRefusalsNoopAndLiteralRetry(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationPreferencesService(contexts, true)
+	service := NewLongVegetationPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	before, err := os.ReadFile(store.Path)
 	if err != nil {
@@ -232,7 +210,7 @@ func TestLongVegetationPreferencesHistoricalInvalidStorage(t *testing.T) {
 		if err := store.Commit(raw); err != nil {
 			t.Fatal(err)
 		}
-		service := NewLongVegetationPreferencesService(contexts, true)
+		service := NewLongVegetationPreferencesService(contexts)
 		review, err := service.GetLongVegetationPreferences(context.Background(), state.ContextID)
 		if title, valid := historical.(string); valid {
 			if err != nil || review.Values.Title != title {
@@ -254,7 +232,7 @@ func TestLongVegetationPreferencesHistoricalInvalidStorage(t *testing.T) {
 
 func TestLongVegetationPreferencesCleanupOwnershipRollbackAndCommittedReceipt(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationPreferencesService(contexts, true)
+	service := NewLongVegetationPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	request := longVegetationTitleRequest(t, "Long Vegetation Report", "committed")
 	before, err := os.ReadFile(store.Path)

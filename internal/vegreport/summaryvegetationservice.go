@@ -10,11 +10,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 )
-
-const summaryVegetationFeatureEnvironment = "VPRO_SUMMARY_VEGETATION"
 
 type SummaryVegetationReferenceOrigin struct {
 	Table string `json:"table"`
@@ -77,21 +74,12 @@ type SummaryVegetationPreview struct {
 }
 
 type SummaryVegetationService struct {
-	contexts           *vprocore.ContextService
-	Enabled            bool `json:"-" yaml:"-"`
-	snapshot           vprocore.PublicationReadSnapshotHooks
-	QualityPreferences bool `json:"-" yaml:"-"`
+	contexts *vprocore.ContextService
+	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewSummaryVegetationService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SummaryVegetationService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(summaryVegetationFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SummaryVegetationService{contexts: contexts, Enabled: enabled}, nil
+func NewSummaryVegetationService(contexts *vprocore.ContextService) (*SummaryVegetationService, error) {
+	return &SummaryVegetationService{contexts: contexts}, nil
 }
 
 // Explicit read-only draft options do not invoke the mutating Access Form_Load
@@ -129,10 +117,7 @@ func (s *SummaryVegetationService) preview(ctx context.Context, contextID string
 	if err := ctx.Err(); err != nil {
 		return fail(err)
 	}
-	if s == nil || !s.Enabled {
-		return fail(errors.New("Summary Vegetation is disabled in this session"))
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return fail(errors.New("Summary Vegetation context service is unavailable"))
 	}
 	if err := vprocore.ValidateGoogleEarthReviewStrings(contextID); err != nil {
@@ -203,14 +188,12 @@ func (s *SummaryVegetationService) readSnapshotWithReferenceMode(ctx context.Con
 		return fail(errors.New("Summary effective common/guide references require Layer11 or Strata12 inspection; First(common name) for13/14 remains unavailable"))
 	}
 
-	if s.QualityPreferences {
-		quality, err := ReadSummaryVegetationQualityPreferences(plots.Projects.Preferences, ctx)
-		if err != nil {
-			return fail(err)
-		}
-		if quality.Enforce {
-			return fail(errors.New("Summary Vegetation quality enforcement is saved but qualified preview is unavailable; no unfiltered report returned"))
-		}
+	quality, err := ReadSummaryVegetationQualityPreferences(plots.Projects.Preferences, ctx)
+	if err != nil {
+		return fail(err)
+	}
+	if quality.Enforce {
+		return fail(errors.New("Summary Vegetation quality enforcement is saved but qualified preview is unavailable; no unfiltered report returned"))
 	}
 	if owner.Selection.SU == "None" || owner.Selection.SU == "USysSuTableDynamic" {
 		return fail(errors.New("Summary Vegetation requires a selected normal SU; hierarchy/dynamic-break scope is unavailable"))
@@ -277,7 +260,6 @@ func (s *SummaryVegetationService) readSnapshotWithReferenceMode(ctx context.Con
 	}
 	var report summaryVegetationLayerReport
 	var grouped summaryVegetationGroupedReport
-	var err error
 	var descriptions *vprocore.ProjectMetadataTable
 	var references *summaryVegetationReferencePlan
 	if options != nil {

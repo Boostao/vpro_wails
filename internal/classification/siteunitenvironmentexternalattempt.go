@@ -98,7 +98,7 @@ func (s *ExternalSUEnvironmentService) finishExternalSUEnvironmentAttempt(reques
 }
 
 func (s *ExternalSUEnvironmentService) RecoverOutcome(ctx context.Context, contextID, requestJSON string) (*ExternalSUEnvironmentAttemptOutcome, error) {
-	if err := s.authorize(ctx, false); err != nil {
+	if err := s.authorize(ctx); err != nil {
 		return nil, err
 	}
 	var request ExternalSUEnvironmentRequest

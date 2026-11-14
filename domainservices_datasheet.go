@@ -24,11 +24,11 @@ type DatasheetFindReplacePreview = datasheetpkg.DatasheetFindReplacePreview
 
 type DatasheetService struct {
 	contexts         *vprocorepkg.ContextService
-	environmentTable *TwoPageEnvironmentTableService
-	vegetationTable  *TwoPageVegetationTableService
+	environmentTable *datasheetpkg.TwoPageEnvironmentTableService
+	vegetationTable  *datasheetpkg.TwoPageVegetationTableService
 }
 
-func NewDatasheetService(environmentTable *TwoPageEnvironmentTableService, vegetationTable *TwoPageVegetationTableService) *DatasheetService {
+func NewDatasheetService(environmentTable *datasheetpkg.TwoPageEnvironmentTableService, vegetationTable *datasheetpkg.TwoPageVegetationTableService) *DatasheetService {
 	var contexts *vprocorepkg.ContextService
 	if environmentTable != nil {
 		contexts = environmentTable.Contexts
@@ -38,6 +38,19 @@ func NewDatasheetService(environmentTable *TwoPageEnvironmentTableService, veget
 		environmentTable: environmentTable,
 		vegetationTable:  vegetationTable,
 	}
+}
+
+func buildDatasheetService(contexts *ContextService) (*DatasheetService, error) {
+	core := unwrapContextService(contexts)
+	envTable, err := datasheetpkg.NewTwoPageEnvironmentTableService(core)
+	if err != nil {
+		return nil, err
+	}
+	vegTable, err := datasheetpkg.NewTwoPageVegetationTableService(core)
+	if err != nil {
+		return nil, err
+	}
+	return NewDatasheetService(envTable, vegTable), nil
 }
 
 func (s *DatasheetService) setContext(contexts *ContextService) {

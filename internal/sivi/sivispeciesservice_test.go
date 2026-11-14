@@ -23,7 +23,7 @@ import (
 )
 
 func TestSIVISpeciesFrontendReferenceWireFixture(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join("frontend", "src", "siviSpeciesReferenceFixture.json"))
+	data, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "siviSpeciesReferenceFixture.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,12 +70,7 @@ func siviSpeciesServiceFixture(t *testing.T, extended bool, strength int) (*sour
 		VALUES (-9223372036854775807,'108050','RAW',10000003,0,'V')`); err != nil {
 		t.Fatal(err)
 	}
-	service, err := sourceform.NewSIVISpeciesService(contexts, func(name string) (string, bool) {
-		if name != sourceform.SiviSpeciesFeatureEnvironment {
-			t.Fatal("Species consulted a predecessor gate", name)
-		}
-		return "true", true
-	})
+	service, err := sourceform.NewSIVISpeciesService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +105,7 @@ func siviSpeciesRequestJSON(t *testing.T, request sourceform.SIVISpeciesWrite) s
 	return string(data)
 }
 
-func TestSIVISpeciesServiceIndependentGateNilCancellationAndReferences(t *testing.T) {
+func TestSIVISpeciesServiceNilCancellationAndReferences(t *testing.T) {
 	service, contexts, state, _, request := siviSpeciesServiceFixture(t, false, 3)
 	valid := siviSpeciesRequestJSON(t, request)
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
@@ -119,44 +114,8 @@ func TestSIVISpeciesServiceIndependentGateNilCancellationAndReferences(t *testin
 		*request.References.Master.Rows[0].Cells[3].Text != "" {
 		t.Fatal("references lost duplicate definitions or nullable metadata", request.References)
 	}
-	contexts.SiviHeightEnabled = true
-	defaultSpecies, err := sourceform.NewSIVISpeciesService(contexts, func(string) (string, bool) { return "", false })
-	if err != nil || !defaultSpecies.Enabled {
-		t.Fatal("default species gate disabled", defaultSpecies, err)
-	}
-	for _, present := range []bool{true} {
-		disabled, err := sourceform.NewSIVISpeciesService(contexts, func(name string) (string, bool) {
-			if name != sourceform.SiviSpeciesFeatureEnvironment {
-				t.Fatal("foreign gate", name)
-			}
-			return "false", present
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-		if got, err := disabled.GetOriginal(context.Background(), state.ContextID, "108050", false); got != nil || err == nil {
-			t.Fatal("disabled original succeeded", got, err)
-		}
-		if got, err := disabled.GetReferences(context.Background(), state.ContextID, "108050"); got.ContextID != "" || err == nil {
-			t.Fatal("disabled reference succeeded", got, err)
-		}
-		if got, err := disabled.SaveReviewed(context.Background(), state.ContextID, "108050", false, valid); got != nil || err == nil {
-			t.Fatal("disabled Save succeeded", got, err)
-		}
-		if got, err := disabled.RestoreReviewed(context.Background(), state.ContextID, "108050", "1", vprocore.AuditRestorePrune); got != nil || err == nil {
-			t.Fatal("disabled Restore succeeded", got, err)
-		}
-	}
-	for _, value := range []string{"", "TRUE", "1", " true ", "yes"} {
-		if got, err := sourceform.NewSIVISpeciesService(contexts, func(string) (string, bool) { return value, true }); got != nil || err == nil {
-			t.Fatal("invalid literal gate", value, got, err)
-		}
-	}
-	if got, err := sourceform.NewSIVISpeciesService(nil, func(string) (string, bool) { return "true", true }); got != nil || err == nil {
+	if got, err := sourceform.NewSIVISpeciesService(nil); got != nil || err == nil {
 		t.Fatal("nil owner", got, err)
-	}
-	if got, err := sourceform.NewSIVISpeciesService(contexts, nil); got != nil || err == nil {
-		t.Fatal("nil lookup", got, err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()

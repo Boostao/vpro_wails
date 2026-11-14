@@ -30,25 +30,10 @@ func vegetationThresholdRequest(t *testing.T, expected, proposed LongVegetationT
 	return string(raw)
 }
 
-func TestLongVegetationThresholdPreferencesGateAndStrictWire(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		got, err := LongVegetationThresholdPreferencesFeature(func(name string) (string, bool) {
-			if name != "VPRO_LONG_VEGETATION_THRESHOLD_PREFERENCES" {
-				t.Fatal(name)
-			}
-			return test.value, test.present
-		})
-		if got != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, got, err)
-		}
-	}
+func TestLongVegetationThresholdPreferencesStrictWire(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*LongVegetationThresholdPreferencesService{nil, {}, NewLongVegetationThresholdPreferencesService(nil, true)} {
+	for _, service := range []*LongVegetationThresholdPreferencesService{nil, {}, NewLongVegetationThresholdPreferencesService(nil)} {
 		for _, requestCtx := range []context.Context{nil, context.Background(), ctx} {
 			if got, err := service.GetLongVegetationThresholdPreferences(requestCtx, "id"); got != nil || err == nil {
 				t.Fatal(got, err)
@@ -63,7 +48,7 @@ func TestLongVegetationThresholdPreferencesGateAndStrictWire(t *testing.T) {
 		Request LongVegetationThresholdPreferencesRequest `json:"request"`
 		Outcome LongVegetationThresholdPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationThresholdWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationThresholdWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,15 +56,7 @@ func TestLongVegetationThresholdPreferencesGateAndStrictWire(t *testing.T) {
 		t.Fatal(err)
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationThresholdPreferencesService(contexts, true)
-	disabled := NewLongVegetationThresholdPreferencesService(contexts, false)
-	if got, err := disabled.GetLongVegetationThresholdPreferences(context.Background(), state.ContextID); got != nil || err == nil {
-		t.Fatal(got, err)
-	}
-	if got := disabled.SaveLongVegetationThresholdPreferences(context.Background(), state.ContextID,
-		vegetationThresholdRequest(t, wire.Request.Expected, wire.Request.Proposed)); got.Committed || got.ErrorMessage == "" {
-		t.Fatal(got)
-	}
+	service := NewLongVegetationThresholdPreferencesService(contexts)
 	read, err := service.GetLongVegetationThresholdPreferences(context.Background(), state.ContextID)
 	if err != nil || read.ContextID != state.ContextID || read.ProjectPath != state.ProjectPath || read.SUPath != state.SUPath {
 		t.Fatal(read, err)
@@ -116,7 +93,7 @@ func TestLongVegetationThresholdPreferencesGateAndStrictWire(t *testing.T) {
 
 func TestLongVegetationThresholdPreferencesStrictNumbersAndMalformedRequests(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationThresholdPreferencesService(contexts, true)
+	service := NewLongVegetationThresholdPreferencesService(contexts)
 	base := vegetationThresholdRequest(t, LongVegetationThresholdPreferenceValues{}, LongVegetationThresholdPreferenceValues{})
 	before, err := os.ReadFile(contexts.Projects.Preferences.Path)
 	if err != nil {
@@ -161,7 +138,7 @@ func TestLongVegetationThresholdPreferencesStrictNumbersAndMalformedRequests(t *
 
 func TestLongVegetationThresholdPreferencesFinitePairsNoopStaleAndHistoricalOmission(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationThresholdPreferencesService(contexts, true)
+	service := NewLongVegetationThresholdPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	for _, next := range []LongVegetationThresholdPreferenceValues{
@@ -214,7 +191,7 @@ func TestLongVegetationThresholdPreferencesFinitePairsNoopStaleAndHistoricalOmis
 
 func TestLongVegetationThresholdPreferencesInvalidStorageAndNonfinitePlans(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationThresholdPreferencesService(contexts, true)
+	service := NewLongVegetationThresholdPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	values, err := store.Snapshot()
 	if err != nil {
@@ -271,7 +248,7 @@ func TestLongVegetationThresholdPreferencesInvalidStorageAndNonfinitePlans(t *te
 
 func TestLongVegetationThresholdPreferencesOwnershipCleanupCollisionCancellationAndRetry(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationThresholdPreferencesService(contexts, true)
+	service := NewLongVegetationThresholdPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	proposed := LongVegetationThresholdPreferenceValues{-1, 1.5}
 	request := vegetationThresholdRequest(t, LongVegetationThresholdPreferenceValues{}, proposed)

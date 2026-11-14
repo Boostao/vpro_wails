@@ -12,8 +12,6 @@ import (
 	"fmt"
 )
 
-const TwoPageParentEntryEditingEnvironment = "VPRO_TWO_PAGE_PARENT_ENTRY_EDITING"
-
 type TwoPageEntryReferenceFilters struct {
 	Zone    vprocore.ProjectMetadataCell `json:"zone"`
 	SubZone vprocore.ProjectMetadataCell `json:"subZone"`
@@ -162,39 +160,26 @@ func (request *TwoPageParentEntryWrite) UnmarshalJSON(data []byte) error {
 }
 
 type TwoPageParentEntryService struct {
-	contexts                    *vprocore.ContextService
-	Readers                     TwoPageEntryReferenceReaders `json:"-" yaml:"-"`
-	ReviewEnabled, EditsEnabled bool                         `json:"-" yaml:"-"`
+	contexts *vprocore.ContextService
+	Readers  TwoPageEntryReferenceReaders `json:"-" yaml:"-"`
 }
 
-func NewTwoPageParentEntryService(contexts *vprocore.ContextService, readers TwoPageEntryReferenceReaders,
-	lookup func(string) (string, bool)) (*TwoPageParentEntryService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("complete-entry service requires owned contexts and an explicit feature lookup")
+func NewTwoPageParentEntryService(contexts *vprocore.ContextService, readers TwoPageEntryReferenceReaders) (*TwoPageParentEntryService, error) {
+	if contexts == nil {
+		return nil, errors.New("complete-entry service requires owned contexts")
 	}
-	review, err := vprocore.SiviFeature(TwoPageParentReviewEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	editing, err := vprocore.SiviFeature(TwoPageParentEntryEditingEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageParentEntryService{contexts: contexts, Readers: readers, ReviewEnabled: review, EditsEnabled: editing}, nil
+	return &TwoPageParentEntryService{contexts: contexts, Readers: readers}, nil
 }
 
-func (s *TwoPageParentEntryService) require(ctx context.Context, editing bool) error {
+func (s *TwoPageParentEntryService) require(ctx context.Context, _ bool) error {
 	if ctx == nil {
 		return errors.New("complete-entry service requires a context")
 	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.contexts == nil || !s.ReviewEnabled {
-		return errors.New("complete-entry reads require independently enabled two-page source review")
-	}
-	if editing && !s.EditsEnabled {
-		return errors.New("complete-entry writes require independently enabled complete-form editing")
+	if s == nil || s.contexts == nil {
+		return errors.New("complete-entry service requires owned contexts")
 	}
 	return nil
 }

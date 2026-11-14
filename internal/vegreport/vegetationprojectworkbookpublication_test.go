@@ -26,7 +26,7 @@ import (
 func projectWorkbookOwnedFixture(t *testing.T, external, none, all bool) (*LongVegetationProjectWorkbookService, vprocore.ProjectState, *LongVegetationReportScope) {
 	t.Helper()
 	scope, state, built := projectPreviewFixture(t, external, none, all)
-	service := NewLongVegetationProjectWorkbookService(scope.contexts, true, true)
+	service := NewLongVegetationProjectWorkbookService(scope.contexts)
 	service.now = func() time.Time { return time.Date(2026, 10, 10, 23, 59, 59, 0, time.Local) }
 	return service, state, built
 }
@@ -111,10 +111,9 @@ func TestProjectWorkbookOwnedReviewPublicationActualPathsSummaryAndOnceOnlyBytes
 func TestProjectWorkbookStrictRequestsGatesStaleScopeAndSavedModeRefuse(t *testing.T) {
 	service, state, scope := projectWorkbookOwnedFixture(t, false, false, false)
 	request := projectWorkbookReadJSON(t, scope)
-	for _, gates := range [][2]bool{{false, false}, {true, false}, {false, true}} {
-		disabled := NewLongVegetationProjectWorkbookService(service.scope.contexts, gates[0], gates[1])
+	for _, disabled := range []*LongVegetationProjectWorkbookService{nil, {}, NewLongVegetationProjectWorkbookService(nil)} {
 		if review, err := disabled.GetReview(context.Background(), state.ContextID, request); err == nil || review != nil {
-			t.Fatal("project workbook borrowed another capability", gates, err)
+			t.Fatal("unconfigured project workbook succeeded", err)
 		}
 	}
 	for _, invalid := range []string{

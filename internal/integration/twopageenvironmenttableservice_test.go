@@ -266,23 +266,8 @@ func TestTwoPageEnvironmentTableInFlightCancellationPreservesCoordinator(t *test
 
 func TestTwoPageEnvironmentTableGateCancellationAndOpeningScope(t *testing.T) {
 	service, state, _ := twoPageEnvironmentTableFixture(t, false)
-	if defaultGated, err := datasheet.NewTwoPageEnvironmentTableService(service.Contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultGated.Review {
-		t.Fatal("default gate not enabled", defaultGated, err)
-	}
-	for _, test := range []struct {
-		value   string
-		present bool
-		valid   bool
-	}{{"false", true, true}, {"TRUE", true, false}, {"1", true, false}, {" true ", true, false}} {
-		gated, err := datasheet.NewTwoPageEnvironmentTableService(service.Contexts, func(string) (string, bool) { return test.value, test.present })
-		if (err == nil) != test.valid {
-			t.Fatal(test, err)
-		}
-		if err == nil {
-			if got, err := gated.GetReview(context.Background(), state.ContextID, "108050", 0, 1); err == nil || got != nil {
-				t.Fatal("off gate returned review", got, err)
-			}
-		}
+	if _, err := datasheet.NewTwoPageEnvironmentTableService(nil); err == nil {
+		t.Fatal("nil context accepted")
 	}
 	for _, plot := range []string{"", "A", "108050 ", "\xff"} {
 		if got, err := service.GetReview(context.Background(), state.ContextID, plot, 0, 1); err == nil || got != nil {

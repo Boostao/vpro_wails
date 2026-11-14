@@ -24,7 +24,7 @@ func TestTwoPageSourceAuditProductionWireFixture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fixture, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageAuditWire.json"))
+	fixture, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageAuditWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

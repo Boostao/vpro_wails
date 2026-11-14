@@ -20,7 +20,6 @@ import (
 func plotLabelRegionalFixture(t *testing.T) (*PlotLabelRegionalService, vprocore.ProjectState) {
 	t.Helper()
 	contexts, state := vprotest.ContextServiceFixture(t)
-	t.Setenv(plotLabelRegionalDateEnvironment, "true")
 	service, err := NewPlotLabelRegionalService(contexts)
 	if err != nil {
 		t.Fatal(err)
@@ -66,11 +65,6 @@ func TestPlotLabelRegionalReadStrictWireAndNoWrites(t *testing.T) {
 	if err := decoder.Decode(&decoded); err != nil || !reflect.DeepEqual(got, &decoded) {
 		t.Fatal("strict regional label wire changed", err)
 	}
-	if path := os.Getenv("VPRO_PLOT_LABEL_REGIONAL_WIRE_PATH"); path != "" {
-		if err := os.WriteFile(path, append(wire, '\n'), 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
 	afterConfig, err := os.ReadFile(service.contexts.Projects.Preferences.Path)
 	if err != nil || !bytes.Equal(config, afterConfig) ||
 		!reflect.DeepEqual(before, vprotest.DatabaseBytes(t, service.contexts.Projects.Sqlite.Attachments)) {
@@ -78,20 +72,8 @@ func TestPlotLabelRegionalReadStrictWireAndNoWrites(t *testing.T) {
 	}
 }
 
-func TestPlotLabelRegionalGateContextAndExplicitDateErrors(t *testing.T) {
+func TestPlotLabelRegionalContextAndExplicitDateErrors(t *testing.T) {
 	service, state := plotLabelRegionalFixture(t)
-	t.Setenv(plotLabelRegionalDateEnvironment, "false")
-	disabled, err := NewPlotLabelRegionalService(service.contexts)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result, err := disabled.GetPreview(t.Context(), state.ContextID, "LB001"); err == nil || result != nil {
-		t.Fatal("backend-off date returned partial success", result, err)
-	}
-	t.Setenv(plotLabelRegionalDateEnvironment, "invalid")
-	if _, err := NewPlotLabelRegionalService(service.contexts); err == nil {
-		t.Fatal("malformed feature flag accepted")
-	}
 	for _, owner := range []string{"", "foreign"} {
 		if result, err := service.GetPreview(t.Context(), owner, "LB001"); err == nil || result != nil {
 			t.Fatal("foreign owner returned a label", result, err)

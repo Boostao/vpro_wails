@@ -15,13 +15,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 )
-
-const environmentWorkbookFeatureEnvironment = "VPRO_LONG_ENVIRONMENT_WORKBOOK"
 
 type EnvironmentWorkbookReview struct {
 	Preview        LongEnvironmentPreview     `json:"preview"`
@@ -57,7 +54,6 @@ type EnvironmentWorkbookOutcome struct {
 
 type EnvironmentWorkbookService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
 type environmentWorkbookSource struct {
@@ -70,15 +66,8 @@ type environmentWorkbookHooks struct {
 	publication vprocore.ArtifactPublicationHooks
 }
 
-func NewEnvironmentWorkbookService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*EnvironmentWorkbookService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(environmentWorkbookFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &EnvironmentWorkbookService{contexts: contexts, enabled: enabled}, nil
+func NewEnvironmentWorkbookService(contexts *vprocore.ContextService) (*EnvironmentWorkbookService, error) {
+	return &EnvironmentWorkbookService{contexts: contexts}, nil
 }
 
 func (s *EnvironmentWorkbookService) authorize(ctx context.Context) error {
@@ -88,10 +77,7 @@ func (s *EnvironmentWorkbookService) authorize(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Environment workbook is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Environment workbook context service is unavailable")
 	}
 	return nil

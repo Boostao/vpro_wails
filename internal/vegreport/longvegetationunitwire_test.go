@@ -20,7 +20,7 @@ func TestLongVegetationUnitPreferencesStrictSharedClientWire(t *testing.T) {
 		Request LongVegetationUnitPreferencesRequest `json:"request"`
 		Outcome LongVegetationUnitPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationUnitWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationUnitWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,8 +28,7 @@ func TestLongVegetationUnitPreferencesStrictSharedClientWire(t *testing.T) {
 		t.Fatal(err)
 	}
 	contexts, state := vprotest.ReportServiceFixture(t, true)
-	contexts.LongVegetationNoneUnitsEnabled = true
-	service := NewLongVegetationUnitPreferencesService(contexts, true)
+	service := NewLongVegetationUnitPreferencesService(contexts)
 	read, err := service.GetLongVegetationUnitPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)

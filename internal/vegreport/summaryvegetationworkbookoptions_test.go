@@ -17,9 +17,7 @@ import (
 
 func TestSummaryDraftWorkbookRetainedShowOptionMatrix(t *testing.T) {
 	source, state := summaryEnvironmentalLifeformServiceFixture(t, false)
-	service, err := NewSummaryVegetationWorkbookService(source, func(name string) (string, bool) {
-		return "true", name == summaryVegetationWorkbookFeatureEnvironment
-	})
+	service, err := NewSummaryVegetationWorkbookService(source)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,9 +100,7 @@ func TestSummaryDraftWorkbookRetainedShowOptionMatrix(t *testing.T) {
 
 func TestSummaryDraftWorkbookIgnoredShowStillBindsPublicationApproval(t *testing.T) {
 	source, state := summaryEnvironmentalLifeformServiceFixture(t, false)
-	service, err := NewSummaryVegetationWorkbookService(source, func(name string) (string, bool) {
-		return "true", name == summaryVegetationWorkbookFeatureEnvironment
-	})
+	service, err := NewSummaryVegetationWorkbookService(source)
 	if err != nil {
 		t.Fatal(err)
 	}

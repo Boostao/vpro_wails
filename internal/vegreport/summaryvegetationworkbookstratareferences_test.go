@@ -14,7 +14,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/xuri/excelize/v2"
@@ -23,7 +22,6 @@ import (
 func summaryStrataReferenceWorkbookFixture(t *testing.T, external bool) (*SummaryVegetationWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	service, state := summaryReferenceWorkbookFixture(t, external)
-	service.GroupedEnabled = true
 	qualifySummaryGroupedDesktopFixture(t, service, state)
 	return service, state
 }
@@ -166,22 +164,11 @@ func TestSummaryStrataReferenceWorkbookIndependentGatesAndUnsupportedModes(t *te
 	group := 12
 	options := SummaryVegetationWorkbookOptions{Average: 1, Display: 6, GroupAndOrder: &group,
 		References: &SummaryVegetationReferenceOptions{ShowCommon: true}}
-	for _, grouped := range []bool{false, true} {
-		for _, references := range []bool{false, true} {
-			service.GroupedEnabled, service.ReferencesEnabled = grouped, references
-			review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
-			if grouped && references {
-				if err != nil || review == nil {
-					t.Fatal("joint existing authority did not enable Strata inspection", err)
-				}
-			} else if err == nil || review != nil || !strings.Contains(err.Error(), "disabled") {
-				t.Fatal("independent authority bypassed", grouped, references, review, err)
-			}
-		}
+	review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
+	if err != nil || review == nil {
+		t.Fatal("joint existing authority did not enable Strata inspection", err)
 	}
-	service.AncillaryEnabled = true
-	for _, mode := range []string{"lifeform", "none", "memberships", "summary", "display2"} {
-		service.AncillaryEnabled = mode != "memberships" && mode != "summary"
+	for _, mode := range []string{"lifeform", "none", "display2"} {
 		changed := options
 		switch mode {
 		case "lifeform", "none":
@@ -190,10 +177,6 @@ func TestSummaryStrataReferenceWorkbookIndependentGatesAndUnsupportedModes(t *te
 				other = 14
 			}
 			changed.GroupAndOrder = &other
-		case "memberships":
-			changed.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{}
-		case "summary":
-			changed.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{CreateSummary: true}
 		case "display2":
 			changed.Display = 2
 		}
@@ -214,7 +197,7 @@ func TestSummaryStrataReferenceWorkbookPublicationAuthorityAndRecovery(t *testin
 	}
 	destination := filepath.Join(t.TempDir(), "Strata # ' literal.xlsx")
 	request := summaryVegetationWorkbookExportRequest{Options: options, ApprovalHash: review.ApprovalHash, Destination: destination}
-	for _, mode := range []string{"layer", "plain", "common", "guide", "group-gate", "reference-gate", "cancel", "owner", "unrendered-peer"} {
+	for _, mode := range []string{"layer", "plain", "common", "guide", "cancel", "owner", "unrendered-peer"} {
 		changed := request
 		ctx, contextID := t.Context(), state.ContextID
 		owner := service.source.environment.report.contexts.Projects.Sqlite
@@ -227,10 +210,6 @@ func TestSummaryStrataReferenceWorkbookPublicationAuthorityAndRecovery(t *testin
 			changed.Options.References = &SummaryVegetationReferenceOptions{}
 		case "guide":
 			changed.Options.References = &SummaryVegetationReferenceOptions{ShowCommon: true, UseGuideNames: true}
-		case "group-gate":
-			service.GroupedEnabled = false
-		case "reference-gate":
-			service.ReferencesEnabled = false
 		case "cancel":
 			cancelled, cancel := context.WithCancel(ctx)
 			cancel()
@@ -242,7 +221,6 @@ func TestSummaryStrataReferenceWorkbookPublicationAuthorityAndRecovery(t *testin
 				`UPDATE USysSppAttributeDescription SET Definition='changed unrendered' WHERE ShortName IS NULL`)
 		}
 		result, err := service.ExportReviewed(ctx, contextID, vprotest.WorkbookRequest(t, changed))
-		service.GroupedEnabled, service.ReferencesEnabled = true, true
 		if mode == "unrendered-peer" {
 			vprotest.MutateContextFixture(t, owner.Attachments["VLists"],
 				`UPDATE USysSppAttributeDescription SET Definition='Not admitted' WHERE ShortName IS NULL`)
@@ -281,6 +259,5 @@ func TestSummaryStrataReferenceWorkbookClientWire(t *testing.T) {
 			ShowClass: item.show, IncludeEnv: item.env, GroupAndOrder: &group, References: &item.references}
 		wire[item.name] = portableSummaryWorkbookReview(t, service, state, options)
 	}
-	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookStrataReferencesWire.json",
-		"VPRO_UPDATE_SUMMARY_STRATA_REFERENCE_WORKBOOK_WIRE", wire)
+	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookStrataReferencesWire.json", wire)
 }

@@ -58,24 +58,24 @@ flowchart TB
 |---|---|---|---|
 | **Backend Language** | Go (`github.com/boostao/vpro-wails`, `CGO_ENABLED=1`, `-tags sqliteonly` default) | `go 1.25.0` (`1.26` in CI) | `go.mod:1-3`, `.github/workflows/release.yml:52` |
 | **Desktop Shell & IPC** | Wails v3 (`github.com/wailsapp/wails/v3` + `@wailsio/runtime`, `wails3 generate bindings -ts -i`) | `v3.0.0-beta.26` | `go.mod:10`, `frontend/package.json:74` |
-| **Primary SQL Engine** | CGO SQLite3 (`github.com/mattn/go-sqlite3`, `PRAGMA journal_mode = WAL`) | `v1.14.52` | `go.mod:9`, `main.go:401` |
+| **Primary SQL Engine** | CGO SQLite3 (`github.com/mattn/go-sqlite3`, `PRAGMA journal_mode = WAL`) | `v1.14.52` | `go.mod:9`, `internal/vprocore/sqlitecontext.go` |
 | **Optional Analytical Engine** | CGO DuckDB (`github.com/duckdb/duckdb-go/v2`, omitted in standard `-tags sqliteonly` desktop builds) | `v2.10505.0` | `go.mod:6`, `build/windows/Taskfile.yml` |
 | **Access Binary Reader** | Internal CGO `accessreader` wrapping vendored `mdbtools` (`libmdb`) on `linux \|\| windows \|\| darwin` | `1.0.1` (`-fvisibility=hidden`, Win `-static`) | `internal/accessreader/reader.go:1-16` |
 | **Windows Native Shell/COM** | `github.com/go-ole/go-ole` (`IFileDialog` / `IShellItem` COM syscalls, balanced STA) | `v1.3.0` | `go.mod:7`, `internal/pictures/` |
 | **Document & Interchange** | `excelize/v2` (`.xlsx`), `go-pdf/fpdf` + `LiberationSans` (`.pdf`), `golang.org/x/text`, `gopkg.in/yaml.v3` | `v2.10.1`, `v0.9.0`, `v0.39.0`, `v3.0.1` | `go.mod:8,11,14,15`, `resources/fonts/` |
-| **Frontend & 3D GIS** | Svelte 5 (`^5.46.4`), `maplibre-gl` (`^6.18.0`), `@deck.gl/*` (`^9.4.1`), `@luma.gl/webgpu` (`^9.4.2`), `pmtiles` (`^4.5.0`) | Svelte 5 + MapLibre 6.18 | `frontend/package.json:66-85` |
-| **CSS, Fonts & Icons** | Tailwind CSS v4 (`@tailwindcss/vite`), `@lucide/svelte`, IBM Plex Sans & Mono (`BC Sans` WOFF2 in `site/`) | `^4.3.3`, `^1.48.0`, `^5.3.0` | `frontend/package.json:69-71`, `site/fonts/` |
-| **Bundler & Test Suites** | Vite 8 (`^8.0.5`), `svelte-check` (`^4.4.8`), Node 22 `node --test` (`190` `.test.cjs` suites), Go test (`661` `*_test.go` files) | `^8.0.5` / Node `22` | `frontend/package.json:6-64,86-90` |
+| **Frontend & 3D GIS** | Svelte 5 (`^5.46.4`), `maplibre-gl` (`^6.18.0`), `@deck.gl/*` (`^9.4.1`), `@luma.gl/webgpu` (`^9.4.2`), `pmtiles` (`^4.5.0`) | Svelte 5 + MapLibre 6.18 | `frontend/package.json` |
+| **CSS, Fonts & Icons** | Tailwind CSS v4 (`@tailwindcss/vite`), `@lucide/svelte`, IBM Plex Sans & Mono (`BC Sans` WOFF2 in `site/`) | `^4.3.3`, `^1.48.0`, `^5.3.0` | `frontend/package.json`, `site/fonts/` |
+| **Bundler & Test Suites** | Vite 8 (`^8.0.5`), `svelte-check` (`^4.4.8`), Node 22 single-pass `frontend/scripts/run-tests.mjs` (`190` `.test.cjs` suites in `frontend/tests/`), Go test (`*_test.go`) | `^8.0.5` / Node `22` | `frontend/package.json`, `frontend/scripts/run-tests.mjs` |
 
 ---
 
-## 3. Backend Go 4-Layer Acyclic Architecture (`546` Production `.go` Files)
+## 3. Backend Go 4-Layer Acyclic Architecture (`431` Production `.go` Files)
 
 ### 3.1 Startup Lifecycle, Non-Destructive Recovery & Guarded Window Close
-Unlike legacy `VPro64.accdb`—which silently resets or crashes when linked `.accdb` paths move (`VPro64_forAI/Modules/V7mdlSplash.txt:70-137`)—`vpro_wails/main.go` enforces deterministic startup and shutdown contracts:
+Unlike legacy `VPro64.accdb`—which silently resets or crashes when linked `.accdb` paths move (`VPro64_forAI/Modules/V7mdlSplash.txt:70-137`)—`vpro_wails/main.go` (`240` LOC) enforces deterministic startup, build-tier (`dev` | `alpha` | `release`), and shutdown contracts:
 
-1. **Startup & Recovery Mode (`main.go:238-258`, `startupservice.go:25-44`):** Resolves `%APPDATA%\vpro\config.yml` and `%LOCALAPPDATA%\vpro\`, verifies SHA-256 hashes of all 5 support databases (`databasefamily.go:19-61`) and 8 embedded reference `.db` catalogues, and opens `SQLiteProjectService`. If `config.yml` or a configured external `.db` fails validation, `runStartupRecovery()` launches a minimal Wails window binding only `StartupService` and `CloseService` so the user can inspect and remediate the error **without overwriting `config.yml` or silently falling back to `Sample.db`**.
-2. **Cryptographic Nonce Window-Close Handshake (`closeservice.go:15-133`, `main.go:649-710`):** Prevents data loss from dirty forms or in-flight workbook publications when the OS window close button is clicked:
+1. **Startup & Recovery Mode (`main.go:96-186`, `internal/lifecycle/startupservice.go`, `internal/lifecycle/buildinfo.go`):** Resolves `%APPDATA%\vpro\config.yml` and `%LOCALAPPDATA%\vpro\`, verifies SHA-256 hashes of all 5 support databases (`databasefamily.go:19-61`) and 8 embedded reference `.db` catalogues, and opens `SQLiteProjectService`. If `config.yml` or a configured external `.db` fails validation, `StartupService` enters non-destructive recovery mode so the user can relocate `.db` paths or materialize `Sample.db` **without overwriting `config.yml` without backup**.
+2. **Cryptographic Nonce Window-Close Handshake (`closeservice.go:15-133`, `main.go:70-76,207-235`):** Prevents data loss from dirty forms or in-flight workbook publications when the OS window close button is clicked:
 
 ```mermaid
 sequenceDiagram
@@ -117,14 +117,14 @@ Legacy Access rewrote shared `QueryDefs` on disk (`SetCurrentProject`), making m
 * **128-Bit `contextID` Epoch Fencing (`contextservice.go:70-100`):** Every project/SU/hierarchy switch mints a new 128-bit hex `contextID`. Every mutation and scoped query checks the caller's `contextID`, deterministically rejecting late IPC calls from stale UI views.
 
 ### 3.3 4-Layer Acyclic Package Decomposition & 12 Registered Wails Services
-Wave 1C–1D consolidated the earlier 86 flat root Wails services into a strict **4-layer acyclic `internal/*` DAG** enforced by automated architectural tests (`9d18b06`), registering **strictly 12 cohesive domain services** in `main.go:831-844` (`domainservices_*.go`):
+Wave 1C–1D consolidated the earlier 86 flat root Wails services into a strict **4-layer acyclic `internal/*` DAG** enforced by automated architectural tests (`internal/integration/architecture_dag_test.go`), registering **strictly 12 cohesive domain services** in `main.go:187-200` (`domainservices_*.go`):
 
 * **Layer 0 — Embedded Assets & Foundations:** `resources` (`resources/embed.go` exporting embedded `embed.FS` / `[]byte` assets + `RepoRoot()`), `internal/sqlutil`, `internal/accessreader` (`linux || windows || darwin`), `internal/accessimport`, `internal/accessinventory`, `internal/accesslayout`, `internal/accesscompare`, `internal/fs882layout`, `internal/listcatalog`, `internal/reports/subzonematrix`.
-* **Layer 1 — Core Context, Reference Catalogues & Shared Engines:** `internal/references` (`BECService`, `ReferenceService`, `Site/Soil/Parent/Geology/Region/Quality` code services), `internal/vprocore` (`SQLiteContext` with `beginReadSnapshot`, `DesktopConfig`, 7-DB `DatabaseFamily` seeding `VPics.db` on cold boot, `ProjectService`, `ContextService`, `PlotService`), `internal/sourceform`, `internal/reports/reportcore`.
-* **Layer 2 — Independent Domain Packages (zero sibling imports):** `internal/lifecycle`, `internal/plotentry`, `internal/sivi`, `internal/twopage`, `internal/datasheet`, `internal/classification`, `internal/lumping`, `internal/diagnostics`, `internal/lmh25rules`, `internal/projectops`, `internal/rsidecar`, `internal/validation`, `internal/vegreport`, `internal/envreport`, `internal/spatial`, `internal/pictures`, `internal/interchange` (plus cross-domain `internal/integration`).
+* **Layer 1 — Core Context, Reference Catalogues & Shared Engines:** `internal/references` (`BECService`, `ReferenceService`, `Site/Soil/Parent/Geology/Region/Quality` code services), `internal/vprocore` (`SQLiteContext` with `beginReadSnapshot`, `DesktopConfig`, `report_preferences_handler.go`, 7-DB `DatabaseFamily` seeding `VPics.db` on cold boot, `ProjectService`, `ContextService`, `PlotService`), `internal/sourceform`, `internal/reports/reportcore`.
+* **Layer 2 — Independent Domain Packages (zero sibling imports):** `internal/lifecycle`, `internal/plotentry`, `internal/sivi`, `internal/twopage`, `internal/datasheet`, `internal/classification`, `internal/lumping`, `internal/diagnostics`, `internal/lmh25rules`, `internal/projectops`, `internal/rsidecar`, `internal/validation`, `internal/vegreport`, `internal/envreport`, `internal/spatial`, `internal/pictures`, `internal/interchange`, `internal/cloudsync` (plus cross-domain `internal/integration`).
 * **Layer 3 — Thin Wails Host (`package main` — 12 Bound Services):**
 
-| # | Registered Wails Service (`main.go:831-844`) | Backing Domain Package(s) & Core Responsibilities |
+| # | Registered Wails Service (`main.go:187-200`) | Backing Domain Package(s) & Core Responsibilities |
 |---:|---|---|
 | `1` | **`LifecycleService`** | Startup activation/recovery hints, cryptographic close nonce (`CloseService`), `USysUserLog` review |
 | `2` | **`ContextService`** | Active `Project`/`SU`/`Hierarchy` switching, 128-bit `contextID` fencing, `New/SaveAs/Splinter/Compare/Merge` (`internal/projectops`), scoped plot lookup |

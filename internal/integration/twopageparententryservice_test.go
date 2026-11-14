@@ -20,94 +20,39 @@ import (
 	"testing"
 )
 
-func TestTwoPageParentEntryServiceIndependentGates(t *testing.T) {
+func TestTwoPageParentEntryServiceOwnedReadsAndCancellation(t *testing.T) {
 	provider, contexts, state := twoPageEntryProviderFixture(t, "FS882-8x6XL")
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	for _, review := range []bool{false, true} {
-		for _, editing := range []bool{false, true} {
-			service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers, func(name string) (string, bool) {
-				switch name {
-				case twopage.TwoPageParentReviewEnvironment:
-					return strconv.FormatBool(review), true
-				case twopage.TwoPageParentEntryEditingEnvironment:
-					return strconv.FormatBool(editing), true
-				default:
-					t.Fatal("complete entry inherited another editor's permission", name)
-					return "", false
-				}
-			})
-			if err != nil {
-				t.Fatal(err)
-			}
-			got, err := service.GetOriginal(context.Background(), state.ContextID, "108050", "FS882-8x6XL")
-			if review {
-				if err != nil || got == nil || len(got.Fields) != 56 || got.ProjectChoices == nil {
-					t.Fatal("enabled complete entry could not read source", got, err)
-				}
-			} else if got != nil || err == nil {
-				t.Fatal("disabled complete entry returned original", got, err)
-			}
-			if !review || !editing {
-				if got, err := service.Save(context.Background(), state.ContextID, "108050", "FS882-8x6XL",
-					twopage.TwoPageParentEntryWrite{}); got != nil || err == nil {
-					t.Fatal("independently disabled complete entry wrote", got, err)
-				}
-				if got, err := service.Restore(context.Background(), state.ContextID, "108050", "FS882-8x6XL",
-					"1", vprocore.AuditRestoreCancel); got != nil || err == nil {
-					t.Fatal("disabled complete entry restored", got, err)
-				}
-			}
-			vprotest.AssertProfileSUFiles(t, contexts, before)
-		}
-	}
-	for _, name := range []string{twopage.TwoPageParentReviewEnvironment, twopage.TwoPageParentEntryEditingEnvironment} {
-		if _, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers, func(key string) (string, bool) {
-			if key == name {
-				return "bad flag", true
-			}
-			return "true", true
-		}); err == nil {
-			t.Fatal("malformed entry gate defaulted", name)
-		}
-	}
-	if _, err := twopage.NewTwoPageParentEntryService(nil, provider.Readers, osAbsentEntryFlags); err == nil {
+	if _, err := twopage.NewTwoPageParentEntryService(nil, provider.Readers); err == nil {
 		t.Fatal("nil contexts accepted")
 	}
-	if _, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers, nil); err == nil {
-		t.Fatal("implicit flag lookup accepted")
-	}
-	if defaultEntry, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers, osAbsentEntryFlags); err != nil || !defaultEntry.ReviewEnabled || !defaultEntry.EditsEnabled {
-		t.Fatal("default entry flags disabled", defaultEntry, err)
-	}
-	service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers, func(string) (string, bool) { return "false", true })
+	service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, err := service.GetReferences(context.Background(), state.ContextID, "108050", "FS882-8x6XL",
-		twopage.TwoPageEntryReferenceFilters{}); got != nil || err == nil {
-		t.Fatal("absent flags enabled references", got, err)
+	got, err := service.GetOriginal(context.Background(), state.ContextID, "108050", "FS882-8x6XL")
+	if err != nil || got == nil || len(got.Fields) != 56 || got.ProjectChoices == nil {
+		t.Fatal("complete entry could not read source", got, err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	var absent *twopage.TwoPageParentEntryService
+	if got, err := absent.GetOriginal(context.Background(), state.ContextID, "108050", "FS882-8x6XL"); got != nil || err == nil {
+		t.Fatal("nil service returned source", got, err)
+	}
 	for _, candidate := range []*twopage.TwoPageParentEntryService{absent, service} {
 		if got, err := candidate.Save(ctx, state.ContextID, "108050", "FS882-8x6XL", twopage.TwoPageParentEntryWrite{}); got != nil || !errors.Is(err, context.Canceled) {
-			t.Fatal("cancellation lost to permission check", got, err)
-		}
-		if got, err := candidate.GetOriginal(context.Background(), state.ContextID, "108050", "FS882-8x6XL"); got != nil || err == nil {
-			t.Fatal("nil/disabled service returned source", got, err)
+			t.Fatal("cancellation lost", got, err)
 		}
 	}
 	vprotest.AssertProfileSUFiles(t, contexts, before)
 }
 
-func osAbsentEntryFlags(string) (string, bool) { return "", false }
-
 func TestTwoPageParentEntryServiceOwnedSnapshotHistoricalFiltersAndRetry(t *testing.T) {
 	for _, form := range []string{"FS882-8x6XL", "FS882-8x6XL-CHARS"} {
 		contexts, state, db, _, _ := twoPageWriteFixture(t, form, false)
 		provider := twoPageEntryCatalogueProviderFixture(t, form)
-		service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers, func(string) (string, bool) { return "true", true })
+		service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -184,7 +129,7 @@ func TestTwoPageParentEntryServiceOwnedSnapshotHistoricalFiltersAndRetry(t *test
 func TestTwoPageParentEntryServiceAtomicAcknowledgementsAndAuthority(t *testing.T) {
 	for _, form := range []string{"FS882-8x6XL", "FS882-8x6XL-CHARS"} {
 		provider, contexts, state := twoPageEntryProviderFixture(t, form)
-		service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers, func(string) (string, bool) { return "true", true })
+		service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -253,7 +198,7 @@ func TestTwoPageParentEntryServiceTypedProjectSaveRestore(t *testing.T) {
 		contexts, state, _, _, choice := sftest.SiviProjectAssignmentWriteFixture(t, true, source, 3, "old")
 		form := "FS882-8x6XL"
 		provider := twoPageEntryCatalogueProviderFixture(t, form)
-		service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers, func(string) (string, bool) { return "true", true })
+		service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -313,7 +258,7 @@ func TestTwoPageParentEntryServiceWALProjectChoicesRemainReadable(t *testing.T) 
 		t.Fatal("disposable WAL fixture unavailable", mode, err)
 	}
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers, func(string) (string, bool) { return "true", true })
+	service, err := twopage.NewTwoPageParentEntryService(contexts, provider.Readers)
 	if err != nil {
 		t.Fatal(err)
 	}

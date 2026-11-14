@@ -55,7 +55,7 @@ func portableSummaryWorkbookReview(t *testing.T, service *SummaryVegetationWorkb
 	return review
 }
 
-func assertSummaryWorkbookClientWire(t *testing.T, name, updateFlag string, wire map[string]*SummaryVegetationWorkbookReview) {
+func assertSummaryWorkbookClientWire(t *testing.T, name string, wire map[string]*SummaryVegetationWorkbookReview) {
 	t.Helper()
 	raw, err := json.MarshalIndent(wire, "", "  ")
 	if err != nil {
@@ -68,12 +68,7 @@ func assertSummaryWorkbookClientWire(t *testing.T, name, updateFlag string, wire
 	if err := decoder.Decode(&decoded); err != nil || !reflect.DeepEqual(decoded, wire) {
 		t.Fatal("strict production workbook review DTO round trip differs", name, err)
 	}
-	file := filepath.Join("frontend", "src", name)
-	if os.Getenv(updateFlag) == "true" {
-		if err := os.WriteFile(file, raw, 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
+	file := filepath.Join("frontend", "tests", "fixtures", name)
 	expected, err := os.ReadFile(file)
 	if err != nil || !bytes.Equal(expected, raw) {
 		t.Fatal("portable strict-Go workbook wire differs", name, err)
@@ -97,6 +92,5 @@ func TestSummaryGroupedDesktopClientWire(t *testing.T) {
 			ShowClass: item.show, IncludeEnv: item.env, GroupAndOrder: &item.group}
 		wire[item.name] = portableSummaryWorkbookReview(t, service, state, options)
 	}
-	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookGroupedWire.json",
-		"VPRO_UPDATE_SUMMARY_GROUPED_WORKBOOK_WIRE", wire)
+	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookGroupedWire.json", wire)
 }

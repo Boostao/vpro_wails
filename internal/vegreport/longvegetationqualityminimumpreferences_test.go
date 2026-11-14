@@ -32,7 +32,7 @@ func vegetationQualityMinimumRequest(t *testing.T, expected, proposed LongVegeta
 
 func TestLongVegetationQualityMinimumPreferencesOwnershipCleanupCancellationCollisionAndRetry(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityMinimumPreferencesService(contexts, true)
+	service := NewLongVegetationQualityMinimumPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	expected := LongVegetationQualityMinimumPreferenceValues{"Poor", "Poor", "Poor"}
 	proposed := LongVegetationQualityMinimumPreferenceValues{"Fair", "Good", "Excellent"}
@@ -110,25 +110,10 @@ func TestLongVegetationQualityMinimumPreferencesOwnershipCleanupCancellationColl
 		t.Fatal("observed committed retry was not a no-op", retry)
 	}
 }
-func TestLongVegetationQualityMinimumPreferencesGateAndOwnedRead(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}} {
-		enabled, err := LongVegetationQualityMinimumPreferencesFeature(func(key string) (string, bool) {
-			if key != "VPRO_LONG_VEGETATION_QUALITY_MINIMUM_PREFERENCES" {
-				t.Fatal(key)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
+func TestLongVegetationQualityMinimumPreferencesOwnedRead(t *testing.T) {
 	cancelled, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*LongVegetationQualityMinimumPreferencesService{nil, {}, NewLongVegetationQualityMinimumPreferencesService(nil, true)} {
+	for _, service := range []*LongVegetationQualityMinimumPreferencesService{nil, {}, NewLongVegetationQualityMinimumPreferencesService(nil)} {
 		for _, ctx := range []context.Context{nil, context.Background(), cancelled} {
 			if read, err := service.GetLongVegetationQualityMinimumPreferences(ctx, "id"); read != nil || err == nil {
 				t.Fatal(read, err)
@@ -139,7 +124,7 @@ func TestLongVegetationQualityMinimumPreferencesGateAndOwnedRead(t *testing.T) {
 		}
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityMinimumPreferencesService(contexts, true)
+	service := NewLongVegetationQualityMinimumPreferencesService(contexts)
 	read, err := service.GetLongVegetationQualityMinimumPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -162,7 +147,7 @@ func TestLongVegetationQualityMinimumPreferencesStrictGoClientWire(t *testing.T)
 		Request LongVegetationQualityMinimumPreferencesRequest `json:"request"`
 		Outcome LongVegetationQualityMinimumPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationQualityMinimumWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationQualityMinimumWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +166,7 @@ func TestLongVegetationQualityMinimumPreferencesStrictGoClientWire(t *testing.T)
 	if err := db.Close(); err != nil {
 		t.Fatal(err)
 	}
-	service := NewLongVegetationQualityMinimumPreferencesService(contexts, true)
+	service := NewLongVegetationQualityMinimumPreferencesService(contexts)
 	read, err := service.GetLongVegetationQualityMinimumPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -215,7 +200,7 @@ func TestLongVegetationQualityMinimumPreferencesStrictGoClientWire(t *testing.T)
 
 func TestLongVegetationQualityMinimumPreferencesHistoricalNULOmissionAndUnavailableStorage(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityMinimumPreferencesService(contexts, true)
+	service := NewLongVegetationQualityMinimumPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	values, err := store.Snapshot()
 	if err != nil {
@@ -277,7 +262,7 @@ func TestLongVegetationQualityMinimumPreferencesHistoricalNULOmissionAndUnavaila
 
 func TestLongVegetationQualityMinimumPreferencesLiteralSaveAndChangedOnlyOmission(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityMinimumPreferencesService(contexts, true)
+	service := NewLongVegetationQualityMinimumPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	for _, literal := range []string{"", " poor ", "CUSTOM-not-a-suggestion", strings.Repeat("界", 32), "Fair", "Poor"} {
 		read, err := service.GetLongVegetationQualityMinimumPreferences(context.Background(), state.ContextID)
@@ -323,7 +308,7 @@ func TestLongVegetationQualityMinimumPreferencesLiteralSaveAndChangedOnlyOmissio
 
 func TestLongVegetationQualityMinimumPreferencesStrictRequestsAndStaleRefusal(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityMinimumPreferencesService(contexts, true)
+	service := NewLongVegetationQualityMinimumPreferencesService(contexts)
 	values := LongVegetationQualityMinimumPreferenceValues{"Poor", "Poor", "Poor"}
 	base := vegetationQualityMinimumRequest(t, values, values)
 	requests := []string{"{}", "null", "[]", strings.Replace(base, `"expected":`, `"Expected":`, 1)}
@@ -359,7 +344,7 @@ func TestLongVegetationQualityMinimumPreferencesStrictRequestsAndStaleRefusal(t 
 
 func TestLongVegetationQualityMinimumSuggestionsEmptyDuplicatesNullAndMalformedRetry(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationQualityMinimumPreferencesService(contexts, true)
+	service := NewLongVegetationQualityMinimumPreferencesService(contexts)
 	db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(contexts.Projects.Sqlite.Attachments["VLists"], "rw"))
 	if err != nil {
 		t.Fatal(err)

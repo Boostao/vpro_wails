@@ -30,9 +30,8 @@ func TestSelectedUnitAuthorityBuildCASSaveOptionsPreviewAndWorkbook(t *testing.T
 			if err := errors.Join(removeErr, su.Close()); err != nil {
 				t.Fatal(err)
 			}
-			contexts.LongVegetationSelectedUnitsEnabled = true
-			selection := NewLongVegetationSelectedUnitSelectionService(contexts, true)
-			preferences := NewLongVegetationUnitPreferencesService(contexts, true)
+			selection := NewLongVegetationSelectedUnitSelectionService(contexts)
+			preferences := NewLongVegetationUnitPreferencesService(contexts)
 			before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 			config, err := os.ReadFile(contexts.Projects.Preferences.Path)
 			if err != nil {
@@ -63,12 +62,6 @@ func TestSelectedUnitAuthorityBuildCASSaveOptionsPreviewAndWorkbook(t *testing.T
 			if err != nil || string(config) != string(afterBuild) {
 				t.Fatal("Build persisted LVUnitGroups", err)
 			}
-			contexts.LongVegetationSelectedUnitsEnabled = false
-			if disabled := preferences.SaveLongVegetationUnitPreferences(ctx, state.ContextID, save); disabled.Committed ||
-				disabled.ErrorMessage == "" {
-				t.Fatal("consumer gate bypassed by selection Build", disabled)
-			}
-			contexts.LongVegetationSelectedUnitsEnabled = true
 			saved := preferences.SaveLongVegetationUnitPreferences(ctx, state.ContextID, save)
 			if !saved.Changed || !saved.Committed || saved.ErrorMessage != "" {
 				t.Fatal("reviewed selected unit CAS failed", saved)
@@ -102,17 +95,6 @@ func TestSelectedUnitAuthorityBuildCASSaveOptionsPreviewAndWorkbook(t *testing.T
 				review.Preview.Settings.UnitGrouping != "selected-fields" {
 				t.Fatal("owned workbook did not use approved source2 summary", review, err)
 			}
-			contexts.LongVegetationSelectedUnitsEnabled = false
-			if _, err := GetLongVegetationOptions(contexts, ctx, state.ContextID); err == nil {
-				t.Fatal("saved2 options ignored backend gate")
-			}
-			if _, err := PreviewLongVegetation(contexts, ctx, state.ContextID); err == nil {
-				t.Fatal("saved2 report ignored backend gate")
-			}
-			if _, err := workbook.GetReview(ctx, state.ContextID, `{"scope":"unlumped"}`); err == nil {
-				t.Fatal("saved2 workbook ignored backend gate")
-			}
-			contexts.LongVegetationSelectedUnitsEnabled = true
 			changed, err := selection.SetLongVegetationSelectedUnitFields(ctx, state.ContextID,
 				selectedUnitDraftJSON(t, retained.Revision, []string{"Plot"}))
 			if err != nil || changed.Build != nil {

@@ -28,25 +28,10 @@ func preferenceRequest(t *testing.T, expected, proposed GoogleEarthPreferenceVal
 	return string(data)
 }
 
-func TestGoogleEarthPreferencesFacadeGate(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		got, err := GoogleEarthPreferencesFeature(func(name string) (string, bool) {
-			if name != "VPRO_GOOGLE_EARTH_PREFERENCES" {
-				t.Fatal(name)
-			}
-			return test.value, test.present
-		})
-		if got != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, got, err)
-		}
-	}
+func TestGoogleEarthPreferencesFacadeUnavailableGuards(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*GoogleEarthPreferencesService{nil, {}, NewGoogleEarthPreferencesService(nil, true)} {
+	for _, service := range []*GoogleEarthPreferencesService{nil, {}, NewGoogleEarthPreferencesService(nil)} {
 		for _, requestCtx := range []context.Context{nil, context.Background(), ctx} {
 			if value, err := service.GetGoogleEarthPreferences(requestCtx, "id"); value != nil || err == nil {
 				t.Fatal(value, err)
@@ -61,7 +46,7 @@ func TestGoogleEarthPreferencesFacadeGate(t *testing.T) {
 
 func TestGoogleEarthPreferencesFacadeOwnedReadCASAndNoDataWrites(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewGoogleEarthPreferencesService(contexts, true)
+	service := NewGoogleEarthPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	got, err := service.GetGoogleEarthPreferences(context.Background(), state.ContextID)
 	if err != nil || got.ContextID != state.ContextID || got.ProjectPath != state.ProjectPath || got.SU != "None" ||
@@ -101,7 +86,7 @@ func TestGoogleEarthPreferencesFacadeOwnedReadCASAndNoDataWrites(t *testing.T) {
 
 func TestGoogleEarthPreferencesFacadeStrictJSONAndMembership(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewGoogleEarthPreferencesService(contexts, true)
+	service := NewGoogleEarthPreferencesService(contexts)
 	before, err := os.ReadFile(contexts.Projects.Preferences.Path)
 	if err != nil {
 		t.Fatal(err)
@@ -157,7 +142,7 @@ func TestGoogleEarthPreferencesFacadeHistoricalAndNonKMLField(t *testing.T) {
 	if err := store.Commit(raw); err != nil {
 		t.Fatal(err)
 	}
-	service := NewGoogleEarthPreferencesService(contexts, true)
+	service := NewGoogleEarthPreferencesService(contexts)
 	got, err := service.GetGoogleEarthPreferences(context.Background(), state.ContextID)
 	if err != nil || got.Values != historical {
 		t.Fatal("historical strings repaired", got, err)
@@ -192,7 +177,7 @@ func TestGoogleEarthPreferencesFacadeMissingNullAndWrongType(t *testing.T) {
 		if err := store.Commit(raw); err != nil {
 			t.Fatal(err)
 		}
-		service := NewGoogleEarthPreferencesService(contexts, true)
+		service := NewGoogleEarthPreferencesService(contexts)
 		if got, err := service.GetGoogleEarthPreferences(context.Background(), state.ContextID); got != nil || err == nil {
 			t.Fatal("silently defaulted", got, err)
 		}
@@ -201,7 +186,7 @@ func TestGoogleEarthPreferencesFacadeMissingNullAndWrongType(t *testing.T) {
 
 func TestGoogleEarthPreferencesFacadeReadCleanupAndCancellation(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewGoogleEarthPreferencesService(contexts, true)
+	service := NewGoogleEarthPreferencesService(contexts)
 	review, err := service.GetGoogleEarthPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -237,16 +222,9 @@ func TestGoogleEarthPreferencesFacadeReadCleanupAndCancellation(t *testing.T) {
 	}
 }
 
-func TestGoogleEarthPreferencesFacadeDisabledOwnedServiceAndReplacementRetry(t *testing.T) {
+func TestGoogleEarthPreferencesFacadeReplacementRetry(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	disabled := NewGoogleEarthPreferencesService(contexts, false)
-	if got, err := disabled.GetGoogleEarthPreferences(context.Background(), state.ContextID); got != nil || err == nil {
-		t.Fatal("live context enabled preferences implicitly", got, err)
-	}
-	if got := disabled.SaveGoogleEarthPreferences(context.Background(), state.ContextID, "{}"); got.Committed || got.ErrorMessage == "" {
-		t.Fatal(got)
-	}
-	service := NewGoogleEarthPreferencesService(contexts, true)
+	service := NewGoogleEarthPreferencesService(contexts)
 	review, err := service.GetGoogleEarthPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -269,7 +247,7 @@ func TestGoogleEarthPreferencesFacadeDisabledOwnedServiceAndReplacementRetry(t *
 
 func TestGoogleEarthPreferencesFacadeQueuedCancelledOwnerLeaseAndRestoration(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewGoogleEarthPreferencesService(contexts, true)
+	service := NewGoogleEarthPreferencesService(contexts)
 	review, err := service.GetGoogleEarthPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -307,7 +285,7 @@ func TestGoogleEarthPreferencesFacadeQueuedCancelledOwnerLeaseAndRestoration(t *
 }
 func TestGoogleEarthPreferencesFacadeCommittedCancellationTransport(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewGoogleEarthPreferencesService(contexts, true)
+	service := NewGoogleEarthPreferencesService(contexts)
 	review, err := service.GetGoogleEarthPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)

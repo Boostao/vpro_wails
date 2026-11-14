@@ -1,0 +1,3 @@
+import { createSummaryVegetationPresentationPreferencesRegistry } from './summaryVegetationPresentationPreferences';
+
+export const summaryVegetationPresentationPreferenceSession = createSummaryVegetationPresentationPreferencesRegistry();

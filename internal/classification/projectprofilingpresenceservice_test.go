@@ -15,44 +15,14 @@ import (
 	"testing"
 )
 
-func presenceFeatureLookup(value string, present bool) func(string) (string, bool) {
-	return func(name string) (string, bool) {
-		if name != profileSpeciesPresenceEnvironment {
-			panic("unexpected species-only feature lookup")
-		}
-		return value, present
-	}
-}
-
-func TestProjectProfileSpeciesPresenceServiceFeatureGate(t *testing.T) {
+func TestProjectProfileSpeciesPresenceServiceOwnerGuards(t *testing.T) {
 	contexts := &vprocore.ContextService{}
-	defaultService, err := NewProjectProfileSpeciesPresenceService(contexts, presenceFeatureLookup("", false))
-	if err != nil || !defaultService.enabled {
-		t.Fatal("default presence feature not enabled", defaultService, err)
+	defaultService, err := NewProjectProfileSpeciesPresenceService(contexts)
+	if err != nil || defaultService == nil {
+		t.Fatal("default presence service unavailable", defaultService, err)
 	}
-	for _, value := range []struct {
-		value   string
-		present bool
-	}{
-		{"false", true},
-	} {
-		service, err := NewProjectProfileSpeciesPresenceService(contexts, presenceFeatureLookup(value.value, value.present))
-		if err != nil {
-			t.Fatal(err)
-		}
-		result, err := service.Preview(context.Background(), "", "{}")
-		if err == nil || result != nil || !strings.Contains(err.Error(), "independently enabled") {
-			t.Fatal("disabled facade reached request parsing or context work", result, err)
-		}
-	}
-	if service, err := NewProjectProfileSpeciesPresenceService(nil, presenceFeatureLookup("true", true)); err == nil || service != nil {
+	if service, err := NewProjectProfileSpeciesPresenceService(nil); err == nil || service != nil {
 		t.Fatal("nil context owner accepted", service, err)
-	}
-	if service, err := NewProjectProfileSpeciesPresenceService(contexts, nil); err == nil || service != nil {
-		t.Fatal("implicit feature lookup accepted", service, err)
-	}
-	if service, err := NewProjectProfileSpeciesPresenceService(contexts, presenceFeatureLookup("invalid", true)); err == nil || service != nil {
-		t.Fatal("malformed feature accepted", service, err)
 	}
 	var absent *ProjectProfileSpeciesPresenceService
 	if result, err := absent.Preview(context.Background(), "", "{}"); err == nil || result != nil {
@@ -62,7 +32,7 @@ func TestProjectProfileSpeciesPresenceServiceFeatureGate(t *testing.T) {
 
 func TestProjectProfileSpeciesPresenceServiceStrictRequest(t *testing.T) {
 	contexts, _, request := profilePresenceContextFixture(t)
-	service, err := NewProjectProfileSpeciesPresenceService(contexts, presenceFeatureLookup("true", true))
+	service, err := NewProjectProfileSpeciesPresenceService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -111,7 +81,7 @@ func TestProjectProfileSpeciesPresenceServiceStrictRequest(t *testing.T) {
 
 func TestProjectProfileSpeciesPresenceServiceWireAndRefusals(t *testing.T) {
 	contexts, state, request := profilePresenceContextFixture(t)
-	service, err := NewProjectProfileSpeciesPresenceService(contexts, presenceFeatureLookup("true", true))
+	service, err := NewProjectProfileSpeciesPresenceService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -173,7 +143,7 @@ func TestProjectProfileSpeciesPresenceServiceWireAndRefusals(t *testing.T) {
 
 func TestProjectProfileSpeciesPresenceServiceOptionalAndActiveLumpWire(t *testing.T) {
 	contexts, state, request := profilePresenceContextFixture(t)
-	service, err := NewProjectProfileSpeciesPresenceService(contexts, presenceFeatureLookup("true", true))
+	service, err := NewProjectProfileSpeciesPresenceService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -97,7 +97,7 @@ func TestLongVegetationOwnedLayerPreviewCancellationStaleNoneAndInvalidOptions(t
 	if err != nil {
 		t.Fatal(err)
 	}
-	invalid := bytes.Replace(config, []byte("LVGroupBy: 1"), []byte("LVGroupBy: 3"), 1)
+	invalid := bytes.Replace(config, []byte("LVGroupBy: 1"), []byte("LVGroupBy: 99"), 1)
 	if bytes.Equal(config, invalid) {
 		t.Fatal("invalid option fixture did not change intended setting")
 	}
@@ -106,6 +106,6 @@ func TestLongVegetationOwnedLayerPreviewCancellationStaleNoneAndInvalidOptions(t
 	}
 	if report, err := PreviewLongVegetationLayers(service, context.Background(), state.ContextID); err == nil ||
 		!reflect.DeepEqual(report, vegetationLayerReport{}) {
-		t.Fatal("inactive grouping silently ignored", report, err)
+		t.Fatal("invalid grouping silently ignored", report, err)
 	}
 }

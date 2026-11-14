@@ -21,7 +21,7 @@ import (
 )
 
 func TestTwoPageVegetationSingleCalibrationTypedAssignments(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageVegetationSingle.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationSingle.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +169,7 @@ func TestTwoPageVegetationLegacySingleReceiptRecovery(t *testing.T) {
 				}
 				request = history.Request
 				before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-				readonly := vegetationFacade(t, contexts, map[string]string{twoPageVegetationReviewEnvironment: "true"})
+				readonly := vegetationFacade(t, contexts)
 				raw := vegetationAttemptJSON(t, request)
 				outcome, err := readonly.RecoverOutcome(context.Background(), state.ContextID, raw)
 				if err != nil || outcome == nil || outcome.Status != "committed" || outcome.RequestJSON != raw ||

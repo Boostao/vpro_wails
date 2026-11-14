@@ -11,7 +11,6 @@ import (
 
 func TestPlotLabelNativeDateCrossPlatformPreviewAndCalendarBounds(t *testing.T) {
 	contexts, state := vprotest.ContextServiceFixture(t)
-	t.Setenv(plotLabelRegionalDateEnvironment, "true")
 
 	vprotest.MutateContextFixture(t, contexts.Projects.Sqlite.Attachments["project"], `
 		INSERT INTO Sample_Env(PlotNumber,Zone,SubZone,SiteSeries,PlotRepresenting,ProjectID)

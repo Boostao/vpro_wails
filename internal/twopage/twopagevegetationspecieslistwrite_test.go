@@ -34,16 +34,9 @@ func twoPageSpeciesListWriteFixture(t *testing.T, external bool, form string, st
 	return contexts, state, db, request
 }
 
-func twoPageSpeciesListFacade(t *testing.T, contexts *vprocore.ContextService, values map[string]string) *TwoPageVegetationSpeciesListService {
+func twoPageSpeciesListFacade(t *testing.T, contexts *vprocore.ContextService) *TwoPageVegetationSpeciesListService {
 	t.Helper()
-	service, err := NewTwoPageVegetationSpeciesListService(contexts, func(name string) (string, bool) {
-		if name != twoPageVegetationReviewEnvironment && name != twoPageVegetationWritingEnvironment &&
-			name != twoPageVegetationSpeciesListEnvironment {
-			t.Fatal("list facade consulted another workflow's gate", name)
-		}
-		value, found := values[name]
-		return value, found
-	})
+	service, err := NewTwoPageVegetationSpeciesListService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,24 +86,11 @@ func TestTwoPageSpeciesListRequestStrictWireAndLegacyShape(t *testing.T) {
 	}
 }
 
-func TestTwoPageSpeciesListIndependentGatesAndLegacySaveDenial(t *testing.T) {
+func TestTwoPageSpeciesListLegacySaveDenial(t *testing.T) {
 	contexts, state, _, request := twoPageSpeciesListWriteFixture(t, false, "SubVegAXL_BC", 3)
 	raw := vegetationAttemptJSON(t, request)
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	for _, values := range []map[string]string{
-		{twoPageVegetationReviewEnvironment: "false", twoPageVegetationWritingEnvironment: "false", twoPageVegetationSpeciesListEnvironment: "false"},
-		{twoPageVegetationReviewEnvironment: "false", twoPageVegetationWritingEnvironment: "false", twoPageVegetationSpeciesListEnvironment: "true"},
-		{twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "false", twoPageVegetationSpeciesListEnvironment: "true"},
-		{twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true", twoPageVegetationSpeciesListEnvironment: "false"},
-	} {
-		service := twoPageSpeciesListFacade(t, contexts, values)
-		if result, err := service.Save(context.Background(), state.ContextID, raw); result != nil || err == nil {
-			t.Fatal("partial/default-off gates granted selection", result, err)
-		}
-	}
-	legacy := vegetationFacade(t, contexts, map[string]string{
-		twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true",
-	})
+	legacy := vegetationFacade(t, contexts)
 	if result, err := legacy.Save(context.Background(), state.ContextID, raw); result != nil || err == nil {
 		t.Fatal("legacy Save inherited independently gated Species authority", result, err)
 	}
@@ -118,9 +98,7 @@ func TestTwoPageSpeciesListIndependentGatesAndLegacySaveDenial(t *testing.T) {
 		len(contexts.TwoPageVegetationAttempts.Requests) != 0 {
 		t.Fatal("refused gates mutated files or began an attempt")
 	}
-	service := twoPageSpeciesListFacade(t, contexts, map[string]string{
-		twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true", twoPageVegetationSpeciesListEnvironment: "true",
-	})
+	service := twoPageSpeciesListFacade(t, contexts)
 	legacyRequest := request
 	legacyRequest.SpeciesList, legacyRequest.Edits = nil, legacyRequest.Edits[1:]
 	if result, err := service.Save(context.Background(), state.ContextID, vegetationAttemptJSON(t, legacyRequest)); result != nil || err == nil {
@@ -169,7 +147,7 @@ func TestTwoPageSpeciesListAtomicAuditsPeersReplayAndReadonlyRecovery(t *testing
 					}
 					vprotest.MutateContextFixture(t, contexts.Projects.Sqlite.Attachments["VLists"], `UPDATE USysAllSpecs SET ScientificName='later' WHERE rowid=-9`)
 					after = vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-					readonly := vegetationFacade(t, contexts, map[string]string{twoPageVegetationReviewEnvironment: "true"})
+					readonly := vegetationFacade(t, contexts)
 					outcome, err := readonly.RecoverOutcome(context.Background(), state.ContextID, vegetationAttemptJSON(t, request))
 					if err != nil || outcome == nil || outcome.Status != "committed" || outcome.Receipt == nil ||
 						!reflect.DeepEqual(outcome.Receipt.History, result.History) || !reflect.DeepEqual(after, vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)) {
@@ -210,16 +188,14 @@ func TestTwoPageSpeciesListReferenceDriftRollbackAndPostcommitRecovery(t *testin
 		!reflect.DeepEqual(before, vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)) {
 		t.Fatal("in-flight cancellation committed a partial selection", result, err)
 	}
-	service := twoPageSpeciesListFacade(t, contexts, map[string]string{
-		twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true", twoPageVegetationSpeciesListEnvironment: "true",
-	})
+	service := twoPageSpeciesListFacade(t, contexts)
 	raw := vegetationAttemptJSON(t, request)
 	result, err := service.saveObserved(context.Background(), state.ContextID, raw, nil,
 		func(*twoPageVegetationWriteResult) error { return failure })
 	if result == nil || !result.DidCommit || !errors.Is(err, failure) {
 		t.Fatal("postcommit error erased actual committed result", result, err)
 	}
-	readonly := vegetationFacade(t, contexts, map[string]string{twoPageVegetationReviewEnvironment: "true"})
+	readonly := vegetationFacade(t, contexts)
 	outcome, err := readonly.RecoverOutcome(context.Background(), state.ContextID, raw)
 	if err != nil || outcome == nil || outcome.Status != "committed" || outcome.Receipt == nil {
 		t.Fatal("postcommit selection outcome could not recover readonly", outcome, err)

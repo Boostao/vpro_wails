@@ -18,49 +18,6 @@ import (
 	"unicode/utf8"
 )
 
-func TestTableCSVReviewFeatureRequiresIndependentLiteralOptIn(t *testing.T) {
-	for _, test := range []struct {
-		name, value               string
-		present, enabled, invalid bool
-	}{
-		{"unset", "", false, true, false},
-		{"true", "true", true, true, false},
-		{"false", "false", true, false, false},
-		{"empty", "", true, false, true},
-		{"uppercase", "TRUE", true, false, true},
-		{"number", "1", true, false, true},
-		{"padded", " true ", true, false, true},
-		{"newline", "true\n", true, false, true},
-		{"negative", "False", true, false, true},
-	} {
-		t.Run(test.name, func(t *testing.T) {
-			calls := 0
-			enabled, err := TableCSVReviewFeature(func(name string) (string, bool) {
-				calls++
-				if name != "VPRO_TABLE_CSV_REVIEW" {
-					t.Fatal("wrong independent feature lookup:", name)
-				}
-				return test.value, test.present
-			})
-			if calls != 1 || enabled != test.enabled || (err != nil) != test.invalid {
-				t.Fatal("literal opt-in changed:", test, enabled, err, calls)
-			}
-			if err != nil && !strings.Contains(err.Error(), "VPRO_TABLE_CSV_REVIEW") {
-				t.Fatal("malformed feature error lost its setting identity:", err)
-			}
-		})
-	}
-	enabled, err := TableCSVReviewFeature(func(name string) (string, bool) {
-		if name == "VPRO_TABLE_CSV_REVIEW" {
-			return "false", true
-		}
-		return "true", true
-	})
-	if enabled || err != nil {
-		t.Fatal("unrelated opt-ins enabled table CSV review:", err)
-	}
-}
-
 func assertTableCSVFacadeReadOnly(t *testing.T, service *vprocore.ContextService) func() {
 	t.Helper()
 	before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
@@ -78,26 +35,6 @@ func assertTableCSVFacadeReadOnly(t *testing.T, service *vprocore.ContextService
 	}
 }
 
-func TestTableCSVReviewFacadeDefaultOffDoesNotInheritSIVI(t *testing.T) {
-	service, state := vprotest.ContextServiceFixture(t)
-	check := assertTableCSVFacadeReadOnly(t, service)
-	defer check()
-	for _, flag := range []*bool{
-		&service.SiviHeightEnabled, &service.SiviParentReviewEnabled,
-		&service.SiviParentEditingEnabled, &service.SiviParentActionEditingEnabled,
-		&service.SiviProjectAssignmentEnabled,
-	} {
-		*flag = true
-		if result, err := GetProjectTableCSVReview(service, context.Background(), state.ContextID, "Sample_Other"); result != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-			t.Fatal("SIVI opt-in enabled table CSV review:", result, err)
-		}
-	}
-	service.TableCSVReviewEnabled = false
-	if result, err := GetProjectTableCSVReview(service, context.Background(), state.ContextID, "Sample_Other"); result != nil || err == nil {
-		t.Fatal("explicit false enabled table CSV review:", result, err)
-	}
-}
-
 func TestTableCSVReviewFacadeParityAndIndependentTypedDTO(t *testing.T) {
 	service, state := vprotest.ContextServiceFixture(t)
 	tableCSVProjectWriter(t, service, `DROP TABLE _table_metadata;
@@ -107,7 +44,6 @@ func TestTableCSVReviewFacadeParityAndIndependentTypedDTO(t *testing.T) {
 		('Sample_Other','  literal café description  ');`)
 	check := assertTableCSVFacadeReadOnly(t, service)
 	defer check()
-	service.TableCSVReviewEnabled = true
 	private, err := ReadProjectTableCSV(service, context.Background(), state.ContextID, "Sample_Other")
 	if err != nil {
 		t.Fatal(err)
@@ -152,14 +88,10 @@ func TestTableCSVReviewFacadeParityAndIndependentTypedDTO(t *testing.T) {
 	if err != nil || !reflect.DeepEqual(again, want) {
 		t.Fatal("public review shared mutable source or caller ownership:", err)
 	}
-	if service.SiviParentReviewEnabled {
-		t.Fatal("table CSV opt-in enabled the SIVI review flag")
-	}
 }
 
 func TestTableCSVReviewFacadeRejectsStaleForeignDerivedAndCancelledWithNil(t *testing.T) {
 	service, state := vprotest.ContextServiceFixture(t)
-	service.TableCSVReviewEnabled = true
 	check := assertTableCSVFacadeReadOnly(t, service)
 	for _, test := range []struct{ contextID, table string }{
 		{"stale", "Sample_Other"}, {"", "Sample_Other"},

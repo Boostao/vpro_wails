@@ -9,22 +9,15 @@ import (
 	"errors"
 )
 
-const UserLogReviewEnvironment = "VPRO_USER_LOG_REVIEW"
-
 type UserLogService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewUserLogService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*UserLogService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("user log review requires owned contexts and explicit feature lookup")
+func NewUserLogService(contexts *vprocore.ContextService) (*UserLogService, error) {
+	if contexts == nil {
+		return nil, errors.New("user log review requires owned contexts")
 	}
-	enabled, err := vprocore.SiviFeature(UserLogReviewEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &UserLogService{contexts, enabled}, nil
+	return &UserLogService{contexts: contexts}, nil
 }
 
 func (s *UserLogService) GetReview(ctx context.Context, contextID string, mode, offset, limit int) (UserLogReview, error) {
@@ -34,8 +27,8 @@ func (s *UserLogService) GetReview(ctx context.Context, contextID string, mode, 
 	if err := ctx.Err(); err != nil {
 		return UserLogReview{}, err
 	}
-	if s == nil || !s.enabled || s.contexts == nil {
-		return UserLogReview{}, errors.New("saved user log review is independently disabled in this session")
+	if s == nil || s.contexts == nil {
+		return UserLogReview{}, errors.New("saved user log review requires owned contexts")
 	}
 	return ReviewUserLog(s.contexts, ctx, contextID, mode, offset, limit)
 }

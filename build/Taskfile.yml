@@ -226,7 +226,12 @@ tasks:
       - '{{if eq .OBFUSCATED "true"}}garble {{.GARBLE_ARGS}} build{{else}}go build{{end}} {{.BUILD_FLAGS}} -o "{{.BIN_DIR}}/{{.APP_NAME}}-server{{exeExt}}"'
     vars:
       EFFECTIVE_TAGS: '{{if contains "sqliteonly" (.EXTRA_TAGS | default "")}}{{.EXTRA_TAGS}}{{else if .EXTRA_TAGS}}sqliteonly,{{.EXTRA_TAGS}}{{else}}sqliteonly{{end}}'
-      BUILD_FLAGS: '-tags server{{if eq .DEV "true"}}{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}},{{.EFFECTIVE_TAGS}} -buildvcs=false -gcflags=all="-l"{{else}},production{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}},{{.EFFECTIVE_TAGS}} -trimpath -buildvcs=false -ldflags="-w -s"{{end}}'
+      EFFECTIVE_VERSION: '{{if .VERSION}}{{.VERSION}}{{else if .RELEASE_VERSION}}{{.RELEASE_VERSION}}{{else if eq .DEV "true"}}2.0.1-dev{{else}}2.0.1{{end}}'
+      DETECTED_GIT_SHA:
+        sh: 'git rev-parse --short=12 HEAD 2>/dev/null || true'
+      EFFECTIVE_COMMIT: '{{if .GIT_COMMIT}}{{.GIT_COMMIT}}{{else if .GITHUB_SHA}}{{.GITHUB_SHA}}{{else}}{{.DETECTED_GIT_SHA}}{{end}}'
+      VERSION_LDFLAGS: '-X github.com/boostao/vpro-wails/internal/lifecycle.appVersion={{.EFFECTIVE_VERSION}}{{if .BUILD_MODE}} -X github.com/boostao/vpro-wails/internal/lifecycle.buildMode={{.BUILD_MODE}}{{end}}{{if .EFFECTIVE_COMMIT}} -X github.com/boostao/vpro-wails/internal/lifecycle.gitCommit={{.EFFECTIVE_COMMIT}}{{end}}'
+      BUILD_FLAGS: '-tags server{{if eq .DEV "true"}}{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}},{{.EFFECTIVE_TAGS}} -buildvcs=false -gcflags=all="-l" -ldflags="{{.VERSION_LDFLAGS}}"{{else}},production{{if eq .OBFUSCATED "true"}},wails_obfuscated{{end}},{{.EFFECTIVE_TAGS}} -trimpath -buildvcs=false -ldflags="-w -s {{.VERSION_LDFLAGS}}"{{end}}'
     env:
       CGO_ENABLED: '{{.CGO_ENABLED | default "1"}}'
 
@@ -297,63 +302,3 @@ tasks:
     preconditions:
       - sh: docker info > /dev/null 2>&1
         msg: "Docker is required. Please install Docker first."
-
-  ios:device:list:
-    summary: Lists connected iOS devices (UDIDs)
-    cmds:
-      - xcrun xcdevice list
-
-  ios:run:device:
-    summary: Build, install, and launch on a physical iPhone using Apple tools (xcodebuild/devicectl)
-    vars:
-      PROJECT: '{{.PROJECT}}'   # e.g., build/ios/xcode/<YourProject>.xcodeproj
-      SCHEME: '{{.SCHEME}}'     # e.g., ios.dev
-      CONFIG: '{{.CONFIG | default "Debug"}}'
-      DERIVED: '{{.DERIVED | default "build/ios/DerivedData"}}'
-      UDID: '{{.UDID}}'         # from `task ios:device:list`
-      BUNDLE_ID: '{{.BUNDLE_ID}}' # e.g., com.yourco.wails.ios.dev
-      TEAM_ID: '{{.TEAM_ID}}'   # optional, if your project is not already set up for signing
-    preconditions:
-      - sh: xcrun -f xcodebuild
-        msg: "xcodebuild not found. Please install Xcode."
-      - sh: xcrun -f devicectl
-        msg: "devicectl not found. Please update to Xcode 15+ (which includes devicectl)."
-      - sh: test -n '{{.PROJECT}}'
-        msg: "Set PROJECT to your .xcodeproj path (e.g., PROJECT=build/ios/xcode/App.xcodeproj)."
-      - sh: test -n '{{.SCHEME}}'
-        msg: "Set SCHEME to your app scheme (e.g., SCHEME=ios.dev)."
-      - sh: test -n '{{.UDID}}'
-        msg: "Set UDID to your device UDID (see: task ios:device:list)."
-      - sh: test -n '{{.BUNDLE_ID}}'
-        msg: "Set BUNDLE_ID to your app's bundle identifier (e.g., com.yourco.wails.ios.dev)."
-    cmds:
-      - |
-        set -euo pipefail
-        echo "Building for device: UDID={{.UDID}} SCHEME={{.SCHEME}} PROJECT={{.PROJECT}}"
-        XCB_ARGS=(
-          -project "{{.PROJECT}}"
-          -scheme "{{.SCHEME}}"
-          -configuration "{{.CONFIG}}"
-          -destination "id={{.UDID}}"
-          -derivedDataPath "{{.DERIVED}}"
-          -allowProvisioningUpdates
-          -allowProvisioningDeviceRegistration
-        )
-        # Optionally inject signing identifiers if provided
-        if [ -n '{{.TEAM_ID}}' ]; then XCB_ARGS+=(DEVELOPMENT_TEAM={{.TEAM_ID}}); fi
-        if [ -n '{{.BUNDLE_ID}}' ]; then XCB_ARGS+=(PRODUCT_BUNDLE_IDENTIFIER={{.BUNDLE_ID}}); fi
-        xcodebuild "${XCB_ARGS[@]}" build | xcpretty || true
-        # If xcpretty isn't installed, run without it
-        if [ "${PIPESTATUS[0]}" -ne 0 ]; then
-          xcodebuild "${XCB_ARGS[@]}" build
-        fi
-        # Find built .app
-        APP_PATH=$(find "{{.DERIVED}}/Build/Products" -type d -name "*.app" -maxdepth 3 | head -n 1)
-        if [ -z "$APP_PATH" ]; then
-          echo "Could not locate built .app under {{.DERIVED}}/Build/Products" >&2
-          exit 1
-        fi
-        echo "Installing: $APP_PATH"
-        xcrun devicectl device install app --device "{{.UDID}}" "$APP_PATH"
-        echo "Launching: {{.BUNDLE_ID}}"
-        xcrun devicectl device process launch --device "{{.UDID}}" --stderr console --stdout console "{{.BUNDLE_ID}}"

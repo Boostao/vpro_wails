@@ -72,12 +72,7 @@ func TestProjectWorkbookStrictClientWireMatchesOriginalKernelAndSummary(t *testi
 	if err != nil {
 		t.Fatal(err)
 	}
-	fixture := filepath.Join("frontend", "src", "longVegetationProjectWorkbookWire.json")
-	if os.Getenv("VPRO_UPDATE_PROJECT_WORKBOOK_WIRE") == "true" {
-		if err := os.WriteFile(fixture, append(encoded, '\n'), 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
+	fixture := filepath.Join("frontend", "tests", "fixtures", "longVegetationProjectWorkbookWire.json")
 	raw, err := os.ReadFile(fixture)
 	if err != nil {
 		t.Fatal(err)

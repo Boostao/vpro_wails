@@ -16,76 +16,27 @@ import (
 	"testing"
 )
 
-func TestTwoPageParentCommonServiceIndependentAuthorization(t *testing.T) {
+func TestTwoPageParentCommonServiceOwnedReadsAndCancellation(t *testing.T) {
 	contexts, state, _, parent, _ := twoPageWriteFixture(t, "FS882-8x6XL", false)
 	request := twopage.TwoPageParentCommonWrite{Original: parent, Edits: twoPageCommonEdits(t, parent)}
-	for _, review := range []bool{false, true} {
-		for _, editing := range []bool{false, true} {
-			service, err := twopage.NewTwoPageParentCommonService(contexts, func(name string) (string, bool) {
-				switch name {
-				case twopage.TwoPageParentReviewEnvironment:
-					return strconv.FormatBool(review), true
-				case twopage.TwoPageParentCommonEditingEnvironment:
-					return strconv.FormatBool(editing), true
-				default:
-					t.Fatal("common service inherited additional-field or SIVI authorization", name)
-					return "", false
-				}
-			})
-			if err != nil {
-				t.Fatal(err)
-			}
-			before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-			got, err := service.GetOriginal(context.Background(), state.ContextID, "108050", parent.Form)
-			if review {
-				if err != nil || !reflect.DeepEqual(got, parent) {
-					t.Fatal("common review did not preserve exact source", got, err)
-				}
-			} else if err == nil || got != nil {
-				t.Fatal("disabled common review returned an original", got, err)
-			}
-			if !review || !editing {
-				if got, err := service.Save(context.Background(), state.ContextID, "108050", parent.Form, request); err == nil || got != nil {
-					t.Fatal("disabled common service wrote", got, err)
-				}
-				if got, err := service.Restore(context.Background(), state.ContextID, "108050", parent.Form, "1", vprocore.AuditRestoreCancel); err == nil || got != nil {
-					t.Fatal("disabled common service bypassed restoration authorization", got, err)
-				}
-			}
-			vprotest.AssertProfileSUFiles(t, contexts, before)
-		}
-	}
-	for _, name := range []string{twopage.TwoPageParentReviewEnvironment, twopage.TwoPageParentCommonEditingEnvironment} {
-		if _, err := twopage.NewTwoPageParentCommonService(contexts, func(key string) (string, bool) {
-			if key == name {
-				return "invalid boolean", true
-			}
-			return "true", true
-		}); err == nil {
-			t.Fatal("common malformed flag silently defaulted", name)
-		}
-	}
-	if _, err := twopage.NewTwoPageParentCommonService(nil, func(string) (string, bool) { return "true", true }); err == nil {
+	if _, err := twopage.NewTwoPageParentCommonService(nil); err == nil {
 		t.Fatal("common nil context accepted")
 	}
-	if _, err := twopage.NewTwoPageParentCommonService(contexts, nil); err == nil {
-		t.Fatal("common implicit environment lookup accepted")
-	}
-	if defaultService, err := twopage.NewTwoPageParentCommonService(contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultService.ReviewEnabled || !defaultService.EditsEnabled {
-		t.Fatal("default common flags disabled", defaultService, err)
-	}
-	service, err := twopage.NewTwoPageParentCommonService(contexts, func(string) (string, bool) { return "false", true })
+	service, err := twopage.NewTwoPageParentCommonService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, err := service.GetOriginal(context.Background(), state.ContextID, "108050", parent.Form); err == nil || got != nil {
-		t.Fatal("missing common flags enabled review", got, err)
+	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
+	got, err := service.GetOriginal(context.Background(), state.ContextID, "108050", parent.Form)
+	if err != nil || !reflect.DeepEqual(got, parent) {
+		t.Fatal("common review did not preserve exact source", got, err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	if got, err := service.Save(ctx, state.ContextID, "108050", parent.Form, request); !errors.Is(err, context.Canceled) || got != nil {
 		t.Fatal("cancelled common save returned a gate error or committed", got, err)
 	}
+	vprotest.AssertProfileSUFiles(t, contexts, before)
 }
 
 func TestTwoPageParentCommonServiceStrictRawTransport(t *testing.T) {
@@ -130,7 +81,7 @@ func TestTwoPageParentCommonServiceStrictRawTransport(t *testing.T) {
 
 func TestTwoPageParentCommonServiceEnabledSaveRestoreAndVariantIsolation(t *testing.T) {
 	contexts, state, _, parent, _ := twoPageWriteFixture(t, "FS882-8x6XL-CHARS", true)
-	service, err := twopage.NewTwoPageParentCommonService(contexts, func(string) (string, bool) { return "true", true })
+	service, err := twopage.NewTwoPageParentCommonService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -10,7 +10,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"os"
 	"reflect"
 	"testing"
 )
@@ -110,27 +109,15 @@ func TestSummaryEnvironmentalNumericValueSourceWire(t *testing.T) {
 	if len(wireCases) != 144 {
 		t.Fatal("all144 successful original cases required", len(wireCases))
 	}
-	if path := os.Getenv("VPRO_SUMMARY_ENVIRONMENT_NUMERIC_WIRE_PATH"); path != "" {
-		encoded, err := json.MarshalIndent(wireCases, "", "  ")
-		if err != nil {
-			t.Fatal(err)
-		}
-		encoded = append(encoded, '\n')
-		if os.Getenv("VPRO_UPDATE_SUMMARY_ENVIRONMENT_NUMERIC_WIRE") == "true" {
-			if err := os.WriteFile(path, encoded, 0600); err != nil {
-				t.Fatal(err)
-			}
-		}
-		actual, err := os.ReadFile(path)
-		if err != nil || !bytes.Equal(actual, encoded) {
-			t.Fatal("strict-Go numeric fixture differs", err)
-		}
-		var decoded []wireCase
-		decoder := json.NewDecoder(bytes.NewReader(actual))
-		decoder.DisallowUnknownFields()
-		if err := decoder.Decode(&decoded); err != nil || !reflect.DeepEqual(decoded, wireCases) {
-			t.Fatal("strict-Go numeric roundtrip differs", err)
-		}
+	encoded, err := json.MarshalIndent(wireCases, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var decoded []wireCase
+	decoder := json.NewDecoder(bytes.NewReader(encoded))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&decoded); err != nil || !reflect.DeepEqual(decoded, wireCases) {
+		t.Fatal("strict-Go numeric roundtrip differs", err)
 	}
 }
 

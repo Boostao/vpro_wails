@@ -225,7 +225,7 @@ func TestSummaryConstancyWorkbookNumericLeadingOrdering(t *testing.T) {
 	}
 }
 
-func TestSummaryConstancyWorkbookIndependentBackendGates(t *testing.T) {
+func TestSummaryConstancyWorkbookInspectionAndOrdinaryIsolation(t *testing.T) {
 	service, state := summaryReferenceWorkbookFixture(t, false)
 	contexts := service.source.environment.report.contexts
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
@@ -235,32 +235,22 @@ func TestSummaryConstancyWorkbookIndependentBackendGates(t *testing.T) {
 	}
 
 	options := summaryConstancyWorkbookOptions()
-	for mask := 0; mask < 8; mask++ {
-		service.GroupedEnabled, service.ReferencesEnabled, service.PresentationEnabled = mask&1 != 0, mask&2 != 0, mask&4 != 0
-		review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
-		if mask != 7 {
-			if err == nil || review != nil {
-				t.Fatal("independent Constancy prerequisite bypassed", mask, review, err)
-			}
-			continue
-		}
-		if err != nil || review == nil || review.Scope != summaryVegetationConstancyScope ||
-			review.Preview.Source != summaryVegetationConstancySource ||
-			review.Preview.Ordering != summaryVegetationConstancyOrdering ||
-			review.Options.ShowClass != 20 || review.Preview.ShowClass != 0 ||
-			!reflect.DeepEqual(review.Preview.GroupField, &SummaryVegetationField{"Lifeform", 4, 4}) ||
-			len(review.Preview.Rows) == 0 {
-			t.Fatal("explicit Constancy inspection unavailable or metadata drifted", review, err)
-		}
-		for _, row := range review.Preview.Rows {
-			if row.RawSpecies == nil || row.Layer.Storage != "integer" && row.Layer.Storage != "null" {
-				t.Fatal("Constancy transport lost raw grouping or numeric lifeform", row)
-			}
+	review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
+	if err != nil || review == nil || review.Scope != summaryVegetationConstancyScope ||
+		review.Preview.Source != summaryVegetationConstancySource ||
+		review.Preview.Ordering != summaryVegetationConstancyOrdering ||
+		review.Options.ShowClass != 20 || review.Preview.ShowClass != 0 ||
+		!reflect.DeepEqual(review.Preview.GroupField, &SummaryVegetationField{"Lifeform", 4, 4}) ||
+		len(review.Preview.Rows) == 0 {
+		t.Fatal("explicit Constancy inspection unavailable or metadata drifted", review, err)
+	}
+	for _, row := range review.Preview.Rows {
+		if row.RawSpecies == nil || row.Layer.Storage != "integer" && row.Layer.Storage != "null" {
+			t.Fatal("Constancy transport lost raw grouping or numeric lifeform", row)
 		}
 	}
-	service.GroupedEnabled, service.ReferencesEnabled, service.PresentationEnabled = false, false, false
 	ordinary := SummaryVegetationWorkbookOptions{Title: "ordinary", Average: 1, Display: 6}
-	review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, ordinary))
+	review, err = service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, ordinary))
 	if err != nil || review == nil || review.Scope != summaryVegetationWorkbookDraftScope {
 		t.Fatal("Constancy prerequisites disabled unrelated ordinary workbook", err)
 	}

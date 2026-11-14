@@ -20,9 +20,25 @@ func NewHelpService(preferences *vprocorepkg.DesktopConfig) (*HelpService, error
 	return &HelpService{core: core}, nil
 }
 
+func buildHelpService(preferences *vprocorepkg.DesktopConfig, contexts *ContextService, dataDir string) (*HelpService, error) {
+	svc, err := NewHelpService(preferences)
+	if err != nil {
+		return nil, err
+	}
+	svc.setContext(contexts)
+	svc.setDataDir(dataDir)
+	return svc, nil
+}
+
 func (s *HelpService) setContext(contexts *ContextService) {
 	if s != nil && s.core != nil {
 		s.core.SetContext(unwrapContextService(contexts))
+	}
+}
+
+func (s *HelpService) setDataDir(dataDir string) {
+	if s != nil && s.core != nil {
+		s.core.SetDataDir(dataDir)
 	}
 }
 

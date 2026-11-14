@@ -67,9 +67,7 @@ func twoPageEnvironmentTableFixture(t *testing.T, external bool) (*datasheet.Two
 		(8,'unmatched',NULL,0,NULL,NULL),(9,NULL,NULL,0,NULL,NULL)`); err != nil {
 		t.Fatal(err)
 	}
-	service, err := datasheet.NewTwoPageEnvironmentTableService(contexts, func(name string) (string, bool) {
-		return "true", name == datasheet.TwoPageEnvironmentTableEnvironment
-	})
+	service, err := datasheet.NewTwoPageEnvironmentTableService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,9 +83,7 @@ func twoPageGoogleEarthFixture(t *testing.T, external bool) (*spatial.TwoPageGoo
 		t.Fatal(err)
 	}
 	vprotest.MutateContextFixture(t, state.SUPath, `INSERT INTO Report_SU VALUES('108050','duplicate membership')`)
-	service, err := spatial.NewTwoPageGoogleEarthService(contexts, func(name string) (string, bool) {
-		return "true", name == spatial.TwoPageGoogleEarthReviewEnvironment
-	})
+	service, err := spatial.NewTwoPageGoogleEarthService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -289,9 +285,7 @@ func twoPageProfilingFixture(t *testing.T, externalSU, externalProfile bool) (*c
 	if err != nil {
 		t.Fatal(err)
 	}
-	service, err := classification.NewTwoPageProfilingService(environment.Contexts, func(name string) (string, bool) {
-		return "true", name == classification.TwoPageProfilingEnvironment
-	})
+	service, err := classification.NewTwoPageProfilingService(environment.Contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -330,9 +324,7 @@ func twoPageProjectMetadataFixture(t *testing.T, external bool) (*classification
 		(9,'spaced ',12,'terminal space',NULL,NULL,NULL)`); err != nil {
 		t.Fatal(err)
 	}
-	service, err := classification.NewTwoPageProjectMetadataService(contexts, func(name string) (string, bool) {
-		return "true", name == classification.TwoPageProjectMetadataEnvironment
-	})
+	service, err := classification.NewTwoPageProjectMetadataService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}

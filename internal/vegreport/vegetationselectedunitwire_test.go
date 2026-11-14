@@ -16,7 +16,7 @@ import (
 )
 
 func TestSelectedUnitStrictClientWireMatchesPreparedKernel(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationSelectedUnitsWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationSelectedUnitsWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +59,7 @@ func TestSelectedUnitStrictClientWireMatchesPreparedKernel(t *testing.T) {
 			{RowID: "22", Cells: []vprocore.ProjectMetadataCell{vprotest.MetadataText("P1")}},
 		},
 	}
-	selectionRaw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationSelectedUnitSelectionWire.json"))
+	selectionRaw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationSelectedUnitSelectionWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

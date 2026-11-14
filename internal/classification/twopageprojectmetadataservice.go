@@ -14,7 +14,6 @@ import (
 	"unicode/utf8"
 )
 
-const TwoPageProjectMetadataEnvironment = "VPRO_TWO_PAGE_PROJECT_METADATA_REVIEW"
 const twoPageProjectMetadataScanMaximum = 100000
 const twoPageProjectMetadataPageMaximum = 200
 const TwoPageProjectMetadataMatching = "DAO-General1033-controlled-ASCII-alphanumeric-space; ignore-case-terminal-U0020; physical-row-order"
@@ -41,18 +40,13 @@ type TwoPageProjectMetadataReview struct {
 
 type TwoPageProjectMetadataService struct {
 	Contexts *vprocore.ContextService `json:"-" yaml:"-"`
-	Review   bool                     `json:"-" yaml:"-"`
 }
 
-func NewTwoPageProjectMetadataService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*TwoPageProjectMetadataService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("two-page project metadata requires owned contexts and explicit feature lookup")
+func NewTwoPageProjectMetadataService(contexts *vprocore.ContextService) (*TwoPageProjectMetadataService, error) {
+	if contexts == nil {
+		return nil, errors.New("two-page project metadata requires owned contexts")
 	}
-	enabled, err := vprocore.SiviFeature(TwoPageProjectMetadataEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageProjectMetadataService{contexts, enabled}, nil
+	return &TwoPageProjectMetadataService{Contexts: contexts}, nil
 }
 
 func (s *TwoPageProjectMetadataService) GetReview(ctx context.Context, contextID, plot string, offset, limit int) (*TwoPageProjectMetadataReview, error) {
@@ -62,8 +56,8 @@ func (s *TwoPageProjectMetadataService) GetReview(ctx context.Context, contextID
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || s.Contexts == nil || !s.Review {
-		return nil, errors.New("two-page project metadata requires independently enabled saved-data review")
+	if s == nil || s.Contexts == nil {
+		return nil, errors.New("two-page project metadata requires owned contexts")
 	}
 	if plot == "" || !utf8.ValidString(plot) || offset < 0 || offset > twoPageProjectMetadataScanMaximum ||
 		limit < 1 || limit > twoPageProjectMetadataPageMaximum {

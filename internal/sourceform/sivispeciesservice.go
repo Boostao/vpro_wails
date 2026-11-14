@@ -13,8 +13,6 @@ import (
 	"reflect"
 )
 
-const SiviSpeciesFeatureEnvironment = "VPRO_SIVI_SPECIES_EDITING"
-
 type SIVISpeciesEdit struct {
 	RowID    string                       `json:"rowId"`
 	Form     string                       `json:"form"`
@@ -186,18 +184,13 @@ func (request *SIVISpeciesWrite) UnmarshalJSON(data []byte) error {
 
 type SIVISpeciesService struct {
 	contexts *vprocore.ContextService
-	Enabled  bool `json:"-" yaml:"-"`
 }
 
-func NewSIVISpeciesService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SIVISpeciesService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("SIVI Species requires context ownership and an explicit feature lookup")
+func NewSIVISpeciesService(contexts *vprocore.ContextService) (*SIVISpeciesService, error) {
+	if contexts == nil {
+		return nil, errors.New("SIVI Species requires context ownership")
 	}
-	enabled, err := vprocore.SiviFeature(SiviSpeciesFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SIVISpeciesService{contexts, enabled}, nil
+	return &SIVISpeciesService{contexts: contexts}, nil
 }
 
 func (s *SIVISpeciesService) require(ctx context.Context) error {
@@ -207,8 +200,8 @@ func (s *SIVISpeciesService) require(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.contexts == nil || !s.Enabled {
-		return errors.New("SIVI Species editing is disabled in this session")
+	if s == nil || s.contexts == nil {
+		return errors.New("SIVI Species requires context ownership")
 	}
 	return nil
 }

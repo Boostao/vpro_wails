@@ -21,36 +21,12 @@ func pictureServiceLookup(values map[string]string) func(string) (string, bool) 
 	}
 }
 
-func TestPictureServiceIndependentGateAndExplicitSources(t *testing.T) {
-	for _, flag := range []string{"", "false", "true", "TRUE", " true", "1"} {
-		lookup := func(name string) (string, bool) {
-			if name == pictureLibraryEnvironment {
-				return "", false
-			}
-			if name != PictureReadingEnvironment {
-				t.Fatal("disabled picture read inferred a library or borrowed authority", name)
-			}
-			return flag, flag != ""
-		}
-		if flag == "true" {
-			lookup = pictureServiceLookup(map[string]string{PictureReadingEnvironment: flag})
-		}
-		service, err := NewPictureService(&vprocore.ContextService{}, lookup)
-		if flag != "" && flag != "false" {
-			if err == nil || service != nil {
-				t.Fatal("malformed gate or missing enabled library silently defaulted", service, err)
-			}
-			continue
-		}
-		if err != nil || service.Enabled {
-			t.Fatal("picture reader is not independently default-off", service, err)
-		}
-		if got, err := service.GetMetadata(context.Background(), "owned", "P"); err == nil || got != nil {
-			t.Fatal("disabled metadata read succeeded", got, err)
-		}
-		if got, err := service.GetImage(context.Background(), "owned", "P", "{}"); err == nil || got != nil {
-			t.Fatal("disabled preview borrowed authority", got, err)
-		}
+func TestPictureServiceExplicitSourcesAndGuards(t *testing.T) {
+	if service, err := NewPictureService(&vprocore.ContextService{}, pictureServiceLookup(nil)); service != nil || err == nil {
+		t.Fatal("missing library and project root silently defaulted", service, err)
+	}
+	if service, err := NewPictureService(&vprocore.ContextService{}, pictureServiceLookup(map[string]string{pictureLibraryEnvironment: ""})); service != nil || err == nil {
+		t.Fatal("empty explicit library path accepted", service, err)
 	}
 	if service, err := NewPictureService(nil, pictureServiceLookup(nil)); service != nil || err == nil {
 		t.Fatal("nil context owner constructed a picture service", service, err)
@@ -77,7 +53,6 @@ func TestPictureServiceStrictReviewedPreviewAndReadOnlyMethods(t *testing.T) {
 	source, path := pictureLibraryFixture(t, pictureFixtureSchema)
 	directory, _ := pictureImageFixture(t, "jpeg", 448, 300)
 	values := map[string]string{
-		PictureReadingEnvironment:        "true",
 		pictureLibraryEnvironment:        path,
 		pictureChildDirectoryEnvironment: directory.path,
 	}
@@ -153,7 +128,7 @@ func TestPictureServiceStrictReviewedPreviewAndReadOnlyMethods(t *testing.T) {
 func TestPictureServiceOptionalDirectoryConfigurationIsNotRepaired(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, false)
 	_, path := pictureLibraryFixture(t, pictureFixtureSchema)
-	values := map[string]string{PictureReadingEnvironment: "true", pictureLibraryEnvironment: path}
+	values := map[string]string{pictureLibraryEnvironment: path}
 	service, err := NewPictureService(contexts, pictureServiceLookup(values))
 	if err != nil {
 		t.Fatal("explicit metadata-only library required an inferred image directory", err)

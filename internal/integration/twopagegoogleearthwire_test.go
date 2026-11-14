@@ -55,12 +55,7 @@ func TestTwoPageGoogleEarthProductionWireFixture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.Join("frontend", "src", "twoPageGoogleEarthWire.json")
-	if os.Getenv("VPRO_UPDATE_TWO_PAGE_GOOGLE_EARTH_WIRE") == "true" {
-		if err := os.WriteFile(path, append(encoded, '\n'), 0o600); err != nil {
-			t.Fatal(err)
-		}
-	}
+	path := filepath.Join("frontend", "tests", "fixtures", "twoPageGoogleEarthWire.json")
 	fixture, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

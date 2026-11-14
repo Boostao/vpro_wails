@@ -15,19 +15,12 @@ import (
 	"unicode/utf8"
 )
 
-const tableCSVArchiveFeatureEnvironment = "VPRO_TABLE_CSV_ARCHIVE_EXPORT"
-
-func TableCSVArchiveFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(tableCSVArchiveFeatureEnvironment, lookup)
-}
-
 type TableCSVArchiveService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewTableCSVArchiveService(contexts *vprocore.ContextService, enabled bool) *TableCSVArchiveService {
-	return &TableCSVArchiveService{contexts: contexts, enabled: enabled}
+func NewTableCSVArchiveService(contexts *vprocore.ContextService) *TableCSVArchiveService {
+	return &TableCSVArchiveService{contexts: contexts}
 }
 
 func (s *TableCSVArchiveService) authorize(ctx context.Context) error {
@@ -37,10 +30,7 @@ func (s *TableCSVArchiveService) authorize(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("table CSV archive export is disabled in this session")
-	}
-	if s.contexts == nil {
+	if s == nil || s.contexts == nil {
 		return errors.New("table CSV archive context service is unavailable")
 	}
 	return nil

@@ -35,15 +35,46 @@ var NewPMTilesAttributor = spatialpkg.NewPMTilesAttributor
 
 type SpatialService struct {
 	contexts               *ContextService
-	coordinates            *CoordinateService
-	googleEarthReview      *GoogleEarthReviewService
-	googleEarthKML         *GoogleEarthKMLService
-	googleEarthKMLExport   *GoogleEarthKMLExportService
-	googleEarthPreferences *GoogleEarthPreferencesService
-	twoPageGoogleEarth     *TwoPageGoogleEarthService
+	coordinates            *vprocorepkg.CoordinateService
+	googleEarthReview      *spatialpkg.GoogleEarthReviewService
+	googleEarthKML         *spatialpkg.GoogleEarthKMLService
+	googleEarthKMLExport   *spatialpkg.GoogleEarthKMLExportService
+	googleEarthPreferences *spatialpkg.GoogleEarthPreferencesService
+	twoPageGoogleEarth     *spatialpkg.TwoPageGoogleEarthService
 	dataDir                string
 	extraDirs              []string
 	attributor             *spatialpkg.PMTilesAttributor
+}
+
+func buildSpatialService(
+	contexts *ContextService,
+	configDir string,
+	preferences *vprocorepkg.DesktopConfig,
+	dataDir string,
+	extraDirs []string,
+	attributor *spatialpkg.PMTilesAttributor,
+) (SpatialService, error) {
+	core := unwrapContextService(contexts)
+	coordinates, err := vprocorepkg.NewCoordinateServiceInternal(configDir, preferences)
+	if err != nil {
+		return SpatialService{}, err
+	}
+	twoPageGoogleEarth, err := spatialpkg.NewTwoPageGoogleEarthService(core)
+	if err != nil {
+		return SpatialService{}, err
+	}
+	return SpatialService{
+		contexts:               contexts,
+		coordinates:            coordinates,
+		googleEarthReview:      spatialpkg.NewGoogleEarthReviewService(core),
+		googleEarthKML:         spatialpkg.NewGoogleEarthKMLService(core),
+		googleEarthKMLExport:   spatialpkg.NewGoogleEarthKMLExportService(core),
+		googleEarthPreferences: spatialpkg.NewGoogleEarthPreferencesService(core),
+		twoPageGoogleEarth:     twoPageGoogleEarth,
+		dataDir:                dataDir,
+		extraDirs:              extraDirs,
+		attributor:             attributor,
+	}, nil
 }
 
 func (s *SpatialService) GetCoordinateMode() (CoordinateMode, error) {

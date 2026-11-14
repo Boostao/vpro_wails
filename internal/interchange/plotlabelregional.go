@@ -8,14 +8,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 	"unicode/utf16"
 	"unicode/utf8"
 )
-
-const plotLabelRegionalDateEnvironment = "VPRO_PLOT_LABEL_REGIONAL_DATE"
 
 type SavedPlotLabelHeader struct {
 	PlotNumber       string  `json:"plotNumber"`
@@ -43,7 +40,6 @@ type plotLabelNativeDate struct {
 
 type PlotLabelRegionalService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	now      func() time.Time
 	format   func(time.Time) (plotLabelNativeDate, error)
 }
@@ -52,16 +48,12 @@ func NewPlotLabelRegionalService(contexts *vprocore.ContextService) (*PlotLabelR
 	if contexts == nil || contexts.Projects == nil || contexts.Plots == nil {
 		return nil, errors.New("regional plot labels require an owned SQLite context")
 	}
-	enabled, err := vprocore.SiviFeature(plotLabelRegionalDateEnvironment, os.LookupEnv)
-	if err != nil {
-		return nil, err
-	}
-	return &PlotLabelRegionalService{contexts: contexts, enabled: enabled, now: time.Now, format: formatPlotLabelNativeDate}, nil
+	return &PlotLabelRegionalService{contexts: contexts, now: time.Now, format: formatPlotLabelNativeDate}, nil
 }
 
 func (s *PlotLabelRegionalService) GetPreview(ctx context.Context, contextID, plot string) (*PlotLabelRegionalPreview, error) {
-	if s == nil || !s.enabled || s.contexts == nil {
-		return nil, errors.New("native regional plot label preview is unavailable; its independent backend gate is disabled")
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("native regional plot label preview requires owned contexts")
 	}
 	if err := ctx.Err(); err != nil {
 		return nil, err

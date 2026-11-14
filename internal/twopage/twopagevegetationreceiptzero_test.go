@@ -15,7 +15,7 @@ import (
 )
 
 func TestTwoPageVegetationClientUnauditedSignedZeroHistory(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageVegetationReceipts.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationReceipts.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

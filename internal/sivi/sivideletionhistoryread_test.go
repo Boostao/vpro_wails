@@ -383,9 +383,7 @@ func assertSIVIDeletionTargetsRefused(t *testing.T, contexts *vprocore.ContextSe
 
 func TestSIVIDeletionTargetsRaw44UnavailableIDsBlobsAndExactParentScope(t *testing.T) {
 	contexts, state, db, deletion := sftest.SiviDeletionFixture(t, true, 3)
-	service, err := NewSIVIDeletionService(contexts, func(name string) (string, bool) {
-		return "true", name == SiviDeletionWritingFeatureEnvironment
-	})
+	service, err := NewSIVIDeletionService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,7 +1,6 @@
 package vegreport
 
 import (
-	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
 )
 
@@ -22,38 +21,7 @@ func TestLongVegetationLifeformDecodeAndDefaultIndependentGate(t *testing.T) {
 	if err != nil || !options.LifeformGrouping || options.NoneGrouping || vegetationSettings(options).Grouping != "lifeform" {
 		t.Fatal("source Lifeform grouping lost explicit identity", options, err)
 	}
-	service, state := vprotest.ReportServiceFixture(t, false)
-	if err := service.Projects.Preferences.Update("ReportOptions", map[string]any{"LVGroupBy": 3}); err != nil {
-		t.Fatal(err)
-	}
-	before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
-	config, err := os.ReadFile(service.Projects.Preferences.Path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, noneEnabled := range []bool{false, true} {
-		service.LongVegetationNoneEnabled = noneEnabled
-		if result, err := GetLongVegetationOptions(service, context.Background(), state.ContextID); err == nil || !reflect.DeepEqual(result, LongVegetationOptions{}) {
-			t.Fatal("None enabled Lifeform options", result, err)
-		}
-		if result, err := PreviewLongVegetation(service, context.Background(), state.ContextID); err == nil || !reflect.DeepEqual(result, LongVegetationPreview{}) {
-			t.Fatal("default Lifeform preview published data", result, err)
-		}
-		if result, err := PreviewLongVegetationLayers(service, context.Background(), state.ContextID); err == nil || !reflect.DeepEqual(result, vegetationLayerReport{}) {
-			t.Fatal("private context path bypassed Lifeform gate", result, err)
-		}
-	}
-	vprotest.AssertProfileSUFiles(t, service, before)
-	after, err := os.ReadFile(service.Projects.Preferences.Path)
-	if err != nil || !bytes.Equal(config, after) {
-		t.Fatal("Lifeform default refusal changed retained settings", err)
-	}
-	if enabled, err := vprocore.SiviFeature(LongVegetationLifeformFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || !enabled {
-		t.Fatal("Lifeform default gate disabled", err)
-	}
-	if _, err := vprocore.SiviFeature(LongVegetationLifeformFeatureEnvironment, func(string) (string, bool) { return "TRUE", true }); err == nil {
-		t.Fatal("malformed Lifeform gate accepted")
-	}
+	service, _ := vprotest.ReportServiceFixture(t, false)
 	options.NoneGrouping = true
 	if err := CheckLongVegetationGrouping(service, options); err == nil {
 		t.Fatal("conflicting grouping flags accepted")
@@ -66,7 +34,6 @@ func TestLongVegetationLifeformOwnedReaderDispatchIdentityAndZeroWrites(t *testi
 		if err := service.Projects.Preferences.Update("ReportOptions", map[string]any{"LVGroupBy": 3}); err != nil {
 			t.Fatal(err)
 		}
-		service.LongVegetationLifeformEnabled = true
 		before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
 		config, err := os.ReadFile(service.Projects.Preferences.Path)
 		if err != nil {
@@ -114,7 +81,6 @@ func TestLongVegetationLifeformRequiresOriginalPersonalTableWithoutLayerFallback
 	if err := service.Projects.Preferences.Update("ReportOptions", map[string]any{"LVGroupBy": 3}); err != nil {
 		t.Fatal(err)
 	}
-	service.LongVegetationLifeformEnabled = true
 	original, err := os.ReadFile(service.Projects.SupportPaths["VUser"])
 	if err != nil {
 		t.Fatal(err)

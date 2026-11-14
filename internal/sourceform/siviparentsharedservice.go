@@ -12,7 +12,6 @@ import (
 	"strconv"
 )
 
-const SiviParentSharedFeatureEnvironment = "VPRO_SIVI_PARENT_SHARED_EDITING"
 const siviParentSharedHistoryTable = "__VPRO_SIVIParentSharedHistory"
 const siviParentSharedHistorySQL = `CREATE TABLE "__VPRO_SIVIParentSharedHistory"(ID INTEGER PRIMARY KEY,Created TEXT NOT NULL,Proposal TEXT NOT NULL,Restored TEXT)`
 
@@ -98,33 +97,26 @@ func (request *SIVIParentSharedWrite) UnmarshalJSON(data []byte) error {
 // Registration is intentionally separate from the XL facade: shared storage
 // does not authorize XL callbacks or its whole-header Save.
 type SIVIParentSharedService struct {
-	Contexts          *vprocore.ContextService         `json:"-" yaml:"-"`
-	Enabled           bool                             `json:"-" yaml:"-"`
-	ReferencesEnabled bool                             `json:"-" yaml:"-"`
-	References        SiviParentSharedReferenceReaders `json:"-" yaml:"-"`
+	Contexts   *vprocore.ContextService         `json:"-" yaml:"-"`
+	References SiviParentSharedReferenceReaders `json:"-" yaml:"-"`
 }
 
-func NewSIVIParentSharedService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SIVIParentSharedService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("SIVI shared-field service requires context ownership and an explicit feature lookup")
+func NewSIVIParentSharedService(contexts *vprocore.ContextService) (*SIVIParentSharedService, error) {
+	if contexts == nil {
+		return nil, errors.New("SIVI shared-field service requires context ownership")
 	}
-	enabled, err := vprocore.SiviFeature(SiviParentSharedFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	referencesEnabled, err := vprocore.SiviFeature(SiviParentSharedReferenceEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SIVIParentSharedService{Contexts: contexts, Enabled: enabled, ReferencesEnabled: referencesEnabled}, nil
+	return &SIVIParentSharedService{Contexts: contexts}, nil
 }
 
 func (s *SIVIParentSharedService) require(ctx context.Context) error {
+	if ctx == nil {
+		return errors.New("SIVI shared-field editing requires a context")
+	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.Contexts == nil || !s.Enabled || !s.Contexts.SiviParentReviewEnabled {
-		return errors.New("SIVI shared-field editing requires independently enabled parent review and shared-field editing")
+	if s == nil || s.Contexts == nil {
+		return errors.New("SIVI shared-field editing requires context ownership")
 	}
 	return nil
 }
@@ -250,13 +242,7 @@ func (s *SIVIParentSharedService) Save(ctx context.Context, contextID, plot stri
 	if err := s.require(ctx); err != nil {
 		return nil, err
 	}
-	if s.ReferencesEnabled {
-		return s.saveWithReferences(ctx, contextID, plot, request)
-	}
-	return WriteSIVIParentPlanned(s.Contexts, ctx, contextID, plot, request.Original, siviParentSharedHistory,
-		func(observed *SiviParentProjection) ([]SiviParentScalarAssignment, error) {
-			return PlanSIVIParentShared(ctx, observed, request.Edits)
-		})
+	return s.saveWithReferences(ctx, contextID, plot, request)
 }
 
 func (s *SIVIParentSharedService) Restore(ctx context.Context, contextID, plot, historyID string, action vprocore.AuditRestoreAction) (*vprocore.AuditRestoreResult, error) {

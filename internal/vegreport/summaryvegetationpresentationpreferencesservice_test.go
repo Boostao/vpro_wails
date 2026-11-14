@@ -79,22 +79,7 @@ func TestSummaryPresentationFacadeStrictRequiredWire(t *testing.T) {
 }
 
 func TestSummaryPresentationFacadeIndependentGateAndOwner(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}} {
-		enabled, err := SummaryVegetationPresentationPreferencesFeature(func(key string) (string, bool) {
-			if key != "VPRO_SUMMARY_VEGETATION_PRESENTATION_PREFERENCES" {
-				t.Fatal(key)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
-	for _, service := range []*SummaryVegetationPresentationPreferencesService{nil, {}, NewSummaryVegetationPresentationPreferencesService(nil, true)} {
+	for _, service := range []*SummaryVegetationPresentationPreferencesService{nil, {}, NewSummaryVegetationPresentationPreferencesService(nil)} {
 		if got, err := service.GetSummaryVegetationPresentationPreferences(context.Background(), "id"); got != nil || err == nil {
 			t.Fatal(got, err)
 		}
@@ -103,7 +88,7 @@ func TestSummaryPresentationFacadeIndependentGateAndOwner(t *testing.T) {
 		}
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationPresentationPreferencesService(contexts, true)
+	service := NewSummaryVegetationPresentationPreferencesService(contexts)
 	read, err := service.GetSummaryVegetationPresentationPreferences(context.Background(), state.ContextID)
 	if err != nil || read.ContextID != state.ContextID || read.Project != "Sample" || read.ProjectPath != state.ProjectPath ||
 		read.SU != "None" || read.SUPath != state.SUPath || read.Source != summaryVegetationPresentationPreferencesSource {
@@ -129,7 +114,7 @@ func TestSummaryPresentationFacadeIndependentGateAndOwner(t *testing.T) {
 
 func TestSummaryPresentationFacadeCleanupCancellationReplacementAndCommittedReceipt(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationPresentationPreferencesService(contexts, true)
+	service := NewSummaryVegetationPresentationPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	read, err := service.GetSummaryVegetationPresentationPreferences(context.Background(), state.ContextID)
 	if err != nil {
@@ -204,7 +189,7 @@ func TestSummaryPresentationFacadeCleanupCancellationReplacementAndCommittedRece
 
 func TestSummaryPresentationFacadeConstancyAwayBackAndNoDatabaseChanges(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationPresentationPreferencesService(contexts, true)
+	service := NewSummaryVegetationPresentationPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	if err := store.Update("ReportOptions", map[string]any{
 		"SVGroupBy": 4, "SVValue": 6, "SVShowEnglishName": -1, "SVShowValOpt": 7.25,
@@ -251,7 +236,7 @@ func TestSummaryPresentationFacadeConstancyAwayBackAndNoDatabaseChanges(t *testi
 func TestSummaryPresentationFacadeUnavailableHierarchyGuardAndHistoricalOmission(t *testing.T) {
 	for _, historical := range []int{0, -1} {
 		contexts, state := vprotest.PrepareKMLContextFixture(t)
-		service := NewSummaryVegetationPresentationPreferencesService(contexts, true)
+		service := NewSummaryVegetationPresentationPreferencesService(contexts)
 		store := contexts.Projects.Preferences
 		if err := store.Update("ReportOptions", map[string]any{"SVShowHierarchyHeader": historical}); err != nil {
 			t.Fatal(err)
@@ -288,12 +273,9 @@ func TestSummaryPresentationFacadeUnavailableHierarchyGuardAndHistoricalOmission
 }
 
 func TestSummaryPresentationFacadeEmitActualGoWire(t *testing.T) {
-	directory := os.Getenv("VPRO_SUMMARY_PRESENTATION_PRIVATE_WIRE_DIR")
-	if directory == "" {
-		t.Skip("private actual-Go wire generation requires an explicit session directory")
-	}
+	directory := t.TempDir()
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationPresentationPreferencesService(contexts, true)
+	service := NewSummaryVegetationPresentationPreferencesService(contexts)
 	read, err := service.GetSummaryVegetationPresentationPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)

@@ -16,8 +16,6 @@ import (
 	"github.com/boostao/vpro-wails/internal/listcatalog"
 )
 
-const SiviParentSharedReferenceEnvironment = "VPRO_SIVI_PARENT_REFERENCE_EDITING"
-
 type SiviParentSharedReferencePolicy struct {
 	Column, List, Reader string `json:"-" yaml:"-"`
 	Maximum              int    `json:"-" yaml:"-"`
@@ -329,9 +327,6 @@ func (s *SIVIParentSharedService) ReadReference(ctx context.Context, tx *sql.Tx,
 func (s *SIVIParentSharedService) GetReferences(ctx context.Context, contextID, plot string, zone vprocore.ProjectMetadataCell) (*SIVIParentSharedReferences, error) {
 	if err := s.require(ctx); err != nil {
 		return nil, err
-	}
-	if !s.ReferencesEnabled {
-		return nil, errors.New("SIVI reference editing is independently disabled")
 	}
 	if _, err := vprocore.MetadataCellValue(zone); err != nil {
 		return nil, err

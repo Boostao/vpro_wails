@@ -69,13 +69,11 @@ func TestPlotLabelPDFAttemptRunningRecoveryAndNoConcurrentReplay(t *testing.T) {
 func TestPlotLabelPDFAttemptReadonlySealExcludesDelayedRPC(t *testing.T) {
 	service, state, request := plotLabelPDFExportFixture(t)
 	raw := plotLabelPDFRequestJSON(t, request)
-	service.enabled = false
 	recovered, err := service.RecoverOutcome(t.Context(), state.ContextID, raw)
 	if err != nil || recovered.Status != "completed" || recovered.Outcome == nil ||
 		recovered.Outcome.Status != "not-published" {
 		t.Fatalf("readonly pending-arrival seal: %+v, %v", recovered, err)
 	}
-	service.enabled = true
 	service.runtime.fonts = func(context.Context) (plotLabelPDFFonts, error) {
 		t.Fatal("sealed delayed RPC reached fresh source/font preparation")
 		return plotLabelPDFFonts{}, nil

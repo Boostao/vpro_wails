@@ -15,15 +15,9 @@ import (
 	"testing"
 )
 
-func vegetationFacade(t *testing.T, contexts *vprocore.ContextService, values map[string]string) *TwoPageVegetationService {
+func vegetationFacade(t *testing.T, contexts *vprocore.ContextService) *TwoPageVegetationService {
 	t.Helper()
-	service, err := NewTwoPageVegetationService(contexts, func(name string) (string, bool) {
-		if name != twoPageVegetationReviewEnvironment && name != twoPageVegetationWritingEnvironment {
-			t.Fatal("vegetation facade consulted another workflow's gate", name)
-		}
-		value, found := values[name]
-		return value, found
-	})
+	service, err := NewTwoPageVegetationService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,49 +33,26 @@ func vegetationAttemptJSON(t *testing.T, request twoPageVegetationRequest) strin
 	return string(raw)
 }
 
-func TestTwoPageVegetationServiceIndependentGatesAndReadonlyRecovery(t *testing.T) {
+func TestTwoPageVegetationServiceCommitAndReadonlyRecovery(t *testing.T) {
 	for _, form := range []string{"SubVegAXL_BC", "SubVegAXL", "SubVegCXL", "SubVegDXL"} {
 		t.Run(form, func(t *testing.T) {
 			contexts, state, db, request := vegetationWriteFixture(t, false, form, 3)
 			raw := vegetationAttemptJSON(t, request)
 			before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-			for _, values := range []map[string]string{
-				{twoPageVegetationReviewEnvironment: "false"},
-				{twoPageVegetationReviewEnvironment: "false", twoPageVegetationWritingEnvironment: "true"},
-			} {
-				facade := vegetationFacade(t, contexts, values)
-				if result, err := facade.GetOriginal(context.Background(), state.ContextID, "108050", form); result != nil || err == nil {
-					t.Fatal("disabled physical original granted", result, err)
-				}
-				if result, err := facade.GetSpeciesReferences(context.Background(), state.ContextID, "108050", form); result != nil || err == nil {
-					t.Fatal("disabled Species references granted", result, err)
-				}
-				if result, err := facade.Save(context.Background(), state.ContextID, raw); result != nil || err == nil {
-					t.Fatal("disabled writer granted", result, err)
-				}
-				if result, err := facade.RecoverOutcome(context.Background(), state.ContextID, raw); result != nil || err == nil {
-					t.Fatal("disabled recovery granted", result, err)
-				}
-			}
-			readonly := vegetationFacade(t, contexts, map[string]string{twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "false"})
+			readonly := vegetationFacade(t, contexts)
 			if result, err := readonly.GetOriginal(context.Background(), state.ContextID, "108050", form); result == nil || err != nil {
-				t.Fatal("review-only physical original refused", result, err)
+				t.Fatal("physical original refused", result, err)
 			}
 			if result, err := readonly.GetSpeciesReferences(context.Background(), state.ContextID, "108050", form); result == nil || err != nil {
-				t.Fatal("review-only physical Species definitions refused", result, err)
-			}
-			if result, err := readonly.Save(context.Background(), state.ContextID, raw); result != nil || err == nil {
-				t.Fatal("review-only grant allowed mutation", result, err)
+				t.Fatal("physical Species definitions refused", result, err)
 			}
 			if result, err := readonly.RecoverReceipt(context.Background(), state.ContextID, raw); result != nil || err != nil {
 				t.Fatal("missing history is not unresolved nil", result, err)
 			}
 			if !reflect.DeepEqual(before, vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)) {
-				t.Fatal("flags/readonly reads created source/schema/history")
+				t.Fatal("readonly reads created source/schema/history")
 			}
-			enabled := vegetationFacade(t, contexts, map[string]string{
-				twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true",
-			})
+			enabled := vegetationFacade(t, contexts)
 			priorAudits := soilWriteCount(t, db, "Sample_Audit")
 			result, err := enabled.Save(context.Background(), state.ContextID, raw)
 			if err != nil || result == nil || !result.DidCommit || result.Replayed ||
@@ -93,7 +64,7 @@ func TestTwoPageVegetationServiceIndependentGatesAndReadonlyRecovery(t *testing.
 			if err != nil || recovered == nil || recovered.DidCommit || !recovered.Replayed ||
 				!reflect.DeepEqual(recovered.History, result.History) ||
 				!reflect.DeepEqual(before, vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)) {
-				t.Fatal("writing-disabled recovery lost provenance or wrote data", recovered, err)
+				t.Fatal("readonly recovery lost provenance or wrote data", recovered, err)
 			}
 		})
 	}
@@ -101,23 +72,10 @@ func TestTwoPageVegetationServiceIndependentGatesAndReadonlyRecovery(t *testing.
 
 func TestTwoPageVegetationServiceStrictTransportAndExplicitErrors(t *testing.T) {
 	contexts, state, _, request := vegetationWriteFixture(t, false, "SubVegAXL_BC", 3)
-	lookup := func(string) (string, bool) { return "", false }
-	if result, err := NewTwoPageVegetationService(nil, lookup); result != nil || err == nil {
+	if result, err := NewTwoPageVegetationService(nil); result != nil || err == nil {
 		t.Fatal("nil owner accepted", result, err)
 	}
-	if result, err := NewTwoPageVegetationService(contexts, nil); result != nil || err == nil {
-		t.Fatal("nil gate lookup accepted", result, err)
-	}
-	for _, name := range []string{twoPageVegetationReviewEnvironment, twoPageVegetationWritingEnvironment} {
-		if result, err := NewTwoPageVegetationService(contexts, func(key string) (string, bool) {
-			return "invalid", key == name
-		}); result != nil || err == nil {
-			t.Fatal("invalid feature value silently accepted", name, result, err)
-		}
-	}
-	service := vegetationFacade(t, contexts, map[string]string{
-		twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true",
-	})
+	service := vegetationFacade(t, contexts)
 	raw := vegetationAttemptJSON(t, request)
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	for _, invalid := range []string{
@@ -155,17 +113,28 @@ func TestTwoPageVegetationServiceStrictTransportAndExplicitErrors(t *testing.T) 
 }
 
 func TestTwoPageVegetationServiceActualMainRegistration(t *testing.T) {
-	data, err := os.ReadFile("main.go")
+	mainData, err := os.ReadFile("main.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	plotEntryData, err := os.ReadFile("domainservices_plotentry.go")
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, required := range []string{
-		"NewTwoPageVegetationService(contextService, os.LookupEnv)",
-		"twoPageVegetation:            twoPageVegetation",
+		"buildPlotEntryService(contextService, plots, refs)",
 		"application.NewService(plotEntryService)",
 	} {
-		if strings.Count(string(data), required) != 1 {
+		if strings.Count(string(mainData), required) != 1 {
 			t.Fatal("actual main registration missing/duplicated", required)
+		}
+	}
+	for _, required := range []string{
+		"twopagepkg.NewTwoPageVegetationService(core)",
+		"twoPageVegetation:            twoPageVegetation",
+	} {
+		if strings.Count(string(plotEntryData), required) != 1 {
+			t.Fatal("actual PlotEntryService builder registration missing/duplicated", required)
 		}
 	}
 }

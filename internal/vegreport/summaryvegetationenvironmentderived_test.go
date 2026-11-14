@@ -9,7 +9,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -17,22 +16,14 @@ import (
 
 func TestSummaryEnvironmentalDerivedOriginalPhysicalCases(t *testing.T) {
 	for _, spec := range []struct {
-		function, environment, fixture string
-		count                          int
+		function, fixture string
+		count             int
 	}{
-		{"SVBioGeoClimaticUnit", "VPRO_SUMMARY_BGC_SOURCE", summaryEnvironmentalBGCSourceFixture, 7},
-		{"SVAspect", "VPRO_SUMMARY_ASPECT_SOURCE", summaryEnvironmentalASPECTSourceFixture, 44},
+		{"SVBioGeoClimaticUnit", summaryEnvironmentalBGCSourceFixture, 7},
+		{"SVAspect", summaryEnvironmentalASPECTSourceFixture, 44},
 	} {
 		t.Run(spec.function, func(t *testing.T) {
-			path := os.Getenv(spec.environment)
 			raw := []byte(spec.fixture)
-			if path != "" {
-				var err error
-				raw, err = os.ReadFile(path)
-				if err != nil {
-					t.Fatal(err)
-				}
-			}
 			var source struct {
 				Physical map[string][][]json.RawMessage `json:"physical"`
 			}
@@ -76,13 +67,6 @@ func TestSummaryEnvironmentalDerivedOriginalPhysicalCases(t *testing.T) {
 			env := build("Sample_Env", columns)
 			su := build("UnitInputs", []vprocore.ProjectMetadataColumn{{Name: "PlotNumber"}, {Name: "SiteUnit"}})
 			receipt := []byte(spec.fixture)
-			if path != "" {
-				var err error
-				receipt, err = os.ReadFile(os.Getenv(spec.environment + "_RECEIPT"))
-				if err != nil {
-					t.Fatal(err)
-				}
-			}
 			var observations struct {
 				Observations []struct {
 					Unit   *string  `json:"unit"`

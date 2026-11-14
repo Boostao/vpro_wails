@@ -9,11 +9,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 )
-
-const summaryVegetationEnvironmentalFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_ENVIRONMENT"
-const summaryVegetationEnvironmentalNumericFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC"
 
 type SummaryVegetationEnvironmentalPreview struct {
 	Vegetation    SummaryVegetationPreview            `json:"vegetation"`
@@ -25,25 +21,12 @@ type SummaryVegetationEnvironmentalPreview struct {
 }
 
 type SummaryVegetationEnvironmentalService struct {
-	report         *SummaryVegetationService
-	enabled        bool
-	numericEnabled bool
-	snapshot       vprocore.PublicationReadSnapshotHooks
+	report   *SummaryVegetationService
+	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewSummaryVegetationEnvironmentalService(report *SummaryVegetationService, lookup func(string) (string, bool)) (*SummaryVegetationEnvironmentalService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(summaryVegetationEnvironmentalFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	numericEnabled, err := vprocore.SiviFeature(summaryVegetationEnvironmentalNumericFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SummaryVegetationEnvironmentalService{report: report, enabled: enabled, numericEnabled: numericEnabled}, nil
+func NewSummaryVegetationEnvironmentalService(report *SummaryVegetationService) (*SummaryVegetationEnvironmentalService, error) {
+	return &SummaryVegetationEnvironmentalService{report: report}, nil
 }
 
 func (s *SummaryVegetationEnvironmentalService) PreviewEnvironmental(ctx context.Context, contextID string,
@@ -93,11 +76,8 @@ func previewSummaryEnvironmentalRawSnapshot[R any](ctx context.Context, s *Summa
 	if err := ctx.Err(); err != nil {
 		return zero, err
 	}
-	if s == nil || !s.enabled {
-		return zero, errors.New("Summary environmental preview is disabled in this session")
-	}
-	if s.report == nil || !s.report.Enabled {
-		return zero, errors.New("Summary environmental preview requires enabled Summary Vegetation")
+	if s == nil || s.report == nil {
+		return zero, errors.New("Summary environmental preview requires Summary Vegetation")
 	}
 	contexts := s.report.contexts
 	if contexts == nil || contexts.Projects == nil || contexts.Projects.Sqlite == nil || contexts.Plots == nil {

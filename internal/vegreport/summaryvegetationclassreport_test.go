@@ -135,11 +135,6 @@ func TestSummaryVegetationClassServiceRefusalCleanupAndRetry(t *testing.T) {
 			t.Fatal("foreign class context accepted", got, err)
 		}
 	}
-	service.Enabled = false
-	if _, err := service.PreviewClass(context.Background(), state.ContextID, 1, 4, 20); err == nil {
-		t.Fatal("default gate bypassed")
-	}
-	service.Enabled = true
 	original := owner.AttachmentInfo["su"]
 	owner.AttachmentInfo["su"] = owner.AttachmentInfo["project"]
 	got, err = service.PreviewClass(context.Background(), state.ContextID, 1, 4, 20)

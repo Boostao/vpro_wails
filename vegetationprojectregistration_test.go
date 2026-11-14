@@ -7,85 +7,67 @@ import (
 	"go/token"
 	"reflect"
 	"testing"
+
+	vegreportpkg "github.com/boostao/vpro-wails/internal/vegreport"
 )
 
-func TestProjectRegistrationUsesOneImmutableDefaultOffCapability(t *testing.T) {
-	for _, item := range []struct {
-		value   string
-		present bool
-		enabled bool
-		valid   bool
-	}{
-		{"", false, true, true}, {"false", true, false, true}, {"true", true, true, true},
-		{"", true, false, false}, {"1", true, false, false}, {"TRUE", true, false, false}, {" true", true, false, false},
-	} {
-		enabled, err := siviFeature(longVegetationProjectScopeFeatureEnvironment, func(name string) (string, bool) {
-			if name != "VPRO_LONG_VEGETATION_PROJECT_SCOPE" {
-				t.Fatal("project scope borrowed another capability", name)
-			}
-			return item.value, item.present
-		})
-		if enabled != item.enabled || (err == nil) != item.valid {
-			t.Fatal("project scope default/strict feature semantics changed", item, enabled, err)
-		}
-		if !enabled {
-			scope := NewLongVegetationReportScopeService(nil, enabled)
-			if value, err := scope.GetLongVegetationReportScope(context.Background(), "owned"); err == nil || value != nil {
-				t.Fatal("disabled registration authorized scope", value, err)
-			}
-			workbook := NewLongVegetationProjectWorkbookService(nil, enabled, true)
-			if value, err := workbook.GetReview(context.Background(), "owned", `{}`); err == nil || value != nil {
-				t.Fatal("workbook bypassed disabled project scope", value, err)
-			}
-		}
+func TestProjectRegistrationUnconditionalDefaultOn(t *testing.T) {
+	scope := vegreportpkg.NewLongVegetationReportScopeService(nil)
+	if value, err := scope.GetLongVegetationReportScope(context.Background(), "owned"); err == nil || value != nil {
+		t.Fatal("unconfigured scope service authorized scope", value, err)
 	}
-	file, err := parser.ParseFile(token.NewFileSet(), "main.go", nil, 0)
+	workbook := vegreportpkg.NewLongVegetationProjectWorkbookService(nil)
+	if value, err := workbook.GetReview(context.Background(), "owned", `{}`); err == nil || value != nil {
+		t.Fatal("unconfigured workbook service authorized review", value, err)
+	}
+	fset := token.NewFileSet()
+	mainFile, err := parser.ParseFile(fset, "main.go", nil, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
-	var flagReads int
-	constructors := map[string][]string{}
-	ast.Inspect(file, func(node ast.Node) bool {
+	domainFile, err := parser.ParseFile(fset, "domainservices_vegreport.go", nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var builderCalls int
+	ast.Inspect(mainFile, func(node ast.Node) bool {
 		call, ok := node.(*ast.CallExpr)
 		if !ok {
 			return true
 		}
-		name, ok := call.Fun.(*ast.Ident)
-		if !ok {
-			return true
-		}
-		if name.Name == "siviFeature" && len(call.Args) == 2 {
-			if argument, ok := call.Args[0].(*ast.Ident); ok && argument.Name == "longVegetationProjectScopeFeatureEnvironment" {
-				flagReads++
-			}
-		}
-		if name.Name != "NewLongVegetationReportScopeService" && name.Name != "NewLongVegetationProjectWorkbookService" {
-			return true
-		}
-		for _, argument := range call.Args {
-			switch value := argument.(type) {
-			case *ast.Ident:
-				constructors[name.Name] = append(constructors[name.Name], value.Name)
-			case *ast.SelectorExpr:
-				inner, ok := value.X.(*ast.SelectorExpr)
-				if !ok {
-					t.Fatal("workbook authorization no longer reuses the owned workbook capability")
-				}
-				root, ok := inner.X.(*ast.Ident)
-				if !ok {
-					t.Fatal("workbook capability has an unknown owner")
-				}
-				constructors[name.Name] = append(constructors[name.Name], root.Name+"."+inner.Sel.Name+"."+value.Sel.Name)
-			default:
-				t.Fatal("project service registration inferred or hardcoded capability")
+		if name, ok := call.Fun.(*ast.Ident); ok && name.Name == "buildVegetationReportService" && len(call.Args) == 1 {
+			if ident, ok := call.Args[0].(*ast.Ident); ok && ident.Name == "contextService" {
+				builderCalls++
 			}
 		}
 		return true
 	})
-	if flagReads != 1 || !reflect.DeepEqual(constructors, map[string][]string{
-		"NewLongVegetationReportScopeService":     {"contextService", "longVegetationProjectScopeEnabled"},
-		"NewLongVegetationProjectWorkbookService": {"contextService", "longVegetationProjectScopeEnabled", "vegetationWorkbook.Private.Enabled"},
+	constructors := map[string][]string{}
+	ast.Inspect(domainFile, func(node ast.Node) bool {
+		call, ok := node.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		sel, ok := call.Fun.(*ast.SelectorExpr)
+		if !ok {
+			return true
+		}
+		if sel.Sel.Name != "NewLongVegetationReportScopeService" && sel.Sel.Name != "NewLongVegetationProjectWorkbookService" {
+			return true
+		}
+		for _, argument := range call.Args {
+			ident, ok := argument.(*ast.Ident)
+			if !ok {
+				t.Fatal("project service registration uses unexpected argument expression")
+			}
+			constructors[sel.Sel.Name] = append(constructors[sel.Sel.Name], ident.Name)
+		}
+		return true
+	})
+	if builderCalls != 1 || !reflect.DeepEqual(constructors, map[string][]string{
+		"NewLongVegetationReportScopeService":     {"core"},
+		"NewLongVegetationProjectWorkbookService": {"core"},
 	}) {
-		t.Fatal("project service registration does not share one immutable default-off capability", flagReads, constructors)
+		t.Fatal("project service registration does not unconditionally wire contextService", builderCalls, constructors)
 	}
 }

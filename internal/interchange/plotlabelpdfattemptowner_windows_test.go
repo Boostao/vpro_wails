@@ -13,7 +13,7 @@ func TestPlotLabelPDFAttemptNewServiceCannotCertifyOldPublicationAbsent(t *testi
 	if err != nil || committed.Status != "published" {
 		t.Fatalf("original publication: %+v, %v", committed, err)
 	}
-	restarted := NewPlotLabelPDFExportService(service.contexts, true)
+	restarted := NewPlotLabelPDFExportService(service.contexts)
 	restarted.runtime = service.runtime
 	if restarted.sessionID == service.sessionID {
 		t.Fatal("fresh service did not establish independent attempt ownership")

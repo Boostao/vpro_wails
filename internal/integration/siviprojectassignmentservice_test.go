@@ -27,55 +27,14 @@ func siviPublicProjectAssignmentRequest(parent *sourceform.SiviParentProjection,
 	}}
 }
 
-func siviEnablePublicAssignment(service *vprocore.ContextService) {
-	service.SiviParentReviewEnabled, service.SiviParentEditingEnabled, service.SiviProjectAssignmentEnabled = true, true, true
-	// Source actions are a separate, unnecessary permission.
-	service.SiviParentActionEditingEnabled = false
-}
+func siviEnablePublicAssignment(*vprocore.ContextService) {}
 
-func TestSIVIProjectAssignmentFeatureLiteralAndIndependent(t *testing.T) {
-	for _, test := range []struct {
-		value   string
-		present bool
-		enabled bool
-		valid   bool
-	}{{"", false, true, true}, {"true", true, true, true}, {"false", true, false, true},
-		{"TRUE", true, false, false}, {" true", true, false, false}, {"1", true, false, false}, {"", true, false, false}} {
-		result, err := sourceform.SiviProjectAssignmentFeature(func(name string) (string, bool) {
-			if name != sourceform.SiviProjectAssignmentFeatureEnvironment {
-				t.Fatal("assignment flag inherited another workflow", name)
-			}
-			return test.value, test.present
-		})
-		if (err == nil) != test.valid || result != test.enabled {
-			t.Fatal("assignment feature accepted a silent/coerced flag", test, result, err)
-		}
-	}
-}
-
-func TestSIVIProjectAssignmentPublicGatesAllSurfacesWithoutWrites(t *testing.T) {
+func TestSIVIProjectAssignmentPublicSurfacesWithoutWrites(t *testing.T) {
 	service, state, _, parent, selection := sftest.SiviProjectAssignmentWriteFixture(t, false, 1, 3, "old")
-	request := siviPublicProjectAssignmentRequest(parent, selection)
 	files := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
 	config, err := os.ReadFile(service.Projects.Preferences.Path)
 	if err != nil {
 		t.Fatal(err)
-	}
-	for mask := 0; mask < 7; mask++ {
-		service.SiviParentReviewEnabled = mask&1 != 0
-		service.SiviParentEditingEnabled = mask&2 != 0
-		service.SiviProjectAssignmentEnabled = mask&4 != 0
-		service.SiviParentActionEditingEnabled = true
-		if got, err := sourceform.GetSIVIProjectAssignmentOriginal(service, context.Background(), state.ContextID, parent.Plot); err == nil || got != nil {
-			t.Fatal("partially enabled assignment initialized", mask, got, err)
-		}
-		if got, err := sourceform.SaveSIVIProjectAssignment(service, context.Background(), state.ContextID, parent.Plot, request); err == nil || got != nil {
-			t.Fatal("partially enabled assignment wrote", mask, got, err)
-		}
-		if got, err := sourceform.RestoreSIVIProjectAssignment(service, context.Background(), state.ContextID, parent.Plot, "1", vprocore.AuditRestoreCancel); err == nil || got != nil {
-			t.Fatal("partially enabled assignment restore succeeded", mask, got, err)
-		}
-		vprotest.AssertProfileSUFiles(t, service, files)
 	}
 	siviEnablePublicAssignment(service)
 	got, err := sourceform.GetSIVIProjectAssignmentOriginal(service, context.Background(), state.ContextID, parent.Plot)

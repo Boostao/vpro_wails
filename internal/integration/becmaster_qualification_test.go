@@ -29,9 +29,7 @@ import (
 func locateDisposableBECMasterCopy(t *testing.T) string {
 	t.Helper()
 	var candidates []string
-	if explicit := strings.TrimSpace(os.Getenv("VPRO_BECMASTER_ACCDB")); explicit != "" {
-		candidates = append(candidates, explicit)
-	} else if home, err := os.UserHomeDir(); err == nil && home != "" {
+	if home, err := os.UserHomeDir(); err == nil && home != "" {
 		candidates = append(candidates, filepath.Join(home, "Work", "VPRO_ACCESS_1", "VPro64", "BECMaster_fixing.accdb"))
 	}
 	for _, src := range candidates {
@@ -61,7 +59,7 @@ func locateDisposableBECMasterCopy(t *testing.T) string {
 			return dst
 		}
 	}
-	t.Skip("BECMaster_fixing.accdb production dataset not available (set VPRO_BECMASTER_ACCDB to run)")
+	t.Skip("BECMaster_fixing.accdb production dataset not available")
 	return ""
 }
 
@@ -304,26 +302,22 @@ func TestBECMasterProductionScaleQualification(t *testing.T) {
 	}
 
 	// Export Summary Vegetation .xlsx workbook on BECMaster PG_Cohort (matching main.go production wiring)
-	lookupTrue := func(string) (string, bool) { return "true", true }
-	sumSvc, err := vegreport.NewSummaryVegetationService(svc, lookupTrue)
+	sumSvc, err := vegreport.NewSummaryVegetationService(svc)
 	if err != nil {
 		t.Fatal(err)
 	}
-	sumEnv, err := vegreport.NewSummaryVegetationEnvironmentalService(sumSvc, lookupTrue)
+	sumEnv, err := vegreport.NewSummaryVegetationEnvironmentalService(sumSvc)
 	if err != nil {
 		t.Fatal(err)
 	}
-	sumLife, err := vegreport.NewSummaryVegetationEnvironmentalLifeformService(sumEnv, lookupTrue)
+	sumLife, err := vegreport.NewSummaryVegetationEnvironmentalLifeformService(sumEnv)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wbSvc, err := vegreport.NewSummaryVegetationWorkbookService(sumLife, lookupTrue)
+	wbSvc, err := vegreport.NewSummaryVegetationWorkbookService(sumLife)
 	if err != nil {
 		t.Fatal(err)
 	}
-	wbSvc.AncillaryEnabled = true
-	wbSvc.ReferencesEnabled = true
-	wbSvc.GroupedEnabled = true
 
 	sumXlsx := filepath.Join(workDir, "BECMaster_PG_SummaryVeg.xlsx")
 	optsReq := vprotest.WorkbookRequest(t, vegreport.SummaryVegetationWorkbookOptions{

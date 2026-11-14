@@ -8,11 +8,8 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 )
-
-const SiviProjectAssignmentFeatureEnvironment = "VPRO_SIVI_PROJECT_ASSIGNMENT"
 
 type SIVIProjectAssignmentOriginal struct {
 	Original             *SIVIParentProjection
@@ -84,18 +81,8 @@ func (input SIVIProjectSelection) Private() SiviProjectSelection {
 	}
 }
 
-func SiviProjectAssignmentFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(SiviProjectAssignmentFeatureEnvironment, lookup)
-}
-
 func RequireSIVIProjectAssignment(s *vprocore.ContextService, ctx context.Context) error {
-	if err := RequireSIVIParentEditing(s, ctx); err != nil {
-		return err
-	}
-	if !s.SiviProjectAssignmentEnabled {
-		return errors.New("SIVI ProjectID assignment requires enabled assignment editing in this session")
-	}
-	return nil
+	return RequireSIVIParentEditing(s, ctx)
 }
 
 func GetSIVIProjectAssignmentOriginal(s *vprocore.ContextService, ctx context.Context, contextID, plot string) (*SIVIProjectAssignmentOriginal, error) {

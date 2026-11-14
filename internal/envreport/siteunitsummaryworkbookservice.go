@@ -1,12 +1,6 @@
 package envreport
 
 import (
-	"github.com/boostao/vpro-wails/internal/reports/reportcore"
-	"github.com/boostao/vpro-wails/internal/sqlutil"
-	"github.com/boostao/vpro-wails/internal/vprocore"
-)
-
-import (
 	"bytes"
 	"context"
 	"crypto/sha256"
@@ -15,13 +9,70 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
+
+	"github.com/boostao/vpro-wails/internal/reports/reportcore"
+	"github.com/boostao/vpro-wails/internal/sqlutil"
+	"github.com/boostao/vpro-wails/internal/vprocore"
 )
 
-const SiteUnitSummaryWorkbookFeatureEnvironment = "VPRO_SITE_UNIT_SUMMARY_WORKBOOK"
+type siteUnitSummaryWorkbookInput struct {
+	Preview SiteUnitSummaryPreview
+	Tables  []vprocore.ProjectMetadataTable
+}
+
+func ReadSiteUnitSummaryWorkbookInput(s *vprocore.ContextService, ctx context.Context, contextID string, method int,
+	hooks vprocore.PublicationReadSnapshotHooks) (siteUnitSummaryWorkbookInput, error) {
+	if ctx == nil {
+		return siteUnitSummaryWorkbookInput{}, errors.New("Summary Environment workbook requires a context")
+	}
+	if err := ctx.Err(); err != nil {
+		return siteUnitSummaryWorkbookInput{}, err
+	}
+	if s == nil || s.Projects == nil || s.Projects.Sqlite == nil || s.Plots == nil {
+		return siteUnitSummaryWorkbookInput{}, errors.New("Summary Environment workbook context service is unavailable")
+	}
+	if method != 1 && method != 2 {
+		return siteUnitSummaryWorkbookInput{}, errors.New("Summary Environment requires Mean (1) or Interquartile (2)")
+	}
+	if err := vprocore.ValidateGoogleEarthReviewStrings(contextID); err != nil {
+		return siteUnitSummaryWorkbookInput{}, err
+	}
+	return vprocore.WithContextPlotRequest(ctx, s, contextID, func(plots *vprocore.PlotService) (siteUnitSummaryWorkbookInput, error) {
+		return vprocore.WithOwnedPreferenceSnapshot(ctx, plots, hooks, func(owner *vprocore.SqliteContext, tx *sql.Tx) (siteUnitSummaryWorkbookInput, error) {
+			return readSiteUnitSummaryWorkbookSource(ctx, owner, tx, contextID, method)
+		})
+	})
+}
+
+func readSiteUnitSummaryWorkbookSource(ctx context.Context, owner *vprocore.SqliteContext, tx *sql.Tx,
+	contextID string, method int) (siteUnitSummaryWorkbookInput, error) {
+	if owner.Selection.SU == "None" {
+		return siteUnitSummaryWorkbookInput{}, errors.New("Summary Environment requires an explicitly selected normal SU")
+	}
+	tables := make([]vprocore.ProjectMetadataTable, 4)
+	for i, source := range []struct{ role, table string }{
+		{"project", owner.Selection.Project + "_Env"}, {"project", owner.Selection.Project + "_Admin"},
+		{"su", owner.Selection.SU + "_SU"}, {"VLists", "MasterSiteUnitList"},
+	} {
+		table, err := vprocore.ReadPhysicalLocationTable(ctx, tx, source.role, source.table)
+		if err != nil {
+			return siteUnitSummaryWorkbookInput{}, err
+		}
+		tables[i] = table
+	}
+	report, err := planSiteUnitSummary(ctx, owner.Selection.Project, owner.Selection.SU, method, 1000000,
+		tables[0], tables[1], tables[2], tables[3])
+	if err != nil {
+		return siteUnitSummaryWorkbookInput{}, err
+	}
+	return siteUnitSummaryWorkbookInput{
+		Preview: SiteUnitSummaryPreview{contextID, owner.Selection.ProjectPath, owner.Selection.SUPath, report},
+		Tables:  tables,
+	}, nil
+}
 
 type siteUnitSummaryWorkbookRequest struct {
 	Method int `json:"method"`
@@ -79,7 +130,6 @@ type SiteUnitSummaryWorkbookOutcome struct {
 
 type SiteUnitSummaryWorkbookService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
 type siteUnitSummaryWorkbookHooks struct {
@@ -92,15 +142,8 @@ type siteUnitSummaryWorkbookSource struct {
 	Scope SiteUnitSummaryWorkbookScope
 }
 
-func NewSiteUnitSummaryWorkbookService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SiteUnitSummaryWorkbookService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(SiteUnitSummaryWorkbookFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SiteUnitSummaryWorkbookService{contexts, enabled}, nil
+func NewSiteUnitSummaryWorkbookService(contexts *vprocore.ContextService) (*SiteUnitSummaryWorkbookService, error) {
+	return &SiteUnitSummaryWorkbookService{contexts: contexts}, nil
 }
 
 func (s *SiteUnitSummaryWorkbookService) authorize(ctx context.Context, method int) error {
@@ -110,10 +153,7 @@ func (s *SiteUnitSummaryWorkbookService) authorize(ctx context.Context, method i
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Summary Environment workbook is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil ||
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil ||
 		s.contexts.Projects.Preferences == nil {
 		return errors.New("Summary Environment workbook owned context/configuration is unavailable")
 	}

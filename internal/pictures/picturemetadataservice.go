@@ -1,39 +1,22 @@
 package pictures
 
 import (
-	"github.com/boostao/vpro-wails/internal/vprocore"
-)
-
-import (
 	"context"
 	"encoding/json"
 	"errors"
 )
 
-const pictureMetadataWritingEnvironment = "VPRO_PICTURE_METADATA_WRITING"
-
 type PictureMetadataWriteResult = pictureMetadataWriteResult
 
 type PictureMetadataService struct {
 	pictures *PictureService
-	enabled  bool
 }
 
-func NewPictureMetadataService(pictures *PictureService, lookup func(string) (string, bool)) (*PictureMetadataService, error) {
-	if pictures == nil || pictures.Contexts == nil || lookup == nil {
-		return nil, errors.New("picture metadata service requires explicit picture ownership and feature lookup")
+func NewPictureMetadataService(pictures *PictureService) (*PictureMetadataService, error) {
+	if pictures == nil || pictures.Contexts == nil || pictures.source == nil {
+		return nil, errors.New("picture metadata service requires explicit picture ownership")
 	}
-	enabled, err := vprocore.SiviFeature(pictureMetadataWritingEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	if enabled && (!pictures.Enabled || pictures.source == nil) {
-		if _, explicit := lookup(pictureMetadataWritingEnvironment); explicit {
-			return nil, errors.New("picture metadata writing requires independently enabled owned picture reading")
-		}
-		enabled = false
-	}
-	return &PictureMetadataService{pictures: pictures, enabled: enabled}, nil
+	return &PictureMetadataService{pictures: pictures}, nil
 }
 
 func (s *PictureMetadataService) require(ctx context.Context) error {
@@ -43,8 +26,8 @@ func (s *PictureMetadataService) require(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled || s.pictures == nil {
-		return errors.New("picture metadata writing is disabled in this session")
+	if s == nil || s.pictures == nil {
+		return errors.New("picture metadata writing requires picture ownership")
 	}
 	return s.pictures.require(ctx)
 }

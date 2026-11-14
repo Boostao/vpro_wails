@@ -115,10 +115,6 @@ func TestSummaryVegetationGroupedServiceErrorsCleanupRetry(t *testing.T) {
 	if _, err := service.PreviewGrouped(context.Background(), state.ContextID, 1, 14); err != nil {
 		t.Fatal("raw correction retry failed", err)
 	}
-	service.Enabled = false
-	if _, err := service.PreviewGrouped(context.Background(), state.ContextID, 1, 12); err == nil {
-		t.Fatal("grouped gate bypassed")
-	}
 }
 
 func TestSummaryVegetationGroupedClientWireFixture(t *testing.T) {
@@ -139,14 +135,9 @@ func TestSummaryVegetationGroupedClientWireFixture(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fixture := filepath.Join("frontend", "src", "summaryVegetationGroupedWire.json")
-	if os.Getenv("VPRO_UPDATE_SUMMARY_VEGETATION_GROUPED_WIRE") == "true" {
-		if err := os.WriteFile(fixture, append(encoded, '\n'), 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
+	fixture := filepath.Join("frontend", "tests", "fixtures", "summaryVegetationGroupedWire.json")
 	raw, err := os.ReadFile(fixture)
-	if err != nil {
+	if err != nil || !bytes.Equal(append(encoded, '\n'), raw) {
 		t.Fatal(err)
 	}
 	var expected []SummaryVegetationPreview

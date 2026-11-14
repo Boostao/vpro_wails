@@ -29,25 +29,10 @@ func vegetationStatisticsRequest(t *testing.T, expected, proposed LongVegetation
 	return string(raw)
 }
 
-func TestLongVegetationStatisticsPreferencesIndependentGateAndStrictRequests(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		got, err := LongVegetationStatisticsPreferencesFeature(func(name string) (string, bool) {
-			if name != "VPRO_LONG_VEGETATION_STATISTICS_PREFERENCES" {
-				t.Fatal(name)
-			}
-			return test.value, test.present
-		})
-		if got != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, got, err)
-		}
-	}
+func TestLongVegetationStatisticsPreferencesStrictRequests(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*LongVegetationStatisticsPreferencesService{nil, {}, NewLongVegetationStatisticsPreferencesService(nil, true)} {
+	for _, service := range []*LongVegetationStatisticsPreferencesService{nil, {}, NewLongVegetationStatisticsPreferencesService(nil)} {
 		for _, requestCtx := range []context.Context{nil, context.Background(), ctx} {
 			if got, err := service.GetLongVegetationStatisticsPreferences(requestCtx, "id"); got != nil || err == nil {
 				t.Fatal(got, err)
@@ -58,7 +43,7 @@ func TestLongVegetationStatisticsPreferencesIndependentGateAndStrictRequests(t *
 		}
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationStatisticsPreferencesService(contexts, true)
+	service := NewLongVegetationStatisticsPreferencesService(contexts)
 	before, err := os.ReadFile(contexts.Projects.Preferences.Path)
 	if err != nil {
 		t.Fatal(err)
@@ -96,7 +81,7 @@ func TestLongVegetationStatisticsPreferencesSharedWireAllCombinationsAndYAMLOnly
 		Request LongVegetationStatisticsPreferencesRequest `json:"request"`
 		Outcome LongVegetationStatisticsPreferencesOutcome `json:"outcome"`
 	}
-	raw, err := os.ReadFile("frontend/src/longVegetationStatisticsWire.json")
+	raw, err := os.ReadFile("frontend/tests/fixtures/longVegetationStatisticsWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,15 +89,7 @@ func TestLongVegetationStatisticsPreferencesSharedWireAllCombinationsAndYAMLOnly
 		t.Fatal(err)
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationStatisticsPreferencesService(contexts, true)
-	disabled := NewLongVegetationStatisticsPreferencesService(contexts, false)
-	if got, err := disabled.GetLongVegetationStatisticsPreferences(context.Background(), state.ContextID); got != nil || err == nil {
-		t.Fatal(got, err)
-	}
-	if got := disabled.SaveLongVegetationStatisticsPreferences(context.Background(), state.ContextID,
-		vegetationStatisticsRequest(t, wire.Request.Expected, wire.Request.Proposed)); got.Committed || got.ErrorMessage == "" {
-		t.Fatal(got)
-	}
+	service := NewLongVegetationStatisticsPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	read, err := service.GetLongVegetationStatisticsPreferences(context.Background(), state.ContextID)
 	if err != nil || read.ContextID != state.ContextID || read.Project != "Sample" || read.SU != "None" ||
@@ -191,7 +168,7 @@ func TestLongVegetationStatisticsPreferencesSharedWireAllCombinationsAndYAMLOnly
 
 func TestLongVegetationStatisticsPreferencesUnavailableStorageNoDefaults(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationStatisticsPreferencesService(contexts, true)
+	service := NewLongVegetationStatisticsPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	base, err := store.Snapshot()
 	if err != nil {
@@ -224,7 +201,7 @@ func TestLongVegetationStatisticsPreferencesUnavailableStorageNoDefaults(t *test
 
 func TestLongVegetationStatisticsPreferencesOwnershipCleanupReplacementCancellationAndRetry(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongVegetationStatisticsPreferencesService(contexts, true)
+	service := NewLongVegetationStatisticsPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	request := vegetationStatisticsRequest(t, LongVegetationStatisticsPreferenceValues{10, 20}, LongVegetationStatisticsPreferenceValues{20, 10})
 	before, err := os.ReadFile(store.Path)

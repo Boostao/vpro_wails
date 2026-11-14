@@ -74,14 +74,9 @@ func TestTwoPageProfilingProductionWire(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := filepath.Join("frontend", "src", "twoPageProfilingWire.json")
-	if os.Getenv("VPRO_UPDATE_TWO_PAGE_PROFILING_WIRE") == "true" {
-		if err := os.WriteFile(path, append(encoded, '\n'), 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
+	path := filepath.Join("frontend", "tests", "fixtures", "twoPageProfilingWire.json")
 	fixture, err := os.ReadFile(path)
-	if err != nil {
+	if err != nil || !bytes.Equal(append(encoded, '\n'), fixture) {
 		t.Fatal(err)
 	}
 	var decoded wireFixture

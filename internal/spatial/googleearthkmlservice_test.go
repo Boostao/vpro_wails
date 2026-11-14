@@ -13,30 +13,15 @@ import (
 	"testing"
 )
 
-func TestGoogleEarthKMLFeatureIndependentLiteralGate(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		enabled, err := GoogleEarthKMLFeature(func(name string) (string, bool) {
-			if name != googleEarthKMLFeatureEnvironment {
-				t.Fatal("unrelated flag lookup", name)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
+func TestGoogleEarthKMLUnavailableAndCancelledGuards(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*GoogleEarthKMLService{nil, {}, NewGoogleEarthKMLService(nil, false), NewGoogleEarthKMLService(nil, true)} {
+	for _, service := range []*GoogleEarthKMLService{nil, {}, NewGoogleEarthKMLService(nil)} {
 		if got, err := service.GetGoogleEarthKMLReview(context.Background(), "id", "{}"); got != nil || err == nil {
 			t.Fatal("unavailable service returned KML", got, err)
 		}
 		if got, err := service.GetGoogleEarthKMLReview(ctx, "id", "{}"); got != nil || !errors.Is(err, context.Canceled) {
-			t.Fatal("cancelled disabled call lost precedence", got, err)
+			t.Fatal("cancelled call lost precedence", got, err)
 		}
 	}
 }
@@ -45,7 +30,7 @@ func TestGoogleEarthKMLFacadeOwnedBytesAndStrictRawJSON(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
 	check := vprotest.AssertPlotLocationFacadeReadOnly(t, contexts)
 	defer check()
-	service := NewGoogleEarthKMLService(contexts, true)
+	service := NewGoogleEarthKMLService(contexts)
 	title := " Explicit <&\U0001f332\r\n "
 	request, err := json.Marshal(GoogleEarthKMLRequest{DescriptionField: "Zone", Title: title})
 	if err != nil {

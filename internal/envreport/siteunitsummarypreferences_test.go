@@ -26,15 +26,7 @@ func summaryPreferenceRequest(t *testing.T, expected, proposed SiteUnitSummaryPr
 	return string(raw)
 }
 
-func TestSiteUnitSummaryPreferencesGateStrictRequestAndOwnership(t *testing.T) {
-	for _, value := range []string{"TRUE", "", "1", " true "} {
-		if _, err := SiteUnitSummaryPreferencesFeature(func(string) (string, bool) { return value, true }); err == nil {
-			t.Fatal("invalid preference grant accepted", value)
-		}
-	}
-	if enabled, err := SiteUnitSummaryPreferencesFeature(func(string) (string, bool) { return "", false }); err != nil || !enabled {
-		t.Fatal("default disabled", enabled, err)
-	}
+func TestSiteUnitSummaryPreferencesStrictRequestAndOwnership(t *testing.T) {
 	for _, raw := range []string{`{}`, `{"expected":null,"proposed":{"method":1,"siteUnitType":1}}`,
 		`{"expected":{"method":1,"siteUnitType":1},"proposed":{"method":null,"siteUnitType":1}}`,
 		`{"expected":{"method":1,"siteUnitType":1},"proposed":{"method":2,"method":1,"siteUnitType":1}}`,
@@ -48,7 +40,7 @@ func TestSiteUnitSummaryPreferencesGateStrictRequestAndOwnership(t *testing.T) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*SiteUnitSummaryPreferencesService{nil, {}, NewSiteUnitSummaryPreferencesService(nil, true)} {
+	for _, service := range []*SiteUnitSummaryPreferencesService{nil, {}, NewSiteUnitSummaryPreferencesService(nil)} {
 		for _, requestCtx := range []context.Context{nil, context.Background(), ctx} {
 			if result, err := service.GetSiteUnitSummaryPreferences(requestCtx, "id"); err == nil || result != nil {
 				t.Fatal("invalid preference read accepted", result, err)
@@ -63,11 +55,7 @@ func TestSiteUnitSummaryPreferencesGateStrictRequestAndOwnership(t *testing.T) {
 
 func TestSiteUnitSummaryPreferencesOwnedCASNoopCollisionAndRestoration(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, true)
-	service := NewSiteUnitSummaryPreferencesService(contexts, true)
-	disabled := NewSiteUnitSummaryPreferencesService(contexts, false)
-	if result, err := disabled.GetSiteUnitSummaryPreferences(context.Background(), state.ContextID); err == nil || result != nil {
-		t.Fatal("live owned context enabled preferences", result, err)
-	}
+	service := NewSiteUnitSummaryPreferencesService(contexts)
 	original, err := service.GetSiteUnitSummaryPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -132,7 +120,7 @@ func TestSiteUnitSummaryPreferencesOwnedCASNoopCollisionAndRestoration(t *testin
 
 func TestSiteUnitSummaryPreferencesFailureRetryAndCommittedCancellation(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, true)
-	service := NewSiteUnitSummaryPreferencesService(contexts, true)
+	service := NewSiteUnitSummaryPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	expected, proposed := SiteUnitSummaryPreferenceValues{1, 1}, SiteUnitSummaryPreferenceValues{2, 1}
 	request := summaryPreferenceRequest(t, expected, proposed)

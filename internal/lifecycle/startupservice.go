@@ -20,6 +20,12 @@ type StartupState struct {
 	Message             string `json:"message"`
 	ConfigPath          string `json:"configPath"`
 	ReleaseChannel      string `json:"releaseChannel"`
+	AppVersion          string `json:"appVersion"`
+	BuildMode           string `json:"buildMode"`
+	GitCommit           string `json:"gitCommit"`
+	BuildDate           string `json:"buildDate"`
+	IsPrerelease        bool   `json:"isPrerelease"`
+	UnsignedNotice      bool   `json:"unsignedNotice"`
 	BackupPath          string `json:"backupPath"`
 	ConfiguredProject   string `json:"configuredProject"`
 	ProjectPath         string `json:"projectPath"`
@@ -27,6 +33,20 @@ type StartupState struct {
 	SUPath              string `json:"suPath"`
 	ConfiguredHierarchy string `json:"configuredHierarchy"`
 	HierarchyPath       string `json:"hierarchyPath"`
+}
+
+func WithBuildMetadata(state StartupState) StartupState {
+	build := CurrentBuildInfo()
+	state.AppVersion = build.AppVersion
+	state.BuildMode = build.BuildMode
+	state.GitCommit = build.GitCommit
+	state.BuildDate = build.BuildDate
+	state.IsPrerelease = build.IsPrerelease
+	state.UnsignedNotice = build.UnsignedNotice
+	if strings.TrimSpace(state.ReleaseChannel) == "" {
+		state.ReleaseChannel = vprocore.ReleaseChannelStable
+	}
+	return state
 }
 
 type StartupRecoveryRequest struct {
@@ -61,11 +81,11 @@ func (s *StartupService) now() time.Time {
 
 func (s *StartupService) GetState() StartupState {
 	if s == nil {
-		return StartupState{ReleaseChannel: vprocore.ReleaseChannelStable}
+		return WithBuildMetadata(StartupState{ReleaseChannel: vprocore.ReleaseChannelStable})
 	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.State
+	return WithBuildMetadata(s.State)
 }
 
 func (s *StartupService) SetState(next StartupState) {
@@ -73,7 +93,7 @@ func (s *StartupService) SetState(next StartupState) {
 		return
 	}
 	s.mu.Lock()
-	s.State = next
+	s.State = WithBuildMetadata(next)
 	s.mu.Unlock()
 }
 
@@ -183,16 +203,16 @@ func (s *StartupService) ResetToSample(ctx context.Context) (StartupState, error
 			return StartupState{}, fmt.Errorf("activate Sample project: %w", actErr)
 		}
 		activated.BackupPath = backupPath
-		s.State = activated
+		s.State = WithBuildMetadata(activated)
 		return s.State, nil
 	}
 
-	s.State = StartupState{
+	s.State = WithBuildMetadata(StartupState{
 		Ready:          true,
 		ConfigPath:     configPath,
 		ReleaseChannel: vprocore.ReleaseChannelStable,
 		BackupPath:     backupPath,
-	}
+	})
 	return s.State, nil
 }
 
@@ -419,7 +439,7 @@ func (s *StartupService) RecoverWithPaths(ctx context.Context, req StartupRecove
 			return StartupState{}, actErr
 		}
 		activated.BackupPath = backupPath
-		s.State = activated
+		s.State = WithBuildMetadata(activated)
 		return s.State, nil
 	}
 
@@ -430,6 +450,6 @@ func (s *StartupService) RecoverWithPaths(ctx context.Context, req StartupRecove
 		BackupPath:     backupPath,
 	}
 	PopulateRecoveryHints(&next)
-	s.State = next
+	s.State = WithBuildMetadata(next)
 	return s.State, nil
 }

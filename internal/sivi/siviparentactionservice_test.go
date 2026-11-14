@@ -25,49 +25,11 @@ func siviPublicActionRequest(original *sourceform.SiviParentProjection, actions 
 	return request
 }
 
-func TestSIVIParentActionEditingFeatureLiteralAndIndependent(t *testing.T) {
-	for _, test := range []struct {
-		value   string
-		present bool
-		enabled bool
-		valid   bool
-	}{{"", false, true, true}, {"true", true, true, true}, {"false", true, false, true},
-		{"TRUE", true, false, false}, {" true", true, false, false}, {"1", true, false, false}, {"", true, false, false}} {
-		result, err := SiviParentActionEditingFeature(func(name string) (string, bool) {
-			if name != siviParentActionEditingFeatureEnvironment {
-				t.Fatal("source action flag inherited another workflow", name)
-			}
-			return test.value, test.present
-		})
-		if (err == nil) != test.valid || result != test.enabled {
-			t.Fatal("source action feature accepted a silent/coerced flag", test, result, err)
-		}
-	}
-}
-
-func TestSIVIParentPublicActionGatesAllThreeSurfaces(t *testing.T) {
-	service, state, original, actions := siviParentActionWriteFixture(t, false, 3)
-	request := siviPublicActionRequest(original, actions)
-	for mask := 0; mask < 7; mask++ {
-		service.SiviParentReviewEnabled = mask&1 != 0
-		service.SiviParentEditingEnabled = mask&2 != 0
-		service.SiviParentActionEditingEnabled = mask&4 != 0
-		files := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
-		if result, err := GetSIVIParentActionOriginal(service, context.Background(), state.ContextID, original.Plot); err == nil || result != nil {
-			t.Fatal("partially enabled action original initialized", mask, result, err)
-		}
-		if result, err := SaveSIVIParentActions(service, context.Background(), state.ContextID, original.Plot, request); err == nil || result != nil {
-			t.Fatal("partially enabled source action wrote", mask, result, err)
-		}
-		if result, err := RestoreSIVIParentActions(service, context.Background(), state.ContextID, original.Plot, "1", vprocore.AuditRestoreCancel); err == nil || result != nil {
-			t.Fatal("partially enabled source action restore succeeded", mask, result, err)
-		}
-		vprotest.AssertProfileSUFiles(t, service, files)
-	}
-	service.SiviParentReviewEnabled, service.SiviParentEditingEnabled, service.SiviParentActionEditingEnabled = true, true, true
+func TestSIVIParentPublicActionOriginalAndCancellation(t *testing.T) {
+	service, state, original, _ := siviParentActionWriteFixture(t, false, 3)
 	got, err := GetSIVIParentActionOriginal(service, context.Background(), state.ContextID, original.Plot)
 	if err != nil || !reflect.DeepEqual(got, original) {
-		t.Fatal("fully enabled owned action original differs", got, err)
+		t.Fatal("owned action original differs", got, err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
@@ -78,7 +40,6 @@ func TestSIVIParentPublicActionGatesAllThreeSurfaces(t *testing.T) {
 
 func TestSIVIParentPublicActionStrictWireSaveRestore(t *testing.T) {
 	service, state, original, actions := siviParentActionWriteFixture(t, true, 3)
-	service.SiviParentReviewEnabled, service.SiviParentEditingEnabled, service.SiviParentActionEditingEnabled = true, true, true
 	actions[1].Option = nil
 	body, err := json.Marshal(siviPublicActionRequest(original, actions))
 	if err != nil {

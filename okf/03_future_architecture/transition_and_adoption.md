@@ -39,7 +39,7 @@ flowchart LR
 ## 2. Preserving User Muscle Memory (UX Continuity Rules)
 
 ### 2.1 Paper-Card Visual Geometry & Keyboard Flow
-1. **Twip-Accurate Card Layouts:** Continue compiling legacy form coordinates (`cmd/fs882layout` $\rightarrow$ `resources/fs882-xl-layout.json`) so field numbers (`SITE 1–37`, `SOIL 1–34`, `VEG 1–10`, `SIVI 1–52`) sit in the exact visual quadrants technicians expect when transcribing paper cards (`vpro_wails/frontend/src/HeaderEditor.svelte`, `LMH25_2023_web.pdf` PDF pp. 10, 47, 102, 200).
+1. **Twip-Accurate Card Layouts:** Continue compiling legacy form coordinates (`cmd/fs882layout` $\rightarrow$ `resources/fs882-xl-layout.json`) so field numbers (`SITE 1–37`, `SOIL 1–34`, `VEG 1–10`, `SIVI 1–52`) sit in the exact visual quadrants technicians expect when transcribing paper cards (`vpro_wails/frontend/src/entry/FS882Form.svelte`, `LMH25_2023_web.pdf` PDF pp. 10, 47, 102, 200).
 2. **Dual-Mode `Enter` & Shortcut Ergonomics (`enterNavigation.ts:1-68`, `VProXP_Userguide.pdf` PDF p. 48):**
    * Preserve horizontal field-to-field `Enter`/`Tab` progression on parent headers and **vertical same-column `Enter` progression** inside `SubVeg*` and `Soil*` subgrids.
    * Add missing legacy power-user shortcuts (`Ctrl+Tab` / `Shift+Ctrl+Tab` to jump between Site, Soil, and Veg subgrids; `Ctrl+F` scoped Plot Find; double-`Esc` to cancel an unsaved child row; `Ctrl+A` quick Species search modal from `Macros/AutoKeys.txt`).

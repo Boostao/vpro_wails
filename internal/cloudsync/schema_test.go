@@ -139,7 +139,7 @@ func requireLivePostgresOrSkip(t *testing.T) *Manager {
 	st, err := mgr.GetConfigStatus()
 	if err != nil || !st.Configured || !st.HasCustodianCreds || !st.HasContributorCreds {
 		mgr.Close()
-		t.Skip("live PostgreSQL credentials (VPRO_PG_* or becmaster.env) not configured; skipping live PG test")
+		t.Skip("live PostgreSQL credentials (VPRO_PG_URL / VPRO_PG_HOST or becmaster.env) not configured; skipping live PG test")
 	}
 	return mgr
 }

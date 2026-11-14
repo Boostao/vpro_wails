@@ -15,7 +15,7 @@ import (
 )
 
 func TestTwoPageVegetationReferencesStrictGoClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageVegetationReferenceWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "twoPageVegetationReferenceWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,9 +37,7 @@ func TestTwoPageVegetationReferencesStrictGoClientWire(t *testing.T) {
 			vprotest.MutateContextFixture(t, contexts.Projects.Sqlite.Attachments["VUser"], `DELETE FROM USysUserSpp;
 				INSERT INTO USysUserSpp(rowid,Code,ScientificName,LifeForm,EnglishName,Codetype) VALUES
 				(1,'MIN',NULL,-32768,'','s'), (2,'MAX','',32767,NULL,'s'), (3,'P NULL',NULL,NULL,'',NULL)`)
-			service, err := NewTwoPageVegetationService(contexts, func(key string) (string, bool) {
-				return "true", key == twoPageVegetationReviewEnvironment
-			})
+			service, err := NewTwoPageVegetationService(contexts)
 			if err != nil {
 				t.Fatal(err)
 			}

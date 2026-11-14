@@ -23,12 +23,7 @@ import (
 func summaryWorkbookServiceFixture(t *testing.T, external bool) (*SiteUnitSummaryWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	contexts, state := vprotest.ReportServiceFixture(t, external)
-	service, err := NewSiteUnitSummaryWorkbookService(contexts, func(name string) (string, bool) {
-		if name != SiteUnitSummaryWorkbookFeatureEnvironment {
-			t.Fatal("summary workbook borrowed another feature gate", name)
-		}
-		return "true", true
-	})
+	service, err := NewSiteUnitSummaryWorkbookService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,19 +86,13 @@ func TestSiteUnitSummaryWorkbookServiceOwnedReviewPublishCollisionAndZeroWrites(
 	}
 }
 
-func TestSiteUnitSummaryWorkbookServiceGateStrictRequestsAndRetainedScope(t *testing.T) {
-	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewSiteUnitSummaryWorkbookService(nil, func(string) (string, bool) { return flag, flag != "" })
-		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag != "false") {
-				t.Fatal("literal independent gate differs", flag, err)
-			}
-			if _, err := service.GetReview(context.Background(), "owned", `{"method":1}`); err == nil {
-				t.Fatal("unavailable gate/context produced review")
-			}
-		} else if err == nil {
-			t.Fatal("malformed flag accepted", flag)
-		}
+func TestSiteUnitSummaryWorkbookServiceStrictRequestsAndRetainedScope(t *testing.T) {
+	unowned, err := NewSiteUnitSummaryWorkbookService(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := unowned.GetReview(context.Background(), "owned", `{"method":1}`); err == nil {
+		t.Fatal("unowned context produced review")
 	}
 	service, state := summaryWorkbookServiceFixture(t, false)
 	for _, request := range []string{`{}`, `{"method":null}`, `{"method":0}`, `{"method":3}`,

@@ -18,8 +18,7 @@ import (
 
 func TestLongVegetationUnitPreferencesSnapshotCleanupPersistenceCollisionAndCommittedCancel(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, true)
-	contexts.LongVegetationNoneUnitsEnabled = true
-	service := NewLongVegetationUnitPreferencesService(contexts, true)
+	service := NewLongVegetationUnitPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	request := vegetationUnitRequest(t, 1, 3)
 	before, err := os.ReadFile(store.Path)

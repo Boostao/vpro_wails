@@ -46,7 +46,7 @@ func TestSelectedUnitSessionDraftBuildIsReadOnlyDetachedAndContextOwned(t *testi
 	for _, external := range []bool{false, true} {
 		t.Run(map[bool]string{false: "attached", true: "external"}[external], func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, external)
-			service := NewLongVegetationSelectedUnitSelectionService(private.contexts, true)
+			service := NewLongVegetationSelectedUnitSelectionService(private.contexts)
 			before := vprotest.DatabaseBytes(t, private.contexts.Projects.Sqlite.Attachments)
 			config, err := os.ReadFile(private.contexts.Projects.Preferences.Path)
 			if err != nil {
@@ -97,7 +97,7 @@ func TestSelectedUnitSessionDraftBuildIsReadOnlyDetachedAndContextOwned(t *testi
 			if err != nil {
 				t.Fatal(err)
 			}
-			fresh := NewLongVegetationSelectedUnitSelectionService(other, true)
+			fresh := NewLongVegetationSelectedUnitSelectionService(other)
 			restarted, err := fresh.GetLongVegetationSelectedUnitSelection(ctx, state.ContextID)
 			if err != nil || restarted.Build != nil || len(restarted.Fields) != 0 {
 				t.Fatal("new session inherited field authority", restarted, err)
@@ -123,7 +123,7 @@ func TestSelectedUnitSessionDraftBuildIsReadOnlyDetachedAndContextOwned(t *testi
 
 func TestSelectedUnitSessionFullPhysicalDriftAndExplicitRecovery(t *testing.T) {
 	private, state := vegetationWorkbookServiceFixture(t, false)
-	service := NewLongVegetationSelectedUnitSelectionService(private.contexts, true)
+	service := NewLongVegetationSelectedUnitSelectionService(private.contexts)
 	db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.ProjectPath, "rw"))
 	if err != nil {
 		t.Fatal(err)
@@ -180,7 +180,7 @@ func TestSelectedUnitSessionFullPhysicalDriftAndExplicitRecovery(t *testing.T) {
 
 func TestSelectedUnitSessionBuildRejectsConcurrentDraftInvalidation(t *testing.T) {
 	private, state := vegetationWorkbookServiceFixture(t, false)
-	service := NewLongVegetationSelectedUnitSelectionService(private.contexts, true)
+	service := NewLongVegetationSelectedUnitSelectionService(private.contexts)
 	ctx := context.Background()
 	draft, err := service.SetLongVegetationSelectedUnitFields(ctx, state.ContextID, selectedUnitDraftJSON(t, "0", []string{"PlotNumber"}))
 	if err != nil {
@@ -246,7 +246,7 @@ func TestSelectedUnitSessionApprovalBindsFieldOrderCompleteContextAndConfigurati
 
 func TestSelectedUnitSessionRejectsStrictRequestsAndRetainsDraftOnReadCleanupFailure(t *testing.T) {
 	private, state := vegetationWorkbookServiceFixture(t, false)
-	service := NewLongVegetationSelectedUnitSelectionService(private.contexts, true)
+	service := NewLongVegetationSelectedUnitSelectionService(private.contexts)
 	ctx := context.Background()
 	for _, raw := range []string{
 		`{}`, `{"revision":"0","fields":null}`, `{"revision":"0","fields":["PlotNumber"],"extra":1}`,
@@ -259,9 +259,8 @@ func TestSelectedUnitSessionRejectsStrictRequestsAndRetainsDraftOnReadCleanupFai
 		}
 
 	}
-	disabled := NewLongVegetationSelectedUnitSelectionService(private.contexts, false)
-	if _, err := disabled.GetLongVegetationSelectedUnitSelection(ctx, state.ContextID); err == nil {
-		t.Fatal("selection gate ignored")
+	if _, err := (*LongVegetationSelectedUnitSelectionService)(nil).GetLongVegetationSelectedUnitSelection(ctx, state.ContextID); err == nil {
+		t.Fatal("nil selection service accepted")
 	}
 	draft, err := service.SetLongVegetationSelectedUnitFields(ctx, state.ContextID, selectedUnitDraftJSON(t, "0", []string{"PlotNumber"}))
 	if err != nil {

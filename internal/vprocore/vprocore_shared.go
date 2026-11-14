@@ -430,21 +430,6 @@ func ValidateSIVIPhysicalSchema(ctx context.Context, tx *sql.Tx, alias, table, s
 
 var SiviDeletionUUID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`)
 
-func SiviFeature(name string, lookup func(string) (string, bool)) (bool, error) {
-	value, present := lookup(name)
-	if !present {
-		return true, nil
-	}
-	switch value {
-	case "true":
-		return true, nil
-	case "false":
-		return false, nil
-	default:
-		return false, fmt.Errorf("%s requires literal true or false", name)
-	}
-}
-
 func WithOwnedSIVISnapshot[T any](ctx context.Context, plots *PlotService, read func(*SqliteContext, *sql.Tx) (T, error)) (result T, resultErr error) {
 	var zero T
 	owner := plots.Projects.Sqlite
@@ -584,8 +569,6 @@ func VegetationLifeformInteger(cell ProjectMetadataCell) (*int, error) {
 	result := int(value)
 	return &result, nil
 }
-
-const LongVegetationProjectScopeFeatureEnvironment = "VPRO_LONG_VEGETATION_PROJECT_SCOPE"
 
 const VegetationSelectedListScope = "selected-list"
 

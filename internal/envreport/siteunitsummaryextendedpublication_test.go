@@ -43,7 +43,6 @@ func summaryExtendedExportJSON(t *testing.T, request SiteUnitSummaryExtendedWork
 func TestSummaryExtendedPublicationOwnedModesDeterminismCollisionAndZeroDataWrites(t *testing.T) {
 	for _, external := range []bool{false, true} {
 		service, state := vprotest.ReportServiceFixture(t, external)
-		service.SiteUnitSummarySpeciesEnabled, service.SiteUnitSummaryLifeformsEnabled = true, true
 		before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
 		config, err := os.ReadFile(service.Projects.Preferences.Path)
 		if err != nil {
@@ -94,17 +93,10 @@ func TestSummaryExtendedPublicationOwnedModesDeterminismCollisionAndZeroDataWrit
 	}
 }
 
-func TestSummaryExtendedPublicationStrictTransportIndependentGatesAndScope(t *testing.T) {
+func TestSummaryExtendedPublicationStrictTransportAndScope(t *testing.T) {
 	service, state := vprotest.ReportServiceFixture(t, false)
 	request := SiteUnitSummaryExtendedWorkbookOptions{1, 2, 1, 1, 1, 0, 0}
 	raw := summaryExtendedJSON(t, request)
-	for _, flags := range [][2]bool{{false, false}, {true, false}, {false, true}} {
-		service.SiteUnitSummarySpeciesEnabled, service.SiteUnitSummaryLifeformsEnabled = flags[0], flags[1]
-		if value, err := reviewSiteUnitSummaryExtendedWorkbook(context.Background(), service, state.ContextID, raw); err == nil || value != nil {
-			t.Fatal("independent feature denial bypassed", flags, err)
-		}
-	}
-	service.SiteUnitSummarySpeciesEnabled, service.SiteUnitSummaryLifeformsEnabled = true, true
 	for _, malformed := range []string{
 		`{}`, strings.Replace(raw, `"method":1`, `"method":null`, 1),
 		strings.Replace(raw, `"method":1`, `"method":1.5`, 1),
@@ -137,7 +129,6 @@ func TestSummaryExtendedPublicationRawSevenTableDriftAndOptions(t *testing.T) {
 	} {
 		t.Run(source.table, func(t *testing.T) {
 			service, state := vprotest.ReportServiceFixture(t, true)
-			service.SiteUnitSummarySpeciesEnabled, service.SiteUnitSummaryLifeformsEnabled = true, true
 			options := SiteUnitSummaryExtendedWorkbookOptions{1, 2, 1, 1, 1, 0, 0}
 			request := summaryExtendedJSON(t, options)
 			review, err := reviewSiteUnitSummaryExtendedWorkbook(context.Background(), service, state.ContextID, request)
@@ -179,7 +170,6 @@ func TestSummaryExtendedPublicationCancellationAndIrreversibleReceipts(t *testin
 	for _, phase := range []string{"first-commit", "first-cleanup", "prelink-cleanup", "published-cleanup", "prelink-cancel", "published-cancel"} {
 		t.Run(phase, func(t *testing.T) {
 			service, state := vprotest.ReportServiceFixture(t, false)
-			service.SiteUnitSummarySpeciesEnabled, service.SiteUnitSummaryLifeformsEnabled = true, true
 			options := SiteUnitSummaryExtendedWorkbookOptions{1, 2, 1, 1, 1, 0, 0}
 			review, err := reviewSiteUnitSummaryExtendedWorkbook(context.Background(), service, state.ContextID, summaryExtendedJSON(t, options))
 			if err != nil {

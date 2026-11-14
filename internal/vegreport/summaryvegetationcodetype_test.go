@@ -53,7 +53,7 @@ func TestSummaryVegetation2026BCPlantTaxonomyCodetypeXX(t *testing.T) {
 		t.Fatalf("SwitchContext: %v", err)
 	}
 
-	service, err := NewSummaryVegetationService(contexts, func(string) (string, bool) { return "true", true })
+	service, err := NewSummaryVegetationService(contexts)
 	if err != nil {
 		t.Fatalf("NewSummaryVegetationService: %v", err)
 	}

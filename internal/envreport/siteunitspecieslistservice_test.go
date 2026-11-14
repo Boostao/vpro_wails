@@ -1,7 +1,6 @@
 package envreport
 
 import (
-	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
 )
 
@@ -14,13 +13,9 @@ import (
 	"testing"
 )
 
-func TestSummarySpeciesPreviewIndependentGatesStrictRequestsAndZeroWrites(t *testing.T) {
+func TestSummarySpeciesPreviewStrictRequestsAndZeroWrites(t *testing.T) {
 	service, state := vprotest.ReportServiceFixture(t, true)
 	request := SiteUnitSpeciesListRequest{1, 1, 1, 1, 0, 0}
-	if got, err := PreviewSiteUnitSummarySpecies(service, context.Background(), state.ContextID, request); err == nil || !reflect.DeepEqual(got, SiteUnitSpeciesListPreview{}) {
-		t.Fatal("default-off species output authorized", got, err)
-	}
-	service.SiteUnitSummarySpeciesEnabled = true
 	before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
 	config, err := os.ReadFile(service.Projects.Preferences.Path)
 	if err != nil {
@@ -29,12 +24,6 @@ func TestSummarySpeciesPreviewIndependentGatesStrictRequestsAndZeroWrites(t *tes
 	for _, method := range []int{1, 2} {
 		for _, order := range []int{1, 2} {
 			request.Method, request.OrderBy = method, order
-			if order == 2 {
-				if got, err := PreviewSiteUnitSummarySpecies(service, context.Background(), state.ContextID, request); err == nil || !reflect.DeepEqual(got, SiteUnitSpeciesListPreview{}) {
-					t.Fatal("species gate bypassed independent lifeform gate", got, err)
-				}
-				service.SiteUnitSummaryLifeformsEnabled = true
-			}
 			got, err := PreviewSiteUnitSummarySpecies(service, context.Background(), state.ContextID, request)
 			if err != nil || !reflect.DeepEqual(got.Options, request) || got.Environment.Report.Method != method {
 				t.Fatal("explicit owned species output unavailable", got, err)
@@ -53,7 +42,6 @@ func TestSummarySpeciesPreviewIndependentGatesStrictRequestsAndZeroWrites(t *tes
 					t.Fatal("species denominator differs from owned physical Environment count", unit)
 				}
 			}
-			service.SiteUnitSummaryLifeformsEnabled = false
 		}
 	}
 	vprotest.AssertProfileSUFiles(t, service, before)
@@ -78,14 +66,10 @@ func TestSummarySpeciesPreviewIndependentGatesStrictRequestsAndZeroWrites(t *tes
 			t.Fatal("malformed/missing/duplicate/Unicode criteria accepted", raw)
 		}
 	}
-	if _, err := vprocore.SiviFeature(SiteUnitSummarySpeciesFeatureEnvironment, func(string) (string, bool) { return "malformed", true }); err == nil {
-		t.Fatal("malformed species gate silently accepted")
-	}
 }
 
 func TestSummarySpeciesPreviewCancellationRefusalOwnershipAndRetry(t *testing.T) {
 	service, state := vprotest.ReportServiceFixture(t, false)
-	service.SiteUnitSummarySpeciesEnabled = true
 	request := SiteUnitSpeciesListRequest{1, 1, 1, 1, 0, 0}
 	for _, invalid := range []SiteUnitSpeciesListRequest{
 		{0, 1, 1, 1, 0, 0}, {1, 3, 1, 1, 0, 0}, {1, 1, 0, 1, 0, 0},

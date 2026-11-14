@@ -127,7 +127,7 @@ func TestOrdinaryAuditReadProductionWire(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fixture, err := os.ReadFile(filepath.Join("frontend", "src", "ordinaryAuditWire.json"))
+	fixture, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "ordinaryAuditWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

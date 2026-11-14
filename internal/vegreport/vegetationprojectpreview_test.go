@@ -29,7 +29,7 @@ func projectReadJSON(t *testing.T, scope *LongVegetationReportScope) string {
 func projectPreviewFixture(t *testing.T, external, none, all bool) (*LongVegetationReportScopeService, vprocore.ProjectState, *LongVegetationReportScope) {
 	t.Helper()
 	contexts, state, _ := projectOwnedSourceFixture(t, external, none)
-	service := NewLongVegetationReportScopeService(contexts, true)
+	service := NewLongVegetationReportScopeService(contexts)
 	ctx := context.Background()
 	kind, group := vprocore.VegetationProjectFieldsScope, 2
 	if all {

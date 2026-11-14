@@ -12,33 +12,17 @@ import (
 	"testing"
 )
 
-func TestSummaryWorkbookOwnedSourceIndependentGatesAndOptionalTables(t *testing.T) {
+func TestSummaryWorkbookOwnedSourceOptionalTables(t *testing.T) {
 	service, state := summaryEnvironmentalLifeformServiceFixture(t, false)
-	options := summaryVegetationWorkbookOptions{Average: 1, Display: 6, IncludeEnv: true}
-	for _, gate := range []*bool{&service.enabled, &service.environment.enabled, &service.environment.numericEnabled} {
-		*gate = false
-		got, err := summaryWorkbookFixtureSource(t.Context(), service, state.ContextID, options, vprocore.PublicationReadSnapshotHooks{})
-		if err == nil || !strings.Contains(err.Error(), "requires enabled environmental") ||
-			!reflect.DeepEqual(got, summaryVegetationWorkbookSource{}) {
-			t.Fatal("independent inspection gate was bypassed", err)
-		}
-		*gate = true
-	}
 	owner := service.environment.report.contexts.Projects.Sqlite
-	service.enabled, service.environment.enabled, service.environment.numericEnabled = false, false, false
 	vprotest.MutateContextFixture(t, owner.Attachments["VPro64"],
 		"ALTER TABLE USysShortVegSummaryFieldList RENAME TO MissingFields")
 	vprotest.MutateContextFixture(t, owner.Attachments["project"], "ALTER TABLE "+
 		vprocore.QuoteHeaderIdentifier(state.ActiveProject+"_Env")+" RENAME TO MissingEnv")
-	options.IncludeEnv = false
+	options := summaryVegetationWorkbookOptions{Average: 1, Display: 6, IncludeEnv: false}
 	got, err := summaryWorkbookFixtureSource(t.Context(), service, state.ContextID, options, vprocore.PublicationReadSnapshotHooks{})
 	if err != nil || got.Input.Environment != nil || got.Environment.FieldList.Rows != nil || len(got.Raw.Personal.Columns) == 0 {
-		t.Fatal("vegetation-only source borrowed an environmental gate/table or lost required personal schema", err)
-	}
-	service.environment.report.Enabled = false
-	got, err = summaryWorkbookFixtureSource(t.Context(), service, state.ContextID, options, vprocore.PublicationReadSnapshotHooks{})
-	if err == nil || !reflect.DeepEqual(got, summaryVegetationWorkbookSource{}) {
-		t.Fatal("vegetation gate was bypassed", err)
+		t.Fatal("vegetation-only source required an environmental table or lost required personal schema", err)
 	}
 }
 

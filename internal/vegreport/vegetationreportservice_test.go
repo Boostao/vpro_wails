@@ -193,7 +193,7 @@ func TestLongVegetationServiceUsesCurrentStrictConfiguration(t *testing.T) {
 		preview.Report.Title != preview.Settings.Title {
 		t.Fatal("preview did not use current unchanged settings", preview, err)
 	}
-	for _, update := range []map[string]any{{"LVGroupBy": 3}, {"LVGroupBy": 1, "DataQualityFilterEnforceLV": -1, "DataQualityFilterSiteNullLV": nil}} {
+	for _, update := range []map[string]any{{"LVGroupBy": 99}, {"LVGroupBy": 1, "DataQualityFilterEnforceLV": -1, "DataQualityFilterSiteNullLV": nil}} {
 		if err := service.Projects.Preferences.Update("ReportOptions", update); err != nil {
 			t.Fatal(err)
 		}

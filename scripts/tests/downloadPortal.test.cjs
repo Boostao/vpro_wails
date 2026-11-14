@@ -5,7 +5,7 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.join(__dirname, '..', '..');
-const portal = import('../../docs/downloads.mjs');
+const portal = import('../../site/src/downloads.mjs');
 const siteBuilder = import('../../site/build.mjs');
 const portalDocs = import('../../site/src/portal-docs.mjs');
 
@@ -443,13 +443,11 @@ test('BC Gov Design System build outputs self-hosted fonts, searchable LMH25 doc
 
   const distDir = path.join(repoRoot, 'site', 'dist');
   const distHtml = readFileSync(path.join(distDir, 'index.html'), 'utf8');
-  const docsHtml = readFileSync(path.join(repoRoot, 'docs', 'index.html'), 'utf8');
   const distCss = readFileSync(path.join(distDir, 'styles.css'), 'utf8');
   const distDownloads = readFileSync(path.join(distDir, 'downloads.mjs'), 'utf8');
   const distPortalDocs = readFileSync(path.join(distDir, 'portal-docs.mjs'), 'utf8');
-  assert.equal(distHtml, docsHtml);
   assert.ok(existsSync(path.join(distDir, 'favicon.ico')), 'Missing site/dist/favicon.ico');
-  assert.ok(existsSync(path.join(repoRoot, 'docs', 'favicon.ico')), 'Missing docs/favicon.ico');
+  assert.equal(existsSync(path.join(repoRoot, 'docs')), false, 'Redundant root docs/ copy must remain absent');
   assert.match(distHtml, /<link rel="icon" href="\.\/favicon\.ico"/);
 
   // Required self-hosted WOFF2 fonts in site/dist/fonts/

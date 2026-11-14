@@ -11,7 +11,6 @@ import (
 	"fmt"
 )
 
-const profileSpeciesPresenceEnvironment = "VPRO_PROFILE_SPECIES_PRESENCE_PREVIEW"
 const profileSpeciesPresenceMode = "saved-species-only-readonly"
 
 type ProjectProfileSpeciesPresencePreview struct {
@@ -26,18 +25,13 @@ type ProjectProfileSpeciesPresencePreview struct {
 
 type ProjectProfileSpeciesPresenceService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewProjectProfileSpeciesPresenceService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*ProjectProfileSpeciesPresenceService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("species-only preview requires owned contexts and explicit feature lookup")
+func NewProjectProfileSpeciesPresenceService(contexts *vprocore.ContextService) (*ProjectProfileSpeciesPresenceService, error) {
+	if contexts == nil {
+		return nil, errors.New("species-only preview requires owned contexts")
 	}
-	enabled, err := vprocore.SiviFeature(profileSpeciesPresenceEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &ProjectProfileSpeciesPresenceService{contexts: contexts, enabled: enabled}, nil
+	return &ProjectProfileSpeciesPresenceService{contexts: contexts}, nil
 }
 
 func decodeSpeciesPresenceRequest(data []byte) (ProjectPlotProfileRunRequest, error) {
@@ -101,8 +95,8 @@ func (s *ProjectProfileSpeciesPresenceService) Preview(ctx context.Context, cont
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || s.contexts == nil || !s.enabled {
-		return nil, errors.New("species-only preview requires independently enabled review; original form callback remains unavailable")
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("species-only preview requires owned contexts")
 	}
 	request, err := decodeSpeciesPresenceRequest([]byte(requestJSON))
 	if err != nil {

@@ -1,43 +1,265 @@
 package main
 
 import (
+	"context"
+	"errors"
+	"log"
+
+	classificationpkg "github.com/boostao/vpro-wails/internal/classification"
 	"github.com/boostao/vpro-wails/internal/lmh25rules"
 	"github.com/boostao/vpro-wails/internal/plotentry"
+	referencespkg "github.com/boostao/vpro-wails/internal/references"
+	sivipkg "github.com/boostao/vpro-wails/internal/sivi"
+	sourceformpkg "github.com/boostao/vpro-wails/internal/sourceform"
+	twopagepkg "github.com/boostao/vpro-wails/internal/twopage"
 	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 )
 
-import (
-	"context"
-	"errors"
-)
+type referenceCatalogBundle struct {
+	references     *referencespkg.ReferenceService
+	bec            *referencespkg.BECService
+	quality        *referencespkg.QualityService
+	siteCodes      *referencespkg.SiteCodeService
+	siteCodesErr   error
+	regionCodes    *referencespkg.RegionCodeService
+	soilCodes      *referencespkg.SoilCodeService
+	geologyCodes   *referencespkg.GeologyCodeService
+	parentCodes    *referencespkg.ParentCodeService
+	parentCodesErr error
+}
+
+func openReferenceCatalogBundle(dataDir string) *referenceCatalogBundle {
+	b := &referenceCatalogBundle{}
+	var err error
+	if b.references, err = referencespkg.NewReferenceService(dataDir); err != nil {
+		log.Printf("Warning: failed to initialize ReferenceService: %v", err)
+	}
+	if b.bec, err = referencespkg.NewBECService(dataDir); err != nil {
+		log.Printf("Warning: failed to initialize BECService: %v", err)
+	}
+	if b.quality, err = referencespkg.NewQualityService(dataDir); err != nil {
+		log.Printf("Warning: failed to initialize QualityService: %v", err)
+	}
+	if b.siteCodes, b.siteCodesErr = referencespkg.NewSiteCodeService(dataDir); b.siteCodesErr != nil {
+		log.Printf("Warning: failed to initialize SiteCodeService: %v", b.siteCodesErr)
+	}
+	if b.regionCodes, err = referencespkg.NewRegionCodeService(dataDir); err != nil {
+		log.Printf("Warning: failed to initialize RegionCodeService: %v", err)
+	}
+	if b.soilCodes, err = referencespkg.NewSoilCodeService(dataDir); err != nil {
+		log.Printf("Warning: failed to initialize SoilCodeService: %v", err)
+	}
+	if b.geologyCodes, err = referencespkg.NewGeologyCodeService(dataDir); err != nil {
+		log.Printf("Warning: failed to initialize GeologyCodeService: %v", err)
+	}
+	if b.parentCodes, b.parentCodesErr = referencespkg.NewParentCodeService(dataDir); b.parentCodesErr != nil {
+		log.Printf("Warning: failed to initialize ParentCodeService: %v", b.parentCodesErr)
+	}
+	return b
+}
+
+func (b *referenceCatalogBundle) Close() {
+	if b == nil {
+		return
+	}
+	type namedCloser struct {
+		name  string
+		close func() error
+	}
+	var closers []namedCloser
+	if b.references != nil {
+		closers = append(closers, namedCloser{"ReferenceService", b.references.Close})
+	}
+	if b.parentCodes != nil {
+		closers = append(closers, namedCloser{"ParentCodeService", b.parentCodes.Close})
+	}
+	if b.geologyCodes != nil {
+		closers = append(closers, namedCloser{"GeologyCodeService", b.geologyCodes.Close})
+	}
+	if b.soilCodes != nil {
+		closers = append(closers, namedCloser{"SoilCodeService", b.soilCodes.Close})
+	}
+	if b.regionCodes != nil {
+		closers = append(closers, namedCloser{"RegionCodeService", b.regionCodes.Close})
+	}
+	if b.siteCodes != nil {
+		closers = append(closers, namedCloser{"SiteCodeService", b.siteCodes.Close})
+	}
+	if b.bec != nil {
+		closers = append(closers, namedCloser{"BECService", b.bec.Close})
+	}
+	for _, item := range closers {
+		if err := item.close(); err != nil {
+			log.Printf("Warning: failed to close %s: %v", item.name, err)
+		}
+	}
+}
 
 type PlotEntryService struct {
 	contexts                     *ContextService
-	plots                        *PlotService
-	siviParentShared             *SIVIParentSharedService
-	siviCovers                   *SIVICoverService
-	siviCombined                 *SIVICombinedService
-	siviCollected                *SIVICollectedService
-	siviSpecies                  *SIVISpeciesService
-	siviIdentity                 *SIVIIdentityService
-	siviCreation                 *SIVICreationService
-	siviCreationUndo             *SIVICreationUndoService
-	siviDeletion                 *SIVIDeletionService
-	twoPageParentExtra           *TwoPageParentExtraService
-	twoPageParentCommon          *TwoPageParentCommonService
-	twoPageParentEntry           *TwoPageParentEntryService
-	twoPageSoil                  *TwoPageSoilService
-	twoPageVegetation            *TwoPageVegetationService
-	twoPageVegetationSpeciesList *TwoPageVegetationSpeciesListService
-	twoPageSourceAudit           *TwoPageSourceAuditService
-	twoPageProjectMetadata       *TwoPageProjectMetadataService
-	references                   *ReferenceService
-	siteCodes                    *SiteCodeService
-	soilCodes                    *SoilCodeService
-	parentCodes                  *ParentCodeService
-	geologyCodes                 *GeologyCodeService
-	regionCodes                  *RegionCodeService
-	quality                      *QualityService
+	plots                        *vprocorepkg.PlotService
+	siviParentShared             *sourceformpkg.SIVIParentSharedService
+	siviCovers                   *sivipkg.SIVICoverService
+	siviCombined                 *sivipkg.SIVICombinedService
+	siviCollected                *sivipkg.SIVICollectedService
+	siviSpecies                  *sourceformpkg.SIVISpeciesService
+	siviIdentity                 *sivipkg.SIVIIdentityService
+	siviCreation                 *sivipkg.SIVICreationService
+	siviCreationUndo             *sivipkg.SIVICreationUndoService
+	siviDeletion                 *sivipkg.SIVIDeletionService
+	twoPageParentExtra           *twopagepkg.TwoPageParentExtraService
+	twoPageParentCommon          *twopagepkg.TwoPageParentCommonService
+	twoPageParentEntry           *twopagepkg.TwoPageParentEntryService
+	twoPageSoil                  *twopagepkg.TwoPageSoilService
+	twoPageVegetation            *twopagepkg.TwoPageVegetationService
+	twoPageVegetationSpeciesList *twopagepkg.TwoPageVegetationSpeciesListService
+	twoPageSourceAudit           *twopagepkg.TwoPageSourceAuditService
+	twoPageProjectMetadata       *classificationpkg.TwoPageProjectMetadataService
+	references                   *referencespkg.ReferenceService
+	siteCodes                    *referencespkg.SiteCodeService
+	soilCodes                    *referencespkg.SoilCodeService
+	parentCodes                  *referencespkg.ParentCodeService
+	geologyCodes                 *referencespkg.GeologyCodeService
+	regionCodes                  *referencespkg.RegionCodeService
+	quality                      *referencespkg.QualityService
+}
+
+func buildPlotEntryService(contexts *ContextService, plots *vprocorepkg.PlotService, refs *referenceCatalogBundle) (PlotEntryService, error) {
+	core := unwrapContextService(contexts)
+	siviParentShared, err := sourceformpkg.NewSIVIParentSharedService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	siviCovers, err := sivipkg.NewSIVICoverService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	siviCombined, err := sivipkg.NewSIVICombinedService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	siviCollected, err := sivipkg.NewSIVICollectedService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	siviSpecies, err := sourceformpkg.NewSIVISpeciesService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	siviIdentity, err := sivipkg.NewSIVIIdentityService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	siviCreation, err := sivipkg.NewSIVICreationService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	siviCreationUndo, err := sivipkg.NewSIVICreationUndoService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	siviDeletion, err := sivipkg.NewSIVIDeletionService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+
+	var refBundle referenceCatalogBundle
+	if refs != nil {
+		refBundle = *refs
+	}
+	siviParentShared.References = sourceformpkg.SiviParentSharedReferenceReaders{
+		Site:    refBundle.siteCodes,
+		Region:  refBundle.regionCodes,
+		Parent:  refBundle.parentCodes,
+		Geology: refBundle.geologyCodes,
+		Bec:     refBundle.bec,
+	}
+	entryReaders := twopagepkg.TwoPageEntryReferenceReaders{}
+	if refBundle.siteCodes != nil {
+		entryReaders.Shared.Site = refBundle.siteCodes
+	}
+	if refBundle.regionCodes != nil {
+		entryReaders.Shared.Region = refBundle.regionCodes
+		entryReaders.Ecosection = refBundle.regionCodes
+	}
+	if refBundle.parentCodes != nil {
+		entryReaders.Shared.Parent = refBundle.parentCodes
+	}
+	if refBundle.geologyCodes != nil {
+		entryReaders.Shared.Geology = refBundle.geologyCodes
+	}
+	if refBundle.bec != nil {
+		entryReaders.Shared.Bec = refBundle.bec
+		entryReaders.Series = refBundle.bec
+	}
+	if refBundle.quality != nil {
+		entryReaders.Quality = refBundle.quality
+	}
+	if refBundle.soilCodes != nil {
+		entryReaders.Soil = refBundle.soilCodes
+	}
+
+	twoPageParentExtra, err := twopagepkg.NewTwoPageParentExtraService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	twoPageParentCommon, err := twopagepkg.NewTwoPageParentCommonService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	twoPageParentEntry, err := twopagepkg.NewTwoPageParentEntryService(core, entryReaders)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	twoPageSoil, err := twopagepkg.NewTwoPageSoilService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	twoPageVegetation, err := twopagepkg.NewTwoPageVegetationService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	twoPageVegetationSpeciesList, err := twopagepkg.NewTwoPageVegetationSpeciesListService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	twoPageSourceAudit, err := twopagepkg.NewTwoPageSourceAuditService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+	twoPageProjectMetadata, err := classificationpkg.NewTwoPageProjectMetadataService(core)
+	if err != nil {
+		return PlotEntryService{}, err
+	}
+
+	return PlotEntryService{
+		contexts:                     contexts,
+		plots:                        plots,
+		siviParentShared:             siviParentShared,
+		siviCovers:                   siviCovers,
+		siviCombined:                 siviCombined,
+		siviCollected:                siviCollected,
+		siviSpecies:                  siviSpecies,
+		siviIdentity:                 siviIdentity,
+		siviCreation:                 siviCreation,
+		siviCreationUndo:             siviCreationUndo,
+		siviDeletion:                 siviDeletion,
+		twoPageParentExtra:           twoPageParentExtra,
+		twoPageParentCommon:          twoPageParentCommon,
+		twoPageParentEntry:           twoPageParentEntry,
+		twoPageSoil:                  twoPageSoil,
+		twoPageVegetation:            twoPageVegetation,
+		twoPageVegetationSpeciesList: twoPageVegetationSpeciesList,
+		twoPageSourceAudit:           twoPageSourceAudit,
+		twoPageProjectMetadata:       twoPageProjectMetadata,
+		references:                   refBundle.references,
+		siteCodes:                    refBundle.siteCodes,
+		soilCodes:                    refBundle.soilCodes,
+		parentCodes:                  refBundle.parentCodes,
+		geologyCodes:                 refBundle.geologyCodes,
+		regionCodes:                  refBundle.regionCodes,
+		quality:                      refBundle.quality,
+	}, nil
 }
 
 // PlotService delegates
@@ -872,4 +1094,3 @@ func (s *PlotEntryService) EvaluateStoredPlotDiagnostics(ctx context.Context, co
 	}
 	return lmh25rules.EvaluateStoredPlotDiagnostics(unwrapContextService(s.contexts), ctx, contextID, plotNumber)
 }
-

@@ -13,12 +13,8 @@ import (
 	"testing"
 )
 
-func TestSummaryLifeformPreviewGateStrictTransportAndReadOnlyOverride(t *testing.T) {
+func TestSummaryLifeformPreviewStrictTransportAndReadOnlyOverride(t *testing.T) {
 	service, state := vprotest.ReportServiceFixture(t, false)
-	if value, err := PreviewSiteUnitSummaryLifeforms(service, context.Background(), state.ContextID, SiteUnitSummaryRequest{1}); err == nil || !reflect.DeepEqual(value, SiteUnitSummaryPreview{}) {
-		t.Fatal("default-off source preview returned output", value, err)
-	}
-	service.SiteUnitSummaryLifeformsEnabled = true
 	before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
 	config, err := os.ReadFile(service.Projects.Preferences.Path)
 	if err != nil {
@@ -59,9 +55,6 @@ func TestSummaryLifeformPreviewGateStrictTransportAndReadOnlyOverride(t *testing
 			t.Fatal("malformed source request accepted", raw)
 		}
 	}
-	if _, err := vprocore.SiviFeature(SiteUnitSummaryLifeformFeatureEnvironment, func(string) (string, bool) { return "bad", true }); err == nil {
-		t.Fatal("malformed runtime feature silently accepted")
-	}
 }
 
 func TestSummaryLifeformPreviewRefusalsAndDetachedProjection(t *testing.T) {
@@ -83,7 +76,6 @@ func TestSummaryLifeformPreviewRefusalsAndDetachedProjection(t *testing.T) {
 	if value, err := siteUnitSummaryLifeformPreview(context.Background(), input); err == nil || !reflect.DeepEqual(value, SiteUnitSummaryPreview{}) {
 		t.Fatal("foreign scalar unit published partial report", value, err)
 	}
-	service.SiteUnitSummaryLifeformsEnabled = true
 	for _, method := range []int{0, 3} {
 		if value, err := PreviewSiteUnitSummaryLifeforms(service, context.Background(), state.ContextID, SiteUnitSummaryRequest{method}); err == nil || !reflect.DeepEqual(value, SiteUnitSummaryPreview{}) {
 			t.Fatal("invalid source method accepted", method, value, err)

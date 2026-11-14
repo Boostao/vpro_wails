@@ -17,7 +17,7 @@ func TestLongVegetationStatisticsPreferencesInvalidateWorkbookApproval(t *testin
 		t.Run(map[bool]string{false: "attached", true: "external"}[external], func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, external)
 			workbooks := &VegetationWorkbookService{Private: private}
-			preferences := NewLongVegetationStatisticsPreferencesService(private.contexts, true)
+			preferences := NewLongVegetationStatisticsPreferencesService(private.contexts)
 			beforeDB := vprotest.DatabaseBytes(t, private.contexts.Projects.Sqlite.Attachments)
 			for _, next := range []struct {
 				values  LongVegetationStatisticsPreferenceValues

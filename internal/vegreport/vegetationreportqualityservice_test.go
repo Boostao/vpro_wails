@@ -75,7 +75,6 @@ func TestLongVegetationQualityServiceOwnedFanoutNullExclusionAndRetry(t *testing
 					t.Fatal("qualified occurrence denominator lost original physical IDs", unit)
 				}
 			}
-			service.LongVegetationLifeformEnabled = true
 			if err := service.Projects.Preferences.Update("ReportOptions", map[string]any{"LVGroupBy": 3}); err != nil {
 				t.Fatal(err)
 			}
@@ -96,7 +95,6 @@ func TestLongVegetationQualityServiceOwnedFanoutNullExclusionAndRetry(t *testing
 					}
 				}
 			}
-			service.LongVegetationStrataEnabled = true
 			if err := service.Projects.Preferences.Update("ReportOptions", map[string]any{"LVGroupBy": 2}); err != nil {
 				t.Fatal(err)
 			}
@@ -119,7 +117,6 @@ func TestLongVegetationQualityServiceOwnedFanoutNullExclusionAndRetry(t *testing
 			if err != nil || !reflect.DeepEqual(preview, again) {
 				t.Fatal("repeated qualified reads differ", err)
 			}
-			service.LongVegetationCodeEnabled = true
 			if err := service.Projects.Preferences.Update("ReportOptions", map[string]any{"LVShowEnglishName": 2}); err != nil {
 				t.Fatal(err)
 			}

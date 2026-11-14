@@ -19,25 +19,10 @@ import (
 	"testing"
 )
 
-func TestLongVegetationSelectedFieldGatePhysicalDefinitionsAndOwnedCleanup(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}} {
-		enabled, err := LongVegetationSelectedFieldPreferencesFeature(func(key string) (string, bool) {
-			if key != "VPRO_LONG_VEGETATION_SELECTED_FIELD_PREFERENCES" {
-				t.Fatal(key)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
+func TestLongVegetationSelectedFieldPhysicalDefinitionsAndOwnedCleanup(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*LongVegetationSelectedFieldPreferencesService{nil, {}, NewLongVegetationSelectedFieldPreferencesService(nil, true)} {
+	for _, service := range []*LongVegetationSelectedFieldPreferencesService{nil, {}, NewLongVegetationSelectedFieldPreferencesService(nil)} {
 		for _, requestContext := range []context.Context{nil, ctx, context.Background()} {
 			if got, err := service.GetLongVegetationSelectedFieldPreferences(requestContext, "id"); got != nil || err == nil {
 				t.Fatal(got, err)
@@ -66,7 +51,7 @@ func TestLongVegetationSelectedFieldGatePhysicalDefinitionsAndOwnedCleanup(t *te
 	if err := store.Update("ReportOptions", map[string]any{"LVShowEnglishName": 4, "LVShowField": " absent field "}); err != nil {
 		t.Fatal(err)
 	}
-	service := NewLongVegetationSelectedFieldPreferencesService(contexts, true)
+	service := NewLongVegetationSelectedFieldPreferencesService(contexts)
 	review, err := service.GetLongVegetationSelectedFieldPreferences(context.Background(), state.ContextID)
 	definitions := []vprocore.ProjectMetadataColumn{{Name: "Code", DeclaredType: "TEXT"}, {Name: "EnglishName", DeclaredType: "TEXT"}, {Name: " Native ", DeclaredType: "TEXT"}, {Name: "ID", DeclaredType: "INTEGER"}, {Name: "IsAttribute", DeclaredType: "BOOLEAN"}}
 	if err != nil || review.Values != (LongVegetationSelectedFieldPreferenceValues{4, " absent field "}) ||
@@ -168,7 +153,7 @@ func vegetationSelectedFieldRequest(t *testing.T, expected, proposed LongVegetat
 }
 
 func TestLongVegetationSelectedFieldStrictGoClientWire(t *testing.T) {
-	raw, err := os.ReadFile(filepath.Join("frontend", "src", "longVegetationSelectedFieldWire.json"))
+	raw, err := os.ReadFile(filepath.Join("frontend", "tests", "fixtures", "longVegetationSelectedFieldWire.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -207,7 +192,7 @@ func TestLongVegetationSelectedFieldStrictGoClientWire(t *testing.T) {
 func TestLongVegetationSelectedFieldSourceReachablePairsHistoricalNoopAndNamingCollision(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
 	store := contexts.Projects.Preferences
-	service := NewLongVegetationSelectedFieldPreferencesService(contexts, true)
+	service := NewLongVegetationSelectedFieldPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	for _, mode := range []int{0, 1, 2, 4} {
 		for _, oldField := range []string{"", " historical\u0000field ", "EnglishName"} {
@@ -254,7 +239,7 @@ func TestLongVegetationSelectedFieldSourceReachablePairsHistoricalNoopAndNamingC
 	if stale.Committed || stale.Changed || !strings.Contains(stale.ErrorMessage, "reload") {
 		t.Fatal("selected-field stale pair accepted", stale)
 	}
-	naming := NewLongVegetationNamingPreferencesService(contexts, true)
+	naming := NewLongVegetationNamingPreferencesService(contexts)
 	namingStale := naming.SaveLongVegetationNamingPreferences(context.Background(), state.ContextID,
 		vegetationNamingRequest(t, LongVegetationNamingPreferenceValues(expected), LongVegetationNamingPreferenceValues{0, ""}))
 	if namingStale.Committed || namingStale.Changed || !strings.Contains(namingStale.ErrorMessage, "reload") {
@@ -268,7 +253,7 @@ func TestLongVegetationSelectedFieldSourceReachablePairsHistoricalNoopAndNamingC
 func TestLongVegetationSelectedFieldStrictRequestsAndUnchangedInvalidOmission(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
 	store := contexts.Projects.Preferences
-	service := NewLongVegetationSelectedFieldPreferencesService(contexts, true)
+	service := NewLongVegetationSelectedFieldPreferencesService(contexts)
 	expected := LongVegetationSelectedFieldPreferenceValues{1, " historical\u0000field "}
 	if err := store.Update("ReportOptions", map[string]any{"LVShowEnglishName": expected.Mode, "LVShowField": expected.SelectedField}); err != nil {
 		t.Fatal(err)

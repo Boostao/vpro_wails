@@ -24,29 +24,12 @@ func (r *ContextSelection) UnmarshalJSON(data []byte) error {
 }
 
 type ContextService struct {
-	Projects                           *ProjectService                `json:"-" yaml:"-"`
-	Plots                              *PlotService                   `json:"-" yaml:"-"`
-	SiviHeightEnabled                  bool                           `json:"-" yaml:"-"`
-	SiviParentReviewEnabled            bool                           `json:"-" yaml:"-"`
-	SiviParentEditingEnabled           bool                           `json:"-" yaml:"-"`
-	SiviParentActionEditingEnabled     bool                           `json:"-" yaml:"-"`
-	SiviProjectAssignmentEnabled       bool                           `json:"-" yaml:"-"`
-	TableCSVReviewEnabled              bool                           `json:"-" yaml:"-"`
-	PlotLocationReviewEnabled          bool                           `json:"-" yaml:"-"`
-	SiteUnitSummaryEnabled             bool                           `json:"-" yaml:"-"`
-	SiteUnitSummaryLifeformsEnabled    bool                           `json:"-" yaml:"-"`
-	SiteUnitSummarySpeciesEnabled      bool                           `json:"-" yaml:"-"`
-	LongVegetationNoneEnabled          bool                           `json:"-" yaml:"-"`
-	LongVegetationNoneUnitsEnabled     bool                           `json:"-" yaml:"-"`
-	LongVegetationLifeformEnabled      bool                           `json:"-" yaml:"-"`
-	LongVegetationStrataEnabled        bool                           `json:"-" yaml:"-"`
-	LongVegetationCodeEnabled          bool                           `json:"-" yaml:"-"`
-	LongVegetationSelectedFieldEnabled bool                           `json:"-" yaml:"-"`
-	LongVegetationSelectedUnitsEnabled bool                           `json:"-" yaml:"-"`
-	SelectedUnitSelections             selectedUnitSelectionLedger    `json:"-" yaml:"-"`
-	ProjectReportScopes                vegetationProjectScopeLedger   `json:"-" yaml:"-"`
-	TwoPageSoilAttempts                twoPageSoilAttemptLedger       `json:"-" yaml:"-"`
-	TwoPageVegetationAttempts          twoPageVegetationAttemptLedger `json:"-" yaml:"-"`
+	Projects                  *ProjectService                `json:"-" yaml:"-"`
+	Plots                     *PlotService                   `json:"-" yaml:"-"`
+	SelectedUnitSelections    selectedUnitSelectionLedger    `json:"-" yaml:"-"`
+	ProjectReportScopes       vegetationProjectScopeLedger   `json:"-" yaml:"-"`
+	TwoPageSoilAttempts       twoPageSoilAttemptLedger       `json:"-" yaml:"-"`
+	TwoPageVegetationAttempts twoPageVegetationAttemptLedger `json:"-" yaml:"-"`
 }
 
 func NewContextService(projects *ProjectService, plots *PlotService) (*ContextService, error) {

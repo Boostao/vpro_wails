@@ -11,7 +11,7 @@ import (
 
 func TestUserLogSharedActualGoWire(t *testing.T) {
 	contexts, state := userLogFixture(t)
-	service := &UserLogService{contexts: contexts, enabled: true}
+	service := &UserLogService{contexts: contexts}
 	wires := map[string]UserLogReview{}
 	for _, item := range []struct {
 		name                string
@@ -32,23 +32,7 @@ func TestUserLogSharedActualGoWire(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	path := os.Getenv("VPRO_USER_LOG_WIRE_PATH")
-	if path == "" {
-		path = filepath.Join("frontend", "src", "userLogWire.json")
-	}
-	if os.Getenv("VPRO_GENERATE_USER_LOG_WIRE") == "true" {
-		output, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if _, err := output.Write(encoded); err != nil {
-			output.Close()
-			t.Fatal(err)
-		}
-		if err := output.Close(); err != nil {
-			t.Fatal(err)
-		}
-	}
+	path := filepath.Join("frontend", "tests", "fixtures", "userLogWire.json")
 	fixture, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

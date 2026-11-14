@@ -4,45 +4,13 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 	"testing"
 	"unicode"
 )
 
 func TestTwoPageVegetationIdentifierFoldExhaustiveCompilerContract(t *testing.T) {
-	path := filepath.Join("frontend", "src", "twoPageVegetationIdentifierFold.json")
-	if os.Getenv("VPRO_UPDATE_IDENTIFIER_FOLD_WIRE") == "true" {
-		seen := map[rune]bool{}
-		var groups []string
-		for r := rune(0); r <= unicode.MaxRune; r++ {
-			if seen[r] {
-				continue
-			}
-			peer := unicode.SimpleFold(r)
-			if peer == r {
-				continue
-			}
-			class := []rune{r}
-			seen[r] = true
-			for next := peer; next != r; next = unicode.SimpleFold(next) {
-				class = append(class, next)
-				seen[next] = true
-			}
-			slices.Sort(class)
-			groups = append(groups, string(class))
-		}
-		payload, err := json.MarshalIndent(struct {
-			Version string   `json:"version"`
-			Groups  []string `json:"groups"`
-		}{Version: unicode.Version, Groups: groups}, "", "  ")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(path, append(payload, '\n'), 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
+	path := filepath.Join("frontend", "src", "shared", "twoPageVegetationIdentifierFold.json")
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

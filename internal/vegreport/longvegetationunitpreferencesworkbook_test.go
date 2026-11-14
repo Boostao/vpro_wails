@@ -19,17 +19,12 @@ func TestLongVegetationUnitPreferencesWorkbookStaleRefusalNoneAndSourceRecovery(
 		t.Run(map[bool]string{false: "attached", true: "external"}[external], func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, external)
 			contexts := private.contexts
-			preferences := NewLongVegetationUnitPreferencesService(contexts, true)
+			preferences := NewLongVegetationUnitPreferencesService(contexts)
 			beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 			old, err := private.GetReview(context.Background(), state.ContextID, `{"scope":"unlumped"}`)
 			if err != nil {
 				t.Fatal(err)
 			}
-			disabled := preferences.SaveLongVegetationUnitPreferences(context.Background(), state.ContextID, vegetationUnitRequest(t, 1, 3))
-			if disabled.Committed || disabled.Changed || disabled.ErrorMessage == "" {
-				t.Fatal("preference gate borrowed None species grouping/consumer availability", disabled)
-			}
-			contexts.LongVegetationNoneUnitsEnabled = true
 			result := preferences.SaveLongVegetationUnitPreferences(context.Background(), state.ContextID, vegetationUnitRequest(t, 1, 3))
 			if !result.Committed || !result.Changed || result.ErrorMessage != "" {
 				t.Fatal("owned source3 preference save failed", result)

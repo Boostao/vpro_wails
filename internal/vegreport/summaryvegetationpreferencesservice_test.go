@@ -28,22 +28,7 @@ func summaryPreferencesRequest(t *testing.T, expected, proposed SummaryVegetatio
 }
 
 func TestSummaryVegetationPreferencesFacadeGatesStrictWire(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		got, err := SummaryVegetationPreferencesFeature(func(name string) (string, bool) {
-			if name != "VPRO_SUMMARY_VEGETATION_PREFERENCES" {
-				t.Fatal(name)
-			}
-			return test.value, test.present
-		})
-		if got != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, got, err)
-		}
-	}
-	for _, service := range []*SummaryVegetationPreferencesService{nil, {}, NewSummaryVegetationPreferencesService(nil, true, true)} {
+	for _, service := range []*SummaryVegetationPreferencesService{nil, {}, NewSummaryVegetationPreferencesService(nil)} {
 		for _, ctx := range []context.Context{nil, context.Background()} {
 			if got, err := service.GetSummaryVegetationPreferences(ctx, "id"); got != nil || err == nil {
 				t.Fatal(got, err)
@@ -54,16 +39,9 @@ func TestSummaryVegetationPreferencesFacadeGatesStrictWire(t *testing.T) {
 		}
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationPreferencesService(contexts, true, true)
-	disabled := NewSummaryVegetationPreferencesService(contexts, false, true)
-	if got, err := disabled.GetSummaryVegetationPreferences(context.Background(), state.ContextID); got != nil || err == nil {
-		t.Fatal(got, err)
-	}
+	service := NewSummaryVegetationPreferencesService(contexts)
 	base := SummaryVegetationPreferenceValues{GroupBy: 1, Average: 1, Display: 1, ShowClass: 1}
 	valid := summaryPreferencesRequest(t, base, base)
-	if got := disabled.SaveSummaryVegetationPreferences(context.Background(), state.ContextID, valid); got.Committed || got.ErrorMessage == "" {
-		t.Fatal(got)
-	}
 	before, err := os.ReadFile(contexts.Projects.Preferences.Path)
 	if err != nil {
 		t.Fatal(err)
@@ -110,50 +88,41 @@ func TestSummaryVegetationPreferencesFacadeOwnedTransitionsAndAvailability(t *te
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
 	store := contexts.Projects.Preferences
 	protected := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	for _, previewEnabled := range []bool{false, true} {
-		service := NewSummaryVegetationPreferencesService(contexts, true, previewEnabled)
-		for _, group := range []int{1, 2, 3, 4} {
-			for _, display := range []int{1, 2, 3, 4, 5, 6} {
-				original := SummaryVegetationPreferenceValues{GroupBy: group, Average: 1, Display: display, ShowClass: 10, ValueLimit: 3.5}
-				if err := store.Update("ReportOptions", map[string]any{"SVGroupBy": group, "SVAvgType": 1, "SVValue": display, "SVShowClass": 10, "SVShowValOpt": 3.5}); err != nil {
-					t.Fatal(err)
-				}
-				read, err := service.GetSummaryVegetationPreferences(context.Background(), state.ContextID)
-				available := !((group == 2 || group == 3) && display == 2)
-				if err != nil || read.Values != original || read.PreviewEnabled != previewEnabled || read.SelectionAvailable != available ||
-					read.ContextID != state.ContextID || read.ProjectPath != state.ProjectPath || read.SUPath != state.SUPath {
-					t.Fatal(read, err)
-				}
-				before, err := os.ReadFile(store.Path)
-				if err != nil {
-					t.Fatal(err)
-				}
-				noop := service.SaveSummaryVegetationPreferences(context.Background(), state.ContextID, summaryPreferencesRequest(t, original, original))
-				after, err := os.ReadFile(store.Path)
-				if err != nil || noop.Committed || noop.Changed || noop.ErrorMessage != "" || !bytes.Equal(before, after) {
-					t.Fatal("historical no-op changed", original, noop, err)
-				}
-				proposed := original
-				proposed.GroupBy, proposed.Display, proposed.ValueLimit = 4, 6, 0
-				got := service.SaveSummaryVegetationPreferences(context.Background(), state.ContextID, summaryPreferencesRequest(t, original, proposed))
-				if got.Committed != previewEnabled || got.Changed != previewEnabled || (got.ErrorMessage != "") == previewEnabled {
-					t.Fatal(previewEnabled, got)
-				}
-				if previewEnabled {
-					reopened := &vprocore.DesktopConfig{Path: store.Path, Replace: os.Rename}
-					actual, err := ReadSummaryVegetationPreferences(reopened, context.Background())
-					if err != nil || SummaryVegetationPreferenceValues(actual) != proposed {
-						t.Fatal(actual, err)
-					}
-					if stale := service.SaveSummaryVegetationPreferences(context.Background(), state.ContextID, summaryPreferencesRequest(t, original, proposed)); stale.Committed || stale.ErrorMessage == "" {
-						t.Fatal(stale)
-					}
-				} else {
-					after, err := os.ReadFile(store.Path)
-					if err != nil || !bytes.Equal(before, after) {
-						t.Fatal("disabled preview changed preferences", err)
-					}
-				}
+	service := NewSummaryVegetationPreferencesService(contexts)
+	for _, group := range []int{1, 2, 3, 4} {
+		for _, display := range []int{1, 2, 3, 4, 5, 6} {
+			original := SummaryVegetationPreferenceValues{GroupBy: group, Average: 1, Display: display, ShowClass: 10, ValueLimit: 3.5}
+			if err := store.Update("ReportOptions", map[string]any{"SVGroupBy": group, "SVAvgType": 1, "SVValue": display, "SVShowClass": 10, "SVShowValOpt": 3.5}); err != nil {
+				t.Fatal(err)
+			}
+			read, err := service.GetSummaryVegetationPreferences(context.Background(), state.ContextID)
+			available := !((group == 2 || group == 3) && display == 2)
+			if err != nil || read.Values != original || !read.PreviewEnabled || read.SelectionAvailable != available ||
+				read.ContextID != state.ContextID || read.ProjectPath != state.ProjectPath || read.SUPath != state.SUPath {
+				t.Fatal(read, err)
+			}
+			before, err := os.ReadFile(store.Path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			noop := service.SaveSummaryVegetationPreferences(context.Background(), state.ContextID, summaryPreferencesRequest(t, original, original))
+			after, err := os.ReadFile(store.Path)
+			if err != nil || noop.Committed || noop.Changed || noop.ErrorMessage != "" || !bytes.Equal(before, after) {
+				t.Fatal("historical no-op changed", original, noop, err)
+			}
+			proposed := original
+			proposed.GroupBy, proposed.Display, proposed.ValueLimit = 4, 6, 0
+			got := service.SaveSummaryVegetationPreferences(context.Background(), state.ContextID, summaryPreferencesRequest(t, original, proposed))
+			if !got.Committed || !got.Changed || got.ErrorMessage != "" {
+				t.Fatal(got)
+			}
+			reopened := &vprocore.DesktopConfig{Path: store.Path, Replace: os.Rename}
+			actual, err := ReadSummaryVegetationPreferences(reopened, context.Background())
+			if err != nil || SummaryVegetationPreferenceValues(actual) != proposed {
+				t.Fatal(actual, err)
+			}
+			if stale := service.SaveSummaryVegetationPreferences(context.Background(), state.ContextID, summaryPreferencesRequest(t, original, proposed)); stale.Committed || stale.ErrorMessage == "" {
+				t.Fatal(stale)
 			}
 		}
 	}
@@ -165,7 +134,7 @@ func TestSummaryVegetationPreferencesFacadeOwnedTransitionsAndAvailability(t *te
 
 func TestSummaryVegetationPreferencesFacadeCleanupCollisionCancellationReceipt(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationPreferencesService(contexts, true, true)
+	service := NewSummaryVegetationPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	base := SummaryVegetationPreferenceValues{GroupBy: 1, Average: 1, Display: 1, ShowClass: 1}
 	next := base
@@ -239,7 +208,7 @@ func TestSummaryVegetationPreferencesFacadeCleanupCollisionCancellationReceipt(t
 
 func TestSummaryVegetationPreferencesFacadeProductionWire(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationPreferencesService(contexts, true, true)
+	service := NewSummaryVegetationPreferencesService(contexts)
 	review, err := service.GetSummaryVegetationPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -269,7 +238,7 @@ func TestSummaryVegetationPreferencesFacadeProductionWire(t *testing.T) {
 	if err := vprocore.DecodeStrictRequiredJSON(raw, &reopened, "Summary preference wire", "review", "request", "outcome"); err != nil || !reflect.DeepEqual(wire, reopened) {
 		t.Fatal("strict actual Go round-trip differs", err)
 	}
-	expectedBytes, err := os.ReadFile("frontend/src/summaryVegetationPreferencesWire.json")
+	expectedBytes, err := os.ReadFile("frontend/tests/fixtures/summaryVegetationPreferencesWire.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -279,16 +248,5 @@ func TestSummaryVegetationPreferencesFacadeProductionWire(t *testing.T) {
 	}
 	if err := json.Unmarshal(raw, &actual); err != nil || !reflect.DeepEqual(expected, actual) {
 		t.Fatal("production Go wire differs from the client fixture", err)
-	}
-	if destination := os.Getenv("VPRO_SUMMARY_PREFERENCES_WIRE_DESTINATION"); destination != "" {
-		file, err := os.OpenFile(destination, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
-		if err != nil {
-			t.Fatal(err)
-		}
-		_, writeErr := file.Write(raw)
-		closeErr := file.Close()
-		if writeErr != nil || closeErr != nil {
-			t.Fatal(writeErr, closeErr)
-		}
 	}
 }

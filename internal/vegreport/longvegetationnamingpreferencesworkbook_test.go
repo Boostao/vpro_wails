@@ -24,8 +24,7 @@ func TestLongVegetationNamingPreferencesIndependentPhysicalNamesAndWorkbook(t *t
 		t.Run(map[bool]string{false: "attached", true: "external"}[external], func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, external)
 			contexts := private.contexts
-			contexts.LongVegetationCodeEnabled = true
-			preferences := NewLongVegetationNamingPreferencesService(contexts, true)
+			preferences := NewLongVegetationNamingPreferencesService(contexts)
 			workbooks := &VegetationWorkbookService{Private: private}
 			lists, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(contexts.Projects.Sqlite.Attachments["VLists"], "ro"))
 			if err != nil {

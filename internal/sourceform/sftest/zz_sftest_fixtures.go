@@ -242,8 +242,7 @@ func SharedReferenceFixture(t *testing.T) (*sourceform.SIVIParentSharedService, 
 func SharedServiceFixture(t *testing.T) (*sourceform.SIVIParentSharedService, vprocore.ProjectState, *sourceform.SIVIParentProjection, sourceform.SIVIParentSharedWrite) {
 	t.Helper()
 	contexts, state, db, original, _ := SiviParentWriteFixture(t, true, 3)
-	contexts.SiviParentReviewEnabled = true
-	service, err := sourceform.NewSIVIParentSharedService(contexts, func(string) (string, bool) { return "true", true })
+	service, err := sourceform.NewSIVIParentSharedService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}

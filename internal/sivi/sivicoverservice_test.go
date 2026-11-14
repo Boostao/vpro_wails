@@ -16,14 +16,9 @@ import (
 	"testing"
 )
 
-func siviCoverServiceFixture(t *testing.T, contexts *vprocore.ContextService, value string, present bool) *SIVICoverService {
+func siviCoverServiceFixture(t *testing.T, contexts *vprocore.ContextService, _ string, _ bool) *SIVICoverService {
 	t.Helper()
-	service, err := NewSIVICoverService(contexts, func(name string) (string, bool) {
-		if name != SiviCoverFeatureEnvironment {
-			t.Fatal("cover gate queried another feature", name)
-		}
-		return value, present
-	})
+	service, err := NewSIVICoverService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,41 +37,14 @@ func siviCoverRequestJSON(t *testing.T, original []sourceform.SiviVegetationProj
 	return string(data)
 }
 
-func TestSIVICoverServiceIndependentDefaultOffAndStrictFeature(t *testing.T) {
-	contexts, state, _, original, heights := sftest.SiviWriteFixture(t, false, 3)
-	edit := sourceform.SiviHeightEdit{heights[0].RowID, "SubVegA-SIVI_BC", "Cover1", vprotest.SiviReal(0), vprotest.SiviReal(3)}
-	valid := siviCoverRequestJSON(t, original, edit)
-	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
+func TestSIVICoverServiceOwnerGuards(t *testing.T) {
+	contexts, _, _, _, _ := sftest.SiviWriteFixture(t, false, 3)
 	defaultCover := siviCoverServiceFixture(t, contexts, "", false)
-	if !defaultCover.enabled {
-		t.Fatal("default cover gate disabled")
+	if defaultCover == nil {
+		t.Fatal("default cover service nil")
 	}
-	for _, flag := range []struct {
-		value   string
-		present bool
-	}{{"false", true}} {
-		service := siviCoverServiceFixture(t, contexts, flag.value, flag.present)
-		if result, err := service.GetOriginal(context.Background(), state.ContextID, "108050", false); err == nil || result != nil {
-			t.Fatal("disabled cover read leaked source", result, err)
-		}
-		if result, err := service.SaveReviewed(context.Background(), state.ContextID, "108050", false, valid); err == nil || result != nil {
-			t.Fatal("disabled cover service wrote valid transport", result, err)
-		}
-		if result, err := service.RestoreReviewed(context.Background(), state.ContextID, "108050", "1", vprocore.AuditRestoreCancel); err == nil || result != nil {
-			t.Fatal("disabled cover restoration returned success", result, err)
-		}
-		vprotest.AssertProfileSUFiles(t, contexts, before)
-	}
-	for _, value := range []string{"", "TRUE", "1", " true ", "yes"} {
-		if service, err := NewSIVICoverService(contexts, func(string) (string, bool) { return value, true }); err == nil || service != nil {
-			t.Fatal("malformed cover gate accepted", value, service, err)
-		}
-	}
-	if service, err := NewSIVICoverService(nil, func(string) (string, bool) { return "true", true }); err == nil || service != nil {
+	if service, err := NewSIVICoverService(nil); err == nil || service != nil {
 		t.Fatal("cover service lacks ownership", service, err)
-	}
-	if service, err := NewSIVICoverService(contexts, nil); err == nil || service != nil {
-		t.Fatal("cover service lacks explicit gate authority", service, err)
 	}
 }
 
@@ -86,9 +54,6 @@ func TestSIVICoverServiceValidOwnedWireAndHeightIsolation(t *testing.T) {
 	read, err := service.GetOriginal(context.Background(), state.ContextID, "108050", false)
 	if err != nil || !reflect.DeepEqual(read, original) {
 		t.Fatal("public source differs from private reviewed projection", read, err)
-	}
-	if result, err := GetSIVIVegetation(contexts, context.Background(), state.ContextID, "108050", false); err == nil || result != nil {
-		t.Fatal("cover gate implicitly enabled height facade", result, err)
 	}
 	edit := sourceform.SiviHeightEdit{heights[0].RowID, "SubVegA-SIVI_BC", "Cover1", vprotest.SiviReal(0), vprotest.SiviReal(3)}
 	saved, err := service.SaveReviewed(context.Background(), state.ContextID, "108050", false, siviCoverRequestJSON(t, original, edit))
