@@ -22,7 +22,6 @@ import (
 func TestSelectedUnitAuthorityDeferredDraftCannotRevokeInFlightWorkbookPublication(t *testing.T) {
 	workbook, state := vegetationWorkbookServiceFixture(t, false)
 	contexts := workbook.contexts
-	contexts.LongVegetationSelectedUnitsEnabled = true
 	su, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.SUPath, "rw"))
 	if err != nil {
 		t.Fatal(err)
@@ -32,8 +31,8 @@ func TestSelectedUnitAuthorityDeferredDraftCannotRevokeInFlightWorkbookPublicati
 		t.Fatal(err)
 	}
 	ctx := context.Background()
-	selection := NewLongVegetationSelectedUnitSelectionService(contexts, true)
-	preferences := NewLongVegetationUnitPreferencesService(contexts, true)
+	selection := NewLongVegetationSelectedUnitSelectionService(contexts)
+	preferences := NewLongVegetationUnitPreferencesService(contexts)
 	draft, err := selection.SetLongVegetationSelectedUnitFields(ctx, state.ContextID, selectedUnitDraftJSON(t, "0", []string{"PlotNumber"}))
 	if err != nil {
 		t.Fatal(err)
@@ -118,9 +117,8 @@ func TestSelectedUnitAuthorityDeferredDraftCannotRevokeInFlightWorkbookPublicati
 func TestSelectedUnitAuthorityCASRefusesApprovalBoundThresholdChangeInsideConfigGap(t *testing.T) {
 	workbook, state := vegetationWorkbookServiceFixture(t, false)
 	contexts := workbook.contexts
-	contexts.LongVegetationSelectedUnitsEnabled = true
 	ctx := context.Background()
-	selection := NewLongVegetationSelectedUnitSelectionService(contexts, true)
+	selection := NewLongVegetationSelectedUnitSelectionService(contexts)
 	draft, err := selection.SetLongVegetationSelectedUnitFields(ctx, state.ContextID, selectedUnitDraftJSON(t, "0", []string{"PlotNumber"}))
 	if err != nil {
 		t.Fatal(err)
@@ -135,7 +133,7 @@ func TestSelectedUnitAuthorityCASRefusesApprovalBoundThresholdChangeInsideConfig
 	}
 	proposed := thresholds
 	proposed.PresenceGreaterThan++
-	preferences := NewLongVegetationUnitPreferencesService(contexts, true)
+	preferences := NewLongVegetationUnitPreferencesService(contexts)
 	preferences.beforeSelectedUnitCAS = func() {
 		changed, err := CompareAndSetLongVegetationThresholdPreferences(contexts.Projects.Preferences, ctx, thresholds, proposed)
 		if err != nil || !changed.Committed {

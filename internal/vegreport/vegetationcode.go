@@ -6,8 +6,6 @@ import (
 
 import "context"
 
-const LongVegetationCodeFeatureEnvironment = "VPRO_LONG_VEGETATION_CODE"
-
 func longVegetationCodeReferences(ctx context.Context, source vprocore.ProjectMetadataTable, options longVegetationOptions) (vprocore.ProjectMetadataTable, longVegetationOptions, error) {
 	if err := ctx.Err(); err != nil {
 		return vprocore.ProjectMetadataTable{}, longVegetationOptions{}, err

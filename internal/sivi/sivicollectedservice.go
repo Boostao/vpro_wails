@@ -12,8 +12,6 @@ import (
 	"fmt"
 )
 
-const SiviCollectedFeatureEnvironment = "VPRO_SIVI_COLLECTED_EDITING"
-
 type SIVICollectedEdit struct {
 	RowID    string                       `json:"rowId"`
 	Form     string                       `json:"form"`
@@ -48,18 +46,13 @@ func (request *SIVICollectedWrite) UnmarshalJSON(data []byte) error {
 
 type SIVICollectedService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewSIVICollectedService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SIVICollectedService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("SIVI Collected service requires context ownership and an explicit feature lookup")
+func NewSIVICollectedService(contexts *vprocore.ContextService) (*SIVICollectedService, error) {
+	if contexts == nil {
+		return nil, errors.New("SIVI Collected service requires context ownership")
 	}
-	enabled, err := vprocore.SiviFeature(SiviCollectedFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SIVICollectedService{contexts: contexts, enabled: enabled}, nil
+	return &SIVICollectedService{contexts: contexts}, nil
 }
 
 func (s *SIVICollectedService) require(ctx context.Context) error {
@@ -69,8 +62,8 @@ func (s *SIVICollectedService) require(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.contexts == nil || !s.enabled {
-		return errors.New("SIVI Collected editing is disabled in this session")
+	if s == nil || s.contexts == nil {
+		return errors.New("SIVI Collected service requires context ownership")
 	}
 	return nil
 }

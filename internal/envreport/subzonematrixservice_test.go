@@ -23,12 +23,7 @@ import (
 func subzoneMatrixServiceFixture(t *testing.T) (*SubzoneMatrixService, vprocore.ProjectState) {
 	t.Helper()
 	contexts, state := subzoneMatrixFixture(t)
-	service, err := NewSubzoneMatrixService(contexts, func(name string) (string, bool) {
-		if name != SubzoneMatrixFeatureEnvironment {
-			t.Fatal("Subzone Matrix borrowed another workflow gate", name)
-		}
-		return "true", true
-	})
+	service, err := NewSubzoneMatrixService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,25 +109,19 @@ func TestSubzoneMatrixServiceOwnedPagingReviewPublicationAndCollision(t *testing
 	}
 }
 
-func TestSubzoneMatrixServiceGateStrictRequestsAndCancellation(t *testing.T) {
-	for _, gate := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewSubzoneMatrixService(nil, func(string) (string, bool) { return gate, gate != "" })
-		if gate == "" || gate == "false" || gate == "true" {
-			if err != nil || service.enabled != (gate != "false") {
-				t.Fatal("independent literal flag differs", gate, err)
-			}
-			if preview, err := service.GetPreview(context.Background(), "owned", `{"offset":0,"limit":25}`); err == nil || preview != nil {
-				t.Fatal("disabled/unowned service returned data")
-			}
-			if review, err := service.GetReview(context.Background(), "owned"); err == nil || review != nil {
-				t.Fatal("disabled/unowned service returned workbook")
-			}
-			if outcome, err := service.ExportReviewed(context.Background(), "owned", `{}`); err == nil || outcome != nil {
-				t.Fatal("disabled/unowned service published")
-			}
-		} else if err == nil {
-			t.Fatal("malformed flag accepted", gate)
-		}
+func TestSubzoneMatrixServiceStrictRequestsAndCancellation(t *testing.T) {
+	unowned, err := NewSubzoneMatrixService(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if preview, err := unowned.GetPreview(context.Background(), "owned", `{"offset":0,"limit":25}`); err == nil || preview != nil {
+		t.Fatal("unowned service returned data")
+	}
+	if review, err := unowned.GetReview(context.Background(), "owned"); err == nil || review != nil {
+		t.Fatal("unowned service returned workbook")
+	}
+	if outcome, err := unowned.ExportReviewed(context.Background(), "owned", `{}`); err == nil || outcome != nil {
+		t.Fatal("unowned service published")
 	}
 	service, state := subzoneMatrixServiceFixture(t)
 	for _, request := range []string{

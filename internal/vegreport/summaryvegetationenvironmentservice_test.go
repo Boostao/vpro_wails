@@ -30,15 +30,7 @@ func summaryEnvironmentalCombinedFixture(t *testing.T, external bool) (*SummaryV
 		(-1,'Env','disabled',NULL,0,'unknown',NULL)`)
 	vprotest.MutateContextFixture(t, owner.Attachments["project"], `DELETE FROM `+vprocore.QuoteHeaderIdentifier(state.ActiveProject+"_Env")+`;
 		INSERT INTO `+vprocore.QuoteHeaderIdentifier(state.ActiveProject+"_Env")+`(PlotNumber,NutrientRegime) VALUES('P1','M'),('P2','N'),('P3',NULL)`)
-	service, err := NewSummaryVegetationEnvironmentalService(report, func(key string) (string, bool) {
-		if key == summaryVegetationEnvironmentalNumericFeatureEnvironment {
-			return "", false
-		}
-		if key != summaryVegetationEnvironmentalFeatureEnvironment {
-			t.Fatal("borrowed environment gate", key)
-		}
-		return "true", true
-	})
+	service, err := NewSummaryVegetationEnvironmentalService(report)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,18 +38,12 @@ func summaryEnvironmentalCombinedFixture(t *testing.T, external bool) (*SummaryV
 }
 
 func TestSummaryEnvironmentalCombinedGatesAndOwnedNoWrites(t *testing.T) {
-	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewSummaryVegetationEnvironmentalService(nil, func(string) (string, bool) { return flag, flag != "" })
-		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag != "false") {
-				t.Fatal(flag, service, err)
-			}
-			if got, err := service.PreviewEnvironmental(t.Context(), "owned", 1, 6, 0); got != nil || err == nil {
-				t.Fatal(got, err)
-			}
-		} else if err == nil {
-			t.Fatal("nonliteral gate accepted", flag)
-		}
+	nilService, err := NewSummaryVegetationEnvironmentalService(nil)
+	if err != nil || nilService == nil {
+		t.Fatal(nilService, err)
+	}
+	if got, err := nilService.PreviewEnvironmental(t.Context(), "owned", 1, 6, 0); got != nil || err == nil {
+		t.Fatal(got, err)
 	}
 	for _, external := range []bool{false, true} {
 		service, state := summaryEnvironmentalCombinedFixture(t, external)
@@ -101,10 +87,6 @@ func TestSummaryEnvironmentalCombinedGatesAndOwnedNoWrites(t *testing.T) {
 		after, err := os.ReadFile(service.report.contexts.Projects.Preferences.Path)
 		if err != nil || !bytes.Equal(config, after) {
 			t.Fatal("combined read changed YAML", err)
-		}
-		service.report.Enabled = false
-		if got, err := service.PreviewEnvironmental(t.Context(), state.ContextID, 1, 6, 0); got != nil || err == nil {
-			t.Fatal("base gate bypassed", got, err)
 		}
 	}
 }

@@ -43,7 +43,7 @@ func TestLongVegetationQualityMinimumPreferencesIndependentQualification(t *test
 		t.Fatal(err, closeErr)
 	}
 	beforeDB := vprotest.DatabaseBytes(t, owner.Attachments)
-	preferences := NewLongVegetationQualityMinimumPreferencesService(contexts, true)
+	preferences := NewLongVegetationQualityMinimumPreferencesService(contexts)
 	for field := 0; field < 3; field++ {
 		if err := contexts.Projects.Preferences.Update("ReportOptions", map[string]any{
 			"DataQualityFilterEnforceLV": -1, "DataQualityFilterSiteLV": "Poor",
@@ -94,7 +94,7 @@ func TestLongVegetationQualityMinimumPreferencesWorkbookActiveInactiveAndStaleAp
 		t.Run(map[bool]string{false: "attached", true: "external"}[external], func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, external)
 			workbooks := &VegetationWorkbookService{Private: private}
-			preferences := NewLongVegetationQualityMinimumPreferencesService(private.contexts, true)
+			preferences := NewLongVegetationQualityMinimumPreferencesService(private.contexts)
 			beforeDB := vprotest.DatabaseBytes(t, private.contexts.Projects.Sqlite.Attachments)
 			for _, active := range []bool{false, true} {
 				if err := private.contexts.Projects.Preferences.Update("ReportOptions", map[string]any{

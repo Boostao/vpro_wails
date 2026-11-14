@@ -18,7 +18,6 @@ import (
 	"golang.org/x/text/language"
 )
 
-const twoPageVegetationTableEnvironment = "VPRO_TWO_PAGE_VEGETATION_TABLE_REVIEW"
 const twoPageVegetationTableScanMaximum = 100000
 const twoPageVegetationTablePageMaximum = 200
 const twoPageVegetationTableOrdering = "controlled-English-ignore-case; numeric-descending-NULL-last; physical-row-ties"
@@ -57,18 +56,13 @@ type TwoPageVegetationTableReview struct {
 
 type TwoPageVegetationTableService struct {
 	contexts *vprocore.ContextService
-	review   bool
 }
 
-func NewTwoPageVegetationTableService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*TwoPageVegetationTableService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("two-page vegetation table requires owned contexts and explicit feature lookup")
+func NewTwoPageVegetationTableService(contexts *vprocore.ContextService) (*TwoPageVegetationTableService, error) {
+	if contexts == nil {
+		return nil, errors.New("two-page vegetation table requires owned contexts")
 	}
-	enabled, err := vprocore.SiviFeature(twoPageVegetationTableEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageVegetationTableService{contexts, enabled}, nil
+	return &TwoPageVegetationTableService{contexts: contexts}, nil
 }
 
 func twoPageVegetationTableSource(form string) ([]TwoPageVegetationTableColumn, []string, error) {
@@ -98,8 +92,8 @@ func (s *TwoPageVegetationTableService) GetReview(ctx context.Context, contextID
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || s.contexts == nil || !s.review {
-		return nil, errors.New("two-page vegetation table requires independently enabled saved-data review")
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("two-page vegetation table requires owned contexts")
 	}
 	if plot == "" || !utf8.ValidString(plot) || offset < 0 || limit < 1 || limit > twoPageVegetationTablePageMaximum {
 		return nil, errors.New("two-page vegetation table requires a valid literal opening parent, nonnegative offset and limit1..200")

@@ -17,7 +17,7 @@ import (
 func plotLabelPDFExportFixture(t *testing.T) (*PlotLabelPDFExportService, vprocore.ProjectState, PlotLabelPDFExportRequest) {
 	t.Helper()
 	contexts, state, runtime := plotLabelPDFOwnedFixture(t)
-	service := NewPlotLabelPDFExportService(contexts, true)
+	service := NewPlotLabelPDFExportService(contexts)
 	service.runtime = runtime
 	review, err := service.GetReview(t.Context(), state.ContextID, `{"plotNumber":"LB001"}`)
 	if err != nil {
@@ -44,17 +44,9 @@ func plotLabelPDFRequestJSON(t *testing.T, request PlotLabelPDFExportRequest) st
 	return string(data)
 }
 
-func TestPlotLabelPDFServiceGateAndOnceOnlyOutcome(t *testing.T) {
+func TestPlotLabelPDFServiceOnceOnlyOutcome(t *testing.T) {
 	service, state, request := plotLabelPDFExportFixture(t)
 	raw := plotLabelPDFRequestJSON(t, request)
-	service.enabled = false
-	if review, err := service.GetReview(t.Context(), state.ContextID, `{"plotNumber":"LB001"}`); err == nil || review != nil {
-		t.Fatalf("disabled review: %v", err)
-	}
-	if outcome, err := service.ExportReviewed(t.Context(), state.ContextID, raw); err == nil || outcome != nil {
-		t.Fatalf("disabled export: %v", err)
-	}
-	service.enabled = true
 	outcome, err := service.ExportReviewed(t.Context(), state.ContextID, raw)
 	if err != nil || outcome.Status != "published" || outcome.SHA256 == "" {
 		t.Fatalf("export: %+v, %v", outcome, err)
@@ -68,10 +60,9 @@ func TestPlotLabelPDFServiceGateAndOnceOnlyOutcome(t *testing.T) {
 	if err != nil || statErr != nil || *repeated != *outcome || !os.SameFile(info, after) {
 		t.Fatalf("UUID repeated publication instead of immutable receipt: %+v, %v, %v", repeated, err, statErr)
 	}
-	service.enabled = false
 	recovered, err := service.RecoverOutcome(t.Context(), state.ContextID, raw)
 	if err != nil || recovered.Status != "completed" || recovered.Outcome == nil || *recovered.Outcome != *outcome {
-		t.Fatalf("readonly backend-off recovery: %+v, %v", recovered, err)
+		t.Fatalf("readonly recovery: %+v, %v", recovered, err)
 	}
 }
 
@@ -112,7 +103,7 @@ func TestPlotLabelPDFServiceNilAndCanceledContext(t *testing.T) {
 	if outcome, err := service.ExportReviewed(context.Background(), "owner", "{}"); err == nil || outcome != nil {
 		t.Fatal("nil service accepted")
 	}
-	service = NewPlotLabelPDFExportService(nil, true)
+	service = NewPlotLabelPDFExportService(nil)
 	if outcome, err := service.ExportReviewed(nil, "owner", "{}"); err == nil || outcome != nil {
 		t.Fatal("nil context accepted")
 	}

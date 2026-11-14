@@ -11,12 +11,6 @@ import (
 	"errors"
 )
 
-const longEnvironmentPreferencesFeatureEnvironment = "VPRO_LONG_ENVIRONMENT_PREFERENCES"
-
-func LongEnvironmentPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longEnvironmentPreferencesFeatureEnvironment, lookup)
-}
-
 type LongEnvironmentPreferenceValues struct {
 	Title string `json:"title"`
 }
@@ -64,12 +58,11 @@ type LongEnvironmentPreferencesOutcome struct {
 
 type LongEnvironmentPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongEnvironmentPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongEnvironmentPreferencesService {
-	return &LongEnvironmentPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongEnvironmentPreferencesService(contexts *vprocore.ContextService) *LongEnvironmentPreferencesService {
+	return &LongEnvironmentPreferencesService{contexts: contexts}
 }
 
 func (s *LongEnvironmentPreferencesService) require(ctx context.Context, contextID string) error {
@@ -79,10 +72,7 @@ func (s *LongEnvironmentPreferencesService) require(ctx context.Context, context
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Environment preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Environment preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

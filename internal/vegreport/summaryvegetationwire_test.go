@@ -29,13 +29,8 @@ func TestSummaryVegetationClientWireFixture(t *testing.T) {
 		t.Fatal(err)
 	}
 	fixture := filepath.Join("frontend", "src", "summaryVegetationWire.json")
-	if os.Getenv("VPRO_UPDATE_SUMMARY_VEGETATION_WIRE") == "true" {
-		if err := os.WriteFile(fixture, append(encoded, '\n'), 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
 	raw, err := os.ReadFile(fixture)
-	if err != nil {
+	if err != nil || !bytes.Equal(append(encoded, '\n'), raw) {
 		t.Fatal(err)
 	}
 	var expected []SummaryVegetationPreview

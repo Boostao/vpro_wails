@@ -9,10 +9,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 )
-
-const summaryVegetationEnvironmentalCountFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_ENVIRONMENT_COUNT"
 
 type SummaryVegetationEnvironmentalCountReview struct {
 	ContextID   string                        `json:"contextId"`
@@ -30,19 +27,11 @@ type SummaryVegetationEnvironmentalCountReview struct {
 
 type SummaryVegetationEnvironmentalCountService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewSummaryVegetationEnvironmentalCountService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SummaryVegetationEnvironmentalCountService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(summaryVegetationEnvironmentalCountFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SummaryVegetationEnvironmentalCountService{contexts: contexts, enabled: enabled}, nil
+func NewSummaryVegetationEnvironmentalCountService(contexts *vprocore.ContextService) (*SummaryVegetationEnvironmentalCountService, error) {
+	return &SummaryVegetationEnvironmentalCountService{contexts: contexts}, nil
 }
 
 func (s *SummaryVegetationEnvironmentalCountService) GetEnvironmentalPlotCount(ctx context.Context, contextID string,
@@ -53,10 +42,7 @@ func (s *SummaryVegetationEnvironmentalCountService) GetEnvironmentalPlotCount(c
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || !s.enabled {
-		return nil, errors.New("Summary environmental plot count is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return nil, errors.New("Summary environmental plot count context service is unavailable")
 	}
 	if err := vprocore.ValidateGoogleEarthReviewStrings(contextID); err != nil {

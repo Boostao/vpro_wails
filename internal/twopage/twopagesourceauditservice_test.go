@@ -26,9 +26,7 @@ func sourceAuditFixture(t *testing.T, external bool, affinity string) (*TwoPageS
 		"Table",EditField,EditWhen,BeforeEdit,AfterEdit,Restore,Flag,ID)`); err != nil {
 		t.Fatal(err)
 	}
-	service, err := NewTwoPageSourceAuditService(contexts, func(name string) (string, bool) {
-		return "true", name == twoPageSourceAuditReviewEnvironment
-	})
+	service, err := NewTwoPageSourceAuditService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,15 +142,8 @@ func TestTwoPageSourceAuditGuardsAndCorrection(t *testing.T) {
 			t.Fatalf("invalid request inherited read ownership: %+v, %v", got, err)
 		}
 	}
-	service.review = false
-	if got, err := service.GetOriginal(context.Background(), state.ContextID, "108050", "FS882-8x6XL"); err == nil || got != nil {
-		t.Fatalf("disabled audit returned success: %+v, %v", got, err)
-	}
-	for _, value := range []string{"invalid", "false"} {
-		got, err := NewTwoPageSourceAuditService(service.contexts, func(string) (string, bool) { return value, true })
-		if value == "invalid" && err == nil || value == "false" && (err != nil || got.review) {
-			t.Fatalf("feature parsing %q = %+v, %v", value, got, err)
-		}
+	if _, err := NewTwoPageSourceAuditService(nil); err == nil {
+		t.Fatal("nil context owner accepted")
 	}
 }
 

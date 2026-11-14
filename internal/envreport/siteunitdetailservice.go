@@ -11,8 +11,6 @@ import (
 	"errors"
 )
 
-const SiteUnitSummaryFeatureEnvironment = "VPRO_SITE_UNIT_SUMMARY"
-
 type SiteUnitSummaryRequest struct {
 	Method int `json:"method"`
 }
@@ -45,11 +43,14 @@ type SiteUnitSummaryOptions struct {
 }
 
 func GetSiteUnitSummaryOptions(s *vprocore.ContextService, ctx context.Context, contextID string) (SiteUnitSummaryOptions, error) {
+	if ctx == nil {
+		return SiteUnitSummaryOptions{}, errors.New("Summary Environment options require a context")
+	}
 	if err := ctx.Err(); err != nil {
 		return SiteUnitSummaryOptions{}, err
 	}
-	if !s.SiteUnitSummaryEnabled {
-		return SiteUnitSummaryOptions{}, errors.New("Summary Environment preview is disabled in this session")
+	if s == nil {
+		return SiteUnitSummaryOptions{}, errors.New("Summary Environment options require owned contexts")
 	}
 	return ReadSiteUnitSummaryOptions(s, ctx, contextID, vprocore.PublicationReadSnapshotHooks{})
 }
@@ -91,11 +92,14 @@ func ReadSiteUnitSummaryOptions(s *vprocore.ContextService, ctx context.Context,
 }
 
 func PreviewSiteUnitSummary(s *vprocore.ContextService, ctx context.Context, contextID string, request SiteUnitSummaryRequest) (SiteUnitSummaryPreview, error) {
+	if ctx == nil {
+		return SiteUnitSummaryPreview{}, errors.New("Summary Environment preview requires a context")
+	}
 	if err := ctx.Err(); err != nil {
 		return SiteUnitSummaryPreview{}, err
 	}
-	if !s.SiteUnitSummaryEnabled {
-		return SiteUnitSummaryPreview{}, errors.New("Summary Environment preview is disabled in this session")
+	if s == nil {
+		return SiteUnitSummaryPreview{}, errors.New("Summary Environment preview requires owned contexts")
 	}
 	return ReadSiteUnitSummary(s, ctx, contextID, request, vprocore.PublicationReadSnapshotHooks{})
 }

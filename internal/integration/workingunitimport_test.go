@@ -27,11 +27,8 @@ func workingUnitProvenanceFixture(t *testing.T) vprocore.WorkingUnitProvenance {
 }
 
 func TestWorkingUnitFreezeNativeSnapshot(t *testing.T) {
-	if os.Getenv("VPRO_FREEZE_WORKING_UNIT") != "1" {
-		t.Skip("one-time explicit typed native snapshot resource generation")
-	}
 	if bytes.HasPrefix(vprocore.WorkingUnitDatabase, []byte("SQLite format 3")) {
-		t.Fatal("Working Unit resource is already frozen")
+		t.Skip("Working Unit resource is already frozen")
 	}
 	data, err := os.ReadFile(filepath.Join("evidence", "private", "working-unit-native", "working-unit-reference-snapshot.json"))
 	if err != nil {

@@ -31,13 +31,7 @@ func TestTwoPageVegetationSpeciesReferencesMasterLONGConsumer(t *testing.T) {
 				(1,'MIN',NULL,-32768,'','s'),
 				(2,'MAX','',32767,NULL,'s'),
 				(3,'NULL',NULL,NULL,'','s')`)
-			service, err := NewTwoPageVegetationService(contexts, func(key string) (string, bool) {
-				if key == twoPageVegetationReviewEnvironment {
-					return "true", true
-				}
-
-				return "", false
-			})
+			service, err := NewTwoPageVegetationService(contexts)
 			if err != nil {
 				t.Fatal(err)
 			}

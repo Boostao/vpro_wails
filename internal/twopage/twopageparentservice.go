@@ -11,9 +11,6 @@ import (
 	"fmt"
 )
 
-const TwoPageParentReviewEnvironment = "VPRO_TWO_PAGE_PARENT_REVIEW"
-const TwoPageParentExtraEditingEnvironment = "VPRO_TWO_PAGE_PARENT_EXTRA_EDITING"
-
 type TwoPageParentExtraWrite struct {
 	Original *sourceform.SIVIParentProjection `json:"original"`
 	Edits    []sourceform.SIVIParentCellEdit  `json:"edits"`
@@ -30,34 +27,25 @@ func (request *TwoPageParentExtraWrite) UnmarshalJSON(data []byte) error {
 }
 
 type TwoPageParentExtraService struct {
-	contexts                    *vprocore.ContextService
-	ReviewEnabled, EditsEnabled bool `json:"-" yaml:"-"`
+	contexts *vprocore.ContextService
 }
 
-func NewTwoPageParentExtraService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*TwoPageParentExtraService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("two-page parent service requires owned contexts and an explicit feature lookup")
+func NewTwoPageParentExtraService(contexts *vprocore.ContextService) (*TwoPageParentExtraService, error) {
+	if contexts == nil {
+		return nil, errors.New("two-page parent service requires owned contexts")
 	}
-	review, err := vprocore.SiviFeature(TwoPageParentReviewEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	editing, err := vprocore.SiviFeature(TwoPageParentExtraEditingEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageParentExtraService{contexts: contexts, ReviewEnabled: review, EditsEnabled: editing}, nil
+	return &TwoPageParentExtraService{contexts: contexts}, nil
 }
 
-func (s *TwoPageParentExtraService) require(ctx context.Context, editing bool) error {
+func (s *TwoPageParentExtraService) require(ctx context.Context, _ bool) error {
+	if ctx == nil {
+		return errors.New("two-page parent service requires a context")
+	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.contexts == nil || !s.ReviewEnabled {
-		return errors.New("two-page parent reads require independently enabled source review")
-	}
-	if editing && !s.EditsEnabled {
-		return errors.New("two-page additional-field writes require independently enabled editing")
+	if s == nil || s.contexts == nil {
+		return errors.New("two-page parent service requires owned contexts")
 	}
 	return nil
 }

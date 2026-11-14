@@ -11,12 +11,6 @@ import (
 	"errors"
 )
 
-const summaryVegetationPreferencesFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_PREFERENCES"
-
-func SummaryVegetationPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(summaryVegetationPreferencesFeatureEnvironment, lookup)
-}
-
 type SummaryVegetationPreferenceValues struct {
 	GroupBy    int     `json:"groupBy"`
 	Average    int     `json:"average"`
@@ -73,14 +67,12 @@ type SummaryVegetationPreferencesOutcome struct {
 }
 
 type SummaryVegetationPreferencesService struct {
-	contexts       *vprocore.ContextService
-	enabled        bool
-	previewEnabled bool
-	snapshot       vprocore.PublicationReadSnapshotHooks
+	contexts *vprocore.ContextService
+	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewSummaryVegetationPreferencesService(contexts *vprocore.ContextService, enabled, previewEnabled bool) *SummaryVegetationPreferencesService {
-	return &SummaryVegetationPreferencesService{contexts: contexts, enabled: enabled, previewEnabled: previewEnabled}
+func NewSummaryVegetationPreferencesService(contexts *vprocore.ContextService) *SummaryVegetationPreferencesService {
+	return &SummaryVegetationPreferencesService{contexts: contexts}
 }
 
 func (s *SummaryVegetationPreferencesService) require(ctx context.Context, contextID string) error {
@@ -90,10 +82,7 @@ func (s *SummaryVegetationPreferencesService) require(ctx context.Context, conte
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Summary Vegetation preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Summary Vegetation preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)
@@ -116,7 +105,7 @@ func (s *SummaryVegetationPreferencesService) GetSummaryVegetationPreferences(ct
 			dto := SummaryVegetationPreferenceValues(values)
 			return &SummaryVegetationPreferencesReview{ContextID: contextID, Project: owner.Selection.Project,
 				ProjectPath: owner.Selection.ProjectPath, SU: owner.Selection.SU, SUPath: owner.Selection.SUPath,
-				Values: dto, PreviewEnabled: s.previewEnabled, SelectionAvailable: summaryVegetationPreferenceSelectionAvailable(dto)}, nil
+				Values: dto, PreviewEnabled: true, SelectionAvailable: summaryVegetationPreferenceSelectionAvailable(dto)}, nil
 		})
 	})
 }
@@ -137,7 +126,7 @@ func (s *SummaryVegetationPreferencesService) SaveSummaryVegetationPreferences(c
 			if readErr != nil {
 				return struct{}{}, readErr
 			}
-			if request.Expected != request.Proposed && (!s.previewEnabled || !summaryVegetationPreferenceSelectionAvailable(request.Proposed)) {
+			if request.Expected != request.Proposed && !summaryVegetationPreferenceSelectionAvailable(request.Proposed) {
 				return struct{}{}, errors.New("Summary Vegetation selection is unavailable in this session; saved values were not reset")
 			}
 			update, saveErr := CompareAndSetSummaryVegetationPreferences(plots.Projects.Preferences, ctx,

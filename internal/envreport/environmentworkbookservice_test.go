@@ -24,12 +24,7 @@ import (
 func workbookServiceFixture(t *testing.T, external bool) (*EnvironmentWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	contexts, state := vprotest.ReportServiceFixture(t, external)
-	service, err := NewEnvironmentWorkbookService(contexts, func(name string) (string, bool) {
-		if name != environmentWorkbookFeatureEnvironment {
-			t.Fatal("workbook gate borrowed another workflow", name)
-		}
-		return "true", true
-	})
+	service, err := NewEnvironmentWorkbookService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,19 +76,13 @@ func TestLongEnvironmentWorkbookServiceOwnedReviewExportAndCollision(t *testing.
 	}
 }
 
-func TestLongEnvironmentWorkbookServiceGateRawUnicodeAndScopeRefusal(t *testing.T) {
-	for _, gate := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewEnvironmentWorkbookService(nil, func(string) (string, bool) { return gate, gate != "" })
-		if gate == "" || gate == "false" || gate == "true" {
-			if err != nil || service.enabled != (gate != "false") {
-				t.Fatal(gate, service, err)
-			}
-			if _, err := service.GetReview(context.Background(), "owned", `{"title":""}`); err == nil {
-				t.Fatal("unavailable workflow published review")
-			}
-		} else if err == nil {
-			t.Fatal("nonliteral gate accepted", gate)
-		}
+func TestLongEnvironmentWorkbookServiceRawUnicodeAndScopeRefusal(t *testing.T) {
+	unowned, err := NewEnvironmentWorkbookService(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := unowned.GetReview(context.Background(), "owned", `{"title":""}`); err == nil {
+		t.Fatal("unavailable workflow published review")
 	}
 	service, state := workbookServiceFixture(t, false)
 	for _, request := range []string{`{"title":"\ud800"}`, `{"title":"\udfff"}`, `{"title":"","extra":true}`, `{}`} {

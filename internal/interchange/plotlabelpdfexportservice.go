@@ -15,19 +15,16 @@ import (
 	"sync"
 )
 
-const PlotLabelPDFExportEnvironment = "VPRO_PLOT_LABEL_PDF_EXPORT"
-
 type PlotLabelPDFExportService struct {
 	contexts  *vprocore.ContextService
-	enabled   bool
 	sessionID string
 	runtime   plotLabelPDFRuntime
 	mu        sync.Mutex
 	attempts  map[string]*plotLabelPDFAttempt
 }
 
-func NewPlotLabelPDFExportService(contexts *vprocore.ContextService, enabled bool) *PlotLabelPDFExportService {
-	return &PlotLabelPDFExportService{contexts: contexts, enabled: enabled, sessionID: rand.Text()}
+func NewPlotLabelPDFExportService(contexts *vprocore.ContextService) *PlotLabelPDFExportService {
+	return &PlotLabelPDFExportService{contexts: contexts, sessionID: rand.Text()}
 }
 
 type PlotLabelPDFReviewRequest struct {
@@ -95,7 +92,7 @@ type PlotLabelPDFExportOutcome struct {
 	ErrorMessage         string `json:"errorMessage"`
 }
 
-func (s *PlotLabelPDFExportService) authorize(ctx context.Context, write bool) error {
+func (s *PlotLabelPDFExportService) authorize(ctx context.Context) error {
 	if ctx == nil {
 		return errors.New("label PDF service requires a context")
 	}
@@ -107,9 +104,6 @@ func (s *PlotLabelPDFExportService) authorize(ctx context.Context, write bool) e
 	}
 	if s.sessionID == "" {
 		return errors.New("label PDF service owner is unavailable")
-	}
-	if write && !s.enabled {
-		return errors.New("label PDF export is disabled in this session")
 	}
 	return nil
 }
@@ -128,7 +122,7 @@ func plotLabelPDFApprovalHash(source ownedPlotLabelPDFPreparation) (string, erro
 }
 
 func (s *PlotLabelPDFExportService) GetReview(ctx context.Context, contextID, requestJSON string) (*PlotLabelPDFExportReview, error) {
-	if err := s.authorize(ctx, true); err != nil {
+	if err := s.authorize(ctx); err != nil {
 		return nil, err
 	}
 	var request PlotLabelPDFReviewRequest
@@ -155,14 +149,14 @@ func (s *PlotLabelPDFExportService) GetReview(ctx context.Context, contextID, re
 }
 
 func (s *PlotLabelPDFExportService) ExportReviewed(ctx context.Context, contextID, requestJSON string) (*PlotLabelPDFExportOutcome, error) {
-	if err := s.authorize(ctx, true); err != nil {
+	if err := s.authorize(ctx); err != nil {
 		return nil, err
 	}
 	return s.exportReviewed(ctx, contextID, requestJSON, plotLabelPDFPublicationHooks{runtime: s.runtime})
 }
 
 func (s *PlotLabelPDFExportService) exportReviewed(ctx context.Context, contextID, requestJSON string, hooks plotLabelPDFPublicationHooks) (outcome *PlotLabelPDFExportOutcome, resultErr error) {
-	if err := s.authorize(ctx, true); err != nil {
+	if err := s.authorize(ctx); err != nil {
 		return nil, err
 	}
 	var request PlotLabelPDFExportRequest

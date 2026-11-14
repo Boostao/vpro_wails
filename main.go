@@ -78,12 +78,6 @@ func newDefaultPictureEnvLookup(base func(string) (string, bool), defaultVPicsPa
 			if defaultImagesDir != "" {
 				return defaultImagesDir, true
 			}
-		case "VPRO_PICTURE_READING",
-			"VPRO_PICTURE_METADATA_WRITING",
-			"VPRO_PICTURE_CREATION_WRITING",
-			"VPRO_PICTURE_DELETION_WRITING",
-			"VPRO_PICTURE_DELETION_RESTORING":
-			return "true", true
 		}
 		return "", false
 	}
@@ -93,207 +87,6 @@ func newDefaultPictureEnvLookup(base func(string) (string, bool), defaultVPicsPa
 var assets embed.FS
 
 func main() {
-	siviHeightEnabled, err := siviHeightFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if _, err := siviFeature(siviCoverFeatureEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := siviFeature(siviCombinedFeatureEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := siviFeature(siviCollectedFeatureEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := siviFeature(siviSpeciesFeatureEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := siviFeature(siviIdentityFeatureEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	for _, name := range []string{siviDeletionWritingFeatureEnvironment, siviDeletionRestoringFeatureEnvironment, siviCreationUndoFeatureEnvironment} {
-		if _, err := siviFeature(name, os.LookupEnv); err != nil {
-			log.Fatal(err)
-		}
-	}
-	if _, err := siviFeature(pictureReadingEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	for _, name := range []string{pictureCreationWritingEnvironment, pictureDeletionWritingEnvironment, pictureDeletionRestoringEnvironment} {
-		if _, err := siviFeature(name, os.LookupEnv); err != nil {
-			log.Fatal(err)
-		}
-	}
-	if _, err := siviFeature(lifeformWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := siviFeature(subzoneMatrixFeatureEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := siviFeature(siteUnitSummaryWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := siviFeature(siteUnitSummaryExtendedWorkbookFeatureEnvironment, os.LookupEnv); err != nil {
-		log.Fatal(err)
-	}
-	for _, name := range []string{twoPageParentReviewEnvironment, twoPageParentExtraEditingEnvironment, twoPageParentCommonEditingEnvironment, twoPageParentEntryEditingEnvironment} {
-		if _, err := siviFeature(name, os.LookupEnv); err != nil {
-			log.Fatal(err)
-		}
-	}
-	siviParentReviewEnabled, err := siviParentReviewFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	siviParentEditingEnabled, err := siviParentEditingFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	siviParentActionEditingEnabled, err := siviParentActionEditingFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	siviProjectAssignmentEnabled, err := siviProjectAssignmentFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tableCSVReviewEnabled, err := tableCSVReviewFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tableCSVArchiveEnabled, err := tableCSVArchiveFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	plotLocationReviewEnabled, err := plotLocationReviewFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	siteUnitSummaryEnabled, err := siviFeature(siteUnitSummaryFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	siteUnitSummaryLifeformsEnabled, err := siviFeature(siteUnitSummaryLifeformFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	siteUnitSummarySpeciesEnabled, err := siviFeature(siteUnitSummarySpeciesFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationNoneEnabled, err := siviFeature(longVegetationNoneFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationLifeformEnabled, err := siviFeature(longVegetationLifeformFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationStrataEnabled, err := siviFeature(longVegetationStrataFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationCodeEnabled, err := siviFeature(longVegetationCodeFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationSelectedFieldEnabled, err := siviFeature(longVegetationSelectedFieldFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationNoneUnitsEnabled, err := siviFeature("VPRO_LONG_VEGETATION_NONE_UNITS", os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationSelectedUnitsEnabled, err := siviFeature(longVegetationSelectedUnitsFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationSelectedUnitSelectionEnabled, err := siviFeature(longVegetationSelectedUnitSelectionFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationProjectScopeEnabled, err := siviFeature(longVegetationProjectScopeFeatureEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	googleEarthReviewEnabled, err := googleEarthReviewFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	googleEarthKMLEnabled, err := googleEarthKMLFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	googleEarthKMLExportEnabled, err := googleEarthKMLExportFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	plotLabelPDFExportEnabled, err := siviFeature(plotLabelPDFExportEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	externalSUEnvironmentEditingEnabled, err := siviFeature(externalSUEnvironmentEditingEnvironment, os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	googleEarthPreferencesEnabled, err := googleEarthPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longEnvironmentPreferencesEnabled, err := longEnvironmentPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationPreferencesEnabled, err := longVegetationPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationStatisticsPreferencesEnabled, err := longVegetationStatisticsPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationSwitchPreferencesEnabled, err := longVegetationSwitchPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationThresholdPreferencesEnabled, err := longVegetationThresholdPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationGroupPreferencesEnabled, err := longVegetationGroupPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationQualityNullPreferencesEnabled, err := longVegetationQualityNullPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationQualityMinimumPreferencesEnabled, err := longVegetationQualityMinimumPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationNamingPreferencesEnabled, err := longVegetationNamingPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationSelectedFieldPreferencesEnabled, err := longVegetationSelectedFieldPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationEnforcementPreferencesEnabled, err := longVegetationEnforcementPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	longVegetationUnitPreferencesEnabled, err := longVegetationUnitPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
-	siteUnitSummaryPreferencesEnabled, err := siteUnitSummaryPreferencesFeature(os.LookupEnv)
-	if err != nil {
-		log.Fatal(err)
-	}
 	dataDir, err := userDataDir()
 	if err != nil {
 		log.Fatal(err)
@@ -431,24 +224,6 @@ func main() {
 		}
 		builtContext.cloud = cloudSyncManager
 		*contextService = *builtContext
-		coreContext := unwrapContextService(contextService)
-		coreContext.SiviHeightEnabled = siviHeightEnabled
-		coreContext.SiviParentReviewEnabled = siviParentReviewEnabled
-		coreContext.SiviParentEditingEnabled = siviParentEditingEnabled
-		coreContext.SiviParentActionEditingEnabled = siviParentActionEditingEnabled
-		coreContext.SiviProjectAssignmentEnabled = siviProjectAssignmentEnabled
-		coreContext.TableCSVReviewEnabled = tableCSVReviewEnabled
-		coreContext.PlotLocationReviewEnabled = plotLocationReviewEnabled
-		coreContext.SiteUnitSummaryEnabled = siteUnitSummaryEnabled
-		coreContext.SiteUnitSummaryLifeformsEnabled = siteUnitSummaryLifeformsEnabled
-		coreContext.SiteUnitSummarySpeciesEnabled = siteUnitSummarySpeciesEnabled
-		coreContext.LongVegetationNoneEnabled = longVegetationNoneEnabled
-		coreContext.LongVegetationLifeformEnabled = longVegetationLifeformEnabled
-		coreContext.LongVegetationStrataEnabled = longVegetationStrataEnabled
-		coreContext.LongVegetationCodeEnabled = longVegetationCodeEnabled
-		coreContext.LongVegetationSelectedFieldEnabled = longVegetationSelectedFieldEnabled
-		coreContext.LongVegetationNoneUnitsEnabled = longVegetationNoneUnitsEnabled
-		coreContext.LongVegetationSelectedUnitsEnabled = longVegetationSelectedUnitsEnabled
 
 		abort := func(cause error) (StartupState, error) {
 			contextService.core = nil
@@ -460,47 +235,47 @@ func main() {
 		if err != nil {
 			return abort(err)
 		}
-		siviParentShared, err := NewSIVIParentSharedService(contextService, os.LookupEnv)
+		siviParentShared, err := NewSIVIParentSharedService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageParentExtra, err := NewTwoPageParentExtraService(contextService, os.LookupEnv)
+		twoPageParentExtra, err := NewTwoPageParentExtraService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageParentCommon, err := NewTwoPageParentCommonService(contextService, os.LookupEnv)
+		twoPageParentCommon, err := NewTwoPageParentCommonService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		siviCovers, err := NewSIVICoverService(contextService, os.LookupEnv)
+		siviCovers, err := NewSIVICoverService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		siviCombined, err := NewSIVICombinedService(contextService, os.LookupEnv)
+		siviCombined, err := NewSIVICombinedService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		siviCollected, err := NewSIVICollectedService(contextService, os.LookupEnv)
+		siviCollected, err := NewSIVICollectedService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		siviSpecies, err := NewSIVISpeciesService(contextService, os.LookupEnv)
+		siviSpecies, err := NewSIVISpeciesService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		siviIdentity, err := NewSIVIIdentityService(contextService, os.LookupEnv)
+		siviIdentity, err := NewSIVIIdentityService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		siviCreation, err := NewSIVICreationService(contextService, os.LookupEnv)
+		siviCreation, err := NewSIVICreationService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		siviCreationUndo, err := NewSIVICreationUndoService(contextService, os.LookupEnv)
+		siviCreationUndo, err := NewSIVICreationUndoService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		siviDeletion, err := NewSIVIDeletionService(contextService, os.LookupEnv)
+		siviDeletion, err := NewSIVIDeletionService(contextService)
 		if err != nil {
 			return abort(err)
 		}
@@ -513,15 +288,15 @@ func main() {
 		if err != nil {
 			return abort(err)
 		}
-		pictureMetadata, err := NewPictureMetadataService(builtPictures, pictureLookup)
+		pictureMetadata, err := NewPictureMetadataService(builtPictures)
 		if err != nil {
 			return abort(err)
 		}
-		pictureCreation, err := NewPictureCreationService(builtPictures, pictureLookup)
+		pictureCreation, err := NewPictureCreationService(builtPictures)
 		if err != nil {
 			return abort(err)
 		}
-		pictureDeletion, err := NewPictureDeletionService(builtPictures, pictureLookup)
+		pictureDeletion, err := NewPictureDeletionService(builtPictures)
 		if err != nil {
 			return abort(err)
 		}
@@ -529,81 +304,51 @@ func main() {
 		builtPictures.Creation = pictureCreation
 		builtPictures.Deletion = pictureDeletion
 
-		summaryVegetation, err := NewSummaryVegetationService(contextService, os.LookupEnv)
+		summaryVegetation, err := NewSummaryVegetationService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		summaryEnvironment, err := NewSummaryVegetationEnvironmentalService(summaryVegetation, os.LookupEnv)
+		summaryEnvironment, err := NewSummaryVegetationEnvironmentalService(summaryVegetation)
 		if err != nil {
 			return abort(err)
 		}
-		summaryEnvironmentLifeform, err := NewSummaryVegetationEnvironmentalLifeformService(summaryEnvironment, os.LookupEnv)
+		summaryEnvironmentLifeform, err := NewSummaryVegetationEnvironmentalLifeformService(summaryEnvironment)
 		if err != nil {
 			return abort(err)
 		}
-		summaryVegetationWorkbook, err := NewSummaryVegetationWorkbookService(summaryEnvironmentLifeform, os.LookupEnv)
+		summaryVegetationWorkbook, err := NewSummaryVegetationWorkbookService(summaryEnvironmentLifeform)
 		if err != nil {
 			return abort(err)
 		}
-		summaryVegetationWorkbook.AncillaryEnabled, err = siviFeature(summaryVegetationAncillaryWorkbookFeatureEnvironment, os.LookupEnv)
+		lifeformSummary, err := NewLifeformSummaryService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		summaryVegetationWorkbook.ReferencesEnabled, err = siviFeature(summaryVegetationEffectiveReferencesFeatureEnvironment, os.LookupEnv)
+		speciesAttributeSummary, err := NewSpeciesAttributeSummaryService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		summaryVegetationWorkbook.GroupedEnabled, err = siviFeature(summaryVegetationGroupedWorkbookFeatureEnvironment, os.LookupEnv)
+		lifeformWorkbook, err := NewLifeformWorkbookService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		summaryVegetationPreferencesEnabled, err := summaryVegetationPreferencesFeature(os.LookupEnv)
+		subzoneMatrix, err := NewSubzoneMatrixService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		summaryVegetationQualityEnabled, err := summaryVegetationQualityPreferencesFeature(os.LookupEnv)
+		siteUnitSummaryWorkbook, err := NewSiteUnitSummaryWorkbookService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		summaryVegetation.QualityPreferences = summaryVegetationQualityEnabled
-		summaryVegetationPresentationEnabled, err := summaryVegetationPresentationPreferencesFeature(os.LookupEnv)
+		siteUnitSummaryExtendedWorkbook, err := NewSiteUnitSummaryExtendedWorkbookService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		summaryVegetationWorkbook.PresentationEnabled = summaryVegetationPresentationEnabled
-		summaryVegetationFieldListEnabled, err := summaryVegetationFieldListFeature(os.LookupEnv)
+		environmentWorkbook, err := NewEnvironmentWorkbookService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		lifeformSummary, err := NewLifeformSummaryService(contextService, os.LookupEnv)
-		if err != nil {
-			return abort(err)
-		}
-		speciesAttributeSummary, err := NewSpeciesAttributeSummaryService(contextService, os.LookupEnv)
-		if err != nil {
-			return abort(err)
-		}
-		lifeformWorkbook, err := NewLifeformWorkbookService(contextService, os.LookupEnv)
-		if err != nil {
-			return abort(err)
-		}
-		subzoneMatrix, err := NewSubzoneMatrixService(contextService, os.LookupEnv)
-		if err != nil {
-			return abort(err)
-		}
-		siteUnitSummaryWorkbook, err := NewSiteUnitSummaryWorkbookService(contextService, os.LookupEnv)
-		if err != nil {
-			return abort(err)
-		}
-		siteUnitSummaryExtendedWorkbook, err := NewSiteUnitSummaryExtendedWorkbookService(contextService, os.LookupEnv)
-		if err != nil {
-			return abort(err)
-		}
-		environmentWorkbook, err := NewEnvironmentWorkbookService(contextService, os.LookupEnv)
-		if err != nil {
-			return abort(err)
-		}
-		vegetationWorkbook, err := NewVegetationWorkbookService(contextService, os.LookupEnv)
+		vegetationWorkbook, err := NewVegetationWorkbookService(contextService)
 		if err != nil {
 			return abort(err)
 		}
@@ -639,51 +384,51 @@ func main() {
 		if soilCodes != nil {
 			entryReaders.Soil = soilCodes
 		}
-		twoPageParentEntry, err := NewTwoPageParentEntryService(contextService, entryReaders, os.LookupEnv)
+		twoPageParentEntry, err := NewTwoPageParentEntryService(contextService, entryReaders)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageSoil, err := NewTwoPageSoilService(contextService, os.LookupEnv)
+		twoPageSoil, err := NewTwoPageSoilService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageSourceAudit, err := NewTwoPageSourceAuditService(contextService, os.LookupEnv)
+		twoPageSourceAudit, err := NewTwoPageSourceAuditService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageGoogleEarth, err := NewTwoPageGoogleEarthService(contextService, os.LookupEnv)
+		twoPageGoogleEarth, err := NewTwoPageGoogleEarthService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageVegetationTable, err := NewTwoPageVegetationTableService(contextService, os.LookupEnv)
+		twoPageVegetationTable, err := NewTwoPageVegetationTableService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageEnvironmentTable, err := NewTwoPageEnvironmentTableService(contextService, os.LookupEnv)
+		twoPageEnvironmentTable, err := NewTwoPageEnvironmentTableService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageProjectMetadata, err := NewTwoPageProjectMetadataService(contextService, os.LookupEnv)
+		twoPageProjectMetadata, err := NewTwoPageProjectMetadataService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		userLog, err := NewUserLogService(contextService, os.LookupEnv)
+		userLog, err := NewUserLogService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageProfiling, err := NewTwoPageProfilingService(contextService, os.LookupEnv)
+		twoPageProfiling, err := NewTwoPageProfilingService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		profileSpeciesPresence, err := NewProjectProfileSpeciesPresenceService(contextService, os.LookupEnv)
+		profileSpeciesPresence, err := NewProjectProfileSpeciesPresenceService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageVegetation, err := NewTwoPageVegetationService(contextService, os.LookupEnv)
+		twoPageVegetation, err := NewTwoPageVegetationService(contextService)
 		if err != nil {
 			return abort(err)
 		}
-		twoPageVegetationSpeciesList, err := NewTwoPageVegetationSpeciesListService(contextService, os.LookupEnv)
+		twoPageVegetationSpeciesList, err := NewTwoPageVegetationSpeciesListService(contextService)
 		if err != nil {
 			return abort(err)
 		}
@@ -735,16 +480,16 @@ func main() {
 			contextService,
 			becService,
 			workingUnits,
-			NewExternalSUEnvironmentService(contextService, externalSUEnvironmentEditingEnabled),
+			NewExternalSUEnvironmentService(contextService),
 			twoPageProfiling,
 			profileSpeciesPresence,
 		)
 		*validationService = *NewValidationService(contextService)
 		*importExportService = *NewImportExportService(
 			contextService,
-			NewTableCSVArchiveService(contextService, tableCSVArchiveEnabled),
+			NewTableCSVArchiveService(contextService),
 			plotLabelRegional,
-			NewPlotLabelPDFExportService(contextService, plotLabelPDFExportEnabled),
+			NewPlotLabelPDFExportService(contextService),
 		)
 		*vegetationReportService = VegetationReportService{
 			contexts:                       contextService,
@@ -752,24 +497,24 @@ func main() {
 			summaryEnvironment:             summaryEnvironment,
 			summaryEnvironmentLifeform:     summaryEnvironmentLifeform,
 			summaryWorkbook:                summaryVegetationWorkbook,
-			summaryPreferences:             NewSummaryVegetationPreferencesService(contextService, summaryVegetationPreferencesEnabled, summaryVegetation.Enabled),
-			summaryQualityPreferences:      NewSummaryVegetationQualityPreferencesService(contextService, summaryVegetationQualityEnabled),
-			summaryPresentationPreferences: NewSummaryVegetationPresentationPreferencesService(contextService, summaryVegetationPresentationEnabled),
-			summaryFieldList:               NewSummaryVegetationFieldListService(contextService, summaryVegetationFieldListEnabled),
-			longPreferences:                NewLongVegetationPreferencesService(contextService, longVegetationPreferencesEnabled),
-			longStatisticsPreferences:      NewLongVegetationStatisticsPreferencesService(contextService, longVegetationStatisticsPreferencesEnabled),
-			longSwitchPreferences:          NewLongVegetationSwitchPreferencesService(contextService, longVegetationSwitchPreferencesEnabled),
-			longThresholdPreferences:       NewLongVegetationThresholdPreferencesService(contextService, longVegetationThresholdPreferencesEnabled),
-			longGroupPreferences:           NewLongVegetationGroupPreferencesService(contextService, longVegetationGroupPreferencesEnabled),
-			longQualityNullPreferences:     NewLongVegetationQualityNullPreferencesService(contextService, longVegetationQualityNullPreferencesEnabled),
-			longQualityMinimumPreferences:  NewLongVegetationQualityMinimumPreferencesService(contextService, longVegetationQualityMinimumPreferencesEnabled),
-			longNamingPreferences:          NewLongVegetationNamingPreferencesService(contextService, longVegetationNamingPreferencesEnabled),
-			longSelectedFieldPreferences:   NewLongVegetationSelectedFieldPreferencesService(contextService, longVegetationSelectedFieldPreferencesEnabled),
-			longEnforcementPreferences:     NewLongVegetationEnforcementPreferencesService(contextService, longVegetationEnforcementPreferencesEnabled),
-			longUnitPreferences:            NewLongVegetationUnitPreferencesService(contextService, longVegetationUnitPreferencesEnabled),
-			longSelectedUnitSelection:      NewLongVegetationSelectedUnitSelectionService(contextService, longVegetationSelectedUnitSelectionEnabled),
-			longReportScope:                NewLongVegetationReportScopeService(contextService, longVegetationProjectScopeEnabled),
-			longProjectWorkbook:            NewLongVegetationProjectWorkbookService(contextService, longVegetationProjectScopeEnabled, vegetationWorkbook.Private.Enabled),
+			summaryPreferences:             NewSummaryVegetationPreferencesService(contextService),
+			summaryQualityPreferences:      NewSummaryVegetationQualityPreferencesService(contextService),
+			summaryPresentationPreferences: NewSummaryVegetationPresentationPreferencesService(contextService),
+			summaryFieldList:               NewSummaryVegetationFieldListService(contextService),
+			longPreferences:                NewLongVegetationPreferencesService(contextService),
+			longStatisticsPreferences:      NewLongVegetationStatisticsPreferencesService(contextService),
+			longSwitchPreferences:          NewLongVegetationSwitchPreferencesService(contextService),
+			longThresholdPreferences:       NewLongVegetationThresholdPreferencesService(contextService),
+			longGroupPreferences:           NewLongVegetationGroupPreferencesService(contextService),
+			longQualityNullPreferences:     NewLongVegetationQualityNullPreferencesService(contextService),
+			longQualityMinimumPreferences:  NewLongVegetationQualityMinimumPreferencesService(contextService),
+			longNamingPreferences:          NewLongVegetationNamingPreferencesService(contextService),
+			longSelectedFieldPreferences:   NewLongVegetationSelectedFieldPreferencesService(contextService),
+			longEnforcementPreferences:     NewLongVegetationEnforcementPreferencesService(contextService),
+			longUnitPreferences:            NewLongVegetationUnitPreferencesService(contextService),
+			longSelectedUnitSelection:      NewLongVegetationSelectedUnitSelectionService(contextService),
+			longReportScope:                NewLongVegetationReportScopeService(contextService),
+			longProjectWorkbook:            NewLongVegetationProjectWorkbookService(contextService),
 			vegetationWorkbook:             vegetationWorkbook,
 			lifeformSummary:                lifeformSummary,
 			lifeformWorkbook:               lifeformWorkbook,
@@ -778,8 +523,8 @@ func main() {
 		*environmentReportService = EnvironmentReportService{
 			contexts:                        contextService,
 			environmentWorkbook:             environmentWorkbook,
-			longEnvironmentPreferences:      NewLongEnvironmentPreferencesService(contextService, longEnvironmentPreferencesEnabled),
-			siteUnitSummaryPreferences:      NewSiteUnitSummaryPreferencesService(contextService, siteUnitSummaryPreferencesEnabled),
+			longEnvironmentPreferences:      NewLongEnvironmentPreferencesService(contextService),
+			siteUnitSummaryPreferences:      NewSiteUnitSummaryPreferencesService(contextService),
 			siteUnitSummaryWorkbook:         siteUnitSummaryWorkbook,
 			siteUnitSummaryExtendedWorkbook: siteUnitSummaryExtendedWorkbook,
 			subzoneMatrix:                   subzoneMatrix,
@@ -790,10 +535,10 @@ func main() {
 		*spatialService = SpatialService{
 			contexts:               contextService,
 			coordinates:            coordinates,
-			googleEarthReview:      NewGoogleEarthReviewService(contextService, googleEarthReviewEnabled),
-			googleEarthKML:         NewGoogleEarthKMLService(contextService, googleEarthKMLEnabled),
-			googleEarthKMLExport:   NewGoogleEarthKMLExportService(contextService, googleEarthKMLExportEnabled),
-			googleEarthPreferences: NewGoogleEarthPreferencesService(contextService, googleEarthPreferencesEnabled),
+			googleEarthReview:      NewGoogleEarthReviewService(contextService),
+			googleEarthKML:         NewGoogleEarthKMLService(contextService),
+			googleEarthKMLExport:   NewGoogleEarthKMLExportService(contextService),
+			googleEarthPreferences: NewGoogleEarthPreferencesService(contextService),
 			twoPageGoogleEarth:     twoPageGoogleEarth,
 			dataDir:                dataDir,
 			extraDirs:              effectiveExtraDirs,

@@ -19,7 +19,6 @@ import (
 	"golang.org/x/text/language"
 )
 
-const TwoPageEnvironmentTableEnvironment = "VPRO_TWO_PAGE_ENVIRONMENT_TABLE_REVIEW"
 const twoPageEnvironmentTableScanMaximum = 100000
 const twoPageEnvironmentTablePageMaximum = 200
 const TwoPageEnvironmentTableOrdering = "declared-target-order; controlled-English-ignore-case; descending-numeric-NULL-last; physical-row-ties"
@@ -51,18 +50,13 @@ type TwoPageEnvironmentTableReview struct {
 
 type TwoPageEnvironmentTableService struct {
 	Contexts *vprocore.ContextService `json:"-" yaml:"-"`
-	Review   bool                     `json:"-" yaml:"-"`
 }
 
-func NewTwoPageEnvironmentTableService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*TwoPageEnvironmentTableService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("two-page environment table requires owned contexts and explicit feature lookup")
+func NewTwoPageEnvironmentTableService(contexts *vprocore.ContextService) (*TwoPageEnvironmentTableService, error) {
+	if contexts == nil {
+		return nil, errors.New("two-page environment table requires owned contexts")
 	}
-	enabled, err := vprocore.SiviFeature(TwoPageEnvironmentTableEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageEnvironmentTableService{contexts, enabled}, nil
+	return &TwoPageEnvironmentTableService{Contexts: contexts}, nil
 }
 
 func ReadEnvironmentTableTarget(s *vprocore.DesktopConfig, ctx context.Context) (string, error) {
@@ -106,8 +100,8 @@ func (s *TwoPageEnvironmentTableService) GetReview(ctx context.Context, contextI
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || s.Contexts == nil || !s.Review {
-		return nil, errors.New("two-page environment table requires independently enabled saved-data review")
+	if s == nil || s.Contexts == nil {
+		return nil, errors.New("two-page environment table requires owned contexts")
 	}
 	if plot == "" || !utf8.ValidString(plot) || offset < 0 || int64(offset) > int64(twoPageEnvironmentTableScanMaximum)*twoPageEnvironmentTableScanMaximum ||
 		limit < 1 || limit > twoPageEnvironmentTablePageMaximum {

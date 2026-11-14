@@ -26,6 +26,5 @@ func TestSummaryEffectiveReferenceWorkbookClientWire(t *testing.T) {
 			IncludeEnv: item.env, References: &item.references, Ancillary: item.ancillary}
 		wire[item.name] = portableSummaryWorkbookReview(t, service, state, options)
 	}
-	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookReferencesWire.json",
-		"VPRO_UPDATE_SUMMARY_REFERENCE_WORKBOOK_WIRE", wire)
+	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookReferencesWire.json", wire)
 }

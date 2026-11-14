@@ -11,12 +11,6 @@ import (
 	"errors"
 )
 
-const longVegetationSwitchPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_SWITCH_PREFERENCES"
-
-func LongVegetationSwitchPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationSwitchPreferencesFeatureEnvironment, lookup)
-}
-
 type LongVegetationSwitchPreferenceValues struct {
 	QuickReport         bool `json:"quickReport"`
 	SpaceBetweenGroups  bool `json:"spaceBetweenGroups"`
@@ -68,12 +62,11 @@ type LongVegetationSwitchPreferencesOutcome struct {
 
 type LongVegetationSwitchPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongVegetationSwitchPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationSwitchPreferencesService {
-	return &LongVegetationSwitchPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongVegetationSwitchPreferencesService(contexts *vprocore.ContextService) *LongVegetationSwitchPreferencesService {
+	return &LongVegetationSwitchPreferencesService{contexts: contexts}
 }
 
 func (s *LongVegetationSwitchPreferencesService) require(ctx context.Context, contextID string) error {
@@ -83,10 +76,7 @@ func (s *LongVegetationSwitchPreferencesService) require(ctx context.Context, co
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation switch preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation switch preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

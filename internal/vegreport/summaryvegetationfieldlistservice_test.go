@@ -37,7 +37,7 @@ func summaryFieldListOwnedFixture(t *testing.T) (*SummaryVegetationFieldListServ
 	if err := errors.Join(writeErr, db.Close()); err != nil {
 		t.Fatal(err)
 	}
-	return NewSummaryVegetationFieldListService(contexts, true), state.ContextID
+	return NewSummaryVegetationFieldListService(contexts), state.ContextID
 }
 
 func summaryFieldListAssertOwnedUnchanged(t *testing.T, service *SummaryVegetationFieldListService, before map[string][]byte, config []byte) {
@@ -105,22 +105,7 @@ func TestSummaryVegetationFieldListFacadeOwnedPhysicalAndWire(t *testing.T) {
 }
 
 func TestSummaryVegetationFieldListFacadeGateAndRequestRefusals(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}} {
-		enabled, err := SummaryVegetationFieldListFeature(func(key string) (string, bool) {
-			if key != "VPRO_SUMMARY_VEGETATION_FIELD_LIST" {
-				t.Fatal(key)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
-	for _, service := range []*SummaryVegetationFieldListService{nil, {}, NewSummaryVegetationFieldListService(nil, true)} {
+	for _, service := range []*SummaryVegetationFieldListService{nil, {}, NewSummaryVegetationFieldListService(nil)} {
 		if got, err := service.GetSummaryVegetationFieldList(t.Context(), "id"); got != nil || err == nil {
 			t.Fatal(got, err)
 		}

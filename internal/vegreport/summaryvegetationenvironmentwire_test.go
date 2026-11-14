@@ -65,14 +65,6 @@ func TestSummaryEnvironmentalClientWireFixture(t *testing.T) {
 		t.Fatal(err)
 	}
 	path := filepath.Join("frontend", "src", "summaryVegetationEnvironmentalWire.json")
-	if private := os.Getenv("VPRO_SUMMARY_ENVIRONMENT_WIRE_PATH"); private != "" {
-		path = private
-	}
-	if os.Getenv("VPRO_UPDATE_SUMMARY_ENVIRONMENT_WIRE") == "true" {
-		if err := os.WriteFile(path, append(encoded, '\n'), 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
 	actual, err := os.ReadFile(path)
 	if err != nil || !bytes.Equal(actual, append(encoded, '\n')) {
 		t.Fatal("production fixture differs", err)

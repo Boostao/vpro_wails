@@ -13,7 +13,6 @@ import (
 	"math"
 	"os"
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -103,10 +102,6 @@ func TestLongVegetationStrataIndependentGateAndOwnedInternalExternalReads(t *tes
 		vegetationSettings(options).Grouping != "strata" {
 		t.Fatal("source grouping2 lost identity", options, err)
 	}
-	if _, err := vprocore.SiviFeature(LongVegetationStrataFeatureEnvironment,
-		func(string) (string, bool) { return "TRUE", true }); err == nil {
-		t.Fatal("malformed gate accepted")
-	}
 	for _, external := range []bool{false, true} {
 		t.Run(map[bool]string{false: "internal", true: "external"}[external], func(t *testing.T) {
 			service, state := vprotest.ReportServiceFixture(t, external)
@@ -118,17 +113,6 @@ func TestLongVegetationStrataIndependentGateAndOwnedInternalExternalReads(t *tes
 				t.Fatal(err)
 			}
 			before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
-			for _, other := range []bool{false, true} {
-				service.LongVegetationLifeformEnabled, service.LongVegetationNoneEnabled = other, other
-				if _, err := GetLongVegetationOptions(service, context.Background(), state.ContextID); err == nil ||
-					!strings.Contains(err.Error(), "disabled in this session") {
-					t.Fatal("independent Strata options gate bypassed", err)
-				}
-				if _, err := PreviewLongVegetation(service, context.Background(), state.ContextID); err == nil {
-					t.Fatal("independent preview gate bypassed")
-				}
-			}
-			service.LongVegetationStrataEnabled = true
 			preview, err := PreviewLongVegetation(service, context.Background(), state.ContextID)
 			if err != nil || preview.Settings.Grouping != "strata" || len(preview.Report.Units) == 0 {
 				t.Fatal(preview, err)

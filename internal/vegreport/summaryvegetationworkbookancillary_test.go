@@ -28,7 +28,6 @@ const summaryAncillaryReviewedTime = "2026-10-17T02:00:00Z"
 func summaryAncillaryDesktopFixture(t *testing.T, external bool) (*SummaryVegetationWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	service, state := summaryDraftWorkbookFixture(t, external)
-	service.AncillaryEnabled = true
 	service.now = func() time.Time { return time.Date(2026, 10, 17, 2, 0, 0, 0, time.UTC) }
 	owner := service.source.environment.report.contexts.Projects.Sqlite
 	vprotest.MutateContextFixture(t, owner.Attachments["VLists"], `
@@ -180,19 +179,14 @@ func TestSummaryAncillaryDesktopModesReviewedTimeReopenAndZeroWrites(t *testing.
 	}
 }
 
-func TestSummaryAncillaryDesktopDefaultOffAndSummaryOnlyInputs(t *testing.T) {
+func TestSummaryAncillaryDesktopSummaryOnlyInputs(t *testing.T) {
 	service, state := summaryAncillaryDesktopFixture(t, false)
 	options := SummaryVegetationWorkbookOptions{Average: 1, Display: 6}
-	service.AncillaryEnabled = false
 	legacy, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
 	if err != nil || legacy.Ancillary != nil || legacy.Scope != summaryVegetationWorkbookDraftScope {
-		t.Fatal("independent ancillary gate changed legacy availability", legacy, err)
+		t.Fatal("ancillary support changed legacy availability", legacy, err)
 	}
 	options.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{}
-	if result, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options)); err == nil || result != nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("disabled ancillary mode fell back to legacy", result, err)
-	}
-	service.AncillaryEnabled = true
 	owner := service.source.environment.report.contexts.Projects.Sqlite
 	vprotest.MutateContextFixture(t, owner.Attachments["VLists"], `DROP TABLE MasterSiteUnitList`)
 	if result, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options)); err != nil || result == nil || result.Ancillary.Summary != nil {
@@ -283,7 +277,7 @@ func TestSummaryAncillaryDesktopTimestampModeGateAndCollisionBindApproval(t *tes
 	destination := filepath.Join(t.TempDir(), "literal # ' workbook.xlsx")
 	request := summaryVegetationWorkbookExportRequest{Options: options, ApprovalHash: review.ApprovalHash,
 		Destination: destination, CreatedAt: review.Ancillary.CreatedAt}
-	for _, mutation := range []string{"timestamp", "summary", "legacy", "gate"} {
+	for _, mutation := range []string{"timestamp", "summary", "legacy"} {
 		changed := request
 		switch mutation {
 		case "timestamp":
@@ -293,11 +287,8 @@ func TestSummaryAncillaryDesktopTimestampModeGateAndCollisionBindApproval(t *tes
 		case "legacy":
 			changed.Options.Ancillary = nil
 			changed.CreatedAt = ""
-		case "gate":
-			service.AncillaryEnabled = false
 		}
 		result, err := service.ExportReviewed(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, changed))
-		service.AncillaryEnabled = true
 		if err == nil || result != nil {
 			t.Fatal("changed creation/mode/availability reused approval", mutation, result, err)
 		}

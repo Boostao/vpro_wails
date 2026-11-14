@@ -84,12 +84,8 @@ func TestSubzoneMatrixDesktopWire(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	_ = encoded
 	path := filepath.Join("frontend", "src", "subzoneMatrixWire.json")
-	if os.Getenv("VPRO_SUBZONE_MATRIX_GENERATE_WIRE") == "true" {
-		if err := os.WriteFile(path, append(encoded, '\n'), 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
 	persisted, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

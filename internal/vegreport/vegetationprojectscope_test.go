@@ -45,8 +45,8 @@ func projectScopeAuthority(t *testing.T, service *LongVegetationReportScopeServi
 func TestProjectScopeExclusiveAuthorityRetainsIndependentDraftsAndZeroWrites(t *testing.T) {
 	for _, external := range []bool{false, true} {
 		contexts, state, _ := projectOwnedSourceFixture(t, external, false)
-		selected := NewLongVegetationSelectedUnitSelectionService(contexts, true)
-		scope := NewLongVegetationReportScopeService(contexts, true)
+		selected := NewLongVegetationSelectedUnitSelectionService(contexts)
+		scope := NewLongVegetationReportScopeService(contexts)
 		before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 		config, err := os.ReadFile(contexts.Projects.Preferences.Path)
 		if err != nil {
@@ -81,7 +81,7 @@ func TestProjectScopeExclusiveAuthorityRetainsIndependentDraftsAndZeroWrites(t *
 		if _, err := PreviewLongVegetation(contexts, ctx, state.ContextID); err == nil {
 			t.Fatal("legacy preview silently selected a list under project intent")
 		}
-		unitPrefs := NewLongVegetationUnitPreferencesService(contexts, true)
+		unitPrefs := NewLongVegetationUnitPreferencesService(contexts)
 		request := `{"expected":{"unitGroups":1},"proposed":{"unitGroups":1}}`
 		if outcome := unitPrefs.SaveLongVegetationUnitPreferences(ctx, state.ContextID, request); outcome.Committed || outcome.Changed || outcome.ErrorMessage == "" {
 			t.Fatal("legacy preference consumer used project authority", outcome)
@@ -145,7 +145,7 @@ func TestProjectScopeExclusiveAuthorityRetainsIndependentDraftsAndZeroWrites(t *
 
 func TestProjectScopeNoneContextOriginalEnvAndSource2RemainSeparate(t *testing.T) {
 	contexts, state, _ := projectOwnedSourceFixture(t, true, true)
-	service := NewLongVegetationReportScopeService(contexts, true)
+	service := NewLongVegetationReportScopeService(contexts)
 	ctx := context.Background()
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	active, err := service.SetLongVegetationReportScope(ctx, state.ContextID,
@@ -193,7 +193,7 @@ func TestProjectScopeNoneContextOriginalEnvAndSource2RemainSeparate(t *testing.T
 func TestProjectScopeBuildSourceConfigurationDriftAndExactRecovery(t *testing.T) {
 	private, state := vegetationWorkbookServiceFixture(t, true)
 	contexts := private.contexts
-	service := NewLongVegetationReportScopeService(contexts, true)
+	service := NewLongVegetationReportScopeService(contexts)
 	ctx := context.Background()
 	active, err := service.SetLongVegetationReportScope(ctx, state.ContextID,
 		projectScopeRequestJSON(t, "0", vprocore.VegetationProjectFieldsScope))
@@ -275,7 +275,7 @@ func TestProjectScopeStrictCASAndFailedInstallsAreAtomic(t *testing.T) {
 		}
 	}
 	private, state := vegetationWorkbookServiceFixture(t, false)
-	service := NewLongVegetationReportScopeService(private.contexts, true)
+	service := NewLongVegetationReportScopeService(private.contexts)
 	ctx := context.Background()
 	for _, revision := range []string{"", "00", "-1", "1", "9223372036854775808"} {
 		if _, err := service.SetLongVegetationReportScope(ctx, state.ContextID,
@@ -287,11 +287,6 @@ func TestProjectScopeStrictCASAndFailedInstallsAreAtomic(t *testing.T) {
 		projectScopeRequestJSON(t, "0", vprocore.VegetationProjectAllScope)); err == nil {
 		t.Fatal("source3 without original None context accepted")
 	}
-	service.enabled = false
-	if _, err := service.GetLongVegetationReportScope(ctx, state.ContextID); err == nil {
-		t.Fatal("disabled service inferred intent")
-	}
-	service.enabled = true
 	owner := private.contexts.Projects.Sqlite
 	owner.Mu.Lock()
 	short, cancel := context.WithTimeout(ctx, 20*time.Millisecond)
@@ -318,8 +313,8 @@ func TestProjectScopeStrictCASAndFailedInstallsAreAtomic(t *testing.T) {
 func TestProjectScopeStaleBuildAndSelectedBuildCannotInstallAcrossScopeSwitch(t *testing.T) {
 	for _, selectedBuild := range []bool{false, true} {
 		private, state := vegetationWorkbookServiceFixture(t, true)
-		scope := NewLongVegetationReportScopeService(private.contexts, true)
-		selected := NewLongVegetationSelectedUnitSelectionService(private.contexts, true)
+		scope := NewLongVegetationReportScopeService(private.contexts)
+		selected := NewLongVegetationSelectedUnitSelectionService(private.contexts)
 		ctx := context.Background()
 		var buildErr error
 		if selectedBuild {

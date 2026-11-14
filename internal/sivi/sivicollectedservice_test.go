@@ -28,12 +28,7 @@ func siviCollectedServiceFixture(t *testing.T, extended bool, strength int) (*SI
 		VALUES ('108050','D',10000003,0,'V')`); err != nil {
 		t.Fatal(err)
 	}
-	service, err := NewSIVICollectedService(contexts, func(name string) (string, bool) {
-		if name != SiviCollectedFeatureEnvironment {
-			t.Fatal("Collected consulted a predecessor permission", name)
-		}
-		return "true", true
-	})
+	service, err := NewSIVICollectedService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,47 +59,12 @@ func siviCollectedRequestJSON(t *testing.T, original []sourceform.SIVIVegetation
 	return string(data)
 }
 
-func TestSIVICollectedServiceIndependentStrictGateNilAndCanceled(t *testing.T) {
+func TestSIVICollectedServiceNilAndCanceled(t *testing.T) {
 	service, contexts, state, _, original, edits := siviCollectedServiceFixture(t, false, 3)
 	valid := siviCollectedRequestJSON(t, original, edits)
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	contexts.SiviHeightEnabled = true
-	_ = siviCoverServiceFixture(t, contexts, "true", true)
-	_ = siviCombinedServiceFixture(t, contexts)
-	defaultEnabled, err := NewSIVICollectedService(contexts, func(string) (string, bool) { return "", false })
-	if err != nil || !defaultEnabled.enabled {
-		t.Fatal("default SIVI collected gate disabled", defaultEnabled, err)
-	}
-	for _, present := range []bool{true} {
-		disabled, err := NewSIVICollectedService(contexts, func(name string) (string, bool) {
-			if name != SiviCollectedFeatureEnvironment {
-				t.Fatal("gate consulted predecessor", name)
-			}
-			return "false", present
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-		if got, err := disabled.GetOriginal(context.Background(), state.ContextID, "108050", false); err == nil || got != nil {
-			t.Fatal("disabled read succeeded", got, err)
-		}
-		if got, err := disabled.SaveReviewed(context.Background(), state.ContextID, "108050", false, valid); err == nil || got != nil {
-			t.Fatal("disabled Save succeeded", got, err)
-		}
-		if got, err := disabled.RestoreReviewed(context.Background(), state.ContextID, "108050", "1", vprocore.AuditRestoreCancel); err == nil || got != nil {
-			t.Fatal("disabled restore succeeded", got, err)
-		}
-	}
-	for _, value := range []string{"", "TRUE", "1", " true ", "yes"} {
-		if got, err := NewSIVICollectedService(contexts, func(string) (string, bool) { return value, true }); err == nil || got != nil {
-			t.Fatal("malformed feature accepted", value, got, err)
-		}
-	}
-	if got, err := NewSIVICollectedService(nil, func(string) (string, bool) { return "true", true }); err == nil || got != nil {
+	if got, err := NewSIVICollectedService(nil); err == nil || got != nil {
 		t.Fatal("nil owner accepted", got, err)
-	}
-	if got, err := NewSIVICollectedService(contexts, nil); err == nil || got != nil {
-		t.Fatal("nil lookup accepted", got, err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()

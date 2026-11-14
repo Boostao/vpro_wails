@@ -11,12 +11,6 @@ import (
 	"errors"
 )
 
-const longVegetationQualityNullPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_QUALITY_NULL_PREFERENCES"
-
-func LongVegetationQualityNullPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationQualityNullPreferencesFeatureEnvironment, lookup)
-}
-
 type LongVegetationQualityNullPreferenceValues struct {
 	SiteIncludeNulls bool `json:"siteIncludeNulls"`
 	VegIncludeNulls  bool `json:"vegIncludeNulls"`
@@ -67,12 +61,11 @@ type LongVegetationQualityNullPreferencesOutcome struct {
 
 type LongVegetationQualityNullPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongVegetationQualityNullPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationQualityNullPreferencesService {
-	return &LongVegetationQualityNullPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongVegetationQualityNullPreferencesService(contexts *vprocore.ContextService) *LongVegetationQualityNullPreferencesService {
+	return &LongVegetationQualityNullPreferencesService{contexts: contexts}
 }
 
 func (s *LongVegetationQualityNullPreferencesService) require(ctx context.Context, contextID string) error {
@@ -82,10 +75,7 @@ func (s *LongVegetationQualityNullPreferencesService) require(ctx context.Contex
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation quality Include Nulls preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation quality Include Nulls preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

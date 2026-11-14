@@ -23,12 +23,7 @@ func summaryEnvironmentalCountOwnedFixture(t *testing.T, external bool) (*Summar
 	contexts, state := vprotest.ReportServiceFixture(t, external)
 	vprotest.MutateContextFixture(t, contexts.Projects.Sqlite.Attachments["su"], `DELETE FROM Report_SU;
 		INSERT INTO Report_SU VALUES('P1','A'),('P1','A'),(NULL,'A'),('P2','a'),(NULL,'zero'),('',''),('P3',' A ')`)
-	service, err := NewSummaryVegetationEnvironmentalCountService(contexts, func(key string) (string, bool) {
-		if key != summaryVegetationEnvironmentalCountFeatureEnvironment {
-			t.Fatal("borrowed workflow gate", key)
-		}
-		return "true", true
-	})
+	service, err := NewSummaryVegetationEnvironmentalCountService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -36,22 +31,15 @@ func summaryEnvironmentalCountOwnedFixture(t *testing.T, external bool) (*Summar
 }
 
 func TestSummaryEnvironmentalCountServiceGateAndRequest(t *testing.T) {
-	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewSummaryVegetationEnvironmentalCountService(nil, func(string) (string, bool) { return flag, flag != "" })
-		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag != "false") {
-				t.Fatal(flag, service, err)
-			}
-			unit := "A"
-			if got, err := service.GetEnvironmentalPlotCount(t.Context(), "owned", &unit); got != nil || err == nil {
-				t.Fatal("unavailable service returned data", got, err)
-			}
-		} else if err == nil {
-			t.Fatal("nonliteral flag accepted", flag)
-		}
+	nilService, err := NewSummaryVegetationEnvironmentalCountService(nil)
+	if err != nil || nilService == nil {
+		t.Fatal(nilService, err)
+	}
+	unit := "A"
+	if got, err := nilService.GetEnvironmentalPlotCount(t.Context(), "owned", &unit); got != nil || err == nil {
+		t.Fatal("unavailable service returned data", got, err)
 	}
 	service, state := summaryEnvironmentalCountOwnedFixture(t, false)
-	unit := "A"
 	for _, id := range []string{"", "stale", state.ContextID + "\x00", string([]byte{0xff})} {
 		if got, err := service.GetEnvironmentalPlotCount(t.Context(), id, &unit); got != nil || err == nil {
 			t.Fatal("invalid context accepted", got, err)

@@ -123,20 +123,19 @@ type vegetationProjectWorkbookSource struct {
 
 type LongVegetationProjectWorkbookService struct {
 	scope    *LongVegetationReportScopeService
-	enabled  bool
 	now      func() time.Time
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongVegetationProjectWorkbookService(contexts *vprocore.ContextService, projectEnabled, workbookEnabled bool) *LongVegetationProjectWorkbookService {
+func NewLongVegetationProjectWorkbookService(contexts *vprocore.ContextService) *LongVegetationProjectWorkbookService {
 	return &LongVegetationProjectWorkbookService{
-		scope: NewLongVegetationReportScopeService(contexts, projectEnabled), enabled: workbookEnabled, now: time.Now,
+		scope: NewLongVegetationReportScopeService(contexts), now: time.Now,
 	}
 }
 
 func (s *LongVegetationProjectWorkbookService) require(ctx context.Context, contextID string) error {
-	if s == nil || !s.enabled || s.scope == nil {
-		return errors.New("project workbook publication is disabled in this session")
+	if s == nil || s.scope == nil {
+		return errors.New("project workbook service is unavailable")
 	}
 	return s.scope.require(ctx, contextID)
 }

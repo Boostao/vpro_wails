@@ -65,10 +65,6 @@ func TestTwoPageGoogleEarthOwnedOptionsAndHistoricalValues(t *testing.T) {
 			t.Fatal("unowned source options returned data", got, err)
 		}
 	}
-	service.Review = false
-	if got, err := service.GetOptions(context.Background(), state.ContextID, "108050", "FS882-8x6XL"); err == nil || got != nil {
-		t.Fatal("source options inherited another feature", got, err)
-	}
 }
 
 func TestTwoPageGoogleEarthOptionsPersistenceErrorAndRetry(t *testing.T) {
@@ -330,28 +326,8 @@ func TestTwoPageGoogleEarthRefusesInvalidPhysicalSourceAndRetries(t *testing.T) 
 	}
 }
 
-func TestTwoPageGoogleEarthIndependentGateAndStrictRequests(t *testing.T) {
+func TestTwoPageGoogleEarthStrictRequests(t *testing.T) {
 	service, state, _ := twoPageGoogleEarthFixture(t, false)
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		got, err := spatial.NewTwoPageGoogleEarthService(service.Contexts, func(name string) (string, bool) {
-			if name != "VPRO_TWO_PAGE_GOOGLE_EARTH_REVIEW" {
-				t.Fatal("unrelated feature lookup", name)
-			}
-			return test.value, test.present
-		})
-		if (err != nil) != test.invalid || err == nil && got.Review != test.enabled {
-			t.Fatal("nonliteral or inherited feature", test, got, err)
-		}
-		if err == nil && !got.Review {
-			if result, err := got.GetReview(context.Background(), state.ContextID, "108050", "FS882-8x6XL", twoPageGoogleEarthRequest); err == nil || result != nil {
-				t.Fatal("default-off facade returned data", result, err)
-			}
-		}
-	}
 	for _, request := range []string{
 		`{}`, `{"descriptionField":"PlotRepresenting","title":null}`, `{"descriptionField":"","title":"x"}`,
 		`{"descriptionField":"Missing","title":"x"}`, `{"descriptionField":"PlotRepresenting","title":"x","unknown":1}`,
@@ -374,7 +350,7 @@ func TestTwoPageGoogleEarthIndependentGateAndStrictRequests(t *testing.T) {
 			t.Fatal("unowned source request returned data", request, got, err)
 		}
 	}
-	if got, err := spatial.NewTwoPageGoogleEarthService(nil, nil); err == nil || got != nil {
+	if got, err := spatial.NewTwoPageGoogleEarthService(nil); err == nil || got != nil {
 		t.Fatal("missing ownership accepted", got, err)
 	}
 	cancelled, cancel := context.WithCancel(context.Background())

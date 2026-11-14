@@ -12,12 +12,6 @@ import (
 	"fmt"
 )
 
-const longVegetationEnforcementPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_ENFORCEMENT_PREFERENCES"
-
-func LongVegetationEnforcementPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationEnforcementPreferencesFeatureEnvironment, lookup)
-}
-
 type LongVegetationEnforcementPreferenceValues struct {
 	Enforce    bool `json:"enforce"`
 	UnitGroups int  `json:"unitGroups"`
@@ -71,13 +65,12 @@ type LongVegetationEnforcementPreferencesOutcome struct {
 
 type LongVegetationEnforcementPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 	printers func(context.Context) (vprocore.PrinterObservation, error)
 }
 
-func NewLongVegetationEnforcementPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationEnforcementPreferencesService {
-	return &LongVegetationEnforcementPreferencesService{contexts: contexts, enabled: enabled, printers: vprocore.ObservePrinters}
+func NewLongVegetationEnforcementPreferencesService(contexts *vprocore.ContextService) *LongVegetationEnforcementPreferencesService {
+	return &LongVegetationEnforcementPreferencesService{contexts: contexts, printers: vprocore.ObservePrinters}
 }
 
 func (s *LongVegetationEnforcementPreferencesService) require(ctx context.Context, contextID string) error {
@@ -87,10 +80,7 @@ func (s *LongVegetationEnforcementPreferencesService) require(ctx context.Contex
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation enforcement preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil || s.printers == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil || s.printers == nil {
 		return errors.New("Long Vegetation enforcement preference context or printer observer is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

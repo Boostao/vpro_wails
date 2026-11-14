@@ -13,7 +13,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -47,26 +46,12 @@ func sharedReferenceEdits(t *testing.T, service *sourceform.SIVIParentSharedServ
 	return edits
 }
 
-func TestSIVIParentSharedReferenceGatesAndPhysicalPolicies(t *testing.T) {
-	service, state, original := sftest.SharedReferenceFixture(t)
+func TestSIVIParentSharedReferencePhysicalPolicies(t *testing.T) {
+	service, _, original := sftest.SharedReferenceFixture(t)
 	if len(sourceform.SiviParentSharedReferenceFields) != 28 || len(sourceform.SiviParentSharedOwners) != 32 {
 		t.Fatal("scope count changed")
 	}
 	ctx := context.Background()
-	edits := sharedReferenceEdits(t, service, state, original)
-	service.ReferencesEnabled = false
-	if _, err := service.GetReferences(ctx, state.ContextID, "108050", vprocore.ProjectMetadataCell{Storage: "null"}); err == nil {
-		t.Fatal("reference gate bypassed")
-	}
-	before := vprotest.DatabaseBytes(t, service.Contexts.Projects.Sqlite.Attachments)
-	if _, err := service.Save(ctx, state.ContextID, "108050", sourceform.SIVIParentSharedWrite{Original: original, Edits: edits}); err == nil {
-		t.Fatal("disabled reference write accepted")
-	}
-	vprotest.AssertProfileSUFiles(t, service.Contexts, before)
-	fresh, err := service.GetOriginal(ctx, state.ContextID, "108050")
-	if err != nil || !reflect.DeepEqual(original, fresh) {
-		t.Fatal("reference gate changed accepted originals", err)
-	}
 	for _, field := range sourceform.SiviParentSharedReferenceFields {
 		bound := strings.Repeat("\U0001f600", field.Maximum/2) + strings.Repeat("x", field.Maximum%2)
 		for _, value := range []vprocore.ProjectMetadataCell{{Storage: "null"}, {Storage: "text", Text: &bound}} {
@@ -86,14 +71,7 @@ func TestSIVIParentSharedReferenceGatesAndPhysicalPolicies(t *testing.T) {
 			}
 		}
 	}
-	if _, err := sourceform.NewSIVIParentSharedService(service.Contexts, func(key string) (string, bool) {
-		if key == sourceform.SiviParentSharedReferenceEnvironment {
-			return "invalid", true
-		}
-		return "true", true
-	}); err == nil {
-		t.Fatal("invalid runtime gate silently repaired")
-	}
+	_ = service
 }
 
 func TestSIVIParentSharedSixRawReferenceDefinitionsOwnershipAndRetry(t *testing.T) {
@@ -245,7 +223,6 @@ func TestSIVIParentSharedTwentyEightReferencesAtomicMembershipAndAuthoritativeRe
 				t.Fatal("reference stale collision accepted")
 			}
 			service.References = sourceform.SiviParentSharedReferenceReaders{}
-			service.ReferencesEnabled = false
 			if _, err := service.Restore(ctx, state.ContextID, "108050", result.HistoryID, action); err != nil {
 				t.Fatal("historical restore required current catalogues/gate", err)
 			}
@@ -406,83 +383,30 @@ func TestSIVIParentSharedReferenceHistoricalNoOpNullableAndMissingCatalogues(t *
 	}
 }
 
-func TestSIVIParentSharedIndependentRuntimeGates(t *testing.T) {
-	service, state, _ := sftest.SharedReferenceFixture(t)
-	before := vprotest.DatabaseBytes(t, service.Contexts.Projects.Sqlite.Attachments)
-	for _, review := range []bool{false, true} {
-		for _, shared := range []bool{false, true} {
-			for _, reference := range []bool{false, true} {
-				service.Contexts.SiviParentReviewEnabled = review
-				gated, err := sourceform.NewSIVIParentSharedService(service.Contexts, func(name string) (string, bool) {
-					enabled := shared
-					if name == sourceform.SiviParentSharedReferenceEnvironment {
-						enabled = reference
-					}
-					return fmt.Sprint(enabled), true
-				})
-				if err != nil {
-					t.Fatal(err)
-				}
-				_, err = gated.GetOriginal(context.Background(), state.ContextID, "108050")
-				if (err == nil) != (review && shared) {
-					t.Fatal("reference gate changed the accepted original gate", review, shared, reference, err)
-				}
-				_, err = gated.GetReferences(context.Background(), state.ContextID, "108050", vprocore.ProjectMetadataCell{Storage: "null"})
-				if (err == nil) != (review && shared && reference) {
-					t.Fatal("reference gate was not independent", review, shared, reference, err)
-				}
-			}
-		}
-	}
-	service.Contexts.SiviParentReviewEnabled = true
-	omitted, err := sourceform.NewSIVIParentSharedService(service.Contexts, func(name string) (string, bool) {
-		return "true", name == sourceform.SiviParentSharedFeatureEnvironment
-	})
-	if err != nil || !omitted.ReferencesEnabled || !omitted.Enabled {
-		t.Fatal("omitted reference gate did not default-enable", err)
-	}
-	vprotest.AssertProfileSUFiles(t, service.Contexts, before)
-}
-
-func TestSIVIParentSharedReferenceRuntimeGatePreservesAcceptedThirtyTwo(t *testing.T) {
+func TestSIVIParentSharedReferencePreservesAcceptedThirtyTwo(t *testing.T) {
 	service, state, original, request := sftest.SharedServiceFixture(t)
 	ctx := context.Background()
-	for _, enabled := range []bool{false, true} {
-		service.ReferencesEnabled = enabled
-		fresh, err := service.GetOriginal(ctx, state.ContextID, "108050")
-		if err != nil || !reflect.DeepEqual(original, fresh) {
-			t.Fatal("reference runtime gate changed full physical originals", enabled, err)
-		}
-		for _, field := range sourceform.SiviParentSharedReferenceFields {
-			_ = sftest.SiviParentEdit(t, fresh, field.Column, vprocore.ProjectMetadataCell{Storage: "null"})
-		}
-		references, err := service.GetReferences(ctx, state.ContextID, "108050", vprocore.ProjectMetadataCell{Storage: "null"})
-		if enabled {
-			if err != nil || len(references.Fields) != 28 {
-				t.Fatal("enabled runtime reference read failed", err)
-			}
-		} else {
-			if err == nil || references != nil || !strings.Contains(err.Error(), "independently disabled") {
-				t.Fatal("disabled reference runtime lacked explicit denial", err)
-			}
-			before := vprotest.DatabaseBytes(t, service.Contexts.Projects.Sqlite.Attachments)
-			edit := sftest.SiviParentEdit(t, original, "RealmClass", vprocore.ProjectMetadataCell{Storage: "text", Text: vprotest.SiviSharedTestPointer("free")})
-			if _, err := service.Save(ctx, state.ContextID, "108050", sourceform.SIVIParentSharedWrite{Original: original, Edits: []sourceform.SIVIParentCellEdit{edit}}); err == nil {
-				t.Fatal("reference runtime denial fell back to a broader writer")
-			}
-			vprotest.AssertProfileSUFiles(t, service.Contexts, before)
-		}
-		result, err := service.Save(ctx, state.ContextID, "108050", request)
-		if err != nil || result.ChangedCells != len(request.Edits) {
-			t.Fatal("reference runtime gate disabled accepted 32-field Save", enabled, result, err)
-		}
-		if _, err := service.Restore(ctx, state.ContextID, "108050", result.HistoryID, vprocore.AuditRestorePrune); err != nil {
-			t.Fatal(err)
-		}
-		fresh, err = service.GetOriginal(ctx, state.ContextID, "108050")
-		if err != nil || !reflect.DeepEqual(original, fresh) {
-			t.Fatal("reference runtime gate changed accepted originals during restoration", enabled, err)
-		}
+	fresh, err := service.GetOriginal(ctx, state.ContextID, "108050")
+	if err != nil || !reflect.DeepEqual(original, fresh) {
+		t.Fatal("reference support changed full physical originals", err)
+	}
+	for _, field := range sourceform.SiviParentSharedReferenceFields {
+		_ = sftest.SiviParentEdit(t, fresh, field.Column, vprocore.ProjectMetadataCell{Storage: "null"})
+	}
+	references, err := service.GetReferences(ctx, state.ContextID, "108050", vprocore.ProjectMetadataCell{Storage: "null"})
+	if err != nil || len(references.Fields) != 28 {
+		t.Fatal("runtime reference read failed", err)
+	}
+	result, err := service.Save(ctx, state.ContextID, "108050", request)
+	if err != nil || result.ChangedCells != len(request.Edits) {
+		t.Fatal("reference support disabled accepted 32-field Save", result, err)
+	}
+	if _, err := service.Restore(ctx, state.ContextID, "108050", result.HistoryID, vprocore.AuditRestorePrune); err != nil {
+		t.Fatal(err)
+	}
+	fresh, err = service.GetOriginal(ctx, state.ContextID, "108050")
+	if err != nil || !reflect.DeepEqual(original, fresh) {
+		t.Fatal("reference support changed accepted originals during restoration", err)
 	}
 }
 

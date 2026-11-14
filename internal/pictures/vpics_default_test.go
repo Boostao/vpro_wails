@@ -22,7 +22,7 @@ func TestPictureServiceDefaultsToCanonicalVPicsWithoutEnvVars(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewPictureService with zero env vars failed: %v", err)
 	}
-	if !svc.Enabled || svc.source == nil || svc.directories.child == nil || svc.directories.manager == nil {
+	if svc.source == nil || svc.directories.child == nil || svc.directories.manager == nil {
 		t.Fatalf("expected PictureService + child/manager dirs enabled by default, got %+v", svc)
 	}
 	wantVPics := filepath.Join(contexts.Projects.Root, "database-family", "VPics.db")
@@ -30,16 +30,16 @@ func TestPictureServiceDefaultsToCanonicalVPicsWithoutEnvVars(t *testing.T) {
 		t.Fatalf("expected canonical VPics.db at %s: %v", wantVPics, err)
 	}
 
-	metaSvc, err := NewPictureMetadataService(svc, emptyLookup)
-	if err != nil || !metaSvc.enabled {
+	metaSvc, err := NewPictureMetadataService(svc)
+	if err != nil || metaSvc == nil {
 		t.Fatalf("expected PictureMetadataService enabled by default: %+v (%v)", metaSvc, err)
 	}
-	createSvc, err := NewPictureCreationService(svc, emptyLookup)
-	if err != nil || !createSvc.enabled {
+	createSvc, err := NewPictureCreationService(svc)
+	if err != nil || createSvc == nil {
 		t.Fatalf("expected PictureCreationService enabled by default: %+v (%v)", createSvc, err)
 	}
-	delSvc, err := NewPictureDeletionService(svc, emptyLookup)
-	if err != nil || !delSvc.writing || !delSvc.restoring {
+	delSvc, err := NewPictureDeletionService(svc)
+	if err != nil || delSvc == nil {
 		t.Fatalf("expected PictureDeletionService enabled by default: %+v (%v)", delSvc, err)
 	}
 

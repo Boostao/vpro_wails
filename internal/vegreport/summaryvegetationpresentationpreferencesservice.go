@@ -11,12 +11,7 @@ import (
 	"errors"
 )
 
-const summaryVegetationPresentationPreferencesFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_PRESENTATION_PREFERENCES"
 const summaryVegetationPresentationPreferencesSource = "owned native YAML saved Summary presentation; explicit Save adaptation; constancy-on forces Group by3/Display1/common names off without clearing limit; no guide renames, field-list writes or report-consumer parity"
-
-func SummaryVegetationPresentationPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(summaryVegetationPresentationPreferencesFeatureEnvironment, lookup)
-}
 
 type SummaryVegetationPresentationPreferenceValues struct {
 	Title           string  `json:"title"`
@@ -80,12 +75,11 @@ type SummaryVegetationPresentationPreferencesOutcome struct {
 
 type SummaryVegetationPresentationPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewSummaryVegetationPresentationPreferencesService(contexts *vprocore.ContextService, enabled bool) *SummaryVegetationPresentationPreferencesService {
-	return &SummaryVegetationPresentationPreferencesService{contexts: contexts, enabled: enabled}
+func NewSummaryVegetationPresentationPreferencesService(contexts *vprocore.ContextService) *SummaryVegetationPresentationPreferencesService {
+	return &SummaryVegetationPresentationPreferencesService{contexts: contexts}
 }
 
 func (s *SummaryVegetationPresentationPreferencesService) require(ctx context.Context, contextID string) error {
@@ -95,10 +89,7 @@ func (s *SummaryVegetationPresentationPreferencesService) require(ctx context.Co
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Summary Vegetation presentation preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Summary Vegetation presentation preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

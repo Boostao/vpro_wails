@@ -92,7 +92,7 @@ func TestTwoPageProfilingOwnedPhysicalOriginalsNoWrites(t *testing.T) {
 
 func TestTwoPageProfilingExplicitSelectionScopeAndRetirement(t *testing.T) {
 	environment, state, _ := twoPageEnvironmentTableFixture(t, false)
-	service, err := classification.NewTwoPageProfilingService(environment.Contexts, func(string) (string, bool) { return "true", true })
+	service, err := classification.NewTwoPageProfilingService(environment.Contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,27 +123,8 @@ func TestTwoPageProfilingExplicitSelectionScopeAndRetirement(t *testing.T) {
 
 func TestTwoPageProfilingGateInputsAndPaging(t *testing.T) {
 	service, state, db := twoPageProfilingFixture(t, false, false)
-	if defaultGated, err := classification.NewTwoPageProfilingService(service.Contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultGated.Review {
-		t.Fatal("default profiling gate not enabled", defaultGated, err)
-	}
-	for _, value := range []string{"false", "TRUE", "1", " true "} {
-		gated, err := classification.NewTwoPageProfilingService(service.Contexts, func(string) (string, bool) { return value, value != "" })
-		if value == "" || value == "false" {
-			if err != nil {
-				t.Fatal(err)
-			}
-			if got, err := gated.GetReview(context.Background(), state.ContextID, "108050", 0, 1); err == nil || got != nil {
-				t.Fatal("default/off service returned mapped data", got, err)
-			}
-		} else if err == nil {
-			t.Fatal("nonliteral gate accepted", value)
-		}
-	}
-	if _, err := classification.NewTwoPageProfilingService(nil, os.LookupEnv); err == nil {
+	if _, err := classification.NewTwoPageProfilingService(nil); err == nil {
 		t.Fatal("missing owner accepted")
-	}
-	if _, err := classification.NewTwoPageProfilingService(service.Contexts, nil); err == nil {
-		t.Fatal("missing lookup accepted")
 	}
 	if got, err := service.GetReview(nil, state.ContextID, "108050", 0, 1); err == nil || got != nil {
 		t.Fatal("nil request accepted", got, err)

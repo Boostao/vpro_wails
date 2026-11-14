@@ -35,10 +35,7 @@ type summaryClassExpected struct {
 }
 
 func TestSummaryVegetationClassSealedSourceFixtures(t *testing.T) {
-	path := os.Getenv("VPRO_SUMMARY_CLASS_FIXTURE")
-	if path == "" {
-		path = filepath.Join("testdata", "summaryVegetationClassSource.json")
-	}
+	path := filepath.Join("testdata", "summaryVegetationClassSource.json")
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

@@ -12,12 +12,6 @@ import (
 	"fmt"
 )
 
-const longVegetationNamingPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_NAMING_PREFERENCES"
-
-func LongVegetationNamingPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationNamingPreferencesFeatureEnvironment, lookup)
-}
-
 type LongVegetationNamingPreferenceValues struct {
 	Mode          int    `json:"mode"`
 	SelectedField string `json:"selectedField"`
@@ -90,12 +84,11 @@ type LongVegetationNamingPreferencesOutcome struct {
 
 type LongVegetationNamingPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongVegetationNamingPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationNamingPreferencesService {
-	return &LongVegetationNamingPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongVegetationNamingPreferencesService(contexts *vprocore.ContextService) *LongVegetationNamingPreferencesService {
+	return &LongVegetationNamingPreferencesService{contexts: contexts}
 }
 
 func (s *LongVegetationNamingPreferencesService) require(ctx context.Context, contextID string) error {
@@ -105,17 +98,14 @@ func (s *LongVegetationNamingPreferencesService) require(ctx context.Context, co
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation Show preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation Show preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)
 }
 
 func (s *LongVegetationNamingPreferencesService) availability() LongVegetationNamingAvailability {
-	return LongVegetationNamingAvailability{None: true, English: true, Code: s.contexts.LongVegetationCodeEnabled}
+	return LongVegetationNamingAvailability{None: true, English: true, Code: true}
 }
 
 func (s *LongVegetationNamingPreferencesService) GetLongVegetationNamingPreferences(ctx context.Context, contextID string) (*LongVegetationNamingPreferencesReview, error) {
@@ -152,7 +142,7 @@ func (s *LongVegetationNamingPreferencesService) SaveLongVegetationNamingPrefere
 				return struct{}{}, readErr
 			}
 			if request.Expected != request.Proposed && !s.availability().allows(request.Proposed.Mode) {
-				return struct{}{}, fmt.Errorf("Long Vegetation Show choice %d is disabled in this session; saved naming values were not reset", request.Proposed.Mode)
+				return struct{}{}, fmt.Errorf("Long Vegetation Show choice %d is unavailable on this control; saved naming values were not reset", request.Proposed.Mode)
 			}
 			update, saveErr := CompareAndSetLongVegetationNamingPreferences(plots.Projects.Preferences, ctx, request.Expected, request.Proposed)
 			outcome.Changed, outcome.Committed = update.Changed, update.Committed

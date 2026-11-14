@@ -12,8 +12,6 @@ import (
 	"fmt"
 )
 
-const SiviIdentityFeatureEnvironment = "VPRO_SIVI_IDENTITY_EDITING"
-
 type SIVIIdentityWrite struct {
 	Original []sourceform.SIVIVegetationProjection `json:"original"`
 	Edits    []sourceform.SIVIHeightEdit           `json:"edits"`
@@ -68,18 +66,13 @@ func (request *SIVIIdentityWrite) UnmarshalJSON(data []byte) error {
 
 type SIVIIdentityService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewSIVIIdentityService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SIVIIdentityService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("SIVI identity service requires context ownership and an explicit feature lookup")
+func NewSIVIIdentityService(contexts *vprocore.ContextService) (*SIVIIdentityService, error) {
+	if contexts == nil {
+		return nil, errors.New("SIVI identity service requires context ownership")
 	}
-	enabled, err := vprocore.SiviFeature(SiviIdentityFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SIVIIdentityService{contexts: contexts, enabled: enabled}, nil
+	return &SIVIIdentityService{contexts: contexts}, nil
 }
 
 func (s *SIVIIdentityService) require(ctx context.Context) error {
@@ -89,8 +82,8 @@ func (s *SIVIIdentityService) require(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.contexts == nil || !s.enabled {
-		return errors.New("SIVI identity editing is disabled in this session")
+	if s == nil || s.contexts == nil {
+		return errors.New("SIVI identity service requires context ownership")
 	}
 	return nil
 }

@@ -10,12 +10,7 @@ import (
 	"errors"
 )
 
-const summaryVegetationFieldListFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_FIELD_LIST"
 const summaryVegetationFieldListSource = "owned imported SQLite VPro64.USysShortVegSummaryFieldList; complete physical rows; Label read-only"
-
-func SummaryVegetationFieldListFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(summaryVegetationFieldListFeatureEnvironment, lookup)
-}
 
 type SummaryVegetationFieldListReview struct {
 	ContextID   string                        `json:"contextId"`
@@ -36,12 +31,11 @@ type SummaryVegetationFieldListSelection struct {
 
 type SummaryVegetationFieldListService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewSummaryVegetationFieldListService(contexts *vprocore.ContextService, enabled bool) *SummaryVegetationFieldListService {
-	return &SummaryVegetationFieldListService{contexts: contexts, enabled: enabled}
+func NewSummaryVegetationFieldListService(contexts *vprocore.ContextService) *SummaryVegetationFieldListService {
+	return &SummaryVegetationFieldListService{contexts: contexts}
 }
 
 func (s *SummaryVegetationFieldListService) require(ctx context.Context, contextID string) error {
@@ -51,10 +45,7 @@ func (s *SummaryVegetationFieldListService) require(ctx context.Context, context
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Summary environmental field-list is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Summary environmental field-list context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

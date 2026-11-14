@@ -16,74 +16,26 @@ import (
 	"testing"
 )
 
-func TestTwoPageParentExtraServiceIndependentGatesAndOwnedReads(t *testing.T) {
+func TestTwoPageParentExtraServiceOwnedReadsAndCancellation(t *testing.T) {
 	contexts, state, _, parent, edits := twoPageWriteFixture(t, "FS882-8x6XL", false)
-	for _, review := range []bool{false, true} {
-		for _, editing := range []bool{false, true} {
-			service, err := twopage.NewTwoPageParentExtraService(contexts, func(name string) (string, bool) {
-				if name == twopage.TwoPageParentReviewEnvironment {
-					return strconv.FormatBool(review), true
-				}
-				if name == twopage.TwoPageParentExtraEditingEnvironment {
-					return strconv.FormatBool(editing), true
-				}
-				t.Fatal("unexpected inherited authorization lookup", name)
-				return "", false
-			})
-			if err != nil {
-				t.Fatal(err)
-			}
-			before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-			got, err := service.GetOriginal(context.Background(), state.ContextID, "108050", parent.Form)
-			if review {
-				if err != nil || !reflect.DeepEqual(got, parent) {
-					t.Fatal("two-page review depends on an unrelated SIVI gate", got, err)
-				}
-			} else if err == nil || got != nil {
-				t.Fatal("disabled review published original", got, err)
-			}
-			if !review || !editing {
-				if got, err := service.Save(context.Background(), state.ContextID, "108050", parent.Form, twopage.TwoPageParentExtraWrite{Original: parent, Edits: edits}); err == nil || got != nil {
-					t.Fatal("disabled service authorized writes", got, err)
-				}
-				if got, err := service.Restore(context.Background(), state.ContextID, "108050", parent.Form, "1", vprocore.AuditRestoreCancel); err == nil || got != nil {
-					t.Fatal("disabled service bypassed restoration authorization", got, err)
-				}
-			}
-			vprotest.AssertProfileSUFiles(t, contexts, before)
-		}
-	}
-	if _, err := twopage.NewTwoPageParentExtraService(nil, func(string) (string, bool) { return "true", true }); err == nil {
+	if _, err := twopage.NewTwoPageParentExtraService(nil); err == nil {
 		t.Fatal("nil owner accepted")
 	}
-	if _, err := twopage.NewTwoPageParentExtraService(contexts, nil); err == nil {
-		t.Fatal("implicit environment lookup accepted")
-	}
-	for _, name := range []string{twopage.TwoPageParentReviewEnvironment, twopage.TwoPageParentExtraEditingEnvironment} {
-		if _, err := twopage.NewTwoPageParentExtraService(contexts, func(key string) (string, bool) {
-			if key == name {
-				return "invalid boolean", true
-			}
-			return "true", true
-		}); err == nil {
-			t.Fatal("malformed flag silently defaulted", name)
-		}
-	}
-	if defaultService, err := twopage.NewTwoPageParentExtraService(contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultService.ReviewEnabled || !defaultService.EditsEnabled {
-		t.Fatal("default extra flags disabled", defaultService, err)
-	}
-	service, err := twopage.NewTwoPageParentExtraService(contexts, func(string) (string, bool) { return "false", true })
+	service, err := twopage.NewTwoPageParentExtraService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, err := service.GetOriginal(context.Background(), state.ContextID, "108050", parent.Form); err == nil || got != nil {
-		t.Fatal("missing flags enabled review", got, err)
+	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
+	got, err := service.GetOriginal(context.Background(), state.ContextID, "108050", parent.Form)
+	if err != nil || !reflect.DeepEqual(got, parent) {
+		t.Fatal("two-page review did not preserve source", got, err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	if got, err := service.Save(ctx, state.ContextID, "108050", parent.Form, twopage.TwoPageParentExtraWrite{Original: parent, Edits: edits}); !errors.Is(err, context.Canceled) || got != nil {
 		t.Fatal("cancelled service returned a gate error or committed", got, err)
 	}
+	vprotest.AssertProfileSUFiles(t, contexts, before)
 }
 
 func TestTwoPageParentExtraServiceTypedRawUnicodeAndStrictTransport(t *testing.T) {
@@ -130,7 +82,7 @@ func TestTwoPageParentExtraServiceTypedRawUnicodeAndStrictTransport(t *testing.T
 
 func TestTwoPageParentExtraServiceEnabledSaveRestoreAndScopeDenial(t *testing.T) {
 	contexts, state, _, parent, edits := twoPageWriteFixture(t, "FS882-8x6XL-CHARS", true)
-	service, err := twopage.NewTwoPageParentExtraService(contexts, func(string) (string, bool) { return "true", true })
+	service, err := twopage.NewTwoPageParentExtraService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}

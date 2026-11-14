@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestSummaryVegetationQualityOptInRefusesUnqualifiedPreviewWithoutChangingFeatureOff(t *testing.T) {
+func TestSummaryVegetationQualityEnforceRefusesUnqualifiedPreview(t *testing.T) {
 	service, state := summaryVegetationServiceFixture(t, false)
 	baseline, err := service.Preview(context.Background(), state.ContextID, 1, 6)
 	if err != nil {
@@ -16,11 +16,6 @@ func TestSummaryVegetationQualityOptInRefusesUnqualifiedPreviewWithoutChangingFe
 	if err := service.contexts.Projects.Preferences.Update("ReportOptions", map[string]any{"DataQualityFilterEnforce": true}); err != nil {
 		t.Fatal(err)
 	}
-	unchanged, err := service.Preview(context.Background(), state.ContextID, 1, 6)
-	if err != nil || !reflect.DeepEqual(baseline, unchanged) {
-		t.Fatal("new quality gate changed existing feature-off behavior", unchanged, err)
-	}
-	service.QualityPreferences = true
 	for _, preview := range []func() (SummaryVegetationPreview, error){
 		func() (SummaryVegetationPreview, error) {
 			return service.Preview(context.Background(), state.ContextID, 1, 6)

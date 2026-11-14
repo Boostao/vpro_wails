@@ -24,37 +24,6 @@ func TestTwoPageSoilCreationWire(t *testing.T) {
 		Request json.RawMessage `json:"request"`
 		Receipt json.RawMessage `json:"receipt"`
 	}
-	target := os.Getenv("VPRO_SOIL_CREATION_WIRE_OUTPUT")
-	if target != "" {
-		cases := []wireCase{}
-		for _, form := range []string{"SoilHumusXL", "SoilMineralXL"} {
-			for strength := 0; strength <= 3; strength++ {
-				service, state, _, request := soilCreationWriteFixture(t, false, form, strength)
-				raw, err := json.Marshal(request)
-				if err != nil {
-					t.Fatal(err)
-				}
-				result, err := service.CreateHorizon(context.Background(), state.ContextID, string(raw))
-				if err != nil {
-					t.Fatal(err)
-				}
-				encoded, err := json.Marshal(result)
-				if err != nil {
-					t.Fatal(err)
-				}
-				cases = append(cases, wireCase{Name: fmt.Sprintf("%s/%d", form, strength), Request: raw, Receipt: encoded})
-			}
-		}
-		file, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
-		if err != nil {
-			t.Fatal(err)
-		}
-		encodeErr := json.NewEncoder(file).Encode(cases)
-		if err := errors.Join(encodeErr, file.Close()); err != nil {
-			t.Fatal(err)
-		}
-		return
-	}
 	raw, err := os.ReadFile(filepath.Join("frontend", "src", "twoPageSoilCreationWire.json"))
 	if err != nil {
 		t.Fatal(err)
@@ -114,8 +83,7 @@ func soilCreationWriteFixture(t *testing.T, external bool, form string, strength
 		"(ID,PlotNumber,Horizon,Flag) VALUES(2,'108050','old',0),(1,'other','peer',-1),(-7,'108050','history',NULL),(NULL,'108050','null ID',NULL)"); err != nil {
 		t.Fatal(err)
 	}
-	service := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true",
-		twoPageSoilWritingEnvironment: "true", twoPageSoilCreationEnvironment: "true"})
+	service := soilFacade(t, contexts)
 	original, err := service.GetOriginal(context.Background(), state.ContextID, "108050", form)
 	if err != nil {
 		t.Fatal(err)
@@ -183,7 +151,7 @@ func TestTwoPageSoilCreationAtomicWriterAndRecovery(t *testing.T) {
 						}
 					}
 					before = vprotest.DatabaseBytes(t, service.contexts.Projects.Sqlite.Attachments)
-					readOnly := soilFacade(t, service.contexts, map[string]string{twoPageSoilReviewEnvironment: "true"})
+					readOnly := soilFacade(t, service.contexts)
 					outcome, err := readOnly.RecoverOutcome(context.Background(), state.ContextID, string(raw))
 					if err != nil || outcome.Status != "committed" || outcome.Receipt == nil || !outcome.Receipt.Replayed {
 						t.Fatal("read-only recovery lost committed creation", outcome, err)
@@ -243,23 +211,10 @@ func TestTwoPageSoilCreationRollbackAndPermanentIDs(t *testing.T) {
 		t.Fatal("deleted current/peer identity was reused", id, err)
 	}
 }
-func TestTwoPageSoilCreationIndependentGatesAndStrictTransport(t *testing.T) {
+func TestTwoPageSoilCreationStrictTransport(t *testing.T) {
 	service, state, _, request := soilCreationWriteFixture(t, false, "SoilHumusXL", 3)
 	raw := soilAttemptJSON(t, request)
 	before := vprotest.DatabaseBytes(t, service.contexts.Projects.Sqlite.Attachments)
-	for mask := 0; mask < 7; mask++ {
-		flags := map[string]string{}
-		for bit, name := range []string{twoPageSoilReviewEnvironment, twoPageSoilWritingEnvironment, twoPageSoilCreationEnvironment} {
-			if mask&(1<<bit) != 0 {
-				flags[name] = "true"
-			} else {
-				flags[name] = "false"
-			}
-		}
-		if result, err := soilFacade(t, service.contexts, flags).CreateHorizon(context.Background(), state.ContextID, raw); err == nil || result != nil {
-			t.Fatal("creation bypassed an independent prerequisite", mask, result, err)
-		}
-	}
 	for _, malformed := range []string{
 		strings.Replace(raw, `"horizon":" Oh "`, `"horizon":null`, 1),
 		strings.Replace(raw, `"horizon":" Oh "`, `"horizon":""`, 1),
@@ -332,7 +287,7 @@ func TestTwoPageSoilCreationCancellationAndCompletionRecovery(t *testing.T) {
 					committed && (result == nil || !result.DidCommit) {
 					t.Fatal("creation completion confused physical commit boundary", result, err)
 				}
-				readOnly := soilFacade(t, service.contexts, map[string]string{twoPageSoilReviewEnvironment: "true"})
+				readOnly := soilFacade(t, service.contexts)
 				outcome, err := readOnly.RecoverOutcome(context.Background(), state.ContextID, raw)
 				if err != nil || outcome == nil {
 					t.Fatal("read-only creation recovery failed", outcome, err)

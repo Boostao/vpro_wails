@@ -18,19 +18,8 @@ import (
 	"testing"
 )
 
-func TestTableCSVArchiveServiceIndependentGateAndAuthorization(t *testing.T) {
-	for _, value := range []string{"", "true", "false", "TRUE", "1", " true", "true "} {
-		enabled, err := TableCSVArchiveFeature(func(key string) (string, bool) {
-			if key != tableCSVArchiveFeatureEnvironment {
-				t.Fatal("archive export inherited another flag", key)
-			}
-			return value, value != ""
-		})
-		if enabled != (value == "" || value == "true") || (err != nil) != (value != "" && value != "true" && value != "false") {
-			t.Fatal("literal flag semantics", value, enabled, err)
-		}
-	}
-	for _, service := range []*TableCSVArchiveService{nil, NewTableCSVArchiveService(nil, false), NewTableCSVArchiveService(nil, true)} {
+func TestTableCSVArchiveServiceUnavailableAuthorization(t *testing.T) {
+	for _, service := range []*TableCSVArchiveService{nil, NewTableCSVArchiveService(nil)} {
 		if result, err := service.GetTableCSVArchiveReview(context.Background(), "owned", "{}"); result != nil || err == nil {
 			t.Fatal("unavailable review accepted", result, err)
 		}
@@ -38,7 +27,7 @@ func TestTableCSVArchiveServiceIndependentGateAndAuthorization(t *testing.T) {
 			t.Fatal("unavailable export accepted", result, err)
 		}
 	}
-	service := NewTableCSVArchiveService(nil, true)
+	service := NewTableCSVArchiveService(nil)
 	if result, err := service.GetTableCSVArchiveReview(nil, "", "{}"); result != nil || err == nil {
 		t.Fatal("nil request context accepted")
 	}
@@ -74,7 +63,7 @@ func TestTableCSVArchiveServiceStrictRawRequests(t *testing.T) {
 		}
 	}
 	contexts, state, _ := ownedTableCSVPublicationFixture(t)
-	service := NewTableCSVArchiveService(contexts, true)
+	service := NewTableCSVArchiveService(contexts)
 	for _, table := range []string{"", "sample_Other", "Sample_SU", "Sample_Env;SELECT 1", "Sample_\x00Other"} {
 		raw, err := json.Marshal(TableCSVArchiveReviewRequest{Table: table})
 		if err != nil {
@@ -88,9 +77,7 @@ func TestTableCSVArchiveServiceStrictRawRequests(t *testing.T) {
 
 func TestTableCSVArchiveServiceReviewPublicationCollisionAndNoWrites(t *testing.T) {
 	contexts, state, source := ownedTableCSVPublicationFixture(t)
-	// The archive's independent gate does not require the read-only UI gate.
-	contexts.TableCSVReviewEnabled = false
-	service := NewTableCSVArchiveService(contexts, true)
+	service := NewTableCSVArchiveService(contexts)
 	review, err := service.GetTableCSVArchiveReview(context.Background(), state.ContextID, `{"table":"Sample_Other"}`)
 	if err != nil {
 		t.Fatal(err)
@@ -134,7 +121,7 @@ func TestTableCSVArchiveServiceReviewPublicationCollisionAndNoWrites(t *testing.
 func TestTableCSVArchiveServiceApprovalBindsMetadataPresenceAndOwnership(t *testing.T) {
 	contexts, state, _ := ownedTableCSVPublicationFixture(t)
 	tableCSVProjectWriter(t, contexts, `DELETE FROM _table_metadata`)
-	service := NewTableCSVArchiveService(contexts, true)
+	service := NewTableCSVArchiveService(contexts)
 	review, err := service.GetTableCSVArchiveReview(context.Background(), state.ContextID, `{"table":"Sample_Other"}`)
 	if err != nil {
 		t.Fatal(err)
@@ -180,7 +167,7 @@ func TestTableCSVArchiveServiceApprovalBindsMetadataPresenceAndOwnership(t *test
 
 func TestTableCSVArchiveServiceAllCoreTablesAndLiteralHashRefusal(t *testing.T) {
 	contexts, state, _ := ownedTableCSVPublicationFixture(t)
-	service := NewTableCSVArchiveService(contexts, true)
+	service := NewTableCSVArchiveService(contexts)
 	for _, suffix := range vprocore.CoreTables {
 		raw, err := json.Marshal(TableCSVArchiveReviewRequest{Table: state.ActiveProject + "_" + suffix})
 		if err != nil {
@@ -212,7 +199,7 @@ func TestTableCSVArchiveServiceRawSourceDriftAndStaleContext(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			contexts, state, _ := ownedTableCSVPublicationFixture(t)
-			service := NewTableCSVArchiveService(contexts, true)
+			service := NewTableCSVArchiveService(contexts)
 			review, err := service.GetTableCSVArchiveReview(context.Background(), state.ContextID, `{"table":"Sample_Other"}`)
 			if err != nil {
 				t.Fatal(err)
@@ -236,7 +223,7 @@ func TestTableCSVArchiveServiceRawSourceDriftAndStaleContext(t *testing.T) {
 
 func TestTableCSVArchiveServicePrecommitCleanupReturnsTypedRefusalAndRetry(t *testing.T) {
 	contexts, state, _ := ownedTableCSVPublicationFixture(t)
-	service := NewTableCSVArchiveService(contexts, true)
+	service := NewTableCSVArchiveService(contexts)
 	review, err := service.GetTableCSVArchiveReview(context.Background(), state.ContextID, `{"table":"Sample_Other"}`)
 	if err != nil {
 		t.Fatal(err)
@@ -289,7 +276,7 @@ func TestTableCSVArchiveApprovalCancellationAndCallerDetachment(t *testing.T) {
 }
 func TestTableCSVArchiveServiceCommittedReadCleanupWarning(t *testing.T) {
 	contexts, state, _ := ownedTableCSVPublicationFixture(t)
-	service := NewTableCSVArchiveService(contexts, true)
+	service := NewTableCSVArchiveService(contexts)
 	review, err := service.GetTableCSVArchiveReview(context.Background(), state.ContextID, `{"table":"Sample_Other"}`)
 	if err != nil {
 		t.Fatal(err)

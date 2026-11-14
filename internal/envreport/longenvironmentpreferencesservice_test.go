@@ -30,25 +30,10 @@ func longEnvironmentPreferenceRequest(t *testing.T, expected, proposed string) s
 	return string(raw)
 }
 
-func TestLongEnvironmentPreferencesFacadeGate(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		got, err := LongEnvironmentPreferencesFeature(func(name string) (string, bool) {
-			if name != "VPRO_LONG_ENVIRONMENT_PREFERENCES" {
-				t.Fatal(name)
-			}
-			return test.value, test.present
-		})
-		if got != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, got, err)
-		}
-	}
+func TestLongEnvironmentPreferencesFacadeUnavailableGuards(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*LongEnvironmentPreferencesService{nil, {}, NewLongEnvironmentPreferencesService(nil, true)} {
+	for _, service := range []*LongEnvironmentPreferencesService{nil, {}, NewLongEnvironmentPreferencesService(nil)} {
 		for _, requestCtx := range []context.Context{nil, context.Background(), ctx} {
 			if value, err := service.GetLongEnvironmentPreferences(requestCtx, "id"); value != nil || err == nil {
 				t.Fatal(value, err)
@@ -62,14 +47,7 @@ func TestLongEnvironmentPreferencesFacadeGate(t *testing.T) {
 
 func TestLongEnvironmentPreferencesFacadeOwnedYAMLOnlyCAS(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongEnvironmentPreferencesService(contexts, true)
-	disabled := NewLongEnvironmentPreferencesService(contexts, false)
-	if value, err := disabled.GetLongEnvironmentPreferences(context.Background(), state.ContextID); value != nil || err == nil {
-		t.Fatal("live context implicitly enabled preferences", value, err)
-	}
-	if value := disabled.SaveLongEnvironmentPreferences(context.Background(), state.ContextID, "{}"); value.Committed || value.ErrorMessage == "" {
-		t.Fatal(value)
-	}
+	service := NewLongEnvironmentPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	got, err := service.GetLongEnvironmentPreferences(context.Background(), state.ContextID)
 	if err != nil || got.ContextID != state.ContextID || got.Project != contexts.Projects.Sqlite.Selection.Project || got.ProjectPath != state.ProjectPath ||
@@ -105,7 +83,7 @@ func TestLongEnvironmentPreferencesFacadeOwnedYAMLOnlyCAS(t *testing.T) {
 
 func TestLongEnvironmentPreferencesFacadeStrictTransport(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongEnvironmentPreferencesService(contexts, true)
+	service := NewLongEnvironmentPreferencesService(contexts)
 	before, err := os.ReadFile(contexts.Projects.Preferences.Path)
 	if err != nil {
 		t.Fatal(err)
@@ -160,7 +138,7 @@ func TestLongEnvironmentPreferencesFacadeHistoricalAndInvalidStorage(t *testing.
 		if err := store.Commit(raw); err != nil {
 			t.Fatal(err)
 		}
-		service := NewLongEnvironmentPreferencesService(contexts, true)
+		service := NewLongEnvironmentPreferencesService(contexts)
 		got, err := service.GetLongEnvironmentPreferences(context.Background(), state.ContextID)
 		title, valid := historical.(string)
 		if !valid || !utf8.ValidString(title) {
@@ -186,7 +164,7 @@ func TestLongEnvironmentPreferencesFacadeHistoricalAndInvalidStorage(t *testing.
 
 func TestLongEnvironmentPreferencesFacadeCleanupCancellationRetryAndOwnership(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongEnvironmentPreferencesService(contexts, true)
+	service := NewLongEnvironmentPreferencesService(contexts)
 	review, err := service.GetLongEnvironmentPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -252,7 +230,7 @@ func TestLongEnvironmentPreferencesFacadeCleanupCancellationRetryAndOwnership(t 
 
 func TestLongEnvironmentPreferencesFacadeCommittedReceipt(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewLongEnvironmentPreferencesService(contexts, true)
+	service := NewLongEnvironmentPreferencesService(contexts)
 	review, err := service.GetLongEnvironmentPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)

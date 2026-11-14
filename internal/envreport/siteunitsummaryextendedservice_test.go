@@ -12,33 +12,19 @@ import (
 	"testing"
 )
 
-func TestSummaryExtendedWorkbookServiceIndependentFlagAndMethods(t *testing.T) {
-	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewSiteUnitSummaryExtendedWorkbookService(nil, func(name string) (string, bool) {
-			if name != SiteUnitSummaryExtendedWorkbookFeatureEnvironment {
-				t.Fatal("borrowed another feature gate", name)
-			}
-			return flag, flag != ""
-		})
-		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag != "false") {
-				t.Fatal("independent default-on flag differs", service, err)
-			}
-		} else if err == nil || service != nil {
-			t.Fatal("malformed flag accepted", flag)
-		}
-		if err == nil && !service.enabled {
-			if value, err := service.GetReview(context.Background(), "unowned", "{}"); err == nil || value != nil {
-				t.Fatal("disabled service returned review", value, err)
-			}
-			if value, err := service.ExportReviewed(context.Background(), "unowned", "{}"); err == nil || value != nil {
-				t.Fatal("disabled service returned publication", value, err)
-			}
-		}
+func TestSummaryExtendedWorkbookServiceMethodsAndGuards(t *testing.T) {
+	unowned, err := NewSiteUnitSummaryExtendedWorkbookService(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if value, err := unowned.GetReview(context.Background(), "unowned", "{}"); err == nil || value != nil {
+		t.Fatal("unowned service returned review", value, err)
+	}
+	if value, err := unowned.ExportReviewed(context.Background(), "unowned", "{}"); err == nil || value != nil {
+		t.Fatal("unowned service returned publication", value, err)
 	}
 	contexts, state := vprotest.ReportServiceFixture(t, false)
-	contexts.SiteUnitSummarySpeciesEnabled, contexts.SiteUnitSummaryLifeformsEnabled = true, true
-	service, err := NewSiteUnitSummaryExtendedWorkbookService(contexts, func(string) (string, bool) { return "true", true })
+	service, err := NewSiteUnitSummaryExtendedWorkbookService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,8 +50,7 @@ func TestSummaryExtendedWorkbookServiceIndependentFlagAndMethods(t *testing.T) {
 
 func TestSummaryExtendedWorkbookServiceReviewedPublication(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, false)
-	contexts.SiteUnitSummaryLifeformsEnabled = true
-	service, err := NewSiteUnitSummaryExtendedWorkbookService(contexts, func(string) (string, bool) { return "true", true })
+	service, err := NewSiteUnitSummaryExtendedWorkbookService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -16,10 +16,7 @@ import (
 )
 
 func TestSummaryEnvironmentalCategoryOriginalFixtures(t *testing.T) {
-	path := os.Getenv("VPRO_TEST_SUMMARY_ENVIRONMENT_CATEGORY_SOURCE")
-	if path == "" {
-		path = filepath.Join("testdata", "summary_environment_category_source.json")
-	}
+	path := filepath.Join("testdata", "summary_environment_category_source.json")
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

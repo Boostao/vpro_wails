@@ -14,13 +14,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 )
-
-const SubzoneMatrixFeatureEnvironment = "VPRO_SUBZONE_MATRIX_WORKBOOK"
 
 type SubzoneMatrixRow struct {
 	Name   *string   `json:"name"`
@@ -90,7 +87,6 @@ func (request *subzoneMatrixExportRequest) UnmarshalJSON(data []byte) error {
 
 type SubzoneMatrixService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
 type subzoneMatrixPublicationHooks struct {
@@ -98,15 +94,8 @@ type subzoneMatrixPublicationHooks struct {
 	publication vprocore.ArtifactPublicationHooks
 }
 
-func NewSubzoneMatrixService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SubzoneMatrixService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(SubzoneMatrixFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SubzoneMatrixService{contexts: contexts, enabled: enabled}, nil
+func NewSubzoneMatrixService(contexts *vprocore.ContextService) (*SubzoneMatrixService, error) {
+	return &SubzoneMatrixService{contexts: contexts}, nil
 }
 
 func (s *SubzoneMatrixService) authorize(ctx context.Context) error {
@@ -116,10 +105,7 @@ func (s *SubzoneMatrixService) authorize(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Subzone Matrix is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Subzone Matrix owned context is unavailable")
 	}
 	return nil

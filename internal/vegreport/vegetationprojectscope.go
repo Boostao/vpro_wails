@@ -51,13 +51,12 @@ func (request *vegetationScopeRequest) UnmarshalJSON(data []byte) error {
 
 type LongVegetationReportScopeService struct {
 	contexts      *vprocore.ContextService
-	enabled       bool
 	snapshot      vprocore.PublicationReadSnapshotHooks
 	beforeInstall func()
 }
 
-func NewLongVegetationReportScopeService(contexts *vprocore.ContextService, enabled bool) *LongVegetationReportScopeService {
-	return &LongVegetationReportScopeService{contexts: contexts, enabled: enabled}
+func NewLongVegetationReportScopeService(contexts *vprocore.ContextService) *LongVegetationReportScopeService {
+	return &LongVegetationReportScopeService{contexts: contexts}
 }
 
 func (s *LongVegetationReportScopeService) require(ctx context.Context, contextID string) error {
@@ -67,10 +66,7 @@ func (s *LongVegetationReportScopeService) require(ctx context.Context, contextI
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation project report scope is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil ||
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil ||
 		s.contexts.Projects.Preferences == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation report scope owned context/configuration is unavailable")
 	}

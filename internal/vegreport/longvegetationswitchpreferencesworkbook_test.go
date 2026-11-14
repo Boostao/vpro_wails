@@ -17,7 +17,7 @@ func TestLongVegetationSwitchPreferencesInvalidateWorkbookApproval(t *testing.T)
 		t.Run(map[bool]string{false: "attached", true: "external"}[external], func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, external)
 			workbooks := &VegetationWorkbookService{Private: private}
-			preferences := NewLongVegetationSwitchPreferencesService(private.contexts, true)
+			preferences := NewLongVegetationSwitchPreferencesService(private.contexts)
 			beforeDB := vprotest.DatabaseBytes(t, private.contexts.Projects.Sqlite.Attachments)
 			for field := 0; field < 4; field++ {
 				old, err := workbooks.GetReview(context.Background(), state.ContextID, `{"scope":"unlumped"}`)

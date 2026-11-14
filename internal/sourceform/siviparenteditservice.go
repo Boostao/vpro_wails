@@ -10,8 +10,6 @@ import (
 	"fmt"
 )
 
-const siviParentEditingFeatureEnvironment = "VPRO_SIVI_PARENT_EDITING"
-
 type SIVIParentDirectWrite struct {
 	Original    *SIVIParentProjection `json:"original"`
 	Scalars     []SIVIParentCellEdit  `json:"scalars"`
@@ -40,16 +38,15 @@ func (request *SIVIParentDirectWrite) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func SiviParentEditingFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(siviParentEditingFeatureEnvironment, lookup)
-}
-
 func RequireSIVIParentEditing(s *vprocore.ContextService, ctx context.Context) error {
+	if ctx == nil {
+		return errors.New("SIVI parent editing requires a context")
+	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if !s.SiviParentReviewEnabled || !s.SiviParentEditingEnabled {
-		return errors.New("SIVI directly bound parent editing requires enabled parent review and editing in this session")
+	if s == nil {
+		return errors.New("SIVI parent editing requires owned contexts")
 	}
 	return nil
 }

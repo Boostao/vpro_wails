@@ -14,7 +14,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/xuri/excelize/v2"
@@ -28,25 +27,6 @@ func TestLongVegetationNoneUnitsOwnedPreviewWorkbookAndStaleEnv(t *testing.T) {
 			store, owner := contexts.Projects.Preferences, contexts.Projects.Sqlite
 			if err := store.Update("ReportOptions", map[string]any{"LVUnitGroups": 3}); err != nil {
 				t.Fatal(err)
-			}
-
-			for _, read := range []func() error{
-				func() error {
-					_, err := GetLongVegetationOptions(contexts, context.Background(), state.ContextID)
-					return err
-				},
-				func() error {
-					_, err := PreviewLongVegetation(contexts, context.Background(), state.ContextID)
-					return err
-				},
-				func() error {
-					_, err := private.GetReview(context.Background(), state.ContextID, `{"scope":"unlumped"}`)
-					return err
-				},
-			} {
-				if err := read(); err == nil || !strings.Contains(err.Error(), "None report units are disabled") {
-					t.Fatal("source3 bypassed its independent default-off gate", err)
-				}
 			}
 			project, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.ProjectPath, "rw"))
 			if err != nil {
@@ -68,7 +48,6 @@ func TestLongVegetationNoneUnitsOwnedPreviewWorkbookAndStaleEnv(t *testing.T) {
 			if _, err := su.Exec(`INSERT INTO Report_SU(PlotNumber,SiteUnit) VALUES('108050',NULL)`); err != nil {
 				t.Fatal(err)
 			}
-			contexts.LongVegetationNoneUnitsEnabled = true
 			beforeDB := vprotest.DatabaseBytes(t, owner.Attachments)
 			beforeConfig, err := os.ReadFile(store.Path)
 			if err != nil {

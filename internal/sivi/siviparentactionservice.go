@@ -12,8 +12,6 @@ import (
 	"fmt"
 )
 
-const siviParentActionEditingFeatureEnvironment = "VPRO_SIVI_PARENT_ACTION_EDITING"
-
 type SIVIParentActionInput struct {
 	ContextID string                       `json:"contextId"`
 	ControlID string                       `json:"controlId"`
@@ -61,18 +59,8 @@ func (request *SIVIParentActionWrite) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func SiviParentActionEditingFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(siviParentActionEditingFeatureEnvironment, lookup)
-}
-
 func RequireSIVIParentActionEditing(s *vprocore.ContextService, ctx context.Context) error {
-	if err := sourceform.RequireSIVIParentEditing(s, ctx); err != nil {
-		return err
-	}
-	if !s.SiviParentActionEditingEnabled {
-		return errors.New("SIVI source action editing requires enabled parent actions in this session")
-	}
-	return nil
+	return sourceform.RequireSIVIParentEditing(s, ctx)
 }
 
 func GetSIVIParentActionOriginal(s *vprocore.ContextService, ctx context.Context, contextID, plot string) (*sourceform.SIVIParentProjection, error) {

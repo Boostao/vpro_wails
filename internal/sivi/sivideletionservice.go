@@ -11,9 +11,6 @@ import (
 	"errors"
 )
 
-const SiviDeletionWritingFeatureEnvironment = "VPRO_SIVI_DELETION_WRITING"
-const SiviDeletionRestoringFeatureEnvironment = "VPRO_SIVI_DELETION_RESTORING"
-
 type SIVIDeletionOriginal = sourceform.SiviDeletionOriginal
 type SIVIDeletionResult = sourceform.SiviDeletionResult
 type SIVIDeletionRestorationReview = siviDeletionRestorationReview
@@ -23,27 +20,17 @@ type SIVIDeletionHistoryList = siviDeletionHistoryList
 type SIVIDeletionTargets = siviDeletionTargets
 
 type SIVIDeletionService struct {
-	contexts  *vprocore.ContextService
-	writing   bool
-	restoring bool
+	contexts *vprocore.ContextService
 }
 
-func NewSIVIDeletionService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SIVIDeletionService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("SIVI deletion requires explicit context ownership and feature lookup")
+func NewSIVIDeletionService(contexts *vprocore.ContextService) (*SIVIDeletionService, error) {
+	if contexts == nil {
+		return nil, errors.New("SIVI deletion requires explicit context ownership")
 	}
-	writing, err := vprocore.SiviFeature(SiviDeletionWritingFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	restoring, err := vprocore.SiviFeature(SiviDeletionRestoringFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SIVIDeletionService{contexts: contexts, writing: writing, restoring: restoring}, nil
+	return &SIVIDeletionService{contexts: contexts}, nil
 }
 
-func (s *SIVIDeletionService) require(ctx context.Context, restoration bool) error {
+func (s *SIVIDeletionService) require(ctx context.Context, _ bool) error {
 	if ctx == nil {
 		return errors.New("SIVI deletion requires a context")
 	}
@@ -52,13 +39,6 @@ func (s *SIVIDeletionService) require(ctx context.Context, restoration bool) err
 	}
 	if s == nil || s.contexts == nil {
 		return errors.New("SIVI deletion requires explicit context ownership")
-	}
-	if restoration {
-		if !s.restoring {
-			return errors.New("SIVI deletion restoration is disabled in this session")
-		}
-	} else if !s.writing {
-		return errors.New("SIVI deletion writing is disabled in this session")
 	}
 	return nil
 }

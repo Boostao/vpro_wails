@@ -504,124 +504,124 @@ var PopulateStartupRecoveryHints = lifecyclepkg.PopulateRecoveryHints
 var ConfigSection = vprocorepkg.ConfigSection
 var NewCloseService = lifecyclepkg.NewCloseService
 
-func NewEnvironmentWorkbookService(p0 *ContextService, p1 func(string) (string, bool)) (*envreportpkg.EnvironmentWorkbookService, error) {
-	return envreportpkg.NewEnvironmentWorkbookService(unwrapContextService(p0), p1)
+func NewEnvironmentWorkbookService(p0 *ContextService) (*envreportpkg.EnvironmentWorkbookService, error) {
+	return envreportpkg.NewEnvironmentWorkbookService(unwrapContextService(p0))
 }
 
-func NewExternalSUEnvironmentService(p0 *ContextService, p1 bool) *classificationpkg.ExternalSUEnvironmentService {
-	return classificationpkg.NewExternalSUEnvironmentService(unwrapContextService(p0), p1)
+func NewExternalSUEnvironmentService(p0 *ContextService) *classificationpkg.ExternalSUEnvironmentService {
+	return classificationpkg.NewExternalSUEnvironmentService(unwrapContextService(p0))
 }
 
 var NewGeologyCodeService = referencespkg.NewGeologyCodeService
 
-func NewGoogleEarthKMLExportService(p0 *ContextService, p1 bool) *spatialpkg.GoogleEarthKMLExportService {
-	return spatialpkg.NewGoogleEarthKMLExportService(unwrapContextService(p0), p1)
+func NewGoogleEarthKMLExportService(p0 *ContextService) *spatialpkg.GoogleEarthKMLExportService {
+	return spatialpkg.NewGoogleEarthKMLExportService(unwrapContextService(p0))
 }
 
-func NewGoogleEarthKMLService(p0 *ContextService, p1 bool) *spatialpkg.GoogleEarthKMLService {
-	return spatialpkg.NewGoogleEarthKMLService(unwrapContextService(p0), p1)
+func NewGoogleEarthKMLService(p0 *ContextService) *spatialpkg.GoogleEarthKMLService {
+	return spatialpkg.NewGoogleEarthKMLService(unwrapContextService(p0))
 }
 
-func NewGoogleEarthPreferencesService(p0 *ContextService, p1 bool) *spatialpkg.GoogleEarthPreferencesService {
-	return spatialpkg.NewGoogleEarthPreferencesService(unwrapContextService(p0), p1)
+func NewGoogleEarthPreferencesService(p0 *ContextService) *spatialpkg.GoogleEarthPreferencesService {
+	return spatialpkg.NewGoogleEarthPreferencesService(unwrapContextService(p0))
 }
 
-func NewGoogleEarthReviewService(p0 *ContextService, p1 bool) *spatialpkg.GoogleEarthReviewService {
-	return spatialpkg.NewGoogleEarthReviewService(unwrapContextService(p0), p1)
+func NewGoogleEarthReviewService(p0 *ContextService) *spatialpkg.GoogleEarthReviewService {
+	return spatialpkg.NewGoogleEarthReviewService(unwrapContextService(p0))
 }
 
-func NewLifeformSummaryService(p0 *ContextService, p1 func(string) (string, bool)) (*vegreportpkg.LifeformSummaryService, error) {
-	return vegreportpkg.NewLifeformSummaryService(unwrapContextService(p0), p1)
+func NewLifeformSummaryService(p0 *ContextService) (*vegreportpkg.LifeformSummaryService, error) {
+	return vegreportpkg.NewLifeformSummaryService(unwrapContextService(p0))
 }
 
-func NewLifeformWorkbookService(p0 *ContextService, p1 func(string) (string, bool)) (*vegreportpkg.LifeformWorkbookService, error) {
-	return vegreportpkg.NewLifeformWorkbookService(unwrapContextService(p0), p1)
+func NewLifeformWorkbookService(p0 *ContextService) (*vegreportpkg.LifeformWorkbookService, error) {
+	return vegreportpkg.NewLifeformWorkbookService(unwrapContextService(p0))
 }
 
-func NewLongEnvironmentPreferencesService(p0 *ContextService, p1 bool) *envreportpkg.LongEnvironmentPreferencesService {
-	return envreportpkg.NewLongEnvironmentPreferencesService(unwrapContextService(p0), p1)
+func NewLongEnvironmentPreferencesService(p0 *ContextService) *envreportpkg.LongEnvironmentPreferencesService {
+	return envreportpkg.NewLongEnvironmentPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationEnforcementPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationEnforcementPreferencesService {
-	return vegreportpkg.NewLongVegetationEnforcementPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationEnforcementPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationEnforcementPreferencesService {
+	return vegreportpkg.NewLongVegetationEnforcementPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationGroupPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationGroupPreferencesService {
-	return vegreportpkg.NewLongVegetationGroupPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationGroupPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationGroupPreferencesService {
+	return vegreportpkg.NewLongVegetationGroupPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationNamingPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationNamingPreferencesService {
-	return vegreportpkg.NewLongVegetationNamingPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationNamingPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationNamingPreferencesService {
+	return vegreportpkg.NewLongVegetationNamingPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationPreferencesService {
-	return vegreportpkg.NewLongVegetationPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationPreferencesService {
+	return vegreportpkg.NewLongVegetationPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationProjectWorkbookService(p0 *ContextService, p1 bool, p2 bool) *vegreportpkg.LongVegetationProjectWorkbookService {
-	return vegreportpkg.NewLongVegetationProjectWorkbookService(unwrapContextService(p0), p1, p2)
+func NewLongVegetationProjectWorkbookService(p0 *ContextService) *vegreportpkg.LongVegetationProjectWorkbookService {
+	return vegreportpkg.NewLongVegetationProjectWorkbookService(unwrapContextService(p0))
 }
 
-func NewLongVegetationQualityMinimumPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationQualityMinimumPreferencesService {
-	return vegreportpkg.NewLongVegetationQualityMinimumPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationQualityMinimumPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationQualityMinimumPreferencesService {
+	return vegreportpkg.NewLongVegetationQualityMinimumPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationQualityNullPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationQualityNullPreferencesService {
-	return vegreportpkg.NewLongVegetationQualityNullPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationQualityNullPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationQualityNullPreferencesService {
+	return vegreportpkg.NewLongVegetationQualityNullPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationReportScopeService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationReportScopeService {
-	return vegreportpkg.NewLongVegetationReportScopeService(unwrapContextService(p0), p1)
+func NewLongVegetationReportScopeService(p0 *ContextService) *vegreportpkg.LongVegetationReportScopeService {
+	return vegreportpkg.NewLongVegetationReportScopeService(unwrapContextService(p0))
 }
 
-func NewLongVegetationSelectedFieldPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationSelectedFieldPreferencesService {
-	return vegreportpkg.NewLongVegetationSelectedFieldPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationSelectedFieldPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationSelectedFieldPreferencesService {
+	return vegreportpkg.NewLongVegetationSelectedFieldPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationSelectedUnitSelectionService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationSelectedUnitSelectionService {
-	return vegreportpkg.NewLongVegetationSelectedUnitSelectionService(unwrapContextService(p0), p1)
+func NewLongVegetationSelectedUnitSelectionService(p0 *ContextService) *vegreportpkg.LongVegetationSelectedUnitSelectionService {
+	return vegreportpkg.NewLongVegetationSelectedUnitSelectionService(unwrapContextService(p0))
 }
 
-func NewLongVegetationStatisticsPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationStatisticsPreferencesService {
-	return vegreportpkg.NewLongVegetationStatisticsPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationStatisticsPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationStatisticsPreferencesService {
+	return vegreportpkg.NewLongVegetationStatisticsPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationSwitchPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationSwitchPreferencesService {
-	return vegreportpkg.NewLongVegetationSwitchPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationSwitchPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationSwitchPreferencesService {
+	return vegreportpkg.NewLongVegetationSwitchPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationThresholdPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationThresholdPreferencesService {
-	return vegreportpkg.NewLongVegetationThresholdPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationThresholdPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationThresholdPreferencesService {
+	return vegreportpkg.NewLongVegetationThresholdPreferencesService(unwrapContextService(p0))
 }
 
-func NewLongVegetationUnitPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.LongVegetationUnitPreferencesService {
-	return vegreportpkg.NewLongVegetationUnitPreferencesService(unwrapContextService(p0), p1)
+func NewLongVegetationUnitPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationUnitPreferencesService {
+	return vegreportpkg.NewLongVegetationUnitPreferencesService(unwrapContextService(p0))
 }
 
 var NewParentCodeService = referencespkg.NewParentCodeService
 
-func NewPictureCreationService(p0 *PictureService, p1 func(string) (string, bool)) (*picturespkg.PictureCreationService, error) {
-	return picturespkg.NewPictureCreationService(unwrapPictureService(p0), p1)
+func NewPictureCreationService(p0 *PictureService) (*picturespkg.PictureCreationService, error) {
+	return picturespkg.NewPictureCreationService(unwrapPictureService(p0))
 }
 
-func NewPictureDeletionService(p0 *PictureService, p1 func(string) (string, bool)) (*picturespkg.PictureDeletionService, error) {
-	return picturespkg.NewPictureDeletionService(unwrapPictureService(p0), p1)
+func NewPictureDeletionService(p0 *PictureService) (*picturespkg.PictureDeletionService, error) {
+	return picturespkg.NewPictureDeletionService(unwrapPictureService(p0))
 }
 
-func NewPictureMetadataService(p0 *PictureService, p1 func(string) (string, bool)) (*picturespkg.PictureMetadataService, error) {
-	return picturespkg.NewPictureMetadataService(unwrapPictureService(p0), p1)
+func NewPictureMetadataService(p0 *PictureService) (*picturespkg.PictureMetadataService, error) {
+	return picturespkg.NewPictureMetadataService(unwrapPictureService(p0))
 }
 
-func NewPlotLabelPDFExportService(p0 *ContextService, p1 bool) *interchangepkg.PlotLabelPDFExportService {
-	return interchangepkg.NewPlotLabelPDFExportService(unwrapContextService(p0), p1)
+func NewPlotLabelPDFExportService(p0 *ContextService) *interchangepkg.PlotLabelPDFExportService {
+	return interchangepkg.NewPlotLabelPDFExportService(unwrapContextService(p0))
 }
 
 func NewPlotLabelRegionalService(p0 *ContextService) (*interchangepkg.PlotLabelRegionalService, error) {
 	return interchangepkg.NewPlotLabelRegionalService(unwrapContextService(p0))
 }
 
-func NewProjectProfileSpeciesPresenceService(p0 *ContextService, p1 func(string) (string, bool)) (*classificationpkg.ProjectProfileSpeciesPresenceService, error) {
-	return classificationpkg.NewProjectProfileSpeciesPresenceService(unwrapContextService(p0), p1)
+func NewProjectProfileSpeciesPresenceService(p0 *ContextService) (*classificationpkg.ProjectProfileSpeciesPresenceService, error) {
+	return classificationpkg.NewProjectProfileSpeciesPresenceService(unwrapContextService(p0))
 }
 
 var NewQualityService = referencespkg.NewQualityService
@@ -630,150 +630,150 @@ var NewReferenceService = referencespkg.NewReferenceService
 
 var NewRegionCodeService = referencespkg.NewRegionCodeService
 
-func NewSIVICollectedService(p0 *ContextService, p1 func(string) (string, bool)) (*sivipkg.SIVICollectedService, error) {
-	return sivipkg.NewSIVICollectedService(unwrapContextService(p0), p1)
+func NewSIVICollectedService(p0 *ContextService) (*sivipkg.SIVICollectedService, error) {
+	return sivipkg.NewSIVICollectedService(unwrapContextService(p0))
 }
 
-func NewSIVICombinedService(p0 *ContextService, p1 func(string) (string, bool)) (*sivipkg.SIVICombinedService, error) {
-	return sivipkg.NewSIVICombinedService(unwrapContextService(p0), p1)
+func NewSIVICombinedService(p0 *ContextService) (*sivipkg.SIVICombinedService, error) {
+	return sivipkg.NewSIVICombinedService(unwrapContextService(p0))
 }
 
-func NewSIVICoverService(p0 *ContextService, p1 func(string) (string, bool)) (*sivipkg.SIVICoverService, error) {
-	return sivipkg.NewSIVICoverService(unwrapContextService(p0), p1)
+func NewSIVICoverService(p0 *ContextService) (*sivipkg.SIVICoverService, error) {
+	return sivipkg.NewSIVICoverService(unwrapContextService(p0))
 }
 
-func NewSIVICreationService(p0 *ContextService, p1 func(string) (string, bool)) (*sivipkg.SIVICreationService, error) {
-	return sivipkg.NewSIVICreationService(unwrapContextService(p0), p1)
+func NewSIVICreationService(p0 *ContextService) (*sivipkg.SIVICreationService, error) {
+	return sivipkg.NewSIVICreationService(unwrapContextService(p0))
 }
 
-func NewSIVICreationUndoService(p0 *ContextService, p1 func(string) (string, bool)) (*sivipkg.SIVICreationUndoService, error) {
-	return sivipkg.NewSIVICreationUndoService(unwrapContextService(p0), p1)
+func NewSIVICreationUndoService(p0 *ContextService) (*sivipkg.SIVICreationUndoService, error) {
+	return sivipkg.NewSIVICreationUndoService(unwrapContextService(p0))
 }
 
-func NewSIVIDeletionService(p0 *ContextService, p1 func(string) (string, bool)) (*sivipkg.SIVIDeletionService, error) {
-	return sivipkg.NewSIVIDeletionService(unwrapContextService(p0), p1)
+func NewSIVIDeletionService(p0 *ContextService) (*sivipkg.SIVIDeletionService, error) {
+	return sivipkg.NewSIVIDeletionService(unwrapContextService(p0))
 }
 
-func NewSIVIIdentityService(p0 *ContextService, p1 func(string) (string, bool)) (*sivipkg.SIVIIdentityService, error) {
-	return sivipkg.NewSIVIIdentityService(unwrapContextService(p0), p1)
+func NewSIVIIdentityService(p0 *ContextService) (*sivipkg.SIVIIdentityService, error) {
+	return sivipkg.NewSIVIIdentityService(unwrapContextService(p0))
 }
 
-func NewSIVIParentSharedService(p0 *ContextService, p1 func(string) (string, bool)) (*sourceformpkg.SIVIParentSharedService, error) {
-	return sourceformpkg.NewSIVIParentSharedService(unwrapContextService(p0), p1)
+func NewSIVIParentSharedService(p0 *ContextService) (*sourceformpkg.SIVIParentSharedService, error) {
+	return sourceformpkg.NewSIVIParentSharedService(unwrapContextService(p0))
 }
 
-func NewSIVISpeciesService(p0 *ContextService, p1 func(string) (string, bool)) (*sourceformpkg.SIVISpeciesService, error) {
-	return sourceformpkg.NewSIVISpeciesService(unwrapContextService(p0), p1)
+func NewSIVISpeciesService(p0 *ContextService) (*sourceformpkg.SIVISpeciesService, error) {
+	return sourceformpkg.NewSIVISpeciesService(unwrapContextService(p0))
 }
 
 var NewSiteCodeService = referencespkg.NewSiteCodeService
 
-func NewSiteUnitSummaryExtendedWorkbookService(p0 *ContextService, p1 func(string) (string, bool)) (*envreportpkg.SiteUnitSummaryExtendedWorkbookService, error) {
-	return envreportpkg.NewSiteUnitSummaryExtendedWorkbookService(unwrapContextService(p0), p1)
+func NewSiteUnitSummaryExtendedWorkbookService(p0 *ContextService) (*envreportpkg.SiteUnitSummaryExtendedWorkbookService, error) {
+	return envreportpkg.NewSiteUnitSummaryExtendedWorkbookService(unwrapContextService(p0))
 }
 
-func NewSiteUnitSummaryPreferencesService(p0 *ContextService, p1 bool) *envreportpkg.SiteUnitSummaryPreferencesService {
-	return envreportpkg.NewSiteUnitSummaryPreferencesService(unwrapContextService(p0), p1)
+func NewSiteUnitSummaryPreferencesService(p0 *ContextService) *envreportpkg.SiteUnitSummaryPreferencesService {
+	return envreportpkg.NewSiteUnitSummaryPreferencesService(unwrapContextService(p0))
 }
 
-func NewSiteUnitSummaryWorkbookService(p0 *ContextService, p1 func(string) (string, bool)) (*envreportpkg.SiteUnitSummaryWorkbookService, error) {
-	return envreportpkg.NewSiteUnitSummaryWorkbookService(unwrapContextService(p0), p1)
+func NewSiteUnitSummaryWorkbookService(p0 *ContextService) (*envreportpkg.SiteUnitSummaryWorkbookService, error) {
+	return envreportpkg.NewSiteUnitSummaryWorkbookService(unwrapContextService(p0))
 }
 
 var NewSoilCodeService = referencespkg.NewSoilCodeService
 
-func NewSpeciesAttributeSummaryService(p0 *ContextService, p1 func(string) (string, bool)) (*vegreportpkg.SpeciesAttributeSummaryService, error) {
-	return vegreportpkg.NewSpeciesAttributeSummaryService(unwrapContextService(p0), p1)
+func NewSpeciesAttributeSummaryService(p0 *ContextService) (*vegreportpkg.SpeciesAttributeSummaryService, error) {
+	return vegreportpkg.NewSpeciesAttributeSummaryService(unwrapContextService(p0))
 }
 
-func NewSubzoneMatrixService(p0 *ContextService, p1 func(string) (string, bool)) (*envreportpkg.SubzoneMatrixService, error) {
-	return envreportpkg.NewSubzoneMatrixService(unwrapContextService(p0), p1)
+func NewSubzoneMatrixService(p0 *ContextService) (*envreportpkg.SubzoneMatrixService, error) {
+	return envreportpkg.NewSubzoneMatrixService(unwrapContextService(p0))
 }
 
 var NewSummaryVegetationEnvironmentalLifeformService = vegreportpkg.NewSummaryVegetationEnvironmentalLifeformService
 
 var NewSummaryVegetationEnvironmentalService = vegreportpkg.NewSummaryVegetationEnvironmentalService
 
-func NewSummaryVegetationFieldListService(p0 *ContextService, p1 bool) *vegreportpkg.SummaryVegetationFieldListService {
-	return vegreportpkg.NewSummaryVegetationFieldListService(unwrapContextService(p0), p1)
+func NewSummaryVegetationFieldListService(p0 *ContextService) *vegreportpkg.SummaryVegetationFieldListService {
+	return vegreportpkg.NewSummaryVegetationFieldListService(unwrapContextService(p0))
 }
 
-func NewSummaryVegetationPreferencesService(p0 *ContextService, p1 bool, p2 bool) *vegreportpkg.SummaryVegetationPreferencesService {
-	return vegreportpkg.NewSummaryVegetationPreferencesService(unwrapContextService(p0), p1, p2)
+func NewSummaryVegetationPreferencesService(p0 *ContextService) *vegreportpkg.SummaryVegetationPreferencesService {
+	return vegreportpkg.NewSummaryVegetationPreferencesService(unwrapContextService(p0))
 }
 
-func NewSummaryVegetationPresentationPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.SummaryVegetationPresentationPreferencesService {
-	return vegreportpkg.NewSummaryVegetationPresentationPreferencesService(unwrapContextService(p0), p1)
+func NewSummaryVegetationPresentationPreferencesService(p0 *ContextService) *vegreportpkg.SummaryVegetationPresentationPreferencesService {
+	return vegreportpkg.NewSummaryVegetationPresentationPreferencesService(unwrapContextService(p0))
 }
 
-func NewSummaryVegetationQualityPreferencesService(p0 *ContextService, p1 bool) *vegreportpkg.SummaryVegetationQualityPreferencesService {
-	return vegreportpkg.NewSummaryVegetationQualityPreferencesService(unwrapContextService(p0), p1)
+func NewSummaryVegetationQualityPreferencesService(p0 *ContextService) *vegreportpkg.SummaryVegetationQualityPreferencesService {
+	return vegreportpkg.NewSummaryVegetationQualityPreferencesService(unwrapContextService(p0))
 }
 
-func NewSummaryVegetationService(p0 *ContextService, p1 func(string) (string, bool)) (*vegreportpkg.SummaryVegetationService, error) {
-	return vegreportpkg.NewSummaryVegetationService(unwrapContextService(p0), p1)
+func NewSummaryVegetationService(p0 *ContextService) (*vegreportpkg.SummaryVegetationService, error) {
+	return vegreportpkg.NewSummaryVegetationService(unwrapContextService(p0))
 }
 
 var NewSummaryVegetationWorkbookService = vegreportpkg.NewSummaryVegetationWorkbookService
 
-func NewTableCSVArchiveService(p0 *ContextService, p1 bool) *interchangepkg.TableCSVArchiveService {
-	return interchangepkg.NewTableCSVArchiveService(unwrapContextService(p0), p1)
+func NewTableCSVArchiveService(p0 *ContextService) *interchangepkg.TableCSVArchiveService {
+	return interchangepkg.NewTableCSVArchiveService(unwrapContextService(p0))
 }
 
-func NewTwoPageEnvironmentTableService(p0 *ContextService, p1 func(string) (string, bool)) (*datasheetpkg.TwoPageEnvironmentTableService, error) {
-	return datasheetpkg.NewTwoPageEnvironmentTableService(unwrapContextService(p0), p1)
+func NewTwoPageEnvironmentTableService(p0 *ContextService) (*datasheetpkg.TwoPageEnvironmentTableService, error) {
+	return datasheetpkg.NewTwoPageEnvironmentTableService(unwrapContextService(p0))
 }
 
-func NewTwoPageGoogleEarthService(p0 *ContextService, p1 func(string) (string, bool)) (*spatialpkg.TwoPageGoogleEarthService, error) {
-	return spatialpkg.NewTwoPageGoogleEarthService(unwrapContextService(p0), p1)
+func NewTwoPageGoogleEarthService(p0 *ContextService) (*spatialpkg.TwoPageGoogleEarthService, error) {
+	return spatialpkg.NewTwoPageGoogleEarthService(unwrapContextService(p0))
 }
 
-func NewTwoPageParentCommonService(p0 *ContextService, p1 func(string) (string, bool)) (*twopagepkg.TwoPageParentCommonService, error) {
-	return twopagepkg.NewTwoPageParentCommonService(unwrapContextService(p0), p1)
+func NewTwoPageParentCommonService(p0 *ContextService) (*twopagepkg.TwoPageParentCommonService, error) {
+	return twopagepkg.NewTwoPageParentCommonService(unwrapContextService(p0))
 }
 
-func NewTwoPageParentEntryService(p0 *ContextService, p1 twopagepkg.TwoPageEntryReferenceReaders, p2 func(string) (string, bool)) (*twopagepkg.TwoPageParentEntryService, error) {
-	return twopagepkg.NewTwoPageParentEntryService(unwrapContextService(p0), p1, p2)
+func NewTwoPageParentEntryService(p0 *ContextService, p1 twopagepkg.TwoPageEntryReferenceReaders) (*twopagepkg.TwoPageParentEntryService, error) {
+	return twopagepkg.NewTwoPageParentEntryService(unwrapContextService(p0), p1)
 }
 
-func NewTwoPageParentExtraService(p0 *ContextService, p1 func(string) (string, bool)) (*twopagepkg.TwoPageParentExtraService, error) {
-	return twopagepkg.NewTwoPageParentExtraService(unwrapContextService(p0), p1)
+func NewTwoPageParentExtraService(p0 *ContextService) (*twopagepkg.TwoPageParentExtraService, error) {
+	return twopagepkg.NewTwoPageParentExtraService(unwrapContextService(p0))
 }
 
-func NewTwoPageProfilingService(p0 *ContextService, p1 func(string) (string, bool)) (*classificationpkg.TwoPageProfilingService, error) {
-	return classificationpkg.NewTwoPageProfilingService(unwrapContextService(p0), p1)
+func NewTwoPageProfilingService(p0 *ContextService) (*classificationpkg.TwoPageProfilingService, error) {
+	return classificationpkg.NewTwoPageProfilingService(unwrapContextService(p0))
 }
 
-func NewTwoPageProjectMetadataService(p0 *ContextService, p1 func(string) (string, bool)) (*classificationpkg.TwoPageProjectMetadataService, error) {
-	return classificationpkg.NewTwoPageProjectMetadataService(unwrapContextService(p0), p1)
+func NewTwoPageProjectMetadataService(p0 *ContextService) (*classificationpkg.TwoPageProjectMetadataService, error) {
+	return classificationpkg.NewTwoPageProjectMetadataService(unwrapContextService(p0))
 }
 
-func NewTwoPageSoilService(p0 *ContextService, p1 func(string) (string, bool)) (*twopagepkg.TwoPageSoilService, error) {
-	return twopagepkg.NewTwoPageSoilService(unwrapContextService(p0), p1)
+func NewTwoPageSoilService(p0 *ContextService) (*twopagepkg.TwoPageSoilService, error) {
+	return twopagepkg.NewTwoPageSoilService(unwrapContextService(p0))
 }
 
-func NewTwoPageSourceAuditService(p0 *ContextService, p1 func(string) (string, bool)) (*twopagepkg.TwoPageSourceAuditService, error) {
-	return twopagepkg.NewTwoPageSourceAuditService(unwrapContextService(p0), p1)
+func NewTwoPageSourceAuditService(p0 *ContextService) (*twopagepkg.TwoPageSourceAuditService, error) {
+	return twopagepkg.NewTwoPageSourceAuditService(unwrapContextService(p0))
 }
 
-func NewTwoPageVegetationService(p0 *ContextService, p1 func(string) (string, bool)) (*twopagepkg.TwoPageVegetationService, error) {
-	return twopagepkg.NewTwoPageVegetationService(unwrapContextService(p0), p1)
+func NewTwoPageVegetationService(p0 *ContextService) (*twopagepkg.TwoPageVegetationService, error) {
+	return twopagepkg.NewTwoPageVegetationService(unwrapContextService(p0))
 }
 
-func NewTwoPageVegetationSpeciesListService(p0 *ContextService, p1 func(string) (string, bool)) (*twopagepkg.TwoPageVegetationSpeciesListService, error) {
-	return twopagepkg.NewTwoPageVegetationSpeciesListService(unwrapContextService(p0), p1)
+func NewTwoPageVegetationSpeciesListService(p0 *ContextService) (*twopagepkg.TwoPageVegetationSpeciesListService, error) {
+	return twopagepkg.NewTwoPageVegetationSpeciesListService(unwrapContextService(p0))
 }
 
-func NewTwoPageVegetationTableService(p0 *ContextService, p1 func(string) (string, bool)) (*datasheetpkg.TwoPageVegetationTableService, error) {
-	return datasheetpkg.NewTwoPageVegetationTableService(unwrapContextService(p0), p1)
+func NewTwoPageVegetationTableService(p0 *ContextService) (*datasheetpkg.TwoPageVegetationTableService, error) {
+	return datasheetpkg.NewTwoPageVegetationTableService(unwrapContextService(p0))
 }
 
-func NewUserLogService(p0 *ContextService, p1 func(string) (string, bool)) (*lifecyclepkg.UserLogService, error) {
-	return lifecyclepkg.NewUserLogService(unwrapContextService(p0), p1)
+func NewUserLogService(p0 *ContextService) (*lifecyclepkg.UserLogService, error) {
+	return lifecyclepkg.NewUserLogService(unwrapContextService(p0))
 }
 
-func NewVegetationWorkbookService(p0 *ContextService, p1 func(string) (string, bool)) (*vegreportpkg.VegetationWorkbookService, error) {
-	return vegreportpkg.NewVegetationWorkbookService(unwrapContextService(p0), p1)
+func NewVegetationWorkbookService(p0 *ContextService) (*vegreportpkg.VegetationWorkbookService, error) {
+	return vegreportpkg.NewVegetationWorkbookService(unwrapContextService(p0))
 }
 
 var NewWorkingUnitService = vprocorepkg.NewWorkingUnitService
@@ -786,59 +786,7 @@ const closeRequestEvent = lifecyclepkg.CloseRequestEvent
 
 var ErrInvalidCloseRequest = lifecyclepkg.ErrInvalidCloseRequest
 
-const externalSUEnvironmentEditingEnvironment = classificationpkg.ExternalSUEnvironmentEditingEnvironment
-
-var googleEarthKMLExportFeature = spatialpkg.GoogleEarthKMLExportFeature
-
-var googleEarthKMLFeature = spatialpkg.GoogleEarthKMLFeature
-
-var googleEarthPreferencesFeature = spatialpkg.GoogleEarthPreferencesFeature
-
-var googleEarthReviewFeature = spatialpkg.GoogleEarthReviewFeature
-
 var initialWindowDimensions = vprocorepkg.InitialWindowDimensions
-
-const lifeformWorkbookFeatureEnvironment = vegreportpkg.LifeformWorkbookFeatureEnvironment
-
-var longEnvironmentPreferencesFeature = envreportpkg.LongEnvironmentPreferencesFeature
-
-const longVegetationCodeFeatureEnvironment = vegreportpkg.LongVegetationCodeFeatureEnvironment
-
-var longVegetationEnforcementPreferencesFeature = vegreportpkg.LongVegetationEnforcementPreferencesFeature
-
-var longVegetationGroupPreferencesFeature = vegreportpkg.LongVegetationGroupPreferencesFeature
-
-const longVegetationLifeformFeatureEnvironment = vegreportpkg.LongVegetationLifeformFeatureEnvironment
-
-var longVegetationNamingPreferencesFeature = vegreportpkg.LongVegetationNamingPreferencesFeature
-
-const longVegetationNoneFeatureEnvironment = vegreportpkg.LongVegetationNoneFeatureEnvironment
-
-var longVegetationPreferencesFeature = vegreportpkg.LongVegetationPreferencesFeature
-
-const longVegetationProjectScopeFeatureEnvironment = vprocorepkg.LongVegetationProjectScopeFeatureEnvironment
-
-var longVegetationQualityMinimumPreferencesFeature = vegreportpkg.LongVegetationQualityMinimumPreferencesFeature
-
-var longVegetationQualityNullPreferencesFeature = vegreportpkg.LongVegetationQualityNullPreferencesFeature
-
-const longVegetationSelectedFieldFeatureEnvironment = vegreportpkg.LongVegetationSelectedFieldFeatureEnvironment
-
-var longVegetationSelectedFieldPreferencesFeature = vegreportpkg.LongVegetationSelectedFieldPreferencesFeature
-
-const longVegetationSelectedUnitSelectionFeatureEnvironment = vegreportpkg.LongVegetationSelectedUnitSelectionFeatureEnvironment
-
-const longVegetationSelectedUnitsFeatureEnvironment = vegreportpkg.LongVegetationSelectedUnitsFeatureEnvironment
-
-var longVegetationStatisticsPreferencesFeature = vegreportpkg.LongVegetationStatisticsPreferencesFeature
-
-const longVegetationStrataFeatureEnvironment = vegreportpkg.LongVegetationStrataFeatureEnvironment
-
-var longVegetationSwitchPreferencesFeature = vegreportpkg.LongVegetationSwitchPreferencesFeature
-
-var longVegetationThresholdPreferencesFeature = vegreportpkg.LongVegetationThresholdPreferencesFeature
-
-var longVegetationUnitPreferencesFeature = vegreportpkg.LongVegetationUnitPreferencesFeature
 
 var newCoordinateService = vprocorepkg.NewCoordinateServiceInternal
 
@@ -847,86 +795,6 @@ var newPlotServiceWithPreferences = vprocorepkg.NewPlotServiceWithPreferences
 var newSQLiteProjectService = vprocorepkg.NewSQLiteProjectService
 
 var openDesktopConfig = vprocorepkg.OpenDesktopConfig
-
-const pictureCreationWritingEnvironment = picturespkg.PictureCreationWritingEnvironment
-
-const pictureDeletionRestoringEnvironment = picturespkg.PictureDeletionRestoringEnvironment
-
-const pictureDeletionWritingEnvironment = picturespkg.PictureDeletionWritingEnvironment
-
-const pictureReadingEnvironment = picturespkg.PictureReadingEnvironment
-
-const plotLabelPDFExportEnvironment = interchangepkg.PlotLabelPDFExportEnvironment
-
-var plotLocationReviewFeature = spatialpkg.PlotLocationReviewFeature
-
-const siteUnitSummaryExtendedWorkbookFeatureEnvironment = envreportpkg.SiteUnitSummaryExtendedWorkbookFeatureEnvironment
-
-const siteUnitSummaryFeatureEnvironment = envreportpkg.SiteUnitSummaryFeatureEnvironment
-
-const siteUnitSummaryLifeformFeatureEnvironment = envreportpkg.SiteUnitSummaryLifeformFeatureEnvironment
-
-var siteUnitSummaryPreferencesFeature = envreportpkg.SiteUnitSummaryPreferencesFeature
-
-const siteUnitSummarySpeciesFeatureEnvironment = envreportpkg.SiteUnitSummarySpeciesFeatureEnvironment
-
-const siteUnitSummaryWorkbookFeatureEnvironment = envreportpkg.SiteUnitSummaryWorkbookFeatureEnvironment
-
-const siviCollectedFeatureEnvironment = sivipkg.SiviCollectedFeatureEnvironment
-
-const siviCombinedFeatureEnvironment = sivipkg.SiviCombinedFeatureEnvironment
-
-const siviCoverFeatureEnvironment = sivipkg.SiviCoverFeatureEnvironment
-
-const siviCreationUndoFeatureEnvironment = sivipkg.SiviCreationUndoFeatureEnvironment
-
-const siviDeletionRestoringFeatureEnvironment = sivipkg.SiviDeletionRestoringFeatureEnvironment
-
-const siviDeletionWritingFeatureEnvironment = sivipkg.SiviDeletionWritingFeatureEnvironment
-
-var siviFeature = vprocorepkg.SiviFeature
-
-var siviHeightFeature = sivipkg.SiviHeightFeature
-
-const siviIdentityFeatureEnvironment = sivipkg.SiviIdentityFeatureEnvironment
-
-var siviParentActionEditingFeature = sivipkg.SiviParentActionEditingFeature
-
-var siviParentEditingFeature = sourceformpkg.SiviParentEditingFeature
-
-var siviParentReviewFeature = sivipkg.SiviParentReviewFeature
-
-var siviProjectAssignmentFeature = sourceformpkg.SiviProjectAssignmentFeature
-
-const siviSpeciesFeatureEnvironment = sourceformpkg.SiviSpeciesFeatureEnvironment
-
-const subzoneMatrixFeatureEnvironment = envreportpkg.SubzoneMatrixFeatureEnvironment
-
-const summaryVegetationAncillaryWorkbookFeatureEnvironment = vegreportpkg.SummaryVegetationAncillaryWorkbookFeatureEnvironment
-
-const summaryVegetationEffectiveReferencesFeatureEnvironment = vegreportpkg.SummaryVegetationEffectiveReferencesFeatureEnvironment
-
-var summaryVegetationFieldListFeature = vegreportpkg.SummaryVegetationFieldListFeature
-
-const summaryVegetationGroupedWorkbookFeatureEnvironment = vegreportpkg.SummaryVegetationGroupedWorkbookFeatureEnvironment
-
-var summaryVegetationPreferencesFeature = vegreportpkg.SummaryVegetationPreferencesFeature
-
-var summaryVegetationPresentationPreferencesFeature = vegreportpkg.SummaryVegetationPresentationPreferencesFeature
-
-var summaryVegetationQualityPreferencesFeature = vegreportpkg.SummaryVegetationQualityPreferencesFeature
-
-var tableCSVArchiveFeature = interchangepkg.TableCSVArchiveFeature
-
-var tableCSVReviewFeature = interchangepkg.TableCSVReviewFeature
-
-const twoPageParentCommonEditingEnvironment = twopagepkg.TwoPageParentCommonEditingEnvironment
-
-const twoPageParentEntryEditingEnvironment = twopagepkg.TwoPageParentEntryEditingEnvironment
-
-const twoPageParentExtraEditingEnvironment = twopagepkg.TwoPageParentExtraEditingEnvironment
-
-const twoPageParentReviewEnvironment = twopagepkg.TwoPageParentReviewEnvironment
 
 var userConfigDir = sqlutilpkg.UserConfigDir
 

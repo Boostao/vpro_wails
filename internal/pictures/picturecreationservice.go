@@ -17,8 +17,6 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-const PictureCreationWritingEnvironment = "VPRO_PICTURE_CREATION_WRITING"
-
 type PictureCreationResult = pictureCreationResult
 
 type PictureCreationSelection struct {
@@ -70,7 +68,6 @@ type pictureCreationReceiptObservation struct {
 // the actual Wails native owner and chooser.
 type PictureCreationService struct {
 	pictures *PictureService
-	enabled  bool
 	owner    func(context.Context) (pictureCreationNativeOwner, error)
 	chooser  func(context.Context) (string, error)
 	mu       sync.Mutex
@@ -80,22 +77,12 @@ type PictureCreationService struct {
 	reads    map[string]map[*pictureCreationReceiptObservation]struct{}
 }
 
-func NewPictureCreationService(pictures *PictureService, lookup func(string) (string, bool)) (*PictureCreationService, error) {
-	if pictures == nil || pictures.Contexts == nil || lookup == nil {
-		return nil, errors.New("picture creation service requires explicit picture ownership and feature lookup")
-	}
-	enabled, err := vprocore.SiviFeature(PictureCreationWritingEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	if enabled && (!pictures.Enabled || pictures.source == nil) {
-		if _, explicit := lookup(PictureCreationWritingEnvironment); explicit {
-			return nil, errors.New("picture creation writing requires independently enabled owned picture reading")
-		}
-		enabled = false
+func NewPictureCreationService(pictures *PictureService) (*PictureCreationService, error) {
+	if pictures == nil || pictures.Contexts == nil || pictures.source == nil {
+		return nil, errors.New("picture creation service requires explicit picture ownership")
 	}
 	return &PictureCreationService{
-		pictures: pictures, enabled: enabled, owner: currentPictureCreationOwner,
+		pictures: pictures, owner: currentPictureCreationOwner,
 		chooser: chooseNativePictureFile, tokens: make(map[string]*pictureCreationCapability),
 		requests: make(map[string]string),
 		creating: make(map[string]*pictureCreationCapability),
@@ -110,8 +97,8 @@ func (s *PictureCreationService) require(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled || s.pictures == nil {
-		return errors.New("picture creation writing is disabled in this session")
+	if s == nil || s.pictures == nil {
+		return errors.New("picture creation writing requires picture ownership")
 	}
 	return s.pictures.require(ctx)
 }

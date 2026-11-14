@@ -10,8 +10,6 @@ import (
 	"errors"
 )
 
-const SiviCreationUndoFeatureEnvironment = "VPRO_SIVI_CREATION_UNDO"
-
 type SIVICreationUndoReview = siviCreationUndoReview
 type SIVICreationUndoResult = siviCreationUndoResult
 type SIVICreationUndoHistoryEvent = siviCreationUndoHistoryEvent
@@ -19,18 +17,13 @@ type SIVICreationUndoHistoryList = siviCreationUndoHistoryList
 
 type SIVICreationUndoService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewSIVICreationUndoService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SIVICreationUndoService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("SIVI creation Undo requires explicit context ownership and feature lookup")
+func NewSIVICreationUndoService(contexts *vprocore.ContextService) (*SIVICreationUndoService, error) {
+	if contexts == nil {
+		return nil, errors.New("SIVI creation Undo requires explicit context ownership")
 	}
-	enabled, err := vprocore.SiviFeature(SiviCreationUndoFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SIVICreationUndoService{contexts: contexts, enabled: enabled}, nil
+	return &SIVICreationUndoService{contexts: contexts}, nil
 }
 
 func (s *SIVICreationUndoService) require(ctx context.Context) error {
@@ -42,9 +35,6 @@ func (s *SIVICreationUndoService) require(ctx context.Context) error {
 	}
 	if s == nil || s.contexts == nil {
 		return errors.New("SIVI creation Undo requires explicit context ownership")
-	}
-	if !s.enabled {
-		return errors.New("SIVI creation Undo is disabled in this session")
 	}
 	return nil
 }

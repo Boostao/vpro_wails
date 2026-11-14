@@ -18,10 +18,8 @@ import (
 func pictureDeletionServiceFixture(t *testing.T) (*PictureDeletionService, pictureDeletionRequest) {
 	t.Helper()
 	contexts, source, request := pictureDeletionFixture(t, false, pictureDeletionTestSchema)
-	pictures := &PictureService{Contexts: contexts, source: source, Enabled: true}
-	service, err := NewPictureDeletionService(pictures, pictureServiceLookup(map[string]string{
-		PictureDeletionWritingEnvironment: "true", PictureDeletionRestoringEnvironment: "true",
-	}))
+	pictures := &PictureService{Contexts: contexts, source: source}
+	service, err := NewPictureDeletionService(pictures)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,44 +35,11 @@ func pictureLifecycleTestWire(t *testing.T, request any) string {
 	return string(wire)
 }
 
-func TestPictureDeletionServiceIndependentGates(t *testing.T) {
-	for _, environment := range []string{PictureDeletionWritingEnvironment, PictureDeletionRestoringEnvironment} {
-		for _, value := range []string{"", "false", "true", "TRUE", " true", "1"} {
-			t.Run(environment+"/"+value, func(t *testing.T) {
-				contexts, source, request := pictureDeletionFixture(t, false, pictureDeletionTestSchema)
-				pictures := &PictureService{Contexts: contexts, Enabled: true, source: source}
-				values := map[string]string{}
-				if value != "" {
-					values[environment] = value
-				}
-				service, err := NewPictureDeletionService(pictures, pictureServiceLookup(values))
-				if value != "" && value != "true" && value != "false" {
-					if err == nil || service != nil {
-						t.Fatal("malformed gate silently defaulted", service, err)
-					}
-					return
-				}
-				wantWriting := value != "false" || environment != PictureDeletionWritingEnvironment
-				wantRestoring := value != "false" || environment != PictureDeletionRestoringEnvironment
-				if err != nil || service.writing != wantWriting || service.restoring != wantRestoring {
-					t.Fatal("independent default-on gate changed", service, err)
-				}
-				if !service.writing {
-					if result, err := service.Delete(t.Context(), request.ContextID, pictureLifecycleTestWire(t, request)); err == nil || result != nil {
-						t.Fatal("disabled deletion wrote", result, err)
-					}
-				}
-				if !service.restoring {
-					if history, err := service.GetHistory(t.Context(), request.ContextID, request.PlotNumber); err == nil || history != nil {
-						t.Fatal("disabled historical restoration borrowed authority", history, err)
-					}
-				}
-				pictures.Enabled, pictures.source = false, nil
-				enabled, err := NewPictureDeletionService(pictures, pictureServiceLookup(map[string]string{environment: "true"}))
-				if err == nil || enabled != nil {
-					t.Fatal("lifecycle gate inferred picture read ownership", enabled, err)
-				}
-			})
+func TestPictureDeletionServiceOwnerGuards(t *testing.T) {
+	contexts, _, _ := pictureDeletionFixture(t, false, pictureDeletionTestSchema)
+	for _, pictures := range []*PictureService{nil, {}, {Contexts: contexts}} {
+		if enabled, err := NewPictureDeletionService(pictures); err == nil || enabled != nil {
+			t.Fatal("lifecycle constructor accepted missing picture read ownership", enabled, err)
 		}
 	}
 }

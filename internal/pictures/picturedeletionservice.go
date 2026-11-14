@@ -1,18 +1,11 @@
 package pictures
 
 import (
-	"github.com/boostao/vpro-wails/internal/vprocore"
-)
-
-import (
 	"context"
 	"encoding/json"
 	"errors"
 	"sync"
 )
-
-const PictureDeletionWritingEnvironment = "VPRO_PICTURE_DELETION_WRITING"
-const PictureDeletionRestoringEnvironment = "VPRO_PICTURE_DELETION_RESTORING"
 
 type PictureDeletionResult = pictureDeletionResult
 type PictureRestorationResult = pictureRestorationResult
@@ -21,39 +14,21 @@ type pictureLifecycleReceiptObservation struct{ changed bool }
 
 type PictureDeletionService struct {
 	pictures  *PictureService
-	writing   bool
-	restoring bool
 	mu        sync.Mutex
 	mutations map[string]bool
 	reads     map[string]map[*pictureLifecycleReceiptObservation]struct{}
 	afterRead func() error
 }
 
-func NewPictureDeletionService(pictures *PictureService, lookup func(string) (string, bool)) (*PictureDeletionService, error) {
-	if pictures == nil || pictures.Contexts == nil || lookup == nil {
-		return nil, errors.New("picture deletion requires explicit picture ownership and feature lookup")
+func NewPictureDeletionService(pictures *PictureService) (*PictureDeletionService, error) {
+	if pictures == nil || pictures.Contexts == nil || pictures.source == nil {
+		return nil, errors.New("picture deletion requires explicit picture ownership")
 	}
-	writing, err := vprocore.SiviFeature(PictureDeletionWritingEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	restoring, err := vprocore.SiviFeature(PictureDeletionRestoringEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	if (writing || restoring) && (!pictures.Enabled || pictures.source == nil) {
-		_, writingExplicit := lookup(PictureDeletionWritingEnvironment)
-		_, restoringExplicit := lookup(PictureDeletionRestoringEnvironment)
-		if (writing && writingExplicit) || (restoring && restoringExplicit) {
-			return nil, errors.New("picture deletion/restoration requires independently enabled owned picture reading")
-		}
-		writing, restoring = false, false
-	}
-	return &PictureDeletionService{pictures: pictures, writing: writing, restoring: restoring,
+	return &PictureDeletionService{pictures: pictures,
 		mutations: map[string]bool{}, reads: map[string]map[*pictureLifecycleReceiptObservation]struct{}{}}, nil
 }
 
-func (s *PictureDeletionService) require(ctx context.Context, restoration bool) error {
+func (s *PictureDeletionService) require(ctx context.Context, _ bool) error {
 	if ctx == nil {
 		return errors.New("picture deletion/restoration requires a request context")
 	}
@@ -62,12 +37,6 @@ func (s *PictureDeletionService) require(ctx context.Context, restoration bool) 
 	}
 	if s == nil || s.pictures == nil {
 		return errors.New("picture deletion/restoration requires explicit picture ownership")
-	}
-	if restoration && !s.restoring {
-		return errors.New("picture restoration is disabled in this session")
-	}
-	if !restoration && !s.writing {
-		return errors.New("picture deletion is disabled in this session")
 	}
 	return s.pictures.require(ctx)
 }

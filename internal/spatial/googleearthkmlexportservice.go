@@ -14,19 +14,12 @@ import (
 	"strings"
 )
 
-const googleEarthKMLExportFeatureEnvironment = "VPRO_GOOGLE_EARTH_KML_EXPORT"
-
-func GoogleEarthKMLExportFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(googleEarthKMLExportFeatureEnvironment, lookup)
-}
-
 type GoogleEarthKMLExportService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewGoogleEarthKMLExportService(contexts *vprocore.ContextService, enabled bool) *GoogleEarthKMLExportService {
-	return &GoogleEarthKMLExportService{contexts: contexts, enabled: enabled}
+func NewGoogleEarthKMLExportService(contexts *vprocore.ContextService) *GoogleEarthKMLExportService {
+	return &GoogleEarthKMLExportService{contexts: contexts}
 }
 
 func (s *GoogleEarthKMLExportService) authorize(ctx context.Context) error {
@@ -36,10 +29,7 @@ func (s *GoogleEarthKMLExportService) authorize(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Google Earth KML file export is disabled in this session")
-	}
-	if s.contexts == nil {
+	if s == nil || s.contexts == nil {
 		return errors.New("Google Earth KML export context service is unavailable")
 	}
 	return nil

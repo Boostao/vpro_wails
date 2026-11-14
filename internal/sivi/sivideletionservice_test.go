@@ -16,21 +16,9 @@ import (
 	"testing"
 )
 
-func siviDeletionServiceLookup(flags map[string]string) func(string) (string, bool) {
-	return func(name string) (string, bool) {
-		if name == SiviDeletionWritingFeatureEnvironment || name == SiviDeletionRestoringFeatureEnvironment {
-			value, present := flags[name]
-			return value, present
-		}
-		return "true", true
-	}
-}
-
-func siviDeletionServiceFixture(t *testing.T, contexts *vprocore.ContextService, writing, restoring bool) *SIVIDeletionService {
+func siviDeletionServiceFixture(t *testing.T, contexts *vprocore.ContextService, _, _ bool) *SIVIDeletionService {
 	t.Helper()
-	service, err := NewSIVIDeletionService(contexts, siviDeletionServiceLookup(map[string]string{
-		SiviDeletionWritingFeatureEnvironment: fmt.Sprint(writing), SiviDeletionRestoringFeatureEnvironment: fmt.Sprint(restoring),
-	}))
+	service, err := NewSIVIDeletionService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,60 +47,28 @@ func siviDeletionServiceJSON(t *testing.T, value any) string {
 	return string(raw)
 }
 
-func TestSIVIDeletionServiceIndependentDefaultOffStrictFlagsAndGuards(t *testing.T) {
-	if _, err := NewSIVIDeletionService(nil, siviDeletionServiceLookup(nil)); err == nil {
+func TestSIVIDeletionServiceGuards(t *testing.T) {
+	if _, err := NewSIVIDeletionService(nil); err == nil {
 		t.Fatal("nil context ownership accepted")
 	}
-	if _, err := NewSIVIDeletionService(&vprocore.ContextService{}, nil); err == nil {
-		t.Fatal("nil feature lookup accepted")
+	service, err := NewSIVIDeletionService(&vprocore.ContextService{})
+	if err != nil || service == nil {
+		t.Fatal("service unavailable", service, err)
 	}
-	for _, feature := range []string{SiviDeletionWritingFeatureEnvironment, SiviDeletionRestoringFeatureEnvironment} {
-		for _, value := range []string{"", "unknown", " true ", "TRUE", "False", "1", "0", " true", "false\n"} {
-			if _, err := NewSIVIDeletionService(&vprocore.ContextService{}, siviDeletionServiceLookup(map[string]string{feature: value})); err == nil ||
-				!strings.Contains(err.Error(), feature) {
-				t.Fatal("malformed feature was silently defaulted/coerced", feature, value, err)
-			}
+	for _, operation := range siviDeletionServiceOperations(service, nil, "C", "P", "F", "1", "{}", "{}", "H") {
+		if err := operation(); err == nil || !strings.Contains(err.Error(), "context") {
+			t.Fatal("nil request context accepted", err)
 		}
 	}
-	for _, flags := range []map[string]string{
-		nil,
-		{SiviDeletionWritingFeatureEnvironment: "false", SiviDeletionRestoringFeatureEnvironment: "false"},
-		{SiviDeletionWritingFeatureEnvironment: "true"},
-		{SiviDeletionRestoringFeatureEnvironment: "true"},
-		{SiviDeletionWritingFeatureEnvironment: "true", SiviDeletionRestoringFeatureEnvironment: "true"},
-	} {
-		service, err := NewSIVIDeletionService(&vprocore.ContextService{}, siviDeletionServiceLookup(flags))
-		wantWriting := flags[SiviDeletionWritingFeatureEnvironment] != "false"
-		wantRestoring := flags[SiviDeletionRestoringFeatureEnvironment] != "false"
-		if err != nil || service.writing != wantWriting || service.restoring != wantRestoring {
-			t.Fatal("flags not independent/default-on", service, err)
-		}
-		for i, operation := range siviDeletionServiceOperations(service, context.Background(), "C", "P", "SubVegA-SIVI", "1", "{}", "{}", "H") {
-			enabled := service.writing
-			if i >= 3 && i < 7 {
-				enabled = service.restoring
-			}
-			if !enabled {
-				if err := operation(); err == nil || !strings.Contains(err.Error(), "disabled") {
-					t.Fatal("disabled operation reached storage/transport", i, err)
-				}
-			}
-		}
-		for _, operation := range siviDeletionServiceOperations(service, nil, "C", "P", "F", "1", "{}", "{}", "H") {
-			if err := operation(); err == nil || !strings.Contains(err.Error(), "context") {
-				t.Fatal("nil request context accepted", err)
-			}
-		}
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-		for _, operation := range siviDeletionServiceOperations(service, ctx, "C", "P", "F", "1", "{}", "{}", "H") {
-			if err := operation(); !errors.Is(err, context.Canceled) {
-				t.Fatal("cancellation did not precede gating/JSON/storage", err)
-			}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	for _, operation := range siviDeletionServiceOperations(service, ctx, "C", "P", "F", "1", "{}", "{}", "H") {
+		if err := operation(); !errors.Is(err, context.Canceled) {
+			t.Fatal("cancellation did not precede JSON/storage", err)
 		}
 	}
 	var missing *SIVIDeletionService
-	for _, service := range []*SIVIDeletionService{missing, {}, {writing: true, restoring: true}} {
+	for _, service := range []*SIVIDeletionService{missing, {}} {
 		for _, operation := range siviDeletionServiceOperations(service, context.Background(), "C", "P", "F", "1", "{}", "{}", "H") {
 			if err := operation(); err == nil || !strings.Contains(err.Error(), "ownership") {
 				t.Fatal("nil service/context ownership accepted", err)
@@ -224,18 +180,6 @@ func TestSIVIDeletionServiceDisposableDeletionIndependentRestorationAndLostRecei
 						t.Fatal("lost deletion receipt not recovered read-only", receipt, err)
 					}
 					vprotest.AssertProfileSUFiles(t, contexts, before)
-				}
-				for _, operation := range siviDeletionServiceOperations(restorer, context.Background(), state.ContextID, deletion.Plot,
-					deletion.Form, deletion.Original.RowID, deletionJSON, "{}", deletion.RequestID)[:3] {
-					if err := operation(); err == nil || !strings.Contains(err.Error(), "disabled") {
-						t.Fatal("restoration feature implicitly enabled deletion", err)
-					}
-				}
-				for _, operation := range siviDeletionServiceOperations(writer, context.Background(), state.ContextID, deletion.Plot,
-					deletion.Form, deletion.Original.RowID, deletionJSON, "{}", deletion.RequestID)[3:7] {
-					if err := operation(); err == nil || !strings.Contains(err.Error(), "disabled") {
-						t.Fatal("deletion feature implicitly enabled restoration", err)
-					}
 				}
 				var review *SIVIDeletionRestorationReview
 				review, err = restorer.ReviewRestoration(context.Background(), state.ContextID, deletion.Plot, deletion.RequestID)

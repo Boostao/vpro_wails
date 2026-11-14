@@ -108,22 +108,6 @@ func TestLongVegetationEnforcementStrictRequestsMalformedStorageAndFeature(t *te
 			t.Fatal("strict enforcement wire accepted malformed request", raw)
 		}
 	}
-	for _, test := range []struct {
-		literal string
-		present bool
-		valid   bool
-		enabled bool
-	}{{"", false, true, true}, {"true", true, true, true}, {"false", true, true, false}, {"TRUE", true, false, false}, {"1", true, false, false}} {
-		got, err := LongVegetationEnforcementPreferencesFeature(func(key string) (string, bool) {
-			if key != "VPRO_LONG_VEGETATION_ENFORCEMENT_PREFERENCES" {
-				t.Fatal(key)
-			}
-			return test.literal, test.present
-		})
-		if got != test.enabled || (err == nil) != test.valid {
-			t.Fatal(test, got, err)
-		}
-	}
 	contexts, _ := vprotest.PrepareKMLContextFixture(t)
 	store := contexts.Projects.Preferences
 	for _, bad := range []any{nil, 1, -2, "False", "0", []any{false}} {
@@ -197,11 +181,11 @@ func TestLongVegetationEnforcementOwnedCleanupPrinterFailureAndCommittedRetry(t 
 		t.Fatal(err)
 	}
 
-	service := NewLongVegetationEnforcementPreferencesService(contexts, true)
+	service := NewLongVegetationEnforcementPreferencesService(contexts)
 	names := vprocore.PrinterObservation{Names: []string{" literal printer "}, Source: vprocore.PrinterObservationSource}
 	service.printers = func(context.Context) (vprocore.PrinterObservation, error) { return names, nil }
 	request := enforcementRequest(t, expected, proposed)
-	for _, bad := range []*LongVegetationEnforcementPreferencesService{nil, {}, NewLongVegetationEnforcementPreferencesService(nil, true)} {
+	for _, bad := range []*LongVegetationEnforcementPreferencesService{nil, {}, NewLongVegetationEnforcementPreferencesService(nil)} {
 		if got, err := bad.GetLongVegetationEnforcementPreferences(context.Background(), state.ContextID); got != nil || err == nil {
 			t.Fatal(got, err)
 		}

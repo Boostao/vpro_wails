@@ -17,9 +17,7 @@ import (
 
 func siviCreationUndoServiceFixture(t *testing.T, contexts *vprocore.ContextService) *SIVICreationUndoService {
 	t.Helper()
-	service, err := NewSIVICreationUndoService(contexts, func(name string) (string, bool) {
-		return "true", name == SiviCreationUndoFeatureEnvironment
-	})
+	service, err := NewSIVICreationUndoService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,52 +33,27 @@ func siviCreationUndoServiceOperations(service *SIVICreationUndoService, ctx con
 	}
 }
 
-func TestSIVICreationUndoServiceIndependentFlagsAndGuards(t *testing.T) {
-	lookup := func(string) (string, bool) { return "true", true }
-	if _, err := NewSIVICreationUndoService(nil, lookup); err == nil {
+func TestSIVICreationUndoServiceGuards(t *testing.T) {
+	if _, err := NewSIVICreationUndoService(nil); err == nil {
 		t.Fatal("nil ownership accepted")
 	}
-	if _, err := NewSIVICreationUndoService(&vprocore.ContextService{}, nil); err == nil {
-		t.Fatal("nil feature lookup accepted")
+	service, err := NewSIVICreationUndoService(&vprocore.ContextService{})
+	if err != nil || service == nil {
+		t.Fatal("default-on service failed", service, err)
 	}
-	for _, value := range []string{"", "TRUE", "1", " true ", "false\n"} {
-		if _, err := NewSIVICreationUndoService(&vprocore.ContextService{}, func(string) (string, bool) {
-			return value, true
-		}); err == nil || !strings.Contains(err.Error(), SiviCreationUndoFeatureEnvironment) {
-			t.Fatal("malformed flag accepted", value, err)
-		}
-	}
-	for _, value := range []string{"absent", "false", "true"} {
-		service, err := NewSIVICreationUndoService(&vprocore.ContextService{}, func(name string) (string, bool) {
-			if name != SiviCreationUndoFeatureEnvironment {
-				return "true", true
-			}
-			return value, value != "absent"
-		})
-		if err != nil || service.enabled != (value != "false") {
-			t.Fatal("independent default-on flag failed", service, err)
-		}
-		if !service.enabled {
-			for _, operation := range siviCreationUndoServiceOperations(service, context.Background()) {
-				if err := operation(); err == nil || !strings.Contains(err.Error(), "disabled") {
-					t.Fatal("disabled call reached transport/storage", err)
-				}
-			}
-		}
-		for _, operation := range siviCreationUndoServiceOperations(service, nil) {
-			if err := operation(); err == nil || !strings.Contains(err.Error(), "context") {
-				t.Fatal("nil context accepted", err)
-			}
-		}
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-		for _, operation := range siviCreationUndoServiceOperations(service, ctx) {
-			if err := operation(); !errors.Is(err, context.Canceled) {
-				t.Fatal("cancellation lost priority", err)
-			}
+	for _, operation := range siviCreationUndoServiceOperations(service, nil) {
+		if err := operation(); err == nil || !strings.Contains(err.Error(), "context") {
+			t.Fatal("nil context accepted", err)
 		}
 	}
-	for _, service := range []*SIVICreationUndoService{nil, {}, {enabled: true}} {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	for _, operation := range siviCreationUndoServiceOperations(service, ctx) {
+		if err := operation(); !errors.Is(err, context.Canceled) {
+			t.Fatal("cancellation lost priority", err)
+		}
+	}
+	for _, service := range []*SIVICreationUndoService{nil, {}} {
 		for _, operation := range siviCreationUndoServiceOperations(service, context.Background()) {
 			if err := operation(); err == nil || !strings.Contains(err.Error(), "ownership") {
 				t.Fatal("unowned service accepted", err)

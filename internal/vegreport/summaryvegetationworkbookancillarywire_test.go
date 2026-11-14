@@ -82,11 +82,6 @@ func TestSummaryAncillaryDesktopClientWire(t *testing.T) {
 		t.Fatal("strict production ancillary review DTO round trip differs", err)
 	}
 	path := filepath.Join("frontend", "src", "summaryVegetationWorkbookAncillaryWire.json")
-	if os.Getenv("VPRO_UPDATE_SUMMARY_ANCILLARY_WORKBOOK_WIRE") == "true" {
-		if err := os.WriteFile(path, raw, 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
 	expected, err := os.ReadFile(path)
 	if err != nil || !bytes.Equal(expected, raw) {
 		t.Fatal("portable strict-Go ancillary workbook wire differs", err)

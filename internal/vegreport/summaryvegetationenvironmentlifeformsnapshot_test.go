@@ -16,7 +16,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 )
 
 func summaryEnvironmentalLifeformServiceFixture(t *testing.T, external bool) (*SummaryVegetationEnvironmentalLifeformService, vprocore.ProjectState) {
@@ -40,12 +39,7 @@ func summaryEnvironmentalLifeformServiceFixture(t *testing.T, external bool) (*S
 	}
 	vprotest.MutateContextFixture(t, owner.Attachments["project"], "INSERT INTO "+veg+
 		"(PlotNumber,Species,Cover1) VALUES('P3','LF1',0)")
-	service, err := NewSummaryVegetationEnvironmentalLifeformService(environment, func(key string) (string, bool) {
-		if key != summaryVegetationEnvironmentalLifeformFeatureEnvironment {
-			t.Fatal("lifeform constructor borrowed another gate", key)
-		}
-		return "true", true
-	})
+	service, err := NewSummaryVegetationEnvironmentalLifeformService(environment)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,37 +94,12 @@ func TestSummaryEnvironmentalLifeformSnapshotOwnedWireAndNoWrites(t *testing.T) 
 		if err := decoder.Decode(&decoded); err != nil || !reflect.DeepEqual(got, &decoded) {
 			t.Fatal("strict lifeform wire round trip", err)
 		}
-		if path := os.Getenv("VPRO_SUMMARY_ENVIRONMENT_LIFEFORM_PREVIEW_WIRE_PATH"); path != "" && !external {
-			got.Vegetation.ContextID = "summary-lifeform-wire"
-			got.Vegetation.ProjectPath = `C:\fixture\Sample.db`
-			got.Vegetation.SUPath = `C:\fixture\Sample.db`
-			got.SourcePath = `C:\fixture\VPro64.db`
-			got.EnvSourcePath = `C:\fixture\Sample.db`
-			got.MasterSourcePath = `C:\fixture\VLists.db`
-			raw, err = json.MarshalIndent(got, "", "  ")
-			if err != nil {
-				t.Fatal(err)
-			}
-			raw = append(raw, '\n')
-			if os.Getenv("VPRO_UPDATE_SUMMARY_ENVIRONMENT_LIFEFORM_PREVIEW_WIRE") == "true" {
-				if err := os.WriteFile(path, raw, 0600); err != nil {
-					t.Fatal(err)
-				}
-			}
-			physical, err := os.ReadFile(path)
-			if err != nil || !bytes.Equal(raw, physical) {
-				t.Fatal("strict-Go lifeform fixture differs", err)
-			}
-		}
 		if !reflect.DeepEqual(before, vprotest.DatabaseBytes(t, owner.Attachments)) {
 			t.Fatal("lifeform snapshot changed original databases/audits")
 		}
 		after, err := os.ReadFile(service.environment.report.contexts.Projects.Preferences.Path)
 		if err != nil || !bytes.Equal(config, after) {
 			t.Fatal("lifeform snapshot changed configuration", err)
-		}
-		if result, err := service.environment.PreviewEnvironmentalNumeric(t.Context(), state.ContextID, 1, 6, 0); err == nil || result != nil {
-			t.Fatal("numeric service implicitly enabled lifeform", result, err)
 		}
 	}
 }
@@ -168,42 +137,12 @@ func TestSummaryEnvironmentalLifeformSnapshotNeedsOnlySelectedInputs(t *testing.
 }
 
 func TestSummaryEnvironmentalLifeformSnapshotGatesAndCleanup(t *testing.T) {
-	for _, value := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewSummaryVegetationEnvironmentalLifeformService(nil, func(string) (string, bool) {
-			return value, value != ""
-		})
-		if value == "" || value == "false" || value == "true" {
-			if err != nil || service == nil || service.enabled != (value != "false") {
-				t.Fatal(value, service, err)
-			}
-		} else if err == nil || service != nil {
-			t.Fatal("nonliteral feature accepted", value, service, err)
-		}
+	nilService, err := NewSummaryVegetationEnvironmentalLifeformService(nil)
+	if err != nil || nilService == nil {
+		t.Fatal(nilService, err)
 	}
-	for mask := 0; mask < 16; mask++ {
-		service, state := summaryEnvironmentalLifeformServiceFixture(t, false)
-		service.enabled = mask&1 != 0
-		service.environment.numericEnabled = mask&2 != 0
-		service.environment.enabled = mask&4 != 0
-		service.environment.report.Enabled = mask&8 != 0
-		owner := service.environment.report.contexts.Projects.Sqlite
-		before := vprotest.DatabaseBytes(t, owner.Attachments)
-		if mask != 15 {
-			projects := service.environment.report.contexts.Projects
-			projects.OperationMu.Lock()
-			ctx, cancel := context.WithTimeout(t.Context(), time.Second)
-			got, err := service.PreviewEnvironmentalLifeform(ctx, state.ContextID, 1, 6, 0)
-			cancel()
-			projects.OperationMu.Unlock()
-			if got != nil || err == nil || errors.Is(err, context.DeadlineExceeded) {
-				t.Fatal("disabled gate acquired context read lease", mask, got, err)
-			}
-		} else if got, err := service.PreviewEnvironmentalLifeform(t.Context(), state.ContextID, 1, 6, 0); err != nil || got == nil {
-			t.Fatal("all enabled gates refused", got, err)
-		}
-		if !reflect.DeepEqual(before, vprotest.DatabaseBytes(t, owner.Attachments)) {
-			t.Fatal("gate/snapshot changed data", mask)
-		}
+	if got, err := nilService.PreviewEnvironmentalLifeform(t.Context(), "owned", 1, 6, 0); got != nil || err == nil {
+		t.Fatal("unavailable lifeform service succeeded", got, err)
 	}
 	service, state := summaryEnvironmentalLifeformServiceFixture(t, true)
 	if got, err := service.PreviewEnvironmentalLifeform(nil, state.ContextID, 1, 6, 0); err == nil || got != nil {

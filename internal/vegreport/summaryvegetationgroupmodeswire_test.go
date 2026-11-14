@@ -49,13 +49,8 @@ func TestSummaryVegetationGroupedModesClientWireFixture(t *testing.T) {
 		t.Fatal(err)
 	}
 	fixture := filepath.Join("frontend", "src", "summaryVegetationGroupedModesWire.json")
-	if os.Getenv("VPRO_UPDATE_SUMMARY_VEGETATION_GROUPED_MODES_WIRE") == "true" {
-		if err := os.WriteFile(fixture, append(encoded, '\n'), 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
 	raw, err := os.ReadFile(fixture)
-	if err != nil {
+	if err != nil || !bytes.Equal(append(encoded, '\n'), raw) {
 		t.Fatal(err)
 	}
 	var expected []SummaryVegetationPreview
@@ -71,9 +66,5 @@ func TestSummaryVegetationGroupedModesClientWireFixture(t *testing.T) {
 	}
 	if _, err := service.PreviewGroupedDisplay(context.Background(), "foreign", 1, 14, 2, 0); err == nil {
 		t.Fatal("foreign grouped mode owner accepted")
-	}
-	service.Enabled = false
-	if _, err := service.PreviewGroupedDisplay(context.Background(), state.ContextID, 1, 14, 2, 0); err == nil {
-		t.Fatal("additional grouped mode gate bypassed")
 	}
 }

@@ -380,15 +380,6 @@ func TestLongVegetationSelectedFieldOwnedIndependentGateAndAllGroupings(t *testi
 					t.Fatal(err)
 				}
 				before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
-				service.LongVegetationCodeEnabled = true
-				service.LongVegetationNoneEnabled, service.LongVegetationStrataEnabled, service.LongVegetationLifeformEnabled = true, true, true
-				if _, err := GetLongVegetationOptions(service, context.Background(), state.ContextID); err == nil {
-					t.Fatal("other flags enabled selected scalar")
-				}
-				if _, err := PreviewLongVegetation(service, context.Background(), state.ContextID); err == nil {
-					t.Fatal("default-off selected scalar report succeeded")
-				}
-				service.LongVegetationSelectedFieldEnabled = true
 				for _, grouping := range []int{1, 2, 3, 4} {
 					if err := service.Projects.Preferences.Update("ReportOptions", map[string]any{"LVGroupBy": grouping}); err != nil {
 						t.Fatal(err)

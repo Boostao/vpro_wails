@@ -11,12 +11,6 @@ import (
 	"errors"
 )
 
-const siteUnitSummaryPreferencesFeatureEnvironment = "VPRO_SITE_UNIT_SUMMARY_PREFERENCES"
-
-func SiteUnitSummaryPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(siteUnitSummaryPreferencesFeatureEnvironment, lookup)
-}
-
 type SiteUnitSummaryPreferencesRequest struct {
 	Expected SiteUnitSummaryPreferenceValues `json:"expected"`
 	Proposed SiteUnitSummaryPreferenceValues `json:"proposed"`
@@ -41,12 +35,11 @@ type SiteUnitSummaryPreferencesOutcome struct {
 
 type SiteUnitSummaryPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewSiteUnitSummaryPreferencesService(contexts *vprocore.ContextService, enabled bool) *SiteUnitSummaryPreferencesService {
-	return &SiteUnitSummaryPreferencesService{contexts: contexts, enabled: enabled}
+func NewSiteUnitSummaryPreferencesService(contexts *vprocore.ContextService) *SiteUnitSummaryPreferencesService {
+	return &SiteUnitSummaryPreferencesService{contexts: contexts}
 }
 
 func (s *SiteUnitSummaryPreferencesService) require(ctx context.Context, contextID string) error {
@@ -56,10 +49,7 @@ func (s *SiteUnitSummaryPreferencesService) require(ctx context.Context, context
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Summary Environment preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Summary Environment preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

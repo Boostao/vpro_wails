@@ -108,8 +108,8 @@ func pictureSelectionAlias(t *testing.T, directory, target string) (string, func
 			return os.Symlink(target, link)
 		}
 		command := exec.Command("powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
-			`$ErrorActionPreference='Stop'; New-Item -ItemType Junction -Path $env:VPRO_SELECTION_ALIAS -Target $env:VPRO_SELECTION_TARGET | Out-Null`)
-		command.Env = append(os.Environ(), "VPRO_SELECTION_ALIAS="+link, "VPRO_SELECTION_TARGET="+filepath.Dir(target))
+			`$ErrorActionPreference='Stop'; New-Item -ItemType Junction -Path $env:SELECTION_ALIAS -Target $env:SELECTION_TARGET | Out-Null`)
+		command.Env = append(os.Environ(), "SELECTION_ALIAS="+link, "SELECTION_TARGET="+filepath.Dir(target))
 		if output, err := command.CombinedOutput(); err != nil {
 			return fmt.Errorf("owned no-privilege junction creation failed: %w: %s", err, output)
 		}

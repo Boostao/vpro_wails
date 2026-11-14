@@ -41,9 +41,6 @@ func TestOwnedPlotLabelPDFReadPublicationAndNoDatabaseWrites(t *testing.T) {
 		t.Fatalf("source review retry: %v", err)
 	}
 	destination := filepath.Join(t.TempDir(), "label # owned.pdf")
-	if evidence := os.Getenv("VPRO_PRIVATE_LABEL_PDF_PUBLICATION_EVIDENCE"); evidence != "" {
-		destination = filepath.Join(evidence, "published.pdf")
-	}
 	result, err := PublishOwnedPlotLabelPDF(contexts, t.Context(), state.ContextID, *expected, destination, plotLabelPDFPublicationHooks{runtime: runtime})
 	if err != nil || !result.Published || result.Path == "" || result.SHA256 == "" {
 		t.Fatalf("publication: %+v, %v", result, err)

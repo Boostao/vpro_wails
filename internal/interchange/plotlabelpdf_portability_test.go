@@ -32,7 +32,7 @@ func TestPlotLabelRegionalAndPDFCrossPlatformFallbackAndHardlinkUnsupported(t *t
 	}
 
 	// 2. Plot Label PDF review + export works cross-platform with embedded LiberationSans fallback when Arial is absent
-	pdfSvc := NewPlotLabelPDFExportService(contexts, true)
+	pdfSvc := NewPlotLabelPDFExportService(contexts)
 	revReq, _ := json.Marshal(PlotLabelPDFReviewRequest{PlotNumber: "PT001"})
 	review, err := pdfSvc.GetReview(context.Background(), state.ContextID, string(revReq))
 	if err != nil || review == nil || len(review.PDFSHA256) != 64 {

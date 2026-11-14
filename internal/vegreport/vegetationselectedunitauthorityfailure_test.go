@@ -21,7 +21,6 @@ func TestSelectedUnitAuthorityHistorical2CannotInferSessionFields(t *testing.T) 
 	if err := contexts.Projects.Preferences.Update("ReportOptions", map[string]any{"LVUnitGroups": 2}); err != nil {
 		t.Fatal(err)
 	}
-	contexts.LongVegetationSelectedUnitsEnabled = true
 	ctx := context.Background()
 	if _, err := GetLongVegetationOptions(contexts, ctx, state.ContextID); err == nil {
 		t.Fatal("historical2 inferred source fields without session Build")
@@ -32,7 +31,7 @@ func TestSelectedUnitAuthorityHistorical2CannotInferSessionFields(t *testing.T) 
 	if _, err := workbook.GetReview(ctx, state.ContextID, `{"scope":"unlumped"}`); err == nil {
 		t.Fatal("historical2 enabled workbook without session Build")
 	}
-	preferences := NewLongVegetationUnitPreferencesService(contexts, true)
+	preferences := NewLongVegetationUnitPreferencesService(contexts)
 	review, err := preferences.GetLongVegetationUnitPreferences(ctx, state.ContextID)
 	if err != nil || review.Values.UnitGroups != 2 || review.Availability.SelectedFields {
 		t.Fatal("historical2 was reset or advertised as available", review, err)
@@ -50,8 +49,7 @@ func TestSelectedUnitAuthorityHistorical2CannotInferSessionFields(t *testing.T) 
 func TestSelectedUnitAuthorityNew2CommitSurvivesReadCleanupFailureWithoutReplay(t *testing.T) {
 	workbook, state := vegetationWorkbookServiceFixture(t, false)
 	contexts := workbook.contexts
-	contexts.LongVegetationSelectedUnitsEnabled = true
-	selection := NewLongVegetationSelectedUnitSelectionService(contexts, true)
+	selection := NewLongVegetationSelectedUnitSelectionService(contexts)
 	ctx := context.Background()
 	draft, err := selection.SetLongVegetationSelectedUnitFields(ctx, state.ContextID, selectedUnitDraftJSON(t, "0", []string{"PlotNumber"}))
 	if err != nil {
@@ -60,7 +58,7 @@ func TestSelectedUnitAuthorityNew2CommitSurvivesReadCleanupFailureWithoutReplay(
 	if _, err := selection.BuildLongVegetationSelectedUnitSelection(ctx, state.ContextID, draft.Revision); err != nil {
 		t.Fatal(err)
 	}
-	preferences := NewLongVegetationUnitPreferencesService(contexts, true)
+	preferences := NewLongVegetationUnitPreferencesService(contexts)
 	preferences.snapshot.CommitRead = func(*sql.Tx) error { return errors.New("injected post-CAS read cleanup failure") }
 	request := `{"expected":{"unitGroups":1},"proposed":{"unitGroups":2}}`
 	committed := preferences.SaveLongVegetationUnitPreferences(ctx, state.ContextID, request)

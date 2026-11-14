@@ -30,26 +30,10 @@ func vegetationGroupRequest(t *testing.T, expected, proposed int) string {
 	return string(raw)
 }
 
-func TestLongVegetationGroupPreferencesGateAndStrictWire(t *testing.T) {
-	for _, test := range []struct {
-		raw              string
-		present, enabled bool
-		invalid          bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		got, err := LongVegetationGroupPreferencesFeature(func(name string) (string, bool) {
-			if name != "VPRO_LONG_VEGETATION_GROUP_PREFERENCES" {
-				t.Fatal(name)
-			}
-			return test.raw, test.present
-		})
-		if got != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, got, err)
-		}
-	}
+func TestLongVegetationGroupPreferencesStrictWire(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*LongVegetationGroupPreferencesService{nil, {}, NewLongVegetationGroupPreferencesService(nil, true)} {
+	for _, service := range []*LongVegetationGroupPreferencesService{nil, {}, NewLongVegetationGroupPreferencesService(nil)} {
 		for _, requestCtx := range []context.Context{nil, context.Background(), ctx} {
 			if got, err := service.GetLongVegetationGroupPreferences(requestCtx, "id"); got != nil || err == nil {
 				t.Fatal(got, err)
@@ -60,8 +44,7 @@ func TestLongVegetationGroupPreferencesGateAndStrictWire(t *testing.T) {
 		}
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	contexts.LongVegetationStrataEnabled, contexts.LongVegetationLifeformEnabled, contexts.LongVegetationNoneEnabled = true, true, true
-	service := NewLongVegetationGroupPreferencesService(contexts, true)
+	service := NewLongVegetationGroupPreferencesService(contexts)
 	var wire struct {
 		Review  LongVegetationGroupPreferencesReview  `json:"review"`
 		Request LongVegetationGroupPreferencesRequest `json:"request"`
@@ -139,56 +122,48 @@ func TestLongVegetationGroupPreferencesGateAndStrictWire(t *testing.T) {
 	}
 }
 
-func TestLongVegetationGroupPreferencesAllTransitionsAndIndependentAvailability(t *testing.T) {
+func TestLongVegetationGroupPreferencesAllTransitions(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
 	store := contexts.Projects.Preferences
-	service := NewLongVegetationGroupPreferencesService(contexts, true)
+	service := NewLongVegetationGroupPreferencesService(contexts)
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	for mask := 0; mask < 8; mask++ {
-		contexts.LongVegetationStrataEnabled = mask&1 != 0
-		contexts.LongVegetationLifeformEnabled = mask&2 != 0
-		contexts.LongVegetationNoneEnabled = mask&4 != 0
-		for original := 1; original <= 4; original++ {
-			for proposed := 1; proposed <= 4; proposed++ {
-				if err := store.Update("ReportOptions", map[string]any{"LVGroupBy": original}); err != nil {
-					t.Fatal(err)
-				}
-				read, err := service.GetLongVegetationGroupPreferences(context.Background(), state.ContextID)
-				expectedAvailability := LongVegetationGroupAvailability{true, mask&1 != 0, mask&2 != 0, mask&4 != 0}
-				if err != nil || read.Values.GroupBy != original || read.Availability != expectedAvailability {
-					t.Fatal(mask, original, read, err)
-				}
-				before, err := os.ReadFile(store.Path)
-				if err != nil {
-					t.Fatal(err)
-				}
-				values, err := store.Snapshot()
-				if err != nil {
-					t.Fatal(err)
-				}
-				allowed := proposed == 1 || proposed == 2 && mask&1 != 0 ||
-					proposed == 3 && mask&2 != 0 || proposed == 4 && mask&4 != 0
-				changed := original != proposed
-				got := service.SaveLongVegetationGroupPreferences(context.Background(), state.ContextID,
-					vegetationGroupRequest(t, original, proposed))
-				if got.Committed != (changed && allowed) || got.Changed != got.Committed ||
-					(got.ErrorMessage != "") != (changed && !allowed) {
-					t.Fatal(mask, original, proposed, got)
-				}
-				after, err := os.ReadFile(store.Path)
-				if err != nil {
-					t.Fatal(err)
-				}
-				if !got.Committed && !bytes.Equal(before, after) {
-					t.Fatal("refusal/no-op rewrote historical storage", mask, original, proposed)
-				}
-				if got.Committed {
-					values["ReportOptions"].(map[string]any)["LVGroupBy"] = proposed
-				}
-				current, err := store.Snapshot()
-				if err != nil || !reflect.DeepEqual(values, current) {
-					t.Fatal("unrelated preference changed", mask, original, proposed, err)
-				}
+	for original := 1; original <= 4; original++ {
+		for proposed := 1; proposed <= 4; proposed++ {
+			if err := store.Update("ReportOptions", map[string]any{"LVGroupBy": original}); err != nil {
+				t.Fatal(err)
+			}
+			read, err := service.GetLongVegetationGroupPreferences(context.Background(), state.ContextID)
+			expectedAvailability := LongVegetationGroupAvailability{true, true, true, true}
+			if err != nil || read.Values.GroupBy != original || read.Availability != expectedAvailability {
+				t.Fatal(original, read, err)
+			}
+			before, err := os.ReadFile(store.Path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			values, err := store.Snapshot()
+			if err != nil {
+				t.Fatal(err)
+			}
+			changed := original != proposed
+			got := service.SaveLongVegetationGroupPreferences(context.Background(), state.ContextID,
+				vegetationGroupRequest(t, original, proposed))
+			if got.Committed != changed || got.Changed != got.Committed || got.ErrorMessage != "" {
+				t.Fatal(original, proposed, got)
+			}
+			after, err := os.ReadFile(store.Path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !got.Committed && !bytes.Equal(before, after) {
+				t.Fatal("no-op rewrote historical storage", original, proposed)
+			}
+			if got.Committed {
+				values["ReportOptions"].(map[string]any)["LVGroupBy"] = proposed
+			}
+			current, err := store.Snapshot()
+			if err != nil || !reflect.DeepEqual(values, current) {
+				t.Fatal("unrelated preference changed", original, proposed, err)
 			}
 		}
 	}
@@ -200,14 +175,7 @@ func TestLongVegetationGroupPreferencesAllTransitionsAndIndependentAvailability(
 func TestLongVegetationGroupPreferencesStorageStaleAndOwnership(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
 	store := contexts.Projects.Preferences
-	service := NewLongVegetationGroupPreferencesService(contexts, true)
-	disabled := NewLongVegetationGroupPreferencesService(contexts, false)
-	if got, err := disabled.GetLongVegetationGroupPreferences(context.Background(), state.ContextID); got != nil || err == nil {
-		t.Fatal(got, err)
-	}
-	if got := disabled.SaveLongVegetationGroupPreferences(context.Background(), state.ContextID, vegetationGroupRequest(t, 1, 1)); got.Committed || got.ErrorMessage == "" {
-		t.Fatal(got)
-	}
+	service := NewLongVegetationGroupPreferencesService(contexts)
 	values, err := store.Snapshot()
 	if err != nil {
 		t.Fatal(err)
@@ -243,8 +211,7 @@ func TestLongVegetationGroupPreferencesStorageStaleAndOwnership(t *testing.T) {
 
 func TestLongVegetationGroupPreferencesCleanupCollisionCancellationAndCommittedRetry(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	contexts.LongVegetationStrataEnabled = true
-	service := NewLongVegetationGroupPreferencesService(contexts, true)
+	service := NewLongVegetationGroupPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	request := vegetationGroupRequest(t, 1, 2)
 	before, err := os.ReadFile(store.Path)

@@ -10,18 +10,15 @@ import (
 	"errors"
 )
 
-const siviHeightFeatureEnvironment = "VPRO_SIVI_HEIGHT_EDITING"
-
-func SiviHeightFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(siviHeightFeatureEnvironment, lookup)
-}
-
 func RequireSIVIHeights(s *vprocore.ContextService, ctx context.Context) error {
+	if ctx == nil {
+		return errors.New("SIVI aggregate-height editing requires a context")
+	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if !s.SiviHeightEnabled {
-		return errors.New("SIVI aggregate-height editing is disabled in this session")
+	if s == nil {
+		return errors.New("SIVI aggregate-height editing requires owned contexts")
 	}
 	return nil
 }

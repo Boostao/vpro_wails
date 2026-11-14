@@ -10,8 +10,6 @@ import (
 	"fmt"
 )
 
-const SiteUnitSummaryLifeformFeatureEnvironment = "VPRO_SITE_UNIT_SUMMARY_LIFEFORMS"
-
 func PreviewSiteUnitSummaryLifeforms(s *vprocore.ContextService, ctx context.Context, contextID string, request SiteUnitSummaryRequest) (SiteUnitSummaryPreview, error) {
 	if ctx == nil {
 		return SiteUnitSummaryPreview{}, errors.New("Summary lifeform preview requires a context")
@@ -19,8 +17,8 @@ func PreviewSiteUnitSummaryLifeforms(s *vprocore.ContextService, ctx context.Con
 	if err := ctx.Err(); err != nil {
 		return SiteUnitSummaryPreview{}, err
 	}
-	if s == nil || !s.SiteUnitSummaryLifeformsEnabled {
-		return SiteUnitSummaryPreview{}, errors.New("Summary lifeform preview is disabled in this session")
+	if s == nil {
+		return SiteUnitSummaryPreview{}, errors.New("Summary lifeform preview requires owned contexts")
 	}
 	input, err := ReadSiteUnitQuickVegetationInput(s, ctx, contextID, request.Method, vprocore.PublicationReadSnapshotHooks{})
 	if err != nil {

@@ -17,74 +17,10 @@ import (
 	"time"
 )
 
-func TestPlotLocationReviewFeatureIndependentLiteralOptIn(t *testing.T) {
-	for _, test := range []struct {
-		name, value               string
-		present, enabled, invalid bool
-	}{
-		{"unset", "", false, true, false},
-		{"true", "true", true, true, false},
-		{"false", "false", true, false, false},
-		{"empty", "", true, false, true},
-		{"uppercase", "TRUE", true, false, true},
-		{"number", "1", true, false, true},
-		{"padded", " true ", true, false, true},
-		{"newline", "true\n", true, false, true},
-		{"negative", "False", true, false, true},
-	} {
-		t.Run(test.name, func(t *testing.T) {
-			calls := 0
-			enabled, err := PlotLocationReviewFeature(func(name string) (string, bool) {
-				calls++
-				if name != "VPRO_PLOT_LOCATION_REVIEW" {
-					t.Fatal("unrelated feature lookup:", name)
-				}
-				return test.value, test.present
-			})
-			if calls != 1 || enabled != test.enabled || (err != nil) != test.invalid {
-				t.Fatal("literal opt-in changed:", test, enabled, err, calls)
-			}
-			if err != nil && !strings.Contains(err.Error(), "VPRO_PLOT_LOCATION_REVIEW") {
-				t.Fatal("invalid setting lost feature identity:", err)
-			}
-		})
-	}
-	enabled, err := PlotLocationReviewFeature(func(name string) (string, bool) {
-		if name == "VPRO_PLOT_LOCATION_REVIEW" {
-			return "false", true
-		}
-		return "true", true
-	})
-	if enabled || err != nil {
-		t.Fatal("unrelated flags enabled location review:", err)
-	}
-}
-
-func TestPlotLocationReviewFacadeDefaultOffAndIndependentGate(t *testing.T) {
-	service, state := vprotest.ContextServiceFixture(t)
-	check := vprotest.AssertPlotLocationFacadeReadOnly(t, service)
-	defer check()
-	for _, flag := range []*bool{
-		&service.SiviHeightEnabled, &service.SiviParentReviewEnabled,
-		&service.SiviParentEditingEnabled, &service.SiviParentActionEditingEnabled,
-		&service.SiviProjectAssignmentEnabled, &service.TableCSVReviewEnabled,
-	} {
-		*flag = true
-		if got, err := GetPlotLocationReview(service, context.Background(), state.ContextID); got != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-			t.Fatal("unrelated opt-in enabled location review:", got, err)
-		}
-	}
-	service.PlotLocationReviewEnabled = false
-	if got, err := GetPlotLocationReview(service, context.Background(), state.ContextID); got != nil || err == nil {
-		t.Fatal("explicit false enabled location review:", got, err)
-	}
-}
-
 func TestPlotLocationReviewFacadeExactDTOParityJSONAndDetachedValues(t *testing.T) {
 	service, state := vprotest.ContextServiceFixture(t)
 	check := vprotest.AssertPlotLocationFacadeReadOnly(t, service)
 	defer check()
-	service.PlotLocationReviewEnabled = true
 	want, err := service.ReadPlotLocations(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -124,17 +60,10 @@ func TestPlotLocationReviewFacadeExactDTOParityJSONAndDetachedValues(t *testing.
 	if err != nil || !reflect.DeepEqual(again, want) {
 		t.Fatal("caller aliases later public location snapshot:", err)
 	}
-	if service.TableCSVReviewEnabled {
-		t.Fatal("location opt-in enabled table CSV flag")
-	}
-	if service.SiviParentReviewEnabled {
-		t.Fatal("location opt-in enabled SIVI flag")
-	}
 }
 
 func TestPlotLocationReviewFacadeStaleOwnershipCancellationRetryAndNilErrors(t *testing.T) {
 	service, state := vprotest.ContextServiceFixture(t)
-	service.PlotLocationReviewEnabled = true
 	check := vprotest.AssertPlotLocationFacadeReadOnly(t, service)
 	defer check()
 	if got, err := GetPlotLocationReview(service, context.Background(), "stale"); got != nil || err == nil {
@@ -195,7 +124,6 @@ func TestPlotLocationReviewFacadeStaleOwnershipCancellationRetryAndNilErrors(t *
 
 func TestPlotLocationReviewFacadeRejectsPhysicalViewWithNil(t *testing.T) {
 	service, state := vprotest.ContextServiceFixture(t)
-	service.PlotLocationReviewEnabled = true
 	vprotest.MutateContextFixture(t, state.ProjectPath, `DROP TABLE Sample_Admin; CREATE VIEW Sample_Admin AS SELECT PlotNumber AS Plot FROM Sample_Env`)
 	check := vprotest.AssertPlotLocationFacadeReadOnly(t, service)
 	defer check()

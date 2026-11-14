@@ -33,9 +33,6 @@ func SelectedUnitAvailability(s *vprocore.ContextService, ctx context.Context, p
 	if err := s.RequireSelectedListReportScope(plots.Projects.ContextID); err != nil {
 		return false, err
 	}
-	if !s.LongVegetationSelectedUnitsEnabled {
-		return false, nil
-	}
 	entry := s.SelectedUnitSelections.Read(plots.Projects.ContextID)
 	if entry.Build == nil {
 		return false, nil
@@ -67,9 +64,6 @@ func DecodeOwnedLongVegetationOptions(s *vprocore.ContextService, ctx context.Co
 
 	if group != 2 {
 		return decodeLongVegetationOptions(values)
-	}
-	if !s.LongVegetationSelectedUnitsEnabled {
-		return longVegetationOptions{}, errors.New("Long Vegetation selected report units are disabled in this session; retained LVUnitGroups=2 was not reset")
 	}
 	fields, err := ApprovedSelectedUnitFields(s, ctx, plots.Projects.ContextID, plots.Projects.Sqlite, tx, values)
 	if err != nil {

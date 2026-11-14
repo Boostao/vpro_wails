@@ -9,8 +9,6 @@ import (
 	"errors"
 )
 
-const SiteUnitSummarySpeciesFeatureEnvironment = "VPRO_SITE_UNIT_SUMMARY_SPECIES"
-
 type SiteUnitSpeciesListRequest struct {
 	Method              int `json:"method"`
 	OrderBy             int `json:"orderBy"`
@@ -69,16 +67,13 @@ func PreviewSiteUnitSummarySpecies(s *vprocore.ContextService, ctx context.Conte
 	if err := ctx.Err(); err != nil {
 		return SiteUnitSpeciesListPreview{}, err
 	}
-	if s == nil || !s.SiteUnitSummarySpeciesEnabled {
-		return SiteUnitSpeciesListPreview{}, errors.New("Summary species preview is disabled in this session")
+	if s == nil {
+		return SiteUnitSpeciesListPreview{}, errors.New("Summary species preview requires owned contexts")
 	}
 	options := siteUnitSpeciesListOptions{request.OrderBy, request.CoverCalculation, request.AndOr,
 		request.PresenceGreaterThan, request.CoverGreaterThan}
 	if err := validateSiteUnitSpeciesListOptions(options); err != nil {
 		return SiteUnitSpeciesListPreview{}, err
-	}
-	if request.OrderBy == 2 && !s.SiteUnitSummaryLifeformsEnabled {
-		return SiteUnitSpeciesListPreview{}, errors.New("Summary lifeform grouping is disabled in this session")
 	}
 	input, err := ReadSiteUnitQuickVegetationInput(s, ctx, contextID, request.Method, vprocore.PublicationReadSnapshotHooks{})
 	if err != nil {

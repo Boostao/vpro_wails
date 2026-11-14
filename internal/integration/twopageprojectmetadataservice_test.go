@@ -237,27 +237,8 @@ func TestTwoPageProjectMetadataGateBoundsAndMasterIndependence(t *testing.T) {
 			t.Fatal("invalid page returned result", page, got, err)
 		}
 	}
-	if defaultGated, err := classification.NewTwoPageProjectMetadataService(service.Contexts, func(string) (string, bool) { return "", false }); err != nil || !defaultGated.Review {
-		t.Fatal("default metadata gate not enabled", defaultGated, err)
-	}
-	for _, value := range []string{"false", "TRUE", "1", " true "} {
-		gated, err := classification.NewTwoPageProjectMetadataService(service.Contexts, func(string) (string, bool) { return value, value != "" })
-		if value == "" || value == "false" {
-			if err != nil {
-				t.Fatal(err)
-			}
-			if got, err := gated.GetReview(context.Background(), state.ContextID, "108050", 0, 1); err == nil || got != nil {
-				t.Fatal("default/off gate returned review", got, err)
-			}
-		} else if err == nil {
-			t.Fatal("nonliteral feature value accepted", value)
-		}
-	}
-	if _, err := classification.NewTwoPageProjectMetadataService(nil, os.LookupEnv); err == nil {
+	if _, err := classification.NewTwoPageProjectMetadataService(nil); err == nil {
 		t.Fatal("missing owned contexts accepted")
-	}
-	if _, err := classification.NewTwoPageProjectMetadataService(service.Contexts, nil); err == nil {
-		t.Fatal("missing explicit feature lookup accepted")
 	}
 	owner := service.Contexts.Projects.Sqlite
 	master, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(owner.Attachments["VMetaData"], "rw"))

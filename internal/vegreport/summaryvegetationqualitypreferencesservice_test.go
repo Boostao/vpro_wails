@@ -57,22 +57,7 @@ func TestSummaryQualityFacadeStrictRequiredWire(t *testing.T) {
 }
 
 func TestSummaryQualityFacadeIndependentGateAndOwnedRead(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}} {
-		enabled, err := SummaryVegetationQualityPreferencesFeature(func(key string) (string, bool) {
-			if key != "VPRO_SUMMARY_VEGETATION_QUALITY_PREFERENCES" {
-				t.Fatal(key)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
-	for _, service := range []*SummaryVegetationQualityPreferencesService{nil, {}, NewSummaryVegetationQualityPreferencesService(nil, true)} {
+	for _, service := range []*SummaryVegetationQualityPreferencesService{nil, {}, NewSummaryVegetationQualityPreferencesService(nil)} {
 		if read, err := service.GetSummaryVegetationQualityPreferences(context.Background(), "id"); read != nil || err == nil {
 			t.Fatal(read, err)
 		}
@@ -81,7 +66,7 @@ func TestSummaryQualityFacadeIndependentGateAndOwnedRead(t *testing.T) {
 		}
 	}
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationQualityPreferencesService(contexts, true)
+	service := NewSummaryVegetationQualityPreferencesService(contexts)
 	read, err := service.GetSummaryVegetationQualityPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -103,7 +88,7 @@ func TestSummaryQualityFacadeIndependentGateAndOwnedRead(t *testing.T) {
 
 func TestSummaryQualityFacadeOwnedCleanupCollisionCancellationAndReceipt(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationQualityPreferencesService(contexts, true)
+	service := NewSummaryVegetationQualityPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	read, err := service.GetSummaryVegetationQualityPreferences(context.Background(), state.ContextID)
 	if err != nil {
@@ -181,7 +166,7 @@ func TestSummaryQualityFacadeOwnedCleanupCollisionCancellationAndReceipt(t *test
 
 func TestSummaryQualityFacadeBECSuggestionsEmptyAndMalformedCorrection(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationQualityPreferencesService(contexts, true)
+	service := NewSummaryVegetationQualityPreferencesService(contexts)
 	db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(contexts.Projects.Sqlite.Attachments["VLists"], "rw"))
 	if err != nil {
 		t.Fatal(err)
@@ -226,7 +211,7 @@ func TestSummaryQualityFacadeBECSuggestionsEmptyAndMalformedCorrection(t *testin
 
 func TestSummaryQualityFacadeSharedBECExternalCASAndNoDatabaseWrites(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationQualityPreferencesService(contexts, true)
+	service := NewSummaryVegetationQualityPreferencesService(contexts)
 	read, err := service.GetSummaryVegetationQualityPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)
@@ -275,12 +260,9 @@ func TestSummaryQualityFacadeSharedBECExternalCASAndNoDatabaseWrites(t *testing.
 }
 
 func TestSummaryQualityFacadeEmitActualGoWire(t *testing.T) {
-	directory := os.Getenv("VPRO_SUMMARY_QUALITY_PRIVATE_WIRE_DIR")
-	if directory == "" {
-		t.Skip("private actual-Go wire generation requires an explicit session directory")
-	}
+	directory := t.TempDir()
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewSummaryVegetationQualityPreferencesService(contexts, true)
+	service := NewSummaryVegetationQualityPreferencesService(contexts)
 	review, err := service.GetSummaryVegetationQualityPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)

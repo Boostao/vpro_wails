@@ -23,12 +23,7 @@ import (
 func lifeformWorkbookServiceFixture(t *testing.T, external bool) (*LifeformWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	contexts, state := vprotest.ReportServiceFixture(t, external)
-	service, err := NewLifeformWorkbookService(contexts, func(name string) (string, bool) {
-		if name != LifeformWorkbookFeatureEnvironment {
-			t.Fatal("workbook borrowed another workflow gate", name)
-		}
-		return "true", true
-	})
+	service, err := NewLifeformWorkbookService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,19 +91,13 @@ func TestLifeformWorkbookServiceOwnedReviewPublicationDeterminismAndCollision(t 
 	}
 }
 
-func TestLifeformWorkbookServiceIndependentGateAndRawShapeRefusal(t *testing.T) {
-	for _, gate := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewLifeformWorkbookService(nil, func(string) (string, bool) { return gate, gate != "" })
-		if gate == "" || gate == "false" || gate == "true" {
-			if err != nil || service.enabled != (gate != "false") {
-				t.Fatal("independent literal gate differs", gate, err)
-			}
-			if _, err := service.GetReview(context.Background(), "owned", `{}`); err == nil {
-				t.Fatal("unavailable service returned a review")
-			}
-		} else if err == nil {
-			t.Fatal("malformed gate accepted", gate)
-		}
+func TestLifeformWorkbookServiceRawShapeRefusal(t *testing.T) {
+	unowned, err := NewLifeformWorkbookService(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := unowned.GetReview(context.Background(), "owned", `{}`); err == nil {
+		t.Fatal("unavailable service returned a review")
 	}
 	service, state := lifeformWorkbookServiceFixture(t, false)
 	valid := `[false,false,false,false,false,false]`

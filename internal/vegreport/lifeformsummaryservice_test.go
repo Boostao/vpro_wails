@@ -20,31 +20,20 @@ import (
 
 func enabledLifeformService(t *testing.T, contexts *vprocore.ContextService) *LifeformSummaryService {
 	t.Helper()
-	service, err := NewLifeformSummaryService(contexts, func(name string) (string, bool) {
-		if name != lifeformSummaryFeatureEnvironment {
-			t.Fatal("gate borrowed another workflow", name)
-		}
-		return "true", true
-	})
+	service, err := NewLifeformSummaryService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return service
 }
 
-func TestLifeformSummaryServiceGateAndOwnedZeroWrites(t *testing.T) {
-	for _, gate := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewLifeformSummaryService(nil, func(string) (string, bool) { return gate, gate != "" })
-		if gate == "" || gate == "false" || gate == "true" {
-			if err != nil || service.enabled != (gate != "false") {
-				t.Fatal(gate, service, err)
-			}
-			if _, err := service.Preview(context.Background(), "owned"); err == nil {
-				t.Fatal("unavailable service published")
-			}
-		} else if err == nil {
-			t.Fatal("nonliteral gate accepted", gate)
-		}
+func TestLifeformSummaryServiceOwnedZeroWrites(t *testing.T) {
+	unowned, err := NewLifeformSummaryService(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := unowned.Preview(context.Background(), "owned"); err == nil {
+		t.Fatal("unavailable service published")
 	}
 	for _, external := range []bool{false, true} {
 		contexts, state := vprotest.ReportServiceFixture(t, external)
@@ -147,15 +136,10 @@ func TestLifeformSummaryServiceCancellationStalenessIdentityAndRetry(t *testing.
 
 func TestLifeformSummaryServiceSchemaRefusalHierarchyExclusionAndBorrowedLifetime(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, false)
-	calls, gate := 0, "true"
-	service, err := NewLifeformSummaryService(contexts, func(string) (string, bool) {
-		calls++
-		return gate, true
-	})
+	service, err := NewLifeformSummaryService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
-	gate = "false"
 	owner := contexts.Projects.Sqlite
 	mutate := func(role, statement string) {
 		t.Helper()
@@ -190,9 +174,6 @@ func TestLifeformSummaryServiceSchemaRefusalHierarchyExclusionAndBorrowedLifetim
 		}
 	}
 	verifyRead("")
-	if calls != 1 {
-		t.Fatal("feature gate was not constructor-lifetime captured", calls)
-	}
 	owner.Selection.SU = "USysSuTableDynamic"
 	verifyRead("hierarchy/dynamic-break scope is unavailable")
 	owner.Selection.SU = state.ActiveSU
@@ -210,15 +191,6 @@ func TestLifeformSummaryServiceSchemaRefusalHierarchyExclusionAndBorrowedLifetim
 	if _, err := contexts.Projects.GetState(context.Background()); err != nil || owner.Conn == nil {
 		t.Fatal("report closed its borrowed owner", err)
 	}
-	disabled, err := NewLifeformSummaryService(contexts, func(string) (string, bool) { return "false", true })
-	if err != nil {
-		t.Fatal(err)
-	}
-	before := vprotest.DatabaseBytes(t, owner.Attachments)
-	if _, err := disabled.Preview(context.Background(), state.ContextID); err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("default-off gate did not refuse preview", err)
-	}
-	vprotest.AssertProfileSUFiles(t, contexts, before)
 }
 
 func TestLifeformSummarySampleRepresentativeCounts(t *testing.T) {

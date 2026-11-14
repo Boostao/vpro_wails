@@ -29,8 +29,8 @@ type pictureCreationOwnerTestKey struct{}
 func pictureCreationFacadeFixture(t *testing.T, format string) (*PictureCreationService, context.Context, pictureCreationRequest) {
 	t.Helper()
 	contexts, _, source, request := pictureCreationFixture(t, false, pictureCreationTestSchema)
-	pictures := &PictureService{Contexts: contexts, Enabled: true, source: source}
-	service, err := NewPictureCreationService(pictures, pictureServiceLookup(map[string]string{PictureCreationWritingEnvironment: "true"}))
+	pictures := &PictureService{Contexts: contexts, source: source}
+	service, err := NewPictureCreationService(pictures)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,34 +74,14 @@ func pictureCreationFacadeChoose(t *testing.T, service *PictureCreationService, 
 	return selected
 }
 
-func TestPictureCreationServiceFeatureAndActualOwnerDenials(t *testing.T) {
-	service, ctx, request := pictureCreationFacadeFixture(t, "jpeg")
-	for _, value := range []string{"", "invalid", "yes", "TRUE "} {
-		if _, err := NewPictureCreationService(service.pictures, pictureServiceLookup(map[string]string{PictureCreationWritingEnvironment: value})); err == nil {
-			t.Fatal("invalid flag accepted", value)
-		}
-	}
-	for _, flags := range []map[string]string{{PictureCreationWritingEnvironment: "false"}, {PictureCreationWritingEnvironment: "false", pictureMetadataWritingEnvironment: "true"}} {
-		disabled, err := NewPictureCreationService(service.pictures, pictureServiceLookup(flags))
-		if err != nil {
-			t.Fatal(err)
-		}
-		if _, err := disabled.Choose(ctx, request.ContextID, request.Project, request.PlotNumber); err == nil {
-			t.Fatal("creation unexpectedly enabled")
-		}
-		if _, err := disabled.LookupReceipt(ctx, pictureCreationFacadeJSON(t, request)); err == nil {
-			t.Fatal("disabled recovery enabled")
-		}
-	}
-	for _, pictures := range []*PictureService{nil, {}, {Contexts: service.pictures.Contexts}, {Contexts: service.pictures.Contexts, Enabled: true}} {
-		if _, err := NewPictureCreationService(pictures, pictureServiceLookup(map[string]string{PictureCreationWritingEnvironment: "true"})); err == nil {
+func TestPictureCreationServiceActualOwnerDenials(t *testing.T) {
+	service, _, request := pictureCreationFacadeFixture(t, "jpeg")
+	for _, pictures := range []*PictureService{nil, {}, {Contexts: service.pictures.Contexts}} {
+		if _, err := NewPictureCreationService(pictures); err == nil {
 			t.Fatal("missing owned reading accepted")
 		}
 	}
-	if _, err := NewPictureCreationService(service.pictures, nil); err == nil {
-		t.Fatal("nil lookup accepted")
-	}
-	production, err := NewPictureCreationService(service.pictures, pictureServiceLookup(map[string]string{PictureCreationWritingEnvironment: "true", pictureMetadataWritingEnvironment: "false"}))
+	production, err := NewPictureCreationService(service.pictures)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -259,7 +239,7 @@ func TestPictureCreationServiceLiteralCommitPreviewAndReceiptLifecycle(t *testin
 			if recovered, err := service.LookupReceipt(t.Context(), raw); err != nil || recovered == nil {
 				t.Fatal("acknowledgement erased durable receipt", err)
 			}
-			restarted, err := NewPictureCreationService(service.pictures, pictureServiceLookup(map[string]string{PictureCreationWritingEnvironment: "true"}))
+			restarted, err := NewPictureCreationService(service.pictures)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -573,15 +553,8 @@ func TestPictureCreationServiceRecoverSelectionFreshOwnership(t *testing.T) {
 			}
 		})
 	}
-	service, ctx, request := pictureCreationFacadeFixture(t, "png")
-	disabled, err := NewPictureCreationService(service.pictures, pictureServiceLookup(nil))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if result, err := disabled.RecoverSelection(ctx, request.ContextID, request.Project, request.PlotNumber); err == nil || result != nil {
-		t.Fatal("disabled selection recovery inferred a production native owner")
-	}
-	production, err := NewPictureCreationService(service.pictures, pictureServiceLookup(map[string]string{PictureCreationWritingEnvironment: "true"}))
+	service, _, request := pictureCreationFacadeFixture(t, "png")
+	production, err := NewPictureCreationService(service.pictures)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -590,67 +563,62 @@ func TestPictureCreationServiceRecoverSelectionFreshOwnership(t *testing.T) {
 	}
 }
 
-func TestPictureCreationServiceDisabledSelectionRecoveryRequiresOwnedReadingAndNativeScope(t *testing.T) {
+func TestPictureCreationServiceSelectionRecoveryRequiresOwnedReadingAndNativeScope(t *testing.T) {
 	service, ctx, request := pictureCreationFacadeFixture(t, "png")
 	before := pictureCreationRawRows(t, service.pictures.source)
-	for _, flags := range []map[string]string{{PictureCreationWritingEnvironment: "false"}, {PictureCreationWritingEnvironment: "false", pictureMetadataWritingEnvironment: "true"}} {
-		disabled, err := NewPictureCreationService(service.pictures, pictureServiceLookup(flags))
-		if err != nil {
-			t.Fatal(err)
+	fresh, err := NewPictureCreationService(service.pictures)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fresh.owner = service.owner
+	fresh.chooser = func(context.Context) (string, error) {
+		t.Fatal("selection recovery opened a chooser")
+		return "", nil
+	}
+	recovered, err := fresh.RecoverSelection(ctx, request.ContextID, request.Project, request.PlotNumber)
+	if err != nil || recovered != nil {
+		t.Fatal("owned readonly recovery failed to prove absence", recovered, err)
+	}
+	for _, scope := range [][3]string{
+		{request.ContextID + "changed", request.Project, request.PlotNumber},
+		{request.ContextID, "Other", request.PlotNumber},
+		{request.ContextID, request.Project, "missing"},
+	} {
+		if result, err := fresh.RecoverSelection(ctx, scope[0], scope[1], scope[2]); err == nil || result != nil {
+			t.Fatal("readonly recovery accepted foreign scope", scope, result, err)
 		}
-		disabled.owner = service.owner
-		disabled.chooser = func(context.Context) (string, error) {
-			t.Fatal("disabled selection recovery opened a chooser")
-			return "", nil
+	}
+	cancelled, cancel := context.WithCancel(ctx)
+	cancel()
+	for _, invalid := range []context.Context{nil, t.Context(), cancelled} {
+		if result, err := fresh.RecoverSelection(invalid, request.ContextID, request.Project, request.PlotNumber); err == nil || result != nil {
+			t.Fatal("readonly recovery accepted invalid request/native ownership", result, err)
 		}
-		if _, err := disabled.Choose(ctx, request.ContextID, request.Project, request.PlotNumber); err == nil {
-			t.Fatal("disabled Choose succeeded")
-		}
-		recovered, err := disabled.RecoverSelection(ctx, request.ContextID, request.Project, request.PlotNumber)
-		if err != nil || recovered != nil {
-			t.Fatal("owned readonly recovery failed to prove absence after disabled Choose", recovered, err)
-		}
-		for _, scope := range [][3]string{
-			{request.ContextID + "changed", request.Project, request.PlotNumber},
-			{request.ContextID, "Other", request.PlotNumber},
-			{request.ContextID, request.Project, "missing"},
-		} {
-			if result, err := disabled.RecoverSelection(ctx, scope[0], scope[1], scope[2]); err == nil || result != nil {
-				t.Fatal("disabled readonly recovery accepted foreign scope", scope, result, err)
-			}
-		}
-		cancelled, cancel := context.WithCancel(ctx)
-		cancel()
-		for _, invalid := range []context.Context{nil, t.Context(), cancelled} {
-			if result, err := disabled.RecoverSelection(invalid, request.ContextID, request.Project, request.PlotNumber); err == nil || result != nil {
-				t.Fatal("disabled readonly recovery accepted invalid request/native ownership", result, err)
-			}
-		}
-		token := strings.Repeat("a", 64)
-		wire := pictureCreationFacadeJSON(t, request)
-		if result, err := disabled.Create(ctx, token, wire); err == nil || result != nil {
-			t.Fatal("readonly absence enabled Create")
-		}
-		if result, err := disabled.GetSelectedImage(ctx, token, wire); err == nil || result != nil {
-			t.Fatal("readonly absence granted an image")
-		}
-		if result, err := disabled.LookupReceipt(ctx, wire); err == nil || result != nil {
-			t.Fatal("readonly absence enabled unrelated history reading")
-		}
-		if err := disabled.ReleaseSelection(ctx, token); err == nil {
-			t.Fatal("readonly absence enabled capability release")
-		}
-		if err := disabled.AcknowledgeReceipt(ctx, token); err == nil {
-			t.Fatal("readonly absence enabled acknowledgement")
-		}
-		if len(disabled.tokens) != 0 || len(disabled.requests) != 0 || len(disabled.creating) != 0 ||
-			!reflect.DeepEqual(before, pictureCreationRawRows(t, service.pictures.source)) {
-			t.Fatal("readonly disabled recovery created authority or changed physical rows")
-		}
-		disabled.pictures = &PictureService{Contexts: service.pictures.Contexts, source: service.pictures.source}
-		if result, err := disabled.RecoverSelection(ctx, request.ContextID, request.Project, request.PlotNumber); err == nil || result != nil {
-			t.Fatal("readonly disabled recovery bypassed disabled reading")
-		}
+	}
+	token := strings.Repeat("a", 64)
+	wire := pictureCreationFacadeJSON(t, request)
+	if result, err := fresh.Create(ctx, token, wire); err == nil || result != nil {
+		t.Fatal("absence enabled Create")
+	}
+	if result, err := fresh.GetSelectedImage(ctx, token, wire); err == nil || result != nil {
+		t.Fatal("absence granted an image")
+	}
+	if result, err := fresh.LookupReceipt(ctx, wire); err != nil || result != nil {
+		t.Fatal("uncommitted history fabricated a receipt", result, err)
+	}
+	if err := fresh.ReleaseSelection(ctx, token); err == nil {
+		t.Fatal("absence enabled capability release")
+	}
+	if err := fresh.AcknowledgeReceipt(ctx, token); err == nil {
+		t.Fatal("absence enabled acknowledgement")
+	}
+	if len(fresh.tokens) != 0 || len(fresh.requests) != 0 || len(fresh.creating) != 0 ||
+		!reflect.DeepEqual(before, pictureCreationRawRows(t, service.pictures.source)) {
+		t.Fatal("readonly recovery created authority or changed physical rows")
+	}
+	fresh.pictures = &PictureService{Contexts: service.pictures.Contexts}
+	if result, err := fresh.RecoverSelection(ctx, request.ContextID, request.Project, request.PlotNumber); err == nil || result != nil {
+		t.Fatal("recovery bypassed missing library source")
 	}
 }
 

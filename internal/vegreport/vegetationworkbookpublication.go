@@ -15,14 +15,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
 )
-
-const vegetationWorkbookFeatureEnvironment = "VPRO_LONG_VEGETATION_WORKBOOK"
 
 type vegetationWorkbookReviewRequest struct {
 	Scope string `json:"scope"`
@@ -86,7 +83,6 @@ type vegetationWorkbookSource struct {
 
 type vegetationWorkbookService struct {
 	contexts *vprocore.ContextService
-	Enabled  bool `json:"-" yaml:"-"`
 	now      func() time.Time
 }
 
@@ -95,15 +91,8 @@ type vegetationWorkbookHooks struct {
 	publication vprocore.ArtifactPublicationHooks
 }
 
-func newVegetationWorkbookService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*vegetationWorkbookService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(vegetationWorkbookFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &vegetationWorkbookService{contexts: contexts, Enabled: enabled, now: time.Now}, nil
+func newVegetationWorkbookService(contexts *vprocore.ContextService) (*vegetationWorkbookService, error) {
+	return &vegetationWorkbookService{contexts: contexts, now: time.Now}, nil
 }
 
 func (s *vegetationWorkbookService) authorize(ctx context.Context) error {
@@ -113,10 +102,7 @@ func (s *vegetationWorkbookService) authorize(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.Enabled {
-		return errors.New("Long Vegetation workbook is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil ||
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil ||
 		s.contexts.Projects.Preferences == nil || s.contexts.Plots == nil || s.now == nil {
 		return errors.New("Long Vegetation workbook owned context/configuration is unavailable")
 	}

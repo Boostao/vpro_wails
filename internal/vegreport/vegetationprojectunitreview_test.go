@@ -105,7 +105,7 @@ func TestProjectUnitReviewStrictRequestsCleanupCancellationAndRetry(t *testing.T
 			t.Fatal("invalid requested approval produced successful unit review", raw, output, err)
 		}
 	}
-	for _, disabled := range []*LongVegetationReportScopeService{nil, NewLongVegetationReportScopeService(service.contexts, false)} {
+	for _, disabled := range []*LongVegetationReportScopeService{nil, {}, NewLongVegetationReportScopeService(nil)} {
 		if output, err := disabled.GetLongVegetationProjectUnitPreferences(ctx, state.ContextID, projectReadJSON(t, scope)); err == nil || !reflect.DeepEqual(output, zero) {
 			t.Fatal("disabled project preference read succeeded", output, err)
 		}

@@ -18,20 +18,8 @@ import (
 	"testing"
 )
 
-func TestGoogleEarthKMLExportIndependentGateAndUnavailableAuthorization(t *testing.T) {
-	for _, value := range []string{"", "true", "false", "TRUE", "1", " true", "true "} {
-		enabled, err := GoogleEarthKMLExportFeature(func(key string) (string, bool) {
-			if key == googleEarthKMLExportFeatureEnvironment {
-				return value, value != ""
-			}
-			t.Fatal("export flag inherited another environment key", key)
-			return "true", true
-		})
-		if enabled != (value == "" || value == "true") || (err != nil) != (value != "" && value != "true" && value != "false") {
-			t.Fatal("literal gate", value, enabled, err)
-		}
-	}
-	for _, service := range []*GoogleEarthKMLExportService{nil, NewGoogleEarthKMLExportService(nil, false), NewGoogleEarthKMLExportService(nil, true)} {
+func TestGoogleEarthKMLExportUnavailableAuthorization(t *testing.T) {
+	for _, service := range []*GoogleEarthKMLExportService{nil, NewGoogleEarthKMLExportService(nil)} {
 		if value, err := service.GetGoogleEarthKMLExportReview(context.Background(), "context", "malformed"); value != nil || err == nil {
 			t.Fatal("unavailable review authorization", value, err)
 		}
@@ -39,7 +27,7 @@ func TestGoogleEarthKMLExportIndependentGateAndUnavailableAuthorization(t *testi
 			t.Fatal("unavailable publication authorization", value, err)
 		}
 	}
-	service := NewGoogleEarthKMLExportService(nil, true)
+	service := NewGoogleEarthKMLExportService(nil)
 	if value, err := service.GetGoogleEarthKMLExportReview(nil, "", "{}"); value != nil || err == nil {
 		t.Fatal("nil request context", value, err)
 	}
@@ -52,7 +40,7 @@ func TestGoogleEarthKMLExportIndependentGateAndUnavailableAuthorization(t *testi
 
 func TestGoogleEarthKMLExportReviewHashBindsRawSourceAndPublishesOnce(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewGoogleEarthKMLExportService(contexts, true)
+	service := NewGoogleEarthKMLExportService(contexts)
 	request := `{"descriptionField":"Zone","title":" Literal <&\r\n "}`
 	review, err := service.GetGoogleEarthKMLExportReview(context.Background(), state.ContextID, request)
 	if err != nil || review == nil || len(review.ApprovalHash) != 64 {
@@ -155,7 +143,7 @@ func TestGoogleEarthKMLExportExplicitCommittedErrorsNeverBecomeRPCFailure(t *tes
 
 func TestGoogleEarthKMLExportFacadeReturnsActualCommittedReadCleanupFailure(t *testing.T) {
 	contexts, state := vprotest.PrepareKMLContextFixture(t)
-	service := NewGoogleEarthKMLExportService(contexts, true)
+	service := NewGoogleEarthKMLExportService(contexts)
 	review, err := service.GetGoogleEarthKMLExportReview(context.Background(), state.ContextID, `{"descriptionField":"Zone","title":""}`)
 	if err != nil {
 		t.Fatal(err)

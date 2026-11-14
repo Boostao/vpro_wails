@@ -11,47 +11,13 @@ import (
 	"testing"
 )
 
-func TestSIVICreationServiceIndependentGateAndGuards(t *testing.T) {
-	lookup := func(value string, present bool) func(string) (string, bool) {
-		return func(name string) (string, bool) {
-			if name == siviCreationFeatureEnvironment {
-				return value, present
-			}
-			return "false", true
-		}
-	}
-	if _, err := NewSIVICreationService(nil, lookup("true", true)); err == nil {
+func TestSIVICreationServiceGuards(t *testing.T) {
+	if _, err := NewSIVICreationService(nil); err == nil {
 		t.Fatal("missing context ownership accepted")
 	}
-	if _, err := NewSIVICreationService(&vprocore.ContextService{}, nil); err == nil {
-		t.Fatal("missing feature lookup accepted")
-	}
-	for _, value := range []string{"", "unknown", " true "} {
-		if _, err := NewSIVICreationService(&vprocore.ContextService{}, lookup(value, true)); err == nil {
-			t.Fatalf("malformed present creation gate %q accepted", value)
-		}
-	}
-	if defaultService, err := NewSIVICreationService(&vprocore.ContextService{}, lookup("", false)); err != nil || !defaultService.enabled {
-		t.Fatalf("default creation gate not enabled: %+v %v", defaultService, err)
-	}
-	for _, absent := range []bool{false} {
-		service, err := NewSIVICreationService(&vprocore.ContextService{}, lookup("false", !absent))
-		if err != nil || service.enabled {
-			t.Fatalf("default/off gate: %+v %v", service, err)
-		}
-		for _, operation := range []func() error{
-			func() error { _, err := service.GetReferences(context.Background(), "C", "P"); return err },
-			func() error { _, err := service.Create(context.Background(), "C", "{}"); return err },
-			func() error { _, err := service.LookupReceipt(context.Background(), "C", "{}"); return err },
-		} {
-			if err := operation(); err == nil || !strings.Contains(err.Error(), "disabled") {
-				t.Fatalf("independent gate failed: %v", err)
-			}
-		}
-	}
-	service, err := NewSIVICreationService(&vprocore.ContextService{}, lookup("true", true))
-	if err != nil || !service.enabled {
-		t.Fatalf("creation incorrectly depends on another editing gate: %v", err)
+	service, err := NewSIVICreationService(&vprocore.ContextService{})
+	if err != nil || service == nil {
+		t.Fatalf("creation service unavailable: %v", err)
 	}
 	if err := service.require(nil); err == nil {
 		t.Fatal("nil request context accepted")
@@ -68,9 +34,7 @@ func TestSIVICreationServiceIndependentGateAndGuards(t *testing.T) {
 }
 
 func TestSIVICreationServiceRawRequestsFailBeforeOwnership(t *testing.T) {
-	service, err := NewSIVICreationService(&vprocore.ContextService{}, func(name string) (string, bool) {
-		return "true", name == siviCreationFeatureEnvironment
-	})
+	service, err := NewSIVICreationService(&vprocore.ContextService{})
 	if err != nil {
 		t.Fatal(err)
 	}

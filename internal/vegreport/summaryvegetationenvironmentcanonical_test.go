@@ -181,23 +181,6 @@ func TestSummaryEnvironmentalCanonicalAllDefinitionsOwnedSnapshot(t *testing.T) 
 			if err != nil || !bytes.Equal(config, afterConfig) {
 				t.Fatal("canonical qualification wrote preferences", err)
 			}
-			if !external {
-				if path := os.Getenv("VPRO_SUMMARY_ENVIRONMENT_CANONICAL_WIRE_PATH"); path != "" {
-					roundtrip.Vegetation.ContextID = "summary-canonical-wire"
-					roundtrip.Vegetation.ProjectPath = `C:\fixture\Sample.db`
-					roundtrip.Vegetation.SUPath = `C:\fixture\Sample.db`
-					roundtrip.SourcePath = `C:\fixture\VPro64.db`
-					roundtrip.EnvSourcePath = `C:\fixture\Sample.db`
-					roundtrip.MasterSourcePath = `C:\fixture\VLists.db`
-					output, err := json.MarshalIndent(roundtrip, "", "  ")
-					if err != nil {
-						t.Fatal(err)
-					}
-					if err := os.WriteFile(path, append(output, '\n'), 0600); err != nil {
-						t.Fatal(err)
-					}
-				}
-			}
 		})
 	}
 }

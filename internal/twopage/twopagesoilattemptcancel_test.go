@@ -15,7 +15,7 @@ import (
 
 func TestTwoPageSoilAttemptCancellationAfterSealingRetainsLateDispatchRefusal(t *testing.T) {
 	contexts, state, _, request := soilWriteFixture(t, true, "SoilHumusXL", 3)
-	service := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
+	service := soilFacade(t, contexts)
 	raw := soilAttemptJSON(t, request)
 	owner := contexts.Projects.Sqlite
 	before := vprotest.DatabaseBytes(t, owner.Attachments)
@@ -71,7 +71,7 @@ func TestTwoPageSoilAttemptFacadeStagedCancellationAndPostcommitCompletionRecove
 	for _, postcommit := range []bool{false, true} {
 		t.Run(map[bool]string{false: "precommit", true: "postcommit"}[postcommit], func(t *testing.T) {
 			contexts, state, db, request := soilWriteFixture(t, true, "SoilHumusXL", 3)
-			service := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
+			service := soilFacade(t, contexts)
 			raw := soilAttemptJSON(t, request)
 			before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 			ctx, cancel := context.WithCancel(context.Background())

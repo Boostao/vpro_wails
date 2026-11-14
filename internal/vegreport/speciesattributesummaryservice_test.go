@@ -19,31 +19,20 @@ import (
 
 func enabledAttributeSummary(t *testing.T, contexts *vprocore.ContextService) *SpeciesAttributeSummaryService {
 	t.Helper()
-	service, err := NewSpeciesAttributeSummaryService(contexts, func(name string) (string, bool) {
-		if name != speciesAttributeSummaryFeatureEnvironment {
-			t.Fatal("attribute gate borrowed another workflow", name)
-		}
-		return "true", true
-	})
+	service, err := NewSpeciesAttributeSummaryService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return service
 }
 
-func TestSpeciesAttributeSummaryServiceGateAndOwnedZeroWrites(t *testing.T) {
-	for _, gate := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewSpeciesAttributeSummaryService(nil, func(string) (string, bool) { return gate, gate != "" })
-		if gate == "" || gate == "false" || gate == "true" {
-			if err != nil || service.enabled != (gate != "false") {
-				t.Fatal(gate, service, err)
-			}
-			if _, err := service.Preview(context.Background(), "owned"); err == nil {
-				t.Fatal("unavailable service published")
-			}
-		} else if err == nil {
-			t.Fatal("nonliteral gate accepted", gate)
-		}
+func TestSpeciesAttributeSummaryServiceOwnedZeroWrites(t *testing.T) {
+	unowned, err := NewSpeciesAttributeSummaryService(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := unowned.Preview(context.Background(), "owned"); err == nil {
+		t.Fatal("unavailable service published")
 	}
 	for _, external := range []bool{false, true} {
 		contexts, state := vprotest.ReportServiceFixture(t, external)

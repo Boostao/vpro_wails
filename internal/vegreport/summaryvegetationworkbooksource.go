@@ -45,14 +45,10 @@ func readSummaryVegetationWorkbookSource(ctx context.Context, service *SummaryVe
 	if err := validateSummaryWorkbookInspectionOptions(options); err != nil {
 		return fail(err)
 	}
-	if service == nil || service.environment == nil || service.environment.report == nil ||
-		!service.environment.report.Enabled {
-		return fail(errors.New("Summary workbook source requires enabled Summary Vegetation"))
+	if service == nil || service.environment == nil || service.environment.report == nil {
+		return fail(errors.New("Summary workbook source requires Summary Vegetation"))
 	}
 	environment := service.environment
-	if options.IncludeEnv && (!service.enabled || !environment.enabled || !environment.numericEnabled) {
-		return fail(errors.New("Summary workbook environmental header requires enabled environmental, numeric and lifeform inspection"))
-	}
 	if plots == nil || plots.Projects == nil || owner == nil || plots.Projects.Sqlite != owner || tx == nil {
 		return fail(errors.New("Summary workbook source requires the owned plot context and read transaction"))
 	}

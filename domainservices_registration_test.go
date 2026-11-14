@@ -371,15 +371,15 @@ func TestColdBootPictureLibraryWiringAndNilPictureServiceGuards(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewPictureService failed on cold boot: %v", err)
 	}
-	picMeta, err := NewPictureMetadataService(picSvc, picLookup)
+	picMeta, err := NewPictureMetadataService(picSvc)
 	if err != nil {
 		t.Fatalf("NewPictureMetadataService failed on cold boot: %v", err)
 	}
-	picCreate, err := NewPictureCreationService(picSvc, picLookup)
+	picCreate, err := NewPictureCreationService(picSvc)
 	if err != nil {
 		t.Fatalf("NewPictureCreationService failed on cold boot: %v", err)
 	}
-	picDelete, err := NewPictureDeletionService(picSvc, picLookup)
+	picDelete, err := NewPictureDeletionService(picSvc)
 	if err != nil {
 		t.Fatalf("NewPictureDeletionService failed on cold boot: %v", err)
 	}
@@ -395,19 +395,16 @@ func TestColdBootPictureLibraryWiringAndNilPictureServiceGuards(t *testing.T) {
 		t.Fatalf("unexpected initial VPics metadata review: %+v", review)
 	}
 
-	// Explicit env override must take precedence over defaults.
+	// Explicit directory/path env override must take precedence over defaults.
+	missingLibrary := filepath.Join(t.TempDir(), "missing-vpics.db")
 	overrideLookup := newDefaultPictureEnvLookup(func(key string) (string, bool) {
-		if key == "VPRO_PICTURE_READING" {
-			return "false", true
+		if key == "VPRO_PICTURE_LIBRARY_PATH" {
+			return missingLibrary, true
 		}
 		return "", false
 	}, defaultVPicsPath, defaultImagesDir)
-	disabledPicSvc, err := NewPictureService(contextSvc, overrideLookup)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := disabledPicSvc.GetMetadata(ctx, state.ContextID, "00337"); err == nil {
-		t.Fatal("expected explicit VPRO_PICTURE_READING=false env override to disable reading")
+	if _, err := NewPictureService(contextSvc, overrideLookup); err == nil {
+		t.Fatal("expected explicit VPRO_PICTURE_LIBRARY_PATH env override to take precedence over default")
 	}
 }
 

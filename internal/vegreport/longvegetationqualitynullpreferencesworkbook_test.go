@@ -17,7 +17,7 @@ func TestLongVegetationQualityNullPreferencesWorkbookActiveInactiveAndStaleAppro
 		t.Run(map[bool]string{false: "attached", true: "external"}[external], func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, external)
 			workbooks := &VegetationWorkbookService{Private: private}
-			preferences := NewLongVegetationQualityNullPreferencesService(private.contexts, true)
+			preferences := NewLongVegetationQualityNullPreferencesService(private.contexts)
 			beforeDB := vprotest.DatabaseBytes(t, private.contexts.Projects.Sqlite.Attachments)
 			for _, active := range []bool{false, true} {
 				if err := private.contexts.Projects.Preferences.Update("ReportOptions", map[string]any{
