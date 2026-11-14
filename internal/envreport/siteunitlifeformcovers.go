@@ -1,16 +1,15 @@
 package envreport
 
 import (
-	"github.com/boostao/vpro-wails/internal/reports/reportcore"
-	"github.com/boostao/vpro-wails/internal/vprocore"
-)
-
-import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"math"
 	"math/big"
+
+	"github.com/boostao/vpro-wails/internal/reports/reportcore"
+	"github.com/boostao/vpro-wails/internal/vprocore"
 )
 
 type siteUnitLifeformCover struct {
@@ -139,4 +138,182 @@ func planSiteUnitLifeformCovers(ctx context.Context, input siteUnitQuickVegetati
 		return nil, err
 	}
 	return result, nil
+}
+
+var siteUnitLifeformCaptions = [...]string{
+	"Genus-level and mixed", "Coniferous Tree", "Deciduous Tree",
+	"Evergreen Shrub", "Deciduous Shrub", "Ferns or Fern-ally",
+	"Graminoid", "Forb", "Parasite or Saprophyte", "Moss",
+	"Liverwort", "Lichen", "Dwarf woody plant", "Macroalgae",
+}
+
+func formatSiteUnitLifeformCover(row siteUnitLifeformCover) (string, error) {
+	if row.Lifeform < 0 || row.Lifeform >= len(siteUnitLifeformCaptions) {
+		return "", errors.New("Summary lifeform caption is outside the source 0..13 range")
+	}
+	if row.Minimum == nil && row.Mean == nil && row.Maximum == nil && row.ValueCount == 0 {
+		return "", nil
+	}
+	if row.Minimum == nil || row.Mean == nil || row.Maximum == nil ||
+		row.ValueCount < 1 || row.PhysicalPlots < 1 || row.DistinctPlots < 1 ||
+		row.DistinctPlots > row.PhysicalPlots || row.ValueCount < row.DistinctPlots {
+		return "", errors.New("Summary lifeform formatting requires complete owned scalar statistics")
+	}
+	for _, value := range []*float64{row.Minimum, row.Mean, row.Maximum} {
+		if math.IsNaN(*value) || math.IsInf(*value, 0) {
+			return "", errors.New("Summary lifeform formatting requires finite scalar values")
+		}
+	}
+	minimum := reportcore.SiteUnitFixedNumber(*row.Minimum, 1, 1)
+	if row.DistinctPlots < row.PhysicalPlots {
+		if *row.Minimum != 0 {
+			return "", errors.New("Summary lifeform incomplete-plot minimum must retain the source zero guard")
+		}
+		minimum = "0"
+	}
+	return minimum + "---" + reportcore.SiteUnitFixedNumber(*row.Mean, 1, 1) + "---" +
+		reportcore.SiteUnitFixedNumber(*row.Maximum, 1, 1), nil
+}
+
+func PreviewSiteUnitSummaryLifeforms(s *vprocore.ContextService, ctx context.Context, contextID string, request SiteUnitSummaryRequest) (SiteUnitSummaryPreview, error) {
+	if ctx == nil {
+		return SiteUnitSummaryPreview{}, errors.New("Summary lifeform preview requires a context")
+	}
+	if err := ctx.Err(); err != nil {
+		return SiteUnitSummaryPreview{}, err
+	}
+	if s == nil {
+		return SiteUnitSummaryPreview{}, errors.New("Summary lifeform preview requires owned contexts")
+	}
+	input, err := ReadSiteUnitQuickVegetationInput(s, ctx, contextID, request.Method, vprocore.PublicationReadSnapshotHooks{})
+	if err != nil {
+		return SiteUnitSummaryPreview{}, err
+	}
+	return siteUnitSummaryLifeformPreview(ctx, input)
+}
+
+func siteUnitSummaryLifeformPreview(ctx context.Context, input siteUnitQuickVegetationInput) (SiteUnitSummaryPreview, error) {
+	fail := func(err error) (SiteUnitSummaryPreview, error) { return SiteUnitSummaryPreview{}, err }
+	result := input.Environment
+	fields := []SiteUnitSummaryField{}
+	indices := []int{}
+	for i, field := range result.Report.Fields {
+		switch field.Key {
+		case "StrataCoverTree":
+			for form, caption := range siteUnitLifeformCaptions {
+				fields = append(fields, SiteUnitSummaryField{"Lifeform", fmt.Sprintf("Lifeform%d", form),
+					caption, "VEGETATION", "lifeform-cover"})
+				indices = append(indices, -1)
+			}
+		case "StrataCoverShrub", "StrataCoverHerb", "StrataCoverMoss":
+		default:
+			fields = append(fields, field)
+			indices = append(indices, i)
+		}
+	}
+	if len(fields) != 49 || len(input.Lifeform) != len(result.Report.Units) {
+		return fail(errors.New("Summary lifeform preview requires the complete owned source field registry"))
+	}
+	result.Report.Fields = fields
+	result.Report.Units = append([]SiteUnitSummaryUnit{}, result.Report.Units...)
+	result.Report.QuerySource = "selected-su-filtered-env-admin-quickveg-lifeform"
+	for i, unit := range result.Report.Units {
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		lifeform := input.Lifeform[i]
+		if lifeform.Code != unit.Code || lifeform.NPlots != len(unit.Plots) || len(lifeform.Rows) != 14 || len(unit.Values) != 39 {
+			return fail(errors.New("Summary lifeform unit/count differs from owned Environment provenance"))
+		}
+		values := []string{}
+		form := 0
+		for _, index := range indices {
+			if index >= 0 {
+				values = append(values, unit.Values[index])
+				continue
+			}
+			row := lifeform.Rows[form]
+			if row.Lifeform != form || row.Caption != siteUnitLifeformCaptions[form] {
+				return fail(errors.New("Summary lifeform row identity/caption differs from the source"))
+			}
+			values = append(values, row.Value)
+			form++
+		}
+		unit.Values = values
+		result.Report.Units[i] = unit
+	}
+	if err := ctx.Err(); err != nil {
+		return fail(err)
+	}
+	return result, nil
+}
+
+type siteUnitQuickVegetationInput struct {
+	Environment SiteUnitSummaryPreview
+	Quick       reportcore.SiteUnitQuickVegetation
+	References  reportcore.VegetationLifeformReferences
+	Lifeform    []siteUnitLifeformCoverUnit
+	Tables      []vprocore.ProjectMetadataTable
+}
+
+func ReadSiteUnitQuickVegetationInput(s *vprocore.ContextService, ctx context.Context, contextID string, method int,
+	hooks vprocore.PublicationReadSnapshotHooks) (siteUnitQuickVegetationInput, error) {
+	if ctx == nil {
+		return siteUnitQuickVegetationInput{}, errors.New("Summary QuickVeg requires a context")
+	}
+	if err := ctx.Err(); err != nil {
+		return siteUnitQuickVegetationInput{}, err
+	}
+	if s == nil || s.Projects == nil || s.Projects.Sqlite == nil || s.Plots == nil {
+		return siteUnitQuickVegetationInput{}, errors.New("Summary QuickVeg context service is unavailable")
+	}
+	if method != 1 && method != 2 {
+		return siteUnitQuickVegetationInput{}, errors.New("Summary Environment requires Mean (1) or Interquartile (2)")
+	}
+	if err := vprocore.ValidateGoogleEarthReviewStrings(contextID); err != nil {
+		return siteUnitQuickVegetationInput{}, err
+	}
+	return vprocore.WithContextPlotRequest(ctx, s, contextID, func(plots *vprocore.PlotService) (siteUnitQuickVegetationInput, error) {
+		return vprocore.WithOwnedPreferenceSnapshot(ctx, plots, hooks, func(owner *vprocore.SqliteContext, tx *sql.Tx) (siteUnitQuickVegetationInput, error) {
+			return readSiteUnitQuickVegetationSource(ctx, owner, tx, contextID, method)
+		})
+	})
+}
+
+func readSiteUnitQuickVegetationSource(ctx context.Context, owner *vprocore.SqliteContext, tx *sql.Tx,
+	contextID string, method int) (siteUnitQuickVegetationInput, error) {
+	if owner.Selection.SU == "USysSuTableDynamic" {
+		return siteUnitQuickVegetationInput{}, errors.New("Summary QuickVeg hierarchy/dynamic-break scope is unavailable")
+	}
+	environment, err := readSiteUnitSummaryWorkbookSource(ctx, owner, tx, contextID, method)
+	if err != nil {
+		return siteUnitQuickVegetationInput{}, err
+	}
+	tables := append([]vprocore.ProjectMetadataTable{}, environment.Tables...)
+	for _, source := range []struct{ role, table string }{
+		{"project", owner.Selection.Project + "_Veg"},
+		{"VLists", "USysAllSpecs"}, {"VUser", "USysUserSpp"},
+	} {
+		table, err := vprocore.ReadPhysicalLocationTable(ctx, tx, source.role, source.table)
+		if err != nil {
+			return siteUnitQuickVegetationInput{}, err
+		}
+		tables = append(tables, table)
+	}
+	quick, err := reportcore.PrepareSiteUnitQuickVegetation(ctx, owner.Selection.Project, owner.Selection.SU, 2, tables[4], tables[2])
+	if err != nil {
+		return siteUnitQuickVegetationInput{}, err
+	}
+	references, err := reportcore.PrepareVegetationLifeformReferences(ctx, tables[5], tables[6])
+	if err != nil {
+		return siteUnitQuickVegetationInput{}, err
+	}
+	input := siteUnitQuickVegetationInput{
+		Environment: environment.Preview, Quick: quick, References: references, Tables: tables,
+	}
+	input.Lifeform, err = planSiteUnitLifeformCovers(ctx, input)
+	if err != nil {
+		return siteUnitQuickVegetationInput{}, err
+	}
+	return input, nil
 }

@@ -1,16 +1,95 @@
 package vegreport
 
 import (
-	"github.com/boostao/vpro-wails/internal/vprocore"
-)
-
-import (
 	"context"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
+
+	"github.com/boostao/vpro-wails/internal/reports/reportcore"
+	"github.com/boostao/vpro-wails/internal/sqlutil"
+	"github.com/boostao/vpro-wails/internal/vprocore"
 )
+
+func addLongVegetationUnitNames(ctx context.Context, report *vegetationLayerReport, master vprocore.ProjectMetadataTable) error {
+	columns, err := vprocore.SiteUnitTransferColumns(master, "SiteSeries", "SiteSeriesLongName")
+	if err != nil {
+		return fmt.Errorf("Long Vegetation master name schema: %w", err)
+	}
+	rows, err := vprocore.SiteUnitTransferIndex(master, columns["SiteSeries"])
+	if err != nil {
+		return err
+	}
+	for i := range report.Units {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		unit := &report.Units[i]
+		code, err := vprocore.VegetationReportIdentity(unit.Code)
+		if err != nil {
+			return err
+		}
+		unit.NameCandidates = []vprocore.EnvironmentReportName{}
+		if code == nil {
+			empty := ""
+			unit.LongName, unit.NameStatus = &empty, "unassigned"
+			continue
+		}
+		names, err := reportcore.ResolveReportUnitNames(ctx, rows[*code], columns["SiteSeriesLongName"], "Long Vegetation")
+		if err != nil {
+			return err
+		}
+		unit.LongName, unit.NameStatus, unit.NameCandidates = names.LongName, names.Status, names.Candidates
+		if names.Status != "unique" {
+			report.Diagnostics = append(report.Diagnostics, vegetationLayerDiagnostic{
+				Code: "unit_name_" + names.Status, Identity: reportcore.VegetationTextKey(unit.Code), Count: len(names.Candidates),
+			})
+		}
+	}
+	return ctx.Err()
+}
+
+func longVegetationCodeReferences(ctx context.Context, source vprocore.ProjectMetadataTable, options longVegetationOptions) (vprocore.ProjectMetadataTable, longVegetationOptions, error) {
+	if err := ctx.Err(); err != nil {
+		return vprocore.ProjectMetadataTable{}, longVegetationOptions{}, err
+	}
+	if !options.ShowSpeciesCode {
+		return source, options, nil
+	}
+	columns, err := vprocore.SiteUnitTransferColumns(source, "Code", "EnglishName")
+	if err != nil {
+		return vprocore.ProjectMetadataTable{}, longVegetationOptions{}, err
+	}
+	result := vprocore.ProjectMetadataTable{
+		Columns: append([]vprocore.ProjectMetadataColumn{}, source.Columns...),
+		Rows:    make([]vprocore.ProjectMetadataRow, 0, len(source.Rows)),
+	}
+	for _, row := range source.Rows {
+		if err := ctx.Err(); err != nil {
+			return vprocore.ProjectMetadataTable{}, longVegetationOptions{}, err
+		}
+		cells := make([]vprocore.ProjectMetadataCell, len(row.Cells))
+		for i, cell := range row.Cells {
+			cells[i] = vprocore.CloneSiteUnitCell(cell)
+		}
+		cells[columns["EnglishName"]] = vprocore.CloneSiteUnitCell(row.Cells[columns["Code"]])
+		result.Rows = append(result.Rows, vprocore.ProjectMetadataRow{RowID: row.RowID, Cells: cells})
+	}
+	options.ShowEnglishName, options.ShowSpeciesCode = true, false
+	return result, options, nil
+}
+
+func CheckLongVegetationGrouping(_ *vprocore.ContextService, options longVegetationOptions) error {
+	if options.ShowEnglishName && options.ShowSpeciesCode || options.SelectedField != "" && (options.ShowEnglishName || options.ShowSpeciesCode) {
+		return errors.New("Long Vegetation supplementary fields cannot combine English name, Code or a selected field")
+	}
+	if options.NoneGrouping && (options.LifeformGrouping || options.StrataGrouping) ||
+		options.LifeformGrouping && options.StrataGrouping {
+		return errors.New("Long Vegetation grouping cannot combine None, Lifeform or Strata")
+	}
+	return nil
+}
 
 type vegetationNoneUnitOccurrence struct {
 	EnvRowID          string
@@ -169,4 +248,88 @@ func planLongVegetationNoneUnits(ctx context.Context, env, su vprocore.ProjectMe
 		}
 	}
 	return result, nil
+}
+
+func vegetationWorkbookNoneUnitSummary(ctx context.Context, summary vegetationWorkbookSummary,
+	env vprocore.ProjectMetadataTable, report LongVegetationReport) (vegetationWorkbookSummary, error) {
+	fail := func(err error) (vegetationWorkbookSummary, error) { return vegetationWorkbookSummary{}, err }
+	if ctx == nil {
+		return fail(errors.New("Long Vegetation None summary requires a context"))
+	}
+	if err := ctx.Err(); err != nil {
+		return fail(err)
+	}
+	if len(report.NoneUnits) == 0 || len(report.NoneUnits) > 1048572 {
+		return fail(errors.New("Long Vegetation None summary requires nonempty bounded derived join evidence"))
+	}
+	columns, err := vprocore.SiteUnitTransferColumns(env, "PlotNumber")
+	if err != nil {
+		return fail(err)
+	}
+	environments := map[string]vprocore.ProjectMetadataCell{}
+	for _, row := range env.Rows {
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		environments[row.RowID] = row.Cells[columns["PlotNumber"]]
+	}
+	physical := map[string]vegetationWorkbookMembership{}
+	for _, member := range summary.Memberships {
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		physical[member.RowID] = member
+	}
+	type witness struct {
+		env, member string
+		quality     int
+	}
+	seen := map[witness]bool{}
+	summary.Memberships = make([]vegetationWorkbookMembership, 0, len(report.NoneUnits))
+	summary.SelectedPlotRows = 0
+	allPlots := "All plots"
+	for _, occurrence := range report.NoneUnits {
+		if err := ctx.Err(); err != nil {
+			return fail(err)
+		}
+		member, present := physical[occurrence.MembershipID]
+		plot, envPresent := environments[occurrence.EnvRowID]
+		if !present || !envPresent || occurrence.PlotNumber.Storage != "text" ||
+			!reflect.DeepEqual(plot, occurrence.PlotNumber) || !reflect.DeepEqual(member.PlotNumber, occurrence.PlotNumber) ||
+			!reflect.DeepEqual(occurrence.SiteUnit, vprocore.ProjectMetadataCell{Storage: "text", Text: &allPlots}) {
+			return fail(errors.New("Long Vegetation None summary derived occurrence differs from original physical Env/SU membership"))
+		}
+		index := -1
+		if report.Quality == nil {
+			if occurrence.QualityOccurrence != nil {
+				return fail(errors.New("Long Vegetation None summary has unexpected quality link"))
+			}
+		} else {
+			if occurrence.QualityOccurrence == nil || *occurrence.QualityOccurrence < 0 ||
+				*occurrence.QualityOccurrence >= len(report.Quality.Occurrences) {
+				return fail(errors.New("Long Vegetation None summary lacks valid original quality link"))
+			}
+			index = *occurrence.QualityOccurrence
+			quality := report.Quality.Occurrences[index]
+			if quality.MembershipID != member.RowID || !reflect.DeepEqual(quality.PlotNumber, member.PlotNumber) ||
+				!reflect.DeepEqual(quality.SiteUnit, member.SiteUnit) {
+				return fail(errors.New("Long Vegetation None summary quality link differs from original SU membership"))
+			}
+		}
+		key := witness{occurrence.EnvRowID, occurrence.MembershipID, index}
+		if seen[key] {
+			return fail(errors.New("Long Vegetation None summary repeats the same derived join witness"))
+		}
+		seen[key] = true
+		member.PlotNumber = vprocore.CloneSiteUnitCell(member.PlotNumber)
+		member.SiteUnit = vprocore.CloneSiteUnitCell(occurrence.SiteUnit)
+		member.Quality = nil
+		copy := occurrence
+		copy.QualityOccurrence = sqlutil.CloneCatalogueValue(occurrence.QualityOccurrence)
+		copy.PlotNumber, copy.SiteUnit = vprocore.CloneSiteUnitCell(occurrence.PlotNumber), vprocore.CloneSiteUnitCell(occurrence.SiteUnit)
+		member.NoneUnit = &copy
+		summary.Memberships = append(summary.Memberships, member)
+		summary.SelectedPlotRows++
+	}
+	return summary, nil
 }

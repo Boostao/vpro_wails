@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	lifecyclepkg "github.com/boostao/vpro-wails/internal/lifecycle"
 	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 )
 
@@ -70,7 +71,7 @@ func TestMainRegistersStrictlyTwelveCohesiveDomainServices(t *testing.T) {
 func TestHelpServiceProvides2026LibraryStampsAboutAndReleaseChannel(t *testing.T) {
 	dataDir := t.TempDir()
 	configDir := t.TempDir()
-	preferences, err := openDesktopConfig(dataDir, configDir)
+	preferences, err := vprocorepkg.OpenDesktopConfig(dataDir, configDir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +103,7 @@ func TestHelpServiceProvides2026LibraryStampsAboutAndReleaseChannel(t *testing.T
 	}
 
 	channel, err := help.GetReleaseChannel(context.Background())
-	if err != nil || channel != ReleaseChannelStable {
+	if err != nil || channel != vprocorepkg.ReleaseChannelStable {
 		t.Fatalf("expected default stable release channel, got %q (%v)", channel, err)
 	}
 	raw, err := os.ReadFile(filepath.Join(configDir, "config.yml"))
@@ -117,7 +118,7 @@ func TestHelpServiceProvides2026LibraryStampsAboutAndReleaseChannel(t *testing.T
 	if err != nil {
 		t.Fatal(err)
 	}
-	if about.ProductName != "VPro" || about.SchemaVersion != "VP08" || about.ReleaseChannel != ReleaseChannelExperimental ||
+	if about.ProductName != "VPro" || about.SchemaVersion != "VP08" || about.ReleaseChannel != vprocorepkg.ReleaseChannelExperimental ||
 		!strings.Contains(about.Organization, "Ministry of Forests") {
 		t.Fatalf("unexpected AboutInfo: %+v", about)
 	}
@@ -135,21 +136,21 @@ func TestHelpServiceProvides2026LibraryStampsAboutAndReleaseChannel(t *testing.T
 func TestLifecycleServiceConsolidatesStartupAndCloseHandshake(t *testing.T) {
 	var emitted string
 	var quitCalled int
-	closeSvc, err := NewCloseService(
+	closeSvc, err := lifecyclepkg.NewCloseService(
 		func(nonce string) bool { emitted = nonce; return false },
 		func() { quitCalled++ },
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
-	startupSvc := &StartupService{State: StartupState{
+	startupSvc := &lifecyclepkg.StartupService{State: StartupState{
 		Ready:          true,
 		ConfigPath:     `C:\config\config.yml`,
-		ReleaseChannel: ReleaseChannelStable,
+		ReleaseChannel: vprocorepkg.ReleaseChannelStable,
 	}}
 	lifecycle := NewLifecycleService(startupSvc, closeSvc, nil)
 	state := lifecycle.GetStartupState()
-	if !state.Ready || state.ReleaseChannel != ReleaseChannelStable {
+	if !state.Ready || state.ReleaseChannel != vprocorepkg.ReleaseChannelStable {
 		t.Fatalf("unexpected startup state: %+v", state)
 	}
 	if closeSvc.ShouldQuit() {
@@ -159,7 +160,7 @@ func TestLifecycleServiceConsolidatesStartupAndCloseHandshake(t *testing.T) {
 	if pending == "" || pending != emitted {
 		t.Fatalf("expected emitted nonce %q to match pending %q", emitted, pending)
 	}
-	if err := lifecycle.CancelClose("forged"); !errors.Is(err, ErrInvalidCloseRequest) {
+	if err := lifecycle.CancelClose("forged"); !errors.Is(err, lifecyclepkg.ErrInvalidCloseRequest) {
 		t.Fatalf("forged nonce must be rejected, got %v", err)
 	}
 	if err := lifecycle.CancelClose(pending); err != nil || lifecycle.GetPendingCloseRequest() != "" {
@@ -215,16 +216,16 @@ func TestImportAccessProjectRenamedAuditAndChildLoadingViaPlotEntryService(t *te
 
 	dataDir := t.TempDir()
 	configDir := t.TempDir()
-	prefs, err := openDesktopConfig(dataDir, configDir)
+	prefs, err := vprocorepkg.OpenDesktopConfig(dataDir, configDir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	projects, err := newSQLiteProjectService(dataDir, configDir, prefs)
+	projects, err := vprocorepkg.NewSQLiteProjectService(dataDir, configDir, prefs)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer projects.CloseSQLiteContext()
-	plots, err := newPlotServiceWithPreferences(projects)
+	plots, err := vprocorepkg.NewPlotServiceWithPreferences(projects)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -334,11 +335,11 @@ func TestColdBootPictureLibraryWiringAndNilPictureServiceGuards(t *testing.T) {
 	// 2. Cold boot EnsureDefaultPictureLibrary + newDefaultPictureEnvLookup enables all 4 picture services out-of-the-box!
 	dataDir := t.TempDir()
 	configDir := t.TempDir()
-	preferences, err := openDesktopConfig(dataDir, configDir)
+	preferences, err := vprocorepkg.OpenDesktopConfig(dataDir, configDir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	projects, err := newSQLiteProjectService(dataDir, configDir, preferences)
+	projects, err := vprocorepkg.NewSQLiteProjectService(dataDir, configDir, preferences)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -347,7 +348,7 @@ func TestColdBootPictureLibraryWiringAndNilPictureServiceGuards(t *testing.T) {
 			_ = projects.Sqlite.Close()
 		}
 	})
-	plots, err := newPlotServiceWithPreferences(projects)
+	plots, err := vprocorepkg.NewPlotServiceWithPreferences(projects)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"os"
 
 	classificationpkg "github.com/boostao/vpro-wails/internal/classification"
@@ -63,6 +64,66 @@ func NewContextService(projects *vprocorepkg.ProjectService, plots *vprocorepkg.
 	return &ContextService{
 		core:  core,
 		cloud: cloudsyncpkg.NewManager(cfgDir, os.LookupEnv),
+	}, nil
+}
+
+type activatedProjectContext struct {
+	preferences          *vprocorepkg.DesktopConfig
+	releaseChannel       string
+	configuredSpatialDir string
+	projects             *vprocorepkg.ProjectService
+	plots                *vprocorepkg.PlotService
+	contextSvc           *ContextService
+}
+
+func openActiveProjectContext(
+	dataDir, configDir string,
+	refs *referenceCatalogBundle,
+	cloud *cloudsyncpkg.Manager,
+) (*activatedProjectContext, error) {
+	preferences, err := vprocorepkg.OpenDesktopConfig(dataDir, configDir)
+	if err != nil {
+		return nil, err
+	}
+	releaseChannel, err := preferences.ReleaseChannel()
+	if err != nil {
+		return nil, err
+	}
+	projects, err := vprocorepkg.NewSQLiteProjectService(dataDir, configDir, preferences)
+	if err != nil {
+		return nil, err
+	}
+	if err := projects.EnsureActiveProjectWAL(context.Background()); err != nil {
+		log.Printf("Warning: failed to initialize active project WAL mode: %v", err)
+	}
+	configuredSpatialDir := ""
+	if snap, snapErr := preferences.Snapshot(); snapErr == nil {
+		if spSec, secErr := vprocorepkg.ConfigSection(snap, "Spatial"); secErr == nil {
+			configuredSpatialDir, _ = spSec["AssetsDir"].(string)
+		}
+	}
+	plots, err := vprocorepkg.NewPlotServiceWithPreferences(projects)
+	if err != nil {
+		_ = projects.CloseSQLiteContext()
+		return nil, err
+	}
+	if refs != nil {
+		plots.SiteCodes, plots.SiteCodesError = refs.siteCodes, refs.siteCodesErr
+		plots.ParentCodes, plots.ParentCodesError = refs.parentCodes, refs.parentCodesErr
+	}
+	builtContext, err := NewContextService(projects, plots)
+	if err != nil {
+		_ = projects.CloseSQLiteContext()
+		return nil, err
+	}
+	builtContext.cloud = cloud
+	return &activatedProjectContext{
+		preferences:          preferences,
+		releaseChannel:       releaseChannel,
+		configuredSpatialDir: configuredSpatialDir,
+		projects:             projects,
+		plots:                plots,
+		contextSvc:           builtContext,
 	}, nil
 }
 
@@ -1058,4 +1119,3 @@ func (s *ContextService) VerifyBECMasterAuditChain(ctx context.Context, limit in
 	}
 	return mgr.VerifyBECMasterAuditChain(ctx, limit)
 }
-

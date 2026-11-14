@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	envreportpkg "github.com/boostao/vpro-wails/internal/envreport"
 	rsidecarpkg "github.com/boostao/vpro-wails/internal/rsidecar"
 )
 
@@ -31,13 +32,43 @@ type QuartoGuideResult = rsidecarpkg.QuartoGuideResult
 
 type EnvironmentReportService struct {
 	contexts                        *ContextService
-	environmentWorkbook             *EnvironmentWorkbookService
-	longEnvironmentPreferences      *LongEnvironmentPreferencesService
-	siteUnitSummaryPreferences      *SiteUnitSummaryPreferencesService
-	siteUnitSummaryWorkbook         *SiteUnitSummaryWorkbookService
-	siteUnitSummaryExtendedWorkbook *SiteUnitSummaryExtendedWorkbookService
-	subzoneMatrix                   *SubzoneMatrixService
+	environmentWorkbook             *envreportpkg.EnvironmentWorkbookService
+	longEnvironmentPreferences      *envreportpkg.LongEnvironmentPreferencesService
+	siteUnitSummaryPreferences      *envreportpkg.SiteUnitSummaryPreferencesService
+	siteUnitSummaryWorkbook         *envreportpkg.SiteUnitSummaryWorkbookService
+	siteUnitSummaryExtendedWorkbook *envreportpkg.SiteUnitSummaryExtendedWorkbookService
+	subzoneMatrix                   *envreportpkg.SubzoneMatrixService
 	dataDir                         string
+}
+
+func buildEnvironmentReportService(contexts *ContextService, dataDir string) (EnvironmentReportService, error) {
+	core := unwrapContextService(contexts)
+	environmentWorkbook, err := envreportpkg.NewEnvironmentWorkbookService(core)
+	if err != nil {
+		return EnvironmentReportService{}, err
+	}
+	siteUnitSummaryWorkbook, err := envreportpkg.NewSiteUnitSummaryWorkbookService(core)
+	if err != nil {
+		return EnvironmentReportService{}, err
+	}
+	siteUnitSummaryExtendedWorkbook, err := envreportpkg.NewSiteUnitSummaryExtendedWorkbookService(core)
+	if err != nil {
+		return EnvironmentReportService{}, err
+	}
+	subzoneMatrix, err := envreportpkg.NewSubzoneMatrixService(core)
+	if err != nil {
+		return EnvironmentReportService{}, err
+	}
+	return EnvironmentReportService{
+		contexts:                        contexts,
+		environmentWorkbook:             environmentWorkbook,
+		longEnvironmentPreferences:      envreportpkg.NewLongEnvironmentPreferencesService(core),
+		siteUnitSummaryPreferences:      envreportpkg.NewSiteUnitSummaryPreferencesService(core),
+		siteUnitSummaryWorkbook:         siteUnitSummaryWorkbook,
+		siteUnitSummaryExtendedWorkbook: siteUnitSummaryExtendedWorkbook,
+		subzoneMatrix:                   subzoneMatrix,
+		dataDir:                         dataDir,
+	}, nil
 }
 
 func (s *EnvironmentReportService) rRuntimeOptions() []rsidecarpkg.RuntimeOptions {

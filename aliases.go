@@ -13,7 +13,6 @@ import (
 	sivipkg "github.com/boostao/vpro-wails/internal/sivi"
 	sourceformpkg "github.com/boostao/vpro-wails/internal/sourceform"
 	spatialpkg "github.com/boostao/vpro-wails/internal/spatial"
-	sqlutilpkg "github.com/boostao/vpro-wails/internal/sqlutil"
 	twopagepkg "github.com/boostao/vpro-wails/internal/twopage"
 	validationpkg "github.com/boostao/vpro-wails/internal/validation"
 	vegreportpkg "github.com/boostao/vpro-wails/internal/vegreport"
@@ -30,17 +29,13 @@ type AccessProjectImportResult = interchangepkg.AccessProjectImportResult
 type AuditEntry = vprocorepkg.AuditEntry
 type AuditRestoreResult = vprocorepkg.AuditRestoreResult
 type BECCatalogueStatus = referencespkg.BECCatalogueStatus
-type BECService = referencespkg.BECService
 type BECSiteSeries = referencespkg.BECSiteSeries
 type BECSubZone = referencespkg.BECSubZone
 type BECZone = referencespkg.BECZone
-type CloseService = lifecyclepkg.CloseService
 type closeService = lifecyclepkg.CloseService
 type CollectedRecordUpdate = vprocorepkg.CollectedRecordUpdate
 type ContextSelection = vprocorepkg.ContextSelection
 type CoordinateParts = vprocorepkg.CoordinateParts
-type CoordinateService = vprocorepkg.CoordinateService
-type DesktopConfig = vprocorepkg.DesktopConfig
 type EnvironmentReport = reportcorepkg.EnvironmentReport
 type EnvironmentReportDiagnostic = reportcorepkg.EnvironmentReportDiagnostic
 type EnvironmentReportField = vprocorepkg.EnvironmentReportField
@@ -53,30 +48,23 @@ type EnvironmentSiteUnitReview = classificationpkg.EnvironmentSiteUnitReview
 type EnvironmentSiteUnitTransfer = classificationpkg.EnvironmentSiteUnitTransfer
 type EnvironmentWorkbookOutcome = envreportpkg.EnvironmentWorkbookOutcome
 type EnvironmentWorkbookReview = envreportpkg.EnvironmentWorkbookReview
-type EnvironmentWorkbookService = envreportpkg.EnvironmentWorkbookService
 type EnvironmentWorkbookSheet = envreportpkg.EnvironmentWorkbookSheet
 type ExternalSQLiteFileInspection = vprocorepkg.ExternalSQLiteFileInspection
 type ExternalSUEnvironmentAttemptOutcome = classificationpkg.ExternalSUEnvironmentAttemptOutcome
 type ExternalSUEnvironmentOutcome = classificationpkg.ExternalSUEnvironmentOutcome
 type ExternalSUEnvironmentReview = classificationpkg.ExternalSUEnvironmentReview
-type ExternalSUEnvironmentService = classificationpkg.ExternalSUEnvironmentService
 type FS882Header = vprocorepkg.FS882Header
 type GeologyCodeChoice = referencespkg.GeologyCodeChoice
-type GeologyCodeService = referencespkg.GeologyCodeService
 type GoogleEarthDescriptionFields = spatialpkg.GoogleEarthDescriptionFields
 type GoogleEarthKMLExportOutcome = spatialpkg.GoogleEarthKMLExportOutcome
 type GoogleEarthKMLExportReview = spatialpkg.GoogleEarthKMLExportReview
-type GoogleEarthKMLExportService = spatialpkg.GoogleEarthKMLExportService
 type GoogleEarthKMLReview = spatialpkg.GoogleEarthKMLReview
-type GoogleEarthKMLService = spatialpkg.GoogleEarthKMLService
 type GoogleEarthPreferenceValues = spatialpkg.GoogleEarthPreferenceValues
 type GoogleEarthPreferencesOutcome = spatialpkg.GoogleEarthPreferencesOutcome
 type GoogleEarthPreferencesReview = spatialpkg.GoogleEarthPreferencesReview
-type GoogleEarthPreferencesService = spatialpkg.GoogleEarthPreferencesService
 type GoogleEarthReview = spatialpkg.GoogleEarthReview
 type googleEarthReview = spatialpkg.GoogleEarthReview
 type GoogleEarthReviewRow = spatialpkg.GoogleEarthReviewRow
-type GoogleEarthReviewService = spatialpkg.GoogleEarthReviewService
 type HeightRecordUpdate = vprocorepkg.HeightRecordUpdate
 type HelpBundle = lifecyclepkg.HelpBundle
 type HelpCodeOption = lifecyclepkg.HelpCodeOption
@@ -101,41 +89,34 @@ type LifeformSummaryEntry = vegreportpkg.LifeformSummaryEntry
 type LifeformSummaryPreview = vegreportpkg.LifeformSummaryPreview
 type LifeformSummaryReport = vegreportpkg.LifeformSummaryReport
 type LifeformSummaryRow = vegreportpkg.LifeformSummaryRow
-type LifeformSummaryService = vegreportpkg.LifeformSummaryService
 type LifeformSummaryUnit = vegreportpkg.LifeformSummaryUnit
 type LifeformWorkbookOutcome = vegreportpkg.LifeformWorkbookOutcome
 type LifeformWorkbookReview = vegreportpkg.LifeformWorkbookReview
-type LifeformWorkbookService = vegreportpkg.LifeformWorkbookService
 type ListItem = referencespkg.ListItem
 type LongEnvironmentOptions = envreportpkg.LongEnvironmentOptions
 type LongEnvironmentPreferenceValues = envreportpkg.LongEnvironmentPreferenceValues
 type LongEnvironmentPreferencesOutcome = envreportpkg.LongEnvironmentPreferencesOutcome
 type LongEnvironmentPreferencesReview = envreportpkg.LongEnvironmentPreferencesReview
-type LongEnvironmentPreferencesService = envreportpkg.LongEnvironmentPreferencesService
 type LongEnvironmentPreview = envreportpkg.LongEnvironmentPreview
 type LongEnvironmentRequest = envreportpkg.LongEnvironmentRequest
 type LongVegetationDiagnostic = vegreportpkg.LongVegetationDiagnostic
 type LongVegetationEnforcementPreferenceValues = vegreportpkg.LongVegetationEnforcementPreferenceValues
 type LongVegetationEnforcementPreferencesOutcome = vegreportpkg.LongVegetationEnforcementPreferencesOutcome
 type LongVegetationEnforcementPreferencesReview = vegreportpkg.LongVegetationEnforcementPreferencesReview
-type LongVegetationEnforcementPreferencesService = vegreportpkg.LongVegetationEnforcementPreferencesService
 type LongVegetationGroupAvailability = vegreportpkg.LongVegetationGroupAvailability
 type LongVegetationGroupPreferenceValues = vegreportpkg.LongVegetationGroupPreferenceValues
 type LongVegetationGroupPreferencesOutcome = vegreportpkg.LongVegetationGroupPreferencesOutcome
 type LongVegetationGroupPreferencesReview = vegreportpkg.LongVegetationGroupPreferencesReview
-type LongVegetationGroupPreferencesService = vegreportpkg.LongVegetationGroupPreferencesService
 type LongVegetationNamingAvailability = vegreportpkg.LongVegetationNamingAvailability
 type LongVegetationNamingPreferenceValues = vegreportpkg.LongVegetationNamingPreferenceValues
 type LongVegetationNamingPreferencesOutcome = vegreportpkg.LongVegetationNamingPreferencesOutcome
 type LongVegetationNamingPreferencesReview = vegreportpkg.LongVegetationNamingPreferencesReview
-type LongVegetationNamingPreferencesService = vegreportpkg.LongVegetationNamingPreferencesService
 type LongVegetationNoneUnitOccurrence = vegreportpkg.LongVegetationNoneUnitOccurrence
 type LongVegetationOptions = vegreportpkg.LongVegetationOptions
 type LongVegetationPlot = vegreportpkg.LongVegetationPlot
 type LongVegetationPreferenceValues = vegreportpkg.LongVegetationPreferenceValues
 type LongVegetationPreferencesOutcome = vegreportpkg.LongVegetationPreferencesOutcome
 type LongVegetationPreferencesReview = vegreportpkg.LongVegetationPreferencesReview
-type LongVegetationPreferencesService = vegreportpkg.LongVegetationPreferencesService
 type LongVegetationPreview = vegreportpkg.LongVegetationPreview
 type LongVegetationProjectBuild = vprocorepkg.LongVegetationProjectBuild
 type LongVegetationProjectFieldDefinitions = vegreportpkg.LongVegetationProjectFieldDefinitions
@@ -145,52 +126,42 @@ type LongVegetationProjectUnit = vprocorepkg.LongVegetationProjectUnit
 type LongVegetationProjectUnitOutcome = vegreportpkg.LongVegetationProjectUnitOutcome
 type LongVegetationProjectUnitPreferences = vegreportpkg.LongVegetationProjectUnitPreferences
 type LongVegetationProjectWorkbookReview = vegreportpkg.LongVegetationProjectWorkbookReview
-type LongVegetationProjectWorkbookService = vegreportpkg.LongVegetationProjectWorkbookService
 type LongVegetationQualityCriterion = vegreportpkg.LongVegetationQualityCriterion
 type LongVegetationQualityMinimumPreferenceValues = vegreportpkg.LongVegetationQualityMinimumPreferenceValues
 type LongVegetationQualityMinimumPreferencesOutcome = vegreportpkg.LongVegetationQualityMinimumPreferencesOutcome
 type LongVegetationQualityMinimumPreferencesReview = vegreportpkg.LongVegetationQualityMinimumPreferencesReview
-type LongVegetationQualityMinimumPreferencesService = vegreportpkg.LongVegetationQualityMinimumPreferencesService
 type LongVegetationQualityNullPreferenceValues = vegreportpkg.LongVegetationQualityNullPreferenceValues
 type LongVegetationQualityNullPreferencesOutcome = vegreportpkg.LongVegetationQualityNullPreferencesOutcome
 type LongVegetationQualityNullPreferencesReview = vegreportpkg.LongVegetationQualityNullPreferencesReview
-type LongVegetationQualityNullPreferencesService = vegreportpkg.LongVegetationQualityNullPreferencesService
 type LongVegetationQualityOccurrence = vegreportpkg.LongVegetationQualityOccurrence
 type LongVegetationQualityReference = vegreportpkg.LongVegetationQualityReference
 type LongVegetationQualitySelection = vegreportpkg.LongVegetationQualitySelection
 type LongVegetationQualitySettings = vegreportpkg.LongVegetationQualitySettings
 type LongVegetationReport = vegreportpkg.LongVegetationReport
 type LongVegetationReportScope = vegreportpkg.LongVegetationReportScope
-type LongVegetationReportScopeService = vegreportpkg.LongVegetationReportScopeService
 type LongVegetationRow = vegreportpkg.LongVegetationRow
 type LongVegetationSelectedFieldPreferenceValues = vegreportpkg.LongVegetationSelectedFieldPreferenceValues
 type LongVegetationSelectedFieldPreferencesOutcome = vegreportpkg.LongVegetationSelectedFieldPreferencesOutcome
 type LongVegetationSelectedFieldPreferencesReview = vegreportpkg.LongVegetationSelectedFieldPreferencesReview
-type LongVegetationSelectedFieldPreferencesService = vegreportpkg.LongVegetationSelectedFieldPreferencesService
 type LongVegetationSelectedUnitBuild = vprocorepkg.LongVegetationSelectedUnitBuild
 type LongVegetationSelectedUnitField = vegreportpkg.LongVegetationSelectedUnitField
 type LongVegetationSelectedUnitOccurrence = vprocorepkg.LongVegetationSelectedUnitOccurrence
 type LongVegetationSelectedUnitSelection = vegreportpkg.LongVegetationSelectedUnitSelection
-type LongVegetationSelectedUnitSelectionService = vegreportpkg.LongVegetationSelectedUnitSelectionService
 type LongVegetationSettings = vegreportpkg.LongVegetationSettings
 type LongVegetationStatisticsPreferenceValues = vegreportpkg.LongVegetationStatisticsPreferenceValues
 type LongVegetationStatisticsPreferencesOutcome = vegreportpkg.LongVegetationStatisticsPreferencesOutcome
 type LongVegetationStatisticsPreferencesReview = vegreportpkg.LongVegetationStatisticsPreferencesReview
-type LongVegetationStatisticsPreferencesService = vegreportpkg.LongVegetationStatisticsPreferencesService
 type LongVegetationSwitchPreferenceValues = vegreportpkg.LongVegetationSwitchPreferenceValues
 type LongVegetationSwitchPreferencesOutcome = vegreportpkg.LongVegetationSwitchPreferencesOutcome
 type LongVegetationSwitchPreferencesReview = vegreportpkg.LongVegetationSwitchPreferencesReview
-type LongVegetationSwitchPreferencesService = vegreportpkg.LongVegetationSwitchPreferencesService
 type LongVegetationThresholdPreferenceValues = vegreportpkg.LongVegetationThresholdPreferenceValues
 type LongVegetationThresholdPreferencesOutcome = vegreportpkg.LongVegetationThresholdPreferencesOutcome
 type LongVegetationThresholdPreferencesReview = vegreportpkg.LongVegetationThresholdPreferencesReview
-type LongVegetationThresholdPreferencesService = vegreportpkg.LongVegetationThresholdPreferencesService
 type LongVegetationUnit = vegreportpkg.LongVegetationUnit
 type LongVegetationUnitAvailability = vegreportpkg.LongVegetationUnitAvailability
 type LongVegetationUnitPreferenceValues = vegreportpkg.LongVegetationUnitPreferenceValues
 type LongVegetationUnitPreferencesOutcome = vegreportpkg.LongVegetationUnitPreferencesOutcome
 type LongVegetationUnitPreferencesReview = vegreportpkg.LongVegetationUnitPreferencesReview
-type LongVegetationUnitPreferencesService = vegreportpkg.LongVegetationUnitPreferencesService
 type MineralRecord = vprocorepkg.MineralRecord
 type OrdinaryAuditReadEntry = vprocorepkg.OrdinaryAuditReadEntry
 type OtherFlagUpdate = vprocorepkg.OtherFlagUpdate
@@ -198,7 +169,6 @@ type OtherRecord = vprocorepkg.OtherRecord
 type OtherRecordUpdate = vprocorepkg.OtherRecordUpdate
 type OtherTextUpdate = vprocorepkg.OtherTextUpdate
 type ParentCodeChoice = referencespkg.ParentCodeChoice
-type ParentCodeService = referencespkg.ParentCodeService
 type PersonalSpeciesDefinitionRequest = plotentrypkg.PersonalSpeciesDefinitionRequest
 type PictureCreationResult = picturespkg.PictureCreationResult
 type PictureCreationSelection = picturespkg.PictureCreationSelection
@@ -213,9 +183,7 @@ type PictureRestorationReview = picturespkg.PictureRestorationReview
 type PlotLabelPDFAttemptOutcome = interchangepkg.PlotLabelPDFAttemptOutcome
 type PlotLabelPDFExportOutcome = interchangepkg.PlotLabelPDFExportOutcome
 type PlotLabelPDFExportReview = interchangepkg.PlotLabelPDFExportReview
-type PlotLabelPDFExportService = interchangepkg.PlotLabelPDFExportService
 type PlotLabelRegionalPreview = interchangepkg.PlotLabelRegionalPreview
-type PlotLabelRegionalService = interchangepkg.PlotLabelRegionalService
 type PlotLocationReport = vprocorepkg.PlotLocationReport
 type PlotLocationReview = vprocorepkg.PlotLocationReview
 type PlotLocationRow = vprocorepkg.PlotLocationRow
@@ -229,7 +197,6 @@ type PlotProfileTableCreation = classificationpkg.PlotProfileTableCreation
 type PlotProfileTableReview = classificationpkg.PlotProfileTableReview
 type PlotProfileWriteRequest = classificationpkg.PlotProfileWriteRequest
 type PlotQualityChoice = referencespkg.PlotQualityChoice
-type PlotService = vprocorepkg.PlotService
 type PlotSummary = vprocorepkg.PlotSummary
 type PrinterObservation = vprocorepkg.PrinterObservation
 type ProfileSUCreated = classificationpkg.ProfileSUCreated
@@ -267,35 +234,22 @@ type ProjectPlotProfileRuleDraft = classificationpkg.ProjectPlotProfileRuleDraft
 type ProjectPlotProfileRunRequest = classificationpkg.ProjectPlotProfileRunRequest
 type ProjectPlotProfileStep = classificationpkg.ProjectPlotProfileStep
 type ProjectProfileSpeciesPresencePreview = classificationpkg.ProjectProfileSpeciesPresencePreview
-type ProjectProfileSpeciesPresenceService = classificationpkg.ProjectProfileSpeciesPresenceService
-type ProjectService = vprocorepkg.ProjectService
 type ProjectState = vprocorepkg.ProjectState
 type ProjectTableCSVReview = interchangepkg.ProjectTableCSVReview
-type QualityService = referencespkg.QualityService
-type qualityService = referencespkg.QualityService
-type ReferenceService = referencespkg.ReferenceService
 type RegionCodeChoice = referencespkg.RegionCodeChoice
-type RegionCodeService = referencespkg.RegionCodeService
-type SIVICollectedService = sivipkg.SIVICollectedService
-type SIVICombinedService = sivipkg.SIVICombinedService
-type SIVICoverService = sivipkg.SIVICoverService
 type SIVICoverWriteResult = sivipkg.SIVICoverWriteResult
 type SIVICreationResult = sivipkg.SIVICreationResult
-type SIVICreationService = sivipkg.SIVICreationService
 type SIVICreationUndoHistoryList = sivipkg.SIVICreationUndoHistoryList
 type SIVICreationUndoResult = sivipkg.SIVICreationUndoResult
 type SIVICreationUndoReview = sivipkg.SIVICreationUndoReview
-type SIVICreationUndoService = sivipkg.SIVICreationUndoService
 type SIVIDeletionHistoryList = sivipkg.SIVIDeletionHistoryList
 type SIVIDeletionOriginal = sivipkg.SIVIDeletionOriginal
 type SIVIDeletionRestorationResult = sivipkg.SIVIDeletionRestorationResult
 type SIVIDeletionRestorationReview = sivipkg.SIVIDeletionRestorationReview
 type SIVIDeletionResult = sivipkg.SIVIDeletionResult
-type SIVIDeletionService = sivipkg.SIVIDeletionService
 type SIVIDeletionTargets = sivipkg.SIVIDeletionTargets
 type SIVIHeightEdit = sourceformpkg.SIVIHeightEdit
 type SIVIHeightWriteResult = sourceformpkg.SIVIHeightWriteResult
-type SIVIIdentityService = sivipkg.SIVIIdentityService
 type SIVIParentActionInput = sivipkg.SIVIParentActionInput
 type SIVIParentActionSaveResult = sivipkg.SIVIParentActionSaveResult
 type SIVIParentActionWrite = sivipkg.SIVIParentActionWrite
@@ -308,7 +262,6 @@ type SIVIParentRow = sourceformpkg.SIVIParentRow
 type SIVIParentSharedReference = sourceformpkg.SIVIParentSharedReference
 type SIVIParentSharedReferenceChoice = sourceformpkg.SIVIParentSharedReferenceChoice
 type SIVIParentSharedReferences = sourceformpkg.SIVIParentSharedReferences
-type SIVIParentSharedService = sourceformpkg.SIVIParentSharedService
 type SIVIParentSharedWrite = sourceformpkg.SIVIParentSharedWrite
 type SIVIParentWriteResult = sourceformpkg.SIVIParentWriteResult
 type SIVIProjectAssignmentOriginal = sourceformpkg.SIVIProjectAssignmentOriginal
@@ -316,14 +269,12 @@ type SIVIProjectAssignmentWrite = sourceformpkg.SIVIProjectAssignmentWrite
 type SIVIProjectChoices = sourceformpkg.SIVIProjectChoices
 type SIVIProjectSelection = sourceformpkg.SIVIProjectSelection
 type SIVISpeciesReferences = sourceformpkg.SIVISpeciesReferences
-type SIVISpeciesService = sourceformpkg.SIVISpeciesService
 type SIVIVegetationProjection = sourceformpkg.SIVIVegetationProjection
 type SUInfo = vprocorepkg.SUInfo
 type SavedPlotLabelHeader = interchangepkg.SavedPlotLabelHeader
 type ScopedPlotLookup = vprocorepkg.ScopedPlotLookup
 type ScopedPlotLookupResult = vprocorepkg.ScopedPlotLookupResult
 type SiteCodeChoice = referencespkg.SiteCodeChoice
-type SiteCodeService = referencespkg.SiteCodeService
 type SiteUnitEnvironmentChange = classificationpkg.SiteUnitEnvironmentChange
 type SiteUnitEnvironmentResult = classificationpkg.SiteUnitEnvironmentResult
 type SiteUnitEnvironmentReview = classificationpkg.SiteUnitEnvironmentReview
@@ -335,13 +286,11 @@ type SiteUnitSpeciesListRow = envreportpkg.SiteUnitSpeciesListRow
 type SiteUnitSpeciesListUnit = envreportpkg.SiteUnitSpeciesListUnit
 type SiteUnitSummaryExtendedWorkbookOptions = envreportpkg.SiteUnitSummaryExtendedWorkbookOptions
 type SiteUnitSummaryExtendedWorkbookReview = envreportpkg.SiteUnitSummaryExtendedWorkbookReview
-type SiteUnitSummaryExtendedWorkbookService = envreportpkg.SiteUnitSummaryExtendedWorkbookService
 type SiteUnitSummaryField = envreportpkg.SiteUnitSummaryField
 type SiteUnitSummaryMembership = envreportpkg.SiteUnitSummaryMembership
 type SiteUnitSummaryOptions = envreportpkg.SiteUnitSummaryOptions
 type SiteUnitSummaryPlot = envreportpkg.SiteUnitSummaryPlot
 type SiteUnitSummaryPreferencesOutcome = envreportpkg.SiteUnitSummaryPreferencesOutcome
-type SiteUnitSummaryPreferencesService = envreportpkg.SiteUnitSummaryPreferencesService
 type SiteUnitSummaryPreview = envreportpkg.SiteUnitSummaryPreview
 type SiteUnitSummaryReport = envreportpkg.SiteUnitSummaryReport
 type SiteUnitSummaryRequest = envreportpkg.SiteUnitSummaryRequest
@@ -349,11 +298,7 @@ type SiteUnitSummaryUnit = envreportpkg.SiteUnitSummaryUnit
 type SiteUnitSummaryWorkbookOutcome = envreportpkg.SiteUnitSummaryWorkbookOutcome
 type SiteUnitSummaryWorkbookReview = envreportpkg.SiteUnitSummaryWorkbookReview
 type SiteUnitSummaryWorkbookScope = envreportpkg.SiteUnitSummaryWorkbookScope
-type SiteUnitSummaryWorkbookService = envreportpkg.SiteUnitSummaryWorkbookService
-type SiviParentSharedReferenceReaders = sourceformpkg.SiviParentSharedReferenceReaders
-type siviParentSharedReferenceReaders = sourceformpkg.SiviParentSharedReferenceReaders
 type SoilCodeChoice = referencespkg.SoilCodeChoice
-type SoilCodeService = referencespkg.SoilCodeService
 type SoilNumberUpdate = vprocorepkg.SoilNumberUpdate
 type SoilRecordUpdate = vprocorepkg.SoilRecordUpdate
 type SoilSuggestion = plotentrypkg.SoilSuggestion
@@ -363,7 +308,6 @@ type SpeciesAttributeDefinition = vegreportpkg.SpeciesAttributeDefinition
 type SpeciesAttributeMatch = vegreportpkg.SpeciesAttributeMatch
 type SpeciesAttributeSummaryPreview = vegreportpkg.SpeciesAttributeSummaryPreview
 type SpeciesAttributeSummaryReport = vegreportpkg.SpeciesAttributeSummaryReport
-type SpeciesAttributeSummaryService = vegreportpkg.SpeciesAttributeSummaryService
 type SpeciesAttributeUnit = vegreportpkg.SpeciesAttributeUnit
 type SpeciesCodeCheckOption = validationpkg.SpeciesCodeCheckOption
 type SpeciesCodeCheckReview = validationpkg.SpeciesCodeCheckReview
@@ -373,21 +317,17 @@ type SpeciesItem = referencespkg.SpeciesItem
 type StandardsArtifactStamp = lifecyclepkg.StandardsArtifactStamp
 type StandardsSourceStamp = lifecyclepkg.StandardsSourceStamp
 type StartupRecoveryRequest = lifecyclepkg.StartupRecoveryRequest
-type StartupService = lifecyclepkg.StartupService
 type startupService = lifecyclepkg.StartupService
 type StartupState = lifecyclepkg.StartupState
 type SubzoneMatrixPreview = envreportpkg.SubzoneMatrixPreview
 type SubzoneMatrixRow = envreportpkg.SubzoneMatrixRow
-type SubzoneMatrixService = envreportpkg.SubzoneMatrixService
 type SubzoneMatrixWorkbookOutcome = envreportpkg.SubzoneMatrixWorkbookOutcome
 type SubzoneMatrixWorkbookReview = envreportpkg.SubzoneMatrixWorkbookReview
 type SummaryVegetationEnvironmentalLifeformPreview = vegreportpkg.SummaryVegetationEnvironmentalLifeformPreview
-type SummaryVegetationEnvironmentalLifeformService = vegreportpkg.SummaryVegetationEnvironmentalLifeformService
 type SummaryVegetationEnvironmentalNumericPreview = vegreportpkg.SummaryVegetationEnvironmentalNumericPreview
 type SummaryVegetationEnvironmentalNumericRow = vegreportpkg.SummaryVegetationEnvironmentalNumericRow
 type SummaryVegetationEnvironmentalPreview = vegreportpkg.SummaryVegetationEnvironmentalPreview
 type SummaryVegetationEnvironmentalRow = vegreportpkg.SummaryVegetationEnvironmentalRow
-type SummaryVegetationEnvironmentalService = vegreportpkg.SummaryVegetationEnvironmentalService
 type SummaryVegetationEnvironmentalValue = vegreportpkg.SummaryVegetationEnvironmentalValue
 type SummaryVegetationField = vegreportpkg.SummaryVegetationField
 type SummaryVegetationFieldListAssignment = vegreportpkg.SummaryVegetationFieldListAssignment
@@ -395,25 +335,20 @@ type SummaryVegetationFieldListCommittedPlan = vegreportpkg.SummaryVegetationFie
 type SummaryVegetationFieldListOutcome = vegreportpkg.SummaryVegetationFieldListOutcome
 type SummaryVegetationFieldListReview = vegreportpkg.SummaryVegetationFieldListReview
 type SummaryVegetationFieldListSelection = vegreportpkg.SummaryVegetationFieldListSelection
-type SummaryVegetationFieldListService = vegreportpkg.SummaryVegetationFieldListService
 type SummaryVegetationPreferenceValues = vegreportpkg.SummaryVegetationPreferenceValues
 type SummaryVegetationPreferencesOutcome = vegreportpkg.SummaryVegetationPreferencesOutcome
 type SummaryVegetationPreferencesReview = vegreportpkg.SummaryVegetationPreferencesReview
-type SummaryVegetationPreferencesService = vegreportpkg.SummaryVegetationPreferencesService
 type SummaryVegetationPresentationPreferenceValues = vegreportpkg.SummaryVegetationPresentationPreferenceValues
 type SummaryVegetationPresentationPreferencesOutcome = vegreportpkg.SummaryVegetationPresentationPreferencesOutcome
 type SummaryVegetationPresentationPreferencesReview = vegreportpkg.SummaryVegetationPresentationPreferencesReview
-type SummaryVegetationPresentationPreferencesService = vegreportpkg.SummaryVegetationPresentationPreferencesService
 type SummaryVegetationPreview = vegreportpkg.SummaryVegetationPreview
 type SummaryVegetationQualityPreferenceValues = vegreportpkg.SummaryVegetationQualityPreferenceValues
 type SummaryVegetationQualityPreferencesOutcome = vegreportpkg.SummaryVegetationQualityPreferencesOutcome
 type SummaryVegetationQualityPreferencesReview = vegreportpkg.SummaryVegetationQualityPreferencesReview
-type SummaryVegetationQualityPreferencesService = vegreportpkg.SummaryVegetationQualityPreferencesService
 type SummaryVegetationReferenceOptions = vegreportpkg.SummaryVegetationReferenceOptions
 type SummaryVegetationReferenceOrigin = vegreportpkg.SummaryVegetationReferenceOrigin
 type SummaryVegetationReferenceReview = vegreportpkg.SummaryVegetationReferenceReview
 type SummaryVegetationRow = vegreportpkg.SummaryVegetationRow
-type SummaryVegetationService = vegreportpkg.SummaryVegetationService
 type SummaryVegetationUnit = vegreportpkg.SummaryVegetationUnit
 type SummaryVegetationWitness = vegreportpkg.SummaryVegetationWitness
 type SummaryVegetationWorkbookAncillaryOptions = vegreportpkg.SummaryVegetationWorkbookAncillaryOptions
@@ -422,53 +357,36 @@ type SummaryVegetationWorkbookAncillaryUnit = vegreportpkg.SummaryVegetationWork
 type SummaryVegetationWorkbookOptions = vegreportpkg.SummaryVegetationWorkbookOptions
 type SummaryVegetationWorkbookReportSummary = vegreportpkg.SummaryVegetationWorkbookReportSummary
 type SummaryVegetationWorkbookReview = vegreportpkg.SummaryVegetationWorkbookReview
-type SummaryVegetationWorkbookService = vegreportpkg.SummaryVegetationWorkbookService
 type TableCSVArchiveOutcome = interchangepkg.TableCSVArchiveOutcome
 type TableCSVArchiveReview = interchangepkg.TableCSVArchiveReview
-type TableCSVArchiveService = interchangepkg.TableCSVArchiveService
 type TableCSVDescription = interchangepkg.TableCSVDescription
 type TableCSVManifest = interchangepkg.TableCSVManifest
 type TwoPageEntryCodeAcknowledgement = twopagepkg.TwoPageEntryCodeAcknowledgement
 type TwoPageEntryFieldPolicy = twopagepkg.TwoPageEntryFieldPolicy
 type TwoPageEntryReferenceFilters = twopagepkg.TwoPageEntryReferenceFilters
-type TwoPageEntryReferenceReaders = twopagepkg.TwoPageEntryReferenceReaders
-type twoPageEntryReferenceReaders = twopagepkg.TwoPageEntryReferenceReaders
 type TwoPageEntryReferenceSnapshot = twopagepkg.TwoPageEntryReferenceSnapshot
 type TwoPageEnvironmentTableReview = datasheetpkg.TwoPageEnvironmentTableReview
 type TwoPageEnvironmentTableRow = datasheetpkg.TwoPageEnvironmentTableRow
-type TwoPageEnvironmentTableService = datasheetpkg.TwoPageEnvironmentTableService
 type TwoPageGoogleEarthOptions = spatialpkg.TwoPageGoogleEarthOptions
 type TwoPageGoogleEarthReview = spatialpkg.TwoPageGoogleEarthReview
-type TwoPageGoogleEarthService = spatialpkg.TwoPageGoogleEarthService
-type TwoPageParentCommonService = twopagepkg.TwoPageParentCommonService
 type TwoPageParentCommonWrite = twopagepkg.TwoPageParentCommonWrite
-type TwoPageParentEntryService = twopagepkg.TwoPageParentEntryService
 type TwoPageParentEntryWrite = twopagepkg.TwoPageParentEntryWrite
-type TwoPageParentExtraService = twopagepkg.TwoPageParentExtraService
 type TwoPageParentExtraWrite = twopagepkg.TwoPageParentExtraWrite
 type TwoPageProfilingReview = classificationpkg.TwoPageProfilingReview
-type TwoPageProfilingService = classificationpkg.TwoPageProfilingService
 type TwoPageProjectMetadataReview = classificationpkg.TwoPageProjectMetadataReview
-type TwoPageProjectMetadataService = classificationpkg.TwoPageProjectMetadataService
 type TwoPageSoilAttemptOutcome = twopagepkg.TwoPageSoilAttemptOutcome
 type TwoPageSoilOriginal = twopagepkg.TwoPageSoilOriginal
 type TwoPageSoilReferences = twopagepkg.TwoPageSoilReferences
-type TwoPageSoilService = twopagepkg.TwoPageSoilService
 type TwoPageSoilWriteResult = twopagepkg.TwoPageSoilWriteResult
 type TwoPageSourceAuditOriginal = twopagepkg.TwoPageSourceAuditOriginal
-type TwoPageSourceAuditService = twopagepkg.TwoPageSourceAuditService
 type TwoPageVegetationAttemptOutcome = twopagepkg.TwoPageVegetationAttemptOutcome
 type TwoPageVegetationOriginal = twopagepkg.TwoPageVegetationOriginal
-type TwoPageVegetationService = twopagepkg.TwoPageVegetationService
-type TwoPageVegetationSpeciesListService = twopagepkg.TwoPageVegetationSpeciesListService
 type TwoPageVegetationSpeciesReferences = twopagepkg.TwoPageVegetationSpeciesReferences
 type TwoPageVegetationTableColumn = datasheetpkg.TwoPageVegetationTableColumn
 type TwoPageVegetationTableReview = datasheetpkg.TwoPageVegetationTableReview
 type TwoPageVegetationTableRow = datasheetpkg.TwoPageVegetationTableRow
-type TwoPageVegetationTableService = datasheetpkg.TwoPageVegetationTableService
 type TwoPageVegetationWriteResult = twopagepkg.TwoPageVegetationWriteResult
 type UserLogReview = lifecyclepkg.UserLogReview
-type UserLogService = lifecyclepkg.UserLogService
 type VegRecord = vprocorepkg.VegRecord
 type VegetationAttributeUpdate = plotentrypkg.VegetationAttributeUpdate
 type VegetationCreationRequest = vprocorepkg.VegetationCreationRequest
@@ -485,320 +403,12 @@ type VegetationSpeciesUpdate = vprocorepkg.VegetationSpeciesUpdate
 type VegetationWorkbookOptions = vegreportpkg.VegetationWorkbookOptions
 type VegetationWorkbookOutcome = vegreportpkg.VegetationWorkbookOutcome
 type VegetationWorkbookReview = vegreportpkg.VegetationWorkbookReview
-type VegetationWorkbookService = vegreportpkg.VegetationWorkbookService
 type VegetationWorkbookSheet = reportcorepkg.VegetationWorkbookSheet
 type VegetationWorkbookSkippedUnit = vegreportpkg.VegetationWorkbookSkippedUnit
 type VegetationWorkbookSummary = vegreportpkg.VegetationWorkbookSummary
 type WhatsNewStatus = lifecyclepkg.WhatsNewStatus
 type WorkingUnitChoice = vprocorepkg.WorkingUnitChoice
 type WorkingUnitModeState = vprocorepkg.WorkingUnitModeState
-type WorkingUnitService = vprocorepkg.WorkingUnitService
-
-var ConvertCoordinate = vprocorepkg.ConvertCoordinate
-
-var DecomposeCoordinate = vprocorepkg.DecomposeCoordinate
-
-var NewBECService = referencespkg.NewBECService
-
-var PopulateStartupRecoveryHints = lifecyclepkg.PopulateRecoveryHints
-var ConfigSection = vprocorepkg.ConfigSection
-var NewCloseService = lifecyclepkg.NewCloseService
-
-func NewEnvironmentWorkbookService(p0 *ContextService) (*envreportpkg.EnvironmentWorkbookService, error) {
-	return envreportpkg.NewEnvironmentWorkbookService(unwrapContextService(p0))
-}
-
-func NewExternalSUEnvironmentService(p0 *ContextService) *classificationpkg.ExternalSUEnvironmentService {
-	return classificationpkg.NewExternalSUEnvironmentService(unwrapContextService(p0))
-}
-
-var NewGeologyCodeService = referencespkg.NewGeologyCodeService
-
-func NewGoogleEarthKMLExportService(p0 *ContextService) *spatialpkg.GoogleEarthKMLExportService {
-	return spatialpkg.NewGoogleEarthKMLExportService(unwrapContextService(p0))
-}
-
-func NewGoogleEarthKMLService(p0 *ContextService) *spatialpkg.GoogleEarthKMLService {
-	return spatialpkg.NewGoogleEarthKMLService(unwrapContextService(p0))
-}
-
-func NewGoogleEarthPreferencesService(p0 *ContextService) *spatialpkg.GoogleEarthPreferencesService {
-	return spatialpkg.NewGoogleEarthPreferencesService(unwrapContextService(p0))
-}
-
-func NewGoogleEarthReviewService(p0 *ContextService) *spatialpkg.GoogleEarthReviewService {
-	return spatialpkg.NewGoogleEarthReviewService(unwrapContextService(p0))
-}
-
-func NewLifeformSummaryService(p0 *ContextService) (*vegreportpkg.LifeformSummaryService, error) {
-	return vegreportpkg.NewLifeformSummaryService(unwrapContextService(p0))
-}
-
-func NewLifeformWorkbookService(p0 *ContextService) (*vegreportpkg.LifeformWorkbookService, error) {
-	return vegreportpkg.NewLifeformWorkbookService(unwrapContextService(p0))
-}
-
-func NewLongEnvironmentPreferencesService(p0 *ContextService) *envreportpkg.LongEnvironmentPreferencesService {
-	return envreportpkg.NewLongEnvironmentPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationEnforcementPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationEnforcementPreferencesService {
-	return vegreportpkg.NewLongVegetationEnforcementPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationGroupPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationGroupPreferencesService {
-	return vegreportpkg.NewLongVegetationGroupPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationNamingPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationNamingPreferencesService {
-	return vegreportpkg.NewLongVegetationNamingPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationPreferencesService {
-	return vegreportpkg.NewLongVegetationPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationProjectWorkbookService(p0 *ContextService) *vegreportpkg.LongVegetationProjectWorkbookService {
-	return vegreportpkg.NewLongVegetationProjectWorkbookService(unwrapContextService(p0))
-}
-
-func NewLongVegetationQualityMinimumPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationQualityMinimumPreferencesService {
-	return vegreportpkg.NewLongVegetationQualityMinimumPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationQualityNullPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationQualityNullPreferencesService {
-	return vegreportpkg.NewLongVegetationQualityNullPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationReportScopeService(p0 *ContextService) *vegreportpkg.LongVegetationReportScopeService {
-	return vegreportpkg.NewLongVegetationReportScopeService(unwrapContextService(p0))
-}
-
-func NewLongVegetationSelectedFieldPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationSelectedFieldPreferencesService {
-	return vegreportpkg.NewLongVegetationSelectedFieldPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationSelectedUnitSelectionService(p0 *ContextService) *vegreportpkg.LongVegetationSelectedUnitSelectionService {
-	return vegreportpkg.NewLongVegetationSelectedUnitSelectionService(unwrapContextService(p0))
-}
-
-func NewLongVegetationStatisticsPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationStatisticsPreferencesService {
-	return vegreportpkg.NewLongVegetationStatisticsPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationSwitchPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationSwitchPreferencesService {
-	return vegreportpkg.NewLongVegetationSwitchPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationThresholdPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationThresholdPreferencesService {
-	return vegreportpkg.NewLongVegetationThresholdPreferencesService(unwrapContextService(p0))
-}
-
-func NewLongVegetationUnitPreferencesService(p0 *ContextService) *vegreportpkg.LongVegetationUnitPreferencesService {
-	return vegreportpkg.NewLongVegetationUnitPreferencesService(unwrapContextService(p0))
-}
-
-var NewParentCodeService = referencespkg.NewParentCodeService
-
-func NewPictureCreationService(p0 *PictureService) (*picturespkg.PictureCreationService, error) {
-	return picturespkg.NewPictureCreationService(unwrapPictureService(p0))
-}
-
-func NewPictureDeletionService(p0 *PictureService) (*picturespkg.PictureDeletionService, error) {
-	return picturespkg.NewPictureDeletionService(unwrapPictureService(p0))
-}
-
-func NewPictureMetadataService(p0 *PictureService) (*picturespkg.PictureMetadataService, error) {
-	return picturespkg.NewPictureMetadataService(unwrapPictureService(p0))
-}
-
-func NewPlotLabelPDFExportService(p0 *ContextService) *interchangepkg.PlotLabelPDFExportService {
-	return interchangepkg.NewPlotLabelPDFExportService(unwrapContextService(p0))
-}
-
-func NewPlotLabelRegionalService(p0 *ContextService) (*interchangepkg.PlotLabelRegionalService, error) {
-	return interchangepkg.NewPlotLabelRegionalService(unwrapContextService(p0))
-}
-
-func NewProjectProfileSpeciesPresenceService(p0 *ContextService) (*classificationpkg.ProjectProfileSpeciesPresenceService, error) {
-	return classificationpkg.NewProjectProfileSpeciesPresenceService(unwrapContextService(p0))
-}
-
-var NewQualityService = referencespkg.NewQualityService
-
-var NewReferenceService = referencespkg.NewReferenceService
-
-var NewRegionCodeService = referencespkg.NewRegionCodeService
-
-func NewSIVICollectedService(p0 *ContextService) (*sivipkg.SIVICollectedService, error) {
-	return sivipkg.NewSIVICollectedService(unwrapContextService(p0))
-}
-
-func NewSIVICombinedService(p0 *ContextService) (*sivipkg.SIVICombinedService, error) {
-	return sivipkg.NewSIVICombinedService(unwrapContextService(p0))
-}
-
-func NewSIVICoverService(p0 *ContextService) (*sivipkg.SIVICoverService, error) {
-	return sivipkg.NewSIVICoverService(unwrapContextService(p0))
-}
-
-func NewSIVICreationService(p0 *ContextService) (*sivipkg.SIVICreationService, error) {
-	return sivipkg.NewSIVICreationService(unwrapContextService(p0))
-}
-
-func NewSIVICreationUndoService(p0 *ContextService) (*sivipkg.SIVICreationUndoService, error) {
-	return sivipkg.NewSIVICreationUndoService(unwrapContextService(p0))
-}
-
-func NewSIVIDeletionService(p0 *ContextService) (*sivipkg.SIVIDeletionService, error) {
-	return sivipkg.NewSIVIDeletionService(unwrapContextService(p0))
-}
-
-func NewSIVIIdentityService(p0 *ContextService) (*sivipkg.SIVIIdentityService, error) {
-	return sivipkg.NewSIVIIdentityService(unwrapContextService(p0))
-}
-
-func NewSIVIParentSharedService(p0 *ContextService) (*sourceformpkg.SIVIParentSharedService, error) {
-	return sourceformpkg.NewSIVIParentSharedService(unwrapContextService(p0))
-}
-
-func NewSIVISpeciesService(p0 *ContextService) (*sourceformpkg.SIVISpeciesService, error) {
-	return sourceformpkg.NewSIVISpeciesService(unwrapContextService(p0))
-}
-
-var NewSiteCodeService = referencespkg.NewSiteCodeService
-
-func NewSiteUnitSummaryExtendedWorkbookService(p0 *ContextService) (*envreportpkg.SiteUnitSummaryExtendedWorkbookService, error) {
-	return envreportpkg.NewSiteUnitSummaryExtendedWorkbookService(unwrapContextService(p0))
-}
-
-func NewSiteUnitSummaryPreferencesService(p0 *ContextService) *envreportpkg.SiteUnitSummaryPreferencesService {
-	return envreportpkg.NewSiteUnitSummaryPreferencesService(unwrapContextService(p0))
-}
-
-func NewSiteUnitSummaryWorkbookService(p0 *ContextService) (*envreportpkg.SiteUnitSummaryWorkbookService, error) {
-	return envreportpkg.NewSiteUnitSummaryWorkbookService(unwrapContextService(p0))
-}
-
-var NewSoilCodeService = referencespkg.NewSoilCodeService
-
-func NewSpeciesAttributeSummaryService(p0 *ContextService) (*vegreportpkg.SpeciesAttributeSummaryService, error) {
-	return vegreportpkg.NewSpeciesAttributeSummaryService(unwrapContextService(p0))
-}
-
-func NewSubzoneMatrixService(p0 *ContextService) (*envreportpkg.SubzoneMatrixService, error) {
-	return envreportpkg.NewSubzoneMatrixService(unwrapContextService(p0))
-}
-
-var NewSummaryVegetationEnvironmentalLifeformService = vegreportpkg.NewSummaryVegetationEnvironmentalLifeformService
-
-var NewSummaryVegetationEnvironmentalService = vegreportpkg.NewSummaryVegetationEnvironmentalService
-
-func NewSummaryVegetationFieldListService(p0 *ContextService) *vegreportpkg.SummaryVegetationFieldListService {
-	return vegreportpkg.NewSummaryVegetationFieldListService(unwrapContextService(p0))
-}
-
-func NewSummaryVegetationPreferencesService(p0 *ContextService) *vegreportpkg.SummaryVegetationPreferencesService {
-	return vegreportpkg.NewSummaryVegetationPreferencesService(unwrapContextService(p0))
-}
-
-func NewSummaryVegetationPresentationPreferencesService(p0 *ContextService) *vegreportpkg.SummaryVegetationPresentationPreferencesService {
-	return vegreportpkg.NewSummaryVegetationPresentationPreferencesService(unwrapContextService(p0))
-}
-
-func NewSummaryVegetationQualityPreferencesService(p0 *ContextService) *vegreportpkg.SummaryVegetationQualityPreferencesService {
-	return vegreportpkg.NewSummaryVegetationQualityPreferencesService(unwrapContextService(p0))
-}
-
-func NewSummaryVegetationService(p0 *ContextService) (*vegreportpkg.SummaryVegetationService, error) {
-	return vegreportpkg.NewSummaryVegetationService(unwrapContextService(p0))
-}
-
-var NewSummaryVegetationWorkbookService = vegreportpkg.NewSummaryVegetationWorkbookService
-
-func NewTableCSVArchiveService(p0 *ContextService) *interchangepkg.TableCSVArchiveService {
-	return interchangepkg.NewTableCSVArchiveService(unwrapContextService(p0))
-}
-
-func NewTwoPageEnvironmentTableService(p0 *ContextService) (*datasheetpkg.TwoPageEnvironmentTableService, error) {
-	return datasheetpkg.NewTwoPageEnvironmentTableService(unwrapContextService(p0))
-}
-
-func NewTwoPageGoogleEarthService(p0 *ContextService) (*spatialpkg.TwoPageGoogleEarthService, error) {
-	return spatialpkg.NewTwoPageGoogleEarthService(unwrapContextService(p0))
-}
-
-func NewTwoPageParentCommonService(p0 *ContextService) (*twopagepkg.TwoPageParentCommonService, error) {
-	return twopagepkg.NewTwoPageParentCommonService(unwrapContextService(p0))
-}
-
-func NewTwoPageParentEntryService(p0 *ContextService, p1 twopagepkg.TwoPageEntryReferenceReaders) (*twopagepkg.TwoPageParentEntryService, error) {
-	return twopagepkg.NewTwoPageParentEntryService(unwrapContextService(p0), p1)
-}
-
-func NewTwoPageParentExtraService(p0 *ContextService) (*twopagepkg.TwoPageParentExtraService, error) {
-	return twopagepkg.NewTwoPageParentExtraService(unwrapContextService(p0))
-}
-
-func NewTwoPageProfilingService(p0 *ContextService) (*classificationpkg.TwoPageProfilingService, error) {
-	return classificationpkg.NewTwoPageProfilingService(unwrapContextService(p0))
-}
-
-func NewTwoPageProjectMetadataService(p0 *ContextService) (*classificationpkg.TwoPageProjectMetadataService, error) {
-	return classificationpkg.NewTwoPageProjectMetadataService(unwrapContextService(p0))
-}
-
-func NewTwoPageSoilService(p0 *ContextService) (*twopagepkg.TwoPageSoilService, error) {
-	return twopagepkg.NewTwoPageSoilService(unwrapContextService(p0))
-}
-
-func NewTwoPageSourceAuditService(p0 *ContextService) (*twopagepkg.TwoPageSourceAuditService, error) {
-	return twopagepkg.NewTwoPageSourceAuditService(unwrapContextService(p0))
-}
-
-func NewTwoPageVegetationService(p0 *ContextService) (*twopagepkg.TwoPageVegetationService, error) {
-	return twopagepkg.NewTwoPageVegetationService(unwrapContextService(p0))
-}
-
-func NewTwoPageVegetationSpeciesListService(p0 *ContextService) (*twopagepkg.TwoPageVegetationSpeciesListService, error) {
-	return twopagepkg.NewTwoPageVegetationSpeciesListService(unwrapContextService(p0))
-}
-
-func NewTwoPageVegetationTableService(p0 *ContextService) (*datasheetpkg.TwoPageVegetationTableService, error) {
-	return datasheetpkg.NewTwoPageVegetationTableService(unwrapContextService(p0))
-}
-
-func NewUserLogService(p0 *ContextService) (*lifecyclepkg.UserLogService, error) {
-	return lifecyclepkg.NewUserLogService(unwrapContextService(p0))
-}
-
-func NewVegetationWorkbookService(p0 *ContextService) (*vegreportpkg.VegetationWorkbookService, error) {
-	return vegreportpkg.NewVegetationWorkbookService(unwrapContextService(p0))
-}
-
-var NewWorkingUnitService = vprocorepkg.NewWorkingUnitService
-
-const ReleaseChannelExperimental = vprocorepkg.ReleaseChannelExperimental
-
-const ReleaseChannelStable = vprocorepkg.ReleaseChannelStable
-
-const closeRequestEvent = lifecyclepkg.CloseRequestEvent
-
-var ErrInvalidCloseRequest = lifecyclepkg.ErrInvalidCloseRequest
-
-var initialWindowDimensions = vprocorepkg.InitialWindowDimensions
-
-var newCoordinateService = vprocorepkg.NewCoordinateServiceInternal
-
-var newPlotServiceWithPreferences = vprocorepkg.NewPlotServiceWithPreferences
-
-var newSQLiteProjectService = vprocorepkg.NewSQLiteProjectService
-
-var openDesktopConfig = vprocorepkg.OpenDesktopConfig
-
-var userConfigDir = sqlutilpkg.UserConfigDir
-
-var userDataDir = sqlutilpkg.UserDataDir
 
 type AuditRestoreAction string
 

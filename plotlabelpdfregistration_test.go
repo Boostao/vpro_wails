@@ -9,13 +9,42 @@ import (
 )
 
 func TestPlotLabelPDFRegistrationIsUnconditionallyRegisteredOnImportExportService(t *testing.T) {
-	file, err := parser.ParseFile(token.NewFileSet(), "main.go", nil, 0)
+	fset := token.NewFileSet()
+	mainFile, err := parser.ParseFile(fset, "main.go", nil, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
-	var constructorArgs [][]string
+	domainFile, err := parser.ParseFile(fset, "domainservices_importexport.go", nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var builderArgs [][]string
 	var domainRegistered int
-	ast.Inspect(file, func(node ast.Node) bool {
+	ast.Inspect(mainFile, func(node ast.Node) bool {
+		call, ok := node.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		if name, ok := call.Fun.(*ast.Ident); ok && name.Name == "buildImportExportService" {
+			var args []string
+			for _, arg := range call.Args {
+				ident, ok := arg.(*ast.Ident)
+				if !ok {
+					t.Fatal("buildImportExportService uses unexpected argument expression")
+				}
+				args = append(args, ident.Name)
+			}
+			builderArgs = append(builderArgs, args)
+		}
+		if selector, ok := call.Fun.(*ast.SelectorExpr); ok && selector.Sel.Name == "NewService" && len(call.Args) == 1 {
+			if ident, ok := call.Args[0].(*ast.Ident); ok && ident.Name == "importExportService" {
+				domainRegistered++
+			}
+		}
+		return true
+	})
+	var constructorArgs [][]string
+	ast.Inspect(domainFile, func(node ast.Node) bool {
 		call, ok := node.(*ast.CallExpr)
 		if !ok {
 			return true
@@ -25,8 +54,8 @@ func TestPlotLabelPDFRegistrationIsUnconditionallyRegisteredOnImportExportServic
 			if !ok {
 				return true
 			}
-			fn, ok := constructor.Fun.(*ast.Ident)
-			if !ok || fn.Name != "NewPlotLabelPDFExportService" {
+			sel, ok := constructor.Fun.(*ast.SelectorExpr)
+			if !ok || sel.Sel.Name != "NewPlotLabelPDFExportService" {
 				return true
 			}
 			var arguments []string
@@ -39,14 +68,9 @@ func TestPlotLabelPDFRegistrationIsUnconditionallyRegisteredOnImportExportServic
 			}
 			constructorArgs = append(constructorArgs, arguments)
 		}
-		if selector, ok := call.Fun.(*ast.SelectorExpr); ok && selector.Sel.Name == "NewService" && len(call.Args) == 1 {
-			if ident, ok := call.Args[0].(*ast.Ident); ok && ident.Name == "importExportService" {
-				domainRegistered++
-			}
-		}
 		return true
 	})
-	if domainRegistered != 1 || !reflect.DeepEqual(constructorArgs, [][]string{{"contextService"}}) {
-		t.Fatal("label PDF service is not unconditionally registered on ImportExportService once", domainRegistered, constructorArgs)
+	if domainRegistered != 1 || !reflect.DeepEqual(builderArgs, [][]string{{"contextService"}}) || !reflect.DeepEqual(constructorArgs, [][]string{{"core"}}) {
+		t.Fatal("label PDF service is not unconditionally registered on ImportExportService once", domainRegistered, builderArgs, constructorArgs)
 	}
 }
