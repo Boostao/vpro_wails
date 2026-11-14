@@ -191,7 +191,7 @@ export function sourcePaperPage(source: SourceForm, name: string, vegetationMode
     : switching ? { SubVegA: !isHeight, SubVegAht: isHeight, SubVegC: !isHeight, SubVegCht: isHeight } : {};
   let controls = paperControls(source, source.controls.filter(control => control.pageId === page.controlId), originX, originY, visibility);
   if (switching) {
-    // FS882 btnCoverAndHeight_Click; verified on a clean disposable Access form.
+    // FS882 btnCoverAndHeight_Click; verified on a clean reference Access form.
     controls = controls.map(control => {
       if (control.controlName === 'SubVegD') return { ...control, x: ((isHeight ? 10900 : 8320) - originX) / 15 };
       if (control.controlName === 'VegNotes' || control.controlName === 'lblNotes') return { ...control, width: (isHeight ? 14250 : 11700) / 15 };

@@ -4,8 +4,8 @@ import { wellFormedUTF16 } from './qualityEditor';
 import { Dialogs } from '@wailsio/runtime';
 
 export function chooseTableCSVArchiveFile(): Promise<string> {
-  return Dialogs.SaveFile({ Title: 'Select a new migration archive destination',
-    Filename: 'migration.zip', Filters: [{ DisplayName: 'ZIP migration archive', Pattern: '*.zip' }] });
+  return Dialogs.SaveFile({ Title: 'Select project table CSV archive destination',
+    Filename: 'project-tables.zip', Filters: [{ DisplayName: 'Project table CSV archive (.zip)', Pattern: '*.zip' }] });
 }
 
 export interface TableCSVArchiveOwner { contextId: string; project: string; projectPath: string }
@@ -25,7 +25,7 @@ export async function validateTableCSVArchiveReview(value: TableCSVArchiveReview
   if (!detached || !hash(detached.approvalHash) || !hash(detached.archiveSHA256) ||
       detached.format !== 'vpro-owned-table-csv' || detached.version !== 1 ||
       !Number.isSafeInteger(detached.byteCount) || detached.byteCount <= 0) {
-    throw new Error('Migration archive review has an incomplete format, version, source approval, archive hash or byte count.');
+    throw new Error('Project table CSV archive review has an incomplete format, version, source approval, archive hash or byte count.');
   }
   const review = await validateProjectTableCSVReview(detached.review, scope.contextId, scope.project, scope.projectPath, table, checksum);
   // Only the CSV checksum is independently checked here; approval and ZIP hash are supplied by the backend.
@@ -42,7 +42,7 @@ export function validateTableCSVArchiveOutcome(value: TableCSVArchiveOutcome | n
       (detached.status !== 'not-published' && (!detached.path || detached.sha256 !== archiveSHA256)) ||
       (detached.status === 'not-published' && (detached.path !== '' || detached.sha256 !== '')) ||
       (detached.status === 'published' ? detached.errorMessage !== '' : detached.errorMessage === '')) {
-    throw new Error('Migration archive publication receipt contradicts the literal destination, expected bytes or outcome.');
+    throw new Error('Project table CSV archive receipt contradicts the literal destination, expected bytes or outcome.');
   }
   return detached;
 }

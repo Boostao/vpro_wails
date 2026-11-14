@@ -49,7 +49,7 @@
   <h1>Lifeform Summary</h1>
   {#if error}<p role="alert" class="error">{error}</p>{/if}
   <p>Project {project}; selected normal SU {su}. Profile navigation does not filter this report.</p>
-  {#if !enabled}<p>This preview is disabled in this build.</p>{/if}
+  {#if !enabled}<p>Lifeform Summary preview is currently unavailable.</p>{/if}
   {#if su === 'None' || su === 'USysSuTableDynamic'}<p>A selected normal SU is required. Hierarchy and dynamic breaks are unavailable.</p>{/if}
   <div class="actions">
     <button onclick={() => show('lifeform')} disabled={!enabled || busy || workbookBusy || su === 'None' || su === 'USysSuTableDynamic'}>Preview Lifeform Summary</button>

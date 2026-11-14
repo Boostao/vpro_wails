@@ -131,11 +131,11 @@
   {#if viewState.publication.blocked && !viewState.publication.busy}
     <button data-summary-workbook-acknowledge onclick={acknowledge}>Acknowledge workbook outcome</button>
   {/if}
-  {#if !enabled}<p>Inspection workbook publication is disabled in this build.</p>{/if}
+  {#if !enabled}<p>Summary Vegetation workbook export is currently unavailable.</p>{/if}
   <p data-summary-workbook-group>Workbook grouping: {groupLabel}.
     {#if constancy}Uses the loaded presentation Constancy draft: Lifeform grouping, Display Values1 and effective references without common/guide names.
     {:else if groupedEnabled}Uses the Summary Group by selection.
-    {:else}Layer only; grouped workbook publication is disabled in this build.{/if}</p>
+    {:else}Layer grouping active.{/if}</p>
   {#if constancy}
     <p data-summary-workbook-constancy>Constancy inspection retains numeric lifeform and separate raw-species groups,
       including visibly identical rows. Equal visible keys use an adapted raw-code tie order.
@@ -301,8 +301,8 @@
     printing and macros remain unavailable. Optional attribute/common/guide projection is read-only and uses literal
     comparison, not Access collation or physical preflight mutations. Source worksheets are a separate inspection
     option. Existing destinations are never replaced.</p>
-  {#if !ancillaryEnabled}<p>Source worksheet publication is disabled in this build.</p>{/if}
-  {#if !referencesEnabled}<p>Effective reference projection is disabled in this build.</p>{/if}
+  {#if !ancillaryEnabled}<p>Source worksheet export is currently unavailable.</p>{/if}
+  {#if !referencesEnabled}<p>Effective reference projection is currently unavailable.</p>{/if}
 </section>
 
 <style>

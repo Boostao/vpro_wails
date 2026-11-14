@@ -203,10 +203,5 @@
   {/each}
   {#if view.receipts.length}<p role="status">{view.receipts.length} immutable committed vegetation receipt(s) retained across remounts.</p>{/if}
   {#if view.references}<VegetationSpeciesReferences references={view.references} />{/if}
-  <p class="text-xs text-gray-600">Experimental existing-row cover/Collected review and physical Species metadata.
-    {#if speciesListAvailable}Species selection is limited to exact existing A/CHARS list codes; common-seven-cover-empty warning/advance remains unavailable.{/if}
-    New numeric drafts use calibrated SINGLE conversion before validation; unchanged historical values are not silently repaired.
-    Physical reader order is a desktop adaptation, not source Species sorting. Manual/alias/NotInList/personal creation decisions,
-    automatic Current/Enter navigation, creation, deletion and restoration remain unavailable.
-    Save is explicit, never triggered by changing rows, selecting Species or cycling Collected. NULL is not empty text.</p>
+  <p class="text-xs text-gray-600">LMH25 2-Page vegetation strata &amp; species editor: cover values validate against calibrated single-precision (&lt; 100%) bounds while leaving untouched historical values intact. Save commits species, cover, and voucher changes atomically.</p>
 </section>

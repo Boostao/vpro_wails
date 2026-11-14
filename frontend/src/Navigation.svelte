@@ -3,10 +3,11 @@
 
   type View = 'home' | 'plots' | 'geospatial-map' | 'diagnostic-synthesis' | 'r-sidecar' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
   type HelpMenuAction = 'guide' | 'tours' | 'shortcuts' | 'whats-new' | 'reset-sample' | 'about';
-  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'new-sivi' | 'metadata' | 'cloud-sync'; helpAction?: HelpMenuAction };
+  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'new-sivi' | 'metadata' | 'cloud-sync'; helpAction?: HelpMenuAction; deferredPhase2?: boolean };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate, siviAvailable = false, onopensivi, newSiviAvailable = false, onopennewsivi,
-    metadataAvailable = false, onopenmetadata, onopencloudsync, onhelpaction, whatsNewUnreadCount = 0, resetSampleAvailable = true }: {
+    metadataAvailable = false, onopenmetadata, onopencloudsync, onhelpaction, whatsNewUnreadCount = 0, resetSampleAvailable = true,
+    releaseChannel = 'stable' }: {
     view: View; onnavigate: (view: View) => void;
     siviAvailable?: boolean; onopensivi?: () => void;
     newSiviAvailable?: boolean; onopennewsivi?: () => void;
@@ -15,11 +16,14 @@
     onhelpaction?: (action: HelpMenuAction) => void;
     whatsNewUnreadCount?: number;
     resetSampleAvailable?: boolean;
+    releaseChannel?: string;
   } = $props();
   let navigation: HTMLElement;
   let openMenu = $state<string | null>(null);
 
-  const menus: Menu[] = [
+  const showDeferredPhase2 = $derived(releaseChannel === 'experimental');
+
+  const menus: Menu[] = $derived([
     { label: 'Forms', icon: ClipboardList, groups: [
       { label: 'Data Entry', items: [
         { name: 'FS882 Data Forms (6x4)', icon: ClipboardList, view: 'fs882' },
@@ -35,11 +39,13 @@
       { label: 'Others', items: [
         { name: 'Metadata', icon: Table, action: 'metadata' },
         { name: 'Combine Species', icon: Link, view: 'lump-editor' },
-        { name: 'Herbarium', icon: Leaf },
         { name: 'Plot Pictures', icon: FileText, view: import.meta.env.VITE_PICTURE_MANAGER !== 'false' ? 'picture-manager' : undefined },
-        { name: 'Colour-theme', icon: Palette },
-        { name: 'User setup', icon: UserCog },
-        { name: 'User log', icon: History, view: import.meta.env.VITE_USER_LOG_REVIEW !== 'false' ? 'user-log' : undefined }
+        { name: 'User log', icon: History, view: import.meta.env.VITE_USER_LOG_REVIEW !== 'false' ? 'user-log' : undefined },
+        ...(showDeferredPhase2 ? [
+          { name: 'Herbarium (Phase 2 Deferred)', icon: Leaf, deferredPhase2: true },
+          { name: 'Colour-theme (Phase 2 Deferred)', icon: Palette, deferredPhase2: true },
+          { name: 'User setup (Phase 2 Deferred)', icon: UserCog, deferredPhase2: true },
+        ] : []),
       ] }
     ] },
     { label: 'Reports', icon: ChartColumn, groups: [
@@ -60,21 +66,20 @@
       { label: 'Others', items: [
         { name: 'Subzone Matrix of Units', icon: Table, view: import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'false' ? 'subzone-matrix' : undefined },
         { name: 'Hierarchy table', icon: Network, view: 'hierarchy' },
-        { name: 'Hierarchy Diagram', icon: Network },
-        { name: 'Print a Plot Label', icon: Tag },
-        { name: import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'false' ? 'Saved plot label PDF' : 'Saved plot label preview', icon: Tag,
+        { name: 'Plot Label PDF', icon: Tag,
           view: (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'false' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'false') ? 'plot-label-preview' : undefined },
-        { name: 'Plot location review', icon: FileText, view: import.meta.env.VITE_PLOT_LOCATION_REVIEW !== 'false' ? 'plot-locations' : undefined },
-        { name: 'Google Earth location preparation', icon: Globe, view: import.meta.env.VITE_GOOGLE_EARTH_REVIEW !== 'false' ? 'google-earth-review' : undefined },
-        { name: 'Create Plot Locations File', icon: FileText },
-        { name: 'Show Plot Locations in Google Earth', icon: Globe }
+        { name: 'Plot Locations', icon: FileText, view: import.meta.env.VITE_PLOT_LOCATION_REVIEW !== 'false' ? 'plot-locations' : undefined },
+        { name: 'Google Earth (KML)', icon: Globe, view: import.meta.env.VITE_GOOGLE_EARTH_REVIEW !== 'false' ? 'google-earth-review' : undefined },
+        ...(showDeferredPhase2 ? [
+          { name: 'Hierarchy Diagram (Phase 2 Deferred)', icon: Network, deferredPhase2: true },
+        ] : []),
       ] }
     ] },
     { label: 'Interchange', icon: Table, groups: [
       { label: 'Import & Export', items: [
         { name: 'Interchange Hub (VENUS 5, TurboVeg, RDS, GeoPackage)', icon: Globe, view: 'interchange-hub' },
         { name: 'Cloud BECMaster Sync', icon: Globe, action: 'cloud-sync' },
-        { name: 'Project table CSV review', icon: Table, view: import.meta.env.VITE_TABLE_CSV_REVIEW !== 'false' ? 'table-csv' : undefined }
+        { name: 'Project Table CSV Archive', icon: Table, view: import.meta.env.VITE_TABLE_CSV_REVIEW !== 'false' ? 'table-csv' : undefined }
       ] }
     ] },
     { label: 'Help', icon: HelpCircle, groups: [
@@ -89,7 +94,7 @@
         { name: 'About VPro & Standards Libraries', icon: Info, helpAction: 'about' }
       ] }
     ] }
-  ];
+  ]);
 
   function closeMenu(restoreFocus = false) {
     if (restoreFocus && openMenu) {
@@ -185,7 +190,6 @@
         <ChevronDown size={14} aria-hidden="true" />
       </summary>
       <div class="nav-menu-content">
-        <p class="nav-unavailable">Unavailable workflows are disabled.</p>
         {#each menu.groups as group (group.label)}
           <section data-nav-group={group.label === 'Project & Classification' ? 'Project' : group.label} aria-labelledby={`nav-${menu.label}-${group.label.replaceAll(' ', '-')}`}>
             <h2 class="nav-group-label" id={`nav-${menu.label}-${group.label.replaceAll(' ', '-')}`}>{group.label}</h2>
@@ -205,7 +209,8 @@
                   : item.helpAction === 'reset-sample'
                     ? 'Non-destructive recovery: materializes a fresh Sample.db and switches session to Sample without deleting user .db files.'
                   : item.helpAction ? item.name
-                  : item.view === 'fs882' ? 'FS882 data entry: only verified workflows are writable.' : item.view ? item.name : 'Not yet available in the desktop app'}
+                  : item.deferredPhase2 ? 'Deferred to Phase 2 per BEC VPro 2.0 scope triage'
+                  : item.view === 'fs882' ? 'FS882 6x4 & 2-Page plot data entry' : item.view ? item.name : item.name}
                 onclick={() => activate(item)}
               >
                 <item.icon size={16} aria-hidden="true" />

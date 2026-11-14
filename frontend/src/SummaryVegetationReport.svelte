@@ -190,7 +190,7 @@
   {#if preferenceView?.draftError}<p role="alert" class="error">{preferenceView.draftError}</p>{/if}
   {#if preferenceView?.error}<p role="alert" class="error">{preferenceView.error}</p>{/if}
   <p class="owner">Project: {project}<br />{projectPath}<br />Current Site Unit Table: {su}<br />{suPath}</p>
-  {#if !enabled}<p>This preview is disabled in this build.</p>{/if}
+  {#if !enabled}<p>Summary Vegetation report preview is currently unavailable.</p>{/if}
   {#if unavailableScope}<p>A selected normal Site Unit Table is required. Hierarchy and dynamic breaks are unavailable.</p>{/if}
   <div class="options">
     <label>Summary Report Units

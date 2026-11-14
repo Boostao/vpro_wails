@@ -5,7 +5,7 @@
   import { ContextService, ImportExportService, LifecycleService, type StartupState, type StartupRecoveryRequest, type ContextSelection, type ProjectInfo, type HierarchyNode, type PlotPage, type PlotSummary, type ProjectPlotProfileFilterRequest, type PlotProfileSource, type PlotProfileSourceInfo, type AccessDatabaseInspection, type AccessProjectCandidate, type AccessProjectImportResult } from '../bindings/github.com/boostao/vpro-wails';
   import { projectState } from './state';
   import Navigation from './Navigation.svelte';
-  import DemoReadiness from './DemoReadiness.svelte';
+  import HomeWorkspaceHub from './HomeWorkspaceHub.svelte';
   import { summaryVegetationPreferenceSession } from './summaryVegetationPreferenceSessions';
   import { summaryVegetationQualityPreferenceSession } from './summaryVegetationQualityPreferenceSessions';
   import { summaryVegetationPresentationPreferenceSession } from './summaryVegetationPresentationPreferenceSessions';
@@ -553,14 +553,14 @@
       if (next === 'fs882') { editorPlotNumber = selected?.plotNumber; editorEntryForm = 'fs882'; }
       if (next === 'picture-manager') {
         if (import.meta.env.VITE_PICTURE_MANAGER === 'false') {
-          error = 'The picture manager is disabled in this build.';
+          error = 'Plot picture management is currently unavailable.';
           return;
         }
         pictureManagerPlot = selected?.plotNumber ?? '';
       }
       if (next === 'plot-label-preview') {
         if (import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'false' && import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT === 'false') {
-          error = 'Saved plot label preview is disabled in this build.';
+          error = 'Plot label PDF preview is currently unavailable.';
           return;
         }
         plotLabelNumber = (view === 'fs882' ? editorPlotNumber : selected?.plotNumber) ?? '';
@@ -1422,6 +1422,7 @@
       onopencloudsync={() => { void requestTransition(async () => { projectAdminTab = 'cloudsync'; projectAdminTabNonce++; view = 'project-admin'; error = ''; }); }}
       whatsNewUnreadCount={whatsNewStatus?.unreadCount ?? 0}
       resetSampleAvailable={!!$projectState?.contextId && !busy && !editorBusy && !companionPanelBusy && !transitionWorking}
+      {releaseChannel}
       onhelpaction={handleHelpMenuAction} />{/if}
     <div class="topbar-context"><Database size={16} strokeWidth={1.8} /><span>{$projectState?.activeProject ?? 'No project'}</span></div>
   </header>
@@ -1483,7 +1484,7 @@
             <input id="external-project" bind:value={externalProject} required disabled={busy || editorBusy || companionPanelBusy || transitionWorking} />
             <label for="external-path">FULL SQLITE FILE PATH</label>
             <input id="external-path" bind:value={externalPath} required disabled={busy || editorBusy || companionPanelBusy || transitionWorking} />
-            <p>Attach does not copy or alter the file. Verified editors write to the attached file. Use disposable copies only.</p>
+            <p>Attaching opens the SQLite database in place without copying it; edits write directly to the attached file.</p>
             <button type="submit" disabled={busy || editorBusy || companionPanelBusy || transitionWorking}>Attach project</button>
           </form>
         </details>
@@ -1607,7 +1608,7 @@
             <table class="w-full text-sm"><thead><tr><th class="text-left">Plot number</th><th class="text-left">SiteUnit</th></tr></thead>
               <tbody>{#each suReview.plots.slice(0, 25) as plot}<tr><td>{plot.plotNumber}</td><td>{plot.siteUnit === null ? 'NULL (no value)' : plot.siteUnit === '' ? 'Empty text' : plot.siteUnit}</td></tr>{/each}</tbody>
             </table>
-            {#if suReview.plots.length > 25}<p>Showing the first25 of {suReview.plots.length} explicitly reviewed rows.</p>{/if}
+            {#if suReview.plots.length > 25}<p>Showing the first 25 of {suReview.plots.length} explicitly reviewed rows.</p>{/if}
           </div>
           <div class="mt-3 flex flex-wrap gap-2">
             <button type="button" class="px-3 py-2 border rounded disabled:opacity-50"
@@ -1616,7 +1617,7 @@
             <button type="button" class="px-3 py-2 border rounded disabled:opacity-50" disabled={busy || transitionWorking || pendingTransition !== null}
               onclick={() => { suReview = null; suError = ''; suSuccess = ''; }}>Dismiss SU review</button>
           </div>
-          <p class="mt-3 text-sm">Only a new file is supported; existing destinations are never replaced. Stored inputs and SiteUnit values are rechecked after Save/Discard/Cancel. No implicit project/SU switch or original database/configuration write. Names use the existing31-character desktop family policy; None, Sample and master names are reserved.</p>
+          <p class="mt-3 text-sm">Creates a new SQLite SU database without overwriting existing files or switching the active project/SU context. Table names follow the 31-character VPro identifier rule (None, Sample, and master names are reserved).</p>
           {#if suProjectEnabled}
             <button type="button" class="mt-3 px-3 py-2 border rounded disabled:opacity-50"
               disabled={busy || editorBusy || transitionWorking || pendingTransition !== null || suReviewContext !== $projectState?.contextId}
@@ -1648,7 +1649,7 @@
       {#if profileSelectionEnabled && $projectState?.contextId}
         <details class="m-2 p-3 border rounded" aria-label="Stored plot profile selection">
           <summary class="font-semibold cursor-pointer">Plot profile: {$projectState.plotProfile.source.name}</summary>
-          <p class="mt-2 text-sm">Select only disposable SQLite files during migration.</p>
+          <p class="mt-2 text-sm">Select an optional SQLite database containing saved plot profile tables.</p>
           <div class="mt-2 flex flex-wrap items-end gap-2">
             <label for="plot-profile-path" class="flex flex-col gap-1 flex-1 min-w-0">SQLite profile database path (blank inspects project and core)
               <input id="plot-profile-path" class="px-2 py-1 border rounded min-w-0" bind:value={profilePath} disabled={busy || transitionWorking || pendingTransition !== null} />
@@ -1715,7 +1716,7 @@
                   <button type="button" class="px-3 py-2 border rounded" disabled={busy || transitionWorking || pendingTransition !== null}
                     onclick={() => { profileFileReview = null; profileFileError = ''; profileFileSuccess = ''; }}>Dismiss blank profile review</button>
                 </div>
-                <p class="mt-3 text-sm">Only a new file is supported; existing files are never replaced. Names use the existing31-character ASCII desktop family policy; None, Sample and master names are reserved. Creation makes no implicit selection, write grant or original data/configuration write.</p>
+                <p class="mt-3 text-sm">Creates a new SQLite profile database without overwriting existing files or altering active session selections. Profile names follow the 31-character ASCII VPro identifier rule (None, Sample, and master names are reserved).</p>
               </section>
             {/if}
             {#if profileFileError}<p role="alert" class="mt-2 text-red-800">{profileFileError}</p>{/if}
@@ -1916,12 +1917,19 @@
           </div>
         {/if}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
-        <div class="home-summary">
-          <div><span class="eyebrow">CURRENT PROJECT</span><h2>{$projectState?.activeProject ?? 'No project selected'}</h2></div>
-          <button class="open-plots" onclick={() => view = 'plots'}>View plots <ChevronRight size={16} /></button>
-        </div>
-        <p class="home-count">{page?.total ?? 0} plots in the current project. Select a project on the left to browse its plots.</p>
-        <DemoReadiness />
+        <HomeWorkspaceHub
+          activeProject={$projectState?.activeProject ?? 'No project selected'}
+          projectPath={$projectState?.projectPath ?? ''}
+          activeSU={$projectState?.activeSU ?? 'None'}
+          activeHierarchy={$projectState?.activeHierarchy ?? 'None'}
+          plotCount={page?.total ?? 0}
+          {buildMode}
+          {appVersion}
+          gitCommit={startupInfo?.gitCommit ?? ''}
+          {releaseChannel}
+          onnavigate={(nextView) => navigate(nextView)}
+          onhelpaction={(action) => handleHelpMenuAction(action)}
+        />
       {:else if view === 'fs882'}
         <div class="h-full flex flex-col p-2">
           {#if error}<p class="error" role="alert">{error}</p>{/if}

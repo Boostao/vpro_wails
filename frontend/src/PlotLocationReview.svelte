@@ -76,8 +76,7 @@
       {/each}
     </details>
   {/if}
-  <p class="notice">Read-only migration preview. Longitude is the source report's numeric negation, not absolute-value normalization.
-    Historical ranges are retained, not clamped or declared map-ready. UTM conversion, file publication, KML and Google Earth launch remain unavailable.</p>
+  <p class="notice">Plot coordinate summary preview. Longitude uses the standard VPro western-hemisphere sign convention, and historical out-of-range coordinates are surfaced without silent clamping.</p>
 </section>
 
 <style>

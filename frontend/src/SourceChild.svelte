@@ -144,10 +144,10 @@
               oninput={event => onstage?.(row.id, control.column ?? '', event.currentTarget.value)} />
           {:else if mapped && name.startsWith('SubVeg') && stagedField}
             <input class="source-cell" type="text" value={value ?? ''} disabled data-column={control.column}
-              aria-label={`${controlLabel(control)}, row ${row.id}`} title="Source cover/height editing is read-only in this build" />
+              aria-label={`${controlLabel(control)}, row ${row.id}`} title="Cover/height cell is read-only" />
           {:else if mapped && name.startsWith('SubVeg') && control.column?.toLowerCase() === 'species'}
             <input class="source-cell" type="text" value={value ?? ''} disabled data-column={control.column}
-              aria-label={`${controlLabel(control)}, row ${row.id}`} title="Species selection is unavailable in this build" />
+              aria-label={`${controlLabel(control)}, row ${row.id}`} title="Species cell is read-only" />
           {:else if mapped && onedit && control.column && editable.has(control.column.toLowerCase())}
             <input class="source-cell" type={numeric.has(control.column.toLowerCase()) ? 'number' : 'text'} step="any"
               value={value ?? ''} disabled={disabled || control.locked || !control.enabled}

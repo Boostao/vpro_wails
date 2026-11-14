@@ -326,10 +326,10 @@
   const twoPageCommonReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW !== 'false';
   const twoPageEntryReviewEnabled = twoPageReviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW !== 'false';
   const ordinarySoilUnavailable = twoPageSoilReviewEnabled && twoPageEntryReviewEnabled && import.meta.env.VITE_TWO_PAGE_SOIL_REVIEW === 'true' && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW === 'true'
-    ? 'Ordinary numeric-ID soil rows, counts and actions are unavailable in this experimental physical-soil review profile. Use complete-entry linked soil review; historical rows are not absent or discarded.'
+    ? 'Standard soil horizon editing is delegated to the linked 2-Page Soil view in this profile; all existing horizons remain intact.'
     : null;
   const ordinaryVegetationUnavailable = twoPageVegetationReviewEnabled && twoPageEntryReviewEnabled && import.meta.env.VITE_TWO_PAGE_VEGETATION_REVIEW === 'true' && import.meta.env.VITE_TWO_PAGE_PARENT_ENTRY_REVIEW === 'true'
-    ? 'Ordinary numeric-ID vegetation rows, counts, totals and actions are unavailable in this experimental physical-vegetation review profile. Use complete-entry linked vegetation review; historical rows are not absent or discarded.'
+    ? 'Standard vegetation editing is delegated to the linked 2-Page Vegetation view in this profile; all existing strata rows remain intact.'
     : null;
   let twoPageOpen = $state(false);
   let twoPageScope = $state<'extra' | 'common' | 'entry'>('extra');
@@ -4395,7 +4395,7 @@
       </OrdinaryFields>
       {/if}
       {#if vegetationMode === 'height'}
-        <p class="mt-2 text-xs text-stone-500">{numberEditingEnabled ? 'Height/cover cells use explicit drafts and atomic Save/Cancel. No guessed height units; float64 precision is preserved within the source Single storage domain.' : 'Cover/height editing is read-only in this build.'} Switching view does not save or change data.</p>
+        <p class="mt-2 text-xs text-stone-500">{numberEditingEnabled ? 'Cover and height values validate against LMH25 (< 100%) single-precision bounds; use Save or Cancel to commit or discard drafts.' : 'Cover/height cells are read-only.'} Switching view does not save or alter data.</p>
       {/if}
       {#if collectedEditingEnabled}
         <p class="mt-2 text-xs text-stone-500">Collected buttons cycle NULL -> C -> V -> NULL using persistent drafts. Other historical values remain unchanged, as in the source click event. Use Save or Cancel; {creationEnabled ? 'new rows use a separate explicit source creation draft.' : 'new-row workflows remain unavailable in the source grids.'}</p>
@@ -4678,7 +4678,7 @@
       {/if}
       {#if !ordinarySoilUnavailable}
       <details class="mt-4 border border-stone-200 rounded p-3">
-        <summary class="text-xs font-semibold cursor-pointer">Experimental soil record actions</summary>
+        <summary class="text-xs font-semibold cursor-pointer">Humus &amp; mineral horizon records</summary>
       <div class="space-y-6">
         <!-- Humus Section -->
         <div class="space-y-3" data-help-id="humus.upper_lower_depth">

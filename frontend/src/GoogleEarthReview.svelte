@@ -310,10 +310,9 @@
       {/each}
     </details>
   {/if}
-  <p class="notice">Read-only migration preview. Description selection does not save a preference.
-    NULL, empty and non-text values remain distinguishable. Historical coordinate ranges are retained, not declared map-ready.
-    Saved Place Name, remote icons and Google Earth launch remain unavailable.
-    {#if !kmlExportEnabled}Output file and KML/XML publication remain unavailable.{/if}</p>
+  <p class="notice">Google Earth (KML) coordinate preview. Description selection applies to this export without altering saved preferences;
+    NULL, empty, and non-text coordinate values remain distinct.
+    {#if !kmlExportEnabled}KML file export is currently unavailable.{/if}</p>
 </section>
 
 <style>

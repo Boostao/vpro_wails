@@ -848,11 +848,8 @@
       </section>
     {/each}
   {/if}
-  <p class="guidance">Read-only experimental vegetation preview. Options are loaded from YAML; only title persistence has a separate reviewed default-off gate.
-    NULL, empty text, zero and absent statistics remain distinct. Source reference/membership multiplicities and English-name fanout are reported, not deduplicated.
-    Unit-name candidates preserve original reference rows; conflicting or unsupported names are not chosen arbitrarily.
-    Taxon lumping, combined variants, Source4 attributes and Excel automation remain unavailable.
-    Workbook review and explicit no-replace XLSX publication require their separate default-off gate.</p>
+  <p class="guidance">Long Vegetation report preview. Report options load from saved configuration; NULL, empty text, zero, and absent statistics remain distinct.
+    Unit-name candidates preserve original reference rows, and workbook export writes to a new .xlsx file without overwriting existing destinations.</p>
 </section>
 
 <style>

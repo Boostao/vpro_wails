@@ -55,10 +55,14 @@ test('compiled Metadata menu requires current availability and callback, without
   const icons = new Proxy({}, { get: () => () => {} });
   const component = serverComponent(source, 'Navigation.svelte', { '@lucide/svelte': icons });
   for (const available of [false, true]) for (const callback of [undefined, () => {}]) {
-    const html = render(component, { props: {
-      view: 'fs882', onnavigate() {}, metadataAvailable: available, onopenmetadata: callback,
+    const stableHtml = render(component, { props: {
+      view: 'fs882', onnavigate() {}, metadataAvailable: available, onopenmetadata: callback, releaseChannel: 'stable',
     } }).body;
-    for (const label of ['Metadata', 'Herbarium', 'Colour-theme', 'User setup', 'Enter/Edit SIVI Data']) {
+    assert.doesNotMatch(stableHtml, /Herbarium|Colour-theme|User setup/);
+    const html = render(component, { props: {
+      view: 'fs882', onnavigate() {}, metadataAvailable: available, onopenmetadata: callback, releaseChannel: 'experimental',
+    } }).body;
+    for (const label of ['Metadata', 'Herbarium \\(Phase 2 Deferred\\)', 'Colour-theme \\(Phase 2 Deferred\\)', 'User setup \\(Phase 2 Deferred\\)', 'Enter/Edit SIVI Data']) {
       const match = html.match(new RegExp(`<button\\b[^>]*>[\\s\\S]*?<span>${label}<\\/span>\\s*<\\/button>`));
       assert.ok(match, `actual compiled ${label} button must exist`);
       const button = match[0].slice(match[0].lastIndexOf('<button'));

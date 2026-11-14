@@ -120,13 +120,13 @@
     {#if destination && !validTableCSVArchiveDestination(destination)}
       <p class="error" role="alert">Destination contains NUL or malformed UTF-16; export is blocked, and no spelling repair is applied.</p>
     {/if}
-    <label for="table-csv-archive-destination">Literal migration archive destination</label>
+    <label for="table-csv-archive-destination">Project table CSV archive destination (.zip)</label>
     <textarea id="table-csv-archive-destination" rows="3" bind:value={destination} disabled={busy || !!publication?.busy || !!publication?.blocked}></textarea>
     <div class="actions">
       <button type="button" data-table-csv-archive-choose disabled={busy || !!publication?.busy || !!publication?.blocked} onclick={chooseDestination}>Choose ZIP destination...</button>
       <button type="button" data-table-csv-archive-publish data-table-csv-archive-export disabled={busy || !!publication?.busy || !!publication?.blocked ||
         !approval || approval.review.manifest.table !== `${project}_${suffix}` || !validTableCSVArchiveDestination(destination)} onclick={publish}>
-        Export reviewed {project}_{suffix} migration archive
+        Export reviewed {project}_{suffix} CSV archive
       </button>
     </div>
     {#if approval}
@@ -137,12 +137,10 @@
         <div><dt>Backend archive byte count / format / version</dt><dd>{approval.byteCount} / {approval.format} / {approval.version}</dd></div>
       </dl>
     {/if}
-    <p class="notice">Opt-in owned-table migration ZIP, not a plain analysis CSV. CSV text uses JSON escaping and typed storage tags.
-      Destination spelling is preserved exactly: no trimming, recasing or extension completion. A native chooser selection is your explicit path choice.
-      Review is read-only; only the explicit reviewed export button publishes. Import, RDS, viewer and TurboVeg remain unavailable.</p>
+    <p class="notice">Exports a verified project table CSV archive (.zip) with JSON-escaped text and typed storage metadata (distinguishing NULL, empty text, and BLOBs).
+      Exact destination paths are preserved without overwriting existing files.</p>
   {:else}
-    <p class="notice">Read-only migration preview. CSV text fields use JSON string escaping; storage tags distinguish NULL, empty text and BLOBs.
-      File publication, import, RDS and TurboVeg remain unavailable.</p>
+    <p class="notice">Project table CSV preview. CSV text fields use JSON string escaping, and storage tags distinguish NULL, empty text, and BLOBs.</p>
   {/if}
   {#if review}
     <p role="status" data-table-csv-summary>{review.manifest.rowIds.length} physical rows;

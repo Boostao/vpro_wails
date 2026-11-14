@@ -203,8 +203,8 @@ test('optional native picker cancellation/errors preserve destination and hold b
   let options;
   const mod = moduleFor(storage(), async value => { options = value; return ''; });
   assert.equal(await mod.chooseTableCSVArchiveFile(), '');
-  assert.equal(options.Title, 'Select a new migration archive destination');
-  assert.equal(options.Filename, 'migration.zip'); assert.equal(options.Filters[0].Pattern, '*.zip');
+  assert.equal(options.Title, 'Select project table CSV archive destination');
+  assert.equal(options.Filename, 'project-tables.zip'); assert.equal(options.Filters[0].Pattern, '*.zip');
 });
 
 const componentSource = readFileSync(path.join(__dirname, 'ProjectTableCSVReview.svelte'), 'utf8');

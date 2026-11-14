@@ -111,9 +111,8 @@
 {@render children(editingEnabled ? { columns: soilCodeColumns, input: soilCodeInput } : undefined)}
 {#if editingEnabled}
     <FieldGuidance title="Soil classification guidance and definitions">
-    <p>Experimental parent editor: independent raw codes, at most 4 UTF-16 characters.
-      Choose full Items explicitly; no case rewriting, automatic completion, truncation or partner autofill.
-      Descriptions and empty Items are metadata, not selections.</p>
+    <p>LMH25 soil classification codes (up to 4 characters per field).
+      Select exact reference codes without automatic case rewriting or truncation.</p>
     {#each soilCodeKeys as key (key)}
       {@const list = soilCodeList(key)}
       {@const definitions = soilCodeDefinitions(views[list].choices, list, draft[key])}

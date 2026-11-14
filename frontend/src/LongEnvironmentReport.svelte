@@ -227,11 +227,10 @@
       </section>
     {/each}
   {/if}
-  <p class="guidance">Read-only experimental preview.
+  <p class="guidance">Long Environment report preview.
     {#if !preferencesEnabled}Title starts from ReportOptions.LEReportTitle in YAML; edits affect only this preview, not saved preferences.{/if}
-    NULL, empty text and historical storage remain distinct. Missing rows and conflicting names are shown, not repaired.
-    No quality filtering, summaries or Excel automation is implemented.
-    Workbook review and explicit no-replace XLSX publication require their separate gate; report preparation never publishes a file.</p>
+    NULL, empty text, and historical storage remain distinct; missing rows and conflicting unit names are surfaced without silent modification.
+    Workbook export writes to a new .xlsx destination without overwriting existing files.</p>
 </section>
 
 <style>
