@@ -357,8 +357,9 @@ func main() {
 			ReleaseChannel: ReleaseChannelStable,
 		},
 	}
+	cloudSyncManager := NewCloudSyncManager(configDir)
 	lifecycleService := NewLifecycleService(startupService, closeService, nil)
-	contextService := &ContextService{}
+	contextService := &ContextService{cloud: cloudSyncManager}
 	plotEntryService := &PlotEntryService{}
 	datasheetService := &DatasheetService{}
 	classificationService := &ClassificationService{bec: becService}
@@ -423,6 +424,7 @@ func main() {
 			_ = projects.CloseSQLiteContext()
 			return StartupState{}, err
 		}
+		builtContext.cloud = cloudSyncManager
 		*contextService = *builtContext
 		coreContext := unwrapContextService(contextService)
 		coreContext.SiviHeightEnabled = siviHeightEnabled
@@ -917,6 +919,9 @@ func main() {
 				if err := attrToClose.Close(); err != nil {
 					log.Printf("Warning: failed to close PMTilesAttributor: %v", err)
 				}
+			}
+			if cloudSyncManager != nil {
+				cloudSyncManager.Close()
 			}
 		},
 		Assets: application.AssetOptions{

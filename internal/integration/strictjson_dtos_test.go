@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/boostao/vpro-wails/internal/classification"
+	"github.com/boostao/vpro-wails/internal/cloudsync"
 	"github.com/boostao/vpro-wails/internal/datasheet"
 	"github.com/boostao/vpro-wails/internal/diagnostics"
 	"github.com/boostao/vpro-wails/internal/interchange"
@@ -363,6 +364,73 @@ func wave2To5StrictDTOTestCases() []strictDTOTestCase {
 			newTarget: func() any { return &rsidecar.QuartoGuideRequest{} },
 			validJSON: `{"guideType":"single_unit","title":"Guide","targetUnit":"01","bgcFilter":"CWHvm1","conceptNotes":"🌲 Notes","refPeriod":"1961_1990","minConstancyPct":20,"useActiveSu":true,"applyLump":false,"includePdf":false,"destinationPath":"/tmp/guide.html"}`,
 			stringKey: "title",
+		},
+
+		// internal/cloudsync
+		{
+			name:      "cloudsync.SessionConfigRequest",
+			newTarget: func() any { return &cloudsync.SessionConfigRequest{} },
+			validJSON: `{"roleMode":"contributor","clearOverrides":false,"host":"localhost","port":5432,"database":"becmaster","sslMode":"require","user":"u","password":"p","adminUser":"a","adminPassword":"ap"}`,
+			stringKey: "roleMode",
+		},
+		{
+			name:      "cloudsync.PublishStandardsRequest",
+			newTarget: func() any { return &cloudsync.PublishStandardsRequest{} },
+			validJSON: `{"releaseId":"R2026","becVersion":"BECdb_v13_2026","taxonomyVersion":"BCPlantTaxa_v19_2025","notes":"🌲 Baseline"}`,
+			stringKey: "releaseId",
+		},
+		{
+			name:      "cloudsync.SeedBaselineRequest",
+			newTarget: func() any { return &cloudsync.SeedBaselineRequest{} },
+			validJSON: `{"sourceDbPath":"/tmp/BECMaster.db","sourceProject":"BECMaster_fixing","snapshotTag":"BECMaster_v13_Baseline","replaceExisting":true,"skipAudit":false,"notes":"Initial"}`,
+			stringKey: "sourceDbPath",
+		},
+		{
+			name:      "cloudsync.SubsetFilter",
+			newTarget: func() any { return &cloudsync.SubsetFilter{} },
+			validJSON: `{"zones":["CWH"],"subzones":["vm1"],"projectIds":["P1"],"plotNumbers":["00337"],"bbox":[-128.5,48.5,-123.0,51.0],"limit":100,"allowFullCheckout":false}`,
+		},
+		{
+			name:      "cloudsync.PullSubsetRequest",
+			newTarget: func() any { return &cloudsync.PullSubsetRequest{} },
+			validJSON: `{"filter":{"zones":["CWH"],"plotNumbers":["00337"]},"targetProject":"CWH_2026","destinationPath":"/tmp/CWH_2026.db","activateOnSuccess":true}`,
+			stringKey: "targetProject",
+		},
+		{
+			name:      "cloudsync.SubmitStagingRequest",
+			newTarget: func() any { return &cloudsync.SubmitStagingRequest{} },
+			validJSON: `{"useActiveSu":false,"submitterNotes":"🌲 Field season","submittedBy":"Ecologist","baseSnapshotTag":"BECMaster_v13_Baseline","custodianOverride":false}`,
+			stringKey: "submitterNotes",
+		},
+		{
+			name:      "cloudsync.ListSubmissionsFilter",
+			newTarget: func() any { return &cloudsync.ListSubmissionsFilter{} },
+			validJSON: `{"status":"pending","submittedBy":"Ecologist","limit":50}`,
+			stringKey: "status",
+		},
+		{
+			name:      "cloudsync.StagingMergePreviewRequest",
+			newTarget: func() any { return &cloudsync.StagingMergePreviewRequest{} },
+			validJSON: `{"submissionId":"550e8400-e29b-41d4-a716-446655440000","baseDbPath":"/tmp/Base.db","baseProject":"Base"}`,
+			stringKey: "submissionId",
+		},
+		{
+			name:      "cloudsync.StagingMergeExecuteRequest",
+			newTarget: func() any { return &cloudsync.StagingMergeExecuteRequest{} },
+			validJSON: `{"submissionId":"550e8400-e29b-41d4-a716-446655440000","expectedPreviewDigest":"abc","defaultConflictResolution":"keep_target","plotResolutions":{"00337":"accept_source"},"fieldResolutions":{"00337::Env::Zone":"accept_source"},"reviewerNotes":"Approved","actor":"Will MacKenzie"}`,
+			stringKey: "submissionId",
+		},
+		{
+			name:      "cloudsync.RejectSubmissionRequest",
+			newTarget: func() any { return &cloudsync.RejectSubmissionRequest{} },
+			validJSON: `{"submissionId":"550e8400-e29b-41d4-a716-446655440000","reviewerNotes":"Missing horizon depths","actor":"Will MacKenzie"}`,
+			stringKey: "reviewerNotes",
+		},
+		{
+			name:      "cloudsync.CreateSnapshotRequest",
+			newTarget: func() any { return &cloudsync.CreateSnapshotRequest{} },
+			validJSON: `{"snapshotTag":"BECMaster_2026_11","notes":"Approved cut","exportFormat":"rds","destinationPath":"/tmp/snap.rds","zoneFilter":"CWH"}`,
+			stringKey: "snapshotTag",
 		},
 
 		// internal/vegreport

@@ -5,6 +5,7 @@ import (
 )
 
 import (
+	"context"
 	"crypto/sha256"
 	"database/sql"
 	"errors"
@@ -222,4 +223,107 @@ func EnsureDefaultPictureLibrary(dataDir string) (dbPath string, imagesDir strin
 	}
 	return dbPath, imagesDir, nil
 }
+
+// ReplaceActiveVListsCatalogue validates staged VLists.db bytes, atomically swaps the
+// attached VLists.db via sqlutil.ReplaceBundledCatalogueFile while safely cycling the
+// SQLiteContext handle (preventing open-file rename failures on Windows), and returns
+// the refreshed ProjectState with a newly minted ContextID.
+func ReplaceActiveVListsCatalogue(ctx context.Context, s *ContextService, expectedID string, newVListsBytes []byte) (ProjectState, error) {
+	if err := ctx.Err(); err != nil {
+		return ProjectState{}, err
+	}
+	if s == nil || s.Projects == nil {
+		return ProjectState{}, errors.New("context service is unavailable")
+	}
+	if len(newVListsBytes) < 4096 {
+		return ProjectState{}, errors.New("staged VLists.db payload is empty or truncated")
+	}
+
+	// Pre-validate staged SQLite image in an isolated temporary file before touching owned state.
+	probeDir, err := os.MkdirTemp("", "vpro-vlists-validate-*")
+	if err != nil {
+		return ProjectState{}, err
+	}
+	defer os.RemoveAll(probeDir)
+	probePath := filepath.Join(probeDir, "VLists.db")
+	if err := os.WriteFile(probePath, newVListsBytes, 0o600); err != nil {
+		return ProjectState{}, err
+	}
+	probeDB, err := sqlutil.OpenReadOnlyContext(ctx, probePath)
+	if err != nil {
+		return ProjectState{}, fmt.Errorf("validate staged VLists.db: %w", err)
+	}
+	for _, requiredTbl := range []string{"USysAllSpecs", "USysTableOfLists", "MasterSiteUnitList", "USysZoneList"} {
+		var exists bool
+		if qErr := probeDB.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE type='table' AND name=?)`, requiredTbl).Scan(&exists); qErr != nil || !exists {
+			_ = probeDB.Close()
+			return ProjectState{}, fmt.Errorf("staged VLists.db is missing required table %s", requiredTbl)
+		}
+	}
+	_ = probeDB.Close()
+
+	s.Projects.OperationMu.Lock()
+	defer s.Projects.OperationMu.Unlock()
+	s.Projects.Mu.Lock()
+	defer s.Projects.Mu.Unlock()
+
+	if expectedID == "" || expectedID != s.Projects.ContextID || s.Projects.Sqlite == nil || s.Projects.Sqlite.Conn == nil {
+		return ProjectState{}, errors.New("project context changed; reload before syncing VLists")
+	}
+	vlistsPath := s.Projects.SupportPaths["VLists"]
+	if strings.TrimSpace(vlistsPath) == "" {
+		vlistsPath = s.Projects.Sqlite.Attachments["VLists"]
+	}
+	if strings.TrimSpace(vlistsPath) == "" {
+		return ProjectState{}, errors.New("active context has no VLists.db attachment path")
+	}
+
+	backupBytes, err := os.ReadFile(vlistsPath)
+	if err != nil {
+		return ProjectState{}, fmt.Errorf("read current VLists.db backup: %w", err)
+	}
+	sel := s.Projects.Sqlite.Selection
+	prof := s.Projects.Sqlite.Profile
+	oldID := s.Projects.ContextID
+
+	// Close current SqliteContext before renaming VLists.db so Windows file locks are released cleanly.
+	_ = s.Projects.Sqlite.Close()
+	s.Projects.Sqlite = nil
+
+	restorePrior := func(cause error) (ProjectState, error) {
+		_ = sqlutil.ReplaceBundledCatalogueFile(vlistsPath, backupBytes, 0o600)
+		if recovered, rErr := NewSQLiteContext(context.Background(), sel, s.Projects.SupportPaths, prof); rErr == nil {
+			s.Projects.PublishSQLiteSelection(recovered, oldID)
+		}
+		return ProjectState{}, cause
+	}
+
+	if err := sqlutil.ReplaceBundledCatalogueFile(vlistsPath, newVListsBytes, 0o600); err != nil {
+		return restorePrior(fmt.Errorf("replace VLists.db: %w", err))
+	}
+
+	candidate, err := NewSQLiteContext(context.Background(), sel, s.Projects.SupportPaths, prof)
+	if err != nil {
+		return restorePrior(fmt.Errorf("reopen SQLite context with updated VLists.db: %w", err))
+	}
+	newID, err := NewContextIdentity()
+	if err != nil {
+		_ = candidate.Close()
+		return restorePrior(err)
+	}
+	s.Projects.PublishSQLiteSelection(candidate, newID)
+	state, err := s.Projects.SqliteStateContextLocked(ctx)
+	if err != nil {
+		_ = candidate.Close()
+		return restorePrior(err)
+	}
+	s.SelectedUnitSelections.Mu.Lock()
+	s.SelectedUnitSelections.Entries = nil
+	s.SelectedUnitSelections.Mu.Unlock()
+	s.ProjectReportScopes.Mu.Lock()
+	s.ProjectReportScopes.Entries = nil
+	s.ProjectReportScopes.Mu.Unlock()
+	return state, nil
+}
+
 

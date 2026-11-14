@@ -32,6 +32,7 @@ func TestFourLayerAcyclicArchitectureZeroLayer2SiblingImports(t *testing.T) {
 	// None of these packages may import any sibling Layer-2 package across Imports, TestImports, or XTestImports.
 	layer2Packages := map[string]bool{
 		modulePrefix + "internal/classification": true,
+		modulePrefix + "internal/cloudsync":      true,
 		modulePrefix + "internal/datasheet":      true,
 		modulePrefix + "internal/diagnostics":    true,
 		modulePrefix + "internal/envreport":      true,

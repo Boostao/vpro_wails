@@ -7,6 +7,9 @@ import { Call as $Call, CancellablePromise as $CancellablePromise } from "@wails
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as cloudsync$0 from "./internal/cloudsync/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as projectops$0 from "./internal/projectops/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
@@ -33,6 +36,10 @@ export function ApplyProjectMetadataAutomation(contextID: string, req: projectop
     return $Call.ByID(2850448861, contextID, req);
 }
 
+export function BootstrapCloudSchemas(): $CancellablePromise<cloudsync$0.SchemaBootstrapResult> {
+    return $Call.ByID(1062558199);
+}
+
 export function CanEditMasterBEC(contextID: string): $CancellablePromise<boolean> {
     return $Call.ByID(3701656016, contextID);
 }
@@ -51,6 +58,14 @@ export function ChooseNewSQLiteProjectFile(contextID: string, suggestedProject: 
 
 export function CompareProjects(contextID: string, req: projectops$0.CompareProjectsRequest): $CancellablePromise<projectops$0.CompareProjectsResult> {
     return $Call.ByID(1284711039, contextID, req);
+}
+
+export function ConfigureCloudSyncSession(req: cloudsync$0.SessionConfigRequest): $CancellablePromise<cloudsync$0.CloudConfigStatus> {
+    return $Call.ByID(3560268208, req);
+}
+
+export function CreateBECMasterSnapshot(contextID: string, req: cloudsync$0.CreateSnapshotRequest): $CancellablePromise<cloudsync$0.SnapshotRecord> {
+    return $Call.ByID(3978276606, contextID, req);
 }
 
 export function CreateBlankProjectMetadata(p1: string, p2: $models.ProjectMetadataCreate): $CancellablePromise<$models.ProjectMetadataRow> {
@@ -125,6 +140,10 @@ export function DeriveProjectMetadataFromPlots(contextID: string, projectID: str
     return $Call.ByID(3409539417, contextID, projectID);
 }
 
+export function ExecuteStagingToMasterMerge(req: cloudsync$0.StagingMergeExecuteRequest): $CancellablePromise<cloudsync$0.StagingMergeResult> {
+    return $Call.ByID(2147411811, req);
+}
+
 export function ExecuteThreeWayMerge(contextID: string, req: projectops$0.ThreeWayMergeExecuteRequest): $CancellablePromise<projectops$0.ThreeWayMergeResult> {
     return $Call.ByID(1873291042, contextID, req);
 }
@@ -135,6 +154,10 @@ export function ExportSplinterProject(contextID: string, req: projectops$0.Expor
 
 export function GetChildCapabilities(contextID: string, kind: string): $CancellablePromise<{ [_ in string]?: boolean } | null> {
     return $Call.ByID(888099326, contextID, kind);
+}
+
+export function GetCloudSyncConfigStatus(): $CancellablePromise<cloudsync$0.CloudConfigStatus> {
+    return $Call.ByID(529381712);
 }
 
 export function GetHeaderCapabilities(contextID: string): $CancellablePromise<{ [_ in string]?: boolean } | null> {
@@ -197,6 +220,10 @@ export function GetSiteUnitSummaryOptions(p1: string): $CancellablePromise<$mode
     return $Call.ByID(1799826469, p1);
 }
 
+export function GetStagingSubmissionDetail(submissionID: string): $CancellablePromise<cloudsync$0.StagingSubmissionDetail> {
+    return $Call.ByID(4148128418, submissionID);
+}
+
 export function GetState(): $CancellablePromise<$models.ProjectState> {
     return $Call.ByID(1033432855);
 }
@@ -223,6 +250,14 @@ export function ListAuditEntries(contextID: string, plot: string): $CancellableP
 
 export function ListAuditReadEntries(contextID: string, plot: string): $CancellablePromise<vprocore$0.OrdinaryAuditReadEntry[] | null> {
     return $Call.ByID(218608203, contextID, plot);
+}
+
+export function ListBECMasterDownloadLog(limit: number): $CancellablePromise<cloudsync$0.DownloadLogEntry[] | null> {
+    return $Call.ByID(10554808, limit);
+}
+
+export function ListBECMasterSnapshots(): $CancellablePromise<cloudsync$0.SnapshotRecord[] | null> {
+    return $Call.ByID(3175260711);
 }
 
 export function ListCreatedSIVIPlots(contextID: string): $CancellablePromise<sivi$0.SIVICreatedPlotEntry[] | null> {
@@ -269,6 +304,10 @@ export function ListSoilSuggestions(p1: string): $CancellablePromise<$models.Soi
     return $Call.ByID(357605878, p1);
 }
 
+export function ListStagingSubmissions(filter: cloudsync$0.ListSubmissionsFilter): $CancellablePromise<cloudsync$0.StagingSubmissionSummary[] | null> {
+    return $Call.ByID(1107386384, filter);
+}
+
 export function ListTwoPageSoilDeletedHorizons(contextID: string, plotNumber: string, form: string): $CancellablePromise<twopage$0.DeletedTwoPageSoilHorizonEntry[] | null> {
     return $Call.ByID(1912568241, contextID, plotNumber, form);
 }
@@ -301,6 +340,10 @@ export function LookupSpeciesCodeCheckTarget(p1: string, p2: $models.VegetationS
     return $Call.ByID(1738673856, p1, p2);
 }
 
+export function PreviewBECMasterSubset(filter: cloudsync$0.SubsetFilter): $CancellablePromise<cloudsync$0.SubsetPreview> {
+    return $Call.ByID(2691294232, filter);
+}
+
 export function PreviewLongEnvironment(p1: string, p2: $models.LongEnvironmentRequest): $CancellablePromise<$models.LongEnvironmentPreview> {
     return $Call.ByID(3771463957, p1, p2);
 }
@@ -325,8 +368,28 @@ export function PreviewSiteUnitSummarySpecies(p1: string, p2: $models.SiteUnitSp
     return $Call.ByID(927926337, p1, p2);
 }
 
+export function PreviewStagingSubmission(contextID: string, useActiveSU: boolean): $CancellablePromise<cloudsync$0.StagingPreflightPreview> {
+    return $Call.ByID(1234564075, contextID, useActiveSU);
+}
+
+export function PreviewStagingToMasterMerge(req: cloudsync$0.StagingMergePreviewRequest): $CancellablePromise<cloudsync$0.StagingMergePreview> {
+    return $Call.ByID(290843804, req);
+}
+
 export function PreviewThreeWayMerge(contextID: string, req: projectops$0.ThreeWayMergePreviewRequest): $CancellablePromise<projectops$0.ThreeWayMergePreview> {
     return $Call.ByID(1579715019, contextID, req);
+}
+
+export function PublishStandardsToCloud(contextID: string, req: cloudsync$0.PublishStandardsRequest): $CancellablePromise<cloudsync$0.PublishStandardsResult> {
+    return $Call.ByID(1223858257, contextID, req);
+}
+
+export function PullBECMasterSubset(contextID: string, req: cloudsync$0.PullSubsetRequest): $CancellablePromise<cloudsync$0.PullSubsetResult> {
+    return $Call.ByID(3773576193, contextID, req);
+}
+
+export function PullCloudStandards(contextID: string): $CancellablePromise<cloudsync$0.PullStandardsResult> {
+    return $Call.ByID(3514028020, contextID);
 }
 
 export function QuarantineOrphanRecords(contextID: string, req: validation$0.QuarantineOrphanRequest): $CancellablePromise<validation$0.QuarantineOrphanResult> {
@@ -339,6 +402,10 @@ export function ReadNewProjectTemplates(contextID: string): $CancellablePromise<
 
 export function ReadPlotLocations(contextID: string): $CancellablePromise<vprocore$0.PlotLocationReview | null> {
     return $Call.ByID(4098818915, contextID);
+}
+
+export function RejectStagingSubmission(req: cloudsync$0.RejectSubmissionRequest): $CancellablePromise<cloudsync$0.StagingSubmissionSummary> {
+    return $Call.ByID(1066255522, req);
 }
 
 export function RequireSelectedListReportScope(contextID: string): $CancellablePromise<void> {
@@ -493,6 +560,10 @@ export function SaveVegRecord(contextID: string, record: vprocore$0.VegRecord): 
     return $Call.ByID(2006819882, contextID, record);
 }
 
+export function SeedBECMasterBaseline(req: cloudsync$0.SeedBaselineRequest): $CancellablePromise<cloudsync$0.SeedBaselineResult> {
+    return $Call.ByID(4154362226, req);
+}
+
 export function SelectHierarchy(name: string, file: string): $CancellablePromise<$models.ProjectState> {
     return $Call.ByID(3372616705, name, file);
 }
@@ -521,8 +592,16 @@ export function SetSIVIProjectIDSource(p1: string, p2: number, p3: number): $Can
     return $Call.ByID(3729314756, p1, p2, p3);
 }
 
+export function SubmitProjectToStaging(contextID: string, req: cloudsync$0.SubmitStagingRequest): $CancellablePromise<cloudsync$0.SubmitStagingResult> {
+    return $Call.ByID(1586450463, contextID, req);
+}
+
 export function SwitchContext(expectedID: string, requested: vprocore$0.ContextSelection): $CancellablePromise<vprocore$0.ProjectState> {
     return $Call.ByID(1469329417, expectedID, requested);
+}
+
+export function TestCloudConnection(): $CancellablePromise<cloudsync$0.CloudConnectionReport> {
+    return $Call.ByID(3866569611);
 }
 
 export function TransferEnvironmentSiteUnits(p1: string, p2: $models.EnvironmentSiteUnitTransfer): $CancellablePromise<$models.EnvironmentSiteUnitResult | null> {
@@ -583,4 +662,8 @@ export function UpdateVegetationNumbers(contextID: string, plot: string, updates
 
 export function UpdateVegetationSpecies(contextID: string, plot: string, updates: vprocore$0.VegetationSpeciesUpdate[] | null): $CancellablePromise<void> {
     return $Call.ByID(2708281787, contextID, plot, updates);
+}
+
+export function VerifyBECMasterAuditChain(limit: number): $CancellablePromise<cloudsync$0.AuditChainVerification> {
+    return $Call.ByID(1450728969, limit);
 }

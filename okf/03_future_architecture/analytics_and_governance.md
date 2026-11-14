@@ -50,6 +50,11 @@ Replace hardcoded VBA usernames with **BC Gov OIDC (`IDIR` / `BCeID`) JWT claims
 * **Unified Audit & Provenance Ledger:** Retain the `VP08` `<Project>_Audit` table for plot-level rollback compatibility while adding server-side append-only PostgreSQL audit partitions (`txid`, `actor_idir`, `source_bundle_sha256`, `before_jsonb`, `after_jsonb`, `prev_hash`) so merges and rollbacks are cryptographically traceable.
 * **Pinned Reference Library Stamps:** Stamp every project's `<Project>_Metadata.AllSpecs` and `TableOfLists` (`Sample_Metadata.sql:56-57`) with semantic library versions (e.g., `PlantSpeciesList_v15_2023-02-01`, `BECdb_v13_2026`), allowing reproducible historical re-runs of `Summary Vegetation` reports even after provincial taxonomy evolves.
 
+### 1.3 Phase 1.5 Delivered Desktop <-> PostgreSQL `BECMaster` Sync Engine (`internal/cloudsync`)
+Implemented across `internal/cloudsync` (`pgx/v5` + `pgxpool` + `pgx.CopyFrom` + `pgx.Batch`), `ContextService` Wails RPCs, and `CloudSyncWorkbench.svelte` (5th tab inside `ProjectAdminWorkbench.svelte`):
+* **3 Isolated Schemas (`schema.go`):** `becmaster` (`env` 112 cols + PostGIS `geom`, `admin` 20 cols, `veg`/`humus`/`mineral`/`other` with `child_identity` + watermark, `metadata` 75 cols, SHA-256 hash-chained `audit` + `merge_ledger`, `snapshots`, `download_log`), `staging` (`submissions` with RLS + `BEFORE INSERT` role/compliance trigger + keyed `VP08` tables), and `standards` (`library_releases` + 2026 `BCPlantTaxonomy v19` & `BECdb v13` catalogues).
+* **Contributor & Custodian Workflows (`contributor.go`, `custodian_merge.go`, `seed.go`):** Offline-first env/`becmaster.env` resolution with strict secret redaction, `< 3 s` standards publish & atomic local `VLists.db` swap, streaming 71,567-plot (`1.65M` veg, `597K` audit) `BECMaster` baseline seeding without OOM, regional subset checkout to WAL `VP08` `.db` + `download_log`, mandatory `RunComplianceValidation` + `UserSpeciesManifest` staging uploads, and `< 300 ms` `pgx.Batch`-pipelined 3-way Custodian merge inside `SERIALIZABLE` PostgreSQL transactions.
+
 ---
 
 ## 2. Consolidated In-App Geospatial Workbench & Geodetic Governance

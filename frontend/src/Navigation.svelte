@@ -3,14 +3,15 @@
 
   type View = 'home' | 'plots' | 'geospatial-map' | 'diagnostic-synthesis' | 'r-sidecar' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview';
   type HelpMenuAction = 'guide' | 'tours' | 'shortcuts' | 'whats-new' | 'reset-sample' | 'about';
-  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'new-sivi' | 'metadata'; helpAction?: HelpMenuAction };
+  type Item = { name: string; icon: typeof House; view?: View; action?: 'sivi' | 'new-sivi' | 'metadata' | 'cloud-sync'; helpAction?: HelpMenuAction };
   type Menu = { label: string; icon: typeof House; groups: { label: string; items: Item[] }[] };
   let { view, onnavigate, siviAvailable = false, onopensivi, newSiviAvailable = false, onopennewsivi,
-    metadataAvailable = false, onopenmetadata, onhelpaction, whatsNewUnreadCount = 0, resetSampleAvailable = true }: {
+    metadataAvailable = false, onopenmetadata, onopencloudsync, onhelpaction, whatsNewUnreadCount = 0, resetSampleAvailable = true }: {
     view: View; onnavigate: (view: View) => void;
     siviAvailable?: boolean; onopensivi?: () => void;
     newSiviAvailable?: boolean; onopennewsivi?: () => void;
     metadataAvailable?: boolean; onopenmetadata?: () => void;
+    onopencloudsync?: () => void;
     onhelpaction?: (action: HelpMenuAction) => void;
     whatsNewUnreadCount?: number;
     resetSampleAvailable?: boolean;
@@ -28,6 +29,7 @@
       ] },
       { label: 'Project & Classification', items: [
         { name: 'Project Admin, QA & Merge', icon: ClipboardList, view: 'project-admin' },
+        { name: 'Cloud BECMaster Sync', icon: Globe, action: 'cloud-sync' },
         { name: 'SU & Hierarchy Explorer', icon: Network, view: 'classification-explorer' }
       ] },
       { label: 'Others', items: [
@@ -71,6 +73,7 @@
     { label: 'Interchange', icon: Table, groups: [
       { label: 'Import & Export', items: [
         { name: 'Interchange Hub (VENUS 5, TurboVeg, RDS, GeoPackage)', icon: Globe, view: 'interchange-hub' },
+        { name: 'Cloud BECMaster Sync', icon: Globe, action: 'cloud-sync' },
         { name: 'Project table CSV review', icon: Table, view: import.meta.env.VITE_TABLE_CSV_REVIEW !== 'false' ? 'table-csv' : undefined }
       ] }
     ] },
@@ -120,6 +123,7 @@
     if (item.action === 'sivi') return siviAvailable && !!onopensivi;
     if (item.action === 'new-sivi') return newSiviAvailable && !!onopennewsivi;
     if (item.action === 'metadata') return metadataAvailable && !!onopenmetadata;
+    if (item.action === 'cloud-sync') return true;
     if (item.helpAction === 'reset-sample') return resetSampleAvailable;
     if (item.helpAction) return true;
     return !!item.view;
@@ -136,6 +140,13 @@
     } else if (item.action === 'metadata' && onopenmetadata) {
       closeMenu(true);
       onopenmetadata();
+    } else if (item.action === 'cloud-sync') {
+      if (typeof onopencloudsync === 'function') {
+        closeMenu(true);
+        onopencloudsync();
+      } else {
+        navigate('project-admin');
+      }
     } else if (item.helpAction) {
       closeMenu(true);
       if (typeof onhelpaction === 'function') onhelpaction(item.helpAction);
@@ -189,6 +200,8 @@
                     : 'Select a plot to open SIVI / FS1333 data entry.'
                   : item.action === 'metadata'
                     ? 'Project metadata for the open plot. Requires a clean, unlocked editor; finish or Undo drafts first.'
+                  : item.action === 'cloud-sync'
+                    ? item.name
                   : item.helpAction === 'reset-sample'
                     ? 'Non-destructive recovery: materializes a fresh Sample.db and switches session to Sample without deleting user .db files.'
                   : item.helpAction ? item.name

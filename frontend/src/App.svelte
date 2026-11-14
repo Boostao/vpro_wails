@@ -60,6 +60,8 @@
     plotReads.cancelAll(); hierarchyReads.cancelAll(); stateReads.cancelAll();
   });
   let view = $state<'home' | 'plots' | 'geospatial-map' | 'diagnostic-synthesis' | 'r-sidecar' | 'hierarchy' | 'fs882' | 'datasheet' | 'classification-explorer' | 'project-admin' | 'lump-editor' | 'interchange-hub' | 'long-environment' | 'summary-environment' | 'long-vegetation' | 'summary-vegetation' | 'lifeform-summary' | 'subzone-matrix' | 'table-csv' | 'user-log' | 'plot-locations' | 'google-earth-review' | 'picture-manager' | 'plot-label-preview'>('home');
+  let projectAdminTab = $state<'lifecycle' | 'compliance' | 'optimizeveg' | 'merge' | 'cloudsync'>('lifecycle');
+  let projectAdminTabNonce = $state(0);
   let newSiviModalOpen = $state(false);
   let helpDrawerOpen = $state(false);
   let helpDrawerTopicId = $state('site.plot_number');
@@ -536,9 +538,10 @@
   }
 
   function navigate(next: typeof view) {
-    if (next === view) return;
+    if (next === view && next !== 'project-admin') return;
     void requestTransition(async () => {
       error = '';
+      if (next === 'project-admin') { projectAdminTab = 'lifecycle'; projectAdminTabNonce++; }
       if (next === 'fs882') { editorPlotNumber = selected?.plotNumber; editorEntryForm = 'fs882'; }
       if (next === 'picture-manager') {
         if (import.meta.env.VITE_PICTURE_MANAGER === 'false') {
@@ -1374,6 +1377,7 @@
       onopennewsivi={() => { newSiviModalOpen = true; }}
       metadataAvailable={view === 'fs882' && !!$projectState?.contextId && !!editor?.canOpenProjectMetadata()}
       onopenmetadata={() => void openProjectMetadata()}
+      onopencloudsync={() => { void requestTransition(async () => { projectAdminTab = 'cloudsync'; projectAdminTabNonce++; view = 'project-admin'; error = ''; }); }}
       whatsNewUnreadCount={whatsNewStatus?.unreadCount ?? 0}
       resetSampleAvailable={!!$projectState?.contextId && !busy && !editorBusy && !companionPanelBusy && !transitionWorking}
       onhelpaction={handleHelpMenuAction} />{/if}
@@ -1989,6 +1993,8 @@
               contextId={$projectState.contextId ?? ''}
               activeProject={$projectState.activeProject}
               activeSu={$projectState.activeSU}
+              initialTab={projectAdminTab}
+              initialTabNonce={projectAdminTabNonce}
               operationHeld={busy || companionPanelBusy || transitionWorking || pendingTransition !== null || !!closeRequest}
               onBusyChange={(value) => { localEditorBusy = value; }}
               oncontextswitched={async () => { await refresh(); }}

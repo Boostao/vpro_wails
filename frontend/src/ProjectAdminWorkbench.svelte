@@ -21,10 +21,14 @@
     type MergeResolutionChoice,
   } from './projectAdminWorkbench';
 
+  type WorkbenchTab = 'lifecycle' | 'compliance' | 'optimizeveg' | 'merge' | 'cloudsync';
+
   let {
     contextId,
     activeProject,
     activeSu = 'None',
+    initialTab = 'lifecycle',
+    initialTabNonce = 0,
     operationHeld = false,
     port = defaultProjectAdminPort,
     onBusyChange,
@@ -33,18 +37,29 @@
     contextId: string;
     activeProject: string;
     activeSu?: string;
+    initialTab?: WorkbenchTab;
+    initialTabNonce?: number;
     operationHeld?: boolean;
     port?: ProjectAdminPort;
     onBusyChange?: (busy: boolean) => void;
     oncontextswitched?: (state: unknown) => void;
   } = $props();
 
-  type WorkbenchTab = 'lifecycle' | 'compliance' | 'optimizeveg' | 'merge';
   let activeTab = $state<WorkbenchTab>('lifecycle');
+  let lastAppliedInitialKey = 'lifecycle::0';
   let busy = $state(false);
   let error = $state<string | null>(null);
   let statusMessage = $state<string | null>(null);
   let generation = 0;
+
+  $effect(() => {
+    const requested = initialTab;
+    const key = `${requested}::${initialTabNonce}`;
+    if (requested && key !== lastAppliedInitialKey && !busy) {
+      lastAppliedInitialKey = key;
+      activeTab = requested;
+    }
+  });
 
   function setBusy(next: boolean) {
     busy = next;
@@ -481,9 +496,11 @@
       ['compliance', 'Compliance Validator & Quarantine'],
       ['optimizeveg', 'Safe OptimizeVeg'],
       ['merge', 'Compare & 3-Way Merge'],
+      ['cloudsync', 'Cloud BECMaster Sync'],
     ] as [id, label]}
       <button
         type="button"
+        data-workbench-tab={id}
         disabled={busy}
         class={`rounded-t px-4 py-2 text-sm font-medium transition-colors ${
           activeTab === id
@@ -963,6 +980,23 @@
           {/if}
         </fieldset>
       </div>
+    {:else if activeTab === 'cloudsync'}
+      {#await import('./CloudSyncWorkbench.svelte')}
+        <p role="status" class="p-4 text-sm text-slate-700">Loading Cloud BECMaster Sync Workbench...</p>
+      {:then { default: CloudSyncWorkbench }}
+        <CloudSyncWorkbench
+          {contextId}
+          {activeProject}
+          {activeSu}
+          {operationHeld}
+          onBusyChange={setBusy}
+          {oncontextswitched}
+        />
+      {:catch loadError}
+        <p role="alert" class="rounded border-l-4 border-red-700 bg-red-50 p-3 text-sm text-red-900">
+          Cloud BECMaster Sync Workbench could not load: {String(loadError)}
+        </p>
+      {/await}
     {/if}
   </div>
 </section>
