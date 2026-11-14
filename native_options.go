@@ -2,12 +2,32 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"path/filepath"
 	"strconv"
 
 	lifecyclepkg "github.com/boostao/vpro-wails/internal/lifecycle"
+	sqlutilpkg "github.com/boostao/vpro-wails/internal/sqlutil"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
+
+func resolveHostEnvironment() (dataDir, configDir string, windows application.WindowsOptions, err error) {
+	dataDir, err = sqlutilpkg.UserDataDir()
+	if err != nil {
+		return "", "", application.WindowsOptions{}, err
+	}
+	configDir, err = sqlutilpkg.UserConfigDir()
+	if err != nil {
+		return "", "", application.WindowsOptions{}, err
+	}
+	rawDebugPort := os.Getenv("VPRO_WEBVIEW_DEBUG_PORT")
+	if rawDebugPort != "" && lifecyclepkg.CurrentBuildInfo().BuildMode != lifecyclepkg.BuildModeDev {
+		log.Printf("Ignoring VPRO_WEBVIEW_DEBUG_PORT in non-dev build (%s)", lifecyclepkg.CurrentBuildInfo().BuildMode)
+	}
+	windows, err = nativeWindowsOptions(rawDebugPort, dataDir, configDir)
+	return dataDir, configDir, windows, err
+}
 
 func nativeWindowsOptions(debugPort, dataDir, configDir string) (application.WindowsOptions, error) {
 	return nativeWindowsOptionsForMode(lifecyclepkg.CurrentBuildInfo().BuildMode, debugPort, dataDir, configDir)

@@ -113,17 +113,28 @@ func TestTwoPageVegetationServiceStrictTransportAndExplicitErrors(t *testing.T) 
 }
 
 func TestTwoPageVegetationServiceActualMainRegistration(t *testing.T) {
-	data, err := os.ReadFile("main.go")
+	mainData, err := os.ReadFile("main.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	plotEntryData, err := os.ReadFile("domainservices_plotentry.go")
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, required := range []string{
-		"NewTwoPageVegetationService(contextService)",
-		"twoPageVegetation:            twoPageVegetation",
+		"buildPlotEntryService(contextService, plots, refs)",
 		"application.NewService(plotEntryService)",
 	} {
-		if strings.Count(string(data), required) != 1 {
+		if strings.Count(string(mainData), required) != 1 {
 			t.Fatal("actual main registration missing/duplicated", required)
+		}
+	}
+	for _, required := range []string{
+		"twopagepkg.NewTwoPageVegetationService(core)",
+		"twoPageVegetation:            twoPageVegetation",
+	} {
+		if strings.Count(string(plotEntryData), required) != 1 {
+			t.Fatal("actual PlotEntryService builder registration missing/duplicated", required)
 		}
 	}
 }

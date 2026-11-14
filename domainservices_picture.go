@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	picturespkg "github.com/boostao/vpro-wails/internal/pictures"
+	vprocorepkg "github.com/boostao/vpro-wails/internal/vprocore"
 )
 
 type PictureService struct {
@@ -18,12 +19,73 @@ func unwrapPictureService(s *PictureService) *picturespkg.PictureService {
 	return s.PictureService
 }
 
+func newDefaultPictureEnvLookup(base func(string) (string, bool), defaultVPicsPath, defaultImagesDir string) func(string) (string, bool) {
+	return func(key string) (string, bool) {
+		if base != nil {
+			if val, ok := base(key); ok {
+				return val, true
+			}
+		}
+		switch key {
+		case "VPRO_PICTURE_LIBRARY_PATH":
+			if defaultVPicsPath != "" {
+				return defaultVPicsPath, true
+			}
+		case "VPRO_PICTURE_CHILD_DIRECTORY", "VPRO_PICTURE_MANAGER_DIRECTORY":
+			if defaultImagesDir != "" {
+				return defaultImagesDir, true
+			}
+		}
+		return "", false
+	}
+}
+
 func NewPictureService(contexts *ContextService, lookup func(string) (string, bool)) (*PictureService, error) {
 	core, err := picturespkg.NewPictureService(unwrapContextService(contexts), lookup)
 	if err != nil {
 		return nil, err
 	}
 	return &PictureService{PictureService: core}, nil
+}
+
+func NewPictureMetadataService(s *PictureService) (*picturespkg.PictureMetadataService, error) {
+	return picturespkg.NewPictureMetadataService(unwrapPictureService(s))
+}
+
+func NewPictureCreationService(s *PictureService) (*picturespkg.PictureCreationService, error) {
+	return picturespkg.NewPictureCreationService(unwrapPictureService(s))
+}
+
+func NewPictureDeletionService(s *PictureService) (*picturespkg.PictureDeletionService, error) {
+	return picturespkg.NewPictureDeletionService(unwrapPictureService(s))
+}
+
+func buildPictureService(contexts *ContextService, dataDir string, baseLookup func(string) (string, bool)) (*PictureService, error) {
+	defaultVPicsPath, defaultImagesDir, err := vprocorepkg.EnsureDefaultPictureLibrary(dataDir)
+	if err != nil {
+		return nil, err
+	}
+	lookup := newDefaultPictureEnvLookup(baseLookup, defaultVPicsPath, defaultImagesDir)
+	svc, err := NewPictureService(contexts, lookup)
+	if err != nil {
+		return nil, err
+	}
+	metadata, err := NewPictureMetadataService(svc)
+	if err != nil {
+		return nil, err
+	}
+	creation, err := NewPictureCreationService(svc)
+	if err != nil {
+		return nil, err
+	}
+	deletion, err := NewPictureDeletionService(svc)
+	if err != nil {
+		return nil, err
+	}
+	svc.Metadata = metadata
+	svc.Creation = creation
+	svc.Deletion = deletion
+	return svc, nil
 }
 
 func (s *PictureService) GetMetadata(ctx context.Context, contextID, plot string) (*PictureMetadataReview, error) {

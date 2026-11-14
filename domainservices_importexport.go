@@ -10,16 +10,16 @@ import (
 
 type ImportExportService struct {
 	contexts          *ContextService
-	tableCSVArchive   *TableCSVArchiveService
-	plotLabelRegional *PlotLabelRegionalService
-	plotLabelPDF      *PlotLabelPDFExportService
+	tableCSVArchive   *interchange.TableCSVArchiveService
+	plotLabelRegional *interchange.PlotLabelRegionalService
+	plotLabelPDF      *interchange.PlotLabelPDFExportService
 }
 
 func NewImportExportService(
 	contexts *ContextService,
-	tableCSVArchive *TableCSVArchiveService,
-	plotLabelRegional *PlotLabelRegionalService,
-	plotLabelPDF *PlotLabelPDFExportService,
+	tableCSVArchive *interchange.TableCSVArchiveService,
+	plotLabelRegional *interchange.PlotLabelRegionalService,
+	plotLabelPDF *interchange.PlotLabelPDFExportService,
 ) *ImportExportService {
 	return &ImportExportService{
 		contexts:          contexts,
@@ -27,6 +27,20 @@ func NewImportExportService(
 		plotLabelRegional: plotLabelRegional,
 		plotLabelPDF:      plotLabelPDF,
 	}
+}
+
+func buildImportExportService(contexts *ContextService) (*ImportExportService, error) {
+	core := unwrapContextService(contexts)
+	plotLabelRegional, err := interchange.NewPlotLabelRegionalService(core)
+	if err != nil {
+		return nil, err
+	}
+	return NewImportExportService(
+		contexts,
+		interchange.NewTableCSVArchiveService(core),
+		plotLabelRegional,
+		interchange.NewPlotLabelPDFExportService(core),
+	), nil
 }
 
 func (s *ImportExportService) ChooseAccessDatabaseFile(ctx context.Context, contextID string) (string, error) {
@@ -282,4 +296,3 @@ func (s *ImportExportService) ExportGeoPackage(ctx context.Context, contextID st
 	}
 	return interchange.ExportGeoPackage(unwrapContextService(s.contexts), ctx, contextID, request)
 }
-
