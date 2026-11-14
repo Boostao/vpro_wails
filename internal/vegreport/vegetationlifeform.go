@@ -1,3 +1,0 @@
-package vegreport
-
-const LongVegetationLifeformFeatureEnvironment = "VPRO_LONG_VEGETATION_LIFEFORM"

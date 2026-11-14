@@ -8,7 +8,6 @@ import (
 import (
 	"context"
 	"database/sql"
-	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -47,7 +46,6 @@ func TestLongVegetationNoneUnitsQualifiedSummaryRetainsOriginalUnitsAndIndices(t
 	}); err != nil {
 		t.Fatal(err)
 	}
-	contexts.LongVegetationNoneUnitsEnabled = true
 	before := vprotest.DatabaseBytes(t, owner.Attachments)
 	review, err := private.GetReview(context.Background(), state.ContextID, `{"scope":"unlumped"}`)
 	if err != nil {
@@ -103,16 +101,6 @@ func TestLongVegetationNoneUnitsQualifiedSummaryRetainsOriginalUnitsAndIndices(t
 	}
 	if err := book.Close(); err != nil {
 		t.Fatal(err)
-	}
-	contexts.LongVegetationNoneUnitsEnabled = false
-	refused := filepath.Join(t.TempDir(), "disabled.xlsx")
-	if result, err := private.ExportReviewed(context.Background(), state.ContextID,
-		vprotest.WorkbookRequest(t, vegetationWorkbookExportRequest{"unlumped", review.CreatedDate, review.ApprovalHash, refused})); err == nil &&
-		(result == nil || result.Status != "not-published" || result.ErrorMessage == "") {
-		t.Fatal("disabled None consumer published reviewed active approval", result)
-	}
-	if _, err := os.Stat(refused); !os.IsNotExist(err) {
-		t.Fatal("disabled None consumer emitted output", err)
 	}
 	vprotest.AssertProfileSUFiles(t, contexts, before)
 }

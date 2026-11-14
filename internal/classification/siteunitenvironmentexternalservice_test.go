@@ -20,7 +20,7 @@ import (
 func externalSUEnvironmentServiceFixture(t *testing.T) (*ExternalSUEnvironmentService, vprocore.ProjectState, ExternalSUEnvironmentRequest, string) {
 	t.Helper()
 	contexts, state, _ := externalSUEnvironmentFixture(t)
-	service := NewExternalSUEnvironmentService(contexts, true)
+	service := NewExternalSUEnvironmentService(contexts)
 	review, err := service.GetReview(t.Context(), state.ContextID)
 	if err != nil || review == nil || review.ProjectPath != state.ProjectPath || review.SUPath != state.SUPath ||
 		review.Review.SU != "External" || len(review.Review.Changes) != 4 {
@@ -34,15 +34,15 @@ func externalSUEnvironmentServiceFixture(t *testing.T) (*ExternalSUEnvironmentSe
 	return service, state, request, string(raw)
 }
 
-func TestExternalSUEnvironmentServiceDefaultOffAndStrictRequests(t *testing.T) {
+func TestExternalSUEnvironmentServiceStrictRequests(t *testing.T) {
 	service, state, request, raw := externalSUEnvironmentServiceFixture(t)
 	before := vprotest.DatabaseBytes(t, service.contexts.Projects.Sqlite.Attachments)
-	disabled := NewExternalSUEnvironmentService(service.contexts, false)
-	if _, err := disabled.GetReview(t.Context(), state.ContextID); err == nil {
-		t.Fatal("disabled service granted source review authority")
+	unowned := NewExternalSUEnvironmentService(nil)
+	if _, err := unowned.GetReview(t.Context(), state.ContextID); err == nil {
+		t.Fatal("unowned service granted source review authority")
 	}
-	if _, err := disabled.TransferReviewed(t.Context(), state.ContextID, raw); err == nil {
-		t.Fatal("disabled service granted write authority")
+	if _, err := unowned.TransferReviewed(t.Context(), state.ContextID, raw); err == nil {
+		t.Fatal("unowned service granted write authority")
 	}
 	for _, malformed := range []string{
 		`{}`, `null`, `[]`, raw + `{}`,
@@ -198,7 +198,7 @@ func TestExternalSUEnvironmentServiceRecoveryBeforeArrivalAndRetiredOwner(t *tes
 	if err != nil || !reflect.DeepEqual(arrival, recovery.Outcome) {
 		t.Fatal("sealed delayed request was allowed to write", arrival, err)
 	}
-	freshService := NewExternalSUEnvironmentService(service.contexts, true)
+	freshService := NewExternalSUEnvironmentService(service.contexts)
 	if result, err := freshService.RecoverOutcome(t.Context(), state.ContextID, raw); result != nil || err == nil || !strings.Contains(err.Error(), "unknown") {
 		t.Fatal("fresh service invented retired-owner noncommit", result, err)
 	}
@@ -207,12 +207,8 @@ func TestExternalSUEnvironmentServiceRecoveryBeforeArrivalAndRetiredOwner(t *tes
 	if err != nil {
 		t.Fatal(err)
 	}
-	service.enabled = false
 	if result, err := service.RecoverOutcome(t.Context(), state.ContextID, string(bytes)); result == nil || err != nil {
-		t.Fatal("disabled writer prevented readonly sealing", result, err)
-	}
-	if _, err := service.TransferReviewed(t.Context(), state.ContextID, string(bytes)); err == nil {
-		t.Fatal("disabled writer accepted sealed new request")
+		t.Fatal("readonly sealing failed", result, err)
 	}
 	vprotest.AssertProfileSUFiles(t, service.contexts, before)
 }

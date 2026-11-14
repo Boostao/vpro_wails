@@ -13,7 +13,6 @@ import (
 	"unicode/utf8"
 )
 
-const TwoPageProfilingEnvironment = "VPRO_TWO_PAGE_PROFILING_REVIEW"
 const twoPageProfilingScanMaximum = 100000
 const twoPageProfilingPageMaximum = 200
 const TwoPageProfilingOrdering = "physical-rowid; not source Order execution"
@@ -41,18 +40,13 @@ type TwoPageProfilingReview struct {
 
 type TwoPageProfilingService struct {
 	Contexts *vprocore.ContextService `json:"-" yaml:"-"`
-	Review   bool                     `json:"-" yaml:"-"`
 }
 
-func NewTwoPageProfilingService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*TwoPageProfilingService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("two-page profiling requires owned contexts and explicit feature lookup")
+func NewTwoPageProfilingService(contexts *vprocore.ContextService) (*TwoPageProfilingService, error) {
+	if contexts == nil {
+		return nil, errors.New("two-page profiling requires owned contexts")
 	}
-	enabled, err := vprocore.SiviFeature(TwoPageProfilingEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageProfilingService{contexts, enabled}, nil
+	return &TwoPageProfilingService{Contexts: contexts}, nil
 }
 
 func (s *TwoPageProfilingService) GetReview(ctx context.Context, contextID, plot string, offset, limit int) (*TwoPageProfilingReview, error) {
@@ -62,8 +56,8 @@ func (s *TwoPageProfilingService) GetReview(ctx context.Context, contextID, plot
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || s.Contexts == nil || !s.Review {
-		return nil, errors.New("two-page profiling requires independently enabled saved-data review")
+	if s == nil || s.Contexts == nil {
+		return nil, errors.New("two-page profiling requires owned contexts")
 	}
 	if plot == "" || !utf8.ValidString(plot) || offset < 0 || offset > twoPageProfilingScanMaximum ||
 		limit < 1 || limit > twoPageProfilingPageMaximum {

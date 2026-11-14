@@ -11,7 +11,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -20,7 +19,6 @@ import (
 func summaryEnvironmentalNumericServiceFixture(t *testing.T, external bool) (*SummaryVegetationEnvironmentalService, vprocore.ProjectState) {
 	t.Helper()
 	service, state := summaryEnvironmentalCombinedFixture(t, external)
-	service.numericEnabled = true
 	owner := service.report.contexts.Projects.Sqlite
 	vprotest.MutateContextFixture(t, owner.Attachments["project"], `UPDATE `+vprocore.QuoteHeaderIdentifier(state.ActiveProject+"_Env")+`
 		SET SeepageDepth=1,RootingDepth=2,StandAge=3,Elevation=4,SlopeGradient=1.25,
@@ -95,33 +93,6 @@ func TestSummaryEnvironmentalNumericSnapshotOwnedAndWire(t *testing.T) {
 		decoder.DisallowUnknownFields()
 		if err := decoder.Decode(&decoded); err != nil || !reflect.DeepEqual(got, &decoded) {
 			t.Fatal("strict typed snapshot wire", err)
-		}
-		if !external {
-			if path := os.Getenv("VPRO_SUMMARY_ENVIRONMENT_NUMERIC_PREVIEW_WIRE_PATH"); path != "" {
-				got.Vegetation.ContextID = "summary-numeric-wire"
-				got.Vegetation.ProjectPath = `C:\fixture\Sample.db`
-				got.Vegetation.SUPath = `C:\fixture\Sample.db`
-				got.SourcePath = `C:\fixture\VPro64.db`
-				got.EnvSourcePath = `C:\fixture\Sample.db`
-				encoded, err := json.MarshalIndent(got, "", "  ")
-				if err != nil {
-					t.Fatal(err)
-				}
-				encoded = append(encoded, '\n')
-				if os.Getenv("VPRO_UPDATE_SUMMARY_ENVIRONMENT_NUMERIC_PREVIEW_WIRE") == "true" {
-					if err := os.WriteFile(path, encoded, 0600); err != nil {
-						t.Fatal(err)
-					}
-				}
-				actual, err := os.ReadFile(path)
-				if err != nil || !bytes.Equal(actual, encoded) {
-					t.Fatal("numeric preview wire changed", err)
-				}
-			}
-		}
-		service.enabled = false
-		if result, err := service.PreviewEnvironmentalNumeric(t.Context(), state.ContextID, 1, 6, 0); err == nil || result != nil {
-			t.Fatal("gate", result, err)
 		}
 	}
 }

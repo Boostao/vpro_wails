@@ -2,7 +2,6 @@ package vegreport
 
 import (
 	"github.com/boostao/vpro-wails/internal/reports/reportcore"
-	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
 )
 
@@ -89,16 +88,6 @@ func TestLongVegetationNoneDecodeAndIndependentPublicGate(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if result, err := GetLongVegetationOptions(service, context.Background(), state.ContextID); err == nil || !reflect.DeepEqual(result, LongVegetationOptions{}) {
-			t.Fatal("default options gate enabled", result, err)
-		}
-		if result, err := PreviewLongVegetation(service, context.Background(), state.ContextID); err == nil || !reflect.DeepEqual(result, LongVegetationPreview{}) {
-			t.Fatal("default preview gate enabled", result, err)
-		}
-		if result, err := PreviewLongVegetationLayers(service, context.Background(), state.ContextID); err == nil || !reflect.DeepEqual(result, vegetationLayerReport{}) {
-			t.Fatal("private context entry bypassed gate", result, err)
-		}
-		service.LongVegetationNoneEnabled = true
 		result, err := PreviewLongVegetation(service, context.Background(), state.ContextID)
 		if err != nil || result.Settings.Grouping != "none" {
 			t.Fatal("enabled owned None preview failed", result, err)
@@ -108,11 +97,5 @@ func TestLongVegetationNoneDecodeAndIndependentPublicGate(t *testing.T) {
 		if err != nil || !bytes.Equal(config, after) {
 			t.Fatal("None read repaired retained preferences", err)
 		}
-	}
-	if enabled, err := vprocore.SiviFeature(LongVegetationNoneFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || !enabled {
-		t.Fatal("default gate disabled", err)
-	}
-	if _, err := vprocore.SiviFeature(LongVegetationNoneFeatureEnvironment, func(string) (string, bool) { return "TRUE", true }); err == nil {
-		t.Fatal("malformed gate accepted")
 	}
 }

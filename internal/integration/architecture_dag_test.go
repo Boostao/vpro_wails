@@ -9,8 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/boostao/vpro-wails/internal/interchange"
-	"github.com/boostao/vpro-wails/internal/sivi"
 	"github.com/boostao/vpro-wails/internal/spatial"
 	"github.com/boostao/vpro-wails/internal/vprocore"
 	"github.com/boostao/vpro-wails/internal/vprocore/vprotest"
@@ -101,27 +99,10 @@ func TestFourLayerAcyclicArchitectureZeroLayer2SiblingImports(t *testing.T) {
 	}
 }
 
-func TestCrossDomainFeatureGateAndPreferenceIsolation(t *testing.T) {
+func TestSharedReportPreferenceStrictValidationPrecedence(t *testing.T) {
 	ctx := context.Background()
-	service, state := vprotest.ContextServiceFixture(t)
 
-	// 1. Enabling TableCSVReview must NOT enable SIVI parent review.
-	service.TableCSVReviewEnabled = true
-	if result, err := sivi.GetSIVIParentOriginal(service, ctx, state.ContextID, "108050"); result != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatalf("table CSV opt-in enabled SIVI review: result=%+v err=%v", result, err)
-	}
-
-	// 2. Enabling PlotLocationReview must NOT enable TableCSVReview or SIVI parent review.
-	service.TableCSVReviewEnabled = false
-	service.PlotLocationReviewEnabled = true
-	if got, err := interchange.GetProjectTableCSVReview(service, ctx, state.ContextID, "Sample_Env"); got != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatalf("plot location opt-in enabled table CSV review: got=%+v err=%v", got, err)
-	}
-	if got, err := sivi.GetSIVIParentOriginal(service, ctx, state.ContextID, "108050"); got != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatalf("plot location opt-in enabled SIVI review: got=%+v err=%v", got, err)
-	}
-
-	// 3. Shared report string preference CAS reads and validates all typed keys (e.g. GoogleEarthDescField) before CAS mismatch.
+	// Shared report string preference CAS reads and validates all typed keys (e.g. GoogleEarthDescField) before CAS mismatch.
 	data, config := vprotest.ConfigFixture(t)
 	store, err := vprocore.OpenDesktopConfig(data, config)
 	if err != nil {

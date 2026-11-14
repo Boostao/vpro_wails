@@ -20,10 +20,8 @@ func TestTwoPageVegetationAttemptUnseenSealingAndCorrectedNewUUID(t *testing.T) 
 		for _, form := range []string{"SubVegAXL_BC", "SubVegAXL", "SubVegCXL", "SubVegDXL"} {
 			t.Run(fmt.Sprintf("%s/external-%v", form, external), func(t *testing.T) {
 				contexts, state, _, request := vegetationWriteFixture(t, external, form, 3)
-				enabled := vegetationFacade(t, contexts, map[string]string{
-					twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true",
-				})
-				readonly := vegetationFacade(t, contexts, map[string]string{twoPageVegetationReviewEnvironment: "true"})
+				enabled := vegetationFacade(t, contexts)
+				readonly := vegetationFacade(t, contexts)
 				raw := vegetationAttemptJSON(t, request)
 				before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 				outcome, err := readonly.RecoverOutcome(context.Background(), state.ContextID, raw)
@@ -53,13 +51,9 @@ func TestTwoPageVegetationAttemptUnseenSealingAndCorrectedNewUUID(t *testing.T) 
 
 func TestTwoPageVegetationAttemptSharedActiveOwnershipAndCommittedSealing(t *testing.T) {
 	contexts, state, db, request := vegetationWriteFixture(t, true, "SubVegAXL", 3)
-	first := vegetationFacade(t, contexts, map[string]string{
-		twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true",
-	})
-	second := vegetationFacade(t, contexts, map[string]string{
-		twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true",
-	})
-	readonly := vegetationFacade(t, contexts, map[string]string{twoPageVegetationReviewEnvironment: "true"})
+	first := vegetationFacade(t, contexts)
+	second := vegetationFacade(t, contexts)
+	readonly := vegetationFacade(t, contexts)
 	raw := vegetationAttemptJSON(t, request)
 	type completion struct {
 		result *TwoPageVegetationWriteResult
@@ -141,9 +135,7 @@ func TestTwoPageVegetationAttemptSharedActiveOwnershipAndCommittedSealing(t *tes
 
 func TestTwoPageVegetationAttemptRollbackCancellationAndOwnerCorrection(t *testing.T) {
 	contexts, state, db, request := vegetationWriteFixture(t, false, "SubVegCXL", 3)
-	service := vegetationFacade(t, contexts, map[string]string{
-		twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true",
-	})
+	service := vegetationFacade(t, contexts)
 	if _, err := db.Exec(`CREATE TRIGGER reject_vegetation BEFORE UPDATE ON Sample_Veg BEGIN SELECT RAISE(ABORT,'attempt rollback'); END`); err != nil {
 		t.Fatal(err)
 	}
@@ -236,9 +228,7 @@ func TestTwoPageVegetationAttemptRotatedAbsenceIsUnknownAndLedgerCancellation(t 
 		{ContextID: state.ContextID, Form: "SubVegDXL", RowID: rowID, Column: "Cover7",
 			Expected: *vegetationPlanCell(original, rowID, "Cover7"), Value: vprotest.SiviReal(5)},
 	}}
-	service := vegetationFacade(t, contexts, map[string]string{
-		twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true",
-	})
+	service := vegetationFacade(t, contexts)
 	raw := vegetationAttemptJSON(t, request)
 	next, err := contexts.SwitchContext(state.ContextID, vprotest.ContextSelection(state))
 	if err != nil || next.ContextID == state.ContextID {
@@ -268,9 +258,7 @@ func TestTwoPageVegetationAttemptInFlightCancelAndPostcommitResult(t *testing.T)
 	for _, committed := range []bool{false, true} {
 		t.Run(fmt.Sprint("committed-", committed), func(t *testing.T) {
 			contexts, state, db, request := vegetationWriteFixture(t, false, "SubVegAXL_BC", 3)
-			service := vegetationFacade(t, contexts, map[string]string{
-				twoPageVegetationReviewEnvironment: "true", twoPageVegetationWritingEnvironment: "true",
-			})
+			service := vegetationFacade(t, contexts)
 			raw := vegetationAttemptJSON(t, request)
 			before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 			ctx, cancel := context.WithCancel(context.Background())

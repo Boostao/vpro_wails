@@ -14,11 +14,8 @@ import (
 )
 
 func TestSIVICreationServiceOwnedReferencesCreateReceiptAndReplay(t *testing.T) {
-	species, contexts, state, _, original := siviSpeciesServiceFixture(t, false, 3)
-	species.Enabled = false
-	service, err := NewSIVICreationService(contexts, func(name string) (string, bool) {
-		return "true", name == siviCreationFeatureEnvironment
-	})
+	_, contexts, state, _, original := siviSpeciesServiceFixture(t, false, 3)
+	service, err := NewSIVICreationService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}

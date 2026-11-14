@@ -13,12 +13,6 @@ import (
 	"strings"
 )
 
-const longVegetationThresholdPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_THRESHOLD_PREFERENCES"
-
-func LongVegetationThresholdPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationThresholdPreferencesFeatureEnvironment, lookup)
-}
-
 type LongVegetationThresholdPreferenceValues struct {
 	PresenceGreaterThan  float64 `json:"presenceGreaterThan"`
 	MeanCoverGreaterThan float64 `json:"meanCoverGreaterThan"`
@@ -94,12 +88,11 @@ type LongVegetationThresholdPreferencesOutcome struct {
 
 type LongVegetationThresholdPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongVegetationThresholdPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationThresholdPreferencesService {
-	return &LongVegetationThresholdPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongVegetationThresholdPreferencesService(contexts *vprocore.ContextService) *LongVegetationThresholdPreferencesService {
+	return &LongVegetationThresholdPreferencesService{contexts: contexts}
 }
 
 func (s *LongVegetationThresholdPreferencesService) require(ctx context.Context, contextID string) error {
@@ -109,10 +102,7 @@ func (s *LongVegetationThresholdPreferencesService) require(ctx context.Context,
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation threshold preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation threshold preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

@@ -18,7 +18,7 @@ func TestSelectedUnitSessionInvalidProjectionDriftRetainsBuildReceiptAndCorrecti
 	for _, change := range []string{"empty-label", "overlength-label", "empty-memberships"} {
 		t.Run(change, func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, false)
-			service := NewLongVegetationSelectedUnitSelectionService(private.contexts, true)
+			service := NewLongVegetationSelectedUnitSelectionService(private.contexts)
 			db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.ProjectPath, "rw"))
 			if err != nil {
 				t.Fatal(err)
@@ -79,7 +79,7 @@ func TestSelectedUnitSessionInvalidProjectionDriftRetainsBuildReceiptAndCorrecti
 func TestSelectedUnitSessionRetiredContextBuildReceiptsAreReleased(t *testing.T) {
 	private, state := vegetationWorkbookServiceFixture(t, false)
 	contexts := private.contexts
-	service := NewLongVegetationSelectedUnitSelectionService(contexts, true)
+	service := NewLongVegetationSelectedUnitSelectionService(contexts)
 	ctx := context.Background()
 	for i := 0; i < 3; i++ {
 		draft, err := service.SetLongVegetationSelectedUnitFields(ctx, state.ContextID, selectedUnitDraftJSON(t, "0", []string{"PlotNumber"}))

@@ -15,8 +15,6 @@ import (
 	"unicode/utf8"
 )
 
-const TwoPageGoogleEarthReviewEnvironment = "VPRO_TWO_PAGE_GOOGLE_EARTH_REVIEW"
-
 type TwoPageGoogleEarthReview struct {
 	ContextID        string                        `json:"contextId"`
 	Project          string                        `json:"project"`
@@ -42,18 +40,13 @@ type TwoPageGoogleEarthOptions struct {
 
 type TwoPageGoogleEarthService struct {
 	Contexts *vprocore.ContextService `json:"-" yaml:"-"`
-	Review   bool                     `json:"-" yaml:"-"`
 }
 
-func NewTwoPageGoogleEarthService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*TwoPageGoogleEarthService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("two-page Google Earth requires owned contexts and explicit feature lookup")
+func NewTwoPageGoogleEarthService(contexts *vprocore.ContextService) (*TwoPageGoogleEarthService, error) {
+	if contexts == nil {
+		return nil, errors.New("two-page Google Earth requires owned contexts")
 	}
-	review, err := vprocore.SiviFeature(TwoPageGoogleEarthReviewEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageGoogleEarthService{Contexts: contexts, Review: review}, nil
+	return &TwoPageGoogleEarthService{Contexts: contexts}, nil
 }
 
 func (s *TwoPageGoogleEarthService) requireReview(ctx context.Context, plot, form string) error {
@@ -63,8 +56,8 @@ func (s *TwoPageGoogleEarthService) requireReview(ctx context.Context, plot, for
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.Contexts == nil || !s.Review {
-		return errors.New("two-page Google Earth requires independently enabled saved-plot review")
+	if s == nil || s.Contexts == nil {
+		return errors.New("two-page Google Earth requires owned contexts")
 	}
 	if plot == "" || !utf8.ValidString(plot) {
 		return errors.New("two-page Google Earth requires an exact valid literal parent")

@@ -55,8 +55,8 @@ type VegetationWorkbookService struct {
 	Private *vegetationWorkbookService `json:"-" yaml:"-"`
 }
 
-func NewVegetationWorkbookService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*VegetationWorkbookService, error) {
-	service, err := newVegetationWorkbookService(contexts, lookup)
+func NewVegetationWorkbookService(contexts *vprocore.ContextService) (*VegetationWorkbookService, error) {
+	service, err := newVegetationWorkbookService(contexts)
 	if err != nil {
 		return nil, err
 	}

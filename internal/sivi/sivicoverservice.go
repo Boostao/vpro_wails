@@ -12,8 +12,6 @@ import (
 	"fmt"
 )
 
-const SiviCoverFeatureEnvironment = "VPRO_SIVI_COVER_EDITING"
-
 type SIVICoverEdit struct {
 	RowID    string                       `json:"rowId"`
 	Form     string                       `json:"form"`
@@ -54,26 +52,24 @@ type SIVICoverWriteResult struct {
 
 type SIVICoverService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewSIVICoverService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SIVICoverService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("SIVI cover service requires context ownership and an explicit feature lookup")
+func NewSIVICoverService(contexts *vprocore.ContextService) (*SIVICoverService, error) {
+	if contexts == nil {
+		return nil, errors.New("SIVI cover service requires context ownership")
 	}
-	enabled, err := vprocore.SiviFeature(SiviCoverFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SIVICoverService{contexts: contexts, enabled: enabled}, nil
+	return &SIVICoverService{contexts: contexts}, nil
 }
 
 func (s *SIVICoverService) require(ctx context.Context) error {
+	if ctx == nil {
+		return errors.New("SIVI cover service requires a context")
+	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.contexts == nil || !s.enabled {
-		return errors.New("SIVI source-cover editing is disabled in this session")
+	if s == nil || s.contexts == nil {
+		return errors.New("SIVI cover service requires context ownership")
 	}
 	return nil
 }

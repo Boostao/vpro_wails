@@ -20,12 +20,7 @@ import (
 func summaryDraftWorkbookFixture(t *testing.T, external bool) (*SummaryVegetationWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	source, state := summaryEnvironmentalLifeformServiceFixture(t, external)
-	service, err := NewSummaryVegetationWorkbookService(source, func(key string) (string, bool) {
-		if key != summaryVegetationWorkbookFeatureEnvironment {
-			t.Fatal("draft workbook borrowed another feature gate", key)
-		}
-		return "true", true
-	})
+	service, err := NewSummaryVegetationWorkbookService(source)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,18 +112,12 @@ func TestSummaryDraftWorkbookServiceReviewPublishCollisionAndZeroWrites(t *testi
 }
 
 func TestSummaryDraftWorkbookServiceGateStrictOptionsAndApproval(t *testing.T) {
-	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewSummaryVegetationWorkbookService(nil, func(string) (string, bool) { return flag, flag != "" })
-		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.enabled != (flag != "false") {
-				t.Fatal("independent literal gate differs", flag, err)
-			}
-			if review, err := service.GetReview(t.Context(), "owned", `{}`); err == nil || review != nil {
-				t.Fatal("unavailable service returned review", review, err)
-			}
-		} else if err == nil {
-			t.Fatal("malformed flag accepted", flag)
-		}
+	nilService, err := NewSummaryVegetationWorkbookService(nil)
+	if err != nil || nilService == nil {
+		t.Fatal("unavailable workbook constructor differs", nilService, err)
+	}
+	if review, err := nilService.GetReview(t.Context(), "owned", `{}`); err == nil || review != nil {
+		t.Fatal("unavailable service returned review", review, err)
 	}
 	service, state := summaryDraftWorkbookFixture(t, false)
 	valid := `{"title":"","average":1,"display":6,"showClass":0,"includeEnv":false}`
@@ -177,9 +166,6 @@ func TestSummaryDraftWorkbookServiceGateStrictOptionsAndApproval(t *testing.T) {
 func TestSummaryDraftWorkbookServiceSavedQualityCannotBeBypassed(t *testing.T) {
 	service, state := summaryDraftWorkbookFixture(t, false)
 	report := service.source.environment.report
-	if report.QualityPreferences {
-		t.Fatal("fixture requires legacy quality gate off to prove independent refusal")
-	}
 	request := vprotest.WorkbookRequest(t, SummaryVegetationWorkbookOptions{Average: 1, Display: 6})
 	for _, enforce := range []any{true, "False", nil} {
 		if err := report.contexts.Projects.Preferences.Update("ReportOptions", map[string]any{"DataQualityFilterEnforce": enforce}); err != nil {

@@ -28,7 +28,7 @@ func TestLongVegetationEnforcementCancellationAttachmentAndUnrelatedPreservation
 		t.Fatal(err)
 	}
 	expected, proposed := LongVegetationEnforcementPreferenceValues{true, 3}, LongVegetationEnforcementPreferenceValues{false, 1}
-	service := NewLongVegetationEnforcementPreferencesService(contexts, true)
+	service := NewLongVegetationEnforcementPreferencesService(contexts)
 	service.printers = func(ctx context.Context) (vprocore.PrinterObservation, error) {
 		if err := ctx.Err(); err != nil {
 			return vprocore.PrinterObservation{}, err
@@ -97,7 +97,7 @@ func TestLongVegetationEnforcementInvalidPrintersNoopReadAndMalformedGroups(t *t
 	if err := store.Update("ReportOptions", map[string]any{"DataQualityFilterEnforceLV": false, "LVUnitGroups": 2}); err != nil {
 		t.Fatal(err)
 	}
-	service := NewLongVegetationEnforcementPreferencesService(contexts, true)
+	service := NewLongVegetationEnforcementPreferencesService(contexts)
 	expected := LongVegetationEnforcementPreferenceValues{false, 2}
 	before, err := os.ReadFile(store.Path)
 	if err != nil {

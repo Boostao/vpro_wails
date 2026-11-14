@@ -14,12 +14,6 @@ import (
 	"reflect"
 )
 
-const longVegetationUnitPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_UNIT_PREFERENCES"
-
-func LongVegetationUnitPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationUnitPreferencesFeatureEnvironment, lookup)
-}
-
 type LongVegetationUnitPreferenceValues struct {
 	UnitGroups int `json:"unitGroups"`
 }
@@ -90,13 +84,12 @@ type LongVegetationUnitPreferencesOutcome struct {
 
 type LongVegetationUnitPreferencesService struct {
 	contexts              *vprocore.ContextService
-	enabled               bool
 	snapshot              vprocore.PublicationReadSnapshotHooks
 	beforeSelectedUnitCAS func()
 }
 
-func NewLongVegetationUnitPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationUnitPreferencesService {
-	return &LongVegetationUnitPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongVegetationUnitPreferencesService(contexts *vprocore.ContextService) *LongVegetationUnitPreferencesService {
+	return &LongVegetationUnitPreferencesService{contexts: contexts}
 }
 
 func (s *LongVegetationUnitPreferencesService) require(ctx context.Context, contextID string) error {
@@ -106,10 +99,7 @@ func (s *LongVegetationUnitPreferencesService) require(ctx context.Context, cont
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation report unit preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation report unit preference context service is unavailable")
 	}
 	if err := vprocore.ValidateGoogleEarthReviewStrings(contextID); err != nil {
@@ -119,7 +109,7 @@ func (s *LongVegetationUnitPreferencesService) require(ctx context.Context, cont
 }
 
 func (s *LongVegetationUnitPreferencesService) availability(selectedFields bool) LongVegetationUnitAvailability {
-	return LongVegetationUnitAvailability{SiteUnitTable: true, SelectedFields: selectedFields, None: s.contexts.LongVegetationNoneUnitsEnabled}
+	return LongVegetationUnitAvailability{SiteUnitTable: true, SelectedFields: selectedFields, None: true}
 }
 
 func (s *LongVegetationUnitPreferencesService) GetLongVegetationUnitPreferences(ctx context.Context, contextID string) (*LongVegetationUnitPreferencesReview, error) {
@@ -156,9 +146,6 @@ func (s *LongVegetationUnitPreferencesService) SaveLongVegetationUnitPreferences
 				return struct{}{}, err
 			}
 			if request.Expected.UnitGroups != 2 && request.Proposed.UnitGroups == 2 {
-				if !s.contexts.LongVegetationSelectedUnitsEnabled {
-					return struct{}{}, errors.New("Long Vegetation selected report units are disabled in this session")
-				}
 				return vprocore.WithOwnedPreferenceSnapshot(ctx, plots, s.snapshot, func(owner *vprocore.SqliteContext, tx *sql.Tx) (struct{}, error) {
 					if err := s.contexts.RequireSelectedListReportScope(contextID); err != nil {
 						return struct{}{}, err

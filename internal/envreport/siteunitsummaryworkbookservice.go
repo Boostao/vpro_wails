@@ -15,13 +15,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 )
-
-const SiteUnitSummaryWorkbookFeatureEnvironment = "VPRO_SITE_UNIT_SUMMARY_WORKBOOK"
 
 type siteUnitSummaryWorkbookRequest struct {
 	Method int `json:"method"`
@@ -79,7 +76,6 @@ type SiteUnitSummaryWorkbookOutcome struct {
 
 type SiteUnitSummaryWorkbookService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
 type siteUnitSummaryWorkbookHooks struct {
@@ -92,15 +88,8 @@ type siteUnitSummaryWorkbookSource struct {
 	Scope SiteUnitSummaryWorkbookScope
 }
 
-func NewSiteUnitSummaryWorkbookService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SiteUnitSummaryWorkbookService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(SiteUnitSummaryWorkbookFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SiteUnitSummaryWorkbookService{contexts, enabled}, nil
+func NewSiteUnitSummaryWorkbookService(contexts *vprocore.ContextService) (*SiteUnitSummaryWorkbookService, error) {
+	return &SiteUnitSummaryWorkbookService{contexts: contexts}, nil
 }
 
 func (s *SiteUnitSummaryWorkbookService) authorize(ctx context.Context, method int) error {
@@ -110,10 +99,7 @@ func (s *SiteUnitSummaryWorkbookService) authorize(ctx context.Context, method i
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Summary Environment workbook is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil ||
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil ||
 		s.contexts.Projects.Preferences == nil {
 		return errors.New("Summary Environment workbook owned context/configuration is unavailable")
 	}

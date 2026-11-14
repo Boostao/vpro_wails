@@ -123,9 +123,6 @@ func TestSummaryVegetationFieldListSaveGateContextAndStrictRefusal(t *testing.T)
 			return service.SaveSummaryVegetationFieldList(t.Context(), id, `{}`)
 		},
 		func() *SummaryVegetationFieldListOutcome {
-			return NewSummaryVegetationFieldListService(service.contexts, false).SaveSummaryVegetationFieldList(t.Context(), id, string(raw))
-		},
-		func() *SummaryVegetationFieldListOutcome {
 			return (*SummaryVegetationFieldListService)(nil).SaveSummaryVegetationFieldList(t.Context(), id, string(raw))
 		},
 		func() *SummaryVegetationFieldListOutcome {

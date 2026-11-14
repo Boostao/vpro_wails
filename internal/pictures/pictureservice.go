@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	PictureReadingEnvironment          = "VPRO_PICTURE_READING"
 	pictureLibraryEnvironment          = "VPRO_PICTURE_LIBRARY_PATH"
 	pictureChildDirectoryEnvironment   = "VPRO_PICTURE_CHILD_DIRECTORY"
 	pictureManagerDirectoryEnvironment = "VPRO_PICTURE_MANAGER_DIRECTORY"
@@ -57,7 +56,6 @@ func (request *PictureImageRequest) UnmarshalJSON(data []byte) error {
 
 type PictureService struct {
 	Contexts    *vprocore.ContextService `json:"-" yaml:"-"`
-	Enabled     bool                     `json:"-" yaml:"-"`
 	source      *ownedPictureLibrary
 	directories pictureImageDirectories
 	Metadata    *PictureMetadataService `json:"-" yaml:"-"`
@@ -91,25 +89,14 @@ func configuredPictureOptions(contexts *vprocore.ContextService) (libraryPath, c
 
 func NewPictureService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*PictureService, error) {
 	if contexts == nil || lookup == nil {
-		return nil, errors.New("picture service requires context ownership and an explicit feature lookup")
+		return nil, errors.New("picture service requires context ownership and an explicit environment lookup")
 	}
-	enabled, err := vprocore.SiviFeature(PictureReadingEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	service := &PictureService{Contexts: contexts, Enabled: enabled}
-	if !enabled {
-		return service, nil
-	}
+	service := &PictureService{Contexts: contexts}
 	cfgLibPath, cfgChildDir, cfgManagerDir := configuredPictureOptions(contexts)
 	path, libExplicit := lookup(pictureLibraryEnvironment)
 	if !libExplicit {
 		if contexts.Projects == nil || strings.TrimSpace(contexts.Projects.Root) == "" {
-			if _, readingExplicit := lookup(PictureReadingEnvironment); readingExplicit {
-				return nil, errors.New("picture reading requires VPRO_PICTURE_LIBRARY_PATH; no installed library was inferred")
-			}
-			service.Enabled = false
-			return service, nil
+			return nil, errors.New("picture reading requires VPRO_PICTURE_LIBRARY_PATH; no installed library was inferred")
 		}
 		if cfgLibPath != "" {
 			path = cfgLibPath
@@ -123,6 +110,7 @@ func NewPictureService(contexts *vprocore.ContextService, lookup func(string) (s
 	} else if path == "" {
 		return nil, errors.New("picture reading requires VPRO_PICTURE_LIBRARY_PATH; no installed library was inferred")
 	}
+	var err error
 	service.source, err = newOwnedPictureLibrary(path)
 	if err != nil {
 		return nil, err
@@ -174,8 +162,8 @@ func (s *PictureService) require(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.Contexts == nil || !s.Enabled {
-		return errors.New("picture reading is disabled in this session")
+	if s == nil || s.Contexts == nil || s.source == nil {
+		return errors.New("picture service requires owned picture library")
 	}
 	return nil
 }

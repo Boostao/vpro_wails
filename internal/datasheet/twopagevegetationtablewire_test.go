@@ -73,12 +73,8 @@ func TestTwoPageVegetationTableProductionWire(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	_ = encoded
 	path := filepath.Join("frontend", "src", "twoPageVegetationTableWire.json")
-	if os.Getenv("VPRO_UPDATE_TWO_PAGE_VEGETATION_TABLE_WIRE") == "true" {
-		if err := os.WriteFile(path, append(encoded, '\n'), 0o600); err != nil {
-			t.Fatal(err)
-		}
-	}
 	fixture, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

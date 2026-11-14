@@ -12,7 +12,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -104,46 +103,21 @@ func TestSummaryGroupedAttributeWorkbookOwnedOutputAndZeroWrites(t *testing.T) {
 	}
 }
 
-func TestSummaryGroupedAttributeWorkbookIndependentGatesAndUnavailableNames(t *testing.T) {
+func TestSummaryGroupedAttributeWorkbookUnavailableGuideNames(t *testing.T) {
 	service, state := summaryStrataReferenceWorkbookFixture(t, false)
-	service.AncillaryEnabled = true
 	for _, grouping := range []int{13, 14} {
 		options := summaryGroupedAttributeWorkbookOptions(summaryGroupedAttributeWorkbookCase{group: grouping, average: 1, display: 6})
-		for _, grouped := range []bool{false, true} {
-			for _, references := range []bool{false, true} {
-				service.GroupedEnabled, service.ReferencesEnabled = grouped, references
-				review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
-				if grouped && references {
-					if err != nil || review == nil {
-						t.Fatal("joint authority refused grouped attributes", grouping, err)
-					}
-				} else if err == nil || review != nil || !strings.Contains(err.Error(), "disabled") {
-					t.Fatal("independent grouped attribute gate bypassed", grouping, grouped, references, review, err)
-				}
-			}
+		review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
+		if err != nil || review == nil {
+			t.Fatal("joint authority refused grouped attributes", grouping, err)
 		}
 		for _, common := range []bool{false, true} {
-			for _, guide := range []bool{false, true} {
-				if !common && !guide {
-					continue
-				}
-				changed := options
-				changed.References = &SummaryVegetationReferenceOptions{ShowCommon: common, UseGuideNames: guide}
-				if review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, changed)); err == nil || review != nil {
-					t.Fatal("unqualified First(common name) granted", grouping, common, guide, review, err)
-				}
-			}
-		}
-		service.AncillaryEnabled = false
-		for _, summary := range []bool{false, true} {
 			changed := options
-			changed.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{CreateSummary: summary}
-			if review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, changed)); err == nil ||
-				review != nil || !strings.Contains(err.Error(), "ancillary workbook is disabled") {
-				t.Fatal("disabled grouped ancillary authority inferred", grouping, summary, err)
+			changed.References = &SummaryVegetationReferenceOptions{ShowCommon: common, UseGuideNames: true}
+			if review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, changed)); err == nil || review != nil {
+				t.Fatal("unqualified guide names granted for grouped mode", grouping, common, review, err)
 			}
 		}
-		service.AncillaryEnabled = true
 	}
 }
 
@@ -157,7 +131,7 @@ func TestSummaryGroupedAttributeWorkbookPublicationAuthorityAndRecovery(t *testi
 		}
 		destination := filepath.Join(t.TempDir(), "Attributes # ' literal.xlsx")
 		request := summaryVegetationWorkbookExportRequest{Options: options, ApprovalHash: review.ApprovalHash, Destination: destination}
-		for _, mode := range []string{"layer", "plain", "other-group", "common", "guide", "group-gate", "reference-gate", "cancel", "owner", "unrendered-peer"} {
+		for _, mode := range []string{"layer", "plain", "other-group", "common", "guide", "cancel", "owner", "unrendered-peer"} {
 			changed := request
 			ctx, contextID := t.Context(), state.ContextID
 			owner := service.source.environment.report.contexts.Projects.Sqlite
@@ -176,10 +150,6 @@ func TestSummaryGroupedAttributeWorkbookPublicationAuthorityAndRecovery(t *testi
 				changed.Options.References = &SummaryVegetationReferenceOptions{ShowCommon: true}
 			case "guide":
 				changed.Options.References = &SummaryVegetationReferenceOptions{UseGuideNames: true}
-			case "group-gate":
-				service.GroupedEnabled = false
-			case "reference-gate":
-				service.ReferencesEnabled = false
 			case "cancel":
 				cancelled, cancel := context.WithCancel(ctx)
 				cancel()
@@ -191,7 +161,6 @@ func TestSummaryGroupedAttributeWorkbookPublicationAuthorityAndRecovery(t *testi
 					`UPDATE USysSppAttributeDescription SET Definition='changed unrendered' WHERE ShortName IS NULL`)
 			}
 			result, err := service.ExportReviewed(ctx, contextID, vprotest.WorkbookRequest(t, changed))
-			service.GroupedEnabled, service.ReferencesEnabled = true, true
 			if mode == "unrendered-peer" {
 				vprotest.MutateContextFixture(t, owner.Attachments["VLists"],
 					`UPDATE USysSppAttributeDescription SET Definition='Not admitted' WHERE ShortName IS NULL`)
@@ -226,6 +195,5 @@ func TestSummaryGroupedAttributeWorkbookClientWire(t *testing.T) {
 	for _, item := range summaryGroupedAttributeWorkbookCases() {
 		wire[item.name] = portableSummaryWorkbookReview(t, service, state, summaryGroupedAttributeWorkbookOptions(item))
 	}
-	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookGroupedAttributesWire.json",
-		"VPRO_UPDATE_SUMMARY_GROUPED_ATTRIBUTE_WORKBOOK_WIRE", wire)
+	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookGroupedAttributesWire.json", wire)
 }

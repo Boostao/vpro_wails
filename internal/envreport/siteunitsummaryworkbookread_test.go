@@ -32,12 +32,10 @@ func TestSiteUnitSummaryWorkbookReadOwnedDetachedAndZeroWrites(t *testing.T) {
 			if err != nil || len(input.Tables) != 4 {
 				t.Fatal("complete owned input unavailable", err)
 			}
-			service.SiteUnitSummaryEnabled = true
 			expected, err := PreviewSiteUnitSummary(service, context.Background(), state.ContextID, SiteUnitSummaryRequest{method})
 			if err != nil || !reflect.DeepEqual(expected, input.Preview) {
 				t.Fatal("shared source capture changed existing preview", err)
 			}
-			service.SiteUnitSummaryEnabled = false
 			raw, err := json.Marshal(input.Tables)
 			if err != nil {
 				t.Fatal(err)

@@ -54,7 +54,7 @@ func TestProjectFieldCatalogueOwnedAttachedExternalAndNoneSchemasZeroWrites(t *t
 	for _, external := range []bool{false, true} {
 		for _, none := range []bool{false, true} {
 			contexts, state, _ := projectOwnedSourceFixture(t, external, none)
-			service := NewLongVegetationReportScopeService(contexts, true)
+			service := NewLongVegetationReportScopeService(contexts)
 			ctx := context.Background()
 			before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 			config, err := os.ReadFile(contexts.Projects.Preferences.Path)
@@ -68,7 +68,7 @@ func TestProjectFieldCatalogueOwnedAttachedExternalAndNoneSchemasZeroWrites(t *t
 				t.Fatal("schema catalogue invented scope or lost physical owner", initial, err)
 			}
 			if !none {
-				selected := NewLongVegetationSelectedUnitSelectionService(contexts, true)
+				selected := NewLongVegetationSelectedUnitSelectionService(contexts)
 				ordinary, err := selected.GetLongVegetationSelectedUnitSelection(ctx, state.ContextID)
 				if err != nil || !reflect.DeepEqual(initial.Definitions, ordinary.Definitions) {
 					t.Fatal("shared catalogue changed legacy selected-list definitions", err)
@@ -109,7 +109,7 @@ func TestProjectFieldCatalogueOwnedAttachedExternalAndNoneSchemasZeroWrites(t *t
 
 func TestProjectFieldCatalogueSchemaDriftCorrectionAndBuildDataValidityRemainSeparate(t *testing.T) {
 	contexts, state, _ := projectOwnedSourceFixture(t, true, true)
-	service := NewLongVegetationReportScopeService(contexts, true)
+	service := NewLongVegetationReportScopeService(contexts)
 	ctx := context.Background()
 	db, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.ProjectPath, "rw"))
 	if err != nil {
@@ -182,7 +182,7 @@ func TestProjectFieldCatalogueSchemaDriftCorrectionAndBuildDataValidityRemainSep
 
 func TestProjectFieldCatalogueRefusesViewsMissingTablesAndRecovers(t *testing.T) {
 	contexts, state, _ := projectOwnedSourceFixture(t, false, true)
-	service := NewLongVegetationReportScopeService(contexts, true)
+	service := NewLongVegetationReportScopeService(contexts)
 	ctx := context.Background()
 	initial, err := service.GetLongVegetationProjectFieldDefinitions(ctx, state.ContextID)
 	if err != nil {
@@ -221,9 +221,9 @@ func TestProjectFieldCatalogueRefusesViewsMissingTablesAndRecovers(t *testing.T)
 
 func TestProjectFieldCatalogueDisabledStaleCancelledCleanupAndOwnerLease(t *testing.T) {
 	contexts, state, _ := projectOwnedSourceFixture(t, true, true)
-	service := NewLongVegetationReportScopeService(contexts, true)
+	service := NewLongVegetationReportScopeService(contexts)
 	ctx := context.Background()
-	for _, disabled := range []*LongVegetationReportScopeService{nil, NewLongVegetationReportScopeService(contexts, false)} {
+	for _, disabled := range []*LongVegetationReportScopeService{nil, {}, NewLongVegetationReportScopeService(nil)} {
 		if output, err := disabled.GetLongVegetationProjectFieldDefinitions(ctx, state.ContextID); err == nil || output != nil {
 			t.Fatal("disabled field catalogue returned success", output, err)
 		}

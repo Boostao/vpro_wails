@@ -17,9 +17,6 @@ import (
 	"strconv"
 )
 
-const LongVegetationSelectedUnitsFeatureEnvironment = "VPRO_LONG_VEGETATION_SELECTED_UNITS"
-const LongVegetationSelectedUnitSelectionFeatureEnvironment = "VPRO_LONG_VEGETATION_SELECTED_UNIT_SELECTION"
-
 type LongVegetationSelectedUnitField struct {
 	Table        string `json:"table"`
 	Name         string `json:"name"`
@@ -61,14 +58,13 @@ func (request *selectedUnitSelectionDraft) UnmarshalJSON(data []byte) error {
 
 type LongVegetationSelectedUnitSelectionService struct {
 	contexts      *vprocore.ContextService
-	enabled       bool
 	snapshot      vprocore.PublicationReadSnapshotHooks
 	beforeInstall func()
 	beforeRead    func()
 }
 
-func NewLongVegetationSelectedUnitSelectionService(contexts *vprocore.ContextService, enabled bool) *LongVegetationSelectedUnitSelectionService {
-	return &LongVegetationSelectedUnitSelectionService{contexts: contexts, enabled: enabled}
+func NewLongVegetationSelectedUnitSelectionService(contexts *vprocore.ContextService) *LongVegetationSelectedUnitSelectionService {
+	return &LongVegetationSelectedUnitSelectionService{contexts: contexts}
 }
 
 func (s *LongVegetationSelectedUnitSelectionService) require(ctx context.Context, contextID string) error {
@@ -78,10 +74,7 @@ func (s *LongVegetationSelectedUnitSelectionService) require(ctx context.Context
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("selected report unit selection is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil ||
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil ||
 		s.contexts.Plots == nil || s.contexts.Projects.Preferences == nil {
 		return errors.New("selected report unit selection owned context/configuration is unavailable")
 	}

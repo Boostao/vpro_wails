@@ -25,9 +25,7 @@ func TestTwoPageSoilDeleteRestoreAndPermanentIDNonReuse(t *testing.T) {
 			VALUES ('SOIL99', 'Bf', 0.0, 35.0, 'SL', '7.5YR 4/6', 0, 9101);
 	`)
 
-	soilSvc, err := twopage.NewTwoPageSoilService(svc, func(string) (string, bool) {
-		return "true", true
-	})
+	soilSvc, err := twopage.NewTwoPageSoilService(svc)
 	if err != nil {
 		t.Fatal(err)
 	}

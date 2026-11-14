@@ -26,24 +26,7 @@ func vegetationUnitRequest(t *testing.T, expected, proposed int) string {
 	return string(data)
 }
 
-func TestLongVegetationUnitPreferencesIndependentGateAndStrictRequest(t *testing.T) {
-	for _, test := range []struct {
-		raw     string
-		present bool
-		want    bool
-		invalid bool
-	}{{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true}} {
-		enabled, err := LongVegetationUnitPreferencesFeature(func(name string) (string, bool) {
-			if name != "VPRO_LONG_VEGETATION_UNIT_PREFERENCES" {
-				t.Fatal("unit preference borrowed report/species grouping gate", name)
-			}
-			return test.raw, test.present
-		})
-		if enabled != test.want || (err != nil) != test.invalid {
-			t.Fatal("nonliteral preference gate accepted", test, enabled, err)
-		}
-	}
+func TestLongVegetationUnitPreferencesStrictRequest(t *testing.T) {
 	for _, raw := range []string{
 		`{}`, `{"expected":{"unitGroups":1}}`,
 		`{"expected":{"unitGroups":1},"proposed":{"unitGroups":null}}`,
@@ -63,7 +46,7 @@ func TestLongVegetationUnitPreferencesIndependentGateAndStrictRequest(t *testing
 			t.Fatal("malformed/duplicate/new unknown request accepted", raw, request)
 		}
 	}
-	for _, service := range []*LongVegetationUnitPreferencesService{nil, {}, NewLongVegetationUnitPreferencesService(nil, true)} {
+	for _, service := range []*LongVegetationUnitPreferencesService{nil, {}, NewLongVegetationUnitPreferencesService(nil)} {
 		for _, ctx := range []context.Context{nil, context.Background()} {
 			if value, err := service.GetLongVegetationUnitPreferences(ctx, "id"); value != nil || err == nil {
 				t.Fatal("unavailable unit editor returned review", value, err)
@@ -77,54 +60,51 @@ func TestLongVegetationUnitPreferencesIndependentGateAndStrictRequest(t *testing
 
 func TestLongVegetationUnitPreferencesChoiceMatrixRetainsHistoryAndOtherOptions(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, true)
-	service := NewLongVegetationUnitPreferencesService(contexts, true)
+	service := NewLongVegetationUnitPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-	for _, enabled := range []bool{false, true} {
-		contexts.LongVegetationNoneUnitsEnabled = enabled
-		for _, current := range []int{1, 2, 3} {
-			for _, proposed := range []int{1, 2, 3} {
-				if err := store.Update("ReportOptions", map[string]any{"LVUnitGroups": current}); err != nil {
-					t.Fatal(err)
+	for _, current := range []int{1, 2, 3} {
+		for _, proposed := range []int{1, 2, 3} {
+			if err := store.Update("ReportOptions", map[string]any{"LVUnitGroups": current}); err != nil {
+				t.Fatal(err)
+			}
+			before, err := os.ReadFile(store.Path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			values, err := store.Snapshot()
+			if err != nil {
+				t.Fatal(err)
+			}
+			review, err := service.GetLongVegetationUnitPreferences(context.Background(), state.ContextID)
+			if err != nil || review.Values.UnitGroups != current || review.ContextID != state.ContextID ||
+				review.Project != state.ActiveProject || review.ProjectPath != state.ProjectPath ||
+				review.SU != state.ActiveSU || review.SUPath != state.SUPath ||
+				review.Availability != (LongVegetationUnitAvailability{SiteUnitTable: true, None: true}) {
+				t.Fatal("owned saved unit choice or availability lost", review, err)
+			}
+			result := service.SaveLongVegetationUnitPreferences(context.Background(), state.ContextID,
+				vegetationUnitRequest(t, current, proposed))
+			allowed := current == proposed || proposed == 1 || proposed == 3
+			changed := allowed && current != proposed
+			if result.Committed != changed || result.Changed != changed ||
+				(result.ErrorMessage != "") == allowed || result.ContextID != state.ContextID {
+				t.Fatal("choice/no-op availability differs", current, proposed, result)
+			}
+			after, err := os.ReadFile(store.Path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !allowed || current == proposed {
+				if !bytes.Equal(before, after) {
+					t.Fatal("rejected or historical unavailable no-op rewrote YAML", current, proposed)
 				}
-				before, err := os.ReadFile(store.Path)
-				if err != nil {
-					t.Fatal(err)
-				}
-				values, err := store.Snapshot()
-				if err != nil {
-					t.Fatal(err)
-				}
-				review, err := service.GetLongVegetationUnitPreferences(context.Background(), state.ContextID)
-				if err != nil || review.Values.UnitGroups != current || review.ContextID != state.ContextID ||
-					review.Project != state.ActiveProject || review.ProjectPath != state.ProjectPath ||
-					review.SU != state.ActiveSU || review.SUPath != state.SUPath ||
-					review.Availability != (LongVegetationUnitAvailability{SiteUnitTable: true, None: enabled}) {
-					t.Fatal("owned saved unit choice or independent availability lost", review, err)
-				}
-				result := service.SaveLongVegetationUnitPreferences(context.Background(), state.ContextID,
-					vegetationUnitRequest(t, current, proposed))
-				allowed := current == proposed || proposed == 1 || proposed == 3 && enabled
-				changed := allowed && current != proposed
-				if result.Committed != changed || result.Changed != changed ||
-					(result.ErrorMessage != "") == allowed || result.ContextID != state.ContextID {
-					t.Fatal("choice/no-op availability differs", enabled, current, proposed, result)
-				}
-				after, err := os.ReadFile(store.Path)
-				if err != nil {
-					t.Fatal(err)
-				}
-				if !allowed || current == proposed {
-					if !bytes.Equal(before, after) {
-						t.Fatal("rejected or historical unavailable no-op rewrote YAML", current, proposed)
-					}
-				} else {
-					values["ReportOptions"].(map[string]any)["LVUnitGroups"] = proposed
-				}
-				actual, err := store.Snapshot()
-				if err != nil || !reflect.DeepEqual(values, actual) {
-					t.Fatal("unit Save changed enforcement/sibling/unrelated options or lost type", actual, err)
-				}
+			} else {
+				values["ReportOptions"].(map[string]any)["LVUnitGroups"] = proposed
+			}
+			actual, err := store.Snapshot()
+			if err != nil || !reflect.DeepEqual(values, actual) {
+				t.Fatal("unit Save changed enforcement/sibling/unrelated options or lost type", actual, err)
 			}
 		}
 	}
@@ -133,8 +113,7 @@ func TestLongVegetationUnitPreferencesChoiceMatrixRetainsHistoryAndOtherOptions(
 
 func TestLongVegetationUnitPreferencesMalformedStorageConflictAndRecovery(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, false)
-	service := NewLongVegetationUnitPreferencesService(contexts, true)
-	contexts.LongVegetationNoneUnitsEnabled = true
+	service := NewLongVegetationUnitPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	for _, bad := range []any{nil, true, "1", 0, 4} {
 		if err := store.Update("ReportOptions", map[string]any{"LVUnitGroups": bad}); err != nil {

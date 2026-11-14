@@ -11,45 +11,30 @@ import (
 	"errors"
 )
 
-const twoPageVegetationReviewEnvironment = "VPRO_TWO_PAGE_VEGETATION_REVIEW"
-const twoPageVegetationWritingEnvironment = "VPRO_TWO_PAGE_VEGETATION_WRITING"
-
 type TwoPageVegetationOriginal = twoPageVegetationOriginal
 type TwoPageVegetationSpeciesReferences = twoPageVegetationSpeciesReferences
 type TwoPageVegetationWriteResult = twoPageVegetationWriteResult
 
 type TwoPageVegetationService struct {
-	contexts        *vprocore.ContextService
-	review, writing bool
+	contexts *vprocore.ContextService
 }
 
-func NewTwoPageVegetationService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*TwoPageVegetationService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("two-page vegetation service requires owned contexts and explicit feature lookup")
+func NewTwoPageVegetationService(contexts *vprocore.ContextService) (*TwoPageVegetationService, error) {
+	if contexts == nil {
+		return nil, errors.New("two-page vegetation service requires owned contexts")
 	}
-	review, err := vprocore.SiviFeature(twoPageVegetationReviewEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	writing, err := vprocore.SiviFeature(twoPageVegetationWritingEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageVegetationService{contexts: contexts, review: review, writing: writing}, nil
+	return &TwoPageVegetationService{contexts: contexts}, nil
 }
 
-func (s *TwoPageVegetationService) require(ctx context.Context, writing bool) error {
+func (s *TwoPageVegetationService) require(ctx context.Context, _ bool) error {
 	if ctx == nil {
 		return errors.New("two-page vegetation service requires a context")
 	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.contexts == nil || !s.review {
-		return errors.New("two-page vegetation reads require independently enabled vegetation review")
-	}
-	if writing && !s.writing {
-		return errors.New("two-page vegetation writes require independently enabled vegetation writing")
+	if s == nil || s.contexts == nil {
+		return errors.New("two-page vegetation service requires owned contexts")
 	}
 	return nil
 }

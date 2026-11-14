@@ -12,12 +12,7 @@ import (
 	"fmt"
 )
 
-const longVegetationSelectedFieldPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_SELECTED_FIELD_PREFERENCES"
 const longVegetationSelectedFieldDefinitionsSource = "configured-owned-imported-SQLite VLists.USysAllSpecs physical columns; source Value List suggestions are not mandatory membership"
-
-func LongVegetationSelectedFieldPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationSelectedFieldPreferencesFeatureEnvironment, lookup)
-}
 
 type LongVegetationSelectedFieldPreferenceValues struct {
 	Mode          int    `json:"mode"`
@@ -72,12 +67,11 @@ type LongVegetationSelectedFieldPreferencesOutcome struct {
 
 type LongVegetationSelectedFieldPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongVegetationSelectedFieldPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationSelectedFieldPreferencesService {
-	return &LongVegetationSelectedFieldPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongVegetationSelectedFieldPreferencesService(contexts *vprocore.ContextService) *LongVegetationSelectedFieldPreferencesService {
+	return &LongVegetationSelectedFieldPreferencesService{contexts: contexts}
 }
 
 func (s *LongVegetationSelectedFieldPreferencesService) require(ctx context.Context, contextID string) error {
@@ -87,10 +81,7 @@ func (s *LongVegetationSelectedFieldPreferencesService) require(ctx context.Cont
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation selected field preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation selected field preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

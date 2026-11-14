@@ -9,12 +9,6 @@ import (
 	"errors"
 )
 
-const tableCSVReviewFeatureEnvironment = "VPRO_TABLE_CSV_REVIEW"
-
-func TableCSVReviewFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(tableCSVReviewFeatureEnvironment, lookup)
-}
-
 type ProjectTableCSVReview struct {
 	ContextID                  string           `json:"contextId"`
 	Project                    string           `json:"project"`
@@ -25,11 +19,14 @@ type ProjectTableCSVReview struct {
 }
 
 func GetProjectTableCSVReview(s *vprocore.ContextService, ctx context.Context, contextID string, table string) (*ProjectTableCSVReview, error) {
+	if ctx == nil {
+		return nil, errors.New("project table CSV review requires a context")
+	}
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if !s.TableCSVReviewEnabled {
-		return nil, errors.New("project table CSV read-only review is disabled in this session")
+	if s == nil {
+		return nil, errors.New("project table CSV review requires owned contexts")
 	}
 	review, err := ReadProjectTableCSV(s, ctx, contextID, table)
 	if err != nil {

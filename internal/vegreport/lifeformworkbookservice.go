@@ -15,13 +15,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 )
-
-const LifeformWorkbookFeatureEnvironment = "VPRO_LIFEFORM_WORKBOOK"
 
 type lifeformWorkbookRequest struct {
 	Details [6]bool
@@ -102,7 +99,6 @@ type LifeformWorkbookOutcome struct {
 
 type LifeformWorkbookService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
 type lifeformWorkbookHooks struct {
@@ -110,15 +106,8 @@ type lifeformWorkbookHooks struct {
 	publication vprocore.ArtifactPublicationHooks
 }
 
-func NewLifeformWorkbookService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*LifeformWorkbookService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(LifeformWorkbookFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &LifeformWorkbookService{contexts: contexts, enabled: enabled}, nil
+func NewLifeformWorkbookService(contexts *vprocore.ContextService) (*LifeformWorkbookService, error) {
+	return &LifeformWorkbookService{contexts: contexts}, nil
 }
 
 func (s *LifeformWorkbookService) authorize(ctx context.Context) error {
@@ -128,10 +117,7 @@ func (s *LifeformWorkbookService) authorize(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Lifeform workbook is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Lifeform workbook owned context is unavailable")
 	}
 	return nil

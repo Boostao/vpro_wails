@@ -23,7 +23,6 @@ import (
 func summaryReferenceWorkbookFixture(t *testing.T, external bool) (*SummaryVegetationWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	service, state := summaryAncillaryDesktopFixture(t, external)
-	service.ReferencesEnabled = true
 	owner := service.source.environment.report.contexts.Projects.Sqlite
 	vprotest.MutateContextFixture(t, owner.Attachments["VLists"], `
 		UPDATE USysAllSpecs SET CombinedEnglishName='Guide:'||EnglishName;
@@ -57,19 +56,10 @@ func TestSummaryEffectiveReferenceWorkbookStrictRequestsAndIndependentGate(t *te
 		}
 	}
 	service, state := summaryReferenceWorkbookFixture(t, false)
-	service.ReferencesEnabled = false
-	for _, selection := range []*SummaryVegetationReferenceOptions{
-		nil, {}, {ShowCommon: true}, {UseGuideNames: true},
-	} {
-		options := SummaryVegetationWorkbookOptions{Title: "literal", Average: 1, Display: 6, References: selection}
-		review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
-		if selection == nil {
-			if err != nil || review == nil || review.Preview.References != nil || review.Scope != summaryVegetationWorkbookDraftScope {
-				t.Fatal("independent reference gate changed legacy availability", review, err)
-			}
-		} else if err == nil || review != nil || !strings.Contains(err.Error(), "effective references are disabled") {
-			t.Fatal("backend gate bypassed", review, err)
-		}
+	options := SummaryVegetationWorkbookOptions{Title: "literal", Average: 1, Display: 6}
+	review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
+	if err != nil || review == nil || review.Preview.References != nil || review.Scope != summaryVegetationWorkbookDraftScope {
+		t.Fatal("effective reference support changed legacy availability", review, err)
 	}
 }
 
@@ -275,7 +265,7 @@ func TestSummaryEffectiveReferenceWorkbookPublicationAuthorityAndRecovery(t *tes
 	}
 	destination := filepath.Join(t.TempDir(), "effective # ' workbook.xlsx")
 	request := summaryVegetationWorkbookExportRequest{Options: options, ApprovalHash: review.ApprovalHash, Destination: destination}
-	for _, mutation := range []string{"legacy", "common", "guide", "gate", "cancel"} {
+	for _, mutation := range []string{"legacy", "common", "guide", "cancel"} {
 		changed := request
 		ctx := t.Context()
 		switch mutation {
@@ -285,15 +275,12 @@ func TestSummaryEffectiveReferenceWorkbookPublicationAuthorityAndRecovery(t *tes
 			changed.Options.References = &SummaryVegetationReferenceOptions{}
 		case "guide":
 			changed.Options.References = &SummaryVegetationReferenceOptions{ShowCommon: true, UseGuideNames: true}
-		case "gate":
-			service.ReferencesEnabled = false
 		case "cancel":
 			cancelled, cancel := context.WithCancel(ctx)
 			cancel()
 			ctx = cancelled
 		}
 		result, err := service.ExportReviewed(ctx, state.ContextID, vprotest.WorkbookRequest(t, changed))
-		service.ReferencesEnabled = true
 		if err == nil || result != nil {
 			t.Fatal("changed effective authority published or returned an outcome", mutation, result, err)
 		}

@@ -10,23 +10,16 @@ import (
 	"errors"
 )
 
-const twoPageVegetationSpeciesListEnvironment = "VPRO_TWO_PAGE_VEGETATION_SPECIES_LIST"
-
 type TwoPageVegetationSpeciesListService struct {
 	vegetation *TwoPageVegetationService
-	enabled    bool
 }
 
-func NewTwoPageVegetationSpeciesListService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*TwoPageVegetationSpeciesListService, error) {
-	vegetation, err := NewTwoPageVegetationService(contexts, lookup)
+func NewTwoPageVegetationSpeciesListService(contexts *vprocore.ContextService) (*TwoPageVegetationSpeciesListService, error) {
+	vegetation, err := NewTwoPageVegetationService(contexts)
 	if err != nil {
 		return nil, err
 	}
-	enabled, err := vprocore.SiviFeature(twoPageVegetationSpeciesListEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageVegetationSpeciesListService{vegetation, enabled}, nil
+	return &TwoPageVegetationSpeciesListService{vegetation: vegetation}, nil
 }
 
 func (s *TwoPageVegetationSpeciesListService) Save(ctx context.Context, contextID, requestJSON string) (*TwoPageVegetationWriteResult, error) {
@@ -40,9 +33,6 @@ func (s *TwoPageVegetationSpeciesListService) saveObserved(ctx context.Context, 
 	}
 	if err := s.vegetation.require(ctx, true); err != nil {
 		return nil, err
-	}
-	if !s.enabled {
-		return nil, errors.New("two-page Species list selection requires its independently enabled feature")
 	}
 	return s.vegetation.saveTwoPageVegetationQualifiedObserved(ctx, contextID, requestJSON, true, beforeCommit, afterCommit)
 }

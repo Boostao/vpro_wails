@@ -286,31 +286,11 @@ func TestSIVIParentSharedTextHistoricalOmissionsRollbackAndRetry(t *testing.T) {
 		t.Fatal("historical mixed originals not restored", err)
 	}
 }
-func TestSIVIParentSharedGateAndStrictTransport(t *testing.T) {
-	service, state, _, request := sftest.SharedServiceFixture(t)
-	for _, value := range []string{"", "TRUE", "1", " true "} {
-		if _, err := sourceform.NewSIVIParentSharedService(service.Contexts, func(string) (string, bool) { return value, true }); err == nil {
-			t.Fatal("coerced shared editor gate", value)
-		}
+func TestSIVIParentSharedStrictTransport(t *testing.T) {
+	_, _, _, request := sftest.SharedServiceFixture(t)
+	if _, err := sourceform.NewSIVIParentSharedService(nil); err == nil {
+		t.Fatal("nil context accepted")
 	}
-	disabled, err := sourceform.NewSIVIParentSharedService(service.Contexts, func(name string) (string, bool) {
-		if name != sourceform.SiviParentSharedFeatureEnvironment && name != sourceform.SiviParentSharedReferenceEnvironment {
-			t.Fatal("wrong gate", name)
-		}
-		return "false", true
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	before := vprotest.DatabaseBytes(t, service.Contexts.Projects.Sqlite.Attachments)
-	if _, err := disabled.Save(context.Background(), state.ContextID, "108050", request); err == nil {
-		t.Fatal("default enabled write")
-	}
-	service.Contexts.SiviParentReviewEnabled = false
-	if _, err := service.GetOriginal(context.Background(), state.ContextID, "108050"); err == nil {
-		t.Fatal("bypassed parent review")
-	}
-	vprotest.AssertProfileSUFiles(t, service.Contexts, before)
 	wire, err := json.Marshal(request)
 	if err != nil {
 		t.Fatal(err)

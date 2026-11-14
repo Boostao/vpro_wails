@@ -14,59 +14,30 @@ import (
 	"testing"
 )
 
-func soilFacade(t *testing.T, contexts *vprocore.ContextService, values map[string]string) *TwoPageSoilService {
+func soilFacade(t *testing.T, contexts *vprocore.ContextService) *TwoPageSoilService {
 	t.Helper()
-	service, err := NewTwoPageSoilService(contexts, func(name string) (string, bool) {
-		value, present := values[name]
-		return value, present
-	})
+	service, err := NewTwoPageSoilService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return service
 }
 
-func TestTwoPageSoilServiceIndependentGatesAndNoWrites(t *testing.T) {
+func TestTwoPageSoilServiceReadOnlyOriginalAndReferencesNoWrites(t *testing.T) {
 	contexts, state, _, request := soilWriteFixture(t, true, "SoilHumusXL", 3)
 	raw, err := json.Marshal(request)
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, values := range []map[string]string{
-		{twoPageSoilReviewEnvironment: "false"},
-		{twoPageSoilReviewEnvironment: "false", twoPageSoilWritingEnvironment: "false"},
-		{twoPageSoilReviewEnvironment: "false", twoPageSoilWritingEnvironment: "true"},
-	} {
-		service := soilFacade(t, contexts, values)
-		before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
-		if original, err := service.GetOriginal(context.Background(), state.ContextID, "108050", "SoilHumusXL"); err == nil || original != nil {
-			t.Fatal("disabled review exposed originals", original, err)
-		}
-		if references, err := service.GetReferences(context.Background(), state.ContextID, "108050", "SoilHumusXL"); err == nil || references != nil {
-			t.Fatal("disabled review exposed source references", references, err)
-		}
-		if result, err := service.Save(context.Background(), state.ContextID, string(raw)); err == nil || result != nil {
-			t.Fatal("writing alone bypassed review ownership", result, err)
-		}
-		if result, err := service.RecoverReceipt(context.Background(), state.ContextID, string(raw)); err == nil || result != nil {
-			t.Fatal("disabled review exposed receipt authority", result, err)
-		}
-		if after := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments); !reflect.DeepEqual(after, before) {
-			t.Fatal("default-off gate checks changed source/schema")
-		}
-	}
-	review := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "false"})
+	review := soilFacade(t, contexts)
 	if original, err := review.GetOriginal(context.Background(), state.ContextID, "108050", "SoilHumusXL"); err != nil ||
 		!reflect.DeepEqual(original, request.Original) {
-		t.Fatal("independent read-only review changed raw original", original, err)
+		t.Fatal("read-only review changed raw original", original, err)
 	}
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	if references, err := review.GetReferences(context.Background(), state.ContextID, "108050", "SoilHumusXL"); err != nil ||
 		references == nil || len(references.Fields) != 6 {
 		t.Fatal("read-only review did not return source references", references, err)
-	}
-	if result, err := review.Save(context.Background(), state.ContextID, string(raw)); err == nil || result != nil {
-		t.Fatal("read-only review granted mutation", result, err)
 	}
 	if result, err := review.RecoverReceipt(context.Background(), state.ContextID, string(raw)); err != nil || result != nil {
 		t.Fatal("uncommitted read-only recovery invented receipt", result, err)
@@ -76,9 +47,9 @@ func TestTwoPageSoilServiceIndependentGatesAndNoWrites(t *testing.T) {
 	}
 }
 
-func TestTwoPageSoilServiceActualSaveAndDisabledWritingRecovery(t *testing.T) {
+func TestTwoPageSoilServiceActualSaveAndReadOnlyRecovery(t *testing.T) {
 	contexts, state, db, request := soilWriteFixture(t, false, "SoilMineralXL", 1)
-	enabled := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
+	enabled := soilFacade(t, contexts)
 	original, err := enabled.GetOriginal(context.Background(), state.ContextID, "108050", "SoilMineralXL")
 	if err != nil {
 		t.Fatal(err)
@@ -109,11 +80,11 @@ func TestTwoPageSoilServiceActualSaveAndDisabledWritingRecovery(t *testing.T) {
 	if err := json.Unmarshal(wire, &roundTrip); err != nil || !reflect.DeepEqual(roundTrip, *accepted) {
 		t.Fatal("exported strict result does not round-trip real production wire", err)
 	}
-	readonly := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "false"})
+	readonly := soilFacade(t, contexts)
 	before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	recovered, err := readonly.RecoverReceipt(context.Background(), state.ContextID, string(raw))
 	if err != nil || recovered == nil || recovered.DidCommit || !recovered.Replayed || !reflect.DeepEqual(recovered.History, accepted.History) {
-		t.Fatal("turning writing off erased read-only irreversible recovery", recovered, err)
+		t.Fatal("read-only irreversible recovery failed", recovered, err)
 	}
 	if after := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments); !reflect.DeepEqual(after, before) {
 		t.Fatal("read-only recovery replayed mutation")
@@ -122,23 +93,10 @@ func TestTwoPageSoilServiceActualSaveAndDisabledWritingRecovery(t *testing.T) {
 
 func TestTwoPageSoilServiceExplicitErrorsAndStrictTransport(t *testing.T) {
 	contexts, state, _, request := soilWriteFixture(t, false, "SoilHumusXL", 3)
-	lookup := func(string) (string, bool) { return "", false }
-	if service, err := NewTwoPageSoilService(nil, lookup); err == nil || service != nil {
+	if service, err := NewTwoPageSoilService(nil); err == nil || service != nil {
 		t.Fatal("nil owned contexts accepted")
 	}
-	if service, err := NewTwoPageSoilService(contexts, nil); err == nil || service != nil {
-		t.Fatal("implicit feature lookup accepted")
-	}
-	for _, name := range []string{twoPageSoilReviewEnvironment, twoPageSoilWritingEnvironment} {
-		for _, invalid := range []string{"", "1", "True", " true", "false ", "yes"} {
-			if service, err := NewTwoPageSoilService(contexts, func(key string) (string, bool) {
-				return invalid, key == name
-			}); err == nil || service != nil {
-				t.Fatalf("malformed feature %s=%q accepted", name, invalid)
-			}
-		}
-	}
-	service := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
+	service := soilFacade(t, contexts)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	if result, err := service.Save(ctx, state.ContextID, "invalid JSON"); !errors.Is(err, context.Canceled) || result != nil {

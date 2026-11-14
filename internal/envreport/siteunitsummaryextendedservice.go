@@ -7,25 +7,14 @@ import (
 import (
 	"context"
 	"errors"
-	"os"
 )
-
-const SiteUnitSummaryExtendedWorkbookFeatureEnvironment = "VPRO_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK"
 
 type SiteUnitSummaryExtendedWorkbookService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewSiteUnitSummaryExtendedWorkbookService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SiteUnitSummaryExtendedWorkbookService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(SiteUnitSummaryExtendedWorkbookFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SiteUnitSummaryExtendedWorkbookService{contexts, enabled}, nil
+func NewSiteUnitSummaryExtendedWorkbookService(contexts *vprocore.ContextService) (*SiteUnitSummaryExtendedWorkbookService, error) {
+	return &SiteUnitSummaryExtendedWorkbookService{contexts: contexts}, nil
 }
 
 func (s *SiteUnitSummaryExtendedWorkbookService) authorize(ctx context.Context) error {
@@ -35,8 +24,8 @@ func (s *SiteUnitSummaryExtendedWorkbookService) authorize(ctx context.Context) 
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Extended Summary workbook is disabled in this session")
+	if s == nil {
+		return errors.New("Extended Summary workbook service is unavailable")
 	}
 	return nil
 }

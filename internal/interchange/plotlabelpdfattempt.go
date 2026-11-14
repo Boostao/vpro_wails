@@ -81,7 +81,7 @@ func (s *PlotLabelPDFExportService) finishAttempt(requestID string, outcome Plot
 }
 
 func (s *PlotLabelPDFExportService) RecoverOutcome(ctx context.Context, contextID, requestJSON string) (*PlotLabelPDFAttemptOutcome, error) {
-	if err := s.authorize(ctx, false); err != nil {
+	if err := s.authorize(ctx); err != nil {
 		return nil, err
 	}
 	var request PlotLabelPDFExportRequest

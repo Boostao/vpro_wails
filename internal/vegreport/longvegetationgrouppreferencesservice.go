@@ -12,12 +12,6 @@ import (
 	"fmt"
 )
 
-const longVegetationGroupPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_GROUP_PREFERENCES"
-
-func LongVegetationGroupPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationGroupPreferencesFeatureEnvironment, lookup)
-}
-
 type LongVegetationGroupPreferenceValues struct {
 	GroupBy int `json:"groupBy"`
 }
@@ -91,12 +85,11 @@ type LongVegetationGroupPreferencesOutcome struct {
 
 type LongVegetationGroupPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongVegetationGroupPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationGroupPreferencesService {
-	return &LongVegetationGroupPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongVegetationGroupPreferencesService(contexts *vprocore.ContextService) *LongVegetationGroupPreferencesService {
+	return &LongVegetationGroupPreferencesService{contexts: contexts}
 }
 
 func (s *LongVegetationGroupPreferencesService) require(ctx context.Context, contextID string) error {
@@ -106,18 +99,14 @@ func (s *LongVegetationGroupPreferencesService) require(ctx context.Context, con
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation grouping preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation grouping preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)
 }
 
 func (s *LongVegetationGroupPreferencesService) availability() LongVegetationGroupAvailability {
-	return LongVegetationGroupAvailability{Layer: true, Strata: s.contexts.LongVegetationStrataEnabled,
-		Lifeform: s.contexts.LongVegetationLifeformEnabled, None: s.contexts.LongVegetationNoneEnabled}
+	return LongVegetationGroupAvailability{Layer: true, Strata: true, Lifeform: true, None: true}
 }
 
 func (s *LongVegetationGroupPreferencesService) GetLongVegetationGroupPreferences(ctx context.Context, contextID string) (*LongVegetationGroupPreferencesReview, error) {
@@ -154,7 +143,7 @@ func (s *LongVegetationGroupPreferencesService) SaveLongVegetationGroupPreferenc
 				return struct{}{}, readErr
 			}
 			if request.Expected.GroupBy != request.Proposed.GroupBy && !s.availability().allows(request.Proposed.GroupBy) {
-				return struct{}{}, fmt.Errorf("Long Vegetation grouping choice %d is disabled in this session; saved LVGroupBy was not reset", request.Proposed.GroupBy)
+				return struct{}{}, fmt.Errorf("Long Vegetation grouping choice %d is unavailable; saved LVGroupBy was not reset", request.Proposed.GroupBy)
 			}
 			update, err := CompareAndSetLongVegetationGroupPreferences(plots.Projects.Preferences, ctx, request.Expected, request.Proposed)
 			outcome.Changed, outcome.Committed = update.Changed, update.Committed

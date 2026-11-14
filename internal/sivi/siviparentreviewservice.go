@@ -10,26 +10,29 @@ import (
 	"errors"
 )
 
-const siviParentReviewFeatureEnvironment = "VPRO_SIVI_PARENT_REVIEW"
-
-func SiviParentReviewFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(siviParentReviewFeatureEnvironment, lookup)
+func requireSIVIParentReview(s *vprocore.ContextService, ctx context.Context) error {
+	if ctx == nil {
+		return errors.New("SIVI parent review requires a context")
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if s == nil {
+		return errors.New("SIVI parent review requires owned contexts")
+	}
+	return nil
 }
 
 func GetSIVIParentOriginal(s *vprocore.ContextService, ctx context.Context, contextID, plot string) (*sourceform.SIVIParentProjection, error) {
-	if err := ctx.Err(); err != nil {
+	if err := requireSIVIParentReview(s, ctx); err != nil {
 		return nil, err
-	}
-
-	if !s.SiviParentReviewEnabled {
-		return nil, errors.New("SIVI parent read-only review is disabled in this session")
 	}
 	return sourceform.ReadSIVIParent(s, ctx, contextID, plot)
 }
 
 func GetSIVIParentJoinReview(s *vprocore.ContextService, ctx context.Context, contextID, plot string) (*sourceform.SIVIParentJoinReview, error) {
-	if !s.SiviParentReviewEnabled {
-		return nil, errors.New("SIVI parent read-only review is disabled in this session")
+	if err := requireSIVIParentReview(s, ctx); err != nil {
+		return nil, err
 	}
 	return vprocore.WithContextPlotRequest(ctx, s, contextID, func(plots *vprocore.PlotService) (*sourceform.SIVIParentJoinReview, error) {
 		return sourceform.ReadOwnedSIVIParentJoin(ctx, plots, contextID, plot)
@@ -37,15 +40,15 @@ func GetSIVIParentJoinReview(s *vprocore.ContextService, ctx context.Context, co
 }
 
 func GetSIVIProjectIDChoices(s *vprocore.ContextService, ctx context.Context, contextID string) (*sourceform.SIVIProjectChoices, error) {
-	if !s.SiviParentReviewEnabled {
-		return nil, errors.New("SIVI parent read-only review is disabled in this session")
+	if err := requireSIVIParentReview(s, ctx); err != nil {
+		return nil, err
 	}
 	return sourceform.ReadSIVIProjectChoices(s, ctx, contextID)
 }
 
 func SetSIVIProjectIDSource(s *vprocore.ContextService, ctx context.Context, contextID string, expected, source int) (*sourceform.SIVIProjectChoices, error) {
-	if !s.SiviParentReviewEnabled {
-		return nil, errors.New("SIVI parent read-only review is disabled in this session")
+	if err := requireSIVIParentReview(s, ctx); err != nil {
+		return nil, err
 	}
 	return vprocore.WithContextPlotRequest(ctx, s, contextID, func(plots *vprocore.PlotService) (*sourceform.SIVIProjectChoices, error) {
 		choices, err := sourceform.ReadOwnedSIVIProjectChoicesAtSource(ctx, plots, contextID, source)

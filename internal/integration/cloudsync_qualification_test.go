@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -21,20 +20,12 @@ import (
 
 func locateBECMasterForPGQualification(t *testing.T) string {
 	t.Helper()
-	candidates := []string{
-		"/tmp/vpro-pg-qa/BECMaster_fixing.accdb",
-	}
-	if explicit := strings.TrimSpace(os.Getenv("VPRO_BECMASTER_ACCDB")); explicit != "" {
-		candidates = append(candidates, explicit)
-	}
+	var candidates []string
 	if home, err := os.UserHomeDir(); err == nil && home != "" {
 		candidates = append(candidates, filepath.Join(home, "Work", "VPRO_ACCESS_1", "VPro64", "BECMaster_fixing.accdb"))
 	}
 	for _, src := range candidates {
 		if st, err := os.Stat(src); err == nil && st.Mode().IsRegular() && st.Size() > 100*1024*1024 {
-			if strings.HasPrefix(src, "/tmp/vpro-pg-qa/") {
-				return src
-			}
 			dst := filepath.Join(t.TempDir(), "BECMaster_fixing_disposable.accdb")
 			inF, err := os.Open(src)
 			if err != nil {
@@ -100,7 +91,7 @@ func TestCloudSyncBECMaster71kQualificationAndThreeWayCustodianMerge(t *testing.
 	defer mgr.Close()
 	cfgStatus, err := mgr.GetConfigStatus()
 	if err != nil || !cfgStatus.Configured || !cfgStatus.HasContributorCreds || !cfgStatus.HasCustodianCreds {
-		t.Skip("live PostgreSQL credentials (VPRO_PG_* or becmaster.env) not configured; skipping live qualification")
+		t.Skip("live PostgreSQL credentials (VPRO_PG_URL / VPRO_PG_HOST or becmaster.env) not configured; skipping live qualification")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
@@ -131,8 +122,8 @@ func TestCloudSyncBECMaster71kQualificationAndThreeWayCustodianMerge(t *testing.
 		}
 	}
 
-	// Seed 71,567-plot BECMaster_fixing baseline if not yet seeded (or if VPRO_FORCE_PG_RESEED=1)
-	if connRep.BECMasterPlotCount < 71500 || os.Getenv("VPRO_FORCE_PG_RESEED") == "1" {
+	// Seed 71,567-plot BECMaster_fixing baseline if not yet seeded
+	if connRep.BECMasterPlotCount < 71500 {
 		accdbPath := locateBECMasterForPGQualification(t)
 		sqliteStage := filepath.Join(t.TempDir(), "BECMaster_fixing.db")
 		impRes, impErr := interchange.ImportAccessProject(svc, ctx, activeCtxID, interchange.AccessProjectImportRequest{

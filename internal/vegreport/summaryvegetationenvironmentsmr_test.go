@@ -7,7 +7,6 @@ import (
 
 import (
 	"encoding/json"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -17,15 +16,7 @@ import (
 func TestSummaryEnvironmentalSMROriginalCases(t *testing.T) {
 	labels := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "", "bad", "00", " 0", "0 "}
 	expected := []string{"VX", "X", "SX", "SM", "M", "SHG", "HG", "SHD", "HD", "", "", "", "", ""}
-	path := os.Getenv("VPRO_SUMMARY_SMR_SOURCE")
 	raw := []byte(summaryEnvironmentalSMRSourceFixture)
-	if path != "" {
-		var err error
-		raw, err = os.ReadFile(path)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
 	var source struct {
 		Observations []struct {
 			Unit   *string  `json:"unit"`

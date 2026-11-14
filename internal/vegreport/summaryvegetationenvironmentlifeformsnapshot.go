@@ -7,10 +7,7 @@ import (
 import (
 	"context"
 	"errors"
-	"os"
 )
-
-const summaryVegetationEnvironmentalLifeformFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_ENVIRONMENT_LIFEFORM"
 
 type SummaryVegetationEnvironmentalLifeformPreview struct {
 	Vegetation       SummaryVegetationPreview                   `json:"vegetation"`
@@ -24,21 +21,12 @@ type SummaryVegetationEnvironmentalLifeformPreview struct {
 
 type SummaryVegetationEnvironmentalLifeformService struct {
 	environment *SummaryVegetationEnvironmentalService
-	enabled     bool
 }
 
 const summaryEnvironmentalLifeformSource = "one owned SQLite snapshot: raw Summary units/Veg/master, physical SU counts, selected field-list and needed Env; source-qualified QuickVeg/lifeform arguments1 through13; literal scope adaptation; explicit numeric Empty; no formatted workbook"
 
-func NewSummaryVegetationEnvironmentalLifeformService(environment *SummaryVegetationEnvironmentalService,
-	lookup func(string) (string, bool)) (*SummaryVegetationEnvironmentalLifeformService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(summaryVegetationEnvironmentalLifeformFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SummaryVegetationEnvironmentalLifeformService{environment: environment, enabled: enabled}, nil
+func NewSummaryVegetationEnvironmentalLifeformService(environment *SummaryVegetationEnvironmentalService) (*SummaryVegetationEnvironmentalLifeformService, error) {
+	return &SummaryVegetationEnvironmentalLifeformService{environment: environment}, nil
 }
 
 func (s *SummaryVegetationEnvironmentalLifeformService) PreviewEnvironmentalLifeform(ctx context.Context,
@@ -49,11 +37,8 @@ func (s *SummaryVegetationEnvironmentalLifeformService) PreviewEnvironmentalLife
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || !s.enabled {
-		return nil, errors.New("Summary lifeform environmental preview is disabled in this session")
-	}
-	if s.environment == nil || !s.environment.numericEnabled {
-		return nil, errors.New("Summary lifeform environmental preview requires enabled numeric environmental inspection")
+	if s == nil || s.environment == nil {
+		return nil, errors.New("Summary lifeform environmental preview service is unavailable")
 	}
 	return previewSummaryEnvironmentalRawSnapshot(ctx, s.environment, contextID, average, display, showClass,
 		validateSummaryEnvironmentalLifeformSelectedFunction,

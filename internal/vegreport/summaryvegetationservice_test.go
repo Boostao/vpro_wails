@@ -31,12 +31,7 @@ func summaryVegetationServiceFixture(t *testing.T, external bool) (*SummaryVeget
 	vprotest.MutateContextFixture(t, owner.Attachments["VUser"], `DELETE FROM USysUserSpp`)
 	vprotest.MutateContextFixture(t, owner.Attachments["VPro64"], `DELETE FROM LayerCode;
 		INSERT INTO LayerCode(LayerText,Layer1234567,Layer) VALUES('1','1','A1'),('10','10',NULL)`)
-	service, err := NewSummaryVegetationService(contexts, func(name string) (string, bool) {
-		if name != summaryVegetationFeatureEnvironment {
-			t.Fatal("gate borrowed another workflow", name)
-		}
-		return "true", true
-	})
+	service, err := NewSummaryVegetationService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,18 +39,12 @@ func summaryVegetationServiceFixture(t *testing.T, external bool) (*SummaryVeget
 }
 
 func TestSummaryVegetationServiceGateAndOwnedZeroWrites(t *testing.T) {
-	for _, flag := range []string{"", "false", "true", "TRUE", "1", " true"} {
-		service, err := NewSummaryVegetationService(nil, func(string) (string, bool) { return flag, flag != "" })
-		if flag == "" || flag == "false" || flag == "true" {
-			if err != nil || service.Enabled != (flag != "false") {
-				t.Fatal(flag, service, err)
-			}
-			if _, err := service.Preview(context.Background(), "owned", 1, 6); err == nil {
-				t.Fatal("unavailable service published")
-			}
-		} else if err == nil {
-			t.Fatal("nonliteral feature flag accepted", flag)
-		}
+	nilService, err := NewSummaryVegetationService(nil)
+	if err != nil || nilService == nil {
+		t.Fatal(nilService, err)
+	}
+	if _, err := nilService.Preview(context.Background(), "owned", 1, 6); err == nil {
+		t.Fatal("unavailable service published")
 	}
 	for _, external := range []bool{false, true} {
 		service, state := summaryVegetationServiceFixture(t, external)

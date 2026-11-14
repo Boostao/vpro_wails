@@ -61,7 +61,7 @@ func TestLongVegetationCodeReferenceBridgePreservesLiteralCellsAndGrouping(t *te
 	}
 }
 
-func TestLongVegetationCodeDefaultGateAndOwnedAllGroupingModes(t *testing.T) {
+func TestLongVegetationCodeOwnedAllGroupingModes(t *testing.T) {
 	for _, external := range []bool{false, true} {
 		t.Run(map[bool]string{false: "internal", true: "external"}[external], func(t *testing.T) {
 			service, state := vprotest.ReportServiceFixture(t, external)
@@ -69,14 +69,6 @@ func TestLongVegetationCodeDefaultGateAndOwnedAllGroupingModes(t *testing.T) {
 				t.Fatal(err)
 			}
 			before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
-			service.LongVegetationNoneEnabled, service.LongVegetationLifeformEnabled, service.LongVegetationStrataEnabled = true, true, true
-			if _, err := GetLongVegetationOptions(service, context.Background(), state.ContextID); err == nil {
-				t.Fatal("other grouping gates authorized supplementary Code")
-			}
-			if _, err := PreviewLongVegetation(service, context.Background(), state.ContextID); err == nil {
-				t.Fatal("default-off Code report accepted")
-			}
-			service.LongVegetationCodeEnabled = true
 			tx, err := service.Projects.Sqlite.BeginReadSnapshot(context.Background())
 			if err != nil {
 				t.Fatal(err)

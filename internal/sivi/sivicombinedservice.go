@@ -12,8 +12,6 @@ import (
 	"fmt"
 )
 
-const SiviCombinedFeatureEnvironment = "VPRO_SIVI_COMBINED_EDITING"
-
 type SIVICombinedWrite struct {
 	Original []sourceform.SIVIVegetationProjection `json:"original"`
 	Edits    []SIVICoverEdit                       `json:"edits"`
@@ -31,18 +29,13 @@ func (request *SIVICombinedWrite) UnmarshalJSON(data []byte) error {
 
 type SIVICombinedService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewSIVICombinedService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SIVICombinedService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("SIVI combined service requires context ownership and an explicit feature lookup")
+func NewSIVICombinedService(contexts *vprocore.ContextService) (*SIVICombinedService, error) {
+	if contexts == nil {
+		return nil, errors.New("SIVI combined service requires context ownership")
 	}
-	enabled, err := vprocore.SiviFeature(SiviCombinedFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SIVICombinedService{contexts: contexts, enabled: enabled}, nil
+	return &SIVICombinedService{contexts: contexts}, nil
 }
 
 func (s *SIVICombinedService) require(ctx context.Context) error {
@@ -52,8 +45,8 @@ func (s *SIVICombinedService) require(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.contexts == nil || !s.enabled {
-		return errors.New("SIVI combined cover/height editing is disabled in this session")
+	if s == nil || s.contexts == nil {
+		return errors.New("SIVI combined service requires context ownership")
 	}
 	return nil
 }

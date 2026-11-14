@@ -17,10 +17,7 @@ import (
 )
 
 func TestSummaryVegetationEnvironmentalCountOriginalSourceCases(t *testing.T) {
-	fixture := os.Getenv("VPRO_TEST_SUMMARY_ENVIRONMENT_COUNT_SOURCE")
-	if fixture == "" {
-		fixture = filepath.Join("testdata", "summary_environment_count_source.json")
-	}
+	fixture := filepath.Join("testdata", "summary_environment_count_source.json")
 	raw, err := os.ReadFile(fixture)
 	if err != nil {
 		t.Fatal(err)

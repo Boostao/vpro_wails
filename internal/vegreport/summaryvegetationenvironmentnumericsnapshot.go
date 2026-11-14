@@ -28,8 +28,8 @@ func (s *SummaryVegetationEnvironmentalService) PreviewEnvironmentalNumeric(ctx 
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || !s.numericEnabled {
-		return nil, errors.New("Summary numeric environmental preview is disabled in this session")
+	if s == nil {
+		return nil, errors.New("Summary numeric environmental preview service is unavailable")
 	}
 	return previewSummaryEnvironmentalSnapshot(ctx, s, contextID, average, display, showClass,
 		func(function string, argument vprocore.ProjectMetadataCell) error {

@@ -11,12 +11,6 @@ import (
 	"errors"
 )
 
-const longVegetationStatisticsPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_STATISTICS_PREFERENCES"
-
-func LongVegetationStatisticsPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationStatisticsPreferencesFeatureEnvironment, lookup)
-}
-
 type LongVegetationStatisticsPreferenceValues struct {
 	AvgType int `json:"avgType"`
 	OrderBy int `json:"orderBy"`
@@ -65,12 +59,11 @@ type LongVegetationStatisticsPreferencesOutcome struct {
 
 type LongVegetationStatisticsPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongVegetationStatisticsPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationStatisticsPreferencesService {
-	return &LongVegetationStatisticsPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongVegetationStatisticsPreferencesService(contexts *vprocore.ContextService) *LongVegetationStatisticsPreferencesService {
+	return &LongVegetationStatisticsPreferencesService{contexts: contexts}
 }
 
 func (s *LongVegetationStatisticsPreferencesService) require(ctx context.Context, contextID string) error {
@@ -80,10 +73,7 @@ func (s *LongVegetationStatisticsPreferencesService) require(ctx context.Context
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation statistics preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation statistics preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

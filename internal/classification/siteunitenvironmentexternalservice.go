@@ -16,11 +16,8 @@ import (
 	"sync"
 )
 
-const ExternalSUEnvironmentEditingEnvironment = "VPRO_EXTERNAL_SU_ENVIRONMENT_EDITING"
-
 type ExternalSUEnvironmentService struct {
 	contexts                 *vprocore.ContextService
-	enabled                  bool
 	sessionID                string
 	mu                       sync.Mutex
 	reviews                  map[string]*externalSUEnvironmentSource
@@ -28,8 +25,8 @@ type ExternalSUEnvironmentService struct {
 	sourceHash, approvalHash string
 }
 
-func NewExternalSUEnvironmentService(contexts *vprocore.ContextService, enabled bool) *ExternalSUEnvironmentService {
-	return &ExternalSUEnvironmentService{contexts: contexts, enabled: enabled, sessionID: rand.Text()}
+func NewExternalSUEnvironmentService(contexts *vprocore.ContextService) *ExternalSUEnvironmentService {
+	return &ExternalSUEnvironmentService{contexts: contexts, sessionID: rand.Text()}
 }
 
 type ExternalSUEnvironmentReview struct {
@@ -91,7 +88,7 @@ type ExternalSUEnvironmentOutcome struct {
 	ErrorMessage string                     `json:"errorMessage"`
 }
 
-func (s *ExternalSUEnvironmentService) authorize(ctx context.Context, write bool) error {
+func (s *ExternalSUEnvironmentService) authorize(ctx context.Context) error {
 	if ctx == nil {
 		return errors.New("external SU/environment service requires a context")
 	}
@@ -101,14 +98,11 @@ func (s *ExternalSUEnvironmentService) authorize(ctx context.Context, write bool
 	if s == nil || s.contexts == nil || s.sessionID == "" {
 		return errors.New("external SU/environment service requires its owned SQLite context and service owner")
 	}
-	if write && !s.enabled {
-		return errors.New("external SU/environment editing is disabled in this session")
-	}
 	return nil
 }
 
 func (s *ExternalSUEnvironmentService) GetReview(ctx context.Context, contextID string) (*ExternalSUEnvironmentReview, error) {
-	if err := s.authorize(ctx, true); err != nil {
+	if err := s.authorize(ctx); err != nil {
 		return nil, err
 	}
 	source, err := ReviewExternalSUEnvironment(s.contexts, ctx, contextID)
@@ -156,7 +150,7 @@ func (s *ExternalSUEnvironmentService) TransferReviewed(ctx context.Context, con
 
 func (s *ExternalSUEnvironmentService) transferReviewed(ctx context.Context, contextID, requestJSON string,
 	hooks externalSUEnvironmentWriteHooks, afterWrite func()) (outcome *ExternalSUEnvironmentOutcome, resultErr error) {
-	if err := s.authorize(ctx, true); err != nil {
+	if err := s.authorize(ctx); err != nil {
 		return nil, err
 	}
 	var request ExternalSUEnvironmentRequest

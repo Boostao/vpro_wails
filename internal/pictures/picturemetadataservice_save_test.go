@@ -32,15 +32,12 @@ func TestPictureMetadataServiceSaveReceiptAndStableReplay(t *testing.T) {
 		t.Fatal(err)
 	}
 	pictures, err := NewPictureService(contexts, pictureServiceLookup(map[string]string{
-		PictureReadingEnvironment: "true",
 		pictureLibraryEnvironment: path,
 	}))
 	if err != nil {
 		t.Fatal(err)
 	}
-	service, err := NewPictureMetadataService(pictures, pictureServiceLookup(map[string]string{
-		pictureMetadataWritingEnvironment: "true",
-	}))
+	service, err := NewPictureMetadataService(pictures)
 	if err != nil {
 		t.Fatal(err)
 	}

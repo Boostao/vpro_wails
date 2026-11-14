@@ -46,9 +46,7 @@ func twoPageVegetationTableFixture(t *testing.T, external bool) (*TwoPageVegetat
 	}
 	vprotest.MutateContextFixture(t, state.SUPath, `DELETE FROM Report_SU;
 		INSERT INTO Report_SU(PlotNumber) VALUES('108050'),('A'),('a'),('B'),(NULL),('absent')`)
-	service, err := NewTwoPageVegetationTableService(contexts, func(name string) (string, bool) {
-		return "true", name == twoPageVegetationTableEnvironment
-	})
+	service, err := NewTwoPageVegetationTableService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -247,27 +245,12 @@ func TestTwoPageVegetationTableInvalidSourceAndRetry(t *testing.T) {
 
 func TestTwoPageVegetationTableGatesAndRequestGuards(t *testing.T) {
 	service, state, _ := twoPageVegetationTableFixture(t, false)
-	if got, err := NewTwoPageVegetationTableService(nil, func(string) (string, bool) { return "true", true }); err == nil || got != nil {
+	if got, err := NewTwoPageVegetationTableService(nil); err == nil || got != nil {
 		t.Fatal("unowned constructor succeeded", got, err)
 	}
-	if got, err := NewTwoPageVegetationTableService(service.contexts, nil); err == nil || got != nil {
-		t.Fatal("missing explicit gate lookup succeeded", got, err)
-	}
-	for _, value := range []string{"", "false", "true", "TRUE", "1"} {
-		got, err := NewTwoPageVegetationTableService(service.contexts, func(string) (string, bool) { return value, value != "" })
-		if value == "TRUE" || value == "1" {
-			if err == nil {
-				t.Fatal("malformed gate accepted", value)
-			}
-			continue
-		}
-		if err != nil || got.review != (value != "false") {
-			t.Fatal("independent gate default changed", value, got, err)
-		}
-	}
-	for _, unavailable := range []*TwoPageVegetationTableService{nil, {}, {contexts: service.contexts}} {
+	for _, unavailable := range []*TwoPageVegetationTableService{nil, {}} {
 		if got, err := unavailable.GetReview(context.Background(), state.ContextID, "108050", "FS882-8x6XL", 0, 1); err == nil || got != nil {
-			t.Fatal("disabled service returned source", got, err)
+			t.Fatal("unowned service returned source", got, err)
 		}
 	}
 	for _, test := range []struct{ plot, form string }{{"", "FS882-8x6XL"}, {"\xff", "FS882-8x6XL"}, {"108050", "FS882-6x4XL"}} {

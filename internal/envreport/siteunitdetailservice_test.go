@@ -21,10 +21,6 @@ func TestSiteUnitSummaryOwnedPreviewMethodsAndZeroWrites(t *testing.T) {
 	for _, external := range []bool{false, true} {
 		t.Run(map[bool]string{false: "project", true: "external"}[external], func(t *testing.T) {
 			service, state := vprotest.ReportServiceFixture(t, external)
-			if _, err := PreviewSiteUnitSummary(service, context.Background(), state.ContextID, SiteUnitSummaryRequest{1}); err == nil {
-				t.Fatal("default gate enabled")
-			}
-			service.SiteUnitSummaryEnabled = true
 			before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
 			config, err := os.ReadFile(service.Projects.Preferences.Path)
 			if err != nil {
@@ -49,7 +45,6 @@ func TestSiteUnitSummaryOwnedPreviewMethodsAndZeroWrites(t *testing.T) {
 
 func TestSiteUnitSummaryCancellationCleanupStaleAndRetry(t *testing.T) {
 	service, state := vprotest.ReportServiceFixture(t, true)
-	service.SiteUnitSummaryEnabled = true
 	sentinel := errors.New("summary snapshot cleanup failed")
 	for _, hooks := range []vprocore.PublicationReadSnapshotHooks{{CommitRead: func(*sql.Tx) error { return sentinel }},
 		{RollbackRead: func(*sql.Tx) error { return sentinel }}} {
@@ -92,21 +87,12 @@ func TestSiteUnitSummaryCancellationCleanupStaleAndRetry(t *testing.T) {
 	}
 }
 
-func TestSiteUnitSummaryStrictRequestAndFeature(t *testing.T) {
+func TestSiteUnitSummaryStrictRequest(t *testing.T) {
 	for _, raw := range []string{`{}`, `{"method":null}`, `{"method":1,"method":2}`, `{"Method":1}`, `{"method":1,"species":true}`, `{"method":"1"}`} {
 		var request SiteUnitSummaryRequest
 		if err := json.Unmarshal([]byte(raw), &request); err == nil {
 			t.Fatal("incomplete or ambiguous request accepted", raw)
 		}
-	}
-	if _, err := vprocore.SiviFeature(SiteUnitSummaryFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil {
-		t.Fatal(err)
-	}
-	if enabled, err := vprocore.SiviFeature(SiteUnitSummaryFeatureEnvironment, func(string) (string, bool) { return "", false }); err != nil || !enabled {
-		t.Fatal("default not on", err)
-	}
-	if _, err := vprocore.SiviFeature(SiteUnitSummaryFeatureEnvironment, func(string) (string, bool) { return "TRUE", true }); err == nil {
-		t.Fatal("malformed flag accepted")
 	}
 }
 
@@ -114,10 +100,6 @@ func TestSiteUnitSummarySavedOptionsOwnedAndReadOnly(t *testing.T) {
 	for _, external := range []bool{false, true} {
 		t.Run(map[bool]string{false: "project", true: "external"}[external], func(t *testing.T) {
 			service, state := vprotest.ReportServiceFixture(t, external)
-			if _, err := GetSiteUnitSummaryOptions(service, context.Background(), state.ContextID); err == nil {
-				t.Fatal("default options gate enabled")
-			}
-			service.SiteUnitSummaryEnabled = true
 			for _, unitType := range []int{1, 2, 3} {
 				if err := service.Projects.Preferences.Update("ReportOptions", map[string]any{
 					"SEOptValueMethod": 2, "SESuType": unitType,
@@ -147,7 +129,6 @@ func TestSiteUnitSummarySavedOptionsOwnedAndReadOnly(t *testing.T) {
 
 func TestSiteUnitSummarySavedOptionsRefuseMalformedAndMissing(t *testing.T) {
 	service, state := vprotest.ReportServiceFixture(t, true)
-	service.SiteUnitSummaryEnabled = true
 	for _, invalid := range []struct {
 		key   string
 		value any
@@ -175,7 +156,6 @@ func TestSiteUnitSummarySavedOptionsRefuseMalformedAndMissing(t *testing.T) {
 
 func TestSiteUnitSummarySavedOptionsCancellationCleanupAndRetry(t *testing.T) {
 	service, state := vprotest.ReportServiceFixture(t, true)
-	service.SiteUnitSummaryEnabled = true
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 	if _, err := GetSiteUnitSummaryOptions(service, ctx, state.ContextID); !errors.Is(err, context.Canceled) {

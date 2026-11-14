@@ -27,7 +27,6 @@ func summaryCommonFirstWorkbookOptions(grouping, average int) SummaryVegetationW
 func summaryCommonFirstDesktopFixture(t *testing.T, external bool) (*SummaryVegetationWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	service, state := summaryStrataReferenceWorkbookFixture(t, external)
-	service.AncillaryEnabled = true
 	owner := service.source.environment.report.contexts.Projects.Sqlite
 	vprotest.MutateContextFixture(t, owner.Attachments["VLists"], `
 		INSERT INTO USysAllSpecs(Code,ScientificName,Lifeform,EnglishName,Codetype,IsAttribute,CombinedEnglishName)
@@ -182,8 +181,7 @@ func TestSummaryCommonFirstWorkbookOwnedOutputAndClientWire(t *testing.T) {
 			t.Fatal("unanimous inspection persisted preferences", err)
 		}
 	}
-	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookUnanimousCommonWire.json",
-		"VPRO_UPDATE_SUMMARY_UNANIMOUS_COMMON_WORKBOOK_WIRE", wire)
+	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookUnanimousCommonWire.json", wire)
 }
 
 func TestSummaryCommonFirstWorkbookAuthorityAmbiguityAndRetry(t *testing.T) {
@@ -280,26 +278,6 @@ func TestSummaryCommonFirstWorkbookAuthorityAmbiguityAndRetry(t *testing.T) {
 	}
 	if !reflect.DeepEqual(before, vprotest.DatabaseBytes(t, owner.Attachments)) {
 		t.Fatal("ambiguity/correction/cancellation mutated source")
-	}
-}
-
-func TestSummaryCommonFirstWorkbookIndependentGates(t *testing.T) {
-	service, state := summaryCommonFirstDesktopFixture(t, false)
-	for mask := 0; mask < 8; mask++ {
-		service.GroupedEnabled, service.ReferencesEnabled, service.PresentationEnabled = mask&1 != 0, mask&2 != 0, mask&4 != 0
-		options := summaryCommonFirstWorkbookOptions(13, 1)
-		review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
-		if mask&3 == 3 {
-			if err != nil || review == nil {
-				t.Fatal("unanimous mode borrowed the Constancy presentation gate", mask, err)
-			}
-		} else if err == nil || review != nil {
-			t.Fatal("independent grouped/reference gate bypassed", mask, err)
-		}
-		ordinary := SummaryVegetationWorkbookOptions{Title: "ordinary", Average: 1, Display: 6}
-		if review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, ordinary)); err != nil || review == nil {
-			t.Fatal("unanimous gates disabled ordinary workbook", mask, err)
-		}
 	}
 }
 

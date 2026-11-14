@@ -9,10 +9,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 )
-
-const speciesAttributeSummaryFeatureEnvironment = "VPRO_SPECIES_ATTRIBUTE_SUMMARY"
 
 type SpeciesAttributeSummaryPreview struct {
 	ContextID   string                        `json:"contextId"`
@@ -23,19 +20,11 @@ type SpeciesAttributeSummaryPreview struct {
 
 type SpeciesAttributeSummaryService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewSpeciesAttributeSummaryService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SpeciesAttributeSummaryService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(speciesAttributeSummaryFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SpeciesAttributeSummaryService{contexts: contexts, enabled: enabled}, nil
+func NewSpeciesAttributeSummaryService(contexts *vprocore.ContextService) (*SpeciesAttributeSummaryService, error) {
+	return &SpeciesAttributeSummaryService{contexts: contexts}, nil
 }
 
 func (s *SpeciesAttributeSummaryService) Preview(ctx context.Context, contextID string) (SpeciesAttributeSummaryPreview, error) {
@@ -45,10 +34,7 @@ func (s *SpeciesAttributeSummaryService) Preview(ctx context.Context, contextID 
 	if err := ctx.Err(); err != nil {
 		return SpeciesAttributeSummaryPreview{}, err
 	}
-	if s == nil || !s.enabled {
-		return SpeciesAttributeSummaryPreview{}, errors.New("species attribute summary is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return SpeciesAttributeSummaryPreview{}, errors.New("species attribute summary context service is unavailable")
 	}
 	if err := vprocore.ValidateGoogleEarthReviewStrings(contextID); err != nil {

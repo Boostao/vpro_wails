@@ -13,12 +13,7 @@ import (
 	"reflect"
 )
 
-const longVegetationQualityMinimumPreferencesFeatureEnvironment = "VPRO_LONG_VEGETATION_QUALITY_MINIMUM_PREFERENCES"
 const longVegetationQualityMinimumSuggestionsSource = "configured-owned-imported-SQLite VLists.USysTableOfLists; PlotQualitySite; ItemOrder then physical rowid; suggestions only"
-
-func LongVegetationQualityMinimumPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(longVegetationQualityMinimumPreferencesFeatureEnvironment, lookup)
-}
 
 type LongVegetationQualityMinimumPreferenceValues struct {
 	SiteMinimum string `json:"siteMinimum"`
@@ -72,12 +67,11 @@ type LongVegetationQualityMinimumPreferencesOutcome struct {
 
 type LongVegetationQualityMinimumPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLongVegetationQualityMinimumPreferencesService(contexts *vprocore.ContextService, enabled bool) *LongVegetationQualityMinimumPreferencesService {
-	return &LongVegetationQualityMinimumPreferencesService{contexts: contexts, enabled: enabled}
+func NewLongVegetationQualityMinimumPreferencesService(contexts *vprocore.ContextService) *LongVegetationQualityMinimumPreferencesService {
+	return &LongVegetationQualityMinimumPreferencesService{contexts: contexts}
 }
 
 func (s *LongVegetationQualityMinimumPreferencesService) require(ctx context.Context, contextID string) error {
@@ -87,10 +81,7 @@ func (s *LongVegetationQualityMinimumPreferencesService) require(ctx context.Con
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Long Vegetation quality minimum preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Long Vegetation quality minimum preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

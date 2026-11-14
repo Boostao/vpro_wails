@@ -11,12 +11,6 @@ import (
 	"errors"
 )
 
-const googleEarthPreferencesFeatureEnvironment = "VPRO_GOOGLE_EARTH_PREFERENCES"
-
-func GoogleEarthPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(googleEarthPreferencesFeatureEnvironment, lookup)
-}
-
 type GoogleEarthPreferenceValues struct {
 	Title            string `json:"title"`
 	DescriptionField string `json:"descriptionField"`
@@ -65,12 +59,11 @@ type GoogleEarthPreferencesOutcome struct {
 
 type GoogleEarthPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewGoogleEarthPreferencesService(contexts *vprocore.ContextService, enabled bool) *GoogleEarthPreferencesService {
-	return &GoogleEarthPreferencesService{contexts: contexts, enabled: enabled}
+func NewGoogleEarthPreferencesService(contexts *vprocore.ContextService) *GoogleEarthPreferencesService {
+	return &GoogleEarthPreferencesService{contexts: contexts}
 }
 
 func (s *GoogleEarthPreferencesService) require(ctx context.Context, contextID string) error {
@@ -80,10 +73,7 @@ func (s *GoogleEarthPreferencesService) require(ctx context.Context, contextID s
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Google Earth preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Google Earth preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

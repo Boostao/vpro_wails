@@ -9,10 +9,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 )
-
-const lifeformSummaryFeatureEnvironment = "VPRO_LIFEFORM_SUMMARY"
 
 type LifeformSummaryPreview struct {
 	ContextID   string                `json:"contextId"`
@@ -23,19 +20,11 @@ type LifeformSummaryPreview struct {
 
 type LifeformSummaryService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewLifeformSummaryService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*LifeformSummaryService, error) {
-	if lookup == nil {
-		lookup = os.LookupEnv
-	}
-	enabled, err := vprocore.SiviFeature(lifeformSummaryFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &LifeformSummaryService{contexts: contexts, enabled: enabled}, nil
+func NewLifeformSummaryService(contexts *vprocore.ContextService) (*LifeformSummaryService, error) {
+	return &LifeformSummaryService{contexts: contexts}, nil
 }
 
 func (s *LifeformSummaryService) Preview(ctx context.Context, contextID string) (LifeformSummaryPreview, error) {
@@ -45,10 +34,7 @@ func (s *LifeformSummaryService) Preview(ctx context.Context, contextID string) 
 	if err := ctx.Err(); err != nil {
 		return LifeformSummaryPreview{}, err
 	}
-	if s == nil || !s.enabled {
-		return LifeformSummaryPreview{}, errors.New("Lifeform Summary is disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return LifeformSummaryPreview{}, errors.New("Lifeform Summary context service is unavailable")
 	}
 	if err := vprocore.ValidateGoogleEarthReviewStrings(contextID); err != nil {

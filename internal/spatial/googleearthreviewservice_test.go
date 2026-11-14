@@ -15,7 +15,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 	"time"
 )
@@ -29,28 +28,10 @@ func googleEarthReviewRequestJSON(t *testing.T, request GoogleEarthReviewRequest
 	return string(raw)
 }
 
-func TestGoogleEarthReviewFeatureLiteralIndependentGate(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{
-		{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true},
-		{" true ", true, false, true}, {"true\n", true, false, true},
-	} {
-		enabled, err := GoogleEarthReviewFeature(func(name string) (string, bool) {
-			if name != "VPRO_GOOGLE_EARTH_REVIEW" {
-				t.Fatal("unrelated feature lookup", name)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
+func TestGoogleEarthReviewUnavailableGuards(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	for _, service := range []*GoogleEarthReviewService{nil, {}, NewGoogleEarthReviewService(nil, false), NewGoogleEarthReviewService(nil, true)} {
+	for _, service := range []*GoogleEarthReviewService{nil, {}, NewGoogleEarthReviewService(nil)} {
 		if got, err := service.GetGoogleEarthReview(context.Background(), "id", googleEarthReviewRequestJSON(t, GoogleEarthReviewRequest{"Zone", 0, 1})); got != nil || err == nil {
 			t.Fatal("unavailable service returned review", got, err)
 		}
@@ -58,7 +39,7 @@ func TestGoogleEarthReviewFeatureLiteralIndependentGate(t *testing.T) {
 			t.Fatal("unavailable service returned fields", got, err)
 		}
 		if got, err := service.GetGoogleEarthReview(ctx, "id", "{}"); got != nil || !errors.Is(err, context.Canceled) {
-			t.Fatal("disabled cancellation precedence lost", got, err)
+			t.Fatal("cancellation precedence lost", got, err)
 		}
 	}
 }
@@ -72,7 +53,7 @@ UPDATE Sample_Env SET "Custom desc ] ; O'Brien"='' WHERE rowid%3=1;
 UPDATE Sample_Env SET Longitude=-181,Latitude=91 WHERE rowid=(SELECT MIN(rowid) FROM Sample_Env WHERE Longitude IS NOT NULL AND Latitude IS NOT NULL)`)
 	check := vprotest.AssertPlotLocationFacadeReadOnly(t, contexts)
 	defer check()
-	service := NewGoogleEarthReviewService(contexts, true)
+	service := NewGoogleEarthReviewService(contexts)
 	field := "Custom desc ] ; O'Brien"
 	choices, err := service.GetGoogleEarthDescriptionFields(context.Background(), state.ContextID)
 	if err != nil || choices == nil || choices.ContextID != state.ContextID || choices.Project != "Sample" ||
@@ -139,11 +120,6 @@ UPDATE Sample_Env SET Longitude=-181,Latitude=91 WHERE rowid=(SELECT MIN(rowid) 
 			t.Fatal("beyond-end or extreme paging overflow", got, err)
 		}
 	}
-	disabled := NewGoogleEarthReviewService(contexts, false)
-	contexts.PlotLocationReviewEnabled, contexts.TableCSVReviewEnabled, contexts.SiviParentReviewEnabled = true, true, true
-	if got, err := disabled.GetGoogleEarthReview(context.Background(), state.ContextID, googleEarthReviewRequestJSON(t, GoogleEarthReviewRequest{field, 0, 1})); got != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("other flags enabled Earth review", got, err)
-	}
 }
 
 func TestGoogleEarthReviewFacadeExternalSUFanoutNullEmptyAndBlob(t *testing.T) {
@@ -174,7 +150,7 @@ INSERT INTO Earth_SU SELECT PlotNumber,'' FROM source.Sample_Env WHERE Latitude 
 	}
 	check := vprotest.AssertPlotLocationFacadeReadOnly(t, contexts)
 	defer check()
-	service := NewGoogleEarthReviewService(contexts, true)
+	service := NewGoogleEarthReviewService(contexts)
 	got, err := service.GetGoogleEarthReview(context.Background(), next.ContextID, googleEarthReviewRequestJSON(t, GoogleEarthReviewRequest{"Earth description", 0, 500}))
 	if err != nil || got == nil || len(got.Rows) != 6 || got.SU != "Earth" || got.SUPath != next.SUPath {
 		t.Fatal("external SU fanout or provenance lost", got, err)
@@ -201,7 +177,7 @@ INSERT INTO Earth_SU SELECT PlotNumber,'' FROM source.Sample_Env WHERE Latitude 
 
 func TestGoogleEarthReviewFacadeRejectsInvalidRequestsAndTransport(t *testing.T) {
 	contexts, state := vprotest.ContextServiceFixture(t)
-	service := NewGoogleEarthReviewService(contexts, true)
+	service := NewGoogleEarthReviewService(contexts)
 	check := vprotest.AssertPlotLocationFacadeReadOnly(t, contexts)
 	defer check()
 	for _, request := range []GoogleEarthReviewRequest{
@@ -249,7 +225,7 @@ func TestGoogleEarthReviewFacadeRejectsInvalidRequestsAndTransport(t *testing.T)
 
 func TestGoogleEarthReviewFacadeStaleOwnershipPhysicalScopeCancellationRetry(t *testing.T) {
 	contexts, state := vprotest.ContextServiceFixture(t)
-	service := NewGoogleEarthReviewService(contexts, true)
+	service := NewGoogleEarthReviewService(contexts)
 	methods := []func(context.Context, string) (bool, error){
 		func(ctx context.Context, id string) (bool, error) {
 			value, err := service.GetGoogleEarthReview(ctx, id, googleEarthReviewRequestJSON(t, GoogleEarthReviewRequest{"Zone", 0, 1}))
@@ -316,7 +292,7 @@ func TestGoogleEarthReviewFacadeStaleOwnershipPhysicalScopeCancellationRetry(t *
 
 func TestGoogleEarthDescriptionFieldsDoesNotNestOperationLease(t *testing.T) {
 	contexts, state := vprotest.ContextServiceFixture(t)
-	service := NewGoogleEarthReviewService(contexts, true)
+	service := NewGoogleEarthReviewService(contexts)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	queued := &vprotest.TableCSVLeaseContext{Context: ctx, Queued: make(chan struct{})}
@@ -365,7 +341,7 @@ func TestGoogleEarthReviewFacadeRejectsPhysicalViewAndMalformedHistoricalText(t 
 		contexts, state := vprotest.ContextServiceFixture(t)
 		vprotest.MutateContextFixture(t, state.ProjectPath, mutation)
 		check := vprotest.AssertPlotLocationFacadeReadOnly(t, contexts)
-		service := NewGoogleEarthReviewService(contexts, true)
+		service := NewGoogleEarthReviewService(contexts)
 		if got, err := service.GetGoogleEarthReview(context.Background(), state.ContextID, googleEarthReviewRequestJSON(t, GoogleEarthReviewRequest{"Zone", 0, 1})); got != nil || err == nil {
 			t.Fatal("physical impostor/malformed text returned review", got, err)
 		}

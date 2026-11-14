@@ -17,7 +17,7 @@ func TestProjectScopeBuildFinalRevalidationRejectsGapDriftWithoutReplacingReceip
 	for _, change := range []string{"project", "su", "config", "final-read-cleanup"} {
 		private, state := vegetationWorkbookServiceFixture(t, true)
 		contexts := private.contexts
-		scope := NewLongVegetationReportScopeService(contexts, true)
+		scope := NewLongVegetationReportScopeService(contexts)
 		ctx := context.Background()
 		active, err := scope.SetLongVegetationReportScope(ctx, state.ContextID,
 			projectScopeRequestJSON(t, "0", vprocore.VegetationProjectFieldsScope))
@@ -74,8 +74,8 @@ func TestProjectScopeBuildFinalRevalidationRejectsGapDriftWithoutReplacingReceip
 
 func TestProjectScopeSelectedGetterRechecksIntentInsideOwnedSnapshot(t *testing.T) {
 	private, state := vegetationWorkbookServiceFixture(t, true)
-	scope := NewLongVegetationReportScopeService(private.contexts, true)
-	selected := NewLongVegetationSelectedUnitSelectionService(private.contexts, true)
+	scope := NewLongVegetationReportScopeService(private.contexts)
+	selected := NewLongVegetationSelectedUnitSelectionService(private.contexts)
 	ctx := context.Background()
 	selected.beforeRead = func() {
 		if _, err := scope.SetLongVegetationReportScope(ctx, state.ContextID,

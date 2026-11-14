@@ -15,14 +15,13 @@ import (
 
 func TestLongVegetationUnitPreferencesEnforcementResetConflictsAndOwnedRetry(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, true)
-	contexts.LongVegetationNoneUnitsEnabled = true
-	service := NewLongVegetationUnitPreferencesService(contexts, true)
+	service := NewLongVegetationUnitPreferencesService(contexts)
 	store := contexts.Projects.Preferences
 	beforeDB := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 	if result := service.SaveLongVegetationUnitPreferences(context.Background(), state.ContextID, vegetationUnitRequest(t, 1, 3)); !result.Committed || !result.Changed || result.ErrorMessage != "" {
 		t.Fatal(result)
 	}
-	enforcement := NewLongVegetationEnforcementPreferencesService(contexts, true)
+	enforcement := NewLongVegetationEnforcementPreferencesService(contexts)
 	enforcement.printers = enforcementFixtureObserver
 	review, err := enforcement.GetLongVegetationEnforcementPreferences(context.Background(), state.ContextID)
 	if err != nil || review.Values.UnitGroups != 3 {
@@ -57,8 +56,7 @@ func TestLongVegetationUnitPreferencesEnforcementResetConflictsAndOwnedRetry(t *
 
 func TestLongVegetationUnitPreferencesCancellationOwnershipAndStaleContext(t *testing.T) {
 	contexts, state := vprotest.ReportServiceFixture(t, true)
-	contexts.LongVegetationNoneUnitsEnabled = true
-	service := NewLongVegetationUnitPreferencesService(contexts, true)
+	service := NewLongVegetationUnitPreferencesService(contexts)
 	owner := contexts.Projects.Sqlite
 	original := owner.AttachmentInfo["su"]
 	owner.AttachmentInfo["su"] = owner.AttachmentInfo["project"]

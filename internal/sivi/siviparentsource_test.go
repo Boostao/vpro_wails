@@ -39,7 +39,6 @@ func TestSIVIASCIIJoinOracleDomain(t *testing.T) {
 
 func TestSIVIParentJoinDetectsPhysicalAliasesAndUnknowns(t *testing.T) {
 	service, state := vprotest.ContextServiceFixture(t)
-	service.SiviParentReviewEnabled = true
 	vprotest.MutateContextFixture(t, state.ProjectPath, `DELETE FROM Sample_Env; DELETE FROM Sample_Admin;
 		INSERT INTO Sample_Env(PlotNumber) VALUES('ABC1'); INSERT INTO Sample_Admin(Plot) VALUES('ABC1')`)
 	for _, test := range []struct{ sql, restore, reason string }{
@@ -79,10 +78,6 @@ func TestSIVIProjectIDSourceOwnedCASRollbackAndNoPlotWrites(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, err := SetSIVIProjectIDSource(service, ctx, state.ContextID, 2, 1); got != nil || err == nil {
-		t.Fatal("default gate enabled preference writer")
-	}
-	service.SiviParentReviewEnabled = true
 	for _, requested := range []int{0, 3} {
 		if got, err := SetSIVIProjectIDSource(service, ctx, state.ContextID, 2, requested); got != nil || err == nil {
 			t.Fatal("invalid source accepted")
@@ -130,7 +125,6 @@ func TestSIVIProjectIDSourceOwnedCASRollbackAndNoPlotWrites(t *testing.T) {
 
 func TestSIVIProjectIDSourceConcurrentCollisionAndMetadataPreflight(t *testing.T) {
 	service, state := vprotest.ContextServiceFixture(t)
-	service.SiviParentReviewEnabled = true
 	var wait sync.WaitGroup
 	results := make(chan error, 2)
 	for i := 0; i < 2; i++ {

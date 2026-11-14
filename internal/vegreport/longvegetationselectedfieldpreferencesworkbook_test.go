@@ -52,7 +52,6 @@ func TestLongVegetationSelectedScalarOwnedPublicationStaleSourceAndConfiguration
 			if _, err := lists.Exec(`UPDATE USysAllSpecs SET Literal=?`, test.value); err != nil {
 				t.Fatal(err)
 			}
-			contexts.LongVegetationSelectedFieldEnabled = true
 			if err := contexts.Projects.Preferences.Update("ReportOptions", map[string]any{"LVShowEnglishName": 4, "LVShowField": "Literal"}); err != nil {
 				t.Fatal(err)
 			}
@@ -134,8 +133,6 @@ func TestLongVegetationSelectedScalarOwnedNullScientificFallbackRefusesUnverifie
 		t.Run(map[bool]string{false: "same-fallback", true: "case-equivalent-mixed-fallback"}[mixed], func(t *testing.T) {
 			service, state := vegetationWorkbookServiceFixture(t, true)
 			contexts := service.contexts
-			contexts.LongVegetationSelectedFieldEnabled = true
-			contexts.LongVegetationNoneEnabled, contexts.LongVegetationStrataEnabled, contexts.LongVegetationLifeformEnabled = true, true, true
 			project, err := sql.Open("sqlite3", sqlutil.SqliteFileURI(state.ProjectPath, "ro"))
 			if err != nil {
 				t.Fatal(err)
@@ -226,7 +223,6 @@ func TestLongVegetationSelectedScalarOwnedNullScientificFallbackRefusesUnverifie
 func TestLongVegetationSelectedFieldMatchingUnsupportedSourceIdentifiersRemainStoredButUnavailable(t *testing.T) {
 	service, state := vegetationWorkbookServiceFixture(t, true)
 	contexts := service.contexts
-	contexts.LongVegetationSelectedFieldEnabled = true
 	if err := contexts.Projects.Preferences.Update("ReportOptions", map[string]any{"LVShowField": ""}); err != nil {
 		t.Fatal(err)
 	}
@@ -243,7 +239,7 @@ func TestLongVegetationSelectedFieldMatchingUnsupportedSourceIdentifiersRemainSt
 			t.Error(err)
 		}
 	})
-	editor := NewLongVegetationSelectedFieldPreferencesService(contexts, true)
+	editor := NewLongVegetationSelectedFieldPreferencesService(contexts)
 	for _, field := range []string{"Bad Name", "Select", `Quoted"name`, "Foo.Bar", "[Code]", "UnverifiedName"} {
 		if _, err := lists.Exec(`ALTER TABLE USysAllSpecs ADD COLUMN ` + vprocore.QuoteHeaderIdentifier(field) + ` TEXT`); err != nil {
 			t.Fatal(err)

@@ -14,9 +14,7 @@ import (
 
 func TestSummaryDraftWorkbookClientWire(t *testing.T) {
 	source, state := summaryEnvironmentalLifeformServiceFixture(t, false)
-	service, err := NewSummaryVegetationWorkbookService(source, func(name string) (string, bool) {
-		return "true", name == summaryVegetationWorkbookFeatureEnvironment
-	})
+	service, err := NewSummaryVegetationWorkbookService(source)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,11 +68,6 @@ func TestSummaryDraftWorkbookClientWire(t *testing.T) {
 		t.Fatal("strict production review DTO round trip differs", err)
 	}
 	path := filepath.Join("frontend", "src", "summaryVegetationWorkbookWire.json")
-	if os.Getenv("VPRO_UPDATE_SUMMARY_WORKBOOK_WIRE") == "true" {
-		if err := os.WriteFile(path, raw, 0600); err != nil {
-			t.Fatal(err)
-		}
-	}
 	expected, err := os.ReadFile(path)
 	if err != nil || !bytes.Equal(expected, raw) {
 		t.Fatal("portable strict-Go Summary workbook wire differs", err)

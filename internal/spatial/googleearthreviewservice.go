@@ -13,19 +13,12 @@ import (
 	"strings"
 )
 
-const googleEarthReviewFeatureEnvironment = "VPRO_GOOGLE_EARTH_REVIEW"
-
-func GoogleEarthReviewFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(googleEarthReviewFeatureEnvironment, lookup)
-}
-
 type GoogleEarthReviewService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewGoogleEarthReviewService(contexts *vprocore.ContextService, enabled bool) *GoogleEarthReviewService {
-	return &GoogleEarthReviewService{contexts: contexts, enabled: enabled}
+func NewGoogleEarthReviewService(contexts *vprocore.ContextService) *GoogleEarthReviewService {
+	return &GoogleEarthReviewService{contexts: contexts}
 }
 
 type GoogleEarthReviewRequest struct {
@@ -79,13 +72,13 @@ type GoogleEarthDescriptionFields struct {
 }
 
 func (s *GoogleEarthReviewService) requireReview(ctx context.Context) error {
+	if ctx == nil {
+		return errors.New("Google Earth review requires a context")
+	}
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Google Earth read-only review is disabled in this session")
-	}
-	if s.contexts == nil {
+	if s == nil || s.contexts == nil {
 		return errors.New("Google Earth review context service is unavailable")
 	}
 	return nil

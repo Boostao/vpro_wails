@@ -12,19 +12,12 @@ import (
 	"strings"
 )
 
-const googleEarthKMLFeatureEnvironment = "VPRO_GOOGLE_EARTH_KML_PREVIEW"
-
-func GoogleEarthKMLFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(googleEarthKMLFeatureEnvironment, lookup)
-}
-
 type GoogleEarthKMLService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewGoogleEarthKMLService(contexts *vprocore.ContextService, enabled bool) *GoogleEarthKMLService {
-	return &GoogleEarthKMLService{contexts: contexts, enabled: enabled}
+func NewGoogleEarthKMLService(contexts *vprocore.ContextService) *GoogleEarthKMLService {
+	return &GoogleEarthKMLService{contexts: contexts}
 }
 
 type GoogleEarthKMLRequest struct {
@@ -62,10 +55,7 @@ func (s *GoogleEarthKMLService) GetGoogleEarthKMLReview(ctx context.Context, con
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || !s.enabled {
-		return nil, errors.New("Google Earth KML byte preview is disabled in this session")
-	}
-	if s.contexts == nil {
+	if s == nil || s.contexts == nil {
 		return nil, errors.New("Google Earth KML context service is unavailable")
 	}
 	var request GoogleEarthKMLRequest

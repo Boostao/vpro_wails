@@ -51,31 +51,19 @@ func TestSummaryGroupedAncillaryDesktopClientWire(t *testing.T) {
 	for _, item := range summaryGroupedAncillaryCases() {
 		wire[item.name] = portableSummaryWorkbookReview(t, service, state, summaryGroupedAncillaryOptions(item))
 	}
-	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookGroupedAncillaryWire.json",
-		"VPRO_UPDATE_SUMMARY_GROUPED_ANCILLARY_WORKBOOK_WIRE", wire)
+	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookGroupedAncillaryWire.json", wire)
 }
 
-func TestSummaryGroupedAncillaryIndependentGatesAndRetainedAuthority(t *testing.T) {
+func TestSummaryGroupedAncillaryRetainedAuthority(t *testing.T) {
 	service, state := summaryStrataReferenceWorkbookFixture(t, false)
 	options := summaryGroupedAncillaryOptions(summaryGroupedAncillaryCases()[1])
-	for _, grouped := range []bool{false, true} {
-		for _, ancillary := range []bool{false, true} {
-			for _, references := range []bool{false, true} {
-				service.GroupedEnabled, service.AncillaryEnabled, service.ReferencesEnabled = grouped, ancillary, references
-				review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
-				if grouped && ancillary && references {
-					if err != nil || review == nil {
-						t.Fatal("fully authorized composition refused", err)
-					}
-				} else if err == nil || review != nil {
-					t.Fatal("independent grouped ancillary/reference gate bypassed", grouped, ancillary, references)
-				}
-			}
-		}
+	review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options))
+	if err != nil || review == nil {
+		t.Fatal("fully authorized composition refused", err)
 	}
 	guideOnly := options
 	guideOnly.References = &SummaryVegetationReferenceOptions{UseGuideNames: true}
-	review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, guideOnly))
+	review, err = service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, guideOnly))
 	if err != nil || review == nil || !reflect.DeepEqual(review.Options, guideOnly) ||
 		review.Preview.References == nil || !review.Preview.References.ShowCommon || !review.Preview.References.UseGuideNames {
 		t.Fatal("guide-only transport authority was rewritten or lost its effective common projection", err)

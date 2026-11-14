@@ -13,8 +13,6 @@ import (
 	"unicode/utf8"
 )
 
-const twoPageSourceAuditReviewEnvironment = "VPRO_TWO_PAGE_SOURCE_AUDIT_REVIEW"
-
 type TwoPageSourceAuditOriginal struct {
 	ContextID    string                        `json:"contextId"`
 	Project      string                        `json:"project"`
@@ -27,18 +25,13 @@ type TwoPageSourceAuditOriginal struct {
 
 type TwoPageSourceAuditService struct {
 	contexts *vprocore.ContextService
-	review   bool
 }
 
-func NewTwoPageSourceAuditService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*TwoPageSourceAuditService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("two-page source audit requires owned contexts and explicit feature lookup")
+func NewTwoPageSourceAuditService(contexts *vprocore.ContextService) (*TwoPageSourceAuditService, error) {
+	if contexts == nil {
+		return nil, errors.New("two-page source audit requires owned contexts")
 	}
-	review, err := vprocore.SiviFeature(twoPageSourceAuditReviewEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &TwoPageSourceAuditService{contexts: contexts, review: review}, nil
+	return &TwoPageSourceAuditService{contexts: contexts}, nil
 }
 
 func (s *TwoPageSourceAuditService) GetOriginal(ctx context.Context, contextID, plot, form string) (*TwoPageSourceAuditOriginal, error) {
@@ -48,8 +41,8 @@ func (s *TwoPageSourceAuditService) GetOriginal(ctx context.Context, contextID, 
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s == nil || s.contexts == nil || !s.review {
-		return nil, errors.New("two-page source audit reads require independently enabled audit review")
+	if s == nil || s.contexts == nil {
+		return nil, errors.New("two-page source audit requires owned contexts")
 	}
 	if plot == "" || !utf8.ValidString(plot) {
 		return nil, errors.New("two-page source audit requires an exact valid literal parent")

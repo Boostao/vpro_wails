@@ -12,53 +12,11 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
-	"strings"
 	"testing"
 )
 
-func TestSIVIHeightFeatureRequiresExplicitLiteralOptIn(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{
-		{"", false, true, false},
-		{"true", true, true, false},
-		{"false", true, false, false},
-		{"", true, false, true},
-		{"TRUE", true, false, true},
-		{"1", true, false, true},
-		{" true ", true, false, true},
-	} {
-		enabled, err := SiviHeightFeature(func(name string) (string, bool) {
-			if name != "VPRO_SIVI_HEIGHT_EDITING" {
-				t.Fatal("unexpected feature setting", name)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
-}
-
-func TestSIVIHeightFacadeDefaultDeniesWithoutDatabaseChanges(t *testing.T) {
-	service, state, _, original, edits := sftest.SiviWriteFixture(t, true, 3)
-	before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
-	if result, err := GetSIVIVegetation(service, context.Background(), state.ContextID, "108050", false); result != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("default reader was enabled", result, err)
-	}
-	if result, err := SaveSIVIHeights(service, context.Background(), state.ContextID, "108050", false, original, edits); result != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("default writer was enabled", result, err)
-	}
-	if result, err := RestoreSIVIHeights(service, context.Background(), state.ContextID, "108050", "1", vprocore.AuditRestoreCancel); result != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("default restorer was enabled", result, err)
-	}
-	vprotest.AssertProfileSUFiles(t, service, before)
-}
-
 func TestSIVIHeightFacadeTransportAndOwnedRoundTrip(t *testing.T) {
 	service, state, db, original, edits := sftest.SiviWriteFixture(t, true, 3)
-	service.SiviHeightEnabled = true
 	review, err := GetSIVIVegetation(service, context.Background(), state.ContextID, "108050", false)
 	if err != nil || !reflect.DeepEqual(review, original) {
 		t.Fatal("public source read differs", review, err)

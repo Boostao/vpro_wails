@@ -54,7 +54,7 @@ func TestLongVegetationEnforcementIndependentQualification(t *testing.T) {
 		t.Fatal(err)
 	}
 	beforeDB := vprotest.DatabaseBytes(t, owner.Attachments)
-	preferences := NewLongVegetationEnforcementPreferencesService(contexts, true)
+	preferences := NewLongVegetationEnforcementPreferencesService(contexts)
 	preferences.printers = enforcementFixtureObserver
 	for _, active := range []bool{true, false} {
 		before, err := preferences.GetLongVegetationEnforcementPreferences(context.Background(), state.ContextID)
@@ -86,7 +86,7 @@ func TestLongVegetationEnforcementWorkbookStaleApprovalAndReset(t *testing.T) {
 		t.Run(map[bool]string{false: "attached", true: "external"}[external], func(t *testing.T) {
 			private, state := vegetationWorkbookServiceFixture(t, external)
 			workbooks := &VegetationWorkbookService{Private: private}
-			preferences := NewLongVegetationEnforcementPreferencesService(private.contexts, true)
+			preferences := NewLongVegetationEnforcementPreferencesService(private.contexts)
 			preferences.printers = enforcementFixtureObserver
 			store := private.contexts.Projects.Preferences
 			if err := store.Update("ReportOptions", map[string]any{"DataQualityFilterEnforceLV": false, "LVUnitGroups": 1}); err != nil {
@@ -130,13 +130,24 @@ func TestLongVegetationEnforcementWorkbookStaleApprovalAndReset(t *testing.T) {
 			if err := store.Update("ReportOptions", map[string]any{"LVUnitGroups": 3}); err != nil {
 				t.Fatal(err)
 			}
-			if review, err := workbooks.GetReview(context.Background(), state.ContextID, `{"scope":"unlumped"}`); review != nil || err == nil {
-				t.Fatal("unimplemented source unit-group3 became available", review, err)
+			if review, err := workbooks.GetReview(context.Background(), state.ContextID, `{"scope":"unlumped"}`); review == nil || err != nil {
+				t.Fatal("default-on source unit-group3 unavailable", review, err)
 			}
 			result := preferences.SaveLongVegetationEnforcementPreferences(context.Background(), state.ContextID,
 				enforcementRequest(t, LongVegetationEnforcementPreferenceValues{false, 3}, LongVegetationEnforcementPreferenceValues{false, 1}))
 			if !result.Committed || result.ErrorMessage != "" {
-				t.Fatal("changed-away/back pair failed unit-group reset", result)
+				t.Fatal("changed-away/back pair failed unit-group3 reset", result)
+			}
+			if err := store.Update("ReportOptions", map[string]any{"LVUnitGroups": 2}); err != nil {
+				t.Fatal(err)
+			}
+			if review, err := workbooks.GetReview(context.Background(), state.ContextID, `{"scope":"unlumped"}`); review != nil || err == nil {
+				t.Fatal("unreviewed source unit-group2 became available", review, err)
+			}
+			result = preferences.SaveLongVegetationEnforcementPreferences(context.Background(), state.ContextID,
+				enforcementRequest(t, LongVegetationEnforcementPreferenceValues{false, 2}, LongVegetationEnforcementPreferenceValues{false, 1}))
+			if !result.Committed || result.ErrorMessage != "" {
+				t.Fatal("changed-away/back pair failed unit-group2 reset", result)
 			}
 			if review, err := workbooks.GetReview(context.Background(), state.ContextID, `{"scope":"unlumped"}`); review == nil || err != nil {
 				t.Fatal("source callback unit-group1 recovery unavailable", review, err)

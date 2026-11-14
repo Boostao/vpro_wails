@@ -11,24 +11,17 @@ import (
 	"errors"
 )
 
-const siviCreationFeatureEnvironment = "VPRO_SIVI_CREATION_WRITING"
-
 type SIVICreationResult = sourceform.SiviCreationResult
 
 type SIVICreationService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 }
 
-func NewSIVICreationService(contexts *vprocore.ContextService, lookup func(string) (string, bool)) (*SIVICreationService, error) {
-	if contexts == nil || lookup == nil {
-		return nil, errors.New("SIVI creation requires explicit context ownership and feature lookup")
+func NewSIVICreationService(contexts *vprocore.ContextService) (*SIVICreationService, error) {
+	if contexts == nil {
+		return nil, errors.New("SIVI creation requires explicit context ownership")
 	}
-	enabled, err := vprocore.SiviFeature(siviCreationFeatureEnvironment, lookup)
-	if err != nil {
-		return nil, err
-	}
-	return &SIVICreationService{contexts: contexts, enabled: enabled}, nil
+	return &SIVICreationService{contexts: contexts}, nil
 }
 
 func (s *SIVICreationService) require(ctx context.Context) error {
@@ -38,8 +31,8 @@ func (s *SIVICreationService) require(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || s.contexts == nil || !s.enabled {
-		return errors.New("SIVI creation is disabled in this session")
+	if s == nil || s.contexts == nil {
+		return errors.New("SIVI creation requires explicit context ownership")
 	}
 	return nil
 }

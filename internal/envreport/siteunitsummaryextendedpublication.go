@@ -92,12 +92,6 @@ func authorizeSiteUnitSummaryExtendedWorkbook(ctx context.Context, service *vpro
 		request.AndOr != 1 || request.PresenceGreaterThan != 0 || request.CoverGreaterThan != 0) {
 		return errors.New("No-species extension requires lifeform grouping and explicit inactive criteria defaults; original layer workbook is separate")
 	}
-	if request.IncludeSpecies == 1 && !service.SiteUnitSummarySpeciesEnabled {
-		return errors.New("Summary species preview is disabled in this session")
-	}
-	if request.OrderBy == 2 && !service.SiteUnitSummaryLifeformsEnabled {
-		return errors.New("Summary lifeform grouping is disabled in this session")
-	}
 	return nil
 }
 

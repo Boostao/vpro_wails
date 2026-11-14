@@ -14,7 +14,7 @@ import (
 )
 
 func TestExternalSUEnvironmentReadonlyExactHistoryRecovery(t *testing.T) {
-	for _, variant := range []string{"committed", "retired-context-disabled", "duplicate", "absent"} {
+	for _, variant := range []string{"committed", "retired-context", "duplicate", "absent"} {
 		t.Run(variant, func(t *testing.T) {
 			service, state, request, raw := externalSUEnvironmentServiceFixture(t)
 			if variant == "absent" {
@@ -43,14 +43,13 @@ func TestExternalSUEnvironmentReadonlyExactHistoryRecovery(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			if variant == "retired-context-disabled" {
+			if variant == "retired-context" {
 				selection := vprotest.ContextSelection(state)
 				selection.SU, selection.SUPath = "None", ""
 				next, err := service.contexts.SwitchContext(state.ContextID, selection)
 				if err != nil || next.ContextID == state.ContextID {
 					t.Fatal("old context was not retired", next, err)
 				}
-				service.enabled = false
 			}
 			before := vprotest.DatabaseBytes(t, service.contexts.Projects.Sqlite.Attachments)
 			result, err := service.RecoverOutcome(t.Context(), state.ContextID, raw)

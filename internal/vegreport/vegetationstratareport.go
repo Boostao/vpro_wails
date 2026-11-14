@@ -14,8 +14,6 @@ import (
 	"unicode/utf8"
 )
 
-const LongVegetationStrataFeatureEnvironment = "VPRO_LONG_VEGETATION_STRATA"
-
 type vegetationStratumObservation struct {
 	PlotNumber   string
 	Species      vprocore.ProjectMetadataCell

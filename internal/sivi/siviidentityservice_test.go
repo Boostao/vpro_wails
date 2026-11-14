@@ -16,40 +16,9 @@ import (
 	"testing"
 )
 
-func TestSIVIIdentityServiceIndependentGateAndUnavailableContext(t *testing.T) {
-	for _, flag := range []string{"", "false", "true", "TRUE", " true", "1"} {
-		service, err := NewSIVIIdentityService(&vprocore.ContextService{}, func(name string) (string, bool) {
-			if name != SiviIdentityFeatureEnvironment {
-				t.Fatal("identity borrowed predecessor editing authority", name)
-			}
-			return flag, flag != ""
-		})
-		if flag != "" && flag != "false" && flag != "true" {
-			if err == nil || service != nil {
-				t.Fatal("malformed identity gate silently defaulted", service, err)
-			}
-			continue
-		}
-		if err != nil || service.enabled != (flag != "false") {
-			t.Fatal("identity flag is not independently default-on", service, err)
-		}
-		if flag == "false" {
-			if result, err := service.GetOriginal(context.Background(), "owned", "P", false); result != nil || err == nil {
-				t.Fatal("disabled identity source read succeeded", result, err)
-			}
-			if result, err := service.SaveReviewed(context.Background(), "owned", "P", false, `{}`); result != nil || err == nil {
-				t.Fatal("disabled identity save succeeded", result, err)
-			}
-			if result, err := service.RestoreReviewed(context.Background(), "owned", "P", "1", vprocore.AuditRestoreCancel); result != nil || err == nil {
-				t.Fatal("disabled identity restoration cancel borrowed authority", result, err)
-			}
-		}
-	}
-	if service, err := NewSIVIIdentityService(nil, func(string) (string, bool) { return "true", true }); service != nil || err == nil {
+func TestSIVIIdentityServiceUnavailableContext(t *testing.T) {
+	if service, err := NewSIVIIdentityService(nil); service != nil || err == nil {
 		t.Fatal("identity constructed without context ownership", service, err)
-	}
-	if service, err := NewSIVIIdentityService(&vprocore.ContextService{}, nil); service != nil || err == nil {
-		t.Fatal("identity constructed without explicit lookup", service, err)
 	}
 	var missing *SIVIIdentityService
 	if result, err := missing.GetOriginal(context.Background(), "owned", "P", false); result != nil || err == nil {
@@ -67,7 +36,7 @@ func TestSIVIIdentityServiceIndependentGateAndUnavailableContext(t *testing.T) {
 
 func TestSIVIIdentityServiceStrictWireSaveAndRestoration(t *testing.T) {
 	contexts, state, db, original, heights := sftest.SiviWriteFixture(t, false, 0)
-	service, err := NewSIVIIdentityService(contexts, func(string) (string, bool) { return "true", true })
+	service, err := NewSIVIIdentityService(contexts)
 	if err != nil {
 		t.Fatal(err)
 	}

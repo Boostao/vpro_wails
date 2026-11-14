@@ -28,8 +28,7 @@ func TestLongVegetationUnitPreferencesStrictSharedClientWire(t *testing.T) {
 		t.Fatal(err)
 	}
 	contexts, state := vprotest.ReportServiceFixture(t, true)
-	contexts.LongVegetationNoneUnitsEnabled = true
-	service := NewLongVegetationUnitPreferencesService(contexts, true)
+	service := NewLongVegetationUnitPreferencesService(contexts)
 	read, err := service.GetLongVegetationUnitPreferences(context.Background(), state.ContextID)
 	if err != nil {
 		t.Fatal(err)

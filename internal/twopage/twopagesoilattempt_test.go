@@ -29,8 +29,8 @@ func TestTwoPageSoilAttemptSealsUnseenLateDispatchWithoutWrites(t *testing.T) {
 		for _, form := range []string{"SoilHumusXL", "SoilMineralXL"} {
 			t.Run(fmt.Sprintf("%s/external-%v", form, external), func(t *testing.T) {
 				contexts, state, _, request := soilWriteFixture(t, external, form, 3)
-				enabled := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
-				readonly := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true"})
+				enabled := soilFacade(t, contexts)
+				readonly := soilFacade(t, contexts)
 				raw := soilAttemptJSON(t, request)
 				before := vprotest.DatabaseBytes(t, contexts.Projects.Sqlite.Attachments)
 				outcome, err := readonly.RecoverOutcome(context.Background(), state.ContextID, raw)
@@ -63,9 +63,9 @@ func TestTwoPageSoilAttemptSealsUnseenLateDispatchWithoutWrites(t *testing.T) {
 
 func TestTwoPageSoilAttemptRunningSharedFacadesAndCompletedReplay(t *testing.T) {
 	contexts, state, db, request := soilWriteFixture(t, true, "SoilHumusXL", 3)
-	first := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
-	second := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
-	readonly := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true"})
+	first := soilFacade(t, contexts)
+	second := soilFacade(t, contexts)
+	readonly := soilFacade(t, contexts)
 	raw := soilAttemptJSON(t, request)
 	type completion struct {
 		result *TwoPageSoilWriteResult
@@ -144,7 +144,7 @@ func TestTwoPageSoilAttemptRunningSharedFacadesAndCompletedReplay(t *testing.T) 
 
 func TestTwoPageSoilAttemptRollbackCancellationAndCorrectedNewUUID(t *testing.T) {
 	contexts, state, db, request := soilWriteFixture(t, false, "SoilHumusXL", 3)
-	service := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
+	service := soilFacade(t, contexts)
 	if _, err := db.Exec(`CREATE TRIGGER reject_soil BEFORE UPDATE ON Sample_Humus BEGIN SELECT RAISE(ABORT,'attempt rollback'); END`); err != nil {
 		t.Fatal(err)
 	}
@@ -188,7 +188,7 @@ func TestTwoPageSoilAttemptContextRotationNeverCertifiesAbsentOldHistory(t *test
 	for _, commit := range []bool{false, true} {
 		t.Run(fmt.Sprint(commit), func(t *testing.T) {
 			contexts, state, _, request := soilWriteFixture(t, true, "SoilHumusXL", 3)
-			service := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
+			service := soilFacade(t, contexts)
 			raw := soilAttemptJSON(t, request)
 			if commit {
 				if _, err := service.Save(context.Background(), state.ContextID, raw); err != nil {
@@ -221,17 +221,10 @@ func TestTwoPageSoilAttemptContextRotationNeverCertifiesAbsentOldHistory(t *test
 	}
 }
 
-func TestTwoPageSoilAttemptRecoveryGatesStrictTransportAndLeaseCancellation(t *testing.T) {
+func TestTwoPageSoilAttemptRecoveryStrictTransportAndLeaseCancellation(t *testing.T) {
 	contexts, state, _, request := soilWriteFixture(t, false, "SoilHumusXL", 3)
 	raw := soilAttemptJSON(t, request)
-	for _, values := range []map[string]string{{twoPageSoilReviewEnvironment: "false"}, {twoPageSoilReviewEnvironment: "false", twoPageSoilWritingEnvironment: "true"}} {
-		service := soilFacade(t, contexts, values)
-		if outcome, err := service.RecoverOutcome(context.Background(), state.ContextID, raw); err == nil || outcome != nil {
-			t.Fatal("outcome recovery bypassed independent review", outcome, err)
-		}
-
-	}
-	service := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true"})
+	service := soilFacade(t, contexts)
 	if outcome, err := service.RecoverOutcome(nil, state.ContextID, raw); err == nil || outcome != nil {
 		t.Fatal("nil recovery context accepted", outcome, err)
 	}

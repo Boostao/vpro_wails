@@ -16,44 +16,12 @@ import (
 	"testing"
 )
 
-func TestSIVIParentDirectFeatureIsLiteralAndIndependent(t *testing.T) {
-	for _, value := range []string{"", "true", "false", "TRUE", "1", " true "} {
-		for _, present := range []bool{false, true} {
-			got, err := sourceform.SiviParentEditingFeature(func(name string) (string, bool) {
-				if name != "VPRO_SIVI_PARENT_EDITING" {
-					t.Fatal("parent editing used a different feature gate", name)
-				}
-				return value, present
-			})
-			valid := !present || value == "true" || value == "false"
-			if (err == nil) != valid || got != (valid && (!present || value == "true")) {
-				t.Fatal("parent editing flag silently defaulted/coerced", value, present, got, err)
-			}
-		}
-	}
-}
-
-func TestSIVIParentDirectPublicGateOwnedJSONWriteAndRestoration(t *testing.T) {
+func TestSIVIParentDirectOwnedJSONWriteAndRestoration(t *testing.T) {
 	service, state, _, original, edits := sftest.SiviParentWriteFixture(t, true, 3)
 	request := sourceform.SIVIParentDirectWrite{Original: original, Scalars: edits.Scalars, Options: edits.Options, Text: edits.Text, Categorical: edits.Categorical}
 	ctx := context.Background()
-	before := vprotest.DatabaseBytes(t, service.Projects.Sqlite.Attachments)
-	for _, gates := range [][2]bool{{false, false}, {true, false}, {false, true}} {
-		service.SiviParentReviewEnabled, service.SiviParentEditingEnabled = gates[0], gates[1]
-		if got, err := sourceform.GetSIVIParentDirectOriginal(service, ctx, state.ContextID, "108050"); err == nil || got != nil {
-			t.Fatal("direct editor original bypassed either independent parent gate", gates, got, err)
-		}
-		if got, err := sourceform.SaveSIVIParentDirect(service, ctx, state.ContextID, "108050", request); err == nil || got != nil {
-			t.Fatal("public save bypassed either independent parent gate", gates, got, err)
-		}
-		if got, err := sourceform.RestoreSIVIParentDirect(service, ctx, state.ContextID, "108050", "1", vprocore.AuditRestoreCancel); err == nil || got != nil {
-			t.Fatal("public restoration bypassed either independent parent gate", gates, got, err)
-		}
-		vprotest.AssertProfileSUFiles(t, service, before)
-	}
-	service.SiviParentReviewEnabled, service.SiviParentEditingEnabled = true, true
 	if got, err := sourceform.GetSIVIParentDirectOriginal(service, ctx, state.ContextID, "108050"); err != nil || !reflect.DeepEqual(got, original) {
-		t.Fatal("enabled direct editor original lost owned source shape", err)
+		t.Fatal("direct editor original lost owned source shape", err)
 	}
 	cancelled, cancel := context.WithCancel(ctx)
 	cancel()
@@ -90,7 +58,6 @@ func TestSIVIParentDirectPublicGateOwnedJSONWriteAndRestoration(t *testing.T) {
 
 func TestSIVIParentDirectTransportRejectsOmissionsUnicodeAndActions(t *testing.T) {
 	service, state, _, original, edits := sftest.SiviParentWriteFixture(t, false, 3)
-	service.SiviParentReviewEnabled, service.SiviParentEditingEnabled = true, true
 	request := sourceform.SIVIParentDirectWrite{Original: original, Scalars: edits.Scalars, Options: edits.Options, Text: edits.Text, Categorical: edits.Categorical}
 	wire, err := json.Marshal(request)
 	if err != nil {

@@ -10,29 +10,8 @@ import (
 	"errors"
 	"os"
 	"reflect"
-	"strings"
 	"testing"
 )
-
-func TestSIVIParentReviewFeatureRequiresIndependentLiteralOptIn(t *testing.T) {
-	for _, test := range []struct {
-		value                     string
-		present, enabled, invalid bool
-	}{
-		{"", false, true, false}, {"true", true, true, false}, {"false", true, false, false},
-		{"", true, false, true}, {"TRUE", true, false, true}, {"1", true, false, true}, {" true ", true, false, true},
-	} {
-		enabled, err := SiviParentReviewFeature(func(name string) (string, bool) {
-			if name != "VPRO_SIVI_PARENT_REVIEW" {
-				t.Fatal("wrong independent feature", name)
-			}
-			return test.value, test.present
-		})
-		if enabled != test.enabled || (err != nil) != test.invalid {
-			t.Fatal(test, enabled, err)
-		}
-	}
-}
 
 func TestSIVIParentReviewFacadeOwnedReadonlyAndCancellation(t *testing.T) {
 	service, state := vprotest.ContextServiceFixture(t)
@@ -41,12 +20,6 @@ func TestSIVIParentReviewFacadeOwnedReadonlyAndCancellation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	service.SiviHeightEnabled = true
-	if result, err := GetSIVIParentOriginal(service, context.Background(), state.ContextID, "108050"); result != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("height opt-in enabled parent reader", err)
-	}
-	service.SiviHeightEnabled = false
-	service.SiviParentReviewEnabled = true
 	want, err := sourceform.ReadSIVIParent(service, context.Background(), state.ContextID, "108050")
 	if err != nil {
 		t.Fatal(err)
@@ -59,9 +32,6 @@ func TestSIVIParentReviewFacadeOwnedReadonlyAndCancellation(t *testing.T) {
 	again, err := GetSIVIParentOriginal(service, context.Background(), state.ContextID, "108050")
 	if err != nil || !reflect.DeepEqual(again, want) {
 		t.Fatal("reader shares source ownership", err)
-	}
-	if result, err := GetSIVIVegetation(service, context.Background(), state.ContextID, "108050", false); result != nil || err == nil || !strings.Contains(err.Error(), "disabled") {
-		t.Fatal("parent review enabled height workflow", err)
 	}
 	if result, err := GetSIVIParentOriginal(service, context.Background(), "stale", "108050"); result != nil || err == nil {
 		t.Fatal("reader accepted stale context", err)

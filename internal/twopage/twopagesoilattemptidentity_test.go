@@ -14,7 +14,7 @@ import (
 
 func TestTwoPageSoilAttemptRejectsRetargetedOwnerAndRetriesAfterExactCorrection(t *testing.T) {
 	contexts, state, _, request := soilWriteFixture(t, true, "SoilHumusXL", 3)
-	service := soilFacade(t, contexts, map[string]string{twoPageSoilReviewEnvironment: "true", twoPageSoilWritingEnvironment: "true"})
+	service := soilFacade(t, contexts)
 	raw := soilAttemptJSON(t, request)
 	owner := contexts.Projects.Sqlite
 	original := owner.Attachments["VLists"]

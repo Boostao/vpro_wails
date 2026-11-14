@@ -3,7 +3,6 @@ package twopage
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -11,32 +10,6 @@ import (
 
 func TestTwoPageSpeciesListClientSharedActualReceipts(t *testing.T) {
 	path := filepath.Join("frontend", "src", "twoPageVegetationSpeciesListReceipts.json")
-	if output := os.Getenv("VPRO_TWO_PAGE_SPECIES_LIST_FIXTURE_OUTPUT"); output != "" {
-		receipts := []twoPageVegetationWriteResult{}
-		for _, form := range []string{"SubVegAXL_BC", "SubVegAXL"} {
-			for strength := 0; strength <= 3; strength++ {
-				contexts, state, _, request := twoPageSpeciesListWriteFixture(t, false, form, strength)
-				result, err := WriteTwoPageVegetation(contexts, context.Background(), state.ContextID, request)
-				if err != nil || result == nil || !result.DidCommit {
-					t.Fatal("actual shared list fixture did not commit", result, err)
-				}
-				receipts = append(receipts, *result)
-			}
-		}
-		raw, err := json.MarshalIndent(receipts, "", "  ")
-		if err != nil {
-			t.Fatal(err)
-		}
-		file, err := os.OpenFile(output, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
-		if err != nil {
-			t.Fatal(err)
-		}
-		_, writeErr := file.Write(append(raw, '\n'))
-		if err := errors.Join(writeErr, file.Close()); err != nil {
-			t.Fatal(err)
-		}
-		path = output
-	}
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)

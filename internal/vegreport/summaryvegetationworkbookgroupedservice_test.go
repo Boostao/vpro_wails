@@ -23,7 +23,6 @@ import (
 func summaryGroupedDesktopFixture(t *testing.T, external bool) (*SummaryVegetationWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	service, state := summaryDraftWorkbookFixture(t, external)
-	service.GroupedEnabled = true
 	qualifySummaryGroupedDesktopFixture(t, service, state)
 	return service, state
 }
@@ -67,28 +66,18 @@ func TestSummaryGroupedDesktopStrictAuthorityAndIndependentGate(t *testing.T) {
 	}
 	grouping := 12
 	options := SummaryVegetationWorkbookOptions{Average: 1, Display: 6, GroupAndOrder: &grouping}
-	service.GroupedEnabled = false
-	if review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, options)); err == nil || review != nil || !strings.Contains(err.Error(), "grouped workbook is disabled") {
-		t.Fatal("independent backend gate bypassed", review, err)
-	}
 	ordinary := options
 	ordinary.GroupAndOrder = nil
 	if review, err := service.GetReview(t.Context(), state.ContextID, vprotest.WorkbookRequest(t, ordinary)); err != nil || review == nil || review.Preview.GroupAndOrder != 0 || review.Scope != summaryVegetationWorkbookDraftScope {
-		t.Fatal("group gate changed ordinary availability", review, err)
+		t.Fatal("grouped support changed ordinary availability", review, err)
 	}
-	service.GroupedEnabled, service.ReferencesEnabled, service.AncillaryEnabled = true, true, true
-	for _, mode := range []string{"references", "memberships", "summary", "display2"} {
-		service.AncillaryEnabled = mode != "memberships" && mode != "summary"
+	for _, mode := range []string{"references", "display2"} {
 		changed := options
 		switch mode {
 		case "references":
 			group := 13
 			changed.GroupAndOrder = &group
 			changed.References = &SummaryVegetationReferenceOptions{ShowCommon: true}
-		case "memberships":
-			changed.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{}
-		case "summary":
-			changed.Ancillary = &SummaryVegetationWorkbookAncillaryOptions{CreateSummary: true}
 		case "display2":
 			changed.Display = 2
 		}
@@ -222,7 +211,7 @@ func TestSummaryGroupedDesktopPublicationAuthorityCollisionAndRetry(t *testing.T
 	}
 	destination := filepath.Join(t.TempDir(), "group # ' literal.xlsx")
 	request := summaryVegetationWorkbookExportRequest{Options: options, ApprovalHash: review.ApprovalHash, Destination: destination}
-	for _, mode := range []string{"ordinary", "group", "gate", "cancel", "owner"} {
+	for _, mode := range []string{"ordinary", "group", "cancel", "owner"} {
 		changed := request
 		ctx, contextID := t.Context(), state.ContextID
 		switch mode {
@@ -231,8 +220,6 @@ func TestSummaryGroupedDesktopPublicationAuthorityCollisionAndRetry(t *testing.T
 		case "group":
 			other := 13
 			changed.Options.GroupAndOrder = &other
-		case "gate":
-			service.GroupedEnabled = false
 		case "cancel":
 			cancelled, cancel := context.WithCancel(ctx)
 			cancel()
@@ -241,7 +228,6 @@ func TestSummaryGroupedDesktopPublicationAuthorityCollisionAndRetry(t *testing.T
 			contextID = "foreign"
 		}
 		result, err := service.ExportReviewed(ctx, contextID, vprotest.WorkbookRequest(t, changed))
-		service.GroupedEnabled = true
 		if err == nil || result != nil {
 			t.Fatal("changed grouped authority returned outcome", mode, result, err)
 		}

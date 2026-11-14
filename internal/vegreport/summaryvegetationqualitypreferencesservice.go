@@ -14,12 +14,7 @@ import (
 	"reflect"
 )
 
-const summaryVegetationQualityPreferencesFeatureEnvironment = "VPRO_SUMMARY_VEGETATION_QUALITY_PREFERENCES"
 const summaryVegetationQualitySuggestionsSource = "configured-owned-imported-SQLite VLists.USysTableOfLists; PlotQualitySite and BEC_Use; ItemOrder then physical rowid; suggestions only, not DataQuality qualification"
-
-func SummaryVegetationQualityPreferencesFeature(lookup func(string) (string, bool)) (bool, error) {
-	return vprocore.SiviFeature(summaryVegetationQualityPreferencesFeatureEnvironment, lookup)
-}
 
 type SummaryVegetationQualityPreferenceValues struct {
 	Enforce          bool   `json:"enforce"`
@@ -81,12 +76,11 @@ type SummaryVegetationQualityPreferencesOutcome struct {
 
 type SummaryVegetationQualityPreferencesService struct {
 	contexts *vprocore.ContextService
-	enabled  bool
 	snapshot vprocore.PublicationReadSnapshotHooks
 }
 
-func NewSummaryVegetationQualityPreferencesService(contexts *vprocore.ContextService, enabled bool) *SummaryVegetationQualityPreferencesService {
-	return &SummaryVegetationQualityPreferencesService{contexts: contexts, enabled: enabled}
+func NewSummaryVegetationQualityPreferencesService(contexts *vprocore.ContextService) *SummaryVegetationQualityPreferencesService {
+	return &SummaryVegetationQualityPreferencesService{contexts: contexts}
 }
 
 func (s *SummaryVegetationQualityPreferencesService) require(ctx context.Context, contextID string) error {
@@ -96,10 +90,7 @@ func (s *SummaryVegetationQualityPreferencesService) require(ctx context.Context
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s == nil || !s.enabled {
-		return errors.New("Summary Vegetation quality preferences are disabled in this session")
-	}
-	if s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
+	if s == nil || s.contexts == nil || s.contexts.Projects == nil || s.contexts.Projects.Sqlite == nil || s.contexts.Plots == nil {
 		return errors.New("Summary Vegetation quality preference context service is unavailable")
 	}
 	return vprocore.ValidateGoogleEarthReviewStrings(contextID)

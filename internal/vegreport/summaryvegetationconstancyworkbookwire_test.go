@@ -13,7 +13,6 @@ import (
 func summaryConstancyDesktopFixture(t *testing.T, external bool) (*SummaryVegetationWorkbookService, vprocore.ProjectState) {
 	t.Helper()
 	service, state := summaryStrataReferenceWorkbookFixture(t, external)
-	service.PresentationEnabled = true
 	owner := service.source.environment.report.contexts.Projects.Sqlite
 	vprotest.MutateContextFixture(t, owner.Attachments["VLists"], `
 		INSERT INTO USysAllSpecs(Code,ScientificName,Lifeform,EnglishName,Codetype)
@@ -61,6 +60,5 @@ func TestSummaryConstancyWorkbookClientWire(t *testing.T) {
 			wire[fmt.Sprintf("%sAverage%d", mode, average)] = review
 		}
 	}
-	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookConstancyWire.json",
-		"VPRO_UPDATE_SUMMARY_CONSTANCY_WORKBOOK_WIRE", wire)
+	assertSummaryWorkbookClientWire(t, "summaryVegetationWorkbookConstancyWire.json", wire)
 }
