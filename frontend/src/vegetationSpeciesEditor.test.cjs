@@ -125,7 +125,6 @@ test('Personal creation checks independent metadata and only recognizes explicit
 
 test('Personal definition has separate explicit save, persistent metadata and native close/Undo gates', () => {
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(form, /VITE_PERSONAL_SPECIES_EDITING !== 'false'/);
   assert.match(form, /personalDraft !== null \? 'Save the personal definition explicitly/);
   assert.match(form, /if \(personalDraft !== null\) \{ cancelPersonalSpecies\(\); return; \}/);
   assert.match(form, /ordinary plot Save never writes the user database/);
@@ -235,7 +234,6 @@ test('Explicit replacement, keep and personal choices preserve ambiguity, origin
 
 test('Species drafts gate every session and survive tab remount, Save, Undo, Lock and native close', () => {
   const form = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(form, /VITE_VEGETATION_SPECIES_EDITING !== 'false'/);
   assert.match(form, /let speciesDrafts = \$state<SpeciesDrafts>/);
   assert.match(form, /siviCreationPeerUnsaved = \$derived\([^;]*speciesUnsaved \|\| deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
   for (const name of ['height', 'other', 'soil', 'attribute', 'collected']) {

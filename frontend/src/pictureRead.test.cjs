@@ -171,7 +171,6 @@ test('picture source slot is independently gated and participates in root pendin
   const root = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
   const header = readFileSync(path.join(__dirname, 'HeaderEditor.svelte'), 'utf8');
   const panel = readFileSync(path.join(__dirname, 'PicturePanel.svelte'), 'utf8');
-  assert.match(root, /VITE_PICTURE_READING !== 'false'/);
   assert.match(root, /pictureEditor=\{pictureReadingEnabled && !twoPageOpen \? linkedPictures : undefined\}/);
   assert.match(root, /<TwoPageEntryEditor[\s\S]*?pictureReaderAvailable=\{pictureReadingEnabled\}/);
   const entry = readFileSync(path.join(__dirname, 'TwoPageEntryEditor.svelte'), 'utf8');
@@ -193,9 +192,9 @@ test('picture panel renders honest read-only guidance and cancellation-aware con
     '../bindings/github.com/boostao/vpro-wails': { PictureService: {} }, './pictureRead': picture,
     './projectMetadataEditor': metadata,
     './pictureLifecycleEditor': require('./pictureLifecycleTestHelpers.cjs').editor,
-    './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
-    './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
-    './PictureMetadataEditor.svelte': { default: () => { throw new Error('Default-off metadata editor rendered'); } },
+    './pictureLifecycleSessions': { pictureLifecycleSession: () => undefined },
+    './pictureCreationSessions': { pictureCreationSession: () => undefined },
+    './PictureMetadataEditor.svelte': { default: () => { throw new Error('Metadata editor must not render without metadataSession'); } },
   });
   const output = render(component, { props: { ...owner, disabled: true, onBusyChange() {} } }).body;
   assert.match(output, /Linked plot pictures/);
@@ -231,7 +230,7 @@ test('actual complete-entry picture child reuses owned readonly child policy onl
     './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('No lifecycle authority'); } },
     './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('No creation authority'); } },
     './PictureMetadataEditor.svelte': { default: () => { throw new Error('No metadata editor authority'); } },
-  }, { VITE_PICTURE_CREATION_WRITING: 'true', VITE_PICTURE_DELETION_WRITING: 'true', VITE_PICTURE_DELETION_RESTORING: 'true' });
+  });
   const component = serverComponent(`<script lang="ts">
     import PicturePanel from './PicturePanel.svelte';
     import SourceChild from './SourceChild.svelte';
@@ -306,7 +305,7 @@ async function mountReceiptReader(disabled, observeMutationReceipts) {
   assert.equal(compiled.warnings.length, 0);
   const ast = ts.createSourceFile('picture-reader.js', compiled.js.code, ts.ScriptTarget.Latest, true);
   const code = ast.statements.filter(node => !ts.isImportDeclaration(node)).map(node => node.getText(ast)).join('\n')
-    .replace('export default function', 'function').replaceAll('import.meta.env', '__environment');
+    .replace('export default function', 'function');
   const calls = [], subscriptions = [];
   const creationReceipt = { ...owner, requestId: 'retained-acknowledged',
     rowId: review().records.rows[0].rowId, committed: review().records.rows[0] };
@@ -321,15 +320,14 @@ async function mountReceiptReader(disabled, observeMutationReceipts) {
   const lifecycle = acknowledged('lifecycle', { receipts: [{ kind: 'delete', receipt: { request: { original: deleted } } }], revision: 1 });
   const mount = new Function('$', 'onDestroy', 'untrack', 'ReadRequests', 'PictureService',
     'pictureMetadataFromWire', 'pictureImageFromWire', 'pictureCellLabel', 'pictureCreationSession',
-    'equalCell', 'pictureLifecycleSession', 'pictureLifecycleOriginalMatches', '__environment',
+    'equalCell', 'pictureLifecycleSession', 'pictureLifecycleOriginalMatches',
     code + '\nreturn _unknown_;')(
     runtime, onDestroy, runtime.untrack, class { track(value) { return value; } cancelAll() {} },
     { GetMetadata(...args) { calls.push(['metadata', ...args]); return Promise.resolve(review()); } },
     picture.pictureMetadataFromWire, picture.pictureImageFromWire, picture.pictureCellLabel,
     () => { calls.push('creation-session'); return created; }, metadata.equalCell,
     () => { calls.push('lifecycle-session'); return lifecycle; },
-    require('./pictureLifecycleTestHelpers.cjs').editor.pictureLifecycleOriginalMatches,
-    { VITE_PICTURE_CREATION_WRITING: 'true', VITE_PICTURE_DELETION_WRITING: 'true', VITE_PICTURE_DELETION_RESTORING: 'true' });
+    require('./pictureLifecycleTestHelpers.cjs').editor.pictureLifecycleOriginalMatches);
   let actions;
   const props = { ...owner, view: 'child', disabled, onBusyChange() {}, inspect: value => { actions = value; } };
   if (observeMutationReceipts !== undefined) props.observeMutationReceipts = observeMutationReceipts;
@@ -412,13 +410,12 @@ test('manager pending reads block parent changes and aggregate root busy state',
   assert.deepEqual(changes, [true, false]);
 });
 
-test('standalone manager has independent default-off navigation and shares root transition/close ownership', () => {
+test('standalone manager navigation shares root transition/close ownership', () => {
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const nav = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
   const manager = readFileSync(path.join(__dirname, 'PictureManager.svelte'), 'utf8');
-  assert.match(nav, /VITE_PICTURE_MANAGER !== 'false' \? 'picture-manager' : undefined/);
-  assert.match(app, /view === 'picture-manager' && import\.meta\.env\.VITE_PICTURE_MANAGER !== 'false'/);
-  assert.match(app, /if \(import\.meta\.env\.VITE_PICTURE_MANAGER === 'false'\)/);
+  assert.match(nav, /name: 'Plot Pictures', icon: FileText, view: 'picture-manager'/);
+  assert.match(app, /view === 'picture-manager' && \$projectState/);
   assert.match(app, /<PictureManager[^>]*onBusyChange=\{\(value\) => \{ localEditorBusy = value; \}\}/s);
   assert.match(app, /editorBusy = \$derived\(localEditorBusy \|\| matrixPublicationBusy \|\| pictureCreationBusy \|\| pictureLifecycleBusy \|\| twoPageSoilBusy \|\| twoPageVegetationBusy \|\| externalSUEnvironmentBusy \|\| summaryPreferenceBusy \|\| summaryFieldListBusy \|\| summaryEnvironmentalBusy \|\| projectReportBusy\)/);
   assert.match(manager, /<PicturePanel[^>]*view="manager" onBusyChange=\{reading\}/);
@@ -432,26 +429,24 @@ test('manager server render retains source caption, literal parent and separate 
     '../bindings/github.com/boostao/vpro-wails': { PictureService: {} }, './pictureRead': picture,
     './projectMetadataEditor': metadata,
     './pictureLifecycleEditor': require('./pictureLifecycleTestHelpers.cjs').editor,
-    './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
-    './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
-    './PictureMetadataEditor.svelte': { default: () => { throw new Error('Default-off metadata editor rendered'); } },
-  }, { VITE_PICTURE_CREATION_WRITING: 'false', VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'false' });
-  const manager = serverComponent(readFileSync(path.join(__dirname, 'PictureManager.svelte'), 'utf8')
-    .replace("import.meta.env.VITE_PICTURE_METADATA_WRITING !== 'false'", 'false'), 'PictureManager.svelte', {
+    './pictureLifecycleSessions': { pictureLifecycleSession: () => undefined },
+    './pictureCreationSessions': { pictureCreationSession: () => undefined },
+    './PictureMetadataEditor.svelte': { default: () => {} },
+  });
+  const manager = serverComponent(readFileSync(path.join(__dirname, 'PictureManager.svelte'), 'utf8'), 'PictureManager.svelte', {
     './PicturePanel.svelte': { default: panel }, './scopedPlotLookup': lookup,
-    './pictureMetadataSessions': { pictureMetadataSession: () => { throw new Error('Default-off metadata session created'); } },
-    './pictureCreationSessions': { pictureCreationSession: () => { throw new Error('Default-off creation session created'); } },
-    './PictureCreationPanel.svelte': { default: () => { throw new Error('Default-off Add panel rendered'); } },
-    './pictureLifecycleSessions': { pictureLifecycleSession: () => { throw new Error('Default-off lifecycle session created'); } },
-    './PictureLifecyclePanel.svelte': { default: () => { throw new Error('Default-off lifecycle panel rendered'); } },
-  }, { VITE_PICTURE_CREATION_WRITING: 'false', VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'false' });
+    './pictureMetadataSessions': { pictureMetadataSession: () => undefined },
+    './pictureCreationSessions': { pictureCreationSession: () => undefined },
+    './PictureCreationPanel.svelte': { default: () => {} },
+    './pictureLifecycleSessions': { pictureLifecycleSession: () => undefined },
+    './PictureLifecyclePanel.svelte': { default: () => {} },
+  });
   const output = render(manager, { props: { contextId: owner.contextId, project: owner.project,
     initialPlot: owner.plotNumber, onBusyChange() {} } }).body;
   assert.match(output, /Plot Pictures/);
   assert.match(output, /for="picture-manager-plot"/);
   assert.match(output, /Selected literal parent/);
   assert.match(output, /explicitly authorized manager directory, not the FS882 child directory/);
-  assert.match(output, /Add a Picture remains unavailable/);
-  assert.match(output, /Metadata editing remains unavailable/);
-  assert.doesNotMatch(output, /<button[^>]*>\s*(?:Save|Add a Picture|Delete)/);
+  assert.match(output, /Add a Picture requires its independent backend permission/);
+  assert.match(output, /Existing metadata editing requires its independent backend permission/);
 });

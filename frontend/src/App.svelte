@@ -44,7 +44,7 @@
   let editorPlotNumber = $state<string | undefined>(undefined);
   let editorEntryForm = $state<'fs882' | 'sivi'>('fs882');
   const editorLabel = $derived(editorEntryForm === 'sivi' ? 'SIVI / FS1333' : 'FS882');
-  const siviStandaloneEnabled = import.meta.env.VITE_SIVI_STANDALONE !== 'false' && import.meta.env.VITE_SIVI_PARENT_REVIEW !== 'false';
+  const siviStandaloneEnabled = true;
   let offset = $state(0);
   let busy = $state(false);
   let error = $state('');
@@ -96,7 +96,7 @@
   let workbenchDirtyLabel = $state('');
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK === 'false' || !state?.contextId ||
+    if (!state?.contextId ||
         state.activeHierarchy === 'None' || !state.hierarchyPath) { matrixPublicationBusy = false; return; }
     const session = matrixPublicationSession({ contextId: state.contextId,
       hierarchy: state.activeHierarchy, hierarchyPath: state.hierarchyPath });
@@ -143,7 +143,7 @@
   });
   $effect(() => {
     const state = $projectState;
-    if (!projectReportWorkspace || import.meta.env.VITE_LONG_VEGETATION_REPORT === 'false' ||
+    if (!projectReportWorkspace ||
         !state?.contextId || !state.projectPath || state.activeSU !== 'None' && !state.suPath) {
       projectReportBusy = false;
       return;
@@ -157,31 +157,24 @@
   });
   $effect(() => subscribeTwoPageSoilActivity(activity => { twoPageSoilBusy = activity.busy || activity.blocked; }));
   $effect(() => subscribeTwoPageVegetationActivity(activity => { twoPageVegetationBusy = activity.busy || activity.blocked; }));
+  $effect(() => subscribeExternalSUEnvironmentActivity(activity => { externalSUEnvironmentBusy = activity.busy || activity.blocked; }));
   $effect(() => {
-    if (import.meta.env.VITE_EXTERNAL_SU_ENVIRONMENT_EDITING === 'false') return;
-    return subscribeExternalSUEnvironmentActivity(activity => { externalSUEnvironmentBusy = activity.busy || activity.blocked; });
-  });
-  $effect(() => {
-    if (import.meta.env.VITE_PICTURE_DELETION_WRITING === 'false' && import.meta.env.VITE_PICTURE_DELETION_RESTORING === 'false') return;
     const state = $projectState;
     return subscribePictureLifecycleActivity(activity => {
       pictureLifecycleBusy = activity.busy || activity.blocked;
       if (activity.owner && activity.owner.contextId === state?.contextId &&
-          activity.owner.project === state.activeProject && view === 'home' &&
-          import.meta.env.VITE_PICTURE_MANAGER !== 'false') {
+          activity.owner.project === state.activeProject && view === 'home') {
         pictureManagerPlot = activity.owner.plotNumber;
         view = 'picture-manager';
       }
     });
   });
   $effect(() => {
-    if (import.meta.env.VITE_PICTURE_CREATION_WRITING === 'false') return;
     const state = $projectState;
     return subscribePictureCreationActivity(activity => {
       pictureCreationBusy = activity.busy || activity.blocked;
       if (activity.owner && activity.owner.contextId === state?.contextId &&
-          activity.owner.project === state.activeProject && view === 'home' &&
-          import.meta.env.VITE_PICTURE_MANAGER !== 'false') {
+          activity.owner.project === state.activeProject && view === 'home') {
         pictureManagerPlot = activity.owner.plotNumber;
         view = 'picture-manager';
       }
@@ -195,11 +188,10 @@
   const summaryPublicationBusy = $derived(summaryEnvironmentPublicationBusy || summaryVegetationPublicationBusy);
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_LONG_VEGETATION_WORKBOOK === 'false' || import.meta.env.VITE_LONG_VEGETATION_REPORT === 'false' ||
-        !state?.contextId || state.activeSU === 'None' || !state.suPath) { vegetationPublicationBusy = false; return; }
+    if (!state?.contextId || state.activeSU === 'None' || !state.suPath) { vegetationPublicationBusy = false; return; }
     const session = vegetationWorkbookPublicationSession({ contextId: state.contextId,
       project: state.activeProject, projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath },
-      import.meta.env.VITE_LONG_VEGETATION_SELECTED_UNITS !== 'false');
+      true);
     return session.subscribe(() => {
       const publication = session.view();
       vegetationPublicationBusy = publication.busy || publication.blocked;
@@ -208,8 +200,7 @@
   });
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_LIFEFORM_WORKBOOK === 'false' || import.meta.env.VITE_LIFEFORM_SUMMARY === 'false' ||
-        !state?.contextId || state.activeSU === 'None' || !state.suPath) { lifeformPublicationBusy = false; return; }
+    if (!state?.contextId || state.activeSU === 'None' || !state.suPath) { lifeformPublicationBusy = false; return; }
     const session = lifeformWorkbookPublicationSession({ contextId: state.contextId,
       project: state.activeProject, projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath });
     return session.subscribe(() => {
@@ -220,8 +211,7 @@
   });
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_TABLE_CSV_ARCHIVE_EXPORT === 'false' || import.meta.env.VITE_TABLE_CSV_REVIEW === 'false' ||
-        !state?.contextId) { archivePublicationBusy = false; return; }
+    if (!state?.contextId) { archivePublicationBusy = false; return; }
     const session = tableCSVArchivePublicationSession({ contextId: state.contextId,
       project: state.activeProject, projectPath: state.projectPath ?? '' });
     return session.subscribe(() => {
@@ -233,15 +223,13 @@
   });
   $effect(() => {
     const state = $projectState;
-    if ((import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK === 'false' && import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK === 'false') ||
-        import.meta.env.VITE_SITE_UNIT_SUMMARY === 'false' ||
-        !state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryEnvironmentPublicationBusy = false; return; }
+    if (!state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryEnvironmentPublicationBusy = false; return; }
     const owner = { contextId: state.contextId, project: state.activeProject,
       projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath };
-    const sessions: Array<ReturnType<typeof siteUnitSummaryWorkbookPublicationSession> |
-      ReturnType<typeof extendedSummaryWorkbookPublicationSession>> = [];
-    if (import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'false') sessions.push(siteUnitSummaryWorkbookPublicationSession(owner));
-    if (import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'false') sessions.push(extendedSummaryWorkbookPublicationSession(owner));
+    const sessions = [
+      siteUnitSummaryWorkbookPublicationSession(owner),
+      extendedSummaryWorkbookPublicationSession(owner),
+    ];
     const update = () => {
       const states = sessions.map(session => session.view());
       const publication = { busy: states.some(state => state.busy), blocked: states.some(state => state.blocked) };
@@ -253,8 +241,7 @@
   });
   $effect(() => {
     const state = $projectState;
-    if (import.meta.env.VITE_SUMMARY_VEGETATION_WORKBOOK === 'false' || import.meta.env.VITE_SUMMARY_VEGETATION === 'false' ||
-        !state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryVegetationPublicationBusy = false; return; }
+    if (!state?.contextId || state.activeSU === 'None' || !state.suPath) { summaryVegetationPublicationBusy = false; return; }
     const session = summaryVegetationWorkbookSession({ contextId: state.contextId, project: state.activeProject,
       projectPath: state.projectPath ?? '', su: state.activeSU, suPath: state.suPath });
     return session.subscribe(() => {
@@ -299,11 +286,11 @@
   let accessError = $state('');
   let accessResult = $state<AccessProjectImportResult | null>(null);
   const accessSelectedCandidate = $derived(accessInspection?.projects?.find(p => p.sourceProject === accessSelectedSourceProject) ?? null);
-  const externalProjectsEnabled = import.meta.env.VITE_EXTERNAL_PROJECTS !== 'false';
-  const profileSelectionEnabled = import.meta.env.VITE_PLOT_PROFILE_SELECTION !== 'false';
-  const profileWriteOwnershipEnabled = import.meta.env.VITE_PLOT_PROFILE_WRITE_OWNERSHIP !== 'false';
-  const profileFileCreationEnabled = import.meta.env.VITE_PLOT_PROFILE_FILE_CREATION !== 'false';
-  const profileTableCreationEnabled = import.meta.env.VITE_PLOT_PROFILE_TABLE_CREATION !== 'false';
+  const externalProjectsEnabled = true;
+  const profileSelectionEnabled = true;
+  const profileWriteOwnershipEnabled = true;
+  const profileFileCreationEnabled = true;
+  const profileTableCreationEnabled = true;
   let profileTableReview = $state<ReviewedProfileTable | null>(null);
   let profileTableContext = $state('');
   let profileTableName = $state('');
@@ -331,14 +318,14 @@
   let suError = $state('');
   let suSuccess = $state('');
   let suCommitted = $state(false);
-  const suProjectEnabled = import.meta.env.VITE_PROJECT_PLOT_PROFILE_SAVE_SU_PROJECT !== 'false';
+  const suProjectEnabled = true;
   let suProjectReview = $state<ReviewedProjectSU | null>(null);
   let suProjectContext = $state('');
   let suProjectName = $state('');
   let suProjectError = $state('');
   let suProjectSuccess = $state('');
   let suProjectCommitted = $state(false);
-  const plotFindEnabled = import.meta.env.VITE_SOURCE_PLOT_FIND !== 'false';
+  const plotFindEnabled = true;
   let plotFindOpen = $state(false);
   let plotFindQuery = $state('');
   let plotFindResult = $state<Awaited<ReturnType<typeof ContextService.LookupScopedPlot>> | null>(null);
@@ -552,17 +539,9 @@
       if (next === 'project-admin') { projectAdminTab = 'lifecycle'; projectAdminTabNonce++; }
       if (next === 'fs882') { editorPlotNumber = selected?.plotNumber; editorEntryForm = 'fs882'; }
       if (next === 'picture-manager') {
-        if (import.meta.env.VITE_PICTURE_MANAGER === 'false') {
-          error = 'Plot picture management is currently unavailable.';
-          return;
-        }
         pictureManagerPlot = selected?.plotNumber ?? '';
       }
       if (next === 'plot-label-preview') {
-        if (import.meta.env.VITE_PLOT_LABEL_PREVIEW === 'false' && import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT === 'false') {
-          error = 'Plot label PDF preview is currently unavailable.';
-          return;
-        }
         plotLabelNumber = (view === 'fs882' ? editorPlotNumber : selected?.plotNumber) ?? '';
       }
       view = next;
@@ -2133,7 +2112,7 @@
             />
           {/await}
         {/key}
-      {:else if view === 'summary-environment' && import.meta.env.VITE_SITE_UNIT_SUMMARY !== 'false' && $projectState}
+      {:else if view === 'summary-environment' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./SiteUnitSummary.svelte')}
           <p role="status" class="p-4 text-sm">Loading Site Unit Summary...</p>
@@ -2146,7 +2125,7 @@
         {:catch loadError}
           <p class="error" role="alert">Site Unit Summary could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'long-environment' && import.meta.env.VITE_LONG_ENVIRONMENT_REPORT !== 'false' && $projectState}
+      {:else if view === 'long-environment' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./LongEnvironmentReport.svelte')}
           <p role="status" class="p-4 text-sm">Loading Long Environment Report...</p>
@@ -2159,7 +2138,7 @@
         {:catch loadError}
           <p class="error" role="alert">Long Environment Report could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'long-vegetation' && import.meta.env.VITE_LONG_VEGETATION_REPORT !== 'false' && $projectState}
+      {:else if view === 'long-vegetation' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./LongVegetationReport.svelte')}
           <p role="status" class="p-4 text-sm">Loading Long Vegetation Report...</p>
@@ -2173,7 +2152,7 @@
         {:catch loadError}
           <p class="error" role="alert">Long Vegetation Report could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'summary-vegetation' && import.meta.env.VITE_SUMMARY_VEGETATION !== 'false' && $projectState}
+      {:else if view === 'summary-vegetation' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./SummaryVegetationReport.svelte')}
           <p role="status" class="p-4 text-sm">Loading Summary Vegetation Report...</p>
@@ -2198,7 +2177,7 @@
         {:catch loadError}
           <p class="error" role="alert">Summary Vegetation Report could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'lifeform-summary' && import.meta.env.VITE_LIFEFORM_SUMMARY !== 'false' && $projectState}
+      {:else if view === 'lifeform-summary' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./LifeformSummary.svelte')}
           <p role="status" class="p-4 text-sm">Loading Lifeform Summary...</p>
@@ -2211,7 +2190,7 @@
         {:catch loadError}
           <p class="error" role="alert">Lifeform Summary could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'table-csv' && import.meta.env.VITE_TABLE_CSV_REVIEW !== 'false' && $projectState}
+      {:else if view === 'table-csv' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./ProjectTableCSVReview.svelte')}
           <p role="status" class="p-4 text-sm">Loading Table CSV Review...</p>
@@ -2223,7 +2202,7 @@
         {:catch loadError}
           <p class="error" role="alert">Table CSV Review could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'user-log' && import.meta.env.VITE_USER_LOG_REVIEW !== 'false' && $projectState}
+      {:else if view === 'user-log' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./UserLogReview.svelte')}
           <p role="status" class="p-4 text-sm">Loading User Log Review...</p>
@@ -2236,7 +2215,7 @@
         {:catch loadError}
           <p class="error" role="alert">User Log Review could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'plot-label-preview' && (import.meta.env.VITE_PLOT_LABEL_PREVIEW !== 'false' || import.meta.env.VITE_PLOT_LABEL_PDF_EXPORT !== 'false') && $projectState}
+      {:else if view === 'plot-label-preview' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./PlotLabelPreview.svelte')}
           <p role="status" class="p-4 text-sm">Loading Plot Label Preview...</p>
@@ -2249,7 +2228,7 @@
         {:catch loadError}
           <p class="error" role="alert">Plot Label Preview could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'picture-manager' && import.meta.env.VITE_PICTURE_MANAGER !== 'false' && $projectState}
+      {:else if view === 'picture-manager' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./PictureManager.svelte')}
           <p role="status" class="p-4 text-sm">Loading Picture Manager...</p>
@@ -2261,7 +2240,7 @@
         {:catch loadError}
           <p class="error" role="alert">Picture Manager could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'plot-locations' && import.meta.env.VITE_PLOT_LOCATION_REVIEW !== 'false' && $projectState}
+      {:else if view === 'plot-locations' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./PlotLocationReview.svelte')}
           <p role="status" class="p-4 text-sm">Loading Plot Location Review...</p>
@@ -2274,7 +2253,7 @@
         {:catch loadError}
           <p class="error" role="alert">Plot Location Review could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'google-earth-review' && import.meta.env.VITE_GOOGLE_EARTH_REVIEW !== 'false' && $projectState}
+      {:else if view === 'google-earth-review' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./GoogleEarthReview.svelte')}
           <p role="status" class="p-4 text-sm">Loading Google Earth Review...</p>
@@ -2287,7 +2266,7 @@
         {:catch loadError}
           <p class="error" role="alert">Google Earth Review could not load: {String(loadError)}</p>
         {/await}
-      {:else if view === 'subzone-matrix' && import.meta.env.VITE_SUBZONE_MATRIX_WORKBOOK !== 'false' && $projectState}
+      {:else if view === 'subzone-matrix' && $projectState}
         {#if error}<p class="error" role="alert">{error}</p>{/if}
         {#await import('./SubzoneMatrixReport.svelte')}
           <p role="status" class="p-4 text-sm">Loading Subzone Matrix Report...</p>

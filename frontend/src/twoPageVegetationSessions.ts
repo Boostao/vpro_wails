@@ -3,12 +3,11 @@ import { TwoPageVegetationSession } from './twoPageVegetationSession';
 import type { TwoPageVegetationOwner } from './twoPageVegetationWire';
 import { notifyTwoPageVegetationActivity, subscribeTwoPageVegetationActivity, twoPageVegetationActivity, twoPageVegetationEntries, twoPageVegetationOwnerKey, type TwoPageVegetationActivity } from './twoPageVegetationActivity';
 
-export const twoPageVegetationReviewEnabled = import.meta.env.VITE_TWO_PAGE_VEGETATION_REVIEW !== 'false';
-export const twoPageVegetationWritingEnabled = twoPageVegetationReviewEnabled && import.meta.env.VITE_TWO_PAGE_VEGETATION_WRITING !== 'false';
-export const twoPageVegetationSpeciesListEnabled = twoPageVegetationWritingEnabled && import.meta.env.VITE_TWO_PAGE_VEGETATION_SPECIES_LIST !== 'false';
+export const twoPageVegetationReviewEnabled = true;
+export const twoPageVegetationWritingEnabled = true;
+export const twoPageVegetationSpeciesListEnabled = true;
 export { subscribeTwoPageVegetationActivity, twoPageVegetationActivity, type TwoPageVegetationActivity };
 export function twoPageVegetationSession(owner: TwoPageVegetationOwner): TwoPageVegetationSession {
-  if (!twoPageVegetationReviewEnabled) throw new Error('Two-page vegetation review is disabled.');
   const key = twoPageVegetationOwnerKey(owner);
   const existing = twoPageVegetationEntries.get(key);
   if (existing) return existing.session;

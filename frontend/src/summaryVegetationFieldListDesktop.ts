@@ -1,7 +1,7 @@
 import { VegetationReportService } from '../bindings/github.com/boostao/vpro-wails';
 import { fieldListJSON, fieldListOwner, validateFieldListReview, type FieldListOwner, type FieldListRead,
   type FieldListReview, type SummaryVegetationFieldListSession } from './summaryVegetationFieldList';
-import { fieldListRegistry, type FieldListEnvironment } from './summaryVegetationFieldListSessions';
+import { fieldListRegistry } from './summaryVegetationFieldListSessions';
 
 export type FieldListContext = Omit<FieldListOwner, 'sourcePath'>;
 export interface FieldListDesktopPort {
@@ -32,8 +32,7 @@ function literalContext(value: FieldListContext): FieldListContext {
   return Object.freeze({ ...value });
 }
 
-export function fieldListDesktop(port: FieldListDesktopPort,
-  environment: FieldListEnvironment = import.meta.env, uuid?: () => string) {
+export function fieldListDesktop(port: FieldListDesktopPort, uuid?: () => string) {
   const contexts = new Map<string, {
     state: FieldListDesktopState; generation: number; pending: FieldListRead<unknown> | null;
     seed: FieldListReview | null; bootstrapDispatches: number; established: boolean;
@@ -51,7 +50,7 @@ export function fieldListDesktop(port: FieldListDesktopPort,
     },
     save: json => port.save(owner.contextId, json),
     validationYield: port.validationYield,
-  }), environment, uuid);
+  }), uuid);
   registry.subscribe(changed);
   function key(context: FieldListContext) { return JSON.stringify(literalContext({
     contextId: context.contextId, project: context.project, projectPath: context.projectPath,
@@ -60,7 +59,6 @@ export function fieldListDesktop(port: FieldListDesktopPort,
   function entry(context: FieldListContext) {
     const id = JSON.stringify(literalContext(context)), existing = contexts.get(id);
     if (existing) return existing;
-    if (!registry.enabled) throw new Error('Private Summary environmental field-list disabled.');
     if (contexts.size >= 16) throw new Error('Retained field-list bootstrap capacity reached; no state is evicted.');
     const created = { state: { context: literalContext(context), scope: null, session: null,
       readBusy: false, readError: '', bootstrapPending: false, canDismissInitialReadError: false } as FieldListDesktopState, generation: 0,

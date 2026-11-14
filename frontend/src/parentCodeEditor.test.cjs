@@ -105,14 +105,13 @@ test('Reference loading and failures are per-list, unchanged historical data sta
   assert.match(editor.validation(codes({ waterSource: 'raw' }), original, {}, false), /acknowledge/);
 });
 
-test('Parent component renders exactly its source slots, metadata distinctions and verified default with opt-out', () => {
+test('Parent component renders exactly its source slots and metadata distinctions', () => {
   const source = read('ParentCodeFields.svelte');
   assert.equal(compile(source, { filename: 'ParentCodeFields.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_PARENT_CODES_EDITING !== 'false'/);
   assert.match(source, /onDestroy[\s\S]*onvalidation\(validationKey/);
   assert.match(source, /Retry \{list\} choices/);
   assert.ok(source.indexOf('{@render children(') < source.indexOf('<FieldGuidance'));
-  function renderScope(scope, enabled) {
+  function renderScope(scope) {
     const controls = fields.filter(field => (field.key === 'realmClass') === (scope === 'site')).map(field => ({
       controlId: field.column, controlName: field.column, column: field.column, type: 'ComboBox', caption: ''
     }));
@@ -121,8 +120,7 @@ test('Parent component renders exactly its source slots, metadata distinctions a
       './paperLayout': { paperPage: () => ({ controls }), accessCaption: value => value },
       './formPresentation': presentationHelpers().presentation
     });
-    const Component = serverComponent(source.replace('import.meta.env.VITE_PARENT_CODES_EDITING',
-      enabled === undefined ? 'undefined' : enabled ? "'true'" : "'false'"), 'ParentCodeFields.svelte', {
+    const Component = serverComponent(source, 'ParentCodeFields.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { ParentCodeService: { ListChoices() { throw Error('No native calls in SSR'); } } },
       './qualityEditor': { QualityLookup: class {
         constructor(fetch, publish, list) { this.list = list; }
@@ -148,10 +146,7 @@ test('Parent component renders exactly its source slots, metadata distinctions a
       capabilities: Object.fromEntries(fields.map(field => [field.key, true])) } }).body;
   }
   for (const scope of ['site', 'soils']) {
-    const off = renderScope(scope, false);
-    assert.ok(off.match(/<input\b[^>]*>/g).every(input => /\bdisabled\b/.test(input)));
-    const html = renderScope(scope, true);
-    assert.equal((renderScope(scope).match(/class="parent-code-control/g) ?? []).length, scope === 'site' ? 1 : 20);
+    const html = renderScope(scope);
     assert.equal((html.match(/class="parent-code-control/g) ?? []).length, scope === 'site' ? 1 : 20);
     assert.match(html, /data-column="SoilDrainage"[^>]*disabled/);
     assert.match(html, /data-kind="null"/);

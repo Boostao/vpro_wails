@@ -109,7 +109,6 @@ test('Source grids stage lexical input while close, view and cancellation guards
   const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   assert.match(form,/\{#if heightUnsaved\}[\s\S]*?Save height\/cover drafts/);
   assert.match(form,/await PlotService\.UpdateVegetationNumbers\(draft\.plotNumber, vegetationNumberUpdates\(heightDrafts\)\)/);
-  assert.match(form,/VITE_HEIGHT_EDITING !== 'false'/);
   assert.match(form,/async function cancelHeightDrafts\(\)[\s\S]*?await loadChildData\(draft\.plotNumber\)/);
   assert.match(form,/if \(heightUnsaved\) \{\s*error = 'Save or Cancel height drafts before changing the plot lock.'/);
 });
@@ -189,7 +188,6 @@ test('All eleven source covers/totals and six heights share strict numeric parsi
   const invalid=stageHeight(drafts,0,'cover1','100',0,'SubVegAhtXL');
   assert.throws(()=>vegetationNumberUpdates(invalid),/less than 100/);
   const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
-  assert.match(source,/VITE_VEGETATION_NUMBER_EDITING !== 'false'/);
   assert.match(source,/onstage=\{numberEditingEnabled \?/);
   assert.match(source,/onedit=\{undefined\} ondelete=\{deletionEnabled \? reviewVegetationDeletion : undefined\}/);
   assert.match(source,/Vegetation record preview \(read-only\)/);
@@ -207,7 +205,6 @@ test('Deletion review compares independently returned source identity, code, ful
 });
 test('Explicit deletion confirmation owns lifecycle without allowing generic Save, close or prototype bypass',()=>{
   const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
-  assert.match(source,/VITE_VEGETATION_DELETE_EDITING !== 'false'/);
   assert.match(source,/siviCreationPeerUnsaved = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
   assert.match(source,/childParentDisabled = \$derived\([^;]*deletionReview !== null \|\| creationDraft !== null \|\| personalDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending \|\| siviCreationUndoPending\)/);
   assert.match(source,/deletionRequest\+\+; deletionReads\.cancelAll\(\)/);
@@ -263,7 +260,6 @@ test('Height-only A creation stays explicit while C-height still requires source
 });
 test('Opt-in source creation owns independent persistent lifecycle and fails closed after committed refresh failure',()=>{
   const source=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
-  assert.match(source,/VITE_VEGETATION_CREATE_EDITING !== 'false'/);
   assert.match(source,/siviCreationPeerUnsaved = \$derived\([^;]*creationDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| environmentSUOpen\)/);
   assert.match(source,/childParentDisabled = \$derived\([^;]*creationDraft !== null \|\| personalDraft !== null \|\| codeCheckOpen \|\| metadataOpen \|\| profileReviewBlocked \|\| siviCreationPending \|\| siviDeletionPending \|\| siviRestorationPending \|\| siviCreationUndoPending\)/);
   assert.match(source,/creationInvalid\.length > 0 \? 'Correct invalid vegetation creation/);

@@ -13,8 +13,8 @@ const sample = () => structuredClone(fixtures[3]);
 const request = sample().history.Request;
 const { contextId, project, plot, form } = request.original;
 const owner = { contextId, project, plot, form };
-const enabled = { VITE_TWO_PAGE_VEGETATION_REVIEW: 'true', VITE_TWO_PAGE_VEGETATION_WRITING: 'true' };
-function registry(environment = {}, overrides = {}) {
+const enabled = {};
+function registry(_environment = {}, overrides = {}) {
   const calls = [], dependencies = {
     '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {
       GetTwoPageVegetationOriginal: overrides.GetTwoPageVegetationOriginal ?? overrides.GetOriginal ?? ((...args) => { calls.push(['read', ...args]); return Promise.resolve(client.proxy(sample().history.Request.original)); }),
@@ -35,10 +35,10 @@ function registry(environment = {}, overrides = {}) {
     }),
   };
   const module = { exports: {} };
-  const source = readFileSync(path.join(__dirname, 'twoPageVegetationSessions.ts'), 'utf8').replaceAll('import.meta.env', '__environment');
+  const source = readFileSync(path.join(__dirname, 'twoPageVegetationSessions.ts'), 'utf8');
   vm.runInNewContext(ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
-  }).outputText, { module, exports: module.exports, __environment: environment, require: name => {
+  }).outputText, { module, exports: module.exports, require: name => {
     if (!(name in dependencies)) throw new Error(`Unexpected vegetation registry dependency ${name}`);
     return dependencies[name];
   } });
@@ -50,29 +50,15 @@ function stage(session) {
   session.stage('-7', 'Collected', 'C', false);
 }
 
-test('every review/writing flag combination stays independent with actual default-off RPC dispatch', async () => {
-  for (const review of ['true', 'false', undefined]) {
-    for (const writing of ['true', 'false', undefined]) {
-      const api = registry({ VITE_TWO_PAGE_VEGETATION_REVIEW: review, VITE_TWO_PAGE_VEGETATION_WRITING: writing });
-      const reviewEnabled = review !== 'false';
-      const writingEnabled = reviewEnabled && writing !== 'false';
-      assert.equal(api.twoPageVegetationReviewEnabled, reviewEnabled);
-      assert.equal(api.twoPageVegetationWritingEnabled, writingEnabled);
-      if (!reviewEnabled) {
-        assert.throws(() => api.twoPageVegetationSession(owner), /disabled/);
-        assert.equal(api.calls.length, 0);
-      } else {
-        const session = api.twoPageVegetationSession(owner);
-        assert.equal(await session.load(), true);
-        if (!writingEnabled) {
-          assert.throws(() => stage(session), /disabled/);
-          await assert.rejects(session.save(request.requestId), /disabled/);
-          assert.equal(api.releaseTwoPageVegetationSession(owner), true);
-          assert.equal(api.calls.length, 1);
-        }
-      }
-    }
-  }
+test('two-page vegetation review, writing and species list are enabled by default', async () => {
+  const api = registry();
+  assert.equal(api.twoPageVegetationReviewEnabled, true);
+  assert.equal(api.twoPageVegetationWritingEnabled, true);
+  assert.equal(api.twoPageVegetationSpeciesListEnabled, true);
+  const session = api.twoPageVegetationSession(owner);
+  assert.equal(await session.load(), true);
+  assert.equal(api.releaseTwoPageVegetationSession(owner), true);
+  assert.equal(api.calls.length, 1);
 });
 
 test('literal tuple ownership preserves case whitespace delimiters contexts and every source form', () => {
@@ -91,49 +77,30 @@ test('literal tuple ownership preserves case whitespace delimiters contexts and 
   assert.equal(api.calls.length, 0);
 });
 
-test('all27 Species review/writing/selection combinations keep the new dispatch independently unavailable by default', async () => {
-  for (const review of ['true', 'false', undefined]) {
-    for (const writing of ['true', 'false', undefined]) {
-      for (const selection of ['true', 'false', undefined]) {
-        const api = registry({ VITE_TWO_PAGE_VEGETATION_REVIEW: review, VITE_TWO_PAGE_VEGETATION_WRITING: writing,
-          VITE_TWO_PAGE_VEGETATION_SPECIES_LIST: selection }, {
-          GetSpeciesReferences: () => {
-            const refs = structuredClone(require('./twoPageVegetationSpeciesListReceipts.json')[7].history.Request.speciesList);
-            Object.assign(refs, owner);
-            return Promise.resolve(client.proxy(refs));
-          },
-        });
-        const reviewEnabled = review !== 'false';
-        const enabled = reviewEnabled && writing !== 'false' && selection !== 'false';
-        assert.equal(api.twoPageVegetationSpeciesListEnabled, enabled);
-        if (!reviewEnabled) {
-          assert.throws(() => api.twoPageVegetationSession(owner), /disabled/);
-          assert.equal(api.calls.length, 0);
-          continue;
-        }
-        const session = api.twoPageVegetationSession(owner);
-        await session.load(); await session.loadReferences();
-        if (!enabled) {
-          assert.throws(() => session.stage('-7', 'Species', 'A', false), /disabled|independent gate/);
-          assert.equal(api.calls.filter(call => call[0].includes('save')).length, 0);
-          continue;
-        }
-        session.stage('-7', 'Species', 'A', false);
-        assert.equal(await session.save(request.requestId), false);
-        assert.equal(api.calls.filter(call => call[0] === 'save').length, 0);
-        const dispatched = api.calls.filter(call => call[0] === 'species-list-save');
-        assert.equal(dispatched.length, 1);
-        assert.equal(dispatched[0][1], contextId);
-        assert.ok(JSON.parse(dispatched[0][2]).speciesList);
-        assert.equal(session.closeState().blocked, true);
-      }
-    }
-  }
+test('Species list save dispatches SaveTwoPageVegetationSpeciesList and blocks until recovery', async () => {
+  const api = registry({}, {
+    GetSpeciesReferences: () => {
+      const refs = structuredClone(require('./twoPageVegetationSpeciesListReceipts.json')[7].history.Request.speciesList);
+      Object.assign(refs, owner);
+      return Promise.resolve(client.proxy(refs));
+    },
+  });
+  assert.equal(api.twoPageVegetationSpeciesListEnabled, true);
+  const session = api.twoPageVegetationSession(owner);
+  await session.load(); await session.loadReferences();
+  session.stage('-7', 'Species', 'A', false);
+  assert.equal(await session.save(request.requestId), false);
+  assert.equal(api.calls.filter(call => call[0] === 'save').length, 0);
+  const dispatched = api.calls.filter(call => call[0] === 'species-list-save');
+  assert.equal(dispatched.length, 1);
+  assert.equal(dispatched[0][1], contextId);
+  assert.ok(JSON.parse(dispatched[0][2]).speciesList);
+  assert.equal(session.closeState().blocked, true);
 });
 
-test('readonly Species facade uses exact retained owner and aggregate operation/remount barriers independently of writing', async () => {
+test('Species facade uses exact retained owner and aggregate operation/remount barriers', async () => {
   let release;
-  const api = registry({ VITE_TWO_PAGE_VEGETATION_REVIEW: 'true' }, {
+  const api = registry({}, {
     GetSpeciesReferences: (...args) => {
       assert.deepEqual(args, [contextId, plot, form]);
       return new Promise(resolve => { release = resolve; });

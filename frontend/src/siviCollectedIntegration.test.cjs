@@ -34,7 +34,6 @@ function host(overrides = {}) {
 
 test('Collected has independent literal frontend/backend gates and actual native registration without granting other columns', () => {
   assert.equal(compile(parent, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(parent, /VITE_SIVI_COLLECTED_EDITING !== 'false'/);
   assert.match(main, /siviFeature\(siviCollectedFeatureEnvironment, os.LookupEnv\)/);
   assert.match(main, /NewSIVICollectedService\(contextService, os.LookupEnv\)/);
   assert.match(main, /siviCollected:\s*siviCollected/);

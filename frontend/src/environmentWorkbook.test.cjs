@@ -99,7 +99,6 @@ test('lost or malformed workbook receipts stay unknown instead of becoming no-fi
 test('workbook panel keeps title/preferences/read/navigation/native-close barriers and receipts above guidance', () => {
   const source = readFileSync(path.join(__dirname, 'LongEnvironmentReport.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'LongEnvironmentReport.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_LONG_ENVIRONMENT_WORKBOOK !== 'false'/);
   assert.match(source, /workbookReview = \$state\.raw<ValidatedEnvironmentWorkbookReview/);
   assert.match(source, /onBusyChange\(busy \|\| preferenceBarrier \|\| workbookBarrier\)/);
   assert.match(source, /reads\.track\(EnvironmentReportService\.GetEnvironmentWorkbookReview/);

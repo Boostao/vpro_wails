@@ -9,15 +9,15 @@ const serverReads = { ReadRequests: class {
   cancelAll() {}
 } };
 
-function serverComponent(source, filename, dependencies, environment = {}) {
+function serverComponent(source, filename, dependencies, _environment = {}) {
   const compiled = compile(source, { filename: path.resolve(__dirname, filename), generate: 'server' });
   assert.equal(compiled.warnings.length, 0);
   const module = { exports: {} };
-  const code = ts.transpileModule(compiled.js.code.replaceAll('import.meta.env', '__testEnvironment'), {
+  const code = ts.transpileModule(compiled.js.code, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
   }).outputText;
   vm.runInNewContext(code, {
-    module, exports: module.exports, structuredClone, __testEnvironment: environment,
+    module, exports: module.exports, structuredClone,
     require(name) {
       if (name in dependencies) {
         const provided = dependencies[name];
@@ -66,54 +66,48 @@ function serverComponent(source, filename, dependencies, environment = {}) {
         });
       }
       if (name === 'svelte' || name.startsWith('svelte/')) return require(name);
-      if (name === './ProjectMetadataEditor.svelte' && environment.VITE_PROJECT_METADATA_EDITING === 'false') {
-        return { default: () => { throw new Error('Metadata editor rendered while its explicit test profile is disabled.'); } };
-      }
-      if (name === './ProjectMetadataEditor.svelte' && environment.VITE_PROJECT_METADATA_EDITING !== 'true') {
+      if (name === './ProjectMetadataEditor.svelte') {
         return { default: () => {} };
       }
-      if (name === './summaryVegetationPreferenceSessions' && environment.VITE_SUMMARY_VEGETATION_PREFERENCES !== 'true') {
+      if (name === './summaryVegetationPreferenceSessions') {
         return { summaryVegetationPreferenceSession: null };
       }
-      if (name === './summaryVegetationQualityPreferenceSessions' && environment.VITE_SUMMARY_VEGETATION_QUALITY_PREFERENCES !== 'true') {
+      if (name === './summaryVegetationQualityPreferenceSessions') {
         return { summaryVegetationQualityPreferenceSession: null };
       }
-      if (name === './summaryVegetationPresentationPreferenceSessions' && environment.VITE_SUMMARY_VEGETATION_PRESENTATION_PREFERENCES !== 'true') {
+      if (name === './summaryVegetationPresentationPreferenceSessions') {
         return { summaryVegetationPresentationPreferenceSession: null };
       }
-      if (name === './summaryVegetationFieldListDesktop' && environment.VITE_SUMMARY_VEGETATION_FIELD_LIST !== 'true') {
+      if (name === './summaryVegetationFieldListDesktop') {
         return { summaryVegetationFieldListDesktop: { enabled: false, contextAvailable: () => false } };
       }
-      if (name === './summaryVegetationEnvironmentalDesktop' && environment.VITE_SUMMARY_VEGETATION_ENVIRONMENT !== 'true') {
+      if (name === './summaryVegetationEnvironmentalDesktop') {
         return { summaryEnvironmentalEnabled: false, summaryEnvironmentalDesktop: {}, summaryEnvironmentalPort: {} };
       }
-      if (name === './SummaryVegetationWorkbookPanel.svelte' && environment.VITE_SUMMARY_VEGETATION_WORKBOOK === 'false') {
-        return { default: () => { throw new Error('Inspection workbook rendered while its explicit test profile is disabled.'); } };
-      }
-      if (name === './SummaryVegetationWorkbookPanel.svelte' && environment.VITE_SUMMARY_VEGETATION_WORKBOOK !== 'true') {
+      if (name === './SummaryVegetationWorkbookPanel.svelte') {
         return { default: () => {} };
       }
       if (name === './SummaryVegetationEnvironmental.svelte') return { default: serverComponent(
         readFileSync(path.join(__dirname, 'SummaryVegetationEnvironmental.svelte'), 'utf8'),
-        'SummaryVegetationEnvironmental.svelte', dependencies, environment) };
+        'SummaryVegetationEnvironmental.svelte', dependencies) };
       if (name === './SummaryVegetationFieldList.svelte') return { default: serverComponent(
         readFileSync(path.join(__dirname, 'SummaryVegetationFieldList.svelte'), 'utf8'),
-        'SummaryVegetationFieldList.svelte', dependencies, environment) };
+        'SummaryVegetationFieldList.svelte', dependencies) };
       if (name === './summaryVegetationFieldList') return loadTypeScript('summaryVegetationFieldList.ts');
       if (name === './SummaryVegetationPresentationPreferences.svelte') return { default: serverComponent(
         readFileSync(path.join(__dirname, 'SummaryVegetationPresentationPreferences.svelte'), 'utf8'),
-        'SummaryVegetationPresentationPreferences.svelte', dependencies, environment) };
+        'SummaryVegetationPresentationPreferences.svelte', dependencies) };
       if (name === './SummaryVegetationQualityPreferences.svelte') return { default: serverComponent(
         readFileSync(path.join(__dirname, 'SummaryVegetationQualityPreferences.svelte'), 'utf8'),
         'SummaryVegetationQualityPreferences.svelte', {
           ...dependencies, './summaryVegetationQualityPreferences': qualityPreferenceHelpers().preferences,
-        }, environment) };
-      if (name === './longVegetationProjectWorkspaces' && environment.VITE_LONG_VEGETATION_PROJECT_SCOPE !== 'true') {
+        }) };
+      if (name === './longVegetationProjectWorkspaces') {
         return { projectReportWorkspace: null };
       }
       if (name === './LongVegetationProjectScopeSelection.svelte' || name === './LongVegetationProjectUnitPreferences.svelte') {
         const filename = name.slice(2);
-        return { default: serverComponent(readFileSync(path.join(__dirname, filename), 'utf8'), filename, dependencies, environment) };
+        return { default: serverComponent(readFileSync(path.join(__dirname, filename), 'utf8'), filename, dependencies) };
       }
       if (name === './FieldGuidance.svelte') return { default: serverComponent(
         readFileSync(path.join(__dirname, 'FieldGuidance.svelte'), 'utf8'), 'FieldGuidance.svelte', {}) };
@@ -177,7 +171,7 @@ function componentFunctions(filename, names, values) {
   const defaultSoilReviewProfile = filename === 'App.svelte' || filename === 'FS882Form.svelte'
     ? { twoPageSoilBusy: false, twoPageSoilBlocked: false, ordinarySoilUnavailable: null, historicalSoilUnavailable: null,
       twoPageVegetationBusy: false, twoPageVegetationBlocked: false, ordinaryVegetationUnavailable: null } : {};
-  const context = vm.createContext({ exports: {}, __testEnvironment: {},
+  const context = vm.createContext({ exports: {},
     ...(filename === 'TwoPageEntryEditor.svelte' ? { vegetationTableOpen: false, vegetationTableBusy: false, environmentTableOpen: false, environmentTableBusy: false, projectMetadataOpen: false, projectMetadataBusy: false, profilingOpen: false, profilingBusy: false } : {}),
     ...(filename === 'SummaryVegetationReport.svelte' ? {
       preferences: null, quality: null, qualityView: null, qualityReadBusy: false,
@@ -187,7 +181,7 @@ function componentFunctions(filename, names, values) {
       fieldListHeld: false, fieldListBusy: false, environmentalHeld: false,
     } : {}),
     ...(filename === 'App.svelte' ? { projectReportBusy: false, summaryPreferenceBusy: false, summaryFieldListBusy: false, summaryEnvironmentalBusy: false, externalSUEnvironmentBusy: false, editorInitializing: false, companionPanelBusy: false, workbenchDirtyLabel: '' } : {}), ...defaultSoilReviewProfile, ...values });
-  const code = selected.map(node => node.getText(ast)).join('\n').replaceAll('import.meta.env', '__testEnvironment') +
+  const code = selected.map(node => node.getText(ast)).join('\n') +
     `\nthis.actions = {${names.join(',')}};`;
   vm.runInContext(ts.transpileModule(code, { compilerOptions: {
     module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022

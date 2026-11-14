@@ -12,7 +12,7 @@
     disabled: boolean; onchange: () => void;
     onvalidation: (key: 'substrate', message: string | null) => void; children: Snippet<[Snippet<[PaperControl?]>]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_SUBSTRATE_EDITING !== 'false';
+  const editingEnabled = true;
   let staged = $state<SubstrateDrafts>({});
   const errors = $derived(substrateErrors(staged));
   $effect(() => {

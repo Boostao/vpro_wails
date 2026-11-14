@@ -222,13 +222,13 @@ test('cancel/owner invalidation discards late PDF review, malformed backend revi
   assert.equal(context.pdfReview, null);
 });
 
-test('PDF-only flag renders distinct portable workflow and retains disabled physical print claims', () => {
+test('PDF export renders distinct portable workflow and retains disabled physical print claims', () => {
   const component = serverComponent(readFileSync(path.join(__dirname, 'PlotLabelPreview.svelte'), 'utf8'),
     'PlotLabelPreview.svelte', {
       '../bindings/github.com/boostao/vpro-wails': {},
       './scopedPlotLookup': lookup, './plotLabelPreview': labels,
       './plotLabelRegional': regional, './plotLabelPDFExport': pdf,
-    }, { VITE_PLOT_LABEL_PDF_EXPORT: 'true' });
+    });
   const body = render(component, { props: { ...scope, onBusyChange() {} } }).body;
   assert.match(body, /Review saved plot label PDF/);
   assert.match(body, /Portable saved label PDF/);

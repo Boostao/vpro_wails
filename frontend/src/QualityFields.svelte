@@ -15,7 +15,7 @@
     disabled: boolean; onchange: () => void; onvalidation: (key: 'quality', message: string | null) => void;
     onbusy?: (busy: boolean) => void; children: Snippet<[Snippet<[PaperControl?]>]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_QUALITY_EDITING !== 'false';
+  const editingEnabled = true;
   const listId = $props.id();
   const lookup = new CatalogueLookup(async (_force, requests) => {
     const rows = await requests.track(PlotEntryService.ListPlotQualityChoices());

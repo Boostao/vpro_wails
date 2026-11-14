@@ -141,8 +141,7 @@ test('common source scope preserves every instance with one live owner per logic
 });
 
 function headerComponents() {
-  const read = name => readFileSync(path.join(__dirname, `${name}.svelte`), 'utf8')
-    .replace(/import\.meta\.env\.VITE_[A-Z_]+/g, "'true'");
+  const read = name => readFileSync(path.join(__dirname, `${name}.svelte`), 'utf8');
   const bec = loadTypeScript('becEditor.ts');
   const reference = loadTypeScript('referenceCodeEditor.ts', { './becEditor': bec, './qualityEditor': quality });
   const workingUnit = loadTypeScript('workingUnitEditor.ts', { './becEditor': bec });

@@ -263,7 +263,6 @@ test('Metadata restoration is independently default-off and preserves explicit l
   const parent=readFileSync(path.join(__dirname,'ProjectMetadataEditor.svelte'),'utf8');
   const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   assert.equal(compile(component,{filename:'ProjectMetadataRestore.svelte',generate:'client'}).warnings.length,0);
-  assert.match(form,/VITE_PROJECT_METADATA_RESTORE !== 'false'/);
   assert.match(parent,/allowRestoration = false/);
   assert.match(parent,/if \(restorationOpen\) return restorationEditor\?\.getCloseState/);
   assert.match(component,/committed = true;[\s\S]*?proposal = null;[\s\S]*?validateMetadataRestorationResult/);
@@ -430,7 +429,6 @@ test('Confirmed source-standard population stages exactly24 literals, preserves 
 test('Metadata component stays outside remounted tabs and gates ordinary Save/Lock/native-close/context while retaining failed writes',()=>{
   const form=readFileSync(path.join(__dirname,'FS882Form.svelte'),'utf8');
   const component=readFileSync(path.join(__dirname,'ProjectMetadataEditor.svelte'),'utf8');
-  assert.match(form,/VITE_PROJECT_METADATA_EDITING !== 'false'/);
   assert.match(form,/siviCreationPeerUnsaved = \$derived\([^;]*metadataOpen/);
   assert.match(form,/childParentDisabled = \$derived\([^;]*metadataOpen/);
   assert.match(form,/if \(metadataOpen\) return metadataEditor\?\.getCloseState/);
@@ -441,8 +439,6 @@ test('Metadata component stays outside remounted tabs and gates ordinary Save/Lo
   assert.match(component,/metadata edit committed, but/);
   assert.match(component,/completed writes must not be replayed/);
   assert.match(component,/Save failed; raw drafts retained/);
-  assert.match(form,/VITE_PROJECT_METADATA_CREATION !== 'false'/);
-  assert.match(form,/VITE_PROJECT_METADATA_TEMPLATE_CREATION !== 'false'/);
   assert.match(component,/template = beginMetadataTemplate\(review, rowId, available\)/);
   assert.match(component,/await client\.CreateProjectMetadataFromTemplate\(metadataTemplateRequest\(template\)\)/);
   assert.match(component,/committed = true; template = null/);

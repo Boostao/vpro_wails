@@ -114,36 +114,31 @@ test('Invalid numeric sessions survive remount and block their scope, then reset
   assert.equal(Object.keys(ordinarySession({ ...draft }, original)).length, 0);
 });
 
-test('Actual scoped source controls render once with labels and explicit opt-out', () => {
+test('Actual scoped source controls render once with labels', () => {
   const source = readFileSync(path.join(__dirname, 'OrdinaryFields.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'OrdinaryFields.svelte', generate: 'client' }).warnings.length, 0);
-  for (const enabled of [true, false]) {
-    const Ordinary = serverComponent(source.replace('import.meta.env.VITE_ORDINARY_PARENT_EDITING',
-      enabled ? 'undefined' : "'false'").replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'false'")
-      .replace('import.meta.env.VITE_ADDITIONAL_PARENT_EDITING', "'false'"),
-      'OrdinaryFields.svelte', { './ordinaryEditor': editor });
-    for (const scope of ['site', 'veg', 'soils']) {
-      const fields = ordinaryFields.filter(field => field.scope === scope);
-      const controls = fields.map(field => ({ column: field.column, type: 'TextBox', enabled: true,
-        locked: false, controlName: field.column, controlId: field.column }));
-      const fixture = `<script>import Ordinary from './OrdinaryFields.svelte'; let { draft, controls, scope, capabilities }=$props();</script>
-        <Ordinary bind:draft original={null} {scope} {capabilities} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
-          {#snippet children(slot)}
-            {#each controls as control}
-              {#if slot && slot.columns.includes(control.column)}{@render slot.input(control,'width:100%')}
-              {:else}<input disabled data-column={control.column}/>{/if}
-            {/each}
-          {/snippet}
-        </Ordinary>`;
-      const Component = serverComponent(fixture, 'OrdinaryFixture.svelte', { './OrdinaryFields.svelte': { default: Ordinary } });
-      const html = render(Component, { props: { draft: values(), controls, scope,
-        capabilities: Object.fromEntries(fields.map(field => [field.key, true])) } }).body;
-      for (const field of fields) {
-        assert.equal((html.match(new RegExp(`data-column="${field.column}"`, 'g')) || []).length, 1);
-        if (enabled) assert.match(html, new RegExp(`aria-label="${field.label}"`));
-      }
-      assert.equal((html.match(/ disabled/g) || []).length, enabled ? 0 : fields.length);
+  const Ordinary = serverComponent(source, 'OrdinaryFields.svelte', { './ordinaryEditor': editor });
+  for (const scope of ['site', 'veg', 'soils']) {
+    const fields = ordinaryFields.filter(field => field.scope === scope);
+    const controls = fields.map(field => ({ column: field.column, type: 'TextBox', enabled: true,
+      locked: false, controlName: field.column, controlId: field.column }));
+    const fixture = `<script>import Ordinary from './OrdinaryFields.svelte'; let { draft, controls, scope, capabilities }=$props();</script>
+      <Ordinary bind:draft original={null} {scope} {capabilities} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
+        {#snippet children(slot)}
+          {#each controls as control}
+            {#if slot && slot.columns.includes(control.column)}{@render slot.input(control,'width:100%')}
+            {:else}<input disabled data-column={control.column}/>{/if}
+          {/each}
+        {/snippet}
+      </Ordinary>`;
+    const Component = serverComponent(fixture, 'OrdinaryFixture.svelte', { './OrdinaryFields.svelte': { default: Ordinary } });
+    const html = render(Component, { props: { draft: values(), controls, scope,
+      capabilities: Object.fromEntries(fields.map(field => [field.key, true])) } }).body;
+    for (const field of fields) {
+      assert.equal((html.match(new RegExp(`data-column="${field.column}"`, 'g')) || []).length, 1);
+      assert.match(html, new RegExp(`aria-label="${field.label}"`));
     }
+    assert.equal((html.match(/ disabled/g) || []).length, 0);
   }
 });
 
@@ -186,48 +181,39 @@ test('Source X/Y Singles and Photo TEXT50 reuse raw-domain validation without ge
   assert.equal(ordinaryValidation('site', draft, null, {}, ordinaryFields), null);
 });
 
-test('Actual final scalar slot is independently gated and never enables the picture manager', () => {
+test('Actual final scalar slot renders enabled controls and never enables the picture manager', () => {
   const source = readFileSync(path.join(__dirname, 'OrdinaryFields.svelte'), 'utf8');
-  for (const enabled of [true, false]) {
-    const Scalar = serverComponent(source
-      .replace('import.meta.env.VITE_ORDINARY_PARENT_EDITING', "'false'")
-      .replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'false'")
-      .replace('import.meta.env.VITE_ADDITIONAL_PARENT_EDITING', enabled ? "'true'" : "'false'"),
-      'OrdinaryFields.svelte', { './ordinaryEditor': editor });
-    const fixture = `<script>import Scalar from './Scalar.svelte';let {draft, controls, capabilities}=$props();</script>
-      <Scalar bind:draft original={null} scope="site" {capabilities} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
-        {#snippet children(slot)}
-          {#each controls as control}
-            {#if slot && slot.columns.includes(control.column)}{@render slot.input(control,'width:100%')}
-            {:else}<input disabled data-column={control.column}/>{/if}
-          {/each}
-        {/snippet}
-      </Scalar>`;
-    const Wrapper = serverComponent(fixture, 'ScalarFixture.svelte', { './Scalar.svelte': { default: Scalar } });
-    const fields = editor.additionalParentFields;
-    const html = render(Wrapper, { props: { draft: values(),
-      controls: fields.map(field => ({ column: field.column, type: 'TextBox', enabled: true, locked: false, controlName: field.column })),
-      capabilities: Object.fromEntries(fields.map(field => [field.key, true])) } }).body;
-    assert.equal((html.match(/data-column=/g) || []).length, 3);
-    assert.equal((html.match(/ disabled/g) || []).length, enabled ? 0 : 3);
-    assert.doesNotMatch(html, /btnManagePictures|btnPlotPicture/);
-  }
+  const Scalar = serverComponent(source, 'OrdinaryFields.svelte', { './ordinaryEditor': editor });
+  const fixture = `<script>import Scalar from './Scalar.svelte';let {draft, controls, capabilities}=$props();</script>
+    <Scalar bind:draft original={null} scope="site" {capabilities} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
+      {#snippet children(slot)}
+        {#each controls as control}
+          {#if slot && slot.columns.includes(control.column)}{@render slot.input(control,'width:100%')}
+          {:else}<input disabled data-column={control.column}/>{/if}
+        {/each}
+      {/snippet}
+    </Scalar>`;
+  const Wrapper = serverComponent(fixture, 'ScalarFixture.svelte', { './Scalar.svelte': { default: Scalar } });
+  const fields = editor.additionalParentFields;
+  const html = render(Wrapper, { props: { draft: values(),
+    controls: fields.map(field => ({ column: field.column, type: 'TextBox', enabled: true, locked: false, controlName: field.column })),
+    capabilities: Object.fromEntries(fields.map(field => [field.key, true])) } }).body;
+  assert.equal((html.match(/data-column=/g) || []).length, 3);
+  assert.equal((html.match(/ disabled/g) || []).length, 0);
+  assert.doesNotMatch(html, /btnManagePictures|btnPlotPicture/);
 });
 
-test('Two separately gated source flags retain nullable identity and labelled CheckBox ownership', () => {
+test('Two source flags retain nullable identity and labelled CheckBox ownership', () => {
   assert.equal(editor.nullableParentFlags.length, 2);
   for (const field of editor.nullableParentFlags) {
     assert.equal(editor.ordinaryField(field.column), undefined);
     assert.equal(editor.nullableParentField(field.column).key, field.key);
   }
   const source = readFileSync(path.join(__dirname, 'OrdinaryFields.svelte'), 'utf8');
-  assert.match(source, /VITE_PARENT_FLAGS_EDITING !== 'false'/);
   assert.match(source, /indeterminate=\{draft\[field.key\] === null\}/);
   assert.match(source, /draft\[field.key\] = event\.currentTarget\.checked/);
   assert.match(source, /draft\[field.key\] = null; onchange\(\)/);
-  const Flags = serverComponent(source.replace('import.meta.env.VITE_ORDINARY_PARENT_EDITING', "'false'")
-    .replace('import.meta.env.VITE_PARENT_FLAGS_EDITING', "'true'")
-    .replace('import.meta.env.VITE_ADDITIONAL_PARENT_EDITING', "'false'"), 'OrdinaryFields.svelte', { './ordinaryEditor': editor });
+  const Flags = serverComponent(source, 'OrdinaryFields.svelte', { './ordinaryEditor': editor });
   const fixture = `<script>import Flags from './OrdinaryFields.svelte';let {draft, field, original=null}=$props();</script>
     <Flags bind:draft {original} scope={field.scope} capabilities={{[field.key]:true}} disabled={false} onchange={()=>{}} onvalidation={()=>{}}>
       {#snippet children(slot)}
@@ -288,29 +274,24 @@ test('Actual drainage component owns only its strict source slot and retains exp
   assert.match(source, /onDestroy[\s\S]*lookup\.dispose\(\)[\s\S]*onvalidation\('soilDrainage'/);
   assert.match(form, /parentCodeBusy \|\| drainageBusy/);
   assert.doesNotMatch(source, /type="checkbox"|rememberAcknowledgement|maxlength=/);
-  for (const enabled of [true, false]) {
-    const Component = serverComponent(source.replace('import.meta.env.VITE_SOIL_DRAINAGE_EDITING',
-      enabled ? "'true'" : "'false'"), 'DrainageFields.svelte', {
-      './drainageEditor': drainage, './qualityEditor': quality,
-      '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {} }
-    });
-    const fixture = `<script>import Drainage from './Drainage.svelte';let draft={soilDrainage:'legacy-long'};</script>
-      <label>Drainage class
-        <Drainage bind:draft original={{soilDrainage:'legacy-long'}} capabilities={{soilDrainage:true}} disabled={false}
-          onchange={()=>{}} onvalidation={()=>{}} onbusy={()=>{}}>
-          {#snippet children(slot)}
-            {#if slot}{@render slot.input({column:'SoilDrainage',type:'ComboBox',enabled:true,locked:false,controlName:'SoilDrainage'},'width:100%')}
-            {:else}<input disabled data-column="SoilDrainage"/>{/if}
-          {/snippet}
-        </Drainage>
-      </label>`;
-    const Wrapper = serverComponent(fixture, 'DrainageFixture.svelte', { './Drainage.svelte': { default: Component } });
-    const html = render(Wrapper).body;
-    assert.equal((html.match(/data-column="SoilDrainage"/g) || []).length, 1);
-    if (enabled) {
-      assert.match(html, /id="header-soilDrainage"/);
-      assert.match(html, /value="legacy-long"/);
-      assert.doesNotMatch(html, /aria-invalid="true"/);
-    } else assert.match(html, /disabled(?:="")? data-column="SoilDrainage"/);
-  }
+  const Component = serverComponent(source, 'DrainageFields.svelte', {
+    './drainageEditor': drainage, './qualityEditor': quality,
+    '../bindings/github.com/boostao/vpro-wails': { PlotEntryService: {} }
+  });
+  const fixture = `<script>import Drainage from './Drainage.svelte';let draft={soilDrainage:'legacy-long'};</script>
+    <label>Drainage class
+      <Drainage bind:draft original={{soilDrainage:'legacy-long'}} capabilities={{soilDrainage:true}} disabled={false}
+        onchange={()=>{}} onvalidation={()=>{}} onbusy={()=>{}}>
+        {#snippet children(slot)}
+          {#if slot}{@render slot.input({column:'SoilDrainage',type:'ComboBox',enabled:true,locked:false,controlName:'SoilDrainage'},'width:100%')}
+          {:else}<input disabled data-column="SoilDrainage"/>{/if}
+        {/snippet}
+      </Drainage>
+    </label>`;
+  const Wrapper = serverComponent(fixture, 'DrainageFixture.svelte', { './Drainage.svelte': { default: Component } });
+  const html = render(Wrapper).body;
+  assert.equal((html.match(/data-column="SoilDrainage"/g) || []).length, 1);
+  assert.match(html, /id="header-soilDrainage"/);
+  assert.match(html, /value="legacy-long"/);
+  assert.doesNotMatch(html, /aria-invalid="true"/);
 });

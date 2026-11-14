@@ -178,15 +178,12 @@ test('saved CRLF no-op preserves raw literals; deliberate multiline LF drafts su
   assert.equal(captured.expected.title, saved); assert.equal(captured.proposed.title, edited);
   assert.equal(remount.view().saved.title, edited);
 });
-test('rendered title has one labelled conditional control: enabled two-row textarea, default-off original input', () => {
+test('rendered title has one labelled two-row textarea control', () => {
   const source = readFileSync(path.join(__dirname, 'LongEnvironmentReport.svelte'), 'utf8');
   const session = new prefs.LongEnvironmentPreferencesSession(scope);
   const saved = 'First line\r\nSecond line';
   session.apply(review(saved));
-  for (const enabled of [true, false]) {
-    const component = serverComponent(source.replace(
-      "import.meta.env.VITE_LONG_ENVIRONMENT_PREFERENCES !== 'false'", String(enabled))
-      .replace("import.meta.env.VITE_LONG_ENVIRONMENT_WORKBOOK !== 'false'", 'false'),
+  const component = serverComponent(source,
     'LongEnvironmentReport.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { EnvironmentReportService: {} },
       './longEnvironmentPreferences': { longEnvironmentPreferencesSession: () => session },
@@ -196,28 +193,21 @@ test('rendered title has one labelled conditional control: enabled two-row texta
         subscribe: () => () => {},
       }) },
     });
-    const { body } = render(component, { props: { ...scope, onBusyChange: () => {} } });
-    const controls = body.match(/<(?:input|textarea)\b[^>]*id="long-environment-title"[^>]*>/g) ?? [];
-    assert.equal(controls.length, 1);
-    assert.match(body, /<label[^>]*for="long-environment-title"[^>]*>Title<\/label>/);
-    if (enabled) {
-      assert.match(controls[0], /^<textarea/); assert.match(controls[0], /rows="2"/);
-      assert.match(body, /First line\r\nSecond line<\/textarea>/);
-      assert.doesNotMatch(controls[0], /maxlength/);
-      assert.equal(session.view().draft.title, saved);
-    } else {
-      assert.match(controls[0], /^<input/); assert.match(controls[0], /disabled/);
-      assert.doesNotMatch(body, /<textarea/);
-    }
-  }
+  const { body } = render(component, { props: { ...scope, onBusyChange: () => {} } });
+  const controls = body.match(/<(?:input|textarea)\b[^>]*id="long-environment-title"[^>]*>/g) ?? [];
+  assert.equal(controls.length, 1);
+  assert.match(body, /<label[^>]*for="long-environment-title"[^>]*>Title<\/label>/);
+  assert.match(controls[0], /^<textarea/); assert.match(controls[0], /rows="2"/);
+  assert.match(body, /First line\r\nSecond line<\/textarea>/);
+  assert.doesNotMatch(controls[0], /maxlength/);
+  assert.equal(session.view().draft.title, saved);
   assert.match(source, /\{#if preferencesEnabled\}\s*<textarea[\s\S]*?\{:else\}\s*<input[^>]*disabled=\{busy \|\| !ready \|\| workbookBarrier\}/);
   assert.equal((source.match(/const value = event.currentTarget.value; editTitle\(value\)/g) ?? []).length, 2);
   assert.match(source, /input, textarea \{[^}]*width: 100%/);
 });
-test('default-off panel has one live title and explicit cancellable Load/noncancellable Save barriers', () => {
+test('panel has one live title and explicit cancellable Load/noncancellable Save barriers', () => {
   const panel = readFileSync(path.join(__dirname, 'LongEnvironmentReport.svelte'), 'utf8');
   assert.equal(compile(panel, { filename: 'LongEnvironmentReport.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(panel, /VITE_LONG_ENVIRONMENT_PREFERENCES !== 'false'/);
   assert.equal((panel.match(/id="long-environment-title"/g) ?? []).length, 2);
   assert.match(panel, /if \(!preferencesEnabled\) void options\(\)/);
   assert.match(panel, /if \(!preferencesEnabled\) title = value.title/);

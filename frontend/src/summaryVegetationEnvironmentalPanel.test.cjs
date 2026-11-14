@@ -26,7 +26,7 @@ const deferred = () => {
 };
 function execute(code, dependencies, globals = {}) {
   const module = { exports: {} };
-  const js = ts.transpileModule(code.replaceAll('import.meta.env', '__environment'), {
+  const js = ts.transpileModule(code, {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
   }).outputText;
   vm.runInNewContext(js, { ...globals, module, exports: module.exports,
@@ -198,87 +198,26 @@ test('retained completed result survives remount without another dispatch or los
   next.destroy();
 });
 
-test('both literal client feature flags required and fixed wire API calls only one combined service', async () => {
-  const desktop = fs.readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalDesktop.ts'), 'utf8');
-  for (const [base, environment, expected] of [['true', 'true', true], ['true', 'false', false],
-    ['false', 'true', false], [undefined, undefined, true], ['false', 'false', false]]) {
-    const calls = [];
-    const module = execute(desktop, {
-      '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {
-        PreviewSummaryVegetationEnvironmental: (...args) => { calls.push(args); return Promise.resolve(wire); },
-      } },
-      './summaryVegetationEnvironmental': client,
-    }, { __environment: { VITE_SUMMARY_VEGETATION: base, VITE_SUMMARY_VEGETATION_ENVIRONMENT: environment,
-      VITE_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC: 'false' }, setTimeout });
-    assert.equal(module.summaryEnvironmentalEnabled, expected);
-    if (expected) {
-      await module.summaryEnvironmentalDesktop.session(owner).show(module.summaryEnvironmentalPort);
-      assert.deepEqual(calls, [[owner.contextId, 1, 6, 0]]);
-    } else assert.throws(() => module.summaryEnvironmentalDesktop.session(owner), /disabled/);
-  }
-});
-
-test('independent numeric client flag selects one correct service and preserves base/environment gates', async () => {
-  const desktop = fs.readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalDesktop.ts'), 'utf8');
-  const numericOwner = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, numericWire.vegetation[key]]));
-  for (const base of ['true', 'false']) for (const environment of ['true', 'false'])
-    for (const numeric of ['true', 'false', 'TRUE', '']) {
-      const calls = [];
-      const module = execute(desktop, {
-        '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: {
-          PreviewSummaryVegetationEnvironmental: (...args) => { calls.push(['legacy', ...args]); return Promise.resolve(wire); },
-          PreviewSummaryVegetationEnvironmentalNumeric: (...args) => { calls.push(['numeric', ...args]); return Promise.resolve(numericWire); },
-        } },
-        './summaryVegetationEnvironmental': client,
-      }, { __environment: { VITE_SUMMARY_VEGETATION: base, VITE_SUMMARY_VEGETATION_ENVIRONMENT: environment,
-        VITE_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC: numeric, VITE_SUMMARY_VEGETATION_ENVIRONMENT_LIFEFORM: 'false' }, setTimeout });
-      const enabled = base !== 'false' && environment !== 'false', typed = enabled && numeric !== 'false';
-      assert.equal(module.summaryEnvironmentalEnabled, enabled);
-      assert.equal(module.summaryEnvironmentalNumericEnabled, typed);
-      if (enabled) {
-        const selectedOwner = typed ? numericOwner : owner;
-        const session = module.summaryEnvironmentalDesktop.session(selectedOwner);
-        assert.equal(await session.show(module.summaryEnvironmentalPort), true);
-        assert.deepEqual(calls, [[typed ? 'numeric' : 'legacy', selectedOwner.contextId, 1, 6, 0]]);
-        assert.equal(session instanceof (typed ? client.SummaryEnvironmentalNumericSession : client.SummaryEnvironmentalSession), true);
-      } else {
-        assert.throws(() => module.summaryEnvironmentalDesktop.session(numericOwner), /disabled/);
-        assert.deepEqual(calls, []);
-      }
-    }
-});
-
-test('literal lifeform client gate requires all three predecessors and selects exactly one matching registry/service', async () => {
-  for (const base of ['false', 'true']) for (const environment of ['false', 'true']) for (const numeric of ['false', 'true'])
-    for (const lifeform of ['', 'false', 'true', 'TRUE', '1', ' true']) {
-      const calls = [];
-      const module = execute(fs.readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalDesktop.ts'), 'utf8'), {
-        '../bindings/github.com/boostao/vpro-wails': {
-          VegetationReportService: {
-            PreviewSummaryVegetationEnvironmental: (...args) => { calls.push(['legacy', ...args]); return Promise.resolve(wire); },
-            PreviewSummaryVegetationEnvironmentalNumeric: (...args) => { calls.push(['numeric', ...args]); return Promise.resolve(numericWire); },
-            PreviewSummaryVegetationEnvironmentalLifeform: (...args) => { calls.push(['lifeform', ...args]); return Promise.resolve(lifeformWire); },
-          },
-        },
-        './summaryVegetationEnvironmental': client,
-      }, { __environment: { VITE_SUMMARY_VEGETATION: base, VITE_SUMMARY_VEGETATION_ENVIRONMENT: environment,
-        VITE_SUMMARY_VEGETATION_ENVIRONMENT_NUMERIC: numeric, VITE_SUMMARY_VEGETATION_ENVIRONMENT_LIFEFORM: lifeform }, setTimeout });
-      const enabled = base !== 'false' && environment !== 'false', typed = enabled && numeric !== 'false';
-      const full = typed && lifeform !== 'false';
-      assert.equal(module.summaryEnvironmentalLifeformEnabled, full);
-      if (!enabled) {
-        assert.throws(() => module.summaryEnvironmentalDesktop.session(owner), /disabled/);
-        assert.deepEqual(calls, []);
-        continue;
-      }
-      const selected = full ? lifeformWire : typed ? numericWire : wire;
-      const owned = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, selected.vegetation[key]]));
-      const session = module.summaryEnvironmentalDesktop.session(owned);
-      assert.equal(session instanceof (full ? client.SummaryEnvironmentalLifeformSession :
-        typed ? client.SummaryEnvironmentalNumericSession : client.SummaryEnvironmentalSession), true);
-      assert.equal(await session.show(module.summaryEnvironmentalPort), true);
-      assert.deepEqual(calls, [[full ? 'lifeform' : typed ? 'numeric' : 'legacy', owned.contextId, 1, 6, 0]]);
-    }
+test('desktop environmental module enables lifeform/numeric/base flags and dispatches lifeform preview service', async () => {
+  const calls = [];
+  const module = execute(fs.readFileSync(path.join(__dirname, 'summaryVegetationEnvironmentalDesktop.ts'), 'utf8'), {
+    '../bindings/github.com/boostao/vpro-wails': {
+      VegetationReportService: {
+        PreviewSummaryVegetationEnvironmental: () => { throw new Error('legacy fallback forbidden'); },
+        PreviewSummaryVegetationEnvironmentalNumeric: () => { throw new Error('numeric fallback forbidden'); },
+        PreviewSummaryVegetationEnvironmentalLifeform: (...args) => { calls.push(['lifeform', ...args]); return Promise.resolve(lifeformWire); },
+      },
+    },
+    './summaryVegetationEnvironmental': client,
+  }, { setTimeout });
+  assert.equal(module.summaryEnvironmentalEnabled, true);
+  assert.equal(module.summaryEnvironmentalNumericEnabled, true);
+  assert.equal(module.summaryEnvironmentalLifeformEnabled, true);
+  const owned = Object.fromEntries(['contextId', 'project', 'projectPath', 'su', 'suPath'].map(key => [key, lifeformWire.vegetation[key]]));
+  const session = module.summaryEnvironmentalDesktop.session(owned);
+  assert.equal(session instanceof client.SummaryEnvironmentalLifeformSession, true);
+  assert.equal(await session.show(module.summaryEnvironmentalPort), true);
+  assert.deepEqual(calls, [['lifeform', owned.contextId, 1, 6, 0]]);
 });
 
 test('actual root derived hold survives pane teardown until cancelled dispatch settles', async () => {

@@ -151,33 +151,31 @@ test('source captions and bindings render once with live correction/Undo and no 
     else assert.match(body, /unloaded boxes do not represent saved values/);
   }
 });
-test('actual report composition preserves default-off switches and propagates retained draft barriers to root', () => {
+test('actual report composition renders switches and propagates retained draft barriers to root', () => {
   const reportSource = source('LongVegetationReport.svelte');
-  for (const enabled of [false, true]) {
-    const owner = { ...scope, contextId: `switch-composition-${enabled}` };
-    const session = prefs.longVegetationSwitchPreferencesSession(owner); session.apply(review(undefined, owner));
-    session.editSwitch('reportSummary', null);
-    const component = serverComponent(reportSource.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
-      .replace('const switchesEnabled = false;', `const switchesEnabled = ${enabled};`), 'LongVegetationReport.svelte', {
-        '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
-        './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': prefs,
-        './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
-        './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
-        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
-        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
-        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
-      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
-      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
-      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
-        './LongVegetationSwitchPreferences.svelte': { default: child() }, './longEnvironmentReport': {}, './longVegetationReport': {},
-        './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
-          view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }
-        } },
-      });
-    const barriers = []; const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
-    assert.equal(barriers.at(-1), enabled);
-    if (enabled) assert.match(body, /data-long-vegetation-switches/); else assert.doesNotMatch(body, /data-long-vegetation-switches/);
-  }
+  const owner = { ...scope, contextId: 'switch-composition-true' };
+  const session = prefs.longVegetationSwitchPreferencesSession(owner); session.apply(review(undefined, owner));
+  session.editSwitch('reportSummary', null);
+  const component = serverComponent(reportSource, 'LongVegetationReport.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
+    './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': prefs,
+    './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
+    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+    './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+    './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+    './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+    './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+    './LongVegetationSwitchPreferences.svelte': { default: child() }, './longEnvironmentReport': {}, './longVegetationReport': {},
+    './vegetationWorkbook': {
+      vegetationWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: false }), subscribe: () => () => {} }),
+      VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } },
+    },
+  });
+  const barriers = []; const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
+  assert.equal(barriers.at(-1), true);
+  assert.match(body, /data-long-vegetation-switches/);
   const panel = source('LongVegetationSwitchPreferences.svelte');
   assert.match(panel, /const value = event.currentTarget.checked; edit\(field.key, value\)/);
   assert.doesNotMatch(panel, /reads\.track\(VegetationReportService\.Save/);

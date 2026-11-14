@@ -233,10 +233,9 @@ test('malformed destinations and stale current methods never dispatch; literal v
   assert.equal(session.view().outcome.path, destination); assert.equal(calls, 1);
 });
 
-test('panel compiles with accessible scoped source tables, default-off gate, current-method guard and cancellation isolation', () => {
+test('panel compiles with accessible scoped source tables, current-method guard and cancellation isolation', () => {
   const text = source();
   assert.equal(compile(text, { filename: 'SiteUnitSummaryWorkbookPanel.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(text, /VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'false'/);
   assert.match(text, /onBusyChange\(busy \|\| publication.busy \|\| publication.blocked\)/);
   assert.match(text, /method !== requestedMethod/);
   assert.match(text, /review\.preview\.report\.method === method/);
@@ -257,11 +256,9 @@ test('panel compiles with accessible scoped source tables, default-off gate, cur
   assert.doesNotMatch(cancellation, /acknowledge|publication\s*=|session\./);
 });
 
-test('actual server-rendered panel exposes label, disabled gate and explicit remount unknown alert above controls', () => {
+test('actual server-rendered panel exposes label and explicit remount unknown alert above controls', () => {
   const owned = { ...owner, contextId: 'unknown-remount' };
-  const Panel = serverComponent(source().replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK", "'false'")
-    .replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK", "'false'")
-    .replace('structuredClone(owner)', '({ ...owner })'),
+  const Panel = serverComponent(source().replace('structuredClone(owner)', '({ ...owner })'),
     'SiteUnitSummaryWorkbookPanel.svelte', {
       '../bindings/github.com/boostao/vpro-wails': { EnvironmentReportService: {} },
       './siteUnitSummaryWorkbook': workbook,
@@ -284,9 +281,7 @@ function panelScript(owned) {
   let destroy, exports;
   let script = source().match(/<script lang="ts">([\s\S]*?)<\/script>/)[1]
     .replace(/\r/g, '')
-    .replace(/^\s*import[\s\S]*?;\n/gm, '')
-    .replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK", "'true'")
-    .replace("import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK", "'false'");
+    .replace(/^\s*import[\s\S]*?;\n/gm, '');
   script = ts.transpileModule(script, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText;
   const getters = [];
   script = script.replace(/const (\w+) = \$derived\(([\s\S]*?)\);/g, (_, name, expression) => {

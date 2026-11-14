@@ -92,44 +92,36 @@ test('actual lifecycle subscriptions settle, retain raw DTOs and detach on owner
   }
 });
 
-test('either independent lifecycle flag constructs an idle manager without notifying reactive root observers', async () => {
+test('lifecycle manager constructs an idle manager without notifying reactive root observers', async () => {
   const client = await import('svelte/internal/client');
   const { compile } = require('svelte/compiler');
   const ts = require('typescript');
-  for (const flags of [
-    { VITE_PICTURE_DELETION_WRITING: 'true', VITE_PICTURE_DELETION_RESTORING: 'false', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_CREATION_WRITING: 'false' },
-    { VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'true', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_CREATION_WRITING: 'false' },
-    { VITE_PICTURE_DELETION_WRITING: 'true', VITE_PICTURE_DELETION_RESTORING: 'true', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_CREATION_WRITING: 'false' },
-  ]) {
-    const retained = registry({ PictureService: {} });
-    const rootBusy = client.state(false);
-    let notifications = 0;
-    const stop = retained.subscribePictureLifecycleActivity(activity => {
-      notifications++; client.set(rootBusy, activity.busy || activity.blocked);
-    });
-    const script = source('PictureManager.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
-    const compiled = compile(`<script lang="ts">${script}</script>`, { generate: 'client' }).js.code
-      .replaceAll('import.meta.env', '__testEnvironment');
-    const ast = ts.createSourceFile('manager.js', compiled, ts.ScriptTarget.Latest, true);
-    const code = ast.statements.filter(node => !ts.isImportDeclaration(node)).map(node => node.getText(ast)).join('\n')
-      .replace('export default function', 'function');
-    const manager = new Function('$', 'untrack', 'plotLookupInputError', 'pictureMetadataSession',
-      'pictureCreationSession', 'pictureLifecycleSession', '__testEnvironment', code + '\nreturn _unknown_;')(
-      client, client.untrack, () => null,
-      () => { throw new Error('Metadata remains disabled'); },
-      () => { throw new Error('Add remains disabled'); }, retained.pictureLifecycleSession, flags);
-    const activity = [];
-    const dispose = client.effect_root(() => manager(null, {
-      ...owner, initialPlot: owner.plotNumber, onBusyChange: value => activity.push(value),
-    }));
-    try {
-      client.flush();
-      assert.deepEqual(activity, [false]);
-      assert.equal(notifications, 1, 'Idle construction must not notify inside a derived evaluation');
-      assert.equal(client.get(rootBusy), false);
-      assert.equal(retained.pictureLifecycleSession(owner).closeState().unsaved, false);
-    } finally { dispose(); stop(); }
-  }
+  const retained = registry({ PictureService: {} });
+  const rootBusy = client.state(false);
+  let notifications = 0;
+  const stop = retained.subscribePictureLifecycleActivity(activity => {
+    notifications++; client.set(rootBusy, activity.busy || activity.blocked);
+  });
+  const script = source('PictureManager.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
+  const compiled = compile(`<script lang="ts">${script}</script>`, { generate: 'client' }).js.code;
+  const ast = ts.createSourceFile('manager.js', compiled, ts.ScriptTarget.Latest, true);
+  const code = ast.statements.filter(node => !ts.isImportDeclaration(node)).map(node => node.getText(ast)).join('\n')
+    .replace('export default function', 'function');
+  const manager = new Function('$', 'untrack', 'plotLookupInputError', 'pictureMetadataSession',
+    'pictureCreationSession', 'pictureLifecycleSession', code + '\nreturn _unknown_;')(
+    client, client.untrack, () => null,
+    () => undefined, () => undefined, retained.pictureLifecycleSession);
+  const activity = [];
+  const dispose = client.effect_root(() => manager(null, {
+    ...owner, initialPlot: owner.plotNumber, onBusyChange: value => activity.push(value),
+  }));
+  try {
+    client.flush();
+    assert.deepEqual(activity, [false]);
+    assert.equal(notifications, 1, 'Idle construction must not notify inside a derived evaluation');
+    assert.equal(client.get(rootBusy), false);
+    assert.equal(retained.pictureLifecycleSession(owner).closeState().unsaved, false);
+  } finally { dispose(); stop(); }
 });
 
 test('binding registry retains unknown requests across remount, recovers without replay and preserves both committed receipts', async () => {
@@ -198,13 +190,13 @@ test('lifecycle panel renders associated source fields and retained safety feedb
   await value.reviewDeletion('-7'); value.confirm(true);
   const component = serverComponent(source('PictureLifecyclePanel.svelte'), 'PictureLifecyclePanel.svelte', {
     './pictureRead': picture,
-  }, { VITE_PICTURE_DELETION_RESTORING: 'false' });
+  });
   let html = render(component, { props: { session: value } }).body;
   assert.equal((html.match(/<output(?:\s[^>]*)?>/g) || []).length, 5);
   for (const column of review().records.columns) assert.match(html, new RegExp(`<label[^>]*>${column.name}<output(?:\\s[^>]*)?>`));
   assert.match(html, /NULL/);
   assert.match(html, /Delete exactly this reviewed physical reference/);
-  assert.doesNotMatch(html, /Historical picture deletions/);
+  assert.match(html, /Historical picture deletions/);
   await value.save(requestId);
   html = render(component, { props: { session: value } }).body;
   assert.match(html, /Mutation outcome is unknown/);
@@ -227,8 +219,7 @@ test('restoration history is independently gated and consumed records remain non
     history: () => operation({ ...owner, events: [{ deletion: deletion(), restoration: restoration() }] }),
   });
   await value.loadHistory();
-  const component = serverComponent(source('PictureLifecyclePanel.svelte')
-    .replace("import.meta.env.VITE_PICTURE_DELETION_RESTORING === 'true'", 'true'),
+  const component = serverComponent(source('PictureLifecyclePanel.svelte'),
   'PictureLifecyclePanel.svelte', { './pictureRead': picture });
   const html = render(component, { props: { session: value } }).body;
   assert.match(html, /Historical picture deletions/);

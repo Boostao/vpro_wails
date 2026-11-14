@@ -121,7 +121,6 @@ test('panel safety feedback precedes fields and parent owner sits outside tab li
   assert.match(markup, /data-sivi-parent-reload[^>]*disabled/);
   assert.doesNotMatch(markup, /data-sivi-parent-field=/);
   const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(parent, /VITE_SIVI_PARENT_REVIEW !== 'false'/);
   assert.match(parent, /siviParentSession\?\.dispose\(\)/);
   assert.match(parent, /GetSIVIParentOriginal\(siviContextId, plot\)/);
   assert.match(parent, /independentHeaderWorkflowBusy = \$derived\([^\n]*siviParentBusy/);

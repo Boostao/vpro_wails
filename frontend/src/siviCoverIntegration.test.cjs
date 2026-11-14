@@ -48,7 +48,6 @@ function host(overrides = {}) {
 
 test('cover facade and source panel are independently gated without widening height saves', () => {
   assert.equal(compile(parent, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(parent, /VITE_SIVI_COVER_EDITING !== 'false'/);
   for (const method of ['GetSIVICoverOriginal', 'SaveSIVICoverReviewed', 'RestoreSIVICoverReviewed']) {
     assert.ok(parent.includes(`PlotEntryService.${method}(`));
   }
@@ -58,8 +57,8 @@ test('cover facade and source panel are independently gated without widening hei
   assert.match(parent, /siviCoverSession = new SIVICoverSession/);
 });
 
-test('literal default-off source notice gate is forwarded to all owned child writers without granting backend authority', () => {
-  assert.match(parent, /siviChildSourceNoticesEnabled = import\.meta\.env\.VITE_SIVI_CHILD_SOURCE_NOTICES !== 'false'/);
+test('source notice flag is forwarded to all owned child writers without granting backend authority', () => {
+  assert.match(parent, /const siviChildSourceNoticesEnabled = true/);
   for (const [Writer, revision] of [['Height', 'siviRevision'], ['Cover', 'siviCoverRevision'], ['Combined', 'siviCombinedRevision'], ['Collected', 'siviCollectedRevision']]) {
     assert.match(parent, new RegExp(`new SIVI${Writer}Session\\(plot, \\{[\\s\\S]*?\\}, \\(\\) => ${revision}\\+\\+, extendedShrubs, siviChildSourceNoticesEnabled\\)`));
   }
@@ -171,8 +170,7 @@ test('acknowledged child changes refresh only an already-loaded peer and preserv
   }
 });
 
-    test('combined facade is independently gated and wired through Save Undo Lock close and disposal', () => {
-      assert.match(parent, /VITE_SIVI_COMBINED_EDITING !== 'false'/);
+    test('combined facade is wired through Save Undo Lock close and disposal', () => {
       for (const method of ['GetSIVICombinedOriginal', 'SaveSIVICombinedReviewed', 'RestoreSIVICombinedReviewed']) assert.ok(parent.includes(`PlotEntryService.${method}(`));
       assert.match(parent, /siviCombinedSession\?\.dispose\(\);[\s\S]{0,70}siviCombinedReads\.cancelAll\(\)/);
       assert.match(parent, /if \(siviCombinedUnsaved\) \{ await siviCombinedOperation\('save'\); return; \}/);

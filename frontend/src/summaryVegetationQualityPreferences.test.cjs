@@ -301,7 +301,7 @@ test('production Summary pane refuses unqualified enforced preview and holds sib
       './summaryVegetation': report,
       './summaryVegetationQualityPreferenceSessions': { summaryVegetationQualityPreferenceSession: () => qualitySession },
       '../bindings/github.com/boostao/vpro-wails': {},
-    }, { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_QUALITY_PREFERENCES: 'true' });
+    });
   const html = render(Panel, { props: { ...owner, onBusyChange() {} } }).body;
   assert.match(html.match(/<button[^>]*data-summary-preview[^>]*>/)[0], /\bdisabled\b/);
   assert.match(html, /no unfiltered report is returned/);

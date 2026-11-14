@@ -18,8 +18,7 @@
     extendedOptions?: ExtendedSummaryWorkbookOptions | null;
   } = $props();
   const extended = untrack(() => extendedOptions !== undefined);
-  const enabled = extended ? import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'false'
-    : import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK !== 'false';
+  const enabled = true;
   const owned = untrack(() => structuredClone(owner));
   const originalSession = siteUnitSummaryWorkbookPublicationSession(owned);
   const extendedSession = extended ? extendedSummaryWorkbookPublicationSession(owned) : null;

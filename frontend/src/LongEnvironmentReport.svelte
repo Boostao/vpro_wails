@@ -20,8 +20,8 @@
   const titleError = $derived(reportTitleError(title));
   const reads = new ReadRequests();
   let generation = 0;
-  const preferencesEnabled = import.meta.env.VITE_LONG_ENVIRONMENT_PREFERENCES !== 'false';
-  const workbookEnabled = import.meta.env.VITE_LONG_ENVIRONMENT_WORKBOOK !== 'false';
+  const preferencesEnabled = true;
+  const workbookEnabled = true;
   const workbookOwner = untrack(() => ({ contextId, project, projectPath, su, suPath }));
   const workbookSession = environmentWorkbookPublicationSession(workbookOwner);
   let publication = $state(workbookSession.view());

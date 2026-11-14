@@ -145,46 +145,42 @@ test('actual field panel associates one live source control with its label and l
   assert.match(html, /no trimming, case change or column creation/);
   assert.match(html, /saving preferences does not enable them/);
 });
-test('actual root remount retains field errors and independently gates every report operation', () => {
-  for (const enabled of [false, true]) {
-    const owner = { ...scope, contextId: `selected-field-root-${enabled}` };
-    const registry = prefs.createLongVegetationSelectedFieldPreferencesRegistry(), session = registry(owner);
-    session.apply({ ...review(), ...owner }); session.editField('new\0field');
-    const reportSource = source('LongVegetationReport.svelte').replace(/import\.meta\.env\.(\w+) !== 'false'/g,
-      (_, flag) => String(enabled && flag === 'VITE_LONG_VEGETATION_SELECTED_FIELD_PREFERENCES'));
-    const child = serverComponent(source('LongVegetationSelectedFieldPreferences.svelte'), 'LongVegetationSelectedFieldPreferences.svelte', {
-      '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationSelectedFieldPreferences': prefs,
-    });
-    const component = serverComponent(reportSource, 'LongVegetationReport.svelte', {
-      '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
-      './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},
-      './LongVegetationSwitchPreferences.svelte': { default() {} }, './longVegetationThresholdPreferences': {},
-      './LongVegetationThresholdPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {},
-      './LongVegetationGroupPreferences.svelte': { default() {} }, './longVegetationQualityNullPreferences': {},
-      './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationQualityMinimumPreferences': {},
-      './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
-      './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
-      './longVegetationSelectedFieldPreferences': { createLongVegetationSelectedFieldPreferencesRegistry: () => registry },
-      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
-      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
-      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
-      './LongVegetationSelectedFieldPreferences.svelte': { default: child }, './longEnvironmentReport': {}, './longVegetationReport': {},
-      './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
-        view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }
-      } },
-    });
-    for (let mount = 0; mount < 2; mount++) {
-      const barriers = [];
-      const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
-      assert.equal(barriers.at(-1), enabled);
-      assert.equal(body.includes('data-long-vegetation-selected-field'), enabled);
-      if (enabled) {
-        assert.match(body, /data-long-vegetation-selected-field-save[^>]*disabled/);
-        assert.doesNotMatch(body, /data-long-vegetation-selected-field-undo[^>]*disabled/);
-      }
-    }
-    session.undo();
+test('actual root remount retains field errors and gates every report operation', () => {
+  const owner = { ...scope, contextId: 'selected-field-root-true' };
+  const registry = prefs.createLongVegetationSelectedFieldPreferencesRegistry(), session = registry(owner);
+  session.apply({ ...review(), ...owner }); session.editField('new\0field');
+  const reportSource = source('LongVegetationReport.svelte');
+  const child = serverComponent(source('LongVegetationSelectedFieldPreferences.svelte'), 'LongVegetationSelectedFieldPreferences.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationSelectedFieldPreferences': prefs,
+  });
+  const component = serverComponent(reportSource, 'LongVegetationReport.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
+    './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},
+    './LongVegetationSwitchPreferences.svelte': { default() {} }, './longVegetationThresholdPreferences': {},
+    './LongVegetationThresholdPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {},
+    './LongVegetationGroupPreferences.svelte': { default() {} }, './longVegetationQualityNullPreferences': {},
+    './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationQualityMinimumPreferences': {},
+    './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': { createLongVegetationSelectedFieldPreferencesRegistry: () => registry },
+    './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+    './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+    './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+    './LongVegetationSelectedFieldPreferences.svelte': { default: child }, './longEnvironmentReport': {}, './longVegetationReport': {},
+    './vegetationWorkbook': {
+      vegetationWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: false }), subscribe: () => () => {} }),
+      VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } },
+    },
+  });
+  for (let mount = 0; mount < 2; mount++) {
+    const barriers = [];
+    const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
+    assert.equal(barriers.at(-1), true);
+    assert.equal(body.includes('data-long-vegetation-selected-field'), true);
+    assert.match(body, /data-long-vegetation-selected-field-save[^>]*disabled/);
+    assert.doesNotMatch(body, /data-long-vegetation-selected-field-undo[^>]*disabled/);
   }
+  session.undo();
   const report = source('LongVegetationReport.svelte');
   assert.match(report, /selectedFieldView = selectedField.view\(\); invalidateReports\(\)/);
   assert.match(report, /function invalidateReports\(\) \{\s*preview = null; workbookReview = null;\s*projectWorkspace\?\.invalidate\(\)/);

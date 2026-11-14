@@ -70,10 +70,8 @@ test('actual parent preview and cancellation preserve the persistent workbook ac
 test('root and parent wire the default-off workbook without authorizing hierarchy or incomplete summary vegetation', () => {
   const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
   const parent = readFileSync(path.join(__dirname, 'LifeformSummary.svelte'), 'utf8');
-  assert.match(app, /VITE_LIFEFORM_WORKBOOK === 'false' \|\| import\.meta\.env\.VITE_LIFEFORM_SUMMARY === 'false'/);
   assert.match(app, /lifeformPublicationBusy = publication.busy \|\| publication.blocked/);
   assert.match(app, /publication.blocked && view === 'home'\) view = 'lifeform-summary'/);
-  assert.match(parent, /VITE_LIFEFORM_WORKBOOK !== 'false'/);
   assert.match(parent, /<LifeformWorkbookPanel owner=\{\{ contextId, project, projectPath, su, suPath \}\} disabled=\{busy\}/);
   assert.match(parent, /onBusyChange=\{\(held\) => \{ workbookBusy = held; reportBusy\(\); \}\}/);
   assert.match(parent, /disabled=\{!enabled \|\| busy \|\| workbookBusy \|\| su === 'None' \|\| su === 'USysSuTableDynamic'\}/);

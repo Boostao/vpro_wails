@@ -226,18 +226,16 @@ test('compiled SSR consumes callbacks, literal table/group captions and portable
   assert.equal(client.warnings.length, 0);
   assert.doesNotMatch(client.js.code, /proxy\(validated\)/);
 });
-for (const flag of [undefined, false, true, 'false', 'TRUE', '1', 'true']) {
-  test(`compiled matrix menu requires exact independent literal ${String(flag)}`, async () => {
-    const component = serverComponent(readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8'), 'Navigation.svelte', {
-      '@lucide/svelte': new Proxy({}, { get: () => () => {} }),
-    }, { VITE_SUBZONE_MATRIX_WORKBOOK: flag });
-    const { render } = await import(pathToFileURL(require.resolve('svelte/server')).href);
-    const body = render(component, { props: { view: 'home', onnavigate: () => {} } }).body;
-    const button = [...body.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].find(match => match[2].includes('Subzone Matrix'));
-    assert.ok(button, 'matrix menu selector must resolve');
-    assert.equal(/\bdisabled(?:=|\s|$)/.test(button[1]), flag === 'false');
+test('compiled matrix menu is unconditionally enabled in Navigation', async () => {
+  const component = serverComponent(readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8'), 'Navigation.svelte', {
+    '@lucide/svelte': new Proxy({}, { get: () => () => {} }),
   });
-}
+  const { render } = await import(pathToFileURL(require.resolve('svelte/server')).href);
+  const body = render(component, { props: { view: 'home', onnavigate: () => {} } }).body;
+  const button = [...body.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)].find(match => match[2].includes('Subzone Matrix'));
+  assert.ok(button, 'matrix menu selector must resolve');
+  assert.equal(/\bdisabled(?:=|\s|$)/.test(button[1]), false);
+});
 test('actual application refresh/paging guards do not borrow plot reads during matrix work', async () => {
   for (const name of ['loadPlots', 'loadHierarchy', 'refresh']) {
     const context = Object.fromEntries([

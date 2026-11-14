@@ -213,32 +213,27 @@ test('actual top-level effect aggregates independent old/extended authority even
   const effect = ast.statements.find(node => ts.isExpressionStatement(node) &&
     node.getText(ast).startsWith('$effect(') && node.getText(ast).includes('extendedSummaryWorkbookPublicationSession'));
   assert.ok(effect);
-  for (const oldGate of [false, true]) for (const newGate of [false, true]) {
-    for (const oldHeld of [false, true]) for (const newHeld of [false, true]) {
-      let cleanup, listeners = [], stopped = 0;
-      const context = vm.createContext({
-        summaryEnvironmentPublicationBusy: false, view: 'home',
-        $projectState: { contextId: 'owned', activeProject: 'Sample', projectPath: 'C:\\project.db', activeSU: 'Selected', suPath: 'C:\\external.db' },
-        $effect(run) { cleanup = run(); },
-        siteUnitSummaryWorkbookPublicationSession: () => ({ view: () => ({ busy: oldHeld, blocked: false }),
-          subscribe(run) { listeners.push(run); run(); return () => stopped++; } }),
-        extendedSummaryWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: newHeld }),
-          subscribe(run) { listeners.push(run); run(); return () => stopped++; } }),
-      });
-      const code = effect.getText(ast)
-        .replaceAll('import.meta.env.VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK', JSON.stringify(newGate ? 'true' : 'false'))
-        .replaceAll('import.meta.env.VITE_SITE_UNIT_SUMMARY_WORKBOOK', JSON.stringify(oldGate ? 'true' : 'false'))
-        .replaceAll('import.meta.env.VITE_SITE_UNIT_SUMMARY', "'true'");
-      vm.runInContext(ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText, context);
-      assert.equal(context.summaryEnvironmentPublicationBusy, oldGate && oldHeld || newGate && newHeld);
-      assert.equal(context.view, newGate && newHeld ? 'summary-environment' : 'home');
-      assert.equal(listeners.length, Number(oldGate) + Number(newGate));
-      if (cleanup) cleanup();
-      assert.equal(stopped, listeners.length);
-    }
+  for (const oldHeld of [false, true]) for (const newHeld of [false, true]) {
+    let cleanup, listeners = [], stopped = 0;
+    const context = vm.createContext({
+      summaryEnvironmentPublicationBusy: false, view: 'home',
+      $projectState: { contextId: 'owned', activeProject: 'Sample', projectPath: 'C:\\project.db', activeSU: 'Selected', suPath: 'C:\\external.db' },
+      $effect(run) { cleanup = run(); },
+      siteUnitSummaryWorkbookPublicationSession: () => ({ view: () => ({ busy: oldHeld, blocked: false }),
+        subscribe(run) { listeners.push(run); run(); return () => stopped++; } }),
+      extendedSummaryWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: newHeld }),
+        subscribe(run) { listeners.push(run); run(); return () => stopped++; } }),
+    });
+    const code = effect.getText(ast);
+    vm.runInContext(ts.transpileModule(code, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText, context);
+    assert.equal(context.summaryEnvironmentPublicationBusy, oldHeld || newHeld);
+    assert.equal(context.view, newHeld ? 'summary-environment' : 'home');
+    assert.equal(listeners.length, 2);
+    if (cleanup) cleanup();
+    assert.equal(stopped, listeners.length);
   }
 });
-test('extended UI keeps gates, visible labels and held authority while restoring the original lifeform mode on remount', () => {
+test('extended UI keeps visible labels and held authority while restoring the original lifeform mode on remount', () => {
   const panel = readFileSync(path.join(__dirname, 'SiteUnitSummaryWorkbookPanel.svelte'), 'utf8');
   const parent = readFileSync(path.join(__dirname, 'SiteUnitSummary.svelte'), 'utf8');
   for (const [name, source] of [['SiteUnitSummaryWorkbookPanel.svelte', panel], ['SiteUnitSummary.svelte', parent]]) {
@@ -247,7 +242,6 @@ test('extended UI keeps gates, visible labels and held authority while restoring
   assert.match(parent, /retainedOptions\?\.orderBy === 2 \? 'lifeform'/);
   assert.match(parent, /extendedAuthority\?\.view\(\)\.blocked/);
   assert.match(parent, /\{extendedOptions\}/);
-  assert.match(panel, /VITE_SITE_UNIT_SUMMARY_EXTENDED_WORKBOOK !== 'false'/);
   assert.match(panel, /sameExtendedSummaryWorkbookOptions\(requestedOptions, extendedOptions/);
   assert.match(panel, /extendedSession\.publish\(review, destination/);
   assert.doesNotMatch(panel, /reads\.track\(EnvironmentReportService\.ExportReviewed/);

@@ -6,7 +6,6 @@ const { compile } = require('svelte/compiler');
 const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
 test('shared SIVI scope is independently gated and uses its owned facade rather than whole-header saves', () => {
   assert.equal(compile(parent, { filename: 'FS882Form.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(parent, /siviParentReviewEnabled && import\.meta\.env\.VITE_SIVI_PARENT_SHARED_EDITING !== 'false'/);
   for (const method of ['GetSIVIParentSharedOriginal', 'SaveSIVIParentShared', 'RestoreSIVIParentShared']) assert.ok(parent.includes(`PlotEntryService.${method}(`));
   assert.match(parent, /read: \(\) => siviParentSharedReads\.track/);
   assert.match(parent, /cancelRead: \(\) => siviParentSharedReads\.cancelAll/);
@@ -22,8 +21,7 @@ test('shared SIVI state joins Save Undo Lock close ownership and sibling refresh
   assert.match(parent, /refreshSIVIParent\(plot, \[siviParentWriteSession, siviParentActionSession, siviProjectAssignmentSession\]\)/);
   assert.match(parent, /siviParentSharedSession\?\.dispose\(\)/);
 });
-test('reference editing is independently gated and its owned reads share cancellation and persistent session lifetime', () => {
-  assert.match(parent, /siviParentSharedEnabled && import\.meta\.env\.VITE_SIVI_PARENT_REFERENCE_EDITING !== 'false'/);
+test('reference editing owned reads share cancellation and persistent session lifetime', () => {
   assert.match(parent, /readReferences: zone => siviParentSharedReads\.track\(PlotEntryService\.GetSIVIParentSharedReferences\(siviContextId, plot, zone\)\)/);
   assert.match(parent, /\(\) => siviParentSharedRevision\+\+, siviParentReferenceEnabled\)/);
   assert.match(parent, /cancelRead: \(\) => siviParentSharedReads\.cancelAll\(\)/);

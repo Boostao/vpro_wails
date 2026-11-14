@@ -251,7 +251,6 @@ test('action errors precede fields and both scoped editors preserve distinct his
 });
 test('mounted source actions join Save/Undo/Lock/close ownership and refresh only clean peer originals', () => {
   const parent = readFileSync(path.join(__dirname, 'FS882Form.svelte'), 'utf8');
-  assert.match(parent, /siviParentActionEditingEnabled = siviParentEditingEnabled && import\.meta\.env\.VITE_SIVI_PARENT_ACTION_EDITING !== 'false'/);
   for (const api of ['GetSIVIParentActionOriginal', 'SaveSIVIParentActions', 'RestoreSIVIParentActions']) assert.ok(parent.includes(`ContextService.${api}`));
   assert.match(parent, /if \(siviParentActionUnsaved\) \{ await siviParentActionOperation\('save'\); return; \}/);
   assert.match(parent, /if \(siviParentActionUnsaved\) \{ void siviParentActionOperation\('undo'\); return; \}/);

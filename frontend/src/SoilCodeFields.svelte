@@ -16,7 +16,7 @@
     onbusy?: (busy: boolean) => void;
     children: Snippet<[{ columns: readonly string[]; input: Snippet<[PaperControl, string]> } | undefined]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_SOIL_CODES_EDITING !== 'false';
+  const editingEnabled = true;
   const groupLookup = new CatalogueLookup(async (force, requests) => {
     if (force) await requests.track(PlotEntryService.ReloadSoilCodeCatalogue());
     const rows = await requests.track(PlotEntryService.ListGreatGroupChoices());

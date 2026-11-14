@@ -477,7 +477,7 @@ test('production report wires one presentation pane, peer mutation holds and exp
       './summaryVegetation': report,
       './summaryVegetationPresentationPreferenceSessions': { summaryVegetationPresentationPreferenceSession: () => presentation },
       '../bindings/github.com/boostao/vpro-wails': {},
-    }, { VITE_SUMMARY_VEGETATION: 'true', VITE_SUMMARY_VEGETATION_PRESENTATION_PREFERENCES: 'true' });
+    });
   const html = render(Panel, { props: { ...owner, onBusyChange() {} } }).body;
   assert.equal(html.split('data-summary-presentation-preferences').length - 1, 1);
   assert.equal(html.split('data-source-control="rptSvTitle"').length - 1, 1);

@@ -229,7 +229,6 @@ test('coordinate inputs retain labelled relationships and configuration/schema/l
     const compiled = compile(text, { filename, generate: 'client' });
     assert.equal(compiled.warnings.filter(w => w.code.startsWith('a11y')).length, 0);
   }
-  assert.match(component, /VITE_COORDINATE_EDITING !== 'false'/);
   assert.match(component, /placeholder=\{capabilities\[mapping\.axis\] !== true \? 'Pending' : ''\}/);
   assert.match(component, /capabilities\[axis\] !== true/);
   assert.match(component, /style=\{position\(control\)\}/);

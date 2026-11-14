@@ -59,7 +59,6 @@ test('Enter adapter preserves native list/select/multiline/IME shortcuts and use
     'source.list',"source.closest('dialog,[role=dialog]')","control.matches(':disabled')",'control.checkVisibility()',
     'control.readOnly',"control.getAttribute('aria-invalid') === 'true'"]) assert.ok(source.includes(guard),guard);
   assert.doesNotMatch(source,/\.click\(|\.submit\(|Save|Create|ByID|fetch\(/);
-  assert.match(form,/VITE_SOURCE_ENTER_NAVIGATION !== 'false'/);
   assert.match(form,/<svelte:window onkeydown=\{sourceEnter\}/);
   assert.match(form,/error = `Source Enter navigation failed/);
   assert.match(source,/element instanceof HTMLTextAreaElement/);

@@ -39,7 +39,6 @@ const ready = () => ({
 test('Native-verified five source slots compile with explicit opt-out and no implicit rewriting or direct writes', () => {
   const source = readFileSync(path.join(__dirname, 'SiteCodeFields.svelte'), 'utf8');
   assert.equal(compile(source, { filename: 'SiteCodeFields.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(source, /VITE_SITE_CODES_EDITING !== 'false'/);
   assert.match(source, /style=\{position\(control\)\}/);
   assert.match(source, /data-source-control=\{control.controlName\}/);
   assert.match(source, /ListSiteDisturbanceChoices/);

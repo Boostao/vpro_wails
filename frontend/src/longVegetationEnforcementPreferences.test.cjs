@@ -141,45 +141,41 @@ test('actual enforcement panel preserves source label and read-only host observa
     'No printer selection, default change or printing', 'including a toggle away and back']) assert.ok(html.includes(expected), expected);
   assert.match(html, /data-long-vegetation-enforcement-save/);
 });
-test('actual report retains enforcement draft barriers across remounts behind its independent flag', () => {
-  for (const enabled of [false, true]) {
-    const owner = { ...scope, contextId: `enforcement-root-${enabled}` };
-    const registry = prefs.createLongVegetationEnforcementPreferencesRegistry(), session = registry(owner);
-    session.apply({ ...review(), ...owner }); session.editEnforce(null);
-    const reportSource = source('LongVegetationReport.svelte').replace(/import\.meta\.env\.(\w+) !== 'false'/g,
-      (_, flag) => String(enabled && flag === 'VITE_LONG_VEGETATION_ENFORCEMENT_PREFERENCES'));
-    const dependencies = {
-      '../bindings/github.com/boostao/vpro-wails': {}, './longEnvironmentReport': {}, './longVegetationReport': {},
-      './longVegetationEnforcementPreferences': { createLongVegetationEnforcementPreferencesRegistry: () => registry },
-      './LongVegetationEnforcementPreferences.svelte': { default: panel() },
-      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
-      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
-      './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
-        view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }
-      } },
-    };
-    for (const name of ['Preferences', 'StatisticsPreferences', 'SwitchPreferences', 'ThresholdPreferences', 'GroupPreferences',
-      'QualityNullPreferences', 'QualityMinimumPreferences', 'NamingPreferences', 'SelectedFieldPreferences']) {
-      dependencies[`./longVegetation${name}`] = {};
-      dependencies[`./LongVegetation${name}.svelte`] = { default() {} };
-    }
-    const report = serverComponent(reportSource, 'LongVegetationReport.svelte', dependencies);
-    for (let mount = 0; mount < 2; mount++) {
-      const holds = [];
-      const html = render(report, { props: { ...owner, onBusyChange: busy => holds.push(busy) } }).body;
-      assert.equal(holds.at(-1), enabled);
-      assert.equal(html.includes('data-long-vegetation-enforcement'), enabled);
-      if (enabled) {
-        assert.match(html, /data-long-vegetation-enforcement-save[^>]*disabled/);
-        assert.doesNotMatch(html, /data-long-vegetation-enforcement-undo[^>]*disabled/);
-      }
-    }
-    session.undo();
+test('actual report retains enforcement draft barriers across remounts', () => {
+  const owner = { ...scope, contextId: 'enforcement-root-true' };
+  const registry = prefs.createLongVegetationEnforcementPreferencesRegistry(), session = registry(owner);
+  session.apply({ ...review(), ...owner }); session.editEnforce(null);
+  const reportSource = source('LongVegetationReport.svelte');
+  const dependencies = {
+    '../bindings/github.com/boostao/vpro-wails': {}, './longEnvironmentReport': {}, './longVegetationReport': {},
+    './longVegetationEnforcementPreferences': { createLongVegetationEnforcementPreferencesRegistry: () => registry },
+    './LongVegetationEnforcementPreferences.svelte': { default: panel() },
+    './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+    './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+    './vegetationWorkbook': {
+      vegetationWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: false }), subscribe: () => () => {} }),
+      VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } },
+    },
+  };
+  for (const name of ['Preferences', 'StatisticsPreferences', 'SwitchPreferences', 'ThresholdPreferences', 'GroupPreferences',
+    'QualityNullPreferences', 'QualityMinimumPreferences', 'NamingPreferences', 'SelectedFieldPreferences']) {
+    dependencies[`./longVegetation${name}`] = {};
+    dependencies[`./LongVegetation${name}.svelte`] = { default() {} };
   }
-  const report = source('LongVegetationReport.svelte');
-  assert.match(report, /enforcementView = enforcement.view\(\); invalidateReports\(\)/);
-  assert.match(report, /function invalidateReports\(\) \{\s*preview = null; workbookReview = null;\s*projectWorkspace\?\.invalidate\(\)/);
-  assert.match(report, /unsubscribeEnforcement\?\.\(\)/);
-  assert.match(report, /selectedFieldBarrier \|\| enforcementBarrier/);
-  assert.match(report, /selectedFieldMutationHeld \|\| enforcementMutationHeld/);
+  const report = serverComponent(reportSource, 'LongVegetationReport.svelte', dependencies);
+  for (let mount = 0; mount < 2; mount++) {
+    const holds = [];
+    const html = render(report, { props: { ...owner, onBusyChange: busy => holds.push(busy) } }).body;
+    assert.equal(holds.at(-1), true);
+    assert.equal(html.includes('data-long-vegetation-enforcement'), true);
+    assert.match(html, /data-long-vegetation-enforcement-save[^>]*disabled/);
+    assert.doesNotMatch(html, /data-long-vegetation-enforcement-undo[^>]*disabled/);
+  }
+  session.undo();
+  const reportText = source('LongVegetationReport.svelte');
+  assert.match(reportText, /enforcementView = enforcement.view\(\); invalidateReports\(\)/);
+  assert.match(reportText, /function invalidateReports\(\) \{\s*preview = null; workbookReview = null;\s*projectWorkspace\?\.invalidate\(\)/);
+  assert.match(reportText, /unsubscribeEnforcement\?\.\(\)/);
+  assert.match(reportText, /selectedFieldBarrier \|\| enforcementBarrier/);
+  assert.match(reportText, /selectedFieldMutationHeld \|\| enforcementMutationHeld/);
 });

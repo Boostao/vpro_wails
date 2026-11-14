@@ -4,12 +4,12 @@ import { createProjectReportWorkspaceRegistry, type ProjectWorkspacePort } from 
 import type { ProjectReportOwner } from './longVegetationProjectReport';
 
 const capabilities = Object.freeze({
-  enabled: import.meta.env.VITE_LONG_VEGETATION_PROJECT_SCOPE !== 'false',
-  workbook: import.meta.env.VITE_LONG_VEGETATION_WORKBOOK !== 'false',
-  lifeform: import.meta.env.VITE_LONG_VEGETATION_LIFEFORM !== 'false',
-  strata: import.meta.env.VITE_LONG_VEGETATION_STRATA !== 'false',
-  code: import.meta.env.VITE_LONG_VEGETATION_CODE !== 'false',
-  selectedField: import.meta.env.VITE_LONG_VEGETATION_SELECTED_FIELD !== 'false',
+  enabled: true,
+  workbook: true,
+  lifeform: true,
+  strata: true,
+  code: true,
+  selectedField: true,
 });
 
 function ownedPorts(owner: ProjectReportOwner): ProjectWorkspacePort {
@@ -39,4 +39,4 @@ function ownedPorts(owner: ProjectReportOwner): ProjectWorkspacePort {
   };
 }
 
-export const projectReportWorkspace = capabilities.enabled ? createProjectReportWorkspaceRegistry(ownedPorts, capabilities) : null;
+export const projectReportWorkspace = createProjectReportWorkspaceRegistry(ownedPorts, capabilities);

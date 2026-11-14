@@ -40,8 +40,7 @@
     { label: 'Notes', scope: 'notes' },
   ];
   const dirty = $derived(siviParentSharedDirty(view.drafts));
-  const fields = $derived(siviParentSharedFieldsFor(Boolean(view.referencesEnabled) &&
-    import.meta.env.VITE_SIVI_PARENT_REFERENCE_EDITING !== 'false'));
+  const fields = $derived(siviParentSharedFieldsFor(Boolean(view.referencesEnabled)));
 </script>
 
 <section class="space-y-4 rounded border border-stone-200 bg-white p-4" aria-label="SIVI shared-field editor" data-sivi-shared-panel>

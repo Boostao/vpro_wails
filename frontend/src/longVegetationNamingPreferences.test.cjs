@@ -156,41 +156,38 @@ test('actual naming panel retains exact source captions, read-only field and his
     assert.doesNotMatch(invalid, /data-long-vegetation-naming-undo[^>]*disabled/);
   }
 });
-test('actual report remount retains naming draft errors and root close barriers behind the independent flag', () => {
-  for (const enabled of [false, true]) {
-    const owner = { ...scope, contextId: `naming-composition-${enabled}` };
-    const registry = prefs.createLongVegetationNamingPreferencesRegistry({ code: true });
-    const session = registry(owner); session.apply(review(1, 'old field', true, owner)); session.editMode('');
-    const reportSource = source('LongVegetationReport.svelte')
-      .replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
-      .replace('const namingSession = false', `const namingSession = ${enabled}`);
-    const component = serverComponent(reportSource, 'LongVegetationReport.svelte', {
-      '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
-      './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},
-      './LongVegetationSwitchPreferences.svelte': { default() {} }, './longVegetationThresholdPreferences': {},
-      './LongVegetationThresholdPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {},
-      './LongVegetationGroupPreferences.svelte': { default() {} }, './longVegetationQualityNullPreferences': {},
-      './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationQualityMinimumPreferences': {},
-      './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
-      './longVegetationNamingPreferences': { createLongVegetationNamingPreferencesRegistry: () => registry },
-      './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
-      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
-      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
-      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
-      './LongVegetationNamingPreferences.svelte': { default: child() }, './longEnvironmentReport': {}, './longVegetationReport': {},
-      './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
-        view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }
-      } },
-    });
-    for (let mount = 0; mount < 2; mount++) {
-      const barriers = [];
-      const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
-      assert.equal(barriers.at(-1), enabled);
-      assert.equal(body.includes('data-long-vegetation-naming'), enabled);
-      if (enabled) assert.match(body, /data-long-vegetation-naming-save[^>]*disabled/);
-    }
-    session.undo();
+test('actual report remount retains naming draft errors and root close barriers', () => {
+  const owner = { ...scope, contextId: 'naming-composition-true' };
+  const registry = prefs.createLongVegetationNamingPreferencesRegistry({ code: true });
+  const session = registry(owner); session.apply(review(1, 'old field', true, owner)); session.editMode('');
+  const reportSource = source('LongVegetationReport.svelte');
+  const component = serverComponent(reportSource, 'LongVegetationReport.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
+    './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},
+    './LongVegetationSwitchPreferences.svelte': { default() {} }, './longVegetationThresholdPreferences': {},
+    './LongVegetationThresholdPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {},
+    './LongVegetationGroupPreferences.svelte': { default() {} }, './longVegetationQualityNullPreferences': {},
+    './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationQualityMinimumPreferences': {},
+    './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': { createLongVegetationNamingPreferencesRegistry: () => registry },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+    './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+    './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+    './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+    './LongVegetationNamingPreferences.svelte': { default: child() }, './longEnvironmentReport': {}, './longVegetationReport': {},
+    './vegetationWorkbook': {
+      vegetationWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: false }), subscribe: () => () => {} }),
+      VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } },
+    },
+  });
+  for (let mount = 0; mount < 2; mount++) {
+    const barriers = [];
+    const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
+    assert.equal(barriers.at(-1), true);
+    assert.equal(body.includes('data-long-vegetation-naming'), true);
+    assert.match(body, /data-long-vegetation-naming-save[^>]*disabled/);
   }
+  session.undo();
   const report = source('LongVegetationReport.svelte');
   assert.match(report, /namingView = naming.view\(\); invalidateReports\(\)/);
   assert.match(report, /function invalidateReports\(\) \{\s*preview = null; workbookReview = null;\s*projectWorkspace\?\.invalidate\(\)/);

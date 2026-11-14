@@ -142,36 +142,33 @@ test('source group labels leaf controls and unloaded distinction render once wit
     else assert.match(body, /unloaded disabled checkboxes do not represent saved values/);
   }
 });
-test('actual report retains errors across remount and propagates independent default-off barriers', () => {
+test('actual report retains errors across remount and propagates barriers', () => {
   const reportSource = source('LongVegetationReport.svelte');
-  for (const enabled of [false, true]) {
-    const owner = { ...scope, contextId: `quality-null-composition-${enabled}` };
-    const session = prefs.longVegetationQualityNullPreferencesSession(owner); session.apply(review(undefined, owner));
-    session.editNullFlag('vegIncludeNulls', null);
-    const component = serverComponent(reportSource.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
-      .replace('const qualityNullsEnabled = false;', `const qualityNullsEnabled = ${enabled};`), 'LongVegetationReport.svelte', {
-        '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
-        './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},
-        './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
-        './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
-        './longVegetationQualityNullPreferences': prefs, './LongVegetationQualityNullPreferences.svelte': { default: child() },
-        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
-        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
-        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
-      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
-      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
-      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
-        './LongVegetationSwitchPreferences.svelte': { default() {} }, './longEnvironmentReport': {}, './longVegetationReport': {},
-        './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
-          view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }
-        } },
-      });
-    for (let mount = 0; mount < 2; mount++) {
-      const barriers = []; const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
-      assert.equal(barriers.at(-1), enabled);
-      if (enabled) assert.match(body, /data-long-vegetation-quality-nulls/);
-      else assert.doesNotMatch(body, /data-long-vegetation-quality-nulls/);
-    }
+  const owner = { ...scope, contextId: 'quality-null-composition-true' };
+  const session = prefs.longVegetationQualityNullPreferencesSession(owner); session.apply(review(undefined, owner));
+  session.editNullFlag('vegIncludeNulls', null);
+  const component = serverComponent(reportSource, 'LongVegetationReport.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': {},
+    './longVegetationStatisticsPreferences': {}, './longVegetationSwitchPreferences': {},
+    './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
+    './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+    './longVegetationQualityNullPreferences': prefs, './LongVegetationQualityNullPreferences.svelte': { default: child() },
+    './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+    './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+    './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+    './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+    './LongVegetationSwitchPreferences.svelte': { default() {} }, './longEnvironmentReport': {}, './longVegetationReport': {},
+    './vegetationWorkbook': {
+      vegetationWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: false }), subscribe: () => () => {} }),
+      VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } },
+    },
+  });
+  for (let mount = 0; mount < 2; mount++) {
+    const barriers = []; const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
+    assert.equal(barriers.at(-1), true);
+    assert.match(body, /data-long-vegetation-quality-nulls/);
   }
   assert.match(reportSource, /qualityNullView = qualityNulls.view\(\); invalidateReports\(\)/);
   assert.match(reportSource, /function invalidateReports\(\) \{\s*preview = null; workbookReview = null;\s*projectWorkspace\?\.invalidate\(\)/);

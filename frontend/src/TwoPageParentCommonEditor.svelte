@@ -20,10 +20,9 @@
     onExtendedShrubsChange?: (enabled: boolean) => void;
   } = $props();
   const owner = untrack(() => ({ contextId, project, plot }));
-  const reviewEnabled = import.meta.env.VITE_TWO_PAGE_PARENT_REVIEW !== 'false'
-    && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_REVIEW !== 'false';
-  const editingEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_COMMON_EDITING !== 'false';
-  const sourceLayoutEnabled = reviewEnabled && import.meta.env.VITE_TWO_PAGE_PARENT_SOURCE_LAYOUT !== 'false';
+  const reviewEnabled = true;
+  const editingEnabled = true;
+  const sourceLayoutEnabled = true;
   const reads = new ReadRequests();
   const key = JSON.stringify(owner);
   const sessions = untrack(() => {

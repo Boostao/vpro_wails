@@ -133,41 +133,36 @@ test('actual statistics handlers cancel borrowed reads, suppress stale loads and
   context.operationHeld = true; await context.actions.saveStatistics(); assert.equal(saves, 0);
   context.operationHeld = false; await context.actions.saveStatistics(); assert.equal(saves, 1);
 });
-test('independent default/title/statistics gates render live labelled choices and correction while blocking root work', () => {
+test('statistics preferences render live labelled choices and correction while blocking root work', () => {
   const source = readFileSync(path.join(__dirname, 'LongVegetationReport.svelte'), 'utf8');
-  for (const enabled of [false, true]) for (const titleEnabled of [false, true]) {
-    const owner = { ...scope, contextId: `statistics-render-${enabled}-${titleEnabled}` };
-    const session = prefs.longVegetationStatisticsPreferencesSession(owner); session.apply(review(undefined, owner)); session.editAverage('');
-    const component = serverComponent(source.replace(/import\.meta\.env\.VITE_LONG_VEGETATION_\w+ !== 'false'/g, 'false')
-      .replace('const statisticsEnabled = false;', `const statisticsEnabled = ${enabled};`)
-      .replace('const preferencesEnabled = false;', `const preferencesEnabled = ${titleEnabled};`), 'LongVegetationReport.svelte', {
-        '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': titles,
-        './longVegetationStatisticsPreferences': prefs, './longEnvironmentReport': {}, './longVegetationReport': {},
-        './longVegetationSwitchPreferences': {},
-        './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
-        './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
-        './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
-        './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
-        './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
-      './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
-      './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
-      './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
-        './LongVegetationSwitchPreferences.svelte': { default() {} },
-        './vegetationWorkbook': { VegetationWorkbookPublicationSession: class {
-          view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; }
-        } },
-      });
-    const barriers = []; const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
-    assert.equal(barriers.at(-1), enabled);
-    if (enabled) {
-      assert.equal((body.match(/id="long-vegetation-average"/g) ?? []).length, 1);
-      assert.match(body, /for="long-vegetation-average">Calculate/); assert.match(body, /for="long-vegetation-order">Order by/);
-      assert.match(body, /value="10">By n Plots/); assert.match(body, /value="20">Characteristic/);
-      assert.match(body, /value="10"[^>]*>Species/); assert.match(body, /value="20"[^>]*>Presence/);
-      assert.match(body, /data-long-vegetation-statistics-save[^>]*disabled/);
-      assert.doesNotMatch(body, /data-long-vegetation-statistics-undo[^>]*disabled/);
-    } else assert.doesNotMatch(body, /id="long-vegetation-average"/);
-  }
+  const owner = { ...scope, contextId: 'statistics-render-true' };
+  const session = prefs.longVegetationStatisticsPreferencesSession(owner); session.apply(review(undefined, owner)); session.editAverage('');
+  const component = serverComponent(source, 'LongVegetationReport.svelte', {
+    '../bindings/github.com/boostao/vpro-wails': {}, './longVegetationPreferences': titles,
+    './longVegetationStatisticsPreferences': prefs, './longEnvironmentReport': {}, './longVegetationReport': {},
+    './longVegetationSwitchPreferences': {},
+    './longVegetationThresholdPreferences': {}, './LongVegetationThresholdPreferences.svelte': { default() {} },
+    './longVegetationQualityNullPreferences': {}, './LongVegetationQualityNullPreferences.svelte': { default() {} }, './longVegetationGroupPreferences': {}, './LongVegetationGroupPreferences.svelte': { default() {} },
+    './longVegetationQualityMinimumPreferences': {}, './LongVegetationQualityMinimumPreferences.svelte': { default() {} },
+    './longVegetationNamingPreferences': {}, './LongVegetationNamingPreferences.svelte': { default() {} },
+    './longVegetationSelectedFieldPreferences': {}, './LongVegetationSelectedFieldPreferences.svelte': { default() {} },
+    './longVegetationEnforcementPreferences': {}, './LongVegetationEnforcementPreferences.svelte': { default() {} },
+    './longVegetationUnitPreferences': {}, './LongVegetationUnitPreferences.svelte': { default() {} },
+    './longVegetationSelectedUnitSelection': {}, './LongVegetationSelectedUnitSelection.svelte': { default() {} },
+    './LongVegetationSwitchPreferences.svelte': { default() {} },
+    './vegetationWorkbook': {
+      vegetationWorkbookPublicationSession: () => ({ view: () => ({ busy: false, blocked: false }), subscribe: () => () => {} }),
+      VegetationWorkbookPublicationSession: class { view() { return { busy: false, blocked: false }; } subscribe() { return () => {}; } },
+    },
+  });
+  const barriers = []; const { body } = render(component, { props: { ...owner, onBusyChange: value => barriers.push(value) } });
+  assert.equal(barriers.at(-1), true);
+  assert.equal((body.match(/id="long-vegetation-average"/g) ?? []).length, 1);
+  assert.match(body, /for="long-vegetation-average">Calculate/); assert.match(body, /for="long-vegetation-order">Order by/);
+  assert.match(body, /value="10">By n Plots/); assert.match(body, /value="20">Characteristic/);
+  assert.match(body, /value="10"[^>]*>Species/); assert.match(body, /value="20"[^>]*>Presence/);
+  assert.match(body, /data-long-vegetation-statistics-save[^>]*disabled/);
+  assert.doesNotMatch(body, /data-long-vegetation-statistics-undo[^>]*disabled/);
   assert.match(source, /const value = event.currentTarget.value; editAverage\(value\)/);
   assert.match(source, /const value = event.currentTarget.value; editOrder\(value\)/);
   assert.doesNotMatch(source, /reads\.track\(LongVegetationStatisticsPreferencesService\.Save/);

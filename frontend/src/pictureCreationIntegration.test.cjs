@@ -85,15 +85,14 @@ test('actual manager derived session creation does not notify reactive root obse
     client.set(rootBusy, activity.busy || activity.blocked);
   });
   const script = source('PictureManager.svelte').match(/<script lang="ts">([\s\S]*?)<\/script>/)[1];
-  const compiled = compile(`<script lang="ts">${script}</script>`, { generate: 'client' }).js.code
-    .replaceAll('import.meta.env', '__testEnvironment');
+  const compiled = compile(`<script lang="ts">${script}</script>`, { generate: 'client' }).js.code;
   const ast = ts.createSourceFile('manager.js', compiled, ts.ScriptTarget.Latest, true);
   const code = ast.statements.filter(node => !ts.isImportDeclaration(node)).map(node => node.getText(ast)).join('\n')
     .replace('export default function', 'function');
   const manager = new Function('$', 'untrack', 'plotLookupInputError', 'pictureMetadataSession',
-    'pictureCreationSession', 'pictureLifecycleSession', '__testEnvironment', code + '\nreturn _unknown_;')(
-      client, client.untrack, () => null, () => { throw new Error('Metadata remains disabled'); },
-      registry.pictureCreationSession, () => { throw new Error('Lifecycle remains disabled'); }, { VITE_PICTURE_CREATION_WRITING: 'true', VITE_PICTURE_METADATA_WRITING: 'false', VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'false' });
+    'pictureCreationSession', 'pictureLifecycleSession', code + '\nreturn _unknown_;')(
+      client, client.untrack, () => null, () => undefined,
+      registry.pictureCreationSession, () => undefined);
   const activity = [];
   const dispose = client.effect_root(() => manager(null, {
     ...owner, initialPlot: owner.plotNumber, onBusyChange: value => activity.push(value),
@@ -373,13 +372,13 @@ test('actual peer receipt effects refresh loaded owners once and discard late de
     .replace('metadataSession?: PictureMetadataSession;', 'metadataSession?: PictureMetadataSession; inspect: (value: unknown) => void;');
   const compiled = compile(`<script lang="ts">${script}
     $effect(() => inspect({ review, selected, error, busy, cancel }));
-  </script>`, { generate: 'client' }).js.code.replaceAll('import.meta.env', '__testEnvironment');
+  </script>`, { generate: 'client' }).js.code;
   const ast = ts.createSourceFile('peer.js', compiled, ts.ScriptTarget.Latest, true);
   const code = ast.statements.filter(node => !ts.isImportDeclaration(node)).map(node => node.getText(ast)).join('\n')
     .replace('export default function', 'function');
   const harness = new Function('$', 'untrack', 'onDestroy', 'ReadRequests', 'PictureService',
     'pictureMetadataFromWire', 'pictureImageFromWire', 'pictureCellLabel', 'pictureCreationSession', 'pictureLifecycleSession',
-    'equalCell', '__testEnvironment', code + '\nreturn _unknown_;');
+    'equalCell', code + '\nreturn _unknown_;');
   for (const mode of ['normal', 'drift', 'cancel', 'dispose', 'owner-change']) {
     const pending = [], snapshots = [], properties = [], disposers = [];
     const session = new sessionModule.PictureCreationSession(owner, {
@@ -394,7 +393,7 @@ test('actual peer receipt effects refresh loaded owners once and discard late de
     } };
     const peer = harness(client, client.untrack, lifecycle.onDestroy, reads.ReadRequests, service,
       picture.pictureMetadataFromWire, picture.pictureImageFromWire, picture.pictureCellLabel,
-      () => session, () => undefined, metadata.equalCell, { VITE_PICTURE_CREATION_WRITING: 'true', VITE_PICTURE_DELETION_WRITING: 'false', VITE_PICTURE_DELETION_RESTORING: 'false' });
+      () => session, () => undefined, metadata.equalCell);
     for (let index = 0; index < 2; index++) {
       const props = client.proxy({ ...owner, view: index ? 'child' : 'manager',
         onBusyChange() {}, inspect(value) { snapshots[index] = value; } });

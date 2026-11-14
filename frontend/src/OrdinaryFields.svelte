@@ -11,9 +11,9 @@
     onvalidation: (key: string, message: string | null) => void; onVegNotesTab?: () => void;
     children: Snippet<[{ columns: readonly string[]; input: Snippet<[PaperControl, string]> } | undefined]>;
   } = $props();
-  const editingEnabled = import.meta.env.VITE_ORDINARY_PARENT_EDITING !== 'false';
-  const flagsEnabled = import.meta.env.VITE_PARENT_FLAGS_EDITING !== 'false';
-  const additionalEnabled = import.meta.env.VITE_ADDITIONAL_PARENT_EDITING !== 'false';
+  const editingEnabled = true;
+  const flagsEnabled = true;
+  const additionalEnabled = true;
   let staged = $state<OrdinaryDrafts>({});
   const fields = $derived([
     ...(editingEnabled ? ordinaryFields : []),

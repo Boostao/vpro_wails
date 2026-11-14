@@ -9,11 +9,10 @@ const component = readFileSync(path.join(__dirname, 'SummaryVegetationReport.sve
 const app = readFileSync(path.join(__dirname, 'App.svelte'), 'utf8');
 const nav = readFileSync(path.join(__dirname, 'Navigation.svelte'), 'utf8');
 
-test('summary report native route, backend and build gates are independent default-off', () => {
+test('summary report native route and component state are wired cleanly', () => {
   assert.equal(compile(component, { filename: 'SummaryVegetationReport.svelte', generate: 'client' }).warnings.length, 0);
-  assert.match(nav, /name: 'Summary Vegetation'.*VITE_SUMMARY_VEGETATION !== 'false' \? 'summary-vegetation' : undefined/);
-  assert.match(app, /view === 'summary-vegetation' && import\.meta\.env\.VITE_SUMMARY_VEGETATION !== 'false' && \$projectState/);
-  assert.match(component, /const enabled = import\.meta\.env\.VITE_SUMMARY_VEGETATION !== 'false'/);
+  assert.match(nav, /name: 'Summary Vegetation', icon: ChartColumn, view: 'summary-vegetation'/);
+  assert.match(app, /view === 'summary-vegetation' && \$projectState/);
   assert.match(component, /\$state\.raw\(session\.view\(\)\)/);
   assert.doesNotMatch(component, /structuredClone|VegetationReportService\.SaveSummaryVegetation\(|ExportReviewed|\.update/);
   assert.match(component, /VegetationReportService\.SaveSummaryVegetationPreferences/);
@@ -54,7 +53,7 @@ test('compiled panel renders retained production result with labels and immutabl
   const panel = serverComponent(component, 'SummaryVegetationReport.svelte', {
     './summaryVegetation': summary,
     '../bindings/github.com/boostao/vpro-wails': { VegetationReportService: { PreviewSummaryVegetation() { throw new Error('Rendering must not replay a read'); } } },
-  }, { VITE_SUMMARY_VEGETATION: 'true' });
+  });
   const held = [];
   let body = render(panel, { props: { ...owner, onBusyChange: value => held.push(value) } }).body;
   assert.match(body, /10\.00/);

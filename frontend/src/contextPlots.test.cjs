@@ -56,7 +56,6 @@ test('context transitions reuse native close validation and preserve drafts unti
 
 test('verified external attachment defaults on and project choices visibly identify their files', () => {
   const root = read('App.svelte');
-  assert.match(root, /VITE_EXTERNAL_PROJECTS !== 'false'/);
   assert.match(root, /class="project-location"/);
   assert.match(root, /item\.name === project\.name/);
   assert.match(root, /\? project\.file : project\.path/);
